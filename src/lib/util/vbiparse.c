@@ -10,6 +10,8 @@
 ***************************************************************************/
 
 #include "osdcore.h"
+#include "vbiparse.h"
+#include <math.h>
 
 
 
@@ -31,7 +33,7 @@
     code from a line of video data
 -------------------------------------------------*/
 
-int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sourceshift, int expectedbits, UINT8 *result)
+int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sourceshift, int expectedbits, UINT32 *result)
 {
 	UINT8 srcabs[MAX_SOURCE_WIDTH];
 	UINT8 min, max, mid, srcabsval;
@@ -125,15 +127,36 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
 	/* now extract the bits */
 	for (x = 0; x < expectedbits; x++)
 	{
-		int leftbit = firstedge + ((double)x - 0.25) * bestclock;
-		int rightbit = firstedge + ((double)x + 0.25) * bestclock;
-		int left = srcabs[leftbit];
-		int right = srcabs[rightbit];
+		int leftstart = firstedge + ceil(((double)x - 0.5) * bestclock);
+//		int leftmid = firstedge + ((double)x - 0.25) * bestclock;
+		int leftend = firstedge + floor(((double)x - 0.0) * bestclock);
+		int rightstart = firstedge + ceil(((double)x + 0.0) * bestclock);
+//		int rightmid = firstedge + ((double)x + 0.25) * bestclock;
+		int rightend = firstedge + floor(((double)x + 0.5) * bestclock);
+		int leftavg, rightavg, leftabs, rightabs;
+		int confidence = 0;
+		int tx;
 
+		/* compute left and right average values */
+		leftavg = 0;
+		for (tx = leftstart; tx <= leftend; tx++)
+			leftavg += (UINT8)(source[tx] >> sourceshift) - mid;
+		leftabs = (leftavg >= 0);
+		leftavg = (leftavg < 0) ? -leftavg : leftavg;
+
+		rightavg = 0;
+		for (tx = rightstart; tx <= rightend; tx++)
+			rightavg += (UINT8)(source[tx] >> sourceshift) - mid;
+		rightabs = (rightavg >= 0);
+		rightavg = (rightavg < 0) ? -rightavg : rightavg;
+		
 		/* all bits should be marked by transitions; fail if we don't get one */
-		if (left == right)
+		if (leftabs == rightabs)
 			return 0;
-		result[x] = (left < right);
+		
+		/* store the bit and its confidence level */
+		confidence = leftavg + rightavg;
+		result[x] = (leftabs < rightabs) | (confidence << 1);
 	}
 	return expectedbits;
 }
@@ -165,4 +188,66 @@ int vbi_parse_white_flag(const UINT16 *source, int sourcewidth, int sourceshift)
 
 	/* if there's a spread of at least 0x20, and the average is above 3/4 of the center, call it good */
 	return (diff >= 0x20) && (avgval >= minval + 3 * diff / 4);
+}
+
+
+/*-------------------------------------------------
+    vbi_parse_all - parse everything from a video 
+    frame
+-------------------------------------------------*/
+
+void vbi_parse_all(const UINT16 *source, int sourcerowpixels, int sourcewidth, int sourceshift, vbi_metadata *vbi)
+{
+	UINT32 bits[2][24];
+	UINT8 bitnum;
+
+	/* first reset it all */
+	memset(vbi, 0, sizeof(*vbi));
+	
+	/* get the white flag */
+	vbi->white = vbi_parse_white_flag(source + 11 * sourcerowpixels, sourcewidth, sourceshift);
+	
+	/* parse line 16 */
+	if (vbi_parse_manchester_code(source + 16 * sourcerowpixels, sourcewidth, sourceshift, 24, bits[0]) == 24)
+		for (bitnum = 0; bitnum < 24; bitnum++)
+			vbi->line16 = (vbi->line16 << 1) | (bits[0][bitnum] & 1);
+
+	/* parse line 17 */
+	if (vbi_parse_manchester_code(source + 17 * sourcerowpixels, sourcewidth, sourceshift, 24, bits[0]) == 24)
+		for (bitnum = 0; bitnum < 24; bitnum++)
+			vbi->line17 = (vbi->line17 << 1) | (bits[0][bitnum] & 1);
+
+	/* parse line 18 */
+	if (vbi_parse_manchester_code(source + 18 * sourcerowpixels, sourcewidth, sourceshift, 24, bits[1]) == 24)
+		for (bitnum = 0; bitnum < 24; bitnum++)
+			vbi->line18 = (vbi->line18 << 1) | (bits[1][bitnum] & 1);
+
+	/* pick the best out of lines 17/18 */
+	/* if we only got one or the other, that's all we have */
+	if (vbi->line17 == 0)
+		vbi->line1718 = vbi->line18;
+	else if (vbi->line18 == 0)
+		vbi->line1718 = vbi->line17;
+	
+	/* if they agree, we're golden */
+	else if (vbi->line17 == vbi->line18)
+		vbi->line1718 = vbi->line17;
+	
+	/* if they don't agree, we have to pick one */
+	else
+	{
+		/* if both are frame numbers, and one is not valid BCD, pick the other */
+		if ((vbi->line17 & 0xf80000) == 0xf80000 && (vbi->line18 & 0xf80000) == 0xf80000)
+		{
+			if ((vbi->line17 & 0xf000) > 0x9000 || (vbi->line17 & 0xf00) > 0x900 || (vbi->line17 & 0xf0) > 0x90 || (vbi->line17 & 0xf) > 0x9)
+				vbi->line1718 = vbi->line18;
+			else if ((vbi->line18 & 0xf000) > 0x9000 || (vbi->line18 & 0xf00) > 0x900 || (vbi->line18 & 0xf0) > 0x90 || (vbi->line18 & 0xf) > 0x9)
+				vbi->line1718 = vbi->line17;
+		}
+
+		/* if still nothing, then scan through the bits and pick the ones with the most confidence */
+		if (vbi->line1718 == 0)
+			for (bitnum = 0; bitnum < 24; bitnum++)
+				vbi->line1718 = (vbi->line1718 << 1) | ((bits[0][bitnum] > bits[1][bitnum]) ? (bits[0][bitnum] & 1) : (bits[1][bitnum] & 1));
+	}
 }

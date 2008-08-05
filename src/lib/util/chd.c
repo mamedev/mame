@@ -831,33 +831,45 @@ core_file *chd_core_file(chd_file *chd)
 
 
 /*-------------------------------------------------
-    chd_multi_filename - compute the indexed CHD
-    filename
+    chd_error_string - return an error string for 
+    the given CHD error 
 -------------------------------------------------*/
 
-#ifdef UNUSED_FUNCTION
-void chd_multi_filename(const char *origname, char *finalname, int index)
+const char *chd_error_string(chd_error err)
 {
-	char *extension;
-	char findex[5];
-
-	/* copy the original name */
-	strcpy(finalname, origname);
-
-	/* determine the offset of the extension period */
-	extension = strchr(finalname, '.');
-	if (extension == NULL)
-		extension = finalname + strlen(finalname);
-
-	/* compute our extension */
-	sprintf(findex, ".%3d", index);
-	if (findex[1] == ' ')
-		findex[1] = 'c';
-	if (findex[2] == ' ')
-		findex[2] = 'h';
-	strcpy(extension, findex);
+	switch (err)
+	{
+		case CHDERR_NONE:						return "no error";
+		case CHDERR_NO_INTERFACE:				return "no drive interface";
+		case CHDERR_OUT_OF_MEMORY:				return "out of memory";
+		case CHDERR_INVALID_FILE:				return "invalid file";
+		case CHDERR_INVALID_PARAMETER:			return "invalid parameter";
+		case CHDERR_INVALID_DATA:				return "invalid data";
+		case CHDERR_FILE_NOT_FOUND:				return "file not found";
+		case CHDERR_REQUIRES_PARENT:			return "requires parent";
+		case CHDERR_FILE_NOT_WRITEABLE:			return "file not writeable";
+		case CHDERR_READ_ERROR:					return "read error";
+		case CHDERR_WRITE_ERROR:				return "write error";
+		case CHDERR_CODEC_ERROR:				return "codec error";
+		case CHDERR_INVALID_PARENT:				return "invalid parent";
+		case CHDERR_HUNK_OUT_OF_RANGE:			return "hunk out of range";
+		case CHDERR_DECOMPRESSION_ERROR:		return "decompression error";
+		case CHDERR_COMPRESSION_ERROR:			return "compression error";
+		case CHDERR_CANT_CREATE_FILE:			return "can't create file";
+		case CHDERR_CANT_VERIFY:				return "can't verify file";
+		case CHDERR_NOT_SUPPORTED:				return "operation not supported";
+		case CHDERR_METADATA_NOT_FOUND:			return "can't find metadata";
+		case CHDERR_INVALID_METADATA_SIZE:		return "invalid metadata size";
+		case CHDERR_UNSUPPORTED_VERSION:		return "unsupported CHD version";
+		case CHDERR_VERIFY_INCOMPLETE:			return "incomplete verify";
+		case CHDERR_INVALID_METADATA:			return "invalid metadata";
+		case CHDERR_INVALID_STATE:				return "invalid state";
+		case CHDERR_OPERATION_PENDING:			return "operation pending";
+		case CHDERR_NO_ASYNC_OPERATION:			return "no async operation in progress";
+		case CHDERR_UNSUPPORTED_FORMAT:			return "unsupported format";
+		default:								return "undocumented error";
+	}
 }
-#endif
 
 
 

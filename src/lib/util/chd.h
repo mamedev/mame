@@ -238,6 +238,9 @@ void chd_close(chd_file *chd);
 /* return the associated core_file */
 core_file *chd_core_file(chd_file *chd);
 
+/* return an error string for the given CHD error */
+const char *chd_error_string(chd_error err);
+
 
 
 /* ----- CHD header management ----- */

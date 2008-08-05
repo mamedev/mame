@@ -43,10 +43,11 @@ enum
 #define LASERDISC_OUTPUT_LINES		4
 
 /* laserdisc field codes */
-#define LASERDISC_CODE_WHITE_FLAG	0
-#define LASERDISC_CODE_LINE16		1
-#define LASERDISC_CODE_LINE17		2
-#define LASERDISC_CODE_LINE18		3
+#define LASERDISC_CODE_WHITE_FLAG	0			/* boolean white flag */
+#define LASERDISC_CODE_LINE16		1			/* 24-bit line 16 code */
+#define LASERDISC_CODE_LINE17		2			/* 24-bit line 17 code */
+#define LASERDISC_CODE_LINE18		3			/* 24-bit line 18 code */
+#define LASERDISC_CODE_LINE1718		4			/* 24-bit best of line 17/18 code */
 
 /* device configuration */
 enum

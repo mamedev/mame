@@ -197,17 +197,6 @@ struct _vp932_info
 };
 
 
-/* per-field metadata */
-typedef struct _field_metadata field_metadata;
-struct _field_metadata
-{
-	UINT8				whiteflag;				/* white flag */
-	UINT32				line16;					/* line 16 Philips code */
-	UINT32				line17;					/* line 17 Philips code */
-	UINT32				line18;					/* line 18 Philips code */
-};
-
-
 /* generic data */
 typedef struct _laserdisc_state laserdisc_state;
 struct _laserdisc_state
@@ -238,7 +227,7 @@ struct _laserdisc_state
 	int					samplerate;				/* playback samplerate */
 
 	/* metadata */
-	field_metadata		metadata[2];			/* metadata parsed from the stream, for each field */
+	vbi_metadata		metadata[2];			/* metadata parsed from the stream, for each field */
 	int					last_frame;				/* last seen frame number */
 	int					last_chapter;			/* last seen chapter number */
 
@@ -274,6 +263,7 @@ struct _laserdisc_state
 
 	/* debugging */
 	char				text[100];				/* buffer for the state */
+	UINT8				lastbackslash;			/* state of last backslash key check */
 
 	/* filled in by player-specific init */
 	void 				(*writedata)(laserdisc_state *ld, UINT8 prev, UINT8 new); /* write callback */
@@ -312,8 +302,8 @@ struct _sound_token
 static int update_position(laserdisc_state *ld);
 static void read_track_data(laserdisc_state *ld);
 static void process_track_data(const device_config *device);
-static void parse_metadata(const UINT16 *videodata, UINT32 rowpixels, UINT32 width, UINT32 track, UINT8 which, field_metadata *metadata);
-static void fake_metadata(UINT32 track, UINT8 which, field_metadata *metadata);
+static void fake_metadata(UINT32 track, UINT8 which, vbi_metadata *metadata);
+static void render_display(UINT16 *videodata, UINT32 rowpixels, UINT32 width, int frame);
 static void *custom_start(int clock, const struct CustomSound_interface *config);
 static void custom_stream_callback(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
@@ -364,6 +354,100 @@ static void vp932_state_changed(laserdisc_state *ld, UINT8 oldstate);
 const struct CustomSound_interface laserdisc_custom_interface =
 {
 	custom_start
+};
+
+static const UINT8 numberfont[10][8] =
+{
+	{
+		0x30,	// ..xx....
+		0x48,	// .x..x...
+		0x84,	// x....x..
+		0x84,	// x....x..
+		0x84,	// x....x..
+		0x48,	// .x..x...
+		0x30	// ..xx....
+	},
+	{
+		0x10,	// ...x....
+		0x30,	// ..xx....
+		0x50,	// .x.x....
+		0x10,	// ...x....
+		0x10,	// ...x....
+		0x10,	// ...x....
+		0x7c	// .xxxxx..
+	},
+	{
+		0x78,	// .xxxx...
+		0x84,	// x....x..
+		0x04,	// .....x..
+		0x38,	// ..xxx...
+		0x40,	// .x......
+		0x80,	// x.......
+		0xfc	// xxxxxx..
+	},
+	{
+		0x78,	// .xxxx...
+		0x84,	// x....x..
+		0x04,	// .....x..
+		0x38,	// ..xxx...
+		0x04,	// .....x..
+		0x84,	// x....x..
+		0x78	// .xxxx...
+	},
+	{
+		0x08,	// ....x...
+		0x18,	// ...xx...
+		0x28,	// ..x.x...
+		0x48,	// .x..x...
+		0xfc,	// xxxxxx..
+		0x08,	// ....x...
+		0x08	// ....x...
+	},
+	{
+		0xfc,	// xxxxxx..
+		0x80,	// x.......
+		0x80,	// x.......
+		0xf8,	// xxxxx...
+		0x04,	// .....x..
+		0x84,	// x....x..
+		0x78	// .xxxx...
+	},
+	{
+		0x38,	// ..xxx...
+		0x40,	// .x......
+		0x80,	// x.......
+		0xf8,	// xxxxx...
+		0x84,	// x....x..
+		0x84,	// x....x..
+		0x78	// .xxxx...
+	},
+	{
+		0xfc,	// xxxxxx..
+		0x04,	// .....x..
+		0x08,	// ....x...
+		0x10,	// ...x....
+		0x20,	// ..x.....
+		0x20,	// ..x.....
+		0x20	// ..x.....
+	},
+	{
+		0x78,	// .xxxx...
+		0x84,	// x....x..
+		0x84,	// x....x..
+		0x78,	// .xxxx...
+		0x84,	// x....x..
+		0x84,	// x....x..
+		0x78	// .xxxx...
+	},
+	{
+		0x78,	// .xxxx..
+		0x84,	// x....x.
+		0x84,	// x....x.
+		0x7c,	// .xxxxx.
+		0x04,	// .....x.
+		0x08,	// ....x..
+		0x70,	// .xxx...
+	}
 };
 
 
@@ -607,17 +691,15 @@ INLINE int add_to_current_track(laserdisc_state *ld, INT32 delta)
     encoded in the metadata, if present, or -1
 -------------------------------------------------*/
 
-INLINE int frame_from_metadata(const field_metadata *metadata)
+INLINE int frame_from_metadata(const vbi_metadata *metadata)
 {
 	UINT32 data;
 
-	if ((metadata->line17 & 0xf80000) == 0xf80000)
-		data = metadata->line17 & 0x7ffff;
-	else if ((metadata->line18 & 0xf80000) == 0xf80000)
-		data = metadata->line18 & 0x7ffff;
-	else if (metadata->line17 == 0x88ffff || metadata->line18 == 0x88ffff)
+	if ((metadata->line1718 & 0xf80000) == 0xf80000)
+		data = metadata->line1718 & 0x7ffff;
+	else if (metadata->line1718 == 0x88ffff)
 		return 0;
-	else if (metadata->line17 == 0x80eeee || metadata->line18 == 0x80eeee)
+	else if (metadata->line1718 == 0x80eeee)
 		return 99999;
 	else
 		return -1;
@@ -632,14 +714,12 @@ INLINE int frame_from_metadata(const field_metadata *metadata)
     or -1
 -------------------------------------------------*/
 
-INLINE int chapter_from_metadata(const field_metadata *metadata)
+INLINE int chapter_from_metadata(const vbi_metadata *metadata)
 {
 	UINT32 data;
 
-	if ((metadata->line17 & 0xf00fff) == 0x800ddd)
-		data = metadata->line17 & 0x7f000;
-	else if ((metadata->line18 & 0xf00fff) == 0x800ddd)
-		data = metadata->line18 & 0x7f000;
+	if ((metadata->line1718 & 0xf00fff) == 0x800ddd)
+		data = metadata->line1718 & 0x7f000;
 	else
 		return -1;
 
@@ -709,6 +789,13 @@ void laserdisc_vsync(const device_config *device)
 	laserdisc_state *ld = get_safe_token(device);
 	UINT8 origstate = ld->state;
 	UINT8 hittarget;
+	int backslash;
+	
+	/* allow the backslash key to toggle the frame display */
+	backslash = input_code_pressed(KEYCODE_BACKSLASH);
+	if (!ld->lastbackslash && backslash)
+		ld->display ^= 1;
+	ld->lastbackslash = backslash;
 
 	/* remember the time */
 	ld->lastvsynctime = timer_get_time();
@@ -988,7 +1075,7 @@ UINT32 laserdisc_get_field_code(const device_config *device, UINT8 code)
 	switch (code)
 	{
 		case LASERDISC_CODE_WHITE_FLAG:
-			return ld->metadata[field].whiteflag;
+			return ld->metadata[field].white;
 
 		case LASERDISC_CODE_LINE16:
 			return ld->metadata[field].line16;
@@ -1057,7 +1144,7 @@ static int update_position(laserdisc_state *ld)
 		LOG_POSITION(("%d:track=%5d frame=%5d target=%5d ... ", fieldnum, tracknum, frame, ld->targetframe));
 
 		/* if we hit the first field of our frame, we're done */
-		if (ld->last_frame == ld->targetframe && frame_from_metadata(&ld->metadata[fieldnum ^ 1]) == ld->targetframe && ld->metadata[fieldnum ^ 1].whiteflag)
+		if (ld->last_frame == ld->targetframe && frame_from_metadata(&ld->metadata[fieldnum ^ 1]) == ld->targetframe && ld->metadata[fieldnum ^ 1].white)
 		{
 			ld->curfractrack = INT_TO_FRAC(tracknum);
 			LOG_POSITION(("hit target\n"));
@@ -1180,7 +1267,7 @@ static void read_track_data(laserdisc_state *ld)
 	ld->avconfig.audio_xor = BYTE_XOR_BE(0);
 	
 	/* if the previous field had the white flag, force the new field to pair with it */
-	if (ld->metadata[fieldnum ^ 1].whiteflag)
+	if (ld->metadata[fieldnum ^ 1].white)
 		ld->videofields[ld->videoindex] = 1;
 	
 	/* if we already have both fields on the current videoindex, advance */
@@ -1241,10 +1328,10 @@ static void process_track_data(const device_config *device)
 
 	/* parse the metadata */
 	if (ld->disc != NULL && ld->avconfig.video_buffer != NULL)
-		parse_metadata((const UINT16 *)ld->avconfig.video_buffer, ld->avconfig.video_stride / 2, ld->videoframe[0]->width, tracknum, fieldnum, &ld->metadata[fieldnum]);
+		vbi_parse_all((const UINT16 *)ld->avconfig.video_buffer, ld->avconfig.video_stride / 2, ld->videoframe[0]->width, 8, &ld->metadata[fieldnum]);
 	else
 		fake_metadata(tracknum, fieldnum, &ld->metadata[fieldnum]);
-	printf("Track %5d: Metadata = %d %08X %08X %08X\n", tracknum, ld->metadata[fieldnum].whiteflag, ld->metadata[fieldnum].line16, ld->metadata[fieldnum].line17, ld->metadata[fieldnum].line18);
+//	printf("Track %5d: Metadata = %d %08X %08X %08X %08X\n", tracknum, ld->metadata[fieldnum].white, ld->metadata[fieldnum].line16, ld->metadata[fieldnum].line17, ld->metadata[fieldnum].line18, ld->metadata[fieldnum].line1718);
 
 	/* update the last seen frame and chapter */
 	frame = frame_from_metadata(&ld->metadata[fieldnum]);
@@ -1253,6 +1340,10 @@ static void process_track_data(const device_config *device)
 	chapter = chapter_from_metadata(&ld->metadata[fieldnum]);
 	if (chapter != -1)
 		ld->last_chapter = chapter;
+
+	/* render the display if present */
+	if (ld->display)
+		render_display((UINT16 *)ld->avconfig.video_buffer, ld->avconfig.video_stride / 2, ld->videoframe[0]->width, ld->last_frame);
 
 	/* update video ld */
 	if (rawdata != NULL && (ld->avconfig.decode_mask & AVCOMP_DECODE_VIDEO))
@@ -1309,44 +1400,15 @@ static void process_track_data(const device_config *device)
 
 
 /*-------------------------------------------------
-    parse_metadata - parse raw metadata into
-    something more useful
--------------------------------------------------*/
-
-static void parse_metadata(const UINT16 *videodata, UINT32 rowpixels, UINT32 width, UINT32 track, UINT8 which, field_metadata *metadata)
-{
-	UINT8 bits[24];
-	UINT8 bitnum;
-	
-	metadata->whiteflag = vbi_parse_white_flag(videodata + 11 * rowpixels, width, 8);
-
-	metadata->line16 = 0;
-	if (vbi_parse_manchester_code(videodata + 16 * rowpixels, width, 8, 24, bits) == 24)
-		for (bitnum = 0; bitnum < 24; bitnum++)
-			metadata->line16 = (metadata->line16 << 1) | bits[bitnum];
-
-	metadata->line17 = 0;
-	if (vbi_parse_manchester_code(videodata + 17 * rowpixels, width, 8, 24, bits) == 24)
-		for (bitnum = 0; bitnum < 24; bitnum++)
-			metadata->line17 = (metadata->line17 << 1) | bits[bitnum];
-
-	metadata->line18 = 0;
-	if (vbi_parse_manchester_code(videodata + 18 * rowpixels, width, 8, 24, bits) == 24)
-		for (bitnum = 0; bitnum < 24; bitnum++)
-			metadata->line18 = (metadata->line18 << 1) | bits[bitnum];
-}
-
-
-/*-------------------------------------------------
     fake_metadata - fake metadata when there's
 	no disc present
 -------------------------------------------------*/
 
-static void fake_metadata(UINT32 track, UINT8 which, field_metadata *metadata)
+static void fake_metadata(UINT32 track, UINT8 which, vbi_metadata *metadata)
 {
 	if (which == 0)
 	{
-		metadata->whiteflag = 1;
+		metadata->white = 1;
 		metadata->line16 = 0;
 		metadata->line17 = metadata->line18 = 0xf80000 | 
 				(((track / 10000) % 10) << 16) |
@@ -1357,6 +1419,63 @@ static void fake_metadata(UINT32 track, UINT8 which, field_metadata *metadata)
 	}
 	else
 		memset(metadata, 0, sizeof(*metadata));
+}
+
+
+/*-------------------------------------------------
+    render_display - draw the frame display
+-------------------------------------------------*/
+
+static void render_display(UINT16 *videodata, UINT32 rowpixels, UINT32 width, int frame)
+{
+	const int xscale = 4, yscale = 2;
+	char buffer[10];
+	int x = width / 10;
+	int y = 50;
+	int ch;
+	int delta;
+	
+	/* do nothing if no data */
+	if (videodata == NULL)
+		return;
+
+	/* convert to a character string and render */
+	sprintf(buffer, "%5d", frame);
+	
+	/* iterate over 5 positions: (-1,-1), (-1,1), (1,-1), (1,1) and (0,0) */
+	/* render all in black except the last one */
+	for (delta = 0; delta < 5; delta++)
+	{
+		int color = (delta < 4) ? 0x0080 : 0xff80;
+		int dx = (delta < 4) ? ((delta & 1) ? -1 : 1) : 0;
+		int dy = (delta < 4) ? ((delta & 2) ? -1 : 1) : 0;
+		
+		/* iterate over 5 characters */
+		for (ch = 0; ch < 5; ch++)
+			if (buffer[ch] >= '0' && buffer[ch] <= '9')
+			{
+				const UINT8 *fontdata = &numberfont[buffer[ch] - '0'][0];
+				int cy, cx;
+				
+				/* iterate over the rows of the character */
+				for (cy = 0; cy < 8; cy++)
+				{
+					UINT8 bits = *fontdata++;
+					
+					/* and over the columns */
+					for (cx = 0; cx < 8; cx++)
+						if (bits & (0x80 >> cx))
+						{
+							int ix, iy;
+							
+							/* fill in an xscale x yscale pixel */
+							for (iy = 0; iy < yscale; iy++)
+								for (ix = 0; ix < xscale; ix++)
+									videodata[(y + cy * yscale + iy + dy) * rowpixels + (x + (ch * 9 + cx) * xscale + ix + dx)] = color;
+						}
+				}
+			}
+	}
 }
 
 

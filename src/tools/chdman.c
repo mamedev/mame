@@ -32,6 +32,21 @@
 #define OPERATION_MERGE			1
 #define OPERATION_CHOMP			2
 
+#ifdef PTR64
+#define IS_FAKE_AVI_FILE(a)		((UINT64)(a) <= 2)
+#else
+#define IS_FAKE_AVI_FILE(a)		((UINT32)(a) <= 2)
+#endif
+#define AVI_FAKE_FILE_22		((avi_file *)1)
+#define AVI_FAKE_FILE_32		((avi_file *)2)
+
+#define AVI_FAKE_FRAMERATE		29970000
+#define AVI_FAKE_FRAMES			54004
+#define AVI_FAKE_WIDTH			720
+#define AVI_FAKE_HEIGHT			524
+#define AVI_FAKE_CHANNELS		2
+#define AVI_FAKE_SAMPLERATE		48000
+
 
 
 /***************************************************************************
@@ -58,33 +73,6 @@ static chd_error chdman_compress_chd(chd_file *chd, chd_file *source, UINT32 tot
 /***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
-
-static const char *const error_strings[] =
-{
-	"no error",
-	"no drive interface",
-	"out of memory",
-	"invalid file",
-	"invalid parameter",
-	"invalid data",
-	"file not found",
-	"requires parent",
-	"file not writeable",
-	"read error",
-	"write error",
-	"codec error",
-	"invalid parent",
-	"hunk out of range",
-	"decompression error",
-	"compression error",
-	"can't create file",
-	"can't verify file",
-	"operation not supported",
-	"can't find metadata",
-	"invalid metadata size",
-	"unsupported CHD version",
-	"incomplete verify"
-};
 
 static clock_t lastprogress = 0;
 
@@ -161,22 +149,6 @@ static void ATTR_PRINTF(2,3) progress(int forceit, const char *fmt, ...)
 	vprintf(fmt, arg);
 	fflush(stdout);
 	va_end(arg);
-}
-
-
-/*-------------------------------------------------
-    error_string - return an error sting
--------------------------------------------------*/
-
-static const char *error_string(int err)
-{
-	static char temp_buffer[100];
-
-	if (err < sizeof(error_strings) / sizeof(error_strings[0]))
-		return error_strings[err];
-
-	sprintf(temp_buffer, "unknown error %d", err);
-	return temp_buffer;
 }
 
 
@@ -332,7 +304,7 @@ static int do_createhd(int argc, char *argv[], int param)
 	err = chd_create(outputfile, (UINT64)totalsectors * (UINT64)sectorsize, hunksize, CHDCOMPRESSION_ZLIB_PLUS, NULL);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error creating CHD file: %s\n", error_string(err));
+		fprintf(stderr, "Error creating CHD file: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -340,7 +312,7 @@ static int do_createhd(int argc, char *argv[], int param)
 	err = chd_open(outputfile, CHD_OPEN_READWRITE, NULL, &chd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error opening new CHD file: %s\n", error_string(err));
+		fprintf(stderr, "Error opening new CHD file: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -349,14 +321,14 @@ static int do_createhd(int argc, char *argv[], int param)
 	err = chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error adding hard disk metadata: %s\n", error_string(err));
+		fprintf(stderr, "Error adding hard disk metadata: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
 	/* compress the hard drive */
 	err = chdman_compress_file(chd, inputfile, offset);
 	if (err != CHDERR_NONE)
-		fprintf(stderr, "Error during compression: %s\n", error_string(err));
+		fprintf(stderr, "Error during compression: %s\n", chd_error_string(err));
 
 cleanup:
 	/* close everything down */
@@ -403,7 +375,7 @@ static int do_createraw(int argc, char *argv[], int param)
 	err = chd_create(outputfile, logicalbytes, hunksize, CHDCOMPRESSION_ZLIB_PLUS, NULL);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error creating CHD file: %s\n", error_string(err));
+		fprintf(stderr, "Error creating CHD file: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -411,14 +383,14 @@ static int do_createraw(int argc, char *argv[], int param)
 	err = chd_open(outputfile, CHD_OPEN_READWRITE, NULL, &chd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error opening new CHD file: %s\n", error_string(err));
+		fprintf(stderr, "Error opening new CHD file: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
 	/* compress the CHD */
 	err = chdman_compress_file(chd, inputfile, offset);
 	if (err != CHDERR_NONE)
-		fprintf(stderr, "Error during compression: %s\n", error_string(err));
+		fprintf(stderr, "Error during compression: %s\n", chd_error_string(err));
 
 cleanup:
 	/* close everything down */
@@ -474,7 +446,7 @@ static int do_createcd(int argc, char *argv[], int param)
 	err = chdcd_parse_toc(inputfile, &toc, &track_info);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error reading input file: %s\n", error_string(err));
+		fprintf(stderr, "Error reading input file: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -498,7 +470,7 @@ static int do_createcd(int argc, char *argv[], int param)
 	err = chd_create(outputfile, (UINT64)totalsectors * (UINT64)sectorsize, hunksize, CHDCOMPRESSION_ZLIB_PLUS, NULL);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error creating CHD file: %s\n", error_string(err));
+		fprintf(stderr, "Error creating CHD file: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -506,7 +478,7 @@ static int do_createcd(int argc, char *argv[], int param)
 	err = chd_open(outputfile, CHD_OPEN_READWRITE, NULL, &chd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error opening new CHD file: %s\n", error_string(err));
+		fprintf(stderr, "Error opening new CHD file: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -520,7 +492,7 @@ static int do_createcd(int argc, char *argv[], int param)
 		err = chd_set_metadata(chd, CDROM_TRACK_METADATA_TAG, i, metadata, strlen(metadata) + 1);
 		if (err != CHDERR_NONE)
 		{
-			fprintf(stderr, "Error adding CD-ROM metadata: %s\n", error_string(err));
+			fprintf(stderr, "Error adding CD-ROM metadata: %s\n", chd_error_string(err));
 			goto cleanup;
 		}
 	}
@@ -529,7 +501,7 @@ static int do_createcd(int argc, char *argv[], int param)
 	err = chd_compress_begin(chd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error compressing: %s\n", error_string(err));
+		fprintf(stderr, "Error compressing: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -595,7 +567,7 @@ static int do_createcd(int argc, char *argv[], int param)
 			err = chd_compress_hunk(chd, cache, &ratio);
 			if (err != CHDERR_NONE)
 			{
-				fprintf(stderr, "Error during compression: %s\n", error_string(err));
+				fprintf(stderr, "Error during compression: %s\n", chd_error_string(err));
 				goto cleanup;
 			}
 		}
@@ -608,7 +580,7 @@ static int do_createcd(int argc, char *argv[], int param)
 	/* cleanup */
 	err = chd_compress_finish(chd);
 	if (err != CHDERR_NONE)
-		fprintf(stderr, "Error during compression finalization: %s\n", error_string(err));
+		fprintf(stderr, "Error during compression finalization: %s\n", chd_error_string(err));
 	else
 		progress(TRUE, "Compression complete ... final ratio = %d%%            \n", (int)(100.0 * ratio));
 
@@ -691,7 +663,7 @@ static avi_error read_avi_frame(avi_file *avi, UINT32 framenum, UINT8 *cache, bi
 	/* loop over the data and copy it to the cache */
 	for (y = framenum % interlace_factor; y < info->video_height; y += interlace_factor)
 	{
-		UINT16 *source = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
+		UINT16 *source = BITMAP_ADDR16(bitmap, y, 0);
 
 		for (x = 0; x < info->video_width; x++)
 		{
@@ -708,6 +680,161 @@ static avi_error read_avi_frame(avi_file *avi, UINT32 framenum, UINT8 *cache, bi
 cleanup:
 	free(temp);
 	return avierr;
+}
+
+
+/*-------------------------------------------------
+    fake_avi_frame - fake an AVI frame
+-------------------------------------------------*/
+
+static avi_error fake_avi_frame(avi_file *avi, UINT32 framenum, UINT8 *cache, bitmap_t *bitmap, int interlaced, UINT32 hunkbytes)
+{
+	static int framecounter = 0;
+	int leftsamp = (framenum % 200 < 10) ? 10000 : 0;
+	int rightsamp = (framenum % 200 >= 100 && framenum % 200 < 110) ? 10000 : 0;
+	int interlace_factor = interlaced ? 2 : 1;
+	UINT32 first_sample, num_samples;
+	int chnum, sampnum, x, y;
+	int whiteflag, line1718;
+	UINT8 *dest = cache;
+	INT16 *temp;
+	
+	/* reset framecounter to 1 on frame 0 */
+	if (framenum == 0)
+		framecounter = 1;
+
+	/* compute the number of samples in this frame */
+	first_sample = ((UINT64)AVI_FAKE_SAMPLERATE * (UINT64)framenum * (UINT64)1000000 + AVI_FAKE_FRAMERATE - 1) / AVI_FAKE_FRAMERATE;
+	num_samples = ((UINT64)AVI_FAKE_SAMPLERATE * (UINT64)(framenum + 1) * (UINT64)1000000 + AVI_FAKE_FRAMERATE - 1) / AVI_FAKE_FRAMERATE - first_sample;
+	if (interlaced)
+	{
+		if (framenum % 2 == 0)
+			num_samples = (num_samples + 1) / 2;
+		else
+		{
+			first_sample += (num_samples + 1) / 2;
+			num_samples -= (num_samples + 1) / 2;
+		}
+	}
+
+	/* allocate a temporary buffer */
+	temp = malloc(num_samples * 2);
+	if (temp == NULL)
+		return AVIERR_NO_MEMORY;
+
+	/* update the header with the actual number of samples in the frame */
+	dest[6] = num_samples >> 8;
+	dest[7] = num_samples;
+	dest += 12 + dest[4];
+
+	/* loop over channels and read the samples */
+	for (chnum = 0; chnum < AVI_FAKE_CHANNELS; chnum++)
+	{
+		int modcheck = AVI_FAKE_SAMPLERATE / ((chnum == 0) ? 110 : 220);
+		int samp = (chnum == 0) ? leftsamp : rightsamp;
+		
+		/* store them big endian at the destination */
+		for (sampnum = 0; sampnum < num_samples; sampnum++)
+		{
+			INT16 sample = ((first_sample + sampnum) % modcheck < modcheck / 2) ? samp : -samp;
+			*dest++ = sample >> 8;
+			*dest++ = sample;
+		}
+	}
+	
+	/* determine what metadata we should generate */
+	whiteflag = line1718 = 0;
+	if (framenum < 2)
+	{
+		whiteflag = (framenum == 0);
+		line1718 = 0x88ffff;
+	}
+	else if (framenum >= AVI_FAKE_FRAMES * 2 - 2)
+	{
+		whiteflag = (framenum == AVI_FAKE_FRAMES * 2 - 2);
+		line1718 = 0x80eeee;
+	}
+	else
+	{
+		int effnum = framenum - 2;
+		if (avi == AVI_FAKE_FILE_22 && effnum % 2 == 0)
+			whiteflag = 1;
+		else if (avi == AVI_FAKE_FILE_32 && (effnum % 5 == 0 || effnum % 5 == 2))
+			whiteflag = 1;
+		if (whiteflag)
+		{
+			line1718 = 0xf80000 | (((framecounter / 10000) % 10) << 16) | (((framecounter / 1000) % 10) << 12) |
+						(((framecounter / 100) % 10) << 8) | (((framecounter / 10) % 10) << 4) | (framecounter % 10);
+			framecounter++;
+		}
+	}
+
+	/* loop over the data and copy it to the cache */
+	for (y = framenum % interlace_factor; y < AVI_FAKE_HEIGHT; y += interlace_factor)
+	{
+		int effy = y / interlace_factor;
+		
+		/* white flag? */
+		if (effy == 11 && whiteflag)
+		{
+			for (x = 0; x < AVI_FAKE_WIDTH; x++)
+			{
+				UINT16 pixel = (x > 10 && x < AVI_FAKE_WIDTH - 10) ? 0xff80 : 0x0080;
+				*dest++ = pixel;
+				*dest++ = pixel >> 8;
+			}
+		}
+		
+		/* line 17/18 */
+		else if ((effy == 17 || effy == 18) && line1718 != 0)
+		{
+			for (x = 0; x < AVI_FAKE_WIDTH; x++)
+			{
+				UINT16 pixel = 0x0080;
+				if (x >= 20)
+				{
+					int bitnum = (x - 20) / 28;
+					if (bitnum < 24)
+					{
+						int bithalf = (x - (bitnum * 28 + 20)) / 14;
+						if ((line1718 << bitnum) & 0x800000) bithalf ^= 1;
+						pixel = bithalf ? 0x0080 : 0xff80;
+					}
+				}
+				*dest++ = pixel;
+				*dest++ = pixel >> 8;
+			}
+		}
+		
+		/* anything else in VBI-land */
+		else if (effy < 22)
+		{
+			for (x = 0; x < AVI_FAKE_WIDTH; x++)
+			{
+				UINT16 pixel = 0x0080;
+				*dest++ = pixel;
+				*dest++ = pixel >> 8;
+			}
+		}
+		
+		/* everything else */
+		else
+		{
+			for (x = 0; x < AVI_FAKE_WIDTH; x++)
+			{
+				UINT16 pixel = framenum;
+				*dest++ = pixel;
+				*dest++ = pixel >> 8;
+			}
+		}
+	}
+
+	/* fill the rest with 0 */
+	while (dest < &cache[hunkbytes])
+		*dest++ = 0;
+
+	free(temp);
+	return AVIERR_NONE;
 }
 
 
@@ -746,26 +873,44 @@ static int do_createav(int argc, char *argv[], int param)
 	/* print some info */
 	printf("Input file:   %s\n", inputfile);
 	printf("Output file:  %s\n", outputfile);
-
-	/* open the source file */
-	avierr = avi_open(inputfile, &avi);
-	if (avierr != AVIERR_NONE)
+	
+	/* special AVI files */
+	if (strcmp(inputfile, "2:2") == 0 || strcmp(inputfile, "3:2") == 0)
 	{
-		fprintf(stderr, "Error opening AVI file: %s\n", avi_error_string(avierr));
-		err = CHDERR_INVALID_FILE;
-		goto cleanup;
-	}
+		/* create a fake handle */
+		avi = (strcmp(inputfile, "2:2") == 0) ? AVI_FAKE_FILE_22 : AVI_FAKE_FILE_32;
 
-	/* get the movie information */
-	info = avi_get_movie_info(avi);
-	fps_times_1million = (UINT64)info->video_timescale * 1000000 / info->video_sampletime;
-	width = info->video_width;
-	height = info->video_height;
-	interlaced = ((fps_times_1million / 1000000) <= 30) && (height % 2 == 0) && (height > 288);
-	channels = info->audio_channels;
-	rate = info->audio_samplerate;
-	totalframes = info->video_numsamples;
-	numframes = MIN(totalframes - firstframe, numframes);
+		/* fake the movie information */
+		fps_times_1million = AVI_FAKE_FRAMERATE;
+		width = AVI_FAKE_WIDTH;
+		height = AVI_FAKE_HEIGHT;
+		interlaced = TRUE;
+		channels = 2;
+		rate = AVI_FAKE_SAMPLERATE;
+		totalframes = AVI_FAKE_FRAMES;
+	}
+	else
+	{
+		/* open the source file */
+		avierr = avi_open(inputfile, &avi);
+		if (avierr != AVIERR_NONE)
+		{
+			fprintf(stderr, "Error opening AVI file: %s\n", avi_error_string(avierr));
+			err = CHDERR_INVALID_FILE;
+			goto cleanup;
+		}
+
+		/* get the movie information */
+		info = avi_get_movie_info(avi);
+		fps_times_1million = (UINT64)info->video_timescale * 1000000 / info->video_sampletime;
+		width = info->video_width;
+		height = info->video_height;
+		interlaced = ((fps_times_1million / 1000000) <= 30) && (height % 2 == 0) && (height > 288);
+		channels = info->audio_channels;
+		rate = info->audio_samplerate;
+		totalframes = info->video_numsamples;
+	}
+  	numframes = MIN(totalframes - firstframe, numframes);
 
 	/* allocate a video buffer */
 	videobitmap.base = malloc(width * height * 2);
@@ -809,7 +954,7 @@ static int do_createav(int argc, char *argv[], int param)
 	err = chd_create(outputfile, (UINT64)numframes * (UINT64)bytes_per_frame, bytes_per_frame, CHDCOMPRESSION_AV, NULL);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error creating CHD file: %s\n", error_string(err));
+		fprintf(stderr, "Error creating CHD file: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -817,7 +962,7 @@ static int do_createav(int argc, char *argv[], int param)
 	err = chd_open(outputfile, CHD_OPEN_READWRITE, NULL, &chd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error opening new CHD file: %s\n", error_string(err));
+		fprintf(stderr, "Error opening new CHD file: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 	header = chd_get_header(chd);
@@ -827,7 +972,7 @@ static int do_createav(int argc, char *argv[], int param)
 	err = chd_set_metadata(chd, AV_METADATA_TAG, 0, metadata, strlen(metadata) + 1);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error adding AV metadata: %s\n", error_string(err));
+		fprintf(stderr, "Error adding AV metadata: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -866,7 +1011,10 @@ static int do_createav(int argc, char *argv[], int param)
 		progress(framenum == 0, "Compressing hunk %d/%d... (ratio=%d%%)  \r", framenum, header->totalhunks, (int)(100.0 * ratio));
 
 		/* read the frame into its proper format in the cache */
-		avierr = read_avi_frame(avi, firstframe + framenum, cache, &videobitmap, interlaced, bytes_per_frame);
+		if (IS_FAKE_AVI_FILE(avi))
+			avierr = fake_avi_frame(avi, firstframe + framenum, cache, &videobitmap, interlaced, bytes_per_frame);
+		else
+			avierr = read_avi_frame(avi, firstframe + framenum, cache, &videobitmap, interlaced, bytes_per_frame);
 		if (avierr != AVIERR_NONE)
 		{
 			fprintf(stderr, "Error reading frame %d from AVI file: %s\n", firstframe + framenum, avi_error_string(avierr));
@@ -888,7 +1036,7 @@ static int do_createav(int argc, char *argv[], int param)
 
 cleanup:
 	/* close everything down */
-	if (avi != NULL)
+	if (avi != NULL && !IS_FAKE_AVI_FILE(avi))
 		avi_close(avi);
 	if (chd != NULL)
 		chd_close(chd);
@@ -943,7 +1091,7 @@ static int do_createblankhd(int argc, char *argv[], int param)
 	err = chd_create(outputfile, (UINT64)totalsectors * (UINT64)sectorsize, hunksize, CHDCOMPRESSION_NONE, NULL);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error creating CHD file: %s\n", error_string(err));
+		fprintf(stderr, "Error creating CHD file: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -951,7 +1099,7 @@ static int do_createblankhd(int argc, char *argv[], int param)
 	err = chd_open(outputfile, CHD_OPEN_READWRITE, NULL, &chd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error opening new CHD file: %s\n", error_string(err));
+		fprintf(stderr, "Error opening new CHD file: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -960,7 +1108,7 @@ static int do_createblankhd(int argc, char *argv[], int param)
 	err = chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error adding hard disk metadata: %s\n", error_string(err));
+		fprintf(stderr, "Error adding hard disk metadata: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -984,7 +1132,7 @@ static int do_createblankhd(int argc, char *argv[], int param)
 		err = chd_write(chd, hunknum, cache);
 		if (err != CHDERR_NONE)
 		{
-			fprintf(stderr, "Error writing CHD file: %s\n", error_string(err));
+			fprintf(stderr, "Error writing CHD file: %s\n", chd_error_string(err));
 			goto cleanup;
 		}
 	}
@@ -1033,7 +1181,7 @@ static int do_copydata(int argc, char *argv[], int param)
 	err = chd_open(inputfile, CHD_OPEN_READ, NULL, &inputchd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error opening src CHD file: %s\n", error_string(err));
+		fprintf(stderr, "Error opening src CHD file: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -1041,14 +1189,14 @@ static int do_copydata(int argc, char *argv[], int param)
 	err = chd_open(outputfile, CHD_OPEN_READWRITE, NULL, &outputchd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error opening dest CHD file: %s\n", error_string(err));
+		fprintf(stderr, "Error opening dest CHD file: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
 	/* compress the source into the dest */
 	err = chdman_compress_chd(outputchd, inputchd, 0);
 	if (err != CHDERR_NONE)
-		fprintf(stderr, "Error during compression: %s\n", error_string(err));
+		fprintf(stderr, "Error during compression: %s\n", chd_error_string(err));
 
 cleanup:
 	/* close everything down */
@@ -1095,7 +1243,7 @@ static int do_extract(int argc, char *argv[], int param)
 	err = chd_open(inputfile, CHD_OPEN_READ, NULL, &infile);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error opening CHD file '%s': %s\n", inputfile, error_string(err));
+		fprintf(stderr, "Error opening CHD file '%s': %s\n", inputfile, chd_error_string(err));
 		goto cleanup;
 	}
 	header = chd_get_header(infile);
@@ -1131,7 +1279,7 @@ static int do_extract(int argc, char *argv[], int param)
 		err = chd_read(infile, hunknum, hunk);
 		if (err != CHDERR_NONE)
 		{
-			fprintf(stderr, "Error reading hunk %d from CHD file: %s\n", hunknum, error_string(err));
+			fprintf(stderr, "Error reading hunk %d from CHD file: %s\n", hunknum, chd_error_string(err));
 			goto cleanup;
 		}
 
@@ -1141,7 +1289,7 @@ static int do_extract(int argc, char *argv[], int param)
 		byteswritten = core_fwrite(outfile, hunk, bytes_to_write);
 		if (byteswritten != bytes_to_write)
 		{
-			fprintf(stderr, "Error writing hunk %d to output file: %s\n", hunknum, error_string(CHDERR_WRITE_ERROR));
+			fprintf(stderr, "Error writing hunk %d to output file: %s\n", hunknum, chd_error_string(CHDERR_WRITE_ERROR));
 			err = CHDERR_WRITE_ERROR;
 			goto cleanup;
 		}
@@ -1197,7 +1345,7 @@ static int do_extractcd(int argc, char *argv[], int param)
 	err = chd_open(inputfile, CHD_OPEN_READ, NULL, &inputchd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error opening CHD file '%s': %s\n", inputfile, error_string(err));
+		fprintf(stderr, "Error opening CHD file '%s': %s\n", inputfile, chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -1299,7 +1447,7 @@ static int do_extractcd(int argc, char *argv[], int param)
 			byteswritten = core_fwrite(outfile2, sector, toc->tracks[track].datasize);
 			if (byteswritten != toc->tracks[track].datasize)
 			{
-				fprintf(stderr, "Error writing frame %d to output file: %s\n", frame, error_string(CHDERR_WRITE_ERROR));
+				fprintf(stderr, "Error writing frame %d to output file: %s\n", frame, chd_error_string(CHDERR_WRITE_ERROR));
 				err = CHDERR_WRITE_ERROR;
 				goto cleanup;
 			}
@@ -1313,7 +1461,7 @@ static int do_extractcd(int argc, char *argv[], int param)
 			byteswritten = core_fwrite(outfile2, sector, toc->tracks[track].subsize);
 			if (byteswritten != toc->tracks[track].subsize)
 			{
-				fprintf(stderr, "Error writing frame %d to output file: %s\n", frame, error_string(CHDERR_WRITE_ERROR));
+				fprintf(stderr, "Error writing frame %d to output file: %s\n", frame, chd_error_string(CHDERR_WRITE_ERROR));
 				err = CHDERR_WRITE_ERROR;
 				goto cleanup;
 			}
@@ -1453,7 +1601,7 @@ static int do_extractav(int argc, char *argv[], int param)
 	err = chd_open(inputfile, CHD_OPEN_READ, NULL, &chd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error opening CHD file '%s': %s\n", inputfile, error_string(err));
+		fprintf(stderr, "Error opening CHD file '%s': %s\n", inputfile, chd_error_string(err));
 		goto cleanup;
 	}
 	header = chd_get_header(chd);
@@ -1462,7 +1610,7 @@ static int do_extractav(int argc, char *argv[], int param)
 	err = chd_get_metadata(chd, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error getting A/V metadata: %s\n", error_string(err));
+		fprintf(stderr, "Error getting A/V metadata: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -1481,6 +1629,8 @@ static int do_extractav(int argc, char *argv[], int param)
 	{
 		fps_times_1million /= 2;
 		height *= 2;
+		firstframe *= 2;
+		numframes *= 2;
 	}
 	numframes = MIN(totalframes - firstframe, numframes);
 
@@ -1550,7 +1700,7 @@ static int do_extractav(int argc, char *argv[], int param)
 		err = chd_read(chd, firstframe + framenum, hunk);
 		if (err != CHDERR_NONE)
 		{
-			fprintf(stderr, "Error reading hunk %d from CHD file: %s\n", firstframe + framenum, error_string(err));
+			fprintf(stderr, "Error reading hunk %d from CHD file: %s\n", firstframe + framenum, chd_error_string(err));
 			goto cleanup;
 		}
 
@@ -1610,7 +1760,7 @@ static int do_verify(int argc, char *argv[], int param)
 	err = chd_open(inputfile, CHD_OPEN_READ, NULL, &chd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error opening CHD file: %s\n", error_string(err));
+		fprintf(stderr, "Error opening CHD file: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 	header = *chd_get_header(chd);
@@ -1642,7 +1792,7 @@ static int do_verify(int argc, char *argv[], int param)
 		if (err == CHDERR_CANT_VERIFY)
 			fprintf(stderr, "Can't verify this type of image (probably writeable)\n");
 		else
-			fprintf(stderr, "\nError during verify: %s\n", error_string(err));
+			fprintf(stderr, "\nError during verify: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -1702,7 +1852,7 @@ static int do_verify(int argc, char *argv[], int param)
 	{
 		err = chd_set_header(inputfile, &header);
 		if (err != CHDERR_NONE)
-			fprintf(stderr, "Error writing new header: %s\n", error_string(err));
+			fprintf(stderr, "Error writing new header: %s\n", chd_error_string(err));
 		else
 			printf("Updated header successfully\n");
 	}
@@ -1743,7 +1893,7 @@ static int do_info(int argc, char *argv[], int param)
 	err = chd_open(inputfile, CHD_OPEN_READ, NULL, &chd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error opening CHD file '%s': %s\n", inputfile, error_string(err));
+		fprintf(stderr, "Error opening CHD file '%s': %s\n", inputfile, chd_error_string(err));
 		goto cleanup;
 	}
 	header = *chd_get_header(chd);
@@ -1996,7 +2146,7 @@ static int do_merge_update_chomp(int argc, char *argv[], int param)
 		err = chd_open(parentfile, CHD_OPEN_READ, NULL, &parentchd);
 		if (err != CHDERR_NONE)
 		{
-			fprintf(stderr, "Error opening CHD file '%s': %s\n", parentfile, error_string(err));
+			fprintf(stderr, "Error opening CHD file '%s': %s\n", parentfile, chd_error_string(err));
 			goto cleanup;
 		}
 	}
@@ -2005,7 +2155,7 @@ static int do_merge_update_chomp(int argc, char *argv[], int param)
 	err = chd_open(inputfile, CHD_OPEN_READ, parentchd, &inputchd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error opening CHD file '%s': %s\n", inputfile, error_string(err));
+		fprintf(stderr, "Error opening CHD file '%s': %s\n", inputfile, chd_error_string(err));
 		goto cleanup;
 	}
 	inputheader = chd_get_header(inputchd);
@@ -2021,7 +2171,7 @@ static int do_merge_update_chomp(int argc, char *argv[], int param)
 	err = chd_create(outputfile, inputheader->logicalbytes, inputheader->hunkbytes, inputheader->compression, NULL);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error creating CHD file: %s\n", error_string(err));
+		fprintf(stderr, "Error creating CHD file: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -2029,7 +2179,7 @@ static int do_merge_update_chomp(int argc, char *argv[], int param)
 	err = chd_open(outputfile, CHD_OPEN_READWRITE, NULL, &outputchd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error opening new CHD file: %s\n", error_string(err));
+		fprintf(stderr, "Error opening new CHD file: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -2037,14 +2187,14 @@ static int do_merge_update_chomp(int argc, char *argv[], int param)
 	err = chd_clone_metadata(inputchd, outputchd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error cloning metadata: %s\n", error_string(err));
+		fprintf(stderr, "Error cloning metadata: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
 	/* do the compression; our interface will route reads for us */
 	err = chdman_compress_chd(outputchd, inputchd, (param == OPERATION_CHOMP) ? (maxhunk + 1) : 0);
 	if (err != CHDERR_NONE)
-		fprintf(stderr, "Error during compression: %s\n", error_string(err));
+		fprintf(stderr, "Error during compression: %s\n", chd_error_string(err));
 
 cleanup:
 	/* close everything down */
@@ -2091,7 +2241,7 @@ static int do_diff(int argc, char *argv[], int param)
 	err = chd_open(parentfile, CHD_OPEN_READ, NULL, &parentchd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error opening CHD file '%s': %s\n", parentfile, error_string(err));
+		fprintf(stderr, "Error opening CHD file '%s': %s\n", parentfile, chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -2099,7 +2249,7 @@ static int do_diff(int argc, char *argv[], int param)
 	err = chd_open(inputfile, CHD_OPEN_READ, NULL, &inputchd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error opening CHD file '%s': %s\n", inputfile, error_string(err));
+		fprintf(stderr, "Error opening CHD file '%s': %s\n", inputfile, chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -2107,7 +2257,7 @@ static int do_diff(int argc, char *argv[], int param)
 	err = chd_create(outputfile, 0, 0, chd_get_header(parentchd)->compression, parentchd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error creating CHD file: %s\n", error_string(err));
+		fprintf(stderr, "Error creating CHD file: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -2115,14 +2265,14 @@ static int do_diff(int argc, char *argv[], int param)
 	err = chd_open(outputfile, CHD_OPEN_READWRITE, parentchd, &outputchd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error opening new CHD file: %s\n", error_string(err));
+		fprintf(stderr, "Error opening new CHD file: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
 	/* do the compression; our interface will route reads for us */
 	err = chdman_compress_chd(outputchd, inputchd, 0);
 	if (err != CHDERR_NONE)
-		fprintf(stderr, "Error during compression: %s\n", error_string(err));
+		fprintf(stderr, "Error during compression: %s\n", chd_error_string(err));
 
 cleanup:
 	/* close everything down */
@@ -2175,7 +2325,7 @@ static int do_setchs(int argc, char *argv[], int param)
 	err = chd_open(inoutfile, CHD_OPEN_READ, NULL, &chd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error opening CHD file '%s' read-only: %s\n", inoutfile, error_string(err));
+		fprintf(stderr, "Error opening CHD file '%s' read-only: %s\n", inoutfile, chd_error_string(err));
 		goto cleanup;
 	}
 	header = *chd_get_header(chd);
@@ -2192,7 +2342,7 @@ static int do_setchs(int argc, char *argv[], int param)
 		err = chd_set_header(inoutfile, &header);
 		if (err != CHDERR_NONE)
 		{
-			fprintf(stderr, "Error making CHD file writeable: %s\n", error_string(err));
+			fprintf(stderr, "Error making CHD file writeable: %s\n", chd_error_string(err));
 			goto cleanup;
 		}
 	}
@@ -2201,7 +2351,7 @@ static int do_setchs(int argc, char *argv[], int param)
 	err = chd_open(inoutfile, CHD_OPEN_READWRITE, NULL, &chd);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error opening CHD file '%s' read/write: %s\n", inoutfile, error_string(err));
+		fprintf(stderr, "Error opening CHD file '%s' read/write: %s\n", inoutfile, chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -2219,7 +2369,7 @@ static int do_setchs(int argc, char *argv[], int param)
 	err = chd_set_metadata(chd, HARD_DISK_METADATA_TAG, 0, metadata, strlen(metadata) + 1);
 	if (err != CHDERR_NONE)
 	{
-		fprintf(stderr, "Error writing new metadata to CHD file: %s\n", error_string(err));
+		fprintf(stderr, "Error writing new metadata to CHD file: %s\n", chd_error_string(err));
 		goto cleanup;
 	}
 
@@ -2241,7 +2391,7 @@ static int do_setchs(int argc, char *argv[], int param)
 	{
 		err = chd_set_header(inoutfile, &header);
 		if (err != CHDERR_NONE)
-			fprintf(stderr, "Error writing new header to CHD file: %s\n", error_string(err));
+			fprintf(stderr, "Error writing new header to CHD file: %s\n", chd_error_string(err));
 	}
 
 	/* print a warning if the size is different */

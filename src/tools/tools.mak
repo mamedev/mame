@@ -26,7 +26,7 @@ TOOLS += \
 	romcmp$(EXE) \
 	chdman$(EXE) \
 	jedutil$(EXE) \
-	makemeta$(EXE) \
+	ldverify$(EXE) \
 	regrep$(EXE) \
 	srcclean$(EXE) \
 	src2html$(EXE) \
@@ -74,13 +74,13 @@ jedutil$(EXE): $(JEDUTILOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 
 
 #-------------------------------------------------
-# makemeta
+# ldverify
 #-------------------------------------------------
 
-MAKEMETAOBJS = \
-	$(TOOLSOBJ)/makemeta.o \
+LDVERIFYOBJS = \
+	$(TOOLSOBJ)/ldverify.o \
 
-makemeta$(EXE): $(MAKEMETAOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
+ldverify$(EXE): $(LDVERIFYOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 
