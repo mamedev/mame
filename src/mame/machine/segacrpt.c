@@ -1098,7 +1098,7 @@ void lvcards_decode(running_machine *machine)
 
 ******************************************************************************/
 
-static void sega_decode_2(running_machine *machine,
+static void sega_decode_2(running_machine *machine,const char *region,
 		const UINT8 opcode_xor[64],const int opcode_swap_select[64],
 		const UINT8 data_xor[64],const int data_swap_select[64])
 {
@@ -1114,7 +1114,7 @@ static void sega_decode_2(running_machine *machine,
 	};
 
 
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(machine, region);
 	UINT8 *decrypted = auto_malloc(0x8000);
 
 	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypted);
@@ -1189,7 +1189,7 @@ void fdwarrio_decode(running_machine *machine)
 	};
 
 
-	sega_decode_2(machine,opcode_xor,opcode_swap_select,data_xor,data_swap_select);
+	sega_decode_2(machine,"main",opcode_xor,opcode_swap_select,data_xor,data_swap_select);
 }
 
 
@@ -1234,7 +1234,7 @@ void astrofl_decode(running_machine *machine)
 	};
 
 
-	sega_decode_2(machine,opcode_xor,opcode_swap_select,data_xor,data_swap_select);
+	sega_decode_2(machine,"z80",opcode_xor,opcode_swap_select,data_xor,data_swap_select);
 }
 
 
@@ -1299,7 +1299,7 @@ void wboy2_decode(running_machine *machine)
 	};
 
 
-	sega_decode_2(machine,opcode_xor,opcode_swap_select,data_xor,data_swap_select);
+	sega_decode_2(machine,"main",opcode_xor,opcode_swap_select,data_xor,data_swap_select);
 }
 
 
@@ -1352,7 +1352,7 @@ void robowres_decode(running_machine *machine)
 	};
 
 
-	sega_decode_2(machine,opcode_xor,opcode_swap_select,data_xor,data_swap_select);
+	sega_decode_2(machine,"main",opcode_xor,opcode_swap_select,data_xor,data_swap_select);
 }
 
 
@@ -1412,9 +1412,9 @@ static void sega_decode_317(running_machine *machine,int order, int opcode_shift
 	};
 
 	if (order)
-		sega_decode_2( machine, xor2_317+opcode_shift, swap2_317+opcode_shift, xor1_317+data_shift, swap1_317+data_shift );
+		sega_decode_2( machine, "main", xor2_317+opcode_shift, swap2_317+opcode_shift, xor1_317+data_shift, swap1_317+data_shift );
 	else
-		sega_decode_2( machine, xor1_317+opcode_shift, swap1_317+opcode_shift, xor2_317+data_shift, swap2_317+data_shift );
+		sega_decode_2( machine, "main", xor1_317+opcode_shift, swap1_317+opcode_shift, xor2_317+data_shift, swap2_317+data_shift );
 }
 
 void spcpostn_decode(running_machine *machine)	{ sega_decode_317( machine, 0, 0, 1 ); }

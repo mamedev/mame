@@ -5300,7 +5300,7 @@ ROM_START( mustangb )
 	ROM_LOAD16_BYTE( "90058-8",    0x00000, 0x80000, CRC(560bff04) SHA1(b005642adc81d878971ecbdead8ef5e604c90ae2) )
 	ROM_LOAD16_BYTE( "90058-9",    0x00001, 0x80000, CRC(b9d72a03) SHA1(43ee9def1b6c491c6832562d66c1af54d81d9b3c) )
 
-	ROM_REGION( 0x010000, "oki1", 0 )	/* OKIM6295 samples */
+	ROM_REGION( 0x010000, "oki", 0 )	/* OKIM6295 samples */
 	ROM_LOAD( "mustang.17",    0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
 ROM_END
 
@@ -5552,7 +5552,7 @@ ROM_START( tdragonb )
 	ROM_LOAD16_BYTE( "td_10.bin",	0x000000, 0x080000, CRC(bfd0ec5d) SHA1(7983661f74e8695f56e45c6e5c278d7d86431052) )	/* Sprites */
 	ROM_LOAD16_BYTE( "td_09.bin",	0x000001, 0x080000, CRC(b6e074eb) SHA1(bdde068f03415391b5edaa42f1389df0f7eef899) )	/* Sprites */
 
-	ROM_REGION( 0x010000, "oki1", 0 )	/* OKIM6295 samples */
+	ROM_REGION( 0x010000, "oki", 0 )	/* OKIM6295 samples */
 	ROM_LOAD( "td_01.bin",     0x00000, 0x10000, CRC(f6f6c4bf) SHA1(ea4cf74d968e254ae47c16c2f4c2f4bc1a528808) )
 ROM_END
 

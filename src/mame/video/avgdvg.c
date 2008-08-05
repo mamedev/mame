@@ -475,7 +475,7 @@ static void mhavoc_data(vgdata *vg)
 
 	if (vg->pc & 0x2000)
 	{
-		bank = &memory_region(Machine, "main")[0x18000];
+		bank = &memory_region(Machine, "alpha")[0x18000];
 		vg->data = bank[(vg->map << 13) | ((vg->pc ^ 1) & 0x1fff)];
 	}
 	else

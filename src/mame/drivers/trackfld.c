@@ -1063,7 +1063,7 @@ ROM_START( atlantol )
 	ROM_LOAD( "atl35", 0x00000, 0x10000, CRC(03331597) SHA1(74a6e20cb0cadc17500b9046d621be252839de98) )
 	ROM_CONTINUE(      0x00000, 0x10000 )
 
-	ROM_REGION( 0x10000, "cpu2", 0 )	/*  64k for the 6802 which plays ADPCM samples */
+	ROM_REGION( 0x10000, "adpcm", 0 )	/*  64k for the 6802 which plays ADPCM samples */
 	/* this bootleg uses a 6802 to "emulate" the VLM5030 speech chip */
 	/* I didn't bother to emulate the 6802, I just play the samples. */
 	ROM_LOAD( "atl36", 0x00000, 0x10000, CRC(0bae8489) SHA1(fbaeac99733f9c46b0b8d9a601c57df4004e2044) )
