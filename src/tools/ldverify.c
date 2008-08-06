@@ -621,7 +621,7 @@ int main(int argc, char *argv[])
 	rsound = malloc(info.samplerate * sizeof(*rsound));
 	if (lsound == NULL || rsound == NULL)
 	{
-		fprintf(stderr, "Out of memory allocating sound buffers of %d bytes\n", info.samplerate * sizeof(*rsound));
+		fprintf(stderr, "Out of memory allocating sound buffers of %d bytes\n", (INT32)(info.samplerate * sizeof(*rsound)));
 		return 1;
 	}
 	
