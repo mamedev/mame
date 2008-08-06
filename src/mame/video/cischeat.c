@@ -219,8 +219,7 @@ READ16_HANDLER( bigrun_vregs_r )
 	switch (offset)
 	{
 		case 0x0000/2 : return input_port_read(machine, "IN1");	// Coins
-		case 0x0002/2 : return input_port_read(machine, "IN2") +
-						(read_shift(machine)<<1);			// Buttons
+		case 0x0002/2 : return input_port_read(machine, "IN2") + (read_shift(machine)<<1);	// Buttons
 		case 0x0004/2 : return input_port_read(machine, "IN3");	// Motor Limit Switches
 		case 0x0006/2 : return input_port_read(machine, "IN4");	// DSW 1 & 2
 
@@ -316,8 +315,7 @@ READ16_HANDLER( cischeat_vregs_r )
 	switch (offset)
 	{
 		case 0x0000/2 : return input_port_read(machine, "IN1");	// Coins
-		case 0x0002/2 : return input_port_read(machine, "IN2") +
-						(read_shift(machine)<<1);			// Buttons
+		case 0x0002/2 : return input_port_read(machine, "IN2") + (read_shift(machine)<<1);			// Buttons
 		case 0x0004/2 : return input_port_read(machine, "IN3");	// Motor Limit Switches
 		case 0x0006/2 : return input_port_read(machine, "IN4");	// DSW 1 & 2
 
@@ -409,18 +407,14 @@ READ16_HANDLER( f1gpstar_vregs_r )
 {
 	switch (offset)
 	{
-		case 0x0000/2 :	// DSW 1&2: coinage changes with Country
-		{
-			int val = input_port_read(machine, "IN1");
-			if (val & 0x0200)	return input_port_read(machine, "IN6") | val; 	// JP, US
-			else				return input_port_read(machine, "IN7") | val; 	// UK, FR
-		}
+		case 0x0000/2 :	return input_port_read(machine, "IN1");	// DSW 1 & 2
 
 //      case 0x0002/2 : return 0xFFFF;
-		case 0x0004/2 :	return input_port_read(machine, "IN2") +
-						       (read_shift(machine)<<5);	// Buttons
+
+		case 0x0004/2 :	return input_port_read(machine, "IN2") + (read_shift(machine)<<5);	// Buttons
 
 		case 0x0006/2 :	return input_port_read(machine, "IN3");	// ? Read at boot only
+
 		case 0x0008/2 :	return soundlatch2_r(machine,0);	// From sound cpu
 
 		case 0x000c/2 :	return input_port_read(machine, "IN4");	// DSW 3
