@@ -1152,7 +1152,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( mazerbla )
-	PORT_START_TAG("ZPU")	/* Strobe 0: ZPU Switches */
+	PORT_START("ZPU")	/* Strobe 0: ZPU Switches */
 	PORT_DIPNAME( 0x40, 0x40, "ZPU Switch 1" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1160,7 +1160,7 @@ static INPUT_PORTS_START( mazerbla )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("DSW0")	/* Strobe 1: Dip Switches 28-35*/
+	PORT_START("DSW0")	/* Strobe 1: Dip Switches 28-35*/
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(	0x03, "6" )
 	PORT_DIPSETTING(	0x02, "5" )
@@ -1182,7 +1182,7 @@ static INPUT_PORTS_START( mazerbla )
 	PORT_DIPSETTING(	0x40, "60000" )
 	PORT_DIPSETTING(	0x00, "70000" )
 
-	PORT_START_TAG("DSW1")	/* Strobe 2: Dip Switches 20-27*/
+	PORT_START("DSW1")	/* Strobe 2: Dip Switches 20-27*/
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_3C ) )
@@ -1219,7 +1219,7 @@ static INPUT_PORTS_START( mazerbla )
 	PORT_DIPSETTING(    0x80, "1 Coin/10 Credits" )
 	PORT_DIPSETTING(    0x70, "1 Coin/14 Credits" )
 
-	PORT_START_TAG("DSW2")	/* Strobe 3: Dip Switches 12-19*/
+	PORT_START("DSW2")	/* Strobe 3: Dip Switches 12-19*/
 	PORT_DIPNAME( 0x01, 0x01, "Service Index" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1245,7 +1245,7 @@ static INPUT_PORTS_START( mazerbla )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("DSW3")	/* Strobe 4: Dip Switches 4-11 */
+	PORT_START("DSW3")	/* Strobe 4: Dip Switches 4-11 */
 	PORT_DIPNAME( 0x03, 0x02, "Number of Freezes" )
 	PORT_DIPSETTING(	0x03, "4" )
 	PORT_DIPSETTING(	0x02, "3" )
@@ -1271,7 +1271,7 @@ static INPUT_PORTS_START( mazerbla )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("BUTTONS")	/* Strobe 5: coin1&2, start1&2, fire */
+	PORT_START("BUTTONS")	/* Strobe 5: coin1&2, start1&2, fire */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1281,20 +1281,20 @@ static INPUT_PORTS_START( mazerbla )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("STICK0_X")	/* Strobe 6: horizontal movement of gun */
+	PORT_START("STICK0_X")	/* Strobe 6: horizontal movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(1)
-	PORT_START_TAG("STICK0_Y")	/* Strobe 7: vertical movement of gun */
+	PORT_START("STICK0_Y")	/* Strobe 7: vertical movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(1)
 
 	/* Mazer Blazer cabinet has only one gun, really */
-	PORT_START_TAG("STICK1_X")	/* Strobe 8: horizontal movement of gun */
+	PORT_START("STICK1_X")	/* Strobe 8: horizontal movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_REVERSE PORT_PLAYER(2)
-	PORT_START_TAG("STICK1_Y")	/* Strobe 9: vertical movement of gun */
+	PORT_START("STICK1_Y")	/* Strobe 9: vertical movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(2)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( greatgun )
-	PORT_START_TAG("ZPU")	/* Strobe 0: ZPU Switches */
+	PORT_START("ZPU")	/* Strobe 0: ZPU Switches */
 	PORT_DIPNAME( 0x40, 0x40, "ZPU Switch 1" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1302,7 +1302,7 @@ static INPUT_PORTS_START( greatgun )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("DSW0")	/* Strobe 1: Dip Switches 28-35*/
+	PORT_START("DSW0")	/* Strobe 1: Dip Switches 28-35*/
 	PORT_DIPNAME( 0x03, 0x00, "Starting Number of Bullets/Credit" )
 	PORT_DIPSETTING(	0x03, "60" )
 	PORT_DIPSETTING(	0x02, "70" )
@@ -1329,7 +1329,7 @@ static INPUT_PORTS_START( greatgun )
 	PORT_DIPSETTING(	0x80, "1" )
 	PORT_DIPSETTING(	0x00, "2" )
 
-	PORT_START_TAG("DSW1")	/* Strobe 2: Dip Switches 20-27*/
+	PORT_START("DSW1")	/* Strobe 2: Dip Switches 20-27*/
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_3C ) )
@@ -1366,7 +1366,7 @@ static INPUT_PORTS_START( greatgun )
 	PORT_DIPSETTING(    0x80, "1 Coin/10 Credits" )
 	PORT_DIPSETTING(    0x70, "1 Coin/14 Credits" )
 
-	PORT_START_TAG("DSW2")	/* Strobe 3: Dip Switches 12-19*/
+	PORT_START("DSW2")	/* Strobe 3: Dip Switches 12-19*/
 	PORT_DIPNAME( 0x01, 0x01, "Service Index" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1392,7 +1392,7 @@ static INPUT_PORTS_START( greatgun )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("DSW3")	/* Strobe 4: Dip Switches 4-11 */
+	PORT_START("DSW3")	/* Strobe 4: Dip Switches 4-11 */
 	PORT_DIPNAME( 0x01, 0x01, "Free game/coin return" )
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
@@ -1419,7 +1419,7 @@ static INPUT_PORTS_START( greatgun )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("BUTTONS")	/* Strobe 5: coin1&2, start1&2, fire */
+	PORT_START("BUTTONS")	/* Strobe 5: coin1&2, start1&2, fire */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
@@ -1429,14 +1429,14 @@ static INPUT_PORTS_START( greatgun )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4 )
 
-	PORT_START_TAG("STICK0_X")	/* Strobe 6: horizontal movement of gun */
+	PORT_START("STICK0_X")	/* Strobe 6: horizontal movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(1)
-	PORT_START_TAG("STICK0_Y")	/* Strobe 7: vertical movement of gun */
+	PORT_START("STICK0_Y")	/* Strobe 7: vertical movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(1)
 
-	PORT_START_TAG("STICK1_X")	/* Strobe 8: horizontal movement of gun */
+	PORT_START("STICK1_X")	/* Strobe 8: horizontal movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(2)
-	PORT_START_TAG("STICK1_Y")	/* Strobe 9: vertical movement of gun */
+	PORT_START("STICK1_Y")	/* Strobe 9: vertical movement of gun */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(7) PORT_PLAYER(2)
 INPUT_PORTS_END
 

@@ -160,7 +160,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( wallc )
-	PORT_START	/* DSW - read from b000 */
+	PORT_START("DSW1")	/* DSW - read from b000 */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(	0x03, "5" )
 	PORT_DIPSETTING(	0x02, "4" )
@@ -183,7 +183,7 @@ static INPUT_PORTS_START( wallc )
 	PORT_DIPSETTING(	0x80, "Free Play With Level Select" )
 	PORT_DIPSETTING(	0x00, DEF_STR( Normal ) )
 
-	PORT_START	/* b200 */
+	PORT_START("SYSTEM")	/* b200 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )	//Right curve button; select current playfield in test mode
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	//not used ?
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )	//service?? plays loud,high-pitched sound
@@ -193,10 +193,10 @@ static INPUT_PORTS_START( wallc )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )	//ok
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )	//ok
 
-	PORT_START	/* b400 - player position 8 bit analog input - value read is used as position of the player directly - what type of input is that ? DIAL ?*/
+	PORT_START("DIAL")	/* b400 - player position 8 bit analog input - value read is used as position of the player directly - what type of input is that ? DIAL ?*/
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(3) PORT_REVERSE PORT_PLAYER(1)
 
-	PORT_START	/* b600 - bits 0-5: coinage */
+	PORT_START("DSW2")	/* b600 - bits 0-5: coinage */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )

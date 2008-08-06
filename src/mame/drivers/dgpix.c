@@ -181,7 +181,7 @@ static READ32_HANDLER( vblank_r )
 {
 	/* burn a bunch of cycles because this is polled frequently during busy loops */
 	activecpu_adjust_icount(-100);
-	return input_port_read(machine, "IN0");
+	return input_port_read(machine, "VBLANK");
 }
 
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -195,7 +195,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x0200, 0x0203) AM_READNOP // used to sync with the protecion PIC? tested bits 0 and 1
 	AM_RANGE(0x0400, 0x0403) AM_READWRITE(vblank_r, vbuffer_w)
-	AM_RANGE(0x0a10, 0x0a13) AM_READ(input_port_1_dword_r)
+	AM_RANGE(0x0a10, 0x0a13) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0200, 0x0203) AM_WRITE(coin_w)
 	AM_RANGE(0x0c00, 0x0c03) AM_WRITENOP // writes only: 1, 0, 1 at startup
 	AM_RANGE(0x0c80, 0x0c83) AM_WRITENOP // sound commands / latches
@@ -235,11 +235,11 @@ static NVRAM_HANDLER( flashroms )
 }
 
 static INPUT_PORTS_START( dgpix )
-	PORT_START_TAG("IN0")
+	PORT_START("VBLANK")
 	PORT_BIT( 0x00000003, IP_ACTIVE_LOW, IPT_VBLANK ) //value 2 is used by fmaniac3
 	PORT_BIT( 0xfffffffc, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN1")
+	PORT_START("INPUTS")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	) PORT_8WAY PORT_PLAYER(1)

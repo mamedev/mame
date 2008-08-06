@@ -212,7 +212,7 @@ static WRITE8_HANDLER( beg_port08_w )
 
 
 static INPUT_PORTS_START( bigevglf )
-	PORT_START_TAG("PORT00")		/* port 00 on sub cpu */
+	PORT_START("PORT00")		/* port 00 on sub cpu */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
@@ -222,11 +222,11 @@ static INPUT_PORTS_START( bigevglf )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
-	PORT_START_TAG("PORT04")		/* port 04 on sub cpu - bit 0 and bit 1 are coin inputs */
+	PORT_START("PORT04")		/* port 04 on sub cpu - bit 0 and bit 1 are coin inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 
-	PORT_START_TAG("DSW1")			/* port 05 on sub cpu */
+	PORT_START("DSW1")			/* port 05 on sub cpu */
 	PORT_DIPNAME( 0x01,   0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(      0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x01, DEF_STR( Cocktail ) )
@@ -243,7 +243,7 @@ static INPUT_PORTS_START( bigevglf )
 	PORT_DIPSETTING(      0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(      0xa0, DEF_STR( 1C_2C ) )
 
-	PORT_START_TAG("DSW2")			/* port 06 on sub cpu */
+	PORT_START("DSW2")			/* port 06 on sub cpu */
 	PORT_DIPNAME( 0x03,   0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x03, DEF_STR( Normal ) )
@@ -267,16 +267,16 @@ static INPUT_PORTS_START( bigevglf )
 	PORT_DIPSETTING(      0x20, "9" )
 	PORT_DIPSETTING(      0x00, "10" )
 
-	PORT_START_TAG("P1X")	/* port 02 on sub cpu - muxed port 0 */
+	PORT_START("P1X")	/* port 02 on sub cpu - muxed port 0 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10)
 
-	PORT_START_TAG("P1Y")	/* port 03 on sub cpu - muxed port 0 */
+	PORT_START("P1Y")	/* port 03 on sub cpu - muxed port 0 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START_TAG("P2X")	/* port 02 on sub cpu - muxed port 1 */
+	PORT_START("P2X")	/* port 02 on sub cpu - muxed port 1 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_COCKTAIL
 
-	PORT_START_TAG("P2Y")	/* port 03 on sub cpu - muxed port 1 */
+	PORT_START("P2Y")	/* port 03 on sub cpu - muxed port 1 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL
 INPUT_PORTS_END
 

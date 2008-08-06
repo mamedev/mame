@@ -86,7 +86,7 @@ ADDRESS_MAP_END
 *************************/
 
 static INPUT_PORTS_START( itgambl2 )
-    PORT_START
+    PORT_START("IN0")
     PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
     PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

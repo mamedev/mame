@@ -19,92 +19,7 @@
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
 
-***************************************************************************/
 
-#include "driver.h"
-#include "cpu/z80/z80.h"
-#include "audio/seibu.h"
-#include "sound/3812intf.h"
-#include "sound/okim6295.h"
-
-WRITE16_HANDLER( dynduke_background_w );
-WRITE16_HANDLER( dynduke_foreground_w );
-WRITE16_HANDLER( dynduke_text_w );
-WRITE16_HANDLER( dynduke_gfxbank_w );
-WRITE16_HANDLER( dynduke_control_w );
-WRITE16_HANDLER( dynduke_paletteram_w );
-VIDEO_START( dynduke );
-VIDEO_UPDATE( dynduke );
-VIDEO_EOF( dynduke );
-
-extern UINT16 *dynduke_back_data, *dynduke_fore_data, *dynduke_scroll_ram;
-
-/* Memory Maps */
-
-static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x06fff) AM_RAM
-	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x08000, 0x080ff) AM_RAM AM_BASE(&dynduke_scroll_ram)
-	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x0b000, 0x0b001) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x0b002, 0x0b003) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x0b004, 0x0b005) AM_WRITENOP
-	AM_RANGE(0x0b006, 0x0b007) AM_WRITE(dynduke_control_w)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(dynduke_text_w) AM_BASE(&videoram16)
-	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
-	AM_RANGE(0xa0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x05fff) AM_RAM
-	AM_RANGE(0x06000, 0x067ff) AM_RAM_WRITE(dynduke_background_w) AM_BASE(&dynduke_back_data)
-	AM_RANGE(0x06800, 0x06fff) AM_RAM_WRITE(dynduke_foreground_w) AM_BASE(&dynduke_fore_data)
-	AM_RANGE(0x07000, 0x07fff) AM_RAM_WRITE(dynduke_paletteram_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x0a000, 0x0a001) AM_WRITE(dynduke_gfxbank_w)
-	AM_RANGE(0x0c000, 0x0c001) AM_WRITENOP
-	AM_RANGE(0xc0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
-
-/* Memory map used by DlbDyn - probably an addressing PAL is different */
-static ADDRESS_MAP_START( masterj_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x06fff) AM_RAM
-	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x08000, 0x087ff) AM_RAM_WRITE(dynduke_text_w) AM_BASE(&videoram16)
-	AM_RANGE(0x09000, 0x0900d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
-	AM_RANGE(0x0c000, 0x0c0ff) AM_RAM AM_BASE(&dynduke_scroll_ram)
-	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x0f000, 0x0f001) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x0f002, 0x0f003) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x0f004, 0x0f005) AM_WRITENOP
-	AM_RANGE(0x0f006, 0x0f007) AM_WRITE(dynduke_control_w)
-	AM_RANGE(0xa0000, 0xfffff) AM_ROM
-ADDRESS_MAP_END
-
-/* Input Ports */
-
-static INPUT_PORTS_START( dynduke )
-	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
-
-	PORT_START_TAG("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
-
-	/*
         SW#1
         --------------------------------------------------------------------
         DESCRIPTION                        1   2   3   4   5   6   7   8
@@ -139,45 +54,144 @@ static INPUT_PORTS_START( dynduke )
         --------------------------------------------------------------------
         FACTORY SETTINGS                     OFF OFF OFF OFF OFF OFF OFF OFF
         --------------------------------------------------------------------
-    */
-	PORT_START_TAG("DSW")
-	PORT_DIPNAME( 0x0007, 0x0006, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x0002, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x0004, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x0006, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x0018, 0x0008, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x0018, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x0010, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0008, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( 1C_6C ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "Starting Coin" )
-	PORT_DIPSETTING(    0x0020, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x0000, "X 2" )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x0300, 0x0300, IPT_UNUSED )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x0c00, "80K 100K+" )
-	PORT_DIPSETTING(    0x0800, "100K 100K+" )
-	PORT_DIPSETTING(    0x0400, "120K 100K+" )
-	PORT_DIPSETTING(    0x0000, "120K 120K+" )
-	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x3000, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x2000, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x1000, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x8000, DEF_STR( On ) )
+
+
+2008-07
+Dip locations and factory settings verified with dip listing 
+Also, implemented conditional port for Coin Mode (SW1:1)
+
+***************************************************************************/
+
+#include "driver.h"
+#include "cpu/z80/z80.h"
+#include "audio/seibu.h"
+#include "sound/3812intf.h"
+#include "sound/okim6295.h"
+
+WRITE16_HANDLER( dynduke_background_w );
+WRITE16_HANDLER( dynduke_foreground_w );
+WRITE16_HANDLER( dynduke_text_w );
+WRITE16_HANDLER( dynduke_gfxbank_w );
+WRITE16_HANDLER( dynduke_control_w );
+WRITE16_HANDLER( dynduke_paletteram_w );
+VIDEO_START( dynduke );
+VIDEO_UPDATE( dynduke );
+VIDEO_EOF( dynduke );
+
+extern UINT16 *dynduke_back_data, *dynduke_fore_data, *dynduke_scroll_ram;
+
+/* Memory Maps */
+
+static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x06fff) AM_RAM
+	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x08000, 0x080ff) AM_RAM AM_BASE(&dynduke_scroll_ram)
+	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x0b000, 0x0b001) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x0b002, 0x0b003) AM_READ_PORT("DSW")
+	AM_RANGE(0x0b004, 0x0b005) AM_WRITENOP
+	AM_RANGE(0x0b006, 0x0b007) AM_WRITE(dynduke_control_w)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(dynduke_text_w) AM_BASE(&videoram16)
+	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0xa0000, 0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x05fff) AM_RAM
+	AM_RANGE(0x06000, 0x067ff) AM_RAM_WRITE(dynduke_background_w) AM_BASE(&dynduke_back_data)
+	AM_RANGE(0x06800, 0x06fff) AM_RAM_WRITE(dynduke_foreground_w) AM_BASE(&dynduke_fore_data)
+	AM_RANGE(0x07000, 0x07fff) AM_RAM_WRITE(dynduke_paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x0a000, 0x0a001) AM_WRITE(dynduke_gfxbank_w)
+	AM_RANGE(0x0c000, 0x0c001) AM_WRITENOP
+	AM_RANGE(0xc0000, 0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+/* Memory map used by DlbDyn - probably an addressing PAL is different */
+static ADDRESS_MAP_START( masterj_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x06fff) AM_RAM
+	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x08000, 0x087ff) AM_RAM_WRITE(dynduke_text_w) AM_BASE(&videoram16)
+	AM_RANGE(0x09000, 0x0900d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
+	AM_RANGE(0x0c000, 0x0c0ff) AM_RAM AM_BASE(&dynduke_scroll_ram)
+	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x0f000, 0x0f001) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x0f002, 0x0f003) AM_READ_PORT("DSW")
+	AM_RANGE(0x0f004, 0x0f005) AM_WRITENOP
+	AM_RANGE(0x0f006, 0x0f007) AM_WRITE(dynduke_control_w)
+	AM_RANGE(0xa0000, 0xfffff) AM_ROM
+ADDRESS_MAP_END
+
+/* Input Ports */
+
+static INPUT_PORTS_START( dynduke )
+	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
+
+	PORT_START("P1_P2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0001, 0x0001, "Coin Mode" ) PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(      0x0001, "Mode 1" )
+	PORT_DIPSETTING(      0x0000, "Mode 2" )
+	PORT_DIPNAME( 0x0006, 0x0006, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:2,3") PORT_CONDITION("DSW", 0x0001, PORTCOND_EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0000, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x0018, 0x0008, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:4,5") PORT_CONDITION("DSW", 0x0001, PORTCOND_EQUALS, 0x0000)
+	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x001e, 0x001e, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW1:2,3,4,5") PORT_CONDITION("DSW", 0x0001, PORTCOND_EQUALS, 0x0001)
+	PORT_DIPSETTING(      0x0018, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x001a, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x001c, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x001e, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0020, 0x0020, "Starting Coin" ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0000, "X 2" )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Upright ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0300, 0x0300, IPT_UNUSED )	/* "SW2:1,2" - Always OFF according to the manual */
+	PORT_DIPNAME( 0x0c00, 0x0400, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(      0x0c00, "80K 100K+" )
+	PORT_DIPSETTING(      0x0800, "100K 100K+" )
+	PORT_DIPSETTING(      0x0400, "120K 100K+" )
+	PORT_DIPSETTING(      0x0000, "120K 120K+" )
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(      0x3000, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 INPUT_PORTS_END
 
 /* Graphics Layouts */

@@ -123,7 +123,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( rbmk )
 
-	PORT_START_TAG("IN0")	/* 16bit */
+	PORT_START("IN0")	/* 16bit */
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Controls ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Joystick ) )
 	PORT_DIPSETTING(      0x0000, "Keyboard" )
@@ -177,7 +177,7 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START_TAG("IN1")	/* 16bit */
+	PORT_START("IN1")	/* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -211,7 +211,7 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START_TAG("IN2")	/* 16bit */
+	PORT_START("IN2")	/* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -262,7 +262,7 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 
-	PORT_START_TAG("IN3")	/* 16bit */
+	PORT_START("IN3")	/* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -312,7 +312,7 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START_TAG("IN4")	/* 16bit */
+	PORT_START("IN4")	/* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -362,7 +362,7 @@ static INPUT_PORTS_START( rbmk )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START_TAG("IN5")	/* 16bit */
+	PORT_START("IN5")	/* 16bit */
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

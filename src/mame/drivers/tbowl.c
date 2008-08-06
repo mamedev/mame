@@ -295,29 +295,29 @@ bits 0 and 1 ? I'll try to have another look when the sprites stuff is finished.
 
 
 static INPUT_PORTS_START( tbowl )
-	PORT_START	/* player 1 inputs (0xfc00) */
+	PORT_START("P1")	/* player 1 inputs (0xfc00) */
 	TBOWL_PLAYER_INPUT(1)
 
-	PORT_START	/* player 2 inputs (0xfc01) */
+	PORT_START("P2")	/* player 2 inputs (0xfc01) */
 	TBOWL_PLAYER_INPUT(2)
 
-	PORT_START	/* player 3 inputs (0xfc02) */
+	PORT_START("P3")	/* player 3 inputs (0xfc02) */
 	TBOWL_PLAYER_INPUT(3)
 
-	PORT_START	/* player 4 inputs (0xfc03) */
+	PORT_START("P4")	/* player 4 inputs (0xfc03) */
 	TBOWL_PLAYER_INPUT(4)
 
-	PORT_START	/* system inputs (0xfc07 -> 0x80f9) */
+	PORT_START("SYSTEM")	/* system inputs (0xfc07 -> 0x80f9) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Service (General)") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Service (General)") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* DSW1 (0xfc08 -> 0xffb4) */
+	PORT_START("DSW1")	/* DSW1 (0xfc08 -> 0xffb4) */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING (   0x00, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING (   0x01, DEF_STR( 7C_1C ) )
@@ -361,7 +361,7 @@ static INPUT_PORTS_START( tbowl )
 	PORT_DIPSETTING (   0xf0, "0:25" )
 //  PORT_DIPSETTING (   0xf8, "1:00" )
 
-	PORT_START	/* DSW2 (0xfc09 -> 0xffb5) */
+	PORT_START("DSW2")	/* DSW2 (0xfc09 -> 0xffb5) */
 	PORT_DIPNAME( 0x03, 0x03, "Difficulty (unused ?)" )	// To be checked again
 	PORT_DIPSETTING (   0x00, "0x00" )
 	PORT_DIPSETTING (   0x01, "0x01" )
@@ -384,7 +384,7 @@ static INPUT_PORTS_START( tbowl )
 	PORT_DIPSETTING (   0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING (   0x80, DEF_STR( On ) )
 
-	PORT_START	/* DSW3 (0xfc0a -> 0xffb6) */
+	PORT_START("DSW3")	/* DSW3 (0xfc0a -> 0xffb6) */
 	PORT_DIPNAME( 0x03, 0x03, "Time (Quarter)" )
 	PORT_DIPSETTING (   0x00, "8:00" )
 	PORT_DIPSETTING (   0x01, "5:00" )
@@ -401,29 +401,29 @@ INPUT_PORTS_END
 /* same as 'tbowl', but different "Quarter Time" Dip Switch
    ("3:00" and "4:00" are inverted) */
 static INPUT_PORTS_START( tbowlj )
-	PORT_START	/* player 1 inputs (0xfc00) */
+	PORT_START("P1")	/* player 1 inputs (0xfc00) */
 	TBOWL_PLAYER_INPUT(1)
 
-	PORT_START	/* player 2 inputs (0xfc01) */
+	PORT_START("P2")	/* player 2 inputs (0xfc01) */
 	TBOWL_PLAYER_INPUT(2)
 
-	PORT_START	/* player 3 inputs (0xfc02) */
+	PORT_START("P3")	/* player 3 inputs (0xfc02) */
 	TBOWL_PLAYER_INPUT(3)
 
-	PORT_START	/* player 4 inputs (0xfc03) */
+	PORT_START("P4")	/* player 4 inputs (0xfc03) */
 	TBOWL_PLAYER_INPUT(4)
 
-	PORT_START	/* system inputs (0xfc07 -> 0x80f9) */
+	PORT_START("SYSTEM")	/* system inputs (0xfc07 -> 0x80f9) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Service (General)") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Service (General)") PORT_CODE(KEYCODE_F1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START	/* DSW1 (0xfc08 -> 0xffb4) */
+	PORT_START("DSW1")	/* DSW1 (0xfc08 -> 0xffb4) */
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING (   0x00, DEF_STR( 8C_1C ) )
 	PORT_DIPSETTING (   0x01, DEF_STR( 7C_1C ) )
@@ -467,7 +467,7 @@ static INPUT_PORTS_START( tbowlj )
 	PORT_DIPSETTING (   0xf0, "0:25" )
 //  PORT_DIPSETTING (   0xf8, "1:00" )
 
-	PORT_START	/* DSW2 (0xfc09 -> 0xffb5) */
+	PORT_START("DSW2")	/* DSW2 (0xfc09 -> 0xffb5) */
 	PORT_DIPNAME( 0x03, 0x03, "Difficulty (unused ?)" )	// To be checked again
 	PORT_DIPSETTING (   0x00, "0x00" )
 	PORT_DIPSETTING (   0x01, "0x01" )
@@ -490,7 +490,7 @@ static INPUT_PORTS_START( tbowlj )
 	PORT_DIPSETTING (   0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING (   0x80, DEF_STR( On ) )
 
-	PORT_START	/* DSW3 (0xfc0a -> 0xffb6) */
+	PORT_START("DSW3")	/* DSW3 (0xfc0a -> 0xffb6) */
 	PORT_DIPNAME( 0x03, 0x03, "Time (Quarter)" )
 	PORT_DIPSETTING (   0x00, "8:00" )
 	PORT_DIPSETTING (   0x01, "5:00" )

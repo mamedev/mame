@@ -1148,7 +1148,7 @@ static struct YM2610interface ym2610_interface =
 
 
 #define STANDARD_IN0														\
-	PORT_START_TAG("IN0")													\
+	PORT_START("IN0")													\
 	STANDARD_DIPS															\
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)		\
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)		\
@@ -1161,7 +1161,7 @@ static struct YM2610interface ym2610_interface =
 
 
 #define STANDARD_IN1														\
-	PORT_START_TAG("IN1")													\
+	PORT_START("IN1")													\
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )							\
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)		\
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)		\
@@ -1174,7 +1174,7 @@ static struct YM2610interface ym2610_interface =
 
 
 #define STANDARD_IN2																				\
-	PORT_START_TAG("IN2")																			\
+	PORT_START("IN2")																			\
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )													\
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )   												\
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Next Game") PORT_CODE(KEYCODE_7)		\
@@ -1185,7 +1185,7 @@ static struct YM2610interface ym2610_interface =
 
 
 #define STANDARD_IN3																				\
-	PORT_START_TAG("IN3")																			\
+	PORT_START("IN3")																			\
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )													\
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )													\
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )													\
@@ -1197,7 +1197,7 @@ static struct YM2610interface ym2610_interface =
 
 
 #define STANDARD_IN4																			\
-	PORT_START_TAG("IN4")																		\
+	PORT_START("IN4")																		\
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\

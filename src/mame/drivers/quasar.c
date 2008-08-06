@@ -218,7 +218,7 @@ ADDRESS_MAP_END
 ************************************************************************/
 
 static INPUT_PORTS_START( quasar )
-	PORT_START_TAG("IN0")	/* Controls 0 */
+	PORT_START("IN0")	/* Controls 0 */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -228,7 +228,7 @@ static INPUT_PORTS_START( quasar )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 )			/* switch collaudo */
 
-	PORT_START_TAG("IN1")	/* Controls 1 */
+	PORT_START("IN1")	/* Controls 1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 )			/* tavalino */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
@@ -238,7 +238,7 @@ static INPUT_PORTS_START( quasar )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START3 )				/* count enable */
 
-	PORT_START_TAG("DSW0")	/* DSW0 */
+	PORT_START("DSW0")	/* DSW0 */
 	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Coin_A ) )			/* confirmed */
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_1C ) )
@@ -261,7 +261,7 @@ static INPUT_PORTS_START( quasar )
 	PORT_DIPSETTING(    0x00, "Collisions excluded" )
 	PORT_DIPSETTING(    0x80, "Collisions included" )
 
-	PORT_START_TAG("DSW1")	/* DSW1 */
+	PORT_START("DSW1")	/* DSW1 */
 	PORT_DIPNAME( 0x07, 0x01, "High Score" )
 	PORT_DIPSETTING(    0x00, "No H.S." ) // this option only wants bit 0 OFF
 	PORT_DIPSETTING(    0x01, "Normal H.S." )
@@ -282,10 +282,10 @@ static INPUT_PORTS_START( quasar )
 	PORT_DIPSETTING(    0x80, "Stop at edge" )
 	PORT_DIPSETTING(    0x00, "Wrap Around" )
 
-	PORT_START_TAG("SENSE")	/* SENSE */
+	PORT_START("SENSE")	/* SENSE */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START_TAG("DSW2")	/* Sound DIP switch */
+	PORT_START("DSW2")	/* Sound DIP switch */
 #if 0
 	PORT_DIPNAME( 0x0f, 0x00, "Noise to play" )
 	PORT_DIPSETTING(    0x00, "00" )

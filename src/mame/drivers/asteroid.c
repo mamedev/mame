@@ -288,7 +288,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( asteroid )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	/* Bit 2 and 3 are handled in the machine dependent part. */
 	/* Bit 2 is the 3 KHz source and Bit 3 the VG_HALT bit    */
@@ -300,7 +300,7 @@ static INPUT_PORTS_START( asteroid )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
@@ -310,7 +310,7 @@ static INPUT_PORTS_START( asteroid )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CODE(KEYCODE_RIGHT) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)/* right */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_LEFT) PORT_CODE(JOYCODE_X_LEFT_SWITCH)	/* left */
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Language ) )	PORT_DIPLOCATION("SW:1,2")
 	PORT_DIPSETTING (	0x00, DEF_STR( English ) )
 	PORT_DIPSETTING (	0x01, DEF_STR( German ) )
@@ -361,7 +361,7 @@ static INPUT_PORTS_START( asteroib )
 	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW:5" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW:6" )
 
-	PORT_START_TAG("HS") /* hyperspace */
+	PORT_START("HS") /* hyperspace */
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)			/* hyperspace */
 INPUT_PORTS_END
@@ -409,7 +409,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( astdelux )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) /* According to schematics */
 	/* Bit 2 and 3 are handled in the machine dependent part. */
 	/* Bit 2 is the 3 KHz source and Bit 3 the VG_HALT bit    */
@@ -421,7 +421,7 @@ static INPUT_PORTS_START( astdelux )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_TILT )
 	PORT_SERVICE( 0x80, IP_ACTIVE_HIGH )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) /* Coin Left */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) /* Coin Center */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 ) /* Coin Right */
@@ -431,7 +431,7 @@ static INPUT_PORTS_START( astdelux )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CODE(KEYCODE_RIGHT) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)/* right */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_LEFT) PORT_CODE(JOYCODE_X_LEFT_SWITCH)	/* left */
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Language ) )		PORT_DIPLOCATION("R5:1,2")
 	PORT_DIPSETTING (	0x00, DEF_STR( English ) )
 	PORT_DIPSETTING (	0x01, DEF_STR( German ) )
@@ -456,7 +456,7 @@ static INPUT_PORTS_START( astdelux )
 	PORT_DIPSETTING (	0x80, "15000" )
 	PORT_DIPSETTING (	0xc0, DEF_STR( None ) )
 
-	PORT_START_TAG("DSW2")
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ) )		PORT_DIPLOCATION("L8:1,2")
 	PORT_DIPSETTING (	0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING (	0x01, DEF_STR( 1C_1C ) )
@@ -478,7 +478,7 @@ static INPUT_PORTS_START( astdelux )
 	PORT_DIPSETTING (	0xe0, DEF_STR( None ) )
 
 	/* The manual includes a 3rd DIP controlling the number & configuration of coin counters, defined as:
-    PORT_START_TAG("DSW3")                                  // 4-Toggle switch located on game PCB at M12
+    PORT_START("DSW3")                                  // 4-Toggle switch located on game PCB at M12
     PORT_DIPNAME( 0x03, 0x00, "Coin Counters" )             PORT_DIPLOCATION("M12:1,2")
     PORT_DIPSETTING (   0x00, "1=Left, Center & Right" )    // "For games having these coin doors: Thai 1Baht/1Baht, German 1DM/1DM, US 25c/25c,
                                                             // Belgian or French 5Fr/5Fr, Swiss or French 1Fr/1Fr, US 25c/25c/25c,
@@ -493,7 +493,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( llander )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	/* Bit 0 is VG_HALT, handled in the machine dependent part */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_SERVICE( 0x02, IP_ACTIVE_LOW )
@@ -502,7 +502,7 @@ static INPUT_PORTS_START( llander )
 	PORT_BIT( 0x78, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -512,7 +512,7 @@ static INPUT_PORTS_START( llander )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_CODE(KEYCODE_RIGHT) PORT_CODE(JOYCODE_X_RIGHT_SWITCH)	/* right */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_LEFT) PORT_CODE(JOYCODE_X_LEFT_SWITCH)		/* left */
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, "Right Coin" )			PORT_DIPLOCATION("P8:1,2") /* "Left Coin Mech always registers X 1" */
 	PORT_DIPSETTING (	0x00, "X 1" )
 	PORT_DIPSETTING (	0x01, "X 4" )
@@ -540,7 +540,7 @@ static INPUT_PORTS_START( llander )
 	/* The way the DAC/counter circuit always trys to self center at the voltage derived from the thrust control, */
 	/* I don't think it ever expected to get to 0xff. We can not emulate the external DAC circuit exactly, */
 	/* so changing the range to 0xfe seems to solve the problem. */
-	PORT_START_TAG("PADDLE")
+	PORT_START("PADDLE")
 	PORT_BIT( 0xff, 0x00, IPT_PADDLE ) PORT_MINMAX(0,254) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_UP) PORT_CODE_DEC(JOYCODE_Y_UP_SWITCH) PORT_CODE_INC(KEYCODE_DOWN) PORT_CODE_INC(JOYCODE_Y_DOWN_SWITCH) PORT_REVERSE
 INPUT_PORTS_END
 

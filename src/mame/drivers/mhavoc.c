@@ -335,7 +335,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( mhavoc )
-	PORT_START_TAG("IN0")	/* IN0 - alpha (player_1 = 0) */
+	PORT_START("IN0")	/* IN0 - alpha (player_1 = 0) */
 	PORT_BIT ( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
@@ -344,17 +344,17 @@ static INPUT_PORTS_START( mhavoc )
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )	/* Left Coin Switch  */
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )	/* Right Coin */
 
-	PORT_START_TAG("IN1")	/* IN1 - gamma */
+	PORT_START("IN1")	/* IN1 - gamma */
 	PORT_BIT ( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START_TAG("DIAL")	/* IN2 - gamma */
+	PORT_START("DIAL")	/* IN2 - gamma */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_REVERSE
 
-	PORT_START_TAG("DSW1")	/* DIP Switch at position 13/14S */
+	PORT_START("DSW1")	/* DIP Switch at position 13/14S */
 	PORT_DIPNAME( 0x01, 0x00, "Adaptive Difficulty" )	PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ))
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
@@ -377,7 +377,7 @@ static INPUT_PORTS_START( mhavoc )
 	PORT_DIPSETTING(    0x80, "5 (4 in Free Play)")
 	PORT_DIPSETTING(    0x40, "6 (5 in Free Play)")
 
-	PORT_START_TAG("DSW2")	/* DIP Switch at position 8S */
+	PORT_START("DSW2")	/* DIP Switch at position 8S */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
@@ -398,7 +398,7 @@ static INPUT_PORTS_START( mhavoc )
 	PORT_DIPSETTING(    0x60, "1 each 5" )
 	PORT_DIPSETTING(    0xe0, DEF_STR( None ) )
 
-	PORT_START_TAG("IN2")	/* IN5 - dummy for player_1 = 1 on alpha */
+	PORT_START("IN2")	/* IN5 - dummy for player_1 = 1 on alpha */
 	PORT_BIT ( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_DIPNAME( 0x40, 0x40, "Credit to start" )
 	PORT_DIPSETTING(    0x40, "1" )
@@ -408,24 +408,24 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( mhavocp )
-	PORT_START_TAG("IN0")	/* IN0 - alpha (player_1 = 0) */
+	PORT_START("IN0")	/* IN0 - alpha (player_1 = 0) */
 	PORT_BIT ( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diag Step/Coin C") PORT_CODE(KEYCODE_F1)
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )	/* Left Coin Switch  */
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )	/* Right Coin */
 
-	PORT_START_TAG("IN1")	/* IN1 - gamma */
+	PORT_START("IN1")	/* IN1 - gamma */
 	PORT_BIT ( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START_TAG("DIAL")	/* IN2 - gamma */
+	PORT_START("DIAL")	/* IN2 - gamma */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_REVERSE
 
-	PORT_START_TAG("DSW1") /* DIP Switch at position 13/14S */
+	PORT_START("DSW1") /* DIP Switch at position 13/14S */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
@@ -447,7 +447,7 @@ static INPUT_PORTS_START( mhavocp )
 	PORT_DIPSETTING(    0x80, "5 (4 in Free Play)")
 	PORT_DIPSETTING(    0x40, "6 (5 in Free Play)")
 
-	PORT_START_TAG("DSW2") /* DIP Switch at position 8S */
+	PORT_START("DSW2") /* DIP Switch at position 8S */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW2:7,8")
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
@@ -468,7 +468,7 @@ static INPUT_PORTS_START( mhavocp )
 	PORT_DIPSETTING(    0x60, "1 each 5" )
 	PORT_DIPSETTING(    0xe0, DEF_STR( None ) )
 
-	PORT_START_TAG("IN2")	/* IN5 - dummy for player_1 = 1 on alpha */
+	PORT_START("IN2")	/* IN5 - dummy for player_1 = 1 on alpha */
 	PORT_BIT ( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_DIPNAME( 0x40, 0x40, "Credit to start" )
 	PORT_DIPSETTING(    0x40, "1" )
@@ -478,19 +478,19 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( alphaone )
-	PORT_START_TAG("IN0")	/* IN0 - alpha (player_1 = 0) */
+	PORT_START("IN0")	/* IN0 - alpha (player_1 = 0) */
 	PORT_BIT ( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_BIT ( 0x7c, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START_TAG("IN1")	/* IN1 - gamma */
+	PORT_START("IN1")	/* IN1 - gamma */
 	PORT_BIT ( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START_TAG("DIAL")	/* IN2 - gamma */
+	PORT_START("DIAL")	/* IN2 - gamma */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_REVERSE
 INPUT_PORTS_END
 

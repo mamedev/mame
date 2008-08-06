@@ -537,7 +537,7 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( topspeed )
 	/* 0x880000 (port 0) -> 0x400852 (-$77ae,A5) (shared RAM) */
-	PORT_START_TAG("DSWA")
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x03, "Deluxe Motorized Cockpit" )
 	PORT_DIPSETTING(    0x02, "Upright (?)" )
@@ -547,7 +547,7 @@ static INPUT_PORTS_START( topspeed )
 	TAITO_COINAGE_WORLD
 
 	/* 0x880000 (port 1) -> 0x400850 (-$77b0,A5) (shared RAM) */
-	PORT_START_TAG("DSWB")
+	PORT_START("DSWB")
 	TAITO_DIFFICULTY
 	PORT_DIPNAME( 0x0c, 0x0c, "Initial Time" )
 	PORT_DIPSETTING(    0x00, "40 seconds" )
@@ -566,7 +566,7 @@ static INPUT_PORTS_START( topspeed )
     PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
     PORT_DIPSETTING(    0x80, "Same as Start" )
 
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -577,7 +577,7 @@ static INPUT_PORTS_START( topspeed )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)                     /* main brake key */
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_BUTTON3 ) PORT_PLAYER(1)                     /* nitro */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_TILT )
@@ -588,18 +588,18 @@ static INPUT_PORTS_START( topspeed )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)                     /* main accel key */
 
-	PORT_START_TAG("IN2")	/* unused */
+	PORT_START("IN2")	/* unused */
 
 	/* Note that sensitivity is chosen to suit keyboard control
        (for sound selection in test mode and hi score name entry).
        With an analogue wheel, the user will need to adjust this. */
 
 	/* continuous steer */
-	PORT_START_TAG(STEER_PORT_TAG)
+	PORT_START(STEER_PORT_TAG)
 	PORT_BIT( 0xffff, 0x00, IPT_AD_STICK_X ) PORT_MINMAX(0xff7f,0x80) PORT_SENSITIVITY(10) PORT_KEYDELTA(2) PORT_PLAYER(1)
 
 	/* fake inputs, allowing digital steer etc. */
-	PORT_START_TAG(FAKE_PORT_TAG)
+	PORT_START(FAKE_PORT_TAG)
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_4WAY PORT_PLAYER(1)

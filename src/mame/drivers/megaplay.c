@@ -118,7 +118,7 @@ static INTERRUPT_GEN (megaplay_bios_irq)
 static UINT32 readpos = 1;  // serial bank selection position (9-bit)
 
 static INPUT_PORTS_START ( megaplay )
-	PORT_START_TAG("P1_1")	/* Player 1 Controls - part 1 */
+	PORT_START("P1_1")	/* Player 1 Controls - part 1 */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
@@ -128,7 +128,7 @@ static INPUT_PORTS_START ( megaplay )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("P1_2")	/* Player 1 Controls - part 2 */
+	PORT_START("P1_2")	/* Player 1 Controls - part 2 */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(  0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -138,7 +138,7 @@ static INPUT_PORTS_START ( megaplay )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("P2_1")	/* Player 2 Controls - part 1 */
+	PORT_START("P2_1")	/* Player 2 Controls - part 1 */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
@@ -148,7 +148,7 @@ static INPUT_PORTS_START ( megaplay )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("P2_2")	/* Player 2 Controls - part 2 */
+	PORT_START("P2_2")	/* Player 2 Controls - part 2 */
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(  0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -158,7 +158,7 @@ static INPUT_PORTS_START ( megaplay )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("TEST")
+	PORT_START("TEST")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Select") PORT_CODE(KEYCODE_0)
     PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_NAME("0x6400 bit 1") PORT_CODE(KEYCODE_W)
     PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_NAME("0x6400 bit 2") PORT_CODE(KEYCODE_E)
@@ -168,7 +168,7 @@ static INPUT_PORTS_START ( megaplay )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) PORT_NAME("0x6400 bit 6") PORT_CODE(KEYCODE_U)
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START_TAG("COIN")
+	PORT_START("COIN")
  	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
     PORT_BIT ( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -183,7 +183,7 @@ static INPUT_PORTS_START ( megaplay )
  *  PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_START2 )
  */
 
-	PORT_START_TAG("DSW0")
+	PORT_START("DSW0")
 	PORT_DIPNAME( 0x0f, 0x0f, "Coin slot 1" ) PORT_DIPLOCATION("SW1:1,2,3,4")
     PORT_DIPSETTING( 0x07, DEF_STR( 4C_1C ) )
     PORT_DIPSETTING( 0x08, DEF_STR( 3C_1C ) )
@@ -224,7 +224,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_sonic )
 	PORT_INCLUDE( megaplay )
 
-	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
+	PORT_START("DSW1")	/* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x03, 0x01, "Initial Players" ) PORT_DIPLOCATION("SW3:1,2")
     PORT_DIPSETTING( 0x00, "4" )
     PORT_DIPSETTING( 0x01, "3" )
@@ -245,7 +245,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_gaxe2 )
 	PORT_INCLUDE( megaplay )
 
-	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
+	PORT_START("DSW1")	/* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW3:1")
     PORT_DIPSETTING( 0x01, DEF_STR( Normal ) )
     PORT_DIPSETTING( 0x00, DEF_STR( Hard ) )
@@ -269,7 +269,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_col3 )
 	PORT_INCLUDE( megaplay )
 
-	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
+	PORT_START("DSW1")	/* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Language ) ) PORT_DIPLOCATION("SW3:1")
     PORT_DIPSETTING( 0x01, DEF_STR( English ) )
     PORT_DIPSETTING( 0x00, DEF_STR( Japanese ) )
@@ -292,7 +292,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_twc )
 	PORT_INCLUDE( megaplay )
 
-	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
+	PORT_START("DSW1")	/* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x01, 0x01, "Time" ) PORT_DIPLOCATION("SW3:1")
     PORT_DIPSETTING( 0x01, DEF_STR( Normal ) )
     PORT_DIPSETTING( 0x00, "Short" )
@@ -310,7 +310,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_sor2 )
 	PORT_INCLUDE( megaplay )
 
-	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
+	PORT_START("DSW1")	/* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW3:1,2")
     PORT_DIPSETTING( 0x00, "4" )
     PORT_DIPSETTING( 0x01, "3" )
@@ -326,7 +326,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_bio )
 	PORT_INCLUDE( megaplay )
 
-	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
+	PORT_START("DSW1")	/* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW3:1,2")
     PORT_DIPSETTING( 0x00, "5" )
     PORT_DIPSETTING( 0x01, "4" )
@@ -342,7 +342,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_gslam )
 	PORT_INCLUDE( megaplay )
 
-	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
+	PORT_START("DSW1")	/* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x07, 0x04, DEF_STR ( Game_Time ) ) PORT_DIPLOCATION("SW3:1,2,3")
     PORT_DIPSETTING( 0x00, "5:00" )
     PORT_DIPSETTING( 0x01, "4:30" )
@@ -360,7 +360,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_mazin )
 	PORT_INCLUDE( megaplay )
 
-	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
+	PORT_START("DSW1")	/* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x01, 0x01, "Initial Player" ) PORT_DIPLOCATION("SW3:1")
     PORT_DIPSETTING( 0x01, "2" )
     PORT_DIPSETTING( 0x00, "1" )
@@ -378,7 +378,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_soni2 )
 	PORT_INCLUDE( megaplay )
 
-	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
+	PORT_START("DSW1")	/* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x03, 0x01, "Initial Players (Normal mode)" ) PORT_DIPLOCATION("SW3:1,2")
     PORT_DIPSETTING( 0x00, "4" )
     PORT_DIPSETTING( 0x01, "3" )
@@ -394,7 +394,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START ( mp_shnb3 )
 	PORT_INCLUDE( megaplay )
 
-	PORT_START_TAG("DSW1")	/* DSW C  (per game settings) */
+	PORT_START("DSW1")	/* DSW C  (per game settings) */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW3:1,2")
     PORT_DIPSETTING( 0x00, "4" )
     PORT_DIPSETTING( 0x01, "3" )

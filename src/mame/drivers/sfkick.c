@@ -40,7 +40,7 @@ ADDRESS_MAP_END
 #endif
 
 static INPUT_PORTS_START( sfkick )
-    PORT_START
+    PORT_START("IN0")
     PORT_DIPNAME(   0x01, 0x01, DEF_STR( Unknown ) )
     PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x00, DEF_STR( On ) )

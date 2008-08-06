@@ -557,7 +557,7 @@ static INPUT_PORTS_START( lucky74 )
 /*  Player buttons are the same for players 1 & 2.
     Test mode shows them as dupes. Maybe are multiplexed?
 */
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)	/* 'A' in test mode */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)	/* 'B' in test mode */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)	/* 'C' in test mode */
@@ -567,7 +567,7 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Input G")  PORT_CODE(KEYCODE_J)	/* 'G' in test mode (inverted screen) */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Input H")  PORT_CODE(KEYCODE_K)	/* 'H' in test mode */
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Bet")         PORT_CODE(KEYCODE_2)	/* 'I' in test mode */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Start")       PORT_CODE(KEYCODE_1)	/* 'J' in test mode */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Cancel")      PORT_CODE(KEYCODE_N)	/* 'K' in test mode */
@@ -577,7 +577,7 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Input O")       PORT_CODE(KEYCODE_M)	/* 'O' in test mode (normal screen) */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* not in test mode */
 
-	PORT_START_TAG("IN2")
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Books")		PORT_CODE(KEYCODE_0)
@@ -587,7 +587,7 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")	/* YM2149, port A */
+	PORT_START("IN3")	/* YM2149, port A */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )    PORT_IMPULSE(2)	/* Coin A */
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Key In")	PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )    PORT_IMPULSE(2)	/* Coin B */
@@ -597,7 +597,7 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN4")
+	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Memory Reset Switch")	PORT_CODE(KEYCODE_R)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -607,7 +607,7 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "Auto Hold" )				PORT_DIPLOCATION("DSW1:1")  /* see note 1 */
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
@@ -638,7 +638,7 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_DIPSETTING(    0x00, "Without" )
 	PORT_DIPSETTING(    0x80, "With" )
 
-	PORT_START_TAG("DSW2")
+	PORT_START("DSW2")
     /* DIPs 1-4 handle the harcoded coinage for Coin A, B and Remote credits (B = A x 5; R = A x 10) */
 	PORT_DIPNAME( 0x0f, 0x0f, "Coinage A, B & Remote" )	PORT_DIPLOCATION("DSW2:1,2,3,4")
 	PORT_DIPSETTING(    0x00, "A: 20 Coins/1 Credit; B: 4 Coins/1 Credit;   R: 2 Pulses/1 Credit   " )
@@ -676,7 +676,7 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_DIPSETTING(    0xe0, "1 Coin/40 Credits" )
 	PORT_DIPSETTING(    0xf0, "1 Coin/50 Credits" )
 
-	PORT_START_TAG("DSW3")
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x01, "Bet Max" )						PORT_DIPLOCATION("DSW3:1")
 	PORT_DIPSETTING(    0x01, "20" )
 	PORT_DIPSETTING(    0x00, "40" )
@@ -700,7 +700,7 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_DIPSETTING(    0x80, "A - Hold" )
 	PORT_DIPSETTING(    0x00, "B - Discard" )
 
-	PORT_START_TAG("DSW4")
+	PORT_START("DSW4")
 	PORT_DIPNAME( 0x01, 0x01, "Hopper Coin SW" )				PORT_DIPLOCATION("DSW4:1")
 	PORT_DIPSETTING(    0x01, "Active Low" )
 	PORT_DIPSETTING(    0x00, "Active High" )

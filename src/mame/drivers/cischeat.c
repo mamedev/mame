@@ -582,13 +582,13 @@ static ADDRESS_MAP_START( readmem_scudhamm, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_READ(SMH_RAM					)	// Scroll RAM 0
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_READ(SMH_RAM					)	// Scroll RAM 2
 	AM_RANGE(0x0b8000, 0x0bffff) AM_READ(SMH_RAM					)	// Palette
-	AM_RANGE(0x100008, 0x100009) AM_READ(input_port_0_word_r		)	// Buttons
+	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("IN0")					// Buttons
 	AM_RANGE(0x100014, 0x100015) AM_READ(OKIM6295_status_0_lsb_r	)	// Sound
 	AM_RANGE(0x100018, 0x100019) AM_READ(OKIM6295_status_1_lsb_r	)	//
 	AM_RANGE(0x100040, 0x100041) AM_READ(scudhamm_analog_r			)	// A / D
 	AM_RANGE(0x100044, 0x100045) AM_READ(scudhamm_motor_pos_r		)	// Motor Position
 	AM_RANGE(0x100050, 0x100051) AM_READ(scudhamm_motor_status_r	)	// Motor Limit Switches
-	AM_RANGE(0x10005c, 0x10005d) AM_READ(input_port_2_word_r		)	// 2 x DSW
+	AM_RANGE(0x10005c, 0x10005d) AM_READ_PORT("IN2")					// 2 x DSW
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_scudhamm, ADDRESS_SPACE_PROGRAM, 16 )
@@ -678,8 +678,8 @@ static ADDRESS_MAP_START( readmem_armchmp2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0000, 0x0a3fff) AM_READ(SMH_RAM					)	// Scroll RAM 0
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_READ(SMH_RAM					)	// Scroll RAM 2
 	AM_RANGE(0x0b8000, 0x0bffff) AM_READ(SMH_RAM					)	// Palette
-	AM_RANGE(0x100000, 0x100001) AM_READ(input_port_2_word_r		)	// DSW
-	AM_RANGE(0x100004, 0x100005) AM_READ(input_port_3_word_r		)	// DSW
+	AM_RANGE(0x100000, 0x100001) AM_READ_PORT("IN2")					// DSW
+	AM_RANGE(0x100004, 0x100005) AM_READ_PORT("IN3")					// DSW
 	AM_RANGE(0x100008, 0x100009) AM_READ(armchmp2_buttons_r			)	// Buttons + Sensors
 	AM_RANGE(0x10000c, 0x10000d) AM_READ(armchmp2_analog_r			)	// A / D
 	AM_RANGE(0x100010, 0x100011) AM_READ(armchmp2_motor_status_r	)	// Motor Limit Switches?
@@ -994,12 +994,12 @@ ADDRESS_MAP_END
 //                  [4] DSW 1 & 2   [5] DSW 3       [6] Driving Wheel
 
 static INPUT_PORTS_START( bigrun )
-	PORT_START_TAG("FAKE")	// IN0 - Fake input port - Buttons status
+	PORT_START("FAKE")	// IN0 - Fake input port - Buttons status
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Accelerator")\
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Low Gear")\
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 High Gear")\
 
-	PORT_START_TAG("IN1")	// Coins - $80000.w
+	PORT_START("IN1")	// Coins - $80000.w
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_COIN2    )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1009,7 +1009,7 @@ static INPUT_PORTS_START( bigrun )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
-	PORT_START_TAG("IN2")	//Controls - $80002.w
+	PORT_START("IN2")	//Controls - $80002.w
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Brake")	// Brake
 //  PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_BUTTON4 )   // Shift - We handle it using buttons 3&4
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1019,7 +1019,7 @@ static INPUT_PORTS_START( bigrun )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Horn")	// Horn
 
-	PORT_START_TAG("IN3")	// Motor Control? - $80004.w
+	PORT_START("IN3")	// Motor Control? - $80004.w
 	PORT_DIPNAME( 0x01, 0x01, "Up Limit SW"  	)	// Limit the Cockpit movements?
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On )  )
@@ -1039,7 +1039,7 @@ static INPUT_PORTS_START( bigrun )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN4")	// DSW 2 & 3 - $80006.w
+	PORT_START("IN4")	// DSW 2 & 3 - $80006.w
 	// DSW 3
 	PORT_DIPNAME( 0x0003, 0x0003, "Extra Setting For Coin B" )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Unused ) )
@@ -1096,7 +1096,7 @@ static INPUT_PORTS_START( bigrun )
 	PORT_DIPSETTING(      0x2000, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 
-	PORT_START_TAG("IN5")	// DSW 3 (4 bits, Cabinet Linking) - $82200.w
+	PORT_START("IN5")	// DSW 3 (4 bits, Cabinet Linking) - $82200.w
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x06, 0x00, "Unit ID"             )
 	PORT_DIPSETTING(    0x00, "1 (Blue-White Car)"  )
@@ -1109,7 +1109,7 @@ static INPUT_PORTS_START( bigrun )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN6")	// Driving Wheel - $80010.w(0)
+	PORT_START("IN6")	// Driving Wheel - $80010.w(0)
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
 INPUT_PORTS_END
 
@@ -1123,11 +1123,11 @@ INPUT_PORTS_END
 //                  [4] DSW 1 & 2   [5] DSW 3       [6] Driving Wheel
 
 static INPUT_PORTS_START( cischeat )
-	PORT_START_TAG("FAKE")	// Fake input port - Buttons status
+	PORT_START("FAKE")	// Fake input port - Buttons status
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Low Gear")\
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 High Gear")\
 
-	PORT_START_TAG("IN1")	// Coins - $80000.w
+	PORT_START("IN1")	// Coins - $80000.w
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_COIN2    )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1137,7 +1137,7 @@ static INPUT_PORTS_START( cischeat )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 
-	PORT_START_TAG("IN2")	// Controls - $80002.w
+	PORT_START("IN2")	// Controls - $80002.w
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Brake")	// Brake
 //  PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_BUTTON4 )   // Shift - We handle it using buttons 3&4
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1147,7 +1147,7 @@ static INPUT_PORTS_START( cischeat )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("P1 Horn")	// Horn
 
-	PORT_START_TAG("IN3")	// Motor Control? - $80004.w
+	PORT_START("IN3")	// Motor Control? - $80004.w
 	PORT_DIPNAME( 0x01, 0x01, "Up Limit SW"  	)	// Limit the Cockpit movements?
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On )  )
@@ -1165,7 +1165,7 @@ static INPUT_PORTS_START( cischeat )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN4")	// DSW 1 & 2 - $80006.w -> !f000a.w(hi byte) !f0008.w(low byte)
+	PORT_START("IN4")	// DSW 1 & 2 - $80006.w -> !f000a.w(hi byte) !f0008.w(low byte)
 	COINAGE_6BITS_2
 	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )	// unused?
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
@@ -1197,7 +1197,7 @@ static INPUT_PORTS_START( cischeat )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On )  )
 
-	PORT_START_TAG("IN5")	// DSW 3 (4 bits, Cabinet Linking) - $82200.w
+	PORT_START("IN5")	// DSW 3 (4 bits, Cabinet Linking) - $82200.w
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x06, 0x06, "Unit ID (2)" )	// -> f0020 (like DSW2 !!)
 	PORT_DIPSETTING(    0x06, "Use other"      )
@@ -1210,7 +1210,7 @@ static INPUT_PORTS_START( cischeat )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN6")	// IN6 - Driving Wheel - $80010.w(0)
+	PORT_START("IN6")	// IN6 - Driving Wheel - $80010.w(0)
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
 INPUT_PORTS_END
 
@@ -1225,7 +1225,7 @@ INPUT_PORTS_END
 //                  [6] Coinage JP&USA  [7] Coinage UK&FR
 
 static INPUT_PORTS_START( f1gpstar )
-	PORT_START_TAG("FAKE")	// Fake input port - Buttons status
+	PORT_START("FAKE")	// Fake input port - Buttons status
     PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("P1 Accelerator")\
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("P1 Low Gear")\
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("P1 High Gear")\
@@ -1237,7 +1237,7 @@ static INPUT_PORTS_START( f1gpstar )
     Europe      English,  Mph , "steering shock", "(c)1992"
     France      French,   Km/h, "steering shock", "(c)1992" */
 
-	PORT_START_TAG("IN1")	// DSW 1 & 2 - $80000.w -> !f9012
+	PORT_START("IN1")	// DSW 1 & 2 - $80000.w -> !f9012
 	// DSW 1 ( Coinage - it changes with Country: we use IN6 & IN7 )
 	PORT_DIPNAME( 0x0040, 0x0040, "Free Play (EU & FR)" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
@@ -1269,7 +1269,7 @@ static INPUT_PORTS_START( f1gpstar )
 	PORT_DIPSETTING(      0x8000, "Torque" )
 	PORT_DIPSETTING(      0x0000, "Shake"  )
 
-	PORT_START_TAG("IN2")	// Controls - $80004.w -> !f9016
+	PORT_START("IN2")	// Controls - $80004.w -> !f9016
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2    )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1279,7 +1279,7 @@ static INPUT_PORTS_START( f1gpstar )
 	PORT_BIT(  0x0040, IP_ACTIVE_LOW, IPT_BUTTON2  ) PORT_NAME("P1 Brake")// Brake -> !f9010
 	PORT_BIT(  0x0080, IP_ACTIVE_LOW, IPT_START2   ) // "Race Together"
 
-	PORT_START_TAG("IN3")	// ? Read at boot only - $80006.w
+	PORT_START("IN3")	// ? Read at boot only - $80006.w
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1303,7 +1303,7 @@ static INPUT_PORTS_START( f1gpstar )
     ON-OFF                  Blue-White Car
     ON- ON                  Blue Car, "equipped with communication link"    */
 
-	PORT_START_TAG("IN4")	// DSW 3 (4 bits, Cabinet Linking) - $8000c.w -> !f9014
+	PORT_START("IN4")	// DSW 3 (4 bits, Cabinet Linking) - $8000c.w -> !f9014
 	PORT_DIPNAME( 0x01, 0x01, "This Unit Is" )
 	PORT_DIPSETTING(    0x01, "Slave" )
 	PORT_DIPSETTING(    0x00, "Master" )
@@ -1319,10 +1319,10 @@ static INPUT_PORTS_START( f1gpstar )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 				//       Accelerator   - $80010.b ->  !f9004.w
-	PORT_START_TAG("IN5")	// Driving Wheel - $80011.b ->  !f9008.w
+	PORT_START("IN5")	// Driving Wheel - $80011.b ->  !f9008.w
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_SENSITIVITY(30) PORT_KEYDELTA(30)
 
-	PORT_START_TAG("IN6")	// Coinage Japan & USA (it changes with Country)
+	PORT_START("IN6")	// Coinage Japan & USA (it changes with Country)
 	PORT_DIPNAME( 0x0007, 0x0007, "Coin A (JP US)" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
@@ -1341,7 +1341,7 @@ static INPUT_PORTS_START( f1gpstar )
 	PORT_DIPSETTING(      0x0028, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_4C ) )
 
-	PORT_START_TAG("IN7")	// Coinage Europe & France (it changes with Country)
+	PORT_START("IN7")	// Coinage Europe & France (it changes with Country)
 	PORT_DIPNAME( 0x0007, 0x0007, "Coin A (EU FR)" )
 	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )
@@ -1368,7 +1368,7 @@ INPUT_PORTS_END
 **************************************************************************/
 
 static INPUT_PORTS_START( wildplt )
-	PORT_START_TAG("IN0")	// DSW 1 & 2
+	PORT_START("IN0")	// DSW 1 & 2
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
@@ -1417,7 +1417,7 @@ static INPUT_PORTS_START( wildplt )
 	PORT_DIPSETTING(      0xc000, DEF_STR( Japan ) )
 	PORT_DIPSETTING(      0x0000, "France?" )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_START1 ) //service 1 too
@@ -1435,10 +1435,10 @@ static INPUT_PORTS_START( wildplt )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // Senser SW. #2
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Emergency Button") //E Stop for motors? ( Senser SW. #3 )
 
-	PORT_START_TAG("IN2")
+	PORT_START("IN2")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_REVERSE
 
-	PORT_START_TAG("IN3")
+	PORT_START("IN3")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_SENSITIVITY(35) PORT_KEYDELTA(15)
 INPUT_PORTS_END
 
@@ -1448,7 +1448,7 @@ INPUT_PORTS_END
 **************************************************************************/
 
 static INPUT_PORTS_START( scudhamm )
-	PORT_START_TAG("IN0")	// Buttons
+	PORT_START("IN0")	// Buttons
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN  ) // GAME OVER if pressed on the selection screen
 	PORT_BIT(  0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1467,10 +1467,10 @@ static INPUT_PORTS_START( scudhamm )
 	PORT_BIT(  0x4000, IP_ACTIVE_HIGH, IPT_TILT    )
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")	// A/D
+	PORT_START("IN1")	// A/D
 	PORT_BIT( 0x00ff, 0x0000, IPT_PADDLE ) PORT_MINMAX(0x0000,0x00ff) PORT_SENSITIVITY(1) PORT_KEYDELTA(0)
 
-	PORT_START_TAG("IN2")	// DSW
+	PORT_START("IN2")	// DSW
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
@@ -1526,7 +1526,7 @@ INPUT_PORTS_END
 **************************************************************************/
 
 static INPUT_PORTS_START( armchmp2 )
-	PORT_START_TAG("IN0")	// Buttons + Sensors
+	PORT_START("IN0")	// Buttons + Sensors
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL  ) // left   sensor
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SPECIAL  ) // right  sensor
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SPECIAL  ) // center sensor
@@ -1540,10 +1540,10 @@ static INPUT_PORTS_START( armchmp2 )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON2  ) // easy
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON3  ) // elbow (it always complains though)
 
-	PORT_START_TAG("IN1")	// A/D
+	PORT_START("IN1")	// A/D
 	PORT_BIT( 0x00ff, 0x0000, IPT_DIAL ) PORT_MINMAX(0x0000,0x00ff) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
-	PORT_START_TAG("IN2")	// DSW
+	PORT_START("IN2")	// DSW
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
@@ -1565,7 +1565,7 @@ static INPUT_PORTS_START( armchmp2 )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Europe ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( World ) )
 
-	PORT_START_TAG("IN3")	// DSW
+	PORT_START("IN3")	// DSW
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )

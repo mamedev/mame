@@ -474,13 +474,13 @@ static ADDRESS_MAP_START( exidy440_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2b00, 0x2b00) AM_READ(exidy440_vertical_pos_r)
 	AM_RANGE(0x2b01, 0x2b01) AM_READWRITE(exidy440_horizontal_pos_r, exidy440_interrupt_clear_w)
 	AM_RANGE(0x2b02, 0x2b02) AM_RAM AM_BASE(&exidy440_scanline)
-	AM_RANGE(0x2b03, 0x2b03) AM_READWRITE(input_port_0_r, exidy440_control_w)
+	AM_RANGE(0x2b03, 0x2b03) AM_READ_PORT("IN0") AM_WRITE(exidy440_control_w)
 	AM_RANGE(0x2c00, 0x2dff) AM_READWRITE(exidy440_paletteram_r, exidy440_paletteram_w)
 	AM_RANGE(0x2e00, 0x2e1f) AM_RAM_WRITE(sound_command_w)
 	AM_RANGE(0x2e20, 0x2e3f) AM_READWRITE(exidy440_input_port_3_r, exidy440_input_port_3_w)
 	AM_RANGE(0x2e40, 0x2e5f) AM_READWRITE(SMH_NOP, exidy440_coin_counter_w)	/* read: clear coin counters I/O2 */
-	AM_RANGE(0x2e60, 0x2e7f) AM_READWRITE(input_port_1_r, SMH_NOP)
-	AM_RANGE(0x2e80, 0x2e9f) AM_READWRITE(input_port_2_r, SMH_NOP)
+	AM_RANGE(0x2e60, 0x2e7f) AM_READ_PORT("IN1") AM_WRITENOP
+	AM_RANGE(0x2e80, 0x2e9f) AM_READ_PORT("IN2") AM_WRITENOP
 	AM_RANGE(0x2ea0, 0x2ebf) AM_READWRITE(sound_command_ack_r, SMH_NOP)
 	AM_RANGE(0x2ec0, 0x2eff) AM_NOP
 	AM_RANGE(0x3000, 0x3fff) AM_RAM
@@ -517,7 +517,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( crossbow )
-	PORT_START_TAG("IN0")		/* player inputs and logic board dips */
+	PORT_START("IN0")		/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
@@ -533,32 +533,32 @@ static INPUT_PORTS_START( crossbow )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
-	PORT_START_TAG("IN1") 		/* audio board dips */
+	PORT_START("IN1") 		/* audio board dips */
 	COINAGE
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN2")		/* start button */
+	PORT_START("IN2")		/* start button */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")		/* coin counters */
+	PORT_START("IN3")		/* coin counters */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("AN0")		/* fake analog X */
+	PORT_START("AN0")		/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START_TAG("AN1")		/* fake analog Y */
+	PORT_START("AN1")		/* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( cheyenne )
-	PORT_START_TAG("IN0")		/* player inputs and logic board dips */
+	PORT_START("IN0")		/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )
@@ -574,32 +574,32 @@ static INPUT_PORTS_START( cheyenne )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
-	PORT_START_TAG("IN1")		/* audio board dips */
+	PORT_START("IN1")		/* audio board dips */
 	COINAGE
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN2")		/* start button */
+	PORT_START("IN2")		/* start button */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")		/* coin counters */
+	PORT_START("IN3")		/* coin counters */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("AN0")		/* fake analog X */
+	PORT_START("AN0")		/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START_TAG("AN1")		/* fake analog Y */
+	PORT_START("AN1")		/* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( combat )
-	PORT_START_TAG("IN0")		/* player inputs and logic board dips */
+	PORT_START("IN0")		/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )
@@ -615,32 +615,32 @@ static INPUT_PORTS_START( combat )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
-	PORT_START_TAG("IN1") 		/* audio board dips */
+	PORT_START("IN1") 		/* audio board dips */
 	COINAGE
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN2")		/* start button */
+	PORT_START("IN2")		/* start button */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")		/* coin counters */
+	PORT_START("IN3")		/* coin counters */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("AN0")		/* fake analog X */
+	PORT_START("AN0")		/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START_TAG("AN1")		/* fake analog Y */
+	PORT_START("AN1")		/* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( catch22 )
-	PORT_START_TAG("IN0")		/* player inputs and logic board dips */
+	PORT_START("IN0")		/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )
@@ -656,33 +656,33 @@ static INPUT_PORTS_START( catch22 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
-	PORT_START_TAG("IN1")		/* audio board dips */
+	PORT_START("IN1")		/* audio board dips */
 	COINAGE
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN2")		/* start button */
+	PORT_START("IN2")		/* start button */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")		/* coin counters */
+	PORT_START("IN3")		/* coin counters */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START_TAG("AN0")		/* fake analog X */
+	PORT_START("AN0")		/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START_TAG("AN1")		/* fake analog Y */
+	PORT_START("AN1")		/* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( cracksht )
-	PORT_START_TAG("IN0")		/* player inputs and logic board dips */
+	PORT_START("IN0")		/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_DIPNAME( 0x0c, 0x00, "Seconds" )
@@ -698,33 +698,33 @@ static INPUT_PORTS_START( cracksht )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
-	PORT_START_TAG("IN1")		/* audio board dips */
+	PORT_START("IN1")		/* audio board dips */
 	COINAGE
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN2")		/* start button */
+	PORT_START("IN2")		/* start button */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")		/* coin counters */
+	PORT_START("IN3")		/* coin counters */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START_TAG("AN0")		/* fake analog X */
+	PORT_START("AN0")		/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START_TAG("AN1")		/* fake analog Y */
+	PORT_START("AN1")		/* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( claypign )
-	PORT_START_TAG("IN0")		/* player inputs and logic board dips */
+	PORT_START("IN0")		/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -736,33 +736,33 @@ static INPUT_PORTS_START( claypign )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
-	PORT_START_TAG("IN1")		/* audio board dips */
+	PORT_START("IN1")		/* audio board dips */
 	COINAGE
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN2")		/* start button */
+	PORT_START("IN2")		/* start button */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")		/* coin counters */
+	PORT_START("IN3")		/* coin counters */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START_TAG("AN0")		/* fake analog X */
+	PORT_START("AN0")		/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START_TAG("AN1")		/* fake analog Y */
+	PORT_START("AN1")		/* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( chiller )
-	PORT_START_TAG("IN0")		/* player inputs and logic board dips */
+	PORT_START("IN0")		/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_DIPNAME( 0x0c, 0x00, "Seconds" )
@@ -778,30 +778,30 @@ static INPUT_PORTS_START( chiller )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
-	PORT_START_TAG("IN1")		/* audio board dips */
+	PORT_START("IN1")		/* audio board dips */
 	COINAGE
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")		/* start button */
+	PORT_START("IN2")		/* start button */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")		/* coin counters */
+	PORT_START("IN3")		/* coin counters */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START_TAG("AN0")		/* fake analog X */
+	PORT_START("AN0")		/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START_TAG("AN1")		/* fake analog Y */
+	PORT_START("AN1")		/* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( topsecex )
-	PORT_START_TAG("IN0")		/* player inputs and logic board dips */
+	PORT_START("IN0")		/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )
@@ -817,27 +817,27 @@ static INPUT_PORTS_START( topsecex )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
-	PORT_START_TAG("IN1")		/* audio board dips */
+	PORT_START("IN1")		/* audio board dips */
 	COINAGE
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")		/* start button */
+	PORT_START("IN2")		/* start button */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")		/* coin counters */
+	PORT_START("IN3")		/* coin counters */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START_TAG("AN0")		/* fake analog X */
+	PORT_START("AN0")		/* fake analog X */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE
 
-	PORT_START_TAG("AN1")		/* fake analog Y */
+	PORT_START("AN1")		/* fake analog Y */
 	PORT_BIT(  0xff, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START_TAG("IN4")		/* start button */
+	PORT_START("IN4")		/* start button */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Fireball")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Laser")
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Missile")
@@ -850,7 +850,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( hitnmiss )
-	PORT_START_TAG("IN0")		/* player inputs and logic board dips */
+	PORT_START("IN0")		/* player inputs and logic board dips */
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(hitnmiss_button1_r, 0)
 	PORT_DIPNAME( 0x0c, 0x00, "Seconds" )
 	PORT_DIPSETTING(    0x04, "20" )
@@ -865,36 +865,36 @@ static INPUT_PORTS_START( hitnmiss )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
-	PORT_START_TAG("IN1")		/* audio board dips */
+	PORT_START("IN1")		/* audio board dips */
 	COINAGE
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN2")		/* start button */
+	PORT_START("IN2")		/* start button */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")		/* coin counters */
+	PORT_START("IN3")		/* coin counters */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START_TAG("AN0")		/* fake analog X */
+	PORT_START("AN0")		/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START_TAG("AN1")		/* fake analog Y */
+	PORT_START("AN1")		/* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 
-	PORT_START_TAG("HITNMISS_BUTTON1")
+	PORT_START("HITNMISS_BUTTON1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( whodunit )
-	PORT_START_TAG("IN0")		/* player inputs and logic board dips */
+	PORT_START("IN0")		/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )
@@ -910,30 +910,30 @@ static INPUT_PORTS_START( whodunit )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
-	PORT_START_TAG("IN1")		/* audio board dips */
+	PORT_START("IN1")		/* audio board dips */
 	COINAGE
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")		/* start button */
+	PORT_START("IN2")		/* start button */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")		/* coin counters */
+	PORT_START("IN3")		/* coin counters */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START_TAG("AN0")		/* fake analog X */
+	PORT_START("AN0")		/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START_TAG("AN1")		/* fake analog Y */
+	PORT_START("AN1")		/* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( showdown )
-	PORT_START_TAG("IN0")		/* player inputs and logic board dips */
+	PORT_START("IN0")		/* player inputs and logic board dips */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_DIPNAME( 0x0c, 0x00, "Hands" )
@@ -949,7 +949,7 @@ static INPUT_PORTS_START( showdown )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
 
-	PORT_START_TAG("IN1")		/* audio board dips */
+	PORT_START("IN1")		/* audio board dips */
 	COINAGE
 	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x70, "1" )
@@ -964,7 +964,7 @@ static INPUT_PORTS_START( showdown )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN2")		/* start button */
+	PORT_START("IN2")		/* start button */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 ) PORT_NAME("Action")
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Bet-All")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Gold")
@@ -974,16 +974,16 @@ static INPUT_PORTS_START( showdown )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")		/* coin counters */
+	PORT_START("IN3")		/* coin counters */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 ) PORT_CHANGED(coin_inserted, 0)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START_TAG("AN0")		/* fake analog X */
+	PORT_START("AN0")		/* fake analog X */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10)
 
-	PORT_START_TAG("AN1")		/* fake analog Y */
+	PORT_START("AN1")		/* fake analog Y */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10)
 INPUT_PORTS_END
 

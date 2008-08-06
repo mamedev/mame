@@ -503,7 +503,7 @@ static INTERRUPT_GEN(skns_interrupt)
 
 static INPUT_PORTS_START( skns )		/* 3 buttons, 2 players */
 
-	PORT_START_TAG("IN0")  /* IN0 */
+	PORT_START("IN0")  /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -513,7 +513,7 @@ static INPUT_PORTS_START( skns )		/* 3 buttons, 2 players */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN1")  /* IN1 */
+	PORT_START("IN1")  /* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -523,7 +523,7 @@ static INPUT_PORTS_START( skns )		/* 3 buttons, 2 players */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN2")  /* IN2 */
+	PORT_START("IN2")  /* IN2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -533,19 +533,19 @@ static INPUT_PORTS_START( skns )		/* 3 buttons, 2 players */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")  /* IN3 */
+	PORT_START("IN3")  /* IN3 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("Paddle A")  /* Paddle A */
+	PORT_START("Paddle A")  /* Paddle A */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("Paddle B")  /* Paddle B */
+	PORT_START("Paddle B")  /* Paddle B */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("Paddle C")  /* Paddle C */
+	PORT_START("Paddle C")  /* Paddle C */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("DSW")  /* DSW */
+	PORT_START("DSW")  /* DSW */
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Flip_Screen) ) // This port affects 0x040191c8 function
 	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
@@ -569,14 +569,14 @@ static INPUT_PORTS_START( skns )		/* 3 buttons, 2 players */
 	PORT_DIPSETTING(    0x00, "Freezes the game")
 	PORT_DIPSETTING(    0x80, "Right value")
 
-	PORT_START_TAG("Paddle D")  /* Paddle D */
+	PORT_START("Paddle D")  /* Paddle D */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( skns_1p )		/* 2 buttons, 1 player */
 
-	PORT_START_TAG("IN0")  /* IN0 */
+	PORT_START("IN0")  /* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -591,12 +591,12 @@ static INPUT_PORTS_START( skns_1p )		/* 2 buttons, 1 player */
        that allows to play them in two player mode
        via a cable-network connection (untestable)
        Service mode test shows only P1 inputs */
-	PORT_START_TAG("IN1")  /* IN1 */
+	PORT_START("IN1")  /* IN1 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	/* same as above, coin 2 and start 2 are untestable
        in ryouran and teljan. So I left disabled for now */
-	PORT_START_TAG("IN2")  /* IN2 */
+	PORT_START("IN2")  /* IN2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 //PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -608,19 +608,19 @@ static INPUT_PORTS_START( skns_1p )		/* 2 buttons, 1 player */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")  /* IN3 */
+	PORT_START("IN3")  /* IN3 */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("Paddle A")  /* Paddle A */
+	PORT_START("Paddle A")  /* Paddle A */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("Paddle B")  /* Paddle B */
+	PORT_START("Paddle B")  /* Paddle B */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("Paddle C")  /* Paddle C */
+	PORT_START("Paddle C")  /* Paddle C */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("DSW")  /* DSW */
+	PORT_START("DSW")  /* DSW */
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR(Flip_Screen) ) // This port affects 0x040191c8 function
 	PORT_DIPSETTING(    0x02, DEF_STR(Off) )
@@ -644,7 +644,7 @@ static INPUT_PORTS_START( skns_1p )		/* 2 buttons, 1 player */
 	PORT_DIPSETTING(    0x00, "Freezes the game")
 	PORT_DIPSETTING(    0x80, "Right value")
 
-	PORT_START_TAG("Paddle D")  /* Paddle D */
+	PORT_START("Paddle D")  /* Paddle D */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 INPUT_PORTS_END

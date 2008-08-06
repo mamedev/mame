@@ -41,7 +41,7 @@ HuC6280A (Hudson)
 #include "sound/c6280.h"
 
 static INPUT_PORTS_START( paranoia )
-    PORT_START_TAG( "JOY" )
+    PORT_START( "JOY" )
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* button I */
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* button II */
     PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* select */

@@ -154,15 +154,15 @@ static const UINT32 sspeedr_controller_table[] =
 
 static INPUT_PORTS_START( sspeedr )
 
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x3f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(64) PORT_REMAP_TABLE(sspeedr_controller_table) PORT_WRAPS PORT_SENSITIVITY(25) PORT_KEYDELTA(10)
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	/* The gas pedal is adjusted physically so the encoder is at position 2 when the pedal is not pressed. */
 	/* It also only uses half of the encoder. */
 	PORT_BIT( 0x1f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(30) PORT_REMAP_TABLE(sspeedr_controller_table + 2) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
-	PORT_START_TAG("DSW")
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -181,7 +181,7 @@ static INPUT_PORTS_START( sspeedr )
 	PORT_DIPSETTING(    0xA0, "RAM/ROM Test" )
 	PORT_DIPSETTING(    0xE0, "Accelerator Adjustment" )
 
-	PORT_START_TAG("IN3")
+	PORT_START("IN3")
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_TOGGLE /* gear shift lever */

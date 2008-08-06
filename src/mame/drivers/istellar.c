@@ -206,7 +206,7 @@ ADDRESS_MAP_END
 /* PORTS */
 static INPUT_PORTS_START( istellar )
 	/* TEST MODE might display a 0 for a short and a 1 for an open circuit?  If so, everything below is inverted. */
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -233,7 +233,7 @@ static INPUT_PORTS_START( istellar )
               settings.  I'm unaware of what mechanism MAME will use to make this work right? */
 
 	/* "In case of inter-stellar upright type the coin switch 2 is not used."  Quoth the manual. */
-	PORT_START_TAG("DSW2")
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:3")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -249,7 +249,7 @@ static INPUT_PORTS_START( istellar )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
 
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY

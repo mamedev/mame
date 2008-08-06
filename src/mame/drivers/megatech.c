@@ -95,7 +95,7 @@ UINT32 bios_ctrl_inputs;
 static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_INCLUDE(megadriv)
 
-	PORT_START_TAG("BIOS_IN0") // port 6
+	PORT_START("BIOS_IN0") // port 6
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Select") PORT_CODE(KEYCODE_0)
     PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
     PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
@@ -117,7 +117,7 @@ static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START_TAG("BIOS_IN1") // port 6
+	PORT_START("BIOS_IN1") // port 6
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_COIN1 )  // a few coin inputs here
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_COIN3 )
@@ -127,7 +127,7 @@ static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START_TAG("BIOS_DSW0")
+	PORT_START("BIOS_DSW0")
 	PORT_DIPNAME( 0x02, 0x02, "Coin slot 3" )
 	PORT_DIPSETTING (   0x00, "Inhibit" )
 	PORT_DIPSETTING (   0x02, "Accept" )
@@ -153,7 +153,7 @@ static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x00, "Inhibit" )
 
-	PORT_START_TAG("BIOS_DSW1")
+	PORT_START("BIOS_DSW1")
 	PORT_DIPNAME( 0x0f, 0x01, "Coin Slot 1 value" )
 	PORT_DIPSETTING(    0x00, "Inhibit" )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
@@ -190,7 +190,7 @@ static INPUT_PORTS_START( megatech ) /* Genesis Input Ports */
 	PORT_DIPSETTING(    0xf0, "0:30" )
 
 
-	PORT_START_TAG("BIOS_J1")
+	PORT_START("BIOS_J1")
     PORT_DIPNAME( 0x0001, 0x0001, "5" )
     PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )

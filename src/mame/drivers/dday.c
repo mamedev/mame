@@ -75,11 +75,11 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5000, 0x5bff) AM_READ(SMH_RAM)
 	AM_RANGE(0x5c00, 0x5fff) AM_READ(dday_colorram_r)
 	AM_RANGE(0x6000, 0x63ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x6c00, 0x6c00) AM_READ(input_port_0_r)
-	AM_RANGE(0x7000, 0x7000) AM_READ(input_port_1_r)
-	AM_RANGE(0x7400, 0x7400) AM_READ(input_port_2_r)
+	AM_RANGE(0x6c00, 0x6c00) AM_READ_PORT("BUTTONS")
+	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("DSW0")
+	AM_RANGE(0x7400, 0x7400) AM_READ_PORT("DSW1")
 	AM_RANGE(0x7800, 0x7800) AM_READ(dday_countdown_timer_r)
-	AM_RANGE(0x7c00, 0x7c00) AM_READ(input_port_3_r)
+	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("PADDLE")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -112,7 +112,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( dday )
-	PORT_START_TAG("IN0")
+	PORT_START("BUTTONS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) /* fire button */
@@ -121,24 +121,24 @@ static INPUT_PORTS_START( dday )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* doesn't seem to be */
                                                   /* accessed */
-	PORT_START_TAG("DSW0")
+	PORT_START("DSW0")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "2" )PORT_CONDITION("DSW0", 0x80,PORTCOND_EQUALS, 0x80)
-	PORT_DIPSETTING(    0x01, "3" )PORT_CONDITION("DSW0", 0x80,PORTCOND_EQUALS, 0x80)
-	PORT_DIPSETTING(    0x02, "4" )PORT_CONDITION("DSW0", 0x80,PORTCOND_EQUALS, 0x80)
-	PORT_DIPSETTING(    0x03, "5" )PORT_CONDITION("DSW0", 0x80,PORTCOND_EQUALS, 0x80)
-	PORT_DIPSETTING(    0x00, "5" )PORT_CONDITION("DSW0", 0x80,PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x01, "6" )PORT_CONDITION("DSW0", 0x80,PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x02, "7" )PORT_CONDITION("DSW0", 0x80,PORTCOND_EQUALS, 0x00)
-	PORT_DIPSETTING(    0x03, "8" )PORT_CONDITION("DSW0", 0x80,PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x00, "2" ) PORT_CONDITION("DSW0", 0x80, PORTCOND_EQUALS, 0x80)
+	PORT_DIPSETTING(    0x01, "3" ) PORT_CONDITION("DSW0", 0x80, PORTCOND_EQUALS, 0x80)
+	PORT_DIPSETTING(    0x02, "4" ) PORT_CONDITION("DSW0", 0x80, PORTCOND_EQUALS, 0x80)
+	PORT_DIPSETTING(    0x03, "5" ) PORT_CONDITION("DSW0", 0x80, PORTCOND_EQUALS, 0x80)
+	PORT_DIPSETTING(    0x00, "5" ) PORT_CONDITION("DSW0", 0x80, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x01, "6" ) PORT_CONDITION("DSW0", 0x80, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x02, "7" ) PORT_CONDITION("DSW0", 0x80, PORTCOND_EQUALS, 0x00)
+	PORT_DIPSETTING(    0x03, "8" ) PORT_CONDITION("DSW0", 0x80, PORTCOND_EQUALS, 0x00)
 
 	PORT_DIPNAME( 0x0c, 0x00, "Extended Play At" )
 	PORT_DIPSETTING(    0x00, "10000" )
 	PORT_DIPSETTING(    0x04, "15000" )
 	PORT_DIPSETTING(    0x08, "20000" )
 	PORT_DIPSETTING(    0x0c, "25000" )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )//No Difficulty setting?
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )// Clearly old code revision, ddayc works much better
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )	// No Difficulty setting?
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )		// Clearly old code revision, ddayc works much better
 	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
@@ -146,11 +146,11 @@ static INPUT_PORTS_START( dday )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Start with 20000 Pts" )//Works the same as Centuri License, but not as well
-	PORT_DIPSETTING(    0x80, DEF_STR( No ) )// Doesn't mention extended play, just gives lives
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )// Also alters table for Extended Play
+	PORT_DIPNAME( 0x80, 0x80, "Start with 20000 Pts" )	// Works the same as Centuri License, but not as well
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )			// Doesn't mention extended play, just gives lives
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )			// Also alters table for Extended Play
 
-	PORT_START_TAG("DSW1")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_2C ) )
@@ -186,29 +186,27 @@ static INPUT_PORTS_START( dday )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_8C ) )
 
-	PORT_START_TAG("IN1")
+	PORT_START("PADDLE")
 	PORT_BIT(0xff, 96, IPT_PADDLE ) PORT_MINMAX(0,191) PORT_SENSITIVITY(20) PORT_KEYDELTA(10) PORT_CENTERDELTA(0)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ddayc )
-PORT_INCLUDE(dday)
+	PORT_INCLUDE(dday)
 
 	PORT_MODIFY("DSW0")
-
 	PORT_DIPNAME( 0x0c, 0x00, "Extended Play At" )
 	PORT_DIPSETTING(    0x00, "4000" )
 	PORT_DIPSETTING(    0x04, "6000" )
 	PORT_DIPSETTING(    0x08, "8000" )
 	PORT_DIPSETTING(    0x0c, "10000" )
 	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )   // Easy   - No Bombs, No Troop Carriers
-	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) ) // Normal - No Bombs, Troop Carriers
-	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )   // Hard   - Bombs, Troop Carriers
-	//PORT_DIPSETTING(    0x00, DEF_STR( Hard ) ) // Same as 0x10
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) ) // Doesn't seem to be used
+	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )		// Easy   - No Bombs, No Troop Carriers
+	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )	// Normal - No Bombs, Troop Carriers
+	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )		// Hard   - Bombs, Troop Carriers
+//	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )		// Same as 0x10
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )	// Doesn't seem to be used
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 

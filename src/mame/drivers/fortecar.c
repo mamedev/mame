@@ -46,7 +46,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( fortecar )
-	PORT_START	/* 8bit */
+	PORT_START("IN0")	/* 8bit */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -72,7 +72,7 @@ static INPUT_PORTS_START( fortecar )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	/* 8bit */
+	PORT_START("IN1")	/* 8bit */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

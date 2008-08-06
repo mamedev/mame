@@ -241,7 +241,7 @@ ADDRESS_MAP_END
 
 /* PORTS */
 static INPUT_PORTS_START( astron )
-	PORT_START_TAG("DSWA")
+	PORT_START("DSWA")
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:4,3,2,1")
 	PORT_DIPSETTING(    0xe0, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
@@ -277,7 +277,7 @@ static INPUT_PORTS_START( astron )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) )
 
-	PORT_START_TAG("DSWB")
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
@@ -301,7 +301,7 @@ static INPUT_PORTS_START( astron )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )                                           /* SW0 = nonJAMMA pin 15 = coin1 & coin2 (?) */
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )                                          /* SW1 = nonJAMMA pin S  = unused (maybe coin2?) */
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("TEST") PORT_CODE(KEYCODE_F1) /* SW2 = nonJAMMA pin T  = test switch */
@@ -311,7 +311,7 @@ static INPUT_PORTS_START( astron )
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("CONTINUE")                   /* SW6 = nonJAMMA pin 18 = continue */
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )                                          /* SW7 = nonJAMMA pin 19 = unused? */
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )								  /* SW8  = nonJAMMA pin 9  = right */
 	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  								  /* SW9  = nonJAMMA pin 10 = left */
 	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    								  /* SW10 = nonJAMMA pin 11 = up */

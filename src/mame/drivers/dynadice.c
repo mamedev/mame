@@ -72,9 +72,9 @@ static ADDRESS_MAP_START( dynadice_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dynadice_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x50, 0x50) AM_READ(input_port_0_r)
-	AM_RANGE(0x51, 0x51) AM_READ(input_port_1_r)
-	AM_RANGE(0x52, 0x52) AM_READ(input_port_2_r)
+	AM_RANGE(0x50, 0x50) AM_READ_PORT("IN0")
+	AM_RANGE(0x51, 0x51) AM_READ_PORT("IN1")
+	AM_RANGE(0x52, 0x52) AM_READ_PORT("DSW")
 	AM_RANGE(0x62, 0x62) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x63, 0x63) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x70, 0x77) AM_WRITE(SMH_NOP)
@@ -94,21 +94,19 @@ static ADDRESS_MAP_START( dynadice_sound_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( dynadice )
-
-	PORT_START
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_DIPNAME( 0x02, 0x02, "Initialize NVRAM" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 	PORT_BIT( 0x30, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) /* increase number of coins */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) /* decrease number of coins */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )  /* start /stop */
 
-	PORT_START
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ))
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ))
@@ -134,7 +132,6 @@ static INPUT_PORTS_START( dynadice )
 	PORT_DIPNAME( 0x80, 0x80, "DSW 1-7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =

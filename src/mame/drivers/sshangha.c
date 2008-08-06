@@ -202,7 +202,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static INPUT_PORTS_START( sshangha )
-	PORT_START_TAG("P1")	/* Player 1 controls (0xfec047.b) */
+	PORT_START("P1")	/* Player 1 controls (0xfec047.b) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -212,7 +212,7 @@ static INPUT_PORTS_START( sshangha )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	PORT_NAME("P1 Help")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START_TAG("P2")	/* Player 2 controls (0xfec046.b) */
+	PORT_START("P2")	/* Player 2 controls (0xfec046.b) */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -222,7 +222,7 @@ static INPUT_PORTS_START( sshangha )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)	PORT_NAME("P2 Help")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START_TAG("SYSTEM")	/* Credits */
+	PORT_START("SYSTEM")	/* Credits */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -234,7 +234,7 @@ static INPUT_PORTS_START( sshangha )
 
 	/* Dips seem inverted with respect to other Deco games */
 
-	PORT_START_TAG("DSW1")	/* Dip switch bank 1 (0xfec04a.b, inverted bits order) */
+	PORT_START("DSW1")	/* Dip switch bank 1 (0xfec04a.b, inverted bits order) */
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Demo_Sounds ) )	// To be confirmed
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
@@ -264,7 +264,7 @@ static INPUT_PORTS_START( sshangha )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )PORT_CONDITION("DSW1",0x10,PORTCOND_NOTEQUALS,0x10)//Mode 2
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )PORT_CONDITION("DSW1",0x10,PORTCOND_NOTEQUALS,0x10)//Mode 2
 
-	PORT_START_TAG("DSW2")	/* Dip switch bank 2 (0xfec04b.b, inverted bits order) */
+	PORT_START("DSW2")	/* Dip switch bank 2 (0xfec04b.b, inverted bits order) */
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )

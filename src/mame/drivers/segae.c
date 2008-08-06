@@ -1535,11 +1535,11 @@ MACHINE_RESET(sms)
 
 
 static INPUT_PORTS_START( transfrm ) /* Used By Transformer */
-	PORT_START_TAG("DSW0")	/* Read from Port 0xf2 */
+	PORT_START("DSW0")	/* Read from Port 0xf2 */
 	SEGA_COIN_A
 	SEGA_COIN_B
 
-	PORT_START_TAG("DSW1")	/* Read from Port 0xf3 */
+	PORT_START("DSW1")	/* Read from Port 0xf3 */
 	PORT_DIPNAME( 0x01, 0x00, "1 Player Only" ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -1562,7 +1562,7 @@ static INPUT_PORTS_START( transfrm ) /* Used By Transformer */
 	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START_TAG("IN0")	/* Read from Port 0xe0 */
+	PORT_START("IN0")	/* Read from Port 0xe0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
@@ -1572,7 +1572,7 @@ static INPUT_PORTS_START( transfrm ) /* Used By Transformer */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START2 )
 
-	PORT_START_TAG("IN1")	/* Read from Port 0xe1 */
+	PORT_START("IN1")	/* Read from Port 0xe1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP  ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -1584,11 +1584,11 @@ static INPUT_PORTS_START( transfrm ) /* Used By Transformer */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( fantzn2 ) /* Used By Fantasy Zone 2 */
-	PORT_START_TAG("DSW0")	/* Read from Port 0xf2 */
+	PORT_START("DSW0")	/* Read from Port 0xf2 */
 	SEGA_COIN_A
 	SEGA_COIN_B
 
-	PORT_START_TAG("DSW1")	/* Read from Port 0xf3 */
+	PORT_START("DSW1")	/* Read from Port 0xf3 */
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
@@ -1609,7 +1609,7 @@ static INPUT_PORTS_START( fantzn2 ) /* Used By Fantasy Zone 2 */
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START_TAG("IN0")	/* Read from Port 0xe0 */
+	PORT_START("IN0")	/* Read from Port 0xe0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
@@ -1619,7 +1619,7 @@ static INPUT_PORTS_START( fantzn2 ) /* Used By Fantasy Zone 2 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START2 )
 
-	PORT_START_TAG("IN1")	/* Read from Port 0xe1 */
+	PORT_START("IN1")	/* Read from Port 0xe1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP  ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -1631,11 +1631,11 @@ static INPUT_PORTS_START( fantzn2 ) /* Used By Fantasy Zone 2 */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( opaopa ) /* Used By Opa Opa */
-	PORT_START_TAG("DSW0")	/* Read from Port 0xf2 */
+	PORT_START("DSW0")	/* Read from Port 0xf2 */
 	SEGA_COIN_A
 	SEGA_COIN_B
 
-	PORT_START_TAG("DSW1")	/* Read from Port 0xf3 */
+	PORT_START("DSW1")	/* Read from Port 0xf3 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1658,7 +1658,7 @@ static INPUT_PORTS_START( opaopa ) /* Used By Opa Opa */
 	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 
-	PORT_START_TAG("IN0")	/* Read from Port 0xe0 */
+	PORT_START("IN0")	/* Read from Port 0xe0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
@@ -1668,7 +1668,7 @@ static INPUT_PORTS_START( opaopa ) /* Used By Opa Opa */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START2 )
 
-	PORT_START_TAG("IN1")	/* Read from Port 0xe1 */
+	PORT_START("IN1")	/* Read from Port 0xe1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP  ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1678,7 +1678,7 @@ static INPUT_PORTS_START( opaopa ) /* Used By Opa Opa */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNUSED )
 
-	PORT_START_TAG("IN2")	/* Read from Port 0xe2 */
+	PORT_START("IN2")	/* Read from Port 0xe2 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP  ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -1691,11 +1691,11 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( tetrisse ) /* Used By Tetris */
-	PORT_START_TAG("DSW0")	/* Read from Port 0xf2 */
+	PORT_START("DSW0")	/* Read from Port 0xf2 */
 	SEGA_COIN_A
 	SEGA_COIN_B
 
-	PORT_START_TAG("DSW1")	/* Read from Port 0xf3 */
+	PORT_START("DSW1")	/* Read from Port 0xf3 */
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
@@ -1710,7 +1710,7 @@ static INPUT_PORTS_START( tetrisse ) /* Used By Tetris */
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 
-	PORT_START_TAG("IN0")	/* Read from Port 0xe0 */
+	PORT_START("IN0")	/* Read from Port 0xe0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
@@ -1720,7 +1720,7 @@ static INPUT_PORTS_START( tetrisse ) /* Used By Tetris */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_START2 )
 
-	PORT_START_TAG("IN1")	/* Read from Port 0xe1 */
+	PORT_START("IN1")	/* Read from Port 0xe1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP  ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -1733,11 +1733,11 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( hangonjr ) /* Used By Hang On Jr */
-	PORT_START_TAG("DSW0")	/* Read from Port 0xf2 */
+	PORT_START("DSW0")	/* Read from Port 0xf2 */
 	SEGA_COIN_A
 	SEGA_COIN_B
 
-	PORT_START_TAG("DSW1")	/* Read from Port 0xf3 */
+	PORT_START("DSW1")	/* Read from Port 0xf3 */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("SW2:1") /* Supose to be demo sound but has no effect */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1755,7 +1755,7 @@ static INPUT_PORTS_START( hangonjr ) /* Used By Hang On Jr */
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 
-	PORT_START_TAG("IN0")	/* Read from Port 0xe0 */
+	PORT_START("IN0")	/* Read from Port 0xe0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_SERVICE_NO_TOGGLE(0x04, IP_ACTIVE_LOW)
@@ -1765,7 +1765,7 @@ static INPUT_PORTS_START( hangonjr ) /* Used By Hang On Jr */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")	/* Read from Port 0xe1 */
+	PORT_START("IN1")	/* Read from Port 0xe1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -1775,21 +1775,21 @@ static INPUT_PORTS_START( hangonjr ) /* Used By Hang On Jr */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")	/* Read from Port 0xf8 */
+	PORT_START("IN2")	/* Read from Port 0xf8 */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x20,0xe0) PORT_SENSITIVITY(100) PORT_KEYDELTA(4)
 
-	PORT_START_TAG("IN3")  /* Read from Port 0xf8 */
+	PORT_START("IN3")  /* Read from Port 0xf8 */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(100) PORT_KEYDELTA(20)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( ridleofp ) /* Used By Riddle Of Pythagoras */
-	PORT_START_TAG("DSW0")	/* Read from Port 0xf2 */
+	PORT_START("DSW0")	/* Read from Port 0xf2 */
 	SEGA_COIN_A
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 	SEGA_COIN_B
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 
-	PORT_START_TAG("DSW1")	/* Read from Port 0xf3 */
+	PORT_START("DSW1")	/* Read from Port 0xf3 */
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -1807,7 +1807,7 @@ static INPUT_PORTS_START( ridleofp ) /* Used By Riddle Of Pythagoras */
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
 
-	PORT_START_TAG("IN0")	/* Read from Port 0xe0 */
+	PORT_START("IN0")	/* Read from Port 0xe0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -1817,7 +1817,7 @@ static INPUT_PORTS_START( ridleofp ) /* Used By Riddle Of Pythagoras */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN ) // Would Be IPT_START2 but the code doesn't use it
 
-	PORT_START_TAG("IN1")	/* Port 0xe1 */
+	PORT_START("IN1")	/* Port 0xe1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
@@ -1827,14 +1827,14 @@ static INPUT_PORTS_START( ridleofp ) /* Used By Riddle Of Pythagoras */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")	/* Read from Port 0xf8 */
+	PORT_START("IN2")	/* Read from Port 0xf8 */
 	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(60) PORT_KEYDELTA(125)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_BUTTON2 )	/* is this used in the game? */
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_BUTTON1 )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")	/* Read from Port 0xf8 */
+	PORT_START("IN3")	/* Read from Port 0xf8 */
 	PORT_BIT( 0x0fff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(60) PORT_KEYDELTA(125) PORT_COCKTAIL
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_UNKNOWN )

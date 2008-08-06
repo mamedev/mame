@@ -358,7 +358,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 static INPUT_PORTS_START( hitme )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )					/* Start button */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )					/* Always high */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )				/* Hblank */
@@ -368,7 +368,7 @@ static INPUT_PORTS_START( hitme )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	/* P1 Bet button */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )				/* Time out counter (*TO) */
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )					/* Always high */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )					/* Aux 2 dipswitch - Unused */
@@ -378,7 +378,7 @@ static INPUT_PORTS_START( hitme )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)	/* P2 Bet button */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )				/* Time out counter (*TO) */
 
-	PORT_START_TAG("IN2")
+	PORT_START("IN2")
 	PORT_DIPNAME( 0x01, 0x00, "Extra Hand On Natural" )			/* Aux 1 dipswitch */
 	PORT_DIPSETTING(    0x00, DEF_STR ( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR ( On )  )
@@ -390,7 +390,7 @@ static INPUT_PORTS_START( hitme )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)	/* P3 Bet button */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )				/* Time out counter (*TO) */
 
-	PORT_START_TAG("IN3")
+	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )				/* Time out counter (TOC1) */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )					/* Always high */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )					/* Aux 2 dipswitch - Unused*/
@@ -400,7 +400,7 @@ static INPUT_PORTS_START( hitme )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(4)	/* P4 Bet button */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )				/* Time out counter (*TO) */
 
-	PORT_START_TAG("IN4")
+	PORT_START("IN4")
 	PORT_DIPNAME( 0x07, 0x07, "Number of Chips" )
 	PORT_DIPSETTING(    0x00, "5 Chips" )
 	PORT_DIPSETTING(    0x01, "10 Chips" )
@@ -412,7 +412,7 @@ static INPUT_PORTS_START( hitme )
 	PORT_DIPSETTING(    0x07, "40 Chips" )
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START_TAG("IN5")
+	PORT_START("IN5")
 	PORT_DIPNAME( 0x07, 0x00, "Number of Hands" )
 	PORT_DIPSETTING(    0x00, "5 Hands" )
 	PORT_DIPSETTING(    0x01, "10 Hands" )
@@ -425,17 +425,17 @@ static INPUT_PORTS_START( hitme )
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	/* this is actually a variable resistor */
-	PORT_START_TAG("R3")
+	PORT_START("R3")
 	PORT_ADJUSTER(30, "Game Speed")
 
 	/* this is actually a variable resistor */
-	PORT_START_TAG("WIDTH")
+	PORT_START("WIDTH")
 	PORT_ADJUSTER(50, "Card Width")
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( barricad )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )							/* Start button */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )							/* Always high */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )						/* Hblank */
@@ -445,7 +445,7 @@ static INPUT_PORTS_START( barricad )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )						/* Time out counter (*TO) */
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )							/* Always high */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )							/* Aux 2 dipswitch - Unused */
@@ -455,7 +455,7 @@ static INPUT_PORTS_START( barricad )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  ) PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )						/* Time out counter (*TO) */
 
-	PORT_START_TAG("IN2")
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )						/* ??? */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )							/* Always high */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )						/* Hblank */
@@ -465,7 +465,7 @@ static INPUT_PORTS_START( barricad )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  ) PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )						/* Time out counter (*TO) */
 
-	PORT_START_TAG("IN3")
+	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )						/* Time out counter (TOC1) */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )						/* Always high */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )						/* Aux 2 dipswitch - Unused*/
@@ -480,7 +480,7 @@ static INPUT_PORTS_START( barricad )
         same dipswitch as hitme's chips, and speed is hitme's hands. The flyer
       says 1-7 points per games, but it really can go to 8. */
 
-	PORT_START_TAG("IN4")
+	PORT_START("IN4")
 	PORT_DIPNAME( 0x07, 0x07, "Points Per Game" )
 	PORT_DIPSETTING(    0x00, "1 Point" )
 	PORT_DIPSETTING(    0x01, "2 Points" )
@@ -494,7 +494,7 @@ static INPUT_PORTS_START( barricad )
 	/* These are like lives, you lose a point if you crash. The last person with
         points wins the game. */
 
-	PORT_START_TAG("IN5")
+	PORT_START("IN5")
 	PORT_DIPNAME( 0x07, 0x00, "Game Speed" )
 	PORT_DIPSETTING(    0x00, "Fast Fast" )
 	PORT_DIPSETTING(    0x01, "7" )
@@ -506,7 +506,7 @@ static INPUT_PORTS_START( barricad )
 	PORT_DIPSETTING(    0x07, "Slow Slow" )
 
 	/* this is actually a variable resistor */
-	PORT_START_TAG("R3")
+	PORT_START("R3")
 	PORT_ADJUSTER(30, "Tone")
 INPUT_PORTS_END
 

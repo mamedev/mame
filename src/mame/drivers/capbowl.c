@@ -293,7 +293,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( capbowl )
-	PORT_START_TAG("IN0")	/* IN0 */
+	PORT_START("IN0")	/* IN0 */
 	/* low 4 bits are for the trackball */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
@@ -302,20 +302,20 @@ static INPUT_PORTS_START( capbowl )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START_TAG("IN1")	/* IN1 */
+	PORT_START("IN1")	/* IN1 */
 	/* low 4 bits are for the trackball */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START_TAG("TRACKY")	/* FAKE */
+	PORT_START("TRACKY")	/* FAKE */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(20) PORT_KEYDELTA(40) PORT_REVERSE
 
-	PORT_START_TAG("TRACKX")	/* FAKE */
+	PORT_START("TRACKX")	/* FAKE */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(20) PORT_KEYDELTA(40)
 
-	PORT_START_TAG("SERVICE")	/* FAKE */
+	PORT_START("SERVICE")	/* FAKE */
 	/* This fake input port is used to get the status of the F2 key, */
 	/* and activate the test mode, which is triggered by a NMI */
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH )

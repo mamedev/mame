@@ -112,7 +112,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( redclash )
-	PORT_START_TAG("IN0")	/* IN0 */
+	PORT_START("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -122,7 +122,7 @@ static INPUT_PORTS_START( redclash )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")	/* IN1 */
+	PORT_START("IN1")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -134,7 +134,7 @@ static INPUT_PORTS_START( redclash )
 	/* them this way is enough to get the game running. */
 	PORT_BIT( 0xc0, 0x40, IPT_VBLANK )
 
-	PORT_START_TAG("DSW1")	/* DSW0 */
+	PORT_START("DSW1")	/* DSW0 */
 	PORT_DIPNAME( 0x03, 0x03, "Difficulty?" )
 	PORT_DIPSETTING(    0x03, "Easy?" )
 	PORT_DIPSETTING(    0x02, "Medium?" )
@@ -158,7 +158,7 @@ static INPUT_PORTS_START( redclash )
 	PORT_DIPSETTING(    0x80, "5" )
 	PORT_DIPSETTING(    0x40, "7" )
 
-	PORT_START_TAG("DSW2")	/* DSW1 */
+	PORT_START("DSW2")	/* DSW1 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 5C_1C ) )
@@ -194,7 +194,7 @@ static INPUT_PORTS_START( redclash )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_8C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_9C ) )
 
-	PORT_START_TAG("FAKE")	/* FAKE */
+	PORT_START("FAKE")	/* FAKE */
 	/* The coin slots are not memory mapped. Coin Left causes a NMI, */
 	/* Coin Right an IRQ. This fake input port is used by the interrupt */
 	/* handler to be notified of coin insertions. We use IMPULSE to */
@@ -205,7 +205,7 @@ static INPUT_PORTS_START( redclash )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( zerohour )
-	PORT_START_TAG("IN0")	/* IN0 */
+	PORT_START("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -215,7 +215,7 @@ static INPUT_PORTS_START( zerohour )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")	/* IN1 */
+	PORT_START("IN1")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -227,7 +227,7 @@ static INPUT_PORTS_START( zerohour )
 	/* them this way is enough to get the game running. */
 	PORT_BIT( 0xc0, 0x40, IPT_VBLANK )
 
-	PORT_START_TAG("DSW1")	/* DSW0 */
+	PORT_START("DSW1")	/* DSW0 */
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW1:8" ) 	/* Switches 6-8 are not used */
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:7" )
 	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW1:6" )
@@ -245,7 +245,7 @@ static INPUT_PORTS_START( zerohour )
 	PORT_DIPSETTING(    0x80, "4" )
 	PORT_DIPSETTING(    0x40, "5" )
 
-	PORT_START_TAG("DSW2")	/* DSW1 */
+	PORT_START("DSW2")	/* DSW1 */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:4,3,2,1")
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
@@ -269,7 +269,7 @@ static INPUT_PORTS_START( zerohour )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 
-	PORT_START_TAG("FAKE")	/* FAKE */
+	PORT_START("FAKE")	/* FAKE */
 	/* The coin slots are not memory mapped. Coin Left causes a NMI, */
 	/* Coin Right an IRQ. This fake input port is used by the interrupt */
 	/* handler to be notified of coin insertions. We use IMPULSE to */

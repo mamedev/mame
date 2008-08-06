@@ -6,6 +6,9 @@ Notes:
 - Position counter doesn't behave correctly because of the K051733 protection.
 - 007232 volume & panning control is almost certainly wrong.
 
+2008-07
+Dip locations and recommended settings verified with manual
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -220,8 +223,8 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( chqflag )
-	PORT_START_TAG("DSW1")	/* DSW #1 */
-	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -237,7 +240,7 @@ static INPUT_PORTS_START( chqflag )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) ) PORT_DIPLOCATION("SW1:5,6,7,8")
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
@@ -256,38 +259,26 @@ static INPUT_PORTS_START( chqflag )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
 //  PORT_DIPSETTING(    0x00, "Coin Slot 2 Invalidity" )
 
-	PORT_START_TAG("DSW2")	/* DSW #2 (according to the manual SW1 thru SW5 are not used) */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
-	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
+	PORT_START("DSW2")
+	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW2:1" )	/* Manual says it's not used */
+	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW2:2" )	/* Manual says it's not used */
+	PORT_DIPUNUSED_DIPLOC( 0x04, 0x04, "SW2:3" )	/* Manual says it's not used */
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW2:4" )	/* Manual says it's not used */
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )	/* Manual says it's not used */
+	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(	0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( Normal ) )
 	PORT_DIPSETTING(	0x20, "Difficult" )
 	PORT_DIPSETTING(	0x00, "Very difficult" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x7f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )	/* DIPSW #3 - SW4 */
-	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW3:4" )	/* Manual says it's not used */
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	/* COINSW + STARTSW */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -295,24 +286,22 @@ static INPUT_PORTS_START( chqflag )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* DIPSW #3 */
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Title" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW3:1" )	/* Manual says it's not used */
+	PORT_DIPNAME( 0x40, 0x40, "Title" ) PORT_DIPLOCATION("SW3:2")
 	PORT_DIPSETTING(	0x40, "Chequered Flag" )
 	PORT_DIPSETTING(	0x00, "Checkered Flag" )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_SERVICE_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW3:3" )
 
-	PORT_START_TAG("IN2")	/* Brake, Shift + ??? */
+	PORT_START("IN2")	/* Brake, Shift + ??? */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* if this is set, it goes directly to test mode */
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* if bit 7 == 0, the game resets */
 
-	PORT_START_TAG("IN3")	/* Accelerator */
+	PORT_START("IN3")	/* Accelerator */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(5)
 
-	PORT_START_TAG("IN4")	/* Driving wheel */
+	PORT_START("IN4")	/* Driving wheel */
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(0x10,0xef) PORT_SENSITIVITY(80) PORT_KEYDELTA(8)
 INPUT_PORTS_END
 

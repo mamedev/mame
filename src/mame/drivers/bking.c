@@ -257,7 +257,7 @@ static ADDRESS_MAP_START( m68705_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( bking )
-	PORT_START_TAG("IN0")	/* IN0 */
+	PORT_START("IN0")	/* IN0 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNUSED )
@@ -265,7 +265,7 @@ static INPUT_PORTS_START( bking )
 	/* continue inputs are labelled in schematics. */
 	/* They are not connected though to any button */
 
-	PORT_START_TAG("IN1")	/* IN1 */
+	PORT_START("IN1")	/* IN1 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )	/* Continue 1 */
@@ -274,7 +274,7 @@ static INPUT_PORTS_START( bking )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )	/* Not Connected */
 
-	PORT_START_TAG("DSWA")	/* IN2 - DIP Switch A */
+	PORT_START("DSWA")	/* IN2 - DIP Switch A */
 	PORT_DIPNAME( 0x01, 0x00, "Holes Awarded" ) PORT_DIPLOCATION("SWA:1")
 	PORT_DIPSETTING(    0x00, "Par Play: 0 Holes/Birdie: 1 Hole/Eagle: 2 Holes/Double Eagle: 4 Holes" )
 	PORT_DIPSETTING(    0x01, "Par Play: 1 Hole/Birdie: 2 Holes/Eagle: 3 Holes/Double Eagle: 4 Holes" )
@@ -299,7 +299,7 @@ static INPUT_PORTS_START( bking )
 	PORT_DIPSETTING(    0x00, DEF_STR(Upright) )
 	PORT_DIPSETTING(    0x80, DEF_STR(Cocktail) )
 
-	PORT_START_TAG("DSWB")	/* IN3 - DIP Switch B */
+	PORT_START("DSWB")	/* IN3 - DIP Switch B */
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SWB:1,2,3,4")
 	PORT_DIPSETTING(    0x0f, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 8C_1C ) )
@@ -335,7 +335,7 @@ static INPUT_PORTS_START( bking )
 	PORT_DIPSETTING(    0x60, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
-	PORT_START_TAG("DSWC")	/* IN4 - DIP Switch C */
+	PORT_START("DSWC")	/* IN4 - DIP Switch C */
 	PORT_DIPNAME( 0x01, 0x01, "Appearance of Crow" ) PORT_DIPLOCATION("SWC:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
@@ -358,16 +358,16 @@ static INPUT_PORTS_START( bking )
 	PORT_DIPSETTING(    0x00, "1 Way" )
 	PORT_DIPSETTING(    0x80, "2 Way" )
 
-	PORT_START_TAG("TRACK0_X")	/* IN5 */
+	PORT_START("TRACK0_X")	/* IN5 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) /* Sensitivity, clip, min, max */
 
-	PORT_START_TAG("TRACK0_Y")	/* IN6 */
+	PORT_START("TRACK0_Y")	/* IN6 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE /* Sensitivity, clip, min, max */
 
-	PORT_START_TAG("TRACK1_X")	/* IN7 */
+	PORT_START("TRACK1_X")	/* IN7 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_COCKTAIL /* Sensitivity, clip, min, max */
 
-	PORT_START_TAG("TRACK1_Y")	/* IN8 */
+	PORT_START("TRACK1_Y")	/* IN8 */
 	PORT_BIT( 0xff, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_REVERSE PORT_COCKTAIL /* Sensitivity, clip, min, max */
 INPUT_PORTS_END
 

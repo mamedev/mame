@@ -146,7 +146,7 @@ static GFXDECODE_START( cowrace )
 GFXDECODE_END
 
 static INPUT_PORTS_START( cowrace )
-	PORT_START	// IN0
+	PORT_START("IN0")
 INPUT_PORTS_END
 
 static const struct YM2203interface ym2203_interface_1 =

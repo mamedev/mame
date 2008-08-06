@@ -122,12 +122,6 @@ static WRITE8_HANDLER( dominob_d008_w )
 	/* is there a purpose on this ? always set to 0x00 (read from 0xc47b in RAM) */
 }
 
-static READ8_HANDLER( dominob_input_2_r )
-{
-	return input_port_read(machine, "IN2");
-}
-
-
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_READWRITE(SMH_ROM, SMH_NOP) // there are some garbage writes to ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
@@ -135,9 +129,9 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xd001, 0xd001) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
 	AM_RANGE(0xd008, 0xd008) AM_WRITE(dominob_d008_w)
-	AM_RANGE(0xd00c, 0xd00c) AM_READ(input_port_0_r)
-	AM_RANGE(0xd010, 0xd010) AM_READWRITE(input_port_1_r, SMH_NOP)
-	AM_RANGE(0xd018, 0xd018) AM_READ(dominob_input_2_r) AM_WRITENOP
+	AM_RANGE(0xd00c, 0xd00c) AM_READ_PORT("IN0")
+	AM_RANGE(0xd010, 0xd010) AM_READ_PORT("IN1") AM_WRITE(SMH_NOP)
+	AM_RANGE(0xd018, 0xd018) AM_READ_PORT("IN2") AM_WRITENOP
 
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&videoram)
 	AM_RANGE(0xe800, 0xe83f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
@@ -161,7 +155,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( dominob )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )             /* works (subs 2 credits), but starts a 1 player game as START1 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )              /* SERVICE1 in 'arkanoid' */
@@ -171,19 +165,19 @@ static INPUT_PORTS_START( dominob )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_SPECIAL )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )            /* also works in "demo mode" ! */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )            /* also works in "demo mode" ! */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* player 2 BUTTON1 in 'arkanoid' - only read to select the girl */
 	PORT_BIT( 0xf8, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")      /* Spinner Player 1 */
+	PORT_START("IN2")      /* Spinner Player 1 */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15)
 
-	PORT_START_TAG("IN3")      /* Spinner Player 2 */ /* No Player 2 */
+	PORT_START("IN3")      /* Spinner Player 2 */ /* No Player 2 */
 //  PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(15) PORT_COCKTAIL
 
-	PORT_START_TAG("DSW")
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )

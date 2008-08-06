@@ -149,7 +149,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START(ttchamp)
-    PORT_START  /* 8bit */
+    PORT_START("SYSTEM")  /* 8bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
@@ -195,7 +195,7 @@ static INPUT_PORTS_START(ttchamp)
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
-	PORT_START	/* 8bit */
+	PORT_START("P1_P2")	/* 8bit */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1) PORT_8WAY
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1) PORT_8WAY
@@ -328,4 +328,3 @@ static DRIVER_INIT (ttchamp)
 
 GAME( 199?, ttchamp, 0,        ttchamp, ttchamp, ttchamp, ROT0,  "Gamart?", "Table Tennis Champions (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )
 GAME( 199?, ttchampa,ttchamp,  ttchamp, ttchamp, ttchamp, ROT0,  "Gamart?", "Table Tennis Champions (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND )
-

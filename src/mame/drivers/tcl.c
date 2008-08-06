@@ -55,7 +55,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( tcl )
-	PORT_START
+	PORT_START("IN0")
 INPUT_PORTS_END
 
 static const gfx_layout charlayout =

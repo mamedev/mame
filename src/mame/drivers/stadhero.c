@@ -113,7 +113,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static INPUT_PORTS_START( stadhero )
-	PORT_START_TAG("P1")	/* 0x30c001 : Player 1 controls */
+	PORT_START("P1")	/* 0x30c001 : Player 1 controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_PLAYER(1)
@@ -123,7 +123,7 @@ static INPUT_PORTS_START( stadhero )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START_TAG("P2")	/* 0x30c000 : Player 2 controls */
+	PORT_START("P2")	/* 0x30c000 : Player 2 controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_PLAYER(2)
@@ -133,7 +133,7 @@ static INPUT_PORTS_START( stadhero )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START_TAG("COIN")	/* 0x30c002 & 0x30c003 : Credits, start buttons */
+	PORT_START("COIN")	/* 0x30c002 & 0x30c003 : Credits, start buttons */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
@@ -143,7 +143,7 @@ static INPUT_PORTS_START( stadhero )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START_TAG("DSW1")	/* 0x30c005 : Dip switch bank 1 */
+	PORT_START("DSW1")	/* 0x30c005 : Dip switch bank 1 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
@@ -163,7 +163,7 @@ static INPUT_PORTS_START( stadhero )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START_TAG("DSW2")	/* 0x30c004 : Dip switch bank 2 */
+	PORT_START("DSW2")	/* 0x30c004 : Dip switch bank 2 */
 	PORT_DIPNAME( 0x03, 0x03, "Time (1P Vs CPU)" )          /* Table at 0x0014f6 */
 	PORT_DIPSETTING(    0x02, "600" )
 	PORT_DIPSETTING(    0x03, "500" )

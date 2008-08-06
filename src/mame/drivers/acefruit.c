@@ -279,14 +279,14 @@ static ADDRESS_MAP_START( acefruit_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( sidewndr )
-	PORT_START_TAG("IN0")	// 0
+	PORT_START("IN0")	// 0
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME( "Stop Nudge/Nudge Up or Down" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Gamble" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )              /* "Cash in" */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_VBLANK ) /* active low or high?? */
 	PORT_BIT( 0xd8, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")	// 1
+	PORT_START("IN1")	// 1
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Sidewind" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Collect" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )              /* "Cash in" */
@@ -295,21 +295,21 @@ static INPUT_PORTS_START( sidewndr )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")	// 2
+	PORT_START("IN2")	// 2
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME( "Cancel/Clear" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME( "Refill" ) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN3 )              /* "Token in" - also "Refill" when "Refill" mode ON */
 	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM(sidewndr_payout_r, (void *)0x01)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")	// 3
+	PORT_START("IN3")	// 3
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME( "Hold/Nudge 1" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME( "Accountancy System" ) PORT_TOGGLE
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN4 )              /* "50P in" */
 	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM(sidewndr_payout_r, (void *)0x02)
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN4")	// 4
+	PORT_START("IN4")	// 4
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME( "Hold/Nudge 2" )
 	PORT_DIPNAME( 0x02, 0x00, "Allow Clear Data" )          /* in "Accountancy System" mode */
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
@@ -322,12 +322,12 @@ static INPUT_PORTS_START( sidewndr )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN5")	// 5
+	PORT_START("IN5")	// 5
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME( "Hold/Nudge 3" )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME( "Test Program" ) PORT_TOGGLE
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN6")	// 6
+	PORT_START("IN6")	// 6
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME( "Hold/Nudge 4" )
 	/* I don't know exactly what this bit is supposed to do :(
        I only found that when bit is LOW, no data is updated
@@ -339,14 +339,14 @@ static INPUT_PORTS_START( sidewndr )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN7")	// 7
+	PORT_START("IN7")	// 7
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )             /* next in "Accountancy System" mode */
 	PORT_DIPNAME( 0x02, 0x00, "Clear Credits on Reset" )    /* also affects rolls */
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("PAYOUT")	// fake port to handle settings via multiple input ports
+	PORT_START("PAYOUT")	// fake port to handle settings via multiple input ports
 	PORT_DIPNAME( 0x03, 0x00, "Payout %" )
 	PORT_DIPSETTING(    0x00, "74%" )
 	PORT_DIPSETTING(    0x02, "78%" )
@@ -399,14 +399,14 @@ INPUT_PORTS_END
 
 /* I've only mapped the known inputs after comparaison with 'spellbnd' and the ones known to do something */
 static INPUT_PORTS_START( starspnr )
-	PORT_START_TAG("IN0")	// 0
+	PORT_START("IN0")	// 0
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Gamble" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	/* tested at 0xef77 after IN5 bit 1 and before IN2 bit 2 - after coins are tested - table at 0xefa5 (3 bytes) */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_VBLANK ) /* active low or high?? */
 
-	PORT_START_TAG("IN1")	// 1
+	PORT_START("IN1")	// 1
 	/* tested at 0xe77c - call from 0x012c */
 	/* tested at 0xeffb after IN6 bit 2 - invalid code after 0xf000 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -415,7 +415,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xeed7 with IN1 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
 	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM(starspnr_coinage_r, (void *)0x08) /* to be confirmed */
 
-	PORT_START_TAG("IN2")	// 2
+	PORT_START("IN2")	// 2
 	/* tested at 0xe83c */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* tested at 0xe5ab - after "Collect" and "Gamble" buttons */
@@ -427,7 +427,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0x1b0f */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")	// 3
+	PORT_START("IN3")	// 3
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME( "Hold 1" )
 	/* tested at 0xe8ea and 0xecbe */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -436,7 +436,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0x0178 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN4")	// 4
+	PORT_START("IN4")	// 4
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME( "Hold 2" )
 	/* tested at 0x064e */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -445,7 +445,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xeed7 with IN1 bit 3 - before coins are tested - table at 0xef55 (4 * 3 bytes) */
 	PORT_BIT( 0x08, 0x00, IPT_SPECIAL) PORT_CUSTOM(starspnr_coinage_r, (void *)0x04) /* to be confirmed */
 
-	PORT_START_TAG("IN5")	// 5
+	PORT_START("IN5")	// 5
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME( "Hold 3" )
 	/* tested at 0xef68 before IN1 bit 3 and before IN2 bit 2 - after coins are tested - table at 0xefa2 (3 bytes) */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -456,7 +456,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xe312 and 0xe377 */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN6")	// 6
+	PORT_START("IN6")	// 6
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME( "Hold 4" )
 	/* tested at 0xee42, 0xee5e and 0xeff5 before IN1 bit 0 - invalid code after 0xf000 */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -465,7 +465,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xe8dd and 0xec1c */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN7")	// 7
+	PORT_START("IN7")	// 7
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_DIPNAME( 0x02, 0x00, "Clear Credits on Reset" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
@@ -477,7 +477,7 @@ static INPUT_PORTS_START( starspnr )
 	/* tested at 0xec2a */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("COINAGE")	// fake port to handle settings via multiple input ports
+	PORT_START("COINAGE")	// fake port to handle settings via multiple input ports
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) )
@@ -489,7 +489,7 @@ static INPUT_PORTS_START( starspnr )
 	PORT_DIPSETTING(    0x08, "1 Coin/10 Credits" )
 	PORT_DIPSETTING(    0x0c, "1 Coin/25 Credits" )
 
-	PORT_START_TAG("PAYOUT")	// fake port to handle settings via multiple input ports
+	PORT_START("PAYOUT")	// fake port to handle settings via multiple input ports
 	PORT_DIPNAME( 0x07, 0x07, "Payout %" )
 	PORT_DIPSETTING(    0x00, "30%" )
 	PORT_DIPSETTING(    0x01, "40%" )

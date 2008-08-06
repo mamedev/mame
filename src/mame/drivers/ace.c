@@ -195,45 +195,45 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( ace )
-	PORT_START_TAG("c008")	/* player thrust */
+	PORT_START("c008")	/* player thrust */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1) PORT_NAME("P1 Thrust")
 
-	PORT_START_TAG("c009")	/* player slowdown */
+	PORT_START("c009")	/* player slowdown */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_NAME("P1 Slowdown")
 
-	PORT_START_TAG("c00a")	/* player left */
+	PORT_START("c00a")	/* player left */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 
-	PORT_START_TAG("c00b")	/* player right */
+	PORT_START("c00b")	/* player right */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 
-	PORT_START_TAG("c00c")	/* player fire */
+	PORT_START("c00c")	/* player fire */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Fire")
 
-	PORT_START_TAG("c00d")	/* enemy thrust */
+	PORT_START("c00d")	/* enemy thrust */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2) PORT_NAME("P2 Thrust")
 
-	PORT_START_TAG("c00e")	/* enemy slowdown */
+	PORT_START("c00e")	/* enemy slowdown */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) PORT_NAME("P2 Slowdown")
 
-	PORT_START_TAG("c00f")	/* enemy left  */
+	PORT_START("c00f")	/* enemy left  */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 
-	PORT_START_TAG("c010")	/* enemy right */
+	PORT_START("c010")	/* enemy right */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 
-	PORT_START_TAG("c011")	/* enemy fire */
+	PORT_START("c011")	/* enemy fire */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fire")
 
 	//c012
 
-	PORT_START_TAG("c014")	/* VBLANK??? */
+	PORT_START("c014")	/* VBLANK??? */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_VBLANK )
 
-	PORT_START_TAG("c015")	/* coin input */
+	PORT_START("c015")	/* coin input */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 
-	PORT_START_TAG("c016")	/* game start */
+	PORT_START("c016")	/* game start */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
 INPUT_PORTS_END
 

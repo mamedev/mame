@@ -267,12 +267,12 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( a600xl )
 
-    PORT_START_TAG("console")  /* IN0 console keys & switch settings */
+    PORT_START("console")  /* IN0 console keys & switch settings */
 	PORT_BIT(0x04, 0x04, IPT_KEYBOARD) PORT_NAME("Option") PORT_CODE(KEYCODE_F2)
 	PORT_BIT(0x02, 0x02, IPT_KEYBOARD) PORT_NAME("Select") PORT_CODE(KEYCODE_F1)
 	PORT_BIT(0x01, 0x01, IPT_START1 )
 
-	PORT_START_TAG("djoy_0_1")	/* IN1 digital joystick #1 + #2 (PIA port A) */
+	PORT_START("djoy_0_1")	/* IN1 digital joystick #1 + #2 (PIA port A) */
 	PORT_BIT(0x01, 0x01, IPT_JOYSTICK_UP) PORT_PLAYER(1)
 	PORT_BIT(0x02, 0x02, IPT_JOYSTICK_DOWN) PORT_PLAYER(1)
 	PORT_BIT(0x04, 0x04, IPT_JOYSTICK_LEFT) PORT_PLAYER(1)
@@ -283,7 +283,7 @@ static INPUT_PORTS_START( a600xl )
 	PORT_BIT(0x40, 0x40, IPT_JOYSTICK_LEFT) PORT_PLAYER(2)
 	PORT_BIT(0x80, 0x80, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
 
-	PORT_START_TAG("djoy_2_3")	/* IN2 digital joystick #3 + #4 (PIA port B) */
+	PORT_START("djoy_2_3")	/* IN2 digital joystick #3 + #4 (PIA port B) */
 	/* not connected */
 	PORT_BIT(0x01, 0x01, IPT_JOYSTICK_UP) PORT_PLAYER(3)
 	PORT_BIT(0x02, 0x02, IPT_JOYSTICK_DOWN) PORT_PLAYER(3)
@@ -294,7 +294,7 @@ static INPUT_PORTS_START( a600xl )
 	PORT_BIT(0x40, 0x40, IPT_JOYSTICK_LEFT) PORT_PLAYER(4)
 	PORT_BIT(0x80, 0x80, IPT_JOYSTICK_RIGHT) PORT_PLAYER(4)
 
-	PORT_START_TAG("djoy_b")	/* IN3 digital joystick buttons (GTIA button bits) */
+	PORT_START("djoy_b")	/* IN3 digital joystick buttons (GTIA button bits) */
 	PORT_BIT(0x01, 0x01, IPT_BUTTON1) PORT_PLAYER(1)
 	PORT_BIT(0x02, 0x02, IPT_BUTTON1) PORT_PLAYER(2)
 	PORT_BIT(0x04, 0x04, IPT_BUTTON1) PORT_PLAYER(3)
@@ -305,10 +305,10 @@ static INPUT_PORTS_START( a600xl )
 	PORT_BIT(0x80, 0x80, IPT_BUTTON2) PORT_PLAYER(4)
 
 	/* Max-A-Flex specific ports */
-	PORT_START_TAG("coin")	/* IN4 coin */
+	PORT_START("coin")	/* IN4 coin */
 	PORT_BIT(0x1, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_CHANGED(coin_inserted, 0)
 
-	PORT_START_TAG("dsw")	/* IN5 DSW */
+	PORT_START("dsw")	/* IN5 DSW */
 	PORT_DIPNAME(0xf, 0x9, "Coin/Time" )
 	PORT_DIPSETTING( 0x0, "30 sec" )
 	PORT_DIPSETTING( 0x1, "60 sec" )

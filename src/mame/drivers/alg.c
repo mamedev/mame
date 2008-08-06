@@ -373,44 +373,44 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( alg )
-	PORT_START_TAG("JOY0DAT")	/* read by Amiga core */
+	PORT_START("JOY0DAT")	/* read by Amiga core */
 	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(amiga_joystick_convert, "P1JOY")
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG("JOY1DAT")	/* read by Amiga core */
+	PORT_START("JOY1DAT")	/* read by Amiga core */
 	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(amiga_joystick_convert, "P2JOY")
 	PORT_BIT( 0xfcfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START_TAG("POTGO")		/* read by Amiga core */
+	PORT_START("POTGO")		/* read by Amiga core */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xaaff, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START_TAG("HVPOS")		/* read by Amiga core */
+	PORT_START("HVPOS")		/* read by Amiga core */
 	PORT_BIT( 0x1ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(lightgun_pos_r, NULL)
 
-	PORT_START_TAG("FIRE")
+	PORT_START("FIRE")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("P1JOY")		/* referenced by JOY0DAT */
+	PORT_START("P1JOY")		/* referenced by JOY0DAT */
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 )
 
-	PORT_START_TAG("P2JOY")		/* referenced by JOY1DAT */
+	PORT_START("P2JOY")		/* referenced by JOY1DAT */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-	PORT_START_TAG("GUN1X")		/* referenced by lightgun_pos_r */
+	PORT_START("GUN1X")		/* referenced by lightgun_pos_r */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
-	PORT_START_TAG("GUN1Y")		/* referenced by lightgun_pos_r */
+	PORT_START("GUN1Y")		/* referenced by lightgun_pos_r */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(1)
 INPUT_PORTS_END
 
@@ -428,13 +428,13 @@ static INPUT_PORTS_START( alg_2p )
 	PORT_MODIFY("P2JOY")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(lightgun_holster_r, NULL)
 
-	PORT_START_TAG("GUN2X")		/* referenced by lightgun_pos_r */
+	PORT_START("GUN2X")		/* referenced by lightgun_pos_r */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START_TAG("GUN2Y")		/* referenced by lightgun_pos_r */
+	PORT_START("GUN2Y")		/* referenced by lightgun_pos_r */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(70) PORT_KEYDELTA(10) PORT_PLAYER(2)
 
-	PORT_START_TAG("TRIGGERS")	/* referenced by lightgun_trigger_r and lightgun_holster_r */
+	PORT_START("TRIGGERS")	/* referenced by lightgun_trigger_r and lightgun_holster_r */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)

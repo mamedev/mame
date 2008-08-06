@@ -305,13 +305,13 @@ static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x106000, 0x106fff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf2_rowscroll)
 
 	/* protection */
-//  AM_RANGE(0x280104, 0x280105) AM_WRITE(SMH_NOP) // ??
-	AM_RANGE(0x2800ac, 0x2800ad) AM_READ(input_port_2_word_r) // dips
-	AM_RANGE(0x280298, 0x280299) AM_READ(input_port_1_word_r) // vbl
-	AM_RANGE(0x280506, 0x280507) AM_READ(input_port_3_word_r)
-	AM_RANGE(0x2802B4, 0x2802B5) AM_READ(input_port_0_word_r) // inverted?
-//  AM_RANGE(0x280330, 0x280331) AM_READ(SMH_NOP) // sound?
-//  AM_RANGE(0x280380, 0x280381) AM_WRITE(SMH_NOP) // sound
+//	AM_RANGE(0x280104, 0x280105) AM_WRITE(SMH_NOP)				// ??
+	AM_RANGE(0x2800ac, 0x2800ad) AM_READ_PORT("DSW")			// dips
+	AM_RANGE(0x280298, 0x280299) AM_READ_PORT("SYSTEM")			// vbl
+	AM_RANGE(0x280506, 0x280507) AM_READ_PORT("UNK")
+	AM_RANGE(0x2802B4, 0x2802B5) AM_READ_PORT("P1_P2")			// inverted?
+//	AM_RANGE(0x280330, 0x280331) AM_READ(SMH_NOP)				// sound?
+//	AM_RANGE(0x280380, 0x280381) AM_WRITE(SMH_NOP)				// sound
 
 	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE(dlbewing_prot_r,dblewing_prot_w)
 
@@ -392,7 +392,7 @@ static GFXDECODE_START( dblewing )
 GFXDECODE_END
 
 static INPUT_PORTS_START( dblewing )
-	PORT_START	/* 16bit */
+	PORT_START("P1_P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -410,7 +410,7 @@ static INPUT_PORTS_START( dblewing )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START	/* 16bit */
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -424,7 +424,7 @@ static INPUT_PORTS_START( dblewing )
    Also the Original PCB showed the title screen in English, and the current implementation shows it
    in Korean(?), so it is likely there is a Language dip/jumper setting */
 
-	PORT_START
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) ) /* 16bit - These values are for Dip Switch #1 */
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 2C_1C ) )
@@ -471,7 +471,7 @@ static INPUT_PORTS_START( dblewing )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START	/* 16bit */
+	PORT_START("UNK")
 	PORT_DIPNAME( 0x0001, 0x0001, "2" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -520,8 +520,6 @@ static INPUT_PORTS_START( dblewing )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-
 INPUT_PORTS_END
 
 static void sound_irq(running_machine *machine, int irq)

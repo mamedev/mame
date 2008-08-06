@@ -108,7 +108,7 @@ static ADDRESS_MAP_START( usg185_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 #define USGIN0\
-	PORT_START_TAG("IN0")\
+	PORT_START("IN0")\
 	PORT_BIT(0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Button 1") PORT_CODE(KEYCODE_Z)\
 	PORT_BIT(0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Button 2") PORT_CODE(KEYCODE_X)\
 	PORT_BIT(0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Button 3") PORT_CODE(KEYCODE_C)\
@@ -123,7 +123,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 #define USGIN2 \
-	PORT_START_TAG("IN2")\
+	PORT_START("IN2")\
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )\
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )\
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )\
@@ -150,7 +150,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 #define USGIN3\
-	PORT_START_TAG("IN3")\
+	PORT_START("IN3")\
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )\
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )\
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )\
@@ -181,7 +181,7 @@ static INPUT_PORTS_START( usg32 )
 
 	USGIN0
 
-	PORT_START_TAG("DSW")
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Service Keyboard Attached?" ) //Not actually a DIP, when keyboard is plugged in, this goes low
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -212,7 +212,7 @@ static INPUT_PORTS_START( usg83 ) //From here, the hardware was slightly upgrade
 
     USGIN0
 
-	PORT_START
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "Service Keyboard Attached?" ) //Not actually a DIP, when keyboard is plugged in, this goes low
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )

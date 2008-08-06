@@ -155,7 +155,7 @@ ADDRESS_MAP_END
 /******************************************************************************/
 
 static INPUT_PORTS_START( funkyjet )
-	PORT_START_TAG("P1")	/* Player 1 controls */
+	PORT_START("P1")	/* Player 1 controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -165,7 +165,7 @@ static INPUT_PORTS_START( funkyjet )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )	/* Button 3 only in "test mode" */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START_TAG("P2")	/* Player 2 controls */
+	PORT_START("P2")	/* Player 2 controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -175,7 +175,7 @@ static INPUT_PORTS_START( funkyjet )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )	/* Button 3 only in "test mode" */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START_TAG("IN0")	/* System Inputs */
+	PORT_START("IN0")	/* System Inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -183,7 +183,7 @@ static INPUT_PORTS_START( funkyjet )
 
 	/* Dips seem inverted with respect to other Deco games */
 
-	PORT_START_TAG("DSWA")	/* Dip switch bank 1 */
+	PORT_START("DSWA")	/* Dip switch bank 1 */
 	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
@@ -207,7 +207,7 @@ static INPUT_PORTS_START( funkyjet )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 
-	PORT_START_TAG("DSWB")	/* Dip switch bank 2 */
+	PORT_START("DSWB")	/* Dip switch bank 2 */
 	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0xc0, "2" )
@@ -243,7 +243,7 @@ static INPUT_PORTS_START( funkyjej )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sotsugyo )
-	PORT_START_TAG("P1")	/* Player 1 controls */
+	PORT_START("P1")	/* Player 1 controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -253,7 +253,7 @@ static INPUT_PORTS_START( sotsugyo )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)	/* only in "test mode" */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
-	PORT_START_TAG("P2")	/* Player 2 controls */
+	PORT_START("P2")	/* Player 2 controls */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -263,7 +263,7 @@ static INPUT_PORTS_START( sotsugyo )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)	/* only in "test mode" */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START_TAG("IN0")	/* System Inputs */
+	PORT_START("IN0")	/* System Inputs */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )		// Not working - see notes
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )		// See notes
@@ -271,7 +271,7 @@ static INPUT_PORTS_START( sotsugyo )
 
 	/* Dips seem inverted with respect to other Deco games */
 
-	PORT_START_TAG("DSWA")	/* Dip switch bank 1 */
+	PORT_START("DSWA")	/* Dip switch bank 1 */
 	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
@@ -295,7 +295,7 @@ static INPUT_PORTS_START( sotsugyo )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 
-	PORT_START_TAG("DSWB")	/* Dip switch bank 2 */
+	PORT_START("DSWB")	/* Dip switch bank 2 */
 	PORT_DIPNAME( 0x80, 0x80, "Freeze" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

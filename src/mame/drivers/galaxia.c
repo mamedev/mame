@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( galaxia )
-	PORT_START	/*  */
+	PORT_START("IN0")
 
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

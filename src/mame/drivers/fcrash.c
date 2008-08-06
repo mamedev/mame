@@ -351,9 +351,9 @@ static ADDRESS_MAP_START( fcrash_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800030, 0x800031) AM_WRITE(cps1_coinctrl_w)
 	AM_RANGE(0x800100, 0x80013f) AM_RAM AM_BASE(&cps1_cps_a_regs)	/* CPS-A custom */
 	AM_RANGE(0x800140, 0x80017f) AM_RAM AM_BASE(&cps1_cps_b_regs)	/* CPS-B custom */
-	AM_RANGE(0x880000, 0x880001) AM_READ(cps1_in1_r)          /* Player input ports */
-	AM_RANGE(0x880006, 0x880007) AM_WRITE(fcrash_soundlatch_w) 	/* Sound command */
-	AM_RANGE(0x880008, 0x88000f) AM_READ(cps1_dsw_r)          /* System input ports / Dip Switches */
+	AM_RANGE(0x880000, 0x880001) AM_READ_PORT("IN1")				/* Player input ports */
+	AM_RANGE(0x880006, 0x880007) AM_WRITE(fcrash_soundlatch_w)		/* Sound command */
+	AM_RANGE(0x880008, 0x88000f) AM_READ(cps1_dsw_r)				/* System input ports / Dip Switches */
 	AM_RANGE(0x890000, 0x890001) AM_WRITENOP	// palette related?
 	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE(&cps1_gfxram) AM_SIZE(&cps1_gfxram_size)
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
@@ -376,16 +376,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kodb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-	AM_RANGE(0x800000, 0x800007) AM_READ(cps1_in1_r)            /* Player input ports */
+	AM_RANGE(0x800000, 0x800007) AM_READ_PORT("IN1")			/* Player input ports */
 	/* forgottn, willow, cawing, nemo, varth read from 800010. Probably debug input leftover from development */
-	AM_RANGE(0x800018, 0x80001f) AM_READ(cps1_dsw_r)            /* System input ports / Dip Switches */
-	AM_RANGE(0x800020, 0x800021) AM_READNOP                     /* ? Used by Rockman ? not mapped according to PAL */
+	AM_RANGE(0x800018, 0x80001f) AM_READ(cps1_dsw_r)			/* System input ports / Dip Switches */
+	AM_RANGE(0x800020, 0x800021) AM_READNOP						/* ? Used by Rockman ? not mapped according to PAL */
 	AM_RANGE(0x800030, 0x800037) AM_WRITE(cps1_coinctrl_w)
 	/* Forgotten Worlds has dial controls on B-board mapped at 800040-80005f. See DRIVER_INIT */
 	AM_RANGE(0x800100, 0x80013f) AM_WRITE(cps1_cps_a_w) AM_BASE(&cps1_cps_a_regs)	/* CPS-A custom */
 	AM_RANGE(0x800140, 0x80017f) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w) AM_BASE(&cps1_cps_b_regs)	/* CPS-B custom */
-//  AM_RANGE(0x800180, 0x800187) AM_WRITE(cps1_soundlatch_w)    /* Sound command */
-//  AM_RANGE(0x800188, 0x80018f) AM_WRITE(cps1_soundlatch2_w)   /* Sound timer fade */
+//	AM_RANGE(0x800180, 0x800187) AM_WRITE(cps1_soundlatch_w)	/* Sound command */
+//	AM_RANGE(0x800188, 0x80018f) AM_WRITE(cps1_soundlatch2_w)	/* Sound timer fade */
 	AM_RANGE(0x8001c0, 0x8001ff) AM_READWRITE(cps1_cps_b_r, cps1_cps_b_w)	/* mirror (SF2 revision "E" US 910228) */
 	AM_RANGE(0x900000, 0x92ffff) AM_RAM_WRITE(cps1_gfxram_w) AM_BASE(&cps1_gfxram) AM_SIZE(&cps1_gfxram_size)	/* SF2CE executes code from here */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM
@@ -468,7 +468,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( fcrash )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -478,14 +478,14 @@ static INPUT_PORTS_START( fcrash )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("DSWA")
+	PORT_START("DSWA")
 	CPS1_COINAGE_1
 	PORT_DIPNAME( 0x40, 0x40, "2 Coins to Start, 1 to Continue" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START_TAG("DSWB")
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0x07, 0x04, "Difficulty Level 1" )
 	PORT_DIPSETTING(    0x07, DEF_STR( Easiest ) )		// "01"
 	PORT_DIPSETTING(    0x06, DEF_STR( Easier ) )		// "02"
@@ -507,7 +507,7 @@ static INPUT_PORTS_START( fcrash )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START_TAG("DSWC")
+	PORT_START("DSWC")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x03, "2" )
@@ -532,7 +532,7 @@ static INPUT_PORTS_START( fcrash )
 	PORT_DIPSETTING(    0x80, "Game" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Test ) )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -553,7 +553,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( kodb )
-	PORT_START_TAG("IN0")
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -563,7 +563,7 @@ static INPUT_PORTS_START( kodb )
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("DSWA")
+	PORT_START("DSWA")
 	CPS1_COINAGE_2( "SW(A)" )
 	PORT_DIPNAME( 0x08, 0x08, "Coin Slots" )						PORT_DIPLOCATION("SW(A):4")
 	PORT_DIPSETTING(    0x00, "1" )
@@ -577,7 +577,7 @@ static INPUT_PORTS_START( kodb )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW(A):8" )
 
-	PORT_START_TAG("DSWB")
+	PORT_START("DSWB")
 	CPS1_DIFFICULTY_1( "SW(B)" )
 	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Lives ) )					PORT_DIPLOCATION("SW(B):4,5,6")
 	PORT_DIPSETTING(    0x30, "1" )
@@ -594,7 +594,7 @@ static INPUT_PORTS_START( kodb )
 	PORT_DIPSETTING(    0x40, "160k and every 450k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 
-	PORT_START_TAG("DSWC")
+	PORT_START("DSWC")
 	PORT_DIPUNUSED_DIPLOC( 0x01, 0x01, "SW(C):1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW(C):2" )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )				PORT_DIPLOCATION("SW(C):3")
@@ -616,7 +616,7 @@ static INPUT_PORTS_START( kodb )
 	PORT_DIPSETTING(    0x80, "Game" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Test ) )
 
-	PORT_START_TAG("IN1")
+	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -634,7 +634,7 @@ static INPUT_PORTS_START( kodb )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")      /* Player 3 */
+	PORT_START("IN2")      /* Player 3 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)

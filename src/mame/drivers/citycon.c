@@ -1,6 +1,9 @@
 /***************************************************************************
 
 
+2008-07
+Dip locations added from dip listing at crazykong.com
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -21,7 +24,7 @@ VIDEO_START( citycon );
 
 static READ8_HANDLER( citycon_in_r )
 {
-	return input_port_read(machine, flip_screen_get() ? "IN1" : "IN0");
+	return input_port_read(machine, flip_screen_get() ? "P2" : "P1");
 }
 
 
@@ -29,8 +32,8 @@ static READ8_HANDLER( citycon_in_r )
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x3000, 0x3000) AM_READ(citycon_in_r)	/* player 1 & 2 inputs multiplexed */
-	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("IN2")
-	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("IN3")
+	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1")
+	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3007, 0x3007) AM_READ(watchdog_reset_r)	/* ? */
 	AM_RANGE(0x4000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
@@ -67,7 +70,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( citycon )
-	PORT_START_TAG("IN0")
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
@@ -77,7 +80,7 @@ static INPUT_PORTS_START( citycon )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START_TAG("IN1")
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
@@ -87,32 +90,26 @@ static INPUT_PORTS_START( citycon )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START_TAG("IN2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "Infinite (Cheat)")
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x00, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW1:5" )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
 	/* the coin input must stay low for exactly 2 frames to be consistently recognized. */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 
-	PORT_START_TAG("IN3")
-	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x07, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -121,21 +118,17 @@ static INPUT_PORTS_START( citycon )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x00, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW2:7" )
+	/* According to manual this is Flip Screen setting */
+//	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip Screen ) ) PORT_DIPLOCATION("SW2:8")
+//	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
 INPUT_PORTS_END
 
 

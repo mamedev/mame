@@ -187,7 +187,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( showhand )
-	PORT_START_TAG("INPUTS")	// 54000
+	PORT_START("INPUTS")	// 54000
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN1     )	PORT_IMPULSE(1)	// coin
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON3   )	PORT_NAME("Payout")	PORT_CODE(KEYCODE_F1) // payout (must be 0 on startup)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_UNKNOWN   )	// ?

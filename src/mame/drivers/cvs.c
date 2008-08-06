@@ -594,7 +594,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( cvs )
-	PORT_START_TAG("IN0")	/* Matrix 0 */
+	PORT_START("IN0")	/* Matrix 0 */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -604,7 +604,7 @@ static INPUT_PORTS_START( cvs )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN1")	/* Dunno */
+	PORT_START("IN1")	/* Dunno */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL        /* "Green button" */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )                      /* "Green button" */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
@@ -614,11 +614,11 @@ static INPUT_PORTS_START( cvs )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN2")	/* Dunno */
+	PORT_START("IN2")	/* Dunno */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )           /* not sure it's SERVICE1 : it uses "Coin B" coinage and doesn't say "CREDIT" */
     PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("IN3")	/* Dunno */
+	PORT_START("IN3")	/* Dunno */
     PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
     PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_COCKTAIL
@@ -628,7 +628,7 @@ static INPUT_PORTS_START( cvs )
     PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
     PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START_TAG("DSW3")	/* SW BANK 3 */
+	PORT_START("DSW3")	/* SW BANK 3 */
 	PORT_DIPUNUSED( 0x01, IP_ACTIVE_HIGH )                  /* can't tell if it's ACTIVE_HIGH or ACTIVE_LOW */
 	PORT_DIPUNUSED( 0x02, IP_ACTIVE_HIGH )                  /* can't tell if it's ACTIVE_HIGH or ACTIVE_LOW */
 	PORT_DIPUNUSED( 0x04, IP_ACTIVE_HIGH )                  /* can't tell if it's ACTIVE_HIGH or ACTIVE_LOW */
@@ -638,7 +638,7 @@ static INPUT_PORTS_START( cvs )
 	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )                  /* can't tell if it's ACTIVE_HIGH or ACTIVE_LOW */
 
-    PORT_START_TAG("DSW2")	/* SW BANK 2 */
+    PORT_START("DSW2")	/* SW BANK 2 */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )
@@ -654,7 +654,7 @@ static INPUT_PORTS_START( cvs )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )                  /* can't tell if it's ACTIVE_HIGH or ACTIVE_LOW */
 
-	PORT_START_TAG("SENSE")	/* SENSE */
+	PORT_START("SENSE")	/* SENSE */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 

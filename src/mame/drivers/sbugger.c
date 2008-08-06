@@ -163,7 +163,7 @@ GFXDECODE_END
 /* input ports */
 
 static INPUT_PORTS_START( sbugger )
-	PORT_START	/* 8-bit */
+	PORT_START("INPUTS")	/* 8-bit */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_2WAY
 	PORT_DIPNAME( 0x02, 0x02, "PA 1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
@@ -177,7 +177,7 @@ static INPUT_PORTS_START( sbugger )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START	/* 8-bit */
+	PORT_START("DSW1")	/* 8-bit */
 	PORT_DIPNAME( 0x01, 0x01, "PB 0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -201,12 +201,12 @@ static INPUT_PORTS_START( sbugger )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START	/* 6-bit */
+	PORT_START("DSW2")	/* 6-bit */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Difficulty ) ) //enemy speed
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
-  PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
 
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )

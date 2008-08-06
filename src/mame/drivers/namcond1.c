@@ -88,7 +88,7 @@ ADDRESS_MAP_END
 /*************************************************************/
 
 static INPUT_PORTS_START( namcond1 )
-	PORT_START      /* player 1 */
+	PORT_START("P1_P2")      /* player 1 */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
@@ -106,7 +106,7 @@ static INPUT_PORTS_START( namcond1 )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START  	/* dipswitches */
+	PORT_START("DSW")  	/* dipswitches */
 	PORT_DIPNAME( 0x0100, 0x0100, "Freeze" )
 	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )

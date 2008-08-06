@@ -2405,14 +2405,12 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 
 			/* start of a new input port */
 			case INPUT_TOKEN_START:
-			case INPUT_TOKEN_START_TAG:
 				if (curfield != NULL)
 					field_config_insert(curfield, &maskbits, errorbuf, errorbuflen);
 				maskbits = 0;
 
 				curport = port_config_alloc((const input_port_config **)&listhead);
-				if (entrytype == INPUT_TOKEN_START_TAG)
-					curport->tag = TOKEN_GET_STRING(ipt);
+				curport->tag = TOKEN_GET_STRING(ipt);
 				curfield = NULL;
 				cursetting = NULL;
 				break;

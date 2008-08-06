@@ -261,8 +261,7 @@ ADDRESS_MAP_END
     player 1 start button when in the cross-hatch screen.
 *****************************************************************************/
 
-#define  WARDNER_PLAYER_INPUT( player )										 \
-	PORT_START 				/* Player 1 button 3 skips video RAM tests */	 \
+#define  WARDNER_PLAYER_INPUT( player )		/* Player 1 button 3 skips video RAM tests */	 \
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(player) PORT_8WAY \
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(player) PORT_8WAY \
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(player) PORT_8WAY \
@@ -273,7 +272,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(player)	/* Shot D */
 
 #define  WARDNER_SYSTEM_INPUTS												\
-	PORT_START				/* test button doesnt seem to do anything ? */	\
+	PORT_START("SYSTEM")				/* test button doesnt seem to do anything ? */	\
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN3 )		/* Service button */	\
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_TILT )								\
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )	/* Test button */		\
@@ -284,7 +283,7 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )	/* V-Blank */
 
 #define  PYROS_DSW_A									\
-	PORT_START		/* DSW A */							\
+	PORT_START("DSWA")		/* DSW A */							\
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )		\
 	PORT_DIPSETTING(	0x01, DEF_STR( Upright ) )		\
 	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )		\
@@ -309,7 +308,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(	0x40, DEF_STR( 1C_2C ) )
 
 #define  WARDNER_DSW_B									\
-	PORT_START		/* DSW B */							\
+	PORT_START("DSWB")		/* DSW B */							\
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )	\
 	PORT_DIPSETTING(	0x01, DEF_STR( Easy ) )					\
 	PORT_DIPSETTING(	0x00, DEF_STR( Normal ) )				\
@@ -336,10 +335,14 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wardner )
 	WARDNER_SYSTEM_INPUTS
+
+	PORT_START("P1")
 	WARDNER_PLAYER_INPUT( 1 )
+
+	PORT_START("P2")
 	WARDNER_PLAYER_INPUT( 2 )
 
-	PORT_START		/* DSW A */
+	PORT_START("DSWA")		/* DSW A */
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Upright ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Cocktail ) )
@@ -368,11 +371,16 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( pyros )
 	WARDNER_SYSTEM_INPUTS
+
+	PORT_START("P1")
 	WARDNER_PLAYER_INPUT( 1 )
+
+	PORT_START("P2")
 	WARDNER_PLAYER_INPUT( 2 )
+
 	PYROS_DSW_A
 
-	PORT_START		/* DSW B */
+	PORT_START("DSWB")		/* DSW B */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Normal ) )
@@ -398,9 +406,15 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( wardnerj )
 	WARDNER_SYSTEM_INPUTS
+
+	PORT_START("P1")
 	WARDNER_PLAYER_INPUT( 1 )
+
+	PORT_START("P2")
 	WARDNER_PLAYER_INPUT( 2 )
+
 	PYROS_DSW_A
+
 	WARDNER_DSW_B
 INPUT_PORTS_END
 

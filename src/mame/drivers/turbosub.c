@@ -179,7 +179,7 @@ static WRITE8_HANDLER( FDT_W )
 }
 
 static INPUT_PORTS_START( turbosub )
-PORT_START
+PORT_START("IN0")
 INPUT_PORTS_END
 
 /*

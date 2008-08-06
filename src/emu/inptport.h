@@ -326,7 +326,6 @@ enum
 	INPUT_TOKEN_END,
 	INPUT_TOKEN_INCLUDE,
 	INPUT_TOKEN_START,
-	INPUT_TOKEN_START_TAG,
 	INPUT_TOKEN_MODIFY,
 	INPUT_TOKEN_FIELD,
 	INPUT_TOKEN_SPECIAL_ONOFF,
@@ -702,13 +701,9 @@ struct _inp_header
 	TOKEN_UINT32_PACK1(INPUT_TOKEN_INCLUDE, 8), \
 	TOKEN_PTR(tokenptr, &ipt_##_name[0]),
 
-/* start of a new input port */
-#define PORT_START \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_START, 8),
-
 /* start of a new input port (with included tag) */
-#define PORT_START_TAG(_tag) \
-	TOKEN_UINT32_PACK1(INPUT_TOKEN_START_TAG, 8), \
+#define PORT_START(_tag) \
+	TOKEN_UINT32_PACK1(INPUT_TOKEN_START, 8), \
 	TOKEN_STRING(_tag),
 
 /* modify an existing port */

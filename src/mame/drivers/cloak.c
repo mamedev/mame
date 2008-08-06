@@ -93,6 +93,10 @@
 
     Motion object ROM: 136023.307,136023.308
     Playfield ROM: 136023.306,136023.305
+	
+	
+	2008-07
+	Dip locations and suggested settings verified with manual.
 
 ****************************************************************************/
 
@@ -164,9 +168,9 @@ static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x100f) AM_READWRITE(pokey1_r, pokey1_w)		/* DSW0 also */
 //  AM_RANGE(0x1008, 0x1008) AM_READ(SMH_RAM)
 	AM_RANGE(0x1800, 0x180f) AM_READWRITE(pokey2_r, pokey2_w)		/* DSW1 also */
-	AM_RANGE(0x2000, 0x2000) AM_READ(input_port_0_r)	/* IN0 */
-	AM_RANGE(0x2200, 0x2200) AM_READ(input_port_1_r)	/* IN1 */
-	AM_RANGE(0x2400, 0x2400) AM_READ(input_port_2_r)	/* IN2 */
+	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("P1")
+	AM_RANGE(0x2200, 0x2200) AM_READ_PORT("P2")
+	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2600, 0x2600) AM_WRITE(cloak_custom_w)
 	AM_RANGE(0x2800, 0x29ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
@@ -208,7 +212,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( cloak )
-	PORT_START	/* IN0 */
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_8WAY
@@ -218,10 +222,10 @@ static INPUT_PORTS_START( cloak )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
 
-	PORT_START	/* IN1 */
+	PORT_START("P2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )		// player 2 controls, not used
 
-	PORT_START	/* IN2 */
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_SERVICE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -231,31 +235,31 @@ static INPUT_PORTS_START( cloak )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )		// player 2 button 1, not used
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START	/* IN3 */
+	PORT_START("START")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )		// not connected
 	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_UNUSED )	// pulled high
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START1 )
 
-	PORT_START      /* DSW0 */
-	PORT_DIPNAME( 0x03, 0x02, "Credits" )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x03, 0x02, "Credits" ) PORT_DIPLOCATION("5A:!7,!8")
 	PORT_DIPSETTING(    0x02, "1 Credit/1 Game" )
 	PORT_DIPSETTING(    0x01, "1 Credit/2 Games" )
 	PORT_DIPSETTING(    0x03, "2 Credits/1 Game" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("5A:!5,!6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("5A:!4")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_DIPNAME( 0x40, 0x00, "Demo Freeze Mode" )	// when active, press button 1 to freeze
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )	// "5A:!3" - it must be OFF according to manual.
+	PORT_DIPNAME( 0x40, 0x00, "Demo Freeze Mode" ) PORT_DIPLOCATION("5A:!2")	// when active, press button 1 to freeze
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )	// "5A:!1" - Not Used according to manual.
 INPUT_PORTS_END
 
 
