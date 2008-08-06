@@ -414,7 +414,7 @@ static READ16_HANDLER( eeprom_r )
 	int res;
 
 	res = (eeprom_read_bit() & 0x01);
-	res |= input_port_read(machine, "IN1") & 0xfe;	/* coin inputs */
+	res |= input_port_read(machine, "DSWB") & 0xfe;	/* coin inputs */
 
 	return res;
 }
