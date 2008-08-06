@@ -152,7 +152,10 @@ WRITE8_HANDLER( thepit_flip_screen_y_w );
 READ8_HANDLER( thepit_input_port_0_r );
 WRITE8_HANDLER( intrepid_graphics_bank_w );
 
-
+static READ8_HANDLER( thepit_colorram_r )
+{
+	return thepit_colorram[offset];
+}
 
 static WRITE8_HANDLER( thepit_sound_enable_w )
 {
@@ -180,10 +183,10 @@ static ADDRESS_MAP_START( thepit_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb800, 0xb800) AM_READWRITE(watchdog_reset_r, soundlatch_w)
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( intrepid_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x8c00, 0x8fff) AM_READWRITE(thepit_colorram_r, thepit_colorram_w) /* mirror for intrepi2 */
 	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(thepit_videoram_w) AM_BASE(&thepit_videoram)
 	AM_RANGE(0x9400, 0x97ff) AM_RAM_WRITE(thepit_colorram_w) AM_BASE(&thepit_colorram)
 	AM_RANGE(0x9800, 0x983f) AM_MIRROR(0x0700) AM_RAM AM_BASE(&thepit_attributesram)
