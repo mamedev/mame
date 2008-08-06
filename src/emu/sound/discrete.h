@@ -3152,6 +3152,14 @@
 
 /*************************************
  *
+ *  Profiling Nodes
+ *
+ *************************************/
+
+#define DISCRETE_PROFILING			(0)
+
+/*************************************
+ *
  *  Core constants
  *
  *************************************/
@@ -3421,6 +3429,9 @@ struct _node_description
 	void *			context;							/* Contextual information specific to this node type */
 	const char *	name;								/* Text name string for identification/debug */
 	const void *	custom;								/* Custom function specific initialisation data */
+#if (DISCRETE_PROFILING)
+	osd_ticks_t		run_time;
+#endif
 };
 
 
