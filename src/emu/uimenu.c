@@ -271,6 +271,8 @@ static void menu_bookkeeping(running_machine *machine, ui_menu *menu, void *para
 static void menu_bookkeeping_populate(running_machine *machine, ui_menu *menu, attotime *curtime);
 #endif
 static void menu_game_info(running_machine *machine, ui_menu *menu, void *parameter, void *state);
+static void menu_cheat(running_machine *machine, ui_menu *menu, void *parameter, void *state);
+static void menu_cheat_populate(running_machine *machine, ui_menu *menu);
 static void menu_memory_card(running_machine *machine, ui_menu *menu, void *parameter, void *state);
 static void menu_memory_card_populate(running_machine *machine, ui_menu *menu, int cardnum);
 static void menu_video_targets(running_machine *machine, ui_menu *menu, void *parameter, void *state);
@@ -1459,8 +1461,8 @@ static void menu_main_populate(running_machine *machine, ui_menu *menu, void *st
 	ui_menu_item_append(menu, "Video Options", NULL, 0, (render_target_get_indexed(1) != NULL) ? menu_video_targets : menu_video_options);
 
 	/* add cheat menu */
-//  if (options_get_bool(mame_options(), OPTION_CHEAT))
-//      ui_menu_item_append(menu, "Cheat", NULL, 0, menu_cheat);
+	if (options_get_bool(mame_options(), OPTION_CHEAT) && cheat_get_next_menu_entry(machine, NULL, NULL, NULL, NULL) != NULL)
+		ui_menu_item_append(menu, "Cheat", NULL, 0, menu_cheat);
 
 	/* add memory card menu */
 	if (machine->config->memcard_handler != NULL)
@@ -2412,6 +2414,70 @@ static void menu_game_info(running_machine *machine, ui_menu *menu, void *parame
 
 	/* process the menu */
 	ui_menu_process(menu, 0);
+}
+
+
+/*-------------------------------------------------
+    menu_cheat - handle the cheat menu
+-------------------------------------------------*/
+
+static void menu_cheat(running_machine *machine, ui_menu *menu, void *parameter, void *state)
+{
+	const ui_menu_event *event;
+
+	/* if the menu isn't built, populate now */
+	if (!ui_menu_populated(menu))
+		menu_cheat_populate(machine, menu);
+
+	/* process the menu */
+	event = ui_menu_process(menu, UI_MENU_PROCESS_LR_REPEAT);
+
+	/* handle events */
+	if (event != NULL && event->itemref != NULL)
+	{
+		int changed = FALSE;
+
+		switch (event->iptkey)
+		{
+			/* if selected, reset to default value */
+			case IPT_UI_SELECT:
+				break;
+
+			/* left decrements */
+			case IPT_UI_LEFT:
+				changed = cheat_select_previous_state(machine, event->itemref);
+				break;
+
+			/* right increments */
+			case IPT_UI_RIGHT:
+				changed = cheat_select_next_state(machine, event->itemref);
+				break;
+		}
+
+		/* if things changed, update */
+		if (changed)
+			ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_REF);
+	}
+}
+
+
+/*-------------------------------------------------
+    menu_cheat_populate - populate the cheat menu
+-------------------------------------------------*/
+
+static void menu_cheat_populate(running_machine *machine, ui_menu *menu)
+{
+	const char *text, *subtext;
+	void *curcheat;
+	UINT32 flags;
+	
+	/* iterate over cheats */
+	for (curcheat = cheat_get_next_menu_entry(machine, NULL, &text, &subtext, &flags); 
+		 curcheat != NULL; 
+		 curcheat = cheat_get_next_menu_entry(machine, curcheat, &text, &subtext, &flags))
+	{
+		ui_menu_item_append(menu, text, subtext, flags, curcheat);
+	}
 }
 
 

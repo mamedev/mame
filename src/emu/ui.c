@@ -429,6 +429,9 @@ void ui_update_and_render(running_machine *machine)
 		if (alpha >= 0)
 			render_ui_add_rect(0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(alpha,0x00,0x00,0x00), PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
+	
+	/* render any cheat stuff at the bottom */
+	cheat_render_text(machine);
 
 	/* call the current UI handler */
 	assert(ui_handler_callback != NULL);

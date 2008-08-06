@@ -24,7 +24,8 @@
 ***************************************************************************/
 
 /* preferred font height; use ui_get_line_height() to get actual height */
-#define UI_TARGET_FONT_HEIGHT	(1.0f / 25.0f)
+#define UI_TARGET_FONT_ROWS		(25)
+#define UI_TARGET_FONT_HEIGHT	(1.0f / (float)UI_TARGET_FONT_ROWS)
 #define UI_MAX_FONT_HEIGHT		(1.0f / 15.0f)
 
 /* width of lines drawn in the UI */
