@@ -58,6 +58,10 @@ static const char *const RegNames[]= {
 	0, "A", "XL", "XH", "X", "YL", "YH", "Y", "UL", "UH", "U", "P", "S"
 };
 
+#if defined(SEC)
+#undef SEC
+#endif
+
 typedef enum {
 	ILL, ILL2, PREFD, NOP,
 

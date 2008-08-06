@@ -297,6 +297,9 @@ static UINT8 const *index_cycle;
 #define EXTENDED IMMWORD(ea)
 
 /* macros to set status flags */
+#if defined(SEC)
+#undef SEC
+#endif
 #define SEC CC|=CC_C
 #define CLC CC&=~CC_C
 #define SEZ CC|=CC_Z

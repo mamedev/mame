@@ -1080,6 +1080,9 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
 /* 6280 ********************************************************
  *  SEC Set carry flag
  ***************************************************************/
+#if defined(SEC)
+#undef SEC
+#endif
 #define SEC 													\
 	CLEAR_T;													\
 	P |= _fC

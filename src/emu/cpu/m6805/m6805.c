@@ -178,6 +178,9 @@ static const UINT8 flags8d[256]= /* decrement */
 #define INDEXED2 {IMMWORD(ea); EA+=X;}
 
 /* macros to set status flags */
+#if defined(SEC)
+#undef SEC
+#endif
 #define SEC CC|=CFLAG
 #define CLC CC&=~CFLAG
 #define SEZ CC|=ZFLAG
