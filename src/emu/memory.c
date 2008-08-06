@@ -825,8 +825,8 @@ void memory_set_context(int activecpu)
 	{
 		space = &cpudata[activecpu].space[ADDRESS_SPACE_IO];
 		active_address_space[ADDRESS_SPACE_IO].bytemask = space->bytemask;
-		active_address_space[ADDRESS_SPACE_IO].readlookup = ((Machine->debug_flags & DEBUG_FLAG_WPR_DATA) != 0) ? wptable : space->read.table;
-		active_address_space[ADDRESS_SPACE_IO].writelookup = ((Machine->debug_flags & DEBUG_FLAG_WPW_DATA) != 0) ? wptable : space->write.table;
+		active_address_space[ADDRESS_SPACE_IO].readlookup = ((Machine->debug_flags & DEBUG_FLAG_WPR_IO) != 0) ? wptable : space->read.table;
+		active_address_space[ADDRESS_SPACE_IO].writelookup = ((Machine->debug_flags & DEBUG_FLAG_WPW_IO) != 0) ? wptable : space->write.table;
 		active_address_space[ADDRESS_SPACE_IO].readhandlers = space->read.handlers;
 		active_address_space[ADDRESS_SPACE_IO].writehandlers = space->write.handlers;
 		active_address_space[ADDRESS_SPACE_IO].accessors = space->accessors;
