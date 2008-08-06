@@ -2353,6 +2353,7 @@ src/mame/includes/redalert.h svneol=native#text/plain
 src/mame/includes/relief.h svneol=native#text/plain
 src/mame/includes/rescap.h svneol=native#text/plain
 src/mame/includes/retofinv.h svneol=native#text/plain
+src/mame/includes/rockola.h svneol=native#text/plain
 src/mame/includes/segag80r.h svneol=native#text/plain
 src/mame/includes/segag80v.h svneol=native#text/plain
 src/mame/includes/segas24.h svneol=native#text/plain

@@ -16,6 +16,9 @@
 #include "sound/custom.h"
 #include "sound/sn76477.h"
 #include "sound/samples.h"
+#include "rockola.h"
+#include "sound/discrete.h"
+
 
 #ifndef M_LN2
 #define M_LN2		0.69314718055994530942
@@ -51,7 +54,13 @@ static sound_stream * tone_stream;
 static int Sound0StopOnRollover;
 static UINT8 LastPort1;
 
-const char *const sasuke_sample_names[] =
+
+const struct CustomSound_interface custom_interface =
+{
+	rockola_sh_start
+};
+
+static const char *const sasuke_sample_names[] =
 {
 	"*sasuke",
 
@@ -64,7 +73,13 @@ const char *const sasuke_sample_names[] =
 	0
 };
 
-const char *const vanguard_sample_names[] =
+const struct Samplesinterface sasuke_samples_interface =
+{
+	4,	/* 4 channels */
+	sasuke_sample_names
+};
+
+static const char *const vanguard_sample_names[] =
 {
 	"*vanguard",
 
@@ -93,7 +108,13 @@ const char *const vanguard_sample_names[] =
 	0
 };
 
-const char *const fantasy_sample_names[] =
+const struct Samplesinterface vanguard_samples_interface =
+{
+	3,	/* 3 channel */
+	vanguard_sample_names
+};
+
+static const char *const fantasy_sample_names[] =
 {
 	"*fantasy",
 
@@ -113,6 +134,252 @@ const char *const fantasy_sample_names[] =
 
 	0
 };
+
+const struct Samplesinterface fantasy_samples_interface =
+{
+	1,	/* 1 channel */
+	fantasy_sample_names
+};
+
+
+const struct SN76477interface sasuke_sn76477_intf_1 =
+{
+	RES_K(470),		/*  4  noise_res     */
+	RES_K(150),		/*  5  filter_res    */
+	CAP_P(4700),	/*  6  filter_cap    */
+	RES_K(22),		/*  7  decay_res     */
+	CAP_U(10),		/*  8  attack_decay_cap  */
+	RES_K(10),		/* 10  attack_res    */
+	RES_K(100),		/* 11  amplitude_res     */
+	RES_K(47),		/* 12  feedback_res      */
+	0 /* NC */,		/* 16  vco_voltage   */
+	0 /* NC */,		/* 17  vco_cap       */
+	0 /* NC */,		/* 18  vco_res       */
+	0 /* NC */,		/* 19  pitch_voltage     */
+	RES_K(10),		/* 20  slf_res       */
+	0 /* NC */,		/* 21  slf_cap       */
+	CAP_U(2.2),		/* 23  oneshot_cap   */
+	RES_K(100),		/* 24  oneshot_res   */
+	0,			    /* 22  vco                    */
+	0,			    /* 26  mixer A           */
+	1,			    /* 25  mixer B           */
+	0,			    /* 27  mixer C           */
+	1,			    /* 1   envelope 1        */
+	0,			    /* 28  envelope 2        */
+	1			    /* 9   enable (variable)      */
+
+	// ic48     GND: 2,22,26,27,28  +5V: 1,15,25
+};
+
+const struct SN76477interface sasuke_sn76477_intf_2 =
+{
+	RES_K(340),		/*  4  noise_res     */
+	RES_K(47),		/*  5  filter_res    */
+	CAP_P(100),		/*  6  filter_cap    */
+	RES_K(470),		/*  7  decay_res     */
+	CAP_U(4.7),		/*  8  attack_decay_cap  */
+	RES_K(10),		/* 10  attack_res    */
+	RES_K(100),		/* 11  amplitude_res     */
+	RES_K(47),		/* 12  feedback_res      */
+	0 /* NC */,		/* 16  vco_voltage   */
+	CAP_P(220),		/* 17  vco_cap       */
+	RES_K(1000),	/* 18  vco_res       */
+	0 /* NC */,		/* 19  pitch_voltage     */
+	RES_K(220),		/* 20  slf_res       */
+	0 /* NC */,		/* 21  slf_cap       */
+	CAP_U(22),		/* 23  oneshot_cap   */
+	RES_K(47),		/* 24  oneshot_res   */
+	1,			    /* 22  vco                    */
+	0,			    /* 26  mixer A           */
+	1,			    /* 25  mixer B           */
+	0,			    /* 27  mixer C           */
+	1,			    /* 1   envelope 1        */
+	1,			    /* 28  envelope 2        */
+	1			    /* 9   enable (variable)      */
+
+	// ic51     GND: 2,26,27        +5V: 1,15,22,25,28
+};
+
+const struct SN76477interface sasuke_sn76477_intf_3 =
+{
+	RES_K(330),		/*  4  noise_res     */
+	RES_K(47),		/*  5  filter_res    */
+	CAP_P(100),		/*  6  filter_cap    */
+	RES_K(1),		/*  7  decay_res     */
+	0 /* NC */,		/*  8  attack_decay_cap  */
+	RES_K(1),		/* 10  attack_res    */
+	RES_K(100),		/* 11  amplitude_res     */
+	RES_K(47),		/* 12  feedback_res      */
+	0 /* NC */,		/* 16  vco_voltage   */
+	CAP_P(1000),	/* 17  vco_cap       */
+	RES_K(1000),	/* 18  vco_res       */
+	0 /* NC */,		/* 19  pitch_voltage     */
+	RES_K(10),		/* 20  slf_res       */
+	CAP_U(1),		/* 21  slf_cap       */
+	CAP_U(2.2),		/* 23  oneshot_cap   */
+	RES_K(150),		/* 24  oneshot_res   */
+	0,			    /* 22  vco                    */
+	1,			    /* 26  mixer A           */
+	1,			    /* 25  mixer B           */
+	0,			    /* 27  mixer C           */
+	1,			    /* 1   envelope 1        */
+	0,			    /* 28  envelope 2        */
+	1			    /* 9   enable (variable)      */
+
+	// ic52     GND: 2,22,27,28     +5V: 1,15,25,26
+};
+
+const struct SN76477interface satansat_sn76477_intf =
+{
+	RES_K(470),		/*  4  noise_res     */
+	RES_M(1.5),		/*  5  filter_res    */
+	CAP_P(220),		/*  6  filter_cap    */
+	0,				/*  7  decay_res     */
+	0,				/*  8  attack_decay_cap  */
+	0,				/* 10  attack_res    */
+	RES_K(47),		/* 11  amplitude_res     */
+	RES_K(47),		/* 12  feedback_res      */
+	0,				/* 16  vco_voltage   */
+	0,				/* 17  vco_cap       */
+	0,				/* 18  vco_res       */
+	0,				/* 19  pitch_voltage     */
+	0,				/* 20  slf_res       */
+	0,				/* 21  slf_cap       */
+	0,				/* 23  oneshot_cap   */
+	0,				/* 24  oneshot_res   */
+	0,			    /* 22  vco                    */
+	0,			    /* 26  mixer A           */
+	1,			    /* 25  mixer B           */
+	0,			    /* 27  mixer C           */
+	1,			    /* 1   envelope 1        */
+	1,			    /* 28  envelope 2        */
+	1			    /* 9   enable (variable)      */
+
+	// ???      GND: 2,26,27        +5V: 15,25
+};
+
+const struct SN76477interface vanguard_sn76477_intf_1 =
+{
+	RES_K(470),		/*  4  noise_res     */
+	RES_M(1.5),		/*  5  filter_res    */
+	CAP_P(220),		/*  6  filter_cap    */
+	0,				/*  7  decay_res     */
+	0,				/*  8  attack_decay_cap  */
+	0,				/* 10  attack_res    */
+	RES_K(47),		/* 11  amplitude_res     */
+	RES_K(4.7),		/* 12  feedback_res      */
+	0,				/* 16  vco_voltage   */
+	0,				/* 17  vco_cap       */
+	0,				/* 18  vco_res       */
+	0,				/* 19  pitch_voltage     */
+	0,				/* 20  slf_res       */
+	0,				/* 21  slf_cap       */
+	0,				/* 23  oneshot_cap   */
+	0,				/* 24  oneshot_res   */
+	0,			    /* 22  vco                    */
+	0,				/* 26  mixer A           */
+	1,				/* 25  mixer B           */
+	0,				/* 27  mixer C           */
+	1,				/* 1   envelope 1        */
+	1,				/* 28  envelope 2        */
+	1			    /* 9   enable (variable)      */
+
+	// SHOT A   GND: 2,9,26,27  +5V: 15,25
+};
+
+const struct SN76477interface vanguard_sn76477_intf_2 =
+{
+	RES_K(10),		/*  4  noise_res     */
+	RES_K(30),		/*  5  filter_res    */
+	0,				/*  6  filter_cap    */
+	0,				/*  7  decay_res     */
+	0,				/*  8  attack_decay_cap  */
+	0,				/* 10  attack_res    */
+	RES_K(47),		/* 11  amplitude_res     */
+	RES_K(4.7),		/* 12  feedback_res      */
+	0,				/* 16  vco_voltage   */
+	0,				/* 17  vco_cap       */
+	0,				/* 18  vco_res       */
+	0,				/* 19  pitch_voltage     */
+	0,				/* 20  slf_res       */
+	0,				/* 21  slf_cap       */
+	0,				/* 23  oneshot_cap   */
+	0,				/* 24  oneshot_res   */
+	0,			    /* 22  vco                    */
+	0,				/* 26  mixer A           */
+	1,				/* 25  mixer B           */
+	0,				/* 27  mixer C           */
+	0,				/* 1   envelope 1        */
+	1,				/* 28  envelope 2        */
+	1			    /* 9   enable (variable)      */
+
+	// SHOT B   GND: 1,2,26,27  +5V: 15,25,28
+};
+
+const struct SN76477interface fantasy_sn76477_intf =
+{
+	RES_K(470),		/*  4  noise_res     */
+	RES_M(1.5),		/*  5  filter_res    */
+	CAP_P(220),		/*  6  filter_cap    */
+	0,				/*  7  decay_res     */
+	0,				/*  8  attack_decay_cap  */
+	0,				/* 10  attack_res    */
+	RES_K(470),		/* 11  amplitude_res     */
+	RES_K(4.7),		/* 12  feedback_res      */
+	0,				/* 16  vco_voltage   */
+	0,				/* 17  vco_cap       */
+	0,				/* 18  vco_res       */
+	0,				/* 19  pitch_voltage     */
+	0,				/* 20  slf_res       */
+	0,				/* 21  slf_cap       */
+	0,				/* 23  oneshot_cap   */
+	0,				/* 24  oneshot_res   */
+	0,			    /* 22  vco                    */
+	0,			    /* 26  mixer A           */
+	1,			    /* 25  mixer B           */
+	0,			    /* 27  mixer C           */
+	/* schematic does not show pin 1 grounded, but it must be. */
+	/* otherwise it is using the VCO for the envelope, but the VCO is not hooked up */
+	0,			    /* 1   envelope 1        */
+	1,			    /* 28  envelope 2        */
+	0			    /* 9   enable (variable)      */
+
+	// BOMB     GND:    2,9,26,27       +5V: 15,25
+};
+
+
+/************************************************************************
+ * fantasy Sound System Analog emulation
+ * July 2008, D. Renaud
+ ************************************************************************/
+
+static const discrete_op_amp_filt_info fantasy_filter =
+{
+	RES_K(10.5), 0, RES_K(33), 0, RES_K(470), CAP_U(.01), CAP_U(.01), 0, 0, 12, -12
+};
+
+#define FANTASY_BOMB_EN				NODE_01
+#define FANTASY_NOISE_STREAM_IN		NODE_02
+#define FANTASY_NOISE_LOGIC			NODE_03
+
+DISCRETE_SOUND_START( fantasy )
+
+	DISCRETE_INPUT_LOGIC (FANTASY_BOMB_EN)
+	DISCRETE_INPUT_STREAM(FANTASY_NOISE_STREAM_IN, 0)
+
+	/* This is not the perfect way to discharge, but it is good enough for now */
+	/* it does not take into acount that there is no discharge when noise is low */
+	DISCRETE_RCDISC2(NODE_10, FANTASY_BOMB_EN, 0, RES_K(10) + RES_K(33), DEFAULT_TTL_V_LOGIC_1 - 0.5, RES_K(1), CAP_U(1))
+	DISCRETE_CLAMP(FANTASY_NOISE_LOGIC, 1, FANTASY_NOISE_STREAM_IN, 0, 1, 0)
+	DISCRETE_SWITCH(NODE_11, 1, FANTASY_NOISE_LOGIC, 0, NODE_10)
+
+	DISCRETE_OP_AMP_FILTER(NODE_20, 1, NODE_11, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &fantasy_filter)
+	DISCRETE_RCFILTER(NODE_21, 1, NODE_20, RES_K(22), CAP_U(.01))
+	DISCRETE_RCFILTER(NODE_22, 1, NODE_21, RES_K(22) +  RES_K(22), CAP_P(2200))
+	DISCRETE_RCFILTER(NODE_23, 1, NODE_22, RES_K(22) + RES_K(22) +  RES_K(22), CAP_U(.001))
+
+	DISCRETE_OUTPUT(NODE_23, 32760.0/12)
+DISCRETE_SOUND_END
 
 
 INLINE void validate_tone_channel(running_machine *machine, int channel)
@@ -645,13 +912,7 @@ WRITE8_HANDLER( fantasy_sound_w )
 		}
 
 		/* BOMB */
-		SN76477_enable_w(0, (data & 0x80) ? 0 : 1);
-		/*
-
-            In the real hardware the SN76477 enable line is grounded
-            and the sound output is switched on/off by a 4066 IC.
-
-        */
+		discrete_sound_w(machine, FANTASY_BOMB_EN, data & 0x80);
 
 		LastPort1 = data;
 		break;
