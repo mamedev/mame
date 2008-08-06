@@ -22,8 +22,6 @@
         * Ninja Clowns
 
     Known issues:
-        * Rim Rockin' Basketball should use an HD6309, but that core is
-          broken, so we're using the 6809 for now
         * Ninja Clowns main ROM dump claims it's bad
 
 ****************************************************************************
@@ -545,7 +543,7 @@ void itech8_update_interrupts(running_machine *machine, int periodic, int tms340
 	if (blitter != -1) blitter_int = blitter;
 
 	/* handle the 6809 case */
-	if (machine->config->cpu[0].type == CPU_M6809)
+	if (machine->config->cpu[0].type == CPU_M6809 || machine->config->cpu[0].type == CPU_HD6309)
 	{
 		/* just modify lines that have changed */
 		if (periodic != -1) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
@@ -627,7 +625,7 @@ static MACHINE_START( sstrike )
 static MACHINE_RESET( itech8 )
 {
 	/* make sure bank 0 is selected */
-	if (machine->config->cpu[0].type == CPU_M6809)
+	if (machine->config->cpu[0].type == CPU_M6809 || machine->config->cpu[0].type == CPU_HD6309)
 		memory_set_bankptr(1, &memory_region(machine, "main")[0x4000]);
 
 	/* reset the PIA (if used) */
@@ -1929,7 +1927,7 @@ static MACHINE_DRIVER_START( rimrockn )
 	MDRV_IMPORT_FROM(itech8_core_hi)
 	MDRV_IMPORT_FROM(itech8_sound_ym3812_external)
 
-	MDRV_CPU_REPLACE("main", M6809/*HD6309*/, CLOCK_12MHz/4)
+	MDRV_CPU_REPLACE("main", HD6309, CLOCK_12MHz)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("main")
