@@ -5,9 +5,8 @@
     driver by Zsolt Vasvari
 
     Games supported:
-        * Sprint 1
-        * Sprint 2
-
+        * Cops'n Robbers
+  
     Known issues:
         * none at this time
 
@@ -49,6 +48,10 @@
     0b00-0bff Car Sync Area
     1000      Sound effect and start led triggers must be here - 1000: LED 2
     1001-1003 ???
+	
+
+2008-08
+Added Dip locations according to manual.
 
 ***************************************************************************/
 
@@ -149,12 +152,12 @@ static INPUT_PORTS_START( copsnrob )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("DSW")		/* DIP1 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:!2,!1")
 	PORT_DIPSETTING(    0x03, "1 Coin/1 Player" )
 	PORT_DIPSETTING(    0x02, "1 Coin/2 Players" )
 	PORT_DIPSETTING(    0x01, "1 Coin/Game" )
 	PORT_DIPSETTING(    0x00, "2 Coins/1 Player" )
-	PORT_DIPNAME( 0x0c, 0x00, "Time Limit" )
+	PORT_DIPNAME( 0x0c, 0x00, "Time Limit" ) PORT_DIPLOCATION("SW:!4,!3")
 	PORT_DIPSETTING(    0x0c, "1min" )
 	PORT_DIPSETTING(    0x08, "1min 45sec" )
 	PORT_DIPSETTING(    0x04, "2min 20sec" )

@@ -5,6 +5,9 @@ Dambusters
 
 Reverse-engineering and MAME Driver by Norbert Kehrer (August 2006)
 
+2008-08
+Dip locations verified with manual
+
 ***************************************************************************/
 
 
@@ -84,23 +87,23 @@ static INPUT_PORTS_START( dambustr )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY
-	PORT_DIPNAME( 0x40, 0x00, "2nd Coin Counter" )
+	PORT_DIPNAME( 0x40, 0x00, "2nd Coin Counter" ) PORT_DIPLOCATION("SW:!1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW:!2")
 	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW:!3,!4")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x01, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, "6" )
-	PORT_DIPNAME( 0x04, 0x00, "Game Test Mode" )
+	PORT_DIPNAME( 0x04, 0x00, "Game Test Mode" ) PORT_DIPLOCATION("SW:!5") /* Manual says must be OFF */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Union Jack" )
+	PORT_DIPNAME( 0x08, 0x00, "Union Jack" ) PORT_DIPLOCATION("SW:!6")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
