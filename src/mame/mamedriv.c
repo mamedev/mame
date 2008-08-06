@@ -6230,6 +6230,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* TIA-MC1 hardware games */
 	DRIVER( konek )		/* (c) 1988 Terminal */
+	DRIVER( sosterm )		/* (c) 1988 Terminal */
 
 	/* Valadon Automation games */
 	DRIVER( bagman )	/* (c) 1982 */
