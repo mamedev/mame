@@ -117,7 +117,7 @@ static WRITE8_HANDLER( thedeep_protection_w )
 // d166-d174:   hl = (hl + 2*a)
 // d175-d181:   hl *= e (e must be non zero)
 // d182-d19a:   hl /= de
-				protection_data = memory_region(machine, "main")[0x185+protection_index++];
+				protection_data = memory_region(machine, "cpu3")[0x185+protection_index++];
 			else
 				protection_data = 0xc9;
 
@@ -443,7 +443,7 @@ ROM_START( thedeep )
 	ROM_REGION( 0x10000, "audio", 0 )		/* 65C02 Code */
 	ROM_LOAD( "dp-12.rom", 0x8000, 0x8000, CRC(c4e848c4) SHA1(d2dec5c8d7d59703f5485cab9124bf4f835fe728) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )		/* i8751 Code */
+	ROM_REGION( 0x1000, "cpu3", 0 )		/* i8751 Code */
 	ROM_LOAD( "dp-14", 0x0000, 0x1000, CRC(0b886dad) SHA1(487192764342f8b0a320d20a378bf94f84592da9) )	// 1xxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
@@ -475,7 +475,7 @@ ROM_START( rundeep )
 	ROM_REGION( 0x10000, "audio", 0 )		/* 65C02 Code */
 	ROM_LOAD( "dp-12.rom", 0x8000, 0x8000, CRC(c4e848c4) SHA1(d2dec5c8d7d59703f5485cab9124bf4f835fe728) )
 
-	ROM_REGION( 0x1000, "cpu2", 0 )		/* i8751 Code */
+	ROM_REGION( 0x1000, "cpu3", 0 )		/* i8751 Code */
 	ROM_LOAD( "dp-14", 0x0000, 0x1000, CRC(0b886dad) SHA1(487192764342f8b0a320d20a378bf94f84592da9) )	// 1xxxxxxxxxxx = 0xFF
 
 	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
