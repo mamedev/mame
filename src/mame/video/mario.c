@@ -163,6 +163,9 @@ VIDEO_START( mario )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	/* TODO: draw_sprites should adopt the scanline logic from dkong.c 
+	 * The schematics have the same logic for sprite buffering.
+	 */ 
 	mario_state	*state = machine->driver_data;
 	int offs;
 
