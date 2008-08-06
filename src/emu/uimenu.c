@@ -2858,7 +2858,7 @@ static void menu_select_game(running_machine *machine, ui_menu *menu, void *para
 			int buflen = strlen(menustate->search);
 
 			/* if it's a backspace and we can handle it, do so */
-			if (event->unichar == 8 && buflen > 0)
+			if ((event->unichar == 8 || event->unichar == 0x7f) && buflen > 0)
 			{
 				*(char *)utf8_previous_char(&menustate->search[buflen]) = 0;
 				menustate->rerandomize = TRUE;
@@ -2866,7 +2866,7 @@ static void menu_select_game(running_machine *machine, ui_menu *menu, void *para
 			}
 
 			/* if it's any other key and we're not maxed out, update */
-			else if (event->unichar >= ' ')
+			else if (event->unichar >= ' ' && event->unichar < 0x7f)
 			{
 				buflen += utf8_from_uchar(&menustate->search[buflen], ARRAY_LENGTH(menustate->search) - buflen, event->unichar);
 				menustate->search[buflen] = 0;
