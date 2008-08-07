@@ -1383,19 +1383,26 @@ static void script_entry_free(script_entry *entry)
 
 static astring *quote_astring_expression(astring *string, int isattribute)
 {
-	if (isattribute)
-	{
-		astring_replacec(string, 0, "&", "&amp;");
-		astring_replacec(string, 0, "<", "&lt;");
-	}
-	else
-	{
-		if (astring_chr(string, 0, '&') != -1 || astring_chr(string, 0, '<') != -1)
-		{
-			astring_insc(string, 0, "<![CDATA[ ");
-			astring_catc(string, " ]]>");
-		}
-	}
+	astring_replacec(string, 0, " && ", " and ");
+	astring_replacec(string, 0, " &&", " and ");
+	astring_replacec(string, 0, "&& ", " and ");
+	astring_replacec(string, 0, "&&", " and ");
+
+	astring_replacec(string, 0, " & ", " band ");
+	astring_replacec(string, 0, " &", " band ");
+	astring_replacec(string, 0, "& ", " band ");
+	astring_replacec(string, 0, "&", " band ");
+
+	astring_replacec(string, 0, " <= ", " le ");
+	astring_replacec(string, 0, " <=", " le ");
+	astring_replacec(string, 0, "<= ", " le ");
+	astring_replacec(string, 0, "<=", " le ");
+
+	astring_replacec(string, 0, " < ", " lt ");
+	astring_replacec(string, 0, " <", " lt ");
+	astring_replacec(string, 0, "< ", " lt ");
+	astring_replacec(string, 0, "<", " lt ");
+
 	return string;
 }
 
@@ -1474,4 +1481,3 @@ static void cheat_variable_set(void *ref, UINT64 value)
 {
 	*(UINT64 *)ref = value;
 }
-

@@ -832,10 +832,50 @@ static EXPRERR parse_string_into_tokens(const char *stringstart, parsed_expressi
 						break;
 					}
 				}
-
+				
 				/* empty string is automatically invalid */
 				if (buffer[0] == 0)
 					return MAKE_EXPRERR_INVALID_TOKEN(token->offset);
+
+				/* check for wordy variants on standard operators */
+				else if (strcmp(buffer, "bnot") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_NOT, TIN_PRECEDENCE_2);
+				else if (strcmp(buffer, "plus") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_ADD, TIN_PRECEDENCE_4);
+				else if (strcmp(buffer, "minus") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_SUBTRACT, TIN_PRECEDENCE_4);
+				else if (strcmp(buffer, "times") == 0 || strcmp(buffer, "mul") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_MULTIPLY, TIN_PRECEDENCE_3);
+				else if (strcmp(buffer, "div") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_DIVIDE, TIN_PRECEDENCE_3);
+				else if (strcmp(buffer, "mod") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_MODULO, TIN_PRECEDENCE_3);
+				else if (strcmp(buffer, "lt") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_LESS, TIN_PRECEDENCE_6);
+				else if (strcmp(buffer, "le") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_LESSOREQUAL, TIN_PRECEDENCE_6);
+				else if (strcmp(buffer, "gt") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_GREATER, TIN_PRECEDENCE_6);
+				else if (strcmp(buffer, "ge") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_GREATEROREQUAL, TIN_PRECEDENCE_6);
+				else if (strcmp(buffer, "eq") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_EQUAL, TIN_PRECEDENCE_7);
+				else if (strcmp(buffer, "ne") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_NOTEQUAL, TIN_PRECEDENCE_7);
+				else if (strcmp(buffer, "not") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_COMPLEMENT, TIN_PRECEDENCE_2);
+				else if (strcmp(buffer, "and") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_LAND, TIN_PRECEDENCE_8);
+				else if (strcmp(buffer, "band") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_BAND, TIN_PRECEDENCE_8);
+				else if (strcmp(buffer, "or") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_LOR, TIN_PRECEDENCE_12);
+				else if (strcmp(buffer, "bor") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_BOR, TIN_PRECEDENCE_10);
+				else if (strcmp(buffer, "bxor") == 0)
+					SET_TOKEN_INFO(0, TOK_OPERATOR, TVL_BXOR, TIN_PRECEDENCE_9);
+
+				/* process anything else as a number or string */
 				else
 				{
 					/* if we have a number prefix, assume it is a number */
