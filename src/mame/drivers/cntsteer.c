@@ -343,13 +343,13 @@ static ADDRESS_MAP_START( cntsteer_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(cntsteer_foreground_w) AM_BASE(&videoram)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM
 
-//	AM_RANGE(0x1b00, 0x1b00) AM_READ_PORT("DSW0")
-//	AM_RANGE(0x1b01, 0x1b01) AM_READ_PORT("DSW0")
-//	AM_RANGE(0x3000, 0x3003) AM_WRITE(zerotrgt_ctrl_w)
-//	AM_RANGE(0x3000, 0x3000) AM_WRITE(cntsteer_halt_cpu0_w)
-//	AM_RANGE(0x3001, 0x3001) AM_WRITE(gekitsui_int2_w)
+//  AM_RANGE(0x1b00, 0x1b00) AM_READ_PORT("DSW0")
+//  AM_RANGE(0x1b01, 0x1b01) AM_READ_PORT("DSW0")
+//  AM_RANGE(0x3000, 0x3003) AM_WRITE(zerotrgt_ctrl_w)
+//  AM_RANGE(0x3000, 0x3000) AM_WRITE(cntsteer_halt_cpu0_w)
+//  AM_RANGE(0x3001, 0x3001) AM_WRITE(gekitsui_int2_w)
 
-//	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW1")
+//  AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -361,15 +361,15 @@ static ADDRESS_MAP_START( cntsteer_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("P1")
 	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("P2")
-//	AM_RANGE(0x3002, 0x3002) AM_WRITE(gekitsui_int_w)
-//	AM_RANGE(0x3000, 0x3003) AM_WRITE(zerotrgt_ctrl_w)
+//  AM_RANGE(0x3002, 0x3002) AM_WRITE(gekitsui_int_w)
+//  AM_RANGE(0x3000, 0x3003) AM_WRITE(zerotrgt_ctrl_w)
 //  wrong 0 1 2 3 are scroll/rotate
-//	AM_RANGE(0x3002, 0x3002) AM_WRITE(cntsteer_restart_cpu0_w)
-//	AM_RANGE(0x3000, 0x3003) AM_WRITENOP
+//  AM_RANGE(0x3002, 0x3002) AM_WRITE(cntsteer_restart_cpu0_w)
+//  AM_RANGE(0x3000, 0x3003) AM_WRITENOP
 //  3007 and 3003 have values..
 	AM_RANGE(0x3007, 0x3007) AM_WRITE(cntsteer_sound_w)
-//	AM_RANGE(0x300a, 0x300a) AM_WRITE(cntsteer_int_w)
-//	AM_RANGE(0x3004, 0x3004) AM_WRITE(cntsteer_int_w)
+//  AM_RANGE(0x300a, 0x300a) AM_WRITE(cntsteer_int_w)
+//  AM_RANGE(0x3004, 0x3004) AM_WRITE(cntsteer_int_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 #endif

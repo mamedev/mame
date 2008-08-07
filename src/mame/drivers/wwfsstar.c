@@ -55,7 +55,7 @@ Notes:
       M6295  - 1.056MHz (resonator)
       YM2151 - 3.579545MHz
       VSync  - 57.4447Hz
-      
+
 
 Bottom Board
 
@@ -95,7 +95,7 @@ TA-0024-P2-23
 Notes:
       IC11x  - TC534000 MaskROMs
       TJ-001 - Probably a microcontroller badged as a Technos Custom IC (QFP80).
-               Clocks: pin 1 - 24MHz, pin 3 - 24/2, pin 4 - 24/4, pin 5 - 24/8, 
+               Clocks: pin 1 - 24MHz, pin 3 - 24/2, pin 4 - 24/4, pin 5 - 24/8,
                pin 6 - 24/16, pin 7 - 24/32, pin 8 - 24/64, pin 64,65 - 1.5MHz
 
  Hardware:

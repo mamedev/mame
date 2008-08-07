@@ -40,7 +40,7 @@ ATARI (C)79
 Notes:
        UM6502A     - 6502 CPU, clock input is on pin 37. This is a little strange because it
                      measures 1.17240MHz. It was assumed to be 1.25MHz [10/8]. This might be
-                     caused by old components that are out of spec now, but the PCB does run 
+                     caused by old components that are out of spec now, but the PCB does run
                      flawlessly, and the other clocks measure correctly so I'm not sure what's going on.
        C012294B-01 - 'Pokey' sound chip, clock 1.25MHz on pin 7 [10/8]
        035826-01   - MMI 6331 bipolar PROM
@@ -60,8 +60,8 @@ Notes:
        -------------------------
        GND                  A | 1   GND
        + 5V                 B | 2   + 5V
-       + 12V                C | 3 
-       - 5V                 D | 4 
+       + 12V                C | 3
+       - 5V                 D | 4
        Audio 1 Out          E | 5   Audio 2 Out
        HSync                F | 6   VSync
        Start2 LED           H | 7   Left Fire
@@ -84,14 +84,14 @@ Notes:
 
        Edge Connector J19 Pinout (Only used in cocktail version)
        -------------------------
-                              A | 1  
-                              B | 2 
-                              C | 3 
-       Right Fire Button 2    D | 4 
+                              A | 1
+                              B | 2
+                              C | 3
+       Right Fire Button 2    D | 4
        Center Fire Button 2   E | 5   Left Fire Button 2
-                              F | 6 
-       Cocktail               H | 7 
-                              J | 8 
+                              F | 6
+       Cocktail               H | 7
+                              J | 8
        Horiz. Trkball Dir. 2  K | 9   Vert. Trackball Dir. 2
        Horiz. Trkball Clock 2 L | 10  Vert. Trackball Clock 2
                               M | 11

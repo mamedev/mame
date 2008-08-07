@@ -125,9 +125,9 @@ static INPUT_PORTS_START( citycon )
 	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x00, "SW2:6" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x00, "SW2:7" )
 	/* According to manual this is Flip Screen setting */
-//	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip Screen ) ) PORT_DIPLOCATION("SW2:8")
-//	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+//  PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip Screen ) ) PORT_DIPLOCATION("SW2:8")
+//  PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:8" )
 INPUT_PORTS_END
 

@@ -264,11 +264,11 @@ static MACHINE_START( gottlieb )
 		/* allocate a timer for serial transmission, and one for philips code processing */
 		laserdisc_bit_timer = timer_alloc(laserdisc_bit_callback, NULL);
 		laserdisc_philips_timer = timer_alloc(laserdisc_philips_callback, NULL);
-		
+
 		/* create some audio RAM */
 		laserdisc_audio_buffer = auto_malloc(AUDIORAM_SIZE);
 		laserdisc_status = 0x38;
-		
+
 		/* more save state registration */
 		state_save_register_global(laserdisc_select);
 		state_save_register_global(laserdisc_status);
@@ -341,15 +341,15 @@ static WRITE8_HANDLER( general_output_w )
 		gottlieb_video_control_w(machine, offset, data);
 	else
 		gottlieb_laserdisc_video_control_w(machine, offset, data);
-	
+
 	/* bit 4 controls the coin meter */
 	coin_counter_w(0, data & 0x10);
 
 	/* bit 5 controls the knocker */
 	output_set_value("knocker0", (data >> 5) & 1);
-	
+
 	/* bit 6 controls "COIN1"; it appears that no games used this */
-	
+
 	/* bit 7 controls the optional coin lockout; it appears that no games used this */
 }
 
@@ -418,7 +418,7 @@ static WRITE8_HANDLER( laserdisc_select_w )
 static WRITE8_HANDLER( laserdisc_command_w )
 {
 	/* a write here latches data into a 8-bit register and starts
-	   a sequence of events that sends serial data to the player */
+       a sequence of events that sends serial data to the player */
 
 	/* set a timer to clock the bits through; a total of 12 bits are clocked */
 	timer_adjust_oneshot(laserdisc_bit_timer, attotime_mul(LASERDISC_CLOCK, 10), (12 << 16) | data);
@@ -440,15 +440,15 @@ static TIMER_CALLBACK( laserdisc_philips_callback )
 	int newcode = laserdisc_get_field_code(laserdisc, (param == 17) ? LASERDISC_CODE_LINE17 : LASERDISC_CODE_LINE18);
 
 	/* the PR8210 sends line 17/18 data on each frame; the laserdisc interface
-	   board receives notification and latches the most recent frame number */
-	   
+       board receives notification and latches the most recent frame number */
+
 	/* the logic detects a valid code when the top 4 bits are all 1s */
 	if ((newcode & 0xf00000) == 0xf00000)
 	{
 		laserdisc_philips_code = newcode;
 		laserdisc_status = (laserdisc_status & ~0x07) | ((newcode >> 16) & 7);
 	}
-	
+
 	/* toggle to the next one */
 	param = (param == 17) ? 18 : 17;
 	timer_adjust_oneshot(laserdisc_philips_timer, video_screen_get_time_until_pos(machine->primary_screen, param, 0), param);
@@ -467,19 +467,19 @@ static TIMER_CALLBACK( laserdisc_bit_callback )
 	UINT8 bitsleft = param >> 16;
 	UINT8 data = param;
 	attotime duration;
-	
+
 	/* assert the line and set a timer for deassertion */
    	laserdisc_line_w(laserdisc, LASERDISC_LINE_CONTROL, ASSERT_LINE);
 	timer_set(attotime_mul(LASERDISC_CLOCK, 10), NULL, 0, laserdisc_bit_off_callback);
-	
-	/* determine how long for the next command; there is a 555 timer with a 
-	   variable resistor controlling the timing of the pulses. Nominally, the 
-	   555 runs at 40083Hz, is divided by 10, and then is divided by 4 for a 
-	   0 bit or 8 for a 1 bit. This gives 998usec per 0 pulse or 1996usec 
-	   per 1 pulse. */
+
+	/* determine how long for the next command; there is a 555 timer with a
+       variable resistor controlling the timing of the pulses. Nominally, the
+       555 runs at 40083Hz, is divided by 10, and then is divided by 4 for a
+       0 bit or 8 for a 1 bit. This gives 998usec per 0 pulse or 1996usec
+       per 1 pulse. */
 	duration = attotime_mul(LASERDISC_CLOCK, 10 * ((data & 0x80) ? 8 : 4));
 	data <<= 1;
-	
+
 	/* if we're not out of bits, set a timer for the next one; else set the ready bit */
 	if (bitsleft-- != 0)
 		timer_adjust_oneshot(laserdisc_bit_timer, duration, (bitsleft << 16) | data);
@@ -498,7 +498,7 @@ static TIMER_CALLBACK( laserdisc_bit_callback )
 INLINE void audio_end_state(void)
 {
 	/* this occurs either when the "break in transmission" condition is hit (no zero crossings
-	   for 400usec) or when the entire audio buffer is full */
+       for 400usec) or when the entire audio buffer is full */
 	laserdisc_status |= 0x08;
 	laserdisc_audio_bit_count = 0;
 	laserdisc_audio_address = 0;
@@ -520,26 +520,26 @@ static void audio_process_clock(int logit)
 	{
 		if (laserdisc_audio_bits == 0x67)
 		{
-			if (logit) 
+			if (logit)
 				logerror(" -- got 0x67");
 			laserdisc_status &= ~0x08;
 			laserdisc_audio_address = 0;
 		}
 	}
-	
+
 	/* otherwise, we keep clocking bytes into the audio buffer */
 	else
 	{
 		laserdisc_audio_bit_count++;
-		
+
 		/* if we collect 8 bits, add to the buffer */
 		if (laserdisc_audio_bit_count == 8)
 		{
-			if (logit) 
+			if (logit)
 				logerror(" -- got new byte %02X", laserdisc_audio_bits);
 			laserdisc_audio_bit_count = 0;
 			laserdisc_audio_buffer[laserdisc_audio_address++] = laserdisc_audio_bits;
-			
+
 			/* if we collect a full buffer, signal */
 			if (laserdisc_audio_address >= AUDIORAM_SIZE)
 				audio_end_state();
@@ -547,41 +547,41 @@ static void audio_process_clock(int logit)
 	}
 }
 
-			
+
 static void audio_handle_zero_crossing(attotime zerotime, int logit)
 {
 	/* compute time from last clock */
 	attotime deltaclock = attotime_sub(zerotime, laserdisc_last_clock);
-	if (logit) 
+	if (logit)
 		logerror(" -- zero @ %s (delta=%s)", attotime_string(zerotime, 6), attotime_string(deltaclock, 6));
-	
+
 	/* if we are within 150usec, we count as a bit */
 	if (attotime_compare(deltaclock, ATTOTIME_IN_USEC(150)) < 0)
 	{
-		if (logit) 
+		if (logit)
 			logerror(" -- count as bit");
 		laserdisc_zero_seen++;
 		return;
 	}
-	
+
 	/* if we are within 215usec, we count as a clock */
 	else if (attotime_compare(deltaclock, ATTOTIME_IN_USEC(215)) < 0)
 	{
-		if (logit) 
+		if (logit)
 			logerror(" -- clock, bit=%d", laserdisc_zero_seen);
 		laserdisc_last_clock = zerotime;
 	}
-	
+
 	/* if we are outside of 215usec, we are technically a missing clock
-	   however, due to sampling errors, it is best to assume this is just
-	   an out-of-skew clock, so we correct it if we are within 75usec */
+       however, due to sampling errors, it is best to assume this is just
+       an out-of-skew clock, so we correct it if we are within 75usec */
 	else if (attotime_compare(deltaclock, ATTOTIME_IN_USEC(275)) < 0)
 	{
 		if (logit)
 			logerror(" -- skewed clock, correcting");
 		laserdisc_last_clock = attotime_add(laserdisc_last_clock, ATTOTIME_IN_USEC(200));
 	}
-	
+
 	/* we'll count anything more than 275us as an actual missing clock */
 	else
 	{
@@ -589,7 +589,7 @@ static void audio_handle_zero_crossing(attotime zerotime, int logit)
 			logerror(" -- missing clock");
 		laserdisc_last_clock = zerotime;
 	}
-	
+
 	/* we have a clock, process it */
 	audio_process_clock(logit);
 }
@@ -601,7 +601,7 @@ static void laserdisc_audio_process(const device_config *device, int samplerate,
 	attotime time_per_sample = ATTOTIME_IN_HZ(samplerate);
 	attotime curtime = laserdisc_last_time;
 	int cursamp;
-	
+
 	if (logit)
 		logerror("--------------\n");
 
@@ -617,7 +617,7 @@ static void laserdisc_audio_process(const device_config *device, int samplerate,
 		/* if we are past the "break in transmission" time, reset everything */
 		if (attotime_compare(attotime_sub(curtime, laserdisc_last_clock), ATTOTIME_IN_USEC(400)) > 0)
 			audio_end_state();
-		
+
 		/* if this sample reinforces that the previous one ended a zero crossing, count it */
 		if ((sample >= 256 && laserdisc_last_samples[1] >= 0 && laserdisc_last_samples[0] < 0) ||
 			(sample <= -256 && laserdisc_last_samples[1] <= 0 && laserdisc_last_samples[0] > 0))
@@ -627,14 +627,14 @@ static void laserdisc_audio_process(const device_config *device, int samplerate,
 
 			/* compute the fractional position of the 0-crossing, between the two samples involved */
 			fractime = (-laserdisc_last_samples[0] * 1000) / (laserdisc_last_samples[1] - laserdisc_last_samples[0]);
-			
+
 			/* use this fraction to compute the approximate actual zero crossing time */
 			zerotime = attotime_add(curtime, attotime_div(attotime_mul(time_per_sample, fractime), 1000));
 
 			/* determine if this is a clock; if it is, process */
 			audio_handle_zero_crossing(zerotime, logit);
 		}
-		if (logit) 
+		if (logit)
 			logerror(" \n");
 
 		/* update our sample tracking and advance time */
@@ -647,8 +647,8 @@ static void laserdisc_audio_process(const device_config *device, int samplerate,
 	laserdisc_last_time = curtime;
 }
 
- 
- 
+
+
  /*************************************
  *
  *  Interrupt generation
@@ -671,9 +671,9 @@ static INTERRUPT_GEN( gottlieb_interrupt )
 	if (laserdisc != NULL)
 	{
 		bitmap_t *dummy;
-		
+
 		laserdisc_vsync(laserdisc);
-		
+
 		/* set the "disc ready" bit, which basically indicates whether or not we have a proper video frame */
 		if (laserdisc_get_video(laserdisc, &dummy) == 0)
 			laserdisc_status &= ~0x20;
@@ -786,7 +786,7 @@ static INPUT_PORTS_START( reactor )
 	PORT_BIT ( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT ( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT ( 0xc0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	
+
 	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
@@ -844,7 +844,7 @@ static INPUT_PORTS_START( qbert )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
-	
+
 	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
@@ -900,7 +900,7 @@ static INPUT_PORTS_START( insector )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	
+
 	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
@@ -965,7 +965,7 @@ static INPUT_PORTS_START( tylz )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	
+
 	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
@@ -1024,7 +1024,7 @@ static INPUT_PORTS_START( argusg )
 
 	PORT_START("TRACKY")
 	PORT_BIT( 0xff, 0, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(15) PORT_KEYDELTA(20)
-	
+
 	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
@@ -1079,7 +1079,7 @@ static INPUT_PORTS_START( mplanets )
 
 	PORT_START("TRACKY")
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(5) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
-	
+
 	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
@@ -1134,7 +1134,7 @@ static INPUT_PORTS_START( krull )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_DOWN ) PORT_8WAY
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICKLEFT_LEFT ) PORT_8WAY
-	
+
 	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
@@ -1190,7 +1190,7 @@ static INPUT_PORTS_START( kngtmare )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_START2 )
-	
+
 	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
@@ -1252,7 +1252,7 @@ static INPUT_PORTS_START( qbertqub )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	
+
 	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
@@ -1318,7 +1318,7 @@ PORT_DIPSETTING(    0xc2, DEF_STR( Free_Play ) ) */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Bunt") PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	
+
 	PORT_INCLUDE(gottlieb1_sound)
 INPUT_PORTS_END
 
@@ -1558,7 +1558,7 @@ static INPUT_PORTS_START( 3stooges )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
-	
+
 	PORT_INCLUDE(gottlieb2_sound)
 INPUT_PORTS_END
 
@@ -1875,7 +1875,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( g2laser )
 	MDRV_IMPORT_FROM(gottlieb_core)
 	MDRV_IMPORT_FROM(gottlieb_soundrev2)
-	
+
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210)
 	MDRV_LASERDISC_AUDIO(laserdisc_audio_process)
 

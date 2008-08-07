@@ -361,7 +361,7 @@ INPUT_PORTS_START( gottlieb1_sound )
 	PORT_BIT( 0x80, 0x80, IPT_UNKNOWN )	/* To U3-6 on QBert */
 INPUT_PORTS_END
 
-	
+
 
 /*************************************
  *
@@ -444,10 +444,10 @@ static TIMER_CALLBACK( nmi_callback )
 	/* assert the NMI if it is not disabled */
 	nmi_state = 1;
 	nmi_state_update(machine);
-	
+
 	/* set a timer to turn it off again on hte next SOUND_CLOCK/16 */
 	timer_set(ATTOTIME_IN_HZ(SOUND2_CLOCK/16), NULL, 0, nmi_clear);
-	
+
 	/* adjust the NMI timer for the next time */
 	nmi_timer_adjust();
 }
@@ -483,7 +483,7 @@ static CUSTOM_INPUT( speech_drq_custom_r )
 static WRITE8_HANDLER( dac_w )
 {
 	/* dual DAC; the first DAC serves as the reference voltage for the
-	   second, effectively scaling the output */
+       second, effectively scaling the output */
 	dac_data[offset] = data;
 	DAC_data_16_w(0, dac_data[0] * dac_data[1]);
 }
@@ -546,7 +546,7 @@ static SOUND_START( gottlieb2 )
 	nmi_timer = timer_alloc(nmi_callback, NULL);
 	nmi_rate = 0;
 	nmi_timer_adjust();
-	
+
 	/* register for save states */
 	state_save_register_global(nmi_rate);
 	state_save_register_global(nmi_state);
@@ -565,7 +565,7 @@ static SOUND_START( gottlieb2 )
 
 static ADDRESS_MAP_START( gottlieb_speech2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x1fff) AM_WRITEONLY AM_BASE(&sp0250_latch)	
+	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x1fff) AM_WRITEONLY AM_BASE(&sp0250_latch)
 	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x1fff) AM_WRITE(speech_control_w)
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x1fff) AM_READ_PORT("GOTTLIEB2")
 	AM_RANGE(0x8000, 0x8000) AM_MIRROR(0x1fff) AM_WRITEONLY AM_BASE(&psg_latch)
@@ -633,7 +633,7 @@ MACHINE_DRIVER_START( gottlieb_soundrev2 )
 MACHINE_DRIVER_END
 
 
-	
+
 /*************************************
  *
  *  Rev. 2 input ports

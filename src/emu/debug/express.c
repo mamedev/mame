@@ -533,7 +533,7 @@ static EXPRERR parse_memory_operator(parsed_expression *expr, int offset, const 
 	if (dot != NULL)
 	{
 		UINT16 index;
-		
+
 		namestring = add_expression_string(expr, buffer, dot - buffer, &index);
 		if (namestring == NULL)
 			return MAKE_EXPRERR_OUT_OF_MEMORY(offset);
@@ -579,7 +579,7 @@ static EXPRERR parse_memory_operator(parsed_expression *expr, int offset, const 
 		case 'q':	*flags |= TIN_MEMORY_QWORD;		break;
 		default:	return MAKE_EXPRERR_INVALID_MEMORY_SIZE(offset + (buffer - startbuffer) + length - 1);
 	}
-	
+
 	/* validate the name */
 	if (expr->callbacks.valid != NULL)
 	{
@@ -589,7 +589,7 @@ static EXPRERR parse_memory_operator(parsed_expression *expr, int offset, const 
 		else if (err != EXPRERR_NONE)
 			return MAKE_EXPRERR(err, offset);
 	}
-	
+
 	return EXPRERR_NONE;
 }
 
@@ -843,7 +843,7 @@ static EXPRERR parse_string_into_tokens(const char *stringstart, parsed_expressi
 					SET_TOKEN_INFO(1, TOK_OPERATOR, TVL_MEMORYAT, TIN_PRECEDENCE_2 | info);
 					break;
 				}
-				
+
 				/* empty string is automatically invalid */
 				if (buffer[0] == 0)
 					return MAKE_EXPRERR_INVALID_TOKEN(token->offset);

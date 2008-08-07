@@ -109,7 +109,7 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
 			for (offby = 0; offby <= MAX_CLOCK_DIFF; offby++)
 				if (srcabs[curbit + offby + 0] != srcabs[curbit + offby + 1] || srcabs[curbit - offby + 0] != srcabs[curbit - offby + 1])
 					break;
-			
+
 			/* if we never found the edge, fail immediately */
 			if (offby > MAX_CLOCK_DIFF)
 				break;
@@ -136,10 +136,10 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
 	for (x = 0; x < expectedbits; x++)
 	{
 		int leftstart = firstedge + ceil(((double)x - 0.5) * bestclock);
-//		int leftmid = firstedge + ((double)x - 0.25) * bestclock;
+//      int leftmid = firstedge + ((double)x - 0.25) * bestclock;
 		int leftend = firstedge + floor(((double)x - 0.0) * bestclock);
 		int rightstart = firstedge + ceil(((double)x + 0.0) * bestclock);
-//		int rightmid = firstedge + ((double)x + 0.25) * bestclock;
+//      int rightmid = firstedge + ((double)x + 0.25) * bestclock;
 		int rightend = firstedge + floor(((double)x + 0.5) * bestclock);
 		int leftavg, rightavg, leftabs, rightabs;
 		int confidence = 0;
@@ -157,11 +157,11 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
 			rightavg += (UINT8)(source[tx] >> sourceshift) - mid;
 		rightabs = (rightavg >= 0);
 		rightavg = (rightavg < 0) ? -rightavg : rightavg;
-		
+
 		/* all bits should be marked by transitions; fail if we don't get one */
 		if (leftabs == rightabs)
 			return 0;
-		
+
 		/* store the bit and its confidence level */
 		confidence = leftavg + rightavg;
 		result[x] = (leftabs < rightabs) | (confidence << 1);
@@ -184,14 +184,14 @@ int vbi_parse_white_flag(const UINT16 *source, int sourcewidth, int sourceshift)
 	int peakval;
 	int result;
 	int x;
-	
+
 	/* compute a histogram of values */
 	for (x = 0; x < sourcewidth; x++)
 	{
 		UINT8 yval = source[x] >> sourceshift;
 		histo[yval]++;
 	}
-	
+
 	/* remove the lowest 1% of the values to account for noise and determine the minimum */
 	subtract = sourcewidth / 100;
 	for (minval = 0; minval < 255; minval++)
@@ -211,7 +211,7 @@ int vbi_parse_white_flag(const UINT16 *source, int sourcewidth, int sourceshift)
 		for (x = 0; x < 256; x++)
 			if (histo[x] != 0) printf("%dx%02X\n", histo[x], x);
 	}
-	
+
 	/* ignore if we have no dynamic range */
 	if (maxval - minval < 10)
 	{
@@ -219,28 +219,28 @@ int vbi_parse_white_flag(const UINT16 *source, int sourcewidth, int sourceshift)
 			printf("White flag NOT detected; threshold too low\n");
 		return FALSE;
 	}
-		
+
 	/*
-		At this point, there are two approaches that have been tried:
-		
-		1. Find the peak value and call it white if the peak is above
-		   the 90% line
-		   
-		2. Ignore the first and last 20% of the line and count how
-		   many pixels are above some threshold (75% line was used).
-		   Call it white if at least 80% of the pixels are above
-		   the threshold.
-		   
-		Both approaches agree 99% of the time, but the first tends to
-		be more correct when there is a discrepancy.
-	*/
+        At this point, there are two approaches that have been tried:
+
+        1. Find the peak value and call it white if the peak is above
+           the 90% line
+
+        2. Ignore the first and last 20% of the line and count how
+           many pixels are above some threshold (75% line was used).
+           Call it white if at least 80% of the pixels are above
+           the threshold.
+
+        Both approaches agree 99% of the time, but the first tends to
+        be more correct when there is a discrepancy.
+    */
 
 	/* determine where the peak is */
 	peakval = 0;
 	for (x = 1; x < 256; x++)
 		if (histo[x] > histo[peakval])
 			peakval = x;
-	
+
 	/* return TRUE if it is above the 90% mark */
 	result = (peakval > minval + 9 * (maxval - minval) / 10);
 	if (PRINTF_WHITE_FLAG)
@@ -253,7 +253,7 @@ int vbi_parse_white_flag(const UINT16 *source, int sourcewidth, int sourceshift)
 	int thresh;
 
 	/* alternate approach: */
-	
+
 	/* ignore the first 1/5 and last 1/5 of the line for the remaining computations */
 	source += sourcewidth / 5;
 	sourcewidth -= 2 * (sourcewidth / 5);
@@ -273,7 +273,7 @@ int vbi_parse_white_flag(const UINT16 *source, int sourcewidth, int sourceshift)
 
 
 /*-------------------------------------------------
-    vbi_parse_all - parse everything from a video 
+    vbi_parse_all - parse everything from a video
     frame
 -------------------------------------------------*/
 
@@ -284,10 +284,10 @@ void vbi_parse_all(const UINT16 *source, int sourcerowpixels, int sourcewidth, i
 
 	/* first reset it all */
 	memset(vbi, 0, sizeof(*vbi));
-	
+
 	/* get the white flag */
 	vbi->white = vbi_parse_white_flag(source + 11 * sourcerowpixels, sourcewidth, sourceshift);
-	
+
 	/* parse line 16 */
 	if (vbi_parse_manchester_code(source + 16 * sourcerowpixels, sourcewidth, sourceshift, 24, bits[0]) == 24)
 		for (bitnum = 0; bitnum < 24; bitnum++)
@@ -309,11 +309,11 @@ void vbi_parse_all(const UINT16 *source, int sourcerowpixels, int sourcewidth, i
 		vbi->line1718 = vbi->line18;
 	else if (vbi->line18 == 0)
 		vbi->line1718 = vbi->line17;
-	
+
 	/* if they agree, we're golden */
 	else if (vbi->line17 == vbi->line18)
 		vbi->line1718 = vbi->line17;
-	
+
 	/* if they don't agree, we have to pick one */
 	else
 	{

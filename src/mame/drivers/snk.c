@@ -1510,8 +1510,8 @@ SOUND : YM3812, Y3014B
 XTAL  : 4.000MHz
 RAM   : 6116 (x1)
 DIPSW : 8 position (x2)
-ROMs  : 
-        cc1.1f		27c512             sound program
+ROMs  :
+        cc1.1f      27c512             sound program
 
 
 2nd PCB (CPU board)
@@ -1520,19 +1520,19 @@ PCB No: A5001UP02-01
 CPU   : Z80 (x2)
 RAM   : 6116 (x4), 2148 (x4)
 OTHER : PALs (x2), TC4584 (used for trackball/spinner control)
-ROMs  : 
-        cc2.2e		27c128  	\ 
-        cc3.2g		  ''		 | for Z80 #1
-        cc4.2h		  ''		/ 
-        cc5.4e		  ''		\
-        cc6.4g		  ''		 | for Z80 #2
-        cc7.4h		  ''		/
-        cc8.7e		27c256		\
-        cc9.7g		  ''		 | gfx
-        cc10.7h		  ''		/
-	cc1pr.5f	63s441		\
-	cc2pr.5g	  ''		 | proms
-	cc3pr.5h	  ''		/
+ROMs  :
+        cc2.2e      27c128      \
+        cc3.2g        ''         | for Z80 #1
+        cc4.2h        ''        /
+        cc5.4e        ''        \
+        cc6.4g        ''         | for Z80 #2
+        cc7.4h        ''        /
+        cc8.7e      27c256      \
+        cc9.7g        ''         | gfx
+        cc10.7h       ''        /
+    cc1pr.5f    63s441      \
+    cc2pr.5g      ''         | proms
+    cc3pr.5h      ''        /
 
 
 3rd PCB (Video board)
@@ -1541,10 +1541,10 @@ PCB No: A5001UP01-01
 XTAL  : 13.400MHz
 RAM   : 6116 (x1), 6264 (x2)
 OTHER : PAL (x1)
-ROMs  : 
-        cc11.1e		27c128  	\ 
-        cc13.2d		  ''		 | gfx
-        cc12.2c		  ''		/ 
+ROMs  :
+        cc11.1e     27c128      \
+        cc13.2d       ''         | gfx
+        cc12.2c       ''        /
 */
 
 ROM_START( countryc )

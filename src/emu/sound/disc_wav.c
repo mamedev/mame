@@ -1501,7 +1501,7 @@ INLINE double dss_inverter_tf(node_description *node, double x)
 		return info->vB;
 	else if (x <= info->vB)
 		return context->tf_tab[(int)((double)(DSS_INV_TAB_SIZE-1) * x / info->vB)];
-	else 
+	else
 		return context->tf_tab[DSS_INV_TAB_SIZE-1];
 }
 

@@ -2436,19 +2436,19 @@ static void menu_cheat(running_machine *machine, ui_menu *menu, void *parameter,
 	if (event != NULL && event->itemref != NULL)
 	{
 		int changed = FALSE;
-		
+
 		/* handle reset all */
 		if ((FPTR)event->itemref == 1 && event->iptkey == IPT_UI_SELECT)
 		{
 			void *curcheat;
-			for (curcheat = cheat_get_next_menu_entry(machine, NULL, NULL, NULL, NULL); 
-				 curcheat != NULL; 
+			for (curcheat = cheat_get_next_menu_entry(machine, NULL, NULL, NULL, NULL);
+				 curcheat != NULL;
 				 curcheat = cheat_get_next_menu_entry(machine, curcheat, NULL, NULL, NULL))
 			{
 				changed |= cheat_select_default_state(machine, curcheat);
 			}
 		}
-		
+
 		/* handle individual cheats */
 		else if ((FPTR)event->itemref > 1)
 		{
@@ -2488,15 +2488,15 @@ static void menu_cheat_populate(running_machine *machine, ui_menu *menu)
 	const char *text, *subtext;
 	void *curcheat;
 	UINT32 flags;
-	
+
 	/* iterate over cheats */
-	for (curcheat = cheat_get_next_menu_entry(machine, NULL, &text, &subtext, &flags); 
-		 curcheat != NULL; 
+	for (curcheat = cheat_get_next_menu_entry(machine, NULL, &text, &subtext, &flags);
+		 curcheat != NULL;
 		 curcheat = cheat_get_next_menu_entry(machine, curcheat, &text, &subtext, &flags))
 	{
 		ui_menu_item_append(menu, text, subtext, flags, curcheat);
 	}
-	
+
 	/* add a reset all option */
 	ui_menu_item_append(menu, "Reset All", NULL, 0, (void *)1);
 }

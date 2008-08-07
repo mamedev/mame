@@ -16,7 +16,7 @@ settings, but music runs too fast.
 
 * kothello
 
-Notes: If you use the key labeled as 'Service Coin' you can start the game 
+Notes: If you use the key labeled as 'Service Coin' you can start the game
 with a single 'coin' no matter the Coingae Setting, but the credit is not
 displayed.
 
@@ -368,13 +368,13 @@ logerror("unsupported register\n");
 			rwp /= 2;
 
 			/*
-			{
-				int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
-				if (fifo2<0) fifo2 *= -1;
-				if (fifo3<0) fifo3 *= -1;
-				rwp += ((fifo2+1)*(fifo3+1));
-			}
-			*/
+            {
+                int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
+                if (fifo2<0) fifo2 *= -1;
+                if (fifo3<0) fifo3 *= -1;
+                rwp += ((fifo2+1)*(fifo3+1));
+            }
+            */
 		}
 		else if ((fifo[0] & 0xfffc) == 0x5c00)	/* SCLR */
 		{
@@ -389,13 +389,13 @@ logerror("unsupported register\n");
 			rwp /= 2;
 
 			/*
-			{
-				int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
-				if (fifo2<0) fifo2 *= -1;
-				if (fifo3<0) fifo3 *= -1;
-				rwp += ((fifo2+1)*(fifo3+1));
-			}
-			*/
+            {
+                int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
+                if (fifo2<0) fifo2 *= -1;
+                if (fifo3<0) fifo3 *= -1;
+                rwp += ((fifo2+1)*(fifo3+1));
+            }
+            */
 		}
 		else if ((fifo[0] & 0xf0ff) == 0x6000)	/* CPY */
 		{
@@ -412,13 +412,13 @@ logerror("unsupported register\n");
 			rwp /= 2;
 
 			/*
-			{
-				int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
-				if (fifo2<0) fifo2 *= -1;
-				if (fifo3<0) fifo3 *= -1;
-				rwp += ((fifo2+1)*(fifo3+1));
-			}
-			*/
+            {
+                int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
+                if (fifo2<0) fifo2 *= -1;
+                if (fifo3<0) fifo3 *= -1;
+                rwp += ((fifo2+1)*(fifo3+1));
+            }
+            */
 		}
 		else if ((fifo[0] & 0xf0fc) == 0x7000)	/* SCPY */
 		{
@@ -435,13 +435,13 @@ logerror("unsupported register\n");
 			rwp /= 2;
 
 			/*
-			{
-				int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
-				if (fifo2<0) fifo2 *= -1;
-				if (fifo3<0) fifo3 *= -1;
-				rwp += ((fifo2+1)*(fifo3+1));
-			}
-			*/
+            {
+                int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
+                if (fifo2<0) fifo2 *= -1;
+                if (fifo3<0) fifo3 *= -1;
+                rwp += ((fifo2+1)*(fifo3+1));
+            }
+            */
 		}
 		else if (fifo[0] == 0x8000)	/* AMOVE */
 		{
@@ -827,7 +827,7 @@ static ADDRESS_MAP_START( shanghai_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x02, 0x03) AM_READWRITE(HD63484_data_r, HD63484_data_w)
 	AM_RANGE(0x20, 0x21) AM_READWRITE(YM2203_status_port_0_lsb_r, YM2203_control_port_0_lsb_w)
 	AM_RANGE(0x22, 0x23) AM_READWRITE(YM2203_read_port_0_lsb_r, YM2203_write_port_0_lsb_w)
-	AM_RANGE(0x40, 0x41) AM_READ_PORT("P1")	
+	AM_RANGE(0x40, 0x41) AM_READ_PORT("P1")
 	AM_RANGE(0x44, 0x45) AM_READ_PORT("P2")
 	AM_RANGE(0x48, 0x49) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x4c, 0x4d) AM_WRITE(shanghai_coin_w)

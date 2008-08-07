@@ -3505,7 +3505,7 @@ ROM_END
 Pairs
 System Ten Co. Ltd., 1989
 
-Hardware is by Nichibutsu with official seal, All ROMs 
+Hardware is by Nichibutsu with official seal, All ROMs
 have official Nichibutsu stickers on them.
 
 PCB No: GH1701

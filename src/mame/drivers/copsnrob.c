@@ -6,7 +6,7 @@
 
     Games supported:
         * Cops'n Robbers
-  
+
     Known issues:
         * none at this time
 
@@ -48,7 +48,7 @@
     0b00-0bff Car Sync Area
     1000      Sound effect and start led triggers must be here - 1000: LED 2
     1001-1003 ???
-	
+
 
 2008-08
 Added Dip locations according to manual.

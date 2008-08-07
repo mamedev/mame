@@ -2290,7 +2290,7 @@ ROM_END
 Elevator Action (4 Board Version, typical Taito SJ hardware)
 Taito, 1983
 
-Manual shows two versions, 4-board without protection, and 
+Manual shows two versions, 4-board without protection, and
 5-board, using an additional 68705 MCU.
 
 PCB Layout
@@ -2300,25 +2300,25 @@ Bottom Board (Main CPU)
 
 WWO70003A
 KNN00013 (sticker)
-|---------------------------------------------| 
-|        IC64   IC52  Z80   2016              | 
+|---------------------------------------------|
+|        IC64   IC52  Z80   2016              |
 |        IC65   *                            |-|
 |        IC66   IC54                         | |
 |        IC67   IC55                       P | |
 |        IC68   2016                         | |
 |        IC69   2016                         | |
 |1                                           |-|
-|8                                            | 
-|W T                                          | 
-|A                                            | 
+|8                                            |
+|W T                                          |
+|A                                            |
 |Y                                           |-|
 |                                            | |
 |         2114                             Q | |
 |         2114                               | |
 |                                            | |
 | 8MHz                                       |-|
-| 12MHz                                       | 
-|---------------------------------------------| 
+| 12MHz                                       |
+|---------------------------------------------|
 Notes:
       T    - 18 way connector for power
       IC*  - 2732 EPROMs
@@ -2333,25 +2333,25 @@ Middle Board (Video)
 
 WWO70002A
 EBN00002 (sticker)
- |---------------------------------------------| 
- |           AM93422   AM93422                 | 
+ |---------------------------------------------|
+ |           AM93422   AM93422                 |
 |-|                                           |-|
 | |                                           | |
 | | P                                       R | |
 | |                              2114         | |
 | |                              2114         | |
 |-|                                           |-|
- |                                             | 
- |                                             | 
- |                                             | 
+ |                                             |
+ |                                             |
+ |                                             |
 |-|                                           |-|
 | |   2016                                    | |
 | | Q 2016                       IC22       S | |
 | |   2016                                    | |
 | |   2016                                    | |
 |-|   2016                                    |-|
- |    2016                                     | 
- |---------------------------------------------| 
+ |    2016                                     |
+ |---------------------------------------------|
 Notes:
       Lots of logic chips, not much else....
       2016    - 2kx8 SRAM
@@ -2359,7 +2359,7 @@ Notes:
       2114    - 1kx4 SRAM
       IC22    - MMI 6301 256x4 Bi-polar PROM
       R,S,P,Q - Flat cable connectors joining to top and bottom PCB
-      
+
 
 Top Board (Sound)
 

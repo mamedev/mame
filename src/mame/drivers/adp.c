@@ -477,13 +477,13 @@ logerror("unsupported register\n");
 			rwp /= 2;
 
 			/*
-			{
-				int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
-				if (fifo2<0) fifo2 *= -1;
-				if (fifo3<0) fifo3 *= -1;
-				rwp += ((fifo2+1)*(fifo3+1));
-			}
-			*/
+            {
+                int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
+                if (fifo2<0) fifo2 *= -1;
+                if (fifo3<0) fifo3 *= -1;
+                rwp += ((fifo2+1)*(fifo3+1));
+            }
+            */
 		}
 		else if ((fifo[0] & 0xfffc) == 0x5c00)	/* SCLR */
 		{
@@ -498,13 +498,13 @@ logerror("unsupported register\n");
 			rwp /= 2;
 
 			/*
-			{
-				int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
-				if (fifo2<0) fifo2 *= -1;
-				if (fifo3<0) fifo3 *= -1;
-				rwp += ((fifo2+1)*(fifo3+1));
-			}
-			*/
+            {
+                int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
+                if (fifo2<0) fifo2 *= -1;
+                if (fifo3<0) fifo3 *= -1;
+                rwp += ((fifo2+1)*(fifo3+1));
+            }
+            */
 		}
 		else if ((fifo[0] & 0xf0ff) == 0x6000)	/* CPY */
 		{
@@ -521,13 +521,13 @@ logerror("unsupported register\n");
 			rwp /= 2;
 
 			/*
-			{
-				int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
-				if (fifo2<0) fifo2 *= -1;
-				if (fifo3<0) fifo3 *= -1;
-				rwp += ((fifo2+1)*(fifo3+1));
-			}
-			*/
+            {
+                int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
+                if (fifo2<0) fifo2 *= -1;
+                if (fifo3<0) fifo3 *= -1;
+                rwp += ((fifo2+1)*(fifo3+1));
+            }
+            */
 		}
 		else if ((fifo[0] & 0xf0fc) == 0x7000)	/* SCPY */
 		{
@@ -544,13 +544,13 @@ logerror("unsupported register\n");
 			rwp /= 2;
 
 			/*
-			{
-				int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
-				if (fifo2<0) fifo2 *= -1;
-				if (fifo3<0) fifo3 *= -1;
-				rwp += ((fifo2+1)*(fifo3+1));
-			}
-			*/
+            {
+                int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
+                if (fifo2<0) fifo2 *= -1;
+                if (fifo3<0) fifo3 *= -1;
+                rwp += ((fifo2+1)*(fifo3+1));
+            }
+            */
 		}
 		else if (fifo[0] == 0x8000)	/* AMOVE */
 		{

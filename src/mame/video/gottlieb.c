@@ -78,7 +78,7 @@ WRITE8_HANDLER( gottlieb_video_control_w )
 		flip_screen_y_set(data & 0x04);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
-	
+
 	/* in Q*Bert Qubes only, bit 4 controls the sprite bank */
 	spritebank = (data & 0x10) >> 4;
 }
@@ -88,7 +88,7 @@ WRITE8_HANDLER( gottlieb_laserdisc_video_control_w )
 {
 	/* bit 0 works like the other games */
 	gottlieb_video_control_w(machine, offset, data & 0x01);
-	
+
 	/* bit 1 controls the sprite bank. */
 	spritebank = (data & 0x02) >> 1;
 
@@ -157,7 +157,7 @@ VIDEO_START( gottlieb )
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 	tilemap_set_scrolldx(bg_tilemap, 0, 318 - 256);
-	
+
 	/* save some state */
 	state_save_register_global(background_priority);
 	state_save_register_global(spritebank);
@@ -168,7 +168,7 @@ VIDEO_START( gottlieb_laserdisc )
 {
 	/* handle normal video */
 	VIDEO_START_CALL(gottlieb);
-	
+
 	/* allocate an overlay texture */
 	overlay_texture = render_texture_alloc(NULL, NULL);
 	if (overlay_texture == NULL)
@@ -244,30 +244,30 @@ VIDEO_UPDATE( gottlieb_laserdisc )
 	const device_config *laserdisc = device_list_first(screen->machine->config->devicelist, LASERDISC);
 	rectangle clip = *cliprect;
 	bitmap_t *video_bitmap;
-	
+
 	/* scale the cliprect to the screen and render it */
 	clip.min_x = 0;
 	clip.max_x = GOTTLIEB_VIDEO_HBLANK - 1;
 	clip.min_y = cliprect->min_y * GOTTLIEB_VIDEO_VCOUNT / bitmap->height;
 	clip.max_y = (cliprect->max_y + 1) * GOTTLIEB_VIDEO_VCOUNT / bitmap->height - 1;
 	video_update_gottlieb(screen, bitmap, &clip);
-	
+
 	/* if this is the last update, handle it */
 	if (cliprect->max_y == video_screen_get_visible_area(screen)->max_y)
 	{
 		/* update the texture with the overlay contents */
 		render_texture_set_bitmap(overlay_texture, bitmap, &overlay_clip, 0, TEXFORMAT_PALETTEA16);
-	
+
 		/* now talk to the laserdisc */
 		laserdisc_get_video(laserdisc, &video_bitmap);
 		if (video_bitmap != NULL)
 			render_texture_set_bitmap(video_texture, video_bitmap, NULL, 0, TEXFORMAT_YUY16);
-		
+
 		/* add both quads to the screen */
 		render_container_empty(render_container_get_screen(screen));
 		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
 		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
 	}
-	
+
 	return 0;
 }

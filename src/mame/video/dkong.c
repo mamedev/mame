@@ -580,44 +580,44 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	int add_y;
 	int add_x;
 	int num_sprt;
-	
+
 	/* Draw the sprites. There are two pecularities which have been mentioned by
-	 * a Donkey Kong II author at CAX 2008: 
-	 * 1) On real hardware, sprites wrap around from the right to the left instead 
-	 *    of clipping.
-	 * 2) On real hardware, there is a limit of 16 sprites per scanline.  
-	 *    Sprites after the 16th (starting from the left) simply don't show.
-	 * 
-	 * 2) is in line with the real hardware which buffers the sprite data 
-	 * for one scanline. The ram is 64x9 and a sprite takes 4 bytes.
-	 * ==> 16 sprites per scanline.
-	 * 
-	 * TODO: 9th bit is not understood right now.
-	 *
-	 * 1) is due to limitation of signals to 8 bit. 
-	 *
-	 * This is quite different from galaxian. The dkong hardware updates sprites
-	 * only once every frame by dma. The number of sprites can not be processed
-	 * directly, Thus the preselection. The buffering takes place during the 
-	 * active phase of the video signal. The scanline is than rendered into the linebuffer
-	 * during HBLANK.
-	 * 
-	 * A sprite will be drawn:
-	 * a) FlipQ = 1 : (sprite_y + 0xF9 + scanline) & 0xF0 == 0xF0
-	 * b) FlipQ = 0 : (sprite_y + 0xF7 + (scanline ^ 0xFF)) & 0xF0 == 0xF0
-	 * 
-	 * FlipQ = 1 ("Normal Play"):
-	 * 
-	 * sprite_y = 0x20
-	 * 
-	 * scanline
-	 * 0x10, 0xEF, 0x208, 0x00
-	 * 0x18, 0xE7, 0x200, 0x00
-	 * 0x19, 0xE6, 0x1FF, 0xF0
-	 * 0x20, 0xDF, 0x1F8, 0xF0
-	 * 
-	 */
-	
+     * a Donkey Kong II author at CAX 2008:
+     * 1) On real hardware, sprites wrap around from the right to the left instead
+     *    of clipping.
+     * 2) On real hardware, there is a limit of 16 sprites per scanline.
+     *    Sprites after the 16th (starting from the left) simply don't show.
+     *
+     * 2) is in line with the real hardware which buffers the sprite data
+     * for one scanline. The ram is 64x9 and a sprite takes 4 bytes.
+     * ==> 16 sprites per scanline.
+     *
+     * TODO: 9th bit is not understood right now.
+     *
+     * 1) is due to limitation of signals to 8 bit.
+     *
+     * This is quite different from galaxian. The dkong hardware updates sprites
+     * only once every frame by dma. The number of sprites can not be processed
+     * directly, Thus the preselection. The buffering takes place during the
+     * active phase of the video signal. The scanline is than rendered into the linebuffer
+     * during HBLANK.
+     *
+     * A sprite will be drawn:
+     * a) FlipQ = 1 : (sprite_y + 0xF9 + scanline) & 0xF0 == 0xF0
+     * b) FlipQ = 0 : (sprite_y + 0xF7 + (scanline ^ 0xFF)) & 0xF0 == 0xF0
+     *
+     * FlipQ = 1 ("Normal Play"):
+     *
+     * sprite_y = 0x20
+     *
+     * scanline
+     * 0x10, 0xEF, 0x208, 0x00
+     * 0x18, 0xE7, 0x200, 0x00
+     * 0x19, 0xE6, 0x1FF, 0xF0
+     * 0x20, 0xDF, 0x1F8, 0xF0
+     *
+     */
+
 	scanline_vf = (cliprect->max_y - 1) & 0xFF;
 	scanline_vfc = (cliprect->max_y - 1) & 0xFF;
 	scanline = cliprect->max_y & 0xFF;
@@ -634,12 +634,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		add_y = 0xF9;
 		add_x = 0xF7;
 	}
-	
+
 	for (offs = state->sprite_bank<<9, num_sprt=0; (num_sprt < 16) && (offs < (state->sprite_bank<<9) + 0x200) /* sprite_ram_size */; offs += 4)
 	{
 		int y = state->sprite_ram[offs];
 		int do_draw = (((y + add_y + 1 + scanline_vf) & 0xF0) == 0xF0) ? 1 : 0;
-		
+
 		if (do_draw)
 		{
 			/* sprite_ram[offs + 2] & 0x40 is used by Donkey Kong 3 only */
@@ -651,15 +651,15 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			int x = state->sprite_ram[offs + 3];
 
 			/* On the real board, the x and y are read inverted after the first
-			 * buffer stage. This due to the fact that the 82S09 delivers complements
-			 * of stored data on read!
-			 */ 
-			
+             * buffer stage. This due to the fact that the 82S09 delivers complements
+             * of stored data on read!
+             */
+
 			x = (x + add_x + 1) & 0xFF;
 			if (state->flip)
 				x ^= 0xFF;
 			y = (y + add_y + 1 + scanline_vfc) & 0x0F;
-			
+
 			if (state->flip)
 			{
 				drawgfx(bitmap,machine->gfx[1],
@@ -678,7 +678,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						x, scanline-y,
 						cliprect,TRANSPARENCY_PEN,0);
 			}
-			
+
 			num_sprt++;
 		}
 	}

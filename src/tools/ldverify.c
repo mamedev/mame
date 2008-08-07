@@ -100,7 +100,7 @@ static void *open_avi(const char *filename, movie_info *info)
 	info->height = aviinfo->video_height;
 	info->samplerate = aviinfo->audio_samplerate;
 	info->channels = aviinfo->audio_channels;
-	
+
 	return avi;
 }
 
@@ -115,7 +115,7 @@ static int read_avi(void *file, int frame, bitmap_t *bitmap, INT16 *lsound, INT1
 	UINT32 firstsample = ((UINT64)aviinfo->audio_samplerate * (UINT64)frame * (UINT64)aviinfo->video_sampletime + aviinfo->video_timescale - 1) / (UINT64)aviinfo->video_timescale;
 	UINT32 lastsample = ((UINT64)aviinfo->audio_samplerate * (UINT64)(frame + 1) * (UINT64)aviinfo->video_sampletime + aviinfo->video_timescale - 1) / (UINT64)aviinfo->video_timescale;
 	avi_error avierr;
-	
+
 	/* read the frame */
 	avierr = avi_read_video_frame_yuy16(file, frame, bitmap);
 	if (avierr != AVIERR_NONE)
@@ -199,7 +199,7 @@ static void *open_chd(const char *filename, movie_info *info)
 		info->numframes = (info->numframes + 1) / 2;
 		info->height *= 2;
 	}
-	
+
 	/* allocate a buffer */
 	chdbuffer = malloc(chd_get_header(chd)->hunkbytes);
 	if (chdbuffer == NULL)
@@ -208,7 +208,7 @@ static void *open_chd(const char *filename, movie_info *info)
 		chd_close(chd);
 		return NULL;
 	}
-	
+
 	return chd;
 }
 
@@ -242,7 +242,7 @@ static int read_chd(void *file, int frame, bitmap_t *bitmap, INT16 *lsound, INT1
 		width = (chdbuffer[8] << 8) | chdbuffer[9];
 		height = ((chdbuffer[10] << 8) | chdbuffer[11]) & 0x7fff;
 		source = chdbuffer + 12 + chdbuffer[4];
-		
+
 		/* make sure the data makes sense */
 		if (width != bitmap->width || height != bitmap->height / interlace_factor)
 		{
@@ -260,7 +260,7 @@ static int read_chd(void *file, int frame, bitmap_t *bitmap, INT16 *lsound, INT1
 				dest[sampnum] = sample | *source++;
 			}
 		}
-		
+
 		/* copy in the bitmap data */
 		for (y = fieldnum; y < height * interlace_factor; y += interlace_factor)
 		{
@@ -301,27 +301,27 @@ static void verify_video(int frame, bitmap_t *bitmap)
 {
 	const int fields_per_frame = 2;
 	int fieldnum;
-	
+
 	/* loop over fields */
 	for (fieldnum = 0; fieldnum < fields_per_frame; fieldnum++)
 	{
 		int field = frame * fields_per_frame + fieldnum;
 		vbi_metadata metadata;
-		
+
 		/* output status */
 		if (frame % 10 == 0 && fieldnum == 0)
 			fprintf(stderr, "%6d.%d...\r", frame, fieldnum);
-		
+
 		/* parse the VBI data */
 		vbi_parse_all(BITMAP_ADDR16(bitmap, fieldnum, 0), bitmap->rowpixels * 2, bitmap->width, 8, &metadata);
-		
+
 		/* if we have data in both 17 and 18, it should match */
 		if (metadata.line17 != 0 && metadata.line18 != 0 && metadata.line17 != metadata.line18)
 		{
 			printf("%6d.%d: line 17 and 18 data does not match (17=%06X 18=%06X) (WARNING)\n", frame, fieldnum, metadata.line17, metadata.line18);
 			printf("%6d.%d: selected %06X based on bit confidence\n", frame, fieldnum, metadata.line1718);
 		}
-		
+
 		/* is this a lead-in code? */
 		if (metadata.line1718 == 0x88ffff)
 		{
@@ -331,12 +331,12 @@ static void verify_video(int frame, bitmap_t *bitmap)
 				video_saw_leadin = TRUE;
 				printf("%6d.%d: lead-in code detected\n", frame, fieldnum);
 			}
-			
+
 			/* if we've previously seen chapters/frames, that's weird */
 			if (video_last_frame != -1 || video_last_chapter != -1)
 				printf("%6d.%d: lead-in code detected after frame/chapter data (WARNING)\n", frame, fieldnum);
 		}
-		
+
 		/* is this a lead-out code? */
 		if (metadata.line1718 == 0x80eeee)
 		{
@@ -350,24 +350,24 @@ static void verify_video(int frame, bitmap_t *bitmap)
 				else
 					printf("%6d.%d: never detected any frame numbers (ERROR)\n", frame, fieldnum);
 			}
-			
+
 			/* if we've previously seen chapters/frames, that's weird */
 			if (video_last_frame == -1)
 				printf("%6d.%d: lead-out code detected with no frames detected beforehand (WARNING)\n", frame, fieldnum);
 		}
-		
+
 		/* is this a frame code? */
 		if ((metadata.line1718 & 0xf80000) == 0xf80000)
 		{
 			int framenum = ((metadata.line1718 >> 0) & 15) * 1 + ((metadata.line1718 >> 4) & 15) * 10 + ((metadata.line1718 >> 8) & 15) * 100 + ((metadata.line1718 >> 12) & 15) * 1000 + ((metadata.line1718 >> 16) & 7) * 10000;
-			
+
 			/* did we see any leadin? */
 			if (!video_saw_leadin)
 			{
    				printf("%6d.%d: detected frame number but never saw any lead-in (WARNING)\n", frame, fieldnum);
    				video_saw_leadin = TRUE;
    			}
-			
+
 			/* if this is the first frame, make sure it's 1 */
 			if (video_last_frame == -1)
 			{
@@ -382,15 +382,15 @@ static void verify_video(int frame, bitmap_t *bitmap)
 			/* print an update every 10000 frames */
 			if (framenum != 0 && framenum % 10000 == 0)
    				printf("%6d.%d: detected frame %d\n", frame, fieldnum, framenum);
-			
+
 			/* if this frame is not consecutive, it's an error */
 			if (video_last_frame != -1 && framenum != video_last_frame + 1)
 				printf("%6d.%d: gap in frame number sequence (%d->%d) (ERROR)\n", frame, fieldnum, video_last_frame, framenum);
-				
+
 			/* remember the frame number */
 			video_last_frame = framenum;
 		}
-		
+
 		/* is the whiteflag set? */
 		if (metadata.white)
 		{
@@ -400,7 +400,7 @@ static void verify_video(int frame, bitmap_t *bitmap)
     			video_first_whitefield = field;
     			printf("%6d.%d: first white flag seen\n", frame, fieldnum);
     		}
-    		
+
     		/* if we've seen frames, but we're not yet to the lead-out, check the cadence */
     		if (video_last_frame != -1 && !video_saw_leadout)
     		{
@@ -408,7 +408,7 @@ static void verify_video(int frame, bitmap_t *bitmap)
     		    if (video_prev_whitefield != -1)
     		        video_cadence_history = (video_cadence_history << 4) | ((field - video_prev_whitefield) & 0x0f);
     		    video_prev_whitefield = field;
-    		    
+
     		    /* if we don't know our cadence yet, determine it */
     		    if (video_cadence == -1 && (video_cadence_history & 0xf00) != 0)
     		    {
@@ -429,24 +429,24 @@ static void verify_video(int frame, bitmap_t *bitmap)
     		        }
     		        else
     		        {
-    		            printf("%6d.%d: unknown cadence (history %d:%d:%d) (WARNING)\n", frame, fieldnum, 
+    		            printf("%6d.%d: unknown cadence (history %d:%d:%d) (WARNING)\n", frame, fieldnum,
     		                    (video_cadence_history >> 8) & 15, (video_cadence_history >> 4) & 15, video_cadence_history & 15);
     		        }
     		    }
-    		    
+
     		    /* if we know our cadence, make sure we stick to it */
     		    if (video_cadence != -1)
     		    {
     		        if (video_cadence == 4 && (video_cadence_history & 0xfff) != 0x222)
     		        {
-    		            printf("%6d.%d: missed cadence (history %d:%d:%d) (WARNING)\n", frame, fieldnum, 
+    		            printf("%6d.%d: missed cadence (history %d:%d:%d) (WARNING)\n", frame, fieldnum,
     		                    (video_cadence_history >> 8) & 15, (video_cadence_history >> 4) & 15, video_cadence_history & 15);
     		            video_cadence = -1;
     		            video_cadence_history = 0;
     		        }
     		        else if (video_cadence == 5 && (video_cadence_history & 0xfff) != 0x323 && (video_cadence_history & 0xfff) != 0x232)
     		        {
-    		            printf("%6d.%d: missed cadence (history %d:%d:%d) (WARNING)\n", frame, fieldnum, 
+    		            printf("%6d.%d: missed cadence (history %d:%d:%d) (WARNING)\n", frame, fieldnum,
     		                    (video_cadence_history >> 8) & 15, (video_cadence_history >> 4) & 15, video_cadence_history & 15);
     		            video_cadence = -1;
     		            video_cadence_history = 0;
@@ -466,7 +466,7 @@ static void verify_video_final(int frame, bitmap_t *bitmap)
 {
 	int fields_per_frame = (bitmap->height >= 288) ? 2 : 1;
 	int field = frame * fields_per_frame;
-	
+
 	/* did we ever see any white flags? */
 	if (video_first_whitefield == -1)
 		printf("Track %6d.%d: never saw any white flags; no cadence detection done (WARNING)\n", field / fields_per_frame, 0);
@@ -475,7 +475,7 @@ static void verify_video_final(int frame, bitmap_t *bitmap)
 	if (video_saw_leadin && !video_saw_leadout)
 		printf("Track %6d.%d: detected lead-in but never saw any lead-out (WARNING)\n", field / fields_per_frame, 0);
 }
-	
+
 
 /*-------------------------------------------------
     verify_audio - verify audio data
@@ -484,10 +484,10 @@ static void verify_video_final(int frame, bitmap_t *bitmap)
 static void verify_audio(const INT16 *lsound, const INT16 *rsound, int samples)
 {
 	int sampnum;
-	
+
 	/* count the overall samples */
 	audio_sample_count += samples;
-	
+
 	/* iterate over samples, tracking min/max */
 	for (sampnum = 0; sampnum < samples; sampnum++)
 	{
@@ -499,7 +499,7 @@ static void verify_audio(const INT16 *lsound, const INT16 *rsound, int samples)
 	    }
 	    else if (lsound[sampnum] == audio_min_lsample)
 	        audio_min_lsample_count++;
-	        
+
 	    /* did we hit a maximum on the left? */
 	    if (lsound[sampnum] > audio_max_lsample)
 	    {
@@ -517,7 +517,7 @@ static void verify_audio(const INT16 *lsound, const INT16 *rsound, int samples)
 	    }
 	    else if (rsound[sampnum] == audio_min_rsample)
 	        audio_min_rsample_count++;
-	        
+
 	    /* did we hit a maximum on the right? */
 	    if (rsound[sampnum] > audio_max_rsample)
 	    {
@@ -542,7 +542,7 @@ static void verify_audio_final(void)
     printf("  Channel 1 minimum: %6d (with %9d/%9d samples at minimum)\n", audio_min_rsample, audio_min_rsample_count, audio_sample_count);
     printf("  Channel 1 maximum: %6d (with %9d/%9d samples at maximum)\n", audio_max_rsample, audio_max_rsample_count, audio_sample_count);
 }
-	
+
 
 /*-------------------------------------------------
     usage - display program usage
@@ -571,12 +571,12 @@ int main(int argc, char *argv[])
 	void *file;
 	int isavi;
 	int frame;
-	
+
 	/* verify arguments */
 	if (argc < 2)
 		return usage();
 	srcfile = argv[1];
-	
+
 	/* check extension of file */
 	srcfilelen = strlen(srcfile);
 	if (srcfilelen < 4)
@@ -587,7 +587,7 @@ int main(int argc, char *argv[])
 		isavi = FALSE;
 	else
 		return usage();
-	
+
 	/* open the file */
 	printf("Processing file: %s\n", srcfile);
 	file = isavi ? open_avi(srcfile, &info) : open_chd(srcfile, &info);
@@ -596,7 +596,7 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Unable to open file '%s'\n", srcfile);
 		return 1;
 	}
-	
+
 	/* comment on the video dimensions */
 	printf("Video dimensions: %dx%d\n", info.width, info.height);
 	if (info.width != 720)
@@ -613,7 +613,7 @@ int main(int argc, char *argv[])
 	printf("Sample rate: %dHz\n", info.samplerate);
 	if (info.samplerate != 48000)
 		printf("WARNING: Unexpected sampele rate (should be 48000Hz)\n");
-	
+
 	/* allocate a bitmap */
 	bitmap = bitmap_alloc(info.width, info.height, BITMAP_FORMAT_YUY16);
 	if (bitmap == NULL)
@@ -621,7 +621,7 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Out of memory creating %dx%d bitmap\n", info.width, info.height);
 		return 1;
 	}
-	
+
 	/* allocate sound buffers */
 	lsound = malloc(info.samplerate * sizeof(*lsound));
 	rsound = malloc(info.samplerate * sizeof(*rsound));
@@ -630,7 +630,7 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "Out of memory allocating sound buffers of %d bytes\n", (INT32)(info.samplerate * sizeof(*rsound)));
 		return 1;
 	}
-	
+
 	/* loop over frames */
 	frame = 0;
 	while (isavi ? read_avi(file, frame, bitmap, lsound, rsound, &samples) : read_chd(file, frame, bitmap, lsound, rsound, &samples))
@@ -639,14 +639,14 @@ int main(int argc, char *argv[])
 		verify_audio(lsound, rsound, samples);
 		frame++;
 	}
-	
+
 	/* close the files */
 	isavi ? close_avi(file) : close_chd(file);
-	
+
 	/* final output */
 	verify_video_final(frame, bitmap);
 	verify_audio_final();
-	
+
 	/* free memory */
 	bitmap_free(bitmap);
 	free(lsound);

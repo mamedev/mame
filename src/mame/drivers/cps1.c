@@ -152,7 +152,7 @@ Stephh's log (2006.09.20) :
       * 'forgottu' and 'lostwrld'
       * 'ghouls' and 'daimakai'
       * 'dynwar' and 'dynwarj'
-	
+
 2008-07:
   - replaced input read handler with direct AM_READ_PORT where suitable
 

@@ -4449,7 +4449,7 @@ Top Board
 |   DSW(8)    C68                                                    |
 | 3.579545MHz            CY7C132                                     |
 |    149                      SYS87B-3(PAL)     62256       62256    |
-|                                  139                               | 
+|                                  139                               |
 |                                     HN58C65  LW2MP0.11D  LW2MP1.13D|
 |                               M5M5179               68000      148 |
 |--------------------------------------------------------------------|
@@ -4513,7 +4513,7 @@ SYSTEM2 VIDEO(E)
 |--------------------------------------------------------------------|
 Notes:
       KEYCUS      : socket not populated
-      LW1_LD8.10W : PROM type MB7118      
+      LW1_LD8.10W : PROM type MB7118
       *           : Unpopulated socket
 
       Namco customs:

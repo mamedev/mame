@@ -157,7 +157,7 @@ static INPUT_PORTS_START( vulgus )
 
 	PORT_START("DSW2")      /* DSW1 */
 	/* Not sure about difficulty
-	   Code perform a read and (& 0x03). NDMix */
+       Code perform a read and (& 0x03). NDMix */
 	PORT_DIPNAME( 0x03, 0x03, "Difficulty?" )
 	PORT_DIPSETTING(    0x02, "Easy?" )
 	PORT_DIPSETTING(    0x03, "Normal?" )

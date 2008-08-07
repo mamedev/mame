@@ -82,7 +82,7 @@ struct _laserdisc_config
 
 #define MDRV_LASERDISC_AUDIO(_func) \
 	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, audio, _func)
-	
+
 #define MDRV_LASERDISC_REMOVE(_tag, _type) \
 	MDRV_DEVICE_REMOVE(_tag, _type)
 

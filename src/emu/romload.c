@@ -977,7 +977,7 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 			open_chd chd = { 0 };
 			chd_header header;
 			chd_error err;
-			
+
 			/* note the region we are in */
 			chd.region = regiontag;
 

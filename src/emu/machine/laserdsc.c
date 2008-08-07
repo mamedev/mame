@@ -652,7 +652,7 @@ INLINE void set_hold_state(laserdisc_state *ld, attotime holdtime, playstate sta
 
 /*-------------------------------------------------
     reset_tracknum - reset the current track
-	number to 1 and clear out other state
+    number to 1 and clear out other state
 -------------------------------------------------*/
 
 INLINE void reset_tracknum(laserdisc_state *ld)
@@ -790,7 +790,7 @@ void laserdisc_vsync(const device_config *device)
 	UINT8 origstate = ld->state;
 	UINT8 hittarget;
 	int backslash;
-	
+
 	/* allow the backslash key to toggle the frame display */
 	backslash = input_code_pressed(KEYCODE_BACKSLASH);
 	if (!ld->lastbackslash && backslash)
@@ -1140,7 +1140,7 @@ static int update_position(laserdisc_state *ld)
 		/* if we have no target, don't do anything */
 		if (ld->targetframe == 0)
 			return TRUE;
-			
+
 		LOG_POSITION(("%d:track=%5d frame=%5d target=%5d ... ", fieldnum, tracknum, frame, ld->targetframe));
 
 		/* if we hit the first field of our frame, we're done */
@@ -1265,18 +1265,18 @@ static void read_track_data(laserdisc_state *ld)
 	ld->avconfig.decode_mask = AVCOMP_DECODE_VIDEO;
 	ld->avconfig.video_xor = BYTE_XOR_LE(0);
 	ld->avconfig.audio_xor = BYTE_XOR_BE(0);
-	
+
 	/* if the previous field had the white flag, force the new field to pair with it */
 	if (ld->metadata[fieldnum ^ 1].white)
 		ld->videofields[ld->videoindex] = 1;
-	
+
 	/* if we already have both fields on the current videoindex, advance */
 	if (ld->videofields[ld->videoindex] >= 2)
 	{
 		ld->videoindex = (ld->videoindex + 1) % ARRAY_LENGTH(ld->videofields);
 		ld->videofields[ld->videoindex] = 0;
 	}
-	
+
 	/* set the video buffer information */
 	ld->avconfig.video_buffer = (UINT8 *)BITMAP_ADDR16(ld->videoframe[ld->videoindex], fieldnum, 0);
 	ld->avconfig.video_stride = 4 * ld->videoframe[ld->videoindex]->rowpixels;
@@ -1331,7 +1331,7 @@ static void process_track_data(const device_config *device)
 		vbi_parse_all((const UINT16 *)ld->avconfig.video_buffer, ld->avconfig.video_stride / 2, ld->videoframe[0]->width, 8, &ld->metadata[fieldnum]);
 	else
 		fake_metadata(tracknum, fieldnum, &ld->metadata[fieldnum]);
-//	printf("Track %5d: Metadata = %d %08X %08X %08X %08X\n", tracknum, ld->metadata[fieldnum].white, ld->metadata[fieldnum].line16, ld->metadata[fieldnum].line17, ld->metadata[fieldnum].line18, ld->metadata[fieldnum].line1718);
+//  printf("Track %5d: Metadata = %d %08X %08X %08X %08X\n", tracknum, ld->metadata[fieldnum].white, ld->metadata[fieldnum].line16, ld->metadata[fieldnum].line17, ld->metadata[fieldnum].line18, ld->metadata[fieldnum].line1718);
 
 	/* update the last seen frame and chapter */
 	frame = frame_from_metadata(&ld->metadata[fieldnum]);
@@ -1358,7 +1358,7 @@ static void process_track_data(const device_config *device)
 		samples = (rawdata[6] << 8) + rawdata[7];
 		sampsource[0] = (const INT16 *)(rawdata + 12 + rawdata[4]) + 0 * samples;
 		sampsource[1] = sampsource[0] + samples;
-		
+
 		/* let the audio callback at it first */
 		if (ld->audiocallback != NULL)
 			(*ld->audiocallback)(device, ld->samplerate, samples, sampsource[0], sampsource[1]);
@@ -1401,7 +1401,7 @@ static void process_track_data(const device_config *device)
 
 /*-------------------------------------------------
     fake_metadata - fake metadata when there's
-	no disc present
+    no disc present
 -------------------------------------------------*/
 
 static void fake_metadata(UINT32 track, UINT8 which, vbi_metadata *metadata)
@@ -1410,7 +1410,7 @@ static void fake_metadata(UINT32 track, UINT8 which, vbi_metadata *metadata)
 	{
 		metadata->white = 1;
 		metadata->line16 = 0;
-		metadata->line17 = metadata->line18 = 0xf80000 | 
+		metadata->line17 = metadata->line18 = 0xf80000 |
 				(((track / 10000) % 10) << 16) |
 				(((track / 1000) % 10) << 12) |
 				(((track / 100) % 10) << 8) |
@@ -1434,14 +1434,14 @@ static void render_display(UINT16 *videodata, UINT32 rowpixels, UINT32 width, in
 	int y = 50;
 	int ch;
 	int delta;
-	
+
 	/* do nothing if no data */
 	if (videodata == NULL)
 		return;
 
 	/* convert to a character string and render */
 	sprintf(buffer, "%5d", frame);
-	
+
 	/* iterate over 5 positions: (-1,-1), (-1,1), (1,-1), (1,1) and (0,0) */
 	/* render all in black except the last one */
 	for (delta = 0; delta < 5; delta++)
@@ -1449,25 +1449,25 @@ static void render_display(UINT16 *videodata, UINT32 rowpixels, UINT32 width, in
 		int color = (delta < 4) ? 0x0080 : 0xff80;
 		int dx = (delta < 4) ? ((delta & 1) ? -1 : 1) : 0;
 		int dy = (delta < 4) ? ((delta & 2) ? -1 : 1) : 0;
-		
+
 		/* iterate over 5 characters */
 		for (ch = 0; ch < 5; ch++)
 			if (buffer[ch] >= '0' && buffer[ch] <= '9')
 			{
 				const UINT8 *fontdata = &numberfont[buffer[ch] - '0'][0];
 				int cy, cx;
-				
+
 				/* iterate over the rows of the character */
 				for (cy = 0; cy < 8; cy++)
 				{
 					UINT8 bits = *fontdata++;
-					
+
 					/* and over the columns */
 					for (cx = 0; cx < 8; cx++)
 						if (bits & (0x80 >> cx))
 						{
 							int ix, iy;
-							
+
 							/* fill in an xscale x yscale pixel */
 							for (iy = 0; iy < yscale; iy++)
 								for (ix = 0; ix < xscale; ix++)
@@ -2393,16 +2393,16 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 data)
 		attotime curtime = timer_get_time();
 		attotime delta;
 		int longpulse;
-		
+
 		/* if we timed out, reset the accumulator */
 		delta = attotime_sub(curtime, pr8210->firstbittime);
 		if (delta.attoseconds > ATTOTIME_IN_USEC(25320).attoseconds)
 		{
 			pr8210->firstbittime = curtime;
 			pr8210->accumulator = 0x5555;
-//			printf("Reset accumulator\n");
+//          printf("Reset accumulator\n");
 		}
-		
+
 		/* get the time difference from the last assert */
 		/* and update our internal command time */
 		delta = attotime_sub(curtime, pr8210->lastbittime);
@@ -2411,7 +2411,7 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 data)
 		/* 0 bit delta is 1.05 msec, 1 bit delta is 2.11 msec */
 		longpulse = (delta.attoseconds < ATTOTIME_IN_USEC(1500).attoseconds) ? 0 : 1;
 		pr8210->accumulator = (pr8210->accumulator << 1) | longpulse;
-		
+
 #if 0
 		{
 			int usecdiff = (int)(delta.attoseconds / ATTOSECONDS_IN_USEC(1));
@@ -2426,7 +2426,7 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 data)
 			UINT8 newcommand = (pr8210->accumulator >> 2) & 0x1f;
 
 //printf("New command = %02X (last=%02X)\n", newcommand, pr8210->lastcommand);
-			
+
 			/* if we got a double command, act on it */
 			if (newcommand == pr8210->lastcommand)
 			{

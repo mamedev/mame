@@ -186,15 +186,15 @@ Notes:
         (G) - 28-Way Connector (Not JAMMA)
         (M) - 50-pin Flat Cable Connector Joining Main PCB To Analog Control PCB
 
-		OSC: 26.686, 24.000, 16.000
+        OSC: 26.686, 24.000, 16.000
 
      Taito custom ICs -
                        TC0070RGB - RGB/Video Mixer (Ceramic Flat Pack SIP25)
                        TC0060DCA - Digital to Analog Conversion for Audio (Ceramic Flat Pack SIP20)
                        TC0100SYT - Sound Communication
                        TC0220IOC - Input/Output. This chip also provides the master reset via the MB3771. It probably does more things too,
-                                   including video output. For example, if the harness is connected backwards, this chip blows and kills 
-                                   the PCB. Even manually resetting the 68000's cannot restart the PCB, and it just shows a wavey pattern 
+                                   including video output. For example, if the harness is connected backwards, this chip blows and kills
+                                   the PCB. Even manually resetting the 68000's cannot restart the PCB, and it just shows a wavey pattern
                                    on screen.
                        TC0110PCR - Pallete Generator
                        TC0100SCN - Tilemap Generator
@@ -205,8 +205,8 @@ Notes:
                        TC0320OBR - Road Object Generator? (tied to TC0150ROD)
 
     ROMs -
-          
-          
+
+
 Analog Control PCB
 ------------------
 J9100175A
@@ -3981,10 +3981,10 @@ Taito Chips:
 CPU board - TCO100SCN, TCO140SYT, TCO170ABT, TCO110PCR
 Video Board - TCO150ROD, TCO050VDZ (x3), TCO020VAR
 
-Ram: CPU BOARD - 6264 (x9), 43256 (x2), 
+Ram: CPU BOARD - 6264 (x9), 43256 (x2),
      VIDEO BOARD - 2018 (x10), 6264 (x2)
 
-PALs/PROMs: 
+PALs/PROMs:
 CPU BOARD - All located near/around the 68000's
 b58-15 (PAL20L8)
 b58-16 (PAL20L8)
@@ -3993,7 +3993,7 @@ b58-13 (PAL16L8)
 b58-11 (PAL16L8)
 b58-12 (PAL16L8)
 
-VIDEO BOARD - 
+VIDEO BOARD -
 b58-22 (PAL16L8) \
 b58-23 (63s141)   |  near TCO150ROD
 b58-24 (63s141)  /
@@ -4008,26 +4008,26 @@ b58-19 (PAL16R4)     near b58-04/03/02/01
 
 ROMs:
 CPU BOARD - b58-18 , 27C010  \
-	    b58-19 , 27C010   |  68k Program
-	    b58-26 , 27C010   |
-	    b58-27 , 27C010  /
+        b58-19 , 27C010   |  68k Program
+        b58-26 , 27C010   |
+        b58-27 , 27C010  /
 
-	    b58-07 , 27C4096 \
-	    b58-08 , 27C4096  |
-	    b58-09 , 27C4100  |  near TCO100SCN & TCO140SYT
-	    b58-10 , 27C4096 /
+        b58-07 , 27C4096 \
+        b58-08 , 27C4096  |
+        b58-09 , 27C4100  |  near TCO100SCN & TCO140SYT
+        b58-10 , 27C4096 /
 
-	    b58-32 , 27C512      z80 program
+        b58-32 , 27C512      z80 program
 
 VIDEO PCB - b58-06 , 27C4100     near TCO150ROD
 
-	    b58-26a, 27C512      ?
-	    b58-27 , LH5763      ?
+        b58-26a, 27C512      ?
+        b58-27 , LH5763      ?
 
-	    b58-01 , 27C4100 \
-	    b58-02 , 27C4100  |
-	    b58-03 , 27C4100  |  near TCO050VDZ's
-	    b58-04 , 27C4100 /
+        b58-01 , 27C4100 \
+        b58-02 , 27C4100  |
+        b58-03 , 27C4100  |  near TCO050VDZ's
+        b58-04 , 27C4100 /
 */
 
 ROM_START( enforce )

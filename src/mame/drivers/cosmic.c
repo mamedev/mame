@@ -10,18 +10,18 @@ Devil Zone      - 8022
 
 
 2008-08
-Dip locations verified with manuals for all the games. 
+Dip locations verified with manuals for all the games.
 
 
 Note on Coinage DSW (devzone and magspot only):
 
-According to manuals, coinage settings (see "DSW" port) should be set by 
-a physical DSW B but only read when SWA:3,4 are both set to OFF. Currently, 
+According to manuals, coinage settings (see "DSW" port) should be set by
+a physical DSW B but only read when SWA:3,4 are both set to OFF. Currently,
 
 * In magspot, SWA:3 affects the number of lives & SWA:4 seems to have no
-	effect
+    effect
 * In devzone, setting SWA:3,4 on anything but OFF,OFF results in no coins
-	accepted at all
+    accepted at all
 
 ***************************************************************************/
 
@@ -478,7 +478,7 @@ static INPUT_PORTS_START( cosmica )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW:2,1")
 	PORT_DIPSETTING(    0x30, "5000" )
 	PORT_DIPSETTING(    0x20, "10000" )
@@ -575,15 +575,15 @@ static INPUT_PORTS_START( magspot )
 	PORT_DIPSETTING(    0x03, "5000" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	/* According to the manual, bits 2-3 should control coinage like in devzone
-	and only bit 4 should control lives setting. */
-//	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SWA:3,4")
-//	PORT_DIPSETTING(    0x0c, "Use Coin A & B" )
-//	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-//	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWA:2")
-//	PORT_DIPSETTING(    0x00, "2" )
-//	PORT_DIPSETTING(    0x10, "3" )
+    and only bit 4 should control lives setting. */
+//  PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SWA:3,4")
+//  PORT_DIPSETTING(    0x0c, "Use Coin A & B" )
+//  PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+//  PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
+//  PORT_DIPNAME( 0x10, 0x10, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWA:2")
+//  PORT_DIPSETTING(    0x00, "2" )
+//  PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SWA:4" )
 	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Lives ) ) PORT_DIPLOCATION("SWA:2,3")
 	PORT_DIPSETTING(    0x00, "2" )
@@ -792,7 +792,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( nomnlndg )
 	PORT_INCLUDE( nomnlnd )
-	
+
 	PORT_MODIFY("IN2")
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW:5,6")
 	PORT_DIPSETTING(    0x01, "3000" )

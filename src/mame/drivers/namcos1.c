@@ -1850,14 +1850,14 @@ Notes:
       BAS  - Bass Adjustment Pot
       BAL  - Balance Adjustment Pot
       VOL  - Master Volume Pot
-      
+
       Namco Custom ICs -
                         123 (QFP80)
                         181 (DIP28, KEYCUS, Splatter House)
                         64A1 (DIP40, 63701 MCU)
 
 
-Bottom Board                        
+Bottom Board
 
 8617961101
 (8617963101)
@@ -1903,7 +1903,7 @@ Notes:
       2064  - 8K x8 SRAM (DIP28)
       62256 - 32K x8 SRAM (DIP28)
               * Note, a -8 part must be used at this location or the PCB will not boot
-              
+
       Namco Custom ICs -
                         30 (SDIP64)
                         39 (DIP42)

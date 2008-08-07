@@ -1044,7 +1044,7 @@ static INPUT_PORTS_START( bigrun )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-  
+
 	PORT_START("IN4")	// DSW 2 & 3 - $80006.w
 	// DSW 3
 	PORT_DIPNAME( 0x0003, 0x0003, "Extra Setting For Coin B" ) PORT_DIPLOCATION("SW302:8,7")	/* 'Not used' (and must be OFF) according to the manual */
@@ -1103,8 +1103,8 @@ static INPUT_PORTS_START( bigrun )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 
 	PORT_START("IN5")	// DSW 3 (4 bits, Cabinet Linking) - $82200.w
-	/* According to Manual: "When Machines are linked for simultaneous racing throught the 
-	Com-Link System, SW1 should be set as shown", i.e. ON for Master Machine, OFF for others */
+	/* According to Manual: "When Machines are linked for simultaneous racing throught the
+    Com-Link System, SW1 should be set as shown", i.e. ON for Master Machine, OFF for others */
 	PORT_DIPNAME( 0x01, 0x00, "Link ID" ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, "Master Unit" )
 	PORT_DIPSETTING(    0x01, "Other Units" )

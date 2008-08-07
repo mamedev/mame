@@ -1184,7 +1184,7 @@ Tiger Heli
 1985 Taito Corporation
 
 The Tiger Heli PCB is almost exactly the same PCB as Slap Fight/Alcon but a few chips
-have different placings and there's more EPROM locations on one of the boards 
+have different placings and there's more EPROM locations on one of the boards
 (although they're not populated).
 Also, Tiger Heli has a 22-way edge connector, while Alcon/Slap Fight is JAMMA.
 

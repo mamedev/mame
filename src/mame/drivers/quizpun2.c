@@ -111,10 +111,10 @@ fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
 /***************************************************************************
                                 Protection
 
-	ROM checksum:	write 0x80 | (0x00-0x7f), write 0, read 2 bytes
-	Read address:	write 0x80 | param1 & 0x07f (0x00), write param2 & 0x7f, read 2 bytes
-	Read EEPROM:	write 0x20 | (0x00-0x0f), write 0, read 8 bytes
-	Write EEPROM:	write 0x00 | (0x00-0x0f), write 0, write 8 bytes
+    ROM checksum:   write 0x80 | (0x00-0x7f), write 0, read 2 bytes
+    Read address:   write 0x80 | param1 & 0x07f (0x00), write param2 & 0x7f, read 2 bytes
+    Read EEPROM:    write 0x20 | (0x00-0x0f), write 0, read 8 bytes
+    Write EEPROM:   write 0x00 | (0x00-0x0f), write 0, write 8 bytes
 
 ***************************************************************************/
 
@@ -216,7 +216,7 @@ static WRITE8_HANDLER( quizpun2_protection_w )
 
 		default:
 			if (prot.wait_param)
-			{	
+			{
 				prot.param = data;
 				prot.wait_param = 0;
 
@@ -294,7 +294,7 @@ static ADDRESS_MAP_START( quizpun2_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0xa000, 0xbfff ) AM_RAM_WRITE( fg_ram_w ) AM_BASE( &fg_ram )	// 4 * 800
 	AM_RANGE( 0xc000, 0xc7ff ) AM_RAM_WRITE( bg_ram_w ) AM_BASE( &bg_ram )	// 4 * 400
-	AM_RANGE( 0xc800, 0xcfff ) AM_RAM										// 
+	AM_RANGE( 0xc800, 0xcfff ) AM_RAM										//
 
 	AM_RANGE( 0xd000, 0xd3ff ) AM_RAM_WRITE( paletteram_xRRRRRGGGGGBBBBB_le_w )  AM_BASE( &paletteram )
 	AM_RANGE( 0xe000, 0xffff ) AM_RAM

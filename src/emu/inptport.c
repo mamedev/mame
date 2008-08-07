@@ -2869,7 +2869,7 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 
 				temptoken.i = INPUT_STRING_On;
 				cursetting = setting_config_alloc(curfield, ~defval & mask, input_port_string_from_token(temptoken));
-				
+
 				/* reset cursetting to NULL to allow subsequent conditions to apply to the field */
 				cursetting = NULL;
 				break;

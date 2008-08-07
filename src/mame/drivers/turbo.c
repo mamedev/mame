@@ -1494,11 +1494,11 @@ Top
 |                                                5837N |
 | 53323   53323  53323      IR3702                     |
 |                                           LA4460 VOL |
-|------------------------------------------------------| 
+|------------------------------------------------------|
 Notes:
       All IC's shown.
 
-      
+
 Middle
 ------
 834-5120  171-5011  CPU BOARD  (sticker 834-5142)
@@ -1535,8 +1535,8 @@ Notes:
       Z80 clock     : 5.000MHz
       315-5014 clock: measured 3.766MHz to 3.815MHz on pin6; moving slowly!? (NOTE! This is an encrypted Z80)
       VSync         : 60Hz
-      VCO voltage   : 1.43 Volts 
-                      Note! This is guessed to make the sprites a reasonable size. A shot of the title screen 
+      VCO voltage   : 1.43 Volts
+                      Note! This is guessed to make the sprites a reasonable size. A shot of the title screen
                       after coinup from a real machine would help to fix the real voltage and give the correct
                       sprite sizes. Note in MAME the Buck Rogers title isn't centered because of the guessed
                       voltage, though I'm sure it's very close.
@@ -1556,11 +1556,11 @@ Notes:
       PR-5198.93      TBP28S46N (compatible with 82S141)
       PR-5199.95      82S181
       *               Empty socket
-      
-      
+
+
 Bottom
 ------
-(sticker 834-5151)  171-5012  ROM BOARD 
+(sticker 834-5151)  171-5012  ROM BOARD
 |------------------------------------------------------|
 |                                                      |
 |                                                      |
@@ -1602,7 +1602,7 @@ Notes:
       EPR-5231.68    27128
       *              Empty socket
 
-      Note! On my PCB, ROMs 58 and 74 match. It could be 
+      Note! On my PCB, ROMs 58 and 74 match. It could be
       wrong, but the PCB appears to work perfectly.
 */
 

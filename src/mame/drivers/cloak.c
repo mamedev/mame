@@ -93,10 +93,10 @@
 
     Motion object ROM: 136023.307,136023.308
     Playfield ROM: 136023.306,136023.305
-	
-	
-	2008-07
-	Dip locations and suggested settings verified with manual.
+
+
+    2008-07
+    Dip locations and suggested settings verified with manual.
 
 ****************************************************************************/
 

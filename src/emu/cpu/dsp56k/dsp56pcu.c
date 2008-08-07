@@ -188,7 +188,7 @@ static void pcu_service_interrupts(void)
 	// Count list of pending interrupts
 	int num_servicable = dsp56k_count_pending_interrupts();
 
-	if (num_servicable == 0) 
+	if (num_servicable == 0)
 		return;
 
 	// Sort list according to priority
@@ -199,7 +199,7 @@ static void pcu_service_interrupts(void)
 	for (i = 0; i < num_servicable; i++)
 	{
 		const int interrupt_index = core.PCU.pending_interrupts[i];
-	
+
 		// Get the priority of the interrupt - a return value of -1 means disabled!
 		INT8 priority = dsp56k_get_irq_priority(interrupt_index);
 
@@ -217,13 +217,13 @@ static void pcu_service_interrupts(void)
 				// The host command input has a floating vector.
 				const UINT16 irq_vector = HV_bits() << 1;
 				PC = irq_vector;
-				
+
 				// TODO: 5-9 5-11 Gotta' Clear HC (HCP gets it too) when taking this exception!
 				HC_bit_set(0);
 			}
 		}
 	}
-	
+
 	dsp56k_clear_pending_interrupts();
 }
 

@@ -345,7 +345,7 @@ static void set_irq_line(int irqline, int state)
 	// If the reset line isn't asserted, service interrupts
 	// TODO: Is it right to immediately service interrupts?
 	//if (core.reset_state != TRUE)
-	//	pcu_service_interrupts();
+	//  pcu_service_interrupts();
 }
 
 

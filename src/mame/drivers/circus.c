@@ -27,9 +27,9 @@ D000      Paddle Position and Interrupt Reset
 
     Notes:
         * Circus: Taito licensed and releasd the game as "Acrobat TV"
-	
-	2008-07
-	Dip locations verified with the manuals.
+
+    2008-07
+    Dip locations verified with the manuals.
 
 ***************************************************************************/
 
@@ -62,7 +62,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("DSW")
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("PADDLE")
-//	AM_RANGE(0xd000, 0xd000) AM_READ(ripcord_IN2_r)
+//  AM_RANGE(0xd000, 0xd000) AM_READ(ripcord_IN2_r)
 	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 

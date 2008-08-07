@@ -698,7 +698,7 @@ static avi_error fake_avi_frame(avi_file *avi, UINT32 framenum, UINT8 *cache, bi
 	int whiteflag, line1718;
 	UINT8 *dest = cache;
 	INT16 *temp;
-	
+
 	/* reset framecounter to 1 on frame 0 */
 	if (framenum == 0)
 		framecounter = 1;
@@ -732,7 +732,7 @@ static avi_error fake_avi_frame(avi_file *avi, UINT32 framenum, UINT8 *cache, bi
 	{
 		int modcheck = AVI_FAKE_SAMPLERATE / ((chnum == 0) ? 110 : 220);
 		int samp = (chnum == 0) ? leftsamp : rightsamp;
-		
+
 		/* store them big endian at the destination */
 		for (sampnum = 0; sampnum < num_samples; sampnum++)
 		{
@@ -741,7 +741,7 @@ static avi_error fake_avi_frame(avi_file *avi, UINT32 framenum, UINT8 *cache, bi
 			*dest++ = sample;
 		}
 	}
-	
+
 	/* determine what metadata we should generate */
 	whiteflag = line1718 = 0;
 	if (framenum < 2)
@@ -773,7 +773,7 @@ static avi_error fake_avi_frame(avi_file *avi, UINT32 framenum, UINT8 *cache, bi
 	for (y = framenum % interlace_factor; y < AVI_FAKE_HEIGHT; y += interlace_factor)
 	{
 		int effy = y / interlace_factor;
-		
+
 		/* white flag? */
 		if (effy == 11 && whiteflag)
 		{
@@ -784,7 +784,7 @@ static avi_error fake_avi_frame(avi_file *avi, UINT32 framenum, UINT8 *cache, bi
 				*dest++ = pixel >> 8;
 			}
 		}
-		
+
 		/* line 17/18 */
 		else if ((effy == 17 || effy == 18) && line1718 != 0)
 		{
@@ -805,7 +805,7 @@ static avi_error fake_avi_frame(avi_file *avi, UINT32 framenum, UINT8 *cache, bi
 				*dest++ = pixel >> 8;
 			}
 		}
-		
+
 		/* anything else in VBI-land */
 		else if (effy < 22)
 		{
@@ -816,7 +816,7 @@ static avi_error fake_avi_frame(avi_file *avi, UINT32 framenum, UINT8 *cache, bi
 				*dest++ = pixel >> 8;
 			}
 		}
-		
+
 		/* everything else */
 		else
 		{
@@ -873,7 +873,7 @@ static int do_createav(int argc, char *argv[], int param)
 	/* print some info */
 	printf("Input file:   %s\n", inputfile);
 	printf("Output file:  %s\n", outputfile);
-	
+
 	/* special AVI files */
 	if (strcmp(inputfile, "2:2") == 0 || strcmp(inputfile, "3:2") == 0)
 	{

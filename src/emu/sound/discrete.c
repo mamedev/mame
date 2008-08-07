@@ -378,7 +378,7 @@ static void discrete_stop(void *chip)
 		int nodenum;
 		osd_ticks_t total = 0;
 		osd_ticks_t tresh;
-		
+
 		/* calculate total time */
 		for (nodenum = 0; nodenum < info->node_count; nodenum++)
 		{
@@ -400,7 +400,7 @@ static void discrete_stop(void *chip)
 		}
 	}
 #endif
-		
+
 	/* close any csv files */
 	for (log_num = 0; log_num < info->num_csvlogs; log_num++)
 		if (info->disc_csv_file[log_num])

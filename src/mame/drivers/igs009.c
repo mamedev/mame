@@ -126,7 +126,7 @@ static VIDEO_UPDATE(jingbell)
 									code + ((x+1) % 4) * 0x100, (code & 0x80) ? 0xc : 0,
 									0, 0,
 									x * 8, ystart + (y * 32 - ((bg_scroll[x + tmap * 0x80] + tmap*0x100/4) & 0xff)) + z * 0x8 * 0x20,
-	//								&myclip, TRANSPARENCY_PEN, 0);
+	//                              &myclip, TRANSPARENCY_PEN, 0);
 									&myclip, TRANSPARENCY_NONE, 0);
 						}
 					}
@@ -170,7 +170,7 @@ static WRITE8_HANDLER( jingbell_nmi_and_coins_w )
 	if ((nmi_enable ^ data) & (~0xdd))
 	{
 		logerror("PC %06X: nmi_and_coins = %02x\n",activecpu_get_pc(),data);
-//		popmessage("%02x",data);
+//      popmessage("%02x",data);
 	}
 
 	coin_counter_w(0,		data & 0x01);	// coin_a
@@ -180,7 +180,7 @@ static WRITE8_HANDLER( jingbell_nmi_and_coins_w )
 
 	set_led_status(6,		data & 0x40);	// led for coin out / hopper active
 
-	nmi_enable = data;	//	data & 0x80		// nmi enable?
+	nmi_enable = data;	//  data & 0x80     // nmi enable?
 
 	out[0] = data;
 	show_out();

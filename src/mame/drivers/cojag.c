@@ -848,7 +848,7 @@ static ADDRESS_MAP_START( m68020_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xf10000, 0xf103ff) AM_READWRITE(jaguar_jerry_regs32_r, jaguar_jerry_regs32_w)
 	AM_RANGE(0xf16000, 0xf1600b) AM_READ(cojag_gun_input_r)	// GPI02
 	AM_RANGE(0xf17000, 0xf17003) AM_READ(status_r)			// GPI03
-//	AM_RANGE(0xf17800, 0xf17803) AM_WRITE(latch_w)			// GPI04
+//  AM_RANGE(0xf17800, 0xf17803) AM_WRITE(latch_w)          // GPI04
 	AM_RANGE(0xf17c00, 0xf17c03) AM_READ_PORT("P1_P2")		// GPI05
 	AM_RANGE(0xf1a100, 0xf1a13f) AM_READWRITE(dspctrl_r, dspctrl_w)
 	AM_RANGE(0xf1a140, 0xf1a17f) AM_READWRITE(jaguar_serial_r, jaguar_serial_w)

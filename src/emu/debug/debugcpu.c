@@ -2576,7 +2576,7 @@ static void expression_write_eeprom(offs_t address, int size, UINT64 data)
 
 /*-------------------------------------------------
     expression_validate - validate that the
-    provided expression references an 
+    provided expression references an
     appropriate name
 -------------------------------------------------*/
 

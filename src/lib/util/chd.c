@@ -831,8 +831,8 @@ core_file *chd_core_file(chd_file *chd)
 
 
 /*-------------------------------------------------
-    chd_error_string - return an error string for 
-    the given CHD error 
+    chd_error_string - return an error string for
+    the given CHD error
 -------------------------------------------------*/
 
 const char *chd_error_string(chd_error err)

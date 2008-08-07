@@ -57,7 +57,7 @@
 
 
 2008-07
-Dip locations and factory settings verified with dip listing 
+Dip locations and factory settings verified with dip listing
 Also, implemented conditional port for Coin Mode (SW1:1)
 
 ***************************************************************************/

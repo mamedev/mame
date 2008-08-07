@@ -307,13 +307,13 @@ static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x106000, 0x106fff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&deco16_pf2_rowscroll)
 
 	/* protection */
-//	AM_RANGE(0x280104, 0x280105) AM_WRITE(SMH_NOP)				// ??
+//  AM_RANGE(0x280104, 0x280105) AM_WRITE(SMH_NOP)              // ??
 	AM_RANGE(0x2800ac, 0x2800ad) AM_READ_PORT("DSW")			// dips
 	AM_RANGE(0x280298, 0x280299) AM_READ_PORT("SYSTEM")			// vbl
 	AM_RANGE(0x280506, 0x280507) AM_READ_PORT("UNK")
 	AM_RANGE(0x2802B4, 0x2802B5) AM_READ_PORT("P1_P2")			// inverted?
-//	AM_RANGE(0x280330, 0x280331) AM_READ(SMH_NOP)				// sound?
-//	AM_RANGE(0x280380, 0x280381) AM_WRITE(SMH_NOP)				// sound
+//  AM_RANGE(0x280330, 0x280331) AM_READ(SMH_NOP)               // sound?
+//  AM_RANGE(0x280380, 0x280381) AM_WRITE(SMH_NOP)              // sound
 
 	AM_RANGE(0x280000, 0x2807ff) AM_READWRITE(dlbewing_prot_r,dblewing_prot_w)
 

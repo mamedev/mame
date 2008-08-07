@@ -7195,7 +7195,7 @@ Notes:
       YM2413 clock   - 3.579545MHz [14.31818/4]
       VSync -  \
       HSync -  / No reading, dead PCB
-      
+
 Z80 x2
 OSC 24MHz, 14.31818MHz, 16MHz
 Oki M6295 + YM2413 + AY-3-8910

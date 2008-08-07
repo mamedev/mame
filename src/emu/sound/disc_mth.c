@@ -986,7 +986,7 @@ static void dst_mixer_step(node_description *node)
 				rTemp = info->r[bit];
 				connected = 1;
 				vTemp = DST_MIXER__IN(bit);
-	
+
 				if (info->rNode[bit])
 				{
 					/* a node has the posibility of being disconnected from the circuit. */
@@ -1021,7 +1021,7 @@ static void dst_mixer_step(node_description *node)
 						}
 					}
 				}
-	
+
 				if (connected)
 				{
 					if (info->c[bit] != 0)
@@ -1040,7 +1040,7 @@ static void dst_mixer_step(node_description *node)
 			{
 				rTemp = info->r[bit];
 				vTemp = DST_MIXER__IN(bit);
-	
+
 				if (info->c[bit] != 0)
 				{
 					/* do input high pass filtering if needed. */
@@ -1050,10 +1050,10 @@ static void dst_mixer_step(node_description *node)
 				i += (((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP) ? info->vRef - vTemp : vTemp) / rTemp;
 			}
 		}
-		
-		if ((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP_WITH_RI) 
+
+		if ((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP_WITH_RI)
 			i += info->vRef / info->rI;
-		
+
 		rTotal = 1.0 / rTotal;
 
 		/* If resistor network or has rI then Millman is used.
@@ -1540,7 +1540,7 @@ INLINE double dst_transform_pop(double *stack,int *pointer)
 INLINE void dst_transform_push(double *stack,int *pointer,double value)
 {
 	//Store THEN increment
-	assert(*pointer < MAX_TRANS_STACK); 
+	assert(*pointer < MAX_TRANS_STACK);
 	stack[(*pointer)++]=value;
 }
 
@@ -1556,7 +1556,7 @@ static void dst_transform_step(node_description *node)
 		node->output[0]=0;
 
 		top = HUGE_VAL;
-		
+
 		while(*fPTR!=0)
 		{
 			switch (*fPTR++)

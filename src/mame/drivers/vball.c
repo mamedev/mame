@@ -342,7 +342,7 @@ static INPUT_PORTS_START (vball2pj)
 	COMMON_PORTS_BEFORE
 
 	/* The 2-player roms have the game-time in the difficulty spot, and
-	   I've assumed vice-versa. (VS the instructions scanned in Naz's dump) */
+       I've assumed vice-versa. (VS the instructions scanned in Naz's dump) */
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, "Single Player Game Time")

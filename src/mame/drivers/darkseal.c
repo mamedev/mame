@@ -8,9 +8,9 @@
 
     Emulation by Bryan McPhail, mish@tendril.co.uk
 
-	2008-08
-	Dip locations verified with the manual.
-	
+    2008-08
+    Dip locations verified with the manual.
+
 ***************************************************************************/
 
 #include "driver.h"

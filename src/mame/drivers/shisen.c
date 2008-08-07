@@ -408,8 +408,8 @@ ROMs  : (All ROMs type 27C512)
 
 1.2C     Sound Program
 
-2.11D  \     
-3.11C  / Main Program 
+2.11D  \
+3.11C  / Main Program
 
 4.3J   \
 5.4J   |

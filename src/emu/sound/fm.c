@@ -684,7 +684,7 @@ static INT32	out_delta[4];	/* channel output NONE,LEFT,RIGHT or CENTER for YM260
 static UINT32	LFO_AM;			/* runtime LFO calculations helper */
 static INT32	LFO_PM;			/* runtime LFO calculations helper */
 
-static int fn_max;    /* maximal phase increment (used for phase overflow) */ 
+static int fn_max;    /* maximal phase increment (used for phase overflow) */
 
 /* log output level */
 #define LOG_ERR  3      /* ERROR       */
@@ -1297,7 +1297,7 @@ INLINE void update_phase_lfo_slot(FM_OPN *OPN, FM_SLOT *SLOT, INT32 pms, UINT32 
 
 		/* phase increment counter */
 		fc = (OPN->fn_table[fn]>>(7-blk)) + SLOT->DT[kc];
-	        
+
 		/* detects frequency overflow (credits to Nemesis) */
 		if (fc < 0) fc += fn_max;
 
@@ -1327,7 +1327,7 @@ INLINE void update_phase_lfo_channel(FM_OPN *OPN, FM_CH *CH)
 
 	        blk = (block_fnum&0x7000) >> 12;
 	        fn  = block_fnum & 0xfff;
-	        
+
 		/* keyscale code */
 	        kc = (blk<<2) | opn_fktable[fn >> 8];
 
@@ -1771,7 +1771,7 @@ static void OPNSetPres(FM_OPN *OPN, int pres, int timer_prescaler, int SSGpres)
 	}
 
 	/* maximal frequency, used for overflow, best setting with BLOCK=5 (notaz) */
-	fn_max = ((UINT32)((double)OPN->fn_table[0x7ff*2] / OPN->ST.freqbase) >> 2); 
+	fn_max = ((UINT32)((double)OPN->fn_table[0x7ff*2] / OPN->ST.freqbase) >> 2);
 
 	/* LFO freq. table */
 	for(i = 0; i < 8; i++)
