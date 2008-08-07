@@ -252,7 +252,7 @@ void sfx_sh_init(void)
     2x 74LS393 quad 4bit counters to address roms
     1x 74LS174 hex-d-flipflops to latch control byte
     2x 74LS139 decoder to decode rom selects
-    1x 74LS161 8bit input multiplexor to select sound bit from rom data
+    1x 74LS161 8bit input multiplexor to select sound bit for rom data read
     1x 74LS00  quad nand to decode signals (unknown) to latch control byte
                ==> 74LS139
     1x 74LS16  quad open collector inverters
@@ -265,8 +265,8 @@ void sfx_sh_init(void)
     Q0      ==> NC
     Q1      ==> PDC
     Q2      ==> CTL2/CTL8 (Speak/Reset)
-    Q7      ==> Reset Counters (LS393)
-    Q8      ==> Trigger Logic
+    Q6      ==> Reset Counters (LS393)
+    Q7      ==> Trigger Logic
 
   ***************************************************************************/
 
