@@ -309,7 +309,7 @@ static TIMER_CALLBACK( ad2083_step )
 	 * static const int prom[16] = {0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00,
 	 *		        0x02, 0x00, 0x40, 0x00, 0x04, 0x06, 0x04, 0x84 };
      */
-	UINT8 *prom = memory_region(machine, "user1"); 
+	UINT8 *prom = memory_region(machine, "tms5110_ctrl"); 
 	UINT8 ctrl;
 
 	if (param == 0)
