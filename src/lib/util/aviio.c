@@ -863,6 +863,13 @@ avi_error avi_read_sound_samples(avi_file *file, int channel, UINT32 firstsample
 			chunkbase = chunkend;
 		}
 
+		/* if we hit the end, fill the rest with silence */
+		if (chunknum == stream->chunks)
+		{
+			memset(output, 0, numsamples * 2);
+			break;
+		}
+
 		/* expand the tempbuffer to hold the data if necessary */
 		avierr = expand_tempbuffer(file, stream->chunk[chunknum].length);
 		if (avierr != AVIERR_NONE)

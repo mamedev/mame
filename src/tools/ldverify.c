@@ -310,7 +310,7 @@ static void verify_video(int frame, bitmap_t *bitmap)
 		
 		/* output status */
 		if (frame % 10 == 0 && fieldnum == 0)
-			printf("%6d.%d...\r", frame, fieldnum);
+			fprintf(stderr, "%6d.%d...\r", frame, fieldnum);
 		
 		/* parse the VBI data */
 		vbi_parse_all(BITMAP_ADDR16(bitmap, fieldnum, 0), bitmap->rowpixels * 2, bitmap->width, 8, &metadata);
@@ -371,14 +371,16 @@ static void verify_video(int frame, bitmap_t *bitmap)
 			/* if this is the first frame, make sure it's 1 */
 			if (video_last_frame == -1)
 			{
-			    if (framenum == 1)
+			    if (framenum == 0)
+    				printf("%6d.%d: detected frame 0\n", frame, fieldnum);
+			    else if (framenum == 1)
     				printf("%6d.%d: detected frame 1\n", frame, fieldnum);
 			    else
-    				printf("%6d.%d: first frame number is not 1 (%d) (ERROR)\n", frame, fieldnum, framenum);
+    				printf("%6d.%d: first frame number is not 0 or 1 (%d) (ERROR)\n", frame, fieldnum, framenum);
     	    }
 
-			/* print an update every 1000 frames */
-			if (framenum % 1000 == 0)
+			/* print an update every 10000 frames */
+			if (framenum != 0 && framenum % 10000 == 0)
    				printf("%6d.%d: detected frame %d\n", frame, fieldnum, framenum);
 			
 			/* if this frame is not consecutive, it's an error */
@@ -464,6 +466,10 @@ static void verify_video_final(int frame, bitmap_t *bitmap)
 {
 	int fields_per_frame = (bitmap->height >= 288) ? 2 : 1;
 	int field = frame * fields_per_frame;
+	
+	/* did we ever see any white flags? */
+	if (video_first_whitefield == -1)
+		printf("Track %6d.%d: never saw any white flags; no cadence detection done (WARNING)\n", field / fields_per_frame, 0);
 
     /* did we ever see any lead-out? */
 	if (video_saw_leadin && !video_saw_leadout)

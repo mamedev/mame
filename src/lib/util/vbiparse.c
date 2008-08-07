@@ -16,6 +16,14 @@
 
 
 /***************************************************************************
+    DEBUGGING
+***************************************************************************/
+
+#define PRINTF_WHITE_FLAG	0
+
+
+
+/***************************************************************************
     CONSTANTS
 ***************************************************************************/
 
@@ -169,25 +177,98 @@ int vbi_parse_manchester_code(const UINT16 *source, int sourcewidth, int sources
 
 int vbi_parse_white_flag(const UINT16 *source, int sourcewidth, int sourceshift)
 {
+	int histo[256] = { 0 };
 	int minval = 0xff;
 	int maxval = 0x00;
-	int avgval = 0x00;
-	int diff;
+	int subtract;
+	int peakval;
+	int result;
 	int x;
-
-	/* compute minimum, maximum, and average values across the line */
+	
+	/* compute a histogram of values */
 	for (x = 0; x < sourcewidth; x++)
 	{
 		UINT8 yval = source[x] >> sourceshift;
-		minval = MIN(yval, minval);
-		maxval = MAX(yval, maxval);
-		avgval += yval;
+		histo[yval]++;
 	}
-	avgval /= sourcewidth;
-	diff = maxval - minval;
+	
+	/* remove the lowest 1% of the values to account for noise and determine the minimum */
+	subtract = sourcewidth / 100;
+	for (minval = 0; minval < 255; minval++)
+		if ((subtract -= histo[minval]) < 0)
+			break;
 
-	/* if there's a spread of at least 0x20, and the average is above 3/4 of the center, call it good */
-	return (diff >= 0x20) && (avgval >= minval + 3 * diff / 4);
+	/* remove the highest 1% of the values to account for noise and determine the maximum */
+	subtract = sourcewidth / 100;
+	for (maxval = 255; maxval > 0; maxval--)
+		if ((subtract -= histo[maxval]) < 0)
+			break;
+
+	/* this is useful for debugging issues with white flag detection */
+	if (PRINTF_WHITE_FLAG)
+	{
+		printf("Histo: min=%02X max=%02X\n", minval, maxval);
+		for (x = 0; x < 256; x++)
+			if (histo[x] != 0) printf("%dx%02X\n", histo[x], x);
+	}
+	
+	/* ignore if we have no dynamic range */
+	if (maxval - minval < 10)
+	{
+		if (PRINTF_WHITE_FLAG)
+			printf("White flag NOT detected; threshold too low\n");
+		return FALSE;
+	}
+		
+	/*
+		At this point, there are two approaches that have been tried:
+		
+		1. Find the peak value and call it white if the peak is above
+		   the 90% line
+		   
+		2. Ignore the first and last 20% of the line and count how
+		   many pixels are above some threshold (75% line was used).
+		   Call it white if at least 80% of the pixels are above
+		   the threshold.
+		   
+		Both approaches agree 99% of the time, but the first tends to
+		be more correct when there is a discrepancy.
+	*/
+
+	/* determine where the peak is */
+	peakval = 0;
+	for (x = 1; x < 256; x++)
+		if (histo[x] > histo[peakval])
+			peakval = x;
+	
+	/* return TRUE if it is above the 90% mark */
+	result = (peakval > minval + 9 * (maxval - minval) / 10);
+	if (PRINTF_WHITE_FLAG)
+		printf("White flag %s: peak=%02X thresh=%02X\n", result ? "detected" : "NOT detected", peakval, minval + 9 * (maxval - minval) / 10);
+	return result;
+
+#ifdef UNUSED_CODE
+{
+	int above = 0;
+	int thresh;
+
+	/* alternate approach: */
+	
+	/* ignore the first 1/5 and last 1/5 of the line for the remaining computations */
+	source += sourcewidth / 5;
+	sourcewidth -= 2 * (sourcewidth / 5);
+
+	/* count how many values were above the 75% mark of the range */
+	thresh = minval + 3 * (maxval - minval) / 4;
+	for (x = 0; x < sourcewidth; x++)
+	{
+		UINT8 yval = source[x] >> sourceshift;
+		above += (yval >= thresh);
+	}
+	/* if at least 80% of the pixels are above the threshold, we'll call it white */
+	return ((above * 100) / sourcewidth >= 80);
+}
+#endif
 }
 
 
