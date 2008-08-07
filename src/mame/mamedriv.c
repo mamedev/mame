@@ -2238,7 +2238,7 @@ V-V                           TP-027
 	/* Williams games */
 	DRIVER( defender )	/* (c) 1980 */
 	DRIVER( defendg )	/* (c) 1980 */
-	DRIVER( defendw )	/* (c) 1980 */
+	DRIVER( defendb )	/* (c) 1980 */
 	DRIVER( defndjeu )	/* bootleg */
 	DRIVER( tornado1 )	/* bootleg */
 	DRIVER( tornado2 )	/* bootleg */
