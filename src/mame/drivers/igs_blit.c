@@ -541,6 +541,55 @@ static void vbowlj_decrypt(running_machine *machine)
 	  }
 }
 
+static void dbc_decrypt(running_machine *machine)
+{
+	int i;
+	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
+
+	int rom_size = 0x80000;
+
+	for (i=0; i<rom_size/2; i++)
+	{
+		UINT16 x = src[i];
+
+		if( i & 0x1000/2 )
+		{
+			if( ~i & 0x400/2 )
+				x ^= 0x0002;
+		}
+
+		if( i & 0x4000/2 )
+		{
+			if( i & 0x100/2 )
+			{
+				if( ~i & 0x08/2 )
+					x ^= 0x2000;
+			}
+			else
+			{
+				if( ~i & 0x28/2 )
+					x ^= 0x2000;
+			}
+		}
+		else
+		{
+			x ^= 0x2000;
+		}
+
+		if( i & 0x200/2 )
+		{
+			x ^= 0x0400;
+		}
+		else
+		{
+			if( (i & 0x80/2) == 0x80/2 || (i & 0x24/2) == 0x24/2 )
+				x ^= 0x0400;
+		}
+
+		src[i] = (x << 8) | (x >> 8);
+	}
+}
+
 // To do:
 #ifdef UNUSED_FUNCTION
 void vbowl_decrypt(running_machine *machine)
@@ -2702,7 +2751,12 @@ static DRIVER_INIT( xymg )
 	rom[0x64836/2]	=	0x6036;		// 064836: 6736         beq 6486e (fills palette with red otherwise)
 }
 
+static DRIVER_INIT( dbc )
+{
+	dbc_decrypt(machine);
 
+	//no protection ?
+}
 
 /***************************************************************************
 
@@ -3028,7 +3082,7 @@ ROM_END
 GAME( 1995, lhb,      0,        lhb,      lhb,      lhb,      ROT0, "IGS",        "Long Hu Bang (set 1)",            0 )
 // the screenshot in the zip shows a 1995 copyright, but only 199 is displayed in MAME?  todo: verify protection patch is correct for this set
 GAME( 1995, lhba,     lhb,      lhb,      lhb,      lhb,      ROT0, "IGS",        "Long Hu Bang (set 2)",            0 )
-GAME( 199?, dbc,      0,        lhb,      lhb,      0,        ROT0, "IGS",        "Da Ban Cheng",                    GAME_NOT_WORKING ) // needs decrypting / prot patches
+GAME( 199?, dbc,      0,        lhb,      lhb,      dbc,      ROT0, "IGS",        "Da Ban Cheng",                    GAME_NOT_WORKING )
 GAME( 1995, chindrag, drgnwrld, chindrag, chindrag, chindrag, ROT0, "IGS / ALTA", "Zhong Guo Long (Japan, V021J)",   0 )
 GAME( 1995, chugokur, drgnwrld, chindrag, chindrag, chugokur, ROT0, "IGS / ALTA", "Zhong Guo Long (Japan, V020J)",   0 )
 GAME( 1996, chmplst2, 0,        chmplst2, chmplst2, chmplst2, ROT0, "IGS",        "Long Hu Bang II",                 GAME_IMPERFECT_GRAPHICS )
