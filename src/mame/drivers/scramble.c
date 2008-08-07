@@ -2913,14 +2913,14 @@ ROM_START( ad2083 )
 	ROM_LOAD( "ad5.3k",       0x2000, 0x2000, CRC(f53f3449) SHA1(0711f2e47504f256d46eea1e225e35f9bde8b9fb) )
 
 	ROM_REGION( 0x2000, "tms5110", 0 ) /* data for the TMS5110 speech chip */
-	ROM_LOAD( "ad1v.9a",      0x0000, 0x1000, BAD_DUMP CRC(4cb93fff) SHA1(2cc686a9a58a85f2bb04fb6ced4626e9952635bb) )
-	ROM_LOAD( "ad2v.10a",     0x1000, 0x1000, BAD_DUMP CRC(4b530ea7) SHA1(8793b3497b598f33b34bf9524e360c6c62e8001d) )
+	ROM_LOAD( "ad1v.9a",      0x0000, 0x1000, CRC(4cb93fff) SHA1(2cc686a9a58a85f2bb04fb6ced4626e9952635bb) )
+	ROM_LOAD( "ad2v.10a",     0x1000, 0x1000, CRC(4b530ea7) SHA1(8793b3497b598f33b34bf9524e360c6c62e8001d) )
 
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "prom-am27s19dc.1m", 0x0000, 0x0020, CRC(2759aebd) SHA1(644fd2c95ca49cbbc0ee1b88ca2563451ddd4fe0) )
 
 	ROM_REGION( 0x0020, "user1", 0 ) /* sample related? near TMS5110 and sample roms */
-	ROM_LOAD( "prom-sn74s188.8a",  0x0000, 0x0020, BAD_DUMP CRC(5e395112) SHA1(427d6a5b5d0837db4bf804f392d77ba5a86ffd72) )
+	ROM_LOAD( "prom-sn74s188.8a",  0x0000, 0x0020, CRC(5e395112) SHA1(427d6a5b5d0837db4bf804f392d77ba5a86ffd72) )
 ROM_END
 
 
