@@ -5103,6 +5103,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ccastle3 )	/* 136022           (c) 1983 */
 	DRIVER( ccastle2 )	/* 136022           (c) 1983 */
 	DRIVER( ccastle1 )	/* 136022           (c) 1983 */
+	DRIVER( ccastlej )	/* 136022           (c) 1983 */
 	DRIVER( cloak )		/* 136023           (c) 1983 */
 	DRIVER( cloaksp )	/* 136023           (c) 1983 */
 	DRIVER( cloakfr )	/* 136023           (c) 1983 */
