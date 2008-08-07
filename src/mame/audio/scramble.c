@@ -301,11 +301,15 @@ static UINT8 speech_cnt;
 
 static TIMER_CALLBACK( ad2083_step )
 {
-	/* only 16 bytes needed ... Stored here since
-     * prom is a bad dump
+	/* only 16 bytes needed ... The original dump is bad. This
+	 * is what is needed to get speech to work. The prom data has
+	 * been updated and marked as BAD_DUMP. The information below 
+	 * is given for reference once another dump should surface.
+     *
+	 * static const int prom[16] = {0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00,
+	 *		        0x02, 0x00, 0x40, 0x00, 0x04, 0x06, 0x04, 0x84 };
      */
-	static const int prom[16] = {0x00, 0x00, 0x02, 0x00, 0x00, 0x02, 0x00, 0x00,
-			        0x02, 0x00, 0x40, 0x00, 0x04, 0x06, 0x04, 0x84 };
+	UINT8 *prom = memory_region(machine, "user1"); 
 	UINT8 ctrl;
 
 	if (param == 0)
