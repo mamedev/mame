@@ -2436,22 +2436,40 @@ static void menu_cheat(running_machine *machine, ui_menu *menu, void *parameter,
 	if (event != NULL && event->itemref != NULL)
 	{
 		int changed = FALSE;
-
-		switch (event->iptkey)
+		
+		/* handle reset all */
+		if ((FPTR)event->itemref == 1 && event->iptkey == IPT_UI_SELECT)
 		{
-			/* if selected, reset to default value */
-			case IPT_UI_SELECT:
-				break;
+			void *curcheat;
+			for (curcheat = cheat_get_next_menu_entry(machine, NULL, NULL, NULL, NULL); 
+				 curcheat != NULL; 
+				 curcheat = cheat_get_next_menu_entry(machine, curcheat, NULL, NULL, NULL))
+			{
+				changed |= cheat_select_default_state(machine, curcheat);
+			}
+		}
+		
+		/* handle individual cheats */
+		else if ((FPTR)event->itemref > 1)
+		{
+			switch (event->iptkey)
+			{
+				/* if selected, reset to default value or activate a oneshot */
+				case IPT_UI_SELECT:
+					changed = cheat_select_default_state(machine, event->itemref);
+					changed |= cheat_activate(machine, event->itemref);
+					break;
 
-			/* left decrements */
-			case IPT_UI_LEFT:
-				changed = cheat_select_previous_state(machine, event->itemref);
-				break;
+				/* left decrements */
+				case IPT_UI_LEFT:
+					changed = cheat_select_previous_state(machine, event->itemref);
+					break;
 
-			/* right increments */
-			case IPT_UI_RIGHT:
-				changed = cheat_select_next_state(machine, event->itemref);
-				break;
+				/* right increments */
+				case IPT_UI_RIGHT:
+					changed = cheat_select_next_state(machine, event->itemref);
+					break;
+			}
 		}
 
 		/* if things changed, update */
@@ -2478,6 +2496,9 @@ static void menu_cheat_populate(running_machine *machine, ui_menu *menu)
 	{
 		ui_menu_item_append(menu, text, subtext, flags, curcheat);
 	}
+	
+	/* add a reset all option */
+	ui_menu_item_append(menu, "Reset All", NULL, 0, (void *)1);
 }
 
 

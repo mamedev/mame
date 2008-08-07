@@ -40,6 +40,11 @@
 #define EXPRERR_INVALID_PARAM_COUNT			(12)
 #define EXPRERR_UNBALANCED_QUOTES			(13)
 #define EXPRERR_TOO_MANY_STRINGS			(14)
+#define EXPRERR_INVALID_MEMORY_SIZE			(15)
+#define EXPRERR_INVALID_MEMORY_SPACE		(16)
+#define EXPRERR_NO_SUCH_MEMORY_SPACE		(17)
+#define EXPRERR_INVALID_MEMORY_NAME			(18)
+#define EXPRERR_MISSING_MEMORY_NAME			(19)
 
 /* values for the address space passed to external_read/write_memory */
 #define EXPSPACE_PROGRAM					(0)
@@ -76,12 +81,20 @@
 #define MAKE_EXPRERR_INVALID_PARAM_COUNT(x)	MAKE_EXPRERR(EXPRERR_INVALID_PARAM_COUNT, (x))
 #define MAKE_EXPRERR_UNBALANCED_QUOTES(x)	MAKE_EXPRERR(EXPRERR_UNBALANCED_QUOTES, (x))
 #define MAKE_EXPRERR_TOO_MANY_STRINGS(x)	MAKE_EXPRERR(EXPRERR_TOO_MANY_STRINGS, (x))
+#define MAKE_EXPRERR_INVALID_MEMORY_SIZE(x) MAKE_EXPRERR(EXPRERR_INVALID_MEMORY_SIZE, (x))
+#define MAKE_EXPRERR_NO_SUCH_MEMORY_SPACE(x) MAKE_EXPRERR(EXPRERR_NO_SUCH_MEMORY_SPACE, (x))
+#define MAKE_EXPRERR_INVALID_MEMORY_SPACE(x) MAKE_EXPRERR(EXPRERR_INVALID_MEMORY_SPACE, (x))
+#define MAKE_EXPRERR_INVALID_MEMORY_NAME(x)	MAKE_EXPRERR(EXPRERR_INVALID_MEMORY_NAME, (x))
 
 
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+/* EXPRERR is an error code for expression evaluation */
+typedef UINT32 EXPRERR;
+
 
 /* callback functions for getting/setting a symbol value */
 typedef UINT64 (*symbol_getter_func)(void *ref);
@@ -93,6 +106,7 @@ typedef UINT64 (*function_execute_func)(void *ref, UINT32 numparams, const UINT6
 /* callback function for memory reads/writes */
 typedef UINT64 (*express_read_func)(const char *name, int space, UINT32 offset, int size);
 typedef void (*express_write_func)(const char *name, int space, UINT32 offset, int size, UINT64 value);
+typedef EXPRERR (*express_valid_func)(const char *name, int space);
 
 
 /* callback parameter for executing expressions */
@@ -101,6 +115,7 @@ struct _express_callbacks
 {
 	express_read_func	read;					/* read callback */
 	express_write_func	write;					/* write callback */
+	express_valid_func	valid;					/* validation callback */
 };
 
 
@@ -143,10 +158,6 @@ typedef struct _symbol_table symbol_table;
 
 /* parsed_expression is an opaque structure for holding a pre-parsed expression */
 typedef struct _parsed_expression parsed_expression;
-
-
-/* EXPRERR is an error code for expression evaluation */
-typedef UINT32 EXPRERR;
 
 
 

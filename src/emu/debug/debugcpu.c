@@ -108,6 +108,7 @@ static void expression_write_address_space(int cpuindex, int space, offs_t addre
 static void expression_write_program_direct(int cpuindex, int opcode, offs_t address, int size, UINT64 data);
 static void expression_write_memory_region(const char *rgntag, offs_t address, int size, UINT64 data);
 static void expression_write_eeprom(offs_t address, int size, UINT64 data);
+static EXPRERR expression_validate(const char *name, int space);
 
 /* variable getters/setters */
 static UINT64 get_wpaddr(void *ref);
@@ -132,7 +133,8 @@ static void set_cpu_reg(void *ref, UINT64 value);
 const express_callbacks debug_expression_callbacks =
 {
 	expression_read_memory,
-	expression_write_memory
+	expression_write_memory,
+	expression_validate
 };
 
 
@@ -2569,6 +2571,51 @@ static void expression_write_eeprom(offs_t address, int size, UINT64 data)
 		}
 		global.memory_modified = TRUE;
 	}
+}
+
+
+/*-------------------------------------------------
+    expression_validate - validate that the
+    provided expression references an 
+    appropriate name
+-------------------------------------------------*/
+
+static EXPRERR expression_validate(const char *name, int space)
+{
+	int cpuindex;
+
+	switch (space)
+	{
+		case EXPSPACE_PROGRAM:
+		case EXPSPACE_DATA:
+		case EXPSPACE_IO:
+			cpuindex = (name != NULL) ? mame_find_cpu_index(Machine, name) : cpu_getactivecpu();
+			if (cpuindex < 0)
+				return (name == NULL) ? EXPRERR_MISSING_MEMORY_NAME : EXPRERR_INVALID_MEMORY_NAME;
+			if (cpunum_addrbus_width(cpuindex, ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM)) == 0)
+				return EXPRERR_NO_SUCH_MEMORY_SPACE;
+			break;
+
+		case EXPSPACE_OPCODE:
+		case EXPSPACE_RAMWRITE:
+			cpuindex = (name != NULL) ? mame_find_cpu_index(Machine, name) : cpu_getactivecpu();
+			if (cpuindex < 0)
+				return (name == NULL) ? EXPRERR_MISSING_MEMORY_NAME : EXPRERR_INVALID_MEMORY_NAME;
+			break;
+
+		case EXPSPACE_EEPROM:
+			if (name != NULL)
+				return EXPRERR_INVALID_MEMORY_NAME;
+			break;
+
+		case EXPSPACE_REGION:
+			if (name == NULL)
+				return EXPRERR_MISSING_MEMORY_NAME;
+			if (memory_region(Machine, name) == NULL)
+				return EXPRERR_INVALID_MEMORY_NAME;
+			break;
+	}
+	return EXPRERR_NONE;
 }
 
 

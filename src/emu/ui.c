@@ -437,6 +437,12 @@ void ui_update_and_render(running_machine *machine)
 	assert(ui_handler_callback != NULL);
 	ui_handler_param = (*ui_handler_callback)(machine, ui_handler_param);
 
+	/* display any popup messages */
+	if (osd_ticks() < popup_text_end)
+		ui_draw_text_box(astring_c(messagebox_text), JUSTIFY_CENTER, 0.5f, 0.9f, messagebox_backcolor);
+	else
+		popup_text_end = 0;
+
 	/* cancel takes us back to the ingame handler */
 	if (ui_handler_param == UI_HANDLER_CANCEL)
 		ui_set_handler(handler_ingame, 0);
@@ -1238,16 +1244,6 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 	/* draw the profiler if visible */
 	if (show_profiler)
 		ui_draw_text_full(profiler_get_text(), 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
-
-	/* let the cheat engine display its stuff */
-//  if (options_get_bool(mame_options(), OPTION_CHEAT))
-//      cheat_display_watches(machine);
-
-	/* display any popup messages */
-	if (osd_ticks() < popup_text_end)
-		ui_draw_text_box(astring_c(messagebox_text), JUSTIFY_CENTER, 0.5f, 0.9f, messagebox_backcolor);
-	else
-		popup_text_end = 0;
 
 	/* if we're single-stepping, pause now */
 	if (single_step)

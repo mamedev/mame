@@ -321,8 +321,17 @@ void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const 
 	if (description != NULL)
 		*description = astring_c(cheat->description);
 	
+	/* if we have no parameter and no run or off script, it's a oneshot cheat */
+	if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL)
+	{
+		if (state != NULL)
+			*state = "Activate";
+		if (flags != NULL)
+			*flags = 0;
+	}
+	
 	/* if we have no parameter, it's just on/off */
-	if (cheat->parameter == NULL)
+	else if (cheat->parameter == NULL)
 	{
 		if (state != NULL)
 			*state = (cheat->state == SCRIPT_STATE_RUN) ? "On" : "Off";
@@ -374,6 +383,67 @@ void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const 
 
 
 /*-------------------------------------------------
+	cheat_activate - activate a oneshot cheat
+-------------------------------------------------*/
+
+int cheat_activate(running_machine *machine, void *entry)
+{
+	cheat_private *cheatinfo = machine->cheat_data;
+	cheat_entry *cheat = entry;
+	int changed = FALSE;
+	
+	/* if we have no parameter and no run or off script, it's a oneshot cheat */
+	if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL)
+	{
+		cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
+		changed = TRUE;
+		popmessage("Activated %s", astring_c(cheat->description));
+	}
+	return changed;
+}
+
+
+/*-------------------------------------------------
+	cheat_select_default_state - select the
+	default state for a cheat, or activate a
+	oneshot cheat
+-------------------------------------------------*/
+
+int cheat_select_default_state(running_machine *machine, void *entry)
+{
+	cheat_private *cheatinfo = machine->cheat_data;
+	cheat_entry *cheat = entry;
+	int changed = FALSE;
+	
+	/* if we have no parameter and no run or off script, it's a oneshot cheat */
+	if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL)
+		;
+	
+	/* if we have no parameter, it's just on/off; default to off */
+	else if (cheat->parameter == NULL)
+	{
+		if (cheat->state != SCRIPT_STATE_OFF)
+		{
+			cheat->state = SCRIPT_STATE_OFF;
+			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_OFF);
+			changed = TRUE;
+		}
+	}
+	
+	/* if we have a value parameter, fall back to the default */
+	else
+	{
+		if (cheat->parameter->value != cheat->parameter->defval)
+		{
+			cheat->parameter->value = cheat->parameter->defval;
+			changed = TRUE;
+		}
+	}
+	return changed;
+}
+
+
+/*-------------------------------------------------
 	cheat_select_previous_state - select the
 	previous state for a cheat
 -------------------------------------------------*/
@@ -384,8 +454,12 @@ int cheat_select_previous_state(running_machine *machine, void *entry)
 	cheat_entry *cheat = entry;
 	int changed = FALSE;
 	
+	/* if we have no parameter and no run or off script, it's a oneshot cheat */
+	if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL)
+		;
+	
 	/* if we have no parameter, it's just on/off */
-	if (cheat->parameter == NULL)
+	else if (cheat->parameter == NULL)
 	{
 		if (cheat->state != SCRIPT_STATE_OFF)
 		{
@@ -439,8 +513,12 @@ int cheat_select_next_state(running_machine *machine, void *entry)
 	cheat_entry *cheat = entry;
 	int changed = FALSE;
 	
+	/* if we have no parameter and no run or off script, it's a oneshot cheat */
+	if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL)
+		;
+	
 	/* if we have no parameter, it's just on/off */
-	if (cheat->parameter == NULL)
+	else if (cheat->parameter == NULL)
 	{
 		if (cheat->state != SCRIPT_STATE_RUN)
 		{

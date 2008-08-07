@@ -38,6 +38,12 @@ void cheat_render_text(running_machine *machine);
 /* return data about the next menu entry, or the first entry if previous == NULL */
 void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const char **description, const char **state, UINT32 *flags);
 
+/* activate a oneshot cheat */
+int cheat_activate(running_machine *machine, void *entry);
+
+/* select the default menu state */
+int cheat_select_default_state(running_machine *machine, void *entry);
+
 /* select the previous menu state */
 int cheat_select_previous_state(running_machine *machine, void *entry);
 
