@@ -6342,7 +6342,7 @@ GAME( 1991, cottonu,  cotton,   system16b,      cotton,   generic_5704,  ROT0,  
 GAME( 1991, cottonj,  cotton,   system16b,      cotton,   generic_5704,  ROT0,   "Sega / Success", "Cotton (set 1, Japan, FD1094 317-0179a)", 0 )
 GAME( 1989, ddux,     0,        system16b,      ddux,     generic_5521,  ROT0,   "Sega",           "Dynamite Dux (set 2, FD1094 317-0096)", 0 )
 GAME( 1989, ddux1,    ddux,     system16b_8751, ddux,     ddux_5704,     ROT0,   "Sega",           "Dynamite Dux (set 1, 8751 317-0095)", 0 )
-GAME( 1986, dunkshot, 0,        timescan,       dunkshot, dunkshot_5358, ROT0,   "Sega",           "Dunk Shot (FD1089 317-0022)", 0 )
+GAME( 1986, dunkshot, 0,        timescan,       dunkshot, dunkshot_5358, ROT0,   "Sega",           "Dunk Shot (FD1089A 317-0022)", 0 )
 GAME( 1989, eswat,    0,        system16b,      eswat,    generic_5797,  ROT0,   "Sega",           "E-Swat - Cyber Police (set 3, World, FD1094 317-0130)", 0 )
 GAME( 1989, eswatu,   eswat,    system16b,      eswat,    generic_5797,  ROT0,   "Sega",           "E-Swat - Cyber Police (set 2, US, FD1094 317-0129)", 0 )
 GAME( 1989, eswatj,   eswat,    system16b,      eswat,    generic_5797,  ROT0,   "Sega",           "E-Swat - Cyber Police (set 1, Japan, FD1094 317-0128)", 0 )
