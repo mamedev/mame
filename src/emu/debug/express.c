@@ -532,7 +532,7 @@ static EXPRERR parse_memory_operator(parsed_expression *expr, int offset, const 
 	dot = strrchr(buffer, '.');
 	if (dot != NULL)
 	{
-		UINT16 index;
+		UINT16 index = 0;
 
 		namestring = add_expression_string(expr, buffer, dot - buffer, &index);
 		if (namestring == NULL)
