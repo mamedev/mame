@@ -1118,6 +1118,7 @@ src/mame/audio/leland.c svneol=native#text/plain
 src/mame/audio/llander.c svneol=native#text/plain
 src/mame/audio/m72.c svneol=native#text/plain
 src/mame/audio/m72.h svneol=native#text/plain
+src/mame/audio/madalien.c svneol=native#text/plain
 src/mame/audio/mario.c svneol=native#text/plain
 src/mame/audio/mcr.c svneol=native#text/plain
 src/mame/audio/mcr.h svneol=native#text/plain

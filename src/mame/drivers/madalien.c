@@ -71,11 +71,11 @@ static READ8_HANDLER(madalien_sound_command_r )
 
 static WRITE8_HANDLER( madalien_portA_w )
 {
-	/* not emulated - amplification? */
+	discrete_sound_w(machine, MADALIEN_8910_PORTA, data);
 }
 static WRITE8_HANDLER( madalien_portB_w )
 {
-	/* not emulated - motor sound? */
+	discrete_sound_w(machine, MADALIEN_8910_PORTB, data);
 }
 
 
@@ -190,7 +190,14 @@ static MACHINE_DRIVER_START( madalien )
 
 	MDRV_SOUND_ADD("ay", AY8910, SOUND_CLOCK / 4)
 	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
+	MDRV_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
+	MDRV_SOUND_ROUTE_EX(1, "discrete", 1.0, 1)
+	MDRV_SOUND_ROUTE_EX(2, "discrete", 1.0, 2)
+
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(madalien)
+
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -265,5 +272,5 @@ ROM_END
 
 
 /*          set       parent    machine   inp       init */
-GAME( 1980, madalien, 0,        madalien, madalien, 0, ROT270, "Data East Corporation", "Mad Alien", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1980, madalina, madalien, madalien, madalien, 0, ROT270, "Data East Corporation", "Mad Alien (Highway Chase)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1980, madalien, 0,        madalien, madalien, 0, ROT270, "Data East Corporation", "Mad Alien", GAME_SUPPORTS_SAVE )
+GAME( 1980, madalina, madalien, madalien, madalien, 0, ROT270, "Data East Corporation", "Mad Alien (Highway Chase)", GAME_SUPPORTS_SAVE )
