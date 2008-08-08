@@ -1675,7 +1675,7 @@ ROM_START( defendw )
 	ROM_LOAD( "rom8.bin",     0x11000, 0x0800, CRC(5227fc0b) SHA1(1e6fd398b5beef0be58667f1f0a789a76edd5eb9) )
 	ROM_LOAD( "rom11.bin",    0x11800, 0x0800, CRC(d068f0c5) SHA1(d32a4232756ca05972780cb35b0add12b31e8283) )
 	ROM_LOAD( "rom7.bin",     0x12000, 0x0800, CRC(fef4cb77) SHA1(96202e97f3392bc043a252e78d1c42b51c38d269) )
-	ROM_LOAD( "rom10.bin",    0x12800, 0x0800, BAD_DUMP CRC(49b50b40) SHA1(91cf841271a2f7d06f81477b4a450eb4580c7ca5) ) // hand-repaired with startrkd rom
+	ROM_LOAD( "rom10.bin",    0x12800, 0x0800, CRC(49b50b40) SHA1(91cf841271a2f7d06f81477b4a450eb4580c7ca5) ) // hand-repaired with startrkd rom, but should be good
 	ROM_LOAD( "rom6.bin",     0x16000, 0x0800, CRC(43d42a1b) SHA1(b13d59940646451c00b49bbe4a41b9e2df4d7758) )
 
 	ROM_REGION( 0x10000, "sound", 0 )
