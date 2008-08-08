@@ -22,7 +22,12 @@ standard Konami sound hardware of that era (slave Z80 + 2xAY-3-8910).
 Also, the Konami design includes an optional starfield generator, only used
 by Tactician.
 
-Rally X has a chip that appears to be DIP28 Fujitsu MB884x with 2K internal ROM stamped NVC285
+Rally X has two Namco customs. They are nothing more than simple logic and can
+be replaced by daughter boards with TTL parts.
+NVC285 (DIP28): Z-80 Sync buss controller. Can be replaced by plug-in board
+A082-91383-B000
+NVC293 (DIP18): Video shifter. Can be replaced by plug-in board A082-91388-A000.
+
 
 Rally X Memory map:
 ------------------
