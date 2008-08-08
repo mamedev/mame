@@ -1532,7 +1532,7 @@ static void soundirq(running_machine *machine, int state)
 
 /* 1 x 24 MHz crystal */
 
-static const AY8910_interface hardhead_ay8910_interface =
+static const ay8910_interface hardhead_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1753,7 +1753,7 @@ MACHINE_DRIVER_END
                                 Star Fighter
 ***************************************************************************/
 
-static const AY8910_interface starfigh_ay8910_interface =
+static const ay8910_interface starfigh_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

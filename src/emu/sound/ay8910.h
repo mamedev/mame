@@ -59,8 +59,8 @@ YMZ294: 0 I/O port
 /* TODO: implement mixing module */
 #define AY8910_RAW_OUTPUT			(8)
 
-typedef struct _AY8910_interface AY8910_interface;
-struct _AY8910_interface
+typedef struct _ay8910_interface ay8910_interface;
+struct _ay8910_interface
 {
 	int					flags;			/* Flags */
 	int					res_load[3]; 	/* Load on channel in ohms */
@@ -124,7 +124,7 @@ WRITE16_HANDLER( AY8910_write_port_4_msb_w );
 
 /*********** An interface for SSG of YM2203 ***********/
 
-void *ay8910_start_ym(sound_type chip_type, int sndindex, int clock, const AY8910_interface *intf);
+void *ay8910_start_ym(sound_type chip_type, int sndindex, int clock, const ay8910_interface *intf);
 
 void ay8910_stop_ym(void *chip);
 void ay8910_reset_ym(void *chip);

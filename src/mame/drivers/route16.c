@@ -567,7 +567,7 @@ INPUT_PORTS_END
 
 
 
-static const AY8910_interface stratvox_ay8910_interface =
+static const ay8910_interface stratvox_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -578,7 +578,7 @@ static const AY8910_interface stratvox_ay8910_interface =
 };
 
 
-static const SN76477_interface sn76477_intf =
+static const sn76477_interface sn76477_intf =
 {
 	RES_K(47),		/*  4  noise_res                    */
 	RES_K(150),		/*  5  filter_res                   */

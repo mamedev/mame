@@ -371,7 +371,7 @@ static GFXDECODE_START( gyruss )
 GFXDECODE_END
 
 
-static const AY8910_interface ay8910_interface_1 =
+static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
@@ -381,7 +381,7 @@ static const AY8910_interface ay8910_interface_1 =
 	gyruss_filter0_w
 };
 
-static const AY8910_interface ay8910_interface_2 =
+static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
@@ -391,7 +391,7 @@ static const AY8910_interface ay8910_interface_2 =
 	gyruss_filter1_w
 };
 
-static const AY8910_interface ay8910_interface_3 =
+static const ay8910_interface ay8910_interface_3 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
@@ -401,7 +401,7 @@ static const AY8910_interface ay8910_interface_3 =
 	NULL
 };
 
-static const AY8910_interface ay8910_interface_4 =
+static const ay8910_interface ay8910_interface_4 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },
@@ -411,7 +411,7 @@ static const AY8910_interface ay8910_interface_4 =
 	NULL
 };
 
-static const AY8910_interface ay8910_interface_5 =
+static const ay8910_interface ay8910_interface_5 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{ RES_K(3.3), RES_K(3.3), RES_K(3.3) },

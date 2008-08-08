@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_BANK1)			// bitmap plane 1-4
 ADDRESS_MAP_END
 
-static const AY8910_interface ay8910_interface_1 =
+static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -87,7 +87,7 @@ static const AY8910_interface ay8910_interface_1 =
 	NULL
 };
 
-static const AY8910_interface ay8910_interface_2 =
+static const ay8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

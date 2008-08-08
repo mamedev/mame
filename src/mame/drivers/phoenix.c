@@ -419,7 +419,7 @@ static const custom_sound_interface pleiads_custom_interface =
 	pleiads_sh_start
 };
 
-static const AY8910_interface survival_ay8910_interface =
+static const ay8910_interface survival_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

@@ -142,7 +142,7 @@ const samples_interface fantasy_samples_interface =
 };
 
 
-const SN76477_interface sasuke_sn76477_intf_1 =
+const sn76477_interface sasuke_sn76477_intf_1 =
 {
 	RES_K(470),		/*  4  noise_res     */
 	RES_K(150),		/*  5  filter_res    */
@@ -171,7 +171,7 @@ const SN76477_interface sasuke_sn76477_intf_1 =
 	// ic48     GND: 2,22,26,27,28  +5V: 1,15,25
 };
 
-const SN76477_interface sasuke_sn76477_intf_2 =
+const sn76477_interface sasuke_sn76477_intf_2 =
 {
 	RES_K(340),		/*  4  noise_res     */
 	RES_K(47),		/*  5  filter_res    */
@@ -200,7 +200,7 @@ const SN76477_interface sasuke_sn76477_intf_2 =
 	// ic51     GND: 2,26,27        +5V: 1,15,22,25,28
 };
 
-const SN76477_interface sasuke_sn76477_intf_3 =
+const sn76477_interface sasuke_sn76477_intf_3 =
 {
 	RES_K(330),		/*  4  noise_res     */
 	RES_K(47),		/*  5  filter_res    */
@@ -229,7 +229,7 @@ const SN76477_interface sasuke_sn76477_intf_3 =
 	// ic52     GND: 2,22,27,28     +5V: 1,15,25,26
 };
 
-const SN76477_interface satansat_sn76477_intf =
+const sn76477_interface satansat_sn76477_intf =
 {
 	RES_K(470),		/*  4  noise_res     */
 	RES_M(1.5),		/*  5  filter_res    */
@@ -258,7 +258,7 @@ const SN76477_interface satansat_sn76477_intf =
 	// ???      GND: 2,26,27        +5V: 15,25
 };
 
-const SN76477_interface vanguard_sn76477_intf_1 =
+const sn76477_interface vanguard_sn76477_intf_1 =
 {
 	RES_K(470),		/*  4  noise_res     */
 	RES_M(1.5),		/*  5  filter_res    */
@@ -287,7 +287,7 @@ const SN76477_interface vanguard_sn76477_intf_1 =
 	// SHOT A   GND: 2,9,26,27  +5V: 15,25
 };
 
-const SN76477_interface vanguard_sn76477_intf_2 =
+const sn76477_interface vanguard_sn76477_intf_2 =
 {
 	RES_K(10),		/*  4  noise_res     */
 	RES_K(30),		/*  5  filter_res    */
@@ -316,7 +316,7 @@ const SN76477_interface vanguard_sn76477_intf_2 =
 	// SHOT B   GND: 1,2,26,27  +5V: 15,25,28
 };
 
-const SN76477_interface fantasy_sn76477_intf =
+const sn76477_interface fantasy_sn76477_intf =
 {
 	RES_K(470),		/*  4  noise_res     */
 	RES_M(1.5),		/*  5  filter_res    */

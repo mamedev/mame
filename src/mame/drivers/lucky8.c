@@ -344,7 +344,7 @@ static GFXDECODE_START( lucky8 )
 	GFXDECODE_ENTRY( "gfx2", 0x1000, spritelayout2, 0, 64 )
 GFXDECODE_END
 
-static const AY8910_interface ay8910_config =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

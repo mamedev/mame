@@ -448,7 +448,7 @@ static WRITE8_HANDLER( grchamp_portB_2_w )
  *
  *************************************/
 
-static const AY8910_interface ay8910_interface_1 =
+static const ay8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -458,7 +458,7 @@ static const AY8910_interface ay8910_interface_1 =
 	grchamp_portB_0_w
 };
 
-static const AY8910_interface ay8910_interface_3 =
+static const ay8910_interface ay8910_interface_3 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

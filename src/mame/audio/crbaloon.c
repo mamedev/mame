@@ -136,7 +136,7 @@ DISCRETE_SOUND_END
 
 
 
-static const SN76477_interface crbaloon_sn76477_interface =
+static const sn76477_interface crbaloon_sn76477_interface =
 {
 	RES_K( 47),	/*  4 noise_res          */
 	RES_K(330),	/*  5 filter_res         */

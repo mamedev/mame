@@ -2177,7 +2177,7 @@ WRITE8_HANDLER( dogpatch_audio_w )
  *  Apr 2007, D.R.
  *************************************/
 
-static const SN76477_interface spcenctr_sn76477_interface =
+static const sn76477_interface spcenctr_sn76477_interface =
 {
 	0,				/*  4 noise_res (N/C)        */
 	0,				/*  5 filter_res (N/C)       */
@@ -2993,7 +2993,7 @@ WRITE8_HANDLER( bowler_audio_6_w )
  *
  *************************************/
 
-static const SN76477_interface invaders_sn76477_interface =
+static const sn76477_interface invaders_sn76477_interface =
 {
 	0,			/*  4 noise_res (N/C)        */
 	0,			/*  5 filter_res (N/C)       */
@@ -3816,7 +3816,7 @@ WRITE8_HANDLER( blueshrk_audio_w )
  *
  *************************************/
 
-static const SN76477_interface invad2ct_p1_sn76477_interface =
+static const sn76477_interface invad2ct_p1_sn76477_interface =
 {
 	0,			/*  4 noise_res (N/C)        */
 	0,			/*  5 filter_res (N/C)       */
@@ -3844,7 +3844,7 @@ static const SN76477_interface invad2ct_p1_sn76477_interface =
 };
 
 
-static const SN76477_interface invad2ct_p2_sn76477_interface =
+static const sn76477_interface invad2ct_p2_sn76477_interface =
 {
 	0,			  /*  4 noise_res (N/C)        */
 	0,			  /*  5 filter_res (N/C)       */

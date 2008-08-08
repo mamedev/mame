@@ -49,7 +49,7 @@ MACHINE_RESET( schaser );
 MACHINE_START( schaser );
 WRITE8_HANDLER( schaser_sh_port_1_w );
 WRITE8_HANDLER( schaser_sh_port_2_w );
-extern const SN76477_interface schaser_sn76477_interface;
+extern const sn76477_interface schaser_sn76477_interface;
 DISCRETE_SOUND_EXTERN( schaser );
 
 WRITE8_HANDLER( rollingc_sh_port_w );

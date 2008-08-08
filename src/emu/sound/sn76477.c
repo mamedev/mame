@@ -98,7 +98,7 @@
 #if TEST_MODE
 #include "input.h"
 
-static const SN76477_interface empty_interface =
+static const sn76477_interface empty_interface =
 {
 	0,			/*  4 noise_clock_res  */
 	0,			/*  5 filter_res       */
@@ -2390,11 +2390,11 @@ static void state_save_register(struct SN76477 *sn)
 static void *sn76477_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	struct SN76477 *sn;
-	SN76477_interface *intf;
+	sn76477_interface *intf;
 
 
 #if TEST_MODE == 0
-	intf = (SN76477_interface *)config;
+	intf = (sn76477_interface *)config;
 #else
 	intf = &test_interface;
 #endif

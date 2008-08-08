@@ -207,7 +207,7 @@ static VIDEO_UPDATE( ettrivia )
 	return 0;
 }
 
-static const AY8910_interface ay8912_interface_2 =
+static const ay8910_interface ay8912_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -217,7 +217,7 @@ static const AY8910_interface ay8912_interface_2 =
 	NULL
 };
 
-static const AY8910_interface ay8912_interface_3 =
+static const ay8910_interface ay8912_interface_3 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

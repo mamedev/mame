@@ -5,7 +5,7 @@
 
 struct YM2203interface
 {
-	const AY8910_interface ay8910_intf;
+	const ay8910_interface ay8910_intf;
 	void (*handler)(running_machine *machine, int irq);
 };
 

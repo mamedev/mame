@@ -169,7 +169,7 @@ static WRITE8_HANDLER( clear_timer_w )
  *
  *************************************/
 
-static const SN76477_interface sn76477_intf =
+static const sn76477_interface sn76477_intf =
 {
 	RES_K(47),	/*  4 noise_res                */
 //  RES_K(120), /*  5 filter_res               */

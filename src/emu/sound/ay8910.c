@@ -164,7 +164,7 @@ struct _ay8910_context
 	int streams;
 	int ready;
 	sound_stream *channel;
-	const AY8910_interface *intf;
+	const ay8910_interface *intf;
 	INT32 register_latch;
 	UINT8 regs[16];
 	INT32 last_enable;
@@ -657,7 +657,7 @@ static void ay8910_statesave(ay8910_context *psg, int sndindex)
  *
  *************************************/
 
-void *ay8910_start_ym(sound_type chip_type, int sndindex, int clock, const AY8910_interface *intf)
+void *ay8910_start_ym(sound_type chip_type, int sndindex, int clock, const ay8910_interface *intf)
 {
 	ay8910_context *info;
 
@@ -818,25 +818,25 @@ int ay8910_read_ym(void *chip)
 
 static void *ay8910_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const AY8910_interface generic_ay8910 =
+	static const ay8910_interface generic_ay8910 =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
 		NULL, NULL, NULL, NULL
 	};
-	const AY8910_interface *intf = (config ? config : &generic_ay8910);
+	const ay8910_interface *intf = (config ? config : &generic_ay8910);
 	return ay8910_start_ym(SOUND_AY8910, sndindex+16, clock, intf);
 }
 
 static void *ym2149_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const AY8910_interface generic_ay8910 =
+	static const ay8910_interface generic_ay8910 =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
 		NULL, NULL, NULL, NULL
 	};
-	const AY8910_interface *intf = (config ? config : &generic_ay8910);
+	const ay8910_interface *intf = (config ? config : &generic_ay8910);
 	return ay8910_start_ym(SOUND_YM2149, sndindex+16, clock, intf);
 }
 

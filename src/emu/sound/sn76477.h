@@ -46,8 +46,8 @@
  *
  *****************************************************************************/
 
-typedef struct _SN76477_interface SN76477_interface;
-struct _SN76477_interface
+typedef struct _sn76477_interface sn76477_interface;
+struct _sn76477_interface
 {
 	double noise_clock_res;
 	double noise_filter_res;

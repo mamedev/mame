@@ -1610,7 +1610,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const AY8910_interface frogger_ay8910_interface =
+static const ay8910_interface frogger_ay8910_interface =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
@@ -1620,7 +1620,7 @@ static const AY8910_interface frogger_ay8910_interface =
 	NULL
 };
 
-static const AY8910_interface konami_ay8910_interface_1 =
+static const ay8910_interface konami_ay8910_interface_1 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
@@ -1630,7 +1630,7 @@ static const AY8910_interface konami_ay8910_interface_1 =
 	NULL
 };
 
-static const AY8910_interface konami_ay8910_interface_2 =
+static const ay8910_interface konami_ay8910_interface_2 =
 {
 	AY8910_DISCRETE_OUTPUT,
 	{RES_K(5.1), RES_K(5.1), RES_K(5.1)},
@@ -1640,7 +1640,7 @@ static const AY8910_interface konami_ay8910_interface_2 =
 	NULL
 };
 
-static const AY8910_interface explorer_ay8910_interface_1 =
+static const ay8910_interface explorer_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1650,7 +1650,7 @@ static const AY8910_interface explorer_ay8910_interface_1 =
 	NULL
 };
 
-static const AY8910_interface explorer_ay8910_interface_2 =
+static const ay8910_interface explorer_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1660,7 +1660,7 @@ static const AY8910_interface explorer_ay8910_interface_2 =
 	NULL
 };
 
-static const AY8910_interface sfx_ay8910_interface =
+static const ay8910_interface sfx_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1670,7 +1670,7 @@ static const AY8910_interface sfx_ay8910_interface =
 	sfx_sample_control_w
 };
 
-static const AY8910_interface scorpion_ay8910_interface =
+static const ay8910_interface scorpion_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1680,7 +1680,7 @@ static const AY8910_interface scorpion_ay8910_interface =
 	scorpion_sound_control_w,
 };
 
-static const AY8910_interface checkmaj_ay8910_interface =
+static const ay8910_interface checkmaj_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

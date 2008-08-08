@@ -1882,7 +1882,7 @@ static MACHINE_RESET( calomega )
 *    Sound Interfaces    *
 *************************/
 
-static const AY8910_interface sys903_ay8912_intf =
+static const ay8910_interface sys903_ay8912_intf =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1892,7 +1892,7 @@ static const AY8910_interface sys903_ay8912_intf =
 	NULL
 };
 
-static const AY8910_interface sys905_ay8912_intf =
+static const ay8910_interface sys905_ay8912_intf =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

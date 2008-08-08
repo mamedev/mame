@@ -283,7 +283,7 @@ static GFXDECODE_START( rcasino )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, charlayout2, 0, 16 )
 GFXDECODE_END
 
-static const AY8910_interface ay8910_config =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

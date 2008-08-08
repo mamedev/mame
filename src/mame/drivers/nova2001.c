@@ -651,7 +651,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const AY8910_interface nova2001_ay8910_interface_1 =
+static const ay8910_interface nova2001_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -661,7 +661,7 @@ static const AY8910_interface nova2001_ay8910_interface_1 =
 	nova2001_scroll_y_w
 };
 
-static const AY8910_interface nova2001_ay8910_interface_2 =
+static const ay8910_interface nova2001_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -671,7 +671,7 @@ static const AY8910_interface nova2001_ay8910_interface_2 =
 	NULL
 };
 
-static const AY8910_interface pkunwar_ay8910_interface_1 =
+static const ay8910_interface pkunwar_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -681,7 +681,7 @@ static const AY8910_interface pkunwar_ay8910_interface_1 =
 	NULL
 };
 
-static const AY8910_interface pkunwar_ay8910_interface_2 =
+static const ay8910_interface pkunwar_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

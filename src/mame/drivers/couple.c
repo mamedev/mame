@@ -119,7 +119,7 @@ static WRITE8_HANDLER( merit_prot_w )
 }
 
 #if 0
-static const AY8910_interface ay8910_config =
+static const ay8910_interface ay8910_config =
 {
 	input_port_4_r,
 };

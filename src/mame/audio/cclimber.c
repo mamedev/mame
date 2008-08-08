@@ -77,7 +77,7 @@ WRITE8_HANDLER( cclimber_sample_trigger_w )
 }
 
 
-const AY8910_interface cclimber_ay8910_interface =
+const ay8910_interface cclimber_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

@@ -197,7 +197,7 @@ static void adpcm_int(running_machine *machine, int data)
  * and put with 470 KOhm to gnd.
  * The following is a approximation */
 
-static const AY8910_interface irem_ay8910_interface_1 =
+static const ay8910_interface irem_ay8910_interface_1 =
 {
 	AY8910_SINGLE_OUTPUT,
 	{470, 0, 0},
@@ -207,7 +207,7 @@ static const AY8910_interface irem_ay8910_interface_1 =
 	ay8910_0_portb_w
 };
 
-static const AY8910_interface irem_ay8910_interface_2 =
+static const ay8910_interface irem_ay8910_interface_2 =
 {
 	AY8910_SINGLE_OUTPUT,
 	{470, 0, 0},

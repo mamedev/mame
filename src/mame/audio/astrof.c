@@ -237,7 +237,7 @@ WRITE8_HANDLER( tomahawk_audio_w )
 }
 
 
-static const SN76477_interface tomahawk_sn76477_interface =
+static const sn76477_interface tomahawk_sn76477_interface =
 {
 	0,				/*  4 noise_res (N/C)        */
 	0,				/*  5 filter_res (N/C)       */

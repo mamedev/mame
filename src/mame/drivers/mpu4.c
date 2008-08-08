@@ -1395,7 +1395,7 @@ static ADDRESS_MAP_START( mod2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_BANK1)	/* 64k  paged ROM (4 pages)  */
 ADDRESS_MAP_END
 
-static const AY8910_interface ay8910_config =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_SINGLE_OUTPUT,
 	{820,0,0},

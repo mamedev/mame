@@ -565,7 +565,7 @@ static VIDEO_UPDATE( laserbat )
 
 /* Laser Battle sound **********************************/
 
-static const SN76477_interface laserbat_sn76477_interface =
+static const sn76477_interface laserbat_sn76477_interface =
 {
 	RES_K(47), 		/*  4 noise_res         R21    47K */
 	0,				/*  5 filter_res (variable) */
@@ -658,7 +658,7 @@ static const pia6821_interface pia_0_intf =
 	/*irqs   : A/B             */ zaccaria_irq0a, zaccaria_irq0b
 };
 
-static const AY8910_interface ay8910_config =
+static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

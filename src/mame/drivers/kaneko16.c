@@ -1646,7 +1646,7 @@ static INTERRUPT_GEN( kaneko16_interrupt )
 	}
 }
 
-static const AY8910_interface ay8910_intf_dsw =
+static const ay8910_interface ay8910_intf_dsw =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1656,7 +1656,7 @@ static const AY8910_interface ay8910_intf_dsw =
 	NULL,
 };
 
-static const AY8910_interface ay8910_intf_eeprom =
+static const ay8910_interface ay8910_intf_eeprom =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

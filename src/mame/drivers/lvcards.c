@@ -456,7 +456,7 @@ GFXDECODE_END
 
 /* Sound Interfaces */
 
-static const AY8910_interface lcay8910_interface =
+static const ay8910_interface lcay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

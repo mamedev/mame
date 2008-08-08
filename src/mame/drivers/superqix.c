@@ -903,7 +903,7 @@ static const samples_interface pbillian_samples_interface =
 	pbillian_sh_start
 };
 
-static const AY8910_interface pbillian_ay8910_interface =
+static const ay8910_interface pbillian_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -913,7 +913,7 @@ static const AY8910_interface pbillian_ay8910_interface =
 	NULL
 };
 
-static const AY8910_interface hotsmash_ay8910_interface =
+static const ay8910_interface hotsmash_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -923,7 +923,7 @@ static const AY8910_interface hotsmash_ay8910_interface =
 	NULL
 };
 
-static const AY8910_interface sqix_ay8910_interface_1 =
+static const ay8910_interface sqix_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -933,7 +933,7 @@ static const AY8910_interface sqix_ay8910_interface_1 =
 	NULL
 };
 
-static const AY8910_interface sqix_ay8910_interface_2 =
+static const ay8910_interface sqix_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -943,7 +943,7 @@ static const AY8910_interface sqix_ay8910_interface_2 =
 	sqix_z80_mcu_w		/* port Bwrite */
 };
 
-static const AY8910_interface bootleg_ay8910_interface_1 =
+static const ay8910_interface bootleg_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -953,7 +953,7 @@ static const AY8910_interface bootleg_ay8910_interface_1 =
 	NULL
 };
 
-static const AY8910_interface bootleg_ay8910_interface_2 =
+static const ay8910_interface bootleg_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

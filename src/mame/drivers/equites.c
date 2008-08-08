@@ -1120,7 +1120,7 @@ static const struct MSM5232interface equites_5232intf =
 };
 
 
-static const AY8910_interface equites_8910intf =
+static const ay8910_interface equites_8910intf =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

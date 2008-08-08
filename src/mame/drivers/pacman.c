@@ -3321,7 +3321,7 @@ static MACHINE_DRIVER_START( crush4 )
 	MDRV_GFXDECODE(crush4)
 MACHINE_DRIVER_END
 
-static const AY8910_interface crushs_ay8910_interface =
+static const ay8910_interface crushs_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

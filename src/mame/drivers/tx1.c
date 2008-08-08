@@ -617,7 +617,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const AY8910_interface tx1_ay8910_interface =
+static const ay8910_interface tx1_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -629,7 +629,7 @@ static const AY8910_interface tx1_ay8910_interface =
 
 
 /* YM2149 IC19 */
-static const AY8910_interface buggyboy_ym2149_interface_1 =
+static const ay8910_interface buggyboy_ym2149_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -640,7 +640,7 @@ static const AY8910_interface buggyboy_ym2149_interface_1 =
 };
 
 /* YM2149 IC24 */
-static const AY8910_interface buggyboy_ym2149_interface_2 =
+static const ay8910_interface buggyboy_ym2149_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

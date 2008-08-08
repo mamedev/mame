@@ -459,7 +459,7 @@ static WRITE8_HANDLER( nyny_ay8910_37_port_b_w )
 }
 
 
-static const AY8910_interface ay8910_37_interface =
+static const ay8910_interface ay8910_37_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -470,7 +470,7 @@ static const AY8910_interface ay8910_37_interface =
 };
 
 
-static const AY8910_interface ay8910_64_interface =
+static const ay8910_interface ay8910_64_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

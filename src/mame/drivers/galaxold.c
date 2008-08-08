@@ -2276,7 +2276,7 @@ static GFXDECODE_START( _4in1 )
 	GFXDECODE_ENTRY( "gfx1", 0x4000, _4in1_spritelayout,    0, 8 )
 GFXDECODE_END
 
-static const AY8910_interface checkmaj_ay8910_interface =
+static const ay8910_interface checkmaj_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -2286,7 +2286,7 @@ static const AY8910_interface checkmaj_ay8910_interface =
 	NULL
 };
 
-static const AY8910_interface bongo_ay8910_interface =
+static const ay8910_interface bongo_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

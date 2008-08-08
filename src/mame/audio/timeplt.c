@@ -152,7 +152,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static const AY8910_interface timeplt_ay8910_interface =
+static const ay8910_interface timeplt_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

@@ -378,7 +378,7 @@ static const struct TMS5110interface ad2083_tms5110_interface =
 };
 
 
-static const AY8910_interface ad2083_ay8910_interface_1 =
+static const ay8910_interface ad2083_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -388,7 +388,7 @@ static const AY8910_interface ad2083_ay8910_interface_1 =
 	NULL
 };
 
-static const AY8910_interface ad2083_ay8910_interface_2 =
+static const ay8910_interface ad2083_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
