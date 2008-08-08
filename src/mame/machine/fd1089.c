@@ -6,7 +6,7 @@ Decryption tables provided by Charles MacDonald
 Decryption algorithm by Nicola Salmoria
 LCG algorithm by Andreas Naive
 
-The FD1089 is a 680000 with built-in encryption.
+The FD1089 is a 68000 with built-in encryption.
 It contains some battery-backed RAM, when the battery dies the CPU stops
 working.
 
