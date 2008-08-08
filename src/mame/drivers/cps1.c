@@ -132,6 +132,8 @@ TO DO (2006.09.20) :
       * 'cworld2j' (IN2 only)
       * 'qad' and 'qadj'
       * 'qtono2'
+  - Check daimakr2 dip switches. E.g. changing the number of lives also changes the
+    starting level.
 
 Stephh's log (2006.09.20) :
 
@@ -4053,6 +4055,33 @@ ROM_START( daimakai )
 	ROM_REGION( 0x18000, "audio", 0 )
 	ROM_LOAD( "dm_37.13c",  0x00000, 0x08000, CRC(3692f6e5) SHA1(61b8438d60a39b4cf5062dff0a53228e8a4e4b5f) )	// == dm_26.10a
 	ROM_CONTINUE(           0x10000, 0x08000 )
+ROM_END
+
+/* B-Board 91634B */
+/* This could be a hack since, running on a 91634B board, it must have been made at least three years after
+   the initial release of the game. However, if if it's a hack, it's exceptionally well made since all ROM
+   stickers look original and the B-board DAM63B PAL label is printed on the chip. */
+ROM_START( daimakr2 )
+	ROM_REGION( CODE_SIZE, "main", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "damj_23.8f",   0x00000, 0x80000, CRC(c3b248ec) SHA1(5c016d2dcf882b2a9564e3c4502a0f51ee3d1803) )
+	ROM_LOAD16_WORD_SWAP( "damj_22.7f",   0x80000, 0x80000, CRC(595ff2f3) SHA1(ac14b81e15f2c340526a03acbb4c28181d94d5b9) )	// == dm-17.7j
+
+	ROM_REGION( 0x400000, "gfx1", 0 )
+	ROMX_LOAD( "dam_01.4a",    0x000000, 0x80000, CRC(0ba9c0b0) SHA1(c4945b603115f32b7346d72426571dc2d361159f) , ROM_GROUPWORD | ROM_SKIP(6) )	// == dm-05.3a
+	ROMX_LOAD( "dam_02.5a",    0x000002, 0x80000, CRC(5d760ab9) SHA1(212176947933fcfef991bc80ad5bd91718689ffe) , ROM_GROUPWORD | ROM_SKIP(6) )	// == dm-07.3f
+	ROMX_LOAD( "dam_03.6a",    0x000004, 0x80000, CRC(4ba90b59) SHA1(35bc9dec5ddbf064c30c951627581c16764456ac) , ROM_GROUPWORD | ROM_SKIP(6) )	// == dm-06.3c
+	ROMX_LOAD( "dam_04.7a",    0x000006, 0x80000, CRC(4bdee9de) SHA1(7d0c4736f16577afe9966447a18f039728f6fbdf) , ROM_GROUPWORD | ROM_SKIP(6) )	// == dm-08.3g
+	ROMX_LOAD( "dam_05.8a",    0x200000, 0x80000, CRC(7dc61b94) SHA1(7796bae7555c541b3c80aacfa24788aeb2ccdfd5) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "dam_06.9a",    0x200002, 0x80000, CRC(fde89758) SHA1(9a6192f629cd1e74e225ef7426338c2816c6b977) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "dam_07.10a",   0x200004, 0x80000, CRC(ec351d78) SHA1(1005a83be4b5577612143ae7f64ca4a08aae7959) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "dam_08.11a",   0x200006, 0x80000, CRC(ee2acc1e) SHA1(4628a9b2447266349d97132003992a21e2bb423a) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_COPY( "gfx1", 0x000000, 0x000000, 0x8000 )	/* stars */
+
+	ROM_REGION( 0x28000, "audio", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "dam_09.12a",    0x00000, 0x08000, CRC(0656ff53) SHA1(063a8124dbe73d014b11f72007f1b877afd1a661) )	// == dm_26.10a + garbage
+	ROM_CONTINUE(              0x10000, 0x18000 )	// second half of ROM is unused, not mapped in memory
 ROM_END
 
 /* B-Board 89624B */
@@ -8449,6 +8478,7 @@ GAME( 1988, lostwrld, forgottn, cps1_10MHz, forgottn, forgottn, ROT0,   "Capcom"
 GAME( 1988, ghouls,   0,        cps1_10MHz, ghouls,   cps1,     ROT0,   "Capcom", "Ghouls'n Ghosts (World)" , 0)				// Wed.26.10.1988 in the ROMS
 GAME( 1988, ghoulsu,  ghouls,   cps1_10MHz, ghoulsu,  cps1,     ROT0,   "Capcom", "Ghouls'n Ghosts (US)" , 0)					// Wed.26.10.1988 in the ROMS
 GAME( 1988, daimakai, ghouls,   cps1_10MHz, daimakai, cps1,     ROT0,   "Capcom", "Dai Makai-Mura (Japan)" , 0)					// Wed.26.10.1988 in the ROMS
+GAME( 1988, daimakr2, ghouls,   cps1_10MHz, daimakai, cps1,     ROT0,   "Capcom", "Dai Makai-Mura (Japan hack?)" , 0)			// still Wed.26.10.1988 in the ROMS...
 GAME( 1989, strider,  0,        cps1_10MHz, strider,  cps1,     ROT0,   "Capcom", "Strider (US set 1)", 0 )
 GAME( 1989, stridrua, strider,  cps1_10MHz, stridrua, cps1,     ROT0,   "Capcom", "Strider (US set 2)", 0 )
 GAME( 1989, striderj, strider,  cps1_10MHz, strider,  cps1,     ROT0,   "Capcom", "Strider Hiryu (Japan set 1)", 0 )

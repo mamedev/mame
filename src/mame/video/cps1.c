@@ -24,6 +24,7 @@ Forgotten Worlds / Lost Worlds              1988  88618B-2  LWCHR            LWI
   (alt B-board revision)                          88621B-2  LW621            LWIO  ?
 Ghouls 'n Ghosts (World / US)               1988  88620-B-2 DM620            LWIO  None       CPS-B-01  DL-0411-10001  None
   (alt B-board revision - Japan)                  88622B-2  DM22A            LWIO  88622-C-1  CPS-B-01  DL-0411-10001  None
+  (alt B-board revision - Japan)                  91634B-2  DAM63B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
 Strider                                     1989  89624B-2  ST24M1           LWIO  88622-C-1  CPS-B-01  DL-0411-10001  None
   (alt B-board revision)                          89624B-2  ST24M2           LWIO  88622-C-2  CPS-B-01  DL-0411-10001  None
   (alt B-board revision)                          89624B-3  ST24B2           LWIO  88622-C-2  CPS-B-01  DL-0411-10001  None
@@ -64,7 +65,7 @@ Street Fighter II (US 911101)                                                   
 Street Fighter II (Japan 911210)                                                              CPS-B-13  DL-0411-10008
 Three Wonders*                              1991  89624B-3  RT24B            LWIO  90630C-4   CPS-B-21  DL-0921-10014        IOC1
   (alt B-board revision - Japan)                  89625B-1  RT22B            IOB1
-  (alt B-board revision)                          91634B-2  RT63B?           IOB1
+  (alt B-board revision)                          91634B-2  RT63B?    BPRG1? IOB1
 King of Dragons*                            1991  90629B-3  KD29B            IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
 Captain Commando*                           1991  91635B-2  CC63B     CCPRG  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
 Knights of the Round*                       1991  91635B-2  KR63B     BPRG1  IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
@@ -86,7 +87,7 @@ Muscle Bomber Duo*                          1993  ?         ?                   
 Quiz Tonosama no Yabou 2                    1995  ?         ?                      ?          ?
 Pnickies                                    1994  ?         ?                      ?          CPS-B-21? DL-0921-10014? ?
 Pang 3                                      1995  94916-10  CP1B1F,CP1B8K,CP1B9KA  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
-Megaman the Power Battle                    1995  91634B-2  RCM63B   BPRG1  IOB1  92631C-6    CPS-B-21  DL-0921-10014  C632  IOC1
+Megaman the Power Battle                    1995  91634B-2  RCM63B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
 
 @actually CPS-B-01, the original number was scratched out and "04" stamped over it
 *denotes Suicide Battery
@@ -452,7 +453,7 @@ static const struct gfx_range mapper_LWCHR_table[] =
 };
 
 
-// DM620 and DM22A are equivalent as far as the game is concerned, though
+// DM620, DM22A and DAM63B are equivalent as far as the game is concerned, though
 // the equations are quite different
 
 #define mapper_DM620	{ 0x8000, 0x2000, 0x2000, 0 }, mapper_DM620_table
@@ -494,6 +495,24 @@ static const struct gfx_range mapper_DM22A_table[] =
 	{ GFXTYPE_SCROLL3, 0x00000, 0x1ffff, 2 },
 
 	{ GFXTYPE_SPRITES, 0x02000, 0x03fff, 3 },
+	{ 0 }
+};
+
+#define mapper_DAM63B	{ 0x8000, 0x8000, 0, 0 }, mapper_DAM63B_table
+static const struct gfx_range mapper_DAM63B_table[] =
+{
+	// verified from PAL dump:
+	// bank0 = pin 19 (ROMs 1,3) & pin 18 (ROMs 2,4)
+	// bank1 = pin 17 (ROMs 5,7) & pin 16 (ROMs 6,8)
+	// pins 12,13,14,15 are always enabled
+
+	/* type            start   end     bank */
+	{ GFXTYPE_SPRITES, 0x00000, 0x01fff, 0 },
+	{ GFXTYPE_SCROLL1, 0x02000, 0x02fff, 0 },
+	{ GFXTYPE_SCROLL2, 0x04000, 0x07fff, 0 },
+
+	{ GFXTYPE_SCROLL3, 0x00000, 0x1ffff, 1 },
+	{ GFXTYPE_SPRITES, 0x02000, 0x03fff, 1 },
 	{ 0 }
 };
 
@@ -1168,6 +1187,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"ghouls",   CPS_B_01,     mapper_DM620 },
 	{"ghoulsu",  CPS_B_01,     mapper_DM620 },
 	{"daimakai", CPS_B_01,     mapper_DM22A },	// equivalent to DM620
+	{"daimakr2", CPS_B_21_DEF, mapper_DAM63B },	// equivalent to DM620, also CPS_B_21_DEF is equivalent to CPS_B_01
 	{"strider",  CPS_B_01,     mapper_ST24M1 },
 	{"stridrua", CPS_B_01,     mapper_ST24M1 },
 	{"striderj", CPS_B_01,     mapper_ST24M1 },

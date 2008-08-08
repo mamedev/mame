@@ -2387,6 +2387,7 @@ V-V                           TP-027
 	DRIVER( ghouls )	/* 12/1988 (c) 1988 (World) */
 	DRIVER( ghoulsu )	/* 12/1988 (c) 1988 (US) */
 	DRIVER( daimakai )	/* 12/1988 (c) 1988 (Japan) */
+	DRIVER( daimakr2 )	/* unknown release date, still (c) 1988 (Japan) */
 	DRIVER( strider )	/*  3/1989 (c) 1989 (not explicitly stated but should be US) */
 	DRIVER( stridrua )	/*  3/1989 (c) 1989 (not explicitly stated but should be US) */
 	DRIVER( striderj )	/*  3/1989 (c) 1989 */
