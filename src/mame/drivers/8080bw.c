@@ -810,8 +810,7 @@ static MACHINE_DRIVER_START( schaser )
 
 	MDRV_SOUND_ADD("sn", SN76477, 0)
 	MDRV_SOUND_CONFIG(schaser_sn76477_interface)
-	// This will be routed to the discrete system when that feature is working.
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
 
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(schaser)
@@ -2413,8 +2412,8 @@ GAME( 1979, desterth, lrescue,  lrescue,  invrvnge, 0, ROT270, "bootleg", "Desti
 GAME( 1979, invadpt2, 0,        invadpt2, invadpt2, 0, ROT270, "Taito", "Space Invaders Part II (Taito)", 0 )
 GAME( 1980, invaddlx, invadpt2, invaders, invadpt2, 0, ROT270, "Midway", "Space Invaders Deluxe", 0 )
 GAME( 1979, cosmo,    0,        cosmo,    cosmo,    0, ROT90,  "TDS & Mints", "Cosmo", GAME_IMPERFECT_SOUND )
-GAME( 1979, schaser,  0,        schaser,  schaser,  0, ROT270, "Taito", "Space Chaser", GAME_IMPERFECT_SOUND| GAME_IMPERFECT_COLORS )
-GAME( 1979, schasrcv, schaser,  schasrcv, schasrcv, 0, ROT270, "Taito", "Space Chaser (CV version)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
+GAME( 1979, schaser,  0,        schaser,  schaser,  0, ROT270, "Taito", "Space Chaser", GAME_IMPERFECT_COLORS )
+GAME( 1979, schasrcv, schaser,  schasrcv, schasrcv, 0, ROT270, "Taito", "Space Chaser (CV version)", GAME_IMPERFECT_COLORS )
 GAME( 1979, sflush,   0,        sflush,   sflush,   0, ROT270, "Taito", "Straight Flush",GAME_NO_SOUND| GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL)
 GAME( 1980, lupin3,   0,        lupin3,   lupin3,   0, ROT270, "Taito", "Lupin III", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
 GAME( 1980, polaris,  0,        polaris,  polaris,  0, ROT270, "Taito", "Polaris (set 1)", 0 )
