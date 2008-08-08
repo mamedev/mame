@@ -1664,6 +1664,27 @@ ROM_START( defendb )
 	ROM_LOAD( "decoder.1",   0x0000, 0x0200, CRC(8dd98da5) SHA1(da979604f7a2aa8b5a6d4a5debd2e80f77569e35) )
 ROM_END
 
+/* the white set seems to be the source of the defcmnd & startrkd bootlegs */
+ROM_START( defendw )
+	ROM_REGION( 0x19000, "main", 0 )
+	ROM_LOAD( "rom1.bin",     0x0d000, 0x1000, CRC(5af871e3) SHA1(f9a42619b37db2eb07d0302ac9d0ff5c1923c21d) )
+	ROM_LOAD( "rom2.bin",     0x0e000, 0x1000, CRC(1126adc9) SHA1(526cf1ca3a7eefd6115d74ac9af1a50774cc258e) )
+	ROM_LOAD( "rom3.bin",     0x0f000, 0x1000, CRC(4097b46b) SHA1(8f506dc59b129c9441d813062fc38747619678db) )
+	ROM_LOAD( "rom9.bin",     0x10000, 0x0800, CRC(93012991) SHA1(9e06ed4a489b2ed063f83b708d3e7c6a02e45389) )
+	ROM_LOAD( "rom12.bin",    0x10800, 0x0800, CRC(4bdd8dc4) SHA1(e7503e68608e8f7bb066c99e1e32c6fe060c1dd3) )
+	ROM_LOAD( "rom8.bin",     0x11000, 0x0800, CRC(5227fc0b) SHA1(1e6fd398b5beef0be58667f1f0a789a76edd5eb9) )
+	ROM_LOAD( "rom11.bin",    0x11800, 0x0800, CRC(d068f0c5) SHA1(d32a4232756ca05972780cb35b0add12b31e8283) )
+	ROM_LOAD( "rom7.bin",     0x12000, 0x0800, CRC(fef4cb77) SHA1(96202e97f3392bc043a252e78d1c42b51c38d269) )
+	ROM_LOAD( "rom10.bin",    0x12800, 0x0800, BAD_DUMP CRC(49b50b40) SHA1(91cf841271a2f7d06f81477b4a450eb4580c7ca5) ) // hand-repaired with startrkd rom
+	ROM_LOAD( "rom6.bin",     0x16000, 0x0800, CRC(43d42a1b) SHA1(b13d59940646451c00b49bbe4a41b9e2df4d7758) )
+
+	ROM_REGION( 0x10000, "sound", 0 )
+	ROM_LOAD( "defend.snd",   0xf800, 0x0800, CRC(fefd5b48) SHA1(ceb0d18483f0691978c604db94417e6941ad7ff2) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "decoder.1",   0x0000, 0x0200, CRC(8dd98da5) SHA1(da979604f7a2aa8b5a6d4a5debd2e80f77569e35) )
+ROM_END
+
 ROM_START( defndjeu )
 	ROM_REGION( 0x19000, "main", 0 )
 	ROM_LOAD( "15", 0x0d000, 0x1000, CRC(706a24bd) SHA1(60cef3d4f7204eff42de2c08244863e83bc842b4) )
@@ -2784,6 +2805,7 @@ static DRIVER_INIT( joust2 )
 GAME( 1980, defender, 0,        defender,            defender, defender, ROT0,   "Williams", "Defender (Red label)", GAME_SUPPORTS_SAVE )
 GAME( 1980, defendg,  defender, defender,            defender, defender, ROT0,   "Williams", "Defender (Green label)", GAME_SUPPORTS_SAVE )
 GAME( 1980, defendb,  defender, defender,            defender, defender, ROT0,   "Williams", "Defender (Blue label)", GAME_SUPPORTS_SAVE )
+GAME( 1980, defendw,  defender, defender,            defender, defender, ROT0,   "Williams", "Defender (White label)", GAME_SUPPORTS_SAVE )
 GAME( 1980, defndjeu, defender, defender,            defender, defndjeu, ROT0,   "Jeutel", "Defender (bootleg)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1980, tornado1, defender, defender,            defender, defndjeu, ROT0,   "Jeutel", "Tornado (bootleg set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1980, tornado2, defender, defender,            defender, defndjeu, ROT0,   "Jeutel", "Tornado (bootleg set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // bad dump?
