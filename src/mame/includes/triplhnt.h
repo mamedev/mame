@@ -23,7 +23,7 @@ void triplhnt_set_collision(running_machine *machine, int data);
 /*----------- defined in audio/triplhnt.c -----------*/
 
 DISCRETE_SOUND_EXTERN( triplhnt );
-extern const struct Samplesinterface triplhnt_samples_interface;
+extern const samples_interface triplhnt_samples_interface;
 
 
 /*----------- defined in video/triplhnt.c -----------*/

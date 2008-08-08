@@ -262,7 +262,7 @@ static void amiga_stream_update(void *param, stream_sample_t **inputs, stream_sa
  *
  *************************************/
 
-void *amiga_sh_start(int clock, const struct CustomSound_interface *config)
+void *amiga_sh_start(int clock, const custom_sound_interface *config)
 {
 	int i;
 

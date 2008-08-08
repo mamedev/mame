@@ -1395,7 +1395,7 @@ static ADDRESS_MAP_START( mod2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_BANK1)	/* 64k  paged ROM (4 pages)  */
 ADDRESS_MAP_END
 
-static const struct AY8910interface ay8910_interface =
+static const AY8910_interface ay8910_config =
 {
 	AY8910_SINGLE_OUTPUT,
 	{820,0,0},
@@ -1418,7 +1418,7 @@ static MACHINE_DRIVER_START( mpu4mod2 )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("AY8913",AY8913, MPU4_MASTER_CLOCK/4)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)

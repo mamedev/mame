@@ -397,7 +397,7 @@ static const struct TMS36XXinterface phoenix_tms36xx_interface =
     0.21       /* tune speed (time between beats) */
 };
 
-static const struct CustomSound_interface phoenix_custom_interface =
+static const custom_sound_interface phoenix_custom_interface =
 {
 	phoenix_sh_start
 };
@@ -414,12 +414,12 @@ static const struct TMS36XXinterface pleiads_tms36xx_interface =
 	{0.33,0.33,0,0.33,0,0.33}
 };
 
-static const struct CustomSound_interface pleiads_custom_interface =
+static const custom_sound_interface pleiads_custom_interface =
 {
 	pleiads_sh_start
 };
 
-static const struct AY8910interface survival_ay8910_interface =
+static const AY8910_interface survival_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

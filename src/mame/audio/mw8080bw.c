@@ -127,7 +127,7 @@ static const char *const seawolf_sample_names[] =
 };
 
 
-static const struct Samplesinterface seawolf_samples_interface =
+static const samples_interface seawolf_samples_interface =
 {
 	5,	/* 5 channels */
 	seawolf_sample_names
@@ -187,7 +187,7 @@ static const char *const gunfight_sample_names[] =
 };
 
 
-static const struct Samplesinterface gunfight_samples_interface =
+static const samples_interface gunfight_samples_interface =
 {
 	1,	/* 1 channel */
 	gunfight_sample_names
@@ -1606,7 +1606,7 @@ static const char *const gmissile_sample_names[] =
 };
 
 
-static const struct Samplesinterface gmissile_samples_interface =
+static const samples_interface gmissile_samples_interface =
 {
 	1,	/* 1 channel */
 	gmissile_sample_names
@@ -1704,7 +1704,7 @@ static const char *const m4_sample_names[] =
 };
 
 
-static const struct Samplesinterface m4_samples_interface =
+static const samples_interface m4_samples_interface =
 {
 	2,	/* 2 channels */
 	m4_sample_names
@@ -1992,7 +1992,7 @@ static const char *const clowns_sample_names[] =
 	0
 };
 
-static const struct Samplesinterface clowns_samples_interface =
+static const samples_interface clowns_samples_interface =
 {
 	1,	/* 1 channel */
 	clowns_sample_names
@@ -2177,7 +2177,7 @@ WRITE8_HANDLER( dogpatch_audio_w )
  *  Apr 2007, D.R.
  *************************************/
 
-static const struct SN76477interface spcenctr_sn76477_interface =
+static const SN76477_interface spcenctr_sn76477_interface =
 {
 	0,				/*  4 noise_res (N/C)        */
 	0,				/*  5 filter_res (N/C)       */
@@ -2759,7 +2759,7 @@ static const char *const phantom2_sample_names[] =
 };
 
 
-static const struct Samplesinterface phantom2_samples_interface =
+static const samples_interface phantom2_samples_interface =
 {
 	2,	/* 2 channels */
 	phantom2_sample_names
@@ -2993,7 +2993,7 @@ WRITE8_HANDLER( bowler_audio_6_w )
  *
  *************************************/
 
-static const struct SN76477interface invaders_sn76477_interface =
+static const SN76477_interface invaders_sn76477_interface =
 {
 	0,			/*  4 noise_res (N/C)        */
 	0,			/*  5 filter_res (N/C)       */
@@ -3038,7 +3038,7 @@ static const char *const invaders_sample_names[] =
 };
 
 
-static const struct Samplesinterface invaders_samples_interface =
+static const samples_interface invaders_samples_interface =
 {
 	6,	/* 6 channels */
 	invaders_sample_names
@@ -3816,7 +3816,7 @@ WRITE8_HANDLER( blueshrk_audio_w )
  *
  *************************************/
 
-static const struct SN76477interface invad2ct_p1_sn76477_interface =
+static const SN76477_interface invad2ct_p1_sn76477_interface =
 {
 	0,			/*  4 noise_res (N/C)        */
 	0,			/*  5 filter_res (N/C)       */
@@ -3844,7 +3844,7 @@ static const struct SN76477interface invad2ct_p1_sn76477_interface =
 };
 
 
-static const struct SN76477interface invad2ct_p2_sn76477_interface =
+static const SN76477_interface invad2ct_p2_sn76477_interface =
 {
 	0,			  /*  4 noise_res (N/C)        */
 	0,			  /*  5 filter_res (N/C)       */

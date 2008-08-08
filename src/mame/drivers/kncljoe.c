@@ -244,7 +244,7 @@ static GFXDECODE_START( kncljoe )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x80, 16 )
 GFXDECODE_END
 
-static const struct AY8910interface ay8910_interface =
+static const AY8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -294,7 +294,7 @@ static MACHINE_DRIVER_START( kncljoe )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("sn1", SN76489, XTAL_3_579545MHz) /* verified on pcb */

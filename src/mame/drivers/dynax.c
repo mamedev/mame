@@ -3673,7 +3673,7 @@ MACHINE_DRIVER_END
                                 Hana Oriduru
 ***************************************************************************/
 
-static const struct AY8910interface hnoridur_ay8910_interface =
+static const AY8910_interface hnoridur_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -4077,7 +4077,7 @@ MACHINE_DRIVER_END
                            Hanafuda Hana Tengoku
 ***************************************************************************/
 
-static const struct AY8910interface htengoku_ay8910_interface =
+static const AY8910_interface htengoku_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -4140,7 +4140,7 @@ static INTERRUPT_GEN( tenkai_interrupt )
 	}
 }
 
-static const struct AY8910interface tenkai_ay8910_interface =
+static const AY8910_interface tenkai_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

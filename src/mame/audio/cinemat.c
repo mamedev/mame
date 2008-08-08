@@ -151,7 +151,7 @@ static const char *const spacewar_sample_names[] =
     0
 };
 
-static const struct Samplesinterface spacewar_samples_interface =
+static const samples_interface spacewar_samples_interface =
 {
 	8,
 	spacewar_sample_names
@@ -228,7 +228,7 @@ static const char *const barrier_sample_names[] =
     0
 };
 
-static const struct Samplesinterface barrier_samples_interface =
+static const samples_interface barrier_samples_interface =
 {
 	3,
 	barrier_sample_names
@@ -279,7 +279,7 @@ static const char *const speedfrk_sample_names[] =
     NULL
 };
 
-static const struct Samplesinterface speedfrk_samples_interface =
+static const samples_interface speedfrk_samples_interface =
 {
 	1,
 	speedfrk_sample_names
@@ -342,7 +342,7 @@ static const char *const starhawk_sample_names[] =
     NULL
 };
 
-static const struct Samplesinterface starhawk_samples_interface =
+static const samples_interface starhawk_samples_interface =
 {
 	5,
 	starhawk_sample_names
@@ -416,7 +416,7 @@ static const char *const sundance_sample_names[] =
     0
 };
 
-static const struct Samplesinterface sundance_samples_interface =
+static const samples_interface sundance_samples_interface =
 {
 	6,
 	sundance_sample_names
@@ -484,7 +484,7 @@ static const char *const tailg_sample_names[] =
     NULL
 };
 
-static const struct Samplesinterface tailg_samples_interface =
+static const samples_interface tailg_samples_interface =
 {
 	6,
 	tailg_sample_names
@@ -570,7 +570,7 @@ static const char *const warrior_sample_names[] =
     NULL
 };
 
-static const struct Samplesinterface warrior_samples_interface =
+static const samples_interface warrior_samples_interface =
 {
 	5,
 	warrior_sample_names
@@ -639,7 +639,7 @@ static const char *const armora_sample_names[] =
     NULL
 };
 
-static const struct Samplesinterface armora_samples_interface =
+static const samples_interface armora_samples_interface =
 {
 	7,
 	armora_sample_names
@@ -738,7 +738,7 @@ static const char *const ripoff_sample_names[] =
     NULL
 };
 
-static const struct Samplesinterface ripoff_samples_interface =
+static const samples_interface ripoff_samples_interface =
 {
 	6,
 	ripoff_sample_names
@@ -823,7 +823,7 @@ static const char *const starcas_sample_names[] =
     0
 };
 
-static const struct Samplesinterface starcas_samples_interface =
+static const samples_interface starcas_samples_interface =
 {
 	8,
 	starcas_sample_names
@@ -935,7 +935,7 @@ static const char *const solarq_sample_names[] =
     NULL
 };
 
-static const struct Samplesinterface solarq_samples_interface =
+static const samples_interface solarq_samples_interface =
 {
 	8,
 	solarq_sample_names
@@ -1074,7 +1074,7 @@ static const char *const boxingb_sample_names[] =
     NULL
 };
 
-static const struct Samplesinterface boxingb_samples_interface =
+static const samples_interface boxingb_samples_interface =
 {
 	12,
 	boxingb_sample_names
@@ -1203,7 +1203,7 @@ static const char *const wotw_sample_names[] =
     0
 };
 
-static const struct Samplesinterface wotw_samples_interface =
+static const samples_interface wotw_samples_interface =
 {
 	8,
 	wotw_sample_names
@@ -1315,7 +1315,7 @@ static const char *const wotwc_sample_names[] =
     0
 };
 
-static const struct Samplesinterface wotwc_samples_interface =
+static const samples_interface wotwc_samples_interface =
 {
 	8,
 	wotwc_sample_names
@@ -1469,7 +1469,7 @@ static WRITE8_HANDLER( sound_output_w )
 }
 
 
-static const struct AY8910interface demon_ay8910_interface_1 =
+static const AY8910_interface demon_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1479,7 +1479,7 @@ static const struct AY8910interface demon_ay8910_interface_1 =
 	sound_portb_w
 };
 
-static const struct AY8910interface demon_ay8910_interface_3 =
+static const AY8910_interface demon_ay8910_interface_3 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

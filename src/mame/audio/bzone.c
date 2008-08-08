@@ -271,7 +271,7 @@ static void bzone_sound_update(void *param, stream_sample_t **inputs, stream_sam
 	}
 }
 
-void *bzone_sh_start(int clock, const struct CustomSound_interface *config)
+void *bzone_sh_start(int clock, const custom_sound_interface *config)
 {
     int i;
 

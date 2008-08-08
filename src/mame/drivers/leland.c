@@ -682,7 +682,7 @@ INPUT_PORTS_END
    register.
 */
 
-static const struct AY8910interface ay8910_interface =
+static const AY8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -693,19 +693,19 @@ static const struct AY8910interface ay8910_interface =
 };
 
 
-static const struct CustomSound_interface dac_custom_interface =
+static const custom_sound_interface dac_custom_interface =
 {
     leland_sh_start
 };
 
 
-static const struct CustomSound_interface i80186_custom_interface =
+static const custom_sound_interface i80186_custom_interface =
 {
     leland_80186_sh_start
 };
 
 
-static const struct CustomSound_interface redline_custom_interface =
+static const custom_sound_interface redline_custom_interface =
 {
   	redline_80186_sh_start
 };
@@ -741,11 +741,11 @@ static MACHINE_DRIVER_START( leland )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay8910.1", AY8910, 10000000/6)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_ADD("ay8910.2", AY8910, 10000000/6)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_ADD("custom", CUSTOM, 0)

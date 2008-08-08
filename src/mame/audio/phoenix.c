@@ -426,7 +426,7 @@ WRITE8_HANDLER( phoenix_sound_control_b_w )
 	mm6221aa_tune_w(0, data >> 6);
 }
 
-void *phoenix_sh_start(int clock, const struct CustomSound_interface *config)
+void *phoenix_sh_start(int clock, const custom_sound_interface *config)
 {
 	int i, j;
 	UINT32 shiftreg;

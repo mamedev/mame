@@ -1136,7 +1136,7 @@ static TIMER_CALLBACK( snes_spc_timer  )
 	}
 }
 
-void *snes_sh_start(int clock, const struct CustomSound_interface *config)
+void *snes_sh_start(int clock, const custom_sound_interface *config)
 {
 	UINT8 ii;
 

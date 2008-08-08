@@ -14,6 +14,8 @@
 #ifndef __LASERDSC_H__
 #define __LASERDSC_H__
 
+#include "sound/custom.h"
+
 
 
 /***************************************************************************
@@ -92,7 +94,7 @@ struct _laserdisc_config
     GLOBAL VARIABLES
 ***************************************************************************/
 
-extern const struct CustomSound_interface laserdisc_custom_interface;
+extern const custom_sound_interface laserdisc_custom_interface;
 
 
 

@@ -52,7 +52,7 @@ static const char *const pulsar_sample_names[] =
 };
 
 
-static const struct Samplesinterface pulsar_samples_interface =
+static const samples_interface pulsar_samples_interface =
 {
 	12,
 	pulsar_sample_names

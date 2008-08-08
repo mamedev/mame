@@ -840,7 +840,7 @@ static const char *const elim_sample_names[] =
 	0	/* end of array */
 };
 
-static const struct Samplesinterface elim2_samples_interface =
+static const samples_interface elim2_samples_interface =
 {
 	8,	/* 8 channels */
 	elim_sample_names
@@ -872,7 +872,7 @@ static const char *const spacfury_sample_names[] =
 };
 
 
-static const struct Samplesinterface spacfury_samples_interface =
+static const samples_interface spacfury_samples_interface =
 {
 	8,	/* 8 channels */
 	spacfury_sample_names
@@ -903,7 +903,7 @@ static const char *const zektor_sample_names[] =
 };
 
 
-static const struct Samplesinterface zektor_samples_interface =
+static const samples_interface zektor_samples_interface =
 {
 	8,
 	zektor_sample_names

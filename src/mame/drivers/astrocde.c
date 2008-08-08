@@ -507,7 +507,7 @@ static z80ctc_interface ctc_intf =
 };
 
 
-static const struct AY8910interface ay8912_interface =
+static const AY8910_interface ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1217,19 +1217,19 @@ static const char *const seawolf_sample_names[] =
 	0
 };
 
-static const struct Samplesinterface seawolf2_samples_interface =
+static const samples_interface seawolf2_samples_interface =
 {
 	10,	/* 5*2 channels */
 	seawolf_sample_names
 };
 
-static const struct Samplesinterface wow_samples_interface =
+static const samples_interface wow_samples_interface =
 {
 	1,
 	wow_sample_names
 };
 
-static const struct Samplesinterface gorf_samples_interface =
+static const samples_interface gorf_samples_interface =
 {
 	1,
 	gorf_sample_names

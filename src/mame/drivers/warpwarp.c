@@ -700,12 +700,12 @@ static GFXDECODE_START( color )
 GFXDECODE_END
 
 
-static const struct CustomSound_interface geebee_custom_interface =
+static const custom_sound_interface geebee_custom_interface =
 {
 	geebee_sh_start
 };
 
-static const struct CustomSound_interface warpwarp_custom_interface =
+static const custom_sound_interface warpwarp_custom_interface =
 {
 	warpwarp_sh_start
 };

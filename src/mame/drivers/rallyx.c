@@ -829,7 +829,7 @@ static const char *const rallyx_sample_names[] =
 	0	/* end of array */
 };
 
-static const struct Samplesinterface samples_interface =
+static const samples_interface rallyx_samples_interface =
 {
 	1,	/* 1 channel */
 	rallyx_sample_names
@@ -870,7 +870,7 @@ static MACHINE_DRIVER_START( rallyx )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(samples_interface)
+	MDRV_SOUND_CONFIG(rallyx_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 

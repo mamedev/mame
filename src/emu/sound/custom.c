@@ -4,7 +4,7 @@
 
 struct custom_info
 {
-	const struct CustomSound_interface *intf;
+	const custom_sound_interface *intf;
 	void *		token;
 };
 

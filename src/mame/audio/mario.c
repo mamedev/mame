@@ -428,7 +428,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static const struct AY8910interface ay8910_interface =
+static const AY8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -476,7 +476,7 @@ MACHINE_DRIVER_START( masao_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, 14318000/6)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_DRIVER_END

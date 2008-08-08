@@ -1,5 +1,9 @@
 /*----------- defined in machine/cclimber.c -----------*/
 
+#include "sound/samples.h"
+#include "sound/ay8910.h"
+
+
 DRIVER_INIT( cclimber );
 DRIVER_INIT( cclimbrj );
 void cclimbrj_decode(running_machine *machine);
@@ -47,8 +51,8 @@ VIDEO_UPDATE( toprollr );
 
 /*----------- defined in audio/cclimber.c -----------*/
 
-extern const struct AY8910interface cclimber_ay8910_interface;
-extern const struct Samplesinterface cclimber_samples_interface;
+extern const AY8910_interface cclimber_ay8910_interface;
+extern const samples_interface cclimber_samples_interface;
 WRITE8_HANDLER( cclimber_sample_trigger_w );
 WRITE8_HANDLER( cclimber_sample_rate_w );
 WRITE8_HANDLER( cclimber_sample_volume_w );

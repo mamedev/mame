@@ -598,7 +598,7 @@ static int subwoofer_sh_start(const sound_config *msound)
 	return 0;
 }
 
-static const struct CustomSound_interface subwoofer_interface =
+static const custom_sound_interface subwoofer_interface =
 {
 	subwoofer_sh_start,
 	0, /* none */

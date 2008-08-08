@@ -1812,13 +1812,13 @@ static const char *const qbert_sample_names[] =
 	0	/* end of array */
 };
 
-static const struct Samplesinterface qbert_samples_interface =
+static const samples_interface qbert_samples_interface =
 {
  	1,	/* one channel */
 	qbert_sample_names
 };
 
-static const struct Samplesinterface reactor_samples_interface =
+static const samples_interface reactor_samples_interface =
 {
 	1,	/* one channel */
 	reactor_sample_names

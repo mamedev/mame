@@ -174,7 +174,7 @@ static void targ_audio_start(void)
 }
 
 
-static const struct Samplesinterface spectar_samples_interface =
+static const samples_interface spectar_samples_interface =
 {
 	4,	/* number of channel */
 	sample_names,
@@ -182,7 +182,7 @@ static const struct Samplesinterface spectar_samples_interface =
 };
 
 
-static const struct Samplesinterface targ_samples_interface =
+static const samples_interface targ_samples_interface =
 {
 	4,	/* number of channel */
 	sample_names,

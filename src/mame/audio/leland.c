@@ -133,7 +133,7 @@ static void leland_update(void *param, stream_sample_t **inputs, stream_sample_t
 }
 
 
-void *leland_sh_start(int clock, const struct CustomSound_interface *config)
+void *leland_sh_start(int clock, const custom_sound_interface *config)
 {
 	/* reset globals */
 	dac_buffer[0] = dac_buffer[1] = NULL;
@@ -502,7 +502,7 @@ static void leland_80186_extern_update(void *param, stream_sample_t **inputs, st
 static TIMER_CALLBACK( internal_timer_int );
 static TIMER_CALLBACK( dma_timer_callback );
 
-void *leland_80186_sh_start(int clock, const struct CustomSound_interface *config)
+void *leland_80186_sh_start(int clock, const custom_sound_interface *config)
 {
 	int i;
 
@@ -543,7 +543,7 @@ void *leland_80186_sh_start(int clock, const struct CustomSound_interface *confi
 }
 
 
-void *redline_80186_sh_start(int clock, const struct CustomSound_interface *config)
+void *redline_80186_sh_start(int clock, const custom_sound_interface *config)
 {
 	void *result = leland_80186_sh_start(clock, config);
 	is_redline = 1;

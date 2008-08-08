@@ -77,7 +77,7 @@ WRITE8_HANDLER( cclimber_sample_trigger_w )
 }
 
 
-const struct AY8910interface cclimber_ay8910_interface =
+const AY8910_interface cclimber_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -87,7 +87,7 @@ const struct AY8910interface cclimber_ay8910_interface =
 	NULL
 };
 
-const struct Samplesinterface cclimber_samples_interface =
+const samples_interface cclimber_samples_interface =
 {
 	1,
 	NULL,

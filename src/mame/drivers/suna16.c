@@ -1025,7 +1025,7 @@ static WRITE8_HANDLER( bestbest_ay8910_port_a_w )
 	// ?
 }
 
-static const struct AY8910interface bestbest_ay8910_interface =
+static const AY8910_interface bestbest_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

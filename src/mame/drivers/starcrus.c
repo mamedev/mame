@@ -160,7 +160,7 @@ static const char *const starcrus_sample_names[] =
     0
 };
 
-static const struct Samplesinterface samples_interface =
+static const samples_interface starcrus_samples_interface =
 {
     4,	/* 4 channels */
 	starcrus_sample_names
@@ -194,7 +194,7 @@ static MACHINE_DRIVER_START( starcrus )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(samples_interface)
+	MDRV_SOUND_CONFIG(starcrus_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

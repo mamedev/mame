@@ -113,7 +113,7 @@ static const char *const frogs_sample_names[] =
 	0
 };
 
-static const struct Samplesinterface frogs_samples_interface =
+static const samples_interface frogs_samples_interface =
 {
 	5,	/* 5 channels */
 	frogs_sample_names

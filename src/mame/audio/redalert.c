@@ -125,7 +125,7 @@ static WRITE8_HANDLER( redalert_ay8910_latch_2_w )
 }
 
 
-static const struct AY8910interface redalert_ay8910_interface =
+static const AY8910_interface redalert_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -311,7 +311,7 @@ static ADDRESS_MAP_START( demoneye_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static const struct AY8910interface demoneye_ay8910_interface =
+static const AY8910_interface demoneye_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

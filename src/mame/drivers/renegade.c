@@ -165,7 +165,7 @@ static void renegade_adpcm_callback(void *param, stream_sample_t **inputs, strea
 	}
 }
 
-static void *renegade_adpcm_start(int clock, const struct CustomSound_interface *config)
+static void *renegade_adpcm_start(int clock, const custom_sound_interface *config)
 {
 	struct renegade_adpcm_state *state = &renegade_adpcm;
 	state->playing = 0;
@@ -775,7 +775,7 @@ static const struct YM3526interface ym3526_interface =
 	irqhandler
 };
 
-static const struct CustomSound_interface adpcm_interface =
+static const custom_sound_interface adpcm_interface =
 {
 	renegade_adpcm_start
 };

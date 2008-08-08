@@ -554,14 +554,14 @@ static TIMER_CALLBACK( galaxian_sh_update )
 }
 
 
-const struct Samplesinterface galaxian_samples_interface =
+const samples_interface galaxian_samples_interface =
 {
 	5,
 	NULL,
 	galaxian_sh_start
 };
 
-const struct Samplesinterface galaxian_custom_interface =
+const samples_interface galaxian_custom_interface =
 {
 	5,
 	NULL,

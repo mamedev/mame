@@ -29,7 +29,7 @@ static const char *const depthch_sample_names[] =
 };
 
 
-static const struct Samplesinterface depthch_samples_interface =
+static const samples_interface depthch_samples_interface =
 {
 	4,
 	depthch_sample_names

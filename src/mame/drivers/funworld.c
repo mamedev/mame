@@ -1664,7 +1664,7 @@ static const pia6821_interface pia1_intf =
 *    Sound Interface    *
 ************************/
 
-static const struct AY8910interface ay8910_intf =
+static const AY8910_interface ay8910_intf =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

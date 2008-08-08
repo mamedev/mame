@@ -675,7 +675,7 @@ GFXDECODE_END
 
 
 
-static const struct AY8910interface ay8910_interface =
+static const AY8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -738,7 +738,7 @@ static MACHINE_DRIVER_START( gsword )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb */
@@ -784,7 +784,7 @@ static MACHINE_DRIVER_START( josvolly )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 #if 0

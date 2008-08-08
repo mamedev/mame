@@ -361,7 +361,7 @@ static GFXDECODE_START( cherrym )
 	GFXDECODE_ENTRY( "gfx2", 0x0020, spritelayout, 0, 16 )
 GFXDECODE_END
 
-static const struct AY8910interface ay8910_interface =
+static const AY8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -399,7 +399,7 @@ static MACHINE_DRIVER_START( cmv801 )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay", AY8910,18432000/12)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_DRIVER_END

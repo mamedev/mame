@@ -197,7 +197,7 @@ static const char *const astrob_sample_names[] =
 };
 
 
-static const struct Samplesinterface astrob_samples_interface =
+static const samples_interface astrob_samples_interface =
 {
 	11,
 	astrob_sample_names
@@ -339,7 +339,7 @@ WRITE8_HANDLER( astrob_sound_w )
  *************************************/
 
 static SOUND_START( 005 );
-static void *sega005_custom_start(int clock, const struct CustomSound_interface *config);
+static void *sega005_custom_start(int clock, const custom_sound_interface *config);
 static void sega005_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 static TIMER_CALLBACK( sega005_auto_timer );
 
@@ -412,14 +412,14 @@ static const char *const sega005_sample_names[] =
 };
 
 
-static const struct Samplesinterface sega005_samples_interface =
+static const samples_interface sega005_samples_interface =
 {
 	7,
 	sega005_sample_names
 };
 
 
-static const struct CustomSound_interface sega005_custom_interface =
+static const custom_sound_interface sega005_custom_interface =
 {
 	sega005_custom_start
 };
@@ -576,7 +576,7 @@ WRITE8_HANDLER( sega005_sound_b_w )
  *
  *************************************/
 
-static void *sega005_custom_start(int clock, const struct CustomSound_interface *config)
+static void *sega005_custom_start(int clock, const custom_sound_interface *config)
 {
 	/* create the stream */
 	sega005_stream = stream_create(0, 1, SEGA005_COUNTER_FREQ, NULL, sega005_stream_update);
@@ -653,7 +653,7 @@ static const char *const spaceod_sample_names[] =
 };
 
 
-static const struct Samplesinterface spaceod_samples_interface =
+static const samples_interface spaceod_samples_interface =
 {
 	11,
 	spaceod_sample_names
@@ -778,7 +778,7 @@ static const char *const monsterb_sample_names[] =
 };
 
 
-static const struct Samplesinterface monsterb_samples_interface =
+static const samples_interface monsterb_samples_interface =
 {
 	2,
 	monsterb_sample_names

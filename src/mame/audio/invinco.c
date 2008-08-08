@@ -35,7 +35,7 @@ static const char *const invinco_sample_names[] =
 };
 
 
-static const struct Samplesinterface invinco_samples_interface =
+static const samples_interface invinco_samples_interface =
 {
 	8,
 	invinco_sample_names

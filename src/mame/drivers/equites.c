@@ -1120,7 +1120,7 @@ static const struct MSM5232interface equites_5232intf =
 };
 
 
-static const struct AY8910interface equites_8910intf =
+static const AY8910_interface equites_8910intf =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1140,7 +1140,7 @@ static const char *const alphamc07_sample_names[] =
 	0
 };
 
-static const struct Samplesinterface alphamc07_samples_interface =
+static const samples_interface alphamc07_samples_interface =
 {
 	3,	/* 3 channels */
 	alphamc07_sample_names

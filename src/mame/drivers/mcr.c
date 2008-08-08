@@ -1490,7 +1490,7 @@ static const char *const journey_sample_names[] =
 	0
 };
 
-static const struct Samplesinterface journey_samples_interface =
+static const samples_interface journey_samples_interface =
 {
 	1,
 	journey_sample_names

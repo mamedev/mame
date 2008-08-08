@@ -529,7 +529,7 @@ static const char *const gaplus_sample_names[] =
 	0
 };
 
-static const struct Samplesinterface samples_interface =
+static const samples_interface gaplus_samples_interface =
 {
 	1,	/* one channel */
 	gaplus_sample_names
@@ -579,7 +579,7 @@ static MACHINE_DRIVER_START( gaplus )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(samples_interface)
+	MDRV_SOUND_CONFIG(gaplus_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 

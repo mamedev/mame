@@ -64,7 +64,7 @@ static void gridlee_stream_update(void *param, stream_sample_t **inputs, stream_
  *
  *************************************/
 
-void *gridlee_sh_start(int clock, const struct CustomSound_interface *config)
+void *gridlee_sh_start(int clock, const custom_sound_interface *config)
 {
 	/* allocate the stream */
 	gridlee_stream = stream_create(0, 1, Machine->sample_rate, NULL, gridlee_stream_update);

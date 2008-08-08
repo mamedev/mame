@@ -610,7 +610,7 @@ static GFXDECODE_START( fghtbskt )
 GFXDECODE_END
 
 
-static const struct Samplesinterface fghtbskt_samples_interface =
+static const samples_interface fghtbskt_samples_interface =
 {
 	1,
 	NULL,

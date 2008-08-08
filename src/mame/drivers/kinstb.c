@@ -197,7 +197,7 @@ static INPUT_PORTS_START( kinstb )
 
 INPUT_PORTS_END
 
-static const struct CustomSound_interface snes_sound_interface =
+static const custom_sound_interface snes_sound_interface =
 { snes_sh_start };
 
 static MACHINE_DRIVER_START( kinstb )

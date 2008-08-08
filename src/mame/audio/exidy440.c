@@ -131,7 +131,7 @@ static void fir_filter(INT32 *input, INT16 *output, int count);
  *
  *************************************/
 
-static void *exidy440_sh_start(int clock, const struct CustomSound_interface *config)
+static void *exidy440_sh_start(int clock, const custom_sound_interface *config)
 {
 	int i, length;
 
@@ -914,7 +914,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static const struct CustomSound_interface custom_interface =
+static const custom_sound_interface custom_interface =
 {
 	exidy440_sh_start,
 	exidy440_sh_stop

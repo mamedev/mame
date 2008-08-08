@@ -565,7 +565,7 @@ int cli_info_listsamples(core_options *options, const char *gamename)
 			for (sndnum = 0; sndnum < MAX_SOUND && config->sound[sndnum].type != SOUND_DUMMY; sndnum++)
 				if (config->sound[sndnum].type == SOUND_SAMPLES)
 				{
-					const char *const *samplenames = ((const struct Samplesinterface *)config->sound[sndnum].config)->samplenames;
+					const char *const *samplenames = ((const samples_interface *)config->sound[sndnum].config)->samplenames;
 					int sampnum;
 
 					/* if the list is legit, walk it and print the sample info */

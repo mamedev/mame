@@ -864,7 +864,7 @@ static const char *const panic_sample_names[] =
 	0
 };
 
-static const struct Samplesinterface panic_samples_interface =
+static const samples_interface panic_samples_interface =
 {
 	9,	/* 9 channels */
 	panic_sample_names
@@ -891,7 +891,7 @@ static const char *const cosmicg_sample_names[] =
 	0
 };
 
-static const struct Samplesinterface cosmicg_samples_interface =
+static const samples_interface cosmicg_samples_interface =
 {
 	9,	/* 9 channels */
 	cosmicg_sample_names

@@ -56,10 +56,11 @@ YMZ294: 0 I/O port
  * mixing modul (i.e. mpatrol ties 6 channels from
  * AY-3-8910 together). Do not use it now.
  */
-/* TODO: implement mixing modul */
+/* TODO: implement mixing module */
 #define AY8910_RAW_OUTPUT			(8)
 
-struct AY8910interface
+typedef struct _AY8910_interface AY8910_interface;
+struct _AY8910_interface
 {
 	int					flags;			/* Flags */
 	int					res_load[3]; 	/* Load on channel in ohms */
@@ -68,6 +69,7 @@ struct AY8910interface
 	write8_machine_func	portAwrite;
 	write8_machine_func	portBwrite;
 };
+
 
 void ay8910_set_volume(int chip,int channel,int volume);
 
@@ -122,7 +124,7 @@ WRITE16_HANDLER( AY8910_write_port_4_msb_w );
 
 /*********** An interface for SSG of YM2203 ***********/
 
-void *ay8910_start_ym(sound_type chip_type, int sndindex, int clock, const struct AY8910interface *intf);
+void *ay8910_start_ym(sound_type chip_type, int sndindex, int clock, const AY8910_interface *intf);
 
 void ay8910_stop_ym(void *chip);
 void ay8910_reset_ym(void *chip);

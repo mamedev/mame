@@ -562,7 +562,7 @@ static const struct TMS5220interface tms5220_interface =
 	looping_spcint
 };
 
-static const struct AY8910interface ay8910_interface =
+static const AY8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -621,7 +621,7 @@ static MACHINE_DRIVER_START( looping )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, SOUND_CLOCK/4)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_SOUND_ADD("tms", TMS5220, TMS_CLOCK)

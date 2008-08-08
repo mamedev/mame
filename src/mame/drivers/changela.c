@@ -457,7 +457,7 @@ static INPUT_PORTS_START( changela )
 INPUT_PORTS_END
 
 
-static const struct AY8910interface ay8910_interface_1 =
+static const AY8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -467,7 +467,7 @@ static const struct AY8910interface ay8910_interface_1 =
 	NULL
 };
 
-static const struct AY8910interface ay8910_interface_2 =
+static const AY8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

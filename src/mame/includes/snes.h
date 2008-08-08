@@ -462,7 +462,7 @@ extern WRITE8_HANDLER( spc_io_w );
 extern READ8_HANDLER( spc_ram_r );
 extern WRITE8_HANDLER( spc_ram_w );
 extern READ8_HANDLER( spc_ipl_r );
-extern void *snes_sh_start(int clock, const struct CustomSound_interface *config);
+extern void *snes_sh_start(int clock, const custom_sound_interface *config);
 extern void snes_sh_update( void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length );
 
 /* Stuff from OpenSPC 0.3.99 by Brad Martin */

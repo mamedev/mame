@@ -565,7 +565,7 @@ static VIDEO_UPDATE( laserbat )
 
 /* Laser Battle sound **********************************/
 
-static const struct SN76477interface sn76477_interface =
+static const SN76477_interface laserbat_sn76477_interface =
 {
 	RES_K(47), 		/*  4 noise_res         R21    47K */
 	0,				/*  5 filter_res (variable) */
@@ -658,7 +658,7 @@ static const pia6821_interface pia_0_intf =
 	/*irqs   : A/B             */ zaccaria_irq0a, zaccaria_irq0b
 };
 
-static const struct AY8910interface ay8910_interface =
+static const AY8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -718,7 +718,7 @@ static MACHINE_DRIVER_START( laserbat )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("sn", SN76477, 0) // output not connected
-	MDRV_SOUND_CONFIG(sn76477_interface)
+	MDRV_SOUND_CONFIG(laserbat_sn76477_interface)
 
 	MDRV_SOUND_ADD("tms1", TMS3615, 4000000/8/2) // 250 kHz, from second chip's clock out
 	MDRV_SOUND_ROUTE(TMS3615_FOOTAGE_8, "mono", 1.0)
@@ -759,7 +759,7 @@ static MACHINE_DRIVER_START( catnmous )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay1", AY8910, 3580000/2) // ?
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("ay2", AY8910, 3580000/2) // ?

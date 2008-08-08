@@ -455,7 +455,7 @@ WRITE8_HANDLER( pleiads_sound_control_c_w )
 	sound_latch_c = data;
 }
 
-static void *common_sh_start(const struct CustomSound_interface *config, const char *name)
+static void *common_sh_start(const custom_sound_interface *config, const char *name)
 {
 	int i, j;
 	UINT32 shiftreg;
@@ -483,7 +483,7 @@ static void *common_sh_start(const struct CustomSound_interface *config, const c
 	return auto_malloc(1);
 }
 
-void *pleiads_sh_start(int clock, const struct CustomSound_interface *config)
+void *pleiads_sh_start(int clock, const custom_sound_interface *config)
 {
 	/* The real values are _unknown_!
      * I took the ones from Naughty Boy / Pop Flamer
@@ -544,7 +544,7 @@ void *pleiads_sh_start(int clock, const struct CustomSound_interface *config)
 	return common_sh_start(config, "Custom (Pleiads)");
 }
 
-void *naughtyb_sh_start(int clock, const struct CustomSound_interface *config)
+void *naughtyb_sh_start(int clock, const custom_sound_interface *config)
 {
 	/* charge 10u??? through 330K (R??) -> 3.3s */
 	pa5_charge_time = 3.3;
@@ -601,7 +601,7 @@ void *naughtyb_sh_start(int clock, const struct CustomSound_interface *config)
 	return common_sh_start(config, "Custom (Naughty Boy)");
 }
 
-void *popflame_sh_start(int clock, const struct CustomSound_interface *config)
+void *popflame_sh_start(int clock, const custom_sound_interface *config)
 {
 	/* charge 10u (C63 in Pop Flamer) through 330K -> 3.3s */
 	pa5_charge_time = 3.3;

@@ -567,7 +567,7 @@ INPUT_PORTS_END
 
 
 
-static const struct AY8910interface stratvox_ay8910_interface =
+static const AY8910_interface stratvox_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -578,7 +578,7 @@ static const struct AY8910interface stratvox_ay8910_interface =
 };
 
 
-static const struct SN76477interface sn76477_interface =
+static const SN76477_interface sn76477_intf =
 {
 	RES_K(47),		/*  4  noise_res                    */
 	RES_K(150),		/*  5  filter_res                   */
@@ -662,7 +662,7 @@ static MACHINE_DRIVER_START( stratvox )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("sn", SN76477, 0)
-	MDRV_SOUND_CONFIG(sn76477_interface)
+	MDRV_SOUND_CONFIG(sn76477_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)

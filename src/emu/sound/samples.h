@@ -14,7 +14,8 @@ struct loaded_samples
     struct loaded_sample sample[1]; /* array of samples */
 };
 
-struct Samplesinterface
+typedef struct _samples_interface samples_interface;
+struct _samples_interface
 {
     int         channels;   /* number of discrete audio channels needed */
     const char *const *samplenames;

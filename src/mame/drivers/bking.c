@@ -432,7 +432,7 @@ static WRITE8_HANDLER( portb_w )
 	if (data != 0x00) logerror("portB = %02x\n",data);
 }
 
-static const struct AY8910interface ay8910_interface =
+static const AY8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -480,7 +480,7 @@ static MACHINE_DRIVER_START( bking )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_ADD("ay2", AY8910, XTAL_6MHz/4)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)

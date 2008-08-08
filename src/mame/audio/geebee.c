@@ -112,7 +112,7 @@ static void geebee_sound_update(void *param, stream_sample_t **inputs, stream_sa
     }
 }
 
-void *geebee_sh_start(int clock, const struct CustomSound_interface *config)
+void *geebee_sh_start(int clock, const custom_sound_interface *config)
 {
 	int i;
 

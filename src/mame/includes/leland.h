@@ -101,10 +101,10 @@ void leland_rotate_memory(running_machine *machine, const char *cpuname);
 
 /*----------- defined in audio/leland.c -----------*/
 
-void *leland_sh_start(int clock, const struct CustomSound_interface *config);
+void *leland_sh_start(int clock, const custom_sound_interface *config);
 
-void *leland_80186_sh_start(int clock, const struct CustomSound_interface *config);
-void *redline_80186_sh_start(int clock, const struct CustomSound_interface *config);
+void *leland_80186_sh_start(int clock, const custom_sound_interface *config);
+void *redline_80186_sh_start(int clock, const custom_sound_interface *config);
 void leland_dac_update(int dacnum, UINT8 sample);
 
 void leland_80186_sound_init(void);

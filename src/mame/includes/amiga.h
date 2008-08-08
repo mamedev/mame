@@ -398,7 +398,7 @@ const amiga_machine_interface *amiga_get_interface(void);
 
 /*----------- defined in audio/amiga.c -----------*/
 
-void *amiga_sh_start(int clock, const struct CustomSound_interface *config);
+void *amiga_sh_start(int clock, const custom_sound_interface *config);
 void amiga_audio_update(void);
 void amiga_audio_data_w(int which, UINT16 data);
 

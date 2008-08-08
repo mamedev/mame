@@ -344,7 +344,7 @@ static GFXDECODE_START( lucky8 )
 	GFXDECODE_ENTRY( "gfx2", 0x1000, spritelayout2, 0, 64 )
 GFXDECODE_END
 
-static const struct AY8910interface ay8910_interface =
+static const AY8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -380,7 +380,7 @@ static MACHINE_DRIVER_START( lucky8 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, 12000000/12)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 

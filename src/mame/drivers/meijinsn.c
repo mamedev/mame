@@ -289,7 +289,7 @@ static INTERRUPT_GEN( meijinsn_interrupt )
 		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 }
 
-static const struct AY8910interface ay8910_interface =
+static const AY8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -334,7 +334,7 @@ static MACHINE_DRIVER_START( meijinsn )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, 2000000)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 MACHINE_DRIVER_END

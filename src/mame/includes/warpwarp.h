@@ -25,7 +25,7 @@ WRITE8_HANDLER( geebee_videoram_w );
 /*----------- defined in audio/geebee.c -----------*/
 
 WRITE8_HANDLER( geebee_sound_w );
-void *geebee_sh_start(int clock, const struct CustomSound_interface *config);
+void *geebee_sh_start(int clock, const custom_sound_interface *config);
 
 
 /*----------- defined in audio/warpwarp.c -----------*/
@@ -33,4 +33,4 @@ void *geebee_sh_start(int clock, const struct CustomSound_interface *config);
 WRITE8_HANDLER( warpwarp_sound_w );
 WRITE8_HANDLER( warpwarp_music1_w );
 WRITE8_HANDLER( warpwarp_music2_w );
-void *warpwarp_sh_start(int clock, const struct CustomSound_interface *config);
+void *warpwarp_sh_start(int clock, const custom_sound_interface *config);

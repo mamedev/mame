@@ -69,7 +69,7 @@ GFXDECODE_END
 
 
 
-static const struct AY8910interface hustler_ay8910_interface =
+static const AY8910_interface hustler_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1100,7 +1100,7 @@ MM_COMMON2
 INPUT_PORTS_END
 
 
-static const struct AY8910interface scobra_ay8910_interface_2 =
+static const AY8910_interface scobra_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

@@ -896,14 +896,14 @@ GFXDECODE_END
 
 
 
-static const struct Samplesinterface pbillian_samples_interface =
+static const samples_interface pbillian_samples_interface =
 {
 	1,
 	NULL,
 	pbillian_sh_start
 };
 
-static const struct AY8910interface pbillian_ay8910_interface =
+static const AY8910_interface pbillian_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -913,7 +913,7 @@ static const struct AY8910interface pbillian_ay8910_interface =
 	NULL
 };
 
-static const struct AY8910interface hotsmash_ay8910_interface =
+static const AY8910_interface hotsmash_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -923,7 +923,7 @@ static const struct AY8910interface hotsmash_ay8910_interface =
 	NULL
 };
 
-static const struct AY8910interface sqix_ay8910_interface_1 =
+static const AY8910_interface sqix_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -933,7 +933,7 @@ static const struct AY8910interface sqix_ay8910_interface_1 =
 	NULL
 };
 
-static const struct AY8910interface sqix_ay8910_interface_2 =
+static const AY8910_interface sqix_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -943,7 +943,7 @@ static const struct AY8910interface sqix_ay8910_interface_2 =
 	sqix_z80_mcu_w		/* port Bwrite */
 };
 
-static const struct AY8910interface bootleg_ay8910_interface_1 =
+static const AY8910_interface bootleg_ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -953,7 +953,7 @@ static const struct AY8910interface bootleg_ay8910_interface_1 =
 	NULL
 };
 
-static const struct AY8910interface bootleg_ay8910_interface_2 =
+static const AY8910_interface bootleg_ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

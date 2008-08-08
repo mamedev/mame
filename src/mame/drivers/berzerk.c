@@ -465,7 +465,7 @@ static VIDEO_UPDATE( berzerk )
  *
  *************************************/
 
-static const struct CustomSound_interface berzerk_custom_interface =
+static const custom_sound_interface berzerk_custom_interface =
 {
 	exidy_sh6840_sh_start,
 	0,

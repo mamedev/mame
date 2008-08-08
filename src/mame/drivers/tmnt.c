@@ -2321,7 +2321,7 @@ static const struct K007232_interface k007232_interface =
 	volume_callback	/* external port callback */
 };
 
-static const struct Samplesinterface samples_interface =
+static const samples_interface tmnt_samples_interface =
 {
 	1,	/* 1 channel for the title music */
 	NULL,
@@ -2450,7 +2450,7 @@ static MACHINE_DRIVER_START( tmnt )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(samples_interface)
+	MDRV_SOUND_CONFIG(tmnt_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

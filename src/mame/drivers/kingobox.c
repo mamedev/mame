@@ -536,7 +536,7 @@ static GFXDECODE_START( rk )
 	GFXDECODE_ENTRY( "gfx4", 0x00000, rk_bglayout,       0, 32 )	/* bg tiles */
 GFXDECODE_END
 
-static const struct AY8910interface ay8910_interface =
+static const AY8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -590,7 +590,7 @@ static MACHINE_DRIVER_START( kingofb )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, 1500000)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
@@ -640,7 +640,7 @@ static MACHINE_DRIVER_START( ringking )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, 1500000)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)

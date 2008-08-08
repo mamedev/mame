@@ -43,7 +43,7 @@ extern UINT8 *gomoku_soundregs2;
 extern WRITE8_HANDLER( gomoku_sound1_w );
 extern WRITE8_HANDLER( gomoku_sound2_w );
 
-extern void *gomoku_sh_start(int clock, const struct CustomSound_interface *config);
+extern void *gomoku_sh_start(int clock, const custom_sound_interface *config);
 
 /* input ports are rotated 90 degrees */
 static READ8_HANDLER( input_port_r )
@@ -161,7 +161,7 @@ static GFXDECODE_START( gomoku )
 GFXDECODE_END
 
 
-static const struct CustomSound_interface custom_interface =
+static const custom_sound_interface custom_interface =
 {
 	gomoku_sh_start
 };

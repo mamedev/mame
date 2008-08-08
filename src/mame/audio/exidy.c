@@ -338,7 +338,7 @@ static void exidy_stream_update(void *param, stream_sample_t **inputs, stream_sa
  *
  *************************************/
 
-void *exidy_sh6840_sh_start(int clock, const struct CustomSound_interface *config)
+void *exidy_sh6840_sh_start(int clock, const custom_sound_interface *config)
 {
 	int sample_rate = SH8253_CLOCK;
 
@@ -626,7 +626,7 @@ static const pia6821_interface venture_pia_1_intf =
 };
 
 
-static void *venture_common_sh_start(int clock, const struct CustomSound_interface *config, int _has_tms5220)
+static void *venture_common_sh_start(int clock, const custom_sound_interface *config, int _has_tms5220)
 {
 	int i;
 
@@ -652,7 +652,7 @@ static void *venture_common_sh_start(int clock, const struct CustomSound_interfa
 }
 
 
-static void *venture_sh_start(int clock, const struct CustomSound_interface *config)
+static void *venture_sh_start(int clock, const custom_sound_interface *config)
 {
 	pia_config(0, &venture_pia_0_intf);
 	pia_config(1, &venture_pia_1_intf);
@@ -676,7 +676,7 @@ static void venture_sh_reset(void *token)
 }
 
 
-static const struct CustomSound_interface venture_custom_interface =
+static const custom_sound_interface venture_custom_interface =
 {
 	venture_sh_start,
 	0,
@@ -848,7 +848,7 @@ static const pia6821_interface victory_pia_e5_intf =
 };
 
 
-static void *victory_sh_start(int clock, const struct CustomSound_interface *config)
+static void *victory_sh_start(int clock, const custom_sound_interface *config)
 {
 	pia_config(1, &victory_pia_e5_intf);
 
@@ -873,7 +873,7 @@ static void victory_sh_reset(void *token)
 }
 
 
-static const struct CustomSound_interface victory_custom_interface =
+static const custom_sound_interface victory_custom_interface =
 {
 	victory_sh_start,
 	0,

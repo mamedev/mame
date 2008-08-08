@@ -789,7 +789,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 	}
 };
 
-static const struct AY8910interface merit_ay8912_interface =
+static const AY8910_interface merit_ay8912_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

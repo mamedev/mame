@@ -98,7 +98,7 @@ static const char *const carnival_sample_names[] =
 };
 
 
-static const struct Samplesinterface carnival_samples_interface =
+static const samples_interface carnival_samples_interface =
 {
 	10,
 	carnival_sample_names

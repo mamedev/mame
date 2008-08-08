@@ -16,7 +16,7 @@ static const char *const triplhnt_sample_names[] =
 	0
 };
 
-const struct Samplesinterface triplhnt_samples_interface =
+const samples_interface triplhnt_samples_interface =
 {
 	2,	/* 2 channels */
 	triplhnt_sample_names

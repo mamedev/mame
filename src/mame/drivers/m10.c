@@ -733,7 +733,7 @@ static const char *const m10_sample_names[] =
 };
 
 
-static const struct Samplesinterface m10_samples_interface =
+static const samples_interface m10_samples_interface =
 {
 	6,	/* 6 channels */
 	m10_sample_names

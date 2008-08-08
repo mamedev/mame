@@ -86,7 +86,7 @@ WRITE8_HANDLER( flower_sound2_w );
 
 extern UINT8 *flower_textram, *flower_bg0ram, *flower_bg1ram, *flower_bg0_scroll, *flower_bg1_scroll;
 extern UINT8 *flower_soundregs1,*flower_soundregs2;
-void *flower_sh_start(int clock, const struct CustomSound_interface *config);
+void *flower_sh_start(int clock, const custom_sound_interface *config);
 
 static UINT8 *sn_irq_enable;
 static UINT8 *sn_nmi_enable;
@@ -246,7 +246,7 @@ static GFXDECODE_START( flower )
 	GFXDECODE_ENTRY( "gfx3", 0, flower_tilelayout, 0,  16 )
 GFXDECODE_END
 
-static const struct CustomSound_interface custom_interface =
+static const custom_sound_interface custom_interface =
 {
 	flower_sh_start
 };

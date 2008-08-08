@@ -321,7 +321,7 @@ INPUT_PORTS_END
 
 
 
-static const struct AY8910interface ay8910_interface =
+static const AY8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -361,7 +361,7 @@ static MACHINE_DRIVER_START( junofrst )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, 14318000/8)
-	MDRV_SOUND_CONFIG(ay8910_interface)
+	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(0, "filter.0.0", 0.30)
 	MDRV_SOUND_ROUTE(1, "filter.0.1", 0.30)
 	MDRV_SOUND_ROUTE(2, "filter.0.2", 0.30)

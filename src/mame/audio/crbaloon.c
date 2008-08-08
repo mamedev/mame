@@ -136,7 +136,7 @@ DISCRETE_SOUND_END
 
 
 
-static const struct SN76477interface sn76477_interface =
+static const SN76477_interface crbaloon_sn76477_interface =
 {
 	RES_K( 47),	/*  4 noise_res          */
 	RES_K(330),	/*  5 filter_res         */
@@ -170,7 +170,7 @@ MACHINE_DRIVER_START( crbaloon_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("sn", SN76477, 0)
-	MDRV_SOUND_CONFIG(sn76477_interface)
+	MDRV_SOUND_CONFIG(crbaloon_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)

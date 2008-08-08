@@ -304,7 +304,7 @@ static void read_track_data(laserdisc_state *ld);
 static void process_track_data(const device_config *device);
 static void fake_metadata(UINT32 track, UINT8 which, vbi_metadata *metadata);
 static void render_display(UINT16 *videodata, UINT32 rowpixels, UINT32 width, int frame);
-static void *custom_start(int clock, const struct CustomSound_interface *config);
+static void *custom_start(int clock, const custom_sound_interface *config);
 static void custom_stream_callback(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 
 /* Pioneer PR-7820 implementation */
@@ -351,7 +351,7 @@ static void vp932_state_changed(laserdisc_state *ld, UINT8 oldstate);
     GLOBAL VARIABLES
 ***************************************************************************/
 
-const struct CustomSound_interface laserdisc_custom_interface =
+const custom_sound_interface laserdisc_custom_interface =
 {
 	custom_start
 };
@@ -1484,7 +1484,7 @@ static void render_display(UINT16 *videodata, UINT32 rowpixels, UINT32 width, in
     for laserdiscs
 -------------------------------------------------*/
 
-static void *custom_start(int clock, const struct CustomSound_interface *config)
+static void *custom_start(int clock, const custom_sound_interface *config)
 {
 	sound_token *token = auto_malloc(sizeof(*token));
 	token->stream = stream_create(0, 2, 48000, token, custom_stream_callback);

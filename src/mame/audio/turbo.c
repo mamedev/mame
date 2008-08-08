@@ -180,7 +180,7 @@ static const char *const turbo_sample_names[] =
 };
 
 
-static const struct Samplesinterface turbo_samples_interface =
+static const samples_interface turbo_samples_interface =
 {
 	10,
 	turbo_sample_names
@@ -436,7 +436,7 @@ static const char *const subroc3d_sample_names[] =
 };
 
 
-static const struct Samplesinterface subroc3d_samples_interface =
+static const samples_interface subroc3d_samples_interface =
 {
 	12,
 	subroc3d_sample_names
@@ -589,7 +589,7 @@ static const char *const buckrog_sample_names[]=
 };
 
 
-static const struct Samplesinterface buckrog_samples_interface =
+static const samples_interface buckrog_samples_interface =
 {
 	6,          /* 6 channels */
 	buckrog_sample_names

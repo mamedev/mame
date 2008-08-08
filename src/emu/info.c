@@ -499,7 +499,7 @@ static void print_game_sampleof(FILE *out, const game_driver *game, const machin
 	for (sndnum = 0; sndnum < ARRAY_LENGTH(config->sound) && config->sound[sndnum].type != SOUND_DUMMY; sndnum++)
 		if (config->sound[sndnum].type == SOUND_SAMPLES)
 		{
-			const char *const *samplenames = ((const struct Samplesinterface *)config->sound[sndnum].config)->samplenames;
+			const char *const *samplenames = ((const samples_interface *)config->sound[sndnum].config)->samplenames;
 			if (samplenames != NULL)
 			{
 				int sampnum;
@@ -533,7 +533,7 @@ static void print_game_sample(FILE *out, const game_driver *game, const machine_
 	for (sndnum = 0; sndnum < ARRAY_LENGTH(config->sound) && config->sound[sndnum].type != SOUND_DUMMY; sndnum++)
 		if (config->sound[sndnum].type == SOUND_SAMPLES)
 		{
-			const char *const *samplenames = ((const struct Samplesinterface *)config->sound[sndnum].config)->samplenames;
+			const char *const *samplenames = ((const samples_interface *)config->sound[sndnum].config)->samplenames;
 			if (samplenames != NULL)
 			{
 				int sampnum;

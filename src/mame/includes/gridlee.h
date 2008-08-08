@@ -12,7 +12,7 @@
 /*----------- defined in audio/gridlee.c -----------*/
 
 WRITE8_HANDLER( gridlee_sound_w );
-void *gridlee_sh_start(int clock, const struct CustomSound_interface *config);
+void *gridlee_sh_start(int clock, const custom_sound_interface *config);
 
 
 /*----------- defined in video/gridlee.c -----------*/

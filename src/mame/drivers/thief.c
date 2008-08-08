@@ -418,7 +418,7 @@ static const char *const sharkatt_sample_names[] =
 	0	/* end of array */
 };
 
-static const struct Samplesinterface sharkatt_samples_interface =
+static const samples_interface sharkatt_samples_interface =
 {
 	2,	/* number of channels */
 	sharkatt_sample_names
@@ -434,7 +434,7 @@ static const char *const thief_sample_names[] =
 	0	/* end of array */
 };
 
-static const struct Samplesinterface thief_samples_interface =
+static const samples_interface thief_samples_interface =
 {
 	2,	/* number of channels */
 	thief_sample_names
@@ -450,7 +450,7 @@ static const char *const natodef_sample_names[] =
 	0	/* end of array */
 };
 
-static const struct Samplesinterface natodef_samples_interface =
+static const samples_interface natodef_samples_interface =
 {
 	2,	/* number of channels */
 	natodef_sample_names

@@ -996,7 +996,7 @@ Addresses found at @0x510, cpu2
         0
     };
 
-    static const struct Samplesinterface radarsc1_samples_interface =
+    static const samples_interface radarsc1_samples_interface =
     {
         8,
         radarsc1_sample_names

@@ -62,7 +62,7 @@ static const char *const blockade_sample_names[] =
     0
 };
 
-const struct Samplesinterface blockade_samples_interface =
+const samples_interface blockade_samples_interface =
 {
     1,	/* 1 channel */
 	blockade_sample_names

@@ -403,7 +403,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const struct CustomSound_interface custom_interface =
+static const custom_sound_interface custom_interface =
 {
 	gridlee_sh_start
 };
@@ -417,7 +417,7 @@ static const char *const sample_names[] =
 	0	/* end of array */
 };
 
-static const struct Samplesinterface samples_interface =
+static const samples_interface gridlee_samples_interface =
 {
 	8,	/* 8 channels */
 	sample_names
@@ -459,7 +459,7 @@ static MACHINE_DRIVER_START( gridlee )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(samples_interface)
+	MDRV_SOUND_CONFIG(gridlee_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
 

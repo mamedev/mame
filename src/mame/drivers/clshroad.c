@@ -36,7 +36,7 @@ VIDEO_START( clshroad );
 VIDEO_UPDATE( clshroad );
 
 extern UINT8 *wiping_soundregs;
-void *wiping_sh_start(int clock, const struct CustomSound_interface *config);
+void *wiping_sh_start(int clock, const custom_sound_interface *config);
 WRITE8_HANDLER( wiping_sound_w );
 
 
@@ -272,7 +272,7 @@ GFXDECODE_END
 
 
 
-static const struct CustomSound_interface custom_interface =
+static const custom_sound_interface custom_interface =
 {
 	wiping_sh_start
 };

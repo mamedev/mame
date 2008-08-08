@@ -273,7 +273,7 @@ GFXDECODE_END
 
 
 
-static const struct AY8910interface ay8910_interface =
+static const AY8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -309,7 +309,7 @@ static MACHINE_DRIVER_START( goldstar )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")//set up a standard mono speaker called 'mono'
 	MDRV_SOUND_ADD("ay", AY8910,1500000)//1 AY8910, at clock 150000Hz
-	MDRV_SOUND_CONFIG(ay8910_interface)//read extra data from interface
+	MDRV_SOUND_CONFIG(ay8910_config)//read extra data from interface
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)//all sound goes to the 'mono' speaker, at 0.50 X maximum
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)//clock
@@ -345,7 +345,7 @@ static MACHINE_DRIVER_START( goldstbl )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")//set up a standard mono speaker called 'mono'
 	MDRV_SOUND_ADD("ay", AY8910,1500000)//1 AY8910, at clock 150000Hz
-	MDRV_SOUND_CONFIG(ay8910_interface)//read extra data from interface
+	MDRV_SOUND_CONFIG(ay8910_config)//read extra data from interface
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)//all sound goes to the 'mono' speaker, at 0.50 X maximum
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)//clock
@@ -380,7 +380,7 @@ static MACHINE_DRIVER_START( moonlght )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")//set up a standard mono speaker called 'mono'
 	MDRV_SOUND_ADD("ay", AY8910,1500000)//1 AY8910, at clock 150000Hz
-	MDRV_SOUND_CONFIG(ay8910_interface)//read extra data from interface
+	MDRV_SOUND_CONFIG(ay8910_config)//read extra data from interface
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)//all sound goes to the 'mono' speaker, at 0.50 X maximum
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)//clock

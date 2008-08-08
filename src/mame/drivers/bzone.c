@@ -552,7 +552,7 @@ static const struct POKEYinterface bzone_pokey_interface =
 };
 
 
-static const struct CustomSound_interface bzone_custom_interface =
+static const custom_sound_interface bzone_custom_interface =
 {
 	bzone_sh_start
 };
@@ -565,7 +565,7 @@ static const struct POKEYinterface redbaron_pokey_interface =
 };
 
 
-static const struct CustomSound_interface redbaron_custom_interface =
+static const custom_sound_interface redbaron_custom_interface =
 {
 	redbaron_sh_start
 };

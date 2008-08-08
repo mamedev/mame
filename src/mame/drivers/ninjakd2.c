@@ -913,7 +913,7 @@ static const struct YM2203interface ym2203_interface =
 };
 
 
-static const struct Samplesinterface samples_interface =
+static const samples_interface ninjakd2_samples_interface =
 {
 	1,	/* 1 channel */
 	NULL,
@@ -972,7 +972,7 @@ static MACHINE_DRIVER_START( ninjakd2 )
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
 	MDRV_SOUND_ADD("PCM", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(samples_interface)
+	MDRV_SOUND_CONFIG(ninjakd2_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 

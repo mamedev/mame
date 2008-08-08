@@ -823,7 +823,7 @@ static const struct namco_52xx_interface namco_52xx_interface =
 	.5				/* Combined gain of both filters */
 };
 
-static const struct CustomSound_interface custom_interface =
+static const custom_sound_interface custom_interface =
 {
 	polepos_sh_start,
 	NULL,

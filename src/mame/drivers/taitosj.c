@@ -1775,7 +1775,7 @@ static WRITE8_HANDLER( dac_vol_w )
 }
 
 
-static const struct AY8910interface ay8910_interface_1 =
+static const AY8910_interface ay8910_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1785,7 +1785,7 @@ static const struct AY8910interface ay8910_interface_1 =
 	NULL
 };
 
-static const struct AY8910interface ay8910_interface_2 =
+static const AY8910_interface ay8910_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1795,7 +1795,7 @@ static const struct AY8910interface ay8910_interface_2 =
 	dac_vol_w	/* port Bwrite */
 };
 
-static const struct AY8910interface ay8910_interface_3 =
+static const AY8910_interface ay8910_interface_3 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -1805,7 +1805,7 @@ static const struct AY8910interface ay8910_interface_3 =
 	NULL
 };
 
-static const struct AY8910interface ay8910_interface_4 =
+static const AY8910_interface ay8910_interface_4 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

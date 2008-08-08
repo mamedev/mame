@@ -264,7 +264,7 @@ static const char *const tankbatt_sample_names[] =
     0	/* end of array */
 };
 
-static const struct Samplesinterface samples_interface =
+static const samples_interface tankbatt_samples_interface =
 {
 	3,	/* 3 channels */
 	tankbatt_sample_names
@@ -298,7 +298,7 @@ static MACHINE_DRIVER_START( tankbatt )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(samples_interface)
+	MDRV_SOUND_CONFIG(tankbatt_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 

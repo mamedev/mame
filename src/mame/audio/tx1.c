@@ -274,7 +274,7 @@ static void tx1_stream_update(void *param, stream_sample_t **inputs, stream_samp
 }
 
 
-void *tx1_sh_start(int clock, const struct CustomSound_interface *config)
+void *tx1_sh_start(int clock, const custom_sound_interface *config)
 {
 	static const int r0[4] = { 390e3, 180e3, 180e3, 180e3 };
 	static const int r1[3] = { 180e3, 390e3, 56e3 };
@@ -495,7 +495,7 @@ static void buggyboy_stream_update(void *param, stream_sample_t **inputs, stream
 	}
 }
 
-void *buggyboy_sh_start(int clock, const struct CustomSound_interface *config)
+void *buggyboy_sh_start(int clock, const custom_sound_interface *config)
 {
 	static const int resistors[4] = { 330000, 220000, 330000, 220000 };
 	double aweights[4];

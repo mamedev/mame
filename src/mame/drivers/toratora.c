@@ -169,7 +169,7 @@ static WRITE8_HANDLER( clear_timer_w )
  *
  *************************************/
 
-static const struct SN76477interface sn76477_interface =
+static const SN76477_interface sn76477_intf =
 {
 	RES_K(47),	/*  4 noise_res                */
 //  RES_K(120), /*  5 filter_res               */
@@ -420,11 +420,11 @@ static MACHINE_DRIVER_START( toratora )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("sn1", SN76477, 0)
-	MDRV_SOUND_CONFIG(sn76477_interface)
+	MDRV_SOUND_CONFIG(sn76477_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("sn2", SN76477, 0)
-	MDRV_SOUND_CONFIG(sn76477_interface)
+	MDRV_SOUND_CONFIG(sn76477_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_DRIVER_END

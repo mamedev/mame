@@ -168,7 +168,7 @@ static void seibu_adpcm_callback(void *param, stream_sample_t **inputs, stream_s
 	}
 }
 
-static void *seibu_adpcm_start(int clock, const struct CustomSound_interface *config)
+static void *seibu_adpcm_start(int clock, const custom_sound_interface *config)
 {
 	int i;
 
@@ -472,7 +472,7 @@ const struct YM3812interface seibu_ym3812_interface =
 	seibu_ym3812_irqhandler
 };
 
-const struct CustomSound_interface seibu_adpcm_interface =
+const custom_sound_interface seibu_adpcm_interface =
 {
 	seibu_adpcm_start,
 	seibu_adpcm_stop

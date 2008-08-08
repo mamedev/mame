@@ -562,7 +562,7 @@ static const char *const bowl3d_sample_names[] =
 };
 
 
-static const struct Samplesinterface meadows_samples_interface =
+static const samples_interface meadows_samples_interface =
 {
 	2,
 	NULL,
@@ -570,7 +570,7 @@ static const struct Samplesinterface meadows_samples_interface =
 };
 
 
-static const struct Samplesinterface bowl3d_samples_interface =
+static const samples_interface bowl3d_samples_interface =
 {
  	1,
 	bowl3d_sample_names

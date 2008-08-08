@@ -4,6 +4,9 @@
 
 ***************************************************************************/
 
+#include "sound/samples.h"
+
+
 /* we scale horizontally by 3 to render stars correctly */
 #define GALAXIAN_XSCALE			3
 
@@ -123,8 +126,8 @@ void jumpbug_extend_sprite_info(const UINT8 *base, UINT8 *sx, UINT8 *sy, UINT8 *
 
 /*----------- defined in audio/galaxian.c -----------*/
 
-extern const struct Samplesinterface galaxian_samples_interface;
-extern const struct Samplesinterface galaxian_custom_interface;
+extern const samples_interface galaxian_samples_interface;
+extern const samples_interface galaxian_custom_interface;
 
 WRITE8_HANDLER( galaxian_sound_w );
 WRITE8_HANDLER( galaxian_pitch_w );

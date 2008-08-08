@@ -617,7 +617,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const struct AY8910interface tx1_ay8910_interface =
+static const AY8910_interface tx1_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -629,7 +629,7 @@ static const struct AY8910interface tx1_ay8910_interface =
 
 
 /* YM2149 IC19 */
-static const struct AY8910interface buggyboy_ym2149_interface_1 =
+static const AY8910_interface buggyboy_ym2149_interface_1 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -640,7 +640,7 @@ static const struct AY8910interface buggyboy_ym2149_interface_1 =
 };
 
 /* YM2149 IC24 */
-static const struct AY8910interface buggyboy_ym2149_interface_2 =
+static const AY8910_interface buggyboy_ym2149_interface_2 =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -666,7 +666,7 @@ static const ppi8255_interface tx1_ppi8255_intf =
 	tx1_coin_cnt
 };
 
-static const struct CustomSound_interface tx1_custom_interface =
+static const custom_sound_interface tx1_custom_interface =
 {
 	tx1_sh_start,
 	NULL,
@@ -684,7 +684,7 @@ static const ppi8255_interface buggyboy_ppi8255_intf =
 	NULL
 };
 
-static const struct CustomSound_interface bb_custom_interface =
+static const custom_sound_interface bb_custom_interface =
 {
 	buggyboy_sh_start,
 	NULL,

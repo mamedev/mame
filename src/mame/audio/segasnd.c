@@ -640,7 +640,7 @@ static void usb_stream_update(void *param, stream_sample_t **inputs, stream_samp
 }
 
 
-static void *usb_start(int clock, const struct CustomSound_interface *config)
+static void *usb_start(int clock, const custom_sound_interface *config)
 {
 	filter_state temp;
 	int tchan, tgroup;
@@ -902,7 +902,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static const struct CustomSound_interface usb_custom_interface =
+static const custom_sound_interface usb_custom_interface =
 {
     usb_start
 };

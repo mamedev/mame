@@ -136,7 +136,7 @@ extern UINT8 *tiamc1_spriteram_x, *tiamc1_spriteram_y, *tiamc1_spriteram_n,
 	*tiamc1_spriteram_a;
 
 /* routines defined in audio */
-extern void *tiamc1_sh_start(int clock, const struct CustomSound_interface *config);
+extern void *tiamc1_sh_start(int clock, const custom_sound_interface *config);
 extern WRITE8_HANDLER( tiamc1_timer0_w );
 extern WRITE8_HANDLER( tiamc1_timer1_w );
 extern WRITE8_HANDLER( tiamc1_timer1_gate_w );
@@ -267,7 +267,7 @@ static GFXDECODE_START( tiamc1 )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, sprites16x16_layout, 0, 16 )
 GFXDECODE_END
 
-static const struct CustomSound_interface tiamc1_custom_interface =
+static const custom_sound_interface tiamc1_custom_interface =
 {
         tiamc1_sh_start
 };

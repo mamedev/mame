@@ -13,7 +13,7 @@ static const char *const circus_sample_names[] =
 	0
 };
 
-const struct Samplesinterface circus_samples_interface =
+const samples_interface circus_samples_interface =
 {
 	3,	/* 3 channels */
 	circus_sample_names
@@ -26,7 +26,7 @@ static const char *const crash_sample_names[] =
 	0
 };
 
-const struct Samplesinterface crash_samples_interface =
+const samples_interface crash_samples_interface =
 {
 	1,	/* 1 channel */
 	crash_sample_names
@@ -42,7 +42,7 @@ static const char *const ripcord_sample_names[] =
 	0
 };
 
-const struct Samplesinterface ripcord_samples_interface =
+const samples_interface ripcord_samples_interface =
 {
 	4,	/* 4 channels */
 	ripcord_sample_names
@@ -59,7 +59,7 @@ static const char *const robotbwl_sample_names[] =
 	0
 };
 
-const struct Samplesinterface robotbwl_samples_interface =
+const samples_interface robotbwl_samples_interface =
 {
 	5,	/* 5 channels */
 	robotbwl_sample_names

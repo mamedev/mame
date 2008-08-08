@@ -119,7 +119,7 @@ static WRITE8_HANDLER( merit_prot_w )
 }
 
 #if 0
-static const struct AY8910interface ay8910_interface =
+static const AY8910_interface ay8910_config =
 {
 	input_port_4_r,
 };
@@ -386,7 +386,7 @@ static MACHINE_DRIVER_START( couple )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, 4000000)
-//  MDRV_SOUND_CONFIG(ay8910_interface)
+//  MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

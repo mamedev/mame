@@ -77,7 +77,7 @@ static const char *const spacefb_sample_names[] =
 };
 
 
-static const struct Samplesinterface spacefb_samples_interface =
+static const samples_interface spacefb_samples_interface =
 {
 	3,
 	spacefb_sample_names

@@ -3,7 +3,7 @@
 /*----------- defined in audio/attckufo.c -----------*/
 
 void attckufo_soundport_w (int offset, int data);
-void *attckufo_custom_start(int clock, const struct CustomSound_interface *config);
+void *attckufo_custom_start(int clock, const custom_sound_interface *config);
 
 
 /*----------- defined in video/attckufo.c -----------*/

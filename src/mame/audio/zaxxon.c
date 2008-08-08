@@ -100,7 +100,7 @@ static const char *const zaxxon_sample_names[] =
 };
 
 
-static const struct Samplesinterface zaxxon_samples_interface =
+static const samples_interface zaxxon_samples_interface =
 {
 	12,
 	zaxxon_sample_names
@@ -206,7 +206,7 @@ static const char *const congo_sample_names[] =
 };
 
 
-static const struct Samplesinterface congo_samples_interface =
+static const samples_interface congo_samples_interface =
 {
 	5,	/* 5 channels */
 	congo_sample_names

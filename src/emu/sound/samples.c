@@ -532,7 +532,7 @@ static STATE_POSTLOAD( samples_postload )
 static void *samples_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	int i;
-	const struct Samplesinterface *intf = config;
+	const samples_interface *intf = config;
 	struct samples_info *info;
 
 	info = auto_malloc(sizeof(*info));

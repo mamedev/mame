@@ -6589,7 +6589,7 @@ static MACHINE_DRIVER_START( akamaru )
 MACHINE_DRIVER_END
 
 
-static const struct AY8910interface quiz365_ay8910_interface =
+static const AY8910_interface quiz365_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -6938,7 +6938,7 @@ static INTERRUPT_GEN( rtc_nmi_irq )
 	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static const struct AY8910interface mjmyster_ay8910_interface =
+static const AY8910_interface mjmyster_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
@@ -6988,7 +6988,7 @@ static INTERRUPT_GEN( hginga_irq )
 		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xf8);
 }
 
-static const struct AY8910interface hginga_ay8910_interface =
+static const AY8910_interface hginga_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,

@@ -113,7 +113,7 @@ static WRITE8_HANDLER( polyplay_sound_channel );
 
 
 /* Polyplay Sound Interface */
-static const struct Samplesinterface polyplay_samples_interface =
+static const samples_interface polyplay_samples_interface =
 {
 	2,
 	NULL,

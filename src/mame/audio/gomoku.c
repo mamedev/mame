@@ -163,7 +163,7 @@ static void gomoku_update_mono(void *param, stream_sample_t **inputs, stream_sam
 
 
 
-void *gomoku_sh_start(int clock, const struct CustomSound_interface *config)
+void *gomoku_sh_start(int clock, const custom_sound_interface *config)
 {
 	sound_channel *voice;
 	int ch;

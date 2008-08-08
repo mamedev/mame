@@ -55,7 +55,7 @@ static int Sound0StopOnRollover;
 static UINT8 LastPort1;
 
 
-const struct CustomSound_interface custom_interface =
+const custom_sound_interface custom_interface =
 {
 	rockola_sh_start
 };
@@ -73,7 +73,7 @@ static const char *const sasuke_sample_names[] =
 	0
 };
 
-const struct Samplesinterface sasuke_samples_interface =
+const samples_interface sasuke_samples_interface =
 {
 	4,	/* 4 channels */
 	sasuke_sample_names
@@ -108,7 +108,7 @@ static const char *const vanguard_sample_names[] =
 	0
 };
 
-const struct Samplesinterface vanguard_samples_interface =
+const samples_interface vanguard_samples_interface =
 {
 	3,	/* 3 channel */
 	vanguard_sample_names
@@ -135,14 +135,14 @@ static const char *const fantasy_sample_names[] =
 	0
 };
 
-const struct Samplesinterface fantasy_samples_interface =
+const samples_interface fantasy_samples_interface =
 {
 	1,	/* 1 channel */
 	fantasy_sample_names
 };
 
 
-const struct SN76477interface sasuke_sn76477_intf_1 =
+const SN76477_interface sasuke_sn76477_intf_1 =
 {
 	RES_K(470),		/*  4  noise_res     */
 	RES_K(150),		/*  5  filter_res    */
@@ -171,7 +171,7 @@ const struct SN76477interface sasuke_sn76477_intf_1 =
 	// ic48     GND: 2,22,26,27,28  +5V: 1,15,25
 };
 
-const struct SN76477interface sasuke_sn76477_intf_2 =
+const SN76477_interface sasuke_sn76477_intf_2 =
 {
 	RES_K(340),		/*  4  noise_res     */
 	RES_K(47),		/*  5  filter_res    */
@@ -200,7 +200,7 @@ const struct SN76477interface sasuke_sn76477_intf_2 =
 	// ic51     GND: 2,26,27        +5V: 1,15,22,25,28
 };
 
-const struct SN76477interface sasuke_sn76477_intf_3 =
+const SN76477_interface sasuke_sn76477_intf_3 =
 {
 	RES_K(330),		/*  4  noise_res     */
 	RES_K(47),		/*  5  filter_res    */
@@ -229,7 +229,7 @@ const struct SN76477interface sasuke_sn76477_intf_3 =
 	// ic52     GND: 2,22,27,28     +5V: 1,15,25,26
 };
 
-const struct SN76477interface satansat_sn76477_intf =
+const SN76477_interface satansat_sn76477_intf =
 {
 	RES_K(470),		/*  4  noise_res     */
 	RES_M(1.5),		/*  5  filter_res    */
@@ -258,7 +258,7 @@ const struct SN76477interface satansat_sn76477_intf =
 	// ???      GND: 2,26,27        +5V: 15,25
 };
 
-const struct SN76477interface vanguard_sn76477_intf_1 =
+const SN76477_interface vanguard_sn76477_intf_1 =
 {
 	RES_K(470),		/*  4  noise_res     */
 	RES_M(1.5),		/*  5  filter_res    */
@@ -287,7 +287,7 @@ const struct SN76477interface vanguard_sn76477_intf_1 =
 	// SHOT A   GND: 2,9,26,27  +5V: 15,25
 };
 
-const struct SN76477interface vanguard_sn76477_intf_2 =
+const SN76477_interface vanguard_sn76477_intf_2 =
 {
 	RES_K(10),		/*  4  noise_res     */
 	RES_K(30),		/*  5  filter_res    */
@@ -316,7 +316,7 @@ const struct SN76477interface vanguard_sn76477_intf_2 =
 	// SHOT B   GND: 1,2,26,27  +5V: 15,25,28
 };
 
-const struct SN76477interface fantasy_sn76477_intf =
+const SN76477_interface fantasy_sn76477_intf =
 {
 	RES_K(470),		/*  4  noise_res     */
 	RES_M(1.5),		/*  5  filter_res    */
@@ -629,7 +629,7 @@ void rockola_set_music_clock(double clock_time)
 	tone_clock = 0;
 }
 
-void *rockola_sh_start(int clock, const struct CustomSound_interface *config)
+void *rockola_sh_start(int clock, const custom_sound_interface *config)
 {
 	// adjusted
 	rockola_set_music_freq(43000);

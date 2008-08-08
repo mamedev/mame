@@ -74,7 +74,7 @@ static void mjkjidai_adpcm_callback (void *param, stream_sample_t **inputs, stre
 	}
 }
 
-static void *mjkjidai_adpcm_start (int clock, const struct CustomSound_interface *config)
+static void *mjkjidai_adpcm_start (int clock, const custom_sound_interface *config)
 {
 	struct mjkjidai_adpcm_state *state = &mjkjidai_adpcm;
 	state->playing = 0;
@@ -345,7 +345,7 @@ static GFXDECODE_START( mjkjidai )
 GFXDECODE_END
 
 
-static const struct CustomSound_interface adpcm_interface =
+static const custom_sound_interface adpcm_interface =
 {
 	mjkjidai_adpcm_start
 };

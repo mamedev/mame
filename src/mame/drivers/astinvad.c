@@ -491,7 +491,7 @@ static const char *const astinvad_sample_names[] =
 	0
 };
 
-static const struct Samplesinterface astinvad_samples_interface =
+static const samples_interface astinvad_samples_interface =
 {
 	6,   /* channels */
 	astinvad_sample_names

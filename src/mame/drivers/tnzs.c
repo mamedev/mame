@@ -1370,7 +1370,7 @@ static const struct YM2203interface kabukiz_ym2203_interface =
 	irqhandler
 };
 
-static const struct Samplesinterface samples_interface =
+static const samples_interface tnzs_samples_interface =
 {
 	1,
 	NULL,
@@ -1579,7 +1579,7 @@ static MACHINE_DRIVER_START( kageki )
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(samples_interface)
+	MDRV_SOUND_CONFIG(tnzs_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

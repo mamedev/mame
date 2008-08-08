@@ -109,7 +109,7 @@ static const char *const lrescue_sample_names[] =
 	0
 };
 
-const struct Samplesinterface lrescue_samples_interface =
+const samples_interface lrescue_samples_interface =
 {
 	4,	/* 4 channels */
 	lrescue_sample_names
@@ -665,7 +665,7 @@ WRITE8_HANDLER( polaris_sh_port_3_w )
 #define SCHASER_4V		SCHASER_HSYNC /2 /4
 #define SCHASER_8V		SCHASER_HSYNC /2 /8
 
-const struct SN76477interface schaser_sn76477_interface =
+const SN76477_interface schaser_sn76477_interface =
 {
 	RES_K( 47),	/*  4 noise_res         */
 	RES_K(330),	/*  5 filter_res        */

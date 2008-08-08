@@ -17,7 +17,7 @@ READ8_HANDLER( bzone_IN0_r );
 
 WRITE8_HANDLER( bzone_sounds_w );
 
-void *bzone_sh_start(int clock, const struct CustomSound_interface *config);
+void *bzone_sh_start(int clock, const custom_sound_interface *config);
 
 
 /*----------- defined in audio/redbaron.c -----------*/
@@ -25,4 +25,4 @@ void *bzone_sh_start(int clock, const struct CustomSound_interface *config);
 WRITE8_HANDLER( redbaron_sounds_w );
 WRITE8_HANDLER( redbaron_pokey_w );
 
-void *redbaron_sh_start(int clock, const struct CustomSound_interface *config);
+void *redbaron_sh_start(int clock, const custom_sound_interface *config);

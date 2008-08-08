@@ -10,7 +10,7 @@
 
 /*----------- defined in audio/polepos.c -----------*/
 
-void *polepos_sh_start(int clock, const struct CustomSound_interface *config);
+void *polepos_sh_start(int clock, const custom_sound_interface *config);
 void polepos_sh_reset(void *token);
 WRITE8_HANDLER( polepos_engine_sound_lsb_w );
 WRITE8_HANDLER( polepos_engine_sound_msb_w );
