@@ -101,42 +101,30 @@ static WRITE8_HANDLER( tbowl_sound_command_w )
 
 /* Board B */
 
-static ADDRESS_MAP_START( readmem_6206B, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM) /* RAM 1 */
-	AM_RANGE(0xa000, 0xbfff) AM_READ(SMH_RAM) /* RAM 1 */
-	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_BANK1) /* Banked ROM */
-	AM_RANGE(0xf800, 0xfbff) AM_READ(shared_r) /* RAM 2 */
-	AM_RANGE(0xfc00, 0xfc00) AM_READ(input_port_0_r) // Player 1 inputs
-	AM_RANGE(0xfc01, 0xfc01) AM_READ(input_port_1_r) // Player 2 inputs
-	AM_RANGE(0xfc02, 0xfc02) AM_READ(input_port_2_r) // Player 3 inputs
-	AM_RANGE(0xfc03, 0xfc03) AM_READ(input_port_3_r) // Player 4 inputs
-//  AM_RANGE(0xfc06, 0xfc06) AM_READ(dummy_r) // Read During NMI
-	AM_RANGE(0xfc07, 0xfc07) AM_READ(input_port_4_r) // System inputs
-	AM_RANGE(0xfc08, 0xfc08) AM_READ(input_port_5_r) // DSW1
-	AM_RANGE(0xfc09, 0xfc09) AM_READ(input_port_6_r) // DSW2
-	AM_RANGE(0xfc0a, 0xfc0a) AM_READ(input_port_7_r) // DSW3
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_6206B, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xbfff) AM_WRITE(tbowl_bg2videoram_w) AM_BASE(&tbowl_bg2videoram)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(tbowl_bgvideoram_w) AM_BASE(&tbowl_bgvideoram)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(tbowl_txvideoram_w) AM_BASE(&tbowl_txvideoram)
-//  AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown_write)* written during start-up, not again */
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf800, 0xfbff) AM_WRITE(shared_w) AM_BASE(&shared_ram) /* check */
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(tbowlb_bankswitch_w)
+static ADDRESS_MAP_START( 6206B_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_RAM
+	AM_RANGE(0xa000, 0xbfff) AM_RAM_WRITE(tbowl_bg2videoram_w) AM_BASE(&tbowl_bg2videoram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM_WRITE(tbowl_bgvideoram_w) AM_BASE(&tbowl_bgvideoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(tbowl_txvideoram_w) AM_BASE(&tbowl_txvideoram)
+//  AM_RANGE(0xf000, 0xf000) AM_WRITE(unknown_write) * written during start-up, not again */
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK1, SMH_ROM)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(shared_r, shared_w) AM_BASE(&shared_ram) /* check */
+	AM_RANGE(0xfc00, 0xfc00) AM_READWRITE(input_port_0_r, tbowlb_bankswitch_w)	/* Player 1 inputs */
+	AM_RANGE(0xfc01, 0xfc01) AM_READ(input_port_1_r) /* Player 2 inputs */
 //  AM_RANGE(0xfc01, 0xfc01) AM_WRITE(unknown_write) /* written during start-up, not again */
+	AM_RANGE(0xfc02, 0xfc02) AM_READ(input_port_2_r) /* Player 3 inputs */
 //  AM_RANGE(0xfc02, 0xfc02) AM_WRITE(unknown_write) /* written during start-up, not again */
-	AM_RANGE(0xfc03, 0xfc03) AM_WRITE(tbowl_coin_counter_w)
-	AM_RANGE(0xfc0d, 0xfc0d) AM_WRITE(tbowl_sound_command_w) /* not sure, used quite a bit */
+	AM_RANGE(0xfc03, 0xfc03) AM_READWRITE(input_port_3_r, tbowl_coin_counter_w)	/* Player 4 inputs */
 //  AM_RANGE(0xfc05, 0xfc05) AM_WRITE(unknown_write) /* no idea */
+//  AM_RANGE(0xfc06, 0xfc06) AM_READ(dummy_r) 		 /* Read During NMI */
+	AM_RANGE(0xfc07, 0xfc07) AM_READ(input_port_4_r) /* System inputs */
+	AM_RANGE(0xfc08, 0xfc08) AM_READ(input_port_5_r) /* DSW1 */
 //  AM_RANGE(0xfc08, 0xfc08) AM_WRITE(unknown_write) /* hardly used .. */
+	AM_RANGE(0xfc09, 0xfc09) AM_READ(input_port_6_r) /* DSW2 */
+	AM_RANGE(0xfc0a, 0xfc0a) AM_READ(input_port_7_r) /* DSW3 */
 //  AM_RANGE(0xfc0a, 0xfc0a) AM_WRITE(unknown_write) /* hardly used .. */
+	AM_RANGE(0xfc0d, 0xfc0d) AM_WRITE(tbowl_sound_command_w) /* not sure, used quite a bit */
 	AM_RANGE(0xfc10, 0xfc10) AM_WRITE(tbowl_bg2xscroll_lo)
 	AM_RANGE(0xfc11, 0xfc11) AM_WRITE(tbowl_bg2xscroll_hi)
 	AM_RANGE(0xfc12, 0xfc12) AM_WRITE(tbowl_bg2yscroll_lo)
@@ -154,21 +142,14 @@ static WRITE8_HANDLER ( tbowl_trigger_nmi )
 	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static ADDRESS_MAP_START( readmem_6206C, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( 6206C_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM) /* not read? */
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_BANK2) /* Banked ROM */
-	AM_RANGE(0xf800, 0xfbff) AM_READ(shared_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_6206C, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xd7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xd800, 0xdfff) AM_WRITE(SMH_RAM) AM_BASE(&tbowl_spriteram)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE(&paletteram) // 2x palettes, one for each monitor?
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf800, 0xfbff) AM_WRITE(shared_w)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(paletteram_xxxxBBBBRRRRGGGG_be_w) AM_BASE(&paletteram) // 2x palettes, one for each monitor?
+	AM_RANGE(0xf000, 0xf7ff) AM_READWRITE(SMH_BANK2, SMH_ROM)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(shared_r, shared_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(tbowlc_bankswitch_w)
 	AM_RANGE(0xfc01, 0xfc01) AM_WRITE(SMH_NOP) /* ? */
 	AM_RANGE(0xfc02, 0xfc02) AM_WRITE(tbowl_trigger_nmi) /* ? */
@@ -217,15 +198,9 @@ static void tbowl_adpcm_int(running_machine *machine, int num)
 	}
 }
 
-static ADDRESS_MAP_START( readmem_6206A, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe010, 0xe010) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_6206A, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( 6206A_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(YM3812_control_port_0_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(YM3812_write_port_0_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(YM3812_control_port_1_w)
@@ -235,6 +210,7 @@ static ADDRESS_MAP_START( writemem_6206A, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe004, 0xe005) AM_WRITE(tbowl_adpcm_vol_w)
 	AM_RANGE(0xe006, 0xe006) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xe007, 0xe007) AM_WRITE(SMH_NOP)	/* NMI acknowledge */
+	AM_RANGE(0xe010, 0xe010) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 /*** Input Ports
@@ -544,10 +520,10 @@ static const gfx_layout sprite8layout =
 };
 
 static GFXDECODE_START( tbowl )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   256, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, bgtilelayout, 768, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, bgtilelayout, 512, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, sprite8layout, 0,   16 )
+	GFXDECODE_ENTRY( "characters", 0, charlayout,   256, 16 )
+	GFXDECODE_ENTRY( "bg_tiles", 0, bgtilelayout, 768, 16 )
+	GFXDECODE_ENTRY( "bg_tiles", 0, bgtilelayout, 512, 16 )
+	GFXDECODE_ENTRY( "sprites", 0, sprite8layout, 0,   16 )
 
 GFXDECODE_END
 
@@ -587,17 +563,17 @@ static MACHINE_DRIVER_START( tbowl )
 
 	/* CPU on Board '6206B' */
 	MDRV_CPU_ADD("main", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
-	MDRV_CPU_PROGRAM_MAP(readmem_6206B,writemem_6206B)
+	MDRV_CPU_PROGRAM_MAP(6206B_map,0)
 	MDRV_CPU_VBLANK_INT("left", irq0_line_hold)
 
 	/* CPU on Board '6206C' */
 	MDRV_CPU_ADD("sub", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
-	MDRV_CPU_PROGRAM_MAP(readmem_6206C,writemem_6206C)
+	MDRV_CPU_PROGRAM_MAP(6206C_map,0)
 	MDRV_CPU_VBLANK_INT("left", irq0_line_hold)
 
 	/* CPU on Board '6206A' */
 	MDRV_CPU_ADD("audio", Z80, 4000000) /* Actual Z80 */
-	MDRV_CPU_PROGRAM_MAP(readmem_6206A,writemem_6206A)
+	MDRV_CPU_PROGRAM_MAP(6206A_map,0)
 
 	MDRV_INTERLEAVE(100)
 
@@ -728,11 +704,11 @@ ROM_START( tbowl )
 	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 */
 	ROM_LOAD( "6206a.1",	0x00000, 0x08000, CRC(4370207b) SHA1(2c929b571c86d35e646870644751e86bd16b5e22) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Characters inc. Alphanumerics */
+	ROM_REGION( 0x10000, "characters", ROMREGION_DISPOSE ) /* 8x8 Characters inc. Alphanumerics */
 	ROM_LOAD16_BYTE( "14.13l",	    0x00000, 0x08000, CRC(f9cf60b9) SHA1(0a79ed29f82ac7bd08062f922f79e439c194f30a) )
 	ROM_LOAD16_BYTE( "15.15l",	    0x00001, 0x08000, CRC(a23f6c53) SHA1(0bb64894a27f41d74117ec492aafd52bc5b16ca4) )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE ) /* BG GFX */
+	ROM_REGION( 0x80000, "bg_tiles", ROMREGION_DISPOSE ) /* BG GFX */
 	ROM_LOAD16_BYTE( "6206b.6",	    0x40001, 0x10000, CRC(b9615ffa) SHA1(813896387291f5325ed7e4058347fe35c0d7b839) )
 	ROM_LOAD16_BYTE( "6206b.8",	    0x40000, 0x10000, CRC(6389c719) SHA1(8043907d6f5b37228c09f05bbf12b4b9bb9bc130) )
 	ROM_LOAD16_BYTE( "6206b.7",	    0x00001, 0x10000, CRC(d139c397) SHA1(4093220e6bddb95d0af445944bead7a064b64c39) )
@@ -742,7 +718,7 @@ ROM_START( tbowl )
 	ROM_LOAD16_BYTE( "6206b.11",    0x20001, 0x10000, CRC(06bf07bb) SHA1(9f12a39b8832bff2ffd84b7e6c1ddb2855ff924b) )
 	ROM_LOAD16_BYTE( "6206b.13",    0x20000, 0x10000, CRC(4ad72c16) SHA1(554474987349b5b11e181ee8a2d1308777b030c1) )
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE ) /* SPR GFX */
+	ROM_REGION( 0x80000, "sprites", ROMREGION_DISPOSE ) /* SPR GFX */
 	ROM_LOAD16_BYTE( "6206c.16",	0x60001, 0x10000, CRC(1a2fb925) SHA1(bc96ee87372826d5bee2b4d2aefde4c47b9ee80a) )
 	ROM_LOAD16_BYTE( "6206c.20",	0x60000, 0x10000, CRC(70bb38a3) SHA1(5145b246f7720dd0359b97be35aa027af07cb6da) )
 	ROM_LOAD16_BYTE( "6206c.17",	0x40001, 0x10000, CRC(de16bc10) SHA1(88e2452c7caf44cd541c27fc56c99703f3330bd7) )
@@ -769,11 +745,11 @@ ROM_START( tbowlj )
 	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 */
 	ROM_LOAD( "6206a.1",	0x00000, 0x08000, CRC(4370207b) SHA1(2c929b571c86d35e646870644751e86bd16b5e22) )
 
-	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE ) /* 8x8 Characters inc. Alphanumerics */
+	ROM_REGION( 0x10000, "characters", ROMREGION_DISPOSE ) /* 8x8 Characters inc. Alphanumerics */
 	ROM_LOAD16_BYTE( "6206b.14",	0x00000, 0x08000, CRC(cf99d0bf) SHA1(d1f23e23c2ebd26e2ffe8b23a02d86e4d32c6f11) )
 	ROM_LOAD16_BYTE( "6206b.15",	0x00001, 0x08000, CRC(d69248cf) SHA1(4dad6a3fdc36b2fe625df0a43fd9e82d1dfd2af6) )
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE ) /* BG GFX */
+	ROM_REGION( 0x80000, "bg_tiles", ROMREGION_DISPOSE ) /* BG GFX */
 	ROM_LOAD16_BYTE( "6206b.6",	    0x40001, 0x10000, CRC(b9615ffa) SHA1(813896387291f5325ed7e4058347fe35c0d7b839) )
 	ROM_LOAD16_BYTE( "6206b.8",	    0x40000, 0x10000, CRC(6389c719) SHA1(8043907d6f5b37228c09f05bbf12b4b9bb9bc130) )
 	ROM_LOAD16_BYTE( "6206b.7",	    0x00001, 0x10000, CRC(d139c397) SHA1(4093220e6bddb95d0af445944bead7a064b64c39) )
@@ -783,7 +759,7 @@ ROM_START( tbowlj )
 	ROM_LOAD16_BYTE( "6206b.11",    0x20001, 0x10000, CRC(06bf07bb) SHA1(9f12a39b8832bff2ffd84b7e6c1ddb2855ff924b) )
 	ROM_LOAD16_BYTE( "6206b.13",    0x20000, 0x10000, CRC(4ad72c16) SHA1(554474987349b5b11e181ee8a2d1308777b030c1) )
 
-	ROM_REGION( 0x80000, "gfx3", ROMREGION_DISPOSE ) /* SPR GFX */
+	ROM_REGION( 0x80000, "sprites", ROMREGION_DISPOSE ) /* SPR GFX */
 	ROM_LOAD16_BYTE( "6206c.16",	0x60001, 0x10000, CRC(1a2fb925) SHA1(bc96ee87372826d5bee2b4d2aefde4c47b9ee80a) )
 	ROM_LOAD16_BYTE( "6206c.20",	0x60000, 0x10000, CRC(70bb38a3) SHA1(5145b246f7720dd0359b97be35aa027af07cb6da) )
 	ROM_LOAD16_BYTE( "6206c.17",	0x40001, 0x10000, CRC(de16bc10) SHA1(88e2452c7caf44cd541c27fc56c99703f3330bd7) )

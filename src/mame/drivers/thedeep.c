@@ -147,40 +147,27 @@ static WRITE8_HANDLER( thedeep_e100_w )
 		logerror("pc %04x: e100 = %02x\n", activecpu_get_pc(),data);
 }
 
-static ADDRESS_MAP_START( thedeep_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM				)	// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1				)	// ROM (banked)
-	AM_RANGE(0xc000, 0xcfff) AM_READ(SMH_RAM				)	// RAM
-	AM_RANGE(0xd000, 0xdfff) AM_READ(SMH_RAM				)	// RAM (MCU data copied here)
-	AM_RANGE(0xe000, 0xe000) AM_READ(thedeep_protection_r	)	// From MCU
-	AM_RANGE(0xe004, 0xe004) AM_READ(thedeep_e004_r		)	// ?
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK1, SMH_ROM)	// ROM (banked)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(0xd000, 0xdfff) AM_RAM				            	// RAM (MCU data copied here)
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE(thedeep_protection_r, thedeep_protection_w	)	// To MCU
+	AM_RANGE(0xe004, 0xe004) AM_READWRITE(thedeep_e004_r, thedeep_nmi_w			)	//
 	AM_RANGE(0xe008, 0xe008) AM_READ_PORT("e008")			// P1 (Inputs)
 	AM_RANGE(0xe009, 0xe009) AM_READ_PORT("e009")			// P2
 	AM_RANGE(0xe00a, 0xe00a) AM_READ_PORT("e00a")			// DSW1
 	AM_RANGE(0xe00b, 0xe00b) AM_READ_PORT("e00b")			// DSW2
-	AM_RANGE(0xe400, 0xe7ff) AM_READ(SMH_RAM				)	// Sprites
-	AM_RANGE(0xe800, 0xefff) AM_READ(SMH_RAM				)	// Text Layer
-	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM				)	// Background Layer
-	AM_RANGE(0xf800, 0xf83f) AM_READ(SMH_RAM				)	// Column Scroll
-	AM_RANGE(0xf840, 0xffff) AM_READ(SMH_RAM				)	//
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( thedeep_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM				)	// ROM
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_ROM				)	// ROM (banked)
-	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM				)	// RAM
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(SMH_RAM				)	// RAM (MCU data copied here)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(thedeep_protection_w	)	// To MCU
-	AM_RANGE(0xe004, 0xe004) AM_WRITE(thedeep_nmi_w			)	//
 	AM_RANGE(0xe00c, 0xe00c) AM_WRITE(thedeep_sound_w		)	// To Sound CPU
 	AM_RANGE(0xe100, 0xe100) AM_WRITE(thedeep_e100_w		)	// ?
 	AM_RANGE(0xe210, 0xe213) AM_WRITE(SMH_RAM) AM_BASE(&thedeep_scroll				)	// Scroll
-	AM_RANGE(0xe400, 0xe7ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size	)	// Sprites
-	AM_RANGE(0xe800, 0xefff) AM_WRITE(thedeep_vram_1_w) AM_BASE(&thedeep_vram_1		)	// Text Layer
-	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(thedeep_vram_0_w) AM_BASE(&thedeep_vram_0		)	// Background Layer
-	AM_RANGE(0xf800, 0xf83f) AM_WRITE(SMH_RAM) AM_BASE(&thedeep_scroll2				)	// Column Scroll
-	AM_RANGE(0xf840, 0xffff) AM_WRITE(SMH_RAM								)	//
+	AM_RANGE(0xe400, 0xe7ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size	)	// Sprites
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(thedeep_vram_1_w) AM_BASE(&thedeep_vram_1		)	// Text Layer
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(thedeep_vram_0_w) AM_BASE(&thedeep_vram_0		)	// Background Layer
+	AM_RANGE(0xf800, 0xf83f) AM_RAM AM_BASE(&thedeep_scroll2				)	// Column Scroll
+	AM_RANGE(0xf840, 0xffff) AM_RAM
 ADDRESS_MAP_END
+
 
 /***************************************************************************
 
@@ -188,17 +175,12 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
-static ADDRESS_MAP_START( thedeep_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r				)	// From Main CPU
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM					)	// ROM
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( thedeep_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM					)	// RAM
+static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(YM2203_control_port_0_w	)	// YM2203
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(YM2203_write_port_0_w		)	//
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM					)	// ROM
+	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r				)	// From Main CPU
+	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -310,9 +292,9 @@ static const gfx_layout layout_16x16x4 =
 };
 
 static GFXDECODE_START( thedeep )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4,	0x080,  8 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4,	0x100, 16 ) // [1] Background Layer
-	GFXDECODE_ENTRY( "gfx3", 0, layout_8x8x2,	0x000, 16 ) // [2] Text Layer
+	GFXDECODE_ENTRY( "sprites", 0, layout_16x16x4,	0x080,  8 ) // [0] Sprites
+	GFXDECODE_ENTRY( "bg_gfx", 0, layout_16x16x4,	0x100, 16 ) // [1] Background Layer
+	GFXDECODE_ENTRY( "text", 0, layout_8x8x2,	0x000, 16 ) // [2] Text Layer
 GFXDECODE_END
 
 
@@ -370,11 +352,11 @@ static MACHINE_DRIVER_START( thedeep )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 6000000)		/* 6MHz */
-	MDRV_CPU_PROGRAM_MAP(thedeep_readmem,thedeep_writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(thedeep_interrupt,2)	/* IRQ by MCU, NMI by vblank (maskable) */
 
  	MDRV_CPU_ADD("audio", M65C02, 2000000)	/* 2MHz */
-	MDRV_CPU_PROGRAM_MAP(thedeep_sound_readmem,thedeep_sound_writemem)
+	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 	/* IRQ by YM2203, NMI by when sound latch written by main cpu */
 
 	/* CPU3 is a i8751 */
@@ -446,19 +428,19 @@ ROM_START( thedeep )
 	ROM_REGION( 0x1000, "cpu3", 0 )		/* i8751 Code */
 	ROM_LOAD( "dp-14", 0x0000, 0x1000, CRC(0b886dad) SHA1(487192764342f8b0a320d20a378bf94f84592da9) )	// 1xxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x40000, "sprites", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "dp-08.rom", 0x00000, 0x10000, CRC(c5624f6b) SHA1(a3c0b13cddae760f30c7344d718cd69cad990054) )
 	ROM_LOAD( "dp-07.rom", 0x10000, 0x10000, CRC(c76768c1) SHA1(e41ace1cb06ebe7f676b3b179b7dd01d00cf4d6a) )
 	ROM_LOAD( "dp-06.rom", 0x20000, 0x10000, CRC(98adea78) SHA1(6a1af70de995a0a5e42fd395dd9454b7e2d9cb82) )
 	ROM_LOAD( "dp-05.rom", 0x30000, 0x10000, CRC(76ea7dd1) SHA1(c29abb44a1182b47da749eeeb2db025ae3f28ea7) )
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )	/* 16x16x4 Background Layer */
+	ROM_REGION( 0x40000, "bg_gfx", ROMREGION_DISPOSE )	/* 16x16x4 Background Layer */
 	ROM_LOAD( "dp-03.rom", 0x00000, 0x10000, CRC(6bf5d819) SHA1(74079632d7c88ec22010c1a5bece0e36847fdab9) )
 	ROM_LOAD( "dp-01.rom", 0x10000, 0x10000, CRC(e56be2fe) SHA1(25acc0f6d9cb5a727c9bac3e80aeb85a4727ddb0) )
 	ROM_LOAD( "dp-04.rom", 0x20000, 0x10000, CRC(4db02c3c) SHA1(6284541372dec1113570cef31ca3c1a202fb4add) )
 	ROM_LOAD( "dp-02.rom", 0x30000, 0x10000, CRC(1add423b) SHA1(b565340d719044ba2c428aab74f43f5a7cf7e2a3) )
 
-	ROM_REGION( 0x4000, "gfx3", ROMREGION_DISPOSE )	/* 8x8x2 Text Layer */
+	ROM_REGION( 0x4000, "text", ROMREGION_DISPOSE )	/* 8x8x2 Text Layer */
 	ROM_LOAD( "dp-11.rom", 0x0000, 0x4000, CRC(196e23d1) SHA1(ed14e63fccb3e5dce462d9b8155e78749eaf9b3b) )
 
 	ROM_REGION( 0x600, "proms", ROMREGION_DISPOSE )	/* Colors */
@@ -478,19 +460,19 @@ ROM_START( rundeep )
 	ROM_REGION( 0x1000, "cpu3", 0 )		/* i8751 Code */
 	ROM_LOAD( "dp-14", 0x0000, 0x1000, CRC(0b886dad) SHA1(487192764342f8b0a320d20a378bf94f84592da9) )	// 1xxxxxxxxxxx = 0xFF
 
-	ROM_REGION( 0x40000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_REGION( 0x40000, "sprites", ROMREGION_DISPOSE )	/* Sprites */
 	ROM_LOAD( "dp-08.rom", 0x00000, 0x10000, CRC(c5624f6b) SHA1(a3c0b13cddae760f30c7344d718cd69cad990054) )
 	ROM_LOAD( "dp-07.rom", 0x10000, 0x10000, CRC(c76768c1) SHA1(e41ace1cb06ebe7f676b3b179b7dd01d00cf4d6a) )
 	ROM_LOAD( "dp-06.rom", 0x20000, 0x10000, CRC(98adea78) SHA1(6a1af70de995a0a5e42fd395dd9454b7e2d9cb82) )
 	ROM_LOAD( "dp-05.rom", 0x30000, 0x10000, CRC(76ea7dd1) SHA1(c29abb44a1182b47da749eeeb2db025ae3f28ea7) )
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )	/* 16x16x4 Background Layer */
+	ROM_REGION( 0x40000, "bg_gfx", ROMREGION_DISPOSE )	/* 16x16x4 Background Layer */
 	ROM_LOAD( "dp-03.rom", 0x00000, 0x10000, CRC(6bf5d819) SHA1(74079632d7c88ec22010c1a5bece0e36847fdab9) )
 	ROM_LOAD( "dp-01.rom", 0x10000, 0x10000, CRC(e56be2fe) SHA1(25acc0f6d9cb5a727c9bac3e80aeb85a4727ddb0) )
 	ROM_LOAD( "dp-04.rom", 0x20000, 0x10000, CRC(4db02c3c) SHA1(6284541372dec1113570cef31ca3c1a202fb4add) )
 	ROM_LOAD( "dp-02.rom", 0x30000, 0x10000, CRC(1add423b) SHA1(b565340d719044ba2c428aab74f43f5a7cf7e2a3) )
 
-	ROM_REGION( 0x4000, "gfx3", ROMREGION_DISPOSE )	/* 8x8x2 Text Layer */
+	ROM_REGION( 0x4000, "text", ROMREGION_DISPOSE )	/* 8x8x2 Text Layer */
 	ROM_LOAD( "11", 0x0000, 0x4000, CRC(5d29e4b9) SHA1(608345291062e9ce329ebe9a8c1e65d52e358785) )
 
 	ROM_REGION( 0x600, "proms", ROMREGION_DISPOSE )	/* Colors */
