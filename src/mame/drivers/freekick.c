@@ -15,17 +15,6 @@ TODO:
 
 ****************************************************************************
 
- currently only the freekick bootleg roms are included
- the fk bootleg roms are the same as one of the other sets + an extra
- 64k ram dump from protection device.
-
- main program rom is unused, is it a dummy or just something to active the
- protection device?
-
- we don't have the game rom data / program from inside the counter run cpu,
- hopefully somebody can work out how to dump it before all the boards die
- since it appears to be battery backed
-
  ---
 
  $78d        - checksum calculations
@@ -857,6 +846,42 @@ ROM_START( freekckb )
 	ROM_LOAD( "24s10n.7h", 0x0500, 0x0100, CRC(a507f941) SHA1(97619959ee4c366cb010525636ab5eefe5a3127a) )
 ROM_END
 
+ROM_START( freekcb2 )
+	ROM_REGION( 0x10000, "main", 0 ) /* Z80 Code */
+	ROM_LOAD( "15.bin", 0x00000, 0x10000, CRC(6569f2b0) SHA1(9306e316e6ae659bae3759a12a4e445b555a8893) ) // this was on the bootleg, would normally be battery backed inside cpu?
+
+	ROM_REGION( 0x08000, "user1", 0 ) /* sound data */
+	ROM_LOAD( "1.bin", 0x00000, 0x08000, CRC(a6030ba9) SHA1(f363100f54a7a80701a6395c7539b8daa60db054) )
+
+	/* the first half of the gfx roms isn't used on this bootleg (roms are double size)
+	   - the content is otherwise identical */
+	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE ) /* GFX */
+	ROM_LOAD( "2.bin", 0x000000, 0x04000, CRC(96aeae91) SHA1(073ca6c9fbe14760ee10293791254da3bcb43940) )
+	ROM_CONTINUE(0x0000,0x4000)
+	ROM_LOAD( "3.bin", 0x004000, 0x04000, CRC(489f538c) SHA1(47e5b3db1bb9efe0e432be83220d9fc09695fdf1) )
+	ROM_CONTINUE(0x4000,0x4000)
+	ROM_LOAD( "4.bin", 0x008000, 0x04000, CRC(73cdb431) SHA1(97f62d8cb21dfd905713b40d54da270d9ff275b9) )
+	ROM_CONTINUE(0x8000,0x4000)
+
+	ROM_REGION( 0xc000, "gfx2", ROMREGION_DISPOSE ) /* GFX */
+	ROM_LOAD( "5.bin", 0x000000, 0x04000, CRC(7def1c52) SHA1(dbe8c7b7c45ea681870b2039cb80728530a057c3) )
+	ROM_CONTINUE(0x0000,0x4000)
+	ROM_LOAD( "6.bin", 0x004000, 0x04000, CRC(59d1b3e7) SHA1(de82dcbaa0fa4f5b5f0cb0c925c12fac8828fa01) )
+	ROM_CONTINUE(0x4000,0x4000)
+	ROM_LOAD( "7.bin", 0x008000, 0x04000, CRC(95c19081) SHA1(d8abc6f8da9188ca7b322f17c16e0494d771df39) )
+	ROM_CONTINUE(0x8000,0x4000)
+
+	/* no proms in the dump, but almost certainly identical */
+	ROM_REGION( 0x0600, "proms", 0 )
+	ROM_LOAD( "24s10n.8j", 0x0000, 0x0100, CRC(53a6bc21) SHA1(d4beedc226004c1aa9b6aae29bee9c8a9b0fff7c) ) /* Or compaitble type prom like the 82S129 */
+	ROM_LOAD( "24s10n.7j", 0x0100, 0x0100, CRC(38dd97d8) SHA1(468a0f87a704982dc1bce1ca21f9bb252ac241a0) )
+	ROM_LOAD( "24s10n.8k", 0x0200, 0x0100, CRC(18e66087) SHA1(54857526179b738862d11ce87e9d0edcb7878488) )
+	ROM_LOAD( "24s10n.7k", 0x0300, 0x0100, CRC(bc21797a) SHA1(4d6cf05e51b7ef9147eeff051c3728764021cfdb) )
+	ROM_LOAD( "24s10n.8h", 0x0400, 0x0100, CRC(8aac5fd0) SHA1(07a179603c0167c1f998b2337d66be95db9911cc) )
+	ROM_LOAD( "24s10n.7h", 0x0500, 0x0100, CRC(a507f941) SHA1(97619959ee4c366cb010525636ab5eefe5a3127a) )
+ROM_END
+
+
 ROM_START( countrun )
 	ROM_REGION( 0x10000, "main", 0 ) /* Z80 Code */
 	//  Custom CPU (pack) No. NS6201-A 1988.3 COUNTER RUN
@@ -1054,7 +1079,8 @@ GAME( 1986, gigasm2b, 0,        gigas,    gigasm2,  gigas,    ROT270, "bootleg",
 GAME( 1987, pbillrd,  0,        pbillrd,  pbillrd,  0,        ROT0,   "Nihon System", "Perfect Billiard", 0 )
 GAME( 1987, pbillrds, pbillrd,  pbillrd,  pbillrd,  pbillrds, ROT0,   "Nihon System", "Perfect Billiard (MC-8123, 317-0030)", 0 )
 GAME( 1987, freekick, 0,        freekckb, freekck,  0,        ROT270, "Nihon System (Sega license)", "Free Kick", GAME_NOT_WORKING )
-GAME( 1987, freekckb, freekick, freekckb, freekck,  0,        ROT270, "bootleg", "Free Kick (bootleg)", 0 )
+GAME( 1987, freekckb, freekick, freekckb, freekck,  0,        ROT270, "bootleg", "Free Kick (bootleg set 1)", 0 )
+GAME( 1987, freekcb2, freekick, freekckb, freekck,  0,        ROT270, "bootleg", "Free Kick (bootleg set 2)", 0 )
 GAME( 1988, countrun, 0,        freekckb, countrun, 0,        ROT0,   "Nihon System (Sega license)", "Counter Run", GAME_NOT_WORKING )
 GAME( 1988, countrnb, countrun, freekckb, countrun, 0,        ROT0,   "bootleg", "Counter Run (bootleg set 1)", 0 )
 GAME( 1988, countrb2, countrun, freekckb, countrun, 0,        ROT0,   "bootleg", "Counter Run (bootleg set 2)", GAME_NOT_WORKING )

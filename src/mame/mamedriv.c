@@ -7419,6 +7419,7 @@ Other Sun games
 	DRIVER( pbillrds )	/* (c) 1988 Nihon System (+ optional Sega) */
 	DRIVER( freekick )	/* (c) 1988 Nihon System (+ optional Sega) */
 	DRIVER( freekckb )	/* (c) 1987 bootleg */
+	DRIVER( freekcb2 )	/* (c) 1987 bootleg */
 	DRIVER( countrun )	/* (c) 1988 Nihon System (+ optional Sega) */
 	DRIVER( countrnb )	/* (c) 1988 bootleg */
 	DRIVER( countrb2 )	/* (c) 1988 bootleg */
