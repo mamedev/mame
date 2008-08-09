@@ -172,72 +172,46 @@ static WRITE8_HANDLER( msm5205_w )
 
 /***************************************************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0xfe0800, 0xfe0cff) AM_READ(SMH_RAM)
-	AM_RANGE(0xfe0d00, 0xfe1807) AM_READ(SMH_RAM)
-	AM_RANGE(0xfe4000, 0xfe4001) AM_READ(input_port_0_word_r)
+static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0xfe0800, 0xfe0cff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xfe0d00, 0xfe1807) AM_RAM		/* still part of OBJ RAM */
+	AM_RANGE(0xfe4000, 0xfe4001) AM_READWRITE(input_port_0_word_r, tigeroad_videoctrl_w)	/* char bank, coin counters, + ? */
 	AM_RANGE(0xfe4002, 0xfe4003) AM_READ(input_port_1_word_r)
+/*	AM_RANGE(0xfe4002, 0xfe4003) AM_WRITE(tigeroad_soundcmd_w) added by init_tigeroad() */
 	AM_RANGE(0xfe4004, 0xfe4005) AM_READ(input_port_2_word_r)
-	AM_RANGE(0xfec000, 0xfec7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xff8200, 0xff867f) AM_READ(SMH_RAM)
-	AM_RANGE(0xffc000, 0xffffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xfe0800, 0xfe0cff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xfe0d00, 0xfe1807) AM_WRITE(SMH_RAM)  /* still part of OBJ RAM */
-	AM_RANGE(0xfe4000, 0xfe4001) AM_WRITE(tigeroad_videoctrl_w)	/* char bank, coin counters, + ? */
-	/*AM_RANGE(0xfe4002, 0xfe4003) AM_WRITE(tigeroad_soundcmd_w) added by init_tigeroad() */
-	AM_RANGE(0xfec000, 0xfec7ff) AM_WRITE(tigeroad_videoram_w) AM_BASE(&videoram16)
+	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE(tigeroad_videoram_w) AM_BASE(&videoram16)
 	AM_RANGE(0xfe8000, 0xfe8003) AM_WRITE(tigeroad_scroll_w)
 	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITE(SMH_RAM)    /* fe800e = watchdog or IRQ acknowledge */
-	AM_RANGE(0xff8200, 0xff867f) AM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xffc000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&ram16)
+	AM_RANGE(0xff8200, 0xff867f) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE(&ram16)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x8000) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ(YM2203_status_port_1_r)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
+
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x8000) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)
+	AM_RANGE(0x8001, 0x8001) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0xa000, 0xa000) AM_READWRITE(YM2203_status_port_1_r, YM2203_control_port_1_w)
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM2203_write_port_1_w)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2203_control_port_1_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM2203_write_port_1_w)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x7f, 0x7f) AM_WRITE(soundlatch2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sample_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( sample_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-/* yes, no RAM */
-static ADDRESS_MAP_START( sample_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sample_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sample_port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sample_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_WRITE(msm5205_w)
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( tigeroad )
@@ -518,9 +492,9 @@ static const gfx_layout sprite_layout =
 };
 
 static GFXDECODE_START( tigeroad )
-	GFXDECODE_ENTRY( "gfx1", 0, text_layout,   512, 16 )   /* colors 512-575 */
-	GFXDECODE_ENTRY( "gfx2", 0, tile_layout,     0, 16 )   /* colors   0-255 */
-	GFXDECODE_ENTRY( "gfx3", 0, sprite_layout, 256, 16 )   /* colors 256-511 */
+	GFXDECODE_ENTRY( "text", 0, text_layout,   512, 16 )   /* colors 512-575 */
+	GFXDECODE_ENTRY( "tiles", 0, tile_layout,     0, 16 )   /* colors   0-255 */
+	GFXDECODE_ENTRY( "sprites", 0, sprite_layout, 256, 16 )   /* colors 256-511 */
 GFXDECODE_END
 
 
@@ -552,13 +526,14 @@ static MACHINE_DRIVER_START( tigeroad )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M68000, XTAL_10MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_PROGRAM_MAP(main_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(0,sound_writeport)
-								/* IRQs are triggered by the YM2203 */
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_IO_MAP(sound_port_map,0)
+    
+	/* IRQs are triggered by the YM2203 */
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
@@ -596,8 +571,8 @@ static MACHINE_DRIVER_START( toramich )
 	MDRV_IMPORT_FROM(tigeroad)
 
 	MDRV_CPU_ADD("sample", Z80, 3579545) /* ? */
-	MDRV_CPU_PROGRAM_MAP(sample_readmem,sample_writemem)
-	MDRV_CPU_IO_MAP(sample_readport,sample_writeport)
+	MDRV_CPU_PROGRAM_MAP(sample_map,0)
+	MDRV_CPU_IO_MAP(sample_port_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,4000)	/* ? */
 
 	/* sound hardware */
@@ -624,10 +599,10 @@ ROM_START( tigeroad )
 
 	/* no samples player in the English version */
 
-	ROM_REGION( 0x008000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x008000, "text", ROMREGION_DISPOSE )
 	ROM_LOAD( "tr01.bin",     0x00000, 0x08000, CRC(74a9f08c) SHA1(458958c8d9a2af5df88bb24c9c5bcbd37d6856bc) ) /* 8x8 text */
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "tiles", ROMREGION_DISPOSE )
 	ROM_LOAD( "tr-01a.bin",   0x00000, 0x20000, CRC(a8aa2e59) SHA1(792f50d688a4ffb574e41257816bc304d41f0458) ) /* tiles */
 	ROM_LOAD( "tr-04a.bin",   0x20000, 0x20000, CRC(8863a63c) SHA1(11bfce5b09c5b8a781c658f035d5658c3710d189) )
 	ROM_LOAD( "tr-02a.bin",   0x40000, 0x20000, CRC(1a2c5f89) SHA1(2a2aa2f1e2a0cdd4bbdb25236e49c7cc573db9e9) )
@@ -637,7 +612,7 @@ ROM_START( tigeroad )
 	ROM_LOAD( "tr-07a.bin",   0xc0000, 0x20000, CRC(5f907d4d) SHA1(1820c5c6e0b078db9c64655c7983ea115ad81036) )
 	ROM_LOAD( "tr08.bin",     0xe0000, 0x20000, CRC(adee35e2) SHA1(6707cf43a697eb9465449a144ae4508afe2e6496) )
 
-	ROM_REGION( 0x080000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "sprites", ROMREGION_DISPOSE )
 	ROM_LOAD( "tr-09a.bin",   0x00000, 0x20000, CRC(3d98ad1e) SHA1(f12cdf50e1708ddae092b9784d4319a7d5f092bc) ) /* sprites */
 	ROM_LOAD( "tr-10a.bin",   0x20000, 0x20000, CRC(8f6f03d7) SHA1(08a02cfb373040ea5ffbf5604f68df92a1338bb0) )
 	ROM_LOAD( "tr-11a.bin",   0x40000, 0x20000, CRC(cd9152e5) SHA1(6df3c43c0c41289890296c2b2aeca915dfdae3b0) )
@@ -661,10 +636,10 @@ ROM_START( toramich )
 	ROM_REGION( 0x10000, "sample", 0 ) /* samples player */
 	ROM_LOAD( "tr_03.bin",    0x0000, 0x10000, CRC(ea1807ef) SHA1(f856e7b592c6df81586821284ea2220468c5ea9d) )
 
-	ROM_REGION( 0x008000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x008000, "text", ROMREGION_DISPOSE )
 	ROM_LOAD( "tr01.bin",     0x00000, 0x08000, CRC(74a9f08c) SHA1(458958c8d9a2af5df88bb24c9c5bcbd37d6856bc) ) /* 8x8 text */
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "tiles", ROMREGION_DISPOSE )
 	ROM_LOAD( "tr-01a.bin",   0x00000, 0x20000, CRC(a8aa2e59) SHA1(792f50d688a4ffb574e41257816bc304d41f0458) ) /* tiles */
 	ROM_LOAD( "tr-04a.bin",   0x20000, 0x20000, CRC(8863a63c) SHA1(11bfce5b09c5b8a781c658f035d5658c3710d189) )
 	ROM_LOAD( "tr-02a.bin",   0x40000, 0x20000, CRC(1a2c5f89) SHA1(2a2aa2f1e2a0cdd4bbdb25236e49c7cc573db9e9) )
@@ -674,7 +649,7 @@ ROM_START( toramich )
 	ROM_LOAD( "tr-07a.bin",   0xc0000, 0x20000, CRC(5f907d4d) SHA1(1820c5c6e0b078db9c64655c7983ea115ad81036) )
 	ROM_LOAD( "tr08.bin",     0xe0000, 0x20000, CRC(adee35e2) SHA1(6707cf43a697eb9465449a144ae4508afe2e6496) )
 
-	ROM_REGION( 0x080000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "sprites", ROMREGION_DISPOSE )
 	ROM_LOAD( "tr-09a.bin",   0x00000, 0x20000, CRC(3d98ad1e) SHA1(f12cdf50e1708ddae092b9784d4319a7d5f092bc) ) /* sprites */
 	ROM_LOAD( "tr-10a.bin",   0x20000, 0x20000, CRC(8f6f03d7) SHA1(08a02cfb373040ea5ffbf5604f68df92a1338bb0) )
 	ROM_LOAD( "tr-11a.bin",   0x40000, 0x20000, CRC(cd9152e5) SHA1(6df3c43c0c41289890296c2b2aeca915dfdae3b0) )
@@ -699,10 +674,10 @@ ROM_START( tigerodb )
 
 	/* no samples player in the English version */
 
-	ROM_REGION( 0x008000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x008000, "text", ROMREGION_DISPOSE )
 	ROM_LOAD( "tr01.bin",     0x00000, 0x08000, CRC(74a9f08c) SHA1(458958c8d9a2af5df88bb24c9c5bcbd37d6856bc) ) /* 8x8 text */
 
-	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "tiles", ROMREGION_DISPOSE )
 	ROM_LOAD( "tr-01a.bin",   0x00000, 0x20000, CRC(a8aa2e59) SHA1(792f50d688a4ffb574e41257816bc304d41f0458) ) /* tiles */
 	ROM_LOAD( "tr-04a.bin",   0x20000, 0x20000, CRC(8863a63c) SHA1(11bfce5b09c5b8a781c658f035d5658c3710d189) )
 	ROM_LOAD( "tr-02a.bin",   0x40000, 0x20000, CRC(1a2c5f89) SHA1(2a2aa2f1e2a0cdd4bbdb25236e49c7cc573db9e9) )
@@ -713,7 +688,7 @@ ROM_START( tigerodb )
 	ROM_LOAD( "tgrroad.17",   0xe0000, 0x10000, CRC(3f7539cc) SHA1(ca3ef1fabcb0c7abd7bc211ba128d2433e3dbf26) )
 	ROM_LOAD( "tgrroad.18",   0xf0000, 0x10000, CRC(e2e053cb) SHA1(eb9432140fc167dec5d3273112933201be2be1b3) )
 
-	ROM_REGION( 0x080000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x080000, "sprites", ROMREGION_DISPOSE )
 	ROM_LOAD( "tr-09a.bin",   0x00000, 0x20000, CRC(3d98ad1e) SHA1(f12cdf50e1708ddae092b9784d4319a7d5f092bc) ) /* sprites */
 	ROM_LOAD( "tr-10a.bin",   0x20000, 0x20000, CRC(8f6f03d7) SHA1(08a02cfb373040ea5ffbf5604f68df92a1338bb0) )
 	ROM_LOAD( "tr-11a.bin",   0x40000, 0x20000, CRC(cd9152e5) SHA1(6df3c43c0c41289890296c2b2aeca915dfdae3b0) )
@@ -734,10 +709,10 @@ ROM_START( f1dream )
 	ROM_REGION( 0x10000, "audio", 0 ) /* audio CPU */
 	ROM_LOAD( "12k_04.bin",   0x0000, 0x8000, CRC(4b9a7524) SHA1(19004958c19ac0af35f2c97790b0082ee2c15bc4) )
 
-	ROM_REGION( 0x008000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x008000, "text", ROMREGION_DISPOSE )
 	ROM_LOAD( "10d_01.bin",   0x00000, 0x08000, CRC(361caf00) SHA1(8a109e4e116d0c5eea86f9c57c05359754daa5b9) ) /* 8x8 text */
 
-	ROM_REGION( 0x060000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x060000, "tiles", ROMREGION_DISPOSE )
 	ROM_LOAD( "03f_12.bin",   0x00000, 0x10000, CRC(bc13e43c) SHA1(f9528839858d7a45395062a43b71d80400c73173) ) /* tiles */
 	ROM_LOAD( "01f_10.bin",   0x10000, 0x10000, CRC(f7617ad9) SHA1(746a0ec433d5246ac4dbae17d6498e3d154e2df1) )
 	ROM_LOAD( "03h_14.bin",   0x20000, 0x10000, CRC(e33cd438) SHA1(89a6faea19e8a01b38ba45413609603e559877e9) )
@@ -745,7 +720,7 @@ ROM_START( f1dream )
 	ROM_LOAD( "17f_09.bin",   0x40000, 0x10000, CRC(ca622155) SHA1(00ae4a8e9cad2c42a10b410b594b0e414ada6cfe) )
 	ROM_LOAD( "02h_13.bin",   0x50000, 0x10000, CRC(2a63961e) SHA1(a35e9bf0408716f460487a8d2ae336572a98d2fb) )
 
-	ROM_REGION( 0x040000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x040000, "sprites", ROMREGION_DISPOSE )
 	ROM_LOAD( "03b_06.bin",   0x00000, 0x10000, CRC(5e54e391) SHA1(475c968bfeb41b0448e621f59724c7b70d184d36) ) /* sprites */
 	ROM_LOAD( "02b_05.bin",   0x10000, 0x10000, CRC(cdd119fd) SHA1(e279ada53f5a1e2ada0195b93399731af213f518) )
 	ROM_LOAD( "03d_08.bin",   0x20000, 0x10000, CRC(811f2e22) SHA1(cca7e8cc43408c2c3067a731a98a8a6418a000aa) )
@@ -768,10 +743,10 @@ ROM_START( f1dreamb )
 	ROM_REGION( 0x10000, "audio", 0 ) /* audio CPU */
 	ROM_LOAD( "12k_04.bin",   0x0000, 0x8000, CRC(4b9a7524) SHA1(19004958c19ac0af35f2c97790b0082ee2c15bc4) )
 
-	ROM_REGION( 0x008000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x008000, "text", ROMREGION_DISPOSE )
 	ROM_LOAD( "10d_01.bin",   0x00000, 0x08000, CRC(361caf00) SHA1(8a109e4e116d0c5eea86f9c57c05359754daa5b9) ) /* 8x8 text */
 
-	ROM_REGION( 0x060000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x060000, "tiles", ROMREGION_DISPOSE )
 	ROM_LOAD( "03f_12.bin",   0x00000, 0x10000, CRC(bc13e43c) SHA1(f9528839858d7a45395062a43b71d80400c73173) ) /* tiles */
 	ROM_LOAD( "01f_10.bin",   0x10000, 0x10000, CRC(f7617ad9) SHA1(746a0ec433d5246ac4dbae17d6498e3d154e2df1) )
 	ROM_LOAD( "03h_14.bin",   0x20000, 0x10000, CRC(e33cd438) SHA1(89a6faea19e8a01b38ba45413609603e559877e9) )
@@ -779,7 +754,7 @@ ROM_START( f1dreamb )
 	ROM_LOAD( "17f_09.bin",   0x40000, 0x10000, CRC(ca622155) SHA1(00ae4a8e9cad2c42a10b410b594b0e414ada6cfe) )
 	ROM_LOAD( "02h_13.bin",   0x50000, 0x10000, CRC(2a63961e) SHA1(a35e9bf0408716f460487a8d2ae336572a98d2fb) )
 
-	ROM_REGION( 0x040000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x040000, "sprites", ROMREGION_DISPOSE )
 	ROM_LOAD( "03b_06.bin",   0x00000, 0x10000, CRC(5e54e391) SHA1(475c968bfeb41b0448e621f59724c7b70d184d36) ) /* sprites */
 	ROM_LOAD( "02b_05.bin",   0x10000, 0x10000, CRC(cdd119fd) SHA1(e279ada53f5a1e2ada0195b93399731af213f518) )
 	ROM_LOAD( "03d_08.bin",   0x20000, 0x10000, CRC(811f2e22) SHA1(cca7e8cc43408c2c3067a731a98a8a6418a000aa) )
