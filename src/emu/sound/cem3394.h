@@ -6,7 +6,8 @@
 
 
 /* interface */
-struct cem3394_interface
+typedef struct _cem3394_interface cem3394_interface;
+struct _cem3394_interface
 {
 	double vco_zero_freq;				/* frequency at 0V for VCO */
 	double filter_zero_freq;			/* frequency at 0V for filter */

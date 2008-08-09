@@ -157,7 +157,7 @@ PORT_START("COIN")	/* COINSW & SERVICESW */
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static const struct gaelcosnd_interface maniacsq_snd_interface =
+static const gaelcosnd_interface maniacsq_snd_interface =
 {
 	"gfx1",		 							/* memory region */
 	{ 0*0x0080000, 1*0x0080000, 0, 0 },		/* start of each ROM bank */
@@ -284,7 +284,7 @@ PORT_START("COIN")	/* COINSW & Service */
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, -6.0 / 240, 0) PORT_SENSITIVITY(35) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-static const struct gaelcosnd_interface bang_snd_interface =
+static const gaelcosnd_interface bang_snd_interface =
 {
 	"gfx1",		 											/* memory region */
 	{ 0*0x0200000, 1*0x0200000, 2*0x0200000, 3*0x0200000 }	/* start of each ROM bank */
@@ -489,7 +489,7 @@ PORT_START("COIN")	/* COINSW & Service */
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static const struct gaelcosnd_interface alighunt_snd_interface =
+static const gaelcosnd_interface alighunt_snd_interface =
 {
 	"gfx1",		 											/* memory region */
 	{ 0*0x0400000, 1*0x0400000, 2*0x0400000, 3*0x0400000 }	/* start of each ROM bank */
@@ -742,7 +742,7 @@ PORT_START("FAKE")	/* Fake: To switch between monitors at run time */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE4 ) PORT_TOGGLE
 INPUT_PORTS_END
 
-static const struct gaelcosnd_interface touchgo_snd_interface =
+static const gaelcosnd_interface touchgo_snd_interface =
 {
 	"gfx1",		 							/* memory region */
 	{ 0*0x0400000, 1*0x0400000, 0, 0 }		/* start of each ROM bank */
@@ -945,7 +945,7 @@ PORT_START("COIN")	/* COINSW & Service */
 	/* bits 6 & 7 are used for accessing the NVRAM */
 INPUT_PORTS_END
 
-static const struct gaelcosnd_interface snowboar_snd_interface =
+static const gaelcosnd_interface snowboar_snd_interface =
 {
 	"gfx1",		 							/* memory region */
 	{ 0*0x0400000, 1*0x0400000, 0, 0 }		/* start of each ROM bank */
@@ -1197,7 +1197,7 @@ PORT_START("ANALOG1")	/* steering wheel player 2 */
 	PORT_BIT( 0xff, 0x8A, IPT_PADDLE_V ) PORT_MINMAX(0x00,0xff) PORT_SENSITIVITY(25) PORT_KEYDELTA(25) PORT_REVERSE PORT_NAME("P2 Wheel")
 INPUT_PORTS_END
 
-static const struct gaelcosnd_interface wrally2_snd_interface =
+static const gaelcosnd_interface wrally2_snd_interface =
 {
 	"gfx1", 							/* memory region */
 	{ 0*0x0200000, 1*0x0200000, 0, 0 }	/* start of each ROM bank */

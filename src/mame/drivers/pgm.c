@@ -437,7 +437,7 @@ static void sound_irq(running_machine *machine, int level)
 	cpunum_set_input_line(machine, 1, 0, level);
 }
 
-static const struct ics2115_interface pgm_ics2115_interface = {
+static const ics2115_interface pgm_ics2115_interface = {
 	sound_irq
 };
 

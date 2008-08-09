@@ -519,7 +519,7 @@ static void irqhandler(running_machine *machine, int irq)
 //  cpunum_set_input_line(machine, 1,1,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct ES5506interface es5506_interface =
+static const es5506_interface es5506_config =
 {
 	"ensoniq.0",
 	"ensoniq.1",
@@ -557,7 +557,7 @@ static MACHINE_DRIVER_START( macrossp )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ensoniq", ES5506, 16000000)
-	MDRV_SOUND_CONFIG(es5506_interface)
+	MDRV_SOUND_CONFIG(es5506_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

@@ -25,7 +25,8 @@
 
 /* --- external SSG(YM2149/AY-3-8910)emulator interface port */
 /* used by YM2203,YM2608,and YM2610 */
-struct ssg_callbacks
+typedef struct _ssg_callbacks ssg_callbacks;
+struct _ssg_callbacks
 {
 	void (*set_clock)(void *param, int clock);
 	void (*write)(void *param, int address, int data);
@@ -121,7 +122,7 @@ typedef void (*FM_IRQHANDLER)(void *param,int irq);
 ** return      0 = success
 */
 void * YM2203Init(void *param, int index, int baseclock, int rate,
-               FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const struct ssg_callbacks *ssg);
+               FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
 
 /*
 ** shutdown the YM2203 emulators
@@ -165,7 +166,7 @@ void YM2203Postload(void *chip);
 /* -------------------- YM2608(OPNA) Interface -------------------- */
 void * YM2608Init(void *param, int index, int baseclock, int rate,
                void *pcmroma,int pcmsizea,
-               FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const struct ssg_callbacks *ssg);
+               FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
 void YM2608Shutdown(void *chip);
 void YM2608ResetChip(void *chip);
 void YM2608UpdateOne(void *chip, FMSAMPLE **buffer, int length);
@@ -180,7 +181,7 @@ void YM2608Postload(void *chip);
 /* -------------------- YM2610(OPNB) Interface -------------------- */
 void * YM2610Init(void *param, int index, int baseclock, int rate,
                void *pcmroma,int pcmasize,void *pcmromb,int pcmbsize,
-               FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const struct ssg_callbacks *ssg);
+               FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
 void YM2610Shutdown(void *chip);
 void YM2610ResetChip(void *chip);
 void YM2610UpdateOne(void *chip, FMSAMPLE **buffer, int length);

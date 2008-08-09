@@ -822,7 +822,7 @@ static void es5506_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 static void *es5506_start_common(sound_type sndtype, const char *tag, int sndindex, int clock, const void *config)
 {
-	const struct ES5506interface *intf = config;
+	const es5506_interface *intf = config;
 	struct ES5506Chip *chip;
 	int j;
 	UINT32 accum_mask;
@@ -1501,8 +1501,8 @@ void ES5506_voice_bank_1_w(int voice, int bank)
 
 static void *es5505_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	const struct ES5505interface *intf = config;
-	struct ES5506interface es5506intf;
+	const es5505_interface *intf = config;
+	es5506_interface es5506intf;
 
 	memset(&es5506intf, 0, sizeof(es5506intf));
 

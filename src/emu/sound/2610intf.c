@@ -53,7 +53,7 @@ static void psg_reset(void *param)
 	ay8910_reset_ym(info->psg);
 }
 
-static const struct ssg_callbacks psgintf =
+static const ssg_callbacks psgintf =
 {
 	psg_set_clock,
 	psg_write,

@@ -261,7 +261,7 @@ void taito_f3_soundsystem_reset(running_machine *machine)
 	//cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-const struct ES5505interface es5505_interface =
+const es5505_interface es5505_taito_f3_config =
 {
 	"ensoniq.0",	/* Bank 0: Unused by F3 games? */
 	"ensoniq.0",	/* Bank 1: All games seem to use this */

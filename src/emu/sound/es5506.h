@@ -8,7 +8,8 @@
 #ifndef ES5506_H
 #define ES5506_H
 
-struct ES5505interface
+typedef struct _es5505_interface es5505_interface;
+struct _es5505_interface
 {
 	const char * region0;						/* memory region where the sample ROM lives */
 	const char * region1;						/* memory region where the sample ROM lives */
@@ -26,8 +27,8 @@ void ES5505_voice_bank_1_w(int voice, int bank);
 
 
 
-
-struct ES5506interface
+typedef struct _es5506_interface es5506_interface;
+struct _es5506_interface
 {
 	const char * region0;						/* memory region where the sample ROM lives */
 	const char * region1;						/* memory region where the sample ROM lives */

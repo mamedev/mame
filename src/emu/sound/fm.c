@@ -622,7 +622,7 @@ typedef struct
 	/* Extention Timer and IRQ handler */
 	FM_TIMERHANDLER	timer_handler;
 	FM_IRQHANDLER	IRQ_Handler;
-	const struct ssg_callbacks *SSG;
+	const ssg_callbacks *SSG;
 } FM_ST;
 
 
@@ -2261,7 +2261,7 @@ static void YM2203_save_state(YM2203 *F2203, int index)
    'rate' is sampling rate
 */
 void * YM2203Init(void *param, int index, int clock, int rate,
-               FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const struct ssg_callbacks *ssg)
+               FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
 {
 	YM2203 *F2203;
 
@@ -3489,7 +3489,7 @@ static void YM2608_deltat_status_reset(void *chip, UINT8 changebits)
 /* YM2608(OPNA) */
 void * YM2608Init(void *param, int index, int clock, int rate,
                void *pcmrom,int pcmsize,
-               FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const struct ssg_callbacks *ssg)
+               FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
 {
 	YM2608 *F2608;
 
@@ -4176,7 +4176,7 @@ static void YM2610_deltat_status_reset(void *chip, UINT8 changebits)
 
 void *YM2610Init(void *param, int index, int clock, int rate,
                void *pcmroma,int pcmsizea,void *pcmromb,int pcmsizeb,
-               FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const struct ssg_callbacks *ssg)
+               FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
 
 {
 	YM2610 *F2610;

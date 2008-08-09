@@ -42,7 +42,7 @@
 enum { V_ON = 1, V_DONE = 2 };
 
 struct ics2115{
-	const struct ics2115_interface *intf;
+	const ics2115_interface *intf;
 	int index;
 	UINT8 *rom;
 	INT16 *ulaw;

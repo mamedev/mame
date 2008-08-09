@@ -1,7 +1,8 @@
 #ifndef _ES5503_H_
 #define _ES5503_H_
 
-struct ES5503interface
+typedef struct _es5503_interface es5503_interface;
+struct _es5503_interface
 {
 	void (*irq_callback)(running_machine *machine, int state);
 	read8_machine_func adc_read;

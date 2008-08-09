@@ -16,7 +16,8 @@ enum
 	C140_TYPE_ASIC219
 };
 
-struct C140interface {
+typedef struct _c140_interface c140_interface;
+struct _c140_interface {
     int banking_type;
 };
 

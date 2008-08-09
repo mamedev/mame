@@ -1156,7 +1156,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const struct cem3394_interface cem_interface =
+static const cem3394_interface cem_interface =
 {
 	431.894,
 	1300.0,

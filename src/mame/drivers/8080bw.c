@@ -29,6 +29,10 @@
 /*       heard while missiles are seen to be moving.  When the red          */
 /*       missiles speed up, there should be more "klunks per second"        */
 /*       with the pitch staying constant.                                   */
+/*      8/8/8 D.R. - Who says?  According to the schematic the sounds are   */
+/*       correct.  Make a video showing otherwise or trace SX0 & SX1 on     */
+/*       a real PCB to find the difference.                                 */
+/*       Currently it beeps every time a player eats a dot.  Seems right.   */
 /*    2. If "Hard" mode is selected, numerous bugs appear which             */
 /*       could be either an emulation fault or a bad rom. Some              */
 /*       bugs are:                                                          */

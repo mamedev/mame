@@ -246,7 +246,7 @@ WRITE16_HANDLER( gaelcosnd_w )
 static void *gaelcosnd_start(sound_type sndtype, const char *tag, int sndindex, int clock, const void *config)
 {
 	int j, vol;
-	const struct gaelcosnd_interface *intf = config;
+	const gaelcosnd_interface *intf = config;
 
 	struct GAELCOSND *info;
 	info = auto_malloc(sizeof(*info));

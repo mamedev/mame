@@ -457,7 +457,7 @@ static void update_stereo(void *param, stream_sample_t **inputs, stream_sample_t
 
 static void *c140_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	const struct C140interface *intf = config;
+	const c140_interface *intf = config;
 	struct c140_info *info;
 
 	info = auto_malloc(sizeof(*info));

@@ -326,7 +326,7 @@ static const custom_sound_interface amiga_custom_interface =
 };
 
 
-static const struct ES5503interface es5503_intf =
+static const es5503_interface es5503_intf =
 {
 	NULL,
 	NULL,

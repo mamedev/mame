@@ -1508,7 +1508,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const struct ES5506interface es5506_interface =
+static const es5506_interface es5506_config =
 {
 	"ensoniq.0",
 	"ensoniq.1",
@@ -1552,7 +1552,7 @@ static MACHINE_DRIVER_START( timekill )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ensoniq", ES5506, SOUND_CLOCK)
-	MDRV_SOUND_CONFIG(es5506_interface)
+	MDRV_SOUND_CONFIG(es5506_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

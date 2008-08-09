@@ -1273,7 +1273,7 @@ static INTERRUPT_GEN( mcu_interrupt )
 	}
 }
 
-static const struct C140interface C140_interface_typeA =
+static const c140_interface C140_interface_typeA =
 {
 	C140_TYPE_ASIC219
 };
