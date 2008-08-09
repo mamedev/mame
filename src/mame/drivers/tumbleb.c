@@ -2274,7 +2274,7 @@ static void semicom_irqhandler(running_machine *machine, int irq)
 }
 
 
-static const struct YM2151interface semicom_ym2151_interface =
+static const ym2151_interface semicom_ym2151_interface =
 {
 	semicom_irqhandler
 };

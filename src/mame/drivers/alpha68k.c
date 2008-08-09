@@ -1865,7 +1865,7 @@ static const ay8910_interface ay8910_config =
 	soundlatch_r
 };
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -1879,7 +1879,7 @@ static void YM3812_irq(running_machine *machine, int param)
 	cpunum_set_input_line(machine, 1, 0, (param) ? HOLD_LINE : CLEAR_LINE);
 }
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface ym3812_config =
 {
 	YM3812_irq
 };
@@ -2056,7 +2056,7 @@ static MACHINE_DRIVER_START( alpha68k_I )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM3812, 4000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -2091,7 +2091,7 @@ static MACHINE_DRIVER_START( alpha68k_II )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM2203, 3000000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 
 	MDRV_SOUND_ADD("ym2", YM2413, 8000000)
@@ -2139,7 +2139,7 @@ static MACHINE_DRIVER_START( alpha68k_II_gm )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM2203, 3000000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 
 	MDRV_SOUND_ADD("ym2", YM2413, 8000000)
@@ -2181,7 +2181,7 @@ static MACHINE_DRIVER_START( alpha68k_V )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM2203, 3000000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 
 	MDRV_SOUND_ADD("ym2", YM2413, 8000000)
@@ -2222,7 +2222,7 @@ static MACHINE_DRIVER_START( alpha68k_V_sb )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM2203, 3000000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
 
 	MDRV_SOUND_ADD("ym2", YM2413, 8000000)
@@ -2262,7 +2262,7 @@ static MACHINE_DRIVER_START( tnexspce )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM3812, 4000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

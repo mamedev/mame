@@ -235,7 +235,7 @@ static void irqhandler(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 1,0,linestate);
 }
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface ym3812_config =
 {
 	irqhandler
 };
@@ -276,7 +276,7 @@ static MACHINE_DRIVER_START( stadhero )
 	MDRV_SOUND_ROUTE(3, "mono", 0.40)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)

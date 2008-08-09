@@ -852,7 +852,7 @@ static void galaxygn_sound_irq(running_machine *machine, int line)
 	cpunum_set_input_line_and_vector(machine, 1, 0, line ? ASSERT_LINE : CLEAR_LINE, 0x80/4);
 }
 
-static const struct YM2151interface galaxygn_ym2151_interface =
+static const ym2151_interface galaxygn_ym2151_interface =
 {
 	galaxygn_sound_irq
 };
@@ -950,7 +950,7 @@ static void wheelrun_ym3526_irqhandler(running_machine *machine, int state)
 	cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ0, state);
 }
 
-static const struct YM3526interface wheelrun_ym3526_interface =
+static const ym3526_interface wheelrun_ym3526_interface =
 {
 	wheelrun_ym3526_irqhandler
 };

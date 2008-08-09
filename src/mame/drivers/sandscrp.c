@@ -416,7 +416,7 @@ static void irq_handler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2203interface ym2203_intf_sandscrp =
+static const ym2203_interface ym2203_intf_sandscrp =
 {
 	{
 		AY8910_LEGACY_OUTPUT,

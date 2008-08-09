@@ -510,12 +510,12 @@ GFXDECODE_END
 
 
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	m72_ym2151_irq_handler
 };
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -560,7 +560,7 @@ static MACHINE_DRIVER_START( vigilant )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579645)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.55)
 	MDRV_SOUND_ROUTE(1, "right", 0.55)
 
@@ -603,7 +603,7 @@ static MACHINE_DRIVER_START( buccanrs )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym1", YM2203, 18432000/6)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.35)
 	MDRV_SOUND_ROUTE(0, "right", 0.35)
 	MDRV_SOUND_ROUTE(1, "left",  0.35)
@@ -662,7 +662,7 @@ static MACHINE_DRIVER_START( kikcubic )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579645)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.55)
 	MDRV_SOUND_ROUTE(1, "right", 0.55)
 

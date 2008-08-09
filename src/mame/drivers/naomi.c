@@ -819,7 +819,7 @@ static INPUT_PORTS_START( naomi )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(dc_coin_slots_callback, &dc_coin_counts[1])
 INPUT_PORTS_END
 
-static const struct AICAinterface aica_interface =
+static const aica_interface aica_config =
 {
 	0,
 	aica_irq
@@ -862,7 +862,7 @@ static MACHINE_DRIVER_START( naomi )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_ADD("aica", AICA, 0)
-	MDRV_SOUND_CONFIG(aica_interface)
+	MDRV_SOUND_CONFIG(aica_config)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
 MACHINE_DRIVER_END

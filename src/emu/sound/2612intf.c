@@ -23,7 +23,7 @@ struct ym2612_info
 	sound_stream *	stream;
 	emu_timer *	timer[2];
 	void *			chip;
-	const struct YM2612interface *intf;
+	const ym2612_interface *intf;
 };
 
 /*------------------------- TM2612 -------------------------------*/
@@ -89,7 +89,7 @@ static STATE_POSTLOAD( ym2612_postload )
 
 static void *ym2612_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const struct YM2612interface dummy = { 0 };
+	static const ym2612_interface dummy = { 0 };
 	struct ym2612_info *info;
 	int rate = clock/72;
 

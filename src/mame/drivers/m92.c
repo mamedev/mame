@@ -939,7 +939,7 @@ static void sound_irq(running_machine *machine, int state)
 		timer_call_after_resynch(NULL, YM2151_CLEAR, setvector_callback);
 }
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	sound_irq
 };
@@ -984,7 +984,7 @@ static MACHINE_DRIVER_START( m92 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2151, 14318180/4)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 	MDRV_SOUND_ROUTE(1, "mono", 0.40)
 

@@ -1109,7 +1109,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static struct YM2610interface ym2610_interface =
+static ym2610_interface ym2610_config =
 {
 	audio_cpu_irq
 };
@@ -1260,7 +1260,7 @@ static MACHINE_DRIVER_START( neogeo )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2610, NEOGEO_YM2610_CLOCK)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.60)
 	MDRV_SOUND_ROUTE(0, "right", 0.60)
 	MDRV_SOUND_ROUTE(1, "left",  1.0)

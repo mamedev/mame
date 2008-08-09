@@ -1966,12 +1966,12 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	irqhandler
 };
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -2256,7 +2256,7 @@ static MACHINE_DRIVER_START( hotdogst )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2203, 4000000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.20)
 	MDRV_SOUND_ROUTE(0, "right", 0.20)
 	MDRV_SOUND_ROUTE(1, "left",  0.20)
@@ -2351,7 +2351,7 @@ static MACHINE_DRIVER_START( mazinger )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2203, 4000000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.20)
 	MDRV_SOUND_ROUTE(0, "right", 0.20)
 	MDRV_SOUND_ROUTE(1, "left",  0.20)
@@ -2407,7 +2407,7 @@ static MACHINE_DRIVER_START( metmqstr )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 16000000/4)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.20)
 	MDRV_SOUND_ROUTE(1, "right", 1.20)
 
@@ -2462,7 +2462,7 @@ static MACHINE_DRIVER_START( pwrinst2 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2203, 16000000 / 4)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.40)
 	MDRV_SOUND_ROUTE(0, "right", 0.40)
 	MDRV_SOUND_ROUTE(1, "left",  0.40)
@@ -2522,7 +2522,7 @@ static MACHINE_DRIVER_START( sailormn )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_ADD("ym", YM2151, 16000000/4)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.30)
 	MDRV_SOUND_ROUTE(1, "right", 0.30)
 

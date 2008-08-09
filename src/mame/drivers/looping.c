@@ -557,7 +557,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const struct TMS5220interface tms5220_interface =
+static const tms5220_interface tms5220_config =
 {
 	looping_spcint
 };
@@ -625,7 +625,7 @@ static MACHINE_DRIVER_START( looping )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_SOUND_ADD("tms", TMS5220, TMS_CLOCK)
-	MDRV_SOUND_CONFIG(tms5220_interface)
+	MDRV_SOUND_CONFIG(tms5220_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)

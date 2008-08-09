@@ -912,12 +912,12 @@ static void sound_irq2(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 1,1,linestate); /* IRQ2 */
 }
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface ym3812_config =
 {
 	sound_irq
 };
 
-static const struct YM3812interface ym3812b_interface =
+static const ym3812_interface ym3812b_interface =
 {
 	sound_irq2
 };
@@ -958,7 +958,7 @@ static MACHINE_DRIVER_START( hbarrel )
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)
@@ -1000,7 +1000,7 @@ static MACHINE_DRIVER_START( baddudes )
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)
@@ -1042,7 +1042,7 @@ static MACHINE_DRIVER_START( birdtry )
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)
@@ -1089,7 +1089,7 @@ static MACHINE_DRIVER_START( robocop )
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)
@@ -1131,7 +1131,7 @@ static MACHINE_DRIVER_START( robocopb )
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)
@@ -1178,7 +1178,7 @@ static MACHINE_DRIVER_START( hippodrm )
 	MDRV_SOUND_ROUTE(3, "mono", 0.35)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1023924)

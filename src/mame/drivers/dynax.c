@@ -3602,7 +3602,7 @@ INPUT_PORTS_END
                                 Hana no Mai
 ***************************************************************************/
 
-static const struct YM2203interface hanamai_ym2203_interface =
+static const ym2203_interface hanamai_ym2203_interface =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -3725,7 +3725,7 @@ MACHINE_DRIVER_END
                                 Sports Match
 ***************************************************************************/
 
-static const struct YM2203interface sprtmtch_ym2203_interface =
+static const ym2203_interface sprtmtch_ym2203_interface =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -3902,7 +3902,7 @@ MACHINE_DRIVER_END
 
 // dual monitor, 2 CPU's, 2 blitters
 
-static const struct YM2203interface jantouki_ym2203_interface =
+static const ym2203_interface jantouki_ym2203_interface =
 {
 	{
 		AY8910_LEGACY_OUTPUT,

@@ -1,7 +1,8 @@
 #ifndef YM2151INTF_H
 #define YM2151INTF_H
 
-struct YM2151interface
+typedef struct _ym2151_interface ym2151_interface;
+struct _ym2151_interface
 {
 	void (*irqhandler)(running_machine *machine, int irq);
 	write8_machine_func portwritehandler;

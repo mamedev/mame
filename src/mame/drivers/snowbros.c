@@ -1519,14 +1519,14 @@ static void irqhandler(running_machine *machine, int irq)
 
 /* SnowBros Sound */
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface ym3812_config =
 {
 	irqhandler
 };
 
 /* SemiCom Sound */
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	irqhandler
 };
@@ -1580,7 +1580,7 @@ static MACHINE_DRIVER_START( snowbros )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("3812", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1612,7 +1612,7 @@ static MACHINE_DRIVER_START( semicom )
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("3812", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.10)
 	MDRV_SOUND_ROUTE(1, "mono", 0.10)
 
@@ -1676,7 +1676,7 @@ static MACHINE_DRIVER_START( honeydol )
 	/* sound hardware */
 
 	MDRV_SOUND_ADD("3812", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 
@@ -1749,7 +1749,7 @@ static MACHINE_DRIVER_START( finalttr )
 	MDRV_MACHINE_RESET ( finalttr )
 
 	MDRV_SOUND_REPLACE("3812", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.08)
 	MDRV_SOUND_ROUTE(1, "mono", 0.08)
 

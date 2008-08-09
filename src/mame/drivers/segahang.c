@@ -813,7 +813,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -824,7 +824,7 @@ static const struct YM2203interface ym2203_interface =
 };
 
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	sound_irq
 };
@@ -925,7 +925,7 @@ static MACHINE_DRIVER_START( sound_board_2203 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2203, MASTER_CLOCK_8MHz/2)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.13)
 	MDRV_SOUND_ROUTE(0, "right", 0.13)
 	MDRV_SOUND_ROUTE(1, "left",  0.13)
@@ -953,7 +953,7 @@ static MACHINE_DRIVER_START( sound_board_2203x2 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym1", YM2203, MASTER_CLOCK_8MHz/2)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.13)
 	MDRV_SOUND_ROUTE(0, "right", 0.13)
 	MDRV_SOUND_ROUTE(1, "left",  0.13)
@@ -991,7 +991,7 @@ static MACHINE_DRIVER_START( sound_board_2151 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, MASTER_CLOCK_8MHz/2)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.43)
 	MDRV_SOUND_ROUTE(1, "right", 0.43)
 

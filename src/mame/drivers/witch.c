@@ -413,7 +413,7 @@ static WRITE8_HANDLER(yscroll_w)
 static READ8_HANDLER(portA_r) {	return input_port_read(machine, "YM_PortA"); }
 static READ8_HANDLER(portB_r) {	return input_port_read(machine, "YM_PortB");}
 
-static const struct YM2203interface ym2203_interface_0 =
+static const ym2203_interface ym2203_interface_0 =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -426,7 +426,7 @@ static const struct YM2203interface ym2203_interface_0 =
 	NULL
 };
 
-static const struct YM2203interface ym2203_interface_1 =
+static const ym2203_interface ym2203_interface_1 =
 {
 	{
 		AY8910_LEGACY_OUTPUT,

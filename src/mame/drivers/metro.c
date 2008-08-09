@@ -519,7 +519,7 @@ static void metro_sound_irq_handler(running_machine *machine, int state)
 	cpunum_set_input_line(machine, 1, UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	metro_sound_irq_handler	/* irq handler */
 };
@@ -1939,7 +1939,7 @@ static void blzntrnd_irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2610interface blzntrnd_ym2610_interface =
+static const ym2610_interface blzntrnd_ym2610_interface =
 {
 	blzntrnd_irqhandler
 };
@@ -3885,7 +3885,7 @@ static MACHINE_DRIVER_START( daitorid )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
 
@@ -4384,7 +4384,7 @@ static MACHINE_DRIVER_START( pururun )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
 

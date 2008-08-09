@@ -3,7 +3,8 @@
 
 #include "fm.h"
 
-struct YM2610interface
+typedef struct _ym2610_interface ym2610_interface;
+struct _ym2610_interface
 {
 	void ( *handler )( running_machine *machine, int irq );	/* IRQ handler for the YM2610 */
 };

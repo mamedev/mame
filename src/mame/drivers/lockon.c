@@ -455,7 +455,7 @@ static WRITE8_HANDLER( ym2203_out_b )
 	set_led_status(1, !(data & 0x10));
 }
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -509,7 +509,7 @@ static MACHINE_DRIVER_START( lockon )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2203, XTAL_16MHz / 4)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.40)
 	MDRV_SOUND_ROUTE(0, "right", 0.40)
 	MDRV_SOUND_ROUTE(1, "f2203.1l", 1.0)

@@ -1,3 +1,7 @@
+#include "sound/262intf.h"
+#include "sound/2151intf.h"
+
+
 #define CPUTAG_T5182 "T5182"
 #define T5182COINPORT "T5182_COIN"
 
@@ -11,4 +15,4 @@ WRITE8_HANDLER(t5182_sharedram_semaphore_main_release_w);
 
 extern UINT8 *t5182_sharedram;
 
-extern const struct YM2151interface t5182_ym2151_interface;
+extern const ym2151_interface t5182_ym2151_interface;

@@ -221,7 +221,7 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2608interface ym2608_interface =
+static const ym2608_interface ym2608_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
@@ -267,7 +267,7 @@ static MACHINE_DRIVER_START( tail2nos )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2608, XTAL_8MHz)	/* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2608_interface)
+	MDRV_SOUND_CONFIG(ym2608_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
 	MDRV_SOUND_ROUTE(1, "left",  1.0)

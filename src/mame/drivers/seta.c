@@ -6689,7 +6689,7 @@ static INTERRUPT_GEN( seta_sub_interrupt )
                                 Thundercade
 ***************************************************************************/
 
-static const struct YM2203interface tndrcade_ym2203_interface =
+static const ym2203_interface tndrcade_ym2203_interface =
 {
 	{
 		AY8910_LEGACY_OUTPUT,

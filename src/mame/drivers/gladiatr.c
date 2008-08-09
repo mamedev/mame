@@ -653,7 +653,7 @@ static READ8_HANDLER(f1_r)
 	return mame_rand(machine);
 }
 
-static const struct YM2203interface ppking_ym2203_interface =
+static const ym2203_interface ppking_ym2203_interface =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -666,7 +666,7 @@ static const struct YM2203interface ppking_ym2203_interface =
 	NULL
 };
 
-static const struct YM2203interface gladiatr_ym2203_interface =
+static const ym2203_interface gladiatr_ym2203_interface =
 {
 	{
 		AY8910_LEGACY_OUTPUT,

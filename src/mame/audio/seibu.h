@@ -62,10 +62,10 @@ WRITE8_HANDLER( seibu_adpcm_ctl_1_w );
 WRITE8_HANDLER( seibu_adpcm_adr_2_w );
 WRITE8_HANDLER( seibu_adpcm_ctl_2_w );
 
-extern const struct YM3812interface seibu_ym3812_interface;
+extern const ym3812_interface seibu_ym3812_interface;
 extern const custom_sound_interface seibu_adpcm_interface;
-extern const struct YM2151interface seibu_ym2151_interface;
-extern const struct YM2203interface seibu_ym2203_interface;
+extern const ym2151_interface seibu_ym2151_interface;
+extern const ym2203_interface seibu_ym2203_interface;
 
 /**************************************************************************/
 

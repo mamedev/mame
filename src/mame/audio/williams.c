@@ -171,14 +171,14 @@ static const pia6821_interface cvsd_pia_intf =
 ****************************************************************************/
 
 /* YM2151 structure (CVSD variant) */
-static const struct YM2151interface cvsd_ym2151_interface =
+static const ym2151_interface cvsd_ym2151_interface =
 {
 	cvsd_ym2151_irq
 };
 
 
 /* YM2151 structure (ADPCM variant) */
-static const struct YM2151interface adpcm_ym2151_interface =
+static const ym2151_interface adpcm_ym2151_interface =
 {
 	adpcm_ym2151_irq
 };

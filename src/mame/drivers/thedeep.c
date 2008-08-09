@@ -328,7 +328,7 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2203interface thedeep_ym2203_intf =
+static const ym2203_interface thedeep_ym2203_intf =
 {
 	{
 		AY8910_LEGACY_OUTPUT,

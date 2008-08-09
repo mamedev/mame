@@ -585,7 +585,7 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2610interface airsys_ym2610_interface =
+static const ym2610_interface airsys_ym2610_interface =
 {
 	irqhandler
 };

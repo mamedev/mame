@@ -23,7 +23,7 @@
 /* the state of the streamed output */
 struct tms5220_info
 {
-	const struct TMS5220interface *intf;
+	const tms5220_interface *intf;
 	sound_stream *stream;
 	int clock;
 	void *chip;
@@ -43,7 +43,7 @@ static void tms5220_update(void *param, stream_sample_t **inputs, stream_sample_
 
 static void *tms5220_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const struct TMS5220interface dummy = { 0 };
+	static const tms5220_interface dummy = { 0 };
 	struct tms5220_info *info;
 
 	info = auto_malloc(sizeof(*info));

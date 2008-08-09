@@ -2119,7 +2119,7 @@ static WRITE8_HANDLER( portA_w )
 	}
 }
 
-static const struct YM2203interface ym2203_interface_triple =
+static const ym2203_interface ym2203_interface_triple =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -2132,7 +2132,7 @@ static const struct YM2203interface ym2203_interface_triple =
 	irqhandler
 };
 
-static const struct YM2203interface ym2203_interface_champwr =
+static const ym2203_interface ym2203_interface_champwr =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -2152,12 +2152,12 @@ static const struct MSM5205interface msm5205_interface =
 	MSM5205_S48_4B		/* 8 kHz */
 };
 
-static const struct YM2610interface ym2610_interface =
+static const ym2610_interface ym2610_config =
 {
 	irqhandler
 };
 
-static const struct YM2203interface ym2203_interface_single =
+static const ym2203_interface ym2203_interface_single =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -2263,7 +2263,7 @@ static MACHINE_DRIVER_START( raimais )
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("ym", YM2610, 8000000) /* verified on pcb (8Mhz OSC is also for the 2nd z80) */
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)

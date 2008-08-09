@@ -877,7 +877,7 @@ static READ8_HANDLER( unk_r )
 	return 0;
 }
 
-static const struct YM2203interface ym2203_interface_1 =
+static const ym2203_interface ym2203_interface_1 =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -887,7 +887,7 @@ static const struct YM2203interface ym2203_interface_1 =
 	irqhandler
 };
 
-static const struct YM2203interface ym2203_interface_2 =
+static const ym2203_interface ym2203_interface_2 =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -897,7 +897,7 @@ static const struct YM2203interface ym2203_interface_2 =
 	NULL
 };
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	irqhandler
 };
@@ -925,7 +925,7 @@ static MACHINE_DRIVER_START( sound_2151 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 
@@ -938,7 +938,7 @@ static MACHINE_DRIVER_START( sound_2151_m68k )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 

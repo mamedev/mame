@@ -1552,7 +1552,7 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-static const struct YM2610interface sngkace_ym2610_interface =
+static const ym2610_interface sngkace_ym2610_interface =
 {
 	sound_irq
 };
@@ -1603,7 +1603,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 
-static const struct YM2610interface gunbird_ym2610_interface =
+static const ym2610_interface gunbird_ym2610_interface =
 {
 	sound_irq	/* irq */
 };

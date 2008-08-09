@@ -1730,7 +1730,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	NULL,
 	n7751_control_w
@@ -1806,7 +1806,7 @@ static MACHINE_DRIVER_START( system16a )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("2151", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)

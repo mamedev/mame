@@ -12,7 +12,7 @@ struct ym2203_info
 	emu_timer *	timer[2];
 	void *			chip;
 	void *			psg;
-	const struct YM2203interface *intf;
+	const ym2203_interface *intf;
 };
 
 
@@ -107,7 +107,7 @@ static STATE_POSTLOAD( ym2203_postload )
 
 static void *ym2203_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const struct YM2203interface generic_2203 =
+	static const ym2203_interface generic_2203 =
 	{
 		{
 			AY8910_LEGACY_OUTPUT,
@@ -116,7 +116,7 @@ static void *ym2203_start(const char *tag, int sndindex, int clock, const void *
 		},
 		NULL
 	};
-	const struct YM2203interface *intf = config ? config : &generic_2203;
+	const ym2203_interface *intf = config ? config : &generic_2203;
 	struct ym2203_info *info;
 	int rate = clock/72; /* ??? */
 

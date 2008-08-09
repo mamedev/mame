@@ -904,7 +904,7 @@ static void sound_irq(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YMF262interface ymf262_interface =
+static const ymf262_interface tecmosys_ymf262_interface =
 {
 	sound_irq		/* irq */
 };
@@ -943,7 +943,7 @@ static MACHINE_DRIVER_START( deroon )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ymf", YMF262, 14318180)
-	MDRV_SOUND_CONFIG(ymf262_interface)
+	MDRV_SOUND_CONFIG(tecmosys_ymf262_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.00)
 	MDRV_SOUND_ROUTE(1, "right", 1.00)
 	MDRV_SOUND_ROUTE(2, "left", 1.00)

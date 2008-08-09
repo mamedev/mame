@@ -32,7 +32,7 @@ struct ym3812_info
 	sound_stream *	stream;
 	emu_timer *	timer[2];
 	void *			chip;
-	const struct YM3812interface *intf;
+	const ym3812_interface *intf;
 };
 
 static void IRQHandler_3812(void *param,int irq)
@@ -81,7 +81,7 @@ static void _stream_update_3812(void * param, int interval)
 
 static void *ym3812_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const struct YM3812interface dummy = { 0 };
+	static const ym3812_interface dummy = { 0 };
 	struct ym3812_info *info;
 	int rate = clock/72;
 
@@ -199,7 +199,7 @@ struct ym3526_info
 	sound_stream *	stream;
 	emu_timer *	timer[2];
 	void *			chip;
-	const struct YM3526interface *intf;
+	const ym3526_interface *intf;
 };
 
 
@@ -250,7 +250,7 @@ static void _stream_update_3526(void *param, int interval)
 
 static void *ym3526_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const struct YM3526interface dummy = { 0 };
+	static const ym3526_interface dummy = { 0 };
 	struct ym3526_info *info;
 	int rate = clock/72;
 
@@ -367,7 +367,7 @@ struct y8950_info
 	sound_stream *	stream;
 	emu_timer *	timer[2];
 	void *			chip;
-	const struct Y8950interface *intf;
+	const y8950_interface *intf;
 	int				index;
 };
 
@@ -445,7 +445,7 @@ static void _stream_update_8950(void *param, int interval)
 
 static void *y8950_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const struct Y8950interface dummy = { 0 };
+	static const y8950_interface dummy = { 0 };
 	struct y8950_info *info;
 	int rate = clock/72;
 

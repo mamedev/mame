@@ -2019,17 +2019,17 @@ static void oscar_irqhandler(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 2,0,linestate); /* M6502_IRQ_LINE */
 }
 
-static const struct YM3526interface ym3526_interface =
+static const ym3526_interface ym3526_config =
 {
 	irqhandler
 };
 
-static const struct YM3526interface oscar_ym3526_interface =
+static const ym3526_interface oscar_ym3526_interface =
 {
 	oscar_irqhandler
 };
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface ym3812_config =
 {
 	irqhandler
 };
@@ -2118,7 +2118,7 @@ static MACHINE_DRIVER_START( cobracom )
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
@@ -2161,7 +2161,7 @@ static MACHINE_DRIVER_START( ghostb )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
@@ -2202,7 +2202,7 @@ static MACHINE_DRIVER_START( srdarwin )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
@@ -2244,7 +2244,7 @@ static MACHINE_DRIVER_START( gondo )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
-	MDRV_SOUND_CONFIG(ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 
@@ -2468,7 +2468,7 @@ static MACHINE_DRIVER_START( garyoret )
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
 
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
-	MDRV_SOUND_CONFIG(ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 

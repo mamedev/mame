@@ -2305,7 +2305,7 @@ static void cuebrick_irq_handler(running_machine *machine, int state)
 	cuebrick_snd_irqlatch = state;
 }
 
-static const struct YM2151interface ym2151_interface_cbj =
+static const ym2151_interface ym2151_interface_cbj =
 {
 	cuebrick_irq_handler
 };

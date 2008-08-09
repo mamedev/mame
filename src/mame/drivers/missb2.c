@@ -339,7 +339,7 @@ static void irqhandler(running_machine *machine, int irq)
 //  cpunum_set_input_line(machine, 2,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM3526interface ym3526_interface =
+static const ym3526_interface ym3526_config =
 {
 	irqhandler
 };
@@ -388,7 +388,7 @@ static MACHINE_DRIVER_START( missb2 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM3526, MAIN_XTAL/8)
-	MDRV_SOUND_CONFIG(ym3526_interface)
+	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)

@@ -329,7 +329,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -377,7 +377,7 @@ static MACHINE_DRIVER_START( capbowl )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, MASTER_CLOCK/2)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.07)
 	MDRV_SOUND_ROUTE(1, "mono", 0.07)
 	MDRV_SOUND_ROUTE(2, "mono", 0.07)

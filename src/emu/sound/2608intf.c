@@ -24,7 +24,7 @@ struct ym2608_info
 	emu_timer *	timer[2];
 	void *			chip;
 	void *			psg;
-	const struct YM2608interface *intf;
+	const ym2608_interface *intf;
 };
 
 
@@ -120,7 +120,7 @@ static STATE_POSTLOAD( ym2608_postload )
 
 static void *ym2608_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const struct YM2608interface generic_2608 =
+	static const ym2608_interface generic_2608 =
 	{
 		{
 			AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
@@ -129,7 +129,7 @@ static void *ym2608_start(const char *tag, int sndindex, int clock, const void *
 		},
 		NULL
 	};
-	const struct YM2608interface *intf = config ? config : &generic_2608;
+	const ym2608_interface *intf = config ? config : &generic_2608;
 	int rate = clock/72;
 	void *pcmbufa;
 	int  pcmsizea;

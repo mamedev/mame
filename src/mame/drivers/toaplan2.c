@@ -3413,7 +3413,7 @@ static void irqhandler(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 1,0,linestate);
 }
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface ym3812_config =
 {
 	irqhandler
 };
@@ -3460,7 +3460,7 @@ static MACHINE_DRIVER_START( tekipaki )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM3812, 27000000/8)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3698,7 +3698,7 @@ static MACHINE_DRIVER_START( pipibibs )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM3812, XTAL_27MHz/8)			/* verified on pcb */
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3738,7 +3738,7 @@ static MACHINE_DRIVER_START( whoopee )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM3812, 27000000/8)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3777,7 +3777,7 @@ static MACHINE_DRIVER_START( pipibibi )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM3812, 27000000/8)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3910,7 +3910,7 @@ static void batsugun_ym2151_irqhandler(running_machine *machine, int linestate)
 //  update_irq_lines(machine, linestate ? assert : clear);
 }
 
-static const struct YM2151interface batsugun_ym2151_interface =
+static const ym2151_interface batsugun_ym2151_interface =
 {
 	batsugun_ym2151_irqhandler
 };

@@ -747,7 +747,7 @@ static MACHINE_DRIVER_START( cntsteer )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-//  MDRV_SOUND_ADD("ym", YM2203, ym2203_interface)
+//  MDRV_SOUND_ADD("ym", YM2203, ym2203_config)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( zerotrgt )

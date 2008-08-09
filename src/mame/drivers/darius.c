@@ -803,7 +803,7 @@ static void irqhandler(running_machine *machine, int irq)	/* assumes Z80 sandwic
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2203interface ym2203_interface_1 =
+static const ym2203_interface ym2203_interface_1 =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -816,7 +816,7 @@ static const struct YM2203interface ym2203_interface_1 =
 	irqhandler
 };
 
-static const struct YM2203interface ym2203_interface_2 =
+static const ym2203_interface ym2203_interface_2 =
 {
 	{
 		AY8910_LEGACY_OUTPUT,

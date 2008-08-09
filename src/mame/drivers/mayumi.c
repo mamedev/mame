@@ -266,7 +266,7 @@ static GFXDECODE_START( mayumi )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout, 0, 32 )
 GFXDECODE_END
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -308,7 +308,7 @@ static MACHINE_DRIVER_START( mayumi )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, MCLK/4)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)

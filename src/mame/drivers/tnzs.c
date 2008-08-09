@@ -1315,7 +1315,7 @@ static GFXDECODE_START( insectx )
 GFXDECODE_END
 
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -1335,7 +1335,7 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2203interface kageki_ym2203_interface =
+static const ym2203_interface kageki_ym2203_interface =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -1347,7 +1347,7 @@ static const struct YM2203interface kageki_ym2203_interface =
 	},
 };
 
-static const struct YM2203interface ym2203b_interface =
+static const ym2203_interface ym2203b_interface =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -1357,7 +1357,7 @@ static const struct YM2203interface ym2203b_interface =
 	irqhandler
 };
 
-static const struct YM2203interface kabukiz_ym2203_interface =
+static const ym2203_interface kabukiz_ym2203_interface =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -1411,7 +1411,7 @@ static MACHINE_DRIVER_START( arknoid2 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
@@ -1450,7 +1450,7 @@ static MACHINE_DRIVER_START( drtoppel )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/4)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
@@ -1496,7 +1496,7 @@ static MACHINE_DRIVER_START( tnzs )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/4)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 
@@ -1534,7 +1534,7 @@ static MACHINE_DRIVER_START( insectx )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_DRIVER_END
 

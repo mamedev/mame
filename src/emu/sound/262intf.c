@@ -17,7 +17,7 @@ struct ymf262_info
 	sound_stream *	stream;
 	emu_timer *	timer[2];
 	void *			chip;
-	const struct YMF262interface *intf;
+	const ymf262_interface *intf;
 };
 
 
@@ -69,7 +69,7 @@ static void _stream_update(void *param, int interval)
 
 static void *ymf262_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const struct YMF262interface dummy = { 0 };
+	static const ymf262_interface dummy = { 0 };
 	struct ymf262_info *info;
 	int rate = clock/288;
 

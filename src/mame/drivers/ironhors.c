@@ -425,7 +425,7 @@ static DISCRETE_SOUND_START( ironhors )
 
 DISCRETE_SOUND_END
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -469,7 +469,7 @@ static MACHINE_DRIVER_START( ironhors )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym2203", YM2203, 18432000/6)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 
 	MDRV_SOUND_ROUTE_EX(0, "disc_ih", 1.0, 0)
 	MDRV_SOUND_ROUTE_EX(1, "disc_ih", 1.0, 1)

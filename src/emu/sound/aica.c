@@ -513,7 +513,7 @@ static void AICA_StopSlot(struct _SLOT *slot,int keyoff)
 
 #define log_base_2(n) (log((float) n)/log((float) 2))
 
-static void AICA_Init(const char *tag, struct _AICA *AICA, const struct AICAinterface *intf, int sndindex)
+static void AICA_Init(const char *tag, struct _AICA *AICA, const aica_interface *intf, int sndindex)
 {
 	int i;
 
@@ -1274,7 +1274,7 @@ static void AICA_Update(void *param, stream_sample_t **inputs, stream_sample_t *
 
 static void *aica_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	const struct AICAinterface *intf;
+	const aica_interface *intf;
 
 	struct _AICA *AICA;
 

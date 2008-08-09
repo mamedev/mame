@@ -257,7 +257,7 @@ static const struct K007232_interface k007232_interface =
 	volume_callback	/* external port callback */
 };
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface ym3812_config =
 {
 	irqhandler
 };
@@ -298,7 +298,7 @@ static MACHINE_DRIVER_START( hcastle )
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 
 	MDRV_SOUND_ADD("ym", YM3812, 3579545)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MDRV_SOUND_ADD("konami2", K051649, 3579545/2)

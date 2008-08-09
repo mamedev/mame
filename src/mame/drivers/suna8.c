@@ -1649,7 +1649,7 @@ MACHINE_DRIVER_END
 
 /* 1 x 24 MHz crystal */
 
-static const struct YM3812interface brickzn_ym3812_interface =
+static const ym3812_interface brickzn_ym3812_interface =
 {
 	soundirq	/* IRQ Line */
 };

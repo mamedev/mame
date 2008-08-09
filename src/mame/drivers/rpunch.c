@@ -482,7 +482,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	ym2151_irq_gen
 };
@@ -523,7 +523,7 @@ static MACHINE_DRIVER_START( rpunch )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2151, MASTER_CLOCK/4)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 

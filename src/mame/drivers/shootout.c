@@ -272,7 +272,7 @@ static void shootout_snd2_irq(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 0,0,linestate);
 }
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -282,7 +282,7 @@ static const struct YM2203interface ym2203_interface =
 	shootout_snd_irq
 };
 
-static const struct YM2203interface ym2203_interface2 =
+static const ym2203_interface ym2203_interface2 =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -337,7 +337,7 @@ static MACHINE_DRIVER_START( shootout )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, 1500000)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

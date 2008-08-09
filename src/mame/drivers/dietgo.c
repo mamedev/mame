@@ -187,7 +187,7 @@ static void sound_irq(running_machine *machine, int state)
 	cpunum_set_input_line(machine, 1,1,state); /* IRQ 2 */
 }
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	sound_irq
 };
@@ -219,7 +219,7 @@ static MACHINE_DRIVER_START( dietgo )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2151, XTAL_32_22MHz/9) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 
 	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32_22MHz/32) /* verified on pcb */

@@ -19,7 +19,7 @@ struct ym2151_info
 	sound_stream *	stream;
 	emu_timer *	timer[2];
 	void *			chip;
-	const struct YM2151interface *intf;
+	const ym2151_interface *intf;
 };
 
 
@@ -39,7 +39,7 @@ static STATE_POSTLOAD( ym2151_postload )
 
 static void *ym2151_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const struct YM2151interface dummy = { 0 };
+	static const ym2151_interface dummy = { 0 };
 	struct ym2151_info *info;
 	int rate;
 

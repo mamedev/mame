@@ -318,7 +318,7 @@ static GFXDECODE_START( ddrible )
 	GFXDECODE_ENTRY( "gfx2", 0x40000, spritelayout,  64, 16 )	/* colors  0-15 but using lookup table */
 GFXDECODE_END
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -373,7 +373,7 @@ static MACHINE_DRIVER_START( ddribble )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "filter1", 0.25)
 	MDRV_SOUND_ROUTE(1, "filter2", 0.25)
 	MDRV_SOUND_ROUTE(2, "filter3", 0.25)

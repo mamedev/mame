@@ -1015,7 +1015,7 @@ static void bestbest_ym3526_irqhandler(running_machine *machine, int state)
 	cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ0, state);
 }
 
-static const struct YM3526interface bestbest_ym3526_interface =
+static const ym3526_interface bestbest_ym3526_interface =
 {
 	bestbest_ym3526_irqhandler
 };

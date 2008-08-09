@@ -4,7 +4,8 @@
 #include "fm.h"
 #include "ay8910.h"
 
-struct YM2608interface
+typedef struct _ym2608_interface ym2608_interface;
+struct _ym2608_interface
 {
 	const ay8910_interface ay8910_intf;
 	void ( *handler )( running_machine *machine, int irq );	/* IRQ handler for the YM2608 */

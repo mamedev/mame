@@ -449,7 +449,7 @@ static const ay8910_interface ay8910_interface_2 =
 	NULL
 };
 
-static const struct TMS5110interface tms5110_interface =
+static const tms5110_interface bagman_tms5110_interface =
 {
 	bagman_speech_rom_read_bit	/*M0 callback function. Called whenever chip requests a single bit of data*/
 };
@@ -486,7 +486,7 @@ static MACHINE_DRIVER_START( bagman )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MDRV_SOUND_ADD("tms", TMS5110A, 640000)
-	MDRV_SOUND_CONFIG(tms5110_interface)
+	MDRV_SOUND_CONFIG(bagman_tms5110_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

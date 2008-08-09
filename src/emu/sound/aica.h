@@ -8,7 +8,8 @@
 
 #define MAX_AICA	(2)
 
-struct AICAinterface
+typedef struct _aica_interface aica_interface;
+struct _aica_interface
 {
 	int roffset;				/* offset in the region */
 	void (*irq_callback)(running_machine *machine, int state);	/* irq callback */

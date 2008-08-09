@@ -3048,12 +3048,12 @@ static void irqhandlerb(running_machine *machine, int irq)
 //  cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2610interface ym2610_interface =
+static const ym2610_interface ym2610_config =
 {
 	irqhandler
 };
 
-static const struct YM2610interface ym2610_interfaceb =
+static const ym2610_interface ym2610_interfaceb =
 {
 	irqhandlerb
 };
@@ -3157,7 +3157,7 @@ static MACHINE_DRIVER_START( contcirc )
 	MDRV_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
 	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "subwoofer", 0.20)
 	MDRV_SOUND_ROUTE(1, "2610.1.l", 2.0)
 	MDRV_SOUND_ROUTE(1, "2610.1.r", 2.0)
@@ -3213,7 +3213,7 @@ static MACHINE_DRIVER_START( chasehq )
 	MDRV_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
 	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "subwoofer", 0.20)
 	MDRV_SOUND_ROUTE(1, "2610.1.l", 1.0)
 	MDRV_SOUND_ROUTE(1, "2610.1.r", 1.0)
@@ -3267,7 +3267,7 @@ static MACHINE_DRIVER_START( enforce )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
 	MDRV_SOUND_ROUTE(1, "2610.1.l", 20.0)
@@ -3376,7 +3376,7 @@ static MACHINE_DRIVER_START( sci )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
 	MDRV_SOUND_ROUTE(1, "2610.1.l", 2.0)
@@ -3433,7 +3433,7 @@ static MACHINE_DRIVER_START( nightstr )
 	MDRV_SPEAKER_ADD("subwoofer", 0.0, 0.0, 1.0)
 
 	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "subwoofer", 0.20)
 	MDRV_SOUND_ROUTE(1, "2610.1.l", 2.0)
 	MDRV_SOUND_ROUTE(1, "2610.1.r", 2.0)
@@ -3487,7 +3487,7 @@ static MACHINE_DRIVER_START( aquajack )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
 	MDRV_SOUND_ROUTE(1, "2610.1.l", 2.0)
@@ -3594,7 +3594,7 @@ static MACHINE_DRIVER_START( dblaxle )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
 	MDRV_SOUND_ROUTE(1, "2610.1.l", 8.0)
@@ -3648,7 +3648,7 @@ static MACHINE_DRIVER_START( racingb )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2610, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
 	MDRV_SOUND_ROUTE(1, "2610.1.l", 8.0)

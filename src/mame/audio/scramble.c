@@ -372,7 +372,7 @@ static WRITE8_HANDLER( ad2083_tms5110_ctrl_w )
 	timer_set(attotime_zero,NULL,0,ad2083_step);
 }
 
-static const struct TMS5110interface ad2083_tms5110_interface =
+static const tms5110_interface ad2083_tms5110_interface =
 {
 	ad2083_speech_rom_read_bit	/* M0 callback function. Called whenever chip requests a single bit of data */
 };

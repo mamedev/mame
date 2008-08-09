@@ -631,7 +631,7 @@ static void sound_irq( running_machine *machine, int irq )
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2608interface ym2608_interface =
+static const ym2608_interface ym2608_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT | AY8910_SINGLE_OUTPUT,
@@ -641,7 +641,7 @@ static const struct YM2608interface ym2608_interface =
 	sound_irq
 };
 
-static const struct YM2610interface ym2610_interface =
+static const ym2610_interface ym2610_config =
 {
 	sound_irq
 };
@@ -716,7 +716,7 @@ static MACHINE_DRIVER_START( bbusters )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2610, 8000000)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "left",  3.0)
 	MDRV_SOUND_ROUTE(0, "right", 3.0)
 	MDRV_SOUND_ROUTE(1, "left",  1.0)
@@ -757,7 +757,7 @@ static MACHINE_DRIVER_START( mechatt )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2608, 8000000)
-	MDRV_SOUND_CONFIG(ym2608_interface)
+	MDRV_SOUND_CONFIG(ym2608_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.50)
 	MDRV_SOUND_ROUTE(0, "right", 0.50)
 	MDRV_SOUND_ROUTE(1, "left",  1.0)

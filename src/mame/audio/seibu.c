@@ -467,7 +467,7 @@ WRITE16_HANDLER( seibu_main_mustb_w )
 
 /***************************************************************************/
 
-const struct YM3812interface seibu_ym3812_interface =
+const ym3812_interface seibu_ym3812_interface =
 {
 	seibu_ym3812_irqhandler
 };
@@ -478,12 +478,12 @@ const custom_sound_interface seibu_adpcm_interface =
 	seibu_adpcm_stop
 };
 
-const struct YM2151interface seibu_ym2151_interface =
+const ym2151_interface seibu_ym2151_interface =
 {
 	seibu_ym2151_irqhandler
 };
 
-const struct YM2203interface seibu_ym2203_interface =
+const ym2203_interface seibu_ym2203_interface =
 {
 	{
 		AY8910_LEGACY_OUTPUT,

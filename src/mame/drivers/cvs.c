@@ -448,7 +448,7 @@ static int speech_rom_read_bit(void)
 }
 
 
-static const struct TMS5110interface tms5100_interface =
+static const tms5110_interface tms5100_interface =
 {
 	speech_rom_read_bit, /* M0 callback function. Called whenever chip requests a single bit of data */
 	NULL

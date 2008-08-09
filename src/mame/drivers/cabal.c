@@ -477,7 +477,7 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2151interface cabalbl_ym2151_interface =
+static const ym2151_interface cabalbl_ym2151_interface =
 {
 	irqhandler
 };

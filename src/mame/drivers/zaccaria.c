@@ -552,7 +552,7 @@ static const ay8910_interface ay8910_config =
 	NULL
 };
 
-static const struct TMS5220interface tms5220_interface =
+static const tms5220_interface tms5220_config =
 {
 	tms5220_irq_handler	/* IRQ handler */
 };
@@ -613,7 +613,7 @@ static MACHINE_DRIVER_START( zaccaria )
 	/* There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF) */
 	/* 162kHz measured on pin 3 20 minutesa fter power on. Clock would then be 162*4=648kHz. */
 	MDRV_SOUND_ADD("tms", TMS5200, 640000)
-	MDRV_SOUND_CONFIG(tms5220_interface)
+	MDRV_SOUND_CONFIG(tms5220_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 

@@ -560,7 +560,7 @@ static void irqhandler(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 2,0,linestate);
 }
 
-static const struct YM3526interface ym3812_interface =
+static const ym3526_interface ym3526_config =
 {
 	irqhandler
 };
@@ -627,7 +627,7 @@ static MACHINE_DRIVER_START( tbowl )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM3812, 4000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	MDRV_SOUND_ADD("ym2", YM3812, 4000000)

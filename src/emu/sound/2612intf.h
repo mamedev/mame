@@ -1,7 +1,8 @@
 #ifndef __2612INTF_H__
 #define __2612INTF_H__
 
-struct YM2612interface
+typedef struct _ym2612_interface ym2612_interface;
+struct _ym2612_interface
 {
 	void (*handler)(running_machine *machine, int irq);
 };

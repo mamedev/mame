@@ -369,19 +369,19 @@ static void snk_sound_callback1_w( running_machine *machine, int state ){ /* ? *
 	if( state ) snk_sound_register |= 0x02;
 }
 
-static const struct YM3526interface ym3526_interface_0 = {
+static const ym3526_interface ym3526_interface_0 = {
 	snk_sound_callback0_w /* ? */
 };
 
-static const struct YM3526interface ym3526_interface_1 = {
+static const ym3526_interface ym3526_interface_1 = {
 	snk_sound_callback1_w /* ? */
 };
 
-static const struct Y8950interface y8950_interface = {
+static const y8950_interface y8950_config = {
 	snk_sound_callback1_w /* ? */
 };
 
-static const struct YM3812interface ym3812_interface = {
+static const ym3812_interface ym3812_config = {
 	snk_sound_callback0_w /* ? */
 };
 
@@ -1000,7 +1000,7 @@ static MACHINE_DRIVER_START( victroad )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("ym2", Y8950, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(y8950_interface)
+	MDRV_SOUND_CONFIG(y8950_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1045,7 +1045,7 @@ static MACHINE_DRIVER_START( gwar )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("ym2", Y8950, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(y8950_interface)
+	MDRV_SOUND_CONFIG(y8950_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1091,7 +1091,7 @@ static MACHINE_DRIVER_START( bermudat )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("ym2", Y8950, 4000000)
-	MDRV_SOUND_CONFIG(y8950_interface)
+	MDRV_SOUND_CONFIG(y8950_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1136,7 +1136,7 @@ static MACHINE_DRIVER_START( psychos )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("ym2", Y8950, 4000000)
-	MDRV_SOUND_CONFIG(y8950_interface)
+	MDRV_SOUND_CONFIG(y8950_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1177,11 +1177,11 @@ static MACHINE_DRIVER_START( chopper1 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM3812, 4000000)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("ym2", Y8950, 4000000)
-	MDRV_SOUND_CONFIG(y8950_interface)
+	MDRV_SOUND_CONFIG(y8950_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1228,7 +1228,7 @@ static MACHINE_DRIVER_START( tdfever )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("ym2", Y8950, 4000000)
-	MDRV_SOUND_CONFIG(y8950_interface)
+	MDRV_SOUND_CONFIG(y8950_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1275,7 +1275,7 @@ static MACHINE_DRIVER_START( tdfever2 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("ym2", Y8950, 4000000)
-	MDRV_SOUND_CONFIG(y8950_interface)
+	MDRV_SOUND_CONFIG(y8950_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -1318,7 +1318,7 @@ static MACHINE_DRIVER_START( fsoccer )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", Y8950, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(y8950_interface)
+	MDRV_SOUND_CONFIG(y8950_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

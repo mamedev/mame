@@ -2,14 +2,16 @@
 #define YM3812INTF_H
 
 
-struct YM3812interface
+typedef struct _ym3812_interface ym3812_interface;
+struct _ym3812_interface
 {
 	void (*handler)(running_machine *machine, int linestate);
 };
 
-#define YM3526interface YM3812interface
+#define ym3526_interface ym3812_interface
 
-struct Y8950interface
+typedef struct _y8950_interface y8950_interface;
+struct _y8950_interface
 {
 	void (*handler)(running_machine *machine, int linestate);
 

@@ -226,7 +226,7 @@ static const struct K007232_interface k007232_interface =
 	volume_callback	/* external port callback */
 };
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	0,
 	aliens_snd_bankswitch_w
@@ -266,7 +266,7 @@ static MACHINE_DRIVER_START( aliens )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 

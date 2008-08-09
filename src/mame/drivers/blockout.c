@@ -174,7 +174,7 @@ static void blockout_irq_handler(running_machine *machine, int irq)
 	cpunum_set_input_line_and_vector(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE,0xff);
 }
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	blockout_irq_handler
 };
@@ -207,7 +207,7 @@ static MACHINE_DRIVER_START( blockout )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.60)
 	MDRV_SOUND_ROUTE(1, "right", 0.60)
 

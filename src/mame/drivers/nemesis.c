@@ -2112,12 +2112,12 @@ static void sound_irq(running_machine *machine, int state)
 /*cpunum_set_input_line(machine, 1,0,HOLD_LINE);*/
 }
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	sound_irq
 };
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface ym3812_config =
 {
 	sound_irq
 };
@@ -2266,7 +2266,7 @@ static MACHINE_DRIVER_START( salamand )
 	MDRV_SOUND_ROUTE(1, "right", 0.10)
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -2311,7 +2311,7 @@ static MACHINE_DRIVER_START( blkpnthr )
 	MDRV_SOUND_ROUTE(1, "right", 0.10)
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -2356,7 +2356,7 @@ static MACHINE_DRIVER_START( citybomb )
 	MDRV_SOUND_ROUTE(1, "right", 0.30)
 
 	MDRV_SOUND_ADD("ym", YM3812, 3579545)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
@@ -2405,7 +2405,7 @@ static MACHINE_DRIVER_START( nyanpani )
 	MDRV_SOUND_ROUTE(1, "right", 0.30)
 
 	MDRV_SOUND_ADD("ym", YM3812, 3579545)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
@@ -2547,7 +2547,7 @@ static MACHINE_DRIVER_START( hcrash )
 	MDRV_SOUND_ROUTE(1, "right", 0.10)
 
 	MDRV_SOUND_ADD("ym", YM2151, 3579545)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

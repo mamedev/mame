@@ -5,7 +5,8 @@
 /* usually 640000 for 8000 Hz sample rate or */
 /* usually 800000 for 10000 Hz sample rate.  */
 
-struct TMS5110interface
+typedef struct _tms5110_interface tms5110_interface;
+struct _tms5110_interface
 {
 	int (*M0_callback)(void);	/* function to be called when chip requests another bit */
 	void (*load_address)(int addr);	/* speech ROM load address callback */

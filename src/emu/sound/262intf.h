@@ -2,7 +2,8 @@
 #define YMF262INTF_H
 
 
-struct YMF262interface
+typedef struct _ymf262_interface ymf262_interface;
+struct _ymf262_interface
 {
 	void (*handler)(running_machine *machine, int irq);
 };

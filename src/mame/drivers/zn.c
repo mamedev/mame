@@ -1265,7 +1265,7 @@ static void irq_handler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YM2610interface ym2610_interface =
+static const ym2610_interface ym2610_config =
 {
 	irq_handler
 };
@@ -1282,7 +1282,7 @@ static MACHINE_DRIVER_START( coh1000ta )
 	MDRV_NVRAM_HANDLER( coh1000ta )
 
 	MDRV_SOUND_ADD("ym", YM2610B, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_interface)
+	MDRV_SOUND_CONFIG(ym2610_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.25)
 	MDRV_SOUND_ROUTE(0, "right", 0.25)
 	MDRV_SOUND_ROUTE(1, "left",  1.0)

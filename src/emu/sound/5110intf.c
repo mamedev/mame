@@ -25,7 +25,7 @@
 /* the state of the streamed output */
 struct tms5110_info
 {
-	const struct TMS5110interface *intf;
+	const tms5110_interface *intf;
 	const char *tag;
 	sound_stream *stream;
 	void *chip;
@@ -68,7 +68,7 @@ static void speech_rom_set_addr(int addr)
 
 static void *tms5110_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const struct TMS5110interface dummy = { 0 };
+	static const tms5110_interface dummy = { 0 };
 	struct tms5110_info *info;
 
 	info = auto_malloc(sizeof(*info));

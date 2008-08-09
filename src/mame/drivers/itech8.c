@@ -1689,7 +1689,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const struct YM2203interface ym2203_interface =
+static const ym2203_interface ym2203_config =
 {
 	{
 		AY8910_LEGACY_OUTPUT,
@@ -1703,7 +1703,7 @@ static const struct YM2203interface ym2203_interface =
 };
 
 
-static const struct YM3812interface ym3812_interface =
+static const ym3812_interface ym3812_config =
 {
 	generate_sound_irq
 };
@@ -1764,7 +1764,7 @@ static MACHINE_DRIVER_START( itech8_sound_ym2203 )
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("ym", YM2203, CLOCK_8MHz/2)
-	MDRV_SOUND_CONFIG(ym2203_interface)
+	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.07)
 	MDRV_SOUND_ROUTE(1, "mono", 0.07)
 	MDRV_SOUND_ROUTE(2, "mono", 0.07)
@@ -1780,7 +1780,7 @@ static MACHINE_DRIVER_START( itech8_sound_ym3812 )
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("ym", YM3812, CLOCK_8MHz/2)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 
@@ -1793,7 +1793,7 @@ static MACHINE_DRIVER_START( itech8_sound_ym3812_external )
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("ym", YM3812, CLOCK_8MHz/2)
-	MDRV_SOUND_CONFIG(ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 

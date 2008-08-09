@@ -591,7 +591,7 @@ static void irqhandler(running_machine *machine, int irq)
 	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static const struct YMF262interface ymf262_interface =
+static const ymf262_interface fuuki32_ymf262_interface =
 {
 	irqhandler		/* irq */
 };
@@ -629,7 +629,7 @@ static MACHINE_DRIVER_START( fuuki32 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ymf1", YMF262, FM_SOUND_CLOCK) /* 33.8688MHz OSC divided by 2 is 16.9344MHz */
-	MDRV_SOUND_CONFIG(ymf262_interface)
+	MDRV_SOUND_CONFIG(fuuki32_ymf262_interface)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 	MDRV_SOUND_ROUTE(2, "left", 0.50)

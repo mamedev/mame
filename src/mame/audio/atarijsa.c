@@ -786,7 +786,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static const struct YM2151interface ym2151_interface =
+static const ym2151_interface ym2151_config =
 {
 	atarigen_ym2151_irq_gen
 };
@@ -811,7 +811,7 @@ MACHINE_DRIVER_START( jsa_i_stereo )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, JSA_MASTER_CLOCK)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.60)
 	MDRV_SOUND_ROUTE(1, "right", 0.60)
 MACHINE_DRIVER_END
@@ -825,7 +825,7 @@ MACHINE_DRIVER_START( jsa_i_stereo_swapped )
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("ym", YM2151, JSA_MASTER_CLOCK)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "right", 0.60)
 	MDRV_SOUND_ROUTE(1, "left", 0.60)
 MACHINE_DRIVER_END
@@ -856,7 +856,7 @@ MACHINE_DRIVER_START( jsa_i_mono_speech )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2151, JSA_MASTER_CLOCK)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 
@@ -877,7 +877,7 @@ MACHINE_DRIVER_START( jsa_ii_mono )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2151, JSA_MASTER_CLOCK)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 
@@ -920,7 +920,7 @@ MACHINE_DRIVER_START( jsa_iiis_stereo )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM2151, JSA_MASTER_CLOCK)
-	MDRV_SOUND_CONFIG(ym2151_interface)
+	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.60)
 	MDRV_SOUND_ROUTE(1, "right", 0.60)
 
