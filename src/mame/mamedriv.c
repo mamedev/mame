@@ -8170,8 +8170,8 @@ Other Sun games
 	DRIVER( vcombat )	/* (c) 1993 VR8 Inc. */
 	DRIVER( shadfgtr )	/* (c) 1989 Sega? */
 	DRIVER( blackt96 )	/* (c) 1996 D.G.R.M. of Korea */
-	DRIVER( lucky74s )	/* (c) 1988 Wing */
-	DRIVER( lucky74b )	/* (c) 1988 Wing */
+	DRIVER( lucky74 )	/* (c) 1988 Wing Co., Ltd */
+	DRIVER( lucky74a )	/* (c) 1988 Wing Co., Ltd */
 
 	/* H8/3048 italian gambling games */
 	DRIVER( laperla )	/* (c) 2002 Nazionale Elettronica */

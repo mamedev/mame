@@ -1,4 +1,4 @@
-/****************************************************************************************
+/*********************************************************************************************
 
     LUCKY 74 - WING CO.,LTD.
     ------------------------
@@ -8,21 +8,22 @@
 
     Games running on this hardware:
 
-    * Lucky 74 (small),  1988,  Wing Co.,Ltd.
-    * Lucky 74 (big),    1988,  Wing Co.,Ltd.
+    * Lucky 74 (bootleg, set 1), 1988, Wing Co.,Ltd.
+    * Lucky 74 (bootleg, set 2), 1988, Wing Co.,Ltd.
 
 
-*****************************************************************************************
+**********************************************************************************************
 
 
     Hardware Notes:
     ---------------
 
-    CPU:  1x Big black box stickered 'WING CPU A001' (Z80 based).
+    CPU:  1x Big black box stickered 'WING CPU A001' (based on a Z80 @ 3 MHz.)
 
-    Co-Processor: 1x NPC SM7831
+    Co-Processor: 1x NPC SM7831 @ 1.5 MHz.
 
-    Sound: 1x Yamaha YM-2149F.
+    Sound: 3x SN76489 @ 3 MHz.
+           1x Yamaha YM-2149F @ 1.5 MHz.
            1x OKI M5205 (4-bit ADPCM samples @ 8kHz).
 
     ROMs: 1x 27C512 (program).
@@ -36,10 +37,10 @@
 
 
     Other: 2x M5M82C255ASP (2x 8255 PPI each).
-           1x M5L8251AP-5  (8251 UART).
-           1x 40-legs IC silkscreened '09R81P 7K4'.
-           1x 28-legs IC silkscreened '06B49P 2G1'.
-           2x 28-legs IC silkscreened '06B53P 9G3'.
+           1x M5L8251AP-5  (8251 USART).
+           1x DIP40 custom IC silkscreened '09R81P 7K4' @ 3 MHz.
+           1x DIP28 custom IC silkscreened '06B49P 2G1' @ 3 MHz.
+           2x DIP28 custom IC silkscreened '06B53P 9G3' @ 1.5 MHz.
            1x 3.6V lithium battery.
            4x 8 DIP switches banks.
            1x Reset switch.
@@ -60,12 +61,15 @@
     PCB is original from WING Co.,Ltd.
 
 
-    The M5M82C255ASP (82c255) is a general purpose programmable I/O. It is compatible with the 8255
-    programmable I/O. The 82c255 is equivalent to two 8255s. It has 48 I/O lines which may be indi-
-    vidually programmed in 6 groups of 8 or 4 groups of 12 and used in 3 major modes of operation.
+    The M5M82C255ASP (82c255) is a general purpose programmable I/O. It is compatible with
+    the 8255 programmable I/O. The 82c255 is equivalent to two 8255s. It has 48 I/O lines
+    which may be individually programmed in 6 groups of 8 or 4 groups of 12 and used in 3
+    major modes of operation.
+
+    For custom IC's 09R81P, 06B49P, and 06B53P, see the reverse-engineering notes below.
 
 
-*****************************************************************************************
+**********************************************************************************************
 
 
     Color Circuitry
@@ -130,12 +134,10 @@
                                            _
 
 
-    Regarding the abobe diagram, there are 2 different states controlled by some bit.
-    Each state drives a different palette that will be assigned to each graphics bank.
+    Regarding the abobe diagram, there are 2 different states controlled by both 06B53P.
+    Each state arrange a different palette that will be assigned to each graphics bank.
 
     As we can see here, same pin of different PROMs are connected together in parallel.
-    We need to check the pin 13 (/G1) and pin 14 (/G2) from each PROM to see if they are
-    connected to the same signal, and futhermore check if one or the other is tied to GND.
 
     To reproduce the states, we need to create a double-sized palette and fill the first
     half with the values created through state 1, then fill the second half with proper
@@ -148,10 +150,266 @@
     *** Dev Notes ***
 
 
-    - Sound seems to be triggered writting at 0xf100.
-      Each event writes sequences like (0x84 0x07 0x99 0x9c 0x9f)...
+    This hardware doesn't seems to be designed for a game like Lucky 74. The co-processor
+    existence, the aparently unused 2x SN76489, the YM2149 used only for input port and
+    NMI trigger purposes and the USART communication system (among other things) indicate
+    that a more elaborated kind of games were meant to be running on this hardware.
+    For Lucky 74, is a big waste of resources.
 
-    - After z80 port 0x00 request, there are writes to ports 0x00 to 0x05.
+
+    Regular sounds and music are driven through one SN76489 mapped at 0xf100. The other two
+    (mapped at 0xf300 & 0xf500) seems to be only initialized at the begining but not used.
+
+    Samples are driven through a custom DIP-40 IC silkscreened '09R81P'.
+
+    Reads to Z80 port 0x00 are in fact requests of the 09R81P /Busy signal, that is tied to
+    M5202 status. The game code continue reading till the less significant bit (bit 0) is
+    activated. In case of lack of response, the code loops reading the port and the game is
+    stuck at this point.
+
+
+    There are 14 samples inside the luckyson.15 ROM.
+
+    Here is a table with the writes (in respective order) by event...
+
+
+    Z80 PORT:                  01  00  02  03  04  05  (SAMPLE)
+    -----------------------------------------------------------
+
+    Coin                       EF  E0  00  DF  F6  01
+    D-UP LOSE                  70  E0  00  DF  7B  01
+    D-UP WIN                   93  E0  00  DF  AA  01
+
+    (complete samples set)
+
+    Test Mode HOLD1 & BET      00  00  00  FF  11  01  "geez!" or "cheers!"
+    Test Mode HOLD2            12  00  00  FF  24  01  "sorry..."
+    Test Mode HOLD3            25  00  00  FF  36  01  "try again"
+    Test Mode HOLD4            37  00  00  DF  46  01  "whoops!"
+    Test Mode HOLD5            46  E0  00  DF  56  01  "you're great"
+    (still not found)          56  E0  00  DF  69  01  "oh dear..."
+    D-UP BIG                   69  E0  00  7F  6E  01  "big" (*)
+    D-UP SMALL                 70  E0  00  DF  7B  01  "small" (*)
+    Test Mode START            7B  E0  00  DF  93  01  "you lose"
+    Test Mode D-UP / D-UP WIN  93  E0  00  DF  AA  01  "you win"
+    (still not found)          AA  E0  00  DF  C3  01  "boy.. you're hot!"
+    Test Mode SMALL            C3  E0  00  DF  DE  01  "lucky you..."
+    Test Mode CANCEL           DE  E0  00  DF  EF  01  "call attendant"
+    Coin                       EF  E0  00  DF  F6  01  "ready?"
+
+    (*) "big" and "small" are splitted from the sample "big or small".
+	
+
+    So, you can easily see that writes to ports 0x00-0x01 define the start (pos) offset,
+    and writes to ports 0x03-0x04 the ending offset of each sample to be played.
+
+    Then, writting 0x01 to port 0x05 (bit 0 activated) just trigger the sample.
+
+    Once finished, the M5205 is ready again and the 09R81P clear the /Busy flag (port 0x00,
+    bit 0 activated).
+
+
+
+*****************************************************************************************
+
+
+    *** Custom IC's Reverse Engineering ***
+
+
+    ======================
+    Custom 06B49P - DIP 28
+    ======================
+
+    This IC is a programmable clock divisor. It provides every frequency needed for all
+    devices from this hardware, plus V-Sync, H-Sync and (V+H)-Sync (composite) frequencies.
+
+    All generated clocks are proportional to the Clock In (12MHz). There are not fixed or
+    harcoded frequencies.
+
+
+    Pinout
+    ======
+
+    General	In Lucky74             Measured     Comments	
+    ------------------------------------------------------------------
+    01 - Clock In 		           (12 MHz)
+    02 - Clock Out 1 (In/2)        (6 MHz)
+    03 - Clock Out 2 (In/4)        (3 MHz)
+    04 - Clock Out 3 (In/4)        (3 MHz)      Yes, again!
+    05 - Clock Out 4 (In/8)        (1.5 MHz)
+    06 - Clock Out 5 (In/16)       (750 kHz)
+    07 - GND
+    08 - Clock Out 6 (In/32)       (375 kHz)    Clock for OKI M5205.
+    09 - Clock Out 7 (In/64)       (187.5 kHz)
+    10 - Clock Out 8 (In/128)      (93.75 kHz)
+    12 - Clock Out 9 (In/256)      (46875 Hz)
+    13 - +5 Vcc
+    14 - GND
+    -------------------------------------------------------------------
+    15 - GND
+    16 - Unknown...                             Logic State "0". Not Connected.
+    17 - Clock Out 10 (In/?)       (7782 Hz)    In/1500 (8000)?...
+    18 - Clock Out 11 (In/?)       (3920 Hz)    In/3000 (4000)?...
+    19 - Clock Out 12 (In/?)       (1960 Hz)    In/6000 (2000)?...
+    20 - Clock Out 13 (In/?)       (950 Hz)     In/12500 (960)?...
+    21 - +5 VCC.
+    22 - Clock Out 14 (In/?)       (475 Hz)     In/25000 (480)?...
+    23 - Clock Out 15 (In/?)       (237 Hz)     In/50000 (240)?...
+    24 - Clock Out 16 (In/100000)  (120 Hz)
+    25 - Clock Out 17 (In/200000)  (60 Hz)
+    26 - H-Sync                    (15625 Hz)   H-Sync (Interlaced). CLKOUT09/3.
+    27 - V-Sync                    (60 Hz)      V-Sync. Same as CLKOUT17.
+    28 - (H+V)-Sync                             Composite Sync (Interlaced).
+
+
+
+    ======================
+    Custom 06B53P - DIP 28
+    ======================
+
+    This IC is a custom video controller. The PCB has two of them.
+    Each one handle one graphics bank, the respective video (and color) RAM,
+    and switch the dual-state color circuitry to generate its own palette.
+
+
+    Pinout
+    ======
+
+    LUCKY 74 - E2                Comments
+    ------------------------------------------------------
+    01 - I - Flip State.
+    02 - I - Clk1 1.5 MHz.	     In fase with 6 MHz & 3 MHz.
+    03 - I - Clk2 12 MHz.
+    04 - I - Clk3 1.5 MHz.       In fase with 6 MHz.
+    05 - I - Clk4 3 MHz.         In fase with 6 MHz.
+    06 - I - Data 0              EP11 & EP12.
+    07 - I - Data 1              EP11 & EP12.
+    08 - I - Data 2              EP11 & EP12.
+    09 - I - Data 3              EP11 & EP12.
+    10 - I - Data 4              EP11 & EP12.
+    12 - I - Data 5              EP11 & EP12.
+    13 - I - Data 6              EP11 & EP12.
+    14 - I - Data 7              EP11 & EP12.
+    ------------------------------------------------------
+    15 - I - Data 7              EP13 & EP14.
+    16 - I - Data 6              EP13 & EP14.
+    17 - I - Data 5              EP13 & EP14.
+    18 - I - Data 4              EP13 & EP14.
+    19 - I - Data 3              EP13 & EP14.
+    20 - I - Data 2              EP13 & EP14.
+    21 - +5V VCC.
+    22 - I - Data 1              EP13 & EP14.
+    23 - I - Data 0              EP13 & EP14.
+    24 - GND                     Ground.
+    25 - O - Prom Selector       C6-D6-E6.A0.
+    26 - O - Prom Selector       C6-D6-E6.A1.
+    27 - O - Prom Selector       C6-D6-E6.A2.
+    28 - O - Prom Selector       C6-D6-E6.A3.
+
+
+    LUCKY 74 - E1                Comments
+    ------------------------------------------------------
+    01 - I - Flip State.
+    02 - I - Clk1 1.5 MHz.	     In fase with 6 MHz & 3 MHz.
+    03 - I - Clk2 12 MHz.
+    04 - I - Clk3 1.5 MHz.       In fase with 6 MHz.
+    05 - I - Clk4 3 MHz.         In fase with 6 MHz.
+    06 - I - Data 0              EP16 & EP17.
+    07 - I - Data 1              EP16 & EP17.
+    08 - I - Data 2              EP16 & EP17.
+    09 - I - Data 3              EP16 & EP17.
+    10 - I - Data 4              EP16 & EP17.
+    12 - I - Data 5              EP16 & EP17.
+    13 - I - Data 6              EP16 & EP17.
+    14 - I - Data 7              EP16 & EP17.
+    ------------------------------------------------------
+    15 - I - Data 7              EP18 & EP19.
+    16 - I - Data 6              EP18 & EP19.
+    17 - I - Data 5              EP18 & EP19.
+    18 - I - Data 4              EP18 & EP19.
+    19 - I - Data 3              EP18 & EP19.
+    20 - I - Data 2              EP18 & EP19.
+    21 - +5V VCC.
+    22 - I - Data 1              EP18 & EP19.
+    23 - I - Data 0              EP18 & EP19.
+    24 - GND                     Ground.
+    25 - O - Prom Selector       C7-D7-E7.A0.
+    26 - O - Prom Selector       C7-D7-E7.A1.
+    27 - O - Prom Selector       C7-D7-E7.A2.
+    28 - O - Prom Selector       C7-D7-E7.A3.
+
+
+
+    ======================
+    Custom 09R81P - DIP 40
+    ======================
+
+    This custom IC is a kind of samples system controller, driving the OKI M5205.
+    The IC is connected to Z80 through ports 0x00 to 0x05. Transmit the status (/busy)
+    to port 0x00 (bit 0). Load the sample start offset from ports 0x00 & 0x01 and the
+    ending offset from ports 0x03 & 0x04, then trigger the sample when the bit 0 of port
+    0x05 is activated.
+
+    Still unknown the use of 3rd register (connected to Z80 port 0x02).
+
+
+    REGISTER  STATE    FUNCTION
+    -----------------------------------------------------------------------
+    0x00      WRITE    Write the status (/busy) activating bit 0 when is ready.
+    0x00      READ     Read the less significant byte of the start offset.
+    0x01      READ     Read the most significant byte of the start offset.
+    0x02      READ     Unknown...
+    0x03      READ     Read the less significant byte of the end offset.
+    0x04      READ     Read the most significant byte of the end offset.
+    0x05      READ     If the bit 0 is activated, just trigger the sample.
+
+
+    Pinout
+    ======
+
+    General                       Comments	
+    ---------------------------------------------------------------
+    01 - Low Nibble Enable        Half sample rate.
+    02 - High Nibble Enable       Half sample rate inverted.
+    03 - /BUSY                    LOW while playing.
+    04 - /Read Strobe             LOW to read from Data Bus. 
+    05 - /Write Strobe            LOW to write on Data Bus. 	
+    06 - A0                       Internal Register address 0.
+    07 - A1                       Internal Register address 1.
+    08 - A2                       Internal Register address 2.
+    09-  VCK                      From OKI M5205 VCK.
+    10 - GND                      Ground.
+    11 - /RES                     LOW to RESET.
+    12 - D0                       Data Bus.
+    13 - D1                       Data Bus.
+    14 - D2                       Data Bus.
+    15 - D3                       Data Bus.
+    16 - D4                       Data Bus.
+    17 - D5                       Data Bus.
+    18 - D6                       Data Bus.
+    19 - D7                       Data Bus.
+    20 - SA15                     Sound ROM Address.
+    ---------------------------------------------------------------
+    21 - GND
+    22 - SA14                     Sound ROM Address.
+    23 - SA13                     Sound ROM Address.
+    24 - SA12                     Sound ROM Address.
+    25 - SA11                     Sound ROM Address.
+    26 - SA10                     Sound ROM Address.
+    27 - SA09                     Sound ROM Address.
+    28 - SA08                     Sound ROM Address.
+    29 - SA07                     Sound ROM Address.
+    30 - +5 VCC.
+    31 - SA06                     Sound ROM Address.
+    32 - SA05                     Sound ROM Address.
+    33 - SA04                     Sound ROM Address.
+    34 - SA03                     Sound ROM Address.
+    35 - SA02                     Sound ROM Address.
+    36 - SA01                     Sound ROM Address.
+    37 - SA00                     Sound ROM Address.
+    38 - Unknown.
+    39 - Unknown.
+    40 - GND                      Ground.
 
 
 
@@ -199,7 +457,8 @@
     *** Tech Notes ***
 
 
-    The following notes were mostly 're-translated' from a very poor translated instructions sheet:
+    The following notes were mostly 're-translated'
+    from a very poor translated instructions sheet:
 
 
     In order to change the DIP switches, always turn the power OFF/ON and reset memory.
@@ -264,16 +523,55 @@
     0xF000 - 0xF003    ; PPI8255_0 --> Input Ports 0 & 1.
     0xF080 - 0xF083    ; PPI8255_2 --> DSW1, DSW2, DSW3.
     0xF0C0 - 0xF0C3    ; PPI8255_3 --> DSW4, LAMPS A & B.
+    0xF100 - 0xF100    ; SN76489 #1.
     0xF200 - 0xF203    ; PPI8255_1 --> Input Ports 2 & 4.
+    0xF300 - 0xF300    ; SN76489 #2.
     0xF400 - 0xF400    ; YM2149 control port 0.
+    0xF500 - 0xF500    ; SN76489 #3.
     0xF600 - 0xF600    ; YM2149 R/W port 0 (Input Port 3).
+    0xF700 - 0xF701    ; USART 8251 port.
+    0xF800 - 0xF803    ; Co-processor SM7831.
 
+
+    -- Z80 I/O ports --
+
+    0x00  R   ; 09R81P /Busy.
+    0x00  W   ; 09R81P ADPCM POS LSB.
+    0x01  W   ; 09R81P ADPCM POS MSB.
+    0x02  W   ; 09R81P unknown...
+    0x03  W   ; 09R81P ADPCM END LSB.
+    0x04  W   ; 09R81P ADPCM END MSB.
+    0x05  W   ; 09R81P trigger.
+
+    0xFF  R   ; unknown...
+    0xFF  W   ; unknown...
 
 
 *****************************************************************************************
 
 
     DRIVER UPDATES:
+
+
+    [2008-08-08]
+
+    - Reverse engineering of custom IC's 06B49P, 06B53P & 09R81P.
+    - Mapped the missing 3x SN76489.
+    - Measured and traced all clocks on the board.
+    - Measured and fixed the interrupt system.
+    - Implemented timings/clocks from custom 06B49P.
+    - Added sound support. All regular game sounds/musics are working.
+    - Implemented the ADPCM samples system through 09R81P + M5205 emulation.
+    - Added pinouts and technical notes about custom IC's 06B49P, 06B53P & 09R81P.
+    - Added flip screen mode.
+    - Inverted the order of double-up difficult DIP switches.
+      (Seems to be the opposite of the indicated in the instruction sheet).
+    - Changed 'Key In' to be active LOW instead of HIGH (checked in the PCB).
+    - Complete memory map and ports scheme.
+    - Created handlers for USART port and co-processor communication.
+    - Renamed the sets accordingly.
+    - Updated all notes.
+    - Cleaned-up the driver.
 
 
     [2008-07-28]
@@ -328,9 +626,6 @@
 
     TODO:
 
-    - Fix sounds (YM-2149F).
-    - Add ADPCM samples (OKI M5205).
-    - Figure out the unknown R/W.
     - USART comm.
     - Co-processor.
 
@@ -338,12 +633,33 @@
 *****************************************************************************************/
 
 
-#define MASTER_CLOCK	XTAL_12MHz			/* confirmed */
-#define CPU_CLOCK		(MASTER_CLOCK/8)	/* guess */
-#define YM2149_CLOCK	(MASTER_CLOCK/8)	/* guess */
+#define MASTER_CLOCK		XTAL_12MHz		/* confirmed */
+
+/* custom 06B49P clocks */
+#define C_06B49P_CLKOUT_01	(MASTER_CLOCK/2)		/* 6 MHz. */
+#define C_06B49P_CLKOUT_02	(MASTER_CLOCK/4)		/* 3 MHz. */
+#define C_06B49P_CLKOUT_03	(MASTER_CLOCK/4)		/* 3 MHz. */
+#define C_06B49P_CLKOUT_04	(MASTER_CLOCK/8)		/* 1.5 MHz. */
+#define C_06B49P_CLKOUT_05	(MASTER_CLOCK/16)		/* 750 kHz. */
+#define C_06B49P_CLKOUT_06	(MASTER_CLOCK/32)		/* 375 kHz. */
+#define C_06B49P_CLKOUT_07	(MASTER_CLOCK/64)		/* 187.5 kHz. */
+#define C_06B49P_CLKOUT_08	(MASTER_CLOCK/128)		/* 93.75 kHz. */
+#define C_06B49P_CLKOUT_09	(MASTER_CLOCK/256)		/* 46875 Hz. */
+#define C_06B49P_CLKOUT_10	(7782)					/* 7782 Hz. measured */
+#define C_06B49P_CLKOUT_11	(3920)					/* 3920 Hz. measured */
+#define C_06B49P_CLKOUT_12	(1960)					/* 1960 Hz. measured */
+#define C_06B49P_CLKOUT_13	(950)					/* 950 Hz. measured */
+#define C_06B49P_CLKOUT_14	(475)					/* 475 Hz. measured */
+#define C_06B49P_CLKOUT_15	(237)					/* 237 Hz. measured */
+#define C_06B49P_CLKOUT_16	(MASTER_CLOCK/100000)	/* 120 Hz. */
+#define C_06B49P_CLKOUT_17	(MASTER_CLOCK/200000)	/* 60 Hz. */
+#define C_06B49P_CLKOUT_18	(MASTER_CLOCK/256/3)	/* 15625 Hz. (H-Sync) */
+#define C_06B49P_CLKOUT_19	(MASTER_CLOCK/200000)	/* 60 Hz. (V-Sync) */
+
 
 #include "driver.h"
 #include "sound/ay8910.h"
+#include "sound/sn76496.h"
 #include "sound/msm5205.h"
 #include "machine/8255ppi.h"
 #include "lucky74.lh"
@@ -359,31 +675,81 @@ VIDEO_START( lucky74 );
 VIDEO_UPDATE( lucky74 );
 
 static UINT8 ym2149_portb;
+static UINT8 usart_8251;
+static UINT8 copro_sm7831;
+
+static int lucky74_adpcm_pos;
+static int lucky74_adpcm_end;
+static int lucky74_adpcm_data;
+static UINT8 lucky74_adpcm_reg[5];
+static UINT8 lucky74_adpcm_busy_line;
 
 
 /*****************************
 *    Read/Write  Handlers    *
 *****************************/
 
-static READ8_HANDLER( testport_r )
+static READ8_HANDLER( custom_09R81P_port_r )
 {
-/* The code expects bit 0 activated from z80 port0, and then write to ports 0-5 (code at 0x793c) */
-	return 0x01;
+	if (offset != 0x00)
+	{
+		return lucky74_adpcm_reg[offset];
+	}
+	else
+	{
+		return lucky74_adpcm_busy_line;
+	}
 }
+
+static WRITE8_HANDLER( custom_09R81P_port_w )
+{
+	lucky74_adpcm_reg[offset] = data;
+}  
 
 static WRITE8_HANDLER( ym2149_portb_w )
 {
-/*  when is in game mode writes 0x0a
-    when is in test mode writes 0x0e
-    after reset writes 0x16
+/*  when is in game mode writes 0x0a.
+    when is in test mode writes 0x0e.
+    after reset writes 0x16.
+
+    bit 0 contains the screen orientation.
 */
 	ym2149_portb = data;
+	flip_screen_set(data & 0x01);
 }
 
-//static WRITE8_HANDLER( debug_w )
-//{
-//  popmessage("written : %02X", data);
-//}
+static READ8_HANDLER( usart_8251_r )
+{
+	/* reads to USART 8251 port */
+	logerror("read from USART port.\n");
+	return 0xff;
+}
+
+static WRITE8_HANDLER( usart_8251_w )
+{
+	/* writes to USART 8251 port */
+	usart_8251 = data;
+	logerror("write to USART port: %02x \n", usart_8251);
+}
+
+static READ8_HANDLER( copro_sm7831_r )
+{
+	/* read from SM7831 co-processor */
+	logerror("read from co-processor.\n");
+	return 0xff;
+}
+
+static WRITE8_HANDLER( copro_sm7831_w )
+{
+	/* write to SM7831 co-processor */
+	copro_sm7831 = data;
+	logerror("write to co-processor: %2X\n", copro_sm7831);
+}
+
+
+/**************
+*    Lamps    *
+**************/
 
 static WRITE8_HANDLER(lamps_a_w)
 {
@@ -394,10 +760,10 @@ static WRITE8_HANDLER(lamps_a_w)
     ---- xx--  BIG + SMALL (need to be individualized)
 */
 
-	output_set_lamp_value(8, (data >> 0) & 1);		/* D-UP? */
-	output_set_lamp_value(9, (data >> 1) & 1);		/* TAKE SCORE? */
-	output_set_lamp_value(10, (data >> 2) & 1);		/* BIG? */
-	output_set_lamp_value(11, (data >> 3) & 1);		/* SMALL? */
+	output_set_lamp_value(8, (data >> 0) & 1);		/* D-UP */
+	output_set_lamp_value(9, (data >> 1) & 1);		/* TAKE SCORE */
+	output_set_lamp_value(10, (data >> 2) & 1);		/* BIG */
+	output_set_lamp_value(11, (data >> 3) & 1);		/* SMALL */
 }
 
 static WRITE8_HANDLER(lamps_b_w)
@@ -419,8 +785,8 @@ static WRITE8_HANDLER(lamps_b_w)
 	output_set_lamp_value(2, (data >> 2) & 1);						/* HOLD3 */
 	output_set_lamp_value(3, (data >> 3) & 1);						/* HOLD4 */
 	output_set_lamp_value(4, (data >> 4) & 1);						/* HOLD5 */
-	output_set_lamp_value(5, (data >> 5) & 1);						/* BET? */
-	output_set_lamp_value(6, ((data >> 6) & 1)|((data >> 7) & 1));	/* START? */
+	output_set_lamp_value(5, (data >> 5) & 1);						/* BET */
+	output_set_lamp_value(6, ((data >> 6) & 1)|((data >> 7) & 1));	/* START */
 	output_set_lamp_value(7, (data >> 7) & 1);						/* CANCEL */
 }
 
@@ -445,102 +811,77 @@ static INTERRUPT_GEN( nmi_interrupt )
 static ADDRESS_MAP_START( lucky74_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)	/* NVRAM */
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)			/* VRAM1-1 */
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(fg_colorram_w) AM_BASE(&fg_colorram)			/* VRAM1-2 */
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)			/* VRAM2-1 */
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(bg_colorram_w) AM_BASE(&bg_colorram)			/* VRAM2-2 */
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)				/* VRAM1-1 */
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(fg_colorram_w) AM_BASE(&fg_colorram)				/* VRAM1-2 */
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)				/* VRAM2-1 */
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(bg_colorram_w) AM_BASE(&bg_colorram)				/* VRAM2-2 */
 	AM_RANGE(0xf000, 0xf003) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports 0 & 1 */
 	AM_RANGE(0xf080, 0xf083) AM_DEVREADWRITE(PPI8255, "ppi8255_2", ppi8255_r, ppi8255_w)	/* DSW 1, 2 & 3 */
 	AM_RANGE(0xf0c0, 0xf0c3) AM_DEVREADWRITE(PPI8255, "ppi8255_3", ppi8255_r, ppi8255_w)	/* DSW 4 */
-//  AM_RANGE(0xf100, 0xf100) AM_WRITE(debug_w)  /* seems to be sounds commands */
+	AM_RANGE(0xf100, 0xf100) AM_WRITE(SN76496_0_w)											/* SN76489 #1 */
 	AM_RANGE(0xf200, 0xf203) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports 2 & 4 */
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0xf300, 0xf300) AM_WRITE(SN76496_1_w)											/* SN76489 #2 */
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(AY8910_control_port_0_w)								/* YM2149 control */
+	AM_RANGE(0xf500, 0xf500) AM_WRITE(SN76496_2_w)											/* SN76489 #3 */
 	AM_RANGE(0xf600, 0xf600) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)		/* YM2149 (Input Port 1) */
+	AM_RANGE(0xf700, 0xf701) AM_READWRITE(usart_8251_r, usart_8251_w)						/* USART 8251 port */
+	AM_RANGE(0xf800, 0xf803) AM_READWRITE(copro_sm7831_r, copro_sm7831_w)					/* SM7831 Co-Processor */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( lucky74_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(testport_r)
-//  AM_RANGE(0x00, 0x05) AM_WRITE(???)
+	AM_RANGE(0x00, 0x05) AM_READWRITE(custom_09R81P_port_r, custom_09R81P_port_w)	/* custom 09R81P (samples system) */
 //  AM_RANGE(0xff, 0xff) AM_READWRITE(???)
 ADDRESS_MAP_END
 
-/* I/O byte R/W
+/* unknown I/O byte R/W
 
-    0x00    R    when hang....
-    0x00      W  unknown....
-    0x01      W  unknown....
-    0x02      W  unknown....
-    0x03      W  unknown....
-    0x04      W  unknown....
-    0x05      W  unknown....
-
-    0xFF    R/W  unknown....
+    0xFF    R W  ; unknown....
 
    -----------------
 
-   Unknown writes:
+*** init log ***
 
-
-   0xf100        W  sound?
-   0xf300        W  unknown...
-   0xf500        W  unknown...
-
-   0xf400        W  ym2149
-   0xf600      R W  ym2149
-
-   0xf701        W  unknown...
-
-   0xf800-03   R W  unknown...
-
-
-*** log ***
-
-cpu #0 (PC=00000105): unmapped I/O byte write to 000000FF = 04
+cpu #0 (PC=00000105): unmapped I/O byte write to 000000FF = 04  ; unknown...
 cpu #0 (PC=00000107): unmapped I/O byte read from 000000FF
 cpu #0 (PC=00000111): unmapped I/O byte write to 000000FF = FB
 cpu #0 (PC=00000113): unmapped I/O byte read from 000000FF
 
-cpu #0 (PC=0000011E): unmapped program memory byte write to 0000F400 = 07  ; YM2149 control
-cpu #0 (PC=00000123): unmapped program memory byte write to 0000F600 = 80  ; YM2149 data
-cpu #0 (PC=00000128): unmapped program memory byte write to 0000F400 = 0F  ; YM2149 control
-cpu #0 (PC=0000012D): unmapped program memory byte write to 0000F600 = 16  ; YM2149 data
+cpu #0 (PC=0000011E): byte write to 0000F400 = 07  ; YM2149 control
+cpu #0 (PC=00000123): byte write to 0000F600 = 80  ; YM2149 data
+cpu #0 (PC=00000128): byte write to 0000F400 = 0F  ; YM2149 control
+cpu #0 (PC=0000012D): byte write to 0000F600 = 16  ; YM2149 data
 
-cpu #0 (PC=00000132): unmapped program memory byte write to 0000F003 = 92  ; PPI 8255_0 --> ports A & B as input.
-cpu #0 (PC=00000137): unmapped program memory byte write to 0000F203 = 99  ; PPI 8255_1 --> ports A & C as input.
-cpu #0 (PC=0000013C): unmapped program memory byte write to 0000F083 = 9B  ; PPI 8255_2 --> ports A, B and half of C as input.
-cpu #0 (PC=00000141): unmapped program memory byte write to 0000F0C3 = 90  ; PPI 8255_3 --> port A as input.
+cpu #0 (PC=00000132): byte write to 0000F003 = 92  ; PPI 8255_0 --> ports A & B as input.
+cpu #0 (PC=00000137): byte write to 0000F203 = 99  ; PPI 8255_1 --> ports A & C as input.
+cpu #0 (PC=0000013C): byte write to 0000F083 = 9B  ; PPI 8255_2 --> ports A, B and half of C as input.
+cpu #0 (PC=00000141): byte write to 0000F0C3 = 90  ; PPI 8255_3 --> port A as input.
 
-cpu #0 (PC=0000014B): unmapped program memory byte write to 0000F100 = 9F  ; unknown...
-cpu #0 (PC=0000014F): unmapped program memory byte write to 0000F100 = BF
-cpu #0 (PC=00000153): unmapped program memory byte write to 0000F100 = DF
-cpu #0 (PC=00000157): unmapped program memory byte write to 0000F100 = FF
-cpu #0 (PC=0000015B): unmapped program memory byte write to 0000F300 = 9F
-cpu #0 (PC=0000015F): unmapped program memory byte write to 0000F300 = BF
-cpu #0 (PC=00000163): unmapped program memory byte write to 0000F300 = DF
-cpu #0 (PC=00000167): unmapped program memory byte write to 0000F300 = FF
-cpu #0 (PC=0000016B): unmapped program memory byte write to 0000F500 = 9F
-cpu #0 (PC=0000016F): unmapped program memory byte write to 0000F500 = BF
-cpu #0 (PC=00000173): unmapped program memory byte write to 0000F500 = DF
-cpu #0 (PC=00000177): unmapped program memory byte write to 0000F500 = FF
+cpu #0 (PC=0000014B): byte write to 0000F100 = 9F  ; SN76489 #1 init...
+cpu #0 (PC=0000014F): byte write to 0000F100 = BF
+cpu #0 (PC=00000153): byte write to 0000F100 = DF
+cpu #0 (PC=00000157): byte write to 0000F100 = FF
+cpu #0 (PC=0000015B): byte write to 0000F300 = 9F  ; SN76489 #2 init...
+cpu #0 (PC=0000015F): byte write to 0000F300 = BF
+cpu #0 (PC=00000163): byte write to 0000F300 = DF
+cpu #0 (PC=00000167): byte write to 0000F300 = FF
+cpu #0 (PC=0000016B): byte write to 0000F500 = 9F  ; SN76489 #3 init...
+cpu #0 (PC=0000016F): byte write to 0000F500 = BF
+cpu #0 (PC=00000173): byte write to 0000F500 = DF
+cpu #0 (PC=00000177): byte write to 0000F500 = FF
 
-cpu #0 (PC=0000017C): unmapped program memory byte write to 0000F800 = 00  ; unknown...
+cpu #0 (PC=0000017C): unmapped program memory byte write to 0000F800 = 00  ; Co-processor SM7831.
 cpu #0 (PC=00000181): unmapped program memory byte write to 0000F802 = 80
 cpu #0 (PC=00000186): unmapped program memory byte write to 0000F803 = C3
 cpu #0 (PC=0000018B): unmapped program memory byte write to 0000F803 = 3C
 
-cpu #0 (PC=0000018F): unmapped program memory byte write to 0000F701 = 00  ; unknown...
+cpu #0 (PC=0000018F): unmapped program memory byte write to 0000F701 = 00  ; USART 8251.
 cpu #0 (PC=00000192): unmapped program memory byte write to 0000F701 = 00
 cpu #0 (PC=00000195): unmapped program memory byte write to 0000F701 = 00
 cpu #0 (PC=0000019A): unmapped program memory byte write to 0000F701 = 40
 cpu #0 (PC=0000019F): unmapped program memory byte write to 0000F701 = 4F
 
-cpu #0 (PC=00000105): unmapped I/O byte write to 000000FF = 04
-cpu #0 (PC=00000107): unmapped I/O byte read from 000000FF
-cpu #0 (PC=00000111): unmapped I/O byte write to 000000FF = FB
-cpu #0 (PC=00000113): unmapped I/O byte read from 000000FF
-
-cpu #0 (PC=000002A6): unmapped program memory byte write to 0000F803 = 55  ; testing bits?...
+cpu #0 (PC=000002A6): unmapped program memory byte write to 0000F803 = 55  ; Co-processor SM7831 (testing bits).
 cpu #0 (PC=000002AB): unmapped program memory byte write to 0000F803 = AA
 cpu #0 (PC=000002B0): unmapped program memory byte write to 0000F803 = 99
 cpu #0 (PC=000002B5): unmapped program memory byte write to 0000F803 = 66
@@ -558,23 +899,23 @@ static INPUT_PORTS_START( lucky74 )
     Test mode shows them as dupes. Maybe are multiplexed?
 */
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)	/* 'A' in test mode */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)	/* 'B' in test mode */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)	/* 'C' in test mode */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)	/* 'D' in test mode */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)	/* 'E' in test mode */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Small")  PORT_CODE(KEYCODE_S)	/* 'F' in test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Input G")  PORT_CODE(KEYCODE_J)	/* 'G' in test mode (inverted screen) */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Input H")  PORT_CODE(KEYCODE_K)	/* 'H' in test mode */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1")      PORT_CODE(KEYCODE_Z)  /* 'A' in test mode */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2")      PORT_CODE(KEYCODE_X)  /* 'B' in test mode */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3")      PORT_CODE(KEYCODE_C)  /* 'C' in test mode */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4")      PORT_CODE(KEYCODE_V)  /* 'D' in test mode */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5")      PORT_CODE(KEYCODE_B)  /* 'E' in test mode */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Small")       PORT_CODE(KEYCODE_S)  /* 'F' in test mode */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Flip SC Off") PORT_CODE(KEYCODE_O)  /* 'G' in test mode (normal screen) */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Input H")       PORT_CODE(KEYCODE_K)  /* 'H' in test mode */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Bet")         PORT_CODE(KEYCODE_2)	/* 'I' in test mode */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Start")       PORT_CODE(KEYCODE_1)	/* 'J' in test mode */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Cancel")      PORT_CODE(KEYCODE_N)	/* 'K' in test mode */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Double-Up")  PORT_CODE(KEYCODE_3)	/* 'L' in test mode */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Take Score") PORT_CODE(KEYCODE_4)	/* 'M' & 'Q' in test mode */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Big")        PORT_CODE(KEYCODE_A)	/* 'N' & 'P' in test mode */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Input O")       PORT_CODE(KEYCODE_M)	/* 'O' in test mode (normal screen) */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Bet")         PORT_CODE(KEYCODE_2)  /* 'I' in test mode */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Start")       PORT_CODE(KEYCODE_1)  /* 'J' in test mode */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Cancel")      PORT_CODE(KEYCODE_N)  /* 'K' in test mode */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Double-Up")  PORT_CODE(KEYCODE_3)  /* 'L' in test mode */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Take Score") PORT_CODE(KEYCODE_4)  /* 'M' & 'Q' in test mode */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Big")        PORT_CODE(KEYCODE_A)  /* 'N' & 'P' in test mode */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Flip SC On")  PORT_CODE(KEYCODE_I)  /* 'O' in test mode (inverted screen) */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* not in test mode */
 
 	PORT_START("IN2")
@@ -589,7 +930,7 @@ static INPUT_PORTS_START( lucky74 )
 
 	PORT_START("IN3")	/* YM2149, port A */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )    PORT_IMPULSE(2)	/* Coin A */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Key In")	PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )  PORT_NAME("Key In")	PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )    PORT_IMPULSE(2)	/* Coin B */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN3 )    PORT_IMPULSE(2)	/* Coin C */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )  PORT_NAME("Service")	PORT_CODE(KEYCODE_9)
@@ -608,16 +949,16 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Auto Hold" )				PORT_DIPLOCATION("DSW1:1")  /* see note 1 */
+	PORT_DIPNAME( 0x01, 0x01, "Auto Hold" )				PORT_DIPLOCATION("DSW1:1")	/* see note 1 */
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, "Jackpot" )				PORT_DIPLOCATION("DSW1:2")  /* see note 2 */
+	PORT_DIPNAME( 0x02, 0x02, "Jackpot" )				PORT_DIPLOCATION("DSW1:2")	/* see note 2 */
 	PORT_DIPSETTING(    0x02, "Bet x 100" )
 	PORT_DIPSETTING(    0x00, "Bet x 150" )
-	PORT_DIPNAME( 0x04, 0x04, "Ceiling Bonus Point" )	PORT_DIPLOCATION("DSW1:3") /* see note 3 */
+	PORT_DIPNAME( 0x04, 0x04, "Ceiling Bonus Point" )	PORT_DIPLOCATION("DSW1:3")	/* see note 3 */
 	PORT_DIPSETTING(    0x04, "Bet x 40"  )
 	PORT_DIPSETTING(    0x00, "Bet x 50"  )
-	PORT_DIPNAME( 0x78, 0x78, "Percentage" )			PORT_DIPLOCATION("DSW1:4,5,6,7") /* see note 4 */
+	PORT_DIPNAME( 0x78, 0x40, "Percentage" )			PORT_DIPLOCATION("DSW1:4,5,6,7")	/* see note 4 */
 	PORT_DIPSETTING(    0x00, "90%" )	/* 110% in the instruction sheet */
 	PORT_DIPSETTING(    0x08, "87%" )	/* 106% in the instruction sheet */
 	PORT_DIPSETTING(    0x10, "84%" )	/* 102% in the instruction sheet */
@@ -677,7 +1018,7 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_DIPSETTING(    0xf0, "1 Coin/50 Credits" )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x01, "Bet Max" )						PORT_DIPLOCATION("DSW3:1")
+	PORT_DIPNAME( 0x01, 0x00, "Bet Max" )						PORT_DIPLOCATION("DSW3:1")
 	PORT_DIPSETTING(    0x01, "20" )
 	PORT_DIPSETTING(    0x00, "40" )
 	PORT_DIPNAME( 0x06, 0x06, "Minimum Bet" )					PORT_DIPLOCATION("DSW3:2,3")	/* Bet Min */
@@ -690,7 +1031,7 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_DIPSETTING(    0x10, "10000" )
 	PORT_DIPSETTING(    0x08, "15000" )
 	PORT_DIPSETTING(    0x00, "20000" )
-	PORT_DIPNAME( 0x20, 0x20, "Woman's figure in Main Game" )	PORT_DIPLOCATION("DSW3:6") /* see note 6 */
+	PORT_DIPNAME( 0x20, 0x20, "Woman's figure in Main Game" )	PORT_DIPLOCATION("DSW3:6")	/* see note 6 */
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x40, 0x40, "Type of Poker" )					PORT_DIPLOCATION("DSW3:7")
@@ -707,7 +1048,7 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_DIPNAME( 0x02, 0x02, "Coin Payment" )					PORT_DIPLOCATION("DSW4:2")
 	PORT_DIPSETTING(    0x00, "Auto" )
 	PORT_DIPSETTING(    0x02, "Auto by PAYOUT SW" )
-	PORT_DIPNAME( 0x04, 0x04, "Hopper Capacity" )				PORT_DIPLOCATION("DSW4:3")
+	PORT_DIPNAME( 0x04, 0x00, "Hopper Capacity" )				PORT_DIPLOCATION("DSW4:3")
 	PORT_DIPSETTING(    0x04, "700" )
 	PORT_DIPSETTING(    0x00, "Unlimited" )
 	PORT_DIPNAME( 0x08, 0x08, "Woman's figure in D-UP game" )	PORT_DIPLOCATION("DSW4:4")	/* doesn't seems to work */
@@ -716,14 +1057,14 @@ static INPUT_PORTS_START( lucky74 )
 	PORT_DIPNAME( 0x10, 0x10, "Double-Up game" )				PORT_DIPLOCATION("DSW4:5")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, "Stop by 6th Double-Up" )			PORT_DIPLOCATION("DSW4:6") /* see note 7 */
+	PORT_DIPNAME( 0x20, 0x20, "Stop by 6th Double-Up" )			PORT_DIPLOCATION("DSW4:6")	/* see note 7 */
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0xC0, 0xC0, "Double-Up difficulty" )			PORT_DIPLOCATION("DSW4:7,8")
-	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )		/* easy */
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )	/* .... */
-	PORT_DIPSETTING(    0x80, DEF_STR( Hard ) )		/* .... */
-	PORT_DIPSETTING(    0xC0, DEF_STR( Hardest ) )	/* difficult */
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )	/* easy      (from instruction sheet) */
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )		/* ....      (from instruction sheet) */
+	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )	/* ....      (from instruction sheet) */
+	PORT_DIPSETTING(    0xC0, DEF_STR( Easy ) )		/* difficult (from instruction sheet) */
 INPUT_PORTS_END
 
 
@@ -751,6 +1092,70 @@ static GFXDECODE_START( lucky74 )
 	GFXDECODE_ENTRY( "fgtiles", 0, tilelayout, 0, 16 )		/* text, frames & cards */
 	GFXDECODE_ENTRY( "bgtiles", 0, tilelayout, 256, 16 )	/* title & whores */
 GFXDECODE_END
+
+
+/********************************************
+*    ADPCM sound system (09R81P + M5205)    *
+********************************************/
+
+static SOUND_START( lucky74 )
+{
+    /* cleaning all 09R81P registers */
+
+	UINT8 i;
+
+	for (i = 0; i < 6; i++)
+	{
+		lucky74_adpcm_reg[i] = 0;
+	}
+
+	lucky74_adpcm_busy_line = 0x01;	/* free and ready */
+}
+
+static void lucky74_adpcm_int(running_machine *machine, int num)
+{
+	if (lucky74_adpcm_reg[05] == 0x01)	/* register 0x05 (bit 0 activated), trigger the sample */
+	{
+		/* conditional zone for samples reproduction */
+
+		if (lucky74_adpcm_busy_line)     /* still not started */
+		{
+			/* init all 09R81P registers */
+			logerror("init ADPCM registers\n");	
+			lucky74_adpcm_end = (lucky74_adpcm_reg[04] << 8) + lucky74_adpcm_reg[03];
+			lucky74_adpcm_pos = (lucky74_adpcm_reg[01] << 8) + lucky74_adpcm_reg[00];
+			lucky74_adpcm_busy_line = 0;
+			lucky74_adpcm_data = -1;
+
+			logerror("sample pos:%4X\n", lucky74_adpcm_pos);
+			logerror("sample end:%4X\n", lucky74_adpcm_end);
+		}
+
+		if (lucky74_adpcm_data == -1)
+		{
+			/* transferring 1st nibble */
+			lucky74_adpcm_data = memory_region(machine, "adpcm")[lucky74_adpcm_pos];
+			lucky74_adpcm_pos = (lucky74_adpcm_pos + 1) & 0xffff;
+			MSM5205_data_w(0, lucky74_adpcm_data >> 4);
+
+			if (lucky74_adpcm_pos == lucky74_adpcm_end)
+			{
+				MSM5205_reset_w(0, 0);			/* reset the M5205 */
+				lucky74_adpcm_reg[05] = 0;		/* clean trigger register */
+				lucky74_adpcm_busy_line = 0x01;	/* deactivate busy flag */
+				logerror("end of sample.\n");
+			}
+		}
+		else
+		{
+			/* transferring 2nd nibble */
+			MSM5205_data_w(0, lucky74_adpcm_data & 0x0f);
+			lucky74_adpcm_data = -1;
+		}
+	}
+
+	return;
+}
 
 
 /*************************************
@@ -812,6 +1217,12 @@ static const ay8910_interface ay8910_config =
 	ym2149_portb_w
 };
 
+static const struct MSM5205interface msm5205_interface =
+{
+	lucky74_adpcm_int,	/* interrupt function */
+	MSM5205_S48_4B		/* 8KHz */
+};
+
 
 /*************************
 *    Machine Drivers     *
@@ -820,13 +1231,15 @@ static const ay8910_interface ay8910_config =
 static MACHINE_DRIVER_START( lucky74 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, CPU_CLOCK)	/* guess */
+	MDRV_CPU_ADD("main", Z80, C_06B49P_CLKOUT_03)	/* 3 MHz. */
 	MDRV_CPU_PROGRAM_MAP(lucky74_map, 0)
 	MDRV_CPU_IO_MAP(lucky74_portmap,0)
-//  MDRV_CPU_VBLANK_INT("main", nmi_interrupt)
-	MDRV_CPU_PERIODIC_INT(nmi_interrupt,120)
+	MDRV_CPU_VBLANK_INT("main", nmi_interrupt)	/* 60 Hz. measured */
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
+	
+	MDRV_SOUND_START(lucky74)
+	
 
 	/* 2x 82c255 (4x 8255) */
 	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
@@ -847,7 +1260,7 @@ static MACHINE_DRIVER_START( lucky74 )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 30*8-1)	/* allow to show the top of bg gfx */
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 1*8, 30*8-1)
 
 	MDRV_GFXDECODE(lucky74)
 
@@ -860,9 +1273,23 @@ static MACHINE_DRIVER_START( lucky74 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay", AY8910, YM2149_CLOCK)	/* YM2149F */
+	MDRV_SOUND_ADD("sn1", SN76489, C_06B49P_CLKOUT_03)	/* 3 MHz. */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MDRV_SOUND_ADD("sn2", SN76489, C_06B49P_CLKOUT_03)	/* 3 MHz. */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MDRV_SOUND_ADD("sn3", SN76489, C_06B49P_CLKOUT_03)	/* 3 MHz. */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MDRV_SOUND_ADD("ym", AY8910, C_06B49P_CLKOUT_04)	/* 1.5 MHz. */
 	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.00)			/* not routed to audio hardware */
+
+	MDRV_SOUND_ADD("msm", MSM5205, C_06B49P_CLKOUT_06)	/* 375 kHz. */
+	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+
 MACHINE_DRIVER_END
 
 
@@ -870,7 +1297,18 @@ MACHINE_DRIVER_END
 *        Rom Load        *
 *************************/
 
-ROM_START( lucky74s )
+/*
+    Bootleg, set 1.
+
+    - The black CPU box was replaced with a mini daughterboard
+      with a real Z80, the program ROM, and NVRAM.
+	  
+    - The checksum routines were patched.
+
+    - All the co-processor routines are there, but the calls were NOPed.
+
+*/
+ROM_START( lucky74 )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "luckychi.00",	0x0000, 0x10000, CRC(3b906f0e) SHA1(1f9abd168c60b0d22fa6c7391bfdf5f3aabd66ef) )
 
@@ -898,12 +1336,16 @@ ROM_START( lucky74s )
 	ROM_LOAD( "luckyprom.c7",	0x0500, 0x0100, CRC(e62fd192) SHA1(86a189df2e2ccef6bd2a4e6d969e777fbba8cdf7) )
 ROM_END
 
-ROM_START( lucky74b )
+/*
+    Bootleg, set 2.
 
-/*  The program ROM seems incomplete.
-    At start, just pop some registers and make a RTI.
-    Maybe protection?
+    - All the co-processor routines were erased.
+
+    - The program ROM seems incomplete or encrypted in some smart way.
+      At start, just pop some registers and make a RTI. Maybe protection...
+
 */
+ROM_START( lucky74a )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "luckygde.00",	0x0000, 0x10000, CRC(e3f7db99) SHA1(5c7d9d3fed9eb19d3d666c8c08b34968a9996a96) )	/* bad dump? */
 
@@ -936,6 +1378,6 @@ ROM_END
 *                Game Drivers                *
 **********************************************
 
-       YEAR  NAME      PARENT    MACHINE  INPUT     INIT  ROT    COMPANY          FULLNAME           FLAGS                             LAYOUT  */
-GAMEL( 1988, lucky74s, 0,        lucky74, lucky74,  0,    ROT0, "Wing Co.,Ltd.", "Lucky 74 (small)", GAME_NO_SOUND                   , layout_lucky74 )
-GAMEL( 1988, lucky74b, lucky74s, lucky74, lucky74,  0,    ROT0, "Wing Co.,Ltd.", "Lucky 74 (big)",   GAME_NO_SOUND | GAME_NOT_WORKING, layout_lucky74 )
+       YEAR  NAME      PARENT   MACHINE  INPUT     INIT  ROT    COMPANY          FULLNAME                    FLAGS             LAYOUT  */
+GAMEL( 1988, lucky74,  0,       lucky74, lucky74,  0,    ROT0, "Wing Co.,Ltd.", "Lucky 74 (bootleg, set 1)", 0,                layout_lucky74 )
+GAMEL( 1988, lucky74a, lucky74, lucky74, lucky74,  0,    ROT0, "Wing Co.,Ltd.", "Lucky 74 (bootleg, set 2)", GAME_NOT_WORKING, layout_lucky74 )

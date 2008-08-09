@@ -11,8 +11,8 @@
 
     Games running on this hardware:
 
-    * Lucky 74 (small),  1988,  Wing Co.,Ltd.
-    * Lucky 74 (big),    1988,  Wing Co.,Ltd.
+    * Lucky 74 (bootleg, set 1), 1988, Wing Co.,Ltd.
+    * Lucky 74 (bootleg, set 2), 1988, Wing Co.,Ltd.
 
 
 *****************************************************************************************
@@ -80,12 +80,10 @@
                                            _
 
 
-    Regarding the abobe diagram, there are 2 different states controlled by some bit.
-    Each state drives a different palette that will be assigned to each graphics bank.
+    Regarding the abobe diagram, there are 2 different states controlled by both 06B53P.
+    Each state arrange a different palette that will be assigned to each graphics bank.
 
     As we can see here, same pin of different PROMs are connected together in parallel.
-    We need to check the pin 13 (/G1) and pin 14 (/G2) from each PROM to see if they are
-    connected to the same signal, and futhermore check if one or the other is tied to GND.
 
     To reproduce the states, we need to create a double-sized palette and fill the first
     half with the values created through state 1, then fill the second half with proper
@@ -126,11 +124,6 @@ WRITE8_HANDLER( bg_colorram_w )
 	bg_colorram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
-
-//WRITE8_HANDLER( flip_scrn_w )
-//{
-//      flip_screen_set(data & 0x40);
-//}
 
 
 PALETTE_INIT( lucky74 )
