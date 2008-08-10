@@ -7292,6 +7292,7 @@ Other Sun games
 	DRIVER( drgnwrld )	/* (c) 1997 */
 	DRIVER( drgwrld3 )	/* (c) 1995 */
 	DRIVER( chindrac )	/* (c) 1995 */
+	DRIVER( chindrah )	/* (c) 1995 */
 
 	DRIVER( lordgun )	/* (c) 1994 */
 	DRIVER( hfh )		/* (c) 199? */
