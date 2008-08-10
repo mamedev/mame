@@ -1097,6 +1097,32 @@ ROM_START( galpania ) /* PAMERA-04 PCB with the CALC1 MCU used */
 	ROM_LOAD( "pm007e.u",     0xc0000, 0x80000, CRC(c7ed7950) SHA1(133258b058d3c562208d0d00b9fac71202647c32) )
 ROM_END
 
+
+/*
+Fantasia II
+Comad, 1997
+
+Game is a copy/clone of Qix etc, with the usual Comad theme.....
+The hardware looks much nicer/cleaner and more professionally made than previous
+Comad boards I've seen also.
+
+
+CPU   : MC68000P12
+Sound : AD-65 (OKI M6295)
+Osc.  : 12.000MHz, 16.000MHz (both near 68000 & PLCC84)
+DIP Sw: 8 position (x2)
+RAM   : 62256 (x12), 6116 (x4)
+PALs  : plenty .....
+OTHER : ACTEL A1020B (84 Pin PLCC)
+
+ROMs: (all type 27C040)
+
+music* - oki samples / music
+prog*  - main program
+obj*   - objects
+scr*   - gfx
+*/
+
 ROM_START( fantasia )
 	ROM_REGION( 0x500000, "main", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE( "prog2_16.rom", 0x000000, 0x80000, CRC(e27c6c57) SHA1(420b66928c46e76fa2496f221691dd6c34542287) )

@@ -356,6 +356,49 @@ ROM_START( iqblock )
 	ROM_LOAD( "u24.5",        0x4000, 0x4000, CRC(61050e1e) SHA1(1f7185b2a5a2e237120276c95344744b146b4bf6) )
 ROM_END
 
+
+/*
+Grand Tour
+IGS, 1993
+
+This game probably runs on the same board as IGS's IQ Block.
+Two of the PALs are labelled GRAND3 and GRAND4. However, there may be other 
+games that run on this same PCB also, since three of the PALs are 
+labelled AF1, AF2 and AF3, meaning the main/first game to run on this 
+hardware was called A-something F-something.
+
+
+PCB Layout
+----------
+
+IGS PCB N0. 0036-5
+----------------------------------------------
+|                                 6264       |
+|  UM3567                        GRAND6      |
+|    3.579545MHz   GRAND1                    |
+|                                GRAND7      |
+|                  GRAND2                    |
+|J                                           |
+|A                 GRAND3                    |
+|M                                    Z80    |
+|M                 GRAND4                    |
+|A                                    PAL    |
+|    6116          GRAND5                    |
+|    6116  IGS001          IGS002     PAL    |
+|                  6264                      |
+|                                     PAL    |
+|  8255      PAL                             |
+|                            PAL      12MHz  |
+| DSW2(8) DSW1(8)                            |
+----------------------------------------------
+
+Notes:
+      Z80 clock: 5.997MHz
+          VSync: 60Hz
+          HSync: 15.21kHz
+          UM3567 compatible with YM2413
+*/
+
 ROM_START( grndtour )
 	ROM_REGION( 0x20000, "main", 0 )	/* 64k for code + 64K for extra RAM */
 	ROM_LOAD( "grand7.u7",        0x0000, 0x10000, CRC(95cac31e) SHA1(47bbcce6981ea3d38e0aa49ccd3762a4529f3c96) )

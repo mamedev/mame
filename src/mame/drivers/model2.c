@@ -4174,6 +4174,17 @@ ROM_START( daytonat )
 	ROM_LOAD("epr-14869c.25", 0x000000, 0x010000, CRC(24b68e64) SHA1(c19d044d4c2fe551474492aa51922587394dd371) )
 ROM_END
 
+
+/*
+Daytona "To The MAXX" upgrade.
+Unofficial Sega hack for Model 2 Daytona machines
+
+Kits contains 4 IC's
+3 of them are standard 27C1024 EPROMS
+1 of them is a PIC 16F84 mounted to a small board the size of an EPROM
+with a 40 pin socket mounted on it, which plugs into position IC15
+*/
+
 ROM_START( daytonam )
 	ROM_REGION( 0x200000, "main", 0 ) // i960 program
 	ROM_LOAD32_WORD( "maxx.12", 0x000000, 0x020000, CRC(604ef2d9) SHA1(b1d5f0d41bea2e74fb9346da35a5041f4464265e) )

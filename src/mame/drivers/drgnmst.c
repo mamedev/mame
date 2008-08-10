@@ -6,6 +6,32 @@ the hardware seems to fall somewhere between the
 hardware playmark commonly used and the hardware
 unico used for zero point etc.
 
+PCB Layout
+----------
+
+  DM1001    DM1002   6116   6116     DM1003
+    6295 6295        6116   *PLCC84  DM1004
+                     6116            DM1005
+     PIC16C55                        DM1006
+     
+       6116            6116          DM1007
+       6116            6116          DM1008
+                       6116
+                       6116          
+                                     TPC1020
+DSW1 62256   62256                   (PLCC84)
+    DM1000A DM1000B
+DSW2    68000      TPC1020           62256
+                   (PLCC84)          62256
+12MHz 32MHz
+
+
+Notes:    
+          *: Unknown PLCC84 chip (surface scratched)
+      VSync: 60Hz
+      HSync: 15.625kHz
+  68K clock: 16MHz
+
 */
 
 #include "driver.h"

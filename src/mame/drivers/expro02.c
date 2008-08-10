@@ -43,11 +43,23 @@ EXPRO-02
 
     Notes
     -----
+    GP-U27/U41 - These are DIP40 chips, but are not MCUs because there is no stable
+                 clock input on any of the pins of these chips. They're not ROMs either
+                 because the pinout doesn't match any known EPROMs.
+                 There are no markings on the chips other than 'GP-U27' & 'GP-U41'
+                 If GP-U41 is removed, on bootup the PCB gives an error 'BG ERROR' and 
+                 a memory address. If GP-U27 is removed, the PCB works but there are no
+                 background graphics.
+
     68000 clock - 12.0MHz
     CALC1-CHIP clock - 16.0MHz
     GP-U41 clocks - pins 21 & 22 - 12.0MHz, pins 1 & 2 - 6.0MHz, pins 8 & 9 - 15.6249kHz (HSync?)
     GP-U27 clock - none (so it's not an MCU)
-    OKI M6295 clock - 2.0MHz (12/6). pin7 = low
+
+	(TODO: which is correct?)
+	OKI M6295 clock - 2.0MHz (12/6). pin7 = low
+    OKI M6295 clock - 2.000 MHz [16/8]. Sample rate 2000000/165
+
     VSync - 60Hz
     HSync - 15.68kHz
     MC-8282 - Kaneko custom I/O JAMMA ceramic module

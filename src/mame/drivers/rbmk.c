@@ -32,18 +32,13 @@ Notes:
       68000 clock - 11.000MHz [22/2]
       VSync       - 58Hz
       Hsync       - none (dead board, no signal)
-      M6295 clock - 1.100MHz [22/20], sample rate = 1100000 / 165, chip is
-printed 'AD-65'
-      YM2151 clock- 2.750MHz [22/8], chip is printed 'K-666'. YM3014 chip is
-printed 'K-664'
+      M6295 clock - 1.100MHz [22/20], sample rate = 1100000 / 165, chip is printed 'AD-65'
+      YM2151 clock- 2.750MHz [22/8], chip is printed 'K-666'. YM3014 chip is printed 'K-664'
                 * - Unpopulated position for PIC16F84
-        3.6V_BATT - Purpose of battery unknown, does not appear to be used
-for backup of suicide RAM,
+        3.6V_BATT - Purpose of battery unknown, does not appear to be used for backup of suicide RAM,
                     and there's no RTC on the board.
-            93C46 - 128 x8 EEPROM. This chip was covered by a plactic cover.
-There's nothing else under
-                    the cover, but there was an unpopulated position for a
-PIC16F84
+            93C46 - 128 x8 EEPROM. This chip was covered by a plactic cover. There's nothing else under
+                    the cover, but there was an unpopulated position for a PIC16F84
             89C51 - Atmel 89C51 Microcontroller (protected)
 
       ROMs -
@@ -52,7 +47,6 @@ PIC16F84
             A1 - Atmel AT27C080     (GFX)
             B1 - Macronix MX261000  (GFX?? or PRG/data for 89C51?)
             S1 - Macronix MX27C2000 (OKI samples)
-
 */
 
 #include "driver.h"

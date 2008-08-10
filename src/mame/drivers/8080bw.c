@@ -2104,6 +2104,23 @@ ROM_START( lrescuem )
 	ROM_LOAD( "cv02-7643.1c",   0x0400, 0x0400, CRC(2bdf83a0) SHA1(01ffbd43964c41987e7d44816271308f9a70802b) )
 ROM_END
 
+
+/*
+Cosmo
+TDS & Mints, 1979/80?
+
+Notes:
+This game runs on modified "original" Taito (3 board) Space Invaders hardware.
+There are approx. 70 (or more) wires tied to various parts of the boards, plus
+there is an extra board on top of the sound board with a *HUGE* amount of wires
+running to it from the main boards. There are 2 EPROMs on the top board that appear
+to be for use with colour generation or extra sounds(?) The PROMs on the middle board
+have been removed and in their place are a pile of wires that join to the top board.
+The remainder of the hardware is just standard Taito Space Invaders..... including
+a SN76477 and the discrete components for sound generation.
+Note that the sounds and gameplay of Cosmo are VERY different from Space Invaders.
+*/
+
 ROM_START( cosmo )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "1.36",         0x0000, 0x0800, CRC(445c9a98) SHA1(89bce80a061e9c12544231f970d9dec801eb1b94) )

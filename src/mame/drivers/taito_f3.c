@@ -2198,6 +2198,91 @@ ROM_START( akkanvdr )
  	ROM_LOAD16_BYTE("e06-05", 0x400000, 0x200000, CRC(f370ff15) SHA1(4bc464d1c3a28326c8b1ae2036387954cb1dd813) )	// CC CD CE CF
 ROM_END
 
+
+/*
+Elevator Action Returns (Asia)
+Taito, 1994
+
+This game runs on Taito F3 System (F3 Motherboard and game cart)
+
+PCB Layout
+----------
+
+Main Board
+NEW F3 MOTHER (ASIA) M20A0001B MOTHER PCB J1100335B
+|------------------------------------------------------|
+| MB87078 51832       D77-07 D77-05                    |
+| MC33274 51832       68000  D77-04            HM511664|
+| TDA1543 D77-08             D77-03  TCO630FDP         |
+|                                              HM511664|
+|    HM511664                                  HM511664|
+|    5510-ESPR5                      TC518128  HM511664|
+|J                    MB8421         TC518128          |
+|                                                      |
+|A       TC0650FDA    MB8421                           |
+|                                                      |
+|M                                   16MHz             |
+|         2088        D77-06                  TC0660FCM|
+|M        2088                       30.4761MHz        |
+|         2088                                         |
+|A                    68681          26.686MHz         |
+|                                                      |
+|  JP3                                          D77-02 |
+|                                                      |
+|                     ENSONIC                          |
+|        TCO640FIO    5701                             |
+|                                               D77-01 |
+|                                51832                 |
+|                                                      |
+|                                51832                 |
+|                  ENSONIC                             |
+|                  5505-OTISR2   51832                 |
+|  SW1  93C46 3771                          68EC020    |
+|                                51832                 |
+|------------------------------------------------------|
+
+Notes:
+      68020 clock    : 15.23809 (30.47618 / 2)
+      68000 clock    : 15.23809 (30.47618 / 2)
+      68681 clocks   : pin2- 500kHz, pin32- 4.000MHz, pin36- 1.000MHz, pin38- 1.000MHz, pin39- 500kHz, 
+      5505 clocks    : pin12- 2.6686MHz, pin34- 15.23809MHz, 
+      5510 clocks    : pin1- 8.000MHz, pins4-6- 2.6686MHz, pin16- 2.6686MHz
+      VSync          : 59Hz
+      HSync          : 15.78kHz
+      
+      D77* = PALs
+
+
+ROM Board
+
+J9100361A ROM PCB (sticker M20A0112A  223101651)
+|-------------------------------------------------------|
+|D77-09  E02-03.12  IC10*  E02-02.8 IC6*  E02-01.4 IC2* |
+|             IC11*    IC9*     IC7*   IC5*    IC3* IC1*|
+|                                                       |
+|                                                       |
+|                                                       |
+|                                                       |
+|                                                       |
+| E02-14.33          D77-15    E02-12.20   E02-10.18    |
+|      E02-13.32  D77-10           E02-11.19   E02-16.17|
+|                                                       |
+|                                                       |
+|                                                       |
+|                                                       |
+|D77-12                                                 |
+|  E02-08.47 E02-07.45 E02-06.43  IC40*  E02-05.39      |
+|      IC46*     IC44*    IC42* IC41*     E02-04.38     |
+|                                               D77-11  |
+|-------------------------------------------------------|
+Notes:
+      *: Unpopulated socket
+      D77* = PALs
+      E02-13/14 = 27C020 EPROMs
+      E02-10/11/12/16 = 27C4001 EPROMs
+      Remainder of ROMs are 42 pin 16M MASK or 8M MASK.
+*/
+
 ROM_START( elvactr )
 	ROM_REGION(0x200000, "main", 0) /* 68020 code */
  	ROM_LOAD32_BYTE("e02-12.20", 0x000000, 0x80000, CRC(ea5f5a32) SHA1(4f30c56fbf068fee6d3afb2479043c7e89f6c055) )

@@ -4875,6 +4875,72 @@ ROM_START( majest12 )
 	/* no Delta-T samples */
 ROM_END
 
+
+/*
+Gun & Frontier
+Taito, 1990
+
+This game runs on Taito F2 hardware.
+
+
+PCB Layout
+
+K1100624A
+J1100251A  (sticker K1100629A)
+
+|-----------------------------------------------------|
+|          TL074  YM3016F  C71-01.29  TC51832  TC51832|
+|  MB3737  TL074                      TC51832  TC51832|
+|                 YM2610   TCO530SYC                  |
+|                                     TC51832  TC51832|
+|   C71-12.49   Z80B  24MHz           TC51832  TC51832|
+|   5563                                              |
+|                                     TC51832  TC51832|
+|     TCO260DAR           TCO520TBC   TC51832  TC51832|
+|J              TCO360PRI                             |
+|A                                    TC51832  TC51832|
+|M  2088                              TC51832  TC51832|
+|M                         TCO540OBN                  |
+|A  TC51832                                C71-03.19  |
+|                                                     |
+|   TC51832                                           |
+|              TCO100SCN                              |
+|                    66256      66256    66256  66256 |
+|   C71-02.59                                         |
+|          MB3771    C71-16.38  C71-15.37             |
+|   TCO510NIO        C71-10.40  C71-14.39             |
+|         26.686MHz  C71-09.42  C71-08.41    68000    |
+|   DSWB  DSWA                           PAL1    PAL2 |
+|-----------------------------------------------------|
+Notes:
+      Clocks:
+             68000 clock : 12.000MHz
+             Z80 clock   : 4.000MHz
+             YM2610 clock: 8.000MHz
+             VSync       : 60Hz
+
+      Taito Custom Chips:
+                         TCO530SYC - Sound Communication  (QFP160)
+                         TCO260DAR - Palette Controller   (QFP100)
+                         TCO360PRI - Priority Controller  (QFP100)
+                         TCO520TBC - \ Sprite Controllers (QFP100)
+                         TCO540OBN - /                    (QFP160)
+                         TCO100SCN - Tilemap Controller   (QFP160)
+                         TCO510NIO - I/O                  (QFP100)
+                         
+      RAM:
+          62256  : 32K x8 SRAM
+          TC51832: 32K x8 SRAM
+          2088   : 8K x8 SRAM
+          5563   : 8K x8 SRAM
+
+      OTHER:
+            PAL1  : PAL16L8 labelled 'C71-06' at location IC28
+            PAL2  : PAL16L8 labelled 'C71-07' at location IC27
+            TL074 : Quad JFET Op AMP
+            MB3737: Main power AMP
+*/
+
 ROM_START( gunfront )
 	ROM_REGION( 0xc0000, "main", 0 )     /* 768k for 68000 code */
 	ROM_LOAD16_BYTE( "c71-09.ic42",  0x00000, 0x20000, CRC(10a544a2) SHA1(3b46bbd494b432d36aed3fd4b429cef074050c1d) )

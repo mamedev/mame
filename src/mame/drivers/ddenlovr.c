@@ -7586,7 +7586,36 @@ ROM_START( ddenlovr )
 	ROM_LOAD( "1132h.1e", 0x100000, 0x080000, CRC(2de6363d) SHA1(2000328e41bc0261f19e02323434e9dfdc61013a) )	// bank 4, 5
 ROM_END
 
-/* Korean bootleg board */
+
+/* 
+Don Den Lover (bootleg)
+
+PCB Layout
+----------
+
+|------------------------------------|
+|  ROM1               TC524258       |
+|     PAL         PAL TC524258       |
+|      M6295          TC524258       |
+|      YM2413 6264    TC524258   PAL |
+|J        28MHz       TC524258       |
+|A  BATTERY                          |
+|M                    ACTEL          |
+|M                    A1020          |
+|A                               PAL |
+| 32MHz               ACTEL      ROM4|
+| DSW1       PAL      A1020      ROM5|
+|     62256  ROM2                ROM6|
+|     62256  ROM3     ACTEL      ROM7|
+|      68000          A1020      ROM8|
+|------------------------------------|
+Notes:
+      68000 clock 14.00MHz [28/2]
+      YM2413 clock 3.50MHz [28/8]
+      M6295 clock 1.00MHz [32/32]
+      HSync 15.30kHz
+      VSync 60Hz
+*/
 ROM_START( ddenlovb )
 	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
 	ROM_LOAD16_BYTE( "rom2", 0x000000, 0x040000, CRC(cabdf78f) SHA1(789d4754c7b84964ee317b8a618f26a417f50bcc) )

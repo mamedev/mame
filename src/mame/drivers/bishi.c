@@ -15,6 +15,10 @@
 Super Bishi Bashi Champ (Korean version)
 Konami, 1998
 
+[Identical]
+Bishi Bashi Champ (Korean version)
+Konami, 1996
+
 PCB Layout                     ROM
 ----------              Daughterboard (on top)
                                 ||

@@ -5782,16 +5782,77 @@ ROM_START( macross )
 	ROM_LOAD( "921a10",      0x0200, 0x0020, CRC(8371e42d) SHA1(6cfd70dfa00e85ec1df8832d41df331cc3e3733a) )	/* unknown */
 ROM_END
 
+
 /*
 Gunnail (JPN Ver.)
 (c)1992 NMK
-AK92077
 
-CPU  :MC68000P12
+Gun Nail
+NMK/Tecmo, 1993
+
+PCB Layout
+----------
+
+AK92077
+|-------------------------------------------------------------|
+|  LA4460  VOL YM2203  6116    92077-2.U10   62256    62256   |
+|-|                       16MHz |------|     62256    62256   |
+  |   4558   6295 92077-6.U57   |NMK004|     62256    62256   |
+|-|                       12MHz |      |     62256    62256   |
+|    YM3014  6295 92077-5.U56   |------|                      |
+|                 |------| DIP2             |------| |------| |
+|J                |NMK005|                  |NMK009| |NMK009| |
+|A                |      | DIP1             |      | |      | |
+|M                |------|     92077-10.U96 |------| |------| |
+|M                             6116                           |
+|A   |------| 6116             6116     |------| |----------| |
+|    |NMK111| 6116                      |NMK008| |  NMK214  | |
+|    |------|                           |      | |----------| |
+|-|      92077-8.U35 |------|92077-9.U72|------|              |
+  |                  |NMK902|       |----------|              |
+|-|         6116     |------|       |  NMK215  | 92077-7.U134 |
+|           6116         |------|   |----------|              |
+|  |------| 92077-1.U21  |NMK903|                92077-3O.U133|
+|  |NMK111| |----------| |------|         62256  92077-3E.U131|
+|  |------| |  NMK214  | |------|         62256               |
+|           |----------| |NMK903|          |----------------| |
+|  |------|              |------|    6116  |                | |
+|  |NMK111| 92077-4.U19  |------|          |     68000      | |
+|  |------|              |NMK901|    6116  |                | |
+|   6264                 |------|          |----------------| |
+|   6264                                               10MHz  |
+|-------------------------------------------------------------|
+Notes:
+      68000 - Motorola MC68000P12 CPU running at 10.000MHz (DIP64)
+      6116  - 2K x8 SRAM (x9, DIP24)
+      6264  - 8K x8 SRAM (x2, DIP28)
+      62256 - 32K x8 SRAM (x10, DIP28)
+      YM2203- Yamaha YM2203 (DIP40)
+      YM3014- Yamaha YM3014 (DIP8)
+      4558  - BA4558 Op Amp (DIP8)
+      LA4460- Power Amplifier
+      6295  - Oki M6295, running at MHz, sample rate  (x2, QFP44)
+      DIP1/2- 8 position Dip Switches
+      VOL   - Volume Potentiometer
+      
+      NMK CUSTOM IC'S
+          - NMK004; Actually a TLCS90-based Toshiba TMP91P640F-10 MCU
+            with 16K internal OTP PROM, running at 8.000MHz [16 / 2] (QFP64)
+            Note that the internal ROM is secured :(
+          - NMK005 (x1, Square QFP64)
+          - NMK008 (x1, Square QFP84)
+          - NMK009 (x2, Square QFP100)
+          - NMK111 (x3, QFP64)
+          - NMK901 (x1, QFP80)
+          - NMK903 (x2, QFP44)
+          - NMK214 (x2, SDIP64)
+          - NMK215 (x1, SDIP64)
+
 Sound:YM2203C,OKI M6295 x2
 OSC  :12.0000MHz,16.0000MHz,10.0000MHz
 Other:NMK 111 x3,214 x2,901,903 x2,902,005,004,215,008,009 x2
 */
+
 ROM_START( gunnail )
 	ROM_REGION( 0x80000, "main", 0 )		/* 68000 code */
 	ROM_LOAD16_BYTE( "3e.bin",  0x00000, 0x40000, CRC(61d985b2) SHA1(96daca603f18accb47f98a3e584b2c84fc5a2ca4) )
@@ -6626,8 +6687,8 @@ static DRIVER_INIT( bubl2000 )
 
 /*
 
-Fire Hawk - ESD
----------------
+Fire Hawk - ESD, 2001
+---------------------
 
 - To enter test mode, hold on button 1 at boot up
 

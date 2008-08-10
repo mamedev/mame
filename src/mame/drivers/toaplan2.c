@@ -4878,6 +4878,54 @@ ROM_START( batridrk )
 ROM_END
 
 
+/*
+Battle Bakraid
+Raizing/8ing, 1999
+
+PCB Layout
+----------
+
+ET68-V99
+|-----------------------------------------------------|
+|TA8201  16.93MHz     ROM-6                   6264    |
+|  YAC516                                             |
+|       YMZ280B-F     ROM-7               SND_U0720   |
+|                                                     |
+| VOL                 ROM-8                 Z80       |
+|                                                     |
+|                   341256                            |
+|                                               93C66 |
+|                   341256               XILINX       |
+|J                                       XC95108      |
+|A                  27MHz     32MHz                   |
+|M                                                    |
+|M          DIPSW1                      341256  341256|
+|A                  XILINX    XILINK                  |
+|           DIPSW2  XC95144   XC95108   341256  341256|
+|                                                     |
+|           DIPSW3                                    |
+|                                MACH211    PRG1_U023 |
+| TEST_SW            68000                            |
+|                                           PRG0_U022 |
+|                                                     |
+|                                           PRG3_U024 |
+|                             L7A0498                 |
+|                             GP9001        PRG2_U021 |
+| ROM-0       ROM-1           (QFP208)                |
+|                                                     |
+|                               6264       MN414260   |
+| ROM-2       ROM-3                                   |
+|                               6264       MN414260   |
+|-----------------------------------------------------|
+Notes:
+      ROM-0 to ROM-3 - 32M DIP42
+      ROM-6 to ROM-8 - 32M DIP42 Byte Mode
+      68000 clock - 16.000MHz (32/2)
+      Z80 clock - 5.33333MHz (32/6)
+      VSync - 60Hz
+      HSync - 15.39kHz
+*/
+
 ROM_START( bbakraid )
 	ROM_REGION( 0x200000, "main", 0 )			/* Main 68k code */
 	ROM_LOAD16_BYTE( "prg0u022.bin", 0x000000, 0x080000, CRC(0dd59512) SHA1(c6a4e6aa49c6ac3b04ae62a0a4cc8084ae048381) )

@@ -2123,7 +2123,7 @@ static DRIVER_INIT( samplebank )
     U19         "
     U18         "
 
-Bakuretsu Breaker
+Bakuretsu Breaker / Explosive Breaker
 Kaneko, 1992
 
 PCB Layout

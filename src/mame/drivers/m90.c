@@ -1075,6 +1075,46 @@ ROM_START( dynablsb )
 	/* Does this have a sample rom? */
 ROM_END
 
+
+/*
+New Dyna Blaster Global Quest
+Irem, 1992
+
+PCB Layout
+----------
+
+M99-A-A  05C04369A1 MADE IN JAPAN
+License Sticker - 'BOMBER MAN WORLD NEW DYNA BLASTER'
+|--------------------------------------------------|
+|                  |----------|                    |
+|        YM3014    |IREM      |                    |
+|VOL    3.579545MHZ|D9000001A1|  PAL2     4364     |
+|        LM358     |----------|                    |
+|                   BBM2-V0-              4364     |
+|                            |----------|          |
+|                   4364     |NANAO     | BBM2-H0-B|
+|J                     M51953|08J27291A5|          |
+|A                  BBM2-SP- |015       |          |
+|M               D70008AC-6  |          | BBM2-L0-B|
+|M                           |----------|          |
+|A                 6116     32MHz         BBM2-C0- |
+|                                                  |
+|    DSW1          6116  26.6666MHz       BBM2-C1- |
+|                                                  |
+|        PAL1       43256   |-------|     BBM2-C2- |
+|                           | NANAO |              |
+|    DSW2           43256   | GA25  |     BBM2-C3- |
+|                           |-------|              |
+|--------------------------------------------------|
+Notes:
+      D70008AC-6  : NEC D70008AC-6 Z80 compatible CPU, clock 3.579545MHz
+      YM2151 clock: 3.579545MHz
+      PAL1        : PAL16L8 labelled 'M99 A-4S-'
+      PAL2        : PAL16L8 labelled 'M99 A-8C-'
+      HSync       : 15.42kHz
+      VSync       : 60Hz
+*/
+
 ROM_START( bbmanw )
 	ROM_REGION( CODE_SIZE, "main", 0 )
 	ROM_LOAD16_BYTE( "bbm2-h0-b.77",  0x00001, 0x40000, CRC(567d3709) SHA1(1447fc68798589a8757ee2d133d053b80f052113) )

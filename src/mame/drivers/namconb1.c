@@ -929,6 +929,132 @@ ROM_START( gslgr94u )
 	ROM_LOAD( "gse-sha0.bin", 0, 0x80000, CRC(6b2beabb) SHA1(815f7aef44735584edd4a9ca7e672471d07f225e) )
 ROM_END
 
+
+/*
+Great Sluggers (Japan)
+Namco, 1993
+
+This game runs on Namco NB-1 hardware.
+
+PCB Layout
+----------
+NB-1 MAIN PCB                                  MEMEXT OBJ2 PCB  
+8634961101 (8634963101)                    8635901201 (8635901301)
+|------------------------------------------------------|---------|
+|                            62256       62256         |         |
+|LA4705 VOL M5M5178          62256       62256         |GS1OBJ-0 |
+|           M5M5178                              C347  |         |
+| 4558      M5M5178          62256       62256         |         |
+|                            62256       62256         |         |
+| LC78815    C116   156                                |         |
+|JP3                62256    62256       62256         |         |
+|              145  62256    62256       62256         |GS1OBJ-1 |
+|   GS1SHA-0                                           |         |
+|J  JP2                      62256       62256     C355|---------|
+|A                           62256       62256          62256    |
+|M             123                                      62256    |
+|M                                                    JP12       |
+|A                                   %3  JP11                    |
+|              JP5  GS1CHR-0   GS1CHR-2  JP10   137   187   M3771|
+|   GS1VOI-0   JP6  GS1CHR-1   GS1CHR-3      48.384MHz           |
+|                                                                |
+|              C352                                              |
+|SW1   75                                                        |
+|                                                                |
+|   TC551001                   %1                                |
+|                      KM28C16         GS1MPRU      JP9          |
+|   TC551001   PAL2                %2  GS1MPRL                   |
+|   JP1                         JP7    JP8                       |
+|   GS1SPR0    PAL1     C329                      68EC020        |
+|                                                                |
+|----------------------------------------------------------------|
+Notes:
+
+CLOCKs
+------
+MASTER clock : 48.384 MHz
+68020 clock  : 24.192MHz (MASTER / 2)
+HSYNC        : 15.75kHz
+VSYNC        : 59.7Hz
+
+DIPs
+----
+SW1: 2 position, both are OFF. Position 1 toggles TEST mode, position 2 is freeze.
+
+RAM
+---
+TC551001AFL x 2  (SOP32, 128k x8 SRAM)
+62256       x 20 (SOP28, 32k  x8 SRAM)
+M5M5178     x 3  (SOP28, 8k   x8 SRAM)
+
+NAMCO CUSTOM CHIPS
+------------------
+75       (QFP80, M37702 in disguise; sound CPU with internal BIOS)
+123      (QFP80)
+137      (NDIP28)
+145      (QFP80)
+156      (QFP64)
+187      (QFP120)
+C116     (QFP64)
+C329     (QFP100)
+C347     (QFP80)
+C351     (QFP160)
+C352     (QFP100)
+C355     (QFP160)
+
+OTHER
+-----
+KM28C16  2K x8 EEPROM (DIP24)
+%1       Unpopulated KEYCUS socket
+%2       Unpopulated DATA ROM socket
+%3       Unpopulated position for 28MHz OSC
+
+PALs
+----
+PAL1 PALCE16V8 (NAMCO CODE = NB1-1)
+PAL2 PAL16L8   (NAMCO CODE = NB1-2)
+
+JUMPERs
+-------
+JP1      4M  O-O O  1M    Config jumper for ROM size, 4M = 27C4096, 1M = 27C1024
+JP2      4M  O-O O  1M    Config jumper for ROM size, 4M = 27C4096, 1M = 27C1024
+JP3          O-O          (2 pins shorted, hardwired on PCB)
+JP5     /1M  O-O O  1M    Config jumper for ROM size (hardwired on PCB)
+JP6      8M  O-O O  /8M   Config jumper for ROM size (hardwired on PCB)
+JP7      4M  O-O O  1M    Config jumper for ROM size (hardwired on PCB), 4M = 27C4096, 1M = 27C1024
+JP8      4M  O-O O  1M    Config jumper for ROM size (hardwired on PCB), 4M = 27C4096, 1M = 27C1024
+JP9     CON  O-O O  COFF  (hardwired on PCB)
+JP10    24M  O-O O  28M   Config jumper for 28MHz OSC (hardwired on PCB)
+JP11    24M  O-O O  12M   Config jumper for 28MHz OSC (hardwired on PCB)
+JP12    F32  O O-O  355   (hardwired on PCB)
+
+ROMs, MAIN PCB
+--------------
+Filename /      PCB       ROM
+ROM Label       Label     Type
+------------------------------------------------------------------------------
+GS1MPRU.13B     PRGU      27C240        \ Main program
+GS1MPRL.15B     PRGL      27C240        /
+GS1SPR0.5B      SPRG      27C240        Sound program, linked to 75, C351 and C352
+GS1VOI-0.5J     VOICE     16M MASK      Sound voices
+GS1CHR-0.8J     CHR0      8M MASK       Character
+GS1CHR-1.9J     CHR1      8M MASK       Character
+GS1CHR-2.10J    CHR2      8M MASK       Character
+GS1CHR-3.11J    CHR3      8M MASK       Character
+GS1SHA-0.5M     SHAPE     4M MASK       Shape
+
+ROMs, MEMEXT OBJ2 PCB  (All ROMs surface mounted)
+---------------------
+Filename /      PCB       ROM
+ROM Label       Label     Type
+----------------------------------------
+GS1OBJ-0.IC1    OBJL      16M MASK SOP44
+GS1OBJ-1.IC2    OBJU      16M MASK SOP44
+
+Note! All ROMs are different to the Great Sluggers '94 set.
+
+*/
+
 ROM_START( gslugrsj )
 	ROM_REGION( 0x100000, "main", 0 ) /* main program */
 	ROM_LOAD32_WORD( "gs1mprl.15b", 0x00002, 0x80000, CRC(1e6c3626) SHA1(56abe21884fd87df10996db19c49ce14214d4b73) )
@@ -1551,6 +1677,6 @@ GAME( 1997, sws97,    0,        namconb1, namconb1, sws97,    ROT0,  "Namco", "S
 GAME( 1994, vshoot,   0,        namconb1, namconb1, vshoot,   ROT0,  "Namco", "J-League Soccer V-Shoot", GAME_IMPERFECT_SOUND )
 
 /*     YEAR, NAME,     PARENT,   MACHINE,  INPUT,    INIT,     MNTR,  COMPANY, FULLNAME,   FLAGS */
-GAME( 1994, outfxies, 0,	 namconb2, outfxies, outfxies, ROT0, "Namco", "Outfoxies", GAME_IMPERFECT_SOUND )
+GAME( 1994, outfxies, 0,		namconb2, outfxies, outfxies, ROT0, "Namco", "Outfoxies", GAME_IMPERFECT_SOUND )
 GAME( 1994, outfxesj, outfxies, namconb2, outfxies, outfxies, ROT0, "Namco", "Outfoxies (Japan)", GAME_IMPERFECT_SOUND )
-GAME( 1995, machbrkr, 0,	 namconb2, namconb1, machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan)", GAME_IMPERFECT_SOUND )
+GAME( 1995, machbrkr, 0,		namconb2, namconb1, machbrkr, ROT0, "Namco", "Mach Breakers - Numan Athletics 2 (Japan)", GAME_IMPERFECT_SOUND )

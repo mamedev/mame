@@ -2,7 +2,7 @@
 
     TS 2004.10.22. analog[at]op.pl
     - fixed sprite issues
-  - added backgrounds and terrain info (external roms)
+    - added backgrounds and terrain info (external roms)
 
     (press buttons 1+2 at the same time, to release 'army' ;)
 
@@ -10,7 +10,7 @@
         - fix colours (sprites , bg)
 */
 
-/* dump info
+/*
 
 Field Combat (c)1985 Jaleco
 
@@ -23,7 +23,6 @@ Other: Unmarked 24 pin near ROMs 2 & 3
 RAM: 6116 (x3)
 
 X-TAL: 20 MHz
-
 
 inputs + notes by stephh
 
