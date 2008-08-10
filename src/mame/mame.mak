@@ -1049,7 +1049,7 @@ $(MAMEOBJ)/nichibut.a: \
 $(MAMEOBJ)/nintendo.a: \
 	$(DRIVERS)/dkong.o $(AUDIO)/dkong.o $(VIDEO)/dkong.o \
 	$(DRIVERS)/cham24.o \
-	$(DRIVERS)/kinstb.o \
+	$(DRIVERS)/snesb.o \
 	$(DRIVERS)/mario.o $(AUDIO)/mario.o $(VIDEO)/mario.o \
 	$(DRIVERS)/multigam.o \
 	$(DRIVERS)/n8080.o $(AUDIO)/n8080.o $(VIDEO)/n8080.o \
