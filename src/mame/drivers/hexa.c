@@ -30,6 +30,20 @@ d008      bit0/1 = flip screen x/y
 d010      watchdog reset, or IRQ acknowledge, or both
 f000      ????????
 
+*************************************************************************
+
+main hardware consists of.....
+
+sub board with Z80 x2, 2 ROMs and a scratched 18 pin chip (probably a PIC)
+
+main board has....
+12MHz xtal
+ay3-8910
+8 position DSW x1
+ROMs x4
+6116 SRAM x3
+82S123 PROMs x3
+
 *************************************************************************/
 
 #include "driver.h"

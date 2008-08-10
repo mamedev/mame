@@ -339,6 +339,48 @@ MACHINE_DRIVER_END
 
 ***************************************************************************/
 
+/*
+IQ Block
+IGS, 1996
+
+PCB Layout
+----------
+
+IGS PCB N0- 0131-4
+|---------------------------------------|
+|uPD1242H     VOL    U3567   3.579545MHz|
+|                               AR17961 |
+|   HD64180RP8                          |
+|  16MHz                         BATTERY|
+|                                       |
+|                         SPEECH.U17    |
+|                                       |
+|J                        6264          |
+|A                                      |
+|M      8255              V.U18         |
+|M                                      |
+|A                                      |
+|                                       |
+|                                       |
+|                      |-------|        |
+|                      |       |        |
+|       CG.U7          |IGS017 |        |
+|                      |       |        |
+|       TEXT.U8        |-------|   PAL  |
+|            22MHz               61256  |
+|                   DSW1  DSW2  DSW3    |
+|---------------------------------------|
+Notes:
+      HD64180RP8 - Hitachi HD64180 CPU. Clocks 16MHz (pins 2 & 3), 8MHz (pin 64)
+      61256   - 32k x8 SRAM (DIP28)
+      6264    - 8k x8 SRAM (DIP28)
+      IGS017  - Custom IGS IC (QFP208)
+      AR17961 - == Oki M6295 (QFP44). Clock 1.000MHz [16/16]. pin 7 = high
+      U3567   - == YM2413. Clock 3.579545MHz
+      VSync   - 60Hz
+      HSync   - 15.31kHz
+*/
+
 ROM_START( iqblock )
 	ROM_REGION( 0x20000, "main", 0 )	/* 64k for code + 64K for extra RAM */
 	ROM_LOAD( "u7.v5",        0x0000, 0x10000, CRC(811f306e) SHA1(d0aef80f1624002d05721276358f26a3ef69a3f6) )

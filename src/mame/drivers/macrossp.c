@@ -212,6 +212,93 @@ u25.bin |
 u26.bin |
 u27.bin /
 
+
+----------
+PCB Layout
+----------
+
+MOTHERBOARD
+|---------------------------------------------------------------|
+|TA8205AH  GAL16V8B(3)    |----------------|BP964A_U49          |
+|  VOL                    |----------------||-------|  TC55328  |
+| TL074    ES5506                           |AA005  |  TC55328  |
+|  D6376                                    |       |  TC55328  |
+|               TC55257    |-------------|  |       |  TC55328  |
+|               TC55257    |   68000     |  |-------|           |
+|     GAL16V8B(2)          |             |                      |
+|     50MHz     TC55257    |-------------|  |-------|           |
+|               TC55257                     |AA005  |       |-| |
+|                                           |       |       | | |
+|               TC55257                     |       |       | | |
+|      |-------|TC55257                     |-------|       | | |
+|      |68EC020|                                            | | |
+|      |       | GAL16V8B(1)                |-------|       | | |
+|      |-------|                            |AA0062 |       | | |
+|          MCM6206  MCM6206                 |       |       | | |
+|          MCM6206  MCM6206                 |       |       | | |
+|                                           |-------|       |-| |
+|          MCM6206  MCM6206                                     |
+|                                           |-------|  TC55328  |
+|          MCM6206  MCM6206                 |AA004  |  TC55328  |
+|          MCM6206  MCM6206                 |       |           |
+|          MCM6206  MCM6206                 |       |   32MHz   |
+|DSW1(8)                  |----------------||-------|   27MHz   |
+|DSW2(8)                  |----------------| TC55257  TC55257   |
+|---------------------------------------------------------------|
+Notes:
+      68020 clock 25.000MHz [50/2] (QFP100)
+      68000 clock 16.000MHz [32/2] (SDIP64)
+      ES5506 clock 16.000MHz [32/2] (PLCC68)
+      VSync 60Hz
+      HSync 15.83kHz
+      TC55257     - Toshiba TC55257CFL-85 32k x8 SRAM (SOJ28)
+      TC55328     - Toshiba TC55328AJ-15 32k x8 SRAM (SOP28)
+      MCM6206     - Motorola MCM6206BAEJ25 32k x8 SRAM (SOJ28)
+      GAL16V8B(1) - stamped 'U008' (DIP20)
+      GAL16V8B(2) - stamped 'U200' (DIP20)
+      GAL16V8B(3) - stamped 'U009' (DIP20)
+      D6376       - NEC uPD6376 Audio 2-Channel 16-Bit D/A Converter (SOIC16)
+      Custom ICs  -
+                   IKM-AA004 1633JF8433 (QFP208)
+                   IKM-AA0062 1633CF8461 (QFP208)
+                   IKM-AA005 1670F1541 (x2, QFP208)
+
+ROM Board
+---------
+
+MASK ROM BOARD
+|----------------------------------------|
+|  |----------------|                    |
+|  |----------------|                    |
+|                              U19       |
+| *U27    *U26                           |
+|                                        |
+|                                        |
+| *U25     U24        *U23    *U22       |
+|                                        |
+|                                    |-| |
+|  U18     U17         U21     U20   | | |
+|                                    | | |
+|                                    | | |
+|                                    | | |
+|  U16     U15         U14     U13   | | |
+|                                    | | |
+|                                    | | |
+|  U9      U10         U11     U12   | | |
+|                                    |-| |
+|                                        |
+| *U5     *U6         *U7     *U8        |
+|                                        |
+|  U1      U2          U3      U4        |
+|                                        |
+|  |----------------|                    |
+|  |----------------|                    |
+|----------------------------------------|
+Notes:
+      * - These locations not populated
+      ROMs at locations U1, U2, U3, U4, U19, U20 & U21 are 27C040 EPROMs
+      All other ROMs are surface mounted 32MBit SOP44 MaskROMs
+
 ******************************************************************************/
 
 extern UINT32 *macrossp_scra_videoram, *macrossp_scra_videoregs;

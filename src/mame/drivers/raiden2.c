@@ -1377,45 +1377,75 @@ ROM_END
 /* Raiden DX sets */
 
 /*
-
 Raiden DX
-Metrotainment (licensed?)
-Seibu Kaihatsu Inc, 1994
-
-This game runs on Raiden II hardware using Nec V30 CPU
+Seibu Kaihatsu, 1994
 
 PCB Layout
 ----------
 
-|--------------------------------------------------|
-| YM2151 M6295 DX_PCM.3A  Z80     6116             |
-|        M6295 DX_6.3B    DX_5.5B 6116             |
-|                                      28.63636MHz |
-|    YM3012                6116                    |
-|                          6116                    |
-|                  SIE150  6116        SEI252      |
-|J                         6116        SB05-106    |
-|A    DSW2                                         |
-|M    DSW1        DX_OBJ1.4H  DX_OBJ2.6H           |
-|M                                        62256    |
-|A     SEI360     DX_OBJ3.4K  DX_OBJ4.6K  62256    |
-|      SB06-1937   PAL                    62256    |
-|                                         62256    |
-|                   DX_1H.4N DX3H.6N               |
-| SEI0200           DX_2H.4P DX4H.6P    SEI1000    |
-| TC110G21AF  6264    32MHz             SB01-001   |
-|             6264                                 |
-|                         PAL  PAL                 |
-| DX_BACK1.1S DX_BACK2.2S  DX_7.4S  COPX-D2.6S V30 |
-|--------------------------------------------------|
-
+(C) 1993 RAIDEN II DX SEIBU KAIHATSU INC.,o
+|----------------------------------------------------------|
+|      1    2   3   4   5   6    7      8      9     10    |
+|LA4460    M6295  PCM  Z80     6116                       A|
+|   YM2151 M6295   6    5      6116    28.63636MHz        B|
+|     VOL   YM3012                                         |
+|                  |------|                               C|
+|           4560   |SIE150| 6116      |---------|          |
+|                  |      | 6116      | SEI252  |         D|
+|J                 |------| 6116      |SB05-106 |          |
+|A                          6116      |(QFP208) |         E|
+|M                                    |         |         F|
+|M    DSW2(8)                         |---------|          |
+|A                                                        G|
+|     DSW1(8)                                   CXK58258   |
+|           |---------|OBJ-1    OBJ-2           CXK58258  H|
+|           | SEI360  |                         CXK58258  J|
+|           |SB06-1937|DX_OBJ-3 DX_OBJ-4        CXK58258  K|
+|           |(QFP160) |  PAL1               |---------|   L|
+|           |         |                     |SEI1000  |   M|
+| |------|  |---------|  1H      3H         |SB01-001 |   N|
+| |SEI200|         32MHz                    |(QFP184) |    |
+| |      |CY7C185        2H      4H         |         |   P|
+| |------|CY7C185                           |---------|    |
+|                                                         Q|
+|                        PAL2 PAL3             |----|     R|
+|                                              |V30 |      |
+| DX_BACK-1  DX_BACK-2   7   COPX-D2           |----|     S|
+|----------------------------------------------------------|
 Notes:
-      V30 clock: 16.000MHz
-      Z80 clock: 3.57955MHz
-      YM2151 clock:3.57955MHz
-      M6295 clock: 1.022MHz, Sample Rate: /132
-      VSync: 58Hz
-      HSync: 15.59kHz
+      V30 clock    - 16.000MHz [32/2]. Chip is stamped "NEC D70116HG-16 V30 NEC '84" (QFP52)
+      Z80 clock    - 3.579545MHz [28.63636/8]
+      YM2151 clock - 3.579545MHz [28.63636/8]
+      M6295 clocks - 1.022MHz [28.63636/28]. Sample rate 1022000 / 132
+      VSync - 58Hz
+      HSync - 15.59kHz
+      PAL1  - AMI 18CV8 stamped 'JJ5004' (DIP20)
+      PAL2  - AMI 18CV8 stamped 'JJ5002' (DIP20)
+      PAL3  - AMI 18CV8 stamped 'JJ5001' (DIP20)
+      ROMs  -
+              *PCM      - 2M MaskROM stamped 'RAIDEN 2 PCM' at location U1018 (DIP32)
+              6         - 27C020 EPROM labelled 'SEIBU 6' at location U1017 (DIP32)
+              5         - 27C512 EPROM labelled 'SEIBU 5' at location U1110 (DIP28)
+              *OBJ-1    - 16M MaskROM stamped 'RAIDEN 2 OBJ-1' at location U0811 (DIP42)
+              *OBJ-2    - 16M MaskROM stamped 'RAIDEN 2 OBJ-2' at location U082 (DIP42)
+              DX_OBJ-3  - 16M MaskROM stamped 'DX OBJ-3' at location U0837 (DIP42)
+              DX_OBJ-4  - 16M MaskROM stamped 'DX OBJ-4' at location U0836 (DIP42)
+              1H        - 27C4001 EPROM labelled 'SEIBU 1H' at location U1210 (DIP32)
+              2H        - 27C4001 EPROM labelled 'SEIBU 2H' at location U1211 (DIP32)
+              3H        - 27C4001 EPROM labelled 'SEIBU 3H' at location U129 (DIP32)
+              4H        - 27C4001 EPROM labelled 'SEIBU 4H' at location U1212 (DIP32)
+              DX_BACK-1 - 16M MaskROM stamped 'DX BACK-1' at location U075 (DIP42)
+              DX_BACK-2 - 16M MaskROM stamped 'DX BACK-2' at location U0714 (DIP42)
+              7         - 27C210 EPROM labelled 'SEIBU 7' at location U0724 (DIP40)
+              *COPX-D2  - 2M MaskROM stamped 'COPX-D2' at location U0313 (DIP40)
+              * means these ROMs are soldered-in and match ROMs from the original Raiden II PCB
+
+      SEIBU Custom ICs - 
+                         SIE150 (QFP100)
+                         SEI252 SB05-106 (QFP208)
+                         SEI0200 TC110G21AF 0076 (QFP100)
+                         SEI360 SB06-1937 (QFP160)
+                         SEI1000 SB01-001 (QFP184)
 
       NOTE! DX_1H.4N is bad (ROM was blown, I get a different read each time). The rest of the program ROMs are ok.
       The PCB was only partially working originally (locks up almost immediately on power-up). I replaced the program ROMs from a

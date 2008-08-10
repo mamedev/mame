@@ -8,6 +8,38 @@ Supported:
 Puckman Pockimon - (c)2000 Genie? (there should be a way to show Sun Mixing copyright, roms are the same
                                    on a version with the SM (c)
 
+|---------------------------------------|
+| VOL    4558    4MHz   PAL     62256   |
+| YM3812 YM3014                         |
+| 3.579545MHz    555    PAL     |------||
+| LM324     M6295        |----| |TV16B ||
+|          ROM.U3   PAL  |YBOX| |      ||
+|J   PAL                 |----| |      ||
+|A         PAL      PAL         |------||
+|M         PAL      PAL  PAL            |
+|M         PAL      PAL     53.693175MHz|
+|A   DSW2                               |
+|          PAL      PAL    |------|     |
+|    DSW1                  |TA06SD|     |
+|          ROM.U5   ROM.U4 |      |     |
+|                          |------|     |
+|          ROM.U8   ROM.U7 62256  D41264|
+|          *        *      62256  D41264|
+|---------------------------------------|
+Notes:
+      Main CPU is 68000-based, but actual CPU chip is not known
+      Master clock 53.693175MHz. CPU likely running at 53.693175/7 or /6 (??)
+      YM3812 clock 3.579545MHz
+      M6295 clock 1.000MHz (4/4]. Sample rate = 1000000/132
+      VSync 60Hz
+      HSync 16.24kHz
+      62256 - 8k x8 SRAM (DIP28)
+      D41264 - NEC D41264V-15V 64k x4 VRAM (ZIP24)
+      * Unpopulated DIP32 socket
+      Custom ICs -
+                  Y-BOX TA891945 (QFP100)
+                  TA-06SD 9933 B816453 (QFP128)
+                  TV16B 0010 ME251271 (QFP160)
 */
 
 #include "driver.h"

@@ -65,6 +65,7 @@ Notes:
       68020 clock: 24.000MHz
       VSync: 60Hz
 
+      Only ROMs positions 60, 50, 40, 02, 03, 10, 11, 01, 00 are populated.
 
 Tokimeki Mahjong Paradise - Dear My Love Board Notes
 ----------------------------------------------------

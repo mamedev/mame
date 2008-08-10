@@ -992,6 +992,20 @@ ROM_START( gigasm2b )
 	ROM_LOAD( "3.pr", 0x0500, 0x0100, CRC(28b5ee4c) SHA1(e21b9c38f433dca1e8894619b1d9f0389a81b48a) )
 ROM_END
 
+
+/*
+Gigas (bootleg)
+
+CPU: Z80 (on a small plug in board), 8748 MCU (on same plug-in board)
+SND: 76489 x3
+DIPSW: 8 position x3 
+RAM: 6116 x2 (near ROMs 1-6), 6264 x1 (near ROMs 7-8), 2018 x2 (located in center of board)
+XTAL: 18.432MHz
+PROMs: 82s129 x6 (not dumped yet, probably match existing archives....)
+
+Note: MCU dump has fixed bits, but read is good. If not correct, it's protected.
+*/
+
 ROM_START( gigasb )
 	ROM_REGION( 2*0x10000, "main", 0 )
 	ROM_LOAD( "g-7",   0x10000, 0x4000, CRC(daf4e88d) SHA1(391dff914ce8e9b7975fc8827c066d7db16c4171) )

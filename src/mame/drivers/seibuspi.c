@@ -2682,6 +2682,90 @@ ROM_START(rdfta)
 	ROM_LOAD("gd_8.216",   0x200000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
 ROM_END
 
+
+/*
+Raiden Fighters 2 - 2000 Operation Hell Dive
+Seibu Kaihatsu Inc., 2000
+
+This game runs on a single PCB, not the usual SPI hardware that the previous Raiden
+Fighters games ran on.
+
+PCB Layout
+----------
+
+SYS386I
+|-----------------------------------------------------|
+|HA13118   6295   PCM0       OBJ4    OBJ5    OBJ6     |
+|    4560D 6295   PCM1   71256   OBJ1    OBJ2    OBJ3 |
+|                                                     |
+|              PAL  PAL  71256      |----------|      |
+|                                   |          |      |
+|        *     PAL  PAL    71256    |          |      |
+|                                   |  RISE10  |      |
+|                          71256    | (QFP240) |      |
+|J |--------|                       |          |      |
+|  |SIE150  |       |---------|     |----------|      |
+|A |(QFP100)|       |         |                       |
+|  |--------| 71256 |SEI400   |            28.6363MHz |
+|M                  |SB07-3460|                       |
+|             71256 |(QFP208) |                       |
+|M                  |---------|   TC551664            |
+|                                                     |
+|A   93C46            |---------| TC551664            |
+|            PAL      |         |                     |
+|                     |SEI600   |             PRG0-1  |
+|                     |SB08-1513| |--------|          |
+|                     |(QFP208) | | AM386  |          |
+|                     |---------| | DX40   |          |
+| FIX0   BG-1P. BG-1D             |(QFP132)|  PRG2-3  |
+| FIX1                            |--------|          |
+| FIX2   BG-2P  BG-2D                                 |
+|                                 40MHz        PAL    |
+|-----------------------------------------------------|
+Notes:
+      ROMs
+      ----
+           OBJ1, OBJ2, OBJ3 - Objects,  MX23C3210TC surface mounted 32MBit MaskROM (TSOP48)
+           OBJ4, OBJ5, OBJ6 - Objects,  MX23C1610TC surface mounted 16MBit MaskROM (TSOP48)
+                              Note - The PCB is wired to accept MX32C3210 32MBit MaskROMs in all OBJ positions.
+
+           PRG0-1, PRG2-3   - Main program,  LH28F800SU surface mounted 8MBit FlashROM (TSOP56)
+                              Note - The PCB is wired to accept DIP32 27C040 4MBit EPROMs here also with positions
+                              labelled PRG0, PRG1, PRG2 & PRG3
+
+           BG-1P, BG-2P     - Backgrounds, MX29F1610MC surface mounted 16MBit FlashROM (SOP44)
+           BG-1D, BG-2D     - Backgrounds, MX23C3210MC surface mounted 32MBit MaskROM (SOP44)
+           
+           PCM0, PCM1       - PCM sound samples, 27C4001 4MBit EPROM (DIP32)
+
+           FIX0, FIX1, FIX2 - 27C512 EPROM (DIP28)
+
+      Clocks
+      ------
+            M6295 clock -   1.431815MHz (both, 28.6363MHz / 20),  sample rate = M6295 clock / 132 (both)
+            AM386 clock -   40.000MHz
+            VSync       -   54Hz
+
+      RAM
+      ---
+         TC551664 - Toshiba TC551664J-15 1MBit SRAM (64k x16, SOJ44)
+         71256    - 256k SRAM (32k x8, SOJ28)
+
+      Custom IC's
+      -----------
+                 RISE10 (QFP240)
+                 SEI400 (QFP208)
+                 SEI600 (QFP208)
+                 SIE150 (QFP100)
+
+      Other
+      -----
+           93C46   - 128bytes EEPROM (SOIC8, not dumped)
+           HA13118 - 18W audio power AMP
+           4560D   - Op AMP (DIP8)
+           *       - Unpopulated position for Xilinx XC9572 CPLD
+*/
+
 ROM_START(rdft2us)	/* Single board version SXX2F */
 	ROM_REGION32_LE(0x200000, "user1", 0)	/* i386 program */
 	ROM_LOAD32_BYTE("prg0.u0259", 0x000000, 0x80000, CRC(ff3eeec1) SHA1(88c1741e4936db9a5b13e562061b0f1cc6fa6b36) )
@@ -3089,13 +3173,13 @@ GAME( 1995, viprp1hk,  viprp1,  spi,      spi_3button, viprp1,  ROT270, "Seibu K
 
 GAME( 1996, ejanhs,    0,       spi,      spi_ejanhs,  ejanhs,   ROT0,   "Seibu Kaihatsu", "E-Jan High School (Japan)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 
-GAME( 1996, rdft,      0,       spi,      spi_3button, rdft,     ROT270, "Seibu Kaihatsu", "Raiden Fighters (Japan set 1)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, rdftu,     rdft,    spi,      spi_3button, rdft,     ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters (US)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, rdftau,    rdft,    spi,      spi_3button, rdft,     ROT270, "Seibu Kaihatsu", "Raiden Fighters (Australia)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, rdftj,     rdft,    spi,      spi_3button, rdft,     ROT270, "Seibu Kaihatsu", "Raiden Fighters (Japan set 2)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, rdftdi,    rdft,    spi,      spi_3button, rdft,     ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters (Dream Island Co. license)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, rdftit,    rdft,    spi,      spi_3button, rdft,     ROT270, "Seibu Kaihatsu", "Raiden Fighters (Italy)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, rdfta,    rdft,    spi,      spi_3button, rdft,     ROT270, "Seibu Kaihatsu", "Raiden Fighters (Austria)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, rdft,      0,       spi,      spi_3button, rdft, ROT270, "Seibu Kaihatsu", "Raiden Fighters (Japan set 1)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, rdftu,     rdft,    spi,      spi_3button, rdft, ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters (US)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, rdftau,    rdft,    spi,      spi_3button, rdft, ROT270, "Seibu Kaihatsu", "Raiden Fighters (Australia)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, rdftj,     rdft,    spi,      spi_3button, rdft, ROT270, "Seibu Kaihatsu", "Raiden Fighters (Japan set 2)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, rdftdi,    rdft,    spi,      spi_3button, rdft, ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters (Dream Island Co. license)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, rdftit,    rdft,    spi,      spi_3button, rdft, ROT270, "Seibu Kaihatsu", "Raiden Fighters (Italy)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, rdfta,     rdft,    spi,      spi_3button, rdft, ROT270, "Seibu Kaihatsu", "Raiden Fighters (Austria)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 
 GAME( 1997, rdft2,     0,       spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu (Tuning license)", "Raiden Fighters 2",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1997, rdft2a2,   rdft2,   spi,      spi_2button, rdft2,  ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters 2 (Asia, Dream Island license, SPI)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )

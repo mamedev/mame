@@ -2910,7 +2910,38 @@ ROM_START( racinfru )
 	ROM_LOAD( "250a18.12y", 0x200000, 2*1024*1024, CRC(8014a2eb) SHA1(d82f0a7d559340ae05a78ecc8bb69bb35b9c0658) )
 ROM_END
 
-/* Konami's Open Golf Championship - version EAE */
+
+/* 
+Open Golf Championship - version EAE
+Konami, 1994
+
+This game runs on Konami GX hardware (Type 1 bottom board)
+
+Top Board = Standard System GX CPU Board (PWB354192C)
+
+PCB Layout (Bottom Board)
+
+PWB354207B
+--------------------------------------
+A23   
+A22   A26
+A21   A25       A07    M514256(x12)
+A20   A24       A06
+                                 A18
+                                 A17
+           41256                 A16
+           41256 CXK5864 056540  A15
+     053936      CXK5864         A14
+           41256         CXK5864 A13
+                                 A12
+                                 A11
+                   D03 A05       A10
+                   D02 A04       A09
+                                 A08
+--------------------------------------
+
+*/
+
 ROM_START( opengolf )
 	/* main program */
 	ROM_REGION( 0x800000, "main", 0 )

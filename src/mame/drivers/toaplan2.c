@@ -4318,6 +4318,46 @@ ROM_START( kbash )
 ROM_END
 
 
+/*
+Knuckle Bash 2
+This is a hacked version of Knuckle Bash on bootleg/Korean/Chinese
+hardware showing (C)Toaplan 1999 Licensed to Charterfield
+
+PCB Layout
+----------
+
+|--------------------------------------------|
+|UPC1241  EPROM  MECAT-S                     |
+|  LM324                                     |
+|        M6295  M6295                        |
+| PAL   62256                      M5M51008  |
+|       62256    MECAT-M           M5M51008  |
+|        6116                      M5M51008  |
+|J       6116         14.31818MHz  M5M51008  |
+|A             68000                         |
+|M                    16MHz                  |
+|M                  PAL                      |
+|A             PAL                           |
+|        |-------|                           |
+|        |ACTEL  |         PAL               |
+|        |A40MX04|         PAL               |
+|        |       |                           |
+|   DSW1 |-------|         050917-10         |
+|        |ACTEL  |                           |
+|   DSW2 |A40MX04| MECAT-12                  |
+|62256   |       |                           |
+|62256   |-------| MECAT-34                  |
+|--------------------------------------------|
+Notes:
+      68000 clock 16.000MHz
+      M6295 clock 1.000MHz [16/16]. Sample rate (Hz) 16000000/16/132
+      M5M51008 - Mitsubishi M5M51008 128k x8 SRAM (SOP32)
+      62256    - 32k x8 SRAM
+      6116     - 2k x8 SRAM
+      VSync 60Hz
+      HSync 15.68kHz
+*/
+
 ROM_START( kbash2 )
 	ROM_REGION( 0x80000, "main", 0 )			/* Main 68K code */
 	ROM_LOAD16_WORD_SWAP( "mecat-m", 0x000000, 0x80000, CRC(bd2263c6) SHA1(eb794c0fc9c1fb4337114d48149283d42d22e4b3) )

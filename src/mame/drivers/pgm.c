@@ -3287,6 +3287,58 @@ ROM_START( killbldt )
 	ROM_LOAD( "m0300.u1",     0x400000, 0x400000, CRC(93159695) SHA1(50c5976c9b681bd3d1ebefa3bfa9fe6e72dcb96f) )
 ROM_END
 
+
+/*
+Puzzle Star
+IGS, 1999
+
+Cart for IGS PGM system. This game is a 'columns' type game.
+
+PCB Layout
+----------
+
+IGS PCB NO- T0236
+|-----------------------------------------------|
+|                        U6 U7                  |
+|         |-------|                             |
+|         |IGS027A|                             |
+|         |       |                     T0800.U5|
+|         |       |                             |
+|         |-------|                             |
+|          U1_V100MG.U1                         |
+|          U2_V100MG.U2   U3   PAL              |
+|                                               |
+|-|                                           |-|
+  |--------------------||---------------------|
+Notes:
+      IGS027A       - Custom IGS IC, ARM7/9? based CPU (QFP120, stamped 'IGS027A' & labelled 'ENGLISH')
+      T0800.U5      - 16MBit MaskROM (DIP42)
+      U1_V100MG.U1  - MX27C4000 512K x8 EPROM (DIP32, labelled 'PuzzleStar U1 V100MG')
+      U2_V100MG.U2  - MX27C4000 512K x8 EPROM (DIP32, labelled 'PuzzleStar U2 V100MG')
+      PAL           - Atmel ATF22V10B PAL (DIP24, labelled 'EA U4')
+      U3            - Unpopulated position for 32MBit MASKROM (DIP42)
+      U6, U7        - Unpopulated position for 74LS245 logic chip (x2)
+      
+
+IGS PCB NO- T0237
+|-----------------------------------------------|
+|                                               |
+|                                               |
+|                                               |
+|                                               |
+|       A0800.U1   M0800.U2   B0800.U3          |
+|                                               |
+|                                               |
+|                                               |
+|                                               |
+|-|                                           |-|
+  |--------------------||---------------------|
+Notes:
+      U1 - 32MBit MaskROM (DIP42)
+      U2 - 32MBit MaskROM (DIP42)
+      U3 - 16MBit MaskROM (DIP42)
+*/
+
 ROM_START( puzlstar )
 	ROM_REGION( 0x600000, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "pgm_p01s.rom", 0x000000, 0x020000, CRC(e42b166e) SHA1(2a9df9ec746b14b74fae48b1a438da14973702ea) ) // (BIOS)
