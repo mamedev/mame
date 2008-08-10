@@ -125,13 +125,13 @@ static void doclr(int opcode,UINT16 fill,int *dst,INT16 _ax,INT16 _ay)
 		ax = _ax;
 		if (_ay < 0)
 		{
-			*dst = (*dst + 384 - ax) & (HD63484_RAM_SIZE-1);
+			*dst = (*dst + (HD63484_reg[0xca/2] & 0x0fff) * 2 - ax) & (HD63484_RAM_SIZE-1);
 			if (ay == 0) break;
 			ay++;
 		}
 		else
 		{
-			*dst = (*dst - 384 - ax) & (HD63484_RAM_SIZE-1);
+			*dst = (*dst - (HD63484_reg[0xca/2] & 0x0fff) * 2 - ax) & (HD63484_RAM_SIZE-1);
 			if (ay == 0) break;
 			ay--;
 		}
@@ -147,14 +147,14 @@ static void docpy(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 	switch (opcode & 0x0700)
 	{
 		default:
-		case 0x0000: dstep1 =  1; dstep2 = -384 - ax * dstep1; break;
-		case 0x0100: dstep1 =  1; dstep2 =  384 - ax * dstep1; break;
-		case 0x0200: dstep1 = -1; dstep2 = -384 + ax * dstep1; break;
-		case 0x0300: dstep1 = -1; dstep2 =  384 + ax * dstep1; break;
-		case 0x0400: dstep1 = -384; dstep2 =  1 - ay * dstep1; break;
-		case 0x0500: dstep1 =  384; dstep2 =  1 - ay * dstep1; break;
-		case 0x0600: dstep1 = -384; dstep2 = -1 + ay * dstep1; break;
-		case 0x0700: dstep1 =  384; dstep2 = -1 + ay * dstep1; break; // used by kothello
+		case 0x0000: dstep1 =  1; dstep2 = -1 * (HD63484_reg[0xca/2] & 0x0fff) * 2 - ax * dstep1; break;
+		case 0x0100: dstep1 =  1; dstep2 =      (HD63484_reg[0xca/2] & 0x0fff) * 2 - ax * dstep1; break;
+		case 0x0200: dstep1 = -1; dstep2 = -1 * (HD63484_reg[0xca/2] & 0x0fff) * 2 + ax * dstep1; break;
+		case 0x0300: dstep1 = -1; dstep2 =      (HD63484_reg[0xca/2] & 0x0fff) * 2 + ax * dstep1; break;
+		case 0x0400: dstep1 = -1 * (HD63484_reg[0xca/2] & 0x0fff) * 2; dstep2 =  1 - ay * dstep1; break;
+		case 0x0500: dstep1 =      (HD63484_reg[0xca/2] & 0x0fff) * 2; dstep2 =  1 - ay * dstep1; break;
+		case 0x0600: dstep1 = -1 * (HD63484_reg[0xca/2] & 0x0fff) * 2; dstep2 = -1 + ay * dstep1; break;
+		case 0x0700: dstep1 =      (HD63484_reg[0xca/2] & 0x0fff) * 2; dstep2 = -1 + ay * dstep1; break; // used by kothello
 	}
 
 	for (;;)
@@ -194,13 +194,13 @@ static void docpy(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 				if (ay == 0) break;
 				if (_ay > 0)
 				{
-					src = (src - 384) & (HD63484_RAM_SIZE-1);
+					src = (src - (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
 					*dst = (*dst + dstep1) & (HD63484_RAM_SIZE-1);
 					ay--;
 				}
 				else
 				{
-					src = (src + 384) & (HD63484_RAM_SIZE-1);
+					src = (src + (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
 					*dst = (*dst + dstep1) & (HD63484_RAM_SIZE-1);
 					ay++;
 				}
@@ -228,14 +228,14 @@ static void docpy(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 			ay = _ay;
 			if (_ax < 0)
 			{
-				src = (src - 1 + ay * 384) & (HD63484_RAM_SIZE-1);
+				src = (src - 1 + ay * (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
 				*dst = (*dst + dstep2) & (HD63484_RAM_SIZE-1);
 				if (ax == 0) break;
 				ax++;
 			}
 			else
 			{
-				src = (src + 1 - ay * 384) & (HD63484_RAM_SIZE-1);
+				src = (src + 1 - ay * (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
 				*dst = (*dst + dstep2) & (HD63484_RAM_SIZE-1);
 				if (ax == 0) break;
 				ax--;
@@ -246,14 +246,14 @@ static void docpy(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 			ax = _ax;
 			if (_ay < 0)
 			{
-				src = (src + 384 - ax) & (HD63484_RAM_SIZE-1);
+				src = (src + (HD63484_reg[0xca/2] & 0x0fff) * 2 - ax) & (HD63484_RAM_SIZE-1);
 				*dst = (*dst + dstep2) & (HD63484_RAM_SIZE-1);
 				if (ay == 0) break;
 				ay++;
 			}
 			else
 			{
-				src = (src - 384 - ax) & (HD63484_RAM_SIZE-1);
+				src = (src - (HD63484_reg[0xca/2] & 0x0fff) * 2 - ax) & (HD63484_RAM_SIZE-1);
 				*dst = (*dst + dstep2) & (HD63484_RAM_SIZE-1);
 				if (ay == 0) break;
 				ay--;
@@ -467,7 +467,7 @@ logerror("unsupported register\n");
 			{
 				while (ax)
 				{
-					dst = (2*org + cpx - cpy * 384) & (HD63484_RAM_SIZE-1);
+					dst = (2*org + cpx - cpy * (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
 					PLOT(dst,fifo[0] & 0x0007)
 
 					if (ax > 0)
@@ -487,7 +487,7 @@ logerror("unsupported register\n");
 			{
 				while (ay)
 				{
-					dst = (2*org + cpx - cpy * 384) & (HD63484_RAM_SIZE-1);
+					dst = (2*org + cpx - cpy * (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
 					PLOT(dst,fifo[0] & 0x0007)
 
 					if (ay > 0)
@@ -513,7 +513,7 @@ logerror("unsupported register\n");
 
 			pcx = fifo[1];
 			pcy = fifo[2];
-			dst = (2*org + cpx - cpy * 384) & (HD63484_RAM_SIZE-1);
+			dst = (2*org + cpx - cpy * (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
 
 			ax = pcx - cpx;
 			for (;;)
@@ -541,12 +541,12 @@ logerror("unsupported register\n");
 				if (ay == 0) break;
 				else if (ay > 0)
 				{
-					dst = (dst - 384) & (HD63484_RAM_SIZE-1);
+					dst = (dst - (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
 					ay--;
 				}
 				else
 				{
-					dst = (dst + 384) & (HD63484_RAM_SIZE-1);
+					dst = (dst + (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
 					ay++;
 				}
 			}
@@ -577,12 +577,12 @@ logerror("unsupported register\n");
 				if (ay == 0) break;
 				else if (ay > 0)
 				{
-					dst = (dst - 384) & (HD63484_RAM_SIZE-1);
+					dst = (dst - (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
 					ay--;
 				}
 				else
 				{
-					dst = (dst + 384) & (HD63484_RAM_SIZE-1);
+					dst = (dst + (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
 					ay++;
 				}
 			}
@@ -598,7 +598,7 @@ logerror("unsupported register\n");
 			pcy = fifo[2];
 			ax = pcx - cpx;
 			ay = pcy - cpy;
-			dst = (2*org + cpx - cpy * 384) & (HD63484_RAM_SIZE-1);
+			dst = (2*org + cpx - cpy * (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
 
 			for (;;)
 			{
@@ -622,13 +622,13 @@ logerror("unsupported register\n");
 				ax = pcx - cpx;
 				if (pcy < cpy)
 				{
-					dst = (dst + 384 - ax) & (HD63484_RAM_SIZE-1);
+					dst = (dst + (HD63484_reg[0xca/2] & 0x0fff) * 2 - ax) & (HD63484_RAM_SIZE-1);
 					if (ay == 0) break;
 					ay++;
 				}
 				else
 				{
-					dst = (dst - 384 - ax) & (HD63484_RAM_SIZE-1);
+					dst = (dst - (HD63484_reg[0xca/2] & 0x0fff) * 2 - ax) & (HD63484_RAM_SIZE-1);
 					if (ay == 0) break;
 					ay--;
 				}
@@ -639,7 +639,7 @@ logerror("unsupported register\n");
 		{
 			int dst;
 
-			dst = (2*org + cpx - cpy * 384) & (HD63484_RAM_SIZE-1);
+			dst = (2*org + cpx - cpy * (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
 
 			PLOT(dst,fifo[0] & 0x0007)
 		}
@@ -652,13 +652,13 @@ logerror("unsupported register\n");
 			pcx = fifo[1];
 			pcy = fifo[2];
 
-			src = (2*org + pcx - pcy * 384) & (HD63484_RAM_SIZE-1);
-			dst = (2*org + cpx - cpy * 384) & (HD63484_RAM_SIZE-1);
+			src = (2*org + pcx - pcy * (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
+			dst = (2*org + cpx - cpy * (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
 
 			docpy(fifo[0],src,&dst,fifo[3],fifo[4]);
 
-			cpx = (dst - 2*org) % 384;
-			cpy = (dst - 2*org) / 384;
+			cpx = (dst - 2*org) % ((HD63484_reg[0xca/2] & 0x0fff) * 2);
+			cpy = (dst - 2*org) / ((HD63484_reg[0xca/2] & 0x0fff) * 2);
 		}
 		else
 {
@@ -760,7 +760,7 @@ static VIDEO_UPDATE( shanghai )
 	b = 2 * (((HD63484_reg[0xcc/2] & 0x000f) << 16) + HD63484_reg[0xce/2]);
 	for (y = 0;y < 280;y++)
 	{
-		for (x = 0 ; x<384 ; x++)
+		for (x = 0 ; x<(HD63484_reg[0xca/2] & 0x0fff) * 2 ; x++)
 		{
 			b &= (HD63484_RAM_SIZE-1);
 			*BITMAP_ADDR16(bitmap, y, x) = HD63484_ram[b];
@@ -780,10 +780,10 @@ static VIDEO_UPDATE( shanghai )
 
 		for (y = sy ; y <= sy + h && y < 280 ; y++)
 		{
-			for (x = 0 ; x < 384 ; x++)
+			for (x = 0 ; x < (HD63484_reg[0xca/2] & 0x0fff) * 2 ; x++)
 			{
 				b &= (HD63484_RAM_SIZE - 1);
-				if (x <= w && x + sx >= 0 && x + sx < 384)
+				if (x <= w && x + sx >= 0 && x + sx < (HD63484_reg[0xca/2] & 0x0fff) * 2)
 					*BITMAP_ADDR16(bitmap, y, x + sx) = HD63484_ram[b];
 
 				b++;
@@ -1125,7 +1125,7 @@ static MACHINE_DRIVER_START( shanghai )
 	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 280)
-	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
 
 	MDRV_PALETTE_LENGTH(256)
 
@@ -1158,7 +1158,7 @@ static MACHINE_DRIVER_START( shangha2 )
 	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 280)
-	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
 
 	MDRV_PALETTE_LENGTH(256)
 
@@ -1195,7 +1195,7 @@ static MACHINE_DRIVER_START( kothello )
 	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 384)
-	MDRV_SCREEN_VISIBLE_AREA(8, 384-4-1, 0, 250-1)
+	MDRV_SCREEN_VISIBLE_AREA(8, 384-1, 0, 250-1) // Base Screen is 376 pixel
 
 	MDRV_PALETTE_LENGTH(256)
 
