@@ -681,7 +681,7 @@ static UINT8 copro_sm7831;
 static int lucky74_adpcm_pos;
 static int lucky74_adpcm_end;
 static int lucky74_adpcm_data;
-static UINT8 lucky74_adpcm_reg[5];
+static UINT8 lucky74_adpcm_reg[6];
 static UINT8 lucky74_adpcm_busy_line;
 
 
