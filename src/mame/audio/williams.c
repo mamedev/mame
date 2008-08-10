@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( williams_adpcm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2400, 0x2400) AM_MIRROR(0x03fe) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x2401, 0x2401) AM_MIRROR(0x03fe) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0x2800, 0x2800) AM_MIRROR(0x03ff) AM_WRITE(DAC_0_data_w)
-	AM_RANGE(0x2c00, 0x2c00) AM_MIRROR(0x03ff) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+	AM_RANGE(0x2c00, 0x2c00) AM_MIRROR(0x03ff) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x03ff) AM_READ(adpcm_command_r)
 	AM_RANGE(0x3400, 0x3400) AM_MIRROR(0x03ff) AM_WRITE(adpcm_6295_bank_select_w)
 	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x03ff) AM_WRITE(adpcm_talkback_w)
@@ -626,7 +626,7 @@ static WRITE8_HANDLER( adpcm_bank_select_w )
 
 static WRITE8_HANDLER( adpcm_6295_bank_select_w )
 {
-	OKIM6295_set_bank_base(0, (data & 7) * 0x40000);
+	okim6295_set_bank_base(0, (data & 7) * 0x40000);
 }
 
 

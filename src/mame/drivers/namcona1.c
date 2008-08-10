@@ -1367,7 +1367,7 @@ static ADDRESS_MAP_START( namcona2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16)
 ADDRESS_MAP_END
 
-static struct NAMCONAinterface NAMCONA_interface =
+static namcona_interface NAMCONA_interface =
 {
 	NULL,
 	0x70000/2

@@ -176,7 +176,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",activecpu_get_pc(),data);
 	/* bit 3 is unknown (used, e.g. marukin pulses it on the title screen) */
 
 	/* bit 4 selects OKI M6295 bank */
-	if (sndti_exists(SOUND_OKIM6295,0)) OKIM6295_set_bank_base(0, (data & 0x10) ? 0x40000 : 0x00000);
+	if (sndti_exists(SOUND_OKIM6295,0)) okim6295_set_bank_base(0, (data & 0x10) ? 0x40000 : 0x00000);
 
 	/* bit 5 is palette RAM bank selector (doesn't apply to mgakuen) */
 	paletteram_bank = data & 0x20;
@@ -211,7 +211,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",activecpu_get_pc(),data);
 	/* bit 3 is unknown (used, e.g. marukin pulses it on the title screen) */
 
 	/* bit 4 selects OKI M6295 bank */
-//  OKIM6295_set_bank_base(0, (data & 0x10) ? 0x40000 : 0x00000);
+//  okim6295_set_bank_base(0, (data & 0x10) ? 0x40000 : 0x00000);
 	/* not here.. it has its own z80 + sound banking */
 
 	/* bit 5 is palette RAM bank selector (doesn't apply to mgakuen) */

@@ -924,8 +924,8 @@ static WRITE16_HANDLER( megadriv_vdp_w )
 		case 0x12:
 		case 0x14:
 		case 0x16:
-			if (ACCESSING_BITS_0_7) SN76496_0_w(machine, 0, data & 0xff);
-			//if (ACCESSING_BITS_8_15) SN76496_0_w(machine, 0, (data >>8) & 0xff);
+			if (ACCESSING_BITS_0_7) sn76496_0_w(machine, 0, data & 0xff);
+			//if (ACCESSING_BITS_8_15) sn76496_0_w(machine, 0, (data >>8) & 0xff);
 			break;
 
 		default:
@@ -2387,7 +2387,7 @@ static WRITE8_HANDLER( megadriv_z80_vdp_write )
 		case 0x13:
 		case 0x15:
 		case 0x17:
-			SN76496_0_w(machine, 0, data);
+			sn76496_0_w(machine, 0, data);
 			break;
 
 		default:
@@ -2418,7 +2418,7 @@ static WRITE8_HANDLER( z80_write_68k_banked_data )
 	else if (fulladdress == 0xc00011)
 	{
 		/* quite a few early games write here, most of the later ones don't */
-		SN76496_0_w(machine, 0, data);
+		sn76496_0_w(machine, 0, data);
 	}
 	else
 	{

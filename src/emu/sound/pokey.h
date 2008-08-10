@@ -14,8 +14,10 @@
  *
  *****************************************************************************/
 
-#ifndef _POKEYSOUND_H
-#define _POKEYSOUND_H
+#pragma once
+
+#ifndef __POKEY_H__
+#define __POKEY_H__
 
 #include "sndintrf.h"
 
@@ -66,7 +68,9 @@
  *  New function pointers for serial input/output and a interrupt callback.
  *****************************************************************************/
 
-struct POKEYinterface {
+typedef struct _pokey_interface pokey_interface;
+struct _pokey_interface
+{
 	read8_machine_func pot_r[8];
 	read8_machine_func allpot_r;
 	read8_machine_func serin_r;
@@ -102,4 +106,4 @@ void pokey2_kbcode_w (int kbcode, int make);
 void pokey3_kbcode_w (int kbcode, int make);
 void pokey4_kbcode_w (int kbcode, int make);
 
-#endif	/* POKEYSOUND_H */
+#endif	/* __POKEY_H__ */

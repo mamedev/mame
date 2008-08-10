@@ -126,10 +126,10 @@ static READ16_HANDLER( sound_r )
 	int reg = offset * 2;
 
 	if (ACCESSING_BITS_8_15)
-		r |= K054539_0_r(machine, reg+0) << 8;
+		r |= k054539_0_r(machine, reg+0) << 8;
 
 	if (ACCESSING_BITS_0_7)
-		r |= K054539_0_r(machine, reg+1) << 0;
+		r |= k054539_0_r(machine, reg+1) << 0;
 
 	return r;
 }
@@ -139,10 +139,10 @@ static WRITE16_HANDLER( sound_w )
 	int reg = offset * 2;
 
 	if (ACCESSING_BITS_8_15)
-		K054539_0_w(machine, reg+0, (data >> 8) & 0xff);
+		k054539_0_w(machine, reg+0, (data >> 8) & 0xff);
 
 	if (ACCESSING_BITS_0_7)
-		K054539_0_w(machine, reg+1, (data >> 0) & 0xff);
+		k054539_0_w(machine, reg+1, (data >> 0) & 0xff);
 }
 
 static READ16_HANDLER( K056800_68k_r )

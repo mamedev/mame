@@ -79,7 +79,7 @@ static ADDRESS_MAP_START( map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf830, 0xf830) AM_READWRITE(AY8910_read_port_0_r,AY8910_write_port_0_w)
 	AM_RANGE(0xf840, 0xf840) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(goldstar_fa00_w)
-	AM_RANGE(0xfb00, 0xfb00) AM_READWRITE(OKIM6295_status_0_r,OKIM6295_data_0_w)
+	AM_RANGE(0xfb00, 0xfb00) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
 	AM_RANGE(0xfd00, 0xfdff) AM_READWRITE(SMH_RAM,paletteram_BBGGGRRR_w) AM_BASE(&paletteram)
 	AM_RANGE(0xfe00, 0xfe00) AM_READWRITE(protection_r,protection_w)
 ADDRESS_MAP_END

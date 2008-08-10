@@ -68,8 +68,8 @@ static UINT32 volume_table[16];
 static int tables_computed = 0;
 
 /* useful interfaces */
-const struct OKIM6295interface okim6295_interface_pin7high = { 1 };
-const struct OKIM6295interface okim6295_interface_pin7low = { 0 };
+const okim6295_interface okim6295_interface_pin7high = { 1 };
+const okim6295_interface okim6295_interface_pin7low = { 0 };
 
 
 
@@ -318,7 +318,7 @@ static void okim6295_state_save_register(struct okim6295 *info, int sndindex)
 
 static void *okim6295_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	const struct OKIM6295interface *intf = config;
+	const okim6295_interface *intf = config;
 	struct okim6295 *info;
 	int voice;
 	int divisor = intf->pin7 ? 132 : 165;
@@ -373,11 +373,11 @@ static void okim6295_reset(void *chip)
 
 /**********************************************************************************************
 
-     OKIM6295_set_bank_base -- set the base of the bank for a given voice on a given chip
+     okim6295_set_bank_base -- set the base of the bank for a given voice on a given chip
 
 ***********************************************************************************************/
 
-void OKIM6295_set_bank_base(int which, int base)
+void okim6295_set_bank_base(int which, int base)
 {
 	struct okim6295 *info = sndti_token(SOUND_OKIM6295, which);
 	stream_update(info->stream);
@@ -388,11 +388,11 @@ void OKIM6295_set_bank_base(int which, int base)
 
 /**********************************************************************************************
 
-     OKIM6295_set_pin7 -- adjust pin 7, which controls the internal clock division
+     okim6295_set_pin7 -- adjust pin 7, which controls the internal clock division
 
 ***********************************************************************************************/
 
-void OKIM6295_set_pin7(int which, int pin7)
+void okim6295_set_pin7(int which, int pin7)
 {
 	struct okim6295 *info = sndti_token(SOUND_OKIM6295, which);
 	int divisor = pin7 ? 132 : 165;
@@ -403,11 +403,11 @@ void OKIM6295_set_pin7(int which, int pin7)
 
 /**********************************************************************************************
 
-     OKIM6295_status_r -- read the status port of an OKIM6295-compatible chip
+     okim6295_status_r -- read the status port of an OKIM6295-compatible chip
 
 ***********************************************************************************************/
 
-static int OKIM6295_status_r(int num)
+static int okim6295_status_r(int num)
 {
 	struct okim6295 *info = sndti_token(SOUND_OKIM6295, num);
 	int i, result;
@@ -432,11 +432,11 @@ static int OKIM6295_status_r(int num)
 
 /**********************************************************************************************
 
-     OKIM6295_data_w -- write to the data port of an OKIM6295-compatible chip
+     okim6295_data_w -- write to the data port of an OKIM6295-compatible chip
 
 ***********************************************************************************************/
 
-static void OKIM6295_data_w(int num, int data)
+static void okim6295_data_w(int num, int data)
 {
 	struct okim6295 *info = sndti_token(SOUND_OKIM6295, num);
 
@@ -524,114 +524,114 @@ static void OKIM6295_data_w(int num, int data)
 
 /**********************************************************************************************
 
-     OKIM6295_status_0_r -- generic status read functions
-     OKIM6295_status_1_r
+     okim6295_status_0_r -- generic status read functions
+     okim6295_status_1_r
 
 ***********************************************************************************************/
 
-READ8_HANDLER( OKIM6295_status_0_r )
+READ8_HANDLER( okim6295_status_0_r )
 {
-	return OKIM6295_status_r(0);
+	return okim6295_status_r(0);
 }
 
-READ8_HANDLER( OKIM6295_status_1_r )
+READ8_HANDLER( okim6295_status_1_r )
 {
-	return OKIM6295_status_r(1);
+	return okim6295_status_r(1);
 }
 
-READ8_HANDLER( OKIM6295_status_2_r )
+READ8_HANDLER( okim6295_status_2_r )
 {
-	return OKIM6295_status_r(2);
+	return okim6295_status_r(2);
 }
 
-READ16_HANDLER( OKIM6295_status_0_lsb_r )
+READ16_HANDLER( okim6295_status_0_lsb_r )
 {
-	return OKIM6295_status_r(0);
+	return okim6295_status_r(0);
 }
 
-READ16_HANDLER( OKIM6295_status_1_lsb_r )
+READ16_HANDLER( okim6295_status_1_lsb_r )
 {
-	return OKIM6295_status_r(1);
+	return okim6295_status_r(1);
 }
 
-READ16_HANDLER( OKIM6295_status_2_lsb_r )
+READ16_HANDLER( okim6295_status_2_lsb_r )
 {
-	return OKIM6295_status_r(2);
+	return okim6295_status_r(2);
 }
 
-READ16_HANDLER( OKIM6295_status_0_msb_r )
+READ16_HANDLER( okim6295_status_0_msb_r )
 {
-	return OKIM6295_status_r(0) << 8;
+	return okim6295_status_r(0) << 8;
 }
 
-READ16_HANDLER( OKIM6295_status_1_msb_r )
+READ16_HANDLER( okim6295_status_1_msb_r )
 {
-	return OKIM6295_status_r(1) << 8;
+	return okim6295_status_r(1) << 8;
 }
 
-READ16_HANDLER( OKIM6295_status_2_msb_r )
+READ16_HANDLER( okim6295_status_2_msb_r )
 {
-	return OKIM6295_status_r(2) << 8;
+	return okim6295_status_r(2) << 8;
 }
 
 
 
 /**********************************************************************************************
 
-     OKIM6295_data_0_w -- generic data write functions
-     OKIM6295_data_1_w
+     okim6295_data_0_w -- generic data write functions
+     okim6295_data_1_w
 
 ***********************************************************************************************/
 
-WRITE8_HANDLER( OKIM6295_data_0_w )
+WRITE8_HANDLER( okim6295_data_0_w )
 {
-	OKIM6295_data_w(0, data);
+	okim6295_data_w(0, data);
 }
 
-WRITE8_HANDLER( OKIM6295_data_1_w )
+WRITE8_HANDLER( okim6295_data_1_w )
 {
-	OKIM6295_data_w(1, data);
+	okim6295_data_w(1, data);
 }
 
-WRITE8_HANDLER( OKIM6295_data_2_w )
+WRITE8_HANDLER( okim6295_data_2_w )
 {
-	OKIM6295_data_w(2, data);
+	okim6295_data_w(2, data);
 }
 
-WRITE16_HANDLER( OKIM6295_data_0_lsb_w )
+WRITE16_HANDLER( okim6295_data_0_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		OKIM6295_data_w(0, data & 0xff);
+		okim6295_data_w(0, data & 0xff);
 }
 
-WRITE16_HANDLER( OKIM6295_data_1_lsb_w )
+WRITE16_HANDLER( okim6295_data_1_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		OKIM6295_data_w(1, data & 0xff);
+		okim6295_data_w(1, data & 0xff);
 }
 
-WRITE16_HANDLER( OKIM6295_data_2_lsb_w )
+WRITE16_HANDLER( okim6295_data_2_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		OKIM6295_data_w(2, data & 0xff);
+		okim6295_data_w(2, data & 0xff);
 }
 
-WRITE16_HANDLER( OKIM6295_data_0_msb_w )
+WRITE16_HANDLER( okim6295_data_0_msb_w )
 {
 	if (ACCESSING_BITS_8_15)
-		OKIM6295_data_w(0, data >> 8);
+		okim6295_data_w(0, data >> 8);
 }
 
-WRITE16_HANDLER( OKIM6295_data_1_msb_w )
+WRITE16_HANDLER( okim6295_data_1_msb_w )
 {
 	if (ACCESSING_BITS_8_15)
-		OKIM6295_data_w(1, data >> 8);
+		okim6295_data_w(1, data >> 8);
 }
 
-WRITE16_HANDLER( OKIM6295_data_2_msb_w )
+WRITE16_HANDLER( okim6295_data_2_msb_w )
 {
 	if (ACCESSING_BITS_8_15)
-		OKIM6295_data_w(2, data >> 8);
+		okim6295_data_w(2, data >> 8);
 }
 
 

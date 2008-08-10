@@ -127,14 +127,14 @@ static MACHINE_RESET( arcadecl )
 
 static READ16_HANDLER( adpcm_r )
 {
-	return (OKIM6295_status_0_r(machine, offset) << 8) | 0x00ff;
+	return (okim6295_status_0_r(machine, offset) << 8) | 0x00ff;
 }
 
 
 static WRITE16_HANDLER( adpcm_w )
 {
 	if (ACCESSING_BITS_8_15)
-		OKIM6295_data_0_w(machine, offset, (data >> 8) & 0xff);
+		okim6295_data_0_w(machine, offset, (data >> 8) & 0xff);
 }
 
 
@@ -156,7 +156,7 @@ static WRITE16_HANDLER( latch_w )
 	/* lower byte being modified? */
 	if (ACCESSING_BITS_0_7)
 	{
-		OKIM6295_set_bank_base(0, (data & 0x80) ? 0x40000 : 0x00000);
+		okim6295_set_bank_base(0, (data & 0x80) ? 0x40000 : 0x00000);
 		atarigen_set_oki6295_vol(machine, (data & 0x001f) * 100 / 0x1f);
 	}
 }

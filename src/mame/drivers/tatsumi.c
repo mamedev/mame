@@ -216,7 +216,7 @@ static ADDRESS_MAP_START( apache3_v20_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x06000, 0x06001) AM_READ_PORT("IN0") // esw
 	AM_RANGE(0x08000, 0x08000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x08001, 0x08001) AM_READWRITE(tatsumi_hack_ym2151_r, YM2151_data_port_0_w)
-	AM_RANGE(0x0a000, 0x0a000) AM_READWRITE(tatsumi_hack_oki_r, OKIM6295_data_0_w)
+	AM_RANGE(0x0a000, 0x0a000) AM_READWRITE(tatsumi_hack_oki_r, okim6295_data_0_w)
 	AM_RANGE(0x0e000, 0x0e007) AM_READWRITE(apache3_adc_r, apache3_adc_w) //adc select
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -261,7 +261,7 @@ static ADDRESS_MAP_START( roundup5_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffef) AM_RAM
 	AM_RANGE(0xfff0, 0xfff0) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xfff1, 0xfff1) AM_READWRITE(tatsumi_hack_ym2151_r, YM2151_data_port_0_w)
-	AM_RANGE(0xfff4, 0xfff4) AM_READWRITE(tatsumi_hack_oki_r, OKIM6295_data_0_w)
+	AM_RANGE(0xfff4, 0xfff4) AM_READWRITE(tatsumi_hack_oki_r, okim6295_data_0_w)
 	AM_RANGE(0xfff8, 0xfff8) AM_READ_PORT("IN0")
 	AM_RANGE(0xfff9, 0xfff9) AM_READ_PORT("IN1")
 	AM_RANGE(0xfffc, 0xfffc) AM_READ_PORT("STICKX")
@@ -319,7 +319,7 @@ static ADDRESS_MAP_START( cyclwarr_z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffef) AM_RAM
 	AM_RANGE(0xfff0, 0xfff0) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xfff1, 0xfff1) AM_READWRITE(tatsumi_hack_ym2151_r, YM2151_data_port_0_w)
-	AM_RANGE(0xfff4, 0xfff4) AM_READWRITE(tatsumi_hack_oki_r, OKIM6295_data_0_w)
+	AM_RANGE(0xfff4, 0xfff4) AM_READWRITE(tatsumi_hack_oki_r, okim6295_data_0_w)
 	AM_RANGE(0xfffc, 0xfffc) AM_READ(soundlatch_r)
 	AM_RANGE(0xfffe, 0xfffe) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END

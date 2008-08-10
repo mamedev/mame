@@ -294,7 +294,7 @@ static void msm5232_reset(void *_chip)
 	msm5232_gate_update(chip);
 }
 
-static void msm5232_init(MSM5232 *chip, const struct MSM5232interface *intf, int clock, int rate)
+static void msm5232_init(MSM5232 *chip, const msm5232_interface *intf, int clock, int rate)
 {
 	int j;
 
@@ -776,7 +776,7 @@ static void MSM5232_update_one(void *param, stream_sample_t **inputs, stream_sam
 
 static void *msm5232_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	const struct MSM5232interface *intf = config;
+	const msm5232_interface *intf = config;
 	int rate = clock/CLOCK_RATE_DIVIDER;
 	MSM5232 *chip;
 
@@ -794,14 +794,14 @@ static void msm5232_stop (void *chip)
 	msm5232_shutdown(chip);
 }
 
-WRITE8_HANDLER ( MSM5232_0_w )
+WRITE8_HANDLER ( msm5232_0_w )
 {
 	MSM5232 *chip = sndti_token(SOUND_MSM5232, 0);
 	stream_update (chip->stream);
 	msm5232_write(chip, offset, data);
 }
 
-WRITE8_HANDLER ( MSM5232_1_w )
+WRITE8_HANDLER ( msm5232_1_w )
 {
 	MSM5232 *chip = sndti_token(SOUND_MSM5232, 1);
 	stream_update (chip->stream);

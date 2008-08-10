@@ -126,7 +126,7 @@ static void st0016_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 static void *st0016_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	const struct ST0016interface *intf = config;
+	const st0016_interface *intf = config;
 	struct st0016_info *info;
 
 	info = auto_malloc(sizeof(*info));

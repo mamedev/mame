@@ -596,8 +596,8 @@ static ADDRESS_MAP_START( donpachi_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0x800000, 0x800005) AM_READ(SMH_RAM					)	// Layer 2 Control
 	AM_RANGE(0x900000, 0x90007f) AM_READ(donpachi_videoregs_r		)	// Video Regs
 /**/AM_RANGE(0xa08000, 0xa08fff) AM_READ(SMH_RAM					)	// Palette
-	AM_RANGE(0xb00000, 0xb00001) AM_READ(OKIM6295_status_0_lsb_r	)	// M6295
-	AM_RANGE(0xb00010, 0xb00011) AM_READ(OKIM6295_status_1_lsb_r	)	//
+	AM_RANGE(0xb00000, 0xb00001) AM_READ(okim6295_status_0_lsb_r	)	// M6295
+	AM_RANGE(0xb00010, 0xb00011) AM_READ(okim6295_status_1_lsb_r	)	//
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")					// Inputs
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")					// Inputs + EEPROM
 ADDRESS_MAP_END
@@ -615,8 +615,8 @@ static ADDRESS_MAP_START( donpachi_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800005) AM_WRITE(SMH_RAM) AM_BASE(&cave_vctrl_2			)	// Layer 2 Control
 	AM_RANGE(0x900000, 0x90007f) AM_WRITE(SMH_RAM) AM_BASE(&cave_videoregs		)	// Video Regs
 	AM_RANGE(0xa08000, 0xa08fff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram16) AM_SIZE(&cave_paletteram_size)	// Palette
-	AM_RANGE(0xb00000, 0xb00003) AM_WRITE(OKIM6295_data_0_lsb_w				)	// M6295
-	AM_RANGE(0xb00010, 0xb00013) AM_WRITE(OKIM6295_data_1_lsb_w				)	//
+	AM_RANGE(0xb00000, 0xb00003) AM_WRITE(okim6295_data_0_lsb_w				)	// M6295
+	AM_RANGE(0xb00010, 0xb00013) AM_WRITE(okim6295_data_1_lsb_w				)	//
 	AM_RANGE(0xb00020, 0xb0002f) AM_WRITE(NMK112_okibank_lsb_w				)	//
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(cave_eeprom_msb_w					)	// EEPROM
 ADDRESS_MAP_END
@@ -1208,7 +1208,7 @@ static ADDRESS_MAP_START( hotdogst_sound_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r			)	//
 	AM_RANGE(0x50, 0x50) AM_READ(YM2203_status_port_0_r	)	// YM2203
 	AM_RANGE(0x51, 0x51) AM_READ(YM2203_read_port_0_r		)	//
-	AM_RANGE(0x60, 0x60) AM_READ(OKIM6295_status_0_r		)	// M6295
+	AM_RANGE(0x60, 0x60) AM_READ(okim6295_status_0_r		)	// M6295
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotdogst_sound_writeport, ADDRESS_SPACE_IO, 8 )
@@ -1216,7 +1216,7 @@ static ADDRESS_MAP_START( hotdogst_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(hotdogst_rombank_w		)	// ROM bank
 	AM_RANGE(0x50, 0x50) AM_WRITE(YM2203_control_port_0_w	)	// YM2203
 	AM_RANGE(0x51, 0x51) AM_WRITE(YM2203_write_port_0_w		)	//
-	AM_RANGE(0x60, 0x60) AM_WRITE(OKIM6295_data_0_w			)	// M6295
+	AM_RANGE(0x60, 0x60) AM_WRITE(okim6295_data_0_w			)	// M6295
 	AM_RANGE(0x70, 0x70) AM_WRITE(hotdogst_okibank_w		)	// Samples bank
 ADDRESS_MAP_END
 
@@ -1260,7 +1260,7 @@ static ADDRESS_MAP_START( mazinger_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x10) AM_WRITE(soundlatch_ack_w			)	// To Main CPU
 	AM_RANGE(0x50, 0x50) AM_WRITE(YM2203_control_port_0_w	)	// YM2203
 	AM_RANGE(0x51, 0x51) AM_WRITE(YM2203_write_port_0_w		)	//
-	AM_RANGE(0x70, 0x70) AM_WRITE(OKIM6295_data_0_w			)	// M6295
+	AM_RANGE(0x70, 0x70) AM_WRITE(okim6295_data_0_w			)	// M6295
 	AM_RANGE(0x74, 0x74) AM_WRITE(hotdogst_okibank_w		)	// Samples bank
 ADDRESS_MAP_END
 
@@ -1321,9 +1321,9 @@ static ADDRESS_MAP_START( metmqstr_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(metmqstr_rombank_w		)	// Rom Bank
 	AM_RANGE(0x50, 0x50) AM_WRITE(YM2151_register_port_0_w	)	// YM2151
 	AM_RANGE(0x51, 0x51) AM_WRITE(YM2151_data_port_0_w		)	//
-	AM_RANGE(0x60, 0x60) AM_WRITE(OKIM6295_data_0_w			)	// M6295 #0
+	AM_RANGE(0x60, 0x60) AM_WRITE(okim6295_data_0_w			)	// M6295 #0
 	AM_RANGE(0x70, 0x70) AM_WRITE(metmqstr_okibank0_w		)	// Samples Bank #0
-	AM_RANGE(0x80, 0x80) AM_WRITE(OKIM6295_data_1_w			)	// M6295 #1
+	AM_RANGE(0x80, 0x80) AM_WRITE(okim6295_data_1_w			)	// M6295 #1
 	AM_RANGE(0x90, 0x90) AM_WRITE(metmqstr_okibank1_w		)	// Samples Bank #1
 ADDRESS_MAP_END
 
@@ -1355,8 +1355,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pwrinst2_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(OKIM6295_status_0_r		)	// M6295
-	AM_RANGE(0x08, 0x08) AM_READ(OKIM6295_status_1_r		)	//
+	AM_RANGE(0x00, 0x00) AM_READ(okim6295_status_0_r		)	// M6295
+	AM_RANGE(0x08, 0x08) AM_READ(okim6295_status_1_r		)	//
 	AM_RANGE(0x40, 0x40) AM_READ(YM2203_status_port_0_r	)	// YM2203
 	AM_RANGE(0x41, 0x41) AM_READ(YM2203_read_port_0_r		)	//
 	AM_RANGE(0x60, 0x60) AM_READ(soundlatch_hi_r			)	// From Main CPU
@@ -1365,8 +1365,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pwrinst2_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(OKIM6295_data_0_w			)	// M6295
-	AM_RANGE(0x08, 0x08) AM_WRITE(OKIM6295_data_1_w			)	//
+	AM_RANGE(0x00, 0x00) AM_WRITE(okim6295_data_0_w			)	// M6295
+	AM_RANGE(0x08, 0x08) AM_WRITE(okim6295_data_1_w			)	//
 	AM_RANGE(0x10, 0x17) AM_WRITE(NMK112_okibank_w			)	// Samples bank
 	AM_RANGE(0x40, 0x40) AM_WRITE(YM2203_control_port_0_w	)	// YM2203
 	AM_RANGE(0x41, 0x41) AM_WRITE(YM2203_write_port_0_w		)	//
@@ -1437,8 +1437,8 @@ static ADDRESS_MAP_START( sailormn_sound_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r			)	// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r			)	//
 	AM_RANGE(0x51, 0x51) AM_READ(YM2151_status_port_0_r	)	// YM2151
-	AM_RANGE(0x60, 0x60) AM_READ(OKIM6295_status_0_r		)	// M6295 #0
-	AM_RANGE(0x80, 0x80) AM_READ(OKIM6295_status_1_r		)	// M6295 #1
+	AM_RANGE(0x60, 0x60) AM_READ(okim6295_status_0_r		)	// M6295 #0
+	AM_RANGE(0x80, 0x80) AM_READ(okim6295_status_1_r		)	// M6295 #1
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sailormn_sound_writeport, ADDRESS_SPACE_IO, 8 )
@@ -1447,9 +1447,9 @@ static ADDRESS_MAP_START( sailormn_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x10) AM_WRITE(soundlatch_ack_w			)	// To Main CPU
 	AM_RANGE(0x50, 0x50) AM_WRITE(YM2151_register_port_0_w	)	// YM2151
 	AM_RANGE(0x51, 0x51) AM_WRITE(YM2151_data_port_0_w		)	//
-	AM_RANGE(0x60, 0x60) AM_WRITE(OKIM6295_data_0_w			)	// M6295 #0
+	AM_RANGE(0x60, 0x60) AM_WRITE(okim6295_data_0_w			)	// M6295 #0
 	AM_RANGE(0x70, 0x70) AM_WRITE(sailormn_okibank0_w		)	// Samples Bank #0
-	AM_RANGE(0x80, 0x80) AM_WRITE(OKIM6295_data_1_w			)	// M6295 #1
+	AM_RANGE(0x80, 0x80) AM_WRITE(okim6295_data_1_w			)	// M6295 #1
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(sailormn_okibank1_w		)	// Samples Bank #1
 ADDRESS_MAP_END
 

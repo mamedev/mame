@@ -268,7 +268,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(SN76496_0_w)	/* Loads the snd command into the snd latch */
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(sn76496_0_w)	/* Loads the snd command into the snd latch */
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(SMH_NOP)		/* This address triggers the SN chip to read the data port. */
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(DAC_0_data_w)
 /* There are lots more addresses which are used for setting a two bit volume
@@ -292,7 +292,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hyprolyb_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x43ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(SN76496_0_w)	/* Loads the snd command into the snd latch */
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(sn76496_0_w)	/* Loads the snd command into the snd latch */
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(SMH_NOP)		/* This address triggers the SN chip to read the data port. */
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(DAC_0_data_w)
 /* There are lots more addresses which are used for setting a two bit volume
@@ -783,7 +783,7 @@ static GFXDECODE_START( trackfld )
 GFXDECODE_END
 
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	NULL,				/* VCK function */
 	MSM5205_S48_4B		/* 8 kHz */
@@ -870,7 +870,7 @@ static MACHINE_DRIVER_START( hyprolyb )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

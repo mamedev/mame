@@ -435,7 +435,7 @@ static ADDRESS_MAP_START( sound_map_2203, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_MIRROR(0x0800) AM_RAM
 	AM_RANGE(0xd000, 0xd000) AM_MIRROR(0x0ffe) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)
 	AM_RANGE(0xd001, 0xd001) AM_MIRROR(0x0ffe) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xe000, 0xe0ff) AM_MIRROR(0x0f00) AM_READWRITE(SegaPCM_r, SegaPCM_w)
+	AM_RANGE(0xe000, 0xe0ff) AM_MIRROR(0x0f00) AM_READWRITE(sega_pcm_r, sega_pcm_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap_2203, ADDRESS_SPACE_IO, 8 )
@@ -448,7 +448,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map_2151, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x700) AM_READWRITE(SegaPCM_r, SegaPCM_w)
+	AM_RANGE(0xf000, 0xf0ff) AM_MIRROR(0x700) AM_READWRITE(sega_pcm_r, sega_pcm_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -830,7 +830,7 @@ static const ym2151_interface ym2151_config =
 };
 
 
-static const struct SEGAPCMinterface segapcm_interface =
+static const sega_pcm_interface segapcm_interface =
 {
 	BANK_512
 };

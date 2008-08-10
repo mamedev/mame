@@ -421,26 +421,26 @@ static void topspeed_msm5205_vck(running_machine *machine, int chip)
 
 	if (adpcm_data != -1)
 	{
-		MSM5205_data_w(0, adpcm_data & 0x0f);
+		msm5205_data_w(0, adpcm_data & 0x0f);
 		adpcm_data = -1;
 	}
 	else
 	{
 		adpcm_data = memory_region(machine, "adpcm")[adpcm_pos];
 		adpcm_pos = (adpcm_pos + 1) & 0x1ffff;
-		MSM5205_data_w(0, adpcm_data >> 4);
+		msm5205_data_w(0, adpcm_data >> 4);
 	}
 }
 
 static WRITE8_HANDLER( topspeed_msm5205_address_w )
 {
 	adpcm_pos = (adpcm_pos & 0x00ff) | (data << 8);
-	MSM5205_reset_w(0, 0);
+	msm5205_reset_w(0, 0);
 }
 
 static WRITE8_HANDLER( topspeed_msm5205_stop_w )
 {
-	MSM5205_reset_w(0, 1);
+	msm5205_reset_w(0, 1);
 	adpcm_pos &= 0xff00;
 }
 
@@ -667,7 +667,7 @@ static const ym2151_interface ym2151_config =
 	sound_bankswitch_w
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	topspeed_msm5205_vck,	/* VCK function */
 	MSM5205_S48_4B			/* 8 kHz */
@@ -731,7 +731,7 @@ static MACHINE_DRIVER_START( topspeed )
 	MDRV_SOUND_ROUTE(1, "mono", 0.30)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 

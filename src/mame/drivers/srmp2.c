@@ -207,7 +207,7 @@ static WRITE16_HANDLER( srmp2_adpcm_code_w )
 	srmp2_adpcm_sptr += (srmp2_adpcm_bank * 0x10000);
 	srmp2_adpcm_eptr += (srmp2_adpcm_bank * 0x10000);
 
-	MSM5205_reset_w(0, 0);
+	msm5205_reset_w(0, 0);
 	srmp2_adpcm_data = -1;
 }
 
@@ -230,7 +230,7 @@ static WRITE8_HANDLER( srmp3_adpcm_code_w )
 	srmp2_adpcm_sptr += (srmp2_adpcm_bank * 0x10000);
 	srmp2_adpcm_eptr += (srmp2_adpcm_bank * 0x10000);
 
-	MSM5205_reset_w(0, 0);
+	msm5205_reset_w(0, 0);
 	srmp2_adpcm_data = -1;
 }
 
@@ -247,25 +247,25 @@ static void srmp2_adpcm_int(running_machine *machine, int num)
 
 			if (srmp2_adpcm_sptr >= srmp2_adpcm_eptr)
 			{
-				MSM5205_reset_w(0, 1);
+				msm5205_reset_w(0, 1);
 				srmp2_adpcm_data = 0;
 				srmp2_adpcm_sptr = 0;
 			}
 			else
 			{
-				MSM5205_data_w(0, ((srmp2_adpcm_data >> 4) & 0x0f));
+				msm5205_data_w(0, ((srmp2_adpcm_data >> 4) & 0x0f));
 			}
 		}
 		else
 		{
-			MSM5205_data_w(0, ((srmp2_adpcm_data >> 0) & 0x0f));
+			msm5205_data_w(0, ((srmp2_adpcm_data >> 0) & 0x0f));
 			srmp2_adpcm_sptr++;
 			srmp2_adpcm_data = -1;
 		}
 	}
 	else
 	{
-		MSM5205_reset_w(0, 1);
+		msm5205_reset_w(0, 1);
 	}
 }
 
@@ -1035,7 +1035,7 @@ static const ay8910_interface srmp2_ay8910_interface =
 };
 
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	srmp2_adpcm_int,			/* IRQ handler */
 	MSM5205_S48_4B				/* 8 KHz, 4 Bits  */
@@ -1095,7 +1095,7 @@ static MACHINE_DRIVER_START( srmp2 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_DRIVER_END
 
@@ -1135,7 +1135,7 @@ static MACHINE_DRIVER_START( srmp3 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_DRIVER_END
 
@@ -1171,7 +1171,7 @@ static MACHINE_DRIVER_START( mjyuugi )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_DRIVER_END
 

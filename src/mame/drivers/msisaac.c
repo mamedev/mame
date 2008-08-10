@@ -323,7 +323,7 @@ static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(AY8910_control_port_1_w)
 	AM_RANGE(0x8003, 0x8003) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x8010, 0x801d) AM_WRITE(MSM5232_0_w)
+	AM_RANGE(0x8010, 0x801d) AM_WRITE(msm5232_0_w)
 	AM_RANGE(0x8020, 0x8020) AM_WRITE(sound_control_0_w)
 	AM_RANGE(0x8030, 0x8030) AM_WRITE(sound_control_1_w)
 
@@ -507,7 +507,7 @@ static GFXDECODE_START( msisaac )
 	GFXDECODE_ENTRY( "gfx2", 0, tile_layout, 0, 64 )
 GFXDECODE_END
 
-static const struct MSM5232interface msm5232_interface =
+static const msm5232_interface msm5232_config =
 {
 	{ 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6, 0.65e-6 }	/* 0.65 (???) uF capacitors (match the sample, not verified) */
 };
@@ -557,7 +557,7 @@ static MACHINE_DRIVER_START( msisaac )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MDRV_SOUND_ADD("msm", MSM5232, 2000000)
-	MDRV_SOUND_CONFIG(msm5232_interface)
+	MDRV_SOUND_CONFIG(msm5232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1

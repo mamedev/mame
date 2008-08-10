@@ -218,7 +218,7 @@ static WRITE8_HANDLER( cps1_snd_bankswitch_w )
 
 static WRITE8_HANDLER( cps1_oki_pin7_w )
 {
-	OKIM6295_set_pin7(0, (data & 1));
+	okim6295_set_pin7(0, (data & 1));
 }
 
 static WRITE16_HANDLER( cps1_soundlatch_w )
@@ -550,7 +550,7 @@ static ADDRESS_MAP_START( sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xf001, 0xf001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
-	AM_RANGE(0xf002, 0xf002) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+	AM_RANGE(0xf002, 0xf002) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0xf004, 0xf004) AM_WRITE(cps1_snd_bankswitch_w)
 	AM_RANGE(0xf006, 0xf006) AM_WRITE(cps1_oki_pin7_w) /* controls pin 7 of OKI chip */
 	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_r)	/* Sound command */
@@ -3721,7 +3721,7 @@ ADDRESS_MAP_END
 
 static void m5205_int1(running_machine *machine, int data)
 {
-//  MSM5205_data_w(0, sample_buffer1 & 0x0F);
+//  msm5205_data_w(0, sample_buffer1 & 0x0F);
 //  sample_buffer1 >>= 4;
 //  sample_select1 ^= 1;
 //  if (sample_select1 == 0)
@@ -3730,18 +3730,18 @@ static void m5205_int1(running_machine *machine, int data)
 
 static void m5205_int2(running_machine *machine, int data)
 {
-//  MSM5205_data_w(1, sample_buffer2 & 0x0F);
+//  msm5205_data_w(1, sample_buffer2 & 0x0F);
 //  sample_buffer2 >>= 4;
 //  sample_select2 ^= 1;
 }
 
-static const struct MSM5205interface msm5205_interface1 =
+static const msm5205_interface msm5205_interface1 =
 {
 	m5205_int1,	/* interrupt function */
 	MSM5205_S96_4B		/* 4KHz 4-bit */
 };
 
-static const struct MSM5205interface msm5205_interface2 =
+static const msm5205_interface msm5205_interface2 =
 {
 	m5205_int2,	/* interrupt function */
 	MSM5205_S96_4B		/* 4KHz 4-bit */

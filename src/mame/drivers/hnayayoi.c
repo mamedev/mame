@@ -76,28 +76,28 @@ static WRITE8_HANDLER( keyboard_w )
 
 static WRITE8_HANDLER( adpcm_data_w )
 {
-	MSM5205_data_w(0,data);
+	msm5205_data_w(0,data);
 }
 
 static WRITE8_HANDLER( adpcm_vclk_w )
 {
-	MSM5205_vclk_w(0,data & 1);
+	msm5205_vclk_w(0,data & 1);
 }
 
 static WRITE8_HANDLER( adpcm_reset_w )
 {
-	MSM5205_reset_w(0,data & 1);
+	msm5205_reset_w(0,data & 1);
 }
 
 static WRITE8_HANDLER( adpcm_reset_inv_w )
 {
-	MSM5205_reset_w(0,~data & 1);
+	msm5205_reset_w(0,~data & 1);
 }
 
 static MACHINE_RESET( hnayayoi )
 {
 	/* start with the MSM5205 reset */
-	MSM5205_reset_w(0,1);
+	msm5205_reset_w(0,1);
 }
 
 
@@ -576,7 +576,7 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	0,					/* IRQ handler */
 	MSM5205_SEX_4B
@@ -621,7 +621,7 @@ static MACHINE_DRIVER_START( hnayayoi )
 	MDRV_SOUND_ROUTE(3, "mono", 0.80)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

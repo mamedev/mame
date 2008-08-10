@@ -90,27 +90,27 @@ static WRITE8_HANDLER( sound_bank_w )
 {
 	int bank_A=(data&0x3);
 	int bank_B=((data>>2)&0x3);
-	K007232_set_bank( 0, bank_A, bank_B );
+	k007232_set_bank( 0, bank_A, bank_B );
 }
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_READ(YM3812_status_port_0_r)
-	AM_RANGE(0xb000, 0xb00d) AM_READ(K007232_read_port_0_r)
+	AM_RANGE(0xb000, 0xb00d) AM_READ(k007232_read_port_0_r)
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9800, 0x987f) AM_WRITE(K051649_waveform_w)
-	AM_RANGE(0x9880, 0x9889) AM_WRITE(K051649_frequency_w)
-	AM_RANGE(0x988a, 0x988e) AM_WRITE(K051649_volume_w)
-	AM_RANGE(0x988f, 0x988f) AM_WRITE(K051649_keyonoff_w)
+	AM_RANGE(0x9800, 0x987f) AM_WRITE(k051649_waveform_w)
+	AM_RANGE(0x9880, 0x9889) AM_WRITE(k051649_frequency_w)
+	AM_RANGE(0x988a, 0x988e) AM_WRITE(k051649_volume_w)
+	AM_RANGE(0x988f, 0x988f) AM_WRITE(k051649_keyonoff_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM3812_control_port_0_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM3812_write_port_0_w)
-	AM_RANGE(0xb000, 0xb00d) AM_WRITE(K007232_write_port_0_w)
+	AM_RANGE(0xb000, 0xb00d) AM_WRITE(k007232_write_port_0_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(sound_bank_w) /* 7232 bankswitch */
 ADDRESS_MAP_END
 
@@ -248,11 +248,11 @@ static void irqhandler(running_machine *machine, int linestate)
 
 static void volume_callback(int v)
 {
-	K007232_set_volume(0,0,(v >> 4) * 0x11,0);
-	K007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(0,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
 }
 
-static const struct K007232_interface k007232_interface =
+static const k007232_interface k007232_config =
 {
 	volume_callback	/* external port callback */
 };
@@ -293,7 +293,7 @@ static MACHINE_DRIVER_START( hcastle )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("konami1", K007232, 3579545)
-	MDRV_SOUND_CONFIG(k007232_interface)
+	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.44)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 

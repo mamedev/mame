@@ -545,7 +545,7 @@ static WRITE8_HANDLER( rjammer_voice_startstop_w )
 {
 	/* bit 0 of data selects voice start/stop (reset pin on MSM5205)*/
 	// 0 -stop; 1-start
-	MSM5205_reset_w (0, (data&1)^1 );
+	msm5205_reset_w (0, (data&1)^1 );
 
 	return;
 }
@@ -556,9 +556,9 @@ static WRITE8_HANDLER( rjammer_voice_frequency_select_w )
 	/* bit 0 of data selects voice frequency on MSM5205 */
 	// 0 -4 KHz; 1- 8KHz
 	if (data&1)
-		MSM5205_playmode_w(0,MSM5205_S48_4B);	/* 8 KHz */
+		msm5205_playmode_w(0,MSM5205_S48_4B);	/* 8 KHz */
 	else
-		MSM5205_playmode_w(0,MSM5205_S96_4B);	/* 4 KHz */
+		msm5205_playmode_w(0,MSM5205_S96_4B);	/* 4 KHz */
 
 	return;
 }
@@ -570,12 +570,12 @@ static void rjammer_adpcm_vck (running_machine *machine, int data)
 
 	if (ls74==1)
 	{
-		MSM5205_data_w(0, (ls377>>0) & 15 );
+		msm5205_data_w(0, (ls377>>0) & 15 );
 		cpunum_set_input_line(machine, 2, 0, ASSERT_LINE );
 	}
 	else
 	{
-		MSM5205_data_w(0, (ls377>>4) & 15 );
+		msm5205_data_w(0, (ls377>>4) & 15 );
 	}
 
 }
@@ -885,7 +885,7 @@ static const ay8910_interface ay8910_interface_3 =
 	ay8910_portB_2_w  /* write port B */
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	rjammer_adpcm_vck,			/* VCK function */
 	MSM5205_S48_4B				/* 8 KHz (changes at run time) */
@@ -1016,7 +1016,7 @@ static MACHINE_DRIVER_START( rjammer )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

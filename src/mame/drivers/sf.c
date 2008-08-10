@@ -182,11 +182,11 @@ static WRITE8_HANDLER( sound2_bank_w )
 
 static WRITE8_HANDLER( msm5205_w )
 {
-	MSM5205_reset_w(offset,(data>>7)&1);
+	msm5205_reset_w(offset,(data>>7)&1);
 	/* ?? bit 6?? */
-	MSM5205_data_w(offset,data);
-	MSM5205_vclk_w(offset,1);
-	MSM5205_vclk_w(offset,0);
+	msm5205_data_w(offset,data);
+	msm5205_vclk_w(offset,1);
+	msm5205_vclk_w(offset,0);
 }
 
 
@@ -808,7 +808,7 @@ static const ym2151_interface ym2151_config =
 	irq_handler
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	0,				/* interrupt function */
 	MSM5205_SEX_4B	/* 8KHz playback ?    */
@@ -853,12 +853,12 @@ static MACHINE_DRIVER_START( sf )
 	MDRV_SOUND_ROUTE(1, "right", 0.60)
 
 	MDRV_SOUND_ADD("msm1", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
 	MDRV_SOUND_ADD("msm2", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END

@@ -1121,13 +1121,13 @@ static WRITE8_HANDLER( sound_bank_hi_w )
 
 static WRITE8_HANDLER( multipcm_bank_w )
 {
-	multipcm_set_bank(0, 0x80000 * ((data >> 3) & 7), 0x80000 * (data & 7));
+	multi_pcm_set_bank(0, 0x80000 * ((data >> 3) & 7), 0x80000 * (data & 7));
 }
 
 
 static WRITE8_HANDLER( scross_bank_w )
 {
-	multipcm_set_bank(0, 0x80000 * (data & 7), 0x80000 * (data & 7));
+	multi_pcm_set_bank(0, 0x80000 * (data & 7), 0x80000 * (data & 7));
 }
 
 
@@ -1231,8 +1231,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( system32_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("sound", 0x100000)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_WRITE(RF5C68_reg_w)
-	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(RF5C68_r, RF5C68_w)
+	AM_RANGE(0xc000, 0xc00f) AM_MIRROR(0x0ff0) AM_WRITE(rf5c68_reg_w)
+	AM_RANGE(0xd000, 0xdfff) AM_READWRITE(rf5c68_r, rf5c68_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE(&z80_shared_ram)
 ADDRESS_MAP_END
 
@@ -1258,7 +1258,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( multi32_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM AM_REGION("sound", 0x100000)
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK(1)
-	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(MultiPCM_reg_0_r, MultiPCM_reg_0_w)
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(multi_pcm_reg_0_r, multi_pcm_reg_0_w)
 	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE(&z80_shared_ram)
 ADDRESS_MAP_END
 

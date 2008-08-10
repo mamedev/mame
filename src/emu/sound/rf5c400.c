@@ -553,12 +553,12 @@ static void rf5c400_w(int chipnum, int offset, UINT16 data)
 	}
 }
 
-READ16_HANDLER( RF5C400_0_r )
+READ16_HANDLER( rf5c400_0_r )
 {
 	return rf5c400_r(0, offset);
 }
 
-WRITE16_HANDLER( RF5C400_0_w )
+WRITE16_HANDLER( rf5c400_0_w )
 {
 	rf5c400_w(0, offset, data);
 }

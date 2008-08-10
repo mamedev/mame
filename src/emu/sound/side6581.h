@@ -2,8 +2,10 @@
 // /home/ms/source/sidplay/libsidplay/emu/RCS/enve_dl.h,v
 //
 
-#ifndef ENVE_DL_H
-#define ENVE_DL_H
+#pragma once
+
+#ifndef __SIDE6581_H__
+#define __SIDE6581_H__
 
 
 //
@@ -121,4 +123,4 @@ static const UINT8 releaseTab[] =
 };
 
 
-#endif
+#endif /* __SIDE6581_H__ */

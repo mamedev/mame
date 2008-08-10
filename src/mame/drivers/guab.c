@@ -605,7 +605,7 @@ static WRITE16_HANDLER( io_w )
 		}
 		case 0x30:
 		{
-			SN76496_0_w(0, 0, data & 0xff);
+			sn76496_0_w(0, 0, data & 0xff);
 			break;
 		}
 		case 0x31:

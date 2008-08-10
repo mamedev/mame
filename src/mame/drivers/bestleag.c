@@ -180,7 +180,7 @@ static WRITE16_HANDLER( bestleag_fgram_w )
 
 static WRITE16_HANDLER( oki_bank_w )
 {
-	OKIM6295_set_bank_base(0, 0x40000 * ((data & 3) - 1));
+	okim6295_set_bank_base(0, 0x40000 * ((data & 3) - 1));
 }
 
 
@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( bestleag_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300016, 0x300017) AM_READ_PORT("DSWA")
 	AM_RANGE(0x300018, 0x300019) AM_READ_PORT("DSWB")
 	AM_RANGE(0x30001c, 0x30001d) AM_WRITE(oki_bank_w)
-	AM_RANGE(0x30001e, 0x30001f) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
+	AM_RANGE(0x30001e, 0x30001f) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0x304000, 0x304001) AM_WRITENOP
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM
 ADDRESS_MAP_END

@@ -148,9 +148,9 @@ static READ16_HANDLER( dual539_16_r )
 	UINT16 ret = 0;
 
 	if (ACCESSING_BITS_0_7)
-		ret |= K054539_1_r(machine, offset);
+		ret |= k054539_1_r(machine, offset);
 	if (ACCESSING_BITS_8_15)
-		ret |= K054539_0_r(machine, offset)<<8;
+		ret |= k054539_0_r(machine, offset)<<8;
 
 	return ret;
 }
@@ -158,9 +158,9 @@ static READ16_HANDLER( dual539_16_r )
 static WRITE16_HANDLER( dual539_16_w )
 {
 	if (ACCESSING_BITS_0_7)
-		K054539_1_w(machine, offset, data);
+		k054539_1_w(machine, offset, data);
 	if (ACCESSING_BITS_8_15)
-		K054539_0_w(machine, offset, data>>8);
+		k054539_0_w(machine, offset, data>>8);
 }
 
 static READ32_HANDLER( dual539_r )
@@ -994,7 +994,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const struct K054539interface k054539_interface =
+static const k054539_interface k054539_config =
 {
 	"shared"
 };
@@ -1086,12 +1086,12 @@ static MACHINE_DRIVER_START( djmain )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("konami1", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_interface)
+	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
 	MDRV_SOUND_ADD("konami2", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_interface)
+	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

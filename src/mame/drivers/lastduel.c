@@ -146,7 +146,7 @@ static ADDRESS_MAP_START( mg_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(YM2203_write_port_0_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(YM2203_control_port_1_w)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE(YM2203_write_port_1_w)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0xf004, 0xf004) AM_WRITE(okim6295_data_0_w)
 	AM_RANGE(0xf00a, 0xf00a) AM_WRITE(mg_bankswitch_w)
 ADDRESS_MAP_END
 

@@ -957,7 +957,7 @@ static const ym2151_interface ym2151_config =
 	namcos1_sound_interrupt
 };
 
-static const struct namco_interface namco_interface =
+static const namco_interface namco_config =
 {
 	8,          /* number of voices */
 	1           /* stereo */
@@ -1021,7 +1021,7 @@ static MACHINE_DRIVER_START( ns1 )
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 
 	MDRV_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048/2)
-	MDRV_SOUND_CONFIG(namco_interface)
+	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 

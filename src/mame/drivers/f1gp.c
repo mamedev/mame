@@ -258,7 +258,7 @@ static ADDRESS_MAP_START( f1gpb_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff008, 0xfff009) AM_READNOP //?
 	AM_RANGE(0xfff006, 0xfff007) AM_WRITENOP
 	AM_RANGE(0xfff00a, 0xfff00b) AM_RAM AM_BASE(&f1gpb_fgregs)
-	AM_RANGE(0xfff00e, 0xfff00f) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
+	AM_RANGE(0xfff00e, 0xfff00f) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITE(f1gpb_misc_w)
 	AM_RANGE(0xfff010, 0xfff011) AM_WRITENOP
 	AM_RANGE(0xfff020, 0xfff023) AM_RAM //?

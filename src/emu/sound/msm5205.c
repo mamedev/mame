@@ -31,7 +31,7 @@
 
 struct MSM5205Voice
 {
-	const struct MSM5205interface *intf;
+	const msm5205_interface *intf;
 	sound_stream * stream;  /* number of stream system      */
 	INT32 index;
 	INT32 clock;				/* clock rate */
@@ -158,7 +158,7 @@ static void msm5205_reset(void *chip)
 	voice->signal  = 0;
 	voice->step    = 0;
 	/* timer and bitwidth set */
-	MSM5205_playmode_w(voice->index,voice->intf->select);
+	msm5205_playmode_w(voice->index,voice->intf->select);
 }
 
 /*
@@ -206,13 +206,13 @@ static void *msm5205_start(const char *tag, int sndindex, int clock, const void 
  *    Handle an update of the vclk status of a chip (1 is reset ON, 0 is reset OFF)
  *    This function can use selector = MSM5205_SEX only
  */
-void MSM5205_vclk_w (int num, int vclk)
+void msm5205_vclk_w (int num, int vclk)
 {
 	struct MSM5205Voice *voice = sndti_token(SOUND_MSM5205, num);
 
 	if( voice->prescaler != 0 )
 	{
-		logerror("error: MSM5205_vclk_w() called with chip = %d, but VCLK selected master mode\n", num);
+		logerror("error: msm5205_vclk_w() called with chip = %d, but VCLK selected master mode\n", num);
 	}
 	else
 	{
@@ -228,7 +228,7 @@ void MSM5205_vclk_w (int num, int vclk)
  *    Handle an update of the reset status of a chip (1 is reset ON, 0 is reset OFF)
  */
 
-void MSM5205_reset_w (int num, int reset)
+void msm5205_reset_w (int num, int reset)
 {
 	struct MSM5205Voice *voice = sndti_token(SOUND_MSM5205, num);
 	voice->reset = reset;
@@ -238,7 +238,7 @@ void MSM5205_reset_w (int num, int reset)
  *    Handle an update of the data to the chip
  */
 
-void MSM5205_data_w (int num, int data)
+void msm5205_data_w (int num, int data)
 {
 	struct MSM5205Voice *voice = sndti_token(SOUND_MSM5205, num);
 	if( voice->bitwidth == 4)
@@ -251,7 +251,7 @@ void MSM5205_data_w (int num, int data)
  *    Handle an change of the selector
  */
 
-void MSM5205_playmode_w(int num,int select)
+void msm5205_playmode_w(int num,int select)
 {
 	struct MSM5205Voice *voice = sndti_token(SOUND_MSM5205, num);
 	static const int prescaler_table[4] = {96,48,64,0};
@@ -283,7 +283,7 @@ void MSM5205_playmode_w(int num,int select)
 }
 
 
-void MSM5205_set_volume(int num,int volume)
+void msm5205_set_volume(int num,int volume)
 {
 	struct MSM5205Voice *voice = sndti_token(SOUND_MSM5205, num);
 

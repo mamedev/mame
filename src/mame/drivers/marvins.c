@@ -98,7 +98,7 @@ extern WRITE8_HANDLER( marvins_palette_bank_w );
 
 static int sound_cpu_busy;
 
-static const struct namco_interface snkwave_interface =
+static const namco_interface snkwave_interface =
 {
 	1,				/* number of voices */
 	0				/* stereo */

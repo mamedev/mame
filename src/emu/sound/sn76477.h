@@ -33,8 +33,10 @@
 
  *****************************************************************************/
 
-#ifndef SN76477_SOUND_H
-#define SN76477_SOUND_H
+#pragma once
+
+#ifndef __SN76477_H__
+#define __SN76477_H__
 
 #include "rescap.h"
 
@@ -83,43 +85,43 @@ struct _sn76477_interface
  *****************************************************************************/
 
 /* these functions take 0 or 1 as a logic input */
-void SN76477_enable_w(int chip, UINT32 data);		/* active LO, 0 = enabled, 1 = disabled */
-void SN76477_mixer_a_w(int chip, UINT32 data);
-void SN76477_mixer_b_w(int chip, UINT32 data);
-void SN76477_mixer_c_w(int chip, UINT32 data);
-void SN76477_envelope_1_w(int chip, UINT32 data);
-void SN76477_envelope_2_w(int chip, UINT32 data);
-void SN76477_vco_w(int chip, UINT32 data);			/* 0 = external, 1 = controlled by SLF */
-void SN76477_noise_clock_w(int chip, UINT32 data);  /* noise clock write, iff noise_clock_res = 0 */
+void sn76477_enable_w(int chip, UINT32 data);		/* active LO, 0 = enabled, 1 = disabled */
+void sn76477_mixer_a_w(int chip, UINT32 data);
+void sn76477_mixer_b_w(int chip, UINT32 data);
+void sn76477_mixer_c_w(int chip, UINT32 data);
+void sn76477_envelope_1_w(int chip, UINT32 data);
+void sn76477_envelope_2_w(int chip, UINT32 data);
+void sn76477_vco_w(int chip, UINT32 data);			/* 0 = external, 1 = controlled by SLF */
+void sn76477_noise_clock_w(int chip, UINT32 data);  /* noise clock write, if noise_clock_res = 0 */
 
 /* these functions take a resistor value in Ohms */
-void SN76477_one_shot_res_w(int chip, double data);
-void SN76477_slf_res_w(int chip, double data);
-void SN76477_vco_res_w(int chip, double data);
-void SN76477_noise_clock_res_w(int chip, double data);  /* = 0 if the noise gen is clocked via noise_clock */
-void SN76477_noise_filter_res_w(int chip, double data);
-void SN76477_decay_res_w(int chip, double data);
-void SN76477_attack_res_w(int chip, double data);
-void SN76477_amplitude_res_w(int chip, double data);
-void SN76477_feedback_res_w(int chip, double data);
+void sn76477_one_shot_res_w(int chip, double data);
+void sn76477_slf_res_w(int chip, double data);
+void sn76477_vco_res_w(int chip, double data);
+void sn76477_noise_clock_res_w(int chip, double data);  /* = 0 if the noise gen is clocked via noise_clock */
+void sn76477_noise_filter_res_w(int chip, double data);
+void sn76477_decay_res_w(int chip, double data);
+void sn76477_attack_res_w(int chip, double data);
+void sn76477_amplitude_res_w(int chip, double data);
+void sn76477_feedback_res_w(int chip, double data);
 
 /* these functions take a capacitor value in Farads or the voltage on it in Volts */
-#define SN76477_EXTERNAL_VOLTAGE_DISCONNECT   (-1.0)	/* indicates that the voltage in internally computed,
+#define SN76477_EXTERNAL_VOLTAGE_DISCONNECT   (-1.0)	/* indicates that the voltage is internally computed,
                                                            can be used in all the functions that take a
                                                            voltage on a capacitor */
-void SN76477_one_shot_cap_w(int chip, double data);
-void SN76477_one_shot_cap_voltage_w(int chip, double data);
-void SN76477_slf_cap_w(int chip, double data);
-void SN76477_slf_cap_voltage_w(int chip, double data);
-void SN76477_vco_cap_w(int chip, double data);
-void SN76477_vco_cap_voltage_w(int chip, double data);
-void SN76477_noise_filter_cap_w(int chip, double data);
-void SN76477_noise_filter_cap_voltage_w(int chip, double data);
-void SN76477_attack_decay_cap_w(int chip, double data);
-void SN76477_attack_decay_cap_voltage_w(int chip, double data);
+void sn76477_one_shot_cap_w(int chip, double data);
+void sn76477_one_shot_cap_voltage_w(int chip, double data);
+void sn76477_slf_cap_w(int chip, double data);
+void sn76477_slf_cap_voltage_w(int chip, double data);
+void sn76477_vco_cap_w(int chip, double data);
+void sn76477_vco_cap_voltage_w(int chip, double data);
+void sn76477_noise_filter_cap_w(int chip, double data);
+void sn76477_noise_filter_cap_voltage_w(int chip, double data);
+void sn76477_attack_decay_cap_w(int chip, double data);
+void sn76477_attack_decay_cap_voltage_w(int chip, double data);
 
 /* these functions take a voltage value in Volts */
-void SN76477_vco_voltage_w(int chip, double data);
-void SN76477_pitch_voltage_w(int chip, double data);
+void sn76477_vco_voltage_w(int chip, double data);
+void sn76477_pitch_voltage_w(int chip, double data);
 
-#endif
+#endif/* __SN76477_H__ */

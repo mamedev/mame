@@ -1343,7 +1343,7 @@ static WRITE64_HANDLER(model3_sound_w)
 	// serial configuration writes
 	if ((mem_mask == U64(0xff00000000000000)) && (offset == 0))
 	{
-		SCSP_MidiIn(machine, 0, (data>>56)&0xff, 0);
+		scsp_midi_in(machine, 0, (data>>56)&0xff, 0);
 
 		// give the 68k time to notice
 		cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
@@ -4258,9 +4258,9 @@ static WRITE16_HANDLER( model3snd_ctrl )
 
 static ADDRESS_MAP_START( model3_snd, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("scsp1", 0) AM_BASE(&model3_soundram)
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(SCSP_0_r, SCSP_0_w)
+	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(scsp_0_r, scsp_0_w)
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM AM_REGION("scsp2", 0)
-	AM_RANGE(0x300000, 0x300fff) AM_READWRITE(SCSP_1_r, SCSP_1_w)
+	AM_RANGE(0x300000, 0x300fff) AM_READWRITE(scsp_1_r, scsp_1_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(model3snd_ctrl)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("audio", 0x80000)
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("samples", 0)
@@ -4279,13 +4279,13 @@ static void scsp_irq(running_machine *machine, int irq)
 	}
 }
 
-static const struct SCSPinterface scsp_interface =
+static const scsp_interface scsp_config =
 {
 	0,
 	scsp_irq
 };
 
-static const struct SCSPinterface scsp2_interface =
+static const scsp_interface scsp2_interface =
 {
 	0,
 	NULL
@@ -4363,7 +4363,7 @@ static MACHINE_DRIVER_START( model3_10 )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_ADD("scsp1", SCSP, 0)
-	MDRV_SOUND_CONFIG(scsp_interface)
+	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
 
@@ -4401,7 +4401,7 @@ static MACHINE_DRIVER_START( model3_15 )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_ADD("scsp1", SCSP, 0)
-	MDRV_SOUND_CONFIG(scsp_interface)
+	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
 
@@ -4439,7 +4439,7 @@ static MACHINE_DRIVER_START( model3_20 )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_ADD("scsp1", SCSP, 0)
-	MDRV_SOUND_CONFIG(scsp_interface)
+	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
 
@@ -4478,7 +4478,7 @@ static MACHINE_DRIVER_START( model3_21 )
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_ADD("scsp1", SCSP, 0)
-	MDRV_SOUND_CONFIG(scsp_interface)
+	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
 

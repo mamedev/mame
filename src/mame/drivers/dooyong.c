@@ -383,7 +383,7 @@ static ADDRESS_MAP_START( bluehawk_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
 	AM_RANGE(0xf809, 0xf809) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0xf80a, 0xf80a) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0xf80a, 0xf80a) AM_READ(okim6295_status_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bluehawk_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -391,7 +391,7 @@ static ADDRESS_MAP_START( bluehawk_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf808, 0xf808) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xf809, 0xf809) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0xf80a, 0xf80a) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0xf80a, 0xf80a) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
 /***************************************************************************

@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( puckpkmn_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700014, 0x700015) AM_READ(input_port_2_word_r)		/* Input (?) */
 	AM_RANGE(0x700016, 0x700017) AM_READ(input_port_3_word_r)		/* Input (DSW1) */
 	AM_RANGE(0x700018, 0x700019) AM_READ(input_port_4_word_r)		/* Input (DSW2) */
-	AM_RANGE(0x700022, 0x700023) AM_READ(OKIM6295_status_0_lsb_r)	/* M6295 Sound Chip Status Register */
+	AM_RANGE(0x700022, 0x700023) AM_READ(okim6295_status_0_lsb_r)	/* M6295 Sound Chip Status Register */
 	AM_RANGE(0xa04000, 0xa04001) AM_READ(puckpkmn_YM3438_r)			/* Ym3438 Sound Chip Status Register */
 	AM_RANGE(0xc00000, 0xc0001f) AM_READ(genesis_vdp_r)				/* VDP Access */
 	AM_RANGE(0xe00000, 0xe1ffff) AM_READ(SMH_BANK1)				/* VDP sees the roms here */
@@ -133,7 +133,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( puckpkmn_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(SMH_ROM)					/* Main 68k Program Roms */
-	AM_RANGE(0x700022, 0x700023) AM_WRITE(OKIM6295_data_0_lsb_w)		/* M6295 Sound Chip Writes */
+	AM_RANGE(0x700022, 0x700023) AM_WRITE(okim6295_data_0_lsb_w)		/* M6295 Sound Chip Writes */
 	AM_RANGE(0xa04000, 0xa04003) AM_WRITE(puckpkmn_YM3438_w)			/* Ym3438 Sound Chip Writes */
 	AM_RANGE(0xc00000, 0xc0001f) AM_WRITE(genesis_vdp_w)				/* VDP Access */
 	AM_RANGE(0xff0000, 0xffffff) AM_WRITE(SMH_RAM) AM_BASE(&main_ram)		/* Main Ram */

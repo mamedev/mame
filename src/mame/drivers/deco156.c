@@ -157,7 +157,7 @@ static WRITE32_HANDLER(hvysmsh_eeprom_w)
 {
 	if (ACCESSING_BITS_0_7) {
 
-		OKIM6295_set_bank_base(1, 0x40000 * (data & 0x7) );
+		okim6295_set_bank_base(1, 0x40000 * (data & 0x7) );
 
 		eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 		eeprom_write_bit(data & 0x10);
@@ -167,28 +167,28 @@ static WRITE32_HANDLER(hvysmsh_eeprom_w)
 
 static WRITE32_HANDLER( hvysmsh_oki_0_bank_w )
 {
-	OKIM6295_set_bank_base(0, (data & 1) * 0x40000);
+	okim6295_set_bank_base(0, (data & 1) * 0x40000);
 }
 
 static READ32_HANDLER(hvysmsh_oki_0_r)
 {
-	return OKIM6295_status_0_r(machine, 0);
+	return okim6295_status_0_r(machine, 0);
 }
 
 static WRITE32_HANDLER(hvysmsh_oki_0_w)
 {
 //  data & 0xff00 is written sometimes too. game bug or needed data?
-	OKIM6295_data_0_w(machine,0,data&0xff);
+	okim6295_data_0_w(machine,0,data&0xff);
 }
 
 static READ32_HANDLER(hvysmsh_oki_1_r)
 {
-	return OKIM6295_status_1_r(machine, 0);
+	return okim6295_status_1_r(machine, 0);
 }
 
 static WRITE32_HANDLER(hvysmsh_oki_1_w)
 {
-	OKIM6295_data_1_w(machine,0,data&0xff);
+	okim6295_data_1_w(machine,0,data&0xff);
 }
 
 static READ32_HANDLER(wcvol95_eeprom_r)

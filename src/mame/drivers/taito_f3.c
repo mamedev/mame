@@ -3464,13 +3464,13 @@ static DRIVER_INIT( bubsymph )
 
 static READ32_HANDLER( bubsympb_oki_r )
 {
-	return OKIM6295_status_0_r(machine,0);
+	return okim6295_status_0_r(machine,0);
 }
 static WRITE32_HANDLER( bubsympb_oki_w )
 {
 	//printf("write %08x %08x\n",data,mem_mask);
-	if (ACCESSING_BITS_0_7) OKIM6295_data_0_w(machine,0,data&0xff);
-	//if (mem_mask==0x000000ff) OKIM6295_data_0_w(machine,0,data&0xff);
+	if (ACCESSING_BITS_0_7) okim6295_data_0_w(machine,0,data&0xff);
+	//if (mem_mask==0x000000ff) okim6295_data_0_w(machine,0,data&0xff);
 	if (ACCESSING_BITS_16_23)
 	{
 		UINT8 *snd = memory_region(machine, "oki");

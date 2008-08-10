@@ -60,13 +60,13 @@ CHANNEL_DEBUG enables the following keys:
 */
 
 struct k054539_info {
-	const struct K054539interface *intf;
+	const k054539_interface *intf;
 	double voltab[256];
 	double pantab[0xf];
 
-	double K054539_gain[8];
-	UINT8 K054539_posreg_latch[8][3];
-	int K054539_flags;
+	double k054539_gain[8];
+	UINT8 k054539_posreg_latch[8][3];
+	int k054539_flags;
 
 	unsigned char regs[0x230];
 	unsigned char *ram;
@@ -80,7 +80,7 @@ struct k054539_info {
 	UINT32 rom_mask;
 	sound_stream * stream;
 
-	struct K054539_channel {
+	struct k054539_channel {
 		UINT32 pos;
 		UINT32 pfrac;
 		INT32 val;
@@ -90,37 +90,37 @@ struct k054539_info {
 
 //*
 
-void K054539_init_flags(int chip, int flags)
+void k054539_init_flags(int chip, int flags)
 {
 	struct k054539_info *info = sndti_token(SOUND_K054539, chip);
-	info->K054539_flags = flags;
+	info->k054539_flags = flags;
 }
 
-void K054539_set_gain(int chip, int channel, double gain)
+void k054539_set_gain(int chip, int channel, double gain)
 {
 	struct k054539_info *info = sndti_token(SOUND_K054539, chip);
-	if (gain >= 0) info->K054539_gain[channel] = gain;
+	if (gain >= 0) info->k054539_gain[channel] = gain;
 }
 //*
 
-static int K054539_regupdate(struct k054539_info *info)
+static int k054539_regupdate(struct k054539_info *info)
 {
 	return !(info->regs[0x22f] & 0x80);
 }
 
-static void K054539_keyon(struct k054539_info *info, int channel)
+static void k054539_keyon(struct k054539_info *info, int channel)
 {
-	if(K054539_regupdate(info))
+	if(k054539_regupdate(info))
 		info->regs[0x22c] |= 1 << channel;
 }
 
-static void K054539_keyoff(struct k054539_info *info, int channel)
+static void k054539_keyoff(struct k054539_info *info, int channel)
 {
-	if(K054539_regupdate(info))
+	if(k054539_regupdate(info))
 		info->regs[0x22c] &= ~(1 << channel);
 }
 
-static void K054539_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static void k054539_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
 {
 	struct k054539_info *info = param;
 #define VOL_CAP 1.80
@@ -136,7 +136,7 @@ static void K054539_update(void *param, stream_sample_t **inputs, stream_sample_
 	UINT32 rom_mask;
 
 	unsigned char *base1, *base2;
-	struct K054539_channel *chan;
+	struct k054539_channel *chan;
 	stream_sample_t *bufl, *bufr;
 	int cur_pos, cur_pfrac, cur_val, cur_pval;
 	int delta, rdelta, fdelta, pdelta;
@@ -178,7 +178,7 @@ pan -= 0x81;
 else
 			if (pan >= 0x11 && pan <= 0x1f) pan -= 0x11; else pan = 0x18 - 0x11;
 
-			gain = info->K054539_gain[ch];
+			gain = info->k054539_gain[ch];
 
 			lvol = info->voltab[vol] * info->pantab[pan] * gain;
 			if (lvol > VOL_CAP) lvol = VOL_CAP;
@@ -249,7 +249,7 @@ else
 								if(cur_val != (INT16)0x8000)
 									continue;
 							}
-							K054539_keyoff(info, ch);
+							k054539_keyoff(info, ch);
 							goto end_channel_0;
 						}
 					}
@@ -277,7 +277,7 @@ else
 								if(cur_val != (INT16)0x8000)
 									continue;
 							}
-							K054539_keyoff(info, ch);
+							k054539_keyoff(info, ch);
 							goto end_channel_4;
 						}
 					}
@@ -310,7 +310,7 @@ else
 								if(cur_val != 0x88)
 									goto next_iter;
 							}
-							K054539_keyoff(info, ch);
+							k054539_keyoff(info, ch);
 							goto end_channel_8;
 						}
 					next_iter:
@@ -342,7 +342,7 @@ else
 			chan->pfrac = cur_pfrac;
 			chan->pval = cur_pval;
 			chan->val = cur_val;
-			if(K054539_regupdate(info)) {
+			if(k054539_regupdate(info)) {
 				base1[0x0c] = cur_pos     & 0xff;
 				base1[0x0d] = cur_pos>> 8 & 0xff;
 				base1[0x0e] = cur_pos>>16 & 0xff;
@@ -350,7 +350,7 @@ else
 		}
 
 	//* drivers should be given the option to disable reverb when things go terribly wrong
-	if(!(info->K054539_flags & K054539_DISABLE_REVERB))
+	if(!(info->k054539_flags & K054539_DISABLE_REVERB))
 	{
 		for(i=0; i<length; i++) {
 			short val = rbase[(i+reverb_pos) & 0x3fff];
@@ -392,10 +392,10 @@ else
 			if (gc_j) { gc_i &= 7; gc_pos[gc_chip] = gc_i; }
 
 			if (input_code_pressed_once(KEYCODE_5_PAD))
-				info->K054539_gain[gc_i] = 1.0;
+				info->k054539_gain[gc_i] = 1.0;
 			else
 			{
-				gc_fptr = &info->K054539_gain[gc_i];
+				gc_fptr = &info->k054539_gain[gc_i];
 				gc_f0 = *gc_fptr;
 				gc_j = 0;
 				if (input_code_pressed_once(KEYCODE_2_PAD)) { gc_f0 -= 0.1; gc_j = 1; }
@@ -403,7 +403,7 @@ else
 				if (gc_j) { if (gc_f0 < 0) gc_f0 = 0; *gc_fptr = gc_f0; }
 			}
 
-			gc_fptr = &info->K054539_gain[0] + 8;
+			gc_fptr = &info->k054539_gain[0] + 8;
 			gc_cptr = gc_msg + 7;
 			for (gc_j=-8; gc_j; gc_j++)
 			{
@@ -426,20 +426,20 @@ else
 }
 
 
-static TIMER_CALLBACK( K054539_irq )
+static TIMER_CALLBACK( k054539_irq )
 {
 	struct k054539_info *info = ptr;
 	if(info->regs[0x22f] & 0x20)
 		info->intf->irq(machine);
 }
 
-static void K054539_init_chip(const char *tag, struct k054539_info *info, int clock, int sndindex)
+static void k054539_init_chip(const char *tag, struct k054539_info *info, int clock, int sndindex)
 {
 	int i;
 
 	memset(info->regs, 0, sizeof(info->regs));
-	memset(info->K054539_posreg_latch, 0, sizeof(info->K054539_posreg_latch)); //*
-	info->K054539_flags |= K054539_UPDATE_AT_KEYON; //* make it default until proven otherwise
+	memset(info->k054539_posreg_latch, 0, sizeof(info->k054539_posreg_latch)); //*
+	info->k054539_flags |= K054539_UPDATE_AT_KEYON; //* make it default until proven otherwise
 
 	// Real size of 0x4000, the addon is to simplify the reverb buffer computations
 	info->ram = auto_malloc(0x4000*2+clock/50*2);
@@ -460,16 +460,16 @@ static void K054539_init_chip(const char *tag, struct k054539_info *info, int cl
 		// One or more of the registers must be the timer period
 		// And anyway, this particular frequency is probably wrong
 		// 480 hz is TRUSTED by gokuparo disco stage - the looping sample doesn't line up otherwise
-		timer_pulse(ATTOTIME_IN_HZ(480), info, 0, K054539_irq);
+		timer_pulse(ATTOTIME_IN_HZ(480), info, 0, k054539_irq);
 
-	info->stream = stream_create(0, 2, clock, info, K054539_update);
+	info->stream = stream_create(0, 2, clock, info, k054539_update);
 
 	state_save_register_item_array("K054539", sndindex, info->regs);
 	state_save_register_item_pointer("K054539", sndindex, info->ram,  0x4000);
 	state_save_register_item("K054539", sndindex, info->cur_ptr);
 }
 
-static void K054539_w(int chip, offs_t offset, UINT8 data) //*
+static void k054539_w(int chip, offs_t offset, UINT8 data) //*
 {
 	struct k054539_info *info = sndti_token(SOUND_K054539, chip);
 #if 0
@@ -500,7 +500,7 @@ static void K054539_w(int chip, offs_t offset, UINT8 data) //*
 	UINT8 *regbase, *regptr, *posptr;
 
 	regbase = info->regs;
-	latch = (info->K054539_flags & K054539_UPDATE_AT_KEYON) && (regbase[0x22f] & 1);
+	latch = (info->k054539_flags & K054539_UPDATE_AT_KEYON) && (regbase[0x22f] & 1);
 
 	if (latch && offset < 0x100)
 	{
@@ -510,7 +510,7 @@ static void K054539_w(int chip, offs_t offset, UINT8 data) //*
 		if (offs >= 0 && offs <= 2)
 		{
 			// latch writes to the position index registers
-			info->K054539_posreg_latch[ch][offs] = data;
+			info->k054539_posreg_latch[ch][offs] = data;
 			return;
 		}
 	}
@@ -530,7 +530,7 @@ static void K054539_w(int chip, offs_t offset, UINT8 data) //*
 				{
 					if(data & (1<<ch))
 					{
-						posptr = &info->K054539_posreg_latch[ch][0];
+						posptr = &info->k054539_posreg_latch[ch][0];
 						regptr = regbase + (ch<<5) + 0xc;
 
 						// update the chip at key-on
@@ -538,7 +538,7 @@ static void K054539_w(int chip, offs_t offset, UINT8 data) //*
 						regptr[1] = posptr[1];
 						regptr[2] = posptr[2];
 
-						K054539_keyon(info, ch);
+						k054539_keyon(info, ch);
 					}
 				}
 			}
@@ -546,14 +546,14 @@ static void K054539_w(int chip, offs_t offset, UINT8 data) //*
 			{
 				for(ch=0; ch<8; ch++)
 					if(data & (1<<ch))
-						K054539_keyon(info, ch);
+						k054539_keyon(info, ch);
 			}
 		break;
 
 		case 0x215:
 			for(ch=0; ch<8; ch++)
 				if(data & (1<<ch))
-					K054539_keyoff(info, ch);
+					k054539_keyoff(info, ch);
 		break;
 
 		case 0x22d:
@@ -603,7 +603,7 @@ static STATE_POSTLOAD( reset_zones )
 	info->cur_limit = data == 0x80 ? 0x4000 : 0x20000;
 }
 
-static UINT8 K054539_r(int chip, offs_t offset)
+static UINT8 k054539_r(int chip, offs_t offset)
 {
 	struct k054539_info *info = sndti_token(SOUND_K054539, chip);
 	switch(offset) {
@@ -627,7 +627,7 @@ static UINT8 K054539_r(int chip, offs_t offset)
 
 static void *k054539_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const struct K054539interface defintrf = { 0 };
+	static const k054539_interface defintrf = { 0 };
 	int i;
 	struct k054539_info *info;
 
@@ -635,8 +635,8 @@ static void *k054539_start(const char *tag, int sndindex, int clock, const void 
 	memset(info, 0, sizeof(*info));
 
 	for (i = 0; i < 8; i++)
-		info->K054539_gain[i] = 1.0;
-	info->K054539_flags = K054539_RESET_FLAGS;
+		info->k054539_gain[i] = 1.0;
+	info->k054539_flags = K054539_RESET_FLAGS;
 
 	info->intf = (config != NULL) ? config : &defintrf;
 
@@ -662,30 +662,30 @@ static void *k054539_start(const char *tag, int sndindex, int clock, const void 
 	for(i=0; i<0xf; i++)
 		info->pantab[i] = sqrt(i) / sqrt(0xe);
 
-	K054539_init_chip(tag, info, clock, sndindex);
+	k054539_init_chip(tag, info, clock, sndindex);
 
 	state_save_register_postload(Machine, reset_zones, info);
 	return info;
 }
 
-WRITE8_HANDLER( K054539_0_w )
+WRITE8_HANDLER( k054539_0_w )
 {
-	K054539_w(0, offset, data);
+	k054539_w(0, offset, data);
 }
 
-READ8_HANDLER( K054539_0_r )
+READ8_HANDLER( k054539_0_r )
 {
-	return K054539_r(0, offset);
+	return k054539_r(0, offset);
 }
 
-WRITE8_HANDLER( K054539_1_w )
+WRITE8_HANDLER( k054539_1_w )
 {
-	K054539_w(1, offset, data);
+	k054539_w(1, offset, data);
 }
 
-READ8_HANDLER( K054539_1_r )
+READ8_HANDLER( k054539_1_r )
 {
-	return K054539_r(1, offset);
+	return k054539_r(1, offset);
 }
 
 

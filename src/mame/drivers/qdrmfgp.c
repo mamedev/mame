@@ -90,7 +90,7 @@ static WRITE16_HANDLER( gp_control_w )
 			double gain = vol / 90.0;
 
 			for (i=0; i<8; i++)
-				K054539_set_gain(0, i, gain);
+				k054539_set_gain(0, i, gain);
 		}
 	}
 }
@@ -119,7 +119,7 @@ static WRITE16_HANDLER( gp2_control_w )
 			double gain = vol / 90.0;
 
 			for (i=0; i<8; i++)
-				K054539_set_gain(0, i, gain);
+				k054539_set_gain(0, i, gain);
 		}
 	}
 }
@@ -195,7 +195,7 @@ static WRITE16_HANDLER( sndram_w )
 static READ16_HANDLER( k054539_word_r )
 {
 	if (ACCESSING_BITS_0_7)
-		return K054539_0_r(machine, offset);
+		return k054539_0_r(machine, offset);
 
 	return 0;
 }
@@ -203,7 +203,7 @@ static READ16_HANDLER( k054539_word_r )
 static WRITE16_HANDLER( k054539_word_w )
 {
 	if (ACCESSING_BITS_0_7)
-		K054539_0_w(machine, offset, data);
+		k054539_0_w(machine, offset, data);
 }
 
 /*************/
@@ -599,7 +599,7 @@ static void sound_irq(running_machine *machine)
 		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
 }
 
-static const struct K054539interface k054539_interface =
+static const k054539_interface k054539_config =
 {
 	NULL,
 	NULL,
@@ -678,7 +678,7 @@ static MACHINE_DRIVER_START( qdrmfgp )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("konami", K054539, 18432000/384)
-	MDRV_SOUND_CONFIG(k054539_interface)
+	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

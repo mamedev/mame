@@ -231,27 +231,27 @@ static READ16_HANDLER( punkshot_sound_r )
 {
 	/* If the sound CPU is running, read the status, otherwise
        just make it pass the test */
-	return K053260_0_r(machine,2 + offset);
+	return k053260_0_r(machine,2 + offset);
 }
 
 static READ16_HANDLER( blswhstl_sound_r )
 {
 	/* If the sound CPU is running, read the status, otherwise
        just make it pass the test */
-	return K053260_0_r(machine,2 + offset);
+	return k053260_0_r(machine,2 + offset);
 }
 
 static READ16_HANDLER( glfgreat_sound_r )
 {
 	/* If the sound CPU is running, read the status, otherwise
        just make it pass the test */
-	return K053260_0_r(machine,2 + offset) << 8;
+	return k053260_0_r(machine,2 + offset) << 8;
 }
 
 static WRITE16_HANDLER( glfgreat_sound_w )
 {
 	if (ACCESSING_BITS_8_15)
-		K053260_0_w(machine, offset, (data >> 8) & 0xff);
+		k053260_0_w(machine, offset, (data >> 8) & 0xff);
 
 	if (offset)
 		cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
@@ -287,7 +287,7 @@ static WRITE8_HANDLER( prmrsocr_audio_bankswitch_w )
 
 static READ16_HANDLER( tmnt2_sound_r )
 {
-	return K053260_0_r(machine, 2 + offset);
+	return k053260_0_r(machine, 2 + offset);
 }
 
 static READ8_HANDLER( tmnt_sres_r )
@@ -790,7 +790,7 @@ static ADDRESS_MAP_START( punkshot_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0006, 0x0a0007) AM_READ_PORT("P1/P2")
 	AM_RANGE(0x0a0020, 0x0a0021) AM_WRITE(punkshot_0a0020_w)
 	AM_RANGE(0x0a0040, 0x0a0043) AM_READ(punkshot_sound_r)	/* K053260 */
-	AM_RANGE(0x0a0040, 0x0a0041) AM_WRITE(K053260_0_lsb_w)
+	AM_RANGE(0x0a0040, 0x0a0041) AM_WRITE(k053260_0_lsb_w)
 	AM_RANGE(0x0a0060, 0x0a007f) AM_WRITE(K053251_lsb_w)
 	AM_RANGE(0x0a0080, 0x0a0081) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(K052109_word_noA12_r, punkshot_K052109_word_noA12_w)
@@ -812,7 +812,7 @@ static ADDRESS_MAP_START( lgtnfght_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW3")
 	AM_RANGE(0x0a0018, 0x0a0019) AM_WRITE(lgtnfght_0a0018_w)
 	AM_RANGE(0x0a0020, 0x0a0023) AM_READ(punkshot_sound_r)	/* K053260 */
-	AM_RANGE(0x0a0020, 0x0a0021) AM_WRITE(K053260_0_lsb_w)
+	AM_RANGE(0x0a0020, 0x0a0021) AM_WRITE(k053260_0_lsb_w)
 	AM_RANGE(0x0a0028, 0x0a0029) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x0b0000, 0x0b3fff) AM_READWRITE(K053245_scattered_word_r, K053245_scattered_word_w) AM_BASE(&spriteram16)
 	AM_RANGE(0x0c0000, 0x0c001f) AM_READWRITE(K053244_word_noA1_r, K053244_word_noA1_w)
@@ -843,7 +843,7 @@ static ADDRESS_MAP_START( blswhstl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700300, 0x700301) AM_WRITE(blswhstl_700300_w)
 	AM_RANGE(0x700400, 0x700401) AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x780600, 0x780603) AM_READ(blswhstl_sound_r)	/* K053260 */
-	AM_RANGE(0x780600, 0x780601) AM_WRITE(K053260_0_lsb_w)
+	AM_RANGE(0x780600, 0x780601) AM_WRITE(k053260_0_lsb_w)
 	AM_RANGE(0x780604, 0x780605) AM_WRITE(ssriders_soundkludge_w)
 	AM_RANGE(0x780700, 0x78071f) AM_WRITE(K053251_lsb_w)
 ADDRESS_MAP_END
@@ -1144,7 +1144,7 @@ static ADDRESS_MAP_START( tmnt2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1c0800, 0x1c081f) AM_WRITE(tmnt2_1c0800_w) AM_BASE(&tmnt2_1c0800)	/* protection device */
 	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE(K053244_word_noA1_r, K053244_word_noA1_w)
 	AM_RANGE(0x5c0600, 0x5c0603) AM_READ(tmnt2_sound_r)	/* K053260 */
-	AM_RANGE(0x5c0600, 0x5c0601) AM_WRITE(K053260_0_lsb_w)
+	AM_RANGE(0x5c0600, 0x5c0601) AM_WRITE(k053260_0_lsb_w)
 	AM_RANGE(0x5c0604, 0x5c0605) AM_WRITE(ssriders_soundkludge_w)
 	AM_RANGE(0x5c0700, 0x5c071f) AM_WRITE(K053251_lsb_w)
 	AM_RANGE(0x600000, 0x603fff) AM_READWRITE(K052109_word_r, K052109_word_w)
@@ -1170,7 +1170,7 @@ static ADDRESS_MAP_START( ssriders_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1c0800, 0x1c0803) AM_WRITE(ssriders_protection_w)
 	AM_RANGE(0x5a0000, 0x5a001f) AM_READWRITE(K053244_word_noA1_r, K053244_word_noA1_w)
 	AM_RANGE(0x5c0600, 0x5c0603) AM_READ(punkshot_sound_r)	/* K053260 */
-	AM_RANGE(0x5c0600, 0x5c0601) AM_WRITE(K053260_0_lsb_w)
+	AM_RANGE(0x5c0600, 0x5c0601) AM_WRITE(k053260_0_lsb_w)
 	AM_RANGE(0x5c0604, 0x5c0605) AM_WRITE(ssriders_soundkludge_w)
 	AM_RANGE(0x5c0700, 0x5c071f) AM_WRITE(K053251_lsb_w)
 	AM_RANGE(0x600000, 0x603fff) AM_READWRITE(K052109_word_r, K052109_word_w)
@@ -1198,7 +1198,7 @@ static ADDRESS_MAP_START( sunsetbl_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00200, 0xc00201) AM_WRITE(ssriders_eeprom_w)	/* EEPROM and gfx control */
 	AM_RANGE(0xc00404, 0xc00405) AM_READ_PORT("COINS")
 	AM_RANGE(0xc00406, 0xc00407) AM_READ(sunsetbl_eeprom_r)
-	AM_RANGE(0xc00600, 0xc00601) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
+	AM_RANGE(0xc00600, 0xc00601) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0x75d288, 0x75d289) AM_READ(SMH_NOP)	// read repeatedly in some test menus (PC=181f2)
 ADDRESS_MAP_END
 
@@ -1209,7 +1209,7 @@ static ADDRESS_MAP_START( thndrx2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x300000, 0x30001f) AM_WRITE(K053251_lsb_w)
 	AM_RANGE(0x400000, 0x400003) AM_READ(punkshot_sound_r)	/* K053260 */
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(K053260_0_lsb_w)
+	AM_RANGE(0x400000, 0x400001) AM_WRITE(k053260_0_lsb_w)
 	AM_RANGE(0x500000, 0x50003f) AM_READWRITE(K054000_lsb_r, K054000_lsb_w)
 	AM_RANGE(0x500100, 0x500101) AM_WRITE(thndrx2_eeprom_w)
 	AM_RANGE(0x500200, 0x500201) AM_READ(thndrx2_in0_r)
@@ -1226,7 +1226,7 @@ static ADDRESS_MAP_START( mia_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb00d) AM_READWRITE(K007232_read_port_0_r, K007232_write_port_0_w)
+	AM_RANGE(0xb000, 0xb00d) AM_READWRITE(k007232_read_port_0_r, k007232_write_port_0_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xc001, 0xc001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 ADDRESS_MAP_END
@@ -1237,7 +1237,7 @@ static ADDRESS_MAP_START( tmnt_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_READWRITE(tmnt_sres_r, tmnt_sres_w)	/* title music & UPD7759C reset */
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb00d) AM_READWRITE(K007232_read_port_0_r, K007232_write_port_0_w)
+	AM_RANGE(0xb000, 0xb00d) AM_READWRITE(k007232_read_port_0_r, k007232_write_port_0_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xc001, 0xc001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(upd7759_0_port_w)
@@ -1252,7 +1252,7 @@ static ADDRESS_MAP_START( punkshot_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xf801, 0xf801) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_READWRITE(K053260_0_r, K053260_0_w)
+	AM_RANGE(0xfc00, 0xfc2f) AM_READWRITE(k053260_0_r, k053260_0_w)
 ADDRESS_MAP_END
 
 
@@ -1261,14 +1261,14 @@ static ADDRESS_MAP_START( lgtnfght_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xa001, 0xa001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
-	AM_RANGE(0xc000, 0xc02f) AM_READWRITE(K053260_0_r, K053260_0_w)
+	AM_RANGE(0xc000, 0xc02f) AM_READWRITE(k053260_0_r, k053260_0_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( glfgreat_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf82f) AM_READWRITE(K053260_0_r, K053260_0_w)
+	AM_RANGE(0xf800, 0xf82f) AM_READWRITE(k053260_0_r, k053260_0_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
 ADDRESS_MAP_END
 
@@ -1278,7 +1278,7 @@ static ADDRESS_MAP_START( ssriders_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xf801, 0xf801) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
-	AM_RANGE(0xfa00, 0xfa2f) AM_READWRITE(K053260_0_r, K053260_0_w)
+	AM_RANGE(0xfa00, 0xfa2f) AM_READWRITE(k053260_0_r, k053260_0_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(sound_arm_nmi_w)
 ADDRESS_MAP_END
 
@@ -1289,25 +1289,25 @@ static ADDRESS_MAP_START( thndrx2_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x0010) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x0010) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_READWRITE(K053260_0_r, K053260_0_w)
+	AM_RANGE(0xfc00, 0xfc2f) AM_READWRITE(k053260_0_r, k053260_0_w)
 ADDRESS_MAP_END
 
 
-static READ8_HANDLER( K054539_0_ctrl_r )
+static READ8_HANDLER( k054539_0_ctrl_r )
 {
-	return K054539_0_r(machine,0x200+offset);
+	return k054539_0_r(machine,0x200+offset);
 }
-static WRITE8_HANDLER( K054539_0_ctrl_w )
+static WRITE8_HANDLER( k054539_0_ctrl_w )
 {
-	K054539_0_w(machine,0x200+offset,data);
+	k054539_0_w(machine,0x200+offset,data);
 }
 
 static ADDRESS_MAP_START( prmrsocr_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(SMH_BANK1, SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe0ff) AM_READWRITE(K054539_0_r, K054539_0_w)
-	AM_RANGE(0xe100, 0xe12f) AM_READWRITE(K054539_0_ctrl_r, K054539_0_ctrl_w)
+	AM_RANGE(0xe000, 0xe0ff) AM_READWRITE(k054539_0_r, k054539_0_w)
+	AM_RANGE(0xe100, 0xe12f) AM_READWRITE(k054539_0_ctrl_r, k054539_0_ctrl_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
 	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_r)
@@ -2312,11 +2312,11 @@ static const ym2151_interface ym2151_interface_cbj =
 
 static void volume_callback(int v)
 {
-	K007232_set_volume(0,0,(v >> 4) * 0x11,0);
-	K007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(0,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
 }
 
-static const struct K007232_interface k007232_interface =
+static const k007232_interface k007232_config =
 {
 	volume_callback	/* external port callback */
 };
@@ -2394,7 +2394,7 @@ static MACHINE_DRIVER_START( mia )
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 
 	MDRV_SOUND_ADD("konami", K007232, XTAL_3_579545MHz)
-	MDRV_SOUND_CONFIG(k007232_interface)
+	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 MACHINE_DRIVER_END
@@ -2442,7 +2442,7 @@ static MACHINE_DRIVER_START( tmnt )
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 
 	MDRV_SOUND_ADD("konami", K007232, XTAL_3_579545MHz)
-	MDRV_SOUND_CONFIG(k007232_interface)
+	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 
@@ -2631,7 +2631,7 @@ static void sound_nmi(running_machine *machine)
 	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static const struct K054539interface k054539_interface =
+static const k054539_interface k054539_config =
 {
 	NULL,
 	NULL,
@@ -2671,7 +2671,7 @@ static MACHINE_DRIVER_START( prmrsocr )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("konami", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_interface)
+	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

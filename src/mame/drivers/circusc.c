@@ -90,12 +90,12 @@ static WRITE8_HANDLER(circusc_sound_w)
 
 		/* CS3 */
 		case 1:
-			SN76496_0_w(machine, 0, sn_latch);
+			sn76496_0_w(machine, 0, sn_latch);
 			break;
 
 		/* CS4 */
 		case 2:
-			SN76496_1_w(machine, 0, sn_latch);
+			sn76496_1_w(machine, 0, sn_latch);
 			break;
 
 		/* CS5 */

@@ -70,10 +70,10 @@ static WRITE8_HANDLER( sound_select_w )
 	UINT8 to_write = BITSWAP8(*lasso_chip_data, 0, 1, 2, 3, 4, 5, 6, 7);
 
 	if (~data & 0x01)	/* chip #0 */
-		SN76496_0_w(machine, 0, to_write);
+		sn76496_0_w(machine, 0, to_write);
 
 	if (~data & 0x02)	/* chip #1 */
-		SN76496_1_w(machine, 0, to_write);
+		sn76496_1_w(machine, 0, to_write);
 }
 
 

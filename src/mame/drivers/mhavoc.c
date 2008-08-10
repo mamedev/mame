@@ -502,7 +502,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const struct POKEYinterface pokey_interface =
+static const pokey_interface pokey_config =
 {
 	{ 0 },
 	input_port_3_r
@@ -540,7 +540,7 @@ static MACHINE_DRIVER_START( mhavoc )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("pokey.1", POKEY, MHAVOC_CLOCK_1_25M)
-	MDRV_SOUND_CONFIG(pokey_interface)
+	MDRV_SOUND_CONFIG(pokey_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_ADD("pokey.2", POKEY, MHAVOC_CLOCK_1_25M)

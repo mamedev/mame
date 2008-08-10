@@ -55,7 +55,7 @@ static void pcktgal_adpcm_int(running_machine *machine, int data)
 {
 	static int toggle;
 
-	MSM5205_data_w(0,msm5205next >> 4);
+	msm5205_data_w(0,msm5205next >> 4);
 	msm5205next<<=4;
 
 	toggle = 1 - toggle;
@@ -70,7 +70,7 @@ static WRITE8_HANDLER( pcktgal_adpcm_data_w )
 
 static READ8_HANDLER( pcktgal_adpcm_reset_r )
 {
-	MSM5205_reset_w(0,0);
+	msm5205_reset_w(0,0);
 	return 0;
 }
 
@@ -225,7 +225,7 @@ GFXDECODE_END
 
 /***************************************************************************/
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	pcktgal_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 8KHz            */
@@ -270,7 +270,7 @@ static MACHINE_DRIVER_START( pcktgal )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 MACHINE_DRIVER_END
 

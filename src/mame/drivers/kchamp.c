@@ -122,7 +122,7 @@ static WRITE8_HANDLER( sound_reset_w ) {
 }
 
 static WRITE8_HANDLER( sound_control_w ) {
-	MSM5205_reset_w( 0, !( data & 1 ) );
+	msm5205_reset_w( 0, !( data & 1 ) );
 	sound_nmi_enable = ( ( data >> 1 ) & 1 );
 }
 
@@ -407,9 +407,9 @@ static void msmint( running_machine *machine, int data ) {
 	static int counter = 0;
 
 	if ( msm_play_lo_nibble )
-		MSM5205_data_w( 0, msm_data & 0x0f );
+		msm5205_data_w( 0, msm_data & 0x0f );
 	else
-		MSM5205_data_w( 0, ( msm_data >> 4 ) & 0x0f );
+		msm5205_data_w( 0, ( msm_data >> 4 ) & 0x0f );
 
 	msm_play_lo_nibble ^= 1;
 
@@ -420,7 +420,7 @@ static void msmint( running_machine *machine, int data ) {
 	}
 }
 
-static const struct MSM5205interface msm_interface =
+static const msm5205_interface msm_interface =
 {
 	msmint,			/* interrupt function */
 	MSM5205_S96_4B	/* 1 / 96 = 3906.25Hz playback */

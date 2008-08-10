@@ -957,7 +957,7 @@ static WRITE32_HANDLER( model2_serial_w )
 {
 	if (ACCESSING_BITS_0_7 && (offset == 0))
 	{
-		SCSP_MidiIn(machine, 0, data&0xff, 0);
+		scsp_midi_in(machine, 0, data&0xff, 0);
 
 		// give the 68k time to notice
 		cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
@@ -1617,32 +1617,32 @@ static READ16_HANDLER( m1_snd_v60_ready_r )
 
 static READ16_HANDLER( m1_snd_mpcm0_r )
 {
-	return MultiPCM_reg_0_r(machine, 0);
+	return multi_pcm_reg_0_r(machine, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm0_w )
 {
-	MultiPCM_reg_0_w(machine, offset, data);
+	multi_pcm_reg_0_w(machine, offset, data);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm0_bnk_w )
 {
-	multipcm_set_bank(0, 0x100000 * (data & 0xf), 0x100000 * (data & 0xf));
+	multi_pcm_set_bank(0, 0x100000 * (data & 0xf), 0x100000 * (data & 0xf));
 }
 
 static READ16_HANDLER( m1_snd_mpcm1_r )
 {
-	return MultiPCM_reg_1_r(machine, 0);
+	return multi_pcm_reg_1_r(machine, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm1_w )
 {
-	MultiPCM_reg_1_w(machine, offset, data);
+	multi_pcm_reg_1_w(machine, offset, data);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm1_bnk_w )
 {
-	multipcm_set_bank(1, 0x100000 * (data & 0xf), 0x100000 * (data & 0xf));
+	multi_pcm_set_bank(1, 0x100000 * (data & 0xf), 0x100000 * (data & 0xf));
 }
 
 static READ16_HANDLER( m1_snd_ym_r )
@@ -1717,7 +1717,7 @@ static WRITE16_HANDLER( model2snd_ctrl )
 
 static ADDRESS_MAP_START( model2_snd, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_REGION("audio", 0) AM_BASE(&model2_soundram)
-	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(SCSP_0_r, SCSP_0_w)
+	AM_RANGE(0x100000, 0x100fff) AM_READWRITE(scsp_0_r, scsp_0_w)
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(model2snd_ctrl)
 	AM_RANGE(0x600000, 0x67ffff) AM_ROM AM_REGION("audio", 0x80000)
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("scsp", 0)
@@ -1736,7 +1736,7 @@ static void scsp_irq(running_machine *machine, int irq)
 	}
 }
 
-static const struct SCSPinterface scsp_interface =
+static const scsp_interface scsp_config =
 {
 	0,
 	scsp_irq
@@ -1893,7 +1893,7 @@ static MACHINE_DRIVER_START( model2a )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("scsp", SCSP, 0)
-	MDRV_SOUND_CONFIG(scsp_interface)
+	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
 MACHINE_DRIVER_END
@@ -1943,7 +1943,7 @@ static MACHINE_DRIVER_START( model2b )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("scsp", SCSP, 0)
-	MDRV_SOUND_CONFIG(scsp_interface)
+	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
 MACHINE_DRIVER_END
@@ -1977,7 +1977,7 @@ static MACHINE_DRIVER_START( model2c )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("scsp", SCSP, 0)
-	MDRV_SOUND_CONFIG(scsp_interface)
+	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
 MACHINE_DRIVER_END

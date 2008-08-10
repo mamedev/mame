@@ -567,7 +567,7 @@ static WRITE8_HANDLER( slither_coinctl_w )
 static WRITE8_HANDLER( slither_76489_0_w )
 {
 	/* write to the sound chip */
-	SN76496_0_w(machine, 0, data);
+	sn76496_0_w(machine, 0, data);
 
 	/* clock the ready line going back into CB1 */
 	pia_1_cb1_w(machine, 0, 0);
@@ -578,7 +578,7 @@ static WRITE8_HANDLER( slither_76489_0_w )
 static WRITE8_HANDLER( slither_76489_1_w )
 {
 	/* write to the sound chip */
-	SN76496_1_w(machine, 0, data);
+	sn76496_1_w(machine, 0, data);
 
 	/* clock the ready line going back into CB1 */
 	pia_2_cb1_w(machine, 0, 0);

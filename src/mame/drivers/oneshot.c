@@ -106,7 +106,7 @@ static WRITE16_HANDLER( soundbank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		OKIM6295_set_bank_base(0, 0x40000 * ((data & 0x03) ^ 0x03));
+		okim6295_set_bank_base(0, 0x40000 * ((data & 0x03) ^ 0x03));
 	}
 }
 
@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( snd_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8000) AM_READ(soundlatch_r)
 	AM_RANGE(0x8001, 0x87ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe000, 0xe000) AM_READ(YM3812_status_port_0_r)
-	AM_RANGE(0xe010, 0xe010) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0xe010, 0xe010) AM_READ(okim6295_status_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( snd_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -157,7 +157,7 @@ static ADDRESS_MAP_START( snd_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8001, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM3812_control_port_0_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM3812_write_port_0_w)
-	AM_RANGE(0xe010, 0xe010) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0xe010, 0xe010) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( oneshot )

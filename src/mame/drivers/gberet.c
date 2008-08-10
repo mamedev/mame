@@ -158,7 +158,7 @@ static ADDRESS_MAP_START( gberet_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe044, 0xe044) AM_WRITE(gberet_flipscreen_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(gberet_coin_counter_w)
 	AM_RANGE(0xf200, 0xf200) AM_READ(input_port_4_r) AM_WRITENOP		// DSW1 / Loads the snd command into the snd latch
-	AM_RANGE(0xf400, 0xf400) AM_READWRITE(input_port_5_r, SN76496_0_w)	// DSW2 / This address triggers the SN chip to read the data port.
+	AM_RANGE(0xf400, 0xf400) AM_READWRITE(input_port_5_r, sn76496_0_w)	// DSW2 / This address triggers the SN chip to read the data port.
 	AM_RANGE(0xf600, 0xf600) AM_READ(input_port_3_r)	// DSW0
 	AM_RANGE(0xf601, 0xf601) AM_READ(input_port_1_r)	// IN1
 	AM_RANGE(0xf602, 0xf602) AM_READ(input_port_0_r)	// IN0
@@ -178,7 +178,7 @@ static ADDRESS_MAP_START( gberetb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe900, 0xe9ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP				// coin counter not supported
 	AM_RANGE(0xf200, 0xf200) AM_READ(input_port_4_r)	// DSW1
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(SN76496_0_w)
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(sn76496_0_w)
 	AM_RANGE(0xf600, 0xf600) AM_READ(input_port_3_r)	// DSW0
 	AM_RANGE(0xf601, 0xf601) AM_READ(input_port_1_r)	// IN1
 	AM_RANGE(0xf602, 0xf602) AM_READ(input_port_0_r)	// IN0
@@ -200,7 +200,7 @@ static ADDRESS_MAP_START( mrgoemon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe044, 0xe044) AM_WRITE(mrgoemon_flipscreen_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mrgoemon_coin_counter_w)
 	AM_RANGE(0xf200, 0xf200) AM_READ(input_port_4_r) AM_WRITENOP			// DSW1 / Loads the snd command into the snd latch
-	AM_RANGE(0xf400, 0xf400) AM_READWRITE(input_port_5_r, SN76496_0_w)		// DSW2 / This address triggers the SN chip to read the data port.
+	AM_RANGE(0xf400, 0xf400) AM_READWRITE(input_port_5_r, sn76496_0_w)		// DSW2 / This address triggers the SN chip to read the data port.
 	AM_RANGE(0xf600, 0xf600) AM_READWRITE(input_port_3_r, watchdog_reset_w)	// DSW0
 	AM_RANGE(0xf601, 0xf601) AM_READ(input_port_1_r)	// IN1
 	AM_RANGE(0xf602, 0xf602) AM_READ(input_port_0_r)	// IN0

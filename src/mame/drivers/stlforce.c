@@ -101,7 +101,7 @@ static WRITE16_HANDLER( eeprom_w )
 
 static WRITE16_HANDLER( oki_bank_w )
 {
-	OKIM6295_set_bank_base(0, 0x40000 * ((data>>8) & 3));
+	okim6295_set_bank_base(0, 0x40000 * ((data>>8) & 3));
 }
 
 static ADDRESS_MAP_START( stlforce_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -124,7 +124,7 @@ static ADDRESS_MAP_START( stlforce_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400010, 0x400011) AM_WRITE(eeprom_w)
 	AM_RANGE(0x400012, 0x400013) AM_WRITE(oki_bank_w)
 	AM_RANGE(0x40001e, 0x40001f) AM_WRITENOP // sprites buffer commands
-	AM_RANGE(0x410000, 0x410001) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
+	AM_RANGE(0x410000, 0x410001) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( stlforce )

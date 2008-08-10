@@ -1,5 +1,7 @@
-#ifndef SCSPDSP_H
-#define SCSPDSP_H
+#pragma once
+
+#ifndef __SCSPDSP_H__
+#define __SCSPDSP_H__
 
 //the DSP Context
 struct _SCSPDSP
@@ -34,4 +36,5 @@ void SCSPDSP_Init(struct _SCSPDSP *DSP);
 void SCSPDSP_SetSample(struct _SCSPDSP *DSP, INT32 sample, INT32 SEL, INT32 MXL);
 void SCSPDSP_Step(struct _SCSPDSP *DSP);
 void SCSPDSP_Start(struct _SCSPDSP *DSP);
-#endif
+
+#endif /* __SCSPDSP_H__ */

@@ -822,7 +822,7 @@ WRITE8_HANDLER( vanguard_sound_w )
 		}
 
 		/* SHOT B */
-		SN76477_enable_w(1, (data & 0x40) ? 0 : 1);
+		sn76477_enable_w(1, (data & 0x40) ? 0 : 1);
 
 		LastPort1 = data;
 		break;

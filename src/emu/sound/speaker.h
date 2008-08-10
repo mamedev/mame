@@ -5,14 +5,19 @@
     driven by one or more output bits
 
 **********************************************************************/
-#ifndef SPEAKER_H
-#define SPEAKER_H
+
+#pragma once
+
+#ifndef __SPEAKER_H__
+#define __SPEAKER_H__
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-struct Speaker_interface
+
+typedef struct _speaker_interface speaker_interface;
+struct _speaker_interface
 {
 	int num_level; 	/* optional: number of levels (if not two) */
 	const INT16 *levels; 	/* optional: pointer to level lookup table */
@@ -25,5 +30,4 @@ void speaker_level_w (int which, int new_level);
 #endif
 
 
-#endif
-
+#endif /* __SPEAKER_H__ */

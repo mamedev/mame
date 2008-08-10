@@ -232,7 +232,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xca00, 0xca0d) AM_WRITE(MSM5232_0_w)
+	AM_RANGE(0xca00, 0xca0d) AM_WRITE(msm5232_0_w)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(sound_control_0_w)
 	AM_RANGE(0xce00, 0xce00) AM_WRITE(sound_control_1_w)
 	AM_RANGE(0xd800, 0xd800) AM_READWRITE(soundlatch_r, to_main_w)
@@ -643,7 +643,7 @@ static const ay8910_interface ay8910_config =
 	sound_control_3_w
 };
 
-static const struct MSM5232interface msm5232_interface =
+static const msm5232_interface msm5232_config =
 {
 	{ 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6, 1.0e-6 }	/* 1.0 uF capacitors (verified on real PCB) */
 };
@@ -690,7 +690,7 @@ static MACHINE_DRIVER_START( flstory )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MDRV_SOUND_ADD("msm", MSM5232, XTAL_8MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(msm5232_interface)
+	MDRV_SOUND_CONFIG(msm5232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1
@@ -747,7 +747,7 @@ static MACHINE_DRIVER_START( onna34ro )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	MDRV_SOUND_ADD("msm", MSM5232, 2000000)
-	MDRV_SOUND_CONFIG(msm5232_interface)
+	MDRV_SOUND_CONFIG(msm5232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1
@@ -804,7 +804,7 @@ static MACHINE_DRIVER_START( victnine )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("msm", MSM5232, 2000000)
-	MDRV_SOUND_CONFIG(msm5232_interface)
+	MDRV_SOUND_CONFIG(msm5232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1

@@ -337,7 +337,7 @@ static const gfx_layout sauro_spritelayout =
     16*16     /* every sprite takes 32 consecutive bytes */
 };
 
-static const struct sp0256_interface sauro_sp256 =
+static const sp0256_interface sauro_sp256 =
 {
 	lrq_callback,
 	0

@@ -486,26 +486,26 @@ static WRITE8_HANDLER( berzerk_audio_w )
 		/* write data to the S14001 */
 		case 0:
 			/* only if not busy */
-			if (!S14001A_bsy_0_r())
+			if (!s14001a_bsy_0_r())
 			{
-				S14001A_reg_0_w(data & 0x3f);
+				s14001a_reg_0_w(data & 0x3f);
 
 				/* clock the chip -- via a 555 timer */
-				S14001A_rst_0_w(1);
-				S14001A_rst_0_w(0);
+				s14001a_rst_0_w(1);
+				s14001a_rst_0_w(0);
 			}
 
 			break;
 
 		case 1:
 			/* volume */
-			S14001A_set_volume(((data & 0x38) >> 3) + 1);
+			s14001a_set_volume(((data & 0x38) >> 3) + 1);
 
 			/* clock control - the first LS161 divides the clock by 9 to 16, the 2nd by 8,
                giving a final clock from 19.5kHz to 34.7kHz */
 			clock_divisor = 16 - (data & 0x07);
 
-			S14001A_set_clock(S14001_CLOCK / clock_divisor / 8);
+			s14001a_set_clock(S14001_CLOCK / clock_divisor / 8);
 			break;
 
 		default: break; /* 2 and 3 are not connected */
@@ -529,7 +529,7 @@ static WRITE8_HANDLER( berzerk_audio_w )
 
 static READ8_HANDLER( berzerk_audio_r )
 {
-	return ((offset == 4) && !S14001A_bsy_0_r()) ? 0x40 : 0x00;
+	return ((offset == 4) && !s14001a_bsy_0_r()) ? 0x40 : 0x00;
 }
 
 

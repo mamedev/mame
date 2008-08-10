@@ -120,14 +120,14 @@ static READ16_HANDLER( leta_r )
 
 static READ16_HANDLER( adpcm_r )
 {
-	return OKIM6295_status_0_r(machine, offset) | 0xff00;
+	return okim6295_status_0_r(machine, offset) | 0xff00;
 }
 
 
 static WRITE16_HANDLER( adpcm_w )
 {
 	if (ACCESSING_BITS_0_7)
-		OKIM6295_data_0_w(machine, offset, data & 0xff);
+		okim6295_data_0_w(machine, offset, data & 0xff);
 }
 
 

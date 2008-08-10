@@ -263,7 +263,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_READWRITE(twin16_sres_r, twin16_sres_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb00d) AM_READWRITE(K007232_read_port_0_r, K007232_write_port_0_w)
+	AM_RANGE(0xb000, 0xb00d) AM_READWRITE(k007232_read_port_0_r, k007232_write_port_0_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xc001, 0xc001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(upd7759_0_port_w)
@@ -882,11 +882,11 @@ GFXDECODE_END
 
 static void volume_callback(int v)
 {
-	K007232_set_volume(0,0,(v >> 4) * 0x11,0);
-	K007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(0,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
 }
 
-static const struct K007232_interface k007232_interface =
+static const k007232_interface k007232_config =
 {
 	volume_callback	/* external port callback */
 };
@@ -945,7 +945,7 @@ static MACHINE_DRIVER_START( twin16 )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
 	MDRV_SOUND_ADD("konami", K007232, 3579545)
-	MDRV_SOUND_CONFIG(k007232_interface)
+	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.20)
 	MDRV_SOUND_ROUTE(0, "right", 0.20)
 	MDRV_SOUND_ROUTE(1, "left", 0.20)
@@ -997,7 +997,7 @@ static MACHINE_DRIVER_START( fround )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
 	MDRV_SOUND_ADD("konami", K007232, 3579545)
-	MDRV_SOUND_CONFIG(k007232_interface)
+	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.20)
 	MDRV_SOUND_ROUTE(0, "right", 0.20)
 	MDRV_SOUND_ROUTE(1, "left", 0.20)

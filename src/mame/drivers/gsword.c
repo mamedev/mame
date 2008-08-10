@@ -351,9 +351,9 @@ static READ8_HANDLER( gsword_fake_1_r )
 
 static WRITE8_HANDLER( gsword_adpcm_data_w )
 {
-	MSM5205_data_w (0,data & 0x0f); /* bit 0..3 */
-	MSM5205_reset_w(0,(data>>5)&1); /* bit 5    */
-	MSM5205_vclk_w(0,(data>>4)&1);  /* bit 4    */
+	msm5205_data_w (0,data & 0x0f); /* bit 0..3 */
+	msm5205_reset_w(0,(data>>5)&1); /* bit 5    */
+	msm5205_vclk_w(0,(data>>4)&1);  /* bit 4    */
 }
 
 static WRITE8_HANDLER( adpcm_soundcommand_w )
@@ -685,7 +685,7 @@ static const ay8910_interface ay8910_config =
 	NULL
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	0,				/* interrupt function */
 	MSM5205_SEX_4B	/* vclk input mode    */
@@ -742,7 +742,7 @@ static MACHINE_DRIVER_START( gsword )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 
@@ -789,7 +789,7 @@ static MACHINE_DRIVER_START( josvolly )
 
 #if 0
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 #endif
 MACHINE_DRIVER_END

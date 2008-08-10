@@ -226,9 +226,9 @@ static ADDRESS_MAP_START( atetrsb2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE(&paletteram)
 	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE(nvram_w) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x2802, 0x2802) AM_WRITE(SN76496_0_w)
-	AM_RANGE(0x2804, 0x2804) AM_WRITE(SN76496_1_w)
-	AM_RANGE(0x2806, 0x2806) AM_WRITE(SN76496_2_w)
+	AM_RANGE(0x2802, 0x2802) AM_WRITE(sn76496_0_w)
+	AM_RANGE(0x2804, 0x2804) AM_WRITE(sn76496_1_w)
+	AM_RANGE(0x2806, 0x2806) AM_WRITE(sn76496_2_w)
 	AM_RANGE(0x2808, 0x2808) AM_READ_PORT("IN0")
 	AM_RANGE(0x2818, 0x2818) AM_READ_PORT("IN1")
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(watchdog_reset_w)
@@ -318,14 +318,14 @@ GFXDECODE_END
  *
  *************************************/
 
-static const struct POKEYinterface pokey_interface_1 =
+static const pokey_interface pokey_interface_1 =
 {
 	{ 0 },
 	input_port_0_r
 };
 
 
-static const struct POKEYinterface pokey_interface_2 =
+static const pokey_interface pokey_interface_2 =
 {
 	{ 0 },
 	input_port_1_r

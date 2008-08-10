@@ -88,7 +88,7 @@ static MACHINE_RESET( relief )
 	atarigen_interrupt_reset(update_interrupts);
 	atarivc_reset(machine->primary_screen, atarivc_eof_data, 2);
 
-	OKIM6295_set_bank_base(0, 0);
+	okim6295_set_bank_base(0, 0);
 	ym2413_volume = 15;
 	overall_volume = 127;
 	adpcm_bank_base = 0;
@@ -129,7 +129,7 @@ static WRITE16_HANDLER( audio_control_w )
 	if (ACCESSING_BITS_8_15)
 		adpcm_bank_base = (0x100000 * ((data >> 8) & 1)) | (adpcm_bank_base & 0x0c0000);
 
-	OKIM6295_set_bank_base(0, adpcm_bank_base);
+	okim6295_set_bank_base(0, adpcm_bank_base);
 }
 
 
@@ -153,14 +153,14 @@ static WRITE16_HANDLER( audio_volume_w )
 
 static READ16_HANDLER( adpcm_r )
 {
-	return OKIM6295_status_0_r(machine, offset) | 0xff00;
+	return okim6295_status_0_r(machine, offset) | 0xff00;
 }
 
 
 static WRITE16_HANDLER( adpcm_w )
 {
 	if (ACCESSING_BITS_0_7)
-		OKIM6295_data_0_w(machine, offset, data & 0xff);
+		okim6295_data_0_w(machine, offset, data & 0xff);
 }
 
 

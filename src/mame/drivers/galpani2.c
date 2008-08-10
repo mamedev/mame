@@ -212,7 +212,7 @@ static WRITE16_HANDLER( galpani2_oki_1_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		OKIM6295_set_bank_base(1, 0x40000 * (data & 0xf) );
+		okim6295_set_bank_base(1, 0x40000 * (data & 0xf) );
 		logerror("CPU #0 PC %06X : OKI 1 bank %08X\n",activecpu_get_pc(),data);
 	}
 }
@@ -247,8 +247,8 @@ static ADDRESS_MAP_START( galpani2_mem1, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x780002, 0x780003) AM_READ(input_port_1_word_r		)				//
 	AM_RANGE(0x780004, 0x780005) AM_READ(input_port_2_word_r		)				//
 	AM_RANGE(0x780006, 0x780007) AM_READ(input_port_3_word_r		)				//
-	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w	)	// 2 x OKIM6295
-	AM_RANGE(0xc40000, 0xc40001) AM_READWRITE(OKIM6295_status_1_lsb_r, OKIM6295_data_1_lsb_w	)	//
+	AM_RANGE(0xc00000, 0xc00001) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w	)	// 2 x OKIM6295
+	AM_RANGE(0xc40000, 0xc40001) AM_READWRITE(okim6295_status_1_lsb_r, okim6295_data_1_lsb_w	)	//
 	AM_RANGE(0xc80000, 0xc80001) AM_WRITE(galpani2_oki_0_bank_w					)	//
 	AM_RANGE(0xcc0000, 0xcc0001) AM_WRITE(galpani2_oki_1_bank_w					)	//
 ADDRESS_MAP_END

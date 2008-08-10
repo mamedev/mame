@@ -162,7 +162,7 @@ static WRITE16_HANDLER( bitmap_1_w )
 static READ16_HANDLER( oki_0_r )
 {
 	if(offset)
-		return OKIM6295_status_0_r(machine, 0);
+		return okim6295_status_0_r(machine, 0);
 	else
 		return 0;
 }
@@ -170,19 +170,19 @@ static READ16_HANDLER( oki_0_r )
 static WRITE16_HANDLER( oki_0_w )
 {
 	if(offset)
-		OKIM6295_data_0_w(machine, 0, data);
+		okim6295_data_0_w(machine, 0, data);
 }
 
 static WRITE16_HANDLER( oki_1_w )
 {
 	if(offset)
-		OKIM6295_data_1_w(machine, 0, data);
+		okim6295_data_1_w(machine, 0, data);
 }
 
 static READ16_HANDLER( oki_1_r )
 {
 	if(offset)
-		return OKIM6295_status_1_r(machine, 0);
+		return okim6295_status_1_r(machine, 0);
 	else
 		return 0;
 }
@@ -190,13 +190,13 @@ static READ16_HANDLER( oki_1_r )
 static WRITE16_HANDLER( oki_0_bank_w )
 {
 	if(offset)
-		OKIM6295_set_bank_base(0, (data & 1) * 0x40000);
+		okim6295_set_bank_base(0, (data & 1) * 0x40000);
 }
 
 static WRITE16_HANDLER( oki_1_bank_w )
 {
 	if(offset)
-		OKIM6295_set_bank_base(1, (data & 1) * 0x40000);
+		okim6295_set_bank_base(1, (data & 1) * 0x40000);
 }
 
 static WRITE16_HANDLER( pasha2_lamps_w )

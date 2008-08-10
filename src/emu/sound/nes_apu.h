@@ -21,8 +21,10 @@
 
  *****************************************************************************/
 
-#ifndef NES_APU_H
-#define NES_APU_H
+#pragma once
+
+#ifndef __NES_APU_H__
+#define __NES_APU_H__
 
 #include "sndintrf.h"
 
@@ -33,14 +35,16 @@
  * Also make sure to correspond the memory regions to those used in the
  * processor, as each is shared.
  */
-struct NESinterface
+
+typedef struct _nes_interface nes_interface;
+struct _nes_interface
 {
 	const char *region;  /* DMC regions */
 };
 
-READ8_HANDLER( NESPSG_0_r );
-READ8_HANDLER( NESPSG_1_r );
-WRITE8_HANDLER( NESPSG_0_w );
-WRITE8_HANDLER( NESPSG_1_w );
+READ8_HANDLER( nes_psg_0_r );
+READ8_HANDLER( nes_psg_1_r );
+WRITE8_HANDLER( nes_psg_0_w );
+WRITE8_HANDLER( nes_psg_1_w );
 
-#endif
+#endif /* __NES_APU_H__ */

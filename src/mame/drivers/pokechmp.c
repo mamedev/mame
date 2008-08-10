@@ -145,7 +145,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x2800, 0x2800) AM_READ(OKIM6295_status_0_r ) // extra
+	AM_RANGE(0x2800, 0x2800) AM_READ(okim6295_status_0_r ) // extra
 	AM_RANGE(0x3000, 0x3000) AM_READ(soundlatch_r)
 //  AM_RANGE(0x3400, 0x3400) AM_READ(pokechmp_adpcm_reset_r)    /* ? not sure */
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK3)
@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1001, 0x1001) AM_WRITE(YM3812_write_port_0_w)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(SMH_NOP)	/* MSM5205 chip on Pocket Gal, not connected here? */
 //  AM_RANGE(0x2000, 0x2000) AM_WRITE(pokechmp_sound_bank_w)/ * might still be sound bank */
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(OKIM6295_data_0_w) // extra
+	AM_RANGE(0x2800, 0x2800) AM_WRITE(okim6295_data_0_w) // extra
 	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 

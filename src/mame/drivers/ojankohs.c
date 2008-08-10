@@ -88,7 +88,7 @@ static WRITE8_HANDLER( ojankoy_rombank_w )
 	ojankohs_adpcm_reset = ((data & 0x20) >> 5);
 	if (!ojankohs_adpcm_reset) ojankohs_vclk_left = 0;
 
-	MSM5205_reset_w(0, !ojankohs_adpcm_reset);
+	msm5205_reset_w(0, !ojankohs_adpcm_reset);
 }
 
 static WRITE8_HANDLER( ojankohs_adpcm_reset_w )
@@ -96,7 +96,7 @@ static WRITE8_HANDLER( ojankohs_adpcm_reset_w )
 	ojankohs_adpcm_reset = (data & 0x01);
 	ojankohs_vclk_left = 0;
 
-	MSM5205_reset_w(0, !ojankohs_adpcm_reset);
+	msm5205_reset_w(0, !ojankohs_adpcm_reset);
 }
 
 static WRITE8_HANDLER( ojankohs_msm5205_w )
@@ -113,7 +113,7 @@ static void ojankohs_adpcm_int(running_machine *machine, int irq)
 
 	/* clock the data through */
 	if (ojankohs_vclk_left) {
-		MSM5205_data_w(0, (ojankohs_adpcm_data >> 4));
+		msm5205_data_w(0, (ojankohs_adpcm_data >> 4));
 		ojankohs_adpcm_data <<= 4;
 		ojankohs_vclk_left--;
 	}
@@ -131,7 +131,7 @@ static WRITE8_HANDLER( ojankoc_ctrl_w )
 	memory_set_bankptr(1, &BANKROM[bank_address]);
 
 	ojankohs_adpcm_reset = ((data & 0x10) >> 4);
-	MSM5205_reset_w(0, (!(data & 0x10) >> 4));
+	msm5205_reset_w(0, (!(data & 0x10) >> 4));
 	ojankoc_flipscreen(machine, data);
 }
 
@@ -865,7 +865,7 @@ static const ay8910_interface ojankoc_ay8910_interface =
 	input_port_1_r			/* read port #1 */
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	ojankohs_adpcm_int,		/* IRQ handler */
 	MSM5205_S48_4B			/* 8 KHz */
@@ -905,7 +905,7 @@ static MACHINE_DRIVER_START( ojankohs )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -943,7 +943,7 @@ static MACHINE_DRIVER_START( ojankoy )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -980,7 +980,7 @@ static MACHINE_DRIVER_START( ccasino )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -1016,7 +1016,7 @@ static MACHINE_DRIVER_START( ojankoc )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 8000000/22)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

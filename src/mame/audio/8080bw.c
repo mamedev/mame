@@ -28,7 +28,7 @@ WRITE8_HANDLER( invadpt2_sh_port_1_w )
 {
 	UINT8 rising_bits = data & ~port_1_last;
 
-	SN76477_enable_w(0, !(data & 0x01));			/* SAUCER SOUND */
+	sn76477_enable_w(0, !(data & 0x01));			/* SAUCER SOUND */
 
 	if (rising_bits & 0x02) sample_start_n(0, 0, 0, 0);		/* MISSLE SOUND */
 	if (rising_bits & 0x04) sample_start_n(0, 1, 1, 0);		/* EXPLOSION */
@@ -76,7 +76,7 @@ WRITE8_HANDLER( spcewars_sh_port_w )
 {
 	UINT8 rising_bits = data & ~port_1_last;
 
-	SN76477_enable_w(0, !(data & 0x01));			/* Saucer Sound */
+	sn76477_enable_w(0, !(data & 0x01));			/* Saucer Sound */
 
 	if (rising_bits & 0x02) sample_start(0, 0, 0);		/* Shot Sound */
 	if (rising_bits & 0x04) sample_start(1, 1, 0);		/* Base Hit */
@@ -824,15 +824,15 @@ WRITE8_HANDLER( schaser_sh_port_1_w )
 	schaser_explosion = (data >> 5) & 0x01;
 	if (schaser_explosion)
 	{
-		SN76477_amplitude_res_w(0, 1.0 / (1.0/RES_K(200) + 1.0/RES_K(68)));
+		sn76477_amplitude_res_w(0, 1.0 / (1.0/RES_K(200) + 1.0/RES_K(68)));
 	}
 	else
 	{
-		SN76477_amplitude_res_w(0, RES_K(200));
+		sn76477_amplitude_res_w(0, RES_K(200));
 	}
-	SN76477_enable_w(0, !(schaser_effect_555_is_low || schaser_explosion));
-	SN76477_one_shot_cap_voltage_w(0, !(schaser_effect_555_is_low || schaser_explosion) ? 0 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
-	SN76477_mixer_b_w(0, schaser_explosion);
+	sn76477_enable_w(0, !(schaser_effect_555_is_low || schaser_explosion));
+	sn76477_one_shot_cap_voltage_w(0, !(schaser_effect_555_is_low || schaser_explosion) ? 0 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
+	sn76477_mixer_b_w(0, schaser_explosion);
 }
 
 WRITE8_HANDLER( schaser_sh_port_2_w )
@@ -875,8 +875,8 @@ static TIMER_CALLBACK( schaser_effect_555_cb )
 			new_time = attotime_never;
 	}
 	timer_adjust_oneshot(schaser_effect_555_timer, new_time, effect);
-	SN76477_enable_w(0, !(schaser_effect_555_is_low || schaser_explosion));
-	SN76477_one_shot_cap_voltage_w(0, !(schaser_effect_555_is_low || schaser_explosion) ? 0 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
+	sn76477_enable_w(0, !(schaser_effect_555_is_low || schaser_explosion));
+	sn76477_one_shot_cap_voltage_w(0, !(schaser_effect_555_is_low || schaser_explosion) ? 0 : SN76477_EXTERNAL_VOLTAGE_DISCONNECT);
 }
 
 
@@ -978,7 +978,7 @@ WRITE8_HANDLER( lupin3_sh_port_1_w )
 
 	if (rising_bits & 0x01) sample_start(0, 6, 0);		/* Walking, get money */
 
-	SN76477_enable_w(0, data & 0x02 ? 0:1);			/* Helicopter */
+	sn76477_enable_w(0, data & 0x02 ? 0:1);			/* Helicopter */
 
 	if (rising_bits & 0x04) sample_start(0, 7, 0);		/* Translocate */
 	if (rising_bits & 0x08) sample_start(0, 1, 0);		/* Jail */
@@ -1060,7 +1060,7 @@ WRITE8_HANDLER( yosakdon_sh_port_2_w )
 	if (rising_bits & 0x01) sample_start(1, 6, 0);			/* Ready? , Game Over */
 	if (rising_bits & 0x04) sample_start(3, 7, 0);			/* Big bird dead */
 
-	SN76477_enable_w(0, data & 0x08 ? 0:1);				/* Big bird */
+	sn76477_enable_w(0, data & 0x08 ? 0:1);				/* Big bird */
 
 	if (rising_bits & 0x10) sample_start(2, 7, 0);			/* Game Over */
 
@@ -1084,7 +1084,7 @@ WRITE8_HANDLER( shuttlei_sh_port_1_w )
 	if (rising_bits & 0x01) sample_start(4, 4, 0);			/* Fleet move */
 	if (rising_bits & 0x02) sample_start(5, 8, 0);			/* Extra Tank */
 
-	SN76477_enable_w(0, data & 0x04 ? 0:1);				/* UFO */
+	sn76477_enable_w(0, data & 0x04 ? 0:1);				/* UFO */
 
 	port_1_last = data;
 }

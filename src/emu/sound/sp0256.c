@@ -1171,7 +1171,7 @@ static void sp0256_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 static void *sp0256_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	const struct sp0256_interface *intf = config;
+	const sp0256_interface *intf = config;
 	struct sp0256 *sp;
 
 	sp = auto_malloc(sizeof(*sp));

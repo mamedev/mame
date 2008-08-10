@@ -1606,7 +1606,7 @@ GFXDECODE_END
 /* The resistance path of the namco sound is 16k compared to
  * the 10k of the highest gain 54xx filter. Giving a 10/16 gain.
  */
-static const struct namco_interface namco_interface =
+static const namco_interface namco_config =
 {
 	3,				/* number of voices */
 	0				/* stereo */
@@ -1616,7 +1616,7 @@ static const struct namco_interface namco_interface =
  * the signal is 1V, or 25%.  The relative volume between
  * 52xx & 54xx is the same.
  */
-static const struct namco_52xx_interface namco_52xx_interface =
+static const namco_52xx_interface namco_52xx_config =
 {
 	4000,			/* Playback frequency - from 555 timer 6M */
 	80,				/* High pass filter fc */
@@ -1697,11 +1697,11 @@ static MACHINE_DRIVER_START( bosco )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("namco", NAMCO, 18432000/6/32)
-	MDRV_SOUND_CONFIG(namco_interface)
+	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 
 	MDRV_SOUND_ADD("namco2", NAMCO_52XX, 18432000/12)	/* 1.536 MHz */
-	MDRV_SOUND_CONFIG(namco_52xx_interface)
+	MDRV_SOUND_CONFIG(namco_52xx_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	/* discrete circuit on the 54XX outputs */
@@ -1756,7 +1756,7 @@ static MACHINE_DRIVER_START( galaga )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("namco", NAMCO, 18432000/6/32)
-	MDRV_SOUND_CONFIG(namco_interface)
+	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 
 	/* discrete circuit on the 54XX outputs */
@@ -1829,7 +1829,7 @@ static MACHINE_DRIVER_START( xevious )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("namco", NAMCO, 18432000/6/32)
-	MDRV_SOUND_CONFIG(namco_interface)
+	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 
 	/* discrete circuit on the 54XX outputs */
@@ -1903,7 +1903,7 @@ static MACHINE_DRIVER_START( digdug )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("namco", NAMCO, 18432000/6/32)
-	MDRV_SOUND_CONFIG(namco_interface)
+	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 MACHINE_DRIVER_END
 

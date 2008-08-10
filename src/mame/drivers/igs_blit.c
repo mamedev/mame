@@ -694,7 +694,7 @@ static WRITE16_HANDLER( chmplst2_magic_w )
 			{
 				chmplst2_pen_hi = data & 0x07;
 
-				OKIM6295_set_bank_base(0, (data & 0x08) ? 0x40000 : 0);
+				okim6295_set_bank_base(0, (data & 0x08) ? 0x40000 : 0);
 			}
 
 			if ( chmplst2_pen_hi & ~0xf )
@@ -835,7 +835,7 @@ static WRITE16_HANDLER( grtwall_magic_w )
 			{
 				coin_counter_w(0,data & 0x01);
 
-				OKIM6295_set_bank_base(0, (data & 0x10) ? 0x40000 : 0);
+				okim6295_set_bank_base(0, (data & 0x10) ? 0x40000 : 0);
 			}
 
 			if (data & ~0x11)
@@ -890,7 +890,7 @@ static WRITE16_HANDLER( lhb_okibank_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		OKIM6295_set_bank_base(0, (data & 0x200) ? 0x40000 : 0);
+		okim6295_set_bank_base(0, (data & 0x200) ? 0x40000 : 0);
 	}
 
 	if ( data & (~0x200) )
@@ -1078,7 +1078,7 @@ static ADDRESS_MAP_START( chindrag_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x400000, 0x401fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x500000, 0x500001) AM_READ(input_port_3_word_r)
-	AM_RANGE(0x600000, 0x600001) AM_READ(OKIM6295_status_0_lsb_r)
+	AM_RANGE(0x600000, 0x600001) AM_READ(okim6295_status_0_lsb_r)
 	AM_RANGE(0x800002, 0x800003) AM_READ(chindrag_magic_r)
 	AM_RANGE(0xa88000, 0xa88001) AM_READ(igs_3_input_r)
 ADDRESS_MAP_END
@@ -1086,7 +1086,7 @@ static ADDRESS_MAP_START( chindrag_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x200000, 0x200fff) AM_WRITE(SMH_RAM) AM_BASE(&igs_priority_ram)
 	AM_RANGE(0x400000, 0x401fff) AM_WRITE(igs_palette_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(OKIM6295_data_0_lsb_w)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(okim6295_data_0_lsb_w)
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(igs_YM3812_control_port_0_w)
 	AM_RANGE(0x700002, 0x700003) AM_WRITE(igs_YM3812_write_port_0_w)
 	AM_RANGE(0x800000, 0x800003) AM_WRITE(chindrag_magic_w)
@@ -1108,7 +1108,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( chmplst2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x100000, 0x103fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x200000, 0x200001) AM_READ(OKIM6295_status_0_lsb_r)
+	AM_RANGE(0x200000, 0x200001) AM_READ(okim6295_status_0_lsb_r)
 	AM_RANGE(0x208002, 0x208003) AM_READ(chmplst2_magic_r)
 	AM_RANGE(0x20c000, 0x20cfff) AM_READ(SMH_RAM)
 	AM_RANGE(0x210000, 0x211fff) AM_READ(SMH_RAM)
@@ -1117,7 +1117,7 @@ static ADDRESS_MAP_START( chmplst2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 static ADDRESS_MAP_START( chmplst2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x200000, 0x200001) AM_WRITE(OKIM6295_data_0_lsb_w)
+	AM_RANGE(0x200000, 0x200001) AM_WRITE(okim6295_data_0_lsb_w)
 	AM_RANGE(0x204000, 0x204001) AM_WRITE(YM2413_register_port_0_lsb_w	)
 	AM_RANGE(0x204002, 0x204003) AM_WRITE(YM2413_data_port_0_lsb_w		)
 	AM_RANGE(0x208000, 0x208003) AM_WRITE(chmplst2_magic_w)
@@ -1144,7 +1144,7 @@ static ADDRESS_MAP_START( grtwall_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x400000, 0x401fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x520000, 0x520001) AM_READ(input_port_4_word_r)
-	AM_RANGE(0x600000, 0x600001) AM_READ(OKIM6295_status_0_lsb_r)
+	AM_RANGE(0x600000, 0x600001) AM_READ(okim6295_status_0_lsb_r)
 	AM_RANGE(0x800002, 0x800003) AM_READ(grtwall_magic_r)
 	AM_RANGE(0xa88000, 0xa88001) AM_READ(igs_4_input_r)
 ADDRESS_MAP_END
@@ -1152,7 +1152,7 @@ static ADDRESS_MAP_START( grtwall_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x200000, 0x200fff) AM_WRITE(SMH_RAM) AM_BASE(&igs_priority_ram)
 	AM_RANGE(0x400000, 0x401fff) AM_WRITE(igs_palette_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(OKIM6295_data_0_lsb_w)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(okim6295_data_0_lsb_w)
 	AM_RANGE(0x800000, 0x800003) AM_WRITE(grtwall_magic_w)
 	AM_RANGE(0xa20000, 0xa20001) AM_WRITE(igs_priority_w)
 	AM_RANGE(0xa40000, 0xa40001) AM_WRITE(igs_4_input_w)
@@ -1175,7 +1175,7 @@ static ADDRESS_MAP_START( lhb_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x300000, 0x3fffff) AM_READ(igs_layers_r)
 	AM_RANGE(0x400000, 0x401fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x600000, 0x600001) AM_READ(OKIM6295_status_0_lsb_r)
+	AM_RANGE(0x600000, 0x600001) AM_READ(okim6295_status_0_lsb_r)
 	AM_RANGE(0x700000, 0x700001) AM_READ(input_port_5_word_r)
 	AM_RANGE(0x700002, 0x700005) AM_READ(lhb_input2_r)
 	AM_RANGE(0x888000, 0x888001) AM_READ(igs_5_input_r)
@@ -1186,7 +1186,7 @@ static ADDRESS_MAP_START( lhb_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x200fff) AM_WRITE(SMH_RAM) AM_BASE(&igs_priority_ram)
 	AM_RANGE(0x300000, 0x3fffff) AM_WRITE(igs_layers_w)
 	AM_RANGE(0x400000, 0x401fff) AM_WRITE(igs_palette_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(OKIM6295_data_0_lsb_w)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(okim6295_data_0_lsb_w)
 	AM_RANGE(0x700002, 0x700003) AM_WRITE(lhb_input2_w)
 	AM_RANGE(0x820000, 0x820001) AM_WRITE(igs_priority_w)
 	AM_RANGE(0x840000, 0x840001) AM_WRITE(igs_5_input_w)
@@ -1315,7 +1315,7 @@ static ADDRESS_MAP_START( xymg_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x200000, 0x200fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x400000, 0x401fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x600000, 0x600001) AM_READ(OKIM6295_status_0_lsb_r)
+	AM_RANGE(0x600000, 0x600001) AM_READ(okim6295_status_0_lsb_r)
 	AM_RANGE(0x700002, 0x700003) AM_READ(xymg_magic_r)
 	AM_RANGE(0x888000, 0x888001) AM_READ(igs_3_input_r)
 	AM_RANGE(0x1f0000, 0x1f3fff) AM_READ(SMH_RAM)
@@ -1325,7 +1325,7 @@ static ADDRESS_MAP_START( xymg_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x200000, 0x200fff) AM_WRITE(SMH_RAM) AM_BASE(&igs_priority_ram)
 	AM_RANGE(0x400000, 0x401fff) AM_WRITE(igs_palette_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(OKIM6295_data_0_lsb_w)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(okim6295_data_0_lsb_w)
 	AM_RANGE(0x700000, 0x700003) AM_WRITE(xymg_magic_w)
 	AM_RANGE(0x820000, 0x820001) AM_WRITE(igs_priority_w)
 	AM_RANGE(0x840000, 0x840001) AM_WRITE(igs_3_input_w)

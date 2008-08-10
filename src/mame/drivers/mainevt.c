@@ -114,7 +114,7 @@ static WRITE8_HANDLER( mainevt_sh_bankswitch_w )
 	/* bits 0-3 select the 007232 banks */
 	bank_A=(data&0x3);
 	bank_B=((data>>2)&0x3);
-	K007232_set_bank( 0, bank_A, bank_B );
+	k007232_set_bank( 0, bank_A, bank_B );
 
 	/* bits 4-5 select the UPD7759 bank */
 	upd7759_set_bank_base(0, ((data >> 4) & 0x03) * 0x20000);
@@ -129,7 +129,7 @@ static WRITE8_HANDLER( dv_sh_bankswitch_w )
 	/* bits 0-3 select the 007232 banks */
 	bank_A=(data&0x3);
 	bank_B=((data>>2)&0x3);
-	K007232_set_bank( 0, bank_A, bank_B );
+	k007232_set_bank( 0, bank_A, bank_B );
 }
 
 
@@ -197,14 +197,14 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x83ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb00d) AM_READ(K007232_read_port_0_r)
+	AM_RANGE(0xb000, 0xb00d) AM_READ(k007232_read_port_0_r)
 	AM_RANGE(0xd000, 0xd000) AM_READ(upd7759_0_busy_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x83ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xb000, 0xb00d) AM_WRITE(K007232_write_port_0_w)
+	AM_RANGE(0xb000, 0xb00d) AM_WRITE(k007232_write_port_0_w)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(upd7759_0_port_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(mainevt_sh_irqcontrol_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mainevt_sh_bankswitch_w)
@@ -214,14 +214,14 @@ static ADDRESS_MAP_START( dv_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x83ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xb000, 0xb00d) AM_READ(K007232_read_port_0_r)
+	AM_RANGE(0xb000, 0xb00d) AM_READ(k007232_read_port_0_r)
 	AM_RANGE(0xc001, 0xc001) AM_READ(YM2151_status_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dv_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x83ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xb000, 0xb00d) AM_WRITE(K007232_write_port_0_w)
+	AM_RANGE(0xb000, 0xb00d) AM_WRITE(k007232_write_port_0_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM2151_data_port_0_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(devstor_sh_irqcontrol_w)
@@ -688,11 +688,11 @@ INPUT_PORTS_END
 
 static void volume_callback(int v)
 {
-	K007232_set_volume(0,0,(v >> 4) * 0x11,0);
-	K007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(0,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
 }
 
-static const struct K007232_interface k007232_interface =
+static const k007232_interface k007232_config =
 {
 	volume_callback	/* external port callback */
 };
@@ -727,7 +727,7 @@ static MACHINE_DRIVER_START( mainevt )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("konami", K007232, 3579545)
-	MDRV_SOUND_CONFIG(k007232_interface)
+	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 
@@ -770,7 +770,7 @@ static MACHINE_DRIVER_START( devstors )
 	MDRV_SOUND_ROUTE(1, "mono", 0.30)
 
 	MDRV_SOUND_ADD("konami", K007232, 3579545)
-	MDRV_SOUND_CONFIG(k007232_interface)
+	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 MACHINE_DRIVER_END

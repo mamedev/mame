@@ -1,5 +1,7 @@
-#ifndef __SID_H_
-#define __SID_H_
+#pragma once
+
+#ifndef __SID_H__
+#define __SID_H__
 
 /*
   approximation of the sid6581 chip
@@ -71,4 +73,4 @@ void sidEmuFillBuffer(SID6581 *This, stream_sample_t *buffer, UINT32 bufferLen )
 void sidFilterTableInit(void);
 #endif
 
-#endif
+#endif /* __SID_H__ */

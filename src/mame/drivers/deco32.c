@@ -443,12 +443,12 @@ static WRITE32_HANDLER( dragngun_eeprom_w )
 
 static READ32_HANDLER(dragngun_oki_2_r)
 {
-	return OKIM6295_status_2_r(machine, 0);
+	return okim6295_status_2_r(machine, 0);
 }
 
 static WRITE32_HANDLER(dragngun_oki_2_w)
 {
-	OKIM6295_data_2_w(machine, 0, data&0xff);
+	okim6295_data_2_w(machine, 0, data&0xff);
 }
 
 /**********************************************************************************/
@@ -1143,8 +1143,8 @@ static READ8_HANDLER(deco32_bsmt_status_r)
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x110000, 0x110001) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0x120000, 0x120001) AM_READ(OKIM6295_status_0_r)
-	AM_RANGE(0x130000, 0x130001) AM_READ(OKIM6295_status_1_r)
+	AM_RANGE(0x120000, 0x120001) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0x130000, 0x130001) AM_READ(okim6295_status_1_r)
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_READ(SMH_BANK8)
 ADDRESS_MAP_END
@@ -1152,8 +1152,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x110000, 0x110001) AM_WRITE(YM2151_word_0_w)
-	AM_RANGE(0x120000, 0x120001) AM_WRITE(OKIM6295_data_0_w)
-	AM_RANGE(0x130000, 0x130001) AM_WRITE(OKIM6295_data_1_w)
+	AM_RANGE(0x120000, 0x120001) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0x130000, 0x130001) AM_WRITE(okim6295_data_1_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8)
 	AM_RANGE(0x1fec00, 0x1fec01) AM_WRITE(H6280_timer_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(H6280_irq_status_w)
@@ -1187,8 +1187,8 @@ static ADDRESS_MAP_START( nslasher_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xa001, 0xa001) AM_READ(YM2151_status_port_0_r) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ(OKIM6295_status_0_r) AM_WRITE(OKIM6295_data_0_w)
-	AM_RANGE(0xc000, 0xc000) AM_READ(OKIM6295_status_1_r) AM_WRITE(OKIM6295_data_1_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ(okim6295_status_0_r) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0xc000, 0xc000) AM_READ(okim6295_status_1_r) AM_WRITE(okim6295_data_1_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ(latch_r)
 ADDRESS_MAP_END
 
@@ -1792,8 +1792,8 @@ static void sound_irq_nslasher(running_machine *machine, int state)
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	OKIM6295_set_bank_base(0, ((data >> 0)& 1) * 0x40000);
-	OKIM6295_set_bank_base(1, ((data >> 1)& 1) * 0x40000);
+	okim6295_set_bank_base(0, ((data >> 0)& 1) * 0x40000);
+	okim6295_set_bank_base(1, ((data >> 1)& 1) * 0x40000);
 }
 
 static const ym2151_interface ym2151_config =

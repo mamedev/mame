@@ -119,14 +119,14 @@ static READ8_HANDLER( m6803_port2_r )
 static WRITE8_HANDLER( ay8910_0_portb_w )
 {
 	/* bits 2-4 select MSM5205 clock & 3b/4b playback mode */
-	MSM5205_playmode_w(0, (data >> 2) & 7);
+	msm5205_playmode_w(0, (data >> 2) & 7);
 	if (sndti_exists(SOUND_MSM5205, 1))
-		MSM5205_playmode_w(1, ((data >> 2) & 4) | 3);	/* always in slave mode */
+		msm5205_playmode_w(1, ((data >> 2) & 4) | 3);	/* always in slave mode */
 
 	/* bits 0 and 1 reset the two chips */
-	MSM5205_reset_w(0, data & 1);
+	msm5205_reset_w(0, data & 1);
 	if (sndti_exists(SOUND_MSM5205, 1))
-		MSM5205_reset_w(1, data & 2);
+		msm5205_reset_w(1, data & 2);
 }
 
 
@@ -154,15 +154,15 @@ static WRITE8_HANDLER( sound_irq_ack_w )
 static WRITE8_HANDLER( m52_adpcm_w )
 {
 	if (offset & 1)
-		MSM5205_data_w(0, data);
+		msm5205_data_w(0, data);
 	if ((offset & 2) && sndti_exists(SOUND_MSM5205, 1))
-		MSM5205_data_w(1, data);
+		msm5205_data_w(1, data);
 }
 
 
 static WRITE8_HANDLER( m62_adpcm_w )
 {
-	MSM5205_data_w(offset, data);
+	msm5205_data_w(offset, data);
 }
 
 
@@ -180,8 +180,8 @@ static void adpcm_int(running_machine *machine, int data)
 	/* the first MSM5205 clocks the second */
 	if (sndti_exists(SOUND_MSM5205, 1))
 	{
-		MSM5205_vclk_w(1,1);
-		MSM5205_vclk_w(1,0);
+		msm5205_vclk_w(1,1);
+		msm5205_vclk_w(1,0);
 	}
 }
 
@@ -217,13 +217,13 @@ static const ay8910_interface irem_ay8910_interface_2 =
 	NULL
 };
 
-static const struct MSM5205interface irem_msm5205_interface_1 =
+static const msm5205_interface irem_msm5205_interface_1 =
 {
 	adpcm_int,			/* interrupt function */
 	MSM5205_S96_4B		/* default to 4KHz, but can be changed at run time */
 };
 
-static const struct MSM5205interface irem_msm5205_interface_2 =
+static const msm5205_interface irem_msm5205_interface_2 =
 {
 	0,				/* interrupt function */
 	MSM5205_SEX_4B		/* default to 4KHz, but can be changed at run time, slave */

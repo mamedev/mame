@@ -123,7 +123,7 @@ static ADDRESS_MAP_START( sderby_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x200000, 0x200fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
-	AM_RANGE(0x30800e, 0x30800f) AM_READ(OKIM6295_status_0_lsb_r)
+	AM_RANGE(0x30800e, 0x30800f) AM_READ(okim6295_status_0_lsb_r)
 	AM_RANGE(0xd00000, 0xd001ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf00000, 0xffffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( sderby_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x10400e, 0x10400f) AM_WRITE(SMH_NOP)	// ??? - check code at 0x000524 (executed once at startup)
     AM_RANGE(0x200000, 0x200fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x308008, 0x308009) AM_WRITE(SMH_NOP)	// ???
-	AM_RANGE(0x30800e, 0x30800f) AM_WRITE(OKIM6295_data_0_lsb_w)
+	AM_RANGE(0x30800e, 0x30800f) AM_WRITE(okim6295_data_0_lsb_w)
 	AM_RANGE(0x380000, 0x380fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(SMH_NOP)	// ??? - check code at 0x00042e (executed once at startup)
 	AM_RANGE(0xd00000, 0xd001ff) AM_WRITE(SMH_RAM)
@@ -156,7 +156,7 @@ static ADDRESS_MAP_START( roulette_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x708000, 0x70800d) AM_READ(roulette_input_r) AM_WRITE(SMH_NOP) // what are the writes?
 	AM_RANGE(0x708008, 0x708009) AM_WRITE(SMH_NOP)	// ???
-	AM_RANGE(0x70800e, 0x70800f) AM_READ(OKIM6295_status_0_lsb_r) AM_WRITE(OKIM6295_data_0_lsb_w) // ?? it only ever plays 1 sound
+	AM_RANGE(0x70800e, 0x70800f) AM_READ(okim6295_status_0_lsb_r) AM_WRITE(okim6295_data_0_lsb_w) // ?? it only ever plays 1 sound
 	AM_RANGE(0x780000, 0x780fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
 
 	AM_RANGE(0xf00000, 0xffffff) AM_RAM

@@ -249,8 +249,8 @@ static ADDRESS_MAP_START( varia_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x31fffc, 0x31fffd) AM_READ(varia_dips_bit1_r )  // 0x40 = dip1-1 , 0x80 = dip2-1
 	AM_RANGE(0x31fffe, 0x31ffff) AM_READ(varia_random )  // nothing?
 
-	AM_RANGE(0x400000, 0x400001) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w )
-	AM_RANGE(0x400002, 0x400003) AM_WRITE(OKIM6295_data_0_lsb_w )	// Volume/channel info
+	AM_RANGE(0x400000, 0x400001) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w )
+	AM_RANGE(0x400002, 0x400003) AM_WRITE(okim6295_data_0_lsb_w )	// Volume/channel info
 	AM_RANGE(0x500000, 0x50000d) AM_WRITE(vmetal_es8712_w)
 
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM

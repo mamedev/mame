@@ -652,13 +652,13 @@ INLINE void apu_write(int chip,int address, uint8 value)
 /* EXTERNAL INTERFACE FUNCTIONS */
 
 /* REGISTER READ/WRITE FUNCTIONS */
-READ8_HANDLER( NESPSG_0_r ) {return apu_read(0,offset);}
-READ8_HANDLER( NESPSG_1_r ) {return apu_read(1,offset);}
-WRITE8_HANDLER( NESPSG_0_w ) {apu_write(0,offset,data);}
-WRITE8_HANDLER( NESPSG_1_w ) {apu_write(1,offset,data);}
+READ8_HANDLER( nes_psg_0_r ) {return apu_read(0,offset);}
+READ8_HANDLER( nes_psg_1_r ) {return apu_read(1,offset);}
+WRITE8_HANDLER( nes_psg_0_w ) {apu_write(0,offset,data);}
+WRITE8_HANDLER( nes_psg_1_w ) {apu_write(1,offset,data);}
 
 /* UPDATE APU SYSTEM */
-static void NESPSG_update_sound(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
+static void nes_psg_update_sound(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
 {
   struct nesapu_info *info = param;
   apu_update(info, buffer[0], length);
@@ -668,7 +668,7 @@ static void NESPSG_update_sound(void *param, stream_sample_t **inputs, stream_sa
 /* INITIALIZE APU SYSTEM */
 static void *nesapu_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	const struct NESinterface *intf = config;
+	const nes_interface *intf = config;
 	struct nesapu_info *info;
 	int rate = clock / 4;
 	int i;
@@ -693,7 +693,7 @@ static void *nesapu_start(const char *tag, int sndindex, int clock, const void *
 	/* Initialize individual chips */
 	(info->APU.dpcm).cpu_mem=memory_region(Machine, intf->region);
 
-	info->stream = stream_create(0, 1, rate, info, NESPSG_update_sound);
+	info->stream = stream_create(0, 1, rate, info, nes_psg_update_sound);
 
 	/* register for save */
 	for (i = 0; i < 2; i++)

@@ -164,7 +164,7 @@ static WRITE8_HANDLER( sound_bank_w )
 	/* banks # for the 007232 (chip 1) */
 	bank_A = ((data >> 0) & 0x03);
 	bank_B = ((data >> 2) & 0x03);
-	K007232_set_bank( 0, bank_A, bank_B );
+	k007232_set_bank( 0, bank_A, bank_B );
 }
 
 
@@ -207,7 +207,7 @@ static ADDRESS_MAP_START( gradius3_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_bank_w)				/* 007232 bankswitch */
 	AM_RANGE(0xf010, 0xf010) AM_READ(soundlatch_r)
-	AM_RANGE(0xf020, 0xf02d) AM_READWRITE(K007232_read_port_0_r, K007232_write_port_0_w)
+	AM_RANGE(0xf020, 0xf02d) AM_READWRITE(k007232_read_port_0_r, k007232_write_port_0_w)
 	AM_RANGE(0xf030, 0xf030) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xf031, 0xf031) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
@@ -323,11 +323,11 @@ INPUT_PORTS_END
 
 static void volume_callback(int v)
 {
-	K007232_set_volume(0,0,(v >> 4) * 0x11,0);
-	K007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(0,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
 }
 
-static const struct K007232_interface k007232_interface =
+static const k007232_interface k007232_config =
 {
 	volume_callback	/* external port callback */
 };
@@ -376,7 +376,7 @@ static MACHINE_DRIVER_START( gradius3 )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
 	MDRV_SOUND_ADD("konami", K007232, 3579545)
-	MDRV_SOUND_CONFIG(k007232_interface)
+	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.20)
 	MDRV_SOUND_ROUTE(0, "right", 0.20)
 	MDRV_SOUND_ROUTE(1, "left", 0.20)

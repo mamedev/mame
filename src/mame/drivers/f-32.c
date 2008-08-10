@@ -20,12 +20,12 @@ static UINT32 *mosaicf2_videoram;
 
 static READ32_HANDLER( oki_32bit_r )
 {
-	return OKIM6295_status_0_r(machine, 0);
+	return okim6295_status_0_r(machine, 0);
 }
 
 static WRITE32_HANDLER( oki_32bit_w )
 {
-	OKIM6295_data_0_w(machine, 0, data & 0xff);
+	okim6295_data_0_w(machine, 0, data & 0xff);
 }
 
 static READ32_HANDLER( ym2151_status_32bit_r )

@@ -338,7 +338,7 @@ static int adpcm_data = 0x80;
 
 static void splash_msm5205_int(running_machine *machine, int data)
 {
-	MSM5205_data_w(0,adpcm_data >> 4);
+	msm5205_data_w(0,adpcm_data >> 4);
 //  adpcm_data = (adpcm_data << 4) & 0xf0;
 }
 
@@ -465,7 +465,7 @@ GFXDECODE_END
 
 
 
-static const struct MSM5205interface discoboy_msm5205_interface =
+static const msm5205_interface discoboy_msm5205_interface =
 {
 	splash_msm5205_int,	/* IRQ handler */
 	MSM5205_S48_4B		/* ??? unknown hz */

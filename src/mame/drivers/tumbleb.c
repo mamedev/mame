@@ -364,12 +364,12 @@ static WRITE16_HANDLER( tumblepb_oki_w )
 {
 	if (mem_mask==0xffff)
 	{
-		OKIM6295_data_0_w(machine,0,data&0xff);
+		okim6295_data_0_w(machine,0,data&0xff);
 		//printf("tumbleb_oki_w %04x %04x\n",data,mem_mask);
 	}
 	else
 	{
-		OKIM6295_data_0_w(machine,0,(data>>8)&0xff);
+		okim6295_data_0_w(machine,0,(data>>8)&0xff);
 		//printf("tumbleb_oki_w %04x %04x\n",data,mem_mask);
 	}
     /* STUFF IN OTHER BYTE TOO..*/
@@ -490,14 +490,14 @@ static int tumbleb2_music_is_playing;
 
 static void tumbleb2_playmusic(running_machine *machine)
 {
-	int status = OKIM6295_status_0_r(machine,0);
+	int status = okim6295_status_0_r(machine,0);
 
 	if (tumbleb2_music_is_playing)
 	{
 		if ((status&0x08)==0x00)
 		{
-			OKIM6295_data_0_w(machine,0,0x80|tumblep_music_command);
-			OKIM6295_data_0_w(machine,0,0x00|0x82);
+			okim6295_data_0_w(machine,0,0x80|tumblep_music_command);
+			okim6295_data_0_w(machine,0,0x00|0x82);
 		}
 	}
 }
@@ -538,22 +538,22 @@ static void tumbleb2_set_music_bank(running_machine *machine, int bank)
 
 static void tumbleb2_play_sound (running_machine *machine, int data)
 {
-	int status = OKIM6295_status_0_r(machine,0);
+	int status = okim6295_status_0_r(machine,0);
 
 	if ((status&0x01)==0x00)
 	{
-		OKIM6295_data_0_w(machine,0,0x80|data);
-		OKIM6295_data_0_w(machine,0,0x00|0x12);
+		okim6295_data_0_w(machine,0,0x80|data);
+		okim6295_data_0_w(machine,0,0x00|0x12);
 	}
 	else if ((status&0x02)==0x00)
 	{
-		OKIM6295_data_0_w(machine,0,0x80|data);
-		OKIM6295_data_0_w(machine,0,0x00|0x22);
+		okim6295_data_0_w(machine,0,0x80|data);
+		okim6295_data_0_w(machine,0,0x00|0x22);
 	}
 	else if ((status&0x04)==0x00)
 	{
-		OKIM6295_data_0_w(machine,0,0x80|data);
-		OKIM6295_data_0_w(machine,0,0x00|0x42);
+		okim6295_data_0_w(machine,0,0x80|data);
+		okim6295_data_0_w(machine,0,0x00|0x42);
 	}
 }
 
@@ -571,13 +571,13 @@ static void tumbleb2_play_sound (running_machine *machine, int data)
 
 static void process_tumbleb2_music_command(running_machine *machine, int data)
 {
-	int status = OKIM6295_status_0_r(machine,0);
+	int status = okim6295_status_0_r(machine,0);
 
 	if (data == 1) // stop?
 	{
 		if ((status&0x08)==0x08)
 		{
-			OKIM6295_data_0_w(machine,0,0x40);		/* Stop playing music */
+			okim6295_data_0_w(machine,0,0x40);		/* Stop playing music */
 			tumbleb2_music_is_playing = 0;
 		}
 	}
@@ -586,7 +586,7 @@ static void process_tumbleb2_music_command(running_machine *machine, int data)
 		if (tumbleb2_music_is_playing != data)
 		{
 			tumbleb2_music_is_playing = data;
-			OKIM6295_data_0_w(machine,0,0x40); // stop the current music
+			okim6295_data_0_w(machine,0,0x40); // stop the current music
 			switch (data)
 			{
 				case 0x04: // map screen
@@ -725,7 +725,7 @@ static ADDRESS_MAP_START( fncywld_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 #endif
 	AM_RANGE(0x100000, 0x100001) AM_READWRITE(YM2151_status_port_0_lsb_r, YM2151_register_port_0_lsb_w)
 	AM_RANGE(0x100002, 0x100003) AM_READWRITE(SMH_NOP, YM2151_data_port_0_lsb_w)
-	AM_RANGE(0x100004, 0x100005) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
+	AM_RANGE(0x100004, 0x100005) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size) /* sprites */
 	AM_RANGE(0x160800, 0x16080f) AM_WRITE(SMH_RAM) /* goes slightly past the end of spriteram? */
@@ -855,7 +855,7 @@ static ADDRESS_MAP_START( semicom_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xf001, 0xf001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
-	AM_RANGE(0xf002, 0xf002) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+	AM_RANGE(0xf002, 0xf002) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 //  AM_RANGE(0xf006, 0xf006) ??
 	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_r)
 	AM_RANGE(0xf00e, 0xf00e) AM_WRITE(oki_sound_bank_w)
@@ -882,7 +882,7 @@ static ADDRESS_MAP_START( jumppop_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(YM3812_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(YM3812_write_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0x03, 0x03) AM_READ(jumppop_z80latch_r)
 	AM_RANGE(0x04, 0x04) AM_NOP
 	AM_RANGE(0x05, 0x05) AM_WRITE(jumppop_z80_bank_w)
@@ -923,7 +923,7 @@ static ADDRESS_MAP_START( jumpkids_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(jumpkids_oki_bank_w)
-	AM_RANGE(0x9800, 0x9800) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+	AM_RANGE(0x9800, 0x9800) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 

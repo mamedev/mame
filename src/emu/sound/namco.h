@@ -1,7 +1,10 @@
-#ifndef namco_h
-#define namco_h
+#pragma once
 
-struct namco_interface
+#ifndef __NAMCO_H__
+#define __NAMCO_H__
+
+typedef struct _namco_interface namco_interface;
+struct _namco_interface
 {
 	int voices;		/* number of voices */
 	int stereo;		/* set to 1 to indicate stereo (e.g., System 1) */
@@ -29,5 +32,5 @@ extern UINT8 *namco_wavedata;
 #define pacman_soundregs namco_soundregs
 #define polepos_soundregs namco_soundregs
 
-#endif
+#endif /* __NAMCO_H__ */
 

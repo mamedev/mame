@@ -81,7 +81,7 @@ static int make_mixer_table(struct k051649_info *info, int voices)
 
 
 /* generate sound to the mix buffer */
-static void K051649_update(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
+static void k051649_update(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
 {
 	struct k051649_info *info = param;
 	k051649_sound_channel *voice=info->channel_list;
@@ -136,7 +136,7 @@ static void *k051649_start(const char *tag, int sndindex, int clock, const void 
 
 	/* get stream channels */
 	info->rate = clock/16;
-	info->stream = stream_create(0, 1, info->rate, info, K051649_update);
+	info->stream = stream_create(0, 1, info->rate, info, k051649_update);
 	info->mclock = clock;
 
 	/* allocate a buffer to mix into - 1 second's worth should be more than enough */
@@ -165,7 +165,7 @@ static void k051649_reset(void *chip)
 
 /********************************************************************************/
 
-WRITE8_HANDLER( K051649_waveform_w )
+WRITE8_HANDLER( k051649_waveform_w )
 {
 	struct k051649_info *info = sndti_token(SOUND_K051649, 0);
 	stream_update(info->stream);
@@ -175,28 +175,28 @@ WRITE8_HANDLER( K051649_waveform_w )
 		info->channel_list[4].waveform[offset&0x1f]=data;
 }
 
-READ8_HANDLER ( K051649_waveform_r )
+READ8_HANDLER ( k051649_waveform_r )
 {
 	struct k051649_info *info = sndti_token(SOUND_K051649, 0);
 	return info->channel_list[offset>>5].waveform[offset&0x1f];
 }
 
 /* SY 20001114: Channel 5 doesn't share the waveform with channel 4 on this chip */
-WRITE8_HANDLER( K052539_waveform_w )
+WRITE8_HANDLER( k052539_waveform_w )
 {
 	struct k051649_info *info = sndti_token(SOUND_K051649, 0);
 	stream_update(info->stream);
 	info->channel_list[offset>>5].waveform[offset&0x1f]=data;
 }
 
-WRITE8_HANDLER( K051649_volume_w )
+WRITE8_HANDLER( k051649_volume_w )
 {
 	struct k051649_info *info = sndti_token(SOUND_K051649, 0);
 	stream_update(info->stream);
 	info->channel_list[offset&0x7].volume=data&0xf;
 }
 
-WRITE8_HANDLER( K051649_frequency_w )
+WRITE8_HANDLER( k051649_frequency_w )
 {
 	struct k051649_info *info = sndti_token(SOUND_K051649, 0);
 	info->f[offset]=data;
@@ -205,7 +205,7 @@ WRITE8_HANDLER( K051649_frequency_w )
 	info->channel_list[offset>>1].frequency=(info->f[offset&0xe] + (info->f[offset|1]<<8))&0xfff;
 }
 
-WRITE8_HANDLER( K051649_keyonoff_w )
+WRITE8_HANDLER( k051649_keyonoff_w )
 {
 	struct k051649_info *info = sndti_token(SOUND_K051649, 0);
 	stream_update(info->stream);

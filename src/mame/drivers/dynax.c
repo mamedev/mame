@@ -400,7 +400,7 @@ static void adpcm_int(running_machine *machine, int data)
 {
 	static int toggle;
 
-	MSM5205_data_w(0,msm5205next >> 4);
+	msm5205_data_w(0,msm5205next >> 4);
 	msm5205next<<=4;
 
 	toggle = 1 - toggle;
@@ -414,7 +414,7 @@ static void adpcm_int_cpu1(running_machine *machine, int data)
 {
 	static int toggle;
 
-	MSM5205_data_w(0,msm5205next >> 4);
+	msm5205_data_w(0,msm5205next >> 4);
 	msm5205next<<=4;
 
 	toggle = 1 - toggle;
@@ -434,14 +434,14 @@ static WRITE8_HANDLER( adpcm_data_w )
 static WRITE8_HANDLER( adpcm_reset_w )
 {
 	resetkludge = data & 1;
-	MSM5205_reset_w(0,~data & 1);
+	msm5205_reset_w(0,~data & 1);
 }
 
 static MACHINE_RESET( adpcm )
 {
 	/* start with the MSM5205 reset */
 	resetkludge = 0;
-	MSM5205_reset_w(0,1);
+	msm5205_reset_w(0,1);
 }
 
 static WRITE8_HANDLER( yarunara_layer_half_w )
@@ -3615,7 +3615,7 @@ static const ym2203_interface hanamai_ym2203_interface =
 	sprtmtch_sound_callback		/* IRQ handler */
 };
 
-static const struct MSM5205interface hanamai_msm5205_interface =
+static const msm5205_interface hanamai_msm5205_interface =
 {
 	adpcm_int,			/* IRQ handler */
 	MSM5205_S48_4B		/* 8 KHz, 4 Bits  */
@@ -3912,7 +3912,7 @@ static const ym2203_interface jantouki_ym2203_interface =
 	jantouki_sound_callback		/* IRQ handler */
 };
 
-static const struct MSM5205interface jantouki_msm5205_interface =
+static const msm5205_interface jantouki_msm5205_interface =
 {
 	adpcm_int_cpu1,			/* IRQ handler */
 	MSM5205_S48_4B		/* 8 KHz, 4 Bits  */

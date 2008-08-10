@@ -84,7 +84,7 @@ static ADDRESS_MAP_START( jailbrek_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x2043, 0x2043) AM_WRITENOP /* ??? */
     AM_RANGE(0x2044, 0x2044) AM_WRITE(ctrl_w) /* irq, nmi enable, screen flip */
 	AM_RANGE(0x3000, 0x307f) AM_RAM /* related to sprites? */
-	AM_RANGE(0x3100, 0x3100) AM_READWRITE(input_port_4_r, SN76496_0_w) /* DSW1 */
+	AM_RANGE(0x3100, 0x3100) AM_READWRITE(input_port_4_r, sn76496_0_w) /* DSW1 */
 	AM_RANGE(0x3200, 0x3200) AM_READ(input_port_5_r) AM_WRITENOP /* DSW2 */ /* mirror of the previous? */
 	AM_RANGE(0x3300, 0x3300) AM_READWRITE(input_port_0_r, watchdog_reset_w) /* coins, start */
 	AM_RANGE(0x3301, 0x3301) AM_READ(input_port_1_r) /* joy1 */

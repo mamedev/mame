@@ -362,17 +362,17 @@ static WRITE8_HANDLER( time_w )
 
 static READ8_HANDLER( psg_4015_r )
 {
-	return NESPSG_0_r(machine, 0x15);
+	return nes_psg_0_r(machine, 0x15);
 }
 
 static WRITE8_HANDLER( psg_4015_w )
 {
-	NESPSG_0_w(machine, 0x15, data);
+	nes_psg_0_w(machine, 0x15, data);
 }
 
 static WRITE8_HANDLER( psg_4017_w )
 {
-	NESPSG_0_w(machine, 0x17, data);
+	nes_psg_0_w(machine, 0x17, data);
 }
 
 /******************************************************************************/
@@ -408,7 +408,7 @@ static ADDRESS_MAP_START( cart_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_MIRROR(0x1800) AM_BASE(&work_ram)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ppu2c0x_0_r, ppu2c0x_0_w)
 	AM_RANGE(0x4011, 0x4011) AM_WRITE(DAC_0_data_w)
-	AM_RANGE(0x4000, 0x4013) AM_READWRITE(NESPSG_0_r, NESPSG_0_w)
+	AM_RANGE(0x4000, 0x4013) AM_READWRITE(nes_psg_0_r, nes_psg_0_w)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
 	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)  /* PSG status / first control register */
 	AM_RANGE(0x4016, 0x4016) AM_READWRITE(pc10_in0_r, pc10_in0_w)
@@ -677,7 +677,7 @@ static INTERRUPT_GEN( playch10_interrupt ) {
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static const struct NESinterface nes_interface =
+static const nes_interface nes_config =
 {
 	"cart"
 };
@@ -719,7 +719,7 @@ static MACHINE_DRIVER_START( playch10 )
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("nes", NES, N2A03_DEFAULTCLOCK)
-	MDRV_SOUND_CONFIG(nes_interface)
+	MDRV_SOUND_CONFIG(nes_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)

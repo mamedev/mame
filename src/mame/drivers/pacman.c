@@ -1133,8 +1133,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vanvan_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_WRITE(SN76496_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(SN76496_1_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(sn76496_0_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(sn76496_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dremshpr_writeport, ADDRESS_SPACE_IO, 8 )
@@ -1191,7 +1191,7 @@ static ADDRESS_MAP_START( porky_readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s2650games_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(SN76496_0_w)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(sn76496_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( crushs_readport, ADDRESS_SPACE_IO, 8 )
@@ -3052,7 +3052,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const struct namco_interface namco_interface =
+static const namco_interface namco_config =
 {
 	3,			/* number of voices */
 	0			/* stereo */
@@ -3091,7 +3091,7 @@ static MACHINE_DRIVER_START( pacman )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
-	MDRV_SOUND_CONFIG(namco_interface)
+	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

@@ -443,13 +443,13 @@ static void csilver_adpcm_int(running_machine *machine, int data)
 	if (toggle)
 		cpunum_set_input_line(machine, 2,M6502_IRQ_LINE,HOLD_LINE);
 
-	MSM5205_data_w (0,msm5205next>>4);
+	msm5205_data_w (0,msm5205next>>4);
 	msm5205next<<=4;
 }
 
 static READ8_HANDLER( csilver_adpcm_reset_r )
 {
-	MSM5205_reset_w(0,0);
+	msm5205_reset_w(0,0);
 	return 0;
 }
 
@@ -2034,7 +2034,7 @@ static const ym3812_interface ym3812_config =
 	irqhandler
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	csilver_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 8KHz               */
@@ -2426,7 +2426,7 @@ static MACHINE_DRIVER_START( csilver )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.88)
 MACHINE_DRIVER_END
 

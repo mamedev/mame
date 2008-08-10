@@ -2,8 +2,10 @@
 // /home/ms/source/sidplay/libsidplay/emu/RCS/envelope.h,v
 //
 
-#ifndef ENVELOPE_H
-#define ENVELOPE_H
+#pragma once
+
+#ifndef __SIDENVEL_H__
+#define __SIDENVEL_H__
 
 
 extern void enveEmuInit(UINT32 updateFreq, int measuredValues);
@@ -32,4 +34,4 @@ enum
 };
 
 
-#endif
+#endif /* __SIDENVEL_H__ */

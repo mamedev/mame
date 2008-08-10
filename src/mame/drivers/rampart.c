@@ -85,14 +85,14 @@ static MACHINE_RESET( rampart )
 
 static READ16_HANDLER( adpcm_r )
 {
-	return (OKIM6295_status_0_r(machine, offset) << 8) | 0x00ff;
+	return (okim6295_status_0_r(machine, offset) << 8) | 0x00ff;
 }
 
 
 static WRITE16_HANDLER( adpcm_w )
 {
 	if (ACCESSING_BITS_8_15)
-		OKIM6295_data_0_w(machine, offset, (data >> 8) & 0xff);
+		okim6295_data_0_w(machine, offset, (data >> 8) & 0xff);
 }
 
 

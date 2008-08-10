@@ -70,7 +70,7 @@ static WRITE8_HANDLER( okibank_w )
 	/* bit 2 might be reset */
 //  popmessage("%02x",data);
 
-	OKIM6295_set_bank_base(0,(data & 3) * 0x40000);
+	okim6295_set_bank_base(0,(data & 3) * 0x40000);
 }
 
 
@@ -101,7 +101,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( snd_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9800, 0x9800) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0x9800, 0x9800) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( snd_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(okibank_w)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0x9800, 0x9800) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
 

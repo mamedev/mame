@@ -16,7 +16,7 @@
 
 #define BASE_SHIFT	16
 
-struct K053260_channel_def {
+struct k053260_channel_def {
 	unsigned long		rate;
 	unsigned long		size;
 	unsigned long		start;
@@ -29,19 +29,19 @@ struct K053260_channel_def {
 	int					ppcm; /* packed PCM ( 4 bit signed ) */
 	int					ppcm_data;
 };
-struct K053260_chip_def {
+struct k053260_chip_def {
 	sound_stream *					channel;
 	int								mode;
 	int								regs[0x30];
 	unsigned char					*rom;
 	int								rom_size;
 	unsigned long					*delta_table;
-	struct K053260_channel_def		channels[4];
-	const struct K053260_interface	*intf;
+	struct k053260_channel_def		channels[4];
+	const k053260_interface			*intf;
 };
 
 
-static void InitDeltaTable( struct K053260_chip_def *ic, int rate, int clock ) {
+static void InitDeltaTable( struct k053260_chip_def *ic, int rate, int clock ) {
 	int		i;
 	double	base = ( double )rate;
 	double	max = (double)(clock); /* Hz */
@@ -64,8 +64,8 @@ static void InitDeltaTable( struct K053260_chip_def *ic, int rate, int clock ) {
 	}
 }
 
-static void K053260_reset( void *chip ) {
-	struct K053260_chip_def *ic = chip;
+static void k053260_reset( void *chip ) {
+	struct k053260_chip_def *ic = chip;
 	int i;
 
 	for( i = 0; i < 4; i++ ) {
@@ -95,7 +95,7 @@ INLINE int limit( int val, int max, int min ) {
 #define MAXOUT 0x7fff
 #define MINOUT -0x8000
 
-static void K053260_update( void * param, stream_sample_t **inputs, stream_sample_t **buffer, int length ) {
+static void k053260_update( void * param, stream_sample_t **inputs, stream_sample_t **buffer, int length ) {
 	static const long dpcmcnv[] = { 0,1,2,4,8,16,32,64, -128, -64, -32, -16, -8, -4, -2, -1};
 
 	int i, j, lvol[4], rvol[4], play[4], loop[4], ppcm_data[4], ppcm[4];
@@ -103,7 +103,7 @@ static void K053260_update( void * param, stream_sample_t **inputs, stream_sampl
 	unsigned long delta[4], end[4], pos[4];
 	int dataL, dataR;
 	signed char d;
-	struct K053260_chip_def *ic = param;
+	struct k053260_chip_def *ic = param;
 
 	/* precache some values */
 	for ( i = 0; i < 4; i++ ) {
@@ -196,8 +196,8 @@ static void K053260_update( void * param, stream_sample_t **inputs, stream_sampl
 
 static void *k053260_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const struct K053260_interface defintrf = { 0 };
-	struct K053260_chip_def *ic;
+	static const k053260_interface defintrf = { 0 };
+	struct k053260_chip_def *ic;
 	int rate = clock / 32;
 	int i;
 
@@ -211,14 +211,14 @@ static void *k053260_start(const char *tag, int sndindex, int clock, const void 
 	ic->rom = memory_region(Machine, (ic->intf->rgnoverride != NULL) ? ic->intf->rgnoverride : tag);
 	ic->rom_size = memory_region_length(Machine, (ic->intf->rgnoverride != NULL) ? ic->intf->rgnoverride : tag) - 1;
 
-	K053260_reset( ic );
+	k053260_reset( ic );
 
 	for ( i = 0; i < 0x30; i++ )
 		ic->regs[i] = 0;
 
 	ic->delta_table = ( unsigned long * )auto_malloc( 0x1000 * sizeof( unsigned long ) );
 
-	ic->channel = stream_create( 0, 2, rate, ic, K053260_update );
+	ic->channel = stream_create( 0, 2, rate, ic, k053260_update );
 
 	InitDeltaTable( ic, rate, clock );
 
@@ -229,7 +229,7 @@ static void *k053260_start(const char *tag, int sndindex, int clock, const void 
     return ic;
 }
 
-INLINE void check_bounds( struct K053260_chip_def *ic, int channel ) {
+INLINE void check_bounds( struct k053260_chip_def *ic, int channel ) {
 
 	int channel_start = ( ic->channels[channel].bank << 16 ) + ic->channels[channel].start;
 	int channel_end = channel_start + ic->channels[channel].size - 1;
@@ -250,13 +250,13 @@ INLINE void check_bounds( struct K053260_chip_def *ic, int channel ) {
 	if (LOG) logerror("K053260: Sample Start = %06x, Sample End = %06x, Sample rate = %04lx, PPCM = %s\n", channel_start, channel_end, ic->channels[channel].rate, ic->channels[channel].ppcm ? "yes" : "no" );
 }
 
-static void K053260_write( int chip, offs_t offset, UINT8 data )
+static void k053260_write( int chip, offs_t offset, UINT8 data )
 {
 	int i, t;
 	int r = offset;
 	int v = data;
 
-	struct K053260_chip_def *ic = sndti_token(SOUND_K053260, chip);
+	struct k053260_chip_def *ic = sndti_token(SOUND_K053260, chip);
 
 	if ( r > 0x2f ) {
 		logerror("K053260: Writing past registers\n" );
@@ -367,9 +367,9 @@ static void K053260_write( int chip, offs_t offset, UINT8 data )
 	}
 }
 
-static UINT8 K053260_read( int chip, offs_t offset )
+static UINT8 k053260_read( int chip, offs_t offset )
 {
-	struct K053260_chip_def *ic = sndti_token(SOUND_K053260, chip);
+	struct k053260_chip_def *ic = sndti_token(SOUND_K053260, chip);
 
 	switch ( offset ) {
 		case 0x29: /* channel status */
@@ -406,46 +406,46 @@ static UINT8 K053260_read( int chip, offs_t offset )
 /**************************************************************************************************/
 /* Accesors */
 
-READ8_HANDLER( K053260_0_r )
+READ8_HANDLER( k053260_0_r )
 {
-	return K053260_read( 0, offset );
+	return k053260_read( 0, offset );
 }
 
-WRITE8_HANDLER( K053260_0_w )
+WRITE8_HANDLER( k053260_0_w )
 {
-	K053260_write( 0, offset, data );
+	k053260_write( 0, offset, data );
 }
 
-READ8_HANDLER( K053260_1_r )
+READ8_HANDLER( k053260_1_r )
 {
-	return K053260_read( 1, offset );
+	return k053260_read( 1, offset );
 }
 
-WRITE8_HANDLER( K053260_1_w )
+WRITE8_HANDLER( k053260_1_w )
 {
-	K053260_write( 1, offset, data );
+	k053260_write( 1, offset, data );
 }
 
-WRITE16_HANDLER( K053260_0_lsb_w )
+WRITE16_HANDLER( k053260_0_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		K053260_0_w (machine, offset, data & 0xff);
+		k053260_0_w (machine, offset, data & 0xff);
 }
 
-READ16_HANDLER( K053260_0_lsb_r )
+READ16_HANDLER( k053260_0_lsb_r )
 {
-	return K053260_0_r(machine, offset);
+	return k053260_0_r(machine, offset);
 }
 
-WRITE16_HANDLER( K053260_1_lsb_w )
+WRITE16_HANDLER( k053260_1_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		K053260_1_w (machine, offset, data & 0xff);
+		k053260_1_w (machine, offset, data & 0xff);
 }
 
-READ16_HANDLER( K053260_1_lsb_r )
+READ16_HANDLER( k053260_1_lsb_r )
 {
-	return K053260_1_r(machine, offset);
+	return k053260_1_r(machine, offset);
 }
 
 

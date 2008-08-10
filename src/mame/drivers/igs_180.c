@@ -496,7 +496,7 @@ static ADDRESS_MAP_START( igs_180_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x8000, 0x8000 ) AM_WRITE( input_select_w )
 	AM_RANGE( 0x8001, 0x8001 ) AM_READ ( input_r )
 
-	AM_RANGE( 0x9000, 0x9000 ) AM_READWRITE( OKIM6295_status_0_r, OKIM6295_data_0_w )
+	AM_RANGE( 0x9000, 0x9000 ) AM_READWRITE( okim6295_status_0_r, okim6295_data_0_w )
 
 	AM_RANGE( 0xa000, 0xa000 ) AM_READ_PORT( "BUTTONS" )
 

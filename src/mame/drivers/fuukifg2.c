@@ -140,7 +140,7 @@ static WRITE8_HANDLER( fuuki16_oki_banking_w )
         data & 0x10 is always set
     */
 
-	OKIM6295_set_bank_base(0, ((data & 6) >> 1) * 0x40000);
+	okim6295_set_bank_base(0, ((data & 6) >> 1) * 0x40000);
 }
 
 static ADDRESS_MAP_START( fuuki16_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -159,7 +159,7 @@ static ADDRESS_MAP_START( fuuki16_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x11, 0x11) AM_READ(soundlatch_r				)	// From Main CPU
 	AM_RANGE(0x50, 0x50) AM_READ(YM3812_status_port_0_r		)	// YM3812
-	AM_RANGE(0x60, 0x60) AM_READ(OKIM6295_status_0_r		)	// M6295
+	AM_RANGE(0x60, 0x60) AM_READ(okim6295_status_0_r		)	// M6295
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fuuki16_sound_writeport, ADDRESS_SPACE_IO, 8 )
@@ -172,7 +172,7 @@ static ADDRESS_MAP_START( fuuki16_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x41, 0x41) AM_WRITE(YM2203_write_port_0_w		)
 	AM_RANGE(0x50, 0x50) AM_WRITE(YM3812_control_port_0_w	)	// YM3812
 	AM_RANGE(0x51, 0x51) AM_WRITE(YM3812_write_port_0_w		)
-	AM_RANGE(0x61, 0x61) AM_WRITE(OKIM6295_data_0_w			)	// M6295
+	AM_RANGE(0x61, 0x61) AM_WRITE(okim6295_data_0_w			)	// M6295
 ADDRESS_MAP_END
 
 

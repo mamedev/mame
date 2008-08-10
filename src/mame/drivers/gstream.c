@@ -194,10 +194,10 @@ static ADDRESS_MAP_START( gstream_32bit_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xFFF80000, 0xFFFFFFFF) AM_ROM AM_REGION("user1",0) // boot rom
 ADDRESS_MAP_END
 
-static READ32_HANDLER( gstream_oki_0_r ) { return OKIM6295_status_0_r(machine, 0); }
-static READ32_HANDLER( gstream_oki_1_r ) { return OKIM6295_status_1_r(machine, 0); }
-static WRITE32_HANDLER( gstream_oki_0_w ) { OKIM6295_data_0_w(machine, 0, data & 0xff); }
-static WRITE32_HANDLER( gstream_oki_1_w ) { OKIM6295_data_1_w(machine, 0, data & 0xff); }
+static READ32_HANDLER( gstream_oki_0_r ) { return okim6295_status_0_r(machine, 0); }
+static READ32_HANDLER( gstream_oki_1_r ) { return okim6295_status_1_r(machine, 0); }
+static WRITE32_HANDLER( gstream_oki_0_w ) { okim6295_data_0_w(machine, 0, data & 0xff); }
+static WRITE32_HANDLER( gstream_oki_1_w ) { okim6295_data_1_w(machine, 0, data & 0xff); }
 
 static WRITE32_HANDLER( gstream_oki_4030_w )
 {
@@ -214,7 +214,7 @@ static WRITE32_HANDLER( gstream_oki_4030_w )
         old_bank_0 = bank_lookup[data & 0xf];
 
         if(old_bank_0 != -1)
-            OKIM6295_set_bank_base(0, old_bank_0 * 0x40000);
+            okim6295_set_bank_base(0, old_bank_0 * 0x40000);
         else
             logerror("oki_0 banking value = %X\n",data & 0xf);
     }
@@ -224,7 +224,7 @@ static WRITE32_HANDLER( gstream_oki_4030_w )
         old_bank_1 = bank_lookup[(data >> 4) & 0xf];
 
         if(old_bank_1 != -1)
-            OKIM6295_set_bank_base(1, old_bank_1 * 0x40000);
+            okim6295_set_bank_base(1, old_bank_1 * 0x40000);
         else
             logerror("oki_1 banking value = %X\n",(data >> 4) & 0xf);
     }

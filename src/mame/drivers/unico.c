@@ -57,7 +57,7 @@ static WRITE16_HANDLER( burglarx_sound_bank_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		int bank = (data >> 8 ) & 1;
-		OKIM6295_set_bank_base(0, 0x40000 * bank );
+		okim6295_set_bank_base(0, 0x40000 * bank );
 	}
 }
 
@@ -68,7 +68,7 @@ static ADDRESS_MAP_START( readmem_burglarx, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800018, 0x800019) AM_READ(input_port_1_word_r			)	// Buttons
 	AM_RANGE(0x80001a, 0x80001b) AM_READ(input_port_2_word_r			)	// DSW
 	AM_RANGE(0x80001c, 0x80001d) AM_READ(input_port_3_word_r			)	// DSW
-	AM_RANGE(0x800188, 0x800189) AM_READ(OKIM6295_status_0_lsb_r		)	// Sound
+	AM_RANGE(0x800188, 0x800189) AM_READ(okim6295_status_0_lsb_r		)	// Sound
 	AM_RANGE(0x80018c, 0x80018d) AM_READ(YM3812_status_port_0_msb_r	)	//
 /**/AM_RANGE(0x904000, 0x907fff) AM_READ(SMH_RAM						)	// Layers
 /**/AM_RANGE(0x908000, 0x90bfff) AM_READ(SMH_RAM						)	//
@@ -88,7 +88,7 @@ static ADDRESS_MAP_START( writemem_burglarx, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800114, 0x800115) AM_WRITE(SMH_RAM) AM_BASE(&unico_scrollx_2		)	//
 	AM_RANGE(0x800116, 0x800117) AM_WRITE(SMH_RAM) AM_BASE(&unico_scrollx_1		)	//
 	AM_RANGE(0x800120, 0x800121) AM_WRITE(SMH_RAM) AM_BASE(&unico_scrolly_1		)	//
-	AM_RANGE(0x800188, 0x800189) AM_WRITE(OKIM6295_data_0_lsb_w				)	// Sound
+	AM_RANGE(0x800188, 0x800189) AM_WRITE(okim6295_data_0_lsb_w				)	// Sound
 	AM_RANGE(0x80018a, 0x80018b) AM_WRITE(YM3812_data_port_0_msb_w			)	//
 	AM_RANGE(0x80018c, 0x80018d) AM_WRITE(YM3812_register_port_0_msb_w		)	//
 	AM_RANGE(0x80018e, 0x80018f) AM_WRITE(burglarx_sound_bank_w				)	//
@@ -176,7 +176,7 @@ static ADDRESS_MAP_START( readmem_zeropnt, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800174, 0x800175) AM_READ(unico_gunx_0_msb_r			)	//
 	AM_RANGE(0x800178, 0x800179) AM_READ(unico_guny_1_msb_r			)	//
 	AM_RANGE(0x80017c, 0x80017d) AM_READ(unico_gunx_1_msb_r			)	//
-	AM_RANGE(0x800188, 0x800189) AM_READ(OKIM6295_status_0_lsb_r		)	// Sound
+	AM_RANGE(0x800188, 0x800189) AM_READ(okim6295_status_0_lsb_r		)	// Sound
 	AM_RANGE(0x80018c, 0x80018d) AM_READ(YM3812_status_port_0_msb_r	)	//
 /**/AM_RANGE(0x904000, 0x907fff) AM_READ(SMH_RAM						)	// Layers
 /**/AM_RANGE(0x908000, 0x90bfff) AM_READ(SMH_RAM						)	//
@@ -196,7 +196,7 @@ static ADDRESS_MAP_START( writemem_zeropnt, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800114, 0x800115) AM_WRITE(SMH_RAM) AM_BASE(&unico_scrollx_2		)	//
 	AM_RANGE(0x800116, 0x800117) AM_WRITE(SMH_RAM) AM_BASE(&unico_scrollx_1		)	//
 	AM_RANGE(0x800120, 0x800121) AM_WRITE(SMH_RAM) AM_BASE(&unico_scrolly_1		)	//
-	AM_RANGE(0x800188, 0x800189) AM_WRITE(OKIM6295_data_0_lsb_w				)	// Sound
+	AM_RANGE(0x800188, 0x800189) AM_WRITE(okim6295_data_0_lsb_w				)	// Sound
 	AM_RANGE(0x80018a, 0x80018b) AM_WRITE(YM3812_data_port_0_msb_w			)	//
 	AM_RANGE(0x80018c, 0x80018d) AM_WRITE(YM3812_register_port_0_msb_w		)	//
 	AM_RANGE(0x80018e, 0x80018f) AM_WRITE(zeropnt_sound_bank_w				)	//
@@ -224,10 +224,10 @@ static READ32_HANDLER( zeropnt2_guny_0_msb_r )		{ return (unico_guny_0_msb_r(mac
 static READ32_HANDLER( zeropnt2_gunx_1_msb_r )		{ return (unico_gunx_1_msb_r(machine,0,0xffff)-0x0800) << 16; }
 static READ32_HANDLER( zeropnt2_guny_1_msb_r )		{ return (unico_guny_1_msb_r(machine,0,0xffff)+0x0800) << 16; }
 
-static READ32_HANDLER ( zeropnt2_oki0_r )			{ return OKIM6295_status_0_r(machine,0) << 16; }
-static READ32_HANDLER ( zeropnt2_oki1_r )			{ return OKIM6295_status_1_r(machine,0) << 16; }
-static WRITE32_HANDLER( zeropnt2_oki0_w )			{ if (ACCESSING_BITS_16_23)	OKIM6295_data_0_w(machine,0,(data >> 16) & 0xff); }
-static WRITE32_HANDLER( zeropnt2_oki1_w )			{ if (ACCESSING_BITS_16_23)	OKIM6295_data_1_w(machine,0,(data >> 16) & 0xff); }
+static READ32_HANDLER ( zeropnt2_oki0_r )			{ return okim6295_status_0_r(machine,0) << 16; }
+static READ32_HANDLER ( zeropnt2_oki1_r )			{ return okim6295_status_1_r(machine,0) << 16; }
+static WRITE32_HANDLER( zeropnt2_oki0_w )			{ if (ACCESSING_BITS_16_23)	okim6295_data_0_w(machine,0,(data >> 16) & 0xff); }
+static WRITE32_HANDLER( zeropnt2_oki1_w )			{ if (ACCESSING_BITS_16_23)	okim6295_data_1_w(machine,0,(data >> 16) & 0xff); }
 
 static READ32_HANDLER( zeropnt2_ym2151_status_r )	{ return YM2151_status_port_0_r(machine,0) << 16; }
 static WRITE32_HANDLER( zeropnt2_ym2151_reg_w )		{ if (ACCESSING_BITS_16_23)	YM2151_register_port_0_w(machine,0,(data >> 16) & 0xff); }

@@ -134,7 +134,7 @@ static WRITE16_HANDLER( pirates_out_w )
 		eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 
 		/* bit 6 selects oki bank */
-		OKIM6295_set_bank_base(0, (data & 0x40) ? 0x40000 : 0x00000);
+		okim6295_set_bank_base(0, (data & 0x40) ? 0x40000 : 0x00000);
 
 		/* bit 7 used (function unknown) */
 	}
@@ -185,7 +185,7 @@ static ADDRESS_MAP_START( pirates_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x500000, 0x5007ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x800000, 0x803fff) AM_READ(SMH_RAM)
 //  AM_RANGE(0x900000, 0x903fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa00000, 0xa00001) AM_READ(OKIM6295_status_0_lsb_r)
+	AM_RANGE(0xa00000, 0xa00001) AM_READ(okim6295_status_0_lsb_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pirates_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -202,7 +202,7 @@ static ADDRESS_MAP_START( pirates_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x902580, 0x902a7f) AM_WRITE(SMH_RAM)  // more of tilemaps ?
 	AM_RANGE(0x902a80, 0x904187) AM_WRITE(pirates_bg_tileram_w) AM_BASE(&pirates_bg_tileram)
 //  AM_RANGE(0x903c80, 0x904187) AM_WRITE(SMH_RAM)  // more of tilemaps ?
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(OKIM6295_data_0_lsb_w)
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(okim6295_data_0_lsb_w)
 ADDRESS_MAP_END
 
 

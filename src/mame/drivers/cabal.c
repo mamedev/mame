@@ -221,20 +221,20 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( cabalbl_adpcm_0_w )
 {
-	MSM5205_reset_w(0,(data>>7)&1);
+	msm5205_reset_w(0,(data>>7)&1);
 	/* ?? bit 6?? */
-	MSM5205_data_w(0,data);
-	MSM5205_vclk_w(0,1);
-	MSM5205_vclk_w(0,0);
+	msm5205_data_w(0,data);
+	msm5205_vclk_w(0,1);
+	msm5205_vclk_w(0,0);
 }
 
 static WRITE8_HANDLER( cabalbl_adpcm_1_w )
 {
-	MSM5205_reset_w(1,(data>>7)&1);
+	msm5205_reset_w(1,(data>>7)&1);
 	/* ?? bit 6?? */
-	MSM5205_data_w(1,data);
-	MSM5205_vclk_w(1,1);
-	MSM5205_vclk_w(1,0);
+	msm5205_data_w(1,data);
+	msm5205_vclk_w(1,1);
+	msm5205_vclk_w(1,0);
 }
 
 static ADDRESS_MAP_START( cabalbl_talk1_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -482,13 +482,13 @@ static const ym2151_interface cabalbl_ym2151_interface =
 	irqhandler
 };
 
-static const struct MSM5205interface msm5205_interface_1 =
+static const msm5205_interface msm5205_interface_1 =
 {
 	0,
 	MSM5205_SEX_4B
 };
 
-static const struct MSM5205interface msm5205_interface_2 =
+static const msm5205_interface msm5205_interface_2 =
 {
 	0,
 	MSM5205_SEX_4B

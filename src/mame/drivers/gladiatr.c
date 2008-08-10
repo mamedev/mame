@@ -301,9 +301,9 @@ static WRITE8_HANDLER( glad_adpcm_w )
 	/* bit6 = bank offset */
 	memory_set_bankptr(2,rom + ((data & 0x40) ? 0xc000 : 0));
 
-	MSM5205_data_w(0,data);         /* bit0..3  */
-	MSM5205_reset_w(0,(data>>5)&1); /* bit 5    */
-	MSM5205_vclk_w (0,(data>>4)&1); /* bit4     */
+	msm5205_data_w(0,data);         /* bit0..3  */
+	msm5205_reset_w(0,(data>>5)&1); /* bit 5    */
+	msm5205_vclk_w (0,(data>>4)&1); /* bit4     */
 }
 
 static WRITE8_HANDLER( glad_cpu_sound_command_w )
@@ -679,7 +679,7 @@ static const ym2203_interface gladiatr_ym2203_interface =
 	gladiator_ym_irq          /* NMI request for 2nd cpu */
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	0,				/* interrupt function */
 	MSM5205_SEX_4B	/* vclk input mode    */
@@ -733,7 +733,7 @@ static MACHINE_DRIVER_START( ppking )
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 
@@ -782,7 +782,7 @@ static MACHINE_DRIVER_START( gladiatr )
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 

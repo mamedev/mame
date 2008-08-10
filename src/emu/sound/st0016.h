@@ -1,7 +1,10 @@
-#ifndef _ST0016_H_
-#define _ST0016_H_
+#pragma once
 
-struct ST0016interface
+#ifndef __ST0016_H__
+#define __ST0016_H__
+
+typedef struct _st0016_interface st0016_interface;
+struct _st0016_interface
 {
 	UINT8 **p_soundram;
 };
@@ -10,5 +13,4 @@ extern UINT8 *st0016_sound_regs;
 
 WRITE8_HANDLER(st0016_snd_w);
 
-#endif
-
+#endif /* __ST0016_H__ */

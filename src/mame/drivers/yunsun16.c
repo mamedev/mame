@@ -138,7 +138,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800114, 0x800117) AM_RAM AM_BASE(&yunsun16_scroll_0				)	// Scrolling
 	AM_RANGE(0x800154, 0x800155) AM_RAM AM_BASE(&yunsun16_priority				)	// Priority
 	AM_RANGE(0x800180, 0x800181) AM_WRITE(yunsun16_sound_bank_w					)	// Sound
-	AM_RANGE(0x800188, 0x800189) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w	)	// Sound
+	AM_RANGE(0x800188, 0x800189) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w	)	// Sound
 	AM_RANGE(0x8001fe, 0x8001ff) AM_WRITE(SMH_NOP							)	// ? 0 (during int)
 	AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
 	AM_RANGE(0x908000, 0x90bfff) AM_RAM_WRITE(yunsun16_vram_1_w) AM_BASE(&yunsun16_vram_1	)	// Layer 1
@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( sound_port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x10) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w )	// YM3812
 	AM_RANGE(0x11, 0x11) AM_WRITE(YM3812_write_port_0_w )
 	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_r )						// From Main CPU
-	AM_RANGE(0x1c, 0x1c) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w )		// M6295
+	AM_RANGE(0x1c, 0x1c) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w )		// M6295
 ADDRESS_MAP_END
 
 

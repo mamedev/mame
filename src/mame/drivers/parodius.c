@@ -95,7 +95,7 @@ static WRITE8_HANDLER( parodius_3fc0_w )
 
 static READ8_HANDLER( parodius_sound_r )
 {
-	return K053260_0_r(machine,2 + offset);
+	return k053260_0_r(machine,2 + offset);
 }
 
 static WRITE8_HANDLER( parodius_sh_irqtrigger_w )
@@ -153,7 +153,7 @@ static ADDRESS_MAP_START( parodius_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3fc0, 0x3fc0) AM_WRITE(parodius_3fc0_w)
 	AM_RANGE(0x3fc4, 0x3fc4) AM_WRITE(parodius_videobank_w)
 	AM_RANGE(0x3fc8, 0x3fc8) AM_WRITE(parodius_sh_irqtrigger_w)
-	AM_RANGE(0x3fcc, 0x3fcd) AM_WRITE(K053260_0_w)
+	AM_RANGE(0x3fcc, 0x3fcd) AM_WRITE(k053260_0_w)
 	AM_RANGE(0x2000, 0x27ff) AM_WRITE(parodius_052109_053245_w)
 	AM_RANGE(0x2000, 0x5fff) AM_WRITE(K052109_w)
 	AM_RANGE(0x6000, 0x9fff) AM_WRITE(SMH_ROM)					/* banked ROM */
@@ -164,7 +164,7 @@ static ADDRESS_MAP_START( parodius_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf801, 0xf801) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0xfc00, 0xfc2f) AM_READ(K053260_0_r)
+	AM_RANGE(0xfc00, 0xfc2f) AM_READ(k053260_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( parodius_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
@@ -173,7 +173,7 @@ static ADDRESS_MAP_START( parodius_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xf801, 0xf801) AM_WRITE(YM2151_data_port_0_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_WRITE(K053260_0_w)
+	AM_RANGE(0xfc00, 0xfc2f) AM_WRITE(k053260_0_w)
 ADDRESS_MAP_END
 
 /***************************************************************************

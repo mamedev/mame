@@ -100,18 +100,18 @@ static void spacefev_update_SN76477_status(void)
 		dblR1 = 1 / (1 / RES_K(620) + 1 / dblR1); /* ? */
 	}
 
-	SN76477_decay_res_w(0, dblR0);
+	sn76477_decay_res_w(0, dblR0);
 
-	SN76477_vco_res_w(0, dblR1);
+	sn76477_vco_res_w(0, dblR1);
 
-	SN76477_enable_w(0,
+	sn76477_enable_w(0,
 		!mono_flop[0] &&
 		!mono_flop[1] &&
 		!mono_flop[2]);
 
-	SN76477_vco_w(0, mono_flop[1]);
+	sn76477_vco_w(0, mono_flop[1]);
 
-	SN76477_mixer_b_w(0, mono_flop[0]);
+	sn76477_mixer_b_w(0, mono_flop[0]);
 }
 
 
@@ -119,20 +119,20 @@ static void sheriff_update_SN76477_status(void)
 {
 	if (mono_flop[1])
 	{
-		SN76477_vco_voltage_w(0, 5);
+		sn76477_vco_voltage_w(0, 5);
 	}
 	else
 	{
-		SN76477_vco_voltage_w(0, 0);
+		sn76477_vco_voltage_w(0, 0);
 	}
 
-	SN76477_enable_w(0,
+	sn76477_enable_w(0,
 		!mono_flop[0] &&
 		!mono_flop[1]);
 
-	SN76477_vco_w(0, mono_flop[0]);
+	sn76477_vco_w(0, mono_flop[0]);
 
-	SN76477_mixer_b_w(0, !mono_flop[0]);
+	sn76477_mixer_b_w(0, !mono_flop[0]);
 }
 
 
@@ -447,7 +447,7 @@ static TIMER_CALLBACK( spacefev_vco_voltage_timer )
 		voltage = 5 * (1 - exp(- attotime_to_double(timer_timeelapsed(sound_timer[2])) / 0.22));
 	}
 
-	SN76477_vco_voltage_w(0, voltage);
+	sn76477_vco_voltage_w(0, voltage);
 }
 
 

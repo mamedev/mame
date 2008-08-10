@@ -72,27 +72,27 @@ static const UINT8 fixeight_cmd_snd[128] =
 
 static void play_oki_sound(running_machine *machine, int game_sound, int data)
 {
-	int status = OKIM6295_status_0_r(machine,0);
+	int status = okim6295_status_0_r(machine,0);
 
 	logerror("Playing sample %02x from command %02x\n",game_sound,data);
 
 	if (game_sound != 0)
 	{
 		if ((status & 0x01) == 0) {
-			OKIM6295_data_0_w(machine,0,(0x80 | game_sound));
-			OKIM6295_data_0_w(machine,0,0x11);
+			okim6295_data_0_w(machine,0,(0x80 | game_sound));
+			okim6295_data_0_w(machine,0,0x11);
 		}
 		else if ((status & 0x02) == 0) {
-			OKIM6295_data_0_w(machine,0,(0x80 | game_sound));
-			OKIM6295_data_0_w(machine,0,0x21);
+			okim6295_data_0_w(machine,0,(0x80 | game_sound));
+			okim6295_data_0_w(machine,0,0x21);
 		}
 		else if ((status & 0x04) == 0) {
-			OKIM6295_data_0_w(machine,0,(0x80 | game_sound));
-			OKIM6295_data_0_w(machine,0,0x41);
+			okim6295_data_0_w(machine,0,(0x80 | game_sound));
+			okim6295_data_0_w(machine,0,0x41);
 		}
 		else if ((status & 0x08) == 0) {
-			OKIM6295_data_0_w(machine,0,(0x80 | game_sound));
-			OKIM6295_data_0_w(machine,0,0x81);
+			okim6295_data_0_w(machine,0,(0x80 | game_sound));
+			okim6295_data_0_w(machine,0,0x81);
 		}
 	}
 }
@@ -109,7 +109,7 @@ void kbash_okisnd_w(running_machine *machine, int data)
 
 	if (data == 0)
 	{
-		OKIM6295_data_0_w(machine,0,0x78);		/* Stop playing effects */
+		okim6295_data_0_w(machine,0,0x78);		/* Stop playing effects */
 	}
 	else if ((data > 0) && (data < 128))
 	{
@@ -123,7 +123,7 @@ void fixeight_okisnd_w(running_machine *machine, int data)
 
 	if (data == 0)
 	{
-		OKIM6295_data_0_w(machine,0,0x78);		/* Stop playing effects */
+		okim6295_data_0_w(machine,0,0x78);		/* Stop playing effects */
 	}
 	else if ((data > 0) && (data < 128))
 	{
@@ -137,7 +137,7 @@ void batsugun_okisnd_w(running_machine *machine, int data)
 
 	if (data == 0)
 	{
-		OKIM6295_data_0_w(machine,0,0x78);		/* Stop playing effects */
+		okim6295_data_0_w(machine,0,0x78);		/* Stop playing effects */
 	}
 	else if ((data > 0) && (data < 64))
 	{

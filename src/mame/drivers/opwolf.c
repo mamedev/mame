@@ -313,8 +313,8 @@ static MACHINE_START( opwolf )
 
 static MACHINE_RESET( opwolf )
 {
-	MSM5205_reset_w(0, 1);
-	MSM5205_reset_w(1, 1);
+	msm5205_reset_w(0, 1);
+	msm5205_reset_w(1, 1);
 }
 
 static void opwolf_msm5205_vck(running_machine *machine, int chip)
@@ -323,16 +323,16 @@ static void opwolf_msm5205_vck(running_machine *machine, int chip)
 
 	if (adpcm_data[chip] != -1)
 	{
-		MSM5205_data_w(chip, adpcm_data[chip] & 0x0f);
+		msm5205_data_w(chip, adpcm_data[chip] & 0x0f);
 		adpcm_data[chip] = -1;
 		if (adpcm_pos[chip] == adpcm_end[chip])
-			MSM5205_reset_w(chip, 1);
+			msm5205_reset_w(chip, 1);
 	}
 	else
 	{
 		adpcm_data[chip] = memory_region(machine, "adpcm")[adpcm_pos[chip]];
 		adpcm_pos[chip] = (adpcm_pos[chip] + 1) & 0x7ffff;
-		MSM5205_data_w(chip, adpcm_data[chip] >> 4);
+		msm5205_data_w(chip, adpcm_data[chip] >> 4);
 	}
 }
 
@@ -351,7 +351,7 @@ static WRITE8_HANDLER( opwolf_adpcm_b_w )
 		end   *=16;
 		adpcm_pos[0] = start;
 		adpcm_end[0] = end;
-		MSM5205_reset_w(0, 0);
+		msm5205_reset_w(0, 0);
 	}
 
 //  logerror("CPU #1     b00%i-data=%2x   pc=%4x\n",offset,data,activecpu_get_pc() );
@@ -373,7 +373,7 @@ static WRITE8_HANDLER( opwolf_adpcm_c_w )
 		end   *=16;
 		adpcm_pos[1] = start;
 		adpcm_end[1] = end;
-		MSM5205_reset_w(1, 0);
+		msm5205_reset_w(1, 0);
 	}
 
 //  logerror("CPU #1     c00%i-data=%2x   pc=%4x\n",offset,data,activecpu_get_pc() );
@@ -556,7 +556,7 @@ static const ym2151_interface ym2151_config =
 };
 
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	opwolf_msm5205_vck,	/* VCK function */
 	MSM5205_S48_4B		/* 8 kHz */
@@ -606,12 +606,12 @@ static MACHINE_DRIVER_START( opwolf )
 	MDRV_SOUND_ROUTE(1, "right", 0.75)
 
 	MDRV_SOUND_ADD("msm1", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.60)
 
 	MDRV_SOUND_ADD("msm2", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.60)
 MACHINE_DRIVER_END
@@ -658,12 +658,12 @@ static MACHINE_DRIVER_START( opwolfb ) /* OSC clocks unknown for the bootleg, bu
 	MDRV_SOUND_ROUTE(1, "right", 0.75)
 
 	MDRV_SOUND_ADD("msm1", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.60)
 
 	MDRV_SOUND_ADD("msm2", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.60)
 MACHINE_DRIVER_END

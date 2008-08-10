@@ -266,14 +266,14 @@ static WRITE8_HANDLER( tturfbl_msm5205_data_w )
 
 static void tturfbl_msm5205_callback(running_machine *machine, int data)
 {
-	MSM5205_data_w(0, (sample_buffer >> 4) & 0x0F);
+	msm5205_data_w(0, (sample_buffer >> 4) & 0x0F);
 	sample_buffer <<= 4;
 	sample_select ^= 1;
 	if(sample_select == 0)
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static const struct MSM5205interface tturfbl_msm5205_interface =
+static const msm5205_interface tturfbl_msm5205_interface =
 {
 	tturfbl_msm5205_callback,
 	MSM5205_S48_4B

@@ -398,7 +398,7 @@ WRITE16_HANDLER( genesis_vdp_w )
 		case 0x0a:
 		case 0x0b:
 			if (ACCESSING_BITS_0_7 && sndti_exists(SOUND_SN76496, 0))
-				SN76496_0_w(machine, 0, data & 0xff);
+				sn76496_0_w(machine, 0, data & 0xff);
 			break;
 	}
 }

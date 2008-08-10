@@ -406,7 +406,7 @@ static void zn_driver_init( running_machine *machine )
 	at28c16_init( 0, memory_region( machine, "user4" ), NULL );
 }
 
-static const struct PSXSPUinterface psxspu_interface =
+static const psx_spu_interface psxspu_interface =
 {
 	&g_p_n_psxram,
 	psx_irq_set,

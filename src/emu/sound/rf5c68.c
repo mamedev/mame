@@ -138,7 +138,7 @@ static void *rf5c68_start(const char *tag, int sndindex, int clock, const void *
 /*    RF5C68 write register                     */
 /************************************************/
 
-WRITE8_HANDLER( RF5C68_reg_w )
+WRITE8_HANDLER( rf5c68_reg_w )
 {
 	struct rf5c68pcm *chip = sndti_token(SOUND_RF5C68, 0);
 	struct pcm_channel *chan = &chip->chan[chip->cbank];
@@ -204,7 +204,7 @@ WRITE8_HANDLER( RF5C68_reg_w )
 /*    RF5C68 read memory                        */
 /************************************************/
 
-READ8_HANDLER( RF5C68_r )
+READ8_HANDLER( rf5c68_r )
 {
 	struct rf5c68pcm *chip = sndti_token(SOUND_RF5C68, 0);
 	return chip->data[chip->wbank * 0x1000 + offset];
@@ -215,7 +215,7 @@ READ8_HANDLER( RF5C68_r )
 /*    RF5C68 write memory                       */
 /************************************************/
 
-WRITE8_HANDLER( RF5C68_w )
+WRITE8_HANDLER( rf5c68_w )
 {
 	struct rf5c68pcm *chip = sndti_token(SOUND_RF5C68, 0);
 	chip->data[chip->wbank * 0x1000 + offset] = data;

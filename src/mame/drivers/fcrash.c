@@ -65,7 +65,7 @@ static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 
 static void m5205_int1(running_machine *machine, int data)
 {
-	MSM5205_data_w(0, sample_buffer1 & 0x0F);
+	msm5205_data_w(0, sample_buffer1 & 0x0F);
 	sample_buffer1 >>= 4;
 	sample_select1 ^= 1;
 	if (sample_select1 == 0)
@@ -74,7 +74,7 @@ static void m5205_int1(running_machine *machine, int data)
 
 static void m5205_int2(running_machine *machine, int data)
 {
-	MSM5205_data_w(1, sample_buffer2 & 0x0F);
+	msm5205_data_w(1, sample_buffer2 & 0x0F);
 	sample_buffer2 >>= 4;
 	sample_select2 ^= 1;
 }
@@ -646,13 +646,13 @@ static INPUT_PORTS_START( kodb )
 INPUT_PORTS_END
 
 
-static const struct MSM5205interface msm5205_interface1 =
+static const msm5205_interface msm5205_interface1 =
 {
 	m5205_int1,	/* interrupt function */
 	MSM5205_S96_4B		/* 4KHz 4-bit */
 };
 
-static const struct MSM5205interface msm5205_interface2 =
+static const msm5205_interface msm5205_interface2 =
 {
 	m5205_int2,	/* interrupt function */
 	MSM5205_S96_4B		/* 4KHz 4-bit */

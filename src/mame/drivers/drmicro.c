@@ -56,13 +56,13 @@ static void pcm_w(running_machine *machine, int irq)
 		if (~pcm_adr & 1)
 			data >>= 4;
 
-		MSM5205_data_w(0, data & 0x0f);
-		MSM5205_reset_w(0, 0);
+		msm5205_data_w(0, data & 0x0f);
+		msm5205_reset_w(0, 0);
 
 		pcm_adr = (pcm_adr + 1) & 0x7fff;
 	}
 	else
-		MSM5205_reset_w(0, 1);
+		msm5205_reset_w(0, 1);
 }
 
 static WRITE8_HANDLER( pcm_set_w )
@@ -98,9 +98,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(SN76496_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(SN76496_1_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(SN76496_2_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(sn76496_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(sn76496_1_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(sn76496_2_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(pcm_set_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(nmi_enable_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(SMH_NOP) // watchdog?
@@ -217,7 +217,7 @@ static GFXDECODE_START( drmicro )
 	GFXDECODE_ENTRY( "gfx2", 0x0000, spritelayout8, 256, 32 ) /* sprites */
 GFXDECODE_END
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	pcm_w,			/* IRQ handler */
 	MSM5205_S64_4B	/* 6 KHz */
@@ -263,7 +263,7 @@ static MACHINE_DRIVER_START( drmicro )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_DRIVER_END
 

@@ -240,7 +240,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( lordgun_okibank_w )
 {
-	OKIM6295_set_bank_base(0, (data & 2) ? 0x40000 : 0);
+	okim6295_set_bank_base(0, (data & 2) ? 0x40000 : 0);
 	if (data & ~3)	logerror("%04x: unknown okibank bits %02x\n", activecpu_get_pc(), data);
 //  popmessage("OKI %x", data);
 }
@@ -248,7 +248,7 @@ static WRITE8_HANDLER( lordgun_okibank_w )
 static ADDRESS_MAP_START( lordgun_soundio_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x1000, 0x1000) AM_WRITE( YM3812_control_port_0_w )
 	AM_RANGE(0x1001, 0x1001) AM_WRITE( YM3812_write_port_0_w )
-	AM_RANGE(0x2000, 0x2000) AM_READWRITE( OKIM6295_status_0_r, OKIM6295_data_0_w )
+	AM_RANGE(0x2000, 0x2000) AM_READWRITE( okim6295_status_0_r, okim6295_data_0_w )
 	AM_RANGE(0x3000, 0x3000) AM_READ( soundlatch2_r )
 	AM_RANGE(0x4000, 0x4000) AM_READ( soundlatch_r )
 	AM_RANGE(0x5000, 0x5000) AM_READ( SMH_NOP )
@@ -262,8 +262,8 @@ static ADDRESS_MAP_START( hfh_soundio_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x5000, 0x5000) AM_READ( SMH_NOP )
 	AM_RANGE(0x7000, 0x7000) AM_WRITE( YM3812_control_port_0_w )
 	AM_RANGE(0x7001, 0x7001) AM_WRITE( YM3812_write_port_0_w )
-	AM_RANGE(0x7400, 0x7400) AM_READWRITE( OKIM6295_status_0_r, OKIM6295_data_0_w )
-	AM_RANGE(0x7800, 0x7800) AM_READWRITE( OKIM6295_status_1_r, OKIM6295_data_1_w )
+	AM_RANGE(0x7400, 0x7400) AM_READWRITE( okim6295_status_0_r, okim6295_data_0_w )
+	AM_RANGE(0x7800, 0x7800) AM_READWRITE( okim6295_status_1_r, okim6295_data_1_w )
 ADDRESS_MAP_END
 
 

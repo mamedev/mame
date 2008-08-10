@@ -520,7 +520,7 @@ static void darius_adpcm_int (running_machine *machine, int data)
 		cpunum_set_input_line(machine, 3, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	darius_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 8KHz   */
@@ -556,8 +556,8 @@ static WRITE8_HANDLER ( adpcm_nmi_enable )
 
 static WRITE8_HANDLER( adpcm_data_w )
 {
-	MSM5205_data_w (0,   data         );
-	MSM5205_reset_w(0, !(data & 0x20) );	/* my best guess, but it could be output enable as well */
+	msm5205_data_w (0,   data         );
+	msm5205_reset_w(0, !(data & 0x20) );	/* my best guess, but it could be output enable as well */
 }
 
 static ADDRESS_MAP_START( darius_sound2_readport, ADDRESS_SPACE_IO, 8 )
@@ -911,7 +911,7 @@ static MACHINE_DRIVER_START( darius )
 	MDRV_SOUND_ROUTE(3, "filter.2203.1.3r", 0.60)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.l", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "msm5205.r", 1.0)
 

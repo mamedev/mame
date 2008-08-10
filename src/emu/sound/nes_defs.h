@@ -21,8 +21,10 @@
 
  *****************************************************************************/
 
-#ifndef NESTYPES_H
-#define NESTYPES_H
+#pragma once
+
+#ifndef __NES_DEFS_H__
+#define __NES_DEFS_H__
 
 /* BOOLEAN CONSTANTS */
 #ifndef TRUE
@@ -202,4 +204,4 @@ static const int duty_lut[4] =
    2, 4, 8, 12
 };
 
-#endif
+#endif /* __NES_DEFS_H__ */

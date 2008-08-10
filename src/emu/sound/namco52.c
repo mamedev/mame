@@ -54,7 +54,7 @@ Jan 12, 2005.  The 555 is probably an external playback frequency.
 
 struct namco_52xx
 {
-	const struct namco_52xx_interface *intf;	/* pointer to our config data */
+	const namco_52xx_interface *intf;	/* pointer to our config data */
 	UINT8 *rom;			/* pointer to sample ROM */
 	UINT32 rom_len;
 	sound_stream * stream;			/* the output stream */
@@ -170,7 +170,7 @@ static void *namco_52xx_start(const char *tag, int sndindex, int clock, const vo
 }
 
 
-void namcoio_52XX_write(int data)
+void namcoio_52xx_write(int data)
 {
 	struct namco_52xx *chip = sndti_token(SOUND_NAMCO_52XX, 0);
 	data &= 0x0f;

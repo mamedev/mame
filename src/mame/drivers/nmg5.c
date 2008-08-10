@@ -278,7 +278,7 @@ static WRITE16_HANDLER( priority_reg_w )
 
 static WRITE8_HANDLER( oki_banking_w )
 {
-	OKIM6295_set_bank_base(0, (data & 1) ? 0x40000 : 0 );
+	okim6295_set_bank_base(0, (data & 1) ? 0x40000 : 0 );
 }
 
 /*******************************************************************
@@ -348,7 +348,7 @@ static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x10, 0x10) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(YM3812_write_port_0_w)
 	AM_RANGE(0x18, 0x18) AM_READ(soundlatch_r)
-	AM_RANGE(0x1c, 0x1c) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+	AM_RANGE(0x1c, 0x1c) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( nmg5 )

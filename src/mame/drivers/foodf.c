@@ -358,7 +358,7 @@ static READ8_HANDLER( pot_r )
 	return (input_port_read(machine, "DSW") >> offset) << 7;
 }
 
-static const struct POKEYinterface pokey_interface =
+static const pokey_interface pokey_config =
 {
 	{ pot_r,pot_r,pot_r,pot_r,pot_r,pot_r,pot_r,pot_r }
 };
@@ -398,7 +398,7 @@ static MACHINE_DRIVER_START( foodf )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK/2/10)
-	MDRV_SOUND_CONFIG(pokey_interface)
+	MDRV_SOUND_CONFIG(pokey_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	MDRV_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK/2/10)

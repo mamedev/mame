@@ -302,7 +302,7 @@ static WRITE16_HANDLER( moobl_oki_bank_w )
 {
 	logerror("%x to OKI bank\n", data);
 
-	OKIM6295_set_bank_base(0, (data & 0x0f)* 0x40000);
+	okim6295_set_bank_base(0, (data & 0x0f)* 0x40000);
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -358,7 +358,7 @@ static ADDRESS_MAP_START( readmembl, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x0c2f00, 0x0c2f01) AM_READ(SMH_NOP)              /* heck if I know, but it's polled constantly */
 	AM_RANGE(0x0c4000, 0x0c4001) AM_READ(K053246_word_r)
-	AM_RANGE(0x0d6ffe, 0x0d6fff) AM_READ(OKIM6295_status_0_lsb_r)
+	AM_RANGE(0x0d6ffe, 0x0d6fff) AM_READ(okim6295_status_0_lsb_r)
 	AM_RANGE(0x0da000, 0x0da001) AM_READ(player1_r)
 	AM_RANGE(0x0da002, 0x0da003) AM_READ(player2_r)
 	AM_RANGE(0x0dc000, 0x0dc001) AM_READ_PORT("IN0")
@@ -381,7 +381,7 @@ static ADDRESS_MAP_START( writemembl, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0cc000, 0x0cc01f) AM_WRITE(K053251_lsb_w)
 	AM_RANGE(0x0d0000, 0x0d001f) AM_WRITE(SMH_RAM)              /* CCU regs (ignored) */
 	AM_RANGE(0x0d6ffc, 0x0d6ffd) AM_WRITE(moobl_oki_bank_w)
-	AM_RANGE(0x0d6ffe, 0x0d6fff) AM_WRITE(OKIM6295_data_0_lsb_w)
+	AM_RANGE(0x0d6ffe, 0x0d6fff) AM_WRITE(okim6295_data_0_lsb_w)
 	AM_RANGE(0x0d8000, 0x0d8007) AM_WRITE(K056832_b_word_w)       /* VSCCS regs */
 	AM_RANGE(0x0de000, 0x0de001) AM_WRITE(control2_w)
 	AM_RANGE(0x100000, 0x17ffff) AM_WRITE(SMH_ROM)
@@ -451,7 +451,7 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK2)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM)
-	AM_RANGE(0xe000, 0xe22f) AM_READ(K054539_0_r)
+	AM_RANGE(0xe000, 0xe22f) AM_READ(k054539_0_r)
 	AM_RANGE(0xec01, 0xec01) AM_READ(YM2151_status_port_0_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ(soundlatch_r)
 	AM_RANGE(0xf003, 0xf003) AM_READ(soundlatch2_r)
@@ -460,7 +460,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe22f) AM_WRITE(K054539_0_w)
+	AM_RANGE(0xe000, 0xe22f) AM_WRITE(k054539_0_w)
 	AM_RANGE(0xec00, 0xec00) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xec01, 0xec01) AM_WRITE(YM2151_data_port_0_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)

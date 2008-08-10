@@ -442,7 +442,7 @@ static WRITE8_HANDLER( dd_adpcm_w )
 	{
 		case 3:
 			adpcm_idle[chip] = 1;
-			MSM5205_reset_w(chip,1);
+			msm5205_reset_w(chip,1);
 			break;
 
 		case 2:
@@ -455,7 +455,7 @@ static WRITE8_HANDLER( dd_adpcm_w )
 
 		case 0:
 			adpcm_idle[chip] = 0;
-			MSM5205_reset_w(chip,0);
+			msm5205_reset_w(chip,0);
 			break;
 	}
 }
@@ -468,11 +468,11 @@ static void dd_adpcm_int(running_machine *machine, int chip)
 	if (adpcm_pos[chip] >= adpcm_end[chip] || adpcm_pos[chip] >= 0x10000)
 	{
 		adpcm_idle[chip] = 1;
-		MSM5205_reset_w(chip,1);
+		msm5205_reset_w(chip,1);
 	}
 	else if (adpcm_data[chip] != -1)
 	{
-		MSM5205_data_w(chip, adpcm_data[chip] & 0x0f);
+		msm5205_data_w(chip, adpcm_data[chip] & 0x0f);
 		adpcm_data[chip] = -1;
 	}
 	else
@@ -480,7 +480,7 @@ static void dd_adpcm_int(running_machine *machine, int chip)
 		UINT8 *ROM = memory_region(machine, "adpcm") + 0x10000 * chip;
 
 		adpcm_data[chip] = ROM[adpcm_pos[chip]++];
-		MSM5205_data_w(chip,adpcm_data[chip] >> 4);
+		msm5205_data_w(chip,adpcm_data[chip] >> 4);
 	}
 }
 
@@ -605,7 +605,7 @@ static ADDRESS_MAP_START( dd2_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x8801, 0x8801) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
-	AM_RANGE(0x9800, 0x9800) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+	AM_RANGE(0x9800, 0x9800) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -958,7 +958,7 @@ static const ym2151_interface ym2151_config =
 	irq_handler
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	dd_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B	/* 8kHz */
@@ -1009,11 +1009,11 @@ static MACHINE_DRIVER_START( ddragon )
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 
 	MDRV_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK/32)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -1074,11 +1074,11 @@ static MACHINE_DRIVER_START( ddgn6809 )
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 
 	MDRV_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK/32)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

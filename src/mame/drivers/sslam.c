@@ -242,7 +242,7 @@ static TIMER_CALLBACK( music_playback )
 {
 	int pattern = 0;
 
-	if ((OKIM6295_status_0_r(machine,0) & 0x08) == 0)
+	if ((okim6295_status_0_r(machine,0) & 0x08) == 0)
 	{
 		if (sslam_bar != 0) {
 			sslam_bar += 1;
@@ -263,8 +263,8 @@ static TIMER_CALLBACK( music_playback )
 		}
 		if (pattern) {
 			logerror("Changing bar in music track to pattern %02x\n",pattern);
-			OKIM6295_data_0_w(machine,0,(0x80 | pattern));
-			OKIM6295_data_0_w(machine,0,0x81);
+			okim6295_data_0_w(machine,0,(0x80 | pattern));
+			okim6295_data_0_w(machine,0,0x81);
 		}
 	}
 //  {
@@ -276,7 +276,7 @@ static TIMER_CALLBACK( music_playback )
 
 static void sslam_play(running_machine *machine, int track, int data)
 {
-	int status = OKIM6295_status_0_r(machine,0);
+	int status = okim6295_status_0_r(machine,0);
 
 	if (data < 0x80) {
 		if (track) {
@@ -284,24 +284,24 @@ static void sslam_play(running_machine *machine, int track, int data)
 				sslam_track  = data;
 				sslam_bar = 1;
 				if (status & 0x08)
-					OKIM6295_data_0_w(machine,0,0x40);
-				OKIM6295_data_0_w(machine,0,(0x80 | data));
-				OKIM6295_data_0_w(machine,0,0x81);
+					okim6295_data_0_w(machine,0,0x40);
+				okim6295_data_0_w(machine,0,(0x80 | data));
+				okim6295_data_0_w(machine,0,0x81);
 				timer_adjust_periodic(music_timer, ATTOTIME_IN_MSEC(4), 0, ATTOTIME_IN_HZ(250));	/* 250Hz for smooth sequencing */
 			}
 		}
 		else {
 			if ((status & 0x01) == 0) {
-				OKIM6295_data_0_w(machine,0,(0x80 | data));
-				OKIM6295_data_0_w(machine,0,0x11);
+				okim6295_data_0_w(machine,0,(0x80 | data));
+				okim6295_data_0_w(machine,0,0x11);
 			}
 			else if ((status & 0x02) == 0) {
-				OKIM6295_data_0_w(machine,0,(0x80 | data));
-				OKIM6295_data_0_w(machine,0,0x21);
+				okim6295_data_0_w(machine,0,(0x80 | data));
+				okim6295_data_0_w(machine,0,0x21);
 			}
 			else if ((status & 0x04) == 0) {
-				OKIM6295_data_0_w(machine,0,(0x80 | data));
-				OKIM6295_data_0_w(machine,0,0x41);
+				okim6295_data_0_w(machine,0,(0x80 | data));
+				okim6295_data_0_w(machine,0,0x41);
 			}
 		}
 	}
@@ -313,7 +313,7 @@ static void sslam_play(running_machine *machine, int track, int data)
 			sslam_bar = 0;
 		}
 		data &= 0x7f;
-		OKIM6295_data_0_w(machine,0,data);
+		okim6295_data_0_w(machine,0,data);
 	}
 }
 
@@ -346,13 +346,13 @@ static WRITE16_HANDLER( sslam_snd_w )
 			else if (sslam_sound >= 0x70) {
 				/* These vocals are in bank 1, but a bug in the actual MCU doesn't set the bank */
 //              if (sslam_snd_bank != 1)
-//                  OKIM6295_set_bank_base(0, (1 * 0x40000));
+//                  okim6295_set_bank_base(0, (1 * 0x40000));
 //              sslam_snd_bank = 1;
 				sslam_play(machine, 0, sslam_sound);
 			}
 			else if (sslam_sound >= 0x69) {
 				if (sslam_snd_bank != 2)
-					OKIM6295_set_bank_base(0, (2 * 0x40000));
+					okim6295_set_bank_base(0, (2 * 0x40000));
 				sslam_snd_bank = 2;
 				switch (sslam_sound)
 				{
@@ -365,14 +365,14 @@ static WRITE16_HANDLER( sslam_snd_w )
 			}
 			else if (sslam_sound >= 0x65) {
 				if (sslam_snd_bank != 1)
-					OKIM6295_set_bank_base(0, (1 * 0x40000));
+					okim6295_set_bank_base(0, (1 * 0x40000));
 				sslam_snd_bank = 1;
 				sslam_melody = 4;
 				sslam_play(machine, sslam_melody, sslam_sound);
 			}
 			else if (sslam_sound >= 0x60) {
 				if (sslam_snd_bank != 0)
-					OKIM6295_set_bank_base(0, (0 * 0x40000));
+					okim6295_set_bank_base(0, (0 * 0x40000));
 				sslam_snd_bank = 0;
 				switch (sslam_sound)
 				{
@@ -456,7 +456,7 @@ static READ8_HANDLER( playmark_snd_command_r )
 		data = soundlatch_r(machine,0);
 	}
 	else if ((playmark_oki_control & 0x38) == 0x28) {
-		data = (OKIM6295_status_0_r(machine,0) & 0x0f);
+		data = (okim6295_status_0_r(machine,0) & 0x0f);
 	}
 
 	return data;
@@ -476,13 +476,13 @@ static WRITE8_HANDLER( playmark_snd_control_w )
 		if(playmark_oki_bank != ((data & 3) - 1))
 		{
 			playmark_oki_bank = (data & 3) - 1;
-			OKIM6295_set_bank_base(0, 0x40000 * playmark_oki_bank);
+			okim6295_set_bank_base(0, 0x40000 * playmark_oki_bank);
 		}
 	}
 
 	if ((data & 0x38) == 0x18)
 	{
-		OKIM6295_data_0_w(machine, 0, playmark_oki_command);
+		okim6295_data_0_w(machine, 0, playmark_oki_command);
 	}
 
 //  !(data & 0x80) -> sound enable

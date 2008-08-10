@@ -98,7 +98,7 @@ static WRITE16_HANDLER( gotcha_oki_bank_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		OKIM6295_set_bank_base(0,(((~data & 0x0100) >> 8) * 0x40000));
+		okim6295_set_bank_base(0,(((~data & 0x0100) >> 8) * 0x40000));
 	}
 }
 
@@ -142,7 +142,7 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0xc002, 0xc003) AM_WRITE(OKIM6295_data_0_w)	// TWO addresses!
+	AM_RANGE(0xc002, 0xc003) AM_WRITE(okim6295_data_0_w)	// TWO addresses!
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 

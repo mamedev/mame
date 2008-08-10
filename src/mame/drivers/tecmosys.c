@@ -578,7 +578,7 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_WRITE(YMF262_register_B_0_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(YMF262_data_B_0_w)
 
-	AM_RANGE(0x10, 0x10) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(okim6295_data_0_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(tecmosys_oki_bank_w)
 
 	AM_RANGE(0x30, 0x30) AM_WRITE(deroon_bankswitch_w)

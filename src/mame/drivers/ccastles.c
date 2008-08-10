@@ -471,7 +471,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const struct POKEYinterface pokey_interface =
+static const pokey_interface pokey_config =
 {
 	{ 0 },
 	input_port_1_r
@@ -514,7 +514,7 @@ static MACHINE_DRIVER_START( ccastles )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK/8)
-	MDRV_SOUND_CONFIG(pokey_interface)
+	MDRV_SOUND_CONFIG(pokey_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

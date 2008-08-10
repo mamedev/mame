@@ -358,7 +358,7 @@ static ADDRESS_MAP_START( readmem_D, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0e0000, 0x0e0001) AM_READ(dsw_r)
 	AM_RANGE(0x0e8000, 0x0ebfff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0f0000, 0x0f0001) AM_READ(coins_r) /* Coins + P1&P2 Buttons */
-	AM_RANGE(0x0f8000, 0x0f8001) AM_READ(OKIM6295_status_0_lsb_r)
+	AM_RANGE(0x0f8000, 0x0f8001) AM_READ(okim6295_status_0_lsb_r)
 //  { 0x100000, 0x100001  protection
 	AM_RANGE(0x1f0000, 0x1fffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
@@ -371,7 +371,7 @@ static ADDRESS_MAP_START( writemem_D, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0d4000, 0x0d7fff) AM_WRITE(megasys1_scrollram_2_w) AM_BASE(&megasys1_scrollram[2])
 	AM_RANGE(0x0d8000, 0x0d87ff) AM_MIRROR(0x3000) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x0e8000, 0x0ebfff) AM_WRITE(megasys1_scrollram_0_w) AM_BASE(&megasys1_scrollram[0])
-	AM_RANGE(0x0f8000, 0x0f8001) AM_WRITE(OKIM6295_data_0_lsb_w)
+	AM_RANGE(0x0f8000, 0x0f8001) AM_WRITE(okim6295_data_0_lsb_w)
 //  { 0x100000, 0x100001  protection
 	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(SMH_RAM) AM_BASE(&megasys1_ram)
 ADDRESS_MAP_END
@@ -449,7 +449,7 @@ static READ16_HANDLER( oki_status_0_r )
 	if (megasys1_ignore_oki_status == 1)
 		return 0;
 	else
-		return OKIM6295_status_0_lsb_r(machine,offset,mem_mask);
+		return okim6295_status_0_lsb_r(machine,offset,mem_mask);
 }
 
 static READ16_HANDLER( oki_status_1_r )
@@ -457,7 +457,7 @@ static READ16_HANDLER( oki_status_1_r )
 	if (megasys1_ignore_oki_status == 1)
 		return 0;
 	else
-		return OKIM6295_status_1_lsb_r(machine,offset,mem_mask);
+		return okim6295_status_1_lsb_r(machine,offset,mem_mask);
 }
 
 /***************************************************************************
@@ -479,8 +479,8 @@ static ADDRESS_MAP_START( sound_writemem_A, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w)	// to main cpu
 	AM_RANGE(0x080000, 0x080001) AM_WRITE(YM2151_register_port_0_lsb_w)
 	AM_RANGE(0x080002, 0x080003) AM_WRITE(YM2151_data_port_0_lsb_w)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_WRITE(OKIM6295_data_0_lsb_w)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(OKIM6295_data_1_lsb_w)
+	AM_RANGE(0x0a0000, 0x0a0003) AM_WRITE(okim6295_data_0_lsb_w)
+	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(okim6295_data_1_lsb_w)
 	AM_RANGE(0x0e0000, 0x0fffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -510,8 +510,8 @@ static ADDRESS_MAP_START( sound_writemem_B, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w)	/* to main cpu */
 	AM_RANGE(0x080000, 0x080001) AM_WRITE(YM2151_register_port_0_lsb_w)
 	AM_RANGE(0x080002, 0x080003) AM_WRITE(YM2151_data_port_0_lsb_w)
-	AM_RANGE(0x0a0000, 0x0a0003) AM_WRITE(OKIM6295_data_0_lsb_w)
-	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(OKIM6295_data_1_lsb_w)
+	AM_RANGE(0x0a0000, 0x0a0003) AM_WRITE(okim6295_data_0_lsb_w)
+	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(okim6295_data_1_lsb_w)
 	AM_RANGE(0x0e0000, 0x0effff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
@@ -3906,15 +3906,15 @@ static DRIVER_INIT( iganinju )
 								// not like lev 3 interrupts
 }
 
-static WRITE16_HANDLER( OKIM6295_data_0_both_w )
+static WRITE16_HANDLER( okim6295_data_0_both_w )
 {
-	if (ACCESSING_BITS_0_7)	OKIM6295_data_0_w(machine, 0, (data >> 0) & 0xff );
-	else				OKIM6295_data_0_w(machine, 0, (data >> 8) & 0xff );
+	if (ACCESSING_BITS_0_7)	okim6295_data_0_w(machine, 0, (data >> 0) & 0xff );
+	else				okim6295_data_0_w(machine, 0, (data >> 8) & 0xff );
 }
-static WRITE16_HANDLER( OKIM6295_data_1_both_w )
+static WRITE16_HANDLER( okim6295_data_1_both_w )
 {
-	if (ACCESSING_BITS_0_7)	OKIM6295_data_1_w(machine, 0, (data >> 0) & 0xff );
-	else				OKIM6295_data_1_w(machine, 0, (data >> 8) & 0xff );
+	if (ACCESSING_BITS_0_7)	okim6295_data_1_w(machine, 0, (data >> 0) & 0xff );
+	else				okim6295_data_1_w(machine, 0, (data >> 8) & 0xff );
 }
 
 static DRIVER_INIT( jitsupro )
@@ -3930,8 +3930,8 @@ static DRIVER_INIT( jitsupro )
 	RAM[0x438/2] = 0x4e71;	//
 
 	/* the sound code writes oki commands to both the lsb and msb */
-	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xa0003, 0, 0, OKIM6295_data_0_both_w);
-	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xc0000, 0xc0003, 0, 0, OKIM6295_data_1_both_w);
+	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xa0000, 0xa0003, 0, 0, okim6295_data_0_both_w);
+	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xc0000, 0xc0003, 0, 0, okim6295_data_1_both_w);
 }
 
 static DRIVER_INIT( peekaboo )

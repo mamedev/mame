@@ -182,7 +182,7 @@ static void vck_callback(running_machine *machine, int data)
 		UINT8 data = memory_region(machine, "adpcm")[sample_offset >> 1];
 
 		/* write the next nibble and advance */
-		MSM5205_data_w(0, (data >> (4 * (~sample_offset & 1))) & 0x0f);
+		msm5205_data_w(0, (data >> (4 * (~sample_offset & 1))) & 0x0f);
 		sample_offset++;
 
 		/* every 256 clocks, we decrement the length */
@@ -192,7 +192,7 @@ static void vck_callback(running_machine *machine, int data)
 
 			/* if we hit 0xff, automatically turn off playback */
 			if (sample_count == 0xff)
-				MSM5205_reset_w(0, 1);
+				msm5205_reset_w(0, 1);
 		}
 	}
 }
@@ -204,7 +204,7 @@ static WRITE8_HANDLER( crgolfhi_sample_w )
 	{
 		/* offset 0 holds the MSM5205 in reset */
 		case 0:
-			MSM5205_reset_w(0, 1);
+			msm5205_reset_w(0, 1);
 			break;
 
 		/* offset 1 is the length/256 nibbles */
@@ -219,7 +219,7 @@ static WRITE8_HANDLER( crgolfhi_sample_w )
 
 		/* offset 3 turns on playback */
 		case 3:
-			MSM5205_reset_w(0, 0);
+			msm5205_reset_w(0, 0);
 			break;
 	}
 }
@@ -349,7 +349,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const struct MSM5205interface msm5205_intf =
+static const msm5205_interface msm5205_intf =
 {
 	vck_callback,
 	MSM5205_S64_4B

@@ -44,7 +44,7 @@ void crbaloon_audio_set_music_enable(running_machine *machine, int enabled)
 
 void crbaloon_audio_set_explosion_enable(int enabled)
 {
-	SN76477_enable_w(0, enabled);
+	sn76477_enable_w(0, enabled);
 }
 
 
@@ -53,14 +53,14 @@ void crbaloon_audio_set_breath_enable(int enabled)
 	/* changes slf_res to 10k (middle of two 10k resistors)
        it also puts a tantal capacitor against GND on the output,
        but this section of the schematics is not readable. */
-	SN76477_slf_res_w(0, enabled ? RES_K(10) : RES_K(20) );
+	sn76477_slf_res_w(0, enabled ? RES_K(10) : RES_K(20) );
 }
 
 
 void crbaloon_audio_set_appear_enable(int enabled)
 {
 	/* APPEAR is connected to MIXER B */
-	SN76477_mixer_b_w(0, enabled);
+	sn76477_mixer_b_w(0, enabled);
 }
 
 

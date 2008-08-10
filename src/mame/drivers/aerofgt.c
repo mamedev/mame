@@ -160,7 +160,7 @@ static MACHINE_RESET( aerofgt )
 
 static WRITE16_HANDLER( pspikesb_oki_banking_w )
 {
-	OKIM6295_set_bank_base(0, 0x40000 * (data & 3));
+	okim6295_set_bank_base(0, 0x40000 * (data & 3));
 }
 
 
@@ -191,7 +191,7 @@ static ADDRESS_MAP_START( pspikesb_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("IN0")
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("IN1")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW") AM_WRITE(aerofgt_bg1scrolly_w)
-	AM_RANGE(0xfff006, 0xfff007) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
+	AM_RANGE(0xfff006, 0xfff007) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(pspikesb_oki_banking_w)
 ADDRESS_MAP_END
 
@@ -227,7 +227,7 @@ static ADDRESS_MAP_START( pspikesc_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("IN1") AM_WRITE(pspikes_gfxbank_w)
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW")
 	AM_RANGE(0xfff004, 0xfff005) AM_WRITE(aerofgt_bg1scrolly_w)
-	AM_RANGE(0xfff006, 0xfff007) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
+	AM_RANGE(0xfff006, 0xfff007) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( karatblz_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -435,7 +435,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( wbbc97_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0xf810, 0xf810) AM_WRITE(YM3812_control_port_0_w)
 	AM_RANGE(0xf811, 0xf811) AM_WRITE(YM3812_write_port_0_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_NOP

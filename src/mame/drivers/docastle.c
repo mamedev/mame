@@ -170,17 +170,17 @@ static void idsoccer_adpcm_int(running_machine *machine, int chip)
 	if (adpcm_pos >= memory_region_length(machine, "adpcm"))
 	{
 		adpcm_idle = 1;
-		MSM5205_reset_w(0, 1);
+		msm5205_reset_w(0, 1);
 	}
 	else if (adpcm_data != -1)
 	{
-		MSM5205_data_w(0, adpcm_data & 0x0f);
+		msm5205_data_w(0, adpcm_data & 0x0f);
 		adpcm_data = -1;
 	}
 	else
 	{
 		adpcm_data = memory_region(machine, "adpcm")[adpcm_pos++];
-		MSM5205_data_w(0, adpcm_data >> 4);
+		msm5205_data_w(0, adpcm_data >> 4);
 	}
 }
 
@@ -197,13 +197,13 @@ static WRITE8_HANDLER( idsoccer_adpcm_w )
 	if (data & 0x80)
 	{
 		adpcm_idle = 1;
-		MSM5205_reset_w(0, 1);
+		msm5205_reset_w(0, 1);
 	}
 	else
 	{
 		adpcm_pos = (data & 0x7f) * 0x200;
 		adpcm_idle = 0;
-		MSM5205_reset_w(0, 0);
+		msm5205_reset_w(0, 0);
 	}
 }
 
@@ -231,10 +231,10 @@ static ADDRESS_MAP_START( docastle_map2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc005, 0xc005) AM_MIRROR(0x0080) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xc007, 0xc007) AM_MIRROR(0x0080) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc084, 0xc084) AM_READWRITE(docastle_flipscreen_on_r, docastle_flipscreen_on_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(SN76496_0_w)
-	AM_RANGE(0xe400, 0xe400) AM_WRITE(SN76496_1_w)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(SN76496_2_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(SN76496_3_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(sn76496_0_w)
+	AM_RANGE(0xe400, 0xe400) AM_WRITE(sn76496_1_w)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(sn76496_2_w)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE(sn76496_3_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( docastle_map3, ADDRESS_SPACE_PROGRAM, 8 )
@@ -267,10 +267,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dorunrun_map2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(SN76496_0_w)
-	AM_RANGE(0xa400, 0xa400) AM_WRITE(SN76496_1_w)
-	AM_RANGE(0xa800, 0xa800) AM_WRITE(SN76496_2_w)
-	AM_RANGE(0xac00, 0xac00) AM_WRITE(SN76496_3_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(sn76496_0_w)
+	AM_RANGE(0xa400, 0xa400) AM_WRITE(sn76496_1_w)
+	AM_RANGE(0xa800, 0xa800) AM_WRITE(sn76496_2_w)
+	AM_RANGE(0xac00, 0xac00) AM_WRITE(sn76496_3_w)
 	AM_RANGE(0xc001, 0xc001) AM_MIRROR(0x0080) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc002, 0xc002) AM_MIRROR(0x0080) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc003, 0xc003) AM_MIRROR(0x0080) AM_READ_PORT("JOYS")
@@ -306,10 +306,10 @@ static ADDRESS_MAP_START( idsoccer_map2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc005, 0xc005) AM_MIRROR(0x0080) AM_READ_PORT("BUTTONS")
 	AM_RANGE(0xc007, 0xc007) AM_MIRROR(0x0080) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xc084, 0xc084) AM_READ_PORT("JOYS_RIGHT") AM_WRITE(docastle_flipscreen_on_w)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(SN76496_0_w)
-	AM_RANGE(0xe400, 0xe400) AM_WRITE(SN76496_1_w)
-	AM_RANGE(0xe800, 0xe800) AM_WRITE(SN76496_2_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(SN76496_3_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(sn76496_0_w)
+	AM_RANGE(0xe400, 0xe400) AM_WRITE(sn76496_1_w)
+	AM_RANGE(0xe800, 0xe800) AM_WRITE(sn76496_2_w)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE(sn76496_3_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -563,7 +563,7 @@ GFXDECODE_END
 
 /* Sound Interfaces */
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	idsoccer_adpcm_int,	// interrupt function
 	MSM5205_S64_4B		// 6 kHz    ???
@@ -648,7 +648,7 @@ static MACHINE_DRIVER_START( idsoccer )
 
 	// sound hardware
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
 

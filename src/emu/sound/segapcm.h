@@ -2,6 +2,8 @@
 /*    SEGA 8bit PCM                                      */
 /*********************************************************/
 
+#pragma once
+
 #ifndef __SEGAPCM_H__
 #define __SEGAPCM_H__
 
@@ -12,12 +14,13 @@
 #define   BANK_MASKF    (0xf0<<16)
 #define   BANK_MASKF8   (0xf8<<16)
 
-struct SEGAPCMinterface
+typedef struct _sega_pcm_interface sega_pcm_interface;
+struct _sega_pcm_interface
 {
 	int  bank;
 };
 
-WRITE8_HANDLER( SegaPCM_w );
-READ8_HANDLER( SegaPCM_r );
+WRITE8_HANDLER( sega_pcm_w );
+READ8_HANDLER( sega_pcm_r );
 
-#endif
+#endif /* __SEGAPCM_H__ */

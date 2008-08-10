@@ -138,7 +138,7 @@ Notes:
 static WRITE8_HANDLER( yawdim_oki_bank_w )
 {
 	if (data & 4)
-		OKIM6295_set_bank_base(0, 0x40000 * (data & 3));
+		okim6295_set_bank_base(0, 0x40000 * (data & 3));
 }
 
 
@@ -212,7 +212,7 @@ static ADDRESS_MAP_START( yawdim_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x9000, 0x97ff) AM_WRITE(yawdim_oki_bank_w)
-	AM_RANGE(0x9800, 0x9fff) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+	AM_RANGE(0x9800, 0x9fff) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0xa000, 0xa7ff) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 

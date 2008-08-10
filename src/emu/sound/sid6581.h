@@ -6,8 +6,10 @@
 
 ***************************************************************************/
 
-#ifndef SID6581_H
-#define SID6581_H
+#pragma once
+
+#ifndef __SID6581_H__
+#define __SID6581_H__
 
 #include "sndintrf.h"
 
@@ -18,10 +20,11 @@ typedef enum
 } SIDTYPE;
 
 
-typedef struct
+typedef struct _sid6581_interface sid6581_interface;
+struct _sid6581_interface
 {
 	int (*ad_read)(int channel);
-} SID6581_interface;
+} ;
 
 
 READ8_HANDLER  ( sid6581_0_port_r );
@@ -29,4 +32,4 @@ READ8_HANDLER  ( sid6581_1_port_r );
 WRITE8_HANDLER ( sid6581_0_port_w );
 WRITE8_HANDLER ( sid6581_1_port_w );
 
-#endif /* SID6581_H */
+#endif /* __SID6581_H__ */

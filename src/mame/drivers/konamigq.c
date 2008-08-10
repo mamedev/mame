@@ -219,11 +219,11 @@ static READ16_HANDLER( dual539_r )
 	data = 0;
 	if( ACCESSING_BITS_0_7 )
 	{
-		data |= K054539_1_r( machine, offset );
+		data |= k054539_1_r( machine, offset );
 	}
 	if( ACCESSING_BITS_8_15 )
 	{
-		data |= K054539_0_r( machine, offset ) << 8;
+		data |= k054539_0_r( machine, offset ) << 8;
 	}
 	return data;
 }
@@ -232,11 +232,11 @@ static WRITE16_HANDLER( dual539_w )
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		K054539_1_w( machine, offset, data );
+		k054539_1_w( machine, offset, data );
 	}
 	if( ACCESSING_BITS_8_15 )
 	{
-		K054539_0_w( machine, offset, data >> 8 );
+		k054539_0_w( machine, offset, data >> 8 );
 	}
 }
 
@@ -269,7 +269,7 @@ static ADDRESS_MAP_START( sndwritemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x580000, 0x580001) AM_WRITE(SMH_NOP) /* ?? */
 ADDRESS_MAP_END
 
-static const struct K054539interface k054539_interface =
+static const k054539_interface k054539_config =
 {
 	"shared"
 };
@@ -398,12 +398,12 @@ static MACHINE_DRIVER_START( konamigq )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("konami1", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_interface)
+	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
 	MDRV_SOUND_ADD("konami2", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_interface)
+	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

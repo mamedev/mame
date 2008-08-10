@@ -154,8 +154,8 @@ static const ym2203_interface ym2203_interface_1 =
 	{
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
-		soundlatch_r,	OKIM6295_status_0_r,	// read  A,B
-		NULL,			OKIM6295_data_0_w,		// write A,B
+		soundlatch_r,	okim6295_status_0_r,	// read  A,B
+		NULL,			okim6295_data_0_w,		// write A,B
 	},
 	NULL
 };

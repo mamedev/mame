@@ -2737,7 +2737,7 @@ WRITE8_HANDLER( spcenctr_audio_3_w )
 
 	discrete_sound_w(machine, SPCENCTR_BONUS_EN, (data >> 4) & 0x01);
 
-	SN76477_enable_w(0, (data >> 5) & 0x01);	/* saucer sound */
+	sn76477_enable_w(0, (data >> 5) & 0x01);	/* saucer sound */
 
 	/* D6 and D7 are not connected */
 }
@@ -3640,7 +3640,7 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( invaders_audio_1_w )
 {
-	SN76477_enable_w(0, (~data >> 0) & 0x01);	/* saucer sound */
+	sn76477_enable_w(0, (~data >> 0) & 0x01);	/* saucer sound */
 
 	discrete_sound_w(machine, INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
 	discrete_sound_w(machine, INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
@@ -4020,7 +4020,7 @@ MACHINE_DRIVER_END
 
 WRITE8_HANDLER( invad2ct_audio_1_w )
 {
-	SN76477_enable_w(0, (~data >> 0) & 0x01);	/* saucer sound */
+	sn76477_enable_w(0, (~data >> 0) & 0x01);	/* saucer sound */
 
 	discrete_sound_w(machine, INVADERS_NODE(INVADERS_MISSILE_EN, 1), data & 0x02);
 	discrete_sound_w(machine, INVADERS_NODE(INVADERS_EXPLOSION_EN, 1), data & 0x04);
@@ -4044,7 +4044,7 @@ WRITE8_HANDLER( invad2ct_audio_2_w )
 
 WRITE8_HANDLER( invad2ct_audio_3_w )
 {
-	SN76477_enable_w(1, (~data >> 0) & 0x01);	/* saucer sound */
+	sn76477_enable_w(1, (~data >> 0) & 0x01);	/* saucer sound */
 
 	discrete_sound_w(machine, INVADERS_NODE(INVADERS_MISSILE_EN, 2), data & 0x02);
 	discrete_sound_w(machine, INVADERS_NODE(INVADERS_EXPLOSION_EN, 2), data & 0x04);

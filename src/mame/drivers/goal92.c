@@ -93,7 +93,7 @@ static WRITE8_HANDLER( adpcm_control_w )
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
 	memory_set_bankptr(1,&RAM[bankaddress]);
 
-	MSM5205_reset_w(0,data & 0x08);
+	msm5205_reset_w(0,data & 0x08);
 }
 
 static WRITE8_HANDLER( adpcm_data_w )
@@ -251,7 +251,7 @@ static void goal92_adpcm_int(running_machine *machine, int data)
 {
 	static int toggle = 0;
 
-	MSM5205_data_w (0,msm5205next);
+	msm5205_data_w (0,msm5205next);
 	msm5205next>>=4;
 
 	toggle ^= 1;
@@ -259,7 +259,7 @@ static void goal92_adpcm_int(running_machine *machine, int data)
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	goal92_adpcm_int,	/* interrupt function */
 	MSM5205_S96_4B		/* 4KHz 4-bit */
@@ -348,7 +348,7 @@ static MACHINE_DRIVER_START( goal92 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_DRIVER_END
 

@@ -72,7 +72,7 @@ static WRITE16_HANDLER( tx_videoram_w )
 
 static WRITE16_HANDLER( oki1_bank_w )
 {
-	OKIM6295_set_bank_base(1, 0x40000 * (data & 3));
+	okim6295_set_bank_base(1, 0x40000 * (data & 3));
 }
 
 static WRITE16_HANDLER( sprites_commands_w )
@@ -147,8 +147,8 @@ static ADDRESS_MAP_START( mwarr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x110014, 0x110015) AM_WRITE(mwarr_brightness_w)
 	AM_RANGE(0x110016, 0x110017) AM_WRITE(sprites_commands_w)
 	AM_RANGE(0x110000, 0x11ffff) AM_RAM AM_BASE(&mwarr_ram)
-	AM_RANGE(0x180000, 0x180001) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)
-	AM_RANGE(0x190000, 0x190001) AM_READWRITE(OKIM6295_status_1_lsb_r, OKIM6295_data_1_lsb_w)
+	AM_RANGE(0x180000, 0x180001) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
+	AM_RANGE(0x190000, 0x190001) AM_READWRITE(okim6295_status_1_lsb_r, okim6295_data_1_lsb_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mwarr )

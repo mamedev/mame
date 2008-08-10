@@ -74,7 +74,7 @@ static ADDRESS_MAP_START( quizdna_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x91, 0x91) AM_READ(input_port_5_r)
 	AM_RANGE(0xe0, 0xe0) AM_READ(YM2203_status_port_0_r)
 	AM_RANGE(0xe1, 0xe1) AM_READ(YM2203_read_port_0_r)
-	AM_RANGE(0xf0, 0xf0) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0xf0, 0xf0) AM_READ(okim6295_status_0_r)
 
 ADDRESS_MAP_END
 
@@ -87,7 +87,7 @@ static ADDRESS_MAP_START( quizdna_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0xe1, 0xe1) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gakupara_writeport, ADDRESS_SPACE_IO, 8 )
@@ -99,7 +99,7 @@ static ADDRESS_MAP_START( gakupara_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0xe1, 0xe1) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gekiretu_writeport, ADDRESS_SPACE_IO, 8 )
@@ -111,7 +111,7 @@ static ADDRESS_MAP_START( gekiretu_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0xe1, 0xe1) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0xf0, 0xf0) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
 /****************************************************************************/

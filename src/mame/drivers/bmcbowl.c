@@ -346,7 +346,7 @@ static ADDRESS_MAP_START( bmcbowl_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 	AM_RANGE(0x200000, 0x21ffff) AM_RAM AM_BASE(&bmcbowl_vid2)
 
-	AM_RANGE(0x28c000, 0x28c001) AM_READWRITE(OKIM6295_status_0_msb_r,OKIM6295_data_0_msb_w)
+	AM_RANGE(0x28c000, 0x28c001) AM_READWRITE(okim6295_status_0_msb_r,okim6295_data_0_msb_w)
 
 	/* protection device*/
 	AM_RANGE(0x30c000, 0x30c001) AM_WRITE(SMH_NOP)

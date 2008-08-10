@@ -845,7 +845,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bullsdrt_port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(bullsdrt_sprites_bank_w)
 	AM_RANGE(0x20, 0x3f) AM_WRITE(bullsdrt_tilesbank_w) AM_BASE(&bullsdrt_tiles_bankram)
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(bullsdrt_data_port_r, SN76496_0_w)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_READWRITE(bullsdrt_data_port_r, sn76496_0_w)
 ADDRESS_MAP_END
 
 
@@ -1551,21 +1551,21 @@ static const ay8910_interface centipdb_ay8910_interface =
 };
 
 
-static const struct POKEYinterface milliped_pokey_interface_1 =
+static const pokey_interface milliped_pokey_interface_1 =
 {
 	{ 0 },
 	input_port_4_r
 };
 
 
-static const struct POKEYinterface milliped_pokey_interface_2 =
+static const pokey_interface milliped_pokey_interface_2 =
 {
 	{ 0 },
 	input_port_5_r
 };
 
 
-static const struct POKEYinterface warlords_pokey_interface =
+static const pokey_interface warlords_pokey_interface =
 {
 	{ input_port_4_r,input_port_5_r,input_port_6_r,input_port_7_r }
 };

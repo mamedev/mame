@@ -95,14 +95,14 @@ static void ml_msm5205_vck(running_machine *machine, int chip)
 
 	if (adpcm_data != -1)
 	{
-		MSM5205_data_w(0, adpcm_data & 0x0f);
+		msm5205_data_w(0, adpcm_data & 0x0f);
 		adpcm_data = -1;
 	}
 	else
 	{
 		adpcm_data = memory_region(machine, "adpcm")[adpcm_pos];
 		adpcm_pos = (adpcm_pos + 1) & 0xffff;
-		MSM5205_data_w(0, adpcm_data >> 4);
+		msm5205_data_w(0, adpcm_data >> 4);
 	}
 }
 
@@ -113,12 +113,12 @@ static WRITE8_HANDLER( ml_msm5205_address_w )
 
 static WRITE8_HANDLER( ml_msm5205_start_w )
 {
-	MSM5205_reset_w(0, 0);
+	msm5205_reset_w(0, 0);
 }
 
 static WRITE8_HANDLER( ml_msm5205_stop_w )
 {
-	MSM5205_reset_w(0, 1);
+	msm5205_reset_w(0, 1);
 	adpcm_pos &= 0xff00;
 }
 
@@ -341,7 +341,7 @@ static GFXDECODE_START( mlanding )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	ml_msm5205_vck,	/* VCK function */
 	MSM5205_S48_4B		/* 8 kHz */
@@ -395,7 +395,7 @@ static MACHINE_DRIVER_START( mlanding )
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

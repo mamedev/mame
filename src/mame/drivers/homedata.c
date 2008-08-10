@@ -530,7 +530,7 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
 	coin_counter_w(0,~data & 0x80);
 
 	if (BIT(upd7807_portc,5) && !BIT(data,5))	/* clock 1->0 */
-		SN76496_0_w(machine,0,upd7807_porta);
+		sn76496_0_w(machine,0,upd7807_porta);
 
 	upd7807_portc = data;
 }
@@ -590,7 +590,7 @@ static ADDRESS_MAP_START( mrokumei_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(mrokumei_blitter_start_w)	// in some games also ROM bank switch to access service ROM
 	AM_RANGE(0x8001, 0x8001) AM_WRITE(mrokumei_keyboard_select_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(mrokumei_sound_cmd_w)
-	AM_RANGE(0x8003, 0x8003) AM_WRITE(SN76496_0_w)
+	AM_RANGE(0x8003, 0x8003) AM_WRITE(sn76496_0_w)
 	AM_RANGE(0x8006, 0x8006) AM_WRITE(homedata_blitter_param_w)
 	AM_RANGE(0x8007, 0x8007) AM_WRITE(mrokumei_blitter_bank_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)

@@ -405,7 +405,7 @@ static INTERRUPT_GEN(st0016_int)
 }
 
 extern UINT8 *st0016_charram;
-static const struct ST0016interface st0016_interface =
+static const st0016_interface st0016_config =
 {
 	&st0016_charram
 };
@@ -441,7 +441,7 @@ static MACHINE_DRIVER_START( st0016 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("st", ST0016, 0)
-	MDRV_SOUND_CONFIG(st0016_interface)
+	MDRV_SOUND_CONFIG(st0016_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

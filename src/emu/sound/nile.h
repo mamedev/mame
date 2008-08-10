@@ -1,5 +1,7 @@
-#ifndef _NILE_H_
-#define _NILE_H_
+#pragma once
+
+#ifndef __NILE_H__
+#define __NILE_H__
 
 extern UINT16 *nile_sound_regs;
 
@@ -8,5 +10,4 @@ READ16_HANDLER(nile_snd_r);
 WRITE16_HANDLER(nile_sndctrl_w);
 READ16_HANDLER(nile_sndctrl_r);
 
-#endif
-
+#endif /* __NILE_H__ */

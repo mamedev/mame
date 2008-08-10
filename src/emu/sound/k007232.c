@@ -17,7 +17,7 @@
         the bankswitching function can set this up).
 
 NS990821
-support for the K007232_VOL() macro.
+support for the k007232_VOL() macro.
 added external port callback, and functions to set the volume of the channels
 
 */
@@ -49,7 +49,7 @@ typedef struct kdacApcm
 	UINT32  		pcmlimit;
 
 	sound_stream * 	stream;
-	const struct K007232_interface *intf;
+	const k007232_interface *intf;
 	UINT32 			fncode[0x200];
 } KDAC_A_PCM;
 
@@ -296,7 +296,7 @@ static void KDAC_A_update(void *param, stream_sample_t **inputs, stream_sample_t
 /************************************************/
 static void *k007232_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const struct K007232_interface defintrf = { 0 };
+	static const k007232_interface defintrf = { 0 };
 	int i;
 	struct kdacApcm *info;
 
@@ -337,7 +337,7 @@ static void *k007232_start(const char *tag, int sndindex, int clock, const void 
 /************************************************/
 /*    Konami PCM write register                 */
 /************************************************/
-static void K007232_WriteReg( int r, int v, int chip )
+static void k007232_WriteReg( int r, int v, int chip )
 {
   struct kdacApcm *info = sndti_token(SOUND_K007232, chip);
   int  data;
@@ -400,7 +400,7 @@ static void K007232_WriteReg( int r, int v, int chip )
 /************************************************/
 /*    Konami PCM read register                  */
 /************************************************/
-static int K007232_ReadReg( int r, int chip )
+static int k007232_ReadReg( int r, int chip )
 {
   struct kdacApcm *info = sndti_token(SOUND_K007232, chip);
   int  ch = 0;
@@ -425,44 +425,44 @@ static int K007232_ReadReg( int r, int chip )
 
 /*****************************************************************************/
 
-WRITE8_HANDLER( K007232_write_port_0_w )
+WRITE8_HANDLER( k007232_write_port_0_w )
 {
-  K007232_WriteReg(offset,data,0);
+  k007232_WriteReg(offset,data,0);
 }
 
-READ8_HANDLER( K007232_read_port_0_r )
+READ8_HANDLER( k007232_read_port_0_r )
 {
-  return K007232_ReadReg(offset,0);
+  return k007232_ReadReg(offset,0);
 }
 
-WRITE8_HANDLER( K007232_write_port_1_w )
+WRITE8_HANDLER( k007232_write_port_1_w )
 {
-  K007232_WriteReg(offset,data,1);
+  k007232_WriteReg(offset,data,1);
 }
 
-READ8_HANDLER( K007232_read_port_1_r )
+READ8_HANDLER( k007232_read_port_1_r )
 {
-  return K007232_ReadReg(offset,1);
+  return k007232_ReadReg(offset,1);
 }
 
-WRITE8_HANDLER( K007232_write_port_2_w )
+WRITE8_HANDLER( k007232_write_port_2_w )
 {
-  K007232_WriteReg(offset,data,2);
+  k007232_WriteReg(offset,data,2);
 }
 
-READ8_HANDLER( K007232_read_port_2_r )
+READ8_HANDLER( k007232_read_port_2_r )
 {
-  return K007232_ReadReg(offset,2);
+  return k007232_ReadReg(offset,2);
 }
 
-void K007232_set_volume(int chip,int channel,int volumeA,int volumeB)
+void k007232_set_volume(int chip,int channel,int volumeA,int volumeB)
 {
   struct kdacApcm *info = sndti_token(SOUND_K007232, chip);
   info->vol[channel][0] = volumeA;
   info->vol[channel][1] = volumeB;
 }
 
-void K007232_set_bank( int chip, int chABank, int chBBank )
+void k007232_set_bank( int chip, int chABank, int chBBank )
 {
   struct kdacApcm *info = sndti_token(SOUND_K007232, chip);
   info->bank[0] = chABank<<17;

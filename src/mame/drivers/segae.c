@@ -988,7 +988,7 @@ WRITE8_HANDLER( sms_vdp_ctrl_w )
 
 WRITE8_HANDLER( sms_sn76496_w )
 {
-	SN76496_0_w(machine, 0, data & 0xff);
+	sn76496_0_w(machine, 0, data & 0xff);
 }
 
 static void draw_tile_line(int drawxpos, int tileline, UINT16 tiledata, UINT8* linebuf, struct sms_vdp* chip)
@@ -2153,7 +2153,7 @@ static WRITE8_HANDLER( systeme_bank_w )
 
 static WRITE8_HANDLER( sms_sn76496_2_w )
 {
-	SN76496_1_w(machine, 0, data & 0xff);
+	sn76496_1_w(machine, 0, data & 0xff);
 }
 
 static void init_ports_systeme(running_machine *machine)

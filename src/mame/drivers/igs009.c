@@ -281,7 +281,7 @@ static ADDRESS_MAP_START( jingbell_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x64b0, 0x64b0 ) AM_WRITE( YM2413_register_port_0_w )
 	AM_RANGE( 0x64b1, 0x64b1 ) AM_WRITE( YM2413_data_port_0_w )
 
-	AM_RANGE( 0x64c0, 0x64c0 ) AM_READWRITE( OKIM6295_status_0_r, OKIM6295_data_0_w )
+	AM_RANGE( 0x64c0, 0x64c0 ) AM_READWRITE( okim6295_status_0_r, okim6295_data_0_w )
 
 	AM_RANGE( 0x64d0, 0x64d1 ) AM_READWRITE( jingbell_magic_r, jingbell_magic_w )	// DSW1-5
 

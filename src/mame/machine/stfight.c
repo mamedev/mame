@@ -192,15 +192,15 @@ void stfight_adpcm_int( running_machine *machine, int data )
     // finished playing sample?
     if( adpcm_data_offs == adpcm_data_end )
     {
-        MSM5205_reset_w( 0, 1 );
+        msm5205_reset_w( 0, 1 );
         return;
     }
 
 	if( toggle == 0 )
-		MSM5205_data_w( 0, ( adpcm_data >> 4 ) & 0x0f );
+		msm5205_data_w( 0, ( adpcm_data >> 4 ) & 0x0f );
 	else
 	{
-		MSM5205_data_w( 0, adpcm_data & 0x0f );
+		msm5205_data_w( 0, adpcm_data & 0x0f );
 		adpcm_data_offs++;
 	}
 
@@ -215,7 +215,7 @@ WRITE8_HANDLER( stfight_adpcm_control_w )
         adpcm_data_end = sampleLimits[data+1];
     }
 
-    MSM5205_reset_w( 0, data & 0x08 ? 1 : 0 );
+    msm5205_reset_w( 0, data & 0x08 ? 1 : 0 );
 }
 
 WRITE8_HANDLER( stfight_e800_w )

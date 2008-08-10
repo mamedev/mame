@@ -33,7 +33,7 @@ static void sid_update(void *token,stream_sample_t **inputs, stream_sample_t **_
 static void *sid_start(const char *tag, int sndindex, int clock, const void *config, SIDTYPE sidtype)
 {
 	SID6581 *sid;
-	const SID6581_interface *iface = (const SID6581_interface*) config;
+	const sid6581_interface *iface = (const sid6581_interface*) config;
 
 	sid = (SID6581 *) auto_malloc(sizeof(*sid));
 	memset(sid, 0, sizeof(*sid));

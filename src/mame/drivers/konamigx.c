@@ -1207,9 +1207,9 @@ static READ16_HANDLER( dual539_r )
 	UINT16 ret = 0;
 
 	if (ACCESSING_BITS_0_7)
-		ret |= K054539_1_r(machine, offset);
+		ret |= k054539_1_r(machine, offset);
 	if (ACCESSING_BITS_8_15)
-		ret |= K054539_0_r(machine, offset)<<8;
+		ret |= k054539_0_r(machine, offset)<<8;
 
 	return ret;
 }
@@ -1217,9 +1217,9 @@ static READ16_HANDLER( dual539_r )
 static WRITE16_HANDLER( dual539_w )
 {
 	if (ACCESSING_BITS_0_7)
-		K054539_1_w(machine, offset, data);
+		k054539_1_w(machine, offset, data);
 	if (ACCESSING_BITS_8_15)
-		K054539_0_w(machine, offset, data>>8);
+		k054539_0_w(machine, offset, data>>8);
 }
 
 static READ16_HANDLER( sndcomm68k_r )
@@ -1245,7 +1245,7 @@ static ADDRESS_MAP_START( gxsndmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x580000, 0x580001) AM_WRITENOP
 ADDRESS_MAP_END
 
-static const struct K054539interface k054539_interface =
+static const k054539_interface k054539_config =
 {
 	"shared"
 };
@@ -1346,12 +1346,12 @@ static MACHINE_DRIVER_START( konamigx )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("konami1", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_interface)
+	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
 	MDRV_SOUND_ADD("konami2", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_interface)
+	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -3101,15 +3101,15 @@ static MACHINE_RESET(konamigx)
 	if (!strcmp(machine->gamedrv->name, "tkmmpzdm"))
 	{
 		// boost voice(chip 1 channel 3-7)
-		for (i=3; i<=7; i++) K054539_set_gain(1, i, 2.0);
+		for (i=3; i<=7; i++) k054539_set_gain(1, i, 2.0);
 	}
 	else if ((!strcmp(machine->gamedrv->name, "dragoonj")) || (!strcmp(machine->gamedrv->name, "dragoona")))
 	{
 		// soften percussions(chip 1 channel 0-3), boost voice(chip 1 channel 4-7)
 		for (i=0; i<=3; i++)
 		{
-			K054539_set_gain(1, i, 0.8);
-			K054539_set_gain(1, i+4, 2.0);
+			k054539_set_gain(1, i, 0.8);
+			k054539_set_gain(1, i+4, 2.0);
 		}
 	}
 }

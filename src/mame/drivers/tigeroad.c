@@ -163,10 +163,10 @@ static WRITE16_HANDLER( tigeroad_soundcmd_w )
 
 static WRITE8_HANDLER( msm5205_w )
 {
-	MSM5205_reset_w(offset,(data>>7)&1);
-	MSM5205_data_w(offset,data);
-	MSM5205_vclk_w(offset,1);
-	MSM5205_vclk_w(offset,0);
+	msm5205_reset_w(offset,(data>>7)&1);
+	msm5205_data_w(offset,data);
+	msm5205_vclk_w(offset,1);
+	msm5205_vclk_w(offset,0);
 }
 
 
@@ -515,7 +515,7 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	0,				/* interrupt function */
 	MSM5205_SEX_4B	/* 4KHz playback ?  */
@@ -577,7 +577,7 @@ static MACHINE_DRIVER_START( toramich )
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

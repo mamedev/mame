@@ -400,7 +400,7 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)      /* Code bank register */
 	AM_RANGE(0x03, 0x03) AM_WRITE(YM2413_data_port_0_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(YM2413_register_port_0_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(okim6295_data_0_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)	/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)      /* Video RAM bank register */
 	AM_RANGE(0x08, 0x08) AM_WRITE(eeprom_cs_w)
@@ -461,13 +461,13 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( oki_banking_w )
 {
-	OKIM6295_set_bank_base(0, 0x40000 * (data & 3));
+	okim6295_set_bank_base(0, 0x40000 * (data & 3));
 }
 
 static ADDRESS_MAP_START( mstworld_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9800, 0x9800) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0x9800, 0x9800) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -475,7 +475,7 @@ static ADDRESS_MAP_START( mstworld_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(oki_banking_w)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0x9800, 0x9800) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER(mstworld_sound_w)
@@ -1218,7 +1218,7 @@ GFXDECODE_END
 
 static void spangbl_adpcm_int(running_machine *machine, int data)
 {
-	MSM5205_data_w(0, sample_buffer & 0x0F);
+	msm5205_data_w(0, sample_buffer & 0x0F);
 	sample_buffer >>= 4;
 	sample_select ^= 1;
 	if(sample_select == 0)
@@ -1226,7 +1226,7 @@ static void spangbl_adpcm_int(running_machine *machine, int data)
 }
 
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	spangbl_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 4KHz 4-bit */
@@ -1251,7 +1251,7 @@ static MACHINE_DRIVER_START( spangbl )
 
 
 	MDRV_SOUND_REPLACE("oki", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

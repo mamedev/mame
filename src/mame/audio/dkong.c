@@ -1268,16 +1268,16 @@ static ADDRESS_MAP_START( dkong3_sound1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch_r)		// overwrite default
 	AM_RANGE(0x4017, 0x4017) AM_READ(soundlatch2_r)
-	AM_RANGE(0x4000, 0x4017) AM_READ(NESPSG_0_r)
-	AM_RANGE(0x4000, 0x4017) AM_WRITE(NESPSG_0_w)
+	AM_RANGE(0x4000, 0x4017) AM_READ(nes_psg_0_r)
+	AM_RANGE(0x4000, 0x4017) AM_WRITE(nes_psg_0_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkong3_sound2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch3_r)		// overwrite default
-	AM_RANGE(0x4000, 0x4017) AM_READ(NESPSG_1_r)
-	AM_RANGE(0x4000, 0x4017) AM_WRITE(NESPSG_1_w)
+	AM_RANGE(0x4000, 0x4017) AM_READ(nes_psg_1_r)
+	AM_RANGE(0x4000, 0x4017) AM_WRITE(nes_psg_1_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -1287,8 +1287,8 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static const struct NESinterface nes_interface_1 = { "n2a03a" };
-static const struct NESinterface nes_interface_2 = { "n2a03b" };
+static const nes_interface nes_interface_1 = { "n2a03a" };
+static const nes_interface nes_interface_2 = { "n2a03b" };
 
 /*************************************
  *

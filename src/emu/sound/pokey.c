@@ -199,7 +199,7 @@ struct POKEYregisters
 	UINT8 IRQEN;			/* IRQEN  (W/D20E) */
 	UINT8 SKSTAT;			/* SKSTAT (R/D20F) */
 	UINT8 SKCTL;			/* SKCTL  (W/D20F) */
-	struct POKEYinterface intf;
+	pokey_interface intf;
 	attotime clock_period;
 	attotime ad_time_fast;
 	attotime ad_time_slow;
@@ -615,7 +615,7 @@ static void *pokey_start(const char *tag, int sndindex, int clock, const void *c
 	memset(chip, 0, sizeof(*chip));
 
 	if (config)
-		memcpy(&chip->intf, config, sizeof(struct POKEYinterface));
+		memcpy(&chip->intf, config, sizeof(pokey_interface));
 	chip->clock_period = ATTOTIME_IN_HZ(clock);
 	chip->index = sndindex;
 

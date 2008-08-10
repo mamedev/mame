@@ -87,7 +87,7 @@ static int adpcm_pos,adpcm_end;
 static WRITE8_HANDLER( tecmo_adpcm_start_w )
 {
 	adpcm_pos = data << 8;
-	MSM5205_reset_w(0,0);
+	msm5205_reset_w(0,0);
 }
 static WRITE8_HANDLER( tecmo_adpcm_end_w )
 {
@@ -95,7 +95,7 @@ static WRITE8_HANDLER( tecmo_adpcm_end_w )
 }
 static WRITE8_HANDLER( tecmo_adpcm_vol_w )
 {
-	MSM5205_set_volume(0,(data & 0x0f) * 100 / 15);
+	msm5205_set_volume(0,(data & 0x0f) * 100 / 15);
 }
 static void tecmo_adpcm_int(running_machine *machine, int num)
 {
@@ -103,10 +103,10 @@ static void tecmo_adpcm_int(running_machine *machine, int num)
 
 	if (adpcm_pos >= adpcm_end ||
 				adpcm_pos >= memory_region_length(machine, "adpcm"))
-		MSM5205_reset_w(0,1);
+		msm5205_reset_w(0,1);
 	else if (adpcm_data != -1)
 	{
-		MSM5205_data_w(0,adpcm_data & 0x0f);
+		msm5205_data_w(0,adpcm_data & 0x0f);
 		adpcm_data = -1;
 	}
 	else
@@ -114,7 +114,7 @@ static void tecmo_adpcm_int(running_machine *machine, int num)
 		UINT8 *ROM = memory_region(machine, "adpcm");
 
 		adpcm_data = ROM[adpcm_pos++];
-		MSM5205_data_w(0,adpcm_data >> 4);
+		msm5205_data_w(0,adpcm_data >> 4);
 	}
 }
 
@@ -554,7 +554,7 @@ static const ym3526_interface ym3526_config =
 	irqhandler
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	tecmo_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 8KHz               */
@@ -594,7 +594,7 @@ static MACHINE_DRIVER_START( rygar )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb, even if schematics shows a 384khz resonator */
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

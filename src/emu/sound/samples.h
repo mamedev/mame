@@ -1,5 +1,7 @@
-#ifndef SAMPLES_H
-#define SAMPLES_H
+#pragma once
+
+#ifndef __SAMPLES_H__
+#define __SAMPLES_H__
 
 struct loaded_sample
 {
@@ -48,4 +50,4 @@ int sample_loaded(int samplenum);
 /* drivers as well (e.g. a sound chip emulator needing drum samples) */
 struct loaded_samples *readsamples(const char *const *samplenames, const char *name);
 
-#endif
+#endif /* __SAMPLES_H__ */

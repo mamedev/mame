@@ -261,10 +261,10 @@ static READ8_HANDLER( avengers_soundlatch2_r )
 
 static WRITE8_HANDLER( msm5205_w )
 {
-	MSM5205_reset_w(offset,(data>>7)&1);
-	MSM5205_data_w(offset,data);
-	MSM5205_vclk_w(offset,1);
-	MSM5205_vclk_w(offset,0);
+	msm5205_reset_w(offset,(data>>7)&1);
+	msm5205_data_w(offset,data);
+	msm5205_vclk_w(offset,1);
+	msm5205_vclk_w(offset,0);
 }
 
 static ADDRESS_MAP_START( avengers_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -741,7 +741,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	0,				/* interrupt function */
 	MSM5205_SEX_4B	/* slave mode */
@@ -816,7 +816,7 @@ static MACHINE_DRIVER_START( trojan )
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("5205", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

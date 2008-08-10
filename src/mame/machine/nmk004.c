@@ -144,9 +144,9 @@ static void oki_play_sample(running_machine *machine, int sample_no)
 	{
 		// stop all channels
 		if (chip == 0)
-			OKIM6295_data_0_w(machine, 0, 0x78 );
+			okim6295_data_0_w(machine, 0, 0x78 );
 		else
-			OKIM6295_data_1_w(machine, 0, 0x78 );
+			okim6295_data_1_w(machine, 0, 0x78 );
 	}
 	else
 	{
@@ -161,9 +161,9 @@ static void oki_play_sample(running_machine *machine, int sample_no)
 
 		// stop channel
 		if (chip == 0)
-			OKIM6295_data_0_w(machine, 0, (0x08 << ch) );
+			okim6295_data_0_w(machine, 0, (0x08 << ch) );
 		else
-			OKIM6295_data_1_w(machine, 0, (0x08 << ch) );
+			okim6295_data_1_w(machine, 0, (0x08 << ch) );
 
 		if (sample != 0)
 		{
@@ -176,13 +176,13 @@ static void oki_play_sample(running_machine *machine, int sample_no)
 
 			if (chip == 0)
 			{
-				OKIM6295_data_0_w(machine, 0, 0x80 | sample );
-				OKIM6295_data_0_w(machine, 0, (0x10 << ch) | vol );
+				okim6295_data_0_w(machine, 0, 0x80 | sample );
+				okim6295_data_0_w(machine, 0, (0x10 << ch) | vol );
 			}
 			else
 			{
-				OKIM6295_data_1_w(machine, 0, 0x80 | sample );
-				OKIM6295_data_1_w(machine, 0, (0x10 << ch) | vol );
+				okim6295_data_1_w(machine, 0, 0x80 | sample );
+				okim6295_data_1_w(machine, 0, (0x10 << ch) | vol );
 			}
 		}
 	}
@@ -190,7 +190,7 @@ static void oki_play_sample(running_machine *machine, int sample_no)
 
 static void oki_update_state(running_machine *machine)
 {
-	NMK004_state.oki_playing = ((OKIM6295_status_1_r(machine, 0) & 0x0f) << 4) | (OKIM6295_status_0_r(machine, 0) & 0x0f);
+	NMK004_state.oki_playing = ((okim6295_status_1_r(machine, 0) & 0x0f) << 4) | (okim6295_status_0_r(machine, 0) & 0x0f);
 }
 
 

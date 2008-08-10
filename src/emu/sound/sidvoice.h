@@ -1,5 +1,7 @@
-#ifndef __SIDVOICE_H_
-#define __SIDVOICE_H_
+#pragma once
+
+#ifndef __SIDVOICE_H__
+#define __SIDVOICE_H__
 
 #include "sndintrf.h"
 
@@ -114,4 +116,4 @@ extern ptr2sidVoidFunc sid8580ModeNormalTable[16];
 extern ptr2sidVoidFunc sid8580ModeRingTable[16];
 #endif
 
-#endif
+#endif /* __SIDVOICE_H__ */

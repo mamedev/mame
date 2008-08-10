@@ -130,7 +130,7 @@ VIDEO_UPDATE( actionhw );
 #ifdef UNUSED_FUNCTION
 static void kickgoal_play(int melody, int data)
 {
-	int status = OKIM6295_status_0_r(0);
+	int status = okim6295_status_0_r(0);
 
 	logerror("Playing sample %01x:%02x from command %02x\n",kickgoal_snd_bank,kickgoal_sound,data);
 	if (kickgoal_sound == 0) popmessage("Unknown sound command %02x",kickgoal_sound);
@@ -140,23 +140,23 @@ static void kickgoal_play(int melody, int data)
 			kickgoal_melody      = kickgoal_sound;
 			kickgoal_melody_loop = kickgoal_sound;
 			if (status & 0x08)
-				OKIM6295_data_0_w(0,0x40);
-			OKIM6295_data_0_w(0,(0x80 | kickgoal_melody));
-			OKIM6295_data_0_w(0,0x81);
+				okim6295_data_0_w(0,0x40);
+			okim6295_data_0_w(0,(0x80 | kickgoal_melody));
+			okim6295_data_0_w(0,0x81);
 		}
 	}
 	else {
 		if ((status & 0x01) == 0) {
-		OKIM6295_data_0_w(0,(0x80 | kickgoal_sound));
-			OKIM6295_data_0_w(0,0x11);
+		okim6295_data_0_w(0,(0x80 | kickgoal_sound));
+			okim6295_data_0_w(0,0x11);
 		}
 		else if ((status & 0x02) == 0) {
-		OKIM6295_data_0_w(0,(0x80 | kickgoal_sound));
-			OKIM6295_data_0_w(0,0x21);
+		okim6295_data_0_w(0,(0x80 | kickgoal_sound));
+			okim6295_data_0_w(0,0x21);
 		}
 		else if ((status & 0x04) == 0) {
-		OKIM6295_data_0_w(0,(0x80 | kickgoal_sound));
-			OKIM6295_data_0_w(0,0x41);
+		okim6295_data_0_w(0,(0x80 | kickgoal_sound));
+			okim6295_data_0_w(0,0x41);
 		}
 	}
 }
@@ -168,7 +168,7 @@ WRITE16_HANDLER( kickgoal_snd_w )
 		logerror("PC:%06x Writing %04x to Sound CPU\n",activecpu_get_previouspc(),data);
 		if (data >= 0x40) {
 			if (data == 0xfe) {
-				OKIM6295_data_0_w(0,0x40);	/* Stop playing the melody */
+				okim6295_data_0_w(0,0x40);	/* Stop playing the melody */
 				kickgoal_melody      = 0x00;
 				kickgoal_melody_loop = 0x00;
 			}
@@ -177,32 +177,32 @@ WRITE16_HANDLER( kickgoal_snd_w )
 			}
 		}
 		else if (data == 0) {
-			OKIM6295_data_0_w(0,0x38);		/* Stop playing effects */
+			okim6295_data_0_w(0,0x38);		/* Stop playing effects */
 		}
 		else {
 			kickgoal_sound = kickgoal_cmd_snd[data];
 
 			if (kickgoal_sound >= 0x70) {
 				if (kickgoal_snd_bank != 1)
-					OKIM6295_set_bank_base(0, (1 * 0x40000));
+					okim6295_set_bank_base(0, (1 * 0x40000));
 				kickgoal_snd_bank = 1;
 				kickgoal_play(0, data);
 			}
 			else if (kickgoal_sound >= 0x69) {
 				if (kickgoal_snd_bank != 2)
-					OKIM6295_set_bank_base(0, (2 * 0x40000));
+					okim6295_set_bank_base(0, (2 * 0x40000));
 				kickgoal_snd_bank = 2;
 				kickgoal_play(4, data);
 			}
 			else if (kickgoal_sound >= 0x65) {
 				if (kickgoal_snd_bank != 1)
-					OKIM6295_set_bank_base(0, (1 * 0x40000));
+					okim6295_set_bank_base(0, (1 * 0x40000));
 				kickgoal_snd_bank = 1;
 				kickgoal_play(4, data);
 			}
 			else if (kickgoal_sound >= 0x60) {
 				kickgoal_snd_bank = 0;
-					OKIM6295_set_bank_base(0, (0 * 0x40000));
+					okim6295_set_bank_base(0, (0 * 0x40000));
 				kickgoal_snd_bank = 0;
 				kickgoal_play(4, data);
 			}
@@ -222,11 +222,11 @@ static WRITE16_HANDLER( actionhw_snd_w )
 
 	switch (data)
 	{
-		case 0xfc:	OKIM6295_set_bank_base(0, (0 * 0x40000)); break;
-		case 0xfd:	OKIM6295_set_bank_base(0, (2 * 0x40000)); break;
-		case 0xfe:	OKIM6295_set_bank_base(0, (1 * 0x40000)); break;
-		case 0xff:	OKIM6295_set_bank_base(0, (3 * 0x40000)); break;
-		case 0x78:	OKIM6295_data_0_w(machine,0,data);
+		case 0xfc:	okim6295_set_bank_base(0, (0 * 0x40000)); break;
+		case 0xfd:	okim6295_set_bank_base(0, (2 * 0x40000)); break;
+		case 0xfe:	okim6295_set_bank_base(0, (1 * 0x40000)); break;
+		case 0xff:	okim6295_set_bank_base(0, (3 * 0x40000)); break;
+		case 0x78:	okim6295_data_0_w(machine,0,data);
 					snd_sam[0]=00; snd_sam[1]=00; snd_sam[2]=00; snd_sam[3]=00;
 					break;
 		default:	if (snd_new) /* Play new sample */
@@ -234,44 +234,44 @@ static WRITE16_HANDLER( actionhw_snd_w )
 						if ((data & 0x80) && (snd_sam[3] != snd_new))
 						{
 							logerror("About to play sample %02x at vol %02x\n",snd_new,data);
-							if ((OKIM6295_status_0_r(machine,0) & 0x08) != 0x08)
+							if ((okim6295_status_0_r(machine,0) & 0x08) != 0x08)
 							{
 							logerror("Playing sample %02x at vol %02x\n",snd_new,data);
-								OKIM6295_data_0_w(machine,0,snd_new);
-								OKIM6295_data_0_w(machine,0,data);
+								okim6295_data_0_w(machine,0,snd_new);
+								okim6295_data_0_w(machine,0,data);
 							}
 							snd_new = 00;
 						}
 						if ((data & 0x40) && (snd_sam[2] != snd_new))
 						{
 							logerror("About to play sample %02x at vol %02x\n",snd_new,data);
-							if ((OKIM6295_status_0_r(machine,0) & 0x04) != 0x04)
+							if ((okim6295_status_0_r(machine,0) & 0x04) != 0x04)
 							{
 							logerror("Playing sample %02x at vol %02x\n",snd_new,data);
-								OKIM6295_data_0_w(machine,0,snd_new);
-								OKIM6295_data_0_w(machine,0,data);
+								okim6295_data_0_w(machine,0,snd_new);
+								okim6295_data_0_w(machine,0,data);
 							}
 							snd_new = 00;
 						}
 						if ((data & 0x20) && (snd_sam[1] != snd_new))
 						{
 							logerror("About to play sample %02x at vol %02x\n",snd_new,data);
-							if ((OKIM6295_status_0_r(machine,0) & 0x02) != 0x02)
+							if ((okim6295_status_0_r(machine,0) & 0x02) != 0x02)
 							{
 							logerror("Playing sample %02x at vol %02x\n",snd_new,data);
-								OKIM6295_data_0_w(machine,0,snd_new);
-								OKIM6295_data_0_w(machine,0,data);
+								okim6295_data_0_w(machine,0,snd_new);
+								okim6295_data_0_w(machine,0,data);
 							}
 							snd_new = 00;
 						}
 						if ((data & 0x10) && (snd_sam[0] != snd_new))
 						{
 							logerror("About to play sample %02x at vol %02x\n",snd_new,data);
-							if ((OKIM6295_status_0_r(machine,0) & 0x01) != 0x01)
+							if ((okim6295_status_0_r(machine,0) & 0x01) != 0x01)
 							{
 							logerror("Playing sample %02x at vol %02x\n",snd_new,data);
-								OKIM6295_data_0_w(machine,0,snd_new);
-								OKIM6295_data_0_w(machine,0,data);
+								okim6295_data_0_w(machine,0,snd_new);
+								okim6295_data_0_w(machine,0,data);
 							}
 							snd_new = 00;
 						}
@@ -286,7 +286,7 @@ static WRITE16_HANDLER( actionhw_snd_w )
 					else /* Turn a channel off */
 					{
 						logerror("Turning channel %02x off\n",data);
-						OKIM6295_data_0_w(machine,0,data);
+						okim6295_data_0_w(machine,0,data);
 						if (data & 0x40) snd_sam[3] = 00;
 						if (data & 0x20) snd_sam[2] = 00;
 						if (data & 0x10) snd_sam[1] = 00;
@@ -305,7 +305,7 @@ static int m6295_bank;
 static UINT16 m6295_key_delay;
 static INTERRUPT_GEN( kickgoal_interrupt )
 {
-	if ((OKIM6295_status_0_r(machine,0) & 0x08) == 0)
+	if ((okim6295_status_0_r(machine,0) & 0x08) == 0)
 	{
 		switch(kickgoal_melody_loop)
 		{
@@ -334,8 +334,8 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		if (kickgoal_melody_loop)
 		{
 //          logerror("Changing to sample %02x\n",kickgoal_melody_loop);
-			OKIM6295_data_0_w(machine,0,((0x80 | kickgoal_melody_loop) & 0xff));
-			OKIM6295_data_0_w(machine,0,0x81);
+			okim6295_data_0_w(machine,0,((0x80 | kickgoal_melody_loop) & 0xff));
+			okim6295_data_0_w(machine,0,0x81);
 		}
 	}
 	if ( input_code_pressed_once(KEYCODE_PGUP) )
@@ -346,7 +346,7 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 			m6295_bank &= 0x03;
 			if (m6295_bank == 0x03) m6295_bank = 0x00;
 			popmessage("Changing Bank to %02x",m6295_bank);
-			OKIM6295_set_bank_base(0, ((m6295_bank) * 0x40000));
+			okim6295_set_bank_base(0, ((m6295_bank) * 0x40000));
 
 			if (m6295_key_delay == 0xffff) m6295_key_delay = 0x00;
 			else m6295_key_delay = (0x30 * oki_time_base);
@@ -362,7 +362,7 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 			m6295_bank &= 0x03;
 			if (m6295_bank == 0x03) m6295_bank = 0x02;
 			popmessage("Changing Bank to %02x",m6295_bank);
-			OKIM6295_set_bank_base(0, ((m6295_bank) * 0x40000));
+			okim6295_set_bank_base(0, ((m6295_bank) * 0x40000));
 
 			if (m6295_key_delay == 0xffff) m6295_key_delay = 0x00;
 			else m6295_key_delay = (0x30 * oki_time_base);
@@ -376,11 +376,11 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		{
 			m6295_comm += 1;
 			m6295_comm &= 0x7f;
-			if (m6295_comm == 0x00) { OKIM6295_set_bank_base(0, (0 * 0x40000)); m6295_bank = 0; }
-			if (m6295_comm == 0x60) { OKIM6295_set_bank_base(0, (0 * 0x40000)); m6295_bank = 0; }
-			if (m6295_comm == 0x65) { OKIM6295_set_bank_base(0, (1 * 0x40000)); m6295_bank = 1; }
-			if (m6295_comm == 0x69) { OKIM6295_set_bank_base(0, (2 * 0x40000)); m6295_bank = 2; }
-			if (m6295_comm == 0x70) { OKIM6295_set_bank_base(0, (1 * 0x40000)); m6295_bank = 1; }
+			if (m6295_comm == 0x00) { okim6295_set_bank_base(0, (0 * 0x40000)); m6295_bank = 0; }
+			if (m6295_comm == 0x60) { okim6295_set_bank_base(0, (0 * 0x40000)); m6295_bank = 0; }
+			if (m6295_comm == 0x65) { okim6295_set_bank_base(0, (1 * 0x40000)); m6295_bank = 1; }
+			if (m6295_comm == 0x69) { okim6295_set_bank_base(0, (2 * 0x40000)); m6295_bank = 2; }
+			if (m6295_comm == 0x70) { okim6295_set_bank_base(0, (1 * 0x40000)); m6295_bank = 1; }
 			popmessage("Sound test command %02x on Bank %02x",m6295_comm,m6295_bank);
 
 			if (m6295_key_delay == 0xffff) m6295_key_delay = 0x00;
@@ -395,11 +395,11 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		{
 			m6295_comm -= 1;
 			m6295_comm &= 0x7f;
-			if (m6295_comm == 0x2b) { OKIM6295_set_bank_base(0, (0 * 0x40000)); m6295_bank = 0; }
-			if (m6295_comm == 0x64) { OKIM6295_set_bank_base(0, (0 * 0x40000)); m6295_bank = 0; }
-			if (m6295_comm == 0x68) { OKIM6295_set_bank_base(0, (1 * 0x40000)); m6295_bank = 1; }
-			if (m6295_comm == 0x6c) { OKIM6295_set_bank_base(0, (2 * 0x40000)); m6295_bank = 2; }
-			if (m6295_comm == 0x76) { OKIM6295_set_bank_base(0, (1 * 0x40000)); m6295_bank = 1; }
+			if (m6295_comm == 0x2b) { okim6295_set_bank_base(0, (0 * 0x40000)); m6295_bank = 0; }
+			if (m6295_comm == 0x64) { okim6295_set_bank_base(0, (0 * 0x40000)); m6295_bank = 0; }
+			if (m6295_comm == 0x68) { okim6295_set_bank_base(0, (1 * 0x40000)); m6295_bank = 1; }
+			if (m6295_comm == 0x6c) { okim6295_set_bank_base(0, (2 * 0x40000)); m6295_bank = 2; }
+			if (m6295_comm == 0x76) { okim6295_set_bank_base(0, (1 * 0x40000)); m6295_bank = 1; }
 			popmessage("Sound test command %02x on Bank %02x",m6295_comm,m6295_bank);
 
 			if (m6295_key_delay == 0xffff) m6295_key_delay = 0x00;
@@ -412,9 +412,9 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 	{
 		if (m6295_key_delay >= (0x80 * oki_time_base))
 		{
-			OKIM6295_data_0_w(machine,0,0x78);
-			OKIM6295_data_0_w(machine,0,(0x80 | m6295_comm));
-			OKIM6295_data_0_w(machine,0,0x11);
+			okim6295_data_0_w(machine,0,0x78);
+			okim6295_data_0_w(machine,0,(0x80 | m6295_comm));
+			okim6295_data_0_w(machine,0,0x11);
 
 			popmessage("Playing sound %02x on Bank %02x",m6295_comm,m6295_bank);
 

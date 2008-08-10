@@ -123,8 +123,8 @@ static WRITE16_HANDLER( k3_scrolly_w )
 
 static WRITE16_HANDLER( k3_soundbanks_w )
 {
-	OKIM6295_set_bank_base(0, (data & 4) ? 0x40000 : 0);
-	OKIM6295_set_bank_base(1, (data & 2) ? 0x40000 : 0);
+	okim6295_set_bank_base(0, (data & 4) ? 0x40000 : 0);
+	okim6295_set_bank_base(1, (data & 2) ? 0x40000 : 0);
 }
 
 
@@ -145,8 +145,8 @@ static ADDRESS_MAP_START( k3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x440000, 0x440001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x480000, 0x480001) AM_READ_PORT("DSW")
-	AM_RANGE(0x4c0000, 0x4c0001) AM_READWRITE(OKIM6295_status_1_msb_r, OKIM6295_data_1_msb_w)
-	AM_RANGE(0x500000, 0x500001) AM_READWRITE(OKIM6295_status_0_msb_r, OKIM6295_data_0_msb_w)
+	AM_RANGE(0x4c0000, 0x4c0001) AM_READWRITE(okim6295_status_1_msb_r, okim6295_data_1_msb_w)
+	AM_RANGE(0x500000, 0x500001) AM_READWRITE(okim6295_status_0_msb_r, okim6295_data_0_msb_w)
 	AM_RANGE(0x8c0000, 0x8cffff) AM_RAM	// not used?
 ADDRESS_MAP_END
 

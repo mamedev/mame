@@ -131,13 +131,13 @@ static UINT8 aquarium_snd_bitswap(UINT8 scrambled_data)
 
 static READ8_HANDLER( aquarium_oki_r )
 {
-	return (aquarium_snd_bitswap(OKIM6295_status_0_r(machine,0)) );
+	return (aquarium_snd_bitswap(okim6295_status_0_r(machine,0)) );
 }
 
 static WRITE8_HANDLER( aquarium_oki_w )
 {
 	logerror("Z80-PC:%04x Writing %04x to the OKI M6295\n",activecpu_get_previouspc(),aquarium_snd_bitswap(data));
-	OKIM6295_data_0_w( machine, 0, (aquarium_snd_bitswap(data)) );
+	okim6295_data_0_w( machine, 0, (aquarium_snd_bitswap(data)) );
 }
 
 

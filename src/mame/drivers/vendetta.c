@@ -258,7 +258,7 @@ static READ8_HANDLER( vendetta_sound_interrupt_r )
 
 static READ8_HANDLER( vendetta_sound_r )
 {
-	return K053260_0_r(machine, 2 + offset);
+	return k053260_0_r(machine, 2 + offset);
 }
 
 /********************************************/
@@ -293,7 +293,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5fe0, 0x5fe0) AM_WRITE(vendetta_5fe0_w)
 	AM_RANGE(0x5fe2, 0x5fe2) AM_WRITE(vendetta_eeprom_w)
 	AM_RANGE(0x5fe4, 0x5fe4) AM_WRITE(z80_irq_w)
-	AM_RANGE(0x5fe6, 0x5fe7) AM_WRITE(K053260_0_w)
+	AM_RANGE(0x5fe6, 0x5fe7) AM_WRITE(k053260_0_w)
 	/* what is the desired effect of overlapping these memory regions anyway? */
 	AM_RANGE(0x4000, 0x4fff) AM_WRITE(SMH_BANK3)
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(SMH_BANK2)
@@ -328,7 +328,7 @@ static ADDRESS_MAP_START( esckids_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3fd0, 0x3fd0) AM_WRITE(vendetta_5fe0_w)	// Coin Counter, 052109 RMRD, 053246 OBJCHA
 	AM_RANGE(0x3fd2, 0x3fd2) AM_WRITE(vendetta_eeprom_w)	// EEPROM, Video banking
 	AM_RANGE(0x3fd4, 0x3fd4) AM_WRITE(z80_irq_w)			// Sound
-	AM_RANGE(0x3fd6, 0x3fd7) AM_WRITE(K053260_0_w)		// Sound
+	AM_RANGE(0x3fd6, 0x3fd7) AM_WRITE(k053260_0_w)		// Sound
 	AM_RANGE(0x3fda, 0x3fda) AM_WRITE(SMH_NOP)			// Not Emulated (Watchdog ???)
 	/* what is the desired effect of overlapping these memory regions anyway? */
 	AM_RANGE(0x2000, 0x2fff) AM_WRITE(SMH_BANK3)			// 052109 (Tilemap) 0x0000-0x0fff
@@ -343,7 +343,7 @@ static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xf801, 0xf801) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0xfc00, 0xfc2f) AM_READ(K053260_0_r)
+	AM_RANGE(0xfc00, 0xfc2f) AM_READ(k053260_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
@@ -352,7 +352,7 @@ static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xf801, 0xf801) AM_WRITE(YM2151_data_port_0_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(z80_arm_nmi_w)
-	AM_RANGE(0xfc00, 0xfc2f) AM_WRITE(K053260_0_w)
+	AM_RANGE(0xfc00, 0xfc2f) AM_WRITE(k053260_0_w)
 ADDRESS_MAP_END
 
 

@@ -142,13 +142,13 @@ static WRITE8_HANDLER( stratvox_sn76477_w )
      * 1    - SN76477 vco
      * 0    - SN76477 enable
      ***************************************************************/
-    SN76477_enable_w(0, (data >> 0) & 1);
-    SN76477_vco_w(0, (data >> 1) & 1);
-	SN76477_envelope_1_w(0, (data >> 2) & 1);
-	SN76477_envelope_2_w(0, (data >> 3) & 1);
-    SN76477_mixer_a_w(0, (data >> 4) & 1);
-    SN76477_mixer_b_w(0, (data >> 5) & 1);
-    SN76477_mixer_c_w(0, (data >> 6) & 1);
+    sn76477_enable_w(0, (data >> 0) & 1);
+    sn76477_vco_w(0, (data >> 1) & 1);
+	sn76477_envelope_1_w(0, (data >> 2) & 1);
+	sn76477_envelope_2_w(0, (data >> 3) & 1);
+    sn76477_mixer_a_w(0, (data >> 4) & 1);
+    sn76477_mixer_b_w(0, (data >> 5) & 1);
+    sn76477_mixer_c_w(0, (data >> 6) & 1);
 }
 
 

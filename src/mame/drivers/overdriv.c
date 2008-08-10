@@ -227,12 +227,12 @@ static WRITE16_HANDLER( sharedram_w )
 
 static READ16_HANDLER( overdriv_sound_0_r )
 {
-	return K053260_0_r(machine,2 + offset);
+	return k053260_0_r(machine,2 + offset);
 }
 
 static READ16_HANDLER( overdriv_sound_1_r )
 {
-	return K053260_1_r(machine,2 + offset);
+	return k053260_1_r(machine,2 + offset);
 }
 
 static WRITE16_HANDLER( overdriv_soundirq_w )
@@ -279,8 +279,8 @@ static ADDRESS_MAP_START( overdriv_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1c0000, 0x1c001f) AM_WRITE(K051316_ctrl_0_msb_w)
 	AM_RANGE(0x1c8000, 0x1c801f) AM_WRITE(K051316_ctrl_1_msb_w)
 	AM_RANGE(0x1d0000, 0x1d001f) AM_WRITE(K053251_msb_w)
-	AM_RANGE(0x1d8000, 0x1d8003) AM_WRITE(K053260_0_lsb_w)
-	AM_RANGE(0x1e0000, 0x1e0003) AM_WRITE(K053260_1_lsb_w)
+	AM_RANGE(0x1d8000, 0x1d8003) AM_WRITE(k053260_0_lsb_w)
+	AM_RANGE(0x1e0000, 0x1e0003) AM_WRITE(k053260_1_lsb_w)
 	AM_RANGE(0x1e8000, 0x1e8001) AM_WRITE(overdriv_soundirq_w)
 	AM_RANGE(0x1f0000, 0x1f0001) AM_WRITE(cpuA_ctrl_w)	/* halt cpu B, coin counter, start lamp, other? */
 	AM_RANGE(0x1f8000, 0x1f8001) AM_WRITE(eeprom_w)
@@ -324,8 +324,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( overdriv_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0201, 0x0201) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0x0400, 0x042f) AM_READ(K053260_0_r)
-	AM_RANGE(0x0600, 0x062f) AM_READ(K053260_1_r)
+	AM_RANGE(0x0400, 0x042f) AM_READ(k053260_0_r)
+	AM_RANGE(0x0600, 0x062f) AM_READ(k053260_1_r)
 	AM_RANGE(0x0800, 0x0fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x1000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
@@ -333,8 +333,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( overdriv_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0200, 0x0200) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x0201, 0x0201) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0x0400, 0x042f) AM_WRITE(K053260_0_w)
-	AM_RANGE(0x0600, 0x062f) AM_WRITE(K053260_1_w)
+	AM_RANGE(0x0400, 0x042f) AM_WRITE(k053260_0_w)
+	AM_RANGE(0x0600, 0x062f) AM_WRITE(k053260_1_w)
 	AM_RANGE(0x0800, 0x0fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x1000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
@@ -388,7 +388,7 @@ GFXDECODE_END
 
 
 
-static const struct K053260_interface k053260_interface =
+static const k053260_interface k053260_config =
 {
 	"shared"
 };
@@ -441,12 +441,12 @@ static MACHINE_DRIVER_START( overdriv )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
 	MDRV_SOUND_ADD("konami1", K053260, 3579545)
-	MDRV_SOUND_CONFIG(k053260_interface)
+	MDRV_SOUND_CONFIG(k053260_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.70)
 	MDRV_SOUND_ROUTE(1, "right", 0.70)
 
 	MDRV_SOUND_ADD("konami2", K053260, 3579545)
-	MDRV_SOUND_CONFIG(k053260_interface)
+	MDRV_SOUND_CONFIG(k053260_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.70)
 	MDRV_SOUND_ROUTE(1, "right", 0.70)
 MACHINE_DRIVER_END

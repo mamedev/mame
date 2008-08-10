@@ -1,5 +1,7 @@
-#ifndef WAVE8580_H
-#define WAVE8580_H
+#pragma once
+
+#ifndef __SIDW8580_H__
+#define __SIDW8580_H__
 
 
 /* MOS-8580 R5 waveforms $30,$50,$60,$70
@@ -1392,4 +1394,4 @@ static const UINT8 waveform70_8580[4096+4096] =
 };
 
 
-#endif
+#endif /* __SIDW8580_H__ */

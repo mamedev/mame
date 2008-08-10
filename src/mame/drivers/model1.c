@@ -976,32 +976,32 @@ static READ16_HANDLER( m1_snd_v60_ready_r )
 
 static READ16_HANDLER( m1_snd_mpcm0_r )
 {
-	return MultiPCM_reg_0_r(machine, 0);
+	return multi_pcm_reg_0_r(machine, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm0_w )
 {
-	MultiPCM_reg_0_w(machine, offset, data);
+	multi_pcm_reg_0_w(machine, offset, data);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm0_bnk_w )
 {
-	multipcm_set_bank(0, 0x100000 * (data & 3), 0x100000 * (data & 3));
+	multi_pcm_set_bank(0, 0x100000 * (data & 3), 0x100000 * (data & 3));
 }
 
 static READ16_HANDLER( m1_snd_mpcm1_r )
 {
-	return MultiPCM_reg_1_r(machine, 0);
+	return multi_pcm_reg_1_r(machine, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm1_w )
 {
-	MultiPCM_reg_1_w(machine, offset, data);
+	multi_pcm_reg_1_w(machine, offset, data);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm1_bnk_w )
 {
-	multipcm_set_bank(1, 0x100000 * (data & 3), 0x100000 * (data & 3));
+	multi_pcm_set_bank(1, 0x100000 * (data & 3), 0x100000 * (data & 3));
 }
 
 static READ16_HANDLER( m1_snd_ym_r )

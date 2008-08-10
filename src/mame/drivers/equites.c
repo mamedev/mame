@@ -753,7 +753,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
-	AM_RANGE(0xc080, 0xc08d) AM_WRITE(MSM5232_0_w)
+	AM_RANGE(0xc080, 0xc08d) AM_WRITE(msm5232_0_w)
 	AM_RANGE(0xc0a0, 0xc0a0) AM_WRITE(AY8910_write_port_0_w)
 	AM_RANGE(0xc0a1, 0xc0a1) AM_WRITE(AY8910_control_port_0_w)
 	AM_RANGE(0xc0b0, 0xc0b0) AM_WRITENOP // n.c.
@@ -1113,7 +1113,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static const struct MSM5232interface equites_5232intf =
+static const msm5232_interface equites_5232intf =
 {
 	{ 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6, 0.47e-6 }, // verified
 	equites_msm5232_gate

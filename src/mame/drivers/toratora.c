@@ -200,8 +200,8 @@ static const sn76477_interface sn76477_intf =
 
 static void port_a_u2_u3_w(int which, UINT8 data)
 {
-	SN76477_vco_voltage_w(which, 2.35 * (data & 0x7f) / 128.0);
-	SN76477_enable_w(which, (data >> 7) & 0x01);
+	sn76477_vco_voltage_w(which, 2.35 * (data & 0x7f) / 128.0);
+	sn76477_enable_w(which, (data >> 7) & 0x01);
 }
 
 
@@ -219,18 +219,18 @@ static void port_b_u2_u3_w(int which, UINT8 data)
 	  RES_K(47)
 	};
 
-	SN76477_mixer_a_w      (which, (data >> 0) & 0x01);
-	SN76477_mixer_b_w      (which, (data >> 1) & 0x01);
-	SN76477_mixer_c_w      (which, (data >> 2) & 0x01);
-	SN76477_envelope_1_w   (which, (data >> 3) & 0x01);
-	SN76477_envelope_2_w   (which, (data >> 4) & 0x01);
-	SN76477_amplitude_res_w(which, resistances[(data >> 5)] * 2);  /* the *2 shouldn't be neccassary, but... */
+	sn76477_mixer_a_w      (which, (data >> 0) & 0x01);
+	sn76477_mixer_b_w      (which, (data >> 1) & 0x01);
+	sn76477_mixer_c_w      (which, (data >> 2) & 0x01);
+	sn76477_envelope_1_w   (which, (data >> 3) & 0x01);
+	sn76477_envelope_2_w   (which, (data >> 4) & 0x01);
+	sn76477_amplitude_res_w(which, resistances[(data >> 5)] * 2);  /* the *2 shouldn't be neccassary, but... */
 }
 
 
 static void ca2_u2_u3_w(int which, UINT8 data)
 {
-	SN76477_vco_w(which, data);
+	sn76477_vco_w(which, data);
 }
 
 

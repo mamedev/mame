@@ -272,7 +272,7 @@ static ADDRESS_MAP_START( sandscrp_soundport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(sandscrp_bankswitch_w)	// ROM Bank
 	AM_RANGE(0x02, 0x02) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)	// YM2203
 	AM_RANGE(0x03, 0x03) AM_READWRITE(YM2203_read_port_0_r, YM2203_write_port_0_w)		// PORTA/B read
-	AM_RANGE(0x04, 0x04) AM_WRITE(OKIM6295_data_0_w)		// OKIM6295
+	AM_RANGE(0x04, 0x04) AM_WRITE(okim6295_data_0_w)		// OKIM6295
 	AM_RANGE(0x06, 0x06) AM_WRITE(sandscrp_soundlatch_w)	//
 	AM_RANGE(0x07, 0x07) AM_READ(sandscrp_soundlatch_r)		//
 	AM_RANGE(0x08, 0x08) AM_READ(sandscrp_latchstatus_r)	//

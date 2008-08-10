@@ -279,7 +279,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const struct POKEYinterface pokey_interface =
+static const pokey_interface pokey_config =
 {
 	{ 0 },
 	input_port_4_r
@@ -321,7 +321,7 @@ static MACHINE_DRIVER_START( irobot )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("pokey1", POKEY, 1250000)
-	MDRV_SOUND_CONFIG(pokey_interface)
+	MDRV_SOUND_CONFIG(pokey_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	MDRV_SOUND_ADD("pokey2", POKEY, 1250000)

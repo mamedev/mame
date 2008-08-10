@@ -117,7 +117,7 @@ static WRITE16_HANDLER( astrocorp_sound_bank_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		OKIM6295_set_bank_base(0, 0x40000 * ((data >> 8) & 1) );
+		okim6295_set_bank_base(0, 0x40000 * ((data >> 8) & 1) );
 //      logerror("CPU #0 PC %06X: OKI bank %08X\n",activecpu_get_pc(),data);
 	}
 }
@@ -178,7 +178,7 @@ static ADDRESS_MAP_START( astrocorp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x070000, 0x073fff ) AM_RAM
 	AM_RANGE( 0x080000, 0x080001 ) AM_WRITE( astrocorp_sound_bank_w )
 	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE( astrocorp_enable_w )
-	AM_RANGE( 0x0d0000, 0x0d0001 ) AM_READWRITE( astrocorp_unk_r, OKIM6295_data_0_msb_w )
+	AM_RANGE( 0x0d0000, 0x0d0001 ) AM_READWRITE( astrocorp_unk_r, okim6295_data_0_msb_w )
 ADDRESS_MAP_END
 
 

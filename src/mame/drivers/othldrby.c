@@ -45,7 +45,7 @@ static READ16_HANDLER( pap )
 static WRITE16_HANDLER( oki_bankswitch_w )
 {
 	if (ACCESSING_BITS_0_7)
-		OKIM6295_set_bank_base(0, (data & 1) * 0x40000);
+		okim6295_set_bank_base(0, (data & 1) * 0x40000);
 }
 
 static WRITE16_HANDLER( coinctrl_w )
@@ -100,7 +100,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300004, 0x300007) AM_READ(othldrby_videoram_r)
 	AM_RANGE(0x30000c, 0x30000d) AM_READ(pip)	// vblank?
 	AM_RANGE(0x400000, 0x400fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x600000, 0x600001) AM_READ(OKIM6295_status_0_lsb_r)
+	AM_RANGE(0x600000, 0x600001) AM_READ(okim6295_status_0_lsb_r)
 	AM_RANGE(0x700000, 0x700001) AM_READ(pap)	// scanline???
 	AM_RANGE(0x700004, 0x700005) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x700008, 0x700009) AM_READ(input_port_1_word_r)
@@ -118,7 +118,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(othldrby_vreg_addr_w)
 	AM_RANGE(0x30000c, 0x30000f) AM_WRITE(othldrby_vreg_w)
 	AM_RANGE(0x400000, 0x400fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(OKIM6295_data_0_lsb_w)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(okim6295_data_0_lsb_w)
 	AM_RANGE(0x700030, 0x700031) AM_WRITE(oki_bankswitch_w)
 	AM_RANGE(0x700034, 0x700035) AM_WRITE(coinctrl_w)
 ADDRESS_MAP_END

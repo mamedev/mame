@@ -332,7 +332,7 @@ static MACHINE_RESET( konamigv )
 	state_save_register_global_array(btc_trackball_data);
 }
 
-static const struct PSXSPUinterface konamigv_psxspu_interface =
+static const psx_spu_interface konamigv_psxspu_interface =
 {
 	&g_p_n_psxram,
 	psx_irq_set,

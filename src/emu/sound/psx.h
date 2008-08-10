@@ -6,7 +6,10 @@
 
 ***************************************************************************/
 
-#if !defined( PSX_SPU_H )
+#pragma once
+
+#ifndef __PSX_H__
+#define __PSX_H__
 
 WRITE32_HANDLER( psx_spu_w );
 READ32_HANDLER( psx_spu_r );
@@ -15,7 +18,8 @@ READ32_HANDLER( psx_spu_delay_r );
 
 typedef void ( *spu_handler )( UINT32, INT32 );
 
-struct PSXSPUinterface
+typedef struct _psx_spu_interface psx_spu_interface;
+struct _psx_spu_interface
 {
 	UINT32 **p_psxram;
 	void (*irq_set)(running_machine *,UINT32);
@@ -23,5 +27,4 @@ struct PSXSPUinterface
 	void (*spu_install_write_handler)(int,spu_handler);
 };
 
-#define PSX_SPU_H ( 1 )
-#endif
+#endif /* __PSX_H__ */

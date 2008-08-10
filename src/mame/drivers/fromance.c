@@ -153,7 +153,7 @@ static WRITE8_HANDLER( fromance_adpcm_reset_w )
 	fromance_adpcm_reset = (data & 0x01);
 	fromance_vclk_left = 0;
 
-	MSM5205_reset_w(0, !(data & 0x01));
+	msm5205_reset_w(0, !(data & 0x01));
 }
 
 
@@ -173,7 +173,7 @@ static void fromance_adpcm_int(running_machine *machine, int irq)
 	/* clock the data through */
 	if (fromance_vclk_left)
 	{
-		MSM5205_data_w(0, (fromance_adpcm_data >> 4));
+		msm5205_data_w(0, (fromance_adpcm_data >> 4));
 		fromance_adpcm_data <<= 4;
 		fromance_vclk_left--;
 	}
@@ -1041,7 +1041,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	fromance_adpcm_int,	/* IRQ handler */
 	MSM5205_S48_4B		/* 8 KHz */
@@ -1087,7 +1087,7 @@ static MACHINE_DRIVER_START( nekkyoku )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
@@ -1125,7 +1125,7 @@ static MACHINE_DRIVER_START( idolmj )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 
@@ -1163,7 +1163,7 @@ static MACHINE_DRIVER_START( fromance )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_DRIVER_END
 

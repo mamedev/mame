@@ -362,7 +362,7 @@ READ8_HANDLER(tatsumi_hack_ym2151_r)
 // Mame really should emulate the OKI status reads even with Mame sound off.
 READ8_HANDLER(tatsumi_hack_oki_r)
 {
-	int r=OKIM6295_status_0_r(machine,0);
+	int r=okim6295_status_0_r(machine,0);
 
 	if (activecpu_get_pc()==0x2b70 || activecpu_get_pc()==0x2bb5
 		|| activecpu_get_pc()==0x2acc

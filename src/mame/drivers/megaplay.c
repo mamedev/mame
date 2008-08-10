@@ -746,7 +746,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( megaplay_bios_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x3f, 0x3f) AM_WRITE(megatech_bios_port_ctrl_w)
-	AM_RANGE(0x7f, 0x7f) AM_WRITE(SN76496_1_w)	/* SN76489 */
+	AM_RANGE(0x7f, 0x7f) AM_WRITE(sn76496_1_w)	/* SN76489 */
 	AM_RANGE(0xbe, 0xbf) AM_WRITE(megaplay_bios_port_be_bf_w)			/* VDP */
 ADDRESS_MAP_END
 

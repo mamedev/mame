@@ -151,8 +151,8 @@ static READ8_HANDLER(fake_6_r)
 
 static WRITE8_HANDLER( adpcm_data_w )
 {
-	MSM5205_data_w(0, data & 0xf);
-	MSM5205_data_w(0, data>>4);
+	msm5205_data_w(0, data & 0xf);
+	msm5205_data_w(0, data>>4);
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -298,7 +298,7 @@ static WRITE8_HANDLER(writeA)
 {
 	if (data == 0xff) return;	// this gets called at 8910 startup with 0xff before the 5205 exists, causing a crash
 
-	MSM5205_reset_w(0, !(data & 0x01));
+	msm5205_reset_w(0, !(data & 0x01));
 }
 
 static WRITE8_HANDLER(writeB)
@@ -311,7 +311,7 @@ static void ashnojoe_adpcm_int (running_machine *machine, int data)
 	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	ashnojoe_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 4KHz 4-bit */
@@ -368,7 +368,7 @@ static MACHINE_DRIVER_START( ashnojoe )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

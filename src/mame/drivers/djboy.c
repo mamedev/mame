@@ -788,8 +788,8 @@ static ADDRESS_MAP_START( cpu2_port_am, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_READ(YM2203_status_port_0_r) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0x03, 0x03) AM_READ(YM2203_read_port_0_r) AM_WRITE(YM2203_write_port_0_w)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r)
-	AM_RANGE(0x06, 0x06) AM_READ(OKIM6295_status_0_r) AM_WRITE(OKIM6295_data_0_w)
-	AM_RANGE(0x07, 0x07) AM_READ(OKIM6295_status_1_r) AM_WRITE(OKIM6295_data_1_w)
+	AM_RANGE(0x06, 0x06) AM_READ(okim6295_status_0_r) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0x07, 0x07) AM_READ(okim6295_status_1_r) AM_WRITE(okim6295_data_1_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/

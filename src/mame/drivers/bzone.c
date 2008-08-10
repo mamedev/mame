@@ -545,7 +545,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const struct POKEYinterface bzone_pokey_interface =
+static const pokey_interface bzone_pokey_interface =
 {
 	{ 0 },
 	input_port_3_r
@@ -558,7 +558,7 @@ static const custom_sound_interface bzone_custom_interface =
 };
 
 
-static const struct POKEYinterface redbaron_pokey_interface =
+static const pokey_interface redbaron_pokey_interface =
 {
 	{ 0 },
 	redbaron_joy_r

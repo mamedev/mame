@@ -52,7 +52,7 @@ extern VIDEO_UPDATE( ctribe );
 
 static WRITE8_HANDLER( oki_bankswitch_w )
 {
-	OKIM6295_set_bank_base(0, (data & 1) * 0x40000);
+	okim6295_set_bank_base(0, (data & 1) * 0x40000);
 }
 
 static WRITE16_HANDLER( ddragon3_io16_w )
@@ -178,7 +178,7 @@ static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xc801, 0xc801) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0xd800, 0xd800) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0xd800, 0xd800) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0xd800, 0xd800) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0xd800, 0xd800) AM_WRITE(okim6295_data_0_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(oki_bankswitch_w)
 ADDRESS_MAP_END
 
@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( ctribe_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x8801, 0x8801) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0x9800, 0x9800) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0x9800, 0x9800) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -204,7 +204,7 @@ static ADDRESS_MAP_START( ctribe_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0x8801, 0x8801) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0x9800, 0x9800) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0x9800, 0x9800) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
 /*************************************

@@ -145,7 +145,7 @@ static WRITE8_HANDLER( splash_adpcm_data_w ){
 
 static void splash_msm5205_int(running_machine *machine, int data)
 {
-	MSM5205_data_w(0,adpcm_data >> 4);
+	msm5205_data_w(0,adpcm_data >> 4);
 	adpcm_data = (adpcm_data << 4) & 0xf0;
 }
 
@@ -423,7 +423,7 @@ static GFXDECODE_START( splash )
 	GFXDECODE_ENTRY( "gfx1", 0x000000, tilelayout16,0,128 )
 GFXDECODE_END
 
-static const struct MSM5205interface splash_msm5205_interface =
+static const msm5205_interface splash_msm5205_interface =
 {
 	splash_msm5205_int,	/* IRQ handler */
 	MSM5205_S48_4B		/* 8KHz */
@@ -551,7 +551,7 @@ static MACHINE_DRIVER_START( funystrp )
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 //  MDRV_SOUND_ADD("msm", MSM5205, 384000)
-//  MDRV_SOUND_CONFIG(msm5205_interface)
+//  MDRV_SOUND_CONFIG(msm5205_config)
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
 

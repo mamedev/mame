@@ -91,7 +91,7 @@ static READ16_HANDLER( ioc_r )
 
 		case 0x50:
 		case 0x51:
-			return OKIM6295_status_0_r(machine,0)<<8;
+			return okim6295_status_0_r(machine,0)<<8;
 			break;
 
 	}
@@ -149,7 +149,7 @@ static WRITE16_HANDLER( ioc_w )
 		// OKIM6295
 		case 0x50:
 		case 0x51:
-			OKIM6295_data_0_w(machine, 0, data>>8);
+			okim6295_data_0_w(machine, 0, data>>8);
 			break;
 
 		// MSM6585 ADPCM - mini emulation
@@ -366,7 +366,7 @@ GFXDECODE_END
                             (SOUND)
 **************************************************************/
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	NULL,				/* VCK function */
 	MSM5205_S48_4B		/* 8 kHz */
@@ -405,7 +405,7 @@ static MACHINE_DRIVER_START( gcpinbal )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

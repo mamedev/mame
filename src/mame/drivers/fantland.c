@@ -297,7 +297,7 @@ static struct
 
 static void borntofi_adpcm_start(int voice)
 {
-	MSM5205_reset_w(voice,0);
+	msm5205_reset_w(voice,0);
 	borntofi_adpcm[voice].playing = 1;
 	borntofi_adpcm[voice].nibble  = 0;
 //  logerror("CPU #0 PC = %04X: adpcm start = %06x, stop = %06x\n", activecpu_get_pc(), borntofi_adpcm[voice].addr[0], borntofi_adpcm[voice].addr[1]);
@@ -305,7 +305,7 @@ static void borntofi_adpcm_start(int voice)
 
 static void borntofi_adpcm_stop(int voice)
 {
-	MSM5205_reset_w(voice,1);
+	msm5205_reset_w(voice,1);
 	borntofi_adpcm[voice].playing = 0;
 }
 
@@ -362,7 +362,7 @@ static void borntofi_adpcm_int(running_machine *machine, int voice)
 	}
 	else
 	{
-        MSM5205_data_w( voice, rom[start/2] >> ((start & 1) * 4) );
+        msm5205_data_w( voice, rom[start/2] >> ((start & 1) * 4) );
 		borntofi_adpcm[voice].nibble++;
 	}
 }
@@ -894,7 +894,7 @@ MACHINE_DRIVER_END
 
 
 // OKI M5205 running at 384kHz [18.432/48]. Sample rate = 384000 / 48
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	borntofi_adpcm_int,	/* IRQ handler */
 	MSM5205_S48_4B		/* 8 kHz, 4 Bits  */
@@ -937,10 +937,10 @@ static MACHINE_DRIVER_START( borntofi )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("msm1", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_interface) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("msm2", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_interface) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("msm3", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_interface) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("msm4", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_interface) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ADD("msm1", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_config) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ADD("msm2", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_config) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ADD("msm3", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_config) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ADD("msm4", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_config) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 

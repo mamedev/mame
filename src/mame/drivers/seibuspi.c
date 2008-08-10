@@ -859,7 +859,7 @@ static WRITE32_HANDLER( eeprom_w )
 
 	// oki banking
 	if (sndti_exists(SOUND_OKIM6295, 1))
-		OKIM6295_set_bank_base(1, (data & 0x4000000) ? 0x40000 : 0);
+		okim6295_set_bank_base(1, (data & 0x4000000) ? 0x40000 : 0);
 }
 
 static WRITE32_HANDLER( z80_prg_fifo_w )
@@ -908,25 +908,25 @@ static READ32_HANDLER( spi_controls2_r )
 
 static READ32_HANDLER( spi_6295_0_r )
 {
-	return OKIM6295_status_0_r(machine, 0);
+	return okim6295_status_0_r(machine, 0);
 }
 
 static READ32_HANDLER( spi_6295_1_r )
 {
-	return OKIM6295_status_1_r(machine, 0);
+	return okim6295_status_1_r(machine, 0);
 }
 
 static WRITE32_HANDLER( spi_6295_0_w )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		OKIM6295_data_0_w(machine, 0, data & 0xff);
+		okim6295_data_0_w(machine, 0, data & 0xff);
 	}
 }
 
 static WRITE32_HANDLER( spi_6295_1_w )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		OKIM6295_data_1_w(machine, 0, data & 0xff);
+		okim6295_data_1_w(machine, 0, data & 0xff);
 	}
 }
 

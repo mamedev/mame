@@ -411,8 +411,8 @@ WRITE16_HANDLER ( genesis_68k_to_z80_w )
 
 		if ( (offset >= 0x10) && (offset <=0x17) )
 		{
-			if (ACCESSING_BITS_0_7) SN76496_0_w(machine, 0, data & 0xff);
-			if (ACCESSING_BITS_8_15) SN76496_0_w(machine, 0, (data >>8) & 0xff);
+			if (ACCESSING_BITS_0_7) sn76496_0_w(machine, 0, data & 0xff);
+			if (ACCESSING_BITS_8_15) sn76496_0_w(machine, 0, (data >>8) & 0xff);
 		}
 
 	}

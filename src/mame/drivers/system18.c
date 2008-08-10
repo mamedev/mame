@@ -170,14 +170,14 @@ static WRITE8_HANDLER( shdancbl_msm5205_data_w )
 
 static void shdancbl_msm5205_callback(running_machine *machine, int data)
 {
-	MSM5205_data_w(0, sample_buffer & 0x0F);
+	msm5205_data_w(0, sample_buffer & 0x0F);
 	sample_buffer >>= 4;
 	sample_select ^= 1;
 	if(sample_select == 0)
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static const struct MSM5205interface shdancbl_msm5205_interface =
+static const msm5205_interface shdancbl_msm5205_interface =
 {
 	shdancbl_msm5205_callback,
 	MSM5205_S48_4B
@@ -282,15 +282,15 @@ static ADDRESS_MAP_START( sound_readmem_18, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_READ(SMH_ROM)
 	AM_RANGE(0xa000, 0xbfff) AM_READ(system18_bank_r)
 	/**** D/A register ****/
-	AM_RANGE(0xd000, 0xdfff) AM_READ(RF5C68_r)
+	AM_RANGE(0xd000, 0xdfff) AM_READ(rf5c68_r)
 	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem_18, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
 	/**** D/A register ****/
-	AM_RANGE(0xc000, 0xc008) AM_WRITE(RF5C68_reg_w)
-	AM_RANGE(0xd000, 0xdfff) AM_WRITE(RF5C68_w)
+	AM_RANGE(0xc000, 0xc008) AM_WRITE(rf5c68_reg_w)
+	AM_RANGE(0xd000, 0xdfff) AM_WRITE(rf5c68_w)
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_RAM)	//??
 ADDRESS_MAP_END
 

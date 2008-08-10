@@ -63,14 +63,14 @@ static void appoooh_adpcm_int(running_machine *machine, int num)
 		if( appoooh_adpcm_data==-1)
 		{
 			appoooh_adpcm_data = *adpcmptr++;
-			MSM5205_data_w(0,appoooh_adpcm_data >> 4);
+			msm5205_data_w(0,appoooh_adpcm_data >> 4);
 			if(appoooh_adpcm_data==0x70)
 			{
 				adpcmptr = 0;
-				MSM5205_reset_w(0,1);
+				msm5205_reset_w(0,1);
 			}
 		}else{
-			MSM5205_data_w(0,appoooh_adpcm_data & 0x0f );
+			msm5205_data_w(0,appoooh_adpcm_data & 0x0f );
 			appoooh_adpcm_data =-1;
 		}
 	}
@@ -80,7 +80,7 @@ static WRITE8_HANDLER( appoooh_adpcm_w )
 {
 	UINT8 *RAM = memory_region(machine, "adpcm");
 	adpcmptr  = &RAM[data*256];
-	MSM5205_reset_w(0,0);
+	msm5205_reset_w(0,0);
 	appoooh_adpcm_data=-1;
 }
 
@@ -104,9 +104,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(SN76496_0_w)
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_WRITE(SN76496_1_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(SN76496_2_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(sn76496_0_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_WRITE(sn76496_1_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(sn76496_2_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(appoooh_adpcm_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("BUTTON3") AM_WRITE(appoooh_out_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(appoooh_scroll_w) /* unknown */
@@ -202,7 +202,7 @@ GFXDECODE_END
 
 
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	appoooh_adpcm_int,/* interrupt function */
 	MSM5205_S64_4B	/* 6KHz               */
@@ -245,7 +245,7 @@ static MACHINE_DRIVER_START( appoooh )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
@@ -447,7 +447,7 @@ static MACHINE_DRIVER_START( robowres )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

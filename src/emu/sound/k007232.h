@@ -1,22 +1,26 @@
 /*********************************************************/
 /*    Konami PCM controller                              */
 /*********************************************************/
-#ifndef __KDAC_A_H__
-#define __KDAC_A_H__
 
-struct K007232_interface
+#pragma once
+
+#ifndef __K007232_H__
+#define __K007232_H__
+
+typedef struct _k007232_interface k007232_interface;
+struct _k007232_interface
 {
 	void (*portwritehandler)(int);
 };
 
-WRITE8_HANDLER( K007232_write_port_0_w );
-WRITE8_HANDLER( K007232_write_port_1_w );
-WRITE8_HANDLER( K007232_write_port_2_w );
-READ8_HANDLER( K007232_read_port_0_r );
-READ8_HANDLER( K007232_read_port_1_r );
-READ8_HANDLER( K007232_read_port_2_r );
+WRITE8_HANDLER( k007232_write_port_0_w );
+WRITE8_HANDLER( k007232_write_port_1_w );
+WRITE8_HANDLER( k007232_write_port_2_w );
+READ8_HANDLER( k007232_read_port_0_r );
+READ8_HANDLER( k007232_read_port_1_r );
+READ8_HANDLER( k007232_read_port_2_r );
 
-void K007232_set_bank( int chip, int chABank, int chBBank );
+void k007232_set_bank( int chip, int chABank, int chBBank );
 
 /*
   The 007232 has two channels and produces two outputs. The volume control
@@ -26,6 +30,6 @@ void K007232_set_bank( int chip, int chABank, int chBBank );
   then volumeB will be 0 for channel 0, and volumeA will be 0 for channel 1.
   Volume is in the range 0-255.
 */
-void K007232_set_volume(int chip,int channel,int volumeA,int volumeB);
+void k007232_set_volume(int chip,int channel,int volumeA,int volumeB);
 
-#endif
+#endif /* __K007232_H__ */

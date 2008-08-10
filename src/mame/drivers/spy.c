@@ -342,10 +342,10 @@ static WRITE8_HANDLER( sound_bank_w )
 
 	bank_A = (data >> 0) & 0x03;
 	bank_B = (data >> 2) & 0x03;
-	K007232_set_bank(0,bank_A,bank_B);
+	k007232_set_bank(0,bank_A,bank_B);
 	bank_A = (data >> 4) & 0x03;
 	bank_B = (data >> 6) & 0x03;
-	K007232_set_bank(1,bank_A,bank_B);
+	k007232_set_bank(1,bank_A,bank_B);
 }
 
 
@@ -379,8 +379,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spy_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa00d) AM_READ(K007232_read_port_0_r)
-	AM_RANGE(0xb000, 0xb00d) AM_READ(K007232_read_port_1_r)
+	AM_RANGE(0xa000, 0xa00d) AM_READ(k007232_read_port_0_r)
+	AM_RANGE(0xb000, 0xb00d) AM_READ(k007232_read_port_1_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ(YM3812_status_port_0_r)
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -389,8 +389,8 @@ static ADDRESS_MAP_START( spy_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)
-	AM_RANGE(0xa000, 0xa00d) AM_WRITE(K007232_write_port_0_w)
-	AM_RANGE(0xb000, 0xb00d) AM_WRITE(K007232_write_port_1_w)
+	AM_RANGE(0xa000, 0xa00d) AM_WRITE(k007232_write_port_0_w)
+	AM_RANGE(0xb000, 0xb00d) AM_WRITE(k007232_write_port_1_w)
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM3812_control_port_0_w)
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM3812_write_port_0_w)
 ADDRESS_MAP_END
@@ -498,22 +498,22 @@ INPUT_PORTS_END
 
 static void volume_callback0(int v)
 {
-	K007232_set_volume(0,0,(v >> 4) * 0x11,0);
-	K007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(0,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
 }
 
 static void volume_callback1(int v)
 {
-	K007232_set_volume(1,0,(v >> 4) * 0x11,0);
-	K007232_set_volume(1,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(1,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(1,1,0,(v & 0x0f) * 0x11);
 }
 
-static const struct K007232_interface k007232_interface_1 =
+static const k007232_interface k007232_interface_1 =
 {
 	volume_callback0
 };
 
-static const struct K007232_interface k007232_interface_2 =
+static const k007232_interface k007232_interface_2 =
 {
 	volume_callback1
 };

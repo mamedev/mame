@@ -149,7 +149,7 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xBE, 0xBE) AM_WRITE(TMS9928A_vram_w)
 	AM_RANGE(0xBF, 0xBF) AM_WRITE(TMS9928A_register_w)
 	AM_RANGE(0xDF, 0xDF) AM_WRITE(SMH_NOP)  //? 8255 ?
-	AM_RANGE(0x7f, 0x7F) AM_WRITE(SN76496_0_w)
+	AM_RANGE(0x7f, 0x7F) AM_WRITE(sn76496_0_w)
 ADDRESS_MAP_END
 
 /*************************************

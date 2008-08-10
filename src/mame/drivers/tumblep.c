@@ -59,7 +59,7 @@ extern UINT16 *tumblep_pf1_data,*tumblep_pf2_data;
 #ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( tumblep_oki_w )
 {
-	OKIM6295_data_0_w(0,data&0xff);
+	okim6295_data_0_w(0,data&0xff);
     /* STUFF IN OTHER BYTE TOO..*/
 }
 
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100001) AM_NOP	/* YM2203 - this board doesn't have one */
 	AM_RANGE(0x110000, 0x110001) AM_READWRITE(YM2151_status_port_0_r, YM2151_w)
-	AM_RANGE(0x120000, 0x120001) AM_READWRITE(OKIM6295_status_0_r, OKIM6295_data_0_w)
+	AM_RANGE(0x120000, 0x120001) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0x130000, 0x130001) AM_NOP	/* This board only has 1 oki chip */
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_READWRITE(SMH_BANK8, SMH_BANK8)

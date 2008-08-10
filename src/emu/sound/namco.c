@@ -358,7 +358,7 @@ static void namco_update_stereo(void *param, stream_sample_t **inputs, stream_sa
 static void *namco_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	sound_channel *voice;
-	const struct namco_interface *intf = config;
+	const namco_interface *intf = config;
 	int clock_multiple;
 	struct namco_sound *chip;
 

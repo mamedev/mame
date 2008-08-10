@@ -288,13 +288,13 @@ GFXDECODE_END
  *
  *************************************/
 
-static const struct POKEYinterface pokey_interface_1 =
+static const pokey_interface pokey_interface_1 =
 {
 	{ 0 },
 	dsw1_r
 };
 
-static const struct POKEYinterface pokey_interface_2 =
+static const pokey_interface pokey_interface_2 =
 {
 	{ input_port_1_r,input_port_2_r,dsw2_0r,dsw2_1r,dsw2_2r,dsw2_3r,dsw2_4r }
 };

@@ -1,5 +1,7 @@
-#ifndef namco52_h
-#define namco52_h
+#pragma once
+
+#ifndef __NAMCO52_H__
+#define __NAMCO52_H__
 
 /* While a little confusing, this interface uses 2 gains.
  *
@@ -15,7 +17,8 @@
  * defaults to the 52xx internal sample clock. (baseclock/384)
  */
 
-struct namco_52xx_interface
+typedef struct _namco_52xx_interface namco_52xx_interface;
+struct _namco_52xx_interface
 {
 	double	play_rate;		/* Playback frequency */
 	double	hp_filt_fc;
@@ -25,7 +28,7 @@ struct namco_52xx_interface
 	double	filt_gain;
 };
 
-void namcoio_52XX_write(int data);
+void namcoio_52xx_write(int data);
 
-#endif
+#endif /* __NAMCO52_H__ */
 

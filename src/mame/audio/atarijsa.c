@@ -334,7 +334,7 @@ static READ8_HANDLER( jsa2_io_r )
 	{
 		case 0x000:		/* /RDV */
 			if (has_oki6295)
-				result = OKIM6295_status_0_r(machine, offset);
+				result = okim6295_status_0_r(machine, offset);
 			else
 				logerror("atarijsa: Unknown read at %04X\n", offset & 0x206);
 			break;
@@ -392,7 +392,7 @@ static WRITE8_HANDLER( jsa2_io_w )
 
 		case 0x200:		/* /WRV */
 			if (has_oki6295)
-				OKIM6295_data_0_w(machine, offset, data);
+				okim6295_data_0_w(machine, offset, data);
 			else
 				logerror("atarijsa: Unknown write (%02X) at %04X\n", data & 0xff, offset & 0x206);
 			break;
@@ -421,7 +421,7 @@ static WRITE8_HANDLER( jsa2_io_w )
 			coin_counter_w(0, (data >> 4) & 1);
 
 			/* update the OKI frequency */
-			if (has_oki6295) OKIM6295_set_pin7(0, data & 8);
+			if (has_oki6295) okim6295_set_pin7(0, data & 8);
 			break;
 
 		case 0x206:		/* /MIX */
@@ -455,7 +455,7 @@ static READ8_HANDLER( jsa3_io_r )
 	{
 		case 0x000:		/* /RDV */
 			if (has_oki6295)
-				result = OKIM6295_status_0_r(machine, offset);
+				result = okim6295_status_0_r(machine, offset);
 			break;
 
 		case 0x002:		/* /RDP */
@@ -515,7 +515,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 
 		case 0x200:		/* /WRV */
 			if (has_oki6295)
-				OKIM6295_data_0_w(machine, offset, data);
+				okim6295_data_0_w(machine, offset, data);
 			break;
 
 		case 0x202:		/* /WRP */
@@ -536,7 +536,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 			/* update the OKI bank */
 
 			oki6295_bank_base = (0x40000 * ((data >> 1) & 1)) | (oki6295_bank_base & 0x80000);
-			if (has_oki6295) OKIM6295_set_bank_base(0, oki6295_bank_base);
+			if (has_oki6295) okim6295_set_bank_base(0, oki6295_bank_base);
 
 			/* update the bank */
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
@@ -547,7 +547,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 			coin_counter_w(0, (data >> 4) & 1);
 
 			/* update the OKI frequency */
-			if (has_oki6295) OKIM6295_set_pin7(0, data & 8);
+			if (has_oki6295) okim6295_set_pin7(0, data & 8);
 			break;
 
 		case 0x206:		/* /MIX */
@@ -561,7 +561,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 
 			/* update the OKI bank */
 			oki6295_bank_base = (0x80000 * ((data >> 4) & 1)) | (oki6295_bank_base & 0x40000);
-			if (has_oki6295) OKIM6295_set_bank_base(0, oki6295_bank_base);
+			if (has_oki6295) okim6295_set_bank_base(0, oki6295_bank_base);
 
 			/* update the volumes */
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;
@@ -589,9 +589,9 @@ static READ8_HANDLER( jsa3s_io_r )
 			if (has_oki6295)
 			{
 				if (offset & 1)
-					result = OKIM6295_status_1_r(machine, offset);
+					result = okim6295_status_1_r(machine, offset);
 				else
-					result = OKIM6295_status_0_r(machine, offset);
+					result = okim6295_status_0_r(machine, offset);
 			}
 			break;
 
@@ -654,9 +654,9 @@ static WRITE8_HANDLER( jsa3s_io_w )
 			if (has_oki6295)
 			{
 				if (offset & 1)
-					OKIM6295_data_1_w(machine, offset, data);
+					okim6295_data_1_w(machine, offset, data);
 				else
-					OKIM6295_data_0_w(machine, offset, data);
+					okim6295_data_0_w(machine, offset, data);
 			}
 			break;
 
@@ -677,7 +677,7 @@ static WRITE8_HANDLER( jsa3s_io_w )
 
 			/* update the OKI bank */
 			oki6295_bank_base = (0x40000 * ((data >> 1) & 1)) | (oki6295_bank_base & 0x80000);
-			OKIM6295_set_bank_base(0, oki6295_bank_base);
+			okim6295_set_bank_base(0, oki6295_bank_base);
 
 			/* update the bank */
 			memcpy(bank_base, &bank_source_data[0x1000 * ((data >> 6) & 3)], 0x1000);
@@ -688,8 +688,8 @@ static WRITE8_HANDLER( jsa3s_io_w )
 			coin_counter_w(0, (data >> 4) & 1);
 
 			/* update the OKI frequency */
-			OKIM6295_set_pin7(0, data & 8);
-			OKIM6295_set_pin7(1, data & 8);
+			okim6295_set_pin7(0, data & 8);
+			okim6295_set_pin7(1, data & 8);
 			break;
 
 		case 0x206:		/* /MIX */
@@ -703,8 +703,8 @@ static WRITE8_HANDLER( jsa3s_io_w )
 
 			/* update the OKI bank */
 			oki6295_bank_base = (0x80000 * ((data >> 4) & 1)) | (oki6295_bank_base & 0x40000);
-			OKIM6295_set_bank_base(0, oki6295_bank_base);
-			OKIM6295_set_bank_base(1, 0x40000 * (data >> 6));
+			okim6295_set_bank_base(0, oki6295_bank_base);
+			okim6295_set_bank_base(1, 0x40000 * (data >> 6));
 
 			/* update the volumes */
 			ym2151_volume = ((data >> 1) & 7) * 100 / 7;

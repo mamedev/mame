@@ -382,7 +382,7 @@ static INTERRUPT_GEN(adpcm_int)
 {
 	if(snd_interrupt_enable == 1 || (snd_interrupt_enable ==0 && msm_toggle==1))
 	{
-		MSM5205_data_w(0,msm_data >> 4);
+		msm5205_data_w(0,msm_data >> 4);
 		msm_data<<=4;
 		msm_toggle^=1;
 		if (msm_toggle==0)
@@ -392,7 +392,7 @@ static INTERRUPT_GEN(adpcm_int)
 	}
 }
 
-static struct MSM5205interface msm_interface =
+static msm5205_interface msm_interface =
 {
 	adpcm_int,			/* interrupt function */
 	MSM5205_S96_4B 	/* 1 / 96 = 3906.25Hz playback  - guess */

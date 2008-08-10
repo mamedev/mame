@@ -454,7 +454,7 @@ static ADDRESS_MAP_START( nndmseal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_BASE(&tetrisp2_vram_rot	)	// Rotation
 	AM_RANGE(0x650000, 0x651fff) AM_RAM_WRITE(tetrisp2_vram_rot_w)	// Rotation (mirror)
 
-	AM_RANGE(0x800000, 0x800003) AM_READWRITE( OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w )	// Sound
+	AM_RANGE(0x800000, 0x800003) AM_READWRITE( okim6295_status_0_lsb_r, okim6295_data_0_lsb_w )	// Sound
 
 	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w) AM_BASE(&tetrisp2_nvram) AM_SIZE(&tetrisp2_nvram_size	)	// NVRAM
 

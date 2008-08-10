@@ -60,9 +60,9 @@ static WRITE8_HANDLER( spcforce_SN76496_select_w )
 {
     spcforce_SN76496_select = data;
 
-	if (~data & 0x40)  SN76496_0_w(machine, 0, spcforce_SN76496_latch);
-	if (~data & 0x20)  SN76496_1_w(machine, 0, spcforce_SN76496_latch);
-	if (~data & 0x10)  SN76496_2_w(machine, 0, spcforce_SN76496_latch);
+	if (~data & 0x40)  sn76496_0_w(machine, 0, spcforce_SN76496_latch);
+	if (~data & 0x20)  sn76496_1_w(machine, 0, spcforce_SN76496_latch);
+	if (~data & 0x10)  sn76496_2_w(machine, 0, spcforce_SN76496_latch);
 }
 
 static READ8_HANDLER( spcforce_t0_r )

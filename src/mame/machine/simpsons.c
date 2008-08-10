@@ -104,7 +104,7 @@ READ8_HANDLER( simpsons_sound_interrupt_r )
 
 READ8_HANDLER( simpsons_sound_r )
 {
-	return K053260_0_r(machine, 2 + offset);
+	return k053260_0_r(machine, 2 + offset);
 }
 
 

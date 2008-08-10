@@ -1040,7 +1040,7 @@ static ADDRESS_MAP_START( viofight_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK1)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x9000, 0x9000) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0xb000, 0xb000) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0xb000, 0xb000) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
 
@@ -1049,7 +1049,7 @@ static ADDRESS_MAP_START( viofight_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(YM2203_control_port_0_w)
 	AM_RANGE(0x9001, 0x9001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xb000, 0xb001) AM_WRITE(OKIM6295_data_0_w)		/* yes, both addresses for the same chip */
+	AM_RANGE(0xb000, 0xb001) AM_WRITE(okim6295_data_0_w)		/* yes, both addresses for the same chip */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
 ADDRESS_MAP_END

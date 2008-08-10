@@ -129,7 +129,7 @@ static WRITE16_HANDLER( tmaster_oki_bank_w )
 	{
 		// data & 0x0800?
 		okibank = ((data >> 8) & 3);
-		OKIM6295_set_bank_base(0, okibank * 0x40000);
+		okim6295_set_bank_base(0, okibank * 0x40000);
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -453,7 +453,7 @@ static ADDRESS_MAP_START( tmaster_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE( 0x600000, 0x600fff ) AM_READWRITE( SMH_RAM, paletteram16_xBBBBBGGGGGRRRRR_word_w ) AM_BASE(&paletteram16) // looks like palettes, maybe
 
-	AM_RANGE( 0x800000, 0x800001 ) AM_READWRITE( OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w )
+	AM_RANGE( 0x800000, 0x800001 ) AM_READWRITE( okim6295_status_0_lsb_r, okim6295_data_0_lsb_w )
 
 	AM_RANGE( 0x800010, 0x800011 ) AM_WRITE( tmaster_color_w )
 ADDRESS_MAP_END
@@ -616,7 +616,7 @@ static ADDRESS_MAP_START( galgames_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x800020, 0x80003f ) AM_NOP	// ?
 	AM_RANGE( 0x900000, 0x900001 ) AM_WRITE( watchdog_reset16_w )
 
-	AM_RANGE( 0xa00000, 0xa00001 ) AM_READWRITE( OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w )
+	AM_RANGE( 0xa00000, 0xa00001 ) AM_READWRITE( okim6295_status_0_lsb_r, okim6295_data_0_lsb_w )
 	AM_RANGE( 0xb00000, 0xb7ffff ) AM_READWRITE( galgames_okiram_r, galgames_okiram_w ) // (only low bytes tested) 4x N341024SJ-15
 
 	AM_RANGE( 0xc00000, 0xc00001 ) AM_WRITE( galgames_palette_offset_w )

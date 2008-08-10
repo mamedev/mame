@@ -395,7 +395,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK2)
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xe22f) AM_READWRITE(K054539_0_r, K054539_0_w)
+	AM_RANGE(0xe000, 0xe22f) AM_READWRITE(k054539_0_r, k054539_0_w)
 	AM_RANGE(0xec00, 0xec00) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xec01, 0xec01) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch3_w)
@@ -446,7 +446,7 @@ INPUT_PORTS_END
 
 
 
-static const struct K054539interface k054539_interface =
+static const k054539_interface k054539_config =
 {
 	NULL,
 	ym_set_mixing
@@ -496,7 +496,7 @@ static MACHINE_DRIVER_START( xexex )
 	MDRV_SOUND_ROUTE(1, "filter2r", 0.50)
 
 	MDRV_SOUND_ADD("konami", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_interface)
+	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(0, "right", 1.0)
 	MDRV_SOUND_ROUTE(1, "left", 1.0)
@@ -604,7 +604,7 @@ static MACHINE_RESET( xexex )
 {
 	cur_sound_region = 0;
 	suspension_active = 0;
-	K054539_init_flags(0, K054539_REVERSE_STEREO);
+	k054539_init_flags(0, K054539_REVERSE_STEREO);
 }
 
 static STATE_POSTLOAD( xexex_postload )

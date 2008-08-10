@@ -81,7 +81,7 @@ static READ8_HANDLER( wolfpack_misc_r )
 	/* BIT6 => UNUSED      */
 	/* BIT7 => VBLANK      */
 
-	if (!S14001A_bsy_0_r())
+	if (!s14001a_bsy_0_r())
         val |= 0x01;
 
 	if (!wolfpack_collision)
@@ -109,13 +109,13 @@ static WRITE8_HANDLER( wolfpack_word_w )
 {
        /* latch word from bus into temp register, and place on s14001a input bus */
        /* there is no real need for a temp register at all, since the bus 'register' acts as one */
-        S14001A_reg_0_w(data & 0x1f); /* SA0 (IN5) is pulled low according to the schematic, so its 0x1f and not 0x3f as one would expect */
+        s14001a_reg_0_w(data & 0x1f); /* SA0 (IN5) is pulled low according to the schematic, so its 0x1f and not 0x3f as one would expect */
 }
 
 static WRITE8_HANDLER( wolfpack_start_speech_w )
 {
-        S14001A_set_volume(15); /* hack, should be executed just once during game init, or defaulted to this in the s14001a core */
-        S14001A_rst_0_w(data&1);
+        s14001a_set_volume(15); /* hack, should be executed just once during game init, or defaulted to this in the s14001a core */
+        s14001a_rst_0_w(data&1);
 }
 
 

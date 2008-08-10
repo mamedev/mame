@@ -89,7 +89,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xc801, 0xc801) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
-	AM_RANGE(0xd800, 0xd800) AM_READWRITE(OKIM6295_status_0_r,OKIM6295_data_0_w)
+	AM_RANGE(0xd800, 0xd800) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(oki_bankswitch_w)
 ADDRESS_MAP_END
@@ -177,7 +177,7 @@ static READ16_HANDLER( wwfwfest_inputs_read )
 
 static WRITE8_HANDLER( oki_bankswitch_w )
 {
-	OKIM6295_set_bank_base(0, (data & 1) * 0x40000);
+	okim6295_set_bank_base(0, (data & 1) * 0x40000);
 }
 
 static WRITE16_HANDLER ( wwfwfest_soundwrite )

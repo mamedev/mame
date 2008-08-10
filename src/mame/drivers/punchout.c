@@ -480,13 +480,13 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch_r)
 	AM_RANGE(0x4017, 0x4017) AM_READ(soundlatch2_r)
-	AM_RANGE(0x4000, 0x4017) AM_READ(NESPSG_0_r)
+	AM_RANGE(0x4000, 0x4017) AM_READ(nes_psg_0_r)
 	AM_RANGE(0xe000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x4000, 0x4017) AM_WRITE(NESPSG_0_w)
+	AM_RANGE(0x4000, 0x4017) AM_WRITE(nes_psg_0_w)
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -683,7 +683,7 @@ GFXDECODE_END
 
 
 
-static const struct NESinterface nes_interface =
+static const nes_interface nes_config =
 {
 	"audio"
 };
@@ -729,7 +729,7 @@ static MACHINE_DRIVER_START( punchout )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("nes", NES, N2A03_DEFAULTCLOCK)
-	MDRV_SOUND_CONFIG(nes_interface)
+	MDRV_SOUND_CONFIG(nes_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("vlm", VLM5030, 3580000)

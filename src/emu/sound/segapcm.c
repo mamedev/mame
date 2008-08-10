@@ -79,7 +79,7 @@ static void SEGAPCM_update(void *param, stream_sample_t **inputs, stream_sample_
 
 static void *segapcm_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	const struct SEGAPCMinterface *intf = config;
+	const sega_pcm_interface *intf = config;
 	int mask, rom_mask, len;
 	struct segapcm *spcm;
 
@@ -111,14 +111,14 @@ static void *segapcm_start(const char *tag, int sndindex, int clock, const void 
 }
 
 
-WRITE8_HANDLER( SegaPCM_w )
+WRITE8_HANDLER( sega_pcm_w )
 {
 	struct segapcm *spcm = sndti_token(SOUND_SEGAPCM, 0);
 	stream_update(spcm->stream);
 	spcm->ram[offset & 0x07ff] = data;
 }
 
-READ8_HANDLER( SegaPCM_r )
+READ8_HANDLER( sega_pcm_r )
 {
 	struct segapcm *spcm = sndti_token(SOUND_SEGAPCM, 0);
 	stream_update(spcm->stream);

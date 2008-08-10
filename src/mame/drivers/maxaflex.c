@@ -420,7 +420,7 @@ static PALETTE_INIT( atari )
 }
 
 
-static const struct POKEYinterface pokey_interface = {
+static const pokey_interface pokey_config = {
 	{ 0 },
 	0,
 	0,0,
@@ -455,7 +455,7 @@ static MACHINE_DRIVER_START( a600xl )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("pokey", POKEY, FREQ_17_EXACT)
-	MDRV_SOUND_CONFIG(pokey_interface)
+	MDRV_SOUND_CONFIG(pokey_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)

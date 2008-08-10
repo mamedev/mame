@@ -47,8 +47,8 @@ static ADDRESS_MAP_START( ajax_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM								/* ROM F6 */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM								/* RAM 2128SL at D16 */
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)				/* 007232 bankswitch */
-	AM_RANGE(0xa000, 0xa00d) AM_READWRITE(K007232_read_port_0_r, K007232_write_port_0_w)		/* 007232 registers (chip 1) */
-	AM_RANGE(0xb000, 0xb00d) AM_READWRITE(K007232_read_port_1_r, K007232_write_port_1_w)		/* 007232 registers (chip 2) */
+	AM_RANGE(0xa000, 0xa00d) AM_READWRITE(k007232_read_port_0_r, k007232_write_port_0_w)		/* 007232 registers (chip 1) */
+	AM_RANGE(0xb000, 0xb00d) AM_READWRITE(k007232_read_port_1_r, k007232_write_port_1_w)		/* 007232 registers (chip 2) */
 	AM_RANGE(0xb80c, 0xb80c) AM_WRITE(k007232_extvol_w)			/* extra volume, goes to the 007232 w/ A11 */
 																/* selecting a different latch for the external port */
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)	/* YM2151 */
@@ -185,38 +185,38 @@ static WRITE8_HANDLER( sound_bank_w )
 	/* banks # for the 007232 (chip 1) */
 	bank_A = ((data >> 1) & 0x01);
 	bank_B = ((data >> 0) & 0x01);
-	K007232_set_bank( 0, bank_A, bank_B );
+	k007232_set_bank( 0, bank_A, bank_B );
 
 	/* banks # for the 007232 (chip 2) */
 	bank_A = ((data >> 4) & 0x03);
 	bank_B = ((data >> 2) & 0x03);
-	K007232_set_bank( 1, bank_A, bank_B );
+	k007232_set_bank( 1, bank_A, bank_B );
 }
 
 static void volume_callback0(int v)
 {
-	K007232_set_volume(0,0,(v >> 4) * 0x11,0);
-	K007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
+	k007232_set_volume(0,0,(v >> 4) * 0x11,0);
+	k007232_set_volume(0,1,0,(v & 0x0f) * 0x11);
 }
 
 static WRITE8_HANDLER( k007232_extvol_w )
 {
 	/* channel A volume (mono) */
-	K007232_set_volume(1,0,(data & 0x0f) * 0x11/2,(data & 0x0f) * 0x11/2);
+	k007232_set_volume(1,0,(data & 0x0f) * 0x11/2,(data & 0x0f) * 0x11/2);
 }
 
 static void volume_callback1(int v)
 {
 	/* channel B volume/pan */
-	K007232_set_volume(1,1,(v & 0x0f) * 0x11/2,(v >> 4) * 0x11/2);
+	k007232_set_volume(1,1,(v & 0x0f) * 0x11/2,(v >> 4) * 0x11/2);
 }
 
-static const struct K007232_interface k007232_interface_1 =
+static const k007232_interface k007232_interface_1 =
 {
 	volume_callback0
 };
 
-static const struct K007232_interface k007232_interface_2 =
+static const k007232_interface k007232_interface_2 =
 {
 	volume_callback1
 };

@@ -381,7 +381,7 @@ GFXDECODE_END
 
 
 
-static const struct namco_interface namco_interface =
+static const namco_interface namco_config =
 {
 	8,					/* number of voices */
 	0					/* stereo */
@@ -422,7 +422,7 @@ static MACHINE_DRIVER_START( baraduke )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048)
-	MDRV_SOUND_CONFIG(namco_interface)
+	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 

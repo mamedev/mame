@@ -228,7 +228,7 @@ WRITE8_HANDLER( tomahawk_audio_w )
 	/* D4 - UFO */
 
 	/* D5 - UFO under water */
-	SN76477_enable_w(0, (~data >> 5) & 0x01);
+	sn76477_enable_w(0, (~data >> 5) & 0x01);
 
 	/* D6 - explosion */
 

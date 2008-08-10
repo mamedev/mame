@@ -114,7 +114,7 @@ static ADDRESS_MAP_START( wrally_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700004, 0x700005) AM_READ(input_port_2_word_r)									/* Wheel */
 	AM_RANGE(0x700008, 0x700009) AM_READ(input_port_3_word_r)									/* TESTSW & SERVICESW */
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)								/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_READWRITE(OKIM6295_status_0_lsb_r, OKIM6295_data_0_lsb_w)	/* OKI6295 status/data register */
+	AM_RANGE(0x70000e, 0x70000f) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)	/* OKI6295 status/data register */
 	AM_RANGE(0x70000a, 0x70001b) AM_WRITE(wrally_coin_lockout_w)								/* Coin lockouts */
 	AM_RANGE(0x70002a, 0x70003b) AM_WRITE(wrally_coin_counter_w)								/* Coin counters */
 	AM_RANGE(0x70004a, 0x70004b) AM_WRITE(SMH_NOP)												/* Sound muting */

@@ -180,7 +180,7 @@ static WRITE32_HANDLER( simpl156_eeprom_w )
 
 	okibank = data & 0x07;
 
-	OKIM6295_set_bank_base(1, 0x40000 * (data & 0x7) );
+	okim6295_set_bank_base(1, 0x40000 * (data & 0x7) );
 
 	eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 	eeprom_write_bit(data & 0x10);
@@ -190,22 +190,22 @@ static WRITE32_HANDLER( simpl156_eeprom_w )
 
 static READ32_HANDLER( oki_r )
 {
-	return OKIM6295_status_0_r(machine, 0);
+	return okim6295_status_0_r(machine, 0);
 }
 
 static WRITE32_HANDLER( oki_w )
 {
-	OKIM6295_data_0_w(machine, 0, data & 0xff);
+	okim6295_data_0_w(machine, 0, data & 0xff);
 }
 
 static READ32_HANDLER( oki2_r )
 {
-	return OKIM6295_status_1_r(machine, 0);
+	return okim6295_status_1_r(machine, 0);
 }
 
 static WRITE32_HANDLER( oki2_w )
 {
-	OKIM6295_data_1_w(machine, 0, data & 0xff);
+	okim6295_data_1_w(machine, 0, data & 0xff);
 }
 
 /* we need to throw away bits for all ram accesses as the devices are connected as 16-bit */

@@ -1532,7 +1532,7 @@ static MACHINE_RESET( konami573 )
 	flash_bank = -1;
 }
 
-static const struct PSXSPUinterface konami573_psxspu_interface =
+static const psx_spu_interface konami573_psxspu_interface =
 {
 	&g_p_n_psxram,
 	psx_irq_set,

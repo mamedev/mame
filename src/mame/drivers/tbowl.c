@@ -164,7 +164,7 @@ static int adpcm_pos[2],adpcm_end[2];
 static WRITE8_HANDLER( tbowl_adpcm_start_w )
 {
 	adpcm_pos[offset & 1] = data << 8;
-	MSM5205_reset_w(offset & 1,0);
+	msm5205_reset_w(offset & 1,0);
 }
 
 static WRITE8_HANDLER( tbowl_adpcm_end_w )
@@ -174,7 +174,7 @@ static WRITE8_HANDLER( tbowl_adpcm_end_w )
 
 static WRITE8_HANDLER( tbowl_adpcm_vol_w )
 {
-	MSM5205_set_volume(offset & 1, (data & 0x7f) * 100 / 0x7f);
+	msm5205_set_volume(offset & 1, (data & 0x7f) * 100 / 0x7f);
 }
 
 static void tbowl_adpcm_int(running_machine *machine, int num)
@@ -183,10 +183,10 @@ static void tbowl_adpcm_int(running_machine *machine, int num)
 
 	if (adpcm_pos[num] >= adpcm_end[num] ||
 				adpcm_pos[num] >= memory_region_length(machine, "adpcm")/2)
-		MSM5205_reset_w(num,1);
+		msm5205_reset_w(num,1);
 	else if (adpcm_data[num] != -1)
 	{
-		MSM5205_data_w(num,adpcm_data[num] & 0x0f);
+		msm5205_data_w(num,adpcm_data[num] & 0x0f);
 		adpcm_data[num] = -1;
 	}
 	else
@@ -194,7 +194,7 @@ static void tbowl_adpcm_int(running_machine *machine, int num)
 		UINT8 *ROM = memory_region(machine, "adpcm") + 0x10000 * num;
 
 		adpcm_data[num] = ROM[adpcm_pos[num]++];
-		MSM5205_data_w(num,adpcm_data[num] >> 4);
+		msm5205_data_w(num,adpcm_data[num] >> 4);
 	}
 }
 
@@ -541,7 +541,7 @@ static const ym3526_interface ym3526_config =
 	irqhandler
 };
 
-static const struct MSM5205interface msm5205_interface =
+static const msm5205_interface msm5205_config =
 {
 	tbowl_adpcm_int,	/* interrupt function */
 	MSM5205_S48_4B		/* 8KHz               */
@@ -611,11 +611,11 @@ static MACHINE_DRIVER_START( tbowl )
 
 	/* something for the samples? */
 	MDRV_SOUND_ADD("msm1", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_SOUND_ADD("msm2", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_interface)
+	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 

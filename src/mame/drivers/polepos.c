@@ -787,7 +787,7 @@ GFXDECODE_END
  * Sound interfaces
  *********************************************************************/
 
-static const struct namco_interface namco_interface =
+static const namco_interface namco_config =
 {
 	8,				/* number of voices */
 	1				/* stereo */
@@ -813,7 +813,7 @@ static const struct namco_interface namco_interface =
  * to allow headroom when more the one effect is played.
  */
 
-static const struct namco_52xx_interface namco_52xx_interface =
+static const namco_52xx_interface namco_52xx_config =
 {
 	0,				/* Use internal Playback frequency */
 	100,			/* High pass filter fc */
@@ -882,12 +882,12 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("namco", NAMCO, 24576000/512)
-	MDRV_SOUND_CONFIG(namco_interface)
+	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
 
 	MDRV_SOUND_ADD("namco2", NAMCO_52XX, 24576000/16)	/* 1.536 MHz */
-	MDRV_SOUND_CONFIG(namco_52xx_interface)
+	MDRV_SOUND_CONFIG(namco_52xx_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.80)
 

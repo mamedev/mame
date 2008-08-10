@@ -202,7 +202,7 @@ static READ8_HANDLER( playmark_snd_command_r )
 //      logerror("PortB reading %02x from the 68K\n",data);
 	}
 	else if ((playmark_oki_control & 0x38) == 0x28) {
-		data = (OKIM6295_status_0_r(machine,0) & 0x0f);
+		data = (okim6295_status_0_r(machine,0) & 0x0f);
 //      logerror("PortB reading %02x from the OKI status port\n",data);
 	}
 
@@ -230,7 +230,7 @@ static WRITE8_HANDLER( playmark_oki_banking_w )
 
 		if(((old_bank - 1) * 0x40000) < memory_region_length(machine, "oki"))
 		{
-			OKIM6295_set_bank_base(0, 0x40000 * (old_bank - 1));
+			okim6295_set_bank_base(0, 0x40000 * (old_bank - 1));
 		}
 	}
 }
@@ -260,7 +260,7 @@ static WRITE8_HANDLER( playmark_snd_control_w )
 	if ((data & 0x38) == 0x18)
 	{
 //      logerror("Writing %02x to OKI1, PortC=%02x, Code=%02x\n",playmark_oki_command,playmark_oki_control,playmark_snd_command);
-		OKIM6295_data_0_w(machine, 0, playmark_oki_command);
+		okim6295_data_0_w(machine, 0, playmark_oki_command);
 	}
 }
 

@@ -453,7 +453,7 @@ static WRITE8_HANDLER( metro_portb_w )
 	{
 		/* write */
 		if (!BIT(data,4))
-			OKIM6295_data_0_w(machine,0,porta);
+			okim6295_data_0_w(machine,0,porta);
 	}
 	portb = data;
 }
@@ -503,13 +503,13 @@ static WRITE8_HANDLER( daitorid_portb_w )
 	{
 		/* write */
 		if (!BIT(data,4))
-			OKIM6295_data_0_w(machine,0,porta);
+			okim6295_data_0_w(machine,0,porta);
 	}
 	if (BIT(portb,3) && !BIT(data,3))	/* clock 1->0 */
 	{
 		/* read */
 		if (!BIT(data,4))
-			porta = OKIM6295_status_0_r(machine,0);
+			porta = okim6295_status_0_r(machine,0);
 	}
 	portb = data;
 }
@@ -1381,7 +1381,7 @@ static int gakusai_oki_bank_lo, gakusai_oki_bank_hi;
 static void gakusai_oki_bank_set(void)
 {
 	int bank = (gakusai_oki_bank_lo & 7) + (gakusai_oki_bank_hi & 1) * 8;
-	OKIM6295_set_bank_base(0, bank * 0x40000);
+	okim6295_set_bank_base(0, bank * 0x40000);
 }
 
 static WRITE16_HANDLER( gakusai_oki_bank_hi_w )
@@ -1450,7 +1450,7 @@ static ADDRESS_MAP_START( gakusai_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x278880, 0x278881) AM_READ(gakusai_input_r			)	// Inputs
 	AM_RANGE(0x278882, 0x278883) AM_READ_PORT("IN0")					//
 	AM_RANGE(0x27880e, 0x27880f) AM_READ(SMH_RAM					)	// Screen Control
-	AM_RANGE(0x700000, 0x700001) AM_READ(OKIM6295_status_0_lsb_r	)	// Sound
+	AM_RANGE(0x700000, 0x700001) AM_READ(okim6295_status_0_lsb_r	)	// Sound
 	AM_RANGE(0xc00000, 0xc00001) AM_READ(gakusai_eeprom_r			)	// EEPROM
 ADDRESS_MAP_END
 
@@ -1479,7 +1479,7 @@ static ADDRESS_MAP_START( gakusai_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(gakusai_oki_bank_lo_w			)	// Sound
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(YM2413_register_port_0_lsb_w	)
 	AM_RANGE(0x600002, 0x600003) AM_WRITE(YM2413_data_port_0_lsb_w		)
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(OKIM6295_data_0_lsb_w 		)
+	AM_RANGE(0x700000, 0x700001) AM_WRITE(okim6295_data_0_lsb_w 		)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(gakusai_eeprom_w				)	// EEPROM
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(gakusai_oki_bank_hi_w			)
 ADDRESS_MAP_END
@@ -1504,7 +1504,7 @@ static ADDRESS_MAP_START( gakusai2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x678880, 0x678881) AM_READ(gakusai_input_r			)	// Inputs
 	AM_RANGE(0x678882, 0x678883) AM_READ_PORT("IN0")					//
 	AM_RANGE(0x67880e, 0x67880f) AM_READ(SMH_RAM					)	// Screen Control
-	AM_RANGE(0xb00000, 0xb00001) AM_READ(OKIM6295_status_0_lsb_r	)	// Sound
+	AM_RANGE(0xb00000, 0xb00001) AM_READ(okim6295_status_0_lsb_r	)	// Sound
 	AM_RANGE(0xe00000, 0xe00001) AM_READ(gakusai_eeprom_r			)	// EEPROM
 ADDRESS_MAP_END
 
@@ -1533,7 +1533,7 @@ static ADDRESS_MAP_START( gakusai2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(SMH_NOP						)	// ? 5
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(gakusai_oki_bank_lo_w			)	// Sound
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(gakusai_oki_bank_hi_w			)
-	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(OKIM6295_data_0_lsb_w 		)
+	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(okim6295_data_0_lsb_w 		)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(YM2413_register_port_0_lsb_w	)
 	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(YM2413_data_port_0_lsb_w		)
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(gakusai_eeprom_w				)	// EEPROM
@@ -1589,7 +1589,7 @@ static ADDRESS_MAP_START( dokyusp_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x278880, 0x278881) AM_READ(gakusai_input_r			)	// Inputs
 	AM_RANGE(0x278882, 0x278883) AM_READ_PORT("IN0")					//
 	AM_RANGE(0x27880e, 0x27880f) AM_READ(SMH_RAM					)	// Screen Control
-	AM_RANGE(0x700000, 0x700001) AM_READ(OKIM6295_status_0_lsb_r	)	// Sound
+	AM_RANGE(0x700000, 0x700001) AM_READ(okim6295_status_0_lsb_r	)	// Sound
 	AM_RANGE(0xd00000, 0xd00001) AM_READ(dokyusp_eeprom_r			)	// EEPROM
 ADDRESS_MAP_END
 
@@ -1618,7 +1618,7 @@ static ADDRESS_MAP_START( dokyusp_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(gakusai_oki_bank_lo_w			)	// Sound
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(YM2413_register_port_0_lsb_w	)
 	AM_RANGE(0x600002, 0x600003) AM_WRITE(YM2413_data_port_0_lsb_w		)
-	AM_RANGE(0x700000, 0x700001) AM_WRITE(OKIM6295_data_0_lsb_w 		)
+	AM_RANGE(0x700000, 0x700001) AM_WRITE(okim6295_data_0_lsb_w 		)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(dokyusp_eeprom_reset_w		)	// EEPROM
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(dokyusp_eeprom_bit_w			)	// EEPROM
 ADDRESS_MAP_END
@@ -1643,7 +1643,7 @@ static ADDRESS_MAP_START( dokyusei_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478882, 0x478883) AM_READ_PORT("IN0")					//
 	AM_RANGE(0x478884, 0x478885) AM_READ_PORT("DSW0")					// 2 x DSW
 	AM_RANGE(0x478886, 0x478887) AM_READ_PORT("DSW1")					//
-	AM_RANGE(0xd00000, 0xd00001) AM_READ(OKIM6295_status_0_lsb_r	)	// Sound
+	AM_RANGE(0xd00000, 0xd00001) AM_READ(okim6295_status_0_lsb_r	)	// Sound
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dokyusei_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1673,7 +1673,7 @@ static ADDRESS_MAP_START( dokyusei_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(gakusai_oki_bank_lo_w			)	// Samples Bank
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(YM2413_register_port_0_lsb_w	)	// Sound
 	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(YM2413_data_port_0_lsb_w		)	//
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(OKIM6295_data_0_lsb_w			)	//
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(okim6295_data_0_lsb_w			)	//
 ADDRESS_MAP_END
 
 
@@ -2026,7 +2026,7 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( mouja_sound_rombank_w )
 {
 	if (ACCESSING_BITS_0_7)
-		OKIM6295_set_bank_base(0, ((data >> 3) & 0x07) * 0x40000);
+		okim6295_set_bank_base(0, ((data >> 3) & 0x07) * 0x40000);
 }
 
 static ADDRESS_MAP_START( mouja_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -2043,7 +2043,7 @@ static ADDRESS_MAP_START( mouja_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478882, 0x478883) AM_READ_PORT("IN1")				//
 	AM_RANGE(0x478884, 0x478885) AM_READ_PORT("DSW0")				//
 	AM_RANGE(0x478886, 0x478887) AM_READ_PORT("IN2")				//
-	AM_RANGE(0xd00000, 0xd00001) AM_READ(OKIM6295_status_0_lsb_r)
+	AM_RANGE(0xd00000, 0xd00001) AM_READ(okim6295_status_0_lsb_r)
 #if 0
 	AM_RANGE(0x460000, 0x46ffff) AM_READ(metro_bankedrom_r		)	// Banked ROM
 #endif
@@ -2072,7 +2072,7 @@ static ADDRESS_MAP_START( mouja_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(YM2413_register_port_0_lsb_w	)
 	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(YM2413_data_port_0_lsb_w		)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(mouja_sound_rombank_w			)
-	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(OKIM6295_data_0_msb_w  		)
+	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(okim6295_data_0_msb_w  		)
 
 #if 0
 	AM_RANGE(0x478840, 0x47884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs	)	// Tiles Blitter
@@ -2103,7 +2103,7 @@ static ADDRESS_MAP_START( puzzlet_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x430000, 0x433fff ) AM_RAM
 	AM_RANGE( 0x470000, 0x47dfff ) AM_RAM
 
-	AM_RANGE( 0x500000, 0x500001 ) AM_READWRITE( OKIM6295_status_0_msb_r, OKIM6295_data_0_msb_w )
+	AM_RANGE( 0x500000, 0x500001 ) AM_READWRITE( okim6295_status_0_msb_r, okim6295_data_0_msb_w )
 	AM_RANGE( 0x580000, 0x580001 ) AM_WRITE( YM2413_register_port_0_msb_w )
 	AM_RANGE( 0x580002, 0x580003 ) AM_WRITE( YM2413_data_port_0_msb_w )
 

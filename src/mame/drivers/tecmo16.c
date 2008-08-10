@@ -148,7 +148,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM)
 	AM_RANGE(0xf000, 0xfbff) AM_READ(SMH_RAM)	/* Sound RAM */
-	AM_RANGE(0xfc00, 0xfc00) AM_READ(OKIM6295_status_0_r)
+	AM_RANGE(0xfc00, 0xfc00) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0xfc05, 0xfc05) AM_READ(YM2151_status_port_0_r)
 	AM_RANGE(0xfc08, 0xfc08) AM_READ(soundlatch_r)
 	AM_RANGE(0xfc0c, 0xfc0c) AM_READ(SMH_NOP)
@@ -158,7 +158,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xf000, 0xfbff) AM_WRITE(SMH_RAM)	/* Sound RAM */
-	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(OKIM6295_data_0_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(okim6295_data_0_w)
 	AM_RANGE(0xfc04, 0xfc04) AM_WRITE(YM2151_register_port_0_w)
 	AM_RANGE(0xfc05, 0xfc05) AM_WRITE(YM2151_data_port_0_w)
 	AM_RANGE(0xfc0c, 0xfc0c) AM_WRITE(SMH_NOP)
