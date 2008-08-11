@@ -278,7 +278,7 @@ static const tms34010_config msp_config =
 };
 
 
-static const struct dsp32_config dsp32c_config =
+static const dsp32_config dsp32c_config =
 {
 	hddsk_update_pif				/* a change has occurred on an output pin */
 };

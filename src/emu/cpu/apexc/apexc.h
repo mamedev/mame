@@ -1,4 +1,9 @@
 /* register names for apexc_get_reg & apexc_set_reg */
+#pragma once
+
+#ifndef __APEXC_H__
+#define __APEXC_H__
+
 enum
 {
 	APEXC_CR =1,	/* control register */
@@ -32,3 +37,4 @@ unsigned apexc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *op
 
 #define apexc_readop(address)	apexc_readmem(address)
 
+#endif /* __APEXC_H__ */

@@ -1,3 +1,8 @@
+#pragma once
+
+#ifndef __I8085DAA_H__
+#define __I8085DAA_H__
+
 static const UINT16 DAA[2048] = {
   (0x00<<8)   +ZF         +VF      ,
   (0x01<<8)                        ,
@@ -2048,3 +2053,5 @@ static const UINT16 DAA[2048] = {
   (0x98<<8)+SF         +XF   +NF+CF,
   (0x99<<8)+SF         +XF+VF+NF+CF
 };
+
+#endif /* __I8085DAA_H__ */

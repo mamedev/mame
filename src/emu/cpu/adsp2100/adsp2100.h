@@ -6,8 +6,10 @@
 
 ***************************************************************************/
 
-#ifndef _ADSP2100_H
-#define _ADSP2100_H
+#pragma once
+
+#ifndef __ADSP2100_H__
+#define __ADSP2100_H__
 
 #include "cpuintrf.h"
 
@@ -100,7 +102,7 @@ extern void adsp2101_get_info(UINT32 state, cpuinfo *info);
 
 extern void adsp2104_get_info(UINT32 state, cpuinfo *info);
 extern void adsp2104_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
-#endif
+#endif /* (HAS_ADSP2104) */
 
 #if (HAS_ADSP2105)
 /**************************************************************************
@@ -116,7 +118,7 @@ extern void adsp2104_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
 
 extern void adsp2105_get_info(UINT32 state, cpuinfo *info);
 extern void adsp2105_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
-#endif
+#endif /* (HAS_ADSP2105) */
 
 #if (HAS_ADSP2115)
 /**************************************************************************
@@ -134,7 +136,7 @@ extern void adsp2105_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
 
 extern void adsp2115_get_info(UINT32 state, cpuinfo *info);
 extern void adsp2115_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
-#endif
+#endif /* (HAS_ADSP2115) */
 
 #if (HAS_ADSP2181)
 /**************************************************************************
@@ -159,6 +161,6 @@ extern void adsp2181_idma_addr_w(UINT16 data);
 extern UINT16 adsp2181_idma_addr_r(void);
 extern void adsp2181_idma_data_w(UINT16 data);
 extern UINT16 adsp2181_idma_data_r(void);
-#endif
+#endif /* (HAS_ADSP2181) */
 
-#endif /* _ADSP2100_H */
+#endif /* __ADSP2100_H__ */

@@ -7,8 +7,10 @@
  *        Please, notify me, if you make any changes to this file         *
  **************************************************************************/
 
-#ifndef _I8039_H
-#define _I8039_H
+#pragma once
+
+#ifndef __I8039_H__
+#define __I8039_H__
 
 #ifndef INLINE
 #define INLINE static inline
@@ -75,7 +77,7 @@ extern void i8039_get_info(UINT32 state, cpuinfo *info);
 #define i8035_ICount			i8039_ICount
 
 extern void i8035_get_info(UINT32 state, cpuinfo *info);
-#endif
+#endif /* (HAS_I8035) */
 
 /**************************************************************************
  * I8048 section
@@ -100,7 +102,7 @@ extern void i8035_get_info(UINT32 state, cpuinfo *info);
 #define i8048_ICount			i8039_ICount
 
 extern void i8048_get_info(UINT32 state, cpuinfo *info);
-#endif
+#endif /* (HAS_I8048) */
 
 /**************************************************************************
  * I8749 section
@@ -125,7 +127,7 @@ extern void i8048_get_info(UINT32 state, cpuinfo *info);
 #define i8749_ICount			i8039_ICount
 
 extern void i8749_get_info(UINT32 state, cpuinfo *info);
-#endif
+#endif /* (HAS_I8749) */
 
 /**************************************************************************
  * N7751 section
@@ -150,7 +152,7 @@ extern void i8749_get_info(UINT32 state, cpuinfo *info);
 #define n7751_ICount			i8039_ICount
 
 extern void n7751_get_info(UINT32 state, cpuinfo *info);
-#endif
+#endif /* (HAS_N7751) */
 
 /**************************************************************************
  * MB8884 section
@@ -175,7 +177,7 @@ extern void n7751_get_info(UINT32 state, cpuinfo *info);
 #define mb8884_ICount			i8039_ICount
 
 extern void mb8884_get_info(UINT32 state, cpuinfo *info);
-#endif
+#endif /* (HAS_MB8884) */
 
 /**************************************************************************
  * M58715 section
@@ -200,7 +202,7 @@ extern void mb8884_get_info(UINT32 state, cpuinfo *info);
 #define m58715_ICount			i8039_ICount
 
 extern void m58715_get_info(UINT32 state, cpuinfo *info);
-#endif
+#endif /* (HAS_M58715) */
 
 /*
  *   Input a UINT8 from given I/O port
@@ -243,4 +245,4 @@ extern void m58715_get_info(UINT32 state, cpuinfo *info);
 
 offs_t i8039_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif  /* _I8039_H */
+#endif  /* __I8039_H__ */

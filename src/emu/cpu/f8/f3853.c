@@ -23,7 +23,7 @@
 static UINT8 f3853_value_to_cycle[0x100];
 
 static struct {
-    F3853_CONFIG config;
+    f3853_config config;
 
     UINT8 high,low; // bit 7 set to 0 for timer interrupt, to 1 for external interrupt
     int external_enable;
@@ -72,7 +72,7 @@ static TIMER_CALLBACK( f3853_timer_callback )
 }
 
 
-void f3853_init(const F3853_CONFIG *config)
+void f3853_init(const f3853_config *config)
 {
 	UINT8 reg=0xfe;
 	int i;

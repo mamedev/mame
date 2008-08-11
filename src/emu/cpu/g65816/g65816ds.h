@@ -1,5 +1,7 @@
-#ifndef HEADER__G65816DS
-#define HEADER__G65816DS
+#pragma once
+
+#ifndef __G65816DS_H__
+#define __G65816DS_H__
 /* ======================================================================== */
 /* =============================== COPYRIGHT ============================== */
 /* ======================================================================== */
@@ -20,4 +22,4 @@ author (Karl Stenerud) at karl@higashiyama-unet.ocn.ne.jp.
 unsigned g65816_disassemble(char* buff, unsigned int pc, unsigned int pb, const UINT8 *oprom, int m_flag, int x_flag);
 
 
-#endif /* HEADER__G65816DS */
+#endif /* __G65816DS_H__ */

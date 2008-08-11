@@ -8,8 +8,10 @@
 
 ***************************************************************************/
 
-#ifndef _CCPU_H_
-#define	_CCPU_H_
+#pragma once
+
+#ifndef __CCPU_H__
+#define	__CCPU_H__
 
 #include "cpuintrf.h"
 
@@ -38,7 +40,8 @@ enum
     CONFIG STRUCTURE
 ***************************************************************************/
 
-struct CCPUConfig
+typedef struct _ccpu_config ccpu_config;
+struct _ccpu_config
 {
 	UINT8		(*external_input)(void);		/* if NULL, assume JMI jumper is present */
 	void		(*vector_callback)(INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift);
@@ -55,4 +58,4 @@ void ccpu_wdt_timer_trigger(void);
 
 offs_t ccpu_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif
+#endif /* __CCPU_H__ */

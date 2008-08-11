@@ -1,5 +1,7 @@
-#ifndef __I386_H_
-#define __I386_H_
+#pragma once
+
+#ifndef __I386_H__
+#define __I386_H__
 
 #include "cpuintrf.h"
 
@@ -893,4 +895,4 @@ INLINE void BUMP_DI(int adjustment)
 #define WRITEPORT16(port, value)	(io_write_word_32le(port, value))
 #define WRITEPORT32(port, value)	(io_write_dword_32le(port, value))
 
-#endif
+#endif /* __I386_H__ */

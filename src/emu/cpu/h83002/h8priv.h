@@ -4,10 +4,13 @@
 
 ****************************************************************************/
 
-#ifndef _H8PRIV_H_
-#define _H8PRIV_H_
+#pragma once
 
-typedef struct
+#ifndef __H8PRIV_H__
+#define __H8PRIV_H__
+
+typedef struct _h83002_state h83002_state;
+struct _h83002_state
 {
 	// main CPU stuff
 	UINT32 h8err;
@@ -32,7 +35,7 @@ typedef struct
 
 	int cpu_number;
 
-} h83002_state;
+};
 
 extern h83002_state h8;
 
@@ -51,4 +54,4 @@ UINT8 h8_3007_itu_read8(UINT8 reg);
 void h8_itu_write8(UINT8 reg, UINT8 val);
 void h8_3007_itu_write8(UINT8 reg, UINT8 val);
 
-#endif
+#endif /* __H8PRIV_H__ */

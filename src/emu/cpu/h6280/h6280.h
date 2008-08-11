@@ -10,8 +10,10 @@
 
 ******************************************************************************/
 
-#ifndef _H6280_H
-#define _H6280_H
+#pragma once
+
+#ifndef __H6280_H__
+#define __H6280_H__
 
 #include "cpuintrf.h"
 
@@ -34,11 +36,11 @@ enum {
 void h6280_get_info(UINT32 state, cpuinfo *info);
 
 
-READ8_HANDLER( H6280_irq_status_r );
-WRITE8_HANDLER( H6280_irq_status_w );
+READ8_HANDLER( h6280_irq_status_r );
+WRITE8_HANDLER( h6280_irq_status_w );
 
-READ8_HANDLER( H6280_timer_r );
-WRITE8_HANDLER( H6280_timer_w );
+READ8_HANDLER( h6280_timer_r );
+WRITE8_HANDLER( h6280_timer_w );
 
 /* functions for use by the PSG and joypad port only! */
 UINT8 h6280io_get_buffer(void);
@@ -46,4 +48,4 @@ void h6280io_set_buffer(UINT8);
 
 offs_t h6280_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif /* _H6280_H */
+#endif /* __H6280_H__ */

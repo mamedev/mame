@@ -347,7 +347,7 @@ static void dsp32c_set_context(void *src)
 
 static void dsp32c_init(int index, int clock, const void *_config, int (*irqcallback)(int))
 {
-	const struct dsp32_config *config = _config;
+	const dsp32_config *config = _config;
 
 	/* copy in config data */
 	if (config)

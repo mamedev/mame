@@ -1,5 +1,7 @@
-#ifndef ARM_H
-#define ARM_H
+#pragma once
+
+#ifndef __ARM_H__
+#define __ARM_H__
 
 #include "cpuintrf.h"
 
@@ -27,4 +29,4 @@ enum
 	ARM32_IR13, ARM32_IR14, ARM32_SR13, ARM32_SR14
 };
 
-#endif /* ARM_H */
+#endif /* __ARM_H__ */

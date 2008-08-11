@@ -1,3 +1,8 @@
+#pragma once
+
+#ifndef __TABLEV30_H__
+#define __TABLEV30_H__
+
 // special nec instructions missing
 // at the time the same like table186.h
 
@@ -526,3 +531,5 @@ static void (*const PREFIXV30(_instruction)[256])(void) =
 #else
 #define TABLEV30 PREFIXV30(_instruction)[FETCHOP]();
 #endif
+
+#endif /* __TABLEV30_H__ */

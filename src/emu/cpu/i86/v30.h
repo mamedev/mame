@@ -1,3 +1,8 @@
+#pragma once
+
+#ifndef __V30_H__
+#define __V30_H__
+
 #define SetMD(x)		(I.MF = (x))	/* OB [19.07.99] Mode Flag V30 */
 
 #define MD		(I.MF!=0)
@@ -21,3 +26,5 @@
 	  I.OverVal = (f) & 2048; \
 	  I.MF = ((f) & 0x8000) == 0x8000; \
 }
+
+#endif /* __V30_H__ */

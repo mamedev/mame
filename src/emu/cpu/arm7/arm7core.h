@@ -28,8 +28,10 @@
 
  ******************************************************************************/
 
-#ifndef ARM7CORE_H
-#define ARM7CORE_H
+#pragma once
+
+#ifndef __ARM7CORE_H__
+#define __ARM7CORE_H__
 
 #include "cpuintrf.h"
 
@@ -405,4 +407,4 @@ extern char *(*arm7_dasm_cop_dt_callback)(char *pBuf, UINT32 opcode, char *pCond
 extern char *(*arm7_dasm_cop_rt_callback)(char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
 extern char *(*arm7_dasm_cop_do_callback)(char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
 
-#endif /* ARM7CORE_H */
+#endif /* __ARM7CORE_H__ */

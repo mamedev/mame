@@ -1,6 +1,8 @@
 /* ASG 971222 -- rewrote this interface */
-#ifndef __I86INTRF_H_
-#define __I86INTRF_H_
+#pragma once
+
+#ifndef __I86INTF_H__
+#define __I86INTF_H__
 
 #include "cpuintrf.h"
 
@@ -27,4 +29,4 @@ enum
 /* Public functions */
 void i8086_get_info(UINT32 state, cpuinfo *info);
 
-#endif
+#endif /* __I86INTF_H__ */

@@ -1,3 +1,8 @@
+#pragma once
+
+#ifndef __INSTR86_H__
+#define __INSTR86_H__
+
 /****************************************************************************
 *             real mode i286 emulator v1.4 by Fabrice Frances               *
 *               (initial work based on David Hedley's pcemu)                *
@@ -235,3 +240,5 @@ static void PREFIX86(_std)(void);
 static void PREFIX86(_fepre)(void);
 static void PREFIX86(_ffpre)(void);
 static void PREFIX86(_wait)(void);
+
+#endif /* __INSTR86_H__ */

@@ -176,7 +176,7 @@ static ADDRESS_MAP_START( robocop_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_RAM) /* Main ram */
 	AM_RANGE(0x1f2000, 0x1f3fff) AM_WRITE(SMH_RAM) AM_BASE(&robocop_shared_ram) /* Shared ram */
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(H6280_irq_status_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hippodrm_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -195,7 +195,7 @@ static ADDRESS_MAP_START( hippodrm_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1a1000, 0x1a17ff) AM_WRITE(dec0_pf3_data_8bit_w)
 	AM_RANGE(0x1d0000, 0x1d00ff) AM_WRITE(hippodrm_prot_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8) /* Main ram */
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(H6280_irq_status_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slyspy_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -344,7 +344,7 @@ static ADDRESS_MAP_START( slyspy_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0b0000, 0x0b0001) AM_WRITE(YM2203_w)
 	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE(okim6295_data_0_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8) /* Main ram */
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(H6280_irq_status_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( midres_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -360,7 +360,7 @@ static ADDRESS_MAP_START( midres_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x118000, 0x118001) AM_WRITE(YM2203_w)
 	AM_RANGE(0x130000, 0x130001) AM_WRITE(okim6295_data_0_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8) /* Main ram */
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(H6280_irq_status_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/

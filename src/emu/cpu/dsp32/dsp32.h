@@ -6,7 +6,9 @@
 
 ***************************************************************************/
 
-#ifndef _DSP32_H
+#pragma once
+
+#ifndef __DSP32_H__
 #define _DSP32_H
 
 #include "cpuintrf.h"
@@ -65,7 +67,8 @@ enum
 
 #define DSP32_OUTPUT_PIF		0x01
 
-struct dsp32_config
+typedef struct _dsp32_config dsp32_config;
+struct _dsp32_config
 {
 	void	(*output_pins_changed)(UINT32 pins);	/* a change has occurred on an output pin */
 };
@@ -81,4 +84,4 @@ extern void dsp32c_get_info(UINT32 state, cpuinfo *info);
 extern void dsp32c_pio_w(int cpunum, int reg, int data);
 extern int dsp32c_pio_r(int cpunum, int reg);
 
-#endif /* _DSP32_H */
+#endif /* __DSP32_H__ */

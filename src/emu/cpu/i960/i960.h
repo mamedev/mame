@@ -1,5 +1,7 @@
-#ifndef __I960_H
-#define __I960_H
+#pragma once
+
+#ifndef __I960_H__
+#define __I960_H__
 
 #include "cpuintrf.h"
 
@@ -61,4 +63,4 @@ void i960_get_info(UINT32 state, cpuinfo *info);
 void i960_noburst(void);
 void i960_stall(void);
 
-#endif
+#endif /* __I960_H__ */

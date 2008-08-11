@@ -1,6 +1,8 @@
 /* ASG 971222 -- rewrote this interface */
-#ifndef __V20INTRF_H_
-#define __V20INTRF_H_
+#pragma once
+
+#ifndef __V20INTF_H__
+#define __V20INTF_H__
 
 #include "i86intrf.h"
 #include "v30intrf.h"
@@ -8,4 +10,4 @@
 /* Public functions */
 void v20_get_info(UINT32 state, cpuinfo *info);
 
-#endif
+#endif /* __V20INTF_H__ */

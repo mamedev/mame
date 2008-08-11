@@ -17,8 +17,10 @@
  *
  *****************************************************************************/
 
-#ifndef _CP1610_H
-#define _CP1610_H
+#pragma once
+
+#ifndef __CP1610_H__
+#define __CP1610_H__
 
 #include "cpuintrf.h"
 
@@ -42,4 +44,4 @@ unsigned cp1610_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *o
 #define cp1610_readmem16(A) program_read_word_16be((A)<<1)
 #define cp1610_writemem16(A,B) program_write_word_16be((A)<<1,B)
 
-#endif /* _CP1610_H */
+#endif /* __CP1610_H__ */

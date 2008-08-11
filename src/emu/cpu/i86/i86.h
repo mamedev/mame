@@ -3,8 +3,10 @@
 /*           (initial work based on David Hedley's pcemu)                   */
 /*                                                                          */
 /****************************************************************************/
-#ifndef __I86_H_
-#define __I86_H_
+#pragma once
+
+#ifndef __I86_H__
+#define __I86_H__
 
 #define I8086_NMI_INT_VECTOR 2
 #define INPUT_LINE_TEST 20    /* PJB 03/05 */
@@ -123,5 +125,5 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,SIH,SIL,DIH,DIL } BREGS;
 	  I.DirVal = ((f) & 1024) ? -1 : 1; \
 	  I.OverVal = (f) & 2048; \
 }
-#endif
 
+#endif /* __I86_H__ */

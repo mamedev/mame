@@ -135,7 +135,7 @@ void ccpu_wdt_timer_trigger(void)
 
 static void ccpu_init(int index, int clock, const void *_config, int (*irqcallback)(int))
 {
-	const struct CCPUConfig *config = _config;
+	const ccpu_config *config = _config;
 
 	/* copy input params */
 	ccpu.external_input = config->external_input ? config->external_input : read_jmi;

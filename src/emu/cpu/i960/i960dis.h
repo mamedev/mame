@@ -1,15 +1,16 @@
-#ifndef _I960DISASSEMBLER_H
-#define _I960DISASSEMBLER_H
+#ifndef __I960DIS_H__
+#define __I960DIS_H__
 
-typedef struct
+typedef struct _disassemble_t disassemble_t;
+struct _disassemble_t
 {
 	char		*buffer;	// output buffer
 	unsigned long	IP;
 	unsigned long	IPinc;
 	const UINT8 *oprom;
 	UINT32 disflags;
-} disassemble_t;
+};
 
 char *i960_disassemble(disassemble_t *diss);
 
-#endif // _I960DISASSEMBLER_H
+#endif /* __I960DIS_H__ */

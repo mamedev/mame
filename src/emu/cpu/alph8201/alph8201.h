@@ -7,8 +7,10 @@
  *                                                                          *
  \**************************************************************************/
 
-#ifndef _ALPH8202_H
-#define _ALPH8202_H
+#pragma once
+
+#ifndef __ALPH8201_H__
+#define __ALPH8201_H__
 
 #ifndef INLINE
 #define INLINE static inline
@@ -67,4 +69,4 @@ extern void alpha8301_get_info(UINT32 state, cpuinfo *info);
 
 offs_t ALPHA8201_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif  /* _ALPHA8201_H */
+#endif  /* __ALPH8201_H__ */

@@ -6,8 +6,10 @@
 
 ***************************************************************************/
 
-#ifndef _ASAP_H
-#define _ASAP_H
+#pragma once
+
+#ifndef __ASAP_H__
+#define __ASAP_H__
 
 #include "cpuintrf.h"
 
@@ -39,4 +41,4 @@ enum
 
 extern void asap_get_info(UINT32 state, cpuinfo *info);
 
-#endif /* _ASAP_H */
+#endif /* __ASAP_H__ */

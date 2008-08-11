@@ -1,5 +1,7 @@
-#ifndef HEADER__G65816CM
-#define HEADER__G65816CM
+#pragma once
+
+#ifndef __G65816CM_H__
+#define __G65816CM_H__
 
 #define g65816i_branching(A)
 #define g65816i_jumping(A)
@@ -60,7 +62,8 @@ INLINE int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 /* ======================================================================== */
 
 /* CPU Structure */
-typedef struct
+typedef struct _g65816i_cpu_struct g65816i_cpu_struct;
+struct _g65816i_cpu_struct
 {
 	uint a;				/* Accumulator */
 	uint b;				/* holds high byte of accumulator */
@@ -93,7 +96,7 @@ typedef struct
 	void (*set_reg)(int regnum, uint val);
 	void (*set_line)(int line, int state);
 	int  (*execute)(int cycles);
-} g65816i_cpu_struct;
+};
 
 extern g65816i_cpu_struct g65816i_cpu;
 extern int g65816_ICount;
@@ -306,4 +309,4 @@ INLINE void g65816i_set_execution_mode(uint mode)
 /* ======================================================================== */
 /* ================================== CPU ================================= */
 /* ======================================================================== */
-#endif /* HEADER__G65816CM */
+#endif /* __G65816CM_H__ */

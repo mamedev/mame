@@ -319,7 +319,7 @@ static void set_irq_line(int irqline, int state)
 
 /*****************************************************************************/
 
-READ8_HANDLER( H6280_irq_status_r )
+READ8_HANDLER( h6280_irq_status_r )
 {
 	int status;
 
@@ -338,7 +338,7 @@ READ8_HANDLER( H6280_irq_status_r )
 	}
 }
 
-WRITE8_HANDLER( H6280_irq_status_w )
+WRITE8_HANDLER( h6280_irq_status_w )
 {
 	h6280.io_buffer=data;
 	switch (offset&3)
@@ -355,13 +355,13 @@ WRITE8_HANDLER( H6280_irq_status_w )
 	}
 }
 
-READ8_HANDLER( H6280_timer_r )
+READ8_HANDLER( h6280_timer_r )
 {
 	/* only returns countdown */
 	return ((h6280.timer_value/1024)&0x7F)|(h6280.io_buffer&0x80);
 }
 
-WRITE8_HANDLER( H6280_timer_w )
+WRITE8_HANDLER( h6280_timer_w )
 {
 	h6280.io_buffer=data;
 	switch (offset) {

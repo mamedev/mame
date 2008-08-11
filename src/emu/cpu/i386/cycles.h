@@ -1,3 +1,8 @@
+#pragma once
+
+#ifndef __CYCLES_H__
+#define __CYCLES_H__
+
 typedef enum {
 	CYCLES_MOV_REG_REG,
 	CYCLES_MOV_REG_MEM,
@@ -664,3 +669,5 @@ static const X86_CYCLE_TABLE x86_cycle_table[] =
 	{ CYCLES_CMPXCHG_REG_MEM_T,	{ {  0,  0 },  {  7,  7 },  {  7,  7 },  {  7,  7 } }		},
 	{ CYCLES_CMPXCHG_REG_MEM_F,	{ {  0,  0 },  { 10, 10 },  { 10, 10 },  { 10, 10 } }		},
 };
+
+#endif /* __CYCLES_H__ */

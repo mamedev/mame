@@ -19,7 +19,9 @@
  *
  *****************************************************************************/
 
-#ifndef _F8_H
+#pragma once
+
+#ifndef __F8_H__
 #define _F8_H
 
 #include "cpuintrf.h"
@@ -50,6 +52,4 @@ void f8_get_info(UINT32 state, cpuinfo *info);
 }
 #endif
 
-#endif /* _F8_H */
-
-
+#endif /* __F8_H__ */

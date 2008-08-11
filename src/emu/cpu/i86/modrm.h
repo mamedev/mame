@@ -1,3 +1,9 @@
+#pragma once
+
+#ifndef __MODRM_H__
+#define __MODRM_H__
+
+
 static struct {
 	struct {
 		WREGS w[256];
@@ -115,4 +121,4 @@ static struct {
 	unsigned dst = I.regs.w[AX];			\
     src += (FETCH << 8)
 
-
+#endif /* __MODRM_H__ */

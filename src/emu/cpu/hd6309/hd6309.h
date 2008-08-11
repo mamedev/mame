@@ -1,7 +1,9 @@
 /*** hd6309: Portable 6309 emulator ******************************************/
 
-#ifndef _HD6309_H
-#define _HD6309_H
+#pragma once
+
+#ifndef __HD6309_H__
+#define __HD6309_H__
 
 #include "cpuintrf.h"
 
@@ -48,5 +50,4 @@ void hd6309_get_info(UINT32 state, cpuinfo *info);
 #	 define TRUE (!FALSE)
 #endif
 
-#endif /* _HD6309_H */
-
+#endif /* __HD6309_H__ */

@@ -1,3 +1,8 @@
+#pragma once
+
+#ifndef __I386OPS_H__
+#define __I386OPS_H__
+
 typedef struct {
 	UINT8 opcode;
 	UINT32 flags;
@@ -367,3 +372,5 @@ static const X86_OPCODE x86_opcode_table[] =
 	{ 0xC1,		OP_2BYTE|OP_I486,			I486OP(xadd_rm16_r16),			I486OP(xadd_rm32_r32),		},
 	{ 0xC7,		OP_2BYTE|OP_PENTIUM,		PENTIUMOP(cmpxchg8b_m64),		PENTIUMOP(cmpxchg8b_m64),	}
 };
+
+#endif /* __I386OPS_H__ */

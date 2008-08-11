@@ -4,8 +4,10 @@
 
 ****************************************************************************/
 
-#ifndef _H83002_H_
-#define _H83002_H_
+#pragma once
+
+#ifndef __H83002_H__
+#define __H83002_H__
 
 #include "cpuintrf.h"
 
@@ -75,4 +77,4 @@ void h8_3002_get_info(UINT32 state, cpuinfo *info);
 
 void h8_3002_InterruptRequest(UINT8 source);
 
-#endif
+#endif /* __H83002_H__ */

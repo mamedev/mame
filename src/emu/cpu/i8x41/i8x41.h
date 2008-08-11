@@ -23,8 +23,10 @@
  *
  *****************************************************************************/
 
-#ifndef _I8X41_H
-#define _I8X41_H
+#pragma once
+
+#ifndef __I8X41_H__
+#define __I8X41_H__
 
 #include "cpuintrf.h"
 
@@ -38,14 +40,18 @@
  * I8X41_STAT is A0 = 1 and R only
  */
 
-typedef enum {
+enum _i8x41_type
+{
 	TYPE_I8X41,
 	TYPE_I8X42
-} i8x41_type;
+};
+typedef enum _i8x41_type i8x41_type;
 
-typedef struct {
+typedef struct _i8x41_config i8x41_config;
+struct _i8x41_config
+{
 	i8x41_type	type;
-} i8x41_config;
+};
 
 /****************************************************************************
  *  Interrupt constants
@@ -93,4 +99,4 @@ extern void i8x41_get_info(UINT32 state, cpuinfo *info);
 
 extern offs_t i8x41_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif /* _I8X41_H */
+#endif /* __I8X41_H__ */

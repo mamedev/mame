@@ -1,6 +1,8 @@
 /* ASG 971222 -- rewrote this interface */
-#ifndef __I286INTR_H_
-#define __I286INTR_H_
+#pragma once
+
+#ifndef __I286INTF_H__
+#define __I286INTF_H__
 
 #include "i86intf.h"
 
@@ -43,4 +45,4 @@ enum
 /* Public functions */
 void i80286_get_info(UINT32 state, cpuinfo *info);
 
-#endif
+#endif /* __I286INTF_H__ */

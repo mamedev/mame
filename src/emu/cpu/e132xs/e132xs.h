@@ -1,5 +1,7 @@
-#ifndef E132XS_H
-#define E132XS_H
+#pragma once
+
+#ifndef __E132XS_H__
+#define __E132XS_H__
 
 #include "cpuintrf.h"
 
@@ -194,4 +196,4 @@ extern int hyp_type_16bit;
 #define	E132XS_ENTRY_IRAM	3
 #define	E132XS_ENTRY_MEM3	7
 
-#endif /* E132XS_H */
+#endif /* __E132XS_H__ */

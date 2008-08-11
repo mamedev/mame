@@ -5,14 +5,22 @@
   timer shift register basically the same as in f3851!
 */
 
+#pragma once
+
+#ifndef __F3853_H__
+#define __F3853_H__
+
+
 #include "cpuintrf.h"
 
-typedef struct {
+typedef struct _f3853_config f3853_config;
+struct _f3853_config
+{
     int frequency;
     void (*interrupt_request)(UINT16 addr, int level);
-} F3853_CONFIG;
+};
 
-void f3853_init(const F3853_CONFIG *config);
+void f3853_init(const f3853_config *config);
 void f3853_reset(void);
 
 // ports 0x0c - 0x0f
@@ -22,3 +30,4 @@ WRITE8_HANDLER(f3853_w);
 void f3853_set_external_interrupt_in_line(int level);
 void f3853_set_priority_in_line(int level);
 
+#endif /* __F3853_H__ */

@@ -30,8 +30,10 @@
  *
  *****************************************************************************/
 
-#ifndef _I8051_H
-#define _I8051_H
+#pragma once
+
+#ifndef __I8051_H__
+#define __I8051_H__
 
 #include "cpuintrf.h"
 
@@ -144,6 +146,4 @@ void i8052_get_info(UINT32 state, cpuinfo *info);
 void i8751_get_info(UINT32 state, cpuinfo *info);
 void i8752_get_info(UINT32 state, cpuinfo *info);
 
-#endif /* _I8051_H */
-
-
+#endif /* __I8051_H__ */

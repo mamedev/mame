@@ -7,8 +7,10 @@
 ***************************************************************************/
 
 
-#ifndef _DSP56K_H
-#define _DSP56K_H
+#pragma once
+
+#ifndef __DSP56K_H__
+#define __DSP56K_H__
 
 #include "cpuintrf.h"
 
@@ -64,7 +66,7 @@ enum
 };
 
 // For Debugger and opcodes
-enum parallelMoveType
+enum _parallel_move_type
 {
 	PARALLEL_TYPE_XMDM,
 	PARALLEL_TYPE_XMDM_SPECIAL,
@@ -72,6 +74,7 @@ enum parallelMoveType
 	PARALLEL_TYPE_ARU,
 	PARALLEL_TYPE_RRDM
 };
+typedef enum _parallelMoveType parallelMoveType;
 
 extern void dsp56k_get_info(UINT32 state, cpuinfo *info);
 
@@ -80,4 +83,4 @@ UINT8 dsp56k_host_interface_read(UINT8 offset);
 
 UINT16 dsp56k_get_peripheral_memory(UINT16 addr);
 
-#endif  // _DSP56K_H
+#endif /* __DSP56K_H__ */

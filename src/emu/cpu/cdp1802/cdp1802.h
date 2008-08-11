@@ -1,5 +1,7 @@
-#ifndef _CDP1802_H
-#define _CDP1802_H
+#pragma once
+
+#ifndef __CDP1802_H__
+#define __CDP1802_H__
 
 #include "cpuintrf.h"
 
@@ -112,4 +114,4 @@ struct _cdp1802_interface
 
 offs_t cdp1802_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif
+#endif /* __CDP1802_H__ */

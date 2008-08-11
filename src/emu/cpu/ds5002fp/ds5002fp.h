@@ -37,8 +37,10 @@
  *
  *****************************************************************************/
 
-#ifndef _DS5002FP_H
-#define _DS5002FP_H
+#pragma once
+
+#ifndef __DS5002FP_H__
+#define __DS5002FP_H__
 
 #include "cpuintrf.h"
 
@@ -136,6 +138,4 @@ extern offs_t ds5002fp_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const U
 
 void ds5002fp_get_info(UINT32 state, cpuinfo *info);
 
-#endif /* _DS5002FP_H */
-
-
+#endif /* __DS5002FP_H__ */

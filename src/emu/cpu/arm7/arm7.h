@@ -28,8 +28,10 @@
 
  ******************************************************************************/
 
-#ifndef ARM7_H
-#define ARM7_H
+#pragma once
+
+#ifndef __ARM7_H__
+#define __ARM7_H__
 
 #include "cpuintrf.h"
 
@@ -38,4 +40,4 @@
  ***************************************************************************************************/
 extern void arm7_get_info(UINT32 state, cpuinfo *info);
 
-#endif /* ARM7_H */
+#endif /* __ARM7_H__ */

@@ -10,6 +10,12 @@
  *
  *******************************************************/
 
+#pragma once
+
+#ifndef __I8085CPU_H__
+#define __I8085CPU_H__
+
+
 #define SF              0x80
 #define ZF              0x40
 #define YF              0x20
@@ -186,3 +192,5 @@ int q = I.AF.b.h+R; 							\
 		(((I.BC.b.h^I.HL.b.h)&(I.HL.b.h^q)&SF)>>5);				\
 	if (I.HL.b.l!=0) I.AF.b.l&=~ZF;								\
 }
+
+#endif /* __I8085CPU_H__ */

@@ -83,7 +83,7 @@ static ADDRESS_MAP_START( battlera_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1fe000, 0x1fe001) AM_READWRITE(HuC6270_register_r, HuC6270_register_w)
 	AM_RANGE(0x1fe002, 0x1fe003) AM_WRITE(HuC6270_data_w)
 	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(control_data_r, control_data_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(H6280_irq_status_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( battlera_portmap, ADDRESS_SPACE_IO, 8 )
@@ -132,7 +132,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1fe800, 0x1fe80f) AM_WRITE(c6280_0_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK(7) /* Main ram */
 	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(soundlatch_r, battlera_adpcm_reset_w)
-	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(H6280_irq_status_w)
+	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(h6280_irq_status_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
