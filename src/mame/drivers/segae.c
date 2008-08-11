@@ -2359,7 +2359,7 @@ static DRIVER_INIT( astrofl )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	astrofl_decode(machine);
+	astrofl_decode(machine, "z80");
 }
 
 GAME( 1985, hangonjr, 0,        systeme, hangonjr, hangonjr, ROT0,  "Sega", "Hang-On Jr.", 0 )

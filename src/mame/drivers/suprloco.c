@@ -274,7 +274,7 @@ static DRIVER_INIT( suprloco )
 
 
 	/* decrypt program ROMs */
-	suprloco_decode(machine);
+	suprloco_decode(machine, "main");
 }
 
 

@@ -550,7 +550,7 @@ ROM_END
 
 
 static DRIVER_INIT(robowres){
-	robowres_decode(machine);
+	robowres_decode(machine, "main");
 }
 
 static DRIVER_INIT(robowrb){

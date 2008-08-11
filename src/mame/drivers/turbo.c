@@ -1767,7 +1767,7 @@ static DRIVER_INIT( turbo_enc )
 
 static DRIVER_INIT( buckrog_enc )
 {
-	buckrog_decode(machine);
+	buckrog_decode(machine, "main");
 }
 
 

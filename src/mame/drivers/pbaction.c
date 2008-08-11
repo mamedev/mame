@@ -414,7 +414,7 @@ static DRIVER_INIT( pbactio3 )
 	}
 
 	/* then do the standard Sega decryption */
-	pbaction_decode(machine);
+	pbaction_decode(machine, "main");
 
 	/* install a protection (?) workaround */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc000, 0, 0, pbactio3_prot_kludge_r );

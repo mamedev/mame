@@ -458,7 +458,7 @@ ROM_END
 
 static DRIVER_INIT( calorie )
 {
-	calorie_decode(machine);
+	calorie_decode(machine, "main");
 }
 
 static DRIVER_INIT( calorieb )

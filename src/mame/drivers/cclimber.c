@@ -1904,13 +1904,13 @@ ROM_END
 
 static DRIVER_INIT( yamato )
 {
-	yamato_decode(machine);
+	yamato_decode(machine,"main");
 }
 
 
 static DRIVER_INIT( toprollr )
 {
-	toprollr_decode(machine);
+	toprollr_decode(machine,"user1");
 }
 
 

@@ -648,7 +648,7 @@ static DRIVER_INIT( jongkyo )
 	}
 
 	/* then do the standard Sega decryption */
-	jongkyo_decode(machine);
+	jongkyo_decode(machine, "main");
 
 	videoram2 = auto_malloc(0x4000);
 	state_save_register_global_pointer(videoram2, 0x4000);

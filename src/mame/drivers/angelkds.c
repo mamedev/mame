@@ -737,7 +737,7 @@ ROM_START( spcpostn )
 ROM_END
 
 
-static DRIVER_INIT( spcpostn )	{ spcpostn_decode(machine); }
+static DRIVER_INIT( spcpostn )	{ spcpostn_decode(machine, "main"); }
 
 
 GAME( 1988, angelkds, 0, angelkds, angelkds,        0,  ROT90,  "Sega / Nasco?", "Angel Kids (Japan)" , 0) /* Nasco not displayed but 'Exa Planning' is */

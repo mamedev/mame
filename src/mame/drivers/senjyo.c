@@ -994,7 +994,7 @@ DRIVER_INIT( starforc )
 DRIVER_INIT( starfore )
 {
 	/* encrypted CPU */
-	suprloco_decode(machine);
+	suprloco_decode(machine, "main");
 
 	is_senjyo = 0;
 	senjyo_scrollhack = 0;
@@ -1003,7 +1003,7 @@ DRIVER_INIT( starfore )
 DRIVER_INIT( starfora )
 {
 	/* encrypted CPU */
-	yamato_decode(machine);
+	yamato_decode(machine, "main");
 
 	is_senjyo = 0;
 	senjyo_scrollhack = 1;

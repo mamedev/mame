@@ -613,7 +613,7 @@ ROM_END
 
 static DRIVER_INIT( pengo )
 {
-	pengo_decode(machine);
+	pengo_decode(machine, "main");
 }
 
 

@@ -1499,7 +1499,7 @@ static DRIVER_INIT( monsterb )
 static DRIVER_INIT( monster2 )
 {
 	/* configure the 315-5006 security chip */
-	spatter_decode(machine);
+	spatter_decode(machine, "main");
 	sega_security(0);
 
 	/* configure video */
@@ -1536,7 +1536,7 @@ static DRIVER_INIT( pignewt )
 static DRIVER_INIT( sindbadm )
 {
 	/* configure the encrypted Z80 */
-	sindbadm_decode(machine);
+	sindbadm_decode(machine, "main");
 	sega_security(0);
 
 	/* configure video */

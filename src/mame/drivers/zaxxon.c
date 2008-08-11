@@ -1389,7 +1389,7 @@ ROM_END
  *
  *************************************/
 
-static void zaxxonb_decode(running_machine *machine)
+static void zaxxonb_decode(running_machine *machine, const char *region)
 {
 /*
     the values vary, but the translation mask is always laid out like this:
@@ -1434,8 +1434,8 @@ static void zaxxonb_decode(running_machine *machine)
 	};
 
 	int A;
-	UINT8 *rom = memory_region(machine, "main");
-	int size = memory_region_length(machine, "main");
+	UINT8 *rom = memory_region(machine, region);
+	int size = memory_region_length(machine, region);
 	UINT8 *decrypt = auto_malloc(size);
 
 	memory_set_decrypted_region(0, 0x0000, size - 1, decrypt);
@@ -1475,25 +1475,25 @@ static void zaxxonb_decode(running_machine *machine)
 
 static DRIVER_INIT( zaxxonb )
 {
-	zaxxonb_decode(machine);
+	zaxxonb_decode(machine, "main");
 }
 
 
 static DRIVER_INIT( szaxxon )
 {
-	szaxxon_decode(machine);
+	szaxxon_decode(machine, "main");
 }
 
 
 static DRIVER_INIT( futspy )
 {
-	futspy_decode(machine);
+	futspy_decode(machine, "main");
 }
 
 
 static DRIVER_INIT( razmataz )
 {
-	nprinces_decode(machine);
+	nprinces_decode(machine, "main");
 
 	/* additional input ports are wired */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc004, 0xc004, 0, 0x18f3, input_port_read_handler8(machine->portconfig, "SW04"));
@@ -1514,7 +1514,7 @@ static DRIVER_INIT( razmataz )
 
 static DRIVER_INIT( ixion )
 {
-	szaxxon_decode(machine);
+	szaxxon_decode(machine, "main");
 
 	/* connect the universal sound board */
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r, sega_usb_data_w);
