@@ -2771,56 +2771,158 @@ ROM_END
 
 /***************************************************************************
 
-                        Great 1000 Miles Rally 2
+Great 1000 Miles Rally 2 USA
+Kaneko, 1995
 
-Bootup displays "TB06MM2EX 1000 Miglia 2"
-                "Master Up 95-04-04 19:39:01"
+PCB Layouts
+-----------
 
-Top board
----------
-PCB ID : M201F00138  KANEKO AX-SYSTEM BOARD
-CPU    : TMP68HC000N-16 (68000)
-SOUND  : Oki M6295 (x2)
-OSC    : 27.000MHz, 16.000MHz, 20.000MHz, 33.3330MHz
-RAM    : LC3664 (28 pin SOIC, x4)
-         UT6264 (28 pin SOIC, x2)
-         LH628256 (28 pin DIP, x6)
-         D42101 (24 pin DIP, x2)
-         424260 (40 pin SOIC, x2)
-PALs   : AXOP048, AXOP049, AXOP050 (GAL16V8, near M6295's)
-         AXOP021 \
-         AXOP022  |
-         AXOP062  |
-         AXOP063  |  (18CV8     )
-         AXOP064  |  (near 68000)
-         AXOP070  |
-         AXOP071  |
-         AXOP089 /
+KANEKO AX-SYSTEM BOARD 
+M201F00584 KANEKO (sticker)
+|------------------------------------------------------|
+|    PX4460  CNC1                                      |
+|LA4461     M6295            6264  6264                |
+|    LPF6K  M6295     PAL1           |----------|      |
+|                     PAL2           |KANEKO    |      |
+|                     PAL3           |VIEW2-CHIP|   CN3|
+|                                    |(QFP144)  |      |
+|           CNC2                     |          |      |
+|                                    |----------|      |
+|J                                   6264              |
+|A                                   6264              |
+|M               62256                                 |
+|M               62256               |----------|      |
+|A                                   |KANEKO    |      |
+|                                    |VIEW2-CHIP|      |
+|   MC1091                           |(QFP144)  |   CN2|
+|                                    |          |      |
+|       CNA                          |----------|      |
+|                               6264                   |
+|    |----|                     6264 |----------|      |
+|    | *1 |      62256               |KANEKO    |      |
+|    |----|      62256               |KC-002    |      |
+|             |---------------|      |(QFP208)  |      |
+|             |     68000     |      |          |      |
+|             |               |      |----------|      |
+|      PAL4   |---------------|33.3333MHz       424260 |
+|      PAL5              PAL6  20MHz            424260 |
+|                        PAL7  PAL8                    |
+|62256                PAL9                             |
+|62256                PAL10                            |
+|                     PAL11                            |
+|                     27MHz  16MHz                     |
+|            CNB                            CN1        |
+|------------------------------------------------------|
+Notes:
+      68000 - Toshiba TMP68HC000N-16 CPU running at 16.000MHz (SDIP64)
+      M6295 - Oki M6295 ADPCM Sample Player IC, clock 2.000MHz (both), sample rate = 2000000/165 (QFP44)
+      LA4461- Sanyo LA4461 12W Power Amplifier (SIP10, same as LA4460 but with reverse pinout)
+      LPF6K - KANEKO Custom Ceramic AD/DA Module (SIP7)
+      PX4460- KANEKO Custom Ceramic AD/DA Module (SIP5)
+      MC1091- KANEKO Custom Ceramic Input Module (ZIP46)
+      6264  - Sony CXK5864CM-10LL 8k x8 SRAM (SOP28)
+      62256 - Sony CXK58257ASP-70L 32k x8 SRAM (DIP28)
+      424260- NEC 424260-80 256k x16 DRAM (SOJ40)
+      PAL1  - AMI 18CV8PC-25 stamped 'AX0P048' (DIP20)
+      PAL2  - AMI 18CV8PC-25 stamped 'AX0P049' (DIP20)
+      PAL3  - AMI 18CV8PC-25 stamped 'AX0P050' (DIP20)
+      PAL4  - AMI 18CV8PC-25 stamped 'AX0P021' (DIP20)
+      PAL5  - AMI 18CV8PC-25 stamped 'AX0P022' (DIP20)
+      PAL6  - AMI 18CV8PC-25 stamped 'AX0P070' (DIP20)
+      PAL7  - AMI 18CV8PC-25 stamped 'AX0P071' (DIP20)
+      PAL8  - AMI 18CV8PC-25 stamped 'AX0P089' (DIP20)
+      PAL9  - AMI 18CV8PC-25 stamped 'AX0P062' (DIP20)
+      PAL10 - AMI 18CV8PC-25 stamped 'AX0P063' (DIP20)
+      PAL11 - AMI 18CV8PC-25 stamped 'AX0P064' (DIP20)
+      CNC1/CNC2 \
+      CNA/CNB   | Multi-pin connectors joining top board to bottom board
+      CN1/2/3   /
+      Custom IC's - 
+                   KANEKO VIEW2-CHIP (x2, QFP144)
+                   KANEKO KC-002 (QFP208)
+                   *1 - KANEKO JAPAN 9448 TA (QFP44)
 
-OTHER  : Custom chips
-                      Kaneko Japan 9448 TA (44 pin PQFP, near JAMMA connector)
-                      Kaneko VIEW2-CHIP (x2, 144 pin PQFP)
-                      Kaneko KC002 L0002 023 9339EK706 (208 pin PQFP)
 
-ROMs   : None
+KANEKO AX-SYSTEM BOARD ROM-08 
+AX09S00584 KANEKO (sticker)
+|------------------------------------------------------|
+| 93C46  SW1      CNB                        CN1       |
+|     |-------| EPROM.U31   SP_ROM0.U49                |
+|     |KANEKO |                                        |
+|CN4  |TBS0P02| EPROM.U32   SP_ROM1.U50    PAL8        |
+|     |(QFP74)|                                        |
+|     |-------| EPROM.U33   SP_ROM2.U51    SP-ROM4.U85 |
+|                                                      |
+|       PAL1                SP_ROM3.U52    SP-ROM5.U86 |
+|       PAL2                                           |
+|PAL3                                      SP-ROM6.U87 |
+|PAL4                                                  |
+|                                          SP-ROM7.U88 |
+|EPROM.U5                                              |
+|                         6116                         |
+|EPROM.U6                                  BG0_ROM0.U89|
+|         CNA             6116                         |
+|EPROM.U7                                  BG0_ROM1.U90|
+|                                                      |
+|EPROM.U8                                  BG1_ROM0.U93|
+|                                                      |
+|      PAL5                                BG1_ROM1.U94|
+|      PAL6               6116             PAL9        |
+|UPC339C                                            CN2|
+|UPC339C                  6116             BG2_ROM0.U91|
+|                                                      |
+|CNN3            CNC2                      BG2_ROM1.U92|
+|                                                      |
+|CNN2            S2_ROM0.U47  S2_ROM1.U65              |
+|                                          BG2_ROM0.U96|
+|CNN1            S1_ROM0.U48  S1_ROM1.U66           CN3|
+|   NE555                                  BG2_ROM1.U97|
+|AD7820          CNC1         PAL7                     |
+|------------------------------------------------------|
+Notes:
+      AD7820  - Analog Devices AD7820 Linear Compatible CMOS High Speed 8-Bit ADC with Track/Hold Function (DIP20)
+      93C46   - Atmel 93C46 Serial EEPROM (DIP8)
+      6116    - 2k x8 SRAM (DIP24)
+      NE555   - Texas Instruments NE555 General Purpose Single Bipolar Timer (DIP8)
+      UPC339C - NEC uPC339C Low Power Quad Comparator (DIP14)
+      PAL1    - Lattice GAL16V8B stamped 'COMUX2'   (DIP20)
+      PAL2    - Lattice GAL16V8B stamped 'COMUX3'   (DIP20)
+      PAL3    - AMI 18CV8PC-25 stamped 'COMUX1'     (DIP20)
+      PAL4    - AMI 18CV8PC-25 stamped 'MMS4P004'   (DIP20)
+      PAL5    - Lattice GAL16V8B stamped 'COMUX5'   (DIP20)
+      PAL6    - Lattice GAL16V8B stamped 'COMUX4'   (DIP20)
+      PAL7    - AMI 18CV8PC-25 stamped 'MMS4P067'   (DIP20)
+      PAL8    - Lattice GAL16V8B stamped 'MMS4G084' (DIP20)
+      PAL9    - Lattice GAL16V8B stamped 'MMS4G095' (DIP20)
+      CNN1/2/3- Connectors for analog controls
+      CN4     - 16 Pin Flat Cable Connector
+      CNC1/CNC2 \
+      CNA/CNB   | Multi-pin connectors joining top board to bottom board
+      CN1/2/3   /
+      Custom IC - KANEKO TBS0P02 Custom Microcontroller (QFP74)
 
+      ROMs - (Note: Not all ROM locations are populated on the above layout)
 
-Bottom board
-------------
-PCB ID : AX09S00138  KANEKO AX-SYSTEM BOARD ROM-08
-DIP    : 8 position (x1)
-RAM    : 6116 (x4)
-PALs   : COMUX4, COMUX4 (GAL16V8, near U21)
-         MMs4P067 (18CV8, near U47)
-         MMs6G095 (GAL16V8, near U94)
-         MMs4G084 (GAL16V8, near U50)
-         COMUX2, COMUX3 (GAL16V8, near U33)
-         COMUX1, MMS4P004 (18CV8, near U33)
+            Filename       Device Type           Use
+            -----------------------------------------------------
+            M2P1A1.U7      27C040 (4M)           \  68000 Program
+            M2P0A1.U8      27C040 (4M)           /
 
-OTHER  : 93C46 EEPROM
-         KANEKO TBSOP02 454 9451MK002 (74 pin PQFP, NEC uPD78324 series MCU?)
+            M2D0X0.U31     27C010 (1M)              MCU Program
 
-ROMs   :  (filename is ROM Label, extension is PCB 'u' location)
+            M2S0A1.U32     27C040 (4M)           \
+            M2S1A1.U33     27C040 (4M)           |
+            M2-200-00.U49  32M MaskROM (42-Pin)  |  Sprites
+            M2-201-00.U50  16M MaskROM (42-Pin)  |
+            M2-202-00.U51  16M MaskROM (42-Pin)  /
+
+            M2-300-00.U89  16M MaskROM (42-Pin)  \
+            M2-301-00.U90  16M MaskROM (42-Pin)  |  Tiles
+            M2B0X0.U93     27C010 (1M)           |
+            M2B1X0.U94     27C010 (1M)           /
+
+            M2-100-00.U48  8M MASKROM (32-Pin)   \  
+            M2W1A1.U47     27C040 (4M)           /  Oki Samples
 
 ***************************************************************************/
 

@@ -1629,6 +1629,184 @@ ROM_END
 /**************************************************************************************************************************
  **************************************************************************************************************************
  **************************************************************************************************************************
+
+Super Monaco GP
+Sega, 1989
+
+This game runs on Sega X-Board hardware.
+
+PCB Layouts
+-----------
+
+Main Board
+
+Top    : 834-6335
+Bottom : 171-5494
+Sticker: 834-7088-01 REV. B  SUPER MONACO GP
+|-----------------------------------------------------------------------------|
+|IC67 IC66 IC65 IC64 IC58 IC57 IC56 IC55             16MHz                    |
+|IC71 IC70 IC69 IC68                      IC107  IC15   IC11    IC8           |
+|IC75 IC74 IC73 IC72                             IC16   IC12                  |
+|IC79 IC78 IC77 IC76 IC63 IC62 IC61 IC60  IC108  IC17   IC13   IC10 IC9   IC3 |
+|                                                IC18   IC14                  |
+|                                                                             |
+|                                                                             |
+|     IC84              IC81                                                  |
+|                                                                IC23         |
+|                                                                IC22         |
+|                                       IC109                        IC21 IC20|
+|                     IC125      IC118              IC28             IC30 IC29|
+|IC93 IC92 IC91 IC90  IC126                                      IC31         |
+|                                             IC53               IC32         |
+|                     IC32                               IC40  IC38           |
+|                     IC33                                     IC39           |
+|IC97 IC96 IC95 IC94        IC127       IC117                                 |
+|                     IC134                                                   |
+|                     IC135                   50MHz                           |
+|                                                                     IC37    |
+|IC101 IC100 IC99 IC98  IC148                                                 |
+|                                        IC165                                |
+|                                                              IC42           |
+|                                 IC150                               IC41    |
+|IC105 IC104 IC103 IC102                                                      |
+|                    IC154  IC152                   IC160   IC159   DSWB  DSWA|
+|                       IC153     IC151  IC149                                |
+|-----------------------------------------------------------------------------|
+Notes:
+      ROMs:
+           IC58 : EPR12561A.58 (27C010 EPROM)
+           IC57 : not populated
+           IC63 : EPR12562A.63 (27C010 EPROM)
+           IC62 : not populated
+
+           IC11 : MPR12437.11  (831000 MASKROM)
+           IC12 : MPR12438.12  (831000 MASKROM)
+           IC13 : MPR12439.13  (831000 MASKROM)
+           IC17 : EPR12436.17  (27C512 EPROM)
+
+           IC21 : not populated
+           IC20 : EPR12574A.20 (27C010 EPROM)
+           IC30 : not populated
+           IC29 : EPR12575A.29 (27C010 EPROM)
+
+           IC40 : not populated
+
+           IC90 : MPR12425.90  (831000 MASKROM)
+           IC91 : MPR12421.91  (831000 MASKROM)
+           IC92 : MPR12417.92  (831000 MASKROM)
+           IC93 : EPR12609.93  (27C010 EPROM)
+
+           IC94 : MPR12426.94  (831000 MASKROM)
+           IC95 : MPR12422.95  (831000 MASKROM)
+           IC96 : MPR12418.96  (831000 MASKROM)
+           IC97 : EPR12610.97  (27C010 EPROM)
+
+           IC98 : MPR12427.98  (831000 MASKROM)
+           IC99 : MPR12423.99  (831000 MASKROM)
+           IC100: MPR12419.100 (831000 MASKROM)
+           IC101: EPR12611.101 (27C010 EPROM)
+
+           IC102: MPR12428.102 (831000 MASKROM)
+           IC103: MPR12424.103 (831000 MASKROM)
+           IC104: MPR12420.104 (831000 MASKROM)
+           IC105: EPR12612.105 (27C010 EPROM)
+
+           IC154: EPR12429.154 (27C512 EPROM)
+           IC153: EPR12430.153 (27C512 EPROM)
+           IC152: EPR12431.152 (27C512 EPROM)
+
+      PALs:
+           IC18 : 315-5280
+           IC84 : 315-5278
+           IC109: 315-5290
+           IC117: 315-5291
+           IC127: 315-5304
+
+      RAM:
+          IC9  : 6116    (2K x8 SRAM)
+          IC10 : 6116    (2K x8 SRAM)
+          IC16 : 6116    (2K x8 SRAM)
+          IC22 : 6264    (8K x8 SRAM)
+          IC23 : 6264    (8K x8 SRAM)
+          IC31 : 6264    (8K x8 SRAM)
+          IC32 : 6116    (2K x8 SRAM)
+          IC32 : 6264    (8K x8 SRAM)
+          IC33 : 6116    (2K x8 SRAM)
+          IC38 : 6264    (8K x8 SRAM)
+          IC39 : 6264    (8K x8 SRAM)
+          IC55 : 6264    (8K x8 SRAM)
+          IC56 : 6264    (8K x8 SRAM)
+          IC60 : 6264    (8K x8 SRAM)
+          IC61 : 6264    (8K x8 SRAM)
+          IC64 : TC51832 (32K x8 SRAM)
+          IC65 : TC51832 (32K x8 SRAM)
+          IC66 : TC51832 (32K x8 SRAM)
+          IC67 : TC51832 (32K x8 SRAM)
+          IC68 : TC51832 (32K x8 SRAM)
+          IC69 : TC51832 (32K x8 SRAM)
+          IC70 : TC51832 (32K x8 SRAM)
+          IC71 : TC51832 (32K x8 SRAM)
+          IC72 : TC51832 (32K x8 SRAM)
+          IC73 : TC51832 (32K x8 SRAM)
+          IC74 : TC51832 (32K x8 SRAM)
+          IC75 : TC51832 (32K x8 SRAM)
+          IC76 : TC51832 (32K x8 SRAM)
+          IC77 : TC51832 (32K x8 SRAM)
+          IC78 : TC51832 (32K x8 SRAM)
+          IC79 : TC51832 (32K x8 SRAM)
+          IC125: MB81C78 (8K x8 SRAM ?)
+          IC126: MB81C78 (8K x8 SRAM ?)
+          IC134: 62256   (32K x8 SRAM)
+          IC135: 62256   (32K x8 SRAM)
+          IC150: 6264    (8K x8 SRAM)
+          IC151: 6264    (8K x8 SRAM)
+
+      SEGA Customs:
+                   IC8  : 315-5218  (QFP100)
+                   IC37 : 315-5248  (QFP100)
+                   IC41 : 315-5249  (QFP120)
+                   IC42 : 315-5275  (QFP100, located underneath the PCB)
+                   IC53 : 315-5250  (QFP120)
+                   IC81 : 315-5211A (PGA179)
+                   IC107: 315-5248  (QFP100)
+                   IC108: 315-5249  (QFP120)
+                   IC148: 315-5197  (PGA135)
+                   IC149: 315-5242  (Custom ceramic DIP package. contains a QFP44 and some smt resistors/caps etc)
+
+      OTHER:
+            IC14 : Z80 CPU (DIP40)
+            IC15 : YM2151 (DIP24)
+            IC28 : 68000 CPU (DIP64)
+            IC118: Hitachi FD1094 Encrypted 68000 CPU
+            IC159: SONY CXD1095 (QFP64)
+            IC160: SONY CXD1095 (QFP64)
+            IC165: ADC0804 (DIP20)
+
+
+Network Board
+
+Top    : 834-6780
+Bottom : 171-5729-01
+Sticker: 834-7112
+
+|---------| |--| |----------------------|
+|         RX   TX            315-5336   |
+|             315-5337                  |
+|                                       |
+|            16MHz      6264            |
+|                     EPR12587.14       |
+| MB89372P-SH     Z80E        MB8421    |
+|---------------------------------------|
+Notes:
+      PALs     : 315-5337, 315-5336
+      Z80 clock: 8.000MHz
+      6264     : 8K x8 SRAM
+      MB8421   : Manufactured by Fujitsu, SDIP52
+      MB89372  : Manufactured by Fujitsu, SDIP64
+      EPR12587 : 27C256 EEPROM
+
+***********************************************************************
+
     Super Monaco GP, Sega X-board
     CPU: FD1094 (317-0126a)
 
@@ -1675,6 +1853,7 @@ ROM_END
 
     Ep12587.14
 */
+
 ROM_START( smgp )
 	ROM_REGION( 0x80000, "main", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "epr12563b.58", 0x00000, 0x20000, CRC(baf1f333) SHA1(f91a7a311237b9940a44b815716d4226a7ae1e8b) )
