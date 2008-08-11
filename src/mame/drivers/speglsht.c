@@ -44,6 +44,62 @@ SETA ST-0016 TC6187AF JAPAN 9348YAA (U68, 208pin PQFP, sound & object)
            514256-70 514256-70
                                                 NEC D6376
 
+PCB Layout
+----------
+
+GOLF E30-001A
+|-------------------------------------------------------------|
+|     VOL                                                     |
+|         MB3714                                              |
+|                                                             |
+|          D6376                          PAL6                |
+|                              PAL5            MB3790         |
+|                                                             |
+|                                                             |
+|                       PAL4                          TC528257|
+|J                      PAL3               TC514256           |
+|A                      PAL2               TC514256   TC528257|
+|M                                         TC514256           |
+|M                                         TC514256   TC528257|
+|A                      PAL1 SX004-06.U35  TC514256           |
+|                                          TC514256     50MHz |
+|                            SX004-05.U34  TC514256           |
+|           *       LH52B256               TC514256 |-------| |
+|     SX004-07.U70  LH52B256 SX004-04.U33           | R3051 | |
+|    TC514256 TC514256                              |       | |
+|                 42.9545MHz SX004-03.U32           |-------| |
+|          |-------|                      |-------|           |
+|TC5588    |ST0016 |         SX004-02.U31 |ST0015 |           |
+|          |       |                      |       |           |
+|SW4 SW3   |-------|         SX004-01.U30 |-------|           |
+|-------------------------------------------------------------|
+Notes:
+      VOL     : Master Volume Potentiometer
+      MB3714  : Fujitsu MB3714 Power Amp 
+      D6376   : NEC uPD6376 2-channel 16-bit D/A convertor (SOIC16)
+      MB3790  : Power Monitoring IC with Reset and Watchdog Timer Function (SOIC16)
+      TC528257: Toshiba TC528257 32k x8 SRAM (SOJ28)
+      TC5588  : Toshiba TC5588 8k x8 SRAM (SOJ28)
+      TC514256: Toshiba TC514256 32k x8 SRAM (SOJ28)
+      LH52B256: Sharp LH52B256 32k x8 SRAM (SOP28)
+      R3051   : IDT 79R3051-25 CPU (PLCC84, Main CPU, R3000 core, running at 25MHz)
+      ST0015  : Seta ST-0015 Custom (QFP208)
+      ST0016  : Seta ST-0016 Custom (QFP208, Sub CPU with Z80 core)
+                note - 42.9545MHz OSC is tied to ST-0016 on pin 191, there's probably
+                internal divider. Actual chip might run at 7.159MHz (/6) or 14.31818MHz (/3)?
+      PAL1    : Lattice GAL16V8B (DIP20, labelled 'SX004-10')
+      PAL2    : Lattice GAL22V10B (DIP24, labelled 'SX004-11')
+      PAL3    : Lattice GAL22V10B (DIP24, labelled 'SX004-12')
+      PAL4    : Lattice GAL22V10B (DIP24, labelled 'SX004-13')
+      PAL5    : Lattice GAL16V8B (DIP20, labelled 'SX004-09')
+      PAL6    : Lattice GAL16V8B (DIP20, labelled 'SX004-08')
+      SW3     : 8 position Dip Switch
+      SW4     : 8 position Dip Switch
+      U30,U31,
+      U32,U33 : Macronix MX27C4000 512k x8 EPROM (DIP32, PCB labelled 'RPRO0', 'RPRO1', 'RPRO2', 'RPRO3')
+      U34,U35 : 8M MASKROM (DIP42, PCB labelled 'RD0', 'RD1')
+      U70     : 16M MASKROM (DIP42, PCB labelled 'ZPRO0')
+      *       : Unpopulated position for 16M DIP42 MASKROM (PCB labelled 'ZPRO1')
 
 */
 

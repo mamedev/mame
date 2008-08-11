@@ -1676,6 +1676,20 @@ ROM_START( uccops )
 	ROM_LOAD( "uc_w42.rom", 0x000000, 0x080000, CRC(d17d3fd6) SHA1(b02da0d01c41c7bf50cd35d6c75bacc3e3e0b85a) )
 ROM_END
 
+
+/*
+Undercover Cops Alpha Renewal Version
+Irem, 1992
+
+An alt. version, runs on standard 
+M92 main board:  M92-A-B 05C04170B1
+
+ROM board:  M92-E-B 05C04238B1
+Chips used are...
+Nanao 08J27504A1  
+Nanao 08J27291A5  @ 14.31818MHz
+*/
+
 ROM_START( uccopsar ) /* Alpha Renewal Version */
 	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_BYTE( "uc_h0_a.ic28", 0x000001, 0x040000, CRC(9e17cada) SHA1(086bb9c1ab851cab3734c2f9188d8ff3c5f98913) )

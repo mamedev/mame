@@ -1113,6 +1113,32 @@ ROM_START( rohga2 ) /* Asia/Europe v3.0 Alternate Set */
 	ROM_LOAD( "hb-00.11p", 0x00000,  0x200,  CRC(b7a7baad) SHA1(39781c3412493b985d3616ac31142fc00bbcddf4) )	/* ? */
 ROM_END
 
+
+/*
+PCB No: DE-0353-3
+Mask ROM code: MAM
+Sound : 45 (HuC6280 CPU), OKI M6295 (x2), YM2151, YM3012
+RAM   : 6264 (x4 near 113 + x1 near 18P - 5 total) 
+Xtals: 32.200MHz, 28.000MHz
+DIPSW: 8 position x3
+PALs: PAL16L8 x4 labelled TP-00 (near MAM-07), TP-01, TP-02 (both near 68000),
+      TP-04 (near 113 and HB-00)
+DE ICs:
+59 (CPU, 68000)
+55, 56 (BG)
+52 x2, 71 (Sprites)
+104 (I/O+Protection)
+113 (Linked to 104, Alpha Blending)
+
+ROMs:
+JD00-2.2A  \
+JD03-2.2D  / Main Program
+HB-00.11P  - PROM located near 113 and 4x 6264 RAMs
+MAM-13.15P - Oki Samples, this was missing from existing archive
+
+Sound out is stereo, there is a jumper to select Mono or Stereo output.
+*/
+
 ROM_START( rohgah ) /* Hong Kong v3.0 */
 	ROM_REGION(0x200000, "main", 0 ) /* 68000 code */
 	ROM_LOAD16_BYTE( "jd00-2.2a", 0x000000, 0x40000, CRC(ec70646a) SHA1(5e25fe8ce0dfebf8f5903ebe9aa5ef01ca7aa2f0) )

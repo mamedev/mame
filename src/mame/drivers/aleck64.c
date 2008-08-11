@@ -500,6 +500,15 @@ ROM_START( mtetrisc )
 	ROM_LOAD ( "at24c01.u34", 0x000000, 0x80,  CRC(ba7e503f) SHA1(454aa4fdde7d8694d1affaf25cd750fa678686bb) )
 ROM_END
 
+
+/*
+Star Soldier Vanishing Earth for Aleck64
+Uses standard PCB '3D ROM PCB-2A' containing... (PCB Labels in brackets)
+1x Macronix MX23C9602CZ 96MBit Serial EEPROM @ U3 (NUS96M)
+1x CIC-NUS-5101 Protection Chip (CIC-NUS)
+1x BK4D-NUS (BU9850)
+*/
+
 ROM_START( starsldr )
 	ROM_REGION32_BE( 0x800, "user1", ROMREGION_ERASE00 )
 	PIF_BOOTROM
@@ -518,6 +527,15 @@ ROM_START( srmvs )
 
 ROM_END
 
+
+/*
+Vivid Dolls for Aleck64
+Uses standard PCB '3D ROM PCB-2A' containing... (PCB Labels in brackets)
+1x CIC-NUS-5101 Protection Chip (U1 CIC-NUS)
+1x BK4D-NUS (U2 BU9850)
+1x Macronix MX23C6402CZ 64MBit Serial EEPROM (U3 NUS64M)
+*/
+
 ROM_START( vivdolls )
 	ROM_REGION32_BE( 0x800, "user1", ROMREGION_ERASE00 )
 	PIF_BOOTROM
@@ -526,6 +544,19 @@ ROM_START( vivdolls )
 	ROM_LOAD16_WORD_SWAP( "nus-zsaj-0.u3", 0x000000, 0x800000,  CRC(f3220e29) SHA1(06d8b808cc19378b046803f4dc75c7d791b7767f) )
 
 ROM_END
+
+
+/*
+Tower And Shaft for Aleck64
+Uses custom PCB 'ALK-ROM01 ARUZE' containing... (PCB Labels in brackets)
+1x Macronix MX23C6402CZ 64MBit Serial EEPROM (U1)  Note - This ROM is mostly empty.
+1x Altera MAX EPM3128ATC144-10 CPLD/FPGA labelled AL01 (U2)
+1x Fujitsu MSP55LV128 128MBit SOP44 FlashROM labelled UA3012-ALL02-U3 (U3)
+1x BK4D-NUS BU9850 (U5)
+1x CIC-NUS-5101 Protection Chip (U6)
+1x 74F245 Logic Chip
+Some transistors
+*/
 
 ROM_START( twrshaft )
 	ROM_REGION32_BE( 0x800, "user1", ROMREGION_ERASE00 )

@@ -1382,6 +1382,50 @@ ROM_START( offrodc1 ) /* Version 1.10, Mon 08-18-97 */
 ROM_END
 
 
+/*
+War Gods
+Midway, 1996
+
+This game runs on hardware that appears to be similar to Cruisin' USA but using 
+a 420M 2.5" IDE hard drive. Only about 100M of the hard drive is used.
+There are only 2 ROMs located at U12 and U41.
+
+PCB LAYOUT
+|-------------------------------------------------------------------------------------------------------------------|
+|                                                                         SEAGATE ST9420AG                          |
+|                                                                                                                   |
+|                                                                                                                   |
+|                                                                                                                   |
+|                                                 |-------------|                                                   |
+|NEC431008LE-15 x4          LH540204U-20 x2       |MIDWAY       |                U12              16.000MHz         |
+|                                                 |5410-14591-00|                |-------------|                    |
+| |---------|                      |-------------||(C)1995      |                |MIDWAY       |                    |
+| |TMS320C31|         16.6667MHz   |LSI LIA7968  ||             |                |5410-14590-00|   ADSP-2115        |
+| |PQL60    |         40.0000MHz   |5410-1346500 ||             |                |(C)1995      |                    |
+| |         |                      |MIDWAY MFG CO||-------------|                |-------------|   NEC4218160 x1    |
+| |         |                      |             |                                   M628032-15E x3                 |
+| |---------|                      |             |                        ALTERA                                    |
+|  60.00MHz                        |-------------|  NEC4218160-60 x2      EPM7032LC44-15T                           |
+|                                                                                                                   |
+|                                                                                                                   |
+|                                                                            U41                                    |
+|                                                                                                                   |
+|                         TMS55165DGH-70 x2          NEC424260-70 x4                                                |
+|                                                                                                                   |
+|                                                                                  4MHz                  BATT+3V    |
+|TL084 x2                                                                          PIC16C57(U69)  MAX232            |
+|                         M628032-20E x2                                    |-------------|                         |-|
+|AD1866                                                                     |MIDWAY       |     SW2   ULN2064B      | |9 PIN
+|                                                                           |5410-14589-00|                         | |SERIAL
+|                                                                           |(C) 1995     |     SW1                 |-|LINK
+|                                                                           |             |                         |
+|                                                                           |             |                         |
+|                                                                           |-------------|                         |
+|                                                                                                                   |
+|                             |--|           J   A   M   M   A           |--|                                       |
+|-----------------------------|  |---------------------------------------|  |---------------------------------------|
+*/
+
 ROM_START( wargods ) /* Boot EPROM Version 1.0, Game Type: 452 (12/11/1995) */
 	ROM_REGION16_LE( 0x10000, "dcs", 0 )	/* sound data */
 	ROM_LOAD16_BYTE( "u2.rom",   0x000000, 0x8000, CRC(bec7d3ae) SHA1(db80aa4a645804a4574b07b9f34dec6b6b64190d) )

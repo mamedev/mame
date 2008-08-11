@@ -469,6 +469,34 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
+/*
+Tickee Tickats
+Raster Elite, 1994
+
+This is a gun shooting game similar to Point Blank, with ticket redemption on game completion.
+The PCB is around 6" square and contains only a few conponents.
+
+CPU  : TMS34010FNL-40
+SOUND: AY-3-8910 (x2)
+OSC  : 40.000MHz, 14.31818MHz
+RAM  : TOSHIBA TC524258BZ-80 (x4)
+DIPSW: 8 position (x1)
+PROMs: None
+PALs : None
+OTHER: ADV476KN50E (DIP28)
+       MACH110 (CPLD, PLCC44)
+       DALLAS DS1220Y-150 (NVRAM)
+       4-pin header for standard light gun (x2)
+       
+ROMS : 
+-----------------------------------------
+ds1220y.ic1  NVRAM       located near ic2
+1.ic2        27C040  \
+2.ic3        27C040   |
+3.ic4        27C040   |  main program
+4.ic5        27C040   /
+*/
+
 ROM_START( tickee )
 	ROM_REGION16_LE( 0x200000, "user1", 0 )	/* 34010 code */
 	ROM_LOAD16_BYTE( "3.ic4",  0x000000, 0x80000, CRC(5b1e399c) SHA1(681608f06bbaf3d258e9f4768a8a6c5047ad08ec) )

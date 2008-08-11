@@ -752,6 +752,55 @@ static MACHINE_DRIVER_START( squash )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+
+/*
+Squash (version 1.0)
+Gaelco, 1992
+
+PCB Layout
+----------
+
+REF 922804/1
+|---------------------------------------------|
+|   LM358  SOUND.1D    26MHz     6116         |
+|   VOL                PAL       6116         |
+|          M6295                 6116         |
+|  1MHz            |-------|     6116         |
+|                  |ACTEL  |                  |
+|J                 |A1020A |    C12.6H        |
+|A         6116    |PL84C  |    C11.7H        |
+|M                 |-------|    C10.8H        |
+|M         6116                 C09.10H       |
+|A                 |-------|     PAL          |
+|                  |ACTEL  |    6264          |
+|                  |A1020A |    6264          |
+|         D16.E16  |PL84C  |             PAL  |
+| SW1     62256    |-------|                  |
+|    68000                                    |
+| SW2     D18.E18               6116          |
+|20MHz    62256                 6116          |
+|         PAL                                 |
+|---------------------------------------------|
+Notes:
+      68000 CPU running at 10.000MHz
+      OKI M6295 running at 1.000MHz. Sample Rate = 1000000 / 132
+      62256 - 32k x8 SRAM (x2, DIP28)
+      6264  - 8k x8 SRAM  (x2, DIP28)
+      6116  - 2k x8 SRAM  (x8, DIP24)
+      VSync - 58Hz
+      
+      ROMs:
+           SQUASH_D16.E16    27C010   \
+           SQUASH_D18.E18    27C010   /  68K Program
+
+           SQUASH_C09.10H    27C040   \
+           SQUASH_C10.8H     27C040   |
+           SQUASH_C11.7H     27C040   |  GFX
+           SQUASH_C12.6H     27C040   /
+
+           SQUASH_SOUND.1D   27C040      Sound
+*/
+
 /* encrypted video ram */
 ROM_START( squash )
 	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */

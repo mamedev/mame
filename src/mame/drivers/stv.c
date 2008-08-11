@@ -3168,6 +3168,22 @@ ROM_START( sandor )
 	ROM_RELOAD(                           0x1000000, 0x0400000 )
 ROM_END
 
+
+/*
+Treasure Hunt
+Deniam (Licensed to Sega Enterprises, Ltd), 1997
+
+PCB Number: LEX-0704
+
+This is a non-Sega-manufactured STV cart which works with Japanese and USA bioses. 
+The cart is mostly the same as the Sega carts, containing not a lot except some ROMs
+and logic chips.
+
+On the top side, there are two 27C040 EPROMs and positions for 5 maskROMs, but only 4 of
+them are populated. In between the two eproms is an unpopulated position for a TSOP40 flashROM.
+On the bottom are locations for 5 maskROMs (none are populated) and also some logic ICs.
+*/
+
 ROM_START( thunt )
 	STV_BIOS
 

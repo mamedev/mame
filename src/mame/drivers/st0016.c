@@ -485,6 +485,10 @@ E51-00001-A
 |                                    |
 |  DSW1   DSW2        RENJYU-1  6264 |
 |------------------------------------|
+
+Note:
+      Unknown QFP (surface scratched off) is the CPU 
+        + GFX generator - it's possibly NEC V70/V810
 */
 
 ROM_START( renju )

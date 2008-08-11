@@ -2044,24 +2044,76 @@ static DRIVER_INIT( s1945jn )
 
 /***************************************************************************
 
-                            Strikers 1945 (Japan)
+Strikers 1945
+1995, Psikyo
 
-Board:  SH404
+PCB Layout
+----------
+
+SH404
+|----------------------------------------------------------|
+|HA1388  2058D   62256 6264  62256  16MHz PAL1 * 3.U63 U61 |
+|       YAC513-M 62256 62256 6264   14.31818MHz  33.8688MHz|
+|  VOL                                                     |
+|                         |------|62256 |-------||-------| |
+|      4MHz   LH5168      |PS3204|62256 |LZ8420M||YMF278B| |
+|     16C57   LH5168      |------|      |-------||-------| |
+|         PAL2                                             |
+|                                                          |
+|J                                          |--------|     |
+|A           |------| 5.U41   62256  62256  |        |     |
+|M           |68020 | 4.U40   62256  62256  | PS3103 | U34 |
+|M           |------|                       |        |     |
+|A  |------|                                |--------|     |
+|   |PS3305|                                               |
+|   |------|              |--------|                       |
+|                         |        |      U23 U22 U21 U20  |
+| MB3771                  |PS2001B |                       |
+|    6264   62256 62256   |        |                       |
+|    6264   62256 62256   |--------|                       |
+|                                                          |
+|DIP1                     6116  6116                       |
+|DIP2                     6116  6116        LH5168     U1  |
+|----------------------------------------------------------|
+Notes:
+      68020    - Motorola MC68EC020 CPU (QFP100, running at 16.000MHz)
+      PS3305   - Psikyo Custom (QFP100)
+      PS3204   - Psikyo Custom (QFP100)
+      PS2001B  - Psikyo Custom (QFP160)
+      PS3103   - Psikyo Custom (QFP160)
+      6116     - 2k x8 SRAM (x4, DIP24)
+      LH5168   - Sharp LH5168 2k x8 SRAM (x3, DIP24)
+      62256    - NKK N341256 32k x8 SRAM (x14, DIP28)
+      6264     - ISSI IS61C64 8k x8 SRAM (x4, DIP28)
+      MB3771   - Fujitsu MB3771 Master Reset IC (DIP8)
+      DIP1     - 8 position DIP Switch
+      DIP2     - 8 position DIP Switch
+      PAL1     - AMD PALCE 16V8H (DIP20, stamped '4041')
+      PAL2     - AMD PALCE 16V8H (DIP20, stamped '4040')
+      YMF278B  - Yamaha YMF278B-F Sound Chip, running at 33.8688MHz (QFP64)
+      3.U63    - Macronix MX27C1000 128k x8 EPROM (Sound Program, DIP32, labelled '3')
+      4.U40    - AMD AM27C2048 256k x16 EPROM (Main Program, DIP40, labelled '4' & '5')
+      5.U41    /
+      16C57    - Microchip PIC16C57 Microcontroller (DIP24, running at 4.000MHz, labelled '1')
+      YAC513   - Yamaha YAC513-M D/A Converter (SOIC16)
+      LZ8420M  - Sharp LZ8420M Z80-core CPU (QFP64, running at 4.000MHz)
+      HA1388   - Hitachi HA1388 Sound Amp
+      2058D    - JRC 2058 Op Amp
+      U61, U34,\
+      U20, U21,- 16M MASKROM (SOP44)
+      U22, U23 /
+      U1       - 4M MASKROM (SOP44)
+      VOL      - Master Volume Potentiometer
+      *        - Unpopulated position for 16M SOP44 MASKROM
+      
+
 CPU:    MC68EC020FG16
-Sound:  LZ8420M (Z80 core)
-        YMF278B-F
 OSC:    16.000MHz
         14.3181MHz
         33.8688MHz (YMF)
         4.000MHz (PIC)
 
-Chips:  PS2001B
-        PS3103
-        PS3204
-        PS3305
-
-
-1-U59      security (PIC16C57; not dumped)
+1-U59   security (PIC16C57; not dumped)
 
 ***************************************************************************/
 

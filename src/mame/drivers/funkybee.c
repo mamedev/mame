@@ -375,6 +375,36 @@ ROM_START( funkbeeb )
 	ROM_LOAD( "funkybee.clr",   0x0000, 0x0020, CRC(e2cf5fe2) SHA1(50b293f48f078cbcebccb045aa779ced2fb298c8) )
 ROM_END
 
+
+/*
+Sky Lancer PCB Layout
+---------------------
+
+  |--------------------------------------------|
+ _|                          ROM.U33           |
+|                                              |
+|                            ROM.U32           |
+|    WF19054                                   |
+|                                              |
+|_                                             |
+  |                                  6264      |
+  |                     |------|     6116      |
+ _|           DSW4(8)   |ACTEL |               |
+|             DSW3(8)   |A1010B|               |
+|             DSW2(8)   |      |          6264 |
+|             DSW1(8)   |------|               |
+|                                         6264 |
+|    M5M82C255                                 |
+|                                              |
+|       ROM.U35                                |
+|3.6V_BATT                                     |
+|_          6116              Z80        12MHz |
+  |--------------------------------------------|
+Notes:
+      Z80 @ 3.0MHz [12/4]
+      WF19054 = AY-3-8910 @ 1.5MHz [12/8]
+*/
+
 ROM_START( skylancr )
   	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "1sl.5a",        0x0000, 0x2000, CRC(e80b315e) SHA1(0c02aa9f0d4bdfc3482c400d0e4e38fd3912a512) )

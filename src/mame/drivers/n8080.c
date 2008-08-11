@@ -474,6 +474,120 @@ static INPUT_PORTS_START( helifire )
 INPUT_PORTS_END
 
 
+/*
+Space Fever (3 sets, Space Fever?, High Splitter?, Space Launcher?)
+Nintendo, 1979
+
+Note: These are all simple ROM swaps on a standard b/w Space Fever PCB.
+
+
+PCB Layouts
+-----------
+
+Top Board (Sound PCB)
+
+TSF-SOU
+|----------------------------------------------------|
+|                                 VR3    VR2    VR1  |
+|  8035                    74123                     |
+|                 74275                              |
+|  6MHz                                              |
+|                          74123         SN76477     |
+|  SF_SOUND.IC2   74275                              |
+|                                                    |
+|                          7405                      |
+|                                                    |
+|----------------------------------------------------|
+Notes:
+      All IC's shown.
+      There is no AMP on the PCB, sound amplification is done via a small external AMP board.
+      ROM IC2 is a 2708 EPROM.
+      VR1: master volume
+      VR2: shoot volume
+      VR3: music volume
+      8035 clocks: pins 2 and 3 measure 6.000MHz 
+                   pin 9 measures 399.256kHz
+                   pin 12 measures 200.0kHz
+                   pin 13 measures 105.0kHz
+                   pin 21 measures 399.4Khz
+                   pin 22 measures 400.0kHz
+                   pin 23 measures 399.3kHz
+                   pin 24 measures 399.3kHz
+                   pin 39 measures 61.5627Hz
+      
+
+Middle board
+------------
+
+TSF-I/O  PI-500803
+|----------------------------------------------------|
+|                                                    |
+|     VR1                                            |
+|                     20.160MHz                      |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                     DSW1(8)                        |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|----------------------------------------------------|
+Notes:
+      VR1: adjusts brightness
+      Board contains mostly logic ICs (not shown)
+      Video output is b/w, the harness is wired to a JAMMA fingerboard but only blue is used.
+      
+
+Bottom board
+------------
+
+TSF-CPU  PI-500802
+|----------------------------------------------------|
+|                                                    |
+|                                                    |
+|                                                    |
+|             SF_F1.F1  SF_G1.G1  SF_H1.H1  SF_I1.I1 |
+|                                                    |
+|   8080                                             |
+|                                                    |
+|             SF_F2.F2  SF_G2.G2  SF_H2.H2  SF_I2.I2 |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|                                                    |
+|     4116  4116  4116  4116  4116  4116  4116  4116 |
+|----------------------------------------------------|
+Notes:
+      All ROMs are 2708, 1K x8
+      4116: 2K x8 DRAM
+      8080 clock: 2.0160MHz (20.160 / 10)
+      Sync: no V reading, H is 15.57kHz
+      
+      Set 1 is on the PCB and is complete.
+      Some ROMs in set1 match the current sfeverbw set.
+      
+      The other two sets were supplied as just EPROMs.
+      Set2 (maybe High Splitter) is missing the ROM at location I2. Might be missing, or maybe
+      just the program is smaller and the extra ROM was not required.
+*/
+
 ROM_START( spacefev )
 	ROM_REGION( 0x8000, "main", 0 )
 	ROM_LOAD( "sf.f1",    0x0000, 0x0400, CRC(35f295bd) SHA1(34d1df25fcdea598ca1191cecc2125e6f63dbce3) )
