@@ -384,7 +384,7 @@ static WRITE8_HANDLER( namcos1_coin_w )
 
 static void namcos1_update_DACs(void)
 {
-	DAC_signed_data_16_w(0,0x8000 + (dac0_value * dac0_gain) + (dac1_value * dac1_gain));
+	dac_signed_data_16_w(0,0x8000 + (dac0_value * dac0_gain) + (dac1_value * dac1_gain));
 }
 
 void namcos1_init_DACs(void)
@@ -464,9 +464,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(17)	/* Banked ROMs */
-	AM_RANGE(0x4000, 0x4001) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0x4000, 0x4001) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x4001, 0x4001) AM_WRITE(ym2151_data_port_0_w)
 	AM_RANGE(0x5000, 0x53ff) AM_READWRITE(namcos1_cus30_r, namcos1_cus30_w) AM_MIRROR(0x400) AM_BASE(&namco_wavedata) /* PSG ( Shared ) */
 	AM_RANGE(0x7000, 0x77ff) AM_RAMBANK(18)	/* TRIRAM (shared) */
 	AM_RANGE(0x8000, 0x9fff) AM_RAM	/* Sound RAM 3 */

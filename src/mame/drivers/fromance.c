@@ -343,8 +343,8 @@ static ADDRESS_MAP_START( nekkyoku_writeport_sub, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xe6, 0xe6) AM_WRITE(fromance_busycheck_sub_w)
 	AM_RANGE(0xe7, 0xe7) AM_WRITE(fromance_adpcm_reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0xe9, 0xe9) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xea, 0xea) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0xe9, 0xe9) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xea, 0xea) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_readport_sub, ADDRESS_SPACE_IO, 8 )
@@ -364,8 +364,8 @@ static ADDRESS_MAP_START( idolmj_writeport_sub, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x26, 0x26) AM_WRITE(fromance_busycheck_sub_w)
 	AM_RANGE(0x27, 0x27) AM_WRITE(fromance_adpcm_reset_w)
 	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0x29, 0x29) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x2a, 0x2a) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x29, 0x29) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x2a, 0x2a) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromance_writeport_sub, ADDRESS_SPACE_IO, 8 )
@@ -378,8 +378,8 @@ static ADDRESS_MAP_START( fromance_writeport_sub, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x26, 0x26) AM_WRITE(fromance_busycheck_sub_w)
 	AM_RANGE(0x27, 0x27) AM_WRITE(fromance_adpcm_reset_w)
 	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)
-	AM_RANGE(0x2a, 0x2a) AM_WRITE(YM2413_register_port_0_w)
-	AM_RANGE(0x2b, 0x2b) AM_WRITE(YM2413_data_port_0_w)
+	AM_RANGE(0x2a, 0x2a) AM_WRITE(ym2413_register_port_0_w)
+	AM_RANGE(0x2b, 0x2b) AM_WRITE(ym2413_data_port_0_w)
 ADDRESS_MAP_END
 
 

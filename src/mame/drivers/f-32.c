@@ -30,17 +30,17 @@ static WRITE32_HANDLER( oki_32bit_w )
 
 static READ32_HANDLER( ym2151_status_32bit_r )
 {
-	return YM2151_status_port_0_r(machine, 0);
+	return ym2151_status_port_0_r(machine, 0);
 }
 
 static WRITE32_HANDLER( ym2151_data_32bit_w )
 {
-	YM2151_data_port_0_w(machine, 0, data & 0xff);
+	ym2151_data_port_0_w(machine, 0, data & 0xff);
 }
 
 static WRITE32_HANDLER( ym2151_register_32bit_w )
 {
-	YM2151_register_port_0_w(machine,0,data & 0xff);
+	ym2151_register_port_0_w(machine,0,data & 0xff);
 }
 
 static READ32_HANDLER( eeprom_r )

@@ -148,17 +148,17 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
-	AM_RANGE(0xf000, 0xf000) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0xf002, 0xf002) AM_READ(YM2203_status_port_1_r)
+	AM_RANGE(0xf000, 0xf000) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0xf002, 0xf002) AM_READ(ym2203_status_port_1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(YM2203_control_port_1_w)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE(YM2203_write_port_1_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xf002, 0xf002) AM_WRITE(ym2203_control_port_1_w)
+	AM_RANGE(0xf003, 0xf003) AM_WRITE(ym2203_write_port_1_w)
 ADDRESS_MAP_END
 
 /* Whizz */
@@ -228,14 +228,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( whizz_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(YM2151_status_port_0_r)
+	AM_RANGE(0x01, 0x01) AM_READ(ym2151_status_port_0_r)
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( whizz_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym2151_data_port_0_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 

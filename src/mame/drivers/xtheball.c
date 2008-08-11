@@ -126,7 +126,7 @@ static void xtheball_from_shiftreg(UINT32 address, UINT16 *shiftreg)
 static WRITE16_HANDLER( dac_w )
 {
 	if (ACCESSING_BITS_8_15)
-		DAC_data_w(0, data >> 8);
+		dac_data_w(0, data >> 8);
 }
 
 

@@ -71,10 +71,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( battlnts_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM							/* ROM 777c01.rom */
 	AM_RANGE(0x8000, 0x87ff) AM_RAM							/* RAM */
-	AM_RANGE(0xa000, 0xa000) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w)	/* YM3812 (chip 1) */
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM3812_write_port_0_w)		/* YM3812 (chip 1) */
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE(YM3812_status_port_1_r, YM3812_control_port_1_w)	/* YM3812 (chip 2) */
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM3812_write_port_1_w)		/* YM3812 (chip 2) */
+	AM_RANGE(0xa000, 0xa000) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)	/* YM3812 (chip 1) */
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym3812_write_port_0_w)		/* YM3812 (chip 1) */
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(ym3812_status_port_1_r, ym3812_control_port_1_w)	/* YM3812 (chip 2) */
+	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym3812_write_port_1_w)		/* YM3812 (chip 2) */
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)			/* soundlatch_r */
 ADDRESS_MAP_END
 

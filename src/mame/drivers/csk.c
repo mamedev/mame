@@ -204,8 +204,8 @@ static ADDRESS_MAP_START( cpoker_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x5090, 0x5090) AM_WRITE(custom_io_w)
 	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r)			/* Keyboard */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("50A0")			/* Not connected */
-	AM_RANGE(0x50b0, 0x50b0) AM_WRITE(YM2413_register_port_0_w)
-	AM_RANGE(0x50b1, 0x50b1) AM_WRITE(YM2413_data_port_0_w)
+	AM_RANGE(0x50b0, 0x50b0) AM_WRITE(ym2413_register_port_0_w)
+	AM_RANGE(0x50b1, 0x50b1) AM_WRITE(ym2413_data_port_0_w)
 	AM_RANGE(0x6800, 0x6fff) AM_WRITE(SMH_RAM) AM_BASE(&cpk_expram)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(&cpk_videoram)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&cpk_colorram)
@@ -224,8 +224,8 @@ static ADDRESS_MAP_START( csk227_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x5082, 0x5082) AM_READ_PORT("5082")			/* Coing & Kbd */
 	AM_RANGE(0x5091, 0x5091) AM_READ_PORT("5091")			/* Keyboard */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("50A0")			/* Not connected */
-	AM_RANGE(0x50b0, 0x50b0) AM_WRITE(YM2413_register_port_0_w)
-	AM_RANGE(0x50b1, 0x50b1) AM_WRITE(YM2413_data_port_0_w)
+	AM_RANGE(0x50b0, 0x50b0) AM_WRITE(ym2413_register_port_0_w)
+	AM_RANGE(0x50b1, 0x50b1) AM_WRITE(ym2413_data_port_0_w)
 	AM_RANGE(0x6800, 0x6fff) AM_WRITE(SMH_RAM) AM_BASE(&cpk_expram)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(&cpk_videoram)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&cpk_colorram)
@@ -245,8 +245,8 @@ static ADDRESS_MAP_START( csk234_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x5090, 0x5090) AM_WRITE(custom_io_w)
 	AM_RANGE(0x5091, 0x5091) AM_READ(custom_io_r)			/* used for protection and other */
 	AM_RANGE(0x50a0, 0x50a0) AM_READ_PORT("50A0")			/* Not connected */
-	AM_RANGE(0x50b0, 0x50b0) AM_WRITE(YM2413_register_port_0_w)
-	AM_RANGE(0x50b1, 0x50b1) AM_WRITE(YM2413_data_port_0_w)
+	AM_RANGE(0x50b0, 0x50b0) AM_WRITE(ym2413_register_port_0_w)
+	AM_RANGE(0x50b1, 0x50b1) AM_WRITE(ym2413_data_port_0_w)
 	AM_RANGE(0x6800, 0x6fff) AM_WRITE(SMH_RAM) AM_BASE(&cpk_expram)
 	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE(&cpk_videoram)
 	AM_RANGE(0x7800, 0x7fff) AM_RAM AM_BASE(&cpk_colorram)

@@ -210,8 +210,8 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(okim6295_data_0_w)
-	AM_RANGE(0xf810, 0xf810) AM_WRITE(YM3812_control_port_0_w)
-	AM_RANGE(0xf811, 0xf811) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0xf810, 0xf810) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0xf811, 0xf811) AM_WRITE(ym3812_write_port_0_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(SMH_NOP)	/* irq ack ?? */
 ADDRESS_MAP_END
 

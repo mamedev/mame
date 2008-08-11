@@ -594,7 +594,7 @@ static void mahmajn_io_w(running_machine *machine, int port, UINT8 data)
 			cur_input_line = (cur_input_line + 1) & 7;
 		break;
 	case 7: // DAC
-		DAC_0_signed_data_w(machine, 0, data);
+		dac_0_signed_data_w(machine, 0, data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
@@ -608,7 +608,7 @@ static void hotrod_io_w(running_machine *machine, int port, UINT8 data)
 	case 3: // Lamps
 		break;
 	case 7: // DAC
-		DAC_0_signed_data_w(machine,0, data);
+		dac_0_signed_data_w(machine,0, data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
@@ -738,19 +738,19 @@ static WRITE16_HANDLER( curbank_w )
 
 static READ16_HANDLER( ym_status_r )
 {
-	return YM2151_status_port_0_r(machine, 0);
+	return ym2151_status_port_0_r(machine, 0);
 }
 
 static WRITE16_HANDLER( ym_register_w )
 {
 	if(ACCESSING_BITS_0_7)
-		YM2151_register_port_0_w(machine, 0, data);
+		ym2151_register_port_0_w(machine, 0, data);
 }
 
 static WRITE16_HANDLER( ym_data_w )
 {
 	if(ACCESSING_BITS_0_7)
-		YM2151_data_port_0_w(machine, 0, data);
+		ym2151_data_port_0_w(machine, 0, data);
 }
 
 

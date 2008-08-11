@@ -82,10 +82,10 @@ static WRITE8_HANDLER( YM2151_w )
 {
 	switch (offset) {
 	case 0:
-		YM2151_register_port_0_w(machine,0,data);
+		ym2151_register_port_0_w(machine,0,data);
 		break;
 	case 1:
-		YM2151_data_port_0_w(machine,0,data);
+		ym2151_data_port_0_w(machine,0,data);
 		break;
 	}
 }
@@ -94,18 +94,18 @@ static WRITE8_HANDLER( YM2203_w )
 {
 	switch (offset) {
 	case 0:
-		YM2203_control_port_0_w(machine,0,data);
+		ym2203_control_port_0_w(machine,0,data);
 		break;
 	case 1:
-		YM2203_write_port_0_w(machine,0,data);
+		ym2203_write_port_0_w(machine,0,data);
 		break;
 	}
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100001) AM_READWRITE(YM2203_status_port_0_r, YM2203_w)
-	AM_RANGE(0x110000, 0x110001) AM_READWRITE(YM2151_status_port_0_r, YM2151_w)
+	AM_RANGE(0x100000, 0x100001) AM_READWRITE(ym2203_status_port_0_r, YM2203_w)
+	AM_RANGE(0x110000, 0x110001) AM_READWRITE(ym2151_status_port_0_r, YM2151_w)
 	AM_RANGE(0x120000, 0x120001) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0x130000, 0x130001) AM_READWRITE(okim6295_status_1_r, okim6295_data_1_w)
 	AM_RANGE(0x140000, 0x140001) AM_READ(vaportra_soundlatch_r)

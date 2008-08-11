@@ -86,10 +86,10 @@ static void start_talking (running_machine *machine)
 #endif
 
 	speech_rom_address = 0x0;
-	tms5110_CTL_w(machine,0,TMS5110_CMD_SPEAK);
-	tms5110_PDC_w(machine,0,0);
-	tms5110_PDC_w(machine,0,1);
-	tms5110_PDC_w(machine,0,0);
+	tms5110_ctl_w(machine,0,TMS5110_CMD_SPEAK);
+	tms5110_pdc_w(machine,0,0);
+	tms5110_pdc_w(machine,0,1);
+	tms5110_pdc_w(machine,0,0);
 }
 
 static void reset_talking (running_machine *machine)
@@ -98,18 +98,18 @@ static void reset_talking (running_machine *machine)
   the function calls below. In real they happen with the frequency of 160 kHz.
 */
 
-	tms5110_CTL_w(machine,0,TMS5110_CMD_RESET);
-	tms5110_PDC_w(machine,0,0);
-	tms5110_PDC_w(machine,0,1);
-	tms5110_PDC_w(machine,0,0);
+	tms5110_ctl_w(machine,0,TMS5110_CMD_RESET);
+	tms5110_pdc_w(machine,0,0);
+	tms5110_pdc_w(machine,0,1);
+	tms5110_pdc_w(machine,0,0);
 
-	tms5110_PDC_w(machine,0,0);
-	tms5110_PDC_w(machine,0,1);
-	tms5110_PDC_w(machine,0,0);
+	tms5110_pdc_w(machine,0,0);
+	tms5110_pdc_w(machine,0,1);
+	tms5110_pdc_w(machine,0,0);
 
-	tms5110_PDC_w(machine,0,0);
-	tms5110_PDC_w(machine,0,1);
-	tms5110_PDC_w(machine,0,0);
+	tms5110_pdc_w(machine,0,0);
+	tms5110_pdc_w(machine,0,1);
+	tms5110_pdc_w(machine,0,0);
 
 	speech_rom_address = 0x0;
 }
@@ -230,15 +230,15 @@ static ADDRESS_MAP_START( pickin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa007, 0xa007) AM_WRITE(SMH_NOP)	/* ???? */
 
 	/* guess */
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0xb800, 0xb800) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0xb800, 0xb800) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x08) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x08, 0x08) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x0c, 0x0c) AM_READ(ay8910_read_port_0_r)
 	//AM_RANGE(0x56, 0x56) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 

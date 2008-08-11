@@ -85,11 +85,11 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(sound_command_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ(sound_nmi_ack_r)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0xe002, 0xe007) AM_WRITE(snkwave_w)
-	AM_RANGE(0xe008, 0xe008) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0xe009, 0xe009) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0xe008, 0xe008) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0xe009, 0xe009) AM_WRITE(ay8910_write_port_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )

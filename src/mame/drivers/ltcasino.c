@@ -69,7 +69,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xec10, 0xec10) AM_READ(input_port_4_r)
 	AM_RANGE(0xec12, 0xec12) AM_READ(input_port_5_r)
 
-	AM_RANGE(0xec20, 0xec20) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0xec20, 0xec20) AM_READ(ay8910_read_port_0_r)
 	AM_RANGE(0xec21, 0xec21) AM_READ(input_port_6_r) //ltcasino -> pc: F3F3 (A in service) and F3FD (B in service)
 	AM_RANGE(0xec3e, 0xec3e) AM_READ(SMH_NOP) //not used
 
@@ -85,8 +85,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(ltcasino_tile_atr_w) AM_BASE(&ltcasino_tile_atr_ram)
 	AM_RANGE(0xe800, 0xebff) AM_WRITE(SMH_RAM)
 
-	AM_RANGE(0xec20, 0xec20) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xec21, 0xec21) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0xec20, 0xec20) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xec21, 0xec21) AM_WRITE(ay8910_control_port_0_w)
 
 	AM_RANGE(0xec30, 0xec3f) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_ROM)

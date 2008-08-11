@@ -48,14 +48,14 @@ static WRITE16_HANDLER( pkscramble_YM2203_w )
 {
 	switch (offset)
 	{
-		case 0: YM2203_control_port_0_w(machine,0,data & 0xff);break;
-		case 1: YM2203_write_port_0_w(machine,0,data & 0xff);break;
+		case 0: ym2203_control_port_0_w(machine,0,data & 0xff);break;
+		case 1: ym2203_write_port_0_w(machine,0,data & 0xff);break;
 	}
 }
 
 static READ16_HANDLER( pkscramble_YM2203_r )
 {
-	return YM2203_status_port_0_r(machine,0);
+	return ym2203_status_port_0_r(machine,0);
 }
 
 // input bit 0x20 in port1 should stay low until bit 0x20 is written here, then

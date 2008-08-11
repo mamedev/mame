@@ -230,15 +230,15 @@ static WRITE8_HANDLER( sound_control_3_w ) /* unknown */
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xc801, 0xc801) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xc801, 0xc801) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0xca00, 0xca0d) AM_WRITE(msm5232_0_w)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(sound_control_0_w)
 	AM_RANGE(0xce00, 0xce00) AM_WRITE(sound_control_1_w)
 	AM_RANGE(0xd800, 0xd800) AM_READWRITE(soundlatch_r, to_main_w)
 	AM_RANGE(0xda00, 0xda00) AM_READWRITE(SMH_NOP, nmi_enable_w)			/* unknown read*/
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(nmi_disable_w)
-	AM_RANGE(0xde00, 0xde00) AM_READWRITE(SMH_NOP, DAC_0_signed_data_w)	/* signed 8-bit DAC &  unknown read */
+	AM_RANGE(0xde00, 0xde00) AM_READWRITE(SMH_NOP, dac_0_signed_data_w)	/* signed 8-bit DAC &  unknown read */
 	AM_RANGE(0xe000, 0xefff) AM_ROM											/* space for diagnostics ROM */
 ADDRESS_MAP_END
 

@@ -119,7 +119,7 @@ static TIMER_CALLBACK( scanline_callback )
 		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 
 	/* update the DAC state */
-	DAC_data_w(0, (videoram[0x380 + 0x11] & (scanline >> 2)) ? 255 : 0);
+	dac_data_w(0, (videoram[0x380 + 0x11] & (scanline >> 2)) ? 255 : 0);
 
 	/* on the VBLANK, read the pot and schedule an interrupt time for it */
 	if (scanline == video_screen_get_visible_area(machine->primary_screen)->max_y + 1)

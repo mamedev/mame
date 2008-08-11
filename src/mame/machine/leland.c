@@ -1168,7 +1168,7 @@ READ8_HANDLER( leland_master_input_r )
 
 		case 0x03:	/* /IGID */
 		case 0x13:
-			result = AY8910_read_port_0_r(machine, offset);
+			result = ay8910_read_port_0_r(machine, offset);
 			break;
 
 		case 0x10:	/* /GIN0 */
@@ -1207,11 +1207,11 @@ WRITE8_HANDLER( leland_master_output_w )
 			break;
 
 		case 0x0a:	/* /OGIA */
-			AY8910_control_port_0_w(machine, 0, data);
+			ay8910_control_port_0_w(machine, 0, data);
 			break;
 
 		case 0x0b:	/* /OGID */
-			AY8910_write_port_0_w(machine, 0, data);
+			ay8910_write_port_0_w(machine, 0, data);
 			break;
 
 		case 0x0c:	/* /BKXL */

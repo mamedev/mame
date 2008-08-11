@@ -316,7 +316,7 @@ static WRITE8_HANDLER( mrokumei_sound_io_w )
 	switch (offset & 0xff)
 	{
 		case 0x40:
-			DAC_signed_data_w(0,data);
+			dac_signed_data_w(0,data);
 			break;
 		default:
 			logerror("%04x: I/O write to port %04x\n",activecpu_get_pc(),offset);
@@ -373,17 +373,17 @@ static WRITE8_HANDLER( reikaids_upd7807_portc_w )
 	if (BIT(upd7807_portc,5) && !BIT(data,5))	/* write clock 1->0 */
 	{
 		if (BIT(data,3))
-			YM2203_write_port_0_w(machine,0,upd7807_porta);
+			ym2203_write_port_0_w(machine,0,upd7807_porta);
 		else
-			YM2203_control_port_0_w(machine,0,upd7807_porta);
+			ym2203_control_port_0_w(machine,0,upd7807_porta);
 	}
 
 	if (BIT(upd7807_portc,4) && !BIT(data,4))	/* read clock 1->0 */
 	{
 		if (BIT(data,3))
-			upd7807_porta = YM2203_read_port_0_r(machine,0);
+			upd7807_porta = ym2203_read_port_0_r(machine,0);
 		else
-			upd7807_porta = YM2203_status_port_0_r(machine,0);
+			upd7807_porta = ym2203_status_port_0_r(machine,0);
 	}
 
 	upd7807_portc = data;
@@ -660,7 +660,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( reikaids_upd7807_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_WRITE(reikaids_upd7807_porta_w)
-	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_WRITE(DAC_0_signed_data_w)
+	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_WRITE(dac_0_signed_data_w)
 	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_WRITE(reikaids_upd7807_portc_w)
 ADDRESS_MAP_END
 
@@ -714,7 +714,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pteacher_upd7807_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_WRITE(pteacher_upd7807_porta_w)
-	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_WRITE(DAC_0_signed_data_w)
+	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_WRITE(dac_0_signed_data_w)
 	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_WRITE(pteacher_upd7807_portc_w)
 ADDRESS_MAP_END
 

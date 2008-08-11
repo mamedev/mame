@@ -492,18 +492,18 @@ static ADDRESS_MAP_START( fromanc2_readport_sound, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)					// snd cmd (1P)
 	AM_RANGE(0x04, 0x04) AM_READ(soundlatch2_r)					// snd cmd (2P)
 	AM_RANGE(0x09, 0x09) AM_READ(SMH_NOP)						// ?
-	AM_RANGE(0x08, 0x08) AM_READ(YM2610_status_port_0_A_r)
-	AM_RANGE(0x0a, 0x0a) AM_READ(YM2610_status_port_0_B_r)
+	AM_RANGE(0x08, 0x08) AM_READ(ym2610_status_port_0_a_r)
+	AM_RANGE(0x0a, 0x0a) AM_READ(ym2610_status_port_0_b_r)
 	AM_RANGE(0x0c, 0x0c) AM_READ(fromanc2_sndcpu_nmi_clr)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fromanc2_writeport_sound, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)						// ?
-	AM_RANGE(0x08, 0x08) AM_WRITE(YM2610_control_port_0_A_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(YM2610_data_port_0_A_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(YM2610_control_port_0_B_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(YM2610_data_port_0_B_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(ym2610_control_port_0_a_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE(ym2610_data_port_0_a_w)
+	AM_RANGE(0x0a, 0x0a) AM_WRITE(ym2610_control_port_0_b_w)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(ym2610_data_port_0_b_w)
 ADDRESS_MAP_END
 
 

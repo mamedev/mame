@@ -1372,8 +1372,8 @@ static DRIVER_INIT( zektor )
 	has_usb = FALSE;
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x38, 0x38, 0, 0, sega_speech_data_w);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b, 0x3b, 0, 0, sega_speech_control_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c, 0x3c, 0, 0, AY8910_control_port_0_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d, 0x3d, 0, 0, AY8910_write_port_0_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3c, 0x3c, 0, 0, ay8910_control_port_0_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3d, 0x3d, 0, 0, ay8910_write_port_0_w);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3e, 0x3e, 0, 0, zektor1_sh_w);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3f, 0x3f, 0, 0, zektor2_sh_w);
 

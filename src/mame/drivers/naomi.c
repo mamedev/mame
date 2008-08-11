@@ -832,7 +832,7 @@ static const aica_interface aica_config =
 static MACHINE_RESET( naomi )
 {
 	MACHINE_RESET_CALL(dc);
-	AICA_set_ram_base(0, dc_sound_ram, 8*1024*1024);
+	aica_set_ram_base(0, dc_sound_ram, 8*1024*1024);
 }
 
 static MACHINE_DRIVER_START( naomi )

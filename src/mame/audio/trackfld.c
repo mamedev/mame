@@ -29,7 +29,7 @@ READ8_HANDLER( trackfld_sh_timer_r )
 
 READ8_HANDLER( trackfld_speech_r )
 {
-    return VLM5030_BSY() ? 0x10 : 0;
+    return vlm5030_bsy() ? 0x10 : 0;
 }
 
 static int last_addr = 0;
@@ -45,10 +45,10 @@ WRITE8_HANDLER( trackfld_sound_w )
 
         /* A8 VLM5030 ST pin */
         if( changes & 0x100 )
-            VLM5030_ST( offset&0x100 );
+            vlm5030_st( offset&0x100 );
         /* A9 VLM5030 RST pin */
         if( changes & 0x200 )
-            VLM5030_RST( offset&0x200 );
+            vlm5030_rst( offset&0x200 );
     }
     last_addr = offset;
 }
@@ -57,7 +57,7 @@ READ8_HANDLER( hyperspt_sh_timer_r )
 {
     UINT32 clock = activecpu_gettotalcycles() / TIMER_RATE;
 
-    return (clock & 0x3) | (VLM5030_BSY()? 0x04 : 0);
+    return (clock & 0x3) | (vlm5030_bsy()? 0x04 : 0);
 }
 
 WRITE8_HANDLER( hyperspt_sound_w )
@@ -72,10 +72,10 @@ WRITE8_HANDLER( hyperspt_sound_w )
 
     /* A4 VLM5030 ST pin */
     if( changes & 0x10 )
-        VLM5030_ST( offset&0x10 );
+        vlm5030_st( offset&0x10 );
     /* A5 VLM5030 RST pin */
     if( changes & 0x20 )
-        VLM5030_RST( offset&0x20 );
+        vlm5030_rst( offset&0x20 );
 
     last_addr = offset;
 }

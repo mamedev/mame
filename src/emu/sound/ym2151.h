@@ -1,5 +1,4 @@
 /*
-**
 ** File: ym2151.h - header file for software implementation of YM2151
 **                                            FM Operator Type-M(OPM)
 **
@@ -29,8 +28,11 @@
 ** Ishmair - for the datasheet and motivation.
 */
 
-#ifndef _H_YM2151_
-#define _H_YM2151_
+#pragma once
+
+#ifndef __YM2151_H__
+#define __YM2151_H__
+
 
 /* 16- and 8-bit samples (signed) are supported*/
 #define SAMPLE_BITS 16
@@ -52,13 +54,13 @@ typedef stream_sample_t SAMP;
 ** 'clock' is the chip clock in Hz
 ** 'rate' is sampling rate
 */
-void *YM2151Init(int index, int clock, int rate);
+void *ym2151_init(int index, int clock, int rate);
 
 /* shutdown the YM2151 emulators*/
-void YM2151Shutdown(void *chip);
+void ym2151_shutdown(void *chip);
 
 /* reset all chip registers for YM2151 number 'num'*/
-void YM2151ResetChip(void *chip);
+void ym2151_reset_chip(void *chip);
 
 /*
 ** Generate samples for one of the YM2151's
@@ -67,20 +69,21 @@ void YM2151ResetChip(void *chip);
 ** '**buffers' is table of pointers to the buffers: left and right
 ** 'length' is the number of samples that should be generated
 */
-void YM2151UpdateOne(void *chip, SAMP **buffers, int length);
+void ym2151_update_one(void *chip, SAMP **buffers, int length);
 
 /* write 'v' to register 'r' on YM2151 chip number 'n'*/
-void YM2151WriteReg(void *chip, int r, int v);
+void ym2151_write_reg(void *chip, int r, int v);
 
 /* read status register on YM2151 chip number 'n'*/
-int YM2151ReadStatus(void *chip);
+int ym2151_read_status(void *chip);
 
 /* set interrupt handler on YM2151 chip number 'n'*/
-void YM2151SetIrqHandler(void *chip, void (*handler)(running_machine *machine, int irq));
+void ym2151_set_irq_handler(void *chip, void (*handler)(running_machine *machine, int irq));
 
 /* set port write handler on YM2151 chip number 'n'*/
-void YM2151SetPortWriteHandler(void *chip, write8_machine_func handler);
+void ym2151_set_port_write_handler(void *chip, write8_machine_func handler);
 
 /* refresh chip when load state */
-STATE_POSTLOAD( YM2151Postload );
-#endif /*_H_YM2151_*/
+STATE_POSTLOAD( ym2151_postload );
+
+#endif /*__YM2151_H__*/

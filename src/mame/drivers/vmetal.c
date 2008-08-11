@@ -164,12 +164,12 @@ static WRITE16_HANDLER( vmetal_control_w )
 	if ((data & 0x40) == 0)
 		sndti_reset(SOUND_ES8712, 0);
 	else
-		ES8712_play(0);
+		es8712_play(0);
 
 	if (data & 0x10)
-		ES8712_set_bank_base(0, 0x100000);
+		es8712_set_bank_base(0, 0x100000);
 	else
-		ES8712_set_bank_base(0, 0x000000);
+		es8712_set_bank_base(0, 0x000000);
 
 	if (data & 0xa0)
 		logerror("PC:%06x - Writing unknown bits %04x to $200000\n",activecpu_get_previouspc(),data);
@@ -207,7 +207,7 @@ static WRITE16_HANDLER( vmetal_es8712_w )
     16   002a 000e 0083 00ee 000f 0069 0069   0e832a-0f69ee
     */
 
-	ES8712_data_0_lsb_w(machine, offset, data, mem_mask);
+	es8712_data_0_lsb_w(machine, offset, data, mem_mask);
 	logerror("PC:%06x - Writing %04x to ES8712 offset %02x\n",activecpu_get_previouspc(),data,offset);
 }
 

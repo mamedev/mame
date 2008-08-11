@@ -19,7 +19,7 @@ struct _VR0Chip
 	UINT32 *TexBase;
 	UINT32 *FBBase;
 	UINT32 SOUNDREGS[0x10000/4];
-	struct VR0Interface Intf;
+	vr0_interface Intf;
 	sound_stream * stream;
 };
 
@@ -78,8 +78,8 @@ static const unsigned short ULawTo16[]=
 #define ENVVOL(chan)	(VR0->SOUNDREGS[(0x20/4)*chan+0x04/4]&0xffffff)
 
 /*
-#define GETSOUNDREG16(Chan,Offs) program_read_word_32le(VR0->Intf.RegBase+0x20*Chan+Offs)
-#define GETSOUNDREG32(Chan,Offs) program_read_dword_32le(VR0->Intf.RegBase+0x20*Chan+Offs)
+#define GETSOUNDREG16(Chan,Offs) program_read_word_32le(VR0->Intf.reg_base+0x20*Chan+Offs)
+#define GETSOUNDREG32(Chan,Offs) program_read_dword_32le(VR0->Intf.reg_base+0x20*Chan+Offs)
 
 #define CURSADDR(chan)  GETSOUNDREG32(chan,0x00)
 #define DSADDR(chan)    GETSOUNDREG16(chan,0x08)
@@ -87,16 +87,16 @@ static const unsigned short ULawTo16[]=
 #define LOOPEND(chan)   (GETSOUNDREG32(chan,0x10)&0x3fffff)
 #define ENVVOL(chan)    (GETSOUNDREG32(chan,0x04)&0xffffff)
 */
-void VR0_Snd_Set_Areas(UINT32 *Texture,UINT32 *Frame)
+void vr0_snd_set_areas(UINT32 *texture,UINT32 *frame)
 {
 	struct _VR0Chip *VR0 = sndti_token(SOUND_VRENDER0, 0);
-	VR0->TexBase=Texture;
-	VR0->FBBase=Frame;
+	VR0->TexBase=texture;
+	VR0->FBBase=frame;
 }
 
 static void *vrender0_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	const struct VR0Interface *intf;
+	const vr0_interface *intf;
 	struct _VR0Chip *VR0;
 
 	VR0 = auto_malloc(sizeof(*VR0));
@@ -104,7 +104,7 @@ static void *vrender0_start(const char *tag, int sndindex, int clock, const void
 
 	intf=config;
 
-	memcpy(&(VR0->Intf),intf,sizeof(struct VR0Interface));
+	memcpy(&(VR0->Intf),intf,sizeof(vr0_interface));
 	memset(VR0->SOUNDREGS,0,0x10000);
 
 	VR0->stream = stream_create(0, 2, 44100, VR0, VR0_Update);
@@ -112,7 +112,7 @@ static void *vrender0_start(const char *tag, int sndindex, int clock, const void
 	return VR0;
 }
 
-WRITE32_HANDLER(VR0_Snd_Write)
+WRITE32_HANDLER(vr0_snd_write)
 {
 	struct _VR0Chip *VR0 = sndti_token(SOUND_VRENDER0, 0);
 	if(offset==0x404/4)
@@ -137,7 +137,7 @@ WRITE32_HANDLER(VR0_Snd_Write)
 }
 
 
-READ32_HANDLER(VR0_Snd_Read)
+READ32_HANDLER(vr0_snd_read)
 {
 	struct _VR0Chip *VR0 = sndti_token(SOUND_VRENDER0, 0);
 	return VR0->SOUNDREGS[offset];

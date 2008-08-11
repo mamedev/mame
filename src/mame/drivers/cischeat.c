@@ -849,7 +849,7 @@ static ADDRESS_MAP_START( bigrun_sound_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM						)	// ROM
 	AM_RANGE(0x0f0000, 0x0fffff) AM_READ(SMH_RAM						)	// RAM
 	AM_RANGE(0x040000, 0x040001) AM_READ(soundlatch_word_r				)	// From Main CPU
-	AM_RANGE(0x080002, 0x080003) AM_READ(YM2151_status_port_0_lsb_r	)
+	AM_RANGE(0x080002, 0x080003) AM_READ(ym2151_status_port_0_lsb_r	)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ(okim6295_status_0_lsb_r		)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(okim6295_status_1_lsb_r		)
 ADDRESS_MAP_END
@@ -859,8 +859,8 @@ static ADDRESS_MAP_START( bigrun_sound_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0f0000, 0x0fffff) AM_WRITE(SMH_RAM						)	// RAM
 	AM_RANGE(0x040000, 0x040001) AM_WRITE(bigrun_soundbank_w			)	// Sample Banking
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w			)	// To Main CPU
-	AM_RANGE(0x080000, 0x080001) AM_WRITE(YM2151_register_port_0_lsb_w	)
-	AM_RANGE(0x080002, 0x080003) AM_WRITE(YM2151_data_port_0_lsb_w		)
+	AM_RANGE(0x080000, 0x080001) AM_WRITE(ym2151_register_port_0_lsb_w	)
+	AM_RANGE(0x080002, 0x080003) AM_WRITE(ym2151_data_port_0_lsb_w		)
 	AM_RANGE(0x0a0000, 0x0a0003) AM_WRITE(okim6295_data_0_lsb_w			)
 	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(okim6295_data_1_lsb_w			)
 ADDRESS_MAP_END
@@ -883,7 +883,7 @@ static ADDRESS_MAP_START( cischeat_sound_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM						)	// ROM
 	AM_RANGE(0x0f0000, 0x0fffff) AM_READ(SMH_RAM						)	// RAM
 	AM_RANGE(0x060004, 0x060005) AM_READ(soundlatch_word_r				)	// From Main CPU
-	AM_RANGE(0x080002, 0x080003) AM_READ(YM2151_status_port_0_lsb_r	)
+	AM_RANGE(0x080002, 0x080003) AM_READ(ym2151_status_port_0_lsb_r	)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ(okim6295_status_0_lsb_r		)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(okim6295_status_1_lsb_r		)
 ADDRESS_MAP_END
@@ -894,8 +894,8 @@ static ADDRESS_MAP_START( cischeat_sound_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x040002, 0x040003) AM_WRITE(cischeat_soundbank_0_w		)	// Sample Banking
 	AM_RANGE(0x040004, 0x040005) AM_WRITE(cischeat_soundbank_1_w		)	// Sample Banking
 	AM_RANGE(0x060002, 0x060003) AM_WRITE(soundlatch2_word_w			)	// To Main CPU
-	AM_RANGE(0x080000, 0x080001) AM_WRITE(YM2151_register_port_0_lsb_w	)
-	AM_RANGE(0x080002, 0x080003) AM_WRITE(YM2151_data_port_0_lsb_w		)
+	AM_RANGE(0x080000, 0x080001) AM_WRITE(ym2151_register_port_0_lsb_w	)
+	AM_RANGE(0x080002, 0x080003) AM_WRITE(ym2151_data_port_0_lsb_w		)
 	AM_RANGE(0x0a0000, 0x0a0003) AM_WRITE(okim6295_data_0_lsb_w			)
 	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(okim6295_data_1_lsb_w			)
 ADDRESS_MAP_END
@@ -909,7 +909,7 @@ static ADDRESS_MAP_START( f1gpstar_sound_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM						)	// ROM
 	AM_RANGE(0x0e0000, 0x0fffff) AM_READ(SMH_RAM						)	// RAM              (cischeat: f0000-fffff)
 	AM_RANGE(0x060000, 0x060001) AM_READ(soundlatch_word_r				)	// From Main CPU    (cischeat: 60004)
-	AM_RANGE(0x080002, 0x080003) AM_READ(YM2151_status_port_0_lsb_r	)
+	AM_RANGE(0x080002, 0x080003) AM_READ(ym2151_status_port_0_lsb_r	)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ(okim6295_status_0_lsb_r		)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(okim6295_status_1_lsb_r		)
 ADDRESS_MAP_END
@@ -920,8 +920,8 @@ static ADDRESS_MAP_START( f1gpstar_sound_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x040004, 0x040005) AM_WRITE(cischeat_soundbank_0_w		)	// Sample Banking   (cischeat: 40002)
 	AM_RANGE(0x040008, 0x040009) AM_WRITE(cischeat_soundbank_1_w		)	// Sample Banking   (cischeat: 40004)
 	AM_RANGE(0x060000, 0x060001) AM_WRITE(soundlatch2_word_w			)	// To Main CPU      (cischeat: 60002)
-	AM_RANGE(0x080000, 0x080001) AM_WRITE(YM2151_register_port_0_lsb_w	)
-	AM_RANGE(0x080002, 0x080003) AM_WRITE(YM2151_data_port_0_lsb_w		)
+	AM_RANGE(0x080000, 0x080001) AM_WRITE(ym2151_register_port_0_lsb_w	)
+	AM_RANGE(0x080002, 0x080003) AM_WRITE(ym2151_data_port_0_lsb_w		)
 	AM_RANGE(0x0a0000, 0x0a0003) AM_WRITE(okim6295_data_0_lsb_w			)
 	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(okim6295_data_1_lsb_w			)
 ADDRESS_MAP_END
@@ -935,7 +935,7 @@ static ADDRESS_MAP_START( f1gpstr2_sound_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM						)	// ROM
 	AM_RANGE(0x0e0000, 0x0fffff) AM_READ(SMH_RAM						)	// RAM
 	AM_RANGE(0x060004, 0x060005) AM_READ(soundlatch_word_r				)	// From Main CPU    (f1gpstar: 60000)
-	AM_RANGE(0x080002, 0x080003) AM_READ(YM2151_status_port_0_lsb_r	)
+	AM_RANGE(0x080002, 0x080003) AM_READ(ym2151_status_port_0_lsb_r	)
 	AM_RANGE(0x0a0000, 0x0a0001) AM_READ(okim6295_status_0_lsb_r		)
 	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(okim6295_status_1_lsb_r		)
 ADDRESS_MAP_END
@@ -947,8 +947,8 @@ static ADDRESS_MAP_START( f1gpstr2_sound_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x040008, 0x040009) AM_WRITE(cischeat_soundbank_1_w		)	// Sample Banking
 	AM_RANGE(0x04000e, 0x04000f) AM_WRITE(SMH_NOP						)	// ? 0              (f1gpstar: no)
 	AM_RANGE(0x060002, 0x060003) AM_WRITE(soundlatch2_word_w			)	// To Main CPU      (f1gpstar: 60000)
-	AM_RANGE(0x080000, 0x080001) AM_WRITE(YM2151_register_port_0_lsb_w	)
-	AM_RANGE(0x080002, 0x080003) AM_WRITE(YM2151_data_port_0_lsb_w		)
+	AM_RANGE(0x080000, 0x080001) AM_WRITE(ym2151_register_port_0_lsb_w	)
+	AM_RANGE(0x080002, 0x080003) AM_WRITE(ym2151_data_port_0_lsb_w		)
 	AM_RANGE(0x0a0000, 0x0a0003) AM_WRITE(okim6295_data_0_lsb_w			)
 	AM_RANGE(0x0c0000, 0x0c0003) AM_WRITE(okim6295_data_1_lsb_w			)
 ADDRESS_MAP_END

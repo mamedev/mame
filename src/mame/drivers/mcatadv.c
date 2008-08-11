@@ -247,18 +247,18 @@ static ADDRESS_MAP_START( mcatadv_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM		)	// ROM
 	AM_RANGE(0x4000, 0xbfff) AM_READ(SMH_BANK1		)	// ROM
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_RAM		)	// RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(YM2610_status_port_0_A_r		)
-	AM_RANGE(0xe002, 0xe002) AM_READ(YM2610_status_port_0_B_r		)
+	AM_RANGE(0xe000, 0xe000) AM_READ(ym2610_status_port_0_a_r		)
+	AM_RANGE(0xe002, 0xe002) AM_READ(ym2610_status_port_0_b_r		)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcatadv_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM		)	// ROM
 	AM_RANGE(0x4000, 0xbfff) AM_WRITE(SMH_ROM		)	// ROM
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM		)	// RAM
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM2610_control_port_0_A_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM2610_data_port_0_A_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(YM2610_control_port_0_B_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(YM2610_data_port_0_B_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2610_control_port_0_a_w)
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym2610_data_port_0_a_w)
+	AM_RANGE(0xe002, 0xe002) AM_WRITE(ym2610_control_port_0_b_w)
+	AM_RANGE(0xe003, 0xe003) AM_WRITE(ym2610_data_port_0_b_w)
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mcatadv_sound_bw_w)
 ADDRESS_MAP_END
 
@@ -287,17 +287,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nost_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x05) AM_READ(YM2610_status_port_0_A_r)
-	AM_RANGE(0x06, 0x07) AM_READ(YM2610_status_port_0_B_r)
+	AM_RANGE(0x04, 0x05) AM_READ(ym2610_status_port_0_a_r)
+	AM_RANGE(0x06, 0x07) AM_READ(ym2610_status_port_0_b_r)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nost_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM2610_control_port_0_A_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM2610_data_port_0_A_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(YM2610_control_port_0_B_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(YM2610_data_port_0_B_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ym2610_control_port_0_a_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym2610_data_port_0_a_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(ym2610_control_port_0_b_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ym2610_data_port_0_b_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(mcatadv_sound_bw_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(soundlatch2_w)
 ADDRESS_MAP_END

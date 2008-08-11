@@ -103,9 +103,9 @@ void meadows_sh_update(void)
 		dac_enable = meadows_0c03 & ENABLE_DAC;
 
 		if (dac_enable)
-			DAC_data_w(0, meadows_dac);
+			dac_data_w(0, meadows_dac);
 		else
-			DAC_data_w(0, 0);
+			dac_data_w(0, 0);
 	}
 
 	latched_0c01 = meadows_0c01;
@@ -120,9 +120,9 @@ void meadows_sh_dac_w(int data)
 {
 	meadows_dac = data;
 	if (dac_enable)
-		DAC_data_w(0, meadows_dac);
+		dac_data_w(0, meadows_dac);
 	else
-		DAC_data_w(0, 0);
+		dac_data_w(0, 0);
 }
 
 

@@ -173,12 +173,12 @@ static void tms5110_reset(void *chip)
 
 /******************************************************************************
 
-     tms5110_CTL_w -- write Control Command to the sound chip
+     tms5110_ctl_w -- write Control Command to the sound chip
 commands like Speech, Reset, etc., are loaded into the chip via the CTL pins
 
 ******************************************************************************/
 
-WRITE8_HANDLER( tms5110_CTL_w )
+WRITE8_HANDLER( tms5110_ctl_w )
 {
 	struct tms5110_info *info = sndti_token(SOUND_TMS5110, 0);
 
@@ -189,11 +189,11 @@ WRITE8_HANDLER( tms5110_CTL_w )
 
 /******************************************************************************
 
-     tms5110_PDC_w -- write to PDC pin on the sound chip
+     tms5110_pdc_w -- write to PDC pin on the sound chip
 
 ******************************************************************************/
 
-WRITE8_HANDLER( tms5110_PDC_w )
+WRITE8_HANDLER( tms5110_pdc_w )
 {
 	struct tms5110_info *info = sndti_token(SOUND_TMS5110, 0);
 

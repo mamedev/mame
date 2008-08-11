@@ -1080,13 +1080,13 @@ static READ16_HANDLER( xymg_magic_r )
 static WRITE16_HANDLER( igs_YM3812_control_port_0_w )
 {
 	if (ACCESSING_BITS_0_7)
-		YM3812_control_port_0_w(machine,0,data);
+		ym3812_control_port_0_w(machine,0,data);
 }
 
 static WRITE16_HANDLER( igs_YM3812_write_port_0_w )
 {
 	if (ACCESSING_BITS_0_7)
-		YM3812_write_port_0_w(machine,0,data);
+		ym3812_write_port_0_w(machine,0,data);
 }
 
 static ADDRESS_MAP_START( chindrag, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1119,8 +1119,8 @@ static ADDRESS_MAP_START( chmplst2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM
 	AM_RANGE( 0x100000, 0x103fff ) AM_RAM AM_BASE( &generic_nvram16 ) AM_SIZE( &generic_nvram_size )
 	AM_RANGE( 0x200000, 0x200001 ) AM_READWRITE( okim6295_status_0_lsb_r, okim6295_data_0_lsb_w )
-	AM_RANGE( 0x204000, 0x204001 ) AM_WRITE( YM2413_register_port_0_lsb_w )
-	AM_RANGE( 0x204002, 0x204003 ) AM_WRITE( YM2413_data_port_0_lsb_w )
+	AM_RANGE( 0x204000, 0x204001 ) AM_WRITE( ym2413_register_port_0_lsb_w )
+	AM_RANGE( 0x204002, 0x204003 ) AM_WRITE( ym2413_data_port_0_lsb_w )
 	AM_RANGE( 0x208000, 0x208003 ) AM_WRITE( chmplst2_magic_w )
 	AM_RANGE( 0x208002, 0x208003 ) AM_READ ( chmplst2_magic_r )
 	AM_RANGE( 0x20c000, 0x20cfff ) AM_RAM AM_BASE(&igs_priority_ram)

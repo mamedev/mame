@@ -1647,7 +1647,7 @@ static WRITE16_HANDLER( m1_snd_mpcm1_bnk_w )
 
 static READ16_HANDLER( m1_snd_ym_r )
 {
-	return YM3438_status_port_0_A_r(machine, 0);
+	return ym3438_status_port_0_a_r(machine, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_ym_w )
@@ -1655,19 +1655,19 @@ static WRITE16_HANDLER( m1_snd_ym_w )
 	switch (offset)
 	{
 		case 0:
-			YM3438_control_port_0_A_w(machine, 0, data);
+			ym3438_control_port_0_a_w(machine, 0, data);
 			break;
 
 		case 1:
-			YM3438_data_port_0_A_w(machine, 0, data);
+			ym3438_data_port_0_a_w(machine, 0, data);
 			break;
 
 		case 2:
-			YM3438_control_port_0_B_w(machine, 0, data);
+			ym3438_control_port_0_b_w(machine, 0, data);
 			break;
 
 		case 3:
-			YM3438_data_port_0_B_w(machine, 0, data);
+			ym3438_data_port_0_b_w(machine, 0, data);
 			break;
 	}
 }

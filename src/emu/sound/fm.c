@@ -2190,7 +2190,7 @@ typedef struct
 } YM2203;
 
 /* Generate samples for one of the YM2203s */
-void YM2203UpdateOne(void *chip, FMSAMPLE *buffer, int length)
+void ym2203_update_one(void *chip, FMSAMPLE *buffer, int length)
 {
 	YM2203 *F2203 = chip;
 	FM_OPN *OPN =   &F2203->OPN;
@@ -2273,7 +2273,7 @@ void YM2203UpdateOne(void *chip, FMSAMPLE *buffer, int length)
 }
 
 /* ---------- reset one of chip ---------- */
-void YM2203ResetChip(void *chip)
+void ym2203_reset_chip(void *chip)
 {
 	int i;
 	YM2203 *F2203 = chip;
@@ -2300,7 +2300,7 @@ void YM2203ResetChip(void *chip)
 }
 
 #ifdef __STATE_H__
-void YM2203Postload(void *chip)
+void ym2203_postload(void *chip)
 {
 	if (chip)
 	{
@@ -2351,7 +2351,7 @@ static void YM2203_save_state(YM2203 *F2203, int index)
    'clock' is the chip clock in Hz
    'rate' is sampling rate
 */
-void * YM2203Init(void *param, int index, int clock, int rate,
+void * ym2203_init(void *param, int index, int clock, int rate,
                FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
 {
 	YM2203 *F2203;
@@ -2377,7 +2377,7 @@ void * YM2203Init(void *param, int index, int clock, int rate,
 	F2203->OPN.ST.timer_handler = timer_handler;
 	F2203->OPN.ST.IRQ_Handler   = IRQHandler;
 	F2203->OPN.ST.SSG           = ssg;
-	YM2203ResetChip(F2203);
+	ym2203_reset_chip(F2203);
 
 #ifdef __STATE_H__
 	YM2203_save_state(F2203, index);
@@ -2386,7 +2386,7 @@ void * YM2203Init(void *param, int index, int clock, int rate,
 }
 
 /* shut down emulator */
-void YM2203Shutdown(void *chip)
+void ym2203_shutdown(void *chip)
 {
 	YM2203 *FM2203 = chip;
 
@@ -2395,7 +2395,7 @@ void YM2203Shutdown(void *chip)
 }
 
 /* YM2203 I/O interface */
-int YM2203Write(void *chip,int a,UINT8 v)
+int ym2203_write(void *chip,int a,UINT8 v)
 {
 	YM2203 *F2203 = chip;
 	FM_OPN *OPN = &F2203->OPN;
@@ -2422,12 +2422,12 @@ int YM2203Write(void *chip,int a,UINT8 v)
 			(*OPN->ST.SSG->write)(OPN->ST.param,a,v);
 			break;
 		case 0x20:	/* 0x20-0x2f : Mode section */
-			YM2203UpdateReq(OPN->ST.param);
+			ym2203_update_req(OPN->ST.param);
 			/* write register */
 			OPNWriteMode(OPN,addr,v);
 			break;
 		default:	/* 0x30-0xff : OPN section */
-			YM2203UpdateReq(OPN->ST.param);
+			ym2203_update_req(OPN->ST.param);
 			/* write register */
 			OPNWriteReg(OPN,addr,v);
 		}
@@ -2436,7 +2436,7 @@ int YM2203Write(void *chip,int a,UINT8 v)
 	return OPN->ST.irq;
 }
 
-UINT8 YM2203Read(void *chip,int a)
+UINT8 ym2203_read(void *chip,int a)
 {
 	YM2203 *F2203 = chip;
 	int addr = F2203->OPN.ST.address;
@@ -2453,7 +2453,7 @@ UINT8 YM2203Read(void *chip,int a)
 	return ret;
 }
 
-int YM2203TimerOver(void *chip,int c)
+int ym2203_timer_over(void *chip,int c)
 {
 	YM2203 *F2203 = chip;
 
@@ -2463,7 +2463,7 @@ int YM2203TimerOver(void *chip,int c)
 	}
 	else
 	{	/* Timer A */
-		YM2203UpdateReq(F2203->OPN.ST.param);
+		ym2203_update_req(F2203->OPN.ST.param);
 		/* timer update */
 		TimerAOver( &(F2203->OPN.ST) );
 		/* CSM mode key,TL control */
@@ -3362,7 +3362,7 @@ INLINE void YM2608IRQMaskWrite(FM_OPN *OPN, YM2608 *F2608, int v)
 }
 
 /* Generate samples for one of the YM2608s */
-void YM2608UpdateOne(void *chip, FMSAMPLE **buffer, int length)
+void ym2608_update_one(void *chip, FMSAMPLE **buffer, int length)
 {
 	YM2608 *F2608 = chip;
 	FM_OPN *OPN   = &F2608->OPN;
@@ -3502,7 +3502,7 @@ void YM2608UpdateOne(void *chip, FMSAMPLE **buffer, int length)
 
 }
 #ifdef __STATE_H__
-void YM2608Postload(void *chip)
+void ym2608_postload(void *chip)
 {
 	if (chip)
 	{
@@ -3578,7 +3578,7 @@ static void YM2608_deltat_status_reset(void *chip, UINT8 changebits)
 	FM_STATUS_RESET(&(F2608->OPN.ST), changebits);
 }
 /* YM2608(OPNA) */
-void * YM2608Init(void *param, int index, int clock, int rate,
+void * ym2608_init(void *param, int index, int clock, int rate,
                void *pcmrom,int pcmsize,
                FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
 {
@@ -3625,7 +3625,7 @@ void * YM2608Init(void *param, int index, int clock, int rate,
 	F2608->pcmbuf   = YM2608_ADPCM_ROM;
 	F2608->pcm_size = 0x2000;
 
-	YM2608ResetChip(F2608);
+	ym2608_reset_chip(F2608);
 
 	Init_ADPCMATable();
 
@@ -3636,7 +3636,7 @@ void * YM2608Init(void *param, int index, int clock, int rate,
 }
 
 /* shut down emulator */
-void YM2608Shutdown(void *chip)
+void ym2608_shutdown(void *chip)
 {
 	YM2608 *F2608 = chip;
 
@@ -3645,7 +3645,7 @@ void YM2608Shutdown(void *chip)
 }
 
 /* reset one of chips */
-void YM2608ResetChip(void *chip)
+void ym2608_reset_chip(void *chip)
 {
 	int i;
 	YM2608 *F2608 = chip;
@@ -3727,7 +3727,7 @@ void YM2608ResetChip(void *chip)
 /* n = number  */
 /* a = address */
 /* v = value   */
-int YM2608Write(void *chip, int a,UINT8 v)
+int ym2608_write(void *chip, int a,UINT8 v)
 {
 	YM2608 *F2608 = chip;
 	FM_OPN *OPN   = &F2608->OPN;
@@ -3765,7 +3765,7 @@ int YM2608Write(void *chip, int a,UINT8 v)
 			(*OPN->ST.SSG->write)(OPN->ST.param,a,v);
 			break;
 		case 0x10:	/* 0x10-0x1f : Rhythm section */
-			YM2608UpdateReq(OPN->ST.param);
+			ym2608_update_req(OPN->ST.param);
 			FM_ADPCMAWrite(F2608,addr-0x10,v);
 			break;
 		case 0x20:	/* Mode Register */
@@ -3775,12 +3775,12 @@ int YM2608Write(void *chip, int a,UINT8 v)
 				YM2608IRQMaskWrite(OPN, F2608, v);
 				break;
 			default:
-				YM2608UpdateReq(OPN->ST.param);
+				ym2608_update_req(OPN->ST.param);
 				OPNWriteMode(OPN,addr,v);
 			}
 			break;
 		default:	/* OPN section */
-			YM2608UpdateReq(OPN->ST.param);
+			ym2608_update_req(OPN->ST.param);
 			OPNWriteReg(OPN,addr,v);
 		}
 		break;
@@ -3796,7 +3796,7 @@ int YM2608Write(void *chip, int a,UINT8 v)
 
 		addr = OPN->ST.address;
 		F2608->REGS[addr | 0x100] = v;
-		YM2608UpdateReq(OPN->ST.param);
+		ym2608_update_req(OPN->ST.param);
 		switch( addr & 0xf0 )
 		{
 		case 0x00:	/* DELTAT PORT */
@@ -3823,7 +3823,7 @@ int YM2608Write(void *chip, int a,UINT8 v)
 	return OPN->ST.irq;
 }
 
-UINT8 YM2608Read(void *chip,int a)
+UINT8 ym2608_read(void *chip,int a)
 {
 	YM2608 *F2608 = chip;
 	int addr = F2608->OPN.ST.address;
@@ -3863,7 +3863,7 @@ UINT8 YM2608Read(void *chip,int a)
 	return ret;
 }
 
-int YM2608TimerOver(void *chip,int c)
+int ym2608_timer_over(void *chip,int c)
 {
 	YM2608 *F2608 = chip;
 
@@ -3883,7 +3883,7 @@ int YM2608TimerOver(void *chip,int c)
 		break;
 	case 0:
 		{	/* Timer A */
-			YM2608UpdateReq(F2608->OPN.ST.param);
+			ym2608_update_req(F2608->OPN.ST.param);
 			/* timer update */
 			TimerAOver( &(F2608->OPN.ST) );
 			/* CSM mode key,TL controll */
@@ -3908,7 +3908,7 @@ int YM2608TimerOver(void *chip,int c)
 /* YM2610(OPNB) */
 
 /* Generate samples for one of the YM2610s */
-void YM2610UpdateOne(void *chip, FMSAMPLE **buffer, int length)
+void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length)
 {
 	YM2610 *F2610 = chip;
 	FM_OPN *OPN   = &F2610->OPN;
@@ -4045,7 +4045,7 @@ void YM2610UpdateOne(void *chip, FMSAMPLE **buffer, int length)
 
 #if BUILD_YM2610B
 /* Generate samples for one of the YM2610Bs */
-void YM2610BUpdateOne(void *chip, FMSAMPLE **buffer, int length)
+void ym2610b_update_one(void *chip, FMSAMPLE **buffer, int length)
 {
 	YM2610 *F2610 = chip;
 	FM_OPN *OPN   = &F2610->OPN;
@@ -4185,7 +4185,7 @@ void YM2610BUpdateOne(void *chip, FMSAMPLE **buffer, int length)
 
 
 #ifdef __STATE_H__
-void YM2610Postload(void *chip)
+void ym2610_postload(void *chip)
 {
 	if (chip)
 	{
@@ -4265,7 +4265,7 @@ static void YM2610_deltat_status_reset(void *chip, UINT8 changebits)
 	F2610->adpcm_arrivedEndAddress &= (~changebits);
 }
 
-void *YM2610Init(void *param, int index, int clock, int rate,
+void *ym2610_init(void *param, int index, int clock, int rate,
                void *pcmroma,int pcmsizea,void *pcmromb,int pcmsizeb,
                FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
 
@@ -4306,7 +4306,7 @@ void *YM2610Init(void *param, int index, int clock, int rate,
 	F2610->deltaT.status_change_which_chip = F2610;
 	F2610->deltaT.status_change_EOS_bit = 0x80;	/* status flag: set bit7 on End Of Sample */
 
-	YM2610ResetChip(F2610);
+	ym2610_reset_chip(F2610);
 
 	Init_ADPCMATable();
 #ifdef __STATE_H__
@@ -4316,7 +4316,7 @@ void *YM2610Init(void *param, int index, int clock, int rate,
 }
 
 /* shut down emulator */
-void YM2610Shutdown(void *chip)
+void ym2610_shutdown(void *chip)
 {
 	YM2610 *F2610 = chip;
 
@@ -4325,7 +4325,7 @@ void YM2610Shutdown(void *chip)
 }
 
 /* reset one of chip */
-void YM2610ResetChip(void *chip)
+void ym2610_reset_chip(void *chip)
 {
 	int i;
 	YM2610 *F2610 = chip;
@@ -4391,7 +4391,7 @@ void YM2610ResetChip(void *chip)
 /* n = number  */
 /* a = address */
 /* v = value   */
-int YM2610Write(void *chip, int a, UINT8 v)
+int ym2610_write(void *chip, int a, UINT8 v)
 {
 	YM2610 *F2610 = chip;
 	FM_OPN *OPN   = &F2610->OPN;
@@ -4422,7 +4422,7 @@ int YM2610Write(void *chip, int a, UINT8 v)
 			(*OPN->ST.SSG->write)(OPN->ST.param,a,v);
 			break;
 		case 0x10: /* DeltaT ADPCM */
-			YM2610UpdateReq(OPN->ST.param);
+			ym2610_update_req(OPN->ST.param);
 
 			switch(addr)
 			{
@@ -4462,11 +4462,11 @@ int YM2610Write(void *chip, int a, UINT8 v)
 
 			break;
 		case 0x20:	/* Mode Register */
-			YM2610UpdateReq(OPN->ST.param);
+			ym2610_update_req(OPN->ST.param);
 			OPNWriteMode(OPN,addr,v);
 			break;
 		default:	/* OPN section */
-			YM2610UpdateReq(OPN->ST.param);
+			ym2610_update_req(OPN->ST.param);
 			/* write register */
 			OPNWriteReg(OPN,addr,v);
 		}
@@ -4481,7 +4481,7 @@ int YM2610Write(void *chip, int a, UINT8 v)
 		if (F2610->addr_A1 != 1)
 			break;	/* verified on real YM2608 */
 
-		YM2610UpdateReq(OPN->ST.param);
+		ym2610_update_req(OPN->ST.param);
 		addr = OPN->ST.address;
 		F2610->REGS[addr | 0x100] = v;
 		if( addr < 0x30 )
@@ -4493,7 +4493,7 @@ int YM2610Write(void *chip, int a, UINT8 v)
 	return OPN->ST.irq;
 }
 
-UINT8 YM2610Read(void *chip,int a)
+UINT8 ym2610_read(void *chip,int a)
 {
 	YM2610 *F2610 = chip;
 	int addr = F2610->OPN.ST.address;
@@ -4521,7 +4521,7 @@ UINT8 YM2610Read(void *chip,int a)
 	return ret;
 }
 
-int YM2610TimerOver(void *chip,int c)
+int ym2610_timer_over(void *chip,int c)
 {
 	YM2610 *F2610 = chip;
 
@@ -4531,7 +4531,7 @@ int YM2610TimerOver(void *chip,int c)
 	}
 	else
 	{	/* Timer A */
-		YM2610UpdateReq(F2610->OPN.ST.param);
+		ym2610_update_req(F2610->OPN.ST.param);
 		/* timer update */
 		TimerAOver( &(F2610->OPN.ST) );
 		/* CSM mode key,TL controll */
@@ -4567,7 +4567,7 @@ typedef struct
 static int dacen;
 
 /* Generate samples for one of the YM2612s */
-void YM2612UpdateOne(void *chip, FMSAMPLE **buffer, int length)
+void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length)
 {
 	YM2612 *F2612 = chip;
 	FM_OPN *OPN   = &F2612->OPN;
@@ -4687,7 +4687,7 @@ void YM2612UpdateOne(void *chip, FMSAMPLE **buffer, int length)
 }
 
 #ifdef __STATE_H__
-void YM2612Postload(void *chip)
+void ym2612_postload(void *chip)
 {
 	if (chip)
 	{
@@ -4734,7 +4734,7 @@ static void YM2612_save_state(YM2612 *F2612, int index)
 #endif /* _STATE_H */
 
 /* initialize YM2612 emulator(s) */
-void * YM2612Init(void *param, int index, int clock, int rate,
+void * ym2612_init(void *param, int index, int clock, int rate,
                FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler)
 {
 	YM2612 *F2612;
@@ -4761,7 +4761,7 @@ void * YM2612Init(void *param, int index, int clock, int rate,
 	/* Extend handler */
 	F2612->OPN.ST.timer_handler = timer_handler;
 	F2612->OPN.ST.IRQ_Handler   = IRQHandler;
-	YM2612ResetChip(F2612);
+	ym2612_reset_chip(F2612);
 
 #ifdef __STATE_H__
 	YM2612_save_state(F2612, index);
@@ -4770,7 +4770,7 @@ void * YM2612Init(void *param, int index, int clock, int rate,
 }
 
 /* shut down emulator */
-void YM2612Shutdown(void *chip)
+void ym2612_shutdown(void *chip)
 {
 	YM2612 *F2612 = chip;
 
@@ -4779,7 +4779,7 @@ void YM2612Shutdown(void *chip)
 }
 
 /* reset one of chip */
-void YM2612ResetChip(void *chip)
+void ym2612_reset_chip(void *chip)
 {
 	int i;
 	YM2612 *F2612 = chip;
@@ -4816,7 +4816,7 @@ void YM2612ResetChip(void *chip)
 /* n = number  */
 /* a = address */
 /* v = value   */
-int YM2612Write(void *chip, int a, UINT8 v)
+int ym2612_write(void *chip, int a, UINT8 v)
 {
 	YM2612 *F2612 = chip;
 	int addr;
@@ -4841,7 +4841,7 @@ int YM2612Write(void *chip, int a, UINT8 v)
 			switch( addr )
 			{
 			case 0x2a:	/* DAC data (YM2612) */
-				YM2612UpdateReq(F2612->OPN.ST.param);
+				ym2612_update_req(F2612->OPN.ST.param);
 				F2612->dacout = ((int)v - 0x80) << 7;	/* level unknown */
 				break;
 			case 0x2b:	/* DAC Sel  (YM2612) */
@@ -4849,13 +4849,13 @@ int YM2612Write(void *chip, int a, UINT8 v)
 				F2612->dacen = v & 0x80;
 				break;
 			default:	/* OPN section */
-				YM2612UpdateReq(F2612->OPN.ST.param);
+				ym2612_update_req(F2612->OPN.ST.param);
 				/* write register */
 				OPNWriteMode(&(F2612->OPN),addr,v);
 			}
 			break;
 		default:	/* 0x30-0xff OPN section */
-			YM2612UpdateReq(F2612->OPN.ST.param);
+			ym2612_update_req(F2612->OPN.ST.param);
 			/* write register */
 			OPNWriteReg(&(F2612->OPN),addr,v);
 		}
@@ -4872,14 +4872,14 @@ int YM2612Write(void *chip, int a, UINT8 v)
 
 		addr = F2612->OPN.ST.address;
 		F2612->REGS[addr | 0x100] = v;
-		YM2612UpdateReq(F2612->OPN.ST.param);
+		ym2612_update_req(F2612->OPN.ST.param);
 		OPNWriteReg(&(F2612->OPN),addr | 0x100,v);
 		break;
 	}
 	return F2612->OPN.ST.irq;
 }
 
-UINT8 YM2612Read(void *chip,int a)
+UINT8 ym2612_read(void *chip,int a)
 {
 	YM2612 *F2612 = chip;
 
@@ -4895,7 +4895,7 @@ UINT8 YM2612Read(void *chip,int a)
 	return 0;
 }
 
-int YM2612TimerOver(void *chip,int c)
+int ym2612_timer_over(void *chip,int c)
 {
 	YM2612 *F2612 = chip;
 
@@ -4905,7 +4905,7 @@ int YM2612TimerOver(void *chip,int c)
 	}
 	else
 	{	/* Timer A */
-		YM2612UpdateReq(F2612->OPN.ST.param);
+		ym2612_update_req(F2612->OPN.ST.param);
 		/* timer update */
 		TimerAOver( &(F2612->OPN.ST) );
 		/* CSM mode key,TL controll */

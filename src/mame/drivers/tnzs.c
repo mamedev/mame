@@ -373,7 +373,7 @@ static WRITE8_HANDLER( kabukiz_sample_w )
 {
 	// to avoid the write when the sound chip is initialized
 	if(data != 0xff)
-		DAC_0_data_w(machine, 0, data);
+		dac_0_data_w(machine, 0, data);
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -419,8 +419,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_BANK2)
-	AM_RANGE(0xb000, 0xb000) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0xb001, 0xb001) AM_READ(YM2203_read_port_0_r)
+	AM_RANGE(0xb000, 0xb000) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0xb001, 0xb001) AM_READ(ym2203_read_port_0_r)
 	AM_RANGE(0xc000, 0xc001) AM_READ(tnzs_mcu_r)	/* plain input ports in insectx (memory handler */
 									/* changed in insectx_init() ) */
 	AM_RANGE(0xd000, 0xdfff) AM_READ(SMH_RAM)
@@ -433,8 +433,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tnzs_bankswitch1_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0xc000, 0xc001) AM_WRITE(tnzs_mcu_w)	/* not present in insectx */
 	AM_RANGE(0xd000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(tnzs_sharedram_w)
@@ -443,8 +443,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kageki_sub_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_BANK2)
-	AM_RANGE(0xb000, 0xb000) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0xb001, 0xb001) AM_READ(YM2203_read_port_0_r)
+	AM_RANGE(0xb000, 0xb000) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0xb001, 0xb001) AM_READ(ym2203_read_port_0_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN1")
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("IN2")
@@ -455,8 +455,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kageki_sub_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(tnzs_bankswitch1_w)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0xd000, 0xdfff) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xe000, 0xefff) AM_WRITE(tnzs_sharedram_w)
 ADDRESS_MAP_END
@@ -513,14 +513,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tnzsb_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(YM2203_status_port_0_r)
+	AM_RANGE(0x00, 0x00) AM_READ(ym2203_status_port_0_r)
 	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tnzsb_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
 ADDRESS_MAP_END
 
 
@@ -603,8 +603,8 @@ static ADDRESS_MAP_START( jpopnics_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x9fff) AM_READWRITE(SMH_BANK2, SMH_ROM)
 
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(jpopnics_subbankswitch_w)
-	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("IN0") AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xb001, 0xb001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("IN0") AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xb001, 0xb001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN1")
 	AM_RANGE(0xc001, 0xc001) AM_READ_PORT("IN2")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSWA")

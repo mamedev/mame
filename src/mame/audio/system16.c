@@ -76,7 +76,7 @@ READ8_HANDLER( sys16_7751_sh_command_r )
 /* write to P1 */
 WRITE8_HANDLER( sys16_7751_sh_dac_w )
 {
-	DAC_data_w(0,data);
+	dac_data_w(0,data);
 }
 
 /* write to P2 */

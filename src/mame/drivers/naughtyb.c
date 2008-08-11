@@ -361,7 +361,7 @@ static const custom_sound_interface popflame_custom_interface =
 	popflame_sh_start
 };
 
-static const struct TMS36XXinterface tms3615_interface =
+static const tms36xx_interface tms3615_interface =
 {
 	TMS3615,	/* TMS36xx subtype */
 	/*

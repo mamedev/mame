@@ -357,13 +357,13 @@ static ADDRESS_MAP_START( galpani3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf00014, 0xf00015) AM_READ(input_port_2_word_r)
 	AM_RANGE(0xf00016, 0xf00017) AM_NOP // ? read, but overwritten
 
-	AM_RANGE(0xf00020, 0xf00021) AM_WRITE(YMZ280B_register_0_lsb_w)	// sound
-	AM_RANGE(0xf00022, 0xf00023) AM_WRITE(YMZ280B_data_0_lsb_w)		//
+	AM_RANGE(0xf00020, 0xf00021) AM_WRITE(ymz280b_register_0_lsb_w)	// sound
+	AM_RANGE(0xf00022, 0xf00023) AM_WRITE(ymz280b_data_0_lsb_w)		//
 	AM_RANGE(0xf00040, 0xf00041) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
 ADDRESS_MAP_END
 
 
-static const struct YMZ280Binterface ymz280b_intf =
+static const ymz280b_interface ymz280b_intf =
 {
 	0	// irq ?
 };

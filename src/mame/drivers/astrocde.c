@@ -716,9 +716,9 @@ static ADDRESS_MAP_START( tenpin_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x90, 0x93) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
 	AM_RANGE(0x97, 0x97) AM_READ(soundlatch_r)
-	AM_RANGE(0x98, 0x98) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x98, 0x98) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x9a, 0x9a) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x98, 0x98) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x98, 0x98) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x9a, 0x9a) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 

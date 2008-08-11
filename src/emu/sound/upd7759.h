@@ -1,5 +1,7 @@
-#ifndef UPD7759S_H
-#define UPD7759S_H
+#pragma once
+
+#ifndef __UPD7759_H__
+#define __UPD7759_H__
 
 /* There are two modes for the uPD7759, selected through the !MD pin.
    This is the mode select input.  High is stand alone, low is slave.
@@ -8,7 +10,8 @@
 
 #define UPD7759_STANDARD_CLOCK		640000
 
-struct upd7759_interface
+typedef struct _upd7759_interface upd7759_interface;
+struct _upd7759_interface
 {
 	void (*drqcallback)(int param);	/* drq callback (per chip, slave mode only) */
 };
@@ -26,5 +29,4 @@ WRITE8_HANDLER( upd7759_0_port_w );
 WRITE8_HANDLER( upd7759_0_start_w );
 READ8_HANDLER( upd7759_0_busy_r );
 
-#endif
-
+#endif /* __UPD7759_H__ */

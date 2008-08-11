@@ -275,15 +275,15 @@ static WRITE16_HANDLER( cave_sound_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		if (offset)	YMZ280B_data_0_w     (machine, offset, data & 0xff);
-		else		YMZ280B_register_0_w (machine, offset, data & 0xff);
+		if (offset)	ymz280b_data_0_w     (machine, offset, data & 0xff);
+		else		ymz280b_register_0_w (machine, offset, data & 0xff);
 	}
 }
 
 /* Handles reads from the YMZ280B */
 static READ16_HANDLER( cave_sound_r )
 {
-	return YMZ280B_status_0_r(machine,offset);
+	return ymz280b_status_0_r(machine,offset);
 }
 
 
@@ -1206,16 +1206,16 @@ static ADDRESS_MAP_START( hotdogst_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r			)	// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r			)	//
-	AM_RANGE(0x50, 0x50) AM_READ(YM2203_status_port_0_r	)	// YM2203
-	AM_RANGE(0x51, 0x51) AM_READ(YM2203_read_port_0_r		)	//
+	AM_RANGE(0x50, 0x50) AM_READ(ym2203_status_port_0_r	)	// YM2203
+	AM_RANGE(0x51, 0x51) AM_READ(ym2203_read_port_0_r		)	//
 	AM_RANGE(0x60, 0x60) AM_READ(okim6295_status_0_r		)	// M6295
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotdogst_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(hotdogst_rombank_w		)	// ROM bank
-	AM_RANGE(0x50, 0x50) AM_WRITE(YM2203_control_port_0_w	)	// YM2203
-	AM_RANGE(0x51, 0x51) AM_WRITE(YM2203_write_port_0_w		)	//
+	AM_RANGE(0x50, 0x50) AM_WRITE(ym2203_control_port_0_w	)	// YM2203
+	AM_RANGE(0x51, 0x51) AM_WRITE(ym2203_write_port_0_w		)	//
 	AM_RANGE(0x60, 0x60) AM_WRITE(okim6295_data_0_w			)	// M6295
 	AM_RANGE(0x70, 0x70) AM_WRITE(hotdogst_okibank_w		)	// Samples bank
 ADDRESS_MAP_END
@@ -1251,15 +1251,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mazinger_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r			)	// From Main CPU
-	AM_RANGE(0x52, 0x52) AM_READ(YM2203_status_port_0_r	)	// YM2203
+	AM_RANGE(0x52, 0x52) AM_READ(ym2203_status_port_0_r	)	// YM2203
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mazinger_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(mazinger_rombank_w		)	// ROM bank
 	AM_RANGE(0x10, 0x10) AM_WRITE(soundlatch_ack_w			)	// To Main CPU
-	AM_RANGE(0x50, 0x50) AM_WRITE(YM2203_control_port_0_w	)	// YM2203
-	AM_RANGE(0x51, 0x51) AM_WRITE(YM2203_write_port_0_w		)	//
+	AM_RANGE(0x50, 0x50) AM_WRITE(ym2203_control_port_0_w	)	// YM2203
+	AM_RANGE(0x51, 0x51) AM_WRITE(ym2203_write_port_0_w		)	//
 	AM_RANGE(0x70, 0x70) AM_WRITE(okim6295_data_0_w			)	// M6295
 	AM_RANGE(0x74, 0x74) AM_WRITE(hotdogst_okibank_w		)	// Samples bank
 ADDRESS_MAP_END
@@ -1313,14 +1313,14 @@ static ADDRESS_MAP_START( metmqstr_sound_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_READ(soundflags_r				)	// Communication
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r			)	// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r			)	//
-	AM_RANGE(0x51, 0x51) AM_READ(YM2151_status_port_0_r	)	// YM2151
+	AM_RANGE(0x51, 0x51) AM_READ(ym2151_status_port_0_r	)	// YM2151
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( metmqstr_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(metmqstr_rombank_w		)	// Rom Bank
-	AM_RANGE(0x50, 0x50) AM_WRITE(YM2151_register_port_0_w	)	// YM2151
-	AM_RANGE(0x51, 0x51) AM_WRITE(YM2151_data_port_0_w		)	//
+	AM_RANGE(0x50, 0x50) AM_WRITE(ym2151_register_port_0_w	)	// YM2151
+	AM_RANGE(0x51, 0x51) AM_WRITE(ym2151_data_port_0_w		)	//
 	AM_RANGE(0x60, 0x60) AM_WRITE(okim6295_data_0_w			)	// M6295 #0
 	AM_RANGE(0x70, 0x70) AM_WRITE(metmqstr_okibank0_w		)	// Samples Bank #0
 	AM_RANGE(0x80, 0x80) AM_WRITE(okim6295_data_1_w			)	// M6295 #1
@@ -1357,8 +1357,8 @@ static ADDRESS_MAP_START( pwrinst2_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(okim6295_status_0_r		)	// M6295
 	AM_RANGE(0x08, 0x08) AM_READ(okim6295_status_1_r		)	//
-	AM_RANGE(0x40, 0x40) AM_READ(YM2203_status_port_0_r	)	// YM2203
-	AM_RANGE(0x41, 0x41) AM_READ(YM2203_read_port_0_r		)	//
+	AM_RANGE(0x40, 0x40) AM_READ(ym2203_status_port_0_r	)	// YM2203
+	AM_RANGE(0x41, 0x41) AM_READ(ym2203_read_port_0_r		)	//
 	AM_RANGE(0x60, 0x60) AM_READ(soundlatch_hi_r			)	// From Main CPU
 	AM_RANGE(0x70, 0x70) AM_READ(soundlatch_lo_r			)	//
 ADDRESS_MAP_END
@@ -1368,8 +1368,8 @@ static ADDRESS_MAP_START( pwrinst2_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(okim6295_data_0_w			)	// M6295
 	AM_RANGE(0x08, 0x08) AM_WRITE(okim6295_data_1_w			)	//
 	AM_RANGE(0x10, 0x17) AM_WRITE(NMK112_okibank_w			)	// Samples bank
-	AM_RANGE(0x40, 0x40) AM_WRITE(YM2203_control_port_0_w	)	// YM2203
-	AM_RANGE(0x41, 0x41) AM_WRITE(YM2203_write_port_0_w		)	//
+	AM_RANGE(0x40, 0x40) AM_WRITE(ym2203_control_port_0_w	)	// YM2203
+	AM_RANGE(0x41, 0x41) AM_WRITE(ym2203_write_port_0_w		)	//
 //  AM_RANGE(0x50, 0x50) AM_WRITE(SMH_NOP      )   // ?? volume
 //  AM_RANGE(0x51, 0x51) AM_WRITE(SMH_NOP      )   // ?? volume
 	AM_RANGE(0x80, 0x80) AM_WRITE(pwrinst2_rombank_w		)	// ROM bank
@@ -1436,7 +1436,7 @@ static ADDRESS_MAP_START( sailormn_sound_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x20, 0x20) AM_READ(soundflags_r				)	// Communication
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r			)	// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r			)	//
-	AM_RANGE(0x51, 0x51) AM_READ(YM2151_status_port_0_r	)	// YM2151
+	AM_RANGE(0x51, 0x51) AM_READ(ym2151_status_port_0_r	)	// YM2151
 	AM_RANGE(0x60, 0x60) AM_READ(okim6295_status_0_r		)	// M6295 #0
 	AM_RANGE(0x80, 0x80) AM_READ(okim6295_status_1_r		)	// M6295 #1
 ADDRESS_MAP_END
@@ -1445,8 +1445,8 @@ static ADDRESS_MAP_START( sailormn_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sailormn_rombank_w		)	// Rom Bank
 	AM_RANGE(0x10, 0x10) AM_WRITE(soundlatch_ack_w			)	// To Main CPU
-	AM_RANGE(0x50, 0x50) AM_WRITE(YM2151_register_port_0_w	)	// YM2151
-	AM_RANGE(0x51, 0x51) AM_WRITE(YM2151_data_port_0_w		)	//
+	AM_RANGE(0x50, 0x50) AM_WRITE(ym2151_register_port_0_w	)	// YM2151
+	AM_RANGE(0x51, 0x51) AM_WRITE(ym2151_data_port_0_w		)	//
 	AM_RANGE(0x60, 0x60) AM_WRITE(okim6295_data_0_w			)	// M6295 #0
 	AM_RANGE(0x70, 0x70) AM_WRITE(sailormn_okibank0_w		)	// Samples Bank #0
 	AM_RANGE(0x80, 0x80) AM_WRITE(okim6295_data_1_w			)	// M6295 #1
@@ -1956,7 +1956,7 @@ static MACHINE_RESET( cave )
 		((UINT8 *)eeprom_get_data_pointer(NULL,NULL))[cave_region_byte] =  input_port_read(machine, "EEPROM");
 }
 
-static const struct YMZ280Binterface ymz280b_intf =
+static const ymz280b_interface ymz280b_intf =
 {
 	sound_irq_gen
 };

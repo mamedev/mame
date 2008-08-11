@@ -312,7 +312,7 @@ static ADDRESS_MAP_START( gottlieb_sound1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x0d80) AM_RAM
 	AM_RANGE(0x0200, 0x021f) AM_MIRROR(0x0de0) AM_DEVREADWRITE(RIOT6532, "riot", riot6532_r, riot6532_w)
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_WRITE(DAC_0_data_w)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x0fff) AM_WRITE(dac_0_data_w)
 	AM_RANGE(0x2000, 0x2000) AM_MIRROR(0x0fff) AM_WRITE(vortrax_data_w)
 	AM_RANGE(0x3000, 0x3000) AM_MIRROR(0x0fff) AM_WRITE(speech_clock_dac_w)
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
@@ -485,7 +485,7 @@ static WRITE8_HANDLER( dac_w )
 	/* dual DAC; the first DAC serves as the reference voltage for the
        second, effectively scaling the output */
 	dac_data[offset] = data;
-	DAC_data_16_w(0, dac_data[0] * dac_data[1]);
+	dac_data_16_w(0, dac_data[0] * dac_data[1]);
 }
 
 
@@ -507,17 +507,17 @@ static WRITE8_HANDLER( speech_control_w )
 		{
 			/* bit 4 goes to the 8913 BC1 pin */
 			if (data & 0x10)
-				AY8910_control_port_0_w(machine, 0, *psg_latch);
+				ay8910_control_port_0_w(machine, 0, *psg_latch);
 			else
-				AY8910_write_port_0_w(machine, 0, *psg_latch);
+				ay8910_write_port_0_w(machine, 0, *psg_latch);
 		}
 		else
 		{
 			/* bit 4 goes to the 8913 BC1 pin */
 			if (data & 0x10)
-				AY8910_control_port_1_w(machine, 0, *psg_latch);
+				ay8910_control_port_1_w(machine, 0, *psg_latch);
 			else
-				AY8910_write_port_1_w(machine, 0, *psg_latch);
+				ay8910_write_port_1_w(machine, 0, *psg_latch);
 		}
 	}
 

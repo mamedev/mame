@@ -1529,8 +1529,8 @@ static ADDRESS_MAP_START( truxton2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700008, 0x700009) AM_READ_PORT("IN2")
 	AM_RANGE(0x70000a, 0x70000b) AM_READ_PORT("SYS")
 	AM_RANGE(0x700010, 0x700011) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
-	AM_RANGE(0x700014, 0x700015) AM_WRITE(YM2151_register_port_0_lsb_w)
-	AM_RANGE(0x700016, 0x700017) AM_READWRITE(YM2151_status_port_0_lsb_r, YM2151_data_port_0_lsb_w)
+	AM_RANGE(0x700014, 0x700015) AM_WRITE(ym2151_register_port_0_lsb_w)
+	AM_RANGE(0x700016, 0x700017) AM_READWRITE(ym2151_status_port_0_lsb_r, ym2151_data_port_0_lsb_w)
 	AM_RANGE(0x70001e, 0x70001f) AM_WRITE(toaplan2_coin_word_w)		/* Coin count/lock */
 ADDRESS_MAP_END
 
@@ -1767,8 +1767,8 @@ static ADDRESS_MAP_START( snowbro2_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300008, 0x300009) AM_WRITE(toaplan2_0_scroll_reg_select_w)
 	AM_RANGE(0x30000c, 0x30000d) AM_READWRITE(toaplan2_inputport_0_word_r, toaplan2_0_scroll_reg_data_w)	/* VBlank */
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(YM2151_register_port_0_lsb_w)
-	AM_RANGE(0x500002, 0x500003) AM_READWRITE(YM2151_status_port_0_lsb_r, YM2151_data_port_0_lsb_w)
+	AM_RANGE(0x500000, 0x500001) AM_WRITE(ym2151_register_port_0_lsb_w)
+	AM_RANGE(0x500002, 0x500003) AM_READWRITE(ym2151_status_port_0_lsb_r, ym2151_data_port_0_lsb_w)
 	AM_RANGE(0x600000, 0x600001) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("JMPR")
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("DSWA")
@@ -1928,16 +1928,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&toaplan2_shared_ram)
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym3812_write_port_0_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( raizing_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&raizing_shared_ram)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xe001, 0xe001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0xe004, 0xe004) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0xe00e, 0xe00e) AM_WRITE(toaplan2_coin_w)
 ADDRESS_MAP_END
@@ -1947,8 +1947,8 @@ static ADDRESS_MAP_START( bgaregga_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&raizing_shared_ram)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xe001, 0xe001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0xe004, 0xe004) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0xe006, 0xe006) AM_WRITE(raizing_okim6295_bankselect_0)
 	AM_RANGE(0xe008, 0xe008) AM_WRITE(raizing_okim6295_bankselect_1)
@@ -1974,8 +1974,8 @@ static ADDRESS_MAP_START( batrider_sound_z80_port, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x46, 0x46) AM_WRITE(raizing_clear_nmi_w)
 	AM_RANGE(0x48, 0x48) AM_READ(soundlatch_r)
 	AM_RANGE(0x4a, 0x4a) AM_READ(soundlatch2_r)
-	AM_RANGE(0x80, 0x80) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x81, 0x81) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x81, 0x81) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0x82, 0x82) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0x84, 0x84) AM_READWRITE(okim6295_status_1_r, okim6295_data_1_w)
 	AM_RANGE(0x88, 0x88) AM_WRITE(batrider_bankswitch_w)
@@ -2001,8 +2001,8 @@ static ADDRESS_MAP_START( bbakraid_sound_z80_port, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x46, 0x46) AM_WRITE(raizing_clear_nmi_w)
 	AM_RANGE(0x48, 0x48) AM_READ(soundlatch_r)
 	AM_RANGE(0x4a, 0x4a) AM_READ(soundlatch2_r)
-	AM_RANGE(0x80, 0x80) AM_WRITE(YMZ280B_register_0_w)
-	AM_RANGE(0x81, 0x81) AM_READWRITE(YMZ280B_status_0_r, YMZ280B_data_0_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(ymz280b_register_0_w)
+	AM_RANGE(0x81, 0x81) AM_READWRITE(ymz280b_status_0_r, ymz280b_data_0_w)
 ADDRESS_MAP_END
 
 
@@ -2022,8 +2022,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( V25_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x03fff) AM_ROM
 //  AM_RANGE(0x00000, 0x007ff) AM_RAM                           /* External shared RAM (Banked) */
-	AM_RANGE(0x04000, 0x04000) AM_READWRITE(YM2151_status_port_0_r, YM2151_register_port_0_w)
-	AM_RANGE(0x04001, 0x04001) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0x04000, 0x04000) AM_READWRITE(ym2151_status_port_0_r, ym2151_register_port_0_w)
+	AM_RANGE(0x04001, 0x04001) AM_WRITE(ym2151_data_port_0_w)
 	AM_RANGE(0x04002, 0x04002) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 //  AM_RANGE(0x04004, 0x04004) AM_WRITE(oki_bankswitch_w)
 	AM_RANGE(0x04008, 0x04008) AM_READ_PORT("IN1")
@@ -2053,8 +2053,8 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( V25_rambased_mem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x00000) AM_WRITE( YM2151_register_port_0_w )
-	AM_RANGE(0x00001, 0x00001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0x00000, 0x00000) AM_WRITE( ym2151_register_port_0_w )
+	AM_RANGE(0x00001, 0x00001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 
 	AM_RANGE(0x07800, 0x07fff) AM_RAM AM_SHARE(6)
 
@@ -3418,7 +3418,7 @@ static const ym3812_interface ym3812_config =
 	irqhandler
 };
 
-static const struct YMZ280Binterface ymz280b_interface =
+static const ymz280b_interface ymz280b_config =
 {
 	bbakraid_irqhandler
 };
@@ -4203,7 +4203,7 @@ static MACHINE_DRIVER_START( bbakraid )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
-	MDRV_SOUND_CONFIG(ymz280b_interface)
+	MDRV_SOUND_CONFIG(ymz280b_config)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_DRIVER_END

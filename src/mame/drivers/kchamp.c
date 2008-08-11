@@ -162,10 +162,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sound_msm_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(sound_control_w)
 ADDRESS_MAP_END
@@ -237,11 +237,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kc_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(DAC_0_data_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(dac_0_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(kc_sound_control_w)
 ADDRESS_MAP_END
 

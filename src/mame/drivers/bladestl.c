@@ -128,8 +128,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)	/* YM2203 */
-	AM_RANGE(0x1001, 0x1001) AM_READWRITE(YM2203_read_port_0_r, YM2203_write_port_0_w)		/* YM2203 */
+	AM_RANGE(0x1000, 0x1000) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)	/* YM2203 */
+	AM_RANGE(0x1001, 0x1001) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)		/* YM2203 */
 	AM_RANGE(0x3000, 0x3000) AM_WRITE(bladestl_speech_ctrl_w)	/* UPD7759 */
 	AM_RANGE(0x4000, 0x4000) AM_READ(upd7759_0_busy_r)			/* UPD7759 */
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(SMH_NOP)					/* ??? */

@@ -80,7 +80,7 @@ static WRITE8_HANDLER( audio_dac_w)
 
 	dac_address += 0x10000;
 
-	DAC_data_w( 0, rom[dac_address+cur_dac_address_index] );
+	dac_data_w( 0, rom[dac_address+cur_dac_address_index] );
 
 	timer_set( ATTOTIME_IN_HZ( 16000 ), NULL, 0, dac_irq );
 }

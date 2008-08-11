@@ -108,9 +108,9 @@ static WRITE16_HANDLER( ym2413_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		if (offset & 1)
-			YM2413_data_port_0_w(machine, 0, (data >> 8) & 0xff);
+			ym2413_data_port_0_w(machine, 0, (data >> 8) & 0xff);
 		else
-			YM2413_register_port_0_w(machine, 0, (data >> 8) & 0xff);
+			ym2413_register_port_0_w(machine, 0, (data >> 8) & 0xff);
 	}
 }
 

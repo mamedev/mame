@@ -1239,14 +1239,14 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( system32_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0c) AM_READWRITE(YM3438_status_port_0_A_r, YM3438_control_port_0_A_w)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x0c) AM_WRITE(YM3438_data_port_0_A_w)
-	AM_RANGE(0x82, 0x82) AM_MIRROR(0x0c) AM_WRITE(YM3438_control_port_0_B_w)
-	AM_RANGE(0x83, 0x83) AM_MIRROR(0x0c) AM_WRITE(YM3438_data_port_0_B_w)
-	AM_RANGE(0x90, 0x90) AM_MIRROR(0x0c) AM_READWRITE(YM3438_status_port_1_A_r, YM3438_control_port_1_A_w)
-	AM_RANGE(0x91, 0x91) AM_MIRROR(0x0c) AM_WRITE(YM3438_data_port_1_A_w)
-	AM_RANGE(0x92, 0x92) AM_MIRROR(0x0c) AM_WRITE(YM3438_control_port_1_B_w)
-	AM_RANGE(0x93, 0x93) AM_MIRROR(0x0c) AM_WRITE(YM3438_data_port_1_B_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0c) AM_READWRITE(ym3438_status_port_0_a_r, ym3438_control_port_0_a_w)
+	AM_RANGE(0x81, 0x81) AM_MIRROR(0x0c) AM_WRITE(ym3438_data_port_0_a_w)
+	AM_RANGE(0x82, 0x82) AM_MIRROR(0x0c) AM_WRITE(ym3438_control_port_0_b_w)
+	AM_RANGE(0x83, 0x83) AM_MIRROR(0x0c) AM_WRITE(ym3438_data_port_0_b_w)
+	AM_RANGE(0x90, 0x90) AM_MIRROR(0x0c) AM_READWRITE(ym3438_status_port_1_a_r, ym3438_control_port_1_a_w)
+	AM_RANGE(0x91, 0x91) AM_MIRROR(0x0c) AM_WRITE(ym3438_data_port_1_a_w)
+	AM_RANGE(0x92, 0x92) AM_MIRROR(0x0c) AM_WRITE(ym3438_control_port_1_b_w)
+	AM_RANGE(0x93, 0x93) AM_MIRROR(0x0c) AM_WRITE(ym3438_data_port_1_b_w)
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(sound_bank_lo_w)
 	AM_RANGE(0xb0, 0xbf) AM_WRITE(sound_bank_hi_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(sound_int_control_lo_w)
@@ -1265,10 +1265,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( multi32_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0c) AM_READWRITE(YM3438_status_port_0_A_r, YM3438_control_port_0_A_w)
-	AM_RANGE(0x81, 0x81) AM_MIRROR(0x0c) AM_WRITE(YM3438_data_port_0_A_w)
-	AM_RANGE(0x82, 0x82) AM_MIRROR(0x0c) AM_WRITE(YM3438_control_port_0_B_w)
-	AM_RANGE(0x83, 0x83) AM_MIRROR(0x0c) AM_WRITE(YM3438_data_port_0_B_w)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x0c) AM_READWRITE(ym3438_status_port_0_a_r, ym3438_control_port_0_a_w)
+	AM_RANGE(0x81, 0x81) AM_MIRROR(0x0c) AM_WRITE(ym3438_data_port_0_a_w)
+	AM_RANGE(0x82, 0x82) AM_MIRROR(0x0c) AM_WRITE(ym3438_control_port_0_b_w)
+	AM_RANGE(0x83, 0x83) AM_MIRROR(0x0c) AM_WRITE(ym3438_data_port_0_b_w)
 	AM_RANGE(0xa0, 0xaf) AM_WRITE(sound_bank_lo_w)
 	AM_RANGE(0xb0, 0xbf) AM_WRITE(multipcm_bank_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(sound_int_control_lo_w)
@@ -2107,7 +2107,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static const struct YM3438interface ym3438_interface =
+static const ym3438_interface ym3438_config =
 {
 	ym3438_irq_handler
 };
@@ -2183,7 +2183,7 @@ static MACHINE_DRIVER_START( system32 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym1", YM3438, MASTER_CLOCK/4)
-	MDRV_SOUND_CONFIG(ym3438_interface)
+	MDRV_SOUND_CONFIG(ym3438_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.40)
 	MDRV_SOUND_ROUTE(1, "right", 0.40)
 
@@ -2244,7 +2244,7 @@ static MACHINE_DRIVER_START( multi32 )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ym", YM3438, MASTER_CLOCK/4)
-	MDRV_SOUND_CONFIG(ym3438_interface)
+	MDRV_SOUND_CONFIG(ym3438_config)
 	MDRV_SOUND_ROUTE(1, "left", 0.40)
 	MDRV_SOUND_ROUTE(0, "right", 0.40)
 

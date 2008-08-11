@@ -115,7 +115,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bigkarnk_readmem_snd, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)				/* RAM */
 	AM_RANGE(0x0800, 0x0801) AM_READ(okim6295_status_0_r)	/* OKI6295 */
-	AM_RANGE(0x0a00, 0x0a00) AM_READ(YM3812_status_port_0_r)	/* YM3812 */
+	AM_RANGE(0x0a00, 0x0a00) AM_READ(ym3812_status_port_0_r)	/* YM3812 */
 	AM_RANGE(0x0b00, 0x0b00) AM_READ(soundlatch_r)			/* Sound latch */
 	AM_RANGE(0x0c00, 0xffff) AM_READ(SMH_ROM)				/* ROM */
 ADDRESS_MAP_END
@@ -124,8 +124,8 @@ static ADDRESS_MAP_START( bigkarnk_writemem_snd, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)				/* RAM */
 	AM_RANGE(0x0800, 0x0800) AM_WRITE(okim6295_data_0_w)		/* OKI6295 */
 //  AM_RANGE(0x0900, 0x0900) AM_WRITE(SMH_NOP)             /* enable sound output? */
-	AM_RANGE(0x0a00, 0x0a00) AM_WRITE(YM3812_control_port_0_w)/* YM3812 */
-	AM_RANGE(0x0a01, 0x0a01) AM_WRITE(YM3812_write_port_0_w)	/* YM3812 */
+	AM_RANGE(0x0a00, 0x0a00) AM_WRITE(ym3812_control_port_0_w)/* YM3812 */
+	AM_RANGE(0x0a01, 0x0a01) AM_WRITE(ym3812_write_port_0_w)	/* YM3812 */
 	AM_RANGE(0x0c00, 0xffff) AM_WRITE(SMH_ROM)				/* ROM */
 ADDRESS_MAP_END
 

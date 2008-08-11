@@ -100,8 +100,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(dac_w)
 {
-	DAC_0_data_w(machine, 0, data & 0xf0 );	/* left */
-	DAC_1_data_w(machine, 0, (data & 0x0f)<<4 );	/* right */
+	dac_0_data_w(machine, 0, data & 0xf0 );	/* left */
+	dac_1_data_w(machine, 0, (data & 0x0f)<<4 );	/* right */
 }
 
 

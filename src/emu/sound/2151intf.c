@@ -26,14 +26,14 @@ struct ym2151_info
 static void ym2151_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)
 {
 	struct ym2151_info *info = param;
-	YM2151UpdateOne(info->chip, buffers, length);
+	ym2151_update_one(info->chip, buffers, length);
 }
 
 
-static STATE_POSTLOAD( ym2151_postload )
+static STATE_POSTLOAD( ym2151intf_postload )
 {
 	struct ym2151_info *info = param;
-	YM2151Postload(machine, info->chip);
+	ym2151_postload(machine, info->chip);
 }
 
 
@@ -53,14 +53,14 @@ static void *ym2151_start(const char *tag, int sndindex, int clock, const void *
 	/* stream setup */
 	info->stream = stream_create(0,2,rate,info,ym2151_update);
 
-	info->chip = YM2151Init(sndindex,clock,rate);
+	info->chip = ym2151_init(sndindex,clock,rate);
 
-	state_save_register_postload(Machine, ym2151_postload, info);
+	state_save_register_postload(Machine, ym2151intf_postload, info);
 
 	if (info->chip != 0)
 	{
-		YM2151SetIrqHandler(info->chip,info->intf->irqhandler);
-		YM2151SetPortWriteHandler(info->chip,info->intf->portwritehandler);
+		ym2151_set_irq_handler(info->chip,info->intf->irqhandler);
+		ym2151_set_port_write_handler(info->chip,info->intf->portwritehandler);
 		return info;
 	}
 	return NULL;
@@ -70,138 +70,138 @@ static void *ym2151_start(const char *tag, int sndindex, int clock, const void *
 static void ym2151_stop(void *token)
 {
 	struct ym2151_info *info = token;
-	YM2151Shutdown(info->chip);
+	ym2151_shutdown(info->chip);
 }
 
 static void ym2151_reset(void *token)
 {
 	struct ym2151_info *info = token;
-	YM2151ResetChip(info->chip);
+	ym2151_reset_chip(info->chip);
 }
 
 static int lastreg0,lastreg1,lastreg2;
 
-READ8_HANDLER( YM2151_status_port_0_r )
+READ8_HANDLER( ym2151_status_port_0_r )
 {
 	struct ym2151_info *token = sndti_token(SOUND_YM2151, 0);
 	stream_update(token->stream);
-	return YM2151ReadStatus(token->chip);
+	return ym2151_read_status(token->chip);
 }
 
-READ8_HANDLER( YM2151_status_port_1_r )
+READ8_HANDLER( ym2151_status_port_1_r )
 {
 	struct ym2151_info *token = sndti_token(SOUND_YM2151, 1);
 	stream_update(token->stream);
-	return YM2151ReadStatus(token->chip);
+	return ym2151_read_status(token->chip);
 }
 
-READ8_HANDLER( YM2151_status_port_2_r )
+READ8_HANDLER( ym2151_status_port_2_r )
 {
 	struct ym2151_info *token = sndti_token(SOUND_YM2151, 2);
 	stream_update(token->stream);
-	return YM2151ReadStatus(token->chip);
+	return ym2151_read_status(token->chip);
 }
 
-WRITE8_HANDLER( YM2151_register_port_0_w )
+WRITE8_HANDLER( ym2151_register_port_0_w )
 {
 	lastreg0 = data;
 }
-WRITE8_HANDLER( YM2151_register_port_1_w )
+WRITE8_HANDLER( ym2151_register_port_1_w )
 {
 	lastreg1 = data;
 }
-WRITE8_HANDLER( YM2151_register_port_2_w )
+WRITE8_HANDLER( ym2151_register_port_2_w )
 {
 	lastreg2 = data;
 }
 
-WRITE8_HANDLER( YM2151_data_port_0_w )
+WRITE8_HANDLER( ym2151_data_port_0_w )
 {
 	struct ym2151_info *token = sndti_token(SOUND_YM2151, 0);
 	stream_update(token->stream);
-	YM2151WriteReg(token->chip,lastreg0,data);
+	ym2151_write_reg(token->chip,lastreg0,data);
 }
 
-WRITE8_HANDLER( YM2151_data_port_1_w )
+WRITE8_HANDLER( ym2151_data_port_1_w )
 {
 	struct ym2151_info *token = sndti_token(SOUND_YM2151, 1);
 	stream_update(token->stream);
-	YM2151WriteReg(token->chip,lastreg1,data);
+	ym2151_write_reg(token->chip,lastreg1,data);
 }
 
-WRITE8_HANDLER( YM2151_data_port_2_w )
+WRITE8_HANDLER( ym2151_data_port_2_w )
 {
 	struct ym2151_info *token = sndti_token(SOUND_YM2151, 2);
 	stream_update(token->stream);
-	YM2151WriteReg(token->chip,lastreg2,data);
+	ym2151_write_reg(token->chip,lastreg2,data);
 }
 
-WRITE8_HANDLER( YM2151_word_0_w )
+WRITE8_HANDLER( ym2151_word_0_w )
 {
 	if (offset)
-		YM2151_data_port_0_w(machine,0,data);
+		ym2151_data_port_0_w(machine,0,data);
 	else
-		YM2151_register_port_0_w(machine,0,data);
+		ym2151_register_port_0_w(machine,0,data);
 }
 
-WRITE8_HANDLER( YM2151_word_1_w )
+WRITE8_HANDLER( ym2151_word_1_w )
 {
 	if (offset)
-		YM2151_data_port_1_w(machine,0,data);
+		ym2151_data_port_1_w(machine,0,data);
 	else
-		YM2151_register_port_1_w(machine,0,data);
+		ym2151_register_port_1_w(machine,0,data);
 }
 
-READ16_HANDLER( YM2151_status_port_0_lsb_r )
+READ16_HANDLER( ym2151_status_port_0_lsb_r )
 {
-	return YM2151_status_port_0_r(machine,0);
+	return ym2151_status_port_0_r(machine,0);
 }
 
-READ16_HANDLER( YM2151_status_port_1_lsb_r )
+READ16_HANDLER( ym2151_status_port_1_lsb_r )
 {
-	return YM2151_status_port_1_r(machine,0);
+	return ym2151_status_port_1_r(machine,0);
 }
 
-READ16_HANDLER( YM2151_status_port_2_lsb_r )
+READ16_HANDLER( ym2151_status_port_2_lsb_r )
 {
-	return YM2151_status_port_2_r(machine,0);
+	return ym2151_status_port_2_r(machine,0);
 }
 
 
-WRITE16_HANDLER( YM2151_register_port_0_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		YM2151_register_port_0_w(machine, 0, data & 0xff);
-}
-
-WRITE16_HANDLER( YM2151_register_port_1_lsb_w )
+WRITE16_HANDLER( ym2151_register_port_0_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		YM2151_register_port_1_w(machine, 0, data & 0xff);
+		ym2151_register_port_0_w(machine, 0, data & 0xff);
 }
 
-WRITE16_HANDLER( YM2151_register_port_2_lsb_w )
+WRITE16_HANDLER( ym2151_register_port_1_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		YM2151_register_port_2_w(machine, 0, data & 0xff);
+		ym2151_register_port_1_w(machine, 0, data & 0xff);
 }
 
-WRITE16_HANDLER( YM2151_data_port_0_lsb_w )
+WRITE16_HANDLER( ym2151_register_port_2_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		YM2151_data_port_0_w(machine, 0, data & 0xff);
+		ym2151_register_port_2_w(machine, 0, data & 0xff);
 }
 
-WRITE16_HANDLER( YM2151_data_port_1_lsb_w )
+WRITE16_HANDLER( ym2151_data_port_0_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		YM2151_data_port_1_w(machine, 0, data & 0xff);
+		ym2151_data_port_0_w(machine, 0, data & 0xff);
 }
 
-WRITE16_HANDLER( YM2151_data_port_2_lsb_w )
+WRITE16_HANDLER( ym2151_data_port_1_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		YM2151_data_port_2_w(machine, 0, data & 0xff);
+		ym2151_data_port_1_w(machine, 0, data & 0xff);
+}
+
+WRITE16_HANDLER( ym2151_data_port_2_lsb_w )
+{
+	if (ACCESSING_BITS_0_7)
+		ym2151_data_port_2_w(machine, 0, data & 0xff);
 }
 
 

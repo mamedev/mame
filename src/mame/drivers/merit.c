@@ -214,8 +214,8 @@ static ADDRESS_MAP_START( trvwhiz_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trvwhiz_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x8100, 0x8100) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x8100, 0x8100) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 
@@ -234,8 +234,8 @@ static ADDRESS_MAP_START( phrcraze_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( phrcraze_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0xc004, 0xc004) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xc104, 0xc104) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0xc004, 0xc004) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xc104, 0xc104) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 
@@ -254,8 +254,8 @@ static ADDRESS_MAP_START( tictac_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tictac_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0xc00c, 0xc00c) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xc10c, 0xc10c) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0xc00c, 0xc00c) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xc10c, 0xc10c) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 

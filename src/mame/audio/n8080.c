@@ -408,13 +408,13 @@ static READ8_HANDLER( helifire_8035_p2_r )
 
 static WRITE8_HANDLER( n8080_dac_w )
 {
-	DAC_data_w(0, data & 0x80);
+	dac_data_w(0, data & 0x80);
 }
 
 
 static WRITE8_HANDLER( helifire_dac_w )
 {
-	DAC_data_w(0, data * helifire_dac_volume);
+	dac_data_w(0, data * helifire_dac_volume);
 }
 
 

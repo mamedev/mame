@@ -182,9 +182,9 @@ static READ16_HANDLER( ym3438_r )
 {
 	switch (offset)
 	{
-		case 0: return YM3438_status_port_0_A_r(machine, 0);
-		case 1: return YM3438_read_port_0_r(machine, 0);
-		case 2: return YM3438_status_port_0_B_r(machine, 0);
+		case 0: return ym3438_status_port_0_a_r(machine, 0);
+		case 1: return ym3438_read_port_0_r(machine, 0);
+		case 2: return ym3438_status_port_0_b_r(machine, 0);
 	}
 	return 0xff;
 }
@@ -207,10 +207,10 @@ static WRITE16_HANDLER( ym3438_w )
 
 		switch (offset)
 		{
-			case 0: YM3438_control_port_0_A_w(machine, 0, data & 0xff);	last_port = data;	break;
-			case 1: YM3438_data_port_0_A_w(machine, 0, data & 0xff);							break;
-			case 2: YM3438_control_port_0_B_w(machine, 0, data & 0xff);	last_port = data;	break;
-			case 3: YM3438_data_port_0_B_w(machine, 0, data & 0xff);							break;
+			case 0: ym3438_control_port_0_a_w(machine, 0, data & 0xff);	last_port = data;	break;
+			case 1: ym3438_data_port_0_a_w(machine, 0, data & 0xff);							break;
+			case 2: ym3438_control_port_0_b_w(machine, 0, data & 0xff);	last_port = data;	break;
+			case 3: ym3438_data_port_0_b_w(machine, 0, data & 0xff);							break;
 		}
 	}
 }
@@ -1342,7 +1342,7 @@ INPUT_PORTS_END
     Sound interfaces
 ******************************************************************************/
 
-static const struct YM3438interface ym3438_intf =
+static const ym3438_interface ym3438_intf =
 {
 	genesis_irq2_interrupt		/* IRQ handler */
 };

@@ -500,8 +500,8 @@ static ADDRESS_MAP_START( igs_180_portmap, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE( 0xa000, 0xa000 ) AM_READ_PORT( "BUTTONS" )
 
-	AM_RANGE( 0xb000, 0xb000 ) AM_WRITE( YM2413_register_port_0_w )
-	AM_RANGE( 0xb001, 0xb001 ) AM_WRITE( YM2413_data_port_0_w )
+	AM_RANGE( 0xb000, 0xb000 ) AM_WRITE( ym2413_register_port_0_w )
+	AM_RANGE( 0xb001, 0xb001 ) AM_WRITE( ym2413_data_port_0_w )
 ADDRESS_MAP_END
 
 

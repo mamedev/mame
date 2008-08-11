@@ -1008,8 +1008,8 @@ static WRITE8_HANDLER( M58817_command_w )
 {
 	logerror("PA Write %x\n", data);
 
-	tms5110_CTL_w(machine, 0, data & 0x0f);
-	tms5110_PDC_w(machine, 0, (data>>4) & 0x01);
+	tms5110_ctl_w(machine, 0, data & 0x0f);
+	tms5110_pdc_w(machine, 0, (data>>4) & 0x01);
 	// FIXME 0x20 is CS
 }
 

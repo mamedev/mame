@@ -1744,8 +1744,8 @@ static void ymf271_init(YMF271Chip *chip, UINT8 *rom, void (*cb)(running_machine
 
 static void *ymf271_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const struct YMF271interface defintrf = { 0 };
-	const struct YMF271interface *intf;
+	static const ymf271_interface defintrf = { 0 };
+	const ymf271_interface *intf;
 	int i;
 	YMF271Chip *chip;
 
@@ -1777,22 +1777,22 @@ static void *ymf271_start(const char *tag, int sndindex, int clock, const void *
 	return chip;
 }
 
-READ8_HANDLER( YMF271_0_r )
+READ8_HANDLER( ymf271_0_r )
 {
 	return ymf271_r(0, offset);
 }
 
-WRITE8_HANDLER( YMF271_0_w )
+WRITE8_HANDLER( ymf271_0_w )
 {
 	ymf271_w(0, offset, data);
 }
 
-READ8_HANDLER( YMF271_1_r )
+READ8_HANDLER( ymf271_1_r )
 {
 	return ymf271_r(1, offset);
 }
 
-WRITE8_HANDLER( YMF271_1_w )
+WRITE8_HANDLER( ymf271_1_w )
 {
 	ymf271_w(1, offset, data);
 }

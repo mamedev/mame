@@ -649,15 +649,15 @@ static WRITE8_HANDLER( bullsdrt_coin_count_w )
 
 static WRITE8_HANDLER( caterplr_AY8910_w )
 {
-	AY8910_control_port_0_w(machine, 0, offset);
-	AY8910_write_port_0_w(machine, 0, data);
+	ay8910_control_port_0_w(machine, 0, offset);
+	ay8910_write_port_0_w(machine, 0, data);
 }
 
 
 static READ8_HANDLER( caterplr_AY8910_r )
 {
-	AY8910_control_port_0_w(machine, 0, offset);
-	return AY8910_read_port_0_r(machine, 0);
+	ay8910_control_port_0_w(machine, 0, offset);
+	return ay8910_read_port_0_r(machine, 0);
 }
 
 
@@ -704,8 +704,8 @@ static ADDRESS_MAP_START( centipdb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c01, 0x0c01) AM_MIRROR(0x4000) AM_READ_PORT("IN1")		/* IN1 */
 	AM_RANGE(0x0c02, 0x0c02) AM_MIRROR(0x4000) AM_READ(centiped_IN2_r)	/* IN2 */
 	AM_RANGE(0x0c03, 0x0c03) AM_MIRROR(0x4000) AM_READ_PORT("IN3")		/* IN3 */
-	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x4000) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x4000) AM_READWRITE(AY8910_read_port_0_r, AY8910_control_port_0_w)
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x4000) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x1001, 0x1001) AM_MIRROR(0x4000) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
 	AM_RANGE(0x1400, 0x140f) AM_MIRROR(0x4000) AM_WRITE(centiped_paletteram_w) AM_BASE(&paletteram)
 	AM_RANGE(0x1600, 0x163f) AM_MIRROR(0x4000) AM_WRITE(atari_vg_earom_w)
 	AM_RANGE(0x1680, 0x1680) AM_MIRROR(0x4000) AM_WRITE(atari_vg_earom_ctrl_w)
@@ -1942,8 +1942,8 @@ static DRIVER_INIT( caterplr )
 
 static DRIVER_INIT( magworm )
 {
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1001, 0x1001, 0, 0, AY8910_control_port_0_w);
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1003, 0x1003, 0, 0, AY8910_read_port_0_r, AY8910_write_port_0_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1001, 0x1001, 0, 0, ay8910_control_port_0_w);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1003, 0x1003, 0, 0, ay8910_read_port_0_r, ay8910_write_port_0_w);
 }
 
 

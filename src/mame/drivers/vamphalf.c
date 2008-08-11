@@ -71,7 +71,7 @@ static WRITE32_HANDLER( oki32_w )
 static READ16_HANDLER( ym2151_status_r )
 {
 	if(offset)
-		return YM2151_status_port_0_r(machine, 0);
+		return ym2151_status_port_0_r(machine, 0);
 	else
 		return 0;
 }
@@ -79,28 +79,28 @@ static READ16_HANDLER( ym2151_status_r )
 static WRITE16_HANDLER( ym2151_data_w )
 {
 	if(offset)
-		YM2151_data_port_0_w(machine, 0, data);
+		ym2151_data_port_0_w(machine, 0, data);
 }
 
 static WRITE16_HANDLER( ym2151_register_w )
 {
 	if(offset)
-		YM2151_register_port_0_w(machine, 0, data);
+		ym2151_register_port_0_w(machine, 0, data);
 }
 
 static READ32_HANDLER( ym2151_status32_r )
 {
-	return YM2151_status_port_0_r(machine, 0) << 8;
+	return ym2151_status_port_0_r(machine, 0) << 8;
 }
 
 static WRITE32_HANDLER( ym2151_data32_w )
 {
-	YM2151_data_port_0_w(machine, 0, (data >> 8) & 0xff);
+	ym2151_data_port_0_w(machine, 0, (data >> 8) & 0xff);
 }
 
 static WRITE32_HANDLER( ym2151_register32_w )
 {
-	YM2151_register_port_0_w(machine, 0, (data >> 8) & 0xff);
+	ym2151_register_port_0_w(machine, 0, (data >> 8) & 0xff);
 }
 
 static READ16_HANDLER( eeprom_r )

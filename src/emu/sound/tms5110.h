@@ -1,5 +1,7 @@
-#ifndef tms5110_h
-#define tms5110_h
+#pragma once
+
+#ifndef __TMS5110_H__
+#define __TMS5110_H__
 
 
 /* TMS5110 commands */
@@ -42,5 +44,4 @@ int tms5110_ready_read(void *chip);
 
 void tms5110_process(void *chip, INT16 *buffer, unsigned int size);
 
-#endif
-
+#endif /* __TMS5110_H__ */

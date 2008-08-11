@@ -179,10 +179,10 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0801, 0x0801) AM_WRITE(MC6840_control_port_1_w)	/* Takahiro Nogi. 1999/09/27 */
 	AM_RANGE(0x0802, 0x0802) AM_WRITE(MC6840_write_port_0_w)		/* Takahiro Nogi. 1999/09/27 */
 	AM_RANGE(0x0803, 0x0803) AM_WRITE(MC6840_write_port_1_w)		/* Takahiro Nogi. 1999/09/27 */
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(Y8950_control_port_0_w)
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(Y8950_write_port_0_w)
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x2801, 0x2801) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(y8950_control_port_0_w)
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(y8950_write_port_0_w)
+	AM_RANGE(0x2800, 0x2800) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x2801, 0x2801) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 

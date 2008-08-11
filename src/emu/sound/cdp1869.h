@@ -27,8 +27,10 @@
 
 */
 
-#ifndef __CDP1869_SOUND__
-#define __CDP1869_SOUND__
+#pragma once
+
+#ifndef __CDP1869_H__
+#define __CDP1869_H__
 
 void cdp1869_set_toneamp(int which, int value);
 void cdp1869_set_tonefreq(int which, int value);
@@ -38,4 +40,4 @@ void cdp1869_set_wnamp(int which, int value);
 void cdp1869_set_wnfreq(int which, int value);
 void cdp1869_set_wnoff(int which, int value);
 
-#endif
+#endif /* __CDP1869_H__ */

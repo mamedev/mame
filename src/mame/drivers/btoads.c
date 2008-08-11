@@ -171,7 +171,7 @@ static WRITE8_HANDLER( bsmt2000_port_w )
 {
 	UINT16 reg = offset >> 8;
 	UINT16 val = ((offset & 0xff) << 8) | data;
-	BSMT2000_data_0_w(machine, reg, val, 0xffff);
+	bsmt2000_data_0_w(machine, reg, val, 0xffff);
 }
 
 

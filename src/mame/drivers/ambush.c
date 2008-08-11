@@ -74,10 +74,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(AY8910_read_port_0_r, AY8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(AY8910_read_port_1_r, AY8910_control_port_1_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(ay8910_read_port_1_r, ay8910_control_port_1_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE(ay8910_write_port_1_w)
 ADDRESS_MAP_END
 
 

@@ -126,10 +126,10 @@ WRITE8_HANDLER( timeplt_sh_irqtrigger_w )
 static ADDRESS_MAP_START( timeplt_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
 	AM_RANGE(0x3000, 0x33ff) AM_MIRROR(0x0c00) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
+	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(timeplt_filter_w)
 ADDRESS_MAP_END
 
@@ -138,10 +138,10 @@ static ADDRESS_MAP_START( locomotn_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x3000, 0x3fff) AM_WRITE(timeplt_filter_w)
-	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
-	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
-	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0x4000, 0x4000) AM_MIRROR(0x0fff) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0x5000, 0x5000) AM_MIRROR(0x0fff) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x0fff) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
+	AM_RANGE(0x7000, 0x7000) AM_MIRROR(0x0fff) AM_WRITE(ay8910_control_port_1_w)
 ADDRESS_MAP_END
 
 

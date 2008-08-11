@@ -231,8 +231,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_writeport_m660, ADDRESS_SPACE_IO, 8 )
@@ -249,7 +249,7 @@ static READ8_HANDLER( sound_command1_r )
 
 static WRITE8_HANDLER( sound_out1_w )
 {
-	DAC_data_w(0,data);
+	dac_data_w(0,data);
 }
 
 static READ8_HANDLER( sound_command2_r ){
@@ -258,7 +258,7 @@ static READ8_HANDLER( sound_command2_r ){
 
 static WRITE8_HANDLER( sound_out2_w )
 {
-	DAC_data_w(1,data);
+	dac_data_w(1,data);
 }
 
 static READ8_HANDLER( sound_command3_r ){
@@ -332,8 +332,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_sound3_m660, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_sound3_m660, ADDRESS_SPACE_PROGRAM, 8 )

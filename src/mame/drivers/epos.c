@@ -103,8 +103,8 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(epos_port_1_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
 

@@ -122,8 +122,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ(YM2203_status_port_1_r)
+	AM_RANGE(0x9000, 0x9000) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(ym2203_status_port_1_r)
 	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r)
 	AM_RANGE(0xb001, 0xb001) AM_READ(SMH_NOP)	/* ??? */
 	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_ROM)	/* space for diagnostic ROM? */
@@ -132,10 +132,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2203_control_port_1_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM2203_write_port_1_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x9001, 0x9001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym2203_control_port_1_w)
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym2203_write_port_1_w)
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(SMH_NOP)	/* ??? */
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(lkage_sh_nmi_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITE(lkage_sh_nmi_disable_w)

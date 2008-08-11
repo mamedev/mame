@@ -220,8 +220,8 @@ static ADDRESS_MAP_START( taitosj_main_nomcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd40b, 0xd40b) AM_MIRROR(0x00f0) AM_READ_PORT("IN2")
 	AM_RANGE(0xd40c, 0xd40c) AM_MIRROR(0x00f0) AM_READ_PORT("IN3")			/* Service */
 	AM_RANGE(0xd40d, 0xd40d) AM_MIRROR(0x00f0) AM_READ_PORT("IN4")
-	AM_RANGE(0xd40e, 0xd40e) AM_MIRROR(0x00f0) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xd40f, 0xd40f) AM_MIRROR(0x00f0) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)	/* DSW2 and DSW3 */
+	AM_RANGE(0xd40e, 0xd40e) AM_MIRROR(0x00f0) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xd40f, 0xd40f) AM_MIRROR(0x00f0) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)	/* DSW2 and DSW3 */
 	AM_RANGE(0xd500, 0xd505) AM_MIRROR(0x00f0) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_scroll)
 	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_colorbank)
 	AM_RANGE(0xd508, 0xd508) AM_MIRROR(0x00f0) AM_WRITE(taitosj_collision_reg_clear_w)
@@ -260,8 +260,8 @@ static ADDRESS_MAP_START( taitosj_main_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd40b, 0xd40b) AM_MIRROR(0x00f0) AM_READ_PORT("IN2")
 	AM_RANGE(0xd40c, 0xd40c) AM_MIRROR(0x00f0) AM_READ_PORT("IN3")			/* Service */
 	AM_RANGE(0xd40d, 0xd40d) AM_MIRROR(0x00f0) AM_READ_PORT("IN4")
-	AM_RANGE(0xd40e, 0xd40e) AM_MIRROR(0x00f0) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xd40f, 0xd40f) AM_MIRROR(0x00f0) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)	/* DSW2 and DSW3 */
+	AM_RANGE(0xd40e, 0xd40e) AM_MIRROR(0x00f0) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xd40f, 0xd40f) AM_MIRROR(0x00f0) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)	/* DSW2 and DSW3 */
 	AM_RANGE(0xd500, 0xd505) AM_MIRROR(0x00f0) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_scroll)
 	AM_RANGE(0xd506, 0xd507) AM_MIRROR(0x00f0) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_colorbank)
 	AM_RANGE(0xd508, 0xd508) AM_MIRROR(0x00f0) AM_WRITE(taitosj_collision_reg_clear_w)
@@ -326,8 +326,8 @@ static ADDRESS_MAP_START( kikstart_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd40b, 0xd40b) AM_MIRROR(0x00f0) AM_READ_PORT("IN2")
 	AM_RANGE(0xd40c, 0xd40c) AM_MIRROR(0x00f0) AM_READ_PORT("IN3")			/* Service */
 	AM_RANGE(0xd40d, 0xd40d) AM_MIRROR(0x00f0) AM_READ_PORT("IN4")
-	AM_RANGE(0xd40e, 0xd40e) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xd40f, 0xd40f) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)	/* DSW2 and DSW3 */
+	AM_RANGE(0xd40e, 0xd40e) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xd40f, 0xd40f) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)	/* DSW2 and DSW3 */
 	AM_RANGE(0xd508, 0xd508) AM_WRITE(taitosj_collision_reg_clear_w)
 	AM_RANGE(0xd509, 0xd50a) AM_WRITE(SMH_RAM) AM_BASE(&taitosj_gfxpointer)
 	AM_RANGE(0xd50b, 0xd50b) AM_WRITE(taitosj_soundcommand_w)
@@ -342,12 +342,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( taitosj_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x4800, 0x4800) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x4801, 0x4801) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
-	AM_RANGE(0x4802, 0x4802) AM_WRITE(AY8910_control_port_2_w)
-	AM_RANGE(0x4803, 0x4803) AM_READWRITE(AY8910_read_port_2_r, AY8910_write_port_2_w)
-	AM_RANGE(0x4804, 0x4804) AM_WRITE(AY8910_control_port_3_w)
-	AM_RANGE(0x4805, 0x4805) AM_READWRITE(AY8910_read_port_3_r, AY8910_write_port_3_w)
+	AM_RANGE(0x4800, 0x4800) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x4801, 0x4801) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
+	AM_RANGE(0x4802, 0x4802) AM_WRITE(ay8910_control_port_2_w)
+	AM_RANGE(0x4803, 0x4803) AM_READWRITE(ay8910_read_port_2_r, ay8910_write_port_2_w)
+	AM_RANGE(0x4804, 0x4804) AM_WRITE(ay8910_control_port_3_w)
+	AM_RANGE(0x4805, 0x4805) AM_READWRITE(ay8910_read_port_3_r, ay8910_write_port_3_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)
 	AM_RANGE(0xe000, 0xefff) AM_ROM	/* space for diagnostic ROM */
 ADDRESS_MAP_END
@@ -1765,13 +1765,13 @@ static UINT8 dac_vol;
 static WRITE8_HANDLER( dac_out_w )
 {
 	dac_out = data - 0x80;
-	DAC_signed_data_16_w(0,dac_out * dac_vol + 0x8000);
+	dac_signed_data_16_w(0,dac_out * dac_vol + 0x8000);
 }
 
 static WRITE8_HANDLER( dac_vol_w )
 {
 	dac_vol = voltable[data];
-	DAC_signed_data_16_w(0,dac_out * dac_vol + 0x8000);
+	dac_signed_data_16_w(0,dac_out * dac_vol + 0x8000);
 }
 
 

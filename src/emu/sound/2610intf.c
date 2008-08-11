@@ -73,13 +73,13 @@ static void IRQHandler(void *param,int irq)
 static TIMER_CALLBACK( timer_callback_0 )
 {
 	struct ym2610_info *info = ptr;
-	YM2610TimerOver(info->chip,0);
+	ym2610_timer_over(info->chip,0);
 }
 
 static TIMER_CALLBACK( timer_callback_1 )
 {
 	struct ym2610_info *info = ptr;
-	YM2610TimerOver(info->chip,1);
+	ym2610_timer_over(info->chip,1);
 }
 
 static void timer_handler(void *param,int c,int count,int clock)
@@ -99,7 +99,7 @@ static void timer_handler(void *param,int c,int count,int clock)
 }
 
 /* update request from fm.c */
-void YM2610UpdateRequest(void *param)
+void ym2610_update_request(void *param)
 {
 	struct ym2610_info *info = param;
 	stream_update(info->stream);
@@ -109,14 +109,14 @@ void YM2610UpdateRequest(void *param)
 static void ym2610_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)
 {
 	struct ym2610_info *info = param;
-	YM2610UpdateOne(info->chip, buffers, length);
+	ym2610_update_one(info->chip, buffers, length);
 }
 
 
-static STATE_POSTLOAD( ym2610_postload )
+static STATE_POSTLOAD( ym2610_intf_postload )
 {
 	struct ym2610_info *info = param;
-	YM2610Postload(info->chip);
+	ym2610_postload(info->chip);
 }
 
 
@@ -165,11 +165,11 @@ static void *ym2610_start(const char *tag, int sndindex, int clock, const void *
 	}
 
 	/**** initialize YM2610 ****/
-	info->chip = YM2610Init(info,sndindex,clock,rate,
+	info->chip = ym2610_init(info,sndindex,clock,rate,
 		           pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
 		           timer_handler,IRQHandler,&psgintf);
 
-	state_save_register_postload(Machine, ym2610_postload, info);
+	state_save_register_postload(Machine, ym2610_intf_postload, info);
 
 	if (info->chip)
 		return info;
@@ -183,7 +183,7 @@ static void *ym2610_start(const char *tag, int sndindex, int clock, const void *
 static void ym2610b_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)
 {
 	struct ym2610_info *info = param;
-	YM2610BUpdateOne(info->chip, buffers, length);
+	ym2610b_update_one(info->chip, buffers, length);
 }
 
 static void *ym2610b_start(const char *tag, int sndindex, int clock, const void *config)
@@ -231,7 +231,7 @@ static void *ym2610b_start(const char *tag, int sndindex, int clock, const void 
 	}
 
 	/**** initialize YM2610 ****/
-	info->chip = YM2610Init(info,sndindex,clock,rate,
+	info->chip = ym2610_init(info,sndindex,clock,rate,
 		           pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
 		           timer_handler,IRQHandler,&psgintf);
 	if (info->chip)
@@ -245,131 +245,131 @@ static void *ym2610b_start(const char *tag, int sndindex, int clock, const void 
 static void ym2610_stop(void *token)
 {
 	struct ym2610_info *info = token;
-	YM2610Shutdown(info->chip);
+	ym2610_shutdown(info->chip);
 	ay8910_stop_ym(info->psg);
 }
 
 static void ym2610_reset(void *token)
 {
 	struct ym2610_info *info = token;
-	YM2610ResetChip(info->chip);
+	ym2610_reset_chip(info->chip);
 }
 
 /************************************************/
 /* Status Read for YM2610 - Chip 0              */
 /************************************************/
-READ8_HANDLER( YM2610_status_port_0_A_r )
+READ8_HANDLER( ym2610_status_port_0_a_r )
 {
-//logerror("PC %04x: 2610 S0A=%02X\n",activecpu_get_pc(),YM2610Read(sndti_token(chip_type,0,0));
+//logerror("PC %04x: 2610 S0A=%02X\n",activecpu_get_pc(),ym2610_read(sndti_token(chip_type,0,0));
 	struct ym2610_info *info = sndti_token(chip_type,0);
-	return YM2610Read(info->chip,0);
+	return ym2610_read(info->chip,0);
 }
 
-READ16_HANDLER( YM2610_status_port_0_A_lsb_r )
+READ16_HANDLER( ym2610_status_port_0_a_lsb_r )
 {
-//logerror("PC %04x: 2610 S0A=%02X\n",activecpu_get_pc(),YM2610Read(sndti_token(chip_type,0,0));
+//logerror("PC %04x: 2610 S0A=%02X\n",activecpu_get_pc(),ym2610_read(sndti_token(chip_type,0,0));
 	struct ym2610_info *info = sndti_token(chip_type,0);
-	return YM2610Read(info->chip,0);
+	return ym2610_read(info->chip,0);
 }
 
-READ8_HANDLER( YM2610_status_port_0_B_r )
+READ8_HANDLER( ym2610_status_port_0_b_r )
 {
-//logerror("PC %04x: 2610 S0B=%02X\n",activecpu_get_pc(),YM2610Read(sndti_token(chip_type,0,2));
+//logerror("PC %04x: 2610 S0B=%02X\n",activecpu_get_pc(),ym2610_read(sndti_token(chip_type,0,2));
 	struct ym2610_info *info = sndti_token(chip_type,0);
-	return YM2610Read(info->chip,2);
+	return ym2610_read(info->chip,2);
 }
 
-READ16_HANDLER( YM2610_status_port_0_B_lsb_r )
+READ16_HANDLER( ym2610_status_port_0_b_lsb_r )
 {
-//logerror("PC %04x: 2610 S0B=%02X\n",activecpu_get_pc(),YM2610Read(sndti_token(chip_type,0,2));
+//logerror("PC %04x: 2610 S0B=%02X\n",activecpu_get_pc(),ym2610_read(sndti_token(chip_type,0,2));
 	struct ym2610_info *info = sndti_token(chip_type,0);
-	return YM2610Read(info->chip,2);
+	return ym2610_read(info->chip,2);
 }
 
 /************************************************/
 /* Status Read for YM2610 - Chip 1              */
 /************************************************/
-READ8_HANDLER( YM2610_status_port_1_A_r ) {
+READ8_HANDLER( ym2610_status_port_1_a_r ) {
 	struct ym2610_info *info = sndti_token(chip_type,1);
-	return YM2610Read(info->chip,0);
+	return ym2610_read(info->chip,0);
 }
 
-READ16_HANDLER( YM2610_status_port_1_A_lsb_r ) {
+READ16_HANDLER( ym2610_status_port_1_a_lsb_r ) {
 	struct ym2610_info *info = sndti_token(chip_type,1);
-	return YM2610Read(info->chip,0);
+	return ym2610_read(info->chip,0);
 }
 
-READ8_HANDLER( YM2610_status_port_1_B_r ) {
+READ8_HANDLER( ym2610_status_port_1_b_r ) {
 	struct ym2610_info *info = sndti_token(chip_type,1);
-	return YM2610Read(info->chip,2);
+	return ym2610_read(info->chip,2);
 }
 
-READ16_HANDLER( YM2610_status_port_1_B_lsb_r ) {
+READ16_HANDLER( ym2610_status_port_1_b_lsb_r ) {
 	struct ym2610_info *info = sndti_token(chip_type,1);
-	return YM2610Read(info->chip,2);
+	return ym2610_read(info->chip,2);
 }
 
 /************************************************/
 /* Port Read for YM2610 - Chip 0                */
 /************************************************/
-READ8_HANDLER( YM2610_read_port_0_r ){
+READ8_HANDLER( ym2610_read_port_0_r ){
 	struct ym2610_info *info = sndti_token(chip_type,0);
-	return YM2610Read(info->chip,1);
+	return ym2610_read(info->chip,1);
 }
 
-READ16_HANDLER( YM2610_read_port_0_lsb_r ){
+READ16_HANDLER( ym2610_read_port_0_lsb_r ){
 	struct ym2610_info *info = sndti_token(chip_type,0);
-	return YM2610Read(info->chip,1);
+	return ym2610_read(info->chip,1);
 }
 
 /************************************************/
 /* Port Read for YM2610 - Chip 1                */
 /************************************************/
-READ8_HANDLER( YM2610_read_port_1_r ){
+READ8_HANDLER( ym2610_read_port_1_r ){
 	struct ym2610_info *info = sndti_token(chip_type,1);
-	return YM2610Read(info->chip,1);
+	return ym2610_read(info->chip,1);
 }
 
-READ16_HANDLER( YM2610_read_port_1_lsb_r ){
+READ16_HANDLER( ym2610_read_port_1_lsb_r ){
 	struct ym2610_info *info = sndti_token(chip_type,1);
-	return YM2610Read(info->chip,1);
+	return ym2610_read(info->chip,1);
 }
 
 /************************************************/
 /* Control Write for YM2610 - Chip 0            */
 /* Consists of 2 addresses                      */
 /************************************************/
-WRITE8_HANDLER( YM2610_control_port_0_A_w )
+WRITE8_HANDLER( ym2610_control_port_0_a_w )
 {
 //logerror("PC %04x: 2610 Reg A %02X",activecpu_get_pc(),data);
 	struct ym2610_info *info = sndti_token(chip_type,0);
-	YM2610Write(info->chip,0,data);
+	ym2610_write(info->chip,0,data);
 }
 
-WRITE16_HANDLER( YM2610_control_port_0_A_lsb_w )
+WRITE16_HANDLER( ym2610_control_port_0_a_lsb_w )
 {
 //logerror("PC %04x: 2610 Reg A %02X",activecpu_get_pc(),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		struct ym2610_info *info = sndti_token(chip_type,0);
-		YM2610Write(info->chip,0,data);
+		ym2610_write(info->chip,0,data);
 	}
 }
 
-WRITE8_HANDLER( YM2610_control_port_0_B_w )
+WRITE8_HANDLER( ym2610_control_port_0_b_w )
 {
 //logerror("PC %04x: 2610 Reg B %02X",activecpu_get_pc(),data);
 	struct ym2610_info *info = sndti_token(chip_type,0);
-	YM2610Write(info->chip,2,data);
+	ym2610_write(info->chip,2,data);
 }
 
-WRITE16_HANDLER( YM2610_control_port_0_B_lsb_w )
+WRITE16_HANDLER( ym2610_control_port_0_b_lsb_w )
 {
 //logerror("PC %04x: 2610 Reg B %02X",activecpu_get_pc(),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		struct ym2610_info *info = sndti_token(chip_type,0);
-		YM2610Write(info->chip,2,data);
+		ym2610_write(info->chip,2,data);
 	}
 }
 
@@ -377,29 +377,29 @@ WRITE16_HANDLER( YM2610_control_port_0_B_lsb_w )
 /* Control Write for YM2610 - Chip 1            */
 /* Consists of 2 addresses                      */
 /************************************************/
-WRITE8_HANDLER( YM2610_control_port_1_A_w ){
+WRITE8_HANDLER( ym2610_control_port_1_a_w ){
 	struct ym2610_info *info = sndti_token(chip_type,1);
-	YM2610Write(info->chip,0,data);
+	ym2610_write(info->chip,0,data);
 }
 
-WRITE16_HANDLER( YM2610_control_port_1_A_lsb_w ){
+WRITE16_HANDLER( ym2610_control_port_1_a_lsb_w ){
 	if (ACCESSING_BITS_0_7)
 	{
 		struct ym2610_info *info = sndti_token(chip_type,1);
-		YM2610Write(info->chip,0,data);
+		ym2610_write(info->chip,0,data);
 	}
 }
 
-WRITE8_HANDLER( YM2610_control_port_1_B_w ){
+WRITE8_HANDLER( ym2610_control_port_1_b_w ){
 	struct ym2610_info *info = sndti_token(chip_type,1);
-	YM2610Write(info->chip,2,data);
+	ym2610_write(info->chip,2,data);
 }
 
-WRITE16_HANDLER( YM2610_control_port_1_B_lsb_w ){
+WRITE16_HANDLER( ym2610_control_port_1_b_lsb_w ){
 	if (ACCESSING_BITS_0_7)
 	{
 		struct ym2610_info *info = sndti_token(chip_type,1);
-		YM2610Write(info->chip,2,data);
+		ym2610_write(info->chip,2,data);
 	}
 }
 
@@ -407,37 +407,37 @@ WRITE16_HANDLER( YM2610_control_port_1_B_lsb_w ){
 /* Data Write for YM2610 - Chip 0               */
 /* Consists of 2 addresses                      */
 /************************************************/
-WRITE8_HANDLER( YM2610_data_port_0_A_w )
+WRITE8_HANDLER( ym2610_data_port_0_a_w )
 {
 //logerror(" =%02X\n",data);
 	struct ym2610_info *info = sndti_token(chip_type,0);
-	YM2610Write(info->chip,1,data);
+	ym2610_write(info->chip,1,data);
 }
 
-WRITE16_HANDLER( YM2610_data_port_0_A_lsb_w )
+WRITE16_HANDLER( ym2610_data_port_0_a_lsb_w )
 {
 //logerror(" =%02X\n",data);
 	if (ACCESSING_BITS_0_7)
 	{
 		struct ym2610_info *info = sndti_token(chip_type,0);
-		YM2610Write(info->chip,1,data);
+		ym2610_write(info->chip,1,data);
 	}
 }
 
-WRITE8_HANDLER( YM2610_data_port_0_B_w )
+WRITE8_HANDLER( ym2610_data_port_0_b_w )
 {
 //logerror(" =%02X\n",data);
 	struct ym2610_info *info = sndti_token(chip_type,0);
-	YM2610Write(info->chip,3,data);
+	ym2610_write(info->chip,3,data);
 }
 
-WRITE16_HANDLER( YM2610_data_port_0_B_lsb_w )
+WRITE16_HANDLER( ym2610_data_port_0_b_lsb_w )
 {
 //logerror(" =%02X\n",data);
 	if (ACCESSING_BITS_0_7)
 	{
 		struct ym2610_info *info = sndti_token(chip_type,0);
-		YM2610Write(info->chip,3,data);
+		ym2610_write(info->chip,3,data);
 	}
 }
 
@@ -445,29 +445,29 @@ WRITE16_HANDLER( YM2610_data_port_0_B_lsb_w )
 /* Data Write for YM2610 - Chip 1               */
 /* Consists of 2 addresses                      */
 /************************************************/
-WRITE8_HANDLER( YM2610_data_port_1_A_w ){
+WRITE8_HANDLER( ym2610_data_port_1_a_w ){
 	struct ym2610_info *info = sndti_token(chip_type,1);
-	YM2610Write(info->chip,1,data);
+	ym2610_write(info->chip,1,data);
 }
 
-WRITE16_HANDLER( YM2610_data_port_1_A_lsb_w ){
+WRITE16_HANDLER( ym2610_data_port_1_a_lsb_w ){
 	if (ACCESSING_BITS_0_7)
 	{
 		struct ym2610_info *info = sndti_token(chip_type,1);
-		YM2610Write(info->chip,1,data);
+		ym2610_write(info->chip,1,data);
 	}
 }
 
-WRITE8_HANDLER( YM2610_data_port_1_B_w ){
+WRITE8_HANDLER( ym2610_data_port_1_b_w ){
 	struct ym2610_info *info = sndti_token(chip_type,1);
-	YM2610Write(info->chip,3,data);
+	ym2610_write(info->chip,3,data);
 }
 
-WRITE16_HANDLER( YM2610_data_port_1_B_lsb_w ){
+WRITE16_HANDLER( ym2610_data_port_1_b_lsb_w ){
 	if (ACCESSING_BITS_0_7)
 	{
 		struct ym2610_info *info = sndti_token(chip_type,1);
-		YM2610Write(info->chip,3,data);
+		ym2610_write(info->chip,3,data);
 	}
 }
 

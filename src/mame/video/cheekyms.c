@@ -50,7 +50,7 @@ WRITE8_HANDLER( cheekyms_port_40_w )
 {
 	/* the lower bits probably trigger sound samples */
 
-	DAC_data_w(0, data ? 0x80 : 0);
+	dac_data_w(0, data ? 0x80 : 0);
 }
 
 

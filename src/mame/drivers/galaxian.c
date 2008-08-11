@@ -297,8 +297,8 @@ static READ8_HANDLER( konami_ay8910_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x20) result &= AY8910_read_port_0_r(machine, 0);
-	if (offset & 0x80) result &= AY8910_read_port_1_r(machine, 0);
+	if (offset & 0x20) result &= ay8910_read_port_0_r(machine, 0);
+	if (offset & 0x80) result &= ay8910_read_port_1_r(machine, 0);
 	return result;
 }
 
@@ -307,14 +307,14 @@ static WRITE8_HANDLER( konami_ay8910_w )
 {
 	/* the decoding here is very simplistic, and you can address two simultaneously */
 	if (offset & 0x10)
-		AY8910_control_port_0_w(machine, 0, data);
+		ay8910_control_port_0_w(machine, 0, data);
 	else if (offset & 0x20)
-		AY8910_write_port_0_w(machine, 0, data);
+		ay8910_write_port_0_w(machine, 0, data);
 
 	if (offset & 0x40)
-		AY8910_control_port_1_w(machine, 0, data);
+		ay8910_control_port_1_w(machine, 0, data);
 	else if (offset & 0x80)
-		AY8910_write_port_1_w(machine, 0, data);
+		ay8910_write_port_1_w(machine, 0, data);
 }
 
 
@@ -607,7 +607,7 @@ static WRITE8_HANDLER( sfx_sample_io_w )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	if (offset & 0x04) ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_2" ), offset & 3, data);
-	if (offset & 0x10) DAC_0_signed_data_w(machine, offset, data);
+	if (offset & 0x10) dac_0_signed_data_w(machine, offset, data);
 }
 
 
@@ -681,7 +681,7 @@ static READ8_HANDLER( frogger_ay8910_r )
 {
 	/* the decoding here is very simplistic */
 	UINT8 result = 0xff;
-	if (offset & 0x40) result &= AY8910_read_port_0_r(machine, 0);
+	if (offset & 0x40) result &= ay8910_read_port_0_r(machine, 0);
 	return result;
 }
 
@@ -690,9 +690,9 @@ static WRITE8_HANDLER( frogger_ay8910_w )
 {
 	/* the decoding here is very simplistic */
 	if (offset & 0x40)
-		AY8910_write_port_0_w(machine, 0, data);
+		ay8910_write_port_0_w(machine, 0, data);
 	else if (offset & 0x80)
-		AY8910_control_port_0_w(machine, 0, data);
+		ay8910_control_port_0_w(machine, 0, data);
 }
 
 
@@ -759,9 +759,9 @@ static READ8_HANDLER( scorpion_ay8910_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x08) result &= AY8910_read_port_2_r(machine, 0);
-	if (offset & 0x20) result &= AY8910_read_port_0_r(machine, 0);
-	if (offset & 0x80) result &= AY8910_read_port_1_r(machine, 0);
+	if (offset & 0x08) result &= ay8910_read_port_2_r(machine, 0);
+	if (offset & 0x20) result &= ay8910_read_port_0_r(machine, 0);
+	if (offset & 0x80) result &= ay8910_read_port_1_r(machine, 0);
 	return result;
 }
 
@@ -769,12 +769,12 @@ static READ8_HANDLER( scorpion_ay8910_r )
 static WRITE8_HANDLER( scorpion_ay8910_w )
 {
 	/* the decoding here is very simplistic, and you can address all six simultaneously */
-	if (offset & 0x04) AY8910_control_port_2_w(machine, 0, data);
-	if (offset & 0x08) AY8910_write_port_2_w(machine, 0, data);
-	if (offset & 0x10) AY8910_control_port_0_w(machine, 0, data);
-	if (offset & 0x20) AY8910_write_port_0_w(machine, 0, data);
-	if (offset & 0x40) AY8910_control_port_1_w(machine, 0, data);
-	if (offset & 0x80) AY8910_write_port_1_w(machine, 0, data);
+	if (offset & 0x04) ay8910_control_port_2_w(machine, 0, data);
+	if (offset & 0x08) ay8910_write_port_2_w(machine, 0, data);
+	if (offset & 0x10) ay8910_control_port_0_w(machine, 0, data);
+	if (offset & 0x20) ay8910_write_port_0_w(machine, 0, data);
+	if (offset & 0x40) ay8910_control_port_1_w(machine, 0, data);
+	if (offset & 0x80) ay8910_write_port_1_w(machine, 0, data);
 }
 
 
@@ -909,9 +909,9 @@ static WRITE8_HANDLER( zigzag_ay8910_w )
 			if ((offset & 1) != 0)
 			{
 				if ((offset & 2) == 0)
-					AY8910_write_port_0_w(machine, 0, zigzag_ay8910_latch);
+					ay8910_write_port_0_w(machine, 0, zigzag_ay8910_latch);
 				else
-					AY8910_control_port_0_w(machine, 0, zigzag_ay8910_latch);
+					ay8910_control_port_0_w(machine, 0, zigzag_ay8910_latch);
 			}
 			break;
 
@@ -984,7 +984,7 @@ static WRITE8_HANDLER( kingball_sound2_w )
 
 static WRITE8_HANDLER( kingball_dac_w )
 {
-	DAC_0_data_w(machine, offset, data ^ 0xff);
+	dac_0_data_w(machine, offset, data ^ 0xff);
 }
 
 
@@ -1004,21 +1004,21 @@ static WRITE8_HANDLER( mshuttle_ay8910_cs_w )
 static WRITE8_HANDLER( mshuttle_ay8910_control_w )
 {
 	if (!mshuttle_ay8910_cs)
-		AY8910_control_port_0_w(machine, offset, data);
+		ay8910_control_port_0_w(machine, offset, data);
 }
 
 
 static WRITE8_HANDLER( mshuttle_ay8910_data_w )
 {
 	if (!mshuttle_ay8910_cs)
-		AY8910_write_port_0_w(machine, offset, data);
+		ay8910_write_port_0_w(machine, offset, data);
 }
 
 
 static READ8_HANDLER( mshuttle_ay8910_data_r )
 {
 	if (!mshuttle_ay8910_cs)
-		return AY8910_read_port_0_r(machine, offset);
+		return ay8910_read_port_0_r(machine, offset);
 	return 0xff;
 }
 
@@ -1399,8 +1399,8 @@ static ADDRESS_MAP_START( jumpbug_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0x0400) AM_RAM_WRITE(galaxian_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x5000, 0x50ff) AM_MIRROR(0x0700) AM_RAM_WRITE(galaxian_objram_w) AM_BASE(&spriteram)
-	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x00ff) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x5900, 0x5900) AM_MIRROR(0x00ff) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x5800, 0x5800) AM_MIRROR(0x00ff) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x5900, 0x5900) AM_MIRROR(0x00ff) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x6000, 0x6000) AM_MIRROR(0x07ff) AM_READ_PORT("IN0")
 	AM_RANGE(0x6002, 0x6006) AM_MIRROR(0x07f8) AM_WRITE(galaxian_gfxbank_w)
 	AM_RANGE(0x6800, 0x6800) AM_MIRROR(0x07ff) AM_READ_PORT("IN1")
@@ -1505,9 +1505,9 @@ static ADDRESS_MAP_START( checkman_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x03, 0x03) AM_READ(soundlatch_r)
-	AM_RANGE(0x04, 0x04) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x06, 0x06) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x04, 0x04) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x06, 0x06) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
 
 
@@ -1516,9 +1516,9 @@ static ADDRESS_MAP_START( checkmaj_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xa002, 0xa002) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xa002, 0xa002) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
 
 

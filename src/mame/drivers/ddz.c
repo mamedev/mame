@@ -45,7 +45,7 @@ static INPUT_PORTS_START(ddz)
 INPUT_PORTS_END
 
 
-static const struct VR0Interface vr0_interface =
+static const vr0_interface vr0_config =
 {
 	0x04800000
 };
@@ -76,7 +76,7 @@ static MACHINE_DRIVER_START( ddz )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("vrender", VRENDER0, 0)
-	MDRV_SOUND_CONFIG(vr0_interface)
+	MDRV_SOUND_CONFIG(vr0_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

@@ -1042,7 +1042,7 @@ INLINE void refresh_EG(YM2151Operator * op)
 
 
 /* write a register on YM2151 chip number 'n' */
-void YM2151WriteReg(void *_chip, int r, int v)
+void ym2151_write_reg(void *_chip, int r, int v)
 {
 	YM2151 *chip = _chip;
 	YM2151Operator *op = &chip->oper[ (r&0x07)*4+((r&0x18)>>3) ];
@@ -1366,7 +1366,7 @@ static TIMER_CALLBACK( cymfile_callback )
 }
 
 
-int YM2151ReadStatus( void *_chip )
+int ym2151_read_status( void *_chip )
 {
 	YM2151 *chip = _chip;
 	return chip->status;
@@ -1379,7 +1379,7 @@ int YM2151ReadStatus( void *_chip )
 /*
 *   state save support for MAME
 */
-STATE_POSTLOAD( YM2151Postload )
+STATE_POSTLOAD( ym2151_postload )
 {
 	YM2151 *YM2151_chip = (YM2151 *)param;
 	int j;
@@ -1487,10 +1487,10 @@ static void ym2151_state_save_register( YM2151 *chip, int sndindex )
 
 	state_save_register_item_array(buf1, sndindex, chip->connect);
 
-	state_save_register_postload(Machine, YM2151Postload, chip);
+	state_save_register_postload(Machine, ym2151_postload, chip);
 }
 #else
-STATE_POSTLOAD( YM2151Postload )
+STATE_POSTLOAD( ym2151_postload )
 {
 }
 
@@ -1507,7 +1507,7 @@ static void ym2151_state_save_register( YM2151 *chip, int sndindex )
 *   'clock' is the chip clock in Hz
 *   'rate' is sampling rate
 */
-void * YM2151Init(int index, int clock, int rate)
+void * ym2151_init(int index, int clock, int rate)
 {
 	YM2151 *PSG;
 
@@ -1535,14 +1535,14 @@ void * YM2151Init(int index, int clock, int rate)
 	/*logerror("YM2151[init] eg_timer_add=%8x eg_timer_overflow=%8x\n", PSG->eg_timer_add, PSG->eg_timer_overflow);*/
 
 #ifdef USE_MAME_TIMERS
-/* this must be done _before_ a call to YM2151ResetChip() */
+/* this must be done _before_ a call to ym2151_reset_chip() */
 	PSG->timer_A = timer_alloc(timer_callback_a, PSG);
 	PSG->timer_B = timer_alloc(timer_callback_b, PSG);
 #else
 	PSG->tim_A      = 0;
 	PSG->tim_B      = 0;
 #endif
-	YM2151ResetChip(PSG);
+	ym2151_reset_chip(PSG);
 	/*logerror("YM2151[init] clock=%i sampfreq=%i\n", PSG->clock, PSG->sampfreq);*/
 
 	if (LOG_CYM_FILE)
@@ -1559,7 +1559,7 @@ void * YM2151Init(int index, int clock, int rate)
 
 
 
-void YM2151Shutdown(void *_chip)
+void ym2151_shutdown(void *_chip)
 {
 	YM2151 *chip = _chip;
 
@@ -1589,7 +1589,7 @@ void YM2151Shutdown(void *_chip)
 /*
 *   Reset chip number 'n'.
 */
-void YM2151ResetChip(void *_chip)
+void ym2151_reset_chip(void *_chip)
 {
 	int i;
 	YM2151 *chip = _chip;
@@ -1641,11 +1641,11 @@ void YM2151ResetChip(void *_chip)
 	chip->csm_req	= 0;
 	chip->status    = 0;
 
-	YM2151WriteReg(chip, 0x1b, 0);	/* only because of CT1, CT2 output pins */
-	YM2151WriteReg(chip, 0x18, 0);	/* set LFO frequency */
+	ym2151_write_reg(chip, 0x1b, 0);	/* only because of CT1, CT2 output pins */
+	ym2151_write_reg(chip, 0x18, 0);	/* set LFO frequency */
 	for (i=0x20; i<0x100; i++)		/* set the operators */
 	{
-		YM2151WriteReg(chip, i, 0);
+		ym2151_write_reg(chip, i, 0);
 	}
 }
 
@@ -2372,7 +2372,7 @@ INLINE signed int acc_calc(signed int value)
 *   '**buffers' is table of pointers to the buffers: left and right
 *   'length' is the number of samples that should be generated
 */
-void YM2151UpdateOne(void *chip, SAMP **buffers, int length)
+void ym2151_update_one(void *chip, SAMP **buffers, int length)
 {
 	int i;
 	signed int outl,outr;
@@ -2485,13 +2485,13 @@ void YM2151UpdateOne(void *chip, SAMP **buffers, int length)
 	}
 }
 
-void YM2151SetIrqHandler(void *chip, void(*handler)(running_machine *machine, int irq))
+void ym2151_set_irq_handler(void *chip, void(*handler)(running_machine *machine, int irq))
 {
 	YM2151 *PSG = chip;
 	PSG->irqhandler = handler;
 }
 
-void YM2151SetPortWriteHandler(void *chip, write8_machine_func handler)
+void ym2151_set_port_write_handler(void *chip, write8_machine_func handler)
 {
 	YM2151 *PSG = chip;
 	PSG->porthandler = handler;

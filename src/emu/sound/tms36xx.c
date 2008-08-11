@@ -40,7 +40,7 @@ struct TMS36XX {
 	int tune_ofs;		/* note currently playing */
 	int tune_max;		/* end of tune */
 
-	const struct TMS36XXinterface *intf;
+	const tms36xx_interface *intf;
 };
 
 #define C(n)	(int)((FSCALE<<(n-1))*1.18921)	/* 2^(3/12) */

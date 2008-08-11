@@ -311,8 +311,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( multchmp_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM3812_control_port_0_w	)	// YM3812
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM3812_write_port_0_w		)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ym3812_control_port_0_w	)	// YM3812
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym3812_write_port_0_w		)
 	AM_RANGE(0x02, 0x02) AM_WRITE(okim6295_data_0_w			)	// M6295
 	AM_RANGE(0x04, 0x04) AM_WRITE(SMH_NOP					)	// ? $00, $30
 	AM_RANGE(0x05, 0x05) AM_WRITE(esd16_sound_rombank_w 	)	// ROM Bank

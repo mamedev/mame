@@ -1007,7 +1007,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hardhead_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM					)	// ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0xc800, 0xc800) AM_READ(YM3812_status_port_0_r 	)	// ? unsure
+	AM_RANGE(0xc800, 0xc800) AM_READ(ym3812_status_port_0_r 	)	// ? unsure
 	AM_RANGE(0xd800, 0xd800) AM_READ(soundlatch_r				)	// From Main CPU
 ADDRESS_MAP_END
 
@@ -1015,10 +1015,10 @@ static ADDRESS_MAP_START( hardhead_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM					)	// ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM					)	// RAM
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch2_w				)	//
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM3812_control_port_0_w	)	// YM3812
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM3812_write_port_0_w		)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(AY8910_control_port_0_w	)	// AY8910
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(AY8910_write_port_0_w		)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym3812_control_port_0_w	)	// YM3812
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym3812_write_port_0_w		)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE(ay8910_control_port_0_w	)	// AY8910
+	AM_RANGE(0xa003, 0xa003) AM_WRITE(ay8910_write_port_0_w		)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hardhead_sound_readport, ADDRESS_SPACE_IO, 8 )
@@ -1046,10 +1046,10 @@ static ADDRESS_MAP_START( rranger_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM					)	// ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM					)	// RAM
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch2_w				)	//
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2203_control_port_0_w	)	// YM2203
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM2203_write_port_0_w		)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(YM2203_control_port_1_w	)	// AY8910
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(YM2203_write_port_1_w		)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym2203_control_port_0_w	)	// YM2203
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym2203_write_port_0_w		)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE(ym2203_control_port_1_w	)	// AY8910
+	AM_RANGE(0xa003, 0xa003) AM_WRITE(ym2203_write_port_1_w		)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( rranger_sound_readport, ADDRESS_SPACE_IO, 8 )
@@ -1073,10 +1073,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( brickzn_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM					)	// ROM
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM3812_control_port_0_w	)	// YM3812
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM3812_write_port_0_w		)
-	AM_RANGE(0xc002, 0xc002) AM_WRITE(AY8910_control_port_0_w	)	// AY8910
-	AM_RANGE(0xc003, 0xc003) AM_WRITE(AY8910_write_port_0_w		)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym3812_control_port_0_w	)	// YM3812
+	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym3812_write_port_0_w		)
+	AM_RANGE(0xc002, 0xc002) AM_WRITE(ay8910_control_port_0_w	)	// AY8910
+	AM_RANGE(0xc003, 0xc003) AM_WRITE(ay8910_write_port_0_w		)
 	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM					)	// RAM
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch2_w				)	// To PCM CPU
 ADDRESS_MAP_END
@@ -1102,7 +1102,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( brickzn_pcm_w )
 {
-	DAC_signed_data_w( offset, (data & 0xf) * 0x11 );
+	dac_signed_data_w( offset, (data & 0xf) * 0x11 );
 }
 
 static ADDRESS_MAP_START( brickzn_pcm_readport, ADDRESS_SPACE_IO, 8 )

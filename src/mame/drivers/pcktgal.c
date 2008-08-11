@@ -109,10 +109,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x0801, 0x0801) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(YM3812_control_port_0_w)
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0x0800, 0x0800) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x0801, 0x0801) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0x1001, 0x1001) AM_WRITE(ym3812_write_port_0_w)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(pcktgal_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(pcktgal_sound_bank_w)
 	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)

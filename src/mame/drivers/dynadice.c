@@ -60,8 +60,8 @@ static WRITE8_HANDLER( sound_control_w )
     D3 - /Reset
 
 */
-	if ((data &7)==7) AY8910_control_port_0_w(machine,0,ay_data);
-	if ((data &7)==6) AY8910_write_port_0_w(machine,0,ay_data);
+	if ((data &7)==7) ay8910_control_port_0_w(machine,0,ay_data);
+	if ((data &7)==6) ay8910_write_port_0_w(machine,0,ay_data);
 }
 
 

@@ -72,8 +72,8 @@ static ADDRESS_MAP_START( quizdna_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x81, 0x81) AM_READ(input_port_3_r)
 	AM_RANGE(0x90, 0x90) AM_READ(input_port_4_r)
 	AM_RANGE(0x91, 0x91) AM_READ(input_port_5_r)
-	AM_RANGE(0xe0, 0xe0) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0xe1, 0xe1) AM_READ(YM2203_read_port_0_r)
+	AM_RANGE(0xe0, 0xe0) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0xe1, 0xe1) AM_READ(ym2203_read_port_0_r)
 	AM_RANGE(0xf0, 0xf0) AM_READ(okim6295_status_0_r)
 
 ADDRESS_MAP_END
@@ -85,8 +85,8 @@ static ADDRESS_MAP_START( quizdna_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x05, 0x06) AM_WRITE(SMH_NOP) /* unknown */
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(quizdna_rombank_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xe1, 0xe1) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
@@ -97,8 +97,8 @@ static ADDRESS_MAP_START( gakupara_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x04) AM_WRITE(SMH_NOP) /* unknown */
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(quizdna_rombank_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xe1, 0xe1) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
@@ -109,8 +109,8 @@ static ADDRESS_MAP_START( gekiretu_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x05, 0x06) AM_WRITE(SMH_NOP) /* unknown */
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(gekiretu_rombank_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0xe0, 0xe0) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xe1, 0xe1) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0xf0, 0xf0) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 

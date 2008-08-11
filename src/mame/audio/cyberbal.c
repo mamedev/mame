@@ -155,7 +155,7 @@ WRITE16_HANDLER( cyberbal_sound_68k_w )
 
 WRITE16_HANDLER( cyberbal_sound_68k_dac_w )
 {
-	DAC_data_16_w((offset >> 3) & 1, (((data >> 3) & 0x800) | ((data >> 2) & 0x7ff)) << 4);
+	dac_data_16_w((offset >> 3) & 1, (((data >> 3) & 0x800) | ((data >> 2) & 0x7ff)) << 4);
 
 	if (fast_68k_int)
 	{

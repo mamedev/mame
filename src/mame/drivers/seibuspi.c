@@ -1044,7 +1044,7 @@ static ADDRESS_MAP_START( spisound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x400b, 0x400b) AM_WRITENOP			/* Unknown */
 	AM_RANGE(0x4013, 0x4013) AM_READ(z80_coin_r)
 	AM_RANGE(0x401b, 0x401b) AM_WRITE(z80_bank_w)		/* control register: bits 0-2 = bank @ 8000, bit 3 = watchdog? */
-	AM_RANGE(0x6000, 0x600f) AM_READWRITE(YMF271_0_r, YMF271_0_w)
+	AM_RANGE(0x6000, 0x600f) AM_READWRITE(ymf271_0_r, ymf271_0_w)
 	AM_RANGE(0x8000, 0xffff) AM_ROMBANK(4)
 ADDRESS_MAP_END
 
@@ -1083,7 +1083,7 @@ static void irqhandler(running_machine *machine, int state)
 		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 
-static const struct YMF271interface ymf271_interface =
+static const ymf271_interface ymf271_config =
 {
 	flashrom_read,
 	flashrom_write,
@@ -1797,7 +1797,7 @@ static MACHINE_DRIVER_START( spi )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ymf", YMF271, 16934400)
-	MDRV_SOUND_CONFIG(ymf271_interface)
+	MDRV_SOUND_CONFIG(ymf271_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -1837,7 +1837,7 @@ static MACHINE_DRIVER_START( sxx2g ) /* single board version using measured cloc
 	MDRV_CPU_REPLACE("sound", Z80, 4915200) /* 4.9152MHz */
 
 	MDRV_SOUND_REPLACE("ymf", YMF271, 16384000) /* 16.3840MHz */
-	MDRV_SOUND_CONFIG(ymf271_interface)
+	MDRV_SOUND_CONFIG(ymf271_config)
 
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

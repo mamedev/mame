@@ -473,12 +473,12 @@ static ADDRESS_MAP_START( ssio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x0c00) AM_RAM
 	AM_RANGE(0x9000, 0x9003) AM_MIRROR(0x0ffc) AM_READ(ssio_data_r)
-	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0ffc) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x0ffc) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x0ffc) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x0ffc) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x0ffc) AM_READ(AY8910_read_port_1_r)
-	AM_RANGE(0xb002, 0xb002) AM_MIRROR(0x0ffc) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0ffc) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xa001, 0xa001) AM_MIRROR(0x0ffc) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0xa002, 0xa002) AM_MIRROR(0x0ffc) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xb000, 0xb000) AM_MIRROR(0x0ffc) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0xb001, 0xb001) AM_MIRROR(0x0ffc) AM_READ(ay8910_read_port_1_r)
+	AM_RANGE(0xb002, 0xb002) AM_MIRROR(0x0ffc) AM_WRITE(ay8910_write_port_1_w)
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(SMH_NOP, ssio_status_w)
 	AM_RANGE(0xd000, 0xdfff) AM_WRITENOP	/* low bit controls yellow LED */
 	AM_RANGE(0xe000, 0xefff) AM_READ(ssio_irq_clear)
@@ -516,7 +516,7 @@ MACHINE_DRIVER_END
 static WRITE8_HANDLER( csdeluxe_porta_w )
 {
 	dacval = (dacval & ~0x3fc) | (data << 2);
-	DAC_signed_data_16_w(csdeluxe_dac_index, dacval << 6);
+	dac_signed_data_16_w(csdeluxe_dac_index, dacval << 6);
 }
 
 static WRITE8_HANDLER( csdeluxe_portb_w )
@@ -524,7 +524,7 @@ static WRITE8_HANDLER( csdeluxe_portb_w )
 	UINT8 z_mask = pia_get_port_b_z_mask(0);
 
 	dacval = (dacval & ~0x003) | (data >> 6);
-	DAC_signed_data_16_w(csdeluxe_dac_index, dacval << 6);
+	dac_signed_data_16_w(csdeluxe_dac_index, dacval << 6);
 
 	if (~z_mask & 0x10)  csdeluxe_status = (csdeluxe_status & ~1) | ((data >> 4) & 1);
 	if (~z_mask & 0x20)  csdeluxe_status = (csdeluxe_status & ~2) | ((data >> 4) & 2);
@@ -639,7 +639,7 @@ MACHINE_DRIVER_END
 static WRITE8_HANDLER( soundsgood_porta_w )
 {
 	dacval = (dacval & ~0x3fc) | (data << 2);
-	DAC_signed_data_16_w(soundsgood_dac_index, dacval << 6);
+	dac_signed_data_16_w(soundsgood_dac_index, dacval << 6);
 }
 
 static WRITE8_HANDLER( soundsgood_portb_w )
@@ -647,7 +647,7 @@ static WRITE8_HANDLER( soundsgood_portb_w )
 	UINT8 z_mask = pia_get_port_b_z_mask(1);
 
 	dacval = (dacval & ~0x003) | (data >> 6);
-	DAC_signed_data_16_w(soundsgood_dac_index, dacval << 6);
+	dac_signed_data_16_w(soundsgood_dac_index, dacval << 6);
 
 	if (~z_mask & 0x10)  soundsgood_status = (soundsgood_status & ~1) | ((data >> 4) & 1);
 	if (~z_mask & 0x20)  soundsgood_status = (soundsgood_status & ~2) | ((data >> 4) & 2);
@@ -737,13 +737,13 @@ MACHINE_DRIVER_END
 static WRITE8_HANDLER( turbocs_porta_w )
 {
 	dacval = (dacval & ~0x3fc) | (data << 2);
-	DAC_signed_data_16_w(turbocs_dac_index, dacval << 6);
+	dac_signed_data_16_w(turbocs_dac_index, dacval << 6);
 }
 
 static WRITE8_HANDLER( turbocs_portb_w )
 {
 	dacval = (dacval & ~0x003) | (data >> 6);
-	DAC_signed_data_16_w(turbocs_dac_index, dacval << 6);
+	dac_signed_data_16_w(turbocs_dac_index, dacval << 6);
 	turbocs_status = (data >> 4) & 3;
 }
 

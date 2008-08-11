@@ -1552,8 +1552,8 @@ static WRITE16_HANDLER( atomicp_sound_w )
 	if (ACCESSING_BITS_8_15)
 		switch (offset & 1)
 		{
-			case 0:	YM2413_register_port_0_w(machine, 0, data >> 8);	break;
-			case 1:	YM2413_data_port_0_w(machine, 0, data >> 8);		break;
+			case 0:	ym2413_register_port_0_w(machine, 0, data >> 8);	break;
+			case 1:	ym2413_data_port_0_w(machine, 0, data >> 8);		break;
 		}
 }
 
@@ -1781,8 +1781,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x3e) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x3e) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_WRITE(upd7759_control_w)
 	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_READWRITE(upd7759_status_r, upd7759_0_port_w)
 	AM_RANGE(0xc0, 0xc0) AM_MIRROR(0x3f) AM_READ(soundlatch_r)
@@ -3214,7 +3214,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const struct upd7759_interface upd7759_interface =
+static const upd7759_interface upd7759_config =
 {
 	upd7759_generate_nmi
 };
@@ -3271,7 +3271,7 @@ static MACHINE_DRIVER_START( system16b )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
 
 	MDRV_SOUND_ADD("7759", UPD7759, UPD7759_STANDARD_CLOCK)
-	MDRV_SOUND_CONFIG(upd7759_interface)
+	MDRV_SOUND_CONFIG(upd7759_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.48)
 MACHINE_DRIVER_END
 

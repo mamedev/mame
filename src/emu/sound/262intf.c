@@ -32,13 +32,13 @@ static void IRQHandler_262(void *param,int irq)
 static TIMER_CALLBACK( timer_callback_262_0 )
 {
 	struct ymf262_info *info = ptr;
-	YMF262TimerOver(info->chip, 0);
+	ymf262_timer_over(info->chip, 0);
 }
 
 static TIMER_CALLBACK( timer_callback_262_1 )
 {
 	struct ymf262_info *info = ptr;
-	YMF262TimerOver(info->chip, 1);
+	ymf262_timer_over(info->chip, 1);
 }
 
 static void timer_handler_262(void *param,int timer, attotime period)
@@ -57,7 +57,7 @@ static void timer_handler_262(void *param,int timer, attotime period)
 static void ymf262_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)
 {
 	struct ymf262_info *info = param;
-	YMF262UpdateOne(info->chip, buffers, length);
+	ymf262_update_one(info->chip, buffers, length);
 }
 
 static void _stream_update(void *param, int interval)
@@ -79,16 +79,16 @@ static void *ymf262_start(const char *tag, int sndindex, int clock, const void *
 	info->intf = config ? config : &dummy;
 
 	/* stream system initialize */
-	info->chip = YMF262Init(clock,rate);
+	info->chip = ymf262_init(clock,rate);
 	if (info->chip == NULL)
 		return NULL;
 
 	info->stream = stream_create(0,4,rate,info,ymf262_stream_update);
 
 	/* YMF262 setup */
-	YMF262SetTimerHandler (info->chip, timer_handler_262, info);
-	YMF262SetIRQHandler   (info->chip, IRQHandler_262, info);
-	YMF262SetUpdateHandler(info->chip, _stream_update, info);
+	ymf262_set_timer_handler (info->chip, timer_handler_262, info);
+	ymf262_set_irq_handler   (info->chip, IRQHandler_262, info);
+	ymf262_set_update_handler(info->chip, _stream_update, info);
 
 	info->timer[0] = timer_alloc(timer_callback_262_0, info);
 	info->timer[1] = timer_alloc(timer_callback_262_1, info);
@@ -99,58 +99,58 @@ static void *ymf262_start(const char *tag, int sndindex, int clock, const void *
 static void ymf262_stop(void *token)
 {
 	struct ymf262_info *info = token;
-	YMF262Shutdown(info->chip);
+	ymf262_shutdown(info->chip);
 }
 
 /* reset */
 static void ymf262_reset(void *token)
 {
 	struct ymf262_info *info = token;
-	YMF262ResetChip(info->chip);
+	ymf262_reset_chip(info->chip);
 }
 
 /* chip #0 */
-READ8_HANDLER( YMF262_status_0_r ) {
+READ8_HANDLER( ymf262_status_0_r ) {
 	struct ymf262_info *info = sndti_token(SOUND_YMF262, 0);
-	return YMF262Read(info->chip, 0);
+	return ymf262_read(info->chip, 0);
 }
-WRITE8_HANDLER( YMF262_register_A_0_w ) {
+WRITE8_HANDLER( ymf262_register_a_0_w ) {
 	struct ymf262_info *info = sndti_token(SOUND_YMF262, 0);
-	YMF262Write(info->chip, 0, data);
+	ymf262_write(info->chip, 0, data);
 }
-WRITE8_HANDLER( YMF262_data_A_0_w ) {
+WRITE8_HANDLER( ymf262_data_a_0_w ) {
 	struct ymf262_info *info = sndti_token(SOUND_YMF262, 0);
-	YMF262Write(info->chip, 1, data);
+	ymf262_write(info->chip, 1, data);
 }
-WRITE8_HANDLER( YMF262_register_B_0_w ) {
+WRITE8_HANDLER( ymf262_register_b_0_w ) {
 	struct ymf262_info *info = sndti_token(SOUND_YMF262, 0);
-	YMF262Write(info->chip, 2, data);
+	ymf262_write(info->chip, 2, data);
 }
-WRITE8_HANDLER( YMF262_data_B_0_w ) {
+WRITE8_HANDLER( ymf262_data_b_0_w ) {
 	struct ymf262_info *info = sndti_token(SOUND_YMF262, 0);
-	YMF262Write(info->chip, 3, data);
+	ymf262_write(info->chip, 3, data);
 }
 
 /* chip #1 */
-READ8_HANDLER( YMF262_status_1_r ) {
+READ8_HANDLER( ymf262_status_1_r ) {
 	struct ymf262_info *info = sndti_token(SOUND_YMF262, 1);
-	return YMF262Read(info->chip, 0);
+	return ymf262_read(info->chip, 0);
 }
-WRITE8_HANDLER( YMF262_register_A_1_w ) {
+WRITE8_HANDLER( ymf262_register_a_1_w ) {
 	struct ymf262_info *info = sndti_token(SOUND_YMF262, 1);
-	YMF262Write(info->chip, 0, data);
+	ymf262_write(info->chip, 0, data);
 }
-WRITE8_HANDLER( YMF262_data_A_1_w ) {
+WRITE8_HANDLER( ymf262_data_a_1_w ) {
 	struct ymf262_info *info = sndti_token(SOUND_YMF262, 1);
-	YMF262Write(info->chip, 1, data);
+	ymf262_write(info->chip, 1, data);
 }
-WRITE8_HANDLER( YMF262_register_B_1_w ) {
+WRITE8_HANDLER( ymf262_register_b_1_w ) {
 	struct ymf262_info *info = sndti_token(SOUND_YMF262, 1);
-	YMF262Write(info->chip, 2, data);
+	ymf262_write(info->chip, 2, data);
 }
-WRITE8_HANDLER( YMF262_data_B_1_w ) {
+WRITE8_HANDLER( ymf262_data_b_1_w ) {
 	struct ymf262_info *info = sndti_token(SOUND_YMF262, 1);
-	YMF262Write(info->chip, 3, data);
+	ymf262_write(info->chip, 3, data);
 }
 
 

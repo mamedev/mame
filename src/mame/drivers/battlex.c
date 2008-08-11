@@ -87,8 +87,8 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(battlex_flipscreen_w)
 	/* verify all of these */
-	AM_RANGE(0x22, 0x22) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x23, 0x23) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x22, 0x22) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x23, 0x23) AM_WRITE(ay8910_control_port_0_w)
 
 	/* 0x30 looks like scroll, but can't be ? changes (increases or decreases)
         depending on the direction your ship is facing on lev 2. at least */

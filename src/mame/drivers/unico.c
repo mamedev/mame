@@ -37,9 +37,9 @@ Year + Game         PCB             Notes
 
 ***************************************************************************/
 
-static READ16_HANDLER ( YM3812_status_port_0_msb_r )	{	return YM3812_status_port_0_r(machine,0) << 8;	}
-static WRITE16_HANDLER( YM3812_register_port_0_msb_w )	{	if (ACCESSING_BITS_8_15)	YM3812_control_port_0_w(machine,0,data >> 8);	}
-static WRITE16_HANDLER( YM3812_data_port_0_msb_w )		{	if (ACCESSING_BITS_8_15)	YM3812_write_port_0_w(machine,0,data >> 8);		}
+static READ16_HANDLER ( YM3812_status_port_0_msb_r )	{	return ym3812_status_port_0_r(machine,0) << 8;	}
+static WRITE16_HANDLER( YM3812_register_port_0_msb_w )	{	if (ACCESSING_BITS_8_15)	ym3812_control_port_0_w(machine,0,data >> 8);	}
+static WRITE16_HANDLER( YM3812_data_port_0_msb_w )		{	if (ACCESSING_BITS_8_15)	ym3812_write_port_0_w(machine,0,data >> 8);		}
 
 
 /*
@@ -229,9 +229,9 @@ static READ32_HANDLER ( zeropnt2_oki1_r )			{ return okim6295_status_1_r(machine
 static WRITE32_HANDLER( zeropnt2_oki0_w )			{ if (ACCESSING_BITS_16_23)	okim6295_data_0_w(machine,0,(data >> 16) & 0xff); }
 static WRITE32_HANDLER( zeropnt2_oki1_w )			{ if (ACCESSING_BITS_16_23)	okim6295_data_1_w(machine,0,(data >> 16) & 0xff); }
 
-static READ32_HANDLER( zeropnt2_ym2151_status_r )	{ return YM2151_status_port_0_r(machine,0) << 16; }
-static WRITE32_HANDLER( zeropnt2_ym2151_reg_w )		{ if (ACCESSING_BITS_16_23)	YM2151_register_port_0_w(machine,0,(data >> 16) & 0xff); }
-static WRITE32_HANDLER( zeropnt2_ym2151_data_w )	{ if (ACCESSING_BITS_16_23)	YM2151_data_port_0_w(machine,0,(data >> 16) & 0xff); }
+static READ32_HANDLER( zeropnt2_ym2151_status_r )	{ return ym2151_status_port_0_r(machine,0) << 16; }
+static WRITE32_HANDLER( zeropnt2_ym2151_reg_w )		{ if (ACCESSING_BITS_16_23)	ym2151_register_port_0_w(machine,0,(data >> 16) & 0xff); }
+static WRITE32_HANDLER( zeropnt2_ym2151_data_w )	{ if (ACCESSING_BITS_16_23)	ym2151_data_port_0_w(machine,0,(data >> 16) & 0xff); }
 
 static WRITE32_HANDLER( zeropnt2_sound_bank_w )
 {

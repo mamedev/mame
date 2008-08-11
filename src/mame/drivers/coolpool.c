@@ -403,7 +403,7 @@ static WRITE16_HANDLER( dsp_romaddr_w )
 
 static WRITE16_HANDLER( dsp_dac_w )
 {
-	DAC_signed_data_16_w(0, (INT16)(data << 4) + 0x8000);
+	dac_signed_data_16_w(0, (INT16)(data << 4) + 0x8000);
 }
 
 

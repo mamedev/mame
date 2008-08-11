@@ -349,7 +349,7 @@ WRITE16_HANDLER( tatsumi_v30_68000_w )
 // self-test in Tatsumi games.  Needs fixed, but hack it here for now.
 READ8_HANDLER(tatsumi_hack_ym2151_r)
 {
-	int r=YM2151_status_port_0_r(machine,0);
+	int r=ym2151_status_port_0_r(machine,0);
 
 	if (activecpu_get_pc()==0x2aca || activecpu_get_pc()==0x29fe
 		|| activecpu_get_pc()==0xf9721

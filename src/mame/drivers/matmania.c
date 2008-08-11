@@ -47,7 +47,7 @@ static WRITE8_HANDLER( matmania_sh_command_w )
 
 static WRITE8_HANDLER( matmania_dac_w )
 {
-	DAC_signed_data_w(0,data);
+	dac_signed_data_w(0,data);
 }
 
 
@@ -126,10 +126,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x2002, 0x2002) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x2003, 0x2003) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x2002, 0x2002) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x2003, 0x2003) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0x2004, 0x2004) AM_WRITE(matmania_dac_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
@@ -142,8 +142,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( maniach_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(YM3526_control_port_0_w)
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(YM3526_write_port_0_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(ym3526_control_port_0_w)
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(ym3526_write_port_0_w)
 	AM_RANGE(0x2002, 0x2002) AM_WRITE(matmania_dac_w)
 	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END

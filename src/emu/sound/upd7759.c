@@ -622,8 +622,8 @@ static void register_for_save(struct upd7759_chip *chip, int index)
 
 static void *upd7759_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const struct upd7759_interface defintrf = { 0 };
-	const struct upd7759_interface *intf = (config != NULL) ? config : &defintrf;
+	static const upd7759_interface defintrf = { 0 };
+	const upd7759_interface *intf = (config != NULL) ? config : &defintrf;
 	struct upd7759_chip *chip;
 
 	chip = auto_malloc(sizeof(*chip));

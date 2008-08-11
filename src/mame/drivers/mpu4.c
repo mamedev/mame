@@ -768,14 +768,14 @@ static void update_ay(running_machine *machine)
 		  	}
 		  	case 0x02:
 			{/* CA2 = 0 CB2 = 1? : Write to selected PSG register and write data to Port A */
-	  			AY8910_write_port_0_w(machine, 0, pia_get_output_a(3));
+	  			ay8910_write_port_0_w(machine, 0, pia_get_output_a(3));
 				LOG(("AY Chip Write \n"));
 				break;
 	  		}
 		  	case 0x03:
 			{/* CA2 = 1 CB2 = 1? : The register will now be selected and the user can read from or write to it.
              The register will remain selected until another is chosen.*/
-				AY8910_control_port_0_w(machine, 0, pia_get_output_a(3));
+				ay8910_control_port_0_w(machine, 0, pia_get_output_a(3));
 				LOG(("AY Chip Select \n"));
 				break;
 	  		}

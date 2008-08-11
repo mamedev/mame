@@ -198,8 +198,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0xa001, 0xa001) AM_READ(YM2203_read_port_0_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0xa001, 0xa001) AM_READ(ym2203_read_port_0_r)
 	AM_RANGE(0xd000, 0xd000) AM_READ(lsasquad_sh_sound_command_r)
 	AM_RANGE(0xd800, 0xd800) AM_READ(lsasquad_sound_status_r)
 	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_ROM)	/* space for diagnostic ROM? */
@@ -208,10 +208,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xc001, 0xc001) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(lsasquad_sh_result_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(lsasquad_sh_nmi_disable_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(lsasquad_sh_nmi_enable_w)
@@ -387,10 +387,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_mem_daikaiju, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)
-	AM_RANGE(0xa001, 0xa001) AM_READWRITE(YM2203_read_port_0_r, YM2203_write_port_0_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0xa000, 0xa000) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
+	AM_RANGE(0xa001, 0xa001) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xc001, 0xc001) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ(daikaiju_sh_sound_command_r)
 	AM_RANGE(0xd400, 0xd400) AM_WRITENOP
 	AM_RANGE(0xd800, 0xd800) AM_READ(daikaiju_sound_status_r) AM_WRITENOP

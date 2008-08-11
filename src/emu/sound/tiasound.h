@@ -32,13 +32,15 @@
 /* bear this legend.                                                         */
 /*                                                                           */
 /*****************************************************************************/
-#ifndef TIASOUND_H
-#define TIASOUND_H
+#pragma once
+
+#ifndef __TIASOUND_H__
+#define __TIASOUND_H__
 
 void *tia_sound_init(int clock, int sample_rate, int gain);
 void tia_sound_free(void *chip);
 void tia_process (void *chip, stream_sample_t *buffer, int length);
 void tia_write(void *chip, offs_t offset, UINT8 data);
 
-#endif	/* TIASOUND_H */
+#endif	/* __TIASOUND_H__ */
 

@@ -99,11 +99,11 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(exerion_videoreg_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xd800, 0xd800) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0xd801, 0xd801) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0xd802, 0xd802) AM_READ(AY8910_read_port_1_r)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xd001, 0xd001) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xd800, 0xd800) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0xd801, 0xd801) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0xd802, 0xd802) AM_READ(ay8910_read_port_1_r)
 ADDRESS_MAP_END
 
 

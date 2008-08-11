@@ -94,10 +94,10 @@ static WRITE8_HANDLER( ay8910_port0a_w )
 	{
 		/* TODO: is this right? it sound awful */
 		static const int table[4] = { 0x05, 0x1b, 0x0b, 0x55 };
-		DAC_signed_data_w(0,table[(data & 0x06) >> 1]);
+		dac_signed_data_w(0,table[(data & 0x06) >> 1]);
 	}
 	else
-		DAC_signed_data_w(0,0x80);
+		dac_signed_data_w(0,0x80);
 }
 
 
@@ -109,9 +109,9 @@ static int active_8910,port0a,acs;
 static READ8_HANDLER( zaccaria_port0a_r )
 {
 	if (active_8910 == 0)
-		return AY8910_read_port_0_r(machine,0);
+		return ay8910_read_port_0_r(machine,0);
 	else
-		return AY8910_read_port_1_r(machine,0);
+		return ay8910_read_port_1_r(machine,0);
 }
 
 static WRITE8_HANDLER( zaccaria_port0a_w )
@@ -129,9 +129,9 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
 		if (last & 0x01)
-			AY8910_control_port_0_w(machine,0,port0a);
+			ay8910_control_port_0_w(machine,0,port0a);
 		else
-			AY8910_write_port_0_w(machine,0,port0a);
+			ay8910_write_port_0_w(machine,0,port0a);
 	}
 	else if ((last & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
@@ -144,9 +144,9 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
 		if (last & 0x04)
-			AY8910_control_port_1_w(machine,0,port0a);
+			ay8910_control_port_1_w(machine,0,port0a);
 		else
-			AY8910_write_port_1_w(machine,0,port0a);
+			ay8910_write_port_1_w(machine,0,port0a);
 	}
 	else if ((last & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{
@@ -268,7 +268,7 @@ static WRITE8_HANDLER( sound1_command_w )
 
 static WRITE8_HANDLER( mc1408_data_w )
 {
-	DAC_data_w(1,data);
+	dac_data_w(1,data);
 }
 
 

@@ -117,8 +117,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hnayayoi_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0x03, 0x03) AM_READ(YM2203_read_port_0_r)
+	AM_RANGE(0x02, 0x02) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0x03, 0x03) AM_READ(ym2203_read_port_0_r)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW3")
 	AM_RANGE(0x41, 0x41) AM_READ(keyboard_0_r)
 	AM_RANGE(0x42, 0x42) AM_READ(keyboard_1_r)
@@ -127,8 +127,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hnayayoi_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(adpcm_data_w)
 //  AM_RANGE(0x08, 0x08) AM_WRITE(SMH_NOP) // CRT Controller
 //  AM_RANGE(0x09, 0x09) AM_WRITE(SMH_NOP) // CRT Controller
@@ -146,8 +146,8 @@ static ADDRESS_MAP_START( hnfubuki_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_READ(SMH_ROM)
 	AM_RANGE(0x7800, 0x7fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x8000, 0xfeff) AM_READ(SMH_ROM)
-	AM_RANGE(0xff02, 0xff02) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0xff03, 0xff03) AM_READ(YM2203_read_port_0_r)
+	AM_RANGE(0xff02, 0xff02) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0xff03, 0xff03) AM_READ(ym2203_read_port_0_r)
 	AM_RANGE(0xff04, 0xff04) AM_READ_PORT("DSW3")
 	AM_RANGE(0xff41, 0xff41) AM_READ(keyboard_0_r)
 	AM_RANGE(0xff42, 0xff42) AM_READ(keyboard_1_r)
@@ -158,8 +158,8 @@ static ADDRESS_MAP_START( hnfubuki_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x77ff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x7800, 0x7fff) AM_WRITE(SMH_RAM) AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x8000, 0xfeff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xff00, 0xff00) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xff01, 0xff01) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0xff00, 0xff00) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xff01, 0xff01) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0xff06, 0xff06) AM_WRITE(adpcm_data_w)
 //  AM_RANGE(0xff08, 0xff08) AM_WRITE(SMH_NOP) // CRT Controller
 //  AM_RANGE(0xff09, 0xff09) AM_WRITE(SMH_NOP) // CRT Controller
@@ -197,8 +197,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( untoucha_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x11, 0x11) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0x51, 0x51) AM_READ(YM2203_read_port_0_r)
+	AM_RANGE(0x11, 0x11) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0x51, 0x51) AM_READ(ym2203_read_port_0_r)
 	AM_RANGE(0x16, 0x16) AM_READ(keyboard_0_r)	// bit 7 = blitter busy flag
 	AM_RANGE(0x15, 0x15) AM_READ(keyboard_1_r)
 	AM_RANGE(0x14, 0x14) AM_READ_PORT("COIN")
@@ -206,8 +206,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( untoucha_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x50, 0x50) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x50, 0x50) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0x13, 0x13) AM_WRITE(adpcm_data_w)
 //  AM_RANGE(0x12, 0x12) AM_WRITE(SMH_NOP) // CRT Controller
 //  AM_RANGE(0x52, 0x52) AM_WRITE(SMH_NOP) // CRT Controller

@@ -38,13 +38,13 @@ static void IRQHandler(void *param,int irq)
 static TIMER_CALLBACK( timer_callback_2612_0 )
 {
 	struct ym2612_info *info = ptr;
-	YM2612TimerOver(info->chip,0);
+	ym2612_timer_over(info->chip,0);
 }
 
 static TIMER_CALLBACK( timer_callback_2612_1 )
 {
 	struct ym2612_info *info = ptr;
-	YM2612TimerOver(info->chip,1);
+	ym2612_timer_over(info->chip,1);
 }
 
 static void timer_handler(void *param,int c,int count,int clock)
@@ -63,7 +63,7 @@ static void timer_handler(void *param,int c,int count,int clock)
 }
 
 /* update request from fm.c */
-void YM2612UpdateRequest(void *param)
+void ym2612_update_request(void *param)
 {
 	struct ym2612_info *info = param;
 	stream_update(info->stream);
@@ -76,14 +76,14 @@ void YM2612UpdateRequest(void *param)
 static void ym2612_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)
 {
 	struct ym2612_info *info = param;
-	YM2612UpdateOne(info->chip, buffers, length);
+	ym2612_update_one(info->chip, buffers, length);
 }
 
 
-static STATE_POSTLOAD( ym2612_postload )
+static STATE_POSTLOAD( ym2612_intf_postload )
 {
 	struct ym2612_info *info = param;
-	YM2612Postload(info->chip);
+	ym2612_postload(info->chip);
 }
 
 
@@ -107,9 +107,9 @@ static void *ym2612_start(const char *tag, int sndindex, int clock, const void *
 	info->stream = stream_create(0,2,rate,info,ym2612_stream_update);
 
 	/**** initialize YM2612 ****/
-	info->chip = YM2612Init(info,sndindex,clock,rate,timer_handler,IRQHandler);
+	info->chip = ym2612_init(info,sndindex,clock,rate,timer_handler,IRQHandler);
 
-	state_save_register_postload(Machine, ym2612_postload, info);
+	state_save_register_postload(Machine, ym2612_intf_postload, info);
 
 	if (info->chip)
 		return info;
@@ -121,117 +121,117 @@ static void *ym2612_start(const char *tag, int sndindex, int clock, const void *
 static void ym2612_stop(void *token)
 {
 	struct ym2612_info *info = token;
-	YM2612Shutdown(info->chip);
+	ym2612_shutdown(info->chip);
 }
 
 static void ym2612_reset(void *token)
 {
 	struct ym2612_info *info = token;
-	YM2612ResetChip(info->chip);
+	ym2612_reset_chip(info->chip);
 }
 
 
 /************************************************/
 /* Status Read for YM2612 - Chip 0              */
 /************************************************/
-READ8_HANDLER( YM2612_status_port_0_A_r )
+READ8_HANDLER( ym2612_status_port_0_a_r )
 {
   struct ym2612_info *info = sndti_token(SOUND_YM2612,0);
-  return YM2612Read(info->chip,0);
+  return ym2612_read(info->chip,0);
 }
 
-READ8_HANDLER( YM2612_status_port_0_B_r )
+READ8_HANDLER( ym2612_status_port_0_b_r )
 {
   struct ym2612_info *info = sndti_token(SOUND_YM2612,0);
-  return YM2612Read(info->chip,2);
+  return ym2612_read(info->chip,2);
 }
 
 /************************************************/
 /* Status Read for YM2612 - Chip 1              */
 /************************************************/
-READ8_HANDLER( YM2612_status_port_1_A_r ) {
+READ8_HANDLER( ym2612_status_port_1_a_r ) {
   struct ym2612_info *info = sndti_token(SOUND_YM2612,1);
-  return YM2612Read(info->chip,0);
+  return ym2612_read(info->chip,0);
 }
 
-READ8_HANDLER( YM2612_status_port_1_B_r ) {
+READ8_HANDLER( ym2612_status_port_1_b_r ) {
   struct ym2612_info *info = sndti_token(SOUND_YM2612,1);
-  return YM2612Read(info->chip,2);
+  return ym2612_read(info->chip,2);
 }
 
 /************************************************/
 /* Port Read for YM2612 - Chip 0                */
 /************************************************/
-READ8_HANDLER( YM2612_read_port_0_r ){
+READ8_HANDLER( ym2612_read_port_0_r ){
   struct ym2612_info *info = sndti_token(SOUND_YM2612,0);
-  return YM2612Read(info->chip,1);
+  return ym2612_read(info->chip,1);
 }
 
 /************************************************/
 /* Port Read for YM2612 - Chip 1                */
 /************************************************/
-READ8_HANDLER( YM2612_read_port_1_r ){
+READ8_HANDLER( ym2612_read_port_1_r ){
   struct ym2612_info *info = sndti_token(SOUND_YM2612,1);
-  return YM2612Read(info->chip,1);
+  return ym2612_read(info->chip,1);
 }
 
 /************************************************/
 /* Control Write for YM2612 - Chip 0            */
 /* Consists of 2 addresses                      */
 /************************************************/
-WRITE8_HANDLER( YM2612_control_port_0_A_w )
+WRITE8_HANDLER( ym2612_control_port_0_a_w )
 {
   struct ym2612_info *info = sndti_token(SOUND_YM2612,0);
-  YM2612Write(info->chip,0,data);
+  ym2612_write(info->chip,0,data);
 }
 
-WRITE8_HANDLER( YM2612_control_port_0_B_w )
+WRITE8_HANDLER( ym2612_control_port_0_b_w )
 {
   struct ym2612_info *info = sndti_token(SOUND_YM2612,0);
-  YM2612Write(info->chip,2,data);
+  ym2612_write(info->chip,2,data);
 }
 
 /************************************************/
 /* Control Write for YM2612 - Chip 1            */
 /* Consists of 2 addresses                      */
 /************************************************/
-WRITE8_HANDLER( YM2612_control_port_1_A_w ){
+WRITE8_HANDLER( ym2612_control_port_1_a_w ){
   struct ym2612_info *info = sndti_token(SOUND_YM2612,1);
-  YM2612Write(info->chip,0,data);
+  ym2612_write(info->chip,0,data);
 }
 
-WRITE8_HANDLER( YM2612_control_port_1_B_w ){
+WRITE8_HANDLER( ym2612_control_port_1_b_w ){
   struct ym2612_info *info = sndti_token(SOUND_YM2612,1);
-  YM2612Write(info->chip,2,data);
+  ym2612_write(info->chip,2,data);
 }
 
 /************************************************/
 /* Data Write for YM2612 - Chip 0               */
 /* Consists of 2 addresses                      */
 /************************************************/
-WRITE8_HANDLER( YM2612_data_port_0_A_w )
+WRITE8_HANDLER( ym2612_data_port_0_a_w )
 {
   struct ym2612_info *info = sndti_token(SOUND_YM2612,0);
-  YM2612Write(info->chip,1,data);
+  ym2612_write(info->chip,1,data);
 }
 
-WRITE8_HANDLER( YM2612_data_port_0_B_w )
+WRITE8_HANDLER( ym2612_data_port_0_b_w )
 {
   struct ym2612_info *info = sndti_token(SOUND_YM2612,0);
-  YM2612Write(info->chip,3,data);
+  ym2612_write(info->chip,3,data);
 }
 
 /************************************************/
 /* Data Write for YM2612 - Chip 1               */
 /* Consists of 2 addresses                      */
 /************************************************/
-WRITE8_HANDLER( YM2612_data_port_1_A_w ){
+WRITE8_HANDLER( ym2612_data_port_1_a_w ){
   struct ym2612_info *info = sndti_token(SOUND_YM2612,1);
-  YM2612Write(info->chip,1,data);
+  ym2612_write(info->chip,1,data);
 }
-WRITE8_HANDLER( YM2612_data_port_1_B_w ){
+WRITE8_HANDLER( ym2612_data_port_1_b_w ){
   struct ym2612_info *info = sndti_token(SOUND_YM2612,1);
-  YM2612Write(info->chip,3,data);
+  ym2612_write(info->chip,3,data);
 }
 
 #if BUILD_YM3438
@@ -239,104 +239,104 @@ WRITE8_HANDLER( YM2612_data_port_1_B_w ){
 /************************************************/
 /* Status Read for YM3438 - Chip 0              */
 /************************************************/
-READ8_HANDLER( YM3438_status_port_0_A_r )
+READ8_HANDLER( ym3438_status_port_0_a_r )
 {
   struct ym2612_info *info = sndti_token(SOUND_YM3438,0);
-  return YM2612Read(info->chip,0);
+  return ym2612_read(info->chip,0);
 }
 
-READ8_HANDLER( YM3438_status_port_0_B_r )
+READ8_HANDLER( ym3438_status_port_0_b_r )
 {
   struct ym2612_info *info = sndti_token(SOUND_YM3438,0);
-  return YM2612Read(info->chip,2);
+  return ym2612_read(info->chip,2);
 }
 
 /************************************************/
 /* Status Read for YM3438 - Chip 1              */
 /************************************************/
-READ8_HANDLER( YM3438_status_port_1_A_r ) {
+READ8_HANDLER( ym3438_status_port_1_a_r ) {
   struct ym2612_info *info = sndti_token(SOUND_YM3438,1);
-  return YM2612Read(info->chip,0);
+  return ym2612_read(info->chip,0);
 }
 
-READ8_HANDLER( YM3438_status_port_1_B_r ) {
+READ8_HANDLER( ym3438_status_port_1_b_r ) {
   struct ym2612_info *info = sndti_token(SOUND_YM3438,1);
-  return YM2612Read(info->chip,2);
+  return ym2612_read(info->chip,2);
 }
 
 /************************************************/
 /* Port Read for YM3438 - Chip 0                */
 /************************************************/
-READ8_HANDLER( YM3438_read_port_0_r ){
+READ8_HANDLER( ym3438_read_port_0_r ){
   struct ym2612_info *info = sndti_token(SOUND_YM3438,0);
-  return YM2612Read(info->chip,1);
+  return ym2612_read(info->chip,1);
 }
 
 /************************************************/
 /* Port Read for YM3438 - Chip 1                */
 /************************************************/
-READ8_HANDLER( YM3438_read_port_1_r ){
+READ8_HANDLER( ym3438_read_port_1_r ){
   struct ym2612_info *info = sndti_token(SOUND_YM3438,1);
-  return YM2612Read(info->chip,1);
+  return ym2612_read(info->chip,1);
 }
 
 /************************************************/
 /* Control Write for YM3438 - Chip 0            */
 /* Consists of 2 addresses                      */
 /************************************************/
-WRITE8_HANDLER( YM3438_control_port_0_A_w )
+WRITE8_HANDLER( ym3438_control_port_0_a_w )
 {
   struct ym2612_info *info = sndti_token(SOUND_YM3438,0);
-  YM2612Write(info->chip,0,data);
+  ym2612_write(info->chip,0,data);
 }
 
-WRITE8_HANDLER( YM3438_control_port_0_B_w )
+WRITE8_HANDLER( ym3438_control_port_0_b_w )
 {
   struct ym2612_info *info = sndti_token(SOUND_YM3438,0);
-  YM2612Write(info->chip,2,data);
+  ym2612_write(info->chip,2,data);
 }
 
 /************************************************/
 /* Control Write for YM3438 - Chip 1            */
 /* Consists of 2 addresses                      */
 /************************************************/
-WRITE8_HANDLER( YM3438_control_port_1_A_w ){
+WRITE8_HANDLER( ym3438_control_port_1_a_w ){
   struct ym2612_info *info = sndti_token(SOUND_YM3438,1);
-  YM2612Write(info->chip,0,data);
+  ym2612_write(info->chip,0,data);
 }
 
-WRITE8_HANDLER( YM3438_control_port_1_B_w ){
+WRITE8_HANDLER( ym3438_control_port_1_b_w ){
   struct ym2612_info *info = sndti_token(SOUND_YM3438,1);
-  YM2612Write(info->chip,2,data);
+  ym2612_write(info->chip,2,data);
 }
 
 /************************************************/
 /* Data Write for YM3438 - Chip 0               */
 /* Consists of 2 addresses                      */
 /************************************************/
-WRITE8_HANDLER( YM3438_data_port_0_A_w )
+WRITE8_HANDLER( ym3438_data_port_0_a_w )
 {
   struct ym2612_info *info = sndti_token(SOUND_YM3438,0);
-  YM2612Write(info->chip,1,data);
+  ym2612_write(info->chip,1,data);
 }
 
-WRITE8_HANDLER( YM3438_data_port_0_B_w )
+WRITE8_HANDLER( ym3438_data_port_0_b_w )
 {
   struct ym2612_info *info = sndti_token(SOUND_YM3438,0);
-  YM2612Write(info->chip,3,data);
+  ym2612_write(info->chip,3,data);
 }
 
 /************************************************/
 /* Data Write for YM3438 - Chip 1               */
 /* Consists of 2 addresses                      */
 /************************************************/
-WRITE8_HANDLER( YM3438_data_port_1_A_w ){
+WRITE8_HANDLER( ym3438_data_port_1_a_w ){
   struct ym2612_info *info = sndti_token(SOUND_YM3438,1);
-  YM2612Write(info->chip,1,data);
+  ym2612_write(info->chip,1,data);
 }
-WRITE8_HANDLER( YM3438_data_port_1_B_w ){
+WRITE8_HANDLER( ym3438_data_port_1_b_w ){
   struct ym2612_info *info = sndti_token(SOUND_YM3438,1);
-  YM2612Write(info->chip,3,data);
+  ym2612_write(info->chip,3,data);
 }
 
 #endif

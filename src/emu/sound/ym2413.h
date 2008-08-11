@@ -1,5 +1,7 @@
-#ifndef _H_YM2413_
-#define _H_YM2413_
+#pragma once
+
+#ifndef __YM2413_H__
+#define __YM2413_H__
 
 /* select output bits size of output : 8 or 16 */
 #define SAMPLE_BITS 16
@@ -27,16 +29,15 @@ typedef INT8 SAMP;
 
 
 
-void *YM2413Init(int clock, int rate, int index);
-void YM2413Shutdown(void *chip);
-void YM2413ResetChip(void *chip);
-void YM2413Write(void *chip, int a, int v);
-unsigned char YM2413Read(void *chip, int a);
-void YM2413UpdateOne(void *chip, SAMP **buffers, int length);
+void *ym2413_init(int clock, int rate, int index);
+void ym2413_shutdown(void *chip);
+void ym2413_reset_chip(void *chip);
+void ym2413_write(void *chip, int a, int v);
+unsigned char ym2413_read(void *chip, int a);
+void ym2413_update_one(void *chip, SAMP **buffers, int length);
 
 typedef void (*OPLL_UPDATEHANDLER)(void *param,int min_interval_us);
 
-void YM2413SetUpdateHandler(void *chip, OPLL_UPDATEHANDLER UpdateHandler, void *param);
+void ym2413_set_update_handler(void *chip, OPLL_UPDATEHANDLER UpdateHandler, void *param);
 
-
-#endif /*_H_YM2413_*/
+#endif /*__YM2413_H__*/

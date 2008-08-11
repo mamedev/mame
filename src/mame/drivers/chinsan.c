@@ -197,8 +197,8 @@ static ADDRESS_MAP_START( chinsan_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(chinsan_port00_w)
 	AM_RANGE(0x01, 0x01) AM_READ(chinsan_input_port_0_r)
 	AM_RANGE(0x02, 0x02) AM_READ(chinsan_input_port_1_r)
-	AM_RANGE(0x10, 0x10) AM_READ(YM2203_status_port_0_r) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x11, 0x11) AM_READ(YM2203_read_port_0_r) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x10, 0x10) AM_READ(ym2203_status_port_0_r) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x11, 0x11) AM_READ(ym2203_read_port_0_r) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(ctrl_w)	// ROM bank + unknown stuff (input mutliplex?)
 ADDRESS_MAP_END
 

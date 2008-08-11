@@ -182,9 +182,9 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x1ffff) AM_ROM
 	AM_RANGE(0x9ff00, 0x9ffff) AM_WRITE(SMH_NOP) /* Irq controller? */
 	AM_RANGE(0xa0000, 0xa3fff) AM_RAM
-	AM_RANGE(0xa8000, 0xa803f) AM_READWRITE(IremGA20_r, IremGA20_w)
-	AM_RANGE(0xa8040, 0xa8041) AM_WRITE(YM2151_register_port_0_lsb_w)
-	AM_RANGE(0xa8042, 0xa8043) AM_READWRITE(YM2151_status_port_0_lsb_r, YM2151_data_port_0_lsb_w)
+	AM_RANGE(0xa8000, 0xa803f) AM_READWRITE(irem_ga20_r, irem_ga20_w)
+	AM_RANGE(0xa8040, 0xa8041) AM_WRITE(ym2151_register_port_0_lsb_w)
+	AM_RANGE(0xa8042, 0xa8043) AM_READWRITE(ym2151_status_port_0_lsb_r, ym2151_data_port_0_lsb_w)
 	AM_RANGE(0xa8044, 0xa8045) AM_READWRITE(m107_soundlatch_r, m107_sound_irq_ack_w)
 	AM_RANGE(0xa8046, 0xa8047) AM_WRITE(m107_sound_status_w)
 	AM_RANGE(0xffff0, 0xfffff) AM_ROM

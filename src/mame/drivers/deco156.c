@@ -214,15 +214,15 @@ static WRITE32_HANDLER(wcvol95_nonbuffered_palette_w)
 
 static READ32_HANDLER( deco156_snd_r )
 {
-	return YMZ280B_status_0_r(machine, 0);
+	return ymz280b_status_0_r(machine, 0);
 }
 
 static WRITE32_HANDLER( deco156_snd_w )
 {
 	if (offset)
-		YMZ280B_data_0_w(machine, 0, data);
+		ymz280b_data_0_w(machine, 0, data);
 	else
-		YMZ280B_register_0_w(machine, 0, data);
+		ymz280b_register_0_w(machine, 0, data);
 }
 
 /***************************************************************************/
@@ -407,7 +407,7 @@ static void sound_irq_gen(running_machine *machine, int state)
 	logerror("sound irq\n");
 }
 
-static const struct YMZ280Binterface ymz280b_intf =
+static const ymz280b_interface ymz280b_intf =
 {
 	sound_irq_gen
 };

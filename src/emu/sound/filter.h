@@ -1,10 +1,12 @@
-#ifndef __FILTER_H
-#define __FILTER_H
+#pragma once
+
+#ifndef __FILTER_H__
+#define __FILTER_H__
 
 /* Max filter order */
 #define FILTER_ORDER_MAX 51
 
-/* Define to use interger calculation */
+/* Define to use integer calculation */
 #define FILTER_USE_INT
 
 #ifdef FILTER_USE_INT
@@ -14,15 +16,19 @@ typedef int filter_real;
 typedef double filter_real;
 #endif
 
-typedef struct filter_struct {
+typedef struct _filter filter;
+struct _filter
+{
 	filter_real xcoeffs[(FILTER_ORDER_MAX+1)/2];
 	unsigned order;
-} filter;
+};
 
-typedef struct filter_state_struct {
+typedef struct _filter_state filter_state;
+struct _filter_state
+{
 	unsigned prev_mac;
 	filter_real xprev[FILTER_ORDER_MAX];
-} filter_state;
+};
 
 /* Allocate a FIR Low Pass filter */
 filter* filter_lp_fir_alloc(double freq, int order);
@@ -59,12 +65,14 @@ filter_real filter_compute(filter* f, filter_state* s);
 
 #define Q_TO_DAMP(q)	(1.0/q)
 
-typedef struct filter2_context_struct {
+typedef struct _filter2_context filter2_context;
+struct _filter2_context
+{
 	double x0, x1, x2;	/* x[k], x[k-1], x[k-2], current and previous 2 input values */
 	double y0, y1, y2;	/* y[k], y[k-1], y[k-2], current and previous 2 output values */
 	double a1, a2;		/* digital filter coefficients, denominator */
 	double b0, b1, b2;	/* digital filter coefficients, numerator */
-} filter2_context;
+};
 
 
 /* Setup the filter context based on the passed filter type info.
@@ -109,4 +117,4 @@ void filter2_step(filter2_context *filter2);
 void filter_opamp_m_bandpass_setup(double r1, double r2, double r3, double c1, double c2,
 					filter2_context *filter2);
 
-#endif
+#endif /* __FILTER_H__ */

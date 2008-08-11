@@ -737,7 +737,7 @@ static void AICA_UpdateReg(struct _AICA *AICA, int reg)
 			break;
 		case 0x8:
 		case 0x9:
-			AICA_MidiIn(Machine, 0, AICA->udata.data[0x8/2]&0xff, 0);
+			aica_midi_in(Machine, 0, AICA->udata.data[0x8/2]&0xff, 0);
 			break;
 		case 0x12:
 		case 0x13:
@@ -941,7 +941,7 @@ static void AICA_w16(struct _AICA *AICA,unsigned int addr,unsigned short val)
 
 			if (addr == 0x3bfe)
 			{
-				AICADSP_Start(&AICA->DSP);
+				aica_dsp_start(&AICA->DSP);
 			}
 		}
 	}
@@ -1225,7 +1225,7 @@ static void AICA_DoMasterSamples(struct _AICA *AICA, int nsamples)
 				sample=AICA_UpdateSlot(AICA, slot);
 
 				Enc=((TL(slot))<<0x0)|((IMXL(slot))<<0xd);
-				AICADSP_SetSample(&AICA->DSP,(sample*AICA->LPANTABLE[Enc])>>(SHIFT-2),ISEL(slot),IMXL(slot));
+				aica_dsp_setsample(&AICA->DSP,(sample*AICA->LPANTABLE[Enc])>>(SHIFT-2),ISEL(slot),IMXL(slot));
 				Enc=((TL(slot))<<0x0)|((DIPAN(slot))<<0x8)|((DISDL(slot))<<0xd);
 				{
 					smpl+=(sample*AICA->LPANTABLE[Enc])>>SHIFT;
@@ -1237,7 +1237,7 @@ static void AICA_DoMasterSamples(struct _AICA *AICA, int nsamples)
 		}
 
 		// process the DSP
-		AICADSP_Step(&AICA->DSP);
+		aica_dsp_step(&AICA->DSP);
 
 		// mix DSP output
 		for(i=0;i<16;++i)
@@ -1302,7 +1302,7 @@ static void aica_stop(void)
 }
 #endif
 
-void AICA_set_ram_base(int which, void *base, int size)
+void aica_set_ram_base(int which, void *base, int size)
 {
 	struct _AICA *AICA = sndti_token(SOUND_AICA, which);
 	if (AICA)
@@ -1316,7 +1316,7 @@ void AICA_set_ram_base(int which, void *base, int size)
 	}
 }
 
-READ16_HANDLER( AICA_0_r )
+READ16_HANDLER( aica_0_r )
 {
 	struct _AICA *AICA = sndti_token(SOUND_AICA, 0);
 	UINT16 res = AICA_r16(AICA, offset*2);
@@ -1324,7 +1324,7 @@ READ16_HANDLER( AICA_0_r )
 	return res;
 }
 
-WRITE16_HANDLER( AICA_0_w )
+WRITE16_HANDLER( aica_0_w )
 {
 	struct _AICA *AICA = sndti_token(SOUND_AICA, 0);
 	UINT16 tmp;
@@ -1334,14 +1334,14 @@ WRITE16_HANDLER( AICA_0_w )
 	AICA_w16(AICA,offset*2, tmp);
 }
 
-WRITE16_HANDLER( AICA_MidiIn )
+WRITE16_HANDLER( aica_midi_in )
 {
 	struct _AICA *AICA = sndti_token(SOUND_AICA, 0);
 	AICA->MidiStack[AICA->MidiW++]=data;
 	AICA->MidiW &= 15;
 }
 
-READ16_HANDLER( AICA_MidiOutR )
+READ16_HANDLER( aica_midi_out_r )
 {
 	struct _AICA *AICA = sndti_token(SOUND_AICA, 0);
 	unsigned char val;

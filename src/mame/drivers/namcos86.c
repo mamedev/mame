@@ -413,9 +413,9 @@ static ADDRESS_MAP_START( NAME##_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )					\
 	AM_RANGE(0x0080, 0x00ff) AM_RAM														\
 	AM_RANGE(0x1000, 0x13ff) AM_READWRITE(namcos1_cus30_r,namcos1_cus30_w) /* PSG device, shared RAM */	\
 	AM_RANGE(0x1400, 0x1fff) AM_RAM														\
-	AM_RANGE(ADDR_INPUT+0x00, ADDR_INPUT+0x01) AM_READ(YM2151_status_port_0_r)			\
-	AM_RANGE(ADDR_INPUT+0x00, ADDR_INPUT+0x00) AM_WRITE(YM2151_register_port_0_w)		\
-	AM_RANGE(ADDR_INPUT+0x01, ADDR_INPUT+0x01) AM_WRITE(YM2151_data_port_0_w)			\
+	AM_RANGE(ADDR_INPUT+0x00, ADDR_INPUT+0x01) AM_READ(ym2151_status_port_0_r)			\
+	AM_RANGE(ADDR_INPUT+0x00, ADDR_INPUT+0x00) AM_WRITE(ym2151_register_port_0_w)		\
+	AM_RANGE(ADDR_INPUT+0x01, ADDR_INPUT+0x01) AM_WRITE(ym2151_data_port_0_w)			\
 	AM_RANGE(ADDR_INPUT+0x20, ADDR_INPUT+0x20) AM_READ(input_port_0_r)					\
 	AM_RANGE(ADDR_INPUT+0x21, ADDR_INPUT+0x21) AM_READ(input_port_1_r)					\
 	AM_RANGE(ADDR_INPUT+0x30, ADDR_INPUT+0x30) AM_READ(dsw0_r)							\

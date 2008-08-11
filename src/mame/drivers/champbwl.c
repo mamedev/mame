@@ -323,7 +323,7 @@ static GFXDECODE_START( champbwl )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 32 )
 GFXDECODE_END
 
-static const struct x1_010_interface champbwl_sound_intf =
+static const x1_010_interface champbwl_sound_intf =
 {
 	0x0000		/* address */
 };

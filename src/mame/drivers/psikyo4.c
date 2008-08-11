@@ -364,29 +364,29 @@ static READ32_HANDLER( ps4_sample_r ) /* Send sample data for test */
 
 static READ32_HANDLER( psh_ymf_fm_r )
 {
-	return YMF278B_status_port_0_r(machine, 0)<<24; /* Also, bit 0 being high indicates not ready to send sample data for test */
+	return ymf278b_status_port_0_r(machine, 0)<<24; /* Also, bit 0 being high indicates not ready to send sample data for test */
 }
 
 static WRITE32_HANDLER( psh_ymf_fm_w )
 {
 	if (ACCESSING_BITS_24_31)	// FM bank 1 address (OPL2/OPL3 compatible)
 	{
-		YMF278B_control_port_0_A_w(machine, 0, data>>24);
+		ymf278b_control_port_0_a_w(machine, 0, data>>24);
 	}
 
 	if (ACCESSING_BITS_16_23)	// FM bank 1 data
 	{
-		YMF278B_data_port_0_A_w(machine, 0, data>>16);
+		ymf278b_data_port_0_a_w(machine, 0, data>>16);
 	}
 
 	if (ACCESSING_BITS_8_15)	// FM bank 2 address (OPL3/YMF 262 extended)
 	{
-		YMF278B_control_port_0_B_w(machine, 0, data>>8);
+		ymf278b_control_port_0_b_w(machine, 0, data>>8);
 	}
 
 	if (ACCESSING_BITS_0_7)	// FM bank 2 data
 	{
-		YMF278B_data_port_0_B_w(machine, 0, data);
+		ymf278b_data_port_0_b_w(machine, 0, data);
 	}
 }
 
@@ -394,7 +394,7 @@ static WRITE32_HANDLER( psh_ymf_pcm_w )
 {
 	if (ACCESSING_BITS_24_31)	// PCM address (OPL4/YMF 278B extended)
 	{
-		YMF278B_control_port_0_C_w(machine, 0, data>>24);
+		ymf278b_control_port_0_c_w(machine, 0, data>>24);
 
 #if ROMTEST
 		if (data>>24 == 0x06)	// Reset Sample reading (They always write this code immediately before reading data)
@@ -406,7 +406,7 @@ static WRITE32_HANDLER( psh_ymf_pcm_w )
 
 	if (ACCESSING_BITS_16_23)	// PCM data
 	{
-		YMF278B_data_port_0_C_w(machine, 0, data>>16);
+		ymf278b_data_port_0_c_w(machine, 0, data>>16);
 	}
 }
 
@@ -481,7 +481,7 @@ static void irqhandler(running_machine *machine, int linestate)
 		cpunum_set_input_line(machine, 0, 12, CLEAR_LINE);
 }
 
-static const struct YMF278B_interface ymf278b_interface =
+static const ymf278b_interface ymf278b_config =
 {
 	irqhandler
 };
@@ -520,7 +520,7 @@ static MACHINE_DRIVER_START( ps4big )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ymf", YMF278B, MASTER_CLOCK/2)
-	MDRV_SOUND_CONFIG(ymf278b_interface)
+	MDRV_SOUND_CONFIG(ymf278b_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END

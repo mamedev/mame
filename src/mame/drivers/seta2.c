@@ -1801,7 +1801,7 @@ static INTERRUPT_GEN( samshoot_interrupt )
 	}
 }
 
-static const struct x1_010_interface x1_010_sound_intf =
+static const x1_010_interface x1_010_sound_intf =
 {
 	0x0000,		/* address */
 };

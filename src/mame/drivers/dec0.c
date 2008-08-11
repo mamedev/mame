@@ -294,10 +294,10 @@ static WRITE8_HANDLER( YM3812_w )
 {
 	switch (offset) {
 	case 0:
-		YM3812_control_port_0_w(machine,0,data);
+		ym3812_control_port_0_w(machine,0,data);
 		break;
 	case 1:
-		YM3812_write_port_0_w(machine,0,data);
+		ym3812_write_port_0_w(machine,0,data);
 		break;
 	}
 }
@@ -306,10 +306,10 @@ static WRITE8_HANDLER( YM2203_w )
 {
 	switch (offset) {
 	case 0:
-		YM2203_control_port_0_w(machine,0,data);
+		ym2203_control_port_0_w(machine,0,data);
 		break;
 	case 1:
-		YM2203_write_port_0_w(machine,0,data);
+		ym2203_write_port_0_w(machine,0,data);
 		break;
 	}
 }

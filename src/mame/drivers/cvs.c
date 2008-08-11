@@ -336,7 +336,7 @@ static WRITE8_HANDLER( cvs_4_bit_dac_data_w )
 			    (cvs_4_bit_dac_data[3] << 3);
 
 	/* scale up to a full byte and output */
-	DAC_1_data_w(machine, 0, (dac_value << 4) | dac_value);
+	dac_1_data_w(machine, 0, (dac_value << 4) | dac_value);
 }
 
 
@@ -353,30 +353,30 @@ static void speech_execute_command(running_machine *machine, UINT8 command)
 	/* reset */
 	if (command == 0x3f)
 	{
-		tms5110_CTL_w(machine, 0, TMS5110_CMD_RESET);
+		tms5110_ctl_w(machine, 0, TMS5110_CMD_RESET);
 
-		tms5110_PDC_w(machine, 0,0);
-		tms5110_PDC_w(machine, 0,1);
-		tms5110_PDC_w(machine, 0,0);
+		tms5110_pdc_w(machine, 0,0);
+		tms5110_pdc_w(machine, 0,1);
+		tms5110_pdc_w(machine, 0,0);
 
-		tms5110_PDC_w(machine, 0,0);
-		tms5110_PDC_w(machine, 0,1);
-		tms5110_PDC_w(machine, 0,0);
+		tms5110_pdc_w(machine, 0,0);
+		tms5110_pdc_w(machine, 0,1);
+		tms5110_pdc_w(machine, 0,0);
 
-		tms5110_PDC_w(machine, 0,0);
-		tms5110_PDC_w(machine, 0,1);
-		tms5110_PDC_w(machine, 0,0);
+		tms5110_pdc_w(machine, 0,0);
+		tms5110_pdc_w(machine, 0,1);
+		tms5110_pdc_w(machine, 0,0);
 
 		speech_rom_bit_address = 0;
 	}
 	/* start */
 	else
 	{
-		tms5110_CTL_w(machine, 0, TMS5110_CMD_SPEAK);
+		tms5110_ctl_w(machine, 0, TMS5110_CMD_SPEAK);
 
-		tms5110_PDC_w(machine, 0, 0);
-		tms5110_PDC_w(machine, 0, 1);
-		tms5110_PDC_w(machine, 0, 0);
+		tms5110_pdc_w(machine, 0, 0);
+		tms5110_pdc_w(machine, 0, 1);
+		tms5110_pdc_w(machine, 0, 0);
 
 		speech_rom_bit_address = command * 0x80 * 8;
 	}
@@ -422,13 +422,13 @@ static WRITE8_HANDLER( cvs_tms5110_ctl_w )
 		  0 |								/* CTL4 */
 		  (cvs_tms5110_ctl_data[0] << 3);	/* CTL8 */
 
-	//tms5110_CTL_w(0, ctl);
+	//tms5110_ctl_w(0, ctl);
 }
 
 
 static WRITE8_HANDLER( cvs_tms5110_pdc_w )
 {
-	//tms5110_PDC_w(0, ~data >> 7);
+	//tms5110_pdc_w(0, ~data >> 7);
 }
 
 
@@ -552,7 +552,7 @@ static ADDRESS_MAP_START( cvs_dac_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
     AM_RANGE(0x1000, 0x107f) AM_RAM
     AM_RANGE(0x1800, 0x1800) AM_READ(soundlatch_r)
-    AM_RANGE(0x1840, 0x1840) AM_WRITE(DAC_0_data_w)
+    AM_RANGE(0x1840, 0x1840) AM_WRITE(dac_0_data_w)
     AM_RANGE(0x1880, 0x1883) AM_WRITE(cvs_4_bit_dac_data_w) AM_BASE(&cvs_4_bit_dac_data)
     AM_RANGE(0x1884, 0x1887) AM_WRITE(SMH_NOP)		/* not connected to anything */
 ADDRESS_MAP_END

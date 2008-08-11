@@ -64,8 +64,8 @@ static ADDRESS_MAP_START( survival_memory_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4fff) AM_READWRITE(SMH_BANK1, phoenix_videoram_w)	/* 2 pages selected by bit 0 of the video register */
 	AM_RANGE(0x5000, 0x53ff) AM_WRITE(phoenix_videoreg_w)
 	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
-	AM_RANGE(0x6800, 0x68ff) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x6900, 0x69ff) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
+	AM_RANGE(0x6800, 0x68ff) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x6900, 0x69ff) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
 	AM_RANGE(0x7000, 0x73ff) AM_READ(survival_input_port_0_r)				/* IN0 or IN1 */
 	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0") 							/* DSW */
 ADDRESS_MAP_END
@@ -390,7 +390,7 @@ static GFXDECODE_START( pleiads )
 GFXDECODE_END
 
 
-static const struct TMS36XXinterface phoenix_tms36xx_interface =
+static const tms36xx_interface phoenix_tms36xx_interface =
 {
 	MM6221AA,	/* TMS36xx subtype(s) */
 	{0.50,0,0,1.05,0,0}, /* decay times of voices */
@@ -402,7 +402,7 @@ static const custom_sound_interface phoenix_custom_interface =
 	phoenix_sh_start
 };
 
-static const struct TMS36XXinterface pleiads_tms36xx_interface =
+static const tms36xx_interface pleiads_tms36xx_interface =
 {
 	TMS3615,	/* TMS36xx subtype(s) */
 	/*

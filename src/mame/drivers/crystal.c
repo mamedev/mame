@@ -515,7 +515,7 @@ static ADDRESS_MAP_START( crystal_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03000000, 0x0300ffff) AM_RAM AM_BASE(&vidregs)
 	AM_RANGE(0x03800000, 0x03ffffff) AM_RAM AM_BASE(&textureram)
 	AM_RANGE(0x04000000, 0x047fffff) AM_RAM AM_BASE(&frameram)
-	AM_RANGE(0x04800000, 0x04800fff) AM_READ(VR0_Snd_Read) AM_WRITE(VR0_Snd_Write)
+	AM_RANGE(0x04800000, 0x04800fff) AM_READ(vr0_snd_read) AM_WRITE(vr0_snd_write)
 
 	AM_RANGE(0x05000000, 0x05000003) AM_READ(FlashCmd_r) AM_WRITE(FlashCmd_w)
 	AM_RANGE(0x05000000, 0x05ffffff) AM_READ(SMH_BANK1)
@@ -604,7 +604,7 @@ static MACHINE_RESET(crystal)
 	Timer3=timer_alloc(Timer3cb, NULL);
 	timer_adjust_oneshot(Timer3,attotime_never,0);
 
-	VR0_Snd_Set_Areas(textureram,frameram);
+	vr0_snd_set_areas(textureram,frameram);
 #ifdef IDLE_LOOP_SPEEDUP
 	FlipCntRead=0;
 #endif
@@ -798,7 +798,7 @@ static INPUT_PORTS_START(crystal)
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static const struct VR0Interface vr0_interface =
+static const vr0_interface vr0_config =
 {
 	0x04800000
 };
@@ -830,7 +830,7 @@ static MACHINE_DRIVER_START( crystal )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("vrender", VRENDER0, 0)
-	MDRV_SOUND_CONFIG(vr0_interface)
+	MDRV_SOUND_CONFIG(vr0_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

@@ -129,8 +129,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x30, 0x30) AM_READ(SMH_NOP)	/* Z180 internal registers */
-	AM_RANGE(0x70, 0x70) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0x71, 0x71) AM_READ(YM2203_read_port_0_r)
+	AM_RANGE(0x70, 0x70) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0x71, 0x71) AM_READ(ym2203_read_port_0_r)
 	AM_RANGE(0x72, 0x72) AM_READ(protection_r)
 	AM_RANGE(0x74, 0x74) AM_READ(input_port_0_r)
 	AM_RANGE(0x76, 0x76) AM_READ(input_port_1_r)
@@ -139,16 +139,16 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_WRITE(SMH_NOP)	/* Z180 internal registers */
-	AM_RANGE(0x70, 0x70) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x71, 0x71) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x70, 0x70) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x71, 0x71) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0x72, 0x72) AM_WRITE(protection_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gfire2_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x30, 0x30) AM_READ(SMH_NOP)	/* Z180 internal registers */
-	AM_RANGE(0x70, 0x70) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0x71, 0x71) AM_READ(YM2203_read_port_0_r)
+	AM_RANGE(0x70, 0x70) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0x71, 0x71) AM_READ(ym2203_read_port_0_r)
 	AM_RANGE(0x72, 0x72) AM_READ(gfire2_protection_r)
 	AM_RANGE(0x74, 0x74) AM_READ(input_port_0_r)
 	AM_RANGE(0x76, 0x76) AM_READ(input_port_1_r)
@@ -157,8 +157,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( gfire2_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_WRITE(SMH_NOP)	/* Z180 internal registers */
-	AM_RANGE(0x70, 0x70) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x71, 0x71) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x70, 0x70) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x71, 0x71) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0x72, 0x72) AM_WRITE(gfire2_protection_w)
 ADDRESS_MAP_END
 

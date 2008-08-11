@@ -150,12 +150,12 @@ static READ8_HANDLER( AY8910_port_r )
 
 	if (AY8910_selected & 0x08)
 {
-		ret = AY8910_read_port_0_r(machine, offset);
+		ret = ay8910_read_port_0_r(machine, offset);
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #0 Port Read: %x\n", safe_activecpu_get_pc(), ret);}
 
 	if (AY8910_selected & 0x10)
 {
-		ret = AY8910_read_port_1_r(machine, offset);
+		ret = ay8910_read_port_1_r(machine, offset);
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #1 Port Read: %x\n", safe_activecpu_get_pc(), ret);}
 
 	return ret;
@@ -168,23 +168,23 @@ static WRITE8_HANDLER( AY8910_port_w )
 	{
 		if (AY8910_selected & 0x08)
 {if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #0 Control Write: %x\n", safe_activecpu_get_pc(), data);
-			AY8910_control_port_0_w(machine, offset, data);
+			ay8910_control_port_0_w(machine, offset, data);
 }
 		if (AY8910_selected & 0x10)
 {if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #1 Control Write: %x\n", safe_activecpu_get_pc(), data);
-			AY8910_control_port_1_w(machine, offset, data);
+			ay8910_control_port_1_w(machine, offset, data);
 }
 	}
 	else
 	{
 		if (AY8910_selected & 0x08)
 {if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #0 Port Write: %x\n", safe_activecpu_get_pc(), data);
-			AY8910_write_port_0_w(machine, offset, data);
+			ay8910_write_port_0_w(machine, offset, data);
 }
 
 		if (AY8910_selected & 0x10)
 {if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  AY8910 #1 Port Write: %x\n", safe_activecpu_get_pc(), data);
-			AY8910_write_port_1_w(machine, offset, data);
+			ay8910_write_port_1_w(machine, offset, data);
 }
 	}
 }

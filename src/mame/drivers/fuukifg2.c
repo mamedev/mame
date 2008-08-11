@@ -158,7 +158,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( fuuki16_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x11, 0x11) AM_READ(soundlatch_r				)	// From Main CPU
-	AM_RANGE(0x50, 0x50) AM_READ(YM3812_status_port_0_r		)	// YM3812
+	AM_RANGE(0x50, 0x50) AM_READ(ym3812_status_port_0_r		)	// YM3812
 	AM_RANGE(0x60, 0x60) AM_READ(okim6295_status_0_r		)	// M6295
 ADDRESS_MAP_END
 
@@ -168,10 +168,10 @@ static ADDRESS_MAP_START( fuuki16_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x11, 0x11) AM_WRITE(SMH_NOP					)	// ? To Main CPU
 	AM_RANGE(0x20, 0x20) AM_WRITE(fuuki16_oki_banking_w		)	// Oki Banking
 	AM_RANGE(0x30, 0x30) AM_WRITE(SMH_NOP					)	// ? In the NMI routine
-	AM_RANGE(0x40, 0x40) AM_WRITE(YM2203_control_port_0_w	)	// YM2203
-	AM_RANGE(0x41, 0x41) AM_WRITE(YM2203_write_port_0_w		)
-	AM_RANGE(0x50, 0x50) AM_WRITE(YM3812_control_port_0_w	)	// YM3812
-	AM_RANGE(0x51, 0x51) AM_WRITE(YM3812_write_port_0_w		)
+	AM_RANGE(0x40, 0x40) AM_WRITE(ym2203_control_port_0_w	)	// YM2203
+	AM_RANGE(0x41, 0x41) AM_WRITE(ym2203_write_port_0_w		)
+	AM_RANGE(0x50, 0x50) AM_WRITE(ym3812_control_port_0_w	)	// YM3812
+	AM_RANGE(0x51, 0x51) AM_WRITE(ym3812_write_port_0_w		)
 	AM_RANGE(0x61, 0x61) AM_WRITE(okim6295_data_0_w			)	// M6295
 ADDRESS_MAP_END
 

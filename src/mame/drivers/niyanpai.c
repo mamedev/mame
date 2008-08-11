@@ -43,11 +43,11 @@ Memo:
 
 #define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
 #if SIGNED_DAC
-#define DAC_0_WRITE	DAC_0_signed_data_w
-#define DAC_1_WRITE	DAC_1_signed_data_w
+#define DAC_0_WRITE	dac_0_signed_data_w
+#define DAC_1_WRITE	dac_1_signed_data_w
 #else
-#define DAC_0_WRITE	DAC_0_data_w
-#define DAC_1_WRITE	DAC_1_data_w
+#define DAC_0_WRITE	dac_0_data_w
+#define DAC_1_WRITE	dac_1_data_w
 #endif
 
 
@@ -532,8 +532,8 @@ static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x56, 0x56) AM_WRITE(tmpz84c011_0_dir_pc_w)
 	AM_RANGE(0x34, 0x34) AM_WRITE(tmpz84c011_0_dir_pd_w)
 	AM_RANGE(0x44, 0x44) AM_WRITE(tmpz84c011_0_dir_pe_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(YM3812_control_port_0_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE(ym3812_write_port_0_w)
 ADDRESS_MAP_END
 
 

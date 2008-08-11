@@ -712,8 +712,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ozon1_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( drivfrcg, ADDRESS_SPACE_PROGRAM, 8 )
@@ -764,9 +764,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bongo_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
 
 
@@ -822,12 +822,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( harem_cpu2_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(AY8910_control_port_2_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(AY8910_write_port_2_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_control_port_2_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(ay8910_write_port_2_w)
 	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 

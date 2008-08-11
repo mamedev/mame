@@ -132,7 +132,7 @@ static void IremGA20_update( void *param, stream_sample_t **inputs, stream_sampl
 	}
 }
 
-WRITE16_HANDLER( IremGA20_w )
+WRITE16_HANDLER( irem_ga20_w )
 {
 	struct IremGA20_chip_def *chip = sndti_token(SOUND_IREMGA20, 0);
 	int channel;
@@ -183,7 +183,7 @@ WRITE16_HANDLER( IremGA20_w )
 	}
 }
 
-READ16_HANDLER( IremGA20_r )
+READ16_HANDLER( irem_ga20_r )
 {
 	struct IremGA20_chip_def *chip = sndti_token(SOUND_IREMGA20, 0);
 	int channel;

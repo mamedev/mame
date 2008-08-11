@@ -120,8 +120,8 @@ static ADDRESS_MAP_START( srider_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x0d00c, 0x0d00c ) AM_READ_PORT( "INC" )
 
-	AM_RANGE( 0x0d016, 0x0d016 ) AM_WRITE( YM3812_control_port_0_w )
-	AM_RANGE( 0x0d017, 0x0d017 ) AM_WRITE( YM3812_write_port_0_w )
+	AM_RANGE( 0x0d016, 0x0d016 ) AM_WRITE( ym3812_control_port_0_w )
+	AM_RANGE( 0x0d017, 0x0d017 ) AM_WRITE( ym3812_write_port_0_w )
 
 	AM_RANGE( 0x0d018, 0x0d018 ) AM_WRITE( okim6295_data_0_w )
 

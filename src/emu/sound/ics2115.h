@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef __ICS2115_H__
 #define __ICS2115_H__
 
@@ -9,4 +11,4 @@ struct _ics2115_interface {
 READ8_HANDLER( ics2115_r );
 WRITE8_HANDLER( ics2115_w );
 
-#endif
+#endif /* __ICS2115_H__ */

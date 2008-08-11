@@ -277,31 +277,31 @@ static WRITE16_HANDLER( kaneko16_soundlatch_w )
 static READ16_HANDLER( kaneko16_YM2149_0_r )
 {
 	/* Each 2149 register is mapped to a different address */
-	AY8910_control_port_0_w(machine,0,offset);
-	return AY8910_read_port_0_r(machine,0);
+	ay8910_control_port_0_w(machine,0,offset);
+	return ay8910_read_port_0_r(machine,0);
 }
 static READ16_HANDLER( kaneko16_YM2149_1_r )
 {
 	/* Each 2149 register is mapped to a different address */
-	AY8910_control_port_1_w(machine,0,offset);
-	return AY8910_read_port_1_r(machine,0);
+	ay8910_control_port_1_w(machine,0,offset);
+	return ay8910_read_port_1_r(machine,0);
 }
 
 static WRITE16_HANDLER( kaneko16_YM2149_0_w )
 {
 	/* Each 2149 register is mapped to a different address */
-	AY8910_control_port_0_w(machine,0,offset);
+	ay8910_control_port_0_w(machine,0,offset);
 	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_BITS_0_7)	AY8910_write_port_0_w(machine,0, data       & 0xff);
-	else				AY8910_write_port_0_w(machine,0,(data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7)	ay8910_write_port_0_w(machine,0, data       & 0xff);
+	else				ay8910_write_port_0_w(machine,0,(data >> 8) & 0xff);
 }
 static WRITE16_HANDLER( kaneko16_YM2149_1_w )
 {
 	/* Each 2149 register is mapped to a different address */
-	AY8910_control_port_1_w(machine,0,offset);
+	ay8910_control_port_1_w(machine,0,offset);
 	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_BITS_0_7)	AY8910_write_port_1_w(machine,0, data       & 0xff);
-	else				AY8910_write_port_1_w(machine,0,(data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7)	ay8910_write_port_1_w(machine,0, data       & 0xff);
+	else				ay8910_write_port_1_w(machine,0,(data >> 8) & 0xff);
 }
 
 
@@ -856,8 +856,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blazeon_soundport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x03, 0x03) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 

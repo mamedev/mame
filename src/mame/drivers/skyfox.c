@@ -87,8 +87,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( skyfox_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM				)	// ROM
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM				)	// RAM
-	AM_RANGE(0xa001, 0xa001) AM_READ(YM2203_read_port_0_r 	)	// YM2203 #1
-//  AM_RANGE(0xc001, 0xc001) AM_READ(YM2203_read_port_1_r   )   // YM2203 #2
+	AM_RANGE(0xa001, 0xa001) AM_READ(ym2203_read_port_0_r 	)	// YM2203 #1
+//  AM_RANGE(0xc001, 0xc001) AM_READ(ym2203_read_port_1_r   )   // YM2203 #2
 	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r			)	// From Main CPU
 ADDRESS_MAP_END
 
@@ -96,11 +96,11 @@ static ADDRESS_MAP_START( skyfox_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM					)	// ROM
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM					)	// RAM
 //  AM_RANGE(0x9000, 0x9001) AM_WRITE(SMH_NOP                  )   // ??
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2203_control_port_0_w 	)	// YM2203 #1
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM2203_write_port_0_w 	)	//
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym2203_control_port_0_w 	)	// YM2203 #1
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym2203_write_port_0_w 	)	//
 //  AM_RANGE(0xb000, 0xb001) AM_WRITE(SMH_NOP                  )   // ??
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2203_control_port_1_w 	)	// YM2203 #2
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM2203_write_port_1_w 	)	//
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2203_control_port_1_w 	)	// YM2203 #2
+	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym2203_write_port_1_w 	)	//
 ADDRESS_MAP_END
 
 

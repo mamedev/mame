@@ -433,7 +433,7 @@ static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
 	AM_RANGE(0x21000a, 0x21000b) AM_READ(input_port_3_word_r	)	/*  P2      */	\
 	AM_RANGE(0x21000c, 0x21000d) AM_READ(input_port_4_word_r	)	/*  Coins   */	\
 	AM_RANGE(0x21000e, 0x21000f) AM_READ(SMH_NOP				)	/*          */	\
-	AM_RANGE(0x300000, 0x30007f) AM_READ(ES5506_data_0_word_r	)	/*  Sound   */	\
+	AM_RANGE(0x300000, 0x30007f) AM_READ(es5506_data_0_word_r	)	/*  Sound   */	\
 	AM_RANGE(0x482000, 0x482fff) AM_RAM_WRITE(dsp_w) AM_BASE(&dsp_ram)   \
 	AM_RANGE(_ROM, 0xffffff) AM_READ(SMH_BANK1			)	/*  ROM     */	    \
 //AM_RANGE(0x990000, 0x99007f) AM_READ(fake_r)
@@ -449,7 +449,7 @@ static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
 	AM_RANGE(0x230000, 0x230071) AM_WRITE(SMH_RAM) AM_BASE(&ssv_irq_vectors)	          /* IRQ Vectors */ \
 	AM_RANGE(0x240000, 0x240071) AM_WRITE(ssv_irq_ack_w )                                 /* IRQ Ack */     \
 	AM_RANGE(0x260000, 0x260001) AM_WRITE(ssv_irq_enable_w)                               /* IRQ Enable */  \
-	AM_RANGE(0x300000, 0x30007f) AM_WRITE(ES5506_data_0_word_w)                           /* Sound */       \
+	AM_RANGE(0x300000, 0x30007f) AM_WRITE(es5506_data_0_word_w)                           /* Sound */       \
 //AM_RANGE(0x990000, 0x99007f) AM_WRITE(ssv_scroll_w)
 
 
@@ -835,7 +835,7 @@ static WRITE16_HANDLER( srmp7_sound_bank_w )
 		int bank = 0x400000/2 * (data & 1);	// UINT16 address
 		int voice;
 		for (voice = 0; voice < 32; voice++)
-			ES5506_voice_bank_0_w(voice, bank);
+			es5506_voice_bank_0_w(voice, bank);
 	}
 //  popmessage("%04X",data);
 }

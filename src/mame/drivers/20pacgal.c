@@ -88,7 +88,7 @@ static const namco_interface namco_config =
 
 static WRITE8_HANDLER( _20pacgal_dac_w )
 {
-	DAC_signed_data_w(0, data);
+	dac_signed_data_w(0, data);
 }
 
 

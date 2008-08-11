@@ -2114,7 +2114,7 @@ ROM_END
 
 static WRITE8_HANDLER( grobda_DAC_w )
 {
-	DAC_data_w(0, (data << 4) | data);
+	dac_data_w(0, (data << 4) | data);
 }
 
 static DRIVER_INIT( grobda )

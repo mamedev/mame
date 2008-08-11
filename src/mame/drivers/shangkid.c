@@ -102,7 +102,7 @@ static WRITE8_HANDLER( shangkid_sound_enable_w )
 static WRITE8_HANDLER( shangkid_bbx_AY8910_control_w )
 {
 	bbx_AY8910_control = data;
-	AY8910_control_port_0_w( machine, offset, data );
+	ay8910_control_port_0_w( machine, offset, data );
 }
 
 static WRITE8_HANDLER( chinhero_bbx_AY8910_write_w )
@@ -123,7 +123,7 @@ static WRITE8_HANDLER( chinhero_bbx_AY8910_write_w )
 		break;
 
 	default:
-		AY8910_write_port_0_w( machine, offset, data );
+		ay8910_write_port_0_w( machine, offset, data );
 		break;
 	}
 }
@@ -148,7 +148,7 @@ static WRITE8_HANDLER( shangkid_bbx_AY8910_write_w )
 		break;
 
 	default:
-		AY8910_write_port_0_w( machine, offset, data );
+		ay8910_write_port_0_w( machine, offset, data );
 		break;
 	}
 }
@@ -376,7 +376,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(shangkid_soundlatch_r, DAC_0_data_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(shangkid_soundlatch_r, dac_0_data_w)
 ADDRESS_MAP_END
 
 /***************************************************************************************/
@@ -467,8 +467,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dynamski_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* ports are reversed */
-	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
 static MACHINE_DRIVER_START( dynamski )

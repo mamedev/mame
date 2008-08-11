@@ -188,7 +188,7 @@ static ADDRESS_MAP_START( chqflag_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)				/* RAM */
 	AM_RANGE(0xa000, 0xa00d) AM_READ(k007232_read_port_0_r)	/* 007232 (chip 1) */
 	AM_RANGE(0xb000, 0xb00d) AM_READ(k007232_read_port_1_r)	/* 007232 (chip 2) */
-	AM_RANGE(0xc001, 0xc001) AM_READ(YM2151_status_port_0_r)	/* YM2151 */
+	AM_RANGE(0xc001, 0xc001) AM_READ(ym2151_status_port_0_r)	/* YM2151 */
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)			/* soundlatch_r */
 	//AM_RANGE(0xe000, 0xe000) AM_READ(SMH_NOP)                /* ??? */
 ADDRESS_MAP_END
@@ -216,8 +216,8 @@ static ADDRESS_MAP_START( chqflag_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa01c, 0xa01c) AM_WRITE(k007232_extvolume_w)/* extra volume, goes to the 007232 w/ A11 */
 											/* selecting a different latch for the external port */
 	AM_RANGE(0xb000, 0xb00d) AM_WRITE(k007232_write_port_1_w)		/* 007232 (chip 2) */
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)	/* YM2151 */
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM2151_data_port_0_w)		/* YM2151 */
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2151_register_port_0_w)	/* YM2151 */
+	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym2151_data_port_0_w)		/* YM2151 */
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP)					/* ??? */
 ADDRESS_MAP_END
 

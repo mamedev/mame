@@ -1,5 +1,7 @@
-#ifndef __YMDELTAT_H_
-#define __YMDELTAT_H_
+#pragma once
+
+#ifndef __YMDELTAT_H__
+#define __YMDELTAT_H__
 
 #define YM_DELTAT_SHIFT    (16)
 
@@ -21,7 +23,7 @@ typedef struct deltat_adpcm_state {     /* AT: rearranged and tigntened structur
 	double	read_time;		/* Y8950: 8 cycles of main clock;  YM2608: 18 cycles of main clock */
 #endif
 	UINT32	memory_size;
-	int	output_range;
+	int		output_range;
 	UINT32	now_addr;		/* current address      */
 	UINT32	now_step;		/* currect step         */
 	UINT32	step;			/* step                 */
@@ -79,4 +81,4 @@ void YM_DELTAT_ADPCM_CALC(YM_DELTAT *DELTAT);
 void YM_DELTAT_postload(YM_DELTAT *DELTAT,UINT8 *regs);
 void YM_DELTAT_savestate(const char *statename,int num,YM_DELTAT *DELTAT);
 
-#endif
+#endif /* __YMDELTAT_H__ */

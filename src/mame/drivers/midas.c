@@ -242,8 +242,8 @@ static ADDRESS_MAP_START( mem_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb40000, 0xb40001) AM_READ( ret_ffff )
 	AM_RANGE(0xb60000, 0xb60001) AM_READ( ret_ffff )
 
-	AM_RANGE(0xb80008, 0xb80009) AM_WRITE( YMZ280B_register_0_lsb_w )
-	AM_RANGE(0xb8000a, 0xb8000b) AM_READWRITE( YMZ280B_status_0_lsb_r, YMZ280B_data_0_lsb_w )
+	AM_RANGE(0xb80008, 0xb80009) AM_WRITE( ymz280b_register_0_lsb_w )
+	AM_RANGE(0xb8000a, 0xb8000b) AM_READWRITE( ymz280b_status_0_lsb_r, ymz280b_data_0_lsb_w )
 
 	AM_RANGE(0xba0000, 0xba0001) AM_READ_PORT("IN4")
 	AM_RANGE(0xbc0000, 0xbc0001) AM_READ_PORT("IN3")
@@ -431,7 +431,7 @@ static void livequiz_irqhandler(running_machine *machine, int state)
 	logerror("YMZ280 is generating an interrupt. State=%08x\n",state);
 }
 
-static const struct YMZ280Binterface ymz280b_interface =
+static const ymz280b_interface ymz280b_config =
 {
 	livequiz_irqhandler
 };
@@ -462,7 +462,7 @@ static MACHINE_DRIVER_START( livequiz )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
-	MDRV_SOUND_CONFIG(ymz280b_interface)
+	MDRV_SOUND_CONFIG(ymz280b_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.80)
 	MDRV_SOUND_ROUTE(1, "right", 0.80)
 MACHINE_DRIVER_END

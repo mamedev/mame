@@ -360,7 +360,7 @@ static ADDRESS_MAP_START( rainbow_s_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x7fff) AM_READ(SMH_BANK5)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x9001, 0x9001) AM_READ(YM2151_status_port_0_r)
+	AM_RANGE(0x9001, 0x9001) AM_READ(ym2151_status_port_0_r)
 	AM_RANGE(0x9002, 0x9100) AM_READ(SMH_RAM)
 	AM_RANGE(0xa001, 0xa001) AM_READ(taitosound_slave_comm_r)
 ADDRESS_MAP_END
@@ -368,8 +368,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( rainbow_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x9000, 0x9000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x9001, 0x9001) AM_WRITE(ym2151_data_port_0_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(taitosound_slave_port_w)
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(taitosound_slave_comm_w)
 ADDRESS_MAP_END
@@ -377,8 +377,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jumping_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xb000, 0xb000) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0xb400, 0xb400) AM_READ(YM2203_status_port_1_r)
+	AM_RANGE(0xb000, 0xb000) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0xb400, 0xb400) AM_READ(ym2203_status_port_1_r)
 	AM_RANGE(0xb800, 0xb800) AM_READ(jumping_latch_r)
 	AM_RANGE(0xc000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
@@ -386,10 +386,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( jumping_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x8000, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xb000, 0xb000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xb001, 0xb001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xb400, 0xb400) AM_WRITE(YM2203_control_port_1_w)
-	AM_RANGE(0xb401, 0xb401) AM_WRITE(YM2203_write_port_1_w)
+	AM_RANGE(0xb000, 0xb000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xb001, 0xb001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xb400, 0xb400) AM_WRITE(ym2203_control_port_1_w)
+	AM_RANGE(0xb401, 0xb401) AM_WRITE(ym2203_write_port_1_w)
 	AM_RANGE(0xbc00, 0xbc00) AM_WRITE(SMH_NOP)	/* looks like a bankswitch, but sound works with or without it */
 ADDRESS_MAP_END
 

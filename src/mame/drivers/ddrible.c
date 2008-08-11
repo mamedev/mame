@@ -96,7 +96,7 @@ static READ8_HANDLER( ddrible_vlm5030_busy_r )
 	return mame_rand(machine); /* patch */
 	/* FIXME: remove ? */
 #if 0
-	if (VLM5030_BSY()) return 1;
+	if (vlm5030_bsy()) return 1;
 	else return 0;
 #endif
 }
@@ -111,10 +111,10 @@ static WRITE8_HANDLER( ddrible_vlm5030_ctrl_w )
 	/* b3 : ROM bank select   */
 	if (sndti_exists(SOUND_VLM5030, 0))
 	{
-		VLM5030_RST( data & 0x40 ? 1 : 0 );
-		VLM5030_ST(  data & 0x20 ? 1 : 0 );
-		VLM5030_VCU( data & 0x10 ? 1 : 0 );
-		VLM5030_set_rom(&SPEECH_ROM[data & 0x08 ? 0x10000 : 0]);
+		vlm5030_rst( data & 0x40 ? 1 : 0 );
+		vlm5030_st(  data & 0x20 ? 1 : 0 );
+		vlm5030_vcu( data & 0x10 ? 1 : 0 );
+		vlm5030_set_rom(&SPEECH_ROM[data & 0x08 ? 0x10000 : 0]);
 	}
 	/* b2 : SSG-C rc filter enable */
 	/* b1 : SSG-B rc filter enable */
@@ -173,16 +173,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)					/* shared RAM with CPU #1 */
-	AM_RANGE(0x1000, 0x1000) AM_READ(YM2203_status_port_0_r)		/* YM2203 */
-	AM_RANGE(0x1001, 0x1001) AM_READ(YM2203_read_port_0_r)		/* YM2203 */
+	AM_RANGE(0x1000, 0x1000) AM_READ(ym2203_status_port_0_r)		/* YM2203 */
+	AM_RANGE(0x1001, 0x1001) AM_READ(ym2203_read_port_0_r)		/* YM2203 */
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)					/* ROM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM) AM_BASE(&ddrible_snd_sharedram)	/* shared RAM with CPU #1 */
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(YM2203_control_port_0_w)			/* YM2203 */
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(YM2203_write_port_0_w)				/* YM2203 */
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(VLM5030_data_w)						/* Speech data */
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(ym2203_control_port_0_w)			/* YM2203 */
+	AM_RANGE(0x1001, 0x1001) AM_WRITE(ym2203_write_port_0_w)				/* YM2203 */
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(vlm5030_data_w)						/* Speech data */
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)							/* ROM */
 ADDRESS_MAP_END
 
@@ -331,7 +331,7 @@ static const ym2203_interface ym2203_config =
 	NULL
 };
 
-static const struct VLM5030interface vlm5030_interface =
+static const vlm5030_interface vlm5030_config =
 {
 	0x10000     /* memory size 64Kbyte * 2 bank */
 };
@@ -380,7 +380,7 @@ static MACHINE_DRIVER_START( ddribble )
 	MDRV_SOUND_ROUTE(3, "mono", 0.25)
 
 	MDRV_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(vlm5030_interface)
+	MDRV_SOUND_CONFIG(vlm5030_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("filter1", FILTER_RC, 0)

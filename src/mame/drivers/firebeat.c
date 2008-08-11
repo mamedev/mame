@@ -1338,11 +1338,11 @@ static READ32_HANDLER( sound_r )
 
 	if (ACCESSING_BITS_24_31)	/* External RAM read */
 	{
-		r |= YMZ280B_data_0_r(machine, offset) << 24;
+		r |= ymz280b_data_0_r(machine, offset) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= YMZ280B_status_0_r(machine, offset) << 16;
+		r |= ymz280b_status_0_r(machine, offset) << 16;
 	}
 
 	return r;
@@ -1353,11 +1353,11 @@ static WRITE32_HANDLER( sound_w )
 //  printf("sound_w: %08X, %08X, %08X\n", offset, data, mem_mask);
 	if (ACCESSING_BITS_24_31)
 	{
-		YMZ280B_register_0_w(machine, offset, (data >> 24) & 0xff);
+		ymz280b_register_0_w(machine, offset, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		YMZ280B_data_0_w(machine, offset, (data >> 16) & 0xff);
+		ymz280b_data_0_w(machine, offset, (data >> 16) & 0xff);
 	}
 }
 
@@ -1824,7 +1824,7 @@ static void sound_irq_callback(running_machine *machine, int state)
 {
 }
 
-static const struct YMZ280Binterface ymz280b_intf =
+static const ymz280b_interface ymz280b_intf =
 {
 	sound_irq_callback,			// irq
 	soundram_r,

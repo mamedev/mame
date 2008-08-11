@@ -64,7 +64,7 @@ AMSPDWY_WHEEL_R( 1 )
 
 static READ8_HANDLER( amspdwy_sound_r )
 {
-	return (YM2151_status_port_0_r(machine,0) & ~ 0x30) | input_port_read(machine, "IN0");
+	return (ym2151_status_port_0_r(machine,0) & ~ 0x30) | input_port_read(machine, "IN0");
 }
 
 static WRITE8_HANDLER( amspdwy_sound_w )
@@ -115,8 +115,8 @@ static ADDRESS_MAP_START( amspdwy_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM									// ROM
 //  AM_RANGE(0x8000, 0x8000) AM_WRITENOP                            // ? Written with 0 at the start
 	AM_RANGE(0x9000, 0x9000) AM_READ(soundlatch_r)					// From Main CPU
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2151_register_port_0_w)		// YM2151
-	AM_RANGE(0xa001, 0xa001) AM_WRITE(YM2151_data_port_0_w)			//
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym2151_register_port_0_w)		// YM2151
+	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym2151_data_port_0_w)			//
 	AM_RANGE(0xc000, 0xdfff) AM_RAM									// Work RAM
 	AM_RANGE(0xffff, 0xffff) AM_READNOP								// ??? IY = FFFF at the start ?
 ADDRESS_MAP_END

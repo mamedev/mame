@@ -629,8 +629,8 @@ static void ymz280b_update(void *param, stream_sample_t **inputs, stream_sample_
 
 static void *ymz280b_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	static const struct YMZ280Binterface defintrf = { 0 };
-	const struct YMZ280Binterface *intf = (config != NULL) ? config : &defintrf;
+	static const ymz280b_interface defintrf = { 0 };
+	const ymz280b_interface *intf = (config != NULL) ? config : &defintrf;
 	struct YMZ280BChip *chip;
 
 	chip = auto_malloc(sizeof(*chip));
@@ -942,41 +942,41 @@ static int compute_status(struct YMZ280BChip *chip)
 
 /**********************************************************************************************
 
-     YMZ280B_status_0_r/YMZ280B_status_1_r -- handle a read from the status register
+     ymz280b_status_0_r/ymz280b_status_1_r -- handle a read from the status register
 
 ***********************************************************************************************/
 
-READ8_HANDLER( YMZ280B_status_0_r )
+READ8_HANDLER( ymz280b_status_0_r )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
 	return compute_status(chip);
 }
 
-READ8_HANDLER( YMZ280B_status_1_r )
+READ8_HANDLER( ymz280b_status_1_r )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
 	return compute_status(chip);
 }
 
-READ16_HANDLER( YMZ280B_status_0_lsb_r )
+READ16_HANDLER( ymz280b_status_0_lsb_r )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
 	return compute_status(chip);
 }
 
-READ16_HANDLER( YMZ280B_status_0_msb_r )
+READ16_HANDLER( ymz280b_status_0_msb_r )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
 	return compute_status(chip) << 8;
 }
 
-READ16_HANDLER( YMZ280B_status_1_lsb_r )
+READ16_HANDLER( ymz280b_status_1_lsb_r )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
 	return compute_status(chip);
 }
 
-READ16_HANDLER( YMZ280B_status_1_msb_r )
+READ16_HANDLER( ymz280b_status_1_msb_r )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
 	return compute_status(chip) << 8;
@@ -984,41 +984,41 @@ READ16_HANDLER( YMZ280B_status_1_msb_r )
 
 /**********************************************************************************************
 
-     YMZ280B_register_0_w/YMZ280B_register_1_w -- handle a write to the register select
+     ymz280b_register_0_w/ymz280b_register_1_w -- handle a write to the register select
 
 ***********************************************************************************************/
 
-WRITE8_HANDLER( YMZ280B_register_0_w )
+WRITE8_HANDLER( ymz280b_register_0_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
 	chip->current_register = data;
 }
 
-WRITE8_HANDLER( YMZ280B_register_1_w )
+WRITE8_HANDLER( ymz280b_register_1_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
 	chip->current_register = data;
 }
 
-WRITE16_HANDLER( YMZ280B_register_0_lsb_w )
+WRITE16_HANDLER( ymz280b_register_0_lsb_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
 	if (ACCESSING_BITS_0_7)	chip->current_register = data & 0xff;
 }
 
-WRITE16_HANDLER( YMZ280B_register_0_msb_w )
+WRITE16_HANDLER( ymz280b_register_0_msb_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
 	if (ACCESSING_BITS_8_15)	chip->current_register = (data >> 8) & 0xff;
 }
 
-WRITE16_HANDLER( YMZ280B_register_1_lsb_w )
+WRITE16_HANDLER( ymz280b_register_1_lsb_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
 	if (ACCESSING_BITS_0_7)	chip->current_register = data & 0xff;
 }
 
-WRITE16_HANDLER( YMZ280B_register_1_msb_w )
+WRITE16_HANDLER( ymz280b_register_1_msb_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
 	if (ACCESSING_BITS_8_15)	chip->current_register = (data >> 8) & 0xff;
@@ -1026,41 +1026,41 @@ WRITE16_HANDLER( YMZ280B_register_1_msb_w )
 
 /**********************************************************************************************
 
-     YMZ280B_data_0_w/YMZ280B_data_1_w -- handle a write to the current register
+     ymz280b_data_0_w/ymz280b_data_1_w -- handle a write to the current register
 
 ***********************************************************************************************/
 
-WRITE8_HANDLER( YMZ280B_data_0_w )
+WRITE8_HANDLER( ymz280b_data_0_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
 	write_to_register(chip, data);
 }
 
-WRITE8_HANDLER( YMZ280B_data_1_w )
+WRITE8_HANDLER( ymz280b_data_1_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
 	write_to_register(chip, data);
 }
 
-WRITE16_HANDLER( YMZ280B_data_0_lsb_w )
+WRITE16_HANDLER( ymz280b_data_0_lsb_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
 	if (ACCESSING_BITS_0_7)	write_to_register(chip, data & 0xff);
 }
 
-WRITE16_HANDLER( YMZ280B_data_0_msb_w )
+WRITE16_HANDLER( ymz280b_data_0_msb_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
 	if (ACCESSING_BITS_8_15)	write_to_register(chip, (data >> 8) & 0xff);
 }
 
-WRITE16_HANDLER( YMZ280B_data_1_lsb_w )
+WRITE16_HANDLER( ymz280b_data_1_lsb_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
 	if (ACCESSING_BITS_0_7)	write_to_register(chip, data & 0xff);
 }
 
-WRITE16_HANDLER( YMZ280B_data_1_msb_w )
+WRITE16_HANDLER( ymz280b_data_1_msb_w )
 {
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
 	if (ACCESSING_BITS_8_15)	write_to_register(chip, (data >> 8) & 0xff);
@@ -1068,11 +1068,11 @@ WRITE16_HANDLER( YMZ280B_data_1_msb_w )
 
 /**********************************************************************************************
 
-     YMZ280B_data_0_r/YMZ280B_data_1_r -- handle an external RAM read
+     ymz280b_data_0_r/ymz280b_data_1_r -- handle an external RAM read
 
 ***********************************************************************************************/
 
-READ8_HANDLER( YMZ280B_data_0_r )
+READ8_HANDLER( ymz280b_data_0_r )
 {
 	UINT8 data;
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
@@ -1081,7 +1081,7 @@ READ8_HANDLER( YMZ280B_data_0_r )
 	return data;
 }
 
-READ8_HANDLER( YMZ280B_data_1_r )
+READ8_HANDLER( ymz280b_data_1_r )
 {
 	UINT8 data;
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);

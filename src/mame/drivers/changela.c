@@ -266,8 +266,8 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xc000, 0xc7ff) AM_READ(changela_mem_device_r)			/* RAM4 (River Bed RAM); RAM5 (Tree RAM) */
 
-	AM_RANGE(0xd000, 0xd000) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0xd010, 0xd010) AM_READ(AY8910_read_port_1_r)
+	AM_RANGE(0xd000, 0xd000) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0xd010, 0xd010) AM_READ(ay8910_read_port_1_r)
 
 	/* LS139 - U24 */
 	AM_RANGE(0xd024, 0xd024) AM_READ(changela_24_r)
@@ -298,10 +298,10 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xca00, 0xca00) AM_WRITE(changela_slope_rom_addr_hi_w)
 	AM_RANGE(0xcb00, 0xcb00) AM_WRITE(changela_slope_rom_addr_lo_w)
 
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xd001, 0xd001) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xd010, 0xd010) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0xd011, 0xd011) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xd001, 0xd001) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xd010, 0xd010) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0xd011, 0xd011) AM_WRITE(ay8910_write_port_1_w)
 
 	/* LS259 - U44 */
 	AM_RANGE(0xd020, 0xd020) AM_WRITE(changela_collision_reset_0)

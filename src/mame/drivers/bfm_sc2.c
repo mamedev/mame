@@ -1545,8 +1545,8 @@ static ADDRESS_MAP_START( memmap_vid, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2A00, 0x2AFF) AM_WRITE(nec_latch_w)			// this is where it reads?
 	AM_RANGE(0x2B00, 0x2BFF) AM_WRITE(nec_reset_w)			// upd7759 reset line
 	AM_RANGE(0x2C00, 0x2C00) AM_WRITE(unlock_w)				// custom chip unlock
-	AM_RANGE(0x2D00, 0x2D00) AM_WRITE(YM2413_register_port_0_w)
-	AM_RANGE(0x2D01, 0x2D01) AM_WRITE(YM2413_data_port_0_w)
+	AM_RANGE(0x2D00, 0x2D00) AM_WRITE(ym2413_register_port_0_w)
+	AM_RANGE(0x2D01, 0x2D01) AM_WRITE(ym2413_data_port_0_w)
 	AM_RANGE(0x2E00, 0x2E00) AM_WRITE(bankswitch_w)			// write bank (rom page select for 0x6000 - 0x7fff )
 	AM_RANGE(0x2F00, 0x2F00) AM_WRITE(vfd2_data_w)			// vfd2 data
 

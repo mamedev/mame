@@ -352,10 +352,10 @@ static void bsmt2000_reg_write(bsmt2000_chip *chip, offs_t offset, UINT16 data)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    BSMT2000_data_0_w - write to chip 0
+    bsmt2000_data_0_w - write to chip 0
 -------------------------------------------------*/
 
-WRITE16_HANDLER( BSMT2000_data_0_w )
+WRITE16_HANDLER( bsmt2000_data_0_w )
 {
 	bsmt2000_reg_write(sndti_token(SOUND_BSMT2000, 0), offset, data);
 }

@@ -84,8 +84,8 @@ static ADDRESS_MAP_START( twins_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( twins_io, ADDRESS_SPACE_IO, 16 )
-	AM_RANGE(0x0000, 0x0001) AM_WRITE(AY8910_control_port_0_lsb_w)
-	AM_RANGE(0x0002, 0x0003) AM_READ(AY8910_read_port_0_lsb_r) AM_WRITE(AY8910_write_port_0_lsb_w)
+	AM_RANGE(0x0000, 0x0001) AM_WRITE(ay8910_control_port_0_lsb_w)
+	AM_RANGE(0x0002, 0x0003) AM_READ(ay8910_read_port_0_lsb_r) AM_WRITE(ay8910_write_port_0_lsb_w)
 	AM_RANGE(0x0004, 0x0005) AM_READWRITE(twins_port4_r, twins_port4_w)
 	AM_RANGE(0x0006, 0x0007) AM_WRITE(port6_pal0_w)
 	AM_RANGE(0x000e, 0x000f) AM_WRITE(porte_paloff0_w)
@@ -247,8 +247,8 @@ static ADDRESS_MAP_START( twinsa_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0000, 0x0001) AM_READWRITE(twinsa_unk_r, porte_paloff0_w)
 	AM_RANGE(0x0002, 0x0003) AM_WRITE(porte_paloff0_w)
 	AM_RANGE(0x0004, 0x0005) AM_WRITE(twinsa_port4_w) // palette on this set
-	AM_RANGE(0x0008, 0x0009) AM_WRITE(AY8910_control_port_0_lsb_w)
-	AM_RANGE(0x0010, 0x0011) AM_READWRITE(AY8910_read_port_0_lsb_r, AY8910_write_port_0_lsb_w)
+	AM_RANGE(0x0008, 0x0009) AM_WRITE(ay8910_control_port_0_lsb_w)
+	AM_RANGE(0x0010, 0x0011) AM_READWRITE(ay8910_read_port_0_lsb_r, ay8910_write_port_0_lsb_w)
 	AM_RANGE(0x0018, 0x0019) AM_READ(twins_port4_r) AM_WRITE(twins_port4_w)
 ADDRESS_MAP_END
 

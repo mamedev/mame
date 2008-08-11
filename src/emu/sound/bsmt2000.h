@@ -5,9 +5,11 @@
  *
  **********************************************************************************************/
 
-#ifndef BSMT2000_H
-#define BSMT2000_H
+#pragma once
 
-WRITE16_HANDLER( BSMT2000_data_0_w );
+#ifndef __BSMT2000_H__
+#define __BSMT2000_H__
 
-#endif
+WRITE16_HANDLER( bsmt2000_data_0_w );
+
+#endif /* __BSMT2000_H__ */

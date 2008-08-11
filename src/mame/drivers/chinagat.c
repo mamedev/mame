@@ -300,8 +300,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x8801, 0x8801) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0x8800, 0x8800) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x8801, 0x8801) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0x9800, 0x9800) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -312,17 +312,17 @@ static ADDRESS_MAP_START( ym2203c_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 // 8804 and/or 8805 make a gong sound when the coin goes in
 // but only on the title screen....
 
-	AM_RANGE(0x8800, 0x8800) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)
-	AM_RANGE(0x8801, 0x8801) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x8800, 0x8800) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
+	AM_RANGE(0x8801, 0x8801) AM_WRITE(ym2203_write_port_0_w)
 //  AM_RANGE(0x8802, 0x8802) AM_READWRITE(okim6295_data_0_w, okim6295_status_0_r)
 //  AM_RANGE(0x8803, 0x8803) AM_WRITE(okim6295_data_0_w)
-	AM_RANGE(0x8804, 0x8804) AM_READWRITE(YM2203_status_port_1_r,  YM2203_control_port_1_w)
-	AM_RANGE(0x8805, 0x8805) AM_WRITE(YM2203_write_port_1_w)
+	AM_RANGE(0x8804, 0x8804) AM_READWRITE(ym2203_status_port_1_r,  ym2203_control_port_1_w)
+	AM_RANGE(0x8805, 0x8805) AM_WRITE(ym2203_write_port_1_w)
 //  AM_RANGE(0x8804, 0x8804) AM_WRITE(SMH_RAM)
 //  AM_RANGE(0x8805, 0x8805) AM_WRITE(SMH_RAM)
 
-//  AM_RANGE(0x8800, 0x8800) AM_WRITE(YM2151_register_port_0_w)
-//  AM_RANGE(0x8801, 0x8801) AM_WRITE(YM2151_data_port_0_w)
+//  AM_RANGE(0x8800, 0x8800) AM_WRITE(ym2151_register_port_0_w)
+//  AM_RANGE(0x8801, 0x8801) AM_WRITE(ym2151_data_port_0_w)
 //  AM_RANGE(0x9800, 0x9800) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -330,8 +330,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( saiyugb1_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8800) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x8801, 0x8801) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0x8800, 0x8800) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x8801, 0x8801) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(saiyugb1_mcu_command_w)
 	AM_RANGE(0xA000, 0xA000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END

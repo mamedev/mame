@@ -138,11 +138,11 @@ static READ8_HANDLER( marvins_port_0_r )
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_BASE(&namco_wavedata)	/* silly hack - this shouldn't be here */
 	AM_RANGE(0x4000, 0x4000) AM_READ(sound_command_r)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x8001, 0x8001) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x8002, 0x8007) AM_WRITE(snkwave_w)
-	AM_RANGE(0x8008, 0x8008) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x8009, 0x8009) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0x8008, 0x8008) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x8009, 0x8009) AM_WRITE(ay8910_write_port_1_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(sound_nmi_ack_r)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END

@@ -593,9 +593,9 @@ static ADDRESS_MAP_START( ampoker2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x35, 0x35) AM_WRITE (ampoker2_port35_w)	/* see write handlers */
 	AM_RANGE(0x36, 0x36) AM_WRITE (ampoker2_port36_w)	/* see write handlers */
 	AM_RANGE(0x37, 0x37) AM_WRITE(ampoker2_watchdog_reset_w)
-	AM_RANGE(0x38, 0x38) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x39, 0x39) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x3A, 0x3A) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x38, 0x38) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x39, 0x39) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x3A, 0x3A) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
 
 

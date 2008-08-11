@@ -167,7 +167,7 @@ static WRITE32_HANDLER( avengrs_palette_w )
 static READ32_HANDLER( avengrs_sound_r )
 {
 	if (ACCESSING_BITS_24_31) {
-		return YMZ280B_status_0_r(machine,0)<<24;
+		return ymz280b_status_0_r(machine,0)<<24;
 	} else {
 		logerror("%08x:  non-byte read from sound mask %08x\n",activecpu_get_pc(),mem_mask);
 	}
@@ -179,9 +179,9 @@ static WRITE32_HANDLER( avengrs_sound_w )
 {
 	if (ACCESSING_BITS_24_31) {
 		if (offset)
-			YMZ280B_data_0_w(machine,0,data>>24);
+			ymz280b_data_0_w(machine,0,data>>24);
 		else
-			YMZ280B_register_0_w(machine,0,data>>24);
+			ymz280b_register_0_w(machine,0,data>>24);
 	} else {
 		logerror("%08x:  non-byte written to sound %08x mask %08x\n",activecpu_get_pc(),data,mem_mask);
 	}

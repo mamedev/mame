@@ -2008,7 +2008,7 @@ static READ16_HANDLER( peripheral_r )
 			if (!has_ym2151)
 				return pit8254_r(machine, offset | 0x40, mem_mask);
 			else
-				return YM2151_status_port_0_lsb_r(machine, offset, mem_mask);
+				return ym2151_status_port_0_lsb_r(machine, offset, mem_mask);
 
 		case 4:
 			if (is_redline)
@@ -2044,9 +2044,9 @@ static WRITE16_HANDLER( peripheral_w )
 			if (!has_ym2151)
 				pit8254_w(machine, offset | 0x40, data, mem_mask);
 			else if (offset == 0)
-				YM2151_register_port_0_lsb_w(machine, offset, data, mem_mask);
+				ym2151_register_port_0_lsb_w(machine, offset, data, mem_mask);
 			else if (offset == 1)
-				YM2151_data_port_0_lsb_w(machine, offset, data, mem_mask);
+				ym2151_data_port_0_lsb_w(machine, offset, data, mem_mask);
 			break;
 
 		case 4:

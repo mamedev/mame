@@ -93,15 +93,15 @@ static WRITE8_HANDLER( draco_sound_g_w )
 	switch (data)
 	{
 	case 0x01:
-		AY8910_write_port_0_w(machine, 0, state->draco_ay_latch);
+		ay8910_write_port_0_w(machine, 0, state->draco_ay_latch);
 		break;
 
 	case 0x02:
-		state->draco_ay_latch = AY8910_read_port_0_r(machine, 0);
+		state->draco_ay_latch = ay8910_read_port_0_r(machine, 0);
 		break;
 
 	case 0x03:
-		AY8910_control_port_0_w(machine, 0, state->draco_ay_latch);
+		ay8910_control_port_0_w(machine, 0, state->draco_ay_latch);
 		break;
 	}
 }

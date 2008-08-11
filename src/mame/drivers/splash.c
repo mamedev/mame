@@ -133,7 +133,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( splash_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xd7ff) AM_READ(SMH_ROM)					/* ROM */
 	AM_RANGE(0xe800, 0xe800) AM_READ(soundlatch_r)				/* Sound latch */
-	AM_RANGE(0xf000, 0xf000) AM_READ(YM3812_status_port_0_r)		/* YM3812 */
+	AM_RANGE(0xf000, 0xf000) AM_READ(ym3812_status_port_0_r)		/* YM3812 */
 	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)					/* RAM */
 ADDRESS_MAP_END
 
@@ -154,8 +154,8 @@ static ADDRESS_MAP_START( splash_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xd7ff) AM_WRITE(SMH_ROM)					/* ROM */
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(splash_adpcm_data_w)		/* ADPCM data for the MSM5205 chip */
 //  AM_RANGE(0xe000, 0xe000) AM_WRITE(SMH_NOP)                 /* ??? */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(YM3812_control_port_0_w)	/* YM3812 */
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(YM3812_write_port_0_w)		/* YM3812 */
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(ym3812_control_port_0_w)	/* YM3812 */
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(ym3812_write_port_0_w)		/* YM3812 */
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)					/* RAM */
 ADDRESS_MAP_END
 
@@ -214,8 +214,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roldf_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x12, 0x12) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x13, 0x13) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x12, 0x12) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x13, 0x13) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0x40, 0x40) AM_NOP	/* NMI ack */
 	AM_RANGE(0x70, 0x70) AM_READ(soundlatch_r)
 ADDRESS_MAP_END

@@ -1,4 +1,6 @@
-#ifndef _CDDA_H_
+#pragma once
+
+#ifndef __CDDA_H__
 #define _CDDA_H_
 
 void cdda_set_cdrom(int num, void *file);
@@ -13,5 +15,4 @@ int cdda_audio_active(int num);
 int cdda_audio_paused(int num);
 int cdda_audio_ended(int num);
 
-#endif
-
+#endif /* __CDDA_H__ */

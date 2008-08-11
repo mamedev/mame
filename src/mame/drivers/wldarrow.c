@@ -129,25 +129,25 @@ static WRITE8_HANDLER( counter_w )
 
 static WRITE8_HANDLER( wldarrow_dac_1_w )
 {
-	DAC_data_w(0, 0x00);
+	dac_data_w(0, 0x00);
 }
 
 
 static WRITE8_HANDLER( wldarrow_dac_2_w )
 {
-	DAC_data_w(0, 0x55);
+	dac_data_w(0, 0x55);
 }
 
 
 static WRITE8_HANDLER( wldarrow_dac_3_w )
 {
-	DAC_data_w(0, 0xaa);
+	dac_data_w(0, 0xaa);
 }
 
 
 static WRITE8_HANDLER( wldarrow_dac_4_w )
 {
-	DAC_data_w(0, 0xff);
+	dac_data_w(0, 0xff);
 }
 
 

@@ -1,5 +1,7 @@
-#ifndef intf5220_h
-#define intf5220_h
+#pragma once
+
+#ifndef __5200INTF_H__
+#define __5200INTF_H__
 
 /* clock rate = 80 * output sample rate,     */
 /* usually 640000 for 8000 Hz sample rate or */
@@ -28,5 +30,4 @@ enum
 	SNDINFO_INT_TMS5220_VARIANT = SNDINFO_INT_CORE_SPECIFIC
 };
 
-#endif
-
+#endif /* __5200INTF_H__ */

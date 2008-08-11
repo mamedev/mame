@@ -55,10 +55,10 @@ if (data & 0xe0) popmessage("bankswitch %02x",data);
 
 static ADDRESS_MAP_START( labyrunr_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0020, 0x005f) AM_READ(SMH_RAM)	/* scroll registers */
-	AM_RANGE(0x0801, 0x0801) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0x0800, 0x0800) AM_READ(YM2203_read_port_0_r)
-	AM_RANGE(0x0901, 0x0901) AM_READ(YM2203_status_port_1_r)
-	AM_RANGE(0x0900, 0x0900) AM_READ(YM2203_read_port_1_r)
+	AM_RANGE(0x0801, 0x0801) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0x0800, 0x0800) AM_READ(ym2203_read_port_0_r)
+	AM_RANGE(0x0901, 0x0901) AM_READ(ym2203_status_port_1_r)
+	AM_RANGE(0x0900, 0x0900) AM_READ(ym2203_read_port_1_r)
 	AM_RANGE(0x0a00, 0x0a00) AM_READ(input_port_5_r)
 	AM_RANGE(0x0a01, 0x0a01) AM_READ(input_port_4_r)
 	AM_RANGE(0x0b00, 0x0b00) AM_READ(input_port_3_r)
@@ -73,10 +73,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( labyrunr_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0007) AM_WRITE(K007121_ctrl_0_w)
 	AM_RANGE(0x0020, 0x005f) AM_WRITE(SMH_RAM)	AM_BASE(&labyrunr_scrollram) /* scroll registers */
-	AM_RANGE(0x0801, 0x0801) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x0901, 0x0901) AM_WRITE(YM2203_control_port_1_w)
-	AM_RANGE(0x0900, 0x0900) AM_WRITE(YM2203_write_port_1_w)
+	AM_RANGE(0x0801, 0x0801) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x0800, 0x0800) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x0901, 0x0901) AM_WRITE(ym2203_control_port_1_w)
+	AM_RANGE(0x0900, 0x0900) AM_WRITE(ym2203_write_port_1_w)
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(labyrunr_bankswitch_w)
 	AM_RANGE(0x0d00, 0x0d1f) AM_WRITE(K051733_w)				/* 051733 (protection) */
 	AM_RANGE(0x0e00, 0x0e00) AM_WRITE(watchdog_reset_w)

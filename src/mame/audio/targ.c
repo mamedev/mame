@@ -63,7 +63,7 @@ WRITE8_HANDLER( targ_audio_1_w )
 {
 	/* CPU music */
 	if ((data & 0x01) != (port_1_last & 0x01))
-		DAC_data_w(0,(data & 0x01) * 0xff);
+		dac_data_w(0,(data & 0x01) * 0xff);
 
 	/* shot */
 	if (FALLING_EDGE(0x02) && !sample_playing(0))  sample_start(0,1,0);

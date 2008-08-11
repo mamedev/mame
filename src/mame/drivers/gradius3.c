@@ -208,8 +208,8 @@ static ADDRESS_MAP_START( gradius3_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(sound_bank_w)				/* 007232 bankswitch */
 	AM_RANGE(0xf010, 0xf010) AM_READ(soundlatch_r)
 	AM_RANGE(0xf020, 0xf02d) AM_READWRITE(k007232_read_port_0_r, k007232_write_port_0_w)
-	AM_RANGE(0xf030, 0xf030) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xf031, 0xf031) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0xf030, 0xf030) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xf031, 0xf031) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 

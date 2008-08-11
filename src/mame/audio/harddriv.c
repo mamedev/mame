@@ -334,7 +334,7 @@ WRITE16_HANDLER( hdsnddsp_dac_w )
 {
 	/* DAC L */
 	if (!dacmute)
-		DAC_signed_data_16_w(offset, data ^ 0x8000);
+		dac_signed_data_16_w(offset, data ^ 0x8000);
 }
 
 

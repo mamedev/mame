@@ -855,9 +855,9 @@ static WRITE32_HANDLER( skns_v3t_w )
 static WRITE32_HANDLER( skns_ymz280_w )
 {
 	if (ACCESSING_BITS_24_31)
-		YMZ280B_register_0_w(machine,offset,(data >> 24) & 0xff);
+		ymz280b_register_0_w(machine,offset,(data >> 24) & 0xff);
 	if (ACCESSING_BITS_16_23)
-		YMZ280B_data_0_w(machine,offset,(data >> 16) & 0xff);
+		ymz280b_data_0_w(machine,offset,(data >> 16) & 0xff);
 }
 
 static ADDRESS_MAP_START( skns_readmem, ADDRESS_SPACE_PROGRAM, 32 )
@@ -944,7 +944,7 @@ GFXDECODE_END
 
 /***** MACHINE DRIVER *****/
 
-static const struct YMZ280Binterface ymz280b_intf =
+static const ymz280b_interface ymz280b_intf =
 {
 	0	// irq ?
 };

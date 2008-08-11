@@ -398,8 +398,8 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x01, 0x01) AM_WRITE(input_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)      /* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_WRITE(YM2413_data_port_0_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(YM2413_register_port_0_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ym2413_data_port_0_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(ym2413_register_port_0_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(okim6295_data_0_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)	/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)      /* Video RAM bank register */
@@ -426,8 +426,8 @@ static ADDRESS_MAP_START( spangb_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x02) AM_READ(input_r)	/* Super Pang needs a kludge to initialize EEPROM. */
 	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)      /* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_WRITE(YM2413_data_port_0_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(YM2413_register_port_0_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ym2413_data_port_0_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(ym2413_register_port_0_w)
 	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r)
 	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)	/* watchdog? irq ack? */
 	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)      /* Video RAM bank register */

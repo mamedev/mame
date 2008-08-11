@@ -194,8 +194,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sauro_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM3812_control_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym3812_write_port_0_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(adpcm_w)
 	AM_RANGE(0xe000, 0xe006) AM_WRITE(SMH_NOP)	/* echo from write to e0000 */
 	AM_RANGE(0xe00e, 0xe00f) AM_WRITE(SMH_NOP)
@@ -218,8 +218,8 @@ static ADDRESS_MAP_START( trckydoc_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xec00, 0xefff) AM_WRITE(trckydoc_spriteram_mirror_w) // it clears sprites from the screen by writing here to set some of the attributes
 	AM_RANGE(0xf000, 0xf3ff) AM_WRITE(tecfri_videoram_w) AM_BASE(&tecfri_videoram)
 	AM_RANGE(0xf400, 0xf7ff) AM_WRITE(tecfri_colorram_w) AM_BASE(&tecfri_colorram)
-	AM_RANGE(0xf820, 0xf820) AM_WRITE(YM3812_control_port_0_w)
-	AM_RANGE(0xf821, 0xf821) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0xf820, 0xf820) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0xf821, 0xf821) AM_WRITE(ym3812_write_port_0_w)
 	AM_RANGE(0xf830, 0xf830) AM_WRITE(tecfri_scroll_bg_w)
 	AM_RANGE(0xf838, 0xf838) AM_WRITE(SMH_NOP)				/* only written at startup */
 	AM_RANGE(0xf839, 0xf839) AM_WRITE(flip_screen_w)

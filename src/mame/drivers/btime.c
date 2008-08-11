@@ -328,10 +328,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE(&audio_rambase)
 	AM_RANGE(0x0400, 0x0fff) AM_ROM AM_REGION("audio", 0xf400)
-	AM_RANGE(0x2000, 0x2fff) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x8000, 0x8fff) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0x2000, 0x2fff) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x4000, 0x4fff) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x6000, 0x6fff) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x8000, 0x8fff) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0xa000, 0xafff) AM_READ(soundlatch_r)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM
@@ -339,10 +339,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( disco_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x4000, 0x4fff) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x5000, 0x5fff) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x6000, 0x6fff) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x7000, 0x7fff) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0x4000, 0x4fff) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x5000, 0x5fff) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x6000, 0x6fff) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x7000, 0x7fff) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0x8000, 0x8fff) AM_READWRITE(soundlatch_r, SMH_NOP) /* ack ? */
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END

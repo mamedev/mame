@@ -62,13 +62,13 @@ static INTERRUPT_GEN( jb_interrupt_nmi )
 
 
 static READ8_HANDLER( jailbrek_speech_r ) {
-	return ( VLM5030_BSY() ? 1 : 0 );
+	return ( vlm5030_bsy() ? 1 : 0 );
 }
 
 static WRITE8_HANDLER( jailbrek_speech_w ) {
 	/* bit 0 could be latch direction like in yiear */
-	VLM5030_ST( ( data >> 1 ) & 1 );
-	VLM5030_RST( ( data >> 2 ) & 1 );
+	vlm5030_st( ( data >> 1 ) & 1 );
+	vlm5030_rst( ( data >> 2 ) & 1 );
 }
 
 static ADDRESS_MAP_START( jailbrek_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -91,7 +91,7 @@ static ADDRESS_MAP_START( jailbrek_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3302, 0x3302) AM_READ(input_port_2_r) /* joy2 */
 	AM_RANGE(0x3303, 0x3303) AM_READ(input_port_3_r) /* DSW0 */
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(jailbrek_speech_w) /* speech pins */
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(VLM5030_data_w) /* speech data */
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(vlm5030_data_w) /* speech data */
 	AM_RANGE(0x6000, 0x6000) AM_READ(jailbrek_speech_r)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

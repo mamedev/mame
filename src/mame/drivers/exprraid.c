@@ -133,10 +133,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x0000, 0x1fff) AM_RAM
-    AM_RANGE(0x2000, 0x2000) AM_READWRITE(YM2203_status_port_0_r, YM2203_control_port_0_w)
-	AM_RANGE(0x2001, 0x2001) AM_READWRITE(YM2203_read_port_0_r, YM2203_write_port_0_w)
-    AM_RANGE(0x4000, 0x4000) AM_READWRITE(YM3526_status_port_0_r, YM3526_control_port_0_w)
-    AM_RANGE(0x4001, 0x4001) AM_WRITE(YM3526_write_port_0_w)
+    AM_RANGE(0x2000, 0x2000) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
+	AM_RANGE(0x2001, 0x2001) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+    AM_RANGE(0x4000, 0x4000) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
+    AM_RANGE(0x4001, 0x4001) AM_WRITE(ym3526_write_port_0_w)
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
     AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END

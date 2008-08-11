@@ -1,5 +1,7 @@
-#ifndef cem3394_h
-#define cem3394_h
+#pragma once
+
+#ifndef __CEM3394_H__
+#define __CEM3394_H__
 
 
 #define CEM3394_SAMPLE_RATE		(44100*4)
@@ -42,5 +44,4 @@ void cem3394_set_voltage(int chip, int input, double voltage);
 double cem3394_get_parameter(int chip, int input);
 
 
-#endif
-
+#endif /* __CEM3394_H__ */

@@ -124,11 +124,11 @@ Sub_MemMap( flashgla, 0x7fff, 0xe000, 0xc040, 0xc080, 0xc0c0 )
 #define Sub_PortMap( name, ay0_base, ay1_base )								\
 static ADDRESS_MAP_START( name##_sub_portmap, ADDRESS_SPACE_IO, 8 )			\
 	ADDRESS_MAP_GLOBAL_MASK(0xff)										\
-	AM_RANGE(ay0_base+0, ay0_base+0) AM_WRITE(AY8910_control_port_0_w)		\
-	AM_RANGE(ay0_base+1, ay0_base+1) AM_WRITE(AY8910_write_port_0_w)		\
-	AM_RANGE(ay0_base+2, ay0_base+2) AM_READ(AY8910_read_port_0_r)			\
-	AM_RANGE(ay1_base+0, ay1_base+0) AM_WRITE(AY8910_control_port_1_w)		\
-	AM_RANGE(ay1_base+1, ay1_base+1) AM_WRITE(AY8910_write_port_1_w)		\
+	AM_RANGE(ay0_base+0, ay0_base+0) AM_WRITE(ay8910_control_port_0_w)		\
+	AM_RANGE(ay0_base+1, ay0_base+1) AM_WRITE(ay8910_write_port_0_w)		\
+	AM_RANGE(ay0_base+2, ay0_base+2) AM_READ(ay8910_read_port_0_r)			\
+	AM_RANGE(ay1_base+0, ay1_base+0) AM_WRITE(ay8910_control_port_1_w)		\
+	AM_RANGE(ay1_base+1, ay1_base+1) AM_WRITE(ay8910_write_port_1_w)		\
 ADDRESS_MAP_END																\
 
 Sub_PortMap( gyrodine, 0x00, 0xc0 )

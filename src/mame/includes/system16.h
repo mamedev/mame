@@ -1,6 +1,7 @@
 /******************** NEW STUFF *******************/
 
 #include "video/segaic16.h"
+#include "sound/upd7759.h"
 
 /*----------- defined in video/segahang.c -----------*/
 
@@ -96,7 +97,7 @@ extern UINT16 *sys16_extraram2;
 extern UINT16 *sys16_extraram3;
 
 /* sound */
-extern const struct upd7759_interface sys16_upd7759_interface;
+extern const upd7759_interface sys16_upd7759_interface;
 
 extern int sys18_sound_info[4*2];
 

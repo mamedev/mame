@@ -195,7 +195,7 @@ static void seta_update( void *param, stream_sample_t **inputs, stream_sample_t 
 static void *x1_010_start(const char *tag, int sndindex, int clock, const void *config)
 {
 	int i;
-	const struct x1_010_interface *intf = config;
+	const x1_010_interface *intf = config;
 	struct x1_010_info *info;
 
 	info = auto_malloc(sizeof(*info));

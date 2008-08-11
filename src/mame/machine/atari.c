@@ -717,9 +717,9 @@ static UINT8 console_read(void)
 static void console_write(UINT8 data)
 {
 	if (data & 0x08)
-		DAC_data_w(0, -120);
+		dac_data_w(0, -120);
 	else
-		DAC_data_w(0, +120);
+		dac_data_w(0, +120);
 }
 
 

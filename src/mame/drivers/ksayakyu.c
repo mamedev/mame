@@ -125,11 +125,11 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( soundcpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x83ff) AM_RAM
-	AM_RANGE(0xa001, 0xa001) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0xa002, 0xa002) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xa003, 0xa003) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xa006, 0xa006) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0xa007, 0xa007) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0xa001, 0xa001) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0xa002, 0xa002) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xa003, 0xa003) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xa006, 0xa006) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0xa007, 0xa007) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0xa008, 0xa008) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xa00c, 0xa00c) AM_WRITE(tomaincpu_w)
 	AM_RANGE(0xa010, 0xa010) AM_WRITE(SMH_NOP)

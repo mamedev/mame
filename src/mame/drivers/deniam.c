@@ -80,13 +80,13 @@ static MACHINE_RESET( deniam )
 static WRITE16_HANDLER( YM3812_control_port_0_msb_w )
 {
 	if (ACCESSING_BITS_8_15)
-		YM3812_control_port_0_w(machine,0,(data >> 8) & 0xff);
+		ym3812_control_port_0_w(machine,0,(data >> 8) & 0xff);
 }
 
 static WRITE16_HANDLER( YM3812_write_port_0_msb_w )
 {
 	if (ACCESSING_BITS_8_15)
-		YM3812_write_port_0_w(machine,0,(data >> 8) & 0xff);
+		ym3812_write_port_0_w(machine,0,(data >> 8) & 0xff);
 }
 
 
@@ -134,8 +134,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_WRITE(YM3812_control_port_0_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ym3812_write_port_0_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(okim6295_data_0_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(deniam16b_oki_rom_bank_w)
 ADDRESS_MAP_END

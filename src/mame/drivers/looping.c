@@ -366,7 +366,7 @@ static WRITE8_HANDLER( looping_sound_sw )
 
 	looping_state *state = machine->driver_data;
 	state->sound[offset + 1] = data ^ 1;
-	DAC_data_w(0, ((state->sound[2] << 7) + (state->sound[3] << 6)) * state->sound[7]);
+	dac_data_w(0, ((state->sound[2] << 7) + (state->sound[3] << 6)) * state->sound[7]);
 }
 
 
@@ -498,8 +498,8 @@ static ADDRESS_MAP_START( looping_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x37ff) AM_ROM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM
-	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x00f4) AM_READWRITE(AY8910_read_port_0_r, AY8910_control_port_0_w)
-	AM_RANGE(0x3c02, 0x3c02) AM_MIRROR(0x00f4) AM_READWRITE(SMH_NOP, AY8910_write_port_0_w)
+	AM_RANGE(0x3c00, 0x3c00) AM_MIRROR(0x00f4) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
+	AM_RANGE(0x3c02, 0x3c02) AM_MIRROR(0x00f4) AM_READWRITE(SMH_NOP, ay8910_write_port_0_w)
 	AM_RANGE(0x3c03, 0x3c03) AM_MIRROR(0x00f6) AM_NOP
 	AM_RANGE(0x3e00, 0x3e00) AM_MIRROR(0x00f4) AM_READWRITE(SMH_NOP, tms5220_data_w)
 	AM_RANGE(0x3e02, 0x3e02) AM_MIRROR(0x00f4) AM_READWRITE(tms5220_status_r, SMH_NOP)

@@ -55,14 +55,14 @@ static INT32 UNPACK(UINT16 val)
 	return uval;
 }
 
-void AICADSP_Init(struct _AICADSP *DSP)
+void aica_dsp_init(struct _AICADSP *DSP)
 {
 	memset(DSP,0,sizeof(struct _AICADSP));
 	DSP->RBL=0x8000;
 	DSP->Stopped=1;
 }
 
-void AICADSP_Step(struct _AICADSP *DSP)
+void aica_dsp_step(struct _AICADSP *DSP)
 {
 	INT32 ACC=0;	//26 bit
 	INT32 SHIFTED=0;	//24 bit
@@ -328,7 +328,7 @@ void AICADSP_Step(struct _AICADSP *DSP)
 //      fclose(f);
 }
 
-void AICADSP_SetSample(struct _AICADSP *DSP,INT32 sample,int SEL,int MXL)
+void aica_dsp_setsample(struct _AICADSP *DSP,INT32 sample,int SEL,int MXL)
 {
 	//DSP->MIXS[SEL]+=sample<<(MXL+1)/*7*/;
 	DSP->MIXS[SEL]+=sample;
@@ -336,7 +336,7 @@ void AICADSP_SetSample(struct _AICADSP *DSP,INT32 sample,int SEL,int MXL)
 //      int a=1;
 }
 
-void AICADSP_Start(struct _AICADSP *DSP)
+void aica_dsp_start(struct _AICADSP *DSP)
 {
 	int i;
 	DSP->Stopped=0;

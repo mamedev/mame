@@ -188,7 +188,7 @@ static WRITE32_HANDLER( control_w )
 	/* toggling BSMT off then on causes a reset */
 	if (!(old & 0x80000000) && (control_data & 0x80000000))
 	{
-		BSMT2000_data_0_w(machine, bsmt_data_bank, 0, 0xffff);
+		bsmt2000_data_0_w(machine, bsmt_data_bank, 0, 0xffff);
 		sndti_reset(SOUND_BSMT2000, 0);
 	}
 
@@ -208,7 +208,7 @@ static WRITE32_HANDLER( control_w )
 static WRITE32_HANDLER( bsmt2000_reg_w )
 {
 	if (control_data & 0x80000000)
-		BSMT2000_data_0_w(machine, bsmt_reg, data & 0xffff, mem_mask & 0xffff);
+		bsmt2000_data_0_w(machine, bsmt_reg, data & 0xffff, mem_mask & 0xffff);
 	else
 		COMBINE_DATA(&bsmt_data_offset);
 }

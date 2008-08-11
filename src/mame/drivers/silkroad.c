@@ -188,14 +188,14 @@ static WRITE32_HANDLER(silk_6295_1_w)
 
 static READ32_HANDLER(silk_ym_r)
 {
-	return YM2151_status_port_0_r(machine, 0)<<16;
+	return ym2151_status_port_0_r(machine, 0)<<16;
 }
 
 static WRITE32_HANDLER(silk_ym_regport_w)
 {
 	if (ACCESSING_BITS_16_23)
 	{
-		YM2151_register_port_0_w(machine, 0, (data>>16) & 0xff);
+		ym2151_register_port_0_w(machine, 0, (data>>16) & 0xff);
 	}
 }
 
@@ -203,7 +203,7 @@ static WRITE32_HANDLER(silk_ym_dataport_w)
 {
 	if (ACCESSING_BITS_16_23)
 	{
-		YM2151_data_port_0_w(machine, 0, (data>>16) & 0xff);
+		ym2151_data_port_0_w(machine, 0, (data>>16) & 0xff);
 	}
 }
 

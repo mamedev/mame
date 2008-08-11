@@ -353,8 +353,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(YM3812_control_port_0_w)
-	AM_RANGE(0xec01, 0xec01) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0xec01, 0xec01) AM_WRITE(ym3812_write_port_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )

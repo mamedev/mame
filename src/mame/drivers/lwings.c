@@ -353,10 +353,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xe002, 0xe002) AM_WRITE(YM2203_control_port_1_w)
-	AM_RANGE(0xe003, 0xe003) AM_WRITE(YM2203_write_port_1_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xe002, 0xe002) AM_WRITE(ym2203_control_port_1_w)
+	AM_RANGE(0xe003, 0xe003) AM_WRITE(ym2203_write_port_1_w)
 	AM_RANGE(0xe006, 0xe006) AM_WRITE(SMH_RAM) AM_BASE(&avengers_soundlatch2)
 ADDRESS_MAP_END
 

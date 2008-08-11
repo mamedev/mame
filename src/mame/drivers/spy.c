@@ -381,7 +381,7 @@ static ADDRESS_MAP_START( spy_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xa000, 0xa00d) AM_READ(k007232_read_port_0_r)
 	AM_RANGE(0xb000, 0xb00d) AM_READ(k007232_read_port_1_r)
-	AM_RANGE(0xc000, 0xc000) AM_READ(YM3812_status_port_0_r)
+	AM_RANGE(0xc000, 0xc000) AM_READ(ym3812_status_port_0_r)
 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
@@ -391,8 +391,8 @@ static ADDRESS_MAP_START( spy_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(sound_bank_w)
 	AM_RANGE(0xa000, 0xa00d) AM_WRITE(k007232_write_port_0_w)
 	AM_RANGE(0xb000, 0xb00d) AM_WRITE(k007232_write_port_1_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM3812_control_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym3812_write_port_0_w)
 ADDRESS_MAP_END
 
 

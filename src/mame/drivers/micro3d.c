@@ -827,11 +827,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundmem_data, ADDRESS_SPACE_DATA, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM                                  /* 2Kb RAM */
-	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xfd01, 0xfd01) AM_READWRITE(YM2151_status_port_0_r,YM2151_data_port_0_w)
+	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xfd01, 0xfd01) AM_READWRITE(ym2151_status_port_0_r,ym2151_data_port_0_w)
 	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(upd7759_0_port_w)
-	AM_RANGE(0xff00, 0xff00) AM_WRITE(DAC_0_data_w)   /* DAC A - used for S&H, special effects? */
-	AM_RANGE(0xff01, 0xff01) AM_WRITE(DAC_1_data_w)   /* DAC B - 'SPEECH' */
+	AM_RANGE(0xff00, 0xff00) AM_WRITE(dac_0_data_w)   /* DAC A - used for S&H, special effects? */
+	AM_RANGE(0xff01, 0xff01) AM_WRITE(dac_1_data_w)   /* DAC B - 'SPEECH' */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( soundmem_io, ADDRESS_SPACE_IO, 8 )

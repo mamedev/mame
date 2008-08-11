@@ -589,8 +589,8 @@ static ADDRESS_MAP_START( aso_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xd000, 0xd000) AM_READ(hal21_soundcommand_r)
 	AM_RANGE(0xe000, 0xe000) AM_READ(CPUC_ready_r)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(YM3526_status_port_0_r, YM3526_control_port_0_w) /* YM3526 #1 control port? */
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(YM3526_write_port_0_w)   /* YM3526 #1 write port?  */
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w) /* YM3526 #1 control port? */
+	AM_RANGE(0xf001, 0xf001) AM_WRITE(ym3526_write_port_0_w)   /* YM3526 #1 write port?  */
 	AM_RANGE(0xf002, 0xf002) AM_READNOP // unknown read
 	AM_RANGE(0xf004, 0xf004) AM_READNOP // unknown read
 	AM_RANGE(0xf006, 0xf006) AM_READNOP // unknown read
@@ -603,11 +603,11 @@ static ADDRESS_MAP_START( hal21_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(hal21_soundcommand_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ(CPUC_ready_r)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(hal21_soundack_w) // bitfielded(0-5) acknowledge write, details unknown
-	AM_RANGE(0xe008, 0xe008) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0xe009, 0xe009) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0xe008, 0xe008) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0xe009, 0xe009) AM_WRITE(ay8910_write_port_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hal21_sound_portmap, ADDRESS_SPACE_IO, 8 )

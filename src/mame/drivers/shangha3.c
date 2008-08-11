@@ -116,7 +116,7 @@ static ADDRESS_MAP_START( shangha3_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x200000, 0x200001) AM_READ(input_port_0_word_r)
 	AM_RANGE(0x200002, 0x200003) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x20001e, 0x20001f) AM_READ(AY8910_read_port_0_lsb_r)
+	AM_RANGE(0x20001e, 0x20001f) AM_READ(ay8910_read_port_0_lsb_r)
 	AM_RANGE(0x20004e, 0x20004f) AM_READ(shangha3_prot_r)
 	AM_RANGE(0x20006e, 0x20006f) AM_READ(okim6295_status_0_lsb_r)
 	AM_RANGE(0x300000, 0x30ffff) AM_READ(SMH_RAM)
@@ -128,8 +128,8 @@ static ADDRESS_MAP_START( shangha3_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200008, 0x200009) AM_WRITE(shangha3_blitter_go_w)
 	AM_RANGE(0x20000a, 0x20000b) AM_WRITE(SMH_NOP)	/* irq ack? */
 	AM_RANGE(0x20000c, 0x20000d) AM_WRITE(shangha3_coinctrl_w)
-	AM_RANGE(0x20002e, 0x20002f) AM_WRITE(AY8910_write_port_0_lsb_w)
-	AM_RANGE(0x20003e, 0x20003f) AM_WRITE(AY8910_control_port_0_lsb_w)
+	AM_RANGE(0x20002e, 0x20002f) AM_WRITE(ay8910_write_port_0_lsb_w)
+	AM_RANGE(0x20003e, 0x20003f) AM_WRITE(ay8910_control_port_0_lsb_w)
 	AM_RANGE(0x20004e, 0x20004f) AM_WRITE(shangha3_prot_w)
 	AM_RANGE(0x20006e, 0x20006f) AM_WRITE(okim6295_data_0_lsb_w)
 	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(SMH_RAM) AM_BASE(&shangha3_ram) AM_SIZE(&shangha3_ram_size)	/* gfx & work ram */
@@ -195,17 +195,17 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( heberpop_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(YM3438_status_port_0_A_r)
+	AM_RANGE(0x00, 0x00) AM_READ(ym3438_status_port_0_a_r)
 	AM_RANGE(0x80, 0x80) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( heberpop_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM3438_control_port_0_A_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM3438_data_port_0_A_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(YM3438_control_port_0_B_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(YM3438_data_port_0_B_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ym3438_control_port_0_a_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym3438_data_port_0_a_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(ym3438_control_port_0_b_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ym3438_data_port_0_b_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
@@ -491,7 +491,7 @@ static void irqhandler(running_machine *machine, int linestate)
 	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, linestate);
 }
 
-static const struct YM3438interface ym3438_interface =
+static const ym3438_interface ym3438_config =
 {
 	irqhandler
 };
@@ -565,7 +565,7 @@ static MACHINE_DRIVER_START( heberpop )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM3438, 8000000)
-	MDRV_SOUND_CONFIG(ym3438_interface)
+	MDRV_SOUND_CONFIG(ym3438_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 	MDRV_SOUND_ROUTE(1, "mono", 0.40)
 
@@ -607,7 +607,7 @@ static MACHINE_DRIVER_START( blocken )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM3438, 8000000)
-	MDRV_SOUND_CONFIG(ym3438_interface)
+	MDRV_SOUND_CONFIG(ym3438_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 	MDRV_SOUND_ROUTE(1, "mono", 0.40)
 

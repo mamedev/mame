@@ -2082,13 +2082,13 @@ static unsigned char OPLLRead(YM2413 *chip,int a)
 
 
 
-void * YM2413Init(int clock, int rate, int index)
+void * ym2413_init(int clock, int rate, int index)
 {
 	/* emulator create */
 	return OPLLCreate(clock, rate, index);
 }
 
-void YM2413Shutdown(void *chip)
+void ym2413_shutdown(void *chip)
 {
 	YM2413 *OPLL = chip;
 
@@ -2096,25 +2096,25 @@ void YM2413Shutdown(void *chip)
 	OPLLDestroy(OPLL);
 }
 
-void YM2413ResetChip(void *chip)
+void ym2413_reset_chip(void *chip)
 {
 	YM2413 *OPLL = chip;
 	OPLLResetChip(OPLL);
 }
 
-void YM2413Write(void *chip, int a, int v)
+void ym2413_write(void *chip, int a, int v)
 {
 	YM2413 *OPLL = chip;
 	OPLLWrite(OPLL, a, v);
 }
 
-unsigned char YM2413Read(void *chip, int a)
+unsigned char ym2413_read(void *chip, int a)
 {
 	YM2413 *OPLL = chip;
 	return OPLLRead(OPLL, a) & 0x03 ;
 }
 
-void YM2413SetUpdateHandler(void *chip,OPLL_UPDATEHANDLER UpdateHandler,void *param)
+void ym2413_set_update_handler(void *chip,OPLL_UPDATEHANDLER UpdateHandler,void *param)
 {
 	YM2413 *OPLL = chip;
 	OPLLSetUpdateHandler(OPLL, UpdateHandler, param);
@@ -2128,7 +2128,7 @@ void YM2413SetUpdateHandler(void *chip,OPLL_UPDATEHANDLER UpdateHandler,void *pa
 ** '*buffer' is the output buffer pointer
 ** 'length' is the number of samples that should be generated
 */
-void YM2413UpdateOne(void *_chip, SAMP **buffers, int length)
+void ym2413_update_one(void *_chip, SAMP **buffers, int length)
 {
 	YM2413		*chip  = _chip;
 	UINT8		rhythm = chip->rhythm&0x20;

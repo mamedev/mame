@@ -252,15 +252,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bssoccer_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM					)	// ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0xf801, 0xf801) AM_READ(YM2151_status_port_0_r	)	// YM2151
+	AM_RANGE(0xf801, 0xf801) AM_READ(ym2151_status_port_0_r	)	// YM2151
 	AM_RANGE(0xfc00, 0xfc00) AM_READ(soundlatch_r				)	// From Main CPU
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bssoccer_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM					)	// ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM					)	// RAM
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(YM2151_register_port_0_w	)	// YM2151
-	AM_RANGE(0xf801, 0xf801) AM_WRITE(YM2151_data_port_0_w		)	//
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(ym2151_register_port_0_w	)	// YM2151
+	AM_RANGE(0xf801, 0xf801) AM_WRITE(ym2151_data_port_0_w		)	//
 	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(soundlatch2_w 			)	// To PCM Z80 #1
 	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(soundlatch3_w 			)	// To PCM Z80 #2
 ADDRESS_MAP_END
@@ -272,15 +272,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( uballoon_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_READ(SMH_ROM					)	// ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0xf801, 0xf801) AM_READ(YM2151_status_port_0_r	)	// YM2151
+	AM_RANGE(0xf801, 0xf801) AM_READ(ym2151_status_port_0_r	)	// YM2151
 	AM_RANGE(0xfc00, 0xfc00) AM_READ(soundlatch_r				)	// From Main CPU
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( uballoon_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_WRITE(SMH_ROM					)	// ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_WRITE(SMH_RAM					)	// RAM
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(YM2151_register_port_0_w	)	// YM2151
-	AM_RANGE(0xf801, 0xf801) AM_WRITE(YM2151_data_port_0_w		)	//
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(ym2151_register_port_0_w	)	// YM2151
+	AM_RANGE(0xf801, 0xf801) AM_WRITE(ym2151_data_port_0_w		)	//
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(soundlatch2_w				)	// To PCM Z80
 ADDRESS_MAP_END
 
@@ -291,15 +291,15 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sunaq_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xe82f) AM_READ(SMH_ROM					)	// ROM
 	AM_RANGE(0xe830, 0xf7ff) AM_READ(SMH_RAM					)	// RAM
-	AM_RANGE(0xf801, 0xf801) AM_READ(YM2151_status_port_0_r	)	// YM2151
+	AM_RANGE(0xf801, 0xf801) AM_READ(ym2151_status_port_0_r	)	// YM2151
 	AM_RANGE(0xfc00, 0xfc00) AM_READ(soundlatch_r				)	// From Main CPU
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sunaq_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xe82f) AM_WRITE(SMH_ROM					)	// ROM
 	AM_RANGE(0xe830, 0xf7ff) AM_WRITE(SMH_RAM					)	// RAM (writes to efxx, could be a program bug tho)
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(YM2151_register_port_0_w	)	// YM2151
-	AM_RANGE(0xf801, 0xf801) AM_WRITE(YM2151_data_port_0_w		)	//
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(ym2151_register_port_0_w	)	// YM2151
+	AM_RANGE(0xf801, 0xf801) AM_WRITE(ym2151_data_port_0_w		)	//
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(soundlatch2_w				)	// To PCM Z80
 ADDRESS_MAP_END
 
@@ -309,10 +309,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bestbest_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0xbfff ) AM_ROM									// ROM
-	AM_RANGE( 0xc000, 0xc000 ) AM_WRITE( YM3526_control_port_0_w	)	// YM3526
-	AM_RANGE( 0xc001, 0xc001 ) AM_WRITE( YM3526_write_port_0_w		)	//
-	AM_RANGE( 0xc002, 0xc002 ) AM_WRITE( AY8910_control_port_0_w	)	// AY8910
-	AM_RANGE( 0xc003, 0xc003 ) AM_WRITE( AY8910_write_port_0_w		)	//
+	AM_RANGE( 0xc000, 0xc000 ) AM_WRITE( ym3526_control_port_0_w	)	// YM3526
+	AM_RANGE( 0xc001, 0xc001 ) AM_WRITE( ym3526_write_port_0_w		)	//
+	AM_RANGE( 0xc002, 0xc002 ) AM_WRITE( ay8910_control_port_0_w	)	// AY8910
+	AM_RANGE( 0xc003, 0xc003 ) AM_WRITE( ay8910_write_port_0_w		)	//
 	AM_RANGE( 0xe000, 0xe7ff ) AM_RAM									// RAM
 	AM_RANGE( 0xf000, 0xf000 ) AM_WRITE( soundlatch2_w				)	// To PCM Z80
 	AM_RANGE( 0xf800, 0xf800 ) AM_READ ( soundlatch_r				)	// From Main CPU
@@ -377,12 +377,12 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( bssoccer_DAC_1_w )
 {
-	DAC_data_w( 0 + (offset & 1), (data & 0xf) * 0x11 );
+	dac_data_w( 0 + (offset & 1), (data & 0xf) * 0x11 );
 }
 
 static WRITE8_HANDLER( bssoccer_DAC_2_w )
 {
-	DAC_data_w( 2 + (offset & 1), (data & 0xf) * 0x11 );
+	dac_data_w( 2 + (offset & 1), (data & 0xf) * 0x11 );
 }
 
 

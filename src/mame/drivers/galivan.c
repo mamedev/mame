@@ -182,10 +182,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM3526_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM3526_write_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(DAC_0_data_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(DAC_1_data_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ym3526_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym3526_write_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(dac_0_data_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(dac_1_data_w)
 ADDRESS_MAP_END
 
 

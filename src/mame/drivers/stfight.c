@@ -267,8 +267,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc001, 0xc001) AM_READ(YM2203_read_port_0_r)
-	AM_RANGE(0xc801, 0xc801) AM_READ(YM2203_read_port_1_r)
+	AM_RANGE(0xc001, 0xc001) AM_READ(ym2203_read_port_0_r)
+	AM_RANGE(0xc801, 0xc801) AM_READ(ym2203_read_port_1_r)
 	AM_RANGE(0xf000, 0xf000) AM_READ(stfight_fm_r)
 	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)
 
@@ -276,10 +276,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem_cpu2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(YM2203_control_port_1_w)
-	AM_RANGE(0xc801, 0xc801) AM_WRITE(YM2203_write_port_1_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0xc001, 0xc001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(ym2203_control_port_1_w)
+	AM_RANGE(0xc801, 0xc801) AM_WRITE(ym2203_write_port_1_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(stfight_e800_w)
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)
 

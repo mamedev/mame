@@ -221,7 +221,7 @@ static WRITE8_HANDLER( psg1_4017_w )
 static ADDRESS_MAP_START( vsnes_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_BASE(&work_ram)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ppu2c0x_0_r, ppu2c0x_0_w)
-	AM_RANGE(0x4011, 0x4011) AM_WRITE(DAC_0_data_w)
+	AM_RANGE(0x4011, 0x4011) AM_WRITE(dac_0_data_w)
 	AM_RANGE(0x4000, 0x4013) AM_READWRITE(nes_psg_0_r, nes_psg_0_w)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_0_w)
 	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)  /* PSG status / first control register */
@@ -234,7 +234,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vsnes_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_MIRROR(0x1800) AM_RAM AM_BASE(&work_ram_1)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(ppu2c0x_1_r, ppu2c0x_1_w)
-	AM_RANGE(0x4011, 0x4011) AM_WRITE(DAC_1_data_w)
+	AM_RANGE(0x4011, 0x4011) AM_WRITE(dac_1_data_w)
 	AM_RANGE(0x4000, 0x4013) AM_READWRITE(nes_psg_1_r, nes_psg_1_w)
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_1_w)
 	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg1_4015_r, psg1_4015_w)	/* PSG status / first control register */

@@ -273,8 +273,8 @@ static ADDRESS_MAP_START( ttmahjng_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(route16_out0_w)
 	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("IN0") AM_WRITE(route16_out1_w)
 	AM_RANGE(0x5800, 0x5800) AM_READWRITE(ttmahjng_input_port_matrix_r, ttmahjng_input_port_matrix_w)
-	AM_RANGE(0x6800, 0x6800) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x6900, 0x6900) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x6800, 0x6800) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x6900, 0x6900) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE(&route16_videoram1) AM_SIZE(&route16_videoram_size)
 ADDRESS_MAP_END
 
@@ -288,7 +288,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( stratvox_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x2800, 0x2800) AM_WRITE(DAC_0_data_w)
+	AM_RANGE(0x2800, 0x2800) AM_WRITE(dac_0_data_w)
 	AM_RANGE(0x4000, 0x43ff) AM_READWRITE(sharedram_r, sharedram_w)
 	AM_RANGE(0x8000, 0xbfff) AM_RAM AM_BASE(&route16_videoram2)
 ADDRESS_MAP_END
@@ -296,8 +296,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1ff)
-	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x00ff) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x0100, 0x0100) AM_MIRROR(0x00ff) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x0000, 0x0000) AM_MIRROR(0x00ff) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x0100, 0x0100) AM_MIRROR(0x00ff) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
 

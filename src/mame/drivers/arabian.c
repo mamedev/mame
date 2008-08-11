@@ -229,8 +229,8 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0x01ff) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xca00, 0xca00) AM_MIRROR(0x01ff) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0xc800, 0xc800) AM_MIRROR(0x01ff) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xca00, 0xca00) AM_MIRROR(0x01ff) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 

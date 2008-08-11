@@ -122,9 +122,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x4fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(VLM5030_data_w) /* speech data */
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(vlm5030_data_w) /* speech data */
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(hyperspt_sound_w)	  /* speech and output control */
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(DAC_0_data_w)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(dac_0_data_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(konami_SN76496_0_w) 	 /* This address triggers the SN chip to read the data port. */
 ADDRESS_MAP_END

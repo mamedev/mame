@@ -285,7 +285,7 @@ static ADDRESS_MAP_START( readport_ojankohs, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ(ojankohs_keymatrix_r)
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_1_r)
-	AM_RANGE(0x06, 0x06) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x06, 0x06) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_ojankohs, ADDRESS_SPACE_IO, 8 )
@@ -296,8 +296,8 @@ static ADDRESS_MAP_START( writeport_ojankohs, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_WRITE(ojankohs_adpcm_reset_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(ojankohs_flipscreen_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE(SMH_NOP)				// unknown
 	AM_RANGE(0x11, 0x11) AM_WRITE(SMH_NOP)				// unknown
 ADDRESS_MAP_END
@@ -309,8 +309,8 @@ static ADDRESS_MAP_START( writeport_ojankoy, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_WRITE(ojankoy_coinctr_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(ojankohs_flipscreen_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport_ccasino, ADDRESS_SPACE_IO, 8 )
@@ -320,7 +320,7 @@ static ADDRESS_MAP_START( readport_ccasino, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_1_r)
 	AM_RANGE(0x03, 0x03) AM_READ(ccasino_dipsw3_r)
 	AM_RANGE(0x04, 0x04) AM_READ(ccasino_dipsw4_r)
-	AM_RANGE(0x06, 0x06) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x06, 0x06) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_ccasino, ADDRESS_SPACE_IO, 8 )
@@ -331,8 +331,8 @@ static ADDRESS_MAP_START( writeport_ccasino, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_WRITE(ojankohs_adpcm_reset_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(ojankohs_flipscreen_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(ojankohs_msm5205_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x08, 0x0f) AM_WRITE(ccasino_palette_w)		// 16bit address access
 	AM_RANGE(0x10, 0x10) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x11, 0x11) AM_WRITE(SMH_NOP)
@@ -341,7 +341,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( readport_ojankoc, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xfc, 0xfd) AM_READ(ojankoc_keymatrix_r)
-	AM_RANGE(0xff, 0xff) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0xff, 0xff) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport_ojankoc, ADDRESS_SPACE_IO, 8 )
@@ -350,8 +350,8 @@ static ADDRESS_MAP_START( writeport_ojankoc, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf9, 0xf9) AM_WRITE(ojankohs_msm5205_w)
 	AM_RANGE(0xfb, 0xfb) AM_WRITE(ojankoc_ctrl_w)
 	AM_RANGE(0xfd, 0xfd) AM_WRITE(ojankohs_portselect_w)
-	AM_RANGE(0xfe, 0xfe) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xff, 0xff) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0xfe, 0xfe) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xff, 0xff) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( mahjong_p1 )

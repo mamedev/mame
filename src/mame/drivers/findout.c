@@ -96,7 +96,7 @@ static WRITE8_HANDLER( sound_w )
 	interrupt_enable_w(machine, 0,data & 0x40);
 
 	/* bit 7 goes directly to the sound amplifier */
-	DAC_data_w(0,((data & 0x80) >> 7) * 255);
+	dac_data_w(0,((data & 0x80) >> 7) * 255);
 
 //  logerror("%04x: sound_w %02x\n",activecpu_get_pc(),data);
 //  popmessage("%02x",data);

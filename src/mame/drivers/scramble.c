@@ -410,30 +410,30 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( triplep_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x01, 0x01) AM_READ(ay8910_read_port_0_r)
 	AM_RANGE(0x02, 0x02) AM_READ(triplep_pip_r)
 	AM_RANGE(0x03, 0x03) AM_READ(triplep_pap_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( triplep_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( hotshock_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x40, 0x40) AM_READ(AY8910_read_port_1_r)
+	AM_RANGE(0x20, 0x20) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x40, 0x40) AM_READ(ay8910_read_port_1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotshock_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(ay8910_control_port_1_w)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( scorpion_extra_sound_w )
@@ -453,12 +453,12 @@ static WRITE8_HANDLER( scorpion_sound_cmd_w )
 
 static ADDRESS_MAP_START( scorpion_sound_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x08, 0x08) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
-	AM_RANGE(0x10, 0x10) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x20, 0x20) AM_READWRITE(AY8910_read_port_1_r, AY8910_write_port_1_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(AY8910_control_port_2_w)
-	AM_RANGE(0x80, 0x80) AM_READWRITE(AY8910_read_port_2_r, AY8910_write_port_2_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x08, 0x08) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x20, 0x20) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_control_port_2_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(ay8910_read_port_2_r, ay8910_write_port_2_w)
 ADDRESS_MAP_END
 
 static READ8_HANDLER( hncholms_prot_r )
@@ -1839,16 +1839,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scramble_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x80, 0x80) AM_READ(AY8910_read_port_1_r)
+	AM_RANGE(0x20, 0x20) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x80, 0x80) AM_READ(ay8910_read_port_1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( scramble_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(ay8910_write_port_1_w)
 ADDRESS_MAP_END
 
 

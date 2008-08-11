@@ -60,7 +60,7 @@ static void sound_cause_nmi( int chip ){
 }
 
 
-const struct upd7759_interface sys16_upd7759_interface =
+const upd7759_interface sys16_upd7759_interface =
 {
 	sound_cause_nmi
 };

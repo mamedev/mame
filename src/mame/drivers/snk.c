@@ -403,8 +403,8 @@ static ADDRESS_MAP_START( YM3526_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ(snk_soundlatch_clear_r)
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(YM3526_status_port_0_r, YM3526_control_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM3526_write_port_0_w)
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym3526_write_port_0_w)
 ADDRESS_MAP_END
 
 
@@ -412,10 +412,10 @@ static ADDRESS_MAP_START( YM3526_YM3526_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe800, 0xe800) AM_READWRITE(YM3526_status_port_0_r, YM3526_control_port_0_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(YM3526_write_port_0_w)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(YM3526_status_port_1_r, YM3526_control_port_1_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(YM3526_write_port_1_w)
+	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3526_write_port_0_w)
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE(ym3526_status_port_1_r, ym3526_control_port_1_w)
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(ym3526_write_port_1_w)
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_register_r, snk_sound_register_w)
 ADDRESS_MAP_END
 
@@ -424,10 +424,10 @@ static ADDRESS_MAP_START( YM3526_Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe800, 0xe800) AM_READWRITE(YM3526_status_port_0_r, YM3526_control_port_0_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(YM3526_write_port_0_w)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(Y8950_status_port_0_r, Y8950_control_port_0_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(Y8950_write_port_0_w)
+	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3526_write_port_0_w)
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE(y8950_status_port_0_r, y8950_control_port_0_w)
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(y8950_write_port_0_w)
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_register_r, snk_sound_register_w)
 ADDRESS_MAP_END
 
@@ -436,10 +436,10 @@ static ADDRESS_MAP_START( YM3812_Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe800, 0xe800) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(YM3812_write_port_0_w)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(Y8950_status_port_0_r, Y8950_control_port_0_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(Y8950_write_port_0_w)
+	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE(y8950_status_port_0_r, y8950_control_port_0_w)
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(y8950_write_port_0_w)
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_register_r, snk_sound_register_w)
 ADDRESS_MAP_END
 
@@ -448,8 +448,8 @@ static ADDRESS_MAP_START( Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(Y8950_status_port_0_r, Y8950_control_port_0_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(Y8950_write_port_0_w)
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE(y8950_status_port_0_r, y8950_control_port_0_w)
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(y8950_write_port_0_w)
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_register_r, snk_sound_register_w)
 ADDRESS_MAP_END
 

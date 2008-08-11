@@ -380,18 +380,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( royalmah_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
+	AM_RANGE( 0x01, 0x01 ) AM_READ( ay8910_read_port_0_r )
+	AM_RANGE( 0x02, 0x02 ) AM_WRITE( ay8910_write_port_0_w )
+	AM_RANGE( 0x03, 0x03 ) AM_WRITE( ay8910_control_port_0_w )
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE( royalmah_palbank_w )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ippatsu_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
+	AM_RANGE( 0x01, 0x01 ) AM_READ( ay8910_read_port_0_r )
+	AM_RANGE( 0x02, 0x02 ) AM_WRITE( ay8910_write_port_0_w )
+	AM_RANGE( 0x03, 0x03 ) AM_WRITE( ay8910_control_port_0_w )
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE( royalmah_palbank_w )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
 	AM_RANGE( 0x12, 0x12 ) AM_READ_PORT("DSW2")
@@ -400,9 +400,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( suzume_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
+	AM_RANGE( 0x01, 0x01 ) AM_READ( ay8910_read_port_0_r )
+	AM_RANGE( 0x02, 0x02 ) AM_WRITE( ay8910_write_port_0_w )
+	AM_RANGE( 0x03, 0x03 ) AM_WRITE( ay8910_control_port_0_w )
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE( royalmah_palbank_w )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
 	AM_RANGE( 0x80, 0x80 ) AM_READ( suzume_dsw_r )
@@ -411,9 +411,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dondenmj_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE( 0x01, 0x01 ) AM_READ( ay8910_read_port_0_r )
+	AM_RANGE( 0x02, 0x02 ) AM_WRITE( ay8910_write_port_0_w )
+	AM_RANGE( 0x03, 0x03 ) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE( royalmah_palbank_w )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
 	AM_RANGE( 0x85, 0x85 ) AM_READ_PORT("DSW2")	// DSW2
@@ -423,9 +423,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjdiplob_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
+	AM_RANGE( 0x01, 0x01 ) AM_READ( ay8910_read_port_0_r )
+	AM_RANGE( 0x02, 0x02 ) AM_WRITE( ay8910_write_port_0_w )
+	AM_RANGE( 0x03, 0x03 ) AM_WRITE( ay8910_control_port_0_w )
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE( royalmah_palbank_w )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
 	AM_RANGE( 0x61, 0x61 ) AM_WRITE(tontonb_bank_w)
@@ -435,9 +435,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tontonb_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
+	AM_RANGE( 0x01, 0x01 ) AM_READ( ay8910_read_port_0_r )
+	AM_RANGE( 0x02, 0x02 ) AM_WRITE( ay8910_write_port_0_w )
+	AM_RANGE( 0x03, 0x03 ) AM_WRITE( ay8910_control_port_0_w )
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE( royalmah_palbank_w )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
 	AM_RANGE( 0x44, 0x44 ) AM_WRITE( tontonb_bank_w )
@@ -447,9 +447,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( majs101b_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
+	AM_RANGE( 0x01, 0x01 ) AM_READ( ay8910_read_port_0_r )
+	AM_RANGE( 0x02, 0x02 ) AM_WRITE( ay8910_write_port_0_w )
+	AM_RANGE( 0x03, 0x03 ) AM_WRITE( ay8910_control_port_0_w )
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE( royalmah_palbank_w )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
 	AM_RANGE( 0x00, 0x00 ) AM_READWRITE( majs101b_dsw_r, dynax_bank_w )
@@ -457,9 +457,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjderngr_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
+	AM_RANGE( 0x01, 0x01 ) AM_READ( ay8910_read_port_0_r )
+	AM_RANGE( 0x02, 0x02 ) AM_WRITE( ay8910_write_port_0_w )
+	AM_RANGE( 0x03, 0x03 ) AM_WRITE( ay8910_control_port_0_w )
 //  AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1")
 	AM_RANGE( 0x10, 0x10 ) AM_WRITE( mjderngr_coin_w )	// palette bank is set separately
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
@@ -472,9 +472,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mjapinky_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x00, 0x00 ) AM_WRITE( mjapinky_bank_w )
-	AM_RANGE( 0x01, 0x01 ) AM_READ( AY8910_read_port_0_r )
-	AM_RANGE( 0x02, 0x02 ) AM_WRITE( AY8910_write_port_0_w )
-	AM_RANGE( 0x03, 0x03 ) AM_WRITE( AY8910_control_port_0_w )
+	AM_RANGE( 0x01, 0x01 ) AM_READ( ay8910_read_port_0_r )
+	AM_RANGE( 0x02, 0x02 ) AM_WRITE( ay8910_write_port_0_w )
+	AM_RANGE( 0x03, 0x03 ) AM_WRITE( ay8910_control_port_0_w )
 	AM_RANGE( 0x04, 0x04 ) AM_READ_PORT("DSW2")
 	AM_RANGE( 0x10, 0x10 ) AM_READ_PORT("DSW1") AM_WRITE( mjapinky_palbank_w )
 	AM_RANGE( 0x11, 0x11 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
@@ -546,9 +546,9 @@ static ADDRESS_MAP_START( janptr96_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x20, 0x20 ) AM_READWRITE( janptr96_unknown_r, janptr96_rambank_w )
 	AM_RANGE( 0x50, 0x50 ) AM_WRITE( mjderngr_palbank_w )
 	AM_RANGE( 0x60, 0x6f ) AM_DEVREADWRITE(MSM6242, "rtc", msm6242_r, msm6242_w)
-	AM_RANGE( 0x81, 0x81 ) AM_READ( AY8910_read_port_0_r )
-	AM_RANGE( 0x82, 0x82 ) AM_WRITE( AY8910_write_port_0_w )
-	AM_RANGE( 0x83, 0x83 ) AM_WRITE( AY8910_control_port_0_w )
+	AM_RANGE( 0x81, 0x81 ) AM_READ( ay8910_read_port_0_r )
+	AM_RANGE( 0x82, 0x82 ) AM_WRITE( ay8910_write_port_0_w )
+	AM_RANGE( 0x83, 0x83 ) AM_WRITE( ay8910_control_port_0_w )
 	AM_RANGE( 0x93, 0x93 ) AM_WRITE( input_port_select_w )
 	AM_RANGE( 0xd8, 0xd8 ) AM_WRITE( janptr96_coin_counter_w )
 	AM_RANGE( 0xd9, 0xd9 ) AM_READ_PORT("SYSTEM")
@@ -578,7 +578,7 @@ static READ8_HANDLER( mjifb_rom_io_r )
 	{
 		case 0x8000:	return input_port_read(machine, "DSW4");		// dsw 4
 		case 0x8200:	return input_port_read(machine, "DSW3");		// dsw 3
-		case 0x9001:	return AY8910_read_port_0_r(machine, 0);	// inputs
+		case 0x9001:	return ay8910_read_port_0_r(machine, 0);	// inputs
 		case 0x9011:	return input_port_read(machine, "SYSTEM");
 	}
 
@@ -599,8 +599,8 @@ static WRITE8_HANDLER( mjifb_rom_io_w )
 	switch(offset)
 	{
 		case 0x8e00:	palette_base = data & 0x1f;	return;
-		case 0x9002:	AY8910_write_port_0_w(machine,0,data);			return;
-		case 0x9003:	AY8910_control_port_0_w(machine,0,data);		return;
+		case 0x9002:	ay8910_write_port_0_w(machine,0,data);			return;
+		case 0x9003:	ay8910_control_port_0_w(machine,0,data);		return;
 		case 0x9010:
 			mjifb_coin_counter_w(machine,0,data);
 			return;
@@ -685,7 +685,7 @@ static READ8_HANDLER( mjdejavu_rom_io_r )
 	{
 		case 0x8000:	return input_port_read(machine, "DSW2");		// dsw 2
 		case 0x8001:	return input_port_read(machine, "DSW1");		// dsw 1
-		case 0x9001:	return AY8910_read_port_0_r(machine, 0);	// inputs
+		case 0x9001:	return ay8910_read_port_0_r(machine, 0);	// inputs
 		case 0x9011:	return input_port_read(machine, "SYSTEM");
 	}
 
@@ -705,8 +705,8 @@ static WRITE8_HANDLER( mjdejavu_rom_io_w )
 	switch(offset)
 	{
 		case 0x8802:	palette_base = data & 0x1f;					return;
-		case 0x9002:	AY8910_write_port_0_w(machine,0,data);		return;
-		case 0x9003:	AY8910_control_port_0_w(machine,0,data);	return;
+		case 0x9002:	ay8910_write_port_0_w(machine,0,data);		return;
+		case 0x9003:	ay8910_control_port_0_w(machine,0,data);	return;
 		case 0x9010:	mjifb_coin_counter_w(machine,0,data);		return;
 		case 0x9011:	input_port_select_w(machine,0,data);		return;
 		case 0x9013:
@@ -752,9 +752,9 @@ static WRITE8_HANDLER( mjtensin_6ff3_w )
 static ADDRESS_MAP_START( mjtensin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x6fbf ) AM_RAM
-	AM_RANGE( 0x6fc1, 0x6fc1 ) AM_READ( AY8910_read_port_0_r )
-	AM_RANGE( 0x6fc2, 0x6fc2 ) AM_WRITE( AY8910_write_port_0_w )
-	AM_RANGE( 0x6fc3, 0x6fc3 ) AM_WRITE( AY8910_control_port_0_w )
+	AM_RANGE( 0x6fc1, 0x6fc1 ) AM_READ( ay8910_read_port_0_r )
+	AM_RANGE( 0x6fc2, 0x6fc2 ) AM_WRITE( ay8910_write_port_0_w )
+	AM_RANGE( 0x6fc3, 0x6fc3 ) AM_WRITE( ay8910_control_port_0_w )
 	AM_RANGE( 0x6fd0, 0x6fd0 ) AM_WRITE( janptr96_coin_counter_w )
 	AM_RANGE( 0x6fd1, 0x6fd1 ) AM_READ_PORT("SYSTEM") AM_WRITE( input_port_select_w )
 	AM_RANGE( 0x6fe0, 0x6fef ) AM_DEVREADWRITE(MSM6242, "rtc", msm6242_r, msm6242_w)
@@ -821,9 +821,9 @@ static WRITE8_HANDLER( cafetime_7fe3_w )
 static ADDRESS_MAP_START( cafetime_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x5fff ) AM_ROM
 	AM_RANGE( 0x6000, 0x7eff ) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE( 0x7fc1, 0x7fc1 ) AM_READ( AY8910_read_port_0_r )
-	AM_RANGE( 0x7fc2, 0x7fc2 ) AM_WRITE( AY8910_write_port_0_w )
-	AM_RANGE( 0x7fc3, 0x7fc3 ) AM_WRITE( AY8910_control_port_0_w )
+	AM_RANGE( 0x7fc1, 0x7fc1 ) AM_READ( ay8910_read_port_0_r )
+	AM_RANGE( 0x7fc2, 0x7fc2 ) AM_WRITE( ay8910_write_port_0_w )
+	AM_RANGE( 0x7fc3, 0x7fc3 ) AM_WRITE( ay8910_control_port_0_w )
 	AM_RANGE( 0x7fd0, 0x7fd0 ) AM_WRITE( janptr96_coin_counter_w )
 	AM_RANGE( 0x7fd1, 0x7fd1 ) AM_READ_PORT("SYSTEM") AM_WRITENOP
 	AM_RANGE( 0x7fd3, 0x7fd3 ) AM_WRITE( input_port_select_w )

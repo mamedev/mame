@@ -39,7 +39,7 @@ void YM2413DAC_update(int chip,stream_sample_t **inputs, stream_sample_t **_buff
 static void ym2413_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffers, int length)
 {
 	struct ym2413_info *info = param;
-	YM2413UpdateOne(info->chip, buffers, length);
+	ym2413_update_one(info->chip, buffers, length);
 }
 
 static void _stream_update(void *param, int interval)
@@ -57,14 +57,14 @@ static void *ym2413_start(const char *tag, int sndindex, int clock, const void *
 	memset(info, 0, sizeof(*info));
 
 	/* emulator create */
-	info->chip = YM2413Init(clock, rate, sndindex);
+	info->chip = ym2413_init(clock, rate, sndindex);
 	if (!info->chip)
 		return NULL;
 
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2413_stream_update);
 
-	YM2413SetUpdateHandler(info->chip, _stream_update, info);
+	ym2413_set_update_handler(info->chip, _stream_update, info);
 
 	return info;
 
@@ -98,18 +98,18 @@ static void *ym2413_start(const char *tag, int sndindex, int clock, const void *
 static void ym2413_stop (void *chip)
 {
 	struct ym2413_info *info = chip;
-	YM2413Shutdown(info->chip);
+	ym2413_shutdown(info->chip);
 }
 
 static void ym2413_reset (void *chip)
 {
 	struct ym2413_info *info = chip;
-	YM2413ResetChip(info->chip);
+	ym2413_reset_chip(info->chip);
 }
 
 
 #ifdef YM2413ISA
-WRITE8_HANDLER( YM2413_register_port_0_w ) {
+WRITE8_HANDLER( ym2413_register_port_0_w ) {
 int i,a;
 	outportb(0x308,data); // ym2413_write (0, 0, data);
 	//add delay
@@ -118,37 +118,37 @@ int i,a;
 
  } /* 1st chip */
 #else
-WRITE8_HANDLER( YM2413_register_port_0_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 0); YM2413Write (info->chip, 0, data); } /* 1st chip */
+WRITE8_HANDLER( ym2413_register_port_0_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 0); ym2413_write (info->chip, 0, data); } /* 1st chip */
 #endif
-WRITE8_HANDLER( YM2413_register_port_1_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 1); YM2413Write (info->chip, 0, data); } /* 2nd chip */
-WRITE8_HANDLER( YM2413_register_port_2_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 2); YM2413Write (info->chip, 0, data); } /* 3rd chip */
-WRITE8_HANDLER( YM2413_register_port_3_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 3); YM2413Write (info->chip, 0, data); } /* 4th chip */
+WRITE8_HANDLER( ym2413_register_port_1_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 1); ym2413_write (info->chip, 0, data); } /* 2nd chip */
+WRITE8_HANDLER( ym2413_register_port_2_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 2); ym2413_write (info->chip, 0, data); } /* 3rd chip */
+WRITE8_HANDLER( ym2413_register_port_3_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 3); ym2413_write (info->chip, 0, data); } /* 4th chip */
 
 #ifdef YM2413ISA
-WRITE8_HANDLER( YM2413_data_port_0_w ) {
+WRITE8_HANDLER( ym2413_data_port_0_w ) {
 int i,a;
-	outportb(0x309,data);// YM2413Write (sndti_token(SOUND_YM2413, 0), 1, data);
+	outportb(0x309,data);// ym2413_write (sndti_token(SOUND_YM2413, 0), 1, data);
 	//add delay
 	for (i=0; i<0x40; i++)
 		a = inportb(0x80);
  } /* 1st chip */
 #else
-WRITE8_HANDLER( YM2413_data_port_0_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 0); YM2413Write (info->chip, 1, data); } /* 1st chip */
+WRITE8_HANDLER( ym2413_data_port_0_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 0); ym2413_write (info->chip, 1, data); } /* 1st chip */
 #endif
-WRITE8_HANDLER( YM2413_data_port_1_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 1); YM2413Write (info->chip, 1, data); } /* 2nd chip */
-WRITE8_HANDLER( YM2413_data_port_2_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 2); YM2413Write (info->chip, 1, data); } /* 3rd chip */
-WRITE8_HANDLER( YM2413_data_port_3_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 3); YM2413Write (info->chip, 1, data); } /* 4th chip */
+WRITE8_HANDLER( ym2413_data_port_1_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 1); ym2413_write (info->chip, 1, data); } /* 2nd chip */
+WRITE8_HANDLER( ym2413_data_port_2_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 2); ym2413_write (info->chip, 1, data); } /* 3rd chip */
+WRITE8_HANDLER( ym2413_data_port_3_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 3); ym2413_write (info->chip, 1, data); } /* 4th chip */
 
-WRITE16_HANDLER( YM2413_register_port_0_lsb_w ) { if (ACCESSING_BITS_0_7) YM2413_register_port_0_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( YM2413_register_port_0_msb_w ) { if (ACCESSING_BITS_8_15) YM2413_register_port_0_w(machine,offset,((data & 0xff00) >> 8)); }
-WRITE16_HANDLER( YM2413_register_port_1_lsb_w ) { if (ACCESSING_BITS_0_7) YM2413_register_port_1_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( YM2413_register_port_2_lsb_w ) { if (ACCESSING_BITS_0_7) YM2413_register_port_2_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( YM2413_register_port_3_lsb_w ) { if (ACCESSING_BITS_0_7) YM2413_register_port_3_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( YM2413_data_port_0_lsb_w ) { if (ACCESSING_BITS_0_7) YM2413_data_port_0_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( YM2413_data_port_0_msb_w ) { if (ACCESSING_BITS_8_15) YM2413_data_port_0_w(machine,offset,((data & 0xff00) >> 8)); }
-WRITE16_HANDLER( YM2413_data_port_1_lsb_w ) { if (ACCESSING_BITS_0_7) YM2413_data_port_1_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( YM2413_data_port_2_lsb_w ) { if (ACCESSING_BITS_0_7) YM2413_data_port_2_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( YM2413_data_port_3_lsb_w ) { if (ACCESSING_BITS_0_7) YM2413_data_port_3_w(machine,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_register_port_0_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_0_w(machine,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_register_port_0_msb_w ) { if (ACCESSING_BITS_8_15) ym2413_register_port_0_w(machine,offset,((data & 0xff00) >> 8)); }
+WRITE16_HANDLER( ym2413_register_port_1_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_1_w(machine,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_register_port_2_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_2_w(machine,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_register_port_3_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_3_w(machine,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_data_port_0_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_0_w(machine,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_data_port_0_msb_w ) { if (ACCESSING_BITS_8_15) ym2413_data_port_0_w(machine,offset,((data & 0xff00) >> 8)); }
+WRITE16_HANDLER( ym2413_data_port_1_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_1_w(machine,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_data_port_2_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_2_w(machine,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_data_port_3_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_3_w(machine,offset,data & 0xff); }
 
 
 /**************************************************************************

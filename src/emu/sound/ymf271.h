@@ -1,16 +1,19 @@
-#ifndef _YMF271_H_
-#define _YMF271_H_
+#pragma once
 
-struct YMF271interface
+#ifndef __YMF271_H__
+#define __YMF271_H__
+
+typedef struct _ymf271_interface ymf271_interface;
+struct _ymf271_interface
 {
 	read8_machine_func ext_read;		/* external memory read */
 	write8_machine_func ext_write;	/* external memory write */
 	void (*irq_callback)(running_machine *machine, int state);	/* irq callback */
 };
 
-READ8_HANDLER( YMF271_0_r );
-WRITE8_HANDLER( YMF271_0_w );
-READ8_HANDLER( YMF271_1_r );
-WRITE8_HANDLER( YMF271_1_w );
+READ8_HANDLER( ymf271_0_r );
+WRITE8_HANDLER( ymf271_0_w );
+READ8_HANDLER( ymf271_1_r );
+WRITE8_HANDLER( ymf271_1_w );
 
-#endif
+#endif /* __YMF271_H__ */

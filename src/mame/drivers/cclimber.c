@@ -380,9 +380,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cclimber_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x08) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x0c, 0x0c) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x08, 0x08) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x09, 0x09) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x0c, 0x0c) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( yamato_portmap, ADDRESS_SPACE_IO, 8 )
@@ -407,18 +407,18 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( swimmer_audio_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE(ay8910_control_port_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( yamato_audio_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ay8910_write_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_READ(yamato_p0_r)	/* ??? */
 	AM_RANGE(0x08, 0x08) AM_READ(yamato_p1_r)	/* ??? */
 ADDRESS_MAP_END

@@ -686,18 +686,18 @@ static WRITE16_HANDLER( prmrsocr_eeprom_w )
 
 static READ16_HANDLER( cuebrick_snd_r )
 {
-	return YM2151_status_port_0_r(machine,0)<<8;
+	return ym2151_status_port_0_r(machine,0)<<8;
 }
 
 static WRITE16_HANDLER( cuebrick_snd_w )
 {
 	if (offset)
 	{
-		YM2151_data_port_0_w(machine, 0, data>>8);
+		ym2151_data_port_0_w(machine, 0, data>>8);
 	}
 	else
 	{
-		YM2151_register_port_0_w(machine, 0, data>>8);
+		ym2151_register_port_0_w(machine, 0, data>>8);
 	}
 }
 
@@ -1227,8 +1227,8 @@ static ADDRESS_MAP_START( mia_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 	AM_RANGE(0xb000, 0xb00d) AM_READWRITE(k007232_read_port_0_r, k007232_write_port_0_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xc001, 0xc001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 ADDRESS_MAP_END
 
 
@@ -1238,8 +1238,8 @@ static ADDRESS_MAP_START( tmnt_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x9000) AM_READWRITE(tmnt_sres_r, tmnt_sres_w)	/* title music & UPD7759C reset */
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 	AM_RANGE(0xb000, 0xb00d) AM_READWRITE(k007232_read_port_0_r, k007232_write_port_0_w)
-	AM_RANGE(0xc000, 0xc000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xc001, 0xc001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0xc000, 0xc000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xc001, 0xc001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(upd7759_0_port_w)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(upd7759_0_start_w)
 	AM_RANGE(0xf000, 0xf000) AM_READ(upd7759_0_busy_r)
@@ -1249,8 +1249,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( punkshot_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xf801, 0xf801) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xf801, 0xf801) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
 	AM_RANGE(0xfc00, 0xfc2f) AM_READWRITE(k053260_0_r, k053260_0_w)
 ADDRESS_MAP_END
@@ -1259,8 +1259,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( lgtnfght_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xa001, 0xa001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xa001, 0xa001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0xc000, 0xc02f) AM_READWRITE(k053260_0_r, k053260_0_w)
 ADDRESS_MAP_END
 
@@ -1276,8 +1276,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ssriders_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xf801, 0xf801) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xf801, 0xf801) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0xfa00, 0xfa2f) AM_READWRITE(k053260_0_r, k053260_0_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_WRITE(sound_arm_nmi_w)
 ADDRESS_MAP_END
@@ -1286,8 +1286,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( thndrx2_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x0010) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x0010) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x0010) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x0010) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(sound_arm_nmi_w)
 	AM_RANGE(0xfc00, 0xfc2f) AM_READWRITE(k053260_0_r, k053260_0_w)
 ADDRESS_MAP_END

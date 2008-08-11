@@ -1,5 +1,7 @@
-#ifndef BEEP_H
-#define BEEP_H
+#pragma once
+
+#ifndef __BEEP_H__
+#define __BEEP_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -13,4 +15,4 @@ void beep_set_volume(int,int);
 }
 #endif
 
-#endif
+#endif /* __BEEP_H__ */

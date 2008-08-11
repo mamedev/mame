@@ -785,7 +785,7 @@ static const samples_interface monsterb_samples_interface =
 };
 
 
-static const struct TMS36XXinterface monsterb_tms3617_interface =
+static const tms36xx_interface monsterb_tms3617_interface =
 {
 	TMS3617,
 	{0.5,0.5,0.5,0.5,0.5,0.5}  /* decay times of voices */
@@ -807,7 +807,7 @@ static ADDRESS_MAP_START( monsterb_7751_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(I8039_t1, I8039_t1) AM_READ(n7751_t1_r)
 	AM_RANGE(I8039_p2, I8039_p2) AM_READ(n7751_command_r)
 	AM_RANGE(I8039_bus, I8039_bus) AM_READ(n7751_rom_r)
-	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(DAC_0_data_w)
+	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(dac_0_data_w)
 	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(n7751_busy_w)
 	AM_RANGE(I8039_p4, I8039_p6) AM_WRITE(n7751_rom_offset_w)
 	AM_RANGE(I8039_p7, I8039_p7) AM_WRITE(n7751_rom_select_w)

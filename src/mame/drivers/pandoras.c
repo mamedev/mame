@@ -166,14 +166,14 @@ static ADDRESS_MAP_START( pandoras_readmem_snd, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)				/* ROM */
 	AM_RANGE(0x2000, 0x23ff) AM_READ(SMH_RAM)				/* RAM */
 	AM_RANGE(0x4000, 0x4000) AM_READ(soundlatch_r)			/* soundlatch_r */
-	AM_RANGE(0x6001, 0x6001) AM_READ(AY8910_read_port_0_r)	/* AY-8910 */
+	AM_RANGE(0x6001, 0x6001) AM_READ(ay8910_read_port_0_r)	/* AY-8910 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pandoras_writemem_snd, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_WRITE(SMH_ROM)				/* ROM */
 	AM_RANGE(0x2000, 0x23ff) AM_WRITE(SMH_RAM)				/* RAM */
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(AY8910_control_port_0_w)/* AY-8910 */
-	AM_RANGE(0x6002, 0x6002) AM_WRITE(AY8910_write_port_0_w)	/* AY-8910 */
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(ay8910_control_port_0_w)/* AY-8910 */
+	AM_RANGE(0x6002, 0x6002) AM_WRITE(ay8910_write_port_0_w)	/* AY-8910 */
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(pandoras_i8039_irqtrigger_w)/* cause INT on the 8039 */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(soundlatch2_w)			/* sound command to the 8039 */
 ADDRESS_MAP_END
@@ -191,7 +191,7 @@ static ADDRESS_MAP_START( i8039_readport, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(DAC_0_data_w)
+	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(dac_0_data_w)
 	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
 

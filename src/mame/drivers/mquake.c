@@ -89,7 +89,7 @@ static void mquake_cia_0_portb_w(UINT8 data)
 
 static READ16_HANDLER( es5503_word_lsb_r )
 {
-	return (ACCESSING_BITS_0_7) ? (ES5503_reg_0_r(machine, offset) | 0xff00) : 0xffff;
+	return (ACCESSING_BITS_0_7) ? (es5503_reg_0_r(machine, offset) | 0xff00) : 0xffff;
 }
 
 static WRITE16_HANDLER( es5503_word_lsb_w )
@@ -105,12 +105,12 @@ static WRITE16_HANDLER( es5503_word_lsb_w )
 				// if not writing a "halt", set the bank
 				if (!(data & 1))
 				{
-					ES5503_set_base_0(memory_region(machine, "ensoniq") + ((data>>4)*0x10000));
+					es5503_set_base_0(memory_region(machine, "ensoniq") + ((data>>4)*0x10000));
 				}
 			}
 		}
 
-		ES5503_reg_0_w(machine, offset, data);
+		es5503_reg_0_w(machine, offset, data);
 	}
 }
 
@@ -337,7 +337,7 @@ static const es5503_interface es5503_intf =
 static MACHINE_RESET(mquake)
 {
 	/* set ES5503 wave memory (this is banked in 64k increments) */
-	ES5503_set_base_0(memory_region(machine, "ensoniq"));
+	es5503_set_base_0(memory_region(machine, "ensoniq"));
 
 	MACHINE_RESET_CALL(amiga);
 }

@@ -57,18 +57,18 @@ static WRITE8_HANDLER( dogfgt_soundcontrol_w )
 	{
 		/* bit 4 goes to the 8910 #0 BC1 pin */
 		if (last & 0x10)
-			AY8910_control_port_0_w(machine,0,soundlatch);
+			ay8910_control_port_0_w(machine,0,soundlatch);
 		else
-			AY8910_write_port_0_w(machine,0,soundlatch);
+			ay8910_write_port_0_w(machine,0,soundlatch);
 	}
 	/* bit 7 goes to 8910 #1 BDIR pin  */
 	if ((last & 0x80) == 0x80 && (data & 0x80) == 0x00)
 	{
 		/* bit 6 goes to the 8910 #1 BC1 pin */
 		if (last & 0x40)
-			AY8910_control_port_1_w(machine,0,soundlatch);
+			ay8910_control_port_1_w(machine,0,soundlatch);
 		else
-			AY8910_write_port_1_w(machine,0,soundlatch);
+			ay8910_write_port_1_w(machine,0,soundlatch);
 	}
 
 	last = data;

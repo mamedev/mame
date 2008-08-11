@@ -1398,8 +1398,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(BANKED_SOUND_ROM_R) /* banked */
-	AM_RANGE(0x4000, 0x4001) AM_READ(YM2151_status_port_0_r)
-	AM_RANGE(0x5000, 0x6fff) AM_READ(C140_r)
+	AM_RANGE(0x4000, 0x4001) AM_READ(ym2151_status_port_0_r)
+	AM_RANGE(0x5000, 0x6fff) AM_READ(c140_r)
 	AM_RANGE(0x7000, 0x77ff) AM_READ(namcos2_dualportram_byte_r)
 	AM_RANGE(0x7800, 0x7fff) AM_READ(namcos2_dualportram_byte_r)	/* mirror */
 	AM_RANGE(0x8000, 0x9fff) AM_READ(SMH_RAM)
@@ -1409,9 +1409,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3000, 0x3003) AM_WRITE(SMH_NOP) /* ? */
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(YM2151_data_port_0_w)
-	AM_RANGE(0x5000, 0x6fff) AM_WRITE(C140_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0x4001, 0x4001) AM_WRITE(ym2151_data_port_0_w)
+	AM_RANGE(0x5000, 0x6fff) AM_WRITE(c140_w)
 	AM_RANGE(0x7000, 0x77ff) AM_WRITE(namcos2_dualportram_byte_w) AM_BASE(&mpDualPortRAM)
 	AM_RANGE(0x7800, 0x7fff) AM_WRITE(namcos2_dualportram_byte_w) /* mirror */
 	AM_RANGE(0x8000, 0x9fff) AM_WRITE(SMH_RAM)

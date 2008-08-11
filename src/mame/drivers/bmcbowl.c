@@ -336,8 +336,8 @@ static ADDRESS_MAP_START( bmcbowl_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x092000, 0x09201f) AM_READWRITE(via_r,via_w)
 
 	AM_RANGE(0x093000, 0x093003) AM_WRITE(SMH_NOP)  // related to music
-	AM_RANGE(0x092800, 0x092801) AM_WRITE(AY8910_write_port_0_msb_w		)
-	AM_RANGE(0x092802, 0x092803) AM_READ(AY8910_read_port_0_msb_r) AM_WRITE(AY8910_control_port_0_msb_w	)
+	AM_RANGE(0x092800, 0x092801) AM_WRITE(ay8910_write_port_0_msb_w		)
+	AM_RANGE(0x092802, 0x092803) AM_READ(ay8910_read_port_0_msb_r) AM_WRITE(ay8910_control_port_0_msb_w	)
 	AM_RANGE(0x093802, 0x093803) AM_READ_PORT("IN0")
 	AM_RANGE(0x095000, 0x095fff) AM_RAM AM_BASE((UINT16 **)&stats_ram) AM_SIZE(&stats_ram_size) /* 8 bit */
 	AM_RANGE(0x097000, 0x097001) AM_READ(SMH_NOP)

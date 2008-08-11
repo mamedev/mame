@@ -455,14 +455,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tharrier_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(YM2203_read_port_0_r)
+	AM_RANGE(0x00, 0x00) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0x01, 0x01) AM_READ(ym2203_read_port_0_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tharrier_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tharrier_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1068,8 +1068,8 @@ static WRITE8_HANDLER( raphero_sound_rombank_w )
 static ADDRESS_MAP_START( raphero_sound_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x7fff ) AM_ROM
 	AM_RANGE( 0x8000, 0xbfff ) AM_READ( SMH_BANK1 )
-	AM_RANGE( 0xc000, 0xc000 ) AM_READWRITE( YM2203_status_port_0_r, YM2203_control_port_0_w )
-	AM_RANGE( 0xc001, 0xc001 ) AM_READWRITE( YM2203_read_port_0_r, YM2203_write_port_0_w )
+	AM_RANGE( 0xc000, 0xc000 ) AM_READWRITE( ym2203_status_port_0_r, ym2203_control_port_0_w )
+	AM_RANGE( 0xc001, 0xc001 ) AM_READWRITE( ym2203_read_port_0_r, ym2203_write_port_0_w )
 	AM_RANGE( 0xc800, 0xc800 ) AM_READWRITE( okim6295_status_0_r, okim6295_data_0_w )
 	AM_RANGE( 0xc808, 0xc808 ) AM_READWRITE( okim6295_status_1_r, okim6295_data_1_w )
 	AM_RANGE( 0xc810, 0xc817 ) AM_WRITE( NMK112_okibank_w )
@@ -1096,16 +1096,16 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( macross2_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(YM2203_status_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(YM2203_read_port_0_r)
+	AM_RANGE(0x00, 0x00) AM_READ(ym2203_status_port_0_r)
+	AM_RANGE(0x01, 0x01) AM_READ(ym2203_read_port_0_r)
 	AM_RANGE(0x80, 0x80) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0x88, 0x88) AM_READ(okim6295_status_1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( macross2_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(okim6295_data_0_w)
 	AM_RANGE(0x88, 0x88) AM_WRITE(okim6295_data_1_w)
 	AM_RANGE(0x90, 0x97) AM_WRITE(NMK112_okibank_w)
@@ -4720,8 +4720,8 @@ static ADDRESS_MAP_START( afega_sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM									// RAM
 	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)					// From Main CPU
-	AM_RANGE(0xf808, 0xf808) AM_WRITE(YM2151_register_port_0_w)		// YM2151
-	AM_RANGE(0xf809, 0xf809) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)	// YM2151
+	AM_RANGE(0xf808, 0xf808) AM_WRITE(ym2151_register_port_0_w)		// YM2151
+	AM_RANGE(0xf809, 0xf809) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)	// YM2151
 	AM_RANGE(0xf80a, 0xf80a) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)		// M6295
 ADDRESS_MAP_END
 

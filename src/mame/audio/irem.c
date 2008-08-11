@@ -68,17 +68,17 @@ static WRITE8_HANDLER( m6803_port2_w )
 		{
 			/* PSG 0 or 1? */
 			if (port2 & 0x08)
-				AY8910_control_port_0_w(machine, 0, port1);
+				ay8910_control_port_0_w(machine, 0, port1);
 			if (port2 & 0x10)
-				AY8910_control_port_1_w(machine, 0, port1);
+				ay8910_control_port_1_w(machine, 0, port1);
 		}
 		else
 		{
 			/* PSG 0 or 1? */
 			if (port2 & 0x08)
-				AY8910_write_port_0_w(machine, 0, port1);
+				ay8910_write_port_0_w(machine, 0, port1);
 			if (port2 & 0x10)
-				AY8910_write_port_1_w(machine, 0, port1);
+				ay8910_write_port_1_w(machine, 0, port1);
 		}
 	}
 	port2 = data;
@@ -96,9 +96,9 @@ static READ8_HANDLER( m6803_port1_r )
 {
 	/* PSG 0 or 1? */
 	if (port2 & 0x08)
-		return AY8910_read_port_0_r(machine, 0);
+		return ay8910_read_port_0_r(machine, 0);
 	if (port2 & 0x10)
-		return AY8910_read_port_1_r(machine, 0);
+		return ay8910_read_port_1_r(machine, 0);
 	return 0xff;
 }
 

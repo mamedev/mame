@@ -241,7 +241,7 @@ static emu_timer *combasc_interleave_timer;
 static READ8_HANDLER ( combasc_YM2203_status_port_0_r )
 {
 	static int boost = 1;
-	int status = YM2203_status_port_0_r(machine,0);
+	int status = ym2203_status_port_0_r(machine,0);
 
 	if (activecpu_get_pc() == 0x334)
 	{
@@ -320,8 +320,8 @@ static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)					/* ROM */
 	AM_RANGE(0x8000, 0x87ef) AM_READ(SMH_RAM)					/* RAM */
 	AM_RANGE(0x87f0, 0x87ff) AM_READ(SMH_RAM)					/* ??? */
-	AM_RANGE(0x9000, 0x9000) AM_READ(YM2203_status_port_0_r)		/* YM 2203 */
-	AM_RANGE(0x9008, 0x9008) AM_READ(YM2203_status_port_0_r)		/* ??? */
+	AM_RANGE(0x9000, 0x9000) AM_READ(ym2203_status_port_0_r)		/* YM 2203 */
+	AM_RANGE(0x9008, 0x9008) AM_READ(ym2203_status_port_0_r)		/* ??? */
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)				/* soundlatch_r? */
 	AM_RANGE(0x8800, 0xfffb) AM_READ(SMH_ROM)					/* ROM? */
 	AM_RANGE(0xfffc, 0xffff) AM_READ(SMH_RAM)					/* ??? */
@@ -331,8 +331,8 @@ static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)				/* ROM */
 	AM_RANGE(0x8000, 0x87ef) AM_WRITE(SMH_RAM)				/* RAM */
 	AM_RANGE(0x87f0, 0x87ff) AM_WRITE(SMH_RAM)				/* ??? */
- 	AM_RANGE(0x9000, 0x9000) AM_WRITE(YM2203_control_port_0_w)/* YM 2203 */
-	AM_RANGE(0x9001, 0x9001) AM_WRITE(YM2203_write_port_0_w)	/* YM 2203 */
+ 	AM_RANGE(0x9000, 0x9000) AM_WRITE(ym2203_control_port_0_w)/* YM 2203 */
+	AM_RANGE(0x9001, 0x9001) AM_WRITE(ym2203_write_port_0_w)	/* YM 2203 */
 	//AM_RANGE(0x9800, 0x9800) AM_WRITE(combasc_unknown_w_1)    /* OKIM5205? */
 	//AM_RANGE(0xa800, 0xa800) AM_WRITE(combasc_unknown_w_2)    /* OKIM5205? */
 	AM_RANGE(0x8800, 0xfffb) AM_WRITE(SMH_ROM)				/* ROM */
@@ -354,8 +354,8 @@ static ADDRESS_MAP_START( combasc_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(combasc_play_w)			/* upd7759 play voice */
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(upd7759_0_port_w)		/* upd7759 voice select */
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(combasc_voice_reset_w)	/* upd7759 reset? */
- 	AM_RANGE(0xe000, 0xe000) AM_WRITE(YM2203_control_port_0_w)/* YM 2203 */
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(YM2203_write_port_0_w)	/* YM 2203 */
+ 	AM_RANGE(0xe000, 0xe000) AM_WRITE(ym2203_control_port_0_w)/* YM 2203 */
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym2203_write_port_0_w)	/* YM 2203 */
 ADDRESS_MAP_END
 
 

@@ -475,10 +475,10 @@ static INTERRUPT_GEN ( sound_interrupt ) { if (!nmimask) cpunum_set_input_line(m
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
 //  AM_RANGE(0x1000, 0x1000) AM_WRITE(nmiack_w)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(AY8910_control_port_1_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x8000, 0x8000) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(nmimask_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM

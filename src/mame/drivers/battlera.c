@@ -96,8 +96,8 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( YM2203_w )
 {
 	switch (offset) {
-	case 0: YM2203_control_port_0_w(machine,0,data); break;
-	case 1: YM2203_write_port_0_w(machine,0,data); break;
+	case 0: ym2203_control_port_0_w(machine,0,data); break;
+	case 1: ym2203_write_port_0_w(machine,0,data); break;
 	}
 }
 
@@ -129,7 +129,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
  	AM_RANGE(0x000000, 0x00ffff) AM_ROM
 	AM_RANGE(0x040000, 0x040001) AM_WRITE(YM2203_w)
 	AM_RANGE(0x080000, 0x080001) AM_WRITE(battlera_adpcm_data_w)
-	AM_RANGE(0x1fe800, 0x1fe80f) AM_WRITE(C6280_0_w)
+	AM_RANGE(0x1fe800, 0x1fe80f) AM_WRITE(c6280_0_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_RAMBANK(7) /* Main ram */
 	AM_RANGE(0x1ff000, 0x1ff001) AM_READWRITE(soundlatch_r, battlera_adpcm_reset_w)
 	AM_RANGE(0x1ff400, 0x1ff403) AM_WRITE(H6280_irq_status_w)

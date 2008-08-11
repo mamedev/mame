@@ -786,7 +786,7 @@ static ADDRESS_MAP_START( kyros_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xe002, 0xe002) AM_WRITE(soundlatch_clear_w)
-	AM_RANGE(0xe004, 0xe004) AM_WRITE(DAC_0_signed_data_w)
+	AM_RANGE(0xe004, 0xe004) AM_WRITE(dac_0_signed_data_w)
 	AM_RANGE(0xe006, 0xe00e) AM_WRITE(SMH_NOP) // soundboard I/O's, ignored
 /* reference only
     AM_RANGE(0xe006, 0xe006) AM_WRITE(SMH_NOP) // NMI: diminishing saw-tooth
@@ -802,7 +802,7 @@ static ADDRESS_MAP_START( sstingry_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc100, 0xc100) AM_READ(soundlatch_r)
 	AM_RANGE(0xc102, 0xc102) AM_WRITE(soundlatch_clear_w)
-	AM_RANGE(0xc104, 0xc104) AM_WRITE(DAC_0_signed_data_w)
+	AM_RANGE(0xc104, 0xc104) AM_WRITE(dac_0_signed_data_w)
 	AM_RANGE(0xc106, 0xc10e) AM_WRITENOP // soundboard I/O's, ignored
 ADDRESS_MAP_END
 
@@ -814,8 +814,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( alpha68k_I_s_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(soundlatch_r, soundlatch_clear_w)
-	AM_RANGE(0xe800, 0xe800) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3812_write_port_0_w)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xfc00, 0xfc00) AM_RAM // unknown port
 ADDRESS_MAP_END
@@ -830,36 +830,36 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_r, soundlatch_clear_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(DAC_0_signed_data_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(YM2413_register_port_0_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(YM2413_data_port_0_w)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(YM2203_write_port_0_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(dac_0_signed_data_w)
+	AM_RANGE(0x0a, 0x0a) AM_WRITE(ym2413_register_port_0_w)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(ym2413_data_port_0_w)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x0d, 0x0d) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0x0e, 0x0e) AM_WRITE(sound_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kyros_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(YM2203_write_port_1_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(YM2203_control_port_1_w)
-	AM_RANGE(0x90, 0x90) AM_WRITE(YM2203_write_port_2_w)
-	AM_RANGE(0x91, 0x91) AM_WRITE(YM2203_control_port_2_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x11, 0x11) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(ym2203_write_port_1_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE(ym2203_control_port_1_w)
+	AM_RANGE(0x90, 0x90) AM_WRITE(ym2203_write_port_2_w)
+	AM_RANGE(0x91, 0x91) AM_WRITE(ym2203_control_port_2_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jongbou_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(soundlatch_clear_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tnexspce_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(YM3812_status_port_0_r, YM3812_control_port_0_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(ym3812_write_port_0_w)
 	AM_RANGE(0x3b, 0x3b) AM_READNOP // unknown read port
 	AM_RANGE(0x3d, 0x3d) AM_READNOP // unknown read port
 	AM_RANGE(0x7b, 0x7b) AM_READNOP // unknown read port

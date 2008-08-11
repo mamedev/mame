@@ -1,5 +1,7 @@
-#ifndef CUSTOM_H
-#define CUSTOM_H
+#pragma once
+
+#ifndef __CUSTOM_H__
+#define __CUSTOM_H__
 
 typedef struct _custom_sound_interface custom_sound_interface;
 struct _custom_sound_interface
@@ -13,4 +15,4 @@ struct _custom_sound_interface
 void *custom_get_token(int index);
 
 
-#endif
+#endif /* __CUSTOM_H__ */

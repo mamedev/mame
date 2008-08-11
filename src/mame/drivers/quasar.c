@@ -160,7 +160,7 @@ static READ8_HANDLER( Quasar_T1_r )
 
 static WRITE8_HANDLER( Quasar_DAC_w )
 {
-	DAC_0_signed_data_w(machine,0,data);
+	dac_0_signed_data_w(machine,0,data);
 }
 
 // memory map taken from the manual

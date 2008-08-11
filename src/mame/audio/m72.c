@@ -203,6 +203,6 @@ READ8_HANDLER( m72_sample_r )
 
 WRITE8_HANDLER( m72_sample_w )
 {
-	DAC_signed_data_w(0,data);
+	dac_signed_data_w(0,data);
 	sample_addr = (sample_addr + 1) & (memory_region_length(machine, "samples") - 1);
 }

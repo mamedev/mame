@@ -316,8 +316,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(YM3526_control_port_0_w)
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(YM3526_write_port_0_w)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(ym3526_control_port_0_w)
+	AM_RANGE(0x1001, 0x1001) AM_WRITE(ym3526_write_port_0_w)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(firetrap_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2400, 0x2400) AM_WRITE(firetrap_sound_2400_w)
 	AM_RANGE(0x2800, 0x2800) AM_WRITE(firetrap_sound_bankselect_w)

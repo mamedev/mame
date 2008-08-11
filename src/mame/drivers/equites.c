@@ -557,10 +557,10 @@ static void equites_update_dac(void)
 	// Note that PB0 goes through three filters while PB1 only goes through one.
 
 	if (equites_8155_portb & 1)
-		DAC_signed_data_w(0, equites_dac_latch);
+		dac_signed_data_w(0, equites_dac_latch);
 
 	if (equites_8155_portb & 2)
-		DAC_signed_data_w(1, equites_dac_latch);
+		dac_signed_data_w(1, equites_dac_latch);
 }
 
 static WRITE8_HANDLER(equites_dac_latch_w)
@@ -754,8 +754,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
 	AM_RANGE(0xc080, 0xc08d) AM_WRITE(msm5232_0_w)
-	AM_RANGE(0xc0a0, 0xc0a0) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0xc0a1, 0xc0a1) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0xc0a0, 0xc0a0) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xc0a1, 0xc0a1) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0xc0b0, 0xc0b0) AM_WRITENOP // n.c.
 	AM_RANGE(0xc0c0, 0xc0c0) AM_WRITE(equites_cymbal_ctrl_w)
 	AM_RANGE(0xc0d0, 0xc0d0) AM_WRITE(equites_dac_latch_w)	// followed by 1 (and usually 0) on 8155 port B

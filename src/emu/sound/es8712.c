@@ -264,11 +264,11 @@ static void es8712_reset(void *chip_src)
 
 /****************************************************************************
 
-    ES8712_set_bank_base -- set the base of the bank on a given chip
+    es8712_set_bank_base -- set the base of the bank on a given chip
 
 *****************************************************************************/
 
-void ES8712_set_bank_base(int which, int base)
+void es8712_set_bank_base(int which, int base)
 {
 	struct es8712 *chip = sndti_token(SOUND_ES8712, which);
 	stream_update(chip->stream);
@@ -278,11 +278,11 @@ void ES8712_set_bank_base(int which, int base)
 
 /****************************************************************************
 
-    ES8712_set_frequency -- dynamically adjusts the frequency of a given ADPCM chip
+    es8712_set_frequency -- dynamically adjusts the frequency of a given ADPCM chip
 
 *****************************************************************************/
 
-void ES8712_set_frequency(int which, int frequency)
+void es8712_set_frequency(int which, int frequency)
 {
 	struct es8712 *chip = sndti_token(SOUND_ES8712, which);
 
@@ -295,11 +295,11 @@ void ES8712_set_frequency(int which, int frequency)
 
 /**********************************************************************************************
 
-    ES8712_play -- Begin playing the addressed sample
+    es8712_play -- Begin playing the addressed sample
 
 ***********************************************************************************************/
 
-void ES8712_play(int which)
+void es8712_play(int which)
 {
 	struct es8712 *chip = sndti_token(SOUND_ES8712, which);
 
@@ -337,8 +337,8 @@ void ES8712_play(int which)
 
 /**********************************************************************************************
 
-     ES8712_data_0_w -- generic data write functions
-     ES8712_data_1_w
+     es8712_data_0_w -- generic data write functions
+     es8712_data_1_w
 
 ***********************************************************************************************/
 
@@ -377,59 +377,59 @@ static void ES8712_data_w(int which, int offset, UINT32 data)
 		case 05:	chip->end   &= 0x0000ffff;
 					chip->end   |= ((data & 0x0f) << 16); break;
 		case 06:
-				ES8712_play(which);
+				es8712_play(which);
 				break;
 		default:	break;
 	}
 	chip->start &= 0xfffff; chip->end &= 0xfffff;
 }
 
-WRITE8_HANDLER( ES8712_data_0_w )
+WRITE8_HANDLER( es8712_data_0_w )
 {
 	ES8712_data_w(0, offset, data);
 }
 
-WRITE8_HANDLER( ES8712_data_1_w )
+WRITE8_HANDLER( es8712_data_1_w )
 {
 	ES8712_data_w(1, offset, data);
 }
 
-WRITE8_HANDLER( ES8712_data_2_w )
+WRITE8_HANDLER( es8712_data_2_w )
 {
 	ES8712_data_w(2, offset, data);
 }
 
-WRITE16_HANDLER( ES8712_data_0_lsb_w )
+WRITE16_HANDLER( es8712_data_0_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
 		ES8712_data_w(0, offset, data & 0xff);
 }
 
-WRITE16_HANDLER( ES8712_data_1_lsb_w )
+WRITE16_HANDLER( es8712_data_1_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
 		ES8712_data_w(1, offset, data & 0xff);
 }
 
-WRITE16_HANDLER( ES8712_data_2_lsb_w )
+WRITE16_HANDLER( es8712_data_2_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
 		ES8712_data_w(2, offset, data & 0xff);
 }
 
-WRITE16_HANDLER( ES8712_data_0_msb_w )
+WRITE16_HANDLER( es8712_data_0_msb_w )
 {
 	if (ACCESSING_BITS_8_15)
 		ES8712_data_w(0, offset, data >> 8);
 }
 
-WRITE16_HANDLER( ES8712_data_1_msb_w )
+WRITE16_HANDLER( es8712_data_1_msb_w )
 {
 	if (ACCESSING_BITS_8_15)
 		ES8712_data_w(1, offset, data >> 8);
 }
 
-WRITE16_HANDLER( ES8712_data_2_msb_w )
+WRITE16_HANDLER( es8712_data_2_msb_w )
 {
 	if (ACCESSING_BITS_8_15)
 		ES8712_data_w(2, offset, data >> 8);

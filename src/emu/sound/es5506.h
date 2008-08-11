@@ -5,8 +5,10 @@
  *
  **********************************************************************************************/
 
-#ifndef ES5506_H
-#define ES5506_H
+#pragma once
+
+#ifndef __ES5506_H__
+#define __ES5506_H__
 
 typedef struct _es5505_interface es5505_interface;
 struct _es5505_interface
@@ -17,13 +19,13 @@ struct _es5505_interface
 	UINT16 (*read_port)(void);			/* input port read */
 };
 
-READ16_HANDLER( ES5505_data_0_r );
-READ16_HANDLER( ES5505_data_1_r );
-WRITE16_HANDLER( ES5505_data_0_w );
-WRITE16_HANDLER( ES5505_data_1_w );
+READ16_HANDLER( es5505_data_0_r );
+READ16_HANDLER( es5505_data_1_r );
+WRITE16_HANDLER( es5505_data_0_w );
+WRITE16_HANDLER( es5505_data_1_w );
 
-void ES5505_voice_bank_0_w(int voice, int bank);
-void ES5505_voice_bank_1_w(int voice, int bank);
+void es5505_voice_bank_0_w(int voice, int bank);
+void es5505_voice_bank_1_w(int voice, int bank);
 
 
 
@@ -38,17 +40,17 @@ struct _es5506_interface
 	UINT16 (*read_port)(void);			/* input port read */
 };
 
-READ8_HANDLER( ES5506_data_0_r );
-READ8_HANDLER( ES5506_data_1_r );
-WRITE8_HANDLER( ES5506_data_0_w );
-WRITE8_HANDLER( ES5506_data_1_w );
+READ8_HANDLER( es5506_data_0_r );
+READ8_HANDLER( es5506_data_1_r );
+WRITE8_HANDLER( es5506_data_0_w );
+WRITE8_HANDLER( es5506_data_1_w );
 
-READ16_HANDLER( ES5506_data_0_word_r );
-READ16_HANDLER( ES5506_data_1_word_r );
-WRITE16_HANDLER( ES5506_data_0_word_w );
-WRITE16_HANDLER( ES5506_data_1_word_w );
+READ16_HANDLER( es5506_data_0_word_r );
+READ16_HANDLER( es5506_data_1_word_r );
+WRITE16_HANDLER( es5506_data_0_word_w );
+WRITE16_HANDLER( es5506_data_1_word_w );
 
-void ES5506_voice_bank_0_w(int voice, int bank);
-void ES5506_voice_bank_1_w(int voice, int bank);
+void es5506_voice_bank_0_w(int voice, int bank);
+void es5506_voice_bank_1_w(int voice, int bank);
 
-#endif
+#endif /* __ES5506_H__ */

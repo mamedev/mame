@@ -146,18 +146,18 @@ static READ16_HANDLER( bishi_mirror_r )
 
 static READ16_HANDLER( bishi_sound_r )
 {
-	return YMZ280B_status_0_r(machine, offset)<<8;
+	return ymz280b_status_0_r(machine, offset)<<8;
 }
 
 static WRITE16_HANDLER( bishi_sound_w )
 {
  	if (offset)
 	{
-		YMZ280B_data_0_w(machine, offset, data>>8);
+		ymz280b_data_0_w(machine, offset, data>>8);
 	}
  	else
 	{
-		YMZ280B_register_0_w(machine, offset, data>>8);
+		ymz280b_register_0_w(machine, offset, data>>8);
 	}
 }
 
@@ -324,7 +324,7 @@ static void sound_irq_gen(running_machine *machine, int state)
 		cpunum_set_input_line(machine, 0, MC68000_IRQ_1, CLEAR_LINE);
 }
 
-static const struct YMZ280Binterface ymz280b_intf =
+static const ymz280b_interface ymz280b_intf =
 {
 	sound_irq_gen
 };

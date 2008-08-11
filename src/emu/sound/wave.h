@@ -1,5 +1,7 @@
-#ifndef WAVE_H
-#define WAVE_H
+#pragma once
+
+#ifndef __WAVE_H__
+#define __WAVE_H__
 
 /*****************************************************************************
  *  CassetteWave interface
@@ -11,6 +13,4 @@
 
 
 
-#endif /* WAVE_H */
-
-
+#endif /* __WAVE_H__ */

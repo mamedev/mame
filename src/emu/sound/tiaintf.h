@@ -1,8 +1,8 @@
-#ifndef TIA_H
-#define TIA_H
+#pragma once
+
+#ifndef __TIAINTF_H__
+#define __TIAINTF_H__
 
 WRITE8_HANDLER( tia_sound_w );
 
-#endif
-
-
+#endif /* __TIAINTF_H__ */

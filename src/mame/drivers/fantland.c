@@ -276,9 +276,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fantland_sound_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0080, 0x0080 ) AM_READ( soundlatch_r )
-	AM_RANGE( 0x0100, 0x0100 ) AM_WRITE( YM2151_register_port_0_w )
-	AM_RANGE( 0x0101, 0x0101 ) AM_READWRITE( YM2151_status_port_0_r, YM2151_data_port_0_w )
-	AM_RANGE( 0x0180, 0x0180 ) AM_WRITE( DAC_0_data_w )
+	AM_RANGE( 0x0100, 0x0100 ) AM_WRITE( ym2151_register_port_0_w )
+	AM_RANGE( 0x0101, 0x0101 ) AM_READWRITE( ym2151_status_port_0_r, ym2151_data_port_0_w )
+	AM_RANGE( 0x0180, 0x0180 ) AM_WRITE( dac_0_data_w )
 ADDRESS_MAP_END
 
 
@@ -383,8 +383,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( wheelrun_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READWRITE( YM3526_status_port_0_r, YM3526_control_port_0_w )
-	AM_RANGE(0xa001, 0xa001) AM_WRITE( YM3526_write_port_0_w )
+	AM_RANGE(0xa000, 0xa000) AM_READWRITE( ym3526_status_port_0_r, ym3526_control_port_0_w )
+	AM_RANGE(0xa001, 0xa001) AM_WRITE( ym3526_write_port_0_w )
 
 	AM_RANGE(0xb000, 0xb000) AM_WRITE( SMH_NOP )	// on a car crash / hit
 	AM_RANGE(0xc000, 0xc000) AM_WRITE( SMH_NOP )	// ""

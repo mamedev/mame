@@ -154,8 +154,8 @@ static ADDRESS_MAP_START( wallc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP
 	AM_RANGE(0xb100, 0xb100) AM_WRITE(wallc_coin_counter_w)
 	AM_RANGE(0xb200, 0xb200) AM_WRITENOP
-	AM_RANGE(0xb500, 0xb500) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0xb600, 0xb600) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0xb500, 0xb500) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xb600, 0xb600) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 

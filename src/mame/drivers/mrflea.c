@@ -242,21 +242,21 @@ static ADDRESS_MAP_START( readport_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( mrflea_data0_w ){
-	AY8910_control_port_0_w( machine, offset, mrflea_select0 );
-	AY8910_write_port_0_w( machine, offset, data );
+	ay8910_control_port_0_w( machine, offset, mrflea_select0 );
+	ay8910_write_port_0_w( machine, offset, data );
 }
 
 static WRITE8_HANDLER( mrflea_data1_w ){
 }
 
 static WRITE8_HANDLER( mrflea_data2_w ){
-	AY8910_control_port_1_w( machine, offset, mrflea_select2 );
-	AY8910_write_port_1_w( machine, offset, data );
+	ay8910_control_port_1_w( machine, offset, mrflea_select2 );
+	ay8910_write_port_1_w( machine, offset, data );
 }
 
 static WRITE8_HANDLER( mrflea_data3_w ){
-	AY8910_control_port_2_w( machine, offset, mrflea_select3 );
-	AY8910_write_port_2_w( machine, offset, data );
+	ay8910_control_port_2_w( machine, offset, mrflea_select3 );
+	ay8910_write_port_2_w( machine, offset, data );
 }
 
 static ADDRESS_MAP_START( writeport_io, ADDRESS_SPACE_IO, 8 )

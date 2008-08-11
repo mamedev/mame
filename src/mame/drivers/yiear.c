@@ -68,15 +68,15 @@ extern WRITE8_HANDLER( konami_SN76496_0_w );
 
 static READ8_HANDLER( yiear_speech_r )
 {
-	if (VLM5030_BSY()) return 1;
+	if (vlm5030_bsy()) return 1;
 	else return 0;
 }
 
 static WRITE8_HANDLER( yiear_VLM5030_control_w )
 {
 	/* bit 0 is latch direction */
-	VLM5030_ST( ( data >> 1 ) & 1 );
-	VLM5030_RST( ( data >> 2 ) & 1 );
+	vlm5030_st( ( data >> 1 ) & 1 );
+	vlm5030_rst( ( data >> 2 ) & 1 );
 }
 
 static INTERRUPT_GEN( yiear_nmi_interrupt )
@@ -92,7 +92,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(konami_SN76496_latch_w)
 	AM_RANGE(0x4900, 0x4900) AM_WRITE(konami_SN76496_0_w)
 	AM_RANGE(0x4a00, 0x4a00) AM_WRITE(yiear_VLM5030_control_w)
-	AM_RANGE(0x4b00, 0x4b00) AM_WRITE(VLM5030_data_w)
+	AM_RANGE(0x4b00, 0x4b00) AM_WRITE(vlm5030_data_w)
 	AM_RANGE(0x4c00, 0x4c00) AM_READ(input_port_3_r)
 	AM_RANGE(0x4d00, 0x4d00) AM_READ(input_port_4_r)
 	AM_RANGE(0x4e00, 0x4e00) AM_READ(input_port_0_r)

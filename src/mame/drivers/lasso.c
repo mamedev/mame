@@ -167,7 +167,7 @@ static ADDRESS_MAP_START( wwjgtin_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_ROM
 	AM_RANGE(0xb000, 0xb000) AM_WRITE(SMH_RAM) AM_BASE(&lasso_chip_data)
 	AM_RANGE(0xb001, 0xb001) AM_WRITE(sound_select_w)
-	AM_RANGE(0xb003, 0xb003) AM_WRITE(DAC_0_data_w)
+	AM_RANGE(0xb003, 0xb003) AM_WRITE(dac_0_data_w)
 	AM_RANGE(0xb004, 0xb004) AM_READ(sound_status_r)
 	AM_RANGE(0xb005, 0xb005) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
@@ -198,12 +198,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pinbo_audio_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_READ(AY8910_read_port_0_r)
-	AM_RANGE(0x04, 0x04) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x06, 0x06) AM_READ(AY8910_read_port_1_r)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x04, 0x04) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x06, 0x06) AM_READ(ay8910_read_port_1_r)
 	AM_RANGE(0x08, 0x08) AM_READWRITE(soundlatch_r, SMH_NOP) /* ??? */
 	AM_RANGE(0x14, 0x14) AM_WRITE(SMH_NOP)	/* ??? */
 ADDRESS_MAP_END

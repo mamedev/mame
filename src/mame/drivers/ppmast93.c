@@ -190,9 +190,9 @@ static WRITE8_HANDLER(ppmast_sound_w)
 {
 	switch(offset&0xff)
 	{
-		case 0: YM2413_register_port_0_w(machine,0,data); break;
-		case 1: YM2413_data_port_0_w(machine,0,data); break;
-		case 2: DAC_0_data_w(machine,0,data);break;
+		case 0: ym2413_register_port_0_w(machine,0,data); break;
+		case 1: ym2413_data_port_0_w(machine,0,data); break;
+		case 2: dac_0_data_w(machine,0,data);break;
 		default: logerror("%x %x - %x\n",offset,data,activecpu_get_previouspc());
 	}
 }

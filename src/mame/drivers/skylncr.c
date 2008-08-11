@@ -182,8 +182,8 @@ static ADDRESS_MAP_START( io_map_skylncr, ADDRESS_SPACE_IO, 8 )
 
 	AM_RANGE(0x20, 0x20) AM_WRITE( skylncr_coin_w )
 
-	AM_RANGE(0x30, 0x30) AM_WRITE( AY8910_control_port_0_w )
-	AM_RANGE(0x31, 0x31) AM_READWRITE( AY8910_read_port_0_r , AY8910_write_port_0_w )
+	AM_RANGE(0x30, 0x30) AM_WRITE( ay8910_control_port_0_w )
+	AM_RANGE(0x31, 0x31) AM_READWRITE( ay8910_read_port_0_r , ay8910_write_port_0_w )
 
 	AM_RANGE(0x40, 0x41) AM_WRITE( skylncr_paletteram_w )
 	AM_RANGE(0x50, 0x51) AM_WRITE( skylncr_paletteram2_w )

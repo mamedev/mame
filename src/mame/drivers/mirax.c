@@ -106,8 +106,8 @@ static WRITE8_HANDLER(ay1_sel)
 {
 	if(activecpu_get_previouspc()==0x309)
 	{
-		AY8910_control_port_0_w(machine,0,nAyCtrl);
-		AY8910_write_port_0_w(machine,0,nAyData);
+		ay8910_control_port_0_w(machine,0,nAyCtrl);
+		ay8910_write_port_0_w(machine,0,nAyData);
 	}
 }
 
@@ -116,8 +116,8 @@ static WRITE8_HANDLER(ay2_sel)
 
 	if(activecpu_get_previouspc()==0x309)
 	{
-		AY8910_control_port_1_w(machine,0,nAyCtrl);
-		AY8910_write_port_1_w(machine,0,nAyData);
+		ay8910_control_port_1_w(machine,0,nAyCtrl);
+		ay8910_write_port_1_w(machine,0,nAyData);
 	}
 }
 

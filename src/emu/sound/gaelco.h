@@ -1,5 +1,7 @@
-#ifndef gaelco_snd_h
-#define gaelco_snd_h
+#pragma once
+
+#ifndef __GALELCO_H__
+#define __GALELCO_H__
 
 typedef struct _gaelcosnd_interface gaelcosnd_interface;
 struct _gaelcosnd_interface
@@ -13,4 +15,4 @@ extern UINT16 *gaelco_sndregs;
 WRITE16_HANDLER( gaelcosnd_w );
 READ16_HANDLER( gaelcosnd_r );
 
-#endif
+#endif /* __GALELCO_H__ */

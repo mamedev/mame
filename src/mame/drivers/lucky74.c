@@ -821,9 +821,9 @@ static ADDRESS_MAP_START( lucky74_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf100, 0xf100) AM_WRITE(sn76496_0_w)											/* SN76489 #1 */
 	AM_RANGE(0xf200, 0xf203) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)	/* Input Ports 2 & 4 */
 	AM_RANGE(0xf300, 0xf300) AM_WRITE(sn76496_1_w)											/* SN76489 #2 */
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(AY8910_control_port_0_w)								/* YM2149 control */
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(ay8910_control_port_0_w)								/* YM2149 control */
 	AM_RANGE(0xf500, 0xf500) AM_WRITE(sn76496_2_w)											/* SN76489 #3 */
-	AM_RANGE(0xf600, 0xf600) AM_READWRITE(AY8910_read_port_0_r, AY8910_write_port_0_w)		/* YM2149 (Input Port 1) */
+	AM_RANGE(0xf600, 0xf600) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)		/* YM2149 (Input Port 1) */
 	AM_RANGE(0xf700, 0xf701) AM_READWRITE(usart_8251_r, usart_8251_w)						/* USART 8251 port */
 	AM_RANGE(0xf800, 0xf803) AM_READWRITE(copro_sm7831_r, copro_sm7831_w)					/* SM7831 Co-Processor */
 ADDRESS_MAP_END

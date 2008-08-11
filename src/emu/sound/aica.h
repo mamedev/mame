@@ -3,8 +3,8 @@
     Sega/Yamaha AICA emulation
 */
 
-#ifndef _AICA_H_
-#define _AICA_H_
+#ifndef __AICA_H__
+#define __AICA_H__
 
 #define MAX_AICA	(2)
 
@@ -15,14 +15,14 @@ struct _aica_interface
 	void (*irq_callback)(running_machine *machine, int state);	/* irq callback */
 };
 
-void AICA_set_ram_base(int which, void *base, int size);
+void aica_set_ram_base(int which, void *base, int size);
 
 // AICA register access
-READ16_HANDLER( AICA_0_r );
-WRITE16_HANDLER( AICA_0_w );
+READ16_HANDLER( aica_0_r );
+WRITE16_HANDLER( aica_0_w );
 
 // MIDI I/O access
-WRITE16_HANDLER( AICA_MidiIn );
-READ16_HANDLER( AICA_MidiOutR );
+WRITE16_HANDLER( aica_midi_in );
+READ16_HANDLER( aica_midi_out_r );
 
-#endif
+#endif /* __AICA_H__ */

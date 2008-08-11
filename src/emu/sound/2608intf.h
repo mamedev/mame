@@ -1,3 +1,5 @@
+#pragma once
+
 #ifndef __2608INTF_H__
 #define __2608INTF_H__
 
@@ -14,23 +16,23 @@ struct _ym2608_interface
 /************************************************/
 /* Chip 0 functions             */
 /************************************************/
-READ8_HANDLER( YM2608_status_port_0_A_r );
-READ8_HANDLER( YM2608_status_port_0_B_r );
-READ8_HANDLER( YM2608_read_port_0_r );
-WRITE8_HANDLER( YM2608_control_port_0_A_w );
-WRITE8_HANDLER( YM2608_control_port_0_B_w );
-WRITE8_HANDLER( YM2608_data_port_0_A_w );
-WRITE8_HANDLER( YM2608_data_port_0_B_w );
+READ8_HANDLER( ym2608_status_port_0_a_r );
+READ8_HANDLER( ym2608_status_port_0_b_r );
+READ8_HANDLER( ym2608_read_port_0_r );
+WRITE8_HANDLER( ym2608_control_port_0_a_w );
+WRITE8_HANDLER( ym2608_control_port_0_b_w );
+WRITE8_HANDLER( ym2608_data_port_0_a_w );
+WRITE8_HANDLER( ym2608_data_port_0_b_w );
 
 /************************************************/
 /* Chip 1 functions             */
 /************************************************/
-READ8_HANDLER( YM2608_status_port_1_A_r );
-READ8_HANDLER( YM2608_status_port_1_B_r );
-READ8_HANDLER( YM2608_read_port_1_r );
-WRITE8_HANDLER( YM2608_control_port_1_A_w );
-WRITE8_HANDLER( YM2608_control_port_1_B_w );
-WRITE8_HANDLER( YM2608_data_port_1_A_w );
-WRITE8_HANDLER( YM2608_data_port_1_B_w );
+READ8_HANDLER( ym2608_status_port_1_a_r );
+READ8_HANDLER( ym2608_status_port_1_b_r );
+READ8_HANDLER( ym2608_read_port_1_r );
+WRITE8_HANDLER( ym2608_control_port_1_a_w );
+WRITE8_HANDLER( ym2608_control_port_1_b_w );
+WRITE8_HANDLER( ym2608_data_port_1_a_w );
+WRITE8_HANDLER( ym2608_data_port_1_b_w );
 
 #endif /* __2608INTF_H__ */

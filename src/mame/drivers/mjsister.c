@@ -37,7 +37,7 @@ static TIMER_CALLBACK( dac_callback )
 {
 	UINT8 *DACROM = memory_region(machine, "samples");
 
-	DAC_data_w(0,DACROM[(dac_bank * 0x10000 + dac_adr++) & 0x1ffff]);
+	dac_data_w(0,DACROM[(dac_bank * 0x10000 + dac_adr++) & 0x1ffff]);
 
 	if (((dac_adr & 0xff00 ) >> 8) !=  dac_adr_e )
 		timer_set(attotime_mul(ATTOTIME_IN_HZ(MCLK), 1024), NULL, 0, dac_callback);
@@ -164,7 +164,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjsister_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x11, 0x11) AM_READ(AY8910_read_port_0_r)
+	AM_RANGE(0x11, 0x11) AM_READ(ay8910_read_port_0_r)
 	AM_RANGE(0x20, 0x20) AM_READ(mjsister_keys_r)
 	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN0")
 ADDRESS_MAP_END
@@ -172,8 +172,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mjsister_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(SMH_NOP) /* HD46505? */
-	AM_RANGE(0x10, 0x10) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(AY8910_write_port_0_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x12, 0x12) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(mjsister_banksel1_w)
 	AM_RANGE(0x31, 0x31) AM_WRITE(mjsister_banksel2_w)
 	AM_RANGE(0x32, 0x32) AM_WRITE(mjsister_input_sel1_w)

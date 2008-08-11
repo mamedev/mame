@@ -1,24 +1,26 @@
-#ifndef VLM5030_h
-#define VLM5030_h
+#pragma once
 
-struct VLM5030interface
+#ifndef __VLM5030_H__
+#define __VLM5030_H__
+
+typedef struct _vlm5030_interface vlm5030_interface;
+struct _vlm5030_interface
 {
 	int memory_size;    /* memory size of speech rom (0=memory region length) */
 };
 
 /* set speech rom address */
-void VLM5030_set_rom(void *speech_rom);
+void vlm5030_set_rom(void *speech_rom);
 
 /* get BSY pin level */
-int VLM5030_BSY(void);
+int vlm5030_bsy(void);
 /* latch contoll data */
-WRITE8_HANDLER( VLM5030_data_w );
+WRITE8_HANDLER( vlm5030_data_w );
 /* set RST pin level : reset / set table address A8-A15 */
-void VLM5030_RST (int pin );
+void vlm5030_rst (int pin );
 /* set VCU pin level : ?? unknown */
-void VLM5030_VCU(int pin );
+void vlm5030_vcu(int pin );
 /* set ST pin level  : set table address A0-A7 / start speech */
-void VLM5030_ST(int pin );
+void vlm5030_st(int pin );
 
-#endif
-
+#endif /* __VLM5030_H__ */

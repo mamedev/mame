@@ -962,20 +962,20 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dec8_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(YM2203_control_port_0_w) /* OPN */
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(YM3812_control_port_0_w) /* OPL */
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(ym2203_control_port_0_w) /* OPN */
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(ym3812_control_port_0_w) /* OPL */
+	AM_RANGE(0x4001, 0x4001) AM_WRITE(ym3812_write_port_0_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
 /* Used by Gondomania, Psycho-Nics Oscar & Garyo Retsuden */
 static ADDRESS_MAP_START( oscar_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x2000, 0x2000) AM_WRITE(YM2203_control_port_0_w) /* OPN */
-	AM_RANGE(0x2001, 0x2001) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(YM3526_control_port_0_w) /* OPL */
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(YM3526_write_port_0_w)
+	AM_RANGE(0x2000, 0x2000) AM_WRITE(ym2203_control_port_0_w) /* OPN */
+	AM_RANGE(0x2001, 0x2001) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(ym3526_control_port_0_w) /* OPL */
+	AM_RANGE(0x4001, 0x4001) AM_WRITE(ym3526_write_port_0_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -988,10 +988,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ym3526_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x05ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(YM2203_control_port_0_w) /* OPN */
-	AM_RANGE(0x0801, 0x0801) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(YM3526_control_port_0_w) /* OPL? */
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(YM3526_write_port_0_w)
+	AM_RANGE(0x0800, 0x0800) AM_WRITE(ym2203_control_port_0_w) /* OPN */
+	AM_RANGE(0x0801, 0x0801) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(ym3526_control_port_0_w) /* OPL? */
+	AM_RANGE(0x1001, 0x1001) AM_WRITE(ym3526_write_port_0_w)
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
@@ -1006,10 +1006,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( csilver_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x0800, 0x0800) AM_WRITE(YM2203_control_port_0_w)
-	AM_RANGE(0x0801, 0x0801) AM_WRITE(YM2203_write_port_0_w)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(YM3526_control_port_0_w)
-	AM_RANGE(0x1001, 0x1001) AM_WRITE(YM3526_write_port_0_w)
+	AM_RANGE(0x0800, 0x0800) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x0801, 0x0801) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(ym3526_control_port_0_w)
+	AM_RANGE(0x1001, 0x1001) AM_WRITE(ym3526_write_port_0_w)
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(csilver_adpcm_data_w)	/* ADPCM data for the MSM5205 chip */
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(csilver_sound_bank_w)
 	AM_RANGE(0x4000, 0xffff) AM_WRITE(SMH_ROM)

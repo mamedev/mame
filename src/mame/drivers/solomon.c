@@ -80,12 +80,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x11, 0x11) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x21, 0x21) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x30, 0x30) AM_WRITE(AY8910_control_port_2_w)
-	AM_RANGE(0x31, 0x31) AM_WRITE(AY8910_write_port_2_w)
+	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x11, 0x11) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x20, 0x20) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x21, 0x21) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x30, 0x30) AM_WRITE(ay8910_control_port_2_w)
+	AM_RANGE(0x31, 0x31) AM_WRITE(ay8910_write_port_2_w)
 ADDRESS_MAP_END
 
 

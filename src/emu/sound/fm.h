@@ -2,8 +2,11 @@
   File: fm.h -- header file for software emulation for FM sound generator
 
 */
-#ifndef _H_FM_FM_
-#define _H_FM_FM_
+
+#pragma once
+
+#ifndef __FM_H__
+#define __FM_H__
 
 /* --- select emulation chips --- */
 #define BUILD_YM2203  (HAS_YM2203)		/* build YM2203(OPN)   emulator */
@@ -47,24 +50,27 @@ struct _ssg_callbacks
 
 #if BUILD_YM2203
   /* in 2203intf.c */
-  void YM2203UpdateRequest(void *param);
-  #define YM2203UpdateReq(chip) YM2203UpdateRequest(chip)
-#endif
+  void ym2203_update_request(void *param);
+  #define ym2203_update_req(chip) ym2203_update_request(chip)
+#endif /* BUILD_YM2203 */
+
 #if BUILD_YM2608
   /* in 2608intf.c */
-  void YM2608UpdateRequest(void *param);
-  #define YM2608UpdateReq(chip) YM2608UpdateRequest(chip);
-#endif
+  void ym2608_update_request(void *param);
+  #define ym2608_update_req(chip) ym2608_update_request(chip);
+#endif /* BUILD_YM2608 */
+
 #if (BUILD_YM2610||BUILD_YM2610B)
   /* in 2610intf.c */
-  void YM2610UpdateRequest(void *param);
-  #define YM2610UpdateReq(chip) YM2610UpdateRequest(chip);
-#endif
+  void ym2610_update_request(void *param);
+  #define ym2610_update_req(chip) ym2610_update_request(chip);
+#endif /* (BUILD_YM2610||BUILD_YM2610B) */
+
 #if (BUILD_YM2612||BUILD_YM3438)
   /* in 2612intf.c */
-  void YM2612UpdateRequest(void *param);
-  #define YM2612UpdateReq(chip) YM2612UpdateRequest(chip);
-#endif
+  void ym2612_update_request(void *param);
+  #define ym2612_update_req(chip) ym2612_update_request(chip);
+#endif /* (BUILD_YM2612||BUILD_YM3438) */
 
 /* compiler dependence */
 #if 0
@@ -76,7 +82,7 @@ typedef unsigned int	UINT32;  /* unsigned 32bit */
 typedef signed char		INT8;    /* signed  8bit   */
 typedef signed short	INT16;   /* signed 16bit   */
 typedef signed int		INT32;   /* signed 32bit   */
-#endif
+#endif /* OSD_CPU_H */
 #endif
 
 #ifndef INLINE
@@ -121,92 +127,93 @@ typedef void (*FM_IRQHANDLER)(void *param,int irq);
 ** 'IRQHandler'    IRQ callback handler when changed IRQ level
 ** return      0 = success
 */
-void * YM2203Init(void *param, int index, int baseclock, int rate,
+void * ym2203_init(void *param, int index, int baseclock, int rate,
                FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
 
 /*
 ** shutdown the YM2203 emulators
 */
-void YM2203Shutdown(void *chip);
+void ym2203_shutdown(void *chip);
 
 /*
 ** reset all chip registers for YM2203 number 'num'
 */
-void YM2203ResetChip(void *chip);
+void ym2203_reset_chip(void *chip);
 
 /*
 ** update one of chip
 */
-void YM2203UpdateOne(void *chip, FMSAMPLE *buffer, int length);
+void ym2203_update_one(void *chip, FMSAMPLE *buffer, int length);
 
 /*
 ** Write
 ** return : InterruptLevel
 */
-int YM2203Write(void *chip,int a,unsigned char v);
+int ym2203_write(void *chip,int a,unsigned char v);
 
 /*
 ** Read
 ** return : InterruptLevel
 */
-unsigned char YM2203Read(void *chip,int a);
+unsigned char ym2203_read(void *chip,int a);
 
 /*
 **  Timer OverFlow
 */
-int YM2203TimerOver(void *chip, int c);
+int ym2203_timer_over(void *chip, int c);
 
 /*
 **  State Save
 */
-void YM2203Postload(void *chip);
+void ym2203_postload(void *chip);
 #endif /* BUILD_YM2203 */
 
 #if BUILD_YM2608
 /* -------------------- YM2608(OPNA) Interface -------------------- */
-void * YM2608Init(void *param, int index, int baseclock, int rate,
+void * ym2608_init(void *param, int index, int baseclock, int rate,
                void *pcmroma,int pcmsizea,
                FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
-void YM2608Shutdown(void *chip);
-void YM2608ResetChip(void *chip);
-void YM2608UpdateOne(void *chip, FMSAMPLE **buffer, int length);
+void ym2608_shutdown(void *chip);
+void ym2608_reset_chip(void *chip);
+void ym2608_update_one(void *chip, FMSAMPLE **buffer, int length);
 
-int YM2608Write(void *chip, int a,unsigned char v);
-unsigned char YM2608Read(void *chip,int a);
-int YM2608TimerOver(void *chip, int c );
-void YM2608Postload(void *chip);
+int ym2608_write(void *chip, int a,unsigned char v);
+unsigned char ym2608_read(void *chip,int a);
+int ym2608_timer_over(void *chip, int c );
+void ym2608_postload(void *chip);
 #endif /* BUILD_YM2608 */
 
 #if (BUILD_YM2610||BUILD_YM2610B)
 /* -------------------- YM2610(OPNB) Interface -------------------- */
-void * YM2610Init(void *param, int index, int baseclock, int rate,
+void * ym2610_init(void *param, int index, int baseclock, int rate,
                void *pcmroma,int pcmasize,void *pcmromb,int pcmbsize,
                FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg);
-void YM2610Shutdown(void *chip);
-void YM2610ResetChip(void *chip);
-void YM2610UpdateOne(void *chip, FMSAMPLE **buffer, int length);
-#if BUILD_YM2610B
-void YM2610BUpdateOne(void *chip, FMSAMPLE **buffer, int length);
-#endif
+void ym2610_shutdown(void *chip);
+void ym2610_reset_chip(void *chip);
+void ym2610_update_one(void *chip, FMSAMPLE **buffer, int length);
 
-int YM2610Write(void *chip, int a,unsigned char v);
-unsigned char YM2610Read(void *chip,int a);
-int YM2610TimerOver(void *chip, int c );
-void YM2610Postload(void *chip);
+#if BUILD_YM2610B
+void ym2610b_update_one(void *chip, FMSAMPLE **buffer, int length);
+#endif /* BUILD_YM2610B */
+
+int ym2610_write(void *chip, int a,unsigned char v);
+unsigned char ym2610_read(void *chip,int a);
+int ym2610_timer_over(void *chip, int c );
+void ym2610_postload(void *chip);
 #endif /* (BUILD_YM2610||BUILD_YM2610B) */
 
 #if (BUILD_YM2612||BUILD_YM3438)
-void * YM2612Init(void *param, int index, int baseclock, int rate,
+void * ym2612_init(void *param, int index, int baseclock, int rate,
                FM_TIMERHANDLER TimerHandler,FM_IRQHANDLER IRQHandler);
-void YM2612Shutdown(void *chip);
-void YM2612ResetChip(void *chip);
-void YM2612UpdateOne(void *chip, FMSAMPLE **buffer, int length);
+void ym2612_shutdown(void *chip);
+void ym2612_reset_chip(void *chip);
+void ym2612_update_one(void *chip, FMSAMPLE **buffer, int length);
 
-int YM2612Write(void *chip, int a,unsigned char v);
-unsigned char YM2612Read(void *chip,int a);
-int YM2612TimerOver(void *chip, int c );
-void YM2612Postload(void *chip);
+int ym2612_write(void *chip, int a,unsigned char v);
+unsigned char ym2612_read(void *chip,int a);
+int ym2612_timer_over(void *chip, int c );
+void ym2612_postload(void *chip);
 #endif /* (BUILD_YM2612||BUILD_YM3438) */
 
 
-#endif /* _H_FM_FM_ */
+#endif /* __FM_H__ */

@@ -120,7 +120,7 @@ static void init_voice( VOICE *v )
 	v->sample_end=0;
 	v->sample_loop=0;
 }
-READ8_HANDLER( C140_r )
+READ8_HANDLER( c140_r )
 {
 	struct c140_info *info = sndti_token(SOUND_C140, 0);
 	offset&=0x1ff;
@@ -185,7 +185,7 @@ static long find_sample(struct c140_info *info, long adrs, long bank, int voice)
 
 	return (newadr);
 }
-WRITE8_HANDLER( C140_w )
+WRITE8_HANDLER( c140_w )
 {
 	struct c140_info *info = sndti_token(SOUND_C140, 0);
 	stream_update(info->stream);
@@ -247,7 +247,7 @@ WRITE8_HANDLER( C140_w )
 	}
 }
 
-void C140_set_base(int which, void *base)
+void c140_set_base(int which, void *base)
 {
 	struct c140_info *info = sndti_token(SOUND_C140, 0);
 	info->pRom = base;

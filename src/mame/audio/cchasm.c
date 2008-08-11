@@ -26,10 +26,10 @@ READ8_HANDLER( cchasm_snd_io_r )
         return sound_flags | coin;
 
     case 0x01:
-        return AY8910_read_port_0_r (machine, offset);
+        return ay8910_read_port_0_r (machine, offset);
 
     case 0x21:
-        return AY8910_read_port_1_r (machine, offset);
+        return ay8910_read_port_1_r (machine, offset);
 
     case 0x40:
         return soundlatch_r (machine, offset);
@@ -49,19 +49,19 @@ WRITE8_HANDLER( cchasm_snd_io_w )
     switch (offset & 0x61 )
     {
     case 0x00:
-        AY8910_control_port_0_w (machine, offset, data);
+        ay8910_control_port_0_w (machine, offset, data);
         break;
 
     case 0x01:
-        AY8910_write_port_0_w (machine, offset, data);
+        ay8910_write_port_0_w (machine, offset, data);
         break;
 
     case 0x20:
-        AY8910_control_port_1_w (machine, offset, data);
+        ay8910_control_port_1_w (machine, offset, data);
         break;
 
     case 0x21:
-        AY8910_write_port_1_w (machine, offset, data);
+        ay8910_write_port_1_w (machine, offset, data);
         break;
 
     case 0x40:
@@ -142,7 +142,7 @@ static WRITE8_HANDLER( ctc_timer_1_w )
     {
         output[0] ^= 0x7f;
         channel_active[0] = 1;
-        DAC_data_w(0, output[0]);
+        dac_data_w(0, output[0]);
     }
 }
 
@@ -152,7 +152,7 @@ static WRITE8_HANDLER( ctc_timer_2_w )
     {
         output[1] ^= 0x7f;
         channel_active[1] = 1;
-        DAC_data_w(1, output[0]);
+        dac_data_w(1, output[0]);
     }
 }
 

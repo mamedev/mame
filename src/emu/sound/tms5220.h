@@ -1,5 +1,7 @@
-#ifndef tms5220_h
-#define tms5220_h
+#pragma once
+
+#ifndef __TMS5220_H__
+#define __TMS5220_H__
 
 void *tms5220_create(int index);
 void tms5220_destroy(void *chip);
@@ -21,14 +23,13 @@ void tms5220_set_load_address(void *chip, void (*func)(int));
 void tms5220_set_read_and_branch(void *chip, void (*func)(void));
 
 
-
-typedef enum
+enum _tms5220_variant
 {
 	variant_tms5220,	/* TMS5220_IS_TMS5220, TMS5220_IS_TMS5220C,  TMS5220_IS_TSP5220C */
 	variant_tmc0285		/* TMS5220_IS_TMS5200, TMS5220_IS_CD2501 */
-} tms5220_variant;
+};
+typedef enum _tms5220_variant tms5220_variant;
 
 void tms5220_set_variant(void *chip, tms5220_variant new_variant);
 
-#endif
-
+#endif /* __TMS5220_H__ */

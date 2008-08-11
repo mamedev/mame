@@ -138,8 +138,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)	/* Sound latch read */
 //  AM_RANGE(0xd000, 0xd000) AM_WRITE(SMH_NOP)      /* ??? */
 	AM_RANGE(0xe000, 0xe000) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)		/* M6295 */
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(YM2151_register_port_0_w)							/* YM2151 */
-	AM_RANGE(0xf001, 0xf001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)	/* YM2151 */
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(ym2151_register_port_0_w)							/* YM2151 */
+	AM_RANGE(0xf001, 0xf001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)	/* YM2151 */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )

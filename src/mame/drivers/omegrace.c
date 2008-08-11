@@ -373,10 +373,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_port, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_r, AY8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(AY8910_write_port_1_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_r, ay8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ay8910_write_port_1_w)
 ADDRESS_MAP_END
 
 

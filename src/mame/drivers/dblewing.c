@@ -332,10 +332,10 @@ static WRITE8_HANDLER( YM2151_w )
 {
 	switch (offset) {
 	case 0:
-		YM2151_register_port_0_w(0,data);
+		ym2151_register_port_0_w(0,data);
 		break;
 	case 1:
-		YM2151_data_port_0_w(0,data);
+		ym2151_data_port_0_w(0,data);
 		break;
 	}
 }
@@ -345,7 +345,7 @@ static WRITE8_HANDLER( YM2151_w )
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-//  AM_RANGE(0xa000, 0xa001) AM_READWRITE(YM2151_status_port_0_r,YM2151_w)
+//  AM_RANGE(0xa000, 0xa001) AM_READWRITE(ym2151_status_port_0_r,YM2151_w)
 //  AM_RANGE(0xb000, 0xb000) AM_READ(okim6295_status_0_r)
 //  AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END

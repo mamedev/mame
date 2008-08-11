@@ -244,9 +244,9 @@ static WRITE8_HANDLER( ym2151_data_latch_w )
 {
 	/* bit 7 of the sound control selects which port */
 	if (sound_control & 0x80)
-		YM2151_data_port_0_w(machine, offset, data);
+		ym2151_data_port_0_w(machine, offset, data);
 	else
-		YM2151_register_port_0_w(machine, offset, data);
+		ym2151_register_port_0_w(machine, offset, data);
 }
 
 
@@ -280,7 +280,7 @@ static WRITE8_HANDLER( sound_slave_dac_w )
 {
 	/* DAC A is used to modulate DAC B */
 	dac_value[offset & 1] = data;
-	DAC_data_16_w(0, (dac_value[0] ^ 0xff) * dac_value[1]);
+	dac_data_16_w(0, (dac_value[0] ^ 0xff) * dac_value[1]);
 }
 
 

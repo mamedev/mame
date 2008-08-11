@@ -1,5 +1,7 @@
-#ifndef HC55516_H
-#define HC55516_H
+#pragma once
+
+#ifndef __HC55516_H__
+#define __HC55516_H__
 
 
 /* sets the digit (0 or 1) */
@@ -33,4 +35,4 @@ WRITE8_HANDLER( hc55516_1_digit_clock_clear_w );
 READ8_HANDLER ( hc55516_1_clock_state_r );
 
 
-#endif
+#endif /* __HC55516_H__ */

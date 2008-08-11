@@ -260,12 +260,12 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
 	AM_RANGE(0x3000, 0x3000) AM_READWRITE(soundlatch_r,interrupt_enable_w)	/* Stinger/Scion */
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(AY8910_control_port_2_w)
-	AM_RANGE(0x4001, 0x4001) AM_WRITE(AY8910_write_port_2_w)
-	AM_RANGE(0x5000, 0x5000) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x5001, 0x5001) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(AY8910_control_port_1_w)				/* Wiz only */
-	AM_RANGE(0x6001, 0x6001) AM_WRITE(AY8910_write_port_1_w)				/* Wiz only */
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(ay8910_control_port_2_w)
+	AM_RANGE(0x4001, 0x4001) AM_WRITE(ay8910_write_port_2_w)
+	AM_RANGE(0x5000, 0x5000) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x5001, 0x5001) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x6000, 0x6000) AM_WRITE(ay8910_control_port_1_w)				/* Wiz only */
+	AM_RANGE(0x6001, 0x6001) AM_WRITE(ay8910_write_port_1_w)				/* Wiz only */
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(soundlatch_r,interrupt_enable_w)	/* Wiz */
 ADDRESS_MAP_END
 

@@ -441,9 +441,9 @@ static WRITE8_HANDLER( metro_portb_w )
 		{
 			/* write */
 			if (BIT(data,1))
-				YM2413_data_port_0_w(machine,0,porta);
+				ym2413_data_port_0_w(machine,0,porta);
 			else
-				YM2413_register_port_0_w(machine,0,porta);
+				ym2413_register_port_0_w(machine,0,porta);
 		}
 		portb = data;
 		return;
@@ -485,15 +485,15 @@ static WRITE8_HANDLER( daitorid_portb_w )
 		{
 			/* write */
 			if (BIT(data,1))
-				YM2151_data_port_0_w(machine,0,porta);
+				ym2151_data_port_0_w(machine,0,porta);
 			else
-				YM2151_register_port_0_w(machine,0,porta);
+				ym2151_register_port_0_w(machine,0,porta);
 		}
 		if (!BIT(data,3))
 		{
 			/* read */
 			if (BIT(data,1))
-				porta = YM2151_status_port_0_r(machine,0);
+				porta = ym2151_status_port_0_r(machine,0);
 		}
 		portb = data;
 		return;
@@ -527,7 +527,7 @@ static const ym2151_interface ym2151_config =
 
 static READ16_HANDLER( ymf278b_r )
 {
-	return YMF278B_status_port_0_r(machine, 0);
+	return ymf278b_status_port_0_r(machine, 0);
 }
 
 static WRITE16_HANDLER( ymf278b_w )
@@ -536,28 +536,28 @@ static WRITE16_HANDLER( ymf278b_w )
 		switch(offset)
 		{
 			case 0:
-				YMF278B_control_port_0_A_w(machine, 0, data);
+				ymf278b_control_port_0_a_w(machine, 0, data);
 				break;
 			case 1:
-				YMF278B_data_port_0_A_w(machine, 0, data);
+				ymf278b_data_port_0_a_w(machine, 0, data);
 				break;
 			case 2:
-				YMF278B_control_port_0_B_w(machine, 0, data);
+				ymf278b_control_port_0_b_w(machine, 0, data);
 				break;
 			case 3:
-				YMF278B_data_port_0_B_w(machine, 0, data);
+				ymf278b_data_port_0_b_w(machine, 0, data);
 				break;
 			case 4:
-				YMF278B_control_port_0_C_w(machine, 0, data);
+				ymf278b_control_port_0_c_w(machine, 0, data);
 				break;
 			case 5:
-				YMF278B_data_port_0_C_w(machine, 0, data);
+				ymf278b_data_port_0_c_w(machine, 0, data);
 				break;
 		}
 }
 
 
-static const struct YMF278B_interface ymf278b_interface =
+static const ymf278b_interface ymf278b_config =
 {
 	ymf278b_interrupt
 };
@@ -1477,8 +1477,8 @@ static ADDRESS_MAP_START( gakusai_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x279700, 0x279713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(SMH_NOP						)	// ? 5
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(gakusai_oki_bank_lo_w			)	// Sound
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(YM2413_register_port_0_lsb_w	)
-	AM_RANGE(0x600002, 0x600003) AM_WRITE(YM2413_data_port_0_lsb_w		)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(ym2413_register_port_0_lsb_w	)
+	AM_RANGE(0x600002, 0x600003) AM_WRITE(ym2413_data_port_0_lsb_w		)
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(okim6295_data_0_lsb_w 		)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(gakusai_eeprom_w				)	// EEPROM
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(gakusai_oki_bank_hi_w			)
@@ -1534,8 +1534,8 @@ static ADDRESS_MAP_START( gakusai2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(gakusai_oki_bank_lo_w			)	// Sound
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(gakusai_oki_bank_hi_w			)
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(okim6295_data_0_lsb_w 		)
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(YM2413_register_port_0_lsb_w	)
-	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(YM2413_data_port_0_lsb_w		)
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(ym2413_register_port_0_lsb_w	)
+	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(ym2413_data_port_0_lsb_w		)
 	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(gakusai_eeprom_w				)	// EEPROM
 ADDRESS_MAP_END
 
@@ -1616,8 +1616,8 @@ static ADDRESS_MAP_START( dokyusp_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x279700, 0x279713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
 	AM_RANGE(0x400000, 0x400001) AM_WRITE(SMH_NOP						)	// ? 5
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(gakusai_oki_bank_lo_w			)	// Sound
-	AM_RANGE(0x600000, 0x600001) AM_WRITE(YM2413_register_port_0_lsb_w	)
-	AM_RANGE(0x600002, 0x600003) AM_WRITE(YM2413_data_port_0_lsb_w		)
+	AM_RANGE(0x600000, 0x600001) AM_WRITE(ym2413_register_port_0_lsb_w	)
+	AM_RANGE(0x600002, 0x600003) AM_WRITE(ym2413_data_port_0_lsb_w		)
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(okim6295_data_0_lsb_w 		)
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(dokyusp_eeprom_reset_w		)	// EEPROM
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(dokyusp_eeprom_bit_w			)	// EEPROM
@@ -1671,8 +1671,8 @@ static ADDRESS_MAP_START( dokyusei_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(gakusai_oki_bank_hi_w			)	// Samples Bank?
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(SMH_NOP						)	// ? 4
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(gakusai_oki_bank_lo_w			)	// Samples Bank
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(YM2413_register_port_0_lsb_w	)	// Sound
-	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(YM2413_data_port_0_lsb_w		)	//
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(ym2413_register_port_0_lsb_w	)	// Sound
+	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(ym2413_data_port_0_lsb_w		)	//
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(okim6295_data_0_lsb_w			)	//
 ADDRESS_MAP_END
 
@@ -1959,18 +1959,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( blzntrnd_sound_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r)
-	AM_RANGE(0x80, 0x80) AM_READ(YM2610_status_port_0_A_r)
-	AM_RANGE(0x82, 0x82) AM_READ(YM2610_status_port_0_B_r)
+	AM_RANGE(0x80, 0x80) AM_READ(ym2610_status_port_0_a_r)
+	AM_RANGE(0x82, 0x82) AM_READ(ym2610_status_port_0_b_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blzntrnd_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(blzntrnd_sh_bankswitch_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x80, 0x80) AM_WRITE(YM2610_control_port_0_A_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(YM2610_data_port_0_A_w)
-	AM_RANGE(0x82, 0x82) AM_WRITE(YM2610_control_port_0_B_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE(YM2610_data_port_0_B_w)
+	AM_RANGE(0x80, 0x80) AM_WRITE(ym2610_control_port_0_a_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE(ym2610_data_port_0_a_w)
+	AM_RANGE(0x82, 0x82) AM_WRITE(ym2610_control_port_0_b_w)
+	AM_RANGE(0x83, 0x83) AM_WRITE(ym2610_data_port_0_b_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( blzntrnd_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -2069,8 +2069,8 @@ static ADDRESS_MAP_START( mouja_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478850, 0x47885b) AM_WRITE(SMH_RAM) AM_BASE(&metro_scroll		)	// Scroll Regs
 	AM_RANGE(0x478888, 0x478889) AM_WRITE(SMH_NOP)								// ??
 	AM_RANGE(0x479700, 0x479713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
-	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(YM2413_register_port_0_lsb_w	)
-	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(YM2413_data_port_0_lsb_w		)
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(ym2413_register_port_0_lsb_w	)
+	AM_RANGE(0xc00002, 0xc00003) AM_WRITE(ym2413_data_port_0_lsb_w		)
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(mouja_sound_rombank_w			)
 	AM_RANGE(0xd00000, 0xd00001) AM_WRITE(okim6295_data_0_msb_w  		)
 
@@ -2104,8 +2104,8 @@ static ADDRESS_MAP_START( puzzlet_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x470000, 0x47dfff ) AM_RAM
 
 	AM_RANGE( 0x500000, 0x500001 ) AM_READWRITE( okim6295_status_0_msb_r, okim6295_data_0_msb_w )
-	AM_RANGE( 0x580000, 0x580001 ) AM_WRITE( YM2413_register_port_0_msb_w )
-	AM_RANGE( 0x580002, 0x580003 ) AM_WRITE( YM2413_data_port_0_msb_w )
+	AM_RANGE( 0x580000, 0x580001 ) AM_WRITE( ym2413_register_port_0_msb_w )
+	AM_RANGE( 0x580002, 0x580003 ) AM_WRITE( ym2413_data_port_0_msb_w )
 
 	AM_RANGE( 0x700000, 0x71ffff ) AM_READWRITE( SMH_RAM, metro_vram_0_w ) AM_BASE( &metro_vram_0 )	// Layer 0
 	AM_RANGE( 0x720000, 0x73ffff ) AM_READWRITE( SMH_RAM, metro_vram_1_w ) AM_BASE( &metro_vram_1 )	// Layer 1
@@ -3782,7 +3782,7 @@ static MACHINE_DRIVER_START( balcube )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MDRV_SOUND_CONFIG(ymf278b_interface)
+	MDRV_SOUND_CONFIG(ymf278b_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -3815,7 +3815,7 @@ static MACHINE_DRIVER_START( bangball )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MDRV_SOUND_CONFIG(ymf278b_interface)
+	MDRV_SOUND_CONFIG(ymf278b_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
@@ -3848,7 +3848,7 @@ static MACHINE_DRIVER_START( batlbubl )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MDRV_SOUND_CONFIG(ymf278b_interface)
+	MDRV_SOUND_CONFIG(ymf278b_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END

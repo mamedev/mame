@@ -149,13 +149,13 @@ static MACHINE_START( exctsccr )
 // Champion Baseball has only one DAC
 static WRITE8_HANDLER( champbas_dac_w )
 {
-	DAC_signed_data_w(0, data << 2);
+	dac_signed_data_w(0, data << 2);
 }
 
 // Exciting Soccer has two
 static WRITE8_HANDLER( exctsccr_DAC_data_w )
 {
-	DAC_signed_data_w(offset, data << 2);
+	dac_signed_data_w(offset, data << 2);
 }
 
 
@@ -217,8 +217,8 @@ AB 1010_1011
 static ADDRESS_MAP_START( talbot_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1) /* MCU shared RAM */
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x7001, 0x7001) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x7001, 0x7001) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(&champbas_bg_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
 	AM_RANGE(0x8ff0, 0x8fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
@@ -245,8 +245,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( champbas_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x7001, 0x7001) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x7001, 0x7001) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x7800, 0x7fff) AM_ROM	// champbb2 only
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(&champbas_bg_videoram)
 	AM_RANGE(0x8800, 0x8fef) AM_RAM
@@ -278,8 +278,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( exctsccb_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 //  AM_RANGE(0x6000, 0x63ff) AM_RAM AM_SHARE(1) // MCU not used (though it's present on the board)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x7001, 0x7001) AM_WRITE(AY8910_control_port_0_w)
+	AM_RANGE(0x7000, 0x7000) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x7001, 0x7001) AM_WRITE(ay8910_control_port_0_w)
 //  AM_RANGE(0x7800, 0x7fff) AM_ROM // champbb2 only
 	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(champbas_bg_videoram_w) AM_BASE(&champbas_bg_videoram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE(&spriteram_2) /* ??? */
@@ -349,14 +349,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( exctsccr_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK( 0x00ff )
-	AM_RANGE(0x82, 0x82) AM_WRITE(AY8910_write_port_0_w)
-	AM_RANGE(0x83, 0x83) AM_WRITE(AY8910_control_port_0_w)
-	AM_RANGE(0x86, 0x86) AM_WRITE(AY8910_write_port_1_w)
-	AM_RANGE(0x87, 0x87) AM_WRITE(AY8910_control_port_1_w)
-	AM_RANGE(0x8a, 0x8a) AM_WRITE(AY8910_write_port_2_w)
-	AM_RANGE(0x8b, 0x8b) AM_WRITE(AY8910_control_port_2_w)
-	AM_RANGE(0x8e, 0x8e) AM_WRITE(AY8910_write_port_3_w)
-	AM_RANGE(0x8f, 0x8f) AM_WRITE(AY8910_control_port_3_w)
+	AM_RANGE(0x82, 0x82) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x83, 0x83) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x86, 0x86) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x87, 0x87) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x8a, 0x8a) AM_WRITE(ay8910_write_port_2_w)
+	AM_RANGE(0x8b, 0x8b) AM_WRITE(ay8910_control_port_2_w)
+	AM_RANGE(0x8e, 0x8e) AM_WRITE(ay8910_write_port_3_w)
+	AM_RANGE(0x8f, 0x8f) AM_WRITE(ay8910_control_port_3_w)
 ADDRESS_MAP_END
 
 

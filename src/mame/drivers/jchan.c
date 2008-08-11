@@ -604,8 +604,8 @@ static ADDRESS_MAP_START( jchan_sub, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x703fff) AM_RAM // AM_BASE(&jchan_spriteram) AM_WRITE(jchan_suprnova_sprite32_w)
 	AM_RANGE(0x780000, 0x78003f) AM_RAM // AM_BASE(&jchan_sprregs) AM_WRITE(jchan_suprnova_sprite32regs_w)
 
-	AM_RANGE(0x800000, 0x800001) AM_WRITE(YMZ280B_register_0_lsb_w) // sound
-	AM_RANGE(0x800002, 0x800003) AM_WRITE(YMZ280B_data_0_lsb_w) 	//
+	AM_RANGE(0x800000, 0x800001) AM_WRITE(ymz280b_register_0_lsb_w) // sound
+	AM_RANGE(0x800002, 0x800003) AM_WRITE(ymz280b_data_0_lsb_w) 	//
 
 	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
 ADDRESS_MAP_END
@@ -735,7 +735,7 @@ INPUT_PORTS_END
 
 /* sound stuff */
 
-static const struct YMZ280Binterface ymz280b_intf =
+static const ymz280b_interface ymz280b_intf =
 {
 	0	// irq ?
 };

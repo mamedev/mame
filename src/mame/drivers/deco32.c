@@ -1131,7 +1131,7 @@ static WRITE8_HANDLER(deco32_bsmt0_w)
 
 static WRITE8_HANDLER(deco32_bsmt1_w)
 {
-	BSMT2000_data_0_w(machine, offset^ 0xff, ((bsmt_latch<<8)|data), 0xffff);
+	bsmt2000_data_0_w(machine, offset^ 0xff, ((bsmt_latch<<8)|data), 0xffff);
 	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, HOLD_LINE); /* BSMT is ready */
 }
 
@@ -1142,7 +1142,7 @@ static READ8_HANDLER(deco32_bsmt_status_r)
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x110000, 0x110001) AM_READ(YM2151_status_port_0_r)
+	AM_RANGE(0x110000, 0x110001) AM_READ(ym2151_status_port_0_r)
 	AM_RANGE(0x120000, 0x120001) AM_READ(okim6295_status_0_r)
 	AM_RANGE(0x130000, 0x130001) AM_READ(okim6295_status_1_r)
 	AM_RANGE(0x140000, 0x140001) AM_READ(soundlatch_r)
@@ -1151,7 +1151,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x000000, 0x00ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x110000, 0x110001) AM_WRITE(YM2151_word_0_w)
+	AM_RANGE(0x110000, 0x110001) AM_WRITE(ym2151_word_0_w)
 	AM_RANGE(0x120000, 0x120001) AM_WRITE(okim6295_data_0_w)
 	AM_RANGE(0x130000, 0x130001) AM_WRITE(okim6295_data_1_w)
 	AM_RANGE(0x1f0000, 0x1f1fff) AM_WRITE(SMH_BANK8)
@@ -1185,8 +1185,8 @@ static READ8_HANDLER(latch_r)
 static ADDRESS_MAP_START( nslasher_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xa001, 0xa001) AM_READ(YM2151_status_port_0_r) AM_WRITE(YM2151_data_port_0_w)
+	AM_RANGE(0xa000, 0xa000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xa001, 0xa001) AM_READ(ym2151_status_port_0_r) AM_WRITE(ym2151_data_port_0_w)
 	AM_RANGE(0xb000, 0xb000) AM_READ(okim6295_status_0_r) AM_WRITE(okim6295_data_0_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ(okim6295_status_1_r) AM_WRITE(okim6295_data_1_w)
 	AM_RANGE(0xd000, 0xd000) AM_READ(latch_r)

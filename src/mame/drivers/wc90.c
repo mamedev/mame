@@ -162,10 +162,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(YM2608_status_port_0_A_r, YM2608_control_port_0_A_w)
-	AM_RANGE(0xf801, 0xf801) AM_WRITE(YM2608_data_port_0_A_w)
-	AM_RANGE(0xf802, 0xf802) AM_READWRITE(YM2608_status_port_0_B_r, YM2608_control_port_0_B_w)
-	AM_RANGE(0xf803, 0xf803) AM_WRITE(YM2608_data_port_0_B_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(ym2608_status_port_0_a_r, ym2608_control_port_0_a_w)
+	AM_RANGE(0xf801, 0xf801) AM_WRITE(ym2608_data_port_0_a_w)
+	AM_RANGE(0xf802, 0xf802) AM_READWRITE(ym2608_status_port_0_b_r, ym2608_control_port_0_b_w)
+	AM_RANGE(0xf803, 0xf803) AM_WRITE(ym2608_data_port_0_b_w)
 	AM_RANGE(0xfc00, 0xfc00) AM_READ(SMH_NOP) /* ??? adpcm ??? */
 	AM_RANGE(0xfc10, 0xfc10) AM_READ(soundlatch_r)
 ADDRESS_MAP_END

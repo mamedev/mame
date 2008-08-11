@@ -28,7 +28,7 @@ static void DAC_update(void *param,stream_sample_t **inputs, stream_sample_t **_
 }
 
 
-void DAC_data_w(int num,UINT8 data)
+void dac_data_w(int num,UINT8 data)
 {
 	struct dac_info *info = sndti_token(SOUND_DAC, num);
 	INT16 out = info->UnsignedVolTable[data];
@@ -42,7 +42,7 @@ void DAC_data_w(int num,UINT8 data)
 }
 
 
-void DAC_signed_data_w(int num,UINT8 data)
+void dac_signed_data_w(int num,UINT8 data)
 {
 	struct dac_info *info = sndti_token(SOUND_DAC, num);
 	INT16 out = info->SignedVolTable[data];
@@ -56,7 +56,7 @@ void DAC_signed_data_w(int num,UINT8 data)
 }
 
 
-void DAC_data_16_w(int num,UINT16 data)
+void dac_data_16_w(int num,UINT16 data)
 {
 	struct dac_info *info = sndti_token(SOUND_DAC, num);
 	INT16 out = data >> 1;		/* range      0..32767 */
@@ -70,7 +70,7 @@ void DAC_data_16_w(int num,UINT16 data)
 }
 
 
-void DAC_signed_data_16_w(int num,UINT16 data)
+void dac_signed_data_16_w(int num,UINT16 data)
 {
 	struct dac_info *info = sndti_token(SOUND_DAC, num);
 	INT16 out = (INT32)data - (INT32)0x08000;	/* range -32768..32767 */
@@ -118,34 +118,34 @@ static void *dac_start(const char *tag, int sndindex, int clock, const void *con
 
 
 
-WRITE8_HANDLER( DAC_0_data_w )
+WRITE8_HANDLER( dac_0_data_w )
 {
-	DAC_data_w(0,data);
+	dac_data_w(0,data);
 }
 
-WRITE8_HANDLER( DAC_1_data_w )
+WRITE8_HANDLER( dac_1_data_w )
 {
-	DAC_data_w(1,data);
+	dac_data_w(1,data);
 }
 
-WRITE8_HANDLER( DAC_2_data_w )
+WRITE8_HANDLER( dac_2_data_w )
 {
-	DAC_data_w(2,data);
+	dac_data_w(2,data);
 }
 
-WRITE8_HANDLER( DAC_0_signed_data_w )
+WRITE8_HANDLER( dac_0_signed_data_w )
 {
-	DAC_signed_data_w(0,data);
+	dac_signed_data_w(0,data);
 }
 
-WRITE8_HANDLER( DAC_1_signed_data_w )
+WRITE8_HANDLER( dac_1_signed_data_w )
 {
-	DAC_signed_data_w(1,data);
+	dac_signed_data_w(1,data);
 }
 
-WRITE8_HANDLER( DAC_2_signed_data_w )
+WRITE8_HANDLER( dac_2_signed_data_w )
 {
-	DAC_signed_data_w(2,data);
+	dac_signed_data_w(2,data);
 }
 
 

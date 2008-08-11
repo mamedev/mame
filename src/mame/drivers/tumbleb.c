@@ -723,8 +723,8 @@ static ADDRESS_MAP_START( fncywld_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 #else
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
 #endif
-	AM_RANGE(0x100000, 0x100001) AM_READWRITE(YM2151_status_port_0_lsb_r, YM2151_register_port_0_lsb_w)
-	AM_RANGE(0x100002, 0x100003) AM_READWRITE(SMH_NOP, YM2151_data_port_0_lsb_w)
+	AM_RANGE(0x100000, 0x100001) AM_READWRITE(ym2151_status_port_0_lsb_r, ym2151_register_port_0_lsb_w)
+	AM_RANGE(0x100002, 0x100003) AM_READWRITE(SMH_NOP, ym2151_data_port_0_lsb_w)
 	AM_RANGE(0x100004, 0x100005) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0x140000, 0x140fff) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size) /* sprites */
@@ -823,10 +823,10 @@ static WRITE8_HANDLER( YM2151_w )
 {
 	switch (offset) {
 	case 0:
-		YM2151_register_port_0_w(0,data);
+		ym2151_register_port_0_w(0,data);
 		break;
 	case 1:
-		YM2151_data_port_0_w(0,data);
+		ym2151_data_port_0_w(0,data);
 		break;
 	}
 }
@@ -853,8 +853,8 @@ static WRITE8_HANDLER( oki_sound_bank_w )
 static ADDRESS_MAP_START( semicom_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(YM2151_register_port_0_w)
-	AM_RANGE(0xf001, 0xf001) AM_READWRITE(YM2151_status_port_0_r, YM2151_data_port_0_w)
+	AM_RANGE(0xf000, 0xf000) AM_WRITE(ym2151_register_port_0_w)
+	AM_RANGE(0xf001, 0xf001) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0xf002, 0xf002) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 //  AM_RANGE(0xf006, 0xf006) ??
 	AM_RANGE(0xf008, 0xf008) AM_READ(soundlatch_r)
@@ -880,8 +880,8 @@ static READ8_HANDLER(jumppop_z80latch_r)
 
 static ADDRESS_MAP_START( jumppop_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(YM3812_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(YM3812_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym3812_write_port_0_w)
 	AM_RANGE(0x02, 0x02) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0x03, 0x03) AM_READ(jumppop_z80latch_r)
 	AM_RANGE(0x04, 0x04) AM_NOP
