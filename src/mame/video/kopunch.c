@@ -2,8 +2,7 @@
 
 UINT8 *kopunch_videoram2;
 
-static INT8 scroll[2]; // REMOVE
-static int gfxbank, gfxflip;
+static int gfxbank;
 
 static tilemap *bg_tilemap, *fg_tilemap;
 
@@ -40,25 +39,23 @@ PALETTE_INIT( kopunch )
 WRITE8_HANDLER( kopunch_videoram_w )
 {
 	videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( kopunch_videoram2_w )
 {
 	kopunch_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( kopunch_scroll_x_w )
 {
-	scroll[0] = data; // REMOVE
-	tilemap_set_scrollx(fg_tilemap, 0, data);
+	tilemap_set_scrollx(bg_tilemap, 0, data);
 }
 
 WRITE8_HANDLER( kopunch_scroll_y_w )
 {
-	scroll[1] = data; // REMOVE
-	tilemap_set_scrolly(fg_tilemap, 0, data);
+	tilemap_set_scrolly(bg_tilemap, 0, data);
 }
 
 WRITE8_HANDLER( kopunch_gfxbank_w )
@@ -66,22 +63,20 @@ WRITE8_HANDLER( kopunch_gfxbank_w )
 	if (gfxbank != (data & 0x07))
 	{
 		gfxbank = data & 0x07;
-		tilemap_mark_all_tiles_dirty(fg_tilemap);
+		tilemap_mark_all_tiles_dirty(bg_tilemap);
 	}
 
-	gfxflip = data & 0x08; // REMOVE
-
-	tilemap_set_flip(fg_tilemap, (data & 0x08) ? TILEMAP_FLIPY : 0);
+	tilemap_set_flip(bg_tilemap, (data & 0x08) ? TILEMAP_FLIPY : 0);
 }
 
-static TILE_GET_INFO( get_bg_tile_info )
+static TILE_GET_INFO( get_fg_tile_info )
 {
 	int code = videoram[tile_index];
 
 	SET_TILE_INFO(0, code, 0, 0);
 }
 
-static TILE_GET_INFO( get_fg_tile_info )
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = (kopunch_videoram2[tile_index] & 0x7f) + 128 * gfxbank;
 
@@ -90,35 +85,18 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( kopunch )
 {
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
-		 8, 8, 32, 32);
-
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		 8, 8, 16, 16);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,  8,  8, 32, 32);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
+
+	tilemap_set_scrolldx(bg_tilemap, 16, 16);
 }
 
 VIDEO_UPDATE( kopunch )
 {
-	int offs;
-
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	//tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 
-	for (offs = 1023;offs >= 0;offs--)
-	{
-		int sx,sy;
-
-		sx = offs % 16;
-		sy = offs / 16;
-
-		drawgfx(bitmap,screen->machine->gfx[1],
-				(kopunch_videoram2[offs] & 0x7f) + 128 * gfxbank,
-				0,
-				0,gfxflip,
-				8*(sx+8)+scroll[0],8*(8+(gfxflip ? 15-sy : sy))+scroll[1],
-				cliprect,TRANSPARENCY_PEN,0);
-	}
 	return 0;
 }

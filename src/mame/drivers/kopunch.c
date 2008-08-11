@@ -156,16 +156,27 @@ static const gfx_layout charlayout =
 	8*8
 };
 
+static const gfx_layout charlayoutbig =
+{
+	16,16,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(2,3), RGN_FRAC(1,3), RGN_FRAC(0,3) },
+	{ 7,7, 6,6, 5,5, 4,4, 3,3, 2,2, 1,1, 0,0 },
+	{ 0*8,0*8, 1*8,1*8, 2*8,2*8, 3*8,3*8, 4*8,4*8, 5*8,5*8, 6*8,6*8, 7*8,7*8 },
+	8*8
+};
+
 static GFXDECODE_START( kopunch )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, charlayoutbig, 0, 1 )
 GFXDECODE_END
 
 
 static MACHINE_DRIVER_START( kopunch )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080, 4000000)	/* 4 MHz ???? appears to use 8080 instructions, not z80 */
+	MDRV_CPU_ADD("main", 8080, 4000000)	/* 4 MHz ???? uses 8080 instructions, not z80 */
 	MDRV_CPU_PROGRAM_MAP(kopunch_map,0)
 	MDRV_CPU_IO_MAP(kopunch_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(kopunch_interrupt,4)	/* ??? */
@@ -219,24 +230,4 @@ ROM_START( kopunch )
 	ROM_LOAD( "epr1100",      0x0040, 0x0020, CRC(bedb66b1) SHA1(8e78bb205d900075b761e1baa5f5813174ff28ba) )	/* unknown */
 ROM_END
 
-
-static DRIVER_INIT( kopunch )
-{
-//  UINT8 *rom = memory_region(machine, "main");
-
-	/* It looks like there is a security chip, that changes instruction of the form:
-        0334: 3E 0C       ld   a,$0C
-        0336: 30 FB       jr   nc,$0333
-       into something else (maybe just a nop) with the effect of resuming execution
-       from the operand of the JR  NC instruction (in the example above, 0337).
-       For now, I'm just patching the affected instructions. */
-
-/*  rom[0x119] = 0;
-    rom[0x336] = 0;
-    rom[0x381] = 0;
-    rom[0xf0b] = 0;
-    rom[0xf33] = 0;*/
-}
-
-
-GAME( 1981, kopunch, 0, kopunch, kopunch, kopunch, ROT270, "Sega", "KO Punch", GAME_NO_SOUND | GAME_NOT_WORKING)
+GAME( 1981, kopunch, 0, kopunch, kopunch, 0, ROT270, "Sega", "KO Punch", GAME_NO_SOUND | GAME_NOT_WORKING)
