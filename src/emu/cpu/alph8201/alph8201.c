@@ -9,7 +9,7 @@ The Alpha8201/830x isn't a real CPU. It is a Hitachi HD44801 4-bit MCU,
 programmed to interpret an external program using a custom instruction set.
 Alpha8301 has an expanded instruction set, backwards compatible with Alpha8201
 
-The internal ROM hasn't been read (yet), so here we provide a simultaion of
+The internal ROM hasn't been read (yet), so here we provide a simulation of
 the behaviour.
 
 
@@ -20,14 +20,19 @@ Shougi 2                  1982? 8201 (pcb)
 Talbot                    1982  8201?
 Champion Base Ball        1983  8201 (schematics)
 Exciting Soccer           1983  8301?
-Champion Base Ball II     1983  8302?(unofficial schematics)
-Exciting Soccer II        1984  8302?
+Champion Base Ball II     1983  8302 (pcb, unofficial schematics)
+Exciting Soccer II        1984  8303?
 Equites                   1984  8303 (post)
 Bull Fighter              1984  8303 (post)
 Splendor Blast            1985  8303 (post)
 Gekisou                   1985  8304 (post)
 The Koukouyakyuh          1985  8304 (post)
 High Voltage              1985  8404?(post says 8404, but readme says 8304)
+
+ALPHA8201: "44801A75" -> HD44801 , ROM code = A75
+ALPHA8302: "44801B35" -> HD44801 , ROM code = B35
+ALPHA8303: "44801B42" -> HD44801 , ROM code = B42
+ALPHA8304: ?
 
 
     Notes :
@@ -37,7 +42,6 @@ High Voltage              1985  8404?(post says 8404, but readme says 8304)
 
     TODO:
         verify with real chip or analyze more.
-            -call/ret stack point (8301).
             -A lot of 8301 opcode.
             -memory address 000 specification
             -memory address 001 bit 7-5 specification
@@ -169,12 +173,14 @@ typedef struct
 {
 	UINT8 RAM[8*8];  /* internal GP register 8 * 8bank       */
 	unsigned PREVPC;
-	PAIR  retptr;   /* for 8301, return address stack of CALL */
+	PAIR  retptr;   /* for 8301, return address of CALL       */
 	PAIR  pc;       /* 2bit+8bit program counter              */
 	UINT8 regPtr;   /* RB register base                       */
 	UINT8 mb;       /* MB memory bank reg. latch after Branch */
 	UINT8 cf;       /* C flag                                 */
 	UINT8 zf;       /* Z flag                                 */
+	UINT8 savec;    /* for 8301, save flags                   */
+	UINT8 savez;    /* for 8301, save flags                   */
 //
 	PAIR ix0;		/* 8bit memory read index reg. */
 	PAIR ix1;		/* 8bitmemory read index reg.  */
@@ -267,7 +273,7 @@ INLINE void M_XOR(UINT8 dat)
 {
 	R.A ^= dat;
 	ZF = (R.A==0);
-//  CF = 0; unknown whether it's affected or not
+	CF = 0;
 }
 
 INLINE void M_JMP(UINT8 dat)
@@ -304,35 +310,6 @@ INLINE void M_UNDEFINED2(void)
 
 static void undefined(void)	{ M_UNDEFINED(); }
 static void undefined2(void)	{ M_UNDEFINED2(); }
-
-#if (HAS_ALPHA8301)
-static void need_verify(const char *s)
-{
-	UINT8 op  = M_RDOP(PC-1);
-	logerror("ALPHA8201:  PC = %03x, unknown opcode = %02x is '%s' ??\n",PC-1, op,s);
-#if SHOW_MESSAGE_CONSOLE
-	mame_printf_debug("ALPHA8201:  PC = %03x, unknown opcode = %02x is '%s' ??\n",PC-1, op,s);
-#endif
-#if BREAK_ON_UNCERTAIN_OPCODE
-	debugger_break(Machine);
-#endif
-}
-#endif
-
-#if 0
-static void need_verify2(const char *s)
-{
-	UINT8 op1 = M_RDOP(PC-2);
-	UINT8 op2 = M_RDOP(PC-1);
-	logerror("ALPHA8201:  PC = %03x, unknown opcode = %02x %02x is '%s' ??\n",PC-2, op1, op2, s);
-#if SHOW_MESSAGE_CONSOLE
-	mame_printf_debug("ALPHA8201:  PC = %03x, unknown opcode = %02x %02x is '%s' ??\n",PC-2, op1, op2, s);
-#endif
-#if BREAK_ON_UNCERTAIN_OPCODE
-	debugger_break(Machine);
-#endif
-}
-#endif
 
 static void nop(void)		 { }
 static void rora(void)		 { CF = R.A &1;     R.A = (R.A>>1) | (R.A<<7); }
@@ -538,6 +515,7 @@ static void djnz_lp2(void)	{ UINT8 i=M_RDMEM_OPCODE(); LP2--; if (LP2 != 0) M_JM
 static void jnz(void)	{ UINT8 i=M_RDMEM_OPCODE(); if (!ZF) M_JMP(i); }
 static void jnc(void)	{ UINT8 i=M_RDMEM_OPCODE(); if (!CF) M_JMP(i);}
 static void jz(void)	{ UINT8 i=M_RDMEM_OPCODE(); if ( ZF) M_JMP(i); }
+static void jc(void)	{ UINT8 i=M_RDMEM_OPCODE(); if ( CF) M_JMP(i);}
 static void jmp(void)	{ M_JMP( M_RDMEM_OPCODE() ); }
 
 #if (HAS_ALPHA8201)
@@ -586,19 +564,25 @@ static const s_opcode opcode_8201[256]=
 #if (HAS_ALPHA8301)
 
 /* ALPHA 8301 : added instruction */
-static void dec_ix0(void)  { IX0--; } /* OK */
-
-static void ld_a_x(void)  { R.A = R.B; need_verify("LD   A,unk"); }
-static void ld_x_a(void)  { R.B = R.A; need_verify("LD   unk,A"); }
-static void ld_a_b(void)  { R.A = R.B; }
-static void ld_b_a(void)  { R.B = R.A; }
+static void exg_a_ix0(void)  { UINT8 t=R.A; R.A = IX0; IX0 = t; }
+static void exg_a_ix1(void)  { UINT8 t=R.A; R.A = IX1; IX1 = t; }
+static void exg_a_ix2(void)  { UINT8 t=R.A; R.A = IX2; IX2 = t; }
 static void exg_a_lp0(void)  { UINT8 t=R.A; R.A = LP0; LP0 = t; }
-static void ld_lp0_a(void)  { LP0 = R.A; }
+static void exg_a_lp1(void)  { UINT8 t=R.A; R.A = LP1; LP1 = t; }
+static void exg_a_lp2(void)  { UINT8 t=R.A; R.A = LP2; LP2 = t; }
+static void exg_a_b(void)    { UINT8 t=R.A; R.A = R.B; R.B = t; }
+static void exg_a_rb(void)   { UINT8 t=R.A; R.A = regPTR; regPTR = t; }
 
-static void ld_ix0_a(void)    { IX0 = R.A; } /* maybe OK */
-static void ld_ix1_a(void)    { IX1 = R.A; need_verify("LD   IX1,A"); } /* not found */
-static void ld_ix2_a(void)    { IX2 = R.A; } /* maybe OK */
+static void ld_ix0_a(void)    { IX0 = R.A; }
+static void ld_ix1_a(void)    { IX1 = R.A; }
+static void ld_ix2_a(void)    { IX2 = R.A; }
+static void ld_lp0_a(void)    { LP0 = R.A; }
+static void ld_lp1_a(void)    { LP1 = R.A; }
+static void ld_lp2_a(void)    { LP2 = R.A; }
+static void ld_b_a(void)      { R.B = R.A; }
+static void ld_rb_a(void)     { regPTR = R.A; }
 
+static void exg_ix0_ix1(void)  { UINT8 t=IX1; IX1 = IX0; IX0 = t; }
 static void exg_ix0_ix2(void)  { UINT8 t=IX2; IX2 = IX0; IX0 = t; }
 
 static void op_d4(void) { R.A = M_RDMEM( ((RD_REG(7) & 3) << 8) | M_RDMEM_OPCODE() ); }
@@ -608,20 +592,26 @@ static void op_d7(void) { M_WRMEM( ((RD_REG(7) & 3) << 8) | M_RDMEM_OPCODE(), LP
 static void ld_a_abs(void) { R.A = M_RDMEM( ((R.mb & 3) << 8) | M_RDMEM_OPCODE() ); }
 static void ld_abs_a(void) { M_WRMEM( ((R.mb & 3) << 8) | M_RDMEM_OPCODE(), R.A ); }
 
-static void op_dd(void) { regRAM[(M_RDMEM_OPCODE()>>1)&0x3f] = R.A; }
-static void op_ldir(void) { M_WRMEM(BIX2+0, regRAM[(R.B>>1)&0x3f]); IX2++; R.B+=2; LP0--; if (LP0 != 0) PCL--; }
-static void op_f6(void) { regRAM[(R.B>>1)&0x3f] = R.A; }
-static void op_f8(void) { M_SUB( regRAM[(R.B>>1)&0x3f] );  need_verify("SUB/CMP  A,(RXB)"); }
-static void op_f9(void) { M_XOR( regRAM[(R.B>>1)&0x3f] ); }
+static void ld_a_r(void) { R.A = regRAM[(M_RDMEM_OPCODE()>>1)&0x3f]; }
+static void ld_r_a(void) { regRAM[(M_RDMEM_OPCODE()>>1)&0x3f] = R.A; }
+static void op_rep_ld_ix2_b(void) { do { M_WRMEM(BIX2, regRAM[(R.B>>1)&0x3f]); IX2++; R.B+=2; LP0--; } while (LP0 != 0); }
+static void op_rep_ld_b_ix0(void) { do { regRAM[(R.B>>1)&0x3f] = M_RDMEM(BIX0); IX0++; R.B+=2; LP0--; } while (LP0 != 0); }
+static void ld_rxb_a(void) { regRAM[(R.B>>1)&0x3f] = R.A; }
+static void ld_a_rxb(void) { R.A = regRAM[(R.B>>1)&0x3f]; }
+static void cmp_a_rxb(void) { UINT8 i=regRAM[(R.B>>1)&0x3f];  ZF = (R.A==i); CF = (R.A>=i); }
+static void xor_a_rxb(void) { M_XOR( regRAM[(R.B>>1)&0x3f] ); }
 
-static void add_a_cf(void) { R.A += CF; CF = 0; ZF = (R.A==0); }
+static void add_a_cf(void) { if (CF) inc_a(); }
+static void sub_a_cf(void) { if (CF) dec_a(); }
 static void tst_a(void)	 { ZF = (R.A==0); }
 static void clr_a(void)	 { R.A = 0; ZF = (R.A==0); }
 static void cmp_a_n(void)	{ UINT8 i=M_RDMEM_OPCODE();  ZF = (R.A==i); CF = (R.A>=i); }
 static void xor_a_n(void)	{ M_XOR( M_RDMEM_OPCODE() ); }
-static void call(void) { UINT8 i=M_RDMEM_OPCODE(); R.retptr.w.l = PC; M_JMP(i); }; /* OK , but stack is unknown */
+static void call(void) { UINT8 i=M_RDMEM_OPCODE(); R.retptr.w.l = PC; M_JMP(i); };
 static void ld_a_ix0_a(void) { R.A = M_RDMEM(BIX0+R.A); }
-static void ret(void) { R.mb = R.retptr.b.h; M_JMP( R.retptr.b.l ); }; /* OK , but stack is unknown */
+static void ret(void) { R.mb = R.retptr.b.h; M_JMP( R.retptr.b.l ); };
+static void save_zc(void) { R.savez = ZF; R.savec = CF; };
+static void rest_zc(void) { ZF = R.savez; CF = R.savec; };
 
 static const s_opcode opcode_8301[256]=
 {
@@ -658,12 +648,12 @@ static const s_opcode opcode_8301[256]=
 	{C2, ld_ix0_n	},{C2, ld_ix1_n},{C2, ld_ix2_n	},{C2, ld_a_n	},{C2, ld_lp0_n	},{C2, ld_lp1_n	},{C2, ld_lp2_n	},{C2, ld_b_n	},
 	{C2, add_a_n	},{C2, sub_a_n	},{C2, and_a_n	},{C2, or_a_n	},{C2, djnz_lp0	},{C2, djnz_lp1	},{C2, djnz_lp2	},{C2, jnz		},
 	{C2, jnc			},{C2, jz		},{C2, jmp		},{C2,undefined2},{C2, op_d4    },{C2, op_d5    },{C2, op_d6    },{C2, op_d7    },
-	{C2, ld_a_abs  },{C2, ld_abs_a},{C2,cmp_a_n	},{C2,xor_a_n   },{C2,undefined2},{C2, op_dd    },{C2,undefined2},{C2, call},
+	{C2, ld_a_abs  },{C2, ld_abs_a},{C2,cmp_a_n	},{C2,xor_a_n   },{C2, ld_a_r   },{C2, ld_r_a   },{C2, jc       },{C2, call},
 /* E0 : 8301 */
-	{C1, dec_ix0	},{C1, undefined},{C1, undefined},{C1, ld_a_x   },{C1, undefined},{C1, ld_a_b   },{C1, exg_a_lp0   },{C1, undefined},
-	{C1, ld_ix0_a	},{C1, ld_ix1_a },{C1, ld_ix2_a },{C1, ld_x_a   },{C1, undefined},{C1, ld_b_a   },{C1, ld_lp0_a   },{C1, undefined},
-	{C1, undefined	},{C1,exg_ix0_ix2},{C1,op_ldir  },{C1, undefined},{C1, undefined},{C1, undefined},{C1, op_f6    },{C1, undefined},
-	{C1, op_f8		},{C1, op_f9    },{C1, add_a_cf },{C1, undefined},{C1, tst_a    },{C1, clr_a	},{C1,ld_a_ix0_a},{C1, ret }
+	{C1, exg_a_ix0	},{C1, exg_a_ix1},{C1, exg_a_ix2},{C1, exg_a_lp1},{C1, exg_a_lp2},{C1, exg_a_b  },{C1, exg_a_lp0},{C1, exg_a_rb },
+	{C1, ld_ix0_a	},{C1, ld_ix1_a },{C1, ld_ix2_a },{C1, ld_lp1_a },{C1, ld_lp2_a },{C1, ld_b_a   },{C1, ld_lp0_a },{C1, ld_rb_a  },
+	{C1,exg_ix0_ix1},{C1,exg_ix0_ix2},{C1,op_rep_ld_ix2_b},{C1, op_rep_ld_b_ix0},{C1, save_zc},{C1, rest_zc},{C1, ld_rxb_a },{C1, ld_a_rxb },
+	{C1, cmp_a_rxb },{C1, xor_a_rxb},{C1, add_a_cf },{C1, sub_a_cf },{C1, tst_a    },{C1, clr_a    },{C1, ld_a_ix0_a},{C1, ret     }
 };
 #endif
 
@@ -690,6 +680,9 @@ static void ALPHA8201_init (int index, int clock, const void *config, int (*irqc
 	state_save_register_item("ALPHA8201", index, LP2);
 	state_save_register_item("ALPHA8201", index, R.A);
 	state_save_register_item("ALPHA8201", index, R.B);
+	state_save_register_item("ALPHA8201", index, R.retptr);
+	state_save_register_item("ALPHA8201", index, R.savec);
+	state_save_register_item("ALPHA8201", index, R.savez);
 }
 /****************************************************************************
  * Reset registers to their initial values

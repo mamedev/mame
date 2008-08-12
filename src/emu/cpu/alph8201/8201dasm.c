@@ -16,6 +16,7 @@ typedef unsigned char byte;
 #define PTRS_PER_FORMAT 2
 
 /****************************************************
+
 8201 CONFIRMED OPCODES:
 
 opcode       mnemonic     function      flags
@@ -28,11 +29,11 @@ opcode       mnemonic     function      flags
 00000101     INC A        A++           ZC
 00000110     DEC A        A--           ZC (C=1 means No Borrow: A>=1)
 00000110     CPL A        A^=$FF        --
-00001aaa     LD A,(IX0+i) [IX0+i]->A    --
-00010aaa     LD A,(IX1+i) [IX1+i]->A    --
-00011aaa     LD (IX2+i),A A->[IX2+i]    --
+00001aaa     LD A,(IX0+i) A=[IX0+i]     --
+00010aaa     LD A,(IX1+i) A=[IX1+i]     --
+00011aaa     LD (IX2+i),A [IX2+i]=A     --
 00111aaa     BIT R0.n     ZF=R0 bit n   Z-
-0100aaa0     LD A,Rn      A=Rn          Z-
+0100aaa0     LD A,Rn      A=Rn          Z- [1]
 0100aaa1     LD Rn,A      Rn=A          --
 0101aaa0     ADD A,Rn     A+=Rn         ZC
 0101aaa1     SUB A,Rn     A-=Rn         ZC (C=1 means No Borrow: A>=Rn)
@@ -65,6 +66,64 @@ opcode       mnemonic     function      flags
 1101--1- imm J   imm      branch        --
 1110--xx mirror for the above
 1111--xx mirror for the above
+
+Bugs:
+[1] the Z flag is not updated correctly after a LD A,Rn instruction. Fixed in 8301.
+
+
+8302 CONFIRMED OPCODES:
+----------------------
+all of the 8201 ones, with stricter decoding for the following:
+
+11010-00 imm JNC imm      branch if !C  --
+11010-01 imm JZ  imm      branch if Z   --
+11010-1- imm J   imm      branch        --
+
+and these new opcodes:
+
+opcode       mnemonic     function         flags
+--------     ------------ ---------------  -----
+11011000 imm LD A,(imm)   A=MB:[imm]       --
+11011001 imm LD (imm),A   MB:[imm]=A       --
+11011010 imm CMP A,imm    temp=A-imm       ZC
+11011011 imm XOR A,imm    A^=imm           Z0
+11011100 imm LD A,R(imm)  A=reg(imm)       --
+11011101 imm LD R(imm),A  reg(imm)=A       --
+11011110 imm JC imm       branch if C      --
+11011111 imm CALL $xx     save PC, branch  --
+
+11100000     EXG A,IX0    A<->IX0          --
+11100001     EXG A,IX1    A<->IX1          --
+11100010     EXG A,IX2    A<->IX2          --
+11100011     EXG A,LP1    A<->LP1          --
+11100100     EXG A,LP2    A<->LP2          --
+11100101     EXG A,RXB    A<->RXB          --
+11100110     EXG A,LP0    A<->LP0          --
+11100111     EXG A,RB     A<->RB           --
+11101000     LD IX0,A     IX0=A            --
+11101001     LD IX1,A     IX1=A            --
+11101010     LD IX2,A     IX2=A            --
+11101011     LD LP1,A     LP1=A            --
+11101100     LD LP2,A     LP2=A            --
+11101101     LD RXB,A     RXB=A            --
+11101110     LD LP0,A     LP0=A            --
+11101111     LD RB,A      RB=A             --
+11110000     EXG IX0,IX1  IX0<->IX1        --
+11110001     EXG IX0,IX2  IX0<->IX2        --
+11110010     REP LD (IX2),(RXB)  equivalent to LD (IX2),(RXB); INC RXB; DJNZ LP0
+11110011     REP LD (RXB),(IX0)  equivalent to LD (RXB),(IX0); INC RXB; DJNZ LP0
+11110100     SAVE ZC      save ZC          --
+11110101     REST ZC      restore ZC       ZC
+11110110     LD (RXB),A   reg(RXB)=A       --
+11110111     LD A,(RXB)   A=reg(RXB)       --
+11111000     CMP A,(RXB)  temp=A-reg(RXB)  ZC
+11111001     XOR A,(RXB)  A^=reg(RXB)      Z0
+11111010     ADD A,CF     if (C) A++       ZC
+11111011     SUB A,!CF    if (!C) A--      ZC
+11111100     TST A        A==0?            Z-
+11111101     CLR A        A=0              --
+11111110     LD A,(IX0+A) A=[IX0+A]        --
+11111111     RET          restore PC       --
 
 ****************************************************/
 
@@ -122,48 +181,48 @@ static const char *const Formats[] = {
 
 	/* -------------- 830x only ------------- */
 
-	FMT("1101_0100 I", "LD   A,(R7:$%02X)"),	// D4 : exctscc2, bullfgtr; not sure if R7 or R77
-	FMT("1101_0101 I", "LD   (R7:$%02X),A"),	// D5 : exctscc2, bullfgtr, kouyakyu; not sure if R7 or R77
-	FMT("1101_0110 I", "LD   LP0,(R7:$%02X)"),	// D6 : kouyakyu; not sure if R7 or R77
-	FMT("1101_0111 I", "LD   (R7:$%02X),LP0"),	// D7 : hvoltage; not sure if R7 or R77
+	FMT("1101_0100 I", "LD   A,(R7:$%02X)"),	// D4 : 8303+ only? exctscc2, bullfgtr; not sure if R7 or R77
+	FMT("1101_0101 I", "LD   (R7:$%02X),A"),	// D5 : 8303+ only? exctscc2, bullfgtr, kouyakyu; not sure if R7 or R77
+	FMT("1101_0110 I", "LD   LP0,(R7:$%02X)"),	// D6 : 8303+ only? kouyakyu; not sure if R7 or R77
+	FMT("1101_0111 I", "LD   (R7:$%02X),LP0"),	// D7 : 8303+ only? hvoltage; not sure if R7 or R77
 	FMT("1101_1000 I", "LD   A,($%02X)"),		// D8 : equites
 	FMT("1101_1001 I", "LD   ($%02X),A"),		// D9 : equites
 	FMT("1101_1010 I", "CMP  A,$%02X"),			// DA :
 	FMT("1101_1011 I", "XOR  A,$%02X"),			// DB : equites splndrbt
-	FMT("1101_1100 I", "unk  $%02X"),			// DC : not found (LD   A,R($%02X) ?)
+	FMT("1101_1100 I", "LD   A,R($%02X)"),		// DC : not found
 	FMT("1101_1101 I", "LD   R($%02X),A"),		// DD : equites, splndrbt
-	FMT("1101_1110 I", "unk  $%02X"),			// DE : not found
+	FMT("1101_1110 I", "JC   $%02X"),			// DE : not found
 	FMT("1101_1111 I", "CALL $%02X"),			// DF :
 
-	FMT("1110_0000", "DEC  IX0"),			// E0 :
-	FMT("1110_0001", "unknown"),			// E1 : not found (DEC IX1?)
-	FMT("1110_0010", "unknown"),			// E2 : not found (DEC IX2?)
-	FMT("1110_0011", "ld   a,unk ?"),		// E3 : exctsccr in pair with EB
-	FMT("1110_0100", "unknown"),			// E4 : not found
-	FMT("1110_0101", "LD   A,B"),			// E5 : splndrbt
+	FMT("1110_0000", "EXG  A,IX0"),			// E0 : exctsccr
+	FMT("1110_0001", "EXG  A,IX1"),			// E1 : not found
+	FMT("1110_0010", "EXG  A,IX2"),			// E2 : not found
+	FMT("1110_0011", "EXG  A,LP1"),			// E3 : exctsccr in pair with EB
+	FMT("1110_0100", "EXG  A,LP2"),			// E4 : not found
+	FMT("1110_0101", "EXG  A,RXB"),			// E5 : splndrbt
 	FMT("1110_0110", "EXG  A,LP0"),			// E6 : splndrbt, bullfgtr, kouyakyu. EXG, not LD: see splndrbt $3ba to $3d3
-	FMT("1110_0111", "unknown"),			// E7 : not found
+	FMT("1110_0111", "EXG  A,RB"),			// E7 : not found
 	FMT("1110_1000", "LD   IX0,A"),			// E8 :
-	FMT("1110_1001", "ld   ix1,a ?"),		// E9 : not found
+	FMT("1110_1001", "LD   IX1,A"),			// E9 : not found
 	FMT("1110_1010", "LD   IX2,A"),			// EA :
-	FMT("1110_1011", "ld   unk,a ?"),		// EB : exctsccr in pair with E3. unk is not LP0, IX0, IX2
-	FMT("1110_1100", "unknown"),			// EC : not found
-	FMT("1110_1101", "LD   B,A"),			// ED : splndrbt
+	FMT("1110_1011", "LD   LP1,A"),			// EB : exctsccr in pair with E3
+	FMT("1110_1100", "LP   LP2,A"),			// EC : not found
+	FMT("1110_1101", "LD   RXB,A"),			// ED : splndrbt
 	FMT("1110_1110", "LD   LP0,A"),			// EE : splndrbt, bullfgtr
-	FMT("1110_1111", "unknown"),			// EF : not found
-	FMT("1111_0000", "unknown"),			// F0 : not found
-	FMT("1111_0001", "EXG  IX0,IX2"),		// F1 : should be EXG, see splndrbt $2e to $38, equites $40 to $4a
-	FMT("1111_0010", "LDIR"),				// F2 : splndrbt  LD (IX2+%X),(RXB); INC B; DJNZ LP0
-	FMT("1111_0011", "unknown"),			// F3 : not found
-	FMT("1111_0100", "unknown"),			// F4 : not found
-	FMT("1111_0101", "unknown"),			// F5 : not found
+	FMT("1110_1111", "LD   RB,A"),			// EF : not found
+	FMT("1111_0000", "EXG  IX0,IX1"),		// F0 : not found
+	FMT("1111_0001", "EXG  IX0,IX2"),		// F1 : splndrbt $2e to $38, equites $40 to $4a
+	FMT("1111_0010", "REP  LD (IX2),(RXB)"),// F2 : splndrbt  LD (IX2),(RXB); INC RXB; DJNZ LP0
+	FMT("1111_0011", "REP  LD (RXB),(IX0)"),// F3 : not found LD (RXB),(IX0); INC RXB; DJNZ LP0
+	FMT("1111_0100", "SAVE ZC"),			// F4 : not found
+	FMT("1111_0101", "REST ZC"),			// F5 : not found
 	FMT("1111_0110", "LD   (RXB),A"),		// F6 : exctsccr
-	FMT("1111_0111", "unknown"),			// F7 : not found
-	FMT("1111_1000", "sub/cmp  a,(rxb) ?"),	// F8 : exctsccr : ZF check  could be CMP instead? see DA/DB
+	FMT("1111_0111", "LD   A,(RXB)"),		// F7 : not found
+	FMT("1111_1000", "CMP  A,(RXB)"),		// F8 : exctsccr
 	FMT("1111_1001", "XOR  A,(RXB)"),		// F9 : exctsccr
 	FMT("1111_1010", "ADD  A,CF"),			// FA :
-	FMT("1111_1011", "unknown"),			// FB : not found (SUB  A,CF ?)
-	FMT("1111_1100", "TST  A"),				// FC : ZF = (A==0) ?
+	FMT("1111_1011", "SUB  A,!CF"),			// FB : not found
+	FMT("1111_1100", "TST  A"),				// FC :
 	FMT("1111_1101", "CLR  A"),				// FD :
 	FMT("1111_1110", "LD   A,(IX0+A)"),		// FE :
 	FMT("1111_1111", "RET"),				// FF :
