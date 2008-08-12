@@ -346,7 +346,7 @@ static void r3000_set_context(void *src)
 
 static void r3000_init(int index, int clock, const void *_config, int (*irqcallback)(int))
 {
-	const struct r3000_config *config = _config;
+	const r3000_cpu_core *config = _config;
 
 	/* allocate memory */
 	r3000.icache = auto_malloc(config->icache);

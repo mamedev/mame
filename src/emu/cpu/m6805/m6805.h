@@ -1,7 +1,9 @@
 /*** m6805: Portable 6805 emulator ******************************************/
 
-#ifndef _M6805_H
-#define _M6805_H
+#pragma once
+
+#ifndef __M6805_H__
+#define __M6805_H__
 
 #include "cpuintrf.h"
 
@@ -84,4 +86,4 @@ extern void hd63705_get_info(UINT32 state, cpuinfo *info);
 
 offs_t m6805_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif /* _M6805_H */
+#endif /* __M6805_H__ */

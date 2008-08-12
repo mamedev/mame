@@ -452,7 +452,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const struct r3000_config config =
+static const r3000_cpu_core config =
 {
 	0,		/* 1 if we have an FPU, 0 otherwise */
 	4096,	/* code cache size */

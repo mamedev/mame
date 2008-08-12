@@ -1,5 +1,7 @@
-#ifndef M68KMAME__HEADER
-#define M68KMAME__HEADER
+#pragma once
+
+#ifndef __M68KMAME_H__
+#define __M68KMAME_H__
 
 /* ======================================================================== */
 /* ============================== MAME STUFF ============================== */
@@ -56,7 +58,7 @@
 #define m68ki_remaining_cycles m68k_ICount
 
 
-extern struct m68k_memory_interface m68k_memory_intf;
+extern m68k_memory_interface m68k_memory_intf;
 extern offs_t m68k_encrypted_opcode_start[MAX_CPU];
 extern offs_t m68k_encrypted_opcode_end[MAX_CPU];
 
@@ -172,4 +174,4 @@ void m68k_set_encrypted_opcode_range(int cpunum, offs_t start, offs_t end);
 /* ============================== END OF FILE ============================= */
 /* ======================================================================== */
 
-#endif /* M68KMAME__HEADER */
+#endif /* __M68KMAME_H__ */

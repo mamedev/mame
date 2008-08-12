@@ -1,5 +1,7 @@
-#ifndef M68K__HEADER
-#define M68K__HEADER
+#pragma once
+
+#ifndef __M68K_H__
+#define __M68K_H__
 
 /* ======================================================================== */
 /* ========================= LICENSING & COPYRIGHT ======================== */
@@ -80,7 +82,7 @@ enum
 };
 
 /* Registers used by m68k_get_reg() and m68k_set_reg() */
-typedef enum
+enum _m68k_register_t
 {
 	/* Real registers */
 	M68K_REG_D0,		/* Data registers */
@@ -122,7 +124,10 @@ typedef enum
 	M68K_REG_PPC,		/* Previous value in the program counter */
 	M68K_REG_IR,		/* Instruction register */
 	M68K_REG_CPU_TYPE	/* Type of CPU being run */
-} m68k_register_t;
+};
+typedef enum _m68k_register_t m68k_register_t;
+
+
 
 /* ======================================================================== */
 /* ====================== FUNCTIONS CALLED BY THE CPU ===================== */
@@ -376,4 +381,4 @@ unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigne
 /* ============================== END OF FILE ============================= */
 /* ======================================================================== */
 
-#endif /* M68K__HEADER */
+#endif /* __M68K_H__ */

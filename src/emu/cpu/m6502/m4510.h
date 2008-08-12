@@ -19,8 +19,10 @@
  *
  *****************************************************************************/
 
-#ifndef _M4510_H
-#define _M4510_H
+#pragma once
+
+#ifndef __M4510_H__
+#define __M4510_H__
 
 #include "m6502.h"
 
@@ -41,6 +43,4 @@ void m4510_get_info(UINT32 state, cpuinfo *info);
 
 extern unsigned m4510_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif
-
-
+#endif /* __M4510_H__ */

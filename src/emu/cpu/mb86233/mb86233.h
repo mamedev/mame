@@ -1,5 +1,7 @@
-#ifndef _MB86233_H
-#define _MB86233_H
+#pragma once
+
+#ifndef __MB86233_H__
+#define __MB86233_H__
 
 #include "cpuintrf.h"
 
@@ -41,7 +43,8 @@ enum
     STRUCTURES
 ***************************************************************************/
 
-struct mb86233_config
+typedef struct _mb86233_cpu_core mb86233_cpu_core;
+struct _mb86233_cpu_core
 {
 	int			(*fifo_read_cb)( UINT32* data );
 	void		(*fifo_write_cb)( UINT32 data );
@@ -50,4 +53,4 @@ struct mb86233_config
 
 extern void mb86233_get_info(UINT32 state, cpuinfo *info);
 
-#endif /* _MB86233_H */
+#endif /* __MB86233_H__ */

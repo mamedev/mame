@@ -5,6 +5,12 @@
  *
  *****************************************************************************/
 
+#pragma once
+
+#ifndef __MINC4510_H__
+#define __MINC4510_H__
+
+
 /* 4510 flags */
 #define F_C	0x01
 #define F_Z	0x02
@@ -70,3 +76,4 @@
 #undef RDOPARG
 #define RDOPARG() m4510_cpu_readop_arg(); m4510_ICount -= 1
 
+#endif /* __MINC4510_H__ */

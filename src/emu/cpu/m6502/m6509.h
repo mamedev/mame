@@ -19,7 +19,9 @@
  *
  *****************************************************************************/
 
-#ifndef _M6509_H
+#pragma once
+
+#ifndef __M6509_H__
 #define _M6509_H
 
 #include "m6502.h"
@@ -38,6 +40,4 @@ enum {
 
 void m6509_get_info(UINT32 state, cpuinfo *info);
 
-#endif /* _M6509_H */
-
-
+#endif /* __M6509_H__ */

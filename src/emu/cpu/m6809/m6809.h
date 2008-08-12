@@ -1,7 +1,9 @@
 /*** m6809: Portable 6809 emulator ******************************************/
 
-#ifndef _M6809_H
-#define _M6809_H
+#pragma once
+
+#ifndef __M6809_H__
+#define __M6809_H__
 
 #include "cpuintrf.h"
 
@@ -47,4 +49,4 @@ void m6809e_get_info(UINT32 state, cpuinfo *info);
 #    define TRUE (!FALSE)
 #endif
 
-#endif /* _M6809_H */
+#endif /* __M6809_H__ */

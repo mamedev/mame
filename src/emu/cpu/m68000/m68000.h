@@ -1,5 +1,7 @@
-#ifndef M68000__HEADER
-#define M68000__HEADER
+#pragma once
+
+#ifndef __M68000_H__
+#define __M68000_H__
 
 #include "cpuintrf.h"
 
@@ -24,7 +26,8 @@ extern int m68k_ICount;
 
 /* Redirect memory calls */
 
-struct m68k_memory_interface
+typedef struct _m68k_memory_interface m68k_memory_interface;
+struct _m68k_memory_interface
 {
 	offs_t	opcode_xor;						// Address Calculation
 	UINT16	(*readimm16)(offs_t);			// Immediate read 16 bit
@@ -46,7 +49,9 @@ struct m68k_memory_interface
 	UINT32	(*read32d)(offs_t);				// Direct read 32 bit
 };
 
-struct m68k_encryption_interface
+
+typedef struct _m68k_encryption_interface m68k_encryption_interface;
+struct _m68k_encryption_interface
 {
 	UINT8	(*read8pc)(offs_t);				// PC Relative read 8 bit
 	UINT16	(*read16pc)(offs_t);			// PC Relative read 16 bit
@@ -160,4 +165,4 @@ void m68040_get_info(UINT32 state, cpuinfo *info);
 // C Core header
 #include "m68kmame.h"
 
-#endif /* M68000__HEADER */
+#endif /* __M68000_H__ */

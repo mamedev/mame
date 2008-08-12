@@ -432,7 +432,7 @@ static void jaguar_state_register(int index, const char *type)
 
 static void jaguargpu_init(int index, int clock, const void *_config, int (*irqcallback)(int))
 {
-	const struct jaguar_config *config = _config;
+	const jaguar_cpu_core *config = _config;
 
 	memset(&jaguar, 0, sizeof(jaguar));
 
@@ -445,7 +445,7 @@ static void jaguargpu_init(int index, int clock, const void *_config, int (*irqc
 
 static void jaguardsp_init(int index, int clock, const void *_config, int (*irqcallback)(int))
 {
-	const struct jaguar_config *config = _config;
+	const jaguar_cpu_core *config = _config;
 
 	memset(&jaguar, 0, sizeof(jaguar));
 

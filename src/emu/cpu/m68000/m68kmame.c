@@ -5,7 +5,7 @@
 
 /* global access */
 
-struct m68k_memory_interface m68k_memory_intf;
+m68k_memory_interface m68k_memory_intf;
 offs_t m68k_encrypted_opcode_start[MAX_CPU];
 offs_t m68k_encrypted_opcode_end[MAX_CPU];
 
@@ -27,7 +27,7 @@ static UINT16 m68008_read_immediate_16(offs_t address)
 }
 
 /* interface for 20/22-bit address bus, 8-bit data bus (68008) */
-static const struct m68k_memory_interface interface_d8 =
+static const m68k_memory_interface interface_d8 =
 {
 	0,
 	m68008_read_immediate_16,
@@ -49,7 +49,7 @@ static UINT16 read_immediate_16(offs_t address)
 }
 
 /* interface for 24-bit address bus, 16-bit data bus (68000, 68010) */
-static const struct m68k_memory_interface interface_d16 =
+static const m68k_memory_interface interface_d16 =
 {
 	0,
 	read_immediate_16,
@@ -125,7 +125,7 @@ static void writelong_d32(offs_t address, UINT32 data)
 }
 
 /* interface for 32-bit data bus (68EC020, 68020) */
-static const struct m68k_memory_interface interface_d32 =
+static const m68k_memory_interface interface_d32 =
 {
 	WORD_XOR_BE(0),
 	read_immediate_16,

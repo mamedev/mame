@@ -116,7 +116,7 @@ static void mb86233_set_context(void *src)
 
 static void mb86233_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	struct mb86233_config * _config = (struct mb86233_config *)config;
+	mb86233_cpu_core * _config = (mb86233_cpu_core *)config;
 	(void)index;
 	(void)clock;
 	(void)irqcallback;

@@ -10,6 +10,8 @@
 
 ***************************************************************************/
 
+#pragma once
+
 #ifndef __MIPS3FE_H__
 #define __MIPS3FE_H__
 
@@ -39,4 +41,4 @@
 
 int mips3fe_describe(void *param, opcode_desc *desc, const opcode_desc *prev);
 
-#endif
+#endif /* __MIPS3FE_H__ */

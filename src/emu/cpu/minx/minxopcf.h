@@ -1,3 +1,8 @@
+#pragma once
+
+#ifndef __MINXOPCF_H__
+#define __MINXOPCF_H__
+
 
 #undef OP
 #define OP(nn) INLINE void minx_CF_##nn(void)
@@ -331,3 +336,4 @@ static const int insnminx_cycles_CF[256] = {
 	 8,  8,  8,  8,  8,  8,  1,  1,  8,  8,  8,  1,  1,  1,  8,  1
 };
 
+#endif /* __MINXOPCF_H__ */

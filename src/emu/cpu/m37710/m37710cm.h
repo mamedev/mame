@@ -1,5 +1,7 @@
-#ifndef HEADER__M37710CM
-#define HEADER__M37710CM
+#pragma once
+
+#ifndef __M37710CM_H__
+#define __M37710CM_H__
 
 #define m37710i_branching(A)
 #define m37710i_jumping(A)
@@ -61,7 +63,8 @@ INLINE int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 /* ======================================================================== */
 
 /* CPU Structure */
-typedef struct
+typedef struct _m37710i_cpu_struct m37710i_cpu_struct;
+struct _m37710i_cpu_struct
 {
 	uint a;			/* Accumulator */
 	uint b;			/* holds high byte of accumulator */
@@ -107,7 +110,8 @@ typedef struct
 	UINT8 m37710_regs[128];
 	attotime reload[8];
 	emu_timer *timers[8];
-} m37710i_cpu_struct;
+};
+
 
 extern m37710i_cpu_struct m37710i_cpu;
 extern int m37710_ICount;
@@ -315,4 +319,4 @@ void m37710i_update_irqs(void);
 /* ======================================================================== */
 /* ================================== CPU ================================= */
 /* ======================================================================== */
-#endif /* HEADER__M37710CM */
+#endif /* __M37710CM_H__ */

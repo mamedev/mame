@@ -1,5 +1,7 @@
-#ifndef HEADER__M7700DS
-#define HEADER__M7700DS
+#pragma once
+
+#ifndef __M7700DS_H__
+#define __M7700DS_H__
 
 /*
 
@@ -16,4 +18,4 @@ All rights reserved.
 
 int m7700_disassemble(char* buff, unsigned int pc, unsigned int pb, const UINT8 *oprom, int m_flag, int x_flag);
 
-#endif /* HEADER__7700DS */
+#endif /* __M7700DS_H__ */

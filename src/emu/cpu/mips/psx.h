@@ -1,5 +1,7 @@
-#ifndef _MIPS_H
-#define _MIPS_H
+#pragma once
+
+#ifndef __PSX_H__
+#define __PSX_H__
 
 #include "cpuintrf.h"
 
@@ -209,4 +211,4 @@ extern unsigned DasmMIPS( char *buffer, UINT32 pc, const UINT8 *opram );
 extern void psxcpu_get_info(UINT32 state, cpuinfo *info);
 #endif
 
-#endif
+#endif /* __PSX_H__ */

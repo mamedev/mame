@@ -6,6 +6,8 @@
 
 ***************************************************************************/
 
+#pragma once
+
 #ifndef __MIPS3COM_H__
 #define __MIPS3COM_H__
 
@@ -258,4 +260,4 @@ INLINE void mips3com_set_irq_line(mips3_state *mips, int irqline, int state)
 		mips->cpr[0][COP0_Cause] &= ~(0x400 << irqline);
 }
 
-#endif
+#endif /* __MIPS3COM_H__ */

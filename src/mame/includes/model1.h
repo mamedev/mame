@@ -1,6 +1,6 @@
 /*----------- defined in machine/model1.c -----------*/
 
-extern const struct mb86233_config model1_vr_tgp_config;
+extern const mb86233_cpu_core model1_vr_tgp_config;
 extern int model1_dump;
 
 READ16_HANDLER( model1_tgp_copro_r );

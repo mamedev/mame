@@ -21,10 +21,10 @@
  */
 
 
+#pragma once
 
-
-#ifndef M68KCPU__HEADER
-#define M68KCPU__HEADER
+#ifndef __M68KCPU_H__
+#define __M68KCPU_H__
 
 #include "m68k.h"
 #include <limits.h>
@@ -840,13 +840,16 @@
 /* =============================== PROTOTYPES ============================= */
 /* ======================================================================== */
 
-typedef union
+typedef union _fp_reg fp_reg;
+union _fp_reg
 {
 	UINT64 i;
 	double f;
-} fp_reg;
+};
 
-typedef struct
+
+typedef struct _m68ki_cpu_core m68ki_cpu_core;
+struct _m68ki_cpu_core
 {
 	uint cpu_type;     /* CPU Type: 68000, 68008, 68010, 68EC020, or 68020 */
 	uint dar[16];      /* Data and Address Registers */
@@ -907,7 +910,7 @@ typedef struct
 	void (*set_fc_callback)(unsigned int new_fc);     /* Called when the CPU function code changes */
 	void (*instr_hook_callback)(unsigned int pc);     /* Called every instruction cycle prior to execution */
 
-} m68ki_cpu_core;
+};
 
 
 extern m68ki_cpu_core m68ki_cpu;
@@ -2041,4 +2044,4 @@ INLINE void m68ki_check_interrupts(void)
 /* ============================== END OF FILE ============================= */
 /* ======================================================================== */
 
-#endif /* M68KCPU__HEADER */
+#endif /* __M68KCPU_H__ */

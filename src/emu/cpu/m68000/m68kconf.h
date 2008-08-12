@@ -20,9 +20,10 @@
  */
 
 
+#pragma once
 
-#ifndef M68KCONF__HEADER
-#define M68KCONF__HEADER
+#ifndef __M68KCONF_H__
+#define __M68KCONF_H__
 
 
 /* Configuration switches.
@@ -198,4 +199,4 @@
 /* ============================== END OF FILE ============================= */
 /* ======================================================================== */
 
-#endif /* M68KCONF__HEADER */
+#endif /* __M68KCONF_H__ */

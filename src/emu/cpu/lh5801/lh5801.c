@@ -45,7 +45,7 @@ enum {
 
 typedef struct
 {
-	const LH5801_CONFIG *config;
+	const lh5801_cpu_core *config;
 
 	PAIR s, p, u, x, y;
 	int tm; //9 bit
@@ -91,7 +91,7 @@ static LH5801_Regs lh5801= { 0 };
 static void lh5801_init(int cpu, int clock, const void *config, int (*irqcallback)(int))
 {
 	memset(&lh5801, 0, sizeof(lh5801));
-	lh5801.config = (const LH5801_CONFIG *) config;
+	lh5801.config = (const lh5801_cpu_core *) config;
 }
 
 static void lh5801_reset(void)

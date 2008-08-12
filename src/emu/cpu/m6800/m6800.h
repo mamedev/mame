@@ -1,7 +1,9 @@
 /*** m6800: Portable 6800 class emulator *************************************/
 
-#ifndef _M6800_H
-#define _M6800_H
+#pragma once
+
+#ifndef __M6800_H__
+#define __M6800_H__
 
 #include "cpuintrf.h"
 
@@ -218,4 +220,4 @@ offs_t m6808_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opra
 offs_t hd63701_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 offs_t nsc8105_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif /* _M6800_H */
+#endif /* __M6800_H__ */

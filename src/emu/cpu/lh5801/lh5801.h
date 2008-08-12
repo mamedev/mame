@@ -18,8 +18,10 @@
  *   - This entire notice must remain in the source code.
  *
  *****************************************************************************/
-#ifndef _LH5801_H
-#define _LH5801_H
+#pragma once
+
+#ifndef __LH5801_H__
+#define __LH5801_H__
 
 /*
 lh5801
@@ -64,9 +66,11 @@ pc 8bit
 #include "cpuintrf.h"
 
 
-typedef struct {
+typedef struct _lh5801_cpu_core lh5801_cpu_core;
+struct _lh5801_cpu_core
+{
 	UINT8 (*in)(void);
-} LH5801_CONFIG;
+};
 
 #define LH5801_INT_NONE 0
 #define LH5801_IRQ 1
@@ -74,4 +78,4 @@ typedef struct {
 void lh5801_get_info(UINT32 state, cpuinfo *info);
 extern offs_t lh5801_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif
+#endif /* __LH5801_H__ */

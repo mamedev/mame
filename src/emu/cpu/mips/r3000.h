@@ -6,8 +6,8 @@
 
 ***************************************************************************/
 
-#ifndef _R3000_H
-#define _R3000_H
+#ifndef __R3000_H__
+#define __R3000_H__
 
 #include "cpuintrf.h"
 
@@ -47,7 +47,8 @@ enum
     STRUCTURES
 ***************************************************************************/
 
-struct r3000_config
+typedef struct _r3000_cpu_core r3000_cpu_core;
+struct _r3000_cpu_core
 {
 	UINT8		hasfpu;			/* 1 if we have an FPU, 0 otherwise */
 	size_t		icache;			/* code cache size */
@@ -65,4 +66,4 @@ extern void r3000le_get_info(UINT32 state, cpuinfo *info);
 extern void r3041be_get_info(UINT32 state, cpuinfo *info);
 extern void r3041le_get_info(UINT32 state, cpuinfo *info);
 
-#endif /* _JAGUAR_H */
+#endif /* __R3000_H__ */

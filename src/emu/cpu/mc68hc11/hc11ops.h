@@ -1,10 +1,17 @@
-typedef struct {
+#pragma once
+
+#ifndef __HC11OPS_H__
+#define __HC11OPS_H__
+
+typedef struct _hc11_opcode_list_struct hc11_opcode_list_struct;
+struct _hc11_opcode_list_struct
+{
 	int page;
 	int opcode;
 	void (*handler)(void);
-} HC11_OPCODE_LIST;
+};
 
-static const HC11_OPCODE_LIST hc11_opcode_list[] =
+static const hc11_opcode_list_struct hc11_opcode_list[] =
 {
 	/*  page    opcode          handler                     */
 	{	0,		0x1b,			HC11OP(aba)					},
@@ -187,3 +194,5 @@ static const HC11_OPCODE_LIST hc11_opcode_list[] =
 	{	0,		0x1a,			HC11OP(page3)				},
 	{	0,		0xcd,			HC11OP(page4)				},
 };
+
+#endif /* __HC11OPS_H__ */

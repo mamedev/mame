@@ -308,7 +308,7 @@ static const st0016_interface st0016_config =
 	cpunum_set_input_line(machine, 1, R3000_IRQ4, ASSERT_LINE);
 }
 
-static const struct r3000_config config =
+static const r3000_cpu_core config =
 {
 	0,
 	4096,	/* code cache size */

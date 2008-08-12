@@ -1,5 +1,7 @@
-#ifndef _MC68HC11_H
-#define _MC68HC11_H
+#pragma once
+
+#ifndef __MC68HC11_H__
+#define __MC68HC11_H__
 
 #include "cpuintrf.h"
 
@@ -27,4 +29,4 @@ void mc68hc11_get_info(UINT32 state, cpuinfo *info);
 #define MC68HC11_IO_AD6				0x16
 #define MC68HC11_IO_AD7				0x17
 
-#endif
+#endif /* __MC68HC11_H__ */

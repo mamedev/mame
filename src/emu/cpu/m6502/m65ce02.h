@@ -19,8 +19,10 @@
  *
  *****************************************************************************/
 
-#ifndef _M65CE02_H
-#define _M65CE02_H
+#pragma once
+
+#ifndef __M65CE02_H__
+#define __M65CE02_H__
 
 #include "m6502.h"
 
@@ -36,6 +38,4 @@ void m65ce02_get_info(UINT32 state, cpuinfo *info);
 
 extern unsigned m65ce02_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif /* _M65CE02_H */
-
-
+#endif /* __M65CE02_H__ */

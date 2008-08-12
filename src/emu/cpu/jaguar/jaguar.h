@@ -6,8 +6,10 @@
 
 ***************************************************************************/
 
-#ifndef _JAGUAR_H
-#define _JAGUAR_H
+#pragma once
+
+#ifndef __JAGUAR_H__
+#define __JAGUAR_H__
 
 #include "cpuintrf.h"
 
@@ -73,7 +75,8 @@ enum
     CONFIGURATION STRUCTURE
 ***************************************************************************/
 
-struct jaguar_config
+typedef struct _jaguar_cpu_core jaguar_cpu_core;
+struct _jaguar_cpu_core
 {
 	void (*cpu_int_callback)(void);
 };
@@ -104,4 +107,4 @@ extern void jaguardsp_ctrl_w(int cpunum, offs_t offset, UINT32 data, UINT32 mem_
 extern UINT32 jaguardsp_ctrl_r(int cpunum, offs_t offset);
 
 
-#endif /* _JAGUAR_H */
+#endif /* __JAGUAR_H__ */

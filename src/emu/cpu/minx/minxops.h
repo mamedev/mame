@@ -1,3 +1,8 @@
+#pragma once
+
+#ifndef __MINXOPS_H__
+#define __MINXOPS_H__
+
 
 #undef OP
 #define OP(nn) INLINE void minx_##nn(void)
@@ -331,3 +336,4 @@ static const int insnminx_cycles[256] = {
 	20,  8, 24, 12,  8,  1,  8, 12,  8,  8,  8, 20, 20,  1,  1,  8
 };
 
+#endif /* __MINXOPS_H__ */

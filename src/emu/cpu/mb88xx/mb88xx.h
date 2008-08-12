@@ -7,8 +7,10 @@
 
 ***************************************************************************/
 
-#ifndef _MB88xx_H_
-#define	_MB88xx_H_
+#pragma once
+
+#ifndef __MB88XX_H__
+#define	__MB88XX_H__
 
 #ifndef INLINE
 #define INLINE static inline
@@ -56,7 +58,8 @@ enum
     CONFIG STRUCTURE
 ***************************************************************************/
 
-struct MB88Config
+typedef struct _mb88_cpu_core mb88_cpu_core;
+struct _mb88_cpu_core
 {
 	UINT8		*PLA_config;		/* PLA configuration (32 byte values), if NULL assume direct output */
 };
@@ -73,4 +76,4 @@ void mb8844_get_info(UINT32 state, cpuinfo *info);
 
 offs_t mb88_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif
+#endif /* __MB88XX_H__ */

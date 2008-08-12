@@ -1,5 +1,9 @@
-#ifndef minx_H
-#define minx_H
+#pragma once
+
+#ifndef __MINX_H__
+#define __MINX_H__
+
+
 #include "cpuintrf.h"
 #include "osd_cpu.h"
 #include "driver.h"
@@ -12,5 +16,4 @@ enum {
 
 extern unsigned minx_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram );
 
-#endif
-
+#endif /* __MINX_H__ */

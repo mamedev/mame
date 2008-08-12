@@ -22,6 +22,12 @@
  *
  *****************************************************************************/
 
+#pragma once
+
+#ifndef __OPSCE02_H__
+#define __OPSCE02_H__
+
+
 #define SET_NZ(n)	if ((n) == 0) P = (P & ~F_N) | F_Z; else P = (P & ~(F_N | F_Z)) | ((n) & F_N)
 #define SET_Z(n)	if ((n) == 0) P |= F_Z; else P &= ~F_Z
 
@@ -989,3 +995,4 @@
 	A = Z;										\
 	SET_NZ(A)
 
+#endif /* __OPSCE02_H__ */

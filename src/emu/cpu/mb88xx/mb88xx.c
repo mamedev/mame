@@ -121,7 +121,7 @@ static void mb88_init(int index, int clock, const void *config, int (*irqcallbac
 {
 	if ( config )
 	{
-		const struct MB88Config *_config = (const struct MB88Config*)config;
+		const mb88_cpu_core *_config = (const mb88_cpu_core*)config;
 		mb88.PLA = _config->PLA_config;
 	}
 
