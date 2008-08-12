@@ -432,6 +432,7 @@ $(MAMEOBJ)/shared.a: \
 	$(MACHINE)/segacrpt.o \
 	$(MACHINE)/ticket.o \
 	$(VIDEO)/avgdvg.o \
+	$(VIDEO)/hd63484.o \
 
 
 
