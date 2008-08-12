@@ -472,8 +472,8 @@ static void verify_video_final(int frame, bitmap_t *bitmap)
 		printf("Track %6d.%d: never saw any white flags; no cadence detection done (WARNING)\n", field / fields_per_frame, 0);
 
     /* did we ever see any lead-out? */
-	if (video_saw_leadin && !video_saw_leadout)
-		printf("Track %6d.%d: detected lead-in but never saw any lead-out (WARNING)\n", field / fields_per_frame, 0);
+	if (!video_saw_leadout)
+		printf("Track %6d.%d: never saw any lead-out (WARNING)\n", field / fields_per_frame, 0);
 }
 
 

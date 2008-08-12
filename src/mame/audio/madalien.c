@@ -107,7 +107,7 @@ static const discrete_mixer_desc madalien_555_1c_cv =
 {
 	DISC_MIXER_IS_RESISTOR,
 	{RES_K(1.5), RES_K(5)},
-	{}, {}, 0, RES_K(10), 0, 0, 0, 1
+	{0}, {0}, 0, RES_K(10), 0, 0, 0, 1
 };
 
 static const discrete_mixer_desc madalien_final_mix =

@@ -205,7 +205,6 @@ struct _laserdisc_state
 	chd_file *			disc;					/* handle to the disc itself */
 	av_codec_decompress_config avconfig;		/* decompression configuration */
 	UINT8				readpending;			/* true if a read is pending */
-	UINT8 *				framebuffer;			/* buffer to hold one frame */
 	UINT32				maxfractrack;			/* maximum track number */
 	UINT32				fieldnum;				/* field number (0 or 1) */
 
@@ -216,6 +215,7 @@ struct _laserdisc_state
 	UINT32				videoframenum[3];		/* frame number contained in each frame */
 	UINT8				videoindex;				/* index of the current video buffer */
 	bitmap_t *			emptyframe;				/* blank frame */
+	bitmap_t			videotarget;			/* fake target bitmap for decompression */
 
 	/* audio data */
 	laserdisc_audio_func audiocallback;			/* callback function for audio processing */
@@ -223,6 +223,8 @@ struct _laserdisc_state
 	UINT32				audiobufsize;			/* size of buffer */
 	UINT32				audiobufin;				/* input index */
 	UINT32				audiobufout;			/* output index */
+	UINT32				audiocursamples;		/* current samples this track */
+	UINT32				audiomaxsamples;		/* maximum samples per track */
 	int					audiocustom;			/* custom sound index */
 	int					samplerate;				/* playback samplerate */
 
@@ -1261,11 +1263,6 @@ static void read_track_data(laserdisc_state *ld)
 	UINT32 chdhunk = (tracknum - 1) * 2 + fieldnum;
 	chd_error err;
 
-	/* initialize the decompression structure */
-	ld->avconfig.decode_mask = AVCOMP_DECODE_VIDEO;
-	ld->avconfig.video_xor = BYTE_XOR_LE(0);
-	ld->avconfig.audio_xor = BYTE_XOR_BE(0);
-
 	/* if the previous field had the white flag, force the new field to pair with it */
 	if (ld->metadata[fieldnum ^ 1].white)
 		ld->videofields[ld->videoindex] = 1;
@@ -1277,15 +1274,35 @@ static void read_track_data(laserdisc_state *ld)
 		ld->videofields[ld->videoindex] = 0;
 	}
 
-	/* set the video buffer information */
-	ld->avconfig.video_buffer = (UINT8 *)BITMAP_ADDR16(ld->videoframe[ld->videoindex], fieldnum, 0);
-	ld->avconfig.video_stride = 4 * ld->videoframe[ld->videoindex]->rowpixels;
-
-	/* if audio is active, enable audio decoding */
-	if (audio_channel_active(ld, 0))
-		ld->avconfig.decode_mask |= AVCOMP_DECODE_AUDIO(0);
-	if (audio_channel_active(ld, 1))
-		ld->avconfig.decode_mask |= AVCOMP_DECODE_AUDIO(1);
+	/* set the video target information */
+	ld->videotarget = *ld->videoframe[ld->videoindex];
+	ld->videotarget.base = BITMAP_ADDR16(&ld->videotarget, fieldnum, 0);
+	ld->videotarget.height /= 2;
+	ld->videotarget.rowpixels *= 2;
+	ld->avconfig.video = &ld->videotarget;
+	
+	/* set the audio target information */
+	if (ld->audiobufin + ld->audiomaxsamples <= ld->audiobufsize)
+	{
+		/* if we can fit without wrapping, just read the data directly */
+		ld->avconfig.audio[0] = &ld->audiobuffer[0][ld->audiobufin];
+		ld->avconfig.audio[1] = &ld->audiobuffer[1][ld->audiobufin];
+	}
+	else
+	{
+		/* otherwise, read to the beginning of the buffer */
+		ld->avconfig.audio[0] = &ld->audiobuffer[0][0];
+		ld->avconfig.audio[1] = &ld->audiobuffer[1][0];
+	}
+	
+	/* override if we're not decoding */
+	ld->avconfig.maxsamples = ld->audiomaxsamples;
+	ld->avconfig.actsamples = &ld->audiocursamples;
+	ld->audiocursamples = 0;
+	if (!audio_channel_active(ld, 0))
+		ld->avconfig.audio[0] = NULL;
+	if (!audio_channel_active(ld, 1))
+		ld->avconfig.audio[1] = NULL;
 
 	/* configure the codec and then read */
 	if (ld->disc != NULL)
@@ -1293,7 +1310,7 @@ static void read_track_data(laserdisc_state *ld)
 		err = chd_codec_config(ld->disc, AV_CODEC_DECOMPRESS_CONFIG, &ld->avconfig);
 		if (err == CHDERR_NONE)
 		{
-			err = chd_read_async(ld->disc, chdhunk, ld->framebuffer);
+			err = chd_read_async(ld->disc, chdhunk, NULL);
 			ld->readpending = TRUE;
 		}
 	}
@@ -1310,25 +1327,22 @@ static void process_track_data(const device_config *device)
 	laserdisc_state *ld = get_safe_token(device);
 	UINT32 tracknum = FRAC_TO_INT(ld->curfractrack);
 	UINT32 fieldnum = ld->fieldnum & 1;
-	const UINT8 *rawdata = NULL;
-	const INT16 *sampsource[2];
 	int frame, chapter;
 	chd_error chderr;
-	int samples;
 
 	/* wait for the async operation to complete */
 	if (ld->disc != NULL && ld->readpending)
 	{
 		/* complete the async operation */
 		chderr = chd_async_complete(ld->disc);
-		if (chderr == CHDERR_NONE || chderr == CHDERR_NO_ASYNC_OPERATION)
-			rawdata = ld->framebuffer;
+		if (chderr != CHDERR_NONE && chderr != CHDERR_NO_ASYNC_OPERATION)
+			ld->avconfig.video = NULL;
 	}
 	ld->readpending = FALSE;
 
 	/* parse the metadata */
-	if (ld->disc != NULL && ld->avconfig.video_buffer != NULL)
-		vbi_parse_all((const UINT16 *)ld->avconfig.video_buffer, ld->avconfig.video_stride / 2, ld->videoframe[0]->width, 8, &ld->metadata[fieldnum]);
+	if (ld->disc != NULL && ld->avconfig.video != NULL)
+		vbi_parse_all((const UINT16 *)ld->avconfig.video->base, ld->avconfig.video->rowpixels, ld->avconfig.video->width, 8, &ld->metadata[fieldnum]);
 	else
 		fake_metadata(tracknum, fieldnum, &ld->metadata[fieldnum]);
 //  printf("Track %5d: Metadata = %d %08X %08X %08X %08X\n", tracknum, ld->metadata[fieldnum].white, ld->metadata[fieldnum].line16, ld->metadata[fieldnum].line17, ld->metadata[fieldnum].line18, ld->metadata[fieldnum].line1718);
@@ -1343,59 +1357,39 @@ static void process_track_data(const device_config *device)
 
 	/* render the display if present */
 	if (ld->display)
-		render_display((UINT16 *)ld->avconfig.video_buffer, ld->avconfig.video_stride / 2, ld->videoframe[0]->width, ld->last_frame);
+		render_display((UINT16 *)ld->avconfig.video->base, ld->avconfig.video->rowpixels, ld->avconfig.video->width, ld->last_frame);
 
-	/* update video ld */
-	if (rawdata != NULL && (ld->avconfig.decode_mask & AVCOMP_DECODE_VIDEO))
+	/* update video field */
+	if (ld->avconfig.video != NULL)
 	{
 		ld->videofields[ld->videoindex]++;
 		ld->videoframenum[ld->videoindex] = ld->last_frame;
 	}
 
-	/* stream the audio into our ring buffers */
-	if (rawdata != NULL)
+	/* shift audio data if we read it into the beginning of the buffer */
+	if (ld->audiocursamples != 0 && ld->audiobufin != 0)
 	{
-		samples = (rawdata[6] << 8) + rawdata[7];
-		sampsource[0] = (const INT16 *)(rawdata + 12 + rawdata[4]) + 0 * samples;
-		sampsource[1] = sampsource[0] + samples;
-
-		/* let the audio callback at it first */
-		if (ld->audiocallback != NULL)
-			(*ld->audiocallback)(device, ld->samplerate, samples, sampsource[0], sampsource[1]);
-
-		/* loop until all samples are copied */
-		while (samples != 0)
-		{
-			int samples_to_copy = MIN(ld->audiobufsize - ld->audiobufin, samples);
-			int channum;
-
-			/* don't overrun the output pointer */
-			if (ld->audiobufout > ld->audiobufin)
+		int chnum;
+		
+		/* iterate over channels */
+		for (chnum = 0; chnum < 2; chnum++)
+			if (ld->avconfig.audio[chnum] == &ld->audiobuffer[chnum][0])
 			{
-				samples_to_copy = MIN(samples_to_copy, ld->audiobufout - ld->audiobufin);
-				if (samples_to_copy == 0)
-					break;
+				int samplesleft;
+				
+				/* move data to the end */
+				samplesleft = ld->audiobufsize - ld->audiobufin;
+				samplesleft = MIN(samplesleft, ld->audiocursamples);
+				memmove(&ld->audiobuffer[chnum][ld->audiobufin], &ld->audiobuffer[chnum][0], samplesleft * 2);
+				
+				/* shift data at the beginning */
+				if (samplesleft < ld->audiocursamples)
+					memmove(&ld->audiobuffer[chnum][0], &ld->audiobuffer[chnum][samplesleft], (ld->audiocursamples - samplesleft) * 2);
 			}
-
-			/* for reach channel, copy the data or clear to 0 */
-			for (channum = 0; channum < 2; channum++)
-			{
-				if (audio_channel_active(ld, channum))
-				{
-					memcpy(&ld->audiobuffer[channum][ld->audiobufin], sampsource[channum], samples_to_copy * 2);
-					sampsource[channum] += samples_to_copy;
-				}
-				else
-					memset(&ld->audiobuffer[channum][ld->audiobufin], 0, samples_to_copy * 2);
-			}
-			samples -= samples_to_copy;
-
-			/* point past the data */
-			ld->audiobufin += samples_to_copy;
-			if (ld->audiobufin >= ld->audiobufsize)
-				ld->audiobufin = 0;
-		}
 	}
+	
+	/* update the input buffer pointer */
+	ld->audiobufin = (ld->audiobufin + ld->audiocursamples) % ld->audiobufsize;
 }
 
 
@@ -1524,15 +1518,17 @@ static void custom_stream_callback(void *param, stream_sample_t **inputs, stream
 	/* otherwise, stream from our buffer */
 	else
 	{
-		const INT16 *buffer0 = ld->audiobuffer[0];
-		const INT16 *buffer1 = ld->audiobuffer[1];
+		INT16 *buffer0 = ld->audiobuffer[0];
+		INT16 *buffer1 = ld->audiobuffer[1];
 		int sampout = ld->audiobufout;
 
-		/* copy samples */
+		/* copy samples, clearing behind us as we go */
 		while (sampout != ld->audiobufin && samples-- > 0)
 		{
 			*dst0++ = buffer0[sampout];
 			*dst1++ = buffer1[sampout];
+			buffer0[sampout] = 0;
+			buffer1[sampout] = 0;
 			sampout++;
 			if (sampout >= ld->audiobufsize)
 				sampout = 0;
@@ -1565,15 +1561,15 @@ static void custom_stream_callback(void *param, stream_sample_t **inputs, stream
     device start callback
 -------------------------------------------------*/
 
-static DEVICE_START(laserdisc)
+static DEVICE_START( laserdisc )
 {
 	int fps = 30, fpsfrac = 0, width = 720, height = 240, interlaced = 1, channels = 2, rate = 44100;
 	const laserdisc_config *config = device->inline_config;
-	UINT32 fps_times_1million, max_samples_per_track;
 	laserdisc_state *ld = get_safe_token(device);
+	UINT32 fps_times_1million;
 	char metadata[256];
-	chd_error err;
 	int sndnum, index;
+	chd_error err;
 
 	/* copy config data to the live state */
 	ld->type = config->type;
@@ -1605,7 +1601,6 @@ static DEVICE_START(laserdisc)
 
 		/* determine the maximum track and allocate a frame buffer */
 		ld->maxfractrack = INT_TO_FRAC(chd_get_header(ld->disc)->totalhunks / (interlaced + 1));
-		ld->framebuffer = auto_malloc(chd_get_header(ld->disc)->hunkbytes);
 	}
 	else
 		ld->maxfractrack = INT_TO_FRAC(54000);
@@ -1625,8 +1620,8 @@ static DEVICE_START(laserdisc)
 
 	/* allocate audio buffers */
 	fps_times_1million = fps * 1000000 + fpsfrac;
-	max_samples_per_track = ((UINT64)rate * 1000000 + fps_times_1million - 1) / fps_times_1million;
-	ld->audiobufsize = max_samples_per_track * 4;
+	ld->audiomaxsamples = ((UINT64)rate * 1000000 + fps_times_1million - 1) / fps_times_1million;
+	ld->audiobufsize = ld->audiomaxsamples * 4;
 	ld->audiobuffer[0] = auto_malloc(ld->audiobufsize * sizeof(ld->audiobuffer[0][0]));
 	ld->audiobuffer[1] = auto_malloc(ld->audiobufsize * sizeof(ld->audiobuffer[1][0]));
 	ld->samplerate = rate;
@@ -1637,7 +1632,7 @@ static DEVICE_START(laserdisc)
     device exit callback
 -------------------------------------------------*/
 
-static DEVICE_STOP(laserdisc)
+static DEVICE_STOP( laserdisc )
 {
 	laserdisc_state *ld = get_safe_token(device);
 
@@ -1722,7 +1717,7 @@ static DEVICE_RESET( laserdisc )
     device set info callback
 -------------------------------------------------*/
 
-static DEVICE_SET_INFO(laserdisc)
+static DEVICE_SET_INFO( laserdisc )
 {
 	laserdisc_state *ld = get_safe_token(device);
 	switch (state)
@@ -1743,7 +1738,7 @@ static DEVICE_SET_INFO(laserdisc)
     device get info callback
 -------------------------------------------------*/
 
-DEVICE_GET_INFO(laserdisc)
+DEVICE_GET_INFO( laserdisc )
 {
 	const laserdisc_config *config = (device != NULL) ? device->inline_config : NULL;
 	switch (state)

@@ -64,6 +64,37 @@
            4M samples -> 31 bits max
            8M samples -> 32 bits max
 
+****************************************************************************
+
+	Delta-RLE encoding works as follows:
+	
+	Starting value is assumed to be 0. All data is encoded as a delta
+	from the previous value, such that final[i] = final[i - 1] + delta.
+	Long runs of 0s are RLE-encoded as follows:
+	
+		0x100 = repeat count of 8
+		0x101 = repeat count of 9
+		0x102 = repeat count of 10
+		0x103 = repeat count of 11
+		0x104 = repeat count of 12
+		0x105 = repeat count of 13
+		0x106 = repeat count of 14
+		0x107 = repeat count of 15
+		0x108 = repeat count of 16
+		0x109 = repeat count of 32
+		0x10a = repeat count of 64
+		0x10b = repeat count of 128
+		0x10c = repeat count of 256
+		0x10d = repeat count of 512
+		0x10e = repeat count of 1024
+		0x10f = repeat count of 2048
+	
+	Note that repeat counts are reset at the end of a row, so if a 0 run
+	extends to the end of a row, a large repeat count may be used.
+	
+	The reason for starting the run counts at 8 is that 0 is expected to
+	be the most common symbol, and is typically encoded in 1 or 2 bits.
+
 ***************************************************************************/
 
 #include "huffman.h"
@@ -74,7 +105,21 @@
     CONSTANTS
 ***************************************************************************/
 
-#define MAX_HUFFMAN_NODES		(256 + 256)
+#define HUFFMAN_CODES			256
+#define HUFFMAN_DELTARLE_CODES	(HUFFMAN_CODES + 16)
+
+#define MAX_HUFFMAN_CODES		(HUFFMAN_DELTARLE_CODES)
+#define MAX_HUFFMAN_NODES		(MAX_HUFFMAN_CODES + MAX_HUFFMAN_CODES)
+
+
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
+#define MAKE_LOOKUP(code,bits)	(((code) << 6) | ((bits) & 0x1f))
+#define LOOKUP_CODE(val)		((val) >> 6)
+#define LOOKUP_BITS(val)		((val) & 0x1f)
 
 
 
@@ -85,37 +130,39 @@
 typedef struct _bit_buffer bit_buffer;
 struct _bit_buffer
 {
-	UINT32			buffer;
-	int				bits;
+	UINT32					buffer;							/* current bit accumulator */
+	int						bits;							/* number of bits in the accumulator */
 	union
 	{
-		const UINT8 *read;
-		UINT8 *		write;
+		const UINT8 *		read;							/* read pointer */
+		UINT8 *				write;							/* write pointer */
 	} data;
-	UINT32			doffset;
-	UINT32			dlength;
-	int				overflow;
+	UINT32					doffset;						/* byte offset within the data */
+	UINT32					dlength;						/* length of the data */
+	int						overflow;						/* flag: true if we read/wrote past the end */
 };
 
 
 typedef struct _huffman_node huffman_node;
 struct _huffman_node
 {
-	huffman_node *	parent;
-	UINT32			count;
-	UINT32			weight;
-	UINT32			bits;
-	UINT8			numbits;
+	huffman_node *			parent;							/* pointer to parent node */
+	UINT32					count;							/* number of hits on this node */
+	UINT32					weight;							/* assigned weight of this node */
+	UINT32					bits;							/* bits used to encode the node */
+	UINT8					numbits;						/* number of bits needed for this node */
 };
 
 
 struct _huffman_context
 {
-	UINT8			maxbits;
-	UINT8			lookupdirty;
-	huffman_node 	huffnode[MAX_HUFFMAN_NODES];
-	UINT32			lookupmask;
-	huffman_lookup_value *lookup;
+	UINT8					maxbits;						/* maximum bits per code */
+	UINT8					lookupdirty;					/* TRUE if the lookup table is dirty */
+	UINT8					prevdata;						/* value of the previous data (for delta-RLE encoding) */
+	UINT32					datahisto[MAX_HUFFMAN_CODES];	/* histogram of data values */
+	int						rleremaining;					/* number of RLE bytes remaining (for delta-RLE encoding) */
+	huffman_node 			huffnode[MAX_HUFFMAN_NODES];	/* array of nodes */
+	huffman_lookup_value *	lookup;							/* pointer to the lookup table */
 };
 
 
@@ -124,11 +171,16 @@ struct _huffman_context
     PROTOTYPES
 ***************************************************************************/
 
-static void huffman_write_rle_tree_bits(bit_buffer *bitbuf, int value, int repcount, int numbits);
-static int CLIB_DECL huffman_tree_node_compare(const void *item1, const void *item2);
-static int huffman_build_tree(huffman_context *context, const UINT32 *datahisto, UINT32 totaldata, UINT32 totalweight);
-static huffman_error huffman_assign_canonical_codes(huffman_context *context);
-static huffman_error huffman_build_lookup_table(huffman_context *context);
+static huffman_error huffman_deltarle_decode_data_interleaved_0102(huffman_context **contexts, const UINT8 *source, UINT32 slength, UINT8 *dest, UINT32 dwidth, UINT32 dheight, UINT32 dstride, UINT32 dxor, UINT32 *actlength);
+
+static huffman_error import_tree(huffman_context *context, const UINT8 *source, UINT32 slength, UINT32 *actlength, UINT32 numcodes);
+static huffman_error export_tree(huffman_context *context, UINT8 *dest, UINT32 dlength, UINT32 *actlength, UINT32 numcodes);
+static void write_rle_tree_bits(bit_buffer *bitbuf, int value, int repcount, int numbits);
+static int CLIB_DECL tree_node_compare(const void *item1, const void *item2);
+static huffman_error compute_optimal_tree(huffman_context *context, const UINT32 *datahisto, UINT32 numcodes);
+static int huffman_build_tree(huffman_context *context, const UINT32 *datahisto, UINT32 totaldata, UINT32 totalweight, UINT32 numcodes);
+static huffman_error assign_canonical_codes(huffman_context *context, UINT32 numcodes);
+static huffman_error build_lookup_table(huffman_context *context, UINT32 numcodes);
 
 
 
@@ -223,7 +275,7 @@ INLINE void bit_buffer_read_init(bit_buffer *bitbuf, const UINT8 *data, UINT32 d
 
 /*-------------------------------------------------
     bit_buffer_read - read 'numbits' bits from
-    the buffer, returning the right-justified
+    the buffer, returning them right-justified
 -------------------------------------------------*/
 
 INLINE UINT32 bit_buffer_read(bit_buffer *bitbuf, int numbits)
@@ -253,6 +305,46 @@ INLINE UINT32 bit_buffer_read(bit_buffer *bitbuf, int numbits)
 
 
 /*-------------------------------------------------
+    bit_buffer_peek - peek ahead and return 
+    'numbits' bits from the buffer, returning 
+    them right-justified
+-------------------------------------------------*/
+
+INLINE UINT32 bit_buffer_peek(bit_buffer *bitbuf, int numbits)
+{
+	/* fetch data if we need more */
+	if (numbits > bitbuf->bits)
+	{
+		while (bitbuf->bits <= 24)
+		{
+			if (bitbuf->doffset < bitbuf->dlength)
+				bitbuf->buffer |= bitbuf->data.read[bitbuf->doffset] << (24 - bitbuf->bits);
+			bitbuf->doffset++;
+			bitbuf->bits += 8;
+		}
+		if (numbits > bitbuf->bits)
+			bitbuf->overflow = TRUE;
+	}
+
+	/* return the data */
+	return bitbuf->buffer >> (32 - numbits);
+}
+
+
+/*-------------------------------------------------
+    bit_buffer_remove - remove 'numbits' bits
+    from the bit buffer; this presupposes that
+    at least 'numbits' are present
+-------------------------------------------------*/
+
+INLINE void bit_buffer_remove(bit_buffer *bitbuf, int numbits)
+{
+	bitbuf->buffer <<= numbits;
+	bitbuf->bits -= numbits;
+}
+
+
+/*-------------------------------------------------
     bit_buffer_read_offset - return the current
     rounded byte reading offset
 -------------------------------------------------*/
@@ -267,6 +359,51 @@ INLINE UINT32 bit_buffer_read_offset(bit_buffer *bitbuf)
 		bits -= 8;
 	}
 	return result;
+}
+
+
+/*-------------------------------------------------
+    code_to_rlecount - number of RLE repetitions
+    encoded in a given byte
+-------------------------------------------------*/
+
+INLINE int code_to_rlecount(int code)
+{
+	if (code == 0x00)
+		return 1;
+	if (code <= 0x107)
+		return 8 + (code - 0x100);
+	return 16 << (code - 0x108);
+}
+
+
+/*-------------------------------------------------
+    rlecount_to_byte - return a byte encoding
+    the maximum RLE count less than or equal to
+    the provided amount
+-------------------------------------------------*/
+
+INLINE int rlecount_to_code(int rlecount)
+{
+	if (rlecount >= 2048)
+		return 0x10f;
+	if (rlecount >= 1024)
+		return 0x10e;
+	if (rlecount >= 512)
+		return 0x10d;
+	if (rlecount >= 256)
+		return 0x10c;
+	if (rlecount >= 128)
+		return 0x10b;
+	if (rlecount >= 64)
+		return 0x10a;
+	if (rlecount >= 32)
+		return 0x109;
+	if (rlecount >= 16)
+		return 0x108;
+	if (rlecount >= 8)
+		return 0x100 + (rlecount - 8);
+	return 0x00;
 }
 
 
@@ -294,7 +431,6 @@ huffman_error huffman_create_context(huffman_context **context, int maxbits)
 	/* set the info */
 	memset(*context, 0, sizeof(**context));
 	(*context)->maxbits = maxbits;
-	(*context)->lookupmask = (1 << maxbits) - 1;
 	(*context)->lookupdirty = TRUE;
 
 	return HUFFERR_NONE;
@@ -315,56 +451,834 @@ void huffman_free_context(huffman_context *context)
 
 
 /*-------------------------------------------------
-    huffman_compute_tree - compute an optimal
-    huffman tree for the given source data
--------------------------------------------------*/
-
-huffman_error huffman_compute_tree(huffman_context *context, const UINT8 *source, UINT32 slength, UINT32 sstride)
-{
-	UINT32 lowerweight, upperweight;
-	UINT32 datahisto[256];
-	int i;
-
-	/* build the data histogram */
-	memset(datahisto, 0, sizeof(datahisto));
-	for (i = 0; i < slength; i += sstride)
-		datahisto[source[i]]++;
-
-	/* binary search to achieve the optimum encoding */
-	lowerweight = 0;
-	upperweight = slength * 2;
-	while (TRUE)
-	{
-		UINT32 curweight = (upperweight + lowerweight) / 2;
-		int curmaxbits;
-
-		/* build a tree using the current weight */
-		curmaxbits = huffman_build_tree(context, datahisto, slength, curweight);
-
-		/* apply binary search here */
-		if (curmaxbits <= context->maxbits)
-		{
-			lowerweight = curweight;
-
-			/* early out if it worked with the raw weights, or if we're done searching */
-			if (curweight == slength || (upperweight - lowerweight) <= 1)
-				break;
-		}
-		else
-			upperweight = curweight;
-	}
-
-	/* assign canonical codes for all nodes based on their code lengths */
-	return huffman_assign_canonical_codes(context);
-}
-
-
-/*-------------------------------------------------
     huffman_import_tree - import a huffman tree
     from a source data stream
 -------------------------------------------------*/
 
 huffman_error huffman_import_tree(huffman_context *context, const UINT8 *source, UINT32 slength, UINT32 *actlength)
+{
+	return import_tree(context, source, slength, actlength, HUFFMAN_CODES);
+}
+
+
+/*-------------------------------------------------
+    huffman_export_tree - export a huffman tree
+    to a target data stream
+-------------------------------------------------*/
+
+huffman_error huffman_export_tree(huffman_context *context, UINT8 *dest, UINT32 dlength, UINT32 *actlength)
+{
+	return export_tree(context, dest, dlength, actlength, HUFFMAN_CODES);
+}
+
+
+/*-------------------------------------------------
+    huffman_deltarle_import_tree - import a 
+    huffman tree from a source data stream for
+    delta-RLE encoded data
+-------------------------------------------------*/
+
+huffman_error huffman_deltarle_import_tree(huffman_context *context, const UINT8 *source, UINT32 slength, UINT32 *actlength)
+{
+	return import_tree(context, source, slength, actlength, HUFFMAN_DELTARLE_CODES);
+}
+
+
+/*-------------------------------------------------
+    huffman__deltarle_export_tree - export a 
+    huffman tree to a target data stream for
+    delta-RLE encoded data
+-------------------------------------------------*/
+
+huffman_error huffman_deltarle_export_tree(huffman_context *context, UINT8 *dest, UINT32 dlength, UINT32 *actlength)
+{
+	return export_tree(context, dest, dlength, actlength, HUFFMAN_DELTARLE_CODES);
+}
+
+
+/*-------------------------------------------------
+    huffman_compute_tree - compute an optimal
+    huffman tree for the given source data
+-------------------------------------------------*/
+
+huffman_error huffman_compute_tree(huffman_context *context, const UINT8 *source, UINT32 swidth, UINT32 sheight, UINT32 sstride, UINT32 sxor)
+{
+	return huffman_compute_tree_interleaved(1, &context, source, swidth, sheight, sstride, sxor);
+}
+
+huffman_error huffman_compute_tree_interleaved(int numcontexts, huffman_context **contexts, const UINT8 *source, UINT32 swidth, UINT32 sheight, UINT32 sstride, UINT32 sxor)
+{
+	UINT32 sx, sy, ctxnum;
+	huffman_error error;
+	
+	/* initialize all nodes */
+	for (ctxnum = 0; ctxnum < numcontexts; ctxnum++)
+	{
+		huffman_context *context = contexts[ctxnum];
+		memset(context->datahisto, 0, sizeof(context->datahisto));
+	}
+
+	/* iterate over "height" */
+	for (sy = 0; sy < sheight; sy++)
+	{
+		/* iterate over "width" */
+		for (sx = 0; sx < swidth; )
+		{
+			/* iterate over contexts */
+			for (ctxnum = 0; ctxnum < numcontexts; ctxnum++, sx++)
+			{
+				huffman_context *context = contexts[ctxnum];
+				context->datahisto[source[sx ^ sxor]]++;
+			}
+		}
+		
+		/* advance to the next row */
+		source += sstride;
+	}
+	
+	/* compute optimal trees for each */
+	for (ctxnum = 0; ctxnum < numcontexts; ctxnum++)
+	{
+		huffman_context *context = contexts[ctxnum];
+		error = compute_optimal_tree(context, context->datahisto, HUFFMAN_CODES);
+		if (error != HUFFERR_NONE)
+			return error;
+	}
+	return HUFFERR_NONE;
+}
+
+
+/*-------------------------------------------------
+    huffman_deltarle_compute_tree - compute an 
+    optimal huffman tree for the given source 
+    data, with pre-encoding as delta-RLE
+-------------------------------------------------*/
+
+huffman_error huffman_deltarle_compute_tree(huffman_context *context, const UINT8 *source, UINT32 swidth, UINT32 sheight, UINT32 sstride, UINT32 sxor)
+{
+	return huffman_deltarle_compute_tree_interleaved(1, &context, source, swidth, sheight, sstride, sxor);
+}
+
+huffman_error huffman_deltarle_compute_tree_interleaved(int numcontexts, huffman_context **contexts, const UINT8 *source, UINT32 swidth, UINT32 sheight, UINT32 sstride, UINT32 sxor)
+{
+	UINT32 sx, sy, ctxnum;
+	huffman_error error;
+	
+	/* initialize all nodes */
+	for (ctxnum = 0; ctxnum < numcontexts; ctxnum++)
+	{
+		huffman_context *context = contexts[ctxnum];
+		memset(context->datahisto, 0, sizeof(context->datahisto));
+		context->prevdata = 0;
+	}
+
+	/* iterate over "height" */
+	for (sy = 0; sy < sheight; sy++)
+	{
+		/* reset RLE counts */
+		for (ctxnum = 0; ctxnum < numcontexts; ctxnum++)
+		{
+			huffman_context *context = contexts[ctxnum];
+			context->rleremaining = 0;
+		}
+
+		/* iterate over "width" */
+		for (sx = 0; sx < swidth; )
+		{
+			/* iterate over contexts */
+			for (ctxnum = 0; ctxnum < numcontexts; ctxnum++, sx++)
+			{
+				huffman_context *context = contexts[ctxnum];
+				UINT8 newdata, delta;
+				
+				/* if still counting RLE, do nothing */
+				if (context->rleremaining != 0)
+				{
+					context->rleremaining--;
+					continue;
+				}
+
+				/* fetch new data and compute the delta */
+				newdata = source[sx ^ sxor];
+				delta = newdata - context->prevdata;
+				context->prevdata = newdata;
+
+				/* 0 deltas scan forward for a count */
+				if (delta == 0)
+				{
+					int zerocount = 1;
+					int rlecode;
+					UINT32 scan;
+
+					/* count the number of consecutive values */
+					for (scan = sx + 1; scan < swidth; scan++)
+						if (contexts[scan % numcontexts] == context)
+						{
+							if (newdata == source[scan ^ sxor])
+								zerocount++;
+							else
+								break;
+						}
+					
+					/* if we hit the end of row, maximize the count */
+					if (scan >= swidth && zerocount >= 8)
+						zerocount = 100000;
+
+					/* encode the maximal count we can */
+					rlecode = rlecount_to_code(zerocount);
+					context->datahisto[rlecode]++;
+					
+					/* set up the remaining count */
+					context->rleremaining = code_to_rlecount(rlecode) - 1;
+				}
+				else
+				{
+					/* encode the actual delta */
+					context->datahisto[delta]++;
+				}
+			}
+		}
+		
+		/* advance to the next row */
+		source += sstride;
+	}
+	
+	/* compute optimal trees for each */
+	for (ctxnum = 0; ctxnum < numcontexts; ctxnum++)
+	{
+		huffman_context *context = contexts[ctxnum];
+		error = compute_optimal_tree(context, context->datahisto, HUFFMAN_DELTARLE_CODES);
+		if (error != HUFFERR_NONE)
+			return error;
+	}
+	return HUFFERR_NONE;
+}
+
+
+/*-------------------------------------------------
+    huffman_encode_data - encode data using the
+    given tree
+-------------------------------------------------*/
+
+huffman_error huffman_encode_data(huffman_context *context, const UINT8 *source, UINT32 swidth, UINT32 sheight, UINT32 sstride, UINT32 sxor, UINT8 *dest, UINT32 dlength, UINT32 *actlength)
+{
+	return huffman_encode_data_interleaved(1, &context, source, swidth, sheight, sstride, sxor, dest, dlength, actlength);
+}
+
+huffman_error huffman_encode_data_interleaved(int numcontexts, huffman_context **contexts, const UINT8 *source, UINT32 swidth, UINT32 sheight, UINT32 sstride, UINT32 sxor, UINT8 *dest, UINT32 dlength, UINT32 *actlength)
+{
+	UINT32 sx, sy, ctxnum;
+	bit_buffer bitbuf;
+
+	/* initialize the output buffer */
+	bit_buffer_write_init(&bitbuf, dest, dlength);
+	
+	/* iterate over "height" */
+	for (sy = 0; sy < sheight; sy++)
+	{
+		/* iterate over "width" */
+		for (sx = 0; sx < swidth; )
+		{
+			/* iterate over contexts */
+			for (ctxnum = 0; ctxnum < numcontexts; ctxnum++, sx++)
+			{
+				huffman_context *context = contexts[ctxnum];
+				huffman_node *node = &context->huffnode[source[sx ^ sxor]];
+				bit_buffer_write(&bitbuf, node->bits, node->numbits);
+			}
+		}
+		
+		/* advance to the next row */
+		source += sstride;
+	}
+
+	/* flush and return a status */
+	*actlength = bit_buffer_flush(&bitbuf);
+	return bitbuf.overflow ? HUFFERR_OUTPUT_BUFFER_TOO_SMALL : HUFFERR_NONE;
+}
+
+
+/*-------------------------------------------------
+    huffman_deltarle_encode_data - encode data 
+    using the given tree with delta-RLE
+    pre-encoding
+-------------------------------------------------*/
+
+huffman_error huffman_deltarle_encode_data(huffman_context *context, const UINT8 *source, UINT32 swidth, UINT32 sheight, UINT32 sstride, UINT32 sxor, UINT8 *dest, UINT32 dlength, UINT32 *actlength)
+{
+	return huffman_deltarle_encode_data_interleaved(1, &context, source, swidth, sheight, sstride, sxor, dest, dlength, actlength);
+}
+
+huffman_error huffman_deltarle_encode_data_interleaved(int numcontexts, huffman_context **contexts, const UINT8 *source, UINT32 swidth, UINT32 sheight, UINT32 sstride, UINT32 sxor, UINT8 *dest, UINT32 dlength, UINT32 *actlength)
+{
+	UINT32 sx, sy, ctxnum;
+	bit_buffer bitbuf;
+	
+	/* initialize the output buffer */
+	bit_buffer_write_init(&bitbuf, dest, dlength);
+	
+	/* initialize the contexts */
+	for (ctxnum = 0; ctxnum < numcontexts; ctxnum++)
+	{
+		huffman_context *context = contexts[ctxnum];
+		context->prevdata = 0;
+	}
+	
+	/* iterate over "height" */
+	for (sy = 0; sy < sheight; sy++)
+	{
+		/* reset RLE counts */
+		for (ctxnum = 0; ctxnum < numcontexts; ctxnum++)
+		{
+			huffman_context *context = contexts[ctxnum];
+			context->rleremaining = 0;
+		}
+
+		/* iterate over "width" */
+		for (sx = 0; sx < swidth; )
+		{
+			/* iterate over contexts */
+			for (ctxnum = 0; ctxnum < numcontexts; ctxnum++, sx++)
+			{
+				huffman_context *context = contexts[ctxnum];
+				UINT8 newdata, delta;
+				huffman_node *node;
+				
+				/* if still counting RLE, do nothing */
+				if (context->rleremaining != 0)
+				{
+					context->rleremaining--;
+					continue;
+				}
+
+				/* fetch new data and compute the delta */
+				newdata = source[sx ^ sxor];
+				delta = newdata - context->prevdata;
+				context->prevdata = newdata;
+
+				/* 0 deltas scan forward for a count */
+				if (delta == 0)
+				{
+					int zerocount = 1;
+					int rlecode;
+					UINT32 scan;
+
+					/* count the number of consecutive values */
+					for (scan = sx + 1; scan < swidth; scan++)
+						if (contexts[scan % numcontexts] == context)
+						{
+							if (newdata == source[scan ^ sxor])
+								zerocount++;
+							else
+								break;
+						}
+
+					/* if we hit the end of row, maximize the count */
+					if (scan >= swidth && zerocount >= 8)
+						zerocount = 100000;
+
+					/* encode the maximal count we can */
+					rlecode = rlecount_to_code(zerocount);
+					node = &context->huffnode[rlecode];
+					bit_buffer_write(&bitbuf, node->bits, node->numbits);
+					
+					/* set up the remaining count */
+					context->rleremaining = code_to_rlecount(rlecode) - 1;
+				}
+				else
+				{
+					/* encode the actual delta */
+					node = &context->huffnode[delta];
+					bit_buffer_write(&bitbuf, node->bits, node->numbits);
+				}
+			}
+		}
+		
+		/* advance to the next row */
+		source += sstride;
+	}
+
+	/* flush and return a status */
+	*actlength = bit_buffer_flush(&bitbuf);
+	return bitbuf.overflow ? HUFFERR_OUTPUT_BUFFER_TOO_SMALL : HUFFERR_NONE;
+}
+
+
+/*-------------------------------------------------
+    huffman_decode_data - decode data using the
+    given tree
+-------------------------------------------------*/
+
+huffman_error huffman_decode_data(huffman_context *context, const UINT8 *source, UINT32 slength, UINT8 *dest, UINT32 dwidth, UINT32 dheight, UINT32 dstride, UINT32 dxor, UINT32 *actlength)
+{
+	const huffman_lookup_value *table;
+	int maxbits = context->maxbits;
+	huffman_error error;
+	bit_buffer bitbuf;
+	UINT32 dx, dy;
+
+	/* regenerate the lookup table if necessary */
+	if (context->lookupdirty)
+	{
+		error = build_lookup_table(context, HUFFMAN_CODES);
+		if (error != HUFFERR_NONE)
+			return error;
+	}
+	table = context->lookup;
+	
+	/* initialize our bit buffer */
+	bit_buffer_read_init(&bitbuf, source, slength);
+
+	/* iterate over "height" */
+	for (dy = 0; dy < dheight; dy++)
+	{
+		/* iterate over "width" */
+		for (dx = 0; dx < dwidth; dx++)
+		{
+			huffman_lookup_value lookup;
+			UINT32 bits;
+			
+			/* peek ahead to get maxbits worth of data */
+			bits = bit_buffer_peek(&bitbuf, maxbits);
+			
+			/* look it up, then remove the actual number of bits for this code */
+			lookup = table[bits];
+			bit_buffer_remove(&bitbuf, LOOKUP_BITS(lookup));
+
+			/* store the upper byte */
+			dest[dx ^ dxor] = LOOKUP_CODE(lookup);
+		}
+		
+		/* advance to the next row */
+		dest += dstride;
+	}
+
+	/* determine the actual length and indicate overflow */
+	*actlength = bit_buffer_read_offset(&bitbuf);
+	return bitbuf.overflow ? HUFFERR_INPUT_BUFFER_TOO_SMALL : HUFFERR_NONE;
+}
+
+
+/*-------------------------------------------------
+    huffman_decode_data_interleaved - decode
+    interleaved data using multiple contexts
+-------------------------------------------------*/
+
+huffman_error huffman_decode_data_interleaved(int numcontexts, huffman_context **contexts, const UINT8 *source, UINT32 slength, UINT8 *dest, UINT32 dwidth, UINT32 dheight, UINT32 dstride, UINT32 dxor, UINT32 *actlength)
+{
+	UINT32 dx, dy, ctxnum;
+	huffman_error error;
+	bit_buffer bitbuf;
+
+	/* regenerate the lookup tables if necessary */
+	for (ctxnum = 0; ctxnum < numcontexts; ctxnum++)
+	{
+		huffman_context *context = contexts[ctxnum];
+		if (context->lookupdirty)
+		{
+			error = build_lookup_table(context, HUFFMAN_CODES);
+			if (error != HUFFERR_NONE)
+				return error;
+		}
+	}
+	
+	/* initialize our bit buffer */
+	bit_buffer_read_init(&bitbuf, source, slength);
+
+	/* iterate over "height" */
+	for (dy = 0; dy < dheight; dy++)
+	{
+		/* iterate over "width" */
+		for (dx = 0; dx < dwidth; )
+		{
+			/* iterate over contexts */
+			for (ctxnum = 0; ctxnum < numcontexts; ctxnum++, dx++)
+			{
+				huffman_context *context = contexts[ctxnum];
+				huffman_lookup_value lookup;
+				UINT32 bits;
+				
+				/* peek ahead to get maxbits worth of data */
+				bits = bit_buffer_peek(&bitbuf, context->maxbits);
+				
+				/* look it up, then remove the actual number of bits for this code */
+				lookup = context->lookup[bits];
+				bit_buffer_remove(&bitbuf, LOOKUP_BITS(lookup));
+
+				/* store the upper byte */
+				dest[dx ^ dxor] = LOOKUP_CODE(lookup);
+			}
+		}
+		
+		/* advance to the next row */
+		dest += dstride;
+	}
+
+	/* determine the actual length and indicate overflow */
+	*actlength = bit_buffer_read_offset(&bitbuf);
+	return bitbuf.overflow ? HUFFERR_INPUT_BUFFER_TOO_SMALL : HUFFERR_NONE;
+}
+
+
+/*-------------------------------------------------
+    huffman_deltarle_decode_data - decode data 
+    using the given tree with delta-RLE 
+    post-decoding
+-------------------------------------------------*/
+
+huffman_error huffman_deltarle_decode_data(huffman_context *context, const UINT8 *source, UINT32 slength, UINT8 *dest, UINT32 dwidth, UINT32 dheight, UINT32 dstride, UINT32 dxor, UINT32 *actlength)
+{
+	const huffman_lookup_value *table;
+	int maxbits = context->maxbits;
+	UINT32 rleremaining = 0;
+	huffman_error error;
+	UINT8 prevdata = 0;
+	bit_buffer bitbuf;
+	UINT32 dx, dy;
+
+	/* regenerate the lookup table if necessary */
+	if (context->lookupdirty)
+	{
+		error = build_lookup_table(context, HUFFMAN_DELTARLE_CODES);
+		if (error != HUFFERR_NONE)
+			return error;
+	}
+	table = context->lookup;
+	
+	/* initialize our bit buffer */
+	bit_buffer_read_init(&bitbuf, source, slength);
+
+	/* iterate over "height" */
+	for (dy = 0; dy < dheight; dy++)
+	{
+		/* reset RLE counts */
+		rleremaining = 0;
+
+		/* iterate over "width" */
+		for (dx = 0; dx < dwidth; dx++)
+		{
+			huffman_lookup_value lookup;
+			UINT32 bits;
+			int data;
+			
+			/* if we have RLE remaining, just store that */
+			if (rleremaining != 0)
+			{
+				rleremaining--;
+				dest[dx ^ dxor] = prevdata;
+				continue;
+			}
+			
+			/* peek ahead to get maxbits worth of data */
+			bits = bit_buffer_peek(&bitbuf, maxbits);
+			
+			/* look it up, then remove the actual number of bits for this code */
+			lookup = table[bits];
+			bit_buffer_remove(&bitbuf, LOOKUP_BITS(lookup));
+
+			/* compute the data and handle RLE decoding */
+			data = LOOKUP_CODE(lookup);
+			
+			/* if not an RLE special, just add to the previous; otherwise, start counting RLE */
+			if (data < 0x100)
+				prevdata += (UINT8)data;
+			else
+				rleremaining = code_to_rlecount(data) - 1;
+
+			/* store the updated data value */
+			dest[dx ^ dxor] = prevdata;
+		}
+		
+		/* advance to the next row */
+		dest += dstride;
+	}
+
+	/* determine the actual length and indicate overflow */
+	*actlength = bit_buffer_read_offset(&bitbuf);
+	return bitbuf.overflow ? HUFFERR_INPUT_BUFFER_TOO_SMALL : HUFFERR_NONE;
+}
+
+
+/*-------------------------------------------------
+    huffman_deltarle_decode_data_interleaved - 
+    decode data using multiple contexts and
+    delta-RLE post-decoding
+-------------------------------------------------*/
+
+huffman_error huffman_deltarle_decode_data_interleaved(int numcontexts, huffman_context **contexts, const UINT8 *source, UINT32 slength, UINT8 *dest, UINT32 dwidth, UINT32 dheight, UINT32 dstride, UINT32 dxor, UINT32 *actlength)
+{
+	UINT32 dx, dy, ctxnum;
+	huffman_error error;
+	bit_buffer bitbuf;
+	
+	/* fast case the A/V Y/Cb/Y/Cr case */
+	if (numcontexts == 4 && contexts[0] == contexts[2] && contexts[0] != contexts[1] && contexts[1] != contexts[3] && 
+		contexts[0]->maxbits == contexts[1]->maxbits && contexts[0]->maxbits == contexts[3]->maxbits)
+		return huffman_deltarle_decode_data_interleaved_0102(contexts, source, slength, dest, dwidth, dheight, dstride, dxor, actlength);
+
+	/* regenerate the lookup tables if necessary */
+	for (ctxnum = 0; ctxnum < numcontexts; ctxnum++)
+	{
+		huffman_context *context = contexts[ctxnum];
+		if (context->lookupdirty)
+		{
+			error = build_lookup_table(context, HUFFMAN_DELTARLE_CODES);
+			if (error != HUFFERR_NONE)
+				return error;
+		}
+		context->prevdata = 0;
+	}
+
+	/* initialize our bit buffer */
+	bit_buffer_read_init(&bitbuf, source, slength);
+
+	/* iterate over "height" */
+	for (dy = 0; dy < dheight; dy++)
+	{
+		/* reset RLE counts */
+		for (ctxnum = 0; ctxnum < numcontexts; ctxnum++)
+		{
+			huffman_context *context = contexts[ctxnum];
+			context->rleremaining = 0;
+		}
+
+		/* iterate over "width" */
+		for (dx = 0; dx < dwidth; )
+		{
+			/* iterate over contexts */
+			for (ctxnum = 0; ctxnum < numcontexts; ctxnum++, dx++)
+			{
+				huffman_context *context = contexts[ctxnum];
+				huffman_lookup_value lookup;
+				UINT32 bits;
+				int data;
+				
+				/* if we have RLE remaining, just store that */
+				if (context->rleremaining != 0)
+				{
+					context->rleremaining--;
+					dest[dx ^ dxor] = context->prevdata;
+					continue;
+				}
+				
+				/* peek ahead to get maxbits worth of data */
+				bits = bit_buffer_peek(&bitbuf, context->maxbits);
+				
+				/* look it up, then remove the actual number of bits for this code */
+				lookup = context->lookup[bits];
+				bit_buffer_remove(&bitbuf, LOOKUP_BITS(lookup));
+
+				/* compute the data and handle RLE decoding */
+				data = LOOKUP_CODE(lookup);
+
+				/* if not an RLE special, just add to the previous; otherwise, start counting RLE */
+				if (data < 0x100)
+					context->prevdata += (UINT8)data;
+				else
+					context->rleremaining = code_to_rlecount(data) - 1;
+
+				/* store the updated data value */
+				dest[dx ^ dxor] = context->prevdata;
+			}
+		}
+		
+		/* advance to the next row */
+		dest += dstride;
+	}
+
+	/* determine the actual length and indicate overflow */
+	*actlength = bit_buffer_read_offset(&bitbuf);
+	return bitbuf.overflow ? HUFFERR_INPUT_BUFFER_TOO_SMALL : HUFFERR_NONE;
+}
+
+
+/*-------------------------------------------------
+    huffman_deltarle_decode_data_interleaved_0102 - 
+    decode data using 3 unique contexts in 
+    0/1/0/2 order (used for Y/Cb/Y/Cr encoding)
+-------------------------------------------------*/
+
+static huffman_error huffman_deltarle_decode_data_interleaved_0102(huffman_context **contexts, const UINT8 *source, UINT32 slength, UINT8 *dest, UINT32 dwidth, UINT32 dheight, UINT32 dstride, UINT32 dxor, UINT32 *actlength)
+{
+	const huffman_lookup_value *table02, *table1, *table3;
+	int rleremaining02, rleremaining1, rleremaining3;
+	UINT8 prevdata02 = 0, prevdata1 = 0, prevdata3 = 0;
+	int maxbits = contexts[0]->maxbits;
+	huffman_error error;
+	bit_buffer bitbuf;
+	UINT32 dx, dy;
+	
+	/* regenerate the lookup tables if necessary */
+	if (contexts[0]->lookupdirty)
+	{
+		error = build_lookup_table(contexts[0], HUFFMAN_DELTARLE_CODES);
+		if (error != HUFFERR_NONE)
+			return error;
+	}
+	if (contexts[1]->lookupdirty)
+	{
+		error = build_lookup_table(contexts[1], HUFFMAN_DELTARLE_CODES);
+		if (error != HUFFERR_NONE)
+			return error;
+	}
+	if (contexts[3]->lookupdirty)
+	{
+		error = build_lookup_table(contexts[3], HUFFMAN_DELTARLE_CODES);
+		if (error != HUFFERR_NONE)
+			return error;
+	}
+	
+	/* cache the tables locally */
+	table02 = contexts[0]->lookup;
+	table1 = contexts[1]->lookup;
+	table3 = contexts[3]->lookup;
+
+	/* initialize our bit buffer */
+	bit_buffer_read_init(&bitbuf, source, slength);
+
+	/* iterate over "height" */
+	for (dy = 0; dy < dheight; dy++)
+	{
+		/* reset RLE counts */
+		rleremaining02 = rleremaining1 = rleremaining3 = 0;
+
+		/* iterate over "width" */
+		for (dx = 0; dx < dwidth; dx += 4)
+		{
+			huffman_lookup_value lookup;
+			UINT32 bits;
+			int data;
+			
+			/* ----- offset 0 ----- */
+			
+			/* if we have RLE remaining, just store that */
+			if (rleremaining02 != 0)
+				rleremaining02--;
+			else
+			{
+				/* peek ahead to get maxbits worth of data */
+				bits = bit_buffer_peek(&bitbuf, maxbits);
+				
+				/* look it up, then remove the actual number of bits for this code */
+				lookup = table02[bits];
+				bit_buffer_remove(&bitbuf, LOOKUP_BITS(lookup));
+
+				/* compute the data and handle RLE decoding */
+				data = LOOKUP_CODE(lookup);
+				
+				/* if not an RLE special, just add to the previous; otherwise, start counting RLE */
+				if (data < 0x100)
+					prevdata02 += (UINT8)data;
+				else
+					rleremaining02 = code_to_rlecount(data) - 1;
+			}
+
+			/* store the updated data value */
+			dest[(dx + 0) ^ dxor] = prevdata02;
+
+			/* ----- offset 1 ----- */
+			
+			/* if we have RLE remaining, just store that */
+			if (rleremaining1 != 0)
+				rleremaining1--;
+			else
+			{
+				/* peek ahead to get maxbits worth of data */
+				bits = bit_buffer_peek(&bitbuf, maxbits);
+				
+				/* look it up, then remove the actual number of bits for this code */
+				lookup = table1[bits];
+				bit_buffer_remove(&bitbuf, LOOKUP_BITS(lookup));
+
+				/* compute the data and handle RLE decoding */
+				data = LOOKUP_CODE(lookup);
+				
+				/* if not an RLE special, just add to the previous; otherwise, start counting RLE */
+				if (data < 0x100)
+					prevdata1 += (UINT8)data;
+				else
+					rleremaining1 = code_to_rlecount(data) - 1;
+			}
+
+			/* store the updated data value */
+			dest[(dx + 1) ^ dxor] = prevdata1;
+
+			/* ----- offset 2 (same as 0) ----- */
+			
+			/* if we have RLE remaining, just store that */
+			if (rleremaining02 != 0)
+				rleremaining02--;
+			else
+			{
+				/* peek ahead to get maxbits worth of data */
+				bits = bit_buffer_peek(&bitbuf, maxbits);
+				
+				/* look it up, then remove the actual number of bits for this code */
+				lookup = table02[bits];
+				bit_buffer_remove(&bitbuf, LOOKUP_BITS(lookup));
+
+				/* compute the data and handle RLE decoding */
+				data = LOOKUP_CODE(lookup);
+				
+				/* if not an RLE special, just add to the previous; otherwise, start counting RLE */
+				if (data < 0x100)
+					prevdata02 += (UINT8)data;
+				else
+					rleremaining02 = code_to_rlecount(data) - 1;
+			}
+
+			/* store the updated data value */
+			dest[(dx + 2) ^ dxor] = prevdata02;
+
+			/* ----- offset 3 ----- */
+			
+			/* if we have RLE remaining, just store that */
+			if (rleremaining3 != 0)
+				rleremaining3--;
+			else
+			{
+				/* peek ahead to get maxbits worth of data */
+				bits = bit_buffer_peek(&bitbuf, maxbits);
+				
+				/* look it up, then remove the actual number of bits for this code */
+				lookup = table3[bits];
+				bit_buffer_remove(&bitbuf, LOOKUP_BITS(lookup));
+
+				/* compute the data and handle RLE decoding */
+				data = LOOKUP_CODE(lookup);
+				
+				/* if not an RLE special, just add to the previous; otherwise, start counting RLE */
+				if (data < 0x100)
+					prevdata3 += (UINT8)data;
+				else
+					rleremaining3 = code_to_rlecount(data) - 1;
+			}
+
+			/* store the updated data value */
+			dest[(dx + 3) ^ dxor] = prevdata3;
+		}
+		
+		/* advance to the next row */
+		dest += dstride;
+	}
+
+	/* determine the actual length and indicate overflow */
+	*actlength = bit_buffer_read_offset(&bitbuf);
+	return bitbuf.overflow ? HUFFERR_INPUT_BUFFER_TOO_SMALL : HUFFERR_NONE;
+}
+
+
+
+/***************************************************************************
+    INTERNAL FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    import_tree - import a huffman tree from a 
+    source data stream
+-------------------------------------------------*/
+
+static huffman_error import_tree(huffman_context *context, const UINT8 *source, UINT32 slength, UINT32 *actlength, UINT32 numcodes)
 {
 	huffman_error error;
 	bit_buffer bitbuf;
@@ -383,7 +1297,7 @@ huffman_error huffman_import_tree(huffman_context *context, const UINT8 *source,
 		numbits = 3;
 
 	/* loop until we read all the nodes */
-	for (curnode = 0; curnode < 256; )
+	for (curnode = 0; curnode < numcodes; )
 	{
 		int nodebits = bit_buffer_read(&bitbuf, numbits);
 
@@ -411,12 +1325,12 @@ huffman_error huffman_import_tree(huffman_context *context, const UINT8 *source,
 	}
 
 	/* assign canonical codes for all nodes based on their code lengths */
-	error = huffman_assign_canonical_codes(context);
+	error = assign_canonical_codes(context, numcodes);
 	if (error != HUFFERR_NONE)
 		return error;
 
 	/* make sure we ended up with the right number */
-	if (curnode != 256)
+	if (curnode != numcodes)
 		return HUFFERR_INVALID_DATA;
 
 	*actlength = bit_buffer_read_offset(&bitbuf);
@@ -425,11 +1339,11 @@ huffman_error huffman_import_tree(huffman_context *context, const UINT8 *source,
 
 
 /*-------------------------------------------------
-    huffman_export_tree - export a huffman tree
-    to a target data stream
+    export_tree - export a huffman tree to a 
+    target data stream
 -------------------------------------------------*/
 
-huffman_error huffman_export_tree(huffman_context *context, UINT8 *dest, UINT32 dlength, UINT32 *actlength)
+static huffman_error export_tree(huffman_context *context, UINT8 *dest, UINT32 dlength, UINT32 *actlength, UINT32 numcodes)
 {
 	bit_buffer bitbuf;
 	int repcount;
@@ -451,7 +1365,7 @@ huffman_error huffman_export_tree(huffman_context *context, UINT8 *dest, UINT32 
 	/* RLE encode the lengths */
 	lastval = ~0;
 	repcount = 0;
-	for (i = 0; i < 256; i++)
+	for (i = 0; i < numcodes; i++)
 	{
 		int newval = context->huffnode[i].numbits;
 
@@ -463,253 +1377,25 @@ huffman_error huffman_export_tree(huffman_context *context, UINT8 *dest, UINT32 
 		else
 		{
 			if (repcount != 0)
-				huffman_write_rle_tree_bits(&bitbuf, lastval, repcount, numbits);
+				write_rle_tree_bits(&bitbuf, lastval, repcount, numbits);
 			lastval = newval;
 			repcount = 1;
 		}
 	}
 
 	/* flush the last value */
-	huffman_write_rle_tree_bits(&bitbuf, lastval, repcount, numbits);
+	write_rle_tree_bits(&bitbuf, lastval, repcount, numbits);
 	*actlength = bit_buffer_flush(&bitbuf);
 	return bitbuf.overflow ? HUFFERR_OUTPUT_BUFFER_TOO_SMALL : HUFFERR_NONE;
 }
 
 
 /*-------------------------------------------------
-    huffman_get_lookup_table - return a pointer to
-    the lookup table
+    write_rle_tree_bits - write an RLE encoded
+    set of data to a target stream
 -------------------------------------------------*/
 
-huffman_error huffman_get_lookup_table(huffman_context *context, const huffman_lookup_value **table)
-{
-	if (context->lookupdirty)
-	{
-		huffman_error error = huffman_build_lookup_table(context);
-		if (error != HUFFERR_NONE)
-			return error;
-	}
-	*table = context->lookup;
-	return HUFFERR_NONE;
-}
-
-
-/*-------------------------------------------------
-    huffman_encode_data - encode data using the
-    current tree
--------------------------------------------------*/
-
-huffman_error huffman_encode_data(huffman_context *context, const UINT8 *source, UINT32 slength, UINT8 *dest, UINT32 dlength, UINT32 *actlength)
-{
-	bit_buffer bitbuf;
-	UINT32 soffset;
-
-	/* initialize the output buffer */
-	bit_buffer_write_init(&bitbuf, dest, dlength);
-
-	/* loop over source data and encode */
-	for (soffset = 0; soffset < slength; soffset++)
-	{
-		huffman_node *node = &context->huffnode[source[soffset]];
-		bit_buffer_write(&bitbuf, node->bits, node->numbits);
-	}
-	*actlength = bit_buffer_flush(&bitbuf);
-	return bitbuf.overflow ? HUFFERR_OUTPUT_BUFFER_TOO_SMALL : HUFFERR_NONE;
-}
-
-
-/*-------------------------------------------------
-    huffman_encode_data_interleaved_2 - encode
-    alternating data with two contexts
--------------------------------------------------*/
-
-huffman_error huffman_encode_data_interleaved_2(huffman_context *context1, huffman_context *context2, const UINT8 *source, UINT32 slength, UINT8 *dest, UINT32 dlength, UINT32 *actlength)
-{
-	bit_buffer bitbuf;
-	UINT32 soffset;
-
-	/* initialize the output buffer */
-	bit_buffer_write_init(&bitbuf, dest, dlength);
-
-	/* loop over source data and encode */
-	for (soffset = 0; soffset < slength; soffset += 2)
-	{
-		huffman_node *node;
-
-		node = &context1->huffnode[source[soffset + 0]];
-		bit_buffer_write(&bitbuf, node->bits, node->numbits);
-
-		node = &context2->huffnode[source[soffset + 1]];
-		bit_buffer_write(&bitbuf, node->bits, node->numbits);
-	}
-	*actlength = bit_buffer_flush(&bitbuf);
-	return bitbuf.overflow ? HUFFERR_OUTPUT_BUFFER_TOO_SMALL : HUFFERR_NONE;
-}
-
-
-/*-------------------------------------------------
-    huffman_decode_data - decode data using the
-    current tree
--------------------------------------------------*/
-
-huffman_error huffman_decode_data(huffman_context *context, const UINT8 *source, UINT32 slength, UINT8 *dest, UINT32 dlength, UINT32 *actlength)
-{
-	int maxbits = context->maxbits;
-	int shiftbits = 32 - maxbits;
-	const huffman_lookup_value *table;
-	int overflow = FALSE;
-	huffman_error error;
-	UINT32 doffset = 0;
-	UINT32 soffset = 0;
-	UINT32 bitbuf = 0;
-	int sbits = 0;
-
-	/* regenerate the lookup table if necessary */
-	error = huffman_get_lookup_table(context, &table);
-	if (error != HUFFERR_NONE)
-		return error;
-
-	/* decode until we process all of the destination data */
-	for (doffset = 0; doffset < dlength; doffset++)
-	{
-		huffman_lookup_value lookup;
-
-		/* if we don't have enough bits, load up the buffer */
-		if (sbits < maxbits)
-		{
-			while (sbits <= 24)
-			{
-				if (soffset < slength)
-					bitbuf |= source[soffset] << (24 - sbits);
-				soffset++;
-				sbits += 8;
-			}
-			if (sbits < maxbits)
-				overflow = TRUE;
-		}
-
-		/* lookup the data */
-		lookup = table[bitbuf >> shiftbits];
-
-		/* store the upper byte */
-		dest[doffset] = lookup >> 8;
-
-		/* count the bits */
-		lookup &= 0x1f;
-		bitbuf <<= lookup;
-		sbits -= lookup;
-	}
-
-	/* back off soffset while we have whole bytes */
-	while (sbits >= 8)
-	{
-		sbits -= 8;
-		soffset--;
-	}
-	*actlength = soffset;
-	return overflow ? HUFFERR_INPUT_BUFFER_TOO_SMALL : HUFFERR_NONE;
-}
-
-
-/*-------------------------------------------------
-    huffman_decode_data_interleaved_2 - decode
-    interleaved data using two contexts
--------------------------------------------------*/
-
-huffman_error huffman_decode_data_interleaved_2(huffman_context *context1, huffman_context *context2, const UINT8 *source, UINT32 slength, UINT8 *dest, UINT32 dlength, UINT32 *actlength)
-{
-	int maxbits1 = context1->maxbits, maxbits2 = context2->maxbits;
-	const huffman_lookup_value *table1, *table2;
-	int shiftbits1 = 32 - maxbits1;
-	int shiftbits2 = 32 - maxbits2;
-	int overflow = FALSE;
-	huffman_error error;
-	UINT32 doffset = 0;
-	UINT32 soffset = 0;
-	UINT32 bitbuf = 0;
-	int sbits = 0;
-
-	/* regenerate the lookup table if necessary */
-	error = huffman_get_lookup_table(context1, &table1);
-	if (error != HUFFERR_NONE)
-		return error;
-	error = huffman_get_lookup_table(context2, &table2);
-	if (error != HUFFERR_NONE)
-		return error;
-
-	/* decode until we process all of the destination data */
-	for (doffset = 0; doffset < dlength; doffset += 2)
-	{
-		huffman_lookup_value lookup;
-
-		/* if we don't have enough bits, load up the buffer */
-		if (sbits < maxbits1)
-		{
-			while (sbits <= 24)
-			{
-				if (soffset < slength)
-					bitbuf |= source[soffset] << (24 - sbits);
-				soffset++;
-				sbits += 8;
-			}
-			if (sbits < maxbits1)
-				overflow = TRUE;
-		}
-
-		/* lookup the data */
-		lookup = table1[bitbuf >> shiftbits1];
-
-		/* store the upper byte */
-		dest[doffset + 0] = lookup >> 8;
-
-		/* count the bits */
-		lookup &= 0x1f;
-		bitbuf <<= lookup;
-		sbits -= lookup;
-
-		/* if we don't have enough bits, load up the buffer */
-		if (sbits < maxbits2)
-		{
-			while (sbits <= 24)
-			{
-				if (soffset < slength)
-					bitbuf |= source[soffset] << (24 - sbits);
-				soffset++;
-				sbits += 8;
-			}
-			if (sbits < maxbits2)
-				overflow = TRUE;
-		}
-
-		/* lookup the data */
-		lookup = table2[bitbuf >> shiftbits2];
-
-		/* store the upper byte */
-		dest[doffset + 1] = lookup >> 8;
-
-		/* count the bits */
-		lookup &= 0x1f;
-		bitbuf <<= lookup;
-		sbits -= lookup;
-	}
-
-	/* back off soffset while we have whole bytes */
-	while (sbits >= 8)
-	{
-		sbits -= 8;
-		soffset--;
-	}
-	*actlength = soffset;
-	return overflow ? HUFFERR_INPUT_BUFFER_TOO_SMALL : HUFFERR_NONE;
-}
-
-
-/*-------------------------------------------------
-    huffman_write_rle_tree_bits - write an RLE
-    encoded set of data to a target stream
--------------------------------------------------*/
-
-static void huffman_write_rle_tree_bits(bit_buffer *bitbuf, int value, int repcount, int numbits)
+static void write_rle_tree_bits(bit_buffer *bitbuf, int value, int repcount, int numbits)
 {
 	/* loop until we have output all of the repeats */
 	while (repcount > 0)
@@ -743,11 +1429,11 @@ static void huffman_write_rle_tree_bits(bit_buffer *bitbuf, int value, int repco
 
 
 /*-------------------------------------------------
-    huffman_tree_node_compare - compare two
-    tree nodes by weight
+    tree_node_compare - compare two tree nodes
+    by weight
 -------------------------------------------------*/
 
-static int CLIB_DECL huffman_tree_node_compare(const void *item1, const void *item2)
+static int CLIB_DECL tree_node_compare(const void *item1, const void *item2)
 {
 	const huffman_node *node1 = *(const huffman_node **)item1;
 	const huffman_node *node2 = *(const huffman_node **)item2;
@@ -756,13 +1442,58 @@ static int CLIB_DECL huffman_tree_node_compare(const void *item1, const void *it
 
 
 /*-------------------------------------------------
+    compute_optimal_tree - common backend for
+    computing a tree based on the data histogram
+-------------------------------------------------*/
+
+static huffman_error compute_optimal_tree(huffman_context *context, const UINT32 *datahisto, UINT32 numcodes)
+{
+	UINT32 lowerweight, upperweight;
+	UINT32 sdatacount;
+	int i;
+	
+	/* compute the number of data items in the histogram */
+	sdatacount = 0;
+	for (i = 0; i < numcodes; i++)
+		sdatacount += datahisto[i];
+
+	/* binary search to achieve the optimum encoding */
+	lowerweight = 0;
+	upperweight = sdatacount * 2;
+	while (TRUE)
+	{
+		UINT32 curweight = (upperweight + lowerweight) / 2;
+		int curmaxbits;
+
+		/* build a tree using the current weight */
+		curmaxbits = huffman_build_tree(context, datahisto, sdatacount, curweight, numcodes);
+
+		/* apply binary search here */
+		if (curmaxbits <= context->maxbits)
+		{
+			lowerweight = curweight;
+
+			/* early out if it worked with the raw weights, or if we're done searching */
+			if (curweight == sdatacount || (upperweight - lowerweight) <= 1)
+				break;
+		}
+		else
+			upperweight = curweight;
+	}
+
+	/* assign canonical codes for all nodes based on their code lengths */
+	return assign_canonical_codes(context, numcodes);
+}
+
+
+/*-------------------------------------------------
     huffman_build_tree - build a huffman tree
     based on the data distribution
 -------------------------------------------------*/
 
-static int huffman_build_tree(huffman_context *context, const UINT32 *datahisto, UINT32 totaldata, UINT32 totalweight)
+static int huffman_build_tree(huffman_context *context, const UINT32 *datahisto, UINT32 totaldata, UINT32 totalweight, UINT32 numcodes)
 {
-	huffman_node *list[256];
+	huffman_node *list[MAX_HUFFMAN_CODES];
 	int listitems;
 	int nextalloc;
 	int maxbits;
@@ -770,8 +1501,8 @@ static int huffman_build_tree(huffman_context *context, const UINT32 *datahisto,
 
 	/* make a list of all non-zero nodes */
 	listitems = 0;
-	memset(context->huffnode, 0, 256 * sizeof(context->huffnode[0]));
-	for (i = 0; i < 256; i++)
+	memset(context->huffnode, 0, numcodes * sizeof(context->huffnode[0]));
+	for (i = 0; i < numcodes; i++)
 		if (datahisto[i] != 0)
 		{
 			list[listitems++] = &context->huffnode[i];
@@ -784,10 +1515,10 @@ static int huffman_build_tree(huffman_context *context, const UINT32 *datahisto,
 		}
 
 	/* sort the list by weight, largest weight first */
-	qsort(list, listitems, sizeof(list[0]), huffman_tree_node_compare);
+	qsort(list, listitems, sizeof(list[0]), tree_node_compare);
 
 	/* now build the tree */
-	nextalloc = 256;
+	nextalloc = MAX_HUFFMAN_CODES;
 	while (listitems > 1)
 	{
 		huffman_node *node0, *node1, *newnode;
@@ -815,7 +1546,7 @@ static int huffman_build_tree(huffman_context *context, const UINT32 *datahisto,
 
 	/* compute the number of bits in each code, and fill in another histogram */
 	maxbits = 0;
-	for (i = 0; i < 256; i++)
+	for (i = 0; i < numcodes; i++)
 	{
 		huffman_node *node = &context->huffnode[i];
 		node->numbits = 0;
@@ -841,12 +1572,12 @@ static int huffman_build_tree(huffman_context *context, const UINT32 *datahisto,
 
 
 /*-------------------------------------------------
-    huffman_assign_canonical_codes - assign
+    assign_canonical_codes - assign
     canonical codes to all the nodes based on the
     number of bits in each
 -------------------------------------------------*/
 
-static huffman_error huffman_assign_canonical_codes(huffman_context *context)
+static huffman_error assign_canonical_codes(huffman_context *context, UINT32 numcodes)
 {
 	UINT32 bithisto[33];
 	int curstart;
@@ -854,7 +1585,7 @@ static huffman_error huffman_assign_canonical_codes(huffman_context *context)
 
 	/* build up a histogram of bit lengths */
 	memset(bithisto, 0, sizeof(bithisto));
-	for (i = 0; i < 256; i++)
+	for (i = 0; i < numcodes; i++)
 	{
 		huffman_node *node = &context->huffnode[i];
 		if (node->numbits > context->maxbits)
@@ -875,7 +1606,7 @@ static huffman_error huffman_assign_canonical_codes(huffman_context *context)
 	}
 
 	/* now assign canonical codes */
-	for (i = 0; i < 256; i++)
+	for (i = 0; i < numcodes; i++)
 	{
 		huffman_node *node = &context->huffnode[i];
 		if (node->numbits > 0)
@@ -889,11 +1620,11 @@ static huffman_error huffman_assign_canonical_codes(huffman_context *context)
 
 
 /*-------------------------------------------------
-    huffman_build_lookup_table - build a lookup
+    build_lookup_table - build a lookup
     table for fast decoding
 -------------------------------------------------*/
 
-static huffman_error huffman_build_lookup_table(huffman_context *context)
+static huffman_error build_lookup_table(huffman_context *context, UINT32 numcodes)
 {
 	int i;
 
@@ -904,7 +1635,7 @@ static huffman_error huffman_build_lookup_table(huffman_context *context)
 		return HUFFERR_OUT_OF_MEMORY;
 
 	/* now build */
-	for (i = 0; i < 256; i++)
+	for (i = 0; i < numcodes; i++)
 	{
 		huffman_node *node = &context->huffnode[i];
 		if (node->numbits > 0)
@@ -918,7 +1649,7 @@ static huffman_error huffman_build_lookup_table(huffman_context *context)
 			huffman_lookup_value value;
 
 			/* set up the entry */
-			value = (i << 8) | node->numbits;
+			value = (i << 6) | node->numbits;
 
 			/* fill all matching entries */
 			dest = &context->lookup[start];

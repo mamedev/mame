@@ -11,6 +11,7 @@
 #include "corefile.h"
 #include "chdcd.h"
 #include "aviio.h"
+#include "avcomp.h"
 #include "bitmap.h"
 #include "md5.h"
 #include "sha1.h"
@@ -601,84 +602,40 @@ cleanup:
     read_avi_frame - read an AVI frame
 -------------------------------------------------*/
 
-static avi_error read_avi_frame(avi_file *avi, UINT32 framenum, UINT8 *cache, bitmap_t *bitmap, int interlaced, UINT32 hunkbytes)
+static avi_error read_avi_frame(avi_file *avi, UINT32 framenum, UINT32 first_sample, bitmap_t *fullbitmap, int interlaced, av_codec_compress_config *avconfig)
 {
 	const avi_movie_info *info = avi_get_movie_info(avi);
 	int interlace_factor = interlaced ? 2 : 1;
-	UINT32 first_sample, num_samples;
 	avi_error avierr = AVIERR_NONE;
-	int chnum, sampnum, x, y;
-	UINT8 *dest = cache;
-	INT16 *temp;
-
-	/* compute the number of samples in this frame */
-	first_sample = avi_first_sample_in_frame(avi, framenum / interlace_factor);
-	num_samples = avi_first_sample_in_frame(avi, framenum / interlace_factor + 1) - first_sample;
-	if (interlaced)
-	{
-		if (framenum % 2 == 0)
-			num_samples = (num_samples + 1) / 2;
-		else
-		{
-			first_sample += (num_samples + 1) / 2;
-			num_samples -= (num_samples + 1) / 2;
-		}
-	}
-
-	/* allocate a temporary buffer */
-	temp = malloc(num_samples * 2);
-	if (temp == NULL)
-		return AVIERR_NO_MEMORY;
-
-	/* update the header with the actual number of samples in the frame */
-	dest[6] = num_samples >> 8;
-	dest[7] = num_samples;
-	dest += 12 + dest[4];
+	int chnum;
 
 	/* loop over channels and read the samples */
 	for (chnum = 0; chnum < info->audio_channels; chnum++)
 	{
 		/* read the sound samples */
-		avierr = avi_read_sound_samples(avi, chnum, first_sample, num_samples, temp);
+		avierr = avi_read_sound_samples(avi, chnum, first_sample, avconfig->samples, avconfig->audio[chnum]);
 		if (avierr != AVIERR_NONE)
 			goto cleanup;
-
-		/* store them big endian at the destination */
-		for (sampnum = 0; sampnum < num_samples; sampnum++)
-		{
-			INT16 sample = temp[sampnum];
-			*dest++ = sample >> 8;
-			*dest++ = sample;
-		}
 	}
 
 	/* read the video data when we hit a new frame */
 	if (framenum % interlace_factor == 0)
 	{
-		avierr = avi_read_video_frame_yuy16(avi, framenum / interlace_factor, bitmap);
+		avierr = avi_read_video_frame_yuy16(avi, framenum / interlace_factor, fullbitmap);
 		if (avierr != AVIERR_NONE)
 			goto cleanup;
 	}
-
-	/* loop over the data and copy it to the cache */
-	for (y = framenum % interlace_factor; y < info->video_height; y += interlace_factor)
+	
+	/* build the fake bitmap */
+	*avconfig->video = *fullbitmap;
+	if (interlaced)
 	{
-		UINT16 *source = BITMAP_ADDR16(bitmap, y, 0);
-
-		for (x = 0; x < info->video_width; x++)
-		{
-			UINT16 pixel = *source++;
-			*dest++ = pixel;
-			*dest++ = pixel >> 8;
-		}
+		avconfig->video->base = BITMAP_ADDR16(avconfig->video, framenum % interlace_factor, 0);
+		avconfig->video->rowpixels *= 2;
+		avconfig->video->height /= 2;
 	}
 
-	/* fill the rest with 0 */
-	while (dest < &cache[hunkbytes])
-		*dest++ = 0;
-
 cleanup:
-	free(temp);
 	return avierr;
 }
 
@@ -687,59 +644,29 @@ cleanup:
     fake_avi_frame - fake an AVI frame
 -------------------------------------------------*/
 
-static avi_error fake_avi_frame(avi_file *avi, UINT32 framenum, UINT8 *cache, bitmap_t *bitmap, int interlaced, UINT32 hunkbytes)
+static avi_error fake_avi_frame(avi_file *avi, UINT32 framenum, UINT32 first_sample, bitmap_t *fullbitmap, int interlaced, av_codec_compress_config *avconfig)
 {
 	static int framecounter = 0;
 	int leftsamp = (framenum % 200 < 10) ? 10000 : 0;
 	int rightsamp = (framenum % 200 >= 100 && framenum % 200 < 110) ? 10000 : 0;
 	int interlace_factor = interlaced ? 2 : 1;
-	UINT32 first_sample, num_samples;
 	int chnum, sampnum, x, y;
 	int whiteflag, line1718;
-	UINT8 *dest = cache;
-	INT16 *temp;
 
 	/* reset framecounter to 1 on frame 0 */
 	if (framenum == 0)
 		framecounter = 1;
-
-	/* compute the number of samples in this frame */
-	first_sample = ((UINT64)AVI_FAKE_SAMPLERATE * (UINT64)framenum * (UINT64)1000000 + AVI_FAKE_FRAMERATE - 1) / AVI_FAKE_FRAMERATE;
-	num_samples = ((UINT64)AVI_FAKE_SAMPLERATE * (UINT64)(framenum + 1) * (UINT64)1000000 + AVI_FAKE_FRAMERATE - 1) / AVI_FAKE_FRAMERATE - first_sample;
-	if (interlaced)
-	{
-		if (framenum % 2 == 0)
-			num_samples = (num_samples + 1) / 2;
-		else
-		{
-			first_sample += (num_samples + 1) / 2;
-			num_samples -= (num_samples + 1) / 2;
-		}
-	}
-
-	/* allocate a temporary buffer */
-	temp = malloc(num_samples * 2);
-	if (temp == NULL)
-		return AVIERR_NO_MEMORY;
-
-	/* update the header with the actual number of samples in the frame */
-	dest[6] = num_samples >> 8;
-	dest[7] = num_samples;
-	dest += 12 + dest[4];
 
 	/* loop over channels and read the samples */
 	for (chnum = 0; chnum < AVI_FAKE_CHANNELS; chnum++)
 	{
 		int modcheck = AVI_FAKE_SAMPLERATE / ((chnum == 0) ? 110 : 220);
 		int samp = (chnum == 0) ? leftsamp : rightsamp;
+		INT16 *dest = avconfig->audio[chnum];
 
-		/* store them big endian at the destination */
-		for (sampnum = 0; sampnum < num_samples; sampnum++)
-		{
-			INT16 sample = ((first_sample + sampnum) % modcheck < modcheck / 2) ? samp : -samp;
-			*dest++ = sample >> 8;
-			*dest++ = sample;
-		}
+		/* store them to the audio buffer */
+		for (sampnum = 0; sampnum < avconfig->samples; sampnum++)
+			*dest++ = ((first_sample + sampnum) % modcheck < modcheck / 2) ? samp : -samp;
 	}
 
 	/* determine what metadata we should generate */
@@ -769,26 +696,31 @@ static avi_error fake_avi_frame(avi_file *avi, UINT32 framenum, UINT8 *cache, bi
 		}
 	}
 
-	/* loop over the data and copy it to the cache */
-	for (y = framenum % interlace_factor; y < AVI_FAKE_HEIGHT; y += interlace_factor)
+	/* build the fake bitmap */
+	*avconfig->video = *fullbitmap;
+	if (interlaced)
 	{
-		int effy = y / interlace_factor;
+		avconfig->video->base = BITMAP_ADDR16(avconfig->video, framenum % interlace_factor, 0);
+		avconfig->video->rowpixels *= 2;
+		avconfig->video->height /= 2;
+	}
+
+	/* loop over the data and copy it to the cache */
+	for (y = 0; y < avconfig->video->height; y++)
+	{
+		UINT16 *dest = BITMAP_ADDR16(avconfig->video, y, 0);
 
 		/* white flag? */
-		if (effy == 11 && whiteflag)
+		if (y == 11 && whiteflag)
 		{
 			for (x = 0; x < AVI_FAKE_WIDTH; x++)
-			{
-				UINT16 pixel = (x > 10 && x < AVI_FAKE_WIDTH - 10) ? 0xff80 : 0x0080;
-				*dest++ = pixel;
-				*dest++ = pixel >> 8;
-			}
+				*dest++ = (x > 10 && x < avconfig->video->width - 10) ? 0xff80 : 0x0080;
 		}
 
 		/* line 17/18 */
-		else if ((effy == 17 || effy == 18) && line1718 != 0)
+		else if ((y == 17 || y == 18) && line1718 != 0)
 		{
-			for (x = 0; x < AVI_FAKE_WIDTH; x++)
+			for (x = 0; x < avconfig->video->width; x++)
 			{
 				UINT16 pixel = 0x0080;
 				if (x >= 20)
@@ -802,38 +734,24 @@ static avi_error fake_avi_frame(avi_file *avi, UINT32 framenum, UINT8 *cache, bi
 					}
 				}
 				*dest++ = pixel;
-				*dest++ = pixel >> 8;
 			}
 		}
 
 		/* anything else in VBI-land */
-		else if (effy < 22)
+		else if (y < 22)
 		{
-			for (x = 0; x < AVI_FAKE_WIDTH; x++)
-			{
-				UINT16 pixel = 0x0080;
-				*dest++ = pixel;
-				*dest++ = pixel >> 8;
-			}
+			for (x = 0; x < avconfig->video->width; x++)
+				*dest++ = 0x0080;
 		}
 
 		/* everything else */
 		else
 		{
-			for (x = 0; x < AVI_FAKE_WIDTH; x++)
-			{
-				UINT16 pixel = framenum;
-				*dest++ = pixel;
-				*dest++ = pixel >> 8;
-			}
+			for (x = 0; x < avconfig->video->width; x++)
+				*dest++ = framenum;
 		}
 	}
 
-	/* fill the rest with 0 */
-	while (dest < &cache[hunkbytes])
-		*dest++ = 0;
-
-	free(temp);
 	return AVIERR_NONE;
 }
 
@@ -847,18 +765,20 @@ static int do_createav(int argc, char *argv[], int param)
 {
 	UINT32 fps_times_1million, width, height, interlaced, channels, rate, totalframes;
 	UINT32 max_samples_per_frame, bytes_per_frame, firstframe, numframes;
+	av_codec_compress_config avconfig = { 0 };
 	const char *inputfile, *outputfile;
-	bitmap_t videobitmap = { 0 };
+	bitmap_t *fullbitmap = NULL;
 	const avi_movie_info *info;
 	const chd_header *header;
 	chd_file *chd = NULL;
 	avi_file *avi = NULL;
-	UINT8 *cache = NULL;
+	bitmap_t fakebitmap;
 	double ratio = 1.0;
 	char metadata[256];
 	avi_error avierr;
-	chd_error err;
 	UINT32 framenum;
+	chd_error err;
+	int chnum;
 
 	/* require 4-6 args total */
 	if (argc < 4 || argc > 6)
@@ -912,20 +832,6 @@ static int do_createav(int argc, char *argv[], int param)
 	}
   	numframes = MIN(totalframes - firstframe, numframes);
 
-	/* allocate a video buffer */
-	videobitmap.base = malloc(width * height * 2);
-	if (videobitmap.base ==  NULL)
-	{
-		fprintf(stderr, "Out of memory allocating temporary bitmap\n");
-		err = CHDERR_OUT_OF_MEMORY;
-		goto cleanup;
-	}
-	videobitmap.format = BITMAP_FORMAT_YUY16;
-	videobitmap.width = width;
-	videobitmap.height = height;
-	videobitmap.bpp = 16;
-	videobitmap.rowpixels = width;
-
 	/* print some of it */
 	printf("Use frames:   %d-%d\n", firstframe, firstframe + numframes - 1);
 	printf("Frame rate:   %d.%06d\n", fps_times_1million / 1000000, fps_times_1million % 1000000);
@@ -949,6 +855,29 @@ static int do_createav(int argc, char *argv[], int param)
 	/* determine the number of bytes per frame */
 	max_samples_per_frame = ((UINT64)rate * 1000000 + fps_times_1million - 1) / fps_times_1million;
 	bytes_per_frame = 12 + channels * max_samples_per_frame * 2 + width * height * 2;
+
+	/* allocate a video buffer */
+	fullbitmap = bitmap_alloc(width, height * (interlaced ? 2 : 1), BITMAP_FORMAT_YUY16);
+	if (fullbitmap == NULL)
+	{
+		fprintf(stderr, "Out of memory allocating temporary bitmap\n");
+		err = CHDERR_OUT_OF_MEMORY;
+		goto cleanup;
+	}
+	avconfig.video = &fakebitmap;
+	
+	/* allocate audio buffers */
+	avconfig.channels = channels;
+	for (chnum = 0; chnum < channels; chnum++)
+	{
+		avconfig.audio[chnum] = malloc(max_samples_per_frame * 2);
+		if (avconfig.audio[chnum] == NULL)
+		{
+			fprintf(stderr, "Out of memory allocating temporary audio buffer\n");
+			err = CHDERR_OUT_OF_MEMORY;
+			goto cleanup;
+		}
+	}
 
 	/* create the new CHD */
 	err = chd_create(outputfile, (UINT64)numframes * (UINT64)bytes_per_frame, bytes_per_frame, CHDCOMPRESSION_AV, NULL);
@@ -976,29 +905,6 @@ static int do_createav(int argc, char *argv[], int param)
 		goto cleanup;
 	}
 
-	/* allocate a cache */
-	cache = malloc(bytes_per_frame);
-	if (cache == NULL)
-	{
-		fprintf(stderr, "Out of memory allocating temporary buffer\n");
-		err = CHDERR_OUT_OF_MEMORY;
-		goto cleanup;
-	}
-
-	/* fill in the basic values */
-	cache[0] = 'c';
-	cache[1] = 'h';
-	cache[2] = 'a';
-	cache[3] = 'v';
-	cache[4] = 0;
-	cache[5] = channels;
-	cache[6] = max_samples_per_frame >> 8;
-	cache[7] = max_samples_per_frame;
-	cache[8] = width >> 8;
-	cache[9] = width;
-	cache[10] = (interlaced << 7) | (height >> 8);
-	cache[11] = height;
-
 	/* begin compressing */
 	err = chd_compress_begin(chd);
 	if (err != CHDERR_NONE)
@@ -1007,22 +913,32 @@ static int do_createav(int argc, char *argv[], int param)
 	/* loop over source hunks until we run out */
 	for (framenum = 0; framenum < numframes; framenum++)
 	{
+		int effframe = firstframe + framenum;
+		UINT32 first_sample;
+
 		/* progress */
 		progress(framenum == 0, "Compressing hunk %d/%d... (ratio=%d%%)  \r", framenum, header->totalhunks, (int)(100.0 * ratio));
 
+		/* compute the number of samples in this frame */
+		first_sample = ((UINT64)rate * (UINT64)effframe * (UINT64)1000000 + fps_times_1million - 1) / (UINT64)fps_times_1million;
+		avconfig.samples = ((UINT64)rate * (UINT64)(effframe + 1) * (UINT64)1000000 + fps_times_1million - 1) / (UINT64)fps_times_1million - first_sample;
+
 		/* read the frame into its proper format in the cache */
 		if (IS_FAKE_AVI_FILE(avi))
-			avierr = fake_avi_frame(avi, firstframe + framenum, cache, &videobitmap, interlaced, bytes_per_frame);
+			avierr = fake_avi_frame(avi, effframe, first_sample, fullbitmap, interlaced, &avconfig);
 		else
-			avierr = read_avi_frame(avi, firstframe + framenum, cache, &videobitmap, interlaced, bytes_per_frame);
+			avierr = read_avi_frame(avi, effframe, first_sample, fullbitmap, interlaced, &avconfig);
 		if (avierr != AVIERR_NONE)
 		{
-			fprintf(stderr, "Error reading frame %d from AVI file: %s\n", firstframe + framenum, avi_error_string(avierr));
+			fprintf(stderr, "Error reading frame %d from AVI file: %s\n", effframe, avi_error_string(avierr));
 			err = CHDERR_COMPRESSION_ERROR;
 		}
 
+		/* configure the compressor for this frame */
+		chd_codec_config(chd, AV_CODEC_COMPRESS_CONFIG, &avconfig);
+
 		/* append the data */
-		err = chd_compress_hunk(chd, cache, &ratio);
+		err = chd_compress_hunk(chd, NULL, &ratio);
 		if (err != CHDERR_NONE)
 			goto cleanup;
 	}
@@ -1040,10 +956,11 @@ cleanup:
 		avi_close(avi);
 	if (chd != NULL)
 		chd_close(chd);
-	if (cache != NULL)
-		free(cache);
-	if (videobitmap.base != NULL)
-		free(videobitmap.base);
+	for (chnum = 0; chnum < ARRAY_LENGTH(avconfig.audio); chnum++)
+		if (avconfig.audio[chnum] != NULL)
+			free(avconfig.audio[chnum]);
+	if (fullbitmap != NULL)
+		bitmap_free(fullbitmap);
 	if (err != CHDERR_NONE)
 		osd_rmfile(outputfile);
 	return (err != CHDERR_NONE);
@@ -1488,80 +1405,6 @@ cleanup:
 
 
 /*-------------------------------------------------
-    write_avi_frame - write an AVI frame
--------------------------------------------------*/
-
-static avi_error write_avi_frame(avi_file *avi, UINT32 framenum, const UINT8 *buffer, bitmap_t *bitmap)
-{
-	const avi_movie_info *info = avi_get_movie_info(avi);
-	UINT32 channels, samples, width, height;
-	avi_error avierr = AVIERR_NONE;
-	int chnum, sampnum, x, y;
-	int interlace_factor;
-	INT16 *temp;
-
-	/* extract core data */
-	channels = buffer[5];
-	samples = (buffer[6] << 8) | buffer[7];
-	width = (buffer[8] << 8) | buffer[9];
-	height = (buffer[10] << 8) | buffer[11];
-	interlace_factor = (height & 0x8000) ? 2 : 1;
-	height &= 0x7fff;
-	height *= interlace_factor;
-	buffer += 12 + buffer[4];
-
-	/* make sure it makes sense */
-	if (width != info->video_width || height != info->video_height)
-		return AVIERR_INVALID_DATA;
-
-	/* allocate a temporary buffer */
-	temp = malloc(samples * 2);
-	if (temp == NULL)
-		return AVIERR_NO_MEMORY;
-
-	/* loop over audio channels */
-	for (chnum = 0; chnum < channels; chnum++)
-	{
-		/* extract samples */
-		for (sampnum = 0; sampnum < samples; sampnum++)
-		{
-			INT16 sample = *buffer++ << 8;
-			temp[sampnum] = sample | *buffer++;
-		}
-
-		/* write the samples */
-		avierr = avi_append_sound_samples(avi, chnum, temp, samples, 0);
-		if (avierr != AVIERR_NONE)
-			goto cleanup;
-	}
-
-	/* loop over the data and copy it to the bitmap */
-	for (y = framenum % interlace_factor; y < height; y += interlace_factor)
-	{
-		UINT16 *dest = (UINT16 *)bitmap->base + y * bitmap->rowpixels;
-
-		for (x = 0; x < width; x++)
-		{
-			UINT16 pixel = *buffer++;
-			*dest++ = pixel | *buffer++ << 8;
-		}
-	}
-
-	/* write the video data */
-	if (interlace_factor == 1 || framenum % 2 == 1)
-	{
-		avierr = avi_append_video_frame_yuy16(avi, bitmap);
-		if (avierr != AVIERR_NONE)
-			goto cleanup;
-	}
-
-cleanup:
-	free(temp);
-	return avierr;
-}
-
-
-/*-------------------------------------------------
     do_extractav - extract an AVI file from a
     CHD image
 -------------------------------------------------*/
@@ -1569,19 +1412,21 @@ cleanup:
 static int do_extractav(int argc, char *argv[], int param)
 {
 	int fps, fpsfrac, width, height, interlaced, channels, rate, totalframes;
+	av_codec_decompress_config avconfig = { 0 };
 	const char *inputfile, *outputfile;
-	int firstframe, numframes;
-	bitmap_t videobitmap = { 0 };
+	UINT32 firstframe, numframes;
+	bitmap_t *fullbitmap = NULL;
+	UINT32 framenum, numsamples;
 	UINT32 fps_times_1million;
 	const chd_header *header;
 	chd_file *chd = NULL;
 	avi_file *avi = NULL;
+	bitmap_t fakebitmap;
 	avi_movie_info info;
 	char metadata[256];
-	void *hunk = NULL;
 	avi_error avierr;
 	chd_error err;
-	int framenum;
+	int chnum;
 
 	/* require 4-6 args total */
 	if (argc < 4 || argc > 6)
@@ -1635,18 +1480,29 @@ static int do_extractav(int argc, char *argv[], int param)
 	numframes = MIN(totalframes - firstframe, numframes);
 
 	/* allocate a video buffer */
-	videobitmap.base = malloc(width * height * 2);
-	if (videobitmap.base ==  NULL)
+	fullbitmap = bitmap_alloc(width, height * (interlaced ? 2 : 1), BITMAP_FORMAT_YUY16);
+	if (fullbitmap ==  NULL)
 	{
 		fprintf(stderr, "Out of memory allocating temporary bitmap\n");
 		err = CHDERR_OUT_OF_MEMORY;
 		goto cleanup;
 	}
-	videobitmap.format = BITMAP_FORMAT_YUY16;
-	videobitmap.width = width;
-	videobitmap.height = height;
-	videobitmap.bpp = 16;
-	videobitmap.rowpixels = width;
+	avconfig.video = &fakebitmap;
+	
+	/* allocate audio buffers */
+	avconfig.channels = channels;
+	avconfig.maxsamples = ((UINT64)rate * 1000000 + fps_times_1million - 1) / fps_times_1million;
+	avconfig.actsamples = &numsamples;
+	for (chnum = 0; chnum < channels; chnum++)
+	{
+		avconfig.audio[chnum] = malloc(avconfig.maxsamples * 2);
+		if (avconfig.audio[chnum] == NULL)
+		{
+			fprintf(stderr, "Out of memory allocating temporary audio buffer\n");
+			err = CHDERR_OUT_OF_MEMORY;
+			goto cleanup;
+		}
+	}
 
 	/* print some of it */
 	printf("Use frames:   %d-%d\n", firstframe, firstframe + numframes - 1);
@@ -1657,15 +1513,6 @@ static int do_extractav(int argc, char *argv[], int param)
 			(UINT32)((UINT64)totalframes * 1000000 / fps_times_1million / 60 / 60),
 			(UINT32)(((UINT64)totalframes * 1000000 / fps_times_1million / 60) % 60),
 			(UINT32)(((UINT64)totalframes * 1000000 / fps_times_1million) % 60));
-
-	/* allocate memory to hold a hunk */
-	hunk = malloc(header->hunkbytes);
-	if (hunk == NULL)
-	{
-		fprintf(stderr, "Out of memory allocating hunk buffer!\n");
-		err = CHDERR_OUT_OF_MEMORY;
-		goto cleanup;
-	}
 
 	/* build up the movie info */
 	info.video_format = FORMAT_YUY2;
@@ -1695,22 +1542,41 @@ static int do_extractav(int argc, char *argv[], int param)
 	{
 		/* progress */
 		progress(framenum == 0, "Extracting hunk %d/%d...  \r", framenum, numframes);
+		
+		/* set up the fake bitmap for this frame */
+		*avconfig.video = *fullbitmap;
+		if (interlaced)
+		{
+			avconfig.video->base = BITMAP_ADDR16(avconfig.video, framenum % 2, 0);
+			avconfig.video->rowpixels *= 2;
+			avconfig.video->height /= 2;
+		}
+		
+		/* configure the decompressor for this frame */
+		chd_codec_config(chd, AV_CODEC_DECOMPRESS_CONFIG, &avconfig);
 
-		/* read the hunk into a buffer */
-		err = chd_read(chd, firstframe + framenum, hunk);
+		/* read the hunk into the buffers */
+		err = chd_read(chd, firstframe + framenum, NULL);
 		if (err != CHDERR_NONE)
 		{
 			fprintf(stderr, "Error reading hunk %d from CHD file: %s\n", firstframe + framenum, chd_error_string(err));
 			goto cleanup;
 		}
 
-		/* write the hunk to the file */
-		avierr = write_avi_frame(avi, framenum, hunk, &videobitmap);
-		if (avierr != AVIERR_NONE)
+		/* write audio */
+		for (chnum = 0; chnum < channels; chnum++)
 		{
-			fprintf(stderr, "Error writing AVI frame: %s\n", avi_error_string(avierr));
-			err = CHDERR_DECOMPRESSION_ERROR;
-			goto cleanup;
+			avierr = avi_append_sound_samples(avi, chnum, avconfig.audio[chnum], numsamples, 0);
+			if (avierr != AVIERR_NONE)
+				goto cleanup;
+		}
+		
+		/* write video */
+		if (!interlaced || (firstframe + framenum) % 2 == 1)
+		{
+			avierr = avi_append_video_frame_yuy16(avi, fullbitmap);
+			if (avierr != AVIERR_NONE)
+				goto cleanup;
 		}
 	}
 	progress(TRUE, "Extraction complete!                    \n");
@@ -1719,10 +1585,11 @@ cleanup:
 	/* clean up our mess */
 	if (avi != NULL)
 		avi_close(avi);
-	if (hunk != NULL)
-		free(hunk);
-	if (videobitmap.base != NULL)
-		free(videobitmap.base);
+	for (chnum = 0; chnum < ARRAY_LENGTH(avconfig.audio); chnum++)
+		if (avconfig.audio[chnum] != NULL)
+			free(avconfig.audio[chnum]);
+	if (fullbitmap != NULL)
+		bitmap_free(fullbitmap);
 	if (chd != NULL)
 		chd_close(chd);
 	if (err != CHDERR_NONE)
