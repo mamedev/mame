@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef __PSX_H__
-#define __PSX_H__
+#ifndef __SOUND_PSX_H__
+#define __SOUND_PSX_H__
 
 WRITE32_HANDLER( psx_spu_w );
 READ32_HANDLER( psx_spu_r );
@@ -27,4 +27,4 @@ struct _psx_spu_interface
 	void (*spu_install_write_handler)(int,spu_handler);
 };
 
-#endif /* __PSX_H__ */
+#endif /* __SOUND_PSX_H__ */
