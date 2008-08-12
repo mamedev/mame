@@ -12,7 +12,7 @@
 #include "madalien.h"
 
 
-#define SOUND_CLOCK 4000000
+#define SOUND_CLOCK XTAL_4MHz
 
 
 static UINT8 *shift_hi;
@@ -180,7 +180,7 @@ static MACHINE_DRIVER_START( madalien )
 
 	MDRV_CPU_ADD("audio", M6502, SOUND_CLOCK / 8)   /* 512kHz */
 	MDRV_CPU_PROGRAM_MAP(audio_map, 0)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 800)    /* unknown due to incomplete schematics */
+	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(madalien_video)
@@ -272,5 +272,5 @@ ROM_END
 
 
 /*          set       parent    machine   inp       init */
-GAME( 1980, madalien, 0,        madalien, madalien, 0, ROT270, "Data East Corporation", "Mad Alien", GAME_SUPPORTS_SAVE )
-GAME( 1980, madalina, madalien, madalien, madalien, 0, ROT270, "Data East Corporation", "Mad Alien (Highway Chase)", GAME_SUPPORTS_SAVE )
+GAME( 1980, madalien, 0,        madalien, madalien, 0, ROT270, "Data East Corporation", "Mad Alien", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1980, madalina, madalien, madalien, madalien, 0, ROT270, "Data East Corporation", "Mad Alien (Highway Chase)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

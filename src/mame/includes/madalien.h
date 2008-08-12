@@ -9,7 +9,7 @@
 #include "sound/discrete.h"
 
 
-#define MADALIEN_MAIN_CLOCK		(10595000)
+#define MADALIEN_MAIN_CLOCK		XTAL_10_595MHz
 
 
 /*----------- defined in video/madalien.c -----------*/
