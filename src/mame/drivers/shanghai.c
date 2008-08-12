@@ -25,20 +25,23 @@ displayed.
 #include "driver.h"
 #include "audio/seibu.h"
 
+static int get_pixel(int x,int y);
+
 /* the on-chip FIFO is 16 bytes long, but we use a larger one to simplify */
 /* decoding of long commands. Commands can be up to 64KB long... but Shanghai */
 /* doesn't reach that length. */
+
 #define FIFO_LENGTH 50
-#define HD63484_RAM_SIZE 0x200000
+#define HD63484_RAM_SIZE 0x100000
+
 static int fifo_counter;
 static UINT16 fifo[FIFO_LENGTH];
 static UINT16 readfifo;
-static UINT8 *HD63484_ram;
+static UINT16 *HD63484_ram;
 static UINT16 HD63484_reg[256/2];
-static int org,rwp;
-static UINT16 cl0,cl1,ccmp;
+static int org,org_dpd,rwp;
+static UINT16 cl0,cl1,ccmp,edg,mask,ppy,pzcy,ppx,pzcs,psy,psx,pey,pzy,pex,pzx,xmin,ymin,xmax,ymax,rwp_dn;
 static INT16 cpx,cpy;
-
 
 static const int instruction_length[64] =
 {
@@ -87,7 +90,7 @@ static void HD63484_start(void)
 	memset(HD63484_ram,0,HD63484_RAM_SIZE);
 }
 
-static void doclr(int opcode,UINT16 fill,int *dst,INT16 _ax,INT16 _ay)
+static void doclr16(int opcode,UINT16 fill,int *dst,INT16 _ax,INT16 _ay)
 {
 	INT16 ax,ay;
 
@@ -101,13 +104,17 @@ static void doclr(int opcode,UINT16 fill,int *dst,INT16 _ax,INT16 _ay)
 			switch (opcode & 0x0003)
 			{
 				case 0:
-					HD63484_ram[*dst]  = fill; break;
+					HD63484_ram[*dst]  = fill;
+					break;
 				case 1:
-					HD63484_ram[*dst] |= fill; break;
+					HD63484_ram[*dst] |= fill;
+					break;
 				case 2:
-					HD63484_ram[*dst] &= fill; break;
+					HD63484_ram[*dst] &= fill;
+					break;
 				case 3:
-					HD63484_ram[*dst] ^= fill; break;
+					HD63484_ram[*dst] ^= fill;
+					break;
 			}
 			if (ax == 0) break;
 			else if (ax > 0)
@@ -125,20 +132,20 @@ static void doclr(int opcode,UINT16 fill,int *dst,INT16 _ax,INT16 _ay)
 		ax = _ax;
 		if (_ay < 0)
 		{
-			*dst = (*dst + (HD63484_reg[0xca/2] & 0x0fff) * 2 - ax) & (HD63484_RAM_SIZE-1);
+			*dst = (*dst + (HD63484_reg[0xca/2] & 0x0fff) - ax) & (HD63484_RAM_SIZE-1);
 			if (ay == 0) break;
 			ay++;
 		}
 		else
 		{
-			*dst = (*dst - (HD63484_reg[0xca/2] & 0x0fff) * 2 - ax) & (HD63484_RAM_SIZE-1);
+			*dst = (*dst - (HD63484_reg[0xca/2] & 0x0fff) - ax) & (HD63484_RAM_SIZE-1);
 			if (ay == 0) break;
 			ay--;
 		}
 	}
 }
 
-static void docpy(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
+static void docpy16(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 {
 	int dstep1,dstep2;
 	int ax = _ax;
@@ -147,14 +154,14 @@ static void docpy(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 	switch (opcode & 0x0700)
 	{
 		default:
-		case 0x0000: dstep1 =  1; dstep2 = -1 * (HD63484_reg[0xca/2] & 0x0fff) * 2 - ax * dstep1; break;
-		case 0x0100: dstep1 =  1; dstep2 =      (HD63484_reg[0xca/2] & 0x0fff) * 2 - ax * dstep1; break;
-		case 0x0200: dstep1 = -1; dstep2 = -1 * (HD63484_reg[0xca/2] & 0x0fff) * 2 + ax * dstep1; break;
-		case 0x0300: dstep1 = -1; dstep2 =      (HD63484_reg[0xca/2] & 0x0fff) * 2 + ax * dstep1; break;
-		case 0x0400: dstep1 = -1 * (HD63484_reg[0xca/2] & 0x0fff) * 2; dstep2 =  1 - ay * dstep1; break;
-		case 0x0500: dstep1 =      (HD63484_reg[0xca/2] & 0x0fff) * 2; dstep2 =  1 - ay * dstep1; break;
-		case 0x0600: dstep1 = -1 * (HD63484_reg[0xca/2] & 0x0fff) * 2; dstep2 = -1 + ay * dstep1; break;
-		case 0x0700: dstep1 =      (HD63484_reg[0xca/2] & 0x0fff) * 2; dstep2 = -1 + ay * dstep1; break; // used by kothello
+		case 0x0000: dstep1 =  1; dstep2 = -1 * (HD63484_reg[0xca/2] & 0x0fff) - ax * dstep1; break;
+		case 0x0100: dstep1 =  1; dstep2 =      (HD63484_reg[0xca/2] & 0x0fff) - ax * dstep1; break;
+		case 0x0200: dstep1 = -1; dstep2 = -1 * (HD63484_reg[0xca/2] & 0x0fff) + ax * dstep1; break;
+		case 0x0300: dstep1 = -1; dstep2 =      (HD63484_reg[0xca/2] & 0x0fff) + ax * dstep1; break;
+		case 0x0400: dstep1 = -1 * (HD63484_reg[0xca/2] & 0x0fff); dstep2 =  1 - ay * dstep1; break;
+		case 0x0500: dstep1 =      (HD63484_reg[0xca/2] & 0x0fff); dstep2 =  1 - ay * dstep1; break;
+		case 0x0600: dstep1 = -1 * (HD63484_reg[0xca/2] & 0x0fff); dstep2 = -1 + ay * dstep1; break;
+		case 0x0700: dstep1 =      (HD63484_reg[0xca/2] & 0x0fff); dstep2 = -1 + ay * dstep1; break;
 	}
 
 	for (;;)
@@ -164,13 +171,17 @@ static void docpy(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 			switch (opcode & 0x0007)
 			{
 				case 0:
-					HD63484_ram[*dst]  = HD63484_ram[src]; break;
+					HD63484_ram[*dst]  = HD63484_ram[src];
+					break;
 				case 1:
-					HD63484_ram[*dst] |= HD63484_ram[src]; break;
+					HD63484_ram[*dst] |= HD63484_ram[src];
+					break;
 				case 2:
-					HD63484_ram[*dst] &= HD63484_ram[src]; break;
+					HD63484_ram[*dst] &= HD63484_ram[src];
+					break;
 				case 3:
-					HD63484_ram[*dst] ^= HD63484_ram[src]; break;
+					HD63484_ram[*dst] ^= HD63484_ram[src];
+					break;
 				case 4:
 					if (HD63484_ram[*dst] == (ccmp & 0xff))
 						HD63484_ram[*dst] = HD63484_ram[src];
@@ -194,13 +205,13 @@ static void docpy(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 				if (ay == 0) break;
 				if (_ay > 0)
 				{
-					src = (src - (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
+					src = (src - (HD63484_reg[0xca/2] & 0x0fff)) & (HD63484_RAM_SIZE-1);
 					*dst = (*dst + dstep1) & (HD63484_RAM_SIZE-1);
 					ay--;
 				}
 				else
 				{
-					src = (src + (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
+					src = (src + (HD63484_reg[0xca/2] & 0x0fff)) & (HD63484_RAM_SIZE-1);
 					*dst = (*dst + dstep1) & (HD63484_RAM_SIZE-1);
 					ay++;
 				}
@@ -228,14 +239,14 @@ static void docpy(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 			ay = _ay;
 			if (_ax < 0)
 			{
-				src = (src - 1 + ay * (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
+				src = (src - 1 + ay * (HD63484_reg[0xca/2] & 0x0fff)) & (HD63484_RAM_SIZE-1);
 				*dst = (*dst + dstep2) & (HD63484_RAM_SIZE-1);
 				if (ax == 0) break;
 				ax++;
 			}
 			else
 			{
-				src = (src + 1 - ay * (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
+				src = (src + 1 - ay * (HD63484_reg[0xca/2] & 0x0fff)) & (HD63484_RAM_SIZE-1);
 				*dst = (*dst + dstep2) & (HD63484_RAM_SIZE-1);
 				if (ax == 0) break;
 				ax--;
@@ -246,14 +257,14 @@ static void docpy(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 			ax = _ax;
 			if (_ay < 0)
 			{
-				src = (src + (HD63484_reg[0xca/2] & 0x0fff) * 2 - ax) & (HD63484_RAM_SIZE-1);
+				src = (src + (HD63484_reg[0xca/2] & 0x0fff) - ax) & (HD63484_RAM_SIZE-1);
 				*dst = (*dst + dstep2) & (HD63484_RAM_SIZE-1);
 				if (ay == 0) break;
 				ay++;
 			}
 			else
 			{
-				src = (src - (HD63484_reg[0xca/2] & 0x0fff) * 2 - ax) & (HD63484_RAM_SIZE-1);
+				src = (src - (HD63484_reg[0xca/2] & 0x0fff) - ax) & (HD63484_RAM_SIZE-1);
 				*dst = (*dst + dstep2) & (HD63484_RAM_SIZE-1);
 				if (ay == 0) break;
 				ay--;
@@ -262,38 +273,287 @@ static void docpy(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 	}
 }
 
+static int org_first_pixel(int _org_dpd)
+{
+	int gbm = (HD63484_reg[0x02/2] & 0x700) >> 8;
+	
+	switch (gbm)
+	{
+		case 0:
+			return (_org_dpd & 0x0f);
+		case 1:
+			return (_org_dpd & 0x0e) >> 1;
+		case 2:
+			return (_org_dpd & 0x0c) >> 2;
+		case 3:
+			return (_org_dpd & 0x08) >> 3;
+		case 4:
+			return 0;
 
+		default:
+			logerror ("Graphic bit mode not supported\n");
+			return 0;
+	}
+}
 
-#define PLOT(addr,OPM)								\
-switch (OPM)										\
-{													\
-	case 0:											\
-		HD63484_ram[addr]  = cl0; break;			\
-	case 1:											\
-		HD63484_ram[addr] |= cl0; break;			\
-	case 2:											\
-		HD63484_ram[addr] &= cl0; break;			\
-	case 3:											\
-		HD63484_ram[addr] ^= cl0; break;			\
-	case 4:											\
-		if (HD63484_ram[addr] == (ccmp & 0xff))		\
-			HD63484_ram[addr] = cl0;				\
-		break;										\
-	case 5:											\
-		if (HD63484_ram[addr] != (ccmp & 0xff))		\
-			HD63484_ram[addr] = cl0;				\
-		break;										\
-	case 6:											\
-		if (HD63484_ram[addr] < (cl0 & 0xff))		\
-			HD63484_ram[addr] = cl0;				\
-		break;										\
-	case 7:											\
-		if (HD63484_ram[addr] > (cl0 & 0xff))		\
-			HD63484_ram[addr] = cl0;				\
-		break;										\
-}													\
+static void dot(int x, int y, int opm, UINT16 color)
+{
+	int dst, x_int, x_mod, bpp;
+	UINT16 color_shifted, bitmask, bitmask_shifted;
 
+	x += org_first_pixel(org_dpd);
 
+	switch ((HD63484_reg[0x02/2] & 0x700) >> 8)
+	{
+		case 0:
+			bpp = 1;
+			bitmask = 0x0001;
+			break;
+		case 1:
+			bpp = 2;
+			bitmask = 0x0003;
+			break;
+		case 2:
+			bpp = 4;
+			bitmask = 0x000f;
+			break;
+		case 3:
+			bpp = 8;
+			bitmask = 0x00ff;
+			break;
+		case 4:
+			bpp = 16;
+			bitmask = 0xffff;
+			break;
+
+		default:
+			bpp = 0;
+			bitmask = 0x0000;
+			logerror ("Graphic bit mode not supported\n");
+	}
+
+	if (x >= 0)
+	{
+		x_int = x / (16 / bpp);
+		x_mod = x % (16 / bpp);
+	}
+	else
+	{
+		x_int = x / (16 / bpp);
+		x_mod = -1 * (x % (16 / bpp));
+		if (x_mod) {
+			x_int--;
+			x_mod = (16 / bpp) - x_mod;
+		}
+	}
+	color &= bitmask;
+
+	bitmask_shifted = bitmask << (x_mod * bpp);
+	color_shifted = color << (x_mod * bpp);
+
+	dst = (org + x_int - y * (HD63484_reg[0xca/2] & 0x0fff)) & (HD63484_RAM_SIZE-1);
+
+	switch (opm)
+	{
+		case 0:
+			HD63484_ram[dst] = (HD63484_ram[dst] & ~bitmask_shifted) | color_shifted;
+			break;
+		case 1:
+			HD63484_ram[dst] = HD63484_ram[dst] | color_shifted;
+			break;
+		case 2:
+			HD63484_ram[dst] = HD63484_ram[dst] & ((HD63484_ram[dst] & ~bitmask_shifted) | color_shifted);
+			break;
+		case 3:
+			HD63484_ram[dst] = HD63484_ram[dst] ^ color_shifted;
+			break;
+		case 4:
+			if (get_pixel(x,y) == (ccmp & bitmask))
+			 	HD63484_ram[dst] = (HD63484_ram[dst] & ~bitmask_shifted) | color_shifted;
+			break;
+		case 5:
+			if (get_pixel(x,y) != (ccmp & bitmask))
+			 	HD63484_ram[dst] = (HD63484_ram[dst] & ~bitmask_shifted) | color_shifted;
+			break;
+		case 6:
+			if (get_pixel(x,y) < (cl0 & bitmask))
+			 	HD63484_ram[dst] = (HD63484_ram[dst] & ~bitmask_shifted) | color_shifted;
+			break;
+		case 7:
+			if (get_pixel(x,y) > (cl0 & bitmask))
+			 	HD63484_ram[dst] = (HD63484_ram[dst] & ~bitmask_shifted) | color_shifted;
+			break;
+	}
+}
+
+static int get_pixel(int x,int y)
+{
+	int dst, x_int, x_mod, bpp;
+	UINT16 bitmask, bitmask_shifted;
+
+	switch ((HD63484_reg[0x02/2] & 0x700) >> 8)
+	{
+		case 0:
+			bpp = 1;
+			bitmask = 0x0001;
+			break;
+		case 1:
+			bpp = 2;
+			bitmask = 0x0003;
+			break;
+		case 2:
+			bpp = 4;
+			bitmask = 0x000f;
+			break;
+		case 3:
+			bpp = 8;
+			bitmask = 0x00ff;
+			break;
+		case 4:
+			bpp = 16;
+			bitmask = 0xffff;
+			break;
+
+		default:
+			bpp = 0;
+			bitmask = 0x0000;
+			logerror ("Graphic bit mode not supported\n");
+	}
+	if (x >= 0)
+	{
+		x_int = x / (16 / bpp);
+		x_mod = x % (16 / bpp);
+	}
+	else
+	{
+		x_int = x / (16 / bpp);
+		x_mod = -1 * (x % (16 / bpp));
+		if (x_mod) {
+			x_int--;
+			x_mod = (16 / bpp) - x_mod;
+		}
+	}
+
+	bitmask_shifted = bitmask << (x_mod * bpp);
+
+	dst = (org + x_int - y * (HD63484_reg[0xca/2] & 0x0fff)) & (HD63484_RAM_SIZE-1);
+
+	return ((HD63484_ram[dst] & bitmask_shifted) >> (x_mod * bpp));
+}
+
+static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,INT16 _ay)
+{
+	int step1_x,step1_y,step2_x,step2_y;
+	int ax = _ax;
+	int ay = _ay;
+	int xxs = src_x;
+	int yys = src_y;
+	int xxd = dst_x;
+	int yyd = dst_y;
+
+	switch (opcode & 0x0700)
+	{
+		default:
+		case 0x0000: step1_x =  1; step1_y =  0; step2_x = -ax; step2_y =   1; break;
+		case 0x0100: step1_x =  1; step1_y =  0; step2_x = -ax; step2_y =  -1; break;
+		case 0x0200: step1_x = -1; step1_y =  0; step2_x =  ax; step2_y =   1; break;
+		case 0x0300: step1_x = -1; step1_y =  0; step2_x =  ax; step2_y =  -1; break;
+		case 0x0400: step1_x =  0; step1_y =  1; step2_x =   1; step2_y =  ay; break;
+		case 0x0500: step1_x =  0; step1_y = -1; step2_x =   1; step2_y = -ay; break;
+		case 0x0600: step1_x =  0; step1_y =  1; step2_x =  -1; step2_y =  ay; break;
+		case 0x0700: step1_x =  0; step1_y = -1; step2_x =  -1; step2_y = -ay; break;
+	}
+
+	for (;;)
+	{
+		for (;;)
+		{
+			dot(xxd,yyd,opcode & 0x0007,get_pixel(xxs,yys));
+
+			if (opcode & 0x0800)
+			{
+				if (ay == 0) break;
+				if (_ay > 0)
+				{
+					yys++;
+					xxd += step1_x;
+					yyd += step1_y;
+					ay--;
+				}
+				else
+				{
+					yys--;
+					xxd += step1_x;
+					yyd += step1_y;
+					ay++;
+				}
+			}
+			else
+			{
+				if (ax == 0) break;
+				else if (ax > 0)
+				{
+					xxs++;
+					xxd += step1_x;
+					yyd += step1_y;
+					ax--;
+				}
+				else
+				{
+					xxs--;
+					xxd += step1_x;
+					yyd += step1_y;
+					ax++;
+				}
+			}
+		}
+
+		if (opcode & 0x0800)
+		{
+			ay = _ay;
+			if (_ax < 0)
+			{
+				xxs--;
+				yys -= ay;
+				xxd += step2_x;
+				yyd += step2_y;
+				if (ax == 0) break;
+				ax++;
+			}
+			else
+			{
+				xxs++;
+				yys += ay;
+				xxd += step2_x;
+				yyd += step2_y;
+				if (ax == 0) break;
+				ax--;
+			}
+		}
+		else
+		{
+			ax = _ax;
+			if (_ay < 0)
+			{
+				xxs -= ax;
+				yys--;
+				xxd += step2_x;
+				yyd += step2_y;
+				if (ay == 0) break;
+				ay++;
+			}
+			else
+			{
+				xxs -= ax;
+				yys++;
+				xxd += step2_x;
+				yyd += step2_y;
+				if (ay == 0) break;
+				ay--;
+			}
+		}
+	}
+}
 
 static void HD63484_command_w(UINT16 cmd)
 {
@@ -324,6 +584,7 @@ static void HD63484_command_w(UINT16 cmd)
 
 		if (fifo[0] == 0x0400) { /* ORG */
 			org = ((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4);
+			org_dpd = fifo[2] & 0x000f;
 		}
 		else if ((fifo[0] & 0xffe0) == 0x0800)	/* WPR */
 		{
@@ -333,8 +594,42 @@ static void HD63484_command_w(UINT16 cmd)
 				cl1 = fifo[1];
 			else if (fifo[0] == 0x0802)
 				ccmp = fifo[1];
+			else if (fifo[0] == 0x0803)
+				edg = fifo[1];
+			else if (fifo[0] == 0x0804)
+				mask = fifo[1];
+			else if (fifo[0] == 0x0805)
+				{
+					ppy  = (fifo[1] & 0xf000) >> 12;
+					pzcy = (fifo[1] & 0x0f00) >> 8;
+					ppx  = (fifo[1] & 0x00f0) >> 4;
+					pzcs = (fifo[1] & 0x000f) >> 0;
+				}
+			else if (fifo[0] == 0x0806)
+				{
+					psy  = (fifo[1] & 0xf000) >> 12;
+					psx  = (fifo[1] & 0x00f0) >> 4;
+				}
+			else if (fifo[0] == 0x0807)
+				{
+					pey  = (fifo[1] & 0xf000) >> 12;
+					pzy  = (fifo[1] & 0x0f00) >> 8;
+					pex  = (fifo[1] & 0x00f0) >> 4;
+					pzx  = (fifo[1] & 0x000f) >> 0;
+				}
+			else if (fifo[0] == 0x0808)
+				xmin = fifo[1];
+			else if (fifo[0] == 0x0809)
+				ymin = fifo[1];
+			else if (fifo[0] == 0x080a)
+				xmax = fifo[1];
+			else if (fifo[0] == 0x080b)
+				ymax = fifo[1];
 			else if (fifo[0] == 0x080c)
-				rwp = (rwp & 0x00fff) | ((fifo[1] & 0x00ff) << 12);
+				{
+					rwp = (rwp & 0x00fff) | ((fifo[1] & 0x00ff) << 12);
+					rwp_dn = (fifo[1] & 0xc000) >> 14;
+				}
 			else if (fifo[0] == 0x080d)
 				rwp = (rwp & 0xff000) | ((fifo[1] & 0xfff0) >> 4);
 			else
@@ -346,28 +641,19 @@ logerror("unsupported register\n");
 		}
 		else if (fifo[0] == 0x4400)	/* RD */
 		{
-			readfifo = HD63484_ram[2*rwp] | (HD63484_ram[2*rwp+1] << 8);
-			rwp = (rwp + 1) & (HD63484_RAM_SIZE/2-1);
+			readfifo = HD63484_ram[rwp];
+			rwp = (rwp + 1) & (HD63484_RAM_SIZE-1);
 		}
 		else if (fifo[0] == 0x4800)	/* WT */
 		{
-			HD63484_ram[2*rwp]   = fifo[1] & 0x00ff ;
-			HD63484_ram[2*rwp+1] = (fifo[1] & 0xff00) >> 8;
-			rwp = (rwp + 1) & (HD63484_RAM_SIZE/2-1);
+			HD63484_ram[rwp] = fifo[1];
+			rwp = (rwp + 1) & (HD63484_RAM_SIZE-1);
 		}
 		else if (fifo[0] == 0x5800)	/* CLR */
 		{
-			int ax = 2*fifo[2];
+			doclr16(fifo[0],fifo[1],&rwp,fifo[2],fifo[3]);
 
-			rwp *= 2;
-			if (fifo[2] & 0x8000) { rwp += 1; ax -= 1; } else { ax += 1; }
-
-			doclr(fifo[0],fifo[1],&rwp,ax,fifo[3]);
-
-			if (fifo[2] & 0x8000) rwp -= 1;
-			rwp /= 2;
-
-			/*
+		/*
             {
                 int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
                 if (fifo2<0) fifo2 *= -1;
@@ -378,17 +664,9 @@ logerror("unsupported register\n");
 		}
 		else if ((fifo[0] & 0xfffc) == 0x5c00)	/* SCLR */
 		{
-			int ax = 2*fifo[2];
+			doclr16(fifo[0],fifo[1],&rwp,fifo[2],fifo[3]);
 
-			rwp *= 2;
-			if (fifo[2] & 0x8000) { rwp += 1; ax -= 1; } else { ax += 1; }
-
-			doclr(fifo[0],fifo[1],&rwp,ax,fifo[3]);
-
-			if (fifo[2] & 0x8000) rwp -= 1;
-			rwp /= 2;
-
-			/*
+		/*
             {
                 int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
                 if (fifo2<0) fifo2 *= -1;
@@ -399,19 +677,9 @@ logerror("unsupported register\n");
 		}
 		else if ((fifo[0] & 0xf0ff) == 0x6000)	/* CPY */
 		{
-			int src,ax;
+			docpy16(fifo[0],((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4),&rwp,fifo[3],fifo[4]);
 
-			ax = 2*fifo[3];
-			src = (((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4))*2;
-			rwp *= 2;
-			if (fifo[3] & 0x8000) { rwp += 1; src += 1; ax -= 1; } else { ax += 1; }
-
-			docpy(fifo[0],src,&rwp,ax,fifo[4]);
-
-			if (fifo[3] & 0x8000) rwp -= 1;
-			rwp /= 2;
-
-			/*
+		/*
             {
                 int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
                 if (fifo2<0) fifo2 *= -1;
@@ -422,19 +690,9 @@ logerror("unsupported register\n");
 		}
 		else if ((fifo[0] & 0xf0fc) == 0x7000)	/* SCPY */
 		{
-			int src,ax;
+			docpy16(fifo[0],((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4),&rwp,fifo[3],fifo[4]);
 
-			ax = 2*fifo[3];
-			src = (((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4))*2;
-			rwp *= 2;
-			if (fifo[3] & 0x8000) { rwp += 1; src += 1; ax -= 1; } else { ax += 1; }
-
-			docpy(fifo[0],src,&rwp,ax,fifo[4]);
-
-			if (fifo[3] & 0x8000) rwp -= 1;
-			rwp /= 2;
-
-			/*
+		/*
             {
                 int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
                 if (fifo2<0) fifo2 *= -1;
@@ -448,12 +706,10 @@ logerror("unsupported register\n");
 			cpx = fifo[1];
 			cpy = fifo[2];
 		}
-//      else if ((fifo[0] & 0xff00) == 0x8800)  /* ALINE */
 		else if ((fifo[0] & 0xfff8) == 0x8800)	/* ALINE */
 		{
 			INT16 ex,ey,sx,sy;
 			INT16 ax,ay;
-			int dst;
 
 			sx = cpx;
 			sy = cpy;
@@ -467,8 +723,7 @@ logerror("unsupported register\n");
 			{
 				while (ax)
 				{
-					dst = (2*org + cpx - cpy * (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
-					PLOT(dst,fifo[0] & 0x0007)
+					dot(cpx,cpy,fifo[0] & 0x0007,cl0);
 
 					if (ax > 0)
 					{
@@ -487,8 +742,7 @@ logerror("unsupported register\n");
 			{
 				while (ay)
 				{
-					dst = (2*org + cpx - cpy * (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
-					PLOT(dst,fifo[0] & 0x0007)
+					dot(cpx,cpy,fifo[0] & 0x0007,cl0);
 
 					if (ay > 0)
 					{
@@ -504,31 +758,31 @@ logerror("unsupported register\n");
 				}
 			}
 		}
-//      else if ((fifo[0] & 0xff00) == 0x9000)  /* ARCT */
 		else if ((fifo[0] & 0xfff8) == 0x9000)	/* ARCT */
 		{
 			INT16 pcx,pcy;
-			INT16 ax,ay;
-			int dst;
+			INT16 ax,ay,xx,yy;
 
 			pcx = fifo[1];
 			pcy = fifo[2];
-			dst = (2*org + cpx - cpy * (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
+
+			xx = cpx;
+			yy = cpy;
 
 			ax = pcx - cpx;
 			for (;;)
 			{
-				PLOT(dst,fifo[0] & 0x0007)
+				dot(xx,yy,fifo[0] & 0x0007,cl0);
 
 				if (ax == 0) break;
 				else if (ax > 0)
 				{
-					dst = (dst + 1) & (HD63484_RAM_SIZE-1);
+					xx++;
 					ax--;
 				}
 				else
 				{
-					dst = (dst - 1) & (HD63484_RAM_SIZE-1);
+					xx--;
 					ax++;
 				}
 			}
@@ -536,17 +790,17 @@ logerror("unsupported register\n");
 			ay = pcy - cpy;
 			for (;;)
 			{
-				PLOT(dst,fifo[0] & 0x0007)
+				dot(xx,yy,fifo[0] & 0x0007,cl0);
 
 				if (ay == 0) break;
 				else if (ay > 0)
 				{
-					dst = (dst - (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
+					yy++;
 					ay--;
 				}
 				else
 				{
-					dst = (dst + (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
+					yy--;
 					ay++;
 				}
 			}
@@ -554,17 +808,17 @@ logerror("unsupported register\n");
 			ax = cpx - pcx;
 			for (;;)
 			{
-				PLOT(dst,fifo[0] & 0x0007)
+				dot(xx,yy,fifo[0] & 0x0007,cl0);
 
 				if (ax == 0) break;
 				else if (ax > 0)
 				{
-					dst = (dst + 1) & (HD63484_RAM_SIZE-1);
+					xx++;
 					ax--;
 				}
 				else
 				{
-					dst = (dst - 1) & (HD63484_RAM_SIZE-1);
+					xx--;
 					ax++;
 				}
 			}
@@ -572,49 +826,49 @@ logerror("unsupported register\n");
 			ay = cpy - pcy;
 			for (;;)
 			{
-				PLOT(dst,fifo[0] & 0x0007)
+				dot(xx,yy,fifo[0] & 0x0007,cl0);
 
 				if (ay == 0) break;
 				else if (ay > 0)
 				{
-					dst = (dst - (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
+					yy++;
 					ay--;
 				}
 				else
 				{
-					dst = (dst + (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
+					yy--;
 					ay++;
 				}
 			}
 		}
-//      else if ((fifo[0] & 0xff00) == 0xc000)  /* AFRCT */
 		else if ((fifo[0] & 0xfff8) == 0xc000)	/* AFRCT */
 		{
 			INT16 pcx,pcy;
-			INT16 ax,ay;
-			int dst;
+			INT16 ax,ay,xx,yy;
+
 
 			pcx = fifo[1];
 			pcy = fifo[2];
 			ax = pcx - cpx;
 			ay = pcy - cpy;
-			dst = (2*org + cpx - cpy * (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
+			xx = cpx;
+			yy = cpy;
 
 			for (;;)
 			{
 				for (;;)
 				{
-					PLOT(dst,fifo[0] & 0x0007)
+					dot(xx,yy,fifo[0] & 0x0007,cl0);
 
 					if (ax == 0) break;
 					else if (ax > 0)
 					{
-						dst = (dst + 1) & (HD63484_RAM_SIZE-1);
+						xx++;
 						ax--;
 					}
 					else
 					{
-						dst = (dst - 1) & (HD63484_RAM_SIZE-1);
+						xx--;
 						ax++;
 					}
 				}
@@ -622,43 +876,30 @@ logerror("unsupported register\n");
 				ax = pcx - cpx;
 				if (pcy < cpy)
 				{
-					dst = (dst + (HD63484_reg[0xca/2] & 0x0fff) * 2 - ax) & (HD63484_RAM_SIZE-1);
+					yy--;
+					xx -= ax;
 					if (ay == 0) break;
 					ay++;
 				}
 				else
 				{
-					dst = (dst - (HD63484_reg[0xca/2] & 0x0fff) * 2 - ax) & (HD63484_RAM_SIZE-1);
+					yy++;
+					xx -= ax;
 					if (ay == 0) break;
 					ay--;
 				}
 			}
 		}
-//      else if ((fifo[0] & 0xff00) == 0xcc00)  /* DOT */
 		else if ((fifo[0] & 0xfff8) == 0xcc00)	/* DOT */
 		{
-			int dst;
-
-			dst = (2*org + cpx - cpy * (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
-
-			PLOT(dst,fifo[0] & 0x0007)
+			dot(cpx,cpy,fifo[0] & 0x0007,cl0);
 		}
-//      else if ((fifo[0] & 0xf000) == 0xe000)  /* AGCPY */
 		else if ((fifo[0] & 0xf0f8) == 0xe000)	/* AGCPY */
 		{
-			INT16 pcx,pcy;
-			int src,dst;
+			agcpy(fifo[0],fifo[1],fifo[2],cpx,cpy,fifo[3],fifo[4]);
 
-			pcx = fifo[1];
-			pcy = fifo[2];
-
-			src = (2*org + pcx - pcy * (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
-			dst = (2*org + cpx - cpy * (HD63484_reg[0xca/2] & 0x0fff) * 2) & (HD63484_RAM_SIZE-1);
-
-			docpy(fifo[0],src,&dst,fifo[3],fifo[4]);
-
-			cpx = (dst - 2*org) % ((HD63484_reg[0xca/2] & 0x0fff) * 2);
-			cpy = (dst - 2*org) / ((HD63484_reg[0xca/2] & 0x0fff) * 2);
+			cpx += fifo[3];
+			cpy += fifo[4];
 		}
 		else
 {
@@ -714,9 +955,6 @@ logerror("%05x: HD63484 read register %02x\n",activecpu_get_pc(),regno);
 	return res;
 }
 
-
-
-
 static PALETTE_INIT( shanghai )
 {
 	int i;
@@ -756,14 +994,14 @@ static VIDEO_UPDATE( shanghai )
 {
 	int x,y,b;
 
-
-	b = 2 * (((HD63484_reg[0xcc/2] & 0x000f) << 16) + HD63484_reg[0xce/2]);
+	b = ((HD63484_reg[0xcc/2] & 0x000f) << 16) + HD63484_reg[0xce/2];
 	for (y = 0;y < 280;y++)
 	{
-		for (x = 0 ; x<(HD63484_reg[0xca/2] & 0x0fff) * 2 ; x++)
+		for (x = 0 ; x<(HD63484_reg[0xca/2] & 0x0fff) * 2 ; x += 2)
 		{
 			b &= (HD63484_RAM_SIZE-1);
-			*BITMAP_ADDR16(bitmap, y, x) = HD63484_ram[b];
+			*BITMAP_ADDR16(bitmap, y, x) = HD63484_ram[b] & 0x00ff;
+			*BITMAP_ADDR16(bitmap, y, x+1) = (HD63484_ram[b] & 0xff00) >> 8;
 			b++;
 		}
 	}
@@ -774,18 +1012,20 @@ static VIDEO_UPDATE( shanghai )
 		int h = HD63484_reg[0x96/2] & 0x0fff;
 		int sx = ((HD63484_reg[0x92/2] >> 8) - (HD63484_reg[0x84/2] >> 8)) * 4;
 		int w = (HD63484_reg[0x92/2] & 0xff) * 4;
-		if (sx < 0) sx = 0;	/* not sure about this (shangha2 title screen) */
+		if (sx < 0) sx = 0;	// not sure about this (shangha2 title screen)
 
-		b = 2 * (((HD63484_reg[0xdc/2] & 0x000f) << 16) + HD63484_reg[0xde/2]);
+		b = (((HD63484_reg[0xdc/2] & 0x000f) << 16) + HD63484_reg[0xde/2]);
 
 		for (y = sy ; y <= sy + h && y < 280 ; y++)
 		{
-			for (x = 0 ; x < (HD63484_reg[0xca/2] & 0x0fff) * 2 ; x++)
+			for (x = 0 ; x < (HD63484_reg[0xca/2] & 0x0fff) * 2 ; x += 2)
 			{
 				b &= (HD63484_RAM_SIZE - 1);
 				if (x <= w && x + sx >= 0 && x + sx < (HD63484_reg[0xca/2] & 0x0fff) * 2)
-					*BITMAP_ADDR16(bitmap, y, x + sx) = HD63484_ram[b];
-
+					{
+						*BITMAP_ADDR16(bitmap, y, x + sx) = HD63484_ram[b] & 0x00ff;
+						*BITMAP_ADDR16(bitmap, y, x + sx + 1) = (HD63484_ram[b] & 0xff00) >> 8;
+					}
 				b++;
 			}
 		}
@@ -793,7 +1033,6 @@ static VIDEO_UPDATE( shanghai )
 
 	return 0;
 }
-
 
 static INTERRUPT_GEN( shanghai_interrupt )
 {
@@ -1194,7 +1433,7 @@ static MACHINE_DRIVER_START( kothello )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(384, 384)
+	MDRV_SCREEN_SIZE(384, 280)
 	MDRV_SCREEN_VISIBLE_AREA(8, 384-1, 0, 250-1) // Base Screen is 376 pixel
 
 	MDRV_PALETTE_LENGTH(256)
@@ -1215,8 +1454,6 @@ static MACHINE_DRIVER_START( kothello )
 
 	SEIBU_SOUND_SYSTEM_ADPCM_INTERFACE
 MACHINE_DRIVER_END
-
-
 
 /***************************************************************************
 
@@ -1314,3 +1551,4 @@ ROM_END
 GAME( 1988, shanghai, 0, shanghai, shanghai, 0, ROT0, "Sunsoft", "Shanghai (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1989, shangha2, 0, shangha2, shangha2, 0, ROT0, "Sunsoft", "Shanghai II (Japan)", 0 )
 GAME( 1990, kothello, 0, kothello, kothello, 0, ROT0, "Success", "Kyuukyoku no Othello", GAME_IMPERFECT_GRAPHICS )
+
