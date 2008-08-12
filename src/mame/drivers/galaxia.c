@@ -1,8 +1,6 @@
-/* Galxaia */
+/* Galxaia 
 
-/*
-
-Galaxia by Zaccaria (1980)
+Galaxia by Zaccaria (1979)
 
 Taken from an untested board.
 
@@ -19,23 +17,43 @@ do contain Galaxian-like graphics...
 
 ---
 
-rom mapping is still wrong, correct this before anything else
+TS 2008.08.12:
+- fixed rom loading
+- added preliminary video emulation
 
 */
 
 #include "driver.h"
+#include "video/s2636.h"
+#include "cpu/s2650/s2650.h"
 
 static UINT8 *galaxia_video;
+static UINT8 *galaxia_color;
+
+static s2636_t *s2636_0, *s2636_1, *s2636_2;
+static UINT8 *galaxia_s2636_0_ram;
+static UINT8 *galaxia_s2636_1_ram;
+static UINT8 *galaxia_s2636_2_ram;
 
 static VIDEO_START( galaxia )
 {
+	int width = video_screen_get_width(machine->primary_screen);
+	int height = video_screen_get_height(machine->primary_screen);
+
+	/* configure the S2636 chips */
+	s2636_0 = s2636_config(galaxia_s2636_0_ram, height, width,  3, -27);
+	s2636_1 = s2636_config(galaxia_s2636_1_ram, height, width,  3, -27);
+	s2636_2 = s2636_config(galaxia_s2636_1_ram, height, width,  3, -27);
 }
 
 static VIDEO_UPDATE( galaxia )
 {
 	int x,y, count;
+	
+	bitmap_t *s2636_0_bitmap;
+	bitmap_t *s2636_1_bitmap;
+	bitmap_t *s2636_2_bitmap;
 
-	fillbitmap(bitmap,0,cliprect);
 	count = 0;
 
 	for (y=0;y<256/8;y++)
@@ -46,45 +64,73 @@ static VIDEO_UPDATE( galaxia )
 			drawgfx(bitmap,screen->machine->gfx[0],tile,0,0,0,x*8,y*8,cliprect,TRANSPARENCY_NONE,0);
 			count++;
 		}
-
 	}
+	
+	s2636_0_bitmap = s2636_update(s2636_0, cliprect);
+	s2636_1_bitmap = s2636_update(s2636_1, cliprect);
+	s2636_2_bitmap = s2636_update(s2636_2, cliprect);
 
+	/* copy the S2636 images into the main bitmap */
+	{
+		int y;
 
+		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		{
+			int x;
 
+			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			{
+				int pixel0 = *BITMAP_ADDR16(s2636_0_bitmap, y, x);
+				int pixel1 = *BITMAP_ADDR16(s2636_1_bitmap, y, x);
+				int pixel2 = *BITMAP_ADDR16(s2636_2_bitmap, y, x);
+
+				if (S2636_IS_PIXEL_DRAWN(pixel0))
+					*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel0);
+
+				if (S2636_IS_PIXEL_DRAWN(pixel1))
+					*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel1);
+					
+				if (S2636_IS_PIXEL_DRAWN(pixel2))
+					*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel2);
+			}
+		}
+	}
 	return 0;
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x13ff) AM_READ(SMH_ROM)
-	AM_RANGE(0x1400, 0x1fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x5000, 0x6fff) AM_READ(SMH_ROM)
+static WRITE8_HANDLER(galaxia_video_w)
+{
+	if (activecpu_get_reg(S2650_FO))
+	{
+		galaxia_video[offset]=data;
+	}
+	else
+	{
+		galaxia_color[offset]=data;
+	}
+}
+	
+static READ8_HANDLER(galaxia_video_r)
+{
+	return galaxia_video[offset];
+}
+
+static ADDRESS_MAP_START( mem_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x13ff) AM_ROM
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM  
+	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&galaxia_s2636_0_ram)
+	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&galaxia_s2636_1_ram)
+	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&galaxia_s2636_2_ram)
+	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(galaxia_video_r, galaxia_video_w)  AM_BASE(&galaxia_video)
+	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM  
+	AM_RANGE(0x2000, 0x33ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x13ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x1400, 0x14ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1500, 0x15ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1600, 0x16ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1700, 0x17ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1800, 0x18ff) AM_WRITE(SMH_RAM) AM_BASE(&galaxia_video)
-	AM_RANGE(0x1900, 0x19ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1a00, 0x1aff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1b00, 0x1bff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1d00, 0x1dff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1e00, 0x1eff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(SMH_RAM)
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_READ(input_port_0_r)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-
 
 static INPUT_PORTS_START( galaxia )
 	PORT_START("IN0")
@@ -138,16 +184,17 @@ static GFXDECODE_START( galaxia )
 GFXDECODE_END
 
 
-
-
+static INTERRUPT_GEN( galaxia_interrupt )
+{
+	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x03);
+}
 
 static MACHINE_DRIVER_START( galaxia )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", S2650,2000000)		 /* ? MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-//  MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+	MDRV_CPU_PROGRAM_MAP(mem_map, 0)
+	MDRV_CPU_IO_MAP(io_map, 0)
+	MDRV_CPU_VBLANK_INT("main", galaxia_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -169,15 +216,14 @@ ROM_START( galaxia )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "08h.bin", 0x00000, 0x0400, CRC(f3b4ffde) SHA1(15b004e7821bfc145158b1e9435f061c524f6b86) )
 	ROM_LOAD( "10h.bin", 0x00400, 0x0400, CRC(6d07fdd4) SHA1(d7d4b345a055275d59951788569db370bccd5195) )
-	ROM_LOAD( "08i.bin", 0x00800, 0x0400, CRC(45b88599) SHA1(3b79c21db1aa9d80fac81ac5a554e438805febd1) )
-	ROM_LOAD( "10i.bin", 0x00c00, 0x0400, CRC(c0baa654) SHA1(80e0880c32ad285fbce0f7f552268b964b97cab3) )
-
-	ROM_LOAD( "11h.bin", 0x05000, 0x0400, CRC(1520eb3d) SHA1(3683174da701e1124af0f9c2ee4a9a84f3fea33a) )
-	ROM_LOAD( "13h.bin", 0x05400, 0x0400, CRC(c4482770) SHA1(aee983cc3d80989f49aea4138961bb623039484a) )
-	ROM_LOAD( "11i.bin", 0x05800, 0x0400, CRC(4456808a) SHA1(f9e8cfdde0e17f13f1be297b2b4503ccc959b33c) )
-	ROM_LOAD( "13i.bin", 0x05c00, 0x0400, CRC(cf653b9a) SHA1(fef5943de60cb5ba2459fc6ae7419e29c96a76cd) )
-	ROM_LOAD( "11l.bin", 0x06000, 0x0400, CRC(50c6a645) SHA1(46638907bc393df6be25fc7461d73047d1746ffc) )
-	ROM_LOAD( "13l.bin", 0x06400, 0x0400, CRC(3a9c38c7) SHA1(d1e934092b69c0f3f9636eba05a1d8a6d9588e6b) )
+	ROM_LOAD( "11h.bin", 0x00800, 0x0400, CRC(1520eb3d) SHA1(3683174da701e1124af0f9c2ee4a9a84f3fea33a) )
+	ROM_LOAD( "13h.bin", 0x00c00, 0x0400, CRC(c4482770) SHA1(aee983cc3d80989f49aea4138961bb623039484a) )
+	ROM_LOAD( "08i.bin", 0x01000, 0x0400, CRC(45b88599) SHA1(3b79c21db1aa9d80fac81ac5a554e438805febd1) )
+	ROM_LOAD( "10i.bin", 0x02000, 0x0400, CRC(c0baa654) SHA1(80e0880c32ad285fbce0f7f552268b964b97cab3) )
+	ROM_LOAD( "11i.bin", 0x02400, 0x0400, CRC(4456808a) SHA1(f9e8cfdde0e17f13f1be297b2b4503ccc959b33c) )
+	ROM_LOAD( "13i.bin", 0x02800, 0x0400, CRC(cf653b9a) SHA1(fef5943de60cb5ba2459fc6ae7419e29c96a76cd) )
+	ROM_LOAD( "11l.bin", 0x02c00, 0x0400, CRC(50c6a645) SHA1(46638907bc393df6be25fc7461d73047d1746ffc) )
+	ROM_LOAD( "13l.bin", 0x03000, 0x0400, CRC(3a9c38c7) SHA1(d1e934092b69c0f3f9636eba05a1d8a6d9588e6b) )
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "01d.bin", 0x00000, 0x0400, CRC(2dd50aab) SHA1(758d7a5383c9a1ee134d99e3f7025819cfbe0e0f) )
@@ -187,4 +233,10 @@ ROM_START( galaxia )
 	ROM_LOAD( "11o", 0x00000, 0x0200, CRC(ae816417) SHA1(9497857d13c943a2735c3b85798199054e613b2c) )
 ROM_END
 
-GAME( 1979, galaxia, 0, galaxia, galaxia, 0, ROT90, "Zaccaria", "Galaxia", GAME_NOT_WORKING|GAME_NO_SOUND )
+
+static DRIVER_INIT(galaxia)
+{
+	galaxia_color=auto_malloc(0x400);
+}
+
+GAME( 1979, galaxia, 0, galaxia, galaxia, galaxia, ROT90, "Zaccaria", "Galaxia", GAME_NOT_WORKING|GAME_NO_SOUND )
