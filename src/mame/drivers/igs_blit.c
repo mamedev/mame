@@ -3076,7 +3076,6 @@ ROM_END
 /***************************************************************************
 
     Zhong Guo Long? (Hong Kong, V011H)
-    Only the program roms was in this set!
 
 ***************************************************************************/
 
@@ -3084,13 +3083,11 @@ ROM_START( chindrah )
 	ROM_REGION( 0x80000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "c_drgn_hk.u3", 0x00000, 0x80000, CRC(182037ce) SHA1(141b698777533e57493e588d2526523d4bd3e17d) )
 
-	// The rest of the roms taken from chindrac:
-
 	ROM_REGION( 0x400000, "gfx1", 0 )
-	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, NO_DUMP CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
+	ROM_LOAD( "igs-d0301.u39", 0x000000, 0x400000, CRC(78ab45d9) SHA1(c326ee9f150d766edd6886075c94dea3691b606d) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, NO_DUMP CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
+	ROM_LOAD( "igs-s0302.u43", 0x00000, 0x40000, CRC(fde63ce1) SHA1(cc32d2cace319fe4d5d0aa96d7addb2d1def62f2) )
 ROM_END
 
 
