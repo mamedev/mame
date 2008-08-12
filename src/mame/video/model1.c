@@ -1,5 +1,6 @@
 #include "driver.h"
 #include "video/segaic24.h"
+#include "cpu/mb86233/mb86233.h"
 #include "includes/model1.h"
 
 #define LOG_TGP_VIDEO 0
