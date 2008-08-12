@@ -55,7 +55,7 @@ Carrier Air Wing / U.S. Navy                1990  89624B-3  CA24B            IOB
   (alt B-board revision - Japan)                  89625B-1  CA22B            LWIO
 Street Fighter II (910214)                  1991  90629B-2  STF29            IOB1  90632C-1   CPS-B-17  DL-0411-10012  C632
 Street Fighter II (US 910206)                                                                 CPS-B-17  DL-0411-10012
-Street Fighter II (US 910228)                                                                 CPS-B-18  DL-0411-10013  C632B
+Street Fighter II (US 910228)                                                ??               CPS-B-18  DL-0411-10013  C632B
 Street Fighter II (Japan 910306)                                                              CPS-B-12  DL-0411-10007
 Street Fighter II (US 910318)                                                                 CPS-B-05  DL-0411-10006
 Street Fighter II (US 910411)                                                                 CPS-B-15  DL-0411-10010
@@ -63,7 +63,7 @@ Street Fighter II (World 910522)                                                
 Street Fighter II (US 910522)                                                                 CPS-B-14  DL-0411-10009
 Street Fighter II (US 911101)                                                                 CPS-B-17  DL-0411-10012
 Street Fighter II (Japan 911210)                                                              CPS-B-13  DL-0411-10008
-Three Wonders*                              1991  89624B-3  RT24B            LWIO  90630C-4   CPS-B-21  DL-0921-10014        IOC1
+Three Wonders*                              1991  89624B-3  RT24B            IOB1  90630C-4   CPS-B-21  DL-0921-10014        IOC1
   (alt B-board revision - Japan)                  89625B-1  RT22B            IOB1
   (alt B-board revision)                          91634B-2  RT63B?    BPRG1? IOB1
 King of Dragons*                            1991  90629B-3  KD29B            IOB1  90631C-5   CPS-B-21  DL-0921-10014  C632  IOC1
@@ -683,7 +683,7 @@ static const struct gfx_range mapper_AR22B_table[] =
 	// verified from PAL dump:
 	// bank 0 = pin 19 (ROMs 1,5, 9,13,17,24,32,38)
 	// bank 1 = pin 16 (ROMs 2,6,10,14,18,25,33,39)
-	// pin 14 is always enabled and pin 12 looks wrong
+	// pins 12 and 14 are tristated
 
 	/* type            start   end     bank */
 	{ GFXTYPE_SPRITES, 0x0000, 0x2fff, 0 },
@@ -1643,9 +1643,9 @@ INLINE int cps2_port(int offset)
 
 static void cps1_gfx_decode(running_machine *machine)
 {
-	int size=memory_region_length(machine, "gfx1");
+	int size=memory_region_length(machine, "gfx");
 	int i,j,gfxsize;
-	UINT8 *cps1_gfx = memory_region(machine, "gfx1");
+	UINT8 *cps1_gfx = memory_region(machine, "gfx");
 
 
 	gfxsize=size/4;
@@ -1699,11 +1699,11 @@ static void unshuffle(UINT64 *buf,int len)
 static void cps2_gfx_decode(running_machine *machine)
 {
 	const int banksize=0x200000;
-	int size=memory_region_length(machine, "gfx1");
+	int size=memory_region_length(machine, "gfx");
 	int i;
 
 	for (i = 0;i < size;i += banksize)
-		unshuffle((UINT64 *)(memory_region(machine, "gfx1") + i),banksize/8);
+		unshuffle((UINT64 *)(memory_region(machine, "gfx") + i),banksize/8);
 
 	cps1_gfx_decode(machine);
 }
@@ -2541,12 +2541,12 @@ static void cps2_render_sprites(running_machine *machine, bitmap_t *bitmap,const
 static void cps1_render_stars(const device_config *screen, bitmap_t *bitmap,const rectangle *cliprect)
 {
 	int offs;
-	UINT8 *stars_rom = memory_region(screen->machine, "gfx2");
+	UINT8 *stars_rom = memory_region(screen->machine, "stars");
 
 	if (!stars_rom && (cps1_stars_enabled[0] || cps1_stars_enabled[1]))
 	{
 #ifdef MAME_DEBUG
-		popmessage("stars enabled but no stars ROM");
+//		popmessage("stars enabled but no stars ROM");
 #endif
 		return;
 	}
