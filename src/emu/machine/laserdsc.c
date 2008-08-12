@@ -290,8 +290,8 @@ struct _laserdisc_state
 typedef struct _sound_token sound_token;
 struct _sound_token
 {
-	sound_stream *	stream;
-	laserdisc_state *ld;
+	sound_stream *		stream;
+	laserdisc_state *	ld;
 };
 
 
@@ -880,6 +880,13 @@ void laserdisc_vsync(const device_config *device)
 			(*ld->statechanged)(ld, origstate);
 	}
 
+	/* flush any audio before we read more */
+	if (sndti_exists(SOUND_CUSTOM, ld->audiocustom))
+	{
+		sound_token *token = custom_get_token(ld->audiocustom);
+		stream_update(token->stream);
+	}
+
 	/* start reading the track data for the next round */
 	ld->fieldnum++;
 	read_track_data(ld);
@@ -1365,6 +1372,10 @@ static void process_track_data(const device_config *device)
 		ld->videofields[ld->videoindex]++;
 		ld->videoframenum[ld->videoindex] = ld->last_frame;
 	}
+	
+	/* pass the audio to the callback */
+	if (ld->audiocallback != NULL)
+		(*ld->audiocallback)(device, ld->samplerate, ld->audiocursamples, ld->avconfig.audio[0], ld->avconfig.audio[1]);
 
 	/* shift audio data if we read it into the beginning of the buffer */
 	if (ld->audiocursamples != 0 && ld->audiobufin != 0)

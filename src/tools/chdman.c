@@ -84,20 +84,6 @@ static clock_t lastprogress = 0;
 ***************************************************************************/
 
 /*-------------------------------------------------
-    put_bigendian_uint32 - write a UINT32 in big-endian order to memory
--------------------------------------------------*/
-
-#ifdef UNUSED_FUNCTON
-INLINE void put_bigendian_uint32(UINT8 *base, UINT32 value)
-{
-	base[0] = value >> 24;
-	base[1] = value >> 16;
-	base[2] = value >> 8;
-	base[3] = value;
-}
-#endif
-
-/*-------------------------------------------------
     print_big_int - 64-bit int printing with commas
 -------------------------------------------------*/
 
@@ -1490,7 +1476,6 @@ static int do_extractav(int argc, char *argv[], int param)
 	avconfig.video = &fakebitmap;
 	
 	/* allocate audio buffers */
-	avconfig.channels = channels;
 	avconfig.maxsamples = ((UINT64)rate * 1000000 + fps_times_1million - 1) / fps_times_1million;
 	avconfig.actsamples = &numsamples;
 	for (chnum = 0; chnum < channels; chnum++)

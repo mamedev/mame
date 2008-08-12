@@ -593,7 +593,7 @@ int osd_work_item_wait(osd_work_item *item, osd_ticks_t timeout)
 		ResetEvent(item->event);
 
 	// if we don't have an event, we need to spin (shouldn't ever really happen)
-	if (item->event != NULL)
+	if (item->event == NULL)
 	{
 		osd_ticks_t stopspin = osd_ticks() + timeout;
 		while (!item->done && osd_ticks() < stopspin)

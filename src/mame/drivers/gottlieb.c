@@ -604,6 +604,13 @@ static void laserdisc_audio_process(const device_config *device, int samplerate,
 
 	if (logit)
 		logerror("--------------\n");
+	
+	/* if no data, reset it all */
+	if (ch1 == NULL)
+	{
+		laserdisc_last_time = attotime_add(curtime, attotime_mul(time_per_sample, samples));
+		return;
+	}
 
 	/* iterate over samples */
 	for (cursamp = 0; cursamp < samples; cursamp++)

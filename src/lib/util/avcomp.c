@@ -584,13 +584,6 @@ static avcomp_error encode_audio(avcomp_state *state, int channels, int samples,
 			return AVCERR_COMPRESSION_ERROR;
 		output += size;
 
-		/* if we didn't compress enough, set the huffman table size to 0 and memcpy the data */
-		if (size >= samples * 2)
-		{
-			memcpy(output, input, samples * 2);
-			size = samples * 2;
-		}
-
 		/* store the size of this stream */
 		totalsize += size;
 		if (totalsize >= channels * samples * 2)

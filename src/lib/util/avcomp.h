@@ -65,7 +65,6 @@ typedef struct _av_codec_decompress_config av_codec_decompress_config;
 struct _av_codec_decompress_config
 {
 	bitmap_t *	video;						/* pointer to video bitmap */
-	UINT32		channels;					/* number of channels */
 	UINT32		maxsamples;					/* maximum number of samples per channel */
 	UINT32 *	actsamples;					/* actual number of samples per channel */
 	INT16 *		audio[16];					/* pointer to individual audio channels */

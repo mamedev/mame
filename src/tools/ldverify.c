@@ -19,12 +19,6 @@
 
 
 /***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-
-
-/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -56,6 +50,10 @@ static int video_last_chapter = -1;
 static int video_cadence = -1;
 static UINT32 video_cadence_history = 0;
 static int video_prev_whitefield = -1;
+static int video_min_overall = 255;
+static int video_max_overall = 0;
+static int video_low_frames = 0;
+static int video_high_frames = 0;
 
 static int audio_min_lsample = 32767;
 static int audio_min_rsample = 32767;
@@ -306,6 +304,8 @@ static void verify_video(int frame, bitmap_t *bitmap)
 	for (fieldnum = 0; fieldnum < fields_per_frame; fieldnum++)
 	{
 		int field = frame * fields_per_frame + fieldnum;
+		int x, y, pixels, remaining, minval, maxval;
+		UINT32 pixelhisto[256] = { 0 };
 		vbi_metadata metadata;
 
 		/* output status */
@@ -454,6 +454,43 @@ static void verify_video(int frame, bitmap_t *bitmap)
     		    }
     		}
         }
+        
+        /* now examine the active video signal */
+        pixels = 0;
+        for (y = 22*2 + fieldnum; y < bitmap->height; y += 2)
+        {
+        	for (x = 16; x < 720 - 16; x++)
+        		pixelhisto[*BITMAP_ADDR16(bitmap, y, x) >> 8]++;
+        	pixels += 720 - 16 - 16;
+        }
+        
+        /* remove the top/bottom 0.1% */
+        remaining = pixels / 1000;
+        for (minval = 0; remaining >= 0; minval++)
+        	remaining -= pixelhisto[minval];
+        remaining = pixels / 1000;
+        for (maxval = 255; remaining >= 0; maxval--)
+        	remaining -= pixelhisto[maxval];
+        
+        /* update the overall min/max */
+        video_min_overall = MIN(minval, video_min_overall);
+        video_max_overall = MAX(maxval, video_max_overall);
+        if (minval < 16)
+        {
+        	video_low_frames++;
+        	if (video_low_frames < 10)
+				printf("%6d.%d: active video signal level low (%02X) (WARNING)\n", frame, fieldnum, minval);
+			else if (video_low_frames == 10)
+				printf("%6d.%d: active video signal level low (%02X) - suppressing future warnings (WARNING)\n", frame, fieldnum, minval);
+        }
+        if (maxval > 236)
+        {
+        	video_high_frames++;
+        	if (video_high_frames < 10)
+				printf("%6d.%d: active video signal level high (%02X) (WARNING)\n", frame, fieldnum, minval);
+			else if (video_high_frames == 10)
+				printf("%6d.%d: active video signal level high (%02X) - suppressing future warnings (WARNING)\n", frame, fieldnum, minval);
+        }
 	}
 }
 
@@ -474,6 +511,14 @@ static void verify_video_final(int frame, bitmap_t *bitmap)
     /* did we ever see any lead-out? */
 	if (!video_saw_leadout)
 		printf("Track %6d.%d: never saw any lead-out (WARNING)\n", field / fields_per_frame, 0);
+	
+	/* summary info */
+    printf("\nVideo summary:\n");
+    printf("  Overall video range: %d-%d (%02X-%02X)\n", video_min_overall, video_max_overall, video_min_overall, video_max_overall);
+    if (video_low_frames)
+    	printf("  Total frames with low signal: %d\n", video_low_frames);
+    if (video_high_frames)
+    	printf("  Total frames with high signal: %d\n", video_high_frames);
 }
 
 
@@ -536,11 +581,9 @@ static void verify_audio(const INT16 *lsound, const INT16 *rsound, int samples)
 
 static void verify_audio_final(void)
 {
-    printf("Audio summary:\n");
-    printf("  Channel 0 minimum: %6d (with %9d/%9d samples at minimum)\n", audio_min_lsample, audio_min_lsample_count, audio_sample_count);
-    printf("  Channel 0 maximum: %6d (with %9d/%9d samples at maximum)\n", audio_max_lsample, audio_max_lsample_count, audio_sample_count);
-    printf("  Channel 1 minimum: %6d (with %9d/%9d samples at minimum)\n", audio_min_rsample, audio_min_rsample_count, audio_sample_count);
-    printf("  Channel 1 maximum: %6d (with %9d/%9d samples at maximum)\n", audio_max_rsample, audio_max_rsample_count, audio_sample_count);
+    printf("\nAudio summary:\n");
+    printf("  Overall channel 0 range: %d-%d (%04X-%04X)\n", audio_min_lsample, audio_max_lsample, (UINT16)audio_min_lsample, (UINT16)audio_max_lsample);
+    printf("  Overall channel 1 range: %d-%d (%04X-%04X)\n", audio_min_rsample, audio_max_rsample, (UINT16)audio_min_rsample, (UINT16)audio_max_rsample);
 }
 
 
