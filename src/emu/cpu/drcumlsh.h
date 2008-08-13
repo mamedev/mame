@@ -226,4 +226,4 @@
 #define UML_FDRSQRT(block, dst, src1)						do { drcuml_block_append_2(block, DRCUML_OP_FRSQRT,  8, IF_ALWAYS,  dst, src1); } while (0)
 
 
-#endif
+#endif /* __DRCUMLSH_H__ */

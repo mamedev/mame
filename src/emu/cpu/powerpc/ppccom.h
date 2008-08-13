@@ -6,6 +6,8 @@
 
 ***************************************************************************/
 
+#pragma once
+
 #ifndef __PPCCOM_H__
 #define __PPCCOM_H__
 
@@ -595,4 +597,4 @@ void ppccom_execute_mtdcr(powerpc_state *ppc);
 void ppc4xx_set_info(powerpc_state *ppc, UINT32 state, cpuinfo *info);
 void ppc4xx_get_info(powerpc_state *ppc, UINT32 state, cpuinfo *info);
 
-#endif
+#endif /* __PPCCOM_H__ */

@@ -20,12 +20,6 @@
  *
  *****************************************************************************/
 
-#pragma once
-
-#ifndef __OPS09_H__
-#define __OPS09_H__
-
-
 #define m6502 m6509
 #define m6502_ICount m6509_ICount
 
@@ -218,5 +212,3 @@
 #define KIL 													\
 	PCW--;														\
 	logerror("M6509 KILL opcode %05x: %02x\n", PCD, cpu_readop(PCD))
-
-#endif /* __OPS09_H__ */

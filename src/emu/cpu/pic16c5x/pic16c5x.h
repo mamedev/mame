@@ -9,8 +9,10 @@
  *                                                                          *
  \**************************************************************************/
 
-#ifndef _PIC16C5X_H
-#define _PIC16C5X_H
+#pragma once
+
+#ifndef __PIC16C5X_H__
+#define __PIC16C5X_H__
 
 
 #include "cpuintrf.h"
@@ -24,7 +26,8 @@
  *  is handled by the cpu execution engine.
  */
 
-enum {
+enum
+{
 	PIC16C5x_PC=1, PIC16C5x_STK0, PIC16C5x_STK1, PIC16C5x_FSR,
 	PIC16C5x_W,    PIC16C5x_ALU,  PIC16C5x_STR,  PIC16C5x_OPT,
 	PIC16C5x_TMR0, PIC16C5x_PRTA, PIC16C5x_PRTB, PIC16C5x_PRTC,
@@ -130,4 +133,4 @@ offs_t pic16C5x_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *o
 #endif
 
 
-#endif	/* _PIC16C5X_H */
+#endif	/* __PIC16C5X_H__ */

@@ -15,8 +15,10 @@
  *                                                                          *
  \***************************************************************************/
 
-#ifndef _TMS32025_H
-#define _TMS32025_H
+#pragma once
+
+#ifndef __TMS32025_H__
+#define __TMS32025_H__
 
 
 #include "cpuintrf.h"
@@ -50,7 +52,8 @@
 #define TMS32025_INT_NONE		  -1
 
 
-enum {
+enum
+{
 	TMS32025_PC=1,
 	TMS32025_PFC,  TMS32025_STR0, TMS32025_STR1, TMS32025_IFR,
 	TMS32025_RPTC, TMS32025_ACC,  TMS32025_PREG, TMS32025_TREG,
@@ -73,4 +76,4 @@ extern void tms32026_get_info(UINT32 state, cpuinfo *info);
 
 offs_t tms32025_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif	/* _TMS32025_H */
+#endif	/* __TMS32025_H__ */

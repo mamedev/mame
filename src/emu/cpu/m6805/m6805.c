@@ -36,7 +36,8 @@
 
 #define IRQ_LEVEL_DETECT 0
 
-enum {
+enum
+{
 	SUBTYPE_M6805,
 	SUBTYPE_M68705,
 	SUBTYPE_HD63705

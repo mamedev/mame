@@ -7,7 +7,8 @@
 #include "cpuintrf.h"
 #include <stdarg.h>
 
-enum {
+enum
+{
 	EA_IMM8 = 1,
 	EA_IMM16,
 	EA_EXT,

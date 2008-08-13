@@ -1,8 +1,3 @@
-#pragma once
-
-#ifndef __TABLE86_H__
-#define __TABLE86_H__
-
 static void (*const PREFIX86(_instruction)[256])(void) =
 {
 	 PREFIX86(_add_br8),          /* 0x00 */
@@ -528,5 +523,3 @@ static void (*const PREFIX86(_instruction)[256])(void) =
 #else
 #define TABLE86 PREFIX86(_instruction)[FETCHOP]();
 #endif
-
-#endif /* __TABLE86_H__ */

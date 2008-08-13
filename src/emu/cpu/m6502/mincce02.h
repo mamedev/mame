@@ -5,11 +5,6 @@
  *
  *****************************************************************************/
 
-#pragma once
-
-#ifndef __MINCCE02_H__
-#define __MINCCE02_H__
-
 
 /* 65ce02 flags */
 #define F_C	0x01
@@ -74,5 +69,3 @@
 
 #define RDMEM(addr)			program_read_byte_8le(addr); m65ce02_ICount -= 1
 #define WRMEM(addr,data)	program_write_byte_8le(addr,data); m65ce02_ICount -= 1
-
-#endif /* __MINCCE02_H__ */

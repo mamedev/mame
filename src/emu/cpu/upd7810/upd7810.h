@@ -1,5 +1,7 @@
-#ifndef _UPD7810_H_
-#define _UPD7810_H_
+#pragma once
+
+#ifndef __UPD7810_H__
+#define __UPD7810_H__
 
 #include "cpuintrf.h"
 
@@ -10,7 +12,8 @@
 */
 
 // unfortunatly memory configuration differs with internal rom size
-typedef enum {
+typedef enum
+{
 	TYPE_7801,
 	TYPE_78C05,
 	TYPE_78C06,
@@ -36,7 +39,8 @@ typedef struct {
     upd7810_io_callback io_callback;
 } UPD7810_CONFIG;
 
-enum {
+enum
+{
 	UPD7810_PC=1, UPD7810_SP, UPD7810_PSW,
 	UPD7810_EA, UPD7810_V, UPD7810_A, UPD7810_VA,
 	UPD7810_BC, UPD7810_B, UPD7810_C, UPD7810_DE, UPD7810_D, UPD7810_E, UPD7810_HL, UPD7810_H, UPD7810_L,
@@ -51,11 +55,13 @@ enum {
 };
 
 /* port numbers for PA,PB,PC,PD and PF */
-enum {
+enum
+{
 	UPD7810_PORTA, UPD7810_PORTB, UPD7810_PORTC, UPD7810_PORTD, UPD7810_PORTF
 };
 
-enum {
+enum
+{
 	UPD7807_PORTA, UPD7807_PORTB, UPD7807_PORTC, UPD7807_PORTD, UPD7807_PORTF,
 	UPD7807_PORTT
 };
@@ -165,5 +171,4 @@ offs_t upd7807_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *op
 offs_t upd7801_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 offs_t upd78c05_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif
-
+#endif /* __UPD7810_H__ */

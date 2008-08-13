@@ -1,9 +1,12 @@
-#ifndef Z180_H
-#define Z180_H
+#pragma once
+
+#ifndef __Z180_H__
+#define __Z180_H__
 
 #include "cpuintrf.h"
 
-enum {
+enum
+{
 	Z180_PC=1,
 	Z180_SP,
 	Z180_AF,
@@ -93,7 +96,8 @@ enum {
 	Z180_IOLINES	/* read/write I/O lines */
 };
 
-enum {
+enum
+{
 	Z180_TABLE_op,
 	Z180_TABLE_cb,
 	Z180_TABLE_ed,
@@ -129,5 +133,4 @@ extern void z180_get_info(UINT32 state, cpuinfo *info);
 
 offs_t z180_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif
-
+#endif /* __Z180_H__ */

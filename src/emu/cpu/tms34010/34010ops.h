@@ -7,8 +7,10 @@
 
 ***************************************************************************/
 
-#ifndef _34010OPS_H
-#define _34010OPS_H
+#pragma once
+
+#ifndef __34010OPS_H__
+#define __34010OPS_H__
 
 #include "cpuintrf.h"
 
@@ -276,4 +278,4 @@ enum
 
 
 
-#endif /* _34010OPS_H */
+#endif /* __34010OPS_H__ */

@@ -1,9 +1,12 @@
-#ifndef S2650_H
-#define S2650_H
+#pragma once
+
+#ifndef __S2650_H__
+#define __S2650_H__
 
 #include "cpuintrf.h"
 
-enum {
+enum
+{
 	S2650_PC=1, S2650_PS, S2650_R0, S2650_R1, S2650_R2, S2650_R3,
 	S2650_R1A, S2650_R2A, S2650_R3A,
 	S2650_HALT, S2650_SI, S2650_FO
@@ -25,4 +28,4 @@ extern void s2650_get_info(UINT32 state, cpuinfo *info);
 
 extern offs_t s2650_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif
+#endif /* __S2650_H__ */

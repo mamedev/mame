@@ -1,6 +1,9 @@
-#ifndef _RSP_H
-#define _RSP_H
+#pragma once
 
+#ifndef __RSP_H__
+#define __RSP_H__
+
+typedef struct _rsp_config rsp_config;
 struct _rsp_config
 {
 	read32_machine_func dp_reg_r;
@@ -9,7 +12,6 @@ struct _rsp_config
 	write32_machine_func sp_reg_w;
 	void (*sp_set_status)(UINT32 status);
 };
-typedef struct _rsp_config rsp_config;
 
 enum
 {
@@ -71,4 +73,4 @@ void rsp_get_info(UINT32 state, cpuinfo *info);
 
 extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 
-#endif
+#endif /* __RSP_H__ */

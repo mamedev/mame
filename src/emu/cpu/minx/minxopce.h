@@ -1,9 +1,3 @@
-#pragma once
-
-#ifndef __MINXOPCE_H__
-#define __MINXOPCE_H__
-
-
 #undef OP
 #define OP(nn) INLINE void minx_CE_##nn(void)
 
@@ -335,5 +329,3 @@ static const int insnminx_cycles_CE[256] = {
 	12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12,
 	12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12
 };
-
-#endif /* __MINXOPCE_H__ */

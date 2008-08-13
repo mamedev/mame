@@ -1,5 +1,7 @@
-#ifndef TLCS90_INCLUDE
-#define TLCS90_INCLUDE
+#pragma once
+
+#ifndef __TLCS90_H__
+#define __TLCS90_H__
 
 #include "cpuintrf.h"
 
@@ -12,7 +14,8 @@ unsigned t90_dasm(char *buffer, UINT32 oldpc, const UINT8 *oprom, const UINT8 *o
 
 #define T90_IOBASE	0xffc0
 
-typedef enum	{
+typedef enum
+{
 	T90_P0=T90_IOBASE,	T90_P1,		T90_P01CR_IRFL,	T90_IRFH,	T90_P2,		T90_P2CR,	T90_P3,		T90_P3CR,
 	T90_P4,				T90_P4CR,	T90_P5,			T90_SMMOD,	T90_P6,		T90_P7,		T90_P67CR,	T90_SMCR,
 	T90_P8,				T90_P8CR,	T90_WDMOD,		T90_WDCR,	T90_TREG0,	T90_TREG1,	T90_TREG2,	T90_TREG3,
@@ -21,4 +24,4 @@ typedef enum	{
 	T90_DMAEH,			T90_SCMOD,	T90_SCCR,		T90_SCBUF,	T90_BX,		T90_BY,		T90_ADREG,	T90_ADMOD
 }	e_ir;
 
-#endif
+#endif /* __TLCS90_H__ */

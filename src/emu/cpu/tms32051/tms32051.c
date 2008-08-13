@@ -23,7 +23,8 @@ static void check_interrupts(void);
 #define INTERRUPT_TXNT		7
 #define INTERRUPT_INT4		8
 
-enum {
+enum
+{
 	TMS32051_PC = 1,
 	TMS32051_ACC,
 	TMS32051_ACCB,

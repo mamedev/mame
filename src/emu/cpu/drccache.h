@@ -10,6 +10,8 @@
 
 ***************************************************************************/
 
+#pragma once
+
 #ifndef __DRCCACHE_H__
 #define __DRCCACHE_H__
 
@@ -104,4 +106,4 @@ drccodeptr drccache_end_codegen(drccache *cache);
 void drccache_request_oob_codegen(drccache *cache, drccache_oob_func callback, void *param1, void *param2, void *param3);
 
 
-#endif
+#endif /* __DRCCACHE_H__ */

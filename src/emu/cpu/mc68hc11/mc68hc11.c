@@ -7,7 +7,8 @@
 #include "debugger.h"
 #include "mc68hc11.h"
 
-enum {
+enum
+{
 	HC11_PC = 1,
 	HC11_SP,
 	HC11_A,

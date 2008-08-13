@@ -506,4 +506,4 @@ void drcuml_add_comment(drcuml_block *block, const char *format, ...) ATTR_PRINT
 void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drcuml_state *state);
 
 
-#endif
+#endif /* __DRCUML_H__ */

@@ -18,7 +18,8 @@
 
 #include "cpuintrf.h"
 
-enum {
+enum
+{
 	ALPHA8201_PC=1,
 	ALPHA8201_SP,
 	ALPHA8201_RB,

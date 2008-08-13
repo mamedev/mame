@@ -24,7 +24,8 @@
 
 #include "cpuintrf.h"
 
-enum {
+enum
+{
 	CP1610_R0=1, CP1610_R1, CP1610_R2, CP1610_R3,
 	CP1610_R4, CP1610_R5, CP1610_R6, CP1610_R7
 };

@@ -1,8 +1,3 @@
-#pragma once
-
-#ifndef __I86MEM_H__
-#define __I86MEM_H__
-
 typedef struct _memory_interface memory_interface;
 struct _memory_interface
 {
@@ -18,5 +13,3 @@ struct _memory_interface
 	void	(*wbyte_port)(offs_t, UINT8);
 	void	(*wword_port)(offs_t, UINT16);
 };
-
-#endif /* __I86MEM_H__ */

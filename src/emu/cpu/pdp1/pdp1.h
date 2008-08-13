@@ -1,5 +1,7 @@
-#ifndef _PDP1_H
-#define _PDP1_H
+#pragma once
+
+#ifndef __PDP1_H__
+#define __PDP1_H__
 
 #include "cpuintrf.h"
 
@@ -21,7 +23,8 @@ enum
 #define pdp1_pulse_start_clear()	cpunum_set_reg(0, PDP1_START_CLEAR, 0)
 #define pdp1_pulse_iot_done()		cpunum_set_reg(0, PDP1_IO_COMPLETE, 0)
 
-typedef struct pdp1_reset_param_t
+typedef struct _pdp1_reset_param_t pdp1_reset_param_t;
+struct _pdp1_reset_param_t
 {
 	/* callbacks for iot instructions (required for any I/O) */
 	void (*extern_iot[64])(int op2, int nac, int mb, int *io, int ac);
@@ -36,7 +39,7 @@ typedef struct pdp1_reset_param_t
 	int hw_mul_div;
 	/* 0: standard sequence break system 1: type 20 sequence break system */
 	int type_20_sbs;
-} pdp1_reset_param_t;
+};
 
 #define IOT_NO_COMPLETION_PULSE -1
 
@@ -76,4 +79,4 @@ void pdp1_get_info(UINT32 state, cpuinfo *info);
 
 unsigned pdp1_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif /* _PDP1_H */
+#endif /* __PDP1_H__ */

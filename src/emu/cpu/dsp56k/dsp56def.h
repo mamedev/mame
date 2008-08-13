@@ -5,13 +5,6 @@
 /***************************************************************************
     ALU
 ***************************************************************************/
-
-#pragma once
-
-#ifndef __DSP56DEF_H__
-#define __DSP56DEF_H__
-
-
 #define X		core.ALU.x.d
 #define X1		core.ALU.x.w.h
 #define X0		core.ALU.x.w.l
@@ -387,5 +380,3 @@ static void PCDDR_set(UINT16 value);
 
 /* Port C Dtaa Register (PCD) */
 static void PCD_set(UINT16 value);
-
-#endif /* __DSP56DEF_H__ */

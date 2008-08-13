@@ -17,7 +17,8 @@ extern int i386_dasm_one(char *buffer, UINT32 pc, const UINT8 *oprom, int mode);
 typedef enum { ES, CS, SS, DS, FS, GS } SREGS;
 
 #ifdef LSB_FIRST
-typedef enum {
+typedef enum
+{
 	AL = 0,
 	AH = 1,
 	CL = 4,
@@ -28,7 +29,8 @@ typedef enum {
 	BH = 13
 } BREGS;
 #else
-typedef enum {
+typedef enum
+{
 	AL = 3,
 	AH = 2,
 	CL = 7,
@@ -41,7 +43,8 @@ typedef enum {
 #endif
 
 #ifdef LSB_FIRST
-typedef enum {
+typedef enum
+{
 	AX = 0,
 	CX = 2,
 	DX = 4,
@@ -52,7 +55,8 @@ typedef enum {
 	DI = 14
 } WREGS;
 #else
-typedef enum {
+typedef enum
+{
 	AX = 1,
 	CX = 3,
 	DX = 5,

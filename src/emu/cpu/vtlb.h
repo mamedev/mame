@@ -86,4 +86,4 @@ void vtlb_flush_address(vtlb_state *vtlb, offs_t address);
 const vtlb_entry *vtlb_table(vtlb_state *vtlb);
 
 
-#endif
+#endif /* __VTLB_H__ */

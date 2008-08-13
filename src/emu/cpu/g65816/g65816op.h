@@ -1,9 +1,3 @@
-#pragma once
-
-#ifndef __G65816OP_H__
-#define __G65816OP_H__
-
-
 #include "deprecat.h"
 
 /* ======================================================================== */
@@ -2453,5 +2447,3 @@ TABLE_FUNCTION(int, execute, (int clocks))
 	}
 	return clocks;
 }
-
-#endif /* __G65816OP_H__ */

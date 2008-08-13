@@ -1,9 +1,3 @@
-#pragma once
-
-#ifndef __MINXFUNC_H__
-#define __MINXFUNC_H__
-
-
 INLINE UINT8 ADD8( UINT8 arg1, UINT8 arg2 )
 {
 	UINT32 res = arg1 + arg2;
@@ -367,5 +361,3 @@ INLINE void CALL( UINT16 arg )
 #define AD2_Y8	UINT32 addr2 = ( regs.YI << 16 ) | ( regs.Y + rdop() )
 #define AD2_XL	UINT32 addr2 = ( regs.XI << 16 ) | ( regs.X + ( regs.HL & 0x00FF ) )
 #define AD2_YL	UINT32 addr2 = ( regs.YI << 16 ) | ( regs.Y + ( regs.HL & 0x00FF ) )
-
-#endif /* __MINXFUNC_H__ */

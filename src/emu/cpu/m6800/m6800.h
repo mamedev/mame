@@ -7,9 +7,11 @@
 
 #include "cpuintrf.h"
 
-enum {
+enum
+{
 	M6800_PC=1, M6800_S, M6800_A, M6800_B, M6800_X, M6800_CC,
-	M6800_WAI_STATE };
+	M6800_WAI_STATE
+};
 
 #define M6800_WAI		8			/* set when WAI is waiting for an interrupt */
 #define M6800_SLP		0x10		/* HD63701 only */

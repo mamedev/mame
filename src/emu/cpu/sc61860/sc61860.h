@@ -19,8 +19,11 @@
  *   - This entire notice must remain in the source code.
  *
  *****************************************************************************/
-#ifndef _SC61860_H
-#define _SC61860_H
+
+#pragma once
+
+#ifndef __SC61860_H__
+#define __SC61860_H__
 
 /*
   official names seam to be
@@ -35,7 +38,9 @@
 
 #include "cpuintrf.h"
 
-typedef struct {
+typedef struct _sc61860_cpu_core sc61860_cpu_core;
+struct _sc61860_cpu_core
+{
     int (*reset)(void);
     int (*brk)(void);
     int (*x)(void);
@@ -44,7 +49,7 @@ typedef struct {
     int (*inb)(void);
     void (*outb)(int);
     void (*outc)(int);
-} SC61860_CONFIG;
+};
 
 unsigned sc61860_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
@@ -53,4 +58,4 @@ UINT8 *sc61860_internal_ram(void);
 
 void sc61860_get_info(UINT32 state, cpuinfo *info);
 
-#endif
+#endif /* __SC61860_H__ */

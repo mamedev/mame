@@ -22,7 +22,8 @@
 #define	COP400_PORT_SIO	0x105
 #define	COP400_PORT_CKO	0x106
 
-enum {
+enum
+{
 	COP400_PC=1,
 	COP400_A,
 	COP400_B,

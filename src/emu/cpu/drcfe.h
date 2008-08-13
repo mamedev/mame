@@ -31,6 +31,8 @@
 
 ***************************************************************************/
 
+#pragma once
+
 #ifndef __DRCFE_H__
 #define __DRCFE_H__
 
@@ -157,4 +159,4 @@ void drcfe_exit(drcfe_state *drcfe);
 const opcode_desc *drcfe_describe_code(drcfe_state *drcfe, offs_t startpc);
 
 
-#endif
+#endif /* __DRCFE_H__ */

@@ -25,7 +25,8 @@
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-enum {
+enum
+{
 	LH5801_T=1,
 	LH5801_P,
 	LH5801_S,

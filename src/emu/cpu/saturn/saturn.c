@@ -52,7 +52,7 @@ typedef SaturnNib Saturn64[16];
  ****************************************************************************/
 typedef struct
 {
-	SATURN_CONFIG *config;
+	saturn_cpu_core *config;
 
 	Saturn64 reg[9]; //r0,r1,r2,r3,r4,a,b,c,d
 
@@ -98,7 +98,7 @@ static Saturn_Regs saturn;
 
 static void saturn_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	saturn.config = (SATURN_CONFIG *) config;
+	saturn.config = (saturn_cpu_core *) config;
 	saturn.irq_callback = irqcallback;
 
 	state_save_register_item_array("saturn",index,saturn.reg[R0]);

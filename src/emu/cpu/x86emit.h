@@ -18,6 +18,8 @@
 
 ***************************************************************************/
 
+#pragma once
+
 #ifndef __X86EMIT_H__
 #define __X86EMIT_H__
 
@@ -3143,4 +3145,4 @@ INLINE void emit_cvttpd2dq_r128_m128(x86code **emitptr, UINT8 dreg, DECLARE_MEMP
 INLINE void emit_roundpd_r128_r128_imm(x86code **emitptr, UINT8 dreg, UINT8 sreg, UINT8 imm)		{ emit_op_modrm_reg(emitptr, OP_ROUNDPD_Vdq_Wdq_Ib, OP_32BIT, dreg, sreg); emit_byte(emitptr, imm); }
 INLINE void emit_roundpd_r128_m128_imm(x86code **emitptr, UINT8 dreg, DECLARE_MEMPARAMS, UINT8 imm) { emit_op_modrm_mem(emitptr, OP_ROUNDPD_Vdq_Wdq_Ib, OP_32BIT, dreg, MEMPARAMS); emit_byte(emitptr, imm); }
 
-#endif
+#endif /* __X86EMIT_H__ */

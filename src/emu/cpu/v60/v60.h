@@ -1,9 +1,12 @@
-#ifndef __V60_H
-#define __V60_H
+#pragma once
+
+#ifndef __V60_H__
+#define __V60_H__
 
 #include "cpuintrf.h"
 
-enum {
+enum
+{
 	V60_R0 = 1,
 	V60_R1,
 	V60_R2,
@@ -80,11 +83,10 @@ void v60_stall(void);
 
 #if HAS_V60
 void v60_get_info(UINT32 state, cpuinfo *info);
-#endif
-
-#endif
+#endif /* HAS_V60 */
 
 #if HAS_V70
 void v70_get_info(UINT32 state, cpuinfo *info);
-#endif
+#endif /* HAS_V70 */
 
+#endif /* __V60_H__ */

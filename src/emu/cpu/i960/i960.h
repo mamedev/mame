@@ -5,7 +5,8 @@
 
 #include "cpuintrf.h"
 
-enum {
+enum
+{
   I960_PFP = 0,
   I960_SP  = 1,
   I960_RIP = 2,
@@ -52,7 +53,8 @@ enum {
   I960_PIP = 37
 };
 
-enum {
+enum
+{
   I960_IRQ0 = 0,
   I960_IRQ1 = 1,
   I960_IRQ2 = 2,

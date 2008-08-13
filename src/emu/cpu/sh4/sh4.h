@@ -8,17 +8,19 @@
  *
  *****************************************************************************/
 
-#ifndef _SH4_H
-#define _SH4_H
+#ifndef __SH4_H__
+#define __SH4_H__
 
 #include "cpuintrf.h"
 
 #define SH4_INT_NONE	-1
-enum {
+enum
+{
 	SH4_IRL0=0, SH4_IRL1, SH4_IRL2, SH4_IRL3, SH4_IRLn
 };
 
-enum {
+enum
+{
 	SH4_PC=1, SH4_SR, SH4_PR, SH4_GBR, SH4_VBR, SH4_DBR, SH4_MACH, SH4_MACL,
 	SH4_R0, SH4_R1, SH4_R2, SH4_R3, SH4_R4, SH4_R5, SH4_R6, SH4_R7,
 	SH4_R8, SH4_R9, SH4_R10, SH4_R11, SH4_R12, SH4_R13, SH4_R14, SH4_R15, SH4_EA,
@@ -30,7 +32,8 @@ enum {
 	SH4_XF8, SH4_XF9, SH4_XF10, SH4_XF11, SH4_XF12, SH4_XF13, SH4_XF14, SH4_XF15
 };
 
-enum {
+enum
+{
 	SH4_INTC_NMI=23, SH4_INTC_IRLn0, SH4_INTC_IRLn1, SH4_INTC_IRLn2, SH4_INTC_IRLn3, SH4_INTC_IRLn4,
 	SH4_INTC_IRLn5, SH4_INTC_IRLn6, SH4_INTC_IRLn7, SH4_INTC_IRLn8, SH4_INTC_IRLn9, SH4_INTC_IRLnA,
 	SH4_INTC_IRLnB, SH4_INTC_IRLnC, SH4_INTC_IRLnD, SH4_INTC_IRLnE, SH4_INTC_IRL0, SH4_INTC_IRL1,
@@ -105,5 +108,5 @@ READ32_HANDLER( sh4_internal_r );
 
 extern unsigned DasmSH4( char *dst, unsigned pc, UINT16 opcode );
 
-#endif /* _SH4_H */
+#endif /* __SH4_H__ */
 

@@ -1,9 +1,12 @@
-#ifndef _Z80_H_
-#define _Z80_H_
+#pragma once
+
+#ifndef __Z80_H__
+#define __Z80_H__
 
 #include "cpuintrf.h"
 
-enum {
+enum
+{
 	Z80_PC=1, Z80_SP,
 	Z80_A, Z80_B, Z80_C, Z80_D, Z80_E, Z80_H, Z80_L,
 	Z80_AF, Z80_BC, Z80_DE, Z80_HL,
@@ -12,7 +15,8 @@ enum {
 	Z80_DC0, Z80_DC1, Z80_DC2, Z80_DC3
 };
 
-enum {
+enum
+{
 	Z80_TABLE_op,
 	Z80_TABLE_cb,
 	Z80_TABLE_ed,
@@ -31,5 +35,4 @@ extern void z80_get_info(UINT32 state, cpuinfo *info);
 
 extern unsigned z80_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif
-
+#endif /* __Z80_H__ */

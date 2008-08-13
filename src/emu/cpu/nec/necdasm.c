@@ -21,7 +21,8 @@ static const nec_config default_config =
 
 static const nec_config *Iconfig;
 
-enum {
+enum
+{
 	PARAM_REG8 = 1,		/* 8-bit register */
 	PARAM_REG16,		/* 16-bit register */
 	PARAM_REG2_8,		/* 8-bit register */
@@ -60,7 +61,8 @@ enum {
 	PARAM_IY
 };
 
-enum {
+enum
+{
 	MODRM = 1,
 	GROUP,
 	FPU,

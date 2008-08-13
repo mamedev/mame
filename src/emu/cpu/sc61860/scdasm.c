@@ -79,7 +79,8 @@
 */
 
 
-typedef enum {
+typedef enum
+{
 	Ill,
 	Imp,
 	Imm, ImmW,

@@ -82,7 +82,8 @@ TODO:
 
 #if 0
 /* CPU subtypes, needed for extra insn after TAP/CLI/SEI */
-enum {
+enum
+{
 	SUBTYPE_M6800,
 	SUBTYPE_M6801,
 	SUBTYPE_M6802,

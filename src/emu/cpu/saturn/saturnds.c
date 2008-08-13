@@ -71,7 +71,8 @@ static const char number_2_hex[]=
 
 
 // don't split branch and return, source relies on this ordering
-typedef enum {
+typedef enum
+{
 	Return, ReturnSetXM, ReturnSetCarry, ReturnClearCarry, ReturnFromInterrupt,
 	jump3,jump4,jump,
 	call3,call4,call,
@@ -551,8 +552,10 @@ static const struct {
 
 };
 
-typedef struct {
-	enum {
+typedef struct
+{
+	enum
+	{
 		Complete=-1,
 		Illegal,
 		Opcode0, Opcode0E, Opcode0Ea,
@@ -569,7 +572,8 @@ typedef struct {
 		OpcodeE,
 		OpcodeF
 	} sel;
-	enum {
+	enum
+	{
 		AdrNone,
 		AdrAF, AdrA, AdrB, AdrCount,
 		BranchReturn, TestBranchRet, ImmBranch,

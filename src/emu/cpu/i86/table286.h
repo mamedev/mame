@@ -1,8 +1,3 @@
-#pragma once
-
-#ifndef __TABLE286_H__
-#define __TABLE286_H__
-
 /*
  * special 286 protected mode instructions missing
  * at the time the same like table186.h
@@ -533,5 +528,3 @@ static void (*const PREFIX286(_instruction)[256])(void) =
 #else
 #define TABLE286 PREFIX286(_instruction)[FETCHOP]();
 #endif
-
-#endif /* __TABLE286_H__ */

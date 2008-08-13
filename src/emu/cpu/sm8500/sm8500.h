@@ -1,5 +1,8 @@
-#ifndef sm8500_H
-#define sm8500_H
+#pragma once
+
+#ifndef __SM8500_H__
+#define __SM8500_H__
+
 #include "cpuintrf.h"
 
 typedef struct {
@@ -20,7 +23,8 @@ typedef struct {
 #define WDT_INT         9
 #define NMI_INT         10
 
-enum {
+enum
+{
 	/* "main" 16 bit register */
         SM8500_PC=1, SM8500_SP, SM8500_PS, SM8500_SYS16, SM8500_RR0, SM8500_RR2, SM8500_RR4, SM8500_RR6, SM8500_RR8, SM8500_RR10,
 	SM8500_RR12, SM8500_RR14,
@@ -51,5 +55,4 @@ INLINE void sm85cpu_mem_writeword( UINT32 address, UINT16 value )
 
 extern unsigned sm8500_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram );
 
-#endif
-
+#endif /* __SM8500_H__ */

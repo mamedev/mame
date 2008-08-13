@@ -1,3 +1,8 @@
+#pragma once
+
+#ifndef __TX0_H__
+#define __TX0_H__
+
 #include "cpuintrf.h"
 
 
@@ -19,7 +24,8 @@ enum
 #define tx0_pulse_reset()		cpunum_set_reg(0, TX0_RESET, 0)
 #define tx0_pulse_io_complete()	cpunum_set_reg(0, TX0_IO_COMPLETE, 0)
 
-typedef struct tx0_reset_param_t
+typedef struct _tx0_reset_param_t tx0_reset_param_t;
+struct _tx0_reset_param_t
 {
 	/* 8 standard I/O handlers:
         0: cpy (8kW only)
@@ -35,7 +41,7 @@ typedef struct tx0_reset_param_t
 	void (*sel_handler)(void);
 	/* callback called when reset line is pulsed: IO devices should reset */
 	void (*io_reset_callback)(void);
-} tx0_reset_param_t;
+};
 
 /* PUBLIC FUNCTIONS */
 void tx0_64kw_get_info(UINT32 state, cpuinfo *info);
@@ -46,3 +52,5 @@ void tx0_8kw_get_info(UINT32 state, cpuinfo *info);
 
 unsigned tx0_dasm_64kw(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 unsigned tx0_dasm_8kw(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+
+#endif /* __TX0_H__ */

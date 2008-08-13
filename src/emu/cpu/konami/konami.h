@@ -7,9 +7,11 @@
 
 #include "cpuintrf.h"
 
-enum {
+enum
+{
 	KONAMI_PC=1, KONAMI_S, KONAMI_CC ,KONAMI_A, KONAMI_B, KONAMI_U, KONAMI_X, KONAMI_Y,
-	KONAMI_DP };
+	KONAMI_DP
+};
 
 enum
 {

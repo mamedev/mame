@@ -4,8 +4,10 @@
   C Header file for TMS9900 core
 */
 
-#ifndef TMS9900_H
-#define TMS9900_H
+#pragma once
+
+#ifndef __TMS9900_H__
+#define __TMS9900_H__
 
 #include "cpuintrf.h"
 
@@ -35,7 +37,8 @@
 #define TI9985_ID		TMS9985_ID
 
 
-enum {
+enum
+{
 	TMS9900_PC=1, TMS9900_WP, TMS9900_STATUS, TMS9900_IR,
 	TMS9900_R0, TMS9900_R1, TMS9900_R2, TMS9900_R3,
 	TMS9900_R4, TMS9900_R5, TMS9900_R6, TMS9900_R7,
@@ -216,6 +219,4 @@ typedef struct tms99110areset_param
 
 unsigned Dasm9900 (char *buffer, unsigned pc, int model_id, const UINT8 *oprom, const UINT8 *opram);
 
-#endif
-
-
+#endif /* __TMS9900_H__ */

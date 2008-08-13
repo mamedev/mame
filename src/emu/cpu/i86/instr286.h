@@ -1,9 +1,3 @@
-#pragma once
-
-#ifndef __INSTR286_H__
-#define __INSTR286_H__
-
-
 #define ILLEGAL_INSTRUCTION 6
 #define GENERAL_PROTECTION_FAULT 0xd
 
@@ -17,5 +11,3 @@ static void i80286_code_descriptor(UINT16 selector, UINT16 offset);
 static void i80286_data_descriptor(int reg, UINT16 selector);
 static void PREFIX286(_0fpre)(void);
 static void PREFIX286(_arpl)(void);
-
-#endif /* __INSTR286_H__ */

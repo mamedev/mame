@@ -6,7 +6,8 @@
 
 #include "cpuintrf.h"
 
-enum {
+enum
+{
 	PARAM_REG = 1,		/* 16 or 32-bit register */
 	PARAM_REG8,			/* 8-bit register */
 	PARAM_REG16,		/* 16-bit register */

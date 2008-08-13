@@ -1,8 +1,3 @@
-#pragma once
-
-#ifndef __INSTR186_H__
-#define __INSTR186_H__
-
 /****************************************************************************
 *             real mode i286 emulator v1.4 by Fabrice Frances               *
 *               (initial work based on David Hedley's pcemu)                *
@@ -30,5 +25,3 @@ static void PREFIX186(_outsw)(void);
 /* changed instructions */
 static void PREFIX186(_repne)(void);
 static void PREFIX186(_repe)(void);
-
-#endif /* __INSTR186_H__ */

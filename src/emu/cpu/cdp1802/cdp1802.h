@@ -5,38 +5,41 @@
 
 #include "cpuintrf.h"
 
-enum {
+enum
+{
 	CDP1802_INPUT_LINE_INT,
 	CDP1802_INPUT_LINE_DMAIN,
 	CDP1802_INPUT_LINE_DMAOUT
 };
 
-enum {
+enum
+{
 	EF1 = 0x01,
 	EF2 = 0x02,
 	EF3 = 0x04,
 	EF4 = 0x08
 };
 
-typedef enum _cdp1802_control_mode cdp1802_control_mode;
 enum _cdp1802_control_mode {
 	CDP1802_MODE_LOAD,
 	CDP1802_MODE_RESET,
 	CDP1802_MODE_PAUSE,
 	CDP1802_MODE_RUN
 };
+typedef enum _cdp1802_control_mode cdp1802_control_mode;
 
-typedef enum _cdp1802_state cdp1802_state;
 enum _cdp1802_state {
 	CDP1802_STATE_CODE_S0_FETCH,
 	CDP1802_STATE_CODE_S1_EXECUTE,
 	CDP1802_STATE_CODE_S2_DMA,
 	CDP1802_STATE_CODE_S3_INTERRUPT
 };
+typedef enum _cdp1802_state cdp1802_state;
 
 // CDP1802 Registers
 
-enum {
+enum
+{
 	CDP1802_PC = 1,
 	CDP1802_P,		// Designates which register is Program Counter
 	CDP1802_X,		// Designates which register is Data Pointer

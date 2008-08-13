@@ -1,8 +1,3 @@
-#pragma once
-
-#ifndef __H6280OPS_H__
-#define __H6280OPS_H__
-
 /*****************************************************************************
 
     h6280ops.h - Addressing modes and opcode macros for the Hu6820 cpu
@@ -1384,5 +1379,3 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
  ***************************************************************/
 #define CSL														\
     h6280.clocks_per_cycle = 4;
-
-#endif /* __H6280OPS_H__ */

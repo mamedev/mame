@@ -6,8 +6,10 @@
 
 ***************************************************************************/
 
-#ifndef _TMS32031_H
-#define _TMS32031_H
+#pragma once
+
+#ifndef __TMS32031_H__
+#define __TMS32031_H__
 
 #include "cpuintrf.h"
 
@@ -75,4 +77,4 @@ extern double convert_tms3203x_fp_to_double(UINT32 floatdata);
 extern UINT32 convert_float_to_tms3203x_fp(float fval);
 extern UINT32 convert_double_to_tms3203x_fp(double dval);
 
-#endif /* _TMS32031_H */
+#endif /* __TMS32031_H__ */

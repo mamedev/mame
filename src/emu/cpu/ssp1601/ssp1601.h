@@ -1,9 +1,12 @@
-#ifndef SSP1601_H
-#define SSP1601_H
+#pragma once
+
+#ifndef __SSP1601_H__
+#define __SSP1601_H__
 
 #include "cpuintrf.h"
 
-enum {
+enum
+{
 	/* general registers */
 	SSP_R0,   SSP_X,     SSP_Y,    SSP_A,
 	SSP_ST,   SSP_STACK, SSP_PC,   SSP_P,
@@ -19,4 +22,4 @@ void ssp1601_get_info(UINT32 state, cpuinfo *info);
 
 extern unsigned dasm_ssp1601(char *buffer, unsigned pc, const UINT8 *oprom);
 
-#endif /* SSP1601_H */
+#endif /* __SSP1601_H__ */

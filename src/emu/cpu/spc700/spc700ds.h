@@ -1,5 +1,7 @@
-#ifndef HEADER__SPC700DS
-#define HEADER__SPC700DS
+#pragma once
+
+#ifndef __SPC700DS_H__
+#define __SPC700DS_H__
 /* ======================================================================== */
 /* =============================== COPYRIGHT ============================== */
 /* ======================================================================== */
@@ -24,4 +26,4 @@ offs_t spc700_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 #define spc700_read_8_disassembler(addr)				program_read_byte_8(addr)
 
 
-#endif /* HEADER__SPC700DS */
+#endif /* __SPC700DS_H__ */

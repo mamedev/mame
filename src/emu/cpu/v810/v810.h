@@ -1,5 +1,7 @@
-#ifndef V810_H
-#define V810_H
+#pragma once
+
+#ifndef __V810_H__
+#define __V810_H__
 
 #include "cpuintrf.h"
 
@@ -119,6 +121,5 @@ enum
 
 	V810_PC
 };
-#endif
 
-
+#endif /* __V810_H__ */

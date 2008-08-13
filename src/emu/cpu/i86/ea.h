@@ -1,9 +1,3 @@
-#pragma once
-
-#ifndef __EA_H__
-#define __EA_H__
-
-
 static unsigned EA;
 static UINT16 EO; /* HJB 12/13/98 effective offset of the address (before segment is added) */
 
@@ -62,5 +56,3 @@ static unsigned (*const GetEA[192])(void)={
 	EA_200, EA_201, EA_202, EA_203, EA_204, EA_205, EA_206, EA_207,
 	EA_200, EA_201, EA_202, EA_203, EA_204, EA_205, EA_206, EA_207
 };
-
-#endif /* __EA_H__ */

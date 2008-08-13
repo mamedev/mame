@@ -17,8 +17,10 @@
  *
  *****************************************************************************/
 
-#ifndef _TMS7000_H
-#define _TMS7000_H
+#pragma once
+
+#ifndef __TMS7000_H__
+#define __TMS7000_H__
 
 #include "cpuintrf.h"
 
@@ -28,14 +30,16 @@ enum { TMS7000_VCC, TMS7000_VSS };
 
 enum { TMS7000_NMOS, TMS7000_CMOS };
 
-enum {
+enum
+{
 	TMS7000_IRQ1_LINE = 0,   /* INT1 */
 	TMS7000_IRQ2_LINE,       /* INT2 */
 	TMS7000_IRQ3_LINE,       /* INT3 */
 	TMS7000_IRQNONE = 255
 };
 
-enum {
+enum
+{
 	TMS7000_PORTA = 0,
 	TMS7000_PORTB,
 	TMS7000_PORTC,
@@ -49,5 +53,4 @@ extern void tms7000_exl_get_info(UINT32 state, cpuinfo *info);
 
 extern unsigned tms7000_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram );
 
-#endif /* _TMS7000_H */
-
+#endif /* __TMS7000_H__ */

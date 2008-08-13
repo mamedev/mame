@@ -40,7 +40,9 @@ HP38G             09/??/95              1LT8             Yorke
 /* 4 bit processor
    20 address lines */
 
-#ifndef _SATURN_H
+#pragma once
+
+#ifndef __SATURN_H__
 #define _SATURN_H
 
 #include "cpuintrf.h"
@@ -49,7 +51,8 @@ HP38G             09/??/95              1LT8             Yorke
 #define SATURN_INT_IRQ	1
 #define SATURN_INT_NMI	2
 
-typedef struct
+typedef struct _saturn_cpu_core saturn_cpu_core;
+struct _saturn_cpu_core
 {
 	void (*out)(running_machine*,int);
 	int (*in)(running_machine*);
@@ -59,9 +62,10 @@ typedef struct
 	int (*id)(running_machine*);
 	void (*crc)(running_machine*,int addr, int data);
 	void (*rsi)(running_machine*);
-} SATURN_CONFIG;
+};
 
-enum {
+enum
+{
 	SATURN_A=1, SATURN_B, SATURN_C, SATURN_D,
 	SATURN_R0, SATURN_R1, SATURN_R2, SATURN_R3, SATURN_R4,
 	SATURN_RSTK0, SATURN_RSTK1, SATURN_RSTK2, SATURN_RSTK3,
@@ -86,5 +90,4 @@ unsigned saturn_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *o
 
 void saturn_get_info(UINT32 state, cpuinfo *info);
 
-#endif
-
+#endif /* __SATURN_H__ */

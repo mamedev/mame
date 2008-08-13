@@ -7,8 +7,10 @@
 
 ***************************************************************************/
 
-#ifndef _TMS34010_H
-#define _TMS34010_H
+#pragma once
+
+#ifndef __TMS34010_H__
+#define __TMS34010_H__
 
 #include "cpuintrf.h"
 #include "driver.h"
@@ -125,4 +127,4 @@ READ16_HANDLER( tms34020_io_register_r );
 offs_t tms34010_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 offs_t tms34020_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif /* _TMS34010_H */
+#endif /* __TMS34010_H__ */

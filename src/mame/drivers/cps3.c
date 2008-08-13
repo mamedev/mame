@@ -2412,7 +2412,7 @@ static INTERRUPT_GEN(cps3_other_interrupt)
 }
 
 
-//static struct sh2_config sh2cp_conf_slave  = { 1 };
+//static sh2_cpu_core sh2cp_conf_slave  = { 1 };
 
 
 static const custom_sound_interface custom_interface =

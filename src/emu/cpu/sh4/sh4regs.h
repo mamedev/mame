@@ -1,5 +1,7 @@
-#ifndef _SH4REGS_H
-#define _SH4REGS_H
+#pragma once
+
+#ifndef __SH4REGS_H__
+#define __SH4REGS_H__
 
 /* 00000001111111100000000011111100 */
 #define PTEH 	0x2000 	/* FF000000 */
@@ -154,4 +156,4 @@
 #define SDINT 	0x3E05 	/* FFF00014 */
 #define SIZEREGS 15878
 
-#endif
+#endif /* __SH4REGS_H__ */

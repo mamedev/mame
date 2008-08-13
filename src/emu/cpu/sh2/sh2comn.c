@@ -672,7 +672,7 @@ void sh2_exception(const char *message, int irqline)
 
 void sh2_common_init(int alloc, int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	const struct sh2_config *conf = config;
+	const sh2_cpu_core *conf = config;
 
 	if (alloc)
 	{

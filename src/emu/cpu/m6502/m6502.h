@@ -49,7 +49,8 @@
 #define SUBTYPE_DECO16	5
 #endif
 
-enum {
+enum
+{
 	M6502_PC=1, M6502_S, M6502_P, M6502_A, M6502_X, M6502_Y,
 	M6502_EA, M6502_ZP,
 	M6502_SUBTYPE

@@ -41,7 +41,7 @@
  ****************************************************************************/
 typedef struct
 {
-    SC61860_CONFIG *config;
+    sc61860_cpu_core *config;
     UINT8 ram[0x60]; // internal special ram
     UINT8 p, q, r; //7 bits only?
 
@@ -87,7 +87,7 @@ static void sc61860_reset(void)
 
 static void sc61860_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	sc61860.config = (SC61860_CONFIG *) config;
+	sc61860.config = (sc61860_cpu_core *) config;
 	timer_pulse(ATTOTIME_IN_HZ(500), NULL, 0, sc61860_2ms_tick);
 }
 

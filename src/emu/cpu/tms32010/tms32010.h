@@ -11,8 +11,10 @@
  *                                                                          *
  \**************************************************************************/
 
-#ifndef _TMS32010_H
-#define _TMS32010_H
+#pragma once
+
+#ifndef __TMS32010_H__
+#define __TMS32010_H__
 
 
 #include "cpuintrf.h"
@@ -37,7 +39,8 @@
 										/* their support is ever added).    */
 
 
-enum {
+enum
+{
 	TMS32010_PC=1, TMS32010_SP,   TMS32010_STR,  TMS32010_ACC,
 	TMS32010_PREG, TMS32010_TREG, TMS32010_AR0,  TMS32010_AR1,
 	TMS32010_STK0, TMS32010_STK1, TMS32010_STK2, TMS32010_STK3
@@ -125,4 +128,4 @@ void tms32010_get_info(UINT32 state, cpuinfo *info);
 
 offs_t tms32010_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif	/* _TMS32010_H */
+#endif	/* __TMS32010_H__ */

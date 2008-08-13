@@ -6,8 +6,10 @@
  *
  *****************************************************************************/
 
-#ifndef _SH2_COMMON_H_
-#define _SH2_COMMON_H_
+#pragma once
+
+#ifndef __SH2COMN_H__
+#define __SH2COMN_H__
 
 #define USE_SH2DRC
 
@@ -17,13 +19,15 @@
 #include "cpu/drcumlsh.h"
 #endif
 
-typedef struct
+typedef struct _irq_entry irq_entry;
+struct _irq_entry
 {
 	int irq_vector;
 	int irq_priority;
-} irq_entry;
+};
 
-enum {
+enum
+{
 	ICF  = 0x00800000,
 	OCFA = 0x00080000,
 	OCFB = 0x00040000,
@@ -166,4 +170,4 @@ void sh2_set_irq_line(int irqline, int state);
 void sh2_set_frt_input(int cpunum, int state);
 void sh2_exception(const char *message, int irqline);
 
-#endif
+#endif /* __SH2COMN_H__ */

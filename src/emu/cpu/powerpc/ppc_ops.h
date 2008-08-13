@@ -1,3 +1,8 @@
+#pragma once
+
+#ifndef __PPC_OPS_H__
+#define __PPC_OPS_H__
+
 static PPC_OPCODE ppc_opcode_common[] =
 {
 	/*code  subcode         handler             */
@@ -141,3 +146,5 @@ static PPC_OPCODE ppc_opcode_common[] =
 	{ 26,	-1,				ppc_xori			},
 	{ 27,	-1,				ppc_xoris			}
 };
+
+#endif /* __PPC_OPS_H__ */

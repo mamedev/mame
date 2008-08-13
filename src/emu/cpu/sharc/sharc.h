@@ -1,5 +1,7 @@
-#ifndef _SHARC_H
-#define _SHARC_H
+#pragma once
+
+#ifndef __SHARC_H__
+#define __SHARC_H__
 
 #include "cpuintrf.h"
 
@@ -8,7 +10,8 @@
 #define SHARC_INPUT_FLAG2		5
 #define SHARC_INPUT_FLAG3		6
 
-typedef enum {
+typedef enum
+{
 	BOOT_MODE_EPROM,
 	BOOT_MODE_HOST,
 	BOOT_MODE_LINK,
@@ -30,4 +33,4 @@ void adsp21062_get_info(UINT32 state, cpuinfo *info);
 
 extern UINT32 sharc_dasm_one(char *buffer, offs_t pc, UINT64 opcode);
 
-#endif /* _SHARC_H */
+#endif /* __SHARC_H__ */

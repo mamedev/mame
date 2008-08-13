@@ -152,4 +152,4 @@ INLINE int drchash_code_exists(drchash_state *drchash, UINT32 mode, UINT32 pc)
 }
 
 
-#endif
+#endif /* __DRCBEUT_H__ */

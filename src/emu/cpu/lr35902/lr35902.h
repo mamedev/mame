@@ -13,7 +13,8 @@ struct _lr35902_cpu_core
 	void	(*timer_fired_func)(int cycles);
 };
 
-enum {
+enum
+{
 	LR35902_PC=1, LR35902_SP, LR35902_AF, LR35902_BC, LR35902_DE, LR35902_HL,
 	LR35902_IRQ_STATE,
 	/* Pseudo registers to keep track of the interrupt statuses */

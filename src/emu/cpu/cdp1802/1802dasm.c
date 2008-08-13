@@ -24,7 +24,8 @@
 
 #include "cdp1802.h"
 
-typedef enum {
+typedef enum
+{
 	Ill,
 	Imm,
 	Imp,
