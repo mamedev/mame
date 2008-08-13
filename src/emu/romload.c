@@ -79,6 +79,21 @@ chd_file *get_disk_handle(const char *region)
 }
 
 
+void set_disk_handle(const char *region, mame_file *file, chd_file *chdfile)
+{
+	open_chd chd = { 0 };
+
+	/* note the region we are in */
+	chd.region = region;
+	chd.origchd = chdfile;
+	chd.origfile = file;
+
+	/* we're okay, add to the list of disks */
+	*chd_list_tailptr = auto_malloc(sizeof(**chd_list_tailptr));
+	**chd_list_tailptr = chd;
+	chd_list_tailptr = &(*chd_list_tailptr)->next;
+}
+
 
 /***************************************************************************
     ROM LOADING

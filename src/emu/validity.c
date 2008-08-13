@@ -527,7 +527,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 			/* if we haven't seen any items since the last region, print a warning */
 			if (items_since_region == 0)
 				mame_printf_warning("%s: %s has empty ROM region (warning)\n", driver->source_file, driver->name);
-			items_since_region = (ROMREGION_ISERASE(romp) || ROMREGION_ISDISPOSE(romp)) ? 1 : 0;
+			items_since_region = (ROMREGION_ISERASE(romp) || ROMREGION_ISDISPOSE(romp) || ROMREGION_ISDISKDATA(romp)) ? 1 : 0;
 			currgn = NULL;
 
 			/* check for an invalid tag */

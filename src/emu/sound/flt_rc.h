@@ -3,7 +3,7 @@
 #ifndef __FLT_RC_H__
 #define FLT_RC_H
 
-#include "rescap.h"
+#include "machine/rescap.h"
 
 #define FLT_RC_LOWPASS		0
 #define FLT_RC_HIGHPASS		1

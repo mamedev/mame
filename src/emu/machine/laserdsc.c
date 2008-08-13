@@ -1363,7 +1363,7 @@ static void process_track_data(const device_config *device)
 		ld->last_chapter = chapter;
 
 	/* render the display if present */
-	if (ld->display)
+	if (ld->display && ld->avconfig.video != NULL)
 		render_display((UINT16 *)ld->avconfig.video->base, ld->avconfig.video->rowpixels, ld->avconfig.video->width, ld->last_frame);
 
 	/* update video field */
