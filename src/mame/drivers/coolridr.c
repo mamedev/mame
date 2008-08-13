@@ -73,18 +73,20 @@ static UINT32* sysh1_workram_h;
 // SH-2 writes 0x01 to 060d88a5, expects something (SH-1?) to change that
 
 static ADDRESS_MAP_START( system_h1_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
+	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_SHARE(1)
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM // either RAM or registers, not sure
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE(&sysh1_workram_h)
+	AM_RANGE(0x20000000, 0x200fffff) AM_ROM AM_SHARE(1)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( coolridr_submap, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM
+	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_SHARE(2)
 	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM
 	AM_RANGE(0x05200000, 0x052001ff) AM_RAM
 	AM_RANGE(0x05300000, 0x0530ffff) AM_RAM
 	AM_RANGE(0x06000000, 0x06000fff) AM_RAM
 	AM_RANGE(0x07fff000, 0x07ffffff) AM_RAM
+	AM_RANGE(0x20000000, 0x2001ffff) AM_ROM AM_SHARE(2)
 ADDRESS_MAP_END
 
 // SH-1 or SH-2 almost certainly copies the program down to here: the ROM containing the program is 32-bit wide and the 68000 is 16-bit
