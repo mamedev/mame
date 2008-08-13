@@ -52,8 +52,12 @@ static UINT32 video_cadence_history = 0;
 static int video_prev_whitefield = -1;
 static int video_min_overall = 255;
 static int video_max_overall = 0;
-static int video_low_frames = 0;
-static int video_high_frames = 0;
+static int video_first_low_frame = -1;
+static int video_first_low_field = -1;
+static int video_num_low_fields = -1;
+static int video_first_high_frame = -1;
+static int video_first_high_field = -1;
+static int video_num_high_fields = -1;
 
 static int audio_min_lsample = 32767;
 static int audio_min_rsample = 32767;
@@ -475,21 +479,39 @@ static void verify_video(int frame, bitmap_t *bitmap)
         /* update the overall min/max */
         video_min_overall = MIN(minval, video_min_overall);
         video_max_overall = MAX(maxval, video_max_overall);
+        
+        /* track low fields */
         if (minval < 16)
         {
-        	video_low_frames++;
-        	if (video_low_frames < 10)
-				printf("%6d.%d: active video signal level low (%02X) (WARNING)\n", frame, fieldnum, minval);
-			else if (video_low_frames == 10)
-				printf("%6d.%d: active video signal level low (%02X) - suppressing future warnings (WARNING)\n", frame, fieldnum, minval);
+        	if (video_first_low_frame == -1)
+        	{
+	        	video_first_low_frame = frame;
+	        	video_first_low_field = fieldnum;
+	        	video_num_low_fields = 0;
+	        }
+	        video_num_low_fields++;
         }
+        else if (video_num_low_fields > 0)
+        {
+			printf("%6d.%d-%6d.%d: active video signal level low for %d fields (WARNING)\n", video_first_low_frame, video_first_low_field, frame, fieldnum, video_num_low_fields);
+			video_first_low_frame = video_first_low_field = video_num_low_fields = -1;
+        }
+
+        /* track high fields */
         if (maxval > 236)
         {
-        	video_high_frames++;
-        	if (video_high_frames < 10)
-				printf("%6d.%d: active video signal level high (%02X) (WARNING)\n", frame, fieldnum, minval);
-			else if (video_high_frames == 10)
-				printf("%6d.%d: active video signal level high (%02X) - suppressing future warnings (WARNING)\n", frame, fieldnum, minval);
+        	if (video_first_high_frame == -1)
+        	{
+	        	video_first_high_frame = frame;
+	        	video_first_high_field = fieldnum;
+	        	video_num_high_fields = 0;
+	        }
+	        video_num_high_fields++;
+        }
+        else if (video_num_high_fields > 0)
+        {
+			printf("%6d.%d-%6d.%d: active video signal level high for %d fields (WARNING)\n", video_first_high_frame, video_first_high_field, frame, fieldnum, video_num_high_fields);
+			video_first_high_frame = video_first_high_field = video_num_high_fields = -1;
         }
 	}
 }
@@ -511,14 +533,16 @@ static void verify_video_final(int frame, bitmap_t *bitmap)
     /* did we ever see any lead-out? */
 	if (!video_saw_leadout)
 		printf("Track %6d.%d: never saw any lead-out (WARNING)\n", field / fields_per_frame, 0);
-	
+
+	/* any remaining high/low reports? */	
+	if (video_num_low_fields > 0)
+		printf("%6d.%d-%6d.%d: active video signal level low for %d fields (WARNING)\n", video_first_low_frame, video_first_low_field, frame, 0, video_num_low_fields);
+	if (video_num_high_fields > 0)
+		printf("%6d.%d-%6d.%d: active video signal level high for %d fields (WARNING)\n", video_first_high_frame, video_first_high_field, frame, 0, video_num_high_fields);
+
 	/* summary info */
     printf("\nVideo summary:\n");
     printf("  Overall video range: %d-%d (%02X-%02X)\n", video_min_overall, video_max_overall, video_min_overall, video_max_overall);
-    if (video_low_frames)
-    	printf("  Total frames with low signal: %d\n", video_low_frames);
-    if (video_high_frames)
-    	printf("  Total frames with high signal: %d\n", video_high_frames);
 }
 
 
