@@ -335,7 +335,7 @@ INLINE void toggle_none_default(input_seq *selected_seq, input_seq *original_seq
 
 INLINE int item_is_selectable(const ui_menu_item *item)
 {
-	return ((item->flags & MENU_FLAG_MULTILINE) == 0 && strcmp(item->text, MENU_SEPARATOR_ITEM) != 0);
+	return ((item->flags & (MENU_FLAG_MULTILINE | MENU_FLAG_DISABLE)) == 0 && strcmp(item->text, MENU_SEPARATOR_ITEM) != 0);
 }
 
 
@@ -2496,6 +2496,9 @@ static void menu_cheat_populate(running_machine *machine, ui_menu *menu)
 	{
 		ui_menu_item_append(menu, text, subtext, flags, curcheat);
 	}
+
+	/* add a separator */
+	ui_menu_item_append(menu, MENU_SEPARATOR_ITEM, NULL, 0, NULL);
 
 	/* add a reset all option */
 	ui_menu_item_append(menu, "Reset All", NULL, 0, (void *)1);

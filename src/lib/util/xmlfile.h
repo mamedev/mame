@@ -28,6 +28,15 @@ enum
 };
 
 
+enum
+{
+	XML_INT_FORMAT_DECIMAL,
+	XML_INT_FORMAT_DECIMAL_POUND,
+	XML_INT_FORMAT_HEX_DOLLAR,
+	XML_INT_FORMAT_HEX_C
+};
+
+
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -138,6 +147,9 @@ const char *xml_get_attribute_string(xml_data_node *node, const char *attribute,
 
 /* return the integer value of an attribute, or the specified default if not present */
 int xml_get_attribute_int(xml_data_node *node, const char *attribute, int defvalue);
+
+/* return the format of the given integer attribute */
+int xml_get_attribute_int_format(xml_data_node *node, const char *attribute);
 
 /* return the float value of an attribute, or the specified default if not present */
 float xml_get_attribute_float(xml_data_node *node, const char *attribute, float defvalue);

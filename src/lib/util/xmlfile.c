@@ -412,9 +412,36 @@ int xml_get_attribute_int(xml_data_node *node, const char *attribute, int defval
 	const char *string = xml_get_attribute_string(node, attribute, NULL);
 	int value;
 
-	if (string == NULL || sscanf(string, "%d", &value) != 1)
+	if (string == NULL)
 		return defvalue;
-	return value;
+	if (string[0] == '$')
+		return (sscanf(&string[1], "%X", &value) == 1) ? value : defvalue;
+	if (string[0] == '0' && string[1] == 'x')
+		return (sscanf(&string[2], "%X", &value) == 1) ? value : defvalue;
+	if (string[0] == '#')
+		return (sscanf(&string[1], "%d", &value) == 1) ? value : defvalue;
+	return (sscanf(&string[0], "%d", &value) == 1) ? value : defvalue;
+}
+
+
+/*-------------------------------------------------
+    xml_get_attribute_int_format - return the
+    format of the given integer attribute
+-------------------------------------------------*/
+
+int xml_get_attribute_int_format(xml_data_node *node, const char *attribute)
+{
+	const char *string = xml_get_attribute_string(node, attribute, NULL);
+
+	if (string == NULL)
+		return XML_INT_FORMAT_DECIMAL;
+	if (string[0] == '$')
+		return XML_INT_FORMAT_HEX_DOLLAR;
+	if (string[0] == '0' && string[1] == 'x')
+		return XML_INT_FORMAT_HEX_C;
+	if (string[0] == '#')
+		return XML_INT_FORMAT_DECIMAL_POUND;
+	return XML_INT_FORMAT_DECIMAL;
 }
 
 

@@ -60,12 +60,7 @@
 #include "debug/debugcpu.h"
 #include "debug/express.h"
 
-
-
-/***************************************************************************
-    MACROS
-***************************************************************************/
-
+#include <ctype.h>
 
 
 
@@ -101,6 +96,7 @@ struct _parameter_item
 	parameter_item *	next;							/* next item in list */
 	astring *			text;							/* name of the item */
 	UINT64				value;							/* value of the item */
+	int					valformat;						/* format of value */
 };
 
 
@@ -109,9 +105,13 @@ typedef struct _cheat_parameter cheat_parameter;
 struct _cheat_parameter
 {
 	UINT64				minval;							/* minimum value */
+	int					minformat;						/* format of minimum value */
 	UINT64				maxval;							/* maximum value */
+	int					maxformat;						/* format of maximum value */
 	UINT64				stepval;						/* step value */
+	int					stepformat;						/* format of step value */
 	UINT64				defval;							/* default value */
+	int					defformat;						/* format of default value */
 	UINT64				value;							/* live value of the parameter */
 	char				valuestring[32];				/* small space for a value string */
 	parameter_item *	itemlist;						/* list of items */
@@ -216,6 +216,35 @@ static void cheat_variable_set(void *ref, UINT64 value);
     INLINE FUNCTIONS
 ***************************************************************************/
 
+/*-------------------------------------------------
+    format_int - format an integer according to
+    the format
+-------------------------------------------------*/
+
+const char *format_int(astring *string, UINT64 value, int format)
+{
+	switch (format)
+	{
+		default:
+		case XML_INT_FORMAT_DECIMAL:
+			astring_printf(string, "%d", (UINT32)value);
+			break;
+			
+		case XML_INT_FORMAT_DECIMAL_POUND:
+			astring_printf(string, "#%d", (UINT32)value);
+			break;
+			
+		case XML_INT_FORMAT_HEX_DOLLAR:
+			astring_printf(string, "$%X", (UINT32)value);
+			break;
+			
+		case XML_INT_FORMAT_HEX_C:
+			astring_printf(string, "0x%X", (UINT32)value);
+			break;
+	}
+	return astring_c(string);
+}
+
 
 
 /***************************************************************************
@@ -246,6 +275,11 @@ void cheat_init(running_machine *machine)
 	/* temporary: save the file back out as output.xml for comparison */
 	if (cheatinfo->cheatlist != NULL)
 		cheat_list_save("output", cheatinfo->cheatlist);
+
+	/* we rely on the debugger expression callbacks; if the debugger isn't
+	   enabled, we must jumpstart them manually */
+	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
+		debug_cpu_init(machine);
 }
 
 
@@ -320,9 +354,25 @@ void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const 
 	/* description is standard */
 	if (description != NULL)
 		*description = astring_c(cheat->description);
+	
+	/* some cheat entries are just text for display */
+	if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL && cheat->script[SCRIPT_STATE_ON] == NULL)
+	{
+		if (description != NULL)
+		{
+			while (isspace(**description))
+				*description += 1;
+			if (**description == 0)
+				*description = MENU_SEPARATOR_ITEM;
+		}
+		if (state != NULL)
+			*state = NULL;
+		if (flags != NULL)
+			*flags = MENU_FLAG_DISABLE;
+	}
 
 	/* if we have no parameter and no run or off script, it's a oneshot cheat */
-	if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL)
+	else if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL)
 	{
 		if (state != NULL)
 			*state = "Activate";
@@ -392,13 +442,14 @@ int cheat_activate(running_machine *machine, void *entry)
 	cheat_entry *cheat = entry;
 	int changed = FALSE;
 
-	/* if we have no parameter and no run or off script, it's a oneshot cheat */
-	if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL)
+	/* if we have no parameter and no run or off script, but we do have an on script, it's a oneshot cheat */
+	if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL && cheat->script[SCRIPT_STATE_ON] != NULL)
 	{
 		cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
 		changed = TRUE;
 		popmessage("Activated %s", astring_c(cheat->description));
 	}
+
 	return changed;
 }
 
@@ -415,7 +466,7 @@ int cheat_select_default_state(running_machine *machine, void *entry)
 	cheat_entry *cheat = entry;
 	int changed = FALSE;
 
-	/* if we have no parameter and no run or off script, it's a oneshot cheat */
+	/* if we have no parameter and no run or off script, it's either text or a oneshot cheat */
 	if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL)
 		;
 
@@ -454,7 +505,7 @@ int cheat_select_previous_state(running_machine *machine, void *entry)
 	cheat_entry *cheat = entry;
 	int changed = FALSE;
 
-	/* if we have no parameter and no run or off script, it's a oneshot cheat */
+	/* if we have no parameter and no run or off script, it's either text or a oneshot cheat */
 	if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL)
 		;
 
@@ -935,28 +986,40 @@ error:
 static void cheat_entry_save(mame_file *cheatfile, const cheat_entry *cheat)
 {
 	script_state state;
+	int scriptcount;
+	
+	/* count the scripts */
+	scriptcount = 0;
+	for (state = SCRIPT_STATE_OFF; state < SCRIPT_STATE_COUNT; state++)
+		if (cheat->script[state] != NULL)
+			scriptcount++;
 
 	/* output the cheat tag */
 	mame_fprintf(cheatfile, "\t<cheat desc=\"%s\"", astring_c(cheat->description));
 	if (cheat->numtemp != DEFAULT_TEMP_VARIABLES)
 		mame_fprintf(cheatfile, " tempvariables=\"%d\"", cheat->numtemp);
-	mame_fprintf(cheatfile, ">\n");
+	if (cheat->comment == NULL && cheat->parameter == NULL && scriptcount == 0)
+		mame_fprintf(cheatfile, " />\n");
+	else
+	{
+		mame_fprintf(cheatfile, ">\n");
 
-	/* save the comment */
-	if (cheat->comment != NULL)
-		mame_fprintf(cheatfile, "\t\t<comment><![CDATA[\n%s\n\t\t]]></comment>\n", astring_c(cheat->comment));
+		/* save the comment */
+		if (cheat->comment != NULL)
+			mame_fprintf(cheatfile, "\t\t<comment><![CDATA[\n%s\n\t\t]]></comment>\n", astring_c(cheat->comment));
 
-	/* output the parameter, if present */
-	if (cheat->parameter != NULL)
-		cheat_parameter_save(cheatfile, cheat->parameter);
+		/* output the parameter, if present */
+		if (cheat->parameter != NULL)
+			cheat_parameter_save(cheatfile, cheat->parameter);
 
-	/* output the script nodes */
-	for (state = SCRIPT_STATE_OFF; state < SCRIPT_STATE_COUNT; state++)
-		if (cheat->script[state] != NULL)
-			cheat_script_save(cheatfile, cheat->script[state]);
+		/* output the script nodes */
+		for (state = SCRIPT_STATE_OFF; state < SCRIPT_STATE_COUNT; state++)
+			if (cheat->script[state] != NULL)
+				cheat_script_save(cheatfile, cheat->script[state]);
 
-	/* close the cheat tag */
-	mame_fprintf(cheatfile, "\t</cheat>\n");
+		/* close the cheat tag */
+		mame_fprintf(cheatfile, "\t</cheat>\n");
+	}
 }
 
 
@@ -1006,9 +1069,13 @@ static cheat_parameter *cheat_parameter_load(const char *filename, xml_data_node
 
 	/* read the core attributes */
 	param->minval = xml_get_attribute_int(paramnode, "min", 0);
+	param->minformat = xml_get_attribute_int_format(paramnode, "min");
 	param->maxval = xml_get_attribute_int(paramnode, "max", 0);
+	param->maxformat = xml_get_attribute_int_format(paramnode, "max");
 	param->stepval = xml_get_attribute_int(paramnode, "step", 1);
+	param->stepformat = xml_get_attribute_int_format(paramnode, "step");
 	param->defval = xml_get_attribute_int(paramnode, "default", param->minval);
+	param->defformat = xml_get_attribute_int_format(paramnode, "default");
 
 	/* iterate over items */
 	itemtailptr = &param->itemlist;
@@ -1035,6 +1102,7 @@ static cheat_parameter *cheat_parameter_load(const char *filename, xml_data_node
 			goto error;
 		}
 		curitem->value = xml_get_attribute_int(itemnode, "value", 0);
+		curitem->valformat = xml_get_attribute_int_format(itemnode, "value");
 
 		/* ensure the maximum expands to suit */
 		param->maxval = MAX(param->maxval, curitem->value);
@@ -1064,6 +1132,8 @@ error:
 
 static void cheat_parameter_save(mame_file *cheatfile, const cheat_parameter *param)
 {
+	astring *string = astring_alloc();
+	
 	/* output the parameter tag */
 	mame_fprintf(cheatfile, "\t\t<parameter");
 
@@ -1071,12 +1141,12 @@ static void cheat_parameter_save(mame_file *cheatfile, const cheat_parameter *pa
 	if (param->itemlist == NULL)
 	{
 		if (param->minval != 0)
-			mame_fprintf(cheatfile, " min=\"%d\"", (UINT32)param->minval);
+			mame_fprintf(cheatfile, " min=\"%s\"", format_int(string, param->minval, param->minformat));
 		if (param->maxval != 0)
-			mame_fprintf(cheatfile, " max=\"%d\"", (UINT32)param->maxval);
+			mame_fprintf(cheatfile, " max=\"%s\"", format_int(string, param->maxval, param->maxformat));
 		if (param->stepval != 1)
-			mame_fprintf(cheatfile, " step=\"%d\"", (UINT32)param->stepval);
-		mame_fprintf(cheatfile, " default=\"%d\"", (UINT32)param->defval);
+			mame_fprintf(cheatfile, " step=\"%s\"", format_int(string, param->stepval, param->stepformat));
+		mame_fprintf(cheatfile, " default=\"%s\"", format_int(string, param->defval, param->defformat));
 		mame_fprintf(cheatfile, "/>\n");
 	}
 
@@ -1085,11 +1155,12 @@ static void cheat_parameter_save(mame_file *cheatfile, const cheat_parameter *pa
 	{
 		const parameter_item *curitem;
 
-		mame_fprintf(cheatfile, " default=\"%d\">\n", (UINT32)param->defval);
+		mame_fprintf(cheatfile, " default=\"%s\">\n", format_int(string, param->defval, param->defformat));
 		for (curitem = param->itemlist; curitem != NULL; curitem = curitem->next)
-			mame_fprintf(cheatfile, "\t\t\t<item value=\"%d\">%s</item>\n", (UINT32)curitem->value, astring_c(curitem->text));
+			mame_fprintf(cheatfile, "\t\t\t<item value=\"%s\">%s</item>\n", format_int(string, curitem->value, curitem->valformat), astring_c(curitem->text));
 		mame_fprintf(cheatfile, "\t\t</parameter>\n");
 	}
+	astring_free(string);
 }
 
 
