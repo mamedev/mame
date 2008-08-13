@@ -4,15 +4,14 @@
 /*******************************************************************************
  Shadow Handling Notes
 ********************************************************************************
- previously shadows were handled by toggling them on and off with a
- shadows_visible flag.
+ Shadows are handled by changing palette bank.
 
- Games Not Using Shadows?
+ Games Not Using Shadows
 
  those using gwar_vh_screenrefresh (gwar, bermudat, psychos, chopper1)
     (0-15 , 15 is transparent)
 
- Games Using Shadows?
+ Games Using Shadows
 
  those using tnk3_vh_screenrefresh (tnk3, athena, fitegolf) sgladiat is similar
     (0-7  , 6  is shadow, 7  is transparent) * these are using aso colour prom convert *
@@ -26,48 +25,55 @@
 *******************************************************************************/
 
 
-int snk_blink_parity = 0;
-
 #define MAX_VRAM_SIZE (64*64*2) /* 0x2000 */
 
 
 
 
-PALETTE_INIT( snk_3bpp_shadow )
+VIDEO_START( snk )
+{
+	tmpbitmap = auto_bitmap_alloc(512, 512, video_screen_get_format(machine->primary_screen));
+}
+
+
+VIDEO_START( snk_3bpp_shadow )
 {
 	int i;
-	PALETTE_INIT_CALL(RRRR_GGGG_BBBB);
+
+	VIDEO_START_CALL(snk);
 
 	if(!(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	/* prepare shadow draw table */
 	for(i = 0; i <= 5; i++) gfx_drawmode_table[i] = DRAWMODE_SOURCE;
-
 	gfx_drawmode_table[6] = DRAWMODE_SHADOW;
 	gfx_drawmode_table[7] = DRAWMODE_NONE;
+
+	for (i = 0x000;i < 0x400;i++)
+		machine->shadow_table[i] = i | 0x200;
 }
 
-PALETTE_INIT( snk_4bpp_shadow )
+VIDEO_START( snk_4bpp_shadow )
 {
 	int i;
-	PALETTE_INIT_CALL(RRRR_GGGG_BBBB);
+
+	VIDEO_START_CALL(snk);
 
 	if(!(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
 		popmessage("driver should use VIDEO_HAS_SHADOWS");
 
 	/* prepare shadow draw table */
 	for(i = 0; i <= 13; i++) gfx_drawmode_table[i] = DRAWMODE_SOURCE;
-
 	gfx_drawmode_table[14] = DRAWMODE_SHADOW;
 	gfx_drawmode_table[15] = DRAWMODE_NONE;
-}
 
-VIDEO_START( snk )
-{
-	snk_blink_parity = 0;
-
-	tmpbitmap = auto_bitmap_alloc(512, 512, video_screen_get_format(machine->primary_screen));
+	/* all palette entries are not affected by shadow sprites... */
+	for (i = 0x00;i < 0x400;i++)
+		machine->shadow_table[i] = i;
+	/* ... except for tilemap colors */
+	for (i = 0x200;i < 0x300;i++)
+		machine->shadow_table[i] = i + 0x100;
 }
 
 /**************************************************************************************/
@@ -210,6 +216,8 @@ VIDEO_UPDATE( tnk3 )
         -------X    scrollx MSB (sprites)
     */
 
+	// TODO attributes & 0x80 is screen flip
+
 	/* to be moved to memmap */
 	spriteram = &ram[0xd000];
 
@@ -283,6 +291,8 @@ VIDEO_UPDATE( athena )
         ------X-    scrollx MSB (background)
         -------X    scrollx MSB (sprites)
     */
+
+	// TODO attributes & 0x80 is screen flip
 
 	/* to be moved to memmap */
 	spriteram = &ram[0xd000];
@@ -488,7 +498,7 @@ byte3: attributes
     -xx-x--- (bank number)
     x------- (x offset bit8)
 */
-static void tdfever_draw_sp(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xscroll, int yscroll, int mode )
+static void tdfever_draw_sp(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xscroll, int yscroll, int mode, int flipx )
 {
 	const UINT8 *source = snk_rambase + ((mode==2)?0x1800:0x1000);
 	const gfx_element *gfx = machine->gfx[(mode==1)?3:2];
@@ -534,11 +544,9 @@ static void tdfever_draw_sp(running_machine *machine, bitmap_t *bitmap, const re
 			default:
 				tile_number |= attributes<<3 & 0x300;
 				color = attributes & 0x0f;
-				if (snk_gamegroup == 7) // ftsoccer
-					palette_set_shadow_mode(machine, ((attributes & 0x6f) == 0x60) ? 1 : 0);
 		}
 
-		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,cliprect,pen_mode,15);
+		drawgfx(bitmap,gfx,tile_number,color,flipx,0,sx,sy,cliprect,pen_mode,15);
 	}
 }
 
@@ -570,7 +578,6 @@ static void tdfever_draw_tx(running_machine *machine, bitmap_t *bitmap, const re
 VIDEO_UPDATE( tdfever )
 {
 	const UINT8 *ram = snk_rambase - 0xd000;
-	int i;
 
 	UINT8 bg_attributes = ram[0xc880];
 	UINT8 sp_attributes = ram[0xc900];
@@ -579,6 +586,8 @@ VIDEO_UPDATE( tdfever )
 	int bg_scroll_y = -ram[0xc800] + ((bg_attributes & 0x01) ? 256:0);
 	int sp_scroll_x = -ram[0xc9c0] + ((sp_attributes & 0x40) ? 0:256);
 	int sp_scroll_y = -ram[0xc980] + ((sp_attributes & 0x80) ? 256:0);
+
+	// TODO bg_attribute & 0x10 is screen flip
 
 	if(snk_gamegroup == 3 || snk_gamegroup == 5) // tdfever, tdfeverj
 	{
@@ -596,15 +605,7 @@ VIDEO_UPDATE( tdfever )
 	}
 	tdfever_draw_bg(screen->machine, bitmap, cliprect, bg_scroll_x, bg_scroll_y );
 
-	if (snk_gamegroup == 5) // tdfeverj
-	{
-		gfx_drawmode_table[13] = DRAWMODE_SHADOW;
-		gfx_drawmode_table[14] = DRAWMODE_SOURCE;
-
-		for (i=0x10e; i<0x200; i+=0x10) palette_set_color(screen->machine,i,MAKE_RGB(snk_blink_parity,snk_blink_parity,snk_blink_parity));
-		snk_blink_parity ^= 0x7f;
-	}
-	tdfever_draw_sp(screen->machine, bitmap, cliprect, sp_scroll_x, sp_scroll_y, 0 );
+	tdfever_draw_sp(screen->machine, bitmap, cliprect, sp_scroll_x, sp_scroll_y, 0, 1 );
 
 	tdfever_draw_tx(screen->machine, bitmap, cliprect, tx_attributes, 0, 0, 0xf800 );
 	return 0;
@@ -628,6 +629,8 @@ VIDEO_UPDATE( gwar )
 	}
 
 	bg_attribute = ram[gwar_sp_baseaddr+0x880];
+
+	// TODO bg_attribute & 0x04 is screen flip
 
 	{
 		int bg_scroll_y, bg_scroll_x;
@@ -666,13 +669,13 @@ VIDEO_UPDATE( gwar )
 
 		if(sp_attribute & 0xf8) // improves priority
 		{
-			tdfever_draw_sp(screen->machine, bitmap, cliprect, sp16_x, sp16_y, 2 );
-			tdfever_draw_sp(screen->machine, bitmap, cliprect, sp32_x, sp32_y, 1 );
+			tdfever_draw_sp(screen->machine, bitmap, cliprect, sp16_x, sp16_y, 2, 0 );
+			tdfever_draw_sp(screen->machine, bitmap, cliprect, sp32_x, sp32_y, 1, 0 );
 		}
 		else
 		{
-			tdfever_draw_sp(screen->machine, bitmap, cliprect, sp32_x, sp32_y, 1 );
-			tdfever_draw_sp(screen->machine, bitmap, cliprect, sp16_x, sp16_y, 2 );
+			tdfever_draw_sp(screen->machine, bitmap, cliprect, sp32_x, sp32_y, 1, 0 );
+			tdfever_draw_sp(screen->machine, bitmap, cliprect, sp16_x, sp16_y, 2, 0 );
 		}
 	}
 

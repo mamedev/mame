@@ -62,7 +62,7 @@ static UINT8 *hal21_vreg, *hal21_sndfifo;
 static UINT8 *textram;
 static UINT8 *aso_scroll_sync;
 static int color[2];
-
+static int snk_blink_parity;	// FIXME likely wrong
 
 /**************************************************************************/
 // Test Handlers
