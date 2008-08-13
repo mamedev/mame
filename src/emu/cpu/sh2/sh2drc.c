@@ -1631,11 +1631,13 @@ static int generate_opcode(drcuml_block *block, compiler_state *compiler, const 
 			break;
 
 		case 11: 	// BSR
+			// panicstr @ 403da22 relies on the delay slot clobbering the PR set by a BSR, so
+			// do this before running the delay slot
+			UML_ADD(block, MEM(&sh2->pr), IMM(desc->pc), IMM(4));	// add sh2->pr, desc->pc, #4 (skip the current insn & delay slot)
+
 			generate_delay_slot(block, compiler, desc);
 
 		   	disp = ((INT32)opcode << 20) >> 20;
-
-			UML_ADD(block, MEM(&sh2->pr), IMM(desc->pc), IMM(4));	// add sh2->pr, desc->pc, #4 (skip the current insn & delay slot)
 
 			sh2->ea = (desc->pc + 2) + disp * 2 + 2;			// sh2->ea = pc+4 + disp*2 + 2
 			generate_update_cycles(block, compiler, IMM(sh2->ea), TRUE);	// <subtract cycles>
