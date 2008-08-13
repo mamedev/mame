@@ -12,6 +12,10 @@
     * Lucky 74 (bootleg, set 2), 1988, Wing Co.,Ltd.
 
 
+    Special thanks to Grull Osgo that helped a lot with the whole audio system and custom IC's
+    reverse-engineering, and Tomasz Slanina that found how NMI interrupts are triggered.
+
+
 **********************************************************************************************
 
 
@@ -278,10 +282,10 @@
     LUCKY 74 - E2                Comments
     ------------------------------------------------------
     01 - I - Flip State.
-    02 - I - Clk1 1.5 MHz.	     In fase with 6 MHz & 3 MHz.
-    03 - I - Clk2 12 MHz.
-    04 - I - Clk3 1.5 MHz.       In fase with 6 MHz.
-    05 - I - Clk4 3 MHz.         In fase with 6 MHz.
+    02 - I - CLK1 1.5 MHz.	     In phase with 6 MHz & 3 MHz.
+    03 - I - CLK2 12 MHz.
+    04 - I - CLK3 1.5 MHz.       In phase with 6 MHz.
+    05 - I - CLK4 3 MHz.         In phase with 6 MHz.
     06 - I - Data 0              EP11 & EP12.
     07 - I - Data 1              EP11 & EP12.
     08 - I - Data 2              EP11 & EP12.
@@ -301,19 +305,19 @@
     22 - I - Data 1              EP13 & EP14.
     23 - I - Data 0              EP13 & EP14.
     24 - GND                     Ground.
-    25 - O - Prom Selector       C6-D6-E6.A0.
-    26 - O - Prom Selector       C6-D6-E6.A1.
-    27 - O - Prom Selector       C6-D6-E6.A2.
-    28 - O - Prom Selector       C6-D6-E6.A3.
+    25 - O - PROM Selector       C6-D6-E6.A0.
+    26 - O - PROM Selector       C6-D6-E6.A1.
+    27 - O - PROM Selector       C6-D6-E6.A2.
+    28 - O - PROM Selector       C6-D6-E6.A3.
 
 
     LUCKY 74 - E1                Comments
     ------------------------------------------------------
     01 - I - Flip State.
-    02 - I - Clk1 1.5 MHz.	     In fase with 6 MHz & 3 MHz.
-    03 - I - Clk2 12 MHz.
-    04 - I - Clk3 1.5 MHz.       In fase with 6 MHz.
-    05 - I - Clk4 3 MHz.         In fase with 6 MHz.
+    02 - I - CLK1 1.5 MHz.	     In phase with 6 MHz & 3 MHz.
+    03 - I - CLK2 12 MHz.
+    04 - I - CLK3 1.5 MHz.       In phase with 6 MHz.
+    05 - I - CLK4 3 MHz.         In phase with 6 MHz.
     06 - I - Data 0              EP16 & EP17.
     07 - I - Data 1              EP16 & EP17.
     08 - I - Data 2              EP16 & EP17.
@@ -333,10 +337,10 @@
     22 - I - Data 1              EP18 & EP19.
     23 - I - Data 0              EP18 & EP19.
     24 - GND                     Ground.
-    25 - O - Prom Selector       C7-D7-E7.A0.
-    26 - O - Prom Selector       C7-D7-E7.A1.
-    27 - O - Prom Selector       C7-D7-E7.A2.
-    28 - O - Prom Selector       C7-D7-E7.A3.
+    25 - O - PROM Selector       C7-D7-E7.A0.
+    26 - O - PROM Selector       C7-D7-E7.A1.
+    27 - O - PROM Selector       C7-D7-E7.A2.
+    28 - O - PROM Selector       C7-D7-E7.A3.
 
 
 
