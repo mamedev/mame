@@ -235,6 +235,153 @@ ROM_START( madalien )
 ROM_END
 
 
+/***************************************************************************
+
+Mad Rider / Mad Alien
+Data East, 1980
+
+This game runs on 4 boards that plug into a PCB containing slots. The whole
+thing is housed in a metal box. All of the PCBs in this box are labelled
+'MAD RIDER'. The actual game appears to be Highway Chase on a Mad Alien PCB
+and might have been converted from Mad Alien. However, the title screen still
+says 'Mad Alien'. The graphics are bad on the edge of the road because one
+PROM at 3K is incorrect. If you have access to a Mad Rider PCB, please dump
+the PROM at 3K or contact us.
+
+
+PCB Layouts
+-----------
+
+Top board
+
+DE-0048B-1 CPU
+|-----------------------------------|
+|                                   |
+|                   10.595MHz       |
+|           DIP8(?)                 |
+|                                   |
+|                                   |
+|     DSW(8)                        |
+|                                   |
+|     DIP40                         |
+|                                   |
+|                                   |
+|                                   |
+|                                   |
+|                                   |
+|                                   |
+|-----------------------------------|
+Notes:
+      This is joined to the PCB below with 4 small flat cables
+      All of the part numbers are scratched out on this PCB
+      DIP40 is a 6502 @ 1.324375MHz [10.595 / 8]
+
+
+DE-0044B
+ |-------------------------------------|
+ |                                     |
+|-|                                    |
+| |     DIP40                          |-|
+| |      M5L8216P  2114 2114             |
+| |*                                     |
+| |      M5L8216P  2114 2114             |
+|-|                                      |
+ |   2114 M5L8216P  2114 2114  MG-1.7F   |
+ |                                       |
+ |   2114 M5L8216P  2114 2114            |
+ |                                       |
+ |   2114 M5L8216P  2114 2114          |-|
+ |                                     |
+ |   2114 M5L8216P  2114 2114          |
+ |-------------------------------------|
+Notes:
+      * - Flat cable joined to next PCB down
+  DIP40 - probably 6845 video chip (surface scratched)
+   MG-1 - 82S123 Bipolar PROM
+
+
+DE-0045B-1
+ |-------------------------------------|
+ |            MD-1.3M                  |
+|-|           ME-1.3L                  |
+| |           MC-1.3K                  |-|
+| |                                      |
+| |*               MF-1.4H               |
+| |                                      |
+|-|                                      |
+ |                                       |
+ |                                       |
+ |                                       |
+ |                       MB.5C           |
+ |                                     |-|
+ |      MA.2B                          |
+ |                                     |
+ |-------------------------------------|
+Notes:
+      * - Flat cable joined to above PCB
+     MA - 2708 EPROM
+     MB - 2716 EPROM
+MC / MD \
+ME / MF - uPB426 or 82S137 Bipolar PROMs
+
+
+DE-0047B-1
+|-------------------------------------|
+|                       DIP16         |
+|   555                4MHz           |
+|                 8910                |-|
+|   4066                6502            |
+|                                       |
+|                                       |
+|*                                      |
+|   555        9_2708.3D                |
+|                      8_2708.3D        |
+|                                       |
+|          LM348                        |
+|                 4066  2114          |-|
+|   555                               |
+|          LM348  4066  2114          |
+|-------------------------------------|
+Notes:
+      * - 3 pin sound output connector
+   6502 - 6502 CPU running at 0.500MHz [4/8]
+          NMI on pin 6 measured 50.0Hz
+   8910 - AY3-8910 sound chip running at 1.000MHz [4/4]
+  DIP16 - socket for small plug-in board containing 3 chips
+          which is covered with epoxy resin
+
+
+Bottom board
+
+DE-0046B-1 ROM
+ |-------------------------------------|
+ |                                  @  |
+ |             2716.3L   2716.4L       |
+ |                                     |-|
+|-|            2716.3K   2716.4K         |
+| |                                      |
+| |            2716.3H   2716.4H         |
+| |                                  #   |
+| |            2716.3F   2716.4F         |
+| |                                      |
+| |                      2716.4E         |
+| |                                      |
+|-|                      2716.4C       |-|
+ |                                     |
+ |    &                             %  |
+ |-------------------------------------|
+Notes:
+      * - 50 pin flat cable connector for controls and video output
+      & - 4 wire jumpers
+      % - 4 wire jumpers
+      # - 6 wire jumpers
+      @ - 3 wire jumpers
+      All ROMs type 2716
+      VSync - 55Hz
+      HSync - 15.43kHz
+
+***************************************************************************/
+
 ROM_START( madalina )
 	ROM_REGION( 0x10000, "main", 0 )                   /* main CPU */
 	ROM_LOAD( "2716.4c", 0xb000, 0x0800, CRC(90be68af) SHA1(472ccfd2e04d6d49be47d919cba0c55d850b2887) )
