@@ -397,7 +397,7 @@ void ptm6840_config(int which, const ptm6840_interface *intf)
 
 	for (i = 0; i < 3; i++)
 	{
-		ptm[which].timer[i] = timer_alloc(ptm6840_timer_cb, (void*)i);
+		ptm[which].timer[i] = timer_alloc(ptm6840_timer_cb, (void*)(FPTR)i);
 		timer_enable(ptm[which].timer[i], FALSE);
 	}
 
@@ -669,7 +669,7 @@ static void ptm6840_timeout(running_machine *machine, int which, int idx)
 	reload_count(machine, which, idx);
 }
 
-static TIMER_CALLBACK( ptm6840_timer_cb ) { ptm6840_timeout(machine, param, (int)ptr); }
+static TIMER_CALLBACK( ptm6840_timer_cb ) { ptm6840_timeout(machine, param, (int)(FPTR)ptr); }
 
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
