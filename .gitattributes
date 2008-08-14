@@ -1649,7 +1649,6 @@ src/mame/drivers/m72.c svneol=native#text/plain
 src/mame/drivers/m79amb.c svneol=native#text/plain
 src/mame/drivers/m90.c svneol=native#text/plain
 src/mame/drivers/m92.c svneol=native#text/plain
-src/mame/drivers/m92.h svneol=native#text/plain
 src/mame/drivers/macrossp.c svneol=native#text/plain
 src/mame/drivers/macs.c svneol=native#text/plain
 src/mame/drivers/madalien.c svneol=native#text/plain
