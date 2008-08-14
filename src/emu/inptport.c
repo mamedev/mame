@@ -2610,6 +2610,12 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 					TOKEN_SKIP_STRING(ipt);
 					break;
 				}
+				if (curfield->diploclist != NULL)
+				{
+					error_buf_append(errorbuf, errorbuflen, "multiple INPUT_TOKEN_DIPLOCATIONs encountered for a single field\n");
+					TOKEN_SKIP_STRING(ipt);
+					break;
+				}
 				curfield->diploclist = diplocation_list_alloc(curfield, TOKEN_GET_STRING(ipt), errorbuf, errorbuflen);
 				break;
 
@@ -2862,7 +2868,15 @@ static input_port_config *port_config_detokenize(input_port_config *listhead, co
 					curfield->seq[SEQ_TYPE_STANDARD].code[0] = KEYCODE_F2;
 				}
 				if (hasdiploc)
+				{
+					if (curfield->diploclist != NULL)
+					{
+						error_buf_append(errorbuf, errorbuflen, "multiple INPUT_TOKEN_DIPLOCATIONs encountered for a single field\n");
+						TOKEN_SKIP_STRING(ipt);
+						break;
+					}
 					curfield->diploclist = diplocation_list_alloc(curfield, TOKEN_GET_STRING(ipt), errorbuf, errorbuflen);
+				}
 
 				temptoken.i = INPUT_STRING_Off;
 				cursetting = setting_config_alloc(curfield, defval & mask, input_port_string_from_token(temptoken));

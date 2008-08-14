@@ -2668,7 +2668,8 @@ static MACHINE_DRIVER_START( cps3 )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(59.633333)	/* just a guess for now, based on previous games */
+										/* however Mantis bug 2110 suggests it may be slightly different */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(512*2, 224*2)

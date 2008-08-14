@@ -3369,7 +3369,7 @@ GAME( 1995, lhb,      0,        lhb,      lhb,      lhb,      ROT0, "IGS",      
 GAME( 1995, lhba,     lhb,      lhb,      lhb,      lhba,     ROT0, "IGS",        "Long Hu Bang (V033C)",               0 )
 GAME( 1995, dbc,      0,        lhb,      lhb,      dbc,      ROT0, "IGS",        "Da Ban Cheng (V027H)",               0 )
 GAME( 1996, chmplst2, 0,        chmplst2, chmplst2, chmplst2, ROT0, "IGS",        "Long Hu Bang II (V185H)",            0 )
-GAME( 1996, xymg,     0,        xymg,     xymg,     xymg,     ROT0, "IGS",        "Xing Yen Man Guan (V651C)",          0 )
+GAME( 1996, xymg,     0,        xymg,     xymg,     xymg,     ROT0, "IGS",        "PinYin: Xing Yun Man Guan (V651C)",          0 )
 GAME( 1996, grtwall,  xymg,     grtwall,  grtwall,  grtwall,  ROT0, "IGS",        "Wan Li Chang Cheng (V638C)",         0 )
 GAME( 1996, vbowl,    0,        vbowl,    vbowl,    vbowl,    ROT0, "IGS",        "Virtua Bowling (World, V101XCM)",    GAME_IMPERFECT_SOUND )
 GAME( 1996, vbowlj,   vbowl,    vbowl,    vbowlj,   vbowlj,   ROT0, "IGS / Alta", "Virtua Bowling (Japan, V100JCM)",    GAME_IMPERFECT_SOUND )
