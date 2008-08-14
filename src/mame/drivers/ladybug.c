@@ -1,8 +1,19 @@
 /***************************************************************************
 
-Lady Bug memory map (preliminary)
+Universal 8106-A2 + 8106-B PCB set
 
 driver by Nicola Salmoria
+
+  Confirmed to use the 8106-A2/8106-B PCB:
+    Lady Bug
+    Snap Jack
+    Cosmic Avenger
+
+  Simular or bootleg PCB:
+    Dorodon (by Falcon)
+    Space Raider
+
+Memory map (preliminary)
 
 0000-5fff ROM
 6000-6fff RAM
