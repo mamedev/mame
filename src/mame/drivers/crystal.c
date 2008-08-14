@@ -237,7 +237,7 @@ static WRITE32_HANDLER(Banksw_w)
 
 static TIMER_CALLBACK( Timercb )
 {
-	int which = (int)ptr;
+	int which = (int)(FPTR)ptr;
 	static const int num[] = { 0, 1, 9, 10 };
 
 	if(!(Timerctrl[which]&2))
@@ -501,7 +501,7 @@ static MACHINE_START(crystal)
 
 	cpunum_set_irq_callback(0,icallback);
 	for (i=0; i<4; i++)
-		Timer[i] = timer_alloc(Timercb, (void*)i);
+		Timer[i] = timer_alloc(Timercb, (void*)(FPTR)i);
 
 	PatchReset();
 }

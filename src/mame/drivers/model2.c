@@ -312,7 +312,7 @@ static WRITE32_HANDLER( timers_w )
 
 static TIMER_CALLBACK( model2_timer_cb )
 {
-	int tnum = (int)ptr;
+	int tnum = (int)(FPTR)ptr;
 	int bit = tnum + 2;
 
 	timer_adjust_oneshot(model2_timers[tnum], attotime_never, 0);
@@ -349,7 +349,7 @@ static MACHINE_RESET(model2_common)
 
 	for (i=0; i<4; i++)
 	{
-		model2_timers[i] = timer_alloc(model2_timer_cb, (void*)i);
+		model2_timers[i] = timer_alloc(model2_timer_cb, (void*)(FPTR)i);
 		timer_adjust_oneshot(model2_timers[i], attotime_never, 0);
 	}
 }
