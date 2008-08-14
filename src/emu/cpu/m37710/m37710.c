@@ -270,7 +270,7 @@ static const char *const m37710_tnames[8] =
 
 static TIMER_CALLBACK( m37710_timer_cb )
 {
-	int which = (int)ptr;
+	int which = (int)(FPTR)ptr;
 	int curirq = M37710_LINE_TIMERA0 - which;
 	int cpunum = param;
 
@@ -974,7 +974,7 @@ static void m37710_init(int index, int clock, const void *config, int (*irqcallb
 	m37710i_destination = 0;
 
 	for (i=0; i<8; i++)
-		m37710i_cpu.timers[i] = timer_alloc(m37710_timer_cb, (void*)i);
+		m37710i_cpu.timers[i] = timer_alloc(m37710_timer_cb, (void*)(FPTR)i);
 
 	state_save_register_item("M377xx", index, m37710i_cpu.a);
 	state_save_register_item("M377xx", index, m37710i_cpu.b);
