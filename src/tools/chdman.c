@@ -611,7 +611,7 @@ static avi_error read_avi_frame(avi_file *avi, UINT32 framenum, UINT32 first_sam
 		if (avierr != AVIERR_NONE)
 			goto cleanup;
 	}
-	
+
 	/* build the fake bitmap */
 	*avconfig->video = *fullbitmap;
 	if (interlaced)
@@ -851,7 +851,7 @@ static int do_createav(int argc, char *argv[], int param)
 		goto cleanup;
 	}
 	avconfig.video = &fakebitmap;
-	
+
 	/* allocate audio buffers */
 	avconfig.channels = channels;
 	for (chnum = 0; chnum < channels; chnum++)
@@ -1474,7 +1474,7 @@ static int do_extractav(int argc, char *argv[], int param)
 		goto cleanup;
 	}
 	avconfig.video = &fakebitmap;
-	
+
 	/* allocate audio buffers */
 	avconfig.maxsamples = ((UINT64)rate * 1000000 + fps_times_1million - 1) / fps_times_1million;
 	avconfig.actsamples = &numsamples;
@@ -1527,7 +1527,7 @@ static int do_extractav(int argc, char *argv[], int param)
 	{
 		/* progress */
 		progress(framenum == 0, "Extracting hunk %d/%d...  \r", framenum, numframes);
-		
+
 		/* set up the fake bitmap for this frame */
 		*avconfig.video = *fullbitmap;
 		if (interlaced)
@@ -1536,7 +1536,7 @@ static int do_extractav(int argc, char *argv[], int param)
 			avconfig.video->rowpixels *= 2;
 			avconfig.video->height /= 2;
 		}
-		
+
 		/* configure the decompressor for this frame */
 		chd_codec_config(chd, AV_CODEC_DECOMPRESS_CONFIG, &avconfig);
 
@@ -1555,7 +1555,7 @@ static int do_extractav(int argc, char *argv[], int param)
 			if (avierr != AVIERR_NONE)
 				goto cleanup;
 		}
-		
+
 		/* write video */
 		if (!interlaced || (firstframe + framenum) % 2 == 1)
 		{

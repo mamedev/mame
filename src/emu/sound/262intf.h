@@ -1,5 +1,5 @@
 #pragma once
-	
+
 #ifndef __262INTF_H__
 #define __262INTF_H__
 

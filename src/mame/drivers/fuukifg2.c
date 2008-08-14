@@ -306,13 +306,13 @@ static INPUT_PORTS_START( pbancho )
 	PORT_DIPSETTING(      0x001c, DEF_STR( Normal )  )	// 3
 	PORT_DIPSETTING(      0x0018, DEF_STR( Hard )    )	// 4
 	PORT_DIPSETTING(      0x0004, DEF_STR( Hardest ) )	// 5
-//	PORT_DIPSETTING(      0x0000, DEF_STR( Normal )  )  // 3
-//	PORT_DIPSETTING(      0x000c, DEF_STR( Normal )  )  // 3
-//	PORT_DIPSETTING(      0x0014, DEF_STR( Normal )  )  // 3
+//  PORT_DIPSETTING(      0x0000, DEF_STR( Normal )  )  // 3
+//  PORT_DIPSETTING(      0x000c, DEF_STR( Normal )  )  // 3
+//  PORT_DIPSETTING(      0x0014, DEF_STR( Normal )  )  // 3
 	PORT_DIPNAME( 0x0060, 0x0060, "Lives (Vs Mode)" )
 	PORT_DIPSETTING(      0x0000, "1" )	// 1 1
 	PORT_DIPSETTING(      0x0060, "2" )	// 2 3
-//	PORT_DIPSETTING(      0x0020, "2" ) // 2 3
+//  PORT_DIPSETTING(      0x0020, "2" ) // 2 3
 	PORT_DIPSETTING(      0x0040, "3" )	// 3 5
 	PORT_DIPNAME( 0x0080, 0x0080, "? Senin Mode ?" )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
@@ -323,7 +323,7 @@ static INPUT_PORTS_START( pbancho )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0200, 0x0200, "Allow Game Selection" )	// "unused" in the manual?
 	PORT_DIPSETTING(      0x0200, DEF_STR( Yes ) )
-//	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )   // Why cripple the game!?
+//  PORT_DIPSETTING(      0x0000, DEF_STR( No ) )   // Why cripple the game!?
 	PORT_DIPNAME( 0x1c00, 0x1c00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x1400, DEF_STR( 3C_1C ) )

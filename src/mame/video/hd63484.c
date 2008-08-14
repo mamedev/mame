@@ -261,7 +261,7 @@ static void docpy16(int opcode,int src,int *dst,INT16 _ax,INT16 _ay)
 static int org_first_pixel(int _org_dpd)
 {
 	int gbm = (HD63484_reg[0x02/2] & 0x700) >> 8;
-	
+
 	switch (gbm)
 	{
 		case 0:

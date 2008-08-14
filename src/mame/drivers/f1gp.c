@@ -380,7 +380,7 @@ INPUT_PORTS_END
 /* the same as f1gp, but with an extra button */
 static INPUT_PORTS_START( f1gp2 )
 	PORT_INCLUDE( f1gp )
-	
+
 	PORT_MODIFY("INPUTS")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 )
 

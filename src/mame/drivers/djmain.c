@@ -41,25 +41,25 @@
 
 Dumping a HD image.
 
-2.5 inch    2.5 to                                  2.5 to  
+2.5 inch    2.5 to                                  2.5 to
 hard drive  3.5 adapter     long 3.5 IDE cable      3.5 adapter   PCB
-               /---|-    |----------------------|    -|---\ 
+               /---|-    |----------------------|    -|---\
 |------|-   |-/    |-    |----------------------|    -|    \-|    -|
 |      |-   |      |-    |----------------------|    -|      |    -|
 |------|-   |-\    |-    |----------------------|    -|    /-|    -|
-               \---|-    |----------------------|    -|---/ 
+               \---|-    |----------------------|    -|---/
                   ||                                  ||
                   ||                            /\    ||<-- Power connector
                   ||                            ||          not used
                   ||                            ||
-                  ||                            
+                  ||
                ---------                   unplug here
                |  PC   |                   when game PCB is booted
                |Power  |                   and working. Boot Windows and stop at menu (F8)
                |Supply |                   Then plug HD into PC IDE controller, and continue boot process
-               |+5V and|                   then dump the hard drive with Winhex 
-               |GND    |                   once PC is booted up again.          
-               ---------                   
+               |+5V and|                   then dump the hard drive with Winhex
+               |GND    |                   once PC is booted up again.
+               ---------
 
 */
 

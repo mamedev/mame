@@ -35,16 +35,16 @@
   '1' to go back to the game.
 
   Guru Notes:
-  This board looks like an early proto, it's hand etched, with 
+  This board looks like an early proto, it's hand etched, with
   a ton of wire mods. I'm told the game is kind of like Scramble.
   It's probably _ultra_ rare too.
-  
-  The board looks like pure crap actually, with lot's of resistors 
+
+  The board looks like pure crap actually, with lot's of resistors
   jumpering tracks and a partial harness that is wired directly to
-  the logic chips which has been *ruthlessly* chopped off! 
-  
+  the logic chips which has been *ruthlessly* chopped off!
+
   Here's what I can see.....
-  
+
   EPROMs (x5, dumped, MALZAK.1 by itself, the other 4 grouped together)
   S 8039 2650AI (DIP 40)
   S 8051 2636N (DIP 40)
@@ -57,7 +57,7 @@
   SN76477 (x2, DIP28)
   INS/DP8212N P8212 (x2, DIP 24)
   plenty of logic chips, resistors, caps etc
-  
+
   Note: There's no PALs or PROMs
 
 */

@@ -75,7 +75,7 @@ GOLF E30-001A
 |-------------------------------------------------------------|
 Notes:
       VOL     : Master Volume Potentiometer
-      MB3714  : Fujitsu MB3714 Power Amp 
+      MB3714  : Fujitsu MB3714 Power Amp
       D6376   : NEC uPD6376 2-channel 16-bit D/A convertor (SOIC16)
       MB3790  : Power Monitoring IC with Reset and Watchdog Timer Function (SOIC16)
       TC528257: Toshiba TC528257 32k x8 SRAM (SOJ28)

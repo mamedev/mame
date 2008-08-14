@@ -69,7 +69,7 @@ static void process_commands(const device_config *laserdisc)
 	static const UINT8 digits[10] = { 0x3f, 0x0f, 0x8f, 0x4f, 0x2f, 0xaf, 0x6f, 0x1f, 0x9f, 0x5f };
 	input_port_value controls = input_port_read(laserdisc->machine, "controls");
  	int number;
-	
+
 	/* scan/step backwards */
 	if (!(last_controls & 0x01) && (controls & 0x01))
 	{
@@ -83,7 +83,7 @@ static void process_commands(const device_config *laserdisc)
 		if (playing)
 			laserdisc_data_w(laserdisc, 0xfd);
 	}
-		
+
 	/* scan/step forwards */
 	if (!(last_controls & 0x02) && (controls & 0x02))
 	{
@@ -97,14 +97,14 @@ static void process_commands(const device_config *laserdisc)
 		if (playing)
 			laserdisc_data_w(laserdisc, 0xfd);
 	}
-	
+
 	/* play/pause */
 	if (!(last_controls & 0x10) && (controls & 0x10))
 	{
 		playing = !playing;
 		laserdisc_data_w(laserdisc, playing ? 0xfd : 0xa0);
 	}
-	
+
 	/* toggle display */
 	if (!(last_controls & 0x20) && (controls & 0x20))
 	{
@@ -112,19 +112,19 @@ static void process_commands(const device_config *laserdisc)
 		laserdisc_data_w(laserdisc, digits[displaying]);
 		laserdisc_data_w(laserdisc, 0xf1);
 	}
-	
+
 	/* numbers */
 	for (number = 0; number < 10; number++)
 		if (!(last_controls & (0x100 << number)) && (controls & (0x100 << number)))
 			laserdisc_data_w(laserdisc, digits[number]);
-	
+
 	/* enter */
 	if (!(last_controls & 0x40000) && (controls & 0x40000))
 	{
 		playing = FALSE;
 		laserdisc_data_w(laserdisc, 0xf7);
 	}
-	
+
 	last_controls = controls;
 }
 
@@ -134,14 +134,14 @@ static TIMER_CALLBACK( vsync_update )
 	const device_config *laserdisc = device_list_first(machine->config->devicelist, LASERDISC);
 	int vblank_scanline;
 	attotime target;
-	
+
 	/* handle commands */
 	if (!param)
 		process_commands(laserdisc);
-	
+
 	/* update the laserdisc */
 	laserdisc_vsync(laserdisc);
-	
+
 	/* set a timer to go off on the next VBLANK */
 	vblank_scanline = video_screen_get_visible_area(machine->primary_screen)->max_y + 1;
 	target = video_screen_get_time_until_pos(machine->primary_screen, vblank_scanline, 0);
@@ -158,7 +158,7 @@ static MACHINE_START( ldplayer )
 static TIMER_CALLBACK( autoplay )
 {
 	const device_config *laserdisc = device_list_first(machine->config->devicelist, LASERDISC);
-	
+
 	/* start playing */
 	laserdisc_data_w(laserdisc, 0xfd);
 	playing = TRUE;
@@ -170,7 +170,7 @@ static MACHINE_RESET( ldplayer )
 {
 	/* set up a timer to start playing immediately */
 	timer_set(attotime_zero, NULL, 0, autoplay);
-	
+
 	/* indicate the name of the file we opened */
 	popmessage("Opened %s\n", astring_c(filename));
 }
@@ -291,7 +291,7 @@ static DRIVER_INIT( ldplayer )
 		while ((dir = mame_readpath(path)) != NULL)
 		{
 			int length = strlen(dir->name);
-			
+
 			/* look for files ending in .chd */
 			if (length > 4 &&
 				tolower(dir->name[length - 4] == '.') &&
@@ -301,7 +301,7 @@ static DRIVER_INIT( ldplayer )
 			{
 				file_error filerr;
 				chd_error chderr;
-				
+
 				/* open the file itself via our search path */
 				filerr = mame_fopen(SEARCHPATH_IMAGE, dir->name, OPEN_FLAG_READ, &image_file);
 				if (filerr == FILERR_NONE)
@@ -324,7 +324,7 @@ static DRIVER_INIT( ldplayer )
 		}
 		mame_closepath(path);
 	}
-	
+
 	/* if we failed, pop a message and exit */
 	if (image_file == NULL)
 		fatalerror("No valid image file found!\n");

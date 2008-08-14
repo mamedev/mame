@@ -187,8 +187,8 @@ Notes:
 
 2008-08
 Dip locations verified for:
-	- dsccr94j, gunforce, inthunt, majtitl2, uccops [manual]
-	- bmaster, hook, lethalt, mysticri, rtypeleo [dip listing]
+    - dsccr94j, gunforce, inthunt, majtitl2, uccops [manual]
+    - bmaster, hook, lethalt, mysticri, rtypeleo [dip listing]
 psoldier dip locations still need veritication.
 
 *****************************************************************************/
@@ -1641,12 +1641,12 @@ ROM_END
 Undercover Cops Alpha Renewal Version
 Irem, 1992
 
-An alt. version, runs on standard 
+An alt. version, runs on standard
 M92 main board:  M92-A-B 05C04170B1
 
 ROM board:  M92-E-B 05C04238B1
 Chips used are...
-Nanao 08J27504A1  
+Nanao 08J27504A1
 Nanao 08J27291A5  @ 14.31818MHz
 */
 

@@ -5834,7 +5834,7 @@ Notes:
       6295  - Oki M6295, running at MHz, sample rate  (x2, QFP44)
       DIP1/2- 8 position Dip Switches
       VOL   - Volume Potentiometer
-      
+
       NMK CUSTOM IC'S
           - NMK004; Actually a TLCS90-based Toshiba TMP91P640F-10 MCU
             with 16K internal OTP PROM, running at 8.000MHz [16 / 2] (QFP64)

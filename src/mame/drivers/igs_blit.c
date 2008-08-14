@@ -152,7 +152,7 @@ static VIDEO_UPDATE(igs)
 
 /***************************************************************************
 
-    In addition to the blitter, the CPU can also read from and write to 
+    In addition to the blitter, the CPU can also read from and write to
     the framebuffers for the 8 layers, seen as 0x100000 bytes in memory.
     The first half contains layers 0-3. Layers 4-7 are in the other half.
 
@@ -160,7 +160,7 @@ static VIDEO_UPDATE(igs)
 
     - bytes 0x00000-0x00003 contain the 1st pixel of layer 0,1,2,3
     - bytes 0x00004-0x00007 contain the 2nd pixel of layer 0,1,2,3
-	...
+    ...
     - bytes 0x80000-0x80003 contain the 1st pixel of layer 4,5,6,7
     - bytes 0x80004-0x80007 contain the 2nd pixel of layer 4,5,6,7
 
@@ -2848,7 +2848,7 @@ static DRIVER_INIT( dbc )
 	rom[0x1923e/2]	=	0x4e71;		// 01923E: 6408         bcc 19248 (fills screen with characters otherwise)
 
 	// Fix for the palette fade on title screen
-//	rom[0x19E90/2]	=	0x00ff;
+//  rom[0x19E90/2]  =   0x00ff;
 }
 
 /***************************************************************************
@@ -2998,13 +2998,13 @@ ROMs:
   2x PAL16L8ACN (u17,u18)(read protected)
   2x PALATF22V10B (u15,u45)
   1x empty space for additional PALATV750 (u16)
-  
+
 Notes:
   1x JAMMA edge connector
   1x trimmer (volume)
   3x 8x2 switches DIP
 
-The PCB is perfectly working, empty spaces and empty sockets are clearly intended to be empty.  
+The PCB is perfectly working, empty spaces and empty sockets are clearly intended to be empty.
 25/07/2007 f205v Corrado Tomaselli Gnoppi
 
 ***************************************************************************/
@@ -3194,7 +3194,7 @@ Notes:
             IGS_M0202  - OKI samples (4M maskROM)
 
 ***************************************************************************/
-      
+
 ROM_START( lhba )
 	ROM_REGION( 0x80000, "main", 0 )
 	ROM_LOAD( "maj_v-033c.u30", 0x00000, 0x80000, CRC(02a0b716) SHA1(cd0ee32ea69f66768196b0e9b4df0fae3af84ed3) )
@@ -3254,7 +3254,7 @@ Notes:
             IGS_M0201  - Graphics (16M maskROM)
             IGS_M0202  - OKI samples (4M maskROM)
             MAJ-H_CG   - Graphics (27c4001 EPROM)
-      
+
 ***************************************************************************/
 
 ROM_START( dbc )

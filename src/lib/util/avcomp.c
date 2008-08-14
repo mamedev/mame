@@ -95,7 +95,7 @@ struct _avcomp_state
 	huffman_context *	crcontext;
 	huffman_context *	audiohicontext;
 	huffman_context *	audiolocontext;
-	
+
 	/* configuration data */
 	av_codec_compress_config compress;
 	av_codec_decompress_config decompress;
@@ -133,7 +133,7 @@ avcomp_state *avcomp_init(UINT32 maxwidth, UINT32 maxheight, UINT32 maxchannels)
 {
 	huffman_error hufferr;
 	avcomp_state *state;
-	
+
 	/* error if out of range */
 	if (maxchannels > MAX_CHANNELS)
 		return NULL;
@@ -219,7 +219,7 @@ void avcomp_config_compress(avcomp_state *state, const av_codec_compress_config 
 
 
 /*-------------------------------------------------
-    avcomp_config_decompress - configure 
+    avcomp_config_decompress - configure
     decompression parameters
 -------------------------------------------------*/
 
@@ -247,7 +247,7 @@ avcomp_error avcomp_encode_data(avcomp_state *state, const UINT8 *source, UINT8 
 	avcomp_error err;
 	UINT32 dstoffs;
 	int chnum;
-	
+
 	/* extract data from source if present */
 	if (source != NULL)
 	{
@@ -261,7 +261,7 @@ avcomp_error avcomp_encode_data(avcomp_state *state, const UINT8 *source, UINT8 
 		samples = (source[6] << 8) + source[7];
 		width = (source[8] << 8) + source[9];
 		height = (source[10] << 8) + source[11];
-		
+
 		/* determine the start of each piece of data */
 		source += 12;
 		metastart = source;
@@ -272,17 +272,17 @@ avcomp_error avcomp_encode_data(avcomp_state *state, const UINT8 *source, UINT8 
 			source += 2 * samples;
 		}
 		videostart = source;
-		
+
 		/* data is assumed to be big-endian already */
 		audioxor = videoxor = 0;
 		videostride = 2 * width;
 	}
-	
+
 	/* otherwise, extract from the state */
 	else
 	{
 		UINT16 betest = 0;
-		
+
 		/* extract metadata information */
 		metastart = state->compress.metadata;
 		metasize = state->compress.metalength;
@@ -305,7 +305,7 @@ avcomp_error avcomp_encode_data(avcomp_state *state, const UINT8 *source, UINT8 
 			width = state->compress.video->width;
 			height = state->compress.video->height;
 		}
-		
+
 		/* data is assumed to be native-endian */
 		*(UINT8 *)&betest = 1;
 		audioxor = videoxor = (betest == 1) ? 1 : 0;
@@ -409,7 +409,7 @@ avcomp_error avcomp_decode_data(avcomp_state *state, const UINT8 *source, UINT32
 		totalsize += (source[10 + 2 * chnum] << 8) | source[11 + 2 * chnum];
 	if (totalsize >= complength)
 		return AVCERR_INVALID_DATA;
-	
+
 	/* starting offsets */
 	srcoffs = 10 + 2 * channels;
 
@@ -440,28 +440,28 @@ avcomp_error avcomp_decode_data(avcomp_state *state, const UINT8 *source, UINT32
 			dest += 2 * samples;
 		}
 		videostart = dest;
-		
+
 		/* data is assumed to be big-endian already */
 		audioxor = videoxor = 0;
 		videostride = 2 * width;
 	}
-	
+
 	/* otherwise, extract from the state */
 	else
 	{
 		UINT16 betest = 0;
-		
+
 		/* determine the start of each piece of data */
 		metastart = state->decompress.metadata;
 		for (chnum = 0; chnum < channels; chnum++)
 			audiostart[chnum] = (UINT8 *)state->decompress.audio[chnum];
 		videostart = (state->decompress.video != NULL) ? state->decompress.video->base : NULL;
 		videostride = (state->decompress.video != NULL) ? state->decompress.video->rowpixels * 2 : 0;
-		
+
 		/* data is assumed to be native-endian */
 		*(UINT8 *)&betest = 1;
 		audioxor = videoxor = (betest == 1) ? 1 : 0;
-		
+
 		/* verify against sizes */
 		if (state->decompress.video != NULL && (state->decompress.video->width < width || state->decompress.video->height < height))
 			return AVCERR_VIDEO_TOO_LARGE;
@@ -470,7 +470,7 @@ avcomp_error avcomp_decode_data(avcomp_state *state, const UINT8 *source, UINT32
 				return AVCERR_AUDIO_TOO_LARGE;
 		if (state->decompress.metadata != NULL && state->decompress.maxmetalength < metasize)
 			return AVCERR_METADATA_TOO_LARGE;
-		
+
 		/* set the output values */
 		if (state->decompress.actsamples != NULL)
 			*state->decompress.actsamples = samples;
@@ -530,14 +530,14 @@ static avcomp_error encode_audio(avcomp_state *state, int channels, int samples,
 	UINT8 *output = dest;
 	int chnum, sampnum;
 	UINT8 *deltabuf;
-	
+
 	/* iterate over channels to compute deltas */
 	deltabuf = state->audiodata;
 	for (chnum = 0; chnum < channels; chnum++)
 	{
 		const UINT8 *srcdata = source[chnum];
 		INT16 prevsample = 0;
-		
+
 		/* extract audio data into hi and lo deltas stored in big-endian order */
 		for (sampnum = 0; sampnum < samples; sampnum++)
 		{
@@ -566,7 +566,7 @@ static avcomp_error encode_audio(avcomp_state *state, int channels, int samples,
 	if (hufferr != HUFFERR_NONE)
 		return AVCERR_COMPRESSION_ERROR;
 	output += size;
-	
+
 	/* note the size of the two trees */
 	huffsize = output - dest;
 	sizes[0] = huffsize >> 8;
@@ -577,7 +577,7 @@ static avcomp_error encode_audio(avcomp_state *state, int channels, int samples,
 	for (chnum = 0; chnum < channels; chnum++)
 	{
 		const UINT8 *input = state->audiodata + chnum * samples * 2;
-		
+
 		/* encode the data */
 		hufferr = huffman_encode_data_interleaved(2, contexts, input, samples * 2, 1, 0, 0, output, samples * 2, &size);
 		if (hufferr != HUFFERR_NONE)
@@ -591,7 +591,7 @@ static avcomp_error encode_audio(avcomp_state *state, int channels, int samples,
 		sizes[chnum * 2 + 2] = size >> 8;
 		sizes[chnum * 2 + 3] = size;
 	}
-	
+
 	/* if we ran out of room, throw it all away and just store raw */
 	if (chnum < channels)
 	{
@@ -701,7 +701,7 @@ static avcomp_error decode_audio(avcomp_state *state, int channels, int samples,
 		for (chnum = 0; chnum < channels; chnum++)
 		{
 			UINT8 *curdest = dest[chnum];
-			
+
 			/* extract the size of this channel */
 			size = (sizes[chnum * 2 + 2] << 8) | sizes[chnum * 2 + 3];
 
@@ -714,7 +714,7 @@ static avcomp_error decode_audio(avcomp_state *state, int channels, int samples,
 					INT16 delta = (source[0] << 8) | source[1];
 					INT16 newsample = prevsample + delta;
 					prevsample = newsample;
-					
+
 					curdest[0 ^ dxor] = newsample >> 8;
 					curdest[1 ^ dxor] = newsample;
 					source += 2;
@@ -733,7 +733,7 @@ static avcomp_error decode_audio(avcomp_state *state, int channels, int samples,
 		return AVCERR_INVALID_DATA;
 	source += actsize;
 	huffsize = actsize;
-	
+
 	hufferr = huffman_import_tree(state->audiolocontext, source, size, &actsize);
 	if (hufferr != HUFFERR_NONE)
 		return AVCERR_INVALID_DATA;
@@ -741,7 +741,7 @@ static avcomp_error decode_audio(avcomp_state *state, int channels, int samples,
 	huffsize += actsize;
 	if (huffsize != size)
 		return AVCERR_INVALID_DATA;
-	
+
 	/* set up the contexts */
 	contexts[0] = state->audiohicontext;
 	contexts[1] = state->audiolocontext;
@@ -778,7 +778,7 @@ static avcomp_error decode_audio(avcomp_state *state, int channels, int samples,
 				INT16 delta = (deltabuf[0] << 8) | deltabuf[1];
 				INT16 newsample = prevsample + delta;
 				prevsample = newsample;
-				
+
 				curdest[0 ^ dxor] = newsample >> 8;
 				curdest[1 ^ dxor] = newsample;
 				deltabuf += 2;
@@ -833,7 +833,7 @@ static avcomp_error decode_video_lossless(avcomp_state *state, int width, int he
 	if (hufferr != HUFFERR_NONE)
 		return AVCERR_INVALID_DATA;
 	source += actsize;
-	
+
 	/* set up the decoding contexts */
 	contexts[0] = state->ycontext;
 	contexts[1] = state->cbcontext;

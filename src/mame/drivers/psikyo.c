@@ -2105,7 +2105,7 @@ Notes:
       U1       - 4M MASKROM (SOP44)
       VOL      - Master Volume Potentiometer
       *        - Unpopulated position for 16M SOP44 MASKROM
-      
+
 
 CPU:    MC68EC020FG16
 OSC:    16.000MHz

@@ -437,13 +437,13 @@ static void cottonbm_slave_speedup( UINT32 data )
 
 DRIVER_INIT(cottonbm)
 {
-//	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-//	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6030ee2);
-//	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+1);
-//	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6032b52);
+//  cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
+//  cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6030ee2);
+//  cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+1);
+//  cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6032b52);
 
-//	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)cottonbm_slave_speedup );
-//   	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, cottonbm_speedup_r ); // idle loop of main cpu
+//  cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)cottonbm_slave_speedup );
+//      memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, cottonbm_speedup_r ); // idle loop of main cpu
 
 	DRIVER_INIT_CALL(stv);
 

@@ -505,7 +505,7 @@ Notes:
       VR1: master volume
       VR2: shoot volume
       VR3: music volume
-      8035 clocks: pins 2 and 3 measure 6.000MHz 
+      8035 clocks: pins 2 and 3 measure 6.000MHz
                    pin 9 measures 399.256kHz
                    pin 12 measures 200.0kHz
                    pin 13 measures 105.0kHz
@@ -514,7 +514,7 @@ Notes:
                    pin 23 measures 399.3kHz
                    pin 24 measures 399.3kHz
                    pin 39 measures 61.5627Hz
-      
+
 
 Middle board
 ------------
@@ -546,7 +546,7 @@ Notes:
       VR1: adjusts brightness
       Board contains mostly logic ICs (not shown)
       Video output is b/w, the harness is wired to a JAMMA fingerboard but only blue is used.
-      
+
 
 Bottom board
 ------------
@@ -579,10 +579,10 @@ Notes:
       4116: 2K x8 DRAM
       8080 clock: 2.0160MHz (20.160 / 10)
       Sync: no V reading, H is 15.57kHz
-      
+
       Set 1 is on the PCB and is complete.
       Some ROMs in set1 match the current sfeverbw set.
-      
+
       The other two sets were supplied as just EPROMs.
       Set2 (maybe High Splitter) is missing the ROM at location I2. Might be missing, or maybe
       just the program is smaller and the extra ROM was not required.

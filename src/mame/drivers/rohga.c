@@ -1118,7 +1118,7 @@ ROM_END
 PCB No: DE-0353-3
 Mask ROM code: MAM
 Sound : 45 (HuC6280 CPU), OKI M6295 (x2), YM2151, YM3012
-RAM   : 6264 (x4 near 113 + x1 near 18P - 5 total) 
+RAM   : 6264 (x4 near 113 + x1 near 18P - 5 total)
 Xtals: 32.200MHz, 28.000MHz
 DIPSW: 8 position x3
 PALs: PAL16L8 x4 labelled TP-00 (near MAM-07), TP-01, TP-02 (both near 68000),

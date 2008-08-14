@@ -230,12 +230,12 @@ static INPUT_PORTS_START( galivan )
 	/* This is how the Bonus Life are defined in Service Mode */
 	/* However, to keep the way Bonus Life are defined in MAME, */
 	/* below are the same values, but using the MAME way */
-//	PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )
-//	PORT_DIPSETTING(    0x04, "20k" )
-//	PORT_DIPSETTING(    0x00, "50k" )
-//	PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )
-//	PORT_DIPSETTING(    0x08, "every 60k" )
-//	PORT_DIPSETTING(    0x00, "every 90k" )
+//  PORT_DIPNAME( 0x04, 0x04, "1st Bonus Life" )
+//  PORT_DIPSETTING(    0x04, "20k" )
+//  PORT_DIPSETTING(    0x00, "50k" )
+//  PORT_DIPNAME( 0x08, 0x08, "2nd Bonus Life" )
+//  PORT_DIPSETTING(    0x08, "every 60k" )
+//  PORT_DIPSETTING(    0x00, "every 90k" )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
 	PORT_DIPSETTING(    0x0c, "20k and every 60k" )
 	PORT_DIPSETTING(    0x08, "50k and every 60k" )

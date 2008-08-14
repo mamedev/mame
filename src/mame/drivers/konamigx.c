@@ -1485,7 +1485,7 @@ static INPUT_PORTS_START( common )
 	// d5a002 = input port: service4/3/2/1 coin 4/3/2/1
 	// d5a003 = objint stat, exioint stat, trackint stat, excgint stat, escint stat,
 	//      excpuint stat, objdma stat, eeprom do
-	
+
 	// note: racin' force expects bit 1 of the eeprom port to toggle
 	PORT_BIT( 0x00000001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
 	PORT_BIT( 0x000000fe, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gx_rdport1_3_r, NULL)
@@ -2672,22 +2672,22 @@ PWB300456A
 |DIPSW  CN3   CN4                              |
 |----------------------------------------------|
 Notes:
-      This version mother board has the game board connectors on top, 
+      This version mother board has the game board connectors on top,
       meaning the game board plugs in above the mother board. A small
       cable feeds the RGB from the game board to the JAMMA connector via
       an adapter board for the 1st screen. Another small cable is used
       to connect the 2nd RGB output to the 'versus' cabinet/monitor.
-      
+
       68020 clock: 24.000MHz (QFP100)
       68000 clock: 8.000MHz  (PLCC68)
       VSync      : 60Hz
-      
+
       S_OUT: Connector for right speaker sound output.
       CN3  : Connector for 3rd player controls
       CN4  : Connector for 4th player controls
       CN5  : Connector for player 1 gun
       CN6  : Connector for player 2 gun
-      
+
       RAM:
           CY7C185: 8K   x8 SRAM
           8464   : 8K   x8 SRAM
@@ -2739,7 +2739,7 @@ PWB 301798A
 |----------------------------------------------|
 Notes:
       *: Unpopulated ROM positions.
-      
+
       Konami Customs:
                      003462 - Xilinx PLCC84 FPGA stamped 003462
                      053936 - QFP100, also marked KS10011-PF PSAC2
@@ -3040,7 +3040,7 @@ ROM_START( racinfru )
 ROM_END
 
 
-/* 
+/*
 Open Golf Championship - version EAE
 Konami, 1994
 
@@ -3052,7 +3052,7 @@ PCB Layout (Bottom Board)
 
 PWB354207B
 --------------------------------------
-A23   
+A23
 A22   A26
 A21   A25       A07    M514256(x12)
 A20   A24       A06

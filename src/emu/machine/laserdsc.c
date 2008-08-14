@@ -1287,7 +1287,7 @@ static void read_track_data(laserdisc_state *ld)
 	ld->videotarget.height /= 2;
 	ld->videotarget.rowpixels *= 2;
 	ld->avconfig.video = &ld->videotarget;
-	
+
 	/* set the audio target information */
 	if (ld->audiobufin + ld->audiomaxsamples <= ld->audiobufsize)
 	{
@@ -1301,7 +1301,7 @@ static void read_track_data(laserdisc_state *ld)
 		ld->avconfig.audio[0] = &ld->audiobuffer[0][0];
 		ld->avconfig.audio[1] = &ld->audiobuffer[1][0];
 	}
-	
+
 	/* override if we're not decoding */
 	ld->avconfig.maxsamples = ld->audiomaxsamples;
 	ld->avconfig.actsamples = &ld->audiocursamples;
@@ -1372,7 +1372,7 @@ static void process_track_data(const device_config *device)
 		ld->videofields[ld->videoindex]++;
 		ld->videoframenum[ld->videoindex] = ld->last_frame;
 	}
-	
+
 	/* pass the audio to the callback */
 	if (ld->audiocallback != NULL)
 		(*ld->audiocallback)(device, ld->samplerate, ld->audiocursamples, ld->avconfig.audio[0], ld->avconfig.audio[1]);
@@ -1381,24 +1381,24 @@ static void process_track_data(const device_config *device)
 	if (ld->audiocursamples != 0 && ld->audiobufin != 0)
 	{
 		int chnum;
-		
+
 		/* iterate over channels */
 		for (chnum = 0; chnum < 2; chnum++)
 			if (ld->avconfig.audio[chnum] == &ld->audiobuffer[chnum][0])
 			{
 				int samplesleft;
-				
+
 				/* move data to the end */
 				samplesleft = ld->audiobufsize - ld->audiobufin;
 				samplesleft = MIN(samplesleft, ld->audiocursamples);
 				memmove(&ld->audiobuffer[chnum][ld->audiobufin], &ld->audiobuffer[chnum][0], samplesleft * 2);
-				
+
 				/* shift data at the beginning */
 				if (samplesleft < ld->audiocursamples)
 					memmove(&ld->audiobuffer[chnum][0], &ld->audiobuffer[chnum][samplesleft], (ld->audiocursamples - samplesleft) * 2);
 			}
 	}
-	
+
 	/* update the input buffer pointer */
 	ld->audiobufin = (ld->audiobufin + ld->audiocursamples) % ld->audiobufsize;
 }

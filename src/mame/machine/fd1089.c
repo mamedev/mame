@@ -43,53 +43,53 @@ static int rndseed;
 
 int rnd()
 {
-	rndseed = rndseed * 0x290029;
-	return (rndseed >> 16) & 0xff;
+    rndseed = rndseed * 0x290029;
+    return (rndseed >> 16) & 0xff;
 }
 
 void generate_key(UINT8 *key, int seed, int upper_bound)
 {
-	int i;
+    int i;
 
-	rndseed = seed;
-	for (i = 0; i < 0x1000; ++i)
-	{
-		if ("we must encrypt this data table position")
-		{
-			UINT8 byteval;
+    rndseed = seed;
+    for (i = 0; i < 0x1000; ++i)
+    {
+        if ("we must encrypt this data table position")
+        {
+            UINT8 byteval;
 
-			do
-			{
-				byteval = rnd();
-			} while (byteval == 0x40);
+            do
+            {
+                byteval = rnd();
+            } while (byteval == 0x40);
 
-			opcode_key[i] = byteval;
+            opcode_key[i] = byteval;
 
-			do
-			{
-				byteval = rnd();
-			} while (byteval == 0x40);
+            do
+            {
+                byteval = rnd();
+            } while (byteval == 0x40);
 
-			data_key[i] = byteval;
-		}
-	}
+            data_key[i] = byteval;
+        }
+    }
 
-	rndseed = seed;
-	for (i = 0; i < 0x1000; ++i)
-	{
-		if ("we mustn't encrypt this data table position")
-		{
-			UINT8 byteval;
+    rndseed = seed;
+    for (i = 0; i < 0x1000; ++i)
+    {
+        if ("we mustn't encrypt this data table position")
+        {
+            UINT8 byteval;
 
-			do
-			{
-				byteval = rnd();
-			} while (byteval == 0x40);
+            do
+            {
+                byteval = rnd();
+            } while (byteval == 0x40);
 
-			opcode_key[i] = byteval;
-			data_key[i] = 0x40;
-		}
-	}
+            opcode_key[i] = byteval;
+            data_key[i] = 0x40;
+        }
+    }
 }
 
 

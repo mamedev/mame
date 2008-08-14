@@ -315,13 +315,13 @@ static WRITE8_HANDLER( wdclr_w )
 
 static CUSTOM_INPUT( tempest_knob_r )
 {
-	return input_port_read(field->port->machine, (tempest_player_select == 0) ? 
+	return input_port_read(field->port->machine, (tempest_player_select == 0) ?
 										TEMPEST_KNOB_P1_TAG : TEMPEST_KNOB_P2_TAG);
 }
 
 static CUSTOM_INPUT( tempest_buttons_r )
 {
-	return input_port_read(field->port->machine, (tempest_player_select == 0) ? 
+	return input_port_read(field->port->machine, (tempest_player_select == 0) ?
 										TEMPEST_BUTTONS_P1_TAG : TEMPEST_BUTTONS_P2_TAG);
 }
 

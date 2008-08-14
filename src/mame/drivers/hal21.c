@@ -348,9 +348,9 @@ static VIDEO_UPDATE( aso )
 }
 
 
-static CUSTOM_INPUT( sound_status_r ) 
-{ 
-	return snk_sound_busy_bit; 
+static CUSTOM_INPUT( sound_status_r )
+{
+	return snk_sound_busy_bit;
 }
 
 

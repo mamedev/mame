@@ -487,7 +487,7 @@ E51-00001-A
 |------------------------------------|
 
 Note:
-      Unknown QFP (surface scratched off) is the CPU 
+      Unknown QFP (surface scratched off) is the CPU
         + GFX generator - it's possibly NEC V70/V810
 */
 

@@ -1590,7 +1590,7 @@ static ADDRESS_MAP_START( quiz365_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x17ffff) AM_WRITE(SMH_ROM)					// ROM
 	AM_RANGE(0x200000, 0x2003ff) AM_WRITE(ddenlovr_palette_w)		// Palette
 	AM_RANGE(0x200e0a, 0x200e0d) AM_WRITE(quiz365_protection_w)		// Protection
-//	AM_RANGE(0x201000, 0x2017ff) AM_WRITE(SMH_RAM)					// ?
+//  AM_RANGE(0x201000, 0x2017ff) AM_WRITE(SMH_RAM)                  // ?
 	AM_RANGE(0x300200, 0x300201) AM_WRITE(ddenlovr_select2_16_w)
 	AM_RANGE(0x300202, 0x300203) AM_WRITE(quiz365_coincounter_w)	// Coin Counters + more stuff written on startup
 	AM_RANGE(0x300240, 0x300247) AM_WRITE(ddenlovr16_palette_base_w)
@@ -1656,7 +1656,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ddenlvrj_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)					// ROM
 	AM_RANGE(0x200000, 0x2003ff) AM_WRITE(ddenlovr_palette_w)		// Palette
-//	AM_RANGE(0x201000, 0x2017ff) AM_WRITE(SMH_RAM)					// ? B0 on startup, then 00
+//  AM_RANGE(0x201000, 0x2017ff) AM_WRITE(SMH_RAM)                  // ? B0 on startup, then 00
 	AM_RANGE(0x300040, 0x300047) AM_WRITE(ddenlovr16_palette_base_w)
 	AM_RANGE(0x300048, 0x30004f) AM_WRITE(ddenlovr16_palette_mask_w)
 	AM_RANGE(0x300050, 0x300057) AM_WRITE(ddenlovr16_transparency_pen_w)
@@ -1697,7 +1697,7 @@ static ADDRESS_MAP_START( ddenlovr_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)						// ROM
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(ddenlovr_oki_bank_w)
 	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w)			// Palette
-//	AM_RANGE(0xd01000, 0xd017ff) SMH_RAM)								// ? B0 on startup, then 00
+//  AM_RANGE(0xd01000, 0xd017ff) SMH_RAM)                               // ? B0 on startup, then 00
 	AM_RANGE(0xe00040, 0xe00047) AM_WRITE(ddenlovr16_palette_base_w)
 	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE(ddenlovr16_palette_mask_w)
 	AM_RANGE(0xe00050, 0xe00057) AM_WRITE(ddenlovr16_transparency_pen_w)
@@ -1712,7 +1712,7 @@ static ADDRESS_MAP_START( ddenlovr_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe00400, 0xe00401) AM_WRITE(ym2413_register_port_0_lsb_w)
 	AM_RANGE(0xe00402, 0xe00403) AM_WRITE(ym2413_data_port_0_lsb_w)
 	AM_RANGE(0xe00500, 0xe0051f) AM_DEVWRITE8(MSM6242, "rtc", msm6242_w, 0x00ff)	// 6242RTC
-//	AM_RANGE(0xe00302, 0xe00303) AM_WRITE(SMH_NOP)						// ?
+//  AM_RANGE(0xe00302, 0xe00303) AM_WRITE(SMH_NOP)                      // ?
 	AM_RANGE(0xe00600, 0xe00601) AM_WRITE(ay8910_control_port_0_lsb_w)
 	AM_RANGE(0xe00602, 0xe00603) AM_WRITE(ay8910_write_port_0_lsb_w)
 	AM_RANGE(0xe00700, 0xe00701) AM_WRITE(okim6295_data_0_lsb_w)
@@ -3242,7 +3242,7 @@ static ADDRESS_MAP_START( akamaru_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(SMH_ROM)					// ROM
 	AM_RANGE(0x213570, 0x213571) AM_WRITE(akamaru_protection1_w)	// OKI bank
 	AM_RANGE(0xd00000, 0xd003ff) AM_WRITE(ddenlovr_palette_w)		// Palette
-//	AM_RANGE(0xd01000, 0xd017ff) AM_WRITE(SMH_RAM)					// 0
+//  AM_RANGE(0xd01000, 0xd017ff) AM_WRITE(SMH_RAM)                  // 0
 	AM_RANGE(0xe00040, 0xe00047) AM_WRITE(ddenlovr16_palette_base_w)
 	AM_RANGE(0xe00048, 0xe0004f) AM_WRITE(ddenlovr16_palette_mask_w)
 	AM_RANGE(0xe00050, 0xe00057) AM_WRITE(ddenlovr16_transparency_pen_w)
@@ -3674,7 +3674,7 @@ static INPUT_PORTS_START( quiz365 )
 	PORT_DIPSETTING(    0x40, "0" )
 	PORT_DIPSETTING(    0x80, "1" )
 	PORT_DIPSETTING(    0xc0, "2" )
-//	PORT_DIPSETTING(    0x00, "2" )
+//  PORT_DIPSETTING(    0x00, "2" )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, "Unknown 2-0&1" )
@@ -3785,7 +3785,7 @@ static INPUT_PORTS_START( rongrong )
   	PORT_DIPSETTING(    0x30, "1" )
   	PORT_DIPSETTING(    0x20, "2" )
   	PORT_DIPSETTING(    0x10, "3" )
-//	PORT_DIPSETTING(    0x00, "3" )
+//  PORT_DIPSETTING(    0x00, "3" )
  	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
   	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
   	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -3936,8 +3936,8 @@ static INPUT_PORTS_START( mmpanic )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x0c, "4" )
 	PORT_DIPSETTING(    0x08, "5" )
-//	PORT_DIPSETTING(    0x04, "5" )
-//	PORT_DIPSETTING(    0x00, "5" )
+//  PORT_DIPSETTING(    0x04, "5" )
+//  PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x20, 0x20, "Linked Cabinets" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -4056,7 +4056,7 @@ static INPUT_PORTS_START( animaljr )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x18, 0x18, "Unknown 2-3&4" )	// used ?
-//	PORT_DIPSETTING(    0x10, "0" )
+//  PORT_DIPSETTING(    0x10, "0" )
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x18, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
@@ -4698,7 +4698,7 @@ static INPUT_PORTS_START( mjreach1 )
 	PORT_DIPSETTING(    0x01, "1500" )
 	PORT_DIPSETTING(    0x00, "2000" )
 	PORT_DIPNAME( 0x18, 0x18, "YAKUMAN Times" )
-//	PORT_DIPSETTING(    0x00, "1" )
+//  PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x18, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x08, "3" )
@@ -4905,9 +4905,9 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
 	PORT_DIPNAME( 0x0c, 0x0c, "Min Credits To Start" )
 	PORT_DIPSETTING(    0x0c, "1" )
-//	PORT_DIPSETTING(    0x08, "2" ) // ? these don't let you start a game
-//	PORT_DIPSETTING(    0x04, "3" )
-//	PORT_DIPSETTING(    0x00, "5" )
+//  PORT_DIPSETTING(    0x08, "2" ) // ? these don't let you start a game
+//  PORT_DIPSETTING(    0x04, "3" )
+//  PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, "10" )
 	PORT_DIPSETTING(    0x00, "255" )
@@ -4932,7 +4932,7 @@ static INPUT_PORTS_START( mjchuuka )
 	PORT_DIPSETTING(    0x01, "1000?" )
 	PORT_DIPSETTING(    0x00, "1000?" )
 	PORT_DIPNAME( 0x18, 0x18, "YAKUMAN Times" )
-//	PORT_DIPSETTING(    0x00, "1" )
+//  PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x18, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x08, "3?" )
@@ -5047,8 +5047,8 @@ static INPUT_PORTS_START( funkyfig )
 	PORT_DIPSETTING(    0x10, "3" )
 	PORT_DIPSETTING(    0x0c, "4" )
 	PORT_DIPSETTING(    0x08, "5" )
-//	PORT_DIPSETTING(    0x04, "5" )
-//	PORT_DIPSETTING(    0x00, "5" )
+//  PORT_DIPSETTING(    0x04, "5" )
+//  PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x20, 0x20, "Linked Cabinets" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -5198,9 +5198,9 @@ static INPUT_PORTS_START( mjmyster )
 	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
 	PORT_DIPNAME( 0x0c, 0x0c, "Min Credits To Start" )
 	PORT_DIPSETTING(    0x0c, "1" )
-//	PORT_DIPSETTING(    0x08, "2" ) // ? these don't let you start a game
-//	PORT_DIPSETTING(    0x04, "3" )
-//	PORT_DIPSETTING(    0x00, "5" )
+//  PORT_DIPSETTING(    0x08, "2" ) // ? these don't let you start a game
+//  PORT_DIPSETTING(    0x04, "3" )
+//  PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x70, 0x70, "YAKUMAN Bonus" )
 	PORT_DIPSETTING(    0x70, "Cut" )
 	PORT_DIPSETTING(    0x60, "1 T" )
@@ -5216,7 +5216,7 @@ static INPUT_PORTS_START( mjmyster )
 
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x03, "YAKUMAN Times" )
-//	PORT_DIPSETTING(    0x00, "1" )
+//  PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x01, "3?" )
@@ -5293,13 +5293,13 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( hginga )
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE3 )	// medal out
-//	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+//  PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)	// Test
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )	// analyzer
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )	// data clear
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )	// note
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1)
-//	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+//  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_A ) PORT_PLAYER(2)	// A
@@ -5812,9 +5812,9 @@ static INPUT_PORTS_START( mjmyornt )
 	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
 	PORT_DIPNAME( 0x0c, 0x0c, "Min Credits To Start" )
 	PORT_DIPSETTING(    0x0c, "1" )
-//	PORT_DIPSETTING(    0x08, "2" ) // ? these don't let you start a game
-//	PORT_DIPSETTING(    0x04, "3" )
-//	PORT_DIPSETTING(    0x00, "5" )
+//  PORT_DIPSETTING(    0x08, "2" ) // ? these don't let you start a game
+//  PORT_DIPSETTING(    0x04, "3" )
+//  PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x70, 0x70, "YAKUMAN Bonus" )
 	PORT_DIPSETTING(    0x70, "Cut" )
 	PORT_DIPSETTING(    0x60, "1 T" )
@@ -5830,7 +5830,7 @@ static INPUT_PORTS_START( mjmyornt )
 
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x03, "YAKUMAN Times" )
-//	PORT_DIPSETTING(    0x00, "1" )
+//  PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x01, "3?" )
@@ -5993,9 +5993,9 @@ static INPUT_PORTS_START( mjmyuniv )
 	PORT_DIPSETTING(    0x00, "1 Coin/10 Credits" )
 	PORT_DIPNAME( 0x0c, 0x0c, "Min Credits To Start" )
 	PORT_DIPSETTING(    0x0c, "1" )
-//	PORT_DIPSETTING(    0x08, "2" ) // ? these don't let you start a game
-//	PORT_DIPSETTING(    0x04, "3" )
-//	PORT_DIPSETTING(    0x00, "5" )
+//  PORT_DIPSETTING(    0x08, "2" ) // ? these don't let you start a game
+//  PORT_DIPSETTING(    0x04, "3" )
+//  PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x70, 0x70, "YAKUMAN Bonus" )
 	PORT_DIPSETTING(    0x70, "Cut" )
 	PORT_DIPSETTING(    0x60, "1 T" )
@@ -6011,7 +6011,7 @@ static INPUT_PORTS_START( mjmyuniv )
 
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x03, "YAKUMAN Times" )
-//	PORT_DIPSETTING(    0x00, "1" )
+//  PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x03, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x01, "3?" )
@@ -6431,7 +6431,7 @@ static INPUT_PORTS_START( hparadis )
 	PORT_DIPSETTING(    0x60, "Hanafuda" )
 	PORT_DIPSETTING(    0x40, "Mahjong" )
 	PORT_DIPSETTING(    0x20, DEF_STR( Joystick ) )
-//	PORT_DIPSETTING(    0x00, DEF_STR( Joystick ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( Joystick ) )
 	PORT_DIPNAME( 0x80, 0x80, "First Chance" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
@@ -7544,7 +7544,7 @@ ROM_START( ddenlovr )
 ROM_END
 
 
-/* 
+/*
 Don Den Lover (bootleg)
 
 PCB Layout

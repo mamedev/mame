@@ -938,7 +938,7 @@ This game runs on Namco NB-1 hardware.
 
 PCB Layout
 ----------
-NB-1 MAIN PCB                                  MEMEXT OBJ2 PCB  
+NB-1 MAIN PCB                                  MEMEXT OBJ2 PCB
 8634961101 (8634963101)                    8635901201 (8635901301)
 |------------------------------------------------------|---------|
 |                            62256       62256         |         |

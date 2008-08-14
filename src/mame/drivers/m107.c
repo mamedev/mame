@@ -13,8 +13,8 @@
 
 
 2008-08
-Dip locations have been added assuming that the layout is the same as the 
-m92 boards (and earlier Irem boards). However, it would be nice to have them 
+Dip locations have been added assuming that the layout is the same as the
+m92 boards (and earlier Irem boards). However, it would be nice to have them
 confirmed for m107 games as well.
 
 *******************************************************************************/

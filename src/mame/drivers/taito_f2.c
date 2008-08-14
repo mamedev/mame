@@ -4927,7 +4927,7 @@ Notes:
                          TCO540OBN - /                    (QFP160)
                          TCO100SCN - Tilemap Controller   (QFP160)
                          TCO510NIO - I/O                  (QFP100)
-                         
+
       RAM:
           62256  : 32K x8 SRAM
           TC51832: 32K x8 SRAM

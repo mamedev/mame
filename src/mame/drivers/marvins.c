@@ -123,9 +123,9 @@ static READ8_HANDLER( sound_nmi_ack_r )
 	return 0;
 }
 
-static CUSTOM_INPUT( sound_status_r ) 
-{ 
-	return sound_cpu_busy; 
+static CUSTOM_INPUT( sound_status_r )
+{
+	return sound_cpu_busy;
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -194,7 +194,7 @@ static ADDRESS_MAP_START( madcrash_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8500, 0x8500) AM_READ_PORT("DSW2")
 	AM_RANGE(0x8600, 0x86ff) AM_RAM						/* video attribute */
 	AM_RANGE(0x8700, 0x8700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
-//	AM_RANGE(0xc800, 0xc800) AM_WRITE(marvins_palette_bank_w)   // palette bank switch (c8f1 for Vanguard)
+//  AM_RANGE(0xc800, 0xc800) AM_WRITE(marvins_palette_bank_w)   // palette bank switch (c8f1 for Vanguard)
 	AM_RANGE(0xc800, 0xc8ff) AM_RAM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&spriteram) AM_SHARE(1)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(marvins_background_ram_w) AM_SHARE(2) AM_BASE(&spriteram_3)

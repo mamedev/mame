@@ -404,9 +404,9 @@ Grand Tour
 IGS, 1993
 
 This game probably runs on the same board as IGS's IQ Block.
-Two of the PALs are labelled GRAND3 and GRAND4. However, there may be other 
-games that run on this same PCB also, since three of the PALs are 
-labelled AF1, AF2 and AF3, meaning the main/first game to run on this 
+Two of the PALs are labelled GRAND3 and GRAND4. However, there may be other
+games that run on this same PCB also, since three of the PALs are
+labelled AF1, AF2 and AF3, meaning the main/first game to run on this
 hardware was called A-something F-something.
 
 

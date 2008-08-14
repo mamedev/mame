@@ -458,7 +458,7 @@ static void verify_video(int frame, bitmap_t *bitmap)
     		    }
     		}
         }
-        
+
         /* now examine the active video signal */
         pixels = 0;
         for (y = 22*2 + fieldnum; y < bitmap->height; y += 2)
@@ -467,7 +467,7 @@ static void verify_video(int frame, bitmap_t *bitmap)
         		pixelhisto[*BITMAP_ADDR16(bitmap, y, x) >> 8]++;
         	pixels += 720 - 16 - 16;
         }
-        
+
         /* remove the top/bottom 0.1% */
         remaining = pixels / 1000;
         for (minval = 0; remaining >= 0; minval++)
@@ -475,11 +475,11 @@ static void verify_video(int frame, bitmap_t *bitmap)
         remaining = pixels / 1000;
         for (maxval = 255; remaining >= 0; maxval--)
         	remaining -= pixelhisto[maxval];
-        
+
         /* update the overall min/max */
         video_min_overall = MIN(minval, video_min_overall);
         video_max_overall = MAX(maxval, video_max_overall);
-        
+
         /* track low fields */
         if (minval < 16)
         {
@@ -534,7 +534,7 @@ static void verify_video_final(int frame, bitmap_t *bitmap)
 	if (!video_saw_leadout)
 		printf("Track %6d.%d: never saw any lead-out (WARNING)\n", field / fields_per_frame, 0);
 
-	/* any remaining high/low reports? */	
+	/* any remaining high/low reports? */
 	if (video_num_low_fields > 0)
 		printf("%6d.%d-%6d.%d: active video signal level low for %d fields (WARNING)\n", video_first_low_frame, video_first_low_field, frame, 0, video_num_low_fields);
 	if (video_num_high_fields > 0)

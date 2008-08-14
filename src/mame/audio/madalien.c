@@ -126,14 +126,14 @@ static const discrete_mixer_desc madalien_final_mix =
 
 DISCRETE_SOUND_START( madalien )
 	/************************************************
-	 * Input register mapping
-	 ************************************************/
+     * Input register mapping
+     ************************************************/
 	DISCRETE_INPUT_DATA(MADALIEN_8910_PORTA)
 	DISCRETE_INPUT_DATA(MADALIEN_8910_PORTB)
 
 	/************************************************
-	 * Convert to individual bits
-	 ************************************************/
+     * Convert to individual bits
+     ************************************************/
 	// Port A is used to turn filtering on/off.
 	// 1 - player shot, siren, music
 	// turn bit into 4066 Ron value of 270 ohms @ 5V
@@ -165,16 +165,16 @@ DISCRETE_SOUND_START( madalien )
 	DISCRETE_TRANSFORM3(MADALIEN_8910_PORTB_7, 1, MADALIEN_8910_PORTB, 0x40, (DEFAULT_TTL_V_LOGIC_1 - 1) / 0x40, "01&2*")
 
 	/************************************************
-	 * PSG input streams
-	 ************************************************/
+     * PSG input streams
+     ************************************************/
 	// AY-3-8910 PSG have a 1Vpp level
 	DISCRETE_INPUTX_STREAM(MADALIEN_8910_PSG_A, 0, 2.0/32768, .250)
 	DISCRETE_INPUTX_STREAM(MADALIEN_8910_PSG_B, 1, 2.0/32768, .250)
 	DISCRETE_INPUTX_STREAM(MADALIEN_8910_PSG_C, 2, 2.0/32768, .250)
 
 	/************************************************
-	 * AY-3-8910 filtering
-	 ************************************************/
+     * AY-3-8910 filtering
+     ************************************************/
 	// top op-amp
 	DISCRETE_ONOFF(NODE_20, MADALIEN_8910_PORTA_2, MADALIEN_8910_PSG_A)
 	DISCRETE_OP_AMP_FILTER(NODE_21, 1, NODE_20, 0, DISC_OP_AMP_FILTER_IS_BAND_PASS_1M, &madalien_psg_a_filter)
@@ -195,8 +195,8 @@ DISCRETE_SOUND_START( madalien )
 	DISCRETE_MIXER3(NODE_48, 1, NODE_21, NODE_33, NODE_41, &madalien_psg_mix)
 
 	/************************************************
-	 * Player motor
-	 ************************************************/
+     * Player motor
+     ************************************************/
 	DISCRETE_555_ASTABLE(NODE_50,	// cap is buffered by op-amp 2D.
 		1,							// always enabled
 		RES_K(4.7),
@@ -225,8 +225,8 @@ DISCRETE_SOUND_START( madalien )
 	DISCRETE_COMP_ADDER(NODE_59, 1, MADALIEN_8910_PORTB_23, &madalien_effect_1b_vol_r)
 
 	/************************************************
-	 * Enemy motor
-	 ************************************************/
+     * Enemy motor
+     ************************************************/
 	DISCRETE_CRFILTER(NODE_60, 1, MADALIEN_8910_PORTB_7, RES_K(100), CAP_U(4.7))
 	// 2 diodes clamp it positive.
 	DISCRETE_CLAMP(NODE_62, 1, NODE_60, 0, 12, 0)
@@ -249,8 +249,8 @@ DISCRETE_SOUND_START( madalien )
 	DISCRETE_DAC_R1(NODE_68, 1, NODE_67, DEFAULT_TTL_V_LOGIC_1, &madalien_effect2_dac)
 
 	/************************************************
-	 * Mixer
-	 ************************************************/
+     * Mixer
+     ************************************************/
 	DISCRETE_MIXER7(NODE_90, 1, MADALIEN_8910_PSG_A, NODE_48, MADALIEN_8910_PSG_B, MADALIEN_8910_PSG_C, NODE_56, NODE_57, NODE_68, &madalien_final_mix)
 
 	DISCRETE_OUTPUT(NODE_90, 1.1)

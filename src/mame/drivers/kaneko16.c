@@ -365,14 +365,14 @@ static ADDRESS_MAP_START( berlwall, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM		// Work RAM
 	AM_RANGE(0x30e000, 0x30ffff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)		// Sprites
 	AM_RANGE(0x400000, 0x400fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
-//	AM_RANGE(0x480000, 0x480001) AM_RAM     // ?
+//  AM_RANGE(0x480000, 0x480001) AM_RAM     // ?
 	AM_RANGE(0x500000, 0x500001) AM_READWRITE(kaneko16_bg15_reg_r, kaneko16_bg15_reg_w) AM_BASE(&kaneko16_bg15_reg)	// High Color Background
 	AM_RANGE(0x580000, 0x580001) AM_READWRITE(kaneko16_bg15_select_r, kaneko16_bg15_select_w) AM_BASE(&kaneko16_bg15_select)
 	AM_RANGE(0x600000, 0x60003f) AM_RAM_WRITE(kaneko16_sprites_regs_w) AM_BASE(&kaneko16_sprites_regs)	// Sprites Regs
 	AM_RANGE(0x680000, 0x680001) AM_READ_PORT("DSW_P1")
 	AM_RANGE(0x680002, 0x680003) AM_READ_PORT("P2")
 	AM_RANGE(0x680004, 0x680005) AM_READ_PORT("SYSTEM")
-//	AM_RANGE(0x680006, 0x680007) AM_READ_PORT("UNK")
+//  AM_RANGE(0x680006, 0x680007) AM_READ_PORT("UNK")
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(kaneko16_coin_lockout_w)	// Coin Lockout
 	AM_RANGE(0x780000, 0x780001) AM_READ(watchdog_reset16_r)		// Watchdog
 	AM_RANGE(0x800000, 0x80001f) AM_READWRITE(kaneko16_YM2149_0_r, kaneko16_YM2149_0_w)	// Sound
@@ -1079,11 +1079,11 @@ static INPUT_PORTS_START( blazeon )
 	PORT_DIPSETTING(      0x0009, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(      0x000f, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+//  PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0003, "5 Coins/6 Credits" )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 4C_5C ) )
 	PORT_DIPSETTING(      0x0006, DEF_STR( 2C_3C ) )
-//	PORT_DIPSETTING(      0x0001, DEF_STR( 2C_3C ) )
+//  PORT_DIPSETTING(      0x0001, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(      0x000e, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x000d, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_4C ) )
@@ -1097,11 +1097,11 @@ static INPUT_PORTS_START( blazeon )
 	PORT_DIPSETTING(      0x0090, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(      0x00f0, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+//  PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0030, "5 Coins/6 Credits" )
 	PORT_DIPSETTING(      0x0020, DEF_STR( 4C_5C ) )
 	PORT_DIPSETTING(      0x0060, DEF_STR( 2C_3C ) )
-//	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_3C ) )
+//  PORT_DIPSETTING(      0x0010, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(      0x00e0, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x00d0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_4C ) )
@@ -2777,7 +2777,7 @@ Kaneko, 1995
 PCB Layouts
 -----------
 
-KANEKO AX-SYSTEM BOARD 
+KANEKO AX-SYSTEM BOARD
 M201F00584 KANEKO (sticker)
 |------------------------------------------------------|
 |    PX4460  CNC1                                      |
@@ -2837,13 +2837,13 @@ Notes:
       CNC1/CNC2 \
       CNA/CNB   | Multi-pin connectors joining top board to bottom board
       CN1/2/3   /
-      Custom IC's - 
+      Custom IC's -
                    KANEKO VIEW2-CHIP (x2, QFP144)
                    KANEKO KC-002 (QFP208)
                    *1 - KANEKO JAPAN 9448 TA (QFP44)
 
 
-KANEKO AX-SYSTEM BOARD ROM-08 
+KANEKO AX-SYSTEM BOARD ROM-08
 AX09S00584 KANEKO (sticker)
 |------------------------------------------------------|
 | 93C46  SW1      CNB                        CN1       |
@@ -2921,7 +2921,7 @@ Notes:
             M2B0X0.U93     27C010 (1M)           |
             M2B1X0.U94     27C010 (1M)           /
 
-            M2-100-00.U48  8M MASKROM (32-Pin)   \  
+            M2-100-00.U48  8M MASKROM (32-Pin)   \
             M2W1A1.U47     27C040 (4M)           /  Oki Samples
 
 ***************************************************************************/

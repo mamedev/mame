@@ -684,7 +684,7 @@ Notes:
       6264  - 8k x8 SRAM  (x2, DIP28)
       6116  - 2k x8 SRAM  (x8, DIP24)
       VSync - 58Hz
-      
+
       ROMs:
            SQUASH_D16.E16    27C010   \
            SQUASH_D18.E18    27C010   /  68K Program

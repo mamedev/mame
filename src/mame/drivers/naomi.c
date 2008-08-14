@@ -50,9 +50,9 @@ Notes:
       CN25/26         - Connectors for filter board
       EPF8452AQC160-3 - Altera FLEX EPF8452AQC160-3 FPGA (QFP160)
       315-6188.IC31   - Altera EPC1064 (DIP8)
-						According to the datasheet, it's an FPGA Configuration 
-						Device which loads the Altera Flex EPF8452 with some info 
-						on power-up.
+                        According to the datasheet, it's an FPGA Configuration
+                        Device which loads the Altera Flex EPF8452 with some info
+                        on power-up.
       JP1             - set to 2-3. Alt setting is 1-2
       JP4             - set to 2-3. Alt setting is 1-2
       93C46           - 128 bytes EEPROM

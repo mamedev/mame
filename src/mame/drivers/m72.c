@@ -71,10 +71,10 @@ kengo       0x18   --------------
 
 2008-08
 Dip locations verified for the following games:
-	- dbreed, hharry, loht (jpn), poundfor, rtype, rtype2 [manual]
-	- airduel, gallop, imgfight [dip listing]
-The other locations have been added assuming that the layout is the same 
-on all m72 boards. However, it would be nice to have them confirmed for 
+    - dbreed, hharry, loht (jpn), poundfor, rtype, rtype2 [manual]
+    - airduel, gallop, imgfight [dip listing]
+The other locations have been added assuming that the layout is the same
+on all m72 boards. However, it would be nice to have them confirmed for
 other supported games as well.
 
 
@@ -1442,7 +1442,7 @@ static INPUT_PORTS_START( airduel )
 	PORT_DIPSETTING(      0xb000, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(      0xc000, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0xd000, DEF_STR( 3C_1C ) )
-//	PORT_DIPSETTING(      0x1000, DEF_STR( Free-Play ) )  /* another free play */
+//  PORT_DIPSETTING(      0x1000, DEF_STR( Free-Play ) )  /* another free play */
 	PORT_DIPSETTING(      0xe000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x3000, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(      0x2000, DEF_STR( 4C_3C ) )

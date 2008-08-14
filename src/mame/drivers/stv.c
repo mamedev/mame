@@ -3175,7 +3175,7 @@ Deniam (Licensed to Sega Enterprises, Ltd), 1997
 
 PCB Number: LEX-0704
 
-This is a non-Sega-manufactured STV cart which works with Japanese and USA bioses. 
+This is a non-Sega-manufactured STV cart which works with Japanese and USA bioses.
 The cart is mostly the same as the Sega carts, containing not a lot except some ROMs
 and logic chips.
 

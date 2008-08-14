@@ -939,7 +939,7 @@ ROM_END
 static INPUT_PORTS_START( 64street )
 	PORT_START("SYSTEM")
 	COINS
-	
+
 	PORT_START("P1")
 	JOY_2BUTTONS(1)		//  fire    jump
 
@@ -1080,7 +1080,7 @@ static INPUT_PORTS_START( astyanax )
 	JOY_3BUTTONS(1)		//  fire    jump    magic
 
 	PORT_START("P2")	/* 0x80004.b  - 0x80005.b */
-	JOY_3BUTTONS(2)	
+	JOY_3BUTTONS(2)
 	RESERVE
 
 	PORT_START("DSW1") /* 0x80006.b */
@@ -1089,19 +1089,19 @@ static INPUT_PORTS_START( astyanax )
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )    // 1_2 shown in test mode
-//	PORT_DIPSETTING(    0x05, DEF_STR( 1C_1C ) )    // 1_3
-//	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )    // 1_4
-//	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )    // 1_5
+//  PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )    // 1_2 shown in test mode
+//  PORT_DIPSETTING(    0x05, DEF_STR( 1C_1C ) )    // 1_3
+//  PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )    // 1_4
+//  PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )    // 1_5
 	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )    // 1_2 shown in test mode
-//	PORT_DIPSETTING(    0x28, DEF_STR( 1C_1C ) )    // 1_3
-//	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )    // 1_4
-//	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )    // 1_5
+//  PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )    // 1_2 shown in test mode
+//  PORT_DIPSETTING(    0x28, DEF_STR( 1C_1C ) )    // 1_3
+//  PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )    // 1_4
+//  PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )    // 1_5
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1443,11 +1443,11 @@ static INPUT_PORTS_START( bigstrik )
 	PORT_DIPSETTING(    0x09, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 2C_3C ) )
-//	PORT_DIPSETTING(    0x04, DEF_STR( 2C_3C ) )
-//	PORT_DIPSETTING(    0x03, DEF_STR( 2C_3C ) )
-//	PORT_DIPSETTING(    0x02, DEF_STR( 2C_3C ) )
-//	PORT_DIPSETTING(    0x01, DEF_STR( 2C_3C ) )
-//	PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )
+//  PORT_DIPSETTING(    0x04, DEF_STR( 2C_3C ) )
+//  PORT_DIPSETTING(    0x03, DEF_STR( 2C_3C ) )
+//  PORT_DIPSETTING(    0x02, DEF_STR( 2C_3C ) )
+//  PORT_DIPSETTING(    0x01, DEF_STR( 2C_3C ) )
+//  PORT_DIPSETTING(    0x06, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x0d, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_4C ) )
@@ -1460,11 +1460,11 @@ static INPUT_PORTS_START( bigstrik )
 	PORT_DIPSETTING(    0x90, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0xf0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 2C_3C ) )
-//	PORT_DIPSETTING(    0x40, DEF_STR( 2C_3C ) )
-//	PORT_DIPSETTING(    0x30, DEF_STR( 2C_3C ) )
-//	PORT_DIPSETTING(    0x20, DEF_STR( 2C_3C ) )
-//	PORT_DIPSETTING(    0x10, DEF_STR( 2C_3C ) )
-//	PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
+//  PORT_DIPSETTING(    0x40, DEF_STR( 2C_3C ) )
+//  PORT_DIPSETTING(    0x30, DEF_STR( 2C_3C ) )
+//  PORT_DIPSETTING(    0x20, DEF_STR( 2C_3C ) )
+//  PORT_DIPSETTING(    0x10, DEF_STR( 2C_3C ) )
+//  PORT_DIPSETTING(    0x60, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
@@ -1936,7 +1936,7 @@ static INPUT_PORTS_START( hachoo )
 	JOY_2BUTTONS(1)		//  fire    jump
 
 	PORT_START("P2")	/* 0x80004.b  - 0x80005.b */
-	JOY_2BUTTONS(2)	
+	JOY_2BUTTONS(2)
 	RESERVE
 
 	PORT_START("DSW1")	/* 0x80006.b */
@@ -2351,9 +2351,9 @@ static INPUT_PORTS_START( jitsupro )
 	PORT_DIPSETTING(    0x14, "H" )
 	PORT_DIPSETTING(    0x10, "O (M)" )
 	PORT_DIPSETTING(    0x0c, "Bu" )
-//	PORT_DIPSETTING(    0x08, "13" )
-//	PORT_DIPSETTING(    0x04, "14" )
-//	PORT_DIPSETTING(    0x00, "15" )
+//  PORT_DIPSETTING(    0x08, "13" )
+//  PORT_DIPSETTING(    0x04, "14" )
+//  PORT_DIPSETTING(    0x00, "15" )
 	PORT_DIPNAME( 0x40, 0x40, "Scroll Is Based On" )
 	PORT_DIPSETTING(    0x40, "Shadow of Baseball" )
 	PORT_DIPSETTING(    0x00, "The Baseball Itself" )
@@ -2562,7 +2562,7 @@ static INPUT_PORTS_START( lomakai )
 	JOY_2BUTTONS(1)		//  fire    jump
 
 	PORT_START("P2")	/* 0x80004.b  - 0x80005.b */
-	JOY_2BUTTONS(2)	
+	JOY_2BUTTONS(2)
 	RESERVE
 
 	PORT_START("DSW1")	/* 0x80006.b */
@@ -2744,7 +2744,7 @@ static INPUT_PORTS_START( p47 )
 	JOY_2BUTTONS(1)		//  fire    bomb
 
 	PORT_START("P2")	/* 0x80004.b  - 0x80005.b */
-	JOY_2BUTTONS(2)	
+	JOY_2BUTTONS(2)
 	RESERVE
 
 	PORT_START("DSW1")	/* 0x80006.b */
@@ -3065,7 +3065,7 @@ static INPUT_PORTS_START( plusalph )
 	JOY_2BUTTONS(1)		//  fire    bomb
 
 	PORT_START("P2")	/* 0x80004.b  - 0x80005.b */
-	JOY_2BUTTONS(2)	
+	JOY_2BUTTONS(2)
 	RESERVE
 
 	PORT_START("DSW1")	/* 0x80006.b */
@@ -3353,7 +3353,7 @@ static INPUT_PORTS_START( stdragon )
 	JOY_2BUTTONS(1)		//  fire    fire
 
 	PORT_START("P2")	/* 0x80004.b  - 0x80005.b */
-	JOY_2BUTTONS(2)	
+	JOY_2BUTTONS(2)
 	RESERVE
 
 	PORT_START("DSW1")	/* 0x80006.b */
@@ -3440,12 +3440,12 @@ ROM_END
 static INPUT_PORTS_START( soldamj )
 	PORT_START("SYSTEM")	/* 0x80001.b */
 	COINS
-	
+
 	PORT_START("P1")	/* 0x80003.b */
 	JOY_2BUTTONS(1)		//  turn    turn    (3rd button is shown in service mode, but seems unused)
 
 	PORT_START("P2")	/* 0x80004.b  - 0x80005.b */
-	JOY_2BUTTONS(2)	
+	JOY_2BUTTONS(2)
 	RESERVE
 
 	PORT_START("DSW1")	/* 0x80006.b */

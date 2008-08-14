@@ -3090,7 +3090,7 @@ Notes:
 
            BG-1P, BG-2P     - Backgrounds, MX29F1610MC surface mounted 16MBit FlashROM (SOP44)
            BG-1D, BG-2D     - Backgrounds, MX23C3210MC surface mounted 32MBit MaskROM (SOP44)
-           
+
            PCM0, PCM1       - PCM sound samples, 27C4001 4MBit EPROM (DIP32)
 
            FIX0, FIX1, FIX2 - 27C512 EPROM (DIP28)

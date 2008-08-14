@@ -1,25 +1,25 @@
 /***************************************************************************
 
  Arcade games (hacks of console games) running on SNES harware.
-	
+
  Driver (based on nss.c ) by Tomasz Slanina  analog[at]op.pl
 
-	Supported games:
-	- Killer Instinct
-	- Final Fight 2
-	- Sonic Blast Man 2  (not working)
-	
-	Not dumped:
-	- Final Fight 3
-	
+    Supported games:
+    - Killer Instinct
+    - Final Fight 2
+    - Sonic Blast Man 2  (not working)
+
+    Not dumped:
+    - Final Fight 3
+
 TODO:
 
  - ffight2b -  dipswitches ($7eadd7 ?)
  - sblast2b - decrypt (xor+swaps)
  - kiinstb -  fix gfx glitches, missing texts
- 
- 
-	
+
+
+
   Final Fight 2 PCB layout:
   ------------------------
 
@@ -369,10 +369,10 @@ static INPUT_PORTS_START( ffight2b )
 	PORT_DIPSETTING(    0x18, "1" )
 	PORT_DIPNAME( 0xe0, 0x00, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:6,7,8")
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )		
+	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-/*	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) ) */
+/*  PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) ) */
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
@@ -426,7 +426,7 @@ static DRIVER_INIT(kinstb)
 	{
 		rom[i]=BITSWAP8(rom[i],5,0,6,1,7,4,3,2);
 	}
-	
+
 	shared_ram=auto_malloc(0x100);
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x781000, 0x7810ff, 0, 0, sharedram_r, sharedram_w);
 
@@ -468,7 +468,7 @@ DRIVER_INIT( ffight2b )
 	/*  boot vector */
 	rom[0x7ffd]=0x89;
 	rom[0x7ffc]=0x54;
-	
+
 	ffight2b_coins=0;
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7eadce, 0x7eadce, 0, 0, ffight2b_coin_r);
 

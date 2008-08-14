@@ -356,7 +356,7 @@ static int special_result = 0;
 
 static CUSTOM_INPUT( special_port_r )
 {
-	if (sound_int_state) 
+	if (sound_int_state)
 		special_result ^= 1;
 
 	return special_result;

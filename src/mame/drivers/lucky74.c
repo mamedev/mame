@@ -202,7 +202,7 @@
     Coin                       EF  E0  00  DF  F6  01  "ready?"
 
     (*) "big" and "small" are splitted from the sample "big or small".
-	
+
 
     So, you can easily see that writes to ports 0x00-0x01 define the start (pos) offset,
     and writes to ports 0x03-0x04 the ending offset of each sample to be played.
@@ -234,9 +234,9 @@
     Pinout
     ======
 
-    General	In Lucky74             Measured     Comments	
+    General In Lucky74             Measured     Comments
     ------------------------------------------------------------------
-    01 - Clock In 		           (12 MHz)
+    01 - Clock In                  (12 MHz)
     02 - Clock Out 1 (In/2)        (6 MHz)
     03 - Clock Out 2 (In/4)        (3 MHz)
     04 - Clock Out 3 (In/4)        (3 MHz)      Yes, again!
@@ -282,7 +282,7 @@
     LUCKY 74 - E2                Comments
     ------------------------------------------------------
     01 - I - Flip State.
-    02 - I - CLK1 1.5 MHz.	     In phase with 6 MHz & 3 MHz.
+    02 - I - CLK1 1.5 MHz.       In phase with 6 MHz & 3 MHz.
     03 - I - CLK2 12 MHz.
     04 - I - CLK3 1.5 MHz.       In phase with 6 MHz.
     05 - I - CLK4 3 MHz.         In phase with 6 MHz.
@@ -314,7 +314,7 @@
     LUCKY 74 - E1                Comments
     ------------------------------------------------------
     01 - I - Flip State.
-    02 - I - CLK1 1.5 MHz.	     In phase with 6 MHz & 3 MHz.
+    02 - I - CLK1 1.5 MHz.       In phase with 6 MHz & 3 MHz.
     03 - I - CLK2 12 MHz.
     04 - I - CLK3 1.5 MHz.       In phase with 6 MHz.
     05 - I - CLK4 3 MHz.         In phase with 6 MHz.
@@ -371,13 +371,13 @@
     Pinout
     ======
 
-    General                       Comments	
+    General                       Comments
     ---------------------------------------------------------------
     01 - Low Nibble Enable        Half sample rate.
     02 - High Nibble Enable       Half sample rate inverted.
     03 - /BUSY                    LOW while playing.
-    04 - /Read Strobe             LOW to read from Data Bus. 
-    05 - /Write Strobe            LOW to write on Data Bus. 	
+    04 - /Read Strobe             LOW to read from Data Bus.
+    05 - /Write Strobe            LOW to write on Data Bus.
     06 - A0                       Internal Register address 0.
     07 - A1                       Internal Register address 1.
     08 - A2                       Internal Register address 2.
@@ -708,7 +708,7 @@ static READ8_HANDLER( custom_09R81P_port_r )
 static WRITE8_HANDLER( custom_09R81P_port_w )
 {
 	lucky74_adpcm_reg[offset] = data;
-}  
+}
 
 static WRITE8_HANDLER( ym2149_portb_w )
 {
@@ -1125,7 +1125,7 @@ static void lucky74_adpcm_int(running_machine *machine, int num)
 		if (lucky74_adpcm_busy_line)     /* still not started */
 		{
 			/* init all 09R81P registers */
-			logerror("init ADPCM registers\n");	
+			logerror("init ADPCM registers\n");
 			lucky74_adpcm_end = (lucky74_adpcm_reg[04] << 8) + lucky74_adpcm_reg[03];
 			lucky74_adpcm_pos = (lucky74_adpcm_reg[01] << 8) + lucky74_adpcm_reg[00];
 			lucky74_adpcm_busy_line = 0;
@@ -1241,9 +1241,9 @@ static MACHINE_DRIVER_START( lucky74 )
 	MDRV_CPU_VBLANK_INT("main", nmi_interrupt)	/* 60 Hz. measured */
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
-	
+
 	MDRV_SOUND_START(lucky74)
-	
+
 
 	/* 2x 82c255 (4x 8255) */
 	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
@@ -1306,7 +1306,7 @@ MACHINE_DRIVER_END
 
     - The black CPU box was replaced with a mini daughterboard
       with a real Z80, the program ROM, and NVRAM.
-	  
+
     - The checksum routines were patched.
 
     - All the co-processor routines are there, but the calls were NOPed.

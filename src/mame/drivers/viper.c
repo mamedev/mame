@@ -989,9 +989,9 @@ Konami, 2002
 PCB number - GM941-PWB(A)C Copyright 1999 Konami Made In Japan
 
 Mahjong Fight Club is a multi player Mahjong battle game for up to 8 players. A
-single PCB will not boot unless all of the other units are connected and powered 
-on, although how exactly they're connected is unknown. There is probably a 
-master unit that talks to all of the 8 satellite units. At the moment I have 
+single PCB will not boot unless all of the other units are connected and powered
+on, although how exactly they're connected is unknown. There is probably a
+master unit that talks to all of the 8 satellite units. At the moment I have
 only 2 of the 8 satellite units so I can't confirm that.
 However, I don't have access to the main unit anyway as it was not included in
 the auction we won :(
@@ -1015,15 +1015,15 @@ card as it is PC readable. The card contains only 1 file named c09jad04.bin
 surface mounted at location U25. The BIOS is common to ALL Viper games.
 
 nvram.u39 is a ST M48T58Y Timekeeper NVRAM soldered-in at location U39. The
-codes at the start of the image (probably just the first 16 or 32 bytes) are 
-used as a simple (and very weak) protection check to stop game swaps. The 
+codes at the start of the image (probably just the first 16 or 32 bytes) are
+used as a simple (and very weak) protection check to stop game swaps. The
 contents of the NVRAM is different for ALL games on this hardware.
 
 Some games use a dongle and swapping games won't work unless the dongle is also provided.
 The following games comes with a dongle....
 Mahjong Fight Club
 
-For non-dongled games, I have verified the following games will work when the 
+For non-dongled games, I have verified the following games will work when the
 CF card and NVRAM are swapped....
 */
 

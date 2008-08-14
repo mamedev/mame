@@ -117,7 +117,7 @@ static ADDRESS_MAP_START( 6206B_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0xfc02, 0xfc02) AM_WRITE(unknown_write) /* written during start-up, not again */
 	AM_RANGE(0xfc03, 0xfc03) AM_READWRITE(input_port_3_r, tbowl_coin_counter_w)	/* Player 4 inputs */
 //  AM_RANGE(0xfc05, 0xfc05) AM_WRITE(unknown_write) /* no idea */
-//  AM_RANGE(0xfc06, 0xfc06) AM_READ(dummy_r) 		 /* Read During NMI */
+//  AM_RANGE(0xfc06, 0xfc06) AM_READ(dummy_r)        /* Read During NMI */
 	AM_RANGE(0xfc07, 0xfc07) AM_READ(input_port_4_r) /* System inputs */
 	AM_RANGE(0xfc08, 0xfc08) AM_READ(input_port_5_r) /* DSW1 */
 //  AM_RANGE(0xfc08, 0xfc08) AM_WRITE(unknown_write) /* hardly used .. */

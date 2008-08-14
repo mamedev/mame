@@ -2546,7 +2546,7 @@ static void cps1_render_stars(const device_config *screen, bitmap_t *bitmap,cons
 	if (!stars_rom && (cps1_stars_enabled[0] || cps1_stars_enabled[1]))
 	{
 #ifdef MAME_DEBUG
-//		popmessage("stars enabled but no stars ROM");
+//      popmessage("stars enabled but no stars ROM");
 #endif
 		return;
 	}

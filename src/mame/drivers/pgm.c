@@ -3318,7 +3318,7 @@ Notes:
       PAL           - Atmel ATF22V10B PAL (DIP24, labelled 'EA U4')
       U3            - Unpopulated position for 32MBit MASKROM (DIP42)
       U6, U7        - Unpopulated position for 74LS245 logic chip (x2)
-      
+
 
 IGS PCB NO- T0237
 |-----------------------------------------------|

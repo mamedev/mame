@@ -286,7 +286,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			sx, sy,
 			cliprect,
 			TRANSPARENCY_PEN, 0);
-			
+
 		/* sprite wrapping - verified on real hardware*/
 		if(sx>0xf0)
 		{
@@ -297,7 +297,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			cliprect,
 			TRANSPARENCY_PEN, 0);
 		}
-			
+
 	}
 }
 

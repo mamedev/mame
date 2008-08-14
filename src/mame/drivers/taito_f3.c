@@ -1409,7 +1409,7 @@ Notes:
       5510 ESP clocks: pin1- 8.000MHz, pins4-6- 2.6686MHz, pins9-10- 29.7623kHz, pin16- 3.8095225MHz
       VSync          : 59Hz
       HSync          : 15.97kHz
-      
+
       D29* /D49* /D53* = PALs
                          D53-12         PAL16L8B
                          D29-17-1       PALCE16V8H
@@ -2304,12 +2304,12 @@ NEW F3 MOTHER (ASIA) M20A0001B MOTHER PCB J1100335B
 Notes:
       68020 clock    : 15.23809 (30.47618 / 2)
       68000 clock    : 15.23809 (30.47618 / 2)
-      68681 clocks   : pin2- 500kHz, pin32- 4.000MHz, pin36- 1.000MHz, pin38- 1.000MHz, pin39- 500kHz, 
-      5505 clocks    : pin12- 2.6686MHz, pin34- 15.23809MHz, 
+      68681 clocks   : pin2- 500kHz, pin32- 4.000MHz, pin36- 1.000MHz, pin38- 1.000MHz, pin39- 500kHz,
+      5505 clocks    : pin12- 2.6686MHz, pin34- 15.23809MHz,
       5510 clocks    : pin1- 8.000MHz, pins4-6- 2.6686MHz, pin16- 2.6686MHz
       VSync          : 59Hz
       HSync          : 15.78kHz
-      
+
       D77* = PALs
 
 

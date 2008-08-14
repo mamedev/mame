@@ -854,7 +854,7 @@ ROM_START( freekcb2 )
 	ROM_LOAD( "1.bin", 0x00000, 0x08000, CRC(a6030ba9) SHA1(f363100f54a7a80701a6395c7539b8daa60db054) )
 
 	/* the first half of the gfx roms isn't used on this bootleg (roms are double size)
-	   - the content is otherwise identical */
+       - the content is otherwise identical */
 	ROM_REGION( 0xc000, "gfx1", ROMREGION_DISPOSE ) /* GFX */
 	ROM_LOAD( "2.bin", 0x000000, 0x04000, CRC(96aeae91) SHA1(073ca6c9fbe14760ee10293791254da3bcb43940) )
 	ROM_CONTINUE(0x0000,0x4000)
@@ -998,7 +998,7 @@ Gigas (bootleg)
 
 CPU: Z80 (on a small plug in board), 8748 MCU (on same plug-in board)
 SND: 76489 x3
-DIPSW: 8 position x3 
+DIPSW: 8 position x3
 RAM: 6116 x2 (near ROMs 1-6), 6264 x1 (near ROMs 7-8), 2018 x2 (located in center of board)
 XTAL: 18.432MHz
 PROMs: 82s129 x6 (not dumped yet, probably match existing archives....)

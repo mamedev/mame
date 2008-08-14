@@ -604,7 +604,7 @@ static void laserdisc_audio_process(const device_config *device, int samplerate,
 
 	if (logit)
 		logerror("--------------\n");
-	
+
 	/* if no data, reset it all */
 	if (ch1 == NULL)
 	{

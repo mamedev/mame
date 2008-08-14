@@ -178,7 +178,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfe0d00, 0xfe1807) AM_RAM		/* still part of OBJ RAM */
 	AM_RANGE(0xfe4000, 0xfe4001) AM_READWRITE(input_port_0_word_r, tigeroad_videoctrl_w)	/* char bank, coin counters, + ? */
 	AM_RANGE(0xfe4002, 0xfe4003) AM_READ(input_port_1_word_r)
-/*	AM_RANGE(0xfe4002, 0xfe4003) AM_WRITE(tigeroad_soundcmd_w) added by init_tigeroad() */
+/*  AM_RANGE(0xfe4002, 0xfe4003) AM_WRITE(tigeroad_soundcmd_w) added by init_tigeroad() */
 	AM_RANGE(0xfe4004, 0xfe4005) AM_READ(input_port_2_word_r)
 	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE(tigeroad_videoram_w) AM_BASE(&videoram16)
 	AM_RANGE(0xfe8000, 0xfe8003) AM_WRITE(tigeroad_scroll_w)
@@ -532,7 +532,7 @@ static MACHINE_DRIVER_START( tigeroad )
 	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_port_map,0)
-    
+
 	/* IRQs are triggered by the YM2203 */
 
 	/* video hardware */

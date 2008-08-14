@@ -1440,7 +1440,7 @@ Notes:
               *COPX-D2  - 2M MaskROM stamped 'COPX-D2' at location U0313 (DIP40)
               * means these ROMs are soldered-in and match ROMs from the original Raiden II PCB
 
-      SEIBU Custom ICs - 
+      SEIBU Custom ICs -
                          SIE150 (QFP100)
                          SEI252 SB05-106 (QFP208)
                          SEI0200 TC110G21AF 0076 (QFP100)

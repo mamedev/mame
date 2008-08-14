@@ -487,8 +487,8 @@ OTHER: ADV476KN50E (DIP28)
        MACH110 (CPLD, PLCC44)
        DALLAS DS1220Y-150 (NVRAM)
        4-pin header for standard light gun (x2)
-       
-ROMS : 
+
+ROMS :
 -----------------------------------------
 ds1220y.ic1  NVRAM       located near ic2
 1.ic2        27C040  \

@@ -1063,11 +1063,11 @@ static READ64_HANDLER( model3_ctrl_r )
 			}
 			else if (ACCESSING_BITS_24_31)
 			{
-				if(model3_controls_bank & 0x1) 
+				if(model3_controls_bank & 0x1)
 				{
 					return (input_port_read(machine, "IN1")) << 24;
 				}
-				else 
+				else
 				{
 					return (input_port_read(machine, "IN0")) << 24;
 				}

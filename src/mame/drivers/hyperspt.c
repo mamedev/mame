@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( hyperspt_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x10ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x1600, 0x1600) AM_READ_PORT("DSW2")
 	AM_RANGE(0x1680, 0x1680) AM_READ_PORT("SYSTEM")
-//	AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1_P2")
+//  AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1681, 0x1681) AM_READ(konami_IN1_r)	 /* P1/P2 IO and handle fake button for cheating */
 	AM_RANGE(0x1682, 0x1682) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x1683, 0x1683) AM_READ_PORT("DSW1")
@@ -150,7 +150,7 @@ static INPUT_PORTS_START( hyperspt )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-//	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+//  PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* Fake button to press buttons 1 and 3 impossibly fast. Handle via konami_IN1_r */
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Run Like Hell (Cheat)") PORT_PLAYER(1)
 
@@ -200,7 +200,7 @@ static INPUT_PORTS_START( hyperspt )
 	PORT_DIPSETTING(	0x90, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(	0x00, "Disabled" )
 	/* 0x00 disables Coin 2. It still accepts coins and makes the sound, but
-	   it doesn't give you any credit */
+       it doesn't give you any credit */
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, "After Last Event" )
@@ -301,7 +301,7 @@ static INPUT_PORTS_START( roadf )
 	PORT_DIPSETTING(	0x90, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(	0x00, "Disabled" )
 	/* 0x00 disables Coin 2. It still accepts coins and makes the sound, but
-	   it doesn't give you any credit */
+       it doesn't give you any credit */
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )

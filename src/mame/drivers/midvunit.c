@@ -1386,7 +1386,7 @@ ROM_END
 War Gods
 Midway, 1996
 
-This game runs on hardware that appears to be similar to Cruisin' USA but using 
+This game runs on hardware that appears to be similar to Cruisin' USA but using
 a 420M 2.5" IDE hard drive. Only about 100M of the hard drive is used.
 There are only 2 ROMs located at U12 and U41.
 

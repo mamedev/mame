@@ -572,9 +572,9 @@ static INPUT_PORTS_START( victnine )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("EXTRA_P1")      /* D805 */
-	/* bits 0,1 are MCU related: 
-		- bit 0: mcu is ready to receive data from main cpu
-		- bit 1: mcu has sent data to the main cpu       */
+	/* bits 0,1 are MCU related:
+        - bit 0: mcu is ready to receive data from main cpu
+        - bit 1: mcu has sent data to the main cpu       */
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(victnine_mcu_status_bit01_r, NULL)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )

@@ -229,15 +229,15 @@ const char *format_int(astring *string, UINT64 value, int format)
 		case XML_INT_FORMAT_DECIMAL:
 			astring_printf(string, "%d", (UINT32)value);
 			break;
-			
+
 		case XML_INT_FORMAT_DECIMAL_POUND:
 			astring_printf(string, "#%d", (UINT32)value);
 			break;
-			
+
 		case XML_INT_FORMAT_HEX_DOLLAR:
 			astring_printf(string, "$%X", (UINT32)value);
 			break;
-			
+
 		case XML_INT_FORMAT_HEX_C:
 			astring_printf(string, "0x%X", (UINT32)value);
 			break;
@@ -277,7 +277,7 @@ void cheat_init(running_machine *machine)
 		cheat_list_save("output", cheatinfo->cheatlist);
 
 	/* we rely on the debugger expression callbacks; if the debugger isn't
-	   enabled, we must jumpstart them manually */
+       enabled, we must jumpstart them manually */
 	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
 		debug_cpu_init(machine);
 }
@@ -354,7 +354,7 @@ void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const 
 	/* description is standard */
 	if (description != NULL)
 		*description = astring_c(cheat->description);
-	
+
 	/* some cheat entries are just text for display */
 	if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL && cheat->script[SCRIPT_STATE_ON] == NULL)
 	{
@@ -987,7 +987,7 @@ static void cheat_entry_save(mame_file *cheatfile, const cheat_entry *cheat)
 {
 	script_state state;
 	int scriptcount;
-	
+
 	/* count the scripts */
 	scriptcount = 0;
 	for (state = SCRIPT_STATE_OFF; state < SCRIPT_STATE_COUNT; state++)
@@ -1133,7 +1133,7 @@ error:
 static void cheat_parameter_save(mame_file *cheatfile, const cheat_parameter *param)
 {
 	astring *string = astring_alloc();
-	
+
 	/* output the parameter tag */
 	mame_fprintf(cheatfile, "\t\t<parameter");
 

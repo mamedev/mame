@@ -1,4 +1,4 @@
-/* Galxaia 
+/* Galxaia
 
 Galaxia by Zaccaria (1979)
 
@@ -49,7 +49,7 @@ static VIDEO_START( galaxia )
 static VIDEO_UPDATE( galaxia )
 {
 	int x,y, count;
-	
+
 	bitmap_t *s2636_0_bitmap;
 	bitmap_t *s2636_1_bitmap;
 	bitmap_t *s2636_2_bitmap;
@@ -65,7 +65,7 @@ static VIDEO_UPDATE( galaxia )
 			count++;
 		}
 	}
-	
+
 	s2636_0_bitmap = s2636_update(s2636_0, cliprect);
 	s2636_1_bitmap = s2636_update(s2636_1, cliprect);
 	s2636_2_bitmap = s2636_update(s2636_2, cliprect);
@@ -89,7 +89,7 @@ static VIDEO_UPDATE( galaxia )
 
 				if (S2636_IS_PIXEL_DRAWN(pixel1))
 					*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel1);
-					
+
 				if (S2636_IS_PIXEL_DRAWN(pixel2))
 					*BITMAP_ADDR16(bitmap, y, x) = S2636_PIXEL_COLOR(pixel2);
 			}
@@ -109,7 +109,7 @@ static WRITE8_HANDLER(galaxia_video_w)
 		galaxia_color[offset]=data;
 	}
 }
-	
+
 static READ8_HANDLER(galaxia_video_r)
 {
 	return galaxia_video[offset];
@@ -117,12 +117,12 @@ static READ8_HANDLER(galaxia_video_r)
 
 static ADDRESS_MAP_START( mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x13ff) AM_ROM
-	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM  
+	AM_RANGE(0x1400, 0x14ff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x1500, 0x15ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&galaxia_s2636_0_ram)
 	AM_RANGE(0x1600, 0x16ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&galaxia_s2636_1_ram)
 	AM_RANGE(0x1700, 0x17ff) AM_MIRROR(0x6000) AM_RAM AM_BASE(&galaxia_s2636_2_ram)
 	AM_RANGE(0x1800, 0x1bff) AM_MIRROR(0x6000) AM_READWRITE(galaxia_video_r, galaxia_video_w)  AM_BASE(&galaxia_video)
-	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM  
+	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x33ff) AM_ROM
 ADDRESS_MAP_END
 

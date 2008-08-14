@@ -693,7 +693,7 @@ static INPUT_PORTS_START( skybump )
 	PORT_DIPSETTING(    0x40, "3" )
 	PORT_DIPSETTING(    0x60, "5" )
 	PORT_DIPSETTING(    0x00, "Infinite (Cheat)")
-//	PORT_DIPSETTING(    0x20, "Infinite (Cheat)")
+//  PORT_DIPSETTING(    0x20, "Infinite (Cheat)")
 INPUT_PORTS_END
 
 

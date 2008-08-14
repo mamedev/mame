@@ -519,7 +519,7 @@ static MACHINE_RESET(crystal)
 	memory_set_bankptr(1,memory_region(machine, "user1")+0);
 	FlashCmd=0xff;
 	OldPort4=0;
-  
+
 	DMActrl[0]=0;
 	DMActrl[1]=0;
 

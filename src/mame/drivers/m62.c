@@ -60,9 +60,9 @@ JP4: /
 
 2008-08
 Dip locations verified with dips listing for: kungfum, ldrun, kidniki,
-spelunkr, spelunk2. 
-The other locations have been added assuming that the layout is the same 
-on all m62 boards. However, it would be nice to have them confirmed for 
+spelunkr, spelunk2.
+The other locations have been added assuming that the layout is the same
+on all m62 boards. However, it would be nice to have them confirmed for
 other supported games as well.
 
 **************************************************************************/
@@ -451,7 +451,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( common )
 	PORT_START("SYSTEM")
 	/* Start 1 & 2 also restarts and freezes the game with stop mode on
-	   and are used in test mode to enter and esc the various tests */
+       and are used in test mode to enter and esc the various tests */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	/* service coin must be active for 19 frames to be consistently recognized */
