@@ -137,6 +137,56 @@ There's also (external) JAMMA adapter - 4th board filled with resistors and diod
 #include "driver.h"
 #include "sound/ay8910.h"
 #include "video/hd63484.h"
+#include "machine/microtch.h"
+#include "machine/68681.h"
+
+static struct
+{
+	const device_config *duart68681;
+} skattv_devices;
+
+/***************************************************************************
+
+    68681 DUART <-> Microtouch touch screen controller communication
+
+***************************************************************************/
+
+static void duart_irq_handler(const device_config *device, UINT8 vector)
+{
+	cpunum_set_input_line_and_vector(device->machine, 0, 4, HOLD_LINE, vector);
+};
+
+static void duart_tx(const device_config *device, int channel, UINT8 data)
+{
+	if ( channel == 0 )
+	{
+		microtouch_rx(1, &data);
+	}
+};
+
+static void microtouch_tx(UINT8 data)
+{
+	duart68681_rx_data(skattv_devices.duart68681, 0, data);
+}
+
+static MACHINE_START( skattv )
+{
+	microtouch_init(microtouch_tx, 0);
+}
+
+static MACHINE_RESET( skattv )
+{
+	skattv_devices.duart68681 = device_list_find_by_tag( machine->config->devicelist, DUART68681, "duart68681" );
+}
+
+static const duart68681_config skattv_duart68681_config =
+{
+	XTAL_8_664MHz / 2, //??
+	duart_irq_handler,
+	duart_tx,
+	NULL,
+	NULL
+};
 
 static PALETTE_INIT( adp )
 {
@@ -235,20 +285,22 @@ static READ16_HANDLER( handler2_r )
 	return mame_rand(machine) & 0xff;
 }
 
+/*
 static READ16_HANDLER( handler3_r )
 {
 	return mame_rand(machine) & 0x0000;
 //	return mame_rand(machine) & 0xffff;
 }
+*/
 
 static ADDRESS_MAP_START( skattv_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x800080, 0x800081) AM_READ(handler2_r)
 	AM_RANGE(0x8000a0, 0x8000a1) AM_READWRITE(HD63484_status_r, HD63484_address_w) // bad
 	AM_RANGE(0x8000a2, 0x8000a3) AM_READWRITE(HD63484_data_r, HD63484_data_w) // bad
-//	AM_RANGE(0x800100, 0x8001ff) AM_RAM // bad
-	AM_RANGE(0x800180, 0x800181) AM_READ(handler1_r)
-	AM_RANGE(0xffd246, 0xffd247) AM_READ(handler3_r)
+	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8( DUART68681, "duart68681", duart68681_r, duart68681_w, 0xff )
+//	AM_RANGE(0x800180, 0x800181) AM_READ(handler1_r)
+//	AM_RANGE(0xffd246, 0xffd247) AM_READ(handler3_r)
 //	AM_RANGE(0xffd248, 0xffd249) AM_READ(handler3_r)
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -292,6 +344,28 @@ static INPUT_PORTS_START( adp )
 
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( skattv )
+	PORT_INCLUDE(microtouch)
+
+	PORT_START("COIN") // IN3
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN5    )	// "M. Coin 1 Input"
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN6    )	// "M. Coin 2 Input"
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_BILL1    ) PORT_IMPULSE(2)	// "DBV Input"
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN  )	// service coin?
+	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW  )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_SERVICE1 )	// "Calibrate"
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL  )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_COIN1  )	// "E. Coin 1" (ECA?) tmaster defaults to e. coin,
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_COIN2  )	// "E. Coin 2" (ECA?) rather than m. coin
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN3  )	// "E. Coin 3" (ECA?) so they're coin1-coin4
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_COIN4  )	// "E. Coin 4" (ECA?)
+INPUT_PORTS_END
+
 static MACHINE_DRIVER_START( quickjac )
 	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(quickjac_mem, 0)
@@ -319,6 +393,12 @@ static MACHINE_DRIVER_START( skattv )
 	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(skattv_mem, 0)
 //	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+
+	MDRV_MACHINE_START(skattv)
+	MDRV_MACHINE_RESET(skattv)
+
+	MDRV_DEVICE_ADD( "duart68681", DUART68681 )
+	MDRV_DEVICE_CONFIG( skattv_duart68681_config )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -417,7 +497,7 @@ ROM_END
 
 GAME( 1990, backgamn,        0, backgamn,    adp,    0, ROT0,  "ADP", "Backgammon", GAME_NOT_WORKING )
 GAME( 1993, quickjac,        0, quickjac,    adp,    0, ROT0,  "ADP", "Quick Jack", GAME_NOT_WORKING )
-GAME( 1994, skattv,          0, skattv,      adp,    0, ROT0,  "ADP", "Skat TV", GAME_NOT_WORKING )
-GAME( 1995, skattva,    skattv, skattv,      adp,    0, ROT0,  "ADP", "Skat TV (version TS3)", GAME_NOT_WORKING )
+GAME( 1994, skattv,          0, skattv,      skattv,    0, ROT0,  "ADP", "Skat TV", GAME_NOT_WORKING )
+GAME( 1995, skattva,    skattv, skattv,      skattv,    0, ROT0,  "ADP", "Skat TV (version TS3)", GAME_NOT_WORKING )
 GAME( 1997, fashiong,        0, skattv,      adp,    0, ROT0,  "ADP", "Fashion Gambler", GAME_NOT_WORKING )
 
