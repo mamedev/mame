@@ -269,6 +269,7 @@ static UINT8 duart68681_read_rx_fifo(duart68681_state *duart68681, int ch)
 		}
 	}
 	duart68681_update_interrupts(duart68681);
+
 	return r;
 };
 
@@ -321,8 +322,20 @@ READ8_DEVICE_HANDLER(duart68681_r)
 	offset &= 0xf;
 
 	LOG(( "Reading 68681 (%s) reg %x (%s) ", device->tag, offset, duart68681_reg_read_names[offset] ));
+
 	switch (offset)
 	{
+		case 0x00: /* MR1A/MR2A */
+			if ( duart68681->channel[0].MR_ptr == 0 )
+			{
+				r = duart68681->channel[0].MR1;
+				duart68681->channel[0].MR_ptr = 1;
+			}
+			else
+			{
+				r = duart68681->channel[0].MR2;
+			}
+			break;
 		case 0x01: /* SRA */
 			r = duart68681->channel[0].SR;
 			break;
@@ -345,6 +358,17 @@ READ8_DEVICE_HANDLER(duart68681_r)
 			break;
 		case 0x05: /* ISR */
 			r = duart68681->ISR;
+			break;
+		case 0x08: /* MR1B/MR2B */
+			if ( duart68681->channel[1].MR_ptr == 0 )
+			{
+				r = duart68681->channel[1].MR1;
+				duart68681->channel[1].MR_ptr = 1;
+			}
+			else
+			{
+				r = duart68681->channel[1].MR2;
+			}
 			break;
 		case 0x09: /* SRB */
 			r = duart68681->channel[1].SR;
@@ -381,6 +405,7 @@ READ8_DEVICE_HANDLER(duart68681_r)
 			break;
 	}
 	LOG(("returned %02x\n", r));
+
 	return r;
 }
 
@@ -390,6 +415,7 @@ WRITE8_DEVICE_HANDLER(duart68681_w)
 
 	offset &= 0x0f;
 	LOG(( "Writing 68681 (%s) reg %x (%s) with %04x\n", device->tag, offset, duart68681_reg_write_names[offset], data ));
+
 	switch(offset)
 	{
 		case 0x00: /* MRA */
