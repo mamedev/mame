@@ -116,7 +116,7 @@ static void hal21_sound_scheduler(running_machine *machine, int mode, int data)
 		return;
 	}
 
-	snk_sound_busy_bit = 0x20;
+	snk_sound_busy_bit = 0x01;
 	soundlatch_w(machine, 0, data);
 	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -576,7 +576,7 @@ static READ8_HANDLER( hal21_soundcommand_r )
 
 static WRITE8_HANDLER( aso_soundcommand_w )
 {
-	snk_sound_busy_bit = 0x20;
+	snk_sound_busy_bit = 0x01;
 	soundlatch_w(machine, 0, data);
 	cpunum_set_input_line(machine, 2, 0, HOLD_LINE );
 }

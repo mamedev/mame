@@ -117,35 +117,25 @@ WRITE8_HANDLER( arkanoid_68705_ddrC_w )
 	ddrC = data;
 }
 
-
-
-READ8_HANDLER( arkanoid_68705_input_0_r )
+CUSTOM_INPUT( arkanoid_68705_input_r )
 {
-	int res = input_port_read(machine, "IN0") & 0x3f;
+	int res = 0;
 
-	/* bit 0x40 comes from the sticky bit */
-	if (!z80write) res |= 0x40;
+	/* bit 0x40 of comes from the sticky bit */
+	if (!z80write) res |= 0x01;
 
 	/* bit 0x80 comes from a write latch */
-	if (!m68705write) res |= 0x80;
+	if (!m68705write) res |= 0x02;
 
 	return res;
 }
 
-READ8_HANDLER( arkanoid_input_2_r )
+CUSTOM_INPUT( arkanoid_input_mux )
 {
-	if (arkanoid_paddle_select)
-	{
-		arkanoid_paddle_value = input_port_read(machine, "IN3");
-	}
-	else
-	{
-		arkanoid_paddle_value = input_port_read(machine, "IN2");
-	}
-
-	return arkanoid_paddle_value;
+	const char *tag1 = param;
+	const char *tag2 = tag1 + strlen(tag1) + 1;
+	return input_port_read(field->port->machine, (arkanoid_paddle_select == 0) ? tag1 : tag2);
 }
-
 
 /*
 

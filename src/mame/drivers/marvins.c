@@ -104,15 +104,9 @@ static const namco_interface snkwave_interface =
 	0				/* stereo */
 };
 
-static void init_sound( int busy_bit )
-{
-	snk_sound_busy_bit = busy_bit;
-	sound_cpu_busy = 0;
-}
-
 static WRITE8_HANDLER( sound_command_w )
 {
-	sound_cpu_busy = snk_sound_busy_bit;
+	sound_cpu_busy = 0x01;
 	soundlatch_w(machine, 0, data);
 	cpunum_set_input_line(machine, 2, 0, HOLD_LINE);
 }
@@ -129,10 +123,9 @@ static READ8_HANDLER( sound_nmi_ack_r )
 	return 0;
 }
 
-/* this input port has one of its bits mapped to sound CPU status */
-static READ8_HANDLER( marvins_port_0_r )
-{
-	return(input_port_read(machine, "IN0") | sound_cpu_busy);
+static CUSTOM_INPUT( sound_status_r ) 
+{ 
+	return sound_cpu_busy; 
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -167,12 +160,12 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( marvins_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(marvins_palette_bank_w)
-	AM_RANGE(0x8000, 0x8000) AM_READ(marvins_port_0_r)	/* coin input, start, sound CPU status */
-	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("IN1")			/* player #1 controls */
-	AM_RANGE(0x8200, 0x8200) AM_READ_PORT("IN2")			/* player #2 controls */
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("P1")
+	AM_RANGE(0x8200, 0x8200) AM_READ_PORT("P2")
 	AM_RANGE(0x8300, 0x8300) AM_WRITE(sound_command_w)
-	AM_RANGE(0x8400, 0x8400) AM_READ_PORT("DSW1")		/* dipswitch#1 */
-	AM_RANGE(0x8500, 0x8500) AM_READ_PORT("DSW2")		/* dipswitch#2 */
+	AM_RANGE(0x8400, 0x8400) AM_READ_PORT("DSW1")
+	AM_RANGE(0x8500, 0x8500) AM_READ_PORT("DSW2")
 	AM_RANGE(0x8600, 0x8600) AM_RAM						/* video attribute */
 	AM_RANGE(0x8700, 0x8700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&spriteram) AM_SHARE(1)
@@ -193,15 +186,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( madcrash_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8000) AM_READ(marvins_port_0_r)	/* coin input, start, sound CPU status */
-	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("IN1")			/* player #1 controls */
-	AM_RANGE(0x8200, 0x8200) AM_READ_PORT("IN2")			/* player #2 controls */
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x8100, 0x8100) AM_READ_PORT("P1")
+	AM_RANGE(0x8200, 0x8200) AM_READ_PORT("P2")
 	AM_RANGE(0x8300, 0x8300) AM_WRITE(sound_command_w)
-	AM_RANGE(0x8400, 0x8400) AM_READ_PORT("DSW1")		/* dipswitch#1 */
-	AM_RANGE(0x8500, 0x8500) AM_READ_PORT("DSW2")		/* dipswitch#2 */
-	AM_RANGE(0x8600, 0x86ff) AM_RAM	// video attribute
+	AM_RANGE(0x8400, 0x8400) AM_READ_PORT("DSW1")
+	AM_RANGE(0x8500, 0x8500) AM_READ_PORT("DSW2")
+	AM_RANGE(0x8600, 0x86ff) AM_RAM						/* video attribute */
 	AM_RANGE(0x8700, 0x8700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
-//  AM_RANGE(0xc800, 0xc800) AM_WRITE(marvins_palette_bank_w)   // palette bank switch (c8f1 for Vanguard)
+//	AM_RANGE(0xc800, 0xc800) AM_WRITE(marvins_palette_bank_w)   // palette bank switch (c8f1 for Vanguard)
 	AM_RANGE(0xc800, 0xc8ff) AM_RAM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE(&spriteram) AM_SHARE(1)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(marvins_background_ram_w) AM_SHARE(2) AM_BASE(&spriteram_3)
@@ -221,17 +214,17 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( marvins )
-	PORT_START("IN0")
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* sound CPU status */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sound_status_r, NULL) /* sound CPU status */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START("IN1") /* player#1 controls */
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -240,7 +233,7 @@ static INPUT_PORTS_START( marvins )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2") /* player#2 controls */
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -302,17 +295,17 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( vangrd2 )
-	PORT_START("IN0")
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sound_status_r, NULL) /* sound CPU status */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
-	PORT_START("IN1") /* player#1 controls */
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -321,7 +314,7 @@ static INPUT_PORTS_START( vangrd2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2") /* player#2 controls */
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -384,17 +377,17 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( madcrash )
-	PORT_START("IN0")
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sound_status_r, NULL) /* sound CPU status */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("IN1") /* player#1 controls */
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -403,7 +396,7 @@ static INPUT_PORTS_START( madcrash )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2") /* player#2 controls */
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
@@ -745,7 +738,7 @@ ROM_END
 
 static DRIVER_INIT( marvins )
 {
-	init_sound( 0x40 );
+	sound_cpu_busy = 0;
 	snk_gamegroup = 0;
 }
 
@@ -759,14 +752,14 @@ static DRIVER_INIT( madcrash )
     UINT8 *mem = memory_region(machine, "main");
     mem[0x3a5d] = 0; mem[0x3a5e] = 0; mem[0x3a5f] = 0;
 */
-	init_sound( 0x20 );
+	sound_cpu_busy = 0;
 	snk_gamegroup = 1;
 	snk_irq_delay = 1700;
 }
 
 static DRIVER_INIT( vangrd2 )
 {
-	init_sound( 0x20 );
+	sound_cpu_busy = 0;
 	snk_gamegroup = 2;
 }
 

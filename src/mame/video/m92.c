@@ -462,7 +462,7 @@ VIDEO_UPDATE( m92 )
 	m92_screenrefresh(screen->machine, bitmap, cliprect);
 
 	/* Flipscreen appears hardwired to the dipswitch - strange */
-	if (input_port_read(screen->machine, "DIPS21") & 0x100)
+	if (input_port_read(screen->machine, "DSW") & 0x100)
 		flip_screen_set(0);
 	else
 		flip_screen_set(1);

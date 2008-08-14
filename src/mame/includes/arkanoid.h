@@ -43,8 +43,8 @@ extern READ8_HANDLER( arkanoid_68705_portC_r );
 extern WRITE8_HANDLER( arkanoid_68705_portC_w );
 extern WRITE8_HANDLER( arkanoid_68705_ddrC_w );
 
-extern READ8_HANDLER( arkanoid_68705_input_0_r );
-extern READ8_HANDLER( arkanoid_input_2_r );
+extern CUSTOM_INPUT( arkanoid_68705_input_r );
+extern CUSTOM_INPUT( arkanoid_input_mux );
 
 extern READ8_HANDLER( arkanoid_bootleg_f002_r );
 extern WRITE8_HANDLER( arkanoid_bootleg_d018_w );
