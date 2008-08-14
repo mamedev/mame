@@ -315,7 +315,7 @@ static void I386OP(bsr_r16_rm16)(void)		// Opcode 0x0f bd
 		I.ZF = 1;
 	} else {
 		I.ZF = 0;
-		temp = 15;
+		dst = temp = 15;
 		while( (src & (1 << temp)) == 0 ) {
 			temp--;
 			dst = temp;
