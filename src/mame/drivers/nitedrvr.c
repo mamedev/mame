@@ -35,7 +35,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "rescap.h"
+#include "machine/rescap.h"
 #include "sound/discrete.h"
 #include "nitedrvr.h"
 

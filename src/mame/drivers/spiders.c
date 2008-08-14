@@ -188,7 +188,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "rescap.h"
+#include "machine/rescap.h"
 #include "deprecat.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"

@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "segag80r.h"
-#include "rescap.h"
+#include "machine/rescap.h"
 #include "video/resnet.h"
 
 UINT8 segag80r_background_pcb;

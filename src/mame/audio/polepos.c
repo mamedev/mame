@@ -6,7 +6,7 @@
 #include "deprecat.h"
 #include "streams.h"
 #include "sound/filter.h"
-#include "rescap.h"
+#include "machine/rescap.h"
 #include "sound/custom.h"
 #include "namco54.h"
 #include "polepos.h"

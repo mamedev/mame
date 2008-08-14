@@ -38,7 +38,7 @@
 #ifndef __SN76477_H__
 #define __SN76477_H__
 
-#include "rescap.h"
+#include "machine/rescap.h"
 
 
 

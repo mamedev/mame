@@ -701,7 +701,7 @@ TODO:
 #include "includes/galaga.h"
 #include "sound/namco.h"
 #include "sound/namco52.h"
-#include "rescap.h"
+#include "machine/rescap.h"
 #include "sound/samples.h"
 #include "audio/namco54.h"
 #include "nam_cust.h"

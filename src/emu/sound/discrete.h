@@ -3,7 +3,7 @@
 #ifndef __DISCRETE_H__
 #define __DISCRETE_H__
 
-#include "rescap.h"
+#include "machine/rescap.h"
 
 /***********************************************************************
  *

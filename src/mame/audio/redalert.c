@@ -8,7 +8,7 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "rescap.h"
+#include "machine/rescap.h"
 #include "cpu/i8085/i8085.h"
 #include "machine/6821pia.h"
 #include "sound/ay8910.h"

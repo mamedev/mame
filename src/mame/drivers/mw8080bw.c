@@ -142,7 +142,7 @@
 
 #include "driver.h"
 #include "rendlay.h"
-#include "rescap.h"
+#include "machine/rescap.h"
 #include "mw8080bw.h"
 #include "machine/mb14241.h"
 

@@ -8,7 +8,7 @@
 
 #include "driver.h"
 #include "machine/74123.h"
-#include "rescap.h"
+#include "machine/rescap.h"
 
 
 #define	LOG		(0)
