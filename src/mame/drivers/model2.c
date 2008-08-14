@@ -310,8 +310,11 @@ static WRITE32_HANDLER( timers_w )
 	model2_timerrun[offset] = 1;
 }
 
-static void model2_timer_exp(running_machine *machine, int tnum, int bit)
+static TIMER_CALLBACK( model2_timer_cb )
 {
+	int tnum = (int)ptr;
+	int bit = tnum + 2;
+
 	timer_adjust_oneshot(model2_timers[tnum], attotime_never, 0);
 
 	model2_intreq |= (1<<bit);
@@ -324,13 +327,10 @@ static void model2_timer_exp(running_machine *machine, int tnum, int bit)
 	model2_timerrun[tnum] = 0;
 }
 
-static TIMER_CALLBACK( model2_timer_0_cb ) { model2_timer_exp(machine, 0, 2); }
-static TIMER_CALLBACK( model2_timer_1_cb ) { model2_timer_exp(machine, 1, 3); }
-static TIMER_CALLBACK( model2_timer_2_cb ) { model2_timer_exp(machine, 2, 4); }
-static TIMER_CALLBACK( model2_timer_3_cb ) { model2_timer_exp(machine, 3, 5); }
-
 static MACHINE_RESET(model2_common)
 {
+	int i;
+
 	model2_intreq = 0;
 	model2_intena = 0;
 	model2_coproctl = 0;
@@ -347,15 +347,11 @@ static MACHINE_RESET(model2_common)
 
 	model2_timerrun[0] = model2_timerrun[1] = model2_timerrun[2] = model2_timerrun[3] = 0;
 
-	model2_timers[0] = timer_alloc(model2_timer_0_cb, NULL);
-	model2_timers[1] = timer_alloc(model2_timer_1_cb, NULL);
-	model2_timers[2] = timer_alloc(model2_timer_2_cb, NULL);
-	model2_timers[3] = timer_alloc(model2_timer_3_cb, NULL);
-
-	timer_adjust_oneshot(model2_timers[0], attotime_never, 0);
-	timer_adjust_oneshot(model2_timers[1], attotime_never, 0);
-	timer_adjust_oneshot(model2_timers[2], attotime_never, 0);
-	timer_adjust_oneshot(model2_timers[3], attotime_never, 0);
+	for (i=0; i<4; i++)
+	{
+		model2_timers[i] = timer_alloc(model2_timer_cb, (void*)i);
+		timer_adjust_oneshot(model2_timers[i], attotime_never, 0);
+	}
 }
 
 static MACHINE_RESET(model2o)

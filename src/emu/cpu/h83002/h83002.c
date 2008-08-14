@@ -336,11 +336,7 @@ static void h8_init(int index, int clock, const void *config, int (*irqcallback)
 
 	state_save_register_item_array("H8/3002", index, h8.per_regs);
 	state_save_register_item("H8/3002", index, h8.h8TSTR);
-	state_save_register_item("H8/3002", index, h8.h8TCNT0);
-	state_save_register_item("H8/3002", index, h8.h8TCNT1);
-	state_save_register_item("H8/3002", index, h8.h8TCNT2);
-	state_save_register_item("H8/3002", index, h8.h8TCNT3);
-	state_save_register_item("H8/3002", index, h8.h8TCNT4);
+	state_save_register_item_array("H8/3002", index, h8.h8TCNT);
 
 	state_save_register_postload(Machine, h8_onstateload, NULL);
 

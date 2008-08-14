@@ -86,9 +86,7 @@ typedef struct
 	emu_timer *dma_timer[4];
 	emu_timer *refresh_timer;
 	emu_timer *rtc_timer;
-	emu_timer *timer0;
-	emu_timer *timer1;
-	emu_timer *timer2;
+	emu_timer *timer[3];
 	UINT32	refresh_timer_base;
 	int     dma_timer_active[2];
 
@@ -117,6 +115,10 @@ static const int exception_codes[] = { 0x000, 0x020, 0x000, 0x140, 0x140, 0x1E0,
 	0x320, 0x340, 0x360, 0x380, 0x3A0, 0x3C0, 0x240, 0x2A0, 0x300, 0x360, 0x600, 0x620, 0x640, 0x660, 0x680, 0x6A0, 0x780, 0x7A0, 0x7C0,
 	0x7E0, 0x6C0, 0xB00, 0xB80, 0x400, 0x420, 0x440, 0x460, 0x480, 0x4A0, 0x4C0, 0x4E0, 0x500, 0x520, 0x540, 0x700, 0x720, 0x740, 0x760,
 	0x560, 0x580, 0x5A0 };
+
+static const UINT16 tcnt[] = { TCNT0, TCNT1, TCNT2 };
+static const UINT16 tcor[] = { TCOR0, TCOR1, TCOR2 };
+static const UINT16 tcr[] = { TCR0, TCR1, TCR2 };
 
 enum
 {
@@ -3590,9 +3592,9 @@ static void sh4_reset(void)
 	tsaved[3] = sh4.dma_timer[3];
 	tsave[0] = sh4.refresh_timer;
 	tsave[1] = sh4.rtc_timer;
-	tsave[2] = sh4.timer0;
-	tsave[3] = sh4.timer1;
-	tsave[4] = sh4.timer2;
+	tsave[2] = sh4.timer[0];
+	tsave[3] = sh4.timer[1];
+	tsave[4] = sh4.timer[2];
 
 	f = sh4.ftcsr_read_callback;
 	save_irqcallback = sh4.irq_callback;
@@ -3614,9 +3616,9 @@ static void sh4_reset(void)
 	sh4.dma_timer[3] = tsaved[3];
 	sh4.refresh_timer = tsave[0];
 	sh4.rtc_timer = tsave[1];
-	sh4.timer0 = tsave[2];
-	sh4.timer1 = tsave[3];
-	sh4.timer2 = tsave[4];
+	sh4.timer[0] = tsave[2];
+	sh4.timer[1] = tsave[3];
+	sh4.timer[2] = tsave[4];
 	sh4.cpu_number = cpunum;
 	sh4.m = m;
 	memset(sh4.m, 0, 16384*4);
@@ -3756,28 +3758,12 @@ static UINT32 compute_ticks_timer(emu_timer *timer, int hertz, int divisor)
 	return (UINT32)ret;
 }
 
-static void sh4_timer0_recompute(void)
+static void sh4_timer_recompute(int which)
 {
 	double ticks;
 
-	ticks = sh4.m[TCNT0];
-	timer_adjust_oneshot(sh4.timer0, sh4_scale_up_mame_time(attotime_mul(ATTOTIME_IN_HZ(sh4.pm_clock), tcnt_div[sh4.m[TCR0] & 7]), ticks), sh4.cpu_number);
-}
-
-static void sh4_timer1_recompute(void)
-{
-	double ticks;
-
-	ticks = sh4.m[TCNT1];
-	timer_adjust_oneshot(sh4.timer1, sh4_scale_up_mame_time(attotime_mul(ATTOTIME_IN_HZ(sh4.pm_clock), tcnt_div[sh4.m[TCR1] & 7]), ticks), sh4.cpu_number);
-}
-
-static void sh4_timer2_recompute(void)
-{
-	double ticks;
-
-	ticks = sh4.m[TCNT2];
-	timer_adjust_oneshot(sh4.timer2, sh4_scale_up_mame_time(attotime_mul(ATTOTIME_IN_HZ(sh4.pm_clock), tcnt_div[sh4.m[TCR2] & 7]), ticks), sh4.cpu_number);
+	ticks = sh4.m[tcnt[which]];
+	timer_adjust_oneshot(sh4.timer[which], sh4_scale_up_mame_time(attotime_mul(ATTOTIME_IN_HZ(sh4.pm_clock), tcnt_div[sh4.m[tcr[which]] & 7]), ticks), sh4.cpu_number);
 }
 
 static TIMER_CALLBACK( sh4_refresh_timer_callback )
@@ -3909,42 +3895,19 @@ static TIMER_CALLBACK( sh4_rtc_timer_callback )
 	cpuintrf_pop_context();
 }
 
-static TIMER_CALLBACK( sh4_timer0_callback )
+static TIMER_CALLBACK( sh4_timer_callback )
 {
+	static const UINT16 tuni[] = { SH4_INTC_TUNI0, SH4_INTC_TUNI1, SH4_INTC_TUNI2 };
+	int which = (int)ptr;
 	int cpunum = param;
+	int idx = tcr[which];
 
 	cpuintrf_push_context(cpunum);
-	sh4.m[TCNT0] = sh4.m[TCOR0];
-	sh4_timer0_recompute();
-	sh4.m[TCR0] = sh4.m[TCR0] | 0x100;
-	if (sh4.m[TCR0] & 0x20)
-		sh4_exception_request(SH4_INTC_TUNI0);
-	cpuintrf_pop_context();
-}
-
-static TIMER_CALLBACK( sh4_timer1_callback )
-{
-	int cpunum = param;
-
-	cpuintrf_push_context(cpunum);
-	sh4.m[TCNT1] = sh4.m[TCOR1];
-	sh4_timer1_recompute();
-	sh4.m[TCR1] = sh4.m[TCR1] | 0x100;
-	if (sh4.m[TCR1] & 0x20)
-		sh4_exception_request(SH4_INTC_TUNI1);
-	cpuintrf_pop_context();
-}
-
-static TIMER_CALLBACK( sh4_timer2_callback )
-{
-	int cpunum = param;
-
-	cpuintrf_push_context(cpunum);
-	sh4.m[TCNT2] = sh4.m[TCOR2];
-	sh4_timer2_recompute();
-	sh4.m[TCR2] = sh4.m[TCR2] | 0x100;
-	if (sh4.m[TCR2] & 0x20)
-		sh4_exception_request(SH4_INTC_TUNI2);
+	sh4.m[tcnt[which]] = sh4.m[tcor[which]];
+	sh4_timer_recompute(which);
+	sh4.m[idx] = sh4.m[idx] | 0x100;
+	if (sh4.m[idx] & 0x20)
+		sh4_exception_request(tuni[which]);
 	cpuintrf_pop_context();
 }
 
@@ -4258,32 +4221,32 @@ WRITE32_HANDLER( sh4_internal_w )
 		// TMU
 	case TSTR:
 		if (old & 1)
-			sh4.m[TCNT0] = compute_ticks_timer(sh4.timer0, sh4.pm_clock, tcnt_div[sh4.m[TCR0] & 7]);
+			sh4.m[TCNT0] = compute_ticks_timer(sh4.timer[0], sh4.pm_clock, tcnt_div[sh4.m[TCR0] & 7]);
 		if ((sh4.m[TSTR] & 1) == 0) {
-			timer_adjust_oneshot(sh4.timer0, attotime_never, 0);
+			timer_adjust_oneshot(sh4.timer[0], attotime_never, 0);
 		} else
-			sh4_timer0_recompute();
+			sh4_timer_recompute(0);
 
 		if (old & 2)
-			sh4.m[TCNT1] = compute_ticks_timer(sh4.timer1, sh4.pm_clock, tcnt_div[sh4.m[TCR1] & 7]);
+			sh4.m[TCNT1] = compute_ticks_timer(sh4.timer[1], sh4.pm_clock, tcnt_div[sh4.m[TCR1] & 7]);
 		if ((sh4.m[TSTR] & 2) == 0) {
-			timer_adjust_oneshot(sh4.timer1, attotime_never, 0);
+			timer_adjust_oneshot(sh4.timer[1], attotime_never, 0);
 		} else
-			sh4_timer1_recompute();
+			sh4_timer_recompute(1);
 
 		if (old & 4)
-			sh4.m[TCNT2] = compute_ticks_timer(sh4.timer2, sh4.pm_clock, tcnt_div[sh4.m[TCR2] & 7]);
+			sh4.m[TCNT2] = compute_ticks_timer(sh4.timer[2], sh4.pm_clock, tcnt_div[sh4.m[TCR2] & 7]);
 		if ((sh4.m[TSTR] & 4) == 0) {
-			timer_adjust_oneshot(sh4.timer2, attotime_never, 0);
+			timer_adjust_oneshot(sh4.timer[2], attotime_never, 0);
 		} else
-			sh4_timer2_recompute();
+			sh4_timer_recompute(2);
 		break;
 
 	case TCR0:
 		if (sh4.m[TSTR] & 1)
 		{
-			sh4.m[TCNT0] = compute_ticks_timer(sh4.timer0, sh4.pm_clock, tcnt_div[old & 7]);
-			sh4_timer0_recompute();
+			sh4.m[TCNT0] = compute_ticks_timer(sh4.timer[0], sh4.pm_clock, tcnt_div[old & 7]);
+			sh4_timer_recompute(0);
 		}
 		if (!(sh4.m[TCR0] & 0x20) || !(sh4.m[TCR0] & 0x100))
 			sh4_exception_unrequest(SH4_INTC_TUNI0);
@@ -4291,8 +4254,8 @@ WRITE32_HANDLER( sh4_internal_w )
 	case TCR1:
 		if (sh4.m[TSTR] & 2)
 		{
-			sh4.m[TCNT1] = compute_ticks_timer(sh4.timer1, sh4.pm_clock, tcnt_div[old & 7]);
-			sh4_timer1_recompute();
+			sh4.m[TCNT1] = compute_ticks_timer(sh4.timer[1], sh4.pm_clock, tcnt_div[old & 7]);
+			sh4_timer_recompute(1);
 		}
 		if (!(sh4.m[TCR1] & 0x20) || !(sh4.m[TCR1] & 0x100))
 			sh4_exception_unrequest(SH4_INTC_TUNI1);
@@ -4300,8 +4263,8 @@ WRITE32_HANDLER( sh4_internal_w )
 	case TCR2:
 		if (sh4.m[TSTR] & 4)
 		{
-			sh4.m[TCNT2] = compute_ticks_timer(sh4.timer2, sh4.pm_clock, tcnt_div[old & 7]);
-			sh4_timer2_recompute();
+			sh4.m[TCNT2] = compute_ticks_timer(sh4.timer[2], sh4.pm_clock, tcnt_div[old & 7]);
+			sh4_timer_recompute(2);
 		}
 		if (!(sh4.m[TCR2] & 0x20) || !(sh4.m[TCR2] & 0x100))
 			sh4_exception_unrequest(SH4_INTC_TUNI2);
@@ -4310,35 +4273,35 @@ WRITE32_HANDLER( sh4_internal_w )
 	case TCOR0:
 		if (sh4.m[TSTR] & 1)
 		{
-			sh4.m[TCNT0] = compute_ticks_timer(sh4.timer0, sh4.pm_clock, tcnt_div[sh4.m[TCR0] & 7]);
-			sh4_timer0_recompute();
+			sh4.m[TCNT0] = compute_ticks_timer(sh4.timer[0], sh4.pm_clock, tcnt_div[sh4.m[TCR0] & 7]);
+			sh4_timer_recompute(0);
 		}
 		break;
 	case TCNT0:
 		if (sh4.m[TSTR] & 1)
-			sh4_timer0_recompute();
+			sh4_timer_recompute(0);
 		break;
 	case TCOR1:
 		if (sh4.m[TSTR] & 2)
 		{
-			sh4.m[TCNT1] = compute_ticks_timer(sh4.timer1, sh4.pm_clock, tcnt_div[sh4.m[TCR1] & 7]);
-			sh4_timer1_recompute();
+			sh4.m[TCNT1] = compute_ticks_timer(sh4.timer[1], sh4.pm_clock, tcnt_div[sh4.m[TCR1] & 7]);
+			sh4_timer_recompute(1);
 		}
 		break;
 	case TCNT1:
 		if (sh4.m[TSTR] & 2)
-			sh4_timer1_recompute();
+			sh4_timer_recompute(1);
 		break;
 	case TCOR2:
 		if (sh4.m[TSTR] & 4)
 		{
-			sh4.m[TCNT2] = compute_ticks_timer(sh4.timer2, sh4.pm_clock, tcnt_div[sh4.m[TCR2] & 7]);
-			sh4_timer2_recompute();
+			sh4.m[TCNT2] = compute_ticks_timer(sh4.timer[2], sh4.pm_clock, tcnt_div[sh4.m[TCR2] & 7]);
+			sh4_timer_recompute(2);
 		}
 		break;
 	case TCNT2:
 		if (sh4.m[TSTR] & 4)
-			sh4_timer2_recompute();
+			sh4_timer_recompute(2);
 		break;
 
 		// INTC
@@ -4483,19 +4446,19 @@ READ32_HANDLER( sh4_internal_r )
 
 	case TCNT0:
 		if (sh4.m[TSTR] & 1)
-			return compute_ticks_timer(sh4.timer0, sh4.pm_clock, tcnt_div[sh4.m[TCR0] & 7]);
+			return compute_ticks_timer(sh4.timer[0], sh4.pm_clock, tcnt_div[sh4.m[TCR0] & 7]);
 		else
 			return sh4.m[TCNT0];
 		break;
 	case TCNT1:
 		if (sh4.m[TSTR] & 2)
-			return compute_ticks_timer(sh4.timer1, sh4.pm_clock, tcnt_div[sh4.m[TCR1] & 7]);
+			return compute_ticks_timer(sh4.timer[1], sh4.pm_clock, tcnt_div[sh4.m[TCR1] & 7]);
 		else
 			return sh4.m[TCNT1];
 		break;
 	case TCNT2:
 		if (sh4.m[TSTR] & 4)
-			return compute_ticks_timer(sh4.timer2, sh4.pm_clock, tcnt_div[sh4.m[TCR2] & 7]);
+			return compute_ticks_timer(sh4.timer[2], sh4.pm_clock, tcnt_div[sh4.m[TCR2] & 7]);
 		else
 			return sh4.m[TCNT2];
 		break;
@@ -4686,23 +4649,20 @@ static offs_t sh4_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 
 
 static void sh4_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
+	int i;
 	const struct sh4_config *conf = config;
 
-	sh4.timer0 = timer_alloc(sh4_timer0_callback, NULL);
-	timer_adjust_oneshot(sh4.timer0, attotime_never, 0);
-	sh4.timer1 = timer_alloc(sh4_timer1_callback, NULL);
-	timer_adjust_oneshot(sh4.timer1, attotime_never, 0);
-	sh4.timer2 = timer_alloc(sh4_timer2_callback, NULL);
-	timer_adjust_oneshot(sh4.timer2, attotime_never, 0);
+	for (i=0; i<3; i++)
+	{
+		sh4.timer[i] = timer_alloc(sh4_timer_callback, (void*)i);
+		timer_adjust_oneshot(sh4.timer[i], attotime_never, 0);
+	}
 
-	sh4.dma_timer[0] = timer_alloc(sh4_dmac_callback, NULL);
-	timer_adjust_oneshot(sh4.dma_timer[0], attotime_never, 0);
-	sh4.dma_timer[1] = timer_alloc(sh4_dmac_callback, NULL);
-	timer_adjust_oneshot(sh4.dma_timer[1], attotime_never, 0);
-	sh4.dma_timer[2] = timer_alloc(sh4_dmac_callback, NULL);
-	timer_adjust_oneshot(sh4.dma_timer[2], attotime_never, 0);
-	sh4.dma_timer[3] = timer_alloc(sh4_dmac_callback, NULL);
-	timer_adjust_oneshot(sh4.dma_timer[3], attotime_never, 0);
+	for (i=0; i<4; i++)
+	{
+		sh4.dma_timer[i] = timer_alloc(sh4_dmac_callback, NULL);
+		timer_adjust_oneshot(sh4.dma_timer[i], attotime_never, 0);
+	}
 
 	sh4.refresh_timer = timer_alloc(sh4_refresh_timer_callback, NULL);
 	timer_adjust_oneshot(sh4.refresh_timer, attotime_never, 0);

@@ -32,63 +32,22 @@
 #define TCR3	(0x82)
 #define TCR4	(0x92)
 
-static TIMER_CALLBACK( h8itu_timer_0_cb )
-{
-	timer_adjust_oneshot(h8.timer[0], attotime_never, 0);
-	h8.h8TCNT0 = 0;
-	h8.per_regs[TSR0] |= 4;
-	// interrupt on overflow ?
-	if(h8.per_regs[TIER0] & 4)
-	{
-		h8_3002_InterruptRequest(26);
-	}
-}
+static const UINT8 tsr[5] = { TSR0, TSR1, TSR2, TSR3, TSR4 };
+static const UINT8 tier[5] = { TIER0, TIER1, TIER2, TIER3, TIER4 };
+static const UINT8 tcr[5] = { TCR0, TCR1, TCR2, TCR3, TCR4 };
+static const int tscales[4] = { 1, 2, 4, 8 };
 
-static TIMER_CALLBACK( h8itu_timer_1_cb )
+static TIMER_CALLBACK( h8itu_timer_cb )
 {
-	timer_adjust_oneshot(h8.timer[1], attotime_never, 0);
-	h8.h8TCNT1 = 0;
-	h8.per_regs[TSR1] |= 4;
-	// interrupt on overflow ?
-	if(h8.per_regs[TIER1] & 4)
-	{
-		h8_3002_InterruptRequest(30);
-	}
-}
 
-static TIMER_CALLBACK( h8itu_timer_2_cb )
-{
-	timer_adjust_oneshot(h8.timer[2], attotime_never, 0);
-	h8.h8TCNT2 = 0;
-	h8.per_regs[TSR2] |= 4;
+	int which = (int)ptr;
+	timer_adjust_oneshot(h8.timer[which], attotime_never, 0);
+	h8.h8TCNT[which] = 0;
+	h8.per_regs[tsr[which]] |= 4;
 	// interrupt on overflow ?
-	if(h8.per_regs[TIER2] & 4)
+	if(h8.per_regs[tier[which]] & 4)
 	{
-		h8_3002_InterruptRequest(34);
-	}
-}
-
-static TIMER_CALLBACK( h8itu_timer_3_cb )
-{
-	timer_adjust_oneshot(h8.timer[3], attotime_never, 0);
-	h8.h8TCNT3 = 0;
-	h8.per_regs[TSR3] |= 4;
-	// interrupt on overflow ?
-	if(h8.per_regs[TIER3] & 4)
-	{
-		h8_3002_InterruptRequest(38);
-	}
-}
-
-static TIMER_CALLBACK( h8itu_timer_4_cb )
-{
-	timer_adjust_oneshot(h8.timer[4], attotime_never, 0);
-	h8.h8TCNT4 = 0;
-	h8.per_regs[TSR4] |= 4;
-	// interrupt on overflow ?
-	if(h8.per_regs[TIER4] & 4)
-	{
-		h8_3002_InterruptRequest(42);
+		h8_3002_InterruptRequest(26 + 4*which);
 	}
 }
 
@@ -97,31 +56,9 @@ static void h8_itu_refresh_timer(int tnum)
 	int ourTCR = 0;
 	int ourTVAL = 0;
 	attotime period;
-	static const int tscales[4] = { 1, 2, 4, 8 };
 
-	switch (tnum)
-	{
-		case 0:
-			ourTCR = h8.per_regs[TCR0];
-			ourTVAL = h8.h8TCNT0;
-			break;
-		case 1:
-			ourTCR = h8.per_regs[TCR1];
-			ourTVAL = h8.h8TCNT1;
-			break;
-		case 2:
-			ourTCR = h8.per_regs[TCR2];
-			ourTVAL = h8.h8TCNT2;
-			break;
-		case 3:
-			ourTCR = h8.per_regs[TCR3];
-			ourTVAL = h8.h8TCNT3;
-			break;
-		case 4:
-			ourTCR = h8.per_regs[TCR4];
-			ourTVAL = h8.h8TCNT4;
-			break;
-	}
+	ourTCR = h8.per_regs[tcr[tnum]];
+	ourTVAL = h8.h8TCNT[tnum];
 
 	period = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(h8.cpu_number)), tscales[ourTCR & 3] * (65536 - ourTVAL));
 
@@ -138,26 +75,8 @@ static void h8_itu_sync_timers(int tnum)
 	int ourTCR = 0;
 	attotime cycle_time, cur;
 	UINT16 ratio;
-	static const int tscales[4] = { 1, 2, 4, 8 };
 
-	switch (tnum)
-	{
-		case 0:
-			ourTCR = h8.per_regs[TCR0];
-			break;
-		case 1:
-			ourTCR = h8.per_regs[TCR1];
-			break;
-		case 2:
-			ourTCR = h8.per_regs[TCR2];
-			break;
-		case 3:
-			ourTCR = h8.per_regs[TCR3];
-			break;
-		case 4:
-			ourTCR = h8.per_regs[TCR4];
-			break;
-	}
+	ourTCR = h8.per_regs[tcr[tnum]];
 
 	// get the time per unit
 	cycle_time = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(h8.cpu_number)), tscales[ourTCR & 3]);
@@ -165,24 +84,7 @@ static void h8_itu_sync_timers(int tnum)
 
 	ratio = attotime_to_double(cur) / attotime_to_double(cycle_time);
 
-	switch (tnum)
-	{
-		case 0:
-			h8.h8TCNT0 = ratio;
-			break;
-		case 1:
-			h8.h8TCNT1 = ratio;
-			break;
-		case 2:
-			h8.h8TCNT2 = ratio;
-			break;
-		case 3:
-			h8.h8TCNT3 = ratio;
-			break;
-		case 4:
-			h8.h8TCNT4 = ratio;
-			break;
-	}
+	h8.h8TCNT[tnum] = ratio;
 }
 
 UINT8 h8_itu_read8(UINT8 reg)
@@ -196,35 +98,35 @@ UINT8 h8_itu_read8(UINT8 reg)
 		break;
 	case 0x68:
 		h8_itu_sync_timers(0);
-		val = h8.h8TCNT0>>8;
+		val = h8.h8TCNT[0]>>8;
 		break;
 	case 0x69:
 		h8_itu_sync_timers(0);
-		val = h8.h8TCNT0&0xff;
+		val = h8.h8TCNT[0]&0xff;
 		break;
 	case 0x72:
 		h8_itu_sync_timers(1);
-		val = h8.h8TCNT1>>8;
+		val = h8.h8TCNT[1]>>8;
 		break;
 	case 0x73:
 		h8_itu_sync_timers(1);
-		val = h8.h8TCNT1&0xff;
+		val = h8.h8TCNT[1]&0xff;
 		break;
 	case 0x7c:
 		h8_itu_sync_timers(2);
-		val = h8.h8TCNT2>>8;
+		val = h8.h8TCNT[2]>>8;
 		break;
 	case 0x7d:
 		h8_itu_sync_timers(2);
-		val = h8.h8TCNT2&0xff;
+		val = h8.h8TCNT[2]&0xff;
 		break;
 	case 0x86:
 		h8_itu_sync_timers(3);
-		val = h8.h8TCNT3>>8;
+		val = h8.h8TCNT[3]>>8;
 		break;
 	case 0x87:
 		h8_itu_sync_timers(3);
-		val = h8.h8TCNT3&0xff;
+		val = h8.h8TCNT[3]&0xff;
 		break;
 	default:
 		val = h8.per_regs[reg];
@@ -264,70 +166,70 @@ void h8_itu_write8(UINT8 reg, UINT8 val)
 		h8.h8TSTR = val;
 		break;
 	case 0x68:
-		h8.h8TCNT0 = (val<<8) | (h8.h8TCNT0 & 0xff);
+		h8.h8TCNT[0] = (val<<8) | (h8.h8TCNT[0] & 0xff);
 		if (h8.h8TSTR & 1)
 		{
 			h8_itu_refresh_timer(0);
 		}
 		break;
 	case 0x69:
-		h8.h8TCNT0 = (val) | (h8.h8TCNT0 & 0xff00);
+		h8.h8TCNT[0] = (val) | (h8.h8TCNT[0] & 0xff00);
 		if (h8.h8TSTR & 1)
 		{
 			h8_itu_refresh_timer(0);
 		}
 		break;
 	case 0x72:
-		h8.h8TCNT1 = (val<<8) | (h8.h8TCNT1 & 0xff);
+		h8.h8TCNT[1] = (val<<8) | (h8.h8TCNT[1] & 0xff);
 		if (h8.h8TSTR & 2)
 		{
 			h8_itu_refresh_timer(1);
 		}
 		break;
 	case 0x73:
-		h8.h8TCNT1 = (val) | (h8.h8TCNT1 & 0xff00);
+		h8.h8TCNT[1] = (val) | (h8.h8TCNT[1] & 0xff00);
 		if (h8.h8TSTR & 2)
 		{
 			h8_itu_refresh_timer(1);
 		}
 		break;
 	case 0x7c:
-		h8.h8TCNT2 = (val<<8) | (h8.h8TCNT2 & 0xff);
+		h8.h8TCNT[2] = (val<<8) | (h8.h8TCNT[2] & 0xff);
 		if (h8.h8TSTR & 4)
 		{
 			h8_itu_refresh_timer(2);
 		}
 		break;
 	case 0x7d:
-		h8.h8TCNT2 = (val) | (h8.h8TCNT2 & 0xff00);
+		h8.h8TCNT[2] = (val) | (h8.h8TCNT[2] & 0xff00);
 		if (h8.h8TSTR & 4)
 		{
 			h8_itu_refresh_timer(2);
 		}
 		break;
 	case 0x86:
-		h8.h8TCNT3 = (val<<8) | (h8.h8TCNT3 & 0xff);
+		h8.h8TCNT[3] = (val<<8) | (h8.h8TCNT[3] & 0xff);
 		if (h8.h8TSTR & 8)
 		{
 			h8_itu_refresh_timer(3);
 		}
 		break;
 	case 0x87:
-		h8.h8TCNT3 = (val) | (h8.h8TCNT3 & 0xff00);
+		h8.h8TCNT[3] = (val) | (h8.h8TCNT[3] & 0xff00);
 		if (h8.h8TSTR & 8)
 		{
 			h8_itu_refresh_timer(3);
 		}
 		break;
 	case 0x96:
-		h8.h8TCNT4 = (val<<8) | (h8.h8TCNT4 & 0xff);
+		h8.h8TCNT[4] = (val<<8) | (h8.h8TCNT[4] & 0xff);
 		if (h8.h8TSTR & 0x10)
 		{
 			h8_itu_refresh_timer(4);
 		}
 		break;
 	case 0x97:
-		h8.h8TCNT4 = (val) | (h8.h8TCNT4 & 0xff00);
+		h8.h8TCNT[4] = (val) | (h8.h8TCNT[4] & 0xff00);
 		if (h8.h8TSTR & 0x10)
 		{
 			h8_itu_refresh_timer(4);
@@ -513,7 +415,6 @@ void h8_register_write8(UINT32 address, UINT8 val)
 static void h8_3007_itu_refresh_timer(int tnum)
 {
 	attotime period;
-	static const int tscales[4] = { 1, 2, 4, 8 };
 	int ourTCR = h8.per_regs[0x68+(tnum*8)];
 
 	period = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(h8.cpu_number)), tscales[ourTCR & 3]);
@@ -526,33 +427,34 @@ static void h8_3007_itu_refresh_timer(int tnum)
 	timer_adjust_oneshot(h8.timer[tnum], period, 0);
 }
 
-INLINE void h8itu_3007_timer_cb(int tnum)
+static TIMER_CALLBACK( h8itu_3007_timer_cb )
 {
+	int tnum = (int)ptr;
 	int base = 0x68 + (tnum*8);
 	UINT16 count = (h8.per_regs[base + 0x2]<<8) | h8.per_regs[base + 0x3];
 	count++;
 
-//  logerror("h8/3007 timer %d count = %04x\n",tnum,count);
+	//logerror("h8/3007 timer %d count = %04x\n",tnum,count);
 
-	 // GRA match
+	// GRA match
 	if ((h8.per_regs[base + 0x1] & 0x03) && (count == ((h8.per_regs[base + 0x4]<<8) | h8.per_regs[base + 0x5])))
 	{
 		if ((h8.per_regs[base + 0x0] & 0x60) == 0x20)
 		{
-//          logerror("h8/3007 timer %d GRA match, restarting\n",tnum);
+			//logerror("h8/3007 timer %d GRA match, restarting\n",tnum);
 			count = 0;
 			h8_3007_itu_refresh_timer(tnum);
 		}
 		else
 		{
-//          logerror("h8/3007 timer %d GRA match, stopping\n",tnum);
+			//logerror("h8/3007 timer %d GRA match, stopping\n",tnum);
 			timer_adjust_oneshot(h8.timer[tnum], attotime_never, 0);
 		}
 
 		h8.per_regs[0x64] |= 1<<tnum;
 		if(h8.per_regs[0x64] & (4<<tnum))	// interrupt enable
 		{
-//          logerror("h8/3007 timer %d GRA INTERRUPT\n",tnum);
+			//logerror("h8/3007 timer %d GRA INTERRUPT\n",tnum);
 			h8_3002_InterruptRequest(24+tnum*4);
 		}
 	}
@@ -561,31 +463,31 @@ INLINE void h8itu_3007_timer_cb(int tnum)
 	{
 		if ((h8.per_regs[base + 0x0] & 0x60) == 0x40)
 		{
-//          logerror("h8/3007 timer %d GRB match, restarting\n",tnum);
+			//logerror("h8/3007 timer %d GRB match, restarting\n",tnum);
 			count = 0;
 			h8_3007_itu_refresh_timer(tnum);
 		}
 		else
 		{
-//          logerror("h8/3007 timer %d GRB match, stopping\n",tnum);
+			//logerror("h8/3007 timer %d GRB match, stopping\n",tnum);
 			timer_adjust_oneshot(h8.timer[tnum], attotime_never, 0);
 		}
 
 		h8.per_regs[0x65] |= 1<<tnum;
 		if(h8.per_regs[0x65] & (4<<tnum))	// interrupt enable
 		{
-//          logerror("h8/3007 timer %d GRB INTERRUPT\n",tnum);
+			//logerror("h8/3007 timer %d GRB INTERRUPT\n",tnum);
 			h8_3002_InterruptRequest(25+tnum*4);
 		}
 	}
 	// Overflow
 	if (((h8.per_regs[base + 0x1] & 0x33) == 0) && (count == 0))
 	{
-//      logerror("h8/3007 timer %d OVF match, restarting\n",tnum);
+		//logerror("h8/3007 timer %d OVF match, restarting\n",tnum);
 		h8.per_regs[0x66] |= 1<<tnum;
 		if(h8.per_regs[0x66] & (4<<tnum))	// interrupt enable
 		{
-//          logerror("h8/3007 timer %d OVF INTERRUPT\n",tnum);
+			//logerror("h8/3007 timer %d OVF INTERRUPT\n",tnum);
 			h8_3002_InterruptRequest(26+tnum*4);
 		}
 	}
@@ -593,20 +495,6 @@ INLINE void h8itu_3007_timer_cb(int tnum)
 	h8.per_regs[base + 0x2] = count >> 8;
 	h8.per_regs[base + 0x3] = count & 0xff;
 }
-
-static TIMER_CALLBACK( h8itu_3007_timer_0_cb )
-{
-	h8itu_3007_timer_cb(0);
-}
-static TIMER_CALLBACK( h8itu_3007_timer_1_cb )
-{
-	h8itu_3007_timer_cb(1);
-}
-static TIMER_CALLBACK( h8itu_3007_timer_2_cb )
-{
-	h8itu_3007_timer_cb(2);
-}
-
 
 UINT8 h8_3007_itu_read8(UINT8 reg)
 {
@@ -627,7 +515,7 @@ UINT8 h8_3007_itu_read8(UINT8 reg)
 
 void h8_3007_itu_write8(UINT8 reg, UINT8 val)
 {
-//  logerror("%06x: h8/3007 reg %02x = %02x\n",activecpu_get_pc(),reg,val);
+	//logerror("%06x: h8/3007 reg %02x = %02x\n",activecpu_get_pc(),reg,val);
 	h8.per_regs[reg] = val;
 	switch(reg)
 	{
@@ -816,20 +704,20 @@ void h8_3007_register1_write8(UINT32 address, UINT8 val)
 
 void h8_3007_itu_init(void)
 {
-	h8.timer[0] = timer_alloc(h8itu_3007_timer_0_cb, NULL);
-	h8.timer[1] = timer_alloc(h8itu_3007_timer_1_cb, NULL);
-	h8.timer[2] = timer_alloc(h8itu_3007_timer_2_cb, NULL);
+	int i;
+
+	for (i=0; i<3; i++)
+		h8.timer[i] = timer_alloc(h8itu_3007_timer_cb, (void*)i);
 
 	h8_itu_reset();
 }
 
 void h8_itu_init(void)
 {
-	h8.timer[0] = timer_alloc(h8itu_timer_0_cb, NULL);
-	h8.timer[1] = timer_alloc(h8itu_timer_1_cb, NULL);
-	h8.timer[2] = timer_alloc(h8itu_timer_2_cb, NULL);
-	h8.timer[3] = timer_alloc(h8itu_timer_3_cb, NULL);
-	h8.timer[4] = timer_alloc(h8itu_timer_4_cb, NULL);
+	int i;
+
+	for (i=0; i<5; i++)
+		h8.timer[i] = timer_alloc(h8itu_timer_cb, (void*)i);
 
 	h8_itu_reset();
 
@@ -838,10 +726,9 @@ void h8_itu_init(void)
 
 void h8_itu_reset(void)
 {
+	int i;
+
 	// stop all the timers
-	timer_adjust_oneshot(h8.timer[0], attotime_never, 0);
-	timer_adjust_oneshot(h8.timer[1], attotime_never, 0);
-	timer_adjust_oneshot(h8.timer[2], attotime_never, 0);
-	timer_adjust_oneshot(h8.timer[3], attotime_never, 0);
-	timer_adjust_oneshot(h8.timer[4], attotime_never, 0);
+	for (i=0; i<5; i++)
+		timer_adjust_oneshot(h8.timer[i], attotime_never, 0);
 }

@@ -28,7 +28,7 @@ struct _h83002_state
 
 	UINT8 per_regs[256];
 
-	UINT16 h8TCNT0, h8TCNT1, h8TCNT2, h8TCNT3, h8TCNT4;
+	UINT16 h8TCNT[5];
 	UINT8 h8TSTR;
 
 	emu_timer *timer[5];

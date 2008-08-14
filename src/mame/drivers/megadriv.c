@@ -1406,32 +1406,20 @@ static WRITE8_HANDLER( megadriv_z80_YM2612_write )
 static emu_timer *io_timeout[3];
 static int io_stage[3];
 
-static TIMER_CALLBACK( io_timeout0_timer_callback )
+static TIMER_CALLBACK( io_timeout_timer_callback )
 {
-	io_stage[0] = -1;
+	io_stage[(int)ptr] = -1;
 }
-
-static TIMER_CALLBACK( io_timeout1_timer_callback )
-{
-	io_stage[1] = -1;
-}
-
-static TIMER_CALLBACK( io_timeout2_timer_callback )
-{
-	io_stage[2] = -1;
-}
-
 
 static void init_megadri6_io(void)
 {
-	io_timeout[0] = timer_alloc(io_timeout0_timer_callback, NULL);
-	io_stage[0] = -1;
+	int i;
 
-	io_timeout[1] = timer_alloc(io_timeout1_timer_callback, NULL);
-	io_stage[1] = -1;
-
-	io_timeout[2] = timer_alloc(io_timeout2_timer_callback, NULL);
-	io_stage[2] = -1;
+	for (i=0; i<3; i++)
+	{
+		io_timeout[i] = timer_alloc(io_timeout_timer_callback, (void*)i);
+		io_stage[i] = -1;
+	}
 }
 
 /* pointers to our io data read/write functions */
