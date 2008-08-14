@@ -479,7 +479,7 @@ READ8_HANDLER( itech8_blitter_r )
 
 	/* a read from offsets 12-15 return input port values */
 	if (offset >= 12 && offset <= 15)
-		result = input_port_read(machine, portnames[offset - 12]);
+		result = input_port_read_safe(machine, portnames[offset - 12], 0x00);
 
 	return result;
 }

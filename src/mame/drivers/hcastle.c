@@ -51,12 +51,12 @@ static WRITE8_HANDLER( hcastle_coin_w )
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0020, 0x003f) AM_READ(SMH_RAM)
 	AM_RANGE(0x0220, 0x023f) AM_READ(SMH_RAM)
-	AM_RANGE(0x0410, 0x0410) AM_READ(input_port_0_r)
-	AM_RANGE(0x0411, 0x0411) AM_READ(input_port_1_r)
-	AM_RANGE(0x0412, 0x0412) AM_READ(input_port_2_r)
-	AM_RANGE(0x0413, 0x0413) AM_READ(input_port_5_r) /* Dip 3 */
-	AM_RANGE(0x0414, 0x0414) AM_READ(input_port_4_r) /* Dip 2 */
-	AM_RANGE(0x0415, 0x0415) AM_READ(input_port_3_r) /* Dip 1 */
+	AM_RANGE(0x0410, 0x0410) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x0411, 0x0411) AM_READ_PORT("P1")
+	AM_RANGE(0x0412, 0x0412) AM_READ_PORT("P2")
+	AM_RANGE(0x0413, 0x0413) AM_READ_PORT("DSW3")
+	AM_RANGE(0x0414, 0x0414) AM_READ_PORT("DSW2")
+	AM_RANGE(0x0415, 0x0415) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0418, 0x0418) AM_READ(hcastle_gfxbank_r)
 	AM_RANGE(0x0600, 0x06ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x0700, 0x5fff) AM_READ(SMH_RAM)
@@ -117,7 +117,7 @@ ADDRESS_MAP_END
 /*****************************************************************************/
 
 static INPUT_PORTS_START( hcastle )
-	PORT_START("SYSTEM")	/* IN0 */
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -127,7 +127,7 @@ static INPUT_PORTS_START( hcastle )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("P1")	/* IN1 */
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
@@ -137,7 +137,7 @@ static INPUT_PORTS_START( hcastle )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("P2")	/* IN2 */
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
@@ -158,15 +158,15 @@ static INPUT_PORTS_START( hcastle )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x18, 0x10, DEF_STR( Difficulty ) )	// "Difficulty 1"
-	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )				// DEF_STR( Easy )
-	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )			// "Nomal" !
-	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )				// "Difficult"
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )			// "Very Difficult"
-	PORT_DIPNAME( 0x60, 0x40, "Damage" )			// "Difficulty 2"
-	PORT_DIPSETTING(    0x60, "Small" )				// "Strong"
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )			// "Nomal" !
-	PORT_DIPSETTING(    0x20, "Big" )				// "Weak"
-	PORT_DIPSETTING(    0x00, "Biggest" )			// "Very Weak"
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )			// DEF_STR( Easy )
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )		// "Nomal" !
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )			// "Difficult"
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )		// "Very Difficult"
+	PORT_DIPNAME( 0x60, 0x40, "Damage" )				// "Difficulty 2"
+	PORT_DIPSETTING(    0x60, "Small" )					// "Strong"
+	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )		// "Nomal" !
+	PORT_DIPSETTING(    0x20, "Big" )					// "Weak"
+	PORT_DIPSETTING(    0x00, "Biggest" )				// "Very Weak"
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -205,7 +205,7 @@ static INPUT_PORTS_START( hcastle )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
-//  PORT_DIPSETTING(    0x00, "Invalidity" )            // Disables the 2 coin slots
+//	PORT_DIPSETTING(    0x00, "Invalidity" )            // Disables the 2 coin slots
 
 	PORT_START("DSW3")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )

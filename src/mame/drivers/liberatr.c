@@ -214,7 +214,7 @@ static ADDRESS_MAP_START( liberatr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(liberatr_bitmap_w) AM_BASE(&liberatr_bitmapram) 	/* overlapping for my convenience */
 	AM_RANGE(0x4000, 0x403f) AM_READ(atari_vg_earom_r)
 	AM_RANGE(0x5000, 0x5000) AM_READ(liberatr_input_port_0_r)
-	AM_RANGE(0x5001, 0x5001) AM_READ(input_port_1_r)
+	AM_RANGE(0x5001, 0x5001) AM_READ_PORT("IN1")
 	AM_RANGE(0x6000, 0x600f) AM_WRITE(SMH_RAM) AM_BASE(&liberatr_base_ram)
 	AM_RANGE(0x6200, 0x621f) AM_WRITE(SMH_RAM) AM_BASE(&liberatr_colorram)
 	AM_RANGE(0x6400, 0x6400) AM_WRITENOP

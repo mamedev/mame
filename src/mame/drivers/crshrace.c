@@ -173,9 +173,9 @@ static WRITE16_HANDLER( sound_command_w )
 	}
 }
 
-static READ16_HANDLER( country_sndpending_r )
+static CUSTOM_INPUT( country_sndpending_r )
 {
-	return input_port_read(machine, "DSW2") | (pending_command ? 0x8000 : 0);
+	return pending_command;
 }
 
 static WRITE8_HANDLER( pending_command_clear_w )
@@ -199,7 +199,7 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff000, 0xfff001) AM_READ_PORT("P1")
 	AM_RANGE(0xfff002, 0xfff003) AM_READ_PORT("P2")
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("DSW0")
-	AM_RANGE(0xfff006, 0xfff007) AM_READ(country_sndpending_r)
+	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff00e, 0xfff00f) AM_READ_PORT("P3")
 ADDRESS_MAP_END
@@ -384,7 +384,7 @@ static INPUT_PORTS_START( crshrace )
     PORT_DIPSETTING(      0x0e00, "5" )
     PORT_DIPSETTING(      0x0f00, "5" )
 */
-	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* pending sound command */
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(country_sndpending_r, NULL)	/* pending sound command */
 INPUT_PORTS_END
 
 /* Same as 'crshrace', but additional "unknown" Dip Switch (see notes) */

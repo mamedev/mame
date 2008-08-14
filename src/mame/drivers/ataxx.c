@@ -156,7 +156,7 @@ static INPUT_PORTS_START( wsf )
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN3")		/* 0x0D */
+	PORT_START("P1_P2")		/* 0x0D */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -166,7 +166,7 @@ static INPUT_PORTS_START( wsf )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 
-	PORT_START("IN4")		/* 0x0E */
+	PORT_START("P3_P4")		/* 0x0E */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
@@ -176,7 +176,7 @@ static INPUT_PORTS_START( wsf )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
 
-	PORT_START("IN5")		/* 0x0F */
+	PORT_START("BUTTONS")	/* 0x0F */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -219,15 +219,15 @@ static INPUT_PORTS_START( indyheat )
 	PORT_START("AN5")		/* Analog pedal 3 */
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(3)
 
-	PORT_START("IN3")		/* 0x0D */
+	PORT_START("P1")		/* 0x0D */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN4")		/* 0x0E */
+	PORT_START("P2")		/* 0x0E */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN5")		/* 0x0F */
+	PORT_START("P3")		/* 0x0F */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x7e, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE_NO_TOGGLE( 0x80, IP_ACTIVE_LOW )
@@ -252,17 +252,7 @@ static INPUT_PORTS_START( brutforc )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_eeprom_DATA )
 	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN3")		/* 0x0D */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN4")		/* 0x0E */
+	PORT_START("P1")		/* 0x0E */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
@@ -272,7 +262,17 @@ static INPUT_PORTS_START( brutforc )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN5")		/* 0x0F */
+	PORT_START("P2")		/* 0x0D */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("P3")		/* 0x0F */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
@@ -711,9 +711,9 @@ static DRIVER_INIT( wsf )
 	leland_rotate_memory(machine, "slave");
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0d, 0x0d, 0, 0, input_port_3_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0e, 0x0e, 0, 0, input_port_4_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0f, 0x0f, 0, 0, input_port_5_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0d, 0x0d, 0, 0, input_port_read_handler8(machine->portconfig, "P1_P2"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0e, 0x0e, 0, 0, input_port_read_handler8(machine->portconfig, "P3_P4"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0f, 0x0f, 0, 0, input_port_read_handler8(machine->portconfig, "BUTTONS"));
 }
 
 
@@ -738,9 +738,9 @@ static DRIVER_INIT( indyheat )
 	/* set up additional input ports */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x00, 0x02, 0, 0, indyheat_wheel_r);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x08, 0x0b, 0, 0, indyheat_analog_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0d, 0x0d, 0, 0, input_port_9_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0e, 0x0e, 0, 0, input_port_10_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0f, 0x0f, 0, 0, input_port_11_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0d, 0x0d, 0, 0, input_port_read_handler8(machine->portconfig, "P1"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0e, 0x0e, 0, 0, input_port_read_handler8(machine->portconfig, "P2"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0f, 0x0f, 0, 0, input_port_read_handler8(machine->portconfig, "P3"));
 
 	/* set up additional output ports */
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x08, 0x0b, 0, 0, indyheat_analog_w);
@@ -766,9 +766,9 @@ static DRIVER_INIT( brutforc )
 	leland_rotate_memory(machine, "slave");
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0d, 0x0d, 0, 0, input_port_3_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0e, 0x0e, 0, 0, input_port_4_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0f, 0x0f, 0, 0, input_port_5_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0d, 0x0d, 0, 0, input_port_read_handler8(machine->portconfig, "P2"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0e, 0x0e, 0, 0, input_port_read_handler8(machine->portconfig, "P1"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0f, 0x0f, 0, 0, input_port_read_handler8(machine->portconfig, "P3"));
 }
 
 
@@ -795,9 +795,9 @@ static DRIVER_INIT( asylum )
 	memory_set_bankptr(4, auto_malloc(0x1000));
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0d, 0x0d, 0, 0, input_port_3_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0e, 0x0e, 0, 0, input_port_4_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0f, 0x0f, 0, 0, input_port_5_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0d, 0x0d, 0, 0, input_port_read_handler8(machine->portconfig, "P2"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0e, 0x0e, 0, 0, input_port_read_handler8(machine->portconfig, "P1"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0f, 0x0f, 0, 0, input_port_read_handler8(machine->portconfig, "P3"));
 }
 
 

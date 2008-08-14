@@ -53,7 +53,7 @@ static READ8_HANDLER( input_port_r )
 
 	res = 0;
 	for (i = 0; i < 8; i++)
-		res |= ((input_port_read(machine, portnames[i]) >> offset) & 1) << i;
+		res |= ((input_port_read_safe(machine, portnames[i], 0xff) >> offset) & 1) << i;
 
 	return res;
 }
@@ -127,21 +127,6 @@ static INPUT_PORTS_START( gomoku )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
-
-	PORT_START("UNUSED0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("UNUSED1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("UNUSED2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("UNUSED3")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("UNUSED4")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 

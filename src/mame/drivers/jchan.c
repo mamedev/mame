@@ -455,8 +455,8 @@ static READ16_HANDLER ( jchan_ctrl_r )
 {
 	switch(offset)
 	{
-		case 0/2: return input_port_read(machine, "IN0"); // Player 1 controls
-		case 2/2: return input_port_read(machine, "IN1"); // Player 2 controls
+		case 0/2: return input_port_read(machine, "P1");
+		case 2/2: return input_port_read(machine, "P2");
 		default: logerror("jchan_ctrl_r unknown!"); break;
 	}
 	return jchan_ctrl[offset];
@@ -578,7 +578,7 @@ static ADDRESS_MAP_START( jchan_main, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // palette for sprites?
 
 	AM_RANGE(0xf00000, 0xf00003) AM_READWRITE(jchan_ctrl_r, jchan_ctrl_w) AM_BASE(&jchan_ctrl)
-	AM_RANGE(0xf00004, 0xf00005) AM_READ(input_port_2_word_r) // DSW2
+	AM_RANGE(0xf00004, 0xf00005) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf00006, 0xf00007) AM_RAM // ???
 
 	AM_RANGE(0xf80000, 0xf80001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
@@ -674,7 +674,7 @@ static INPUT_PORTS_START( jchan )
 /* TO BE VERIFIED: Player 1 & 2 - see subroutine $21e2a of main68k IT1 */
 /* TO BE VERIFIED: dips assignements according infos by BrianT at http://www.crazykong.com - seems ok */
 
-	PORT_START("IN0")	// Player Controls - $f00000.w (-> $2000b1.b)
+	PORT_START("P1")		/* $f00000.w (-> $2000b1.b) */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	) PORT_8WAY PORT_PLAYER(1)
@@ -684,7 +684,7 @@ static INPUT_PORTS_START( jchan )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
 
-	PORT_START("IN1")	// Player Controls - $f00002.w (-> $2000b5.b)
+	PORT_START("P2")		/* $f00002.w (-> $2000b5.b) */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT	) PORT_8WAY PORT_PLAYER(2)
@@ -694,7 +694,7 @@ static INPUT_PORTS_START( jchan )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
 
-	PORT_START("IN2")	// Coins - f00004.b
+	PORT_START("SYSTEM")	/* $f00004.b */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1	)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2	)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
@@ -704,7 +704,7 @@ static INPUT_PORTS_START( jchan )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1	)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN	)
 
-	PORT_START("DSW")	// DSW provided by the MCU - $200098.b <- $300200
+	PORT_START("DSW")		/* provided by the MCU - $200098.b <- $300200 */
 	PORT_DIPNAME( 0x0100, 0x0100, "Test Mode" )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -729,7 +729,6 @@ static INPUT_PORTS_START( jchan )
 	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )	/* impacts $200116.l once! -> impacts reading of controls @ $21e2a */
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 

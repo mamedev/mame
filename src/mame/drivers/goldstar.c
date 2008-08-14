@@ -63,19 +63,19 @@ static ADDRESS_MAP_START( map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe1ff) AM_RAM AM_BASE(&goldstar_video2)
 	AM_RANGE(0xe800, 0xe9ff) AM_WRITE(SMH_RAM) AM_BASE(&goldstar_video3)
 	AM_RANGE(0xf040, 0xf07f) AM_WRITE(SMH_RAM) AM_BASE(&goldstar_scroll1)
-	AM_RANGE(0xf800, 0xf800) AM_READ(input_port_0_r)
-	AM_RANGE(0xf801, 0xf801) AM_READ(input_port_1_r)	/* Test Mode */
-	AM_RANGE(0xf802, 0xf802) AM_READ(input_port_2_r)	/* DSW 1 */
+	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("IN0")
+	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("IN1")	/* Test Mode */
+	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("DSW1")
 //  AM_RANGE(0xf803, 0xf803)
 //  AM_RANGE(0xf804, 0xf804)
-	AM_RANGE(0xf805, 0xf805) AM_READ(input_port_7_r)	/* DSW 4 (also appears in 8910 port) */
-	AM_RANGE(0xf806, 0xf806) AM_READ(input_port_9_r)	/* (don't know to which one of the */
-										/* service mode dip switches it should map) */
+	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW4")	/* DSW 4 (also appears in 8910 port) */
+	AM_RANGE(0xf806, 0xf806) AM_READ_PORT("DSW7")	/* (don't know to which one of the */
+													/* service mode dip switches it should map) */
 	AM_RANGE(0xf080, 0xf0bf) AM_WRITE(SMH_RAM) AM_BASE(&goldstar_scroll2)
 	AM_RANGE(0xf0c0, 0xf0ff) AM_WRITE(SMH_RAM) AM_BASE(&goldstar_scroll3)
-	AM_RANGE(0xf810, 0xf810) AM_READ(input_port_3_r)
-	AM_RANGE(0xf811, 0xf811) AM_READ(input_port_4_r)
-	AM_RANGE(0xf820, 0xf820) AM_READ(input_port_5_r)	/* DSW 2 */
+	AM_RANGE(0xf810, 0xf810) AM_READ_PORT("UNK1")
+	AM_RANGE(0xf811, 0xf811) AM_READ_PORT("UNK2")
+	AM_RANGE(0xf820, 0xf820) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf830, 0xf830) AM_READWRITE(ay8910_read_port_0_r,ay8910_write_port_0_w)
 	AM_RANGE(0xf840, 0xf840) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0xfa00, 0xfa00) AM_WRITE(goldstar_fa00_w)
@@ -87,7 +87,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_READ(input_port_8_r)
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW6")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( goldstar )
@@ -137,10 +137,10 @@ static INPUT_PORTS_START( goldstar )
 	PORT_DIPSETTING(    0x40, "32 Bet" )
 	PORT_DIPSETTING(    0x00, "50 Bet" )
 
-	PORT_START("IN3")
+	PORT_START("UNK1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN4")
+	PORT_START("UNK2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW2")

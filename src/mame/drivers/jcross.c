@@ -51,7 +51,7 @@ static const namco_interface snkwave_interface =
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	sound_cpu_busy = 0x20;
+	sound_cpu_busy = 1;
 	soundlatch_w(machine, 0, data);
 	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
 }
@@ -68,9 +68,9 @@ static READ8_HANDLER( sound_nmi_ack_r )
 	return 0;
 }
 
-static READ8_HANDLER( jcross_port_0_r )
+static CUSTOM_INPUT( sound_status_r )
 {
-	return(input_port_read(machine, "IN0") | sound_cpu_busy);
+	return sound_cpu_busy;
 }
 
 static WRITE8_HANDLER(jcross_vregs0_w){jcross_vregs[0]=data;}
@@ -99,7 +99,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_READ(jcross_port_0_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("IN1")
 	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("IN2")
 	AM_RANGE(0xa300, 0xa300) AM_WRITE(sound_command_w)
@@ -133,7 +133,7 @@ static INPUT_PORTS_START( jcross )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sound_status_r, NULL) /* sound CPU status */
 
 
 	PORT_START("IN1")

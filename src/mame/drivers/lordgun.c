@@ -108,9 +108,9 @@ static WRITE8_HANDLER(fake2_w)
 //  popmessage("%02x",data);
 }
 
-static READ8_HANDLER( lordgun_eeprom_r )
+static READ8_HANDLER( lordgun_port_0_r )
 {
-	return input_port_read(machine, "IN0") | ((eeprom_read_bit() & 1) << 7);
+	return input_port_read(machine, "IN0");
 }
 
 static WRITE8_HANDLER( lordgun_eeprom_w )
@@ -344,7 +344,7 @@ static INPUT_PORTS_START( lordgun )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_SERVICE_NO_TOGGLE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	// eeprom
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1   )
@@ -409,7 +409,7 @@ INPUT_PORTS_END
 static const ppi8255_interface ppi8255_intf[2] =
 {
 	{
-		lordgun_eeprom_r,			// Port A read
+		lordgun_port_0_r,			// Port A read
 		NULL,						// Port B read
 		input_port_3_r,				// Port C read
 		fake_w,						// Port A write

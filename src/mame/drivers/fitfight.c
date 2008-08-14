@@ -143,10 +143,10 @@ static ADDRESS_MAP_START( fitfight_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(SMH_RAM) AM_BASE(&fof_100000)
 	//written at scanline 5, allways 1. Used by histryma/fitfight @0x0000ec2c/@0x0000f076
 
-	AM_RANGE(0x200000, 0x200001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x300000, 0x300001) AM_READ(input_port_1_word_r)	// for 'histryma' only
-	AM_RANGE(0x400000, 0x400001) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x500000, 0x500001) AM_READ(input_port_3_word_r)
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("EXTRA")	// for 'histryma' only
+	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("SYSTEM_DSW2")
+	AM_RANGE(0x500000, 0x500001) AM_READ_PORT("DSW3_DSW1")
 
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(SMH_RAM) AM_BASE(&fof_600000)
 	//  Is 0x600000 controlling the slave audio CPU? data is 0x1111000zzzzzzzzz (9 sign. bits)
@@ -194,10 +194,10 @@ static ADDRESS_MAP_START( bbprot_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x100000, 0x100001) AM_WRITE(SMH_RAM) AM_BASE(&fof_100000)
 
-	AM_RANGE(0x300000, 0x300001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x380000, 0x380001) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x400000, 0x400001) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x480000, 0x480001) AM_READ(input_port_3_word_r)
+	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("P1_P2")
+	AM_RANGE(0x380000, 0x380001) AM_READ_PORT("EXTRA")
+	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("SYSTEM_DSW2")
+	AM_RANGE(0x480000, 0x480001) AM_READ_PORT("DSW3_DSW1")
 
 	AM_RANGE(0x600000, 0x600001) AM_WRITE(SMH_RAM) AM_BASE(&fof_600000)
 
@@ -284,7 +284,7 @@ static const UPD7810_CONFIG sound_cpu_config =
 /* I've put the inputs the same way they can be read in the "test mode" */
 
 static INPUT_PORTS_START( fitfight )
-	PORT_START("IN0")	// 0x200000.w
+	PORT_START("P1_P2")	// 0x200000.w
 	/* players inputs -> 0xe022cc.w */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -303,10 +303,10 @@ static INPUT_PORTS_START( fitfight )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("IN1")	// 0x300000.w (unused)
+	PORT_START("EXTRA")	// 0x300000.w (unused)
 	PORT_BIT(  0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2")	// 0x400000.w
+	PORT_START("SYSTEM_DSW2")	// 0x400000.w
 	/* LSB : system inputs -> 0xe022cf.b */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -360,7 +360,7 @@ static INPUT_PORTS_START( fitfight )
 	PORT_DIPSETTING(      0x0600, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0700, DEF_STR( 1C_1C ) )
 
-	PORT_START("IN3")	// 0x500000.w
+	PORT_START("DSW3_DSW1")	// 0x500000.w
 	/* MSB : SW3 -> 0xe04c24.b (cpl) */
 	PORT_DIPNAME( 0xe000, 0xe000, "Next Credit" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
@@ -412,7 +412,7 @@ static INPUT_PORTS_START( fitfight )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( histryma )
-	PORT_START("IN0")	// 0x200000.w
+	PORT_START("P1_P2")	// 0x200000.w
 	/* players inputs -> 0xe02cf2.w and 0xe02cf8.w */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -431,7 +431,7 @@ static INPUT_PORTS_START( histryma )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("IN1")	// 0x300000.w
+	PORT_START("EXTRA")	// 0x300000.w
 	/* LSB : players extra inputs -> 0xe02cf5.b and 0xe02cfb.b */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
@@ -444,7 +444,7 @@ static INPUT_PORTS_START( histryma )
 	/* MSB : unused */
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2")	// 0x400000.w
+	PORT_START("SYSTEM_DSW2")	// 0x400000.w
 	/* LSB : system inputs -> 0xe02cf7.b and 0xe02cfd.b */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -498,7 +498,7 @@ static INPUT_PORTS_START( histryma )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(      0x0700, DEF_STR( 1C_1C ) )
 
-	PORT_START("IN3")	// 0x500000.w
+	PORT_START("DSW3_DSW1")	// 0x500000.w
 	/* MSB : SW3 -> 0xe05872.b (cpl) */
 	PORT_DIPNAME( 0xe000, 0xe000, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(      0xe000, DEF_STR( 1C_1C ) )
@@ -554,7 +554,7 @@ INPUT_PORTS_END
    (the only difference being that there is no "Needed Points/Maximum Points"
    Dip Switch, the value always being set to "2/3") */
 static INPUT_PORTS_START( bbprot )
-	PORT_START("IN0")	// 0x300000.w
+	PORT_START("P1_P2")	// 0x300000.w
 	/* players inputs -> 0xe0545e.w and 0xe05464.w */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
@@ -573,7 +573,7 @@ static INPUT_PORTS_START( bbprot )
 	PORT_BIT(  0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT(  0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("IN1")	// 0x380000.w
+	PORT_START("EXTRA")	// 0x380000.w
 	/* LSB : players extra inputs -> 0xe05461.b and 0xe05467.b */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
@@ -586,7 +586,7 @@ static INPUT_PORTS_START( bbprot )
 	/* MSB : unused */
 	PORT_BIT(  0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2")	// 0x400000.w
+	PORT_START("SYSTEM_DSW2")	// 0x400000.w
 	/* LSB : system inputs -> 0xe05463.b and 0xe05469.b */
 	PORT_BIT(  0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT(  0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
@@ -640,7 +640,7 @@ static INPUT_PORTS_START( bbprot )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(      0x0700, DEF_STR( 1C_1C ) )
 
-	PORT_START("IN3")	// 0x480000.w
+	PORT_START("DSW3_DSW1")	// 0x480000.w
 	/* MSB : SW3 -> 0xe07e82.b (cpl) */
 	PORT_DIPNAME( 0xe000, 0xe000, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(      0xe000, DEF_STR( 1C_1C ) )

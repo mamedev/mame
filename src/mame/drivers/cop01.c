@@ -93,21 +93,10 @@ static READ8_HANDLER( cop01_sound_command_r )
 }
 
 
-static READ8_HANDLER( mightguy_dsw_r )
+static CUSTOM_INPUT( mightguy_area_r )
 {
-	int data = 0xff;
-
-	switch (offset)
-	{
-		case 0 :
-			data = (input_port_read(machine, "DSW1") & 0x7f) | ((input_port_read(machine, "FAKE") & 0x04) << 5);
-			break;
-		case 1 :
-			data = (input_port_read(machine, "DSW2") & 0x3f) | ((input_port_read(machine, "FAKE") & 0x03) << 6);
-			break;
-		}
-
-	return (data);
+	int bit_mask = (FPTR)param;
+	return (input_port_read(field->port->machine, "FAKE") & bit_mask) ? 0x01 : 0x00;
 }
 
 
@@ -139,7 +128,8 @@ static ADDRESS_MAP_START( mightguy_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x03, 0x04) AM_READ(mightguy_dsw_r)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
@@ -325,7 +315,7 @@ static INPUT_PORTS_START( mightguy )
 	PORT_DIPSETTING(	0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL )	// "Start Area" - see fake Dip Switch
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(mightguy_area_r, (void *)0x04)	// "Start Area" - see fake Dip Switch
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
@@ -343,7 +333,8 @@ static INPUT_PORTS_START( mightguy )
 	PORT_DIPSETTING(	0x20, DEF_STR( Normal ) )
 	PORT_DIPSETTING(	0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(	0x00, "Invincibility")
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_SPECIAL )	// "Start Area" - see fake Dip Switch
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(mightguy_area_r, (void *)0x01)	// "Start Area" - see fake Dip Switch
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(mightguy_area_r, (void *)0x02)	// "Start Area" - see fake Dip Switch
 
 	PORT_START("FAKE")	/* FAKE Dip Switch */
 	PORT_DIPNAME( 0x07, 0x07, "Starting Area" )

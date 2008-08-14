@@ -874,7 +874,7 @@ ROM_END
 static DRIVER_INIT( asteroib )
 {
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2000, 0, 0, asteroib_IN0_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2003, 0x2003, 0, 0, input_port_3_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2003, 0x2003, 0, 0, input_port_read_handler8(machine->portconfig, "HS"));
 }
 
 

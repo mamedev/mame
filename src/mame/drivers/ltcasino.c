@@ -62,15 +62,15 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_READ(SMH_RAM)
 	AM_RANGE(0xe800, 0xebff) AM_READ(SMH_RAM)
 
-	AM_RANGE(0xec00, 0xec00) AM_READ(input_port_0_r)
-	AM_RANGE(0xec01, 0xec01) AM_READ(input_port_1_r)
-	AM_RANGE(0xec02, 0xec02) AM_READ(input_port_2_r)
-	AM_RANGE(0xec03, 0xec03) AM_READ(input_port_3_r)
-	AM_RANGE(0xec10, 0xec10) AM_READ(input_port_4_r)
-	AM_RANGE(0xec12, 0xec12) AM_READ(input_port_5_r)
+	AM_RANGE(0xec00, 0xec00) AM_READ_PORT("IN0")
+	AM_RANGE(0xec01, 0xec01) AM_READ_PORT("IN1")
+	AM_RANGE(0xec02, 0xec02) AM_READ_PORT("IN2")
+	AM_RANGE(0xec03, 0xec03) AM_READ_PORT("IN3")
+	AM_RANGE(0xec10, 0xec10) AM_READ_PORT("IN4")
+	AM_RANGE(0xec12, 0xec12) AM_READ_PORT("IN5")
 
 	AM_RANGE(0xec20, 0xec20) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0xec21, 0xec21) AM_READ(input_port_6_r) //ltcasino -> pc: F3F3 (A in service) and F3FD (B in service)
+	AM_RANGE(0xec21, 0xec21) AM_READ_PORT("BUTTONS") //ltcasino -> pc: F3F3 (A in service) and F3FD (B in service)
 	AM_RANGE(0xec3e, 0xec3e) AM_READ(SMH_NOP) //not used
 
 	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_ROM)

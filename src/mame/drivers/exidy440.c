@@ -530,8 +530,8 @@ static INPUT_PORTS_START( crossbow )
 	PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, NULL)
 
 	PORT_START("IN1") 		/* audio board dips */
 	COINAGE
@@ -571,8 +571,8 @@ static INPUT_PORTS_START( cheyenne )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, NULL)
 
 	PORT_START("IN1")		/* audio board dips */
 	COINAGE
@@ -612,8 +612,8 @@ static INPUT_PORTS_START( combat )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, NULL)
 
 	PORT_START("IN1") 		/* audio board dips */
 	COINAGE
@@ -653,8 +653,8 @@ static INPUT_PORTS_START( catch22 )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, NULL)
 
 	PORT_START("IN1")		/* audio board dips */
 	COINAGE
@@ -695,8 +695,8 @@ static INPUT_PORTS_START( cracksht )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, NULL)
 
 	PORT_START("IN1")		/* audio board dips */
 	COINAGE
@@ -733,8 +733,8 @@ static INPUT_PORTS_START( claypign )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, NULL)
 
 	PORT_START("IN1")		/* audio board dips */
 	COINAGE
@@ -775,8 +775,8 @@ static INPUT_PORTS_START( chiller )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, NULL)
 
 	PORT_START("IN1")		/* audio board dips */
 	COINAGE
@@ -814,8 +814,8 @@ static INPUT_PORTS_START( topsecex )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, NULL)
 
 	PORT_START("IN1")		/* audio board dips */
 	COINAGE
@@ -835,7 +835,7 @@ static INPUT_PORTS_START( topsecex )
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_REVERSE
 
 	PORT_START("AN1")		/* fake analog Y */
-	PORT_BIT(  0xff, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("IN4")		/* start button */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Fireball")
@@ -844,14 +844,14 @@ static INPUT_PORTS_START( topsecex )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Oil")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Turbo")
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Shield")
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Top Secret")
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( hitnmiss )
 	PORT_START("IN0")		/* player inputs and logic board dips */
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(hitnmiss_button1_r, 0)
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(hitnmiss_button1_r, NULL)
 	PORT_DIPNAME( 0x0c, 0x00, "Seconds" )
 	PORT_DIPSETTING(    0x04, "20" )
 	PORT_DIPSETTING(    0x00, "30" )
@@ -862,8 +862,8 @@ static INPUT_PORTS_START( hitnmiss )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, NULL)
 
 	PORT_START("IN1")		/* audio board dips */
 	COINAGE
@@ -895,7 +895,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( whodunit )
 	PORT_START("IN0")		/* player inputs and logic board dips */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, NULL)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x04, "2" )
@@ -907,8 +907,8 @@ static INPUT_PORTS_START( whodunit )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, NULL)
 
 	PORT_START("IN1")		/* audio board dips */
 	COINAGE
@@ -946,8 +946,8 @@ static INPUT_PORTS_START( showdown )
 	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hardest ) )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, 0)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_beam_r, NULL)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(firq_vblank_r, NULL)
 
 	PORT_START("IN1")		/* audio board dips */
 	COINAGE
@@ -1945,8 +1945,8 @@ static DRIVER_INIT( topsecex )
 
 	/* extra input ports and scrolling */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2ec5, 0x2ec5, 0, 0, topsecex_input_port_5_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2ec6, 0x2ec6, 0, 0, input_port_4_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2ec7, 0x2ec7, 0, 0, input_port_6_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2ec6, 0x2ec6, 0, 0, input_port_read_handler8(machine->portconfig, "AN0"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2ec7, 0x2ec7, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
 
 	topsecex_yscroll = memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2ec1, 0x2ec1, 0, 0, topsecex_yscroll_w);
 }

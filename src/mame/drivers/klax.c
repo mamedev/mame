@@ -47,7 +47,7 @@ static void update_interrupts(running_machine *machine)
 static void scanline_update(const device_config *screen, int scanline)
 {
 	/* generate 32V signals */
-	if ((scanline & 32) == 0 && !(input_port_read(screen->machine, "IN0") & 0x800))
+	if ((scanline & 32) == 0 && !(input_port_read(screen->machine, "P1") & 0x800))
 		atarigen_scanline_int_gen(screen->machine, 0);
 }
 
@@ -104,8 +104,8 @@ static WRITE16_HANDLER( adpcm_w )
 static ADDRESS_MAP_START( main_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x0e0000, 0x0e0fff) AM_READ(atarigen_eeprom_r)
-	AM_RANGE(0x260000, 0x260001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x260002, 0x260003) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x260000, 0x260001) AM_READ_PORT("P1")
+	AM_RANGE(0x260002, 0x260003) AM_READ_PORT("P2")
 	AM_RANGE(0x270000, 0x270001) AM_READ(adpcm_r)
 	AM_RANGE(0x3e0000, 0x3e07ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x3f0000, 0x3f3fff) AM_READ(SMH_RAM)
@@ -137,7 +137,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( klax )
-	PORT_START("IN0")
+	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -149,7 +149,7 @@ static INPUT_PORTS_START( klax )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
-	PORT_START("IN1")
+	PORT_START("P2")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0600, IP_ACTIVE_LOW, IPT_UNUSED )

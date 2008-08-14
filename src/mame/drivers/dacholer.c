@@ -73,11 +73,6 @@ static WRITE8_HANDLER(snd_w)
 	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
-static READ8_HANDLER(dswa_r)
-{
-	return (input_port_read(machine, "DSWA") & 0x0f) | (snd_ack<<4);	//guess ...
-}
-
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8800, 0x97ff) AM_RAM
@@ -91,7 +86,7 @@ static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x03, 0x03) AM_READ(dswa_r)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSWA")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSWB")
 	AM_RANGE(0x20, 0x20) AM_WRITE(coins_w)
 	AM_RANGE(0x21, 0x21) AM_WRITE(bg_bank_w)
@@ -107,25 +102,30 @@ static ADDRESS_MAP_START( snd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER(adpcm_w)
+static WRITE8_HANDLER( adpcm_w )
 {
 	msm_data = data;
-	msm_toggle=0;
+	msm_toggle = 0;
 }
 
-static WRITE8_HANDLER(snd_ack_w)
+static WRITE8_HANDLER( snd_ack_w )
 {
-	snd_ack=data;
+	snd_ack = data;
+}
+
+static CUSTOM_INPUT( snd_ack_r )
+{
+	return snd_ack;		//guess ...
 }
 
 static WRITE8_HANDLER( snd_irq_w )
 {
-	snd_interrupt_enable=data;
+	snd_interrupt_enable = data;
 }
 
 static WRITE8_HANDLER( music_irq_w )
 {
-	music_interrupt_enable=data;
+	music_interrupt_enable = data;
 }
 
 static ADDRESS_MAP_START( snd_io_map, ADDRESS_SPACE_IO, 8 )
@@ -186,6 +186,7 @@ static INPUT_PORTS_START( dacholer )
 	PORT_DIPSETTING(    0x04, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snd_ack_r, NULL)
 
 	PORT_START("DSWB")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )            /* table at 0x0a9c */

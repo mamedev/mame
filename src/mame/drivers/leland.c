@@ -2309,8 +2309,8 @@ static DRIVER_INIT( teamqb )
 	init_master_ports(machine, 0x40, 0x80);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_10_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_11_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
 }
 
 
@@ -2339,8 +2339,8 @@ static DRIVER_INIT( aafb )
 	init_master_ports(machine, 0x00, 0xc0);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_10_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_11_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
 }
 
 
@@ -2369,8 +2369,8 @@ static DRIVER_INIT( aafbb )
 	init_master_ports(machine, 0x80, 0x40);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_10_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_11_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
 }
 
 
@@ -2399,8 +2399,8 @@ static DRIVER_INIT( aafbd2p )
 	init_master_ports(machine, 0x00, 0x40);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_10_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_11_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
 }
 
 
@@ -2505,7 +2505,7 @@ static DRIVER_INIT( pigout )
 	init_master_ports(machine, 0x00, 0x40);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_4_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
 }
 
 

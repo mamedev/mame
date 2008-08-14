@@ -403,7 +403,7 @@ static INPUT_PORTS_START( talbot )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(champbas_watchdog_bit2, 0)	// bit 2 of the watchdog counter
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(champbas_watchdog_bit2, NULL)	// bit 2 of the watchdog counter
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
@@ -450,7 +450,7 @@ static INPUT_PORTS_START( champbas )
 	PORT_DIPSETTING(    0x20, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ))
 	PORT_DIPUNKNOWN( 0x40, 0x00 )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(champbas_watchdog_bit2, 0)	// bit 2 of the watchdog counter
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(champbas_watchdog_bit2, NULL)	// bit 2 of the watchdog counter
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( exctsccr )
@@ -476,7 +476,7 @@ static INPUT_PORTS_START( exctsccr )
 	PORT_DIPSETTING(    0x00, "2 Min." )
 	PORT_DIPSETTING(    0x60, "3 Min." )
 	PORT_DIPSETTING(    0x40, "4 Min." )
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(champbas_watchdog_bit2, 0)	// bit 2 of the watchdog counter
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(champbas_watchdog_bit2, NULL)	// bit 2 of the watchdog counter
 INPUT_PORTS_END
 
 

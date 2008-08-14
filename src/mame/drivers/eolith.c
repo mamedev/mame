@@ -104,7 +104,7 @@ static READ32_HANDLER( eolith_custom_r )
     */
 	eolith_speedup_read();
 
-	return (input_port_read(machine, "IN0") & ~0x308) | (eeprom_read_bit() << 3) | (mame_rand(machine) & 0x300);
+	return (input_port_read(machine, "IN0") & ~0x300) | (mame_rand(machine) & 0x300);
 }
 
 static WRITE32_HANDLER( systemcontrol_w )
@@ -151,10 +151,10 @@ static INPUT_PORTS_START( common )
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_SPECIAL ) // eeprom bit
+	PORT_BIT( 0x00000008, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL) // eeprom bit
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(eolith_speedup_getvblank, 0)
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(eolith_speedup_getvblank, NULL)
 	PORT_BIT( 0x00003f80, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x00008000, IP_ACTIVE_LOW )

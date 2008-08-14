@@ -2754,10 +2754,10 @@ static DRIVER_INIT( explorer )
 
 	/* I/O appears to be direct, not via PPIs */
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8000, 0, 0xffc, input_port_0_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8001, 0x8001, 0, 0xffc, input_port_1_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8002, 0x8002, 0, 0xffc, input_port_2_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8003, 0x8003, 0, 0xffc, input_port_3_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8000, 0, 0xffc, input_port_read_handler8(machine->portconfig, "IN0"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8001, 0x8001, 0, 0xffc, input_port_read_handler8(machine->portconfig, "IN1"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8002, 0x8002, 0, 0xffc, input_port_read_handler8(machine->portconfig, "IN2"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8003, 0x8003, 0, 0xffc, input_port_read_handler8(machine->portconfig, "IN3"));
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8000, 0, 0xfff, soundlatch_w);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0x9000, 0, 0xfff, explorer_sound_control_w);
 }

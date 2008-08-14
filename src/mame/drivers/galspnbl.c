@@ -59,11 +59,11 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00fff) AM_WRITE(SMH_NOP)	/* more palette ? */
 	AM_RANGE(0xa01000, 0xa017ff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xa01800, 0xa027ff) AM_WRITE(SMH_NOP)	/* more palette ? */
-	AM_RANGE(0xa80000, 0xa80001) AM_READ(input_port_0_word_r)
-	AM_RANGE(0xa80010, 0xa80011) AM_READWRITE(input_port_1_word_r, soundcommand_w)
-	AM_RANGE(0xa80020, 0xa80021) AM_READWRITE(input_port_2_word_r, SMH_NOP)	/* w - could be watchdog, but causes resets when picture is shown */
-	AM_RANGE(0xa80030, 0xa80031) AM_READWRITE(input_port_3_word_r, SMH_NOP)	/* w - irq ack? */
-	AM_RANGE(0xa80040, 0xa80041) AM_READ(input_port_4_word_r)
+	AM_RANGE(0xa80000, 0xa80001) AM_READ_PORT("IN0")
+	AM_RANGE(0xa80010, 0xa80011) AM_READ_PORT("IN1") AM_WRITE(soundcommand_w)
+	AM_RANGE(0xa80020, 0xa80021) AM_READ_PORT("SYSTEM") AM_WRITENOP		/* w - could be watchdog, but causes resets when picture is shown */
+	AM_RANGE(0xa80030, 0xa80031) AM_READ_PORT("DSW1") AM_WRITENOP		/* w - irq ack? */
+	AM_RANGE(0xa80040, 0xa80041) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa80050, 0xa80051) AM_WRITE(SMH_RAM) AM_BASE(&galspnbl_scroll)	/* ??? */
 ADDRESS_MAP_END
 
@@ -99,7 +99,7 @@ static INPUT_PORTS_START( galspnbl )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* uncalled (?) code at 0x007e90 ('hotpinbl') or 0x0080c4 ('galspnbl') */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN2")
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME( "Start" )  /* needed to avoid confusion with # of players */
@@ -156,80 +156,11 @@ static INPUT_PORTS_START( galspnbl )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( hotpinbl )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* tested at 0x0016c6 - doesn't seem tilt related */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* tested at 0x0016d2 - doesn't seem tilt related */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME( "Left Flippers" )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Launch Ball / Tilt" )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* uncalled (?) code at 0x007ed2 ('hotpinbl') or 0x008106 ('galspnbl') */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_INCLUDE( galspnbl )
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("IN1")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "Right Flippers" )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL )            /* same as BUTTON3 - leftover from another game ? */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* uncalled (?) code at 0x007e90 ('hotpinbl') or 0x0080c4 ('galspnbl') */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME( "Start" )  /* needed to avoid confusion with # of players */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DSW1")	/* 0x700018.b */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Unknown ) )          /* difficulty ? code at 0x0085c6 ('hotpinbl') or 0x008994 ('galspnbl') */
-	PORT_DIPSETTING(    0x03, "0" )
-	PORT_DIPSETTING(    0x02, "1" )
-	PORT_DIPSETTING(    0x01, "2" )
-	PORT_DIPSETTING(    0x00, "3" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Extra Ball" )
-	PORT_DIPSETTING(    0x04, "100K 500K" )
-	PORT_DIPSETTING(    0x0c, "200K 800K" )
-	PORT_DIPSETTING(    0x08, "200K only" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x20, 0x20, "Slide Show" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
-
-	PORT_START("DSW2")	/* 0x700019.b */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x01, "2 Coins/1 Credit 3/2" )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x06, "1 Coin/1 Credit 2/3" )
-	PORT_DIPSETTING(    0x00, "1 Coin/1 Credit 5/6" )
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x08, "2 Coins/1 Credit 3/2" )
-	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x30, "1 Coin/1 Credit 2/3" )
-	PORT_DIPSETTING(    0x00, "1 Coin/1 Credit 5/6" )
-	PORT_DIPSETTING(    0x28, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "Balls" )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_DIPSETTING(    0xc0, "3" )
-	PORT_DIPSETTING(    0x80, "4" )
-	PORT_DIPSETTING(    0x40, "5" )
 INPUT_PORTS_END
 
 

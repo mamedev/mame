@@ -117,14 +117,12 @@ static READ8_HANDLER( fgoal_analog_r )
 }
 
 
-static READ8_HANDLER( fgoal_switches_r )
+static CUSTOM_INPUT( fgoal_80_r )
 {
-	if (video_screen_get_vpos(machine->primary_screen) & 0x80)
-		return input_port_read(machine, "IN1") | 0x80;
-	else
-		return input_port_read(machine, "IN1");
-}
+	UINT8 ret = (video_screen_get_vpos(field->port->machine->primary_screen) & 0x80) ? 1 : 0;
 
+	return ret;
+}
 
 static READ8_HANDLER( fgoal_nmi_reset_r )
 {
@@ -224,8 +222,8 @@ static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x00f0, 0x00f0) AM_READ(fgoal_row_r)
 	AM_RANGE(0x00f1, 0x00f1) AM_READ(fgoal_analog_r)
-	AM_RANGE(0x00f2, 0x00f2) AM_READ(input_port_0_r)
-	AM_RANGE(0x00f3, 0x00f3) AM_READ(fgoal_switches_r)
+	AM_RANGE(0x00f2, 0x00f2) AM_READ_PORT("IN0")
+	AM_RANGE(0x00f3, 0x00f3) AM_READ_PORT("IN1")
 	AM_RANGE(0x00f4, 0x00f4) AM_READ(fgoal_address_hi_r)
 	AM_RANGE(0x00f5, 0x00f5) AM_READ(fgoal_address_lo_r)
 	AM_RANGE(0x00f6, 0x00f6) AM_READ(fgoal_shifter_r)
@@ -254,7 +252,6 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( fgoal )
-
 	PORT_START("IN0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_DIPNAME( 0x40, 0x40, "Display Coinage Settings" )
@@ -277,11 +274,10 @@ static INPUT_PORTS_START( fgoal )
 	PORT_DIPSETTING(    0x05, "65000" )
 	PORT_DIPSETTING(    0x06, "79000" )
 	PORT_DIPSETTING(    0x07, "93000" )
-
 	/* extra credit score changes depending on player's performance */
 
 	PORT_START("IN1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* 128V */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(fgoal_80_r, NULL) /* 128V */
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ))
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ))
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ))
@@ -299,13 +295,11 @@ static INPUT_PORTS_START( fgoal )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ))
 
 	/* game freezes when analog controls read $00 or $ff */
-
 	PORT_START("PADDLE0")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(1, 254) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(1)
 
 	PORT_START("PADDLE1")
 	PORT_BIT( 0xff, 0x80, IPT_PADDLE ) PORT_MINMAX(1, 254) PORT_SENSITIVITY(50) PORT_KEYDELTA(10) PORT_CENTERDELTA(0) PORT_REVERSE PORT_PLAYER(2)
-
 INPUT_PORTS_END
 
 static const UINT32 gfxlayout_xoffset[64] =

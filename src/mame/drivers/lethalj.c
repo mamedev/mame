@@ -126,8 +126,8 @@ static ADDRESS_MAP_START( lethalj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x04200000, 0x0420001f) AM_WRITENOP	/* clocks bits through here */
 	AM_RANGE(0x04300000, 0x0430007f) AM_READ(lethalj_gun_r)
 	AM_RANGE(0x04400000, 0x0440000f) AM_WRITENOP	/* clocks bits through here */
-	AM_RANGE(0x04500010, 0x0450001f) AM_READ(input_port_0_word_r)
-	AM_RANGE(0x04600000, 0x0460000f) AM_READ(input_port_1_word_r)
+	AM_RANGE(0x04500010, 0x0450001f) AM_READ_PORT("IN0")
+	AM_RANGE(0x04600000, 0x0460000f) AM_READ_PORT("IN1")
 	AM_RANGE(0x04700000, 0x0470007f) AM_WRITE(lethalj_blitter_w)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xc0000240, 0xc000025f) AM_WRITENOP	/* seems to be a bug in their code, one of many. */
@@ -355,11 +355,6 @@ static INPUT_PORTS_START( ripribit )
 	PORT_DIPSETTING(      0x4000, "700" )
 	PORT_DIPSETTING(      0x2000, "800" )
 	PORT_DIPSETTING(      0x0000, "1000" )
-
-	PORT_START("LIGHT0_X")				/* fake analog X */
-	PORT_START("LIGHT0_Y")				/* fake analog Y */
-	PORT_START("LIGHT1_X")				/* fake analog X */
-	PORT_START("LIGHT1_Y")				/* fake analog Y */
 INPUT_PORTS_END
 
 
@@ -411,11 +406,6 @@ static INPUT_PORTS_START( cfarm )
  	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
  	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0xffc0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("LIGHT0_X")				/* fake analog X */
-	PORT_START("LIGHT0_Y")				/* fake analog Y */
-	PORT_START("LIGHT1_X")				/* fake analog X */
-	PORT_START("LIGHT1_Y")				/* fake analog Y */
 INPUT_PORTS_END
 
 
@@ -466,11 +456,6 @@ static INPUT_PORTS_START( cclownz )
 	PORT_BIT( 0x0060, IP_ACTIVE_LOW, IPT_UNUSED )
  	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("LIGHT0_X")				/* fake analog X */
-	PORT_START("LIGHT0_Y")				/* fake analog Y */
-	PORT_START("LIGHT1_X")				/* fake analog X */
-	PORT_START("LIGHT1_Y")				/* fake analog Y */
 
 	PORT_START("PADDLE")
  	PORT_BIT( 0x00ff, 0x0000, IPT_PADDLE ) PORT_PLAYER(1) PORT_SENSITIVITY(50) PORT_KEYDELTA(8) PORT_CENTERDELTA(0) PORT_REVERSE

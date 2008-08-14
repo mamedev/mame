@@ -124,10 +124,10 @@ static ADDRESS_MAP_START( flower_cpu1_2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa003, 0xa003) AM_WRITENOP	//irq enable
 	AM_RANGE(0xa005, 0xa005) AM_WRITENOP	//nmi enable (routine is empty)
 	AM_RANGE(0xa004, 0xa004) AM_WRITENOP	//nmi enable (routine is empty)
-	AM_RANGE(0xa100, 0xa100) AM_READ(input_port_2_r)
-	AM_RANGE(0xa101, 0xa101) AM_READ(input_port_3_r)
-	AM_RANGE(0xa102, 0xa102) AM_READ(input_port_0_r)
-	AM_RANGE(0xa103, 0xa103) AM_READ(input_port_1_r)
+	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("IN0CPU1")
+	AM_RANGE(0xa101, 0xa101) AM_READ_PORT("IN1CPU1")
+	AM_RANGE(0xa102, 0xa102) AM_READ_PORT("IN0CPU0")
+	AM_RANGE(0xa103, 0xa103) AM_READ_PORT("IN1CPU0")
 	AM_RANGE(0xa400, 0xa400) AM_WRITE(sound_command_w)
 	AM_RANGE(0xc000, 0xddff) AM_SHARE(1) AM_RAM
 	AM_RANGE(0xde00, 0xdfff) AM_SHARE(2) AM_RAM AM_BASE(&spriteram)
@@ -387,4 +387,3 @@ ROM_END
 
 GAME( 1986, flower,  0,      flower, flower, 0, ROT0, "Komax",      "Flower (Komax)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1986, flowers, flower, flower, flower, 0, ROT0, "Sega/Alpha", "Flower (Sega/Alpha)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
-

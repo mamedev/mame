@@ -198,7 +198,7 @@ static ADDRESS_MAP_START( laserbat_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x05) AM_WRITE(sprite_x_y_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(laserbat_input_mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(laserbat_csound2_w)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_4_r)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 
@@ -210,7 +210,7 @@ static ADDRESS_MAP_START( catnmous_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x04, 0x05) AM_WRITE(sprite_x_y_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(laserbat_input_mux_w)
 	AM_RANGE(0x07, 0x07) AM_WRITENOP // unknown
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_4_r)
+	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 // the same as in zaccaria.c ?
@@ -271,9 +271,9 @@ static INPUT_PORTS_START( laserbat )
 	PORT_DIPSETTING(    0x20, "5" )
 	PORT_DIPSETTING(    0x30, "6" )
 	PORT_DIPSETTING(    0x40, "Infinites" )
-//  PORT_DIPSETTING(    0x50, "Infinites" )
-//  PORT_DIPSETTING(    0x60, "Infinites" )
-//  PORT_DIPSETTING(    0x70, "Infinites" )
+//	PORT_DIPSETTING(    0x50, "Infinites" )
+//	PORT_DIPSETTING(    0x60, "Infinites" )
+//	PORT_DIPSETTING(    0x70, "Infinites" )
 	PORT_DIPNAME( 0x80, 0x80, "Collision Detection" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
@@ -296,7 +296,7 @@ static INPUT_PORTS_START( laserbat )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 
-	PORT_START("SENSE")	/* SENSE */
+	PORT_START("SENSE")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 
@@ -374,7 +374,7 @@ static INPUT_PORTS_START( lazarian )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
 
-	PORT_START("SENSE")	/* SENSE */
+	PORT_START("SENSE")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 
@@ -424,9 +424,9 @@ static INPUT_PORTS_START( catnmous )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x30, "5" )
 	PORT_DIPSETTING(    0x40, "Infinites" )
-//  PORT_DIPSETTING(    0x50, "Infinites" )
-//  PORT_DIPSETTING(    0x60, "Infinites" )
-//  PORT_DIPSETTING(    0x70, "Infinites" )
+//	PORT_DIPSETTING(    0x50, "Infinites" )
+//	PORT_DIPSETTING(    0x60, "Infinites" )
+//	PORT_DIPSETTING(    0x70, "Infinites" )
 	PORT_DIPNAME( 0x80, 0x80, "Game Over Melody" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
@@ -457,7 +457,7 @@ static INPUT_PORTS_START( catnmous )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SENSE")	/* SENSE */
+	PORT_START("SENSE")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 

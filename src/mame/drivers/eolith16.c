@@ -45,7 +45,7 @@ static WRITE16_HANDLER( eeprom_w )
 static READ16_HANDLER( eolith16_custom_r )
 {
 	eolith_speedup_read();
-	return (input_port_read(machine, "SPECIAL") & ~0x10) | (eeprom_read_bit() << 4);
+	return input_port_read(machine, "SPECIAL");
 }
 
 
@@ -76,8 +76,8 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( eolith16 )
 	PORT_START("SPECIAL")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SPECIAL ) // eeprom bit
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(eolith_speedup_getvblank, 0)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL) // eeprom bit
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(eolith_speedup_getvblank, NULL)
 	PORT_BIT( 0xff6f, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("SYSTEM")

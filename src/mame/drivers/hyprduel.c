@@ -472,10 +472,10 @@ static ADDRESS_MAP_START( hyprduel_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x478000, 0x4787ff) AM_READ(SMH_RAM				)	// Tiles Set
 	AM_RANGE(0x4788a2, 0x4788a3) AM_READ(hyprduel_irq_cause_r	)	// IRQ Cause
 	AM_RANGE(0xc00000, 0xc07fff) AM_READ(SMH_RAM				)	// (sound driver controls)
-	AM_RANGE(0xe00000, 0xe00001) AM_READ(input_port_0_word_r	)	// Inputs
-	AM_RANGE(0xe00002, 0xe00003) AM_READ(input_port_1_word_r	)	//
-	AM_RANGE(0xe00004, 0xe00005) AM_READ(input_port_2_word_r	)	//
-	AM_RANGE(0xe00006, 0xe00007) AM_READ(input_port_3_word_r	)	//
+	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("SERVICE")
+	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("DSW")
+	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("P1_P2")
+	AM_RANGE(0xe00006, 0xe00007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xfe0000, 0xffffff) AM_READ(SMH_RAM				)
 ADDRESS_MAP_END
 
@@ -540,10 +540,10 @@ static ADDRESS_MAP_START( magerror_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x878000, 0x8787ff) AM_READ(SMH_RAM				)	// Tiles Set
 	AM_RANGE(0x8788a2, 0x8788a3) AM_READ(hyprduel_irq_cause_r	)	// IRQ Cause
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READ(SMH_RAM				)	// (sound driver controls) ?
-	AM_RANGE(0xe00000, 0xe00001) AM_READ(input_port_0_word_r	)	// Inputs
-	AM_RANGE(0xe00002, 0xe00003) AM_READ(input_port_1_word_r	)	//
-	AM_RANGE(0xe00004, 0xe00005) AM_READ(input_port_2_word_r	)	//
-	AM_RANGE(0xe00006, 0xe00007) AM_READ(input_port_3_word_r	)	//
+	AM_RANGE(0xe00000, 0xe00001) AM_READ_PORT("SERVICE")
+	AM_RANGE(0xe00002, 0xe00003) AM_READ_PORT("DSW")
+	AM_RANGE(0xe00004, 0xe00005) AM_READ_PORT("P1_P2")
+	AM_RANGE(0xe00006, 0xe00007) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xfe0000, 0xffffff) AM_READ(SMH_RAM				)
 ADDRESS_MAP_END
 

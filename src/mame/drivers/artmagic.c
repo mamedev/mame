@@ -376,9 +376,9 @@ static void stonebal_protection(running_machine *machine)
 }
 
 
-static READ16_HANDLER( special_port5_r )
+static CUSTOM_INPUT( prot_r )
 {
-	return input_port_read(machine, "300008") | prot_output_bit;
+	return prot_output_bit;
 }
 
 
@@ -422,7 +422,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("300004")
 	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("300006")
 	AM_RANGE(0x300008, 0x300009) AM_READ_PORT("300008")
-	AM_RANGE(0x30000a, 0x30000b) AM_READ(special_port5_r)
+	AM_RANGE(0x30000a, 0x30000b) AM_READ_PORT("30000a")
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_BASE(&control)
 	AM_RANGE(0x300004, 0x300007) AM_WRITE(protection_bit_w)
 	AM_RANGE(0x360000, 0x360001) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
@@ -439,7 +439,7 @@ static ADDRESS_MAP_START( stonebal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300004, 0x300005) AM_READ_PORT("300004")
 	AM_RANGE(0x300006, 0x300007) AM_READ_PORT("300006")
 	AM_RANGE(0x300008, 0x300009) AM_READ_PORT("300008")
-	AM_RANGE(0x30000a, 0x30000b) AM_READ(special_port5_r)
+	AM_RANGE(0x30000a, 0x30000b) AM_READ_PORT("30000a")
 	AM_RANGE(0x30000c, 0x30000d) AM_READ_PORT("30000c")
 	AM_RANGE(0x30000e, 0x30000f) AM_READ_PORT("30000e")
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_BASE(&control)
@@ -575,7 +575,7 @@ static INPUT_PORTS_START( cheesech )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("30000a")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* protection data */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(prot_r, NULL)	/* protection data */
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* protection ready */
 	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )

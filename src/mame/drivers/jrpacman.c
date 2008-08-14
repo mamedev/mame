@@ -20,9 +20,9 @@
     memory mapped ports:
 
     read:
-    5000      IN0
-    5040      IN1
-    5080      DSW1
+    5000      P1
+    5040      P2
+    5080      DSW
 
     *
      * IN0 (all bits are inverted)
@@ -122,21 +122,21 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(jrpacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4800, 0x4fef) AM_RAM
 	AM_RANGE(0x4ff0, 0x4fff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x5000, 0x503f) AM_READ(input_port_0_r)	/* IN0 */
+	AM_RANGE(0x5000, 0x503f) AM_READ_PORT("P1")
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(pacman_sound_enable_w)
 	AM_RANGE(0x5003, 0x5003) AM_WRITE(pacman_flipscreen_w)
-	AM_RANGE(0x5040, 0x507f) AM_READ(input_port_1_r)	/* IN1 */
+	AM_RANGE(0x5040, 0x507f) AM_READ_PORT("P2")
 	AM_RANGE(0x5040, 0x505f) AM_WRITE(pacman_sound_w) AM_BASE(&pacman_soundregs)
-	AM_RANGE(0x5060, 0x506f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
+	AM_RANGE(0x5060, 0x506f) AM_WRITEONLY AM_BASE(&spriteram_2)
 	AM_RANGE(0x5070, 0x5070) AM_WRITE(pengo_palettebank_w)
 	AM_RANGE(0x5071, 0x5071) AM_WRITE(pengo_colortablebank_w)
 	AM_RANGE(0x5073, 0x5073) AM_WRITE(jrpacman_bgpriority_w)
 	AM_RANGE(0x5074, 0x5074) AM_WRITE(jrpacman_charbank_w)
 	AM_RANGE(0x5075, 0x5075) AM_WRITE(jrpacman_spritebank_w)
-	AM_RANGE(0x5080, 0x50bf) AM_READ(input_port_2_r)	/* DSW1 */
+	AM_RANGE(0x5080, 0x50bf) AM_READ_PORT("DSW")
 	AM_RANGE(0x5080, 0x5080) AM_WRITE(jrpacman_scroll_w)
-	AM_RANGE(0x50c0, 0x50c0) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x50c0, 0x50c0) AM_WRITENOP
 	AM_RANGE(0x8000, 0xdfff) AM_ROM
 ADDRESS_MAP_END
 
@@ -155,7 +155,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( jrpacman )
-	PORT_START("IN0")
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
@@ -167,7 +167,7 @@ static INPUT_PORTS_START( jrpacman )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN3 )
 
-	PORT_START("IN1")
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
@@ -179,7 +179,7 @@ static INPUT_PORTS_START( jrpacman )
 	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
-	PORT_START("DSW0")
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )

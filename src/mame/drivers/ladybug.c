@@ -93,16 +93,16 @@ static ADDRESS_MAP_START( ladybug_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x6fff) AM_RAM
 	AM_RANGE(0x7000, 0x73ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x8000, 0x8fff) AM_READ(SMH_NOP)
-	AM_RANGE(0x9000, 0x9000) AM_READ(input_port_0_r)
-	AM_RANGE(0x9001, 0x9001) AM_READ(input_port_1_r)
-	AM_RANGE(0x9002, 0x9002) AM_READ(input_port_3_r)
-	AM_RANGE(0x9003, 0x9003) AM_READ(input_port_4_r)
+	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN0")
+	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("IN1")
+	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("DSW0")
+	AM_RANGE(0x9003, 0x9003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(ladybug_flipscreen_w)
 	AM_RANGE(0xb000, 0xbfff) AM_WRITE(sn76496_0_w)
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(sn76496_1_w)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(ladybug_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(ladybug_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xe000, 0xe000) AM_READ(input_port_2_r)	/* IN2 */
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
 
@@ -113,10 +113,10 @@ static ADDRESS_MAP_START( sraider_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8005, 0x8005) AM_READ(sraider_8005_r)  // protection check?
 	AM_RANGE(0x8006, 0x8006) AM_WRITE(sraider_sound_low_w)
 	AM_RANGE(0x8007, 0x8007) AM_WRITE(sraider_sound_high_w)
-	AM_RANGE(0x9000, 0x9000) AM_READ(input_port_0_r)
-	AM_RANGE(0x9001, 0x9001) AM_READ(input_port_1_r)
-	AM_RANGE(0x9002, 0x9002) AM_READ(input_port_2_r)
-	AM_RANGE(0x9003, 0x9003) AM_READ(input_port_3_r)
+	AM_RANGE(0x9000, 0x9000) AM_READ_PORT("IN0")
+	AM_RANGE(0x9001, 0x9001) AM_READ_PORT("IN1")
+	AM_RANGE(0x9002, 0x9002) AM_READ_PORT("DSW0")
+	AM_RANGE(0x9003, 0x9003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd000, 0xd3ff) AM_WRITE(ladybug_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0xd400, 0xd7ff) AM_WRITE(ladybug_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(SMH_NOP)  //unknown 0x10 when in attract, 0x20 when coined/playing
@@ -184,13 +184,13 @@ static CUSTOM_INPUT( ladybug_p2_control_r )
 
 static INPUT_PORTS_START( ladybug )
 	PORT_START("IN0")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ladybug_p1_control_r, 0)
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ladybug_p1_control_r, NULL)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ladybug_p2_control_r, 0)
+	PORT_BIT( 0x1f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ladybug_p2_control_r, NULL)
 	/* This should be connected to the 4V clock. I don't think the game uses it. */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	/* Note that there are TWO VBlank inputs, one is active low, the other active */

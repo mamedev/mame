@@ -443,7 +443,7 @@ static INPUT_PORTS_START( combasc )
 
 	PORT_INCLUDE( common_inputs )
 
-	PORT_START("IN2")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
@@ -827,7 +827,7 @@ static DRIVER_INIT( combasct )
 static DRIVER_INIT( combasc )
 {
 	/* joystick instead of trackball */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0404, 0x0404, 0, 0, input_port_4_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0404, 0x0404, 0, 0, input_port_read_handler8(machine->portconfig, "IN1"));
 
 	combasc_init_common();
 }

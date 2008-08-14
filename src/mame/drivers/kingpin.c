@@ -94,10 +94,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( kingpin_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(io_read_missing_dips)
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_2_r)
-/*  AM_RANGE(0x02, 0x02) AM_READ(io_read_missing_dips) */
-	AM_RANGE(0x10, 0x10) AM_READ(input_port_0_r)
-	AM_RANGE(0x11, 0x11) AM_READ(input_port_1_r)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW")
+/*	AM_RANGE(0x02, 0x02) AM_READ(io_read_missing_dips) */
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
+	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")
 	AM_RANGE(0x20, 0x20) AM_READ(TMS9928A_vram_r)
 	AM_RANGE(0x21, 0x21) AM_READ(TMS9928A_register_r)
 ADDRESS_MAP_END
