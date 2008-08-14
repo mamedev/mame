@@ -690,10 +690,10 @@ static MACHINE_DRIVER_START( ladybug )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-   MDRV_SOUND_ADD("sn1", SN76489, 4000000)
+	MDRV_SOUND_ADD("sn1", SN76489, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-   MDRV_SOUND_ADD("sn2", SN76489, 4000000)
+	MDRV_SOUND_ADD("sn2", SN76489, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -753,118 +753,118 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( ladybug )
-	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "lb1.cpu",      0x0000, 0x1000, CRC(d09e0adb) SHA1(ddc1f849cbcefb64b70a26c2a4c993f0516af814) )
-	ROM_LOAD( "lb2.cpu",      0x1000, 0x1000, CRC(88bc4a0a) SHA1(193c9f90b7550020c0923cb158dff7d5faa53bc6) )
-	ROM_LOAD( "lb3.cpu",      0x2000, 0x1000, CRC(53e9efce) SHA1(1960e9cd896b6a65197aefc3f10348103552b598) )
-	ROM_LOAD( "lb4.cpu",      0x3000, 0x1000, CRC(ffc424d7) SHA1(2a4b9533e61e265bdd38c126add8c26d5bc048d5) )
-	ROM_LOAD( "lb5.cpu",      0x4000, 0x1000, CRC(ad6af809) SHA1(276275d56c725b9d90eeb44c317ceb06bac27ae7) )
-	ROM_LOAD( "lb6.cpu",      0x5000, 0x1000, CRC(cf1acca4) SHA1(c05de7de4bd05d5c2af6aa752e057a9286f3effc) )
+	ROM_REGION( 0x10000, "main", 0 ) /* Located on the UNIVERSAL 8106-A2 CPU PCB */
+	ROM_LOAD( "l1.c4", 0x0000, 0x1000, CRC(d09e0adb) SHA1(ddc1f849cbcefb64b70a26c2a4c993f0516af814) ) /* PCB silkscreened ROM1 */
+	ROM_LOAD( "l2.d4", 0x1000, 0x1000, CRC(88bc4a0a) SHA1(193c9f90b7550020c0923cb158dff7d5faa53bc6) ) /* PCB silkscreened ROM2 */
+	ROM_LOAD( "l3.e4", 0x2000, 0x1000, CRC(53e9efce) SHA1(1960e9cd896b6a65197aefc3f10348103552b598) ) /* PCB silkscreened ROM3 */
+	ROM_LOAD( "l4.h4", 0x3000, 0x1000, CRC(ffc424d7) SHA1(2a4b9533e61e265bdd38c126add8c26d5bc048d5) ) /* PCB silkscreened ROM4 */
+	ROM_LOAD( "l5.j4", 0x4000, 0x1000, CRC(ad6af809) SHA1(276275d56c725b9d90eeb44c317ceb06bac27ae7) ) /* PCB silkscreened ROM5 */
+	ROM_LOAD( "l6.k4", 0x5000, 0x1000, CRC(cf1acca4) SHA1(c05de7de4bd05d5c2af6aa752e057a9286f3effc) ) /* PCB silkscreened ROM6 */
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "lb9.vid",      0x0000, 0x1000, CRC(77b1da1e) SHA1(58cb82417396a3d96acfc864f091b1a5988f228d) )
-	ROM_LOAD( "lb10.vid",     0x1000, 0x1000, CRC(aa82e00b) SHA1(83a5b745e58844b6dd7d05dfe9dbb5959aaf5c40) )
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE ) /* Located on the UNIVERSAL 8106-B video PCB */
+	ROM_LOAD( "l9.f7", 0x0000, 0x1000, CRC(77b1da1e) SHA1(58cb82417396a3d96acfc864f091b1a5988f228d) )
+	ROM_LOAD( "l0.h7", 0x1000, 0x1000, CRC(aa82e00b) SHA1(83a5b745e58844b6dd7d05dfe9dbb5959aaf5c40) )
 
-	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "lb8.cpu",      0x0000, 0x1000, CRC(8b99910b) SHA1(0bc812cf872f04eacedb50feed53f1aa8a1f24b9) )
-	ROM_LOAD( "lb7.cpu",      0x1000, 0x1000, CRC(86a5b448) SHA1(f8585a6fcf921e3e21f112dd2de474cb53cef290) )
+	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE ) /* Located on the UNIVERSAL 8106-A2 CPU PCB */
+	ROM_LOAD( "l8.l7", 0x0000, 0x1000, CRC(8b99910b) SHA1(0bc812cf872f04eacedb50feed53f1aa8a1f24b9) )
+	ROM_LOAD( "l7.m7", 0x1000, 0x1000, CRC(86a5b448) SHA1(f8585a6fcf921e3e21f112dd2de474cb53cef290) )
 
-	ROM_REGION( 0x0060, "proms", 0 )
-	ROM_LOAD( "10-2.vid",     0x0000, 0x0020, CRC(df091e52) SHA1(4d7fea6d9ab31e5f280b1dc198a325f00c3826ef) ) /* palette */
-	ROM_LOAD( "10-1.vid",     0x0020, 0x0020, CRC(40640d8f) SHA1(85d13a9b78c47174cff7c869f52b30263bae575e) ) /* sprite color lookup table */
-	ROM_LOAD( "10-3.vid",     0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
+	ROM_REGION( 0x0060, "proms", 0 ) /* BPROMs are 82s123 & located on the UNIVERSAL 8106-B video PCB */
+	ROM_LOAD( "10-2.k1", 0x0000, 0x0020, CRC(df091e52) SHA1(4d7fea6d9ab31e5f280b1dc198a325f00c3826ef) ) /* palette */
+	ROM_LOAD( "10-1.f4", 0x0020, 0x0020, CRC(40640d8f) SHA1(85d13a9b78c47174cff7c869f52b30263bae575e) ) /* sprite color lookup table */
+	ROM_LOAD( "10-3.c4", 0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
 ROM_END
 
 ROM_START( ladybugb )
 	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "lb1a.cpu",     0x0000, 0x1000, CRC(ec135e54) SHA1(69fc6db04b28c25eda329fc88c235267ca93a09f) )
-	ROM_LOAD( "lb2a.cpu",     0x1000, 0x1000, CRC(3049c5c6) SHA1(51ceb70fa4789ff91c9bb1e157be5b6c09ff3c8e) )
-	ROM_LOAD( "lb3a.cpu",     0x2000, 0x1000, CRC(b0fef837) SHA1(37e9d8d157c3af12cd97534a42dd21f621ac501b) )
-	ROM_LOAD( "lb4.cpu",      0x3000, 0x1000, CRC(ffc424d7) SHA1(2a4b9533e61e265bdd38c126add8c26d5bc048d5) )
-	ROM_LOAD( "lb5.cpu",      0x4000, 0x1000, CRC(ad6af809) SHA1(276275d56c725b9d90eeb44c317ceb06bac27ae7) )
-	ROM_LOAD( "lb6a.cpu",     0x5000, 0x1000, CRC(88c8002a) SHA1(ffff1b8d4c1521710c988eee12081d28ed491ccf) )
+	ROM_LOAD( "lb1a.cpu", 0x0000, 0x1000, CRC(ec135e54) SHA1(69fc6db04b28c25eda329fc88c235267ca93a09f) )
+	ROM_LOAD( "lb2a.cpu", 0x1000, 0x1000, CRC(3049c5c6) SHA1(51ceb70fa4789ff91c9bb1e157be5b6c09ff3c8e) )
+	ROM_LOAD( "lb3a.cpu", 0x2000, 0x1000, CRC(b0fef837) SHA1(37e9d8d157c3af12cd97534a42dd21f621ac501b) )
+	ROM_LOAD( "l4.h4",    0x3000, 0x1000, CRC(ffc424d7) SHA1(2a4b9533e61e265bdd38c126add8c26d5bc048d5) )
+	ROM_LOAD( "l5.j4",    0x4000, 0x1000, CRC(ad6af809) SHA1(276275d56c725b9d90eeb44c317ceb06bac27ae7) )
+	ROM_LOAD( "lb6a.cpu", 0x5000, 0x1000, CRC(88c8002a) SHA1(ffff1b8d4c1521710c988eee12081d28ed491ccf) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "lb9.vid",      0x0000, 0x1000, CRC(77b1da1e) SHA1(58cb82417396a3d96acfc864f091b1a5988f228d) )
-	ROM_LOAD( "lb10.vid",     0x1000, 0x1000, CRC(aa82e00b) SHA1(83a5b745e58844b6dd7d05dfe9dbb5959aaf5c40) )
+	ROM_LOAD( "l9.f7", 0x0000, 0x1000, CRC(77b1da1e) SHA1(58cb82417396a3d96acfc864f091b1a5988f228d) )
+	ROM_LOAD( "l0.h7", 0x1000, 0x1000, CRC(aa82e00b) SHA1(83a5b745e58844b6dd7d05dfe9dbb5959aaf5c40) )
 
-	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "lb8.cpu",      0x0000, 0x1000, CRC(8b99910b) SHA1(0bc812cf872f04eacedb50feed53f1aa8a1f24b9) )
-	ROM_LOAD( "lb7.cpu",      0x1000, 0x1000, CRC(86a5b448) SHA1(f8585a6fcf921e3e21f112dd2de474cb53cef290) )
+	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE ) /* Located on the UNIVERSAL 8106-A2 CPU PCB */
+	ROM_LOAD( "l8.l7", 0x0000, 0x1000, CRC(8b99910b) SHA1(0bc812cf872f04eacedb50feed53f1aa8a1f24b9) )
+	ROM_LOAD( "l7.m7", 0x1000, 0x1000, CRC(86a5b448) SHA1(f8585a6fcf921e3e21f112dd2de474cb53cef290) )
 
-	ROM_REGION( 0x0060, "proms", 0 )
-	ROM_LOAD( "10-2.vid",     0x0000, 0x0020, CRC(df091e52) SHA1(4d7fea6d9ab31e5f280b1dc198a325f00c3826ef) ) /* palette */
-	ROM_LOAD( "10-1.vid",     0x0020, 0x0020, CRC(40640d8f) SHA1(85d13a9b78c47174cff7c869f52b30263bae575e) ) /* sprite color lookup table */
-	ROM_LOAD( "10-3.vid",     0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
+	ROM_REGION( 0x0060, "proms", 0 ) /* BPROMs are 82s123 or compatible */
+	ROM_LOAD( "10-2.k1", 0x0000, 0x0020, CRC(df091e52) SHA1(4d7fea6d9ab31e5f280b1dc198a325f00c3826ef) ) /* palette */
+	ROM_LOAD( "10-1.f4", 0x0020, 0x0020, CRC(40640d8f) SHA1(85d13a9b78c47174cff7c869f52b30263bae575e) ) /* sprite color lookup table */
+	ROM_LOAD( "10-3.c4", 0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
 ROM_END
 
 ROM_START( ladybgb2 )
 	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "lb1b.cpu",     0x0000, 0x1000, CRC(35d61e65) SHA1(43b797f1882e0acbf6685deea82de77e78d2c917) )
-	ROM_LOAD( "lb2b.cpu",     0x1000, 0x1000, CRC(a13e0fe4) SHA1(9e2876d8390d2b072d064b197057089a25c13a4a) )
-	ROM_LOAD( "lb3b.cpu",     0x2000, 0x1000, CRC(ee8ac716) SHA1(ead222d2cd022ea3a4559e3cff08cabf2486eb68) )
-	ROM_LOAD( "lb4.cpu",      0x3000, 0x1000, CRC(ffc424d7) SHA1(2a4b9533e61e265bdd38c126add8c26d5bc048d5) )
-	ROM_LOAD( "lb5.cpu",      0x4000, 0x1000, CRC(ad6af809) SHA1(276275d56c725b9d90eeb44c317ceb06bac27ae7) )
-	ROM_LOAD( "lb6b.cpu",     0x5000, 0x1000, CRC(dc906e89) SHA1(ffa5c3fc9d438e85cbe4fb33343dec664406fda7) )
+	ROM_LOAD( "lb1b.cpu", 0x0000, 0x1000, CRC(35d61e65) SHA1(43b797f1882e0acbf6685deea82de77e78d2c917) )
+	ROM_LOAD( "lb2b.cpu", 0x1000, 0x1000, CRC(a13e0fe4) SHA1(9e2876d8390d2b072d064b197057089a25c13a4a) )
+	ROM_LOAD( "lb3b.cpu", 0x2000, 0x1000, CRC(ee8ac716) SHA1(ead222d2cd022ea3a4559e3cff08cabf2486eb68) )
+	ROM_LOAD( "l4.h4",    0x3000, 0x1000, CRC(ffc424d7) SHA1(2a4b9533e61e265bdd38c126add8c26d5bc048d5) )
+	ROM_LOAD( "l5.j4",    0x4000, 0x1000, CRC(ad6af809) SHA1(276275d56c725b9d90eeb44c317ceb06bac27ae7) )
+	ROM_LOAD( "lb6b.cpu", 0x5000, 0x1000, CRC(dc906e89) SHA1(ffa5c3fc9d438e85cbe4fb33343dec664406fda7) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "lb9.vid",      0x0000, 0x1000, CRC(77b1da1e) SHA1(58cb82417396a3d96acfc864f091b1a5988f228d) )
-	ROM_LOAD( "lb10.vid",     0x1000, 0x1000, CRC(aa82e00b) SHA1(83a5b745e58844b6dd7d05dfe9dbb5959aaf5c40) )
+	ROM_LOAD( "l9.f7", 0x0000, 0x1000, CRC(77b1da1e) SHA1(58cb82417396a3d96acfc864f091b1a5988f228d) )
+	ROM_LOAD( "l0.h7", 0x1000, 0x1000, CRC(aa82e00b) SHA1(83a5b745e58844b6dd7d05dfe9dbb5959aaf5c40) )
 
-	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "lb8.cpu",      0x0000, 0x1000, CRC(8b99910b) SHA1(0bc812cf872f04eacedb50feed53f1aa8a1f24b9) )
-	ROM_LOAD( "lb7.cpu",      0x1000, 0x1000, CRC(86a5b448) SHA1(f8585a6fcf921e3e21f112dd2de474cb53cef290) )
+	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE ) /* Located on the UNIVERSAL 8106-A2 CPU PCB */
+	ROM_LOAD( "l8.l7", 0x0000, 0x1000, CRC(8b99910b) SHA1(0bc812cf872f04eacedb50feed53f1aa8a1f24b9) )
+	ROM_LOAD( "l7.m7", 0x1000, 0x1000, CRC(86a5b448) SHA1(f8585a6fcf921e3e21f112dd2de474cb53cef290) )
 
-	ROM_REGION( 0x0060, "proms", 0 )
-	ROM_LOAD( "10-2.vid",     0x0000, 0x0020, CRC(df091e52) SHA1(4d7fea6d9ab31e5f280b1dc198a325f00c3826ef) ) /* palette */
-	ROM_LOAD( "10-1.vid",     0x0020, 0x0020, CRC(40640d8f) SHA1(85d13a9b78c47174cff7c869f52b30263bae575e) ) /* sprite color lookup table */
-	ROM_LOAD( "10-3.vid",     0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
+	ROM_REGION( 0x0060, "proms", 0 ) /* BPROMs are 82s123 or compatible */
+	ROM_LOAD( "10-2.k1", 0x0000, 0x0020, CRC(df091e52) SHA1(4d7fea6d9ab31e5f280b1dc198a325f00c3826ef) ) /* palette */
+	ROM_LOAD( "10-1.f4", 0x0020, 0x0020, CRC(40640d8f) SHA1(85d13a9b78c47174cff7c869f52b30263bae575e) ) /* sprite color lookup table */
+	ROM_LOAD( "10-3.c4", 0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
 ROM_END
 
 ROM_START( snapjack )
-	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "sj2a.bin",     0x0000, 0x1000, CRC(6b30fcda) SHA1(85e4ebbbe8e8d6c79a14387d7a6818abc9430037) )
-	ROM_LOAD( "sj2b.bin",     0x1000, 0x1000, CRC(1f1088d1) SHA1(0fd5204ea27e9bdd811e9ea21e9bbab84b916f4a) )
-	ROM_LOAD( "sj2c.bin",     0x2000, 0x1000, CRC(edd65f3a) SHA1(763d588f0755a22c0f24269e6f38979fd516693f) )
-	ROM_LOAD( "sj2d.bin",     0x3000, 0x1000, CRC(f4481192) SHA1(514bb124a1d75a622e2ca4c2175d819092d4638d) )
-	ROM_LOAD( "sj2e.bin",     0x4000, 0x1000, CRC(1bff7d05) SHA1(47246095313ebba30f42d715a9fb5fc1abb68ea6) )
-	ROM_LOAD( "sj2f.bin",     0x5000, 0x1000, CRC(21793edf) SHA1(11e259161bab3a32a8b52f7baa4fec17be6d4302) )
+	ROM_REGION( 0x10000, "main", 0 ) /* Located on the UNIVERSAL 8106-A2 CPU PCB */
+	ROM_LOAD( "sj1.c4", 0x0000, 0x1000, CRC(6b30fcda) SHA1(85e4ebbbe8e8d6c79a14387d7a6818abc9430037) ) /* PCB silkscreened ROM1 */
+	ROM_LOAD( "sj2.d4", 0x1000, 0x1000, CRC(1f1088d1) SHA1(0fd5204ea27e9bdd811e9ea21e9bbab84b916f4a) ) /* PCB silkscreened ROM2 */
+	ROM_LOAD( "sj3.e4", 0x2000, 0x1000, CRC(edd65f3a) SHA1(763d588f0755a22c0f24269e6f38979fd516693f) ) /* PCB silkscreened ROM3 */
+	ROM_LOAD( "sj4.h4", 0x3000, 0x1000, CRC(f4481192) SHA1(514bb124a1d75a622e2ca4c2175d819092d4638d) ) /* PCB silkscreened ROM4 */
+	ROM_LOAD( "sj5.j4", 0x4000, 0x1000, CRC(1bff7d05) SHA1(47246095313ebba30f42d715a9fb5fc1abb68ea6) ) /* PCB silkscreened ROM5 */
+	ROM_LOAD( "sj6.k4", 0x5000, 0x1000, CRC(21793edf) SHA1(11e259161bab3a32a8b52f7baa4fec17be6d4302) ) /* PCB silkscreened ROM6 */
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "sj2i.bin",     0x0000, 0x1000, CRC(ff2011c7) SHA1(38409e2318dee3cc0678d4ee9e93d9b895883df6) )
-	ROM_LOAD( "sj2j.bin",     0x1000, 0x1000, CRC(f097babb) SHA1(461662719bc7f1cf21c41759f4832a92b0fdb4f2) )
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE ) /* Located on the UNIVERSAL 8106-B video PCB */
+	ROM_LOAD( "sj9.f7", 0x0000, 0x1000, CRC(ff2011c7) SHA1(38409e2318dee3cc0678d4ee9e93d9b895883df6) )
+	ROM_LOAD( "sj0.h7", 0x1000, 0x1000, CRC(f097babb) SHA1(461662719bc7f1cf21c41759f4832a92b0fdb4f2) )
 
-	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "sj2h.bin",     0x0000, 0x1000, CRC(b7f105b6) SHA1(1135c3188b41cb0ccb24079c613188209b624683) )
-	ROM_LOAD( "sj2g.bin",     0x1000, 0x1000, CRC(1cdb03a8) SHA1(5f390a672f3adf6392f8060bf7f0bcabc2eba139) )
+	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE ) /* Located on the UNIVERSAL 8106-A2 CPU PCB */
+	ROM_LOAD( "sj8.l7", 0x0000, 0x1000, CRC(b7f105b6) SHA1(1135c3188b41cb0ccb24079c613188209b624683) )
+	ROM_LOAD( "sj7.m7", 0x1000, 0x1000, CRC(1cdb03a8) SHA1(5f390a672f3adf6392f8060bf7f0bcabc2eba139) )
 
-	ROM_REGION( 0x0060, "proms", 0 )
-	ROM_LOAD( "sj8t.bin",     0x0000, 0x0020, CRC(cbbd9dd1) SHA1(e267726ba59e9a42ac89dd22eb1508ad21fd32ac) ) /* palette */
-	ROM_LOAD( "sj9k.bin",     0x0020, 0x0020, CRC(5b16fbd2) SHA1(0a776aeca3947a6f29d527018f5182e758b50c5d) ) /* sprite color lookup table */
-	ROM_LOAD( "sj9h.bin",     0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
+	ROM_REGION( 0x0060, "proms", 0 ) /* BPROMs are 82s123 & located on the UNIVERSAL 8106-B video PCB */
+	ROM_LOAD( "10-2.k1", 0x0000, 0x0020, CRC(cbbd9dd1) SHA1(e267726ba59e9a42ac89dd22eb1508ad21fd32ac) ) /* palette */
+	ROM_LOAD( "10-1.f4", 0x0020, 0x0020, CRC(5b16fbd2) SHA1(0a776aeca3947a6f29d527018f5182e758b50c5d) ) /* sprite color lookup table */
+	ROM_LOAD( "10-3.c4", 0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
 ROM_END
 
 ROM_START( cavenger )
-	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "1",            0x0000, 0x1000, CRC(9e0cc781) SHA1(f23bd6b9f427c26ac996a5c8ba29f356cf45c78a) )
-	ROM_LOAD( "2",            0x1000, 0x1000, CRC(5ce5b950) SHA1(170e3f8be592dcccb8868474f40f8f2223e8a8b5) )
-	ROM_LOAD( "3",            0x2000, 0x1000, CRC(bc28218d) SHA1(4b0f1b38a5837b7ffc9aec6c28c6eb72cfa46226) )
-	ROM_LOAD( "4",            0x3000, 0x1000, CRC(2b32e9f5) SHA1(f8a7ea799d8ff9b4f830d064bb2f34a76729c336) )
-	ROM_LOAD( "5",            0x4000, 0x1000, CRC(d117153e) SHA1(622c90a6c3f0adc24fe8a1d4969075cbd55add4e) )
-	ROM_LOAD( "6",            0x5000, 0x1000, CRC(c7d366cb) SHA1(ec4981fe34abf992acbd6325b2c756c58ff80b04) )
+	ROM_REGION( 0x10000, "main", 0 ) /* Located on the UNIVERSAL 8106-A2 CPU PCB */
+	ROM_LOAD( "1.c4", 0x0000, 0x1000, CRC(9e0cc781) SHA1(f23bd6b9f427c26ac996a5c8ba29f356cf45c78a) ) /* PCB silkscreened ROM1 */
+	ROM_LOAD( "2.d4", 0x1000, 0x1000, CRC(5ce5b950) SHA1(170e3f8be592dcccb8868474f40f8f2223e8a8b5) ) /* PCB silkscreened ROM2 */
+	ROM_LOAD( "3.e4", 0x2000, 0x1000, CRC(bc28218d) SHA1(4b0f1b38a5837b7ffc9aec6c28c6eb72cfa46226) ) /* PCB silkscreened ROM3 */
+	ROM_LOAD( "4.h4", 0x3000, 0x1000, CRC(2b32e9f5) SHA1(f8a7ea799d8ff9b4f830d064bb2f34a76729c336) ) /* PCB silkscreened ROM4 */
+	ROM_LOAD( "5.j4", 0x4000, 0x1000, CRC(d117153e) SHA1(622c90a6c3f0adc24fe8a1d4969075cbd55add4e) ) /* PCB silkscreened ROM5 */
+	ROM_LOAD( "6.k4", 0x5000, 0x1000, CRC(c7d366cb) SHA1(ec4981fe34abf992acbd6325b2c756c58ff80b04) ) /* PCB silkscreened ROM6 */
 
-	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "9",            0x0000, 0x1000, CRC(63357785) SHA1(20eaa866b7700535312fd415edaea94408ff3e3d) )
-	ROM_LOAD( "0",            0x1000, 0x1000, CRC(52ad1133) SHA1(bc8c52c6ba919287773ff6a4ec793ebd95176130) )
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE ) /* Located on the UNIVERSAL 8106-B video PCB */
+	ROM_LOAD( "9.f7", 0x0000, 0x1000, CRC(63357785) SHA1(20eaa866b7700535312fd415edaea94408ff3e3d) )
+	ROM_LOAD( "0.h7", 0x1000, 0x1000, CRC(52ad1133) SHA1(bc8c52c6ba919287773ff6a4ec793ebd95176130) )
 
-	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "8",            0x0000, 0x1000, CRC(b022bf2d) SHA1(85f78d5a1e5782587bb66ad101a94fd0d62fb790) )
+	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE ) /* Located on the UNIVERSAL 8106-A2 CPU PCB */
+	ROM_LOAD( "8.l7", 0x0000, 0x1000, CRC(b022bf2d) SHA1(85f78d5a1e5782587bb66ad101a94fd0d62fb790) )
 	/* 1000-1fff empty */
 
-	ROM_REGION( 0x0060, "proms", 0 )
-	ROM_LOAD( "t8.bpr",       0x0000, 0x0020, CRC(42a24dd5) SHA1(03175ee7f8e11896a89d7cc0d614a78a49923627) ) /* palette */
-	ROM_LOAD( "k9.bpr",       0x0020, 0x0020, CRC(d736b8de) SHA1(4c9c76826f3a2a631d01fd2531d55318172b0c12) ) /* sprite color lookup table */
-	ROM_LOAD( "h9.bpr",       0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
+	ROM_REGION( 0x0060, "proms", 0 ) /* BPROMs are 82s123 & located on the UNIVERSAL 8106-B video PCB */
+	ROM_LOAD( "10-2.k1", 0x0000, 0x0020, CRC(42a24dd5) SHA1(03175ee7f8e11896a89d7cc0d614a78a49923627) ) /* palette */
+	ROM_LOAD( "10-1.f4", 0x0020, 0x0020, CRC(d736b8de) SHA1(4c9c76826f3a2a631d01fd2531d55318172b0c12) ) /* sprite color lookup table */
+	ROM_LOAD( "10-3.c4", 0x0040, 0x0020, CRC(27fa3a50) SHA1(7cf59b7a37c156640d6ea91554d1c4276c1780e0) ) /* ?? */
 ROM_END
 
 ROM_START( dorodon )
@@ -932,7 +932,7 @@ ROM_START( sraider )
 	ROM_LOAD( "sraids11.l6",  0x1000, 0x1000, CRC(ba22d949) SHA1(83762ced1df92ff594887e44d5b783826bbfb0c9) )
 
 	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
-    ROM_LOAD( "sraid-s7.m2",  0x0000, 0x1000, CRC(299f8e07) SHA1(1de71f251286088487da7285d6f8070147002af5) )
+	ROM_LOAD( "sraid-s7.m2",  0x0000, 0x1000, CRC(299f8e07) SHA1(1de71f251286088487da7285d6f8070147002af5) )
 	ROM_LOAD( "sraid-s8.n2",  0x1000, 0x1000, CRC(57ba8888) SHA1(2aa1a5f682d146a55a96e471bb78e5c60da02bf9) )
 
 	ROM_REGION( 0x1000, "gfx3", ROMREGION_DISPOSE )	/* fixed portion of the grid */
