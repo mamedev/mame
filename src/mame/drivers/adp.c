@@ -178,13 +178,15 @@ static VIDEO_UPDATE(adp)
 	int x,y,b;
 
 	b = ((HD63484_reg[0xcc/2] & 0x000f) << 16) + HD63484_reg[0xce/2];
-	for (y = 0;y < 280;y++)
+	for (y = 0;y < 480;y++)
 	{
-		for (x = 0 ; x<(HD63484_reg[0xca/2] & 0x0fff) * 2 ; x += 2)
+		for (x = 0 ; x<(HD63484_reg[0xca/2] & 0x0fff) * 2 ; x += 4)
 		{
 			b &= (HD63484_RAM_SIZE-1);
-			*BITMAP_ADDR16(bitmap, y, x) = HD63484_ram[b] & 0x00ff;
-			*BITMAP_ADDR16(bitmap, y, x+1) = (HD63484_ram[b] & 0xff00) >> 8;
+			*BITMAP_ADDR16(bitmap, y, x    ) = (HD63484_ram[b] & 0x000f);
+			*BITMAP_ADDR16(bitmap, y, x + 1) = (HD63484_ram[b] & 0x00f0) >> 4;
+			*BITMAP_ADDR16(bitmap, y, x + 2) = (HD63484_ram[b] & 0x0f00) >> 8;
+			*BITMAP_ADDR16(bitmap, y, x + 3) = (HD63484_ram[b] & 0xf000) >> 12;
 			b++;
 		}
 	}
@@ -199,15 +201,17 @@ static VIDEO_UPDATE(adp)
 
 		b = (((HD63484_reg[0xdc/2] & 0x000f) << 16) + HD63484_reg[0xde/2]);
 
-		for (y = sy ; y <= sy + h && y < 280 ; y++)
+		for (y = sy ; y <= sy + h && y < 480 ; y++)
 		{
-			for (x = 0 ; x < (HD63484_reg[0xca/2] & 0x0fff) * 2 ; x += 2)
+			for (x = 0 ; x < (HD63484_reg[0xca/2] & 0x0fff) * 2 ; x += 4)
 			{
 				b &= (HD63484_RAM_SIZE - 1);
 				if (x <= w && x + sx >= 0 && x + sx < (HD63484_reg[0xca/2] & 0x0fff) * 2)
 					{
-						*BITMAP_ADDR16(bitmap, y, x + sx) = HD63484_ram[b] & 0x00ff;
-						*BITMAP_ADDR16(bitmap, y, x + sx + 1) = (HD63484_ram[b] & 0xff00) >> 8;
+						*BITMAP_ADDR16(bitmap, y, x + sx    ) = (HD63484_ram[b] & 0x000f);
+						*BITMAP_ADDR16(bitmap, y, x + sx + 1) = (HD63484_ram[b] & 0x00f0) >> 4;
+						*BITMAP_ADDR16(bitmap, y, x + sx + 2) = (HD63484_ram[b] & 0x0f00) >> 8;
+						*BITMAP_ADDR16(bitmap, y, x + sx + 3) = (HD63484_ram[b] & 0xf000) >> 12;
 					}
 				b++;
 			}
@@ -217,19 +221,60 @@ static VIDEO_UPDATE(adp)
 	return 0;
 }
 
+static READ16_HANDLER( handler1_r )
+{
+	return 0x13;
+}
+
+static READ16_HANDLER( handler2_r )
+{
+	if (input_code_pressed(KEYCODE_Q)) return 0x01;
+	if (input_code_pressed(KEYCODE_W)) return 0x02;
+	if (input_code_pressed(KEYCODE_E)) return 0x04;
+	if (input_code_pressed(KEYCODE_R)) return 0x08;
+	return mame_rand(machine) & 0xff;
+}
+
+static READ16_HANDLER( handler3_r )
+{
+	return mame_rand(machine) & 0x0000;
+//	return mame_rand(machine) & 0xffff;
+}
+
 static ADDRESS_MAP_START( skattv_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x800080, 0x800081) AM_READ(handler2_r)
 	AM_RANGE(0x8000a0, 0x8000a1) AM_READWRITE(HD63484_status_r, HD63484_address_w) // bad
 	AM_RANGE(0x8000a2, 0x8000a3) AM_READWRITE(HD63484_data_r, HD63484_data_w) // bad
-	AM_RANGE(0x800100, 0x8001ff) AM_RAM // bad
+//	AM_RANGE(0x800100, 0x8001ff) AM_RAM // bad
+	AM_RANGE(0x800180, 0x800181) AM_READ(handler1_r)
+	AM_RANGE(0xffd246, 0xffd247) AM_READ(handler3_r)
+//	AM_RANGE(0xffd248, 0xffd249) AM_READ(handler3_r)
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quickjac_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x40001f) AM_RAM // bad
-	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w) // bad
-	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w) // bad
+	AM_RANGE(0x400000, 0x400001) AM_READ(handler1_r)
+	AM_RANGE(0x400002, 0x400003) AM_READ(handler1_r)
+	AM_RANGE(0x400004, 0x400005) AM_READ(handler1_r)
+	AM_RANGE(0x400006, 0x400007) AM_READ(handler1_r)
+	AM_RANGE(0x400008, 0x400009) AM_READ(handler1_r)
+	AM_RANGE(0x40000a, 0x40000b) AM_READ(handler1_r)
+	AM_RANGE(0x40000c, 0x40000d) AM_READ(handler1_r)
+	AM_RANGE(0x40000e, 0x40000f) AM_READ(handler1_r)
+	AM_RANGE(0x400010, 0x400011) AM_READ(handler1_r)
+	AM_RANGE(0x400012, 0x400013) AM_READ(handler1_r)
+	AM_RANGE(0x400014, 0x400015) AM_READ(handler1_r)
+	AM_RANGE(0x400016, 0x400017) AM_READ(handler1_r)
+	AM_RANGE(0x400018, 0x400019) AM_READ(handler1_r)
+	AM_RANGE(0x40001a, 0x40001b) AM_READ(handler1_r)
+	AM_RANGE(0x40001c, 0x40001d) AM_READ(handler1_r)
+	AM_RANGE(0x40001e, 0x40001f) AM_READ(handler1_r)
+//	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w) // bad
+//	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w) // bad
+	AM_RANGE(0x800080, 0x800081) AM_READ(handler1_r)
+	AM_RANGE(0x800082, 0x800083) AM_READ(handler1_r)
 	AM_RANGE(0x800100, 0x8001ff) AM_RAM // bad
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
@@ -250,6 +295,7 @@ INPUT_PORTS_END
 static MACHINE_DRIVER_START( quickjac )
 	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(quickjac_mem, 0)
+	//MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -272,6 +318,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( skattv )
 	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(skattv_mem, 0)
+//	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
