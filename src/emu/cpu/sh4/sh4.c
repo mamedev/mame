@@ -3898,7 +3898,7 @@ static TIMER_CALLBACK( sh4_rtc_timer_callback )
 static TIMER_CALLBACK( sh4_timer_callback )
 {
 	static const UINT16 tuni[] = { SH4_INTC_TUNI0, SH4_INTC_TUNI1, SH4_INTC_TUNI2 };
-	int which = (int)ptr;
+	int which = (int)(FPTR)ptr;
 	int cpunum = param;
 	int idx = tcr[which];
 
@@ -4654,7 +4654,7 @@ static void sh4_init(int index, int clock, const void *config, int (*irqcallback
 
 	for (i=0; i<3; i++)
 	{
-		sh4.timer[i] = timer_alloc(sh4_timer_callback, (void*)i);
+		sh4.timer[i] = timer_alloc(sh4_timer_callback, (void*)(FPTR)i);
 		timer_adjust_oneshot(sh4.timer[i], attotime_never, 0);
 	}
 
