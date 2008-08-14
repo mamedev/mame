@@ -126,23 +126,10 @@ WRITE8_HANDLER( starwars_out_w )
  *
  *************************************/
 
-READ8_HANDLER( starwars_input_1_r )
+CUSTOM_INPUT( matrix_flag_r )
 {
-	int x = input_port_read(machine, "IN1");
-
 	/* set the matrix processor flag */
-	if (math_run)
-		x |= 0x80;
-	else
-		x &= ~0x80;
-
-	/* set the AVG done flag */
-	if (avgdvg_done())
-		x |= 0x40;
-	else
-		x &= ~0x40;
-
-	return x;
+	return math_run ? 1 : 0;
 }
 
 

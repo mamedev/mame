@@ -1222,6 +1222,11 @@ int avgdvg_done(void)
 	return vg->sync_halt;
 }
 
+CUSTOM_INPUT( avgdvg_done_r )
+{
+	return vg->sync_halt ? 0x01 : 0x00;
+}
+
 WRITE8_HANDLER( avgdvg_go_w )
 {
 	if (vg->sync_halt && (nvect > 10))

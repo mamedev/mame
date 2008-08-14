@@ -212,9 +212,6 @@
 
 #include "bzone.lh"
 
-#define IN0_3KHZ (1<<7)
-#define IN0_VG_HALT (1<<6)
-
 #define MASTER_CLOCK (12096000)
 #define CLOCK_3KHZ  (MASTER_CLOCK / 4096)
 
@@ -269,23 +266,9 @@ static INTERRUPT_GEN( bzone_interrupt )
  *
  *************************************/
 
-READ8_HANDLER( bzone_IN0_r )
+static CUSTOM_INPUT( clock_r )
 {
-	int res;
-
-	res = input_port_read(machine, "IN0");
-
-	if (activecpu_gettotalcycles() & 0x100)
-		res |= IN0_3KHZ;
-	else
-		res &= ~IN0_3KHZ;
-
-	if (avgdvg_done())
-		res |= IN0_VG_HALT;
-	else
-		res &= ~IN0_VG_HALT;
-
-	return res;
+	return (cpunum_gettotalcycles(0) & 0x100) ? 1 : 0;
 }
 
 
@@ -318,7 +301,7 @@ static READ8_HANDLER( redbaron_joy_r )
 static ADDRESS_MAP_START( bzone_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_READ(bzone_IN0_r)    /* IN0 */
+	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
 	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(bzone_coin_counter_w)
@@ -338,7 +321,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( redbaron_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_READ(bzone_IN0_r)    /* IN0 */
+	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
 	AM_RANGE(0x0a00, 0x0a00) AM_READ_PORT("DSW0")
 	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x1000, 0x1000) AM_WRITE(SMH_NOP)		/* coin out */
@@ -369,18 +352,16 @@ ADDRESS_MAP_END
 
 #define BZONEIN0\
 	PORT_START("IN0")\
-	PORT_BIT ( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )\
-	PORT_BIT ( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )\
-	PORT_BIT ( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )\
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )\
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )\
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )\
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )\
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)\
  	/* bit 6 is the VG HALT bit. We set it to "low" */\
 	/* per default (busy vector processor). */\
- 	/* handled by bzone_IN0_r() */\
-	PORT_BIT ( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )\
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)\
 	/* bit 7 is tied to a 3kHz clock */\
- 	/* handled by bzone_IN0_r() */\
-  	PORT_BIT ( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(clock_r, NULL)
 
 
 #define BZONEDSW0\

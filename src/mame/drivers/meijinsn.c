@@ -84,7 +84,7 @@ static READ16_HANDLER( alpha_mcu_r )
 	switch (offset)
 	{
 		case 0: /* Dipswitch 2 */
-			shared_ram[0] = (source&0xff00)|input_port_read(machine, "IN2");
+			shared_ram[0] = (source&0xff00)|input_port_read(machine, "DSW");
 			return 0;
 
 		case 0x22: /* Coin value */
@@ -95,15 +95,15 @@ static READ16_HANDLER( alpha_mcu_r )
 
 			credits=0;
 
-			if ((input_port_read(machine, "IN3")&0x3)==3) latch=0;
+			if ((input_port_read(machine, "COINS")&0x3)==3) latch=0;
 
-			if ((input_port_read(machine, "IN3")&0x1)==0 && !latch)
+			if ((input_port_read(machine, "COINS")&0x1)==0 && !latch)
 			{
 				shared_ram[0x29] = (source&0xff00)|(0x22);	// coinA
 				shared_ram[0x22] = (source&0xff00)|0x0;
 				latch=1;
 
-				coinvalue = (~input_port_read(machine, "IN2")>>3) & 1;
+				coinvalue = (~input_port_read(machine, "DSW")>>3) & 1;
 
 				deposits1++;
 				if (deposits1 == coinage1[coinvalue][0])
@@ -114,13 +114,13 @@ static READ16_HANDLER( alpha_mcu_r )
 				else
 					credits = 0;
 			}
-			else if ((input_port_read(machine, "IN3")&0x2)==0 && !latch)
+			else if ((input_port_read(machine, "COINS")&0x2)==0 && !latch)
 			{
 				shared_ram[0x29] = (source&0xff00)|(0x22);	// coinA
 				shared_ram[0x22] = (source&0xff00)|0x0;
 				latch=1;
 
-				coinvalue = (~input_port_read(machine, "IN2")>>3) & 1;
+				coinvalue = (~input_port_read(machine, "DSW")>>3) & 1;
 
 				deposits2++;
 				if (deposits2 == coinage2[coinvalue][0])
@@ -149,8 +149,8 @@ static ADDRESS_MAP_START( meijinsn_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x180dff) AM_RAM
 	AM_RANGE(0x180e00, 0x180fff) AM_RAM AM_BASE(&shared_ram)
 	AM_RANGE(0x181000, 0x181fff) AM_RAM
-	AM_RANGE(0x1c0000, 0x1c0001) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x1a0000, 0x1a0001) AM_WRITE(sound_w) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x1c0000, 0x1c0001) AM_READ_PORT("P2")
+	AM_RANGE(0x1a0000, 0x1a0001) AM_READ_PORT("P1") AM_WRITE(sound_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( meijinsn_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -167,28 +167,28 @@ static ADDRESS_MAP_START( meijinsn_sound_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( meijinsn )
-PORT_START("IN0")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(1)
+	PORT_START("P1")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1        ) PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2        ) PORT_PLAYER(1)
-	PORT_BIT( 0x7cc0, IP_ACTIVE_HIGH, IPT_UNKNOWN        )
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_START1  )
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_START2  )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x7cc0, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SERVICE )
 
-	PORT_START("IN1")
-	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON1        ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON2        ) PORT_PLAYER(2)
-	PORT_BIT( 0xc0ff, IP_ACTIVE_HIGH, IPT_UNKNOWN        )
+	PORT_START("P2")
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT) PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0xc0ff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("IN2")
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x07, 0x00, "Game time (actual game)" )
 	PORT_DIPSETTING(    0x07, "1:00" )
 	PORT_DIPSETTING(    0x06, "2:00" )
@@ -208,7 +208,7 @@ PORT_START("IN0")
 	PORT_DIPSETTING(    0x20, "1:00" )
 	PORT_DIPSETTING(    0x00, "2:00" )
 
-	PORT_START("IN3")  /* Coin input to microcontroller */
+	PORT_START("COINS")  /* Coin input to microcontroller */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END

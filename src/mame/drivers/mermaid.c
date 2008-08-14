@@ -107,18 +107,18 @@ VIDEO_EOF( mermaid );
 
 /* Read/Write Handlers */
 
-static UINT8 *mermaid_AY8910_enable;
+static UINT8 *mermaid_ay8910_enable;
 
-static WRITE8_HANDLER( mermaid_AY8910_write_port_w )
+static WRITE8_HANDLER( mermaid_ay8910_write_port_w )
 {
-	if (mermaid_AY8910_enable[0]) ay8910_write_port_0_w(machine, offset, data);
-	if (mermaid_AY8910_enable[1]) ay8910_write_port_1_w(machine, offset, data);
+	if (mermaid_ay8910_enable[0]) ay8910_write_port_0_w(machine, offset, data);
+	if (mermaid_ay8910_enable[1]) ay8910_write_port_1_w(machine, offset, data);
 }
 
-static WRITE8_HANDLER( mermaid_AY8910_control_port_w )
+static WRITE8_HANDLER( mermaid_ay8910_control_port_w )
 {
-	if (mermaid_AY8910_enable[0]) ay8910_control_port_0_w(machine, offset, data);
-	if (mermaid_AY8910_enable[1]) ay8910_control_port_1_w(machine, offset, data);
+	if (mermaid_ay8910_enable[0]) ay8910_control_port_0_w(machine, offset, data);
+	if (mermaid_ay8910_enable[1]) ay8910_control_port_1_w(machine, offset, data);
 }
 
 /* Memory Map */
@@ -132,26 +132,26 @@ static ADDRESS_MAP_START( mermaid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd840, 0xd85f) AM_RAM_WRITE(mermaid_fg_scroll_w) AM_BASE(&mermaid_fg_scrollram)
 	AM_RANGE(0xd880, 0xd8bf) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(mermaid_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0xe000, 0xe000) AM_READ(input_port_0_r)
-	AM_RANGE(0xe000, 0xe001) AM_RAM AM_BASE(&mermaid_AY8910_enable)
+	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW")
+	AM_RANGE(0xe000, 0xe001) AM_RAM AM_BASE(&mermaid_ay8910_enable)
 	AM_RANGE(0xe002, 0xe002) AM_WRITENOP	// ???
 	AM_RANGE(0xe003, 0xe003) AM_WRITENOP	// ???
 	AM_RANGE(0xe004, 0xe004) AM_WRITENOP	// ???
 	AM_RANGE(0xe005, 0xe005) AM_WRITE(mermaid_flip_screen_x_w)
 	AM_RANGE(0xe006, 0xe006) AM_WRITE(mermaid_flip_screen_y_w)
 	AM_RANGE(0xe007, 0xe007) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0xe800, 0xe800) AM_READ(input_port_1_r) AM_WRITENOP // ???
+	AM_RANGE(0xe800, 0xe800) AM_READ_PORT("P1") AM_WRITENOP // ???
 	AM_RANGE(0xe801, 0xe801) AM_WRITENOP	// ???
 	AM_RANGE(0xe802, 0xe802) AM_WRITENOP	// ???
 	AM_RANGE(0xe803, 0xe803) AM_WRITENOP	// ???
 	AM_RANGE(0xe804, 0xe804) AM_WRITE(rougien_gfxbankswitch1_w)
 	AM_RANGE(0xe805, 0xe805) AM_WRITE(rougien_gfxbankswitch2_w)
 	AM_RANGE(0xe807, 0xe807) AM_WRITENOP	// ???
-	AM_RANGE(0xf000, 0xf000) AM_READ(input_port_2_r)
+	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("P2")
 	AM_RANGE(0xf800, 0xf800) AM_READ(mermaid_collision_r)
 	AM_RANGE(0xf802, 0xf802) AM_WRITENOP	// ???
-	AM_RANGE(0xf806, 0xf806) AM_WRITE(mermaid_AY8910_write_port_w)
-	AM_RANGE(0xf807, 0xf807) AM_WRITE(mermaid_AY8910_control_port_w)
+	AM_RANGE(0xf806, 0xf806) AM_WRITE(mermaid_ay8910_write_port_w)
+	AM_RANGE(0xf807, 0xf807) AM_WRITE(mermaid_ay8910_control_port_w)
 ADDRESS_MAP_END
 
 /* Input Ports */
@@ -178,24 +178,24 @@ static INPUT_PORTS_START( mermaid )
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
 
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_8WAY
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP    ) PORT_8WAY PORT_COCKTAIL
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT  ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN  ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )

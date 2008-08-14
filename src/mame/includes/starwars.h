@@ -20,7 +20,7 @@ extern UINT8 *starwars_ram_overlay;
 WRITE8_HANDLER( starwars_nstore_w );
 
 WRITE8_HANDLER( starwars_out_w );
-READ8_HANDLER( starwars_input_1_r );
+CUSTOM_INPUT( matrix_flag_r );
 
 READ8_HANDLER( starwars_adc_r );
 WRITE8_HANDLER( starwars_adc_select_w );

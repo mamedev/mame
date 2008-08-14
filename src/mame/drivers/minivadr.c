@@ -50,7 +50,7 @@ static VIDEO_UPDATE( minivadr )
 static ADDRESS_MAP_START( minivadr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM AM_BASE(&videoram) AM_SIZE(&videoram_size)
-	AM_RANGE(0xe008, 0xe008) AM_READWRITE(input_port_0_r, SMH_NOP)	// W - ???
+	AM_RANGE(0xe008, 0xe008) AM_READ_PORT("INPUTS") AM_WRITENOP		// W - ???
 ADDRESS_MAP_END
 
 

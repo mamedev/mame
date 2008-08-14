@@ -315,49 +315,21 @@ static WRITE8_HANDLER( wdclr_w )
 
 static CUSTOM_INPUT( tempest_knob_r )
 {
-	UINT32 ret;
-
-	if (tempest_player_select)
-	{
-		ret = input_port_read(field->port->machine, TEMPEST_KNOB_P2_TAG);
-	}
-	else
-	{
-		ret = input_port_read(field->port->machine, TEMPEST_KNOB_P1_TAG);
-	}
-
-	return ret;
+	return input_port_read(field->port->machine, (tempest_player_select == 0) ? 
+										TEMPEST_KNOB_P1_TAG : TEMPEST_KNOB_P2_TAG);
 }
 
 static CUSTOM_INPUT( tempest_buttons_r )
 {
-	UINT32 ret;
-
-	if (tempest_player_select)
-	{
-		ret = input_port_read(field->port->machine, TEMPEST_BUTTONS_P2_TAG);
-	}
-	else
-	{
-		ret = input_port_read(field->port->machine, TEMPEST_BUTTONS_P1_TAG);
-	}
-
-	return ret;
+	return input_port_read(field->port->machine, (tempest_player_select == 0) ? 
+										TEMPEST_BUTTONS_P1_TAG : TEMPEST_BUTTONS_P2_TAG);
 }
 
 
-static READ8_HANDLER( tempest_IN0_r )
+static CUSTOM_INPUT( clock_r )
 {
-	int res = input_port_read(machine, "IN0");
-
-	if (avgdvg_done())
-		res |= 0x40;
-
 	/* Emulate the 3kHz source on bit 7 (divide 1.5MHz by 512) */
-	if (activecpu_gettotalcycles() & 0x100)
-		res |= 0x80;
-
-	return res;
+	return (cpunum_gettotalcycles(0) & 0x100) ? 1 : 0;
 }
 
 
@@ -409,9 +381,9 @@ static WRITE8_HANDLER( tempest_coin_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x080f) AM_WRITE(SMH_RAM) AM_BASE(&tempest_colorram)
-	AM_RANGE(0x0c00, 0x0c00) AM_READ(tempest_IN0_r)	/* IN0 */
-	AM_RANGE(0x0d00, 0x0d00) AM_READ_PORT("DSW1")	/* DSW1 */
-	AM_RANGE(0x0e00, 0x0e00) AM_READ_PORT("DSW2")	/* DSW2 */
+	AM_RANGE(0x0c00, 0x0c00) AM_READ_PORT("IN0")
+	AM_RANGE(0x0d00, 0x0d00) AM_READ_PORT("DSW1")
+	AM_RANGE(0x0e00, 0x0e00) AM_READ_PORT("DSW2")
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("main", 0x2000)
 	AM_RANGE(0x3000, 0x3fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(tempest_coin_w)
@@ -439,7 +411,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( tempest )
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -448,14 +420,12 @@ static INPUT_PORTS_START( tempest )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
 	/* bit 6 is the VG HALT bit. We set it to "low" */
 	/* per default (busy vector processor). */
- 	/* handled by tempest_IN0_r() */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
 	/* bit 7 is tied to a 3kHz (?) clock */
- 	/* handled by tempest_IN0_r() */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(clock_r, NULL)
 
-	PORT_START("IN1/DSW0")	/* IN1/DSW0 */
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(tempest_knob_r, 0)
+	PORT_START("IN1/DSW0")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(tempest_knob_r, NULL)
 	/* The next one is reponsible for cocktail mode.
      * According to the documentation, this is not a switch, although
      * it may have been planned to put it on the Math Box PCB, D/E2 )
@@ -467,7 +437,7 @@ static INPUT_PORTS_START( tempest )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")	/* IN2 */
+	PORT_START("IN2")
 	PORT_DIPNAME(  0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(     0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(     0x03, "Medium1" )
@@ -476,12 +446,12 @@ static INPUT_PORTS_START( tempest )
 	PORT_DIPNAME(  0x04, 0x04, "Rating" )
 	PORT_DIPSETTING(     0x04, "1, 3, 5, 7, 9" )
 	PORT_DIPSETTING(     0x00, "tied to high score" )
-	PORT_BIT(0x18, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(tempest_buttons_r, 0)
+	PORT_BIT(0x18, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(tempest_buttons_r, NULL)
 	PORT_BIT(0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW1")	/* DSW1 - (N13 on analog vector generator PCB */
+	PORT_START("DSW1")	/* N13 on analog vector generator PCB */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
@@ -505,7 +475,7 @@ static INPUT_PORTS_START( tempest )
 	PORT_DIPSETTING(    0xc0, "Freeze Mode" )
 	PORT_DIPSETTING(    0xe0, "Freeze Mode" )
 
-	PORT_START("DSW2")	/* DSW2 - (L12 on analog vector generator PCB */
+	PORT_START("DSW2")	/* L12 on analog vector generator PCB */
 	PORT_DIPNAME( 0x01, 0x00, "Minimum" )
 	PORT_DIPSETTING(    0x00, "1 Credit" )
 	PORT_DIPSETTING(    0x01, "2 Credit" )

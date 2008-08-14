@@ -141,18 +141,18 @@ static ADDRESS_MAP_START( mlanding_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM AM_BASE(&ml_unk)//AM_SHARE(2)
 	AM_RANGE(0x280000, 0x2807ff) AM_RAM // is it shared with mecha ? tested around $940
 
-	AM_RANGE(0x290000, 0x290001) AM_READ(input_port_1_word_r)
-	AM_RANGE(0x290002, 0x290003) AM_READ(input_port_0_word_r)
+	AM_RANGE(0x290000, 0x290001) AM_READ_PORT("IN1")
+	AM_RANGE(0x290002, 0x290003) AM_READ_PORT("IN0")
 
 	AM_RANGE(0x240004, 0x240005) AM_NOP //watchdog ??
 	AM_RANGE(0x240006, 0x240007) AM_READ(io1_r) // vblank ?
 	AM_RANGE(0x2a0000, 0x2a0001) AM_WRITE(ml_subreset_w)
 
-	AM_RANGE(0x2b0000, 0x2b0001) AM_READ(input_port_4_word_r) //-40 .. 40 analog controls ?
-	AM_RANGE(0x2b0004, 0x2b0005) AM_READ(input_port_5_word_r) //-40 .. 40 analog controls ?
-	AM_RANGE(0x2c0000, 0x2c0001) AM_READ(input_port_6_word_r) //-60 .. 60 analog controls ?
-	AM_RANGE(0x2c0002, 0x2c0003) AM_READ(input_port_2_word_r)
-	AM_RANGE(0x2b0002, 0x2b0003) AM_READ(input_port_2_word_r)
+	AM_RANGE(0x2b0000, 0x2b0001) AM_READ_PORT("STICKX")		//-40 .. 40 analog controls ?
+	AM_RANGE(0x2b0004, 0x2b0005) AM_READ_PORT("STICKY")		//-40 .. 40 analog controls ?
+	AM_RANGE(0x2c0000, 0x2c0001) AM_READ_PORT("STICKZ")		//-60 .. 60 analog controls ?
+	AM_RANGE(0x2c0002, 0x2c0003) AM_READ_PORT("IN3")
+	AM_RANGE(0x2b0002, 0x2b0003) AM_READ_PORT("IN2")		// IN2/IN3 could be switched
 ADDRESS_MAP_END
 
 
@@ -311,24 +311,23 @@ static INPUT_PORTS_START( mlanding )
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_COIN3 )
-	PORT_DIPNAME( 0x020, 0x020, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x020, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "test 1" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "test 1" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-
-	PORT_START("STICX")  /* Stick 1 (3) */
+	PORT_START("STICX")		/* Stick 1 (3) */
 	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_X ) PORT_MINMAX(0xffd8,0x28) PORT_SENSITIVITY(30) PORT_KEYDELTA(1) PORT_PLAYER(1)
 
-	PORT_START("STICKY")  /* Stick 2 (4) */
+	PORT_START("STICKY")	/* Stick 2 (4) */
 	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_Y ) PORT_MINMAX(0xffd8,0x28) PORT_SENSITIVITY(30) PORT_KEYDELTA(1) PORT_PLAYER(1)
 
-	PORT_START("STICKZ")  /* Stick 3 (5) */
+	PORT_START("STICKZ")	/* Stick 3 (5) */
 	PORT_BIT( 0xffff, 0x0000, IPT_AD_STICK_Z ) PORT_MINMAX(0xffc4,0x3c) PORT_SENSITIVITY(30) PORT_KEYDELTA(1) PORT_PLAYER(1)
 INPUT_PORTS_END
 
@@ -438,4 +437,3 @@ static DRIVER_INIT(mlanding)
 }
 
 GAME( 1990, mlanding, 0,        mlanding,   mlanding, mlanding,        ROT0,    "Taito Corporation", "Midnight Landing", GAME_NOT_WORKING|GAME_NO_SOUND )
-

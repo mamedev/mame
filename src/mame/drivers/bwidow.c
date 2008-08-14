@@ -221,7 +221,6 @@
 #include "video/avgdvg.h"
 #include "machine/atari_vg.h"
 #include "sound/pokey.h"
-#include "bzone.h"
 
 #define MASTER_CLOCK (12096000)
 #define CLOCK_3KHZ  (MASTER_CLOCK / 4096)
@@ -295,6 +294,10 @@ static READ8_HANDLER( spacduel_IN3_r )
 	return res;
 }
 
+static CUSTOM_INPUT( clock_r )
+{
+	return (cpunum_gettotalcycles(0) & 0x100) ? 1 : 0;
+}
 
 
 /*************************************
@@ -346,7 +349,7 @@ static ADDRESS_MAP_START( bwidow_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x67ff) AM_READWRITE(pokey1_r, pokey1_w)
 	AM_RANGE(0x6800, 0x6fff) AM_READWRITE(pokey2_r, pokey2_w)
 	AM_RANGE(0x7000, 0x7000) AM_READ(atari_vg_earom_r)
-	AM_RANGE(0x7800, 0x7800) AM_READ(bzone_IN0_r)	/* IN0 */
+	AM_RANGE(0x7800, 0x7800) AM_READ_PORT("IN0")
 	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN3")
 	AM_RANGE(0x8800, 0x8800) AM_READ_PORT("IN4")
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(bwidow_misc_w) /* coin counters, leds */
@@ -362,7 +365,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spacduel_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0800, 0x0800) AM_READ(bzone_IN0_r)	/* IN0 */
+	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("IN0")
 	AM_RANGE(0x0900, 0x0907) AM_READ(spacduel_IN3_r)	/* IN1 */
 	AM_RANGE(0x0905, 0x0906) AM_WRITE(SMH_NOP) /* ignore? */
 	AM_RANGE(0x0a00, 0x0a00) AM_READ(atari_vg_earom_r)
@@ -395,11 +398,11 @@ static INPUT_PORTS_START( bwidow )
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
-	/* bit 6 is the VG HALT bit. We set it to "low" */
+ 	/* bit 6 is the VG HALT bit. We set it to "low" */
 	/* per default (busy vector processor). */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
 	/* bit 7 is tied to a 3kHz clock */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(clock_r, NULL)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME(0x03, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("D4:!7,!8")
@@ -474,14 +477,14 @@ static INPUT_PORTS_START( gravitar )
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
-	/* bit 6 is the VG HALT bit. We set it to "low" */
+ 	/* bit 6 is the VG HALT bit. We set it to "low" */
 	/* per default (busy vector processor). */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
 	/* bit 7 is tied to a 3kHz clock */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(clock_r, NULL)
 
 	PORT_START("DSW0")
-	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED ) // D4:!7,!8
+	PORT_DIPUNUSED_DIPLOC( 0x03, IP_ACTIVE_HIGH, "D4:!7,!8" )
 	PORT_DIPNAME(0x0c, 0x04, DEF_STR( Lives ) ) PORT_DIPLOCATION("D4:!5,!6")
 	PORT_DIPSETTING (  0x00, "3" )
 	PORT_DIPSETTING (  0x04, "4" )
@@ -490,7 +493,7 @@ static INPUT_PORTS_START( gravitar )
 	PORT_DIPNAME(0x10, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("D4:!4")
 	PORT_DIPSETTING (  0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING (  0x10, DEF_STR( Hard ) )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED ) // D4:!3
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_HIGH, "D4:!3" )
 	PORT_DIPNAME(0xc0, 0x00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("D4:!1,!2")
 	PORT_DIPSETTING (  0x00, "10000" )
 	PORT_DIPSETTING (  0x40, "20000" )
@@ -548,11 +551,11 @@ static INPUT_PORTS_START( lunarbat )
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	/* bit 6 is the VG HALT bit. We set it to "low" */
+ 	/* bit 6 is the VG HALT bit. We set it to "low" */
 	/* per default (busy vector processor). */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
 	/* bit 7 is tied to a 3kHz clock */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(clock_r, NULL)
 
 	PORT_START("DSW0")	/* DSW0 - Not read */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -582,11 +585,11 @@ static INPUT_PORTS_START( spacduel )
 	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
-	/* bit 6 is the VG HALT bit. We set it to "low" */
+ 	/* bit 6 is the VG HALT bit. We set it to "low" */
 	/* per default (busy vector processor). */
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
 	/* bit 7 is tied to a 3kHz clock */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(clock_r, NULL)
 
 	PORT_START("DSW0")
 	PORT_DIPNAME(0x03, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("D4:!7,!8")

@@ -7,6 +7,7 @@ extern UINT16 *quantum_colorram;
 extern UINT16 *quantum_vectorram;
 
 int avgdvg_done(void);
+CUSTOM_INPUT( avgdvg_done_r );
 WRITE8_HANDLER( avgdvg_go_w );
 WRITE8_HANDLER( avgdvg_reset_w );
 WRITE16_HANDLER( avgdvg_go_word_w );
