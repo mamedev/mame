@@ -750,7 +750,7 @@ static ADDRESS_MAP_START( namcos11_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
 	AM_RANGE(0x1fa04000, 0x1fa0ffff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(&namcos11_sharedram) /* shared ram */
 	AM_RANGE(0x1fa20000, 0x1fa2ffff) AM_WRITE(keycus_w) AM_BASE(&namcos11_keycus) AM_SIZE(&namcos11_keycus_size) /* keycus */
-	AM_RANGE(0x1fa30000, 0x1fa30fff) AM_READWRITE( at28c16_32le_16lsb_0_r, at28c16_32le_16lsb_0_w ) /* eeprom */
+	AM_RANGE(0x1fa30000, 0x1fa30fff) AM_READWRITE8(at28c16_0_r, at28c16_0_w, 0x00ff00ff) /* eeprom */
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1fbf6000, 0x1fbf6003) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_SHARE(2) AM_REGION("user1", 0) /* bios */

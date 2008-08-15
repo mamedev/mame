@@ -78,7 +78,7 @@ static ADDRESS_MAP_START( namcond1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(namcond1_shared_ram_r,namcond1_shared_ram_w) AM_BASE(&namcond1_shared_ram)
 	AM_RANGE(0x800000, 0x80000f) AM_READWRITE(ygv608_r,ygv608_w)
-	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE(at28c16_16msb_0_r,at28c16_16msb_0_w)
+	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE8(at28c16_0_r, at28c16_0_w, 0xff00)
 #ifdef MAME_DEBUG
 	AM_RANGE(0xb00000, 0xb00001) AM_READ(ygv608_debug_trigger)
 #endif
