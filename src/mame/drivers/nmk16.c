@@ -6351,6 +6351,28 @@ ROM_START( redhawke ) /* Excellent Co., Ldt license (no code scramble), (c) 1997
 	ROM_LOAD( "5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
 ROM_END
 
+ROM_START( redhawki ) /* For use in Italy only, Haedong Corp. license (no code scramble), (c) 1997 */
+	ROM_REGION( 0x80000, "main", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "rhit-2.bin", 0x000000, 0x020000, CRC(30cade0e) SHA1(2123ca858bcaed5165739107ccc2830561af0b38) )
+	ROM_LOAD16_BYTE( "rhit-3.bin", 0x000001, 0x020000, CRC(37dbb3c2) SHA1(d1f8258f357b885d38f87d288f98046dbd7d56aa) )
+
+	ROM_REGION( 0x10000, "audio", 0 )		/* Z80 Code */
+	ROM_LOAD( "1.bin", 0x00000, 0x10000, CRC(5d8cf28e) SHA1(2a440bf5136f95af137b6688e566a14e65be94b1) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )	/* Sprites, 16x16x4 */
+	ROM_LOAD16_BYTE( "rhit-6.bin", 0x000001, 0x080000, CRC(7cbd5c60) SHA1(69bd728861ea5a02f514d5aed837b549f3c86019) )
+	ROM_LOAD16_BYTE( "rhit-7.bin", 0x000000, 0x080000, CRC(bcb367c7) SHA1(a8f0527bf75a227cdfd98385549892fb16330aea) )
+
+	ROM_REGION( 0x080000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0, 16x16x8 */
+	ROM_LOAD( "rhit-4.bin", 0x000000, 0x080000, CRC(aafb3cc4) SHA1(b5f6608c1e05470fdfb22e0a35a8a74974c4d3cf) )
+
+	ROM_REGION( 0x00100, "gfx3", ROMREGION_DISPOSE | ROMREGION_ERASEFF )	/* Layer 1, 8x8x4 */
+	// Unused
+
+	ROM_REGION( 0x40000, "oki1", 0 )	/* Samples */
+	ROM_LOAD( "5", 0x00000, 0x40000, CRC(e911ce33) SHA1(a29c4dea98a22235122303325c63c15fadd3431d) )
+ROM_END
+
 static DRIVER_INIT( redhawk )
 {
 	decryptcode( machine, 23, 22, 21, 20, 19, 18, 16, 15, 14, 17, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0 );
@@ -6923,6 +6945,7 @@ GAME( 1995, twinactn, 0,        twinactn, twinactn, 0,        ROT0,   "Afega",  
 GAME( 1998, stagger1, 0,        stagger1, stagger1, 0,        ROT270, "Afega",                         "Stagger I (Japan)", 0 )
 GAME( 1997, redhawk,  stagger1, stagger1, stagger1, redhawk,  ROT270, "Afega",                         "Red Hawk (US)", 0 )
 GAME( 1997, redhawke, stagger1, stagger1, stagger1, 0,        ROT270, "Afega (Excellent Co. license)", "Red Hawk (Excellent Co., Ltd)", 0 )
+GAME( 1997, redhawki, stagger1, stagger1, stagger1, 0,        ROT270, "Afega (Haedong Corp. license)", "Red Hawk (Haedong Corp.)", GAME_NOT_WORKING )
 GAME( 1997, redhawkb, stagger1, redhawkb, redhawkb, 0,        ROT0,   "bootleg",                       "Red Hawk (bootleg)", 0 )
 GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, grdnstrm, ROT270, "Afega",                         "Sen Jin - Guardian Storm (Korea)", 0 )
 GAME( 1998, bubl2000, 0,        popspops, bubl2000, bubl2000, ROT0,   "Tuning",                        "Bubble 2000", 0 ) // on a tuning board (bootleg?)

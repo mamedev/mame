@@ -2087,6 +2087,7 @@ const game_driver * const drivers[] =
 	DRIVER( snowbrob )	/* MIN16-02 (c) 1990 Toaplan + Romstar license */
 	DRIVER( snowbroc )	/* MIN16-02 (c) 1990 Toaplan + Romstar license */
 	DRIVER( snowbroj )	/* MIN16-02 (c) 1990 Toaplan */
+	DRIVER( snowbrod )	/* MIN16-02 (c) 1990 Toaplan + Dooyong license */
 	DRIVER( wintbob )	/* bootleg */
 	DRIVER( honeydol )	/* (c) 1995 Barko Corp */
 	DRIVER( twinadv )	/* (c) 1995 Barko Corp */
@@ -7143,6 +7144,7 @@ Other Sun games
 	DRIVER( stagger1 )	/* (c) 1998 */
 	DRIVER( redhawk )	/* (c) 1997 */
 	DRIVER( redhawke )	/* (c) 1997 Excellent Co., Ltd license */
+	DRIVER( redhawki )	/* (c) 1997 Haedong Corp. license */
 	DRIVER( redhawkb )	/* (c) 1997 */
 	DRIVER( grdnstrm )	/* (c) 1998 */
 	DRIVER( bubl2000 )	/* (c) 1998 Tuning */
