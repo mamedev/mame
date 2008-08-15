@@ -24,12 +24,17 @@ Thanks to Kevin Horton for working out most of the logic gate types
 from the diagram.
 
 The color coding in the diagram is simple:
-* a pad with an outside connection to a t5182 edge pin is shown as red text with a red border, with that outside pin's number as its text
-* a pad with no outside connection but a connection to an obvious internal component, is shown as green text with a green border, with that component's function as its text. (/EN is for the data line related 74245 'D', most of the rest are for the z80)
+* a pad with an outside connection to a t5182 edge pin is shown as red text with a red border, with that outside pin's
+  number as its text
+* a pad with no outside connection but a connection to an obvious internal component, is shown as green text with a
+  green border, with that component's function as its text. (/EN is for the data line related 74245 'D', most of the
+  rest are for the z80)
 * pads connected to VCC +5V are shown in gold, with no text. The +5V input pins' numbers are red striped with gold
 * pads connected to GND are shown in blue, with no text. The GND input pins' numbers are red striped with blue
-* pads not directly connected but PULLED to +5v by one of the 5 internal resistors are shown in lemon yellow/greenish yellow, with text describing their function. (DIR on the 74245 is such a pad)
-* pads which are internal, and have no immediately obvious function connected to (but still serve a purpose) are shown as red numbers with a green border. The numbering order was the order they were traced in.
+* pads not directly connected but PULLED to +5v by one of the 5 internal resistors are shown in lemon yellow/greenish
+  yellow, with text describing their function. (DIR on the 74245 is such a pad)
+* pads which are internal, and have no immediately obvious function connected to (but still serve a purpose) are shown
+  as red numbers with a green border. The numbering order was the order they were traced in.
 * the two unbonded pins (/HALT and /RFSH) on the z80 are marked in dark blue on the die
 * all the z80 pin functions are marked outside the z80 diespace in red. this was done to help trace the pins.
 * note that /NMI is pulled high but is not listed in lemon yellow. This is because it connects to an external pin also.
@@ -90,10 +95,21 @@ Z80 /IORQ Test pin  |_|24                  27|_|  Z80 /RD
                       |______________________|
 
 Based on sketch made by Tormod
-Note: all pins marked as 'Test pin' are disabled internally and cannot be used without removing the chip cover and soldering together test pads.
-Note: pins 21 and 22 are both shorted together, and go active (low) while the internal rom is being read. The internal rom can be disabled by pulling /IORQ or /MREQ low, but both of those test pins are disabled, and also one would have to use the DIR test pin at the same time to feed the z80 a new internal rom (this is PROBABLY how seibu prototyped the rom, they had an external rom connected to this enable, and the internal rom disabled somehow) This pin CAN however be used as an indicator as to when the internal rom is being read, allowing one to snoop the address and data busses without fear of getting ram data as opposed to rom.
+Note: all pins marked as 'Test pin' are disabled internally and cannot be used without removing the chip cover and 
+      soldering together test pads.
+Note: pins 21 and 22 are both shorted together, and go active (low) while the internal rom is being read. The internal
+      rom can be disabled by pulling /IORQ or /MREQ low, but both of those test pins are disabled, and also one would
+      have to use the DIR test pin at the same time to feed the z80 a new internal rom (this is PROBABLY how seibu
+      prototyped the rom, they had an external rom connected to this enable, and the internal rom disabled somehow)
+      This pin CAN however be used as an indicator as to when the internal rom is being read, allowing one to snoop
+      the address and data busses without fear of getting ram data as opposed to rom.
 
-UPDATE: after removing the t5182 from the board, I realized pins 21 and 22 were shorted together on the board itself, and not inside the chip! After figuring out the difference between the two, I realized this blows open a HUGE backdoor to allow the internal rom to be read via a trojan! Its relatively easy, through creative external manipulation, without EVER opening the chip, to have a trojan program run at 0x0000-0x1fff, internal ram at and map the INTERNAL ROM at location 0x4000-0x7fff! Just connect the internal rom /enable to pin 34 instead of pin 22, and use pin 22 for your external trojan rom /enable!
+UPDATE: After removing the t5182 from the board, I realized pins 21 and 22 were shorted together on the board itself, 
+        and not inside the chip! After figuring out the difference between the two, I realized this blows open a HUGE
+        backdoor to allow the internal rom to be read via a trojan! Its relatively easy, through creative external
+        manipulation, without EVER opening the chip, to have a trojan program run at 0x0000-0x1fff, and map the
+        INTERNAL ROM at location 0x4000-0x7fff! Just connect the internal rom /enable to pin 34 instead of pin 22, and
+        use pin 22 for your external trojan rom /enable!
 
 
 Z80 Memory Map:
