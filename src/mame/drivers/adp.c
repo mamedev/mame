@@ -295,11 +295,11 @@ static READ16_HANDLER( handler3_r )
 
 static ADDRESS_MAP_START( skattv_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x800080, 0x800081) AM_READ(handler2_r)
-	AM_RANGE(0x8000a0, 0x8000a1) AM_READWRITE(HD63484_status_r, HD63484_address_w) // bad
-	AM_RANGE(0x8000a2, 0x8000a3) AM_READWRITE(HD63484_data_r, HD63484_data_w) // bad
+	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w) // bad
+	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w) // bad
+	AM_RANGE(0x8000a0, 0x8000a1) AM_READ(handler2_r)
+	AM_RANGE(0x8000a2, 0x8000a3) AM_READ(handler2_r)
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8( DUART68681, "duart68681", duart68681_r, duart68681_w, 0xff )
-//	AM_RANGE(0x800180, 0x800181) AM_READ(handler1_r)
 //	AM_RANGE(0xffd246, 0xffd247) AM_READ(handler3_r)
 //	AM_RANGE(0xffd248, 0xffd249) AM_READ(handler3_r)
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
@@ -307,22 +307,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quickjac_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x400001) AM_READ(handler1_r)
-	AM_RANGE(0x400002, 0x400003) AM_READ(handler1_r)
-	AM_RANGE(0x400004, 0x400005) AM_READ(handler1_r)
-	AM_RANGE(0x400006, 0x400007) AM_READ(handler1_r)
-	AM_RANGE(0x400008, 0x400009) AM_READ(handler1_r)
-	AM_RANGE(0x40000a, 0x40000b) AM_READ(handler1_r)
-	AM_RANGE(0x40000c, 0x40000d) AM_READ(handler1_r)
-	AM_RANGE(0x40000e, 0x40000f) AM_READ(handler1_r)
-	AM_RANGE(0x400010, 0x400011) AM_READ(handler1_r)
-	AM_RANGE(0x400012, 0x400013) AM_READ(handler1_r)
-	AM_RANGE(0x400014, 0x400015) AM_READ(handler1_r)
-	AM_RANGE(0x400016, 0x400017) AM_READ(handler1_r)
-	AM_RANGE(0x400018, 0x400019) AM_READ(handler1_r)
-	AM_RANGE(0x40001a, 0x40001b) AM_READ(handler1_r)
-	AM_RANGE(0x40001c, 0x40001d) AM_READ(handler1_r)
-	AM_RANGE(0x40001e, 0x40001f) AM_READ(handler1_r)
+	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8( DUART68681, "duart68681", duart68681_r, duart68681_w, 0xff )
 //	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w) // bad
 //	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w) // bad
 	AM_RANGE(0x800080, 0x800081) AM_READ(handler1_r)
@@ -370,6 +355,12 @@ static MACHINE_DRIVER_START( quickjac )
 	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(quickjac_mem, 0)
 	//MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+
+	MDRV_MACHINE_START(skattv)
+	MDRV_MACHINE_RESET(skattv)
+
+	MDRV_DEVICE_ADD( "duart68681", DUART68681 )
+	MDRV_DEVICE_CONFIG( skattv_duart68681_config )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -496,7 +487,7 @@ ROM_START( fashiong )
 ROM_END
 
 GAME( 1990, backgamn,        0, backgamn,    adp,    0, ROT0,  "ADP", "Backgammon", GAME_NOT_WORKING )
-GAME( 1993, quickjac,        0, quickjac,    adp,    0, ROT0,  "ADP", "Quick Jack", GAME_NOT_WORKING )
+GAME( 1993, quickjac,        0, quickjac,    skattv,    0, ROT0,  "ADP", "Quick Jack", GAME_NOT_WORKING )
 GAME( 1994, skattv,          0, skattv,      skattv,    0, ROT0,  "ADP", "Skat TV", GAME_NOT_WORKING )
 GAME( 1995, skattva,    skattv, skattv,      skattv,    0, ROT0,  "ADP", "Skat TV (version TS3)", GAME_NOT_WORKING )
 GAME( 1997, fashiong,        0, skattv,      adp,    0, ROT0,  "ADP", "Fashion Gambler", GAME_NOT_WORKING )
