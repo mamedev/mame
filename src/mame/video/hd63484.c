@@ -17,7 +17,7 @@ static int get_pixel(int x,int y);
 /* decoding of long commands. Commands can be up to 64KB long... but Shanghai */
 /* doesn't reach that length. */
 
-#define FIFO_LENGTH 65536
+#define FIFO_LENGTH 256
 
 static int fifo_counter;
 static UINT16 fifo[FIFO_LENGTH];
@@ -71,7 +71,8 @@ static const char *const instruction_name[64] =
 void HD63484_start(void)
 {
 	fifo_counter = 0;
-	HD63484_ram = auto_malloc(HD63484_RAM_SIZE);
+	HD63484_ram = auto_malloc(HD63484_RAM_SIZE * sizeof(UINT16));
+
 	memset(HD63484_ram,0,HD63484_RAM_SIZE);
 }
 
@@ -868,6 +869,7 @@ logerror("unsupported register\n");
 {
 logerror("unsupported command\n");
 popmessage("unsupported command %s (%04x)",instruction_name[fifo[0]>>10],fifo[0]);
+printf("unsupported command %s (%04x)\n",instruction_name[fifo[0]>>10],fifo[0]);
 }
 
 		fifo_counter = 0;

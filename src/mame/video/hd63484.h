@@ -1,4 +1,4 @@
-#define HD63484_RAM_SIZE 0x80000
+#define HD63484_RAM_SIZE 0x100000
 
 extern UINT16 *HD63484_ram;
 extern UINT16 HD63484_reg[256/2];
