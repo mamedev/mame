@@ -188,6 +188,7 @@ static const duart68681_config skattv_duart68681_config =
 	NULL
 };
 
+/*
 static PALETTE_INIT( adp )
 {
 	int i;
@@ -198,17 +199,17 @@ static PALETTE_INIT( adp )
 		int bit0,bit1,bit2,r,g,b;
 
 
-		/* red component */
+		// red component
 		bit0 = (i >> 2) & 0x01;
 		bit1 = (i >> 3) & 0x01;
 		bit2 = (i >> 4) & 0x01;
 		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* green component */
+		// green component
 		bit0 = (i >> 5) & 0x01;
 		bit1 = (i >> 6) & 0x01;
 		bit2 = (i >> 7) & 0x01;
 		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		/* blue component */
+		// blue component
 		bit0 = 0;
 		bit1 = (i >> 0) & 0x01;
 		bit2 = (i >> 1) & 0x01;
@@ -217,10 +218,18 @@ static PALETTE_INIT( adp )
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
 }
+*/
 
 static VIDEO_START(adp)
 {
+	// UINT32 i;
+	// UINT16 *prgrom = (UINT16*)memory_region(machine, "main");
+
 	HD63484_start();
+
+	// for (i = 0; i < 0x10; i++)
+	// 	HD63484_ram[0x80000 + i] = i;
+
 }
 
 static VIDEO_UPDATE(adp)
@@ -228,6 +237,31 @@ static VIDEO_UPDATE(adp)
 	int x,y,b;
 
 	b = ((HD63484_reg[0xcc/2] & 0x000f) << 16) + HD63484_reg[0xce/2];
+
+	if (input_code_pressed(KEYCODE_Q)) b = 0x060 * 280 * 1;
+	if (input_code_pressed(KEYCODE_W)) b = 0x060 * 280 * 2;
+	if (input_code_pressed(KEYCODE_E)) b = 0x060 * 280 * 3;
+	if (input_code_pressed(KEYCODE_R)) b = 0x060 * 280 * 4;
+	if (input_code_pressed(KEYCODE_T)) b = 0x060 * 280 * 5;
+	if (input_code_pressed(KEYCODE_Y)) b = 0x060 * 280 * 6;
+	if (input_code_pressed(KEYCODE_U)) b = 0x060 * 280 * 7;
+	if (input_code_pressed(KEYCODE_I)) b = 0x060 * 280 * 8;
+	if (input_code_pressed(KEYCODE_A)) b = 0x060 * 280 * 9;
+	if (input_code_pressed(KEYCODE_S)) b = 0x060 * 280 * 10;
+	if (input_code_pressed(KEYCODE_D)) b = 0x060 * 280 * 11;
+	if (input_code_pressed(KEYCODE_F)) b = 0x060 * 280 * 12;
+	if (input_code_pressed(KEYCODE_G)) b = 0x060 * 280 * 13;
+	if (input_code_pressed(KEYCODE_H)) b = 0x060 * 280 * 14;
+	if (input_code_pressed(KEYCODE_J)) b = 0x060 * 280 * 15;
+	if (input_code_pressed(KEYCODE_K)) b = 0x060 * 280 * 16;
+	if (input_code_pressed(KEYCODE_Z)) b = 0x060 * 280 * 17;
+	if (input_code_pressed(KEYCODE_X)) b = 0x060 * 280 * 18;
+	if (input_code_pressed(KEYCODE_C)) b = 0x060 * 280 * 19;
+	if (input_code_pressed(KEYCODE_V)) b = 0x060 * 280 * 20;
+	if (input_code_pressed(KEYCODE_B)) b = 0x060 * 280 * 21;
+	if (input_code_pressed(KEYCODE_N)) b = 0x060 * 280 * 22;
+	if (input_code_pressed(KEYCODE_M)) b = 0x060 * 280 * 23;
+
 	for (y = 0;y < 280;y++)
 	{
 		for (x = 0 ; x < (HD63484_reg[0xca/2] & 0x0fff) * 4 ; x += 4)
@@ -368,7 +402,7 @@ static MACHINE_DRIVER_START( quickjac )
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
 	MDRV_PALETTE_LENGTH(0x100)
 
-	MDRV_PALETTE_INIT(adp)
+//	MDRV_PALETTE_INIT(adp)
 	MDRV_VIDEO_START(adp)
 	MDRV_VIDEO_UPDATE(adp)
 
@@ -397,7 +431,7 @@ static MACHINE_DRIVER_START( skattv )
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
 	MDRV_PALETTE_LENGTH(0x100)
 
-	MDRV_PALETTE_INIT(adp)
+//	MDRV_PALETTE_INIT(adp)
 	MDRV_VIDEO_START(adp)
 	MDRV_VIDEO_UPDATE(adp)
 
@@ -419,7 +453,7 @@ static MACHINE_DRIVER_START( backgamn )
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MDRV_PALETTE_LENGTH(0x100)
 
-	MDRV_PALETTE_INIT(adp)
+//	MDRV_PALETTE_INIT(adp)
 	MDRV_VIDEO_START(adp)
 	MDRV_VIDEO_UPDATE(adp)
 
@@ -484,37 +518,9 @@ ROM_START( fashiong )
 	ROM_LOAD16_BYTE( "m48z08posz.bin", 0x0001, 0x2000, CRC(7c5a4b78) SHA1(262d0d7f5b24e356ab54eb2450bbaa90e3fb5464) )
 ROM_END
 
-static DRIVER_INIT(skattv)
-{
-	UINT16 i;
-	UINT16 *prgrom = (UINT16*)memory_region(machine, "main");
-
-	i = prgrom[0x66];
-	prgrom[0x66] = prgrom[0x106];
-	prgrom[0x106] = i;
-	
-	i = prgrom[0x67];
-	prgrom[0x67] = prgrom[0x107];
-	prgrom[0x107] = i;
-}
-
-static DRIVER_INIT(quickjac)
-{
-	UINT16 i;
-	UINT16 *prgrom = (UINT16*)memory_region(machine, "main");
-
-	i = prgrom[0x66];
-	prgrom[0x66] = prgrom[0x102];
-	prgrom[0x102] = i;
-	
-	i = prgrom[0x67];
-	prgrom[0x67] = prgrom[0x103];
-	prgrom[0x103] = i;
-}
-
 GAME( 1990, backgamn,        0, backgamn,    adp,    0, ROT0,  "ADP", "Backgammon", GAME_NOT_WORKING )
-GAME( 1993, quickjac,        0, quickjac,    skattv,    quickjac, ROT0,  "ADP", "Quick Jack", GAME_NOT_WORKING )
-GAME( 1994, skattv,          0, skattv,      skattv,    skattv, ROT0,  "ADP", "Skat TV", GAME_NOT_WORKING )
-GAME( 1995, skattva,    skattv, skattv,      skattv,    skattv, ROT0,  "ADP", "Skat TV (version TS3)", GAME_NOT_WORKING )
+GAME( 1993, quickjac,        0, quickjac,    skattv,    0, ROT0,  "ADP", "Quick Jack", GAME_NOT_WORKING )
+GAME( 1994, skattv,          0, skattv,      skattv,    0, ROT0,  "ADP", "Skat TV", GAME_NOT_WORKING )
+GAME( 1995, skattva,    skattv, skattv,      skattv,    0, ROT0,  "ADP", "Skat TV (version TS3)", GAME_NOT_WORKING )
 GAME( 1997, fashiong,        0, skattv,      adp,    0, ROT0,  "ADP", "Fashion Gambler", GAME_NOT_WORKING )
 
