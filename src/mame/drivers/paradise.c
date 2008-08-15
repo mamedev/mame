@@ -752,87 +752,157 @@ Notes:
 
 ROM_START( tgtball )
 	ROM_REGION( 0x44000, "main", 0 )		/* Z80 Code */
-	ROM_LOAD( "rom7.bin", 0x00000, 0x0c000, CRC(8dbeab12) SHA1(7181c23459990aecbe2d13377aaf19f65108eac6) )
-	ROM_CONTINUE(         0x10000, 0x34000    )
+	ROM_LOAD( "rom7.u128", 0x00000, 0x0c000, CRC(8dbeab12) SHA1(7181c23459990aecbe2d13377aaf19f65108eac6) )
+	ROM_CONTINUE(          0x10000, 0x34000 )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT)	/* 16x16x8 Sprites */
-	ROM_LOAD( "yunsung.114", 0x00000, 0x40000, CRC(3dbe1872) SHA1(754f90123a3944ca548fc66ee65a93615155bf30) )
-	ROM_LOAD( "yunsung.115", 0x40000, 0x40000, CRC(30f49dac) SHA1(b70d37973bd03069c48641d6c0804be6f9aa6553) )
+	ROM_LOAD( "yunsung.u114", 0x00000, 0x40000, CRC(3dbe1872) SHA1(754f90123a3944ca548fc66ee65a93615155bf30) )
+	ROM_LOAD( "yunsung.u115", 0x40000, 0x40000, CRC(30f49dac) SHA1(b70d37973bd03069c48641d6c0804be6f9aa6553) )
 
 	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE | ROMREGION_ERASEFF)	/* 8x8x4 Background */
 	/* not for this game? */
 
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE | ROMREGION_INVERT)	/* 8x8x8 Foreground */
-	ROM_LOAD( "rom2.bin", 0x00000, 0x80000, CRC(fe4004ec) SHA1(fde782665445ad465b8f8fb95df5f60cd24016ad) )
-	ROM_LOAD( "rom1.bin", 0x80000, 0x80000, CRC(aef17762) SHA1(3dd8924695b67eec0f25549dbe2461b927268b8f) )
+	ROM_LOAD( "rom2.u92", 0x00000, 0x80000, CRC(fe4004ec) SHA1(fde782665445ad465b8f8fb95df5f60cd24016ad) )
+	ROM_LOAD( "rom1.u93", 0x80000, 0x80000, CRC(aef17762) SHA1(3dd8924695b67eec0f25549dbe2461b927268b8f) )
 
 	ROM_REGION( 0x100000, "gfx4", ROMREGION_DISPOSE | ROMREGION_INVERT)	/* 8x8x8 Midground */
-	ROM_LOAD( "rom4.bin", 0x00000, 0x80000,  CRC(0a5abf62) SHA1(6900d598764300c81c90f5a7efb294639178bee6) )
-	ROM_LOAD( "rom3.bin", 0x80000, 0x80000,  CRC(94822bbf) SHA1(9fa6595eb819f163b58181926c276346cfa5c332) )
+	ROM_LOAD( "rom4.u110", 0x00000, 0x80000,  CRC(0a5abf62) SHA1(6900d598764300c81c90f5a7efb294639178bee6) )
+	ROM_LOAD( "rom3.u111", 0x80000, 0x80000,  CRC(94822bbf) SHA1(9fa6595eb819f163b58181926c276346cfa5c332) )
 
 	ROM_REGION( 0x40000, "oki1", 0 )	/* Samples */
-	ROM_LOAD( "yunsung.85", 0x00000, 0x20000, CRC(cdf3336b) SHA1(98029d6d5d8ffb3b24ae2bcf950618a7d5b404c3) )
+	ROM_LOAD( "yunsung.u85", 0x00000, 0x20000, CRC(cdf3336b) SHA1(98029d6d5d8ffb3b24ae2bcf950618a7d5b404c3) )
 
 	ROM_REGION( 0x80000, "oki2", 0 )	/* Samples (banked) */
-	ROM_LOAD( "yunsung.113", 0x00000, 0x40000, CRC(150a6cc6) SHA1(b435fcf8ba48006f506db6b63ba54a30a6b3eade) )
+	ROM_LOAD( "yunsung.u113", 0x00000, 0x40000, CRC(150a6cc6) SHA1(b435fcf8ba48006f506db6b63ba54a30a6b3eade) )
 ROM_END
 
 ROM_START( tgtballa )
 	ROM_REGION( 0x44000, "main", 0 )		/* Z80 Code */
-	ROM_LOAD( "yunsung.128", 0x00000, 0x0c000, CRC(cb0f3d46) SHA1(b56c4abbd4248074c1559a0f1902d2ea11cb01a8) )
-	ROM_CONTINUE(            0x10000, 0x34000 )
+	ROM_LOAD( "yunsung.u128", 0x00000, 0x0c000, CRC(cb0f3d46) SHA1(b56c4abbd4248074c1559a0f1902d2ea11cb01a8) )
+	ROM_CONTINUE(             0x10000, 0x34000 )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT)	/* 16x16x8 Sprites */
-	ROM_LOAD( "yunsung.114", 0x00000, 0x40000, CRC(3dbe1872) SHA1(754f90123a3944ca548fc66ee65a93615155bf30) )
-	ROM_LOAD( "yunsung.115", 0x40000, 0x40000, CRC(30f49dac) SHA1(b70d37973bd03069c48641d6c0804be6f9aa6553) )
+	ROM_LOAD( "yunsung.u114", 0x00000, 0x40000, CRC(3dbe1872) SHA1(754f90123a3944ca548fc66ee65a93615155bf30) )
+	ROM_LOAD( "yunsung.u115", 0x40000, 0x40000, CRC(30f49dac) SHA1(b70d37973bd03069c48641d6c0804be6f9aa6553) )
 
 	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE | ROMREGION_ERASEFF)	/* 8x8x4 Background */
 	/* not for this game? */
 
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE | ROMREGION_INVERT)	/* 8x8x8 Foreground */
-	ROM_LOAD( "yunsung.92", 0x00000, 0x80000, CRC(bcf206a9) SHA1(0db2cee21c025b7b8d2d5b898c7231c77e36904d) )
-	ROM_LOAD( "yunsung.93", 0x80000, 0x80000, CRC(64edb93c) SHA1(94f8d4fd159c682d952d6a4c38dc50f2c0c0824d) )
+	ROM_LOAD( "yunsung.u92", 0x00000, 0x80000, CRC(bcf206a9) SHA1(0db2cee21c025b7b8d2d5b898c7231c77e36904d) )
+	ROM_LOAD( "yunsung.u93", 0x80000, 0x80000, CRC(64edb93c) SHA1(94f8d4fd159c682d952d6a4c38dc50f2c0c0824d) )
 
 	ROM_REGION( 0x100000, "gfx4", ROMREGION_DISPOSE | ROMREGION_INVERT)	/* 8x8x8 Midground */
-	ROM_LOAD( "yunsung.110", 0x00000, 0x80000, CRC(c209201e) SHA1(ba1cb3a204f689f9a3636834628d2265927e34f7) )
-	ROM_LOAD( "yunsung.111", 0x80000, 0x80000, CRC(82334337) SHA1(4b2a07196027b190366131cd7b8eca87a1bd0b1c) )
+	ROM_LOAD( "yunsung.u110", 0x00000, 0x80000, CRC(c209201e) SHA1(ba1cb3a204f689f9a3636834628d2265927e34f7) )
+	ROM_LOAD( "yunsung.u111", 0x80000, 0x80000, CRC(82334337) SHA1(4b2a07196027b190366131cd7b8eca87a1bd0b1c) )
 
 	ROM_REGION( 0x40000, "oki1", 0 )	/* Samples */
-	ROM_LOAD( "yunsung.85", 0x00000, 0x20000, CRC(cdf3336b) SHA1(98029d6d5d8ffb3b24ae2bcf950618a7d5b404c3) )
+	ROM_LOAD( "yunsung.u85", 0x00000, 0x20000, CRC(cdf3336b) SHA1(98029d6d5d8ffb3b24ae2bcf950618a7d5b404c3) )
 
 	ROM_REGION( 0x80000, "oki2", 0 )	/* Samples (banked) */
-	ROM_LOAD( "yunsung.113", 0x00000, 0x40000, CRC(150a6cc6) SHA1(b435fcf8ba48006f506db6b63ba54a30a6b3eade) )
+	ROM_LOAD( "yunsung.u113", 0x00000, 0x40000, CRC(150a6cc6) SHA1(b435fcf8ba48006f506db6b63ba54a30a6b3eade) )
 ROM_END
 
-ROM_START( torus ) /* Board looks identical to the YS-0402 but has no number printed on the PCB */
+/*
+
+Yun Sung Torus (c) 1996
+
+PCB Layout
+----------
+
+Looks identical to the YS-0402 but has no number printed on the PCB
+  For vertical games, Yun Sung would take a known board reprogram the
+  Actel A1020B but not give the PCB a specific number.  This was also
+  done for Yun Sung's game Paparazzi.  See yunsun16.c driver
+
++----------------------------------------+
+|    M6295 Z80 4MHz                      |
+|          U1                            |
+|     U    6264                          |
+|VOL  2                                  |
+|     8                                  |
+|                                        |
+|J DSW1   12MHz                          |
+|A                                       |
+|M DSW2       +-------+                  |
+|M            | ACTEL |                  |
+|A            |A1020B |                  |
+|             |PLCC84 |                  |
+| U66         +-------+ 6116             |
+| U67                   6116             |
+| U92                   6116        62256|
+| U93                   6116        62256|
+| U105                  6116        62256|
+| U106                  6116        62256|
++----------------------------------------+
+
+Z80A
+AD-65 (OKI M6295)
+Actel A1020B PLC84C (or compatible QuickLogic QL12X16B-XPL84C)
+OSC: 12.000 MHz, 4.000Mhz
+
+RAM 4 Hyundai HY62256ALP-70
+    1 Hyundai HY6264LP-10 (by program rom & Z80A)
+    6 UMC UM6116K-3
+DSW 2 8-switch DIP
+
+All roms had a Yun Sung label with no other ID markings or numbers
+
+*/
+
+ROM_START( torus )
 	ROM_REGION( 0x14000, "main", 0 )		/* Z80 Code */
-	ROM_LOAD( "bc13.bin",     0x00000, 0xc000, CRC(55d3ef3e) SHA1(195463271fdb3f9f5c19068efd1c99105f761fe9) )
-	ROM_CONTINUE(             0x10000, 0x4000 )
+	ROM_LOAD( "yunsung.u1", 0x00000, 0xc000, CRC(55d3ef3e) SHA1(195463271fdb3f9f5c19068efd1c99105f761fe9) )
+	ROM_CONTINUE(           0x10000, 0x4000 )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT)	/* 16x16x8 Sprites */
-	ROM_LOAD( "bc5.bin",      0x00000, 0x40000, CRC(5b60ce9f) SHA1(d5c091145e0bae7cd776e642ea17895d086ed2b0) )
-	ROM_LOAD( "bc6.bin",      0x40000, 0x40000, CRC(4caa0c50) SHA1(a971b6e87cd1162cf370d39cfeafefbb1557e14e) )
+	ROM_LOAD( "yunsung.u67", 0x00000, 0x40000, CRC(5b60ce9f) SHA1(d5c091145e0bae7cd776e642ea17895d086ed2b0) )
+	ROM_LOAD( "yunsung.u66", 0x40000, 0x40000, CRC(4caa0c50) SHA1(a971b6e87cd1162cf370d39cfeafefbb1557e14e) )
 
 	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE | ROMREGION_ERASEFF)	/* 8x8x4 Background */
 	/* not for this game */
 
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE | ROMREGION_INVERT)	/* 8x8x8 Foreground */
-	ROM_LOAD( "bc2.bin",      0x00000, 0x80000, CRC(67c5ba1a) SHA1(0e39752ddc5ee9469647140a3fc9e6bb69d6afa1) )
-	ROM_LOAD( "bc1.bin",      0x80000, 0x80000, CRC(efb105e9) SHA1(7bfe6ff64b25797dd524a7077def5669f25f16ec) )
+	ROM_LOAD( "yunsung.u105", 0x00000, 0x80000, CRC(67c5ba1a) SHA1(0e39752ddc5ee9469647140a3fc9e6bb69d6afa1) )
+	ROM_LOAD( "yunsung.u106", 0x80000, 0x80000, CRC(efb105e9) SHA1(7bfe6ff64b25797dd524a7077def5669f25f16ec) )
 
 	ROM_REGION( 0x40000, "gfx4", ROMREGION_DISPOSE | ROMREGION_INVERT)	/* 8x8x8 Midground */
-	ROM_LOAD( "bc4.bin",      0x00000, 0x20000, CRC(ee914caf) SHA1(42f3d760a4c14658ac2eb0ba7f54fb9916368b50) )
-	ROM_LOAD( "bc3.bin",      0x20000, 0x20000, CRC(aff1dab9) SHA1(ae488abd605c1e78b8b73452a2c1391cc0fe6b00) )
+	ROM_LOAD( "yunsung.u93", 0x00000, 0x20000, CRC(ee914caf) SHA1(42f3d760a4c14658ac2eb0ba7f54fb9916368b50) )
+	ROM_LOAD( "yunsung.u92", 0x20000, 0x20000, CRC(aff1dab9) SHA1(ae488abd605c1e78b8b73452a2c1391cc0fe6b00) )
 
 	ROM_REGION( 0x40000, "oki1", 0 )	/* Samples */
-	ROM_LOAD( "bc15.bin",     0x00000, 0x40000, CRC(12d84839) SHA1(840d82253c0651ebe6799ea2bb5bae334e963e12) )
+	ROM_LOAD( "yunsung.u28", 0x00000, 0x40000, CRC(12d84839) SHA1(840d82253c0651ebe6799ea2bb5bae334e963e12) )
 ROM_END
 
 /*
 
-Yun Sung Mad Ball
+Yun Sung Mad Ball (c) 1997-1998
 
-PCB: YS-0402
+PCB Layout
+----------
+
+YS-0402 YUNSUNG
++----------------------------------------+
+|    M6295 Z80 4MHz                      |
+|          U1                            |
+|     U    6264                          |
+|VOL  2                                  |
+|     8                                  |
+|                                        |
+|J DSW1   12MHz                          |
+|A                                       |
+|M DSW2       +-------+                  |
+|M            | ACTEL |                  |
+|A            |A1020B |                  |
+|             |PLCC84 |                  |
+| U66         +-------+ 6116             |
+| U67                   6116             |
+| U92                   6116        62256|
+| U93                   6116        62256|
+| U105                  6116        62256|
+| U106                  6116        62256|
++----------------------------------------+
 
 Z80A
 AD-65 (OKI M6295)
@@ -841,6 +911,7 @@ OSC: 12.000 MHz, 4.000Mhz
 
 RAM 4 Hyundai HY62256ALP-70
     1 Hyundai HY6264LP-10 (by P rom & Z80A)
+    6 UMC UM6116K-3
 DSW 2 8-switch DIP
 
 
@@ -860,50 +931,50 @@ All roms read with manufacturer's IDs and routines
 
 ROM_START( madball ) /* Models in swimsuits only, no nudity */
 	ROM_REGION( 0x24000, "main", 0 )		/* Z80 Code */
-	ROM_LOAD( "p.u1",     0x00000, 0xc000, CRC(73008425) SHA1(6eded60fd5c637a63783247c858d999d5974d378) )
-	ROM_CONTINUE(             0x10000, 0x14000 )
+	ROM_LOAD( "p.u1", 0x00000, 0xc000, CRC(73008425) SHA1(6eded60fd5c637a63783247c858d999d5974d378) )
+	ROM_CONTINUE(     0x10000, 0x14000 )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT)	/* 16x16x8 Sprites */
-	ROM_LOAD( "2.u67",      0x00000, 0x40000, CRC(1f3a6cd5) SHA1(7a17549f2fff003605d91703c84a398488b2f74c) )
-	ROM_LOAD( "1.u66",      0x40000, 0x40000, CRC(8637c7b4) SHA1(e0026e48f0e8f3554a5b448e0d1f9d1c5551dbfb) )
+	ROM_LOAD( "2.u67", 0x00000, 0x40000, CRC(1f3a6cd5) SHA1(7a17549f2fff003605d91703c84a398488b2f74c) )
+	ROM_LOAD( "1.u66", 0x40000, 0x40000, CRC(8637c7b4) SHA1(e0026e48f0e8f3554a5b448e0d1f9d1c5551dbfb) )
 
 	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE | ROMREGION_ERASEFF)	/* 8x8x4 Background */
 	/* not for this game */
 
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE | ROMREGION_INVERT)	/* 8x8x8 Foreground */
-	ROM_LOAD( "5.u105",      0x00000, 0x80000, CRC(f26aac1e) SHA1(50ad34ee70bf45fa4e1dc9281b83bcdd7c7db3f8) )
-	ROM_LOAD( "6.u106",      0x80000, 0x80000, CRC(27b78907) SHA1(ab6645457adc0d17b141e366aac7e00e8ce4296b) )
+	ROM_LOAD( "5.u105", 0x00000, 0x80000, CRC(f26aac1e) SHA1(50ad34ee70bf45fa4e1dc9281b83bcdd7c7db3f8) )
+	ROM_LOAD( "6.u106", 0x80000, 0x80000, CRC(27b78907) SHA1(ab6645457adc0d17b141e366aac7e00e8ce4296b) )
 
 	ROM_REGION( 0x100000, "gfx4", ROMREGION_DISPOSE | ROMREGION_INVERT)	/* 8x8x8 Midground */
-	ROM_LOAD( "4.u93",      0x80000, 0x80000, CRC(c3be56ad) SHA1(9cfa0b38c60798deccca74dc6b0ce0826ff7f467) )
-	ROM_LOAD( "3.u92",      0x00000, 0x80000, CRC(846019a6) SHA1(571bfa299e13b96ca263bd7e62c760bdbe3438bd) )
+	ROM_LOAD( "4.u93", 0x80000, 0x80000, CRC(c3be56ad) SHA1(9cfa0b38c60798deccca74dc6b0ce0826ff7f467) )
+	ROM_LOAD( "3.u92", 0x00000, 0x80000, CRC(846019a6) SHA1(571bfa299e13b96ca263bd7e62c760bdbe3438bd) )
 
 	ROM_REGION( 0x80000, "oki1", 0 )	/* Samples */
-	ROM_LOAD( "s.u28",     0x00000, 0x80000, CRC(78f02584) SHA1(70542e126db73a573db9ef41399d3a07fb7ea94b) )
+	ROM_LOAD( "s.u28", 0x00000, 0x80000, CRC(78f02584) SHA1(70542e126db73a573db9ef41399d3a07fb7ea94b) )
 ROM_END
 
 ROM_START( madballn ) /* Even numbered stages show topless models.  Is nudity controlled by a dipswitch? */
 	ROM_REGION( 0x24000, "main", 0 )		/* Z80 Code */
-	ROM_LOAD( "bc13.u1",     0x00000, 0xc000, CRC(531fa919) SHA1(0eafc663b9ad50d0dfc5491fe96c9bcf30483991) )
-	ROM_CONTINUE(             0x10000, 0x14000 )
+	ROM_LOAD( "u1.bin", 0x00000, 0xc000, CRC(531fa919) SHA1(0eafc663b9ad50d0dfc5491fe96c9bcf30483991) )
+	ROM_CONTINUE(       0x10000, 0x14000 )
 
 	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT)	/* 16x16x8 Sprites */
-	ROM_LOAD( "2.u67",      0x00000, 0x40000, CRC(1f3a6cd5) SHA1(7a17549f2fff003605d91703c84a398488b2f74c) )
-	ROM_LOAD( "1.u66",      0x40000, 0x40000, CRC(8637c7b4) SHA1(e0026e48f0e8f3554a5b448e0d1f9d1c5551dbfb) )
+	ROM_LOAD( "2.u67", 0x00000, 0x40000, CRC(1f3a6cd5) SHA1(7a17549f2fff003605d91703c84a398488b2f74c) )
+	ROM_LOAD( "1.u66", 0x40000, 0x40000, CRC(8637c7b4) SHA1(e0026e48f0e8f3554a5b448e0d1f9d1c5551dbfb) )
 
 	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE | ROMREGION_ERASEFF)	/* 8x8x4 Background */
 	/* not for this game */
 
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE | ROMREGION_INVERT)	/* 8x8x8 Foreground */
-	ROM_LOAD( "bc2.u105",      0x00000, 0x80000, CRC(d75faa62) SHA1(95badf932e8a8084e67aa7df8d6cb2cb2917d5fc) )
-	ROM_LOAD( "bc1.u106",      0x80000, 0x80000, CRC(04b8f7a5) SHA1(97555880f200d0ecc521f8c76bcaa4a0f0eb1aa9) )
+	ROM_LOAD( "u105.bin", 0x00000, 0x80000, CRC(d75faa62) SHA1(95badf932e8a8084e67aa7df8d6cb2cb2917d5fc) )
+	ROM_LOAD( "u106.bin", 0x80000, 0x80000, CRC(04b8f7a5) SHA1(97555880f200d0ecc521f8c76bcaa4a0f0eb1aa9) )
 
 	ROM_REGION( 0x100000, "gfx4", ROMREGION_DISPOSE | ROMREGION_INVERT)	/* 8x8x8 Midground */
-	ROM_LOAD( "bc3.u93",      0x80000, 0x80000, CRC(f07a5fe6) SHA1(0b1117d8ff0f2a6c953ab1988065b75a33e2c949) )
-	ROM_LOAD( "bc4.u92",      0x00000, 0x80000, CRC(7ed233ab) SHA1(8a4bc31741b4e6e1c03974f9b00f747a29c78ebf) )
+	ROM_LOAD( "u93.bin", 0x80000, 0x80000, CRC(f07a5fe6) SHA1(0b1117d8ff0f2a6c953ab1988065b75a33e2c949) )
+	ROM_LOAD( "u92.bin", 0x00000, 0x80000, CRC(7ed233ab) SHA1(8a4bc31741b4e6e1c03974f9b00f747a29c78ebf) )
 
 	ROM_REGION( 0x80000, "oki1", 0 )	/* Samples */
-	ROM_LOAD( "s.u28",     0x00000, 0x80000, CRC(78f02584) SHA1(70542e126db73a573db9ef41399d3a07fb7ea94b) )
+	ROM_LOAD( "s.u28", 0x00000, 0x80000, CRC(78f02584) SHA1(70542e126db73a573db9ef41399d3a07fb7ea94b) )
 ROM_END
 
 static DRIVER_INIT (paradise)
