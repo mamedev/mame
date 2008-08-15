@@ -17,7 +17,7 @@ static int get_pixel(int x,int y);
 /* decoding of long commands. Commands can be up to 64KB long... but Shanghai */
 /* doesn't reach that length. */
 
-#define FIFO_LENGTH 50
+#define FIFO_LENGTH 65536
 
 static int fifo_counter;
 static UINT16 fifo[FIFO_LENGTH];
@@ -540,6 +540,58 @@ static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,I
 	}
 }
 
+void line(INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col)
+{
+			
+			INT16 ax,ay;
+			
+			int cpx_t=sx;
+			int cpy_t=sy;
+
+			ax = ex - sx;
+			ay = ey - sy;
+
+			if (abs(ax) >= abs(ay))
+			{
+				while (ax)
+				{
+					dot(cpx_t,cpy_t,col,cl0);
+
+					if (ax > 0)
+					{
+						cpx_t++;
+						ax--;
+					}
+					else
+					{
+						cpx_t--;
+						ax++;
+					}
+					cpy_t = sy + ay * (cpx_t - sx) / (ex - sx);
+				}
+			}
+			else
+			{
+				while (ay)
+				{
+					dot(cpx_t,cpy_t,col,cl0);
+
+					if (ay > 0)
+					{
+						cpy_t++;
+						ay--;
+					}
+					else
+					{
+						cpy_t--;
+						ay++;
+					}
+					cpx_t = sx + ax * (cpy_t - sy) / (ey - sy);
+				}
+			}	
+	
+}
+
 static void HD63484_command_w(UINT16 cmd)
 {
 	int len;
@@ -691,140 +743,56 @@ logerror("unsupported register\n");
 			cpx = fifo[1];
 			cpy = fifo[2];
 		}
-		else if ((fifo[0] & 0xfff8) == 0x8800)	/* ALINE */
+		else if (fifo[0] == 0x8400)	/* RMOVE */
 		{
-			INT16 ex,ey,sx,sy;
-			INT16 ax,ay;
-
-			sx = cpx;
-			sy = cpy;
-			ex = fifo[1];
-			ey = fifo[2];
-
-			ax = ex - sx;
-			ay = ey - sy;
-
-			if (abs(ax) >= abs(ay))
-			{
-				while (ax)
-				{
-					dot(cpx,cpy,fifo[0] & 0x0007,cl0);
-
-					if (ax > 0)
-					{
-						cpx++;
-						ax--;
-					}
-					else
-					{
-						cpx--;
-						ax++;
-					}
-					cpy = sy + ay * (cpx - sx) / (ex - sx);
-				}
-			}
-			else
-			{
-				while (ay)
-				{
-					dot(cpx,cpy,fifo[0] & 0x0007,cl0);
-
-					if (ay > 0)
-					{
-						cpy++;
-						ay--;
-					}
-					else
-					{
-						cpy--;
-						ay++;
-					}
-					cpx = sx + ax * (cpy - sy) / (ey - sy);
-				}
-			}
+			cpx += (INT16)fifo[1];
+			cpy += (INT16)fifo[2];
+		}
+		else if ((fifo[0] & 0xff00) == 0x8800)	/* ALINE */
+		{
+			line(cpx,cpy,fifo[1],fifo[2],fifo[0]&7);
+			cpx=(INT16)fifo[1];
+			cpy=(INT16)fifo[2];
+		}
+		else if ((fifo[0] & 0xff00) == 0x8c00)	/* RLINE */
+		{
+			line(cpx,cpy,cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],fifo[0]&7);
+			cpx+=(INT16)fifo[1];
+			cpy+=(INT16)fifo[2];
 		}
 		else if ((fifo[0] & 0xfff8) == 0x9000)	/* ARCT */
 		{
-			INT16 pcx,pcy;
-			INT16 ax,ay,xx,yy;
-
-			pcx = fifo[1];
-			pcy = fifo[2];
-
-			xx = cpx;
-			yy = cpy;
-
-			ax = pcx - cpx;
-			for (;;)
+			line(cpx,cpy,(INT16)fifo[1],cpy,fifo[0]&7);
+			line((INT16)fifo[1],cpy,(INT16)fifo[1],(INT16)fifo[2],fifo[0]&7);
+			line((INT16)fifo[1],(INT16)fifo[2],cpx,(INT16)fifo[2],fifo[0]&7);
+			line(cpx,(INT16)fifo[2],cpx,cpy,fifo[0]&7);
+			cpx=(INT16)fifo[1];
+			cpy=(INT16)fifo[2];
+		}
+		else if ((fifo[0] & 0xfff8) == 0x9400)	/* RRCT  added*/ 
+		{
+			line(cpx,cpy,cpx+(INT16)fifo[1],cpy,fifo[0]&7);
+			line(cpx+(INT16)fifo[1],cpy,cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],fifo[0]&7);
+			line(cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],cpx,cpy+(INT16)fifo[2],fifo[0]&7);
+			line(cpx,cpy+(INT16)fifo[2],cpx,cpy,fifo[0]&7);
+			
+			cpx=cpx+(INT16)fifo[1];
+			cpy=cpy+(INT16)fifo[2];
+		}
+		else if ((fifo[0] & 0xfff8) == 0xa400)	/* RPLG  added*/ 
+		{
+			int nseg,sx,sy,ex,ey;
+			sx=cpx;
+			sy=cpy;
+			for(nseg=0;nseg<fifo[1];nseg++)
 			{
-				dot(xx,yy,fifo[0] & 0x0007,cl0);
-
-				if (ax == 0) break;
-				else if (ax > 0)
-				{
-					xx++;
-					ax--;
-				}
-				else
-				{
-					xx--;
-					ax++;
-				}
+				ex=sx+(INT16)fifo[2+nseg*2];
+				ey=sy+(INT16)fifo[2+nseg*2+1];
+				line(sx,sy,ex,ey,fifo[0]&7);
+				sx=ex;
+				sy=ey;
 			}
-
-			ay = pcy - cpy;
-			for (;;)
-			{
-				dot(xx,yy,fifo[0] & 0x0007,cl0);
-
-				if (ay == 0) break;
-				else if (ay > 0)
-				{
-					yy++;
-					ay--;
-				}
-				else
-				{
-					yy--;
-					ay++;
-				}
-			}
-
-			ax = cpx - pcx;
-			for (;;)
-			{
-				dot(xx,yy,fifo[0] & 0x0007,cl0);
-
-				if (ax == 0) break;
-				else if (ax > 0)
-				{
-					xx++;
-					ax--;
-				}
-				else
-				{
-					xx--;
-					ax++;
-				}
-			}
-
-			ay = cpy - pcy;
-			for (;;)
-			{
-				dot(xx,yy,fifo[0] & 0x0007,cl0);
-
-				if (ay == 0) break;
-				else if (ay > 0)
-				{
-					yy++;
-					ay--;
-				}
-				else
-				{
-					yy--;
-					ay++;
-				}
-			}
+			line(sx,sy,cpx,cpy,fifo[0]&7);
 		}
 		else if ((fifo[0] & 0xfff8) == 0xc000)	/* AFRCT */
 		{
@@ -874,6 +842,16 @@ logerror("unsupported register\n");
 					ay--;
 				}
 			}
+		}
+		else if ((fifo[0] & 0xfff8) == 0xc400)	/* RFRCT  added TODO*/ 
+		{
+			line(cpx,cpy,cpx+(INT16)fifo[1],cpy,fifo[0]&7);
+			line(cpx+fifo[1],cpy,cpx+fifo[1],cpy+fifo[2],fifo[0]&7);
+			line(cpx+fifo[1],cpy+fifo[2],cpx,cpy+fifo[2],fifo[0]&7);
+			line(cpx,cpy+fifo[2],cpx,cpy,fifo[0]&7);
+			
+			cpx=cpx+(INT16)fifo[1];
+			cpy=cpy+(INT16)fifo[2];
 		}
 		else if ((fifo[0] & 0xfff8) == 0xcc00)	/* DOT */
 		{

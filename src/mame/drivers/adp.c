@@ -228,9 +228,9 @@ static VIDEO_UPDATE(adp)
 	int x,y,b;
 
 	b = ((HD63484_reg[0xcc/2] & 0x000f) << 16) + HD63484_reg[0xce/2];
-	for (y = 0;y < 480;y++)
+	for (y = 0;y < 280;y++)
 	{
-		for (x = 0 ; x<(HD63484_reg[0xca/2] & 0x0fff) * 2 ; x += 4)
+		for (x = 0 ; x < (HD63484_reg[0xca/2] & 0x0fff) * 4 ; x += 4)
 		{
 			b &= (HD63484_RAM_SIZE-1);
 			*BITMAP_ADDR16(bitmap, y, x    ) = (HD63484_ram[b] & 0x000f);
@@ -251,9 +251,9 @@ static VIDEO_UPDATE(adp)
 
 		b = (((HD63484_reg[0xdc/2] & 0x000f) << 16) + HD63484_reg[0xde/2]);
 
-		for (y = sy ; y <= sy + h && y < 480 ; y++)
+		for (y = sy ; y <= sy + h && y < 280 ; y++)
 		{
-			for (x = 0 ; x < (HD63484_reg[0xca/2] & 0x0fff) * 2 ; x += 4)
+			for (x = 0 ; x < (HD63484_reg[0xca/2] & 0x0fff) * 4 ; x += 4)
 			{
 				b &= (HD63484_RAM_SIZE - 1);
 				if (x <= w && x + sx >= 0 && x + sx < (HD63484_reg[0xca/2] & 0x0fff) * 2)
@@ -271,34 +271,27 @@ static VIDEO_UPDATE(adp)
 	return 0;
 }
 
-static READ16_HANDLER( handler1_r )
+static READ16_HANDLER(test_r)
 {
-	return 0x13;
+	switch (mame_rand(machine) & 3)
+	{
+		case 0:
+			return 0;
+		case 1:
+			return 0xffff;
+		default:
+			return mame_rand(machine) % 0xffff;
+	}
 }
-
-static READ16_HANDLER( handler2_r )
-{
-	if (input_code_pressed(KEYCODE_Q)) return 0x01;
-	if (input_code_pressed(KEYCODE_W)) return 0x02;
-	if (input_code_pressed(KEYCODE_E)) return 0x04;
-	if (input_code_pressed(KEYCODE_R)) return 0x08;
-	return mame_rand(machine) & 0xff;
-}
-
-/*
-static READ16_HANDLER( handler3_r )
-{
-	return mame_rand(machine) & 0x0000;
-//	return mame_rand(machine) & 0xffff;
-}
-*/
 
 static ADDRESS_MAP_START( skattv_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w) // bad
-	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w) // bad
-	AM_RANGE(0x8000a0, 0x8000a1) AM_READ(handler2_r)
-	AM_RANGE(0x8000a2, 0x8000a3) AM_READ(handler2_r)
+	AM_RANGE(0x400000, 0x4000ff) AM_READ(test_r) //18b too
+	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w)
+	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w)
+//	AM_RANGE(0x8000a0, 0x8000a1) AM_READ(handler2_r)
+//	AM_RANGE(0x8000a2, 0x8000a3) AM_READ(handler2_r)
+	AM_RANGE(0x800100, 0x80017f) AM_READ(test_r) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8( DUART68681, "duart68681", duart68681_r, duart68681_w, 0xff )
 //	AM_RANGE(0xffd246, 0xffd247) AM_READ(handler3_r)
 //	AM_RANGE(0xffd248, 0xffd249) AM_READ(handler3_r)
@@ -308,11 +301,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( quickjac_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40001f) AM_DEVREADWRITE8( DUART68681, "duart68681", duart68681_r, duart68681_w, 0xff )
-//	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w) // bad
-//	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w) // bad
-	AM_RANGE(0x800080, 0x800081) AM_READ(handler1_r)
-	AM_RANGE(0x800082, 0x800083) AM_READ(handler1_r)
-	AM_RANGE(0x800100, 0x8001ff) AM_RAM // bad
+	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w) // bad
+	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w) // bad
+	AM_RANGE(0x800100, 0x8001ff) AM_READ(test_r) //18b too
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -351,10 +342,17 @@ static INPUT_PORTS_START( skattv )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_COIN4  )	// "E. Coin 4" (ECA?)
 INPUT_PORTS_END
 
+/*
+static INTERRUPT_GEN( adp_int )
+{
+	cpunum_set_input_line(machine, 0, 1, HOLD_LINE); // ??? All irqs have the same vector, and the mask used is 0 or 7
+}
+*/
+
 static MACHINE_DRIVER_START( quickjac )
 	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(quickjac_mem, 0)
-	//MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
+//	MDRV_CPU_VBLANK_INT("main", adp_int)
 
 	MDRV_MACHINE_START(skattv)
 	MDRV_MACHINE_RESET(skattv)
@@ -363,11 +361,11 @@ static MACHINE_DRIVER_START( quickjac )
 	MDRV_DEVICE_CONFIG( skattv_duart68681_config )
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MDRV_SCREEN_SIZE(384, 280)
+	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
 	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_PALETTE_INIT(adp)
@@ -383,7 +381,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( skattv )
 	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(skattv_mem, 0)
-//	MDRV_CPU_VBLANK_INT("main", irq4_line_hold)
+//	MDRV_CPU_VBLANK_INT("main", adp_int)
 
 	MDRV_MACHINE_START(skattv)
 	MDRV_MACHINE_RESET(skattv)
@@ -392,11 +390,11 @@ static MACHINE_DRIVER_START( skattv )
 	MDRV_DEVICE_CONFIG( skattv_duart68681_config )
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(30)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MDRV_SCREEN_SIZE(384, 280)
+	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
 	MDRV_PALETTE_LENGTH(0x100)
 
 	MDRV_PALETTE_INIT(adp)
@@ -486,9 +484,37 @@ ROM_START( fashiong )
 	ROM_LOAD16_BYTE( "m48z08posz.bin", 0x0001, 0x2000, CRC(7c5a4b78) SHA1(262d0d7f5b24e356ab54eb2450bbaa90e3fb5464) )
 ROM_END
 
+static DRIVER_INIT(skattv)
+{
+	UINT16 i;
+	UINT16 *prgrom = (UINT16*)memory_region(machine, "main");
+
+	i = prgrom[0x66];
+	prgrom[0x66] = prgrom[0x106];
+	prgrom[0x106] = i;
+	
+	i = prgrom[0x67];
+	prgrom[0x67] = prgrom[0x107];
+	prgrom[0x107] = i;
+}
+
+static DRIVER_INIT(quickjac)
+{
+	UINT16 i;
+	UINT16 *prgrom = (UINT16*)memory_region(machine, "main");
+
+	i = prgrom[0x66];
+	prgrom[0x66] = prgrom[0x102];
+	prgrom[0x102] = i;
+	
+	i = prgrom[0x67];
+	prgrom[0x67] = prgrom[0x103];
+	prgrom[0x103] = i;
+}
+
 GAME( 1990, backgamn,        0, backgamn,    adp,    0, ROT0,  "ADP", "Backgammon", GAME_NOT_WORKING )
-GAME( 1993, quickjac,        0, quickjac,    skattv,    0, ROT0,  "ADP", "Quick Jack", GAME_NOT_WORKING )
-GAME( 1994, skattv,          0, skattv,      skattv,    0, ROT0,  "ADP", "Skat TV", GAME_NOT_WORKING )
-GAME( 1995, skattva,    skattv, skattv,      skattv,    0, ROT0,  "ADP", "Skat TV (version TS3)", GAME_NOT_WORKING )
+GAME( 1993, quickjac,        0, quickjac,    skattv,    quickjac, ROT0,  "ADP", "Quick Jack", GAME_NOT_WORKING )
+GAME( 1994, skattv,          0, skattv,      skattv,    skattv, ROT0,  "ADP", "Skat TV", GAME_NOT_WORKING )
+GAME( 1995, skattva,    skattv, skattv,      skattv,    skattv, ROT0,  "ADP", "Skat TV (version TS3)", GAME_NOT_WORKING )
 GAME( 1997, fashiong,        0, skattv,      adp,    0, ROT0,  "ADP", "Fashion Gambler", GAME_NOT_WORKING )
 
