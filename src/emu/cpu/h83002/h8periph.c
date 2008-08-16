@@ -40,7 +40,7 @@ static const int tscales[4] = { 1, 2, 4, 8 };
 static TIMER_CALLBACK( h8itu_timer_cb )
 {
 
-	int which = (int)ptr;
+	int which = (int)(FPTR)ptr;
 	timer_adjust_oneshot(h8.timer[which], attotime_never, 0);
 	h8.h8TCNT[which] = 0;
 	h8.per_regs[tsr[which]] |= 4;
@@ -429,7 +429,7 @@ static void h8_3007_itu_refresh_timer(int tnum)
 
 static TIMER_CALLBACK( h8itu_3007_timer_cb )
 {
-	int tnum = (int)ptr;
+	int tnum = (int)(FPTR)ptr;
 	int base = 0x68 + (tnum*8);
 	UINT16 count = (h8.per_regs[base + 0x2]<<8) | h8.per_regs[base + 0x3];
 	count++;
@@ -707,7 +707,7 @@ void h8_3007_itu_init(void)
 	int i;
 
 	for (i=0; i<3; i++)
-		h8.timer[i] = timer_alloc(h8itu_3007_timer_cb, (void*)i);
+		h8.timer[i] = timer_alloc(h8itu_3007_timer_cb, (void*)(FPTR)i);
 
 	h8_itu_reset();
 }
@@ -717,7 +717,7 @@ void h8_itu_init(void)
 	int i;
 
 	for (i=0; i<5; i++)
-		h8.timer[i] = timer_alloc(h8itu_timer_cb, (void*)i);
+		h8.timer[i] = timer_alloc(h8itu_timer_cb, (void*)(FPTR)i);
 
 	h8_itu_reset();
 
