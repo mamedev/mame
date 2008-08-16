@@ -24,8 +24,9 @@ static UINT16 fifo[FIFO_LENGTH];
 static UINT16 readfifo;
 UINT16 *HD63484_ram;
 UINT16 HD63484_reg[256/2];
+UINT16 pattern[16];
 static int org,org_dpd,rwp;
-static UINT16 cl0,cl1,ccmp,edg,mask,ppy,pzcy,ppx,pzcs,psy,psx,pey,pzy,pex,pzx,xmin,ymin,xmax,ymax,rwp_dn;
+static UINT16 cl0,cl1,ccmp,edg,mask,ppy,pzcy,ppx,pzcx,psy,psx,pey,pzy,pex,pzx,xmin,ymin,xmax,ymax,rwp_dn;
 static INT16 cpx,cpy;
 
 static const int instruction_length[64] =
@@ -71,9 +72,8 @@ static const char *const instruction_name[64] =
 void HD63484_start(void)
 {
 	fifo_counter = 0;
-	HD63484_ram = auto_malloc(HD63484_RAM_SIZE * sizeof(UINT16));
-
-	memset(HD63484_ram,0,HD63484_RAM_SIZE);
+	HD63484_ram = auto_malloc(HD63484_RAM_SIZE * sizeof(*HD63484_ram));
+	memset(HD63484_ram, 0, HD63484_RAM_SIZE * sizeof(*HD63484_ram));
 }
 
 static void doclr16(int opcode,UINT16 fill,int *dst,INT16 _ax,INT16 _ay)
@@ -427,6 +427,39 @@ static int get_pixel(int x,int y)
 	return ((HD63484_ram[dst] & bitmask_shifted) >> (x_mod * bpp));
 }
 
+static int get_pixel_ptn(int x,int y)
+{
+	int dst, x_int, x_mod, bpp;
+	UINT16 bitmask, bitmask_shifted;
+
+	bpp = 1;
+	bitmask = 0x0001;
+
+	if (x >= 0)
+	{
+		x_int = x / (16 / bpp);
+		x_mod = x % (16 / bpp);
+	}
+	else
+	{
+		x_int = x / (16 / bpp);
+		x_mod = -1 * (x % (16 / bpp));
+		if (x_mod) {
+			x_int--;
+			x_mod = (16 / bpp) - x_mod;
+		}
+	}
+
+	bitmask_shifted = bitmask << (x_mod * bpp);
+
+	dst = (x_int + y * 1);
+
+	if ((pattern[dst] & bitmask_shifted) >> (x_mod * bpp))
+		return 1; //cl1
+	else
+		return 0; //cl0
+}
+
 static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,INT16 _ay)
 {
 	int step1_x,step1_y,step2_x,step2_y;
@@ -455,6 +488,120 @@ static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,I
 		for (;;)
 		{
 			dot(xxd,yyd,opcode & 0x0007,get_pixel(xxs,yys));
+
+			if (opcode & 0x0800)
+			{
+				if (ay == 0) break;
+				if (_ay > 0)
+				{
+					yys++;
+					xxd += step1_x;
+					yyd += step1_y;
+					ay--;
+				}
+				else
+				{
+					yys--;
+					xxd += step1_x;
+					yyd += step1_y;
+					ay++;
+				}
+			}
+			else
+			{
+				if (ax == 0) break;
+				else if (ax > 0)
+				{
+					xxs++;
+					xxd += step1_x;
+					yyd += step1_y;
+					ax--;
+				}
+				else
+				{
+					xxs--;
+					xxd += step1_x;
+					yyd += step1_y;
+					ax++;
+				}
+			}
+		}
+
+		if (opcode & 0x0800)
+		{
+			ay = _ay;
+			if (_ax < 0)
+			{
+				xxs--;
+				yys -= ay;
+				xxd += step2_x;
+				yyd += step2_y;
+				if (ax == 0) break;
+				ax++;
+			}
+			else
+			{
+				xxs++;
+				yys += ay;
+				xxd += step2_x;
+				yyd += step2_y;
+				if (ax == 0) break;
+				ax--;
+			}
+		}
+		else
+		{
+			ax = _ax;
+			if (_ay < 0)
+			{
+				xxs -= ax;
+				yys--;
+				xxd += step2_x;
+				yyd += step2_y;
+				if (ay == 0) break;
+				ay++;
+			}
+			else
+			{
+				xxs -= ax;
+				yys++;
+				xxd += step2_x;
+				yyd += step2_y;
+				if (ay == 0) break;
+				ay--;
+			}
+		}
+	}
+}
+
+static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
+{
+	int step1_x,step1_y,step2_x,step2_y;
+	int ax = _ax;
+	int ay = _ay;
+	int xxs = src_x;
+	int yys = src_y;
+	int xxd = cpx;
+	int yyd = cpy;
+
+	switch (opcode & 0x0700)
+	{
+		default:
+		case 0x0000: step1_x =  1; step1_y =  0; step2_x = -ax; step2_y =   1; break;
+		case 0x0100: step1_x =  1; step1_y =  0; step2_x = -ax; step2_y =  -1; break;
+		case 0x0200: step1_x = -1; step1_y =  0; step2_x =  ax; step2_y =   1; break;
+		case 0x0300: step1_x = -1; step1_y =  0; step2_x =  ax; step2_y =  -1; break;
+		case 0x0400: step1_x =  0; step1_y =  1; step2_x =   1; step2_y =  ay; break;
+		case 0x0500: step1_x =  0; step1_y = -1; step2_x =   1; step2_y = -ay; break;
+		case 0x0600: step1_x =  0; step1_y =  1; step2_x =  -1; step2_y =  ay; break;
+		case 0x0700: step1_x =  0; step1_y = -1; step2_x =  -1; step2_y = -ay; break;
+	}
+
+	for (;;)
+	{
+		for (;;)
+		{
+			dot(xxd,yyd,opcode & 0x0007,get_pixel_ptn(xxs,yys));
 
 			if (opcode & 0x0800)
 			{
@@ -641,7 +788,7 @@ static void HD63484_command_w(UINT16 cmd)
 					ppy  = (fifo[1] & 0xf000) >> 12;
 					pzcy = (fifo[1] & 0x0f00) >> 8;
 					ppx  = (fifo[1] & 0x00f0) >> 4;
-					pzcs = (fifo[1] & 0x000f) >> 0;
+					pzcx = (fifo[1] & 0x000f) >> 0;
 				}
 			else if (fifo[0] == 0x0806)
 				{
@@ -675,7 +822,11 @@ logerror("unsupported register\n");
 		}
 		else if ((fifo[0] & 0xfff0) == 0x1800)	/* WPTN */
 		{
-			/* pattern RAM not supported */
+			int i;
+			int start = fifo[0] & 0x000f;
+			int n = fifo[1];
+			for (i = 0; i < n; i++)
+				pattern[start + i] = fifo[2 + i];
 		}
 		else if (fifo[0] == 0x4400)	/* RD */
 		{
@@ -858,6 +1009,14 @@ logerror("unsupported register\n");
 		{
 			dot(cpx,cpy,fifo[0] & 0x0007,cl0);
 		}
+		else if ((fifo[0] & 0xf000) == 0xd000)	/* PTN (to do) */
+		{
+			// if ((fifo[0] & 0x0700) == 0x0400) printf("4");
+			ptn(fifo[0] & 0x0007,psx,psy,pex - psx,pey - psy);
+
+			cpx += pex - psx;
+			cpy += pey - psy;
+		}
 		else if ((fifo[0] & 0xf0f8) == 0xe000)	/* AGCPY */
 		{
 			agcpy(fifo[0],fifo[1],fifo[2],cpx,cpy,fifo[3],fifo[4]);
@@ -869,7 +1028,6 @@ logerror("unsupported register\n");
 {
 logerror("unsupported command\n");
 popmessage("unsupported command %s (%04x)",instruction_name[fifo[0]>>10],fifo[0]);
-printf("unsupported command %s (%04x)\n",instruction_name[fifo[0]>>10],fifo[0]);
 }
 
 		fifo_counter = 0;
