@@ -256,6 +256,7 @@ VIDEO_START( grdnstrm );
 VIDEO_START( firehawk );
 VIDEO_UPDATE( afega );
 VIDEO_UPDATE( redhawkb );
+VIDEO_UPDATE(redhawki );
 VIDEO_UPDATE( bubl2000 );
 VIDEO_UPDATE( firehawk );
 
@@ -4885,6 +4886,13 @@ static MACHINE_DRIVER_START( stagger1 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.70)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( redhawki )
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(stagger1)
+	/* video hardware */
+	MDRV_VIDEO_UPDATE(redhawki)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( redhawkb )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(stagger1)
@@ -6959,7 +6967,7 @@ GAME( 1996, airattca, airattck, ssmissin, airattck, ssmissin, ROT270, "Comad",  
 GAME( 1995, twinactn, 0,        twinactn, twinactn, 0,        ROT0,   "Afega",                         "Twin Action", 0 )
 GAME( 1998, stagger1, 0,        stagger1, stagger1, 0,        ROT270, "Afega",                         "Stagger I (Japan)", 0 )
 GAME( 1997, redhawk,  stagger1, stagger1, stagger1, redhawk,  ROT270, "Afega",                         "Red Hawk (US)", 0 )
-GAME( 1997, redhawki, stagger1, stagger1, stagger1, 0,        ROT0,   "Afega",                         "Red Hawk (Italy)", GAME_NOT_WORKING )
+GAME( 1997, redhawki, stagger1, redhawki, stagger1, 0,        ROT0,   "Afega",                         "Red Hawk (Italy)", 0 ) // bootleg? strange scroll regs
 GAME( 1997, redhawke, stagger1, stagger1, stagger1, 0,        ROT270, "Afega (Excellent Co. license)", "Red Hawk (Excellent Co., Ltd)", 0 )
 GAME( 1997, redhawkb, stagger1, redhawkb, redhawkb, 0,        ROT0,   "bootleg",                       "Red Hawk (bootleg)", 0 )
 GAME( 1998, grdnstrm, 0,        grdnstrm, grdnstrm, grdnstrm, ROT270, "Afega",                         "Sen Jin - Guardian Storm (Korea)", 0 )

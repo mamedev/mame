@@ -1077,7 +1077,6 @@ static void video_update(running_machine *machine, bitmap_t *bitmap, const recta
 	tilemap_set_scrollx(tilemap_1, 0, afega_scroll_1[1]);
 	tilemap_set_scrolly(tilemap_1, 0, afega_scroll_1[0]);
 
-
 	tilemap_draw(bitmap,cliprect,tilemap_0,0,0);
 
 	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,3);
@@ -1088,9 +1087,25 @@ static void video_update(running_machine *machine, bitmap_t *bitmap, const recta
 	tilemap_draw(bitmap,cliprect,tilemap_1,0,0);
 }
 
+static void redhawki_video_update(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect	)
+{
+
+
+	tilemap_set_scrollx(tilemap_0, 0, afega_scroll_1[0]&0xff);
+	tilemap_set_scrolly(tilemap_0, 0, afega_scroll_1[1]&0xff);
+
+	tilemap_draw(bitmap,cliprect,tilemap_0,0,0);
+
+	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,3);
+	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,2);
+	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,1);
+	nmk16_draw_sprites_flipsupported(machine, bitmap,cliprect,0);
+}
+
 VIDEO_UPDATE( afega )		{	video_update(screen->machine,bitmap,cliprect, 1, -0x100,+0x000, 0x0001);	return 0; }
 VIDEO_UPDATE( bubl2000 )	{	video_update(screen->machine,bitmap,cliprect, 0, -0x100,+0x000, 0x0001);	return 0; }	// no flipscreen support, I really would confirmation from the schematics
 VIDEO_UPDATE( redhawkb )	{	video_update(screen->machine,bitmap,cliprect, 0, +0x000,+0x100, 0x0001);	return 0; }
+VIDEO_UPDATE( redhawki )	{	redhawki_video_update(screen->machine,bitmap,cliprect); return 0;} // strange scroll regs
 
 VIDEO_UPDATE( firehawk )
 {
