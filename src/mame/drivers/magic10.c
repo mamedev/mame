@@ -1,14 +1,19 @@
 /*
-    Magic's 10     (c) 1995 AWP Games
-    Magic's 10 2   (c) 1997 ABM Games
+    Magic's 10                 (c) 1995 AWP Games
+    Magic's 10 2               (c) 1997 ABM Games
+    Super Pool (9743 Rev.01)   (c) 1997 ABM Games
+    Hot Slot (ver 05.01)       (c) 1996 ABM Electronics
+    Magic Colors (ver 1.7A)        1999 Unknown
 
     driver by Pierpaolo Prazzoli
+    aditional work by Roberto Fresca
 
     TODO:
     - ticket / coin dispenser
     - some unknown writes
     - finish magic10_2 (association coin - credits handling its inputs
       and some reads that drive the note displayed?)
+    - protection (suprpool, hotslot, mcolors)
 
 Magic's 10 instruction for the 1st boot:
 - Switch "Disable Free Play" to ON
@@ -76,6 +81,23 @@ static READ16_HANDLER( magic102_r )
 	return ret;
 }
 
+static READ16_HANDLER( hotslot_copro_r )
+{
+	static UINT16 ret = 0x0080;
+	return ret;
+}
+
+static WRITE16_HANDLER( hotslot_copro_w )
+{
+	logerror("Writting to copro: %d \n", data);
+}
+
+static WRITE16_HANDLER( vid_reg_1_w )	// layer pos control
+{
+	layer2_offset[0] = -(data - 5);
+//	logerror("Layer2 offset: %d  Register: %d \n", layer2_offset[0], data);
+}
+
 static ADDRESS_MAP_START( magic10_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE(&layer1_videoram)
@@ -88,7 +110,7 @@ static ADDRESS_MAP_START( magic10_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400008, 0x400009) AM_WRITE(magic10_misc_w)
 	AM_RANGE(0x40000a, 0x40000b) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0x40000e, 0x40000f) AM_WRITENOP
-	AM_RANGE(0x400080, 0x400087) AM_WRITENOP
+	AM_RANGE(0x400080, 0x400087) AM_WRITENOP	// video registers?
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -104,7 +126,7 @@ static ADDRESS_MAP_START( magic10a_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500008, 0x500009) AM_WRITE(magic10_misc_w)
 	AM_RANGE(0x50000a, 0x50000b) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0x50000e, 0x50000f) AM_WRITENOP
-	AM_RANGE(0x500080, 0x500087) AM_WRITENOP
+	AM_RANGE(0x500080, 0x500087) AM_WRITENOP	// video registers?
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 ADDRESS_MAP_END
 
@@ -124,7 +146,29 @@ static ADDRESS_MAP_START( magic102_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500002, 0x50001f) AM_WRITENOP
 	AM_RANGE(0x600000, 0x603fff) AM_RAM
 	AM_RANGE(0x700000, 0x700001) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
-	AM_RANGE(0x700080, 0x700087) AM_WRITENOP
+	AM_RANGE(0x700080, 0x700087) AM_WRITENOP	// video registers?
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hotslot_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(layer1_videoram_w) AM_BASE(&layer1_videoram)
+	AM_RANGE(0x101000, 0x101fff) AM_RAM_WRITE(layer0_videoram_w) AM_BASE(&layer0_videoram)
+	AM_RANGE(0x102000, 0x103fff) AM_RAM_WRITE(layer2_videoram_w) AM_BASE(&layer2_videoram)
+	AM_RANGE(0x200000, 0x2007ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x400000, 0x4001ff) AM_RAM_WRITE(paletteram_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x500004, 0x500005) AM_READWRITE(hotslot_copro_r, hotslot_copro_w)	// copro comm
+	AM_RANGE(0x500006, 0x500011) AM_RAM
+	AM_RANGE(0x500012, 0x500013) AM_READ_PORT("IN0")
+	AM_RANGE(0x500014, 0x500015) AM_READ_PORT("IN1")
+	AM_RANGE(0x500016, 0x500017) AM_READ_PORT("IN2")
+	AM_RANGE(0x500018, 0x500019) AM_READ_PORT("DSW1")
+	AM_RANGE(0x50001a, 0x50001d) AM_WRITENOP
+	AM_RANGE(0x600000, 0x603fff) AM_RAM
+	AM_RANGE(0x70000a, 0x70000b) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
+	AM_RANGE(0x700080, 0x700081) AM_WRITENOP			// video registers
+	AM_RANGE(0x700082, 0x700083) AM_WRITE(vid_reg_1_w)	// video registers
+	AM_RANGE(0x700084, 0x700085) AM_WRITENOP			// video registers
+	AM_RANGE(0x700086, 0x700087) AM_WRITENOP			// video registers
 ADDRESS_MAP_END
 
 
@@ -200,7 +244,7 @@ static INPUT_PORTS_START( magic102 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Note A")
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Note B")
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Note C")
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME("Note D")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME("Note D") PORT_CODE(KEYCODE_9)
 	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -276,6 +320,58 @@ static INPUT_PORTS_START( magic102 )
 */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( hotslot )
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Win-Tab") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("1/2 Win") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Bet") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("Hopper") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Note A")
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Note B")
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 )   PORT_NAME("Note C")
+	PORT_SERVICE_NO_TOGGLE( 0x0010, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("Outhole") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN5 )   PORT_NAME("Note D") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER )   PORT_NAME("Door") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+    PORT_START("IN2")
+    PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+    PORT_START("DSW1")
+    PORT_DIPNAME( 0x03,	0x03, DEF_STR( Difficulty ) )
+    PORT_DIPSETTING(	0x00, DEF_STR( Easy ) )
+    PORT_DIPSETTING(	0x01, DEF_STR( Medium ) )
+    PORT_DIPSETTING(	0x02, DEF_STR( Hard ) )
+    PORT_DIPSETTING(	0x03, DEF_STR( Hardest ) )
+    PORT_DIPNAME( 0x0c,	0x0c, DEF_STR( Coinage ) )
+    PORT_DIPSETTING(	0x00, "Coin A=10; B=10" )
+    PORT_DIPSETTING(	0x08, "Coin A=10; B=20" )
+    PORT_DIPSETTING(	0x04, "Coin A=10; B=50" )
+    PORT_DIPSETTING(	0x0c, "Coin A=10; B=100" )
+    PORT_DIPNAME( 0x10,	0x10, "Bet Max" )
+    PORT_DIPSETTING(	0x10, "10" )
+    PORT_DIPSETTING(	0x00, "20" )
+    PORT_DIPNAME( 0x20,	0x20, "Cum" )
+    PORT_DIPSETTING(	0x20, "10" )
+    PORT_DIPSETTING(	0x00, "100" )
+    PORT_DIPNAME( 0xc0,	0xc0, "Payout" )
+    PORT_DIPSETTING(	0x00, "Replay Only" )
+    PORT_DIPSETTING(	0x40, "Tokens Only" )
+    PORT_DIPSETTING(	0x80, "Tickets Only" )
+    PORT_DIPSETTING(	0xc0, "Tickets & Tokens" )
+    PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+INPUT_PORTS_END
+
 static TILE_GET_INFO( get_layer0_tile_info )
 {
 	SET_TILE_INFO(1,layer0_videoram[tile_index*2],layer0_videoram[tile_index*2+1] & 0xf,TILE_FLIPYX((layer0_videoram[tile_index*2+1] & 0xc0) >> 6));
@@ -310,6 +406,10 @@ static VIDEO_UPDATE( magic10 )
 	tilemap_draw(bitmap,cliprect,layer0_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,layer1_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,layer2_tilemap,0,0);
+
+	tilemap_set_scrollx(layer2_tilemap,0,layer2_offset[0]);
+	tilemap_set_scrolly(layer2_tilemap,0,layer2_offset[1]);
+
 	return 0;
 }
 
@@ -387,6 +487,17 @@ static MACHINE_DRIVER_START( magic102 )
 
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( hotslot )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(magic10)
+	MDRV_CPU_MODIFY("cpu")
+	MDRV_CPU_PROGRAM_MAP(hotslot_map,0)
+
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 2*8, 32*8-1)
 MACHINE_DRIVER_END
 
 /*
@@ -492,6 +603,17 @@ ABM (Nazionale Elettronica Giochi S.A.S.), 1998.
 1x 8x2 switches dip
 1x lithium battery
 
+
+  STATUS:
+
+  Memory map = done.
+  Inputs =     done.
+  Machine =    done.
+
+  OKI 6295 =     ok.
+  Screen size =  ok.
+  Fixed layers = yes.
+
 */
 
 ROM_START( suprpool )
@@ -509,6 +631,133 @@ ROM_START( suprpool )
 	ROM_LOAD( "1.u32", 0x00000, 0x40000, CRC(47804af7) SHA1(602dc0361869b52532e2adcb0de3cbdd042761b3) )
 ROM_END
 
+/*
+
+Hot Slot  
+
+CPU:
+1x HD6473308CP10 (u24)(main)
+1x A40MX04-PL84-9828 (u50)(main)
+1x missing PLD (u1)
+
+1x 6295 (u31)(sound)
+1x KA358 (u33)(sound)
+1x TDA2003 (u34)(sound)
+
+1x oscillator 20.0000MHz (OSC1)
+1x 1000J blu resonator (XTAL1)
+
+ROMs:
+3x 27C2001 (1,4,6)
+2x 27C020 (5,7)
+2x 27C010 (2,3)
+1x GAL16V8D (as PAL16R4)(read protected)
+1x missing PAL22V10
+
+Note:
+1x 28x2 edge connector
+1x trimmer (volume)
+1n trimmer (unknown)
+3x 12 legs connector (J1,J2,J3)
+1x 8x2 switches DIP
+
+- Co-processor is unknown, but fits in a QFP68 socket.
+- The system RAM test need the bit 7 of offset 0x500005 activated to be successful.
+  This offset seems to be a kind of port.
+
+  code:
+
+  0x00f550  move.b  #$b,  $500005
+  0x00f558  btst    #$7,  $500005
+  0x00f560  beq     $f558
+  ....
+
+  seems to copy some bytes (maybe commands) and wait for the status on bit 7
+
+
+  STATUS:
+
+  Memory map = done.
+  Inputs =     done.
+  Machine =    done.
+
+  OKI 6295 =     ok.
+  Screen size =  ok.
+  Fixed layers = almost (see driver init).
+
+*/
+
+ROM_START( hotslot )
+	ROM_REGION( 0x40000, "cpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "hotslot2.u3", 0x00000, 0x20000, CRC(676cbe32) SHA1(78721326f3334fcdfdaffb72dbcacfb8bb591d51) )
+	ROM_LOAD16_BYTE( "hotslot3.u2", 0x00001, 0x20000, CRC(2c362765) SHA1(c41741c97fe8e5b3a66eb08ebf68d24c6c771ba8) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) /* Sprites */
+	ROM_LOAD( "hotslot7.u35", 0x00000, 0x40000, CRC(715073c2) SHA1(39085871fee182a9b22c3e042211e76da0ee3024) )
+	ROM_LOAD( "hotslot6.u36", 0x40000, 0x40000, CRC(8ef2e25a) SHA1(d4a3288878fabab7ea193d5dadde1fe9fea6bc8a) )
+	ROM_LOAD( "hotslot5.u37", 0x80000, 0x40000, CRC(98375b25) SHA1(2167f3374bdfc5e1fef7b9ec4361bc68223876b8) )
+	ROM_LOAD( "hotslot4.u38", 0xc0000, 0x40000, CRC(cc8a241a) SHA1(8c6ea51d5f7475be79775df0b976ffddc5a960ed) )
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "hotslot1.u32", 0x00000, 0x40000, CRC(ae880970) SHA1(3c302b3f6f6bbf72a522889592add3b6ef8ce1b0) )
+ROM_END
+
+/*
+
+Magic Colors  
+
+CPU:
+1x HD6473308CP10 (u24)(main)
+1x A40MX04-PL84-9828 (u50)(main)
+1x missing PLD (u1)
+
+1x M6295 (u31)(sound)
+1x KA358 (u33)(sound)
+1x TDA2003 (u34)(sound)
+
+1x oscillator 20.0000MHz (OSC1)
+1x 1000J blu resonator (XTAL1)
+
+ROMs:
+6x 27C010 (2,3,4,5,6,7)
+1x 27C020 (1)
+1x GAL16V8D (as PAL16R4)(read protected)
+1x missing PAL22V10
+
+Note:
+1x 28x2 edge connector
+1x trimmer (volume)
+1x 12 legs connector (J1,J2,J3)
+
+
+  STATUS:
+
+  Memory map = done.
+  Inputs =     done.
+  Machine =    done.
+
+  OKI 6295 =     ok.
+  Screen size =  ok.
+  Fixed layers = yes.
+
+*/
+
+ROM_START( mcolors )
+	ROM_REGION( 0x40000, "cpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "m.colors1.7a-2.u3", 0x00000, 0x20000, CRC(02ce6aab) SHA1(349cb639024a818cb88e911788a0146f48d25333) )
+	ROM_LOAD16_BYTE( "m.colors1.7a-3.u2", 0x00001, 0x20000, CRC(076b9680) SHA1(856d1cfaca886d78a36e129a7b41455362932e66) )
+
+	ROM_REGION( 0x80000, "gfx1", 0 ) /* Sprites */
+	ROM_LOAD( "m.colors1.7-7.u35", 0x00000, 0x20000, CRC(ec44b289) SHA1(269c965112f0ba308bb5f02d965e32df70310b2c) )
+	ROM_LOAD( "m.colors1.7-6.u36", 0x20000, 0x20000, CRC(44e550e2) SHA1(abfc05b386efb0f9ad7479ff53079e6ecbaec137) )
+	ROM_LOAD( "m.colors1.7-5.u37", 0x40000, 0x20000, CRC(ec363d0d) SHA1(283f0bf3e3d76d64389f0abdffbeaa3d538b8991) )
+	ROM_LOAD( "m.colors1.7-4.u38", 0x60000, 0x20000, CRC(7845667d) SHA1(66b1409b8b661b95e2658385da9c2662430d8030) )
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "m.color1.u32", 0x00000, 0x40000, CRC(db8d6769) SHA1(2ab7730fd8ae9522e5452fe1f535002e11db5e7b) )
+ROM_END
+
+
 static DRIVER_INIT( magic10 )
 {
 	layer2_offset[0] = 32;
@@ -521,7 +770,25 @@ static DRIVER_INIT( magic102 )
 	layer2_offset[1] = 20;
 }
 
-GAME( 1995, magic10,   0,       magic10,   magic10,   magic10,   ROT0, "A.W.P. Games", "Magic's 10 (ver. 16.55)",  0 )
-GAME( 1995, magic10a,  magic10, magic10a,  magic10,   magic10,   ROT0, "A.W.P. Games", "Magic's 10 (ver. 16.45)",  0 )
-GAME( 1997, magic102,  0,       magic102,  magic102,  magic102,  ROT0, "ABM Games",    "Magic's 10 2 (ver 1.1)",   GAME_NOT_WORKING )
-GAME( 1997, suprpool,  0,       magic102,  magic102,  magic102,  ROT0, "ABM Games",    "Super Pool (9743 Rev.01)", GAME_NOT_WORKING )
+static DRIVER_INIT( suprpool )
+{
+	layer2_offset[0] = 8;
+	layer2_offset[1] = 16;
+}
+
+static DRIVER_INIT( hotslot )
+{
+/*	a value of -56 center the playfield, but displace the intro and initial screen.
+    a value of -64 center the intro and initial screen, but displace the playfield.
+*/
+	layer2_offset[0] = -56;	// X offset.
+	layer2_offset[1] = 0;	// Y offset.
+}
+
+
+GAME( 1995, magic10,   0,       magic10,   magic10,   magic10,   ROT0, "A.W.P. Games",    "Magic's 10 (ver. 16.55)",  0 )
+GAME( 1995, magic10a,  magic10, magic10a,  magic10,   magic10,   ROT0, "A.W.P. Games",    "Magic's 10 (ver. 16.45)",  0 )
+GAME( 1997, magic102,  0,       magic102,  magic102,  magic102,  ROT0, "ABM Games",       "Magic's 10 2 (ver 1.1)",   GAME_NOT_WORKING )
+GAME( 1997, suprpool,  0,       magic102,  magic102,  suprpool,  ROT0, "ABM Games",       "Super Pool (9743 Rev.01)", GAME_NOT_WORKING )
+GAME( 1996, hotslot,   0,       hotslot,   hotslot,   hotslot,   ROT0, "ABM Electronics", "Hot Slot (ver 05.01)",     GAME_NOT_WORKING )
+GAME( 1999, mcolors,   0,       magic102,  magic102,  magic102,  ROT0, "unknown",         "Magic Colors (ver 1.7A)",  GAME_NOT_WORKING )
