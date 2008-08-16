@@ -3,10 +3,10 @@
     Magic's 10 2               (c) 1997 ABM Games
     Super Pool (9743 Rev.01)   (c) 1997 ABM Games
     Hot Slot (ver 05.01)       (c) 1996 ABM Electronics
-    Magic Colors (ver 1.7A)        1999 Unknown
+    Magic Colors (ver 1.7a)        1999 Unknown
 
-    driver by Pierpaolo Prazzoli
-    aditional work by Roberto Fresca
+    Driver by Pierpaolo Prazzoli
+    Aditional work by Roberto Fresca
 
     TODO:
     - ticket / coin dispenser
@@ -95,7 +95,6 @@ static WRITE16_HANDLER( hotslot_copro_w )
 static WRITE16_HANDLER( vid_reg_1_w )	// layer pos control
 {
 	layer2_offset[0] = -(data - 5);
-//	logerror("Layer2 offset: %d  Register: %d \n", layer2_offset[0], data);
 }
 
 static ADDRESS_MAP_START( magic10_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -683,7 +682,7 @@ Note:
 
   OKI 6295 =     ok.
   Screen size =  ok.
-  Fixed layers = almost (see driver init).
+  Fixed layers = yes.
 
 */
 
@@ -791,4 +790,4 @@ GAME( 1995, magic10a,  magic10, magic10a,  magic10,   magic10,   ROT0, "A.W.P. G
 GAME( 1997, magic102,  0,       magic102,  magic102,  magic102,  ROT0, "ABM Games",       "Magic's 10 2 (ver 1.1)",   GAME_NOT_WORKING )
 GAME( 1997, suprpool,  0,       magic102,  magic102,  suprpool,  ROT0, "ABM Games",       "Super Pool (9743 Rev.01)", GAME_NOT_WORKING )
 GAME( 1996, hotslot,   0,       hotslot,   hotslot,   hotslot,   ROT0, "ABM Electronics", "Hot Slot (ver 05.01)",     GAME_NOT_WORKING )
-GAME( 1999, mcolors,   0,       magic102,  magic102,  magic102,  ROT0, "unknown",         "Magic Colors (ver 1.7A)",  GAME_NOT_WORKING )
+GAME( 1999, mcolors,   0,       magic102,  magic102,  magic102,  ROT0, "unknown",         "Magic Colors (ver 1.7a)",  GAME_NOT_WORKING )
