@@ -317,13 +317,46 @@ static offs_t g65816_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UIN
 	return g65816_disassemble(buffer, (pc & 0x00ffff), (pc & 0xff0000) >> 16, oprom, FLAG_M, FLAG_X);
 }
 
+static STATE_POSTLOAD( g65816_restore_state )
+{
+	// restore proper function pointers
+	g65816i_set_execution_mode((FLAG_M>>4) | (FLAG_X>>4));
 
+	// make sure the memory system can keep up
+	g65816i_jumping(REGISTER_PB | REGISTER_PC);
+}
 
 static void g65816_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	g65816_set_irq_callback(irqcallback);
-}
 
+	state_save_register_item("G65816", index, g65816i_cpu.a);
+	state_save_register_item("G65816", index, g65816i_cpu.b);
+	state_save_register_item("G65816", index, g65816i_cpu.x);
+	state_save_register_item("G65816", index, g65816i_cpu.y);
+	state_save_register_item("G65816", index, g65816i_cpu.s);
+	state_save_register_item("G65816", index, g65816i_cpu.pc);
+	state_save_register_item("G65816", index, g65816i_cpu.ppc);
+	state_save_register_item("G65816", index, g65816i_cpu.pb);
+	state_save_register_item("G65816", index, g65816i_cpu.db);
+	state_save_register_item("G65816", index, g65816i_cpu.d);
+	state_save_register_item("G65816", index, g65816i_cpu.flag_e);
+	state_save_register_item("G65816", index, g65816i_cpu.flag_m);
+	state_save_register_item("G65816", index, g65816i_cpu.flag_x);
+	state_save_register_item("G65816", index, g65816i_cpu.flag_n);
+	state_save_register_item("G65816", index, g65816i_cpu.flag_v);
+	state_save_register_item("G65816", index, g65816i_cpu.flag_d);
+	state_save_register_item("G65816", index, g65816i_cpu.flag_i);
+	state_save_register_item("G65816", index, g65816i_cpu.flag_z);
+	state_save_register_item("G65816", index, g65816i_cpu.flag_c);
+	state_save_register_item("G65816", index, g65816i_cpu.line_irq);
+	state_save_register_item("G65816", index, g65816i_cpu.line_nmi);
+	state_save_register_item("G65816", index, g65816i_cpu.ir);
+	state_save_register_item("G65816", index, g65816i_cpu.irq_delay);
+	state_save_register_item("G65816", index, g65816i_cpu.stopped);
+
+	state_save_register_postload(Machine, g65816_restore_state, NULL);
+}
 
 /**************************************************************************
  * Generic set_info
