@@ -19,6 +19,7 @@
 #include "deprecat.h"
 #include "sh2.h"
 #include "sh2comn.h"
+#include "eminline.h"
 
 #ifdef USE_SH2DRC
 
@@ -125,6 +126,7 @@ static const char *log_desc_flags_to_string(UINT32 flags);
 static void cfunc_printf_probe(void *param);
 static void cfunc_unimplemented(void *param);
 static void cfunc_checkirqs(void *param);
+static void cfunc_fastirq(void *param);
 static void cfunc_MAC_W(void *param);
 static void cfunc_MAC_L(void *param);
 static void cfunc_DIV1(void *param);
@@ -138,6 +140,28 @@ SH2 *sh2;
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
+
+INLINE UINT16 RW(offs_t A)
+{
+	if (A >= 0xe0000000)
+		return sh2_internal_r(Machine, (A & 0x1fc)>>2, 0xffff << (((~A) & 2)*8)) >> (((~A) & 2)*8);
+
+	if (A >= 0xc0000000)
+		return program_read_word_32be(A);
+
+	return program_read_word_32be(A & AM);
+}
+
+INLINE UINT32 RL(offs_t A)
+{
+	if (A >= 0xe0000000)
+		return sh2_internal_r(Machine, (A & 0x1fc)>>2, 0xffffffff);
+
+	if (A >= 0xc0000000)
+		return program_read_dword_32be(A);
+
+	return program_read_dword_32be(A & AM);
+}
 
 /*-------------------------------------------------
     epc - compute the exception PC from a
@@ -264,15 +288,12 @@ static void cfunc_checkirqs(void *param)
 	}
 }
 
-INLINE UINT16 RW(offs_t A)
+/*-------------------------------------------------
+    cfunc_fastirq - checks for pending IRQs
+-------------------------------------------------*/
+static void cfunc_fastirq(void *param)
 {
-	if (A >= 0xe0000000)
-		return sh2_internal_r(Machine, (A & 0x1fc)>>2, 0xffff << (((~A) & 2)*8)) >> (((~A) & 2)*8);
-
-	if (A >= 0xc0000000)
-		return program_read_word_32be(A);
-
-	return program_read_word_32be(A & AM);
+	sh2_exception("fastirq",sh2->irqline); 			
 }
 
 /*-------------------------------------------------
@@ -324,6 +345,11 @@ static void cfunc_MAC_W(void *param)
 	{
 		if (ans == 1)
 			{
+				if ((sh2->cpu_type == CPU_TYPE_SH1) && ((src == 0) || (src == 2)))
+				{
+					sh2->mach |= 0x00000001;
+				}
+
 				if (src == 0)
 					sh2->macl = 0x7fffffff;
 				if (src == 2)
@@ -335,18 +361,22 @@ static void cfunc_MAC_W(void *param)
 		sh2->mach += tempn;
 		if (templ > sh2->macl)
 			sh2->mach += 1;
+
+		// SH-1 has limited precision
+		if (sh2->cpu_type == CPU_TYPE_SH1)
+		{
+			if ((sh2->mach & 0x200) == 0)
+			{
+				sh2->mach &= 0x3ff;
+			}
+			else
+			{
+				sh2->mach |= 0xfffffc00;
+			}
+		}
+
+
 	}
-}
-
-INLINE UINT32 RL(offs_t A)
-{
-	if (A >= 0xe0000000)
-		return sh2_internal_r(Machine, (A & 0x1fc)>>2, 0xffffffff);
-
-	if (A >= 0xc0000000)
-		return program_read_dword_32be(A);
-
-	return program_read_dword_32be(A & AM);
 }
 
 /*-------------------------------------------------
@@ -795,6 +825,18 @@ static void sh2_reset(void)
 	sh2->internal_irq_level = -1;
 
 	sh2->cache_dirty = TRUE;
+
+	sh2->cpu_type = CPU_TYPE_SH2;
+}
+
+/*-------------------------------------------------
+    sh1_reset - reset the processor
+-------------------------------------------------*/
+
+static void sh1_reset(void)
+{
+	sh2_reset();
+	sh2->cpu_type = CPU_TYPE_SH1;
 }
 
 /*-------------------------------------------------
@@ -992,7 +1034,35 @@ static void static_generate_entry_point(drcuml_state *drcuml)
 	load_fast_iregs(block);
 
 	/* check for interrupts */
-	UML_CALLC(block, cfunc_checkirqs, NULL);
+	UML_CMP(block, MEM(&sh2->pending_nmi), IMM(0));			// cmp pending_nmi, #0
+	UML_JMPc(block, IF_Z, skip+2);					// jz skip+2
+
+	UML_MOV(block, MEM(&sh2->pending_nmi), IMM(0));			// zap pending_nmi
+	UML_JMP(block, skip+1);						// and then go take it (evec is already set)
+
+	UML_LABEL(block, skip+2);					// skip+2:
+	UML_MOV(block, MEM(&sh2->evec), IMM(0xffffffff));		// mov evec, -1
+	UML_MOV(block, IREG(0), IMM(0xffffffff));			// mov r0, -1 (r0 = irq)
+	UML_AND(block, IREG(1),  IREG(0), IMM(0xffff));	     		// and r1, 0xffff
+	UML_LZCNT(block, IREG(1), MEM(&sh2->pending_irq));		// lzcnt r1, r1
+	UML_CMP(block, IREG(1), IMM(32));				// cmp r1, #32
+	UML_JMPc(block, IF_Z, skip+1);					// jz skip+1
+
+	UML_SUB(block, MEM(&sh2->irqline), IMM(31), IREG(1));	   	// sub irqline, #31, r1
+
+	UML_CMP(block, MEM(&sh2->internal_irq_level), IMM(0xffffffff));	// cmp internal_irq_level, #-1
+	UML_JMPc(block, IF_Z, skip+3);					// jz skip+3
+	UML_CMP(block, MEM(&sh2->internal_irq_level), MEM(&sh2->irqline));		// cmp internal_irq_level, irqline
+	UML_JMPc(block, IF_BE, skip+3);					// ja skip+3
+
+	UML_MOV(block, MEM(&sh2->irqline), MEM(&sh2->internal_irq_level));		// mov r0, internal_irq_level
+
+	UML_LABEL(block, skip+3);					// skip+3:
+	UML_CMP(block, MEM(&sh2->irqline), IMM(0xffffffff));		// cmp irqline, #-1
+	UML_JMPc(block, IF_Z, skip+1);					// jz skip+1
+	UML_CALLC(block, cfunc_fastirq, NULL);				// callc fastirq
+
+	UML_LABEL(block, skip+1);					// skip+1:
 
 	UML_CMP(block, MEM(&sh2->evec), IMM(0xffffffff));		// cmp evec, 0xffffffff
 	UML_JMPc(block, IF_Z, skip);      				// jz skip
@@ -1344,10 +1414,38 @@ static void generate_update_cycles(drcuml_block *block, compiler_state *compiler
 		drcuml_codelabel skip = compiler->labelnum++;
 
 		compiler->checkints = FALSE;
+		compiler->labelnum += 3;
 
 		/* check for interrupts */
-		UML_CALLC(block, cfunc_checkirqs, NULL);
+		UML_CMP(block, MEM(&sh2->pending_nmi), IMM(0));			// cmp pending_nmi, #0
+		UML_JMPc(block, IF_Z, skip+2);					// jz skip+2
 
+		UML_MOV(block, MEM(&sh2->pending_nmi), IMM(0));			// zap pending_nmi
+		UML_JMP(block, skip+1);						// and then go take it (evec is already set)
+	
+		UML_LABEL(block, skip+2);					// skip+2:
+		UML_MOV(block, MEM(&sh2->evec), IMM(0xffffffff));		// mov evec, -1
+		UML_MOV(block, IREG(0), IMM(0xffffffff));			// mov r0, -1 (r0 = irq)
+		UML_AND(block, IREG(1),  IREG(0), IMM(0xffff));	     		// and r1, 0xffff
+		UML_LZCNT(block, IREG(1), MEM(&sh2->pending_irq));		// lzcnt r1, r1
+		UML_CMP(block, IREG(1), IMM(32));				// cmp r1, #32
+		UML_JMPc(block, IF_Z, skip+1);					// jz skip+1
+
+		UML_SUB(block, MEM(&sh2->irqline), IMM(31), IREG(1));	   	// sub irqline, #31, r1
+
+		UML_CMP(block, MEM(&sh2->internal_irq_level), IMM(0xffffffff));	// cmp internal_irq_level, #-1
+		UML_JMPc(block, IF_Z, skip+3);					// jz skip+3
+		UML_CMP(block, MEM(&sh2->internal_irq_level), MEM(&sh2->irqline));		// cmp internal_irq_level, irqline
+		UML_JMPc(block, IF_BE, skip+3);					// ja skip+3
+
+		UML_MOV(block, MEM(&sh2->irqline), MEM(&sh2->internal_irq_level));		// mov r0, internal_irq_level
+
+		UML_LABEL(block, skip+3);					// skip+3:
+		UML_CMP(block, MEM(&sh2->irqline), IMM(0xffffffff));		// cmp irqline, #-1
+		UML_JMPc(block, IF_Z, skip+1);					// jz skip+1
+		UML_CALLC(block, cfunc_fastirq, NULL);				// callc fastirq
+
+		UML_LABEL(block, skip+1);					// skip+1:
 		UML_CMP(block, MEM(&sh2->evec), IMM(0xffffffff));		// cmp evec, 0xffffffff
 		UML_JMPc(block, IF_Z, skip);      				// jz skip
 
@@ -1713,16 +1811,19 @@ static int generate_group_0(drcuml_block *block, compiler_state *compiler, const
 		break;
 
 	case 0x03: // BSRF(Rn);
-		UML_ADD(block, MEM(&sh2->target), R32(Rn), IMM(4));	// add target, Rm, #4
-		UML_ADD(block, MEM(&sh2->target), MEM(&sh2->target), IMM(desc->pc));	// add target, target, pc
+		if (sh2->cpu_type > CPU_TYPE_SH1)
+		{
+			UML_ADD(block, MEM(&sh2->target), R32(Rn), IMM(4));	// add target, Rm, #4
+			UML_ADD(block, MEM(&sh2->target), MEM(&sh2->target), IMM(desc->pc));	// add target, target, pc
 
-		generate_delay_slot(block, compiler, desc);
+			generate_delay_slot(block, compiler, desc);
 
-		UML_ADD(block, MEM(&sh2->pr), IMM(desc->pc), IMM(4));	// add sh2->pr, desc->pc, #4 (skip the current insn & delay slot)
+			UML_ADD(block, MEM(&sh2->pr), IMM(desc->pc), IMM(4));	// add sh2->pr, desc->pc, #4 (skip the current insn & delay slot)
 
-		generate_update_cycles(block, compiler, MEM(&sh2->target), TRUE);	// <subtract cycles>
-		UML_HASHJMP(block, IMM(0), MEM(&sh2->target), sh2->nocode);	// jmp target
-		return TRUE;
+			generate_update_cycles(block, compiler, MEM(&sh2->target), TRUE);	// <subtract cycles>
+			UML_HASHJMP(block, IMM(0), MEM(&sh2->target), sh2->nocode);	// jmp target
+			return TRUE;
+		}
 		break;
 
 	case 0x04: // MOVBS0(Rm, Rn);
@@ -1770,8 +1871,11 @@ static int generate_group_0(drcuml_block *block, compiler_state *compiler, const
 	case 0x17: // MULL(Rm, Rn);
 	case 0x27: // MULL(Rm, Rn);
 	case 0x37: // MULL(Rm, Rn);
-		UML_MULU(block, MEM(&sh2->macl), MEM(&sh2->ea), R32(Rn), R32(Rm));	// mulu macl, ea, Rn, Rm
-		return TRUE;
+		if (sh2->cpu_type > CPU_TYPE_SH1)
+		{
+			UML_MULU(block, MEM(&sh2->macl), MEM(&sh2->ea), R32(Rn), R32(Rm));	// mulu macl, ea, Rn, Rm
+			return TRUE;
+		}
 		break;
 
 	case 0x08: // CLRT();
@@ -1837,10 +1941,13 @@ static int generate_group_0(drcuml_block *block, compiler_state *compiler, const
 	case 0x1f: // MAC_L(Rm, Rn);
 	case 0x2f: // MAC_L(Rm, Rn);
 	case 0x3f: // MAC_L(Rm, Rn);
-		save_fast_iregs(block);
-		UML_CALLC(block, cfunc_MAC_L, desc->opptr.w);
-		load_fast_iregs(block);
-		return TRUE;
+		if (sh2->cpu_type > CPU_TYPE_SH1)
+		{
+			save_fast_iregs(block);
+			UML_CALLC(block, cfunc_MAC_L, desc->opptr.w);
+			load_fast_iregs(block);
+			return TRUE;
+		}
 		break;
 
 	case 0x12: // STCGBR(Rn);
@@ -1906,13 +2013,17 @@ static int generate_group_0(drcuml_block *block, compiler_state *compiler, const
 		return TRUE;
 		break;
 
-	case 0x23: // BRAF(Rn);    0x40 + 9054 = 9098
-		UML_ADD(block, MEM(&sh2->target), R32(Rn), IMM(desc->pc+4));	// add target, Rn, pc+4
+	case 0x23: // BRAF(Rn);
+		if (sh2->cpu_type > CPU_TYPE_SH1)
+		{
+			UML_ADD(block, MEM(&sh2->target), R32(Rn), IMM(desc->pc+4));	// add target, Rn, pc+4
 
-		generate_delay_slot(block, compiler, desc);
+			generate_delay_slot(block, compiler, desc);
 
-		generate_update_cycles(block, compiler, MEM(&sh2->target), TRUE);	// <subtract cycles>
-		UML_HASHJMP(block, IMM(0), MEM(&sh2->target), sh2->nocode);	// jmp target
+			generate_update_cycles(block, compiler, MEM(&sh2->target), TRUE);	// <subtract cycles>
+			UML_HASHJMP(block, IMM(0), MEM(&sh2->target), sh2->nocode);	// jmp target
+			return TRUE;
+		}
 		break;
 
 	case 0x28: // CLRMAC();
@@ -2195,13 +2306,19 @@ static int generate_group_3(drcuml_block *block, compiler_state *compiler, const
 		break;
 
 	case  5: // DMULU(Rm, Rn);
-		UML_MULU(block, MEM(&sh2->macl), MEM(&sh2->mach), R32(Rn), R32(Rm));
-		return TRUE;
+		if (sh2->cpu_type > CPU_TYPE_SH1)
+		{
+			UML_MULU(block, MEM(&sh2->macl), MEM(&sh2->mach), R32(Rn), R32(Rm));
+			return TRUE;
+		}
 		break;
 
 	case 13: // DMULS(Rm, Rn);
-		UML_MULS(block, MEM(&sh2->macl), MEM(&sh2->mach), R32(Rn), R32(Rm));
-		return TRUE;
+		if (sh2->cpu_type > CPU_TYPE_SH1)
+		{
+			UML_MULS(block, MEM(&sh2->macl), MEM(&sh2->mach), R32(Rn), R32(Rm));
+			return TRUE;
+		}
 		break;
 
 	case  8: // SUB(Rm, Rn);
@@ -2407,15 +2524,18 @@ static int generate_group_4(drcuml_block *block, compiler_state *compiler, const
 		break;
 
 	case 0x10: // DT(Rn);
-		UML_AND(block, IREG(0), MEM(&sh2->sr), IMM(~T));	// and r0, sr, ~T (clear the T bit)
-		UML_SUB(block, R32(Rn), R32(Rn), IMM(1));	// sub Rn, Rn, 1
-		UML_JMPc(block, IF_NZ, compiler->labelnum);  	// jz compiler->labelnum
+		if (sh2->cpu_type > CPU_TYPE_SH1)
+		{
+			UML_AND(block, IREG(0), MEM(&sh2->sr), IMM(~T));	// and r0, sr, ~T (clear the T bit)
+			UML_SUB(block, R32(Rn), R32(Rn), IMM(1));	// sub Rn, Rn, 1
+			UML_JMPc(block, IF_NZ, compiler->labelnum);  	// jz compiler->labelnum
 
-		UML_OR(block, IREG(0), IREG(0), IMM(T));	// or r0, r0, T
-		UML_LABEL(block, compiler->labelnum++);	     	// desc->pc:
+			UML_OR(block, IREG(0), IREG(0), IMM(T));	// or r0, r0, T
+			UML_LABEL(block, compiler->labelnum++);	     	// desc->pc:
 
-		UML_MOV(block, MEM(&sh2->sr), IREG(0));		// mov sh2->sr, r0
-		return TRUE;
+			UML_MOV(block, MEM(&sh2->sr), IREG(0));		// mov sh2->sr, r0
+			return TRUE;
+		}
 		break;
 
 	case 0x11: // CMPPZ(Rn);
@@ -2924,39 +3044,45 @@ static int generate_group_8(drcuml_block *block, compiler_state *compiler, const
 		break;
 
 	case 13<< 8: // BTS(opcode & 0xff);
-		UML_TEST(block, MEM(&sh2->sr), IMM(T));		// test sh2->sr, T
-		UML_JMPc(block, IF_Z, compiler->labelnum);  	// jz compiler->labelnum
+		if (sh2->cpu_type > CPU_TYPE_SH1)
+		{
+			UML_TEST(block, MEM(&sh2->sr), IMM(T));		// test sh2->sr, T
+			UML_JMPc(block, IF_Z, compiler->labelnum);  	// jz compiler->labelnum
 
-		templabel = compiler->labelnum;			// save our label
-		compiler->labelnum++;				// make sure the delay slot doesn't use it
-		generate_delay_slot(block, compiler, desc);
+			templabel = compiler->labelnum;			// save our label
+			compiler->labelnum++;				// make sure the delay slot doesn't use it
+			generate_delay_slot(block, compiler, desc);
 
-		disp = ((INT32)opcode << 24) >> 24;
-		sh2->ea = (desc->pc + 2) + disp * 2 + 2;     	// sh2->ea = destination
+			disp = ((INT32)opcode << 24) >> 24;
+			sh2->ea = (desc->pc + 2) + disp * 2 + 2;     	// sh2->ea = destination
 
-		generate_update_cycles(block, compiler, IMM(sh2->ea), TRUE);	// <subtract cycles>
-		UML_HASHJMP(block, IMM(0), IMM(sh2->ea), sh2->nocode);	// jmp sh2->ea
+			generate_update_cycles(block, compiler, IMM(sh2->ea), TRUE);	// <subtract cycles>
+			UML_HASHJMP(block, IMM(0), IMM(sh2->ea), sh2->nocode);	// jmp sh2->ea
 
-		UML_LABEL(block, templabel);	     	// labelnum:
-		return TRUE;
+			UML_LABEL(block, templabel);	     	// labelnum:
+			return TRUE;
+		}
 		break;
 
 	case 15<< 8: // BFS(opcode & 0xff);
-		UML_TEST(block, MEM(&sh2->sr), IMM(T));		// test sh2->sr, T
-		UML_JMPc(block, IF_NZ, compiler->labelnum);  	// jnz compiler->labelnum
+		if (sh2->cpu_type > CPU_TYPE_SH1)
+		{
+			UML_TEST(block, MEM(&sh2->sr), IMM(T));		// test sh2->sr, T
+			UML_JMPc(block, IF_NZ, compiler->labelnum);  	// jnz compiler->labelnum
 
-		templabel = compiler->labelnum;			// save our label
-		compiler->labelnum++;				// make sure the delay slot doesn't use it
-		generate_delay_slot(block, compiler, desc);	// delay slot only if the branch is taken
+			templabel = compiler->labelnum;			// save our label
+			compiler->labelnum++;				// make sure the delay slot doesn't use it
+			generate_delay_slot(block, compiler, desc);	// delay slot only if the branch is taken
 
-		disp = ((INT32)opcode << 24) >> 24;
-		sh2->ea = (desc->pc + 2) + disp * 2 + 2;     	// sh2->ea = destination
+			disp = ((INT32)opcode << 24) >> 24;
+			sh2->ea = (desc->pc + 2) + disp * 2 + 2;     	// sh2->ea = destination
 
-		generate_update_cycles(block, compiler, IMM(sh2->ea), TRUE);	// <subtract cycles>
-		UML_HASHJMP(block, IMM(0), IMM(sh2->ea), sh2->nocode);	// jmp sh2->ea
+			generate_update_cycles(block, compiler, IMM(sh2->ea), TRUE);	// <subtract cycles>
+			UML_HASHJMP(block, IMM(0), IMM(sh2->ea), sh2->nocode);	// jmp sh2->ea
 
-		UML_LABEL(block, templabel);	     	// labelnum:
-		return TRUE;
+			UML_LABEL(block, templabel);	     	// labelnum:
+			return TRUE;
+		}
 		break;
 	}
 
@@ -3094,8 +3220,39 @@ static int generate_group_12(drcuml_block *block, compiler_state *compiler, cons
 		break;
 
 	case 12<<8: // TSTM(opcode & 0xff);
+		UML_AND(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(~T));	// and sr, sr, ~T (clear the T bit)
+		UML_ADD(block, IREG(0), R32(0), MEM(&sh2->gbr));	// add r0, R0, gbr
+		UML_CALLH(block, sh2->read8);				// read8
+
+		UML_CMP(block, IREG(0), IMM(0));			// cmp r0, #0
+		UML_JMPc(block, IF_NZ, compiler->labelnum);		// jnz labelnum
+
+		UML_OR(block, MEM(&sh2->sr), MEM(&sh2->sr), IMM(T));	// or sr, sr, T
+
+		UML_LABEL(block, compiler->labelnum++);			// labelnum:
+		return TRUE;
+		break;
+
 	case 13<<8: // ANDM(opcode & 0xff);
+		UML_ADD(block, IREG(0), R32(0), MEM(&sh2->gbr));	// add r0, R0, gbr
+		UML_CALLH(block, sh2->read8);				// read8
+
+		UML_AND(block, IREG(1), IREG(0), IMM(opcode&0xff));	// and r1, r0, #opcode&0xff
+		UML_ADD(block, IREG(0), R32(0), MEM(&sh2->gbr));	// add r0, R0, gbr
+		SETEA(0);
+		UML_CALLH(block, sh2->write8);				// write8
+		return TRUE;
+		break;
+
 	case 14<<8: // XORM(opcode & 0xff);
+		UML_ADD(block, IREG(0), R32(0), MEM(&sh2->gbr));	// add r0, R0, gbr
+		UML_CALLH(block, sh2->read8);				// read8
+
+		UML_XOR(block, IREG(1), IREG(0), IMM(opcode&0xff));	// xor r1, r0, #opcode&0xff
+		UML_ADD(block, IREG(0), R32(0), MEM(&sh2->gbr));	// add r0, R0, gbr
+		SETEA(0);
+		UML_CALLH(block, sh2->write8);				// write8
+		return TRUE;
 		break;
 
 	case 15<<8: // ORM(opcode & 0xff);
@@ -3334,7 +3491,7 @@ void sh2_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "SH-2");				break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Hitachi SH7600");		break;
+		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Hitachi SuperH RISC");		break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "2.0");				break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME team, all rights reserved."); break;
@@ -3375,6 +3532,25 @@ void sh2_get_info(UINT32 state, cpuinfo *info)
 
 		case CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK:		info->f = (genf*)sh2->ftcsr_read_callback; break;
 
+	}
+}
+
+/*-------------------------------------------------
+    sh1_get_info - return information about a
+    given CPU instance
+-------------------------------------------------*/
+
+void sh1_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_PTR_RESET:						info->reset = sh1_reset;				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:	    					strcpy(info->s, "SH-1");				break;
+
+		default:							sh2_get_info(state, info);			break;
 	}
 }
 

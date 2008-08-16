@@ -47,6 +47,9 @@ enum
 #define Rn	((opcode>>8)&15)
 #define Rm	((opcode>>4)&15)
 
+#define CPU_TYPE_SH1	(0)
+#define CPU_TYPE_SH2	(1)
+
 #define REGFLAG_R(n)                                        (1 << (n))
 
 /* register flags 1 */
@@ -97,6 +100,7 @@ typedef struct
 	UINT32	pending_irq;
 	UINT32	test_irq;
 	UINT32	pending_nmi;
+	INT32  irqline;
 	UINT32	evec;				// exception vector for DRC
 	UINT32  irqsr;				// IRQ-time old SR for DRC
 	UINT32 target;				// target for jmp/jsr/etc so the delay slot can't kill it
@@ -123,7 +127,7 @@ typedef struct
 	emu_timer *dma_timer[2];
 	int     dma_timer_active[2];
 
-	int     is_slave, cpu_number;
+	int     is_slave, cpu_number, cpu_type;
 
 	void	(*ftcsr_read_callback)(UINT32 data);
 

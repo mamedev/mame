@@ -456,10 +456,17 @@ $(CPUOBJ)/h83002/h8periph.o:	$(CPUSRC)/h83002/h8periph.c \
 								$(CPUSRC)/h83002/h8priv.h
 
 
+#-------------------------------------------------
+# Hitachi SH1/SH2
+#-------------------------------------------------
 
-#-------------------------------------------------
-# Hitachi SH2
-#-------------------------------------------------
+CPUDEFS += -DHAS_SH1=$(if $(filter SH1,$(CPUS)),1,0)
+
+ifneq ($(filter SH1,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/sh2
+CPUOBJS += $(CPUOBJ)/sh2/sh2.o $(CPUOBJ)/sh2/sh2comn.o $(CPUOBJ)/sh2/sh2drc.o $(CPUOBJ)/sh2/sh2fe.o
+DBGOBJS += $(CPUOBJ)/sh2/sh2dasm.o
+endif
 
 CPUDEFS += -DHAS_SH2=$(if $(filter SH2,$(CPUS)),1,0)
 

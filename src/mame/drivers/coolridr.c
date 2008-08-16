@@ -163,7 +163,7 @@ static MACHINE_DRIVER_START( coolridr )
 	MDRV_CPU_ADD("sound", M68000, 12000000)	// ?? mhz
 	MDRV_CPU_PROGRAM_MAP(system_h1_sound_map,0)
 
-	MDRV_CPU_ADD("sub", SH2, 8000000)	// SH7032 HD6417032F20!! ?? mhz
+	MDRV_CPU_ADD("sub", SH1, 8000000)	// SH7032 HD6417032F20!! ?? mhz
 	MDRV_CPU_PROGRAM_MAP(coolridr_submap,0)
 	MDRV_CPU_VBLANK_INT_HACK(system_h1_sub, 2)
 

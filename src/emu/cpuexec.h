@@ -165,6 +165,7 @@ enum _cpu_type
 	CPU_RM7000LE,
 	CPU_ARM,
 	CPU_ARM7,
+	CPU_SH1,
 	CPU_SH2,
 	CPU_SH4,
 	CPU_DSP32C,
