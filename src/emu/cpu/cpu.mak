@@ -500,12 +500,19 @@ CPUDEFS += -DHAS_SH4=$(if $(filter SH4,$(CPUS)),1,0)
 
 ifneq ($(filter SH4,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/sh4
-CPUOBJS += $(CPUOBJ)/sh4/sh4.o
+CPUOBJS += $(CPUOBJ)/sh4/sh4.o $(CPUOBJ)/sh4/sh4comn.o
 DBGOBJS += $(CPUOBJ)/sh4/sh4dasm.o
 endif
 
 $(CPUOBJ)/sh4/sh4.o:	$(CPUSRC)/sh4/sh4.c \
-						$(CPUSRC)/sh4/sh4.h
+			$(CPUSRC)/sh4/sh4.h \
+			$(CPUSRC)/sh4/sh4regs.h \
+			$(CPUSRC)/sh4/sh4comn.h
+
+$(CPUOBJ)/sh4/sh4comn.o:  $(CPUSRC)/sh4/sh4comn.c \
+			$(CPUSRC)/sh4/sh4comn.h \
+			$(CPUSRC)/sh4/sh4regs.h \
+			$(CPUSRC)/sh4/sh4.h
 
 #-------------------------------------------------
 # Hudsonsoft 6280
