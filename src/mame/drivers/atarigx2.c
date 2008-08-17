@@ -2115,7 +2115,7 @@ static DRIVER_INIT( rrreveng )
 	atarigx2_motion_object_base = 0x400;
 	atarigx2_motion_object_mask = 0x3ff;
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xca0fc0, 0xca0fc3, 0, 0, rrreveng_prot_r);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xca0fc0, 0xca0fc3, 0, 0, rrreveng_prot_r);
 }
 
 

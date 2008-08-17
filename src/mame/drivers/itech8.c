@@ -2509,17 +2509,17 @@ ROM_END
 
 static DRIVER_INIT( slikshot )
 {
-	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x0180, 0x0180, 0, 0, slikshot_z80_r);
-	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_w);
+	memory_install_read_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x0180, 0x0180, 0, 0, slikshot_z80_r);
+	memory_install_read_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_r);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01cf, 0x01cf, 0, 0, slikshot_z80_control_w);
 }
 
 
 static DRIVER_INIT( sstrike )
 {
-	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x1180, 0x1180, 0, 0, slikshot_z80_r);
-	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_w);
+	memory_install_read_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x1180, 0x1180, 0, 0, slikshot_z80_r);
+	memory_install_read_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_r);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x11cf, 0x11cf, 0, 0, slikshot_z80_control_w);
 }
 
 
@@ -2554,15 +2554,15 @@ static DRIVER_INIT( neckneck )
 static DRIVER_INIT( rimrockn )
 {
 	/* additional input ports */
-	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x0161, 0x0161, 0, 0, input_port_read_handler8(machine->portconfig, "161"));
-	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x0162, 0x0162, 0, 0, input_port_read_handler8(machine->portconfig, "162"));
-	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x0163, 0x0163, 0, 0, input_port_read_handler8(machine->portconfig, "163"));
-	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x0164, 0x0164, 0, 0, input_port_read_handler8(machine->portconfig, "164"));
-	memory_install_read8_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x0165, 0x0165, 0, 0, input_port_read_handler8(machine->portconfig, "165"));
+	memory_install_read_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x0161, 0x0161, 0, 0, input_port_read_handler8(machine->portconfig, "161"));
+	memory_install_read_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x0162, 0x0162, 0, 0, input_port_read_handler8(machine->portconfig, "162"));
+	memory_install_read_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x0163, 0x0163, 0, 0, input_port_read_handler8(machine->portconfig, "163"));
+	memory_install_read_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x0164, 0x0164, 0, 0, input_port_read_handler8(machine->portconfig, "164"));
+	memory_install_read_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x0165, 0x0165, 0, 0, input_port_read_handler8(machine->portconfig, "165"));
 
 	/* different banking mechanism (disable the old one) */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01a0, 0x01a0, 0, 0, rimrockn_bank_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01c0, 0x01df, 0, 0, itech8_blitter_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01a0, 0x01a0, 0, 0, rimrockn_bank_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01c0, 0x01df, 0, 0, itech8_blitter_w);
 }
 
 

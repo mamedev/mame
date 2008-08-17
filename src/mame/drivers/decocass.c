@@ -1138,7 +1138,7 @@ static DRIVER_INIT( decocrom )
 		decrypted2[i] = swap_bits_5_6(rom[i]);
 
 	/* convert charram to a banked ROM */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0xafff, 0, 0, SMH_BANK1, decocass_de0091_w);
+	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0xafff, 0, 0, SMH_BANK1, decocass_de0091_w);
 	memory_configure_bank(1, 0, 1, decocass_charram, 0);
 	memory_configure_bank(1, 1, 1, memory_region(machine, "user3"), 0);
 	memory_configure_bank_decrypted(1, 0, 1, &decrypted[0x6000], 0);
@@ -1146,7 +1146,7 @@ static DRIVER_INIT( decocrom )
 	memory_set_bank(1, 0);
 
 	/* install the bank selector */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe900, 0xe900, 0, 0, decocass_e900_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe900, 0xe900, 0, 0, decocass_e900_w);
 }
 
 

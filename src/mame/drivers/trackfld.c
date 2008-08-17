@@ -1257,7 +1257,7 @@ static DRIVER_INIT( atlantol )
 
 	memory_set_decrypted_region(0, 0x0000, 0xffff, decrypt);
 
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1000, 0, 0, SMH_NOP );
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1000, 0, 0, SMH_NOP );
 }
 
 static DRIVER_INIT( mastkin )

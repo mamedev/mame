@@ -1459,7 +1459,7 @@ static void init_crusnusa_common(running_machine *machine, offs_t speedup)
 	adc_shift = 24;
 
 	/* speedups */
-	generic_speedup = memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, speedup, speedup + 1, 0, 0, generic_speedup_r);
+	generic_speedup = memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, speedup, speedup + 1, 0, 0, generic_speedup_r);
 }
 static DRIVER_INIT( crusnusa ) { init_crusnusa_common(machine, 0xc93e); }
 static DRIVER_INIT( crusnu40 ) { init_crusnusa_common(machine, 0xc957); }
@@ -1472,21 +1472,21 @@ static void init_crusnwld_common(running_machine *machine, offs_t speedup)
 	adc_shift = 16;
 
 	/* control register is different */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x994000, 0x994000, 0, 0, crusnwld_control_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x994000, 0x994000, 0, 0, crusnwld_control_w);
 
 	/* valid values are 450 or 460 */
 	midway_serial_pic_init(machine, 450);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x996000, 0x996000, 0, 0, offroadc_serial_data_r);
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x996000, 0x996000, 0, 0, offroadc_serial_data_w);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x996000, 0x996000, 0, 0, offroadc_serial_data_r);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x996000, 0x996000, 0, 0, offroadc_serial_data_w);
 
 	/* install strange protection device */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9d0000, 0x9d1fff, 0, 0, bit_data_r);
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9d0000, 0x9d0000, 0, 0, bit_reset_w);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9d0000, 0x9d1fff, 0, 0, bit_data_r);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9d0000, 0x9d0000, 0, 0, bit_reset_w);
 
 	/* speedups */
 	if (speedup)
-		generic_speedup = memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, speedup, speedup + 1, 0, 0, generic_speedup_r);
+		generic_speedup = memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, speedup, speedup + 1, 0, 0, generic_speedup_r);
 }
 static DRIVER_INIT( crusnwld ) { init_crusnwld_common(machine, 0xd4c0); }
 #if 0
@@ -1500,15 +1500,15 @@ static DRIVER_INIT( offroadc )
 	adc_shift = 16;
 
 	/* control register is different */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x994000, 0x994000, 0, 0, crusnwld_control_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x994000, 0x994000, 0, 0, crusnwld_control_w);
 
 	/* valid values are 230 or 234 */
 	midway_serial_pic2_init(machine, 230, 94);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
-	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x996000, 0x996000, 0, 0, offroadc_serial_data_r, offroadc_serial_data_w);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x991030, 0x991030, 0, 0, offroadc_serial_status_r);
+	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x996000, 0x996000, 0, 0, offroadc_serial_data_r, offroadc_serial_data_w);
 
 	/* speedups */
-	generic_speedup = memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x195aa, 0x195aa, 0, 0, generic_speedup_r);
+	generic_speedup = memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x195aa, 0x195aa, 0, 0, generic_speedup_r);
 }
 
 
@@ -1533,7 +1533,7 @@ static DRIVER_INIT( wargods )
 	midway_serial_pic2_set_default_nvram(default_nvram);
 
 	/* speedups */
-	generic_speedup = memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2f4c, 0x2f4c, 0, 0, generic_speedup_r);
+	generic_speedup = memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2f4c, 0x2f4c, 0, 0, generic_speedup_r);
 }
 
 

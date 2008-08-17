@@ -2154,7 +2154,7 @@ static DRIVER_INIT (ss92048_01)
 static DRIVER_INIT (kirarast)
 {
 //  { 0xfcc00004, 0xfcc00007, ms32_mahjong_read_inputs1 }
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfcc00004, 0xfcc00007, 0, 0, ms32_mahjong_read_inputs1 );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfcc00004, 0xfcc00007, 0, 0, ms32_mahjong_read_inputs1 );
 
 	DRIVER_INIT_CALL(ss92047_01);
 }
@@ -2162,7 +2162,7 @@ static DRIVER_INIT (kirarast)
 static DRIVER_INIT (47pie2)
 {
 //  { 0xfcc00004, 0xfcc00007, ms32_mahjong_read_inputs1 }
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfcc00004, 0xfcc00007, 0, 0, ms32_mahjong_read_inputs1 );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfcc00004, 0xfcc00007, 0, 0, ms32_mahjong_read_inputs1 );
 
 	DRIVER_INIT_CALL(ss92048_01);
 }
@@ -2179,7 +2179,7 @@ static DRIVER_INIT (f1superb)
 static DRIVER_INIT (bnstars)
 {
 //  { 0xfcc00004, 0xfcc00007, ms32_mahjong_read_inputs1 }
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfcc00004, 0xfcc00007, 0, 0, ms32_mahjong_read_inputs1 );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfcc00004, 0xfcc00007, 0, 0, ms32_mahjong_read_inputs1 );
 
 	DRIVER_INIT_CALL(ss92046_01);
 }

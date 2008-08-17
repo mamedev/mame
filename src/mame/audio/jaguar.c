@@ -271,7 +271,7 @@ void cojag_sound_init(running_machine *machine)
 	}
 
 #if ENABLE_SPEEDUP_HACKS
-	memory_install_write32_handler(machine, 2, ADDRESS_SPACE_PROGRAM, 0xf1a100, 0xf1a103, 0, 0, dsp_flags_w);
+	memory_install_write_handler(machine, 2, ADDRESS_SPACE_PROGRAM, 0xf1a100, 0xf1a103, 0, 0, dsp_flags_w);
 #endif
 }
 

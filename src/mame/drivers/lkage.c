@@ -571,9 +571,9 @@ static READ8_HANDLER( fake_status_r )
 
 static DRIVER_INIT( lkageb )
 {
-	memory_install_read8_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xf062, 0xf062, 0, 0, fake_mcu_r);
-	memory_install_read8_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xf087, 0xf087, 0, 0, fake_status_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf062, 0xf062, 0, 0, fake_mcu_w );
+	memory_install_read_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xf062, 0xf062, 0, 0, fake_mcu_r);
+	memory_install_read_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0xf087, 0xf087, 0, 0, fake_status_r);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf062, 0xf062, 0, 0, fake_mcu_w );
 }
 
 GAME( 1984, lkage,   0,     lkage,  lkage, 0,       ROT0, "Taito Corporation", "The Legend of Kage", 0 )

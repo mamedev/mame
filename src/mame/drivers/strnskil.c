@@ -515,16 +515,16 @@ static DRIVER_INIT( pettanp )
 //  AM_RANGE(0xd806, 0xd806) AM_READ(protection_r) /* protection data read (pettanp) */
 
 	/* Fujitsu MB8841 4-Bit MCU */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd806, 0xd806, 0, 0, pettanp_protection_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd80d, 0xd80d, 0, 0, protection_w);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd806, 0xd806, 0, 0, pettanp_protection_r);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd80d, 0xd80d, 0, 0, protection_w);
 
 }
 
 static DRIVER_INIT( banbam )
 {
 	/* Fujitsu MB8841 4-Bit MCU */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd806, 0xd806, 0, 0, banbam_protection_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd80d, 0xd80d, 0, 0, protection_w);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd806, 0xd806, 0, 0, banbam_protection_r);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd80d, 0xd80d, 0, 0, protection_w);
 }
 
 GAME( 1984, strnskil, 0,        strnskil, strnskil, 0,       ROT0, "Sun Electronics", "Strength & Skill", 0 )

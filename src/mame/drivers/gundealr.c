@@ -567,7 +567,7 @@ static DRIVER_INIT( gundealr )
 static DRIVER_INIT( yamyam )
 {
 	input_ports_hack = 1;
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe000, 0, 0, yamyam_protection_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xe000, 0, 0, yamyam_protection_w);
 }
 
 

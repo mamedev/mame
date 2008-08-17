@@ -844,7 +844,7 @@ static DRIVER_INIT( dassault )
 	free(tmp);
 
 	/* Save time waiting on vblank bit */
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3f8000, 0x3f8001, 0, 0, dassault_main_skip);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3f8000, 0x3f8001, 0, 0, dassault_main_skip);
 }
 
 static DRIVER_INIT( thndzone )
@@ -864,7 +864,7 @@ static DRIVER_INIT( thndzone )
 	free(tmp);
 
 	/* Save time waiting on vblank bit */
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3f8000, 0x3f8001, 0, 0, thndzone_main_skip);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3f8000, 0x3f8001, 0, 0, thndzone_main_skip);
 }
 
 /**********************************************************************************/

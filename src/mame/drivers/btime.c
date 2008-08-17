@@ -1714,7 +1714,7 @@ static DRIVER_INIT( cookrace )
 static DRIVER_INIT( wtennis )
 {
 	memcpy(&audio_rambase[0x200], memory_region(machine, "audio") + 0xf200, 0x200);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc15f, 0xc15f, 0, 0, wtennis_reset_hack_r);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc15f, 0xc15f, 0, 0, wtennis_reset_hack_r);
 	decrypt_C10707_cpu(0, "main");
 }
 

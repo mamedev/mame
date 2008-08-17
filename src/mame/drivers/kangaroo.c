@@ -186,7 +186,7 @@ static MACHINE_START( kangaroo )
 static MACHINE_START( kangaroo_mcu )
 {
 	MACHINE_START_CALL(kangaroo);
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xef00, 0xefff, 0, 0, mcu_sim_r, mcu_sim_w);
+	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xef00, 0xefff, 0, 0, mcu_sim_r, mcu_sim_w);
 	kangaroo_clock = 0;
 }
 

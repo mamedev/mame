@@ -1443,11 +1443,11 @@ static DRIVER_INIT( astrob )
 	segag80r_background_pcb = G80_BACKGROUND_NONE;
 
 	/* install speech board */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x38, 0x38, 0, 0, sega_speech_data_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b, 0x3b, 0, 0, sega_speech_control_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_IO, 0x38, 0x38, 0, 0, sega_speech_data_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_IO, 0x3b, 0x3b, 0, 0, sega_speech_control_w);
 
 	/* install Astro Blaster sound board */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3e, 0x3f, 0, 0, astrob_sound_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_IO, 0x3e, 0x3f, 0, 0, astrob_sound_w);
 }
 
 
@@ -1470,14 +1470,14 @@ static DRIVER_INIT( spaceod )
 	segag80r_background_pcb = G80_BACKGROUND_SPACEOD;
 
 	/* configure ports for the background board */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0x08, 0x0f, 0, 0, spaceod_back_port_r, spaceod_back_port_w);
+	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_IO, 0x08, 0x0f, 0, 0, spaceod_back_port_r, spaceod_back_port_w);
 
 	/* install Space Odyssey sound board */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x0e, 0x0f, 0, 0, spaceod_sound_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_IO, 0x0e, 0x0f, 0, 0, spaceod_sound_w);
 
 	/* install our wacky mangled ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xf8, 0xfb, 0, 0, spaceod_mangled_ports_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xfc, 0xfc, 0, 0, spaceod_port_fc_r);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_IO, 0xf8, 0xfb, 0, 0, spaceod_mangled_ports_r);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_IO, 0xfc, 0xfc, 0, 0, spaceod_port_fc_r);
 }
 
 
@@ -1491,8 +1491,8 @@ static DRIVER_INIT( monsterb )
 	monsterb_expand_gfx("gfx1");
 
 	/* install background board handlers */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0xb8, 0xbd, 0, 0, monsterb_back_port_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, monsterb_vidram_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_IO, 0xb8, 0xbd, 0, 0, monsterb_back_port_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, monsterb_vidram_w);
 }
 
 
@@ -1507,9 +1507,9 @@ static DRIVER_INIT( monster2 )
 	monsterb_expand_gfx("gfx1");
 
 	/* install background board handlers */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0xb4, 0xb5, 0, 0, pignewt_back_color_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0xb8, 0xbd, 0, 0, pignewt_back_port_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, pignewt_vidram_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_IO, 0xb4, 0xb5, 0, 0, pignewt_back_color_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_IO, 0xb8, 0xbd, 0, 0, pignewt_back_port_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, pignewt_vidram_w);
 }
 
 
@@ -1523,13 +1523,13 @@ static DRIVER_INIT( pignewt )
 	monsterb_expand_gfx("gfx1");
 
 	/* install background board handlers */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0xb4, 0xb5, 0, 0, pignewt_back_color_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0xb8, 0xbd, 0, 0, pignewt_back_port_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, pignewt_vidram_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_IO, 0xb4, 0xb5, 0, 0, pignewt_back_color_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_IO, 0xb8, 0xbd, 0, 0, pignewt_back_port_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, pignewt_vidram_w);
 
 	/* install Universal sound board */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0x3f, 0x3f, 0, 0, sega_usb_status_r, sega_usb_data_w);
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, sega_usb_ram_r, usb_ram_w);
+	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_IO, 0x3f, 0x3f, 0, 0, sega_usb_status_r, sega_usb_data_w);
+	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd000, 0xdfff, 0, 0, sega_usb_ram_r, usb_ram_w);
 }
 
 
@@ -1543,8 +1543,8 @@ static DRIVER_INIT( sindbadm )
 	segag80r_background_pcb = G80_BACKGROUND_SINDBADM;
 
 	/* install background board handlers */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x40, 0x41, 0, 0, sindbadm_back_port_w);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, sindbadm_vidram_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_IO, 0x40, 0x41, 0, 0, sindbadm_back_port_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, sindbadm_vidram_w);
 }
 
 

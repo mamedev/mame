@@ -545,8 +545,8 @@ DRIVER_INIT( hippodrm )
 {
 	UINT8 *RAM = memory_region(machine, "sub");
 
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x180000, 0x180fff, 0, 0, hippodrm_68000_share_r, hippodrm_68000_share_w);
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xffc800, 0xffcfff, 0, 0, sprite_mirror_w);
+	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x180000, 0x180fff, 0, 0, hippodrm_68000_share_r, hippodrm_68000_share_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xffc800, 0xffcfff, 0, 0, sprite_mirror_w);
 
 	h6280_decrypt(machine, "sub");
 
@@ -570,7 +570,7 @@ DRIVER_INIT( slyspy )
 
 DRIVER_INIT( robocop )
 {
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x180000, 0x180fff, 0, 0, robocop_68000_share_r, robocop_68000_share_w);
+	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x180000, 0x180fff, 0, 0, robocop_68000_share_r, robocop_68000_share_w);
 }
 
 DRIVER_INIT( baddudes )

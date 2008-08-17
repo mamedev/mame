@@ -1335,7 +1335,7 @@ static DRIVER_INIT( invasn )
 {
 	dcs2_init(machine, 0, 0);
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 468/* or 488 */, 94, NULL);
-	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9c0000, 0x9c0000, 0, 0, invasn_gun_r, invasn_gun_w);
+	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9c0000, 0x9c0000, 0, 0, invasn_gun_r, invasn_gun_w);
 }
 
 
@@ -1345,8 +1345,8 @@ static DRIVER_INIT( crusnexo )
 	midway_ioasic_init(machine, MIDWAY_IOASIC_STANDARD, 472/* or 476,477,478,110 */, 99, NULL);
 	memory_configure_bank(1, 0, 3, memory_region(machine, "user2"), 0x400000*4);
 
-	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9b0004, 0x9b0007, 0, 0, crusnexo_leds_r, crusnexo_leds_w);
-	memory_install_write32_handler    (machine, 0, ADDRESS_SPACE_PROGRAM, 0x8d0009, 0x8d000a, 0, 0, keypad_select_w);
+	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9b0004, 0x9b0007, 0, 0, crusnexo_leds_r, crusnexo_leds_w);
+	memory_install_write_handler    (machine, 0, ADDRESS_SPACE_PROGRAM, 0x8d0009, 0x8d000a, 0, 0, keypad_select_w);
 }
 
 

@@ -72,7 +72,7 @@ static UINT8 coin_counter[2];
 
 static WRITE16_HANDLER( arcadia_multibios_change_game )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x800000, 0x97ffff, 0, 0, (data == 0) ? SMH_BANK2 : SMH_NOP);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x800000, 0x97ffff, 0, 0, (data == 0) ? SMH_BANK2 : SMH_NOP);
 }
 
 
@@ -105,11 +105,11 @@ static void arcadia_cia_0_porta_w(UINT8 data)
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		memory_install_write16_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, SMH_BANK1);
+		memory_install_write_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, SMH_BANK1);
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		memory_install_write16_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, SMH_UNMAP);
+		memory_install_write_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, SMH_UNMAP);
 
 	/* bit 2 = Power Led on Amiga */
 	set_led_status(0, (data & 2) ? 0 : 1);

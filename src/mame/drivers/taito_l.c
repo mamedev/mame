@@ -2986,7 +2986,7 @@ static DRIVER_INIT( evilston )
 {
 	UINT8 *ROM = memory_region(machine, "audio");
 	ROM[0x72]=0x45;	/* reti -> retn  ('dead' loop @ $1104 )*/
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa7fe, 0xa7fe, 0, 0, evilston_snd_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa7fe, 0xa7fe, 0, 0, evilston_snd_w);
 }
 
 

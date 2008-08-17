@@ -2762,22 +2762,22 @@ static void init_common(running_machine *machine, int ioasic, int serialnum, int
 	{
 		case PHOENIX_CONFIG:
 			/* original Phoenix board only has 4MB of RAM */
-			memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00400000, 0x007fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+			memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00400000, 0x007fffff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 			break;
 
 		case SEATTLE_WIDGET_CONFIG:
 			/* set up the widget board */
 			device = device_list_find_by_tag(machine->config->devicelist, SMC91C94, "ethernet");
-			memory_install_readwrite32_device_handler(device, 0, ADDRESS_SPACE_PROGRAM, 0x16c00000, 0x16c0001f, 0, 0, widget_r, widget_w);
+			memory_install_readwrite_device_handler(device, 0, ADDRESS_SPACE_PROGRAM, 0x16c00000, 0x16c0001f, 0, 0, widget_r, widget_w);
 			break;
 
 		case FLAGSTAFF_CONFIG:
 			/* set up the analog inputs */
-			memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x14000000, 0x14000003, 0, 0, analog_port_r, analog_port_w);
+			memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x14000000, 0x14000003, 0, 0, analog_port_r, analog_port_w);
 
 			/* set up the ethernet controller */
 			device = device_list_find_by_tag(machine->config->devicelist, SMC91C94, "ethernet");
-			memory_install_readwrite32_device_handler(device, 0, ADDRESS_SPACE_PROGRAM, 0x16c00000, 0x16c0003f, 0, 0, ethernet_r, ethernet_w);
+			memory_install_readwrite_device_handler(device, 0, ADDRESS_SPACE_PROGRAM, 0x16c00000, 0x16c0003f, 0, 0, ethernet_r, ethernet_w);
 			break;
 	}
 
@@ -2916,7 +2916,7 @@ static DRIVER_INIT( carnevil )
 	init_common(machine, MIDWAY_IOASIC_CARNEVIL, 469/* 469 or 486 or 528 */, 80, SEATTLE_CONFIG);
 
 	/* set up the gun */
-	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x16800000, 0x1680001f, 0, 0, carnevil_gun_r, carnevil_gun_w);
+	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x16800000, 0x1680001f, 0, 0, carnevil_gun_r, carnevil_gun_w);
 
 	/* speedups */
 	add_speedup(0x8015176C, 0x3C03801A);		/* confirmed */

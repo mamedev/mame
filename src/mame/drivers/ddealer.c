@@ -249,8 +249,8 @@ static WRITE16_HANDLER( ddealer_mcu_w )
 
 static DRIVER_INIT( ddealer )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe01c, 0xfe01d, 0, 0, ddealer_mcu_r );
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe01e, 0xfe01f, 0, 0, ddealer_mcu_w );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe01c, 0xfe01d, 0, 0, ddealer_mcu_r );
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe01e, 0xfe01f, 0, 0, ddealer_mcu_w );
 }
 
 ROM_START( ddealer )

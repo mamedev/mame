@@ -817,12 +817,12 @@ static DRIVER_INIT( hyprduel )
 //  ROM[(0x174b9*0x20)+0x1f] |= 0x0e;       /* I */
 //  ROM[(0x174e9*0x20)+0x1f] |= 0x0e;
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc07fff, 0, 0, hypr_sharedram1_w);
-	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc07fff, 0, 0, hypr_sharedram1_w);
-	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x000000, 0x003fff, 0, 0, hypr_sharedram1_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc07fff, 0, 0, hypr_sharedram1_w);
+	memory_install_write_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc07fff, 0, 0, hypr_sharedram1_w);
+	memory_install_write_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x000000, 0x003fff, 0, 0, hypr_sharedram1_w);
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe0000, 0xffffff, 0, 0, hypr_sharedram2_w);
-	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xfe0000, 0xffffff, 0, 0, hypr_sharedram2_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe0000, 0xffffff, 0, 0, hypr_sharedram2_w);
+	memory_install_write_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xfe0000, 0xffffff, 0, 0, hypr_sharedram2_w);
 
 	requested_int = 0x00;
 	blitter_bit = 2;

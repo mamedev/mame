@@ -1082,13 +1082,13 @@ static DRIVER_INIT( stinger )
 
 static DRIVER_INIT( scion )
 {
-	memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4001, 0, 0, SMH_NOP);
+	memory_install_write_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4001, 0, 0, SMH_NOP);
 }
 
 
 static DRIVER_INIT( wiz )
 {
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd400, 0xd400, 0, 0, wiz_protection_r);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd400, 0xd400, 0, 0, wiz_protection_r);
 }
 
 

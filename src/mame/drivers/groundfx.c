@@ -486,7 +486,7 @@ static DRIVER_INIT( groundfx )
 	int data;
 
 	/* Speedup handlers */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x20b574, 0x20b577, 0, 0, irq_speedup_r_groundfx);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x20b574, 0x20b577, 0, 0, irq_speedup_r_groundfx);
 
 	/* make piv tile GFX format suitable for gfxdecode */
 	offset = size/2;

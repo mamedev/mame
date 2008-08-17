@@ -685,7 +685,7 @@ static DRIVER_INIT( backfire )
 	deco156_decrypt(machine);
 	cpunum_set_clockscale(machine, 0, 4.0f); /* core timings aren't accurate */
 	descramble_sound(machine);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0170018, 0x017001b, 0, 0, backfire_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0170018, 0x017001b, 0, 0, backfire_speedup_r );
 }
 
 GAME( 1995, backfire, 0,        backfire,      backfire, backfire, ROT0, "Data East Corporation", "Backfire! (set 1)", 0 )

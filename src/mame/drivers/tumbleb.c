@@ -3365,7 +3365,7 @@ static DRIVER_INIT( tumbleb2 )
 	tumblepb_patch_code(0x000132);
 	#endif
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x100001, 0, 0, tumbleb2_soundmcu_w );
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x100001, 0, 0, tumbleb2_soundmcu_w );
 
 }
 
@@ -3406,7 +3406,7 @@ static READ16_HANDLER( bcstory_1a0_read )
 static DRIVER_INIT ( bcstory )
 {
 	tumblepb_gfx1_rearrange(machine);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x180008, 0x180009, 0, 0, bcstory_1a0_read ); // io should be here??
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x180008, 0x180009, 0, 0, bcstory_1a0_read ); // io should be here??
 }
 
 
@@ -3647,7 +3647,7 @@ static DRIVER_INIT( htchctch )
 
 	HCROM[0x1e228/2] = 0x4e75;
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x140000, 0x1407ff, 0, 0, SMH_NOP ); // kill palette writes as the interrupt code we don't have controls them
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x140000, 0x1407ff, 0, 0, SMH_NOP ); // kill palette writes as the interrupt code we don't have controls them
 
 
 	{
@@ -3713,10 +3713,10 @@ static DRIVER_INIT( chokchok )
 	DRIVER_INIT_CALL(htchctch);
 
 	/* different palette format, closer to tumblep -- is this controlled by a register? the palette was right with the hatch catch trojan */
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x140000, 0x140fff, 0, 0, paletteram16_xxxxBBBBGGGGRRRR_word_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x140000, 0x140fff, 0, 0, paletteram16_xxxxBBBBGGGGRRRR_word_w);
 
 	/* slightly different banking */
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100002, 0x100003, 0, 0, chokchok_tilebank_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100002, 0x100003, 0, 0, chokchok_tilebank_w);
 }
 
 static DRIVER_INIT( wlstar )
@@ -3724,7 +3724,7 @@ static DRIVER_INIT( wlstar )
 	DRIVER_INIT_CALL(htchctch);
 
 	/* slightly different banking */
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100002, 0x100003, 0, 0, wlstar_tilebank_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100002, 0x100003, 0, 0, wlstar_tilebank_w);
 }
 
 static DRIVER_INIT ( dquizgo )

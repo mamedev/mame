@@ -580,7 +580,7 @@ ROM_END
 
 static DRIVER_INIT( crgolfhi )
 {
-	memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
+	memory_install_write_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
 }
 
 

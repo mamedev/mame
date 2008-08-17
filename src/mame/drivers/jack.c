@@ -1441,10 +1441,10 @@ static DRIVER_INIT( striv )
 	}
 
 	// Set-up the weirdest questions read ever done
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, striv_question_r);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, striv_question_r);
 
 	// Nop out unused sprites writes
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xb0ff, 0, 0, SMH_NOP);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xb0ff, 0, 0, SMH_NOP);
 
 	timer_rate = 128;
 }

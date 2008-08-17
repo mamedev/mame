@@ -257,9 +257,9 @@ static MACHINE_START( gottlieb )
 	if (laserdisc != NULL)
 	{
 		/* attach to the I/O ports */
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05805, 0x05807, 0, 0x07f8, laserdisc_status_r);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05805, 0x05805, 0, 0x07f8, laserdisc_command_w);	/* command for the player */
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05806, 0x05806, 0, 0x07f8, laserdisc_select_w);
+		memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05805, 0x05807, 0, 0x07f8, laserdisc_status_r);
+		memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05805, 0x05805, 0, 0x07f8, laserdisc_command_w);	/* command for the player */
+		memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05806, 0x05806, 0, 0x07f8, laserdisc_select_w);
 
 		/* allocate a timer for serial transmission, and one for philips code processing */
 		laserdisc_bit_timer = timer_alloc(laserdisc_bit_callback, NULL);
@@ -2539,7 +2539,7 @@ static DRIVER_INIT( romtiles )
 static DRIVER_INIT( stooges )
 {
 	DRIVER_INIT_CALL(ramtiles);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05803, 0x05803, 0, 0x07f8, stooges_output_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x05803, 0x05803, 0, 0x07f8, stooges_output_w);
 }
 
 

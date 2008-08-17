@@ -488,7 +488,7 @@ static READ32_HANDLER( gstream_speedup_r )
 
 static DRIVER_INIT( gstream )
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd1ee0, 0xd1ee3, 0, 0, gstream_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd1ee0, 0xd1ee3, 0, 0, gstream_speedup_r );
 
 }
 GAME( 2002, gstream, 0, gstream, gstream, gstream, ROT270, "Oriental Soft Japan", "G-Stream G2020", GAME_IMPERFECT_SOUND )

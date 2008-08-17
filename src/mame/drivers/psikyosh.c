@@ -1231,7 +1231,7 @@ static DRIVER_INIT( soldivid )
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x1afaa);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x1ae74);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, soldivid_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, soldivid_speedup_r );
 	use_factory_eeprom=eeprom_0;
 }
 
@@ -1244,7 +1244,7 @@ static DRIVER_INIT( s1945ii )
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x609fed2);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 2);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60a0170);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, s1945ii_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, s1945ii_speedup_r );
 	use_factory_eeprom=eeprom_DEFAULT;
 }
 
@@ -1257,7 +1257,7 @@ static DRIVER_INIT( daraku )
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x47976);
 	memory_set_bankptr(1,&RAM[0x100000]);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, daraku_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, daraku_speedup_r );
 	use_factory_eeprom=eeprom_DARAKU;
 }
 
@@ -1270,7 +1270,7 @@ static DRIVER_INIT( sbomberb )
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60a1658);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 2);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60a1380);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, sbomberb_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, sbomberb_speedup_r );
 	use_factory_eeprom=eeprom_DEFAULT;
 }
 
@@ -1285,7 +1285,7 @@ static DRIVER_INIT( gunbird2 )
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 2);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6028be4);
 	memory_set_bankptr(1,&RAM[0x100000]);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x604000c, 0x604000f, 0, 0, gunbird2_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x604000c, 0x604000f, 0, 0, gunbird2_speedup_r );
 	use_factory_eeprom=eeprom_DEFAULT;
 }
 
@@ -1302,7 +1302,7 @@ static DRIVER_INIT( s1945iii )
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 3);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602b97a);
 	memory_set_bankptr(1,&RAM[0x100000]);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, s1945iii_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, s1945iii_speedup_r );
 	use_factory_eeprom=eeprom_S1945III;
 }
 
@@ -1317,7 +1317,7 @@ static DRIVER_INIT( dragnblz )
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6027c72);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 3);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60279a6);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, dragnblz_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, dragnblz_speedup_r );
 	use_factory_eeprom=eeprom_DRAGNBLZ;
 }
 
@@ -1332,7 +1332,7 @@ static DRIVER_INIT( gnbarich )
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602d2ee);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 3);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602d040);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, gnbarich_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, gnbarich_speedup_r );
 	use_factory_eeprom=eeprom_GNBARICH;
 }
 
@@ -1343,7 +1343,7 @@ static DRIVER_INIT( mjgtaste )
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6031f02);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x603214a);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, mjgtaste_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, mjgtaste_speedup_r );
 	use_factory_eeprom=eeprom_MJGTASTE;
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
 }

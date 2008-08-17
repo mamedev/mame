@@ -1396,7 +1396,7 @@ static DRIVER_INIT( xenophob )
 	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(cpunum_get_clock(0) / 10) * (256 + 16));
 
 	/* install control port handler */
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0c0000, 0x0cffff, 0, 0, xenophobe_control_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0c0000, 0x0cffff, 0, 0, xenophobe_control_w);
 }
 
 
@@ -1408,9 +1408,9 @@ static DRIVER_INIT( spyhunt2 )
 	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(cpunum_get_clock(0) / 10) * (256 + 16));
 
 	/* analog port handling is a bit tricky */
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0c0000, 0x0cffff, 0, 0, spyhunt2_control_w);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0d0000, 0x0dffff, 0, 0, spyhunt2_port_0_r);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0e0000, 0x0effff, 0, 0, spyhunt2_port_1_r);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0c0000, 0x0cffff, 0, 0, spyhunt2_control_w);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0d0000, 0x0dffff, 0, 0, spyhunt2_port_0_r);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0e0000, 0x0effff, 0, 0, spyhunt2_port_1_r);
 }
 
 
@@ -1424,10 +1424,10 @@ static DRIVER_INIT( blasted )
 	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(cpunum_get_clock(0) / 10) * (256 + 16));
 
 	/* handle control writes */
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0c0000, 0x0cffff, 0, 0, blasted_control_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0c0000, 0x0cffff, 0, 0, blasted_control_w);
 
 	/* 6840 is mapped to the lower 8 bits */
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a0000, 0x0a000f, 0, 0, mcr68_6840_lower_r, mcr68_6840_lower_w);
+	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a0000, 0x0a000f, 0, 0, mcr68_6840_lower_r, mcr68_6840_lower_w);
 }
 
 
@@ -1439,13 +1439,13 @@ static DRIVER_INIT( archrivl )
 	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(cpunum_get_clock(0) / 10) * (256 + 16));
 
 	/* handle control writes */
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0c0000, 0x0cffff, 0, 0, archrivl_control_w);
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0c0000, 0x0cffff, 0, 0, archrivl_control_w);
 
 	/* 49-way joystick handling is a bit tricky */
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0e0000, 0x0effff, 0, 0, archrivl_port_1_r);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0e0000, 0x0effff, 0, 0, archrivl_port_1_r);
 
 	/* 6840 is mapped to the lower 8 bits */
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a0000, 0x0a000f, 0, 0, mcr68_6840_lower_r, mcr68_6840_lower_w);
+	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a0000, 0x0a000f, 0, 0, mcr68_6840_lower_r, mcr68_6840_lower_w);
 }
 
 

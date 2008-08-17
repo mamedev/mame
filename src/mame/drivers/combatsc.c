@@ -827,7 +827,7 @@ static DRIVER_INIT( combasct )
 static DRIVER_INIT( combasc )
 {
 	/* joystick instead of trackball */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0404, 0x0404, 0, 0, input_port_read_handler8(machine->portconfig, "IN1"));
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0404, 0x0404, 0, 0, input_port_read_handler8(machine->portconfig, "IN1"));
 
 	combasc_init_common();
 }

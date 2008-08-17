@@ -205,8 +205,8 @@ void install_stvbios_speedups(running_machine *machine)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6013aee);
 
 /* idle skip bios? .. not 100% sure this is safe .. we'll see */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60335d0, 0x60335d3, 0, 0, stv_speedup_r );
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60335bc, 0x60335bf, 0, 0, stv_speedup2_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60335d0, 0x60335d3, 0, 0, stv_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60335bc, 0x60335bf, 0, 0, stv_speedup2_r );
 }
 
 static READ32_HANDLER( shienryu_slave_speedup_r )
@@ -237,8 +237,8 @@ DRIVER_INIT(shienryu)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x600440e);
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ae8e0, 0x60ae8e3, 0, 0, shienryu_speedup_r ); // after you enable sound cpu
-	memory_install_read32_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x60ae8e4, 0x60ae8e7, 0, 0, shienryu_slave_speedup_r ); // after you enable sound cpu
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ae8e0, 0x60ae8e3, 0, 0, shienryu_speedup_r ); // after you enable sound cpu
+	memory_install_read_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x60ae8e4, 0x60ae8e7, 0, 0, shienryu_slave_speedup_r ); // after you enable sound cpu
 
 	DRIVER_INIT_CALL(stv);
 }
@@ -272,7 +272,7 @@ DRIVER_INIT(prikura)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6018c6e);
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60b9228, 0x60b922b, 0, 0, prikura_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60b9228, 0x60b922b, 0, 0, prikura_speedup_r );
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)prikura_slave_speedup );
 
 	DRIVER_INIT_CALL(stv);
@@ -320,8 +320,8 @@ DRIVER_INIT(hanagumi)
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6010160);
 
-   	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6094188, 0x609418b, 0, 0, hanagumi_speedup_r );
-   	memory_install_read32_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x6015438, 0x601543b, 0, 0, hanagumi_slave_off );
+   	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6094188, 0x609418b, 0, 0, hanagumi_speedup_r );
+   	memory_install_read_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x6015438, 0x601543b, 0, 0, hanagumi_slave_off );
 
 	DRIVER_INIT_CALL(stv);
 }
@@ -368,7 +368,7 @@ DRIVER_INIT(puyosun)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60236fe);
 
-   	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, puyosun_speedup_r ); // idle loop of main cpu
+   	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, puyosun_speedup_r ); // idle loop of main cpu
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)puyosun_slave_speedup );
 
 	DRIVER_INIT_CALL(ic13);
@@ -399,7 +399,7 @@ DRIVER_INIT(mausuke)
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60461A0);
 
-   	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, mausuke_speedup_r ); // idle loop of main cpu
+   	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, mausuke_speedup_r ); // idle loop of main cpu
 
 	DRIVER_INIT_CALL(ic13);
 
@@ -443,7 +443,7 @@ DRIVER_INIT(cottonbm)
 //  cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6032b52);
 
 //  cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)cottonbm_slave_speedup );
-//      memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, cottonbm_speedup_r ); // idle loop of main cpu
+//      memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, cottonbm_speedup_r ); // idle loop of main cpu
 
 	DRIVER_INIT_CALL(stv);
 
@@ -483,7 +483,7 @@ DRIVER_INIT(cotton2)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60338ea);
 
-   	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, cotton2_speedup_r ); // idle loop of main cpu
+   	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, cotton2_speedup_r ); // idle loop of main cpu
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)cotton2_slave_speedup );
 
 	DRIVER_INIT_CALL(stv);
@@ -549,8 +549,8 @@ DRIVER_INIT(dnmtdeka)
 
 	dnmtdeka_pending_commands = 0;
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60985a0, 0x60985a3, 0, 0, dnmtdeka_speedup_r ); // idle loop of main cpu
-	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060e0ad4, 0x060e0bc3, 0, 0, dnmtdeka_cmd_read, dnmtdeka_cmd_write );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60985a0, 0x60985a3, 0, 0, dnmtdeka_speedup_r ); // idle loop of main cpu
+	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060e0ad4, 0x060e0bc3, 0, 0, dnmtdeka_cmd_read, dnmtdeka_cmd_write );
 
 	DRIVER_INIT_CALL(ic13);
 }
@@ -637,12 +637,12 @@ DRIVER_INIT(diehard)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60051f2);
 
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060986ac, 0x060986af, 0, 0, diehard_speedup_r );
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060e0bd0, 0x060e0dcf, 0, 0, diehard_cmd_write );
-	memory_install_read32_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x060e0bd0, 0x060e0dcf, 0, 0, diehard_cmd_read );
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060e0dd8, 0x060e0ddb, 0, 0, diehard_cmd_ack_read );
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060e0dd8, 0x060e0ddb, 0, 0, diehard_cmd_ack_write_cpu0 );
-	memory_install_write32_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x060e0dd8, 0x060e0ddb, 0, 0, diehard_cmd_ack_write );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060986ac, 0x060986af, 0, 0, diehard_speedup_r );
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060e0bd0, 0x060e0dcf, 0, 0, diehard_cmd_write );
+	memory_install_read_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x060e0bd0, 0x060e0dcf, 0, 0, diehard_cmd_read );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060e0dd8, 0x060e0ddb, 0, 0, diehard_cmd_ack_read );
+	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060e0dd8, 0x060e0ddb, 0, 0, diehard_cmd_ack_write_cpu0 );
+	memory_install_write_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x060e0dd8, 0x060e0ddb, 0, 0, diehard_cmd_ack_write );
 
 
 	DRIVER_INIT_CALL(ic13);
@@ -680,9 +680,9 @@ DRIVER_INIT(fhboxers)
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+2);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x600b31e);
 
-   	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600420c, 0x600420f, 0, 0, fhboxers_speedup_r ); // idle loop of main cpu
-   	memory_install_read32_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x6090740, 0x6090743, 0, 0, fhboxers_speedup2_r ); // idle loop of second cpu
-  	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x06090bb4, 0x06090bb7, 0, 0, fhboxers_speedup3_r ); // idle loop of main cpu
+   	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600420c, 0x600420f, 0, 0, fhboxers_speedup_r ); // idle loop of main cpu
+   	memory_install_read_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x6090740, 0x6090743, 0, 0, fhboxers_speedup2_r ); // idle loop of second cpu
+  	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x06090bb4, 0x06090bb7, 0, 0, fhboxers_speedup3_r ); // idle loop of main cpu
 
 	DRIVER_INIT_CALL(ic13);
 }
@@ -709,8 +709,8 @@ DRIVER_INIT(bakubaku)
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+1);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6033760);
 
-   	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60833f0, 0x60833f3, 0, 0, bakubaku_speedup_r ); // idle loop of main cpu
-   	memory_install_read32_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x60fdfe8, 0x60fdfeb, 0, 0, bakubaku_speedup2_r ); // turn off slave sh2, is it needed after boot ??
+   	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60833f0, 0x60833f3, 0, 0, bakubaku_speedup_r ); // idle loop of main cpu
+   	memory_install_read_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x60fdfe8, 0x60fdfeb, 0, 0, bakubaku_speedup2_r ); // turn off slave sh2, is it needed after boot ??
 
 	DRIVER_INIT_CALL(ic13);
 }
@@ -770,11 +770,11 @@ DRIVER_INIT( groovef )
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60060c2);
 
 	/* prevent game from hanging on startup -- todo: remove these hacks */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ca6cc, 0x60ca6cf, 0, 0, groovef_hack2_r );
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60fffcc, 0x60fffcf, 0, 0, groovef_hack1_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ca6cc, 0x60ca6cf, 0, 0, groovef_hack2_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60fffcc, 0x60fffcf, 0, 0, groovef_hack1_r );
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60c64ec, 0x60c64ef, 0, 0, groovef_speedup_r );
-//  memory_install_read32_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x60060dc, 0x60060df, 0, 0, groovef_second_cpu_off_r ); // not a good idea, needs it for ai.
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60c64ec, 0x60c64ef, 0, 0, groovef_speedup_r );
+//  memory_install_read_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x60060dc, 0x60060df, 0, 0, groovef_second_cpu_off_r ); // not a good idea, needs it for ai.
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)groovef_slave_speedup );
 
 	DRIVER_INIT_CALL(stv);
@@ -841,9 +841,9 @@ DRIVER_INIT( danchih )
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602ae26);
 
 	/* prevent game from hanging on title screen -- todo: remove these hacks */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffcbc, 0x60ffcbf, 0, 0, danchih_hack_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffcbc, 0x60ffcbf, 0, 0, danchih_hack_r );
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, danchih_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, danchih_speedup_r );
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)danchih_slave_speedup );
 
 	DRIVER_INIT_CALL(stv);
@@ -894,9 +894,9 @@ DRIVER_INIT( astrass )
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+1);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x605b9da);
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000770, 0x6000773, 0, 0, astrass_hack_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000770, 0x6000773, 0, 0, astrass_hack_r );
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0608e4d8, 0x0608e4db, 0, 0, astrass_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0608e4d8, 0x0608e4db, 0, 0, astrass_speedup_r );
 
 	install_astrass_protection(machine);
 
@@ -938,7 +938,7 @@ DRIVER_INIT(thunt)
 0602A026: TST     R0,R0
 0602A028: BF      $0602A024
 */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x06031424, 0x06031427, 0, 0, thunt_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x06031424, 0x06031427, 0, 0, thunt_speedup_r );
 
 /*
 06013EE8: MOV.L   @($10,PC),R0
@@ -949,7 +949,7 @@ DRIVER_INIT(thunt)
 06013EF2: RTS
 06013EF4: MOV     #$01,R0
 */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x06075958, 0x0607595b, 0, 0, thunt_speedup2_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x06075958, 0x0607595b, 0, 0, thunt_speedup2_r );
 
 /*
 0602AAF8: MOV.B   @R11,R2
@@ -996,8 +996,8 @@ DRIVER_INIT(sandor)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602abcc);
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060314f8, 0x060314fb, 0, 0, sandor_speedup_r );
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x06075a2c, 0x06075a2f, 0, 0, sandor_speedup2_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060314f8, 0x060314fb, 0, 0, sandor_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x06075a2c, 0x06075a2f, 0, 0, sandor_speedup2_r );
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf *)sandor_slave_speedup);
 	DRIVER_INIT_CALL(ic13);
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(1);
@@ -1046,7 +1046,7 @@ DRIVER_INIT(grdforce)
 06041E34: CMP/PZ  R0
 06041E36: BT      $06041E2C
 */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060ffc10, 0x060ffc13, 0, 0, grdforce_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060ffc10, 0x060ffc13, 0, 0, grdforce_speedup_r );
 
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf *)grdforce_slave_speedup);
 
@@ -1079,7 +1079,7 @@ DRIVER_INIT(batmanfr)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60125bc);
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0602acf0, 0x0602acf3, 0, 0, batmanfr_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0602acf0, 0x0602acf3, 0, 0, batmanfr_speedup_r );
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)batmanfr_slave_speedup );
 
 	DRIVER_INIT_CALL(stv);
@@ -1133,7 +1133,7 @@ DRIVER_INIT(winterht)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x609ae4e);
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060ffc10, 0x060ffc13, 0, 0, winterht_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060ffc10, 0x060ffc13, 0, 0, winterht_speedup_r );
 
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)winterht_slave_speedup );
 
@@ -1163,7 +1163,7 @@ DRIVER_INIT(seabass)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60321ee);
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060ffc10, 0x060ffc13, 0, 0, seabass_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060ffc10, 0x060ffc13, 0, 0, seabass_speedup_r );
 
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)seabass_slave_speedup );
 
@@ -1192,7 +1192,7 @@ DRIVER_INIT(vfremix)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x604c332);
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x06074f98, 0x06074f9b, 0, 0, vfremix_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x06074f98, 0x06074f9b, 0, 0, vfremix_speedup_r );
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)vfremix_slave_speedup );
 
 	DRIVER_INIT_CALL(ic13);
@@ -1222,7 +1222,7 @@ DRIVER_INIT(sss)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6028cd6);
 
 	install_standard_protection(machine);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060ffc10, 0x060ffc13, 0, 0, sss_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060ffc10, 0x060ffc13, 0, 0, sss_speedup_r );
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)sss_slave_speedup );
 
 	DRIVER_INIT_CALL(ic13);
@@ -1254,7 +1254,7 @@ DRIVER_INIT(othellos)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602d92e);
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060ffc10, 0x060ffc13, 0, 0, othellos_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060ffc10, 0x060ffc13, 0, 0, othellos_speedup_r );
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)othellos_slave_speedup );
 
 	DRIVER_INIT_CALL(stv);
@@ -1293,7 +1293,7 @@ DRIVER_INIT(gaxeduel)
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6012ee4);
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x002f4068, 0x002f406b, 0, 0, gaxeduel_speedup_r);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x002f4068, 0x002f406b, 0, 0, gaxeduel_speedup_r);
 	DRIVER_INIT_CALL(ic13);
 }
 
@@ -1308,7 +1308,7 @@ DRIVER_INIT(suikoenb)
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6013f7a);
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060705d0, 0x060705d3, 0, 0, suikoenb_speedup_r);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060705d0, 0x060705d3, 0, 0, suikoenb_speedup_r);
 	DRIVER_INIT_CALL(ic13);
 }
 
@@ -1335,7 +1335,7 @@ DRIVER_INIT(sokyugrt)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x605eec0);
 
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)sokyugrt_slave_speedup );
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060788cc, 0x060788cf, 0, 0, sokyugrt_speedup_r);
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060788cc, 0x060788cf, 0, 0, sokyugrt_speedup_r);
 	DRIVER_INIT_CALL(ic13);
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
 
@@ -1373,7 +1373,7 @@ DRIVER_INIT(znpwfv)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60175a6);
 
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)znpwfv_slave_speedup );
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, znpwfv_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, znpwfv_speedup_r );
 
 	DRIVER_INIT_CALL(ic13);
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_NSEC(500);
@@ -1400,7 +1400,7 @@ DRIVER_INIT(twcup98)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6062bca);
 
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)twcup98_slave_speedup );
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, twcup98_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, twcup98_speedup_r );
 
 	DRIVER_INIT_CALL(ic13);
 	install_standard_protection(machine);
@@ -1429,7 +1429,7 @@ DRIVER_INIT(smleague)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6062bca);
 
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)smleague_slave_speedup );
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, smleague_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, smleague_speedup_r );
 
 	DRIVER_INIT_CALL(ic13);
 
@@ -1448,7 +1448,7 @@ DRIVER_INIT(finlarch)
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6064d60);
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, finlarch_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, finlarch_speedup_r );
 
 	DRIVER_INIT_CALL(ic13);
 
@@ -1484,7 +1484,7 @@ DRIVER_INIT(maruchan)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x601ba46);
 
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)maruchan_slave_speedup );
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, maruchan_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, maruchan_speedup_r );
 
 	DRIVER_INIT_CALL(ic13);
 
@@ -1504,7 +1504,7 @@ DRIVER_INIT(pblbeach)
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x605eb78);
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0606c398, 0x0606c39b, 0, 0, pblbeach_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0606c398, 0x0606c39b, 0, 0, pblbeach_speedup_r );
 
 	DRIVER_INIT_CALL(ic13);
 }
@@ -1521,7 +1521,7 @@ DRIVER_INIT(shanhigw)
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6020c5c);
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x06095cd8, 0x06095cdb, 0, 0, shanhigw_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x06095cd8, 0x06095cdb, 0, 0, shanhigw_speedup_r );
 
 	DRIVER_INIT_CALL(stv);
 }
@@ -1553,7 +1553,7 @@ DRIVER_INIT(elandore)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x605340a);
 
 	install_standard_protection(machine);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, elandore_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, elandore_speedup_r );
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf *)elandore_slave_speedup);
 	DRIVER_INIT_CALL(stv);
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(0);
@@ -1586,7 +1586,7 @@ DRIVER_INIT(rsgun)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6036152);
 
 	install_standard_protection(machine);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, rsgun_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, rsgun_speedup_r );
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf *)rsgun_slave_speedup);
 
 	DRIVER_INIT_CALL(stv);
@@ -1627,7 +1627,7 @@ DRIVER_INIT(nameclv3)
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602b80e);
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60452c0, 0x60452c3, 0, 0, nameclv3_speedup_r );
+	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60452c0, 0x60452c3, 0, 0, nameclv3_speedup_r );
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)nameclv3_slave_speedup );
 	DRIVER_INIT_CALL(stv);
 }
