@@ -964,9 +964,10 @@ static void m37710_init(int index, int clock, const void *config, int (*irqcallb
 {
 	int i;
 
+	memset(&m37710i_cpu, 0, sizeof(m37710i_cpu));
+
 	INT_ACK = irqcallback;
 
-	memset(&m37710i_cpu, 0, sizeof(m37710i_cpu));
 	m37710_ICount = 0;
 	m37710_fullCount = 0;
 
