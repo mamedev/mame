@@ -10,6 +10,7 @@
 #include "sound/cdda.h"
 #ifdef MESS
 #include "devices/chd_cd.h"
+#include "deprecat.h"
 #endif
 #include "scsicd.h"
 
@@ -694,7 +695,8 @@ static void scsicd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 	state_save_register_item( tag, 0, our_this->play_err_flag );
 
 #ifdef MESS
-	our_this->cdrom = mess_cd_get_cdrom_file_by_number( diskregion );
+	/* TODO: get rid of this ifdef MESS section */
+	our_this->cdrom = mess_cd_get_cdrom_file( device_list_find_by_tag( Machine->config->devicelist, CDROM, "cdrom" ) );
 #else
 	our_this->cdrom = cdrom_open(get_disk_handle( diskregion ));
 

@@ -9,7 +9,7 @@
 #ifndef __STVCD_H__
 #define __STVCD_H__
 
-void stvcd_reset(void);
+void stvcd_reset(running_machine* machine);
 void stvcd_exit(running_machine* machine);
 
 READ32_HANDLER( stvcd_r );

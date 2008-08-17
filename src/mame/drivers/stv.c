@@ -2569,7 +2569,7 @@ static MACHINE_RESET( stv )
 	cpunum_set_clock(machine, 1, MASTER_CLOCK_320/2);
 	cpunum_set_clock(machine, 2, MASTER_CLOCK_320/5);
 
-	stvcd_reset();
+	stvcd_reset(machine);
 }
 
 

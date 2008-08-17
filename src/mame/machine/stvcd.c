@@ -203,7 +203,7 @@ static TIMER_CALLBACK( sector_cb )
 }
 
 // global functions
-void stvcd_reset(void)
+void stvcd_reset(running_machine *machine)
 {
 	INT32 i, j;
 
@@ -259,7 +259,7 @@ void stvcd_reset(void)
 	}
 
 	#ifdef MESS
-	cdrom = mess_cd_get_cdrom_file_by_number(0);
+	cdrom = mess_cd_get_cdrom_file(device_list_find_by_tag( machine->config->devicelist, CDROM, "cdrom" ));
 	#else
 	cdrom = cdrom_open(get_disk_handle("cdrom"));
 	#endif
