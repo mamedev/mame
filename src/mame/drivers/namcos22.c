@@ -5149,7 +5149,7 @@ static DRIVER_INIT( timecris )
 {
 	namcos22s_init(NAMCOS22_TIME_CRISIS);
 
-	install_130_speedup(machine);
+	// install_130_speedup(machine); // with speed up the SUBCPU START WAIT test fails
 }
 
 /************************************************************************************/
