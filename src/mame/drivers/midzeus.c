@@ -91,7 +91,7 @@ static MACHINE_START( midzeus )
 
 static MACHINE_START( midzeus2 )
 {
-	timekeeper_init(machine, 0, TIMEKEEPER_MIDZEUS2, NULL);
+	timekeeper_init(machine, 0, TIMEKEEPER_M48T35, NULL);
 	MACHINE_START_CALL(midzeus);
 }
 

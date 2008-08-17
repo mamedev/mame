@@ -1,7 +1,11 @@
 /*
  * STmicroelectronics TIMEKEEPER SRAM
  *
- * Supports: MK48T08, M48T02 & M48T58
+ * Supports:
+ *           M48T02
+ *           M48T35
+ *           M48T58
+ *           MK48T08
  *
  */
 
@@ -53,8 +57,8 @@ static struct timekeeper_chip timekeeper[ MAX_TIMEKEEPER_CHIPS ];
 #define SECONDS_ST ( 0x80 )
 
 #define DAY_FT ( 0x40 ) /* not emulated */
-#define DAY_CEB ( 0x20 ) /* M48T58 */
-#define DAY_CB ( 0x10 ) /* M48T58 */
+#define DAY_CEB ( 0x20 ) /* M48T35/M48T58 */
+#define DAY_CB ( 0x10 ) /* M48T35/M48T58 */
 
 #define DATE_BLE ( 0x80 ) /* M48T58: not emulated */
 #define DATE_BL ( 0x40 ) /* M48T58: not emulated */
@@ -199,9 +203,15 @@ static TIMER_CALLBACK( timekeeper_tick )
 	if( carry )
 	{
 		carry = inc_bcd( &c->century, MASK_CENTURY, 0x00, 0x99 );
-		if( c->type == TIMEKEEPER_M48T58 && ( c->day & DAY_CEB ) != 0 )
+		switch( c->type )
 		{
-			c->day ^= DAY_CB;
+		case TIMEKEEPER_M48T35:
+		case TIMEKEEPER_M48T58:
+			if( ( c->day & DAY_CEB ) != 0 )
+			{
+				c->day ^= DAY_CB;
+			}
+			break;
 		}
 	}
 
@@ -242,6 +252,19 @@ void timekeeper_init( running_machine *machine, int chip, int type, UINT8 *data 
 		c->offset_flags = -1;
 		c->size = 0x800;
 		break;
+	case TIMEKEEPER_M48T35:
+		c->offset_control = 0x7ff8;
+		c->offset_seconds = 0x7ff9;
+		c->offset_minutes = 0x7ffa;
+		c->offset_hours = 0x7ffb;
+		c->offset_day = 0x7ffc;
+		c->offset_date = 0x7ffd;
+		c->offset_month = 0x7ffe;
+		c->offset_year = 0x7fff;
+		c->offset_century = -1;
+		c->offset_flags = -1;
+		c->size = 0x8000;
+		break;
 	case TIMEKEEPER_M48T58:
 		c->offset_control = 0x1ff8;
 		c->offset_seconds = 0x1ff9;
@@ -267,19 +290,6 @@ void timekeeper_init( running_machine *machine, int chip, int type, UINT8 *data 
 		c->offset_century = 0x1ff1;
 		c->offset_flags = 0x1ff0;
 		c->size = 0x2000;
-		break;
-	case TIMEKEEPER_MIDZEUS2:
-		c->offset_control = 0x7ff8;
-		c->offset_seconds = 0x7ff9;
-		c->offset_minutes = 0x7ffa;
-		c->offset_hours = 0x7ffb;
-		c->offset_day = 0x7ffc;
-		c->offset_date = 0x7ffd;
-		c->offset_month = 0x7ffe;
-		c->offset_year = 0x7fff;
-		c->offset_century = -1;
-		c->offset_flags = -1;
-		c->size = 0x8000;
 		break;
 	}
 
@@ -379,9 +389,15 @@ static void timekeeper_write( UINT32 chip, offs_t offset, UINT8 data )
 		}
 		c->control = data;
 	}
-	else if( c->type == TIMEKEEPER_M48T58 && offset == c->offset_day )
+	else if( offset == c->offset_day )
 	{
-		c->day = ( c->day & ~DAY_CEB ) | ( data & DAY_CEB );
+		switch( c->type )
+		{
+		case TIMEKEEPER_M48T35:
+		case TIMEKEEPER_M48T58:
+			c->day = ( c->day & ~DAY_CEB ) | ( data & DAY_CEB );
+			break;
+		}
 	}
 	else if( c->type == TIMEKEEPER_M48T58 && offset == c->offset_date )
 	{
@@ -396,7 +412,7 @@ static void timekeeper_write( UINT32 chip, offs_t offset, UINT8 data )
 	c->data[ offset ] = data;
 }
 
-/* 8bit memory handlers */
+/* memory handlers */
 
 READ8_HANDLER( timekeeper_0_r )
 {
@@ -407,102 +423,3 @@ WRITE8_HANDLER( timekeeper_0_w )
 {
 	timekeeper_write(0, offset, data);
 }
-
-/* 16bit memory handlers */
-
-static UINT16 timekeeper_msb16_read( UINT32 chip, offs_t offset, UINT16 mem_mask )
-{
-	UINT16 data = 0;
-	if( ACCESSING_BITS_8_15 )
-	{
-		data |= timekeeper_read( chip, offset ) << 8;
-	}
-	return data;
-}
-
-static void timekeeper_msb16_write( UINT32 chip, offs_t offset, UINT16 data, UINT16 mem_mask )
-{
-	if( ACCESSING_BITS_8_15 )
-	{
-		timekeeper_write( chip, offset, data >> 8 );
-	}
-}
-
-READ16_HANDLER( timekeeper_0_msb16_r ) { return timekeeper_msb16_read( 0, offset, mem_mask ); }
-WRITE16_HANDLER( timekeeper_0_msb16_w ) { timekeeper_msb16_write( 0, offset, data, mem_mask ); }
-
-/* 32bit memory handlers */
-
-static UINT32 timekeeper_32be_read( UINT32 chip, offs_t offset, UINT32 mem_mask )
-{
-	UINT32 data = 0;
-	if( ACCESSING_BITS_24_31 )
-	{
-		data |= timekeeper_read( chip, ( offset * 4 ) + 0 ) << 24;
-	}
-	if( ACCESSING_BITS_16_23 )
-	{
-		data |= timekeeper_read( chip, ( offset * 4 ) + 1 ) << 16;
-	}
-	if( ACCESSING_BITS_8_15 )
-	{
-		data |= timekeeper_read( chip, ( offset * 4 ) + 2 ) << 8;
-	}
-	if( ACCESSING_BITS_0_7 )
-	{
-		data |= timekeeper_read( chip, ( offset * 4 ) + 3 ) << 0;
-	}
-	return data;
-}
-
-static void timekeeper_32be_write( UINT32 chip, offs_t offset, UINT32 data, UINT32 mem_mask )
-{
-	if( ACCESSING_BITS_24_31 )
-	{
-		timekeeper_write( chip, ( offset * 4 ) + 0, data >> 24 );
-	}
-	if( ACCESSING_BITS_16_23 )
-	{
-		timekeeper_write( chip, ( offset * 4 ) + 1, data >> 16 );
-	}
-	if( ACCESSING_BITS_8_15 )
-	{
-		timekeeper_write( chip, ( offset * 4 ) + 2, data >> 8 );
-	}
-	if( ACCESSING_BITS_0_7 )
-	{
-		timekeeper_write( chip, ( offset * 4 ) + 3, data >> 0 );
-	}
-}
-
-READ32_HANDLER( timekeeper_0_32be_r ) { return timekeeper_32be_read( 0, offset, mem_mask ); }
-WRITE32_HANDLER( timekeeper_0_32be_w ) { timekeeper_32be_write( 0, offset, data, mem_mask ); }
-
-static UINT32 timekeeper_32le_lsb16_read( UINT32 chip, offs_t offset, UINT32 mem_mask )
-{
-	UINT32 data = 0;
-	if( ACCESSING_BITS_0_7 )
-	{
-		data |= timekeeper_read( chip, ( offset * 2 ) + 0 ) << 0;
-	}
-	if( ACCESSING_BITS_16_23 )
-	{
-		data |= timekeeper_read( chip, ( offset * 2 ) + 1 ) << 16;
-	}
-	return data;
-}
-
-static void timekeeper_32le_lsb16_write( UINT32 chip, offs_t offset, UINT32 data, UINT32 mem_mask )
-{
-	if( ACCESSING_BITS_0_7 )
-	{
-		timekeeper_write( chip, ( offset * 2 ) + 0, data >> 0 );
-	}
-	if( ACCESSING_BITS_16_23 )
-	{
-		timekeeper_write( chip, ( offset * 2 ) + 1, data >> 16 );
-	}
-}
-
-READ32_HANDLER( timekeeper_0_32le_lsb16_r ) { return timekeeper_32le_lsb16_read( 0, offset, mem_mask ); }
-WRITE32_HANDLER( timekeeper_0_32le_lsb16_w ) { timekeeper_32le_lsb16_write( 0, offset, data, mem_mask ); }

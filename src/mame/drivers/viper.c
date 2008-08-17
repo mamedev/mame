@@ -549,34 +549,6 @@ static WRITE64_HANDLER(voodoo3_lfb_w)
 #endif
 
 
-static READ64_HANDLER(m48t58_r)
-{
-	UINT64 r = 0;
-
-	if (ACCESSING_BITS_32_63)
-	{
-		r |= (UINT64)timekeeper_0_32be_r(machine, (offset * 2) + 0, (UINT32)(mem_mask >> 32)) << 32;
-	}
-	if (ACCESSING_BITS_0_31)
-	{
-		r |= timekeeper_0_32be_r(machine, (offset * 2) + 1, (UINT32)(mem_mask));
-	}
-
-	return r;
-}
-
-static WRITE64_HANDLER(m48t58_w)
-{
-	if (ACCESSING_BITS_32_63)
-	{
-		timekeeper_0_32be_w(machine, (offset * 2) + 0, (UINT32)(data >> 32), (UINT32)(mem_mask >> 32));
-	}
-	if (ACCESSING_BITS_0_31)
-	{
-		timekeeper_0_32be_w(machine, (offset * 2) + 1, (UINT32)(data), (UINT32)(mem_mask));
-	}
-}
-
 /*****************************************************************************/
 
 static ADDRESS_MAP_START(viper_map, ADDRESS_SPACE_PROGRAM, 64)
@@ -589,7 +561,7 @@ static ADDRESS_MAP_START(viper_map, ADDRESS_SPACE_PROGRAM, 64)
 	AM_RANGE(0xfee00000, 0xfeefffff) AM_READWRITE(pci_config_data_r, pci_config_data_w)
 	AM_RANGE(0xff300000, 0xff300fff) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ata_r, ata_w)
 	AM_RANGE(0xffe10000, 0xffe10007) AM_READ(unk1_r)
-	AM_RANGE(0xffe30000, 0xffe31fff) AM_READWRITE(m48t58_r, m48t58_w)
+	AM_RANGE(0xffe30000, 0xffe31fff) AM_READWRITE8(timekeeper_0_r, timekeeper_0_w, U64(0xffffffffffffffff))
 	AM_RANGE(0xffe40000, 0xffe4000f) AM_NOP
 	AM_RANGE(0xffe50000, 0xffe50007) AM_WRITE(unk2_w)
 	AM_RANGE(0xffe80000, 0xffe80007) AM_WRITE(unk1a_w)

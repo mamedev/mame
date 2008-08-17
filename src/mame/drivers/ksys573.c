@@ -1299,7 +1299,7 @@ static ADDRESS_MAP_START( konami573_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f500000, 0x1f500003) AM_READWRITE( control_r, control_w )	// Konami can't make a game without a "control" register.
 	AM_RANGE(0x1f560000, 0x1f560003) AM_WRITE( atapi_reset_w )
 	AM_RANGE(0x1f5c0000, 0x1f5c0003) AM_WRITENOP 				// watchdog?
-	AM_RANGE(0x1f620000, 0x1f623fff) AM_READWRITE( timekeeper_0_32le_lsb16_r, timekeeper_0_32le_lsb16_w )
+	AM_RANGE(0x1f620000, 0x1f623fff) AM_READWRITE8(timekeeper_0_r, timekeeper_0_w, 0x00ff00ff)
 	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE(mb89371_r, mb89371_w)
 	AM_RANGE(0x1f6a0000, 0x1f6a0003) AM_READWRITE( security_r, security_w )
 	AM_RANGE(0x1f800000, 0x1f8003ff) AM_RAM /* scratchpad */

@@ -3884,7 +3884,7 @@ static DRIVER_INIT( wcbowlt )	/* PIC 16C54 labeled as ITBWL-3 */
 	init_shuffle_bowl_common(machine, 0x111a);
 
 	timekeeper_init( machine, 0, TIMEKEEPER_M48T02, NULL );
-	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x681000, 0x6817ff, 0, 0, timekeeper_0_32be_r, timekeeper_0_32be_w);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x681000, 0x6817ff, 0, 0, timekeeper_0_r, timekeeper_0_w, 0xffffffff);
 }
 
 static void init_gt_common(running_machine *machine)
@@ -3933,7 +3933,7 @@ static DRIVER_INIT( aamat )
     */
 	DRIVER_INIT_CALL(aama);
 	timekeeper_init( machine, 0, TIMEKEEPER_M48T02, NULL );
-	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x681000, 0x6817ff, 0, 0, timekeeper_0_32be_r, timekeeper_0_32be_w);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x681000, 0x6817ff, 0, 0, timekeeper_0_r, timekeeper_0_w, 0xffffffff);
 }
 
 
