@@ -139,6 +139,7 @@ There's also (external) JAMMA adapter - 4th board filled with resistors and diod
 #include "video/hd63484.h"
 #include "machine/microtch.h"
 #include "machine/68681.h"
+#include "deprecat.h"
 
 static struct
 {
@@ -169,6 +170,11 @@ static void microtouch_tx(UINT8 data)
 	duart68681_rx_data(skattv_devices.duart68681, 0, data);
 }
 
+static UINT8 duart_input(const device_config *device)
+{
+	return input_port_read(Machine, "DSW1");
+}
+
 static MACHINE_START( skattv )
 {
 	microtouch_init(microtouch_tx, 0);
@@ -184,7 +190,7 @@ static const duart68681_config skattv_duart68681_config =
 	XTAL_8_664MHz / 2, //??
 	duart_irq_handler,
 	duart_tx,
-	NULL,
+	duart_input,
 	NULL
 };
 
@@ -389,23 +395,15 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( skattv )
 	PORT_INCLUDE(microtouch)
 
-	PORT_START("COIN") // IN3
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN5    )	// "M. Coin 1 Input"
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN6    )	// "M. Coin 2 Input"
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_BILL1    ) PORT_IMPULSE(2)	// "DBV Input"
+	PORT_START("DSW1")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN5    )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN6    )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_BILL1    )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW,  IPT_UNKNOWN  )	// service coin?
-	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW  )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_SERVICE1 )	// "Calibrate"
+	PORT_SERVICE_NO_TOGGLE( 0x10, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL  )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW,  IPT_COIN1  )	// "E. Coin 1" (ECA?) tmaster defaults to e. coin,
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW,  IPT_COIN2  )	// "E. Coin 2" (ECA?) rather than m. coin
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW,  IPT_COIN3  )	// "E. Coin 3" (ECA?) so they're coin1-coin4
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_COIN4  )	// "E. Coin 4" (ECA?)
 INPUT_PORTS_END
 
 /*
