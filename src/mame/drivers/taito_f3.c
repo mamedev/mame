@@ -3526,7 +3526,7 @@ static DRIVER_INIT( ringrage )
 
 static DRIVER_INIT( arabianm )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408124, 0x408127, 0, 0, irq_speedup_r_arabianm );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408124, 0x408127, 0, 0, irq_speedup_r_arabianm );
 	f3_game=ARABIANM;
 	tile_decode(machine);
 }
@@ -3539,28 +3539,28 @@ static DRIVER_INIT( ridingf )
 
 static DRIVER_INIT( gseeker )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40ad94, 0x40ad97, 0, 0, irq_speedup_r_gseeker );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x40ad94, 0x40ad97, 0, 0, irq_speedup_r_gseeker );
 	f3_game=GSEEKER;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( gunlock )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400007, 0, 0, irq_speedup_r_gunlock );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400004, 0x400007, 0, 0, irq_speedup_r_gunlock );
 	f3_game=GUNLOCK;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( elvactr )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4007a0, 0x4007a3, 0, 0, irq_speedup_r_eaction2 );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4007a0, 0x4007a3, 0, 0, irq_speedup_r_eaction2 );
 	f3_game=EACTION2;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( cupfinal )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_cupfinal );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_cupfinal );
 	f3_game=SCFINALS;
 	tile_decode(machine);
 }
@@ -3581,35 +3581,35 @@ static DRIVER_INIT( scfinals )
 	/* Rom checksum error */
 	RAM[0xdd0/4]=0x4e750000;
 
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_scfinals );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_scfinals );
 	f3_game=SCFINALS;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( lightbr )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400130, 0x400133, 0, 0, irq_speedup_r_lightbr );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400130, 0x400133, 0, 0, irq_speedup_r_lightbr );
 	f3_game=LIGHTBR;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( kaiserkn )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408110, 0x408113, 0, 0, irq_speedup_r_kaiserkn );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408110, 0x408113, 0, 0, irq_speedup_r_kaiserkn );
 	f3_game=KAISERKN;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( dariusg )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x406ba8, 0x406bab, 0, 0, irq_speedup_r_dariusg );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x406ba8, 0x406bab, 0, 0, irq_speedup_r_dariusg );
 	f3_game=DARIUSG;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( spcinvdj )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400230, 0x400233, 0, 0, irq_speedup_r_spcinvdj );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400230, 0x400233, 0, 0, irq_speedup_r_spcinvdj );
 	f3_game=SPCINVDX;
 	tile_decode(machine);
 }
@@ -3622,28 +3622,28 @@ static DRIVER_INIT( qtheater )
 
 static DRIVER_INIT( spcinv95 )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_spcinv95 );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_spcinv95 );
 	f3_game=SPCINV95;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( gekirido )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x406bb0, 0x406bb3, 0, 0, irq_speedup_r_gekirido );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x406bb0, 0x406bb3, 0, 0, irq_speedup_r_gekirido );
 	f3_game=GEKIRIDO;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( ktiger2 )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400570, 0x400573, 0, 0, irq_speedup_r_ktiger2 );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400570, 0x400573, 0, 0, irq_speedup_r_ktiger2 );
 	f3_game=KTIGER2;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( bubsymph )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_bubsymph );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_bubsymph );
 	f3_game=BUBSYMPH;
 	tile_decode(machine);
 }
@@ -3674,7 +3674,7 @@ static WRITE32_HANDLER( bubsympb_oki_w )
 
 static DRIVER_INIT( bubsympb )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_bubsymph );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_bubsymph );
 	f3_game=BUBSYMPH;
 	//tile_decode(machine);
 
@@ -3697,35 +3697,35 @@ static DRIVER_INIT( bubsympb )
 		}
 	}
 
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_r );
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_w );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_r );
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_w );
 }
 
 
 static DRIVER_INIT( bubblem )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_bubblem );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_bubblem );
 	f3_game=BUBBLEM;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( cleopatr )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_cleopatr );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_cleopatr );
 	f3_game=CLEOPATR;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( popnpop )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x401cf8, 0x401cfb, 0, 0, irq_speedup_r_popnpop );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x401cf8, 0x401cfb, 0, 0, irq_speedup_r_popnpop );
 	f3_game=POPNPOP;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( landmakr )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400824, 0x400827, 0, 0, irq_speedup_r_landmakr );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400824, 0x400827, 0, 0, irq_speedup_r_landmakr );
 	f3_game=LANDMAKR;
 	tile_decode(machine);
 }
@@ -3741,21 +3741,21 @@ static DRIVER_INIT( landmkrp )
 	RAM[0x1ffff8/4]=0xffffffff; /* From 0xffffff03 */
 	RAM[0x1ffffc/4]=0xffff0003; /* From 0xffff00ff */
 
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400824, 0x400827, 0, 0, irq_speedup_r_landmakr );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400824, 0x400827, 0, 0, irq_speedup_r_landmakr );
 	f3_game=LANDMAKR;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( pbobble3 )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x405af4, 0x405af7, 0, 0, irq_speedup_r_pbobble3 );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x405af4, 0x405af7, 0, 0, irq_speedup_r_pbobble3 );
 	f3_game=PBOBBLE3;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( pbobble4 )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4058f4, 0x4058f7, 0, 0, irq_speedup_r_pbobble4 );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4058f4, 0x4058f7, 0, 0, irq_speedup_r_pbobble4 );
 	f3_game=PBOBBLE4;
 	tile_decode(machine);
 }
@@ -3768,49 +3768,49 @@ static DRIVER_INIT( quizhuhu )
 
 static DRIVER_INIT( pbobble2 )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x404a50, 0x404a53, 0, 0, irq_speedup_r_pbobble2 );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x404a50, 0x404a53, 0, 0, irq_speedup_r_pbobble2 );
 	f3_game=PBOBBLE2;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( pbobbl2x )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x405c58, 0x405c5b, 0, 0, irq_speedup_r_pbobbl2x );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x405c58, 0x405c5b, 0, 0, irq_speedup_r_pbobbl2x );
 	f3_game=PBOBBLE2;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( hthero95 )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_pwrgoal );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x408114, 0x408117, 0, 0, irq_speedup_r_pwrgoal );
 	f3_game=HTHERO95;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( kirameki )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400414, 0x400417, 0, 0, irq_speedup_r_kirameki );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400414, 0x400417, 0, 0, irq_speedup_r_kirameki );
 	f3_game=KIRAMEKI;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( puchicar )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4024d8, 0x4024db, 0, 0, irq_speedup_r_puchicar );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4024d8, 0x4024db, 0, 0, irq_speedup_r_puchicar );
 	f3_game=PUCHICAR;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( twinqix )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_twinqix );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400134, 0x400137, 0, 0, irq_speedup_r_twinqix );
 	f3_game=TWINQIX;
 	tile_decode(machine);
 }
 
 static DRIVER_INIT( arkretrn )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x402154, 0x402157, 0, 0, irq_speedup_r_arkretrn );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x402154, 0x402157, 0, 0, irq_speedup_r_arkretrn );
 	f3_game=ARKRETRN;
 	tile_decode(machine);
 }

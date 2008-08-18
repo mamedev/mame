@@ -1164,8 +1164,8 @@ static READ32_HANDLER( system11gun_r )
 
 static void system11gun_install( running_machine *machine )
 {
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f788000, 0x1f788003, 0, 0, system11gun_w );
-	memory_install_read_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f780000, 0x1f78000f, 0, 0, system11gun_r );
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f788000, 0x1f788003, 0, 0, system11gun_w );
+	memory_install_read32_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f780000, 0x1f78000f, 0, 0, system11gun_r );
 }
 
 static UINT8 kcram[ 12 ];
@@ -1215,8 +1215,8 @@ static MACHINE_RESET( namcos12 )
 		strcmp( machine->gamedrv->name, "tektagtb" ) == 0 ||
 		strcmp( machine->gamedrv->name, "tektagtc" ) == 0 )
 	{
-		memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fb00003, 0, 0, tektagt_protection_1_r, tektagt_protection_1_w );
-		memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fb80000, 0x1fb80003, 0, 0, tektagt_protection_2_r, tektagt_protection_2_w );
+		memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fb00003, 0, 0, tektagt_protection_1_r, tektagt_protection_1_w );
+		memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fb80000, 0x1fb80003, 0, 0, tektagt_protection_2_r, tektagt_protection_2_w );
 	}
 
 	if( strcmp( machine->gamedrv->name, "tektagt" ) == 0 ||
@@ -1238,9 +1238,9 @@ static MACHINE_RESET( namcos12 )
 		strcmp( machine->gamedrv->name, "ghlpanic" ) == 0 )
 	{
 		/* this is based on guesswork, it might not even be keycus. */
-		memory_install_read_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fc20280, 0x1fc2028b, 0, 0, SMH_BANK2 );
-		memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f008000, 0x1f008003, 0, 0, kcon_w );
-		memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f018000, 0x1f018003, 0, 0, kcoff_w );
+		memory_install_read32_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fc20280, 0x1fc2028b, 0, 0, SMH_BANK2 );
+		memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f008000, 0x1f008003, 0, 0, kcon_w );
+		memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f018000, 0x1f018003, 0, 0, kcoff_w );
 
 		memset( kcram, 0, sizeof( kcram ) );
 		memory_set_bankptr( 2, kcram );

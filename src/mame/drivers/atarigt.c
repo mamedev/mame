@@ -1085,7 +1085,7 @@ static DRIVER_INIT( tmek )
 	protection_w = tmek_protection_w;
 
 	/* temp hack */
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd72000, 0xd75fff, 0, 0, tmek_pf_w);
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd72000, 0xd75fff, 0, 0, tmek_pf_w);
 }
 
 

@@ -170,7 +170,7 @@ void cage_init(running_machine *machine, offs_t speedup)
 	timer[1] = timer_alloc(cage_timer_callback, NULL);
 
 	if (speedup)
-		speedup_ram = memory_install_write_handler(machine, cage_cpu, ADDRESS_SPACE_PROGRAM, speedup, speedup, 0, 0, speedup_w);
+		speedup_ram = memory_install_write32_handler(machine, cage_cpu, ADDRESS_SPACE_PROGRAM, speedup, speedup, 0, 0, speedup_w);
 
 	state_save_register_global(cpu_to_cage_ready);
 	state_save_register_global(cage_to_cpu_ready);

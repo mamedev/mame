@@ -1827,8 +1827,8 @@ static DRIVER_INIT( gekisou )
 	unpack_region("gfx3");
 
 	// install special handlers for unknown device (protection?)
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x580000, 0x580001, 0, 0, gekisou_unknown_0_w);
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5a0000, 0x5a0001, 0, 0, gekisou_unknown_1_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x580000, 0x580001, 0, 0, gekisou_unknown_0_w);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5a0000, 0x5a0001, 0, 0, gekisou_unknown_1_w);
 }
 
 static DRIVER_INIT( splndrbt )
@@ -1841,7 +1841,7 @@ static DRIVER_INIT( hvoltage )
 	unpack_region("gfx3");
 
 #if HVOLTAGE_DEBUG
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000038, 0x000039, 0, 0, hvoltage_debug_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000038, 0x000039, 0, 0, hvoltage_debug_r);
 #endif
 }
 

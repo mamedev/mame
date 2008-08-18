@@ -1935,15 +1935,15 @@ ROM_END
 
 static DRIVER_INIT( caterplr )
 {
-	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x100f, 0, 0, caterplr_AY8910_r, caterplr_AY8910_w);
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1780, 0x1780, 0, 0, caterplr_rand_r);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x100f, 0, 0, caterplr_AY8910_r, caterplr_AY8910_w);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1780, 0x1780, 0, 0, caterplr_rand_r);
 }
 
 
 static DRIVER_INIT( magworm )
 {
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1001, 0x1001, 0, 0, ay8910_control_port_0_w);
-	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1003, 0x1003, 0, 0, ay8910_read_port_0_r, ay8910_write_port_0_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1001, 0x1001, 0, 0, ay8910_control_port_0_w);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1003, 0x1003, 0, 0, ay8910_read_port_0_r, ay8910_write_port_0_w);
 }
 
 

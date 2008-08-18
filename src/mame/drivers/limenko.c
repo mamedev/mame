@@ -839,17 +839,17 @@ static READ32_HANDLER( spotty_speedup_r )
 
 static DRIVER_INIT( dynabomb )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe2784, 0xe2787, 0, 0, dynabomb_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe2784, 0xe2787, 0, 0, dynabomb_speedup_r );
 }
 
 static DRIVER_INIT( legendoh )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x32ab0, 0x32ab3, 0, 0, legendoh_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x32ab0, 0x32ab3, 0, 0, legendoh_speedup_r );
 }
 
 static DRIVER_INIT( sb2003 )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x135800, 0x135803, 0, 0, sb2003_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x135800, 0x135803, 0, 0, sb2003_speedup_r );
 }
 
 static DRIVER_INIT( spotty )
@@ -867,7 +867,7 @@ static DRIVER_INIT( spotty )
 		dst[x+2] = (src[x+1]&0x0f) >> 0;
 	}
 
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6626c, 0x6626f, 0, 0, spotty_speedup_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6626c, 0x6626f, 0, 0, spotty_speedup_r );
 }
 
 GAME( 2000, dynabomb, 0,      limenko, sb2003,   dynabomb, ROT0, "Limenko", "Dynamite Bomber (Korea, Rev 1.5)",   GAME_NO_SOUND )

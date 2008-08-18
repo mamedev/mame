@@ -1800,15 +1800,15 @@ static DRIVER_INIT( jogakuen )
 	/* it seems that Mahjong Jogakuen runs on the same board as the others,
        but with just these two addresses swapped. Instead of creating a new
        MachineDriver, I just fix them here. */
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8007, 0x8007, 0, 0, pteacher_blitter_bank_w);
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8005, 0x8005, 0, 0, pteacher_gfx_bank_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8007, 0x8007, 0, 0, pteacher_blitter_bank_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8005, 0x8005, 0, 0, pteacher_gfx_bank_w);
 }
 
 static DRIVER_INIT( mjikaga )
 {
 	/* Mahjong Ikagadesuka is different as well. */
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7802, 0x7802, 0, 0, pteacher_snd_r);
-	memory_install_write_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0123, 0x0123, 0, 0, pteacher_snd_answer_w);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7802, 0x7802, 0, 0, pteacher_snd_r);
+	memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0123, 0x0123, 0, 0, pteacher_snd_answer_w);
 }
 
 static DRIVER_INIT( reikaids )

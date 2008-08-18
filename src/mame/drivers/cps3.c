@@ -3034,7 +3034,7 @@ static DRIVER_INIT( cps3_speedups )
 		cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
 		cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, cps3_speedup_code_address);
 
-		memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, cps3_speedup_ram_address+0x02000000, cps3_speedup_ram_address+0x02000003, 0, 0, cps3_speedup_r );
+		memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, cps3_speedup_ram_address+0x02000000, cps3_speedup_ram_address+0x02000003, 0, 0, cps3_speedup_r );
 	}
 }
 

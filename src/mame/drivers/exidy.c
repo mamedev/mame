@@ -1371,7 +1371,7 @@ static DRIVER_INIT( phantoma )
 	exidy_color_latch[0] = 0x09;
 
 	/* the ROM is actually mapped high */
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, SMH_BANK1);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xffff, 0, 0, SMH_BANK1);
 	memory_set_bankptr(1, memory_region(machine, "main") + 0xf800);
 }
 

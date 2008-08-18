@@ -156,8 +156,8 @@ static READ16_HANDLER( aladbl_r )
 static DRIVER_INIT( aladbl )
 {
 	// 220000 = writes to mcu? 330000 = reads?
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x220000, 0x220001, 0, 0, aladbl_w);
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x330000, 0x330001, 0, 0, aladbl_r);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x220000, 0x220001, 0, 0, aladbl_w);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x330000, 0x330001, 0, 0, aladbl_r);
 	DRIVER_INIT_CALL(megadrij);
 }
 

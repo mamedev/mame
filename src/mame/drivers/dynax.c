@@ -5609,7 +5609,7 @@ ROM_END
 
 static DRIVER_INIT( mjreach )
 {
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x10060, 0x10060, 0, 0, yarunara_flipscreen_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x10060, 0x10060, 0, 0, yarunara_flipscreen_w);
 }
 
 /***************************************************************************

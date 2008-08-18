@@ -4612,8 +4612,8 @@ static DRIVER_INIT( bjtwin )
 static READ16_HANDLER( vandykeb_r ) { return 0x0000; }
 static DRIVER_INIT (vandykeb)
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x08000e, 0x08000f, 0, 0, vandykeb_r );
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x08001e, 0x08001f, 0, 0, SMH_NOP );
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x08000e, 0x08000f, 0, 0, vandykeb_r );
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x08001e, 0x08001f, 0, 0, SMH_NOP );
 }
 
 

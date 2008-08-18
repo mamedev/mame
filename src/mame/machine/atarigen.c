@@ -548,7 +548,7 @@ void atarigen_slapstic_init(running_machine *machine, int cpunum, offs_t base, o
 		slapstic_init(machine, chipnum);
 
 		/* install the memory handlers */
-		atarigen_slapstic = memory_install_readwrite_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, base, base + 0x7fff, 0, mirror, atarigen_slapstic_r, atarigen_slapstic_w);
+		atarigen_slapstic = memory_install_readwrite16_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, base, base + 0x7fff, 0, mirror, atarigen_slapstic_r, atarigen_slapstic_w);
 
 		/* allocate memory for a copy of bank 0 */
 		atarigen_slapstic_bank0 = auto_malloc(0x2000);

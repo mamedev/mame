@@ -657,8 +657,8 @@ static DRIVER_INIT(vipercf)
 
 	DRIVER_INIT_CALL(viper);
 
-	memory_install_readwrite_device_handler( ide, 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff000fff, 0, 0, cf_card_data_r, cf_card_data_w );
-	memory_install_readwrite_device_handler( ide, 0, ADDRESS_SPACE_PROGRAM, 0xff200000, 0xff200fff, 0, 0, cf_card_r, cf_card_w );
+	memory_install_readwrite64_device_handler( ide, 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff000fff, 0, 0, cf_card_data_r, cf_card_data_w );
+	memory_install_readwrite64_device_handler( ide, 0, ADDRESS_SPACE_PROGRAM, 0xff200000, 0xff200fff, 0, 0, cf_card_r, cf_card_w );
 }
 
 static DRIVER_INIT(ppp2nd)

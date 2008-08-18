@@ -705,26 +705,26 @@ ROM_END
 
 static DRIVER_INIT( policetr )
 {
-	speedup_data = memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
+	speedup_data = memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
 	speedup_pc = 0x1fc028ac;
 }
 
 static DRIVER_INIT( plctr13b )
 {
-	speedup_data = memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
+	speedup_data = memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000fc8, 0x00000fcb, 0, 0, speedup_w);
 	speedup_pc = 0x1fc028bc;
 }
 
 
 static DRIVER_INIT( sshooter )
 {
-	speedup_data = memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
+	speedup_data = memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
 	speedup_pc = 0x1fc03470;
 }
 
 static DRIVER_INIT( sshoot12 )
 {
-	speedup_data = memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
+	speedup_data = memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00018fd8, 0x00018fdb, 0, 0, speedup_w);
 	speedup_pc = 0x1fc033e0;
 }
 

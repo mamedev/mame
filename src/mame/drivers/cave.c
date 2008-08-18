@@ -4104,7 +4104,7 @@ static DRIVER_INIT( agallet )
 	unpack_sprites(machine);
 
 //  Speed Hack
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb80000, 0xb80001, 0, 0, agallet_irq_cause_r);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb80000, 0xb80001, 0, 0, agallet_irq_cause_r);
 }
 
 static DRIVER_INIT( dfeveron )

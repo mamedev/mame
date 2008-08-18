@@ -576,12 +576,12 @@ static READ8_HANDLER( cyclej_r )
 
 static DRIVER_INIT( actfancr )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f0026, 0x1f0027, 0, 0, cycle_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f0026, 0x1f0027, 0, 0, cycle_r);
 }
 
 static DRIVER_INIT( actfancj )
 {
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f0026, 0x1f0027, 0, 0, cyclej_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f0026, 0x1f0027, 0, 0, cyclej_r);
 }
 
 

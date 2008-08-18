@@ -743,15 +743,15 @@ static DRIVER_INIT( pipedrm )
 	/* sprite RAM lives at the end of palette RAM */
 	spriteram = &paletteram[0xc00];
 	spriteram_size = 0x400;
-	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xcc00, 0xcfff, 0, 0, SMH_BANK3, SMH_BANK3);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xcc00, 0xcfff, 0, 0, SMH_BANK3, SMH_BANK3);
 	memory_set_bankptr(3, spriteram);
 }
 
 
 static DRIVER_INIT( hatris )
 {
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_IO, 0x20, 0x20, 0, 0, sound_command_nonmi_w);
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_IO, 0x21, 0x21, 0, 0, fromance_gfxreg_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x20, 0x20, 0, 0, sound_command_nonmi_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x21, 0x21, 0, 0, fromance_gfxreg_w);
 }
 
 

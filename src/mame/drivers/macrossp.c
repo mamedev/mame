@@ -752,7 +752,7 @@ PC :00018110 018110: beq     18104
 
 static DRIVER_INIT( macrossp )
 {
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf10158, 0xf1015b, 0, 0, macrossp_speedup_w );
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf10158, 0xf1015b, 0, 0, macrossp_speedup_w );
 }
 
 static DRIVER_INIT( quizmoon )

@@ -993,11 +993,11 @@ static WRITE16_HANDLER( vbl_toggle_w )
 
 static void mcu_init( running_machine *machine )
 {
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x20008a, 0x20008b, 0, 0, twrldc94_mcu_w);
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x20008a, 0x20008b, 0, 0, twrldc94_mcu_r);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x20008a, 0x20008b, 0, 0, twrldc94_mcu_w);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x20008a, 0x20008b, 0, 0, twrldc94_mcu_r);
 
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x20008e, 0x20008f, 0, 0, twrldc94_prot_reg_w);
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x20008e, 0x20008f, 0, 0, twrldc94_prot_reg_r);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x20008e, 0x20008f, 0, 0, twrldc94_prot_reg_w);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x20008e, 0x20008f, 0, 0, twrldc94_prot_reg_r);
 }
 
 static DRIVER_INIT( twrldc94 )
@@ -1017,8 +1017,8 @@ static DRIVER_INIT( vgoalsoc )
 	gametype = 3;
 	mcu_init( machine );
 
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200090, 0x200091, 0, 0, vbl_toggle_w); // vblank toggle
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200090, 0x200091, 0, 0, vbl_toggle_r);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200090, 0x200091, 0, 0, vbl_toggle_w); // vblank toggle
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200090, 0x200091, 0, 0, vbl_toggle_r);
 }
 
 /*** GAME DRIVERS ************************************************************/

@@ -54,18 +54,18 @@ static WRITE8_HANDLER( chqflag_bankswitch_w )
 	/* bit 5 = memory bank select */
 	if (data & 0x20)
 	{
-		memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1fff, 0, 0, SMH_BANK5, paletteram_xBBBBBGGGGGRRRRR_be_w);
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1fff, 0, 0, SMH_BANK5, paletteram_xBBBBBGGGGGRRRRR_be_w);
 		memory_set_bankptr(5, paletteram);
 
 		if (K051316_readroms)
-			memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x17ff, 0, 0, K051316_rom_0_r, K051316_0_w);	/* 051316 #1 (ROM test) */
+			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x17ff, 0, 0, K051316_rom_0_r, K051316_0_w);	/* 051316 #1 (ROM test) */
 		else
-			memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x17ff, 0, 0, K051316_0_r, K051316_0_w);		/* 051316 #1 */
+			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x17ff, 0, 0, K051316_0_r, K051316_0_w);		/* 051316 #1 */
 	}
 	else
 	{
-		memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x17ff, 0, 0, SMH_BANK1, SMH_BANK1);				/* RAM */
-		memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1fff, 0, 0, SMH_BANK2, SMH_BANK2);				/* RAM */
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x17ff, 0, 0, SMH_BANK1, SMH_BANK1);				/* RAM */
+		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1800, 0x1fff, 0, 0, SMH_BANK2, SMH_BANK2);				/* RAM */
 	}
 
 	/* other bits unknown/unused */
@@ -82,9 +82,9 @@ static WRITE8_HANDLER( chqflag_vreg_w )
 	/* bit 4 = enable rom reading thru K051316 #1 & #2 */
 	K051316_readroms = (data & 0x10);
 	if (K051316_readroms)
-		memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2800, 0x2fff, 0, 0, K051316_rom_1_r);	/* 051316 (ROM test) */
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2800, 0x2fff, 0, 0, K051316_rom_1_r);	/* 051316 (ROM test) */
 	else
-		memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2800, 0x2fff, 0, 0, K051316_1_r);		/* 051316 */
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2800, 0x2fff, 0, 0, K051316_1_r);		/* 051316 */
 
 	/* Bits 3-7 probably control palette dimming in a similar way to TMNT2/Saunset Riders, */
 	/* however I don't have enough evidence to determine the exact behaviour. */

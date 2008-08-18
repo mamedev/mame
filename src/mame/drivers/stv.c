@@ -2354,10 +2354,10 @@ DRIVER_INIT ( stv )
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	/* debug .. watch the command buffer rsgun, cottonbm etc. appear to use to communicate between cpus */
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc44, 0x60ffc47, 0, 0, w60ffc44_write );
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc48, 0x60ffc4b, 0, 0, w60ffc48_write );
-	memory_install_write_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x60ffc44, 0x60ffc47, 0, 0, w60ffc44_write );
-	memory_install_write_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x60ffc48, 0x60ffc4b, 0, 0, w60ffc48_write );
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc44, 0x60ffc47, 0, 0, w60ffc44_write );
+	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc48, 0x60ffc4b, 0, 0, w60ffc48_write );
+	memory_install_write32_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x60ffc44, 0x60ffc47, 0, 0, w60ffc44_write );
+	memory_install_write32_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x60ffc48, 0x60ffc4b, 0, 0, w60ffc48_write );
 
   	smpc_ram[0x23] = DectoBCD(systime.local_time.year /100);
     smpc_ram[0x25] = DectoBCD(systime.local_time.year %100);

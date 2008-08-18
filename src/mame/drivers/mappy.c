@@ -2127,7 +2127,7 @@ static DRIVER_INIT( grobda )
        However, removing the 15XX from the board causes sound to disappear completely, so
        the DAC might be built-in after all.
       */
-	memory_install_write_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0002, 0x0002, 0, 0, grobda_DAC_w );
+	memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0002, 0x0002, 0, 0, grobda_DAC_w );
 
 	DRIVER_INIT_CALL(58_56);
 }
@@ -2135,7 +2135,7 @@ static DRIVER_INIT( grobda )
 static DRIVER_INIT( digdug2 )
 {
 	/* appears to not use the watchdog */
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8000, 0, 0, SMH_NOP);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x8000, 0, 0, SMH_NOP);
 	DRIVER_INIT_CALL(58_56);
 }
 

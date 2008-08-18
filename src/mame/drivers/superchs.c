@@ -503,8 +503,8 @@ static READ16_HANDLER( sub_cycle_r )
 static DRIVER_INIT( superchs )
 {
 	/* Speedup handlers */
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x100003, 0, 0, main_cycle_r);
-	memory_install_read_handler(machine, 2, ADDRESS_SPACE_PROGRAM, 0x80000a, 0x80000b, 0, 0, sub_cycle_r);
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x100003, 0, 0, main_cycle_r);
+	memory_install_read16_handler(machine, 2, ADDRESS_SPACE_PROGRAM, 0x80000a, 0x80000b, 0, 0, sub_cycle_r);
 }
 
 GAME( 1992, superchs, 0, superchs, superchs, superchs, ROT0, "Taito America Corporation", "Super Chase - Criminal Termination (US)", 0 )

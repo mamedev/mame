@@ -4977,19 +4977,19 @@ static READ16_HANDLER( mcuc74_speedup_r )
 
 static void install_c74_speedup(running_machine *machine)
 {
-	memory_install_readwrite_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x80, 0x81, 0, 0, mcuc74_speedup_r, mcu_speedup_w);
+	memory_install_readwrite16_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x80, 0x81, 0, 0, mcuc74_speedup_r, mcu_speedup_w);
 }
 
 static void install_130_speedup(running_machine *machine)
 {
 	// install speedup cheat for 1.30 MCU BIOS
-	memory_install_readwrite_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu130_speedup_r, mcu_speedup_w);
+	memory_install_readwrite16_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu130_speedup_r, mcu_speedup_w);
 }
 
 static void install_141_speedup(running_machine *machine)
 {
 	// install speedup cheat for 1.41 MCU BIOS
-	memory_install_readwrite_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu141_speedup_r, mcu_speedup_w);
+	memory_install_readwrite16_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x82, 0x83, 0, 0, mcu141_speedup_r, mcu_speedup_w);
 }
 
 static void namcos22_init( enum namcos22_gametype game_type )
@@ -5008,7 +5008,7 @@ static DRIVER_INIT( alpiner )
 {
 	namcos22s_init(NAMCOS22_ALPINE_RACER);
 
-	memory_install_read_handler(machine, 3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
+	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
 
 	install_130_speedup(machine);
 }
@@ -5017,7 +5017,7 @@ static DRIVER_INIT( alpiner2 )
 {
 	namcos22s_init(NAMCOS22_ALPINE_RACER_2);
 
-	memory_install_read_handler(machine, 3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
+	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
 
 	install_130_speedup(machine);
 }
@@ -5026,7 +5026,7 @@ static DRIVER_INIT( alpinesa )
 {
 	namcos22s_init(NAMCOS22_ALPINE_SURFER);
 
-	memory_install_read_handler(machine, 3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
+	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, alpineracer_mcu_adc_r);
 
 	install_141_speedup(machine);
 }
@@ -5035,7 +5035,7 @@ static DRIVER_INIT( airco22 )
 {
 	namcos22s_init(NAMCOS22_AIR_COMBAT22);
 
-	memory_install_read_handler(machine, 3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, airco22_mcu_adc_r);
+	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, airco22_mcu_adc_r);
 }
 
 static DRIVER_INIT( propcycl )
@@ -5059,7 +5059,7 @@ static DRIVER_INIT( propcycl )
 
 	namcos22s_init(NAMCOS22_PROP_CYCLE);
 
-	memory_install_read_handler(machine, 3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, propcycle_mcu_adc_r);
+	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, propcycle_mcu_adc_r);
 
 	install_141_speedup(machine);
 }
@@ -5140,7 +5140,7 @@ static DRIVER_INIT( cybrcyc )
 
 	namcos22s_init(NAMCOS22_CYBER_CYCLES);
 
-	memory_install_read_handler(machine, 3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, cybrcycc_mcu_adc_r);
+	memory_install_read8_handler(machine, 3, ADDRESS_SPACE_IO, M37710_ADC0_L, M37710_ADC7_H, 0, 0, cybrcycc_mcu_adc_r);
 
 	install_130_speedup(machine);
 }

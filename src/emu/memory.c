@@ -1502,57 +1502,46 @@ int memory_get_log_unmap(int spacenum)
     X-bit case
 -------------------------------------------------*/
 
-void *_memory_install_handler(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *rhandler, genf *whandler, const char *rhandler_name, const char *whandler_name)
+UINT8 *_memory_install_handler8(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_machine_func rhandler, write8_machine_func whandler, const char *rhandler_name, const char *whandler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	if (rhandler != 0)
-		space_map_range(space, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, rhandler, machine, rhandler_name);
-	if (whandler != 0)
-		space_map_range(space, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, whandler, machine, whandler_name);
+	if (rhandler != NULL)
+		space_map_range(space, ROW_READ, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, machine, rhandler_name);
+	if (whandler != NULL)
+		space_map_range(space, ROW_WRITE, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, machine, whandler_name);
 	mem_dump();
 	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
-UINT8 *_memory_install_handler8(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_machine_func rhandler, write8_machine_func whandler, const char *rhandler_name, const char *whandler_name, int unitmask)
+UINT16 *_memory_install_handler16(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_machine_func rhandler, write16_machine_func whandler, const char *rhandler_name, const char *whandler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	if (rhandler != NULL)
-		space_map_range(space, ROW_READ, 8, unitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, machine, rhandler_name);
+		space_map_range(space, ROW_READ, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, machine, rhandler_name);
 	if (whandler != NULL)
-		space_map_range(space, ROW_WRITE, 8, unitmask, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, machine, whandler_name);
+		space_map_range(space, ROW_WRITE, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, machine, whandler_name);
 	mem_dump();
 	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
-UINT16 *_memory_install_handler16(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_machine_func rhandler, write16_machine_func whandler, const char *rhandler_name, const char *whandler_name, int unitmask)
+UINT32 *_memory_install_handler32(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_machine_func rhandler, write32_machine_func whandler, const char *rhandler_name, const char *whandler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	if (rhandler != NULL)
-		space_map_range(space, ROW_READ, 16, unitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, machine, rhandler_name);
+		space_map_range(space, ROW_READ, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, machine, rhandler_name);
 	if (whandler != NULL)
-		space_map_range(space, ROW_WRITE, 16, unitmask, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, machine, whandler_name);
+		space_map_range(space, ROW_WRITE, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, machine, whandler_name);
 	mem_dump();
 	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
-UINT32 *_memory_install_handler32(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_machine_func rhandler, write32_machine_func whandler, const char *rhandler_name, const char *whandler_name, int unitmask)
+UINT64 *_memory_install_handler64(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_machine_func rhandler, write64_machine_func whandler, const char *rhandler_name, const char *whandler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	if (rhandler != NULL)
-		space_map_range(space, ROW_READ, 32, unitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, machine, rhandler_name);
+		space_map_range(space, ROW_READ, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, machine, rhandler_name);
 	if (whandler != NULL)
-		space_map_range(space, ROW_WRITE, 32, unitmask, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, machine, whandler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-UINT64 *_memory_install_handler64(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_machine_func rhandler, write64_machine_func whandler, const char *rhandler_name, const char *whandler_name, int unitmask)
-{
-	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	if (rhandler != NULL)
-		space_map_range(space, ROW_READ, 64, unitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, machine, rhandler_name);
-	if (whandler != NULL)
-		space_map_range(space, ROW_WRITE, 64, unitmask, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, machine, whandler_name);
+		space_map_range(space, ROW_WRITE, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, machine, whandler_name);
 	mem_dump();
 	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
@@ -1564,57 +1553,46 @@ UINT64 *_memory_install_handler64(running_machine *machine, int cpunum, int spac
     for X-bit case
 -------------------------------------------------*/
 
-void *_memory_install_device_handler(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *rhandler, genf *whandler, const char *rhandler_name, const char *whandler_name)
+UINT8 *_memory_install_device_handler8(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, write8_device_func whandler, const char *rhandler_name, const char *whandler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	if (rhandler != 0)
-		space_map_range(space, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, rhandler, (void *)device, rhandler_name);
-	if (whandler != 0)
-		space_map_range(space, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, whandler, (void *)device, whandler_name);
+	if (rhandler != NULL)
+		space_map_range(space, ROW_READ, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
+	if (whandler != NULL)
+		space_map_range(space, ROW_WRITE, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
 	mem_dump();
 	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
-UINT8 *_memory_install_device_handler8(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, write8_device_func whandler, const char *rhandler_name, const char *whandler_name, int unitmask)
+UINT16 *_memory_install_device_handler16(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, write16_device_func whandler, const char *rhandler_name, const char *whandler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	if (rhandler != NULL)
-		space_map_range(space, ROW_READ, 8, unitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
+		space_map_range(space, ROW_READ, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
 	if (whandler != NULL)
-		space_map_range(space, ROW_WRITE, 8, unitmask, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
+		space_map_range(space, ROW_WRITE, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
 	mem_dump();
 	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
-UINT16 *_memory_install_device_handler16(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, write16_device_func whandler, const char *rhandler_name, const char *whandler_name, int unitmask)
+UINT32 *_memory_install_device_handler32(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, write32_device_func whandler, const char *rhandler_name, const char *whandler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	if (rhandler != NULL)
-		space_map_range(space, ROW_READ, 16, unitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
+		space_map_range(space, ROW_READ, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
 	if (whandler != NULL)
-		space_map_range(space, ROW_WRITE, 16, unitmask, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
+		space_map_range(space, ROW_WRITE, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
 	mem_dump();
 	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
-UINT32 *_memory_install_device_handler32(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, write32_device_func whandler, const char *rhandler_name, const char *whandler_name, int unitmask)
+UINT64 *_memory_install_device_handler64(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, write64_device_func whandler, const char *rhandler_name, const char *whandler_name)
 {
 	addrspace_data *space = &cpudata[cpunum].space[spacenum];
 	if (rhandler != NULL)
-		space_map_range(space, ROW_READ, 32, unitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
+		space_map_range(space, ROW_READ, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
 	if (whandler != NULL)
-		space_map_range(space, ROW_WRITE, 32, unitmask, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-UINT64 *_memory_install_device_handler64(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, write64_device_func whandler, const char *rhandler_name, const char *whandler_name, int unitmask)
-{
-	addrspace_data *space = &cpudata[cpunum].space[spacenum];
-	if (rhandler != NULL)
-		space_map_range(space, ROW_READ, 64, unitmask, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
-	if (whandler != NULL)
-		space_map_range(space, ROW_WRITE, 64, unitmask, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
+		space_map_range(space, ROW_WRITE, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
 	mem_dump();
 	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }

@@ -327,7 +327,7 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 	if (LOG_MEMORY_MAP) mame_printf_debug("----\nRemapping:\n");
 
 	/* first reset everything back to the beginning */
-	memory_install_readwrite_handler(machine, mame_find_cpu_index(machine, chip->cpu), ADDRESS_SPACE_PROGRAM, 0x000000, 0xffffff, 0, 0, segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w);
+	memory_install_readwrite16_handler(machine, mame_find_cpu_index(machine, chip->cpu), ADDRESS_SPACE_PROGRAM, 0x000000, 0xffffff, 0, 0, segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w);
 
 	/* loop over the regions */
 	for (rgnum = 0; chip->map[rgnum].regbase != 0; rgnum++)
@@ -361,9 +361,9 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 
 		/* map it */
 		if (read)
-			memory_install_read_handler(machine, mame_find_cpu_index(machine, chip->cpu), ADDRESS_SPACE_PROGRAM, region_start, region_end, 0, region_mirror, read);
+			memory_install_read16_handler(machine, mame_find_cpu_index(machine, chip->cpu), ADDRESS_SPACE_PROGRAM, region_start, region_end, 0, region_mirror, read);
 		if (write)
-			memory_install_write_handler(machine, mame_find_cpu_index(machine, chip->cpu), ADDRESS_SPACE_PROGRAM, region_start, region_end, 0, region_mirror, write);
+			memory_install_write16_handler(machine, mame_find_cpu_index(machine, chip->cpu), ADDRESS_SPACE_PROGRAM, region_start, region_end, 0, region_mirror, write);
 
 		/* set the bank pointer */
 		if (banknum && read)

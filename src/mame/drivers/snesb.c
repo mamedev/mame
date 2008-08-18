@@ -428,7 +428,7 @@ static DRIVER_INIT(kinstb)
 	}
 
 	shared_ram=auto_malloc(0x100);
-	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x781000, 0x7810ff, 0, 0, sharedram_r, sharedram_w);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x781000, 0x7810ff, 0, 0, sharedram_r, sharedram_w);
 
 	DRIVER_INIT_CALL(snes_hirom);
 }
@@ -470,7 +470,7 @@ DRIVER_INIT( ffight2b )
 	rom[0x7ffc]=0x54;
 
 	ffight2b_coins=0;
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7eadce, 0x7eadce, 0, 0, ffight2b_coin_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7eadce, 0x7eadce, 0, 0, ffight2b_coin_r);
 
 	DRIVER_INIT_CALL(snes);
 }

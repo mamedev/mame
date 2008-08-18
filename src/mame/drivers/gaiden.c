@@ -1384,8 +1384,8 @@ static DRIVER_INIT( wildfang )
 	/* sprite size Y = sprite size X */
 	gaiden_sprite_sizey = 0;
 
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x07a006, 0x07a007, 0, 0, wildfang_protection_r);
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x07a804, 0x07a805, 0, 0, wildfang_protection_w);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x07a006, 0x07a007, 0, 0, wildfang_protection_r);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x07a804, 0x07a805, 0, 0, wildfang_protection_w);
 }
 
 static DRIVER_INIT( raiga )
@@ -1393,8 +1393,8 @@ static DRIVER_INIT( raiga )
 	/* sprite size Y independent from sprite size X */
 	gaiden_sprite_sizey = 2;
 
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x07a006, 0x07a007, 0, 0, raiga_protection_r);
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x07a804, 0x07a805, 0, 0, raiga_protection_w);
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x07a006, 0x07a007, 0, 0, raiga_protection_r);
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x07a804, 0x07a805, 0, 0, raiga_protection_w);
 }
 
 static DRIVER_INIT( drgnbowl )

@@ -1254,15 +1254,15 @@ static void mips_update_scratchpad( running_machine *machine )
 
 	if( ( mipscpu.biu & BIU_RAM ) == 0 )
 	{
-		memory_install_readwrite_handler( machine, cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r, psx_berr_w );
+		memory_install_readwrite32_handler( machine, cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r, psx_berr_w );
 	}
 	else if( ( mipscpu.biu & BIU_DS ) == 0 )
 	{
-		memory_install_readwrite_handler( machine, cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r, SMH_NOP );
+		memory_install_readwrite32_handler( machine, cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r, SMH_NOP );
 	}
 	else
 	{
-		memory_install_readwrite_handler( machine, cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, SMH_BANK32, SMH_BANK32 );
+		memory_install_readwrite32_handler( machine, cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, SMH_BANK32, SMH_BANK32 );
 
 		memory_set_bankptr( 32, mipscpu.dcache );
 	}

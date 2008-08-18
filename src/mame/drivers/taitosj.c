@@ -2700,27 +2700,27 @@ ROM_END
 static DRIVER_INIT( spacecr )
 {
 	/* install protection handler */
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd48b, 0xd48b, 0, 0, spacecr_prot_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd48b, 0xd48b, 0, 0, spacecr_prot_r);
 }
 
 static DRIVER_INIT( alpine )
 {
 	/* install protection handlers */
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd40b, 0xd40b, 0, 0, alpine_port_2_r);
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd50f, 0xd50f, 0, 0, alpine_protection_w);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd40b, 0xd40b, 0, 0, alpine_port_2_r);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd50f, 0xd50f, 0, 0, alpine_protection_w);
 }
 
 static DRIVER_INIT( alpinea )
 {
 	/* install protection handlers */
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd40b, 0xd40b, 0, 0, alpine_port_2_r);
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd50e, 0xd50e, 0, 0, alpinea_bankswitch_w);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd40b, 0xd40b, 0, 0, alpine_port_2_r);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd50e, 0xd50e, 0, 0, alpinea_bankswitch_w);
 }
 
 static DRIVER_INIT( junglhbr )
 {
 	/* inverter on bits 0 and 1 */
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, junglhbr_characterram_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0xbfff, 0, 0, junglhbr_characterram_w);
 }
 
 static DRIVER_INIT( kikstart )

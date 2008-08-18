@@ -802,13 +802,13 @@ static WRITE8_HANDLER( analog_select_w )
 
 static DRIVER_INIT( bradley )
 {
-	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400, 0x7ff, 0, 0, SMH_BANK1, SMH_BANK1);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400, 0x7ff, 0, 0, SMH_BANK1, SMH_BANK1);
 	memory_set_bankptr(1, auto_malloc(0x400));
 
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1808, 0x1808, 0, 0, input_port_read_handler8(machine->portconfig, "1808"));
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1809, 0x1809, 0, 0, input_port_read_handler8(machine->portconfig, "1809"));
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x180a, 0x180a, 0, 0, analog_data_r);
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1848, 0x1850, 0, 0, analog_select_w);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1808, 0x1808, 0, 0, input_port_read_handler8(machine->portconfig, "1808"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1809, 0x1809, 0, 0, input_port_read_handler8(machine->portconfig, "1809"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x180a, 0x180a, 0, 0, analog_data_r);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1848, 0x1850, 0, 0, analog_select_w);
 }
 
 

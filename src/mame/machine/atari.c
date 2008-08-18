@@ -145,7 +145,7 @@ void a600xl_mmu(running_machine *machine, UINT8 new_mmu)
 		rbank2 = SMH_BANK2;
 		wbank2 = SMH_UNMAP;
 	}
-	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
 	if (rbank2 == SMH_BANK2)
 		memory_set_bankptr(2, memory_region(machine, "main")+0x5000);
 }
@@ -177,8 +177,8 @@ void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 		wbank4 = SMH_BANK4;
 		base4 = memory_region(machine, "main")+0x0d800;  /* 4K RAM + 8K RAM */
 	}
-	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, rbank3, wbank3);
-	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd800, 0xffff, 0, 0, rbank4, wbank4);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, rbank3, wbank3);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd800, 0xffff, 0, 0, rbank4, wbank4);
 	memory_set_bankptr(3, base3);
 	memory_set_bankptr(4, base4);
 
@@ -197,7 +197,7 @@ void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 		wbank1 = SMH_UNMAP;
 		base1 = memory_region(machine, "main")+0x10000;  /* 8K BASIC */
 	}
-	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, rbank1, wbank1);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xbfff, 0, 0, rbank1, wbank1);
 	memory_set_bankptr(1, base1);
 
 	/* check if self-test ROM changed */
@@ -215,7 +215,7 @@ void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 		wbank2 = SMH_UNMAP;
 		base2 = memory_region(machine, "main")+0x15000;  /* 0x0800 bytes */
 	}
-	memory_install_readwrite_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
+	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5000, 0x57ff, 0, 0, rbank2, wbank2);
 	memory_set_bankptr(2, base2);
 }
 
@@ -633,9 +633,9 @@ DRIVER_INIT( atari )
 
 	/* install RAM */
 	ram_top = MIN(mess_ram_size, ram_size) - 1;
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 		0x0000, ram_top, 0, 0, SMH_BANK2);
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 		0x0000, ram_top, 0, 0, SMH_BANK2);
 	memory_set_bankptr(2, mess_ram);
 }
@@ -677,9 +677,9 @@ static void a800_setbank(running_machine *machine, int n)
 			break;
 	}
 
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0,
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0,
 		read_addr ? SMH_BANK1 : SMH_NOP);
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0,
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0,
 		write_addr ? SMH_BANK1 : SMH_NOP);
 	if (read_addr)
 		memory_set_bankptr(1, read_addr);
@@ -785,9 +785,9 @@ static void atari_machine_start(running_machine *machine, int type, const pia682
 
 		/* install RAM */
 		ram_top = MIN(mess_ram_size, ram_size) - 1;
-		memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 			0x0000, ram_top, 0, 0, SMH_BANK2);
-		memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
+		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM,
 			0x0000, ram_top, 0, 0, SMH_BANK2);
 		memory_set_bankptr(2, mess_ram);
 	}

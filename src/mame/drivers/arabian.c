@@ -425,8 +425,8 @@ ROM_END
 
 static DRIVER_INIT( arabian )
 {
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd34b, 0xd34b, 0, 0, custom_flip_w);
-	memory_install_write_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd400, 0xd401, 0, 0, custom_cocktail_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd34b, 0xd34b, 0, 0, custom_flip_w);
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xd400, 0xd401, 0, 0, custom_cocktail_w);
 }
 
 

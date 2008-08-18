@@ -1004,14 +1004,14 @@ static DRIVER_INIT (megaplay)
 	megplay_stat(machine);
 
 	/* for now ... */
-	memory_install_readwrite_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0xa10000, 0xa1001f, 0, 0, OLD_megaplay_genesis_io_r, OLD_megaplay_genesis_io_w);
+	memory_install_readwrite16_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0xa10000, 0xa1001f, 0, 0, OLD_megaplay_genesis_io_r, OLD_megaplay_genesis_io_w);
 
 	/* megaplay has ram shared with the bios cpu here */
-	memory_install_readwrite_handler(machine, 1,  ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_BANK7, SMH_BANK7);
+	memory_install_readwrite8_handler(machine, 1,  ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_BANK7, SMH_BANK7);
 	memory_set_bankptr(7, &ic36_ram[0]);
 
 	/* instead of a RAM mirror the 68k sees the extra ram of the 2nd z80 too */
-	memory_install_readwrite_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0xa02000, 0xa03fff, 0, 0, megadriv_68k_read_z80_extra_ram, megadriv_68k_write_z80_extra_ram);
+	memory_install_readwrite16_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0xa02000, 0xa03fff, 0, 0, megadriv_68k_read_z80_extra_ram, megadriv_68k_write_z80_extra_ram);
 }
 
 /*

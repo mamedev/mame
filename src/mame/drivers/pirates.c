@@ -486,7 +486,7 @@ static DRIVER_INIT( genix )
 
 	/* If this value is increased then something has gone wrong and the protection failed */
 	/* Write-protect it for now */
-	memory_install_read_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x109e98, 0x109e9b, 0, 0, genix_prot_r );
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x109e98, 0x109e9b, 0, 0, genix_prot_r );
 }
 
 
