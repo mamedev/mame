@@ -74,11 +74,11 @@ Street Fighter II' Champion Edition         1992  91635B-2  S9263B    BPRG1  IOB
   (alt B-board revision - Japan)                  91634B-2  S9263B    BPRG1  IOB1
 Varth (World)                               1992  89624B-3  VA24B            IOB1  88622-C-5  CPS-B-04  DL-0411-10005  None
   (alt B-board revision - US)                     ?         VA63B?           ?
-Varth (Japan)*                                    ?         VA22B?           ?     ?          CPS-B-21  DL-0921-10014  ?
+Varth (Japan)*                                    88622B-3  VA22B            LWIO  92641C-1   CPS-B-21  DL-0921-10014        IOC1
 Capcom World 2*                             1992  ?         Q522B            IOB1  ?          CPS-B-21  DL-0921-10014        IOC1
 Quiz and Dragons (US)*                      1992  89625B-1  QD22B            IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
-Quiz and Dragons (Japan)*                   1994  ?         ?                IOB1  ?          CPS-B-21  DL-0921-10014        IOC1
-Warriors of Fate*                           1992  ?         TK263B    BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
+Quiz and Dragons (Japan)                    1994  ?         ?                IOB1  ?          CPS-B-21  DL-0921-10014        IOC1
+Warriors of Fate*                           1992  91634B-2  TK263B    BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
 Street Fighter II Turbo Hyper Fighting      1992  91635B-2  S9263B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
 Cadillacs and Dinosaurs*                    1993  ?         CD63B     BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
 Punisher*                                   1993  91635B-2  PS63B     BPRG1  IOB1  92641C-1   CPS-B-21  DL-0921-10014        IOC1
@@ -987,6 +987,23 @@ static const struct gfx_range mapper_S9263B_table[] =
 };
 
 
+// VA22B and VA63B are equivalent, but since we could dump both PALs we are
+// documenting both.
+
+#define mapper_VA22B	{ 0x4000, 0x4000, 0, 0 }, mapper_VA22B_table
+static const struct gfx_range mapper_VA22B_table[] =
+{
+	// verified from PAL dump:
+	// bank 0 = pin 19 (ROMs 1,5, 9,13,17,24,32,38)
+	// bank 1 = pin 16 (ROMs 2,6,10,14,18,25,33,39)
+	// pin 12 and pin 14 are never enabled
+
+	/* type                                                                  start    end      bank */
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x00000, 0x03fff, 0 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x04000, 0x07fff, 1 },
+	{ 0 }
+};
+
 #define mapper_VA63B	{ 0x8000, 0, 0, 0 }, mapper_VA63B_table
 static const struct gfx_range mapper_VA63B_table[] =
 {
@@ -994,11 +1011,8 @@ static const struct gfx_range mapper_VA63B_table[] =
 	// bank0 = pin 19 (ROMs 1,3) & pin 18 (ROMs 2,4)
 	// pins 12,13,14,15,16,17 are never enabled
 
-	/* type            start   end     bank */
-	{ GFXTYPE_SPRITES, 0x0000, 0x7fff, 0 },
-	{ GFXTYPE_SCROLL1, 0x0000, 0x7fff, 0 },
-	{ GFXTYPE_SCROLL2, 0x0000, 0x7fff, 0 },
-	{ GFXTYPE_SCROLL3, 0x0000, 0x7fff, 0 },
+	/* type                                                                  start    end      bank */
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x00000, 0x07fff, 0 },
 	{ 0 }
 };
 
@@ -1017,12 +1031,14 @@ static const struct gfx_range mapper_Q522B_table[] =
 #define mapper_TK263B	{ 0x8000, 0x8000, 0, 0 }, mapper_TK263B_table
 static const struct gfx_range mapper_TK263B_table[] =
 {
-	/* type                              start   end     bank */
-	{ GFXTYPE_SPRITES,                   0x0000, 0x7fff, 0 },
+	// verified from PAL dump:
+	// bank0 = pin 19 (ROMs 1,3) & pin 18 (ROMs 2,4)
+	// bank1 = pin 17 (ROMs 5,7) & pin 16 (ROMs 6,8)
+	// pins 12,13,14,15 are always enabled
 
-	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x8000, 0xcfff, 1 },
-	{ GFXTYPE_SCROLL1,                   0xd000, 0xdfff, 1 },
-	{ GFXTYPE_SCROLL3,                   0xe000, 0xffff, 1 },
+	/* type                                                                  start    end      bank */
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x00000, 0x07fff, 0 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x08000, 0x0ffff, 1 },
 	{ 0 }
 };
 
@@ -1110,16 +1126,17 @@ static const struct gfx_range mapper_qtono2_table[] =
 #define mapper_RCM63B	{ 0x8000, 0x8000, 0x8000, 0x8000 }, mapper_RCM63B_table
 static const struct gfx_range mapper_RCM63B_table[] =
 {
-	/* type                              start    end      bank */
-	{ GFXTYPE_SCROLL1,                   0x00000, 0x017ff, 0 },
-	{ GFXTYPE_SPRITES,                   0x01800, 0x07fff, 0 },
+	// verified from PAL dump:
+	// bank0 = pin 19 (ROMs 1,3) & pin 18 (ROMs 2,4)
+	// bank1 = pin 17 (ROMs 5,7) & pin 16 (ROMs 6,8)
+	// bank0 = pin 15 (ROMs 10,12) & pin 14 (ROMs 11,13)
+	// bank1 = pin 13 (ROMs 14,16) & pin 12 (ROMs 15,17)
 
-	{ GFXTYPE_SPRITES,                   0x08000, 0x0ffff, 1 },
-
-	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL2, 0x10000, 0x17fff, 2 },
-
-	{ GFXTYPE_SCROLL2,                   0x18000, 0x19fff, 3 },
-	{ GFXTYPE_SCROLL3,                   0x1a000, 0x1ffff, 3 },
+	/* type                                                                  start    end      bank */
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x00000, 0x07fff, 0 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x08000, 0x0ffff, 1 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x10000, 0x17fff, 2 },
+	{ GFXTYPE_SPRITES | GFXTYPE_SCROLL1 | GFXTYPE_SCROLL2 | GFXTYPE_SCROLL3, 0x18000, 0x1ffff, 3 },
 	{ 0 }
 };
 
@@ -1275,7 +1292,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"varth",    CPS_B_04,     mapper_VA63B },	/* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthr1",  CPS_B_04,     mapper_VA63B },	/* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
 	{"varthu",   CPS_B_04,     mapper_VA63B },	/* CPSB test has been patched out (60=0008) register is also written to, possibly leftover from development */
-	{"varthj",   CPS_B_21_BT5, mapper_VA63B },	/* CPSB test has been patched out (72=0001) register is also written to, possibly leftover from development */
+	{"varthj",   CPS_B_21_BT5, mapper_VA22B },	/* CPSB test has been patched out (72=0001) register is also written to, possibly leftover from development */
 	{"cworld2j", CPS_B_21_BT6, mapper_Q522B,  0x36, 0, 0x34 },	/* (ports 36, 34 probably leftover input code from another game) */
 	{"wof",      CPS_B_21_DEF, mapper_TK263B },	/* bootleg? */
 	{"wofa",     CPS_B_21_DEF, mapper_TK263B },	/* bootleg? */
