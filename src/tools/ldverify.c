@@ -22,7 +22,7 @@
     CONSTANTS
 ***************************************************************************/
 
-#define REPORT_BLANKS_THRESHOLD		8
+#define REPORT_BLANKS_THRESHOLD		50
 
 
 
@@ -523,9 +523,10 @@ static void verify_video(int frame, bitmap_t *bitmap)
 			}
 			video_num_blank_fields++;
 		}
-		else if (video_num_blank_fields >= REPORT_BLANKS_THRESHOLD)
+		else if (video_num_blank_fields > 0)
 		{
-			printf("%6d.%d-%6d.%d: blank frames for %d fields (INFO)\n", video_first_blank_frame, video_first_blank_field, frame, fieldnum, video_num_blank_fields);
+			if (video_num_blank_fields >= REPORT_BLANKS_THRESHOLD)
+				printf("%6d.%d-%6d.%d: blank frames for %d fields (INFO)\n", video_first_blank_frame, video_first_blank_field, frame, fieldnum, video_num_blank_fields);
 			video_first_blank_frame = video_first_blank_field = video_num_blank_fields = -1;
         }
 
