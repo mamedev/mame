@@ -380,7 +380,19 @@ READ8_DEVICE_HANDLER(duart68681_r)
 			if ( duart68681->duart_config->input_port_read != NULL )
 				r = duart68681->duart_config->input_port_read(duart68681->device);
 			else
-				r = 0x0;
+				{
+					r = 0xff;
+					/*
+					if (input_code_pressed(KEYCODE_1)) r ^= 0x0001;
+					if (input_code_pressed(KEYCODE_2)) r ^= 0x0002;
+					if (input_code_pressed(KEYCODE_3)) r ^= 0x0004;
+					if (input_code_pressed(KEYCODE_4)) r ^= 0x0008;
+					if (input_code_pressed(KEYCODE_5)) r ^= 0x0010;
+					if (input_code_pressed(KEYCODE_6)) r ^= 0x0020;
+					if (input_code_pressed(KEYCODE_7)) r ^= 0x0040;
+					if (input_code_pressed(KEYCODE_8)) r ^= 0x0080;
+					*/
+				}
 			break;
 		case 0x0e: /* Start counter command */
 			switch( (duart68681->ACR >> 4) & 0x07 )

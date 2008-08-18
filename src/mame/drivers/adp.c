@@ -222,13 +222,13 @@ static PALETTE_INIT( adp )
 
 static VIDEO_START(adp)
 {
-	// UINT32 i;
-	// UINT16 *prgrom = (UINT16*)memory_region(machine, "main");
+//	UINT32 i;
+//	UINT16 *prgrom = (UINT16*)memory_region(machine, "main");
 
 	HD63484_start();
 
-	// for (i = 0; i < 0x10; i++)
-	// 	HD63484_ram[0x80000 + i] = i;
+//	for (i = 0; i < 0x70000; i++)
+//	 	HD63484_ram[0x90000 + i] = prgrom[i];
 
 }
 
@@ -318,6 +318,36 @@ static READ16_HANDLER(test_r)
 	}
 }
 
+static READ16_HANDLER(test1_r)
+{
+	if (input_code_pressed(KEYCODE_Q)) return 0x0001;
+	if (input_code_pressed(KEYCODE_W)) return 0x0002;
+	if (input_code_pressed(KEYCODE_E)) return 0x0004;
+	if (input_code_pressed(KEYCODE_R)) return 0x0008;
+	if (input_code_pressed(KEYCODE_T)) return 0x0010;
+	if (input_code_pressed(KEYCODE_Y)) return 0x0020;
+	if (input_code_pressed(KEYCODE_U)) return 0x0040;
+	if (input_code_pressed(KEYCODE_I)) return 0x0080;
+	if (input_code_pressed(KEYCODE_A)) return 0x0100;
+	if (input_code_pressed(KEYCODE_S)) return 0x0200;
+	if (input_code_pressed(KEYCODE_D)) return 0x0400;
+	if (input_code_pressed(KEYCODE_F)) return 0x0800;
+	if (input_code_pressed(KEYCODE_G)) return 0x1000;
+	if (input_code_pressed(KEYCODE_H)) return 0x2000;
+	if (input_code_pressed(KEYCODE_J)) return 0x4000;
+	if (input_code_pressed(KEYCODE_K)) return 0x8000;
+
+	switch (mame_rand(machine) & 3)
+	{
+		case 0:
+			return 0;
+		case 1:
+			return 0xffff;
+		default:
+			return mame_rand(machine) % 0xffff;
+	}
+}
+
 static ADDRESS_MAP_START( skattv_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x4000ff) AM_READ(test_r) //18b too
@@ -325,7 +355,9 @@ static ADDRESS_MAP_START( skattv_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w)
 //	AM_RANGE(0x8000a0, 0x8000a1) AM_READ(handler2_r)
 //	AM_RANGE(0x8000a2, 0x8000a3) AM_READ(handler2_r)
-	AM_RANGE(0x800100, 0x80017f) AM_READ(test_r) //18b too
+//	AM_RANGE(0x800100, 0x80017f) AM_READ(test_r) //18b too
+	AM_RANGE(0x800100, 0x800101) AM_READ(test_r) //18b too
+	AM_RANGE(0x800140, 0x800141) AM_READ(test1_r) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8( DUART68681, "duart68681", duart68681_r, duart68681_w, 0xff )
 //	AM_RANGE(0xffd246, 0xffd247) AM_READ(handler3_r)
 //	AM_RANGE(0xffd248, 0xffd249) AM_READ(handler3_r)
