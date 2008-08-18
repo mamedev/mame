@@ -32,11 +32,6 @@ static emu_timer *serial_timer;
 static UINT8 serial_timer_active;
 static UINT16 input_select;
 
-static bitmap_t *amiga_bitmap;
-static render_texture *video_texture;
-static render_texture *overlay_texture;
-
-static void video_cleanup(running_machine *machine);
 static TIMER_CALLBACK( response_timer );
 
 
@@ -72,79 +67,12 @@ static int get_lightgun_pos(const device_config *screen, int player, int *x, int
 
 static VIDEO_START( alg )
 {
-	/* reset our globals */
-	video_texture = NULL;
-	overlay_texture = NULL;
-
-	/* configure for cleanup */
-	add_exit_callback(machine, video_cleanup);
-
-	/* allocate Amiga bitmap */
-	amiga_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-
 	/* standard video start */
 	VIDEO_START_CALL(amiga);
 
 	/* configure pen 4096 as transparent in the renderer and use it for the genlock color */
 	render_container_set_palette_alpha(render_container_get_screen(machine->primary_screen), 4096, 0x00);
 	amiga_set_genlock_color(4096);
-}
-
-
-static void video_cleanup(running_machine *machine)
-{
-	if (video_texture != NULL)
-		render_texture_free(video_texture);
-	if (overlay_texture != NULL)
-		render_texture_free(overlay_texture);
-}
-
-
-
-/*************************************
- *
- *  Video update
- *
- *************************************/
-
-static VIDEO_UPDATE( alg )
-{
-	int y;
-
-	/* update the Amiga video */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		amiga_render_scanline(screen->machine, amiga_bitmap, y);
-
-	/* at the end of the frame, composite the video */
-	if (!video_skip_this_frame() && (cliprect->max_y == video_screen_get_visible_area(screen)->max_y))
-	{
-		bitmap_t *vidbitmap;
-		rectangle fixedvis = *video_screen_get_visible_area(screen);
-		fixedvis.max_x++;
-		fixedvis.max_y++;
-
-		/* first lay down the video data */
-		laserdisc_get_video(laserdisc, &vidbitmap);
-		if (video_texture == NULL)
-			video_texture = render_texture_alloc(NULL, NULL);
-		render_texture_set_bitmap(video_texture, vidbitmap, NULL, 0, TEXFORMAT_YUY16);
-
-		/* then overlay the Amiga video */
-		if (overlay_texture == NULL)
-			overlay_texture = render_texture_alloc(NULL, NULL);
-		render_texture_set_bitmap(overlay_texture, amiga_bitmap, &fixedvis, 0, TEXFORMAT_PALETTEA16);
-
-		/* add both quads to the screen */
-		render_container_empty(render_container_get_screen(screen));
-		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
-		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
-
-		/* display disc information */
-		if (laserdisc != NULL)
-			popmessage("%s", laserdisc_describe_state(laserdisc));
-	}
-
-	return 0;
 }
 
 
@@ -473,21 +401,19 @@ static MACHINE_DRIVER_START( alg_r1 )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_LASERDISC_ADD("laserdisc", SONY_LDP1450)
+	MDRV_LASERDISC_OVERLAY(amiga, 512*2, 262, BITMAP_FORMAT_INDEXED16)
+	MDRV_LASERDISC_OVERLAY_CLIP((129-8)*2, (449+8-1)*2, 44-8, 244+8-1)
 
     /* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER)
-
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.97)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_REFRESH_RATE(59.997)
 	MDRV_SCREEN_SIZE(512*2, 262)
 	MDRV_SCREEN_VISIBLE_AREA((129-8)*2, (449+8-1)*2, 44-8, 244+8-1)
+
 	MDRV_PALETTE_LENGTH(4097)
 	MDRV_PALETTE_INIT(amiga)
 
 	MDRV_VIDEO_START(alg)
-	MDRV_VIDEO_UPDATE(alg)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")

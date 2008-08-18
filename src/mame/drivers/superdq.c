@@ -34,18 +34,6 @@ static UINT8 superdq_ld_out_latch;
 static tilemap *superdq_tilemap;
 static int superdq_color_bank = 0;
 
-static render_texture *video_texture;
-static render_texture *overlay_texture;
-static bitmap_t *last_video_bitmap;
-
-static void video_cleanup(running_machine *machine)
-{
-	if (video_texture != NULL)
-		render_texture_free(video_texture);
-	if (overlay_texture != NULL)
-		render_texture_free(overlay_texture);
-}
-
 static TILE_GET_INFO( get_tile_info )
 {
 	int tile = videoram[tile_index];
@@ -56,41 +44,13 @@ static TILE_GET_INFO( get_tile_info )
 static VIDEO_START( superdq )
 {
 	superdq_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows, 8, 8, 32, 32);
-
-	add_exit_callback(machine, video_cleanup);
 }
 
 static VIDEO_UPDATE( superdq )
 {
+	render_container_set_palette_alpha(render_container_get_screen(screen), 0, 0x00);
+
 	tilemap_draw(bitmap,cliprect,superdq_tilemap,0,0);
-
-	if (!video_skip_this_frame())
-	{
-		bitmap_t *vidbitmap;
-		rectangle fixedvis = *video_screen_get_visible_area(screen);
-		fixedvis.max_x++;
-		fixedvis.max_y++;
-
-		laserdisc_get_video(laserdisc, &vidbitmap);
-
-		/* first lay down the video data */
-		if (video_texture == NULL)
-			video_texture = render_texture_alloc(NULL, NULL);
-		if (vidbitmap != last_video_bitmap)
-			render_texture_set_bitmap(video_texture, vidbitmap, NULL, 0, TEXFORMAT_YUY16);
-
-		last_video_bitmap = vidbitmap;
-
-		/* then overlay the TMS9928A video */
-		if (overlay_texture == NULL)
-			overlay_texture = render_texture_alloc(NULL, NULL);
-		render_texture_set_bitmap(overlay_texture, bitmap, &fixedvis, 0, TEXFORMAT_PALETTEA16);
-
-		/* add both quads to the screen */
-		render_container_empty(render_container_get_screen(screen));
-		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
-		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
-	}
 
 	/* display disc information */
 	popmessage("%s", laserdisc_describe_state(laserdisc));
@@ -349,23 +309,16 @@ static MACHINE_DRIVER_START( superdq )
 	MDRV_MACHINE_RESET(superdq)
 
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000)
+	MDRV_LASERDISC_OVERLAY(superdq, 256, 256, BITMAP_FORMAT_INDEXED16)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER)
-
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_INDEXED16)
 
 	MDRV_GFXDECODE(superdq)
 	MDRV_PALETTE_LENGTH(32)
 
 	MDRV_PALETTE_INIT(superdq)
 	MDRV_VIDEO_START(superdq)
-	MDRV_VIDEO_UPDATE(superdq)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")

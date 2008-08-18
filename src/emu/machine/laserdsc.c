@@ -15,6 +15,7 @@
 #include "profiler.h"
 #include "streams.h"
 #include "vbiparse.h"
+#include "config.h"
 #include "sound/custom.h"
 
 
@@ -78,6 +79,7 @@ typedef enum _playstate playstate;
 #define AUDIO_CH2_ENABLE			0x02
 #define AUDIO_EXPLICIT_MUTE			0x04
 #define AUDIO_IMPLICIT_MUTE			0x08
+#define AUDIO_SQUELCH_OVERRIDE		0x10
 
 #define VIDEO_ENABLE				0x01
 #define VIDEO_EXPLICIT_MUTE			0x02
@@ -107,6 +109,13 @@ typedef enum _playstate playstate;
 #define PR8210_SLOW_SPEED			(PLAY_SPEED / 5)
 #define PR8210_STEP_SPEED			(PLAY_SPEED / 7)
 #define PR8210_SEARCH_SPEED			INT_TO_FRAC(5000)
+
+/* Simutrek Special specific states */
+#define SIMUTREK_SCAN_SPEED			PR8210_SCAN_SPEED
+#define SIMUTREK_FAST_SPEED			PR8210_FAST_SPEED
+#define SIMUTREK_SLOW_SPEED			PR8210_SLOW_SPEED
+#define SIMUTREK_STEP_SPEED			PR8210_STEP_SPEED
+#define SIMUTREK_SEARCH_SPEED		PR8210_SEARCH_SPEED
 
 /* Pioneer LD-V1000 specific states */
 #define LDV1000_MODE_STATUS			0
@@ -162,6 +171,21 @@ struct _pr8210_info
 	UINT8				seekstate;				/* state of the seek command */
 };
 
+/* Simutrek-specific data */
+typedef struct _simutrek_info simutrek_info;
+struct _simutrek_info
+{
+	UINT8				mode;					/* current mode */
+	UINT8				lastcommand;			/* last command byte received */
+	UINT16				accumulator;			/* bit accumulator */
+	attotime			lastbittime;			/* time of last bit received */
+	attotime			firstbittime;			/* time of first bit in command */
+	UINT8				seekstate;				/* state of the seek command */
+	UINT8				cmdcnt;					/* counter for multi-byte command */
+	UINT8				cmdbytes[3];			/* storage for multi-byte command */
+	void				(*cmd_ack_callback)(void); /* callback to clear game command write flag */
+};
+
 
 /* LD-V1000-specific data */
 typedef struct _ldv1000_info ldv1000_info;
@@ -201,6 +225,9 @@ struct _vp932_info
 typedef struct _laserdisc_state laserdisc_state;
 struct _laserdisc_state
 {
+	/* general config */
+	laserdisc_config	config;					/* copy of the inline config */
+	
 	/* disc parameters */
 	chd_file *			disc;					/* handle to the disc itself */
 	av_codec_decompress_config avconfig;		/* decompression configuration */
@@ -218,7 +245,6 @@ struct _laserdisc_state
 	bitmap_t			videotarget;			/* fake target bitmap for decompression */
 
 	/* audio data */
-	laserdisc_audio_func audiocallback;			/* callback function for audio processing */
 	INT16 *				audiobuffer[2];			/* buffer for audio samples */
 	UINT32				audiobufsize;			/* size of buffer */
 	UINT32				audiobufin;				/* input index */
@@ -234,7 +260,6 @@ struct _laserdisc_state
 	int					last_chapter;			/* last seen chapter number */
 
 	/* core states */
-	UINT8				type;					/* laserdisc type */
 	playstate			state;					/* current playback state */
 	UINT8				video;					/* video state: bit 0 = on/off */
 	UINT8				audio;					/* audio state: bit 0 = audio 1, bit 1 = audio 2 */
@@ -262,6 +287,14 @@ struct _laserdisc_state
 	INT32				curfracspeed;			/* current speed the head is moving */
 	INT32				curfractrack;			/* current track */
 	INT32				targetframe;			/* target frame (0 means no target) */
+	
+	/* video updating */
+	UINT8				videoenable;			/* is video enabled? */
+	render_texture *	videotex;				/* texture for the video */
+	UINT8				overenable;				/* is the overlay enabled? */
+	bitmap_t *			overbitmap[2];			/* overlay bitmaps */
+	int					overindex;				/* index of the overlay bitmap */
+	render_texture *	overtex;				/* texture for the overlay */
 
 	/* debugging */
 	char				text[100];				/* buffer for the state */
@@ -279,6 +312,7 @@ struct _laserdisc_state
 	{
 		pr7820_info		pr7820;					/* PR-7820-specific info */
 		pr8210_info		pr8210;					/* PR-8210-specific info */
+		simutrek_info	simutrek;				/* Simutrek-specific info */
 		ldv1000_info 	ldv1000;				/* LD-V1000-specific info */
 		ldp1450_info 	ldp1450;				/* LDP-1450-specific info */
 		vp932_info 		vp932;					/* 22VP932-specific info */
@@ -308,6 +342,8 @@ static void fake_metadata(UINT32 track, UINT8 which, vbi_metadata *metadata);
 static void render_display(UINT16 *videodata, UINT32 rowpixels, UINT32 width, int frame);
 static void *custom_start(int clock, const custom_sound_interface *config);
 static void custom_stream_callback(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
+static void configuration_load(running_machine *machine, int config_type, xml_data_node *parentnode);
+static void configuration_save(running_machine *machine, int config_type, xml_data_node *parentnode);
 
 /* Pioneer PR-7820 implementation */
 static void pr7820_init(laserdisc_state *ld);
@@ -321,6 +357,12 @@ static void pr8210_init(laserdisc_state *ld);
 static void pr8210_soft_reset(laserdisc_state *ld);
 static void pr8210_command(laserdisc_state *ld);
 static void pr8210_control_w(laserdisc_state *ld, UINT8 data);
+
+/* Simutrek modified players implementation */
+static void simutrek_init(laserdisc_state *ld);
+static void simutrek_soft_reset(laserdisc_state *ld);
+static void simutrek_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data);
+static UINT8 simutrek_status_r(laserdisc_state *ld);
 
 /* Pioneer LDV-1000 implementation */
 static void ldv1000_init(laserdisc_state *ld);
@@ -513,6 +555,8 @@ INLINE int audio_channel_active(laserdisc_state *ld, int channel)
 		default:
 			break;
 	}
+	if (ld->audio & AUDIO_SQUELCH_OVERRIDE)
+		result = 1;
 	return result;
 }
 
@@ -881,7 +925,7 @@ void laserdisc_vsync(const device_config *device)
 	}
 
 	/* flush any audio before we read more */
-	if (sndti_exists(SOUND_CUSTOM, ld->audiocustom))
+	if (ld->audiocustom != -1)
 	{
 		sound_token *token = custom_get_token(ld->audiocustom);
 		stream_update(token->stream);
@@ -1374,8 +1418,8 @@ static void process_track_data(const device_config *device)
 	}
 
 	/* pass the audio to the callback */
-	if (ld->audiocallback != NULL)
-		(*ld->audiocallback)(device, ld->samplerate, ld->audiocursamples, ld->avconfig.audio[0], ld->avconfig.audio[1]);
+	if (ld->config.audio != NULL)
+		(*ld->config.audio)(device, ld->samplerate, ld->audiocursamples, ld->avconfig.audio[0], ld->avconfig.audio[1]);
 
 	/* shift audio data if we read it into the beginning of the buffer */
 	if (ld->audiocursamples != 0 && ld->audiobufin != 0)
@@ -1565,6 +1609,253 @@ static void custom_stream_callback(void *param, stream_sample_t **inputs, stream
 
 
 /***************************************************************************
+    CONFIG SETTINGS ACCESS
+***************************************************************************/
+
+/*-------------------------------------------------
+    configuration_load - read and apply data from 
+    the configuration file
+-------------------------------------------------*/
+
+static void configuration_load(running_machine *machine, int config_type, xml_data_node *parentnode)
+{
+	xml_data_node *overnode;
+	xml_data_node *ldnode;
+
+	/* we only care about game files */
+	if (config_type != CONFIG_TYPE_GAME)
+		return;
+
+	/* might not have any data */
+	if (parentnode == NULL)
+		return;
+
+	/* iterate over overlay nodes */
+	for (ldnode = xml_get_sibling(parentnode->child, "device"); ldnode != NULL; ldnode = xml_get_sibling(ldnode->next, "device"))
+	{
+		const char *devtag = xml_get_attribute_string(ldnode, "tag", "");
+		const device_config *device = device_list_find_by_tag(machine->config->devicelist, LASERDISC, devtag);
+		if (device != NULL)
+		{
+			laserdisc_state *ld = get_safe_token(device);
+			
+			/* handle the overlay node */
+			overnode = xml_get_sibling(ldnode->child, "overlay");
+			if (overnode != NULL)
+			{
+				/* fetch positioning controls */
+				ld->config.overposx = xml_get_attribute_float(overnode, "hoffset", ld->config.overposx);
+				ld->config.overscalex = xml_get_attribute_float(overnode, "hstretch", ld->config.overscalex);
+				ld->config.overposy = xml_get_attribute_float(overnode, "voffset", ld->config.overposy);
+				ld->config.overscaley = xml_get_attribute_float(overnode, "vstretch", ld->config.overscaley);
+			}
+		}
+	}
+}
+
+
+/*-------------------------------------------------
+    configuration_save - save data to the 
+    configuration file
+-------------------------------------------------*/
+
+static void configuration_save(running_machine *machine, int config_type, xml_data_node *parentnode)
+{
+	const device_config *device;
+
+	/* we only care about game files */
+	if (config_type != CONFIG_TYPE_GAME)
+		return;
+
+	/* iterate over disc devices */
+	for (device = device_list_first(machine->config->devicelist, LASERDISC); device != NULL; device = device_list_next(device, LASERDISC))
+	{
+		laserdisc_config *origconfig = device->inline_config;
+		laserdisc_state *ld = get_safe_token(device);
+		xml_data_node *overnode;
+		xml_data_node *ldnode;
+
+		/* create a node */
+		ldnode = xml_add_child(parentnode, "device", NULL);
+		if (ldnode != NULL)
+		{
+			int changed = FALSE;
+			
+			/* output the basics */
+			xml_set_attribute(ldnode, "tag", device->tag);
+
+			/* add an overlay node */
+			overnode = xml_add_child(ldnode, "overlay", NULL);
+			if (overnode != NULL)
+			{
+				/* output the positioning controls */
+				if (ld->config.overposx != origconfig->overposx)
+				{
+					xml_set_attribute_float(overnode, "hoffset", ld->config.overposx);
+					changed = TRUE;
+				}
+
+				if (ld->config.overscalex != origconfig->overscalex)
+				{
+					xml_set_attribute_float(overnode, "hstretch", ld->config.overscalex);
+					changed = TRUE;
+				}
+
+				if (ld->config.overposy != origconfig->overposy)
+				{
+					xml_set_attribute_float(overnode, "voffset", ld->config.overposy);
+					changed = TRUE;
+				}
+
+				if (ld->config.overscaley != origconfig->overscaley)
+				{
+					xml_set_attribute_float(overnode, "vstretch", ld->config.overscaley);
+					changed = TRUE;
+				}
+			}
+
+			/* if nothing changed, kill the node */
+			if (!changed)
+				xml_delete_node(ldnode);
+		}
+	}
+}
+
+
+
+/***************************************************************************
+    VIDEO INTERFACE
+***************************************************************************/
+
+/*-------------------------------------------------
+    laserdisc_video_enable - enable/disable the 
+    video
+-------------------------------------------------*/
+
+void laserdisc_video_enable(const device_config *device, int enable)
+{
+	laserdisc_state *ld = get_safe_token(device);
+	ld->videoenable = enable;
+}
+
+
+/*-------------------------------------------------
+    laserdisc_video_enable - enable/disable the 
+    video
+-------------------------------------------------*/
+
+void laserdisc_overlay_enable(const device_config *device, int enable)
+{
+	laserdisc_state *ld = get_safe_token(device);
+	ld->overenable = enable;
+}
+
+
+/*-------------------------------------------------
+    video update callback
+-------------------------------------------------*/
+
+VIDEO_UPDATE( laserdisc )
+{
+	const device_config *laserdisc = device_list_first(screen->machine->config->devicelist, LASERDISC);
+	if (laserdisc != NULL)
+	{
+		laserdisc_state *ld = laserdisc->token;
+		bitmap_t *overbitmap = ld->overbitmap[ld->overindex];
+		bitmap_t *vidbitmap = NULL;
+	
+		/* handle the overlay if present */
+		if (overbitmap != NULL)
+		{
+			rectangle clip = *cliprect;
+		
+			/* scale the cliprect to the overlay size */
+			clip.min_x = 0;
+			clip.max_x = ld->config.overwidth - 1;
+			clip.min_y = cliprect->min_y * overbitmap->height / bitmap->height;
+			clip.max_y = (cliprect->max_y + 1) * overbitmap->height / bitmap->height - 1;
+			
+			/* call the callback */
+			if (ld->config.overupdate != NULL)
+				(*ld->config.overupdate)(screen, overbitmap, &clip);
+		}
+		
+		/* if this is the last update, do the rendering */
+		if (cliprect->max_y == video_screen_get_visible_area(screen)->max_y)
+		{
+			float x0, y0, x1, y1;
+			
+			/* update the texture with the overlay contents */
+			if (overbitmap != NULL)
+			{
+				if (overbitmap->format == BITMAP_FORMAT_INDEXED16)
+					render_texture_set_bitmap(ld->overtex, overbitmap, &ld->config.overclip, 0, TEXFORMAT_PALETTEA16);
+				else if (overbitmap->format == BITMAP_FORMAT_RGB32)
+					render_texture_set_bitmap(ld->overtex, overbitmap, &ld->config.overclip, 0, TEXFORMAT_ARGB32);
+			}
+		
+			/* get the laserdisc video */
+			laserdisc_get_video(laserdisc, &vidbitmap);
+			if (vidbitmap != NULL)
+				render_texture_set_bitmap(ld->videotex, vidbitmap, NULL, 0, TEXFORMAT_YUY16);
+			
+			/* reset the screen contents */
+			render_container_empty(render_container_get_screen(screen));
+			
+			/* add the video texture */
+			if (ld->videoenable)
+				render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), ld->videotex, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+
+			/* add the overlay */
+			if (ld->overenable && overbitmap != NULL)
+			{
+				x0 = 0.5f - 0.5f * ld->config.overscalex + ld->config.overposx;
+				y0 = 0.5f - 0.5f * ld->config.overscaley + ld->config.overposy;
+				x1 = x0 + ld->config.overscalex;
+				y1 = y0 + ld->config.overscaley;
+				render_screen_add_quad(screen, x0, y0, x1, y1, MAKE_ARGB(0xff,0xff,0xff,0xff), ld->overtex, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
+			}
+			
+			/* swap to the next bitmap */
+			ld->overindex = (ld->overindex + 1) % ARRAY_LENGTH(ld->overbitmap);
+		}
+	}
+	
+	return 0;
+}
+
+
+
+/***************************************************************************
+    CONFIGURATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    laserdisc_get_config - return a copy of the 
+    current live configuration settings
+-------------------------------------------------*/
+
+void laserdisc_get_config(const device_config *device, laserdisc_config *config)
+{
+	laserdisc_state *ld = get_safe_token(device);
+	*config = ld->config;
+}
+
+
+/*-------------------------------------------------
+    laserdisc_get_config - change the current live 
+    configuration settings
+-------------------------------------------------*/
+
+void laserdisc_set_config(const device_config *device, const laserdisc_config *config)
+{
+	laserdisc_state *ld = get_safe_token(device);
+	ld->config = *config;
+}
+
+
+
+/***************************************************************************
     DEVICE INTERFACE
 ***************************************************************************/
 
@@ -1583,14 +1874,30 @@ static DEVICE_START( laserdisc )
 	chd_error err;
 
 	/* copy config data to the live state */
-	ld->type = config->type;
-	ld->audiocallback = config->audio;
+	ld->config = *config;
+	if (ld->config.overclip.max_x == ld->config.overclip.min_x || ld->config.overclip.max_y == ld->config.overclip.min_y)
+	{
+		ld->config.overclip.min_x = ld->config.overclip.min_y = 0;
+		ld->config.overclip.max_x = ld->config.overwidth - 1;
+		ld->config.overclip.max_y = ld->config.overheight - 1;
+	}
+	if (ld->config.overscalex == 0)
+		ld->config.overscalex = 1.0f;
+	if (ld->config.overscaley == 0)
+		ld->config.overscaley = 1.0f;
 
 	/* find the disc */
 	ld->disc = get_disk_handle(device->tag);
+	ld->audiocustom = 0;
 	for (sndnum = 0; sndnum < MAX_SOUND; sndnum++)
+	{
 		if (device->machine->config->sound[sndnum].tag != NULL && strcmp(device->machine->config->sound[sndnum].tag, device->tag) == 0)
-			sndnum_to_sndti(sndnum, &ld->audiocustom);
+			break;
+		if (device->machine->config->sound[sndnum].type == SOUND_CUSTOM)
+			ld->audiocustom++;
+	}
+	if (sndnum == MAX_SOUND)
+		ld->audiocustom = -1;
 
 	/* get the disc metadata and extract the ld */
 	if (ld->disc != NULL)
@@ -1622,8 +1929,9 @@ static DEVICE_START( laserdisc )
 		ld->videoframe[index] = auto_bitmap_alloc(width, height * 2, BITMAP_FORMAT_YUY16);
 		ld->videovisframe[index] = auto_malloc(sizeof(*ld->videovisframe[index]));
 		*ld->videovisframe[index] = *ld->videoframe[index];
-		ld->videovisframe[index]->base = BITMAP_ADDR16(ld->videovisframe[index], 44, 0);
+		ld->videovisframe[index]->base = BITMAP_ADDR16(ld->videovisframe[index], 44, ld->videoframe[index]->width * 8 / 720);
 		ld->videovisframe[index]->height -= 44;
+		ld->videovisframe[index]->width -= 2 * ld->videoframe[index]->width * 8 / 720;
 		fillbitmap_yuy16(ld->videoframe[index], 40, 109, 240);
 	}
 	ld->emptyframe = auto_bitmap_alloc(width, height * 2, BITMAP_FORMAT_YUY16);
@@ -1636,6 +1944,26 @@ static DEVICE_START( laserdisc )
 	ld->audiobuffer[0] = auto_malloc(ld->audiobufsize * sizeof(ld->audiobuffer[0][0]));
 	ld->audiobuffer[1] = auto_malloc(ld->audiobufsize * sizeof(ld->audiobuffer[1][0]));
 	ld->samplerate = rate;
+	
+	/* allocate texture for rendering */
+	ld->videoenable = TRUE;
+	ld->videotex = render_texture_alloc(NULL, NULL);
+	if (ld->videotex == NULL)
+		fatalerror("Out of memory allocating video texture");
+	
+	/* allocate overlay */
+	if (ld->config.overwidth > 0 && ld->config.overheight > 0 && ld->config.overupdate != NULL)
+	{
+		ld->overenable = TRUE;
+		ld->overbitmap[0] = auto_bitmap_alloc(ld->config.overwidth, ld->config.overheight, ld->config.overformat);
+		ld->overbitmap[1] = auto_bitmap_alloc(ld->config.overwidth, ld->config.overheight, ld->config.overformat);
+		ld->overtex = render_texture_alloc(NULL, NULL);
+		if (ld->overtex == NULL)
+			fatalerror("Out of memory allocating overlay texture");
+	}
+
+	/* register callbacks */
+	config_register(device->machine, "laserdisc", configuration_load, configuration_save);
 }
 
 
@@ -1650,6 +1978,12 @@ static DEVICE_STOP( laserdisc )
 	/* make sure all async operations have completed */
 	if (ld->disc != NULL)
 		chd_async_complete(ld->disc);
+	
+	/* free any textures */
+	if (ld->videotex != NULL)
+		render_texture_free(ld->videotex);
+	if (ld->overtex != NULL)
+		render_texture_free(ld->overtex);
 }
 
 
@@ -1663,7 +1997,7 @@ static DEVICE_RESET( laserdisc )
 	int i;
 
 	/* attempt to wire up the audio */
-	if (sndti_exists(SOUND_CUSTOM, ld->audiocustom))
+	if (ld->audiocustom != -1)
 	{
 		sound_token *token = custom_get_token(ld->audiocustom);
 		token->ld = ld;
@@ -1692,7 +2026,7 @@ static DEVICE_RESET( laserdisc )
 	ld->statechanged = NULL;
 
 	/* each player can init */
-	switch (ld->type)
+	switch (ld->config.type)
 	{
 		case LASERDISC_TYPE_PIONEER_PR7820:
 			pr7820_init(ld);
@@ -1700,6 +2034,10 @@ static DEVICE_RESET( laserdisc )
 
 		case LASERDISC_TYPE_PIONEER_PR8210:
 			pr8210_init(ld);
+			break;
+
+		case LASERDISC_TYPE_SIMUTREK_SPECIAL:
+			simutrek_init(ld);
 			break;
 
 		case LASERDISC_TYPE_PIONEER_LDV1000:
@@ -1735,9 +2073,9 @@ static DEVICE_SET_INFO( laserdisc )
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case LDINFO_INT_TYPE:
-			if (ld != NULL && ld->type != info->i)
+			if (ld != NULL && ld->config.type != info->i)
 			{
-				ld->type = info->i;
+				ld->config.type = info->i;
 				device_reset(device);
 			}
 			break;
@@ -1751,7 +2089,14 @@ static DEVICE_SET_INFO( laserdisc )
 
 DEVICE_GET_INFO( laserdisc )
 {
-	const laserdisc_config *config = (device != NULL) ? device->inline_config : NULL;
+	const laserdisc_config *config = NULL;
+	
+	if (device != NULL)
+	{
+		laserdisc_state *ld = device->token;
+		config = (ld == NULL) ? device->inline_config : &ld->config;
+	}
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -1773,6 +2118,7 @@ DEVICE_GET_INFO( laserdisc )
 				default:
 				case LASERDISC_TYPE_PIONEER_PR7820:		info->s = "Pioneer PR-7820";		break;
 				case LASERDISC_TYPE_PIONEER_PR8210:		info->s = "Pioneer PR-8210";		break;
+				case LASERDISC_TYPE_SIMUTREK_SPECIAL:	info->s = "Simutrek Modified LDP";	break;
 				case LASERDISC_TYPE_PIONEER_LDV1000:	info->s = "Pioneer LD-V1000";		break;
 				case LASERDISC_TYPE_PHILLIPS_22VP932:	info->s = "Philips 22VP932";		break;
 				case LASERDISC_TYPE_SONY_LDP1450:		info->s = "Sony LDP-1450";			break;
@@ -2443,6 +2789,182 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 data)
 				pr8210->lastcommand = newcommand;
 		}
 	}
+}
+
+
+
+/***************************************************************************
+    SIMUTREK MODIFIED PR-8210 PLAYER IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+
+	Command Set:
+
+	FX XX XX  : Seek to frame XXXXX
+	01-19	  : Skip forward 1-19 frames
+	99-81     : Skip back 1-19 frames
+	5a        : Toggle frame display
+
+-------------------------------------------------*/
+
+/*-------------------------------------------------
+    simutrek_init - Simutrek-specific
+    initialization
+-------------------------------------------------*/
+
+static void simutrek_init(laserdisc_state *ld)
+{
+	/* set up the read callbacks */
+	ld->readline[LASERDISC_LINE_STATUS] = simutrek_status_r;
+
+	/* set up the write callbacks */
+	ld->writedata = simutrek_data_w;
+
+	/* do a soft reset */
+	simutrek_soft_reset(ld);
+}
+
+
+/*-------------------------------------------------
+    simutrek_soft_reset - Simutrek-specific
+    soft reset
+-------------------------------------------------*/
+
+static void simutrek_soft_reset(laserdisc_state *ld)
+{
+	simutrek_info *simutrek = &ld->u.simutrek;
+
+	ld->audio = AUDIO_CH1_ENABLE  | AUDIO_CH2_ENABLE;
+	ld->display = 0;
+	simutrek->firstbittime = simutrek->lastbittime = timer_get_time();
+	simutrek->accumulator = 0;
+	simutrek->lastcommand = 0;
+	simutrek->seekstate = 0;
+	simutrek->cmdcnt = 0;
+	simutrek->cmdbytes[0] = 0;
+	simutrek->cmdbytes[1] = 0;
+	simutrek->cmdbytes[2] = 0;
+}
+
+
+/*-------------------------------------------------
+    simutrek_status_r - Simutrek-specific
+    command processing
+-------------------------------------------------*/
+
+static UINT8 simutrek_status_r(laserdisc_state *ld)
+{
+	return (ld->state != LASERDISC_SEARCHING_FRAME) ? ASSERT_LINE : CLEAR_LINE;
+}
+
+
+/*-------------------------------------------------
+    simutrek_data_w - Simutrek-specific
+    data processing
+-------------------------------------------------*/
+
+static void simutrek_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
+{
+	simutrek_info *simutrek = &ld->u.simutrek;
+
+	/* Acknowledge every command byte */
+	if (simutrek->cmd_ack_callback != NULL)
+		(*simutrek->cmd_ack_callback)();
+
+	/* Is this byte part of a multi-byte seek command? */
+	if (simutrek->cmdcnt > 0)
+	{
+		CMDPRINTF(("Simutrek: Seek to frame byte %d of 3\n", simutrek->cmdcnt + 1));
+		simutrek->cmdbytes[simutrek->cmdcnt++] = data;
+	
+		if (simutrek->cmdcnt == 3)
+		{
+			int frame = ((simutrek->cmdbytes[0] & 0xf) * 10000) +
+						((simutrek->cmdbytes[1] >> 4)  * 1000) +
+						((simutrek->cmdbytes[1] & 0xf) * 100) +
+						((simutrek->cmdbytes[2] >> 4)  * 10) +
+						(simutrek->cmdbytes[2] & 0xf);
+
+			CMDPRINTF(("Simutrek: Seek to frame %d\n", frame));
+
+			if (laserdisc_ready(ld))
+				set_state(ld, LASERDISC_SEARCHING_FRAME, SIMUTREK_SEARCH_SPEED, frame);
+
+			simutrek->cmdcnt = 0;
+		}
+	}
+	else if (data == 0)
+	{
+		CMDPRINTF(("Simutrek: 0 ?\n"));
+	}
+	else if ((data & 0xf0) == 0xf0)
+	{
+		CMDPRINTF(("Simutrek: Seek to frame byte 1 of 3\n"));
+		simutrek->cmdbytes[simutrek->cmdcnt++] = data;
+	}
+	else if ((data >= 1) && (data <= 0x19))
+	{
+		int step = ((data >> 4) * 10) + (data & 0xf);
+		CMDPRINTF(("Simutrek: Step forwards by %d frame(s)\n", step));
+
+		if (laserdisc_ready(ld))
+		{
+			set_state(ld, LASERDISC_STEPPING_FORWARD, STOP_SPEED, NULL_TARGET_FRAME);
+			add_to_current_track(ld, step * ONE_TRACK);
+		}
+	}
+	else if ((data >= 0x81) && (data <= 0x99))
+	{
+		int step = 100 - (((data >> 4) * 10) + (data & 0xf));
+		CMDPRINTF(("Simutrek: Step backwards by %d frame(s)\n", step));
+
+		if (laserdisc_ready(ld))
+		{
+			set_state(ld, LASERDISC_STEPPING_REVERSE, STOP_SPEED, NULL_TARGET_FRAME);
+			add_to_current_track(ld, step * -ONE_TRACK);
+		}
+	}
+	else if (data == 0x5a)
+	{
+		CMDPRINTF(("Simutrek: Frame window toggle\n"));
+		ld->display ^= 1;
+	}
+	else
+	{
+		CMDPRINTF(("Simutrek: Unknown command (%.2x)\n", data));
+	}
+}
+
+
+/*-------------------------------------------------
+    simutrek_set_audio_squelch - Simutrek-specific
+    command to enable/disable audio squelch
+-------------------------------------------------*/
+
+void simutrek_set_audio_squelch(const device_config *device, int state)
+{
+	laserdisc_state *ld = get_safe_token(device);
+
+	if (state == ASSERT_LINE)
+		ld->audio |= AUDIO_SQUELCH_OVERRIDE;		
+	else
+		ld->audio &= ~AUDIO_SQUELCH_OVERRIDE;
+}
+
+
+/*-------------------------------------------------
+    simutrek_set_audio_squelch - Simutrek-specific
+    command to set callback function for
+	player/interface command acknowledge
+-------------------------------------------------*/
+
+void simutrek_set_cmd_ack_callback(const device_config *device, void (*callback)(void))
+{
+	laserdisc_state *ld = get_safe_token(device);
+	simutrek_info *simutrek = &ld->u.simutrek;
+
+	simutrek->cmd_ack_callback = callback;
 }
 
 

@@ -137,6 +137,7 @@ CPUS += UPD7807
 CPUS += ARM
 CPUS += ARM7
 CPUS += JAGUAR
+CPUS += CUBEQCPU
 CPUS += R3000
 CPUS += R3041
 CPUS += R4600
@@ -1536,6 +1537,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/coolpool.o \
 	$(DRIVERS)/cowrace.o \
 	$(DRIVERS)/crystal.o $(VIDEO)/vrender0.o \
+	$(DRIVERS)/cubeqst.o \
 	$(DRIVERS)/cybertnk.o \
 	$(DRIVERS)/dcheese.o $(VIDEO)/dcheese.o \
 	$(DRIVERS)/dgpix.o \

@@ -87,61 +87,7 @@ static const device_config *laserdisc;
 static int port_bank = 0;
 static int phillips_code = 0;
 
-static render_texture *video_texture;
-static render_texture *overlay_texture;
-static bitmap_t *last_video_bitmap;
-
 static emu_timer *irq_timer;
-
-/********************************************************/
-
-static void video_cleanup(running_machine *machine)
-{
-	if (video_texture != NULL)
-		render_texture_free(video_texture);
-	if (overlay_texture != NULL)
-		render_texture_free(overlay_texture);
-}
-
-static VIDEO_UPDATE( cliff )
-{
-	/* update the TMS9928A video */
-	VIDEO_UPDATE_CALL(tms9928a);
-
-	if (laserdisc != NULL)
-	{
-		bitmap_t *vidbitmap;
-		rectangle fixedvis = *TMS9928A_get_visarea();
-		fixedvis.max_x++;
-		fixedvis.max_y++;
-
-		laserdisc_get_video(laserdisc, &vidbitmap);
-
-		/* first lay down the video data */
-		if (video_texture == NULL)
-			video_texture = render_texture_alloc(NULL, NULL);
-		if (vidbitmap != last_video_bitmap)
-			render_texture_set_bitmap(video_texture, vidbitmap, NULL, 0, TEXFORMAT_YUY16);
-
-		last_video_bitmap = vidbitmap;
-
-		/* then overlay the TMS9928A video */
-		if (overlay_texture == NULL)
-			overlay_texture = render_texture_alloc(NULL, NULL);
-		render_texture_set_bitmap(overlay_texture, bitmap, &fixedvis, 0, TEXFORMAT_PALETTEA16);
-
-		/* add both quads to the screen */
-		render_container_empty(render_container_get_screen(screen));
-		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
-		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
-	}
-
-	/* display disc information */
-	if (laserdisc != NULL)
-		popmessage("%s", laserdisc_describe_state(laserdisc));
-
-	return 0;
-}
 
 /********************************************************/
 
@@ -746,15 +692,15 @@ static MACHINE_DRIVER_START( cliffhgr )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210)
+	MDRV_LASERDISC_OVERLAY(tms9928a, 15+32*8+15, 27+24*8+24, BITMAP_FORMAT_INDEXED16)
+	MDRV_LASERDISC_OVERLAY_CLIP(15-12, 15+32*8+12-1, 27-9, 27+24*8+9-1)
 
 	/* start with the TMS9928a video configuration */
 	MDRV_IMPORT_FROM(tms9928a)
 
 	/* override video rendering and raw screen info */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER)
-	MDRV_VIDEO_UPDATE(cliff)
-	MDRV_SCREEN_MODIFY("main")
-	MDRV_SCREEN_RAW_PARAMS(13500000, 858, 0, 720, 262.5, 21, 262.5)
+	MDRV_SCREEN_REMOVE("main")
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_INDEXED16)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
@@ -822,13 +768,7 @@ ROM_END
 
 static DRIVER_INIT( cliff )
 {
-	video_texture = NULL;
-	overlay_texture = NULL;
-	last_video_bitmap = NULL;
-
 	TMS9928A_configure(&tms9928a_interface);
-
-	add_exit_callback(machine, video_cleanup);
 }
 
 

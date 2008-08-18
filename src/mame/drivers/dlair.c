@@ -71,12 +71,6 @@ static UINT8 last_misc;
 static UINT8 laserdisc_type;
 static UINT8 laserdisc_data;
 
-static render_texture *video_texture;
-static render_texture *overlay_texture;
-static UINT32 last_seqid;
-
-static bitmap_t *overlay_bitmap;
-
 static const UINT8 led_map[16] =
 	{ 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7c,0x07,0x7f,0x67,0x77,0x7c,0x39,0x5e,0x79,0x00 };
 
@@ -148,30 +142,6 @@ static const struct z80_irq_daisy_chain dleuro_daisy_chain[] =
  *
  *************************************/
 
-static void video_cleanup(running_machine *machine)
-{
-	/* free our textures */
-	if (video_texture != NULL)
-		render_texture_free(video_texture);
-	if (overlay_texture != NULL)
-		render_texture_free(overlay_texture);
-}
-
-
-static VIDEO_START( dlair )
-{
-	bitmap_t *vidbitmap;
-
-	/* create textures */
-	last_seqid = laserdisc_get_video(laserdisc, &vidbitmap);
-	video_texture = render_texture_alloc(NULL, NULL);
-	render_texture_set_bitmap(video_texture, vidbitmap, NULL, 0, TEXFORMAT_YUY16);
-	overlay_bitmap = NULL;
-
-	add_exit_callback(machine, video_cleanup);
-}
-
-
 static PALETTE_INIT( dleuro )
 {
 	int i;
@@ -184,16 +154,6 @@ static PALETTE_INIT( dleuro )
 }
 
 
-static VIDEO_START( dleuro )
-{
-	VIDEO_START_CALL(dlair);
-
-	overlay_bitmap = auto_bitmap_alloc(video_screen_get_width(machine->primary_screen), video_screen_get_height(machine->primary_screen), BITMAP_FORMAT_INDEXED16);
-	fillbitmap(overlay_bitmap, 8, NULL);
-	overlay_texture = render_texture_alloc(NULL, NULL);
-}
-
-
 
 /*************************************
  *
@@ -201,31 +161,8 @@ static VIDEO_START( dleuro )
  *
  *************************************/
 
-static VIDEO_UPDATE( dlair )
-{
-	bitmap_t *vidbitmap;
-	UINT32 seqid;
-
-	/* get the current video and update the bitmap if different */
-	seqid = laserdisc_get_video(laserdisc, &vidbitmap);
-	if (seqid != last_seqid)
-		render_texture_set_bitmap(video_texture, vidbitmap, NULL, 0, TEXFORMAT_YUY16);
-	last_seqid = seqid;
-
-	/* cover the whole screen with a quad */
-	render_container_empty(render_container_get_screen(screen));
-	render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
-
-	popmessage("%s", laserdisc_describe_state(laserdisc));
-
-	return 0;
-}
-
-
 static VIDEO_UPDATE( dleuro )
 {
-	bitmap_t *vidbitmap;
-	UINT32 seqid;
 	int x, y;
 
 	/* redraw the overlay */
@@ -233,26 +170,8 @@ static VIDEO_UPDATE( dleuro )
 		for (x = 0; x < 32; x++)
 		{
 			UINT8 *base = &videoram[y * 64 + x * 2 + 1];
-			drawgfx(overlay_bitmap, screen->machine->gfx[0], base[0], base[1], 0, 0, 10 * x, 16 * y, cliprect, TRANSPARENCY_NONE, 0);
+			drawgfx(bitmap, screen->machine->gfx[0], base[0], base[1], 0, 0, 10 * x, 16 * y, cliprect, TRANSPARENCY_NONE, 0);
 		}
-
-	/* update the overlay */
-	render_texture_set_bitmap(overlay_texture, overlay_bitmap, video_screen_get_visible_area(screen), 0, TEXFORMAT_PALETTE16);
-
-	/* get the current video and update the bitmap if different */
-	seqid = laserdisc_get_video(laserdisc, &vidbitmap);
-	if (seqid != last_seqid)
-		render_texture_set_bitmap(video_texture, vidbitmap, NULL, 0, TEXFORMAT_YUY16);
-	last_seqid = seqid;
-
-	/* cover the whole screen with a quad */
-	render_container_empty(render_container_get_screen(screen));
-	if (last_misc & 0x02)
-		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
-	else
-		render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), overlay_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
-
-	popmessage("%s", laserdisc_describe_state(laserdisc));
 
 	return 0;
 }
@@ -799,14 +718,7 @@ static MACHINE_DRIVER_START( dlair_base )
 	MDRV_MACHINE_RESET(dlair)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER)
-
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 910, 0, 720, 525.0/2, 0, 480/2)
-
-	MDRV_VIDEO_START(dlair)
-	MDRV_VIDEO_UPDATE(dlair)
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_RGB32)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
@@ -849,21 +761,15 @@ static MACHINE_DRIVER_START( dleuro )
 	MDRV_MACHINE_RESET(dlair)
 
 	MDRV_LASERDISC_ADD("laserdisc", PHILLIPS_22VP932)
+	MDRV_LASERDISC_OVERLAY(dleuro, 256, 256, BITMAP_FORMAT_INDEXED16)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 199, 0, 239)
+	MDRV_LASERDISC_SCREEN_ADD_PAL("main", BITMAP_FORMAT_INDEXED16)
 
 	MDRV_GFXDECODE(dlair)
 	MDRV_PALETTE_LENGTH(16)
 
 	MDRV_PALETTE_INIT(dleuro)
-	MDRV_VIDEO_START(dleuro)
-	MDRV_VIDEO_UPDATE(dleuro)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")

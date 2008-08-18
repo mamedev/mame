@@ -80,6 +80,8 @@ static void astron_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect)
 
 static VIDEO_UPDATE( astron )
 {
+	render_container_set_palette_alpha(render_container_get_screen(screen), 0, 0x00);
+
 	fillbitmap(bitmap, 0, cliprect);
 
 	astron_draw_characters(screen->machine, bitmap, cliprect);
@@ -341,7 +343,8 @@ static MACHINE_START( astron )
 
 /* DRIVER */
 static MACHINE_DRIVER_START( astron )
-/*  main cpu */
+
+	/* main cpu */
 	MDRV_CPU_ADD("main", Z80, SCHEMATIC_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(mainmem,0)
 	MDRV_CPU_IO_MAP(mainport,0)
@@ -351,19 +354,13 @@ static MACHINE_DRIVER_START( astron )
 	MDRV_MACHINE_START(astron)
 
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000)
+	MDRV_LASERDISC_OVERLAY(astron, 256, 256, BITMAP_FORMAT_INDEXED16)
 
-/*  video */
-
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	/* video hardware */
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_INDEXED16)
 
 	MDRV_GFXDECODE(segald)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_VIDEO_UPDATE(astron)
 
 	/* sound hardare */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
@@ -403,6 +400,9 @@ ROM_START( astron )
 	ROM_LOAD( "pr-5277.bin", 0x100, 0x100, CRC(bf2c33ab) SHA1(4a83b3e9b74b900621e8f42edf94cc04b791cdd0) )
 	ROM_LOAD( "pr-5276.bin", 0x200, 0x20,  CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
 	ROM_LOAD( "pr-5275.bin", 0x220, 0x20,  CRC(0c872a9b) SHA1(eaabce5d867a4e896bd356abc94429f9a4eec372) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "astron", 0, NO_DUMP )
 ROM_END
 
 ROM_START( astronp )
@@ -433,6 +433,9 @@ ROM_START( astronp )
 	ROM_LOAD( "pr-5277.bin", 0x100, 0x100, CRC(bf2c33ab) SHA1(4a83b3e9b74b900621e8f42edf94cc04b791cdd0) )
 	ROM_LOAD( "pr-5276.bin", 0x200, 0x20,  CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
 	ROM_LOAD( "pr-5275.bin", 0x220, 0x20,  CRC(0c872a9b) SHA1(eaabce5d867a4e896bd356abc94429f9a4eec372) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "astron", 0, NO_DUMP )
 ROM_END
 
 ROM_START( galaxyr )
@@ -465,6 +468,9 @@ ROM_START( galaxyr )
 	ROM_LOAD( "pr-5277.bin", 0x100, 0x100, CRC(bf2c33ab) SHA1(4a83b3e9b74b900621e8f42edf94cc04b791cdd0) )
 	ROM_LOAD( "pr-5276.bin", 0x200, 0x20,  CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
 	ROM_LOAD( "pr-5275.bin", 0x220, 0x20,  CRC(0c872a9b) SHA1(eaabce5d867a4e896bd356abc94429f9a4eec372) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "galaxyr", 0, NO_DUMP )
 ROM_END
 
 ROM_START( galaxyrp )
@@ -497,6 +503,9 @@ ROM_START( galaxyrp )
 	ROM_LOAD( "pr-5277.bin", 0x100, 0x100, CRC(bf2c33ab) SHA1(4a83b3e9b74b900621e8f42edf94cc04b791cdd0) )
 	ROM_LOAD( "pr-5276.bin", 0x200, 0x20,  CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
 	ROM_LOAD( "pr-5275.bin", 0x220, 0x20,  CRC(0c872a9b) SHA1(eaabce5d867a4e896bd356abc94429f9a4eec372) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "galaxyr", 0, NO_DUMP )
 ROM_END
 
 ROM_START( sblazerp )
@@ -529,6 +538,9 @@ ROM_START( sblazerp )
 	ROM_LOAD( "pr-5277.bin", 0x100, 0x100, CRC(bf2c33ab) SHA1(4a83b3e9b74b900621e8f42edf94cc04b791cdd0) )
 	ROM_LOAD( "pr-5276.bin", 0x200, 0x20,  CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
 	ROM_LOAD( "pr-5275.bin", 0x220, 0x20,  CRC(0c872a9b) SHA1(eaabce5d867a4e896bd356abc94429f9a4eec372) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "sblazer", 0, NO_DUMP )
 ROM_END
 
 ROM_START( cobraseg )
@@ -557,6 +569,9 @@ ROM_START( cobraseg )
 	ROM_LOAD( "pr-5277.bin", 0x100, 0x100, CRC(bf2c33ab) SHA1(4a83b3e9b74b900621e8f42edf94cc04b791cdd0) )
 	ROM_LOAD( "pr-5276.bin", 0x200, 0x20,  CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
 	ROM_LOAD( "pr-5275.bin", 0x220, 0x20,  CRC(0c872a9b) SHA1(eaabce5d867a4e896bd356abc94429f9a4eec372) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "cobracom", 0, NO_DUMP )
 ROM_END
 
 

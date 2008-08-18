@@ -19,6 +19,14 @@
 
 
 /***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+#define REPORT_BLANKS_THRESHOLD		8
+
+
+
+/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -52,6 +60,9 @@ static UINT32 video_cadence_history = 0;
 static int video_prev_whitefield = -1;
 static int video_min_overall = 255;
 static int video_max_overall = 0;
+static int video_first_blank_frame = -1;
+static int video_first_blank_field = -1;
+static int video_num_blank_fields = -1;
 static int video_first_low_frame = -1;
 static int video_first_low_field = -1;
 static int video_num_low_fields = -1;
@@ -307,9 +318,12 @@ static void verify_video(int frame, bitmap_t *bitmap)
 	/* loop over fields */
 	for (fieldnum = 0; fieldnum < fields_per_frame; fieldnum++)
 	{
+		int yminval, ymaxval, cbminval, cbmaxval, crminval, crmaxval;
 		int field = frame * fields_per_frame + fieldnum;
-		int x, y, pixels, remaining, minval, maxval;
-		UINT32 pixelhisto[256] = { 0 };
+		int x, y, pixels, remaining;
+		UINT32 yhisto[256] = { 0 };
+		UINT32 crhisto[256] = { 0 };
+		UINT32 cbhisto[256] = { 0 };
 		vbi_metadata metadata;
 
 		/* output status */
@@ -464,24 +478,63 @@ static void verify_video(int frame, bitmap_t *bitmap)
         for (y = 22*2 + fieldnum; y < bitmap->height; y += 2)
         {
         	for (x = 16; x < 720 - 16; x++)
-        		pixelhisto[*BITMAP_ADDR16(bitmap, y, x) >> 8]++;
+        	{
+        		yhisto[*BITMAP_ADDR16(bitmap, y, x) >> 8]++;
+        		if (x % 2 == 0)
+	        		cbhisto[*BITMAP_ADDR16(bitmap, y, x) & 0xff]++;
+        		else
+	        		crhisto[*BITMAP_ADDR16(bitmap, y, x) & 0xff]++;
+        	}
         	pixels += 720 - 16 - 16;
         }
 
-        /* remove the top/bottom 0.1% */
+        /* remove the top/bottom 0.1% of Y */
         remaining = pixels / 1000;
-        for (minval = 0; remaining >= 0; minval++)
-        	remaining -= pixelhisto[minval];
+        for (yminval = 0; remaining >= 0; yminval++)
+        	remaining -= yhisto[yminval];
         remaining = pixels / 1000;
-        for (maxval = 255; remaining >= 0; maxval--)
-        	remaining -= pixelhisto[maxval];
+        for (ymaxval = 255; remaining >= 0; ymaxval--)
+        	remaining -= yhisto[ymaxval];
+
+        /* remove the top/bottom 0.1% of Cb */
+        remaining = pixels / 500;
+        for (cbminval = 0; remaining >= 0; cbminval++)
+        	remaining -= cbhisto[cbminval];
+        remaining = pixels / 500;
+        for (cbmaxval = 255; remaining >= 0; cbmaxval--)
+        	remaining -= cbhisto[cbmaxval];
+
+        /* remove the top/bottom 0.1% of Cr */
+        remaining = pixels / 500;
+        for (crminval = 0; remaining >= 0; crminval++)
+        	remaining -= crhisto[crminval];
+        remaining = pixels / 500;
+        for (crmaxval = 255; remaining >= 0; crmaxval--)
+        	remaining -= crhisto[crmaxval];
+
+        /* track blank frames */
+		if (ymaxval - yminval < 10 && cbmaxval - cbminval < 10 && crmaxval - cbmaxval < 10)
+		{
+			if (video_first_blank_frame == -1)
+			{
+				video_first_blank_frame = frame;
+				video_first_blank_field = fieldnum;
+				video_num_blank_fields = 0;
+			}
+			video_num_blank_fields++;
+		}
+		else if (video_num_blank_fields >= REPORT_BLANKS_THRESHOLD)
+		{
+			printf("%6d.%d-%6d.%d: blank frames for %d fields (INFO)\n", video_first_blank_frame, video_first_blank_field, frame, fieldnum, video_num_blank_fields);
+			video_first_blank_frame = video_first_blank_field = video_num_blank_fields = -1;
+        }
 
         /* update the overall min/max */
-        video_min_overall = MIN(minval, video_min_overall);
-        video_max_overall = MAX(maxval, video_max_overall);
+        video_min_overall = MIN(yminval, video_min_overall);
+        video_max_overall = MAX(ymaxval, video_max_overall);
 
         /* track low fields */
-        if (minval < 16)
+        if (yminval < 16)
         {
         	if (video_first_low_frame == -1)
         	{
@@ -498,7 +551,7 @@ static void verify_video(int frame, bitmap_t *bitmap)
         }
 
         /* track high fields */
-        if (maxval > 236)
+        if (ymaxval > 236)
         {
         	if (video_first_high_frame == -1)
         	{
@@ -535,6 +588,8 @@ static void verify_video_final(int frame, bitmap_t *bitmap)
 		printf("Track %6d.%d: never saw any lead-out (WARNING)\n", field / fields_per_frame, 0);
 
 	/* any remaining high/low reports? */
+	if (video_num_blank_fields >= REPORT_BLANKS_THRESHOLD)
+		printf("%6d.%d-%6d.%d: blank frames for %d fields (INFO)\n", video_first_blank_frame, video_first_blank_field, frame, 0, video_num_blank_fields);
 	if (video_num_low_fields > 0)
 		printf("%6d.%d-%6d.%d: active video signal level low for %d fields (WARNING)\n", video_first_low_frame, video_first_low_field, frame, 0, video_num_low_fields);
 	if (video_num_high_fields > 0)

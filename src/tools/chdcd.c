@@ -119,6 +119,115 @@ static int msf_to_frames( char *token )
 	return f;
 }
 
+chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_track_input_info *outinfo)
+{
+	FILE *infile;
+	int i, numtracks;
+	int chdpos=0;
+
+	infile = fopen(tocfname, "rt");
+
+	if (infile == (FILE *)NULL)
+	{
+		return CHDERR_FILE_NOT_FOUND;
+	}
+
+	/* clear structures */
+	memset(outtoc, 0, sizeof(cdrom_toc));
+	memset(outinfo, 0, sizeof(chdcd_track_input_info));
+
+
+	fgets(linebuffer,511,infile);
+	numtracks=atoi(linebuffer);
+
+	for(i=0;i<numtracks;++i)
+	{	
+		char *tok;
+		int trknum;
+		int trksize,trktype;
+		int sz;
+		int hunks;
+
+
+		fgets(linebuffer,511,infile);
+		
+		tok=strtok(linebuffer," ");
+
+		trknum=atoi(tok)-1;
+
+		outinfo->swap[trknum]=0;
+		outinfo->offset[trknum]=0;
+
+		//outtoc->tracks[trknum].trktype = CD_TRACK_MODE1;
+		outtoc->tracks[trknum].datasize = 0;
+		outtoc->tracks[trknum].subtype = CD_SUB_NONE;
+		outtoc->tracks[trknum].subsize = 0;
+
+		tok=strtok(NULL," ");
+		outtoc->tracks[trknum].physframeofs=atoi(tok);
+	
+		tok=strtok(NULL," ");
+		trktype=atoi(tok);
+
+		tok=strtok(NULL," ");
+		trksize=atoi(tok);
+
+		if(trktype==4 && trksize==2352)
+		{
+			outtoc->tracks[trknum].trktype=CD_TRACK_MODE1_RAW;
+			outtoc->tracks[trknum].datasize=2352;
+		}
+		if(trktype==4 && trksize==2048)
+		{
+			outtoc->tracks[trknum].trktype=CD_TRACK_MODE1;
+			outtoc->tracks[trknum].datasize=2048;
+		}
+		if(trktype==0)
+		{
+			//assert(trksize==2352);
+			outtoc->tracks[trknum].trktype=CD_TRACK_AUDIO;
+			outtoc->tracks[trknum].datasize=2352;
+		}
+		
+		tok=strtok(NULL," ");
+		strcpy(&(outinfo->fname[trknum][0]),tok);
+		sz=get_file_size(outinfo->fname[trknum]);
+
+		outtoc->tracks[trknum].frames=sz/trksize;
+		outtoc->tracks[trknum].extraframes=0;
+		
+		if(trknum!=0)
+		{
+			int dif=outtoc->tracks[trknum].physframeofs-(outtoc->tracks[trknum-1].frames+outtoc->tracks[trknum-1].physframeofs);
+			outtoc->tracks[trknum-1].frames+=dif;
+		}
+
+/*
+		if(trknum!=0)
+		{
+			outtoc->tracks[trknum-1].extraframes=outtoc->tracks[trknum].physframeofs-(outtoc->tracks[trknum-1].frames+outtoc->tracks[trknum-1].physframeofs);
+		}
+*/
+		hunks = (outtoc->tracks[trknum].frames+CD_FRAMES_PER_HUNK - 1) / CD_FRAMES_PER_HUNK;
+		outtoc->tracks[trknum].extraframes = hunks * CD_FRAMES_PER_HUNK - outtoc->tracks[trknum].frames;
+
+		chdpos+=outtoc->tracks[trknum].frames+outtoc->tracks[trknum].extraframes;
+
+	}
+	/*
+	for(i=0;i<numtracks;++i)
+	{
+		printf("%s %d %d %d\n",outinfo->fname[i],outtoc->tracks[i].frames,outtoc->tracks[i].extraframes,outtoc->tracks[i].physframeofs);
+	}
+	*/
+	/* close the input TOC */
+	fclose(infile);
+
+	/* store the number of tracks found */
+	outtoc->numtrks = numtracks;
+
+	return CHDERR_NONE;
+}
 
 /*-------------------------------------------------
     chdcd_parse_toc - parse a CDRDAO format TOC file
@@ -129,6 +238,11 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 	FILE *infile;
 	int i, trknum;
 	static char token[128];
+
+	if (strstr(tocfname,".gdi"))
+	{
+		return chdcd_parse_gdi(tocfname, outtoc, outinfo);
+	}
 
 	infile = fopen(tocfname, "rt");
 

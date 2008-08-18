@@ -354,7 +354,7 @@ avcomp_error avcomp_encode_data(avcomp_state *state, const UINT8 *source, UINT8 
 	/* encode the video data */
 	if (width > 0 && height > 0)
 	{
-		UINT32 vidlength;
+		UINT32 vidlength = 0;
 
 		/* encode the video */
 		err = encode_video(state, width, height, videostart, videostride, videoxor, dest + dstoffs, &vidlength);
@@ -633,7 +633,7 @@ static avcomp_error encode_video_lossless(avcomp_state *state, int width, int he
 	huffman_error hufferr;
 	UINT32 outbytes;
 	UINT8 *output;
-
+	
 	/* set up the output; first byte is 0x80 to indicate lossless encoding */
 	output = dest;
 	*output++ = 0x80;
@@ -800,7 +800,7 @@ static avcomp_error decode_video(avcomp_state *state, int width, int height, con
 	/* if the high bit of the first byte is set, we decode losslessly */
 	if (source[0] & 0x80)
 		return decode_video_lossless(state, width, height, source, complength, dest, dstride, dxor);
-	else
+	else 
 		return AVCERR_INVALID_DATA;
 }
 

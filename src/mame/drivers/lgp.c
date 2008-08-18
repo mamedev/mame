@@ -83,6 +83,8 @@ static VIDEO_UPDATE( lgp )
 {
 	int charx, chary;
 
+	render_container_set_palette_alpha(render_container_get_screen(screen), 0, 0x00);
+
 	/* clear */
 	fillbitmap(bitmap, 0, cliprect);
 
@@ -340,13 +342,13 @@ static MACHINE_START( lgp )
 
 /* DRIVER */
 static MACHINE_DRIVER_START( lgp )
-/*  main cpu */
+	/* main cpu */
 	MDRV_CPU_ADD("main", Z80, CPU_PCB_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_program_map,0)
 	MDRV_CPU_IO_MAP(main_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", vblank_callback_lgp)
 
-/*  sound cpu */
+	/* sound cpu */
 	MDRV_CPU_ADD("audio", Z80, SOUND_PCB_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(sound_program_map,0)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
@@ -354,23 +356,17 @@ static MACHINE_DRIVER_START( lgp )
 	MDRV_MACHINE_START(lgp)
 
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000)
+	MDRV_LASERDISC_OVERLAY(lgp, 256, 256, BITMAP_FORMAT_INDEXED16)
 
-/*  video */
-
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	/* video hardware */
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_INDEXED16)
 
 	MDRV_PALETTE_LENGTH(256)
 	/* MDRV_PALETTE_INIT(lgp) */
 
 	MDRV_GFXDECODE(lgp)
-	MDRV_VIDEO_UPDATE(lgp)
 
-/*  sound */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
@@ -459,6 +455,9 @@ ROM_START( lgp )
 	ROM_LOAD( "a02_38.44",  0x00220, 0x100, CRC(6f37212a) SHA1(32b891dc9b97637620b2f1f9d9d76509c333cb2d) )
 	ROM_LOAD( "a02_39.109", 0x00320, 0x100, CRC(88363809) SHA1(b22a7bd8ce6b28bf7cfa64c3a08e4cf7f9b4cd20) )
 	ROM_LOAD( "a02_40.110", 0x00420, 0x100, CRC(fdfc7aac) SHA1(2413f7f9ad11c91d2adc0aab37bf70ff5c68ab6f) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "lgp", 0, NO_DUMP )
 ROM_END
 
 

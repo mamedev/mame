@@ -133,8 +133,8 @@ static void ATTR_PRINTF(2,3) progress(int forceit, const char *fmt, ...)
 
 	/* standard vfprintf stuff here */
 	va_start(arg, fmt);
-	vprintf(fmt, arg);
-	fflush(stdout);
+	vfprintf(stderr, fmt, arg);
+	fflush(stderr);
 	va_end(arg);
 }
 

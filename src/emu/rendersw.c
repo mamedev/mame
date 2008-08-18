@@ -210,6 +210,50 @@ INLINE UINT32 get_texel_palette16_bilinear(const render_texinfo *texture, INT32 
 
 
 /*-------------------------------------------------
+    get_texel_palette16a_nearest - return the
+    nearest neighbor texel from a palettized
+    16bpp source
+-------------------------------------------------*/
+
+INLINE UINT32 get_texel_palette16a_nearest(const render_texinfo *texture, INT32 curu, INT32 curv)
+{
+	const UINT16 *texbase = (const UINT16 *)texture->base + (curv >> 16) * texture->rowpixels + (curu >> 16);
+	return texture->palette[texbase[0]];
+}
+
+
+/*-------------------------------------------------
+    get_texel_palette16a_bilinear - return a
+    bilinear filtered texel from a palettized
+    16bpp source
+-------------------------------------------------*/
+
+INLINE UINT32 get_texel_palette16a_bilinear(const render_texinfo *texture, INT32 curu, INT32 curv)
+{
+	const UINT16 *texbase = texture->base;
+	rgb_t pix00, pix01, pix10, pix11;
+	INT32 u0, u1, v0, v1;
+
+	u0 = curu >> 16;
+	u1 = 1;
+	if (u0 < 0) u0 = u1 = 0;
+	else if (u0 + 1 >= texture->width) u0 = texture->width - 1, u1 = 0;
+	v0 = curv >> 16;
+	v1 = texture->rowpixels;
+	if (v0 < 0) v0 = v1 = 0;
+	else if (v0 + 1 >= texture->height) v0 = texture->height - 1, v1 = 0;
+
+	texbase += v0 * texture->rowpixels + u0;
+
+	pix00 = texture->palette[texbase[0]];
+	pix01 = texture->palette[texbase[u1]];
+	pix10 = texture->palette[texbase[v1]];
+	pix11 = texture->palette[texbase[u1 + v1]];
+	return rgba_bilinear_filter(pix00, pix01, pix10, pix11, curu >> 8, curv >> 8);
+}
+
+
+/*-------------------------------------------------
     get_texel_rgb15_nearest - return the
     nearest neighbor texel from a 15bpp RGB source
 -------------------------------------------------*/
@@ -1004,7 +1048,7 @@ static void FUNC_PREFIX(draw_quad_palettea16_alpha)(const render_primitive *prim
 			/* loop over cols */
 			for (x = setup->startx; x < endx; x++)
 			{
-				UINT32 pix = GET_TEXEL(palette16)(&prim->texture, curu, curv);
+				UINT32 pix = GET_TEXEL(palette16a)(&prim->texture, curu, curv);
 				UINT32 ta = pix >> 24;
 				if (ta != 0)
 				{
@@ -1047,7 +1091,7 @@ static void FUNC_PREFIX(draw_quad_palettea16_alpha)(const render_primitive *prim
 			/* loop over cols */
 			for (x = setup->startx; x < endx; x++)
 			{
-				UINT32 pix = GET_TEXEL(palette16)(&prim->texture, curu, curv);
+				UINT32 pix = GET_TEXEL(palette16a)(&prim->texture, curu, curv);
 				UINT32 ta = (pix >> 24) * sa;
 				if (ta != 0)
 				{

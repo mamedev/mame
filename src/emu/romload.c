@@ -1010,7 +1010,7 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 					sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s NOT FOUND\n", astring_c(filename));
 
 				/* if this is NO_DUMP, keep going, though the system may not be able to handle it */
-				if (hash_data_has_info(ROM_GETHASHDATA(romp), HASH_INFO_NO_DUMP))
+				if (hash_data_has_info(ROM_GETHASHDATA(romp), HASH_INFO_NO_DUMP) || DISK_ISOPTIONAL(romp))
 					romdata->warnings++;
 				else
 					romdata->errors++;

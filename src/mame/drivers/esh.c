@@ -42,6 +42,8 @@ static VIDEO_UPDATE( esh )
 {
 	int charx, chary;
 
+	render_container_set_palette_alpha(render_container_get_screen(screen), 0, 0x00);
+
 	/* clear */
 	fillbitmap(bitmap, 0, cliprect);
 
@@ -280,7 +282,8 @@ static MACHINE_START( esh )
 
 /* DRIVER */
 static MACHINE_DRIVER_START( esh )
-/*  main cpu */
+
+	/* main cpu */
 	MDRV_CPU_ADD("main", Z80, PCB_CLOCK/6)						/* The denominator is a Daphne guess based on PacMan's hardware */
 	MDRV_CPU_PROGRAM_MAP(z80_0_mem,0)
 	MDRV_CPU_IO_MAP(z80_0_io,0)
@@ -291,23 +294,17 @@ static MACHINE_DRIVER_START( esh )
 	MDRV_MACHINE_START(esh)
 
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000)
+	MDRV_LASERDISC_OVERLAY(esh, 256, 256, BITMAP_FORMAT_INDEXED16)
 
-/*  video */
-
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	/* video hardware */
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_INDEXED16)
 
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(esh)
 
 	MDRV_GFXDECODE(esh)
-	MDRV_VIDEO_UPDATE(esh)
 
-/*  sound */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
@@ -334,6 +331,9 @@ ROM_START( esh )
 	ROM_LOAD( "rgb.j1", 0x000, 0x200, CRC(1e9f795f) SHA1(61a58694929fa39b2412bc9244e5681d65a0eacb) )
 	ROM_LOAD( "h.c5",   0x200, 0x100, CRC(abde5e4b) SHA1(9dd3a7fd523b519ac613b9f08ae9cc962992cf5d) )	/* Video timing? */
 	ROM_LOAD( "v.c6",   0x300, 0x100, CRC(7157ba22) SHA1(07355f30efe46196d216356eda48a59fc622e43f) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "esh", 0, NO_DUMP )
 ROM_END
 
 ROM_START( esha )
@@ -353,6 +353,9 @@ ROM_START( esha )
 	ROM_LOAD( "rgb.j1", 0x000, 0x200, CRC(1e9f795f) SHA1(61a58694929fa39b2412bc9244e5681d65a0eacb) )
 	ROM_LOAD( "h.c5",   0x200, 0x100, CRC(abde5e4b) SHA1(9dd3a7fd523b519ac613b9f08ae9cc962992cf5d) )	/* Video timing? */
 	ROM_LOAD( "v.c6",   0x300, 0x100, CRC(7157ba22) SHA1(07355f30efe46196d216356eda48a59fc622e43f) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "esh", 0, NO_DUMP )
 ROM_END
 
 ROM_START( eshb )
@@ -372,6 +375,9 @@ ROM_START( eshb )
 	ROM_LOAD( "rgb.j1", 0x000, 0x200, CRC(1e9f795f) SHA1(61a58694929fa39b2412bc9244e5681d65a0eacb) )
 	ROM_LOAD( "h.c5",   0x200, 0x100, CRC(abde5e4b) SHA1(9dd3a7fd523b519ac613b9f08ae9cc962992cf5d) )	/* Video timing? */
 	ROM_LOAD( "v.c6",   0x300, 0x100, CRC(7157ba22) SHA1(07355f30efe46196d216356eda48a59fc622e43f) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "esh", 0, NO_DUMP )
 ROM_END
 
 

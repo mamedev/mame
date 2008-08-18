@@ -38,16 +38,6 @@ static int pr7820_enter;
 
 static const UINT8 led_map[16] = { 0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7c, 0x07, 0x7f, 0x67, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x00 };
 
-/* Video */
-
-static VIDEO_UPDATE( thayers )
-{
-	/* display disc information */
-	popmessage("%s", laserdisc_describe_state(laserdisc));
-
-	return 0;
-}
-
 /* Interrupts */
 
 static void check_interrupt(running_machine *machine)
@@ -772,15 +762,9 @@ static MACHINE_DRIVER_START( thayers )
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR7820)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // inaccurate
-	MDRV_SCREEN_SIZE(32*10, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*10, 32*10-1, 0*8, 32*8-1)
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_RGB32)
 
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_VIDEO_UPDATE(thayers)
 
 	/* sound hardware */
 	// SSI 263 @ 2MHz

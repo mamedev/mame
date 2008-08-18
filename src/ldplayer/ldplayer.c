@@ -15,46 +15,11 @@
 #include <ctype.h>
 
 
-static render_texture *video_texture;
 static astring *filename;
 
 static input_port_value last_controls;
 static UINT8 playing;
 static UINT8 displaying;
-
-
-
-/*************************************
- *
- *  Video update
- *
- *************************************/
-
-static VIDEO_START( ldplayer )
-{
-	/* allocate a video texture */
-	video_texture = render_texture_alloc(NULL, NULL);
-	if (video_texture == NULL)
-		fatalerror("Out of memory allocating video texture");
-}
-
-
-static VIDEO_UPDATE( ldplayer )
-{
-	const device_config *laserdisc = device_list_first(screen->machine->config->devicelist, LASERDISC);
-	bitmap_t *video_bitmap;
-
-	/* now talk to the laserdisc */
-	laserdisc_get_video(laserdisc, &video_bitmap);
-	if (video_bitmap != NULL)
-		render_texture_set_bitmap(video_texture, video_bitmap, NULL, 0, TEXFORMAT_YUY16);
-
-	/* add a quad to the screen */
-	render_container_empty(render_container_get_screen(screen));
-	render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), video_texture, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
-
-	return 0;
-}
 
 
 
@@ -217,15 +182,6 @@ static MACHINE_DRIVER_START( ldplayer_core )
 	MDRV_MACHINE_START(ldplayer)
 	MDRV_MACHINE_RESET(ldplayer)
 
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER)
-
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-
-	MDRV_VIDEO_START(ldplayer)
-	MDRV_VIDEO_UPDATE(ldplayer)
-
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
@@ -238,9 +194,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ldplayer_ntsc )
 	MDRV_IMPORT_FROM(ldplayer_core)
-
-	MDRV_SCREEN_MODIFY("main")
-	MDRV_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 910, 0, 720, 525.0/2, 0, 480/2)
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_RGB32)
 MACHINE_DRIVER_END
 
 

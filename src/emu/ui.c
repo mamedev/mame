@@ -12,6 +12,7 @@
 #include "driver.h"
 #include "osdepend.h"
 #include "video/vector.h"
+#include "machine/laserdsc.h"
 #include "profiler.h"
 #include "cheat.h"
 #include "render.h"
@@ -151,9 +152,14 @@ static INT32 slider_xscale(running_machine *machine, INT32 newval, char *buffer,
 static INT32 slider_yscale(running_machine *machine, INT32 newval, char *buffer, void *arg);
 static INT32 slider_xoffset(running_machine *machine, INT32 newval, char *buffer, void *arg);
 static INT32 slider_yoffset(running_machine *machine, INT32 newval, char *buffer, void *arg);
+static INT32 slider_overxscale(running_machine *machine, INT32 newval, char *buffer, void *arg);
+static INT32 slider_overyscale(running_machine *machine, INT32 newval, char *buffer, void *arg);
+static INT32 slider_overxoffset(running_machine *machine, INT32 newval, char *buffer, void *arg);
+static INT32 slider_overyoffset(running_machine *machine, INT32 newval, char *buffer, void *arg);
 static INT32 slider_flicker(running_machine *machine, INT32 newval, char *buffer, void *arg);
 static INT32 slider_beam(running_machine *machine, INT32 newval, char *buffer, void *arg);
 static char *slider_get_screen_desc(const device_config *screen);
+static char *slider_get_laserdisc_desc(const device_config *screen);
 #ifdef MAME_DEBUG
 static INT32 slider_crossscale(running_machine *machine, INT32 newval, char *buffer, void *arg);
 static INT32 slider_crossoffset(running_machine *machine, INT32 newval, char *buffer, void *arg);
@@ -1530,9 +1536,8 @@ static UINT32 handler_load_save(running_machine *machine, UINT32 state)
 
 static void slider_init(running_machine *machine)
 {
-	int numscreens = video_screen_count(machine->config);
-	const input_port_config *port;
 	const input_field_config *field;
+	const input_port_config *port;
 	const device_config *device;
 	int numitems, item;
 
@@ -1571,15 +1576,14 @@ static void slider_init(running_machine *machine)
 			slider_config(&slider_list[slider_count++], 10, 1000, 2000, 1, slider_overclock, (void *)(FPTR)item);
 	}
 
-	for (item = 0; item < numscreens; item++)
+	for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
 	{
-		const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, item);
-		const screen_config *scrconfig = screen->inline_config;
+		const screen_config *scrconfig = device->inline_config;
 		int defxscale = floor(scrconfig->xscale * 1000.0f + 0.5f);
 		int defyscale = floor(scrconfig->yscale * 1000.0f + 0.5f);
 		int defxoffset = floor(scrconfig->xoffset * 1000.0f + 0.5f);
 		int defyoffset = floor(scrconfig->yoffset * 1000.0f + 0.5f);
-		void *param = (void *)screen;
+		void *param = (void *)device;
 
 		/* add refresh rate tweaker */
 		if (options_get_bool(mame_options(), OPTION_CHEAT))
@@ -1595,6 +1599,25 @@ static void slider_init(running_machine *machine)
 		slider_config(&slider_list[slider_count++], -500, defxoffset, 500, 2, slider_xoffset, param);
 		slider_config(&slider_list[slider_count++], 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_yscale, param);
 		slider_config(&slider_list[slider_count++], -500, defyoffset, 500, 2, slider_yoffset, param);
+	}
+
+	for (device = device_list_first(machine->config->devicelist, LASERDISC); device != NULL; device = device_list_next(device, LASERDISC))
+	{
+		const laserdisc_config *config = device->inline_config;
+		if (config->overupdate != NULL)
+		{
+			int defxscale = floor(config->overscalex * 1000.0f + 0.5f);
+			int defyscale = floor(config->overscaley * 1000.0f + 0.5f);
+			int defxoffset = floor(config->overposx * 1000.0f + 0.5f);
+			int defyoffset = floor(config->overposy * 1000.0f + 0.5f);
+			void *param = (void *)device;
+		
+			/* add scale and offset controls per-overlay */
+			slider_config(&slider_list[slider_count++], 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_overxscale, param);
+			slider_config(&slider_list[slider_count++], -500, defxoffset, 500, 2, slider_overxoffset, param);
+			slider_config(&slider_list[slider_count++], 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_overyscale, param);
+			slider_config(&slider_list[slider_count++], -500, defyoffset, 500, 2, slider_overyoffset, param);
+		}
 	}
 
 	for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
@@ -1938,6 +1961,90 @@ static INT32 slider_yoffset(running_machine *machine, INT32 newval, char *buffer
 
 
 /*-------------------------------------------------
+    slider_overxscale - screen horizontal scale slider
+    callback
+-------------------------------------------------*/
+
+static INT32 slider_overxscale(running_machine *machine, INT32 newval, char *buffer, void *arg)
+{
+	const device_config *laserdisc = arg;
+	laserdisc_config settings;
+
+	laserdisc_get_config(laserdisc, &settings);
+	if (buffer != NULL)
+	{
+		settings.overscalex = (float)newval * 0.001f;
+		laserdisc_set_config(laserdisc, &settings);
+		sprintf(buffer, "%s %s %.3f", slider_get_laserdisc_desc(laserdisc), "Overlay Horiz Stretch", settings.overscalex);
+	}
+	return floor(settings.overscalex * 1000.0f + 0.5f);
+}
+
+
+/*-------------------------------------------------
+    slider_overyscale - screen vertical scale slider
+    callback
+-------------------------------------------------*/
+
+static INT32 slider_overyscale(running_machine *machine, INT32 newval, char *buffer, void *arg)
+{
+	const device_config *laserdisc = arg;
+	laserdisc_config settings;
+
+	laserdisc_get_config(laserdisc, &settings);
+	if (buffer != NULL)
+	{
+		settings.overscaley = (float)newval * 0.001f;
+		laserdisc_set_config(laserdisc, &settings);
+		sprintf(buffer, "%s %s %.3f", slider_get_laserdisc_desc(laserdisc), "Overlay Vert Stretch", settings.overscaley);
+	}
+	return floor(settings.overscaley * 1000.0f + 0.5f);
+}
+
+
+/*-------------------------------------------------
+    slider_overxoffset - screen horizontal position
+    slider callback
+-------------------------------------------------*/
+
+static INT32 slider_overxoffset(running_machine *machine, INT32 newval, char *buffer, void *arg)
+{
+	const device_config *laserdisc = arg;
+	laserdisc_config settings;
+
+	laserdisc_get_config(laserdisc, &settings);
+	if (buffer != NULL)
+	{
+		settings.overposx = (float)newval * 0.001f;
+		laserdisc_set_config(laserdisc, &settings);
+		sprintf(buffer, "%s %s %.3f", slider_get_laserdisc_desc(laserdisc), "Overlay Horiz Position", settings.overposx);
+	}
+	return floor(settings.overposx * 1000.0f + 0.5f);
+}
+
+
+/*-------------------------------------------------
+    slider_overyoffset - screen vertical position
+    slider callback
+-------------------------------------------------*/
+
+static INT32 slider_overyoffset(running_machine *machine, INT32 newval, char *buffer, void *arg)
+{
+	const device_config *laserdisc = arg;
+	laserdisc_config settings;
+
+	laserdisc_get_config(laserdisc, &settings);
+	if (buffer != NULL)
+	{
+		settings.overposy = (float)newval * 0.001f;
+		laserdisc_set_config(laserdisc, &settings);
+		sprintf(buffer, "%s %s %.3f", slider_get_laserdisc_desc(laserdisc), "Overlay Vert Position", settings.overposy);
+	}
+	return floor(settings.overposy * 1000.0f + 0.5f);
+}
+
+
+/*-------------------------------------------------
     slider_flicker - vector flicker slider
     callback
 -------------------------------------------------*/
@@ -1971,7 +2078,7 @@ static INT32 slider_beam(running_machine *machine, INT32 newval, char *buffer, v
 
 /*-------------------------------------------------
     slider_get_screen_desc - returns the
-    description for a given screen index
+    description for a given screen
 -------------------------------------------------*/
 
 static char *slider_get_screen_desc(const device_config *screen)
@@ -1983,6 +2090,25 @@ static char *slider_get_screen_desc(const device_config *screen)
 		sprintf(descbuf, "Screen '%s'", screen->tag);
 	else
 		strcpy(descbuf, "Screen");
+
+	return descbuf;
+}
+
+
+/*-------------------------------------------------
+    slider_get_laserdisc_desc - returns the
+    description for a given laseridsc
+-------------------------------------------------*/
+
+static char *slider_get_laserdisc_desc(const device_config *laserdisc)
+{
+	int ldcount = device_list_items(laserdisc->machine->config->devicelist, LASERDISC);
+	static char descbuf[256];
+
+	if (ldcount > 1)
+		sprintf(descbuf, "Laserdisc '%s'", laserdisc->tag);
+	else
+		strcpy(descbuf, "Laserdisc");
 
 	return descbuf;
 }

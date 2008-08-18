@@ -7938,6 +7938,7 @@ Other Sun games
 	DRIVER( ttchampa )
 	DRIVER( dreamwld )	/* (c) 2000 SemiCom */
 	DRIVER( cybertnk )	/* (c) 1990 Coreland */
+	DRIVER( cubeqst )	/* (c) 1983 Simutrek Inc. */
 	DRIVER( pkscram )	/* (c) 1993 Cosmo Electronics Corporation */
 
 	/* Funworld */

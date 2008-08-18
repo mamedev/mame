@@ -203,6 +203,8 @@ static void gpworld_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 static VIDEO_UPDATE( gpworld )
 {
+	render_container_set_palette_alpha(render_container_get_screen(screen), 0, 0x00);
+
 	fillbitmap(bitmap, 0, cliprect);
 
 	gpworld_draw_tiles(screen->machine, bitmap, cliprect);
@@ -427,7 +429,8 @@ GFXDECODE_END
 
 /* DRIVER */
 static MACHINE_DRIVER_START( gpworld )
-/*  main cpu */
+
+	/* main cpu */
 	MDRV_CPU_ADD("main", Z80, GUESSED_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(mainmem,0)
 	MDRV_CPU_IO_MAP(mainport,0)
@@ -436,21 +439,15 @@ static MACHINE_DRIVER_START( gpworld )
 	MDRV_MACHINE_START(gpworld)
 
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000)
+	MDRV_LASERDISC_OVERLAY(gpworld, 512, 256, BITMAP_FORMAT_INDEXED16)
 
-/*  video */
-
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	/* video hardware */
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_INDEXED16)
 
 	MDRV_GFXDECODE(gpworld)
 	MDRV_PALETTE_LENGTH(1024)
-	MDRV_VIDEO_UPDATE(gpworld)
 
-/*  sound */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
@@ -490,6 +487,9 @@ ROM_START( gpworld )
 	ROM_LOAD( "pr6146.ic2",  0x000, 0x020, CRC(d10801a0) SHA1(89e9ac0d9c9eee6efd5455a3416c436ceda8f632) )
 	ROM_LOAD( "pr6147.ic28", 0x020, 0x100, CRC(b7173df9) SHA1(044beda43cb1793033021a08b3ee3441d5ffe6c3) )
 	ROM_LOAD( "pr5501.ic14", 0x120, 0x100, CRC(1bdf71d4) SHA1(ac52e948cce6df4abb7543c08e2c6454efd63e79) )
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "gpworld", 0, NO_DUMP )
 ROM_END
 
 

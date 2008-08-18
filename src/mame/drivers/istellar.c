@@ -44,6 +44,8 @@ static VIDEO_UPDATE( istellar )
 {
 	int charx, chary;
 
+	render_container_set_palette_alpha(render_container_get_screen(screen), 0, 0x00);
+
 	/* clear */
 	fillbitmap(bitmap, 0, cliprect);
 
@@ -325,18 +327,18 @@ static INTERRUPT_GEN( vblank_callback_istellar )
 
 /* DRIVER */
 static MACHINE_DRIVER_START( istellar )
-/*  main cpu */
+	/* main cpu */
 	MDRV_CPU_ADD("main", Z80, GUESSED_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(z80_0_mem,0)
 	MDRV_CPU_IO_MAP(z80_0_io,0)
 	MDRV_CPU_VBLANK_INT("main", vblank_callback_istellar)
 
-/*  sound cpu */
+	/* sound cpu */
 	MDRV_CPU_ADD("audio", Z80, GUESSED_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(z80_1_mem,0)
 	MDRV_CPU_IO_MAP(z80_1_io,0)
 
-/*  ldp comm cpu */
+	/* ldp comm cpu */
 	MDRV_CPU_ADD("sub", Z80, GUESSED_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(z80_2_mem,0)
 	MDRV_CPU_IO_MAP(z80_2_io,0)
@@ -344,23 +346,17 @@ static MACHINE_DRIVER_START( istellar )
 	MDRV_MACHINE_START(istellar)
 
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000)
+	MDRV_LASERDISC_OVERLAY(istellar, 256, 256, BITMAP_FORMAT_INDEXED16)
 
-/*  video */
-
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	/* video hardware */
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_INDEXED16)
 
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(istellar)
 
 	MDRV_GFXDECODE(istellar)
-	MDRV_VIDEO_UPDATE(istellar)
 
-/*  sound */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
@@ -399,6 +395,9 @@ ROM_START( istellar )
 	ROM_LOAD( "red6b.bot",   0x000, 0x100, CRC(5c52f844) SHA1(a8a3d91f3247ad13c805d8d8288b07f3cdaf1189) )	/* At IC location C63? (bottom board) - label ? */
 	ROM_LOAD( "green6c.bot", 0x100, 0x100, CRC(7d8c845c) SHA1(04ae2ca0cc6679e21346ce34e9e01aa5bf4e2067) )	/* At IC location C62? (bottom board) - label ? */
 	ROM_LOAD( "blue6d.bot",  0x200, 0x100, CRC(5ebb81f9) SHA1(285d60f2894c524ca80fc68ad7c2dfd9093a67ea) )	/* At IC location C61? (bottom board) - label ? */
+
+	DISK_REGION( "laserdisc" )
+	DISK_IMAGE_READONLY( "istellar", 0, NO_DUMP )
 ROM_END
 
 

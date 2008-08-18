@@ -208,6 +208,7 @@ struct _rom_load_data
 /* ----- per-disk macros ----- */
 #define DISK_GETINDEX(r)			((r)->_offset)
 #define DISK_ISREADONLY(r)			((ROM_GETFLAGS(r) & DISK_READONLYMASK) == DISK_READONLY)
+#define DISK_ISOPTIONAL(r)			((ROM_GETFLAGS(r) & ROM_OPTIONALMASK) == ROM_OPTIONAL)
 
 
 /* ----- start/stop macros ----- */
@@ -259,6 +260,7 @@ struct _rom_load_data
 #define DISK_REGION(tag)							ROM_REGION(1, tag, ROMREGION_DATATYPEDISK)
 #define DISK_IMAGE(name,idx,hash)					ROMX_LOAD(name, idx, 0, hash, DISK_READWRITE)
 #define DISK_IMAGE_READONLY(name,idx,hash)			ROMX_LOAD(name, idx, 0, hash, DISK_READONLY)
+#define DISK_IMAGE_READONLY_OPTIONAL(name,idx,hash)	ROMX_LOAD(name, idx, 0, hash, DISK_READONLY | ROM_OPTIONAL)
 
 
 /* ----- hash macros ----- */

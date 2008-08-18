@@ -38,6 +38,4 @@ extern WRITE8_HANDLER( gottlieb_laserdisc_video_control_w );
 extern WRITE8_HANDLER( gottlieb_paletteram_w );
 
 VIDEO_START( gottlieb );
-VIDEO_START( gottlieb_laserdisc );
 VIDEO_UPDATE( gottlieb );
-VIDEO_UPDATE( gottlieb_laserdisc );
