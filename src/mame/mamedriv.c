@@ -1339,6 +1339,7 @@ const game_driver * const drivers[] =
 	/* trivia: IREM means "International Rental Electronics Machines" */
 	DRIVER( andromed )	/* (c) 1979 */
 	DRIVER( ipminvad )	/* M10 no copyright notice */
+	DRIVER( ipminva1 )	/* M10 incomplete dump */
 	DRIVER( skychut )	/* Irem [1980] */
 	DRIVER( spacbeam )	/* M15 no copyright notice */
 	DRIVER( greenber )	/* Irem */
@@ -1346,6 +1347,8 @@ const game_driver * const drivers[] =
 
 	DRIVER( redalert )	/* (c) 1981 + "GDI presents" */
 	DRIVER( demoneye )	/* (c) 1981 */
+	DRIVER( ww3 )		/* (c) 1981 */
+
 	DRIVER( olibochu )	/* M47 (c) 1981 + "GDI presents" */
 	DRIVER( mpatrol )	/* M52 (c) 1982 */
 	DRIVER( mpatrolw )	/* M52 (c) 1982 + Williams license */

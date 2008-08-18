@@ -38,7 +38,7 @@ UINT8 *redalert_video_control;
  *************************************/
 
 static UINT8 *redalert_bitmap_colorram;
-
+static UINT8  redalert_control_xor;
 
 
 /*************************************
@@ -141,8 +141,16 @@ static VIDEO_START( redalert )
 	redalert_bitmap_colorram = auto_malloc(0x0400);
 
 	state_save_register_global_pointer(redalert_bitmap_colorram, 0x0400);
+	
+	redalert_control_xor = 0x00;
 }
 
+static VIDEO_START( ww3 )
+{
+	VIDEO_START_CALL( redalert );
+
+	redalert_control_xor = 0x04;
+}
 
 
 /*************************************
@@ -198,7 +206,7 @@ static VIDEO_UPDATE( redalert )
 			else
 				pen = pens[((charmap_code & 0xfe) << 1) | color_prom_a0_a1];
 
-			if (*redalert_video_control & 0x04)
+			if ((*redalert_video_control ^ redalert_control_xor) & 0x04)
 				*BITMAP_ADDR32(bitmap, y, x) = pen;
 			else
 				*BITMAP_ADDR32(bitmap, y ^ 0xff, x ^ 0xff) = pen;
@@ -299,9 +307,8 @@ static VIDEO_UPDATE( demoneye )
  *
  *************************************/
 
-MACHINE_DRIVER_START( redalert_video )
+static MACHINE_DRIVER_START( redalert_video_common )
 
-	MDRV_VIDEO_START(redalert)
 	MDRV_VIDEO_UPDATE(redalert)
 
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -313,6 +320,19 @@ MACHINE_DRIVER_START( redalert_video )
 
 MACHINE_DRIVER_END
 
+MACHINE_DRIVER_START( redalert_video )
+
+	MDRV_VIDEO_START(redalert)
+	MDRV_IMPORT_FROM( redalert_video_common )
+	
+MACHINE_DRIVER_END
+
+MACHINE_DRIVER_START( ww3_video )
+
+	MDRV_VIDEO_START( ww3 )
+	MDRV_IMPORT_FROM( redalert_video_common )
+	
+MACHINE_DRIVER_END
 
 
 /*************************************

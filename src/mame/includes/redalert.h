@@ -15,6 +15,7 @@ WRITE8_HANDLER( redalert_voice_command_w );
 WRITE8_HANDLER( demoneye_audio_command_w );
 
 MACHINE_DRIVER_EXTERN( redalert_audio );
+MACHINE_DRIVER_EXTERN( ww3_audio );
 MACHINE_DRIVER_EXTERN( demoneye_audio );
 
 
@@ -26,5 +27,6 @@ extern UINT8 *redalert_charmap_videoram;
 extern UINT8 *redalert_video_control;
 WRITE8_HANDLER( redalert_bitmap_videoram_w );
 
+MACHINE_DRIVER_EXTERN( ww3_video );
 MACHINE_DRIVER_EXTERN( redalert_video );
 MACHINE_DRIVER_EXTERN( demoneye_video );

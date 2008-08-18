@@ -143,13 +143,17 @@ static ADDRESS_MAP_START( redalert_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x77ff) AM_MIRROR(0x0800) AM_ROM
 ADDRESS_MAP_END
 
+/*************************************
+ *
+ * Red Alert audio board
+ *
+ *************************************/
 
 static SOUND_START( redalert_audio )
 {
 	state_save_register_global(ay8910_latch_1);
 	state_save_register_global(ay8910_latch_2);
 }
-
 
 
 /*************************************
@@ -209,22 +213,15 @@ static SOUND_START( redalert )
 
 /*************************************
  *
- *  Red Alert machine driver
+ *  Red Alert audio board (m37b)
  *
  *************************************/
 
-MACHINE_DRIVER_START( redalert_audio )
+static MACHINE_DRIVER_START( redalert_audio_m37b )
 
 	MDRV_CPU_ADD("audio", M6502, REDALERT_AUDIO_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(redalert_audio_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, REDALERT_AUDIO_CPU_IRQ_FREQ)
-
-	MDRV_CPU_ADD("voice", 8085A, REDALERT_VOICE_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(redalert_voice_map,0)
-
-	MDRV_SOUND_START( redalert )
-
-	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay", AY8910, REDALERT_AY8910_CLOCK)
 	MDRV_SOUND_CONFIG(redalert_ay8910_interface)
@@ -232,11 +229,55 @@ MACHINE_DRIVER_START( redalert_audio )
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 	/* channel C is used a noise source and is not connected to a speaker */
 
+MACHINE_DRIVER_END
+
+/*************************************
+ *
+ *  Red Alert voice board (ue17b)
+ *
+ *************************************/
+
+static MACHINE_DRIVER_START( redalert_audio_voice )
+
+	MDRV_CPU_ADD("voice", 8085A, REDALERT_VOICE_CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(redalert_voice_map,0)
+
 	MDRV_SOUND_ADD("cvsd", HC55516, REDALERT_HC55516_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
+/*************************************
+ *
+ *  Red Alert
+ *
+ *************************************/
 
+MACHINE_DRIVER_START( redalert_audio )
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_IMPORT_FROM( redalert_audio_m37b )
+	MDRV_IMPORT_FROM( redalert_audio_voice )
+
+	MDRV_SOUND_START( redalert )
+
+MACHINE_DRIVER_END
+
+/*************************************
+ *
+ *  Red Alert
+ *
+ *************************************/
+
+MACHINE_DRIVER_START( ww3_audio )
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_IMPORT_FROM( redalert_audio_m37b )
+
+	MDRV_SOUND_START( redalert_audio )
+
+MACHINE_DRIVER_END
 
 /*************************************
  *

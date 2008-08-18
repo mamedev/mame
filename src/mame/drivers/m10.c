@@ -99,6 +99,16 @@ Notes (couriersud)
 
     M10-Board: Has SN76477
 
+	ipminva1
+	========
+	
+	This is from an incomplete dump without documentation.
+	The filename contained m10 and with a hack to work
+	around the missing rom you get some action.
+	
+	The files are all different from ipminvad. Either this has
+	been a prototype or eventually the famous "capsule invader".
+		
 ***************************************************************************/
 #include "driver.h"
 #include "sound/samples.h"
@@ -834,6 +844,16 @@ static MACHINE_DRIVER_START( headoni )
 	MDRV_CPU_REPLACE("main", M6502,11730000/16)
 MACHINE_DRIVER_END
 
+/*************************************
+ *
+ *  Driver Initialization
+ *
+ *************************************/
+
+/*
+ * Hacks to work around missing roms to get at least some 
+ * video output
+ */
 static DRIVER_INIT( andromed )
 {
 	int i;
@@ -843,6 +863,14 @@ static DRIVER_INIT( andromed )
 		state->rom[i]=0x60;
 }
 
+static DRIVER_INIT( ipminva1 )
+{
+	int i;
+	m10_state *state = machine->driver_data;
+
+	for (i=0x1400;i<0x17ff;i++)
+		state->rom[i]=0x60;
+}
 
 /***************************************************************************
 
@@ -883,6 +911,22 @@ ROM_START( ipminvad )
 	ROM_LOAD( "b10r", 0x0400, 0x0400, CRC(be4b8585) SHA1(0154eae62585e154cf20edcf4599bda8bd333aa9) )
 ROM_END
 
+ROM_START( ipminva1 )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "b1g",  0x1000, 0x0400, CRC(069102e2) SHA1(90affe384a688b0d42154633e80b708371117fc2) )
+	ROM_LOAD( "b2f",  0x1400, 0x0400, CRC(a6aa5879) SHA1(959ab207110785c03e57ca69c0e62356dd974085) )
+	ROM_LOAD( "b3f",  0x1800, 0x0400, CRC(0c09feb9) SHA1(0db43f480162f8e3fb8b61fcceb2884d19ff115b) )
+	ROM_LOAD( "b4f",  0x1c00, 0x0400, CRC(a4d32207) SHA1(ea9a01d09d82b8c27701601f03989735558d975c) )
+	ROM_RELOAD(       0xfc00, 0x0400 )	/* for the reset and interrupt vectors */
+	ROM_LOAD( "b5f",  0x2000, 0x0400, CRC(192361c7) SHA1(b13e80429a9183ce78c4df52a32070416d4ec988) )
+	ROM_LOAD( "b6f",  0x2400, 0x0400, NO_DUMP )
+	ROM_LOAD( "b7f",  0x2800, 0x0400, CRC(0f5115ab) SHA1(3bdd3fc1cfe6bfacb5820ee12c15f2909d2f58d1) )
+	
+	ROM_REGION( 0x0800, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "b9",  0x0000, 0x0400, CRC(f6cfa53c) SHA1(ec1076982edee95efb24a1bb08e733bcccacb922) )
+	ROM_LOAD( "b10", 0x0400, 0x0400, CRC(63672cd2) SHA1(3d9fa15509a363e1a32e58a2242b266b1162e9a6) )
+ROM_END
+
 ROM_START( skychut )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "sc1d",  0x1000, 0x0400, CRC(30b5ded1) SHA1(3a8b4fa344522404661b062808a2ea1d5858fdd0) )
@@ -917,7 +961,7 @@ ROM_START( headoni )
 	ROM_LOAD( "e2.9b", 0x1400, 0x0400, CRC(dada26a8) SHA1(1368ade1c0c57d33d15594370cf1edf95fc44fd1) )
 	ROM_LOAD( "e3.9c", 0x1800, 0x0400, CRC(61ff24f5) SHA1(0e68aedd01b765fb2af76f914b3d287ecf30f716) )
 	ROM_LOAD( "e4.9d", 0x1c00, 0x0400, CRC(ce4c5a67) SHA1(8db493d43f311a29127405aad7693bc08b570b14) )
-	ROM_RELOAD(      0xfc00, 0x0400 )	/* for the reset and interrupt vectors */
+	ROM_RELOAD(        0xfc00, 0x0400 )	/* for the reset and interrupt vectors */
 	ROM_LOAD( "e5.9f", 0x2000, 0x0400, CRC(b5232439) SHA1(39b8fb4bbd00a73b9a2b68bc3e88fb45d3f62d7c) )
 	ROM_LOAD( "e6.9g", 0x2400, 0x0400, CRC(99acd1a6) SHA1(799382c1b079aad3034a1cc738dc06954978a0ac) )
 ROM_END
@@ -938,6 +982,7 @@ ROM_END
 
 GAME( 1979, andromed, 0, m11,     skychut,  andromed, ROT270, "Irem", "Andromeda (Japan?)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS | GAME_NOT_WORKING )
 GAME( 1979?,ipminvad, 0, m10,     ipminvad, 0,        ROT270, "Irem", "I P M Invader", GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS )
+GAME( ????, ipminva1, 0, m10,     ipminvad, ipminva1, ROT270, "Irem", "I P M Invader (Incomplete Dump)", GAME_NOT_WORKING )
 GAME( 1980, skychut,  0, m11,     skychut,  0,        ROT270, "Irem", "Sky Chuter", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
 GAME( 1979, spacbeam, 0, m15,     spacbeam, 0,        ROT270, "Irem", "Space Beam", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS )
 GAME( 1979?,headoni,  0, headoni, headoni,  0,        ROT270, "Irem", "Head On (Irem, M-15 Hardware)", GAME_NO_COCKTAIL | GAME_NO_SOUND | GAME_IMPERFECT_COLORS )

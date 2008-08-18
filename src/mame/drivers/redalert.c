@@ -65,6 +65,20 @@
         * Game is NOT_WORKING due to missing graphics layer
         * Everything needs to be verified on real PCB or schematics
 
+    ********************************************************************
+    IREM 'WW III' 1981
+    
+    From readme (Stefan Lindberg)
+    
+	The PCB is not working so i don't know if the roms are fine, the soundrom 
+	was for sure bad it gave different checksums but most of the reads matched 
+	the MAME soundrom (red alert) it is marked exactly the same "w3s1"(IC5). 
+	The Bprom matched the Red Alert set also... marked "W3" i think? 
+	it's hard to see because the sticker has been damaged.
+	The other eproms exept one did not match anything in MAME, 
+	ans#d only one of those had the eprom type markings on it... i read all 
+	like that type.
+   
 ****************************************************************************/
 
 #include "driver.h"
@@ -127,6 +141,21 @@ static ADDRESS_MAP_START( redalert_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0x0f8f) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&redalert_video_control)
 	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0x0f8f) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&redalert_bitmap_color)
 	AM_RANGE(0xc060, 0xc060) AM_MIRROR(0x0f8f) AM_READWRITE(SMH_NOP, redalert_voice_command_w)
+	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE(redalert_interrupt_clear_r, redalert_interrupt_clear_w)
+	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("main", 0x8000)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ww3_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_RAM
+	AM_RANGE(0x2000, 0x3fff) AM_RAM_WRITE(redalert_bitmap_videoram_w) AM_BASE(&redalert_bitmap_videoram)
+	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(&redalert_charmap_videoram)
+	AM_RANGE(0x5000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x0f8f) AM_READ_PORT("C000") AM_WRITENOP
+	AM_RANGE(0xc010, 0xc010) AM_MIRROR(0x0f8f) AM_READ_PORT("C010") AM_WRITENOP
+	AM_RANGE(0xc020, 0xc020) AM_MIRROR(0x0f8f) AM_READ_PORT("C020") AM_WRITENOP
+	AM_RANGE(0xc030, 0xc030) AM_MIRROR(0x0f8f) AM_READWRITE(SMH_NOP, redalert_audio_command_w)
+	AM_RANGE(0xc040, 0xc040) AM_MIRROR(0x0f8f) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&redalert_video_control)
+	AM_RANGE(0xc050, 0xc050) AM_MIRROR(0x0f8f) AM_READWRITE(SMH_NOP, SMH_RAM) AM_BASE(&redalert_bitmap_color)
 	AM_RANGE(0xc070, 0xc070) AM_MIRROR(0x0f8f) AM_READWRITE(redalert_interrupt_clear_r, redalert_interrupt_clear_w)
 	AM_RANGE(0xf000, 0xffff) AM_ROM AM_REGION("main", 0x8000)
 ADDRESS_MAP_END
@@ -283,6 +312,19 @@ static MACHINE_DRIVER_START( redalert )
 	MDRV_IMPORT_FROM(redalert_audio)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( ww3 )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", M6502, MAIN_CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(ww3_main_map,0)
+	MDRV_CPU_VBLANK_INT("main", redalert_vblank_interrupt)
+
+	/* video hardware */
+	MDRV_IMPORT_FROM(ww3_video)
+
+	/* audio hardware */
+	MDRV_IMPORT_FROM(ww3_audio)
+MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( demoneye )
 
@@ -305,6 +347,25 @@ MACHINE_DRIVER_END
  *  ROM definitions
  *
  *************************************/
+
+ROM_START( ww3 )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "w3i5.3f",      0x5000, 0x1000, CRC(9fc24ad3) )
+	ROM_LOAD( "w3i6.3d",      0x6000, 0x1000, CRC(cb2a308c) )
+	ROM_LOAD( "w3i7b.3b",     0x7000, 0x1000, CRC(1a0c3936) )
+	ROM_LOAD( "w3i8.3g",      0x8000, 0x1000, CRC(9e18a92c) )
+	ROM_LOAD( "w3i9.3e",      0x9000, 0x1000, CRC(8c5884a4) )
+	ROM_LOAD( "w3ia.3c",      0xa000, 0x1000, CRC(dccb8605) )
+	ROM_LOAD( "w3ib.3a",      0xb000, 0x1000, CRC(3658e465) )
+	
+	ROM_REGION( 0x10000, "audio", 0 )
+	/* rom taken from redalert */
+	ROM_LOAD( "w3s1",         0x7000, 0x0800, BAD_DUMP CRC(4af956a5) SHA1(25368a40d7ebc60316fd2d78ec4c686e701b96dc) )
+
+	ROM_REGION( 0x0200, "proms", 0 ) /* color PROM */
+	/* prom taken from redalert */
+	ROM_LOAD( "m-257sc.1a",	  0x0000, 0x0200, CRC(b1aca792) SHA1(db37f99b9880cc3c434e2a55a0bbb017d9a72aa3) )
+ROM_END
 
 ROM_START( redalert )
 	ROM_REGION( 0x10000, "main", 0 )
@@ -359,4 +420,5 @@ ROM_END
  *************************************/
 
 GAME( 1981, redalert, 0, redalert, redalert, 0, ROT270, "Irem + GDI", "Red Alert",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1981, ww3,      0, ww3,      redalert, 0, ROT270, "Irem",       "WW III",     GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1981, demoneye, 0, demoneye, demoneye, 0, ROT270, "Irem",       "Demoneye-X", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
