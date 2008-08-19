@@ -226,9 +226,32 @@ ROM_START( galaxia )
 ROM_END
 
 
+ROM_START( astrowar )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "astro8h.rom",  0x00000, 0x0400, CRC(b0ec246c) )
+	ROM_LOAD( "astro10h.rom", 0x00400, 0x0400, CRC(090d360f) )
+	ROM_LOAD( "astro11h.rom", 0x00800, 0x0400, CRC(72ab1378) )
+	ROM_LOAD( "astro13h.rom", 0x00c00, 0x0400, CRC(2dc4c895) )
+	ROM_LOAD( "astro8i.rom",  0x01000, 0x0400, CRC(ab87fbfc) )
+	ROM_LOAD( "astro10i.rom", 0x02000, 0x0400, CRC(533675c1) )
+	ROM_LOAD( "astro11i.rom", 0x02400, 0x0400, CRC(59cf8901) )
+	ROM_LOAD( "astro13i.rom", 0x02800, 0x0400, CRC(5149c121) )
+	ROM_LOAD( "astro11l.rom", 0x02c00, 0x0400, CRC(29f52f57) )
+	ROM_LOAD( "astro13l.rom", 0x03000, 0x0400, CRC(882cdb87) )
+
+	ROM_REGION( 0x0800, "gfx1", 0 )
+	ROM_LOAD( "astro1d.rom",  0x00000, 0x0400, CRC(6053f834) )
+	ROM_LOAD( "astro3d.rom",  0x00400, 0x0400, CRC(822505aa) )
+
+	ROM_REGION( 0x80000, "proms", 0 )
+	ROM_LOAD( "11o.rom", 0x00000, 0x0200, NO_DUMP ) /* a rom is missing */
+ROM_END
+
+
 static DRIVER_INIT(galaxia)
 {
 	galaxia_color=auto_malloc(0x400);
 }
 
 GAME( 1979, galaxia, 0, galaxia, galaxia, galaxia, ROT90, "Zaccaria", "Galaxia", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1980, astrowar, 0, galaxia, galaxia, galaxia, ROT90, "Zaccaria", "Astro Wars", GAME_NOT_WORKING|GAME_NO_SOUND )
