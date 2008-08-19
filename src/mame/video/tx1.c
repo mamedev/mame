@@ -1274,7 +1274,7 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap)
 
 	const UINT8 *const pixdata_rgn = (UINT8*)memory_region(machine, "gfx2");
 
-	profiler_mark(PROFILER_USER1);
+	profiler_mark(PROFILER_USER2);
 
 	for (offs = 0; offs <= buggyboy_objram_size; offs += 8)
 	{

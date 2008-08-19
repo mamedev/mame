@@ -22,7 +22,6 @@
 // MAME headers
 #include "osdepend.h"
 #include "driver.h"
-#include "profiler.h"
 #include "video/vector.h"
 #include "render.h"
 #include "rendutil.h"

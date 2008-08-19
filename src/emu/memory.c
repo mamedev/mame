@@ -169,12 +169,6 @@ typedef enum _read_or_write read_or_write;
 #define LEVEL1_INDEX(a)			((a) >> LEVEL2_BITS)
 #define LEVEL2_INDEX(e,a)		((1 << LEVEL1_BITS) + (((e) - SUBTABLE_BASE) << LEVEL2_BITS) + ((a) & ((1 << LEVEL2_BITS) - 1)))
 
-/* macros for the profiler */
-#define MEMREADSTART()			do { profiler_mark(PROFILER_MEMREAD); } while (0)
-#define MEMREADEND(ret)			do { profiler_mark(PROFILER_END); return ret; } while (0)
-#define MEMWRITESTART()			do { profiler_mark(PROFILER_MEMWRITE); } while (0)
-#define MEMWRITEEND(ret)		do { (ret); profiler_mark(PROFILER_END); return; } while (0)
-
 /* helper macros */
 #define HANDLER_IS_RAM(h)		((FPTR)(h) == STATIC_RAM)
 #define HANDLER_IS_ROM(h)		((FPTR)(h) == STATIC_ROM)

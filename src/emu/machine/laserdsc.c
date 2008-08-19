@@ -12,7 +12,6 @@
 #include "driver.h"
 #include "laserdsc.h"
 #include "avcomp.h"
-#include "profiler.h"
 #include "streams.h"
 #include "vbiparse.h"
 #include "config.h"
