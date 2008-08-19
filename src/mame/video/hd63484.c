@@ -782,9 +782,9 @@ static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
 
 void line(INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col)
 {
-			
+
 			INT16 ax,ay;
-			
+
 			int cpx_t=sx;
 			int cpy_t=sy;
 
@@ -828,8 +828,8 @@ void line(INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col)
 					}
 					cpx_t = sx + ax * (cpy_t - sy) / (ey - sy);
 				}
-			}	
-	
+			}
+
 }
 
 static void HD63484_command_w(UINT16 cmd)
@@ -1014,17 +1014,17 @@ logerror("unsupported register\n");
 			cpx = (INT16)fifo[1];
 			cpy = (INT16)fifo[2];
 		}
-		else if ((fifo[0] & 0xfff8) == 0x9400)	/* RRCT  added*/ 
+		else if ((fifo[0] & 0xfff8) == 0x9400)	/* RRCT  added*/
 		{
 			line(cpx,cpy,cpx+(INT16)fifo[1],cpy,fifo[0]&7);
 			line(cpx+(INT16)fifo[1],cpy,cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],fifo[0]&7);
 			line(cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],cpx,cpy+(INT16)fifo[2],fifo[0]&7);
 			line(cpx,cpy+(INT16)fifo[2],cpx,cpy,fifo[0]&7);
-			
+
 			cpx += (INT16)fifo[1];
 			cpy += (INT16)fifo[2];
 		}
-		else if ((fifo[0] & 0xfff8) == 0xa400)	/* RPLG  added*/ 
+		else if ((fifo[0] & 0xfff8) == 0xa400)	/* RPLG  added*/
 		{
 			int nseg,sx,sy,ex,ey;
 			sx = cpx;
@@ -1088,13 +1088,13 @@ logerror("unsupported register\n");
 				}
 			}
 		}
-		else if ((fifo[0] & 0xfff8) == 0xc400)	/* RFRCT  added TODO*/ 
+		else if ((fifo[0] & 0xfff8) == 0xc400)	/* RFRCT  added TODO*/
 		{
 			line(cpx,cpy,cpx+(INT16)fifo[1],cpy,fifo[0]&7);
 			line(cpx+fifo[1],cpy,cpx+fifo[1],cpy+fifo[2],fifo[0]&7);
 			line(cpx+fifo[1],cpy+fifo[2],cpx,cpy+fifo[2],fifo[0]&7);
 			line(cpx,cpy+fifo[2],cpx,cpy,fifo[0]&7);
-			
+
 			cpx=cpx+(INT16)fifo[1];
 			cpy=cpy+(INT16)fifo[2];
 		}

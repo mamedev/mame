@@ -71,10 +71,10 @@ struct _laserdisc_config
 {
 	UINT32					type;
 	laserdisc_audio_func	audio;
-	
+
 	/* rendering information */
 	const char *			screen;
-	
+
 	/* overlay information */
 	video_update_func		overupdate;
 	UINT32					overwidth, overheight, overformat;

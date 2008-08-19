@@ -258,7 +258,7 @@ $(CPUOBJ)/jaguar/jaguar.o:	$(CPUSRC)/jaguar/jaguar.c \
 #-------------------------------------------------
 
 CPUDEFS += -DHAS_CUBEQCPU=$(if $(filter CUBEQCPU,$(CPUS)),1,0)
- 
+
 ifneq ($(filter CUBEQCPU,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/cubeqcpu
 CPUOBJS += $(CPUOBJ)/cubeqcpu/cubeqcpu.o

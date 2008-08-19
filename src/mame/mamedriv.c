@@ -6713,6 +6713,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( explbrkr )	/* (c) 1992 Kaneko */
 	DRIVER( bakubrkr )	/* (c) 1992 Kaneko */
 	DRIVER( shogwarr )	/* (c) 1992 Kaneko */
+	DRIVER( shogware )	/* (c) 1992 Kaneko */
 	DRIVER( fjbuster )	/* (c) 1992 Kaneko */
 	DRIVER( brapboys )	/* (c) 1992 Kaneko */
 	DRIVER( brapboyj )	/* (c) 1992 Kaneko */

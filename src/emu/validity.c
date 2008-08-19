@@ -812,7 +812,7 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 					mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_name(entry->write_devtype), entry->write_devtag);
 					error = TRUE;
 				}
-				
+
 				/* make sure ports exist */
 				if (entry->read_porttag != NULL && input_port_by_tag(portlist, entry->read_porttag) == NULL)
 				{
@@ -1382,7 +1382,7 @@ static int validate_inputs(int drivnum, const machine_config *config, const inpu
 				/* look up the string and print an error if default strings are not used */
 				strindex = get_defstr_index(field->name, driver, &error);
 			}
-			
+
 			/* verify conditions on the field */
 			if (field->condition.tag != NULL)
 			{
@@ -1390,7 +1390,7 @@ static int validate_inputs(int drivnum, const machine_config *config, const inpu
 				for (scanport = *portlistptr; scanport != NULL; scanport = scanport->next)
 					if (scanport->tag != NULL && strcmp(field->condition.tag, scanport->tag) == 0)
 						break;
-				
+
 				/* if none, error */
 				if (scanport == NULL)
 				{
@@ -1398,7 +1398,7 @@ static int validate_inputs(int drivnum, const machine_config *config, const inpu
 					error = TRUE;
 				}
 			}
-			
+
 			/* verify conditions on the settings */
 			for (setting = field->settinglist; setting != NULL; setting = setting->next)
 				if (setting->condition.tag != NULL)
@@ -1407,7 +1407,7 @@ static int validate_inputs(int drivnum, const machine_config *config, const inpu
 					for (scanport = *portlistptr; scanport != NULL; scanport = scanport->next)
 						if (scanport->tag != NULL && strcmp(setting->condition.tag, scanport->tag) == 0)
 							break;
-					
+
 					/* if none, error */
 					if (scanport == NULL)
 					{

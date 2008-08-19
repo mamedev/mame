@@ -293,7 +293,7 @@ static void cfunc_checkirqs(void *param)
 -------------------------------------------------*/
 static void cfunc_fastirq(void *param)
 {
-	sh2_exception("fastirq",sh2->irqline); 			
+	sh2_exception("fastirq",sh2->irqline);
 }
 
 /*-------------------------------------------------
@@ -1422,7 +1422,7 @@ static void generate_update_cycles(drcuml_block *block, compiler_state *compiler
 
 		UML_MOV(block, MEM(&sh2->pending_nmi), IMM(0));			// zap pending_nmi
 		UML_JMP(block, skip+1);						// and then go take it (evec is already set)
-	
+
 		UML_LABEL(block, skip+2);					// skip+2:
 		UML_MOV(block, MEM(&sh2->evec), IMM(0xffffffff));		// mov evec, -1
 		UML_MOV(block, IREG(0), IMM(0xffffffff));			// mov r0, -1 (r0 = irq)

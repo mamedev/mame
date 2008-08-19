@@ -1,6 +1,6 @@
 /***************************************************************************
 
-Toshiba T5182 die map, by Jonathan Gevaryahu AKA Lord Nightmare, 
+Toshiba T5182 die map, by Jonathan Gevaryahu AKA Lord Nightmare,
 with assistance from Kevin Horton.
 T5182 supplied by Tomasz 'Dox' Slanina
 
@@ -20,7 +20,7 @@ Subdie D is a 74245 bidirectional bus transciever
 Subdie E is a 74138 1 to 8 decoder/demultiplexer with active low outputs
 Subdie F is a 74138 1 to 8 decoder/demultiplexer with active low outputs
 Subdie G is a 7408 quad AND gate
-Thanks to Kevin Horton for working out most of the logic gate types 
+Thanks to Kevin Horton for working out most of the logic gate types
 from the diagram.
 
 
@@ -96,7 +96,7 @@ Note: pins 21 and 22 are both shorted together on the pcb, and go active (low)
       However, the fact that pins 21 and 22 were NOT internally connected
       together by Toshiba on the *production* seibu t5182 means a huge
       security hole is opened:
-  
+
       It is trivial, through external connections, without EVER opening the
       chip, to connect pin 22 to a trojan rom /CE and hence have a user trojan
       program run at 0x0000-0x1fff. Then, connect pin 21 to pin 34 to map the
@@ -127,7 +127,7 @@ xxxxxxxxx101xxxx i/o /EN 5 goes low
 xxxxxxxxx110xxxx i/o /EN 6\__ these two are unbonded pins, so are useless.
 xxxxxxxxx111xxxx i/o /EN 7/
 
-IMPORTANT: the data lines for the external rom on darkmist are scrambled on the 
+IMPORTANT: the data lines for the external rom on darkmist are scrambled on the
 SEI8608B board as such:
 CPU:     ROM:
 D0       D0

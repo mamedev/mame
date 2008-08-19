@@ -765,7 +765,7 @@ static WRITE32_HANDLER( int1_ack32_w )
 
 static WRITE32_HANDLER( timekeeper_0_32be_w )
 {
-	write32be_with_write8_handler( timekeeper_0_w, machine, offset, data, mem_mask );	
+	write32be_with_write8_handler( timekeeper_0_w, machine, offset, data, mem_mask );
 }
 
 static READ32_HANDLER( timekeeper_0_32be_r )

@@ -1548,7 +1548,7 @@ static INPUT_PORTS_START( mustang )
 	PORT_DIPSETTING(      0xc000, "3" )
 	PORT_DIPSETTING(      0x8000, "4" )
 	PORT_DIPSETTING(      0x0000, "5" )
-	
+
 	PORT_START("COIN")	/* referenced by seibu sound board */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -2022,7 +2022,7 @@ static INPUT_PORTS_START( tdragonb )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) ) /* The manual states this dip is "Unused" */
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	
+
 	PORT_START("COIN")	/* referenced by seibu sound board */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END

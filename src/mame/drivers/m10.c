@@ -99,16 +99,16 @@ Notes (couriersud)
 
     M10-Board: Has SN76477
 
-	ipminva1
-	========
-	
-	This is from an incomplete dump without documentation.
-	The filename contained m10 and with a hack to work
-	around the missing rom you get some action.
-	
-	The files are all different from ipminvad. Either this has
-	been a prototype or eventually the famous "capsule invader".
-		
+    ipminva1
+    ========
+
+    This is from an incomplete dump without documentation.
+    The filename contained m10 and with a hack to work
+    around the missing rom you get some action.
+
+    The files are all different from ipminvad. Either this has
+    been a prototype or eventually the famous "capsule invader".
+
 ***************************************************************************/
 #include "driver.h"
 #include "sound/samples.h"
@@ -851,7 +851,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 /*
- * Hacks to work around missing roms to get at least some 
+ * Hacks to work around missing roms to get at least some
  * video output
  */
 static DRIVER_INIT( andromed )
@@ -921,7 +921,7 @@ ROM_START( ipminva1 )
 	ROM_LOAD( "b5f",  0x2000, 0x0400, CRC(192361c7) SHA1(b13e80429a9183ce78c4df52a32070416d4ec988) )
 	ROM_LOAD( "b6f",  0x2400, 0x0400, NO_DUMP )
 	ROM_LOAD( "b7f",  0x2800, 0x0400, CRC(0f5115ab) SHA1(3bdd3fc1cfe6bfacb5820ee12c15f2909d2f58d1) )
-	
+
 	ROM_REGION( 0x0800, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "b9",  0x0000, 0x0400, CRC(f6cfa53c) SHA1(ec1076982edee95efb24a1bb08e733bcccacb922) )
 	ROM_LOAD( "b10", 0x0400, 0x0400, CRC(63672cd2) SHA1(3d9fa15509a363e1a32e58a2242b266b1162e9a6) )

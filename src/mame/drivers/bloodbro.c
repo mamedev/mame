@@ -284,7 +284,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( weststry )
 	PORT_INCLUDE( weststry_base )
-	
+
 	PORT_START("COIN")	/* referenced by seibu sound board */
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END

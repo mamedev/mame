@@ -1645,7 +1645,7 @@ static UINT64 execute_frombcd(void *ref, UINT32 params, const UINT64 *param)
 	UINT64 value = param[0];
 	UINT64 multiplier = 1;
 	UINT64 result = 0;
-	
+
 	while (value != 0)
 	{
 		result += (value & 0x0f) * multiplier;
@@ -1665,7 +1665,7 @@ static UINT64 execute_tobcd(void *ref, UINT32 params, const UINT64 *param)
 	UINT64 value = param[0];
 	UINT64 result = 0;
 	UINT8 shift = 0;
-	
+
 	while (value != 0)
 	{
 		result += (value % 10) << shift;

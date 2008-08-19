@@ -4,7 +4,7 @@
 
     Implementation of the Cube Quest AM2901-based CPUs
 
-	TODO:
+    TODO:
 
     * Tidy up diassembly (split into different files?)
 
@@ -19,7 +19,7 @@
 ***************************************************************************/
 
 /* Am2901 Instruction Fields */
-static const char* ins[] = 
+static const char* ins[] =
 {
 	"ADD  ",
 	"SUBR ",
@@ -43,7 +43,7 @@ static const char* src[] =
 	"D,0",
 };
 
-static const char* dst[] = 
+static const char* dst[] =
 {
 	"QREG ",
 	"NOP  ",
@@ -409,7 +409,7 @@ static void cquestrot_init(int index, int clock, const void *_config, int (*irqc
 	cquestrot_state_register(index, "cquestrot");
 
 	/* Allocate RAM */
-	cquestrot.dram = malloc(16384 * sizeof(UINT16));  /* Shared with 68000 */  
+	cquestrot.dram = malloc(16384 * sizeof(UINT16));  /* Shared with 68000 */
 	cquestrot.sram = malloc(2048 * sizeof(UINT16));   /* Private */
 }
 
@@ -748,7 +748,7 @@ static int cquestsnd_execute(int cycles)
 
 static offs_t cquestsnd_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	static const char* jmps[] = 
+	static const char* jmps[] =
 	{
 		"JUMP ",
 		"     ",
@@ -761,7 +761,7 @@ static offs_t cquestsnd_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const 
 	};
 
 
-	static const char* latches[] = 
+	static const char* latches[] =
 	{
 		"PLTCH  ",
 		"DAC    ",
@@ -880,7 +880,7 @@ static int cquestrot_execute(int cycles)
 
 	/* Core execution loop */
 	do
-	{		
+	{
 		/* Decode the instruction */
 		UINT64 inst = cpu_readop64(ROT_PC << 3);
 
@@ -1084,7 +1084,7 @@ static int cquestrot_execute(int cycles)
 							r15 = (cquestrot.vflag ^ BIT(cquestrot.f, 15)) << 15;
 							break;
 					}
-					
+
 					cquestrot.ram[b] = r15 | (cquestrot.f >> 1);
 					cquestrot.y = cquestrot.f;
 					break;
@@ -1201,7 +1201,7 @@ static int cquestrot_execute(int cycles)
 
 static offs_t cquestrot_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	static const char* jmps[] = 
+	static const char* jmps[] =
 	{
 		"       ",
 		"JSEQ   ",
@@ -1234,7 +1234,7 @@ static offs_t cquestrot_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const 
 		"Y2D  ",
 	};
 
-	static const char* spfs[] = 
+	static const char* spfs[] =
 	{
 		"      ",
 		"      ",
@@ -1262,16 +1262,16 @@ static offs_t cquestrot_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const 
 	int t       = (inshig >> 20) & 0xfff;
 	int jmp     = (inshig >> 16) & 0xf;
 	int spf		= (inshig >> 12) & 0xf;
-//	int rsrc	= (inshig >> 11) & 0x1;
+//  int rsrc    = (inshig >> 11) & 0x1;
 	int yout	= (inshig >> 8) & 0x7;
 	int sel		= (inshig >> 6) & 0x3;
-//	int dsrc	= (inshig >> 4) & 0x3;
+//  int dsrc    = (inshig >> 4) & 0x3;
 	int b		= (inshig >> 0) & 0xf;
 	int a		= (inslow >> 28) & 0xf;
 	int i8_6	= (inslow >> 24) & 0x7;
 	int ci		= (inslow >> 23) & 0x1;
 	int i5_3	= (inslow >> 20) & 0x7;
-//	int _sex	= (inslow >> 19) & 0x1;
+//  int _sex    = (inslow >> 19) & 0x1;
 	int i2_0	= (inslow >> 16) & 0x7;
 
 	sprintf(buffer, "%s %s,%s %x,%x,%c %d %s %s %s %.2x\n",
@@ -1613,7 +1613,7 @@ static int cquestlin_execute(int cycles)
 			cquestlin.pc[prog] = (cquestlin.pc[prog] + 1) & 0x7f;
 
 		if (prog == BACKGROUND)
-			cquestlin.pc[prog] |= 0x80;		
+			cquestlin.pc[prog] |= 0x80;
 		else
 		{
 			/* Handle events that happen during FG execution */
@@ -1643,7 +1643,7 @@ static int cquestlin_execute(int cycles)
 			{
 				int _ycet;
 				int mux_sel = (BIT(cquestlin.sreg, SREG_DX_DY) << 1) | (BIT(cquestlin.sreg, SREG_DX) ^ BIT(cquestlin.sreg, SREG_DY));
-				
+
 				if (mux_sel == 0)
 					_ycet = !(cquestlin.gt0reg && (spf == LSPF_BRES));
 				else if (mux_sel == 1)
@@ -1712,7 +1712,7 @@ static int cquestlin_execute(int cycles)
 		{
 			int _lpwrt = BIT(cquestlin.bglatch, 5);
 
-			cquestlin.bglatch = 
+			cquestlin.bglatch =
 					(!(spf == LSPF_PWRT) << 5)
 					| (_lpwrt << 4)
 					| ((!_lpwrt || (!(spf == LSPF_PWRT) && (latch == LLATCH_BADLATCH))) << 2);
@@ -1759,7 +1759,7 @@ static int cquestlin_execute(int cycles)
 
 static offs_t cquestlin_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	static const char* jmps[] = 
+	static const char* jmps[] =
 	{
 		"     ",
 		"JMSB ",
@@ -1780,7 +1780,7 @@ static offs_t cquestlin_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const 
 		"?????",
 	};
 
-	static const char* latches[] = 
+	static const char* latches[] =
 	{
 		"       ",
 		"SEQLTCH",
@@ -1792,7 +1792,7 @@ static offs_t cquestlin_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const 
 		"ZLTCH  ",
 	};
 
-	static const char* spfs[] = 
+	static const char* spfs[] =
 	{
 		"      ",
 		"FSTOP ",

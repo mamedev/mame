@@ -5,11 +5,11 @@
     driver by Phil Bennett
 
     TODO:
-	   * Emulate D8478 laserdisc interface MCU
+       * Emulate D8478 laserdisc interface MCU
        * Accurate video timings
-	    - Derive from PROMs
+        - Derive from PROMs
        * More accurate line fill circuitry emulation
-	    - Use PROMs
+        - Use PROMs
 
     Known bugs:
         * The graphics tend go screwy when you add the first credit on the
@@ -113,9 +113,9 @@ static VIDEO_UPDATE( cubeqst )
 	int palentry = palette_ram[255];
 
 	/*
-	 * Clear the display with palette RAM entry 0xff
-	 * This will be either transparent or an actual colour
-	*/
+     * Clear the display with palette RAM entry 0xff
+     * This will be either transparent or an actual colour
+    */
 
 	/* Bit 3 selects LD/#GRAPHICS */
 	if ((palentry & (1 << 3)) && disk_on)
@@ -234,8 +234,8 @@ void ldp_ack_callback(void)
 }
 
 /*
-	D0: Command acknowledge
-	D1: Seek status (0 = searching, 1 = ready)
+    D0: Command acknowledge
+    D1: Seek status (0 = searching, 1 = ready)
 */
 static READ16_HANDLER( laserdisc_r )
 {
@@ -293,12 +293,12 @@ static void swap_linecpu_banks(void)
 
 
 /*
-	Reset Control
-	=============
+    Reset Control
+    =============
 
-	D0: /Display (includes rotate and line processors)
-	D1: /Sound
-	D2: /Disk
+    D0: /Display (includes rotate and line processors)
+    D1: /Sound
+    D2: /Disk
 */
 static WRITE16_HANDLER( reset_w )
 {
@@ -326,24 +326,24 @@ static WRITE16_HANDLER( reset_w )
 static WRITE16_HANDLER( io_w )
 {
 	/*
-	   0: Spare lamp
-	   1: Spare driver
-	   2: Coin counter
-	   3: Left-front lamp
-	   4: Right-front lamp
-	   5: Righ back lamp
-	   6: Spare lamp
-	   7: LED latch clock
-	*/
+       0: Spare lamp
+       1: Spare driver
+       2: Coin counter
+       3: Left-front lamp
+       4: Right-front lamp
+       5: Righ back lamp
+       6: Spare lamp
+       7: LED latch clock
+    */
 
 	/* TODO: On rising edge of Q7, status LED latch is written */
 	if ( !BIT(io_latch, 7) && BIT(data, 7) )
 	{
 		/*
-			0: Battery failure
-			1: Bad coin
-			2: No laser unit
-		*/
+            0: Battery failure
+            1: Bad coin
+            2: No laser unit
+        */
 	}
 
 	io_latch = data;
@@ -356,11 +356,11 @@ static READ16_HANDLER( io_r )
 	/*
          Certain bits depend on Q7 of the IO latch:
 
-		  5: Cube   / Trackball H clock
-		  6: R-Fire / Trackball H data
-		  7: L-Fire / Trackball V clock
+          5: Cube   / Trackball H clock
+          6: R-Fire / Trackball H data
+          7: L-Fire / Trackball V clock
          10: Spare  / Trackball V data
-	*/
+    */
 
 	if ( !BIT(io_latch, 7) )
 		return port_data;
@@ -428,11 +428,11 @@ ADDRESS_MAP_END
 
 /* For the bit-sliced CPUs */
 static ADDRESS_MAP_START( rotate_map, ADDRESS_SPACE_PROGRAM, 64 )
-	AM_RANGE(0x000, 0x1ff) AM_ROM	
+	AM_RANGE(0x000, 0x1ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( line_sound_map, ADDRESS_SPACE_PROGRAM, 64 )
-	AM_RANGE(0x000, 0x0ff) AM_ROM	
+	AM_RANGE(0x000, 0x0ff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -471,8 +471,8 @@ static MACHINE_RESET( cubeqst )
 static sound_stream *cquest_stream;
 
 /*
- *	The sound CPU outputs to a 12-bit 7521 DAC
- *	The DAC output is multiplexed between
+ *  The sound CPU outputs to a 12-bit 7521 DAC
+ *  The DAC output is multiplexed between
  *  16 channels (8 per side).
  */
 
@@ -581,7 +581,7 @@ static MACHINE_DRIVER_START( cubeqst )
 	MDRV_LASERDISC_OVERLAY(cubeqst, CUBEQST_HBLANK, CUBEQST_VCOUNT, BITMAP_FORMAT_INDEXED16)
 	MDRV_LASERDISC_OVERLAY_CLIP(0, 320-1, 0, 256-8)
 	MDRV_LASERDISC_OVERLAY_POSITION(0.002, -0.018)
-	
+
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)

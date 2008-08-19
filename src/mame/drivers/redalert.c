@@ -67,24 +67,24 @@
 
     ********************************************************************
     IREM 'WW III' 1981
-    
+
     From readme (Stefan Lindberg)
-    
-	The PCB is not working so I don't know if the roms are fine, the sound rom 
-	was for sure bad it gave different checksums but most of the reads matched 
-	the MAME soundrom (red alert) it is marked exactly the same "w3s1"(IC5). 
-	The Bprom matched the Red Alert set also... marked "W3" i think? 
-	it's hard to see because the sticker has been damaged.
-	The other eproms exept one did not match anything in MAME, 
-	and only one of those had the eprom type markings on it... I read all 
-	like that type.
+
+    The PCB is not working so I don't know if the roms are fine, the sound rom
+    was for sure bad it gave different checksums but most of the reads matched
+    the MAME soundrom (red alert) it is marked exactly the same "w3s1"(IC5).
+    The Bprom matched the Red Alert set also... marked "W3" i think?
+    it's hard to see because the sticker has been damaged.
+    The other eproms exept one did not match anything in MAME,
+    and only one of those had the eprom type markings on it... I read all
+    like that type.
 
      Board set consists of:
         M-27MB (Main board)
         M-27SC
         M-37B  (Sound board)
         M-33 SUB-1
-   
+
 ****************************************************************************/
 
 #include "driver.h"
@@ -363,7 +363,7 @@ ROM_START( ww3 )
 	ROM_LOAD( "w3i9.3e",      0x9000, 0x1000, CRC(8c5884a4) )
 	ROM_LOAD( "w3ia.3c",      0xa000, 0x1000, CRC(dccb8605) )
 	ROM_LOAD( "w3ib.3a",      0xb000, 0x1000, CRC(3658e465) )
-	
+
 	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "w3s1",         0x7000, 0x0800, CRC(4af956a5) SHA1(25368a40d7ebc60316fd2d78ec4c686e701b96dc) )
 

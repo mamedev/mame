@@ -141,7 +141,7 @@ static VIDEO_START( redalert )
 	redalert_bitmap_colorram = auto_malloc(0x0400);
 
 	state_save_register_global_pointer(redalert_bitmap_colorram, 0x0400);
-	
+
 	redalert_control_xor = 0x00;
 }
 
@@ -324,14 +324,14 @@ MACHINE_DRIVER_START( redalert_video )
 
 	MDRV_VIDEO_START(redalert)
 	MDRV_IMPORT_FROM( redalert_video_common )
-	
+
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( ww3_video )
 
 	MDRV_VIDEO_START( ww3 )
 	MDRV_IMPORT_FROM( redalert_video_common )
-	
+
 MACHINE_DRIVER_END
 
 

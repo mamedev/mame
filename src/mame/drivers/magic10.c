@@ -632,7 +632,7 @@ ROM_END
 
 /*
 
-Hot Slot  
+Hot Slot
 
 CPU:
 1x HD6473308CP10 (u24)(main)
@@ -703,7 +703,7 @@ ROM_END
 
 /*
 
-Magic Colors  
+Magic Colors
 
 CPU:
 1x HD6473308CP10 (u24)(main)
@@ -777,7 +777,7 @@ static DRIVER_INIT( suprpool )
 
 static DRIVER_INIT( hotslot )
 {
-/*	a value of -56 center the playfield, but displace the intro and initial screen.
+/*  a value of -56 center the playfield, but displace the intro and initial screen.
     a value of -64 center the intro and initial screen, but displace the playfield.
 */
 	layer2_offset[0] = -56;	// X offset.

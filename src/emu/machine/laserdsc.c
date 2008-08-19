@@ -226,7 +226,7 @@ struct _laserdisc_state
 {
 	/* general config */
 	laserdisc_config	config;					/* copy of the inline config */
-	
+
 	/* disc parameters */
 	chd_file *			disc;					/* handle to the disc itself */
 	av_codec_decompress_config avconfig;		/* decompression configuration */
@@ -286,7 +286,7 @@ struct _laserdisc_state
 	INT32				curfracspeed;			/* current speed the head is moving */
 	INT32				curfractrack;			/* current track */
 	INT32				targetframe;			/* target frame (0 means no target) */
-	
+
 	/* video updating */
 	UINT8				videoenable;			/* is video enabled? */
 	render_texture *	videotex;				/* texture for the video */
@@ -1612,7 +1612,7 @@ static void custom_stream_callback(void *param, stream_sample_t **inputs, stream
 ***************************************************************************/
 
 /*-------------------------------------------------
-    configuration_load - read and apply data from 
+    configuration_load - read and apply data from
     the configuration file
 -------------------------------------------------*/
 
@@ -1637,7 +1637,7 @@ static void configuration_load(running_machine *machine, int config_type, xml_da
 		if (device != NULL)
 		{
 			laserdisc_state *ld = get_safe_token(device);
-			
+
 			/* handle the overlay node */
 			overnode = xml_get_sibling(ldnode->child, "overlay");
 			if (overnode != NULL)
@@ -1654,7 +1654,7 @@ static void configuration_load(running_machine *machine, int config_type, xml_da
 
 
 /*-------------------------------------------------
-    configuration_save - save data to the 
+    configuration_save - save data to the
     configuration file
 -------------------------------------------------*/
 
@@ -1679,7 +1679,7 @@ static void configuration_save(running_machine *machine, int config_type, xml_da
 		if (ldnode != NULL)
 		{
 			int changed = FALSE;
-			
+
 			/* output the basics */
 			xml_set_attribute(ldnode, "tag", device->tag);
 
@@ -1727,7 +1727,7 @@ static void configuration_save(running_machine *machine, int config_type, xml_da
 ***************************************************************************/
 
 /*-------------------------------------------------
-    laserdisc_video_enable - enable/disable the 
+    laserdisc_video_enable - enable/disable the
     video
 -------------------------------------------------*/
 
@@ -1739,7 +1739,7 @@ void laserdisc_video_enable(const device_config *device, int enable)
 
 
 /*-------------------------------------------------
-    laserdisc_video_enable - enable/disable the 
+    laserdisc_video_enable - enable/disable the
     video
 -------------------------------------------------*/
 
@@ -1762,28 +1762,28 @@ VIDEO_UPDATE( laserdisc )
 		laserdisc_state *ld = laserdisc->token;
 		bitmap_t *overbitmap = ld->overbitmap[ld->overindex];
 		bitmap_t *vidbitmap = NULL;
-	
+
 		/* handle the overlay if present */
 		if (overbitmap != NULL)
 		{
 			rectangle clip = *cliprect;
-		
+
 			/* scale the cliprect to the overlay size */
 			clip.min_x = 0;
 			clip.max_x = ld->config.overwidth - 1;
 			clip.min_y = cliprect->min_y * overbitmap->height / bitmap->height;
 			clip.max_y = (cliprect->max_y + 1) * overbitmap->height / bitmap->height - 1;
-			
+
 			/* call the callback */
 			if (ld->config.overupdate != NULL)
 				(*ld->config.overupdate)(screen, overbitmap, &clip);
 		}
-		
+
 		/* if this is the last update, do the rendering */
 		if (cliprect->max_y == video_screen_get_visible_area(screen)->max_y)
 		{
 			float x0, y0, x1, y1;
-			
+
 			/* update the texture with the overlay contents */
 			if (overbitmap != NULL)
 			{
@@ -1792,15 +1792,15 @@ VIDEO_UPDATE( laserdisc )
 				else if (overbitmap->format == BITMAP_FORMAT_RGB32)
 					render_texture_set_bitmap(ld->overtex, overbitmap, &ld->config.overclip, 0, TEXFORMAT_ARGB32);
 			}
-		
+
 			/* get the laserdisc video */
 			laserdisc_get_video(laserdisc, &vidbitmap);
 			if (vidbitmap != NULL)
 				render_texture_set_bitmap(ld->videotex, vidbitmap, NULL, 0, TEXFORMAT_YUY16);
-			
+
 			/* reset the screen contents */
 			render_container_empty(render_container_get_screen(screen));
-			
+
 			/* add the video texture */
 			if (ld->videoenable)
 				render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), ld->videotex, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
@@ -1814,12 +1814,12 @@ VIDEO_UPDATE( laserdisc )
 				y1 = y0 + ld->config.overscaley;
 				render_screen_add_quad(screen, x0, y0, x1, y1, MAKE_ARGB(0xff,0xff,0xff,0xff), ld->overtex, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
 			}
-			
+
 			/* swap to the next bitmap */
 			ld->overindex = (ld->overindex + 1) % ARRAY_LENGTH(ld->overbitmap);
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -1830,7 +1830,7 @@ VIDEO_UPDATE( laserdisc )
 ***************************************************************************/
 
 /*-------------------------------------------------
-    laserdisc_get_config - return a copy of the 
+    laserdisc_get_config - return a copy of the
     current live configuration settings
 -------------------------------------------------*/
 
@@ -1842,7 +1842,7 @@ void laserdisc_get_config(const device_config *device, laserdisc_config *config)
 
 
 /*-------------------------------------------------
-    laserdisc_get_config - change the current live 
+    laserdisc_get_config - change the current live
     configuration settings
 -------------------------------------------------*/
 
@@ -1943,13 +1943,13 @@ static DEVICE_START( laserdisc )
 	ld->audiobuffer[0] = auto_malloc(ld->audiobufsize * sizeof(ld->audiobuffer[0][0]));
 	ld->audiobuffer[1] = auto_malloc(ld->audiobufsize * sizeof(ld->audiobuffer[1][0]));
 	ld->samplerate = rate;
-	
+
 	/* allocate texture for rendering */
 	ld->videoenable = TRUE;
 	ld->videotex = render_texture_alloc(NULL, NULL);
 	if (ld->videotex == NULL)
 		fatalerror("Out of memory allocating video texture");
-	
+
 	/* allocate overlay */
 	if (ld->config.overwidth > 0 && ld->config.overheight > 0 && ld->config.overupdate != NULL)
 	{
@@ -1977,7 +1977,7 @@ static DEVICE_STOP( laserdisc )
 	/* make sure all async operations have completed */
 	if (ld->disc != NULL)
 		chd_async_complete(ld->disc);
-	
+
 	/* free any textures */
 	if (ld->videotex != NULL)
 		render_texture_free(ld->videotex);
@@ -2089,7 +2089,7 @@ static DEVICE_SET_INFO( laserdisc )
 DEVICE_GET_INFO( laserdisc )
 {
 	const laserdisc_config *config = NULL;
-	
+
 	if (device != NULL)
 	{
 		laserdisc_state *ld = device->token;
@@ -2798,12 +2798,12 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 data)
 
 /*-------------------------------------------------
 
-	Command Set:
+    Command Set:
 
-	FX XX XX  : Seek to frame XXXXX
-	01-19	  : Skip forward 1-19 frames
-	99-81     : Skip back 1-19 frames
-	5a        : Toggle frame display
+    FX XX XX  : Seek to frame XXXXX
+    01-19     : Skip forward 1-19 frames
+    99-81     : Skip back 1-19 frames
+    5a        : Toggle frame display
 
 -------------------------------------------------*/
 
@@ -2876,7 +2876,7 @@ static void simutrek_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 	{
 		CMDPRINTF(("Simutrek: Seek to frame byte %d of 3\n", simutrek->cmdcnt + 1));
 		simutrek->cmdbytes[simutrek->cmdcnt++] = data;
-	
+
 		if (simutrek->cmdcnt == 3)
 		{
 			int frame = ((simutrek->cmdbytes[0] & 0xf) * 10000) +
@@ -2946,7 +2946,7 @@ void simutrek_set_audio_squelch(const device_config *device, int state)
 	laserdisc_state *ld = get_safe_token(device);
 
 	if (state == ASSERT_LINE)
-		ld->audio |= AUDIO_SQUELCH_OVERRIDE;		
+		ld->audio |= AUDIO_SQUELCH_OVERRIDE;
 	else
 		ld->audio &= ~AUDIO_SQUELCH_OVERRIDE;
 }
@@ -2955,7 +2955,7 @@ void simutrek_set_audio_squelch(const device_config *device, int state)
 /*-------------------------------------------------
     simutrek_set_audio_squelch - Simutrek-specific
     command to set callback function for
-	player/interface command acknowledge
+    player/interface command acknowledge
 -------------------------------------------------*/
 
 void simutrek_set_cmd_ack_callback(const device_config *device, void (*callback)(void))

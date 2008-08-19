@@ -1611,7 +1611,7 @@ static void slider_init(running_machine *machine)
 			int defxoffset = floor(config->overposx * 1000.0f + 0.5f);
 			int defyoffset = floor(config->overposy * 1000.0f + 0.5f);
 			void *param = (void *)device;
-		
+
 			/* add scale and offset controls per-overlay */
 			slider_config(&slider_list[slider_count++], 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_overxscale, param);
 			slider_config(&slider_list[slider_count++], -500, defxoffset, 500, 2, slider_overxoffset, param);

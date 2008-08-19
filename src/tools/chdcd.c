@@ -141,7 +141,7 @@ chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 	numtracks=atoi(linebuffer);
 
 	for(i=0;i<numtracks;++i)
-	{	
+	{
 		char *tok;
 		int trknum;
 		int trksize,trktype;
@@ -150,7 +150,7 @@ chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 
 
 		fgets(linebuffer,511,infile);
-		
+
 		tok=strtok(linebuffer," ");
 
 		trknum=atoi(tok)-1;
@@ -165,7 +165,7 @@ chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 
 		tok=strtok(NULL," ");
 		outtoc->tracks[trknum].physframeofs=atoi(tok);
-	
+
 		tok=strtok(NULL," ");
 		trktype=atoi(tok);
 
@@ -188,14 +188,14 @@ chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 			outtoc->tracks[trknum].trktype=CD_TRACK_AUDIO;
 			outtoc->tracks[trknum].datasize=2352;
 		}
-		
+
 		tok=strtok(NULL," ");
 		strcpy(&(outinfo->fname[trknum][0]),tok);
 		sz=get_file_size(outinfo->fname[trknum]);
 
 		outtoc->tracks[trknum].frames=sz/trksize;
 		outtoc->tracks[trknum].extraframes=0;
-		
+
 		if(trknum!=0)
 		{
 			int dif=outtoc->tracks[trknum].physframeofs-(outtoc->tracks[trknum-1].frames+outtoc->tracks[trknum-1].physframeofs);
@@ -203,10 +203,10 @@ chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 		}
 
 /*
-		if(trknum!=0)
-		{
-			outtoc->tracks[trknum-1].extraframes=outtoc->tracks[trknum].physframeofs-(outtoc->tracks[trknum-1].frames+outtoc->tracks[trknum-1].physframeofs);
-		}
+        if(trknum!=0)
+        {
+            outtoc->tracks[trknum-1].extraframes=outtoc->tracks[trknum].physframeofs-(outtoc->tracks[trknum-1].frames+outtoc->tracks[trknum-1].physframeofs);
+        }
 */
 		hunks = (outtoc->tracks[trknum].frames+CD_FRAMES_PER_HUNK - 1) / CD_FRAMES_PER_HUNK;
 		outtoc->tracks[trknum].extraframes = hunks * CD_FRAMES_PER_HUNK - outtoc->tracks[trknum].frames;
@@ -215,11 +215,11 @@ chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 
 	}
 	/*
-	for(i=0;i<numtracks;++i)
-	{
-		printf("%s %d %d %d\n",outinfo->fname[i],outtoc->tracks[i].frames,outtoc->tracks[i].extraframes,outtoc->tracks[i].physframeofs);
-	}
-	*/
+    for(i=0;i<numtracks;++i)
+    {
+        printf("%s %d %d %d\n",outinfo->fname[i],outtoc->tracks[i].frames,outtoc->tracks[i].extraframes,outtoc->tracks[i].physframeofs);
+    }
+    */
 	/* close the input TOC */
 	fclose(infile);
 

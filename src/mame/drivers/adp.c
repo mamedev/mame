@@ -197,44 +197,44 @@ static const duart68681_config skattv_duart68681_config =
 /*
 static PALETTE_INIT( adp )
 {
-	int i;
+    int i;
 
 
-	for (i = 0;i < machine->config->total_colors;i++)
-	{
-		int bit0,bit1,bit2,r,g,b;
+    for (i = 0;i < machine->config->total_colors;i++)
+    {
+        int bit0,bit1,bit2,r,g,b;
 
 
-		// red component
-		bit0 = (i >> 2) & 0x01;
-		bit1 = (i >> 3) & 0x01;
-		bit2 = (i >> 4) & 0x01;
-		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		// green component
-		bit0 = (i >> 5) & 0x01;
-		bit1 = (i >> 6) & 0x01;
-		bit2 = (i >> 7) & 0x01;
-		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-		// blue component
-		bit0 = 0;
-		bit1 = (i >> 0) & 0x01;
-		bit2 = (i >> 1) & 0x01;
-		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+        // red component
+        bit0 = (i >> 2) & 0x01;
+        bit1 = (i >> 3) & 0x01;
+        bit2 = (i >> 4) & 0x01;
+        r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+        // green component
+        bit0 = (i >> 5) & 0x01;
+        bit1 = (i >> 6) & 0x01;
+        bit2 = (i >> 7) & 0x01;
+        g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+        // blue component
+        bit0 = 0;
+        bit1 = (i >> 0) & 0x01;
+        bit2 = (i >> 1) & 0x01;
+        b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-		palette_set_color(machine,i,MAKE_RGB(r,g,b));
-	}
+        palette_set_color(machine,i,MAKE_RGB(r,g,b));
+    }
 }
 */
 
 static VIDEO_START(adp)
 {
-//	UINT32 i;
-//	UINT16 *prgrom = (UINT16*)memory_region(machine, "main");
+//  UINT32 i;
+//  UINT16 *prgrom = (UINT16*)memory_region(machine, "main");
 
 	HD63484_start();
 
-//	for (i = 0; i < 0x70000; i++)
-//	 	HD63484_ram[0x90000 + i] = prgrom[i];
+//  for (i = 0; i < 0x70000; i++)
+//      HD63484_ram[0x90000 + i] = prgrom[i];
 
 }
 
@@ -359,14 +359,14 @@ static ADDRESS_MAP_START( skattv_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x4000ff) AM_READ(test_r) //18b too
 	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w)
 	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w)
-//	AM_RANGE(0x8000a0, 0x8000a1) AM_READ(handler2_r)
-//	AM_RANGE(0x8000a2, 0x8000a3) AM_READ(handler2_r)
-//	AM_RANGE(0x800100, 0x80017f) AM_READ(test_r) //18b too
+//  AM_RANGE(0x8000a0, 0x8000a1) AM_READ(handler2_r)
+//  AM_RANGE(0x8000a2, 0x8000a3) AM_READ(handler2_r)
+//  AM_RANGE(0x800100, 0x80017f) AM_READ(test_r) //18b too
 	AM_RANGE(0x800100, 0x800101) AM_READ(test_r) //18b too
 	AM_RANGE(0x800140, 0x800141) AM_READ(test1_r) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8( DUART68681, "duart68681", duart68681_r, duart68681_w, 0xff )
-//	AM_RANGE(0xffd246, 0xffd247) AM_READ(handler3_r)
-//	AM_RANGE(0xffd248, 0xffd249) AM_READ(handler3_r)
+//  AM_RANGE(0xffd246, 0xffd247) AM_READ(handler3_r)
+//  AM_RANGE(0xffd248, 0xffd249) AM_READ(handler3_r)
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -409,14 +409,14 @@ INPUT_PORTS_END
 /*
 static INTERRUPT_GEN( adp_int )
 {
-	cpunum_set_input_line(machine, 0, 1, HOLD_LINE); // ??? All irqs have the same vector, and the mask used is 0 or 7
+    cpunum_set_input_line(machine, 0, 1, HOLD_LINE); // ??? All irqs have the same vector, and the mask used is 0 or 7
 }
 */
 
 static MACHINE_DRIVER_START( quickjac )
 	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(quickjac_mem, 0)
-//	MDRV_CPU_VBLANK_INT("main", adp_int)
+//  MDRV_CPU_VBLANK_INT("main", adp_int)
 
 	MDRV_MACHINE_START(skattv)
 	MDRV_MACHINE_RESET(skattv)
@@ -432,7 +432,7 @@ static MACHINE_DRIVER_START( quickjac )
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
 	MDRV_PALETTE_LENGTH(0x100)
 
-//	MDRV_PALETTE_INIT(adp)
+//  MDRV_PALETTE_INIT(adp)
 	MDRV_VIDEO_START(adp)
 	MDRV_VIDEO_UPDATE(adp)
 
@@ -445,7 +445,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( skattv )
 	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(skattv_mem, 0)
-//	MDRV_CPU_VBLANK_INT("main", adp_int)
+//  MDRV_CPU_VBLANK_INT("main", adp_int)
 
 	MDRV_MACHINE_START(skattv)
 	MDRV_MACHINE_RESET(skattv)
@@ -461,7 +461,7 @@ static MACHINE_DRIVER_START( skattv )
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
 	MDRV_PALETTE_LENGTH(0x100)
 
-//	MDRV_PALETTE_INIT(adp)
+//  MDRV_PALETTE_INIT(adp)
 	MDRV_VIDEO_START(adp)
 	MDRV_VIDEO_UPDATE(adp)
 
@@ -483,7 +483,7 @@ static MACHINE_DRIVER_START( backgamn )
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 	MDRV_PALETTE_LENGTH(0x100)
 
-//	MDRV_PALETTE_INIT(adp)
+//  MDRV_PALETTE_INIT(adp)
 	MDRV_VIDEO_START(adp)
 	MDRV_VIDEO_UPDATE(adp)
 

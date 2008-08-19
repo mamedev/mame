@@ -174,7 +174,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	rectangle clip = *cliprect;
     int offs;
-    
+
     /* this is a temporary guess until the sprite hardware is better understood */
     /* there is some additional clipping, but this may not be it */
     clip.min_x = 8;
