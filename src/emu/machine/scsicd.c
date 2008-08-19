@@ -696,7 +696,7 @@ static void scsicd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 
 #ifdef MESS
 	/* TODO: get rid of this ifdef MESS section */
-	our_this->cdrom = mess_cd_get_cdrom_file( device_list_find_by_tag( Machine->config->devicelist, CDROM, "cdrom" ) );
+	our_this->cdrom = mess_cd_get_cdrom_file( device_list_find_by_tag( Machine->config->devicelist, CDROM, diskregion ) );
 #else
 	our_this->cdrom = cdrom_open(get_disk_handle( diskregion ));
 

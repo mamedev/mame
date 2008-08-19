@@ -10,6 +10,7 @@
 
 #ifdef MESS
 #include "devices/harddriv.h"
+#include "deprecat.h"
 #endif
 #include "scsihd.h"
 
@@ -236,7 +237,8 @@ static void scsihd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 	state_save_register_item( tag, 0, our_this->blocks );
 
 #ifdef MESS
-	our_this->disk = mess_hd_get_hard_disk_file_by_number( diskregion );
+	/* TODO: get rid of this ifdef MESS section */
+	our_this->disk = mess_hd_get_hard_disk_file( device_list_find_by_tag( Machine->config->devicelist, HARDDISK, diskregion ) );
 #else
 	our_this->disk = hard_disk_open(get_disk_handle( diskregion ));
 
