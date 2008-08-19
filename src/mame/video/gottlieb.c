@@ -172,7 +172,12 @@ VIDEO_START( gottlieb )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	rectangle clip = *cliprect;
     int offs;
+    
+    /* this is a temporary guess until the sprite hardware is better understood */
+    /* there is some additional clipping, but this may not be it */
+    clip.min_x = 8;
 
 	for (offs = 0; offs < 256; offs += 4)
 	{
@@ -189,7 +194,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			code, 0,
 			flip_screen_x_get(), flip_screen_y_get(),
 			sx,sy,
-			cliprect,
+			&clip,
 			TRANSPARENCY_PEN, 0);
 	}
 }
