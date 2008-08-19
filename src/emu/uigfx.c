@@ -236,9 +236,9 @@ cancel:
 
 static void palette_handler(running_machine *machine, ui_gfx_state *state)
 {
-	int total = state->palette.which ? colortable_palette_get_size(Machine->colortable) : Machine->config->total_colors;
+	int total = state->palette.which ? colortable_palette_get_size(machine->colortable) : machine->config->total_colors;
 	const char *title = state->palette.which ? "COLORTABLE" : "PALETTE";
-	const rgb_t *raw_color = palette_entry_list_raw(Machine->palette);
+	const rgb_t *raw_color = palette_entry_list_raw(machine->palette);
 	render_font *ui_font = ui_get_font();
 	float cellwidth, cellheight;
 	float chwidth, chheight;
@@ -337,7 +337,7 @@ static void palette_handler(running_machine *machine, ui_gfx_state *state)
 			int index = state->palette.offset + y * state->palette.count + x;
 			if (index < total)
 			{
-				pen_t pen = state->palette.which ? colortable_palette_get_color(Machine->colortable, index) : raw_color[index];
+				pen_t pen = state->palette.which ? colortable_palette_get_color(machine->colortable, index) : raw_color[index];
 				render_ui_add_rect(cellboxbounds.x0 + x * cellwidth, cellboxbounds.y0 + y * cellheight,
 									cellboxbounds.x0 + (x + 1) * cellwidth, cellboxbounds.y0 + (y + 1) * cellheight,
 									0xff000000 | pen, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -380,11 +380,11 @@ static void palette_handle_keys(running_machine *machine, ui_gfx_state *state)
 	/* clamp within range */
 	if (state->palette.which < 0)
 		state->palette.which = 1;
-	if (state->palette.which > (Machine->colortable != NULL))
-		state->palette.which = (Machine->colortable != NULL);
+	if (state->palette.which > (machine->colortable != NULL))
+		state->palette.which = (machine->colortable != NULL);
 
 	/* cache some info in locals */
-	total = state->palette.which ? colortable_palette_get_size(Machine->colortable) : Machine->config->total_colors;
+	total = state->palette.which ? colortable_palette_get_size(machine->colortable) : machine->config->total_colors;
 
 	/* determine number of entries per row and total */
 	rowcount = state->palette.count;
@@ -426,7 +426,7 @@ static void gfxset_handler(running_machine *machine, ui_gfx_state *state)
 {
 	render_font *ui_font = ui_get_font();
 	int set = state->gfxset.set;
-	gfx_element *gfx = Machine->gfx[set];
+	gfx_element *gfx = machine->gfx[set];
 	float fullwidth, fullheight;
 	float cellwidth, cellheight;
 	float chwidth, chheight;
@@ -511,7 +511,7 @@ static void gfxset_handler(running_machine *machine, ui_gfx_state *state)
 	boxbounds.y1 = boxbounds.y0 + fullheight;
 
 	/* figure out the title and expand the outer box to fit */
-	for (x = 0; x < MAX_GFX_ELEMENTS && Machine->gfx[x] != NULL; x++) ;
+	for (x = 0; x < MAX_GFX_ELEMENTS && machine->gfx[x] != NULL; x++) ;
 	sprintf(title, "GFX %d/%d %dx%d COLOR %X", state->gfxset.set, x - 1, gfx->width, gfx->height, state->gfxset.color[set]);
 	titlewidth = render_font_get_string_width(ui_font, chheight, render_get_ui_aspect(), title);
 	x0 = 0.0f;
@@ -598,7 +598,7 @@ static void gfxset_handle_keys(running_machine *machine, ui_gfx_state *state, in
 	if (ui_input_pressed(machine, IPT_UI_PREV_GROUP))
 	{
 		for (temp = state->gfxset.set - 1; temp >= 0; temp--)
-			if (Machine->gfx[temp] != NULL)
+			if (machine->gfx[temp] != NULL)
 				break;
 		if (temp >= 0)
 			state->gfxset.set = temp;
@@ -606,7 +606,7 @@ static void gfxset_handle_keys(running_machine *machine, ui_gfx_state *state, in
 	if (ui_input_pressed(machine, IPT_UI_NEXT_GROUP))
 	{
 		for (temp = state->gfxset.set + 1; temp < MAX_GFX_ELEMENTS; temp++)
-			if (Machine->gfx[temp] != NULL)
+			if (machine->gfx[temp] != NULL)
 				break;
 		if (temp < MAX_GFX_ELEMENTS)
 			state->gfxset.set = temp;
@@ -614,7 +614,7 @@ static void gfxset_handle_keys(running_machine *machine, ui_gfx_state *state, in
 
 	/* cache some info in locals */
 	set = state->gfxset.set;
-	gfx = Machine->gfx[set];
+	gfx = machine->gfx[set];
 
 	/* handle cells per line (minus,plus) */
 	if (ui_input_pressed(machine, IPT_UI_ZOOM_OUT))

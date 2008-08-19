@@ -482,7 +482,7 @@ static void *c140_start(const char *tag, int sndindex, int clock, const void *co
 		}
 	}
 
-	memset(info->REG,0,0x200 );
+	memset(info->REG,0,sizeof(info->REG));
 	{
 		int i;
 		for(i=0;i<MAX_VOICE;i++) init_voice( &info->voi[i] );

@@ -250,7 +250,7 @@ static void sound_exit(running_machine *machine)
 
 	/* reset variables */
 	totalsnd = 0;
-	memset(&sound, 0, sizeof(sound));
+	memset(sound, 0, sizeof(sound));
 }
 
 
