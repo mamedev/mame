@@ -462,7 +462,9 @@ static int get_pixel_ptn(int x,int y)
 
 static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,INT16 _ay)
 {
-	int step1_x,step1_y,step2_x,step2_y;
+	int dst_step1_x,dst_step1_y,dst_step2_x,dst_step2_y;
+	int src_step1_x,src_step1_y,src_step2_x,src_step2_y;
+	int ax_neg,ay_neg;
 	int ax = _ax;
 	int ay = _ay;
 	int xxs = src_x;
@@ -470,18 +472,58 @@ static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,I
 	int xxd = dst_x;
 	int yyd = dst_y;
 
-	switch (opcode & 0x0700)
-	{
-		default:
-		case 0x0000: step1_x =  1; step1_y =  0; step2_x = -ax; step2_y =   1; break;
-		case 0x0100: step1_x =  1; step1_y =  0; step2_x = -ax; step2_y =  -1; break;
-		case 0x0200: step1_x = -1; step1_y =  0; step2_x =  ax; step2_y =   1; break;
-		case 0x0300: step1_x = -1; step1_y =  0; step2_x =  ax; step2_y =  -1; break;
-		case 0x0400: step1_x =  0; step1_y =  1; step2_x =   1; step2_y =  ay; break;
-		case 0x0500: step1_x =  0; step1_y = -1; step2_x =   1; step2_y = -ay; break;
-		case 0x0600: step1_x =  0; step1_y =  1; step2_x =  -1; step2_y =  ay; break;
-		case 0x0700: step1_x =  0; step1_y = -1; step2_x =  -1; step2_y = -ay; break;
-	}
+	if (ax < 0)
+		ax_neg = -1;
+	else
+		ax_neg = 1;
+	if (ay < 0)
+		ay_neg = -1;
+	else
+		ay_neg = 1;
+
+	if (opcode & 0x0800)
+		switch (opcode & 0x0700)
+		{
+			default:
+			case 0x0000: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ay_neg*ay; dst_step2_y =   1; break;
+			case 0x0100: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ay_neg*ay; dst_step2_y =  -1; break;
+			case 0x0200: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ay_neg*ay; dst_step2_y =   1; break;
+			case 0x0300: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ay_neg*ay; dst_step2_y =  -1; break;
+			case 0x0400: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x =  1; dst_step2_y = -ay_neg*ay; break;
+			case 0x0500: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x =  1; dst_step2_y =  ay_neg*ay; break;
+			case 0x0600: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x = -1; dst_step2_y = -ay_neg*ay; break;
+			case 0x0700: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x = -1; dst_step2_y =  ay_neg*ay; break;
+		}
+	else
+		switch (opcode & 0x0700)
+		{
+			default:
+			case 0x0000: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ax_neg*ax; dst_step2_y =   1; break;
+			case 0x0100: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ax_neg*ax; dst_step2_y =  -1; break;
+			case 0x0200: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ax_neg*ax; dst_step2_y =   1; break;
+			case 0x0300: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ax_neg*ax; dst_step2_y =  -1; break;
+			case 0x0400: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x =  1; dst_step2_y =  ax_neg*ax; break;
+			case 0x0500: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x =  1; dst_step2_y = -ax_neg*ax; break;
+			case 0x0600: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x = -1; dst_step2_y =  ax_neg*ax; break;
+			case 0x0700: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x = -1; dst_step2_y = -ax_neg*ax; break;
+		}
+
+	if ((_ax >= 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0000))
+		{ src_step1_x =  1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =   1; }
+	else if ((_ax >= 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0000))
+		{ src_step1_x =  1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =  -1; }
+	else if ((_ax < 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0000))
+		{ src_step1_x = -1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =   1; }
+	else if ((_ax < 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0000))
+		{ src_step1_x = -1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =  -1; }
+	else if ((_ax >= 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0800))
+		{ src_step1_x =  0; src_step1_y =  1; src_step2_x =   1; src_step2_y = -ay; }
+	else if ((_ax >= 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0800))
+		{ src_step1_x =  0; src_step1_y = -1; src_step2_x =   1; src_step2_y = -ay; }
+	else if ((_ax < 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0800))
+		{ src_step1_x =  0; src_step1_y =  1; src_step2_x =  -1; src_step2_y = -ay; }
+	else // ((_ax < 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0800))
+		{ src_step1_x =  0; src_step1_y = -1; src_step2_x =  -1; src_step2_y = -ay; }
 
 	for (;;)
 	{
@@ -494,16 +536,18 @@ static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,I
 				if (ay == 0) break;
 				if (_ay > 0)
 				{
-					yys++;
-					xxd += step1_x;
-					yyd += step1_y;
+					xxs += src_step1_x;
+					yys += src_step1_y;
+					xxd += dst_step1_x;
+					yyd += dst_step1_y;
 					ay--;
 				}
 				else
 				{
-					yys--;
-					xxd += step1_x;
-					yyd += step1_y;
+					xxs += src_step1_x;
+					yys += src_step1_y;
+					xxd += dst_step1_x;
+					yyd += dst_step1_y;
 					ay++;
 				}
 			}
@@ -512,16 +556,18 @@ static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,I
 				if (ax == 0) break;
 				else if (ax > 0)
 				{
-					xxs++;
-					xxd += step1_x;
-					yyd += step1_y;
+					xxs += src_step1_x;
+					yys += src_step1_y;
+					xxd += dst_step1_x;
+					yyd += dst_step1_y;
 					ax--;
 				}
 				else
 				{
-					xxs--;
-					xxd += step1_x;
-					yyd += step1_y;
+					xxs += src_step1_x;
+					yys += src_step1_y;
+					xxd += dst_step1_x;
+					yyd += dst_step1_y;
 					ax++;
 				}
 			}
@@ -532,19 +578,19 @@ static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,I
 			ay = _ay;
 			if (_ax < 0)
 			{
-				xxs--;
-				yys -= ay;
-				xxd += step2_x;
-				yyd += step2_y;
+				xxs += src_step2_x;
+				yys += src_step2_y;
+				xxd += dst_step2_x;
+				yyd += dst_step2_y;
 				if (ax == 0) break;
 				ax++;
 			}
 			else
 			{
-				xxs++;
-				yys += ay;
-				xxd += step2_x;
-				yyd += step2_y;
+				xxs += src_step2_x;
+				yys += src_step2_y;
+				xxd += dst_step2_x;
+				yyd += dst_step2_y;
 				if (ax == 0) break;
 				ax--;
 			}
@@ -554,19 +600,19 @@ static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,I
 			ax = _ax;
 			if (_ay < 0)
 			{
-				xxs -= ax;
-				yys--;
-				xxd += step2_x;
-				yyd += step2_y;
+				xxs += src_step2_x;
+				yys += src_step2_y;
+				xxd += dst_step2_x;
+				yyd += dst_step2_y;
 				if (ay == 0) break;
 				ay++;
 			}
 			else
 			{
-				xxs -= ax;
-				yys++;
-				xxd += step2_x;
-				yyd += step2_y;
+				xxs += src_step2_x;
+				yys += src_step2_y;
+				xxd += dst_step2_x;
+				yyd += dst_step2_y;
 				if (ay == 0) break;
 				ay--;
 			}
@@ -576,26 +622,68 @@ static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,I
 
 static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
 {
-	int step1_x,step1_y,step2_x,step2_y;
+	int dst_step1_x,dst_step1_y,dst_step2_x,dst_step2_y;
+	int src_step1_x,src_step1_y,src_step2_x,src_step2_y;
 	int ax = _ax;
 	int ay = _ay;
+	int ax_neg,ay_neg;
 	int xxs = src_x;
 	int yys = src_y;
 	int xxd = cpx;
 	int yyd = cpy;
 
-	switch (opcode & 0x0700)
-	{
-		default:
-		case 0x0000: step1_x =  1; step1_y =  0; step2_x = -ax; step2_y =   1; break;
-		case 0x0100: step1_x =  1; step1_y =  0; step2_x = -ax; step2_y =  -1; break;
-		case 0x0200: step1_x = -1; step1_y =  0; step2_x =  ax; step2_y =   1; break;
-		case 0x0300: step1_x = -1; step1_y =  0; step2_x =  ax; step2_y =  -1; break;
-		case 0x0400: step1_x =  0; step1_y =  1; step2_x =   1; step2_y =  ay; break;
-		case 0x0500: step1_x =  0; step1_y = -1; step2_x =   1; step2_y = -ay; break;
-		case 0x0600: step1_x =  0; step1_y =  1; step2_x =  -1; step2_y =  ay; break;
-		case 0x0700: step1_x =  0; step1_y = -1; step2_x =  -1; step2_y = -ay; break;
-	}
+	if (ax < 0)
+		ax_neg = -1;
+	else
+		ax_neg = 1;
+	if (ay < 0)
+		ay_neg = -1;
+	else
+		ay_neg = 1;
+
+	if (opcode & 0x0800)
+		switch (opcode & 0x0700)
+		{
+			default:
+			case 0x0000: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ay_neg*ay; dst_step2_y =   1; break;
+			case 0x0100: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ay_neg*ay; dst_step2_y =  -1; break;
+			case 0x0200: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ay_neg*ay; dst_step2_y =   1; break;
+			case 0x0300: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ay_neg*ay; dst_step2_y =  -1; break;
+			case 0x0400: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x =  1; dst_step2_y = -ay_neg*ay; break;
+			case 0x0500: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x =  1; dst_step2_y =  ay_neg*ay; break;
+			case 0x0600: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x = -1; dst_step2_y = -ay_neg*ay; break;
+			case 0x0700: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x = -1; dst_step2_y =  ay_neg*ay; break;
+		}
+	else
+		switch (opcode & 0x0700)
+		{
+			default:
+			case 0x0000: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ax_neg*ax; dst_step2_y =   1; break;
+			case 0x0100: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ax_neg*ax; dst_step2_y =  -1; break;
+			case 0x0200: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ax_neg*ax; dst_step2_y =   1; break;
+			case 0x0300: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ax_neg*ax; dst_step2_y =  -1; break;
+			case 0x0400: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x =  1; dst_step2_y =  ax_neg*ax; break;
+			case 0x0500: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x =  1; dst_step2_y = -ax_neg*ax; break;
+			case 0x0600: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x = -1; dst_step2_y =  ax_neg*ax; break;
+			case 0x0700: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x = -1; dst_step2_y = -ax_neg*ax; break;
+		}
+
+	if ((_ax >= 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0000))
+		{ src_step1_x =  1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =   1; }
+	else if ((_ax >= 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0000))
+		{ src_step1_x =  1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =  -1; }
+	else if ((_ax < 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0000))
+		{ src_step1_x = -1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =   1; }
+	else if ((_ax < 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0000))
+		{ src_step1_x = -1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =  -1; }
+	else if ((_ax >= 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0800))
+		{ src_step1_x =  0; src_step1_y =  1; src_step2_x =   1; src_step2_y = -ay; }
+	else if ((_ax >= 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0800))
+		{ src_step1_x =  0; src_step1_y = -1; src_step2_x =   1; src_step2_y = -ay; }
+	else if ((_ax < 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0800))
+		{ src_step1_x =  0; src_step1_y =  1; src_step2_x =  -1; src_step2_y = -ay; }
+	else // ((_ax < 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0800))
+		{ src_step1_x =  0; src_step1_y = -1; src_step2_x =  -1; src_step2_y = -ay; }
 
 	for (;;)
 	{
@@ -608,16 +696,18 @@ static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
 				if (ay == 0) break;
 				if (_ay > 0)
 				{
-					yys++;
-					xxd += step1_x;
-					yyd += step1_y;
+					xxs += src_step1_x;
+					yys += src_step1_y;
+					xxd += dst_step1_x;
+					yyd += dst_step1_y;
 					ay--;
 				}
 				else
 				{
-					yys--;
-					xxd += step1_x;
-					yyd += step1_y;
+					xxs += src_step1_x;
+					yys += src_step1_y;
+					xxd += dst_step1_x;
+					yyd += dst_step1_y;
 					ay++;
 				}
 			}
@@ -626,16 +716,18 @@ static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
 				if (ax == 0) break;
 				else if (ax > 0)
 				{
-					xxs++;
-					xxd += step1_x;
-					yyd += step1_y;
+					xxs += src_step1_x;
+					yys += src_step1_y;
+					xxd += dst_step1_x;
+					yyd += dst_step1_y;
 					ax--;
 				}
 				else
 				{
-					xxs--;
-					xxd += step1_x;
-					yyd += step1_y;
+					xxs += src_step1_x;
+					yys += src_step1_y;
+					xxd += dst_step1_x;
+					yyd += dst_step1_y;
 					ax++;
 				}
 			}
@@ -646,19 +738,19 @@ static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
 			ay = _ay;
 			if (_ax < 0)
 			{
-				xxs--;
-				yys -= ay;
-				xxd += step2_x;
-				yyd += step2_y;
+				xxs += src_step2_x;
+				yys += src_step2_y;
+				xxd += dst_step2_x;
+				yyd += dst_step2_y;
 				if (ax == 0) break;
 				ax++;
 			}
 			else
 			{
-				xxs++;
-				yys += ay;
-				xxd += step2_x;
-				yyd += step2_y;
+				xxs += src_step2_x;
+				yys += src_step2_y;
+				xxd += dst_step2_x;
+				yyd += dst_step2_y;
 				if (ax == 0) break;
 				ax--;
 			}
@@ -668,19 +760,19 @@ static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
 			ax = _ax;
 			if (_ay < 0)
 			{
-				xxs -= ax;
-				yys--;
-				xxd += step2_x;
-				yyd += step2_y;
+				xxs += src_step2_x;
+				yys += src_step2_y;
+				xxd += dst_step2_x;
+				yyd += dst_step2_y;
 				if (ay == 0) break;
 				ay++;
 			}
 			else
 			{
-				xxs -= ax;
-				yys++;
-				xxd += step2_x;
-				yyd += step2_y;
+				xxs += src_step2_x;
+				yys += src_step2_y;
+				xxd += dst_step2_x;
+				yyd += dst_step2_y;
 				if (ay == 0) break;
 				ay--;
 			}
@@ -760,13 +852,14 @@ static void HD63484_command_w(UINT16 cmd)
 
 	if (fifo_counter >= len)
 	{
+/*
 		int i;
 
-		logerror("PC %05x: HD63484 command %s (%04x) ",activecpu_get_pc(),instruction_name[fifo[0]>>10],fifo[0]);
+		printf("PC %05x: HD63484 command %s (%04x) ",activecpu_get_pc(),instruction_name[fifo[0]>>10],fifo[0]);
 		for (i = 1;i < fifo_counter;i++)
-			logerror("%04x ",fifo[i]);
-		logerror("\n");
-
+			printf("%04x ",fifo[i]);
+		printf("\n");
+*/
 		if (fifo[0] == 0x0400) { /* ORG */
 			org = ((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4);
 			org_dpd = fifo[2] & 0x000f;
@@ -835,7 +928,7 @@ logerror("unsupported register\n");
 		}
 		else if (fifo[0] == 0x4800)	/* WT */
 		{
-			HD63484_ram[rwp] = fifo[1];
+			if (!input_code_pressed(KEYCODE_9)) HD63484_ram[rwp] = fifo[1];
 			rwp = (rwp + 1) & (HD63484_RAM_SIZE-1);
 		}
 		else if (fifo[0] == 0x5800)	/* CLR */
@@ -903,14 +996,14 @@ logerror("unsupported register\n");
 		else if ((fifo[0] & 0xff00) == 0x8800)	/* ALINE */
 		{
 			line(cpx,cpy,fifo[1],fifo[2],fifo[0]&7);
-			cpx=(INT16)fifo[1];
-			cpy=(INT16)fifo[2];
+			cpx = (INT16)fifo[1];
+			cpy = (INT16)fifo[2];
 		}
 		else if ((fifo[0] & 0xff00) == 0x8c00)	/* RLINE */
 		{
 			line(cpx,cpy,cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],fifo[0]&7);
-			cpx+=(INT16)fifo[1];
-			cpy+=(INT16)fifo[2];
+			cpx += (INT16)fifo[1];
+			cpy += (INT16)fifo[2];
 		}
 		else if ((fifo[0] & 0xfff8) == 0x9000)	/* ARCT */
 		{
@@ -918,8 +1011,8 @@ logerror("unsupported register\n");
 			line((INT16)fifo[1],cpy,(INT16)fifo[1],(INT16)fifo[2],fifo[0]&7);
 			line((INT16)fifo[1],(INT16)fifo[2],cpx,(INT16)fifo[2],fifo[0]&7);
 			line(cpx,(INT16)fifo[2],cpx,cpy,fifo[0]&7);
-			cpx=(INT16)fifo[1];
-			cpy=(INT16)fifo[2];
+			cpx = (INT16)fifo[1];
+			cpy = (INT16)fifo[2];
 		}
 		else if ((fifo[0] & 0xfff8) == 0x9400)	/* RRCT  added*/ 
 		{
@@ -928,21 +1021,21 @@ logerror("unsupported register\n");
 			line(cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],cpx,cpy+(INT16)fifo[2],fifo[0]&7);
 			line(cpx,cpy+(INT16)fifo[2],cpx,cpy,fifo[0]&7);
 			
-			cpx=cpx+(INT16)fifo[1];
-			cpy=cpy+(INT16)fifo[2];
+			cpx += (INT16)fifo[1];
+			cpy += (INT16)fifo[2];
 		}
 		else if ((fifo[0] & 0xfff8) == 0xa400)	/* RPLG  added*/ 
 		{
 			int nseg,sx,sy,ex,ey;
-			sx=cpx;
-			sy=cpy;
+			sx = cpx;
+			sy = cpy;
 			for(nseg=0;nseg<fifo[1];nseg++)
 			{
-				ex=sx+(INT16)fifo[2+nseg*2];
-				ey=sy+(INT16)fifo[2+nseg*2+1];
+				ex = sx + (INT16)fifo[2+nseg*2];
+				ey = sy + (INT16)fifo[2+nseg*2+1];
 				line(sx,sy,ex,ey,fifo[0]&7);
-				sx=ex;
-				sy=ey;
+				sx = ex;
+				sy = ey;
 			}
 			line(sx,sy,cpx,cpy,fifo[0]&7);
 		}
@@ -1021,8 +1114,8 @@ logerror("unsupported register\n");
 		{
 			agcpy(fifo[0],fifo[1],fifo[2],cpx,cpy,fifo[3],fifo[4]);
 
-			cpx += fifo[3];
-			cpy += fifo[4];
+			cpx += fifo[4];
+			cpy += fifo[3];
 		}
 		else
 {
