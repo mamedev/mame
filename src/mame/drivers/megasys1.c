@@ -3628,10 +3628,10 @@ INPUT_PORTS_END
 
 ***************************************************************************/
 
-void phantasm_rom_decode(int cpu)
+void phantasm_rom_decode(running_machine *machine, const char *region)
 {
-	UINT16	*RAM	=	(UINT16 *) memory_region(Machine, "main"+cpu);
-	int i,		size	=	memory_region_length(Machine, "main"+cpu);
+	UINT16	*RAM	=	(UINT16 *) memory_region(machine, region);
+	int i,		size	=	memory_region_length(machine, region);
 	if (size > 0x40000)	size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
@@ -3662,10 +3662,10 @@ void phantasm_rom_decode(int cpu)
 
 }
 
-void astyanax_rom_decode(int cpu)
+void astyanax_rom_decode(running_machine *machine, const char *region)
 {
-	UINT16	*RAM	=	(UINT16 *) memory_region(Machine, "main"+cpu);
-	int i,		size	=	memory_region_length(Machine, "main"+cpu);
+	UINT16	*RAM	=	(UINT16 *) memory_region(machine, region);
+	int i,		size	=	memory_region_length(machine, region);
 	if (size > 0x40000)	size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
@@ -3696,10 +3696,10 @@ void astyanax_rom_decode(int cpu)
 	}
 }
 
-void rodland_rom_decode(int cpu)
+void rodland_rom_decode(running_machine *machine, const char *region)
 {
-	UINT16	*RAM	=	(UINT16 *) memory_region(Machine, "main"+cpu);
-	int i,		size	=	memory_region_length(Machine, "main"+cpu);
+	UINT16	*RAM	=	(UINT16 *) memory_region(machine, region);
+	int i,		size	=	memory_region_length(machine, region);
 	if (size > 0x40000)	size = 0x40000;
 
 	for (i = 0 ; i < size/2 ; i++)
@@ -3731,10 +3731,10 @@ void rodland_rom_decode(int cpu)
 }
 
 
-static void rodlandj_gfx_unmangle(const char *region)
+static void rodlandj_gfx_unmangle(running_machine *machine, const char *region)
 {
-	UINT8 *rom = memory_region(Machine, region);
-	int size = memory_region_length(Machine, region);
+	UINT8 *rom = memory_region(machine, region);
+	int size = memory_region_length(machine, region);
 	UINT8 *buffer;
 	int i;
 
@@ -3763,10 +3763,10 @@ static void rodlandj_gfx_unmangle(const char *region)
 	free(buffer);
 }
 
-static void jitsupro_gfx_unmangle(const char *region)
+static void jitsupro_gfx_unmangle(running_machine *machine, const char *region)
 {
-	UINT8 *rom = memory_region(Machine, region);
-	int size = memory_region_length(Machine, region);
+	UINT8 *rom = memory_region(machine, region);
+	int size = memory_region_length(machine, region);
 	UINT8 *buffer;
 	int i;
 
@@ -3810,7 +3810,7 @@ static DRIVER_INIT( astyanax )
 {
 	UINT16 *RAM;
 
-	astyanax_rom_decode(0);
+	astyanax_rom_decode(machine, "main");
 
 	RAM = (UINT16 *) memory_region(machine, "main");
 	RAM[0x0004e6/2] = 0x6040;	// protection
@@ -3871,7 +3871,7 @@ static DRIVER_INIT( hachoo )
 {
 	UINT16 *RAM;
 
-	astyanax_rom_decode(0);
+	astyanax_rom_decode(machine, "main");
 
 	RAM  = (UINT16 *) memory_region(machine, "main");
 	RAM[0x0006da/2] = 0x6000;	// protection
@@ -3890,7 +3890,7 @@ static DRIVER_INIT( iganinju )
 {
 	UINT16 *RAM;
 
-	phantasm_rom_decode(0);
+	phantasm_rom_decode(machine, "main");
 
 	RAM  = (UINT16 *) memory_region(machine, "main");
 	RAM[0x02f000/2] = 0x835d;	// protection
@@ -3914,10 +3914,10 @@ static DRIVER_INIT( jitsupro )
 {
 	UINT16 *RAM  = (UINT16 *) memory_region(machine, "main");
 
-	astyanax_rom_decode(0);		// Code
+	astyanax_rom_decode(machine, "main");		// Code
 
-	jitsupro_gfx_unmangle("gfx1");	// Gfx
-	jitsupro_gfx_unmangle("gfx4");
+	jitsupro_gfx_unmangle(machine, "gfx1");	// Gfx
+	jitsupro_gfx_unmangle(machine, "gfx4");
 
 	RAM[0x436/2] = 0x4e71;	// protection
 	RAM[0x438/2] = 0x4e71;	//
@@ -3934,14 +3934,14 @@ static DRIVER_INIT( peekaboo )
 
 static DRIVER_INIT( phantasm )
 {
-	phantasm_rom_decode(0);
+	phantasm_rom_decode(machine, "main");
 }
 
 static DRIVER_INIT( plusalph )
 {
 	UINT16 *RAM;
 
-	astyanax_rom_decode(0);
+	astyanax_rom_decode(machine, "main");
 
 	RAM  = (UINT16 *) memory_region(machine, "main");
 	RAM[0x0012b6/2] = 0x0000;	// protection
@@ -3949,20 +3949,20 @@ static DRIVER_INIT( plusalph )
 
 static DRIVER_INIT( rodland )
 {
-	rodland_rom_decode(0);
+	rodland_rom_decode(machine, "main");
 }
 
 static DRIVER_INIT( rodlandj )
 {
-	rodlandj_gfx_unmangle("gfx1");
-	rodlandj_gfx_unmangle("gfx4");
+	rodlandj_gfx_unmangle(machine, "gfx1");
+	rodlandj_gfx_unmangle(machine, "gfx4");
 
-	astyanax_rom_decode(0);
+	astyanax_rom_decode(machine, "main");
 }
 
 static DRIVER_INIT( soldam )
 {
-	astyanax_rom_decode(0);
+	astyanax_rom_decode(machine, "main");
 
 	/* Sprite RAM is mirrored. Why? */
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
@@ -3973,7 +3973,7 @@ static DRIVER_INIT( stdragon )
 {
 	UINT16 *RAM;
 
-	phantasm_rom_decode(0);
+	phantasm_rom_decode(machine, "main");
 
 	RAM  = (UINT16 *) memory_region(machine, "main");
 	RAM[0x00045e/2] = 0x0098;	// protection

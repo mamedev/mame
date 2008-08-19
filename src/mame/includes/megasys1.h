@@ -197,6 +197,6 @@ void megasys1_set_vreg_flag(int which, int data);
 
 /*----------- defined in drivers/megasys1.c -----------*/
 
-void astyanax_rom_decode(int cpu);
-void phantasm_rom_decode(int cpu);
-void rodland_rom_decode (int cpu);
+void astyanax_rom_decode(running_machine *machine, const char *region);
+void phantasm_rom_decode(running_machine *machine, const char *region);
+void rodland_rom_decode (running_machine *machine, const char *region);

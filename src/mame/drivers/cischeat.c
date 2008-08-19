@@ -2141,7 +2141,7 @@ static DRIVER_INIT( bigrun )
 	rom_1 = (UINT16 *) memory_region(machine, "user1");
 
 	cischeat_untangle_sprites(machine, "gfx4");	// Untangle sprites
-	phantasm_rom_decode(3);					// Decrypt sound cpu code
+	phantasm_rom_decode(machine, "sound");					// Decrypt sound cpu code
 }
 
 
@@ -2273,7 +2273,7 @@ static DRIVER_INIT( cischeat )
 	rom_3 = (UINT16 *) (memory_region(machine, "user1") + 0xc0000);
 
 	cischeat_untangle_sprites(machine, "gfx4");	// Untangle sprites
-	astyanax_rom_decode(3);					// Decrypt sound cpu code
+	astyanax_rom_decode(machine, "sound");					// Decrypt sound cpu code
 }
 
 
