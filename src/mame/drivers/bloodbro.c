@@ -208,7 +208,7 @@ ADDRESS_MAP_END
 	PORT_DIPSETTING(      0x0020, DEF_STR( Normal ) ) \
 	PORT_DIPSETTING(      0x0000, "x2" )
 
-static INPUT_PORTS_START( weststry )
+static INPUT_PORTS_START( weststry_base )
 	PORT_START("DSW")
 	BLOODBRO_COINAGE
 	/*  SW1:7,8 is listed as "ROM change option", "optional"
@@ -281,8 +281,17 @@ static INPUT_PORTS_START( weststry )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( weststry )
+	PORT_INCLUDE( weststry_base )
+	
+	PORT_START("COIN")	/* referenced by seibu sound board */
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( bloodbro )
-	PORT_INCLUDE( weststry )
+	PORT_INCLUDE( weststry_base )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )

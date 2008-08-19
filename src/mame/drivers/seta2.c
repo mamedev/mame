@@ -651,7 +651,7 @@ static ADDRESS_MAP_START( myangel2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM")				// Coins
 	AM_RANGE(0x600006, 0x600007) AM_READ(watchdog_reset16_r		)	// Watchdog
 	AM_RANGE(0x600300, 0x600301) AM_READ_PORT("DSW1")				// DSW 1
-	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW0")				// DSW 2
+	AM_RANGE(0x600302, 0x600303) AM_READ_PORT("DSW2")				// DSW 2
 	AM_RANGE(0xb00000, 0xb03fff) AM_READ(seta_sound_word_r 		)	// Sound
 	AM_RANGE(0xd00000, 0xd3ffff) AM_READ(SMH_RAM				)	// Sprites
 	AM_RANGE(0xd40000, 0xd4ffff) AM_READ(SMH_RAM				)	// Palette

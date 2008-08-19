@@ -66,7 +66,7 @@ UINT8 invaders_is_flip_screen(void);
 void invaders_set_flip_screen(UINT8 data);
 int invaders_is_cabinet_cocktail(running_machine *machine);
 
-#define BLUESHRK_SPEAR_PORT_TAG			("SPEAR")
+#define BLUESHRK_SPEAR_PORT_TAG			("IN0")
 
 #define INVADERS_CONTROL_PORT_P1 \
 	PORT_START(INVADERS_P1_CONTROL_PORT_TAG) \

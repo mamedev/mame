@@ -455,6 +455,9 @@ static INPUT_PORTS_START( rallybik )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
 	TOAPLAN1_SYSTEM_INPUTS
+
+	PORT_START("TJUMP")	/* Territory Jumper Block (not present?) */
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( truxton )

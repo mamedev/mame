@@ -237,6 +237,9 @@ static INPUT_PORTS_START( hasamu )
 	IREM_COIN_MODE_1_NEW_HIGH
 	/* Coin Mode 2 */
 	IREM_COIN_MODE_2_HIGH
+
+	PORT_START("P3_P4")	/* unused */
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dynablst )
@@ -388,6 +391,9 @@ static INPUT_PORTS_START( bombrman ) /* Does not appear to support 4 players or 
 	IREM_COIN_MODE_1_NEW_HIGH
 	/* Coin Mode 2 */
 	IREM_COIN_MODE_2_HIGH
+
+	PORT_START("P3_P4")	/* unused */
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( bbmanw )
@@ -495,6 +501,9 @@ static INPUT_PORTS_START( quizf1 )
 	IREM_COIN_MODE_1_NEW_HIGH
 	/* Coin Mode 2 */
 	IREM_COIN_MODE_2_HIGH
+
+	PORT_START("P3_P4")	/* unused */
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( matchit2 )
@@ -547,6 +556,9 @@ static INPUT_PORTS_START( matchit2 )
 	IREM_COIN_MODE_1_NEW_HIGH
 	/* Coin Mode 2 */
 	IREM_COIN_MODE_2_HIGH
+
+	PORT_START("P3_P4")	/* unused */
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( shisen2 )
@@ -601,6 +613,9 @@ static INPUT_PORTS_START( shisen2 )
 	IREM_COIN_MODE_1_NEW_HIGH
 	/* Coin Mode 2 */
 	IREM_COIN_MODE_2_HIGH
+
+	PORT_START("P3_P4")	/* unused */
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( riskchal )
@@ -648,6 +663,9 @@ static INPUT_PORTS_START( riskchal )
 	IREM_COIN_MODE_1_NEW_HIGH
 	/* Coin Mode 2 */
 	IREM_COIN_MODE_2_HIGH
+
+	PORT_START("P3_P4")	/* unused */
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 /*****************************************************************************/
