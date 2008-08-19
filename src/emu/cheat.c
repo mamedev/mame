@@ -209,6 +209,8 @@ static astring *quote_astring_expression(astring *string, int isattribute);
 static int validate_format(const char *filename, int line, const script_entry *entry);
 static UINT64 cheat_variable_get(void *ref);
 static void cheat_variable_set(void *ref, UINT64 value);
+static UINT64 execute_frombcd(void *ref, UINT32 params, const UINT64 *param);
+static UINT64 execute_tobcd(void *ref, UINT32 params, const UINT64 *param);
 
 
 
@@ -375,7 +377,7 @@ void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const 
 	else if (cheat->parameter == NULL && cheat->script[SCRIPT_STATE_RUN] == NULL && cheat->script[SCRIPT_STATE_OFF] == NULL)
 	{
 		if (state != NULL)
-			*state = "Activate";
+			*state = "Set";
 		if (flags != NULL)
 			*flags = 0;
 	}
@@ -918,6 +920,8 @@ static cheat_entry *cheat_entry_load(running_machine *machine, const char *filen
 		sprintf(tempname, "temp%d", curtemp);
 		symtable_add_register(cheat->symbols, tempname, &cheat->tempvar[curtemp], cheat_variable_get, cheat_variable_set);
 	}
+	symtable_add_function(cheat->symbols, "frombcd", NULL, 1, 1, execute_frombcd);
+	symtable_add_function(cheat->symbols, "tobcd", NULL, 1, 1, execute_tobcd);
 
 	/* read the first comment node */
 	commentnode = xml_get_sibling(cheatnode->child, "comment");
@@ -1630,3 +1634,45 @@ static void cheat_variable_set(void *ref, UINT64 value)
 {
 	*(UINT64 *)ref = value;
 }
+
+
+/*-------------------------------------------------
+    execute_frombcd - convert a value from BCD
+-------------------------------------------------*/
+
+static UINT64 execute_frombcd(void *ref, UINT32 params, const UINT64 *param)
+{
+	UINT64 value = param[0];
+	UINT64 multiplier = 1;
+	UINT64 result = 0;
+	
+	while (value != 0)
+	{
+		result += (value & 0x0f) * multiplier;
+		value >>= 4;
+		multiplier *= 10;
+	}
+	return result;
+}
+
+
+/*-------------------------------------------------
+    execute_tobcd - convert a value to BCD
+-------------------------------------------------*/
+
+static UINT64 execute_tobcd(void *ref, UINT32 params, const UINT64 *param)
+{
+	UINT64 value = param[0];
+	UINT64 result = 0;
+	UINT8 shift = 0;
+	
+	while (value != 0)
+	{
+		result += (value % 10) << shift;
+		value /= 10;
+		shift += 4;
+	}
+	return result;
+}
+
+
