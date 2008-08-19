@@ -484,6 +484,8 @@ union _addrmap64_token
 
 
 /* wrappers for dynamic read handler installation */
+#define memory_install_read_handler(machine, cpu, space, start, end, mask, mirror, rhandler) \
+	_memory_install_handler(machine, cpu, space, start, end, mask, mirror, rhandler, (FPTR)NULL, #rhandler, NULL)
 #define memory_install_read8_handler(machine, cpu, space, start, end, mask, mirror, rhandler) \
 	_memory_install_handler8(machine, cpu, space, start, end, mask, mirror, rhandler, NULL, #rhandler, NULL)
 #define memory_install_read16_handler(machine, cpu, space, start, end, mask, mirror, rhandler) \
@@ -493,6 +495,8 @@ union _addrmap64_token
 #define memory_install_read64_handler(machine, cpu, space, start, end, mask, mirror, rhandler) \
 	_memory_install_handler64(machine, cpu, space, start, end, mask, mirror, rhandler, NULL, #rhandler, NULL)
 
+#define memory_install_read_device_handler(device, cpu, space, start, end, mask, mirror, rhandler) \
+	_memory_install_device_handler(device, cpu, space, start, end, mask, mirror, rhandler, NULL, #rhandler, NULL)
 #define memory_install_read8_device_handler(device, cpu, space, start, end, mask, mirror, rhandler) \
 	_memory_install_device_handler8(device, cpu, space, start, end, mask, mirror, rhandler, NULL, #rhandler, NULL)
 #define memory_install_read16_device_handler(device, cpu, space, start, end, mask, mirror, rhandler) \
@@ -504,6 +508,8 @@ union _addrmap64_token
 
 
 /* wrappers for dynamic write handler installation */
+#define memory_install_write_handler(machine, cpu, space, start, end, mask, mirror, whandler) \
+	_memory_install_handler(machine, cpu, space, start, end, mask, mirror, (FPTR)NULL, whandler, NULL, #whandler)
 #define memory_install_write8_handler(machine, cpu, space, start, end, mask, mirror, whandler) \
 	_memory_install_handler8(machine, cpu, space, start, end, mask, mirror, NULL, whandler, NULL, #whandler)
 #define memory_install_write16_handler(machine, cpu, space, start, end, mask, mirror, whandler) \
@@ -513,6 +519,8 @@ union _addrmap64_token
 #define memory_install_write64_handler(machine, cpu, space, start, end, mask, mirror, whandler) \
 	_memory_install_handler64(machine, cpu, space, start, end, mask, mirror, NULL, whandler, NULL, #whandler)
 
+#define memory_install_write_device_handler(device, cpu, space, start, end, mask, mirror, whandler) \
+	_memory_install_device_handler(device, cpu, space, start, end, mask, mirror, NULL, whandler, NULL, #whandler)
 #define memory_install_write8_device_handler(device, cpu, space, start, end, mask, mirror, whandler) \
 	_memory_install_device_handler8(device, cpu, space, start, end, mask, mirror, NULL, whandler, NULL, #whandler)
 #define memory_install_write16_device_handler(device, cpu, space, start, end, mask, mirror, whandler) \
@@ -524,6 +532,8 @@ union _addrmap64_token
 
 
 /* wrappers for dynamic read/write handler installation */
+#define memory_install_readwrite_handler(machine, cpu, space, start, end, mask, mirror, rhandler, whandler) \
+	_memory_install_handler(machine, cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
 #define memory_install_readwrite8_handler(machine, cpu, space, start, end, mask, mirror, rhandler, whandler) \
 	_memory_install_handler8(machine, cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
 #define memory_install_readwrite16_handler(machine, cpu, space, start, end, mask, mirror, rhandler, whandler) \
@@ -533,6 +543,8 @@ union _addrmap64_token
 #define memory_install_readwrite64_handler(machine, cpu, space, start, end, mask, mirror, rhandler, whandler) \
 	_memory_install_handler64(machine, cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
 
+#define memory_install_readwrite_device_handler(device, cpu, space, start, end, mask, mirror, rhandler, whandler) \
+	_memory_install_device_handler(device, cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
 #define memory_install_readwrite8_device_handler(device, cpu, space, start, end, mask, mirror, rhandler, whandler) \
 	_memory_install_device_handler8(device, cpu, space, start, end, mask, mirror, rhandler, whandler, #rhandler, #whandler)
 #define memory_install_readwrite16_device_handler(device, cpu, space, start, end, mask, mirror, rhandler, whandler) \
