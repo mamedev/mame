@@ -256,6 +256,7 @@ $(CPUOBJ)/jaguar/jaguar.o:	$(CPUSRC)/jaguar/jaguar.c \
 #-------------------------------------------------
 # Simutrek Cube Quest bit-sliced CPUs
 #-------------------------------------------------
+
 CPUDEFS += -DHAS_CUBEQCPU=$(if $(filter CUBEQCPU,$(CPUS)),1,0)
  
 ifneq ($(filter CUBEQCPU,$(CPUS)),)
