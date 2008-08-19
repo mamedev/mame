@@ -3214,6 +3214,64 @@ ROM_START( shogwarr )
 	ROM_LOAD( "fb003.u45",   0x080000, 0x080000, CRC(405722e9) SHA1(92e51093d50f74f650ba137f5fc2910e0f85337e) )	// 2 x $40000
 ROM_END
 
+/***************************************************************************
+
+Shogun Warriors (Europe Rev.xx)(Kaneko 1992)
+
+Dumped from an original Kaneko PCB. Board No. Z01DK-002 / Serial FB92E01342. + Top board "Z05DP FOR Z01DK"
+
+Two Program roms are equal to the Japanese version. See Below:
+
+fb000e.u43  = fb001e.u43  Shogun Warriors               <Note: Different label compared to Mame.
+fb001e.u101 = fb000e.u42  Shogun Warriors               <Note: Different label/position compared to Mame.
+fb030e.u61  = fb030j.u61  Fujiyama Buster(Japan)        <Note: Same as the Japanese version in Mame.
+fb031e.u62 NO MATCH
+fb040e.u33  = fb040j.u33  Fujiyama Buster (Japan)       <Note: Same as the Japanese version in Mame.
+
+
+The rom positions are equal to the Japanese version in Mame (Same Hardware revision).
+The "e" suffix on the roms of "Shogun Warriors" that is previously
+in Mame indicates that it is an European Version too, so this must be
+an earlier or later European revision.
+
+Some hardware(custom chip) differences compared with the info in the Mame source:
+
+Fujiyama Buster(Japan)                      Shogun Warriors (Europe) (My Dump)
+
+KANEKO JAPAN 9152EV 175101 (160 Pin PQFP) = KANEKO JAPAN 9202EV 175071 (160 Pin PQFP)
+KANEKO JAPAN 9203 T (44 PIN PQFP)         = KANEKO JAPAN 9204 T (44 PIN PQFP)
+
+***************************************************************************/
+
+ROM_START( shogware )
+ 	ROM_REGION( 0x040000, "main", 0 )			/* 68000 Code */
+	ROM_LOAD16_BYTE( "fb030e.u61", 0x000000, 0x020000, CRC(32ce7909) SHA1(02d87342706ac9547eb611bd542f8498ba41e34a) )
+	ROM_LOAD16_BYTE( "fb031e.u62", 0x000001, 0x020000, CRC(228aeaf5) SHA1(5e080d7975bc5dcf6fccfbc286eafe939496d9bf) )
+
+ 	ROM_REGION( 0x020000, "cpu1", 0 )			/* MCU Code */
+	ROM_LOAD( "fb040e.u33",  0x000000, 0x020000, CRC(299d0746) SHA1(67fe3a47ab01fa02ce2bb5836c2041986c19d875) )
+
+	ROM_REGION( 0x600000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_LOAD( "fb020a.u1",  0x000000, 0x080000, CRC(da1b7373) SHA1(89510901848f1798fb76dd82d1cd9ac97c41521d) )
+	ROM_LOAD( "fb022a.u5",  0x080000, 0x080000, CRC(60aa1282) SHA1(4648816016e00df3256226ba5134f6e5bb429909) )
+	ROM_LOAD( "fb020b.u2",  0x100000, 0x100000, CRC(276b9d7b) SHA1(7a154f65b4737f2b6ac8effa3352711079f571dc) )
+	ROM_LOAD( "fb021a.u3",  0x200000, 0x100000, CRC(7da15d37) SHA1(345cf2242e8210a697294a45197f2b3b974de885) )
+	ROM_LOAD( "fb021b.u4",  0x300000, 0x100000, CRC(6a512d7b) SHA1(7fc3002d23262a9a590a283ea9e111e38d889ef2) )
+	ROM_LOAD( "fb023.u7",   0x400000, 0x100000, CRC(132794bd) SHA1(bcc73c3183c59a4b66f79d04774773b8a9239501) )
+	ROM_LOAD( "fb022b.u6",  0x500000, 0x080000, CRC(cd05a5c8) SHA1(9f000cca8d31e19fdc4b38c00c3ed13f71e5541c) )
+
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Tiles (scrambled) */
+	ROM_LOAD( "fb010.u65",  0x000000, 0x100000, CRC(296ffd92) SHA1(183a28e4594c428deb4726ed22d5166592b94b60) )	// 42 pin mask rom
+	ROM_LOAD( "fb011.u66",  0x100000, 0x080000, CRC(500a0367) SHA1(6dc5190f81b21f59ee56a3b2332c8d86d6599782) )	// 40 pin mask rom (verified correct)
+
+	ROM_REGION( 0x100000, "oki1", 0 )	/* Samples */
+	ROM_LOAD( "fb000e.u42",  0x000000, 0x080000, CRC(969f1465) SHA1(4f56d1ad341b08f4db41b7ab2498740612ff7c3d) )	// 2 x $40000
+	ROM_LOAD( "fb001e.u43",  0x080000, 0x080000, CRC(f524aaa1) SHA1(006a886f9df2e57c51b61c6cea70a6574fc20304) )	// 2 x $40000
+
+	ROM_REGION( 0x100000, "oki2", 0 )	/* Samples */
+	ROM_LOAD( "fb002.u44",   0x000000, 0x080000, CRC(05d7c2a9) SHA1(e34d395985caec10139a22daa179bb185df157d6) )	// 2 x $40000
+	ROM_LOAD( "fb003.u45",   0x080000, 0x080000, CRC(405722e9) SHA1(92e51093d50f74f650ba137f5fc2910e0f85337e) )	// 2 x $40000
+ROM_END
 
 static DRIVER_INIT( shogwarr )
 {
@@ -3595,6 +3653,7 @@ GAME( 1995, gtmr2u,   gtmr2,    gtmr2,    gtmr2,    samplebank, ROT0,  "Kaneko",
 /* Non-working games (mainly due to protection) */
 
 GAME( 1992, shogwarr, 0,        shogwarr, shogwarr, shogwarr,   ROT0,  "Kaneko", "Shogun Warriors",         GAME_NOT_WORKING )
+GAME( 1992, shogware, shogwarr, shogwarr, shogwarr, shogwarr,   ROT0,  "Kaneko", "Shogun Warriors (Euro)",  GAME_NOT_WORKING )
 GAME( 1992, fjbuster, shogwarr, shogwarr, shogwarr, shogwarr,   ROT0,  "Kaneko", "Fujiyama Buster (Japan)", GAME_NOT_WORKING )
 GAME( 1992, brapboys, 0,        shogwarr, shogwarr, 0,          ROT0,  "Kaneko", "B.Rap Boys (World)",      GAME_NOT_WORKING )
 GAME( 1992, brapboyj, brapboys, shogwarr, shogwarr, 0,          ROT0,  "Kaneko", "B.Rap Boys (Japan)",      GAME_NOT_WORKING )
