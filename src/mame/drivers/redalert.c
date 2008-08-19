@@ -70,14 +70,20 @@
     
     From readme (Stefan Lindberg)
     
-	The PCB is not working so i don't know if the roms are fine, the soundrom 
+	The PCB is not working so I don't know if the roms are fine, the sound rom 
 	was for sure bad it gave different checksums but most of the reads matched 
 	the MAME soundrom (red alert) it is marked exactly the same "w3s1"(IC5). 
 	The Bprom matched the Red Alert set also... marked "W3" i think? 
 	it's hard to see because the sticker has been damaged.
 	The other eproms exept one did not match anything in MAME, 
-	ans#d only one of those had the eprom type markings on it... i read all 
+	and only one of those had the eprom type markings on it... I read all 
 	like that type.
+
+     Board set consists of:
+        M-27MB (Main board)
+        M-27SC
+        M-37B  (Sound board)
+        M-33 SUB-1
    
 ****************************************************************************/
 
@@ -359,12 +365,10 @@ ROM_START( ww3 )
 	ROM_LOAD( "w3ib.3a",      0xb000, 0x1000, CRC(3658e465) )
 	
 	ROM_REGION( 0x10000, "audio", 0 )
-	/* rom taken from redalert */
-	ROM_LOAD( "w3s1",         0x7000, 0x0800, BAD_DUMP CRC(4af956a5) SHA1(25368a40d7ebc60316fd2d78ec4c686e701b96dc) )
+	ROM_LOAD( "w3s1",         0x7000, 0x0800, CRC(4af956a5) SHA1(25368a40d7ebc60316fd2d78ec4c686e701b96dc) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) /* color PROM */
-	/* prom taken from redalert */
-	ROM_LOAD( "m-257sc.1a",	  0x0000, 0x0200, CRC(b1aca792) SHA1(db37f99b9880cc3c434e2a55a0bbb017d9a72aa3) )
+	ROM_LOAD( "m-27sc.1a",	  0x0000, 0x0200, CRC(b1aca792) SHA1(db37f99b9880cc3c434e2a55a0bbb017d9a72aa3) ) /* NEC uPB426 or compatible BPROM */
 ROM_END
 
 ROM_START( redalert )
@@ -387,7 +391,7 @@ ROM_START( redalert )
 	ROM_LOAD( "ras4",         0x3000, 0x1000, CRC(130e66db) SHA1(385b8f889fee08fddbb2f75a691af569109eacd1) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) /* color PROM */
-	ROM_LOAD( "m-257sc.1a",	  0x0000, 0x0200, CRC(b1aca792) SHA1(db37f99b9880cc3c434e2a55a0bbb017d9a72aa3) )
+	ROM_LOAD( "m-257sc.1a",	  0x0000, 0x0200, CRC(b1aca792) SHA1(db37f99b9880cc3c434e2a55a0bbb017d9a72aa3) ) /* NEC uPB426 or compatible BPROM */
 ROM_END
 
 
@@ -405,10 +409,10 @@ ROM_START( demoneye )
 	ROM_LOAD( "demoneye.6s",  0x3000, 0x1000, CRC(0a23def9) SHA1(b52f52be312ec7810e3c9cbd3913e887f983b1ee) )
 
 	ROM_REGION( 0x0200, "proms", 0 ) /* color PROM */
-	ROM_LOAD( "demoneye.1a2", 0x0000, 0x0200, CRC(eaf5a66e) SHA1(d8ebe05ba5d75fbf6ad45f710e5bd27b6afad44b) )
+	ROM_LOAD( "demoneye.1a2", 0x0000, 0x0200, CRC(eaf5a66e) SHA1(d8ebe05ba5d75fbf6ad45f710e5bd27b6afad44b) ) /* NEC uPB426 or compatible BPROM */
 
 	ROM_REGION( 0x0200, "user1", 0 ) /* unknown */
-	ROM_LOAD( "demoneye.1a",  0x0000, 0x0200, CRC(d03488ea) SHA1(11027f502ad2a9255b2e5611ab2eee16ede1d704) )
+	ROM_LOAD( "demoneye.1a",  0x0000, 0x0200, CRC(d03488ea) SHA1(11027f502ad2a9255b2e5611ab2eee16ede1d704) ) /* NEC uPB426 or compatible BPROM */
 ROM_END
 
 
