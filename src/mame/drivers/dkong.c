@@ -2287,7 +2287,11 @@ ROM_START( dkong3 )
 	ROM_REGION( 0x0500, "proms", 0 )
 	ROM_LOAD( "dkc1-c.1d",    0x0000, 0x0200, CRC(df54befc) SHA1(7912dbf0a0c8ef68f4ae0f95e55ab164da80e4a1) ) /* palette red & green component */
 	ROM_LOAD( "dkc1-c.1c",    0x0200, 0x0200, CRC(66a77f40) SHA1(c408d65990f0edd78c4590c447426f383fcd2d88) ) /* palette blue component */
-	ROM_LOAD( "dkc1-v.2n",    0x0400, 0x0100, CRC(50e33434) SHA1(b63da9bed9dc4c7da78e4c26d4ba14b65f2b7e72) )	/* character color codes on a per-column basis */
+	ROM_LOAD( "dkc1-v.2n",    0x0400, 0x0100, CRC(50e33434) SHA1(b63da9bed9dc4c7da78e4c26d4ba14b65f2b7e72) ) /* character color codes on a per-column basis */
+
+	ROM_REGION( 0x0020, "adrdecode", 0 )
+	/* address decode prom 18s030 - this has inverted outputs. The dump does not reflect this. */
+	ROM_LOAD( "dkc1-v.5e",    0x0000, 0x0020, CRC(d3e2eaf8) SHA1(87bb298137c26570dafb4ac495c87e82441e70e5) ) 
 ROM_END
 
 ROM_START( dkong3j )
@@ -2317,6 +2321,10 @@ ROM_START( dkong3j )
 	ROM_LOAD( "dkc1-c.1d",    0x0000, 0x0200, CRC(df54befc) SHA1(7912dbf0a0c8ef68f4ae0f95e55ab164da80e4a1) ) /* palette red & green component */
 	ROM_LOAD( "dkc1-c.1c",    0x0200, 0x0200, CRC(66a77f40) SHA1(c408d65990f0edd78c4590c447426f383fcd2d88) ) /* palette blue component */
 	ROM_LOAD( "dkc1-v.2n",    0x0400, 0x0100, CRC(50e33434) SHA1(b63da9bed9dc4c7da78e4c26d4ba14b65f2b7e72) )	/* character color codes on a per-column basis */
+
+	ROM_REGION( 0x0020, "adrdecode", 0 )
+	/* address decode prom 18s030 - this has inverted outputs. The dump does not reflect this. */
+	ROM_LOAD( "dkc1-v.5e",    0x0000, 0x0020, CRC(d3e2eaf8) SHA1(87bb298137c26570dafb4ac495c87e82441e70e5) ) 
 ROM_END
 
 ROM_START( dkong3b )
