@@ -1104,18 +1104,108 @@ logerror("unsupported register\n");
 		}
 		else if ((fifo[0] & 0xf000) == 0xd000)	/* PTN (to do) */
 		{
-			// if ((fifo[0] & 0x0700) == 0x0400) printf("4");
 			ptn(fifo[0] & 0x0007,psx,psy,pex - psx,pey - psy);
 
-			cpx += pex - psx;
-			cpy += pey - psy;
+			if ((fifo[0] & 0x0800) == 0x0000)
+				switch (fifo[0] & 0x0700)
+				{
+					case 0x0000:
+						if ((pey - psy) > 0)
+							cpy += (pey - psy);
+						else
+							cpy -= (pey - psy);
+						break;
+					case 0x0100:
+						// missing
+						break;
+					case 0x0200:
+						if ((pey - psy) > 0)
+							cpx += (pey - psy);
+						else
+							cpx -= (pey - psy);
+						break;
+					case 0x0300:
+						// missing
+						break;
+					case 0x0400:
+						if ((pey - psy) > 0)
+							cpy -= (pey - psy);
+						else
+							cpy += (pey - psy);
+						break;
+					case 0x0500:
+						// missing
+						break;
+					case 0x0600:
+						if ((pey - psy) > 0)
+							cpx -= (pey - psy);
+						else
+							cpx += (pey - psy);
+						break;
+					case 0x0700:
+						// missing
+						break;
+				}
+			else
+				{
+					// missing
+				}
 		}
 		else if ((fifo[0] & 0xf0f8) == 0xe000)	/* AGCPY */
 		{
 			agcpy(fifo[0],fifo[1],fifo[2],cpx,cpy,fifo[3],fifo[4]);
 
-			cpx += fifo[4];
-			cpy += fifo[3];
+			switch (fifo[0] & 0x0700)
+			{
+				case 0x0000:
+					if (fifo[4] > 0)
+						cpy += fifo[4];
+					else
+						cpy -= fifo[4];
+					break;
+				case 0x0100:
+					if (fifo[4] > 0)
+						cpy -= fifo[4];
+					else
+						cpy += fifo[4];
+					break;
+				case 0x0200:
+					if (fifo[4] > 0)
+						cpy += fifo[4];
+					else
+						cpy -= fifo[4];
+					break;
+				case 0x0300:
+					if (fifo[4] > 0)
+						cpy -= fifo[4];
+					else
+						cpy += fifo[4];
+					break;
+				case 0x0400:
+					if (fifo[3] > 0)
+						cpx += fifo[3];
+					else
+						cpx -= fifo[3];
+					break;
+				case 0x0500:
+					if (fifo[3] > 0)
+						cpx += fifo[3];
+					else
+						cpx -= fifo[3];
+					break;
+				case 0x0600:
+					if (fifo[3] > 0)
+						cpx -= fifo[3];
+					else
+						cpx += fifo[3];
+					break;
+				case 0x0700:
+					if (fifo[3] > 0)
+						cpx -= fifo[3];
+					else
+						cpx += fifo[3];
+					break;
+			}
 		}
 		else
 {
