@@ -1,46 +1,48 @@
-
 /*
 
-Megadrive / Genesis Rewrite, Take 65498465432356345250432.3  August 06
+	Megadrive / Genesis support
+	PRELIMINARY
 
-Thanks to:
-Charles Macdonald for much useful information (cgfm2.emuviews.com)
+	The Megadrive / Genesis form the basis of a number of official Sega Arcade PCBs
+	as well as a selection of bootlegs.
 
-Long Decription names mostly taken from the GoodGen database
+	Current Issues
 
-ToDo:
+	Timing is wrong
+	 -- DMA timing not emulated
+	 -- Sprite render timing incorrect
+	 -- Interrupt Timing Problems
 
-The Code here is terrible for now, this is just for testing
-Fix HV Counter & Raster Implementation (One line errors in some games, others not working eg. Dracula)
-Fix Horizontal timings (currently a kludge, currently doesn't change with resolution changes)
-Add Real DMA timings (using a timer)
-Add All VDP etc. Mirror addresses (not done yet as I prefer to catch odd cases for now)
-Investigate other Bugs (see list bloew)
-Rewrite (again) using cleaner, more readable and better optimized code with knowledge gained
-Add support for other peripherals (6 player pad, Teamplay Adapters, Lightguns, Sega Mouse etc.)
-Sort out set info, making sure all games have right manufacturers, dates etc.
-Make sure everything that needs backup RAM has it setup and working
-Fix Reset glitches
-Add 32X / SegaCD support
-Add Megaplay, Megatech support (needs SMS emulation too)
-Add other obscure features (palette flicker for mid-screen CRAM changes, undocumented register behavior)
-Figure out how sprite masking *really* works
-Add EEprom support in games that need it
+	Known Problems
+	 -- g_lem / Lemmings (JU) (REV01) [!]
+	  Rasters are off
+	 -- g_drac / Bram Stoker's Dracula (U) [!]
+	  Doesn't work, Timing Sensisitve
+	 -- g_sscc / Sesame Street Counting Cafe (U) [!]
+	  Doesn't work
+	 -- g_fatr / Fatal Rewind (UE) [!] (and clones)
+	  Doesn't work. Timing Sensitive
 
-Known Issues:
-    Bass Masters Classic Pro Edition (U) [!] - Sega Logo is corrupt
-    Bram Stoker's Dracula (U) [!] - Doesn't Work (HV Timing)
-    Double Dragon 2 - The Revenge (J) [!] - Too Slow?
-    International Superstar Soccer Deluxe (E) [!] - Single line Raster Glitch
-    Lemmings (JU) (REV01) [!] - Rasters off by ~7-8 lines (strange case)
-    Mercs - Sometimes sound doesn't work..
+	 -- various
+	  Rasters off by 1 line, bottom line corrupt? bad frame timing?
 
-    Some beta games without proper sound programs seem to crash because the z80 crashes
+	  + more
+
+    ToDo:
+
+	Fix bugs - comprehensive testing!
+
+    Add SegaCD / 32X support (not used by any arcade systems?)
+    Add PicoDrive support (not arcade)
+
+    Change SegaC2 to use the VDP emulation here
+    Change System18 to use the VDP emulation here
 
 Known Non-Issues (confirmed on Real Genesis)
     Castlevania - Bloodlines (U) [!] - Pause text is missing on upside down level
     Blood Shot (E) (M4) [!] - corrupt texture in level 1 is correct...
 */
+
 
 #include "driver.h"
 #include "deprecat.h"
@@ -54,7 +56,7 @@ Known Non-Issues (confirmed on Real Genesis)
 #define MEGADRIV_VDP_VRAM(address) megadrive_vdp_vram[(address)&0x7fff]
 
 /* the same on all systems? */
-#define MASTER_CLOCK		53693100
+#define MASTER_CLOCK_NTSC		53693100
 /* timing details */
 static int megadriv_framerate;
 static int megadrive_total_scanlines;
@@ -2904,6 +2906,14 @@ static UINT8 megadrive_io_read_data_port_svp(int portnum)
 	return megadrive_io_read_data_port_3button(portnum);
 }
 
+
+static READ16_HANDLER( svp_speedup_r )
+{
+	 cpu_spinuntil_time(ATTOTIME_IN_USEC(100));
+	return 0x0425;
+}
+
+
 static void svp_init(running_machine *machine)
 {
 	UINT8 *ROM;
@@ -2918,6 +2928,8 @@ static void svp_init(running_machine *machine)
 	// "cell arrange" 1 and 2
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x390000, 0x39ffff, 0, 0, svp_68k_cell1_r);
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3a0000, 0x3affff, 0, 0, svp_68k_cell2_r);
+
+	memory_install_read16_handler(machine, 2, ADDRESS_SPACE_PROGRAM, 0x438, 0x438, 0, 0, svp_speedup_r);
 
 	svp.iram = auto_malloc(0x800);
 	memory_set_bankptr( 3, svp.iram );
@@ -2943,7 +2955,7 @@ INPUT_PORTS_END
 MACHINE_DRIVER_START( megdsvp )
 	MDRV_IMPORT_FROM(megadriv)
 
-	MDRV_CPU_ADD("svp", SSP1601, MASTER_CLOCK / 7 * 3) /* ~23 MHz (guessed) */
+	MDRV_CPU_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
 	MDRV_CPU_PROGRAM_MAP(svp_ssp_map, 0)
 	MDRV_CPU_IO_MAP(svp_ext_map, 0)
 	/* IRQs are not used by this CPU */
@@ -5005,11 +5017,11 @@ static NVRAM_HANDLER( megadriv )
 
 
 MACHINE_DRIVER_START( megadriv )
-	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK / 7) /* 7.67 MHz */
+	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
 	MDRV_CPU_PROGRAM_MAP(megadriv_readmem,megadriv_writemem)
 	/* IRQs are handled via the timers */
 
-	MDRV_CPU_ADD("sound", Z80, MASTER_CLOCK / 15) /* 3.58 MHz */
+	MDRV_CPU_ADD("sound", Z80, MASTER_CLOCK_NTSC / 15) /* 3.58 MHz */
 	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)
 	MDRV_CPU_IO_MAP(z80_portmap,0)
 	/* IRQ handled via the timers */
@@ -5038,22 +5050,22 @@ MACHINE_DRIVER_START( megadriv )
 #if 0
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2612, MASTER_CLOCK/7) /* 7.67 MHz */
+	MDRV_SOUND_ADD("ym", YM2612, MASTER_CLOCK_NTSC/7) /* 7.67 MHz */
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("sn", SN76496, MASTER_CLOCK/15)
+	MDRV_SOUND_ADD("sn", SN76496, MASTER_CLOCK_NTSC/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50) /* 3.58 MHz */
 #else
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ym", YM2612, MASTER_CLOCK/7) /* 7.67 MHz */
+	MDRV_SOUND_ADD("ym", YM2612, MASTER_CLOCK_NTSC/7) /* 7.67 MHz */
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("sn", SN76496, MASTER_CLOCK/15)
+	MDRV_SOUND_ADD("sn", SN76496, MASTER_CLOCK_NTSC/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.25) /* 3.58 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right",0.25) /* 3.58 MHz */
 #endif
@@ -5063,7 +5075,7 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START( megadpal )
 	MDRV_IMPORT_FROM(megadriv)
 
-	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_MODIFY("megadriv")
 	MDRV_SCREEN_REFRESH_RATE(50)
 MACHINE_DRIVER_END
 
@@ -5078,7 +5090,6 @@ MACHINE_DRIVER_START( _32x )
 	MDRV_CPU_ADD("SH2slave", SH2, 10000000 )
 	MDRV_CPU_PROGRAM_MAP(sh2slave_readmem,sh2slave_writemem)
 MACHINE_DRIVER_END
-
 
 /* Callback when the genesis enters interrupt code */
 static IRQ_CALLBACK(genesis_int_callback)
