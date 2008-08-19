@@ -35,10 +35,10 @@
 # UNICODE = 1
 
 # set this to the minimum Direct3D version to support (8 or 9)
-DIRECT3D = 8
+# DIRECT3D = 9
 
 # set this to the minimum DirectInput version to support (7 or 8)
-DIRECTINPUT = 7
+# DIRECTINPUT = 8
 
 
 
@@ -203,12 +203,12 @@ endif
 # add the windows libraries
 LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi
 
-ifeq ($(DIRECTINPUT),7)
-LIBS += -ldinput
-CFLAGS += -DDIRECTINPUT_VERSION=0x0700
-else
+ifeq ($(DIRECTINPUT),8)
 LIBS += -ldinput8
 CFLAGS += -DDIRECTINPUT_VERSION=0x0800
+else
+LIBS += -ldinput
+CFLAGS += -DDIRECTINPUT_VERSION=0x0700
 endif
 
 ifdef PTR64
@@ -262,10 +262,10 @@ OSDOBJS = \
 	$(WINOBJ)/window.o \
 	$(WINOBJ)/winmain.o
 
-ifeq ($(DIRECT3D),8)
-OSDOBJS += $(WINOBJ)/d3d8intf.o
-else
+ifeq ($(DIRECT3D),9)
 CFLAGS += -DDIRECT3D_VERSION=0x0900
+else
+OSDOBJS += $(WINOBJ)/d3d8intf.o
 endif
 
 # extra dependencies
