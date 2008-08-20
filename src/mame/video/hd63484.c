@@ -318,6 +318,9 @@ static void dot(int x, int y, int opm, UINT16 color)
 			logerror ("Graphic bit mode not supported\n");
 	}
 
+	// bpp = 4;
+	// bitmask = 0x000f;
+
 	if (x >= 0)
 	{
 		x_int = x / (16 / bpp);
@@ -430,7 +433,30 @@ static int get_pixel(int x,int y)
 static int get_pixel_ptn(int x,int y)
 {
 	int dst, x_int, x_mod, bpp;
-	UINT16 bitmask, bitmask_shifted;
+	UINT16 bitmask, bitmask_shifted, bitmask_cl;
+
+	switch ((HD63484_reg[0x02/2] & 0x700) >> 8)
+	{
+		case 0:
+			bitmask_cl = 0x0001;
+			break;
+		case 1:
+			bitmask_cl = 0x0003;
+			break;
+		case 2:
+			bitmask_cl = 0x000f;
+			break;
+		case 3:
+			bitmask_cl = 0x00ff;
+			break;
+		case 4:
+			bitmask_cl = 0xffff;
+			break;
+
+		default:
+			bitmask_cl = 0x0000;
+			logerror ("Graphic bit mode not supported\n");
+	}
 
 	bpp = 1;
 	bitmask = 0x0001;
@@ -455,9 +481,9 @@ static int get_pixel_ptn(int x,int y)
 	dst = (x_int + y * 1);
 
 	if ((pattern[dst] & bitmask_shifted) >> (x_mod * bpp))
-		return 1; //cl1
+		return 1;
 	else
-		return 0; //cl0
+		return 0;
 }
 
 static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,INT16 _ay)
@@ -622,7 +648,7 @@ static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,I
 
 static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
 {
-	int dst_step1_x,dst_step1_y,dst_step2_x,dst_step2_y;
+	int dst_step1_x = 0,dst_step1_y = 0,dst_step2_x = 0,dst_step2_y = 0;
 	int src_step1_x,src_step1_y,src_step2_x,src_step2_y;
 	int ax = _ax;
 	int ay = _ay;
@@ -631,6 +657,7 @@ static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
 	int yys = src_y;
 	int xxd = cpx;
 	int yyd = cpy;
+	int getpixel;
 
 	if (ax < 0)
 		ax_neg = -1;
@@ -645,51 +672,56 @@ static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
 		switch (opcode & 0x0700)
 		{
 			default:
-			case 0x0000: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ay_neg*ay; dst_step2_y =   1; break;
-			case 0x0100: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ay_neg*ay; dst_step2_y =  -1; break;
-			case 0x0200: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ay_neg*ay; dst_step2_y =   1; break;
-			case 0x0300: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ay_neg*ay; dst_step2_y =  -1; break;
-			case 0x0400: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x =  1; dst_step2_y = -ay_neg*ay; break;
-			case 0x0500: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x =  1; dst_step2_y =  ay_neg*ay; break;
-			case 0x0600: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x = -1; dst_step2_y = -ay_neg*ay; break;
-			case 0x0700: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x = -1; dst_step2_y =  ay_neg*ay; break;
+			case 0x0000: logerror("PTN: not supported"); break;
+			case 0x0100: logerror("PTN: not supported"); break;
+			case 0x0200: logerror("PTN: not supported"); break;
+			case 0x0300: logerror("PTN: not supported"); break;
+			case 0x0400: logerror("PTN: not supported"); break;
+ 			case 0x0500: logerror("PTN: not supported"); break;
+			case 0x0600: logerror("PTN: not supported"); break;
+			case 0x0700: logerror("PTN: not supported"); break;
 		}
 	else
 		switch (opcode & 0x0700)
 		{
 			default:
-			case 0x0000: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ax_neg*ax; dst_step2_y =   1; break;
-			case 0x0100: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ax_neg*ax; dst_step2_y =  -1; break;
-			case 0x0200: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ax_neg*ax; dst_step2_y =   1; break;
-			case 0x0300: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ax_neg*ax; dst_step2_y =  -1; break;
-			case 0x0400: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x =  1; dst_step2_y =  ax_neg*ax; break;
-			case 0x0500: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x =  1; dst_step2_y = -ax_neg*ax; break;
-			case 0x0600: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x = -1; dst_step2_y =  ax_neg*ax; break;
-			case 0x0700: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x = -1; dst_step2_y = -ax_neg*ax; break;
+			case 0x0000: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ax_neg*ax; dst_step2_y =  1; break;
+			case 0x0100: logerror("PTN: not supported"); break;
+			case 0x0200: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x = -1; dst_step2_y = -ax_neg*ax; break;
+			case 0x0300: logerror("PTN: not supported"); break; 
+			case 0x0400: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ax_neg*ax; dst_step2_y = -1; break;
+			case 0x0500: logerror("PTN: not supported"); break; 
+			case 0x0600: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x =  1; dst_step2_y =  ax_neg*ax; break;
+			case 0x0700: logerror("PTN: not supported"); break; 
 		}
-
-	if ((_ax >= 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0000))
-		{ src_step1_x =  1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =   1; }
-	else if ((_ax >= 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0000))
-		{ src_step1_x =  1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =  -1; }
-	else if ((_ax < 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0000))
-		{ src_step1_x = -1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =   1; }
-	else if ((_ax < 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0000))
-		{ src_step1_x = -1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =  -1; }
-	else if ((_ax >= 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0800))
-		{ src_step1_x =  0; src_step1_y =  1; src_step2_x =   1; src_step2_y = -ay; }
-	else if ((_ax >= 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0800))
-		{ src_step1_x =  0; src_step1_y = -1; src_step2_x =   1; src_step2_y = -ay; }
-	else if ((_ax < 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0800))
-		{ src_step1_x =  0; src_step1_y =  1; src_step2_x =  -1; src_step2_y = -ay; }
-	else // ((_ax < 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0800))
-		{ src_step1_x =  0; src_step1_y = -1; src_step2_x =  -1; src_step2_y = -ay; }
+	 
+	src_step1_x =  1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =  1;
 
 	for (;;)
 	{
 		for (;;)
 		{
-			dot(xxd,yyd,opcode & 0x0007,get_pixel_ptn(xxs,yys));
+			getpixel = get_pixel_ptn(xxs,yys);
+			switch ((opcode & 0x0018) >> 3) 
+			{
+				case 0x0000:
+					if (getpixel)
+						dot(xxd,yyd,opcode & 0x0007,cl1);
+					else
+						dot(xxd,yyd,opcode & 0x0007,cl0);
+					break;
+				case 0x0001:
+					if (getpixel)
+						dot(xxd,yyd,opcode & 0x0007,cl1);
+					break;
+				case 0x0002:
+					if (getpixel == 0)
+						dot(xxd,yyd,opcode & 0x0007,cl0);
+					break;
+				case 0x0003:
+					logerror("PTN: not supported"); break;
+					break;
+			}
 
 			if (opcode & 0x0800)
 			{
@@ -852,14 +884,13 @@ static void HD63484_command_w(UINT16 cmd)
 
 	if (fifo_counter >= len)
 	{
-/*
 		int i;
 
-		printf("PC %05x: HD63484 command %s (%04x) ",activecpu_get_pc(),instruction_name[fifo[0]>>10],fifo[0]);
+		logerror("PC %05x: HD63484 command %s (%04x) ",activecpu_get_pc(),instruction_name[fifo[0]>>10],fifo[0]);
 		for (i = 1;i < fifo_counter;i++)
-			printf("%04x ",fifo[i]);
-		printf("\n");
-*/
+			logerror("%04x ",fifo[i]);
+		logerror("\n");
+
 		if (fifo[0] == 0x0400) { /* ORG */
 			org = ((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4);
 			org_dpd = fifo[2] & 0x000f;
@@ -911,7 +942,7 @@ static void HD63484_command_w(UINT16 cmd)
 			else if (fifo[0] == 0x080d)
 				rwp = (rwp & 0xff000) | ((fifo[1] & 0xfff0) >> 4);
 			else
-logerror("unsupported register\n");
+				logerror("unsupported register\n");
 		}
 		else if ((fifo[0] & 0xfff0) == 0x1800)	/* WPTN */
 		{
@@ -935,53 +966,52 @@ logerror("unsupported register\n");
 		{
 			doclr16(fifo[0],fifo[1],&rwp,fifo[2],fifo[3]);
 
-		/*
+
             {
                 int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
                 if (fifo2<0) fifo2 *= -1;
                 if (fifo3<0) fifo3 *= -1;
                 rwp += ((fifo2+1)*(fifo3+1));
             }
-            */
+
 		}
 		else if ((fifo[0] & 0xfffc) == 0x5c00)	/* SCLR */
 		{
 			doclr16(fifo[0],fifo[1],&rwp,fifo[2],fifo[3]);
 
-		/*
+
             {
                 int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
                 if (fifo2<0) fifo2 *= -1;
                 if (fifo3<0) fifo3 *= -1;
                 rwp += ((fifo2+1)*(fifo3+1));
             }
-            */
+
 		}
 		else if ((fifo[0] & 0xf0ff) == 0x6000)	/* CPY */
 		{
 			docpy16(fifo[0],((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4),&rwp,fifo[3],fifo[4]);
 
-		/*
             {
                 int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
                 if (fifo2<0) fifo2 *= -1;
                 if (fifo3<0) fifo3 *= -1;
                 rwp += ((fifo2+1)*(fifo3+1));
             }
-            */
+
 		}
 		else if ((fifo[0] & 0xf0fc) == 0x7000)	/* SCPY */
 		{
 			docpy16(fifo[0],((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4),&rwp,fifo[3],fifo[4]);
 
-		/*
+
             {
                 int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
                 if (fifo2<0) fifo2 *= -1;
                 if (fifo3<0) fifo3 *= -1;
                 rwp += ((fifo2+1)*(fifo3+1));
             }
-            */
+
 		}
 		else if (fifo[0] == 0x8000)	/* AMOVE */
 		{
@@ -1104,7 +1134,7 @@ logerror("unsupported register\n");
 		}
 		else if ((fifo[0] & 0xf000) == 0xd000)	/* PTN (to do) */
 		{
-			ptn(fifo[0] & 0x0007,psx,psy,pex - psx,pey - psy);
+			ptn(fifo[0],psx,psy,pex - psx,pey - psy);
 
 			if ((fifo[0] & 0x0800) == 0x0000)
 				switch (fifo[0] & 0x0700)
@@ -1208,10 +1238,10 @@ logerror("unsupported register\n");
 			}
 		}
 		else
-{
-logerror("unsupported command\n");
-popmessage("unsupported command %s (%04x)",instruction_name[fifo[0]>>10],fifo[0]);
-}
+			{
+				logerror("unsupported command\n");
+				popmessage("unsupported command %s (%04x)",instruction_name[fifo[0]>>10],fifo[0]);
+			}
 
 		fifo_counter = 0;
 	}
