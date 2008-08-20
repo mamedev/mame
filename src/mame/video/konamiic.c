@@ -5311,6 +5311,9 @@ READ8_HANDLER( K051733_r )
 		case 0x05:
 			return int_sqrt(op3<<16) & 0xff;
 
+		case 0x06:
+			return K051733_ram[0x13];
+
 		case 0x07:{
 			if (xobj1c + rad < xobj2c)
 				return 0x80;
