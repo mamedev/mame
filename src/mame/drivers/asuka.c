@@ -231,6 +231,10 @@ VIDEO_START( cadash );
 VIDEO_UPDATE( asuka );
 VIDEO_UPDATE( bonzeadv );
 
+static int adpcm_pos;
+static int adpcm_data;
+
+
 /***********************************************************
                 INTERRUPTS
 ***********************************************************/
@@ -258,12 +262,8 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 
 
-static int adpcm_pos;
-
 static void asuka_msm5205_vck(running_machine *machine, int chip)
 {
-	static int adpcm_data = -1;
-
 	if (adpcm_data != -1)
 	{
 		msm5205_data_w(0, adpcm_data & 0x0f);
@@ -304,6 +304,11 @@ static MACHINE_START( asuka )
 	state_save_register_global(adpcm_pos);
 }
 
+static MACHINE_RESET( asuka )
+{
+	adpcm_pos = 0;
+	adpcm_data = -1;
+}
 
 
 /***********************************************************
@@ -803,6 +808,7 @@ static MACHINE_DRIVER_START( bonzeadv )
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_MACHINE_START(asuka)
+	MDRV_MACHINE_RESET(asuka)
 
 	MDRV_VIDEO_START(asuka)
 	MDRV_VIDEO_EOF(asuka)
@@ -841,6 +847,7 @@ static MACHINE_DRIVER_START( asuka )
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_MACHINE_START(asuka)
+	MDRV_MACHINE_RESET(asuka)
 
 	MDRV_VIDEO_START(asuka)
 	MDRV_VIDEO_EOF(asuka)
@@ -882,6 +889,7 @@ static MACHINE_DRIVER_START( cadash )
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_MACHINE_START(asuka)
+	MDRV_MACHINE_RESET(asuka)
 
 	MDRV_VIDEO_START(cadash)
 	MDRV_VIDEO_EOF(asuka)
@@ -919,6 +927,7 @@ static MACHINE_DRIVER_START( mofflott )
 	MDRV_PALETTE_LENGTH(4096)	/* only Mofflott uses full palette space */
 
 	MDRV_MACHINE_START(asuka)
+	MDRV_MACHINE_RESET(asuka)
 
 	MDRV_VIDEO_START(galmedes)
 	MDRV_VIDEO_EOF(asuka)
@@ -960,6 +969,7 @@ static MACHINE_DRIVER_START( galmedes )
 	MDRV_PALETTE_LENGTH(4096)	/* only Mofflott uses full palette space */
 
 	MDRV_MACHINE_START(asuka)
+	MDRV_MACHINE_RESET(asuka)
 
 	MDRV_VIDEO_START(galmedes)
 	MDRV_VIDEO_EOF(asuka)
@@ -997,6 +1007,7 @@ static MACHINE_DRIVER_START( eto )
 	MDRV_PALETTE_LENGTH(4096)
 
 	MDRV_MACHINE_START(asuka)
+	MDRV_MACHINE_RESET(asuka)
 
 	MDRV_VIDEO_START(galmedes)
 	MDRV_VIDEO_EOF(asuka)

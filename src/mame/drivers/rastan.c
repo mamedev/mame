@@ -170,6 +170,10 @@ VIDEO_START( rastan );
 VIDEO_UPDATE( rastan );
 
 
+static int adpcm_pos;
+static int adpcm_data;
+
+
 static WRITE8_HANDLER( rastan_bankswitch_w )
 {
 	int offs;
@@ -182,12 +186,8 @@ static WRITE8_HANDLER( rastan_bankswitch_w )
 }
 
 
-static int adpcm_pos;
-
 static void rastan_msm5205_vck(running_machine *machine, int chip)
 {
-	static int adpcm_data = -1;
-
 	if (adpcm_data != -1)
 	{
 		msm5205_data_w(0, adpcm_data & 0x0f);
@@ -373,6 +373,11 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B		/* 8 kHz */
 };
 
+static MACHINE_RESET( rastan )
+{
+	adpcm_pos = 0;
+	adpcm_data = -1;
+}
 
 
 static MACHINE_DRIVER_START( rastan )
@@ -400,6 +405,8 @@ static MACHINE_DRIVER_START( rastan )
 
 	MDRV_VIDEO_START(rastan)
 	MDRV_VIDEO_UPDATE(rastan)
+
+	MDRV_MACHINE_RESET(rastan)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

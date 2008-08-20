@@ -19,22 +19,7 @@ DIP Locations verified for:
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-
-
-/* bking3 mcu communication */
-extern MACHINE_RESET( buggychl );
-extern READ8_HANDLER( buggychl_68705_portA_r );
-extern WRITE8_HANDLER( buggychl_68705_portA_w );
-extern WRITE8_HANDLER( buggychl_68705_ddrA_w );
-extern READ8_HANDLER( buggychl_68705_portB_r );
-extern WRITE8_HANDLER( buggychl_68705_portB_w );
-extern WRITE8_HANDLER( buggychl_68705_ddrB_w );
-extern READ8_HANDLER( buggychl_68705_portC_r );
-extern WRITE8_HANDLER( buggychl_68705_portC_w );
-extern WRITE8_HANDLER( buggychl_68705_ddrC_w );
-extern WRITE8_HANDLER( buggychl_mcu_w );
-extern READ8_HANDLER( buggychl_mcu_r );
-extern READ8_HANDLER( buggychl_mcu_status_r );
+#include "includes/buggychl.h"
 
 extern PALETTE_INIT( bking );
 
@@ -62,7 +47,7 @@ extern READ8_HANDLER( bking_pos_r );
 UINT8 *bking_playfield_ram;
 
 static int bking3_addr_h, bking3_addr_l;
-static int sndnmi_enable = 1;
+static int sndnmi_enable;
 
 static READ8_HANDLER( bking_sndnmi_disable_r )
 {
@@ -789,6 +774,11 @@ ROM_START( bking3 )
 	ROM_LOAD( "a24-21.25",    0x0000, 0x1000, CRC(3106fcac) SHA1(08454adfb58e5df84140d86ed52fa4ef684df9f1) ) /* extra rom on the same SUB PCB where is the mcu */
 ROM_END
 
-GAME( 1982, bking,  0, bking,  bking,  0, ROT270, "Taito Corporation", "Birdie King", 0 )
-GAME( 1983, bking2, 0, bking,  bking2, 0, ROT90,  "Taito Corporation", "Birdie King 2", 0 )
-GAME( 1984, bking3, 0, bking3, bking2, 0, ROT90,  "Taito Corporation", "Birdie King 3", 0 )
+static DRIVER_INIT( bking )
+{
+	sndnmi_enable = 1;
+}
+
+GAME( 1982, bking,  0, bking,  bking,  bking, ROT270, "Taito Corporation", "Birdie King", 0 )
+GAME( 1983, bking2, 0, bking,  bking2, bking, ROT90,  "Taito Corporation", "Birdie King 2", 0 )
+GAME( 1984, bking3, 0, bking3, bking2, bking, ROT90,  "Taito Corporation", "Birdie King 3", 0 )

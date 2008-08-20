@@ -24,8 +24,8 @@ WRITE8_HANDLER( nitedrvr_steering_reset_w );
 WRITE8_HANDLER( nitedrvr_out0_w );
 WRITE8_HANDLER( nitedrvr_out1_w );
 
-void nitedrvr_crash_toggle(running_machine *machine);
-void nitedrvr_register_machine_vars(void);
+MACHINE_RESET( nitedrvr );
+MACHINE_START( nitedrvr );
 
 
 /*----------- defined in audio/nitedrvr.c -----------*/

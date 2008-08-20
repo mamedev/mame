@@ -8,12 +8,12 @@
 #include "nitedrvr.h"
 #include "sound/discrete.h"
 
-static UINT8 nitedrvr_gear = 1;
+static UINT8 nitedrvr_gear;
 static UINT8 nitedrvr_track;
 static INT32 nitedrvr_steering_buf;
 static INT32 nitedrvr_steering_val;
 static UINT8 nitedrvr_crash_en;
-static UINT8 nitedrvr_crash_data = 0x0f;
+static UINT8 nitedrvr_crash_data;
 static UINT8 nitedrvr_crash_data_en;	// IC D8
 static UINT8 ac_line;
 static INT32 last_steering_val;
@@ -247,7 +247,7 @@ WRITE8_HANDLER( nitedrvr_out1_w )
 }
 
 
-void nitedrvr_crash_toggle(running_machine *machine)
+static TIMER_CALLBACK( nitedrvr_crash_toggle_callback )
 {
 	if (nitedrvr_crash_en && nitedrvr_crash_data_en)
 	{
@@ -269,8 +269,8 @@ void nitedrvr_crash_toggle(running_machine *machine)
 	}
 }
 
-void nitedrvr_register_machine_vars(void)
-{/* save all the statics in this file. */
+MACHINE_START( nitedrvr )
+{
 	state_save_register_global(nitedrvr_gear);
 	state_save_register_global(nitedrvr_track);
 	state_save_register_global(nitedrvr_steering_buf);
@@ -280,4 +280,19 @@ void nitedrvr_register_machine_vars(void)
 	state_save_register_global(nitedrvr_crash_data_en);
 	state_save_register_global(ac_line);
 	state_save_register_global(last_steering_val);
+}
+
+MACHINE_RESET( nitedrvr )
+{
+	nitedrvr_gear = 1;
+	nitedrvr_track = 0;
+	nitedrvr_steering_buf = 0;
+	nitedrvr_steering_val = 0;
+	nitedrvr_crash_en = 0;
+	nitedrvr_crash_data = 0x0f;
+	nitedrvr_crash_data_en = 0;
+	ac_line = 0;
+	last_steering_val = 0;
+
+	timer_pulse(PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)), NULL, 0, nitedrvr_crash_toggle_callback);
 }

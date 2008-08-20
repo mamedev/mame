@@ -64,6 +64,8 @@ WRITE8_HANDLER( tecmo_flipscreen_w );
 VIDEO_START( tecmo );
 VIDEO_UPDATE( tecmo );
 
+static int adpcm_pos,adpcm_end;
+static int adpcm_data;
 
 
 static WRITE8_HANDLER( tecmo_bankswitch_w )
@@ -82,8 +84,6 @@ static WRITE8_HANDLER( tecmo_sound_command_w )
 	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
 }
 
-static int adpcm_pos,adpcm_end;
-
 static WRITE8_HANDLER( tecmo_adpcm_start_w )
 {
 	adpcm_pos = data << 8;
@@ -99,8 +99,6 @@ static WRITE8_HANDLER( tecmo_adpcm_vol_w )
 }
 static void tecmo_adpcm_int(running_machine *machine, int num)
 {
-	static int adpcm_data = -1;
-
 	if (adpcm_pos >= adpcm_end ||
 				adpcm_pos >= memory_region_length(machine, "adpcm"))
 		msm5205_reset_w(0,1);
@@ -561,6 +559,12 @@ static const msm5205_interface msm5205_config =
 };
 
 
+static MACHINE_RESET( rygar )
+{
+	adpcm_pos = 0;
+	adpcm_end = 0;
+	adpcm_data = -1;
+}
 
 static MACHINE_DRIVER_START( rygar )
 
@@ -585,6 +589,8 @@ static MACHINE_DRIVER_START( rygar )
 
 	MDRV_VIDEO_START(tecmo)
 	MDRV_VIDEO_UPDATE(tecmo)
+
+	MDRV_MACHINE_RESET( rygar )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

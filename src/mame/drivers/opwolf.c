@@ -119,6 +119,9 @@ int opwolf_region;
 static UINT8 *cchip_ram;
 static UINT8 adpcm_b[0x08];
 static UINT8 adpcm_c[0x08];
+static UINT32 adpcm_pos[2],adpcm_end[2];
+static int adpcm_data[2];
+
 static int opwolf_gun_xoffs, opwolf_gun_yoffs;
 
 WRITE16_HANDLER( rainbow_spritectrl_w );
@@ -291,8 +294,6 @@ static ADDRESS_MAP_START( z80_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static UINT32 adpcm_pos[2],adpcm_end[2];
-
 //static UINT8 adpcm_d[0x08];
 //0 - start ROM offset LSB
 //1 - start ROM offset MSB
@@ -313,14 +314,18 @@ static MACHINE_START( opwolf )
 
 static MACHINE_RESET( opwolf )
 {
+	adpcm_b[0] = adpcm_b[1] = 0;
+	adpcm_c[0] = adpcm_c[1] = 0;
+	adpcm_pos[0] = adpcm_pos[1] = 0;
+	adpcm_end[0] = adpcm_end[1] = 0;
+	adpcm_data[0] = adpcm_data[1] = -1;
+
 	msm5205_reset_w(0, 1);
 	msm5205_reset_w(1, 1);
 }
 
 static void opwolf_msm5205_vck(running_machine *machine, int chip)
 {
-	static int adpcm_data[2] = { -1, -1 };
-
 	if (adpcm_data[chip] != -1)
 	{
 		msm5205_data_w(chip, adpcm_data[chip] & 0x0f);

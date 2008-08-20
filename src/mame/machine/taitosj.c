@@ -24,14 +24,10 @@ static UINT8 spacecr_prot_value;
 static UINT8 protection_value;
 static UINT32 address;
 
-void taitosj_register_main_savestate(void);
-
 MACHINE_START( taitosj )
 {
 	memory_configure_bank(1, 0, 1, memory_region(machine, "main") + 0x6000, 0);
 	memory_configure_bank(1, 1, 1, memory_region(machine, "main") + 0x10000, 0);
-
-	taitosj_register_main_savestate();
 
 	state_save_register_global(fromz80);
 	state_save_register_global(toz80);
@@ -50,7 +46,7 @@ MACHINE_RESET( taitosj )
 {
 	/* set the default ROM bank (many games only have one bank and */
 	/* never write to the bank selector register) */
-    taitosj_bankswitch_w(machine, 0, 0);
+	taitosj_bankswitch_w(machine, 0, 0);
 
 
 	zaccept = 1;

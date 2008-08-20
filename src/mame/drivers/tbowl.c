@@ -18,6 +18,10 @@ Might be some priority glitches
 #include "sound/msm5205.h"
 #include "rendlay.h"
 
+static int adpcm_pos[2],adpcm_end[2];
+static int adpcm_data[2];
+static UINT8 *shared_ram;
+
 /* in video/tbowl.c */
 extern UINT8 *tbowl_txvideoram, *tbowl_bgvideoram, *tbowl_bg2videoram;
 extern UINT8 *tbowl_spriteram;
@@ -70,8 +74,6 @@ static WRITE8_HANDLER( tbowlc_bankswitch_w )
 /*** Shared Ram Handlers
 
 ***/
-
-static UINT8 *shared_ram;
 
 static READ8_HANDLER( shared_r )
 {
@@ -159,8 +161,6 @@ ADDRESS_MAP_END
 
 /* Board A */
 
-static int adpcm_pos[2],adpcm_end[2];
-
 static WRITE8_HANDLER( tbowl_adpcm_start_w )
 {
 	adpcm_pos[offset & 1] = data << 8;
@@ -179,8 +179,6 @@ static WRITE8_HANDLER( tbowl_adpcm_vol_w )
 
 static void tbowl_adpcm_int(running_machine *machine, int num)
 {
-	static int adpcm_data[2] = { -1, -1 };
-
 	if (adpcm_pos[num] >= adpcm_end[num] ||
 				adpcm_pos[num] >= memory_region_length(machine, "adpcm")/2)
 		msm5205_reset_w(num,1);
@@ -559,6 +557,13 @@ The game is displayed on 2 monitors
 
 ***/
 
+static MACHINE_RESET( tbowl )
+{
+	adpcm_pos[0] = adpcm_pos[1] = 0;
+	adpcm_end[0] = adpcm_end[1] = 0;
+	adpcm_data[0] = adpcm_data[1] = -1;
+}
+
 static MACHINE_DRIVER_START( tbowl )
 
 	/* CPU on Board '6206B' */
@@ -598,6 +603,8 @@ static MACHINE_DRIVER_START( tbowl )
 
 	MDRV_VIDEO_START(tbowl)
 	MDRV_VIDEO_UPDATE(tbowl)
+
+	MDRV_MACHINE_RESET( tbowl )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

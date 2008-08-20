@@ -36,6 +36,16 @@ Encryption PAL 16R4 on CPU board
 */
 
 static UINT8 *decrypt;
+static int adpcm_data_offs;
+static int adpcm_data_end;
+static int toggle;
+static UINT8 fm_data;
+
+static int coin_mech_latch[2];
+static int stfight_coin_mech_query_active = 0;
+static int stfight_coin_mech_query;
+
+
 
 DRIVER_INIT( empcity )
 {
@@ -82,6 +92,15 @@ DRIVER_INIT( stfight )
 
 MACHINE_RESET( stfight )
 {
+	adpcm_data_offs = adpcm_data_end = 0;
+	toggle = 0;
+	fm_data = 0;
+	coin_mech_latch[0] = 0x02;
+	coin_mech_latch[1] = 0x01;
+
+	stfight_coin_mech_query_active = 0;
+	stfight_coin_mech_query = 0;
+
     // initialise rom bank
     stfight_bank_w( machine, 0, 0 );
 }
@@ -109,7 +128,7 @@ INTERRUPT_GEN( stfight_vb_interrupt )
 {
     // Do a RST10
     cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xd7);
-   	timer_set(ATTOTIME_IN_HZ(120), NULL, 0, stfight_interrupt_1);
+    timer_set(ATTOTIME_IN_HZ(120), NULL, 0, stfight_interrupt_1);
 }
 
 /*
@@ -122,13 +141,8 @@ READ8_HANDLER( stfight_dsw_r )
     return( ~input_port_read(machine, offset ? "DSW1" : "DSW0") );
 }
 
-static int stfight_coin_mech_query_active = 0;
-static int stfight_coin_mech_query;
-
 READ8_HANDLER( stfight_coin_r )
 {
-    static int coin_mech_latch[2] = { 0x02, 0x01 };
-
     int coin_mech_data;
     int i;
 
@@ -180,12 +194,9 @@ static const int sampleLimits[] =
     0x5400,     // girl getting shot
     0x7200      // (end of samples)
 };
-static int adpcm_data_offs;
-static int adpcm_data_end;
 
 void stfight_adpcm_int( running_machine *machine, int data )
 {
-	static int toggle;
 	UINT8 *SAMPLES = memory_region(machine, "adpcm");
 	int adpcm_data = SAMPLES[adpcm_data_offs & 0x7fff];
 
@@ -225,8 +236,6 @@ WRITE8_HANDLER( stfight_e800_w )
 /*
  *      Machine hardware for YM2303 fm sound control
  */
-
-static UINT8 fm_data;
 
 WRITE8_HANDLER( stfight_fm_w )
 {

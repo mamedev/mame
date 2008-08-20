@@ -131,17 +131,6 @@ GFXDECODE_END
 
 /* Machine Initialization */
 
-static TIMER_CALLBACK( nitedrvr_crash_toggle_callback )
-{
-	nitedrvr_crash_toggle(machine);
-}
-
-static MACHINE_RESET( nitedrvr )
-{
-	timer_pulse(PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)), NULL, 0, nitedrvr_crash_toggle_callback);
-	nitedrvr_register_machine_vars();
-}
-
 /* Machine Driver */
 
 static MACHINE_DRIVER_START( nitedrvr )
@@ -151,6 +140,7 @@ static MACHINE_DRIVER_START( nitedrvr )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 	MDRV_WATCHDOG_VBLANK_INIT(3)
 
+	MDRV_MACHINE_START(nitedrvr)
 	MDRV_MACHINE_RESET(nitedrvr)
 
 	// video hardware

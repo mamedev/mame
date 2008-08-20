@@ -56,6 +56,8 @@ extern UINT16 *splash_spriteram;
 extern UINT16 *splash_pixelram;
 extern UINT16 *roldfrog_bitmap_mode;
 static UINT16 *roldfrog_protdata;
+static int adpcm_data;
+static int ret;
 
 extern int splash_bitmap_type;
 extern int splash_sprite_attr2_shift;
@@ -137,8 +139,6 @@ static ADDRESS_MAP_START( splash_readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)					/* RAM */
 ADDRESS_MAP_END
 
-static int adpcm_data;
-
 static WRITE8_HANDLER( splash_adpcm_data_w ){
 	adpcm_data = data;
 }
@@ -165,7 +165,6 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( roldfrog_bombs_r )
 {
-	static int ret = 0x100;
 	ret ^= 0x100;
 	return ret;
 }
@@ -429,6 +428,11 @@ static const msm5205_interface splash_msm5205_interface =
 	MSM5205_S48_4B		/* 8KHz */
 };
 
+static MACHINE_RESET( splash )
+{
+	adpcm_data = 0;
+	ret = 0x100;
+}
 
 static MACHINE_DRIVER_START( splash )
 
@@ -454,6 +458,8 @@ static MACHINE_DRIVER_START( splash )
 
 	MDRV_VIDEO_START(splash)
 	MDRV_VIDEO_UPDATE(splash)
+
+	MDRV_MACHINE_RESET( splash )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -508,6 +514,8 @@ static MACHINE_DRIVER_START( roldfrog )
 	MDRV_VIDEO_START(splash)
 	MDRV_VIDEO_UPDATE(splash)
 
+	MDRV_MACHINE_RESET( splash )
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym", YM2203, 3000000)
@@ -543,6 +551,8 @@ static MACHINE_DRIVER_START( funystrp )
 
 	MDRV_VIDEO_START(splash)
 	MDRV_VIDEO_UPDATE(funystrp)
+
+	MDRV_MACHINE_RESET( splash )
 
 	/* sound hardware */
 //  MDRV_SPEAKER_STANDARD_MONO("mono")

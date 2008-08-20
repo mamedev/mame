@@ -119,6 +119,20 @@ static read8_machine_func porte1_r;
 static read8_machine_func portf0_r;
 static read8_machine_func portf1_r;
 
+static int adpcm_pos;
+static int adpcm_data;
+static int trackx,tracky;
+static int mux_ctrl = 0;
+static int extport;
+static int last_irq_level;
+static int high = 0;
+static int high2 = 0;
+
+static const UINT8 *mcu_reply;
+static int mcu_pos = 0, mcu_reply_len = 0;
+static int last_data_adr, last_data;
+static int cur_bank = 0;
+
 static void palette_notifier(int addr)
 {
 	UINT8 *p = palette_ram + (addr & ~1);
@@ -166,6 +180,19 @@ static void machine_init(running_machine *machine)
 		decodechar(machine->gfx[2], i, taitol_rambanks);
 		decodechar(machine->gfx[2], i+512, taitol_rambanks + 0x4000);
 	}
+
+	adpcm_pos = 0;
+	adpcm_data = -1;
+	trackx = tracky = 0;
+	mux_ctrl = 0;
+	extport = 0;
+	last_irq_level = 0;
+	high = 0;
+	high2 = 0;
+
+	mcu_pos = mcu_reply_len = 0;
+	last_data_adr = last_data = 0;
+	cur_bank = 0;
 }
 
 
@@ -261,8 +288,6 @@ static MACHINE_RESET( horshoes )
 }
 
 
-static int last_irq_level;
-
 static IRQ_CALLBACK(irq_callback)
 {
 	return irq_adr_table[last_irq_level];
@@ -323,7 +348,6 @@ static READ8_HANDLER( irq_enable_r )
 
 static WRITE8_HANDLER( rombankswitch_w )
 {
-	static int high = 0;
 	if(cur_rombank != data)
 	{
 		if(data>high)
@@ -340,16 +364,14 @@ static WRITE8_HANDLER( rombankswitch_w )
 
 static WRITE8_HANDLER( rombank2switch_w )
 {
-	static int high = 0;
-
 	data &= 0xf;
 
 	if(cur_rombank2 != data)
 	{
-		if(data>high)
+		if(data>high2)
 		{
-			high = data;
-			logerror("New rom2 size : %x\n", (high+1)*0x4000);
+			high2 = data;
+			logerror("New rom2 size : %x\n", (high2+1)*0x4000);
 		}
 
 //      logerror("robs2 %02x (%04x)\n", data, activecpu_get_pc());
@@ -449,8 +471,6 @@ static WRITE8_HANDLER( control2_w )
 	coin_counter_w(1,data & 0x08);
 }
 
-static int extport;
-
 static READ8_HANDLER( portA_r )
 {
 	if (extport == 0) return porte0_r(machine,0);
@@ -474,10 +494,6 @@ static READ8_HANDLER( ym2203_data1_r )
 	extport = 1;
 	return ym2203_read_port_0_r(machine,offset);
 }
-
-static const UINT8 *mcu_reply;
-static int mcu_pos = 0, mcu_reply_len = 0;
-static int last_data_adr, last_data;
 
 static const UINT8 puzznic_mcu_reply[] = { 0x50, 0x1f, 0xb6, 0xba, 0x06, 0x03, 0x47, 0x05, 0x00 };
 
@@ -533,8 +549,6 @@ static WRITE8_HANDLER( shared_w )
 	shared_ram[offset] = data;
 }
 
-static int mux_ctrl = 0;
-
 static READ8_HANDLER( mux_r )
 {
 	switch(mux_ctrl)
@@ -575,12 +589,8 @@ static WRITE8_HANDLER( mux_ctrl_w )
 
 
 
-static int adpcm_pos;
-
 static void champwr_msm5205_vck(running_machine *machine, int chip)
 {
-	static int adpcm_data = -1;
-
 	if (adpcm_data != -1)
 	{
 		msm5205_data_w(0, adpcm_data & 0x0f);
@@ -621,8 +631,6 @@ static WRITE8_HANDLER( champwr_msm5205_volume_w )
 }
 
 
-
-static int trackx,tracky;
 
 static READ8_HANDLER( horshoes_tracky_reset_r )
 {
@@ -2105,8 +2113,6 @@ static void irqhandler(running_machine *machine, int irq)
 
 static WRITE8_HANDLER( portA_w )
 {
-	static int cur_bank = 0;
-
 	if (cur_bank != (data & 0x03) )
 	{
 		int bankaddress;

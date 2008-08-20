@@ -243,8 +243,11 @@ WRITE16_HANDLER( rastan_spriteflip_w );
 VIDEO_START( topspeed );
 VIDEO_UPDATE( topspeed );
 
-static UINT16 cpua_ctrl = 0xff;
+static UINT16 cpua_ctrl;
 static INT32 ioc220_port = 0;
+static INT32 banknum;
+static int adpcm_pos;
+static int adpcm_data;
 
 extern UINT16 *topspeed_spritemap;
 
@@ -400,8 +403,6 @@ logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",activecpu_ge
                         SOUND
 *****************************************************/
 
-static INT32 banknum = -1;
-
 static void reset_sound_region(running_machine *machine)
 {
 	memory_set_bankptr( 10, memory_region(machine, "audio") + (banknum * 0x4000) + 0x10000 );
@@ -413,12 +414,8 @@ static WRITE8_HANDLER( sound_bankswitch_w )	/* assumes Z80 sandwiched between 68
 	reset_sound_region(machine);
 }
 
-static int adpcm_pos;
-
 static void topspeed_msm5205_vck(running_machine *machine, int chip)
 {
-	static int adpcm_data = -1;
-
 	if (adpcm_data != -1)
 	{
 		msm5205_data_w(0, adpcm_data & 0x0f);
@@ -692,6 +689,15 @@ static MACHINE_START( topspeed )
 	state_save_register_postload(machine, topspeed_postload, NULL);
 }
 
+static MACHINE_RESET( topspeed )
+{
+	cpua_ctrl = 0xff;
+	ioc220_port = 0;
+	banknum = -1;
+	adpcm_pos = 0;
+	adpcm_data = -1;
+}
+
 static MACHINE_DRIVER_START( topspeed )
 
 	/* basic machine hardware */
@@ -707,6 +713,7 @@ static MACHINE_DRIVER_START( topspeed )
 	MDRV_CPU_VBLANK_INT("main", topspeed_cpub_interrupt)
 
 	MDRV_MACHINE_START(topspeed)
+	MDRV_MACHINE_RESET(topspeed)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

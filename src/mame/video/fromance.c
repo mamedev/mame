@@ -27,7 +27,7 @@ static UINT8 crtc_register;
 static UINT8 crtc_data[0x10];
 static emu_timer *crtc_timer;
 
-static UINT8 flipscreen_old = -1;
+static UINT8 flipscreen_old;
 
 static tilemap *bg_tilemap, *fg_tilemap;
 
@@ -73,11 +73,9 @@ static TILE_GET_INFO( get_nekkyoku_fg_tile_info ) { get_nekkyoku_tile_info(machi
  *
  *************************************/
 
-VIDEO_START( fromance )
+static void init_common(void)
 {
-	/* allocate tilemaps */
-	bg_tilemap = tilemap_create(get_fromance_bg_tile_info, tilemap_scan_rows,       8,4, 64,64);
-	fg_tilemap = tilemap_create(get_fromance_fg_tile_info, tilemap_scan_rows,  8,4, 64,64);
+	flipscreen_old = -1;
 
 	/* allocate local videoram */
 	local_videoram[0] = auto_malloc(0x1000 * 3);
@@ -112,43 +110,22 @@ VIDEO_START( fromance )
 	state_save_register_global_pointer(local_paletteram, 0x800 * 2);
 }
 
+VIDEO_START( fromance )
+{
+	/* allocate tilemaps */
+	bg_tilemap = tilemap_create(get_fromance_bg_tile_info, tilemap_scan_rows,       8,4, 64,64);
+	fg_tilemap = tilemap_create(get_fromance_fg_tile_info, tilemap_scan_rows,  8,4, 64,64);
+
+	init_common();
+}
+
 VIDEO_START( nekkyoku )
 {
 	/* allocate tilemaps */
 	bg_tilemap = tilemap_create(get_nekkyoku_bg_tile_info, tilemap_scan_rows,       8,4, 64,64);
 	fg_tilemap = tilemap_create(get_nekkyoku_fg_tile_info, tilemap_scan_rows,  8,4, 64,64);
 
-	/* allocate local videoram */
-	local_videoram[0] = auto_malloc(0x1000 * 3);
-	local_videoram[1] = auto_malloc(0x1000 * 3);
-
-	/* allocate local palette RAM */
-	local_paletteram = auto_malloc(0x800 * 2);
-
-	/* configure tilemaps */
-	tilemap_set_transparent_pen(fg_tilemap,15);
-
-	/* reset the timer */
-	crtc_timer = timer_alloc(crtc_interrupt_gen, NULL);
-
-	scrollx_ofs = 0x159;
-	scrolly_ofs = 0x10;
-
-	/* state save */
-	state_save_register_global(selected_videoram);
-	state_save_register_global_pointer(local_videoram[0], 0x1000 * 3);
-	state_save_register_global_pointer(local_videoram[1], 0x1000 * 3);
-	state_save_register_global(selected_paletteram);
-	state_save_register_global_array(scrollx);
-	state_save_register_global_array(scrolly);
-	state_save_register_global(gfxreg);
-	state_save_register_global(flipscreen);
-	state_save_register_global(flipscreen_old);
-	state_save_register_global(scrollx_ofs);
-	state_save_register_global(scrolly_ofs);
-	state_save_register_global(crtc_register);
-	state_save_register_global_array(crtc_data);
-	state_save_register_global_pointer(local_paletteram, 0x800 * 2);
+	init_common();
 }
 
 VIDEO_START( pipedrm )

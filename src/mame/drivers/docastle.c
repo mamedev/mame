@@ -159,14 +159,16 @@ Dip locations verified with manual for docastle, dorunrun and dowild.
 #include "includes/docastle.h"
 
 
+static int adpcm_pos, adpcm_idle;
+static int adpcm_data;
+static int adpcm_status;
+
+
 /* Read/Write Handlers */
 
-static int adpcm_pos, adpcm_idle;
 
 static void idsoccer_adpcm_int(running_machine *machine, int chip)
 {
-	static int adpcm_data = -1;
-
 	if (adpcm_pos >= memory_region_length(machine, "adpcm"))
 	{
 		adpcm_idle = 1;
@@ -187,9 +189,8 @@ static void idsoccer_adpcm_int(running_machine *machine, int chip)
 static READ8_HANDLER( idsoccer_adpcm_status_r )
 {
 	// this is wrong, but the samples work anyway!!
-	static int i;
-	i ^= 0x80;
-	return i;
+	adpcm_status ^= 0x80;
+	return adpcm_status;
 }
 
 static WRITE8_HANDLER( idsoccer_adpcm_w )
@@ -571,6 +572,14 @@ static const msm5205_interface msm5205_config =
 
 /* Machine Drivers */
 
+static MACHINE_RESET( docastle )
+{
+	adpcm_pos = adpcm_idle = 0;
+	adpcm_data = -1;
+	adpcm_status = 0;
+}
+
+
 static MACHINE_DRIVER_START( docastle )
 	// basic machine hardware
 //  MDRV_CPU_ADD("main", Z80, 4000000)  // 4 MHz
@@ -602,6 +611,8 @@ static MACHINE_DRIVER_START( docastle )
 	MDRV_PALETTE_INIT(docastle)
 	MDRV_VIDEO_START(docastle)
 	MDRV_VIDEO_UPDATE(docastle)
+
+	MDRV_MACHINE_RESET( docastle )
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")

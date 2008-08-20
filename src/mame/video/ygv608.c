@@ -538,13 +538,13 @@ VIDEO_START( ygv608 )
 	add_exit_callback(machine, ygv608_exit);
 }
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 #ifdef _ENABLE_SPRITES
 
   // sprites are always clipped to 512x512
   // - regardless of the visible display dimensions
-  static rectangle spriteClip = { 0, 512, 0, 512 };
+  rectangle spriteClip = { 0, 512, 0, 512 };
 
   PSPRITE_ATTR sa;
   int flipx = 0, flipy = 0;

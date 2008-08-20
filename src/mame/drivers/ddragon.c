@@ -97,14 +97,13 @@ extern UINT8 technos_video_hw;
 /* end of extern code & data */
 
 static emu_timer *scanline_timer;
-static MACHINE_START( ddragon );
-static WRITE8_HANDLER( ddragon_bankswitch_w );
 
 /* private globals */
 static UINT8 dd_sub_cpu_busy;
 static UINT8 sprite_irq, sound_irq, ym_irq, snd_cpu;
 static UINT32 adpcm_pos[2], adpcm_end[2];
 static UINT8 adpcm_idle[2];
+static int adpcm_data[2];
 static UINT8 *darktowr_mcu_ports;
 static UINT8 *rambase;
 /* end of private globals */
@@ -196,7 +195,10 @@ static MACHINE_START( ddragon )
 static MACHINE_RESET( ddragon )
 {
 	dd_sub_cpu_busy = 1;
+	adpcm_pos[0] = adpcm_pos[1] = 0;
+	adpcm_end[0] = adpcm_end[1] = 0;
 	adpcm_idle[0] = adpcm_idle[1] = 1;
+	adpcm_data[0] = adpcm_data[1] = -1;
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
@@ -463,8 +465,6 @@ static WRITE8_HANDLER( dd_adpcm_w )
 
 static void dd_adpcm_int(running_machine *machine, int chip)
 {
-	static int adpcm_data[2] = { -1, -1 };
-
 	if (adpcm_pos[chip] >= adpcm_end[chip] || adpcm_pos[chip] >= 0x10000)
 	{
 		adpcm_idle[chip] = 1;

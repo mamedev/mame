@@ -17,6 +17,9 @@ static bitmap_t *ml_bitmap[8];
 #define ML_CHARS 0x2000
 static UINT8 dirtychar[ML_CHARS];
 static int status_bit;
+static int adpcm_pos;
+static int adpcm_data;
+
 
 
 static const gfx_layout tiles8x8_layout =
@@ -87,12 +90,8 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 	memory_set_bankptr( 1, memory_region(machine, "z80") + ((data) & 0x03) * 0x4000 + 0x10000 );
 }
 
-static int adpcm_pos;
-
 static void ml_msm5205_vck(running_machine *machine, int chip)
 {
-	static int adpcm_data = -1;
-
 	if (adpcm_data != -1)
 	{
 		msm5205_data_w(0, adpcm_data & 0x0f);
@@ -352,6 +351,12 @@ static const ym2151_interface ym2151_config =
 	sound_bankswitch_w
 };
 
+static MACHINE_RESET( mlanding )
+{
+	status_bit = 0;
+	adpcm_pos = 0;
+	adpcm_data = -1;
+}
 
 static MACHINE_DRIVER_START( mlanding )
 
@@ -384,6 +389,8 @@ static MACHINE_DRIVER_START( mlanding )
 
 	MDRV_VIDEO_START(mlanding)
 	MDRV_VIDEO_UPDATE(mlanding)
+
+	MDRV_MACHINE_RESET(mlanding)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

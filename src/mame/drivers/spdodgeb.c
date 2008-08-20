@@ -41,6 +41,13 @@ WRITE8_HANDLER( spdodgeb_videoram_w );
 /* private globals */
 static int toggle=0;//, soundcode = 0;
 static int adpcm_pos[2],adpcm_end[2],adpcm_idle[2];
+static int adpcm_data[2];
+static int mcu63701_command;
+static int inputs[4];
+
+static UINT8 tapc[4] = {0,0,0,0};	// R1, R2, L1, L2
+static UINT8 last_port[2] = {0,0};
+static UINT8 last_dash[2] = {0,0};
 /* end of private globals */
 
 
@@ -78,8 +85,6 @@ static WRITE8_HANDLER( spd_adpcm_w )
 
 static void spd_adpcm_int(running_machine *machine, int chip)
 {
-	static int adpcm_data[2] = { -1, -1 };
-
 	if (adpcm_pos[chip] >= adpcm_end[chip] || adpcm_pos[chip] >= 0x10000)
 	{
 		adpcm_idle[chip] = 1;
@@ -99,9 +104,6 @@ static void spd_adpcm_int(running_machine *machine, int chip)
 	}
 }
 
-
-static int mcu63701_command;
-static int inputs[4];
 
 #if 0	// default - more sensitive (state change and timing measured on real board?)
 static void mcu63705_update_inputs(running_machine *machine)
@@ -178,9 +180,6 @@ static void mcu63705_update_inputs(running_machine *machine)
 #define A 0x10
 #define D 0x20
 
-	static UINT8 tapc[4] = {0,0,0,0};	// R1, R2, L1, L2
-	static UINT8 last_port[2] = {0,0};
-	static UINT8 last_dash[2] = {0,0};
 	UINT8 curr_port[2];
 	UINT8 curr_dash[2];
 	int p;
@@ -429,6 +428,19 @@ static const msm5205_interface msm5205_config =
 };
 
 
+static MACHINE_RESET( spdodgeb )
+{
+	toggle = 0;
+	adpcm_pos[0] = adpcm_pos[1] = 0;
+	adpcm_end[0] = adpcm_end[0] = 0;
+	adpcm_idle[0] = adpcm_data[1] = 0;
+	adpcm_data[0] = adpcm_data[1] = -1;
+	mcu63701_command = 0;
+	memset(inputs, 0, sizeof(inputs));
+	memset(tapc, 0, sizeof(tapc));
+	last_port[0] = last_port[1] = 0;
+	last_dash[0] = last_dash[1] = 0;
+}
 
 static MACHINE_DRIVER_START( spdodgeb )
 
@@ -454,6 +466,8 @@ static MACHINE_DRIVER_START( spdodgeb )
 	MDRV_PALETTE_INIT(spdodgeb)
 	MDRV_VIDEO_START(spdodgeb)
 	MDRV_VIDEO_UPDATE(spdodgeb)
+
+	MDRV_MACHINE_RESET( spdodgeb )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")

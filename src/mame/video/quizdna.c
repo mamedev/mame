@@ -19,7 +19,7 @@ static tilemap *quizdna_fg_tilemap;
 
 static UINT8 quizdna_bg_xscroll[2];
 
-static int quizdna_flipscreen = -1;
+static int quizdna_flipscreen;
 static int quizdna_video_enable;
 
 
@@ -56,6 +56,11 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( quizdna )
 {
+	quizdna_flipscreen = -1;
+	quizdna_video_enable = 0;
+	quizdna_bg_xscroll[0] = 0;
+	quizdna_bg_xscroll[1] = 0;
+
 	quizdna_bg_ram = auto_malloc(0x2000);
 	quizdna_fg_ram = auto_malloc(0x1000);
 

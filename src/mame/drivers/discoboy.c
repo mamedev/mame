@@ -49,6 +49,7 @@ static UINT8* discoboy_ram_att;
 static UINT8 discoboy_ram_bank;
 static UINT8 port_00;
 static UINT8 discoboy_gfxbank;
+static int adpcm_data;
 
 static VIDEO_START( discoboy )
 {
@@ -330,8 +331,6 @@ ADDRESS_MAP_END
 
 /* Sound */
 
-static int adpcm_data = 0x80;
-
 //static WRITE8_HANDLER( splash_adpcm_data_w ){
 //  adpcm_data = data;
 //}
@@ -460,7 +459,6 @@ static const gfx_layout tiles8x8_layout2 =
 static GFXDECODE_START( discoboy )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0x000, 128 )
 	GFXDECODE_ENTRY( "gfx2", 0, tiles8x8_layout2, 0x000, 128 )
-
 GFXDECODE_END
 
 
@@ -471,6 +469,13 @@ static const msm5205_interface discoboy_msm5205_interface =
 	MSM5205_S48_4B		/* ??? unknown hz */
 };
 
+static MACHINE_RESET( discoboy )
+{
+	discoboy_ram_bank = 0;
+	port_00 = 0;
+	discoboy_gfxbank = 0;
+	adpcm_data = 0x80;
+}
 
 static MACHINE_DRIVER_START( discoboy )
 	/* basic machine hardware */
@@ -498,6 +503,8 @@ static MACHINE_DRIVER_START( discoboy )
 
 	MDRV_VIDEO_START(discoboy)
 	MDRV_VIDEO_UPDATE(discoboy)
+
+	MDRV_MACHINE_RESET( discoboy )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
