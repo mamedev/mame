@@ -433,30 +433,7 @@ static int get_pixel(int x,int y)
 static int get_pixel_ptn(int x,int y)
 {
 	int dst, x_int, x_mod, bpp;
-	UINT16 bitmask, bitmask_shifted, bitmask_cl;
-
-	switch ((HD63484_reg[0x02/2] & 0x700) >> 8)
-	{
-		case 0:
-			bitmask_cl = 0x0001;
-			break;
-		case 1:
-			bitmask_cl = 0x0003;
-			break;
-		case 2:
-			bitmask_cl = 0x000f;
-			break;
-		case 3:
-			bitmask_cl = 0x00ff;
-			break;
-		case 4:
-			bitmask_cl = 0xffff;
-			break;
-
-		default:
-			bitmask_cl = 0x0000;
-			logerror ("Graphic bit mode not supported\n");
-	}
+	UINT16 bitmask, bitmask_shifted;
 
 	bpp = 1;
 	bitmask = 0x0001;
@@ -814,7 +791,6 @@ static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
 
 void line(INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col)
 {
-
 			INT16 ax,ay;
 
 			int cpx_t=sx;
@@ -827,7 +803,7 @@ void line(INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col)
 			{
 				while (ax)
 				{
-					dot(cpx_t,cpy_t,col,cl0);
+					dot(cpx_t,cpy_t,col & 7,cl0);
 
 					if (ax > 0)
 					{
@@ -846,7 +822,7 @@ void line(INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col)
 			{
 				while (ay)
 				{
-					dot(cpx_t,cpy_t,col,cl0);
+					dot(cpx_t,cpy_t,col & 7,cl0);
 
 					if (ay > 0)
 					{
@@ -1025,31 +1001,31 @@ static void HD63484_command_w(UINT16 cmd)
 		}
 		else if ((fifo[0] & 0xff00) == 0x8800)	/* ALINE */
 		{
-			line(cpx,cpy,fifo[1],fifo[2],fifo[0]&7);
+			line(cpx,cpy,fifo[1],fifo[2],fifo[0] & 0xff);
 			cpx = (INT16)fifo[1];
 			cpy = (INT16)fifo[2];
 		}
 		else if ((fifo[0] & 0xff00) == 0x8c00)	/* RLINE */
 		{
-			line(cpx,cpy,cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],fifo[0]&7);
+			line(cpx,cpy,cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],fifo[0] & 0xff);
 			cpx += (INT16)fifo[1];
 			cpy += (INT16)fifo[2];
 		}
 		else if ((fifo[0] & 0xfff8) == 0x9000)	/* ARCT */
 		{
-			line(cpx,cpy,(INT16)fifo[1],cpy,fifo[0]&7);
-			line((INT16)fifo[1],cpy,(INT16)fifo[1],(INT16)fifo[2],fifo[0]&7);
-			line((INT16)fifo[1],(INT16)fifo[2],cpx,(INT16)fifo[2],fifo[0]&7);
-			line(cpx,(INT16)fifo[2],cpx,cpy,fifo[0]&7);
+			line(cpx,cpy,(INT16)fifo[1],cpy,fifo[0] & 0xff);
+			line((INT16)fifo[1],cpy,(INT16)fifo[1],(INT16)fifo[2],fifo[0] & 0xff);
+			line((INT16)fifo[1],(INT16)fifo[2],cpx,(INT16)fifo[2],fifo[0] & 0xff);
+			line(cpx,(INT16)fifo[2],cpx,cpy,fifo[0] & 0xff);
 			cpx = (INT16)fifo[1];
 			cpy = (INT16)fifo[2];
 		}
 		else if ((fifo[0] & 0xfff8) == 0x9400)	/* RRCT  added*/
 		{
-			line(cpx,cpy,cpx+(INT16)fifo[1],cpy,fifo[0]&7);
-			line(cpx+(INT16)fifo[1],cpy,cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],fifo[0]&7);
-			line(cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],cpx,cpy+(INT16)fifo[2],fifo[0]&7);
-			line(cpx,cpy+(INT16)fifo[2],cpx,cpy,fifo[0]&7);
+			line(cpx,cpy,cpx+(INT16)fifo[1],cpy,fifo[0] & 0xff);
+			line(cpx+(INT16)fifo[1],cpy,cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],fifo[0] & 0xff);
+			line(cpx+(INT16)fifo[1],cpy+(INT16)fifo[2],cpx,cpy+(INT16)fifo[2],fifo[0] & 0xff);
+			line(cpx,cpy+(INT16)fifo[2],cpx,cpy,fifo[0] & 0xff);
 
 			cpx += (INT16)fifo[1];
 			cpy += (INT16)fifo[2];
@@ -1086,7 +1062,7 @@ static void HD63484_command_w(UINT16 cmd)
 			{
 				for (;;)
 				{
-					dot(xx,yy,fifo[0] & 0x0007,cl0);
+					dot(xx,yy,fifo[0] & 0x07,cl0);
 
 					if (ax == 0) break;
 					else if (ax > 0)
@@ -1120,17 +1096,23 @@ static void HD63484_command_w(UINT16 cmd)
 		}
 		else if ((fifo[0] & 0xfff8) == 0xc400)	/* RFRCT  added TODO*/
 		{
-			line(cpx,cpy,cpx+(INT16)fifo[1],cpy,fifo[0]&7);
-			line(cpx+fifo[1],cpy,cpx+fifo[1],cpy+fifo[2],fifo[0]&7);
-			line(cpx+fifo[1],cpy+fifo[2],cpx,cpy+fifo[2],fifo[0]&7);
-			line(cpx,cpy+fifo[2],cpx,cpy,fifo[0]&7);
+			line(cpx,cpy,cpx+(INT16)fifo[1],cpy,fifo[0] & 0xff);
+			line(cpx+fifo[1],cpy,cpx+fifo[1],cpy+fifo[2],fifo[0] & 0xff);
+			line(cpx+fifo[1],cpy+fifo[2],cpx,cpy+fifo[2],fifo[0] & 0xff);
+			line(cpx,cpy+fifo[2],cpx,cpy,fifo[0] & 0xff);
 
 			cpx=cpx+(INT16)fifo[1];
 			cpy=cpy+(INT16)fifo[2];
 		}
+		else if (fifo[0] == 0xc800)	/* PAINT */
+		{
+			// int i;
+			// for (i=-2; i<90; i++)
+			//	line(cpx,cpy+i,cpx+60,cpy+i,0x0000);
+		}
 		else if ((fifo[0] & 0xfff8) == 0xcc00)	/* DOT */
 		{
-			dot(cpx,cpy,fifo[0] & 0x0007,cl0);
+			dot(cpx,cpy,fifo[0] & 0xff,cl0);
 		}
 		else if ((fifo[0] & 0xf000) == 0xd000)	/* PTN (to do) */
 		{
