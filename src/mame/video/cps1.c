@@ -1280,7 +1280,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"sf2v004",  CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2accp2", CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2m1",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
-	{"sf2m2",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
+	{"sf2m2",    CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m3",    CPS_B_21_DEF, mapper_S9263B, 0x36 },
 	{"sf2m4",    HACK_B_1,     mapper_S9263B, 0x36, 0, 0, 1 },
 	{"sf2m5",    CPS_B_21_DEF, mapper_S9263B, 0x36, 0, 0, 1 },
