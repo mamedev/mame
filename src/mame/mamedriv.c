@@ -3838,6 +3838,7 @@ Sep.1994 Quiz Ghost Hunter
 	/* Model 2C-CRX (TGPx4, SCSP sound board) */
 	DRIVER( skisuprg )	/* 1996 */
 	DRIVER( stcc )		/* 1996 */
+	DRIVER( waverunr )	/* 1996 */
 	DRIVER( hotd )		/* 1997 */
 	DRIVER( overrev )	/* 1997 */
 	DRIVER( topskatr )	/* 1997 */
