@@ -28,7 +28,94 @@
 #define MAX_VRAM_SIZE (64*64*2) /* 0x2000 */
 
 
+UINT8 *tnk3_fg_videoram;
+UINT8 *tnk3_bg_videoram;
 
+static tilemap *fg_tilemap;
+static tilemap *bg_tilemap;
+static int fg_bank;
+static int bg_scrollx, bg_scrolly, sp_scrollx, sp_scrolly;
+
+/**************************************************************************************/
+
+PALETTE_INIT( tnk3 )
+{
+	int i;
+	int num_colors = 0x400;
+
+	/*
+        palette format is RRRG GGBB B??? the three unknown bits are used but
+        I'm not sure how, I'm currently using them as least significant bit but
+        that's most likely wrong.
+    */
+	for( i=0; i<num_colors; i++ )
+	{
+		int bit0=0,bit1,bit2,bit3,r,g,b;
+
+		bit0 = (color_prom[i + 2*num_colors] >> 2) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		bit3 = (color_prom[i] >> 3) & 0x01;
+		r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		bit0 = (color_prom[i + 2*num_colors] >> 1) & 0x01;
+		bit1 = (color_prom[i + num_colors] >> 2) & 0x01;
+		bit2 = (color_prom[i + num_colors] >> 3) & 0x01;
+		bit3 = (color_prom[i] >> 0) & 0x01;
+		g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		bit0 = (color_prom[i + 2*num_colors] >> 0) & 0x01;
+		bit1 = (color_prom[i + 2*num_colors] >> 3) & 0x01;
+		bit2 = (color_prom[i + num_colors] >> 0) & 0x01;
+		bit3 = (color_prom[i + num_colors] >> 1) & 0x01;
+		b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
+
+		palette_set_color(machine,i,MAKE_RGB(r,g,b));
+	}
+}
+
+/**************************************************************************************/
+
+static TILE_GET_INFO( tnk3_get_fg_tile_info )
+{
+	int code = tnk3_fg_videoram[tile_index];
+	int color = code >> 5;
+	SET_TILE_INFO(0,
+			code | (fg_bank << 8),
+			color,
+			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
+}
+
+static TILE_GET_INFO( ikari_get_fg_tile_info )
+{
+	int code = tnk3_fg_videoram[tile_index];
+	SET_TILE_INFO(0,
+			code,
+			0,
+			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
+}
+
+static TILEMAP_MAPPER( tnk3_fg_scan_cols )
+{
+	col -= 2;
+	if (col & 0x20)
+		return 0x400 + row + ((col & 0x1f) << 5);
+	else
+		return row + (col << 5);
+}
+
+static TILE_GET_INFO( tnk3_get_bg_tile_info )
+{
+	int attr = tnk3_bg_videoram[2*tile_index+1];
+	int code = tnk3_bg_videoram[2*tile_index] | ((attr & 0x30) << 4);
+	int color = (attr & 0xf) ^ 8;
+	SET_TILE_INFO(1,
+			code,
+			color,
+			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
+}
+
+/**************************************************************************************/
 
 VIDEO_START( snk )
 {
@@ -43,7 +130,7 @@ VIDEO_START( snk_3bpp_shadow )
 	VIDEO_START_CALL(snk);
 
 	if(!(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
-		popmessage("driver should use VIDEO_HAS_SHADOWS");
+		fatalerror("driver should use VIDEO_HAS_SHADOWS");
 
 	/* prepare shadow draw table */
 	for(i = 0; i <= 5; i++) gfx_drawmode_table[i] = DRAWMODE_SOURCE;
@@ -61,7 +148,7 @@ VIDEO_START( snk_4bpp_shadow )
 	VIDEO_START_CALL(snk);
 
 	if(!(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
-		popmessage("driver should use VIDEO_HAS_SHADOWS");
+		fatalerror("driver should use VIDEO_HAS_SHADOWS");
 
 	/* prepare shadow draw table */
 	for(i = 0; i <= 13; i++) gfx_drawmode_table[i] = DRAWMODE_SOURCE;
@@ -76,7 +163,168 @@ VIDEO_START( snk_4bpp_shadow )
 		machine->shadow_table[i] = i + 0x100;
 }
 
+VIDEO_START( tnk3 )
+{
+	VIDEO_START_CALL(snk_3bpp_shadow);
+
+	fg_tilemap = tilemap_create(tnk3_get_fg_tile_info, tnk3_fg_scan_cols, 8, 8, 36, 28);
+	bg_tilemap = tilemap_create(tnk3_get_bg_tile_info, tilemap_scan_cols, 8, 8, 64, 64);
+
+	tilemap_set_transparent_pen(fg_tilemap, 15);
+	tilemap_set_scrolldy(fg_tilemap, 8, 8);
+
+	tilemap_set_scrolldx(bg_tilemap, 15, 24);
+	tilemap_set_scrolldy(bg_tilemap,  8, -32);
+}
+
+VIDEO_START( ikari )
+{
+	VIDEO_START_CALL(snk_3bpp_shadow);
+
+	fg_tilemap = tilemap_create(ikari_get_fg_tile_info, tnk3_fg_scan_cols,  8, 8, 36, 28);
+
+	tilemap_set_transparent_pen(fg_tilemap, 15);
+	tilemap_set_scrolldy(fg_tilemap, 8, 8);
+}
+
 /**************************************************************************************/
+
+WRITE8_HANDLER( tnk3_fg_videoram_w )
+{
+	tnk3_fg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(fg_tilemap, offset);
+}
+
+WRITE8_HANDLER( tnk3_bg_videoram_w )
+{
+	tnk3_bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset >> 1);
+}
+
+WRITE8_HANDLER( tnk3_videoattrs_w )
+{
+	/*
+		video attributes:
+        X-------    flip screen
+        -X------    character bank (for text layer)
+        --X-----
+        ---X----    scrolly MSB (background)
+        ----X---    scrolly MSB (sprites)
+        -----X--
+        ------X-    scrollx MSB (background)
+        -------X    scrollx MSB (sprites)
+    */
+
+	int bank = (data & 0x40) >> 6;
+
+	if (fg_bank != bank)
+	{
+		tilemap_mark_all_tiles_dirty(fg_tilemap);
+		fg_bank = bank;
+	}
+
+	flip_screen_set(data & 0x80);
+
+	bg_scrolly = (bg_scrolly & 0xff) | ((data & 0x10) << 4);
+	sp_scrolly = (sp_scrolly & 0xff) | ((data & 0x08) << 5);
+	bg_scrollx = (bg_scrollx & 0xff) | ((data & 0x02) << 7);
+	sp_scrollx = (sp_scrollx & 0xff) | ((data & 0x01) << 8);
+}
+
+WRITE8_HANDLER( tnk3_bg_scrollx_w )
+{
+	bg_scrollx = (bg_scrollx & ~0xff) | data;
+}
+
+WRITE8_HANDLER( tnk3_bg_scrolly_w )
+{
+	bg_scrolly = (bg_scrolly & ~0xff) | data;
+}
+
+WRITE8_HANDLER( tnk3_sp_scrollx_w )
+{
+	sp_scrollx = (sp_scrollx & ~0xff) | data;
+}
+
+WRITE8_HANDLER( tnk3_sp_scrolly_w )
+{
+	sp_scrolly = (sp_scrolly & ~0xff) | data;
+}
+
+/**************************************************************************************/
+
+static void tnk3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xscroll, int yscroll)
+{
+	const gfx_element *gfx = machine->gfx[2];
+
+	int tile_number, attributes, color, sx, sy;
+	int xflip,yflip;
+	int offs;
+
+	/* tnk3 has 512 tiles, attribute bit 5 is y-flip */
+	/* athena has 1024 tiles, attribute bit 5 is extra bank bit */
+	int is_athena = (gfx->total_elements > 512);
+
+	for(offs = 0; offs < 50*4; offs+=4)
+	{
+		tile_number = spriteram[offs+1];
+		attributes  = spriteram[offs+3];
+		if (attributes & 0x40) tile_number |= 0x100;
+		color = attributes & 0xf;
+		sx =  xscroll + 29 - spriteram[offs+2];
+		if (!(attributes & 0x80)) sx += 256;
+		sy = -yscroll - 9 + spriteram[offs];
+		if (attributes & 0x10) sy += 256;
+		xflip = 0;
+		yflip = 0;
+
+		if (is_athena)
+		{
+			if (attributes & 0x20) tile_number |= 0x200;
+		}
+		else	// tnk3
+		{
+			yflip = attributes & 0x20;
+		}
+
+		if (flip_screen_get())
+		{
+			sx = 73 - sx;	// this causes slight misalignment in tnk3 but is correct for athena and fitegolf
+			sy = 246 - sy;
+			xflip = !xflip;
+			yflip = !yflip;
+		}
+
+		sx &= 0x1ff;
+		sy &= 0x1ff;
+		if (sx > 512-16) sx -= 512;
+		if (sy > 512-16) sy -= 512;
+
+		drawgfx(bitmap,gfx,
+				tile_number,
+				color,
+				xflip,yflip,
+				sx,sy,
+				cliprect,TRANSPARENCY_PEN_TABLE,7);
+	}
+}
+
+
+
+VIDEO_UPDATE( tnk3 )
+{
+	tilemap_set_scrollx(bg_tilemap, 0, bg_scrollx);
+	tilemap_set_scrolly(bg_tilemap, 0, bg_scrolly);
+
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tnk3_draw_sprites(screen->machine, bitmap, cliprect, sp_scrollx, sp_scrolly);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+
+	return 0;
+}
+
+
+/************************************************************************************/
 
 static void tnk3_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int scrollx, int scrolly,
 					int x_size, int y_size, int bg_type )
@@ -95,15 +343,15 @@ static void tnk3_draw_background(running_machine *machine, bitmap_t *bitmap, con
 
 		if(bg_type == 0)
 		{
-				/* type tnk3 */
-				tile_number |= (attributes & 0x30) << 4;
-				color = (attributes & 0xf) ^ 8;
+			/* type tnk3 */
+			tile_number |= (attributes & 0x30) << 4;
+			color = (attributes & 0xf) ^ 8;
 		}
 		else
 		{
-				/* type ikari */
-				tile_number |= (attributes & 0x03) << 8;
-				color = attributes >> 4;
+			/* type ikari */
+			tile_number |= (attributes & 0x03) << 8;
+			color = attributes >> 4;
 		}
 
 		sx = x * 512 / x_size;
@@ -114,266 +362,6 @@ static void tnk3_draw_background(running_machine *machine, bitmap_t *bitmap, con
 	copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,cliprect);
 }
 
-void tnk3_draw_text(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank, UINT8 *source )
-{
-	const gfx_element *gfx = machine->gfx[0];
-
-	int tile_number, color, sx, sy;
-	int x, y;
-
-	for(x=0; x<32; x++) for(y=0; y<32; y++)
-	{
-		tile_number = source[(x<<5)+y];
-
-		if(tile_number == 0x20 || tile_number == 0xff) continue;
-
-		if(bank == -1) color = 8;
-		else
-		{
-			color = tile_number >> 5;
-			tile_number |= bank << 8;
-		}
-		sx = (x+2) << 3;
-		sy = (y+1) << 3;
-
-		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,cliprect,TRANSPARENCY_PEN,15);
-	}
-}
-
-static void tnk3_draw_status_main(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank, UINT8 *source, int start )
-{
-	const gfx_element *gfx = machine->gfx[0];
-
-	int tile_number, color, sx, sy;
-	int x, y;
-
-	for(x = start; x < start+2; x++) for(y = 0; y < 32; y++)
-	{
-		tile_number = source[(x<<5)+y];
-
-		if(bank == -1) color = 8;
-		else
-		{
- 			color = tile_number >> 5;
-			tile_number |= (bank << 8);
-		}
-		sx = ((x+34)&0x3f) << 3;
-		sy = (y+1) << 3;
-
-		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,cliprect,TRANSPARENCY_NONE,0);
-	}
-}
-
-void tnk3_draw_status(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank, UINT8 *source )
-{
-	tnk3_draw_status_main(machine,bitmap,cliprect,bank,source, 0);
-	tnk3_draw_status_main(machine,bitmap,cliprect,bank,source,30);
-}
-
-static void tnk3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xscroll, int yscroll )
-{
-	const gfx_element *gfx = machine->gfx[2];
-
-	int tile_number, attributes, color, sx, sy;
-	int yflip;
-	int offs;
-
-	for(offs = 0; offs < 50*4; offs+=4)
-	{
-		if(*(UINT32*)(spriteram+offs) == 0 || *(UINT32*)(spriteram+offs) == -1) continue;
-
-		tile_number = spriteram[offs+1];
-		attributes  = spriteram[offs+3]; /* YBFX.CCCC */
-		if(attributes & 0x40) tile_number |= 256;
-
-		color = attributes & 0xf;
-		sx =  xscroll - spriteram[offs+2];
-		if(!(attributes & 0x80)) sx += 256;
-		sy = -yscroll + spriteram[offs];
-		if(attributes & 0x10) sy += 256;
-		sx &= 0x1ff;
-		sy &= 0x1ff;
-		if (sx > 512-16) sx -= 512;
-		if (sy > 512-16) sy -= 512;
-		yflip = attributes & 0x20;
-
-		drawgfx(bitmap,gfx,tile_number,color,0,yflip,sx,sy,cliprect,TRANSPARENCY_PEN_TABLE,7);
-	}
-}
-
-VIDEO_UPDATE( tnk3 )
-{
-	UINT8 *ram = snk_rambase - 0xd000;
-	int attributes = ram[0xc800];
-	/*
-        X-------
-        -X------    character bank (for text layer)
-        --X-----
-        ---X----    scrolly MSB (background)
-        ----X---    scrolly MSB (sprites)
-        -----X--
-        ------X-    scrollx MSB (background)
-        -------X    scrollx MSB (sprites)
-    */
-
-	// TODO attributes & 0x80 is screen flip
-
-	/* to be moved to memmap */
-	spriteram = &ram[0xd000];
-
-	{
-		int bg_scrollx = -ram[0xcc00] + 15;
-		int bg_scrolly = -ram[0xcb00] + 8;
-		if(attributes & 0x02) bg_scrollx += 256;
-		if(attributes & 0x10) bg_scrolly += 256;
-		tnk3_draw_background(screen->machine, bitmap, cliprect, bg_scrollx, bg_scrolly, 64, 64, 0 );
-	}
-
-	{
-		int sp_scrollx = ram[0xca00] + 29;
-		int sp_scrolly = ram[0xc900] + 9;
-		if(attributes & 0x01) sp_scrollx += 256;
-		if(attributes & 0x08) sp_scrolly += 256;
-		tnk3_draw_sprites(screen->machine, bitmap, cliprect, sp_scrollx, sp_scrolly );
-	}
-
-	{
-		int bank = (attributes & 0x40) ? 1:0;
-
-		tnk3_draw_text(screen->machine, bitmap, cliprect, bank, &ram[0xf800] );
-		tnk3_draw_status(screen->machine, bitmap, cliprect, bank, &ram[0xfc00] );
-	}
-	return 0;
-}
-
-static void athena_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xscroll, int yscroll )
-{
-	const gfx_element *gfx = machine->gfx[2];
-
-	int tile_number, attributes, color, sx, sy;
-	int offs;
-
-	for(offs = 0; offs < 50*4; offs+=4)
-	{
-		if(*(UINT32*)(spriteram+offs) == 0 || *(UINT32*)(spriteram+offs) == -1) continue;
-
-		tile_number = spriteram[offs+1];
-		attributes  = spriteram[offs+3]; /* YBBX.CCCC */
-		if(attributes & 0x40) tile_number |= 256;
-		if(attributes & 0x20) tile_number |= 512;
-
-		color = attributes & 0xf;
-		sx =  xscroll - spriteram[offs+2];
-		if(!(attributes & 0x80)) sx += 256;
-		sy = -yscroll + spriteram[offs];
-		if(attributes & 0x10) sy += 256;
-		sx &= 0x1ff;
-		sy &= 0x1ff;
-		if (sx > 512-16) sx -= 512;
-		if (sy > 512-16) sy -= 512;
-
-		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,cliprect,TRANSPARENCY_PEN_TABLE,7);
-	}
-}
-
-/* Same as tnk3 but sprite attribute bit 5 is extra bank bit instead of y-flip. */
-VIDEO_UPDATE( athena )
-{
-	UINT8 *ram = snk_rambase - 0xd000;
-	int attributes = ram[0xc800];
-	/*
-        X-------
-        -X------    character bank (for text layer)
-        --X-----
-        ---X----    scrolly MSB (background)
-        ----X---    scrolly MSB (sprites)
-        -----X--
-        ------X-    scrollx MSB (background)
-        -------X    scrollx MSB (sprites)
-    */
-
-	// TODO attributes & 0x80 is screen flip
-
-	/* to be moved to memmap */
-	spriteram = &ram[0xd000];
-
-	{
-		int bg_scrollx = -ram[0xcc00] + 15;
-		int bg_scrolly = -ram[0xcb00] + 8;
-		if(attributes & 0x02) bg_scrollx += 256;
-		if(attributes & 0x10) bg_scrolly += 256;
-		tnk3_draw_background(screen->machine, bitmap, cliprect, bg_scrollx, bg_scrolly, 64, 64, 0 );
-	}
-
-	{
-		int sp_scrollx = ram[0xca00] + 29;
-		int sp_scrolly = ram[0xc900] + 9;
-		if(attributes & 0x01) sp_scrollx += 256;
-		if(attributes & 0x08) sp_scrolly += 256;
-		athena_draw_sprites(screen->machine, bitmap, cliprect, sp_scrollx, sp_scrolly );
-	}
-
-	{
-		int bank = (attributes & 0x40) ? 1:0;
-
-		tnk3_draw_text(screen->machine, bitmap, cliprect, bank, &ram[0xf800] );
-		tnk3_draw_status(screen->machine, bitmap, cliprect, bank, &ram[0xfc00] );
-	}
-	return 0;
-}
-
-/************************************************************************************/
-
-VIDEO_START( sgladiat )
-{
-	tmpbitmap = auto_bitmap_alloc(512, 256, video_screen_get_format(machine->primary_screen));
-}
-
-static void sgladiat_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int scrollx, int scrolly )
-{
-	const gfx_element *gfx = machine->gfx[1];
-
-	int tile_number, color, sx, sy;
-	int offs, x, y;
-
-	for(x = 0; x < 64; x++) for(y = 0; y < 32; y++)
-	{
-		offs = (x<<5)+y;
-		tile_number = videoram[offs];
-
-		color = 0;
-		sx = x << 3;
-		sy = y << 3;
-
-		drawgfx(tmpbitmap,gfx,tile_number,color,0,0,sx,sy,0,TRANSPARENCY_NONE,0);
-	}
-	copyscrollbitmap(bitmap,tmpbitmap,1,&scrollx,1,&scrolly,cliprect);
-}
-
-VIDEO_UPDATE( sgladiat )
-{
-	UINT8 *pMem = snk_rambase - 0xd000;
-	int attributes, scrollx, scrolly;
-
-	attributes = pMem[0xd300];
-
-	scrollx = -pMem[0xd700] + ((attributes & 2) ? 256:0);
-	scrolly = -pMem[0xd600];
-	scrollx += 15;
-	scrolly += 8;
-	sgladiat_draw_background(screen->machine, bitmap, cliprect, scrollx, scrolly );
-
-	scrollx = pMem[0xd500] + ((attributes & 1) ? 256:0);
-	scrolly = pMem[0xd400];
-	scrollx += 29;
-	scrolly += 9;
-	tnk3_draw_sprites(screen->machine, bitmap, cliprect, scrollx, scrolly );
-
-	tnk3_draw_text(screen->machine, bitmap, cliprect, 0, &pMem[0xf000] );
-	return 0;
-}
-
-/**************************************************************************************/
 
 static void ikari_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int start, int xscroll, int yscroll,
 				UINT8 *source, int mode )
@@ -438,8 +426,15 @@ VIDEO_UPDATE( ikari )
 		ikari_draw_sprites(screen->machine, bitmap, cliprect, 25, sp16_scrollx, sp16_scrolly, &ram[0xe800], 2 );
 	}
 
-	tnk3_draw_text(screen->machine, bitmap, cliprect, -1, &ram[0xf800] );
-	tnk3_draw_status(screen->machine, bitmap, cliprect, -1, &ram[0xfc00] );
+	/* FIXME meaning of 0xc980 uncertain.
+	   Normally 0x20, ikarijp sets it to 0x31 during test mode. Not used anywhere else?
+	   Changing palette bank is necessary to fix colors in ikarijp test mode. */
+	if (ram[0xc980] == 0x31)
+		tilemap_set_palette_offset(fg_tilemap, 16);
+	else
+		tilemap_set_palette_offset(fg_tilemap, 0);
+
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;
 }
 

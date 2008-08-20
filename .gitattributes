@@ -3202,6 +3202,7 @@ src/mame/video/senjyo.c svneol=native#text/plain
 src/mame/video/seta.c svneol=native#text/plain
 src/mame/video/seta2.c svneol=native#text/plain
 src/mame/video/sf.c svneol=native#text/plain
+src/mame/video/sgladiat.c svneol=native#text/plain
 src/mame/video/shadfrce.c svneol=native#text/plain
 src/mame/video/shangha3.c svneol=native#text/plain
 src/mame/video/shangkid.c svneol=native#text/plain

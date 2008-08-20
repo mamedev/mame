@@ -24,21 +24,30 @@ extern int snk_irq_delay;
 
 /*----------- defined in video/snk.c -----------*/
 
+extern PALETTE_INIT( tnk3 );
+
+extern VIDEO_START( tnk3 );
+extern VIDEO_START( ikari );
 extern VIDEO_START( snk );
-extern VIDEO_START( snk_3bpp_shadow );
 extern VIDEO_START( snk_4bpp_shadow );
 extern VIDEO_START( sgladiat );
 
 extern VIDEO_UPDATE( tnk3 );
-extern VIDEO_UPDATE( athena );
 extern VIDEO_UPDATE( ikari );
 extern VIDEO_UPDATE( tdfever );
 extern VIDEO_UPDATE( gwar );
 extern VIDEO_UPDATE( sgladiat );
 
-void tnk3_draw_text( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank, UINT8 *source );
-void tnk3_draw_status( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank, UINT8 *source );
+extern WRITE8_HANDLER( tnk3_videoattrs_w );
+extern WRITE8_HANDLER( tnk3_sp_scrolly_w );
+extern WRITE8_HANDLER( tnk3_sp_scrollx_w );
+extern WRITE8_HANDLER( tnk3_bg_scrolly_w );
+extern WRITE8_HANDLER( tnk3_bg_scrollx_w );
 
+extern UINT8 *tnk3_fg_videoram;
+extern UINT8 *tnk3_bg_videoram;
+extern WRITE8_HANDLER( tnk3_fg_videoram_w );
+extern WRITE8_HANDLER( tnk3_bg_videoram_w );
 
 /*----------- defined in drivers/hal21.c -----------*/
 

@@ -1268,7 +1268,7 @@ $(MAMEOBJ)/snk.a: \
 	$(DRIVERS)/munchmo.o $(VIDEO)/munchmo.o \
 	$(DRIVERS)/prehisle.o $(VIDEO)/prehisle.o \
 	$(DRIVERS)/rockola.o $(AUDIO)/rockola.o $(VIDEO)/rockola.o \
-	$(DRIVERS)/sgladiat.o \
+	$(DRIVERS)/sgladiat.o $(VIDEO)/sgladiat.o \
 	$(DRIVERS)/snk.o $(VIDEO)/snk.o \
 	$(DRIVERS)/snk68.o $(VIDEO)/snk68.o \
 

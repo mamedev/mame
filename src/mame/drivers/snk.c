@@ -1,17 +1,35 @@
 /*
 snk.c
+
 various SNK triple Z80 games
 
-Known Issues:
-- consolidate gfx decode/drivers, if possible
+driver by Bryan McPhail, Acho A. Tang, Nicola Salmoria
+
+Notes:
+------
+- How to enter test mode:
+  tnk3: keep 1 pressed during boot
+  athena: keep 1 pressed during boot
+  fitegolf: use the service mode dip switch
+
+  victroad: keep 1 pressed during boot
+
+TODO:
+-----
+- Fighting Golf: unknown writes to CF00, probably video related.
+
+- The Fighting Golf flyer shows a different gameplay, where button A is pressed
+  multiple times to select the spin. The flyer also says that the game "includes
+  the unique feature of 2 distinct styles of game play, selectable by dipswitch
+  setting. For the avid golfer, a more challenging style of swing.".
+  Either a different ROM set exists, or we are missing some configuration option.
+
 - emulate protection (get rid of patches)
+
+
 
 Bryan McPhail, 27/01/00:
 
-  Fixed Gwar, Gwarj, both working properly now.
-  Renamed Gwarjp to Gwarj.
-  Added Gwara
-  Removed strcmp(drv->names) :)
   Made Gwara (the new clone) the main set, and old gwar to gwara.  This is
   because (what is now) gwara seemingly has a different graphics board.  Fix
   chars and scroll registers are in different locations, while gwar (new)
@@ -30,11 +48,10 @@ Bryan McPhail, 27/01/00:
 Oct. 5, 2003:
 
   Added tdfever2, all ROMs are replacements for those in tdfever except
-  td22.6l, td21.6k, and td20.8k. td20.8k is the reason the new gfx code
-  is needed. Though the gfx appear strange on the vs. screens / choose
-  number of players screens eg. the numbers aren't in the boxes, they're
-  in the lower right corners, and there is no background color like
-  there is in tdfever, this is not a bug, we have confirmed it to be
+  td22.6l, td21.6k, and td20.8k. Though the gfx appear strange on the vs.
+  screens / choose number of players screens eg. the numbers aren't in the
+  boxes, they're in the lower right corners, and there is no background color
+  like there is in tdfever, this is not a bug, we have confirmed it to be
   correct against my pcb.
 
 
@@ -110,7 +127,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 AT042903:
  - fixed Psycho Soldier lyrics tempo
- - fixed char layer alignment in Fighting Golf, Athena and TNK3
  - cleaned garbage tiles in Bermuda Triangle and improved sprite priority
  - corrected tile ROM loading in Bermuda(alt)/Worldwar
  - corrected sound ROM loading and palette in Touchdown Fever
@@ -119,11 +135,8 @@ AT042903:
 AT08XX03:
  - revamped CPU handshaking, improved clipping and made changes public to
    marvins.c, hal21.c and sgladiat.c
- - fixed shadows in tnk3, athena, fitegolf, countryc,
- and fsoccer
- - added highlights to tdfever and fsoccer(needs masking at team selection)
- - notes:
 
+ - notes:
     Mad Crasher and Gladiator(sgladiat.c) have different memory maps but
     their code base and port layouts are quite similar. The following are
     some distinctive designs of these two games common to many other SNK
@@ -221,13 +234,17 @@ Credits (in alphabetical order)
 #include "snk.h"
 #include "sound/3812intf.h"
 
+
+//#define DEBUG_SOUND
+
+static int countryc_trackball;
+
 /*********************************************************************/
 // Variables and Interrupt Handlers Common to All SNK Triple Z80 Games
 
 int snk_gamegroup = 0;
 int snk_sound_busy_bit = 0;
 int snk_irq_delay = 1500;
-static int use_input_cp_hack = 0;
 
 static const UINT32 dial_8_gray[8]   = { 0x0a,0x08,0x0c,0x04,0x05,0x01,0x03,0x0f };
 
@@ -301,19 +318,22 @@ static int snk_rot( running_machine *machine, int which )
 	/* For Guerilla War we add a 0xf0 value for 1 input read once every 8 rotations.
      * 0xf0 isn't a valid direction, but avoids the "joystick error" protection
      * which happens when direction changes directly from 0x50<->0x60 8 times.
+     * The rotary joystick is a mechanical 12-way positional switch, so what happens
+     * is that occasionally while rotating the stick none of the switches will be
+     * closed. The protection test verifies that, to prevent replacement of the
+     * rotary stick with a simple TTL counter.
+     * Note that returning 0xf0 just once is enough to disable the test. On the
+     * other hand, always returning 0xf0 inbetween valid values confuses the game.
     */
-	if (use_input_cp_hack)
+	bttn = value & 0x0f;
+	value &= 0xf0;
+	if ((last_value[which] == 0x50 && value == 0x60) || (last_value[which] == 0x60 && value == 0x50))
 	{
-		bttn = value & 0x0f;
-		value &= 0xf0;
-		if ((last_value[which] == 0x50 && value == 0x60) || (last_value[which] == 0x60 && value == 0x50))
-		{
-			if (!cp_count[which]) value = 0xf0;
-			cp_count[which] = (cp_count[which] + 1) & 0x07;
-		}
-		last_value[which] = value;
-		value |= bttn;
+		if (!cp_count[which]) value = 0xf0;
+		cp_count[which] = (cp_count[which] + 1) & 0x07;
 	}
+	last_value[which] = value;
+	value |= bttn;
 
 	return value;
 }
@@ -352,6 +372,208 @@ static int snk_input_port_r( running_machine *machine, int which ){
 }
 
 /*********************************************************************/
+
+enum
+{
+	YM1IRQ_ASSERT,
+	YM1IRQ_CLEAR,
+	YM2IRQ_ASSERT,
+	YM2IRQ_CLEAR,
+	CMDIRQ_BUSY_ASSERT,
+	BUSY_CLEAR,
+	CMDIRQ_CLEAR
+};
+
+// FIXME this should be initialised on machine reset
+static int irqstatus;
+
+static TIMER_CALLBACK( sndirq_update_callback )
+{
+	switch(param)
+	{
+		case YM1IRQ_ASSERT:
+#ifdef DEBUG_SOUND
+logerror("callback: YM1 ASSERT\n");
+#endif
+			irqstatus |= 1;
+			break;
+
+		case YM1IRQ_CLEAR:
+#ifdef DEBUG_SOUND
+logerror("callback: YM1 CLEAR\n");
+#endif
+			irqstatus &= ~1;
+			break;
+
+		case YM2IRQ_ASSERT:
+#ifdef DEBUG_SOUND
+logerror("callback: YM2 ASSERT\n");
+#endif
+			irqstatus |= 2;
+			break;
+
+		case YM2IRQ_CLEAR:
+#ifdef DEBUG_SOUND
+logerror("callback: YM2 CLEAR\n");
+#endif
+			irqstatus &= ~2;
+			break;
+
+		case CMDIRQ_BUSY_ASSERT:
+#ifdef DEBUG_SOUND
+logerror("callback: CMD ASSERT\n");
+#endif
+			irqstatus |= 8|4;
+			break;
+
+		case BUSY_CLEAR:
+#ifdef DEBUG_SOUND
+logerror("callback: BUSY CLEAR\n");
+#endif
+			irqstatus &= ~4;
+			break;
+
+		case CMDIRQ_CLEAR:
+#ifdef DEBUG_SOUND
+logerror("callback: CMD CLEAR\n");
+#endif
+			irqstatus &= ~8;
+			break;
+	}
+
+	cpunum_set_input_line(machine, 2, 0, (irqstatus & 0xb) ? ASSERT_LINE : CLEAR_LINE);
+
+#ifdef DEBUG_SOUND
+popmessage("%d",irqstatus);
+#endif
+}
+
+
+static WRITE8_HANDLER( tnk3_soundlatch_w )
+{
+#ifdef DEBUG_SOUND
+logerror("soundlatch_w %02x\n", data);
+#endif
+	soundlatch_w(machine, offset, data);
+	timer_call_after_resynch(NULL, CMDIRQ_BUSY_ASSERT, sndirq_update_callback);
+}
+
+static READ8_HANDLER(tnk3_cmdirq_ack_r)
+{
+	soundlatch_w(machine, 0, 0);
+	timer_call_after_resynch(NULL, CMDIRQ_CLEAR, sndirq_update_callback);
+	return 0xff;
+}
+
+static void ymirq_callback_1(running_machine *machine, int irq)
+{
+#ifdef DEBUG_SOUND
+logerror("ym callback 1 %d\n",irq);
+#endif
+	if (irq)
+		timer_call_after_resynch(NULL, YM1IRQ_ASSERT, sndirq_update_callback);
+}
+
+static void ymirq_callback_2(running_machine *machine, int irq)
+{
+#ifdef DEBUG_SOUND
+logerror("ym callback 2 %d\n",irq);
+#endif
+	if (irq)
+		timer_call_after_resynch(NULL, YM2IRQ_ASSERT, sndirq_update_callback);
+}
+
+static READ8_HANDLER(tnk3_ymirq_ack_r)
+{
+	timer_call_after_resynch(NULL, YM1IRQ_CLEAR, sndirq_update_callback);
+	return 0xff;
+}
+
+static READ8_HANDLER(tnk3_busy_clear_r)
+{
+	timer_call_after_resynch(NULL, BUSY_CLEAR, sndirq_update_callback);
+	return 0xff;
+}
+
+static const ym3526_interface athena_ym3526_interface_1 =
+{
+	ymirq_callback_1
+};
+
+static const ym3526_interface athena_ym3526_interface_2 =
+{
+	ymirq_callback_2
+};
+
+static const ym3812_interface fitegolf_ym3812_interface =
+{
+	ymirq_callback_1
+};
+
+static CUSTOM_INPUT( soundcmd_status )
+{
+	return (irqstatus & 4) ? 1 : 0;
+}
+
+
+
+static READ8_HANDLER(athena_sound_status_r)
+{
+#ifdef DEBUG_SOUND
+logerror("read status: %x\n",irqstatus);
+#endif
+
+	return irqstatus;
+}
+
+static READ8_HANDLER(athena_soundlatch_r)
+{
+#ifdef DEBUG_SOUND
+logerror("soundlatch_r %02x\n",soundlatch_r(machine, 0));
+#endif
+	return soundlatch_r(machine, 0);
+}
+
+static WRITE8_HANDLER(athena_irq_ack_w)
+{
+#ifdef DEBUG_SOUND
+logerror("%04x: irq_ack_w %02x\n",activecpu_get_pc(),data);
+#endif
+
+	if (~data & 0x10)	// ack YM1 irq
+{
+#ifdef DEBUG_SOUND
+logerror("ym1 ack\n");
+#endif
+		timer_call_after_resynch(NULL, YM1IRQ_CLEAR, sndirq_update_callback);
+}
+
+	if (~data & 0x20)	// ack YM2 irq
+{
+#ifdef DEBUG_SOUND
+logerror("ym2 ack\n");
+#endif
+		timer_call_after_resynch(NULL, YM2IRQ_CLEAR, sndirq_update_callback);
+}
+
+	if (~data & 0x40)	// clear busy flag
+{
+#ifdef DEBUG_SOUND
+logerror("busy clear\n");
+#endif
+		timer_call_after_resynch(NULL, BUSY_CLEAR, sndirq_update_callback);
+}
+
+	if (~data & 0x80)	// ack command from main cpu
+{
+#ifdef DEBUG_SOUND
+logerror("cmd ack\n");
+#endif
+		timer_call_after_resynch(NULL, CMDIRQ_CLEAR, sndirq_update_callback);
+}
+}
+
+
 
 static WRITE8_HANDLER( snk_sound_register_w ){
 	snk_sound_register &= (data>>4);
@@ -395,64 +617,6 @@ static READ8_HANDLER( snk_soundlatch_clear_r ){ /* TNK3 */
 	snk_sound_register = 0;
 	return 0x00;
 }
-
-/*********************************************************************/
-
-static ADDRESS_MAP_START( YM3526_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
-	AM_RANGE(0xc000, 0xc000) AM_READ(snk_soundlatch_clear_r)
-	AM_RANGE(0xe000, 0xe000) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym3526_write_port_0_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( YM3526_YM3526_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3526_write_port_0_w)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(ym3526_status_port_1_r, ym3526_control_port_1_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(ym3526_write_port_1_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_register_r, snk_sound_register_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( YM3526_Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3526_write_port_0_w)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(y8950_status_port_0_r, y8950_control_port_0_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(y8950_write_port_0_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_register_r, snk_sound_register_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( YM3812_Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3812_write_port_0_w)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(y8950_status_port_0_r, y8950_control_port_0_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(y8950_write_port_0_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_register_r, snk_sound_register_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(y8950_status_port_0_r, y8950_control_port_0_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(y8950_write_port_0_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_register_r, snk_sound_register_w)
-ADDRESS_MAP_END
-
 
 /**********************  Tnk3, Athena, Fighting Golf ********************/
 
@@ -536,21 +700,76 @@ static WRITE8_HANDLER( cpuB_io_w )
 	if (offset==0 || offset==0x700) snk_cpuB_nmi_ack_w(machine, 0, 0);
 }
 
+static WRITE8_HANDLER( athena_coin_counter_w )
+{
+	coin_counter_w(0, ~data & 2);
+	coin_counter_w(1, ~data & 1);
+}
+
+static WRITE8_HANDLER( countryc_trackball_w )
+{
+	countryc_trackball = data & 1;
+}
+
+static CUSTOM_INPUT( countryc_trackball_x )
+{
+	return input_port_read(field->port->machine, countryc_trackball ? "TRACKBALLX2" : "TRACKBALLX1");
+}
+
+static CUSTOM_INPUT( countryc_trackball_y )
+{
+	return input_port_read(field->port->machine, countryc_trackball ? "TRACKBALLY2" : "TRACKBALLY1");
+}
+
+
 /**********************  Tnk3, Athena, Fighting Golf ********************/
 
 static ADDRESS_MAP_START( tnk3_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(cpuA_io_r, cpuA_io_w) AM_BASE(&io_ram)
-	AM_RANGE(0xd000, 0xf7ff) AM_RAM AM_SHARE(2) AM_BASE(&snk_rambase)
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
+	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
+	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")
+	// c300 is an input in tnk3, output in athena/fitegolf (coin counter)
+	// and in countryc (trackball select) (see DRIVER_INIT).
+	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE(athena_coin_counter_w)
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(tnk3_soundlatch_w)
+	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(tnk3_videoattrs_w)	// flip screen, char bank, scroll msb
+	AM_RANGE(0xc900, 0xc900) AM_WRITE(tnk3_sp_scrolly_w)
+	AM_RANGE(0xca00, 0xca00) AM_WRITE(tnk3_sp_scrollx_w)
+	AM_RANGE(0xcb00, 0xcb00) AM_WRITE(tnk3_bg_scrolly_w)
+	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(tnk3_bg_scrollx_w)
+	AM_RANGE(0xcf00, 0xcf00) AM_WRITENOP	// fitegolf/countryc only. Either 0 or 1. Video related?
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE(1) AM_BASE(&spriteram)	// + work ram
+	AM_RANGE(0xd800, 0xf7ff) AM_RAM_WRITE(tnk3_bg_videoram_w) AM_SHARE(2) AM_BASE(&tnk3_bg_videoram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(tnk3_fg_videoram_w) AM_SHARE(3) AM_BASE(&tnk3_fg_videoram)	// + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tnk3_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(cpuB_io_r, cpuB_io_w)
-	AM_RANGE(0xc800, 0xefff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// tnk3, athena
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// fitegolf
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xd000, 0xefff) AM_RAM_WRITE(tnk3_bg_videoram_w) AM_SHARE(2)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(tnk3_fg_videoram_w) AM_SHARE(3)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( ikari_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(cpuA_io_r, cpuA_io_w) AM_BASE(&io_ram)
+	AM_RANGE(0xd000, 0xf7ff) AM_RAM AM_SHARE(1) AM_BASE(&snk_rambase)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(tnk3_fg_videoram_w) AM_SHARE(2) AM_BASE(&tnk3_fg_videoram)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( ikari_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(cpuB_io_r, cpuB_io_w)
+	AM_RANGE(0xd000, 0xf7ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(tnk3_fg_videoram_w) AM_SHARE(2)
 ADDRESS_MAP_END
 
 
@@ -567,6 +786,1462 @@ static ADDRESS_MAP_START( cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(cpuB_io_r, cpuB_io_w)
 	AM_RANGE(0xd000, 0xffff) AM_RAM AM_SHARE(1)
 ADDRESS_MAP_END
+
+/***********************************************************************/
+
+static ADDRESS_MAP_START( tnk3_YM3526_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xc000, 0xc000) AM_READ(tnk3_busy_clear_r)
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym3526_write_port_0_w)
+	AM_RANGE(0xe004, 0xe004) AM_READ(tnk3_cmdirq_ack_r)
+	AM_RANGE(0xe006, 0xe006) AM_READ(tnk3_ymirq_ack_r)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( athena_YM3526_YM3526_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(0xe000, 0xe000) AM_READ(athena_soundlatch_r)
+	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3526_write_port_0_w)
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE(ym3526_status_port_1_r, ym3526_control_port_1_w)
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(ym3526_write_port_1_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(athena_sound_status_r, athena_irq_ack_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( fitegolf_YM3812_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(0xe000, 0xe000) AM_READ(athena_soundlatch_r)
+	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(athena_sound_status_r, athena_irq_ack_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( YM3526_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+	AM_RANGE(0xc000, 0xc000) AM_READ(snk_soundlatch_clear_r)
+	AM_RANGE(0xe000, 0xe000) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(ym3526_write_port_0_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( YM3526_YM3526_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
+	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3526_write_port_0_w)
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE(ym3526_status_port_1_r, ym3526_control_port_1_w)
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(ym3526_write_port_1_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_register_r, snk_sound_register_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( YM3526_Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
+	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3526_write_port_0_w)
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE(y8950_status_port_0_r, y8950_control_port_0_w)
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(y8950_write_port_0_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_register_r, snk_sound_register_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( YM3812_Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
+	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
+	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE(y8950_status_port_0_r, y8950_control_port_0_w)
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(y8950_write_port_0_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_register_r, snk_sound_register_w)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
+	AM_RANGE(0xf000, 0xf000) AM_READWRITE(y8950_status_port_0_r, y8950_control_port_0_w)
+	AM_RANGE(0xf400, 0xf400) AM_WRITE(y8950_write_port_0_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_register_r, snk_sound_register_w)
+ADDRESS_MAP_END
+
+/*********************************************************************/
+
+#define SNK_JOY1_PORT \
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) \
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) \
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) \
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) \
+	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12) \
+
+#define SNK_JOY2_PORT \
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) \
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) \
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) \
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) \
+	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
+
+#define SNK_JOY1_NODIAL_PORT \
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) \
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) \
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) \
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) \
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
+
+#define SNK_JOY2_NODIAL_PORT \
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) \
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) \
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) \
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) \
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+#define SNK_BUTTON_PORT \
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) \
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) \
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) \
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) \
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+#define SNK_COINAGE \
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) ) \
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) ) \
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) ) \
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) ) \
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
+
+
+
+
+static INPUT_PORTS_START( tnk3 )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundcmd_status, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12) \
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Walk everywhere (Cheat)") PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW1:4,5,6")
+	/* 0x08 and 0x10: 1 Coin/1 Credit */
+	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPSETTING(    0xc0, "20k 60k" )
+	PORT_DIPSETTING(    0x80, "40k 90k" )
+	PORT_DIPSETTING(    0x40, "50k 120k" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Bonus Occurrence" ) PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPSETTING(    0x01, "1st & every 2nd" )
+	PORT_DIPSETTING(    0x00, "1st & 2nd only" )
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:2,3")
+	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x18, 0x10, "Game Mode" ) PORT_DIPLOCATION("DSW2:4,5")
+	PORT_DIPSETTING(    0x18, "Demo Sounds Off" )
+	PORT_DIPSETTING(    0x10, "Demo Sounds On" )
+	PORT_DIPSETTING(    0x00, "Freeze" )
+	PORT_DIPSETTING(    0x08, "Infinite Lives (Cheat)")
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7") // unused in manual
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( athena )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundcmd_status, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:1") /* Listed as "Unused" in the manual */
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" ) PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x04, "1st & every 2nd" )
+	PORT_DIPSETTING(    0x00, "1st & 2nd only" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW1:4")
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DSW1:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Freeze" ) PORT_DIPLOCATION("DSW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("DSW2:5,6")
+	PORT_DIPSETTING(    0x30, "50k 100k" )
+	PORT_DIPSETTING(    0x20, "80k 160k" )
+	PORT_DIPSETTING(    0x10, "100k 200k" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7") /* Listed as "Unused" in the manual */
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Energy" ) PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, "12" )
+	PORT_DIPSETTING(    0x00, "14" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( fitegolf )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundcmd_status, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Language ) ) PORT_DIPLOCATION("DSW1:1") /* Version */
+	PORT_DIPSETTING(    0x01, DEF_STR( English ) )  /* Over Sea */
+	PORT_DIPSETTING(    0x00, DEF_STR( Japanese ) ) /* Domestic */
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x04, "Upright 2 Players" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DSW1:4,5")
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DSW1:6,7")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Shot Time" ) PORT_DIPLOCATION("DSW2:1")
+	PORT_DIPSETTING(    0x00, "Short (10 sec)" )
+	PORT_DIPSETTING(    0x01, "Long (12 sec)" )
+	PORT_DIPNAME( 0x02, 0x02, "Bonus Holes" ) PORT_DIPLOCATION("DSW2:2")
+	PORT_DIPSETTING(    0x02, "5 (Par 1,Birdie 2,Eagle 3)" )
+	PORT_DIPSETTING(    0x00, "3 (Par 0,Birdie 1,Eagle 2)" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" ) PORT_DIPLOCATION("DSW2:3,4")
+	PORT_DIPSETTING(    0x04, "Demo Sounds Off" )
+	PORT_DIPSETTING(    0x0c, "Demo Sounds On" )
+	PORT_DIPSETTING(    0x00, "Freeze" )
+	PORT_DIPSETTING(    0x08, "Endless Game (Cheat)")
+	PORT_DIPNAME( 0x30, 0x30, "Play Holes" ) PORT_DIPLOCATION("DSW2:5,6")
+	PORT_DIPSETTING(    0x30, "2" )
+	PORT_DIPSETTING(    0x20, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW ) PORT_DIPLOCATION("DSW2:8")
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( countryc )
+	PORT_INCLUDE( fitegolf )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(countryc_trackball_x, 0)
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(countryc_trackball_y, 0)
+
+	PORT_START("TRACKBALLX1")
+	PORT_BIT( 0x7f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+
+	PORT_START("TRACKBALLY1")
+	PORT_BIT( 0x7f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+
+	PORT_START("TRACKBALLX2")
+	PORT_BIT( 0x7f, 0x00, IPT_TRACKBALL_X ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_REVERSE PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+
+	PORT_START("TRACKBALLY2")
+	PORT_BIT( 0x7f, 0x00, IPT_TRACKBALL_Y ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Controls ) ) PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Dual ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DSW1:6,7")
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )
+INPUT_PORTS_END
+
+
+
+static INPUT_PORTS_START( ikari )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* sound CPU status */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN1")
+	SNK_JOY1_PORT
+
+
+
+	PORT_START("IN2")
+	SNK_JOY2_PORT
+
+
+	PORT_START("IN3")
+	SNK_BUTTON_PORT
+
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Allow killing each other" )
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x02, "P1 & P2 Fire Buttons" )
+	PORT_DIPSETTING(    0x02, "Separate" )
+	PORT_DIPSETTING(    0x00, "Common" )
+	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
+	PORT_DIPSETTING(    0x04, "1st & every 2nd" )
+	PORT_DIPSETTING(    0x00, "1st & 2nd only" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	SNK_COINAGE
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" )
+	PORT_DIPSETTING(    0x0c, "Demo Sounds Off" )
+	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
+	PORT_DIPSETTING(    0x04, "Freeze" )
+	PORT_DIPSETTING(    0x00, "Infinite Lives (Cheat)")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x30, "50k 100k" )
+	PORT_DIPSETTING(    0x20, "60k 120k" )
+	PORT_DIPSETTING(    0x10, "100k 200k" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x40 ,0x40, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( ikarijp )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,IPT_UNKNOWN ) /* sound CPU status */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* tilt? */
+
+	PORT_START("IN1")
+	SNK_JOY1_PORT
+
+
+
+	PORT_START("IN2")
+	SNK_JOY2_PORT
+
+
+	PORT_START("IN3")
+	SNK_BUTTON_PORT
+
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Allow killing each other" )
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x02, "P1 & P2 Fire Buttons" )
+	PORT_DIPSETTING(    0x02, "Separate" )
+	PORT_DIPSETTING(    0x00, "Common" )
+	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
+	PORT_DIPSETTING(    0x04, "1st & every 2nd" )
+	PORT_DIPSETTING(    0x00, "1st & 2nd only" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	SNK_COINAGE
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" )
+	PORT_DIPSETTING(    0x0c, "Demo Sounds Off" )
+	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
+	PORT_DIPSETTING(    0x04, "Freeze" )
+	PORT_DIPSETTING(    0x00, "Infinite Lives (Cheat)")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x30, "50k 100k" )
+	PORT_DIPSETTING(    0x20, "60k 120k" )
+	PORT_DIPSETTING(    0x10, "100k 200k" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x40 ,0x40, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( ikarijpb )
+	PORT_INCLUDE(ikarijp)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(8) PORT_WRAPS PORT_REMAP_TABLE(dial_8_gray) PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_FULL_TURN_COUNT(8)
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(8) PORT_WRAPS PORT_REMAP_TABLE(dial_8_gray) PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_FULL_TURN_COUNT(8)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( victroad )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) 	/* sound related ??? */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN1")
+	SNK_JOY1_PORT
+
+
+
+	PORT_START("IN2")
+	SNK_JOY2_PORT
+
+
+	PORT_START("IN3")
+	SNK_BUTTON_PORT
+
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Kill friend & walk everywhere (Cheat)")
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x02, "P1 & P2 Fire Buttons" )
+	PORT_DIPSETTING(    0x02, "Separate" )
+	PORT_DIPSETTING(    0x00, "Common" )
+	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
+	PORT_DIPSETTING(    0x04, "1st & every 2nd" )
+	PORT_DIPSETTING(    0x00, "1st & 2nd only" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	SNK_COINAGE
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" )
+	PORT_DIPSETTING(    0x0c, "Demo Sounds Off" )
+	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
+	PORT_DIPSETTING(    0x00, "Freeze" )
+	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x30, "50k 100k" )
+	PORT_DIPSETTING(    0x20, "60k 120k" )
+	PORT_DIPSETTING(    0x10, "100k 200k" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x40 ,0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, "Credits Buy Lives During Play" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( dogosokj )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) 	/* sound related ??? */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN1")
+	SNK_JOY1_NODIAL_PORT
+
+
+	PORT_START("IN2")
+	SNK_JOY2_NODIAL_PORT
+
+
+	PORT_START("IN3")
+	SNK_BUTTON_PORT
+
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, "Kill friend & walk everywhere (Cheat)")
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x02, "P1 & P2 Fire Buttons" )
+	PORT_DIPSETTING(    0x02, "Separate" )
+	PORT_DIPSETTING(    0x00, "Common" )
+	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
+	PORT_DIPSETTING(    0x04, "1st & every 2nd" )
+	PORT_DIPSETTING(    0x00, "1st & 2nd only" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	SNK_COINAGE
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" )
+	PORT_DIPSETTING(    0x0c, "Demo Sounds Off" )
+	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
+	PORT_DIPSETTING(    0x00, "Freeze" )
+	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x30, "50k 100k" )
+	PORT_DIPSETTING(    0x20, "60k 120k" )
+	PORT_DIPSETTING(    0x10, "100k 200k" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x40 ,0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( gwar )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) 	/* sound related ??? */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* causes reset */
+	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN1")
+	SNK_JOY1_PORT
+
+
+
+	PORT_START("IN2")
+	SNK_JOY2_PORT
+
+
+	PORT_START("IN3")
+	SNK_BUTTON_PORT
+
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
+	PORT_DIPSETTING(    0x04, "1st & 2nd only" )
+	PORT_DIPSETTING(    0x00, "1st & every 2nd" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	SNK_COINAGE
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Freeze" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x30, "30k 60k" )
+	PORT_DIPSETTING(    0x20, "40k 80k" )
+	PORT_DIPSETTING(    0x10, "50k 100k" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x40 ,0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bermudat )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* sound CPU status */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* tile? */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN1")
+	SNK_JOY1_PORT
+
+
+
+	PORT_START("IN2")
+	SNK_JOY2_PORT
+
+
+	PORT_START("IN3")
+	SNK_BUTTON_PORT
+
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
+	PORT_DIPSETTING(    0x04, "1st & every 2nd" )
+	PORT_DIPSETTING(    0x00, "1st & 2nd only" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	SNK_COINAGE
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" )
+	PORT_DIPSETTING(    0x0c, "Demo Sounds Off" )
+	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
+	PORT_DIPSETTING(    0x00, "Freeze" )
+	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x30, "50k 100k" )
+	PORT_DIPSETTING(    0x20, "60k 120k" )
+	PORT_DIPSETTING(    0x10, "100k 200k" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0xc0, 0xc0, "Game Style" )
+	PORT_DIPSETTING(    0xc0, "Normal without continue" )
+	PORT_DIPSETTING(    0x80, "Normal with continue" )
+	PORT_DIPSETTING(    0x40, "Time attack 3 minutes" )
+	PORT_DIPSETTING(    0x00, "Time attack 5 minutes" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bermudaa )
+	PORT_INCLUDE( bermudat )
+
+	PORT_MODIFY("IN0")
+	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW)
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x30, "25k 50k" )
+	PORT_DIPSETTING(    0x20, "35k 70k" )
+	PORT_DIPSETTING(    0x10, "50K 100k" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+/* Same as Bermudaa, but has different Bonus Life */
+static INPUT_PORTS_START( worldwar )
+	PORT_INCLUDE( bermudaa )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x30, "50k 100k" )
+	PORT_DIPSETTING(    0x20, "80k 160k" )
+	PORT_DIPSETTING(    0x10, "100k 200k" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( psychos )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound related */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* reset */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+
+	PORT_START("IN2")
+	SNK_BUTTON_PORT
+
+
+	PORT_START("DSW1")
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
+	PORT_DIPSETTING(    0x00, "1st & every 2nd" )
+	PORT_DIPSETTING(    0x04, "1st & 2nd only" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	SNK_COINAGE
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Freeze" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x30, "50K 100K" )
+	PORT_DIPSETTING(    0x20, "60K 120K" )
+	PORT_DIPSETTING(    0x10, "100K 200K" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( legofair )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound CPU status */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )  /* Reset */
+	PORT_SERVICE_NO_TOGGLE(0x08, 0x08 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
+	PORT_DIPSETTING(    0x00, "1st & every 2nd" )
+	PORT_DIPSETTING(    0x04, "1st & 2nd only" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	SNK_COINAGE
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" )
+	PORT_DIPSETTING(    0x08, "Demo Sounds Off" )
+	PORT_DIPSETTING(    0x0c, "Demo Sounds On" )
+	PORT_DIPSETTING(    0x00, "Freeze" )
+	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x30, "50k 100k" )
+	PORT_DIPSETTING(    0x20, "75k 150k" )
+	PORT_DIPSETTING(    0x10, "100k 200k" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( choppera )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound CPU status */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )  /* Reset */
+	PORT_SERVICE_NO_TOGGLE(0x08, 0x08)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN1")
+	SNK_JOY1_NODIAL_PORT
+
+
+	PORT_START("IN2")
+	SNK_JOY2_NODIAL_PORT
+
+
+	PORT_START("IN3")
+	SNK_BUTTON_PORT
+
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
+	PORT_DIPSETTING(    0x00, "1st & every 2nd" )
+	PORT_DIPSETTING(    0x04, "1st & 2nd only" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x08, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	SNK_COINAGE
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" )
+	PORT_DIPSETTING(    0x08, "Demo Sounds Off" )
+	PORT_DIPSETTING(    0x0c, "Demo Sounds On" )
+	PORT_DIPSETTING(    0x00, "Freeze" )
+	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x30, "50k 100k" )
+	PORT_DIPSETTING(    0x20, "75k 150k" )
+	PORT_DIPSETTING(    0x10, "100k 200k" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( fsoccer )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound CPU status */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start Game A")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Start Game B")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Start Game E")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
+
+	PORT_START("IN5")	/* Only used in the "test mode" in this version */
+	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN6")	/* Only used in the "test mode" in this version */
+	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN7")	/* Only used in the "test mode" in this version */
+	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(3)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN8")	/* Only used in the "test mode" in this version */
+	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(4)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x03, "Upright (With VS)" )
+	PORT_DIPSETTING(    0x02, "Upright (Without VS)" )
+	PORT_DIPSETTING(    0x00, "Cocktail (2 Players)" )
+	PORT_DIPSETTING(    0x01, "Cocktail (4 Players)" )
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Version ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Europe ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( USA ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Japan ) )
+/*  PORT_DIPSETTING(    0x0c, DEF_STR( Europe ) ) */
+	SNK_COINAGE
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" )
+	PORT_DIPSETTING(    0x08, "Demo Sound Off" )
+	PORT_DIPSETTING(    0x0c, "Demo Sound On" )
+	PORT_DIPSETTING(    0x00, "Freeze" )
+	PORT_DIPSETTING(    0x04, "Win Match Against CPU (Cheat)")
+	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Game_Time ) )	/* See notes */
+	PORT_DIPSETTING(    0x10, "1:00" )
+	PORT_DIPSETTING(    0x60, "1:10" )
+	PORT_DIPSETTING(    0x50, "1:20" )
+	PORT_DIPSETTING(    0x40, "1:30" )
+	PORT_DIPSETTING(    0x30, "1:40" )
+	PORT_DIPSETTING(    0x20, "1:50" )
+	PORT_DIPSETTING(    0x70, "2:00" )
+	PORT_DIPSETTING(    0x00, "2:10" )
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START("IN9")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 ) PORT_NAME("Start Game C")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 ) PORT_NAME("Start Game D")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tdfever )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound CPU status */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start Game A")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Start Game B")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Start Game E")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
+
+	PORT_START("IN5")
+	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN6")
+	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN7")
+	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(3)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN8")
+	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(4)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x02, "2 Player Upright" )
+	PORT_DIPSETTING(    0x00, "4 Player Cocktail" )
+	PORT_DIPNAME( 0x0c, 0x00, "1st Down Bonus Time" )
+	PORT_DIPSETTING(    0x00, "Every 1st Down" )
+	PORT_DIPSETTING(    0x04, "Every 4 1st Downs" )
+	PORT_DIPSETTING(    0x08, "Every 6 1st Downs" )
+	PORT_DIPSETTING(    0x0c, "Every 8 1st Downs" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )	/* Manual shows these two as blank */
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" )
+	PORT_DIPSETTING(    0x0c, "Demo Sound Off" )
+	PORT_DIPSETTING(    0x08, "Demo Sound On" )
+	PORT_DIPSETTING(    0x00, "Freeze" )
+	PORT_DIPSETTING(    0x04, "Never Finish (Cheat)")
+	PORT_DIPNAME( 0x70, 0x70, "Play Time" )
+	PORT_DIPSETTING(    0x70, "1:00" )
+	PORT_DIPSETTING(    0x60, "1:10" )
+	PORT_DIPSETTING(    0x50, "1:20" )
+	PORT_DIPSETTING(    0x40, "1:30" )
+	PORT_DIPSETTING(    0x30, "1:40" )
+	PORT_DIPSETTING(    0x20, "1:50" )
+	PORT_DIPSETTING(    0x10, "2:00" )
+	PORT_DIPSETTING(    0x00, "2:10" )
+/*
+Actual Play Times listed in manual based on Players & cabinet type:
+
+                Upright/Cocktail     Cocktail Only
+ Dip Switch       A       B         C      D      E    <-- Start button "MODE"
+ SW6 SW7 SW8    1PvsCPU 2PvsCPU   1Pvs2P 2Pvs1P 2Pvs2P
+ OFF OFF OFF     1:00    1:10      2:00   2:10   3:00
+ ON  OFF OFF     1:10    1:20      2:10   2:20   3:10
+ OFF ON  OFF     1:20    1:30      2:20   2:30   3:20
+ ON  ON  OFF     1:30    1:40      2:30   2:40   3:30
+ OFF OFF ON      1:40    1:50      2:40   2:50   3:40
+ ON  OFF ON      1:50    2:00      2:50   3:00   3:50
+ OFF ON  ON      2:00    2:10      3:00   3:10   4:00
+ ON  ON  ON      2:10    2:20      3:10   3:20   4:10
+*/
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN9")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 ) PORT_NAME("Start Game C")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 ) PORT_NAME("Start Game D")
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tdfeverj )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound CPU status */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start Game A")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Start Game B")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Start Game E")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
+
+	PORT_START("IN5")
+	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN6")
+	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN7")
+	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(3)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN8")
+	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(4)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, "2 Player Upright" )
+	PORT_DIPSETTING(    0x02, "4 Player Cocktail" )
+	PORT_DIPNAME( 0x0c, 0x00, "1st Down Bonus Time" )
+	PORT_DIPSETTING(    0x00, "Every 1st Down" )
+	PORT_DIPSETTING(    0x04, "Every 4 1st Downs" )
+	PORT_DIPSETTING(    0x08, "Every 6 1st Downs" )
+	PORT_DIPSETTING(    0x0c, "Every 8 1st Downs" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )	/* Manual shows these two as blank */
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" )
+	PORT_DIPSETTING(    0x0c, "Demo Sound Off" )
+	PORT_DIPSETTING(    0x08, "Demo Sound On" )
+	PORT_DIPSETTING(    0x00, "Freeze" )
+	PORT_DIPSETTING(    0x04, "Never Finish (Cheat)")
+	PORT_DIPNAME( 0x70, 0x70, "Play Time" )
+	PORT_DIPSETTING(    0x70, "1:00" )
+	PORT_DIPSETTING(    0x60, "1:10" )
+	PORT_DIPSETTING(    0x50, "1:20" )
+	PORT_DIPSETTING(    0x40, "1:30" )
+	PORT_DIPSETTING(    0x30, "1:40" )
+	PORT_DIPSETTING(    0x20, "1:50" )
+	PORT_DIPSETTING(    0x10, "2:00" )
+	PORT_DIPSETTING(    0x00, "2:10" )
+/*
+Actual Play Times listed in manual based on Players & cabinet type:
+
+                Upright/Cocktail     Cocktail Only
+ Dip Switch       A       B         C      D      E    <-- Start button "MODE"
+ SW6 SW7 SW8    1PvsCPU 2PvsCPU   1Pvs2P 2Pvs1P 2Pvs2P
+ OFF OFF OFF     1:00    1:10      2:00   2:10   3:00
+ ON  OFF OFF     1:10    1:20      2:10   2:20   3:10
+ OFF ON  OFF     1:20    1:30      2:20   2:30   3:20
+ ON  ON  OFF     1:30    1:40      2:30   2:40   3:30
+ OFF OFF ON      1:40    1:50      2:40   2:50   3:40
+ ON  OFF ON      1:50    2:00      2:50   3:00   3:50
+ OFF ON  ON      2:00    2:10      3:00   3:10   4:00
+ ON  ON  ON      2:10    2:20      3:10   3:20   4:10
+*/
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN9")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 ) PORT_NAME("Start Game C")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 ) PORT_NAME("Start Game D")
+INPUT_PORTS_END
 
 /*********************************************************************/
 
@@ -677,7 +2352,7 @@ static GFXDECODE_START( tnk3 )
 GFXDECODE_END
 
 static GFXDECODE_START( ikari )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout_4bpp,      0x100, 0x100>>4 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout_4bpp,      0x180, 0x080>>4 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_4bpp,      0x100, 0x100>>4 )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_3bpp,    0x000, 0x080>>3 )
 	GFXDECODE_ENTRY( "gfx4", 0, bigspritelayout_3bpp, 0x080, 0x080>>3 )
@@ -712,51 +2387,7 @@ static MACHINE_DRIVER_START( tnk3 )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(YM3526_sound_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
-
-	MDRV_INTERLEAVE(100)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(36*8, 28*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
-
-	MDRV_GFXDECODE(tnk3)
-	MDRV_PALETTE_LENGTH(0x400)
-
-	MDRV_PALETTE_INIT(aso)
-	MDRV_VIDEO_START(snk_3bpp_shadow)
-	MDRV_VIDEO_UPDATE(tnk3)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("ym", YM3526, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym3526_interface_0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( athena )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_13_4MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(tnk3_cpuA_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-
-	MDRV_CPU_ADD("sub", Z80, XTAL_13_4MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(tnk3_cpuB_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-
-	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(YM3526_YM3526_sound_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MDRV_CPU_PROGRAM_MAP(tnk3_YM3526_sound_map,0)
 
 	MDRV_INTERLEAVE(300)
 
@@ -765,7 +2396,6 @@ static MACHINE_DRIVER_START( athena )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
@@ -773,19 +2403,54 @@ static MACHINE_DRIVER_START( athena )
 	MDRV_GFXDECODE(tnk3)
 	MDRV_PALETTE_LENGTH(0x400)
 
-	MDRV_PALETTE_INIT(aso)
-	MDRV_VIDEO_START(snk_3bpp_shadow)
-	MDRV_VIDEO_UPDATE(athena)
+	MDRV_PALETTE_INIT(tnk3)
+	MDRV_VIDEO_START(tnk3)
+	MDRV_VIDEO_UPDATE(tnk3)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
+	MDRV_SOUND_ADD("ym", YM3526, XTAL_8MHz/2) /* verified on pcb */
+	MDRV_SOUND_CONFIG(athena_ym3526_interface_1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 3.0)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( athena )
+
+	MDRV_IMPORT_FROM(tnk3)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("audio")
+	MDRV_CPU_PROGRAM_MAP(athena_YM3526_YM3526_sound_map,0)
+
+	/* sound hardware */
+	MDRV_SOUND_REMOVE("ym")
+
 	MDRV_SOUND_ADD("ym1", YM3526, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym3526_interface_0)
+	MDRV_SOUND_CONFIG(athena_ym3526_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_SOUND_ADD("ym2", YM3526, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym3526_interface_1)
+	MDRV_SOUND_CONFIG(athena_ym3526_interface_2)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( fitegolf )
+
+	MDRV_IMPORT_FROM(tnk3)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("audio")
+	// xtal is 4MHz instead of 8MHz/2 but the end result is the same
+	MDRV_CPU_PROGRAM_MAP(fitegolf_YM3812_sound_map,0)
+
+	/* sound hardware */
+	MDRV_SOUND_REMOVE("ym")
+
+	MDRV_SOUND_ADD("ym", YM3812, XTAL_4MHz) /* verified on pcb */
+	MDRV_SOUND_CONFIG(fitegolf_ym3812_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -794,11 +2459,11 @@ static MACHINE_DRIVER_START( ikari )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, XTAL_13_4MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpuA_map,0)
+	MDRV_CPU_PROGRAM_MAP(ikari_cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_13_4MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpuB_map,0)
+	MDRV_CPU_PROGRAM_MAP(ikari_cpuB_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz/2) /* verified on pcb */
@@ -812,7 +2477,6 @@ static MACHINE_DRIVER_START( ikari )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
@@ -821,7 +2485,7 @@ static MACHINE_DRIVER_START( ikari )
 	MDRV_PALETTE_LENGTH(0x400)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_VIDEO_START(snk_3bpp_shadow)
+	MDRV_VIDEO_START(ikari)
 	MDRV_VIDEO_UPDATE(ikari)
 
 	/* sound hardware */
@@ -841,11 +2505,11 @@ static MACHINE_DRIVER_START( victroad )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, XTAL_13_4MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpuA_map,0)
+	MDRV_CPU_PROGRAM_MAP(ikari_cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_13_4MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpuB_map,0)
+	MDRV_CPU_PROGRAM_MAP(ikari_cpuB_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz/2) /* verified on pcb */
@@ -859,7 +2523,6 @@ static MACHINE_DRIVER_START( victroad )
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
@@ -868,7 +2531,7 @@ static MACHINE_DRIVER_START( victroad )
 	MDRV_PALETTE_LENGTH(0x400)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_VIDEO_START(snk_3bpp_shadow)
+	MDRV_VIDEO_START(ikari)
 	MDRV_VIDEO_UPDATE(ikari)
 
 	/* sound hardware */
@@ -904,10 +2567,9 @@ static MACHINE_DRIVER_START( gwar )
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(400, 224)
-	MDRV_SCREEN_VISIBLE_AREA(8, 399-8, 0, 223)
+	MDRV_SCREEN_SIZE(50*8, 28*8)
+	MDRV_SCREEN_VISIBLE_AREA(1*8, 49*8-1, 0*8, 28*8-1)
 
 	MDRV_GFXDECODE(gwar)
 	MDRV_PALETTE_LENGTH(0x400)
@@ -950,10 +2612,9 @@ static MACHINE_DRIVER_START( bermudat )
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(400, 224)
-	MDRV_SCREEN_VISIBLE_AREA(16, 399, 0, 223)
+	MDRV_SCREEN_SIZE(50*8, 28*8)
+	MDRV_SCREEN_VISIBLE_AREA(2*8, 49*8-1, 0*8, 28*8-1)
 
 	MDRV_GFXDECODE(gwar)
 	MDRV_PALETTE_LENGTH(0x400)
@@ -995,10 +2656,9 @@ static MACHINE_DRIVER_START( psychos )
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(400, 224)
-	MDRV_SCREEN_VISIBLE_AREA(8, 399-8, 0, 223)
+	MDRV_SCREEN_SIZE(50*8, 28*8)
+	MDRV_SCREEN_VISIBLE_AREA(1*8, 49*8-1, 0*8, 28*8-1)
 
 	MDRV_GFXDECODE(gwar)
 	MDRV_PALETTE_LENGTH(0x400)
@@ -1040,10 +2700,9 @@ static MACHINE_DRIVER_START( chopper1 )
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(400, 224)
-	MDRV_SCREEN_VISIBLE_AREA(8, 399-8, 0, 223)
+	MDRV_SCREEN_SIZE(50*8, 28*8)
+	MDRV_SCREEN_VISIBLE_AREA(1*8, 49*8-1, 0*8, 28*8-1)
 
 	MDRV_GFXDECODE(gwar)
 	MDRV_PALETTE_LENGTH(0x400)
@@ -1074,7 +2733,7 @@ static MACHINE_DRIVER_START( tdfever )
 
 	MDRV_CPU_ADD("sub", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(cpuB_map,0)
-//  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+//	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	snk_irq_AB replaces this
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map,0)
@@ -1083,61 +2742,13 @@ static MACHINE_DRIVER_START( tdfever )
 	MDRV_INTERLEAVE(300)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_HAS_SHADOWS)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1000))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(400,224)
-	MDRV_SCREEN_VISIBLE_AREA(8, 399-8, 0, 223)
-
-	MDRV_GFXDECODE(tdfever)
-	MDRV_PALETTE_LENGTH(0x400)
-
-	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_VIDEO_START(snk_4bpp_shadow)
-	MDRV_VIDEO_UPDATE(tdfever)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("ym1", YM3526, 4000000)
-	MDRV_SOUND_CONFIG(ym3526_interface_0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MDRV_SOUND_ADD("ym2", Y8950, 4000000)
-	MDRV_SOUND_CONFIG(y8950_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( tdfever2 )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(cpuA_map,0)
-	MDRV_CPU_VBLANK_INT("main", snk_irq_AB)
-
-	MDRV_CPU_ADD("sub", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(cpuB_map,0)
-//  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-
-	MDRV_CPU_ADD("audio", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-
-	MDRV_INTERLEAVE(300)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_HAS_SHADOWS)
-
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1000))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(400,224)
-	MDRV_SCREEN_VISIBLE_AREA(8, 399-8, 0, 223)
+	MDRV_SCREEN_SIZE(50*8, 28*8)
+	MDRV_SCREEN_VISIBLE_AREA(1*8, 49*8-1, 0*8, 28*8-1)
 
 	MDRV_GFXDECODE(tdfever)
 	MDRV_PALETTE_LENGTH(0x400)
@@ -1177,14 +2788,13 @@ static MACHINE_DRIVER_START( fsoccer )
 	MDRV_INTERLEAVE(100)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_HAS_SHADOWS)
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(400,224)
-	MDRV_SCREEN_VISIBLE_AREA(8, 399-8, 0, 223)
+	MDRV_SCREEN_SIZE(50*8, 28*8)
+	MDRV_SCREEN_VISIBLE_AREA(1*8, 49*8-1, 0*8, 28*8-1)
 
 	MDRV_GFXDECODE(tdfever)
 	MDRV_PALETTE_LENGTH(0x400)
@@ -1376,6 +2986,7 @@ ROM_START( fitegol2 )
 	ROM_LOAD( "pal20l8a.6r", 0x0400, 0x0144, CRC(0f011673) SHA1(383e6f6e78daec9c874d5b48378111ca60f5ed64) )
 ROM_END
 
+/***********************************************************************/
 
 /*
 Country Club
@@ -1409,9 +3020,9 @@ ROMs  :
         cc8.7e      27c256      \
         cc9.7g        ''         | gfx
         cc10.7h       ''        /
-    cc1pr.5f    63s441      \
-    cc2pr.5g      ''         | proms
-    cc3pr.5h      ''        /
+        cc1pr.5f    63s441      \
+        cc2pr.5g      ''         | proms
+        cc3pr.5h      ''        /
 
 
 3rd PCB (Video board)
@@ -2851,1382 +4462,6 @@ ROM_END
 
 /***********************************************************************/
 
-#define SNK_JOY1_PORT \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12) \
-
-#define SNK_JOY2_PORT \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
-
-#define SNK_JOY1_NODIAL_PORT \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
-
-#define SNK_JOY2_NODIAL_PORT \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-#define SNK_BUTTON_PORT \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) \
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) \
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-#define SNK_COINAGE \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) ) \
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
-
-static INPUT_PORTS_START( ikari )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* sound CPU status */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("IN1")
-	SNK_JOY1_PORT
-
-
-
-	PORT_START("IN2")
-	SNK_JOY2_PORT
-
-
-	PORT_START("IN3")
-	SNK_BUTTON_PORT
-
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Allow killing each other" )
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, "P1 & P2 Fire Buttons" )
-	PORT_DIPSETTING(    0x02, "Separate" )
-	PORT_DIPSETTING(    0x00, "Common" )
-	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
-	PORT_DIPSETTING(    0x04, "1st & every 2nd" )
-	PORT_DIPSETTING(    0x00, "1st & 2nd only" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	SNK_COINAGE
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" )
-	PORT_DIPSETTING(    0x0c, "Demo Sounds Off" )
-	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
-	PORT_DIPSETTING(    0x04, "Freeze" )
-	PORT_DIPSETTING(    0x00, "Infinite Lives (Cheat)")
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x30, "50k 100k" )
-	PORT_DIPSETTING(    0x20, "60k 120k" )
-	PORT_DIPSETTING(    0x10, "100k 200k" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40 ,0x40, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( ikarijp )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW,IPT_UNKNOWN ) /* sound CPU status */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* tilt? */
-
-	PORT_START("IN1")
-	SNK_JOY1_PORT
-
-
-
-	PORT_START("IN2")
-	SNK_JOY2_PORT
-
-
-	PORT_START("IN3")
-	SNK_BUTTON_PORT
-
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Allow killing each other" )
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, "P1 & P2 Fire Buttons" )
-	PORT_DIPSETTING(    0x02, "Separate" )
-	PORT_DIPSETTING(    0x00, "Common" )
-	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
-	PORT_DIPSETTING(    0x04, "1st & every 2nd" )
-	PORT_DIPSETTING(    0x00, "1st & 2nd only" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	SNK_COINAGE
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" )
-	PORT_DIPSETTING(    0x0c, "Demo Sounds Off" )
-	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
-	PORT_DIPSETTING(    0x04, "Freeze" )
-	PORT_DIPSETTING(    0x00, "Infinite Lives (Cheat)")
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x30, "50k 100k" )
-	PORT_DIPSETTING(    0x20, "60k 120k" )
-	PORT_DIPSETTING(    0x10, "100k 200k" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40 ,0x40, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( ikarijpb )
-	PORT_INCLUDE(ikarijp)
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(8) PORT_WRAPS PORT_REMAP_TABLE(dial_8_gray) PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_FULL_TURN_COUNT(8)
-
-	PORT_MODIFY("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(8) PORT_WRAPS PORT_REMAP_TABLE(dial_8_gray) PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_FULL_TURN_COUNT(8)
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( victroad )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) 	/* sound related ??? */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("IN1")
-	SNK_JOY1_PORT
-
-
-
-	PORT_START("IN2")
-	SNK_JOY2_PORT
-
-
-	PORT_START("IN3")
-	SNK_BUTTON_PORT
-
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Kill friend & walk everywhere (Cheat)")
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, "P1 & P2 Fire Buttons" )
-	PORT_DIPSETTING(    0x02, "Separate" )
-	PORT_DIPSETTING(    0x00, "Common" )
-	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
-	PORT_DIPSETTING(    0x04, "1st & every 2nd" )
-	PORT_DIPSETTING(    0x00, "1st & 2nd only" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	SNK_COINAGE
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" )
-	PORT_DIPSETTING(    0x0c, "Demo Sounds Off" )
-	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
-	PORT_DIPSETTING(    0x00, "Freeze" )
-	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x30, "50k 100k" )
-	PORT_DIPSETTING(    0x20, "60k 120k" )
-	PORT_DIPSETTING(    0x10, "100k 200k" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40 ,0x00, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, "Credits Buy Lives During Play" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( dogosokj )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) 	/* sound related ??? */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("IN1")
-	SNK_JOY1_NODIAL_PORT
-
-
-	PORT_START("IN2")
-	SNK_JOY2_NODIAL_PORT
-
-
-	PORT_START("IN3")
-	SNK_BUTTON_PORT
-
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Kill friend & walk everywhere (Cheat)")
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, "P1 & P2 Fire Buttons" )
-	PORT_DIPSETTING(    0x02, "Separate" )
-	PORT_DIPSETTING(    0x00, "Common" )
-	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
-	PORT_DIPSETTING(    0x04, "1st & every 2nd" )
-	PORT_DIPSETTING(    0x00, "1st & 2nd only" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	SNK_COINAGE
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" )
-	PORT_DIPSETTING(    0x0c, "Demo Sounds Off" )
-	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
-	PORT_DIPSETTING(    0x00, "Freeze" )
-	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x30, "50k 100k" )
-	PORT_DIPSETTING(    0x20, "60k 120k" )
-	PORT_DIPSETTING(    0x10, "100k 200k" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40 ,0x00, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( gwar )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) 	/* sound related ??? */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* causes reset */
-	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("IN1")
-	SNK_JOY1_PORT
-
-
-
-	PORT_START("IN2")
-	SNK_JOY2_PORT
-
-
-	PORT_START("IN3")
-	SNK_BUTTON_PORT
-
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
-	PORT_DIPSETTING(    0x04, "1st & 2nd only" )
-	PORT_DIPSETTING(    0x00, "1st & every 2nd" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	SNK_COINAGE
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Freeze" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x30, "30k 60k" )
-	PORT_DIPSETTING(    0x20, "40k 80k" )
-	PORT_DIPSETTING(    0x10, "50k 100k" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40 ,0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( athena )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound CPU status */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) /* Listed as "Unused" in the manual */
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
-	PORT_DIPSETTING(    0x04, "1st & every 2nd" )
-	PORT_DIPSETTING(    0x00, "1st & 2nd only" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	SNK_COINAGE
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Freeze" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x30, "50k 100k" )
-	PORT_DIPSETTING(    0x20, "80k 160k" )
-	PORT_DIPSETTING(    0x10, "100k 200k" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) /* Listed as "Unused" in the manual */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Energy" )
-	PORT_DIPSETTING(    0x80, "12" )
-	PORT_DIPSETTING(    0x00, "14" )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( tnk3 )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* sound CPU status */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0xf0, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0xf0, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
-
-	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Walk everywhere (Cheat)")
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x04, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coinage ) )
-	/* 0x08 and 0x10: 1 Coin/1 Credit */
-	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0xc0, "20k 60k" )
-	PORT_DIPSETTING(    0x80, "40k 90k" )
-	PORT_DIPSETTING(    0x40, "50k 120k" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Bonus Occurrence" )
-	PORT_DIPSETTING(    0x01, "1st & every 2nd" )
-	PORT_DIPSETTING(    0x00, "1st & 2nd only" )
-	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x18, 0x10, "Game Mode" )
-	PORT_DIPSETTING(    0x18, "Demo Sounds Off" )
-	PORT_DIPSETTING(    0x10, "Demo Sounds On" )
-	PORT_DIPSETTING(    0x00, "Freeze" )
-	PORT_DIPSETTING(    0x08, "Infinite Lives (Cheat)")
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) ) // unused in manual
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( bermudat )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* sound CPU status */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* tile? */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("IN1")
-	SNK_JOY1_PORT
-
-
-
-	PORT_START("IN2")
-	SNK_JOY2_PORT
-
-
-	PORT_START("IN3")
-	SNK_BUTTON_PORT
-
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
-	PORT_DIPSETTING(    0x04, "1st & every 2nd" )
-	PORT_DIPSETTING(    0x00, "1st & 2nd only" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	SNK_COINAGE
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" )
-	PORT_DIPSETTING(    0x0c, "Demo Sounds Off" )
-	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
-	PORT_DIPSETTING(    0x00, "Freeze" )
-	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x30, "50k 100k" )
-	PORT_DIPSETTING(    0x20, "60k 120k" )
-	PORT_DIPSETTING(    0x10, "100k 200k" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "Game Style" )
-	PORT_DIPSETTING(    0xc0, "Normal without continue" )
-	PORT_DIPSETTING(    0x80, "Normal with continue" )
-	PORT_DIPSETTING(    0x40, "Time attack 3 minutes" )
-	PORT_DIPSETTING(    0x00, "Time attack 5 minutes" )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( bermudaa )
-	PORT_INCLUDE( bermudat )
-
-	PORT_MODIFY("IN0")
-	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW)
-
-	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-
-	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x30, "25k 50k" )
-	PORT_DIPSETTING(    0x20, "35k 70k" )
-	PORT_DIPSETTING(    0x10, "50K 100k" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-/* Same as Bermudaa, but has different Bonus Life */
-static INPUT_PORTS_START( worldwar )
-	PORT_INCLUDE( bermudaa )
-
-	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x30, "50k 100k" )
-	PORT_DIPSETTING(    0x20, "80k 160k" )
-	PORT_DIPSETTING(    0x10, "100k 200k" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( psychos )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound related */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* reset */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-
-	PORT_START("IN2")
-	SNK_BUTTON_PORT
-
-
-	PORT_START("DSW1")
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
-	PORT_DIPSETTING(    0x00, "1st & every 2nd" )
-	PORT_DIPSETTING(    0x04, "1st & 2nd only" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	SNK_COINAGE
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Freeze" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x30, "50K 100K" )
-	PORT_DIPSETTING(    0x20, "60K 120K" )
-	PORT_DIPSETTING(    0x10, "100K 200K" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( legofair )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound CPU status */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )  /* Reset */
-	PORT_SERVICE_NO_TOGGLE(0x08, 0x08 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
-	PORT_DIPSETTING(    0x00, "1st & every 2nd" )
-	PORT_DIPSETTING(    0x04, "1st & 2nd only" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	SNK_COINAGE
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" )
-	PORT_DIPSETTING(    0x08, "Demo Sounds Off" )
-	PORT_DIPSETTING(    0x0c, "Demo Sounds On" )
-	PORT_DIPSETTING(    0x00, "Freeze" )
-	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x30, "50k 100k" )
-	PORT_DIPSETTING(    0x20, "75k 150k" )
-	PORT_DIPSETTING(    0x10, "100k 200k" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( choppera )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound CPU status */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )  /* Reset */
-	PORT_SERVICE_NO_TOGGLE(0x08, 0x08)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("IN1")
-	SNK_JOY1_NODIAL_PORT
-
-
-	PORT_START("IN2")
-	SNK_JOY2_NODIAL_PORT
-
-
-	PORT_START("IN3")
-	SNK_BUTTON_PORT
-
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
-	PORT_DIPSETTING(    0x00, "1st & every 2nd" )
-	PORT_DIPSETTING(    0x04, "1st & 2nd only" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	SNK_COINAGE
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" )
-	PORT_DIPSETTING(    0x08, "Demo Sounds Off" )
-	PORT_DIPSETTING(    0x0c, "Demo Sounds On" )
-	PORT_DIPSETTING(    0x00, "Freeze" )
-	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x30, "50k 100k" )
-	PORT_DIPSETTING(    0x20, "75k 150k" )
-	PORT_DIPSETTING(    0x10, "100k 200k" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( fitegolf )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound related? */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Language ) ) /* Version */
-	PORT_DIPSETTING(    0x01, DEF_STR( English ) )  /* Over Sea */
-	PORT_DIPSETTING(    0x00, DEF_STR( Japanese ) ) /* Domestic */
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Shot Time" )
-	PORT_DIPSETTING(    0x00, "Short (10 sec)" )
-	PORT_DIPSETTING(    0x01, "Long (12 sec)" )
-	PORT_DIPNAME( 0x02, 0x02, "Bonus Holes" )
-	PORT_DIPSETTING(    0x02, "5 (Par 1,Birdie 2,Eagle 3)" )
-	PORT_DIPSETTING(    0x00, "3 (Par 0,Birdie 1,Eagle 2)" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" )
-	PORT_DIPSETTING(    0x08, "Endless Game (Cheat)")
-	PORT_DIPSETTING(    0x0c, "Demo Sound On" )
-	PORT_DIPSETTING(    0x00, "Freeze" )
-	PORT_DIPSETTING(    0x04, "Demo Sound Off" )
-	PORT_DIPNAME( 0x30, 0x30, "Play Holes" )
-	PORT_DIPSETTING(    0x30, "2" )
-	PORT_DIPSETTING(    0x20, "3" )
-	PORT_DIPSETTING(    0x10, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( countryc )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound related? */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x7f, 0x00, IPT_TRACKBALL_X  ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30) PORT_REVERSE
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x7f, 0x00, IPT_TRACKBALL_Y  ) PORT_SENSITIVITY(50) PORT_KEYDELTA(30)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 )
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Language ) ) /* NOT showed in Test Mode/Manual */
-	PORT_DIPSETTING(    0x01, DEF_STR( English ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Japanese ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )  /* Trackball */
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )  /* 1 System */
-	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) ) /* 2 Systems */
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_4C ) )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Shot Time" )
-	PORT_DIPSETTING(    0x00, "Short (10 sec)" )
-	PORT_DIPSETTING(    0x01, "Long (12 sec)" )
-	PORT_DIPNAME( 0x02, 0x02, "Bonus Holes" )
-	PORT_DIPSETTING(    0x02, "5 (Par 1,Birdie 2,Eagle 3)" )
-	PORT_DIPSETTING(    0x00, "3 (Par 0,Birdie 1,Eagle 2)" )
-	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" )
-	PORT_DIPSETTING(    0x08, "Endless Game (Cheat)")
-	PORT_DIPSETTING(    0x0c, "Demo Sound On" )
-	PORT_DIPSETTING(    0x00, "Freeze" )
-	PORT_DIPSETTING(    0x04, "Demo Sound Off" )
-	PORT_DIPNAME( 0x30, 0x30, "Play Holes" )
-	PORT_DIPSETTING(    0x30, "2" )
-	PORT_DIPSETTING(    0x20, "3" )
-	PORT_DIPSETTING(    0x10, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( fsoccer )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound CPU status */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start Game A")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Start Game B")
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-
-	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Start Game E")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
-
-	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
-
-	PORT_START("IN5")	/* Only used in the "test mode" in this version */
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN6")	/* Only used in the "test mode" in this version */
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN7")	/* Only used in the "test mode" in this version */
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(3)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN8")	/* Only used in the "test mode" in this version */
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x03, "Upright (With VS)" )
-	PORT_DIPSETTING(    0x02, "Upright (Without VS)" )
-	PORT_DIPSETTING(    0x00, "Cocktail (2 Players)" )
-	PORT_DIPSETTING(    0x01, "Cocktail (4 Players)" )
-	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Version ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Europe ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( USA ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Japan ) )
-/*  PORT_DIPSETTING(    0x0c, DEF_STR( Europe ) ) */
-	SNK_COINAGE
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" )
-	PORT_DIPSETTING(    0x08, "Demo Sound Off" )
-	PORT_DIPSETTING(    0x0c, "Demo Sound On" )
-	PORT_DIPSETTING(    0x00, "Freeze" )
-	PORT_DIPSETTING(    0x04, "Win Match Against CPU (Cheat)")
-	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Game_Time ) )	/* See notes */
-	PORT_DIPSETTING(    0x10, "1:00" )
-	PORT_DIPSETTING(    0x60, "1:10" )
-	PORT_DIPSETTING(    0x50, "1:20" )
-	PORT_DIPSETTING(    0x40, "1:30" )
-	PORT_DIPSETTING(    0x30, "1:40" )
-	PORT_DIPSETTING(    0x20, "1:50" )
-	PORT_DIPSETTING(    0x70, "2:00" )
-	PORT_DIPSETTING(    0x00, "2:10" )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
-
-	PORT_START("IN9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 ) PORT_NAME("Start Game C")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 ) PORT_NAME("Start Game D")
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( tdfever )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound CPU status */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start Game A")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Start Game B")
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-
-	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Start Game E")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
-
-	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
-
-	PORT_START("IN5")
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN6")
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN7")
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(3)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN8")
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x02, "2 Player Upright" )
-	PORT_DIPSETTING(    0x00, "4 Player Cocktail" )
-	PORT_DIPNAME( 0x0c, 0x00, "1st Down Bonus Time" )
-	PORT_DIPSETTING(    0x00, "Every 1st Down" )
-	PORT_DIPSETTING(    0x04, "Every 4 1st Downs" )
-	PORT_DIPSETTING(    0x08, "Every 6 1st Downs" )
-	PORT_DIPSETTING(    0x0c, "Every 8 1st Downs" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )	/* Manual shows these two as blank */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" )
-	PORT_DIPSETTING(    0x0c, "Demo Sound Off" )
-	PORT_DIPSETTING(    0x08, "Demo Sound On" )
-	PORT_DIPSETTING(    0x00, "Freeze" )
-	PORT_DIPSETTING(    0x04, "Never Finish (Cheat)")
-	PORT_DIPNAME( 0x70, 0x70, "Play Time" )
-	PORT_DIPSETTING(    0x70, "1:00" )
-	PORT_DIPSETTING(    0x60, "1:10" )
-	PORT_DIPSETTING(    0x50, "1:20" )
-	PORT_DIPSETTING(    0x40, "1:30" )
-	PORT_DIPSETTING(    0x30, "1:40" )
-	PORT_DIPSETTING(    0x20, "1:50" )
-	PORT_DIPSETTING(    0x10, "2:00" )
-	PORT_DIPSETTING(    0x00, "2:10" )
-/*
-Actual Play Times listed in manual based on Players & cabinet type:
-
-                Upright/Cocktail     Cocktail Only
- Dip Switch       A       B         C      D      E    <-- Start button "MODE"
- SW6 SW7 SW8    1PvsCPU 2PvsCPU   1Pvs2P 2Pvs1P 2Pvs2P
- OFF OFF OFF     1:00    1:10      2:00   2:10   3:00
- ON  OFF OFF     1:10    1:20      2:10   2:20   3:10
- OFF ON  OFF     1:20    1:30      2:20   2:30   3:20
- ON  ON  OFF     1:30    1:40      2:30   2:40   3:30
- OFF OFF ON      1:40    1:50      2:40   2:50   3:40
- ON  OFF ON      1:50    2:00      2:50   3:00   3:50
- OFF ON  ON      2:00    2:10      3:00   3:10   4:00
- ON  ON  ON      2:10    2:20      3:10   3:20   4:10
-*/
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 ) PORT_NAME("Start Game C")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 ) PORT_NAME("Start Game D")
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( tdfeverj )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound CPU status */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start Game A")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Start Game B")
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-
-	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Start Game E")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
-
-	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
-
-	PORT_START("IN5")
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN6")
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN7")
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(3)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN8")
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, "2 Player Upright" )
-	PORT_DIPSETTING(    0x02, "4 Player Cocktail" )
-	PORT_DIPNAME( 0x0c, 0x00, "1st Down Bonus Time" )
-	PORT_DIPSETTING(    0x00, "Every 1st Down" )
-	PORT_DIPSETTING(    0x04, "Every 4 1st Downs" )
-	PORT_DIPSETTING(    0x08, "Every 6 1st Downs" )
-	PORT_DIPSETTING(    0x0c, "Every 8 1st Downs" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )	/* Manual shows these two as blank */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" )
-	PORT_DIPSETTING(    0x0c, "Demo Sound Off" )
-	PORT_DIPSETTING(    0x08, "Demo Sound On" )
-	PORT_DIPSETTING(    0x00, "Freeze" )
-	PORT_DIPSETTING(    0x04, "Never Finish (Cheat)")
-	PORT_DIPNAME( 0x70, 0x70, "Play Time" )
-	PORT_DIPSETTING(    0x70, "1:00" )
-	PORT_DIPSETTING(    0x60, "1:10" )
-	PORT_DIPSETTING(    0x50, "1:20" )
-	PORT_DIPSETTING(    0x40, "1:30" )
-	PORT_DIPSETTING(    0x30, "1:40" )
-	PORT_DIPSETTING(    0x20, "1:50" )
-	PORT_DIPSETTING(    0x10, "2:00" )
-	PORT_DIPSETTING(    0x00, "2:10" )
-/*
-Actual Play Times listed in manual based on Players & cabinet type:
-
-                Upright/Cocktail     Cocktail Only
- Dip Switch       A       B         C      D      E    <-- Start button "MODE"
- SW6 SW7 SW8    1PvsCPU 2PvsCPU   1Pvs2P 2Pvs1P 2Pvs2P
- OFF OFF OFF     1:00    1:10      2:00   2:10   3:00
- ON  OFF OFF     1:10    1:20      2:10   2:20   3:10
- OFF ON  OFF     1:20    1:30      2:20   2:30   3:20
- ON  ON  OFF     1:30    1:40      2:30   2:40   3:30
- OFF OFF ON      1:40    1:50      2:40   2:50   3:40
- ON  OFF ON      1:50    2:00      2:50   3:00   3:50
- OFF ON  ON      2:00    2:10      3:00   3:10   4:00
- ON  ON  ON      2:10    2:20      3:10   3:20   4:10
-*/
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 ) PORT_NAME("Start Game C")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 ) PORT_NAME("Start Game D")
-INPUT_PORTS_END
-
-/***********************************************************************/
-
 /* input port configuration */
 
 static const SNK_INPUT_PORT_TYPE athena_io[SNK_MAX_INPUT_PORTS] = {
@@ -4367,7 +4602,6 @@ static DRIVER_INIT( gwar ){
 	hard_flags = 0;
 	videoram = snk_rambase + 0x800;
 	snk_gamegroup = 2;
-	use_input_cp_hack = 1;
 }
 
 static DRIVER_INIT( gwara ){
@@ -4376,7 +4610,6 @@ static DRIVER_INIT( gwara ){
 	hard_flags = 0;
 	videoram = snk_rambase + 0x800;
 	snk_gamegroup = 4;
-	use_input_cp_hack = 1;
 }
 
 static DRIVER_INIT( chopper ){
@@ -4444,30 +4677,6 @@ static DRIVER_INIT( fsoccer ){
 	snk_gamegroup = 7;
 }
 
-static DRIVER_INIT( tnk3 ){
-	snk_sound_busy_bit = 0x20;
-	snk_io = ikari_io;
-	hard_flags = 0;
-	videoram = snk_rambase + 0x800;
-	snk_gamegroup = 1;
-}
-
-static DRIVER_INIT( athena ){
-	snk_sound_busy_bit = 0x01;
-	snk_io = athena_io;
-	hard_flags = 0;
-	videoram = snk_rambase + 0x800;
-	snk_gamegroup = 1;
-}
-
-static DRIVER_INIT( fitegolf ){
-	snk_sound_busy_bit = 0x01;
-	snk_io = athena_io;
-	hard_flags = 0;
-	videoram = snk_rambase + 0x800;
-	snk_gamegroup = 1;
-}
-
 static DRIVER_INIT( psychos ){
 	snk_sound_busy_bit = 0x01;
 	snk_io = athena_io;
@@ -4476,13 +4685,20 @@ static DRIVER_INIT( psychos ){
 	snk_gamegroup = 0;
 }
 
+
+static DRIVER_INIT( countryc )
+{
+	// replace coin counter with trackball select
+	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc300, 0xc300, 0, 0, countryc_trackball_w);
+}
+
 /*          rom       parent    machine   inp       init */
-GAME( 1985, tnk3,     0,        tnk3,     tnk3,     tnk3,     ROT270, "SNK", "T.N.K. III (US)", GAME_NO_COCKTAIL )
-GAME( 1985, tnk3j,    tnk3,     tnk3,     tnk3,     tnk3,     ROT270, "SNK", "T.A.N.K. (Japan)", GAME_NO_COCKTAIL )
-GAME( 1986, athena,   0,        athena,   athena,   athena,   ROT0,   "SNK", "Athena", GAME_NO_COCKTAIL )
-GAME( 1988, fitegolf, 0,        athena,   fitegolf, fitegolf, ROT0,   "SNK", "Fighting Golf (World?)", GAME_NO_COCKTAIL )
-GAME( 1988, fitegol2, fitegolf, athena,   fitegolf, fitegolf, ROT0,   "SNK", "Fighting Golf (US)", GAME_NO_COCKTAIL )
-GAME( 1988, countryc, fitegolf, athena,   countryc, fitegolf, ROT0,   "SNK", "Country Club", GAME_NO_COCKTAIL )
+GAME( 1985, tnk3,     0,        tnk3,     tnk3,     0,        ROT270, "SNK", "T.N.K III (US)", 0 )
+GAME( 1985, tnk3j,    tnk3,     tnk3,     tnk3,     0,        ROT270, "SNK", "T.A.N.K (Japan)", 0 )
+GAME( 1986, athena,   0,        athena,   athena,   0,        ROT0,   "SNK", "Athena", 0 )
+GAME( 1988, fitegolf, 0,        fitegolf, fitegolf, 0,        ROT0,   "SNK", "Fighting Golf (World?)", 0 )
+GAME( 1988, fitegol2, fitegolf, fitegolf, fitegolf, 0,        ROT0,   "SNK", "Fighting Golf (US)", 0 )
+GAME( 1988, countryc, 0,        fitegolf, countryc, countryc, ROT0,   "SNK", "Country Club", 0 )
 GAME( 1986, ikari,    0,        ikari,    ikari,    ikari,    ROT270, "SNK", "Ikari Warriors (US)", GAME_NO_COCKTAIL )
 GAME( 1986, ikarijp,  ikari,    ikari,    ikarijp,  ikarijp,  ROT270, "SNK", "Ikari (Japan)", GAME_NO_COCKTAIL )
 GAME( 1986, ikarijpb, ikari,    ikari,    ikarijpb, ikarijpb, ROT270, "bootleg", "Ikari (Japan bootleg)", GAME_NO_COCKTAIL )
@@ -4505,8 +4721,7 @@ GAME( 1988, chopperb, chopper,  chopper1, legofair, chopper,  ROT270, "SNK", "Ch
 GAME( 1988, legofair, chopper,  chopper1, legofair, chopper,  ROT270, "SNK", "Koukuu Kihei Monogatari - The Legend of Air Cavalry (Japan)", GAME_NO_COCKTAIL )
 GAME( 1987, tdfever,  0,        tdfever,  tdfever,  tdfever,  ROT270, "SNK", "TouchDown Fever", GAME_NO_COCKTAIL )
 GAME( 1987, tdfeverj, tdfever,  tdfever,  tdfeverj, tdfever, ROT270, "SNK", "TouchDown Fever (Japan)", GAME_NO_COCKTAIL )
-GAME( 1988, tdfever2, tdfever,  tdfever2, tdfever,  tdfever2, ROT270, "SNK", "TouchDown Fever 2", GAME_NO_COCKTAIL ) /* upgrade kit for Touchdown Fever */
+GAME( 1988, tdfever2, tdfever,  tdfever,  tdfever,  tdfever2, ROT270, "SNK", "TouchDown Fever 2", GAME_NO_COCKTAIL ) /* upgrade kit for Touchdown Fever */
 GAME( 1988, fsoccer,  0,        fsoccer,  fsoccer,  fsoccer,  ROT0,   "SNK", "Fighting Soccer (version 4)", GAME_NO_COCKTAIL )
 GAME( 1988, fsoccerj, fsoccer,  fsoccer,  fsoccer,  fsoccer,  ROT0,   "SNK", "Fighting Soccer (Japan)", GAME_NO_COCKTAIL )
 GAME( 1988, fsoccerb, fsoccer,  fsoccer,  fsoccer,  fsoccer,  ROT0,   "bootleg", "Fighting Soccer (joystick hack bootleg)", GAME_NO_COCKTAIL )
-

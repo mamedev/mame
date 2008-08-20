@@ -314,6 +314,62 @@ static void aso_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect, int sc
 	}
 }
 
+static void tnk3_draw_text(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank, UINT8 *source )
+{
+	const gfx_element *gfx = machine->gfx[0];
+
+	int tile_number, color, sx, sy;
+	int x, y;
+
+	for(x=0; x<32; x++) for(y=0; y<32; y++)
+	{
+		tile_number = source[(x<<5)+y];
+
+		if(tile_number == 0x20 || tile_number == 0xff) continue;
+
+		if(bank == -1) color = 8;
+		else
+		{
+			color = tile_number >> 5;
+			tile_number |= bank << 8;
+		}
+		sx = (x+2) << 3;
+		sy = (y+1) << 3;
+
+		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,cliprect,TRANSPARENCY_PEN,15);
+	}
+}
+
+static void tnk3_draw_status_main(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank, UINT8 *source, int start )
+{
+	const gfx_element *gfx = machine->gfx[0];
+
+	int tile_number, color, sx, sy;
+	int x, y;
+
+	for(x = start; x < start+2; x++) for(y = 0; y < 32; y++)
+	{
+		tile_number = source[(x<<5)+y];
+
+		if(bank == -1) color = 8;
+		else
+		{
+ 			color = tile_number >> 5;
+			tile_number |= (bank << 8);
+		}
+		sx = ((x+34)&0x3f) << 3;
+		sy = (y+1) << 3;
+
+		drawgfx(bitmap,gfx,tile_number,color,0,0,sx,sy,cliprect,TRANSPARENCY_NONE,0);
+	}
+}
+
+static void tnk3_draw_status(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bank, UINT8 *source )
+{
+	tnk3_draw_status_main(machine,bitmap,cliprect,bank,source, 0);
+	tnk3_draw_status_main(machine,bitmap,cliprect,bank,source,30);
+}
+
 static VIDEO_UPDATE( aso )
 {
 	int attr, msbs, spsy, spsx, bgsy, bgsx, bank, i;
