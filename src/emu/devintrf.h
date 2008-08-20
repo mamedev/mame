@@ -254,6 +254,9 @@ void devtag_reset(running_machine *machine, device_type type, const char *tag);
 
 /* ----- device information getters ----- */
 
+/* return the device associated with a tag */
+const device_config *devtag_get_device(running_machine *machine, device_type type, const char *tag);
+
 /* return the token associated with an allocated device */
 void *devtag_get_token(running_machine *machine, device_type type, const char *tag);
 

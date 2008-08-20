@@ -591,6 +591,26 @@ void *devtag_get_token(running_machine *machine, device_type type, const char *t
 
 
 /*-------------------------------------------------
+    devtag_get_device - return the device associated
+    with a tag
+-------------------------------------------------*/
+
+const device_config *devtag_get_device(running_machine *machine, device_type type, const char *tag)
+{
+	const device_config *device;
+
+	assert(machine != NULL);
+	assert(type != NULL);
+	assert(tag != NULL);
+
+	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
+	if (device == NULL)
+		fatalerror("devtag_get_device failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
+	return device;
+}
+
+
+/*-------------------------------------------------
     devtag_get_static_config - return a pointer to
     the static configuration for a device based on
     type and tag
