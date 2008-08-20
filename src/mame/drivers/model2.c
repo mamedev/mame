@@ -4469,11 +4469,11 @@ GAME( 199?, rchase2,         0, model2b, model2, 0,       ROT0, "Sega", "Rail Ch
 // Model 2C-CRX (TGPx4, SCSP sound board)
 GAME( 1996, skisuprg,        0, model2c, model2, 0, ROT0, "Sega", "Sega Ski Super G", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, stcc,            0, model2c, model2, 0, ROT0, "Sega", "Sega Touring Car Championship (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, waverunr,        0, model2c, model2, 0, ROT0, "Sega", "Wave Runner (Japan, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, hotd,            0, model2c, model2, 0, ROT0, "Sega", "House of the Dead", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, overrev,         0, model2c, model2, 0, ROT0, "Jaleco", "Over Rev (Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatr,        0, model2c, model2, 0, ROT0, "Sega", "Top Skater (Export, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, topskatu, topskatr, model2c, model2, 0, ROT0, "Sega", "Top Skater (USA)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, waverunr,        0, model2c, model2, 0, ROT0, "Sega", "Wave Runner (Japan, Revision A)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, bel,             0, model2c, bel,    0, ROT0, "Sega/EPL Productions", "Behind Enemy Lines", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, dynmcopc, dynamcop, model2c, model2, 0, ROT0, "Sega", "Dynamite Cop (USA, Model 2C)", GAME_NOT_WORKING|GAME_IMPERFECT_GRAPHICS )
 
