@@ -3825,14 +3825,14 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( doa )		/* 1996 */
 	DRIVER( sgt24h )	/* 1996 */
 	DRIVER( von )		/* 1996 */
-	DRIVER( vonusa )	/* 1996 */
+	DRIVER( vonj )		/* 1996 */
 	DRIVER( dynabb )	/* 1996 */
 	DRIVER( zerogun )	/* 1997 */
 	DRIVER( zerogunj )	/* 1997 */
 	DRIVER( dynmcopb )	/* 1998 */
 	DRIVER( dyndek2b )	/* 1998 */
 	DRIVER( pltkids )	/* 1998 */
-	DRIVER( waverunb )	/* 1997 */
+	DRIVER( waverunr )	/* 1997 */
 	DRIVER( rchase2 )	/* 199? */
 
 	/* Model 2C-CRX (TGPx4, SCSP sound board) */
@@ -3841,7 +3841,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( hotd )		/* 1997 */
 	DRIVER( overrev )	/* 1997 */
 	DRIVER( topskatr )	/* 1997 */
-	DRIVER( waverunr )	/* 1997 */
+	DRIVER( topskatu )	/* 1997 */
 	DRIVER( bel )		/* 1998 */
 	DRIVER( dynmcopc )	/* 1998 */
 
