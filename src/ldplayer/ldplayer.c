@@ -15,11 +15,135 @@
 #include <ctype.h>
 
 
+/*************************************
+ *
+ *  Constants
+ *
+ *************************************/
+
+enum
+{
+	CMD_SCAN_REVERSE,
+	CMD_SCAN_REVERSE_END,
+	CMD_STEP_REVERSE,
+	CMD_SCAN_FORWARD,
+	CMD_SCAN_FORWARD_END,
+	CMD_STEP_FORWARD,
+	CMD_PLAY,
+	CMD_PAUSE,
+	CMD_DISPLAY_ON,
+	CMD_DISPLAY_OFF,
+	CMD_0,
+	CMD_1,
+	CMD_2,
+	CMD_3,
+	CMD_4,
+	CMD_5,
+	CMD_6,
+	CMD_7,
+	CMD_8,
+	CMD_9,
+	CMD_SEARCH
+};
+	
+
+
+/*************************************
+ *
+ *  Globals
+ *
+ *************************************/
+
 static astring *filename;
 
 static input_port_value last_controls;
 static UINT8 playing;
 static UINT8 displaying;
+
+static void (*execute_command)(const device_config *laserdisc, int command);
+
+
+
+/*************************************
+ *
+ *  LD-V1000 implementation
+ *
+ *************************************/
+
+static void ldv1000_execute(const device_config *laserdisc, int command)
+{
+	static const UINT8 digits[10] = { 0x3f, 0x0f, 0x8f, 0x4f, 0x2f, 0xaf, 0x6f, 0x1f, 0x9f, 0x5f };
+	switch (command)
+	{
+		case CMD_SCAN_REVERSE:
+			laserdisc_data_w(laserdisc, 0xf8);
+			playing = TRUE;
+			break;
+		
+		case CMD_SCAN_REVERSE_END:
+			laserdisc_data_w(laserdisc, 0xfd);
+			playing = TRUE;
+			break;
+		
+		case CMD_STEP_REVERSE:
+			laserdisc_data_w(laserdisc, 0xfe);
+			playing = FALSE;
+			break;
+
+		case CMD_SCAN_FORWARD:
+			laserdisc_data_w(laserdisc, 0xf0);
+			playing = TRUE;
+			break;
+
+		case CMD_SCAN_FORWARD_END:
+			laserdisc_data_w(laserdisc, 0xfd);
+			playing = TRUE;
+			break;
+		
+		case CMD_STEP_FORWARD:
+			laserdisc_data_w(laserdisc, 0xf6);
+			playing = FALSE;
+			break;
+		
+		case CMD_PLAY:
+			laserdisc_data_w(laserdisc, 0xfd);
+			playing = TRUE;
+			break;
+		
+		case CMD_PAUSE:
+			laserdisc_data_w(laserdisc, 0xa0);
+			playing = FALSE;
+			break;
+
+		case CMD_DISPLAY_ON:
+			laserdisc_data_w(laserdisc, digits[1]);
+			laserdisc_data_w(laserdisc, 0xf1);
+			break;
+
+		case CMD_DISPLAY_OFF:
+			laserdisc_data_w(laserdisc, digits[0]);
+			laserdisc_data_w(laserdisc, 0xf1);
+			break;
+		
+		case CMD_0:
+		case CMD_1:
+		case CMD_2:
+		case CMD_3:
+		case CMD_4:
+		case CMD_5:
+		case CMD_6:
+		case CMD_7:
+		case CMD_8:
+		case CMD_9:
+			laserdisc_data_w(laserdisc, digits[command - CMD_0]);
+			break;
+		
+		case CMD_SEARCH:
+			laserdisc_data_w(laserdisc, 0xf7);
+			playing = FALSE;
+			break;
+	}
+}
 
 
 
@@ -31,7 +155,6 @@ static UINT8 displaying;
 
 static void process_commands(const device_config *laserdisc)
 {
-	static const UINT8 digits[10] = { 0x3f, 0x0f, 0x8f, 0x4f, 0x2f, 0xaf, 0x6f, 0x1f, 0x9f, 0x5f };
 	input_port_value controls = input_port_read(laserdisc->machine, "controls");
  	int number;
 
@@ -39,56 +162,52 @@ static void process_commands(const device_config *laserdisc)
 	if (!(last_controls & 0x01) && (controls & 0x01))
 	{
 		if (playing)
-			laserdisc_data_w(laserdisc, 0xf8);
+			(*execute_command)(laserdisc, CMD_SCAN_REVERSE);
 		else
-			laserdisc_data_w(laserdisc, 0xfe);
+			(*execute_command)(laserdisc, CMD_STEP_REVERSE);
 	}
 	else if ((last_controls & 0x01) && !(controls & 0x01))
 	{
 		if (playing)
-			laserdisc_data_w(laserdisc, 0xfd);
+			(*execute_command)(laserdisc, CMD_SCAN_REVERSE_END);
 	}
 
 	/* scan/step forwards */
 	if (!(last_controls & 0x02) && (controls & 0x02))
 	{
 		if (playing)
-			laserdisc_data_w(laserdisc, 0xf0);
+			(*execute_command)(laserdisc, CMD_SCAN_FORWARD);
 		else
-			laserdisc_data_w(laserdisc, 0xf6);
+			(*execute_command)(laserdisc, CMD_STEP_FORWARD);
 	}
 	else if ((last_controls & 0x02) && !(controls & 0x02))
 	{
 		if (playing)
-			laserdisc_data_w(laserdisc, 0xfd);
+			(*execute_command)(laserdisc, CMD_SCAN_FORWARD_END);
 	}
 
 	/* play/pause */
 	if (!(last_controls & 0x10) && (controls & 0x10))
 	{
 		playing = !playing;
-		laserdisc_data_w(laserdisc, playing ? 0xfd : 0xa0);
+		(*execute_command)(laserdisc, playing ? CMD_PLAY : CMD_PAUSE);
 	}
 
 	/* toggle display */
 	if (!(last_controls & 0x20) && (controls & 0x20))
 	{
 		displaying = !displaying;
-		laserdisc_data_w(laserdisc, digits[displaying]);
-		laserdisc_data_w(laserdisc, 0xf1);
+		(*execute_command)(laserdisc, displaying ? CMD_DISPLAY_ON : CMD_DISPLAY_OFF);
 	}
 
 	/* numbers */
 	for (number = 0; number < 10; number++)
 		if (!(last_controls & (0x100 << number)) && (controls & (0x100 << number)))
-			laserdisc_data_w(laserdisc, digits[number]);
+			(*execute_command)(laserdisc, CMD_0 + number);
 
 	/* enter */
 	if (!(last_controls & 0x40000) && (controls & 0x40000))
-	{
-		playing = FALSE;
-		laserdisc_data_w(laserdisc, 0xf7);
-	}
+		(*execute_command)(laserdisc, CMD_SEARCH);
 
 	last_controls = controls;
 }
@@ -286,10 +405,14 @@ static DRIVER_INIT( ldplayer )
 
 
 
+static DRIVER_INIT( ldv1000 ) { execute_command = ldv1000_execute; DRIVER_INIT_CALL(ldplayer); }
+
+
+
 /*************************************
  *
  *  Game drivers
  *
  *************************************/
 
-GAME( 2008, ldv1000, 0, ldv1000, ldplayer, ldplayer, ROT0, "MAME", "LDV-1000 Simulator", 0 )
+GAME( 2008, ldv1000, 0, ldv1000, ldplayer, ldv1000, ROT0, "MAME", "LDV-1000 Simulator", 0 )

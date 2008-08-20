@@ -1400,7 +1400,7 @@ ROM_END
  **************************************************************************************************************************
  **************************************************************************************************************************
     Enduro Racer
-    CPU: FD1089A (317-0013A)
+    CPU: FD1089B (317-0013A)
     YM2151 sound board
 
      ASSY CPU BD 837-6001-01
@@ -1472,11 +1472,14 @@ ROM_START( enduror )
 
 	ROM_REGION( 0x2000, "proms", 0 ) /* zoom table */
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
+
+	ROM_REGION( 0x2000, "fd1089b_key", 0 ) /* decryption key */
+	ROM_LOAD( "317-0013a.key", 0x0000, 0x2000, CRC(295e6737) SHA1(2eff36f1f24db1154cf970d4c9fd481ae4f9a57c) )
 ROM_END
 
 /**************************************************************************************************************************
     Enduro Racer
-    CPU: FD1089A (317-0013A)
+    CPU: FD1089B (317-0013A)
     YM2203 sound board
 
      ASSY CPU BD 837-6001-01
@@ -1549,6 +1552,9 @@ ROM_START( enduror1 )
 
 	ROM_REGION( 0x2000, "proms", 0 ) /* zoom table */
 	ROM_LOAD( "epr-6844.ic123", 0x0000, 0x2000, CRC(e3ec7bd6) SHA1(feec0fe664e16fac0fde61cf64b401b9b0575323) )
+
+	ROM_REGION( 0x2000, "fd1089b_key", 0 ) /* decryption key */
+	ROM_LOAD( "317-0013a.key", 0x0000, 0x2000, CRC(295e6737) SHA1(2eff36f1f24db1154cf970d4c9fd481ae4f9a57c) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -1723,7 +1729,7 @@ static DRIVER_INIT( sharrier )
 static DRIVER_INIT( enduror )
 {
 	hangon_generic_init();
-	fd1089_decrypt_0013A(machine);
+	fd1089b_decrypt(machine);
 }
 
 

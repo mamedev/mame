@@ -3406,7 +3406,7 @@ ROM_END
 
 /**************************************************************************************************************************
     Alien Syndrome, Sega System 16B
-    CPU: ????
+    CPU: FD1089A (317-0033)
     ROM Board: 171-5358?
 */
 ROM_START( aliensy3 )
@@ -3438,6 +3438,9 @@ ROM_START( aliensy3 )
 	ROM_LOAD( "epr10724.a8",  0x10000, 0x8000, CRC(f971a817) SHA1(502c95638e4fd5f87e5fc837cb44b39a5d62f4e4) )
 	ROM_LOAD( "epr10725.a9",  0x20000, 0x8000, CRC(6a50e08f) SHA1(d34b2ccadb8b07d5ad99cab5c5b5b79642c65574) )
 	ROM_LOAD( "epr10726.a10", 0x30000, 0x8000, CRC(d50b7736) SHA1(b1f8e3b0cf2ffee5382098100cfabe21b383cd51) )
+
+	ROM_REGION( 0x2000, "fd1089a_key", 0 ) /* decryption key */
+	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(49e882e5) SHA1(29d87af8fc775b22a9a546c112f8f5e7f700ac1a) )
 ROM_END
 
 
@@ -3864,6 +3867,9 @@ ROM_START( aurail1 )
 	ROM_LOAD( "epr13448.a10", 0x00000, 0x08000, CRC(b5183fb9) SHA1(c8372b57fa486256d49dc5851d6b17c92de593fb) )
 	ROM_LOAD( "mpr13449.a11", 0x10000, 0x20000, CRC(d3d9aaf9) SHA1(0fb3a8cb11033accceb3a43a691fb424cf8b9619) )
 	ROM_RELOAD(               0x30000, 0x20000 )
+
+	ROM_REGION( 0x2000, "fd1089b_key", 0 ) /* decryption key */
+	ROM_LOAD( "317-0168.key", 0x0000, 0x2000, CRC(bc2d1792) SHA1(e66d2582eb74ae35f27715fcc9df3e77aba67509) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -3929,6 +3935,9 @@ ROM_START( aurailj )
 	ROM_LOAD( "epr13448.a10", 0x00000, 0x08000, CRC(b5183fb9) SHA1(c8372b57fa486256d49dc5851d6b17c92de593fb) )
 	ROM_LOAD( "mpr13449.a11", 0x10000, 0x20000, CRC(d3d9aaf9) SHA1(0fb3a8cb11033accceb3a43a691fb424cf8b9619) )
 	ROM_RELOAD(               0x30000, 0x20000 )
+
+	ROM_REGION( 0x2000, "fd1089a_key", 0 ) /* decryption key */
+	ROM_LOAD( "317-0167.key", 0x0000, 0x2000, CRC(bc2d1792) SHA1(e66d2582eb74ae35f27715fcc9df3e77aba67509) )
 ROM_END
 
 
@@ -4278,6 +4287,9 @@ ROM_START( dunkshot )
 	ROM_LOAD( "epr10474.a8",   0x10000, 0x08000, CRC(419a656e) SHA1(aa734ae835761badeb069f99acc5fded2a19b3a3) )
 	ROM_LOAD( "epr10475.a9",   0x20000, 0x08000, CRC(17d55e85) SHA1(0c414bafecbfaa82679cc155f15f5255c186358d) )
 	ROM_LOAD( "epr10476.a10",  0x30000, 0x08000, CRC(a6be0956) SHA1(fc4d6e25e0b46679f94fddbb1850fb0b02f8d84b) )
+
+	ROM_REGION( 0x2000, "fd1089a_key", 0 ) /* decryption key */
+	ROM_LOAD( "317-0022.key", 0x0000, 0x2000, CRC(4eedc66d) SHA1(50588fa13bf25a2d1322579cdc9937450543c978) )
 ROM_END
 
 
@@ -5229,6 +5241,9 @@ ROM_START( defense )
 
 	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
 	ROM_LOAD( "10775.a7", 0x0000, 0x8000, CRC(4cbd55a8) SHA1(8af2c52ab61338c8a9f1a74a05470dd3d5e0c42f) )
+
+	ROM_REGION( 0x2000, "fd1089a_key", 0 ) /* decryption key */
+	ROM_LOAD( "317-0028.key", 0x0000, 0x2000, BAD_DUMP CRC(9a5307b2) SHA1(2fcc576ed95b96ff6ea71252c3fab33b8b3fc1f5) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -5264,6 +5279,9 @@ ROM_START( sdib )
 
 	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
 	ROM_LOAD( "10775.a7", 0x0000, 0x8000, CRC(4cbd55a8) SHA1(8af2c52ab61338c8a9f1a74a05470dd3d5e0c42f) )
+
+	ROM_REGION( 0x2000, "fd1089a_key", 0 ) /* decryption key */
+	ROM_LOAD( "317-0028.key", 0x0000, 0x2000, BAD_DUMP CRC(9a5307b2) SHA1(2fcc576ed95b96ff6ea71252c3fab33b8b3fc1f5) )
 ROM_END
 
 /**************************************************************************************************************************
@@ -5533,6 +5551,9 @@ ROM_START( sjryuko )
 	ROM_LOAD( "epr12246.a9", 0x20000, 0x8000, CRC(f1242582) SHA1(f5734b31b449f3f09a0cacc712059644eedee006) )
 	ROM_LOAD( "epr12247.a10",0x30000, 0x8000, CRC(ef8a64c6) SHA1(525e0d968c72c6dd73df69b55b8626495d154649) )
 	ROM_LOAD( "epr12248.a11",0x40000, 0x8000, CRC(d1eabdab) SHA1(f255a66e082353768e8d2bb574e883a4a45f7670) )
+
+	ROM_REGION( 0x2000, "fd1089b_key", 0 ) /* decryption key */
+	ROM_LOAD( "317-5021.key", 0x0000, 0x2000, BAD_DUMP CRC(4a3422e4) SHA1(69a32a6987ff2481f6d6cbbe399269a2461b8bad) )
 ROM_END
 
 
@@ -6131,7 +6152,7 @@ static DRIVER_INIT( generic_5797 )
 static DRIVER_INIT( aliensy3_5358 )
 {
 	DRIVER_INIT_CALL(generic_5358);
-	fd1089_decrypt_0033(machine);
+	fd1089a_decrypt(machine);
 }
 
 
@@ -6166,14 +6187,14 @@ static DRIVER_INIT( altbeas4_5521 )
 static DRIVER_INIT( aurail1_5704 )
 {
 	DRIVER_INIT_CALL(generic_5704);
-	fd1089_decrypt_0168(machine);
+	fd1089b_decrypt(machine);
 }
 
 
 static DRIVER_INIT( aurailj_5704 )
 {
 	DRIVER_INIT_CALL(generic_5704);
-	fd1089_decrypt_0167(machine);
+	fd1089a_decrypt(machine);
 }
 
 
@@ -6187,7 +6208,7 @@ static DRIVER_INIT( ddux_5704 )
 static DRIVER_INIT( dunkshot_5358 )
 {
 	DRIVER_INIT_CALL(generic_5358);
-	fd1089_decrypt_0022(machine);
+	fd1089a_decrypt(machine);
 	custom_io_r = dunkshot_custom_io_r;
 }
 
@@ -6232,7 +6253,7 @@ static DRIVER_INIT( sdi_5358 )
 static DRIVER_INIT( defense_5358 )
 {
 	DRIVER_INIT_CALL(generic_5358);
-	fd1089_decrypt_0028(machine);
+	fd1089a_decrypt(machine);
 	custom_io_r = sdi_custom_io_r;
 }
 
@@ -6254,7 +6275,7 @@ static DRIVER_INIT( shinobi3_5358 )
 static DRIVER_INIT( sjryuko_5358 )
 {
 	DRIVER_INIT_CALL(generic_5358);
-	fd1089_decrypt_5021(machine);
+	fd1089b_decrypt(machine);
 	custom_io_r = sjryuko_custom_io_r;
 	custom_io_w = sjryuko_custom_io_w;
 }
