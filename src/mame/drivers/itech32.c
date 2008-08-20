@@ -270,10 +270,6 @@ INLINE int determine_irq_state(int vint, int xint, int qint)
 {
 	int level = 0;
 
-	/* update the states */
-	if (vint != -1) vint_state = vint;
-	if (xint != -1) xint_state = xint;
-	if (qint != -1) qint_state = qint;
 
 	/* determine which level is active */
 	if (vint_state) level = 1;
@@ -289,13 +285,20 @@ INLINE int determine_irq_state(int vint, int xint, int qint)
 
 void itech32_update_interrupts(running_machine *machine, int vint, int xint, int qint)
 {
-	int level = determine_irq_state(vint, xint, qint);
+	/* update the states */
+	if (vint != -1) vint_state = vint;
+	if (xint != -1) xint_state = xint;
+	if (qint != -1) qint_state = qint;
 
-	/* update it */
-	if (level)
-		cpunum_set_input_line(machine, 0, level, ASSERT_LINE);
-	else
-		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
+	if (is_drivedge) {
+		cpunum_set_input_line(machine, 0, 3, vint_state ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 4, xint_state ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 5, qint_state ? ASSERT_LINE : CLEAR_LINE);
+	} else {
+		cpunum_set_input_line(machine, 0, 1, vint_state ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 2, xint_state ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 3, qint_state ? ASSERT_LINE : CLEAR_LINE);
+	}
 }
 
 

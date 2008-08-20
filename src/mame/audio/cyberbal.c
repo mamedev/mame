@@ -97,17 +97,8 @@ WRITE8_HANDLER( cyberbal_sound_68k_6502_w )
 
 static void update_sound_68k_interrupts(running_machine *machine)
 {
-	int newstate = 0;
-
-	if (fast_68k_int)
-		newstate |= 6;
-	if (io_68k_int)
-		newstate |= 2;
-
-	if (newstate)
-		cpunum_set_input_line(machine, 3, newstate, ASSERT_LINE);
-	else
-		cpunum_set_input_line(machine, 3, 7, CLEAR_LINE);
+	cpunum_set_input_line(machine, 3, 6, fast_68k_int ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 3, 2, io_68k_int   ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

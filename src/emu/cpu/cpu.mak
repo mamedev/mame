@@ -1135,7 +1135,11 @@ $(M68KMAKE): $(CPUOBJ)/m68000/m68kmake.o $(LIBOCORE)
 endif
 
 # rule to ensure we build the header before building the core CPU file
-$(CPUOBJ)/m68000/m68kcpu.o: $(CPUOBJ)/m68000/m68kops.c
+$(CPUOBJ)/m68000/m68kcpu.o: 	$(CPUOBJ)/m68000/m68kops.c \
+								$(CPUSRC)/m68000/m68kcpu.h
+
+$(CPUOBJ)/m68000/m68kmame.o:	$(CPUSRC)/m68000/m68kmame.c \
+								$(CPUSRC)/m68000/m68kcpu.h
 
 
 

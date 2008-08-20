@@ -473,19 +473,8 @@ INTERRUPT_GEN( mcr68_interrupt )
 
 static void update_mcr68_interrupts(running_machine *machine)
 {
-	int newstate = 0;
-
-	/* all interrupts go through an LS148, which gives priority to the highest */
-	if (v493_irq_state)
-		newstate = v493_irq_vector;
-	if (m6840_irq_state)
-		newstate = m6840_irq_vector;
-
-	/* set the new state of the IRQ lines */
-	if (newstate)
-		cpunum_set_input_line(machine, 0, newstate, ASSERT_LINE);
-	else
-		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, v493_irq_vector, v493_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, m6840_irq_vector, m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

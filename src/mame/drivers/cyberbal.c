@@ -36,23 +36,8 @@
 
 static void update_interrupts(running_machine *machine)
 {
-	int newstate1 = 0;
-	int newstate2 = 0;
-
-	if (atarigen_sound_int_state)
-		newstate1 |= 1;
-	if (atarigen_video_int_state)
-		newstate2 |= 1;
-
-	if (newstate1)
-		cpunum_set_input_line(machine, 0, newstate1, ASSERT_LINE);
-	else
-		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
-
-	if (newstate2)
-		cpunum_set_input_line(machine, 2, newstate2, ASSERT_LINE);
-	else
-		cpunum_set_input_line(machine, 2, 7, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 1, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 2, 1, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -73,17 +58,8 @@ static MACHINE_RESET( cyberbal )
 
 static void cyberb2p_update_interrupts(running_machine *machine)
 {
-	int newstate = 0;
-
-	if (atarigen_video_int_state)
-		newstate |= 1;
-	if (atarigen_sound_int_state)
-		newstate |= 3;
-
-	if (newstate)
-		cpunum_set_input_line(machine, 0, newstate, ASSERT_LINE);
-	else
-		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 1, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 3, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

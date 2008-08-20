@@ -62,17 +62,8 @@ static UINT8 sound_msb_latch;
 static void update_irq_state(running_machine *machine)
 {
 	int i;
-
-	/* loop from high priority to low; if we find a live IRQ, assert it */
-	for (i = 4; i >= 0; i--)
-		if (irq_state[i])
-		{
-			cpunum_set_input_line(machine, 0, i, ASSERT_LINE);
-			return;
-		}
-
-	/* otherwise, clear them all */
-	cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
+	for (i = 1; i < 5; i++)
+		cpunum_set_input_line(machine, 0, i, irq_state[i] ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

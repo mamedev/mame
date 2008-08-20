@@ -405,50 +405,46 @@ static TIMER_CALLBACK( scanline_callback )
  *
  *************************************/
 
-static void update_irqs(void)
+static void update_irqs(running_machine *machine)
 {
 	int ints = CUSTOM_REG(REG_INTENA) & CUSTOM_REG(REG_INTREQ);
-	int irq = -1;
 
 	/* Master interrupt switch */
 	if (CUSTOM_REG(REG_INTENA) & 0x4000)
 	{
 		/* Serial transmit buffer empty, disk block finished, software interrupts */
-		if (ints & 0x0007)
-			irq = 1;
+		cpunum_set_input_line(machine, 0, 1, ints & 0x0007 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* I/O ports and timer interrupts */
-		if (ints & 0x0008)
-			irq = 2;
+		cpunum_set_input_line(machine, 0, 2, ints & 0x0008 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* Copper, VBLANK, blitter interrupts */
-		if (ints & 0x0070)
-			irq = 3;
+		cpunum_set_input_line(machine, 0, 3, ints & 0x0070 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* Audio interrupts */
-		if (ints & 0x0780)
-			irq = 4;
+		cpunum_set_input_line(machine, 0, 4, ints & 0x0780 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* Serial receive buffer full, disk sync match */
-		if (ints & 0x1800)
-			irq = 5;
+		cpunum_set_input_line(machine, 0, 5, ints & 0x1800 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* External interrupts */
-		if (ints & 0x2000)
-			irq = 6;
+		cpunum_set_input_line(machine, 0, 6, ints & 0x2000 ? ASSERT_LINE : CLEAR_LINE);
 	}
-
-	/* set the highest IRQ line */
-	if (irq >= 0)
-		cpunum_set_input_line(Machine, 0, irq, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, 0, 7, CLEAR_LINE);
+	{
+		cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 2, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 3, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 4, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 5, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 6, CLEAR_LINE);
+	}
 }
 
 
 static TIMER_CALLBACK( amiga_irq_proc )
 {
-	update_irqs();
+	update_irqs(machine);
 	timer_reset( amiga_irq_timer, attotime_never);
 }
 
@@ -1428,7 +1424,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			if ( temp & 0x8000  ) /* if we're enabling irq's, delay a bit */
 				timer_adjust_oneshot( amiga_irq_timer, ATTOTIME_IN_CYCLES( AMIGA_IRQ_DELAY_CYCLES, 0 ), 0);
 			else /* if we're disabling irq's, process right away */
-				update_irqs();
+				update_irqs(machine);
 			break;
 
 		case REG_INTREQ:
@@ -1445,7 +1441,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			if ( temp & 0x8000  ) /* if we're generating irq's, delay a bit */
 				timer_adjust_oneshot( amiga_irq_timer, ATTOTIME_IN_CYCLES( AMIGA_IRQ_DELAY_CYCLES, 0 ), 0);
 			else /* if we're clearing irq's, process right away */
-				update_irqs();
+				update_irqs(machine);
 			break;
 
 		case REG_ADKCON:

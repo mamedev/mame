@@ -66,28 +66,18 @@ static void yboard_generic_init(void)
 
 static void update_main_irqs(running_machine *machine)
 {
-	int irq = 0;
+	cpunum_set_input_line(machine, 0, 2, timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 2, timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 2, 2, timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 2, 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 6, timer_irq_state && vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 6, timer_irq_state && vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 2, 6, timer_irq_state && vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
 
-	/* the IRQs are effectively ORed together */
-	if (vblank_irq_state)
-		irq |= 4;
-	if (timer_irq_state)
-		irq |= 2;
-
-	/* assert the lines that are live, or clear everything if nothing is live */
-	if (irq != 0)
-	{
-		cpunum_set_input_line(machine, 0, irq, ASSERT_LINE);
-		cpunum_set_input_line(machine, 1, irq, ASSERT_LINE);
-		cpunum_set_input_line(machine, 2, irq, ASSERT_LINE);
+	if(timer_irq_state || vblank_irq_state)
 		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(50));
-	}
-	else
-	{
-		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
-		cpunum_set_input_line(machine, 1, 7, CLEAR_LINE);
-		cpunum_set_input_line(machine, 2, 7, CLEAR_LINE);
-	}
 }
 
 

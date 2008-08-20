@@ -67,15 +67,8 @@ void hdsnd_init(running_machine *machine)
 
 static void update_68k_interrupts(running_machine *machine)
 {
-	int irqline = 0;
-
-	if (mainflag) irqline = 1;
-	if (irq68k) irqline = 3;
-
-	if (irqline)
-		cpunum_set_input_line(machine, hdcpu_sound, irqline, ASSERT_LINE);
-	else
-		cpunum_set_input_line(machine, hdcpu_sound, 7, CLEAR_LINE);
+	cpunum_set_input_line(machine, hdcpu_sound, 1, mainflag ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, hdcpu_sound, 3, irq68k   ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

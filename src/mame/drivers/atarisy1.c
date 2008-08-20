@@ -157,23 +157,10 @@ static TIMER_CALLBACK( delayed_joystick_int );
 
 static void update_interrupts(running_machine *machine)
 {
-	int newstate = 0;
-
-	/* all interrupts go through an LS148, which gives priority to the highest */
-	if (joystick_int && joystick_int_enable)
-		newstate = 2;
-	if (atarigen_scanline_int_state)
-		newstate = 3;
-	if (atarigen_video_int_state)
-		newstate = 4;
-	if (atarigen_sound_int_state)
-		newstate = 6;
-
-	/* set the new state of the IRQ lines */
-	if (newstate)
-		cpunum_set_input_line(machine, 0, newstate, ASSERT_LINE);
-	else
-		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 2, joystick_int && joystick_int_enable ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 3, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 4, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 6, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

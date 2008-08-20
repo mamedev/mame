@@ -554,17 +554,8 @@ void itech8_update_interrupts(running_machine *machine, int periodic, int tms340
 	/* handle the 68000 case */
 	else
 	{
-		int level = 0;
-
-		/* determine which level is active */
-		if (blitter_int) level = 2;
-		if (periodic_int) level = 3;
-
-		/* update it */
-		if (level)
-			cpunum_set_input_line(machine, 0, level, ASSERT_LINE);
-		else
-			cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 2, blitter_int ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, 3, periodic_int ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 

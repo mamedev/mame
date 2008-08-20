@@ -142,18 +142,8 @@ static void set_irq_line(int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
 		irqline = 7;
-	switch(state)
-	{
-		case CLEAR_LINE:
-			m68k_set_irq(0);
-			break;
-		case ASSERT_LINE:
-			m68k_set_irq(irqline);
-			break;
-		default:
-			m68k_set_irq(irqline);
-			break;
-	}
+
+	m68k_set_virq(irqline, state == ASSERT_LINE ? 1 : 0);
 }
 
 
@@ -475,14 +465,14 @@ void m68000_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + 0:				info->i = 0;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 1:				info->i = 0;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 2:				info->i = 0;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 3:				info->i = 0;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 4:				info->i = 0;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 5:				info->i = 0;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 6:				info->i = 0;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 7:				info->i = 0;	/* fix me */			break;
+		case CPUINFO_INT_INPUT_STATE + 0:				info->i = 0;  /* there is no level 0 */	break;
+		case CPUINFO_INT_INPUT_STATE + 1:				info->i = m68k_get_virq(1);				break;
+		case CPUINFO_INT_INPUT_STATE + 2:				info->i = m68k_get_virq(2);				break;
+		case CPUINFO_INT_INPUT_STATE + 3:				info->i = m68k_get_virq(3);				break;
+		case CPUINFO_INT_INPUT_STATE + 4:				info->i = m68k_get_virq(4);				break;
+		case CPUINFO_INT_INPUT_STATE + 5:				info->i = m68k_get_virq(5);				break;
+		case CPUINFO_INT_INPUT_STATE + 6:				info->i = m68k_get_virq(6);				break;
+		case CPUINFO_INT_INPUT_STATE + 7:				info->i = m68k_get_virq(7);				break;
 
 		case CPUINFO_INT_PREVIOUSPC:					info->i = m68k_get_reg(NULL, M68K_REG_PPC); break;
 
@@ -653,14 +643,14 @@ void m68008_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + 0:				info->i = 0;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 1:				info->i = 0;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 2:				info->i = 0;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 3:				info->i = 0;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 4:				info->i = 0;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 5:				info->i = 0;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 6:				info->i = 0;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 7:				info->i = 0;	/* fix me */			break;
+		case CPUINFO_INT_INPUT_STATE + 0:				info->i = 0;  /* there is no level 0 */	break;
+		case CPUINFO_INT_INPUT_STATE + 1:				info->i = m68k_get_virq(1);				break;
+		case CPUINFO_INT_INPUT_STATE + 2:				info->i = m68k_get_virq(2);				break;
+		case CPUINFO_INT_INPUT_STATE + 3:				info->i = m68k_get_virq(3);				break;
+		case CPUINFO_INT_INPUT_STATE + 4:				info->i = m68k_get_virq(4);				break;
+		case CPUINFO_INT_INPUT_STATE + 5:				info->i = m68k_get_virq(5);				break;
+		case CPUINFO_INT_INPUT_STATE + 6:				info->i = m68k_get_virq(6);				break;
+		case CPUINFO_INT_INPUT_STATE + 7:				info->i = m68k_get_virq(7);				break;
 
 		case CPUINFO_INT_PREVIOUSPC:					info->i = m68k_get_reg(NULL, M68K_REG_PPC); break;
 
@@ -885,14 +875,14 @@ void m68020_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + 0:				info->i = 0;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 1:				info->i = 1;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 2:				info->i = 2;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 3:				info->i = 3;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 4:				info->i = 4;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 5:				info->i = 5;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 6:				info->i = 6;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 7:				info->i = 7;	/* fix me */			break;
+		case CPUINFO_INT_INPUT_STATE + 0:				info->i = 0;  /* there is no level 0 */	break;
+		case CPUINFO_INT_INPUT_STATE + 1:				info->i = m68k_get_virq(1);				break;
+		case CPUINFO_INT_INPUT_STATE + 2:				info->i = m68k_get_virq(2);				break;
+		case CPUINFO_INT_INPUT_STATE + 3:				info->i = m68k_get_virq(3);				break;
+		case CPUINFO_INT_INPUT_STATE + 4:				info->i = m68k_get_virq(4);				break;
+		case CPUINFO_INT_INPUT_STATE + 5:				info->i = m68k_get_virq(5);				break;
+		case CPUINFO_INT_INPUT_STATE + 6:				info->i = m68k_get_virq(6);				break;
+		case CPUINFO_INT_INPUT_STATE + 7:				info->i = m68k_get_virq(7);				break;
 
 		case CPUINFO_INT_PREVIOUSPC:					info->i = m68k_get_reg(NULL, M68K_REG_PPC); break;
 
@@ -1123,14 +1113,14 @@ void m68040_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + 0:				info->i = 0;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 1:				info->i = 1;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 2:				info->i = 2;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 3:				info->i = 3;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 4:				info->i = 4;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 5:				info->i = 5;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 6:				info->i = 6;	/* fix me */			break;
-		case CPUINFO_INT_INPUT_STATE + 7:				info->i = 7;	/* fix me */			break;
+		case CPUINFO_INT_INPUT_STATE + 0:				info->i = 0;  /* there is no level 0 */	break;
+		case CPUINFO_INT_INPUT_STATE + 1:				info->i = m68k_get_virq(1);				break;
+		case CPUINFO_INT_INPUT_STATE + 2:				info->i = m68k_get_virq(2);				break;
+		case CPUINFO_INT_INPUT_STATE + 3:				info->i = m68k_get_virq(3);				break;
+		case CPUINFO_INT_INPUT_STATE + 4:				info->i = m68k_get_virq(4);				break;
+		case CPUINFO_INT_INPUT_STATE + 5:				info->i = m68k_get_virq(5);				break;
+		case CPUINFO_INT_INPUT_STATE + 6:				info->i = m68k_get_virq(6);				break;
+		case CPUINFO_INT_INPUT_STATE + 7:				info->i = m68k_get_virq(7);				break;
 
 		case CPUINFO_INT_PREVIOUSPC:					info->i = m68k_get_reg(NULL, M68K_REG_PPC); break;
 

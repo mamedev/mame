@@ -271,26 +271,9 @@ static MACHINE_RESET( mpu4_vid )
 
 static void update_mpu68_interrupts(running_machine *machine)
 {
-	int newstate = 0;
-
-	if (m6840_irq_state)
-		newstate = 1;
-	if (m6850_irq_state)
-		newstate = 2;
-	if (scn2674_irq_state)
-		newstate = 3;
-
-	/* set the new state of the IRQ lines */
-	if (newstate)
-	{
-		LOGSTUFF(("68k IRQ, %x\n", newstate));
-		cpunum_set_input_line(machine, 1, newstate, ASSERT_LINE);
-	}
-	else
-	{
-		LOGSTUFF(("68k IRQ Clear, %x\n", newstate));
-		cpunum_set_input_line(machine, 1, 7, CLEAR_LINE);
-	}
+	cpunum_set_input_line(machine, 1, 1, m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 2, m6850_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 3, scn2674_irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* Communications with 6809 board */

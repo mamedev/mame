@@ -156,17 +156,8 @@ static struct
 
 static void update_irqs(running_machine *machine)
 {
-	int newstate = 0;
-
-	if (tms_irq)
-		newstate = 2;
-	if (duart_1_irq)
-		newstate = 5;
-
-	if (newstate)
-		cpunum_set_input_line(machine, 0, newstate, ASSERT_LINE);
-	else
-		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 2, tms_irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 5, duart_1_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -69,18 +69,9 @@ UINT8 *genesis_z80_ram;
 /* call this whenever the interrupt state has changed */
 static void update_interrupts(running_machine *machine)
 {
-	int level = 0;
-
-	/* determine which interrupt is active */
-	if (irq2_int) level = 2;
-	if (scanline_int) level = 4;
-	if (vblank_int) level = 6;
-
-	/* either set or clear the appropriate lines */
-	if (level)
-		cpunum_set_input_line(machine, 0, level, ASSERT_LINE);
-	else
-		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 2, irq2_int ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 4, scanline_int ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 6, vblank_int ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

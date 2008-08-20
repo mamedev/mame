@@ -57,17 +57,8 @@ static void (*protection_handler)(running_machine *);
 
 static void update_irq_state(running_machine *machine)
 {
-	int irq_lines = 0;
-
-	if (tms_irq)
-		irq_lines |= 4;
-	if (hack_irq)
-		irq_lines |= 5;
-
-	if (irq_lines)
-		cpunum_set_input_line(machine, 0, irq_lines, ASSERT_LINE);
-	else
-		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 4, tms_irq  ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 5, hack_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

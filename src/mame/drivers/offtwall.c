@@ -32,17 +32,8 @@
 
 static void update_interrupts(running_machine *machine)
 {
-	int newstate = 0;
-
-	if (atarigen_scanline_int_state)
-		newstate = 4;
-	if (atarigen_sound_int_state)
-		newstate = 6;
-
-	if (newstate)
-		cpunum_set_input_line(machine, 0, newstate, ASSERT_LINE);
-	else
-		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 4, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 6, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

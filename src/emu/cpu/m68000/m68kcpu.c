@@ -882,6 +882,28 @@ void m68k_set_irq(unsigned int int_level)
 		m68ki_check_interrupts(); /* Level triggered (IRQ) */
 }
 
+void m68k_set_virq(unsigned int level, unsigned int active)
+{
+	uint state = m68ki_cpu.virq_state;
+	uint blevel;
+
+	if(active)
+		state |= 1 << level;
+	else
+		state &= ~(1 << level);
+	m68ki_cpu.virq_state = state;
+
+	for(blevel = 7; blevel > 0; blevel--)
+		if(state & (1 << blevel))
+			break;
+	m68k_set_irq(blevel);
+}
+
+unsigned int m68k_get_virq(unsigned int level)
+{
+	return (m68ki_cpu.virq_state & (1 << level)) ? 1 : 0;
+}
+
 void m68k_init(void)
 {
 	static uint emulation_initialized = 0;
@@ -919,6 +941,7 @@ void m68k_pulse_reset(void)
 	/* Interrupt mask to level 7 */
 	FLAG_INT_MASK = 0x0700;
 	CPU_INT_LEVEL = 0;
+	m68ki_cpu.virq_state = 0;
 	/* Reset VBR */
 	REG_VBR = 0;
 	/* Go to supervisor mode */

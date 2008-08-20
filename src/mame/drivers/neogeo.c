@@ -200,18 +200,9 @@ void neogeo_set_display_counter_lsb(running_machine *machine, UINT16 data)
 
 static void update_interrupts(running_machine *machine)
 {
-	int level = 0;
-
-	/* determine which interrupt is active - order implies priority */
-	if (vblank_interrupt_pending) level = 1;
-	if (display_position_interrupt_pending) level = 2;
-	if (irq3_pending) level = 3;
-
-	/* either set or clear the appropriate lines */
-	if (level)
-		cpunum_set_input_line(machine, 0, level, ASSERT_LINE);
-	else
-		cpunum_set_input_line(machine, 0, 7, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 1, vblank_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 2, display_position_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 3, irq3_pending ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
