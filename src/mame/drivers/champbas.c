@@ -1000,6 +1000,9 @@ ROM_START( exctscc2 )
 	ROM_LOAD( "7_c6.bin",     0x6000, 0x2000, CRC(6d51521e) SHA1(2809bd2e61f40dcd31d43c62520982bdcfb0a865) )	/* vr.7h */
 	ROM_LOAD( "1_a6.bin",     0x8000, 0x1000, CRC(20f2207e) SHA1(b1ed2237d0bd50ddbe593fd2fbff9f1d67c1eb11) )	/* vr.7k */
 
+	ROM_REGION( 0x2000, "MCU", 0 )
+	ROM_LOAD( "8303.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
+
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars
 	ROM_LOAD( "vr.5a",        0x0000, 0x2000, CRC(4ff1783d) SHA1(c45074864c3a4bcbf3a87d164027ae16dca53d9c) ) /* planes 0,1 */
 	ROM_LOAD( "vr.5c",        0x2000, 0x2000, CRC(1fb84ee6) SHA1(56ceb86c509be783f806403ac21e7c9684760d5f) ) /* plane 3 */
@@ -1077,4 +1080,4 @@ GAME( 1983, champb2a, champbb2, champmcu, champbas, champbas, ROT0,   "Alpha Den
 GAME( 1983, exctsccr, 0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer", 0 )
 GAME( 1983, exctscca, exctsccr, exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer (alternate music)", 0 )
 GAME( 1983, exctsccb, exctsccr, exctsccb, exctsccr, exctsccr, ROT270, "bootleg",          "Exciting Soccer (bootleg)", 0 )
-GAME( 1984, exctscc2, 0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer II", GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, exctscc2, 0,        exctsccr, exctsccr, exctsccr, ROT270, "Alpha Denshi Co.", "Exciting Soccer II", 0 )

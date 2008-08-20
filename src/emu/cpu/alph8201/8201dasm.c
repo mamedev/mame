@@ -67,8 +67,8 @@ opcode       mnemonic     function      flags
 1110--xx mirror for the above
 1111--xx mirror for the above
 
-Bugs:
-[1] the Z flag is not updated correctly after a LD A,Rn instruction. Fixed in 8301.
+Notes:
+[1] bug: the Z flag is not updated correctly after a LD A,Rn instruction. Fixed in 8302 (possibly 8301).
 
 
 8302 CONFIRMED OPCODES:
@@ -124,6 +124,34 @@ opcode       mnemonic     function         flags
 11111101     CLR A        A=0              --
 11111110     LD A,(IX0+A) A=[IX0+A]        --
 11111111     RET          restore PC       --
+
+
+8303 CONFIRMED OPCODES:
+----------------------
+all of the 8302 ones, with stricter decoding for the following:
+
+11010000 imm JNC imm      branch if !C  --
+11010001 imm JZ  imm      branch if Z   --
+1101001- imm J   imm      branch        --
+
+additionally, this opcode is modified to support 11-bit instead of 10-bit
+external addressing, this wasn't used in games however.
+
+1011-0aa     LD MB,i      modified so that bit 3 is shifted to bit 2 before loading MB.
+
+and these new opcodes are added:
+
+110101--
+11010100 imm LD A,(R77:$%02X)
+11010101 imm LD (R77:$%02X),A
+11010110 imm LD PC,(R77:$%02X)  [1]
+11010111 imm LD (R77:$%02X),PC  [2]
+
+Notes:
+[1] appears to be LD PC,x in the disassembly, however it's LD LP0,x for kouyakyu
+    which uses a 8304, so the opcode was probably changed again.
+[2] appears to be LD x,PC in the disassembly, however it's LD x,LP0 for hvoltage
+    which uses a 8304 (or 8404?), so the opcode was probably changed again.
 
 ****************************************************/
 
@@ -181,10 +209,10 @@ static const char *const Formats[] = {
 
 	/* -------------- 830x only ------------- */
 
-	FMT("1101_0100 I", "LD   A,(R7:$%02X)"),	// D4 : 8303+ only? exctscc2, bullfgtr; not sure if R7 or R77
-	FMT("1101_0101 I", "LD   (R7:$%02X),A"),	// D5 : 8303+ only? exctscc2, bullfgtr, kouyakyu; not sure if R7 or R77
-	FMT("1101_0110 I", "LD   LP0,(R7:$%02X)"),	// D6 : 8303+ only? kouyakyu; not sure if R7 or R77
-	FMT("1101_0111 I", "LD   (R7:$%02X),LP0"),	// D7 : 8303+ only? hvoltage; not sure if R7 or R77
+	FMT("1101_0100 I", "LD   A,(R77:$%02X)"),	// D4 : 8303+ only. exctscc2, bullfgtr
+	FMT("1101_0101 I", "LD   (R77:$%02X),A"),	// D5 : 8303+ only. exctscc2, bullfgtr, kouyakyu
+	FMT("1101_0110 I", "LD   LP0,(R77:$%02X)"),	// D6 : 8303+ only. kouyakyu
+	FMT("1101_0111 I", "LD   (R77:$%02X),LP0"),	// D7 : 8303+ only. hvoltage
 	FMT("1101_1000 I", "LD   A,($%02X)"),		// D8 : equites
 	FMT("1101_1001 I", "LD   ($%02X),A"),		// D9 : equites
 	FMT("1101_1010 I", "CMP  A,$%02X"),			// DA :

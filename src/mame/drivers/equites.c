@@ -1295,6 +1295,9 @@ ROM_START( equites )
 	ROM_LOAD( "ev3.1k", 0x04000, 0x2000, CRC(10ff140b) SHA1(7c28f988a9c8b2a702d007096199e67b447a183c) )
 	ROM_LOAD( "ev4.1h", 0x06000, 0x2000, CRC(b7917264) SHA1(e58345fda088b171fd348959de15082f3cb42514) )
 
+	ROM_REGION( 0x2000, "MCU", 0 )
+	ROM_LOAD( "8303.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
+
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE ) // chars
 	ROM_LOAD( "ep9",  0x00000, 0x1000, CRC(0325be11) SHA1(d95667b439e3d97b08efeaf08022348546a4f385) )
 
@@ -1356,6 +1359,9 @@ ROM_START( equitess )
 	ROM_LOAD( "ev3.1k", 0x04000, 0x2000, CRC(10ff140b) SHA1(7c28f988a9c8b2a702d007096199e67b447a183c) )
 	ROM_LOAD( "ev4.1h", 0x06000, 0x2000, CRC(b7917264) SHA1(e58345fda088b171fd348959de15082f3cb42514) )
 
+	ROM_REGION( 0x2000, "MCU", 0 )
+	ROM_LOAD( "8303.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
+
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE ) // chars
 	ROM_LOAD( "epr-ep0.3e",  0x00000, 0x1000, CRC(3f5a81c3) SHA1(8fd5bc621f483bfa46be7e40e6480b25243bdf70) )
 
@@ -1392,134 +1398,6 @@ ROM_START( equitess )
 	ROM_LOAD( "bprom.3h",  0x00000, 0x020, CRC(33b98466) SHA1(017c73cf8c17dc5047c89316ae5b45f8d22092e8) )
 ROM_END
 
-/*
-Gekisou (JPN Ver.)
-(c)1985 Eastern
-
-68K55-2
-CPU:MC68000P8
-OSC:12.000MHz
-
-SOUND BOARD NO.59 MC 07
-CPU  :TMP8085AP
-Sound:AY-3-8910A,OKI M5232,D8155HC
-OSC  :6.144MHz
-*/
-ROM_START( gekisou )
-	ROM_REGION( 0x10000, "main", 0 ) // 68000 ROMs
-	ROM_LOAD16_BYTE( "1.15b", 0x00001, 0x4000, CRC(945fd546) SHA1(6045dbf11272fcec8320aacb2852d4223d0943a0) )
-	ROM_LOAD16_BYTE( "2.15d", 0x00000, 0x4000, CRC(3c057150) SHA1(2b1ad7993addfd1c0eee99dfe5bb3476cd387f6a) )
-	ROM_LOAD16_BYTE( "3.14b", 0x08001, 0x4000, CRC(7c1cf4d0) SHA1(a122d3a51d205123e04c694912809e0bb31155d5) )
-	ROM_LOAD16_BYTE( "4.14d", 0x08000, 0x4000, CRC(c7282391) SHA1(144a34d74bb1e71e2f799913ab04927d00faec87) )
-
-	ROM_REGION( 0x10000, "audio", 0 ) // 8085A ROMs
-	ROM_LOAD( "v1.1l", 0x00000, 0x4000, CRC(dc6af437) SHA1(77112fec51343d8e73765b2a342a888612813c3b) )
-	ROM_LOAD( "v2.1h", 0x04000, 0x4000, CRC(cb12582e) SHA1(ef378232e2744540cc4c9187cfb36d780dadc962) )
-	ROM_LOAD( "v3.1e", 0x08000, 0x4000, CRC(0ab5e777) SHA1(9177c42418f022a65d73c3302873b894c5a137a4) )
-
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE ) // chars
-	ROM_LOAD( "0.5c",  0x00000, 0x1000, CRC(7e8bf4d1) SHA1(8abb82be006e8d1df449a5f83d59637314405119) )
-
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE ) // tiles
-	ROM_LOAD( "7.18r",   0x00000, 0x2000, CRC(a1918b6c) SHA1(6ffa4c845d23d311b59cc19411a68a782618b3fd) )
-	// empty space to unpack previous ROM
-	ROM_CONTINUE(        0x04000, 0x2000)
-	// empty space to unpack previous ROM
-	ROM_LOAD( "5.16r",   0x08000, 0x2000, CRC(88ef550a) SHA1(b50e7b8257d1bb6923d289e7af885c14d089b394) )
-	ROM_CONTINUE(        0x0c000, 0x2000)
-	ROM_LOAD( "6.15r",   0x0a000, 0x2000, CRC(473e3fbf) SHA1(5039387b3627c19f592d630ba7bd010a3881adc5) )
-	ROM_CONTINUE(        0x0e000, 0x2000)
-
-	ROM_REGION( 0x10000, "gfx3", ROMREGION_DISPOSE ) // sprites
-	ROM_LOAD( "10.9r",   0x00000, 0x2000, CRC(11d89c73) SHA1(8753f635d321c8e9b93b0ab767cf44aca1db7a0a) )
-	// empty space to unpack previous ROM
-	ROM_CONTINUE(        0x04000, 0x2000)
-	// empty space to unpack previous ROM
-	ROM_LOAD( "8.8r",    0x08000, 0x2000, CRC(2e0c392c) SHA1(48542a24a34e3d5d00af418b29a2ee15557efc99) )
-	ROM_CONTINUE(        0x0c000, 0x2000)
-	ROM_LOAD( "9.6r",    0x0a000, 0x2000, CRC(56a03b08) SHA1(d90b246890fedfc437de85be8bcc6b60ff068be1) )
-	ROM_CONTINUE(        0x0e000, 0x2000)
-
-	ROM_REGION( 0x0700, "proms", 0 )
-	ROM_LOAD( "1b.bpr",  0x0000, 0x100, CRC(11a1c0aa) SHA1(d007d31f68bf802c89422ea2393747ac8de94d70) ) // R
-	ROM_LOAD( "4b.bpr",  0x0100, 0x100, CRC(c7ebe52c) SHA1(19d2ee70d67fd5e1c57f66d030ec9a5b6af5a49e) ) // G
-	ROM_LOAD( "2b.bpr",  0x0200, 0x100, CRC(4f5d4141) SHA1(965221c6af4a868760e6d168b55e037fc5f9fa52) ) // B
-	ROM_LOAD( "2n.bpr",  0x0300, 0x100, CRC(c7333120) SHA1(ad590e8ece3dcf56b285c4a080f4ee8bb4c9d77c) ) // CLUT(same PROM x 4)
-	ROM_LOAD( "3n.bpr",  0x0400, 0x100, CRC(c7333120) SHA1(ad590e8ece3dcf56b285c4a080f4ee8bb4c9d77c) )
-	ROM_LOAD( "4n.bpr",  0x0500, 0x100, CRC(c7333120) SHA1(ad590e8ece3dcf56b285c4a080f4ee8bb4c9d77c) )
-	ROM_LOAD( "5n.bpr",  0x0600, 0x100, CRC(c7333120) SHA1(ad590e8ece3dcf56b285c4a080f4ee8bb4c9d77c) )
-
-	ROM_REGION( 0x0020, "prom", 0 )
-	ROM_LOAD( "3h.bpr",  0x00000, 0x020, CRC(33b98466) SHA1(017c73cf8c17dc5047c89316ae5b45f8d22092e8) )
-ROM_END
-
-/******************************************************************************/
-// Koukouyakyuh ROM Map
-
-/*
-The Koukouyakyuh (JPN Ver.)
-
-(c)1985 Alpha denshi
-
-CPU   :MAIN  68000
-       SOUND 8085
-Sound :AY-3-8910 M3M5232RS
-OSC   :12.000MHz 6.??MHz 14.31818MHz
-*/
-ROM_START( kouyakyu )
-	ROM_REGION( 0x10000, "main", 0 )  // 68000 ROMs
-	ROM_LOAD16_BYTE( "epr-6704.bin", 0x00001, 0x2000, CRC(c7ac2292) SHA1(614bfb0949620d4c260768f14a116b076dd38438) )
-	ROM_LOAD16_BYTE( "epr-6707.bin", 0x00000, 0x2000, CRC(9cb2962e) SHA1(bd1bcbc53a3346e22789f24a35ab3aa681317d02) )
-	ROM_LOAD16_BYTE( "epr-6705.bin", 0x04001, 0x2000, CRC(985327cb) SHA1(86969fe763cbaa527d64de35844773b5ab1d7f83) )
-	ROM_LOAD16_BYTE( "epr-6708.bin", 0x04000, 0x2000, CRC(f8863dc5) SHA1(bfdd294d51420dd70aa97942909a9b8a95ffc05c) )
-	ROM_LOAD16_BYTE( "epr-6706.bin", 0x08001, 0x2000, BAD_DUMP CRC(79e94cd2) SHA1(f44c2292614b46116818fad9a7eb48cceeb3b819)  )	// was bad, manually patched
-	ROM_LOAD16_BYTE( "epr-6709.bin", 0x08000, 0x2000, CRC(f41cb58c) SHA1(f0d1048e949d51432739755f985e4df65b8e918b) )
-	ROM_FILL(                        0x0c000, 0x4000, 0 )
-
-	ROM_REGION( 0x10000, "audio", 0 ) // 8085A ROMs
-	ROM_LOAD( "epr-6703.bin", 0x00000, 0x2000, CRC(fbff3a86) SHA1(4ed2887b1e4509ded853a230f735d4d2aa475886) )
-	ROM_LOAD( "epr-6702.bin", 0x02000, 0x2000, CRC(27ddf031) SHA1(2f11d3b693e46852762669ed1e35a667990edec7) )
-	ROM_LOAD( "epr-6701.bin", 0x04000, 0x2000, CRC(3c83588a) SHA1(a84c813ba9d464cffc855397aaacbb9177c86fb4) )
-	ROM_LOAD( "epr-6700.bin", 0x06000, 0x2000, CRC(ee579266) SHA1(94dfcf506049fc78db00084ff7031d19520d9a85) )
-	ROM_LOAD( "epr-6699.bin", 0x08000, 0x2000, CRC(9bfa4a72) SHA1(8ac4d308dab0d67a26b4e3550c2e8064aaf36a74) )
-	ROM_LOAD( "epr-6698.bin", 0x0a000, 0x2000, CRC(7adfd1ff) SHA1(b543dd6734a681a187dabf602bea390de663039c) )
-
-	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE ) // chars
-	ROM_LOAD( "epr-6710.bin", 0x00000, 0x1000, CRC(accda190) SHA1(265d2fd92574d65e7890e48d5f305bf903a67bc8) )
-
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE ) // tiles
-	ROM_LOAD( "epr-6695.bin", 0x00000, 0x2000, CRC(22bea465) SHA1(4860d7ee3c386cdacc9c608ffe74ec8bfa58edcb) )
-	// empty space to unpack previous ROM
-	ROM_LOAD( "epr-6694.bin", 0x04000, 0x2000, CRC(51a7345e) SHA1(184c890559ed633e23cb459c313e6179cc3eb542) )
-	// empty space to unpack previous ROM
-	ROM_LOAD( "epr-6689.bin", 0x08000, 0x2000, CRC(53bf7587) SHA1(0046cd04d11ce789ff69e0807700a624af96eb36) )
-	ROM_LOAD( "epr-6688.bin", 0x0a000, 0x2000, CRC(ceb76c5b) SHA1(81fa236871f10c77eb201e1c9771bd57406df15b) )
-	ROM_LOAD( "epr-6687.bin", 0x0c000, 0x2000, CRC(9c1f49df) SHA1(1a5cf5278777f829d3654e838bd2bb9f4dbb57ba) )
-	ROM_LOAD( "epr-6686.bin", 0x0e000, 0x2000, CRC(3d9e516f) SHA1(498614821f87dbcc39edb1756e1af6b536044e6a) )
-
-	ROM_REGION( 0x10000, "gfx3", ROMREGION_DISPOSE ) // sprites
-	ROM_LOAD( "epr-6696.bin", 0x00000, 0x2000, CRC(0625f48e) SHA1(bea09ccf37f38678fb53c55bd0a79557d6c81b3f) )
-	// empty space to unpack previous ROM
-	ROM_LOAD( "epr-6697.bin", 0x04000, 0x2000, CRC(f18afabe) SHA1(abd7f6c0bd0de145c423166a2f4e86ccdb12b1ce) )
-	// empty space to unpack previous ROM
-	ROM_LOAD( "epr-6690.bin", 0x08000, 0x2000, CRC(a142a11d) SHA1(209c7e0591622434ada4445f3f8789059c5f4f77) )
-	ROM_LOAD( "epr-6691.bin", 0x0a000, 0x2000, CRC(b640568c) SHA1(8cef1387c469abec8b488621a94cc9575d6c5fcc) )
-	ROM_LOAD( "epr-6692.bin", 0x0c000, 0x2000, CRC(b91d8172) SHA1(8d8f6ea78ebf652f295ce96abf19e628fe777d07) )
-	ROM_LOAD( "epr-6693.bin", 0x0e000, 0x2000, CRC(874e3acc) SHA1(29438f196811fc2c8f54b6c47f1c175e4797dd4c) )
-
-	ROM_REGION( 0x0700, "proms", 0 )
-	ROM_LOAD( "pr6627.bpr",  0x0000, 0x100, CRC(5ec5480d) SHA1(f966a277539a5d257f32692cdd92ce44b08599e8) ) // R
-	ROM_LOAD( "pr6629.bpr",  0x0100, 0x100, CRC(29c7a393) SHA1(67cced39c0a80655c420aad668dfe836c1d7c643) ) // G
-	ROM_LOAD( "pr6628.bpr",  0x0200, 0x100, CRC(8af247a4) SHA1(01702fbce53dd4875e4825f0487e7aed9cf212fa) ) // B
-	ROM_LOAD( "pr6630a.bpr", 0x0300, 0x100, CRC(d6e202da) SHA1(500ebd5c95d2d2c33535d25cf7f8f649897dc224) ) // CLUT(same PROM x 4)
-	ROM_LOAD( "pr6630b.bpr", 0x0400, 0x100, CRC(d6e202da) SHA1(500ebd5c95d2d2c33535d25cf7f8f649897dc224) )
-	ROM_LOAD( "pr6630c.bpr", 0x0500, 0x100, CRC(d6e202da) SHA1(500ebd5c95d2d2c33535d25cf7f8f649897dc224) )
-	ROM_LOAD( "pr6630d.bpr", 0x0600, 0x100, CRC(d6e202da) SHA1(500ebd5c95d2d2c33535d25cf7f8f649897dc224) )
-
-	ROM_REGION( 0x0020, "prom", 0 )
-	ROM_LOAD( "pr.bpr",      0x00000, 0x020, CRC(33b98466) SHA1(017c73cf8c17dc5047c89316ae5b45f8d22092e8) )
-ROM_END
-
 /******************************************************************************/
 // Bull Fighter ROM Map
 
@@ -1538,6 +1416,9 @@ ROM_START( bullfgtr )
 	ROM_LOAD( "hv2vr.bin", 0x02000, 0x2000, CRC(026e1533) SHA1(6271869a3faaafacfac35262746e87a83c158b93) )
 	ROM_LOAD( "hv3vr.bin", 0x04000, 0x2000, CRC(51ee751c) SHA1(60bf848dfdfe313ab05df5a5c05819b0fa87ca50) )
 	ROM_LOAD( "hv4vr.bin", 0x06000, 0x2000, CRC(62c7a25b) SHA1(237d3cbdfbf45b33c2f65d30faba151380866a93) )
+
+	ROM_REGION( 0x2000, "MCU", 0 )
+	ROM_LOAD( "8303.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE ) // chars
 	ROM_LOAD( "h.bin", 0x000000, 0x1000, CRC(c6894c9a) SHA1(0d5a55cded4fd833211bdc733a78c6c8423897de) )
@@ -1618,6 +1499,9 @@ ROM_START( bullfgts )
 	ROM_LOAD( "hv3vr.bin", 0x04000, 0x2000, CRC(51ee751c) SHA1(60bf848dfdfe313ab05df5a5c05819b0fa87ca50) )
 	ROM_LOAD( "hv4vr.bin", 0x06000, 0x2000, CRC(62c7a25b) SHA1(237d3cbdfbf45b33c2f65d30faba151380866a93) )
 
+	ROM_REGION( 0x2000, "MCU", 0 )
+	ROM_LOAD( "8303.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
+
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE ) // chars
 	ROM_LOAD( "h.bin", 0x000000, 0x1000, CRC(c6894c9a) SHA1(0d5a55cded4fd833211bdc733a78c6c8423897de) )
 
@@ -1655,6 +1539,135 @@ ROM_START( bullfgts )
 ROM_END
 
 /******************************************************************************/
+// Koukouyakyuh ROM Map
+
+/*
+The Koukouyakyuh (JPN Ver.)
+
+(c)1985 Alpha denshi
+
+CPU   :MAIN  68000
+       SOUND 8085
+Sound :AY-3-8910 M3M5232RS
+OSC   :12.000MHz 6.??MHz 14.31818MHz
+*/
+ROM_START( kouyakyu )
+	ROM_REGION( 0x10000, "main", 0 )  // 68000 ROMs
+	ROM_LOAD16_BYTE( "epr-6704.bin", 0x00001, 0x2000, CRC(c7ac2292) SHA1(614bfb0949620d4c260768f14a116b076dd38438) )
+	ROM_LOAD16_BYTE( "epr-6707.bin", 0x00000, 0x2000, CRC(9cb2962e) SHA1(bd1bcbc53a3346e22789f24a35ab3aa681317d02) )
+	ROM_LOAD16_BYTE( "epr-6705.bin", 0x04001, 0x2000, CRC(985327cb) SHA1(86969fe763cbaa527d64de35844773b5ab1d7f83) )
+	ROM_LOAD16_BYTE( "epr-6708.bin", 0x04000, 0x2000, CRC(f8863dc5) SHA1(bfdd294d51420dd70aa97942909a9b8a95ffc05c) )
+	ROM_LOAD16_BYTE( "epr-6706.bin", 0x08001, 0x2000, BAD_DUMP CRC(79e94cd2) SHA1(f44c2292614b46116818fad9a7eb48cceeb3b819)  )	// was bad, manually patched
+	ROM_LOAD16_BYTE( "epr-6709.bin", 0x08000, 0x2000, CRC(f41cb58c) SHA1(f0d1048e949d51432739755f985e4df65b8e918b) )
+	ROM_FILL(                        0x0c000, 0x4000, 0 )
+
+	ROM_REGION( 0x10000, "audio", 0 ) // 8085A ROMs
+	ROM_LOAD( "epr-6703.bin", 0x00000, 0x2000, CRC(fbff3a86) SHA1(4ed2887b1e4509ded853a230f735d4d2aa475886) )
+	ROM_LOAD( "epr-6702.bin", 0x02000, 0x2000, CRC(27ddf031) SHA1(2f11d3b693e46852762669ed1e35a667990edec7) )
+	ROM_LOAD( "epr-6701.bin", 0x04000, 0x2000, CRC(3c83588a) SHA1(a84c813ba9d464cffc855397aaacbb9177c86fb4) )
+	ROM_LOAD( "epr-6700.bin", 0x06000, 0x2000, CRC(ee579266) SHA1(94dfcf506049fc78db00084ff7031d19520d9a85) )
+	ROM_LOAD( "epr-6699.bin", 0x08000, 0x2000, CRC(9bfa4a72) SHA1(8ac4d308dab0d67a26b4e3550c2e8064aaf36a74) )
+	ROM_LOAD( "epr-6698.bin", 0x0a000, 0x2000, CRC(7adfd1ff) SHA1(b543dd6734a681a187dabf602bea390de663039c) )
+
+	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE ) // chars
+	ROM_LOAD( "epr-6710.bin", 0x00000, 0x1000, CRC(accda190) SHA1(265d2fd92574d65e7890e48d5f305bf903a67bc8) )
+
+	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE ) // tiles
+	ROM_LOAD( "epr-6695.bin", 0x00000, 0x2000, CRC(22bea465) SHA1(4860d7ee3c386cdacc9c608ffe74ec8bfa58edcb) )
+	// empty space to unpack previous ROM
+	ROM_LOAD( "epr-6694.bin", 0x04000, 0x2000, CRC(51a7345e) SHA1(184c890559ed633e23cb459c313e6179cc3eb542) )
+	// empty space to unpack previous ROM
+	ROM_LOAD( "epr-6689.bin", 0x08000, 0x2000, CRC(53bf7587) SHA1(0046cd04d11ce789ff69e0807700a624af96eb36) )
+	ROM_LOAD( "epr-6688.bin", 0x0a000, 0x2000, CRC(ceb76c5b) SHA1(81fa236871f10c77eb201e1c9771bd57406df15b) )
+	ROM_LOAD( "epr-6687.bin", 0x0c000, 0x2000, CRC(9c1f49df) SHA1(1a5cf5278777f829d3654e838bd2bb9f4dbb57ba) )
+	ROM_LOAD( "epr-6686.bin", 0x0e000, 0x2000, CRC(3d9e516f) SHA1(498614821f87dbcc39edb1756e1af6b536044e6a) )
+
+	ROM_REGION( 0x10000, "gfx3", ROMREGION_DISPOSE ) // sprites
+	ROM_LOAD( "epr-6696.bin", 0x00000, 0x2000, CRC(0625f48e) SHA1(bea09ccf37f38678fb53c55bd0a79557d6c81b3f) )
+	// empty space to unpack previous ROM
+	ROM_LOAD( "epr-6697.bin", 0x04000, 0x2000, CRC(f18afabe) SHA1(abd7f6c0bd0de145c423166a2f4e86ccdb12b1ce) )
+	// empty space to unpack previous ROM
+	ROM_LOAD( "epr-6690.bin", 0x08000, 0x2000, CRC(a142a11d) SHA1(209c7e0591622434ada4445f3f8789059c5f4f77) )
+	ROM_LOAD( "epr-6691.bin", 0x0a000, 0x2000, CRC(b640568c) SHA1(8cef1387c469abec8b488621a94cc9575d6c5fcc) )
+	ROM_LOAD( "epr-6692.bin", 0x0c000, 0x2000, CRC(b91d8172) SHA1(8d8f6ea78ebf652f295ce96abf19e628fe777d07) )
+	ROM_LOAD( "epr-6693.bin", 0x0e000, 0x2000, CRC(874e3acc) SHA1(29438f196811fc2c8f54b6c47f1c175e4797dd4c) )
+
+	ROM_REGION( 0x0700, "proms", 0 )
+	ROM_LOAD( "pr6627.bpr",  0x0000, 0x100, CRC(5ec5480d) SHA1(f966a277539a5d257f32692cdd92ce44b08599e8) ) // R
+	ROM_LOAD( "pr6629.bpr",  0x0100, 0x100, CRC(29c7a393) SHA1(67cced39c0a80655c420aad668dfe836c1d7c643) ) // G
+	ROM_LOAD( "pr6628.bpr",  0x0200, 0x100, CRC(8af247a4) SHA1(01702fbce53dd4875e4825f0487e7aed9cf212fa) ) // B
+	ROM_LOAD( "pr6630a.bpr", 0x0300, 0x100, CRC(d6e202da) SHA1(500ebd5c95d2d2c33535d25cf7f8f649897dc224) ) // CLUT(same PROM x 4)
+	ROM_LOAD( "pr6630b.bpr", 0x0400, 0x100, CRC(d6e202da) SHA1(500ebd5c95d2d2c33535d25cf7f8f649897dc224) )
+	ROM_LOAD( "pr6630c.bpr", 0x0500, 0x100, CRC(d6e202da) SHA1(500ebd5c95d2d2c33535d25cf7f8f649897dc224) )
+	ROM_LOAD( "pr6630d.bpr", 0x0600, 0x100, CRC(d6e202da) SHA1(500ebd5c95d2d2c33535d25cf7f8f649897dc224) )
+
+	ROM_REGION( 0x0020, "prom", 0 )
+	ROM_LOAD( "pr.bpr",      0x00000, 0x020, CRC(33b98466) SHA1(017c73cf8c17dc5047c89316ae5b45f8d22092e8) )
+ROM_END
+
+/******************************************************************************/
+/*
+Gekisou (JPN Ver.)
+(c)1985 Eastern
+
+68K55-2
+CPU:MC68000P8
+OSC:12.000MHz
+
+SOUND BOARD NO.59 MC 07
+CPU  :TMP8085AP
+Sound:AY-3-8910A,OKI M5232,D8155HC
+OSC  :6.144MHz
+*/
+ROM_START( gekisou )
+	ROM_REGION( 0x10000, "main", 0 ) // 68000 ROMs
+	ROM_LOAD16_BYTE( "1.15b", 0x00001, 0x4000, CRC(945fd546) SHA1(6045dbf11272fcec8320aacb2852d4223d0943a0) )
+	ROM_LOAD16_BYTE( "2.15d", 0x00000, 0x4000, CRC(3c057150) SHA1(2b1ad7993addfd1c0eee99dfe5bb3476cd387f6a) )
+	ROM_LOAD16_BYTE( "3.14b", 0x08001, 0x4000, CRC(7c1cf4d0) SHA1(a122d3a51d205123e04c694912809e0bb31155d5) )
+	ROM_LOAD16_BYTE( "4.14d", 0x08000, 0x4000, CRC(c7282391) SHA1(144a34d74bb1e71e2f799913ab04927d00faec87) )
+
+	ROM_REGION( 0x10000, "audio", 0 ) // 8085A ROMs
+	ROM_LOAD( "v1.1l", 0x00000, 0x4000, CRC(dc6af437) SHA1(77112fec51343d8e73765b2a342a888612813c3b) )
+	ROM_LOAD( "v2.1h", 0x04000, 0x4000, CRC(cb12582e) SHA1(ef378232e2744540cc4c9187cfb36d780dadc962) )
+	ROM_LOAD( "v3.1e", 0x08000, 0x4000, CRC(0ab5e777) SHA1(9177c42418f022a65d73c3302873b894c5a137a4) )
+
+	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE ) // chars
+	ROM_LOAD( "0.5c",  0x00000, 0x1000, CRC(7e8bf4d1) SHA1(8abb82be006e8d1df449a5f83d59637314405119) )
+
+	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE ) // tiles
+	ROM_LOAD( "7.18r",   0x00000, 0x2000, CRC(a1918b6c) SHA1(6ffa4c845d23d311b59cc19411a68a782618b3fd) )
+	// empty space to unpack previous ROM
+	ROM_CONTINUE(        0x04000, 0x2000)
+	// empty space to unpack previous ROM
+	ROM_LOAD( "5.16r",   0x08000, 0x2000, CRC(88ef550a) SHA1(b50e7b8257d1bb6923d289e7af885c14d089b394) )
+	ROM_CONTINUE(        0x0c000, 0x2000)
+	ROM_LOAD( "6.15r",   0x0a000, 0x2000, CRC(473e3fbf) SHA1(5039387b3627c19f592d630ba7bd010a3881adc5) )
+	ROM_CONTINUE(        0x0e000, 0x2000)
+
+	ROM_REGION( 0x10000, "gfx3", ROMREGION_DISPOSE ) // sprites
+	ROM_LOAD( "10.9r",   0x00000, 0x2000, CRC(11d89c73) SHA1(8753f635d321c8e9b93b0ab767cf44aca1db7a0a) )
+	// empty space to unpack previous ROM
+	ROM_CONTINUE(        0x04000, 0x2000)
+	// empty space to unpack previous ROM
+	ROM_LOAD( "8.8r",    0x08000, 0x2000, CRC(2e0c392c) SHA1(48542a24a34e3d5d00af418b29a2ee15557efc99) )
+	ROM_CONTINUE(        0x0c000, 0x2000)
+	ROM_LOAD( "9.6r",    0x0a000, 0x2000, CRC(56a03b08) SHA1(d90b246890fedfc437de85be8bcc6b60ff068be1) )
+	ROM_CONTINUE(        0x0e000, 0x2000)
+
+	ROM_REGION( 0x0700, "proms", 0 )
+	ROM_LOAD( "1b.bpr",  0x0000, 0x100, CRC(11a1c0aa) SHA1(d007d31f68bf802c89422ea2393747ac8de94d70) ) // R
+	ROM_LOAD( "4b.bpr",  0x0100, 0x100, CRC(c7ebe52c) SHA1(19d2ee70d67fd5e1c57f66d030ec9a5b6af5a49e) ) // G
+	ROM_LOAD( "2b.bpr",  0x0200, 0x100, CRC(4f5d4141) SHA1(965221c6af4a868760e6d168b55e037fc5f9fa52) ) // B
+	ROM_LOAD( "2n.bpr",  0x0300, 0x100, CRC(c7333120) SHA1(ad590e8ece3dcf56b285c4a080f4ee8bb4c9d77c) ) // CLUT(same PROM x 4)
+	ROM_LOAD( "3n.bpr",  0x0400, 0x100, CRC(c7333120) SHA1(ad590e8ece3dcf56b285c4a080f4ee8bb4c9d77c) )
+	ROM_LOAD( "4n.bpr",  0x0500, 0x100, CRC(c7333120) SHA1(ad590e8ece3dcf56b285c4a080f4ee8bb4c9d77c) )
+	ROM_LOAD( "5n.bpr",  0x0600, 0x100, CRC(c7333120) SHA1(ad590e8ece3dcf56b285c4a080f4ee8bb4c9d77c) )
+
+	ROM_REGION( 0x0020, "prom", 0 )
+	ROM_LOAD( "3h.bpr",  0x00000, 0x020, CRC(33b98466) SHA1(017c73cf8c17dc5047c89316ae5b45f8d22092e8) )
+ROM_END
+
+/******************************************************************************/
 // Splendor Blast ROM Map
 
 /*
@@ -1683,6 +1696,9 @@ ROM_START( splndrbt )
 	ROM_LOAD( "2_v.1l", 0x02000, 0x2000, CRC(2a618c72) SHA1(6ad459d94352c317150ae6344d4db9bb613938dd) )
 	ROM_LOAD( "3_v.1k", 0x04000, 0x2000, CRC(bbee5346) SHA1(753cb784b04f081fa1f8590dc28056d9918f313b) )
 	ROM_LOAD( "4_v.1h", 0x06000, 0x2000, CRC(10f45af4) SHA1(00fa599bad8bf3ba6deee54165f381403096e8f9) )
+
+	ROM_REGION( 0x2000, "MCU", 0 )
+	ROM_LOAD( "8303.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )	// chars
 	ROM_LOAD( "10.8c",  0x00000, 0x2000, CRC(501887d4) SHA1(3cf4401d6fddff1500066219a71ac3b30ecbdd28) )
@@ -1852,10 +1868,10 @@ static DRIVER_INIT( hvoltage )
 // Equites Hardware
 GAME( 1984, equites,  0,        equites,  equites,  equites,  ROT90, "Alpha Denshi Co.",                "Equites", GAME_IMPERFECT_SOUND )
 GAME( 1984, equitess, equites,  equites,  equites,  equites,  ROT90, "Alpha Denshi Co. (Sega license)", "Equites (Sega)", GAME_IMPERFECT_SOUND )
-GAME( 1985, gekisou,  0,        gekisou,  gekisou,  gekisou,  ROT90, "Eastern Corp.",                   "Gekisou (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1984, bullfgtr, 0,        equites,  bullfgtr, bullfgtr, ROT90, "Alpha Denshi Co.",                "Bull Fighter", GAME_IMPERFECT_SOUND )
 GAME( 1984, bullfgts, bullfgtr, equites,  bullfgtr, bullfgtr, ROT90, "Alpha Denshi Co. (Sega license)", "Bull Fighter (Sega)", GAME_IMPERFECT_SOUND )
 GAME( 1985, kouyakyu, 0,        equites,  kouyakyu, kouyakyu, ROT0,  "Alpha Denshi Co.",                "The Koukouyakyuh", GAME_IMPERFECT_SOUND )
+GAME( 1985, gekisou,  0,        gekisou,  gekisou,  gekisou,  ROT90, "Eastern Corp.",                   "Gekisou (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
 // Splendor Blast Hardware
 GAME( 1985, splndrbt, 0,        splndrbt, splndrbt, splndrbt, ROT0,  "Alpha Denshi Co.", "Splendor Blast", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

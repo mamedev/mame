@@ -21,7 +21,7 @@ Talbot                    1982  8201?
 Champion Base Ball        1983  8201 (schematics)
 Exciting Soccer           1983  8301?
 Champion Base Ball II     1983  8302 (pcb, unofficial schematics)
-Exciting Soccer II        1984  8303?
+Exciting Soccer II        1984  8303 (uses 8303+ opcodes)
 Equites                   1984  8303 (post)
 Bull Fighter              1984  8303 (post)
 Splendor Blast            1985  8303 (post)
@@ -585,10 +585,11 @@ static void ld_rb_a(void)     { regPTR = R.A; }
 static void exg_ix0_ix1(void)  { UINT8 t=IX1; IX1 = IX0; IX0 = t; }
 static void exg_ix0_ix2(void)  { UINT8 t=IX2; IX2 = IX0; IX0 = t; }
 
-static void op_d4(void) { R.A = M_RDMEM( ((RD_REG(7) & 3) << 8) | M_RDMEM_OPCODE() ); }
-static void op_d5(void) { M_WRMEM( ((RD_REG(7) & 3) << 8) | M_RDMEM_OPCODE(), R.A ); }
-static void op_d6(void) { LP0 = M_RDMEM( ((RD_REG(7) & 3) << 8) | M_RDMEM_OPCODE() ); }
-static void op_d7(void) { M_WRMEM( ((RD_REG(7) & 3) << 8) | M_RDMEM_OPCODE(), LP0 ); }
+static void op_d4(void) { R.A = M_RDMEM( ((regRAM[(7<<3)+7] & 3) << 8) | M_RDMEM_OPCODE() ); }
+static void op_d5(void) { M_WRMEM( ((regRAM[(7<<3)+7] & 3) << 8) | M_RDMEM_OPCODE(), R.A ); }
+static void op_d6(void) { LP0 = M_RDMEM( ((regRAM[(7<<3)+7] & 3) << 8) | M_RDMEM_OPCODE() ); }
+static void op_d7(void) { M_WRMEM( ((regRAM[(7<<3)+7] & 3) << 8) | M_RDMEM_OPCODE(), LP0 ); }
+
 static void ld_a_abs(void) { R.A = M_RDMEM( ((R.mb & 3) << 8) | M_RDMEM_OPCODE() ); }
 static void ld_abs_a(void) { M_WRMEM( ((R.mb & 3) << 8) | M_RDMEM_OPCODE(), R.A ); }
 
