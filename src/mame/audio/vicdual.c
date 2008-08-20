@@ -38,7 +38,7 @@ static emu_timer *frogs_croak_timer;
 
 static const discrete_555_desc frogsZip555m =
 {
-	DISC_555_TRIGGER_IS_LOGIC | DISC_555_OUT_DC | DISC_555_OUT_CAP,
+	DISC_555_OUT_CAP | DISC_555_OUT_DC | DISC_555_TRIGGER_IS_LOGIC,
 	12,		// B+ voltage of 555
 	DEFAULT_555_VALUES
 };
@@ -48,7 +48,6 @@ static const discrete_555_cc_desc frogsZip555cc =
 	DISC_555_OUT_CAP | DISC_555_OUT_DC,
 	12,		// B+ voltage of 555
 	DEFAULT_555_VALUES,
-	12,		// B+ voltage of the Constant Current source
 	0.6		// Q13 Vbe
 };
 
@@ -220,53 +219,62 @@ WRITE8_HANDLER( frogs_audio_w )
 
 
 static const discrete_mixer_desc headon_mixer =
-	{DISC_MIXER_IS_RESISTOR,
-		{RES_K(130), RES_K(130), RES_K(100), RES_K(100), RES_K(100), RES_K(10)},   // 130 = 390/3, Bonus Res is dummy
-		{0,0,0,0,0},	// no variable resistors
-		{0,0,0,0,CAP_N(470),0},
-		0, RES_K(100),
-		0,
-		CAP_U(1),		// not in schematics, used to suppress DC
-		0, 1};
+{
+	DISC_MIXER_IS_RESISTOR,
+	{RES_K(130), RES_K(130), RES_K(100), RES_K(100), RES_K(100), RES_K(10)},   // 130 = 390/3, Bonus Res is dummy
+	{0,0,0,0,0},	// no variable resistors
+	{0,0,0,0,CAP_N(470),0},
+	0, RES_K(100),
+	0,
+	CAP_U(1),		// not in schematics, used to suppress DC
+	0, 1
+};
 
 static const discrete_mixer_desc headon_crash_mixer =
-	{DISC_MIXER_IS_OP_AMP,
-		{RES_K(50), RES_K(10)},   // Resistors, in fact variable resistors (100k)
-		{0,0,0,0,0},	// no variable resistors
-		{CAP_N(100),CAP_U(1)},
-		0, RES_K(100),
-		0,
-		CAP_U(1)*0,		// not in schematics, used to suppress DC
-		0, 1};
+{
+	DISC_MIXER_IS_OP_AMP,
+	{RES_K(50), RES_K(10)},   // Resistors, in fact variable resistors (100k)
+	{0,0,0,0,0},	// no variable resistors
+	{CAP_N(100),CAP_U(1)},
+	0, RES_K(100),
+	0,
+	CAP_U(1)*0,		// not in schematics, used to suppress DC
+	0, 1
+};
 
 static const discrete_inverter_osc_desc headon_inverter_osc_1 =
-	{DEFAULT_CD40XX_VALUES(12),
+{
+	DEFAULT_CD40XX_VALUES(12),
 	DISC_OSC_INVERTER_IS_TYPE4
-	};
+};
 
 static const discrete_inverter_osc_desc headon_inverter_osc_2 =
-	{DEFAULT_CD40XX_VALUES(12),
+{
+	DEFAULT_CD40XX_VALUES(12),
 	DISC_OSC_INVERTER_IS_TYPE5 | DISC_OSC_INVERTER_OUT_IS_LOGIC
-	};
+};
 
 static const discrete_555_desc headon_555_bonus =
-	{DISC_555_OUT_DC | DISC_555_OUT_ENERGY,
-		12,
-		12-0.5,12*0.66,12*0.33
-	};
+{
+	DISC_555_OUT_ENERGY | DISC_555_OUT_DC,
+	12,
+	DEFAULT_555_CHARGE,
+	12.0-0.5
+};
 
 static const discrete_555_desc headon_555_crash =
-	{DISC_555_OUT_DC | DISC_555_TRIGGER_IS_LOGIC,
-		12,
-		12-0.5,12*0.66,12*0.33
-	};
+{
+	DISC_555_OUT_SQW | DISC_555_OUT_DC | DISC_555_TRIGGER_IS_LOGIC,
+	12,
+	DEFAULT_555_CHARGE,
+	12.0-0.5
+};
 
 static const discrete_555_cc_desc headon_555cc =
 {
-	DISC_555_OUT_DC,
+	DISC_555_OUT_SQW | DISC_555_OUT_DC,
 	12,		// B+ voltage of 555
 	DEFAULT_555_VALUES,
-	12,		// B+ voltage of the Constant Current source
 	0.6		// Q16, Q10 Vbe
 };
 
@@ -274,15 +282,15 @@ static const discrete_555_cc_desc headon_555cc =
 /*
  * From : http://www.vego.nl/8/08/03/08_08_03.htm
  *
- * - voeding: -7 V, clock-frequentie: 2.267 Hz
- *- voeding: -8 V, clock-frequentie: 8.731 Hz
- *- voeding: -9 V, clock-frequentie: 16,38 kHz
- *- voeding: -10 V, clock-frequentie: 23,53 kHz
- *- voeding: -11 V, clock-frequentie: 32,56 kHz
- *- voeding: -12 V, clock-frequentie: 38,34 kHz
- *- voeding: -13 V, clock-frequentie: 40,00 kHz
- *- voeding: -14 V, clock-frequentie: 37,80 kHz
- *- voeding: -15 V, clock-frequentie: 33,17 kHz
+ *- voeding:  -7 V, clock-frequency:  2.267 Hz
+ *- voeding:  -8 V, clock-frequency:  8.731 Hz
+ *- voeding:  -9 V, clock-frequency: 16,38 kHz
+ *- voeding: -10 V, clock-frequency: 23,53 kHz
+ *- voeding: -11 V, clock-frequency: 32,56 kHz
+ *- voeding: -12 V, clock-frequency: 38,34 kHz
+ *- voeding: -13 V, clock-frequency: 40,00 kHz
+ *- voeding: -14 V, clock-frequency: 37,80 kHz
+ *- voeding: -15 V, clock-frequency: 33,17 kHz
  *
  *  However all other mame sources say 100kHz.
  */
@@ -305,9 +313,10 @@ static const discrete_lfsr_desc mm5837_lfsr =
 };
 
 static const discrete_op_amp_filt_info headon_sallen_key_info =
-	{ RES_K(15), RES_K(15), 0, 0, 0,
-	  CAP_N(470), CAP_N(47), 0
-	};
+{
+	RES_K(15), RES_K(15), 0, 0, 0,
+	CAP_N(470), CAP_N(47), 0
+};
 
 static DISCRETE_SOUND_START(headon)
 	/************************************************

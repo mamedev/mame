@@ -26,7 +26,6 @@ static const discrete_555_cc_desc poolshrk_score_vco =
 	DISC_555_OUT_SQW,
 	5,		// B+ voltage of 555
 	DEFAULT_555_VALUES,
-	5,		// B+ voltage of the Constant Current source
 	0.7		// Q3 junction voltage
 };
 

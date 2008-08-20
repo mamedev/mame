@@ -110,7 +110,6 @@ static const discrete_555_cc_desc firetrk_motor_vco =
 	DISC_555_OUT_DC | DISC_555_OUT_SQW,
 	5,		// B+ voltage of 555
 	DEFAULT_555_VALUES,
-	5,		// B+ voltage of the Constant Current source
 	0.7		// Q2 junction voltage
 };
 
@@ -222,7 +221,7 @@ DISCRETE_SOUND_START(firetrk)
 			RES_M(1), 0, 0,		// R28, no rGnd, no rDis
 			&firetrk_motor_vco)
 	DISCRETE_COUNTER_7492(NODE_23, 1, FIRETRUCK_ATTRACT_EN,	// IC A9, QB-QD
-			NODE_22)									// from IC B9, pin 3
+			NODE_22, DISC_CLK_ON_F_EDGE)					// from IC B9, pin 3
 	DISCRETE_TRANSFORM2(NODE_24, 1, NODE_23, 0x04, "01&")	// IC A9, pin 8
 	DISCRETE_COUNTER(NODE_25, 1, FIRETRUCK_ATTRACT_EN,	// IC A9, pin 12
 			NODE_24,									// from IC A9, pin 8
@@ -337,7 +336,6 @@ static const discrete_555_cc_desc superbug_motor_vco =
 	DISC_555_OUT_DC | DISC_555_OUT_SQW,
 	5,				// B+ voltage of 555
 	DEFAULT_555_VALUES,
-	5,				// B+ voltage of the Constant Current source
 	0.7				// Q1 junction voltage
 };
 
@@ -426,8 +424,8 @@ DISCRETE_SOUND_START(superbug)
 			RES_M(3.3), 0, 0,	// R11, no rGnd, no rDis
 			&superbug_motor_vco)
 	DISCRETE_COUNTER_7492(NODE_23, 1, SUPERBUG_ATTRACT_EN,	// IC A7, QB-QD
-			NODE_22)										// from IC A6, pin 3
-	DISCRETE_TRANSFORM2(NODE_24, 1, NODE_23, 0x04, "01&")		// IC A7, pin 8-QD
+			NODE_22, DISC_CLK_ON_F_EDGE)					// from IC A6, pin 3
+	DISCRETE_TRANSFORM2(NODE_24, 1, NODE_23, 0x04, "01&")	// IC A7, pin 8-QD
 	DISCRETE_TRANSFORM2(NODE_25, 1, NODE_23, 0x01, "01&")	// IC A7, pin 11-QB
 	DISCRETE_LOGIC_XOR(NODE_26, 1, NODE_24, NODE_25)	// Gate A9, pin 8
 	DISCRETE_COUNTER(NODE_27, 1, SUPERBUG_ATTRACT_EN,	// IC A7, pin 12-QA
@@ -498,7 +496,6 @@ static const discrete_555_cc_desc montecar_motor_vco =
 	DISC_555_OUT_DC | DISC_555_OUT_SQW,
 	5,		// B+ voltage of 555
 	DEFAULT_555_VALUES,
-	5,		// B+ voltage of the Constant Current source
 	0.7		// Q1 junction voltage
 };
 
@@ -611,7 +608,7 @@ DISCRETE_SOUND_START(montecar)
 			RES_M(1), 0, 0,		// R86, no rGnd, no rDis
 			&montecar_motor_vco)
 	DISCRETE_COUNTER_7492(NODE_23, 1, MONTECAR_ATTRACT_EN,	// IC B/C9, QB-QD
-			NODE_22)										// from IC C9, pin 9
+			NODE_22, DISC_CLK_ON_F_EDGE)						// from IC C9, pin 9
 	DISCRETE_TRANSFORM2(NODE_24, 1, NODE_23, 0x04, "01&")	// IC B/C9, pin 8-QD
 	DISCRETE_TRANSFORM2(NODE_25, 1, NODE_23, 0x01, "01&")	// IC B/C9, pin 11-QB
 	DISCRETE_LOGIC_XOR(NODE_26, 1, NODE_24, NODE_25)	// Gate A9, pin 11
@@ -646,7 +643,7 @@ DISCRETE_SOUND_START(montecar)
 			RES_M(1), 0, 0,		// R81, no rGnd, no rDis
 			&montecar_motor_vco)
 	DISCRETE_COUNTER_7492(NODE_43, 1, MONTECAR_ATTRACT_EN,	// IC A/B9, QB-QD
-			NODE_42)										// from IC C9, pin 5
+			NODE_42, DISC_CLK_ON_F_EDGE)					// from IC C9, pin 5
 	DISCRETE_TRANSFORM2(NODE_44, 1, NODE_43, 0x04, "01&")	// IC A/B9, pin 8-QD
 	DISCRETE_TRANSFORM2(NODE_45, 1, NODE_43, 0x01, "01&")	// IC A/B9, pin 11-QB
 	DISCRETE_LOGIC_XOR(NODE_46, 1, NODE_44, NODE_45)	// Gate A9, pin 6

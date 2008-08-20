@@ -201,62 +201,73 @@ static const discrete_lfsr_desc dkong_lfsr =
 };
 
 static const discrete_mixer_desc dkong_rc_jump_desc =
-	{DISC_MIXER_IS_RESISTOR,
-		{1, DK_R49+DK_R51,NE555_INTERNAL_R,2*NE555_INTERNAL_R},
-		{NODE_26,0,0,0},
-		{0,0,0,0},  // no node capacitors
-		0, 0,
-		DK_C24,
-		0,
-		0, 1};
+{
+	DISC_MIXER_IS_RESISTOR,
+	{1, DK_R49+DK_R51,NE555_INTERNAL_R,2*NE555_INTERNAL_R},
+	{NODE_26,0,0,0},
+	{0,0,0,0},  // no node capacitors
+	0, 0,
+	DK_C24,
+	0,
+	0, 1
+};
 
 static const discrete_mixer_desc dkong_rc_walk_desc =
-	{DISC_MIXER_IS_RESISTOR,
-		{1, DK_R45+DK_R44,NE555_INTERNAL_R,2*NE555_INTERNAL_R},
-		{NODE_52,0,0,0},
-		{0,0,0,0},  // no node capacitors
-		0, 0,
-		DK_C29,
-		0,
-		0, 1};
+{
+	DISC_MIXER_IS_RESISTOR,
+	{1, DK_R45+DK_R44,NE555_INTERNAL_R,2*NE555_INTERNAL_R},
+	{NODE_52,0,0,0},
+	{0,0,0,0},  // no node capacitors
+	0, 0,
+	DK_C29,
+	0,
+	0, 1
+};
 
 static const discrete_mixer_desc dkong_mixer_desc =
-	{DISC_MIXER_IS_RESISTOR,
-		{DK_R2, DK_R24, DK_R1, DK_R14},
-		{0,0,0},	// no variable resistors
-		{0,0,0},  // no node capacitors
+{
+	DISC_MIXER_IS_RESISTOR,
+	{DK_R2, DK_R24, DK_R1, DK_R14},
+	{0,0,0},	// no variable resistors
+	{0,0,0},  // no node capacitors
 #if DK_REVIEW
-		0, RES_K(10),
+	0, RES_K(10),
 #else
-		0, 0,
+	0, 0,
 #endif
-		DK_C159,
-		DK_C12,
-		0, 1};
+	DK_C159,
+	DK_C12,
+	0, 1
+};
 
 /* There is no load on the output for the jump circuit
  * For the walk circuit, the voltage does not matter */
 
 static const discrete_555_desc dkong_555_vco_desc =
-	{DISC_555_OUT_DC | DISC_555_OUT_ENERGY,
-		DK_SUP_V,
-		DK_SUP_V-0.5,DK_SUP_V*0.66,DK_SUP_V*0.33
-	};
+{
+	DISC_555_OUT_ENERGY | DISC_555_OUT_DC,
+	DK_SUP_V,
+	DEFAULT_555_CHARGE,
+	DK_SUP_V - 0.5
+};
 
 static const discrete_inverter_osc_desc dkong_inverter_osc_desc_jump =
-	{DEFAULT_CD40XX_VALUES(DK_SUP_V),
+{
+	DEFAULT_CD40XX_VALUES(DK_SUP_V),
 	DISC_OSC_INVERTER_IS_TYPE1
-	};
+};
 
 static const discrete_inverter_osc_desc dkong_inverter_osc_desc_walk =
-	{DEFAULT_CD40XX_VALUES(DK_SUP_V),
+{
+	DEFAULT_CD40XX_VALUES(DK_SUP_V),
 	DISC_OSC_INVERTER_IS_TYPE2
-	};
+};
 
 static const discrete_op_amp_filt_info dkong_sallen_key_info =
-	{ RES_K(5.6), RES_K(5.6), 0, 0, 0,
-	  CAP_N(22), CAP_N(10), 0
-	};
+{
+	RES_K(5.6), RES_K(5.6), 0, 0, 0,
+	CAP_N(22), CAP_N(10), 0
+};
 
 static DISCRETE_SOUND_START(dkong2b)
 
@@ -502,11 +513,7 @@ static const discrete_mixer_desc radarscp_mixer_desc_7 =
 /* There is no load on the output for the jump circuit
  * For the walk circuit, the voltage does not matter */
 
-static const discrete_555_desc radarscp_555_vco_desc =
-	{DISC_555_OUT_DC | DISC_555_OUT_ENERGY,
-		DK_SUP_V,
-		DK_SUP_V-0.5,DK_SUP_V*0.66,DK_SUP_V*0.33
-	};
+#define radarscp_555_vco_desc  dkong_555_vco_desc
 
 static const discrete_inverter_osc_desc radarscp_inverter_osc_desc_0 =
 	{DEFAULT_CD40XX_VALUES(DK_SUP_V),

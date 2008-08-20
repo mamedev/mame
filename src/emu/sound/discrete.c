@@ -307,8 +307,10 @@ static void *discrete_start(const char *tag, int sndindex, int clock, const void
 
 	/* create the logfile */
 	sprintf(name, "discrete%d.log", info->sndindex);
-	if (DISCRETE_DEBUGLOG && !discrete_current_context->disclogfile)
-		discrete_current_context->disclogfile = fopen(name, "w");
+	if (DISCRETE_DEBUGLOG && !info->disclogfile)
+		info->disclogfile = fopen(name, "w");
+
+	discrete_current_context = info;
 
 	/* first pass through the nodes: sanity check, fill in the indexed_nodes, and make a total count */
 	discrete_log("discrete_start() - Doing node list sanity check");
@@ -329,8 +331,6 @@ static void *discrete_start(const char *tag, int sndindex, int clock, const void
 		/* make sure this is a main node */
 		if (NODE_CHILD_NODE_NUM(intf[info->node_count].node) > 0)
 			fatalerror("discrete_start() - Child node number on NODE_%02d", NODE_INDEX(intf[info->node_count].node) );
-
-
 	}
 	info->node_count++;
 	discrete_log("discrete_start() - Sanity check counted %d nodes", info->node_count);
@@ -357,6 +357,8 @@ static void *discrete_start(const char *tag, int sndindex, int clock, const void
 	setup_output_nodes(info);
 
 	setup_disc_logs(info);
+
+	discrete_current_context = NULL;
 	return info;
 }
 
@@ -414,9 +416,9 @@ static void discrete_stop(void *chip)
 	if (DISCRETE_DEBUGLOG)
 	{
 		/* close the debug log */
-	    if (discrete_current_context->disclogfile)
-	    	fclose(discrete_current_context->disclogfile);
-		discrete_current_context->disclogfile = NULL;
+	    if (info->disclogfile)
+	    	fclose(info->disclogfile);
+		info->disclogfile = NULL;
 	}
 }
 
@@ -703,8 +705,8 @@ static void find_input_nodes(discrete_info *info, discrete_sound_block *block_li
 				if (NODE_CHILD_NODE_NUM(inputnode) >= node_ref->module.num_output)
 					fatalerror("discrete_start - Node NODE_%02d referenced non existent output %d on node NODE_%02d", NODE_INDEX(node->node), NODE_CHILD_NODE_NUM(inputnode), NODE_INDEX(inputnode));
 
-				node->input[inputnum] = &(node_ref->output[NODE_CHILD_NODE_NUM(inputnode)]);	// Link referenced node out to input
-				node->input_is_node |= 1 << inputnum;			// Bit flag if input is node
+				node->input[inputnum] = &(node_ref->output[NODE_CHILD_NODE_NUM(inputnode)]);	/* Link referenced node out to input */
+				node->input_is_node |= 1 << inputnum;			/* Bit flag if input is node */
 			}
 		}
 	}

@@ -238,7 +238,8 @@ static const discrete_555_desc phoenix_effect2_555 =
 {
 	DISC_555_OUT_ENERGY,
 	5,		// B+ voltage of 555
-	4.0, DEFAULT_555_THRESHOLD, DEFAULT_555_TRIGGER
+	DEFAULT_555_CHARGE,
+	4.0		// loaded output voltage
 };
 
 static const discrete_comp_adder_table phoenix_effect2_cap_sel =
@@ -335,52 +336,145 @@ DISCRETE_SOUND_START(phoenix)
 	/* - level 5 spaceship                          */
 	/************************************************/
 	/* R22 has been confirmed on real boards as 470 ohm, not 47k in schematics  */
-	DISCRETE_RCDISC4(NODE_20, 1, PHOENIX_EFFECT_1_FREQ, 470, RES_K(100), RES_K(33), CAP_U(6.8), 12, 1)	// R22, R23, R24, C7
-	DISCRETE_555_ASTABLE_CV(NODE_21, 1, RES_K(47), RES_K(47), CAP_U(.001), NODE_20, &phoenix_effect1_555)		// R25, R26, C8
+	DISCRETE_RCDISC4(NODE_20,					/* IC52 output pin 7 */
+					 1,							/* ENAB */
+					 PHOENIX_EFFECT_1_FREQ,		/* Input to O.C. inverter */
+					 470,						/* R22 */
+					 RES_K(100),				/* R23 */
+					 RES_K(33),					/* R24 */
+					 CAP_U(6.8),				/* C7 */
+					 12,						/* 12V supply */
+					 1)							/* Circuit type 1 */
+	DISCRETE_555_ASTABLE_CV(NODE_21,			/* IC20 pin 6 */
+							1,					/* ENAB */
+							RES_K(47),			/* R25 */
+							RES_K(47),			/* R26 */
+							CAP_U(.001),		/* C8 */
+							NODE_20,			/* IC48 pin 5 input */
+							&phoenix_effect1_555)
 	/* LS163 counts rising edge, but the LS14 inverts that */
-	DISCRETE_NOTE(NODE_22, 1, NODE_21, PHOENIX_EFFECT_1_DATA, 0x0f, 1, DISC_CLK_BY_COUNT | DISC_OUT_IS_ENERGY)
+	DISCRETE_NOTE(NODE_22,						/* IC21 pin 5 output */
+				  1,							/* ENAB */
+				  NODE_21,						/* IC13 pin 2 clock input */
+				  PHOENIX_EFFECT_1_DATA,		/* Pre-load data */
+				  0x0f,							/* Maximum count of first counter 0-15 (IC13) */
+				  1,							/* Maximum count of second counter 0-1 (IC21) */
+				  DISC_CLK_BY_COUNT | DISC_OUT_IS_ENERGY)	/* Module is clocked externally and we anti-alias output */
 	/* When FILT is enabled, the effect is filtered.
      * While the R20 does decrease the amplitude a little, its main purpose
      * is to discharge C5 when the filter is disabled. */
-	DISCRETE_SWITCH(NODE_23, 1, PHOENIX_EFFECT_1_FILT, DEFAULT_TTL_V_LOGIC_1, DEFAULT_TTL_V_LOGIC_1 * RES_K(100) / (RES_K(10) + RES_K(100)))	// R20, R19
-	DISCRETE_MULTIPLY(NODE_24, 1, NODE_22, NODE_23)
-	DISCRETE_RCFILTER(NODE_25, 1, NODE_24, 1.0/(1.0/RES_K(10) + 1.0/RES_K(100)), CAP_U(.047))	// R19, R20, C5
-	DISCRETE_SWITCH(PHOENIX_EFFECT_1_SND, 1, PHOENIX_EFFECT_1_FILT, NODE_24, NODE_25)
+	DISCRETE_SWITCH(NODE_23,
+					1,							/* ENAB */
+					PHOENIX_EFFECT_1_FILT,
+					DEFAULT_TTL_V_LOGIC_1,
+					DEFAULT_TTL_V_LOGIC_1 * RES_K(100) / (RES_K(10) + RES_K(100)))	/* R20, R19 */
+	DISCRETE_MULTIPLY(NODE_24,
+					  1,						/* ENAB */
+					  NODE_22,
+					  NODE_23)
+	DISCRETE_RCFILTER(NODE_25,
+					  1,
+					  NODE_24,
+					  1.0/(1.0/RES_K(10) + 1.0/RES_K(100)),	/* R19, R20 */
+					  CAP_U(.047))							/* C5 */
+	DISCRETE_SWITCH(PHOENIX_EFFECT_1_SND,
+					1,							/* ENAB */
+					PHOENIX_EFFECT_1_FILT,
+					NODE_24,					/* non-filtered */
+					NODE_25)					/* filtered */
 
 	/************************************************/
 	/* Effect 2                                     */
 	/* - bird flying, bird/phoenix/spaceship hit    */
 	/* - phoenix wing hit                           */
 	/************************************************/
-	DISCRETE_COMP_ADDER(NODE_30, 1, PHOENIX_EFFECT_2_FREQ, &phoenix_effect2_cap_sel)
+	DISCRETE_COMP_ADDER(NODE_30,				/* total capacitance of selected capacitors */
+						1,						/* ENAB */
+						PHOENIX_EFFECT_2_FREQ,	/* passed selection bits */
+						&phoenix_effect2_cap_sel)
 	/* Part of the frequency select also effects the gain */
-	DISCRETE_TRANSFORM2(NODE_31, 1, PHOENIX_EFFECT_2_FREQ, 2, "01&1/") // get bit 0x02
-	DISCRETE_SWITCH(NODE_32, 1, NODE_31, DEFAULT_TTL_V_LOGIC_1, DEFAULT_TTL_V_LOGIC_1/2)
-	DISCRETE_555_ASTABLE(NODE_33, 1, RES_K(47), RES_K(100), NODE_30, &phoenix_effect2_555)		// R40, R41
+	DISCRETE_TRANSFORM2(NODE_31,				/* 0/1 state of PHOENIX_EFFECT_2_FREQ high bit */
+						1,						/* ENAB */
+						PHOENIX_EFFECT_2_FREQ, 2, "01&1/") // get bit 0x02
+	DISCRETE_SWITCH(NODE_32,					/* voltage level */
+					1,							/* ENAB */
+					NODE_31,					/* PHOENIX_EFFECT_2_FREQ high bit determines voltage level */
+					DEFAULT_TTL_V_LOGIC_1,
+					DEFAULT_TTL_V_LOGIC_1 / 2)
+	DISCRETE_555_ASTABLE(NODE_33,				/* pin 3 output of IC44 */
+						 1,						/* ENAB */
+						 RES_K(47),				/* R40 */
+						 RES_K(100),			/* R41 */
+						 NODE_30,				/* C16, C17, C18 combined */
+						 &phoenix_effect2_555)
 	/* C20 has been confirmed on real boards as 1uF, not 10uF in schematics  */
-	DISCRETE_555_ASTABLE(NODE_34, 1, RES_K(510), RES_K(510), CAP_U(1), &phoenix_effect2_555)	// R23, R24, C20
+	DISCRETE_555_ASTABLE(NODE_34,				/* pin 3 output of IC51 */
+						 1,						/* ENAB */
+						 RES_K(510),			/* R23 */
+						 RES_K(510),			/* R24 */
+						 CAP_U(1),				/* C20 */
+						 &phoenix_effect2_555)
 	/* R45 & R46 have been confirmed on real boards as 5.1k, not 51k in schematics  */
 	/* We need to work backwards here and calculate the voltage at the junction of R42 & R46 */
 	/* If you remove C22 from the real PCB, you can WAVELOG NODE_35 with a gain of 1000 and compare
      * it against the junction of R42 & R46 on a real PCB. */
-	DISCRETE_MIXER3(NODE_35, 1, NODE_33, NODE_34, 5, &phoenix_effect2_mixer1)
+	DISCRETE_MIXER3(NODE_35,					/* Voltage at junction of R42 & R46 with C22 removed */
+					1,							/* ENAB */
+					NODE_33,					/* output from IC44 */
+					NODE_34,					/* output from IC51 */
+					5,							/* B+ connected internally to pin 5 of 555 */
+					&phoenix_effect2_mixer1)
 	/* Then calculate the voltage going to C22 */
 	/* If you remove C22 from the real PCB, you can WAVELOG NODE_36 with a gain of 1000 and compare
      * it against the junction of R45 & R46 on a real PCB. */
-	DISCRETE_MIXER2(NODE_36, 1, NODE_34, NODE_35, &phoenix_effect2_mixer2)
+	DISCRETE_MIXER2(NODE_36,					/* Voltage at junction of R45 & R46 with C22 removed */
+					1,							/* ENAB */
+					NODE_34,					/* pin 3 output of IC51 */
+					NODE_35,					/* Voltage at junction of R42 & R46 with C22 removed */
+					&phoenix_effect2_mixer2)
 	/* C22 charging is R45 in parallel with R46, R42 and the 555 CV internal resistance */
-	DISCRETE_RCFILTER(NODE_37, 1, NODE_36, 1.0/ (1.0/RES_K(5.1) + (1.0/(RES_K(5.1) + 1.0/(1.0/RES_K(10) + 1.0/RES_K(5) + 1.0/RES_K(10)) ))), CAP_U(100))	// R45, R46, R42, internal 555 Rs, C22
+	DISCRETE_RCFILTER(NODE_37,
+					  1,						/* ENAB */
+					  NODE_36,
+					  1.0/ (1.0/RES_K(5.1) + (1.0/(RES_K(5.1) + 1.0/(1.0/RES_K(10) + 1.0/RES_K(5) + 1.0/RES_K(10)) ))),
+					  CAP_U(100))	/* R45, R46, R42, internal 555 Rs, C22 */
 	/* Now mix from C22 on */
 	/* You can WAVELOG NODE_38 with a gain of 1000 and compare it against IC50 pin 5 on a real PCB. */
-	DISCRETE_MIXER3(NODE_38, 1, NODE_33, NODE_37, 5, &phoenix_effect2_mixer3)
-	DISCRETE_555_ASTABLE_CV(NODE_39, 1, RES_K(20), RES_K(20), CAP_U(0.001), NODE_38, &phoenix_effect1_555)	// R47, R48, C23
-	DISCRETE_NOTE(NODE_40, 1, NODE_39, PHOENIX_EFFECT_2_DATA, 0x0f, 1, DISC_CLK_BY_COUNT | DISC_OUT_IS_ENERGY)
-	DISCRETE_MULTIPLY(PHOENIX_EFFECT_2_SND, 1, NODE_40, NODE_32)
+	DISCRETE_MIXER3(NODE_38,					/* control voltage to pin 5 of IC50 */
+					1,							/* ENAB */
+					NODE_33,					/* pin 3 output of IC44 */
+					NODE_37,					/* voltage on C22 */
+					5,							/* IC50 internally connected to B+ */
+					&phoenix_effect2_mixer3)
+	DISCRETE_555_ASTABLE_CV(NODE_39,			/* IC20 pin 8 output */
+							1,					/* ENAB */
+							RES_K(20),			/* R47 */
+							RES_K(20),			/* R48 */
+							CAP_U(0.001),		/* C23 */
+							NODE_38,			/* IC50 pin 5 input */
+							&phoenix_effect1_555)
+	DISCRETE_NOTE(NODE_40,						/* IC21 pin 9 output */
+				  1,							/* ENAB */
+				  NODE_39,						/* IC14 pin 2 clock input */
+				  PHOENIX_EFFECT_2_DATA,		/* Pre-load data */
+				  0x0f,							/* Maximum count of first counter 0-15 (IC14) */
+				  1,							/* Maximum count of second counter 0-1 (IC21) */
+				  DISC_CLK_BY_COUNT | DISC_OUT_IS_ENERGY)
+	DISCRETE_MULTIPLY(PHOENIX_EFFECT_2_SND,
+					  1,						/* ENAB */
+					  NODE_40,					/* IC21 pin 9 output */
+					  NODE_32)					/* voltage level selected by high bit of PHOENIX_EFFECT_2_FREQ */
 
 	/************************************************/
 	/* Combine all sound sources.                   */
 	/************************************************/
-	DISCRETE_MIXER4(NODE_90, 1, PHOENIX_EFFECT_1_SND, PHOENIX_EFFECT_2_SND, PHOENIX_EFFECT_3_SND, PHOENIX_EFFECT_4_SND,&phoenix_mixer)
+	DISCRETE_MIXER4(NODE_90,
+					1,							/* ENAB */
+					PHOENIX_EFFECT_1_SND,
+					PHOENIX_EFFECT_2_SND,
+					PHOENIX_EFFECT_3_SND,
+					PHOENIX_EFFECT_4_SND,
+					&phoenix_mixer)
 
 	DISCRETE_OUTPUT(NODE_90, 1)
 DISCRETE_SOUND_END
@@ -389,9 +483,11 @@ WRITE8_HANDLER( phoenix_sound_control_a_w )
 {
 	discrete_sound_w(machine, PHOENIX_EFFECT_2_DATA, data & 0x0f);
 	discrete_sound_w(machine, PHOENIX_EFFECT_2_FREQ, (data & 0x30) >> 4);
-//  discrete_sound_w(PHOENIX_EFFECT_3_EN  , data & 0x40);
-//  discrete_sound_w(PHOENIX_EFFECT_4_EN  , data & 0x80);
-
+#if 0
+	/* future handling of noise sounds */
+	discrete_sound_w(PHOENIX_EFFECT_3_EN  , data & 0x40);
+	discrete_sound_w(PHOENIX_EFFECT_4_EN  , data & 0x80);
+#endif
 	stream_update(channel);
 	sound_latch_a = data;
 }

@@ -39,22 +39,22 @@ struct dss_filter2_context
 
 struct dst_op_amp_filt_context
 {
-	int		type;		// What kind of filter
-	int		is_norton;	// 1 = Norton op-amps
+	int		type;		/* What kind of filter */
+	int		is_norton;	/* 1 = Norton op-amps */
 	double	vRef;
 	double	vP;
 	double	vN;
-	double	rTotal;		// All input resistance in parallel.
-	double	iFixed;		// Current supplied by r3 & r4 if used.
+	double	rTotal;		/* All input resistance in parallel. */
+	double	iFixed;		/* Current supplied by r3 & r4 if used. */
 	double	exponentC1;
 	double	exponentC2;
 	double	exponentC3;
-	double	rRatio;		// divide ratio of resistance network
-	double	vC1;		// Charge on C1
-	double	vC1b;		// Charge on C1, part of C1 charge if needed
-	double	vC2;		// Charge on C2
-	double	vC3;		// Charge on C2
-	double	gain;		// Gain of the filter
+	double	rRatio;		/* divide ratio of resistance network */
+	double	vC1;		/* Charge on C1 */
+	double	vC1b;		/* Charge on C1, part of C1 charge if needed */
+	double	vC2;		/* Charge on C2 */
+	double	vC3;		/* Charge on C2 */
+	double	gain;		/* Gain of the filter */
 	double  x1, x2;		/* x[k-1], x[k-2], previous 2 input values */
 	double  y1, y2;		/* y[k-1], y[k-2], previous 2 output values */
 	double  a1,a2;		/* digital filter coefficients, denominator */
@@ -64,18 +64,18 @@ struct dst_op_amp_filt_context
 struct dst_rcdisc_context
 {
 	int state;
-	double t;           // time
-	double f;			// RCINTEGRATE
-	double R1;			// RCINTEGRATE
-	double R2;			// RCINTEGRATE
-	double R3;			// RCINTEGRATE
-	double C;			// RCINTEGRATE
-	double vCap;		// RCDISC_MOD
-	double vCE;			// RCINTEGRATE
+	double t;           /* time */
+	double f;			/* RCINTEGRATE */
+	double R1;			/* RCINTEGRATE */
+	double R2;			/* RCINTEGRATE */
+	double R3;			/* RCINTEGRATE */
+	double C;			/* RCINTEGRATE */
+	double vCap;		/* RCDISC_MOD */
+	double vCE;			/* RCINTEGRATE */
 	double exponent0;
 	double exponent1;
-	double exp_exponent0;// RCINTEGRATE
-	double exp_exponent1;// RCINTEGRATE
+	double exp_exponent0;/* RCINTEGRATE */
+	double exp_exponent1;/* RCINTEGRATE */
 };
 
 struct dst_rcdisc4_context
@@ -109,7 +109,7 @@ struct dst_rcfilter_sw_context
  * input[4]    - Voltage reference. Usually 0V.
  *
  ************************************************************************/
-#define DST_CRFILTER__ENABLE		(*(node->input[0]))
+#define DST_CRFILTER__ENABLE	(*(node->input[0]))
 #define DST_CRFILTER__IN		(*(node->input[1]))
 #define DST_CRFILTER__R			(*(node->input[2]))
 #define DST_CRFILTER__C			(*(node->input[3]))
@@ -135,8 +135,8 @@ static void dst_crfilter_reset(node_description *node)
 	struct dst_rcfilter_context *context = node->context;
 
 	context->exponent = -1.0 / (DST_CRFILTER__R * DST_CRFILTER__C * discrete_current_context->sample_rate);
-	context->exponent = 1.0 - exp(context->exponent);
-	context->vCap = 0;
+	context->exponent =  1.0 - exp(context->exponent);
+	context->vCap   = 0;
 	node->output[0] = DST_CRFILTER__IN;
 }
 
@@ -186,6 +186,7 @@ static void calculate_filter1_coefficients(double fc, double type,
 static void dst_filter1_step(node_description *node)
 {
 	struct dss_filter1_context *context = node->context;
+\
 	double gain = 1.0;
 
 	if (DST_FILTER1__ENABLE == 0.0)
@@ -204,7 +205,7 @@ static void dst_filter1_reset(node_description *node)
 	struct dss_filter1_context *context = node->context;
 
 	calculate_filter1_coefficients(DST_FILTER1__FREQ, DST_FILTER1__TYPE, &context->a1, &context->b0, &context->b1);
-	node->output[0]=0;
+	node->output[0] = 0;
 }
 
 
@@ -237,29 +238,29 @@ static void calculate_filter2_coefficients(double fc, double d, double type,
 
 	/* calculate digital filter coefficents */
 	/*w = 2.0*M_PI*fc; no pre-warping */
-	w = discrete_current_context->sample_rate*2.0*tan(M_PI*fc/discrete_current_context->sample_rate); /* pre-warping */
-	w_squared = w*w;
+	w = discrete_current_context->sample_rate * 2.0 * tan(M_PI * fc / discrete_current_context->sample_rate); /* pre-warping */
+	w_squared = w * w;
 
 	den = two_over_T_squared + d*w*two_over_T + w_squared;
 
-	*a1 = 2.0*(-two_over_T_squared + w_squared)/den;
-	*a2 = (two_over_T_squared - d*w*two_over_T + w_squared)/den;
+	*a1 = 2.0 * (-two_over_T_squared + w_squared) / den;
+	*a2 = (two_over_T_squared - d * w * two_over_T + w_squared) / den;
 
 	if (type == DISC_FILTER_LOWPASS)
 	{
 		*b0 = *b2 = w_squared/den;
-		*b1 = 2.0*(*b0);
+		*b1 = 2.0 * (*b0);
 	}
 	else if (type == DISC_FILTER_BANDPASS)
 	{
-		*b0 = d*w*two_over_T/den;
+		*b0 = d * w * two_over_T / den;
 		*b1 = 0.0;
 		*b2 = -(*b0);
 	}
 	else if (type == DISC_FILTER_HIGHPASS)
 	{
-		*b0 = *b2 = two_over_T_squared/den;
-		*b1 = -2.0*(*b0);
+		*b0 = *b2 = two_over_T_squared / den;
+		*b1 = -2.0 * (*b0);
 	}
 	else
 	{
@@ -270,6 +271,7 @@ static void calculate_filter2_coefficients(double fc, double d, double type,
 static void dst_filter2_step(node_description *node)
 {
 	struct dss_filter2_context *context = node->context;
+
 	double gain = 1.0;
 
 	if (DST_FILTER2__ENABLE == 0.0)
@@ -277,8 +279,8 @@ static void dst_filter2_step(node_description *node)
 		gain = 0.0;
 	}
 
-	node->output[0] = -context->a1*context->y1 - context->a2*context->y2 +
-					context->b0*gain*DST_FILTER2__IN + context->b1*context->x1 + context->b2*context->x2;
+	node->output[0] = -context->a1 * context->y1 - context->a2 * context->y2 +
+					context->b0 * gain * DST_FILTER2__IN + context->b1 * context->x1 + context->b2 * context->x2;
 
 	context->x2 = context->x1;
 	context->x1 = gain * DST_FILTER2__IN;
@@ -293,7 +295,7 @@ static void dst_filter2_reset(node_description *node)
 	calculate_filter2_coefficients(DST_FILTER2__FREQ, DST_FILTER2__DAMP, DST_FILTER2__TYPE,
 								   &context->a1, &context->a2,
 								   &context->b0, &context->b1, &context->b2);
-	node->output[0]=0;
+	node->output[0] = 0;
 }
 
 /************************************************************************
@@ -315,6 +317,7 @@ static void dst_filter2_reset(node_description *node)
 static void dst_sallen_key_step(node_description *node)
 {
 	struct dss_filter2_context *context = node->context;
+
 	double gain = 1.0;
 
 	if (DST_SALLEN_KEY__ENABLE == 0.0)
@@ -322,8 +325,8 @@ static void dst_sallen_key_step(node_description *node)
 		gain = 0.0;
 	}
 
-	node->output[0] = -context->a1*context->y1 - context->a2*context->y2 +
-					context->b0*gain*DST_SALLEN_KEY__INP0 + context->b1*context->x1 + context->b2*context->x2;
+	node->output[0] = -context->a1 * context->y1 - context->a2 * context->y2 +
+					context->b0 * gain * DST_SALLEN_KEY__INP0 + context->b1 * context->x1 + context->b2 * context->x2;
 
 	context->x2 = context->x1;
 	context->x1 = gain * DST_SALLEN_KEY__INP0;
@@ -333,8 +336,9 @@ static void dst_sallen_key_step(node_description *node)
 
 static void dst_sallen_key_reset(node_description *node)
 {
-	struct dss_filter2_context *context = node->context;
-	const discrete_op_amp_filt_info *info = node->custom;
+	struct dss_filter2_context       *context = node->context;
+	const  discrete_op_amp_filt_info *info    = node->custom;
+
 	double freq, q;
 
 	switch ((int) DST_SALLEN_KEY__TYPE)
@@ -350,7 +354,7 @@ static void dst_sallen_key_reset(node_description *node)
 	calculate_filter2_coefficients(freq, 1.0 / q, DISC_FILTER_LOWPASS,
 								   &context->a1, &context->a2,
 								   &context->b0, &context->b1, &context->b2);
-	node->output[0]=0;
+	node->output[0] = 0;
 }
 
 /************************************************************************
@@ -373,10 +377,10 @@ static void dst_sallen_key_reset(node_description *node)
 
 static void dst_op_amp_filt_step(node_description *node)
 {
-	const discrete_op_amp_filt_info *info = node->custom;
-	struct dst_op_amp_filt_context *context = node->context;
+	const  discrete_op_amp_filt_info *info    = node->custom;
+	struct dst_op_amp_filt_context   *context = node->context;
 
-	double i, v=0;
+	double i, v = 0;
 
 	if (DST_OP_AMP_FILT__ENABLE)
 	{
@@ -388,7 +392,7 @@ static void dst_op_amp_filt_step(node_description *node)
 		else
 		{
 			/* Millman the input voltages. */
-			i = context->iFixed;
+			i  = context->iFixed;
 			i += (DST_OP_AMP_FILT__INP1 - context->vRef) / info->r1;
 			if (info->r2 != 0)
 				i += (DST_OP_AMP_FILT__INP2 - context->vRef) / info->r2;
@@ -433,8 +437,8 @@ static void dst_op_amp_filt_step(node_description *node)
 
 			case DISC_OP_AMP_FILTER_IS_BAND_PASS_1M:
 			case DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON:
-				node->output[0] = -context->a1*context->y1 - context->a2*context->y2 +
-								context->b0*v + context->b1*context->x1 + context->b2*context->x2 +
+				node->output[0] = -context->a1 * context->y1 - context->a2 * context->y2 +
+								context->b0 * v + context->b1 * context->x1 + context->b2 * context->x2 +
 								context->vRef;
 				context->x2 = context->x1;
 				context->x1 = v;
@@ -456,8 +460,8 @@ static void dst_op_amp_filt_step(node_description *node)
 
 static void dst_op_amp_filt_reset(node_description *node)
 {
-	const discrete_op_amp_filt_info *info = node->custom;
-	struct dst_op_amp_filt_context *context = node->context;
+	const  discrete_op_amp_filt_info *info    = node->custom;
+	struct dst_op_amp_filt_context   *context = node->context;
 
 	/* Convert the passed filter type into an int for easy use. */
 	context->type = (int)DST_OP_AMP_FILT__TYPE & DISC_OP_AMP_FILTER_TYPE_MASK;
@@ -485,7 +489,7 @@ static void dst_op_amp_filt_reset(node_description *node)
 		context->vN =  info->vN;
 
 		/* Work out the input resistance.  It is all input and bias resistors in parallel. */
-		context->rTotal  = 1.0 / info->r1;			// There has to be an R1.  Otherwise the table is wrong.
+		context->rTotal  = 1.0 / info->r1;			/* There has to be an R1.  Otherwise the table is wrong. */
 		if (info->r2 != 0) context->rTotal += 1.0 / info->r2;
 		if (info->r3 != 0) context->rTotal += 1.0 / info->r3;
 		context->rTotal = 1.0 / context->rTotal;
@@ -500,26 +504,26 @@ static void dst_op_amp_filt_reset(node_description *node)
 	{
 		case DISC_OP_AMP_FILTER_IS_LOW_PASS_1:
 			context->exponentC1 = -1.0 / (info->rF * info->c1 * discrete_current_context->sample_rate);
-			context->exponentC1 = 1.0 - exp(context->exponentC1);
-			context->exponentC2 = 0;
+			context->exponentC1 =  1.0 - exp(context->exponentC1);
+			context->exponentC2 =  0;
 			break;
 		case DISC_OP_AMP_FILTER_IS_HIGH_PASS_1:
 			context->exponentC1 = -1.0 / (context->rTotal * info->c1 * discrete_current_context->sample_rate);
-			context->exponentC1 = 1.0 - exp(context->exponentC1);
-			context->exponentC2 = 0;
+			context->exponentC1 =  1.0 - exp(context->exponentC1);
+			context->exponentC2 =  0;
 			break;
 		case DISC_OP_AMP_FILTER_IS_BAND_PASS_1:
 			context->exponentC1 = -1.0 / (info->rF * info->c1 * discrete_current_context->sample_rate);
-			context->exponentC1 = 1.0 - exp(context->exponentC1);
+			context->exponentC1 =  1.0 - exp(context->exponentC1);
 			context->exponentC2 = -1.0 / (context->rTotal * info->c2 * discrete_current_context->sample_rate);
-			context->exponentC2 = 1.0 - exp(context->exponentC2);
+			context->exponentC2 =  1.0 - exp(context->exponentC2);
 			break;
 		case DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON:
 			context->rTotal = 1.0 / (1.0 / info->r1 + 1.0 / info->r2);
 		case DISC_OP_AMP_FILTER_IS_BAND_PASS_1M:
 		{
 			double fc = 1.0 / (2 * M_PI * sqrt(context->rTotal * info->rF * info->c1 * info->c2));
-			double d = (info->c1 + info->c2) / sqrt(info->rF / context->rTotal * info->c1 * info->c2);
+			double d  = (info->c1 + info->c2) / sqrt(info->rF / context->rTotal * info->c1 * info->c2);
 			double gain = -info->rF / context->rTotal * info->c2 / (info->c1 + info->c2);
 
 			calculate_filter2_coefficients(fc, d, DISC_FILTER_BANDPASS,
@@ -538,15 +542,15 @@ static void dst_op_amp_filt_reset(node_description *node)
 		}
 		case DISC_OP_AMP_FILTER_IS_BAND_PASS_0 | DISC_OP_AMP_IS_NORTON:
 			context->exponentC1 = -1.0 / ((1.0 / (1.0 / info->r1 + 1.0 / (info->r2 + info->r3 + info->r4))) * info->c1 * discrete_current_context->sample_rate);
-			context->exponentC1 = 1.0 - exp(context->exponentC1);
+			context->exponentC1 =  1.0 - exp(context->exponentC1);
 			context->exponentC2 = -1.0 / ((1.0 / (1.0 / (info->r1 + info->r2) + 1.0 / (info->r3 + info->r4))) * info->c2 * discrete_current_context->sample_rate);
-			context->exponentC2 = 1.0 - exp(context->exponentC2);
+			context->exponentC2 =  1.0 - exp(context->exponentC2);
 			context->exponentC3 = -1.0 / ((info->r1 + info->r2 + info->r3 + info->r4) * info->c3 * discrete_current_context->sample_rate);
-			context->exponentC3 = 1.0 - exp(context->exponentC3);
+			context->exponentC3 =  1.0 - exp(context->exponentC3);
 			break;
 		case DISC_OP_AMP_FILTER_IS_HIGH_PASS_0 | DISC_OP_AMP_IS_NORTON:
 			context->exponentC1 = -1.0 / (info->r1 * info->c1 * discrete_current_context->sample_rate);
-			context->exponentC1 = 1.0 - exp(context->exponentC1);
+			context->exponentC1 =  1.0 - exp(context->exponentC1);
 			break;
 	}
 
@@ -586,7 +590,7 @@ static void dst_rcdisc_step(node_description *node)
 				context->state = 1;
 				context->t = 0;
 			}
-			node->output[0]=0;
+			node->output[0] = 0;
 			break;
 
 		case 1:
@@ -603,7 +607,7 @@ static void dst_rcdisc_reset(node_description *node)
 {
 	struct dst_rcdisc_context *context = node->context;
 
-	node->output[0]=0;
+	node->output[0] = 0;
 
 	context->state = 0;
 	context->t = 0;
@@ -633,8 +637,9 @@ static void dst_rcdisc_reset(node_description *node)
 
 static void dst_rcdisc2_step(node_description *node)
 {
-	double diff;
 	struct dst_rcdisc_context *context = node->context;
+
+	double diff;
 
 	/* Works differently to other as we are always on, no enable */
 	/* exponential based in difference between input/output   */
@@ -678,8 +683,9 @@ static void dst_rcdisc2_reset(node_description *node)
 
 static void dst_rcdisc3_step(node_description *node)
 {
-	double diff;
 	struct dst_rcdisc_context *context = node->context;
+
+	double diff;
 
 	/* Exponential based in difference between input/output   */
 
@@ -708,12 +714,12 @@ static void dst_rcdisc3_reset(node_description *node)
 {
 	struct dst_rcdisc_context *context = node->context;
 
-	node->output[0]=0;
+	node->output[0] = 0;
 
 	context->state = 0;
 	context->t = 0;
-	context->exponent0=-1.0 * DST_RCDISC3__R1 * DST_RCDISC3__C;
-	context->exponent1=-1.0 *(DST_RCDISC3__R1 * DST_RCDISC3__R2)/( DST_RCDISC3__R1 + DST_RCDISC3__R2)* DST_RCDISC3__C;
+	context->exponent0 = -1.0 * DST_RCDISC3__R1 * DST_RCDISC3__C;
+	context->exponent1 = -1.0 *(DST_RCDISC3__R1 * DST_RCDISC3__R2)/( DST_RCDISC3__R1 + DST_RCDISC3__R2)* DST_RCDISC3__C;
 }
 
 
@@ -742,6 +748,7 @@ static void dst_rcdisc3_reset(node_description *node)
 static void dst_rcdisc4_step(node_description *node)
 {
 	struct dst_rcdisc4_context *context = node->context;
+
 	int inp1 = (DST_RCDISC4__IN == 0) ? 0 : 1;
 
 	if (DST_RCDISC4__ENABLE == 0)
@@ -767,6 +774,7 @@ static void dst_rcdisc4_step(node_description *node)
 static void  dst_rcdisc4_reset(node_description *node)
 {
 	struct dst_rcdisc4_context *context = node->context;
+
 	double	v, i, r, rT;
 
 	context->type = 0;
@@ -802,21 +810,21 @@ static void  dst_rcdisc4_reset(node_description *node)
 			v = DST_RCDISC4__VP - .5;	/* diode drop */
 
 			/* When the input is 1, both R1 & R3 are basically in parallel. */
-			r = 1.0 / (1.0 / DST_RCDISC4__R1 + 1.0 / DST_RCDISC4__R3);
+			r  = 1.0 / (1.0 / DST_RCDISC4__R1 + 1.0 / DST_RCDISC4__R3);
 			rT = DST_RCDISC4__R2 + r;
-			i = v / rT;
+			i  = v / rT;
 			context->v[1] = i * r + .5;
 			rT = 1.0 / (1.0 / DST_RCDISC4__R2 + 1.0 / r);
 			context->exp[1] = -1.0 / (rT * DST_RCDISC4__C1 * discrete_current_context->sample_rate);
-			context->exp[1] = 1.0 - exp(context->exp[1]);
+			context->exp[1] =  1.0 - exp(context->exp[1]);
 
 			/* When the input is 0, R1 is out of circuit. */
 			rT = DST_RCDISC4__R2 + DST_RCDISC4__R3;
-			i = v / rT;
+			i  = v / rT;
 			context->v[0] = i * DST_RCDISC4__R3 + .5;
 			rT = 1.0 / (1.0 / DST_RCDISC4__R2 + 1.0 / DST_RCDISC4__R3);
 			context->exp[0] = -1.0 / (rT * DST_RCDISC4__C1 * discrete_current_context->sample_rate);
-			context->exp[0] = 1.0 - exp(context->exp[0]);
+			context->exp[0] =  1.0 - exp(context->exp[0]);
 			break;
 
 		case 3:
@@ -828,12 +836,12 @@ static void  dst_rcdisc4_reset(node_description *node)
 			context->v[1] = DST_RCDISC4__R2 / (r + DST_RCDISC4__R2) * (5.0 - 0.5);
 			rT = 1.0 / ( 1.0 / r + 1.0 / DST_RCDISC4__R2);
 			context->exp[1] = -1.0 / (rT * DST_RCDISC4__C1 * discrete_current_context->sample_rate);
-			context->exp[1] = 1.0 - exp(context->exp[1]);
+			context->exp[1] =  1.0 - exp(context->exp[1]);
 
 			/* When the input is 0, R1 is out of circuit. */
 			context->v[0] = 0;
 			context->exp[0] = -1.0 / (DST_RCDISC4__R2 * DST_RCDISC4__C1 * discrete_current_context->sample_rate);
-			context->exp[0] = 1.0 - exp(context->exp[0]);
+			context->exp[0] =  1.0 - exp(context->exp[0]);
 			break;
 	}
 }
@@ -855,8 +863,9 @@ static void  dst_rcdisc4_reset(node_description *node)
 
 static void  dst_rcdisc5_step(node_description *node)
 {
-	double diff,u;
 	struct dst_rcdisc_context *context = node->context;
+
+	double diff,u;
 
 	/* Exponential based in difference between input/output   */
 
@@ -875,7 +884,7 @@ static void  dst_rcdisc5_step(node_description *node)
 	}
 	else
 	{
-		node->output[0]=0;
+		node->output[0] = 0;
 	}
 }
 
@@ -883,11 +892,11 @@ static void  dst_rcdisc5_reset(node_description *node)
 {
 	struct dst_rcdisc_context *context = node->context;
 
-	node->output[0]=0;
+	node->output[0] = 0;
 
 	context->state = 0;
 	context->t = 0;
-	context->exponent0=-1.0 * DST_RCDISC5__R * DST_RCDISC5__C;
+	context->exponent0 = -1.0 * DST_RCDISC5__R * DST_RCDISC5__C;
 }
 
 /************************************************************************
@@ -930,20 +939,21 @@ static void  dst_rcdisc5_reset(node_description *node)
 
 static void  dst_rcintegrate_step(node_description *node)
 {
-	double diff,u,iQ,iQc,iC,RG,vE;
 	struct dst_rcdisc_context *context = node->context;
-	double dt,vP;
+
+	double diff, u, iQ, iQc, iC, RG, vE;
+	double dt, vP;
 
 	if(DST_RCINTEGRATE__ENABLE)
 	{
-		u = DST_RCINTEGRATE__IN1;
+		u  = DST_RCINTEGRATE__IN1;
 		vP = DST_RCINTEGRATE__VP;
 		dt = discrete_current_context->sample_time;
 		if ( u-0.7  < context->vCap*context->R2/(context->R1+context->R2))
 		{
 			/* discharge .... */
-			diff = 0 - context->vCap;
-			iC = 0.0 - context->C / context->exponent1 * diff * context->exp_exponent1; // iC
+			diff = 0.0 - context->vCap;
+			iC   = 0.0 - context->C / context->exponent1 * diff * context->exp_exponent1; /* iC */
 			diff = diff - (diff * context->exp_exponent1);
 			context->vCap += diff;
 			iQ = 0;
@@ -954,7 +964,7 @@ static void  dst_rcintegrate_step(node_description *node)
 		{
 			/* charging */
 			diff = (vP - context->vCE) * context->f - context->vCap;
-			iC = 0.0 - context->C / context->exponent0 * diff * context->exp_exponent0; // iC
+			iC   = 0.0 - context->C / context->exponent0 * diff * context->exp_exponent0; /* iC */
 			diff = diff - (diff * context->exp_exponent0);
 			context->vCap += diff;
 			iQ = iC + (iC * context->R1 + context->vCap) / context->R2;
@@ -964,10 +974,10 @@ static void  dst_rcintegrate_step(node_description *node)
 
 
 		u = DST_RCINTEGRATE__IN1;
-		if (u>0.7+vE)
-			vE=u-0.7;
+		if (u > 0.7+vE)
+			vE = u-0.7;
 		iQc = EM_IC(u - vE);
-		context->vCE = MIN(vP-0.1, vP - RG*iQc);
+		context->vCE = MIN(vP - 0.1, vP - RG * iQc);
 
 		/* Avoid oscillations
          * The method tends to largely overshoot - no wonder without
@@ -975,7 +985,7 @@ static void  dst_rcintegrate_step(node_description *node)
          */
 
 		context->vCE = MAX(context->vCE, 0.1 );
-		context->vCE = 0.1 * context->vCE +0.9 * (vP - vE  - iQ * context->R3);
+		context->vCE = 0.1 * context->vCE + 0.9 * (vP - vE - iQ * context->R3);
 
 		switch (context->state)
 		{
@@ -986,18 +996,19 @@ static void  dst_rcintegrate_step(node_description *node)
 				node->output[0] = vE;
 				break;
 			case DISC_RC_INTEGRATE_TYPE3:
-				node->output[0] = MAX(0,vP - iQ * context->R3);
+				node->output[0] = MAX(0, vP - iQ * context->R3);
 				break;
 		}
 	}
 	else
 	{
-		node->output[0]=0;
+		node->output[0] = 0;
 	}
 }
 static void dst_rcintegrate_reset(node_description *node)
 {
 	struct dst_rcdisc_context *context = node->context;
+
 	double r;
 	double dt = discrete_current_context->sample_time;
 
@@ -1007,7 +1018,7 @@ static void dst_rcintegrate_reset(node_description *node)
 	context->R1 = DST_RCINTEGRATE__R1;
 	context->R2 = DST_RCINTEGRATE__R2;
 	context->R3 = DST_RCINTEGRATE__R3;
-	context->C = DST_RCINTEGRATE__C;
+	context->C  = DST_RCINTEGRATE__C;
 
 	context->vCap = 0;
 	context->vCE  = 0;
@@ -1049,8 +1060,9 @@ static void dst_rcintegrate_reset(node_description *node)
 
 static void dst_rcdisc_mod_step(node_description *node)
 {
-	double diff,Rc,Rc2,vCap,u,vD=0.0;
 	struct dst_rcdisc_context *context = node->context;
+
+	double diff, Rc, Rc2, vCap, u, vD=0.0;
 
 	/* Exponential based in difference between input/output   */
 	vCap = context->vCap;
@@ -1058,18 +1070,18 @@ static void dst_rcdisc_mod_step(node_description *node)
 	if(DST_RCDISC_MOD__ENABLE)
 	{
 		Rc = (DST_RCDISC_MOD__IN1 > 0.5) ? DST_RCDISC_MOD__R2 : DST_RCDISC_MOD__R1 + DST_RCDISC_MOD__R2;
-		if (Rc<1.0)
+		if (Rc < 1.0)
 			Rc = 1.0;
 		u = (DST_RCDISC_MOD__IN1 > 0.5) ? 0 : DST_RCDISC_MOD__VP;
 		Rc2 = (DST_RCDISC_MOD__IN2 > 0.6) ? (DST_RCDISC_MOD__R3 * DST_RCDISC_MOD__R4 / (DST_RCDISC_MOD__R3 + DST_RCDISC_MOD__R4)) : DST_RCDISC_MOD__R4;
 		/* Clamp */
 		diff = u - vCap;
-		vD = diff*Rc2/(Rc+Rc2);
-		if (vD<-0.6)
+		vD = diff * Rc2 / (Rc + Rc2);
+		if (vD < -0.6)
 		{
-			Rc2=0;
-			diff = u + 0.6 - vCap;
-			diff = diff - (diff * exp(0.0-discrete_current_context->sample_time / (DST_RCDISC_MOD__C*Rc)));
+			Rc2   = 0;
+			diff  = u + 0.6 - vCap;
+			diff  = diff - (diff * exp(0.0 - discrete_current_context->sample_time / (DST_RCDISC_MOD__C * Rc)));
 			vCap += diff;
 			node->output[0] = (DST_RCDISC_MOD__IN2 <= 0.6) ? -0.6 : 0;
 		}
@@ -1078,13 +1090,13 @@ static void dst_rcdisc_mod_step(node_description *node)
 			diff = diff - (diff * exp(0.0-discrete_current_context->sample_time / (DST_RCDISC_MOD__C*(Rc+Rc2))));
 			vCap += diff;
 			/* neglecting current through R3 drawn by next node */
-			node->output[0] = (DST_RCDISC_MOD__IN2 <= 0.6) ? (u-vCap)*DST_RCDISC_MOD__R4/(DST_RCDISC_MOD__R4+Rc) : 0;
+			node->output[0] = (DST_RCDISC_MOD__IN2 <= 0.6) ? (u - vCap) * DST_RCDISC_MOD__R4 / (DST_RCDISC_MOD__R4 + Rc) : 0;
 		}
 		context->vCap = vCap;
 	}
 	else
 	{
-		node->output[0]=0;
+		node->output[0] = 0;
 	}
 }
 
@@ -1092,8 +1104,8 @@ static void dst_rcdisc_mod_reset(node_description *node)
 {
 	struct dst_rcdisc_context *context = node->context;
 
-	node->output[0]=0;
-	context->vCap = 0;
+	node->output[0] = 0;
+	context->vCap   = 0;
 }
 
 /************************************************************************
@@ -1128,7 +1140,7 @@ static void dst_rcfilter_step(node_description *node)
 	}
 	else
 	{
-		node->output[0]=0;
+		node->output[0] = 0;
 	}
 }
 
@@ -1138,7 +1150,7 @@ static void dst_rcfilter_reset(node_description *node)
 
 	context->exponent = -1.0 / (DST_RCFILTER__R * DST_RCFILTER__C * discrete_current_context->sample_rate);
 	context->exponent = 1.0 - exp(context->exponent);
-	context->vCap = 0;
+	context->vCap   = 0;
 	node->output[0] = 0;
 }
 
@@ -1164,25 +1176,26 @@ static void dst_rcfilter_reset(node_description *node)
 static void dst_rcfilter_sw_step(node_description *node)
 {
 	struct dst_rcfilter_sw_context *context = node->context;
+
 	int i;
 	double rcexp;
 	int bits = (int)DST_RCFILTER_SW__SWITCH;
-	double us=0, rs=0;
+	double us = 0, rs = 0;
 
 	if (DST_RCFILTER_SW__ENABLE)
 	{
-		for (i=0;i<4;i++)
+		for (i = 0; i < 4; i++)
 		{
-			if ( ( bits & (1<<i)) != 0)
+			if (( bits & (1 << i)) != 0)
 			{
 				us += context->vCap[i];
 				rs += DST_RCFILTER_SW__R;
 			}
 		}
 		node->output[0] = CD4066_ON_RES / ( CD4066_ON_RES + rs) * DST_RCFILTER_SW__VIN + DST_RCFILTER_SW__R / (CD4066_ON_RES + rs)  * us;
-		for (i=0;i<4;i++)
+		for (i = 0; i < 4; i++)
 		{
-			if ( ( bits & (1<<i)) != 0)
+			if (( bits & (1 << i)) != 0)
 			{
 				rcexp = 1.0 - exp(-1.0 / ( CD4066_ON_RES * DST_RCFILTER_SW__C(i)) * discrete_current_context->sample_rate);
 				context->vCap[i] += ((node->output[0] - context->vCap[i]) * rcexp);
@@ -1191,16 +1204,17 @@ static void dst_rcfilter_sw_step(node_description *node)
 	}
 	else
 	{
-		node->output[0]=0;
+		node->output[0] = 0;
 	}
 }
 
 static void dst_rcfilter_sw_reset(node_description *node)
 {
 	struct dst_rcfilter_sw_context *context = node->context;
+
 	int i;
 
-	for (i=0;i<4;i++)
+	for (i = 0; i < 4; i++)
 		context->vCap[i] = 0;
 	node->output[0] = 0;
 }
@@ -1225,16 +1239,18 @@ static void dst_rcfilter_sw_reset(node_description *node)
 
 static void dst_rcfilterN_reset(node_description *node)
 {
-//  double f=1.0/(2*M_PI* DST_RCFILTERN__R * DST_RCFILTERN__C);
+#if 0
+	double f=1.0/(2*M_PI* DST_RCFILTERN__R * DST_RCFILTERN__C);
 
-// !!!!!!!!!!!!!! CAN'T CHEAT LIKE THIS !!!!!!!!!!!!!!!!
-// Put this stuff in a context
-//
-//  node->input[2] = f;
-//  node->input[3] = DISC_FILTER_LOWPASS;
+/* !!!!!!!!!!!!!! CAN'T CHEAT LIKE THIS !!!!!!!!!!!!!!!! */
+/* Put this stuff in a context */
+
+	node->input[2] = f;
+	node->input[3] = DISC_FILTER_LOWPASS;
 
 	/* Use first order filter */
 	dst_filter1_reset(node);
+#endif
 }
 
 
@@ -1256,21 +1272,24 @@ static void dst_rcfilterN_reset(node_description *node)
 
 static void dst_rcdiscN_reset(node_description *node)
 {
-//  double f=1.0/(2*M_PI* DST_RCDISCN__R * DST_RCDISCN__C);
+#if 0
+	double f = 1.0 / (2 * M_PI * DST_RCDISCN__R * DST_RCDISCN__C);
 
-// !!!!!!!!!!!!!! CAN'T CHEAT LIKE THIS !!!!!!!!!!!!!!!!
-// Put this stuff in a context
-//
-//  node->input[2] = f;
-//  node->input[3] = DISC_FILTER_LOWPASS;
+/* !!!!!!!!!!!!!! CAN'T CHEAT LIKE THIS !!!!!!!!!!!!!!!! */
+/* Put this stuff in a context */
+
+	node->input[2] = f;
+	node->input[3] = DISC_FILTER_LOWPASS;
 
 	/* Use first order filter */
 	dst_filter1_reset(node);
+#endif
 }
 
 static void dst_rcdiscN_step(node_description *node)
 {
 	struct dss_filter1_context *context = node->context;
+
 	double gain = 1.0;
 
 	if (DST_RCDISCN__ENABLE == 0.0)
@@ -1321,6 +1340,7 @@ struct dss_rcdisc2_context
 static void dst_rcdisc2N_step(node_description *node)
 {
 	struct dss_rcdisc2_context *context = node->context;
+
 	double input = ((DST_RCDISC2N__ENABLE == 0) ? DST_RCDISC2N__IN0 : DST_RCDISC2N__IN1);
 
 	if (DST_RCDISC2N__ENABLE == 0)
@@ -1337,12 +1357,12 @@ static void dst_rcdisc2N_reset(node_description *node)
 	struct dss_rcdisc2_context *context = node->context;
 	double f1,f2;
 
-	f1=1.0/(2*M_PI* DST_RCDISC2N__R0 * DST_RCDISC2N__C);
-	f2=1.0/(2*M_PI* DST_RCDISC2N__R1 * DST_RCDISC2N__C);
+	f1 = 1.0 / (2 * M_PI * DST_RCDISC2N__R0 * DST_RCDISC2N__C);
+	f2 = 1.0 / (2 * M_PI * DST_RCDISC2N__R1 * DST_RCDISC2N__C);
 
 	calculate_filter1_coefficients(f1, DISC_FILTER_LOWPASS, &context->a1_0, &context->b0_0, &context->b1_0);
 	calculate_filter1_coefficients(f2, DISC_FILTER_LOWPASS, &context->a1_1, &context->b0_1, &context->b1_1);
 
 	/* Initialize the object */
-	node->output[0]=0;
+	node->output[0] = 0;
 }

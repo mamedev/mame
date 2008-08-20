@@ -88,7 +88,7 @@ static const discrete_555_desc spiders_fire_555a =
 
 static const discrete_555_desc spiders_super_web_555a =
 {
-	DISC_555_OUT_DC | DISC_555_OUT_CAP,
+	DISC_555_OUT_CAP | DISC_555_OUT_DC,
 	5,		// B+ voltage of 555
 	DEFAULT_555_VALUES
 };

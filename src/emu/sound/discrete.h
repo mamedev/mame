@@ -121,6 +121,59 @@
  *
  ***********************************************************************
  *
+ * x_time - ANTI-ALSING features.
+ *
+ * Certain modules make use of x_time.  This is a feature that passes
+ * infomation between modules about how long in the current sample, the
+ * switch in state happened.  This is a decimal value of the % of the
+ * full sample period that it has been in the new state.
+ * 0 means it has been at the same state the whole sample.
+ *
+ * Example: Here is the output of a clock source with x_time on the
+ *          output.  The square wave is the real world waveform we
+ *          want.  The ^'s are the sample point.  The numbers under
+ *          the ^'s are the node output with the logic state left of
+ *          the decimal and the x_time to the right.  Under that is
+ *          what the node's anti-aliased output energy would be.
+ *          Note: the example is not 4x sampling so the energy
+ *                does not provide an accurate representation of the
+ *                original waveform.  This is intentional so it fits
+ *                in this header file.
+ *  1      ____    ____    ____    ____    ____    ____    ____    ____
+ *  0   ___    ____    ____    ____    ____    ____    ____    ____    __
+ *        ^....^....^....^....^....^....^....^....^....^....^....^....^
+ *   x_time   0.2  1.4  0.6  1.8  1.2  0.4  1.6  0.8  0.2  1.4  0.6
+ *   energy   0.8  0.4  0.4  0.8  0.2  0.6  0.6  0.2  0.8  0.4  0.4
+ *
+ * Some modules will just pass the x_time onto another module.
+ *
+ * Modules that process x_time will keep track of the node's previous
+ * state so they can calculate the actual energy at the sample time.
+ *
+ * Example: Say we have a 555 module that outputs a clock with x_time
+ *          that is connected to a counter.  The output of the counter
+ *          is connected to DAC_R1.
+ *          In this case the counter module continues counting dependant
+ *          on the integer portion of the 555 output.  But it also
+ *          passes the decimal portion as the x_time.
+ *          The DAC_R1 then uses this info to anti-alias its output.
+ *          Consider the following counter outputs vs DAC_R1
+ *          calculations.  The count changes from 9 to 10.  It has
+ *          been at the new state for 75% of the sample.
+ *          
+ *          counter    binary   x_time    -- DAC_R1 bit energy --
+ *            out       count              D3    D2    D1    D0
+ *            9.0       1001     0.0      1.0   0.0   0.0   1.0
+ *           10.75      1010     0.75     1.0   0.0   0.75  0.25  
+ *           10.0       1010     0.0      1.0   0.0   1.0   0.0
+ *           
+ *           The DAC_R1 uses these energy calculations to scale the
+ *           voltages created on each of its resistors.  This
+ *           anti-aliases the waveform no mater what the resistor
+ *           weighting is.
+ *
+ ***********************************************************************
+ *
  * LIST OF CURRENTLY IMPLEMENTED DISCRETE BLOCKS
  * ---------------------------------------------
  *
@@ -142,7 +195,7 @@
  * DISCRETE_INPUTX_STREAM(NODE,NUM, GAIN,OFFSET)
  *
  * DISCRETE_COUNTER(NODE,ENAB,RESET,CLK,MAX,DIR,INIT0,CLKTYPE)
- * DISCRETE_COUNTER_7492(NODE,ENAB,RESET,CLK)
+ * DISCRETE_COUNTER_7492(NODE,ENAB,RESET,CLK,CLKTYPE)
  * DISCRETE_LFSR_NOISE(NODE,ENAB,RESET,CLK,AMPL,FEED,BIAS,LFSRTB)
  * DISCRETE_NOISE(NODE,ENAB,FREQ,AMP,BIAS)
  * DISCRETE_NOTE(NODE,ENAB,CLK,DATA,MAX1,MAX2,CLKTYPE)
@@ -386,7 +439,7 @@
  *  This counter counts up/down from 0 to MAX.  When the enable is low, the output
  *  is held at it's last value.  When reset is high, the reset value is loaded
  *  into the output.  The counter can be clocked internally or externally.  It also
- *  supports xTime used by the clock modules to pass on anti-aliasing info.
+ *  supports x_time used by the clock modules to pass on anti-aliasing info.
  *
  *  Declaration syntax
  *
@@ -399,6 +452,16 @@
  *                           DISC_CLK_IS_FREQ   - internally clock at this frequency.
  *                                                Clock node must be static if
  *                                                DISC_CLK_IS_FREQ is used.
+ *               x_time options: you can also | these x_time features to the basic
+ *                               types above if needed, or use seperately with 7492.
+ *                           DISC_OUT_IS_ENERGY - This will uses the x_time to
+ *                                                anti-alias the count.  Might be
+ *                                                usefull if not connected to other
+ *                                                modules.
+ *                           DISC_OUT_HAS_XTIME - This will generate x_time if
+ *                                                being used with DISC_CLK_IS_FREQ.
+ *                                                It will pass x_time for the
+ *                                                other clock types.
  *
  *     DISCRETE_COUNTER(name of node,
  *                      enable node or static value,
@@ -413,10 +476,12 @@
  *                           enable node or static value,
  *                           reset node or static value,
  *                           clock node or static value,
- *                           max count static value)
+ *                           clock type static value)
  *
  *  Note: A 7492 counter outputs a special bit pattern on its /6 stage.
- *        A 7492 clocks on falling edge.  This emulates the /6 stage only.
+ *        A 7492 clocks on the falling edge,
+ *        so it is not recommended to use DISC_CLK_ON_R_EDGE for a 7492.
+ *        This module emulates the /6 stage only.
  *        Use another DISCRETE_COUNTER for the /2 stage.
  *
  * EXAMPLES: see Fire Truck, Monte Carlo, Super Bug, Polaris
@@ -1659,7 +1724,7 @@
  *     DISCRETE_DAC_R1(name of node,
  *                     enable node or static value,
  *                     data node (static value is useless),
- *                     vData node or static value (vON),
+ *                     vData node or static value (voltage when a bit is on ),
  *                     address of discrete_dac_r1_ladder structure)
  *
  *     discrete_dac_r1_ladder = {ladderLength, r{}, vBias, rBias, rGnd, cFilter}
@@ -1667,6 +1732,9 @@
  *  Note: Resistors in the ladder that are set to 0, will be handled like they
  *        are out of circuit.  So the bit selecting them will have no effect
  *        on the DAC output voltage.
+ *
+ * x_time - this modules automatically handles any non-integer value
+ *          on the data input as x_time.
  *
  * EXAMPLES: see Fire Truck, Monte Carlo, Super Bug, Polaris
  *
@@ -1802,7 +1870,7 @@
  *                     input 7 node,  (if used)
  *                     address of discrete_mixer_info structure)
  *
- *     discrete_mixer_desc = {type, r{}, rNode{}, c{}, rI, rF, cF, cAmp, vRef, gain}
+ *     discrete_mixer_desc = {type, r{}, r_node{}, c{}, rI, rF, cF, cAmp, vRef, gain}
  *
  * Note: Set all unused components to 0.
  *       If an rNode is not used it should also be set to 0.
@@ -2681,28 +2749,29 @@
  * DISCRETE_555_ASTABLE    - NE555 Chip simulation (astable mode).
  * DISCRETE_555_ASTABLE_CV - NE555 Chip simulation (astable mode) with CV control.
  *
- *                                v555
- *                                 |
- *                       .---------+
- *                       |         |
- *                       Z         |8
- *                    R1 Z     .---------.
- *                       |    7|  Vcc    |
- *                       +-----|Discharge|
- *                       |     |         |
- *                       Z     |   555   |3
- *                    R2 Z     |      Out|---> Netlist Node
- *                       |    6|         |
- *                       +-----|Threshold|
- *                       |     |         |
- *                       +-----|Trigger  |
- *                       |    2|         |---< Control Voltage
- *                       |     |  Reset  |5
- *                       |     '---------'
- *                      ---        4|
- *                    C ---         |
- *                       |          ^
- *                      gnd       Reset
+ *                            v_charge     v_pos
+ *                                 V         V
+ *                                 |         |
+ *                                 |         |
+ *                                 |         |
+ *                                 Z         |8
+ *    _FAST_CHARGE_DIODE        R1 Z     .---------.
+ *       (optional)                |    7|  Vcc    |
+ *                    +--------->  +-----|Discharge|
+ *                    |            |     |         |
+ *                   ---           Z     |   555   |3
+ *                   \ /        R2 Z     |      Out|---> Netlist Node
+ *                    V            |    6|         |
+ *                   ---           +-----|Threshold|
+ *                    |            |     |         |
+ *                    +--------->  +-----|Trigger  |
+ *                                 |    2|         |---< Control Voltage
+ *                                 |     |  Reset  |5
+ *                                 |     '---------'
+ *                                ---        4|
+ *                              C ---         |
+ *                                 |          ^
+ *                                gnd       Reset
  *
  *  Declaration syntax
  *
@@ -2723,27 +2792,27 @@
  *
  *    discrete_555_desc =
  *    {
- *        options,        // bit mapped options
- *        v555,           // B+ voltage of 555
- *        v555high,       // High output voltage of 555 (Usually v555 - 1.2V)
- *        threshold555,   // normally 2/3 of v555
- *        trigger555      // normally 1/3 of v555
+ *        options,        - bit mapped options
+ *        v_pos,          - B+ voltage of 555
+ *        v_charge,       - voltage to charge circuit  (Defaults to v_pos)
+ *        v_out_high,     - High output voltage of 555 (Defaults to v_pos - 1.2V)
  *    }
  *
- * The last 3 options of discrete_555_desc can use the following defaults
- * unless otherwise needed.
- *     DEFAULT_555_HIGH, DEFAULT_555_THRESHOLD, DEFAULT_555_TRIGGER
- * or all 3 combined as:
+ * The last 2 options of discrete_555_desc can use the following defaults:
+ *     DEFAULT_555_CHARGE -  to connect v_charge to v_pos
+ *     DEFAULT_555_HIGH   - to use the normal output voltage based on v_pos
+ * or combine both as:
  *     DEFAULT_555_VALUES
  *
- * eg. {DISC_555_OUT_DC | DISC_555_OUT_SQW, 12, DEFAULT_555_VALUES}
+ * eg. {DISC_555_OUT_SQW | DISC_555_OUT_DC, 12, DEFAULT_555_VALUES}
  *
- *  Output Types:
+ *  Output Types: (only needed with DISC_555_OUT_SQW, DISC_555_OUT_CAP
+ *                 and DISC_555_OUT_ENERGY)
  *     DISC_555_OUT_DC - Output is actual DC. (DEFAULT)
  *     DISC_555_OUT_AC - A cheat to make the waveform AC.
  *
  *  Waveform Types: (ORed with output types)
- *     DISC_555_OUT_SQW     - Output is Squarewave.  0 or v555high. (DEFAULT)
+ *     DISC_555_OUT_SQW     - Output is Squarewave.  0 or v_out_high. (DEFAULT)
  *                            When the state changes from low to high (or high to low)
  *                            during a sample, the output will high (or low) for that
  *                            sample.  This can cause alaising effects.
@@ -2763,7 +2832,7 @@
  *                            through the sample, then the output will be 75% of the
  *                            normal high value.
  *     DISC_555_OUT_LOGIC_X - This will output the 0/1 level of the flip-flop with
- *                            some eXtra info.  This X info is in decimal remainder.
+ *                            some eXtra info.  This x_time is in decimal remainder.
  *                            It lets you know the percent of sample time where the
  *                            flip-flop changed state.  If 0, the change did not happen
  *                            during the sample.  1.75 means the flip-flop is 1 and
@@ -2771,8 +2840,8 @@
  *                            0.2 means the flip-flop is 0 and switched over 4/5 of
  *                            the way through the sample.
  *                            X modules can be used with counters to reduce alaising.
- *   DISC_555_OUT_COUNT_F_X - Same as DISC_555_OUT_COUNT_F but with X info.
- *   DISC_555_OUT_COUNT_R_X - Same as DISC_555_OUT_COUNT_R but with X info.
+ *   DISC_555_OUT_COUNT_F_X - Same as DISC_555_OUT_COUNT_F but with x_time.
+ *   DISC_555_OUT_COUNT_R_X - Same as DISC_555_OUT_COUNT_R but with x_time.
  *
  *  other options - DISCRETE_555_ASTABLE only:
  *     DISC_555_ASTABLE_HAS_FAST_CHARGE_DIODE - diode used to bypass rDischarge
@@ -2785,9 +2854,10 @@
  * DISCRETE_555_MSTABLE - NE555 Chip simulation (monostable mode)
  *                      - Triggered on falling edge.
  *
- *                          v555
- *                           |
- *                 .---------+
+ *            v_charge     v_pos
+ *                 V         V
+ *                 |         |
+ *                 |         |
  *                 |         |
  *                 Z         |
  *               R Z     .---------.
@@ -2817,11 +2887,13 @@
  *                          C node (or value) in farads,
  *                          address of discrete_555_desc structure)
  *
+ *    discrete_555_desc = See DISCRETE_555_ASTABLE for description.
+ *
  *  Trigger Types
  *     DISC_555_TRIGGER_IS_LOGIC   - Input is (0 or !0) logic (DEFAULT)
  *     DISC_555_TRIGGER_IS_VOLTAGE - Input is actual voltage.
  *                                   Voltage must drop below
- *                                   trigger555 to activate.
+ *                                   trigger to activate.
  *     DISC_555_TRIGGER_DISCHARGES_CAP - some circuits connect an external
  *                                       device (transistor) to the cap to
  *                                       discharge it when the trigger is
@@ -2833,7 +2905,7 @@
  *     DISC_555_OUT_AC - A cheat to make the waveform AC.
  *
  *  Waveform Types: (ORed with trigger types)
- *     DISC_555_OUT_SQW     - Output is Squarewave.  0 or v555high. (DEFAULT)
+ *     DISC_555_OUT_SQW     - Output is Squarewave.  0 or v_out_high. (DEFAULT)
  *     DISC_555_OUT_CAP     - Output is Timing Capacitor 'C' voltage.
  *
  * EXAMPLES: see Frogs
@@ -2843,7 +2915,7 @@
  * DISCRETE_555_CC - Constant Current Controlled 555 Oscillator
  *                   Which works out to a VCO when R is fixed.
  *
- *       vCCsource                       v555
+ *       v_cc_source                     v_pos
  *           V                            V
  *           |     .----------------------+
  *           |     |                      |
@@ -2895,16 +2967,21 @@
  *                     address of discrete_555_cc_desc structure)
  *
  *     discrete_555_cc_desc =
- *     {
- *          options,        // bit mapped options
- *          v555,           // B+ voltage of 555
- *          v555high,       // High output voltage of 555 (Usually v555 - 1.2V)
- *          threshold555,   // normally 2/3 of v555
- *          trigger555,     // normally 1/3 of v555
- *          vCCsource,      // B+ voltage of the Constant Current source
- *          vCCjunction     // The voltage drop of the Constant Current source transitor (0 if Op Amp)
- *     }
+ * {    
+ *         options;         - bit mapped options
+ *         v_pos;           - B+ voltage of 555
+ *         v_cc_source;     - Voltage of the Constant Current source
+ *         v_out_high;      - High output voltage of 555 (Defaults to v_pos - 1.2V)
+ *         v_cc_junction;   - The voltage drop of the Constant Current source transitor
+ *                            (0 if Op Amp)
+ *  }
  *
+ * The last 2 options of discrete_555_desc can use the following defaults:
+ *     DEFAULT_555_CC_SOURCE - to connect v_cc_source to v_pos
+ *     DEFAULT_555_HIGH      - to use the normal output voltage based on v_pos
+ * or combine both as:
+ *     DEFAULT_555_VALUES
+ * 
  *  Output Types:
  *     See DISCRETE_555_ASTABLE for description.
  *
@@ -2942,7 +3019,7 @@
  * |  En|<--------.     |                 .---|Discharge   |
  * '----'         |    gnd                |   '------------'
  *   |            |                       |
- *  gnd           '-----------------------+---ZZZZ------> 5V
+ *  gnd           '-----------------------+---ZZZZ------> v_charge (ignored)
  *                                             rX
  *
  *  Declaration syntax
@@ -2958,12 +3035,16 @@
  *                          Vin2 (CV) node or static value,
  *                          address of discrete_555_vco1_desc structure)
  *
- *  discrete_555_vco1_desc = {options,        // bit mapped options
- *                            r1, r2, r3, r4, c,
- *                            v555,           // B+ voltage of 555
- *                            v555high,       // High output voltage of 555 (Usually v555 - 1.2V)
- *                            threshold555,   // normally 2/3 of v555
- *                            trigger555}     // normally 1/3 of v555
+ *  discrete_555_vco1_desc =
+ *  {
+ *      options,            - bit mapped options
+ *      r1, r2, r3, r4, c,
+ *      v_pos,              - B+ voltage of 555
+ *      v_out_high,         - High output voltage of 555 (Defaults to v_pos - 1.2V)
+ *  }
+ *
+ * The last option of discrete_555_vco1_desc can use the following default:
+ *     DEFAULT_555_HIGH      - to use the normal output voltage based on v_pos
  *
  * Notes: The value of resistor rX is not needed.  It is just a pull-up
  *        for the discharge output.
@@ -3543,15 +3624,15 @@ typedef struct _discrete_mixer_desc discrete_mixer_desc;
 struct _discrete_mixer_desc
 {
 	int		type;
-	double	r[DISC_MAX_MIXER_INPUTS];	// static input resistance values.  These are in series with rNode, if used.
-	int		rNode[DISC_MAX_MIXER_INPUTS];	// variable resistance nodes, if needed.  0 if not used.
+	double	r[DISC_MAX_MIXER_INPUTS];		/* static input resistance values.  These are in series with rNode, if used. */
+	int		r_node[DISC_MAX_MIXER_INPUTS];	/* variable resistance nodes, if needed.  0 if not used. */
 	double	c[DISC_MAX_MIXER_INPUTS];
 	double	rI;
 	double	rF;
 	double	cF;
 	double	cAmp;
 	double	vRef;
-	double	gain;				// Scale value to get output close to +/- 32767
+	double	gain;				/* Scale value to get output close to +/- 32767 */
 };
 
 
@@ -3632,44 +3713,40 @@ struct _discrete_op_amp_filt_info
 };
 
 
+#define DEFAULT_555_CHARGE		-1
 #define DEFAULT_555_HIGH		-1
-#define DEFAULT_555_THRESHOLD	-1
-#define DEFAULT_555_TRIGGER		-1
-#define DEFAULT_555_VALUES		DEFAULT_555_HIGH, DEFAULT_555_THRESHOLD, DEFAULT_555_TRIGGER
+#define DEFAULT_555_VALUES		DEFAULT_555_CHARGE, DEFAULT_555_HIGH
 
 typedef struct _discrete_555_desc discrete_555_desc;
 struct _discrete_555_desc
 {
-	int		options;		// bit mapped options
-	double	v555;			// B+ voltage of 555
-	double	v555high;		// High output voltage of 555 (Usually v555 - 1.2V)
-	double	threshold555;	// normally 2/3 of v555
-	double	trigger555;		// normally 1/3 of v555
+	int		options;	/* bit mapped options */
+	double	v_pos;		/* B+ voltage of 555 */
+	double  v_charge;	/* voltage to charge circuit  (Defaults to v_pos) */
+	double	v_out_high;	/* High output voltage of 555 (Defaults to v_pos - 1.2V) */
 };
 
+#define DEFAULT_555_CC_SOURCE	DEFAULT_555_CHARGE
 
 typedef struct _discrete_555_cc_desc discrete_555_cc_desc;
 struct _discrete_555_cc_desc
 {
-	int		options;		// bit mapped options
-	double	v555;			// B+ voltage of 555
-	double	v555high;		// High output voltage of 555 (Usually v555 - 1.2V)
-	double	threshold555;	// normally 2/3 of v555
-	double	trigger555;		// normally 1/3 of v555
-	double	vCCsource;		// B+ voltage of the Constant Current source
-	double	vCCjunction;	// The voltage drop of the Constant Current source transitor (0 if Op Amp)
+	int		options;		/* bit mapped options */
+	double	v_pos;			/* B+ voltage of 555 */
+	double	v_cc_source;	/* Voltage of the Constant Current source */
+	double	v_out_high;		/* High output voltage of 555 (Defaults to v_pos - 1.2V) */
+	double	v_cc_junction;	/* The voltage drop of the Constant Current source transitor (0 if Op Amp) */
 };
 
 
 typedef struct _discrete_555_vco1_desc discrete_555_vco1_desc;
 struct _discrete_555_vco1_desc
 {
-	int    options;				// bit mapped options
-	double r1, r2, r3, r4, c;
-	double v555;				// B+ voltage of 555
-	double v555high;			// High output voltage of 555 (Usually v555 - 1.2V)
-	double threshold555;		// normally 2/3 of v555
-	double trigger555;			// normally 1/3 of v555
+	int    options;				/* bit mapped options */
+	double r1, r2, r3, r4, c;     
+	double v_pos;				/* B+ voltage of 555 */
+	double v_charge;			/* (ignored) */
+	double v_out_high;			/* High output voltage of 555 (Defaults to v_pos - 1.2V) */
 };
 
 
@@ -3958,7 +4035,7 @@ enum
 /* from disc_wav.c */
 /* generic modules */
 #define DISCRETE_COUNTER(NODE,ENAB,RESET,CLK,MAX,DIR,INIT0,CLKTYPE)     { NODE, DSS_COUNTER     , 7, { ENAB,RESET,CLK,NODE_NC,DIR,INIT0,NODE_NC }, { ENAB,RESET,CLK,MAX,DIR,INIT0,CLKTYPE }, NULL, "DISCRETE_COUNTER" },
-#define DISCRETE_COUNTER_7492(NODE,ENAB,RESET,CLK)                      { NODE, DSS_COUNTER     , 7, { ENAB,RESET,CLK,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,RESET,CLK,5,1,0,DISC_COUNTER_IS_7492 }, NULL, "DISCRETE_COUNTER_7492" },
+#define DISCRETE_COUNTER_7492(NODE,ENAB,RESET,CLK,CLKTYPE)              { NODE, DSS_COUNTER     , 7, { ENAB,RESET,CLK,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,RESET,CLK,CLKTYPE,1,0,DISC_COUNTER_IS_7492 }, NULL, "DISCRETE_COUNTER_7492" },
 #define DISCRETE_LFSR_NOISE(NODE,ENAB,RESET,CLK,AMPL,FEED,BIAS,LFSRTB)  { NODE, DSS_LFSR_NOISE  , 6, { ENAB,RESET,CLK,AMPL,FEED,BIAS }, { ENAB,RESET,CLK,AMPL,FEED,BIAS }, LFSRTB, "LFSR Noise Source" },
 #define DISCRETE_NOISE(NODE,ENAB,FREQ,AMPL,BIAS)                        { NODE, DSS_NOISE       , 4, { ENAB,FREQ,AMPL,BIAS }, { ENAB,FREQ,AMPL,BIAS }, NULL, "Noise Source" },
 #define DISCRETE_NOTE(NODE,ENAB,CLK,DATA,MAX1,MAX2,CLKTYPE)             { NODE, DSS_NOTE        , 6, { ENAB,CLK,DATA,NODE_NC,NODE_NC,NODE_NC }, { ENAB,CLK,DATA,MAX1,MAX2,CLKTYPE }, NULL, "Note Generator" },
@@ -4079,6 +4156,8 @@ enum
 #define DISCRETE_555_VCO1_CV(NODE,RESET,VIN,CTRLV,OPTIONS)              { NODE, DSD_555_VCO1    , 3, { RESET,VIN,CTRLV }, { RESET,VIN,CTRLV }, OPTIONS, "555 VCO1 with CV - Op-Amp type" },
 #define DISCRETE_566(NODE,ENAB,VMOD,R,C,OPTIONS)                        { NODE, DSD_566         , 4, { ENAB,VMOD,R,C }, { ENAB,VMOD,R,C }, OPTIONS, "566" },
 #define DISCRETE_74LS624(NODE,ENAB,VMOD,VRNG,C,OUTTYPE)                 { NODE, DSD_LS624       , 5, { ENAB,VMOD,VRNG,C,NODE_NC }, { ENAB,VMOD,VRNG,C, OUTTYPE }, NULL, "74LS624" },
+
+/* logging */
 #define DISCRETE_CSVLOG1(NODE1)                                    { NODE_SPECIAL, DSO_CSVLOG   , 1, { NODE1 }, { NODE1 }, NULL, "CSV Log 1 Node" },
 #define DISCRETE_CSVLOG2(NODE1,NODE2)                              { NODE_SPECIAL, DSO_CSVLOG   , 2, { NODE1,NODE2 }, { NODE1,NODE2 }, NULL, "CSV Log 2 Nodes" },
 #define DISCRETE_CSVLOG3(NODE1,NODE2,NODE3)                        { NODE_SPECIAL, DSO_CSVLOG   , 3, { NODE1,NODE2,NODE3 }, { NODE1,NODE2,NODE3 }, NULL, "CSV Log 3 Nodes" },
@@ -4086,6 +4165,7 @@ enum
 #define DISCRETE_CSVLOG5(NODE1,NODE2,NODE3,NODE4,NODE5)            { NODE_SPECIAL, DSO_CSVLOG   , 5, { NODE1,NODE2,NODE3,NODE4,NODE5 }, { NODE1,NODE2,NODE3,NODE4,NODE5 }, NULL, "CSV Log 5 Nodes" },
 #define DISCRETE_WAVELOG1(NODE1,GAIN1)                             { NODE_SPECIAL, DSO_WAVELOG  , 2, { NODE1,NODE_NC }, { NODE1,GAIN1 }, NULL, "Wave Log 1 Node" },
 #define DISCRETE_WAVELOG2(NODE1,GAIN1,NODE2,GAIN2)                 { NODE_SPECIAL, DSO_WAVELOG  , 4, { NODE1,NODE_NC,NODE2,NODE_NC }, { NODE1,GAIN1,NODE2,GAIN2 }, NULL, "Wave Log 2 Nodes" },
+/* output */
 #define DISCRETE_OUTPUT(OPNODE,GAIN)                               { NODE_SPECIAL, DSO_OUTPUT   , 2, { OPNODE,NODE_NC }, { 0,GAIN }, NULL, "Output Node" },
 
 

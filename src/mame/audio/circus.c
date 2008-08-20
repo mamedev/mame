@@ -95,14 +95,14 @@ static const discrete_mixer_desc crash_mixer =
 
 static const discrete_555_desc crash_beeper_555m =
 {
-	DISC_555_TRIGGER_IS_LOGIC | DISC_555_OUT_DC | DISC_555_OUT_SQW,
+	DISC_555_OUT_SQW | DISC_555_OUT_DC | DISC_555_TRIGGER_IS_LOGIC,
 	5,		// B+ voltage of 555
 	DEFAULT_555_VALUES
 };
 
 static const discrete_555_desc crash_beeper_555a =
 {
-	DISC_555_OUT_DC | DISC_555_OUT_SQW,
+	DISC_555_OUT_SQW | DISC_555_OUT_DC,
 	5,		// B+ voltage of 555
 	DEFAULT_555_VALUES
 };

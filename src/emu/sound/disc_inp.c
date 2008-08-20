@@ -33,8 +33,9 @@ struct dss_adjustment_context
 
 READ8_HANDLER(discrete_sound_r)
 {
-	discrete_info *info = sndti_token(SOUND_DISCRETE, 0);
+	discrete_info    *info = sndti_token(SOUND_DISCRETE, 0);
 	node_description *node = discrete_find_node(info, offset);
+
 	UINT8 data = 0;
 
 	/* Read the node input value if allowed */
@@ -58,15 +59,15 @@ READ8_HANDLER(discrete_sound_r)
 
 WRITE8_HANDLER(discrete_sound_w)
 {
-	discrete_info *info = sndti_token(SOUND_DISCRETE, 0);
+	discrete_info    *info = sndti_token(SOUND_DISCRETE, 0);
 	node_description *node = discrete_find_node(info, offset);
 
 	/* Update the node input value if it's a proper input node */
 	if (node)
 	{
 		UINT8 *node_data = node->context;
-		UINT8 last_data = *node_data;
-		UINT8 new_data = 0;
+		UINT8 last_data  = *node_data;
+		UINT8 new_data    = 0;
 
 		switch (node->module.type)
 		{
@@ -122,12 +123,13 @@ WRITE8_HANDLER(discrete_sound_w)
 static void dss_adjustment_step(node_description *node)
 {
 	struct dss_adjustment_context *context = node->context;
-	INT32 rawportval = input_port_read_direct(context->port);
+
+	INT32  rawportval = input_port_read_direct(context->port);
 
 	/* only recompute if the value changed from last time */
 	if (rawportval != context->lastpval)
 	{
-		double portval = (double)(rawportval - context->pmin) * context->pscale;
+		double portval   = (double)(rawportval - context->pmin) * context->pscale;
 		double scaledval = portval * context->scale + context->min;
 
 		context->lastpval = rawportval;
@@ -141,6 +143,7 @@ static void dss_adjustment_step(node_description *node)
 static void dss_adjustment_reset(node_description *node)
 {
 	struct dss_adjustment_context *context = node->context;
+
 	double min, max;
 
 	if (node->custom)
@@ -153,13 +156,13 @@ static void dss_adjustment_reset(node_description *node)
 		context->port = input_port_by_index(Machine->portconfig, DSS_ADJUSTMENT__PORT);
 
 	context->lastpval = 0x7fffffff;
-	context->pmin = DSS_ADJUSTMENT__PMIN;
-	context->pscale = 1.0 / (double)(DSS_ADJUSTMENT__PMAX - DSS_ADJUSTMENT__PMIN);
+	context->pmin     = DSS_ADJUSTMENT__PMIN;
+	context->pscale   = 1.0 / (double)(DSS_ADJUSTMENT__PMAX - DSS_ADJUSTMENT__PMIN);
 
 	/* linear scale */
 	if (DSS_ADJUSTMENT__LOG == 0)
 	{
-		context->min = DSS_ADJUSTMENT__MIN;
+		context->min   = DSS_ADJUSTMENT__MIN;
 		context->scale = DSS_ADJUSTMENT__MAX - DSS_ADJUSTMENT__MIN;
 	}
 
@@ -169,7 +172,7 @@ static void dss_adjustment_reset(node_description *node)
 		/* force minimum and maximum to be > 0 */
 		min = (DSS_ADJUSTMENT__MIN > 0) ? DSS_ADJUSTMENT__MIN : 1;
 		max = (DSS_ADJUSTMENT__MAX > 0) ? DSS_ADJUSTMENT__MAX : 1;
-		context->min = log10(min);
+		context->min   = log10(min);
 		context->scale = log10(max) - log10(min);
 	}
 
@@ -249,7 +252,7 @@ static void dss_input_pulse_step(node_description *node)
 
 static void dss_input_stream_step(node_description *node)
 {
-	// the context pointer is set to point to the current input stream data in discrete_stream_update
+	/* the context pointer is set to point to the current input stream data in discrete_stream_update */
 	stream_sample_t **ptr = node->context;
 	stream_sample_t *data = *ptr;
 

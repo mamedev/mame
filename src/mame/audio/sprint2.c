@@ -42,7 +42,6 @@ static const discrete_555_cc_desc sprint2_motor_vco =
 	DISC_555_OUT_DC | DISC_555_OUT_SQW,
 	5,		// B+ voltage of 555
 	DEFAULT_555_VALUES,
-	5,		// B+ voltage of the Constant Current source
 	0.7	// VBE 2N3644 (Si)
 };
 
@@ -140,7 +139,7 @@ DISCRETE_SOUND_START(sprint2)
 			&sprint2_motor_vco)
 
 	/* QB-D of 7492 */
-	DISCRETE_COUNTER_7492(NODE_23, 1, SPRINT2_ATTRACT_EN, NODE_22)
+	DISCRETE_COUNTER_7492(NODE_23, 1, SPRINT2_ATTRACT_EN, NODE_22, DISC_CLK_ON_F_EDGE)
 
 	/* Mask the bits and XOR for clock input */
 	DISCRETE_TRANSFORM2(NODE_24, 1, NODE_23, 1, "01&")
@@ -178,7 +177,7 @@ DISCRETE_SOUND_START(sprint2)
 			&sprint2_motor_vco)
 
 	/* QB-D of 7492 */
-	DISCRETE_COUNTER_7492(NODE_43, 1, SPRINT2_ATTRACT_EN, NODE_42)
+	DISCRETE_COUNTER_7492(NODE_43, 1, SPRINT2_ATTRACT_EN, NODE_42, DISC_CLK_ON_F_EDGE)
 
 	/* Mask the bits and XOR for clock input */
 	DISCRETE_TRANSFORM2(NODE_44, 1, NODE_43, 1, "01&")
@@ -263,7 +262,7 @@ DISCRETE_SOUND_START(sprint1)
 			&sprint2_motor_vco)
 
 	/* QB-D of 7492 */
-	DISCRETE_COUNTER_7492(NODE_23, 1, SPRINT2_ATTRACT_EN, NODE_22)
+	DISCRETE_COUNTER_7492(NODE_23, 1, SPRINT2_ATTRACT_EN, NODE_22, DISC_CLK_ON_F_EDGE)
 
 	/* Mask the bits and XOR for clock input */
 	DISCRETE_TRANSFORM2(NODE_24, 1, NODE_23, 1, "01&")
@@ -329,7 +328,6 @@ static const discrete_555_cc_desc dominos_tone_vco =
 	DISC_555_OUT_DC | DISC_555_OUT_SQW,
 	5,		// B+ voltage of 555
 	DEFAULT_555_VALUES,
-	5,		// B+ voltage of the Constant Current source
 	0.7		// Q1 junction voltage
 };
 
@@ -381,7 +379,7 @@ DISCRETE_SOUND_START(dominos)
 	DISCRETE_DAC_R1(NODE_20, 1, DOMINOS_FREQ_DATA, DEFAULT_TTL_V_LOGIC_1, &dominos_tone_vco_dac)
 	DISCRETE_555_CC(NODE_21, 1, NODE_20, DOMINOS_R23, CAP_U(.01), 0, 0, 0, &dominos_tone_vco)
 	DISCRETE_COUNTER_7492(NODE_22, 1, DOMINOS_ATTRACT_EN,	// IC D8, QB-QD
-			NODE_21)									// from IC D7/8, pin 3
+			NODE_21, DISC_CLK_ON_F_EDGE)					// from IC D7/8, pin 3
 	DISCRETE_TRANSFORM2(NODE_23, 1, NODE_22, 0x01, "01&")	// IC D8, pin 11-QB
 	DISCRETE_SWITCH(NODE_24, 1, NODE_23, 0,	// Enable gate C5
 			DOMINOS_AMP_DATA)		// IC C4

@@ -3151,10 +3151,9 @@ static const discrete_comp_adder_table invaders_thump_resistors =
 static const discrete_555_desc invaders_thump_555 =
 {
 	DISC_555_OUT_ENERGY | DISC_555_OUT_DC,
+	5,
 	5.0 - 0.6,				/* 5V - diode drop */
-	DEFAULT_TTL_V_LOGIC_1,	/* Output of F3 7411 buffer */
-	DEFAULT_555_THRESHOLD,
-	DEFAULT_555_TRIGGER
+	DEFAULT_TTL_V_LOGIC_1	/* Output of F3 7411 buffer */
 };
 
 
@@ -3708,8 +3707,8 @@ static const discrete_555_desc blueshrk_555_H1B =
 {
 	DISC_555_OUT_ENERGY | DISC_555_OUT_DC,
 	5,				/* B+ voltage of 555 */
-	12,				/* the OC buffer H2 converts the output voltage to 12V. */
-	DEFAULT_555_THRESHOLD, DEFAULT_555_TRIGGER
+	DEFAULT_555_CHARGE,
+	12				/* the OC buffer H2 converts the output voltage to 12V. */
 };
 
 

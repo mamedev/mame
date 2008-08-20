@@ -44,7 +44,6 @@ static const discrete_555_cc_desc asteroid_thump_555cc =
 	DISC_555_OUT_SQW | DISC_555_OUT_AC | DISCRETE_555_CC_TO_CAP,
 	5,		// B+ voltage of 555
 	DEFAULT_555_VALUES,
-	5,		// B+ voltage of the Constant Current source
 	0.8		// VBE 2N3906 (Si)
 };
 

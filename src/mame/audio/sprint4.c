@@ -83,7 +83,6 @@ static const discrete_555_cc_desc sprint4_motor_vco =
 	DISC_555_OUT_DC | DISC_555_OUT_SQW,
 	5,					// B+ voltage of 555
 	DEFAULT_555_VALUES,
-	5,					// B+ voltage of the Constant Current source
 	0.7					// Q1 junction voltage
 };
 
@@ -191,7 +190,8 @@ static const discrete_mixer_desc sprint4_mixer =
 	DISCRETE_COUNTER_7492(SPRINT4_PLAYER_MOTOR_NODE(4, _plr),	/* IC D9, pins 11,9,8 */            \
 					1,											/* ENAB */                          \
 					SPRINT4_ATTRACT_EN,							/* RESET */                         \
-					SPRINT4_PLAYER_MOTOR_NODE(3, _plr))			/* CLK */                           \
+					SPRINT4_PLAYER_MOTOR_NODE(3, _plr),			/* CLK */                           \
+					DISC_CLK_ON_F_EDGE)																\
 	DISCRETE_TRANSFORM3(SPRINT4_PLAYER_MOTOR_NODE(5, _plr),		/* IC B10, pin 3 */                 \
 					1,											/* ENAB */                          \
 					SPRINT4_PLAYER_MOTOR_NODE(4, _plr),			/* INP0 */                          \

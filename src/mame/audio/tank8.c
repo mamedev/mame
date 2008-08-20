@@ -65,7 +65,7 @@ static const discrete_555_desc tank8_555_a =
 
 static const discrete_555_desc tank8_555_m =
 {
-	DISC_555_TRIGGER_IS_VOLTAGE | DISC_555_OUT_SQW | DISC_555_OUT_DC,
+	DISC_555_OUT_SQW | DISC_555_OUT_DC | DISC_555_TRIGGER_IS_VOLTAGE,
 	5,		// B+ voltage of 555
 	DEFAULT_555_VALUES
 };

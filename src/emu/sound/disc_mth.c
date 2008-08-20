@@ -45,9 +45,10 @@
 
 struct dst_dac_r1_context
 {
-	double	iBias;		// current of the bias circuit
-	double	exponent;	// smoothing curve
-	double	rTotal;		// all resistors in parallel
+	double	i_bias;		/* current of the bias circuit */
+	double	exponent;	/* smoothing curve */
+	double	r_total;	/* all resistors in parallel */
+	int		last_data;
 };
 
 struct dst_flipflop_context
@@ -58,45 +59,45 @@ struct dst_flipflop_context
 struct dst_integrate_context
 {
 	double	change;
-	double	vMaxIn;		// v1 - norton VBE
-	double	vMaxInD;	// v1 - norton VBE - diode drop
-	double	vMaxOut;
+	double	v_max_in;	/* v1 - norton VBE */
+	double	v_max_in_d;	/* v1 - norton VBE - diode drop */
+	double	v_max_out;
 };
 
 #define DISC_MIXER_MAX_INPS	8
 
 struct dst_mixer_context
 {
-	int	type;
-	int	size;
-	double	rTotal;
-	double *rNode[DISC_MIXER_MAX_INPS];			// Either pointer to resistance node output OR NULL
-	double	exponent_rc[DISC_MIXER_MAX_INPS];	// For high pass filtering cause by cIn
-	double	vCap[DISC_MIXER_MAX_INPS];		// cap voltage of each input
-	double	exponent_cF;				// Low pass on mixed inputs
-	double	exponent_cAmp;				// Final high pass caused by out cap and amp input impedance
-	double	vCapF;					// cap voltage of cF
-	double	vCapAmp;				// cap voltage of cAmp
-	double	gain;					// used for DISC_MIXER_IS_OP_AMP_WITH_RI
+	int		type;
+	int		size;
+	double	r_total;
+	double *r_node[DISC_MIXER_MAX_INPS];		/* Either pointer to resistance node output OR NULL */
+	double	exponent_rc[DISC_MIXER_MAX_INPS];	/* For high pass filtering cause by cIn */
+	double	v_cap[DISC_MIXER_MAX_INPS];			/* cap voltage of each input */
+	double	exponent_c_f;			/* Low pass on mixed inputs */
+	double	exponent_c_amp;			/* Final high pass caused by out cap and amp input impedance */
+	double	v_cap_f;				/* cap voltage of cF */
+	double	v_cap_amp;				/* cap voltage of cAmp */
+	double	gain;					/* used for DISC_MIXER_IS_OP_AMP_WITH_RI */
 };
 
 struct dst_oneshot_context
 {
-	double countdown;
-	int state;
-	int lastTrig;
+	double	countdown;
+	int		state;
+	int		last_trig;
 };
 
 struct dss_ramp_context
 {
-	double step;
-	int dir;		/* 1 if End is higher then Start */
-	int last_en;	/* Keep track of the last enable value */
+	double	step;
+	int		dir;		/* 1 if End is higher then Start */
+	int		last_en;	/* Keep track of the last enable value */
 };
 
 struct dst_samphold_context
 {
-	double lastinput;
+	double last_input;
 	int clocktype;
 };
 
@@ -110,19 +111,19 @@ struct dst_op_amp_context
 	UINT8	has_cap;
 	UINT8	has_r1;
 	UINT8	has_r4;
-	double	vMax;
-	double	iFixed;
-	double	vCap;
+	double	v_max;
+	double	i_fixed;
+	double	v_cap;
 	double	exponent;
 };
 
 struct dst_op_amp_1sht_context
 {
-	double	iFixed;
-	double	vMax;
+	double	i_fixed;
+	double	v_max;
 	double	r34ratio;
-	double	vCap1;
-	double	vCap2;
+	double	v_cap1;
+	double	v_cap2;
 	double	exponent1c;
 	double	exponent1d;
 	double	exponent2;
@@ -130,19 +131,19 @@ struct dst_op_amp_1sht_context
 
 struct dst_tvca_op_amp_context
 {
-	double	vOutMax;		// Maximum output voltage
-	double	vTrig[2];		// Voltage used to charge cap1 based on function F3
-	double	vTrig2;			// Voltage used to charge cap2
-	double	vTrig3;			// Voltage used to charge cap3
-	double	iFixed;			// Fixed current going into - input
-	double	exponentC[2];	// Charge exponents based on function F3
-	double	exponentD[2];	// Discharge exponents based on function F3
-	double	exponent2[2];	// Discharge/charge exponents based on function F4
-	double	exponent3[2];	// Discharge/charge exponents based on function F5
-	double	vCap1;			// charge on cap c1
-	double	vCap2;			// charge on cap c2
-	double	vCap3;			// charge on cap c3
-	double	r67;			// = r6 + r7 (for easy use later)
+	double	v_out_max;		/* Maximum output voltage */
+	double	v_trig[2];		/* Voltage used to charge cap1 based on function F3 */
+	double	v_trig2;			/* Voltage used to charge cap2 */
+	double	v_trig3;			/* Voltage used to charge cap3 */
+	double	i_fixed;		/* Fixed current going into - input */
+	double	exponent_c[2];	/* Charge exponents based on function F3 */
+	double	exponent_d[2];	/* Discharge exponents based on function F3 */
+	double	exponent2[2];	/* Discharge/charge exponents based on function F4 */
+	double	exponent3[2];	/* Discharge/charge exponents based on function F5 */
+	double	v_cap1;			/* charge on cap c1 */
+	double	v_cap2;			/* charge on cap c2 */
+	double	v_cap3;			/* charge on cap c3 */
+	double	r67;			/* = r6 + r7 (for easy use later) */
 };
 
 
@@ -244,8 +245,8 @@ static void dst_clamp_step(node_description *node)
 {
 	if(DST_CLAMP__ENABLE)
 	{
-		if(DST_CLAMP__IN < DST_CLAMP__MIN) node->output[0] = DST_CLAMP__MIN;
-		else if(DST_CLAMP__IN > DST_CLAMP__MAX) node->output[0] = DST_CLAMP__MAX;
+		if (DST_CLAMP__IN < DST_CLAMP__MIN) node->output[0] = DST_CLAMP__MIN;
+		else if (DST_CLAMP__IN > DST_CLAMP__MAX) node->output[0] = DST_CLAMP__MAX;
 		else node->output[0]= DST_CLAMP__IN;
 	}
 	else
@@ -273,26 +274,46 @@ static void dst_clamp_step(node_description *node)
 
 static void dst_dac_r1_step(node_description *node)
 {
-	const discrete_dac_r1_ladder *info = node->custom;
-	struct dst_dac_r1_context *context = node->context;
+	const  discrete_dac_r1_ladder *info    = node->custom;
+	struct dst_dac_r1_context     *context = node->context;
 
-	int	bit;
-	double	v;
-	double	i;
+	int		bit, bit_val, data;
+	double	v, i_bit, i_total, x_time;
 
-	i = context->iBias;
+	i_total = context->i_bias;
+
+	data  = (int)DST_DAC_R1__DATA;
+	x_time = DST_DAC_R1__DATA - data;
 
 	if (DST_DAC_R1__ENABLE)
 	{
 		for (bit=0; bit < info->ladderLength; bit++)
 		{
 			/* Add up currents of ON circuits per Millman. */
-			/* Off, being 0V and having no current, can be ignored. */
-			if ((DST_DAC_R1__DATA & (1 << bit)) && info->r[bit])
-				i += DST_DAC_R1__VON / info->r[bit];
+
+			/* ignore if no resistor present */
+			if (info->r[bit] != 0)
+			{
+				i_bit   = DST_DAC_R1__VON / info->r[bit];
+				bit_val = (data >> bit) & 0x01;
+
+				if ((x_time != 0) && (bit_val != ((context->last_data >> bit) & 0x01)))
+				{
+					/* there is x_time and a change in bit,
+					 * so anti-alias the current */
+					i_bit *= bit_val ? x_time : 1.0 - x_time;
+				}
+				else
+				{
+					/* there is no x_time or a change in bit,
+					 * so 0 the current if the bit value is 0 */
+					 if (bit_val == 0) i_bit = 0;
+				}
+			i_total += i_bit;
+			}
 		}
 
-		v = i * context->rTotal;
+		v = i_total * context->r_total;
 
 		/* Filter if needed, else just output voltage */
 		node->output[0] = info->cFilter ? node->output[0] + ((v - node->output[0]) * context->exponent) : v;
@@ -316,9 +337,9 @@ static void dst_dac_r1_reset(node_description *node)
 
 	/* Calculate the Millman current of the bias circuit */
 	if (info->rBias)
-		context->iBias = info->vBias / info->rBias;
+		context->i_bias = info->vBias / info->rBias;
 	else
-		context->iBias = 0;
+		context->i_bias = 0;
 
 	/*
      * We will do a small amount of error checking.
@@ -340,23 +361,23 @@ static void dst_dac_r1_reset(node_description *node)
      * This is the combined resistance of the voltage sources.
      * This is used for the charging curve.
      */
-	context->rTotal = 0;
-	for(bit=0; bit < info->ladderLength; bit++)
+	context->r_total = 0;
+	for(bit = 0; bit < info->ladderLength; bit++)
 	{
 		if (info->r[bit])
-			context->rTotal += 1.0 / info->r[bit];
+			context->r_total += 1.0 / info->r[bit];
 	}
-	if (info->rBias) context->rTotal += 1.0 / info->rBias;
-	if (info->rGnd) context->rTotal += 1.0 / info->rGnd;
-	context->rTotal = 1.0 / context->rTotal;
+	if (info->rBias) context->r_total += 1.0 / info->rBias;
+	if (info->rGnd)  context->r_total += 1.0 / info->rGnd;
+	context->r_total = 1.0 / context->r_total;
 
 	node->output[0] = 0;
 
 	if (info->cFilter)
 	{
 		/* Setup filter constants */
-		context->exponent = -1.0 / (context->rTotal * info->cFilter  * discrete_current_context->sample_rate);
-		context->exponent = 1.0 - exp(context->exponent);
+		context->exponent = -1.0 / (context->r_total * info->cFilter  * discrete_current_context->sample_rate);
+		context->exponent =  1.0 - exp(context->exponent);
 	}
 }
 
@@ -378,9 +399,10 @@ static void dst_dac_r1_reset(node_description *node)
 
 static void dst_diode_mix_step(node_description *node)
 {
-	struct dst_size_context *context = node->context;
-	double max = 0;
-	int addr;
+	struct	dst_size_context *context = node->context;
+
+	double	max = 0;
+	int		addr;
 
 	if (DST_DIODE_MIX__ENABLE)
 	{
@@ -426,7 +448,7 @@ static void dst_divide_step(node_description *node)
 	{
 		if(DST_DIVIDE__DIV == 0)
 		{
-			node->output[0]=DBL_MAX;	/* Max out but don't break */
+			node->output[0 ]= DBL_MAX;	/* Max out but don't break */
 			discrete_log("dst_divider_step() - Divide by Zero attempted in NODE_%02d.\n",NODE_INDEX(node->node));
 		}
 		else
@@ -460,12 +482,12 @@ static void dst_gain_step(node_description *node)
 {
 	if(DST_GAIN__ENABLE)
 	{
-		node->output[0] = DST_GAIN__IN * DST_GAIN__GAIN;
+		node->output[0]  = DST_GAIN__IN * DST_GAIN__GAIN;
 		node->output[0] += DST_GAIN__OFFSET;
 	}
 	else
 	{
-		node->output[0]=0;
+		node->output[0] = 0;
 	}
 }
 
@@ -520,12 +542,12 @@ int dst_trigger_function(int trig0, int trig1, int trig2, int function)
 
 static void dst_integrate_step(node_description *node)
 {
-	const discrete_integrate_info *info = node->custom;
-	struct dst_integrate_context *context = node->context;
+	const  discrete_integrate_info *info    = node->custom;
+	struct dst_integrate_context   *context = node->context;
 
 	int		trig0, trig1;
-	double	iNeg = 0;	// current into - input
-	double	iPos = 0;	// current into + input
+	double	i_neg = 0;	/* current into - input */
+	double	i_pos = 0;	/* current into + input */
 
 	switch (info->type)
 	{
@@ -535,32 +557,32 @@ static void dst_integrate_step(node_description *node)
 				/* This forces the cap to completely charge,
                  * and the output to go to it's max value.
                  */
-				node->output[0] = context->vMaxOut;
+				node->output[0] = context->v_max_out;
 				return;
 			}
 			node->output[0] -= context->change;
 			break;
 
 		case DISC_INTEGRATE_OP_AMP_1 | DISC_OP_AMP_IS_NORTON:
-			iNeg = context->vMaxIn / info->r1;
-			iPos = (DST_INTEGRATE__TRG0 - OP_AMP_NORTON_VBE) / info->r2;
-			if (iPos < 0) iPos = 0;
-			node->output[0] += (iPos - iNeg) / discrete_current_context->sample_rate / info->c;
+			i_neg = context->v_max_in / info->r1;
+			i_pos = (DST_INTEGRATE__TRG0 - OP_AMP_NORTON_VBE) / info->r2;
+			if (i_pos < 0) i_pos = 0;
+			node->output[0] += (i_pos - i_neg) / discrete_current_context->sample_rate / info->c;
 			break;
 
 		case DISC_INTEGRATE_OP_AMP_2 | DISC_OP_AMP_IS_NORTON:
-			trig0 = (int)DST_INTEGRATE__TRG0;
-			trig1 = (int)DST_INTEGRATE__TRG1;
-			iNeg = dst_trigger_function(trig0, trig1, 0, info->f0) ? context->vMaxInD / info->r1 : 0;
-			iPos =  dst_trigger_function(trig0, trig1, 0, info->f1) ? context->vMaxIn / info->r2 : 0;
-			iPos +=  dst_trigger_function(trig0, trig1, 0, info->f2) ? context->vMaxInD / info->r3 : 0;
-			node->output[0] += (iPos - iNeg) / discrete_current_context->sample_rate / info->c;
+			trig0  = (int)DST_INTEGRATE__TRG0;
+			trig1  = (int)DST_INTEGRATE__TRG1;
+			i_neg  = dst_trigger_function(trig0, trig1, 0, info->f0) ? context->v_max_in_d / info->r1 : 0;
+			i_pos  = dst_trigger_function(trig0, trig1, 0, info->f1) ? context->v_max_in / info->r2 : 0;
+			i_pos += dst_trigger_function(trig0, trig1, 0, info->f2) ? context->v_max_in_d / info->r3 : 0;
+			node->output[0] += (i_pos - i_neg) / discrete_current_context->sample_rate / info->c;
 			break;
 	}
 
 	/* Clip the output. */
 	if (node->output[0] < 0) node->output[0] = 0;
-	if (node->output[0] > context->vMaxOut) node->output[0] = context->vMaxOut;
+	if (node->output[0] > context->v_max_out) node->output[0] = context->v_max_out;
 }
 
 static void dst_integrate_reset(node_description *node)
@@ -571,13 +593,13 @@ static void dst_integrate_reset(node_description *node)
 
 	if (info->type & DISC_OP_AMP_IS_NORTON)
 	{
-		context->vMaxOut = info->vP - OP_AMP_NORTON_VBE;
-		context->vMaxIn  = info->v1 - OP_AMP_NORTON_VBE;
-		context->vMaxInD = context->vMaxIn - OP_AMP_NORTON_VBE;
+		context->v_max_out  = info->vP - OP_AMP_NORTON_VBE;
+		context->v_max_in   = info->v1 - OP_AMP_NORTON_VBE;
+		context->v_max_in_d = context->v_max_in - OP_AMP_NORTON_VBE;
 	}
 	else
 	{
-		context->vMaxOut =  info->vP - OP_AMP_VP_RAIL_OFFSET;
+		context->v_max_out =  info->vP - OP_AMP_VP_RAIL_OFFSET;
 
 		v = info->v1 * info->r3 / (info->r2 + info->r3);	/* vRef */
 		v = info->v1 - v;	/* actual charging voltage */
@@ -607,7 +629,7 @@ static void dst_logic_inv_step(node_description *node)
 	}
 	else
 	{
-		node->output[0]=0.0;
+		node->output[0] = 0.0;
 	}
 }
 
@@ -632,11 +654,11 @@ static void dst_logic_and_step(node_description *node)
 {
 	if(DST_LOGIC_AND__ENABLE)
 	{
-		node->output[0]= (DST_LOGIC_AND__IN0 && DST_LOGIC_AND__IN1 && DST_LOGIC_AND__IN2 && DST_LOGIC_AND__IN3)? 1.0 : 0.0;
+		node->output[0] = (DST_LOGIC_AND__IN0 && DST_LOGIC_AND__IN1 && DST_LOGIC_AND__IN2 && DST_LOGIC_AND__IN3)? 1.0 : 0.0;
 	}
 	else
 	{
-		node->output[0]=0.0;
+		node->output[0] = 0.0;
 	}
 }
 
@@ -665,7 +687,7 @@ static void dst_logic_nand_step(node_description *node)
 	}
 	else
 	{
-		node->output[0]=0.0;
+		node->output[0] = 0.0;
 	}
 }
 
@@ -694,7 +716,7 @@ static void dst_logic_or_step(node_description *node)
 	}
 	else
 	{
-		node->output[0]=0.0;
+		node->output[0] = 0.0;
 	}
 }
 
@@ -723,7 +745,7 @@ static void dst_logic_nor_step(node_description *node)
 	}
 	else
 	{
-		node->output[0]=0.0;
+		node->output[0] = 0.0;
 	}
 }
 
@@ -744,11 +766,11 @@ static void dst_logic_xor_step(node_description *node)
 {
 	if(DST_LOGIC_XOR__ENABLE)
 	{
-		node->output[0]=((DST_LOGIC_XOR__IN0 && !DST_LOGIC_XOR__IN1) || (!DST_LOGIC_XOR__IN0 && DST_LOGIC_XOR__IN1)) ? 1.0 : 0.0;
+		node->output[0] = ((DST_LOGIC_XOR__IN0 && !DST_LOGIC_XOR__IN1) || (!DST_LOGIC_XOR__IN0 && DST_LOGIC_XOR__IN1)) ? 1.0 : 0.0;
 	}
 	else
 	{
-		node->output[0]=0.0;
+		node->output[0] = 0.0;
 	}
 }
 
@@ -769,11 +791,11 @@ static void dst_logic_nxor_step(node_description *node)
 {
 	if(DST_LOGIC_XNOR__ENABLE)
 	{
-		node->output[0]=((DST_LOGIC_XNOR__IN0 && !DST_LOGIC_XNOR__IN1) || (!DST_LOGIC_XNOR__IN0 && DST_LOGIC_XNOR__IN1)) ? 0.0 : 1.0;
+		node->output[0] = ((DST_LOGIC_XNOR__IN0 && !DST_LOGIC_XNOR__IN1) || (!DST_LOGIC_XNOR__IN0 && DST_LOGIC_XNOR__IN1)) ? 0.0 : 1.0;
 	}
 	else
 	{
-		node->output[0]=0.0;
+		node->output[0] = 0.0;
 	}
 }
 
@@ -798,6 +820,7 @@ static void dst_logic_nxor_step(node_description *node)
 static void dst_logic_dff_step(node_description *node)
 {
 	struct dst_flipflop_context *context = node->context;
+
 	int clk = (int)DST_LOGIC_DFF__CLOCK;
 
 	if (DST_LOGIC_DFF__ENABLE)
@@ -807,9 +830,7 @@ static void dst_logic_dff_step(node_description *node)
 		else if (DST_LOGIC_DFF__SET)
 			node->output[0] = 1;
 		else if (!context->last_clk && clk)	/* low to high */
-		{
 			node->output[0] = DST_LOGIC_DFF__DATA;
-		}
 	}
 	else
 	{
@@ -821,8 +842,9 @@ static void dst_logic_dff_step(node_description *node)
 static void dst_logic_ff_reset(node_description *node)
 {
 	struct dst_flipflop_context *context = node->context;
+
 	context->last_clk = 0;
-	node->output[0] = 0;
+	node->output[0]   = 0;
 }
 
 
@@ -848,9 +870,10 @@ static void dst_logic_ff_reset(node_description *node)
 static void dst_logic_jkff_step(node_description *node)
 {
 	struct dst_flipflop_context *context = node->context;
+
 	int clk = (int)DST_LOGIC_JKFF__CLOCK;
-	int j = (int)DST_LOGIC_JKFF__J;
-	int k = (int)DST_LOGIC_JKFF__K;
+	int j   = (int)DST_LOGIC_JKFF__J;
+	int k   = (int)DST_LOGIC_JKFF__K;
 
 	if (DST_LOGIC_JKFF__ENABLE)
 	{
@@ -880,7 +903,7 @@ static void dst_logic_jkff_step(node_description *node)
 	}
 	else
 	{
-		node->output[0]=0;
+		node->output[0] = 0;
 	}
 	context->last_clk = clk;
 }
@@ -905,6 +928,7 @@ static void dst_logic_jkff_step(node_description *node)
 static void dst_lookup_table_step(node_description *node)
 {
 	const double *table = node->custom;
+
 	int	addr = DST_LOOKUP_TABLE__IN;
 
 	if (!DST_LOOKUP_TABLE__ENABLE || addr < 0 || addr >= DST_LOOKUP_TABLE__SIZE)
@@ -971,31 +995,31 @@ static void dst_mixer_step(node_description *node)
 	const discrete_mixer_desc *info = node->custom;
 	struct dst_mixer_context *context = node->context;
 
-	double	v, vTemp, rTotal, rTemp, rTemp2 = 0;
-	double	i = 0;		// total current of inputs
-	int	bit, connected;
+	double	v, vTemp, r_total, rTemp, rTemp2 = 0;
+	double	i = 0;		/* total current of inputs */
+	int		bit, connected;
 
 	if (DST_MIXER__ENABLE)
 	{
-		rTotal = context->rTotal;
+		r_total = context->r_total;
 
 		if (context->type & DISC_MIXER_HAS_R_NODE)
 		{
-			for(bit=0; bit < context->size; bit++)
+			for(bit = 0; bit < context->size; bit++)
 			{
-				rTemp = info->r[bit];
+				rTemp     = info->r[bit];
 				connected = 1;
-				vTemp = DST_MIXER__IN(bit);
+				vTemp     = DST_MIXER__IN(bit);
 
-				if (info->rNode[bit])
+				if (info->r_node[bit])
 				{
 					/* a node has the posibility of being disconnected from the circuit. */
-					if (*context->rNode[bit] == 0)
+					if (*context->r_node[bit] == 0)
 						connected = 0;
 					else
 					{
-						rTemp += *context->rNode[bit];
-						rTotal += 1.0 / rTemp;
+						rTemp   += *context->r_node[bit];
+						r_total += 1.0 / rTemp;
 						if (info->c[bit] != 0)
 						{
 							switch (context->type & DISC_MIXER_TYPE_MASK)
@@ -1017,7 +1041,7 @@ static void dst_mixer_step(node_description *node)
 							}
 							/* Re-calculate exponent if resistor is a node */
 							context->exponent_rc[bit] = -1.0 / (rTemp2 * info->c[bit]  * discrete_current_context->sample_rate);
-							context->exponent_rc[bit] = 1.0 - exp(context->exponent_rc[bit]);
+							context->exponent_rc[bit] =  1.0 - exp(context->exponent_rc[bit]);
 						}
 					}
 				}
@@ -1027,8 +1051,8 @@ static void dst_mixer_step(node_description *node)
 					if (info->c[bit] != 0)
 					{
 						/* do input high pass filtering if needed. */
-						context->vCap[bit] += (vTemp - info->vRef - context->vCap[bit]) * context->exponent_rc[bit];
-						vTemp -= context->vCap[bit];
+						context->v_cap[bit] += (vTemp - info->vRef - context->v_cap[bit]) * context->exponent_rc[bit];
+						vTemp -= context->v_cap[bit];
 					}
 					i += (((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP) ? info->vRef - vTemp : vTemp) / rTemp;
 				}
@@ -1044,8 +1068,8 @@ static void dst_mixer_step(node_description *node)
 				if (info->c[bit] != 0)
 				{
 					/* do input high pass filtering if needed. */
-					context->vCap[bit] += (vTemp - info->vRef - context->vCap[bit]) * context->exponent_rc[bit];
-					vTemp -= context->vCap[bit];
+					context->v_cap[bit] += (vTemp - info->vRef - context->v_cap[bit]) * context->exponent_rc[bit];
+					vTemp -= context->v_cap[bit];
 				}
 				i += (((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP) ? info->vRef - vTemp : vTemp) / rTemp;
 			}
@@ -1054,11 +1078,11 @@ static void dst_mixer_step(node_description *node)
 		if ((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP_WITH_RI)
 			i += info->vRef / info->rI;
 
-		rTotal = 1.0 / rTotal;
+		r_total = 1.0 / r_total;
 
 		/* If resistor network or has rI then Millman is used.
          * If op-amp then summing formula is used. */
-		v = i * (((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP) ? info->rF : rTotal);
+		v = i * (((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP) ? info->rF : r_total);
 
 		if ((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP_WITH_RI)
 			v = info->vRef + (context->gain * (info->vRef - v));
@@ -1069,18 +1093,18 @@ static void dst_mixer_step(node_description *node)
 			if (context->type & DISC_MIXER_HAS_R_NODE)
 			{
 				/* Re-calculate exponent if resistor nodes are used */
-				context->exponent_cF = -1.0 / (rTotal * info->cF  * discrete_current_context->sample_rate);
-				context->exponent_cF = 1.0 - exp(context->exponent_cF);
+				context->exponent_c_f = -1.0 / (r_total * info->cF  * discrete_current_context->sample_rate);
+				context->exponent_c_f =  1.0 - exp(context->exponent_c_f);
 			}
-			context->vCapF += (v -info->vRef - context->vCapF) * context->exponent_cF;
-			v = context->vCapF;
+			context->v_cap_f += (v -info->vRef - context->v_cap_f) * context->exponent_c_f;
+			v = context->v_cap_f;
 		}
 
 		/* Do the high pass filtering for cAmp */
 		if (info->cAmp != 0)
 		{
-			context->vCapAmp += (v - context->vCapAmp) * context->exponent_cAmp;
-			v -= context->vCapAmp;
+			context->v_cap_amp += (v - context->v_cap_amp) * context->exponent_c_amp;
+			v -= context->v_cap_amp;
 		}
 		node->output[0] = v * info->gain;
 	}
@@ -1092,21 +1116,21 @@ static void dst_mixer_step(node_description *node)
 
 static void dst_mixer_reset(node_description *node)
 {
-	const discrete_mixer_desc *info = node->custom;
-	struct dst_mixer_context *context = node->context;
+	const  discrete_mixer_desc *info    = node->custom;
+	struct dst_mixer_context   *context = node->context;
 	node_description *r_node;
 
-	int	bit;
+	int		bit;
 	double	rTemp = 0;
 
-	/* link to rNode outputs */
+	/* link to r_node outputs */
 	for (bit = 0; bit < 8; bit ++)
 	{
-		r_node = discrete_find_node(NULL, info->rNode[bit]);
+		r_node = discrete_find_node(NULL, info->r_node[bit]);
 		if (r_node)
-			context->rNode[bit] = &(r_node->output[NODE_CHILD_NODE_NUM(info->rNode[bit])]);
+			context->r_node[bit] = &(r_node->output[NODE_CHILD_NODE_NUM(info->r_node[bit])]);
 		else
-			context->rNode[bit] = NULL;
+			context->r_node[bit] = NULL;
 	}
 
 	context->size = node->active_inputs - 1;
@@ -1124,20 +1148,20 @@ static void dst_mixer_reset(node_description *node)
      * This is the combined resistance of the voltage sources.
      * Also calculate the exponents while we are here.
      */
-	context->rTotal = 0;
-	for(bit=0; bit < context->size; bit++)
+	context->r_total = 0;
+	for(bit = 0; bit < context->size; bit++)
 	{
-		if (info->rNode[bit])
+		if (info->r_node[bit])
 			context->type = context->type | DISC_MIXER_HAS_R_NODE;
 
-		if ((info->r[bit] != 0) && !info->rNode[bit] )
+		if ((info->r[bit] != 0) && !info->r_node[bit] )
 		{
-			context->rTotal += 1.0 / info->r[bit];
+			context->r_total += 1.0 / info->r[bit];
 		}
 
-		context->vCap[bit] = 0;
+		context->v_cap[bit]       = 0;
 		context->exponent_rc[bit] = 0;
-		if ((info->c[bit] != 0)  && !info->rNode[bit])
+		if ((info->c[bit] != 0)  && !info->r_node[bit])
 		{
 			switch (context->type)
 			{
@@ -1158,34 +1182,34 @@ static void dst_mixer_reset(node_description *node)
 			}
 			/* Setup filter constants */
 			context->exponent_rc[bit] = -1.0 / (rTemp * info->c[bit]  * discrete_current_context->sample_rate);
-			context->exponent_rc[bit] = 1.0 - exp(context->exponent_rc[bit]);
+			context->exponent_rc[bit] =  1.0 - exp(context->exponent_rc[bit]);
 		}
 	}
 
 	if (info->rF != 0)
 	{
-		if (info->type == DISC_MIXER_IS_RESISTOR) context->rTotal += 1.0 / info->rF;
+		if (info->type == DISC_MIXER_IS_RESISTOR) context->r_total += 1.0 / info->rF;
 	}
-	if (context->type == DISC_MIXER_IS_OP_AMP_WITH_RI) context->rTotal += 1.0 / info->rI;
+	if (context->type == DISC_MIXER_IS_OP_AMP_WITH_RI) context->r_total += 1.0 / info->rI;
 
-	context->vCapF = 0;
-	context->exponent_cF = 0;
+	context->v_cap_f      = 0;
+	context->exponent_c_f = 0;
 	if (info->cF != 0)
 	{
 		/* Setup filter constants */
-		context->exponent_cF = -1.0 / (((info->type == DISC_MIXER_IS_OP_AMP) ? info->rF : (1.0 / context->rTotal))* info->cF  * discrete_current_context->sample_rate);
-		context->exponent_cF = 1.0 - exp(context->exponent_cF);
+		context->exponent_c_f = -1.0 / (((info->type == DISC_MIXER_IS_OP_AMP) ? info->rF : (1.0 / context->r_total))* info->cF  * discrete_current_context->sample_rate);
+		context->exponent_c_f =  1.0 - exp(context->exponent_c_f);
 	}
 
-	context->vCapAmp = 0;
-	context->exponent_cAmp = 0;
+	context->v_cap_amp      = 0;
+	context->exponent_c_amp = 0;
 	if (info->cAmp != 0)
 	{
 		/* Setup filter constants */
 		/* We will use 100000 ohms as an average final stage impedance. */
 		/* Your amp/speaker system will have more effect on incorrect filtering then any value used here. */
-		context->exponent_cAmp = -1.0 / (100000 * info->cAmp  * discrete_current_context->sample_rate);
-		context->exponent_cAmp = 1.0 - exp(context->exponent_cAmp);
+		context->exponent_c_amp = -1.0 / (100000 * info->cAmp  * discrete_current_context->sample_rate);
+		context->exponent_c_amp =  1.0 - exp(context->exponent_c_amp);
 	}
 
 	if ((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP_WITH_RI) context->gain = info->rF / info->rI;
@@ -1213,11 +1237,12 @@ static void dst_mixer_reset(node_description *node)
 static void dst_multiplex_step(node_description *node)
 {
 	struct dst_size_context *context = node->context;
+
 	int addr;
 
 	if(DST_MULTIPLEX__ENABLE)
 	{
-		addr = DST_MULTIPLEX__ADDR;	// FP to INT
+		addr = DST_MULTIPLEX__ADDR;	/* FP to INT */
 		if ((addr >= 0) && (addr < context->size))
 		{
 			node->output[0] = DST_MULTIPLEX__INP(addr);
@@ -1225,12 +1250,12 @@ static void dst_multiplex_step(node_description *node)
 		else
 		{
 			/* Bad address.  We will leave the output alone. */
-			discrete_log("NODE_%02d - Address = %d. Out of bounds\n",node->node-NODE_00, addr);
+			discrete_log("NODE_%02d - Address = %d. Out of bounds\n", node->node-NODE_00, addr);
 		}
 	}
 	else
 	{
-		node->output[0]=0;
+		node->output[0] = 0;
 	}
 }
 
@@ -1265,24 +1290,25 @@ static void dst_multiplex_reset(node_description *node)
 static void dst_oneshot_step(node_description *node)
 {
 	struct dst_oneshot_context *context = node->context;
+
 	int trigger = (DST_ONESHOT__TRIG != 0);
 
 	/* If the state is triggered we will need to countdown later */
-	int doCount = context->state;
+	int do_count = context->state;
 
 	if (DST_ONESHOT__RESET)
 	{
 		/* Hold in Reset */
 		node->output[0] = 0;
-		context->state = 0;
+		context->state  = 0;
 	}
 	else
 	{
 		/* are we at an edge? */
-		if (trigger != context->lastTrig)
+		if (trigger != context->last_trig)
 		{
 			/* There has been a trigger edge */
-			context->lastTrig = trigger;
+			context->last_trig = trigger;
 
 			/* Is it the proper edge trigger */
 			if ((DST_ONESHOT__TYPE & DISC_ONESHOT_REDGE) ? trigger : !trigger)
@@ -1290,8 +1316,8 @@ static void dst_oneshot_step(node_description *node)
 				if (!context->state)
 				{
 					/* We have first trigger */
-					context->state = 1;
-					node->output[0] = (DST_ONESHOT__TYPE & DISC_OUT_ACTIVE_LOW) ? 0 : DST_ONESHOT__AMP;
+					context->state     = 1;
+					node->output[0]    = (DST_ONESHOT__TYPE & DISC_OUT_ACTIVE_LOW) ? 0 : DST_ONESHOT__AMP;
 					context->countdown = DST_ONESHOT__WIDTH;
 				}
 				else
@@ -1301,20 +1327,20 @@ static void dst_oneshot_step(node_description *node)
 					{
 						/* Retrigger */
 						context->countdown = DST_ONESHOT__WIDTH;
-						doCount = 0;
+						do_count = 0;
 					}
 				}
 			}
 		}
 
-		if (doCount)
+		if (do_count)
 		{
 			context->countdown -= discrete_current_context->sample_time;
 			if(context->countdown <= 0.0)
 			{
-				node->output[0] = (DST_ONESHOT__TYPE & DISC_OUT_ACTIVE_LOW) ? DST_ONESHOT__AMP : 0;
+				node->output[0]    = (DST_ONESHOT__TYPE & DISC_OUT_ACTIVE_LOW) ? DST_ONESHOT__AMP : 0;
 				context->countdown = 0;
-				context->state = 0;
+				context->state     = 0;
 			}
 		}
 	}
@@ -1324,10 +1350,11 @@ static void dst_oneshot_step(node_description *node)
 static void dst_oneshot_reset(node_description *node)
 {
 	struct dst_oneshot_context *context = node->context;
-	context->countdown = 0;
-	context->state = 0;
 
- 	context->lastTrig = 0;
+	context->countdown = 0;
+	context->state     = 0;
+
+ 	context->last_trig = 0;
  	node->output[0] = (DST_ONESHOT__TYPE & DISC_OUT_ACTIVE_LOW) ? DST_ONESHOT__AMP : 0;
 }
 
@@ -1360,21 +1387,21 @@ static void dst_ramp_step(node_description *node)
 		if (!context->last_en)
 		{
 			context->last_en = 1;
-			node->output[0] = DST_RAMP__START;
+			node->output[0]  = DST_RAMP__START;
 		}
 		if(context->dir ? DST_RAMP__DIR : !DST_RAMP__DIR) node->output[0]+=context->step;
-		else node->output[0]-=context->step;
+		else node->output[0] -= context->step;
 		/* Clamp to min/max */
 		if(context->dir ? (node->output[0] < DST_RAMP__START)
-				: (node->output[0] > DST_RAMP__START)) node->output[0]=DST_RAMP__START;
+				: (node->output[0] > DST_RAMP__START)) node->output[0] = DST_RAMP__START;
 		if(context->dir ? (node->output[0] > DST_RAMP__END)
-				: (node->output[0] < DST_RAMP__END)) node->output[0]=DST_RAMP__END;
+				: (node->output[0] < DST_RAMP__END)) node->output[0] = DST_RAMP__END;
 	}
 	else
 	{
 		context->last_en = 0;
-		// Disabled so clamp to output
-		node->output[0]=DST_RAMP__CLAMP;
+		/* Disabled so clamp to output */
+		node->output[0] = DST_RAMP__CLAMP;
 	}
 }
 
@@ -1382,9 +1409,9 @@ static void dst_ramp_reset(node_description *node)
 {
 	struct dss_ramp_context *context = node->context;
 
-	node->output[0]=DST_RAMP__CLAMP;
-	context->step = DST_RAMP__GRAD / discrete_current_context->sample_rate;
-	context->dir = ((DST_RAMP__END - DST_RAMP__START) == abs(DST_RAMP__END - DST_RAMP__START));
+	node->output[0]  = DST_RAMP__CLAMP;
+	context->step    = DST_RAMP__GRAD / discrete_current_context->sample_rate;
+	context->dir     = ((DST_RAMP__END - DST_RAMP__START) == abs(DST_RAMP__END - DST_RAMP__START));
 	context->last_en = 0;
 }
 
@@ -1414,19 +1441,19 @@ static void dst_samphold_step(node_description *node)
 		{
 			case DISC_SAMPHOLD_REDGE:
 				/* Clock the whole time the input is rising */
-				if(DST_SAMPHOLD__CLOCK > context->lastinput) node->output[0]=DST_SAMPHOLD__IN0;
+				if (DST_SAMPHOLD__CLOCK > context->last_input) node->output[0] = DST_SAMPHOLD__IN0;
 				break;
 			case DISC_SAMPHOLD_FEDGE:
 				/* Clock the whole time the input is falling */
-				if(DST_SAMPHOLD__CLOCK < context->lastinput) node->output[0]=DST_SAMPHOLD__IN0;
+				if(DST_SAMPHOLD__CLOCK < context->last_input) node->output[0] = DST_SAMPHOLD__IN0;
 				break;
 			case DISC_SAMPHOLD_HLATCH:
 				/* Output follows input if clock != 0 */
-				if(DST_SAMPHOLD__CLOCK) node->output[0]=DST_SAMPHOLD__IN0;
+				if( DST_SAMPHOLD__CLOCK) node->output[0] = DST_SAMPHOLD__IN0;
 				break;
 			case DISC_SAMPHOLD_LLATCH:
 				/* Output follows input if clock == 0 */
-				if(DST_SAMPHOLD__CLOCK==0) node->output[0]=DST_SAMPHOLD__IN0;
+				if (DST_SAMPHOLD__CLOCK == 0) node->output[0] = DST_SAMPHOLD__IN0;
 				break;
 			default:
 				discrete_log("dst_samphold_step - Invalid clocktype passed");
@@ -1435,20 +1462,20 @@ static void dst_samphold_step(node_description *node)
 	}
 	else
 	{
-		node->output[0]=0;
+		node->output[0] = 0;
 	}
 	/* Save the last value */
-	context->lastinput=DST_SAMPHOLD__CLOCK;
+	context->last_input = DST_SAMPHOLD__CLOCK;
 }
 
 static void dst_samphold_reset(node_description *node)
 {
 	struct dst_samphold_context *context = node->context;
 
-	node->output[0]=0;
-	context->lastinput=-1;
+	node->output[0]     =  0;
+	context->last_input = -1;
 	/* Only stored in here to speed up and save casting in the step function */
-	context->clocktype=(int)DST_SAMPHOLD__TYPE;
+	context->clocktype = (int)DST_SAMPHOLD__TYPE;
 	dst_samphold_step(node);
 }
 
@@ -1472,11 +1499,11 @@ static void dst_switch_step(node_description *node)
 {
 	if(DSS_SWITCH__ENABLE)
 	{
-		node->output[0]=DSS_SWITCH__SWITCH ? DSS_SWITCH__IN1 : DSS_SWITCH__IN0;
+		node->output[0] = DSS_SWITCH__SWITCH ? DSS_SWITCH__IN1 : DSS_SWITCH__IN0;
 	}
 	else
 	{
-		node->output[0]=0;
+		node->output[0] = 0;
 	}
 }
 
@@ -1500,11 +1527,11 @@ static void dst_aswitch_step(node_description *node)
 {
 	if(DSS_SWITCH__ENABLE)
 	{
-		node->output[0]=DSS_ASWITCH__CTRL > DSS_ASWITCH__THRESHOLD ? DSS_ASWITCH__IN : 0;
+		node->output[0] = DSS_ASWITCH__CTRL > DSS_ASWITCH__THRESHOLD ? DSS_ASWITCH__IN : 0;
 	}
 	else
 	{
-		node->output[0]=0;
+		node->output[0] = 0;
 	}
 }
 
@@ -1529,7 +1556,7 @@ static void dst_aswitch_step(node_description *node)
 
 #define MAX_TRANS_STACK	16
 
-INLINE double dst_transform_pop(double *stack,int *pointer)
+INLINE double dst_transform_pop(double *stack, int *pointer)
 {
 	//decrement THEN read
 	assert(*pointer > 0);
@@ -1537,97 +1564,97 @@ INLINE double dst_transform_pop(double *stack,int *pointer)
 	return stack[*pointer];
 }
 
-INLINE void dst_transform_push(double *stack,int *pointer,double value)
+INLINE void dst_transform_push(double *stack, int *pointer, double value)
 {
 	//Store THEN increment
 	assert(*pointer < MAX_TRANS_STACK);
-	stack[(*pointer)++]=value;
+	stack[(*pointer)++] = value;
 }
 
 static void dst_transform_step(node_description *node)
 {
 	if(DST_TRANSFORM__ENABLE)
 	{
-		double trans_stack[MAX_TRANS_STACK];
-		double number1,top;
-		int	trans_stack_ptr=0;
+		double	trans_stack[MAX_TRANS_STACK];
+		double	number1,top;
+		int		trans_stack_ptr = 0;
 
 		const char *fPTR = node->custom;
-		node->output[0]=0;
+		node->output[0]  = 0;
 
 		top = HUGE_VAL;
 
-		while(*fPTR!=0)
+		while(*fPTR != 0)
 		{
 			switch (*fPTR++)
 			{
 				case '*':
-					number1 = dst_transform_pop(trans_stack,&trans_stack_ptr);
+					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
 					top = number1 * top;
 					break;
 				case '/':
-					number1 = dst_transform_pop(trans_stack,&trans_stack_ptr);
+					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
 					top = number1 / top;
 					break;
 				case '+':
-					number1=dst_transform_pop(trans_stack,&trans_stack_ptr);
+					number1=dst_transform_pop(trans_stack, &trans_stack_ptr);
 					top = number1 + top;
 					break;
 				case '-':
-					number1 = dst_transform_pop(trans_stack,&trans_stack_ptr);
+					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
 					top = number1 - top;
 					break;
 				case '0':
-					dst_transform_push(trans_stack,&trans_stack_ptr, top);
+					dst_transform_push(trans_stack, &trans_stack_ptr, top);
 					top = DST_TRANSFORM__IN0;
 					break;
 				case '1':
-					dst_transform_push(trans_stack,&trans_stack_ptr, top);
+					dst_transform_push(trans_stack, &trans_stack_ptr, top);
 					top = DST_TRANSFORM__IN1;
 					break;
 				case '2':
-					dst_transform_push(trans_stack,&trans_stack_ptr, top);
+					dst_transform_push(trans_stack, &trans_stack_ptr, top);
 					top = DST_TRANSFORM__IN2;
 					break;
 				case '3':
-					dst_transform_push(trans_stack,&trans_stack_ptr, top);
+					dst_transform_push(trans_stack, &trans_stack_ptr, top);
 					top = DST_TRANSFORM__IN3;
 					break;
 				case '4':
-					dst_transform_push(trans_stack,&trans_stack_ptr, top);
+					dst_transform_push(trans_stack, &trans_stack_ptr, top);
 					top = DST_TRANSFORM__IN4;
 					break;
 				case 'P':
-					dst_transform_push(trans_stack,&trans_stack_ptr, top);
+					dst_transform_push(trans_stack, &trans_stack_ptr, top);
 					break;
-				case 'i':	// * -1
+				case 'i':	/* * -1 */
 					top = -top;
 					break;
-				case '!':	// Logical NOT of Last Value
+				case '!':	/* Logical NOT of Last Value */
 					top = !top;
 					break;
-				case '=':	// Logical =
-					number1 = dst_transform_pop(trans_stack,&trans_stack_ptr);
+				case '=':	/* Logical = */
+					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
 					top = (int)number1 == (int)top;
 					break;
-				case '>':	// Logical >
-					number1 = dst_transform_pop(trans_stack,&trans_stack_ptr);
+				case '>':	/* Logical > */
+					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
 					top = number1 > top;
 					break;
-				case '<':	// Logical <
-					number1 = dst_transform_pop(trans_stack,&trans_stack_ptr);
+				case '<':	/* Logical < */
+					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
 					top = number1 < top;
 					break;
-				case '&':	// Bitwise AND
-					number1 = dst_transform_pop(trans_stack,&trans_stack_ptr);
+				case '&':	/* Bitwise AND */
+					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
 					top = (int)number1 & (int)top;
 					break;
-				case '|':	// Bitwise OR
-					number1 = dst_transform_pop(trans_stack,&trans_stack_ptr);
+				case '|':	/* Bitwise OR */
+					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
 					top = (int)number1 | (int)top;
 					break;
-				case '^':	// Bitwise XOR
-					number1 = dst_transform_pop(trans_stack,&trans_stack_ptr);
+				case '^':	/* Bitwise XOR */
+					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
 					top = (int)number1 ^ (int)top;
 					break;
 				default:
@@ -1640,7 +1667,7 @@ static void dst_transform_step(node_description *node)
 	}
 	else
 	{
-		node->output[0]=0;
+		node->output[0] = 0;
 	}
 }
 
@@ -1663,12 +1690,12 @@ static void dst_transform_step(node_description *node)
 
 static void dst_op_amp_step(node_description *node)
 {
-	const discrete_op_amp_info *info = node->custom;
-	struct dst_op_amp_context *context = node->context;
+	const  discrete_op_amp_info *info    = node->custom;
+	struct dst_op_amp_context   *context = node->context;
 
-	double iPos = 0;
-	double iNeg = 0;
-	double i = 0;
+	double i_pos = 0;
+	double i_neg = 0;
+	double i    = 0;
 
 	if (DST_OP_AMP__ENABLE)
 	{
@@ -1678,17 +1705,17 @@ static void dst_op_amp_step(node_description *node)
 				/* work out neg pin current */
 				if  (context->has_r1)
 				{
-					iNeg = (DST_OP_AMP__INP0 - OP_AMP_NORTON_VBE) / info->r1;
-					if (iNeg < 0) iNeg = 0;
+					i_neg = (DST_OP_AMP__INP0 - OP_AMP_NORTON_VBE) / info->r1;
+					if (i_neg < 0) i_neg = 0;
 				}
-				iNeg += context->iFixed;
+				i_neg += context->i_fixed;
 
 				/* work out neg pin current */
-				iPos = (DST_OP_AMP__INP1 - OP_AMP_NORTON_VBE) / info->r2;
-				if (iPos < 0) iPos = 0;
+				i_pos = (DST_OP_AMP__INP1 - OP_AMP_NORTON_VBE) / info->r2;
+				if (i_pos < 0) i_pos = 0;
 
 				/* work out current across r4 */
-				i = iPos - iNeg;
+				i = i_pos - i_neg;
 
 				if (context->has_cap)
 				{
@@ -1697,20 +1724,20 @@ static void dst_op_amp_step(node_description *node)
 						/* voltage across r4 charging cap */
 						i *= info->r4;
 						/* exponential charge */
-						context->vCap += (i - context->vCap) * context->exponent;
+						context->v_cap += (i - context->v_cap) * context->exponent;
 					}
 					else
 						/* linear charge */
-						context->vCap += i / context->exponent;
-					node->output[0] = context->vCap;
+						context->v_cap += i / context->exponent;
+					node->output[0] = context->v_cap;
 				}
 				else
 					node->output[0] = i * info->r4;
 
 				/* clamp output */
-				if (node->output[0] > context->vMax) node->output[0] = context->vMax;
+				if (node->output[0] > context->v_max) node->output[0] = context->v_max;
 				else if (node->output[0] < info->vN) node->output[0] = info->vN;
-				context->vCap = node->output[0];
+				context->v_cap = node->output[0];
 				break;
 
 			default:
@@ -1729,9 +1756,9 @@ static void dst_op_amp_reset(node_description *node)
 	context->has_r1 = info->r1 > 0;
 	context->has_r4 = info->r4 > 0;
 
-	context->vMax = info->vP - OP_AMP_NORTON_VBE;
+	context->v_max = info->vP - OP_AMP_NORTON_VBE;
 
-	context->vCap = 0;
+	context->v_cap = 0;
 	if (info->c > 0)
 	{
 		context->has_cap = 1;
@@ -1740,7 +1767,7 @@ static void dst_op_amp_reset(node_description *node)
 		{
 			/* exponential charge */
 			context->exponent = -1.0 / (info->r4 * info->c  * discrete_current_context->sample_rate);
-			context->exponent = 1.0 - exp(context->exponent);
+			context->exponent =  1.0 - exp(context->exponent);
 		}
 		else
 			/* linear charge */
@@ -1748,7 +1775,7 @@ static void dst_op_amp_reset(node_description *node)
 	}
 
 	if (info->r3 >= 0)
-		context->iFixed = (info->vP - OP_AMP_NORTON_VBE) / info->r3;
+		context->i_fixed = (info->vP - OP_AMP_NORTON_VBE) / info->r3;
 }
 
 
@@ -1766,58 +1793,58 @@ static void dst_op_amp_reset(node_description *node)
 
 static void dst_op_amp_1sht_step(node_description *node)
 {
-	const discrete_op_amp_1sht_info *info = node->custom;
-	struct dst_op_amp_1sht_context *context = node->context;
+	const  discrete_op_amp_1sht_info *info    = node->custom;
+	struct dst_op_amp_1sht_context   *context = node->context;
 
-	double iPos;
-	double iNeg;
+	double i_pos;
+	double i_neg;
 	double v;
 
 	/* update trigger circuit */
-	iPos = (DST_OP_AMP_1SHT__TRIGGER - context->vCap2) / info->r2;
-	iPos += node->output[0] / info->r5;
-	context->vCap2 += (DST_OP_AMP_1SHT__TRIGGER - context->vCap2) * context->exponent2;
+	i_pos  = (DST_OP_AMP_1SHT__TRIGGER - context->v_cap2) / info->r2;
+	i_pos += node->output[0] / info->r5;
+	context->v_cap2 += (DST_OP_AMP_1SHT__TRIGGER - context->v_cap2) * context->exponent2;
 
 	/* calculate currents and output */
-	iNeg = (context->vCap1 - OP_AMP_NORTON_VBE) / info->r3;
-	if (iNeg < 0) iNeg = 0;
-	iNeg += context->iFixed;
+	i_neg = (context->v_cap1 - OP_AMP_NORTON_VBE) / info->r3;
+	if (i_neg < 0) i_neg = 0;
+	i_neg += context->i_fixed;
 
-	if (iPos > iNeg) node->output[0] = context->vMax;
+	if (i_pos > i_neg) node->output[0] = context->v_max;
 	else node->output[0] = info->vN;
 
 	/* update c1 */
 	/* rough value of voltage at anode of diode if discharging */
 	v = node->output[0] + 0.6;
-	if (context->vCap1 > node->output[0])
+	if (context->v_cap1 > node->output[0])
 	{
 		/* discharge */
-		if (context->vCap1 > v)
+		if (context->v_cap1 > v)
 			/* immediate discharge through diode */
-			context->vCap1 = v;
+			context->v_cap1 = v;
 		else
 			/* discharge through r4 */
-			context->vCap1 += (node->output[0] - context->vCap1) * context->exponent1d;
+			context->v_cap1 += (node->output[0] - context->v_cap1) * context->exponent1d;
 	}
 	else
 		/* charge */
-		context->vCap1 += ((node->output[0] - OP_AMP_NORTON_VBE) * context->r34ratio + OP_AMP_NORTON_VBE - context->vCap1) * context->exponent1c;
+		context->v_cap1 += ((node->output[0] - OP_AMP_NORTON_VBE) * context->r34ratio + OP_AMP_NORTON_VBE - context->v_cap1) * context->exponent1c;
 }
 
 static void dst_op_amp_1sht_reset(node_description *node)
 {
-	const discrete_op_amp_1sht_info *info = node->custom;
-	struct dst_op_amp_1sht_context *context = node->context;
+	const  discrete_op_amp_1sht_info *info    = node->custom;
+	struct dst_op_amp_1sht_context   *context = node->context;
 
 	context->exponent1c = -1.0 / ((1.0 / (1.0 / info->r3 + 1.0 / info->r4)) * info->c1  * discrete_current_context->sample_rate);
-	context->exponent1c = 1.0 - exp(context->exponent1c);
+	context->exponent1c =  1.0 - exp(context->exponent1c);
 	context->exponent1d = -1.0 / (info->r4 * info->c1  * discrete_current_context->sample_rate);
-	context->exponent1d = 1.0 - exp(context->exponent1d);
-	context->exponent2 = -1.0 / (info->r2 * info->c2  * discrete_current_context->sample_rate);
-	context->exponent2 = 1.0 - exp(context->exponent2);
-	context->iFixed = (info->vP - OP_AMP_NORTON_VBE) / info->r1;
-	context->vCap1 = context->vCap2 = 0;
-	context->vMax = info->vP - OP_AMP_NORTON_VBE;
+	context->exponent1d =  1.0 - exp(context->exponent1d);
+	context->exponent2  = -1.0 / (info->r2 * info->c2  * discrete_current_context->sample_rate);
+	context->exponent2  =  1.0 - exp(context->exponent2);
+	context->i_fixed  = (info->vP - OP_AMP_NORTON_VBE) / info->r1;
+	context->v_cap1   = context->v_cap2 = 0;
+	context->v_max    = info->vP - OP_AMP_NORTON_VBE;
 	context->r34ratio = info->r3 / (info->r3 + info->r4);
 }
 
@@ -1844,15 +1871,15 @@ static void dst_op_amp_1sht_reset(node_description *node)
 
 static void dst_tvca_op_amp_step(node_description *node)
 {
-	const discrete_op_amp_tvca_info *info = node->custom;
-	struct dst_tvca_op_amp_context *context = node->context;
+	const  discrete_op_amp_tvca_info *info    = node->custom;
+	struct dst_tvca_op_amp_context   *context = node->context;
 
 	int		trig0, trig1, trig2, f3;
-	double	i2 = 0;		// current through r2
-	double	i3 = 0;		// current through r3
-	double	iNeg = 0;	// current into - input
-	double	iPos = 0;	// current into + input
-	double	iOut = 0;	// current at output
+	double	i2 = 0;		/* current through r2 */
+	double	i3 = 0;		/* current through r3 */
+	double	i_neg = 0;	/* current into - input */
+	double	i_pos = 0;	/* current into + input */
+	double	i_out = 0;	/* current at output */
 
 	trig0 = (int)DST_TVCA_OP_AMP__TRG0;
 	trig1 = (int)DST_TVCA_OP_AMP__TRG1;
@@ -1875,13 +1902,13 @@ static void dst_tvca_op_amp_step(node_description *node)
 		}
 
 	/* Calculate current going in to - input. */
-	iNeg = context->iFixed + i2 + i3;
+	i_neg = context->i_fixed + i2 + i3;
 
 	/* Update the c1 cap voltage. */
 	if (dst_trigger_function(trig0, trig1, trig2, info->f2))
 	{
 		/* F2 is not grounding the circuit so we charge the cap. */
-		context->vCap1 += (context->vTrig[f3] - context->vCap1) * context->exponentC[f3];
+		context->v_cap1 += (context->v_trig[f3] - context->v_cap1) * context->exponent_c[f3];
 	}
 	else
 	{
@@ -1889,81 +1916,81 @@ static void dst_tvca_op_amp_step(node_description *node)
          * So now the discharge rate is dependent upon F3.
          * If F3 is at ground then we discharge to 0V through r6.
          * If F3 is out of circuit then we discharge to OP_AMP_NORTON_VBE through r6+r7. */
- 		context->vCap1 += ((f3 ? OP_AMP_NORTON_VBE : 0.0) - context->vCap1) * context->exponentD[f3];
+ 		context->v_cap1 += ((f3 ? OP_AMP_NORTON_VBE : 0.0) - context->v_cap1) * context->exponent_d[f3];
 	}
 
 	/* Calculate c1 current going in to + input. */
-	iPos = (context->vCap1 - OP_AMP_NORTON_VBE) / context->r67;
-	if ((iPos < 0) || !f3) iPos = 0;
+	i_pos = (context->v_cap1 - OP_AMP_NORTON_VBE) / context->r67;
+	if ((i_pos < 0) || !f3) i_pos = 0;
 
 	/* Update the c2 cap voltage and current. */
 	if (info->r9 != 0)
 	{
 		f3 = dst_trigger_function(trig0, trig1, trig2, info->f4);
-		context->vCap2 += ((f3 ? context->vTrig2 : 0) - context->vCap2) * context->exponent2[f3];
-		iPos += context->vCap2 / info->r9;
+		context->v_cap2 += ((f3 ? context->v_trig2 : 0) - context->v_cap2) * context->exponent2[f3];
+		i_pos += context->v_cap2 / info->r9;
 	}
 
 	/* Update the c3 cap voltage and current. */
 	if (info->r11 != 0)
 	{
 		f3 = dst_trigger_function(trig0, trig1, trig2, info->f5);
-		context->vCap3 += ((f3 ? context->vTrig3 : 0) - context->vCap3) * context->exponent3[f3];
-		iPos += context->vCap3 / info->r11;
+		context->v_cap3 += ((f3 ? context->v_trig3 : 0) - context->v_cap3) * context->exponent3[f3];
+		i_pos += context->v_cap3 / info->r11;
 	}
 
 
 	/* Calculate output current. */
-	iOut = iPos - iNeg;
-	if (iOut < 0) iOut = 0;
+	i_out = i_pos - i_neg;
+	if (i_out < 0) i_out = 0;
 	/* Convert to voltage for final output. */
-	node->output[0] = iOut * info->r4;
+	node->output[0] = i_out * info->r4;
 	/* Clip the output if needed. */
-	if (node->output[0] > context->vOutMax) node->output[0] = context->vOutMax;
+	if (node->output[0] > context->v_out_max) node->output[0] = context->v_out_max;
 }
 
 static void dst_tvca_op_amp_reset(node_description *node)
 {
-	const discrete_op_amp_tvca_info *info = node->custom;
-	struct dst_tvca_op_amp_context *context = node->context;
+	const  discrete_op_amp_tvca_info *info    = node->custom;
+	struct dst_tvca_op_amp_context   *context = node->context;
 
 	context->r67 = info->r6 + info->r7;
 
-	context->vOutMax = info->vP - OP_AMP_NORTON_VBE;
+	context->v_out_max = info->vP - OP_AMP_NORTON_VBE;
 	/* This is probably overkill because R5 is usually much lower then r6 or r7,
      * but it is better to play it safe. */
-	context->vTrig[0] = (info->v1 - 0.6) * (info->r6 / (info->r6 + info->r5));
-	context->vTrig[1] = (info->v1 - 0.6 - OP_AMP_NORTON_VBE) * (context->r67 / (context->r67 + info->r5)) + OP_AMP_NORTON_VBE;
-	context->iFixed = context->vOutMax / info->r1;
+	context->v_trig[0] = (info->v1 - 0.6) * (info->r6 / (info->r6 + info->r5));
+	context->v_trig[1] = (info->v1 - 0.6 - OP_AMP_NORTON_VBE) * (context->r67 / (context->r67 + info->r5)) + OP_AMP_NORTON_VBE;
+	context->i_fixed   = context->v_out_max / info->r1;
 
-	context->vCap1 = 0;
+	context->v_cap1 = 0;
 	/* Charge rate thru r5 */
 	/* There can be a different charge rates depending on function F3. */
-	context->exponentC[0] = -1.0 / ((1.0 / (1.0 / info->r5 + 1.0 / info->r6)) * info->c1 * discrete_current_context->sample_rate);
-	context->exponentC[0] = 1.0 - exp(context->exponentC[0]);
-	context->exponentC[1] = -1.0 / ((1.0 / (1.0 / info->r5 + 1.0 / context->r67)) * info->c1 * discrete_current_context->sample_rate);
-	context->exponentC[1] = 1.0 - exp(context->exponentC[1]);
+	context->exponent_c[0] = -1.0 / ((1.0 / (1.0 / info->r5 + 1.0 / info->r6)) * info->c1 * discrete_current_context->sample_rate);
+	context->exponent_c[0] =  1.0 - exp(context->exponent_c[0]);
+	context->exponent_c[1] = -1.0 / ((1.0 / (1.0 / info->r5 + 1.0 / context->r67)) * info->c1 * discrete_current_context->sample_rate);
+	context->exponent_c[1] =  1.0 - exp(context->exponent_c[1]);
 	/* Discharge rate thru r6 + r7 */
-	context->exponentD[1] = -1.0 / (context->r67 * info->c1 * discrete_current_context->sample_rate);
-	context->exponentD[1] = 1.0 - exp(context->exponentD[1]);
+	context->exponent_d[1] = -1.0 / (context->r67 * info->c1 * discrete_current_context->sample_rate);
+	context->exponent_d[1] =  1.0 - exp(context->exponent_d[1]);
 	/* Discharge rate thru r6 */
 	if (info->r6 != 0)
 	{
-		context->exponentD[0] = -1.0 / (info->r6 * info->c1 * discrete_current_context->sample_rate);
-		context->exponentD[0] = 1.0 - exp(context->exponentD[0]);
+		context->exponent_d[0] = -1.0 / (info->r6 * info->c1 * discrete_current_context->sample_rate);
+		context->exponent_d[0] =  1.0 - exp(context->exponent_d[0]);
 	}
-	context->vCap2 = 0;
-	context->vTrig2 = (info->v2 - 0.6 - OP_AMP_NORTON_VBE) * (info->r9 / (info->r8 + info->r9));
+	context->v_cap2       = 0;
+	context->v_trig2      = (info->v2 - 0.6 - OP_AMP_NORTON_VBE) * (info->r9 / (info->r8 + info->r9));
 	context->exponent2[0] = -1.0 / (info->r9 * info->c2 * discrete_current_context->sample_rate);
-	context->exponent2[0] = 1.0 - exp(context->exponent2[0]);
+	context->exponent2[0] =  1.0 - exp(context->exponent2[0]);
 	context->exponent2[1] = -1.0 / ((1.0 / (1.0 / info->r8 + 1.0 / info->r9)) * info->c2 * discrete_current_context->sample_rate);
-	context->exponent2[1] = 1.0 - exp(context->exponent2[1]);
-	context->vCap3 = 0;
-	context->vTrig3 = (info->v3 - 0.6 - OP_AMP_NORTON_VBE) * (info->r11 / (info->r10 + info->r11));
+	context->exponent2[1] =  1.0 - exp(context->exponent2[1]);
+	context->v_cap3  = 0;
+	context->v_trig3 = (info->v3 - 0.6 - OP_AMP_NORTON_VBE) * (info->r11 / (info->r10 + info->r11));
 	context->exponent3[0] = -1.0 / (info->r11 * info->c3 * discrete_current_context->sample_rate);
-	context->exponent3[0] = 1.0 - exp(context->exponent3[0]);
+	context->exponent3[0] =  1.0 - exp(context->exponent3[0]);
 	context->exponent3[1] = -1.0 / ((1.0 / (1.0 / info->r10 + 1.0 / info->r11)) * info->c3 * discrete_current_context->sample_rate);
-	context->exponent3[1] = 1.0 - exp(context->exponent3[1]);
+	context->exponent3[1] =  1.0 - exp(context->exponent3[1]);
 
 	dst_tvca_op_amp_step(node);
 }
