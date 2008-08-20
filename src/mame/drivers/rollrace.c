@@ -43,11 +43,11 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe400, 0xe47f) AM_READ(SMH_RAM)
 	AM_RANGE(0xec00, 0xec0f) AM_READ(SMH_NOP) /* Analog sound effects ??*/
 	AM_RANGE(0xf000, 0xf0ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf800, 0xf800) AM_READ(input_port_0_r)		/* player1*/
-	AM_RANGE(0xf801, 0xf801) AM_READ(input_port_1_r)		/* player2*/
-	AM_RANGE(0xf804, 0xf804) AM_READ(input_port_3_r)
-	AM_RANGE(0xf802, 0xf802) AM_READ(input_port_2_r)
-	AM_RANGE(0xf805, 0xf805) AM_READ(input_port_4_r)
+	AM_RANGE(0xf800, 0xf800) AM_READ_PORT("P1")
+	AM_RANGE(0xf801, 0xf801) AM_READ_PORT("P2")
+	AM_RANGE(0xf804, 0xf804) AM_READ_PORT("DSW1")
+	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xf805, 0xf805) AM_READ_PORT("DSW2")
 	AM_RANGE(0xd806, 0xd806) AM_READ(SMH_NOP) /* looks like a watchdog, bit4 checked*/
 ADDRESS_MAP_END
 
@@ -117,14 +117,14 @@ static INPUT_PORTS_START( rollrace )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH,IPT_COIN2 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH,IPT_SERVICE1 )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x08, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_SERVICE( 0x40, IP_ACTIVE_HIGH )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING( 0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING( 0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coin_A ) )
@@ -153,7 +153,7 @@ static INPUT_PORTS_START( rollrace )
 	PORT_DIPSETTING( 	0x40, DEF_STR( On ) )
 /*  PORT_DIPNAME( 0x80, 0x00, "Free Run" ) */
 	PORT_DIPNAME( 0x80, 0x00, "Invulnerability (Cheat)" )
-	PORT_DIPSETTING( 	0x00, DEF_STR( Off ) ) /* test mode, you are invulnerable */
+	PORT_DIPSETTING( 	0x00, DEF_STR( Off ) )	/* test mode, you are invulnerable */
 	PORT_DIPSETTING( 	0x80, DEF_STR( On ) )	/* to 'static' objects */
 
 	PORT_START("DSW2")

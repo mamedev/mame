@@ -246,20 +246,13 @@ WRITE8_HANDLER( _4in1_bank_w )
 	memory_set_bank(1, _4in1_bank);
 }
 
-READ8_HANDLER( _4in1_input_port_1_r )
+CUSTOM_INPUT( _4in1_fake_port_r )
 {
 	static const char *portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
+	int bit_mask = (FPTR)param;
 
-	return (input_port_read(machine, "IN1") & ~0xc0) | (input_port_read(machine, portnames[_4in1_bank]) & 0xc0);
+	return (input_port_read(field->port->machine, portnames[_4in1_bank]) & bit_mask) ? 0x01 : 0x00;
 }
-
-READ8_HANDLER( _4in1_input_port_2_r )
-{
-	static const char *portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
-
-	return (input_port_read(machine, "DSW0") & 0x04) | (input_port_read(machine, portnames[_4in1_bank]) & ~0xc4);
-}
-
 
 DRIVER_INIT( pisces )
 {

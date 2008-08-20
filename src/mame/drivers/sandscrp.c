@@ -214,10 +214,10 @@ static ADDRESS_MAP_START( sandscrp, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x501fff) AM_READWRITE(pandora_spriteram_LSB_r, pandora_spriteram_LSB_w ) // sprites
 	AM_RANGE(0x600000, 0x600fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16)	// Palette
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(sandscrp_coin_counter_w)	// Coin Counters (Lockout unused)
-	AM_RANGE(0xb00000, 0xb00001) AM_READ(input_port_0_word_r)	// Inputs
-	AM_RANGE(0xb00002, 0xb00003) AM_READ(input_port_1_word_r)	//
-	AM_RANGE(0xb00004, 0xb00005) AM_READ(input_port_2_word_r)	//
-	AM_RANGE(0xb00006, 0xb00007) AM_READ(input_port_3_word_r)	//
+	AM_RANGE(0xb00000, 0xb00001) AM_READ_PORT("P1")
+	AM_RANGE(0xb00002, 0xb00003) AM_READ_PORT("P2")
+	AM_RANGE(0xb00004, 0xb00005) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xb00006, 0xb00007) AM_READ_PORT("UNK")
 	AM_RANGE(0xec0000, 0xec0001) AM_READ(watchdog_reset16_r)	//
 	AM_RANGE(0x800000, 0x800001) AM_READ(sandscrp_irq_cause_r)	// IRQ Cause
 	AM_RANGE(0xe00000, 0xe00001) AM_READWRITE(sandscrp_soundlatch_word_r, sandscrp_soundlatch_word_w)	// From/To Sound CPU
@@ -284,7 +284,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( sandscrp )
-	PORT_START("P1")	// IN0 - $b00000.w
+	PORT_START("P1")	/* $b00000.w */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
@@ -295,7 +295,7 @@ static INPUT_PORTS_START( sandscrp )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("P2")	// IN1 - $b00002.w
+	PORT_START("P2")	/* $b00002.w */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
@@ -306,7 +306,7 @@ static INPUT_PORTS_START( sandscrp )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SYSTEM")	// IN2 - $b00004.w
+	PORT_START("SYSTEM")	/* $b00004.w */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1   )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2   )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1    )
@@ -317,10 +317,10 @@ static INPUT_PORTS_START( sandscrp )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("UNK")	// IN3 - $b00006.w
+	PORT_START("UNK")	/* $b00006.w */
 	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("DSW1")	// IN4 - DSW 1 read by the Z80 through the sound chip
+	PORT_START("DSW1")	/* read by the Z80 through the sound chip */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x02, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
@@ -342,7 +342,7 @@ static INPUT_PORTS_START( sandscrp )
 	PORT_DIPSETTING(    0x40, "500K, 1000K" )
 	PORT_DIPSETTING(    0x00, "1000K, 3000K" )
 
-	PORT_START("DSW2")	// IN5 - DSW 2 read by the Z80 through the sound chip
+	PORT_START("DSW2")	/* read by the Z80 through the sound chip */
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 6C_1C ) )
 	PORT_DIPSETTING(    0x0b, DEF_STR( 5C_1C ) )

@@ -68,10 +68,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( quizdna_readport, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_READ(input_port_2_r)
-	AM_RANGE(0x81, 0x81) AM_READ(input_port_3_r)
-	AM_RANGE(0x90, 0x90) AM_READ(input_port_4_r)
-	AM_RANGE(0x91, 0x91) AM_READ(input_port_5_r)
+	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
+	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
+	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x91, 0x91) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xe0, 0xe0) AM_READ(ym2203_status_port_0_r)
 	AM_RANGE(0xe1, 0xe1) AM_READ(ym2203_read_port_0_r)
 	AM_RANGE(0xf0, 0xf0) AM_READ(okim6295_status_0_r)
@@ -117,7 +117,7 @@ ADDRESS_MAP_END
 /****************************************************************************/
 
 static INPUT_PORTS_START( quizdna )
-	PORT_START("DSW2")  /* sw2 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 8C_1C ) )
@@ -146,7 +146,7 @@ static INPUT_PORTS_START( quizdna )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("DSW3")  /* sw3 */
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x02, "Timer" )
 	PORT_DIPSETTING(    0x03, "Slow" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
@@ -211,7 +211,7 @@ static INPUT_PORTS_START( quizdna )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gakupara )
-    PORT_START("DSW2")  /* sw2 */
+    PORT_START("DSW2")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, "10 Coins/1 Credit" )
 	PORT_DIPSETTING(    0x01, DEF_STR( 9C_1C ) )
@@ -241,7 +241,7 @@ static INPUT_PORTS_START( gakupara )
 	PORT_DIPSETTING(    0x40, "Fast" )
 	PORT_DIPSETTING(    0x00, "Very Fast" )
 
-	PORT_START("DSW3")  /* sw3 */
+	PORT_START("DSW3")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x02, 0x02, "Unknown 3-2" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
@@ -307,7 +307,7 @@ static INPUT_PORTS_START( gakupara )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gekiretu )
-	PORT_START("DSW2")  /* dsw2 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 8C_1C ) )
@@ -336,7 +336,7 @@ static INPUT_PORTS_START( gekiretu )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("DSW3")  /* dsw3 */
+	PORT_START("DSW3")
 	PORT_DIPNAME( 0x03, 0x03, "Timer" )
 	PORT_DIPSETTING(    0x03, "Slow" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )

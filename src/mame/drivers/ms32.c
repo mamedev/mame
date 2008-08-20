@@ -180,37 +180,36 @@ static UINT32 to_main;
 
 /********** READ INPUTS **********/
 
-static READ32_HANDLER ( ms32_mahjong_read_inputs1 )
+static CUSTOM_INPUT( mahjong_ctrl_r )
 {
 	UINT32 mj_input;
 
 	switch (ms32_mahjong_input_select[0])
 	{
 		case 0x01:
-			mj_input = input_port_read(machine, "MJ0");	// Player 1 inputs
+			mj_input = input_port_read(field->port->machine, "MJ0");
 			break;
 		case 0x02:
-			mj_input = input_port_read(machine, "MJ1");	// Player 1 inputs
+			mj_input = input_port_read(field->port->machine, "MJ1");
 			break;
 		case 0x04:
-			mj_input = input_port_read(machine, "MJ2");	// Player 1 inputs
+			mj_input = input_port_read(field->port->machine, "MJ2");
 			break;
 		case 0x08:
-			mj_input = input_port_read(machine, "MJ3");	// Player 1 inputs
+			mj_input = input_port_read(field->port->machine, "MJ3");
 			break;
 		case 0x10:
-			mj_input = input_port_read(machine, "MJ4");	// Player 1 inputs
+			mj_input = input_port_read(field->port->machine, "MJ4");
 			break;
 		default:
 			mj_input = 0;
 
 	}
 
-	return  (input_port_read(machine, "INPUTS") & ~0xff) | mj_input;
+	return  mj_input & 0xff;
 }
 
-
-static READ32_HANDLER ( ms32_read_inputs3 )
+static READ32_HANDLER( ms32_read_inputs3 )
 {
 	int a,b,c,d;
 	a = input_port_read(machine, "AN2?"); // unused?
@@ -448,7 +447,16 @@ static INPUT_PORTS_START( ms32_mahjong )
 	PORT_INCLUDE( ms32 )
 
 	PORT_MODIFY("INPUTS")
-	PORT_BIT( 0x000000ff, IP_ACTIVE_LOW, IPT_UNUSED )	// here we read mahjong keys
+	PORT_BIT( 0x000000ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(mahjong_ctrl_r, NULL)	// here we read mahjong keys
+	PORT_BIT( 0x0000ff00, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )	/* Start 1 is already mapped in mahjong inputs */
+	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED )	/* ms32.c mahjongs don't have P2 inputs -> no Start 2*/
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("MJ0")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_START1 )
@@ -863,20 +871,6 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( kirarast )	// player 1 inputs done? others?
 	PORT_INCLUDE( ms32_mahjong )
 
-	PORT_MODIFY("INPUTS")
-	PORT_BIT( 0x0000ffff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME(DEF_STR( Test )) PORT_CODE(KEYCODE_F1)
-//  PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_START1 ) /* already mapped in mahjong inputs */
-	PORT_BIT( 0x00100000, IP_ACTIVE_LOW, IPT_UNUSED )
-//  PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_START2 ) /* ms32.c mahjongs don't have P2 inputs */
-	PORT_BIT( 0x00200000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00800000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 	PORT_MODIFY("DSW")
 	PORT_DIPUNUSED_DIPLOC( 0x00000400, 0x00000400, "SW1:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x00000800, 0x00000800, "SW1:5" )
@@ -918,8 +912,7 @@ static INPUT_PORTS_START( 47pie2 )	// player 1 inputs done? others?
 	PORT_INCLUDE( kirarast )
 
 	PORT_MODIFY("INPUTS")
-//  PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_COIN2 ) /* coin 2 is unused */
-	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )	 /* coin 2 is unused */
 
 	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x00000400, 0x00000400, "Campaign Mode" ) PORT_DIPLOCATION("SW1:6")
@@ -2153,17 +2146,11 @@ static DRIVER_INIT (ss92048_01)
 
 static DRIVER_INIT (kirarast)
 {
-//  { 0xfcc00004, 0xfcc00007, ms32_mahjong_read_inputs1 }
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfcc00004, 0xfcc00007, 0, 0, ms32_mahjong_read_inputs1 );
-
 	DRIVER_INIT_CALL(ss92047_01);
 }
 
 static DRIVER_INIT (47pie2)
 {
-//  { 0xfcc00004, 0xfcc00007, ms32_mahjong_read_inputs1 }
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfcc00004, 0xfcc00007, 0, 0, ms32_mahjong_read_inputs1 );
-
 	DRIVER_INIT_CALL(ss92048_01);
 }
 
@@ -2178,9 +2165,6 @@ static DRIVER_INIT (f1superb)
 
 static DRIVER_INIT (bnstars)
 {
-//  { 0xfcc00004, 0xfcc00007, ms32_mahjong_read_inputs1 }
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfcc00004, 0xfcc00007, 0, 0, ms32_mahjong_read_inputs1 );
-
 	DRIVER_INIT_CALL(ss92046_01);
 }
 

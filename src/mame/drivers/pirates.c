@@ -142,7 +142,7 @@ static WRITE16_HANDLER( pirates_out_w )
 //  logerror("%06x: out_w %04x\n",activecpu_get_pc(),data);
 }
 
-static READ16_HANDLER( pirates_in1_r )
+static CUSTOM_INPUT( prot_r )
 {
 //  static int prot = 0xa3;
 	int bit;
@@ -169,8 +169,7 @@ static READ16_HANDLER( pirates_in1_r )
 #endif
 		bit = 1;
 
-	/* bit 4 is EEPROM data, bit 7 is protection */
-	return input_port_read(machine, "IN1") | (eeprom_read_bit() << 4) | (bit << 7);
+	return bit;
 }
 
 
@@ -180,8 +179,8 @@ static READ16_HANDLER( pirates_in1_r )
 static ADDRESS_MAP_START( pirates_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x100000, 0x10ffff) AM_READ(SMH_RAM)
-	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")
-	AM_RANGE(0x400000, 0x400001) AM_READ(pirates_in1_r)
+	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("INPUTS")
+	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("SYSTEM")
 //  AM_RANGE(0x500000, 0x5007ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x800000, 0x803fff) AM_READ(SMH_RAM)
 //  AM_RANGE(0x900000, 0x903fff) AM_READ(SMH_RAM)
@@ -210,7 +209,7 @@ ADDRESS_MAP_END
 /* Input Ports */
 
 static INPUT_PORTS_START( pirates )
-	PORT_START("IN0")	/* IN0 - 0x300000.w */
+	PORT_START("INPUTS")	/* 0x300000.w */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
@@ -228,15 +227,15 @@ static INPUT_PORTS_START( pirates )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("IN1")	/* IN1 - 0x400000.w */
+	PORT_START("SYSTEM")	/* 0x400000.w */
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH,IPT_SPECIAL )		// EEPROM data
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	// EEPROM data
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_UNKNOWN )		// seems checked in "test mode"
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )		// seems checked in "test mode"
-	PORT_BIT( 0x0080, IP_ACTIVE_HIGH,IPT_SPECIAL )		// protection (see pirates_in1_r)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH,IPT_SPECIAL ) PORT_CUSTOM(prot_r, NULL)		// protection
 	/* What do these bits do ? */
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNKNOWN )

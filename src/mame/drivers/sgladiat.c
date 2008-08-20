@@ -59,7 +59,7 @@ GFXDECODE_END
 
 static WRITE8_HANDLER( sgladiat_soundlatch_w )
 {
-	snk_sound_busy_bit = 0x20;
+	snk_sound_busy_bit = 1;
 	soundlatch_w( machine, offset, data );
 
 	/* trigger NMI on sound CPU */
@@ -80,9 +80,9 @@ static READ8_HANDLER( sgladiat_sound_nmi_ack_r )
 
 /************************************************************************/
 
-static READ8_HANDLER( sgladiat_inp0_r )
+static CUSTOM_INPUT( sound_busy_r )
 {
-	return(input_port_read(machine, "IN0") | snk_sound_busy_bit);
+	return snk_sound_busy_bit;
 }
 
 static WRITE8_HANDLER( sglatiat_flipscreen_w )
@@ -93,21 +93,21 @@ static WRITE8_HANDLER( sglatiat_flipscreen_w )
 
 static ADDRESS_MAP_START( sgladiat_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
-	AM_RANGE(0xa000, 0xa000) AM_READ(sgladiat_inp0_r)
-	AM_RANGE(0xa100, 0xa100) AM_READ(input_port_1_r) /* joy1 */
-	AM_RANGE(0xa200, 0xa200) AM_READ(input_port_2_r) /* joy2 */
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("P1")
+	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("P2")
 	AM_RANGE(0xa300, 0xa300) AM_WRITE(sgladiat_soundlatch_w)
-	AM_RANGE(0xa400, 0xa400) AM_READ(input_port_3_r) /* dsw1 */
-	AM_RANGE(0xa500, 0xa500) AM_READ(input_port_4_r) /* dsw2 */
+	AM_RANGE(0xa400, 0xa400) AM_READ_PORT("DSW1")
+	AM_RANGE(0xa500, 0xa500) AM_READ_PORT("DSW2")
 	AM_RANGE(0xa600, 0xa600) AM_WRITE(sglatiat_flipscreen_w)
 	AM_RANGE(0xa700, 0xa700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE(3) AM_BASE(&snk_rambase)
-//      AM_RANGE(0xd200, 0xd200) AM_WRITE(SMH_RAM) /* ?0x24 */
-//      AM_RANGE(0xd300, 0xd300) AM_WRITE(SMH_RAM) /* ------xx: msb scrollx */
-//      AM_RANGE(0xd400, 0xd400) AM_WRITE(SMH_RAM) /* xscroll (sprite) */
-//      AM_RANGE(0xd500, 0xd500) AM_WRITE(SMH_RAM) /* yscroll (sprite) */
-//      AM_RANGE(0xd600, 0xd600) AM_WRITE(SMH_RAM) /* xscroll (bg) */
-//      AM_RANGE(0xd700, 0xd700) AM_WRITE(SMH_RAM) /* yscroll (bg) */
+//	AM_RANGE(0xd200, 0xd200) AM_WRITE(SMH_RAM) /* ?0x24 */
+//	AM_RANGE(0xd300, 0xd300) AM_WRITE(SMH_RAM) /* ------xx: msb scrollx */
+//	AM_RANGE(0xd400, 0xd400) AM_WRITE(SMH_RAM) /* xscroll (sprite) */
+//	AM_RANGE(0xd500, 0xd500) AM_WRITE(SMH_RAM) /* yscroll (sprite) */
+//	AM_RANGE(0xd600, 0xd600) AM_WRITE(SMH_RAM) /* xscroll (bg) */
+//	AM_RANGE(0xd700, 0xd700) AM_WRITE(SMH_RAM) /* yscroll (bg) */
 	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE(&spriteram) AM_SHARE(1)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&videoram) AM_SHARE(2)
 	AM_RANGE(0xe800, 0xefff) AM_RAM
@@ -218,17 +218,17 @@ ROM_START( sgladiat )
 ROM_END
 
 static INPUT_PORTS_START( sgladiat )
-	PORT_START("IN0")
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN ) /* sound CPU status */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(sound_busy_r, NULL) /* sound CPU status */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN1")
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -238,7 +238,7 @@ static INPUT_PORTS_START( sgladiat )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL

@@ -142,6 +142,8 @@ READ8_HANDLER( nb1413m3_dipsw3_l_r );
 READ8_HANDLER( nb1413m3_dipsw3_h_r );
 WRITE8_HANDLER( nb1413m3_outcoin_w );
 WRITE8_HANDLER( nb1413m3_vcrctrl_w );
+CUSTOM_INPUT( nb1413m3_busyflag_r );
+CUSTOM_INPUT( nb1413m3_outcoin_flag_r );
 
 /* used in: hyhoo.c, niyanpai.c, pastelg.c, nbmj8688.c, nbmj8891.c, nbmj8991.c, nbmj9195.c*/
 INPUT_PORTS_EXTERN( nbmjcontrols );

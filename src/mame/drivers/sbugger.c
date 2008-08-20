@@ -130,12 +130,12 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0xe0, 0xe0) AM_WRITENOP // 8156 command/status reg (write c0 = command START = (start of timer)
-	AM_RANGE(0xe1, 0xe1) AM_READ(input_port_0_r) //8156 PA
-	AM_RANGE(0xe2, 0xe2) AM_READ(input_port_1_r) //8156 PB
-	AM_RANGE(0xe3, 0xe3) AM_READ(input_port_2_r) //8156 PC = 6 bit ! //2 bits tested af f4c6
-	AM_RANGE(0xe4, 0xe4) AM_WRITENOP // 8156 timer reg1 (write 7f = CNT length)
-	AM_RANGE(0xe5, 0xe5) AM_WRITENOP // 8156 timer reg2 (write c0 = timer mode - automatic reload, i.e. single pulse every time TC is reached)
+	AM_RANGE(0xe0, 0xe0) AM_WRITENOP				// 8156 command/status reg (write c0 = command START = (start of timer)
+	AM_RANGE(0xe1, 0xe1) AM_READ_PORT("INPUTS")		// 8156 PA
+	AM_RANGE(0xe2, 0xe2) AM_READ_PORT("DSW1")		// 8156 PB
+	AM_RANGE(0xe3, 0xe3) AM_READ_PORT("DSW2")		// 8156 PC = 6 bit ! //2 bits tested af f4c6
+	AM_RANGE(0xe4, 0xe4) AM_WRITENOP				// 8156 timer reg1 (write 7f = CNT length)
+	AM_RANGE(0xe5, 0xe5) AM_WRITENOP				// 8156 timer reg2 (write c0 = timer mode - automatic reload, i.e. single pulse every time TC is reached)
 
 	AM_RANGE(0xe8, 0xe8) AM_WRITE(sn76496_0_w)
 	AM_RANGE(0xe9, 0xe9) AM_WRITE(sn76496_1_w)
@@ -163,7 +163,7 @@ GFXDECODE_END
 /* input ports */
 
 static INPUT_PORTS_START( sbugger )
-	PORT_START("INPUTS")	/* 8-bit */
+	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_2WAY
 	PORT_DIPNAME( 0x02, 0x02, "PA 1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
@@ -177,7 +177,7 @@ static INPUT_PORTS_START( sbugger )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW1")	/* 8-bit */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, "PB 0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -201,17 +201,15 @@ static INPUT_PORTS_START( sbugger )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("DSW2")	/* 6-bit */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Difficulty ) ) //enemy speed
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
-
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Yes ) )
-
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) ) //bonus stage related (code at $f94 & $df8)
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

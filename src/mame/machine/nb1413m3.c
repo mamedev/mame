@@ -377,17 +377,25 @@ WRITE8_HANDLER( nb1413m3_inputportsel_w )
 	nb1413m3_inputport = data;
 }
 
+CUSTOM_INPUT( nb1413m3_busyflag_r )
+{
+	return nb1413m3_busyflag & 0x01;
+}
+
+
+/* 2008-08 FP:
+ * In ALL games (but pastelg, hyhoo & hyhoo2) nb1413m3_outcoin_flag is read at inputport0.      
+ * However, a few games (lovehous, maiko, mmaiko, hanaoji and the ones using inputport3_r below)
+ * read nb1413m3_outcoin_flag also at inputport3! Is this the correct behaviour for these games
+ * or should they only check the flag at inputport3? */
+CUSTOM_INPUT( nb1413m3_outcoin_flag_r )
+{
+	return nb1413m3_outcoin_flag & 0x01;
+}
+
 READ8_HANDLER( nb1413m3_inputport0_r )
 {
-	switch (nb1413m3_type)
-	{
-		case NB1413M3_HYHOO:
-		case NB1413M3_HYHOO2:
-		case NB1413M3_PASTELG:
-			return ((input_port_read(machine, "SYSTEM") & 0xfe) | (nb1413m3_busyflag & 0x01));
-		default:
-			return ((input_port_read(machine, "SYSTEM") & 0xfc) | ((nb1413m3_outcoin_flag & 0x01) << 1) | (nb1413m3_busyflag & 0x01));
-	}
+	return ((input_port_read(machine, "SYSTEM") & 0xfc) | ((nb1413m3_outcoin_flag & 0x01) << 1));
 }
 
 READ8_HANDLER( nb1413m3_inputport1_r )
@@ -508,12 +516,6 @@ READ8_HANDLER( nb1413m3_inputport3_r )
 		case NB1413M3_FINALBNY:
 		case NB1413M3_MMSIKAKU:
 			return ((nb1413m3_outcoin_flag & 0x01) << 1);
-			break;
-		case NB1413M3_LOVEHOUS:
-		case NB1413M3_MAIKO:
-		case NB1413M3_MMAIKO:
-		case NB1413M3_HANAOJI:
-			return ((input_port_read(machine, "PORT0-2") & 0xfd) | ((nb1413m3_outcoin_flag & 0x01) << 1));
 			break;
 		default:
 			return 0xff;
@@ -685,7 +687,7 @@ WRITE8_HANDLER( nb1413m3_vcrctrl_w )
 
 /* Nichibutsu Mahjong games share a common control panel */
 INPUT_PORTS_START( nbmjcontrols )
-	PORT_START("KEY0")		/* (3) PORT 1-1 */
+	PORT_START("KEY0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_KAN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_M )
@@ -695,7 +697,7 @@ INPUT_PORTS_START( nbmjcontrols )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY1")			/* (4) PORT 1-2 */
+	PORT_START("KEY1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_BET )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_N )
@@ -705,7 +707,7 @@ INPUT_PORTS_START( nbmjcontrols )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY2")			/* (5) PORT 1-3 */
+	PORT_START("KEY2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI )
@@ -715,7 +717,7 @@ INPUT_PORTS_START( nbmjcontrols )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY3")			/* (6) PORT 1-4 */
+	PORT_START("KEY3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_PON )
@@ -725,7 +727,7 @@ INPUT_PORTS_START( nbmjcontrols )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY4")			/* (7) PORT 1-5 */
+	PORT_START("KEY4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_BIG )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP )
@@ -735,7 +737,7 @@ INPUT_PORTS_START( nbmjcontrols )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY5")			/* (6) PORT 2-1 */
+	PORT_START("KEY5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_KAN ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_M ) PORT_PLAYER(2)
@@ -745,7 +747,7 @@ INPUT_PORTS_START( nbmjcontrols )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY6")			/* (7) PORT 2-2 */
+	PORT_START("KEY6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_BET ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_REACH ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_N ) PORT_PLAYER(2)
@@ -755,7 +757,7 @@ INPUT_PORTS_START( nbmjcontrols )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY7")			/* (8) PORT 2-3 */
+	PORT_START("KEY7")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_RON ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_CHI ) PORT_PLAYER(2)
@@ -765,7 +767,7 @@ INPUT_PORTS_START( nbmjcontrols )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY8")			/* (9) PORT 2-4 */
+	PORT_START("KEY8")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_PON ) PORT_PLAYER(2)
@@ -775,7 +777,7 @@ INPUT_PORTS_START( nbmjcontrols )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("KEY9")			/* (10) PORT 2-5 */
+	PORT_START("KEY9")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_MAHJONG_SMALL ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_BIG ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_MAHJONG_FLIP_FLOP ) PORT_PLAYER(2)

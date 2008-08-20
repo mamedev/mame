@@ -589,8 +589,8 @@ static ADDRESS_MAP_START( _4in1_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5400, 0x57ff) AM_READ(galaxold_videoram_r)
 	AM_RANGE(0x5800, 0x58ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("IN0")
-	AM_RANGE(0x6800, 0x6800) AM_READ(_4in1_input_port_1_r)
-	AM_RANGE(0x7000, 0x7000) AM_READ(_4in1_input_port_2_r)
+	AM_RANGE(0x6800, 0x6800) AM_READ_PORT("IN1")
+	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("DSW0")
 	AM_RANGE(0x7800, 0x78ff) AM_READ(watchdog_reset_r)
 	AM_RANGE(0xc000, 0xdfff) AM_READ(SMH_ROM)	/* fixed menu code */
 ADDRESS_MAP_END
@@ -1079,13 +1079,18 @@ static INPUT_PORTS_START( 4in1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL )	// See fake ports
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(_4in1_fake_port_r, (void *)0x40)	// See fake ports
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(_4in1_fake_port_r, (void *)0x80)	// See fake ports
 
 	PORT_START("DSW0")
-	PORT_BIT( 0x3b, IP_ACTIVE_HIGH, IPT_SPECIAL )	// See fake ports
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(_4in1_fake_port_r, (void *)0x01)	// See fake ports
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(_4in1_fake_port_r, (void *)0x02)	// See fake ports
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )			// 2 when continue (Scramble PT2)
 	PORT_DIPSETTING(    0x04, "5" )			// 2 when continue (Scramble PT2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(_4in1_fake_port_r, (void *)0x08)	// See fake ports
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(_4in1_fake_port_r, (void *)0x10)	// See fake ports
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(_4in1_fake_port_r, (void *)0x20)	// See fake ports
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START("FAKE1")      /* The Ghost Muncher PT3 - FAKE DSW0 (bits 0 to 5) and IN1 (bits 6 and 7) */

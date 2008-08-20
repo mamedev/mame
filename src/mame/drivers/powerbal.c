@@ -61,11 +61,6 @@ static NVRAM_HANDLER( magicstk )
 	}
 }
 
-static READ16_HANDLER( magicstk_port2_r )
-{
-	return (input_port_read(machine, "IN2") & 0xfe) | eeprom_read_bit();
-}
-
 static WRITE16_HANDLER( magicstk_coin_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
@@ -113,7 +108,7 @@ static ADDRESS_MAP_START( magicstk_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x098180, 0x09917f) AM_RAM_WRITE(magicstk_bgvideoram_w) AM_BASE(&magicstk_videoram)
 	AM_RANGE(0x0c2010, 0x0c2011) AM_READ_PORT("IN0")
 	AM_RANGE(0x0c2012, 0x0c2013) AM_READ_PORT("IN1")
-	AM_RANGE(0x0c2014, 0x0c2015) AM_READWRITE(magicstk_port2_r, magicstk_coin_eeprom_w)
+	AM_RANGE(0x0c2014, 0x0c2015) AM_READ_PORT("IN2") AM_WRITE(magicstk_coin_eeprom_w)
 	AM_RANGE(0x0c2016, 0x0c2017) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0c2018, 0x0c2019) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0c201c, 0x0c201d) AM_WRITE(oki_banking)
@@ -250,7 +245,7 @@ static INPUT_PORTS_START( magicstk )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )

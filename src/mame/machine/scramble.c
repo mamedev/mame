@@ -63,29 +63,6 @@ MACHINE_RESET( explorer )
 }
 
 
-static READ8_HANDLER( ckongs_input_port_1_r )
-{
-	return (input_port_read(machine, "IN1") & 0xfc) | ((input_port_read(machine, "IN2") & 0x06) >> 1);
-}
-
-static READ8_HANDLER( ckongs_input_port_2_r )
-{
-	return (input_port_read(machine, "IN2") & 0xf9) | ((input_port_read(machine, "IN1") & 0x03) << 1);
-}
-
-
-/* the coinage DIPs are spread accross two input ports */
-static READ8_HANDLER( stratgyx_input_port_2_r )
-{
-	return (input_port_read(machine, "IN2") & ~0x06) | ((input_port_read(machine, "IN4") << 1) & 0x06);
-}
-
-static READ8_HANDLER( stratgyx_input_port_3_r )
-{
-	return (input_port_read(machine, "IN3") & ~0x03) | ((input_port_read(machine, "IN4") >> 2) & 0x03);
-}
-
-
 static READ8_HANDLER( darkplnt_input_port_1_r )
 {
 	static const UINT8 remap[] = {0x03, 0x02, 0x00, 0x01, 0x21, 0x20, 0x22, 0x23,
@@ -228,7 +205,7 @@ const ppi8255_interface stratgyx_ppi8255_intf[2] =
 	{
 		input_port_0_r,				/* Port A read */
 		input_port_1_r,				/* Port B read */
-		stratgyx_input_port_2_r,	/* Port C read */
+		input_port_2_r,				/* Port C read */
 		NULL,						/* Port A write */
 		NULL,						/* Port B write */
 		NULL 						/* Port C write */
@@ -236,7 +213,7 @@ const ppi8255_interface stratgyx_ppi8255_intf[2] =
 	{
 		NULL,						/* Port A read */
 		NULL,						/* Port B read */
-		stratgyx_input_port_3_r,	/* Port C read */
+		input_port_3_r,				/* Port C read */
 		soundlatch_w,				/* Port A write */
 		scramble_sh_irqtrigger_w,	/* Port B write */
 		NULL						/* Port C write */
@@ -290,8 +267,8 @@ const ppi8255_interface ckongs_ppi8255_intf[2] =
 {
 	{
 		input_port_0_r,				/* Port A read */
-		ckongs_input_port_1_r,		/* Port B read */
-		ckongs_input_port_2_r,		/* Port C read */
+		input_port_1_r,				/* Port B read */
+		input_port_2_r,				/* Port C read */
 		NULL,						/* Port A write */
 		NULL,						/* Port B write */
 		NULL 						/* Port C write */

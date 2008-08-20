@@ -182,17 +182,16 @@ VIDEO_START( bigrun )
 
     and allows the shift to be handled using two buttons */
 
-static int read_shift(running_machine *machine)
+CUSTOM_INPUT( cischeat_shift_r )
 {
 	static int ret = 1; /* start with low shift */
-	switch ( (input_port_read(machine, "FAKE") >> 2) & 3 )
+	switch ( (input_port_read(field->port->machine, "FAKE") >> 2) & 3 )
 	{
 		case 1 : ret = 1;	break;	// low  shift: button 3
 		case 2 : ret = 0;	break;	// high shift: button 4
 	}
 	return ret;
 }
-
 
 /*
     F1 GP Star has a real pedal, while Cisco Heat's is connected to
@@ -219,7 +218,7 @@ READ16_HANDLER( bigrun_vregs_r )
 	switch (offset)
 	{
 		case 0x0000/2 : return input_port_read(machine, "IN1");	// Coins
-		case 0x0002/2 : return input_port_read(machine, "IN2") + (read_shift(machine)<<1);	// Buttons
+		case 0x0002/2 : return input_port_read(machine, "IN2");	// Buttons
 		case 0x0004/2 : return input_port_read(machine, "IN3");	// Motor Limit Switches
 		case 0x0006/2 : return input_port_read(machine, "IN4");	// DSW 1 & 2
 
@@ -315,7 +314,7 @@ READ16_HANDLER( cischeat_vregs_r )
 	switch (offset)
 	{
 		case 0x0000/2 : return input_port_read(machine, "IN1");	// Coins
-		case 0x0002/2 : return input_port_read(machine, "IN2") + (read_shift(machine)<<1);			// Buttons
+		case 0x0002/2 : return input_port_read(machine, "IN2");	// Buttons
 		case 0x0004/2 : return input_port_read(machine, "IN3");	// Motor Limit Switches
 		case 0x0006/2 : return input_port_read(machine, "IN4");	// DSW 1 & 2
 
@@ -411,11 +410,11 @@ READ16_HANDLER( f1gpstar_vregs_r )
 
 //      case 0x0002/2 : return 0xFFFF;
 
-		case 0x0004/2 :	return input_port_read(machine, "IN2") + (read_shift(machine)<<5);	// Buttons
+		case 0x0004/2 :	return input_port_read(machine, "IN2");	// Buttons
 
 		case 0x0006/2 :	return input_port_read(machine, "IN3");	// ? Read at boot only
 
-		case 0x0008/2 :	return soundlatch2_r(machine,0);	// From sound cpu
+		case 0x0008/2 :	return soundlatch2_r(machine,0);		// From sound cpu
 
 		case 0x000c/2 :	return input_port_read(machine, "IN4");	// DSW 3
 

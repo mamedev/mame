@@ -123,17 +123,6 @@ static NVRAM_HANDLER( overdriv )
 	}
 }
 
-static READ16_HANDLER( eeprom_r )
-{
-	int res;
-
-//logerror("%06x eeprom_r\n",activecpu_get_pc());
-	/* bit 6 is EEPROM data */
-	res = (eeprom_read_bit() << 6) | input_port_read(machine,"INPUT");
-
-	return res;
-}
-
 static WRITE16_HANDLER( eeprom_w )
 {
 //logerror("%06x: write %04x to eeprom_w\n",activecpu_get_pc(),data);
@@ -257,7 +246,7 @@ static ADDRESS_MAP_START( overdriv_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x040000, 0x043fff) AM_READ(SMH_RAM)
 	AM_RANGE(0x080000, 0x080fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x0c0000, 0x0c0001) AM_READ(eeprom_r)
+	AM_RANGE(0x0c0000, 0x0c0001) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x0c0002, 0x0c0003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("PADDLE")
 	AM_RANGE(0x1d8000, 0x1d8003) AM_READ(overdriv_sound_0_r)	/* K053260 */
@@ -344,14 +333,14 @@ ADDRESS_MAP_END
 /* is missing.                                                        */
 
 static INPUT_PORTS_START( overdriv )
-	PORT_START("INPUT")
+	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_TOGGLE
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* EEPROM data */
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SYSTEM")

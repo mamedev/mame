@@ -44,18 +44,17 @@ static INT32 gp2_irq_control;
  *
  *************************************/
 
-static READ16_HANDLER( i_port1_r )
+static CUSTOM_INPUT( inputs_r )
 {
-	if (control & 0x0080)
-		return input_port_read(machine, "IN0");
-	else
-		return input_port_read(machine, "DSW");
+	const char *tag1 = param;
+	const char *tag2 = tag1 + strlen(tag1) + 1;
+	return input_port_read(field->port->machine, (control & 0x0080) ? tag1 : tag2);
 }
 
-static READ16_HANDLER( i_port2_r )
+static CUSTOM_INPUT( battery_sensor_r )
 {
 	/* bit 0-1  battery power sensor: 3=good, 2=low, other=bad */
-	return (input_port_read(machine, "SENSOR") & 0xfffc) | 0x0003;
+	return 0x0003;
 }
 
 
@@ -345,8 +344,8 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x183fff) AM_READ(SMH_RAM)				/* backup ram */
 	AM_RANGE(0x280000, 0x280fff) AM_READ(SMH_RAM)				/* color ram */
 	AM_RANGE(0x320000, 0x32001f) AM_READ(K053252_word_r)		/* ccu */
-	AM_RANGE(0x330000, 0x330001) AM_READ(i_port2_r)				/* battery power & service sw */
-	AM_RANGE(0x340000, 0x340001) AM_READ(i_port1_r)				/* inputport */
+	AM_RANGE(0x330000, 0x330001) AM_READ_PORT("SENSOR")			/* battery power & service sw */
+	AM_RANGE(0x340000, 0x340001) AM_READ_PORT("340000")			/* inputport */
 	AM_RANGE(0x800000, 0x80045f) AM_READ(k054539_word_r)		/* sound regs */
 	AM_RANGE(0x880000, 0x881fff) AM_READ(K056832_ram_word_r)	/* vram */
 	AM_RANGE(0x882000, 0x883fff) AM_READ(K056832_ram_word_r)	/* vram (mirror) */
@@ -382,8 +381,8 @@ static ADDRESS_MAP_START( gp2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x183fff) AM_READ(SMH_RAM)				/* backup ram */
 	AM_RANGE(0x280000, 0x280fff) AM_READ(SMH_RAM)				/* color ram */
 	AM_RANGE(0x320000, 0x32001f) AM_READ(K053252_word_r)		/* ccu */
-	AM_RANGE(0x330000, 0x330001) AM_READ(i_port2_r)				/* battery power & service */
-	AM_RANGE(0x340000, 0x340001) AM_READ(i_port1_r)				/* inputport */
+	AM_RANGE(0x330000, 0x330001) AM_READ_PORT("SENSOR")			/* battery power & service */
+	AM_RANGE(0x340000, 0x340001) AM_READ_PORT("340000")			/* inputport */
 	AM_RANGE(0x800000, 0x80045f) AM_READ(k054539_word_r)		/* sound regs */
 	AM_RANGE(0x880000, 0x881fff) AM_READ(gp2_vram_r)			/* vram */
 	AM_RANGE(0x89f000, 0x8a0fff) AM_READ(gp2_vram_mirror_r)		/* vram (mirror) */
@@ -420,7 +419,10 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( qdrmfgp )
-	PORT_START("IN0")
+	PORT_START("340000")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(inputs_r, "INPUTS\0DSW")
+
+	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)	/* 1P STOP */
@@ -493,14 +495,17 @@ static INPUT_PORTS_START( qdrmfgp )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
 
 	PORT_START("SENSOR")
-	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_SPECIAL )		/* battery power sensor */
+	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(battery_sensor_r, NULL)	/* battery power sensor */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE3 )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( qdrmfgp2 )
-	PORT_START("IN0")
+	PORT_START("340000")
+	PORT_BIT( 0xffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(inputs_r, "INPUTS\0DSW")
+
+	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)	/* 1P STOP */
@@ -573,7 +578,7 @@ static INPUT_PORTS_START( qdrmfgp2 )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
 
 	PORT_START("SENSOR")
-	PORT_BIT( 0x0003, IP_ACTIVE_LOW, IPT_SPECIAL )		/* battery power sensor */
+	PORT_BIT( 0x0003, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(battery_sensor_r, NULL)	/* battery power sensor */
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE3 )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )

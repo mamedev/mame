@@ -30,41 +30,23 @@ WRITE8_HANDLER( gaplus_customio_3_w )
 
 READ8_HANDLER( gaplus_customio_3_r )
 {
-    int mode;
+	int mode = gaplus_customio_3[8];
 
-    mode = gaplus_customio_3[8];
-    if (mode == 2)
-    {
-        switch (offset)
-        {
-            case 0:
-                return input_port_read(machine, "IN2");		/* cabinet & test mode */
-                break;
-            case 2:
-                return 0x0f;
-                break;
-            default:
-                return gaplus_customio_3[offset];
-        }
-    }
-    else
-    {
-        switch (offset)
-        {
-            case 0:
-                return input_port_read(machine, "IN2");		/* cabinet & test mode */
-                break;
-            case 1:
-                return 0x0f;
-                break;
-            case 2:
-                return 0x0e;
-                break;
-            case 3:
-                return 0x01;
-                break;
-            default:
-                return gaplus_customio_3[offset];
-        }
-    }
+	switch (offset)
+	{
+		case 0:
+			return input_port_read(machine, "IN2");		/* cabinet & test mode */
+			break;
+		case 1:
+			return (mode == 2) ? gaplus_customio_3[offset] : 0x0f;
+			break;
+		case 2:
+			return (mode == 2) ? 0x0f : 0x0e;
+			break;
+		case 3:
+			return (mode == 2) ? gaplus_customio_3[offset] : 0x01;
+			break;
+		default:
+			return gaplus_customio_3[offset];
+	}
 }

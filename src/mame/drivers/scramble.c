@@ -72,9 +72,9 @@ static ADDRESS_MAP_START( turpins_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9400, 0x97ff) AM_READ(galaxold_videoram_r)
 	AM_RANGE(0x9800, 0x98ff) AM_READ(SMH_RAM)
 
-	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
-	AM_RANGE(0xa001, 0xa001) AM_READ(input_port_1_r)
-	AM_RANGE(0xa002, 0xa002) AM_READ(input_port_2_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
+	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1")
+	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2")
 
 	AM_RANGE(0xb800, 0xb800) AM_READ(watchdog_reset_r)
 //  AM_RANGE(0x8100, 0x8103) AM_READ(ppi8255_0_r)
@@ -110,10 +110,10 @@ static ADDRESS_MAP_START( explorer_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5000, 0x50ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x5100, 0x51ff) AM_READ(SMH_NOP)	/* test mode mirror? */
 	AM_RANGE(0x7000, 0x7000) AM_READ(watchdog_reset_r)
-	AM_RANGE(0x8000, 0x8000) AM_READ(input_port_0_r)
-	AM_RANGE(0x8001, 0x8001) AM_READ(input_port_1_r)
-	AM_RANGE(0x8002, 0x8002) AM_READ(input_port_2_r)
-	AM_RANGE(0x8003, 0x8003) AM_READ(input_port_3_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
+	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN1")
+	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN2")
+	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN3")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( explorer_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -262,10 +262,10 @@ static ADDRESS_MAP_START( hotshock_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4bff) AM_READ(SMH_RAM)
 	AM_RANGE(0x4c00, 0x4fff) AM_READ(galaxold_videoram_r)
 	AM_RANGE(0x5000, 0x50ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8000, 0x8000) AM_READ(input_port_0_r)
-	AM_RANGE(0x8001, 0x8001) AM_READ(input_port_1_r)
-	AM_RANGE(0x8002, 0x8002) AM_READ(input_port_2_r)
-	AM_RANGE(0x8003, 0x8003) AM_READ(input_port_3_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
+	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN1")
+	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN2")
+	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN3")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hotshock_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -400,10 +400,10 @@ static ADDRESS_MAP_START( ad2083_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(hotshock_sh_irqtrigger_w)
 	AM_RANGE(0x7000, 0x7000) AM_READ(watchdog_reset_r)
-	AM_RANGE(0x8000, 0x8000) AM_READ(input_port_0_r)
-	AM_RANGE(0x8001, 0x8001) AM_READ(input_port_1_r)
-	AM_RANGE(0x8002, 0x8002) AM_READ(input_port_2_r)
-	AM_RANGE(0x8003, 0x8003) AM_READ(input_port_3_r)
+	AM_RANGE(0x8000, 0x8000) AM_READ_PORT("IN0")
+	AM_RANGE(0x8001, 0x8001) AM_READ_PORT("IN1")
+	AM_RANGE(0x8002, 0x8002) AM_READ_PORT("IN2")
+	AM_RANGE(0x8003, 0x8003) AM_READ_PORT("IN3")
 	AM_RANGE(0xa000, 0xdfff) AM_ROM
 	AM_RANGE(0xe800, 0xebff) AM_RAM
 ADDRESS_MAP_END
@@ -471,7 +471,7 @@ static READ8_HANDLER( hncholms_prot_r )
 
 static ADDRESS_MAP_START( hunchbks_readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ(hncholms_prot_r)
-    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ(input_port_3_r)
+    AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( scramble )
@@ -933,6 +933,15 @@ static INPUT_PORTS_START( triplep )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
+/* ckongs coinage DIPs are spread accross two input ports */
+static CUSTOM_INPUT( ckongs_coinage_r )
+{
+	int bit_mask = (FPTR)param;
+	return (input_port_read(field->port->machine, "FAKE") & bit_mask) ? 0x01 : 0x00;
+}
+
+
 static INPUT_PORTS_START( ckongs )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
@@ -945,15 +954,8 @@ static INPUT_PORTS_START( ckongs )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("IN1")
-	/* the coinage dip switch is spread across bits 0/1 of port 1 and bit 3 of port 2. */
-	/* To handle that, we swap bits 0/1 of port 1 and bits 1/2 of port 2 - this is handled */
-	/* by ckongs_input_port_N_r() */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x02, "3" )
-	PORT_DIPSETTING(    0x00, "4" )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ckongs_coinage_r, (void *)0x01)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ckongs_coinage_r, (void *)0x02)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
@@ -962,23 +964,29 @@ static INPUT_PORTS_START( ckongs )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN2")
-	/* the coinage dip switch is spread across bits 0/1 of port 1 and bit 3 of port 2. */
-	/* To handle that, we swap bits 0/1 of port 1 and bits 1/2 of port 2 - this is handled */
-	/* by ckongs_input_port_N_r() */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_DIPNAME( 0x0e, 0x0e, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x0a, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x0e, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ckongs_coinage_r, (void *)0x04)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
+
+	PORT_START("FAKE")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mars )

@@ -1253,8 +1253,8 @@ static ADDRESS_MAP_START( s12h8rwmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
 	AM_RANGE(0x080000, 0x08ffff) AM_READWRITE( sharedram_sub_r, sharedram_sub_w )
 	AM_RANGE(0x280000, 0x287fff) AM_READWRITE( c352_0_r, c352_0_w )
-	AM_RANGE(0x300000, 0x300001) AM_READ( input_port_1_word_r )
-	AM_RANGE(0x300002, 0x300003) AM_READ( input_port_2_word_r )
+	AM_RANGE(0x300000, 0x300001) AM_READ_PORT("IN0")
+	AM_RANGE(0x300002, 0x300003) AM_READ_PORT("IN1")
 	AM_RANGE(0x300010, 0x300011) AM_NOP	// golgo13 writes here a lot, possibly also a wait state generator?
 	AM_RANGE(0x300030, 0x300031) AM_NOP	// most S12 bioses write here simply to generate a wait state.  there is no deeper meaning.
 ADDRESS_MAP_END

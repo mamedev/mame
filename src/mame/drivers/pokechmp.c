@@ -113,9 +113,9 @@ static WRITE8_HANDLER( pokechmp_paletteram_w )
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x1800, 0x1800) AM_READ(input_port_0_r)
-	AM_RANGE(0x1a00, 0x1a00) AM_READ(input_port_1_r)
-	AM_RANGE(0x1c00, 0x1c00) AM_READ(input_port_2_r)
+	AM_RANGE(0x1800, 0x1800) AM_READ_PORT("P1")
+	AM_RANGE(0x1a00, 0x1a00) AM_READ_PORT("P2")
+	AM_RANGE(0x1c00, 0x1c00) AM_READ_PORT("DSW")
 
 	/* Extra on Poke Champ (not on Pocket Gal) */
 	AM_RANGE(0x2000, 0x27ff) AM_READ(SMH_RAM)

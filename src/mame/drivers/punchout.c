@@ -136,13 +136,10 @@ DRIVER_INIT( armwrest );
 
 
 
-static READ8_HANDLER( punchout_input_3_r )
+static CUSTOM_INPUT( punchout_vlm5030_busy_r )
 {
-	int data = input_port_read(machine, "DSW1");
-	/* bit 4 is busy pin level */
-	if( vlm5030_bsy() ) data &= ~0x10;
-	else data |= 0x10;
-	return data;
+	/* bit 4 of DSW1 is busy pin level */
+	return (vlm5030_bsy()) ? 0x00 : 0x01;
 }
 
 static WRITE8_HANDLER( punchout_speech_reset_w )
@@ -429,7 +426,7 @@ static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW2")
-	AM_RANGE(0x03, 0x03) AM_READ(punchout_input_3_r)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
 
 	/* protection ports - Super Punchout only (move to install handler?) */
 	AM_RANGE(0x07, 0x07) AM_READ(spunchout_prot_0_r)
@@ -551,7 +548,7 @@ static INPUT_PORTS_START( punchout )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x0f, DEF_STR( Free_Play ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )		/* VLM5030 busy signal */
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(punchout_vlm5030_busy_r, NULL)	/* VLM5030 busy signal */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "R18:!1" )		/* Not documented, R18 resistor */
 	PORT_DIPNAME( 0x80, 0x00, "Copyright" )				PORT_DIPLOCATION("R19:!1") /* Not documented, R19 resistor */
@@ -638,6 +635,7 @@ static INPUT_PORTS_START( armwrest )
 	PORT_DIPSETTING(    0x0d, "d" )
 	PORT_DIPSETTING(    0x0e, "e" )
 	PORT_DIPSETTING(    0x0f, "f" )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(punchout_vlm5030_busy_r, NULL)	/* VLM5030 busy signal */
 	PORT_DIPNAME( 0x40, 0x00, "Coin Slots" )			PORT_DIPLOCATION("R18:!1") /* R18 resistor */
 	PORT_DIPSETTING(    0x40, "1" )
 	PORT_DIPSETTING(    0x00, "2" )

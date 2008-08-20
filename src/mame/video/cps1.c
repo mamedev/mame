@@ -1556,12 +1556,7 @@ READ16_HANDLER( cps1_cps_b_r )
 				cps1_cps_b_regs[cps1_game_config->mult_factor2/2]) >> 16;
 
 	if (offset == cps1_game_config->in2_addr/2)	/* Extra input ports (on C-board) */
-	{
-		if (cps1_game_config->bootleg_kludge == 1)
-			return input_port_read(machine, "IN2") << 8;
-		else
-			return input_port_read(machine, "IN2");
-	}
+		return input_port_read(machine, "IN2");
 
 	if (offset == cps1_game_config->in3_addr/2)	/* Player 4 controls (on C-board) ("Captain Commando") */
 		return input_port_read(machine, "IN3");

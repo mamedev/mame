@@ -112,12 +112,11 @@ static READ8_HANDLER( multigam_IN1_r )
 	return ((in_1 >> in_1_shift++) & 0x01) | 0x40;
 }
 
-static READ8_HANDLER( multigam_inputs_r )
+static CUSTOM_INPUT( multigam_inputs_r )
 {
 	/* bit 0: serial input (dsw)
        bit 1: coin */
-	return ((multigam_in_dsw >> multigam_in_dsw_shift++) & 0x01) |
-			input_port_read(machine, "IN0");
+	return (multigam_in_dsw >> multigam_in_dsw_shift++) & 0x01;
 }
 
 
@@ -183,11 +182,11 @@ static ADDRESS_MAP_START( multigam_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4013) AM_READWRITE(nes_psg_0_r, nes_psg_0_w)			/* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
 	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)			/* PSG status / first control register */
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r,        multigam_IN0_w)			/* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READWRITE(multigam_IN1_r,        psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)	/* IN0 - input port 1 */
+	AM_RANGE(0x4017, 0x4017) AM_READWRITE(multigam_IN1_r, psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
 	AM_RANGE(0x5000, 0x5ffe) AM_ROM
-	AM_RANGE(0x5fff, 0x5fff) AM_READ(multigam_inputs_r)
+	AM_RANGE(0x5fff, 0x5fff) AM_READ_PORT("IN0")
 	AM_RANGE(0x6000, 0x7fff) AM_ROM
 	AM_RANGE(0x6fff, 0x6fff) AM_WRITE(multigam_switch_prg_rom)
 	AM_RANGE(0x7fff, 0x7fff) AM_WRITE(multigam_switch_gfx_rom)
@@ -431,13 +430,13 @@ static ADDRESS_MAP_START( multigm3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4013) AM_READWRITE(nes_psg_0_r, nes_psg_0_w)			/* PSG primary registers */
 	AM_RANGE(0x4014, 0x4014) AM_WRITE(sprite_dma_w)
 	AM_RANGE(0x4015, 0x4015) AM_READWRITE(psg_4015_r, psg_4015_w)			/* PSG status / first control register */
-	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r,        multigam_IN0_w)			/* IN0 - input port 1 */
-	AM_RANGE(0x4017, 0x4017) AM_READWRITE(multigam_IN1_r,        psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
+	AM_RANGE(0x4016, 0x4016) AM_READWRITE(multigam_IN0_r, multigam_IN0_w)	/* IN0 - input port 1 */
+	AM_RANGE(0x4017, 0x4017) AM_READWRITE(multigam_IN1_r, psg_4017_w)		/* IN1 - input port 2 / PSG second control register */
 	AM_RANGE(0x5001, 0x5001) AM_WRITE(multigm3_switch_prg_rom)
 	AM_RANGE(0x5002, 0x5002) AM_WRITENOP
 	AM_RANGE(0x5003, 0x5003) AM_WRITE(multigam_switch_gfx_rom)
 	AM_RANGE(0x5000, 0x5ffe) AM_ROM
-	AM_RANGE(0x5fff, 0x5fff) AM_READ(multigam_inputs_r)
+	AM_RANGE(0x5fff, 0x5fff) AM_READ_PORT("IN0")
 	AM_RANGE(0x6000, 0x7fff) AM_RAMBANK(1)
 	AM_RANGE(0x6fff, 0x6fff) AM_WRITENOP /* 0x00 in attract mode, 0xff during play */
 	AM_RANGE(0x8000, 0xffff) AM_ROM AM_WRITE(multigm3_mapper2_w)
@@ -450,7 +449,7 @@ ADDRESS_MAP_END
 *******************************************************/
 
 static INPUT_PORTS_START( multigam_common )
-	PORT_START("P1")		/* IN0 */
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)	/* Select */
@@ -460,7 +459,7 @@ static INPUT_PORTS_START( multigam_common )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 
-	PORT_START("P2")		/* IN1 */
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)	/* Select */
@@ -470,30 +469,31 @@ static INPUT_PORTS_START( multigam_common )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 
-	PORT_START("IN0")		/* IN2 */
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(multigam_inputs_r, NULL)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( multigam )
 	PORT_INCLUDE( multigam_common )
 
-	PORT_START("DSW")		/* IN3 */
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x06, 0x00, "Coin/Time" )
-	PORT_DIPSETTING( 0x00, "3 min" )
-	PORT_DIPSETTING( 0x04, "5 min" )
-	PORT_DIPSETTING( 0x02, "7 min" )
-	PORT_DIPSETTING( 0x06, "10 min" )
+	PORT_DIPSETTING(    0x00, "3 min" )
+	PORT_DIPSETTING(    0x04, "5 min" )
+	PORT_DIPSETTING(    0x02, "7 min" )
+	PORT_DIPSETTING(    0x06, "10 min" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( multigm3 )
 	PORT_INCLUDE( multigam_common )
 
-	PORT_START("DSW")		/* IN3 */
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x06, 0x00, "Coin/Time" )
-	PORT_DIPSETTING( 0x00, "15 min" )
-	PORT_DIPSETTING( 0x04, "8 min" )
-	PORT_DIPSETTING( 0x02, "11 min" )
-	PORT_DIPSETTING( 0x06, "5 min" )
+	PORT_DIPSETTING(    0x00, "15 min" )
+	PORT_DIPSETTING(    0x04, "8 min" )
+	PORT_DIPSETTING(    0x02, "11 min" )
+	PORT_DIPSETTING(    0x06, "5 min" )
 INPUT_PORTS_END
 
 

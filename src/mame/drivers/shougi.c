@@ -262,7 +262,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x43ff) AM_RAM		/* 2114 x 2 (0x400 x 4bit each) */
 
 	/* 4800-480f connected to the 74LS259, A3 is data line so 4800-4807 write 0, and 4808-480f write 1 */
-	AM_RANGE(0x4800, 0x4800) AM_WRITE(cpu_shared_ctrl_sub_w)  AM_READ(input_port_2_r)
+	AM_RANGE(0x4800, 0x4800) AM_READ_PORT("DSW") AM_WRITE(cpu_shared_ctrl_sub_w)
 	AM_RANGE(0x4801, 0x4801) AM_WRITE(nmi_disable_and_clear_line_w)
 	AM_RANGE(0x4802, 0x4802) AM_NOP
 	AM_RANGE(0x4803, 0x4803) AM_NOP
@@ -275,8 +275,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x480c, 0x480c) AM_WRITE(shougi_mcu_halt_on_w)
 	AM_RANGE(0x480f, 0x480f) AM_NOP
 
-	AM_RANGE(0x5000, 0x5000) AM_READ(input_port_0_r)
-	AM_RANGE(0x5800, 0x5800) AM_READ(input_port_1_r) AM_WRITE(shougi_watchdog_reset_w)	/* game won't boot if watchdog doesn't work */
+	AM_RANGE(0x5000, 0x5000) AM_READ_PORT("P1")
+	AM_RANGE(0x5800, 0x5800) AM_READ_PORT("P2") AM_WRITE(shougi_watchdog_reset_w)	/* game won't boot if watchdog doesn't work */
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x6800, 0x6800) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_SHARE(1) /* 2114 x 2 (0x400 x 4bit each) */
@@ -313,7 +313,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( shougi )
-	PORT_START("PLAYER1")
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -323,7 +323,7 @@ static INPUT_PORTS_START( shougi )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 
-	PORT_START("PLAYER2")
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)

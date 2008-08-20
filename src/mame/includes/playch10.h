@@ -17,7 +17,7 @@ DRIVER_INIT( pcgboard_type2 ); /* g-board games with 4 screen mirror */
 DRIVER_INIT( pchboard );	/* h-board games */
 DRIVER_INIT( pciboard );	/* i-board games */
 DRIVER_INIT( pckboard );	/* k-board games */
-READ8_HANDLER( pc10_port_0_r );
+CUSTOM_INPUT( pc10_int_detect_r );
 READ8_HANDLER( pc10_prot_r );
 READ8_HANDLER( pc10_detectclr_r );
 READ8_HANDLER( pc10_in0_r );

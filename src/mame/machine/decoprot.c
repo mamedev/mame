@@ -740,11 +740,11 @@ READ16_HANDLER( deco16_146_funkyjet_prot_r )
 			return ((deco16_prot_ram[0x78e>>1]>>4)&0xff00) | (deco16_prot_ram[0x78e>>1]&0x000f) | ((deco16_prot_ram[0x78e>>1]<<8)&0xf000);
 
 		case 0x00c >> 1: /* Player 1 & Player 2 joysticks & fire buttons */
-			return (input_port_read(machine, "P1") + (input_port_read(machine, "P2") << 8));
+			return input_port_read(machine, "INPUTS");
 		case 0x778 >> 1: /* Credits */
-			return input_port_read(machine, "IN0");
+			return input_port_read(machine, "SYSTEM");
 		case 0x382 >> 1: /* DIPS */
-			return (input_port_read(machine, "DSWA") + (input_port_read(machine, "DSWB") << 8));
+			return input_port_read(machine, "DSW");
 	}
 
 	if (activecpu_get_pc()!=0xc0ea)
@@ -1754,9 +1754,9 @@ READ16_HANDLER( deco16_104_pktgaldx_prot_r )
 	const UINT16* prot_ram=deco16_prot_ram;
 	switch (offset * 2)
 	{
-	case 0x5b2: return input_port_read(machine, "IN0");
+	case 0x5b2: return input_port_read(machine, "SYSTEM");
 	case 0x44c: return input_port_read(machine, "DSW");
-	case 0x042: return input_port_read(machine, "IN1");
+	case 0x042: return input_port_read(machine, "INPUTS");
 
 	case 0x510: return DECO_PORT(0);
 	case 0x51a: return DECO_PORT(2);

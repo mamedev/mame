@@ -133,21 +133,21 @@ e000 - e7ff        R/W      Work RAM
 
 static UINT8 ninjakun_io_a002_ctrl;
 
-static READ8_HANDLER( ninjakun_io_A002_r )
+static CUSTOM_INPUT( ninjakun_io_A002_ctrl_r )
 {
-	return ninjakun_io_a002_ctrl | input_port_read(machine, "IN2"); /* vblank */
+	return ninjakun_io_a002_ctrl;
 }
 
 static WRITE8_HANDLER( ninjakun_cpu1_io_A002_w )
 {
-	if( data == 0x80 ) ninjakun_io_a002_ctrl |= 0x04;
-	if( data == 0x40 ) ninjakun_io_a002_ctrl &= ~0x08;
+	if( data == 0x80 ) ninjakun_io_a002_ctrl |= 0x01;
+	if( data == 0x40 ) ninjakun_io_a002_ctrl &= ~0x02;
 }
 
 static WRITE8_HANDLER( ninjakun_cpu2_io_A002_w )
 {
-	if( data == 0x40 ) ninjakun_io_a002_ctrl |= 0x08;
-	if( data == 0x80 ) ninjakun_io_a002_ctrl &= ~0x04;
+	if( data == 0x40 ) ninjakun_io_a002_ctrl |= 0x02;
+	if( data == 0x80 ) ninjakun_io_a002_ctrl &= ~0x01;
 }
 
 
@@ -183,9 +183,9 @@ static ADDRESS_MAP_START( nova2001_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc002, 0xc002) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0xc003, 0xc003) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0xc004, 0xc004) AM_READ(watchdog_reset_r)
-	AM_RANGE(0xc006, 0xc006) AM_READ(input_port_0_r)
-	AM_RANGE(0xc007, 0xc007) AM_READ(input_port_1_r)
-	AM_RANGE(0xc00e, 0xc00e) AM_READ(input_port_2_r)
+	AM_RANGE(0xc006, 0xc006) AM_READ_PORT("IN0")
+	AM_RANGE(0xc007, 0xc007) AM_READ_PORT("IN1")
+	AM_RANGE(0xc00e, 0xc00e) AM_READ_PORT("IN2")
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -197,9 +197,9 @@ static ADDRESS_MAP_START( ninjakun_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8001, 0x8001) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0x8003, 0x8003) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
-	AM_RANGE(0xa001, 0xa001) AM_READ(input_port_1_r)
-	AM_RANGE(0xa002, 0xa002) AM_READWRITE(ninjakun_io_A002_r, ninjakun_cpu1_io_A002_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
+	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1")
+	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2") AM_WRITE(ninjakun_cpu1_io_A002_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(pkunwar_flipscreen_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_BASE(&nova2001_fg_videoram) AM_SHARE(1)
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_BASE(&nova2001_bg_videoram) AM_SHARE(2)
@@ -216,9 +216,9 @@ static ADDRESS_MAP_START( ninjakun_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8001, 0x8001) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
 	AM_RANGE(0x8002, 0x8002) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0x8003, 0x8003) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
-	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
-	AM_RANGE(0xa001, 0xa001) AM_READ(input_port_1_r)
-	AM_RANGE(0xa002, 0xa002) AM_READWRITE(ninjakun_io_A002_r, ninjakun_cpu2_io_A002_w)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
+	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("IN1")
+	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("IN2") AM_WRITE(ninjakun_cpu2_io_A002_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(nova2001_flipscreen_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(nova2001_fg_videoram_w) AM_SHARE(1)
 	AM_RANGE(0xc800, 0xcfff) AM_READWRITE(ninjakun_bg_videoram_r, ninjakun_bg_videoram_w) AM_SHARE(2)
@@ -317,7 +317,7 @@ static INPUT_PORTS_START( nova2001 )
 	PORT_BIT( 0x78, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 
-	PORT_START("DSW1")  /* dsw0 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -341,7 +341,7 @@ static INPUT_PORTS_START( nova2001 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW2")  /* dsw1 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
@@ -382,6 +382,7 @@ static INPUT_PORTS_START( ninjakun )
 
 	PORT_START("IN2")	/* 0xa002 */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ninjakun_io_A002_ctrl_r, NULL)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
@@ -435,7 +436,7 @@ static INPUT_PORTS_START( ninjakun )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pkunwar )
-	PORT_START("IN0")	/* IN0 */
+	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -445,7 +446,7 @@ static INPUT_PORTS_START( pkunwar )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_VBLANK )
 
-	PORT_START("IN1")	/* IN1 */
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
@@ -455,7 +456,7 @@ static INPUT_PORTS_START( pkunwar )
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("IN2")	/* DSW0 */
+	PORT_START("IN2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -481,7 +482,7 @@ static INPUT_PORTS_START( pkunwar )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW1")	/* DSW1 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
@@ -527,7 +528,7 @@ static INPUT_PORTS_START( raiders5 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
 
-	PORT_START("DSW1")	/* DSW1 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
@@ -551,7 +552,7 @@ static INPUT_PORTS_START( raiders5 )
 	PORT_DIPSETTING(    0x80, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 
-	PORT_START("DSW2")	/* DSW2*/
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x05, DEF_STR( 3C_1C ) )
@@ -576,7 +577,6 @@ static INPUT_PORTS_START( raiders5 )
 	PORT_DIPNAME( 0x80, 0x80, "Unlimited Lives (If Free Play)" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 

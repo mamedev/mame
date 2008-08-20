@@ -88,10 +88,10 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0x87ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x9000, 0x97ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa800, 0xa800) AM_READ(input_port_0_r)
-	AM_RANGE(0xa880, 0xa880) AM_READ(input_port_1_r)
-	AM_RANGE(0xa900, 0xa900) AM_READ(input_port_2_r)
-	AM_RANGE(0xa980, 0xa980) AM_READ(input_port_3_r)
+	AM_RANGE(0xa800, 0xa800) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xa880, 0xa880) AM_READ_PORT("INPUTS")
+	AM_RANGE(0xa900, 0xa900) AM_READ_PORT("DSW1")
+	AM_RANGE(0xa980, 0xa980) AM_READ_PORT("DSW2")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -112,17 +112,17 @@ static ADDRESS_MAP_START( merlinmm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x5400, 0x57ff) AM_RAM
 	AM_RANGE(0x6000, 0x6007) AM_WRITENOP /* solenoid writes */
-	AM_RANGE(0x7000, 0x7000) AM_READ(input_port_4_r)
+	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN4")
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(pingpong_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x8400, 0x87ff) AM_RAM_WRITE(pingpong_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x9000, 0x9002) AM_RAM
 	AM_RANGE(0x9003, 0x9052) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x9053, 0x97ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(coin_w)	/* irq enables */
-	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
-	AM_RANGE(0xa080, 0xa080) AM_READ(input_port_1_r)
-	AM_RANGE(0xa100, 0xa100) AM_READ(input_port_2_r)
-	AM_RANGE(0xa180, 0xa180) AM_READ(input_port_3_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
+	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("IN1")
+	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("IN2")
+	AM_RANGE(0xa180, 0xa180) AM_READ_PORT("IN3")
 	AM_RANGE(0xa200, 0xa200) AM_WRITE(SMH_NOP)		/* SN76496 data latch */
 	AM_RANGE(0xa400, 0xa400) AM_WRITE(sn76496_0_w)	/* trigger read */
 	AM_RANGE(0xa600, 0xa600) AM_WRITE(watchdog_reset_w)
@@ -131,7 +131,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( pingpong )
-	PORT_START("SYSTEM")	/* IN0 */
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
@@ -141,7 +141,7 @@ static INPUT_PORTS_START( pingpong )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("INPUTS")	/* IN1 */
+	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
@@ -151,7 +151,7 @@ static INPUT_PORTS_START( pingpong )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START("DSW1")	/* DSW1 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0F, 0x0F, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x0A, DEF_STR( 3C_1C ) )
@@ -187,7 +187,7 @@ static INPUT_PORTS_START( pingpong )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 
-	PORT_START("DSW2")	/* DSW2 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -220,8 +220,8 @@ static INPUT_PORTS_START( merlinmm )
 	PORT_DIPNAME( 0x10, 0x10, "Door Close")
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, "Door Open")		//Seems strange, one input to register an open door
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )	//And a different one for closing it!
+	PORT_DIPNAME( 0x20, 0x20, "Door Open")		// Seems strange, one input to register an open door
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )	// And a different one for closing it!
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
@@ -297,7 +297,7 @@ static INPUT_PORTS_START( merlinmm )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("IN4")
-	PORT_DIPNAME( 0x01, 0x01, "10P Level" )//Most likely to be optos, rather than DIPs.
+	PORT_DIPNAME( 0x01, 0x01, "10P Level" )		// Most likely to be optos, rather than DIPs.
 	PORT_DIPSETTING(    0x01, DEF_STR( Low ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( High ) )
 	PORT_DIPNAME( 0x02, 0x02, "20P Level" )
@@ -328,7 +328,7 @@ static INPUT_PORTS_START( cashquiz )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) // 0x20 and 0x40 if both ON enable a test menu
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	// 0x20 and 0x40 if both ON enable a test menu
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )

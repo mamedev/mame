@@ -845,6 +845,9 @@ static INPUT_PORTS_START( nstocker )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "G1:7" )
 
+	PORT_MODIFY("IN0")
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(nstocker_bits_r, NULL)
+
 	/* cheese alert -- we have to map this to player 2 so that it doesn't interfere with
        the crosshair controls */
 	PORT_MODIFY("AN3")
@@ -1948,7 +1951,6 @@ static DRIVER_INIT( nametune )
 }
 static DRIVER_INIT( nstocker )
 {
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9902, 0x9902, 0, 0, nstocker_port2_r);
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9f00, 0x9f00, 0, 0, balsente_rombank2_select_w);
 	expand_roms(machine, EXPAND_NONE | SWAP_HALVES); balsente_shooter = 1; balsente_adc_shift = 1;
 }

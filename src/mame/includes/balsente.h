@@ -59,7 +59,7 @@ WRITE8_HANDLER( balsente_chip_select_w );
 WRITE8_HANDLER( balsente_dac_data_w );
 WRITE8_HANDLER( balsente_register_addr_w );
 
-READ8_HANDLER( nstocker_port2_r );
+CUSTOM_INPUT( nstocker_bits_r );
 WRITE8_HANDLER( spiker_expand_w );
 READ8_HANDLER( spiker_expand_r );
 READ8_HANDLER( grudge_steering_r );

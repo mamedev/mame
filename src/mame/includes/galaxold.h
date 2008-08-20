@@ -136,17 +136,12 @@ WRITE8_HANDLER( kingball_sound1_w );
 WRITE8_HANDLER( kingball_sound2_w );
 
 WRITE8_HANDLER( _4in1_bank_w );
-READ8_HANDLER( _4in1_input_port_1_r );
-READ8_HANDLER( _4in1_input_port_2_r );
+CUSTOM_INPUT( _4in1_fake_port_r );
 
 WRITE8_HANDLER( zigzag_sillyprotection_w );
 
 INTERRUPT_GEN( hunchbks_vh_interrupt );
 INTERRUPT_GEN( gmgalax_vh_interrupt );
-
-READ8_HANDLER( gmgalax_input_port_0_r );
-READ8_HANDLER( gmgalax_input_port_1_r );
-READ8_HANDLER( gmgalax_input_port_2_r );
 
 
 /*----------- defined in machine/scramble.c -----------*/

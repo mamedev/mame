@@ -60,9 +60,10 @@ MACHINE_RESET( pc10 )
  *  BIOS ports handling
  *
  *************************************/
-READ8_HANDLER( pc10_port_0_r )
+
+CUSTOM_INPUT( pc10_int_detect_r )
 {
-	return input_port_read(machine, "BIOS") | ( ( ~pc10_int_detect & 1 ) << 3 );
+	return ~pc10_int_detect & 1;
 }
 
 WRITE8_HANDLER( pc10_SDCS_w )

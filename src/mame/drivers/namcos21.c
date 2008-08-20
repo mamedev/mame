@@ -1427,22 +1427,22 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( readmem_mcu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0000) AM_READ(SMH_NOP)
-	AM_RANGE(0x0001, 0x0001) AM_READ(input_port_0_r)			/* p1,p2 start */
-	AM_RANGE(0x0002, 0x0002) AM_READ(input_port_1_r)			/* coins */
+	AM_RANGE(0x0001, 0x0001) AM_READ_PORT("PORTB")			/* p1,p2 start */
+	AM_RANGE(0x0002, 0x0002) AM_READ_PORT("PORTC")			/* coins */
 	AM_RANGE(0x0003, 0x0003) AM_READ(namcos2_mcu_port_d_r)
-	AM_RANGE(0x0007, 0x0007) AM_READ(input_port_10_r)		/* fire buttons */
+	AM_RANGE(0x0007, 0x0007) AM_READ_PORT("PORTH")			/* fire buttons */
 	AM_RANGE(0x0010, 0x0010) AM_READ(namcos2_mcu_analog_ctrl_r)
 	AM_RANGE(0x0011, 0x0011) AM_READ(namcos2_mcu_analog_port_r)
 	AM_RANGE(0x0008, 0x003f) AM_READ(SMH_RAM)
 	AM_RANGE(0x0040, 0x01bf) AM_READ(SMH_RAM)
 	AM_RANGE(0x01c0, 0x1fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x2000, 0x2000) AM_READ(input_port_11_r) /* dipswitches */
-	AM_RANGE(0x3000, 0x3000) AM_READ(input_port_12_r) /* DIAL0 */
-	AM_RANGE(0x3001, 0x3001) AM_READ(input_port_13_r) /* DIAL1 */
-	AM_RANGE(0x3002, 0x3002) AM_READ(input_port_14_r) /* DIAL2 */
-	AM_RANGE(0x3003, 0x3003) AM_READ(input_port_15_r) /* DIAL3 */
+	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW")			
+	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DIAL0")			
+	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("DIAL1")
+	AM_RANGE(0x3002, 0x3002) AM_READ_PORT("DIAL2")
+	AM_RANGE(0x3003, 0x3003) AM_READ_PORT("DIAL3")
 	AM_RANGE(0x5000, 0x57ff) AM_READ(namcos2_dualportram_byte_r)
-	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_NOP) /* watchdog */
+	AM_RANGE(0x6000, 0x6fff) AM_READ(SMH_NOP)				/* watchdog */
 	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
