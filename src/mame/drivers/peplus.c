@@ -89,10 +89,16 @@ Additional notes
           pepp0250     1
           pepp0447     2
           pepp0516     1
+          peps0014     1
+          peps0022     1
+          peps0043     1
+          peps0045     1
+          peps0308     1
           pebe0014     1
           peke1012     1
           peps0615     2
           peps0716     2
+          pex2069p     2
           pexp0019     2
           pexp0112     2
           pexs0006     2
