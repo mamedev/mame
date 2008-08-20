@@ -555,6 +555,7 @@ struct _input_setting_config
 	input_port_value			value;			/* value of the bits in this setting */
 	input_condition				condition;		/* condition under which this setting is valid */
 	const char *				name;			/* user-friendly name to display */
+	UINT16						category;		/* (MESS-specific) category */
 };
 
 
