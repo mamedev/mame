@@ -39,10 +39,20 @@ extern VIDEO_UPDATE( gwar );
 extern VIDEO_UPDATE( sgladiat );
 
 extern WRITE8_HANDLER( tnk3_videoattrs_w );
-extern WRITE8_HANDLER( tnk3_sp_scrolly_w );
-extern WRITE8_HANDLER( tnk3_sp_scrollx_w );
-extern WRITE8_HANDLER( tnk3_bg_scrolly_w );
 extern WRITE8_HANDLER( tnk3_bg_scrollx_w );
+extern WRITE8_HANDLER( tnk3_bg_scrolly_w );
+extern WRITE8_HANDLER( tnk3_sp_scrollx_w );
+extern WRITE8_HANDLER( tnk3_sp_scrolly_w );
+
+extern WRITE8_HANDLER( ikari_bg_scrollx_w );
+extern WRITE8_HANDLER( ikari_bg_scrolly_w );
+extern WRITE8_HANDLER( ikari_bg_scroll_msb_w );
+extern WRITE8_HANDLER( ikari_sp16_scrollx_w );
+extern WRITE8_HANDLER( ikari_sp16_scrolly_w );
+extern WRITE8_HANDLER( ikari_sp32_scrollx_w );
+extern WRITE8_HANDLER( ikari_sp32_scrolly_w );
+extern WRITE8_HANDLER( ikari_sp_scroll_msb_w );
+extern WRITE8_HANDLER( ikari_unknown_video_w );
 
 extern UINT8 *tnk3_fg_videoram;
 extern UINT8 *tnk3_bg_videoram;
