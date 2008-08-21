@@ -1019,6 +1019,7 @@ Memory map(preliminary):
 00-01 R operand 1 / operand 2
 02-03 R operand 1 % operand 2?
 04-05 R sqrt(operand 3<<16)
+06    R unknown - return value written to 13?
 
 06-07 W distance for collision check
 08-09 W Y pos of obj1
