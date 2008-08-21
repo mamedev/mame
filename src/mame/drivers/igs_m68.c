@@ -30,6 +30,7 @@ static VIDEO_UPDATE(igs_m68)
 
 static ADDRESS_MAP_START( igs_m68_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x303000, 0x303fff) AM_RAM
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( igs_m68 )
@@ -308,10 +309,211 @@ ROM_START( sdmg2 )
 	ROM_LOAD( "m0902.u4",  0x000000, 0x080000, CRC(3298b13b) SHA1(13b21ddeed368b7f4fea1408c8fc511244342faf) )
 ROM_END
 
+static DRIVER_INIT( mgcs )
+{
+	int i;
+	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
+
+	int rom_size = 0x80000;
+	
+	for (i=0; i<rom_size/2; i++)
+	{
+		UINT16 x = src[i];
+
+		if( (i & 0x7000/2) == 0x6000/2 || (i & 0x7000/2) == 0x7000/2)
+		{
+			if( (i & 0x20/2) )
+			{
+				if( (i & 0x02/2) )
+				{
+					x ^= 0x0100;
+				}
+			}
+			else if( (i & 0x100/2) && !(i & 0x400/2) )
+			{
+				x ^= 0x0001;
+			}
+
+			if( (i & 0x100/2) && (i & 0x400/2) )
+			{
+				x ^= 0x0001;
+			}
+		}
+		else if( (i & 0x7000/2) == 0x4000/2 || (i & 0x7000/2) == 0x5000/2 )
+		{
+			if( i & 0x20/2 )
+			{
+				if( i & 0x02/2 )
+				{
+					x ^= 0x0100;
+				}
+			}
+
+			if( i & 0x100/2 )
+			{
+				if( !(i & 0x20/2) || (i & 0x80/2) || (i & 0x400/2) )
+				{
+					x ^= 0x0001;
+				}	
+			}
+			else
+			{
+				if( i & 0x80/2 )
+				{
+					x ^= 0x0001;
+				}
+			}
+		}
+		else if( (i & 0x7000/2) == 0x2000/2 || (i & 0x7000/2) == 0x3000/2 )
+		{
+			if( (i & 0x300/2) == 0x100/2 || (i & 0x300/2) == 0x300/2 )
+			{
+				if( !(i & 0x20/2) || (i & 0x400/2) )
+				{
+					x ^= 0x0001;
+				}
+
+				if( i & 0x20/2 )
+				{
+					if( i & 0x02/2 )
+					{
+						x ^= 0x0100;
+					}
+				}				
+			}
+			else if( (i & 0x300/2) == 0x200/2 )
+			{
+				if( i & 0x20/2 )
+				{
+					if( i & 0x02/2 )
+					{
+						x ^= 0x0100;
+					}
+				}
+			}
+			else
+			{
+				if( i & 0x20/2 )
+				{
+					if( !(i & 0x02/2) )
+					{
+						x ^= 0x0100;
+					}
+				}
+				else
+				{
+					x ^= 0x0100;
+				}
+			}
+		}
+		else if( (i & 0x7000/2) == 0x0000/2 || (i & 0x7000/2) == 0x1000/2)
+		{
+			if( (i & 0x300/2) == 0x100/2 || (i & 0x300/2) == 0x300/2 )
+			{
+				if( i & 0x80/2 )
+				{
+					x ^= 0x0001;
+
+					if( i & 0x20/2 )
+					{
+						if( (i & 0x02/2) )
+						{
+							x ^= 0x0100;
+						}
+					}
+				}
+				else
+				{
+					if( i & 0x20/2 )
+					{
+						if( (i & 0x02/2) )
+						{
+							x ^= 0x0100;
+						}
+					}
+					else if( !(i & 0x400/2) )
+					{
+						x ^= 0x0001;
+					}
+
+					if( i & 0x400/2 )
+					{
+						x ^= 0x0001;
+					}
+				}
+			}
+			else if( (i & 0x300/2) == 0x200/2 )
+			{
+				if( i & 0x80/2 )
+				{			
+					x ^= 0x0001;
+
+					if( i & 0x20/2 )
+					{
+						if( (i & 0x02/2) )
+						{
+							x ^= 0x0100;
+						}
+					}
+				}
+				else
+				{
+					if( (i & 0x20/2) )
+					{
+						if( (i & 0x02/2) )
+						{
+							x ^= 0x0100;
+						}
+					}
+				}
+			}
+			else
+			{
+				if( i & 0x80/2 )
+				{
+					x ^= 0x0001;
+
+					if( i & 0x20/2 )
+					{
+						if( !(i & 0x02/2) )
+						{
+							x ^= 0x0100;
+						}
+					}
+					else
+					{
+						x ^= 0x0100;
+					}
+				}
+				else
+				{
+					if( i & 0x400/2 )
+					{
+						if( i & 0x20/2 )
+						{
+							if( !(i & 0x02/2) )
+								x ^= 0x0100;
+						}
+						else
+						{
+							x ^= 0x0100;
+						}
+					}
+					else
+					{
+						x ^= 0x0100;
+					}
+				}
+			}
+		}
+		
+		src[i] = (x << 8) | (x >> 8);
+	}
+}
 
 GAME( 1998, lhzb2,    0,        igs_m68,    igs_m68,    0, ROT0,  "IGS", "Mahjong Long Hu Zheng Ba 2 (set 1)", GAME_NOT_WORKING )
 GAME( 1998, lhzb2a,   lhzb2,    igs_m68,    igs_m68,    0, ROT0,  "IGS", "Mahjong Long Hu Zheng Ba 2 (set 2)", GAME_NOT_WORKING )
-GAME( 1998, mgcs,     0,        igs_m68,    igs_m68,    0, ROT0,  "IGS", "Mahjong Man Guan Cai Shen", GAME_NOT_WORKING )
+GAME( 1998, mgcs,     0,        igs_m68,    igs_m68,    mgcs, ROT0,  "IGS", "Mahjong Man Guan Cai Shen", GAME_NOT_WORKING )
 GAME( 1998, slqz2,    0,        igs_m68,    igs_m68,    0, ROT0,  "IGS", "Mahjong Shuang Long Qiang Zhu 2", GAME_NOT_WORKING )
 GAME( 1997, sdmg2,    0,        igs_m68,    igs_m68,    0, ROT0,  "IGS", "Mahjong Super Da Man Guan 2", GAME_NOT_WORKING )
 
