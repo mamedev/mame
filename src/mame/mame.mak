@@ -742,7 +742,7 @@ $(MAMEOBJ)/gameplan.a: \
 $(MAMEOBJ)/gametron.a: \
 	$(DRIVERS)/gotya.o $(AUDIO)/gotya.o $(VIDEO)/gotya.o \
 	$(DRIVERS)/sbugger.o $(VIDEO)/sbugger.o \
-	$(DRIVERS)/gatron.o \
+	$(DRIVERS)/gatron.o $(VIDEO)/gatron.o \
 
 $(MAMEOBJ)/gottlieb.a: \
 	$(DRIVERS)/exterm.o $(VIDEO)/exterm.o \
@@ -1710,6 +1710,9 @@ $(DRIVERS)/dlair.o:		$(LAYOUT)/dlair.lh
 $(DRIVERS)/firebeat.o:	$(LAYOUT)/firebeat.lh
 
 $(DRIVERS)/funworld.o:	$(LAYOUT)/funworld.lh
+
+$(DRIVERS)/gatron.o:	$(LAYOUT)/poker41.lh \
+						$(LAYOUT)/pulltabs.lh
 
 $(DRIVERS)/lazercmd.o:	$(LAYOUT)/lazercmd.lh
 
