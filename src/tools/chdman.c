@@ -1553,7 +1553,10 @@ static int do_extractav(int argc, char *argv[], int param)
 		{
 			avierr = avi_append_sound_samples(avi, chnum, avconfig.audio[chnum], numsamples, 0);
 			if (avierr != AVIERR_NONE)
+			{
+				fprintf(stderr, "Error writing samples for hunk %d to AVI file: %s\n", firstframe + framenum, avi_error_string(avierr));
 				goto cleanup;
+			}
 		}
 
 		/* write video */
@@ -1561,7 +1564,10 @@ static int do_extractav(int argc, char *argv[], int param)
 		{
 			avierr = avi_append_video_frame_yuy16(avi, fullbitmap);
 			if (avierr != AVIERR_NONE)
+			{
+				fprintf(stderr, "Error writing video for hunk %d to AVI file: %s\n", firstframe + framenum, avi_error_string(avierr));
 				goto cleanup;
+			}
 		}
 	}
 	progress(TRUE, "Extraction complete!                    \n");
