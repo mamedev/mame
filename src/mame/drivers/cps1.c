@@ -1837,7 +1837,9 @@ static INPUT_PORTS_START( sf2m2 )
 	PORT_INCLUDE( sf2hack )
 
 	PORT_MODIFY("DSWB")
-	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SW(B):5" ) // only if HIGH the game boot
+	PORT_DIPNAME( 0x10, 0x00, "It needs to be High" )						PORT_DIPLOCATION("SW(B):5")
+	PORT_DIPSETTING(    0x10, DEF_STR ( Low ) )
+	PORT_DIPSETTING(    0x00, DEF_STR ( High ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sf2m4 )
