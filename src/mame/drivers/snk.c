@@ -11,7 +11,7 @@ ym3526x2
 Athena, Ikari
 
 ym3526 + y8950
-Victory Road, Psycho Soldier, Bermuda Triangle, Touchdown Fever, Guerilla War
+Victory Road, Psycho Soldier, Bermuda Triangle, Touchdown Fever, Guerrilla War
 
 ym3812 + y8950
 Legofair, Chopper1
@@ -42,6 +42,7 @@ Notes:
   1986 athena: keep 1 pressed during boot
   1986 ikari: keep 1 pressed during boot
   1986 victroad: keep 1 pressed during boot
+  1987 gwar: keep F2 pressed during boot
   1988 fitegolf: use the service mode dip switch
 
 - the I/O area (C000-CFFF) is probably mirrored in large part on the two main
@@ -50,6 +51,10 @@ Notes:
 - there are two versions of the Ikari Warriors board, one has the standard JAMMA
   connector while the other has the custom SNK connector. The video and audio
   PCBs are the same, only the CPU PCB changes.
+
+- gwara seemingly has a different video board. Fix chars and scroll registers are
+  in different locations, while gwar (new) matches the bootleg and original
+  japanese versions.
 
 
 TODO:
@@ -70,11 +75,6 @@ TODO:
 
 
 Bryan McPhail, 27/01/00:
-
-  Made Gwara (the new clone) the main set, and old gwar to gwara.  This is
-  because (what is now) gwara seemingly has a different graphics board.  Fix
-  chars and scroll registers are in different locations, while gwar (new)
-  matches the bootleg and original japanese versions.
 
   Added Bermuda Triangle (alternate), World Wars, these are the 'early'
   versions of the main set with different sprites, gameplay etc.  All roms
@@ -277,12 +277,28 @@ INTERRUPT_GEN( snk_irq_BA )
 	timer_set(ATTOTIME_IN_USEC(snk_irq_delay), NULL, 0, irq_trigger_callback);
 }
 
-// NMI handshakes between CPUs are determined to be much simpler
-READ8_HANDLER ( snk_cpuA_nmi_trigger_r ) { cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE); return 0; }
-WRITE8_HANDLER( snk_cpuA_nmi_ack_w ) { cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE); }
 
-READ8_HANDLER ( snk_cpuB_nmi_trigger_r ) { cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE); return 0; }
-WRITE8_HANDLER( snk_cpuB_nmi_ack_w ) { cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE); }
+READ8_HANDLER ( snk_cpuA_nmi_trigger_r )
+{
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+	return 0;
+}
+
+WRITE8_HANDLER( snk_cpuA_nmi_ack_w )
+{
+	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+READ8_HANDLER ( snk_cpuB_nmi_trigger_r )
+{
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+	return 0;
+}
+
+WRITE8_HANDLER( snk_cpuB_nmi_ack_w )
+{
+	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+}
 
 /*********************************************************************/
 
@@ -321,33 +337,9 @@ static int snk_sound_register;
 
 static int snk_rot( running_machine *machine, int which )
 {
-	static int last_value[2] = {0, 0};
-	static int cp_count[2] = {0, 0};
 	static const char *ports[] = { "IN1", "IN2" };
-	int value = input_port_read(machine, ports[which]);
-	int bttn;
 
-	/* For Guerilla War we add a 0xf0 value for 1 input read once every 8 rotations.
-     * 0xf0 isn't a valid direction, but avoids the "joystick error" protection
-     * which happens when direction changes directly from 0x50<->0x60 8 times.
-     * The rotary joystick is a mechanical 12-way positional switch, so what happens
-     * is that occasionally while rotating the stick none of the switches will be
-     * closed. The protection test verifies that, to prevent replacement of the
-     * rotary stick with a simple TTL counter.
-     * Note that returning 0xf0 just once is enough to disable the test. On the
-     * other hand, always returning 0xf0 inbetween valid values confuses the game.
-    */
-	bttn = value & 0x0f;
-	value &= 0xf0;
-	if ((last_value[which] == 0x50 && value == 0x60) || (last_value[which] == 0x60 && value == 0x50))
-	{
-		if (!cp_count[which]) value = 0xf0;
-		cp_count[which] = (cp_count[which] + 1) & 0x07;
-	}
-	last_value[which] = value;
-	value |= bttn;
-
-	return value;
+	return input_port_read(machine, ports[which]);
 }
 
 static int snk_input_port_r( running_machine *machine, int which ){
@@ -712,6 +704,41 @@ static READ8_HANDLER(hardflags7_r)
 
 
 
+/*****************************************************************************
+
+Guerrilla War protection
+
+We add a 0xf value for 1 input read once every 8 rotations.
+0xf isn't a valid direction, but avoids the "joystick error" protection
+which happens when direction changes directly from 0x5<->0x6 8 times.
+The rotary joystick is a mechanical 12-way positional switch, so what happens
+is that occasionally while rotating the stick none of the switches will be
+closed. The protection test verifies that this happens, to prevent replacement
+of the rotary stick with a simple TTL counter.
+Note that returning 0xf just once is enough to disable the test. On the other
+hand, always returning 0xf inbetween valid values confuses the game.
+
+*****************************************************************************/
+
+CUSTOM_INPUT( gwar_rotary )
+{
+	static int last_value[2] = {0, 0};
+	static int cp_count[2] = {0, 0};
+	static const char *ports[] = { "P1ROT", "P2ROT" };
+	int which = (int)param;
+	int value = input_port_read(field->port->machine, ports[which]);
+
+	if ((last_value[which] == 0x5 && value == 0x6) || (last_value[which] == 0x6 && value == 0x5))
+	{
+		if (!cp_count[which]) value = 0xf;
+		cp_count[which] = (cp_count[which] + 1) & 0x07;
+	}
+	last_value[which] = value;
+
+	return value;
+}
+
+
 /**********************  Tnk3, Athena, Fighting Golf ********************/
 
 static READ8_HANDLER( cpuA_io_r )
@@ -828,14 +855,14 @@ static ADDRESS_MAP_START( tnk3_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(tnk3_videoattrs_w)	// flip screen, char bank, scroll msb
-	AM_RANGE(0xc900, 0xc900) AM_WRITE(tnk3_sp_scrolly_w)
-	AM_RANGE(0xca00, 0xca00) AM_WRITE(tnk3_sp_scrollx_w)
-	AM_RANGE(0xcb00, 0xcb00) AM_WRITE(tnk3_bg_scrolly_w)
-	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(tnk3_bg_scrollx_w)
+	AM_RANGE(0xc900, 0xc900) AM_WRITE(snk_sp16_scrolly_w)
+	AM_RANGE(0xca00, 0xca00) AM_WRITE(snk_sp16_scrollx_w)
+	AM_RANGE(0xcb00, 0xcb00) AM_WRITE(snk_bg_scrolly_w)
+	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(snk_bg_scrollx_w)
 	AM_RANGE(0xcf00, 0xcf00) AM_WRITENOP	// fitegolf/countryc only. Either 0 or 1. Video related?
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE(1) AM_BASE(&spriteram)	// + work ram
-	AM_RANGE(0xd800, 0xf7ff) AM_RAM_WRITE(tnk3_bg_videoram_w) AM_SHARE(2) AM_BASE(&tnk3_bg_videoram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(tnk3_fg_videoram_w) AM_SHARE(3) AM_BASE(&tnk3_fg_videoram)	// + work RAM
+	AM_RANGE(0xd800, 0xf7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(2) AM_BASE(&snk_bg_videoram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(3) AM_BASE(&snk_fg_videoram)	// + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tnk3_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -843,9 +870,9 @@ static ADDRESS_MAP_START( tnk3_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// tnk3, athena
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// fitegolf
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE(1)
-	AM_RANGE(0xd000, 0xefff) AM_RAM_WRITE(tnk3_bg_videoram_w) AM_SHARE(2)
+	AM_RANGE(0xd000, 0xefff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(2)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(tnk3_fg_videoram_w) AM_SHARE(3)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(3)
 ADDRESS_MAP_END
 
 
@@ -859,14 +886,14 @@ static ADDRESS_MAP_START( ikari_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
-	AM_RANGE(0xc800, 0xc800) AM_WRITE(ikari_bg_scrolly_w)
-	AM_RANGE(0xc880, 0xc880) AM_WRITE(ikari_bg_scrollx_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(snk_bg_scrolly_w)
+	AM_RANGE(0xc880, 0xc880) AM_WRITE(snk_bg_scrollx_w)
 	AM_RANGE(0xc900, 0xc900) AM_WRITE(ikari_bg_scroll_msb_w)
 	AM_RANGE(0xc980, 0xc980) AM_WRITE(ikari_unknown_video_w)
-	AM_RANGE(0xca00, 0xca00) AM_WRITE(ikari_sp16_scrolly_w)
-	AM_RANGE(0xca80, 0xca80) AM_WRITE(ikari_sp16_scrollx_w)
-	AM_RANGE(0xcb00, 0xcb00) AM_WRITE(ikari_sp32_scrolly_w)
-	AM_RANGE(0xcb80, 0xcb80) AM_WRITE(ikari_sp32_scrollx_w)
+	AM_RANGE(0xca00, 0xca00) AM_WRITE(snk_sp16_scrolly_w)
+	AM_RANGE(0xca80, 0xca80) AM_WRITE(snk_sp16_scrollx_w)
+	AM_RANGE(0xcb00, 0xcb00) AM_WRITE(snk_sp32_scrolly_w)
+	AM_RANGE(0xcb80, 0xcb80) AM_WRITE(snk_sp32_scrollx_w)
 	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(hardflags_scrolly_w)
 	AM_RANGE(0xcc80, 0xcc80) AM_WRITE(hardflags_scrollx_w)
 	AM_RANGE(0xcd00, 0xcd00) AM_WRITE(ikari_sp_scroll_msb_w)
@@ -879,9 +906,9 @@ static ADDRESS_MAP_START( ikari_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xcea0, 0xcea0) AM_READ(hardflags6_r)
 	AM_RANGE(0xcee0, 0xcee0) AM_READ(hardflags7_r)
 	// note the mirror. ikari and victroad use d800, ikarijp uses d000
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(tnk3_bg_videoram_w) AM_MIRROR(0x0800) AM_SHARE(2) AM_BASE(&tnk3_bg_videoram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_MIRROR(0x0800) AM_SHARE(2) AM_BASE(&snk_bg_videoram)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(3) AM_BASE(&spriteram)	// + work ram
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(tnk3_fg_videoram_w) AM_SHARE(4) AM_BASE(&tnk3_fg_videoram)	// + work RAM
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(4) AM_BASE(&snk_fg_videoram)	// + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ikari_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -898,9 +925,80 @@ static ADDRESS_MAP_START( ikari_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xce80, 0xce80) AM_READ(hardflags5_r)
 	AM_RANGE(0xcea0, 0xcea0) AM_READ(hardflags6_r)
 	AM_RANGE(0xcee0, 0xcee0) AM_READ(hardflags7_r)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(tnk3_bg_videoram_w) AM_MIRROR(0x0800) AM_SHARE(2)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_MIRROR(0x0800) AM_SHARE(2)
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(3)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(tnk3_fg_videoram_w) AM_SHARE(4)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(4)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( gwar_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
+	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
+	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")
+	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE(ikari_coin_counter_w)
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(tnk3_soundlatch_w)
+	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(snk_bg_scrolly_w)
+	AM_RANGE(0xc840, 0xc840) AM_WRITE(snk_bg_scrollx_w)
+	AM_RANGE(0xc880, 0xc880) AM_WRITE(gwar_videoattrs_w)	// flip screen, scroll msb
+	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_fg_bank_w)	// char and palette bank
+	AM_RANGE(0xc900, 0xc900) AM_WRITE(snk_sp16_scrolly_w)
+	AM_RANGE(0xc940, 0xc940) AM_WRITE(snk_sp16_scrollx_w)
+	AM_RANGE(0xc980, 0xc980) AM_WRITE(snk_sp32_scrolly_w)
+	AM_RANGE(0xc9c0, 0xc9c0) AM_WRITE(snk_sp32_scrollx_w)
+	AM_RANGE(0xca00, 0xca00) AM_WRITENOP	// unknown. Always 0?
+	AM_RANGE(0xca40, 0xca40) AM_WRITENOP	// unknown. Always 0?
+	AM_RANGE(0xcac0, 0xcac0) AM_WRITE(gwar_unknown_video_w)	// controls sprite priorities somehow?
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(1) AM_BASE(&snk_bg_videoram)	// + work RAM
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(2) AM_BASE(&spriteram)	// + work ram
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(3) AM_BASE(&snk_fg_videoram)	// + work RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( gwar_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
+	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_fg_bank_w)	// char and palette bank
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(1)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(3)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( gwara_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
+	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
+	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")
+	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE(ikari_coin_counter_w)
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(tnk3_soundlatch_w)
+	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(1) AM_BASE(&snk_fg_videoram)	// + work RAM
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(2) AM_BASE(&snk_bg_videoram)	// + work RAM
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(3) AM_BASE(&spriteram)	// + work ram
+	AM_RANGE(0xf800, 0xf800) AM_WRITE(snk_bg_scrolly_w)
+	AM_RANGE(0xf840, 0xf840) AM_WRITE(snk_bg_scrollx_w)
+	AM_RANGE(0xf880, 0xf880) AM_WRITE(gwara_videoattrs_w)	// flip screen, scroll msb
+	AM_RANGE(0xf8c0, 0xf8c0) AM_WRITE(gwar_fg_bank_w)	// char and palette bank
+	AM_RANGE(0xf900, 0xf900) AM_WRITE(snk_sp16_scrolly_w)
+	AM_RANGE(0xf940, 0xf940) AM_WRITE(snk_sp16_scrollx_w)
+	AM_RANGE(0xf980, 0xf980) AM_WRITE(snk_sp32_scrolly_w)
+	AM_RANGE(0xf9c0, 0xf9c0) AM_WRITE(snk_sp32_scrollx_w)
+	AM_RANGE(0xfa80, 0xfa80) AM_WRITE(gwara_sp_scroll_msb_w)
+	AM_RANGE(0xfac0, 0xfac0) AM_WRITE(gwar_unknown_video_w)	// controls sprite priorities somehow?
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( gwara_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(1)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(2)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(3) AM_BASE(&spriteram)	// + work ram
+	AM_RANGE(0xf8c0, 0xf8c0) AM_WRITE(gwar_fg_bank_w)	// char and palette bank
 ADDRESS_MAP_END
 
 
@@ -1004,21 +1102,21 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) \
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) \
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12) \
+	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
 #define SNK_JOY2_PORT \
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) \
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) \
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) \
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
+	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
 #define SNK_JOY1_NODIAL_PORT \
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) \
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) \
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) \
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 #define SNK_JOY2_NODIAL_PORT \
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) \
@@ -1068,14 +1166,14 @@ static INPUT_PORTS_START( tnk3 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12) \
+	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12) \
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
+	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -1353,14 +1451,14 @@ static INPUT_PORTS_START( ikari )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
+	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
+	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -1478,14 +1576,14 @@ static INPUT_PORTS_START( victroad )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
+	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(5) PORT_KEYDELTA(5) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
+	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
@@ -1566,9 +1664,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gwar )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) 	/* sound related ??? */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundcmd_status, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* causes reset */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )	/* tilt? causes reset */
 	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1576,57 +1674,85 @@ static INPUT_PORTS_START( gwar )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN1")
-	SNK_JOY1_PORT
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gwar_rotary, (void*)0)
 
-
+	PORT_START("P1ROT")
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
 	PORT_START("IN2")
-	SNK_JOY2_PORT
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gwar_rotary, (void*)1)
 
+	PORT_START("P2ROT")
+	PORT_BIT( 0x0f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
 	PORT_START("IN3")
-	SNK_BUTTON_PORT
-
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
+	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" ) PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, "1st & 2nd only" )
 	PORT_DIPSETTING(    0x00, "1st & every 2nd" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	SNK_COINAGE
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DSW1:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, "Freeze" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" ) PORT_DIPLOCATION("DSW2:3,4")
+	PORT_DIPSETTING(    0x0c, "Demo Sounds Off" )
+	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
+	PORT_DIPSETTING(    0x00, "Freeze" )
+	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("DSW2:5,6")
 	PORT_DIPSETTING(    0x30, "30k 60k" )
 	PORT_DIPSETTING(    0x20, "40k 80k" )
 	PORT_DIPSETTING(    0x10, "50k 100k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40 ,0x40, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x40 ,0x40, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
+
+
+
 
 static INPUT_PORTS_START( bermudat )
 	PORT_START("IN0")
@@ -2586,16 +2712,15 @@ static MACHINE_DRIVER_START( gwar )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpuA_map,0)
+	MDRV_CPU_PROGRAM_MAP(gwar_cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpuB_map,0)
+	MDRV_CPU_PROGRAM_MAP(gwar_cpuB_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_PROGRAM_MAP(victroad_YM3526_Y8950_sound_map,0)
 
 	MDRV_INTERLEAVE(100)
 
@@ -2610,19 +2735,32 @@ static MACHINE_DRIVER_START( gwar )
 	MDRV_PALETTE_LENGTH(0x400)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_VIDEO_START(snk)
+	MDRV_VIDEO_START(gwar)
 	MDRV_VIDEO_UPDATE(gwar)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM3526, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym3526_interface_0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_CONFIG(athena_ym3526_interface_1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
 	MDRV_SOUND_ADD("ym2", Y8950, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(y8950_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_CONFIG(victroad_y8950_config_2)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( gwara )
+
+	MDRV_IMPORT_FROM(gwar)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(gwara_cpuA_map,0)
+
+	MDRV_CPU_MODIFY("sub")
+	MDRV_CPU_PROGRAM_MAP(gwara_cpuB_map,0)
 MACHINE_DRIVER_END
 
 
@@ -2656,7 +2794,7 @@ static MACHINE_DRIVER_START( bermudat )
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MDRV_VIDEO_START(snk)
-	MDRV_VIDEO_UPDATE(gwar)
+	MDRV_VIDEO_UPDATE(old_gwar)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2700,7 +2838,7 @@ static MACHINE_DRIVER_START( psychos )
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MDRV_VIDEO_START(snk)
-	MDRV_VIDEO_UPDATE(gwar)
+	MDRV_VIDEO_UPDATE(old_gwar)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2744,7 +2882,7 @@ static MACHINE_DRIVER_START( chopper1 )
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
 	MDRV_VIDEO_START(snk)
-	MDRV_VIDEO_UPDATE(gwar)
+	MDRV_VIDEO_UPDATE(old_gwar)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -4599,20 +4737,6 @@ static const SNK_INPUT_PORT_TYPE tdfever_io[SNK_MAX_INPUT_PORTS] = {
 	/* c080 */ SNK_INP9		/* Start games type C & D */
 };
 
-static DRIVER_INIT( gwar ){
-	snk_sound_busy_bit = 0x01;
-	snk_io = ikari_io;
-	videoram = snk_rambase + 0x800;
-	snk_gamegroup = 2;
-}
-
-static DRIVER_INIT( gwara ){
-	snk_sound_busy_bit = 0x01;
-	snk_io = ikari_io;
-	videoram = snk_rambase + 0x800;
-	snk_gamegroup = 4;
-}
-
 static DRIVER_INIT( chopper ){
 	snk_sound_busy_bit = 0x01;
 	snk_io = athena_io;
@@ -4685,7 +4809,8 @@ static DRIVER_INIT( countryc )
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc300, 0xc300, 0, 0, countryc_trackball_w);
 }
 
-/*          rom       parent    machine   inp       init */
+
+/* screen size 288x216 */
 GAME( 1985, tnk3,     0,        tnk3,     tnk3,     0,        ROT270, "SNK", "T.N.K III (US)", 0 )
 GAME( 1985, tnk3j,    tnk3,     tnk3,     tnk3,     0,        ROT270, "SNK", "T.A.N.K (Japan)", 0 )
 GAME( 1986, athena,   0,        athena,   athena,   0,        ROT0,   "SNK", "Athena", 0 )
@@ -4699,10 +4824,12 @@ GAME( 1986, ikarijpb, ikari,    ikari,    ikarijpb, 0,        ROT270, "bootleg",
 GAME( 1986, victroad, 0,        victroad, victroad, 0,        ROT270, "SNK", "Victory Road", 0 )
 GAME( 1986, dogosoke, victroad, victroad, victroad, 0,        ROT270, "SNK", "Dogou Souken", 0 )
 GAME( 1986, dogosokb, victroad, victroad, dogosokb, 0,        ROT270, "bootleg", "Dogou Souken (Joystick hack bootleg)", 0 )
-GAME( 1987, gwar,     0,        gwar,     gwar,     gwar,     ROT270, "SNK", "Guerrilla War (US)", GAME_NO_COCKTAIL )
-GAME( 1987, gwarj,    gwar,     gwar,     gwar,     gwar,     ROT270, "SNK", "Guevara (Japan)", GAME_NO_COCKTAIL )
-GAME( 1987, gwara,    gwar,     gwar,     gwar,     gwara,    ROT270, "SNK", "Guerrilla War (Version 1)", GAME_NO_COCKTAIL )
-GAME( 1987, gwarb,    gwar,     gwar,     gwar,     gwar,     ROT270, "bootleg", "Guerrilla War (bootleg)", GAME_NO_COCKTAIL )
+
+/* screen size 384x224 */
+GAME( 1987, gwar,     0,        gwar,     gwar,     0,        ROT270, "SNK", "Guerrilla War (US)", 0 )
+GAME( 1987, gwarj,    gwar,     gwar,     gwar,     0,        ROT270, "SNK", "Guevara (Japan)", 0 )
+GAME( 1987, gwara,    gwar,     gwara,    gwar,     0,        ROT270, "SNK", "Guerrilla War (Version 1)", 0 )
+GAME( 1987, gwarb,    gwar,     gwar,     gwar,     0,        ROT270, "bootleg", "Guerrilla War (bootleg)", 0 )
 GAME( 1987, bermudat, 0,        bermudat, bermudat, bermudat, ROT270, "SNK", "Bermuda Triangle (Japan)", GAME_NO_COCKTAIL )
 GAME( 1987, bermudao, bermudat, bermudat, bermudat, bermudat, ROT270, "SNK", "Bermuda Triangle (Japan old version)", GAME_NO_COCKTAIL )
 GAME( 1987, bermudaa, bermudat, bermudat, bermudaa, worldwar, ROT270, "SNK", "Bermuda Triangle (US older version)", GAME_NO_COCKTAIL )
