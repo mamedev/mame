@@ -2566,6 +2566,17 @@ static INTERRUPT_GEN( coh1002v_vblank )
 			psxwritebyte(0x0db423, 1);
 		}
 	}
+	if(strcmp( machine->gamedrv->name, "aerofgts" ) == 0 ) /* These need to be corrected for this game */
+	{
+		if (psxreadbyte(0x0db422) == 0) /* WRONG!!!- Copied from sncwgltd */
+		{
+			psxwritebyte(0x0db422, 1); /* WRONG!!!- Copied from sncwgltd */
+		}
+		if (psxreadbyte(0x0db423) == 0) /* WRONG!!!- Copied from sncwgltd */
+		{
+			psxwritebyte(0x0db423, 1); /* WRONG!!!- Copied from sncwgltd */
+		}
+	}
 	psx_vblank(machine, cpunum);
 }
 
