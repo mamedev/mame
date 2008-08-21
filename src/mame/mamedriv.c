@@ -2827,8 +2827,8 @@ V-V                           TP-027
 
 	/* Video System ZN1 */
 	DRIVER( vspsx )
-	DRIVER( sncwgltd )	/* Sonic Wings Limited (JAPAN) */
 	DRIVER( aerofgts )	/* Aero Fighters Special (TAIWAN) */
+	DRIVER( sncwgltd )	/* Sonic Wings Limited (JAPAN) */
 
 	/* Taito FX1a */
 	DRIVER( taitofx1 )

@@ -180,8 +180,8 @@ static const struct
 	{ "gdariusb", tt01, tt07 }, /* OK */
 	{ "gdarius2", tt01, tt07 }, /* OK */
 	{ "taitogn",  tt10, tt16 }, /* shows gnet logo */
+	{ "aerofgts", kn01, kn02 }, /* OK */
 	{ "sncwgltd", kn01, kn02 }, /* OK */
-	{ "aerofgts", kn01, kn02 }, /* Need kludge to stop dropping into test mode on bootup */
 	{ NULL, NULL, NULL }
 };
 
@@ -2555,6 +2555,18 @@ static MACHINE_RESET( coh1002v )
 static INTERRUPT_GEN( coh1002v_vblank )
 {
 	/* kludge: to stop dropping into test mode on bootup */
+	if(strcmp( machine->gamedrv->name, "aerofgts" ) == 0 )
+	{
+		if (psxreadbyte(0x0db49a) == 0)
+		{
+			psxwritebyte(0x0db49a, 1);
+		}
+		if (psxreadbyte(0x0db49b) == 0)
+		{
+			psxwritebyte(0x0db49b, 1);
+		}
+	}
+	/* kludge: to stop dropping into test mode on bootup */
 	if(strcmp( machine->gamedrv->name, "sncwgltd" ) == 0 )
 	{
 		if (psxreadbyte(0x0db422) == 0)
@@ -2564,17 +2576,6 @@ static INTERRUPT_GEN( coh1002v_vblank )
 		if (psxreadbyte(0x0db423) == 0)
 		{
 			psxwritebyte(0x0db423, 1);
-		}
-	}
-	if(strcmp( machine->gamedrv->name, "aerofgts" ) == 0 ) /* These need to be corrected for this game */
-	{
-		if (psxreadbyte(0x0db422) == 0) /* WRONG!!!- Copied from sncwgltd */
-		{
-			psxwritebyte(0x0db422, 1); /* WRONG!!!- Copied from sncwgltd */
-		}
-		if (psxreadbyte(0x0db423) == 0) /* WRONG!!!- Copied from sncwgltd */
-		{
-			psxwritebyte(0x0db423, 1); /* WRONG!!!- Copied from sncwgltd */
 		}
 	}
 	psx_vblank(machine, cpunum);
@@ -3868,25 +3869,6 @@ ROM_START( vspsx )
 	KN_BIOS
 ROM_END
 
-ROM_START( sncwgltd )
-	KN_BIOS
-
-	ROM_REGION32_LE( 0x0280000, "user2", 0 )
-	ROM_LOAD( "ic5.bin",      0x0000000, 0x080000, CRC(458f14aa) SHA1(b4e50be60ffb9b7911561dd35b6a7e0df3432a3a) )
-	ROM_LOAD( "ic6.bin",      0x0080000, 0x080000, CRC(8233dd1e) SHA1(1422b4530d671e3b8b471ec16c20ef7c819ab762) )
-	ROM_LOAD( "ic7.bin",      0x0100000, 0x080000, CRC(df5ba2f7) SHA1(19153084e7cff632380b67a2fff800644a2fbf7d) )
-	ROM_LOAD( "ic8.bin",      0x0180000, 0x080000, CRC(e8145f2b) SHA1(3a1cb189426998856dfeda47267fde64be34c6ec) )
-	ROM_LOAD( "ic9.bin",      0x0200000, 0x080000, CRC(605c9370) SHA1(9734549cae3028c089f4c9f2336ee374b3f950f8) )
-
-	ROM_REGION32_LE( 0x1800000, "user3", 0 )
-	ROM_LOAD( "ic11.bin",     0x0000000, 0x400000, CRC(a93f6fee) SHA1(6f079643b50833f8fb497c49945ad23326cc9170) )
-	ROM_LOAD( "ic12.bin",     0x0400000, 0x400000, CRC(9f584ef7) SHA1(12c04e198f17d1915f58e83aff45ca2e76773df8) )
-	ROM_LOAD( "ic13.bin",     0x0800000, 0x400000, CRC(652e9c78) SHA1(a929b2944de72606338acb822c1031463e2b1cc5) )
-	ROM_LOAD( "ic14.bin",     0x0c00000, 0x400000, CRC(c4ef1424) SHA1(1734a6ee6d0be94d24afefcf2a125b74747f53d0) )
-	ROM_LOAD( "ic15.bin",     0x1000000, 0x400000, CRC(2551d816) SHA1(e1500d4bfa8cc55220c366a5852263ac2070da82) )
-	ROM_LOAD( "ic16.bin",     0x1400000, 0x400000, CRC(21b401bc) SHA1(89374b80453c474aa1dd3a219422f557f95a262c) )
-ROM_END
- 
 ROM_START( aerofgts )
 	KN_BIOS
 
@@ -3906,6 +3888,25 @@ ROM_START( aerofgts )
 	ROM_LOAD( "ic16.bin",     0x1400000, 0x400000, CRC(21b401bc) SHA1(89374b80453c474aa1dd3a219422f557f95a262c) )
 ROM_END
 
+ROM_START( sncwgltd )
+	KN_BIOS
+
+	ROM_REGION32_LE( 0x0280000, "user2", 0 )
+	ROM_LOAD( "ic5.bin",      0x0000000, 0x080000, CRC(458f14aa) SHA1(b4e50be60ffb9b7911561dd35b6a7e0df3432a3a) )
+	ROM_LOAD( "ic6.bin",      0x0080000, 0x080000, CRC(8233dd1e) SHA1(1422b4530d671e3b8b471ec16c20ef7c819ab762) )
+	ROM_LOAD( "ic7.bin",      0x0100000, 0x080000, CRC(df5ba2f7) SHA1(19153084e7cff632380b67a2fff800644a2fbf7d) )
+	ROM_LOAD( "ic8.bin",      0x0180000, 0x080000, CRC(e8145f2b) SHA1(3a1cb189426998856dfeda47267fde64be34c6ec) )
+	ROM_LOAD( "ic9.bin",      0x0200000, 0x080000, CRC(605c9370) SHA1(9734549cae3028c089f4c9f2336ee374b3f950f8) )
+
+	ROM_REGION32_LE( 0x1800000, "user3", 0 )
+	ROM_LOAD( "ic11.bin",     0x0000000, 0x400000, CRC(a93f6fee) SHA1(6f079643b50833f8fb497c49945ad23326cc9170) )
+	ROM_LOAD( "ic12.bin",     0x0400000, 0x400000, CRC(9f584ef7) SHA1(12c04e198f17d1915f58e83aff45ca2e76773df8) )
+	ROM_LOAD( "ic13.bin",     0x0800000, 0x400000, CRC(652e9c78) SHA1(a929b2944de72606338acb822c1031463e2b1cc5) )
+	ROM_LOAD( "ic14.bin",     0x0c00000, 0x400000, CRC(c4ef1424) SHA1(1734a6ee6d0be94d24afefcf2a125b74747f53d0) )
+	ROM_LOAD( "ic15.bin",     0x1000000, 0x400000, CRC(2551d816) SHA1(e1500d4bfa8cc55220c366a5852263ac2070da82) )
+	ROM_LOAD( "ic16.bin",     0x1400000, 0x400000, CRC(21b401bc) SHA1(89374b80453c474aa1dd3a219422f557f95a262c) )
+ROM_END
+ 
 
 /* Taito FX1a/FX1b */
 
@@ -4501,8 +4502,8 @@ GAME( 2001, mfjump,   tps,      coh1002m, zn, coh1002m, ROT0, "Tecmo", "Monster 
 /* it in every zip file */
 GAME( 1996, vspsx,    0,        coh1002v, zn, coh1002v, ROT0,   "Video System", "Video System PSX", GAME_IS_BIOS_ROOT )
 
-GAME( 1996, sncwgltd, vspsx,    coh1002v, zn, coh1002v, ROT270, "Video System", "Sonic Wings Limited (JAPAN)",    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1996, aerofgts, sncwgltd, coh1002v, zn, coh1002v, ROT270, "Video System", "Aero Fighters Special (TAIWAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1996, aerofgts, vspsx,    coh1002v, zn, coh1002v, ROT270, "Video System", "Aero Fighters Special (TAIWAN)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, sncwgltd, aerofgts, coh1002v, zn, coh1002v, ROT270, "Video System", "Sonic Wings Limited (JAPAN)",    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 /* Taito */
 
