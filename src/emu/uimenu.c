@@ -556,6 +556,8 @@ void ui_menu_item_append(ui_menu *menu, const char *text, const char *subtext, U
 	/* update the selection if we need to */
 	if (menu->resetpos == index || (menu->resetref != NULL && menu->resetref == ref))
 		menu->selected = index;
+	if (menu->resetpos == menu->numitems - 1)
+		menu->selected = menu->numitems - 1;
 }
 
 
