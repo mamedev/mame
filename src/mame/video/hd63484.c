@@ -840,6 +840,116 @@ void line(INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col)
 
 }
 
+void paint(int sx, int sy, int col)
+{
+	int getpixel;
+	dot(sx,sy,0,col);
+
+	getpixel = get_pixel(sx+1,sy);
+	switch ((HD63484_reg[0x02/2] & 0x700) >> 8)
+	{
+		case 0:
+			break;
+		case 1:
+			break;
+		case 2:
+			getpixel = (getpixel << 12) | (getpixel << 8) | (getpixel << 4) | (getpixel << 0);
+			break;
+		case 3:
+			getpixel = (getpixel << 8) | (getpixel << 0);
+			break;
+		case 4:
+			break;
+
+		default:
+			logerror ("Graphic bit mode not supported\n");
+	}
+	if ((getpixel != col) && (getpixel != edg))
+		{
+			sx++;
+			paint(sx,sy,col);
+			sx--;
+		}
+
+	getpixel = get_pixel(sx-1,sy);
+	switch ((HD63484_reg[0x02/2] & 0x700) >> 8)
+	{
+		case 0:
+			break;
+		case 1:
+			break;
+		case 2:
+			getpixel = (getpixel << 12) | (getpixel << 8) | (getpixel << 4) | (getpixel << 0);
+			break;
+		case 3:
+			getpixel = (getpixel << 8) | (getpixel << 0);
+			break;
+		case 4:
+			break;
+
+		default:
+			logerror ("Graphic bit mode not supported\n");
+	}
+	if ((getpixel != col) && (getpixel != edg))
+		{
+			sx--;
+			paint(sx,sy,col);
+			sx++;
+		}
+
+	getpixel = get_pixel(sx,sy+1);
+	switch ((HD63484_reg[0x02/2] & 0x700) >> 8)
+	{
+		case 0:
+			break;
+		case 1:
+			break;
+		case 2:
+			getpixel = (getpixel << 12) | (getpixel << 8) | (getpixel << 4) | (getpixel << 0);
+			break;
+		case 3:
+			getpixel = (getpixel << 8) | (getpixel << 0);
+			break;
+		case 4:
+			break;
+
+		default:
+			logerror ("Graphic bit mode not supported\n");
+	}
+	if ((getpixel != col) && (getpixel != edg))
+		{
+			sy++;
+			paint(sx,sy,col);
+			sy--;
+		}
+
+	getpixel = get_pixel(sx,sy-1);
+	switch ((HD63484_reg[0x02/2] & 0x700) >> 8)
+	{
+		case 0:
+			break;
+		case 1:
+			break;
+		case 2:
+			getpixel = (getpixel << 12) | (getpixel << 8) | (getpixel << 4) | (getpixel << 0);
+			break;
+		case 3:
+			getpixel = (getpixel << 8) | (getpixel << 0);
+			break;
+		case 4:
+			break;
+
+		default:
+			logerror ("Graphic bit mode not supported\n");
+	}
+	if ((getpixel != col) && (getpixel != edg))
+		{
+			sy--;
+			paint(sx,sy,col);
+			sy++;
+		}
+}
+
 static void HD63484_command_w(UINT16 cmd)
 {
 	int len;
@@ -1106,9 +1216,7 @@ static void HD63484_command_w(UINT16 cmd)
 		}
 		else if (fifo[0] == 0xc800)	/* PAINT */
 		{
-			// int i;
-			// for (i=-2; i<90; i++)
-			//	line(cpx,cpy+i,cpx+60,cpy+i,0x0000);
+			paint(cpx,cpy,cl0);
 		}
 		else if ((fifo[0] & 0xfff8) == 0xcc00)	/* DOT */
 		{
