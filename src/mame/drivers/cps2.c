@@ -640,7 +640,7 @@ static INTERRUPT_GEN( cps2_interrupt )
 
 	/* 2 is vblank, 4 is some sort of scanline interrupt, 6 is both at the same time. */
 
-	if(scancount >= 261)
+	if(scancount >= 258)
 	{
 		scancount = -1;
 		cps1_scancalls = 0;
@@ -676,7 +676,7 @@ static INTERRUPT_GEN( cps2_interrupt )
 //          popmessage("IRQ4 scancounter = %04i",scancount);
 	}
 
-	if(scancount == 256)  /* VBlank */
+	if(scancount == 240)  /* VBlank */
 	{
 		cps1_cps_b_regs[0x10/2] = cps1_scanline1;
 		cps1_cps_b_regs[0x12/2] = cps1_scanline2;
@@ -1231,16 +1231,14 @@ static const m68k_encryption_interface cps2_encryption =
 static MACHINE_DRIVER_START( cps2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)
 	MDRV_CPU_CONFIG(cps2_encryption)
 	MDRV_CPU_PROGRAM_MAP(cps2_readmem,cps2_writemem)
-	MDRV_CPU_VBLANK_INT_HACK(cps2_interrupt,262)	// 262  /* ??? interrupts per frame */
+	MDRV_CPU_VBLANK_INT_HACK(cps2_interrupt,259)	// 262  /* ??? interrupts per frame */
 
 	MDRV_CPU_ADD("audio", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(qsound_sub_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 251)	/* 251 is good (see 'mercy mercy mercy'section of sgemf attract mode for accurate sound sync */
-
-//  MDRV_INTERLEAVE(262)  /* 262 scanlines, for raster effects */
 
 	MDRV_NVRAM_HANDLER(cps2)
 
@@ -1248,12 +1246,19 @@ static MACHINE_DRIVER_START( cps2 )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.633333)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
-
+	MDRV_SCREEN_RAW_PARAMS(XTAL_8MHz, 518, 64, 448, 259, 16, 240)
+/*
+	Measured clocks:
+		V = 59.6376Hz
+		H = 15.4445kHz
+		H/V = 258.973 ~ 259 lines
+	
+	Possible video clocks:
+		60MHz / 15.4445kHz = 3884.878 / 8 = 485.610 -> unlikely
+		 8MHz / 15.4445kHz =  517.983 ~ 518 -> likely
+		16MHz -> same as 8 but with a /2 divider; also a possibility
+*/
 	MDRV_GFXDECODE(cps2)
 	MDRV_PALETTE_LENGTH(0xc00)
 
