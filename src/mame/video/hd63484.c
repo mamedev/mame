@@ -318,8 +318,8 @@ static void dot(int x, int y, int opm, UINT16 color)
 			logerror ("Graphic bit mode not supported\n");
 	}
 
-	// bpp = 4;
-	// bitmask = 0x000f;
+	// bpp = 4;          // for skattva
+	// bitmask = 0x000f; // for skattva
 
 	if (x >= 0)
 	{
@@ -335,6 +335,7 @@ static void dot(int x, int y, int opm, UINT16 color)
 			x_mod = (16 / bpp) - x_mod;
 		}
 	}
+
 	color &= bitmask;
 
 	bitmask_shifted = bitmask << (x_mod * bpp);
@@ -524,7 +525,7 @@ static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,I
 	else if ((_ax >= 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0800))
 		{ src_step1_x =  0; src_step1_y = -1; src_step2_x =   1; src_step2_y = -ay; }
 	else if ((_ax < 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0800))
-		{ src_step1_x =  0; src_step1_y =  1; src_step2_x =  -1; src_step2_y = -ay; }
+		{ src_step1_x =  0; src_step1_y =  1; src_step2_x =  -1; src_step2_y = -ay; printf("here\n");}
 	else // ((_ax < 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0800))
 		{ src_step1_x =  0; src_step1_y = -1; src_step2_x =  -1; src_step2_y = -ay; }
 
@@ -1026,7 +1027,9 @@ static void HD63484_command_w(UINT16 cmd)
 					rwp_dn = (fifo[1] & 0xc000) >> 14;
 				}
 			else if (fifo[0] == 0x080d)
-				rwp = (rwp & 0xff000) | ((fifo[1] & 0xfff0) >> 4);
+				{
+					rwp = (rwp & 0xff000) | ((fifo[1] & 0xfff0) >> 4);
+				}
 			else
 				logerror("unsupported register\n");
 		}
@@ -1045,13 +1048,12 @@ static void HD63484_command_w(UINT16 cmd)
 		}
 		else if (fifo[0] == 0x4800)	/* WT */
 		{
-			if (!input_code_pressed(KEYCODE_9)) HD63484_ram[rwp] = fifo[1];
+			HD63484_ram[rwp] = fifo[1];
 			rwp = (rwp + 1) & (HD63484_RAM_SIZE-1);
 		}
 		else if (fifo[0] == 0x5800)	/* CLR */
 		{
 			doclr16(fifo[0],fifo[1],&rwp,fifo[2],fifo[3]);
-
 
             {
                 int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
@@ -1064,7 +1066,6 @@ static void HD63484_command_w(UINT16 cmd)
 		else if ((fifo[0] & 0xfffc) == 0x5c00)	/* SCLR */
 		{
 			doclr16(fifo[0],fifo[1],&rwp,fifo[2],fifo[3]);
-
 
             {
                 int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
@@ -1089,7 +1090,6 @@ static void HD63484_command_w(UINT16 cmd)
 		else if ((fifo[0] & 0xf0fc) == 0x7000)	/* SCPY */
 		{
 			docpy16(fifo[0],((fifo[1] & 0x00ff) << 12) | ((fifo[2] & 0xfff0) >> 4),&rwp,fifo[3],fifo[4]);
-
 
             {
                 int fifo2 = (int)fifo[2],fifo3 = (int)fifo[3];
@@ -1271,9 +1271,9 @@ static void HD63484_command_w(UINT16 cmd)
 					// missing
 				}
 		}
-		else if ((fifo[0] & 0xf0f8) == 0xe000)	/* AGCPY */
+		else if ((fifo[0] & 0xf018) == 0xe000)	/* AGCPY */
 		{
-			agcpy(fifo[0],fifo[1],fifo[2],cpx,cpy,fifo[3],fifo[4]);
+			agcpy(fifo[0],(INT16)fifo[1],(INT16)fifo[2],cpx,cpy,fifo[3],fifo[4]);
 
 			switch (fifo[0] & 0x0700)
 			{
