@@ -451,6 +451,9 @@ static void discrete_reset(void *chip)
 		/* otherwise, just step it */
 		else if (node->module.step)
 			(*node->module.step)(node);
+
+		/* and register save state */
+		state_save_register_item_array("discrete", nodenum, node->output);
 	}
 
 	discrete_current_context = NULL;
@@ -665,6 +668,7 @@ static void init_nodes(discrete_info *info, discrete_sound_block *block_list)
 			node->context = NULL;
 			info->discrete_input_streams++;
 		}
+		
 	}
 
 	/* if no outputs, give an error */
