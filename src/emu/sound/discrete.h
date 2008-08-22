@@ -2794,7 +2794,7 @@
  *    {
  *        options,        - bit mapped options
  *        v_pos,          - B+ voltage of 555
- *        v_charge,       - voltage to charge circuit  (Defaults to v_pos)
+ *        v_charge,       - voltage (or node) to charge circuit  (Defaults to v_pos)
  *        v_out_high,     - High output voltage of 555 (Defaults to v_pos - 1.2V)
  *    }
  *
@@ -2888,6 +2888,7 @@
  *                          address of discrete_555_desc structure)
  *
  *    discrete_555_desc = See DISCRETE_555_ASTABLE for description.
+ *      Note: v_charge can not be a node for this circuit.
  *
  *  Trigger Types
  *     DISC_555_TRIGGER_IS_LOGIC   - Input is (0 or !0) logic (DEFAULT)
@@ -3055,9 +3056,9 @@
  *
  * DISCRETE_566 - NE566 VCO simulation.
  *
- *                       vPlus
- *                         V
- *           .-------------+
+ *       v_charge        v_pos
+ *           V             V
+ *           |             |
  *           |             |
  *           |    R    .-------.
  *           '---/\/\--|6  8   |
@@ -3069,7 +3070,7 @@
  *                ---      |
  *                --- C    |
  *                 |       |
- *                vNeg    vNeg
+ *               v_neg   v_neg
  *
  *  Declaration syntax
  *
@@ -3080,7 +3081,9 @@
  *                  C node or static value in Farads,
  *                  address of discrete_566_desc structure)
  *
- *     discrete_566_desc = {options, vPlus, vNeg}
+ *     discrete_566_desc = {options, v_pos, v_neg, v_charge}
+ *       Note: v_charge can be static value, a node
+ *             or use DEFAULT_566_CHARGE to connect to v_pos
  *
  *  Output Types:
  *     DISC_566_OUT_DC - Output is actual DC. (DEFAULT)
@@ -3326,10 +3329,7 @@
 /* Mixer types */
 #define DISC_MIXER_IS_RESISTOR			0
 #define DISC_MIXER_IS_OP_AMP			1
-
 #define DISC_MIXER_IS_OP_AMP_WITH_RI 	2	// Used only internally.  Use DISC_MIXER_IS_OP_AMP
-#define DISC_MIXER_TYPE_MASK			3	// Used only internally.
-#define DISC_MIXER_HAS_R_NODE			4	// Used only internally.
 
 /* Triggered Op Amp Functions */
 enum
@@ -3429,6 +3429,8 @@ enum
 
 #define DISC_566_OUT_MASK				0x30	/* Bits that define output type.
                                                  * Used only internally in module. */
+#define DEFAULT_566_CHARGE	-1
+
 /* LS624 output flags */
 #define DISC_LS624_OUT_ENERGY			0x01
 #define DISC_LS624_OUT_LOGIC			0x02
@@ -3754,8 +3756,9 @@ typedef struct _discrete_566_desc discrete_566_desc;
 struct _discrete_566_desc
 {
 	int		options;	// bit mapped options
-	double	vPlus;		// B+ voltage of 566
-	double	vNeg;		// B- voltage of 566
+	double	v_pos;		// B+ voltage of 566
+	double	v_neg;		// B- voltage of 566
+	double	v_charge;
 };
 
 
@@ -3862,9 +3865,9 @@ enum {
 #define NODE_SUB(_x, _y) (NODE(_x) + (_y))
 
 #if DISCRETE_MAX_NODE_OUTPUTS == 8
-#define NODE_CHILD_NODE_NUM(_x)		((_x) & 7)
-#define NODE_DEFAULT_NODE(_x)		((_x) & ~7)
-#define NODE_INDEX(_x)				(((_x) - NODE_START)>>3)
+#define NODE_CHILD_NODE_NUM(_x)		((int)(_x) & 7)
+#define NODE_DEFAULT_NODE(_x)		((int)(_x) & ~7)
+#define NODE_INDEX(_x)				(((int)(_x) - NODE_START)>>3)
 #else
 #error "DISCRETE_MAX_NODE_OUTPUTS != 8"
 #endif

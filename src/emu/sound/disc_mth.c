@@ -70,6 +70,7 @@ struct dst_mixer_context
 {
 	int		type;
 	int		size;
+	int		has_r_node;
 	double	r_total;
 	double *r_node[DISC_MIXER_MAX_INPS];		/* Either pointer to resistance node output OR NULL */
 	double	exponent_rc[DISC_MIXER_MAX_INPS];	/* For high pass filtering cause by cIn */
@@ -992,8 +993,8 @@ static void dst_lookup_table_step(node_description *node)
 
 static void dst_mixer_step(node_description *node)
 {
-	const discrete_mixer_desc *info = node->custom;
-	struct dst_mixer_context *context = node->context;
+	const  discrete_mixer_desc *info    = node->custom;
+	struct dst_mixer_context   *context = node->context;
 
 	double	v, vTemp, r_total, rTemp, rTemp2 = 0;
 	double	i = 0;		/* total current of inputs */
@@ -1003,15 +1004,18 @@ static void dst_mixer_step(node_description *node)
 	{
 		r_total = context->r_total;
 
-		if (context->type & DISC_MIXER_HAS_R_NODE)
+		if (context->has_r_node)
 		{
-			for(bit = 0; bit < context->size; bit++)
+			/* loop and do any high pass filtering for connected caps */
+			/* but first see if there is an r_node for the current path */
+			/* if so, then the exponents need to be re-calculated */
+			for (bit = 0; bit < context->size; bit++)
 			{
 				rTemp     = info->r[bit];
 				connected = 1;
 				vTemp     = DST_MIXER__IN(bit);
-
-				if (info->r_node[bit])
+	
+				if (context->r_node[bit] != NULL)
 				{
 					/* a node has the posibility of being disconnected from the circuit. */
 					if (*context->r_node[bit] == 0)
@@ -1022,7 +1026,7 @@ static void dst_mixer_step(node_description *node)
 						r_total += 1.0 / rTemp;
 						if (info->c[bit] != 0)
 						{
-							switch (context->type & DISC_MIXER_TYPE_MASK)
+							switch (context->type)
 							{
 								case DISC_MIXER_IS_RESISTOR:
 									/* is there an rF? */
@@ -1045,7 +1049,7 @@ static void dst_mixer_step(node_description *node)
 						}
 					}
 				}
-
+	
 				if (connected)
 				{
 					if (info->c[bit] != 0)
@@ -1054,12 +1058,13 @@ static void dst_mixer_step(node_description *node)
 						context->v_cap[bit] += (vTemp - info->vRef - context->v_cap[bit]) * context->exponent_rc[bit];
 						vTemp -= context->v_cap[bit];
 					}
-					i += (((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP) ? info->vRef - vTemp : vTemp) / rTemp;
+					i += ((context->type == DISC_MIXER_IS_OP_AMP) ? info->vRef - vTemp : vTemp) / rTemp;
 				}
 			}
 		}
 		else
 		{
+			/* no r_nodes, so just do high pass filtering */
 			for (bit = 0; bit < context->size; bit++)
 			{
 				rTemp = info->r[bit];
@@ -1071,26 +1076,26 @@ static void dst_mixer_step(node_description *node)
 					context->v_cap[bit] += (vTemp - info->vRef - context->v_cap[bit]) * context->exponent_rc[bit];
 					vTemp -= context->v_cap[bit];
 				}
-				i += (((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP) ? info->vRef - vTemp : vTemp) / rTemp;
+				i += ((context->type == DISC_MIXER_IS_OP_AMP) ? info->vRef - vTemp : vTemp) / rTemp;
 			}
 		}
 
-		if ((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP_WITH_RI)
+		if (context->type == DISC_MIXER_IS_OP_AMP_WITH_RI)
 			i += info->vRef / info->rI;
 
 		r_total = 1.0 / r_total;
 
 		/* If resistor network or has rI then Millman is used.
          * If op-amp then summing formula is used. */
-		v = i * (((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP) ? info->rF : r_total);
+		v = i * ((context->type == DISC_MIXER_IS_OP_AMP) ? info->rF : r_total);
 
-		if ((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP_WITH_RI)
+		if (context->type == DISC_MIXER_IS_OP_AMP_WITH_RI)
 			v = info->vRef + (context->gain * (info->vRef - v));
 
 		/* Do the low pass filtering for cF */
 		if (info->cF != 0)
 		{
-			if (context->type & DISC_MIXER_HAS_R_NODE)
+			if (context->has_r_node)
 			{
 				/* Re-calculate exponent if resistor nodes are used */
 				context->exponent_c_f = -1.0 / (r_total * info->cF  * discrete_current_context->sample_rate);
@@ -1124,11 +1129,15 @@ static void dst_mixer_reset(node_description *node)
 	double	rTemp = 0;
 
 	/* link to r_node outputs */
-	for (bit = 0; bit < 8; bit ++)
+	context->has_r_node = 0;
+	for (bit = 0; bit < 8; bit++)
 	{
 		r_node = discrete_find_node(NULL, info->r_node[bit]);
 		if (r_node)
+		{
 			context->r_node[bit] = &(r_node->output[NODE_CHILD_NODE_NUM(info->r_node[bit])]);
+			context->has_r_node = 1;
+		}
 		else
 			context->r_node[bit] = NULL;
 	}
@@ -1141,7 +1150,9 @@ static void dst_mixer_reset(node_description *node)
      * then you deserve a crash.
      */
 
-	context->type = ((info->type == DISC_MIXER_IS_OP_AMP) && info->rI) ? DISC_MIXER_IS_OP_AMP_WITH_RI : info->type;
+	context->type = info->type;
+	if ((info->type == DISC_MIXER_IS_OP_AMP) && (info->rI != 0))
+		context->type = DISC_MIXER_IS_OP_AMP_WITH_RI;
 
 	/*
      * Calculate the total of all resistors in parallel.
@@ -1151,9 +1162,6 @@ static void dst_mixer_reset(node_description *node)
 	context->r_total = 0;
 	for(bit = 0; bit < context->size; bit++)
 	{
-		if (info->r_node[bit])
-			context->type = context->type | DISC_MIXER_HAS_R_NODE;
-
 		if ((info->r[bit] != 0) && !info->r_node[bit] )
 		{
 			context->r_total += 1.0 / info->r[bit];
@@ -1188,7 +1196,7 @@ static void dst_mixer_reset(node_description *node)
 
 	if (info->rF != 0)
 	{
-		if (info->type == DISC_MIXER_IS_RESISTOR) context->r_total += 1.0 / info->rF;
+		if (context->type == DISC_MIXER_IS_RESISTOR) context->r_total += 1.0 / info->rF;
 	}
 	if (context->type == DISC_MIXER_IS_OP_AMP_WITH_RI) context->r_total += 1.0 / info->rI;
 
@@ -1212,7 +1220,7 @@ static void dst_mixer_reset(node_description *node)
 		context->exponent_c_amp =  1.0 - exp(context->exponent_c_amp);
 	}
 
-	if ((context->type & DISC_MIXER_TYPE_MASK) == DISC_MIXER_IS_OP_AMP_WITH_RI) context->gain = info->rF / info->rI;
+	if (context->type == DISC_MIXER_IS_OP_AMP_WITH_RI) context->gain = info->rF / info->rI;
 
 	node->output[0] = 0;
 }

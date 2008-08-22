@@ -37,6 +37,7 @@ struct dsd_555_astbl_context
 	double	trigger;
 	double	v_out_high;			/* Logic 1 voltage level */
 	double	v_charge;
+	double *v_charge_node;		/* point to output of node */
 };
 
 struct dsd_555_mstbl_context
@@ -89,7 +90,8 @@ struct dsd_566_context
 	unsigned int state[2];			/* keeps track of excess flip_flop changes during the current step */
 	int			flip_flop;			/* 566 flip/flop output state */
 	double		cap_voltage;		/* voltage on cap */
-	double		v_diff;				/* voltage difference between vPlus and vNeg */
+	double		v_charge;			/* static charge value */
+	double	   *v_charge_node;		/* point to charge node */
 	double		v_sqr_low;			/* voltage for a squarewave at low */
 	double		v_sqr_high;			/* voltage for a squarewave at high */
 	double		threshold_low;		/* falling threshold */
@@ -137,6 +139,7 @@ static void dsd_555_astbl_step(node_description *node)
 	double	t_rc    = 0;					/* RC time constant */
 	double	v_cap   = context->cap_voltage;	/* Current voltage on capacitor, before dt */
 	double	v_cap_next = 0;					/* Voltage on capacitor, after dt */
+	double	v_charge;
 
 	if(DSD_555_ASTBL__RESET)
 	{
@@ -170,6 +173,16 @@ static void dsd_555_astbl_step(node_description *node)
 		}
 	}
 
+	/* get the v_charge and update each step if it is a node */
+	if (context->v_charge_node != NULL)
+	{
+		v_charge = *context->v_charge_node;
+		if (info->options & DISC_555_ASTABLE_HAS_FAST_CHARGE_DIODE) v_charge -= 0.5;
+	}
+	else
+		v_charge = context->v_charge;
+
+
 	/* Calculate future capacitor voltage.
      * ref@ http://www.physics.rutgers.edu/ugrad/205/capacitance.html
      * The formulas from the ref pages have been modified to reflect that we are stepping the change.
@@ -197,8 +210,8 @@ static void dsd_555_astbl_step(node_description *node)
 	{
 		context->flip_flop = 1;
 		/* The voltage goes high because the cap circuit is open. */
-		v_cap_next = context->v_charge;
-		v_cap      = context->v_charge;
+		v_cap_next = v_charge;
+		v_cap      = v_charge;
 		context->cap_voltage = 0;
 	}
 	else
@@ -221,14 +234,14 @@ static void dsd_555_astbl_step(node_description *node)
 					/* Charging */
 					/* Use quick charge if specified. */
 					t_rc       = (DSD_555_ASTBL__R1 + ((info->options & DISC_555_ASTABLE_HAS_FAST_CHARGE_DIODE) ? 0 : DSD_555_ASTBL__R2)) * DSD_555_ASTBL__C;
-					v_cap_next = v_cap + ((context->v_charge - v_cap) * (1.0 - exp(-(dt / t_rc ))));
+					v_cap_next = v_cap + ((v_charge - v_cap) * (1.0 - exp(-(dt / t_rc ))));
 					dt = 0;
 
 					/* has it charged past upper limit? */
 					if (v_cap_next >= context->threshold)
 					{
 						/* calculate the overshoot time */
-						dt     = t_rc  * log(1.0 / (1.0 - ((v_cap_next - context->threshold) / (context->v_charge - v_cap))));
+						dt     = t_rc  * log(1.0 / (1.0 - ((v_cap_next - context->threshold) / (v_charge - v_cap))));
 						x_time = dt;
 						v_cap  = context->threshold;
 						context->flip_flop = 0;
@@ -284,7 +297,7 @@ static void dsd_555_astbl_step(node_description *node)
 			break;
 		case DISC_555_OUT_ENERGY:
 			if (x_time == 0) x_time = 1.0;
-			node->output[0] = context->v_out_high * (context->flip_flop ? x_time : (1.0 - x_time));
+			node->output[0]  = context->v_out_high * (context->flip_flop ? x_time : (1.0 - x_time));
 			node->output[0] += context->ac_shift;
 			break;
 		case DISC_555_OUT_LOGIC_X:
@@ -309,15 +322,25 @@ static void dsd_555_astbl_reset(node_description *node)
 {
 	const  discrete_555_desc     *info    = node->custom;
 	struct dsd_555_astbl_context *context = node->context;
+	node_description *v_charge_node;
 
 	context->use_ctrlv   = (node->input_is_node >> 4) & 1;
 	context->output_type = info->options & DISC_555_OUT_MASK;
 
 	/* Use the defaults or supplied values. */
 	context->v_out_high = (info->v_out_high == DEFAULT_555_HIGH) ? info->v_pos - 1.2 : info->v_out_high;
-	context->v_charge   = (info->v_charge   == DEFAULT_555_CHARGE) ? info->v_pos : info->v_charge;
 
-	if (info->options & DISC_555_ASTABLE_HAS_FAST_CHARGE_DIODE) context->v_charge -= 0.5;
+	/* setup v_charge or node */
+	v_charge_node = discrete_find_node(NULL, info->v_charge);
+	if (v_charge_node)
+		context->v_charge_node = &(v_charge_node->output[NODE_CHILD_NODE_NUM(info->v_charge)]);
+	else
+	{
+		context->v_charge   = (info->v_charge == DEFAULT_555_CHARGE) ? info->v_pos : info->v_charge;
+		context->v_charge_node = NULL;
+
+		if (info->options & DISC_555_ASTABLE_HAS_FAST_CHARGE_DIODE) context->v_charge -= 0.5;
+	}
 
 	if ((DSD_555_ASTBL__CTRLV != -1) && !context->use_ctrlv)
 	{
@@ -1193,20 +1216,31 @@ static void dsd_555_vco1_reset(node_description *node)
 
 static void dsd_566_step(node_description *node)
 {
-	const discrete_566_desc *info = node->custom;
-	struct dsd_566_context *context = node->context;
+	const  discrete_566_desc *info    = node->custom;
+	struct dsd_566_context   *context = node->context;
 
 	double i;				/* Charging current created by vIn */
 	double dt;				/* change in time */
 	double v_cap;			/* Current voltage on capacitor, before dt */
 	double v_cap_next = 0;	/* Voltage on capacitor, after dt */
+	double v_charge;
 
 	if (DSD_566__ENABLE && !context->error)
 	{
 		dt    = discrete_current_context->sample_time;	/* Change in time */
 		v_cap = context->cap_voltage;	/* Set to voltage before change */
+
+		/* get the v_charge and update each step if it is a node */
+		if (context->v_charge_node != NULL)
+		{
+			v_charge  = *context->v_charge_node;
+			v_charge -= info->v_neg;
+		}
+		else
+			v_charge = context->v_charge;
+
 		/* Calculate charging current */
-		i = (context->v_diff - DSD_566__VMOD) / DSD_566__R;
+		i = (v_charge - DSD_566__VMOD) / DSD_566__R;
 
 		/* Keep looping until all toggling in time sample is used up. */
 		do
@@ -1305,35 +1339,48 @@ static void dsd_566_reset(node_description *node)
 {
 	const  discrete_566_desc *info    = node->custom;
 	struct dsd_566_context   *context = node->context;
+	node_description *v_charge_node;
 
-	double	temp;
+	double	v_diff, temp;
 
 	context->error = 0;
-	if (info->vNeg >= info->vPlus)
+	if (info->v_neg >= info->v_pos)
 	{
-		logerror("[vNeg >= vPlus] - NODE_%d DISABLED!\n", node->node - NODE_00);
+		logerror("[v_neg >= v_pos] - NODE_%d DISABLED!\n", node->node - NODE_00);
 		context->error = 1;
+		return;
 	}
 
-	context->v_diff      = info->vPlus - info->vNeg;
+	/* setup v_charge or node */
+	v_charge_node = discrete_find_node(NULL, info->v_charge);
+	if (v_charge_node)
+		context->v_charge_node = &(v_charge_node->output[NODE_CHILD_NODE_NUM(info->v_charge)]);
+	else
+	{
+		context->v_charge  = (info->v_charge == DEFAULT_566_CHARGE) ? info->v_pos : info->v_charge;
+		context->v_charge -= info->v_neg;
+		context->v_charge_node = NULL;
+	}
+
+	v_diff = info->v_pos - info->v_neg;
 	context->flip_flop   = 0;
 	context->cap_voltage = 0;
 	context->state[0]    = 0;
 	context->state[1]    = 0;
 
-	/* The data sheets are crap on this IC.  I will have to get my hands on a chip
+	/* The data sheets are useless for this IC.  I will have to get my hands on a chip
      * to make real measurements.  For now this should work fine for 12V. */
-	context->threshold_high = context->v_diff / 2 + info->vNeg;
-	context->threshold_low  = context->threshold_high - (0.2 * context->v_diff);
-	context->v_sqr_high     = info->vPlus - 0.6;
+	context->threshold_high = v_diff / 2 + info->v_neg;
+	context->threshold_low  = context->threshold_high - (0.2 * v_diff);
+	context->v_sqr_high     = info->v_pos - 0.6;
 	context->v_sqr_low      = context->threshold_high;
 
 	if (info->options & DISC_566_OUT_AC)
 	{
 		temp = (context->v_sqr_high - context->v_sqr_low) / 2;
-		context->v_sqr_high = temp;
+		context->v_sqr_high =  temp;
 		context->v_sqr_low  = -temp;
-		context->triangle_ac_offset = context->threshold_high - (0.1 * context->v_diff);
+		context->triangle_ac_offset = context->threshold_high - (0.1 * v_diff);
 	}
 
 	/* Step the output */

@@ -16,6 +16,9 @@
  *  12MHz signal, effecitvely doubling the horizontal resolution
  */
 
+#include "sound/discrete.h"
+
+
 #define STARSHP1_MASTER_CLOCK		(12096000)
 #define STARSHP1_CPU_CLOCK			(STARSHP1_MASTER_CLOCK / 16)
 #define STARSHP1_PIXEL_CLOCK		(STARSHP1_MASTER_CLOCK / 2)
@@ -67,3 +70,20 @@ PALETTE_INIT( starshp1 );
 VIDEO_UPDATE( starshp1 );
 VIDEO_EOF( starshp1 );
 VIDEO_START( starshp1 );
+
+
+/*----------- defined in sound/starshp1.c -----------*/
+
+DISCRETE_SOUND_EXTERN( starshp1 );
+
+/* Discrete Sound Input Nodes */
+#define STARSHP1_NOISE_AMPLITUDE	NODE_01
+#define STARSHP1_TONE_PITCH         NODE_02
+#define	STARSHP1_MOTOR_SPEED		NODE_03
+#define	STARSHP1_NOISE_FREQ			NODE_04
+#define	STARSHP1_MOLVL				NODE_05
+#define	STARSHP1_SL2				NODE_06
+#define	STARSHP1_SL1				NODE_07
+#define	STARSHP1_KICKER				NODE_08
+#define	STARSHP1_PHASOR_ON			NODE_09
+#define	STARSHP1_ATTRACT			NODE_10

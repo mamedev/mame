@@ -1166,6 +1166,7 @@ src/mame/audio/spiders.c svneol=native#text/plain
 src/mame/audio/sprint2.c svneol=native#text/plain
 src/mame/audio/sprint4.c svneol=native#text/plain
 src/mame/audio/sprint4.h svneol=native#text/plain
+src/mame/audio/starshp1.c svneol=native#text/plain
 src/mame/audio/starwars.c svneol=native#text/plain
 src/mame/audio/subs.c svneol=native#text/plain
 src/mame/audio/suna8.c svneol=native#text/plain

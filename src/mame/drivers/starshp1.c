@@ -30,24 +30,26 @@ static WRITE8_HANDLER( starshp1_audio_w )
 	{
 	case 0:
 		starshp1_attract = data;
+		discrete_sound_w(machine, STARSHP1_ATTRACT, data);
 		break;
 	case 1:
 		starshp1_phasor = data;
+		discrete_sound_w(machine, STARSHP1_PHASOR_ON, data);
 		break;
 	case 2:
-		/* KICKER */
+		discrete_sound_w(machine, STARSHP1_KICKER, data);
 		break;
 	case 3:
-		/* SL1 */
+		discrete_sound_w(machine, STARSHP1_SL1, data);
 		break;
 	case 4:
-		/* SL2 */
+		discrete_sound_w(machine, STARSHP1_SL2, data);
 		break;
 	case 5:
-		/* MOLVL */
+		discrete_sound_w(machine, STARSHP1_MOLVL, data);
 		break;
 	case 6:
-		/* NOISE FREQ */
+		discrete_sound_w(machine, STARSHP1_NOISE_FREQ, data);
 		break;
 	}
 
@@ -106,13 +108,13 @@ static WRITE8_HANDLER( starshp1_analog_out_w )
 		starshp1_ship_size = data;
 		break;
 	case 2:
-		/* NOISE AMPLITUDE */
+		discrete_sound_w(machine, STARSHP1_NOISE_AMPLITUDE, data);
 		break;
 	case 3:
-		/* TONE PITCH */
+		discrete_sound_w(machine, STARSHP1_TONE_PITCH, data);
 		break;
 	case 4:
-		/* MOTOR SPEED */
+		discrete_sound_w(machine, STARSHP1_MOTOR_SPEED, data);
 		break;
 	case 5:
 		starshp1_circle_hpos = data;
@@ -320,6 +322,11 @@ static MACHINE_DRIVER_START( starshp1 )
 	MDRV_VIDEO_EOF(starshp1)
 
 	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(starshp1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -392,5 +399,5 @@ ROM_START( starshpp )
 ROM_END
 
 
-GAME( 1977, starshp1, 0,        starshp1, starshp1, 0, ORIENTATION_FLIP_X, "Atari", "Starship 1",              GAME_NO_SOUND )
-GAME( 1977, starshpp, starshp1, starshp1, starshp1, 0, ORIENTATION_FLIP_X, "Atari", "Starship 1 (prototype?)", GAME_NO_SOUND )
+GAME( 1977, starshp1, 0,        starshp1, starshp1, 0, ORIENTATION_FLIP_X, "Atari", "Starship 1",              GAME_IMPERFECT_SOUND )
+GAME( 1977, starshpp, starshp1, starshp1, starshp1, 0, ORIENTATION_FLIP_X, "Atari", "Starship 1 (prototype?)", GAME_IMPERFECT_SOUND )
