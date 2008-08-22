@@ -1004,10 +1004,10 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 			err = open_disk_image(Machine->gamedrv, romp, &chd.origfile, &chd.origchd);
 			if (err != CHDERR_NONE)
 			{
-				if (err == CHDERR_UNSUPPORTED_VERSION)
-					sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s UNSUPPORTED CHD VERSION\n", astring_c(filename));
-				else
+				if (err == CHDERR_FILE_NOT_FOUND)
 					sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s NOT FOUND\n", astring_c(filename));
+				else
+					sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s CHD ERROR: %s\n", astring_c(filename), chd_error_string(err));
 
 				/* if this is NO_DUMP, keep going, though the system may not be able to handle it */
 				if (hash_data_has_info(ROM_GETHASHDATA(romp), HASH_INFO_NO_DUMP) || DISK_ISOPTIONAL(romp))
@@ -1043,10 +1043,7 @@ static void process_disk_entries(rom_load_data *romdata, const char *regiontag, 
 				err = open_disk_diff(Machine->gamedrv, romp, chd.origchd, &chd.difffile, &chd.diffchd);
 				if (err != CHDERR_NONE)
 				{
-					if (err == CHDERR_UNSUPPORTED_VERSION)
-						sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s UNSUPPORTED CHD VERSION\n", astring_c(filename));
-					else
-						sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s: CAN'T OPEN DIFF FILE\n", astring_c(filename));
+					sprintf(&romdata->errorbuf[strlen(romdata->errorbuf)], "%s DIFF CHD ERROR: %s\n", astring_c(filename), chd_error_string(err));
 					romdata->errors++;
 					continue;
 				}

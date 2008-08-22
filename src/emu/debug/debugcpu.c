@@ -2133,6 +2133,23 @@ UINT64 debug_read_opcode(offs_t address, int size, int arg)
 
 
 /*-------------------------------------------------
+    expression_cpu_index - return the CPU index
+    based on a case insensitive tag search
+-------------------------------------------------*/
+
+static int expression_cpu_index(running_machine *machine, const char *tag)
+{
+	int index;
+	
+	for (index = 0; index < ARRAY_LENGTH(machine->config->cpu); index++)
+		if (machine->config->cpu[index].tag != NULL && mame_stricmp(machine->config->cpu[index].tag, tag) == 0)
+			return index;
+	
+	return -1;
+}
+
+
+/*-------------------------------------------------
     expression_read_memory - read 1,2,4 or 8 bytes
     at the given offset in the given address
     space
@@ -2147,14 +2164,14 @@ static UINT64 expression_read_memory(const char *name, int space, UINT32 address
 		case EXPSPACE_PROGRAM:
 		case EXPSPACE_DATA:
 		case EXPSPACE_IO:
-			cpuindex = (name != NULL) ? mame_find_cpu_index(Machine, name) : cpu_getactivecpu();
+			cpuindex = (name != NULL) ? expression_cpu_index(Machine, name) : cpu_getactivecpu();
 			if (cpuindex < 0)
 				break;
 			return expression_read_address_space(cpuindex, ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM), address, size);
 
 		case EXPSPACE_OPCODE:
 		case EXPSPACE_RAMWRITE:
-			cpuindex = (name != NULL) ? mame_find_cpu_index(Machine, name) : cpu_getactivecpu();
+			cpuindex = (name != NULL) ? expression_cpu_index(Machine, name) : cpu_getactivecpu();
 			if (cpuindex < 0)
 				break;
 			if (name == NULL)
@@ -2356,7 +2373,7 @@ static void expression_write_memory(const char *name, int space, UINT32 address,
 		case EXPSPACE_PROGRAM:
 		case EXPSPACE_DATA:
 		case EXPSPACE_IO:
-			cpuindex = (name != NULL) ? mame_find_cpu_index(Machine, name) : cpu_getactivecpu();
+			cpuindex = (name != NULL) ? expression_cpu_index(Machine, name) : cpu_getactivecpu();
 			if (cpuindex < 0)
 				break;
 			expression_write_address_space(cpuindex, ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM), address, size, data);
@@ -2364,7 +2381,7 @@ static void expression_write_memory(const char *name, int space, UINT32 address,
 
 		case EXPSPACE_OPCODE:
 		case EXPSPACE_RAMWRITE:
-			cpuindex = (name != NULL) ? mame_find_cpu_index(Machine, name) : cpu_getactivecpu();
+			cpuindex = (name != NULL) ? expression_cpu_index(Machine, name) : cpu_getactivecpu();
 			if (cpuindex < 0)
 				break;
 			expression_write_program_direct(cpuindex, (space == EXPSPACE_OPCODE), address, size, data);
@@ -2589,7 +2606,7 @@ static EXPRERR expression_validate(const char *name, int space)
 		case EXPSPACE_PROGRAM:
 		case EXPSPACE_DATA:
 		case EXPSPACE_IO:
-			cpuindex = (name != NULL) ? mame_find_cpu_index(Machine, name) : cpu_getactivecpu();
+			cpuindex = (name != NULL) ? expression_cpu_index(Machine, name) : cpu_getactivecpu();
 			if (cpuindex < 0)
 				return (name == NULL) ? EXPRERR_MISSING_MEMORY_NAME : EXPRERR_INVALID_MEMORY_NAME;
 			if (cpunum_addrbus_width(cpuindex, ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM)) == 0)
@@ -2598,7 +2615,7 @@ static EXPRERR expression_validate(const char *name, int space)
 
 		case EXPSPACE_OPCODE:
 		case EXPSPACE_RAMWRITE:
-			cpuindex = (name != NULL) ? mame_find_cpu_index(Machine, name) : cpu_getactivecpu();
+			cpuindex = (name != NULL) ? expression_cpu_index(Machine, name) : cpu_getactivecpu();
 			if (cpuindex < 0)
 				return (name == NULL) ? EXPRERR_MISSING_MEMORY_NAME : EXPRERR_INVALID_MEMORY_NAME;
 			break;

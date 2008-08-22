@@ -1169,7 +1169,6 @@ src/mame/audio/sprint4.h svneol=native#text/plain
 src/mame/audio/starwars.c svneol=native#text/plain
 src/mame/audio/subs.c svneol=native#text/plain
 src/mame/audio/suna8.c svneol=native#text/plain
-src/mame/audio/system16.c svneol=native#text/plain
 src/mame/audio/t5182.c svneol=native#text/plain
 src/mame/audio/t5182.h svneol=native#text/plain
 src/mame/audio/taito_en.c svneol=native#text/plain

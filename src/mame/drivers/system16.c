@@ -186,21 +186,6 @@ static void sys16_video_config(void (*update)(void), int sprxoffs, const int *ba
 
 /***************************************************************************/
 
-// 7751 emulation
-WRITE8_HANDLER( sys16_7751_audio_8255_w );
- READ8_HANDLER( sys16_7751_audio_8255_r );
- READ8_HANDLER( sys16_7751_sh_rom_r );
- READ8_HANDLER( sys16_7751_sh_t1_r );
- READ8_HANDLER( sys16_7751_sh_command_r );
-WRITE8_HANDLER( sys16_7751_sh_dac_w );
-WRITE8_HANDLER( sys16_7751_sh_busy_w );
-WRITE8_HANDLER( sys16_7751_sh_offset_a0_a3_w );
-WRITE8_HANDLER( sys16_7751_sh_offset_a4_a7_w );
-WRITE8_HANDLER( sys16_7751_sh_offset_a8_a11_w );
-WRITE8_HANDLER( sys16_7751_sh_rom_select_w );
-
-/***************************************************************************/
-
 static UINT16 coinctrl;
 
 static WRITE16_HANDLER( sys16_3d_coinctrl_w )

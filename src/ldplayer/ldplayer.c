@@ -60,90 +60,12 @@ static input_port_value last_controls;
 static UINT8 playing;
 static UINT8 displaying;
 
+static UINT8 pr8210_last_was_number;
+static emu_timer *pr8210_bit_timer;
+static UINT32 pr8210_command_buffer_in, pr8210_command_buffer_out;
+static UINT8 pr8210_command_buffer[10];
+
 static void (*execute_command)(const device_config *laserdisc, int command);
-
-
-
-/*************************************
- *
- *  LD-V1000 implementation
- *
- *************************************/
-
-static void ldv1000_execute(const device_config *laserdisc, int command)
-{
-	static const UINT8 digits[10] = { 0x3f, 0x0f, 0x8f, 0x4f, 0x2f, 0xaf, 0x6f, 0x1f, 0x9f, 0x5f };
-	switch (command)
-	{
-		case CMD_SCAN_REVERSE:
-			laserdisc_data_w(laserdisc, 0xf8);
-			playing = TRUE;
-			break;
-		
-		case CMD_SCAN_REVERSE_END:
-			laserdisc_data_w(laserdisc, 0xfd);
-			playing = TRUE;
-			break;
-		
-		case CMD_STEP_REVERSE:
-			laserdisc_data_w(laserdisc, 0xfe);
-			playing = FALSE;
-			break;
-
-		case CMD_SCAN_FORWARD:
-			laserdisc_data_w(laserdisc, 0xf0);
-			playing = TRUE;
-			break;
-
-		case CMD_SCAN_FORWARD_END:
-			laserdisc_data_w(laserdisc, 0xfd);
-			playing = TRUE;
-			break;
-		
-		case CMD_STEP_FORWARD:
-			laserdisc_data_w(laserdisc, 0xf6);
-			playing = FALSE;
-			break;
-		
-		case CMD_PLAY:
-			laserdisc_data_w(laserdisc, 0xfd);
-			playing = TRUE;
-			break;
-		
-		case CMD_PAUSE:
-			laserdisc_data_w(laserdisc, 0xa0);
-			playing = FALSE;
-			break;
-
-		case CMD_DISPLAY_ON:
-			laserdisc_data_w(laserdisc, digits[1]);
-			laserdisc_data_w(laserdisc, 0xf1);
-			break;
-
-		case CMD_DISPLAY_OFF:
-			laserdisc_data_w(laserdisc, digits[0]);
-			laserdisc_data_w(laserdisc, 0xf1);
-			break;
-		
-		case CMD_0:
-		case CMD_1:
-		case CMD_2:
-		case CMD_3:
-		case CMD_4:
-		case CMD_5:
-		case CMD_6:
-		case CMD_7:
-		case CMD_8:
-		case CMD_9:
-			laserdisc_data_w(laserdisc, digits[command - CMD_0]);
-			break;
-		
-		case CMD_SEARCH:
-			laserdisc_data_w(laserdisc, 0xf7);
-			playing = FALSE;
-			break;
-	}
-}
 
 
 
@@ -244,7 +166,7 @@ static TIMER_CALLBACK( autoplay )
 	const device_config *laserdisc = device_list_first(machine->config->devicelist, LASERDISC);
 
 	/* start playing */
-	laserdisc_data_w(laserdisc, 0xfd);
+	(*execute_command)(laserdisc, CMD_PLAY);
 	playing = TRUE;
 	displaying = FALSE;
 }
@@ -257,6 +179,240 @@ static MACHINE_RESET( ldplayer )
 
 	/* indicate the name of the file we opened */
 	popmessage("Opened %s\n", astring_c(filename));
+}
+
+
+
+/*************************************
+ *
+ *  PR-8210 implementation
+ *
+ *************************************/
+
+INLINE void pr8210_add_command(UINT8 command)
+{
+	pr8210_command_buffer[pr8210_command_buffer_in++ % ARRAY_LENGTH(pr8210_command_buffer)] = (command & 0x1f) | 0x20;
+	pr8210_command_buffer[pr8210_command_buffer_in++ % ARRAY_LENGTH(pr8210_command_buffer)] = (command & 0x1f) | 0x20;
+	pr8210_command_buffer[pr8210_command_buffer_in++ % ARRAY_LENGTH(pr8210_command_buffer)] = 0x00 | 0x20;
+}
+
+
+static TIMER_CALLBACK( pr8210_bit_off_callback )
+{
+	const device_config *laserdisc = ptr;
+	
+	/* deassert the control line */
+	laserdisc_line_w(laserdisc, LASERDISC_LINE_CONTROL, CLEAR_LINE);
+}
+
+
+static TIMER_CALLBACK( pr8210_bit_callback )
+{
+	attotime duration = ATTOTIME_IN_MSEC(30);
+	const device_config *laserdisc = ptr;
+	UINT8 bitsleft = param >> 16;
+	UINT8 data = param;
+	
+	/* if we have bits, process */
+	if (bitsleft != 0)
+	{
+		/* assert the line and set a timer for deassertion */
+	   	laserdisc_line_w(laserdisc, LASERDISC_LINE_CONTROL, ASSERT_LINE);
+		timer_set(ATTOTIME_IN_USEC(250), ptr, 0, pr8210_bit_off_callback);
+
+		/* space 0 bits apart by 1msec, and 1 bits by 2msec */
+		duration = attotime_mul(ATTOTIME_IN_MSEC(1), (data & 0x80) ? 2 : 1);
+		data <<= 1;
+		bitsleft--;
+	}
+
+	/* if we're out of bits, queue up the next command */
+	else if (bitsleft == 0 && pr8210_command_buffer_in != pr8210_command_buffer_out)
+	{
+		data = pr8210_command_buffer[pr8210_command_buffer_out++ % ARRAY_LENGTH(pr8210_command_buffer)];
+		bitsleft = 12;
+	}
+	timer_adjust_oneshot(pr8210_bit_timer, duration, (bitsleft << 16) | data);
+}
+
+
+static MACHINE_START( pr8210 )
+{
+	const device_config *laserdisc = device_list_first(machine->config->devicelist, LASERDISC);
+	MACHINE_START_CALL(ldplayer);
+	pr8210_bit_timer = timer_alloc(pr8210_bit_callback, (void *)laserdisc);
+}
+
+
+static MACHINE_RESET( pr8210 )
+{
+	MACHINE_RESET_CALL(ldplayer);
+	timer_adjust_oneshot(pr8210_bit_timer, attotime_zero, 0);
+}
+
+
+static void pr8210_execute(const device_config *laserdisc, int command)
+{
+	static const UINT8 digits[10] = { 0x01, 0x11, 0x09, 0x19, 0x05, 0x15, 0x0d, 0x1d, 0x03, 0x13 };
+	int prev_was_number = pr8210_last_was_number;
+	
+	pr8210_last_was_number = FALSE;
+	switch (command)
+	{
+		case CMD_SCAN_REVERSE:
+			pr8210_add_command(0x1c);
+			playing = TRUE;
+			break;
+		
+		case CMD_SCAN_REVERSE_END:
+			pr8210_add_command(0x14);
+			playing = TRUE;
+			break;
+		
+		case CMD_STEP_REVERSE:
+			pr8210_add_command(0x12);
+			playing = FALSE;
+			break;
+
+		case CMD_SCAN_FORWARD:
+			pr8210_add_command(0x08);
+			playing = TRUE;
+			break;
+
+		case CMD_SCAN_FORWARD_END:
+			pr8210_add_command(0x14);
+			playing = TRUE;
+			break;
+		
+		case CMD_STEP_FORWARD:
+			pr8210_add_command(0x04);
+			playing = FALSE;
+			break;
+		
+		case CMD_PLAY:
+			pr8210_add_command(0x14);
+			playing = TRUE;
+			break;
+		
+		case CMD_PAUSE:
+			pr8210_add_command(0x0a);
+			playing = FALSE;
+			break;
+
+		case CMD_DISPLAY_ON:
+//			pr8210_add_command(digits[1]);
+//			pr8210_add_command(0xf1);
+			break;
+
+		case CMD_DISPLAY_OFF:
+//			pr8210_add_command(digits[0]);
+//			pr8210_add_command(0xf1);
+			break;
+		
+		case CMD_0:
+		case CMD_1:
+		case CMD_2:
+		case CMD_3:
+		case CMD_4:
+		case CMD_5:
+		case CMD_6:
+		case CMD_7:
+		case CMD_8:
+		case CMD_9:
+			if (!prev_was_number)
+				pr8210_add_command(0x1a);
+			pr8210_add_command(digits[command - CMD_0]);
+			pr8210_last_was_number = TRUE;
+			break;
+		
+		case CMD_SEARCH:
+			pr8210_add_command(0x1a);
+			playing = FALSE;
+			break;
+	}
+}
+
+
+
+/*************************************
+ *
+ *  LD-V1000 implementation
+ *
+ *************************************/
+
+static void ldv1000_execute(const device_config *laserdisc, int command)
+{
+	static const UINT8 digits[10] = { 0x3f, 0x0f, 0x8f, 0x4f, 0x2f, 0xaf, 0x6f, 0x1f, 0x9f, 0x5f };
+	switch (command)
+	{
+		case CMD_SCAN_REVERSE:
+			laserdisc_data_w(laserdisc, 0xf8);
+			playing = TRUE;
+			break;
+		
+		case CMD_SCAN_REVERSE_END:
+			laserdisc_data_w(laserdisc, 0xfd);
+			playing = TRUE;
+			break;
+		
+		case CMD_STEP_REVERSE:
+			laserdisc_data_w(laserdisc, 0xfe);
+			playing = FALSE;
+			break;
+
+		case CMD_SCAN_FORWARD:
+			laserdisc_data_w(laserdisc, 0xf0);
+			playing = TRUE;
+			break;
+
+		case CMD_SCAN_FORWARD_END:
+			laserdisc_data_w(laserdisc, 0xfd);
+			playing = TRUE;
+			break;
+		
+		case CMD_STEP_FORWARD:
+			laserdisc_data_w(laserdisc, 0xf6);
+			playing = FALSE;
+			break;
+		
+		case CMD_PLAY:
+			laserdisc_data_w(laserdisc, 0xfd);
+			playing = TRUE;
+			break;
+		
+		case CMD_PAUSE:
+			laserdisc_data_w(laserdisc, 0xa0);
+			playing = FALSE;
+			break;
+
+		case CMD_DISPLAY_ON:
+			laserdisc_data_w(laserdisc, digits[1]);
+			laserdisc_data_w(laserdisc, 0xf1);
+			break;
+
+		case CMD_DISPLAY_OFF:
+			laserdisc_data_w(laserdisc, digits[0]);
+			laserdisc_data_w(laserdisc, 0xf1);
+			break;
+		
+		case CMD_0:
+		case CMD_1:
+		case CMD_2:
+		case CMD_3:
+		case CMD_4:
+		case CMD_5:
+		case CMD_6:
+		case CMD_7:
+		case CMD_8:
+		case CMD_9:
+			laserdisc_data_w(laserdisc, digits[command - CMD_0]);
+			break;
+		
+		case CMD_SEARCH:
+			laserdisc_data_w(laserdisc, 0xf7);
+			playing = FALSE;
+			break;
+	}
 }
 
 
@@ -323,6 +479,14 @@ static MACHINE_DRIVER_START( ldv1000 )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( pr8210 )
+	MDRV_IMPORT_FROM(ldplayer_ntsc)
+	MDRV_MACHINE_START(pr8210)
+	MDRV_MACHINE_RESET(pr8210)
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210)
+MACHINE_DRIVER_END
+
+
 
 /*************************************
  *
@@ -331,6 +495,11 @@ MACHINE_DRIVER_END
  *************************************/
 
 ROM_START( ldv1000 )
+	DISK_REGION( "laserdisc" )
+ROM_END
+
+
+ROM_START( pr8210 )
 	DISK_REGION( "laserdisc" )
 ROM_END
 
@@ -406,6 +575,7 @@ static DRIVER_INIT( ldplayer )
 
 
 static DRIVER_INIT( ldv1000 ) { execute_command = ldv1000_execute; DRIVER_INIT_CALL(ldplayer); }
+static DRIVER_INIT( pr8210 )  { execute_command = pr8210_execute; DRIVER_INIT_CALL(ldplayer); }
 
 
 
@@ -415,4 +585,5 @@ static DRIVER_INIT( ldv1000 ) { execute_command = ldv1000_execute; DRIVER_INIT_C
  *
  *************************************/
 
-GAME( 2008, ldv1000, 0, ldv1000, ldplayer, ldv1000, ROT0, "MAME", "LDV-1000 Simulator", 0 )
+GAME( 2008, ldv1000, 0, ldv1000, ldplayer, ldv1000, ROT0, "MAME", "Pioneer LDV-1000 Simulator", 0 )
+GAME( 2008, pr8210,  0, pr8210,  ldplayer, pr8210,  ROT0, "MAME", "Pioneer PR-8210 Simulator", 0 )

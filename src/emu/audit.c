@@ -437,6 +437,10 @@ static int audit_one_disk(core_options *options, const rom_entry *rom, const gam
 		else if (hash_data_has_info(record->exphash, HASH_INFO_NO_DUMP))
 			set_status(record, AUDIT_STATUS_NOT_FOUND, SUBSTATUS_NOT_FOUND_NODUMP);
 
+		/* not found but optional */
+		else if (DISK_ISOPTIONAL(rom))
+			set_status(record, AUDIT_STATUS_NOT_FOUND, SUBSTATUS_NOT_FOUND_OPTIONAL);
+
 		/* not found at all */
 		else
 			set_status(record, AUDIT_STATUS_NOT_FOUND, SUBSTATUS_NOT_FOUND);

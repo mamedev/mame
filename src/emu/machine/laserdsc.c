@@ -2602,9 +2602,12 @@ static void pr8210_command(laserdisc_state *ld)
 				break;
 
 			case 0x04:	CMDPRINTF(("pr8210: Step forward\n"));
-				/* step forward */
+				/* step forward one frame */
 				if (laserdisc_ready(ld))
-					set_state(ld, LASERDISC_STEPPING_FORWARD, PR8210_STEP_SPEED, NULL_TARGET_FRAME);
+				{
+					set_state(ld, LASERDISC_STEPPING_FORWARD, STOP_SPEED, NULL_TARGET_FRAME);
+					add_to_current_track(ld, ONE_TRACK);
+				}
 				break;
 
 			case 0x06 :	CMDPRINTF(("pr8210: Chapter\n"));

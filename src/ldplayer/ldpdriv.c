@@ -39,5 +39,6 @@ const game_driver * const drivers[] =
 #else	/* DRIVER_RECURSIVE */
 
 	DRIVER( ldv1000 )	/* Pioneer LD-V1000 */
+	DRIVER( pr8210 )	/* Pioneer PR-8210 */
 
 #endif	/* DRIVER_RECURSIVE */
