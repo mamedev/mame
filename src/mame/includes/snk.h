@@ -37,7 +37,6 @@ extern VIDEO_UPDATE( tnk3 );
 extern VIDEO_UPDATE( ikari );
 extern VIDEO_UPDATE( tdfever );
 extern VIDEO_UPDATE( gwar );
-extern VIDEO_UPDATE( old_gwar );	// FIXME remove
 extern VIDEO_UPDATE( sgladiat );
 
 extern WRITE8_HANDLER( snk_bg_scrollx_w );

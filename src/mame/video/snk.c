@@ -242,7 +242,7 @@ VIDEO_START( gwar )
 
 	VIDEO_START_CALL(snk);
 
-	fg_tilemap = tilemap_create(gwar_get_fg_tile_info, tilemap_scan_cols,  8,  8, 64, 32);
+	fg_tilemap = tilemap_create(gwar_get_fg_tile_info, tilemap_scan_cols,  8,  8, 50, 32);
 	bg_tilemap = tilemap_create(gwar_get_bg_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 15);
@@ -515,36 +515,6 @@ static void ikari_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 	}
 }
 
-
-
-VIDEO_UPDATE( tnk3 )
-{
-	tilemap_set_scrollx(bg_tilemap, 0, bg_scrollx);
-	tilemap_set_scrolly(bg_tilemap, 0, bg_scrolly);
-
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	tnk3_draw_sprites(screen->machine, bitmap, cliprect, sp16_scrollx, sp16_scrolly);
-	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
-
-	return 0;
-}
-
-
-VIDEO_UPDATE( ikari )
-{
-	tilemap_set_scrollx(bg_tilemap, 0, bg_scrollx);
-	tilemap_set_scrolly(bg_tilemap, 0, bg_scrolly);
-
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-
-	ikari_draw_sprites(screen->machine, bitmap, cliprect,  0, sp16_scrollx, sp16_scrolly, spriteram + 0x800, 2 );
-	ikari_draw_sprites(screen->machine, bitmap, cliprect,  0, sp32_scrollx, sp32_scrolly, spriteram, 3 );
-	ikari_draw_sprites(screen->machine, bitmap, cliprect, 25, sp16_scrollx, sp16_scrolly, spriteram + 0x800, 2 );
-
-	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
-	return 0;
-}
-
 /**************************************************************/
 
 static void tdfever_draw_bg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xscroll, int yscroll )
@@ -734,6 +704,38 @@ VIDEO_UPDATE( tdfever )
 	return 0;
 }
 
+
+
+
+VIDEO_UPDATE( tnk3 )
+{
+	tilemap_set_scrollx(bg_tilemap, 0, bg_scrollx);
+	tilemap_set_scrolly(bg_tilemap, 0, bg_scrolly);
+
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tnk3_draw_sprites(screen->machine, bitmap, cliprect, sp16_scrollx, sp16_scrolly);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+
+	return 0;
+}
+
+
+VIDEO_UPDATE( ikari )
+{
+	tilemap_set_scrollx(bg_tilemap, 0, bg_scrollx);
+	tilemap_set_scrolly(bg_tilemap, 0, bg_scrolly);
+
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+
+	ikari_draw_sprites(screen->machine, bitmap, cliprect,  0, sp16_scrollx, sp16_scrolly, spriteram + 0x800, 2 );
+	ikari_draw_sprites(screen->machine, bitmap, cliprect,  0, sp32_scrollx, sp32_scrolly, spriteram, 3 );
+	ikari_draw_sprites(screen->machine, bitmap, cliprect, 25, sp16_scrollx, sp16_scrolly, spriteram + 0x800, 2 );
+
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	return 0;
+}
+
+
 VIDEO_UPDATE( gwar )
 {
 	tilemap_set_scrollx(bg_tilemap, 0, bg_scrollx);
@@ -754,83 +756,5 @@ VIDEO_UPDATE( gwar )
 
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 
-	return 0;
-}
-
-
-VIDEO_UPDATE( old_gwar )
-{
-	const UINT8 *ram = snk_rambase - 0xd000;
-	int gwar_sp_baseaddr, gwar_tx_baseaddr;
-	UINT8 bg_attribute;
-
-	if(snk_gamegroup == 4) // gwara
-	{
-		gwar_sp_baseaddr = 0xf000;
-		gwar_tx_baseaddr = 0xc800;
-	}
-	else
-	{
-		gwar_sp_baseaddr = 0xc000;
-		gwar_tx_baseaddr = 0xf800;
-	}
-
-	bg_attribute = ram[gwar_sp_baseaddr+0x880];
-
-	// TODO bg_attribute & 0x04 is screen flip
-
-	{
-		int bg_scroll_y, bg_scroll_x;
-
-		bg_scroll_x = -ram[gwar_sp_baseaddr+0x840] + 16;
-		bg_scroll_y = -ram[gwar_sp_baseaddr+0x800];
-
-		bg_scroll_x += (bg_attribute & 2) ? 256:0;
- 		bg_scroll_y += (bg_attribute & 1) ? 256:0;
-
-		tdfever_draw_bg(screen->machine, bitmap, cliprect, bg_scroll_x, bg_scroll_y );
-	}
-
-	{
-		UINT8 sp_attribute = ram[gwar_sp_baseaddr+0xac0];
-		int sp16_x = -ram[gwar_sp_baseaddr+0x940] - 9;
-		int sp16_y = -ram[gwar_sp_baseaddr+0x900] - 15;
-		int sp32_x = -ram[gwar_sp_baseaddr+0x9c0] - 9;
-		int sp32_y = -ram[gwar_sp_baseaddr+0x980] - 31;
-
-		if(snk_gamegroup == 2) // gwar, gwarj, gwarb, choppera
-		{
-			sp16_y += (bg_attribute & 0x10) ? 256:0;
-			sp16_x += (bg_attribute & 0x40) ? 256:0;
-			sp32_y += (bg_attribute & 0x20) ? 256:0;
-			sp32_x += (bg_attribute & 0x80) ? 256:0;
-		}
-		else
-		{
-			UINT8 spp_attribute = ram[gwar_sp_baseaddr+0xa80];
-			sp16_x += (spp_attribute & 0x10) ? 256:0;
-			sp16_y += (spp_attribute & 0x04) ? 256:0;
-			sp32_x += (spp_attribute & 0x20) ? 256:0;
-			sp32_y += (spp_attribute & 0x08) ? 256:0;
-		}
-
-		spriteram = snk_rambase + 0x1000;
-
-		if(sp_attribute & 0xf8) // improves priority
-		{
-			tdfever_draw_sp(screen->machine, bitmap, cliprect, sp16_x, sp16_y, 2, 0 );
-			tdfever_draw_sp(screen->machine, bitmap, cliprect, sp32_x, sp32_y, 1, 0 );
-		}
-		else
-		{
-			tdfever_draw_sp(screen->machine, bitmap, cliprect, sp32_x, sp32_y, 1, 0 );
-			tdfever_draw_sp(screen->machine, bitmap, cliprect, sp16_x, sp16_y, 2, 0 );
-		}
-	}
-
-	{
-		UINT8 text_attribute = ram[gwar_sp_baseaddr+0x8c0];
-		tdfever_draw_tx(screen->machine, bitmap, cliprect, text_attribute, 0, 0, gwar_tx_baseaddr );
-	}
 	return 0;
 }

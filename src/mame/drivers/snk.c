@@ -14,7 +14,7 @@ ym3526 + y8950
 Victory Road, Psycho Soldier, Bermuda Triangle, Touchdown Fever, Guerrilla War
 
 ym3812 + y8950
-Legofair, Chopper1
+Chopper1
 
 ym3812
 Fighting Golf
@@ -47,6 +47,7 @@ Notes:
   1987 gwar: keep F2 pressed during boot
   1987 psychos: use the service mode dip switch
   1988 fitegolf: use the service mode dip switch
+  1988 chopper: keep F2 pressed during boot
 
 - the I/O area (C000-CFFF) is probably mirrored in large part on the two main
   CPUs, however I mapped only the addresses actually used by the games.
@@ -124,8 +125,8 @@ Notes:
 TODO:
 -----
 
-- gwar, gwara, bermudat, worldwar: unknown writes to CAC0. These appear to control
-  sprite/sprite relative priorities, but it's not clear how.
+- gwar, gwara, bermudat, worldwar, etc: unknown writes to CAC0. These appear to
+  control sprite/sprite relative priorities, but it's not clear how.
   There seem to be some wrong priorities e.g. the volcanoes shooting fireballs in
   worldwar.
 
@@ -136,8 +137,6 @@ TODO:
   the unique feature of 2 distinct styles of game play, selectable by dipswitch
   setting. For the avid golfer, a more challenging style of swing.".
   Either a different ROM set exists, or we are missing some configuration option.
-
-- emulate protection (get rid of patches)
 
 - ikari/victroad: unknown writes to C980. This is probably (also) related to the
   color used to draw the FG layer, and supporting it is needed to fix the color
@@ -483,17 +482,17 @@ static READ8_HANDLER(tnk3_busy_clear_r)
 	return 0xff;
 }
 
-static const ym3526_interface athena_ym3526_interface_1 =
+static const ym3526_interface athena_ym3526_config_1 =
 {
 	ymirq_callback_1
 };
 
-static const ym3526_interface athena_ym3526_interface_2 =
+static const ym3526_interface athena_ym3526_config_2 =
 {
 	ymirq_callback_2
 };
 
-static const ym3812_interface fitegolf_ym3812_interface =
+static const ym3812_interface ym3812_config_1 =
 {
 	ymirq_callback_1
 };
@@ -559,10 +558,6 @@ static const ym3526_interface ym3526_interface_0 = {
 
 static const y8950_interface y8950_config = {
 	snk_sound_callback1_w /* ? */
-};
-
-static const ym3812_interface ym3812_config = {
-	snk_sound_callback0_w /* ? */
 };
 
 static WRITE8_HANDLER( snk_soundlatch_w ){
@@ -1142,7 +1137,7 @@ static ADDRESS_MAP_START( YM3526_YM3526_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(athena_sound_status_r, athena_irq_ack_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fitegolf_YM3812_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( YM3812_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(athena_soundlatch_r)
@@ -1184,7 +1179,7 @@ static ADDRESS_MAP_START( YM3812_Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3812_write_port_0_w)
 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(y8950_status_port_0_r, y8950_control_port_0_w)
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(y8950_write_port_0_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_register_r, snk_sound_register_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(athena_sound_status_r, athena_irq_ack_w)
 ADDRESS_MAP_END
 
 
@@ -1198,59 +1193,6 @@ static ADDRESS_MAP_START( Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /*********************************************************************/
-
-#define SNK_JOY1_PORT \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
-
-#define SNK_JOY2_PORT \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
-
-#define SNK_JOY1_NODIAL_PORT \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) \
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-#define SNK_JOY2_NODIAL_PORT \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) \
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-#define SNK_BUTTON_PORT \
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) \
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) \
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) \
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) \
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN ) \
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-#define SNK_COINAGE \
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) \
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) ) \
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) ) \
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) ) \
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) ) \
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) ) \
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) ) \
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) ) \
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
-
-
-
 
 static INPUT_PORTS_START( tnk3 )
 	PORT_START("IN0")
@@ -1851,7 +1793,7 @@ static INPUT_PORTS_START( worldwar )
 	PORT_INCLUDE( bermudat )
 
 	PORT_MODIFY("IN0")
-	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW)
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("DSW1:1")
@@ -1890,7 +1832,7 @@ static INPUT_PORTS_START( gwar )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundcmd_status, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )	/* tilt? causes reset */
-	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW)
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
@@ -2057,16 +1999,12 @@ static INPUT_PORTS_START( psychos )
 INPUT_PORTS_END
 
 
-
-
-
-
-static INPUT_PORTS_START( legofair )
+static INPUT_PORTS_START( chopper )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound CPU status */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundcmd_status, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )  /* Reset */
-	PORT_SERVICE_NO_TOGGLE(0x08, 0x08 )
+	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
@@ -2092,106 +2030,92 @@ static INPUT_PORTS_START( legofair )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
+	PORT_START("IN3")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
+	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" ) PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x00, "1st & every 2nd" )
 	PORT_DIPSETTING(    0x04, "1st & 2nd only" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	SNK_COINAGE
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DSW1:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" ) PORT_DIPLOCATION("DSW2:3,4")
 	PORT_DIPSETTING(    0x08, "Demo Sounds Off" )
 	PORT_DIPSETTING(    0x0c, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("DSW2:5,6")
 	PORT_DIPSETTING(    0x30, "50k 100k" )
 	PORT_DIPSETTING(    0x20, "75k 150k" )
 	PORT_DIPSETTING(    0x10, "100k 200k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")
+	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)") PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( choppera )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound CPU status */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )  /* Reset */
-	PORT_SERVICE_NO_TOGGLE(0x08, 0x08)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_INCLUDE( chopper )
 
-	PORT_START("IN1")
-	SNK_JOY1_NODIAL_PORT
+	// P1 and P2 inputs are split in two ports
 
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("IN2")
-	SNK_JOY2_NODIAL_PORT
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-
-	PORT_START("IN3")
-	SNK_BUTTON_PORT
-
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
-	PORT_DIPSETTING(    0x00, "1st & every 2nd" )
-	PORT_DIPSETTING(    0x04, "1st & 2nd only" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x08, "3" )
-	PORT_DIPSETTING(    0x00, "5" )
-	SNK_COINAGE
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" )
-	PORT_DIPSETTING(    0x08, "Demo Sounds Off" )
-	PORT_DIPSETTING(    0x0c, "Demo Sounds On" )
-	PORT_DIPSETTING(    0x00, "Freeze" )
-	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x30, "50k 100k" )
-	PORT_DIPSETTING(    0x20, "75k 150k" )
-	PORT_DIPSETTING(    0x10, "100k 200k" )
-	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, "Invulnerability (Cheat)")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_MODIFY("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
+
+
+
+
+
+
 
 static INPUT_PORTS_START( fsoccer )
 	PORT_START("IN0")
@@ -2271,7 +2195,16 @@ static INPUT_PORTS_START( fsoccer )
 	PORT_DIPSETTING(    0x00, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Japan ) )
 /*  PORT_DIPSETTING(    0x0c, DEF_STR( Europe ) ) */
-	SNK_COINAGE
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )
@@ -2757,7 +2690,7 @@ static MACHINE_DRIVER_START( tnk3 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM3526, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(athena_ym3526_interface_1)
+	MDRV_SOUND_CONFIG(athena_ym3526_config_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_DRIVER_END
 
@@ -2772,7 +2705,7 @@ static MACHINE_DRIVER_START( athena )
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("ym2", YM3526, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(athena_ym3526_interface_2)
+	MDRV_SOUND_CONFIG(athena_ym3526_config_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_DRIVER_END
 
@@ -2784,11 +2717,11 @@ static MACHINE_DRIVER_START( fitegolf )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("audio")
 	// xtal is 4MHz instead of 8MHz/2 but the end result is the same
-	MDRV_CPU_PROGRAM_MAP(fitegolf_YM3812_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(YM3812_sound_map,0)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("ym1", YM3812, XTAL_4MHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(fitegolf_ym3812_interface)
+	MDRV_SOUND_CONFIG(ym3812_config_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_DRIVER_END
 
@@ -2829,11 +2762,11 @@ static MACHINE_DRIVER_START( ikari )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM3526, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(athena_ym3526_interface_1)
+	MDRV_SOUND_CONFIG(athena_ym3526_config_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
 	MDRV_SOUND_ADD("ym2", YM3526, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(athena_ym3526_interface_2)
+	MDRV_SOUND_CONFIG(athena_ym3526_config_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_DRIVER_END
 
@@ -2887,7 +2820,7 @@ static MACHINE_DRIVER_START( bermudat )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM3526, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(athena_ym3526_interface_1)
+	MDRV_SOUND_CONFIG(athena_ym3526_config_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
 	MDRV_SOUND_ADD("ym2", Y8950, XTAL_8MHz/2) /* verified on pcb */
@@ -2924,45 +2857,29 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( chopper1 )
 
+	MDRV_IMPORT_FROM(bermudat)
+
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(cpuA_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_MODIFY("sub")
+	MDRV_CPU_PROGRAM_MAP(gwar_cpuB_map,0)
 
-	MDRV_CPU_ADD("sub", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(cpuB_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-
-	MDRV_CPU_ADD("audio", Z80, 4000000)
+	MDRV_CPU_MODIFY("audio")
 	MDRV_CPU_PROGRAM_MAP(YM3812_Y8950_sound_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-
-	MDRV_INTERLEAVE(100)
-
-	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(50*8, 28*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 49*8-1, 0*8, 28*8-1)
-
-	MDRV_GFXDECODE(gwar)
-	MDRV_PALETTE_LENGTH(0x400)
-
-	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_VIDEO_START(snk)
-	MDRV_VIDEO_UPDATE(old_gwar)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("ym1", YM3812, 4000000)
-	MDRV_SOUND_CONFIG(ym3812_config)
+	MDRV_SOUND_REPLACE("ym1", YM3812, 4000000)
+	MDRV_SOUND_CONFIG(ym3812_config_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
 
-	MDRV_SOUND_ADD("ym2", Y8950, 4000000)
-	MDRV_SOUND_CONFIG(y8950_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+static MACHINE_DRIVER_START( choppera )
+
+	MDRV_IMPORT_FROM(chopper1)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(gwar_cpuA_map,0)
 MACHINE_DRIVER_END
 
 
@@ -4755,38 +4672,6 @@ ROM_END
 
 /* input port configuration */
 
-static const SNK_INPUT_PORT_TYPE athena_io[SNK_MAX_INPUT_PORTS] = {
-	/* c000 */ SNK_INP0,
-	/* c100 */ SNK_INP1,	SNK_UNUSED,
-	/* c200 */ SNK_INP2,	SNK_UNUSED,
-	/* c300 */ SNK_UNUSED,	SNK_UNUSED,
-	/* c400 */ SNK_UNUSED,	SNK_UNUSED,
-	/* c500 */ SNK_DSW1,	SNK_UNUSED,
-	/* c600 */ SNK_DSW2,
-	/* c080 */ SNK_UNUSED
-};
-
-static const SNK_INPUT_PORT_TYPE choppera_io[SNK_MAX_INPUT_PORTS] = {
-	/* c000 */ SNK_INP0,
-	/* c100 */ SNK_INP1,	SNK_UNUSED,
-	/* c200 */ SNK_INP2,	SNK_UNUSED,
-	/* c300 */ SNK_INP3,	SNK_UNUSED,
-	/* c400 */ SNK_UNUSED,	SNK_UNUSED,
-	/* c500 */ SNK_DSW1,	SNK_UNUSED,
-	/* c600 */ SNK_DSW2,
-	/* c080 */ SNK_UNUSED
-};
-
-static const SNK_INPUT_PORT_TYPE fsoccer_io[SNK_MAX_INPUT_PORTS] = {
-	/* c000 */ SNK_INP0,
-	/* c100 */ SNK_INP1, SNK_INP2, SNK_INP3, SNK_INP4, /* joy1..joy4 */
-	/* c300 */ SNK_INP5, SNK_INP6, SNK_INP7, SNK_INP8, /* aim1..aim4 */
-	/* c500 */ SNK_UNUSED,
-	/* c580 */ SNK_DSW1,	/* DSW1 */
-	/* c600 */ SNK_DSW2,	/* DSW2 */
-	/* c080 */ SNK_INP9		/* Start games type C & D */
-};
-
 static const SNK_INPUT_PORT_TYPE tdfever_io[SNK_MAX_INPUT_PORTS] = {
 	/* c000 */ SNK_INP0,
 	/* c100 */ SNK_INP1, SNK_INP2, SNK_INP3, SNK_INP4, /* joy1..joy4 */
@@ -4796,21 +4681,6 @@ static const SNK_INPUT_PORT_TYPE tdfever_io[SNK_MAX_INPUT_PORTS] = {
 	/* c600 */ SNK_DSW2,	/* DSW2 */
 	/* c080 */ SNK_INP9		/* Start games type C & D */
 };
-
-static DRIVER_INIT( chopper ){
-	snk_sound_busy_bit = 0x01;
-	snk_io = athena_io;
-	videoram = snk_rambase + 0x800;
-	snk_gamegroup = 0;
-}
-
-static DRIVER_INIT( choppera ){
-	snk_sound_busy_bit = 0x01;
-	snk_io = choppera_io;
-	videoram = snk_rambase + 0x800;
-	snk_gamegroup = 2;
-}
-
 
 static DRIVER_INIT( tdfever ){
 	snk_sound_busy_bit = 0x08;
@@ -4830,7 +4700,7 @@ static DRIVER_INIT( tdfever2 ){
 
 static DRIVER_INIT( fsoccer ){
 	snk_sound_busy_bit = 0x08;
-	snk_io = fsoccer_io;
+	snk_io = tdfever_io;
 	videoram = snk_rambase + 0x800;
 	snk_gamegroup = 7;
 }
@@ -4863,16 +4733,16 @@ GAME( 1987, bermudat, 0,        bermudat, bermudat, 0,        ROT270, "SNK", "Be
 GAME( 1987, bermudaj, bermudat, bermudat, bermudat, 0,        ROT270, "SNK", "Bermuda Triangle (Japan)", 0 )
 GAME( 1987, worldwar, 0,        bermudat, worldwar, 0,        ROT270, "SNK", "World Wars (World?)", 0 )
 GAME( 1987, bermudaa, worldwar, bermudat, bermudaa, 0,        ROT270, "SNK", "Bermuda Triangle (World Wars) (US)", 0 )
-GAME( 1987, psychos,  0,        bermudat, psychos,  0,        ROT0,   "SNK", "Psycho Soldier (US)", GAME_NO_COCKTAIL )
-GAME( 1987, psychosj, psychos,  bermudat, psychos,  0,        ROT0,   "SNK", "Psycho Soldier (Japan)", GAME_NO_COCKTAIL )
+GAME( 1987, psychos,  0,        bermudat, psychos,  0,        ROT0,   "SNK", "Psycho Soldier (US)", 0 )
+GAME( 1987, psychosj, psychos,  bermudat, psychos,  0,        ROT0,   "SNK", "Psycho Soldier (Japan)", 0 )
 GAME( 1987, gwar,     0,        gwar,     gwar,     0,        ROT270, "SNK", "Guerrilla War (US)", 0 )
 GAME( 1987, gwarj,    gwar,     gwar,     gwar,     0,        ROT270, "SNK", "Guevara (Japan)", 0 )
 GAME( 1987, gwara,    gwar,     gwara,    gwar,     0,        ROT270, "SNK", "Guerrilla War (Version 1)", 0 )
 GAME( 1987, gwarb,    gwar,     gwar,     gwar,     0,        ROT270, "bootleg", "Guerrilla War (bootleg)", 0 )
-GAME( 1988, chopper,  0,        chopper1, legofair, chopper,  ROT270, "SNK", "Chopper I (US set 1)", GAME_NO_COCKTAIL )
-GAME( 1988, choppera, chopper,  chopper1, choppera, choppera, ROT270, "SNK", "Chopper I (US set 2)", GAME_NO_COCKTAIL )
-GAME( 1988, chopperb, chopper,  chopper1, legofair, chopper,  ROT270, "SNK", "Chopper I (US set 3)", GAME_NO_COCKTAIL )
-GAME( 1988, legofair, chopper,  chopper1, legofair, chopper,  ROT270, "SNK", "Koukuu Kihei Monogatari - The Legend of Air Cavalry (Japan)", GAME_NO_COCKTAIL )
+GAME( 1988, chopper,  0,        chopper1, chopper,  0,        ROT270, "SNK", "Chopper I (US set 1)", 0 )
+GAME( 1988, choppera, chopper,  choppera, choppera, 0,        ROT270, "SNK", "Chopper I (US set 2)", 0 )
+GAME( 1988, chopperb, chopper,  chopper1, chopper,  0,        ROT270, "SNK", "Chopper I (US set 3)", 0 )
+GAME( 1988, legofair, chopper,  chopper1, chopper,  0,        ROT270, "SNK", "Koukuu Kihei Monogatari - The Legend of Air Cavalry (Japan)", 0 )
 GAME( 1987, tdfever,  0,        tdfever,  tdfever,  tdfever,  ROT270, "SNK", "TouchDown Fever", GAME_NO_COCKTAIL )
 GAME( 1987, tdfeverj, tdfever,  tdfever,  tdfeverj, tdfever,  ROT270, "SNK", "TouchDown Fever (Japan)", GAME_NO_COCKTAIL )
 GAME( 1988, tdfever2, tdfever,  tdfever,  tdfever,  tdfever2, ROT270, "SNK", "TouchDown Fever 2", GAME_NO_COCKTAIL ) /* upgrade kit for Touchdown Fever */
