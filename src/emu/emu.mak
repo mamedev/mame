@@ -138,6 +138,7 @@ EMUMACHINEOBJS = \
 	$(EMUMACHINE)/i2cmem.o \
  	$(EMUMACHINE)/idectrl.o \
  	$(EMUMACHINE)/intelfsh.o \
+	$(EMUMACHINE)/latch8.o \
 	$(EMUMACHINE)/laserdsc.o \
 	$(EMUMACHINE)/mb3773.o \
 	$(EMUMACHINE)/mb87078.o \
