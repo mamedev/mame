@@ -426,15 +426,15 @@ static void lhb_decrypt(running_machine *machine)
 		UINT16 x = src[i];
 
 		if ((i & 0x1100) != 0x0100)
-			x ^= 0x0002;
+			x ^= 0x0200;
 
 		if ((i & 0x0150) != 0x0000 && (i & 0x0152) != 0x0010)
-			x ^= 0x0400;
+			x ^= 0x0004;
 
 		if ((i & 0x2084) != 0x2084 && (i & 0x2094) != 0x2014)
-			x ^= 0x2000;
+			x ^= 0x0020;
 
-		src[i] = (x >> 8) | (x <<8);
+		src[i] = x;
 	}
 }
 
@@ -509,17 +509,17 @@ static void chmplst2_decrypt(running_machine *machine)
 		UINT16 x = src[i];
 
 		if ((i & 0x0054) != 0x0000 && (i & 0x0056) != 0x0010)
-			x ^= 0x0400;
+			x ^= 0x0004;
 
 		if ((i & 0x0204) == 0x0000)
- 			x ^= 0x0800;
+ 			x ^= 0x0008;
 
 		if ((i & 0x3080) != 0x3080 && (i & 0x3090) != 0x3010)
-			x ^= 0x2000;
+			x ^= 0x0020;
 
 		j = BITSWAP24(i, 23,22,21,20,19,18,17,16,15,14,13, 8, 11,10, 9, 2, 7,6,5,4,3, 12, 1,0);
 
-		result_data[j] = (x >> 8) | (x << 8);
+		result_data[j] = x;
 	}
 
 	memcpy(src,result_data,rom_size);
@@ -540,24 +540,24 @@ static void vbowlj_decrypt(running_machine *machine)
 		UINT16 x = src[i];
 
 		if((i & 0x4100) == 0x0100)
-			x ^= 0x0002;
+			x ^= 0x0200;
 
 		if((i & 0x4000) == 0x4000 && (i & 0x0300) != 0x0100)
-			x ^= 0x0002;
+			x ^= 0x0200;
 
 		if((i & 0x5700) == 0x5100)
-			x ^= 0x0002;
+			x ^= 0x0200;
 
 		if((i & 0x5500) == 0x1000)
-			x ^= 0x0002;
+			x ^= 0x0200;
 
 		if((i & 0x0140) != 0x0000 || (i & 0x0012) == 0x0012)
-			x ^= 0x0400;
+			x ^= 0x0004;
 
 		if((i & 0x2004) != 0x2004 || (i & 0x0090) == 0x0000)
-			x ^= 0x2000;
+			x ^= 0x0020;
 
-	    src[i] = (x << 8) | (x >> 8);
+	    src[i] = x;
 	  }
 }
 
@@ -576,7 +576,7 @@ static void dbc_decrypt(running_machine *machine)
 		if( i & 0x1000/2 )
 		{
 			if( ~i & 0x400/2 )
-				x ^= 0x0002;
+				x ^= 0x0200;
 		}
 
 		if( i & 0x4000/2 )
@@ -584,30 +584,30 @@ static void dbc_decrypt(running_machine *machine)
 			if( i & 0x100/2 )
 			{
 				if( ~i & 0x08/2 )
-					x ^= 0x2000;
+					x ^= 0x0020;
 			}
 			else
 			{
 				if( ~i & 0x28/2 )
-					x ^= 0x2000;
+					x ^= 0x0020;
 			}
 		}
 		else
 		{
-			x ^= 0x2000;
+			x ^= 0x0020;
 		}
 
 		if( i & 0x200/2 )
 		{
-			x ^= 0x0400;
+			x ^= 0x0004;
 		}
 		else
 		{
 			if( (i & 0x80/2) == 0x80/2 || (i & 0x24/2) == 0x24/2 )
-				x ^= 0x0400;
+				x ^= 0x0004;
 		}
 
-		src[i] = (x << 8) | (x >> 8);
+		src[i] = x;
 	}
 }
 
@@ -2896,7 +2896,7 @@ Notes:
 
 ROM_START( chmplst2 )
 	ROM_REGION( 0x80000, "main", 0 )
-	ROM_LOAD( "maj2v185h.u29", 0x00000, 0x80000, CRC(2572d59a) SHA1(1d5362e209dadf8b21c10d1351d4bb038bfcaaef) )
+	ROM_LOAD16_WORD_SWAP( "maj2v185h.u29", 0x00000, 0x80000, CRC(2572d59a) SHA1(1d5362e209dadf8b21c10d1351d4bb038bfcaaef) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "igsm0501.u7", 0x00000, 0x200000, CRC(1c952bd6) SHA1(a6b6f1cdfb29647e81c032ffe59c94f1a10ceaf8) )
@@ -3135,7 +3135,7 @@ ROM_END
 ROM_START( lhb )
 	ROM_REGION( 0x80000, "main", 0 )
 	// identical to LHB-4096
-	ROM_LOAD( "v305j-409", 0x00000, 0x80000, CRC(701de8ef) SHA1(4a77160f642f4de02fa6fbacf595b75c0d4a505d) )
+	ROM_LOAD16_WORD_SWAP( "v305j-409", 0x00000, 0x80000, CRC(701de8ef) SHA1(4a77160f642f4de02fa6fbacf595b75c0d4a505d) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "m0201-ig.160", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
@@ -3197,7 +3197,7 @@ Notes:
 
 ROM_START( lhba )
 	ROM_REGION( 0x80000, "main", 0 )
-	ROM_LOAD( "maj_v-033c.u30", 0x00000, 0x80000, CRC(02a0b716) SHA1(cd0ee32ea69f66768196b0e9b4df0fae3af84ed3) )
+	ROM_LOAD16_WORD_SWAP( "maj_v-033c.u30", 0x00000, 0x80000, CRC(02a0b716) SHA1(cd0ee32ea69f66768196b0e9b4df0fae3af84ed3) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "igs_m0201.u15", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
@@ -3259,7 +3259,7 @@ Notes:
 
 ROM_START( dbc )
 	ROM_REGION( 0x80000, "main", 0 )
-	ROM_LOAD( "maj-h_v027h.u30", 0x00000, 0x80000, CRC(5d5ccd5b) SHA1(7a1223923f9a5825fd919ae9a36912284e705382) )
+	ROM_LOAD16_WORD_SWAP( "maj-h_v027h.u30", 0x00000, 0x80000, CRC(5d5ccd5b) SHA1(7a1223923f9a5825fd919ae9a36912284e705382) )
 
 	ROM_REGION( 0x280000, "gfx1", 0 )
 	ROM_LOAD( "igs_m0201.u15", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )
@@ -3295,7 +3295,7 @@ there are 4 banks of 8 dip switches
 
 ROM_START( vbowl )
 	ROM_REGION( 0x80000, "main", 0 )
-	ROM_LOAD( "bowlingv101xcm.u45", 0x00000, 0x80000, BAD_DUMP CRC(ab8e3f1f) SHA1(69159e22559d6a26fe2afafd770aa640c192ba4b) )
+	ROM_LOAD16_WORD_SWAP( "bowlingv101xcm.u45", 0x00000, 0x80000, BAD_DUMP CRC(ab8e3f1f) SHA1(69159e22559d6a26fe2afafd770aa640c192ba4b) )
 
 	ROM_REGION( 0x400000 * 2, "gfx1", 0)
 	ROM_LOAD( "vrbowlng.u69", 0x000000, 0x400000, CRC(b0d339e8) SHA1(a26a5e0202a78e8cdc562b10d64e14eadfa4e115) )
@@ -3314,7 +3314,7 @@ ROM_END
 
 ROM_START( vbowlj )
 	ROM_REGION( 0x80000, "main", 0 )
-	ROM_LOAD( "vrbowlng.u45", 0x00000, 0x80000, CRC(091c19c1) SHA1(5a7bfbee357122e9061b38dfe988c3853b0984b0) ) // second half all 00
+	ROM_LOAD16_WORD_SWAP( "vrbowlng.u45", 0x00000, 0x80000, CRC(091c19c1) SHA1(5a7bfbee357122e9061b38dfe988c3853b0984b0) ) // second half all 00
 
 	ROM_REGION( 0x400000 * 2, "gfx1", 0)
 	ROM_LOAD( "vrbowlng.u69", 0x000000, 0x400000, CRC(b0d339e8) SHA1(a26a5e0202a78e8cdc562b10d64e14eadfa4e115) )
@@ -3346,7 +3346,7 @@ ROM_END
 
 ROM_START( xymg )
 	ROM_REGION( 0x80000, "main", 0 )
-	ROM_LOAD( "u30-ebac.rom", 0x00000, 0x80000, CRC(7d272b6f) SHA1(15fd1be23cabdc77b747541f5cd9fed6b08be4ad) )
+	ROM_LOAD16_WORD_SWAP( "u30-ebac.rom", 0x00000, 0x80000, CRC(7d272b6f) SHA1(15fd1be23cabdc77b747541f5cd9fed6b08be4ad) )
 
 	ROM_REGION( 0x280000, "gfx1", 0 )
 	ROM_LOAD( "m0201-ig.160", 0x000000, 0x200000, CRC(ec54452c) SHA1(0ee7ffa3d4845af083944e64faf5a1c78247aaa2) )

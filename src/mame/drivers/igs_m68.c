@@ -185,7 +185,7 @@ Notes:
 
 ROM_START( mgcs )
 	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
-	ROM_LOAD( "p1500.u8", 0x00000, 0x80000, CRC(a8cb5905) SHA1(37be7d926a1352869632d43943763accd4dec4b7) )
+	ROM_LOAD16_WORD_SWAP( "p1500.u8", 0x00000, 0x80000, CRC(a8cb5905) SHA1(37be7d926a1352869632d43943763accd4dec4b7) )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "s1502.u10", 0x00000, 0x80000, CRC(a8a6ba58) SHA1(59276a8ab4a31812600816c2a43b74bd71394419) )
@@ -326,17 +326,17 @@ static DRIVER_INIT( mgcs )
 			{
 				if( (i & 0x02/2) )
 				{
-					x ^= 0x0100;
+					x ^= 0x0001;
 				}
 			}
 			else if( (i & 0x100/2) && !(i & 0x400/2) )
 			{
-				x ^= 0x0001;
+				x ^= 0x0100;
 			}
 
 			if( (i & 0x100/2) && (i & 0x400/2) )
 			{
-				x ^= 0x0001;
+				x ^= 0x0100;
 			}
 		}
 		else if( (i & 0x7000/2) == 0x4000/2 || (i & 0x7000/2) == 0x5000/2 )
@@ -345,7 +345,7 @@ static DRIVER_INIT( mgcs )
 			{
 				if( i & 0x02/2 )
 				{
-					x ^= 0x0100;
+					x ^= 0x0001;
 				}
 			}
 
@@ -353,14 +353,14 @@ static DRIVER_INIT( mgcs )
 			{
 				if( !(i & 0x20/2) || (i & 0x80/2) || (i & 0x400/2) )
 				{
-					x ^= 0x0001;
+					x ^= 0x0100;
 				}	
 			}
 			else
 			{
 				if( i & 0x80/2 )
 				{
-					x ^= 0x0001;
+					x ^= 0x0100;
 				}
 			}
 		}
@@ -370,14 +370,14 @@ static DRIVER_INIT( mgcs )
 			{
 				if( !(i & 0x20/2) || (i & 0x400/2) )
 				{
-					x ^= 0x0001;
+					x ^= 0x0100;
 				}
 
 				if( i & 0x20/2 )
 				{
 					if( i & 0x02/2 )
 					{
-						x ^= 0x0100;
+						x ^= 0x0001;
 					}
 				}				
 			}
@@ -387,7 +387,7 @@ static DRIVER_INIT( mgcs )
 				{
 					if( i & 0x02/2 )
 					{
-						x ^= 0x0100;
+						x ^= 0x0001;
 					}
 				}
 			}
@@ -397,12 +397,12 @@ static DRIVER_INIT( mgcs )
 				{
 					if( !(i & 0x02/2) )
 					{
-						x ^= 0x0100;
+						x ^= 0x0001;
 					}
 				}
 				else
 				{
-					x ^= 0x0100;
+					x ^= 0x0001;
 				}
 			}
 		}
@@ -412,13 +412,13 @@ static DRIVER_INIT( mgcs )
 			{
 				if( i & 0x80/2 )
 				{
-					x ^= 0x0001;
+					x ^= 0x0100;
 
 					if( i & 0x20/2 )
 					{
 						if( (i & 0x02/2) )
 						{
-							x ^= 0x0100;
+							x ^= 0x0001;
 						}
 					}
 				}
@@ -428,31 +428,31 @@ static DRIVER_INIT( mgcs )
 					{
 						if( (i & 0x02/2) )
 						{
-							x ^= 0x0100;
+							x ^= 0x0001;
 						}
 					}
 					else if( !(i & 0x400/2) )
 					{
-						x ^= 0x0001;
+						x ^= 0x0100;
 					}
 
 					if( i & 0x400/2 )
 					{
-						x ^= 0x0001;
+						x ^= 0x0100;
 					}
 				}
 			}
 			else if( (i & 0x300/2) == 0x200/2 )
 			{
 				if( i & 0x80/2 )
-				{			
-					x ^= 0x0001;
+				{
+					x ^= 0x0100;
 
 					if( i & 0x20/2 )
 					{
 						if( (i & 0x02/2) )
 						{
-							x ^= 0x0100;
+							x ^= 0x0001;
 						}
 					}
 				}
@@ -462,7 +462,7 @@ static DRIVER_INIT( mgcs )
 					{
 						if( (i & 0x02/2) )
 						{
-							x ^= 0x0100;
+							x ^= 0x0001;
 						}
 					}
 				}
@@ -471,43 +471,38 @@ static DRIVER_INIT( mgcs )
 			{
 				if( i & 0x80/2 )
 				{
-					x ^= 0x0001;
+					x ^= 0x0100;
 
 					if( i & 0x20/2 )
 					{
 						if( !(i & 0x02/2) )
 						{
-							x ^= 0x0100;
+							x ^= 0x0001;
 						}
 					}
 					else
 					{
-						x ^= 0x0100;
+						x ^= 0x0001;
 					}
 				}
 				else
-				{
-					if( i & 0x400/2 )
+				{	
+					if( i & 0x20/2 )
 					{
-						if( i & 0x20/2 )
+						if( !(i & 0x02/2) )
 						{
-							if( !(i & 0x02/2) )
-								x ^= 0x0100;
-						}
-						else
-						{
-							x ^= 0x0100;
+							x ^= 0x0001;
 						}
 					}
 					else
 					{
-						x ^= 0x0100;
+						x ^= 0x0001;
 					}
 				}
 			}
 		}
 		
-		src[i] = (x << 8) | (x >> 8);
+		src[i] = x;
 	}
 }
 
