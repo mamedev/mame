@@ -1633,7 +1633,7 @@ static MACHINE_DRIVER_START( centipdb )
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("pokey", AY8910, 12096000/8)
 	MDRV_SOUND_CONFIG(centipdb_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 10.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_DRIVER_END
 
 
@@ -1646,7 +1646,7 @@ static MACHINE_DRIVER_START( magworm )
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("pokey", AY8910, 12096000/8)
 	MDRV_SOUND_CONFIG(centipdb_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 15.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_DRIVER_END
 
 
