@@ -35,7 +35,7 @@ static tilemap *fg_tilemap;
 static tilemap *bg_tilemap;
 static int fg_bank;
 static int bg_scrollx, bg_scrolly, sp16_scrollx, sp16_scrolly, sp32_scrollx, sp32_scrolly;
-static UINT8 unknown_reg;
+static UINT8 sprite_split_point;
 
 static UINT8 empty_tile[16*16];
 
@@ -407,10 +407,9 @@ WRITE8_HANDLER( gwara_sp_scroll_msb_w )
 	sp16_scrolly = (sp16_scrolly & 0xff) | ((data & 0x04) << 6);
 }
 
-WRITE8_HANDLER( gwar_unknown_video_w )
+WRITE8_HANDLER( gwar_sprite_split_point_w )
 {
-//popmessage("%02x",data);
-	unknown_reg = data;
+	sprite_split_point = data;
 }
 
 /**************************************************************************************/
@@ -570,12 +569,13 @@ byte3: attributes
     -xx-x--- (bank number)
     x------- (x offset bit8)
 */
-static void tdfever_draw_sp(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xscroll, int yscroll, int mode, int flip )
+static void tdfever_draw_sp(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xscroll, int yscroll, int mode,
+		int flip, int from, int to )
 {
 	const UINT8 *source = spriteram + ((mode==2)?0x800:0x000);
 	const gfx_element *gfx = machine->gfx[(mode==1)?3:2];
 	int tile_number, attributes, sx, sy, color, pen_mode;
-	int which, finish, sp_size;
+	int which, sp_size;
 	int flipx, flipy;
 
 	if(mode < 0 || mode > 2) return;
@@ -584,16 +584,14 @@ static void tdfever_draw_sp(running_machine *machine, bitmap_t *bitmap, const re
 
 	if(mode == 2)
 	{
-		finish  = 64 * 4;
 		sp_size = 16;
 	}
 	else
 	{
-		finish  = 32 * 4;
 		sp_size = 32;
 	}
 
-	for(which = 0; which < finish; which+=4)
+	for(which = from*4; which < to*4; which+=4)
 	{
 		if(*(UINT32*)(source+which) == 0 || *(UINT32*)(source+which) == -1) continue;
 
@@ -698,7 +696,7 @@ VIDEO_UPDATE( tdfever )
 	tdfever_draw_bg(screen->machine, bitmap, cliprect, bg_scroll_x, bg_scroll_y );
 
 	spriteram = snk_rambase + 0x1000;
-	tdfever_draw_sp(screen->machine, bitmap, cliprect, sp16_scroll_x, sp16_scroll_y, 0, 1 );
+	tdfever_draw_sp(screen->machine, bitmap, cliprect, sp16_scroll_x, sp16_scroll_y, 0, 1, 0, 32 );
 
 	tdfever_draw_tx(screen->machine, bitmap, cliprect, tx_attributes, 0, 0, 0xf800 );
 	return 0;
@@ -743,16 +741,9 @@ VIDEO_UPDATE( gwar )
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
-	if(unknown_reg & 0xf8) // improves priority
-	{
-		tdfever_draw_sp(screen->machine, bitmap, cliprect, -sp16_scrollx - 9, -sp16_scrolly - 15, 2, 0 );
-		tdfever_draw_sp(screen->machine, bitmap, cliprect, -sp32_scrollx - 9, -sp32_scrolly - 31, 1, 0 );
-	}
-	else
-	{
-		tdfever_draw_sp(screen->machine, bitmap, cliprect, -sp32_scrollx - 9, -sp32_scrolly - 31, 1, 0 );
-		tdfever_draw_sp(screen->machine, bitmap, cliprect, -sp16_scrollx - 9, -sp16_scrolly - 15, 2, 0 );
-	}
+	tdfever_draw_sp(screen->machine, bitmap, cliprect, -sp16_scrollx - 9, -sp16_scrolly - 15, 2, 0, 0, sprite_split_point );
+	tdfever_draw_sp(screen->machine, bitmap, cliprect, -sp32_scrollx - 9, -sp32_scrolly - 31, 1, 0, 0, 32 );
+	tdfever_draw_sp(screen->machine, bitmap, cliprect, -sp16_scrollx - 9, -sp16_scrolly - 15, 2, 0, sprite_split_point, 64 );
 
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 

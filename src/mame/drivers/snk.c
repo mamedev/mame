@@ -125,11 +125,6 @@ Notes:
 TODO:
 -----
 
-- gwar, gwara, bermudat, worldwar, etc: unknown writes to CAC0. These appear to
-  control sprite/sprite relative priorities, but it's not clear how.
-  There seem to be some wrong priorities e.g. the volcanoes shooting fireballs in
-  worldwar.
-
 - Fighting Golf: unknown writes to CF00, probably video related.
 
 - The Fighting Golf flyer shows a different gameplay, where button A is pressed
@@ -988,7 +983,7 @@ static ADDRESS_MAP_START( bermudat_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xca00, 0xca00) AM_WRITE(turbocheck16_1_w)
 	AM_RANGE(0xca40, 0xca40) AM_WRITE(turbocheck16_2_w)
 	AM_RANGE(0xca80, 0xca80) AM_WRITE(gwara_sp_scroll_msb_w)
-	AM_RANGE(0xcac0, 0xcac0) AM_WRITE(gwar_unknown_video_w)	// controls sprite priorities somehow?
+	AM_RANGE(0xcac0, 0xcac0) AM_WRITE(gwar_sprite_split_point_w)
 	AM_RANGE(0xcb00, 0xcb00) AM_READ(turbocheck16_1_r)
 	AM_RANGE(0xcb10, 0xcb10) AM_READ(turbocheck16_2_r)
 	AM_RANGE(0xcb20, 0xcb20) AM_READ(turbocheck16_3_r)
@@ -1047,7 +1042,7 @@ static ADDRESS_MAP_START( gwar_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc9c0, 0xc9c0) AM_WRITE(snk_sp32_scrollx_w)
 	AM_RANGE(0xca00, 0xca00) AM_WRITENOP	// always 0?
 	AM_RANGE(0xca40, 0xca40) AM_WRITENOP	// always 0?
-	AM_RANGE(0xcac0, 0xcac0) AM_WRITE(gwar_unknown_video_w)	// controls sprite priorities somehow?
+	AM_RANGE(0xcac0, 0xcac0) AM_WRITE(gwar_sprite_split_point_w)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(1) AM_BASE(&snk_bg_videoram)	// + work RAM
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(2) AM_BASE(&spriteram)	// + work ram
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(3) AM_BASE(&snk_fg_videoram)	// + work RAM
@@ -1085,7 +1080,7 @@ static ADDRESS_MAP_START( gwara_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf980, 0xf980) AM_WRITE(snk_sp32_scrolly_w)
 	AM_RANGE(0xf9c0, 0xf9c0) AM_WRITE(snk_sp32_scrollx_w)
 	AM_RANGE(0xfa80, 0xfa80) AM_WRITE(gwara_sp_scroll_msb_w)
-	AM_RANGE(0xfac0, 0xfac0) AM_WRITE(gwar_unknown_video_w)	// controls sprite priorities somehow?
+	AM_RANGE(0xfac0, 0xfac0) AM_WRITE(gwar_sprite_split_point_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gwara_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )

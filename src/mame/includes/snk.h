@@ -52,7 +52,7 @@ extern WRITE8_HANDLER( ikari_sp_scroll_msb_w );
 extern WRITE8_HANDLER( ikari_unknown_video_w );
 extern WRITE8_HANDLER( gwar_fg_bank_w );
 extern WRITE8_HANDLER( gwar_videoattrs_w );
-extern WRITE8_HANDLER( gwar_unknown_video_w );
+extern WRITE8_HANDLER( gwar_sprite_split_point_w );
 extern WRITE8_HANDLER( gwara_videoattrs_w );
 extern WRITE8_HANDLER( gwara_sp_scroll_msb_w );
 
