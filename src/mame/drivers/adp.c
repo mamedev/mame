@@ -6,7 +6,6 @@ Skeleton driver by TS -  analog at op.pl
 
 TODO:
 (almost everything)
- - add emulation of HD63484 (like shanghai.c but 4bpp mode and much more commands)
  - add sound and i/o
  - protection in Fashion Gambler (NVRam based?)
 
@@ -141,6 +140,7 @@ There's also (external) JAMMA adapter - 4th board filled with resistors and diod
 #include "machine/68681.h"
 #include "deprecat.h"
 
+static UINT8 register_active;
 static struct
 {
 	const device_config *duart68681;
@@ -194,7 +194,6 @@ static const duart68681_config skattv_duart68681_config =
 	NULL
 };
 
-/*
 static PALETTE_INIT( adp )
 {
     int i;
@@ -206,25 +205,24 @@ static PALETTE_INIT( adp )
 
 
         // red component
-        bit0 = (i >> 2) & 0x01;
+        bit0 = (i >> 0) & 0x01;
         bit1 = (i >> 3) & 0x01;
-        bit2 = (i >> 4) & 0x01;
+        bit2 = (i >> 0) & 0x01;
         r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
         // green component
-        bit0 = (i >> 5) & 0x01;
-        bit1 = (i >> 6) & 0x01;
-        bit2 = (i >> 7) & 0x01;
+        bit0 = (i >> 1) & 0x01;
+        bit1 = (i >> 3) & 0x01;
+        bit2 = (i >> 1) & 0x01;
         g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
         // blue component
-        bit0 = 0;
-        bit1 = (i >> 0) & 0x01;
-        bit2 = (i >> 1) & 0x01;
+        bit0 = (i >> 2) & 0x01;
+        bit1 = (i >> 3) & 0x01;
+        bit2 = (i >> 2) & 0x01;
         b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
         palette_set_color(machine,i,MAKE_RGB(r,g,b));
     }
 }
-*/
 
 static VIDEO_START(adp)
 {
@@ -273,10 +271,10 @@ static VIDEO_UPDATE(adp)
 		for (x = 0 ; x < (HD63484_reg[0xca/2] & 0x0fff) * 4 ; x += 4)
 		{
 			b &= (HD63484_RAM_SIZE-1);
-			*BITMAP_ADDR16(bitmap, y, x    ) = (HD63484_ram[b] & 0x000f);
-			*BITMAP_ADDR16(bitmap, y, x + 1) = (HD63484_ram[b] & 0x00f0) >> 4;
-			*BITMAP_ADDR16(bitmap, y, x + 2) = (HD63484_ram[b] & 0x0f00) >> 8;
-			*BITMAP_ADDR16(bitmap, y, x + 3) = (HD63484_ram[b] & 0xf000) >> 12;
+			*BITMAP_ADDR16(bitmap, y, x    ) = ((HD63484_ram[b] & 0x000f) >>  0) << 0;
+			*BITMAP_ADDR16(bitmap, y, x + 1) = ((HD63484_ram[b] & 0x00f0) >>  4) << 0;
+			*BITMAP_ADDR16(bitmap, y, x + 2) = ((HD63484_ram[b] & 0x0f00) >>  8) << 0;
+			*BITMAP_ADDR16(bitmap, y, x + 3) = ((HD63484_ram[b] & 0xf000) >> 12) << 0;
 			b++;
 		}
 	}
@@ -298,10 +296,10 @@ if (!input_code_pressed(KEYCODE_O))
 				b &= (HD63484_RAM_SIZE - 1);
 				if (x <= w && x + sx >= 0 && x + sx < (HD63484_reg[0xca/2] & 0x0fff) * 4)
 					{
-						*BITMAP_ADDR16(bitmap, y, x + sx    ) = (HD63484_ram[b] & 0x000f);
-						*BITMAP_ADDR16(bitmap, y, x + sx + 1) = (HD63484_ram[b] & 0x00f0) >> 4;
-						*BITMAP_ADDR16(bitmap, y, x + sx + 2) = (HD63484_ram[b] & 0x0f00) >> 8;
-						*BITMAP_ADDR16(bitmap, y, x + sx + 3) = (HD63484_ram[b] & 0xf000) >> 12;
+						*BITMAP_ADDR16(bitmap, y, x + sx    ) = ((HD63484_ram[b] & 0x000f) >>  0) << 0;
+						*BITMAP_ADDR16(bitmap, y, x + sx + 1) = ((HD63484_ram[b] & 0x00f0) >>  4) << 0;
+						*BITMAP_ADDR16(bitmap, y, x + sx + 2) = ((HD63484_ram[b] & 0x0f00) >>  8) << 0;
+						*BITMAP_ADDR16(bitmap, y, x + sx + 3) = ((HD63484_ram[b] & 0xf000) >> 12) << 0;
 					}
 				b++;
 			}
@@ -313,6 +311,36 @@ if (!input_code_pressed(KEYCODE_O))
 
 static READ16_HANDLER(test_r)
 {
+// printf("ra=%04x ",register_active);
+if (register_active == 0x0000) {
+	if (input_code_pressed(KEYCODE_1)) return 0x0001 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_2)) return 0x0002 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_3)) return 0x0004 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_4)) return 0x0008 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_5)) return 0x0010 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_6)) return 0x0020 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_7)) return 0x0040 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_8)) return 0x0080 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_A)) return 0x0100 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_S)) return 0x0200 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_D)) return 0x0400 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_F)) return 0x0800 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_G)) return 0x1000 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_H)) return 0x2000 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_J)) return 0x4000 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_K)) return 0x8000 ^ 0xffff;
+return 0x4;
+}
+	if (input_code_pressed(KEYCODE_1)) return 0x0001 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_2)) return 0x0002 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_3)) return 0x0004 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_4)) return 0x0008 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_5)) return 0x0010 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_6)) return 0x0020 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_7)) return 0x0040 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_8)) return 0x0080 ^ 0xffff;
+
+	// return 0x0004 ^ 0xffff; // 0x0004
 	switch (mame_rand(machine) & 3)
 	{
 		case 0:
@@ -320,10 +348,11 @@ static READ16_HANDLER(test_r)
 		case 1:
 			return 0xffff;
 		default:
-			return mame_rand(machine) % 0xffff;
+			return mame_rand(machine) & 0xffff;
 	}
 }
 
+/*
 static READ16_HANDLER(test1_r)
 {
 	if (input_code_pressed(KEYCODE_Q)) return 0x0001;
@@ -353,17 +382,61 @@ static READ16_HANDLER(test1_r)
 			return mame_rand(machine) % 0xffff;
 	}
 }
+*/
+
+static READ16_HANDLER(rh1_r)
+{
+// printf("ra=%04x ",register_active);
+/*
+	if ((register_active == 0x0e) || (register_active == 0x0e) || (register_active == 0x0e))
+		{
+	if (input_code_pressed(KEYCODE_1)) return 0x0001 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_2)) return 0x0002 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_3)) return 0x0004 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_4)) return 0x0008 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_5)) return 0x0010 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_6)) return 0x0020 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_7)) return 0x0040 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_8)) return 0x0080 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_A)) return 0x0100 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_S)) return 0x0200 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_D)) return 0x0400 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_F)) return 0x0800 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_G)) return 0x1000 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_H)) return 0x2000 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_J)) return 0x4000 ^ 0xffff;
+	if (input_code_pressed(KEYCODE_K)) return 0x8000 ^ 0xffff;
+
+		}
+*/
+	switch (mame_rand(machine) & 3)
+	{
+		case 0:
+			return 0;
+		case 1:
+			return 0xffff;
+		default:
+			return mame_rand(machine) % 0xffff;
+	}
+}
+
+static WRITE16_HANDLER(wh1_w)
+{
+	// register_active = data;
+}
+
+static WRITE16_HANDLER(wh2_w)
+{
+	register_active = data;
+}
 
 static ADDRESS_MAP_START( skattv_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
-	AM_RANGE(0x400000, 0x4000ff) AM_READ(test_r) //18b too
 	AM_RANGE(0x800080, 0x800081) AM_READWRITE(HD63484_status_r, HD63484_address_w)
 	AM_RANGE(0x800082, 0x800083) AM_READWRITE(HD63484_data_r, HD63484_data_w)
-//  AM_RANGE(0x8000a0, 0x8000a1) AM_READ(handler2_r)
-//  AM_RANGE(0x8000a2, 0x8000a3) AM_READ(handler2_r)
-//  AM_RANGE(0x800100, 0x80017f) AM_READ(test_r) //18b too
-	AM_RANGE(0x800100, 0x800101) AM_READ(test_r) //18b too
-	AM_RANGE(0x800140, 0x800141) AM_READ(test1_r) //18b too
+	AM_RANGE(0x800100, 0x800101) AM_READWRITE(test_r,wh2_w) //related to input
+	AM_RANGE(0x800140, 0x800141) AM_READWRITE(rh1_r,wh1_w) //18b too
+	AM_RANGE(0x800142, 0x800143) AM_READWRITE(rh1_r,wh1_w) //18b too
 	AM_RANGE(0x800180, 0x80019f) AM_DEVREADWRITE8( DUART68681, "duart68681", duart68681_r, duart68681_w, 0xff )
 //  AM_RANGE(0xffd246, 0xffd247) AM_READ(handler3_r)
 //  AM_RANGE(0xffd248, 0xffd249) AM_READ(handler3_r)
@@ -396,7 +469,7 @@ static INPUT_PORTS_START( skattv )
 	PORT_INCLUDE(microtouch)
 
 	PORT_START("DSW1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_COIN5    )
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH,  IPT_COIN5    )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW,  IPT_COIN6    )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW,  IPT_BILL1    )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW,  IPT_UNKNOWN  )
@@ -430,9 +503,9 @@ static MACHINE_DRIVER_START( quickjac )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 280)
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
-	MDRV_PALETTE_LENGTH(0x100)
+	MDRV_PALETTE_LENGTH(0x10)
 
-//  MDRV_PALETTE_INIT(adp)
+	MDRV_PALETTE_INIT(adp)
 	MDRV_VIDEO_START(adp)
 	MDRV_VIDEO_UPDATE(adp)
 
@@ -459,9 +532,9 @@ static MACHINE_DRIVER_START( skattv )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(384, 280)
 	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1)
-	MDRV_PALETTE_LENGTH(0x100)
+	MDRV_PALETTE_LENGTH(0x10)
 
-//  MDRV_PALETTE_INIT(adp)
+	MDRV_PALETTE_INIT(adp)
 	MDRV_VIDEO_START(adp)
 	MDRV_VIDEO_UPDATE(adp)
 
@@ -481,7 +554,7 @@ static MACHINE_DRIVER_START( backgamn )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
-	MDRV_PALETTE_LENGTH(0x100)
+	MDRV_PALETTE_LENGTH(0x10)
 
 //  MDRV_PALETTE_INIT(adp)
 	MDRV_VIDEO_START(adp)
