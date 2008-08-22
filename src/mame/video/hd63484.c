@@ -525,7 +525,7 @@ static void agcpy(int opcode,int src_x,int src_y,int dst_x,int dst_y,INT16 _ax,I
 	else if ((_ax >= 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0800))
 		{ src_step1_x =  0; src_step1_y = -1; src_step2_x =   1; src_step2_y = -ay; }
 	else if ((_ax < 0) && (_ay >= 0) && ((opcode & 0x0800) == 0x0800))
-		{ src_step1_x =  0; src_step1_y =  1; src_step2_x =  -1; src_step2_y = -ay; printf("here\n");}
+		{ src_step1_x =  0; src_step1_y =  1; src_step2_x =  -1; src_step2_y = -ay; }
 	else // ((_ax < 0) && (_ay < 0) && ((opcode & 0x0800) == 0x0800))
 		{ src_step1_x =  0; src_step1_y = -1; src_step2_x =  -1; src_step2_y = -ay; }
 
