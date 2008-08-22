@@ -171,7 +171,7 @@ static void update_main_irqs(running_machine *machine)
 {
 	cpunum_set_input_line(machine, 0, 2, irq2_state ? ASSERT_LINE : CLEAR_LINE);
 	cpunum_set_input_line(machine, 0, 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, 6, vblank_irq_state || irq2_state ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 6, vblank_irq_state && irq2_state ? ASSERT_LINE : CLEAR_LINE);
 
 	if(vblank_irq_state || irq2_state)
 		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
