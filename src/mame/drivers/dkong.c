@@ -304,6 +304,7 @@ Donkey Kong Junior Notes
 #include "includes/dkong.h"
 #include "machine/8257dma.h"
 #include "machine/z80dma.h"
+#include "machine/latch8.h"
 
 /*************************************
  *
@@ -471,6 +472,7 @@ static MACHINE_RESET( drakton )
 	memory_set_bank(1, 1);
 }
 
+
 /*************************************
  *
  *  DMA handling
@@ -562,27 +564,29 @@ static WRITE8_DEVICE_HANDLER( p8257_drq_w )
 
 static READ8_HANDLER( dkong_in2_r )
 {
+	/* mcu status (sound feedback) is inverted bit4 from port B (8039) */
+	const device_config *devvp2 = devtag_get_device(machine, LATCH8, "virtual_p2");
+	UINT8 mcustatus = latch8_bit4_q_r(devvp2, 0);
+
 	UINT8 r;
 
-#if DEBUG_DISC_SOUND
-	static UINT8 ui_snd = 0;
-	static UINT8 lst = 0;
-	if  (!lst && (input_port_read(machine, "TST") & 0x01))
-	{
-		ui_snd = (ui_snd + 1) % 10;
-		popmessage("Sound %d", ui_snd);
-	}
-	lst = input_port_read(machine, "TST") & 0x01;
-	if (ui_snd<8)
-		dkongjr_snd_w1(ui_snd, (input_port_read(machine, "TST") & 0x02)>>1);
-	else
-		dkongjr_snd_w2(ui_snd-8, (input_port_read(machine, "TST") & 0x02)>>1);
-#endif
-
-	r = (input_port_read(machine, "IN2") & 0xBF) | (dkong_audio_status_r(machine,0) << 6);
+	r = (input_port_read(machine, "IN2") & 0xBF) | (mcustatus << 6);
 	coin_counter_w(offset, r >> 7);
 	if (r & 0x10)
-		r = (r & ~0x10) | 0x80; /* service ==> coint */
+		r = (r & ~0x10) | 0x80; /* service ==> coin */
+	return r;
+}
+
+static READ8_HANDLER( dkongjr_in2_r )
+{
+	/* dkongjr does not have the mcu line connected */
+
+	UINT8 r;
+
+	r = (input_port_read(machine, "IN2") & 0xBF) | 0x40;
+	coin_counter_w(offset, r >> 7);
+	if (r & 0x10)
+		r = (r & ~0x10) | 0x80; /* service ==> coin */
 	return r;
 }
 
@@ -596,6 +600,7 @@ static READ8_HANDLER( hunchbkd_mirror_r )
 	return data;
 }
 
+
 static WRITE8_HANDLER( hunchbkd_mirror_w )
 {
 #if DEBUG_PROTECTION
@@ -604,6 +609,7 @@ static WRITE8_HANDLER( hunchbkd_mirror_w )
 #endif
 	program_write_byte(0x1000+offset,data);
 }
+
 
 static READ8_HANDLER( epos_decrypt_rom )
 {
@@ -634,12 +640,14 @@ static READ8_HANDLER( epos_decrypt_rom )
 	return 0;
 }
 
+
 static WRITE8_HANDLER( hunchbkd_data_w )
 {
 	dkong_state *state = machine->driver_data;
 
 	state->hunchloopback = data;
 }
+
 
 static READ8_HANDLER( hunchbkd_port0_r )
 {
@@ -658,12 +666,14 @@ static READ8_HANDLER( hunchbkd_port0_r )
     return 0;
 }
 
+
 static READ8_HANDLER( hunchbkd_port1_r )
 {
 	dkong_state *state = machine->driver_data;
 
 	return state->hunchloopback;
 }
+
 
 static READ8_HANDLER( herbiedk_port1_r )
 {
@@ -676,12 +686,13 @@ static READ8_HANDLER( herbiedk_port1_r )
     return 1;
 }
 
+
 static READ8_HANDLER( spclforc_port0_r )
 {
 	switch (activecpu_get_pc())
 	{
-		case 0x00a3: // spclforc
-		case 0x007b: // spcfrcii
+		case 0x00a3: /* spclforc */
+		case 0x007b: /* spcfrcii */
 			return 1;
 	}
 
@@ -738,6 +749,7 @@ static READ8_HANDLER( strtheat_inputport_0_r )
 	}
 }
 
+
 static READ8_HANDLER( strtheat_inputport_1_r )
 {
 	if(input_port_read(machine, "DSW0") & 0x40)
@@ -767,10 +779,12 @@ static ADDRESS_MAP_START( dkong_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(dkong_videoram_w)
 							 		AM_BASE_MEMBER(dkong_state, video_ram)
 	AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE(DMA8257, "dma8257", dma8257_r, dma8257_w)	/* P8257 control registers */
-	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_WRITE(dkong_sh_tuneselect_w)  /* IN0, sound CPU intf */
+	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_LATCH8_WRITE("ls175.3d")      /* IN0, sound CPU intf */
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(radarscp_grid_color_w)  /* IN1 */
+
 	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)								  /* IN2 */
-	AM_RANGE(0x7d00, 0x7d07) AM_WRITE(dkong_snd_disc_w)							  /* Sound signals */
+	AM_RANGE(0x7d00, 0x7d07) AM_DEVWRITE(LATCH8, "ls259.6h", latch8_bit0_w)       /* Sound signals */
+
 	AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)	  /* DSW0 */
 	AM_RANGE(0x7d81, 0x7d81) AM_WRITE(radarscp_grid_enable_w)
 	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
@@ -789,18 +803,23 @@ static ADDRESS_MAP_START( dkongjr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(dkong_videoram_w)
 									AM_BASE_MEMBER(dkong_state, video_ram)
 	AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE(DMA8257, "dma8257", dma8257_r, dma8257_w)	/* P8257 control registers */
-	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_WRITE(dkongjr_sh_tuneselect_w)
+	
+	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_LATCH8_WRITE("ls174.3d")    /* IN0, sound interface */
+
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(dkongjr_gfxbank_w)
-	AM_RANGE(0x7c81, 0x7c81) AM_WRITE(dkongjr_sh_test6_w)
-	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkong_in2_r)	                            /* IN2 */
-	AM_RANGE(0x7d00, 0x7d07) AM_WRITE(dkongjr_snd_w1) 		                    /* Sound addrs */
+	AM_RANGE(0x7c80, 0x7c87) AM_DEVWRITE(LATCH8, "ls259.4h", latch8_bit0_w)     /* latch for sound and signals above */
+
+	AM_RANGE(0x7d00, 0x7d00) AM_READ(dkongjr_in2_r)	                            /* IN2 */
+	AM_RANGE(0x7d00, 0x7d07) AM_DEVWRITE(LATCH8, "ls259.6h",latch8_bit0_w)      /* Sound addrs */
+
 	AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)   /* DSW0 */
-	AM_RANGE(0x7d81, 0x7d81) AM_WRITE(dkongjr_snd_w2) 		                    /* Sound addrs */
 	AM_RANGE(0x7d82, 0x7d82) AM_WRITE(dkong_flipscreen_w)
 	AM_RANGE(0x7d83, 0x7d83) AM_WRITE(dkong_spritebank_w)						/* 2 PSL Signal */
 	AM_RANGE(0x7d84, 0x7d84) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x7d85, 0x7d85) AM_DEVWRITE(DMA8257, "dma8257", p8257_drq_w)		/* P8257 ==> /DRQ0 /DRQ1 */
 	AM_RANGE(0x7d86, 0x7d87) AM_WRITE(dkong_palettebank_w)
+	AM_RANGE(0x7d80, 0x7d87) AM_DEVWRITE(LATCH8, "ls259.5h", latch8_bit0_w)     /* latch for sound and signals above*/
+
 	AM_RANGE(0x8000, 0x9fff) AM_ROM	                                            /* bootleg DKjr only */
 	AM_RANGE(0xb000, 0xbfff) AM_ROM                                             /* pestplce only */
 	AM_RANGE(0xd000, 0xdfff) AM_ROM	                                            /* DK3 bootleg only */
@@ -814,18 +833,18 @@ static ADDRESS_MAP_START( dkong3_map, ADDRESS_SPACE_PROGRAM, 8 )
 									AM_SIZE_MEMBER(dkong_state, sprite_ram_size) /* sprite set 1 */
 	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(dkong_videoram_w)
 									AM_BASE_MEMBER(dkong_state, video_ram)
-	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0")  AM_WRITE(soundlatch_w)
-	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1")  AM_WRITE(soundlatch2_w)
-	AM_RANGE(0x7d00, 0x7d00) AM_READ_PORT("DSW0") AM_WRITE(soundlatch3_w)
+	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0")  AM_LATCH8_WRITE("latch1")
+	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1")  AM_LATCH8_WRITE("latch2")
+	AM_RANGE(0x7d00, 0x7d00) AM_READ_PORT("DSW0") AM_LATCH8_WRITE("latch3")
 	AM_RANGE(0x7d80, 0x7d80) AM_READ_PORT("DSW1") AM_WRITE(dkong3_2a03_reset_w)
 	AM_RANGE(0x7e80, 0x7e80) AM_WRITE(dkong3_coin_counter_w)
 	AM_RANGE(0x7e81, 0x7e81) AM_WRITE(dkong3_gfxbank_w)
 	AM_RANGE(0x7e82, 0x7e82) AM_WRITE(dkong_flipscreen_w)
-	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(dkong_spritebank_w)				/* 2 PSL Signal */
+	AM_RANGE(0x7e83, 0x7e83) AM_WRITE(dkong_spritebank_w)				  /* 2 PSL Signal */
 	AM_RANGE(0x7e84, 0x7e84) AM_WRITE(interrupt_enable_w)
-	AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE(Z80DMA, "z80dma", z80dma_rdy_w)	/* ==> DMA Chip */
+	AM_RANGE(0x7e85, 0x7e85) AM_DEVWRITE(Z80DMA, "z80dma", z80dma_rdy_w)  /* ==> DMA Chip */
 	AM_RANGE(0x7e86, 0x7e87) AM_WRITE(dkong_palettebank_w)
-	AM_RANGE(0x8000, 0x9fff) AM_ROM	                        /* DK3 and bootleg DKjr only */
+	AM_RANGE(0x8000, 0x9fff) AM_ROM	                                      /* DK3 and bootleg DKjr only */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkong3_io_map, ADDRESS_SPACE_IO, 8 )
@@ -846,10 +865,10 @@ static ADDRESS_MAP_START( hunchbkd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_MEMBER(dkong_state, sprite_ram)
 									AM_SIZE_MEMBER(dkong_state, sprite_ram_size)  /* 0x7000 */
-	AM_RANGE(0x1400, 0x1400) AM_READ_PORT("IN0") AM_WRITE(dkong_sh_tuneselect_w)
+	AM_RANGE(0x1400, 0x1400) AM_READ_PORT("IN0") AM_DEVWRITE(LATCH8, "ls175.3d", latch8_w)
 	AM_RANGE(0x1480, 0x1480) AM_READ_PORT("IN1")
 	AM_RANGE(0x1500, 0x1500) AM_READ(dkong_in2_r)                                 /* IN2 */
-	AM_RANGE(0x1500, 0x1507) AM_WRITE(dkong_snd_disc_w)							  /* Sound signals */
+	AM_RANGE(0x1500, 0x1507) AM_DEVWRITE(LATCH8, "ls259.6h", latch8_bit0_w)       /* Sound signals */
 	AM_RANGE(0x1580, 0x1580) AM_READ_PORT("DSW0") AM_WRITE(dkong_audio_irq_w)     /* DSW0 */
 	AM_RANGE(0x1582, 0x1582) AM_WRITE(dkong_flipscreen_w)
 	AM_RANGE(0x1583, 0x1583) AM_WRITE(dkong_spritebank_w)						  /* 2 PSL Signal */
@@ -1197,8 +1216,8 @@ static INPUT_PORTS_START( shootgal )
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Start 1 / P1 Button 1") PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Start 2 / P1 Button 2") PORT_PLAYER(1)
-	//PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	//PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	/* PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN ) */
+	/* PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN ) */
 
 	PORT_START("DSW0")      /* DSW0 */
 	PORT_DIPNAME( 0x01, 0x00, "1" )
@@ -1306,7 +1325,7 @@ static INPUT_PORTS_START( herodk )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION( "SW1:!2" )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
-	PORT_DIPNAME( 0x0c, 0x00, "Difficulty?" )			PORT_DIPLOCATION( "SW1:!3,!4" ) // Stored at 0x1c99
+	PORT_DIPNAME( 0x0c, 0x00, "Difficulty?" )			PORT_DIPLOCATION( "SW1:!3,!4" ) /* Stored at 0x1c99 */
 	PORT_DIPSETTING(    0x00, "0" )
 	PORT_DIPSETTING(    0x04, "1" )
 	PORT_DIPSETTING(    0x08, "2" )
@@ -1727,7 +1746,7 @@ static MACHINE_DRIVER_START( pestplce )
 
 	MDRV_GFXDECODE(pestplce)
 	MDRV_PALETTE_LENGTH(DK2B_PALETTE_LENGTH)
-	MDRV_PALETTE_INIT(dkong2b)	// wrong!
+	MDRV_PALETTE_INIT(dkong2b)	/* wrong! */
 	MDRV_VIDEO_UPDATE(pestplce)
 
 MACHINE_DRIVER_END
@@ -1778,6 +1797,12 @@ static MACHINE_DRIVER_START( dkong3b )
 	MDRV_IMPORT_FROM(dkongjr)
 	MDRV_PALETTE_INIT(dkong3)
 MACHINE_DRIVER_END
+
+/*************************************
+ *
+ * EPOS Machine drivers
+ *
+ *************************************/
 
 static MACHINE_DRIVER_START( strtheat )
 	/* basic machine hardware */
@@ -1862,7 +1887,7 @@ ROM_START( radarsc1 )
 	ROM_FILL(                 0x1000, 0x0800, 0xFF )
 
 	ROM_REGION( 0x0800, "tms", 0 )	/* speech rom */
-	ROM_LOAD( "trs014ha.bin",      0x0000, 0x0800, CRC(d1f1b48c) SHA1(ee5584368d2e9f7bde271f5004585b53f5ff5c3f) ) // speech rom
+	ROM_LOAD( "trs014ha.bin",      0x0000, 0x0800, CRC(d1f1b48c) SHA1(ee5584368d2e9f7bde271f5004585b53f5ff5c3f) ) /* speech rom */
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "trs01v3f",     0x0000, 0x0800, CRC(f095330e) SHA1(dd3de744f28ff108630d3336bd246d3323fa34af) )
@@ -1884,9 +1909,10 @@ ROM_START( radarsc1 )
 	ROM_LOAD( "trs01c2j.bin",    0x0000, 0x0100, CRC(2a087c87) SHA1(dbf0c6173583dc4fa5d3f34d2f42cbaf2bd4b167) ) /* blue */
 	ROM_LOAD( "trs01c2k.bin",    0x0100, 0x0100, CRC(650c5daf) SHA1(72f91ee2fab9eee58ee42881327e6345aa70b7f9) ) /* green */
 	ROM_LOAD( "trs01c2l.bin",    0x0200, 0x0100, CRC(23087910) SHA1(afc05c322b11fefaf0af857fee06a5afd0d4593e) ) /* red */
-	// Hack! The prom at pos 1D on video board has not been dumped
-	// Rom 1D is a MB7051, only 5 address lines
-	// Rom below from TRS02 dump: rs2-v.1hc
+	/* Hack! The prom at pos 1D on video board has not been dumped
+	 * Rom 1D is a MB7051, only 5 address lines
+	 * Rom below from TRS02 dump: rs2-v.1hc
+	 */
 	ROM_LOAD( "trs01v1d.bin",    0x0300, 0x0100, BAD_DUMP CRC(1b828315) SHA1(00c9f8c5ae86b68d38c66f9071b5f1ef421c1005) ) /* character color codes on a per-column basis */
 ROM_END
 
@@ -1921,9 +1947,9 @@ ROM_END
 
 ROM_START( dkongo )
 	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "c_5f_b.bin",   0x0000, 0x1000, CRC(424f2b11) SHA1(e4f096f2bbd37281f42a5f8e083738f55c07f3dd) )	// tkg3c.5f
-	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )	// tkg3c.5g
-	ROM_LOAD( "c_5h_b.bin",   0x2000, 0x1000, CRC(1d28895d) SHA1(63792cab215fc2a7b0e8ee61d8115045571e9d42) )	// tkg3c.5h
+	ROM_LOAD( "c_5f_b.bin",   0x0000, 0x1000, CRC(424f2b11) SHA1(e4f096f2bbd37281f42a5f8e083738f55c07f3dd) )	/* tkg3c.5f */
+	ROM_LOAD( "c_5ct_g.bin",  0x1000, 0x1000, CRC(5ec461ec) SHA1(acb11a8fbdbb3ab46068385fe465f681e3c824bd) )	/* tkg3c.5g */
+	ROM_LOAD( "c_5h_b.bin",   0x2000, 0x1000, CRC(1d28895d) SHA1(63792cab215fc2a7b0e8ee61d8115045571e9d42) )	/* tkg3c.5h */
 	ROM_LOAD( "tkg3c.5k",     0x3000, 0x1000, CRC(553b89bb) SHA1(61611df9e2748fdcd31821038dcc0e16dc933873) )
 	/* space for diagnostic ROM */
 
@@ -2706,8 +2732,6 @@ ROM_START( drktnjr )
 	ROM_REGION( 0x1000, "sound", 0 )	/* sound */
 	/* one is used for dkong conversions, the other one for dkongjr conversions */
 	ROM_LOAD( "2716.3h1",     0x0000, 0x0800, CRC(2a6ec016) SHA1(c95e185a39c8029f00798ce0a00759a4deb45677) ) /* dkongjr */
-	//ROM_RELOAD(               0x0800, 0x0800 )
-	//ROM_FILL(                 0x0800, 0x0800, 0xFF )
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "2716.3n",      0x0000, 0x0800, CRC(ea0e7f9a) SHA1(a8e2b43e15281d45e414eaae98e5248bad79c41b) )
@@ -2825,10 +2849,10 @@ ROM_START( shootgal )
 	ROM_LOAD( "sg-01-0",     0x0000, 0x0800, CRC(f055a624) SHA1(5dfe89d7271092e665cdd5cd59d15a2b70f92f43) )
 
 	ROM_REGION( 0x1800, "tms", 0 )
-	ROM_LOAD( "sg-01snd",    0x0000, 0x1000, CRC(644a0728) SHA1(e249fd57bc49572a2246aaf7c68a547f319f51bc) ) //sg-01-snd
-	ROM_LOAD( "sg-01spk",    0x1000, 0x0800, CRC(aacaf730) SHA1(cd562093ab8931d165cb0877e332474fce131c67) ) //sg-01-spk
+	ROM_LOAD( "sg-01snd",    0x0000, 0x1000, CRC(644a0728) SHA1(e249fd57bc49572a2246aaf7c68a547f319f51bc) ) /* sg-01-snd */
+	ROM_LOAD( "sg-01spk",    0x1000, 0x0800, CRC(aacaf730) SHA1(cd562093ab8931d165cb0877e332474fce131c67) ) /* sg-01-spk */
 
-	ROM_REGION( 0x2000, "user2", 0 ) // gun proms?
+	ROM_REGION( 0x2000, "user2", 0 ) /* gun proms? */
 	ROM_LOAD( "sg-1",        0x0000, 0x0200, CRC(fda82517) SHA1(b36bac69b6f8218b280aae59133ea0d22d7a99f6) )
 	ROM_LOAD( "sg-2",        0x0200, 0x091d, CRC(6e065613) SHA1(26d048af5c302f921de8e2c1bc7c7bf48dc21b5a) )
 

@@ -47,9 +47,9 @@
 #define HARDWARE_TRS02			2
 #define HARDWARE_TKG02			3
 
-#define DK2B_PALETTE_LENGTH		(256+256+8+1) // (256)
-#define DK4B_PALETTE_LENGTH		(256+256+8+1) // (256)
-#define DK3_PALETTE_LENGTH		(256+256+8+1) // (256)
+#define DK2B_PALETTE_LENGTH		(256+256+8+1) /*  (256) */
+#define DK4B_PALETTE_LENGTH		(256+256+8+1) /*  (256) */
+#define DK3_PALETTE_LENGTH		(256+256+8+1) /*  (256) */
 #define RS_PALETTE_LENGTH		(256+256+8+1)
 
 typedef struct _dkong_state dkong_state;
@@ -61,8 +61,6 @@ struct _dkong_state
 	UINT8	hardware_type;
 
 	/* sound state */
-	UINT8 page,mcustatus;
-	UINT8 portT;
 
 	/* video state */
 	tilemap *bg_tilemap;
@@ -91,8 +89,6 @@ struct _dkong_state
 	/* Save state relevant */
 	UINT8	gfx_bank, palette_bank;
 	UINT8	grid_on;
-	UINT8	snd02_enable;
-	UINT8	sig_ansn;
 	UINT16	grid_col;
 	UINT8	sprite_bank;
 	UINT8	dma_latch;
@@ -104,9 +100,6 @@ struct _dkong_state
 };
 
 /*----------- defined in video/dkong.c -----------*/
-
-WRITE8_HANDLER( radarscp_snd02_w ); /* to daisy chain sound 02 signal */
-WRITE8_HANDLER( radarsc1_ansn_w ); /* to daisy chain sound 02 signal */
 
 WRITE8_HANDLER( radarscp_grid_enable_w );
 WRITE8_HANDLER( radarscp_grid_color_w );
@@ -131,17 +124,7 @@ VIDEO_UPDATE( spclforc );
 
 /*----------- defined in audio/dkong.c -----------*/
 
-READ8_HANDLER( dkong_audio_status_r );
 WRITE8_HANDLER( dkong_audio_irq_w );
-
-WRITE8_HANDLER( dkong_snd_disc_w );
-WRITE8_HANDLER( dkong_sh_tuneselect_w );
-
-WRITE8_HANDLER( dkongjr_sh_test6_w );
-WRITE8_HANDLER( dkongjr_sh_tuneselect_w );
-
-WRITE8_HANDLER( dkongjr_snd_w1 );
-WRITE8_HANDLER( dkongjr_snd_w2 );
 
 MACHINE_DRIVER_EXTERN( radarscp_audio );
 MACHINE_DRIVER_EXTERN( dkong2b_audio );

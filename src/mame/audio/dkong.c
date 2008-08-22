@@ -2,9 +2,8 @@
 #include "cpu/i8039/i8039.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/nes_apu.h"
-#include "sound/samples.h"
 #include "sound/discrete.h"
-#include "sound/dac.h"
+#include "machine/latch8.h"
 
 #include "sound/tms5110.h"
 #include "sound/5110intf.h"
@@ -28,23 +27,8 @@
  *   sound is completely overmodulated.
  */
 
-// FIXME: Review at a later time
+/* FIXME: Review at a later time */
 #define		DK_REVIEW		(1)
-
-#define ACTIVELOW_PORT_BIT(P,A,D)   (((P) & (~(1 << (A)))) | (((D) ^ 1) << (A)))
-
-/* Needed for dkongjr ... FIXME */
-//#define I8035_T_R(N) ((portT >> (N)) & 1)
-#define I8035_T_R(M,N) ((soundlatch2_r(machine,0) >> (N)) & 1)
-#define I8035_T_W_AL(M,N,D) do { state->portT = ACTIVELOW_PORT_BIT(state->portT,N,D); soundlatch2_w(machine, 0, state->portT); } while (0)
-
-#define I8035_P1_R(M) (soundlatch3_r(M,0))
-#define I8035_P2_R(M) (soundlatch4_r(M,0))
-#define I8035_P1_W(M,D) soundlatch3_w(M,0,D)
-#define I8035_P2_W(M,D) soundlatch4_w(M,0,D)
-
-#define I8035_P1_W_AL(M,B,D) I8035_P1_W(M,ACTIVELOW_PORT_BIT(I8035_P1_R(M),B,(D)))
-#define I8035_P2_W_AL(M,B,D) I8035_P2_W(M,ACTIVELOW_PORT_BIT(I8035_P2_R(M),B,(D)))
 
 
 /****************************************************************
@@ -62,7 +46,7 @@
 #define DS_SOUND7_INV		NODE_05
 #define DS_SOUND9_INV		NODE_06
 #define DS_DAC				NODE_07
-#define DS_DAC_DISCHARGE	NODE_08
+#define DS_DISCHARGE_INV	NODE_08
 
 #define DS_SOUND0			NODE_208
 #define DS_SOUND1			NODE_209
@@ -205,7 +189,7 @@ static const discrete_mixer_desc dkong_rc_jump_desc =
 	DISC_MIXER_IS_RESISTOR,
 	{1, DK_R49+DK_R51,NE555_INTERNAL_R,2*NE555_INTERNAL_R},
 	{NODE_26,0,0,0},
-	{0,0,0,0},  // no node capacitors
+	{0,0,0,0},  /* no node capacitors */
 	0, 0,
 	DK_C24,
 	0,
@@ -217,7 +201,7 @@ static const discrete_mixer_desc dkong_rc_walk_desc =
 	DISC_MIXER_IS_RESISTOR,
 	{1, DK_R45+DK_R44,NE555_INTERNAL_R,2*NE555_INTERNAL_R},
 	{NODE_52,0,0,0},
-	{0,0,0,0},  // no node capacitors
+	{0,0,0,0},  /* no node capacitors */
 	0, 0,
 	DK_C29,
 	0,
@@ -228,8 +212,8 @@ static const discrete_mixer_desc dkong_mixer_desc =
 {
 	DISC_MIXER_IS_RESISTOR,
 	{DK_R2, DK_R24, DK_R1, DK_R14},
-	{0,0,0},	// no variable resistors
-	{0,0,0},  // no node capacitors
+	{0,0,0},  /* no variable resistors */
+	{0,0,0},  /* no node capacitors */
 #if DK_REVIEW
 	0, RES_K(10),
 #else
@@ -275,13 +259,13 @@ static DISCRETE_SOUND_START(dkong2b)
 	/* Input register mapping for dkong             */
 	/************************************************/
 
-	// DISCRETE_INPUT_DATA
+	/* DISCRETE_INPUT_DATA */
     DISCRETE_INPUT_NOT(DS_SOUND2_INV)
     DISCRETE_INPUT_NOT(DS_SOUND1_INV)
     DISCRETE_INPUT_NOT(DS_SOUND0_INV)
-    DISCRETE_INPUT_LOGIC(DS_DAC_DISCHARGE)
+    DISCRETE_INPUT_NOT(DS_DISCHARGE_INV)
     DISCRETE_INPUT_DATA(DS_DAC)
-	// Mixing - DAC
+	/* Mixing - DAC */
 	DISCRETE_ADJUSTMENT_TAG(DS_ADJ_DAC, 0, 1, DISC_LINADJ, "VR2")
 
 	/************************************************/
@@ -297,7 +281,7 @@ static DISCRETE_SOUND_START(dkong2b)
 	/************************************************/
 	/* Noise */
 	DISCRETE_LFSR_NOISE(NODE_11, 1, 1, CLOCK_2VF, 1.0, 0, 0.5, &dkong_lfsr)
-	DISCRETE_COUNTER(NODE_12, 1, 0, NODE_11, 7, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)	// LS161, IC 3J
+	DISCRETE_COUNTER(NODE_12, 1, 0, NODE_11, 7, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)	/* LS161, IC 3J */
 	DISCRETE_TRANSFORM3(NODE_13,1,NODE_12,3,DK_SUP_V,"01>2*")
 
 	/* Stomp */
@@ -307,8 +291,8 @@ static DISCRETE_SOUND_START(dkong2b)
     DISCRETE_TRANSFORM2(NODE_16, 1, NODE_15, 0.6, "01>")
     DISCRETE_RCDISC2(NODE_17,NODE_16,DK_SUP_V,DK_R8+DK_R7,0.0,DK_R7,DK_C20)
 
- 	DISCRETE_DIODE_MIXER2(NODE_18, 1, DK_1N5553_V, NODE_13, NODE_13) // D3
-	DISCRETE_DIODE_MIXER2(NODE_20, 1, DK_1N5553_V, NODE_17, NODE_18) // D1, D2
+ 	DISCRETE_DIODE_MIXER2(NODE_18, 1, DK_1N5553_V, NODE_13, NODE_13) /* D3 */
+	DISCRETE_DIODE_MIXER2(NODE_20, 1, DK_1N5553_V, NODE_17, NODE_18) /* D1, D2 */
 
     DISCRETE_RCINTEGRATE(NODE_22,1,NODE_20,DK_R5, R_PARALLEL(DK_R4+DK_R3,DK_R6),0,DK_C19,DK_SUP_V,DISC_RC_INTEGRATE_TYPE1)
     DISCRETE_MULTIPLY(DS_OUT_SOUND0,1,NODE_22,DK_R3/R_SERIE(DK_R3,DK_R4))
@@ -316,7 +300,7 @@ static DISCRETE_SOUND_START(dkong2b)
 	/************************************************/
 	/* Jump                                         */
 	/************************************************/
-
+/*  tt */
 	DISCRETE_MULTIPLY(NODE_24,1,DS_SOUND1,DK_SUP_V)
 	/* 4049B Inverter Oscillator build from 3 inverters */
 	DISCRETE_INVERTER_OSC(NODE_25,1,0,DK_R38,DK_R39,DK_C26,0,&dkong_inverter_osc_desc_jump)
@@ -361,8 +345,8 @@ static DISCRETE_SOUND_START(dkong2b)
 	/************************************************/
 
 	/* Signal decay circuit Q7, R20, C32 */
-	DISCRETE_RCDISC(NODE_70, DS_DAC_DISCHARGE, 1, DK_R20, DK_C32)
-	DISCRETE_TRANSFORM4(NODE_71, 1, DS_DAC,  DK_SUP_V/256.0, NODE_70, DS_DAC_DISCHARGE, "01*3!2+*")
+	DISCRETE_RCDISC(NODE_70, DS_DISCHARGE_INV, 1, DK_R20, DK_C32)
+	DISCRETE_TRANSFORM4(NODE_71, 1, DS_DAC,  DK_SUP_V/256.0, NODE_70, DS_DISCHARGE_INV, "01*3!2+*")
 
 	/* following the DAC are two opamps. The first is a current-to-voltage changer
      * for the DAC08 which delivers a variable output current.
@@ -387,12 +371,12 @@ static DISCRETE_SOUND_START(dkong2b)
 
 	DISCRETE_MIXER4(NODE_288, 1, DS_OUT_SOUND0, DS_OUT_SOUND1, DS_OUT_DAC, DS_OUT_SOUND2, &dkong_mixer_desc)
 
-	// Amplifier: internal amplifier
+	/* Amplifier: internal amplifier */
 	DISCRETE_ADDER2(NODE_289,1,NODE_288,5.0*43.0/(100.0+43.0))
     DISCRETE_RCINTEGRATE(NODE_294,1,NODE_289,0,150,1000, CAP_U(33),DK_SUP_V,DISC_RC_INTEGRATE_TYPE3)
     DISCRETE_CRFILTER(NODE_295,1,NODE_294, RES_K(50), DK_C13)
-	//DISCRETE_CRFILTER(NODE_295,1,NODE_294, 1000, DK_C13)
-	// EZV20 equivalent filter circuit ...
+	/*DISCRETE_CRFILTER(NODE_295,1,NODE_294, 1000, DK_C13) */
+	/* EZV20 equivalent filter circuit ... */
 	DISCRETE_CRFILTER(NODE_296,1,NODE_295, RES_K(1), CAP_U(4.7))
 #if DK_NO_FILTERS
 	DISCRETE_OUTPUT(NODE_288, 32767.0/5.0 * 10)
@@ -418,14 +402,14 @@ DISCRETE_SOUND_END
 #define RS_R8		RES_K(100)
 #define RS_R9		RES_K(10)
 #define RS_R14		RES_K(10)
-#define RS_R15		RES_K(5.6)	// ????
+#define RS_R15		RES_K(5.6)	/* ???? */
 #define RS_R16		RES_K(5.6)
 #define RS_R18		RES_K(4.7)
 #define RS_R22		RES_K(5.6)
 #define RS_R23		RES_K(5.6)
 #define RS_R25		RES_K(10)
 #define RS_R26		RES_K(5.1)
-#define RS_R27		RES_K(2) // 10k in schematics - but will oscillate
+#define RS_R27		RES_K(2) /* 10k in schematics - but will oscillate */
 #define RS_R28		150
 #define RS_R29		RES_K(4.7)
 #define RS_R30		RES_K(10)
@@ -444,7 +428,7 @@ DISCRETE_SOUND_END
 #define RS_R54		RES_K(1.2)
 #define RS_R55		RES_K(10)
 #define RS_R56		RES_K(12)
-#define RS_R57		RES_K(4.3) // ??? 43
+#define RS_R57		RES_K(4.3) /* ??? 43 */
 #define RS_R58		RES_K(43)
 #define RS_R59		RES_K(1.2)
 #define RS_R60		RES_K(10)
@@ -483,8 +467,8 @@ DISCRETE_SOUND_END
 static const discrete_mixer_desc radarscp_mixer_desc =
 	{DISC_MIXER_IS_RESISTOR,
 		{RS_R14, RS_R25, RS_R2, RS_R42, RS_R1},
-		{0,0,0,0,0},	// no variable resistors
-		{0,0,0,0,0},  // no node capacitors
+		{0,0,0,0,0},	/* no variable resistors */
+		{0,0,0,0,0},  /* no node capacitors */
 		0, RS_VR2,
 		0,
 		RS_C2,
@@ -494,7 +478,7 @@ static const discrete_mixer_desc radarscp_mixer_desc_0 =
 	{DISC_MIXER_IS_RESISTOR,
 		{RS_R56+RS_R54,NE555_INTERNAL_R,R_PARALLEL(2*NE555_INTERNAL_R,RS_R55) },
 		{0,0,0},
-		{0,0,0,0},  // no node capacitors
+		{0,0,0,0},  /* no node capacitors */
 		0, 0,
 		RS_C51,
 		0,
@@ -503,8 +487,8 @@ static const discrete_mixer_desc radarscp_mixer_desc_0 =
 static const discrete_mixer_desc radarscp_mixer_desc_7 =
 	{DISC_MIXER_IS_RESISTOR,
 		{RS_R63+RS_R59, NE555_INTERNAL_R,R_PARALLEL(2*NE555_INTERNAL_R,RS_R60)},
-		{0,0,0},	// no variable resistors
-		{0,0,0},  // no node capacitors
+		{0,0,0},	/* no variable resistors */
+		{0,0,0},  /* no node capacitors */
 		0, 0,
 		RS_C50,
 		0,
@@ -531,16 +515,16 @@ static DISCRETE_SOUND_START(radarscp)
 	/* Input register mapping for radarscp          */
 	/************************************************/
 
-	// DISCRETE_INPUT_DATA
+	/* DISCRETE_INPUT_DATA */
     DISCRETE_INPUT_NOT(DS_SOUND0_INV)
     DISCRETE_INPUT_NOT(DS_SOUND1_INV)
     DISCRETE_INPUT_NOT(DS_SOUND2_INV)
     DISCRETE_INPUT_NOT(DS_SOUND6_INV)
     DISCRETE_INPUT_NOT(DS_SOUND7_INV)
-    DISCRETE_INPUT_LOGIC(DS_DAC_DISCHARGE)
+    DISCRETE_INPUT_NOT(DS_DISCHARGE_INV)
     DISCRETE_INPUT_DATA(DS_DAC)
 
-	// Mixing - DAC
+	/* Mixing - DAC */
 	DISCRETE_ADJUSTMENT_TAG(DS_ADJ_DAC, 0, 1, DISC_LINADJ, "VR2")
 
 	/************************************************/
@@ -555,10 +539,10 @@ static DISCRETE_SOUND_START(radarscp)
 	/************************************************/
 
 	DISCRETE_LFSR_NOISE(NODE_11, 1, 1, CLOCK_2VF, 1.0, 0, 0.5, &dkong_lfsr)
-	// Clear (1) from SOUND6
-	DISCRETE_COUNTER(NODE_12, 1, DS_SOUND6_INV, NODE_11, 15, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)	// LS161, IC 3J
-	DISCRETE_TRANSFORM3(NODE_13,1,NODE_12,0x04,DK_SUP_V,"01&1=2*")  //QC => SND02
-	DISCRETE_TRANSFORM3(NODE_14,1,NODE_12,0x02,DK_SUP_V,"01&1=2*")  //QB => SND01
+	/* Clear (1) from SOUND6 */
+	DISCRETE_COUNTER(NODE_12, 1, DS_SOUND6_INV, NODE_11, 15, DISC_COUNT_UP, 0, DISC_CLK_ON_R_EDGE)	/* LS161, IC 3J */
+	DISCRETE_TRANSFORM3(NODE_13,1,NODE_12,0x04,DK_SUP_V,"01&1=2*")  /*QC => SND02 */
+	DISCRETE_TRANSFORM3(NODE_14,1,NODE_12,0x02,DK_SUP_V,"01&1=2*")  /*QB => SND01 */
 
 	/************************************************/
 	/* SOUND2                                       */
@@ -567,11 +551,11 @@ static DISCRETE_SOUND_START(radarscp)
 	/* C21 is discharged via Q5 BE */
 
 	DISCRETE_RCDISC_MODULATED(NODE_16,1,DS_SOUND2_INV,0,RS_R_NN01,0,0,RS_R9*2,RS_C20,DK_SUP_V)
-    DISCRETE_TRANSFORM2(NODE_17, 1, NODE_16, 0.6, "01>") // TR2
+    DISCRETE_TRANSFORM2(NODE_17, 1, NODE_16, 0.6, "01>") /* TR2 */
     DISCRETE_RCDISC2(NODE_18,NODE_17,DK_SUP_V,RS_R8+RS_R7,0.0,RS_R7,RS_C19)
 
- 	DISCRETE_DIODE_MIXER2(NODE_19, 1, DK_1N5553_V, NODE_13, NODE_13) // D3
-	DISCRETE_DIODE_MIXER2(NODE_20, 1, DK_1N5553_V, NODE_18, NODE_19) // D1, D2
+ 	DISCRETE_DIODE_MIXER2(NODE_19, 1, DK_1N5553_V, NODE_13, NODE_13) /* D3 */
+	DISCRETE_DIODE_MIXER2(NODE_20, 1, DK_1N5553_V, NODE_18, NODE_19) /* D1, D2 */
 
     DISCRETE_RCINTEGRATE(NODE_22,1,NODE_20,RS_R5, R_PARALLEL(RS_R4+RS_R3,RS_R6),0,RS_C18,DK_SUP_V,DISC_RC_INTEGRATE_TYPE1)
     DISCRETE_MULTIPLY(DS_OUT_SOUND2,1,NODE_22,RS_R3/R_SERIE(RS_R3,RS_R4))
@@ -583,11 +567,11 @@ static DISCRETE_SOUND_START(radarscp)
 	/* C21 is discharged via Q5 BE */
 
 	DISCRETE_RCDISC_MODULATED(NODE_26,1,DS_SOUND1_INV,0,RS_R_NN02,0,0,RS_R32,RS_C31,DK_SUP_V)
-    DISCRETE_TRANSFORM2(NODE_27, 1, NODE_26, 0.6, "01>") // TR5
+    DISCRETE_TRANSFORM2(NODE_27, 1, NODE_26, 0.6, "01>") /* TR5 */
     DISCRETE_RCDISC2(NODE_28,NODE_27,DK_SUP_V,RS_R31+RS_R30,0.0,RS_R30,RS_C30)
 
- 	DISCRETE_DIODE_MIXER2(NODE_29, 1, DK_1N5553_V, NODE_14, NODE_14) // D3
-	DISCRETE_DIODE_MIXER2(NODE_30, 1, DK_1N5553_V, NODE_28, NODE_29) // D1, D2
+ 	DISCRETE_DIODE_MIXER2(NODE_29, 1, DK_1N5553_V, NODE_14, NODE_14) /* D3 */
+	DISCRETE_DIODE_MIXER2(NODE_30, 1, DK_1N5553_V, NODE_28, NODE_29) /* D1, D2 */
 
     DISCRETE_RCINTEGRATE(NODE_31,1,NODE_30,RS_R28, R_PARALLEL(RS_R27+RS_R26,RS_R29),0,RS_C29,DK_SUP_V,DISC_RC_INTEGRATE_TYPE1)
     DISCRETE_MULTIPLY(DS_OUT_SOUND1,1,NODE_31,RS_R26/R_SERIE(RS_R26,RS_R27))
@@ -627,8 +611,8 @@ static DISCRETE_SOUND_START(radarscp)
 	/* DAC                                          */
 	/************************************************/
 	/* Signal decay circuit Q7, R20, C32 */
-	DISCRETE_RCDISC(NODE_170, DS_DAC_DISCHARGE, 1, RS_R40, RS_C40)
-	DISCRETE_TRANSFORM4(NODE_171, 1, DS_DAC,  DK_SUP_V/256.0, NODE_170, DS_DAC_DISCHARGE, "01*3!2+*")
+	DISCRETE_RCDISC(NODE_170, DS_DISCHARGE_INV, 1, RS_R40, RS_C40)
+	DISCRETE_TRANSFORM4(NODE_171, 1, DS_DAC,  DK_SUP_V/256.0, NODE_170, DS_DISCHARGE_INV, "01*3!2+*")
 
 	/* following the DAC are two opamps. The first is a current-to-voltage changer
      * for the DAC08 which delivers a variable output current.
@@ -649,7 +633,7 @@ static DISCRETE_SOUND_START(radarscp)
 
 	DISCRETE_MIXER5(NODE_288, 1, DS_OUT_SOUND0, DS_OUT_SOUND1, DS_OUT_SOUND2, DS_OUT_SOUND7, DS_OUT_DAC, &radarscp_mixer_desc)
 
-	// Amplifier: internal amplifier
+	/* Amplifier: internal amplifier */
 	DISCRETE_ADDER2(NODE_289,1,NODE_288,5.0*43.0/(100.0+43.0))
     DISCRETE_RCINTEGRATE(NODE_294,1,NODE_289,0,150,1000, CAP_U(33),DK_SUP_V,DISC_RC_INTEGRATE_TYPE3)
 	DISCRETE_CRFILTER(NODE_295,1,NODE_294, 1000, DK_C13)
@@ -689,7 +673,7 @@ DISCRETE_SOUND_END
 #define JR_C14		CAP_U(4.7)
 #define JR_C15		CAP_U(22)
 #define JR_C16		CAP_U(3.3)
-#define JR_C17		CAP_U(3.3) // ??? illegible
+#define JR_C17		CAP_U(3.3) /* ??? illegible */
 #define JR_C18		CAP_N(22)
 #define JR_C19		CAP_N(4.7)
 #define JR_C20		CAP_U(0.12)
@@ -726,8 +710,8 @@ DISCRETE_SOUND_END
 static const discrete_mixer_desc dkongjr_mixer_desc =
 	{DISC_MIXER_IS_RESISTOR,
 		{JR_R5, JR_R3, JR_R6, JR_R4, JR_R25},
-		{0,0,0,0,0},	// no variable resistors
-		{0,0,0,0,0},  // no node capacitors
+		{0,0,0,0,0},	/* no variable resistors */
+		{0,0,0,0,0},  /* no node capacitors */
 		0, 0,
 		JR_C155,
 		JR_C161,
@@ -736,9 +720,9 @@ static const discrete_mixer_desc dkongjr_mixer_desc =
 static const discrete_mixer_desc dkongjr_s1_mixer_desc =
 	{DISC_MIXER_IS_RESISTOR,
 		{JR_R13, JR_R12},
-		{0,0},	// no variable resistors
-		{0,0},  // no node capacitors
-		0, RES_K(90), // Internal LS624 resistors ...
+		{0,0},	/* no variable resistors */
+		{0,0},  /* no node capacitors */
+		0, RES_K(90), /* Internal LS624 resistors ... */
 		JR_C24,
 		0,
 		0, 1};
@@ -771,7 +755,7 @@ static DISCRETE_SOUND_START(dkongjr)
     DISCRETE_INPUT_NOT(DS_SOUND6_INV)
     DISCRETE_INPUT_NOT(DS_SOUND7_INV)
     DISCRETE_INPUT_NOT(DS_SOUND9_INV)
-    DISCRETE_INPUT_LOGIC(DS_DAC_DISCHARGE)
+    DISCRETE_INPUT_NOT(DS_DISCHARGE_INV)
     DISCRETE_INPUT_DATA(DS_DAC)
 
 	/************************************************/
@@ -827,15 +811,15 @@ static DISCRETE_SOUND_START(dkongjr)
 
 	DISCRETE_COUNTER(NODE_100,1,0,NODE_118,0xFFFF,DISC_COUNT_UP,0,DISC_CLK_BY_COUNT)
 
-	DISCRETE_BITSET(NODE_101, NODE_100, 7) 	//LS157 2A
-	DISCRETE_BITSET(NODE_102, NODE_100, 4) 	//LS157 2B
-	DISCRETE_BITSET(NODE_103, NODE_100, 13) //LS157 3A
-	DISCRETE_BITSET(NODE_104, NODE_100, 12) //LS157 3B
+	DISCRETE_BITSET(NODE_101, NODE_100, 7) 	/*LS157 2A */
+	DISCRETE_BITSET(NODE_102, NODE_100, 4) 	/*LS157 2B */
+	DISCRETE_BITSET(NODE_103, NODE_100, 13) /*LS157 3A */
+	DISCRETE_BITSET(NODE_104, NODE_100, 12) /*LS157 3B */
 
 	/* LS157 Switches */
-	DISCRETE_SWITCH(NODE_105, 1, DS_SOUND7_INV, GND, NODE_113) // Switch 1 from LS624
-	DISCRETE_SWITCH(NODE_106, 1, DS_SOUND7_INV, NODE_101, NODE_102) // Switch 2
-	DISCRETE_SWITCH(NODE_107, 1, DS_SOUND7_INV, NODE_103, NODE_104) // Switch 3
+	DISCRETE_SWITCH(NODE_105, 1, DS_SOUND7_INV, GND, NODE_113) /* Switch 1 from LS624 */
+	DISCRETE_SWITCH(NODE_106, 1, DS_SOUND7_INV, NODE_101, NODE_102) /* Switch 2 */
+	DISCRETE_SWITCH(NODE_107, 1, DS_SOUND7_INV, NODE_103, NODE_104) /* Switch 3 */
 
 	DISCRETE_LS123(NODE_110, DS_SOUND0_INV, JR_R8, JR_C14)
 	DISCRETE_TRANSFORM2(NODE_111, 1, TTL_HIGH, NODE_110, "01-")
@@ -855,8 +839,8 @@ static DISCRETE_SOUND_START(dkongjr)
 	/* DAC                                          */
 	/************************************************/
 	/* Signal decay circuit Q7, R20, C32 */
-	DISCRETE_RCDISC(NODE_170, DS_DAC_DISCHARGE, 1, JR_R20, JR_C32)
-	DISCRETE_TRANSFORM4(NODE_171, 1, DS_DAC,  DK_SUP_V/256.0, NODE_170, DS_DAC_DISCHARGE, "01*3!2+*")
+	DISCRETE_RCDISC(NODE_170, DS_DISCHARGE_INV, 1, JR_R20, JR_C32)
+	DISCRETE_TRANSFORM4(NODE_171, 1, DS_DAC,  DK_SUP_V/256.0, NODE_170, DS_DISCHARGE_INV, "01*3!2+*")
 
 	/* following the DAC are two opamps. The first is a current-to-voltage changer
      * for the DAC08 which delivers a variable output current.
@@ -889,35 +873,7 @@ DISCRETE_SOUND_END
  *
  ****************************************************************/
 
-static SOUND_START( dkong )
-{
-	dkong_state *state = machine->driver_data;
 
-	state_save_register_global(state->page);
-	state_save_register_global(state->mcustatus);
-	state_save_register_global(state->portT);
-}
-
-static SOUND_RESET( dkong )
-{
-	dkong_state *state = machine->driver_data;
-
-	state->mcustatus = 0;
-	state->page = 0x47;
-	state->portT = 0;
-
-	I8035_T_W_AL(machine,0,0);
-	I8035_T_W_AL(machine,1,0);
-	I8035_P1_W(machine,0xFF);
-	I8035_P2_W(machine,0xFF);
-	soundlatch_w(machine,0,0x0F);
-}
-
-static SOUND_RESET( dkongjr )
-{
-	SOUND_RESET_CALL(dkong);
-	soundlatch_w(machine,0,0x00);
-}
 
 /****************************************************************
  *
@@ -1013,38 +969,17 @@ Addresses found at @0x510, cpu2
 
 static WRITE8_HANDLER( M58817_command_w )
 {
-	logerror("PA Write %x\n", data);
-
 	tms5110_ctl_w(machine, 0, data & 0x0f);
 	tms5110_pdc_w(machine, 0, (data>>4) & 0x01);
-	// FIXME 0x20 is CS
+	/* FIXME 0x20 is CS */
 }
+
 
 /****************************************************************
  *
  * I/O Handlers - static
  *
  ****************************************************************/
-
-static READ8_HANDLER( dkong_sh_p1_r )
-{
-	return I8035_P1_R(machine);
-}
-
-static READ8_HANDLER( dkong_sh_p2_r )
-{
-	return I8035_P2_R(machine);
-}
-
-static READ8_HANDLER( dkong_sh_t0_r )
-{
-	return I8035_T_R(machine,0);
-}
-
-static READ8_HANDLER( dkong_sh_t1_r )
-{
-	return I8035_T_R(machine,1);
-}
 
 static WRITE8_HANDLER( dkong_voice_w )
 {
@@ -1062,57 +997,26 @@ static READ8_HANDLER( dkong_voice_status_r )
 	return 0;
 }
 
-static READ8_HANDLER( dkong_sh_tune_r )
+static READ8_DEVICE_HANDLER( dkong_tune_r )
 {
-	dkong_state *state = machine->driver_data;
-	UINT8 *SND = memory_region(machine, "sound");
+	const device_config *devvp2 = devtag_get_device(device->machine, LATCH8, "virtual_p2");
+	UINT8 *snd_rom = memory_region(device->machine, "sound");
+	UINT8 page = latch8_r(devvp2,0) & 0x47;
 
-	if ( state->page & 0x40 )
+	if ( page & 0x40 )
 	{
-		return (soundlatch_r(machine,0) & 0x0F) | (dkong_voice_status_r(machine,0)<<4);
+		return (latch8_r(device, 0) & 0x0F) | (dkong_voice_status_r(device->machine,0)<<4);
 	}
 	else
 	{
 		/* printf("rom access at pc = %4x\n",activecpu_get_pc()); */
-		return (SND[0x1000+(state->page & 7)*256+offset]);
+		return (snd_rom[0x1000+(page & 7)*256+offset]);
 	}
 }
 
-static READ8_HANDLER( dkongjr_sh_tune_r )
-{
-	return soundlatch_r(machine,0) & 0x01F;
-}
-
-static WRITE8_HANDLER( dkong_sh_p1_w )
+static WRITE8_HANDLER( dkong_p1_w )
 {
 	discrete_sound_w(machine,DS_DAC,data);
-}
-
-
-static READ8_HANDLER( radarsc1_sh_p1_r )
-{
-	int r;
-
-	r = (I8035_P1_R(machine) & 0x80) | (tms5110_status_r(machine,0)<<6);
-	return r;
-}
-
-static WRITE8_HANDLER( dkong_sh_p2_w )
-{
-	dkong_state *state = machine->driver_data;
-
-	/*   If P2.Bit7 -> is apparently an external signal decay or other output control
-     *   If P2.Bit6 -> activates the external compressed sample ROM (not radarsc1)
-     *   If P2.Bit5 -> Signal ANSN ==> Grid enable (radarsc1)
-     *   If P2.Bit4 -> status code to main cpu
-     *   P2.Bit2-0  -> select the 256 byte bank for external ROM
-     */
-
-	state->mcustatus = ((~data & 0x10) >> 4);
-	radarsc1_ansn_w(machine, 0, (data & 0x20) >> 5);
-	state->page = (data & 0x47);
-
-	discrete_sound_w(machine,DS_DAC_DISCHARGE, (data & 0x80) ? 0 : 1 );
 }
 
 
@@ -1122,24 +1026,6 @@ static WRITE8_HANDLER( dkong_sh_p2_w )
  *
  ****************************************************************/
 
-WRITE8_HANDLER( dkongjr_sh_test6_w )
-{
-	I8035_P2_W_AL(machine,6,data & 1);
-}
-
-
-WRITE8_HANDLER( dkongjr_sh_tuneselect_w )
-{
-	soundlatch_w(machine,offset,data);
-}
-
-READ8_HANDLER( dkong_audio_status_r )
-{
-	dkong_state *state = machine->driver_data;
-
-	return state->mcustatus;
-}
-
 WRITE8_HANDLER( dkong_audio_irq_w )
 {
 	if (data)
@@ -1148,92 +1034,6 @@ WRITE8_HANDLER( dkong_audio_irq_w )
 		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
 }
 
-WRITE8_HANDLER( dkong_snd_disc_w )
-{
-	dkong_state *state = machine->driver_data;
-
-	switch (offset)
-	{
-		case 0:
-			discrete_sound_w(machine,DS_SOUND0_INP,data & 1);
-			break;
-		case 1:
-			discrete_sound_w(machine,DS_SOUND1_INP,data & 1);
-			break;
-		case 2:
-			discrete_sound_w(machine,DS_SOUND2_INP,data & 1);
-			radarscp_snd02_w(machine, 0, data & 1);
-			break;
-		case 3:
-			if (state->hardware_type == HARDWARE_TRS01)
-				//SOUND3 ==> PA7
-				I8035_P1_W_AL(machine,7,data & 1);
-			else
-				I8035_P2_W_AL(machine,5,data & 1);
-			break;
-		case 4:
-			I8035_T_W_AL(machine, 1, data & 1);
-			break;
-		case 5:
-			I8035_T_W_AL(machine, 0, data & 1);
-			break;
-		case 6:
-			discrete_sound_w(machine,DS_SOUND6_INP,data & 1);
-			break;
-		case 7:
-			discrete_sound_w(machine,DS_SOUND7_INP,data & 1);
-			break;
- 	}
-	return;
-}
-
-WRITE8_HANDLER( dkong_sh_tuneselect_w )
-{
-	soundlatch_w(machine,offset,data ^ 0x0f);
-}
-
-WRITE8_HANDLER( dkongjr_snd_w1 )
-{
-	dkong_state *state = machine->driver_data;
-
-	switch (offset)
-	{
-		case 0:			/* climb */
-			discrete_sound_w(machine,DS_SOUND0_INP,data & 1);
-			break;
-		case 1:			/* jump */
-			discrete_sound_w(machine,DS_SOUND1_INP,data & 1);
-			break;
-		case 2:			/* land */
-			discrete_sound_w(machine,DS_SOUND2_INP,data & 1);
-			break;
-		case 3: /* Port 3 write ==> PB 5 */
-			I8035_P2_W_AL(machine,5,data & 1);
-			break;
-		case 4:			/* Port 4 write */
-			I8035_T_W_AL(machine,1, data & 1);
-			break;
-		case 5:			/* Port 5 write */
-			I8035_T_W_AL(machine,0, data & 1);
-			break;
-		case 6:			/* Port 6 write ==> PB 4 */
-			I8035_P2_W_AL(machine,4,data & 1);
-			break;
-		case 7:			/* walk */
-			discrete_sound_w(machine,DS_SOUND7_INP,data & 1);
-			break;
-	}
-}
-
-WRITE8_HANDLER( dkongjr_snd_w2 )
-{
-	switch (offset)
-	{
-	case 0:			/* S9 - drop */
-		discrete_sound_w(machine,DS_SOUND9_INP,data & 1);
-		break;
-	}
-}
 
 /*************************************
  *
@@ -1246,35 +1046,38 @@ static ADDRESS_MAP_START( dkong_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkong_sound_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0xff) AM_READWRITE(dkong_sh_tune_r, dkong_voice_w)
-	AM_RANGE(I8039_bus, I8039_bus) AM_READWRITE(dkong_sh_tune_r, dkong_voice_w)
-	AM_RANGE(I8039_p1, I8039_p1) AM_READWRITE(dkong_sh_p1_r, dkong_sh_p1_w)
-	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(dkong_sh_p2_r, dkong_sh_p2_w)
-	AM_RANGE(I8039_t0, I8039_t0) AM_READ(dkong_sh_t0_r)
-	AM_RANGE(I8039_t1, I8039_t1) AM_READ(dkong_sh_t1_r)
+	AM_RANGE(0x00, 0xFF) AM_DEVREAD(LATCH8, "ls175.3d", dkong_tune_r)
+	                     AM_WRITE(dkong_voice_w)
+	AM_RANGE(I8039_bus, I8039_bus) AM_DEVREAD(LATCH8, "ls175.3d", dkong_tune_r)
+	                               AM_WRITE(dkong_voice_w)
+	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(dkong_p1_w) /* only write to dac */
+	AM_RANGE(I8039_p2, I8039_p2) AM_LATCH8_READWRITE("virtual_p2")
+	AM_RANGE(I8039_t0, I8039_t0) AM_LATCH8_READBIT("ls259.6h", 5)
+	AM_RANGE(I8039_t1, I8039_t1) AM_LATCH8_READBIT("ls259.6h", 4)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkongjr_sound_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0xff) AM_READ(dkongjr_sh_tune_r)
-	AM_RANGE(I8039_p1, I8039_p1) AM_READWRITE(dkong_sh_p1_r, dkong_sh_p1_w)
-	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(dkong_sh_p2_r, dkong_sh_p2_w)
-	AM_RANGE(I8039_t0, I8039_t0) AM_READ(dkong_sh_t0_r)
-	AM_RANGE(I8039_t1, I8039_t1) AM_READ(dkong_sh_t1_r)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_LATCH8_READ("ls174.3d")
+	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(dkong_p1_w) /* only write to dac */
+	AM_RANGE(I8039_p2, I8039_p2) AM_LATCH8_READWRITE("virtual_p2")
+	AM_RANGE(I8039_t0, I8039_t0) AM_LATCH8_READBIT("ls259.6h", 5)
+	AM_RANGE(I8039_t1, I8039_t1) AM_LATCH8_READBIT("ls259.6h", 4)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( radarsc1_sound_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0xff) AM_READ(soundlatch_r)
-	AM_RANGE(0x00, 0xff) AM_WRITE(dkong_sh_p1_w) // DAC here
-	AM_RANGE(I8039_p1, I8039_p1) AM_READWRITE(radarsc1_sh_p1_r, M58817_command_w)
-	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(dkong_sh_p2_r, dkong_sh_p2_w)
-	AM_RANGE(I8039_t0, I8039_t0) AM_READ(dkong_sh_t0_r)
-	AM_RANGE(I8039_t1, I8039_t1) AM_READ(dkong_sh_t1_r)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff) AM_DEVREAD(LATCH8, "ls175.3d", latch8_r)
+	AM_RANGE(0x00, 0xff) AM_WRITE(dkong_p1_w) /* DAC here */
+	AM_RANGE(I8039_p1, I8039_p1) AM_LATCH8_READ("virtual_p1")
+	                             AM_WRITE(M58817_command_w)
+	AM_RANGE(I8039_p2, I8039_p2) AM_LATCH8_WRITE("virtual_p2")
+	AM_RANGE(I8039_t0, I8039_t0) AM_LATCH8_READBIT("ls259.6h", 5)
+	AM_RANGE(I8039_t1, I8039_t1) AM_LATCH8_READBIT("ls259.6h", 4)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkong3_sound1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch_r)		// overwrite default
-	AM_RANGE(0x4017, 0x4017) AM_READ(soundlatch2_r)
+	AM_RANGE(0x4016, 0x4016) AM_LATCH8_READ("latch1")		/* overwrite default */
+	AM_RANGE(0x4017, 0x4017) AM_LATCH8_READ("latch2")
 	AM_RANGE(0x4000, 0x4017) AM_READ(nes_psg_0_r)
 	AM_RANGE(0x4000, 0x4017) AM_WRITE(nes_psg_0_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -1282,7 +1085,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dkong3_sound2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x4016, 0x4016) AM_READ(soundlatch3_r)		// overwrite default
+	AM_RANGE(0x4016, 0x4016) AM_LATCH8_READ("latch3")		/* overwrite default */
 	AM_RANGE(0x4000, 0x4017) AM_READ(nes_psg_1_r)
 	AM_RANGE(0x4000, 0x4017) AM_WRITE(nes_psg_1_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM
@@ -1305,12 +1108,34 @@ static const nes_interface nes_interface_2 = { "n2a03b" };
 
 MACHINE_DRIVER_START( dkong2b_audio )
 
+	/* sound latches */
+	
+	MDRV_LATCH8_ADD("ls175.3d")
+	MDRV_LATCH8_MASK(0xf0)
+	MDRV_LATCH8_INVERT(0x0F)
+	
+	MDRV_LATCH8_ADD("ls259.6h")
+	MDRV_LATCH8_DISCRETE_NODE(0, DS_SOUND0_INP)
+	MDRV_LATCH8_DISCRETE_NODE(1, DS_SOUND1_INP)
+	MDRV_LATCH8_DISCRETE_NODE(2, DS_SOUND2_INP)
+	MDRV_LATCH8_DISCRETE_NODE(6, DS_SOUND6_INP)
+	MDRV_LATCH8_DISCRETE_NODE(7, DS_SOUND7_INP)
+
+	/*   If P2.Bit7 -> is apparently an external signal decay or other output control
+	 *   If P2.Bit6 -> activates the external compressed sample ROM (not radarsc1)
+	 *   If P2.Bit5 -> Signal ANSN ==> Grid enable (radarsc1)
+	 *   If P2.Bit4 -> status code to main cpu
+	 *   P2.Bit2-0  -> select the 256 byte bank for external ROM
+	 */
+
+	MDRV_LATCH8_ADD( "virtual_p2" )	/* virtual latch for port B */
+	MDRV_LATCH8_INVERT( 0x20 )		/* signal is inverted       */
+	MDRV_LATCH8_DEVREAD(5, LATCH8, "ls259.6h", latch8_r, 3)
+	MDRV_LATCH8_DISCRETE_NODE(7, DS_DISCHARGE_INV)
+
 	MDRV_CPU_ADD("sound", I8035,I8035_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(dkong_sound_map,0)
 	MDRV_CPU_IO_MAP(dkong_sound_io_map, 0)
-
-	MDRV_SOUND_START(dkong)
-	MDRV_SOUND_RESET(dkong)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
@@ -1334,6 +1159,12 @@ MACHINE_DRIVER_START( radarsc1_audio )
 	MDRV_IMPORT_FROM( radarscp_audio )
 	MDRV_CPU_MODIFY("sound")
 	MDRV_CPU_IO_MAP(radarsc1_sound_io_map, 0)
+	
+	/* virtual_p2 is not used here */
+	MDRV_LATCH8_ADD( "virtual_p1" )	/* virtual latch for port A */
+	MDRV_LATCH8_INVERT( 0x80 )		/* signal is inverted       */
+	MDRV_LATCH8_DEVREAD(7, LATCH8, "ls259.6h", latch8_r, 3)
+	MDRV_LATCH8_READ(6, tms5110_status_r, 0)
 
 	MDRV_SOUND_ADD("tms", M58817, XTAL_640kHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
@@ -1342,12 +1173,32 @@ MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( dkongjr_audio )
 
+	/* sound latches */
+	
+	MDRV_LATCH8_ADD("ls174.3d")
+	MDRV_LATCH8_MASK(0xE0)
+	
+	MDRV_LATCH8_ADD( "ls259.6h")
+	MDRV_LATCH8_DISCRETE_NODE(0, DS_SOUND0_INP)
+	MDRV_LATCH8_DISCRETE_NODE(1, DS_SOUND1_INP)
+	MDRV_LATCH8_DISCRETE_NODE(2, DS_SOUND2_INP)
+	MDRV_LATCH8_DISCRETE_NODE(7, DS_SOUND7_INP)
+
+	MDRV_LATCH8_ADD( "ls259.5h")
+	MDRV_LATCH8_DISCRETE_NODE(1, DS_SOUND9_INP)
+
+	MDRV_LATCH8_ADD( "ls259.4h")
+
+	MDRV_LATCH8_ADD( "virtual_p2" )	/* virtual latch for port B */
+	MDRV_LATCH8_INVERT( 0x70 )		/* all signals are inverted */
+	MDRV_LATCH8_DEVREAD(6, LATCH8, "ls259.4h", latch8_r, 1)
+	MDRV_LATCH8_DEVREAD(5, LATCH8, "ls259.6h", latch8_r, 3)
+	MDRV_LATCH8_DEVREAD(4, LATCH8, "ls259.6h", latch8_r, 6)
+	MDRV_LATCH8_DISCRETE_NODE(7, DS_DISCHARGE_INV)
+	
 	MDRV_CPU_ADD("sound", I8035,I8035_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(dkong_sound_map,0)
 	MDRV_CPU_IO_MAP(dkongjr_sound_io_map, 0)
-
-	MDRV_SOUND_START(dkong)
-	MDRV_SOUND_RESET(dkongjr)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -1367,6 +1218,11 @@ MACHINE_DRIVER_START( dkong3_audio )
 	MDRV_CPU_PROGRAM_MAP(dkong3_sound2_map, 0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
+	/* sound latches */
+	MDRV_LATCH8_ADD( "latch1")
+	MDRV_LATCH8_ADD( "latch2")
+	MDRV_LATCH8_ADD( "latch3")
+	
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("nes1", NES, N2A03_DEFAULTCLOCK)
 	MDRV_SOUND_CONFIG(nes_interface_1)

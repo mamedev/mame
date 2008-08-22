@@ -10,6 +10,7 @@
 #include "driver.h"
 #include "video/resnet.h"
 #include "includes/dkong.h"
+#include "machine/latch8.h"
 
 #define RADARSCP_BCK_COL_OFFSET			256
 #define RADARSCP_GRID_COL_OFFSET		(RADARSCP_BCK_COL_OFFSET + 256)
@@ -60,13 +61,13 @@ static const double cd4049_al = 0.01;
 
 static const res_net_decode_info dkong_decode_info =
 {
-	2,		// there may be two proms needed to construct color
-	0,		// start at 0
-	255,	// end at 255
-	//  R,   G,   B,   R,   G,   B
-	{ 256, 256,   0,   0,   0,   0},		// offsets
-	{   1,  -2,   0,   0,   2,   0},		// shifts
-	{0x07,0x04,0x03,0x00,0x03,0x00}		    // masks
+	2,		/*  there may be two proms needed to construct color */
+	0,		/*  start at 0 */
+	255,	/*  end at 255 */
+	/*  R,   G,   B,   R,   G,   B */
+	{ 256, 256,   0,   0,   0,   0},		/*  offsets */
+	{   1,  -2,   0,   0,   2,   0},		/*  shifts */
+	{0x07,0x04,0x03,0x00,0x03,0x00}		    /*  masks */
 };
 
 static const res_net_info dkong_net_info =
@@ -75,7 +76,7 @@ static const res_net_info dkong_net_info =
 	{
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1000, 470, 220 } },
 		{ RES_NET_AMP_DARLINGTON, 470, 0, 3, { 1000, 470, 220 } },
-		{ RES_NET_AMP_EMITTER,    680, 0, 2, {  470, 220,   0 } }  // dkong
+		{ RES_NET_AMP_EMITTER,    680, 0, 2, {  470, 220,   0 } }  /*  dkong */
 	}
 };
 
@@ -91,13 +92,13 @@ static const res_net_info dkong_net_bck_info =
 
 static const res_net_decode_info dkong3_decode_info =
 {
-	1,		// one prom needed to contruct color
-	0,		// start at 0
-	255,	// end at 255
-	//  R,   G,   B
-	{   0,   0, 512 },		// offsets
-	{   4,   0,   0 },		// shifts
-	{0x0F,0x0F,0x0F }		    // masks
+	1,		/*  one prom needed to contruct color */
+	0,		/*  start at 0 */
+	255,	/*  end at 255 */
+	/*   R,   G,   B */
+	{   0,   0, 512 },		/*  offsets */
+	{   4,   0,   0 },		/*  shifts */
+	{0x0F,0x0F,0x0F }		    /*  masks */
 };
 
 static const res_net_info dkong3_net_info =
@@ -124,7 +125,7 @@ static const res_net_info radarscp_net_info =
 	{
 		{ RES_NET_AMP_DARLINGTON, 470,      0, 3, { 1000, 470, 220 } },
 		{ RES_NET_AMP_DARLINGTON, 470,      0, 3, { 1000, 470, 220 } },
-		{ RES_NET_AMP_DARLINGTON, 680, 150000, 2, {  470, 220,   0 } }    // radarscp
+		{ RES_NET_AMP_DARLINGTON, 680, 150000, 2, {  470, 220,   0 } }    /*  radarscp */
 	}
 };
 
@@ -134,7 +135,7 @@ static const res_net_info radarscp_net_bck_info =
 	{
 		{ RES_NET_AMP_DARLINGTON, 470,      0, 0, { 0 } },
 		{ RES_NET_AMP_DARLINGTON, 470,      0, 0, { 0 } },
-		{ RES_NET_AMP_DARLINGTON, 680, 150000, 0, { 0 } }    // radarscp
+		{ RES_NET_AMP_DARLINGTON, 680, 150000, 0, { 0 } }    /*  radarscp */
 	}
 };
 
@@ -163,8 +164,8 @@ static const res_net_info radarscp_stars_net_info =
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_TTL_OUT | RES_NET_MONITOR_SANYO_EZV20,
 	{
 		{ RES_NET_AMP_DARLINGTON, 4700, 470, 0, { 0 } },
-		{ RES_NET_AMP_DARLINGTON,    1,   0, 0, { 0 } },	// dummy
-		{ RES_NET_AMP_DARLINGTON,    1,   0, 0, { 0 } },	// dummy
+		{ RES_NET_AMP_DARLINGTON,    1,   0, 0, { 0 } },	/*  dummy */
+		{ RES_NET_AMP_DARLINGTON,    1,   0, 0, { 0 } },	/*  dummy */
 	}
 };
 
@@ -174,9 +175,9 @@ static const res_net_info radarscp_blue_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_VCC | RES_NET_MONITOR_SANYO_EZV20,
 	{
-		{ RES_NET_AMP_DARLINGTON,  470, 4700, 0, { 0 } },	// bias/gnd exist in schematics, readable in TKG3 schematics
-		{ RES_NET_AMP_DARLINGTON,  470, 4700, 0, { 0 } },	// bias/gnd exist in schematics, readable in TKG3 schematics
-		{ RES_NET_AMP_DARLINGTON,    0,    0, 8, { 128,64,32,16,8,4,2,1 } },	// dummy
+		{ RES_NET_AMP_DARLINGTON,  470, 4700, 0, { 0 } },	/*  bias/gnd exist in schematics, readable in TKG3 schematics */
+		{ RES_NET_AMP_DARLINGTON,  470, 4700, 0, { 0 } },	/*  bias/gnd exist in schematics, readable in TKG3 schematics */
+		{ RES_NET_AMP_DARLINGTON,    0,    0, 8, { 128,64,32,16,8,4,2,1 } },	/*  dummy */
 	}
 };
 
@@ -186,9 +187,9 @@ static const res_net_info radarscp_grid_net_info =
 {
 	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_TTL_OUT | RES_NET_MONITOR_SANYO_EZV20,
 	{
-		{ RES_NET_AMP_DARLINGTON,    0,   0, 1, { 1 } },	// dummy
-		{ RES_NET_AMP_DARLINGTON,    0,   0, 1, { 1 } },	// dummy
-		{ RES_NET_AMP_DARLINGTON,    0,   0, 1, { 1 } },	// dummy
+		{ RES_NET_AMP_DARLINGTON,    0,   0, 1, { 1 } },	/*  dummy */
+		{ RES_NET_AMP_DARLINGTON,    0,   0, 1, { 1 } },	/*  dummy */
+		{ RES_NET_AMP_DARLINGTON,    0,   0, 1, { 1 } },	/*  dummy */
 	}
 };
 
@@ -210,7 +211,7 @@ PALETTE_INIT( dkong2b)
 	/* Now treat tri-state black background generation */
 
 	for (i=0;i<256;i++)
-		if ( (i & 0x03) == 0x00 )  // NOR => CS=1 => Tristate => real black
+		if ( (i & 0x03) == 0x00 )  /*  NOR => CS=1 => Tristate => real black */
 		{
 			int r,g,b;
 			r = compute_res_net( 1, 0, &dkong_net_bck_info );
@@ -250,7 +251,7 @@ PALETTE_INIT( dkong4b )
 	/* Now treat tri-state black background generation */
 
 	for (i=0;i<256;i++)
-		if ( (i & 0x03) == 0x00 )  // NOR => CS=1 => Tristate => real black
+		if ( (i & 0x03) == 0x00 )  /*  NOR => CS=1 => Tristate => real black */
 		{
 			r = compute_res_net( 1, 0, &radarscp_net_bck_info );
 			g = compute_res_net( 1, 1, &radarscp_net_bck_info );
@@ -288,7 +289,7 @@ PALETTE_INIT( radarscp )
 	/* Now treat tri-state black background generation */
 
 	for (i=0;i<256;i++)
-		if ( (i & 0x03) == 0x00 )  // NOR => CS=1 => Tristate => real black
+		if ( (i & 0x03) == 0x00 )  /*  NOR => CS=1 => Tristate => real black */
 		{
 			r = compute_res_net( 1, 0, &radarscp_net_bck_info );
 			g = compute_res_net( 1, 1, &radarscp_net_bck_info );
@@ -352,7 +353,7 @@ PALETTE_INIT( radarsc1 )
 	/* Now treat tri-state black background generation */
 
 	for (i=0;i<256;i++)
-		if ( (i & 0x03) == 0x00 )  // NOR => CS=1 => Tristate => real black
+		if ( (i & 0x03) == 0x00 )  /*  NOR => CS=1 => Tristate => real black */
 		{
 			r = compute_res_net( 0, 0, &radarsc1_net_info );
 			g = compute_res_net( 0, 1, &radarsc1_net_info );
@@ -480,20 +481,6 @@ WRITE8_HANDLER( dkong_videoram_w )
 	}
 }
 
-WRITE8_HANDLER( radarscp_snd02_w )
-{
-	dkong_state *state = machine->driver_data;
-
-	state->snd02_enable = data & 0x01;
-}
-
-WRITE8_HANDLER( radarsc1_ansn_w )
-{
-	dkong_state *state = machine->driver_data;
-
-	state->sig_ansn = data & 0x01;
-}
-
 WRITE8_HANDLER( dkongjr_gfxbank_w )
 {
 	dkong_state *state = machine->driver_data;
@@ -547,7 +534,7 @@ WRITE8_HANDLER( radarscp_grid_color_w )
 	dkong_state *state = machine->driver_data;
 
 	state->grid_col = (data & 0x07) ^ 0x07;
-	//popmessage("Gridcol: %d", state->grid_col);
+	/* popmessage("Gridcol: %d", state->grid_col); */
 }
 
 WRITE8_HANDLER( dkong_flipscreen_w )
@@ -716,17 +703,20 @@ INLINE double CD4049(running_machine *machine, double x)
  * a period of roughly 4.4 ms
  */
 
-#define RC1		(2.2e3 * 22e-6) // 22e-6;
+#define RC1		(2.2e3 * 22e-6) /*  22e-6; */
 #define RC2		(10e3 * 33e-6)
 #define RC31	(18e3 * 33e-6)
 #define RC32	((18e3 + 68e3) * 33e-6)
 #define RC4		(90e3 * 0.47e-6)
 #define dt		(1./60./(double) VTOTAL)
-#define period2 (((INT64)(PIXEL_CLOCK) * ( 33L * 68L )) / (INT32)10000000L / 3)  // period/2 in pixel ...
+#define period2 (((INT64)(PIXEL_CLOCK) * ( 33L * 68L )) / (INT32)10000000L / 3)  /*  period/2 in pixel ... */
 
 static void radarscp_step(running_machine *machine, int line_cnt)
 {
 	dkong_state *state = machine->driver_data;
+	const device_config *dev6h = devtag_get_device(machine, LATCH8, "ls259.6h");
+	const device_config *devvp2 = devtag_get_device(machine, LATCH8, "virtual_p2");
+
 	/* Condensator is illegible in schematics for TRS2 board.
      * TRS1 board states 3.3u.
      */
@@ -753,13 +743,15 @@ static void radarscp_step(running_machine *machine, int line_cnt)
 	if ( ( !(line_cnt & 0x40) && ((line_cnt+1) & 0x40) ) && (mame_rand(machine) > RAND_MAX/2))
 		state->sig30Hz = (1-state->sig30Hz);
 
-	state->rflip_sig = state->snd02_enable & state->sig30Hz;
+	/* Now mix with SND02 (sound 2) line - on 74ls259, bit2 */
+	state->rflip_sig = latch8_bit2_r(dev6h, 0) & state->sig30Hz; 
+	
 	sig = state->rflip_sig ^ ((line_cnt & 0x80)>>7);
 
 	if (state->hardware_type == HARDWARE_TRS01)
 		state->rflip_sig = !state->rflip_sig;
 
-	if  (sig) // 128VF
+	if  (sig) /*  128VF */
 		diff = (0.0 - cv1);
 	else
 		diff = (3.4 - cv1);
@@ -781,8 +773,12 @@ static void radarscp_step(running_machine *machine, int line_cnt)
 
 	state->blue_level = (int)(vg3/5.0*255);
 
-	// Grid signal
-	if (state->grid_on && state->sig_ansn)
+	/*
+	 * Grid signal
+	 * 
+	 * Mixed with ANS line (bit 5) from Port B of 8039 
+	 */
+	if (state->grid_on && latch8_bit5_r(devvp2, 0))
 	{
 		diff = (0.0 - cv3);
 		diff = diff - diff*exp(0.0 - (1.0/RC32 * dt) );
@@ -798,7 +794,7 @@ static void radarscp_step(running_machine *machine, int line_cnt)
 	diff = diff - diff*exp(0.0 - (1.0/RC4 * dt) );
 	cv4 += diff;
 
-	if (CD4049(machine, CD4049(machine, vg2 - cv4))>2.4/5.0) //TTL - Level
+	if (CD4049(machine, CD4049(machine, vg2 - cv4))>2.4/5.0) /* TTL - Level */
 		state->grid_sig = 0;
 	else
 		state->grid_sig = 1;
@@ -831,7 +827,7 @@ static void radarscp_draw_background(running_machine *machine, dkong_state *stat
 		{
 			pixel = BITMAP_ADDR16(bitmap, y, x);
 			draw_ok = !(*pixel & 0x01) && !(*pixel & 0x02);
-			if (state->hardware_type == HARDWARE_TRS01) // Check again from schematics
+			if (state->hardware_type == HARDWARE_TRS01) /*  Check again from schematics */
 				draw_ok = draw_ok  && !((htable[ (!state->rflip_sig<<7) | (x>>2)] >>2) & 0x01);
 			if (draw_ok)
 				*pixel = *(BITMAP_ADDR16(state->bg_bits, y, x));
@@ -930,7 +926,6 @@ static VIDEO_START( dkong_base )
 	state->gfx_bank = 0;
 	state->palette_bank = 0;
 	state->sprite_bank = 0;
-	state->sig_ansn = 1;
 	state->vidhw = -1;
 
 	state_save_register_global(state->gfx_bank);
@@ -938,8 +933,6 @@ static VIDEO_START( dkong_base )
 	state_save_register_global(state->sprite_bank);
 	state_save_register_global(state->grid_on);
 
-	state_save_register_global(state->snd02_enable);
-	state_save_register_global(state->sig_ansn);
 	state_save_register_global(state->grid_col);
 	state_save_register_global(state->flip);
 }
