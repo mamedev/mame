@@ -37,6 +37,8 @@ static int fg_bank;
 static int bg_scrollx, bg_scrolly, sp16_scrollx, sp16_scrolly, sp32_scrollx, sp32_scrolly;
 static UINT8 unknown_reg;
 
+static UINT8 empty_tile[16*16];
+
 /**************************************************************************************/
 
 PALETTE_INIT( tnk3 )
@@ -147,6 +149,14 @@ static TILE_GET_INFO( gwar_get_bg_tile_info )
 			code,
 			color,
 			0);
+
+	// bermudat uses FFFF to blank the background. A possible explanation is that
+	// ROM selection is performed by a 3-to-8 demuxer connected to bits 1,2,3
+	// (bit 0 goes to A15) so when bit 3 is set none of the ROMs is selected.
+	// (still call SET_TILE_INFO, otherwise problems might occur on boot when
+	// the tile data hasn't been initialised)
+	if (attr & 8)
+		tileinfo->pen_data = empty_tile;
 }
 
 
@@ -228,6 +238,8 @@ VIDEO_START( ikari )
 
 VIDEO_START( gwar )
 {
+	memset(empty_tile,0xf,sizeof(empty_tile));
+
 	VIDEO_START_CALL(snk);
 
 	fg_tilemap = tilemap_create(gwar_get_fg_tile_info, tilemap_scan_cols,  8,  8, 64, 32);

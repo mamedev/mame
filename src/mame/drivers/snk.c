@@ -42,6 +42,8 @@ Notes:
   1986 athena: keep 1 pressed during boot
   1986 ikari: keep 1 pressed during boot
   1986 victroad: keep 1 pressed during boot
+  1987 bermudat: keep 1 pressed during boot
+  1987 worldwar: keep F2 pressed during boot
   1987 gwar: keep F2 pressed during boot
   1988 fitegolf: use the service mode dip switch
 
@@ -56,9 +58,76 @@ Notes:
   in different locations, while gwar (new) matches the bootleg and original
   japanese versions.
 
+- there has been great confusion in the past about the four Bermuda Triangle /
+  World Wars sets. World Wars was thought to be an earlier version, since it
+  appears to have simpler gameplay and graphics. In reality, there is strong
+  evidence that proves that World Wars is a follow-up to Bermuda Triangle.
+  The gameplay is significantly different, and the only ROMs in common are the
+  audio samples, so it cannot be considered a simple clone, even if bermudaa
+  has the worldwar gameplay and the bermudat title screen!! What might have
+  happened is that bermudat performed poorly in Japan/world arcades so it was
+  redesigned before releasing it in the US/different parts of the world.
+  Possibly the Bermuda Triangle title screen was kept for the US since it
+  hand't been relased there yet, while it was changed to World Wars for places
+  where it had already been released.
+
+  The most compelling pieces of evidence to indicate which sets are newer are
+  the following:
+  - to enter test mode, bermudat/bermudaj use P1 start (old style: older games
+    from tnk3 to victroad do it). worldwar/bermudaa use a dedicated service
+    button (new style: newer games like gwar do it).
+  - some of the tiles in the fg ROM (letters saying "standard", "power",
+    "hyper", "safety", "danger") are present in all sets, but are actually used
+	only in bermudat/bermudaj.
+  - the worldwar test mode shows wrong descriptions for the dip switches, which
+    are actually correct for bermudaj.
+
+  So in the end the cronology of the four sets is:
+  1) bermudat
+  - Old gameplay
+  - World version? (English speech)
+  - 5 letters when entering initials, and "TOKYO" as default names
+  - Test mode accessed using P1 start
+  - There is bug in test mode: when the "Bonus Life" dip switches are set to
+    "60k 120k", it shows "80000P 160000P".
+  2) bermudaj
+  - Old gameplay
+  - Definitely Japan version (Japanese speech)
+  - 5 letters when entering initials, and "TOKYO" as default names
+  - Test mode accessed using P1 start
+  - The test mode bug is fixed.
+  3) worldwar
+  - New gameplay
+  - World version?
+  - 5 letters when entering initials, and "WORLD" as default names
+  - Test mode accessed using dedicated service button
+  - Dip switches description in test mode are wrong: they are the same as
+    bermudaj, even if the actual behaviour has changed.
+  4) bermudaa
+  - New gameplay
+  - US version
+  - 3 letters when entering initials, and "SNK  " as default names
+  - Test mode accessed using dedicated service button
+  - Dip switches descriptions updated.
+
+- ikari/victroad do a "front hard check" during boot. This appears to be
+  hardware bounds checking test which is also used during the game.
+  However the game also does software collision detection, because making
+  the test always return true is enough to make the game work.
+
+- bermudat/bermudaj do a "turbo front check" during boot, which is missing in
+  bermudaa/worldwar. Perhaps they realised that as a protection device it was
+  useless since the game doesn't use the hardware after the check.
+
 
 TODO:
 -----
+
+- gwar, gwara, bermudat, worldwar: unknown writes to CAC0. These appear to control
+  sprite/sprite relative priorities, but it's not clear how.
+  There seem to be some wrong priorities e.g. the volcanoes shooting fireballs in
+  worldwar.
+
 - Fighting Golf: unknown writes to CF00, probably video related.
 
 - The Fighting Golf flyer shows a different gameplay, where button A is pressed
@@ -73,18 +142,11 @@ TODO:
   color used to draw the FG layer, and supporting it is needed to fix the color
   test in ikaria/ikarijp.
 
+- gwar: unknown writes to CA00/CA40. Always 0?
+
+
 
 Bryan McPhail, 27/01/00:
-
-  Added Bermuda Triangle (alternate), World Wars, these are the 'early'
-  versions of the main set with different sprites, gameplay etc.  All roms
-  are different except for the samples, technically Bermuda Triangle (Alt)
-  is a clone of World Wars rather than the main Bermuda set.
-
-  Bermuda Triangle (alt) has some tile banking problems (see attract mode),
-  this may also be the cause of the title screen corruption in Bermuda
-  Triangle (main set).
-
 
 Oct. 5, 2003:
 
@@ -121,49 +183,6 @@ Stephh's notes (based on the games Z80 code and some tests) :
       * IPT_START3    : starts game C
       * IPT_START4    : starts game D
       * IPT_SERVICE2  : starts game E
-
-
-2a) 'bermudat'
-
-  - Japan version (5 letters when entering initials, and "TOKYO" as default names)
-
-  - How to enter the "test mode" : while "front turbo check" is displayed on screen,
-    press '1' (start player 1) until a grid is displayed. You can then press '1'
-    to go to the next part or press '2' to reset the game.
-
-  - The typo bug from 'bermudao' "test mode" is fixed.
-
-
-2b) 'bermudao'
-
-  - Japan version (5 letters when entering initials, and "TOKYO" as default names)
-
-  - How to enter the "test mode" : while "front turbo check" is displayed on screen,
-    press '1' (start player 1) until a grid is displayed. You can then press '1'
-    to go to the next part or press '2' to reset the game.
-
-  - There is typo bug in the "test mode" : when "Bonus Life" Dip Switch is set to
-    "60k 120k", it is written "80000P  160000P every".
-
-
-2c) 'bermudaa'
-
-  - US version (3 letters when entering initials, and "SNK  " as default names)
-
-  - How to enter the "test mode" : reset the game and press F2 until is a grid is
-    displayed. You can then press F2 again to go to the next part.
-
-
-2d) 'worldwar'
-
-  - World version (5 letters when entering initials, and "WORLD" as default names)
-    And this had been confirmed by the guy who loant the PCB.
-
-  - How to enter the "test mode" : reset the game and press F2 until is a grid is
-    displayed. You can then press F2 again to go to the next part.
-
-  - Don't trust the "test mode" for the Dip Switches ! The infos which are
-    displayed are the one from 'bermudao' (see what the "unknown" Dip Switches do).
 
 
 AT042903:
@@ -250,8 +269,6 @@ AT08XX03:
 #include "snk.h"
 #include "sound/3812intf.h"
 
-
-//#define DEBUG_SOUND
 
 static int countryc_trackball;
 
@@ -396,68 +413,40 @@ static TIMER_CALLBACK( sndirq_update_callback )
 	switch(param)
 	{
 		case YM1IRQ_ASSERT:
-#ifdef DEBUG_SOUND
-logerror("callback: YM1 ASSERT\n");
-#endif
 			irqstatus |= 1;
 			break;
 
 		case YM1IRQ_CLEAR:
-#ifdef DEBUG_SOUND
-logerror("callback: YM1 CLEAR\n");
-#endif
 			irqstatus &= ~1;
 			break;
 
 		case YM2IRQ_ASSERT:
-#ifdef DEBUG_SOUND
-logerror("callback: YM2 ASSERT\n");
-#endif
 			irqstatus |= 2;
 			break;
 
 		case YM2IRQ_CLEAR:
-#ifdef DEBUG_SOUND
-logerror("callback: YM2 CLEAR\n");
-#endif
 			irqstatus &= ~2;
 			break;
 
 		case CMDIRQ_BUSY_ASSERT:
-#ifdef DEBUG_SOUND
-logerror("callback: CMD ASSERT\n");
-#endif
 			irqstatus |= 8|4;
 			break;
 
 		case BUSY_CLEAR:
-#ifdef DEBUG_SOUND
-logerror("callback: BUSY CLEAR\n");
-#endif
 			irqstatus &= ~4;
 			break;
 
 		case CMDIRQ_CLEAR:
-#ifdef DEBUG_SOUND
-logerror("callback: CMD CLEAR\n");
-#endif
 			irqstatus &= ~8;
 			break;
 	}
 
 	cpunum_set_input_line(machine, 2, 0, (irqstatus & 0xb) ? ASSERT_LINE : CLEAR_LINE);
-
-#ifdef DEBUG_SOUND
-popmessage("%d",irqstatus);
-#endif
 }
 
 
 static WRITE8_HANDLER( tnk3_soundlatch_w )
 {
-#ifdef DEBUG_SOUND
-logerror("soundlatch_w %02x\n", data);
-#endif
 	soundlatch_w(machine, offset, data);
 	timer_call_after_resynch(NULL, CMDIRQ_BUSY_ASSERT, sndirq_update_callback);
 }
@@ -471,18 +460,12 @@ static READ8_HANDLER(tnk3_cmdirq_ack_r)
 
 static void ymirq_callback_1(running_machine *machine, int irq)
 {
-#ifdef DEBUG_SOUND
-logerror("ym callback 1 %d\n",irq);
-#endif
 	if (irq)
 		timer_call_after_resynch(NULL, YM1IRQ_ASSERT, sndirq_update_callback);
 }
 
 static void ymirq_callback_2(running_machine *machine, int irq)
 {
-#ifdef DEBUG_SOUND
-logerror("ym callback 2 %d\n",irq);
-#endif
 	if (irq)
 		timer_call_after_resynch(NULL, YM2IRQ_ASSERT, sndirq_update_callback);
 }
@@ -528,58 +511,27 @@ static CUSTOM_INPUT( soundcmd_status )
 
 static READ8_HANDLER(athena_sound_status_r)
 {
-#ifdef DEBUG_SOUND
-logerror("read status: %x\n",irqstatus);
-#endif
-
 	return irqstatus;
 }
 
 static READ8_HANDLER(athena_soundlatch_r)
 {
-#ifdef DEBUG_SOUND
-logerror("soundlatch_r %02x\n",soundlatch_r(machine, 0));
-#endif
 	return soundlatch_r(machine, 0);
 }
 
 static WRITE8_HANDLER(athena_irq_ack_w)
 {
-#ifdef DEBUG_SOUND
-logerror("%04x: irq_ack_w %02x\n",activecpu_get_pc(),data);
-#endif
-
 	if (~data & 0x10)	// ack YM1 irq
-{
-#ifdef DEBUG_SOUND
-logerror("ym1 ack\n");
-#endif
 		timer_call_after_resynch(NULL, YM1IRQ_CLEAR, sndirq_update_callback);
-}
 
 	if (~data & 0x20)	// ack YM2 irq
-{
-#ifdef DEBUG_SOUND
-logerror("ym2 ack\n");
-#endif
 		timer_call_after_resynch(NULL, YM2IRQ_CLEAR, sndirq_update_callback);
-}
 
 	if (~data & 0x40)	// clear busy flag
-{
-#ifdef DEBUG_SOUND
-logerror("busy clear\n");
-#endif
 		timer_call_after_resynch(NULL, BUSY_CLEAR, sndirq_update_callback);
-}
 
 	if (~data & 0x80)	// ack command from main cpu
-{
-#ifdef DEBUG_SOUND
-logerror("cmd ack\n");
-#endif
 		timer_call_after_resynch(NULL, CMDIRQ_CLEAR, sndirq_update_callback);
-}
 }
 
 
@@ -636,26 +588,24 @@ A trojan could be used on the board to verify the exact behaviour.
 
 *****************************************************************************/
 
-
-static int hf_scrolly, hf_scrollx, hf_size;
+static int hf_posy, hf_posx;
 
 static WRITE8_HANDLER(hardflags_scrollx_w)
 {
-	hf_scrollx = (hf_scrollx & ~0xff) | data;
+	hf_posx = (hf_posx & ~0xff) | data;
 }
 
 static WRITE8_HANDLER(hardflags_scrolly_w)
 {
-	hf_scrolly = (hf_scrolly & ~0xff) | data;
+	hf_posy = (hf_posy & ~0xff) | data;
 }
 
 static WRITE8_HANDLER(hardflags_scroll_msb_w)
 {
-	hf_scrollx = (hf_scrollx & 0xff) | ((data & 0x80) << 1);
-	hf_scrolly = (hf_scrolly & 0xff) | ((data & 0x40) << 2);
-	hf_size = data & 0x1f;
-	if (hf_size == 0)
-		hf_size = 0x40;
+	hf_posx = (hf_posx & 0xff) | ((data & 0x80) << 1);
+	hf_posy = (hf_posy & 0xff) | ((data & 0x40) << 2);
+
+	// low 6 bits might indicate radius, but it's not clear
 }
 
 static int hardflags_check(int num)
@@ -664,10 +614,10 @@ static int hardflags_check(int num)
 	int x = sr[2] + ((sr[3] & 0x80) << 1);
 	int y = sr[0] + ((sr[3] & 0x10) << 4);
 
-	int dx = (x - hf_scrollx) & 0x1ff;
-	int dy = (y - hf_scrolly) & 0x1ff;
+	int dx = (x - hf_posx) & 0x1ff;
+	int dy = (y - hf_posy) & 0x1ff;
 
-	if ((dx >= hf_size && dx <= (0x220-hf_size)) && (dy >= hf_size && dy <= (0x220-hf_size)))
+	if (dx > 0x20 && dx <= 0x1e0 && dy > 0x20 && dy <= 0x1e0)
 		return 0;
 	else
 		return 1;
@@ -702,6 +652,95 @@ static READ8_HANDLER(hardflags7_r)
 		(hardflags_check(6*8 + 1) << 5);
 }
 
+
+
+/*****************************************************************************
+
+"Turbo Front" simulation
+
+This is used by Bermuda Triangle, and appears to be similar to Ikari Warriors.
+In this case, however, the test is only done during boot and not used at all
+in the game.
+
+The simulation is modeled on the ikari one, however all we can do is that it
+passes the startup checks. There is not enough evidence to infer more.
+
+A trojan could be used on the board to verify the exact behaviour.
+
+*****************************************************************************/
+
+static int tc16_posy, tc16_posx, tc32_posy, tc32_posx;
+
+static WRITE8_HANDLER(turbocheck16_1_w)
+{
+	tc16_posy = (tc16_posy & ~0xff) | data;
+}
+
+static WRITE8_HANDLER(turbocheck16_2_w)
+{
+	tc16_posx = (tc16_posx & ~0xff) | data;
+}
+
+static WRITE8_HANDLER(turbocheck32_1_w)
+{
+	tc32_posy = (tc32_posy & ~0xff) | data;
+}
+
+static WRITE8_HANDLER(turbocheck32_2_w)
+{
+	tc32_posx = (tc32_posx & ~0xff) | data;
+}
+
+static WRITE8_HANDLER(turbocheck_msb_w)
+{
+	tc16_posx = (tc16_posx & 0xff) | ((data & 0x80) << 1);
+	tc16_posy = (tc16_posy & 0xff) | ((data & 0x40) << 2);
+	tc32_posx = (tc32_posx & 0xff) | ((data & 0x80) << 1);
+	tc32_posy = (tc32_posy & 0xff) | ((data & 0x40) << 2);
+
+	// low 6 bits might indicate radius, but it's not clear
+}
+
+static int turbofront_check(int small, int num)
+{
+	const UINT8 *sr = &spriteram[0x800*small + 4*num];
+	int x = sr[2] + ((sr[3] & 0x80) << 1);
+	int y = sr[0] + ((sr[3] & 0x10) << 4);
+
+	int dx = (x - (small ? tc16_posx : tc32_posx)) & 0x1ff;
+	int dy = (y - (small ? tc16_posy : tc32_posy)) & 0x1ff;
+
+	if (dx > 0x20 && dx <= 0x1e0 && dy > 0x20 && dy <= 0x1e0)
+		return 0;
+	else
+		return 1;
+}
+
+static int turbofront_check8(int small, int num)
+{
+	return
+		(turbofront_check(small, num + 0) << 0) |
+		(turbofront_check(small, num + 1) << 1) |
+		(turbofront_check(small, num + 2) << 2) |
+		(turbofront_check(small, num + 3) << 3) |
+		(turbofront_check(small, num + 4) << 4) |
+		(turbofront_check(small, num + 5) << 5) |
+		(turbofront_check(small, num + 6) << 6) |
+		(turbofront_check(small, num + 7) << 7);
+}
+
+static READ8_HANDLER(turbocheck16_1_r)	{ return turbofront_check8(1, 0*8); }
+static READ8_HANDLER(turbocheck16_2_r)	{ return turbofront_check8(1, 1*8); }
+static READ8_HANDLER(turbocheck16_3_r)	{ return turbofront_check8(1, 2*8); }
+static READ8_HANDLER(turbocheck16_4_r)	{ return turbofront_check8(1, 3*8); }
+static READ8_HANDLER(turbocheck16_5_r)	{ return turbofront_check8(1, 4*8); }
+static READ8_HANDLER(turbocheck16_6_r)	{ return turbofront_check8(1, 5*8); }
+static READ8_HANDLER(turbocheck16_7_r)	{ return turbofront_check8(1, 6*8); }
+static READ8_HANDLER(turbocheck16_8_r)	{ return turbofront_check8(1, 7*8); }
+static READ8_HANDLER(turbocheck32_1_r)	{ return turbofront_check8(0, 0*8); }
+static READ8_HANDLER(turbocheck32_2_r)	{ return turbofront_check8(0, 1*8); }
+static READ8_HANDLER(turbocheck32_3_r)	{ return turbofront_check8(0, 2*8); }
+static READ8_HANDLER(turbocheck32_4_r)	{ return turbofront_check8(0, 3*8); }
 
 
 /*****************************************************************************
@@ -931,6 +970,60 @@ static ADDRESS_MAP_START( ikari_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( bermudat_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
+	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
+	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")
+	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE(ikari_coin_counter_w)
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(tnk3_soundlatch_w)
+	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(snk_bg_scrolly_w)
+	AM_RANGE(0xc840, 0xc840) AM_WRITE(snk_bg_scrollx_w)
+	AM_RANGE(0xc880, 0xc880) AM_WRITE(gwara_videoattrs_w)	// flip screen, scroll msb
+	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_fg_bank_w)	// char and palette bank
+	AM_RANGE(0xc900, 0xc900) AM_WRITE(snk_sp16_scrolly_w)
+	AM_RANGE(0xc940, 0xc940) AM_WRITE(snk_sp16_scrollx_w)
+	AM_RANGE(0xc980, 0xc980) AM_WRITE(snk_sp32_scrolly_w)
+	AM_RANGE(0xc9c0, 0xc9c0) AM_WRITE(snk_sp32_scrollx_w)
+	// the "turbo check" addresses are only used by bermudat/bermudaj, not bermudaa/worldwar
+	AM_RANGE(0xca00, 0xca00) AM_WRITE(turbocheck16_1_w)
+	AM_RANGE(0xca40, 0xca40) AM_WRITE(turbocheck16_2_w)
+	AM_RANGE(0xcb00, 0xcb00) AM_READ(turbocheck16_1_r)
+	AM_RANGE(0xcb10, 0xcb10) AM_READ(turbocheck16_2_r)
+	AM_RANGE(0xcb20, 0xcb20) AM_READ(turbocheck16_3_r)
+	AM_RANGE(0xcb30, 0xcb30) AM_READ(turbocheck16_4_r)
+	AM_RANGE(0xcb40, 0xcb40) AM_READ(turbocheck16_5_r)
+	AM_RANGE(0xcb50, 0xcb50) AM_READ(turbocheck16_6_r)
+	AM_RANGE(0xcb60, 0xcb60) AM_READ(turbocheck16_7_r)
+	AM_RANGE(0xcb70, 0xcb70) AM_READ(turbocheck16_8_r)
+	AM_RANGE(0xcc00, 0xcc00) AM_WRITE(turbocheck32_1_w)
+	AM_RANGE(0xcc40, 0xcc40) AM_WRITE(turbocheck32_2_w)
+	AM_RANGE(0xcc80, 0xcc80) AM_WRITE(turbocheck_msb_w)
+	AM_RANGE(0xccc0, 0xccc0) AM_READ(turbocheck32_1_r)
+	AM_RANGE(0xccd0, 0xccd0) AM_READ(turbocheck32_2_r)
+	AM_RANGE(0xcce0, 0xcce0) AM_READ(turbocheck32_3_r)
+	AM_RANGE(0xccf0, 0xccf0) AM_READ(turbocheck32_4_r)
+
+	AM_RANGE(0xca80, 0xca80) AM_WRITE(gwara_sp_scroll_msb_w)
+	AM_RANGE(0xcac0, 0xcac0) AM_WRITE(gwar_unknown_video_w)	// controls sprite priorities somehow?
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(1) AM_BASE(&snk_bg_videoram)	// + work RAM
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(2) AM_BASE(&spriteram)	// + work ram
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(3) AM_BASE(&snk_fg_videoram)	// + work RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bermudat_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
+	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_fg_bank_w)	// char and palette bank
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(1)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(3)
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( gwar_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
@@ -949,8 +1042,8 @@ static ADDRESS_MAP_START( gwar_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc940, 0xc940) AM_WRITE(snk_sp16_scrollx_w)
 	AM_RANGE(0xc980, 0xc980) AM_WRITE(snk_sp32_scrolly_w)
 	AM_RANGE(0xc9c0, 0xc9c0) AM_WRITE(snk_sp32_scrollx_w)
-	AM_RANGE(0xca00, 0xca00) AM_WRITENOP	// unknown. Always 0?
-	AM_RANGE(0xca40, 0xca40) AM_WRITENOP	// unknown. Always 0?
+	AM_RANGE(0xca00, 0xca00) AM_WRITENOP	// always 0?
+	AM_RANGE(0xca40, 0xca40) AM_WRITENOP	// always 0?
 	AM_RANGE(0xcac0, 0xcac0) AM_WRITE(gwar_unknown_video_w)	// controls sprite priorities somehow?
 	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(1) AM_BASE(&snk_bg_videoram)	// + work RAM
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(2) AM_BASE(&spriteram)	// + work ram
@@ -1000,6 +1093,7 @@ static ADDRESS_MAP_START( gwara_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(3) AM_BASE(&spriteram)	// + work ram
 	AM_RANGE(0xf8c0, 0xf8c0) AM_WRITE(gwar_fg_bank_w)	// char and palette bank
 ADDRESS_MAP_END
+
 
 
 /* Chopper I, T.D.Fever, Psycho S., Bermuda T. */
@@ -1294,7 +1388,7 @@ static INPUT_PORTS_START( athena )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
@@ -1495,7 +1589,7 @@ static INPUT_PORTS_START( ikari )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
@@ -1620,7 +1714,7 @@ static INPUT_PORTS_START( victroad )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
@@ -1728,7 +1822,7 @@ static INPUT_PORTS_START( gwar )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:1,2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
@@ -1752,13 +1846,11 @@ static INPUT_PORTS_START( gwar )
 INPUT_PORTS_END
 
 
-
-
 static INPUT_PORTS_START( bermudat )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* sound CPU status */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundcmd_status, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* tile? */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT ) /* tilt? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -1766,55 +1858,76 @@ static INPUT_PORTS_START( bermudat )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN1")
-	SNK_JOY1_PORT
-
-
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
 	PORT_START("IN2")
-	SNK_JOY2_PORT
-
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0xf0, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(12) PORT_WRAPS PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2) PORT_REVERSE PORT_FULL_TURN_COUNT(12)
 
 	PORT_START("IN3")
-	SNK_BUTTON_PORT
-
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" )
+	PORT_DIPNAME( 0x04, 0x04, "Bonus Occurrence" ) PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, "1st & every 2nd" )
 	PORT_DIPSETTING(    0x00, "1st & 2nd only" )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
-	SNK_COINAGE
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DSW1:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" )
+	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" ) PORT_DIPLOCATION("DSW2:3,4")
 	PORT_DIPSETTING(    0x0c, "Demo Sounds Off" )
 	PORT_DIPSETTING(    0x08, "Demo Sounds On" )
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x04, "Infinite Lives (Cheat)")
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("DSW2:5,6")
 	PORT_DIPSETTING(    0x30, "50k 100k" )
 	PORT_DIPSETTING(    0x20, "60k 120k" )
 	PORT_DIPSETTING(    0x10, "100k 200k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0xc0, 0xc0, "Game Style" )
+	PORT_DIPNAME( 0xc0, 0xc0, "Game Style" ) PORT_DIPLOCATION("DSW2:7,8")
 	PORT_DIPSETTING(    0xc0, "Normal without continue" )
 	PORT_DIPSETTING(    0x80, "Normal with continue" )
 	PORT_DIPSETTING(    0x40, "Time attack 3 minutes" )
 	PORT_DIPSETTING(    0x00, "Time attack 5 minutes" )
 INPUT_PORTS_END
+
 
 static INPUT_PORTS_START( bermudaa )
 	PORT_INCLUDE( bermudat )
@@ -1823,35 +1936,42 @@ static INPUT_PORTS_START( bermudaa )
 	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW)
 
 	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("DSW2:5,6")
 	PORT_DIPSETTING(    0x30, "25k 50k" )
 	PORT_DIPSETTING(    0x20, "35k 70k" )
 	PORT_DIPSETTING(    0x10, "50K 100k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) ) PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-/* Same as Bermudaa, but has different Bonus Life */
+
 static INPUT_PORTS_START( worldwar )
 	PORT_INCLUDE( bermudaa )
 
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("DSW2:5,6")
 	PORT_DIPSETTING(    0x30, "50k 100k" )
 	PORT_DIPSETTING(    0x20, "80k 160k" )
 	PORT_DIPSETTING(    0x10, "100k 200k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 INPUT_PORTS_END
+
+
+
+
+
+
+
 
 static INPUT_PORTS_START( psychos )
 	PORT_START("IN0")
@@ -1892,7 +2012,7 @@ static INPUT_PORTS_START( psychos )
 	SNK_COINAGE
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
@@ -1963,7 +2083,7 @@ static INPUT_PORTS_START( legofair )
 	SNK_COINAGE
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
@@ -2025,7 +2145,7 @@ static INPUT_PORTS_START( choppera )
 	SNK_COINAGE
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
@@ -2708,15 +2828,15 @@ static MACHINE_DRIVER_START( victroad )
 MACHINE_DRIVER_END
 
 
-static MACHINE_DRIVER_START( gwar )
+static MACHINE_DRIVER_START( bermudat )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(gwar_cpuA_map,0)
+	MDRV_CPU_PROGRAM_MAP(bermudat_cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(gwar_cpuB_map,0)
+	MDRV_CPU_PROGRAM_MAP(bermudat_cpuB_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz/2) /* verified on pcb */
@@ -2751,9 +2871,22 @@ static MACHINE_DRIVER_START( gwar )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( gwar )
+
+	MDRV_IMPORT_FROM(bermudat)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(gwar_cpuA_map,0)
+
+	MDRV_CPU_MODIFY("sub")
+	MDRV_CPU_PROGRAM_MAP(gwar_cpuB_map,0)
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START( gwara )
 
-	MDRV_IMPORT_FROM(gwar)
+	MDRV_IMPORT_FROM(bermudat)
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("main")
@@ -2761,51 +2894,6 @@ static MACHINE_DRIVER_START( gwara )
 
 	MDRV_CPU_MODIFY("sub")
 	MDRV_CPU_PROGRAM_MAP(gwara_cpuB_map,0)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( bermudat )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(cpuA_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-
-	// 5MHz gives CPUB higher priority or ROM test will fail if the first NMI is triggered too early by CPUA
-	MDRV_CPU_ADD("sub", Z80, 5000000)
-	MDRV_CPU_PROGRAM_MAP(cpuB_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-
-	MDRV_CPU_ADD("audio", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-
-	MDRV_INTERLEAVE(100)
-
-	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(50*8, 28*8)
-	MDRV_SCREEN_VISIBLE_AREA(2*8, 49*8-1, 0*8, 28*8-1)
-
-	MDRV_GFXDECODE(gwar)
-	MDRV_PALETTE_LENGTH(0x400)
-
-	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_VIDEO_START(snk)
-	MDRV_VIDEO_UPDATE(old_gwar)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("ym1", YM3526, 4000000)
-	MDRV_SOUND_CONFIG(ym3526_interface_0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MDRV_SOUND_ADD("ym2", Y8950, 4000000)
-	MDRV_SOUND_CONFIG(y8950_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -4017,7 +4105,7 @@ ROM_START( bermudat )
 	ROM_LOAD( "bt_p5.rom",  0x10000, 0x10000, CRC(817bd62c) SHA1(d3ee2ff01a4da8b928728b2fd4948fabd2b04420) )
 ROM_END
 
-ROM_START( bermudao )
+ROM_START( bermudaj )
 	ROM_REGION( 0x10000, "main", 0 )	/* 64k for cpuA code */
 	ROM_LOAD( "btj_p01.bin", 0x0000, 0x10000,  CRC(eda75f36) SHA1(d6fcb46dc45007a77bf6a8ca7aa53aefedcecf92) )
 
@@ -4695,17 +4783,6 @@ static const SNK_INPUT_PORT_TYPE athena_io[SNK_MAX_INPUT_PORTS] = {
 	/* c080 */ SNK_UNUSED
 };
 
-static const SNK_INPUT_PORT_TYPE ikari_io[SNK_MAX_INPUT_PORTS] = {
-	/* c000 */ SNK_INP0,
-	/* c100 */ SNK_ROT_PLAYER1,	SNK_UNUSED,
-	/* c200 */ SNK_ROT_PLAYER2,	SNK_UNUSED,
-	/* c300 */ SNK_INP3,	SNK_UNUSED,
-	/* c400 */ SNK_UNUSED,	SNK_UNUSED,
-	/* c500 */ SNK_DSW1,	SNK_UNUSED,
-	/* c600 */ SNK_DSW2,
-	/* c080 */ SNK_UNUSED
-};
-
 static const SNK_INPUT_PORT_TYPE choppera_io[SNK_MAX_INPUT_PORTS] = {
 	/* c000 */ SNK_INP0,
 	/* c100 */ SNK_INP1,	SNK_UNUSED,
@@ -4751,26 +4828,6 @@ static DRIVER_INIT( choppera ){
 	snk_gamegroup = 2;
 }
 
-static DRIVER_INIT( bermudat ){
-	UINT8 *RAM = memory_region(machine, "main");
-
-	// Patch "Turbo Error"
-	RAM[0x127e] = 0xc9;
-	RAM[0x118d] = 0x00;
-	RAM[0x118e] = 0x00;
-
-	snk_sound_busy_bit = 0x01;
-	snk_io = ikari_io;
-	videoram = snk_rambase + 0x800;
-	snk_gamegroup = 0;
-}
-
-static DRIVER_INIT( worldwar ){
-	snk_sound_busy_bit = 0x01;
-	snk_io = ikari_io;
-	videoram = snk_rambase + 0x800;
-	snk_gamegroup = 0;
-}
 
 static DRIVER_INIT( tdfever ){
 	snk_sound_busy_bit = 0x08;
@@ -4826,14 +4883,14 @@ GAME( 1986, dogosoke, victroad, victroad, victroad, 0,        ROT270, "SNK", "Do
 GAME( 1986, dogosokb, victroad, victroad, dogosokb, 0,        ROT270, "bootleg", "Dogou Souken (Joystick hack bootleg)", 0 )
 
 /* screen size 384x224 */
+GAME( 1987, bermudat, 0,        bermudat, bermudat, 0,        ROT270, "SNK", "Bermuda Triangle (World?)", 0 )
+GAME( 1987, bermudaj, bermudat, bermudat, bermudat, 0,        ROT270, "SNK", "Bermuda Triangle (Japan)", 0 )
+GAME( 1987, worldwar, 0,        bermudat, worldwar, 0,        ROT270, "SNK", "World Wars (World?)", 0 )
+GAME( 1987, bermudaa, worldwar, bermudat, bermudaa, 0,        ROT270, "SNK", "Bermuda Triangle (World Wars) (US)", 0 )
 GAME( 1987, gwar,     0,        gwar,     gwar,     0,        ROT270, "SNK", "Guerrilla War (US)", 0 )
 GAME( 1987, gwarj,    gwar,     gwar,     gwar,     0,        ROT270, "SNK", "Guevara (Japan)", 0 )
 GAME( 1987, gwara,    gwar,     gwara,    gwar,     0,        ROT270, "SNK", "Guerrilla War (Version 1)", 0 )
 GAME( 1987, gwarb,    gwar,     gwar,     gwar,     0,        ROT270, "bootleg", "Guerrilla War (bootleg)", 0 )
-GAME( 1987, bermudat, 0,        bermudat, bermudat, bermudat, ROT270, "SNK", "Bermuda Triangle (Japan)", GAME_NO_COCKTAIL )
-GAME( 1987, bermudao, bermudat, bermudat, bermudat, bermudat, ROT270, "SNK", "Bermuda Triangle (Japan old version)", GAME_NO_COCKTAIL )
-GAME( 1987, bermudaa, bermudat, bermudat, bermudaa, worldwar, ROT270, "SNK", "Bermuda Triangle (US older version)", GAME_NO_COCKTAIL )
-GAME( 1987, worldwar, bermudat, bermudat, worldwar, worldwar, ROT270, "SNK", "World Wars (World)", GAME_NO_COCKTAIL )
 GAME( 1987, psychos,  0,        psychos,  psychos,  psychos,  ROT0,   "SNK", "Psycho Soldier (US)", GAME_NO_COCKTAIL )
 GAME( 1987, psychosj, psychos,  psychos,  psychos,  psychos,  ROT0,   "SNK", "Psycho Soldier (Japan)", GAME_NO_COCKTAIL )
 GAME( 1988, chopper,  0,        chopper1, legofair, chopper,  ROT270, "SNK", "Chopper I (US set 1)", GAME_NO_COCKTAIL )
@@ -4841,7 +4898,7 @@ GAME( 1988, choppera, chopper,  chopper1, choppera, choppera, ROT270, "SNK", "Ch
 GAME( 1988, chopperb, chopper,  chopper1, legofair, chopper,  ROT270, "SNK", "Chopper I (US set 3)", GAME_NO_COCKTAIL )
 GAME( 1988, legofair, chopper,  chopper1, legofair, chopper,  ROT270, "SNK", "Koukuu Kihei Monogatari - The Legend of Air Cavalry (Japan)", GAME_NO_COCKTAIL )
 GAME( 1987, tdfever,  0,        tdfever,  tdfever,  tdfever,  ROT270, "SNK", "TouchDown Fever", GAME_NO_COCKTAIL )
-GAME( 1987, tdfeverj, tdfever,  tdfever,  tdfeverj, tdfever, ROT270, "SNK", "TouchDown Fever (Japan)", GAME_NO_COCKTAIL )
+GAME( 1987, tdfeverj, tdfever,  tdfever,  tdfeverj, tdfever,  ROT270, "SNK", "TouchDown Fever (Japan)", GAME_NO_COCKTAIL )
 GAME( 1988, tdfever2, tdfever,  tdfever,  tdfever,  tdfever2, ROT270, "SNK", "TouchDown Fever 2", GAME_NO_COCKTAIL ) /* upgrade kit for Touchdown Fever */
 GAME( 1988, fsoccer,  0,        fsoccer,  fsoccer,  fsoccer,  ROT0,   "SNK", "Fighting Soccer (version 4)", GAME_NO_COCKTAIL )
 GAME( 1988, fsoccerj, fsoccer,  fsoccer,  fsoccer,  fsoccer,  ROT0,   "SNK", "Fighting Soccer (Japan)", GAME_NO_COCKTAIL )

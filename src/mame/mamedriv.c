@@ -5458,12 +5458,12 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mnchmobl )	/* A2001      (c) 1983 + Centuri license */
 	DRIVER( marvins )	/* A2003      (c) 1983 */
 	DRIVER( madcrash )	/* A2005      (c) 1984 */
-	DRIVER( vangrd2 )	/*            (c) 1984 */
+	DRIVER( vangrd2 )	/* A2005      (c) 1984 */
 	DRIVER( jcross )	/* .. */
 	DRIVER( mainsnk )	/* fill in */
 	DRIVER( canvas )	/*            (c) 1985 */
 	DRIVER( sgladiat )	/* A3006      (c) 1984 */
-	DRIVER( hal21 )		/*            (c) 1985 */
+	DRIVER( hal21 )		/* A4031      (c) 1985 */
 	DRIVER( hal21j )	/*            (c) 1985 (Japan) */
 	DRIVER( aso )		/*            (c) 1985 */
 	DRIVER( alphamis )	/*            (c) 1985 */
@@ -5478,17 +5478,17 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ikaria )	/* A5004 'IW' (c) 1986 */
 	DRIVER( ikarijp )	/* A5004 'IW' (c) 1986 (Japan) */
 	DRIVER( ikarijpb )	/* bootleg */
-	DRIVER( victroad )	/*            (c) 1986 */
-	DRIVER( dogosoke )	/*            (c) 1986 */
+	DRIVER( victroad )	/* A6002      (c) 1986 */
+	DRIVER( dogosoke )	/* A6002      (c) 1986 */
 	DRIVER( dogosokb )	/* bootleg */
 	DRIVER( gwar )		/* A7003 'GV' (c) 1987 */
 	DRIVER( gwarj )		/* A7003 'GV' (c) 1987 (Japan) */
 	DRIVER( gwara )		/* A7003 'GV' (c) 1987 */
 	DRIVER( gwarb )		/* bootleg */
-	DRIVER( bermudat )	/* A6003 'WW' (c) 1987 */
-	DRIVER( bermudao )	/* A6003 'WW' (c) 1987 */
-	DRIVER( bermudaa )	/* A6003 'WW' (c) 1987 */
-	DRIVER( worldwar )	/* A6003 'WW' (c) 1987 */
+	DRIVER( bermudat )	/*            (c) 1987 */
+	DRIVER( bermudaj )	/*            (c) 1987 */
+	DRIVER( bermudaa )	/* A6004 'WW' (c) 1987 */
+	DRIVER( worldwar )	/* A6004 'WW' (c) 1987 */
 	DRIVER( psychos )	/*       'PS' (c) 1987 */
 	DRIVER( psychosj )	/*       'PS' (c) 1987 (Japan) */
 	DRIVER( chopper )	/* A7003 'KK' (c) 1988 */
