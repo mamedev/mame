@@ -557,7 +557,7 @@
 	PUSH(PCL);									\
 	EAH = RDOPARG();								\
 	PCL = RDMEM(EAD);								\
-	PCH = RDMEM(EAD);								\
+	PCH = RDMEM(EAD+1);								\
 	CHANGE_PC
 
 /* 65ce02 ******************************************************
@@ -571,7 +571,7 @@
 	PUSH(PCL);									\
 	EAH = RDOPARG();								\
 	PCL = RDMEM(EAD);								\
-	PCH = RDMEM(EAD);								\
+	PCH = RDMEM(EAD+1);								\
 	CHANGE_PC
 
 /* 65ce02 ******************************************************
