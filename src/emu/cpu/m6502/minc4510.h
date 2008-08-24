@@ -54,7 +54,7 @@
 
 #define CHANGE_PC	change_pc(M4510_MEM(PCD))
 
-#define PEEK_OP()	cpu_readop(M4510_MEM(PCD))
+#define PEEK_OP()	cpu_readop(M4510_MEM(PCW))
 
 #define RDMEM(addr)			program_read_byte_8le(M4510_MEM(addr)); m4510_ICount -= 1
 #define WRMEM(addr,data)	program_write_byte_8le(M4510_MEM(addr),data); m4510_ICount -= 1

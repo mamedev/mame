@@ -31,47 +31,33 @@
 #undef TXS
 #define TXS								\
 	SPL = X;							\
-	if (PEEK_OP() == 0x2b /*TYS*/ ) {	\
+	if (PEEK_OP() == 0x2b /*TYS*/ ) {	            \
 		UINT8 op = RDOP();				\
 		(*m4510.insn[op])();			\
 	}
 
+#undef NOP
+#define NOP       \
+  m4510.interrupt_inhibit = 0; \
+  /* SEI */
+
 /* c65 docu says transfer of axyz to the mapper register
    so no readback!? */
-#define MAP 													\
-		if (PEEK_OP() == 0xea /*NOP, in this case end of map*/ )\
- { \
-  m4510.mem[0]=0; \
-  m4510.mem[1]=0; \
-  m4510.mem[2]=0; \
-  m4510.mem[3]=0; \
-  m4510.mem[4]=0; \
-  m4510.mem[5]=0; \
-  m4510.mem[6]=0; \
-  m4510.mem[7]=0; \
-  CHANGE_PC; \
-} else { \
-  /*UINT16 low, high;*/ \
-  /*low=m4510.low;*/ \
-  /*high=m4510.high;*/ \
+#define MAP 						\
+  m4510.interrupt_inhibit = 1;			\
   m4510.low=m4510.a|(m4510.x<<8); \
   m4510.high=m4510.y|(m4510.z<<8); \
-  /*m4510.a=low&0xff;*/ \
-  /*m4510.x=low>>8;*/ \
-  /*m4510.y=high&0xff;*/ \
-  /*m4510.z=high>>8;*/ \
-  m4510.mem[0]=(m4510.low&0x1000) ? (m4510.low&0xfff)<<8:0; \
-  m4510.mem[1]=(m4510.low&0x2000) ? (m4510.low&0xfff)<<8:0; \
-  m4510.mem[2]=(m4510.low&0x4000) ? (m4510.low&0xfff)<<8:0; \
-  m4510.mem[3]=(m4510.low&0x8000) ? (m4510.low&0xfff)<<8:0; \
+  m4510.mem[0]=(m4510.low&0x1000) ?  (m4510.low&0xfff)<<8:0;  \
+  m4510.mem[1]=(m4510.low&0x2000) ?  (m4510.low&0xfff)<<8:0;  \
+  m4510.mem[2]=(m4510.low&0x4000) ?  (m4510.low&0xfff)<<8:0;  \
+  m4510.mem[3]=(m4510.low&0x8000) ?  (m4510.low&0xfff)<<8:0;  \
   m4510.mem[4]=(m4510.high&0x1000) ? (m4510.high&0xfff)<<8:0; \
   m4510.mem[5]=(m4510.high&0x2000) ? (m4510.high&0xfff)<<8:0; \
   m4510.mem[6]=(m4510.high&0x4000) ? (m4510.high&0xfff)<<8:0; \
   m4510.mem[7]=(m4510.high&0x8000) ? (m4510.high&0xfff)<<8:0; \
   CHANGE_PC; \
- } \
-	m4510_ICount -= 3; \
- { \
+  m4510_ICount -= 3; \
+  { \
 				UINT8 op = RDOP();								\
 				(*m4510.insn[op])();							\
- }
+  }

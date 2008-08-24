@@ -133,6 +133,7 @@ typedef struct {
 	UINT8	y;				/* Y index register */
 	UINT8	z;				/* Z index register */
 	UINT8	p;				/* Processor status */
+	UINT8 interrupt_inhibit;	/* Some instructions, like MAP, inhibit interrupt */
 	UINT8	pending_irq;	/* nonzero if an IRQ is pending */
 	UINT8	after_cli;		/* pending IRQ and last insn cleared I */
 	UINT8	nmi_state;
@@ -172,11 +173,12 @@ INLINE int m4510_cpu_readop_arg(void)
 #define M4510
 #include "t65ce02.c"
 
-static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8le(offset); }
-static WRITE8_HANDLER( default_wrmem_id ) { program_write_byte_8le(offset, data); }
+static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8le(M4510_MEM(offset)); }
+static WRITE8_HANDLER( default_wrmem_id ) { program_write_byte_8le(M4510_MEM(offset), data); }
 
 static void m4510_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
+	m4510.interrupt_inhibit = 0;
 	m4510.rdmem_id = default_rdmem_id;
 	m4510.wrmem_id = default_wrmem_id;
 	m4510.irq_callback = irqcallback;
@@ -197,6 +199,7 @@ static void m4510_reset (void)
 	m4510.z = 0;
 	B = 0;
 	m4510.p = F_E|F_B|F_I|F_Z;	/* set E, I and Z flags */
+	m4510.interrupt_inhibit = 0;
 	m4510.pending_irq = 0;	/* nonzero if an IRQ is pending */
 	m4510.after_cli = 0;		/* pending IRQ and last insn cleared I */
 	m4510.irq_callback = NULL;
@@ -234,7 +237,7 @@ static void m4510_set_context (void *src)
 
 INLINE void m4510_take_irq(void)
 {
-	if( !(P & F_I) )
+	if(( !(P & F_I) ) && (m4510.interrupt_inhibit == 0))
 	{
 		EAD = M4510_IRQ_VEC;
 		m4510_ICount -= 7;
