@@ -31,17 +31,13 @@ INLINE latch8_t *get_safe_token(const device_config *device) {
 	return ( latch8_t * ) device->token;
 }
 
-
-static TIMER_CALLBACK( latch8_timerproc )
+static void update(const device_config *device, UINT8 new_val, UINT8 mask)
 {
-	const device_config *device = ptr;
 	latch8_t *latch8 = get_safe_token(device);
-	UINT8 new_val = param & 0xFF;
-	UINT8 mask = param >> 8;
 	UINT8 old_val = latch8->value;
-
-	latch8->value = (latch8->value & ~mask) | (new_val & mask);
 	
+	latch8->value = (latch8->value & ~mask) | (new_val & mask);
+
 	if (latch8->has_node_map)
 	{
 		int i;
@@ -50,6 +46,15 @@ static TIMER_CALLBACK( latch8_timerproc )
 			if (((changed & (1<<i)) != 0) && latch8->intf->node_map[i] != 0)
 				discrete_sound_w(device->machine, latch8->intf->node_map[i] , (latch8->value >> i) & 1);
 	}
+}
+
+static TIMER_CALLBACK( latch8_timerproc )
+{
+	const device_config *device = ptr;
+	UINT8 new_val = param & 0xFF;
+	UINT8 mask = param >> 8;
+	
+	update(device, new_val, mask);
 }
 
 /* ----------------------------------------------------------------------- */
@@ -88,15 +93,19 @@ READ8_DEVICE_HANDLER( latch8_r )
 		}
 	}
 
-	return (res & ~latch8->intf->mask) ^ latch8->intf->xor;
+	return (res & ~latch8->intf->maskout) ^ latch8->intf->xor;
 }
 
 
 WRITE8_DEVICE_HANDLER( latch8_w )
 {
+	latch8_t *latch8 = get_safe_token(device);
 	assert(offset == 0);
 
-	timer_call_after_resynch((void *)device, (0xFF << 8) | data, latch8_timerproc);
+	if (latch8->intf->nosync != 0xff)
+		timer_call_after_resynch((void *)device, (0xFF << 8) | data, latch8_timerproc);
+	else
+		update(device, data, 0xFF);
 }
 
 
@@ -144,12 +153,17 @@ READ8_DEVICE_HANDLER( latch8_bit7_q_r) { return latch8_bitx_r(device, offset, 7)
 
 INLINE void latch8_bitx_w(const device_config *device, int bit, offs_t offset, UINT8 data)
 {
+	latch8_t *latch8 = get_safe_token(device);
 	UINT8 mask = (1<<offset);
 	UINT8 masked_data = (((data >> bit) & 0x01) << offset);
 
 	assert( offset < 8);
 	
-	timer_call_after_resynch((void *) device, (mask << 8) | masked_data, latch8_timerproc);
+	/* No need to synchronize ? */
+	if (latch8->intf->nosync & mask)
+		update(device, masked_data, mask);
+	else
+		timer_call_after_resynch((void *) device, (mask << 8) | masked_data, latch8_timerproc);
 }
 
 WRITE8_DEVICE_HANDLER( latch8_bit0_w ) { latch8_bitx_w(device, 0, offset, data); }

@@ -36,8 +36,9 @@ typedef struct _latch8_config latch8_config;
 struct _latch8_config
 {
 	/* only for byte reads, does not affect bit reads and node_map */
-	UINT32					mask; 
+	UINT32					maskout; 
 	UINT32					xor;  /* after mask */
+	UINT32					nosync;
 	UINT32					node_map[8];
 	latch8_devread			devread[8];
 };
@@ -51,12 +52,16 @@ struct _latch8_config
 	MDRV_DEVICE_ADD(_tag, LATCH8)
 
 /* Bit mask specifying bits to be masked *out* */
-#define MDRV_LATCH8_MASK(_mask) \
-	MDRV_DEVICE_CONFIG_DATA32(latch8_config, mask, _mask)
+#define MDRV_LATCH8_MASKOUT(_maskout) \
+	MDRV_DEVICE_CONFIG_DATA32(latch8_config, maskout, _maskout)
 
 /* Bit mask specifying bits to be inverted */
 #define MDRV_LATCH8_INVERT(_xor) \
 	MDRV_DEVICE_CONFIG_DATA32(latch8_config, xor, _xor) 
+
+/* Bit mask specifying bits not needing cpu synchronization. */
+#define MDRV_LATCH8_NOSYNC(_nosync) \
+	MDRV_DEVICE_CONFIG_DATA32(latch8_config, nosync, _nosync) 
 
 /* Write bit to discrete node */
 #define MDRV_LATCH8_DISCRETE_NODE(_bit, _node) \

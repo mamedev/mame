@@ -1110,8 +1110,8 @@ MACHINE_DRIVER_START( dkong2b_audio )
 
 	/* sound latches */
 	
-	MDRV_LATCH8_ADD("ls175.3d")
-	MDRV_LATCH8_MASK(0xf0)
+	MDRV_LATCH8_ADD("ls175.3d") /* sound cmd latch */
+	MDRV_LATCH8_MASKOUT(0xf0)
 	MDRV_LATCH8_INVERT(0x0F)
 	
 	MDRV_LATCH8_ADD("ls259.6h")
@@ -1160,7 +1160,7 @@ MACHINE_DRIVER_START( radarsc1_audio )
 	MDRV_CPU_MODIFY("sound")
 	MDRV_CPU_IO_MAP(radarsc1_sound_io_map, 0)
 	
-	/* virtual_p2 is not used here */
+	/* virtual_p2 is not read -see memory map-, all bits are output bits */
 	MDRV_LATCH8_ADD( "virtual_p1" )	/* virtual latch for port A */
 	MDRV_LATCH8_INVERT( 0x80 )		/* signal is inverted       */
 	MDRV_LATCH8_DEVREAD(7, LATCH8, "ls259.6h", latch8_r, 3)
@@ -1176,7 +1176,7 @@ MACHINE_DRIVER_START( dkongjr_audio )
 	/* sound latches */
 	
 	MDRV_LATCH8_ADD("ls174.3d")
-	MDRV_LATCH8_MASK(0xE0)
+	MDRV_LATCH8_MASKOUT(0xE0)
 	
 	MDRV_LATCH8_ADD( "ls259.6h")
 	MDRV_LATCH8_DISCRETE_NODE(0, DS_SOUND0_INP)
