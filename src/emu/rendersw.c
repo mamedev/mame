@@ -120,6 +120,8 @@ INLINE float round_nearest(float f)
     contains Y in the LSB, Cb << 8, and Cr << 16
 -------------------------------------------------*/
 
+#define CLSH(x)		(((INT32) x < 0) ? 0 : x >> 8)
+
 INLINE UINT32 ycc_to_rgb(UINT32 ycc)
 {
 	/* original equations:
@@ -147,23 +149,18 @@ INLINE UINT32 ycc_to_rgb(UINT32 ycc)
     UINT8 y = ycc;
     UINT8 cb = ycc >> 8;
     UINT8 cr = ycc >> 16;
-	int r, g, b, common;
+	UINT32 r, g, b, common;
 
-	common = 298 * y - 298 * 16;
-	r = (common +                        409 * cr - 409 * 128 + 128) >> 8;
-	g = (common - 100 * cb + 100 * 128 - 208 * cr + 208 * 128 + 128) >> 8;
-	b = (common + 516 * cb - 516 * 128                        + 128) >> 8;
+	common = 298 * y - 56992;
+	r = (common +            409 * cr);
+	g = (common - 100 * cb - 208 * cr + 91776);
+	b = (common + 516 * cb - 13696);
 
-	if (r < 0) r = 0;
-	else if (r > 255) r = 255;
-	if (g < 0) g = 0;
-	else if (g > 255) g = 255;
-	if (b < 0) b = 0;
-	else if (b > 255) b = 255;
-
-	return MAKE_RGB(r, g, b);
+	/* MAKE_RGB does upper clamping */
+	return MAKE_RGB(CLSH(r), CLSH(g), CLSH(b));
 }
 
+#undef CLSH
 
 /*-------------------------------------------------
     get_texel_palette16_nearest - return the
