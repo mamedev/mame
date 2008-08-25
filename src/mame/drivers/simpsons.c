@@ -6,6 +6,64 @@ Preliminary driver by:
 Ernesto Corvi
 someone@secureshell.com
 
+PCB Layout
+----------
+
+GX072  PWB352346B
+|-----------------------------------------------------|
+| MB3722   072D04.1D  072D05.1F        8464           |
+|  VOL VOL     YM2151                        072B08.3N|
+|           YM3012     053260       053246            |
+|CN3                 3.579545MHz                      |
+|              Z80     072E03.6G                      |
+|J 052535                 8416      053247            |
+|A 052535                 2018               072B09.8N|
+|M 052535 053994          2018      053251            |
+|M 051550 053995                                      |
+|A                   8464                             |
+|    ER5911               052109    051962  072B10.12N|
+|TEST  072M13.13C                                     |
+|      072L12.15C                                     |
+|CN6   072G02.16C  053248  8464  072B06.16H 072B11.16L|
+|CN7   072G01.17C    24MHz 8464  072B07.18H           |
+|-----------------------------------------------------|
+Notes:
+       CN3 - 4 pin connector for sound output for right speaker (left speaker
+             is via the JAMMA connector)
+   CN6/CN7 - 15 pin connector for player 3 and player 4 controls
+    ER5911 - EEPROM (128bx8 == 93C46)
+      8464 - 8kx8 SRAM
+      8416 - 2kx8 SRAM
+      2018 - 2kx8 SRAM
+    MB3722 - Audio Power AMP
+       Z80 - clock 3.579545MHz
+    YM2151 - clock 3.579545MHz
+    YM3012 - clock 1.7897725MHz [3.579545/2]
+Custom ICs - 053260        - sound chip (QFP80)
+             053246/053247 - sprite generators (QFP120)
+             053251        - priority encoder (QFP100)
+             052535        - RGB DAC (ceramic encased SIP9)
+             051550        - I/O DAC (ceramic encased SIP23)
+             053994/053995 - PALs (MMI PAL16L8, DIP20)
+             052109/051962 - Tilemap Generators (QFP120)
+             053248        - CPU (QFP80), clock input 12.000MHz and 3.000MHz [24/2 and 24/8]
+      ROMs - 072D04 \  256kx8 DIP40 MaskROM
+             072D05 /  1Mx8 DIP40 MaskROM (Sound Samples)
+             072E03 -  32kx8 MaskROM (Z80 Sound Program)
+             072B08 \
+             072B09  |
+             072B10  | 512kx16 DIP40 MaskROM (Sprites)
+             072B11 /
+             072B06 \
+             072B07 /  256kx16 DIP40 MaskROM (Tiles)
+             072M13 \
+             072L12  |
+             072G02  | 128kx8 DIP32 MaskROM (Main Program)
+             072G01 /
+
+     VSync - 59.1856Hz
+     HSync - 15.1566Hz
+
 ***************************************************************************/
 
 #include "driver.h"
