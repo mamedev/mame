@@ -11,8 +11,13 @@
 
 #include "driver.h"
 #include "uimenu.h"
+#include "cpu/i8039/i8039.h"
 #include "machine/laserdsc.h"
 #include <ctype.h>
+
+
+#define TEST_PR8210_ROM		0
+
 
 
 /*************************************
@@ -66,6 +71,16 @@ static UINT32 pr8210_command_buffer_in, pr8210_command_buffer_out;
 static UINT8 pr8210_command_buffer[10];
 
 static void (*execute_command)(const device_config *laserdisc, int command);
+
+#if TEST_PR8210_ROM
+
+static UINT8 pia[0x100];
+static UINT8 pr8210_porta;
+static UINT8 pr8210_portb;
+static UINT8 pr8210_pia_porta;
+static UINT8 pr8210_pia_portb;
+
+#endif
 
 
 
@@ -230,7 +245,11 @@ static TIMER_CALLBACK( pr8210_bit_callback )
 	else if (bitsleft == 0 && pr8210_command_buffer_in != pr8210_command_buffer_out)
 	{
 		data = pr8210_command_buffer[pr8210_command_buffer_out++ % ARRAY_LENGTH(pr8210_command_buffer)];
+#if TEST_PR8210_ROM
+		pr8210_pia_porta = BITSWAP8(data, 0,1,2,3,4,5,6,7);
+#else
 		bitsleft = 12;
+#endif
 	}
 	timer_adjust_oneshot(pr8210_bit_timer, duration, (bitsleft << 16) | data);
 }
@@ -448,6 +467,175 @@ INPUT_PORTS_END
 
 /*************************************
  *
+ *  Test PR-8210 ROM emulation
+ *
+ *************************************/
+
+#if TEST_PR8210_ROM
+
+static READ8_HANDLER( pr8210_pia_r )
+{
+	UINT8 result = pia[offset];
+	switch (offset)
+	{
+		case 0xa0:
+//			printf("%03X:pia_r(%02X) = %02X\n", activecpu_get_pc(), offset, pr8210_pia_porta);
+			result = pr8210_pia_porta;
+			pr8210_pia_porta = 0;
+			break;
+			
+		default:
+			printf("%03X:pia_r(%02X)\n", activecpu_get_pc(), offset);
+			break;
+	}
+	return result;
+}
+
+static WRITE8_HANDLER( pr8210_pia_w )
+{
+	/*
+	   $22-26 (R) = read and copied to memory $23-27
+	   $23 (R) = something compared against $F4
+	   $22-26 (W) = SRCH. text
+	   $27-2B (W) = FRAME/CHAP. text
+	   $2C-30 (W) = frame or chapter number
+	   $40 (W) = $CF at initialization, tracked by ($78)
+	   $60 (W) = port B output, tracked by ($77)
+		   $80 = n/c
+		   $40 = (out) LED3
+		   $20 = (out) LED2
+		   $10 = (out) LED1
+		   			123 -> LHL = Play
+		   			    -> HLL = Slow fwd
+		   			    -> LLL = Slow rev
+		   			    -> HHL = Still
+		   			    -> LLH = Pause
+		   			    -> HHH = all off
+		   $08 = (out) CAV LED
+		   $04 = (out) CLV LED
+		   $02 = (out) A2 LED/AUDIO 2
+		   $01 = (out) A1 LED/AUDIO 1
+	   $80 (W) = 0 or 1
+	   $A0 (R) = port A input
+	   $C0 (R) = stored to ($2E)
+	   $E0 (R) = stored to ($2F)
+	*/
+	if (pia[offset] != data)
+	{
+		switch (offset)
+		{
+			case 0x60:
+				printf("%03X:pia_w(%02X) = %02X (PORT B LEDS:", activecpu_get_pc(), offset, data);
+				if (!(data & 0x01)) printf(" AUDIO1");
+				if (!(data & 0x02)) printf(" AUDIO2");
+				if (!(data & 0x04)) printf(" CLV");
+				if (!(data & 0x08)) printf(" CAV");
+				printf(" LED123=%c%c%c", (data & 0x10) ? 'H' : 'L', (data & 0x20) ? 'H' : 'L', (data & 0x40) ? 'H' : 'L');
+				if (!(data & 0x80)) printf(" ???");
+				printf(")\n");
+				pr8210_pia_portb = data;
+				break;
+			
+			default:
+				printf("%03X:pia_w(%02X) = %02X\n", activecpu_get_pc(), offset, data);
+				break;
+		}
+		pia[offset] = data;
+	}
+}
+
+static READ8_HANDLER( pr8210_bus_r )
+{
+	/*
+	   $80 = n/c
+	   $40 = (in) slide pot interrupt source (slider position limit detector, inside and outside)
+	   $20 = n/c
+	   $10 = (in) /FOCUS LOCK
+	   $08 = (in) /SPDL LOCK
+	   $04 = (in) SIZE 8/12
+	   $02 = (in) FG via op-amp (spindle motor stop detector)
+	   $01 = (in) SLOW TIMER OUT
+	*/
+	offs_t pc = activecpu_get_pc();
+	if (pc != 0x11c)
+		printf("%03X:bus_r\n", pc);
+	
+	/* loop at beginning waits for $40=0, $02=1 */
+	return 0xff & ~0x40 & ~0x04;
+}
+
+static WRITE8_HANDLER( pr8210_porta_w )
+{
+	/*
+	   $80 = (out) SCAN C (F/R)
+	   $40 = (out) AUDIO SQ
+	   $20 = (out) VIDEO SQ
+	   $10 = (out) /SPDL ON
+	   $08 = (out) /FOCUS ON
+	   $04 = (out) SCAN B (L/H)
+	   $02 = (out) SCAN A (/SCAN)
+	   $01 = (out) JUMP TRG (jump back trigger, clock on high->low)
+	*/
+	if (data != pr8210_porta)
+	{
+		printf("%03X:porta_w = %02X", activecpu_get_pc(), data);
+		if (!(data & 0x01)) printf(" JUMPTRG");
+		if (!(data & 0x02))
+		{
+			printf(" SCAN:%c:%c", (data & 0x80) ? 'F' : 'R', (data & 0x04) ? 'L' : 'H');
+		}
+		if (!(data & 0x08)) printf(" /FOCUSON");
+		if (!(data & 0x10)) printf(" /SPDLON");
+		if (data & 0x20) printf(" VIDEOSQ");
+		if (data & 0x40) printf(" AUDIOSQ");
+		printf("\n");
+		pr8210_porta = data;
+	}
+}
+
+static WRITE8_HANDLER( pr8210_portb_w )
+{
+	/*
+	   $80 = (out) /CS on PIA
+	   $40 = (out) 0 to self-generate IRQ
+	   $20 = (out) SLOW TRG
+	   $10 = (out) STANDBY LED
+	   $08 = (out) TP2
+	   $04 = (out) TP1
+	   $02 = (out) ???
+	   $01 = (out) LASER ON
+	*/
+	cputag_set_input_line(machine, "pr8210", 0, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	if ((data & 0x7f) != (pr8210_portb & 0x7f))
+	{
+		printf("%03X:portb_w = %02X", activecpu_get_pc(), data);
+		if (!(data & 0x01)) printf(" LASERON");
+		if (!(data & 0x02)) printf(" ???");
+		if (!(data & 0x04)) printf(" TP1");
+		if (!(data & 0x08)) printf(" TP2");
+		if (!(data & 0x10)) printf(" STANDBYLED");
+		if (!(data & 0x20)) printf(" SLOWTRG");
+		if (!(data & 0x40)) printf(" IRQGEN");
+//		if (data & 0x80) printf(" PIASEL");
+		printf("\n");
+		pr8210_portb = data;
+	}
+}
+
+
+static ADDRESS_MAP_START( pr8210_portmap, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0xff) AM_READWRITE(pr8210_pia_r, pr8210_pia_w)
+	AM_RANGE(I8039_bus, I8039_bus) AM_READ(pr8210_bus_r)
+	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(pr8210_porta_w)
+	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(pr8210_portb_w)
+ADDRESS_MAP_END
+
+#endif
+
+
+
+/*************************************
+ *
  *  Machine drivers
  *
  *************************************/
@@ -484,6 +672,11 @@ static MACHINE_DRIVER_START( pr8210 )
 	MDRV_MACHINE_START(pr8210)
 	MDRV_MACHINE_RESET(pr8210)
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210)
+
+#if TEST_PR8210_ROM
+	MDRV_CPU_ADD("pr8210", I8049, XTAL_4_41MHz)
+	MDRV_CPU_IO_MAP(pr8210_portmap,0)
+#endif
 MACHINE_DRIVER_END
 
 
@@ -501,6 +694,11 @@ ROM_END
 
 ROM_START( pr8210 )
 	DISK_REGION( "laserdisc" )
+
+#if TEST_PR8210_ROM
+	ROM_REGION( 0x800, "pr8210", 0 )
+	ROM_LOAD( "pr-8210_mcu_ud6005a.bin", 0x000, 0x800, CRC(120fa83b) SHA1(b514326ca1f52d6d89056868f9d17eabd4e3f31d) )
+#endif
 ROM_END
 
 

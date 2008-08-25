@@ -799,10 +799,6 @@ static const tms36xx_interface monsterb_tms3617_interface =
  *
  *************************************/
 
-static ADDRESS_MAP_START( monsterb_7751_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( monsterb_7751_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(I8039_t1, I8039_t1) AM_READ(n7751_t1_r)
 	AM_RANGE(I8039_p2, I8039_p2) AM_READ(n7751_command_r)
@@ -839,7 +835,6 @@ MACHINE_DRIVER_START( monsterb_sound_board )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("audio", N7751, 6000000)
-	MDRV_CPU_PROGRAM_MAP(monsterb_7751_map,0)
 	MDRV_CPU_IO_MAP(monsterb_7751_portmap,0)
 
 	/* sound hardware */

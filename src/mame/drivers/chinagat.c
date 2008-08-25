@@ -549,7 +549,7 @@ static MACHINE_DRIVER_START( saiyugb1 )
 	MDRV_CPU_ADD("audio", Z80, 3579545)		/* 3.579545 MHz oscillator */
 	MDRV_CPU_PROGRAM_MAP(saiyugb1_sound_map,0)
 
-	MDRV_CPU_ADD("mcu", I8048,9263750/3)		/* 3.087916 MHz (9.263750 MHz oscillator) */
+	MDRV_CPU_ADD("mcu", I8048, 9263750)		/* 9.263750 MHz oscillator, divided by 3*5 internally */
 	MDRV_CPU_PROGRAM_MAP(i8748_map,0)
 	MDRV_CPU_IO_MAP(i8748_portmap,0)
 

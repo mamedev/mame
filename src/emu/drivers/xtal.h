@@ -54,6 +54,7 @@ enum
 	XTAL_3_6864MHz  	= 3686400,		/* CPS3 */
 	XTAL_4MHz    		= 4000000,
 	XTAL_4_224MHz   	= 4224000,		/* Used to drive OKI M6295 chips, usually with /4 divider */
+	XTAL_4_41MHz		= 4410000,		/* Pioneer PR-8210 ldplayer */
 	XTAL_4_43361MHz		= 4433610,		/* Cidelsa Draco */
 	XTAL_4_433619MHz	= 4433619,		/* PAL color subcarrier */
 	XTAL_4_9152MHz   	= 4915200,

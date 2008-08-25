@@ -34,6 +34,29 @@
  ****************************************************************************/
 
 
+/****************************************************************************
+
+	Chip   RAM  ROM  I/O
+	----   ---  ---  ---
+	8021    64   1k   21  (ROM, reduced instruction set) 
+
+	8035    64    0   27  (external ROM)
+	8041    64   1k   18  (ROM)
+	8048    64   1k   27  (ROM)
+	8648    64   1k   27  (OTPROM)
+	8741    64   1k   18  (EPROM)
+	8748    64   1k   27  (EPROM) 
+	8884    64   1k
+	N7751  128   2k
+
+	8039   128    0   27  (external ROM)
+	8049   128   2k   27  (ROM)
+	8749   128   2k   27  (EPROM)
+	M58715 128    0       (external ROM)
+
+****************************************************************************/
+
+
 #include "debugger.h"
 #include "i8039.h"
 
@@ -75,8 +98,8 @@ static int Timer_IRQ(void);
 #define bus_r()			I8039_In(I8039_bus)
 #define bus_w(V)		I8039_Out(I8039_bus,V)
 
-#define INTRAM_R(A)		(intRAM[(A) & R.ram_mask])
-#define INTRAM_W(A,V)	do { intRAM[(A) & R.ram_mask] = V; } while (0);
+#define INTRAM_R(A)		data_read_byte_8le(A)
+#define INTRAM_W(A,V)	data_write_byte_8le(A, V)
 
 #define C_FLAG			0x80
 #define A_FLAG			0x40
@@ -87,15 +110,14 @@ typedef struct
 {
 	PAIR	PREVPC;			/* previous program counter */
 	PAIR	PC;				/* program counter */
+	UINT8 *	regptr;			/* pointer to r0-r7 */
 	UINT8	A, SP, PSW;
-	UINT8	RAM[128];
 	UINT8	bus, f1;		/* Bus data, and flag1 */
 	UINT8	P1, P2;			/* Internal Port 1 and 2 latched outputs */
 	UINT8	EA;				/* latched EA input */
 	UINT8	cpu_feature;	/* process feature */
-	UINT8	ram_mask;		/* internal ram size - 1 */
 	UINT16	int_rom_size;	/* internal rom size */
-	UINT8	pending_irq, irq_executing, masterClock, regPtr;
+	UINT8	pending_irq, irq_executing, masterClock;
 	UINT8	t_flag, timer, timerON, countON, xirq_en, tirq_en;
 	UINT16	A11;
 	UINT8	irq_state, irq_extra_cycles;
@@ -125,17 +147,19 @@ typedef struct {
 #define M_By	((R.PSW & B_FLAG))
 #define M_Bn	(!M_By)
 
-#define intRAM	R.RAM
-#define regPTR	R.regPtr
+#define R0		R.regptr[0]
+#define R1		R.regptr[1]
+#define R2		R.regptr[2]
+#define R3		R.regptr[3]
+#define R4		R.regptr[4]
+#define R5		R.regptr[5]
+#define R6		R.regptr[6]
+#define R7		R.regptr[7]
 
-#define R0	intRAM[regPTR  ]
-#define R1	intRAM[regPTR+1]
-#define R2	intRAM[regPTR+2]
-#define R3	intRAM[regPTR+3]
-#define R4	intRAM[regPTR+4]
-#define R5	intRAM[regPTR+5]
-#define R6	intRAM[regPTR+6]
-#define R7	intRAM[regPTR+7]
+INLINE void update_regptr(void)
+{
+	R.regptr = memory_get_write_ptr(cpu_getactivecpu(), ADDRESS_SPACE_DATA, (M_By) ? 24 : 0);
+}
 
 INLINE UINT8 ea_r(void)
 {
@@ -174,7 +198,7 @@ INLINE unsigned M_RDMEM_OPCODE (void)
 
 INLINE void push(UINT8 d)
 {
-	intRAM[8+R.SP++] = d;
+	INTRAM_W(8+R.SP++, d);
 	R.SP  = R.SP & 0x0f;
 	R.PSW = R.PSW & 0xf8;
 	R.PSW = R.PSW | (R.SP >> 1);
@@ -184,8 +208,8 @@ INLINE UINT8 pull(void) {
 	R.SP  = (R.SP + 15) & 0x0f;		/*  if (--R.SP < 0) R.SP = 15;  */
 	R.PSW = R.PSW & 0xf8;
 	R.PSW = R.PSW | (R.SP >> 1);
-	/* regPTR = ((M_By) ? 24 : 0);  regPTR should not change */
-	return intRAM[8+R.SP];
+	/* update_regptr();  regPTR should not change */
+	return INTRAM_R(8+R.SP);
 }
 
 INLINE void daa_a(void)
@@ -425,7 +449,7 @@ static void mov_r4_a(void)	 { R4 = R.A; }
 static void mov_r5_a(void)	 { R5 = R.A; }
 static void mov_r6_a(void)	 { R6 = R.A; }
 static void mov_r7_a(void)	 { R7 = R.A; }
-static void mov_psw_a(void)	 { R.PSW = R.A; regPTR = ((M_By) ? 24 : 0); R.SP = (R.PSW & 7) << 1; }
+static void mov_psw_a(void)	 { R.PSW = R.A; update_regptr(); R.SP = (R.PSW & 7) << 1; }
 static void mov_r0_n(void)	 { R0 = M_RDMEM_OPCODE(); }
 static void mov_r1_n(void)	 { R1 = M_RDMEM_OPCODE(); }
 static void mov_r2_n(void)	 { R2 = M_RDMEM_OPCODE(); }
@@ -494,7 +518,7 @@ static void retr(void)
 	R.PC.w.l = ((i & 0x0f) << 8) | pull();
 	change_pc(R.PC.w.l);
 	R.PSW = (R.PSW & 0x0f) | (i & 0xf0);	/* Stack is already changed by pull */
-	regPTR = ((M_By) ? 24 : 0);
+	update_regptr();
 
 	R.irq_executing = I8039_NO_INT;
 
@@ -514,8 +538,8 @@ static void rr_a(void)		 { UINT8 i=R.A & 1; R.A >>= 1; if (i) R.A |= 0x80; else 
 static void rrc_a(void)		 { UINT8 i=M_Cy; if (R.A & 1) SET(C_FLAG); else CLR(C_FLAG); R.A >>= 1; if (i) R.A |= 0x80; else R.A &= 0x7f; }
 static void sel_mb0(void)	 { R.A11 = 0x000; }
 static void sel_mb1(void)	 { R.A11 = 0x800; }
-static void sel_rb0(void)	 { CLR(B_FLAG); regPTR = 0;  }
-static void sel_rb1(void)	 { SET(B_FLAG); regPTR = 24; }
+static void sel_rb0(void)	 { CLR(B_FLAG); update_regptr();  }
+static void sel_rb1(void)	 { SET(B_FLAG); update_regptr(); }
 static void stop_tcnt(void)	 { R.timerON = R.countON = 0; }
 static void strt_cnt(void)	 { R.countON = 1; R.timerON = 0; R.Old_T1 = test_r(1); }	/* NS990113 */
 static void strt_t(void)	 { R.timerON = 1; R.countON = 0; R.masterClock = 0; }	/* NS990113 */
@@ -586,8 +610,11 @@ static const s_opcode opcode_main[256]=
 /****************************************************************************
  * Initialize emulation
  ****************************************************************************/
-static void i8039_init (int index, int clock, const void *config, int (*irqcallback)(int))
+
+static void generic_init(int index, int clock, const void *config, int (*irqcallback)(int), UINT16 romsize)
 {
+	R.int_rom_size = romsize;
+	
 	R.irq_callback = irqcallback;
 
 	state_save_register_item("i8039", index, R.PC.w.l);
@@ -595,7 +622,6 @@ static void i8039_init (int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("i8039", index, R.A);
 	state_save_register_item("i8039", index, R.SP);
 	state_save_register_item("i8039", index, R.PSW);
-	state_save_register_item_array("i8039", index, R.RAM);
 	state_save_register_item("i8039", index, R.bus);
 	state_save_register_item("i8039", index, R.f1);
 	state_save_register_item("i8039", index, R.P1);
@@ -603,7 +629,6 @@ static void i8039_init (int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("i8039", index, R.pending_irq);
 	state_save_register_item("i8039", index, R.irq_executing);
 	state_save_register_item("i8039", index, R.masterClock);
-	state_save_register_item("i8039", index, R.regPtr);
 	state_save_register_item("i8039", index, R.t_flag);
 	state_save_register_item("i8039", index, R.timer);
 	state_save_register_item("i8039", index, R.timerON);
@@ -616,39 +641,32 @@ static void i8039_init (int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("i8039", index, R.Old_T1);
 
 	R.cpu_feature = 0;
-	R.ram_mask = 0x7F;
-	R.int_rom_size = 0x800;
-	/* not changed on reset*/
-	memset(R.RAM, 0x00, 128);
 	R.timer = 0;
 }
 
-#if (HAS_I8035||HAS_I8048||HAS_MB8884)
+#if (HAS_I8035 || HAS_I8041 || HAS_I8048 || HAS_I8648 || HAS_I8748 || HAS_MB8884)
 static void i8035_init (int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	i8039_init(index, clock, config, irqcallback);
-	R.ram_mask = 0x3F;
-	R.int_rom_size = 0x400;
+	generic_init(index, clock, config, irqcallback, 0x400);
 }
 #endif
 
-#if (HAS_I8749)
-static void i8749_init (int index, int clock, const void *config, int (*irqcallback)(int))
+#if (HAS_I8039 || HAS_I8049 || HAS_I8749 || HAS_N7751)
+static void i8039_init (int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	i8039_init(index, clock, config, irqcallback);
-
-	R.ram_mask = 0x7f;
-	R.int_rom_size = 0x800;
+	generic_init(index, clock, config, irqcallback, 0x800);
 }
 #endif
 
 #if (HAS_M58715)
 static void m58715_init (int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	i8039_init(index, clock, config, irqcallback);
+	generic_init(index, clock, config, irqcallback, 0x800);
 	R.cpu_feature = FEATURE_M58715;
 }
-#endif /* HAS_M58715 */
+#endif
+
+
 
 /****************************************************************************
  * Reset registers to their initial values
@@ -830,7 +848,7 @@ static void i8039_set_context (void *src)
 	if( src )
 	{
 		R = *(I8039_Regs*)src;
-		regPTR = ((M_By) ? 24 : 0);
+		update_regptr();
 		R.SP = (R.PSW << 1) & 0x0f;
 		change_pc(R.PC.w.l);
 	}
@@ -898,7 +916,24 @@ static void i8039_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void i8039_get_info(UINT32 state, cpuinfo *info)
+static ADDRESS_MAP_START(program_10bit, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE(0x00, 0x3ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(program_11bit, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE(0x00, 0x7ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(data_6bit, ADDRESS_SPACE_DATA, 8)
+	AM_RANGE(0x00, 0x3f) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(data_7bit, ADDRESS_SPACE_DATA, 8)
+	AM_RANGE(0x00, 0x7f) AM_RAM
+ADDRESS_MAP_END
+
+
+static void generic_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
@@ -915,10 +950,10 @@ void i8039_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 3;							break;
 
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 12;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: /*info->i = 10 or 11 or 12;*/	break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	/*info->i = 6 or 7;*/			break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 9;					break;
@@ -951,16 +986,19 @@ void i8039_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = i8039_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = i8039_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = i8039_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = i8039_init;				break;
+		case CPUINFO_PTR_INIT:							/*info->init = i8039_init;*/			break;
 		case CPUINFO_PTR_RESET:							info->reset = i8039_reset;				break;
 		case CPUINFO_PTR_EXIT:							info->exit = i8039_exit;				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = i8039_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i8039_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &i8039_ICount;			break;
+		
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	/*info->internal_map8 = address_map_program_10bit;*/ break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		/*info->internal_map8 = address_map_data_7bit;*/ break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I8039");				break;
+		case CPUINFO_STR_NAME:							/*strcpy(info->s, "I8039");*/			break;
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Intel 8039");			break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.2");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
@@ -986,119 +1024,195 @@ void i8039_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + I8039_TC:			sprintf(info->s, "TC:%02X", R.timer); break;
 		case CPUINFO_STR_REGISTER + I8039_P1:			sprintf(info->s, "P1:%02X", R.P1); break;
 		case CPUINFO_STR_REGISTER + I8039_P2:			sprintf(info->s, "P2:%02X", R.P2); break;
-		case CPUINFO_STR_REGISTER + I8039_R0:			sprintf(info->s, "R0:%02X", R.RAM[R.regPtr+0]); break;
-		case CPUINFO_STR_REGISTER + I8039_R1:			sprintf(info->s, "R1:%02X", R.RAM[R.regPtr+1]); break;
-		case CPUINFO_STR_REGISTER + I8039_R2:			sprintf(info->s, "R2:%02X", R.RAM[R.regPtr+2]); break;
-		case CPUINFO_STR_REGISTER + I8039_R3:			sprintf(info->s, "R3:%02X", R.RAM[R.regPtr+3]); break;
-		case CPUINFO_STR_REGISTER + I8039_R4:			sprintf(info->s, "R4:%02X", R.RAM[R.regPtr+4]); break;
-		case CPUINFO_STR_REGISTER + I8039_R5:			sprintf(info->s, "R5:%02X", R.RAM[R.regPtr+5]); break;
-		case CPUINFO_STR_REGISTER + I8039_R6:			sprintf(info->s, "R6:%02X", R.RAM[R.regPtr+6]); break;
-		case CPUINFO_STR_REGISTER + I8039_R7:			sprintf(info->s, "R7:%02X", R.RAM[R.regPtr+7]); break;
+		case CPUINFO_STR_REGISTER + I8039_R0:			sprintf(info->s, "R0:%02X", R0); break;
+		case CPUINFO_STR_REGISTER + I8039_R1:			sprintf(info->s, "R1:%02X", R1); break;
+		case CPUINFO_STR_REGISTER + I8039_R2:			sprintf(info->s, "R2:%02X", R2); break;
+		case CPUINFO_STR_REGISTER + I8039_R3:			sprintf(info->s, "R3:%02X", R3); break;
+		case CPUINFO_STR_REGISTER + I8039_R4:			sprintf(info->s, "R4:%02X", R4); break;
+		case CPUINFO_STR_REGISTER + I8039_R5:			sprintf(info->s, "R5:%02X", R5); break;
+		case CPUINFO_STR_REGISTER + I8039_R6:			sprintf(info->s, "R6:%02X", R6); break;
+		case CPUINFO_STR_REGISTER + I8039_R7:			sprintf(info->s, "R7:%02X", R7); break;
 		case CPUINFO_STR_REGISTER + I8039_EA:			sprintf(info->s, "EA:%02X", R.EA); break;
 	}
 }
 
 
 
-#if (HAS_I8035)
 /**************************************************************************
  * CPU-specific get_info/set_info
  **************************************************************************/
+
+#if (HAS_I8035)
 void i8035_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I8035");				break;
-		case CPUINFO_PTR_INIT:							info->init = i8035_init;				break;
-
-		default:										i8039_get_info(state, info);			break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 12;										break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
+		case CPUINFO_PTR_INIT:											info->init = i8035_init;							break;
+		case CPUINFO_STR_NAME:											strcpy(info->s, "I8035");							break;
+		default:														generic_get_info(state, info);						break;
 	}
 }
 #endif
 
+#if (HAS_I8041)
+void i8041_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 10;										break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
+		case CPUINFO_PTR_INIT:											info->init = i8035_init;							break;
+		case CPUINFO_STR_NAME:											strcpy(info->s, "I8041");							break;
+		default:														generic_get_info(state, info);						break;
+	}
+}
+#endif
 
 #if (HAS_I8048)
-/**************************************************************************
- * CPU-specific get_info/set_info
- **************************************************************************/
 void i8048_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I8048");				break;
-		case CPUINFO_PTR_INIT:							info->init = i8035_init;				break;
-
-		default:										i8039_get_info(state, info);			break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 10;										break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
+		case CPUINFO_PTR_INIT:											info->init = i8035_init;							break;
+		case CPUINFO_STR_NAME:											strcpy(info->s, "I8048");							break;
+		default:														generic_get_info(state, info);						break;
 	}
 }
 #endif
 
-#if (HAS_I8749)
-/**************************************************************************
- * CPU-specific get_info/set_info
- **************************************************************************/
-void i8749_get_info(UINT32 state, cpuinfo *info)
+#if (HAS_I8648)
+void i8648_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I8749");				break;
-		case CPUINFO_PTR_INIT:							info->init = i8749_init;				break;
-
-		default:										i8039_get_info(state, info);			break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 10;										break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
+		case CPUINFO_PTR_INIT:											info->init = i8035_init;							break;
+		case CPUINFO_STR_NAME:											strcpy(info->s, "I8648");							break;
+		default:														generic_get_info(state, info);						break;
 	}
 }
 #endif
 
-#if (HAS_N7751)
-/**************************************************************************
- * CPU-specific get_info/set_info
- **************************************************************************/
-void n7751_get_info(UINT32 state, cpuinfo *info)
+#if (HAS_I8748)
+void i8748_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "N7751");				break;
-		case CPUINFO_PTR_INIT:							info->init = i8039_init;				break;
-
-		default:										i8039_get_info(state, info);			break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 10;										break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
+		case CPUINFO_PTR_INIT:											info->init = i8035_init;							break;
+		case CPUINFO_STR_NAME:											strcpy(info->s, "I8748");							break;
+		default:														generic_get_info(state, info);						break;
 	}
 }
 #endif
 
 #if (HAS_MB8884)
-/**************************************************************************
- * CPU-specific get_info/set_info
- **************************************************************************/
 void mb8884_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "MB8884");				break;
-		case CPUINFO_PTR_INIT:							info->init = i8035_init;				break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 10;										break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
+		case CPUINFO_PTR_INIT:											info->init = i8035_init;							break;
+		case CPUINFO_STR_NAME:											strcpy(info->s, "MB8884");							break;
+		default:														generic_get_info(state, info);						break;
+	}
+}
+#endif
 
-		default:										i8039_get_info(state, info);			break;
+#if (HAS_N7751)
+void n7751_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 10;										break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
+		case CPUINFO_PTR_INIT:											info->init = i8035_init;							break;
+		case CPUINFO_STR_NAME:											strcpy(info->s, "N7751");							break;
+		default:														generic_get_info(state, info);						break;
+	}
+}
+#endif
+
+
+
+#if (HAS_I8039)
+void i8039_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 12;										break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 7;										break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
+		case CPUINFO_PTR_INIT:											info->init = i8039_init;							break;
+		case CPUINFO_STR_NAME:											strcpy(info->s, "I8039");							break;
+		default:														generic_get_info(state, info);						break;
+	}
+}
+#endif
+
+#if (HAS_I8049)
+void i8049_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 11;										break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 7;										break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_11bit;	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
+		case CPUINFO_PTR_INIT:											info->init = i8039_init;							break;
+		case CPUINFO_STR_NAME:											strcpy(info->s, "I8049");							break;
+		default:														generic_get_info(state, info);						break;
+	}
+}
+#endif
+
+#if (HAS_I8749)
+void i8749_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 11;										break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 7;										break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_11bit;	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
+		case CPUINFO_PTR_INIT:											info->init = i8039_init;							break;
+		case CPUINFO_STR_NAME:											strcpy(info->s, "I8749");							break;
+		default:														generic_get_info(state, info);						break;
 	}
 }
 #endif
 
 #if (HAS_M58715)
-/**************************************************************************
- * CPU-specific get_info/set_info
- **************************************************************************/
 void m58715_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M58715");				break;
-		case CPUINFO_PTR_INIT:							info->init = m58715_init;				break;
-
-		default:										i8039_get_info(state, info);			break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 12;										break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 7;										break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
+		case CPUINFO_PTR_INIT:											info->init = m58715_init;							break;
+		case CPUINFO_STR_NAME:											strcpy(info->s, "M58715");							break;
+		default:														generic_get_info(state, info);						break;
 	}
 }
 #endif
