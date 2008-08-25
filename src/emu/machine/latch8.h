@@ -65,19 +65,19 @@ struct _latch8_config
 
 /* Write bit to discrete node */
 #define MDRV_LATCH8_DISCRETE_NODE(_bit, _node) \
-	MDRV_DEVICE_CONFIG_DATA32(latch8_config, node_map[_bit], _node) 
+	MDRV_DEVICE_CONFIG_DATA32_ARRAY(latch8_config, node_map, _bit, _node)
 
 /* Upon read, replace bits by reading from another device handler */
 #define MDRV_LATCH8_DEVREAD(_bit, _type, _tag, _handler, _from_bit) \
-	MDRV_DEVICE_CONFIG_DATA32(latch8_config, devread[_bit].from_bit, _from_bit) \
-	MDRV_DEVICE_CONFIG_DATAPTR(latch8_config, devread[_bit].type, _type) \
-	MDRV_DEVICE_CONFIG_DATAPTR(latch8_config, devread[_bit].tag, _tag) \
-	MDRV_DEVICE_CONFIG_DATAPTR(latch8_config, devread[_bit].devread_handler, _handler)
+	MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, from_bit, _from_bit) \
+	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, type, _type) \
+	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, tag, _tag) \
+	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, devread_handler, _handler) \
 
 /* Upon read, replace bits by reading from another machine handler */
 #define MDRV_LATCH8_READ(_bit, _handler, _from_bit) \
-	MDRV_DEVICE_CONFIG_DATA32(latch8_config, devread[_bit].from_bit, _from_bit) \
-	MDRV_DEVICE_CONFIG_DATAPTR(latch8_config, devread[_bit].read_handler, _handler)
+	MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, from_bit, _from_bit) \
+	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, read_handler, _handler) \
 
 /* remove device */
 #define MDRV_LATCH8_REMOVE(_tag) \
@@ -102,36 +102,36 @@ DEVICE_GET_INFO( latch8 );
 
 /* write & read full byte */
 
-READ8_DEVICE_HANDLER( latch8_r);
-WRITE8_DEVICE_HANDLER( latch8_w);
+READ8_DEVICE_HANDLER( latch8_r );
+WRITE8_DEVICE_HANDLER( latch8_w );
 
 /* reset the latch */
 
-WRITE8_DEVICE_HANDLER( latch8_reset);
+WRITE8_DEVICE_HANDLER( latch8_reset );
 
 /* read bit x                 */
 /* return (latch >> x) & 0x01 */ 
 
-READ8_DEVICE_HANDLER( latch8_bit0_r);
-READ8_DEVICE_HANDLER( latch8_bit1_r);
-READ8_DEVICE_HANDLER( latch8_bit2_r);
-READ8_DEVICE_HANDLER( latch8_bit3_r);
-READ8_DEVICE_HANDLER( latch8_bit4_r);
-READ8_DEVICE_HANDLER( latch8_bit5_r);
-READ8_DEVICE_HANDLER( latch8_bit6_r);
-READ8_DEVICE_HANDLER( latch8_bit7_r);
+READ8_DEVICE_HANDLER( latch8_bit0_r );
+READ8_DEVICE_HANDLER( latch8_bit1_r );
+READ8_DEVICE_HANDLER( latch8_bit2_r );
+READ8_DEVICE_HANDLER( latch8_bit3_r );
+READ8_DEVICE_HANDLER( latch8_bit4_r );
+READ8_DEVICE_HANDLER( latch8_bit5_r );
+READ8_DEVICE_HANDLER( latch8_bit6_r );
+READ8_DEVICE_HANDLER( latch8_bit7_r );
 
 /* read inverted bit x        */
 /* return (latch >> x) & 0x01 */ 
 
-READ8_DEVICE_HANDLER( latch8_bit0_q_r);
-READ8_DEVICE_HANDLER( latch8_bit1_q_r);
-READ8_DEVICE_HANDLER( latch8_bit2_q_r);
-READ8_DEVICE_HANDLER( latch8_bit3_q_r);
-READ8_DEVICE_HANDLER( latch8_bit4_q_r);
-READ8_DEVICE_HANDLER( latch8_bit5_q_r);
-READ8_DEVICE_HANDLER( latch8_bit6_q_r);
-READ8_DEVICE_HANDLER( latch8_bit7_q_r);
+READ8_DEVICE_HANDLER( latch8_bit0_q_r );
+READ8_DEVICE_HANDLER( latch8_bit1_q_r );
+READ8_DEVICE_HANDLER( latch8_bit2_q_r );
+READ8_DEVICE_HANDLER( latch8_bit3_q_r );
+READ8_DEVICE_HANDLER( latch8_bit4_q_r );
+READ8_DEVICE_HANDLER( latch8_bit5_q_r );
+READ8_DEVICE_HANDLER( latch8_bit6_q_r );
+READ8_DEVICE_HANDLER( latch8_bit7_q_r );
 
 /* write bit x from data into bit determined by offset */
 /* latch = (latch & ~(1<<offset)) | (((data >> x) & 0x01) << offset) */

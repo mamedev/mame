@@ -219,26 +219,52 @@ union _machine_config_token
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_CONFIG, 8), \
 	TOKEN_PTR(voidptr, &(_config)),
 
-#define MDRV_DEVICE_CONFIG_DATA32(_struct, _field, _val) \
-	TOKEN_UINT32_PACK3(MCONFIG_TOKEN_DEVICE_CONFIG_DATA32, 8, sizeof(((_struct *)NULL)->_field), 6, offsetof(_struct, _field), 12), \
+#define structsizeof(_struct, _field) sizeof(((_struct *)NULL)->_field)
+
+#define MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(_size, _offset, _val) \
+	TOKEN_UINT32_PACK3(MCONFIG_TOKEN_DEVICE_CONFIG_DATA32, 8, (_size), 6, (_offset), 12), \
 	TOKEN_UINT32((UINT32)(_val)),
 
-#define MDRV_DEVICE_CONFIG_DATA64(_struct, _field, _val) \
-	TOKEN_UINT32_PACK3(MCONFIG_TOKEN_DEVICE_CONFIG_DATA64, 8, sizeof(((_struct *)NULL)->_field), 6, offsetof(_struct, _field), 12), \
+#define MDRV_DEVICE_CONFIG_DATA32(_struct, _field, _val) \
+	MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(structsizeof(_struct, _field), offsetof(_struct, _field), _val)
+
+#define MDRV_DEVICE_CONFIG_DATA32_ARRAY(_struct, _field, _index, _val) \
+	MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(structsizeof(_struct, _field[0]), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]), _val)
+
+#define MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) \
+	MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(structsizeof(_memstruct, _member), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]) + offsetof(_memstruct, _member), _val)
+
+#define MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(_size, _offset, _val) \
+	TOKEN_UINT32_PACK3(MCONFIG_TOKEN_DEVICE_CONFIG_DATA64, 8, (_size), 6, (_offset), 12), \
 	TOKEN_UINT64((UINT64)(_val)),
 
+#define MDRV_DEVICE_CONFIG_DATA64(_struct, _field, _val) \
+	MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(structsizeof(_struct, _field), offsetof(_struct, _field), _val)
+
+#define MDRV_DEVICE_CONFIG_DATA64_ARRAY(_struct, _field, _index, _val) \
+	MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(structsizeof(_struct, _field[0]), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]), _val)
+
+#define MDRV_DEVICE_CONFIG_DATA64_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) \
+	MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(structsizeof(_memstruct, _member), offsetof(_struct, _field) + (_index) * structsizeof(_struct, _field[0]) + offsetof(_memstruct, _member), _val)
+
 #define MDRV_DEVICE_CONFIG_DATAFP32(_struct, _field, _val, _fixbits) \
-	TOKEN_UINT32_PACK4(MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP32, 8, sizeof(((_struct *)NULL)->_field), 6, _fixbits, 6, offsetof(_struct, _field), 12), \
+	TOKEN_UINT32_PACK4(MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP32, 8, structsizeof(_struct, _field), 6, _fixbits, 6, offsetof(_struct, _field), 12), \
 	TOKEN_UINT32((INT32)((float)(_val) * (float)(1 << (_fixbits)))),
 
 #define MDRV_DEVICE_CONFIG_DATAFP64(_struct, _field, _val, _fixbits) \
-	TOKEN_UINT32_PACK4(MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP64, 8, sizeof(((_struct *)NULL)->_field), 6, _fixbits, 6, offsetof(_struct, _field), 12), \
+	TOKEN_UINT32_PACK4(MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP64, 8, structsizeof(_struct, _field), 6, _fixbits, 6, offsetof(_struct, _field), 12), \
 	TOKEN_UINT64((INT64)((float)(_val) * (float)((UINT64)1 << (_fixbits)))),
 
 #ifdef PTR64
+#define MDRV_DEVICE_CONFIG_DATAPTR_EXPLICIT(_struct, _size, _offset) MDRV_DEVICE_CONFIG_DATA64_EXPLICIT(_struct, _size, _offset)
 #define MDRV_DEVICE_CONFIG_DATAPTR(_struct, _field, _val) MDRV_DEVICE_CONFIG_DATA64(_struct, _field, _val)
+#define MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(_struct, _field, _index, _val) MDRV_DEVICE_CONFIG_DATA64_ARRAY(_struct, _field, _index, _val)
+#define MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) MDRV_DEVICE_CONFIG_DATA64_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val)
 #else
+#define MDRV_DEVICE_CONFIG_DATAPTR_EXPLICIT(_struct, _size, _offset) MDRV_DEVICE_CONFIG_DATA32_EXPLICIT(_struct, _size, _offset)
 #define MDRV_DEVICE_CONFIG_DATAPTR(_struct, _field, _val) MDRV_DEVICE_CONFIG_DATA32(_struct, _field, _val)
+#define MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(_struct, _field, _index, _val) MDRV_DEVICE_CONFIG_DATA32_ARRAY(_struct, _field, _index, _val)
+#define MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val) MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(_struct, _field, _index, _memstruct, _member, _val)
 #endif
 
 
