@@ -3,9 +3,6 @@
  *
  * 16K ( 2K x 8 ) Parallel EEPROM
  *
- * Todo:
- *  Emulate write timing.
- *
  */
 
 #include "driver.h"
@@ -15,69 +12,163 @@
 #define SIZE_ID ( 0x020 )
 #define OFFSET_ID ( SIZE_DATA - SIZE_ID )
 
-struct at28c16_chip
+typedef struct
 {
 	UINT8 *data;
 	UINT8 *id;
-	UINT8 a9_12v;
-};
+	UINT8 *default_data;
+	UINT8 *default_id;
+	int last_write;
+	int a9_12v;
+	int oe_12v;
+	emu_timer *write_timer;
+} at28c16_state;
 
-static struct at28c16_chip at28c16[ MAX_AT28C16_CHIPS ];
-
-void at28c16_a9_12v( int chip, int a9_12v )
+static TIMER_CALLBACK( write_finished )
 {
-	struct at28c16_chip *c;
-	if( chip >= MAX_AT28C16_CHIPS )
+	at28c16_state *c = (at28c16_state *) ptr;
+	c->last_write = -1;
+}
+
+/*-------------------------------------------------
+    get_safe_token - makes sure that the passed
+    in device is, in fact, an AT28C16
+-------------------------------------------------*/
+
+INLINE at28c16_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == AT28C16);
+
+	return (at28c16_state *)device->token;
+}
+
+WRITE8_DEVICE_HANDLER( at28c16_w )
+{
+	at28c16_state *c = get_safe_token(device);
+
+	if( c->last_write >= 0 )
 	{
-		logerror( "at28c16_a9_12v: invalid chip %d\n", chip );
-		return;
+//		logerror( "%08x: at28c16_write( %d, %04x, %02x ) busy\n", activecpu_get_pc(), chip, offset, data );
 	}
-	c = &at28c16[ chip ];
+	else if( c->oe_12v )
+	{
+//		logerror( "%08x: at28c16_write( %d, %04x, %02x ) erase\n", activecpu_get_pc(), chip, offset, data );
+		memset( c->data, 0xff, SIZE_DATA );
+		memset( c->id, 0xff, SIZE_ID );
+		c->last_write = 0xff;
+		timer_adjust_oneshot( c->write_timer, ATTOTIME_IN_USEC( 200 ), 0 );
+	}
+	else if( offset >= OFFSET_ID && c->a9_12v )
+	{
+//		logerror( "%08x: at28c16_write( %d, %04x, %02x ) id\n", activecpu_get_pc(), chip, offset, data );
+		c->id[ offset - OFFSET_ID ] = data;
+		c->last_write = data;
+		timer_adjust_oneshot( c->write_timer, ATTOTIME_IN_USEC( 200 ), 0 );
+	}
+	else
+	{
+//      logerror( "%08x: at28c16_write( %d, %04x, %02x ) data\n", activecpu_get_pc(), chip, offset, data );
+		c->data[ offset ] = data;
+		c->last_write = data;
+		timer_adjust_oneshot( c->write_timer, ATTOTIME_IN_USEC( 200 ), 0 );
+	}
+}
+
+
+READ8_DEVICE_HANDLER( at28c16_r )
+{
+	at28c16_state *c = get_safe_token(device);
+
+	if( c->last_write >= 0 )
+	{
+//		logerror( "at28c16_read( %04x ) write status\n", offset );
+		return c->last_write ^ 0x80;
+	}
+	else if( offset >= OFFSET_ID && c->a9_12v )
+	{
+//		logerror( "at28c16_read( %04x ) id\n", offset );
+		return c->id[ offset - OFFSET_ID ];
+	}
+	else
+	{
+//      logerror( "%08x: at28c16_read( %d, %04x ) %02x data\n", activecpu_get_pc(), chip, offset, c->data[ offset ] );
+		return c->data[ offset ];
+	}
+}
+
+void at28c16_a9_12v( const device_config *device, int a9_12v )
+{
+	at28c16_state *c = get_safe_token(device);
 
 	c->a9_12v = a9_12v;
 }
 
-/* nvram handlers */
-
-void at28c16_init( int chip, UINT8 *data, UINT8 *id )
+void at28c16_oe_12v( const device_config *device, int oe_12v )
 {
-	struct at28c16_chip *c;
-	if( chip >= MAX_AT28C16_CHIPS )
-	{
-		logerror( "at28c16_init: invalid chip %d\n", chip );
-		return;
-	}
-	c = &at28c16[ chip ];
+	at28c16_state *c = get_safe_token(device);
 
-	c->a9_12v = 0;
-
-	if( data == NULL )
-	{
-		data = auto_malloc( SIZE_DATA );
-	}
-
-	if( id == NULL )
-	{
-		id = auto_malloc( SIZE_ID );
-	}
-
-	c->data = data;
-	c->id = id;
-
-	state_save_register_item_pointer( "at28c16", chip, c->data, SIZE_DATA );
-	state_save_register_item_pointer( "at28c16", chip, c->id, SIZE_ID );
-	state_save_register_item( "at28c16", chip, c->a9_12v );
+	c->oe_12v = oe_12v;
 }
 
-static void nvram_handler_at28c16( running_machine *machine, int chip, mame_file *file, int read_or_write )
+/*-------------------------------------------------
+    device start callback
+-------------------------------------------------*/
+
+static DEVICE_START(at28c16)
 {
-	struct at28c16_chip *c;
-	if( chip >= MAX_AT28C16_CHIPS )
+	at28c16_state *c = get_safe_token(device);
+	const at28c16_config *config;
+	char unique_tag[50];
+
+	/* validate some basic stuff */
+	assert(device != NULL);
+//	assert(device->static_config != NULL);
+	assert(device->inline_config == NULL);
+	assert(device->machine != NULL);
+	assert(device->machine->config != NULL);
+
+	c->data = auto_malloc( SIZE_DATA );
+	c->id = auto_malloc( SIZE_ID );
+	c->a9_12v = 0;
+	c->oe_12v = 0;
+	c->last_write = -1;
+	c->write_timer = timer_alloc( write_finished, c );
+
+	config = device->static_config;
+	if( config != NULL && config->data != NULL )
 	{
-		logerror( "at28c16_nvram_handler: invalid chip %d\n", chip );
-		return;
+		c->default_data = memory_region( device->machine, config->data );
 	}
-	c = &at28c16[ chip ];
+
+	if( config != NULL && config->id != NULL )
+	{
+		c->default_id = memory_region( device->machine, config->id );
+	}
+
+	/* create the name for save states */
+	assert( strlen( device->tag ) < 30 );
+	state_save_combine_module_and_tag( unique_tag, "at28c16", device->tag );
+
+	state_save_register_item_pointer( unique_tag, 0, c->data, SIZE_DATA );
+	state_save_register_item_pointer( unique_tag, 0, c->id, SIZE_ID );
+	state_save_register_item( unique_tag, 0, c->a9_12v );
+	state_save_register_item( unique_tag, 0, c->oe_12v );
+	state_save_register_item( unique_tag, 0, c->last_write );
+}
+
+/*-------------------------------------------------
+    device reset callback
+-------------------------------------------------*/
+
+static DEVICE_RESET(at28c16)
+{
+}
+
+static DEVICE_NVRAM(at28c16)
+{
+	at28c16_state *c = get_safe_token(device);
 
 	if( read_or_write )
 	{
@@ -91,65 +182,66 @@ static void nvram_handler_at28c16( running_machine *machine, int chip, mame_file
 			mame_fread( file, c->data, SIZE_DATA );
 			mame_fread( file, c->id, SIZE_ID );
 		}
+		else
+		{
+			if( c->default_data != NULL )
+			{
+				memcpy( c->data, c->default_data, SIZE_DATA );
+			}
+			else
+			{
+				memset( c->data, 0xff, SIZE_DATA );
+			}
+
+			if( c->default_id != NULL )
+			{
+				memcpy( c->id, c->default_id, SIZE_ID );
+			}
+			else
+			{
+				memset( c->id, 0xff, SIZE_ID );
+			}
+		}
 	}
 }
 
-NVRAM_HANDLER( at28c16_0 ) { nvram_handler_at28c16( machine, 0, file, read_or_write ); }
-NVRAM_HANDLER( at28c16_1 ) { nvram_handler_at28c16( machine, 1, file, read_or_write ); }
-NVRAM_HANDLER( at28c16_2 ) { nvram_handler_at28c16( machine, 2, file, read_or_write ); }
-NVRAM_HANDLER( at28c16_3 ) { nvram_handler_at28c16( machine, 3, file, read_or_write ); }
+/*-------------------------------------------------
+    device set info callback
+-------------------------------------------------*/
 
-/* read / write */
-
-static UINT8 at28c16_read( UINT32 chip, offs_t offset )
+static DEVICE_SET_INFO(at28c16)
 {
-	struct at28c16_chip *c;
-	if( chip >= MAX_AT28C16_CHIPS )
+	switch (state)
 	{
-		logerror( "at28c16_read( %d, %04x ) chip out of range\n", chip, offset );
-		return 0;
-	}
-	c = &at28c16[ chip ];
-
-	if( offset >= OFFSET_ID && c->a9_12v )
-	{
-		logerror( "at28c16_read( %04x ) id\n", offset );
-		return c->id[ offset - OFFSET_ID ];
-	}
-	else
-	{
-//      logerror( "%08x: at28c16_read( %d, %04x ) %02x data\n", activecpu_get_pc(), chip, offset, c->data[ offset ] );
-		return c->data[ offset ];
+		/* no parameters to set */
 	}
 }
 
-static void at28c16_write( UINT32 chip, offs_t offset, UINT8 data )
+/*-------------------------------------------------
+    device get info callback
+-------------------------------------------------*/
+
+DEVICE_GET_INFO(at28c16)
 {
-	struct at28c16_chip *c;
-	if( chip >= MAX_AT28C16_CHIPS )
+	switch (state)
 	{
-		logerror( "at28c16_write( %d, %04x, %02x ) chip out of range\n", chip, offset, data );
-		return;
-	}
-	c = &at28c16[ chip ];
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(at28c16_state); break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0; break; // sizeof(at28c16_config)
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL; break;
 
-	if( offset >= OFFSET_ID && c->a9_12v )
-	{
-		logerror( "at28c16_write( %d, %04x, %02x ) id\n", chip, offset, data );
-		c->id[ offset - OFFSET_ID ] = data;
-	}
-	else
-	{
-//      logerror( "%08x: at28c16_write( %d, %04x, %02x ) data\n", activecpu_get_pc(), chip, offset, data );
-		c->data[ offset ] = data;
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(at28c16); break;
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(at28c16); break;
+		case DEVINFO_FCT_STOP:					/* nothing */ break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(at28c16); break;
+		case DEVINFO_FCT_NVRAM:					info->nvram = DEVICE_NVRAM_NAME(at28c16); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:					info->s = "AT28C16"; break;
+		case DEVINFO_STR_FAMILY:				info->s = "EEPROM"; break;
+		case DEVINFO_STR_VERSION:				info->s = "1.0"; break;
+		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__; break;
+		case DEVINFO_STR_CREDITS:				info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
 	}
 }
-
-READ8_HANDLER( at28c16_0_r ) { return at28c16_read( 0, offset ); }
-READ8_HANDLER( at28c16_1_r ) { return at28c16_read( 1, offset ); }
-READ8_HANDLER( at28c16_2_r ) { return at28c16_read( 2, offset ); }
-READ8_HANDLER( at28c16_3_r ) { return at28c16_read( 3, offset ); }
-WRITE8_HANDLER( at28c16_0_w ) { at28c16_write( 0, offset, data ); }
-WRITE8_HANDLER( at28c16_1_w ) { at28c16_write( 1, offset, data ); }
-WRITE8_HANDLER( at28c16_2_w ) { at28c16_write( 2, offset, data ); }
-WRITE8_HANDLER( at28c16_3_w ) { at28c16_write( 3, offset, data ); }

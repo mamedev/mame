@@ -8,27 +8,22 @@
 #if !defined( AT28C16_H )
 #define AT28C16_H ( 1 )
 
-#define MAX_AT28C16_CHIPS ( 4 )
+typedef struct _at28c16_config at28c16_config;
+struct _at28c16_config
+{
+	const char *data;
+	const char *id;
+};
 
-extern void at28c16_init( int chip, UINT8 *data, UINT8 *id );
-extern void at28c16_a9_12v( int chip, int a9_12v );
+#define AT28C16 DEVICE_GET_INFO_NAME(at28c16)
+DEVICE_GET_INFO(at28c16);
 
-/* nvram handlers */
-
-NVRAM_HANDLER( at28c16_0 );
-NVRAM_HANDLER( at28c16_1 );
-NVRAM_HANDLER( at28c16_2 );
-NVRAM_HANDLER( at28c16_3 );
+extern void at28c16_a9_12v( const device_config *device, int a9_12v );
+extern void at28c16_oe_12v( const device_config *device, int a9_12v );
 
 /* memory handlers */
 
-extern READ8_HANDLER( at28c16_0_r );
-extern READ8_HANDLER( at28c16_1_r );
-extern READ8_HANDLER( at28c16_2_r );
-extern READ8_HANDLER( at28c16_3_r );
-extern WRITE8_HANDLER( at28c16_0_w );
-extern WRITE8_HANDLER( at28c16_1_w );
-extern WRITE8_HANDLER( at28c16_2_w );
-extern WRITE8_HANDLER( at28c16_3_w );
+WRITE8_DEVICE_HANDLER( at28c16_w );
+READ8_DEVICE_HANDLER( at28c16_r );
 
 #endif

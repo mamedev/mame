@@ -132,6 +132,10 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 	(*type)(NULL, DEVINFO_FCT_RESET, &info);
 	device->reset = info.reset;
 
+	info.nvram = NULL;
+	(*type)(NULL, DEVINFO_FCT_NVRAM, &info);
+	device->nvram = info.nvram;
+
 	/* link us to the end and return */
 	*devptr = device;
 	return device;

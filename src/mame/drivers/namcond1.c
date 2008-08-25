@@ -78,7 +78,7 @@ static ADDRESS_MAP_START( namcond1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x400000, 0x40ffff) AM_READWRITE(namcond1_shared_ram_r,namcond1_shared_ram_w) AM_BASE(&namcond1_shared_ram)
 	AM_RANGE(0x800000, 0x80000f) AM_READWRITE(ygv608_r,ygv608_w)
-	AM_RANGE(0xa00000, 0xa00fff) AM_READWRITE8(at28c16_0_r, at28c16_0_w, 0xff00)
+	AM_RANGE(0xa00000, 0xa00fff) AM_DEVREADWRITE8(AT28C16, "at28c16", at28c16_r, at28c16_w, 0xff00)
 #ifdef MAME_DEBUG
 	AM_RANGE(0xb00000, 0xb00001) AM_READ(ygv608_debug_trigger)
 #endif
@@ -272,11 +272,6 @@ static INTERRUPT_GEN( mcu_interrupt )
     }
 }
 
-static DRIVER_INIT( namcond1 )
-{
-	at28c16_init( 0, NULL, NULL );
-}
-
 /******************************************
   ND-1 Master clock = 49.152MHz
   - 680000  = 12288000 (CLK/4)
@@ -302,7 +297,6 @@ static MACHINE_DRIVER_START( namcond1 )
 
 	MDRV_MACHINE_START(namcond1)
 	MDRV_MACHINE_RESET(namcond1)
-	MDRV_NVRAM_HANDLER(at28c16_0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -326,6 +320,8 @@ static MACHINE_DRIVER_START( namcond1 )
 	MDRV_SOUND_ROUTE(1, "left", 1.00)
 	MDRV_SOUND_ROUTE(2, "right", 1.00)
 	MDRV_SOUND_ROUTE(3, "left", 1.00)
+
+	MDRV_DEVICE_ADD( "at28c16", AT28C16 )
 MACHINE_DRIVER_END
 
 ROM_START( ncv1 )
@@ -405,8 +401,8 @@ ROM_START( ncv2j )
     ROM_LOAD( "ncs1voic.7c",     0x000000, 0x200000, CRC(ed05fd88) SHA1(ad88632c89a9946708fc6b4c9247e1bae9b2944b) )
 ROM_END
 
-GAME( 1995, ncv1,      0, namcond1, namcond1, namcond1, ROT90, "Namco", "Namco Classics Collection Vol.1", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, ncv1j,  ncv1, namcond1, namcond1, namcond1, ROT90, "Namco", "Namco Classics Collection Vol.1 (Japan, v1.00)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, ncv1j2, ncv1, namcond1, namcond1, namcond1, ROT90, "Namco", "Namco Classics Collection Vol.1 (Japan, v1.03)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, ncv2,      0, namcond1, namcond1, namcond1, ROT90, "Namco", "Namco Classics Collection Vol.2", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
-GAME( 1996, ncv2j,  ncv2, namcond1, namcond1, namcond1, ROT90, "Namco", "Namco Classics Collection Vol.2 (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, ncv1,      0, namcond1, namcond1, 0, ROT90, "Namco", "Namco Classics Collection Vol.1", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, ncv1j,  ncv1, namcond1, namcond1, 0, ROT90, "Namco", "Namco Classics Collection Vol.1 (Japan, v1.00)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, ncv1j2, ncv1, namcond1, namcond1, 0, ROT90, "Namco", "Namco Classics Collection Vol.1 (Japan, v1.03)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, ncv2,      0, namcond1, namcond1, 0, ROT90, "Namco", "Namco Classics Collection Vol.2", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
+GAME( 1996, ncv2j,  ncv2, namcond1, namcond1, 0, ROT90, "Namco", "Namco Classics Collection Vol.2 (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )

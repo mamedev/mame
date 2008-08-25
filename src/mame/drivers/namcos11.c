@@ -750,7 +750,7 @@ static ADDRESS_MAP_START( namcos11_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f802040, 0x1f802043) AM_WRITENOP
 	AM_RANGE(0x1fa04000, 0x1fa0ffff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE(&namcos11_sharedram) /* shared ram */
 	AM_RANGE(0x1fa20000, 0x1fa2ffff) AM_WRITE(keycus_w) AM_BASE(&namcos11_keycus) AM_SIZE(&namcos11_keycus_size) /* keycus */
-	AM_RANGE(0x1fa30000, 0x1fa30fff) AM_READWRITE8(at28c16_0_r, at28c16_0_w, 0x00ff00ff) /* eeprom */
+	AM_RANGE(0x1fa30000, 0x1fa30fff) AM_DEVREADWRITE8(AT28C16, "at28c16", at28c16_r, at28c16_w, 0x00ff00ff) /* eeprom */
 	AM_RANGE(0x1fb00000, 0x1fb00003) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1fbf6000, 0x1fbf6003) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_ROM AM_SHARE(2) AM_REGION("user1", 0) /* bios */
@@ -861,8 +861,6 @@ static DRIVER_INIT( namcos11 )
 	}
 
 	state_save_register_global( m_n_oldcoin );
-
-	at28c16_init( 0, NULL, NULL );
 }
 
 static MACHINE_RESET( namcos11 )
@@ -878,7 +876,6 @@ static MACHINE_DRIVER_START( coh100 )
 	MDRV_CPU_VBLANK_INT("main", namcos11_vblank)
 
 	MDRV_MACHINE_RESET( namcos11 )
-	MDRV_NVRAM_HANDLER( at28c16_0 )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -896,6 +893,8 @@ static MACHINE_DRIVER_START( coh100 )
 
 	NAMCO_C7X_MCU_SHARED(16384000)
 	NAMCO_C7X_SOUND(16384000)
+
+	MDRV_DEVICE_ADD( "at28c16", AT28C16 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( coh110 )

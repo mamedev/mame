@@ -83,7 +83,7 @@ static READ32_HANDLER( vegaeo_custom_read )
 static ADDRESS_MAP_START( vega_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM
 	AM_RANGE(0x80000000, 0x80013fff) AM_READWRITE(vega_vram_r, vega_vram_w)
-	AM_RANGE(0xfc000000, 0xfc0000ff) AM_READWRITE8(at28c16_0_r, at28c16_0_w, 0xffffffff)
+	AM_RANGE(0xfc000000, 0xfc0000ff) AM_DEVREADWRITE8(AT28C16, "at28c16", at28c16_r, at28c16_w, 0xffffffff)
 	AM_RANGE(0xfc200000, 0xfc2003ff) AM_RAM_WRITE(vega_palette_w) AM_BASE(&paletteram32)
 	AM_RANGE(0xfc400000, 0xfc40005b) AM_WRITENOP // crt registers ?
 	AM_RANGE(0xfc600000, 0xfc600003) AM_WRITENOP // soundlatch
@@ -168,8 +168,6 @@ static MACHINE_DRIVER_START( vega )
 
 	/* sound cpu */
 
-	MDRV_NVRAM_HANDLER(at28c16_0)
-
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -184,6 +182,7 @@ static MACHINE_DRIVER_START( vega )
 	MDRV_VIDEO_UPDATE(vega)
 
 	/* sound hardware */
+	MDRV_DEVICE_ADD( "at28c16", AT28C16 )
 MACHINE_DRIVER_END
 
 /*
@@ -267,8 +266,6 @@ ROM_END
 static DRIVER_INIT( vegaeo )
 {
 	init_eolith_speedup(machine);
-
-	at28c16_init( 0, NULL, NULL );
 }
 
 GAME( 2002, crazywar, 0, vega, crazywar, vegaeo, ROT0, "Eolith", "Crazy War",  GAME_NO_SOUND )
