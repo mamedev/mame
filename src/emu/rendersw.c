@@ -115,12 +115,19 @@ INLINE float round_nearest(float f)
 }
 
 
-/*-------------------------------------------------
+/*------------------------------------------------------------------------
     ycc_to_rgb - convert YCC to RGB; the YCC pixel
     contains Y in the LSB, Cb << 8, and Cr << 16
--------------------------------------------------*/
+    This actually a YCbCr conversion,
+    details my be found in chapter 6.4 ff of
+    http://softwarecommunity.intel.com/isn/downloads/softwareproducts/pdfs/346495.pdf
+    The document also contains the constants below as floats.
+--------------------------------------------------------------------------*/
 
-#define CLSH(x)		(((INT32) x < 0) ? 0 : x >> 8)
+INLINE UINT8 clamp16_shift8(UINT32 x)
+{
+	return (((INT32) x < 0) ? 0 : (x > 65535 ? 255: x >> 8));	
+}
 
 INLINE UINT32 ycc_to_rgb(UINT32 ycc)
 {
@@ -145,6 +152,19 @@ INLINE UINT32 ycc_to_rgb(UINT32 ycc)
         R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
         G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
         B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
+        
+        Now combine constants:
+        
+        R = clip(( 298 * Y            + 409 * Cr - 56992) >> 8)
+        G = clip(( 298 * Y - 100 * Cb - 208 * Cr + 34784) >> 8)
+        B = clip(( 298 * Y + 516 * Cb            - 70688) >> 8)
+        
+        Define common = 298 * y - 56992. This will save one addition 
+        
+        R = clip(( common            + 409 * Cr -     0) >> 8)
+        G = clip(( common - 100 * Cb - 208 * Cr + 91776) >> 8)
+        B = clip(( common + 516 * Cb            - 13696) >> 8)
+                
     */
     UINT8 y = ycc;
     UINT8 cb = ycc >> 8;
@@ -156,11 +176,9 @@ INLINE UINT32 ycc_to_rgb(UINT32 ycc)
 	g = (common - 100 * cb - 208 * cr + 91776);
 	b = (common + 516 * cb - 13696);
 
-	/* MAKE_RGB does upper clamping */
-	return MAKE_RGB(CLSH(r), CLSH(g), CLSH(b));
+	/* Now clamp and shift back */
+	return MAKE_RGB(clamp16_shift8(r), clamp16_shift8(g), clamp16_shift8(b));
 }
-
-#undef CLSH
 
 /*-------------------------------------------------
     get_texel_palette16_nearest - return the
