@@ -27,7 +27,7 @@ UINT8 *snk_bg_videoram;
 
 static tilemap *fg_tilemap;
 static tilemap *bg_tilemap;
-static int fg_bank;
+static int fg_bank, bg_bank;
 static int bg_scrollx, bg_scrolly, sp16_scrollx, sp16_scrolly, sp32_scrollx, sp32_scrolly;
 static UINT8 sprite_split_point;
 
@@ -42,8 +42,7 @@ PALETTE_INIT( tnk3 )
 
 	/*
         palette format is RRRG GGBB B??? the three unknown bits are used but
-        I'm not sure how, I'm currently using them as least significant bit but
-        that's most likely wrong.
+        I'm not sure how, I'm currently using them as least significant bit.
     */
 	for( i=0; i<num_colors; i++ )
 	{
@@ -112,6 +111,15 @@ static TILE_GET_INFO( gwar_get_fg_tile_info )
 			0);
 }
 
+
+static TILE_GET_INFO( aso_get_bg_tile_info )
+{
+	int code = snk_bg_videoram[tile_index];
+	SET_TILE_INFO(1,
+			code | (bg_bank << 8),
+			0,
+			0);
+}
 
 static TILE_GET_INFO( tnk3_get_bg_tile_info )
 {
@@ -191,6 +199,20 @@ static VIDEO_START( snk_4bpp_shadow )
 		machine->shadow_table[i] = i + 0x100;
 }
 
+VIDEO_START( aso )
+{
+	VIDEO_START_CALL(snk_3bpp_shadow);
+
+	fg_tilemap = tilemap_create(tnk3_get_fg_tile_info, tnk3_fg_scan_cols, 8, 8, 36, 28);
+	bg_tilemap = tilemap_create(aso_get_bg_tile_info,  tilemap_scan_cols, 8, 8, 64, 64);
+
+	tilemap_set_transparent_pen(fg_tilemap, 15);
+	tilemap_set_scrolldy(fg_tilemap, 8, 8);
+
+	tilemap_set_scrolldx(bg_tilemap, 15+256, 24+256);
+	tilemap_set_scrolldy(bg_tilemap,  8, -32);
+}
+
 VIDEO_START( tnk3 )
 {
 	VIDEO_START_CALL(snk_3bpp_shadow);
@@ -253,6 +275,12 @@ WRITE8_HANDLER( snk_bg_videoram_w )
 	tilemap_mark_tile_dirty(bg_tilemap, offset >> 1);
 }
 
+WRITE8_HANDLER( aso_bg_videoram_w )
+{
+	snk_bg_videoram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
+}
+
 WRITE8_HANDLER( snk_bg_scrollx_w )
 {
 	bg_scrollx = (bg_scrollx & ~0xff) | data;
@@ -311,6 +339,41 @@ WRITE8_HANDLER( tnk3_videoattrs_w )
 	sp16_scrolly = (sp16_scrolly & 0xff) | ((data & 0x08) << 5);
 	bg_scrollx =   (bg_scrollx   & 0xff) | ((data & 0x02) << 7);
 	sp16_scrollx = (sp16_scrollx & 0xff) | ((data & 0x01) << 8);
+}
+
+WRITE8_HANDLER( aso_videoattrs_w )
+{
+	/*
+		video attributes:
+        X-------
+        -X------
+        --X-----    flip screen
+        ---X----    scrolly MSB (background)
+        ----X---    scrolly MSB (sprites)
+        -----X--
+        ------X-    scrollx MSB (background)
+        -------X    scrollx MSB (sprites)
+    */
+
+	flip_screen_set(data & 0x20);
+
+	bg_scrolly =   (bg_scrolly   & 0xff) | ((data & 0x10) << 4);
+	sp16_scrolly = (sp16_scrolly & 0xff) | ((data & 0x08) << 5);
+	bg_scrollx =   (bg_scrollx   & 0xff) | ((data & 0x02) << 7);
+	sp16_scrollx = (sp16_scrollx & 0xff) | ((data & 0x01) << 8);
+}
+
+WRITE8_HANDLER( aso_bg_bank_w )
+{
+	int bank = (data & 0x30) >> 4;
+
+	if (bg_bank != bank)
+	{
+		tilemap_mark_all_tiles_dirty(bg_tilemap);
+		bg_bank = bank;
+	}
+
+	tilemap_set_palette_offset(bg_tilemap, ((data & 0xf) ^ 8) << 4);
 }
 
 WRITE8_HANDLER( ikari_bg_scroll_msb_w )

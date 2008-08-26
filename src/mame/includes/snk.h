@@ -20,6 +20,7 @@ extern WRITE8_HANDLER( snk_cpuB_nmi_ack_w );
 extern PALETTE_INIT( tnk3 );
 
 extern VIDEO_START( tnk3 );
+extern VIDEO_START( aso );
 extern VIDEO_START( ikari );
 extern VIDEO_START( gwar );
 extern VIDEO_START( tdfever );
@@ -37,6 +38,8 @@ extern WRITE8_HANDLER( snk_sp32_scrollx_w );
 extern WRITE8_HANDLER( snk_sp32_scrolly_w );
 
 extern WRITE8_HANDLER( tnk3_videoattrs_w );
+extern WRITE8_HANDLER( aso_videoattrs_w );
+extern WRITE8_HANDLER( aso_bg_bank_w );
 extern WRITE8_HANDLER( ikari_bg_scroll_msb_w );
 extern WRITE8_HANDLER( ikari_sp_scroll_msb_w );
 extern WRITE8_HANDLER( ikari_unknown_video_w );
@@ -52,6 +55,7 @@ extern UINT8 *snk_fg_videoram;
 extern UINT8 *snk_bg_videoram;
 extern WRITE8_HANDLER( snk_fg_videoram_w );
 extern WRITE8_HANDLER( snk_bg_videoram_w );
+extern WRITE8_HANDLER( aso_bg_videoram_w );
 
 /*----------- defined in drivers/hal21.c -----------*/
 
