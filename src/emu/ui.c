@@ -66,6 +66,8 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef INT32 (*slider_update)(running_machine *machine, INT32 newval, char *buffer, void *arg);
+
 typedef struct _slider_state slider_state;
 struct _slider_state
 {
@@ -73,7 +75,7 @@ struct _slider_state
 	INT32			defval;				/* default value */
 	INT32			maxval;				/* maximum value */
 	INT32			incval;				/* increment value */
-	INT32			(*update)(running_machine *machine, INT32 newval, char *buffer, void *arg); /* callback */
+	slider_update	update;				/* callback */
 	void *			arg;				/* argument */
 };
 

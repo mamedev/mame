@@ -100,9 +100,14 @@ static READ8_HANDLER( gyruss_portA_r )
 }
 
 
-static WRITE8_HANDLER(gyruss_dac_w)
+static WRITE8_HANDLER( gyruss_dac_w )
 {
 	discrete_sound_w(machine, NODE(16), data);
+}
+
+static WRITE8_HANDLER( gyruss_irq_clear_w )
+{
+	cputag_set_input_line(machine, "audio2", 0, CLEAR_LINE);
 }
 
 static void filter_w(running_machine *machine, int chip, int data)
@@ -133,12 +138,12 @@ static WRITE8_HANDLER( gyruss_filter1_w )
 static WRITE8_HANDLER( gyruss_sh_irqtrigger_w )
 {
 	/* writing to this register triggers IRQ on the sound CPU */
-	cpunum_set_input_line_and_vector(machine, 2,0,HOLD_LINE,0xff);
+	cputag_set_input_line_and_vector(machine, "audio", 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( gyruss_i8039_irq_w )
 {
-	cpunum_set_input_line(machine, 3, 0, PULSE_LINE);
+	cputag_set_input_line(machine, "audio2", 0, ASSERT_LINE);
 }
 
 
@@ -201,8 +206,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( audio_cpu2_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_r)
-	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(gyruss_dac_w)
-	AM_RANGE(I8039_p2, I8039_p2) AM_WRITE(SMH_NOP)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(gyruss_dac_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(gyruss_irq_clear_w)
 ADDRESS_MAP_END
 
 

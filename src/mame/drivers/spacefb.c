@@ -227,10 +227,10 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( spacefb_audio_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(dac_0_data_w)
-	AM_RANGE(I8039_p2, I8039_p2) AM_READ(spacefb_audio_p2_r)
-	AM_RANGE(I8039_t0, I8039_t0) AM_READ(spacefb_audio_t0_r)
-	AM_RANGE(I8039_t1, I8039_t1) AM_READ(spacefb_audio_t1_r)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(dac_0_data_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READ(spacefb_audio_p2_r)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(spacefb_audio_t0_r)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(spacefb_audio_t1_r)
 ADDRESS_MAP_END
 
 

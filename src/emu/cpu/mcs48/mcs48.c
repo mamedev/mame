@@ -1,40 +1,28 @@
-/****************************************************************************
- *                     Intel MCS-48 Portable Emulator                       *
- *                                                                          *
- *                   Copyright Mirko Buffoni                                *
- *  Based on the original work Copyright Dan Boris, an 8048 emulator        *
- *      You are not allowed to distribute this software commercially        *
- *        Please, notify me, if you make any changes to this file           *
- *                                                                          *
- *                                                                          *
- *  **** Change Log ****                                                    *
- *                                                                          *
- *  TLP (19-Jun-2001)                                                       *
- *   - Changed Ports 1 and 2 to quasi bidirectional output latched ports    *
- *   - Added the Port 1 & 2 output latch data to the debugger window        *
- *  TLP (02-Jan-2002)                                                       *
- *   - External IRQs no longer go pending (sampled as a level state)        *
- *   - Timer IRQs do not go pending if Timer interrupts are disabled        *
- *   - Timer IRQs made pending, were incorrectly being cleared if the       *
- *      external interrupt was being serviced                               *
- *   - External interrupts now take precedence when simultaneous            *
- *      internal and external interrupt requests occur                      *
- *   - 'DIS TCNTI' now removes pending timer IRQs                           *
- *   - Nested IRQs of any sort are no longer allowed                        *
- *   - T_flag was not being set in the right place of execution, which      *
- *      could have lead to it being incorrectly set after being cleared     *
- *   - Counter overflows now also set the T_flag                            *
- *   - Added the Timer/Counter register to the debugger window              *
- *  TLP (09-Jan-2002)                                                       *
- *   - Changed Interrupt system to instant servicing                        *
- *   - The Timer and Counter can no longer be 'on' simultaneously           *
- *   - Added Save State                                                     *
- *  TLP (15-Feb-2002)                                                       *
- *   - Corrected Positive signal edge sensing (used on the T1 input)        *
- ****************************************************************************/
+/*
+gyruss - busted
 
+EA pin - defined by architecture, must implement:
+   1 means external access, bypassing internal ROM
+   reimplement as a push, not a pull
+T0 output clock
+*/
 
-/****************************************************************************
+/***************************************************************************
+
+	mcs48.c
+	
+	Intel MCS-48 Portable Emulator
+	
+	Copyright Mirko Buffoni
+	Based on the original work Copyright Dan Boris, an 8048 emulator
+	You are not allowed to distribute this software commercially
+
+****************************************************************************
+
+	Note that the default internal divisor for this chip is by 3 and
+	then again by 5, or by 15 total.
+
+****************************************************************************
 
 	Chip   RAM  ROM  I/O
 	----   ---  ---  ---
@@ -54,12 +42,79 @@
 	8749   128   2k   27  (EPROM)
 	M58715 128    0       (external ROM)
 
-****************************************************************************/
-
+***************************************************************************/
 
 #include "debugger.h"
 #include "mcs48.h"
 
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+/* timer/counter enable bits */
+#define TIMER_ENABLED	0x01
+#define COUNTER_ENABLED	0x02
+
+/* flag bits */
+#define C_FLAG			0x80
+#define A_FLAG			0x40
+#define F_FLAG			0x20
+#define B_FLAG			0x10
+
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+/* live processor state */
+typedef struct _mcs48_regs mcs48_regs;
+struct _mcs48_regs
+{
+	PAIR		prevpc;				/* 16-bit previous program counter */
+	PAIR		pc;					/* 16-bit program counter */
+	UINT8		a;					/* 8-bit accumulator */
+	UINT8 *		regptr;				/* pointer to r0-r7 */
+	UINT8		psw;				/* 8-bit PSW */
+	UINT8		p1;					/* 8-bit latched port 1 */
+	UINT8		p2;					/* 8-bit latched port 2 */
+	UINT8		f1;					/* 1-bit flag 1 */
+	UINT8		ea;					/* 1-bit latched ea input */
+	UINT8		timer;				/* 8-bit timer */
+	UINT8		prescaler;			/* 5-bit timer prescaler */
+	UINT8		t1_history;			/* 8-bit history of the T1 input */
+
+	UINT8		irq_state;			/* TRUE if an IRQ is pending */
+	UINT8		irq_in_progress;	/* TRUE if an IRQ is in progress */
+	UINT8		timer_overflow;		/* TRUE on a timer overflow; cleared by taking interrupt */
+	UINT8		timer_flag;			/* TRUE on a timer overflow; cleared on JTF */
+	UINT8		tirq_enabled;		/* TRUE if the timer IRQ is enabled */
+	UINT8		xirq_enabled;		/* TRUE if the external IRQ is enabled */
+	UINT8		timecount_enabled;	/* bitmask of timer/counter enabled */
+
+	UINT16		a11;				/* A11 value, either 0x000 or 0x800 */
+
+	int			(*irq_callback)(int irqline);
+	int			inst_cycles;		/* cycles for the current instruction */
+	UINT8		cpu_feature;		/* processor feature flags */
+	UINT16		int_rom_size;		/* internal rom size */
+};
+
+
+/* opcode table entry */
+typedef struct _mcs48_opcode mcs48_opcode;
+struct _mcs48_opcode
+{
+	UINT8		cycles;
+	void 		(*function)(void);
+};
+
+
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
 
 /*** Cycle times for the jump on condition instructions, are unusual.
      Condition is tested during the first cycle, so if condition is not
@@ -73,848 +128,799 @@
 #define ADJUST_CYCLES { }					/* User Manual cycles setting */
 #endif
 
-/* There are certain differences between the processors */
-#define FEATURE_M58715		1
 
-/* HJB 01/05/99 changed to positive values to use pending_irq as a flag */
-#define I8039_NO_INT		0	/* No Interrupts pending or executing   */
-#define I8039_EXTERNAL_INT	1	/* Execute a normal external interrupt  */
-#define I8039_TIMCNT_INT	2	/* Execute a Timer/Counter interrupt    */
+/* ROM is mapped to ADDRESS_SPACE_PROGRAM */
+#define program_r(a)	program_read_byte_8le(a)
+
+/* RAM is mapped to ADDRESS_SPACE_DATA */
+#define ram_r(a)		data_read_byte_8le(a)
+#define ram_w(a,V)		data_write_byte_8le(a, V)
+
+/* ports are mapped to ADDRESS_SPACE_IO */
+#define ext_r(a)		io_read_byte_8le(a)
+#define ext_w(a,V)		io_write_byte_8le(a, V)
+#define port_r(a)		io_read_byte_8le(MCS48_PORT_P0 + a)
+#define port_w(a,V)		io_write_byte_8le(MCS48_PORT_P0 + a, V)
+#define test_r(a)		io_read_byte_8le(MCS48_PORT_T0 + a)
+#define test_w(a,V)		io_write_byte_8le(MCS48_PORT_T0 + a, V)
+#define bus_r()			io_read_byte_8le(MCS48_PORT_BUS)
+#define bus_w(V)		io_write_byte_8le(MCS48_PORT_BUS, V)
+#define ea_r()			io_read_byte_8le(MCS48_PORT_EA)
+
+/* simplfied access to common bits */
+#undef A
+#define A				mcs48.a
+#undef PC
+#define PC				mcs48.pc.w.l
+#undef PSW
+#define PSW				mcs48.psw
+
+/* r0-r7 map to memory via the regptr */
+#define R0				mcs48.regptr[0]
+#define R1				mcs48.regptr[1]
+#define R2				mcs48.regptr[2]
+#define R3				mcs48.regptr[3]
+#define R4				mcs48.regptr[4]
+#define R5				mcs48.regptr[5]
+#define R6				mcs48.regptr[6]
+#define R7				mcs48.regptr[7]
+
+/* the carry flag as 0 or 1, used for carry-in */
+#define CARRYIN			((PSW & C_FLAG) >> 7)
 
 
-static int Ext_IRQ(void);
-static int Timer_IRQ(void);
 
-#define M_RDMEM(A)		I8039_RDMEM(A)
-//#define M_RDOP(A)     I8039_RDOP(A)
-//#define M_RDOP_ARG(A) I8039_RDOP_ARG(A)
-#define M_IN(A)			I8039_In(A)
-#define M_OUT(A,V)		I8039_Out(A,V)
+/***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
 
-#define port_r(A)		I8039_In(I8039_p0 + A)
-#define port_w(A,V)		I8039_Out(I8039_p0 + A,V)
-#define test_r(A)		I8039_In(I8039_t0 + A)
-#define test_w(A,V)		I8039_Out(I8039_t0 + A,V)
-#define bus_r()			I8039_In(I8039_bus)
-#define bus_w(V)		I8039_Out(I8039_bus,V)
+static mcs48_regs	mcs48;
+static int			mcs48_icount;
 
-#define INTRAM_R(A)		data_read_byte_8le(A)
-#define INTRAM_W(A,V)	data_write_byte_8le(A, V)
 
-#define C_FLAG			0x80
-#define A_FLAG			0x40
-#define F_FLAG			0x20
-#define B_FLAG			0x10
 
-typedef struct
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+static void check_irqs(void);
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    opcode_fetch - fetch an opcode byte
+-------------------------------------------------*/
+
+INLINE UINT8 opcode_fetch(offs_t address)
 {
-	PAIR	PREVPC;			/* previous program counter */
-	PAIR	PC;				/* program counter */
-	UINT8 *	regptr;			/* pointer to r0-r7 */
-	UINT8	A, SP, PSW;
-	UINT8	bus, f1;		/* Bus data, and flag1 */
-	UINT8	P1, P2;			/* Internal Port 1 and 2 latched outputs */
-	UINT8	EA;				/* latched EA input */
-	UINT8	cpu_feature;	/* process feature */
-	UINT16	int_rom_size;	/* internal rom size */
-	UINT8	pending_irq, irq_executing, masterClock;
-	UINT8	t_flag, timer, timerON, countON, xirq_en, tirq_en;
-	UINT16	A11;
-	UINT8	irq_state, irq_extra_cycles;
-	int		(*irq_callback)(int irqline);
-	int		inst_cycles;
-	UINT8	Old_T1;
-} I8039_Regs;
+	/* fix me - need to figure out how to bypass internal ROM in this case */
+	if (mcs48.ea && address < mcs48.int_rom_size)
+		return 0x00;
+	return cpu_readop(address);
+}
 
-static I8039_Regs R;
-static int	   i8039_ICount;
 
-/* The opcode table now is a combination of cycle counts and function pointers */
-typedef struct {
-	unsigned cycles;
-	void (*function) (void);
-}	s_opcode;
+/*-------------------------------------------------
+    argument_fetch - fetch an opcode argument
+    byte
+-------------------------------------------------*/
 
-#define POSITIVE_EDGE_T1  (( (int)(T1-R.Old_T1) > 0) ? 1 : 0)
-#define NEGATIVE_EDGE_T1  (( (int)(R.Old_T1-T1) > 0) ? 1 : 0)
+INLINE UINT8 argument_fetch(offs_t address)
+{
+	/* fix me - need to figure out how to bypass internal ROM in this case */
+	if (mcs48.ea && address < mcs48.int_rom_size)
+		return 0x00;
+	return cpu_readop_arg(address);
+}
 
-#define M_Cy	((R.PSW & C_FLAG) >> 7)
-#define M_Cn	(!M_Cy)
-#define M_Ay	((R.PSW & A_FLAG))
-#define M_An	(!M_Ay)
-#define M_F0y	((R.PSW & F_FLAG))
-#define M_F0n	(!M_F0y)
-#define M_By	((R.PSW & B_FLAG))
-#define M_Bn	(!M_By)
 
-#define R0		R.regptr[0]
-#define R1		R.regptr[1]
-#define R2		R.regptr[2]
-#define R3		R.regptr[3]
-#define R4		R.regptr[4]
-#define R5		R.regptr[5]
-#define R6		R.regptr[6]
-#define R7		R.regptr[7]
+/*-------------------------------------------------
+    update_regptr - update the regptr member to
+    point to the appropriate register bank
+-------------------------------------------------*/
 
 INLINE void update_regptr(void)
 {
-	R.regptr = memory_get_write_ptr(cpu_getactivecpu(), ADDRESS_SPACE_DATA, (M_By) ? 24 : 0);
+	mcs48.regptr = memory_get_write_ptr(cpu_getactivecpu(), ADDRESS_SPACE_DATA, (PSW & B_FLAG) ? 24 : 0);
 }
 
-INLINE UINT8 ea_r(void)
+
+/*-------------------------------------------------
+    push_pc_psw - push the PC and PSW values onto
+    the stack
+-------------------------------------------------*/
+
+INLINE void push_pc_psw(void)
 {
-	R.EA = I8039_In(I8039_ea);
-	return R.EA;
+	UINT8 sp = PSW & 0x07;
+	ram_w(8 + 2*sp, mcs48.pc.b.l);
+	ram_w(9 + 2*sp, (mcs48.pc.b.h & 0x0f) | (PSW & 0xf0));
+	PSW = (PSW & 0xf8) | ((sp + 1) & 0x07);
 }
 
-INLINE UINT8 M_RDOP(int A)
+
+/*-------------------------------------------------
+    pull_pc_psw - pull the PC and PSW values from
+    the stack
+-------------------------------------------------*/
+
+INLINE void pull_pc_psw(void)
 {
-	if (R.cpu_feature & FEATURE_M58715)
-		if ((A<R.int_rom_size) && !ea_r())
-			return 0x00;
-	return I8039_RDOP(A);
+	UINT8 sp = (PSW - 1) & 0x07;
+	mcs48.pc.b.l = ram_r(8 + 2*sp);
+	mcs48.pc.b.h = ram_r(9 + 2*sp);
+	PSW = (mcs48.pc.b.h & 0xf0) | 0x08 | sp;
+	mcs48.pc.b.h &= 0x0f;
+	update_regptr();
+	change_pc(PC);
 }
 
-INLINE UINT8 M_RDOP_ARG(int A)
+
+/*-------------------------------------------------
+    pull_pc - pull the PC value from the stack,
+    leaving the upper part of PSW intact
+-------------------------------------------------*/
+
+INLINE void pull_pc(void)
 {
-	if (R.cpu_feature & FEATURE_M58715)
-		if ((A<R.int_rom_size) && !ea_r())
-			return 0x00;
-	return I8039_RDOP_ARG(A);
+	UINT8 sp = (PSW - 1) & 0x07;
+	mcs48.pc.b.l = ram_r(8 + 2*sp);
+	mcs48.pc.b.h = ram_r(9 + 2*sp) & 0x0f;
+	PSW = (PSW & 0xf0) | 0x08 | sp;
+	change_pc(PC);
 }
 
-INLINE void CLR (UINT8 flag) { R.PSW &= ~flag; }
-INLINE void SET (UINT8 flag) { R.PSW |= flag;  }
 
+/*-------------------------------------------------
+    execute_add - perform the logic of an ADD
+    instruction
+-------------------------------------------------*/
 
-/* Get next opcode argument and increment program counter */
-INLINE unsigned M_RDMEM_OPCODE (void)
+INLINE void execute_add(UINT8 dat)
 {
-	unsigned retval;
-	retval=M_RDOP_ARG(R.PC.w.l);
-	R.PC.w.l++;
-	return retval;
+	UINT16 temp = A + dat;
+
+	PSW &= ~(C_FLAG | A_FLAG);
+	PSW |= ((A ^ temp) << 2) & A_FLAG;
+	PSW |= (temp >> 1) & C_FLAG;
+	A = temp;
 }
 
-INLINE void push(UINT8 d)
+
+/*-------------------------------------------------
+    execute_addc - perform the logic of an ADDC
+    instruction
+-------------------------------------------------*/
+
+INLINE void execute_addc(UINT8 dat)
 {
-	INTRAM_W(8+R.SP++, d);
-	R.SP  = R.SP & 0x0f;
-	R.PSW = R.PSW & 0xf8;
-	R.PSW = R.PSW | (R.SP >> 1);
+	UINT16 temp = A + dat + CARRYIN;
+
+	PSW &= ~(C_FLAG | A_FLAG);
+	PSW |= ((A ^ temp) << 2) & A_FLAG;
+	PSW |= (temp >> 1) & C_FLAG;
+	A = temp;
 }
 
-INLINE UINT8 pull(void) {
-	R.SP  = (R.SP + 15) & 0x0f;		/*  if (--R.SP < 0) R.SP = 15;  */
-	R.PSW = R.PSW & 0xf8;
-	R.PSW = R.PSW | (R.SP >> 1);
-	/* update_regptr();  regPTR should not change */
-	return INTRAM_R(8+R.SP);
-}
 
-INLINE void daa_a(void)
+/*-------------------------------------------------
+    execute_jmp - perform the logic of a JMP
+    instruction
+-------------------------------------------------*/
+
+INLINE void execute_jmp(UINT16 address)
 {
-	if ((R.A & 0x0f) > 0x09 || (R.PSW & A_FLAG))
+	UINT16 a11 = (mcs48.irq_in_progress) ? 0 : mcs48.a11;
+	PC = address | a11;
+	change_pc(PC);
+}
+
+
+/*-------------------------------------------------
+    execute_call - perform the logic of a CALL
+    instruction
+-------------------------------------------------*/
+
+INLINE void execute_call(UINT16 address)
+{
+	push_pc_psw();
+	execute_jmp(address);
+}
+
+
+/*-------------------------------------------------
+    execute_jcc - perform the logic of a 
+    conditional jump instruction
+-------------------------------------------------*/
+
+INLINE void execute_jcc(UINT8 result)
+{
+	UINT8 offset = argument_fetch(PC++);
+	if (result != 0)
 	{
-		R.A += 0x06;
-		if ( ! ( R.A & 0xf0 ) )
-			SET(C_FLAG);
+		PC = ((PC - 1) & 0xf00) | offset;
+		change_pc(PC);
 	}
-	if ((R.A & 0xf0) > 0x90 || (R.PSW & C_FLAG))
+	else
+		ADJUST_CYCLES;
+}
+
+
+
+/***************************************************************************
+    OPCODE HANDLERS
+***************************************************************************/
+
+static void illegal(void)
+{
+	logerror("I8039:  pc = %04x,  Illegal opcode = %02x\n", PC-1, program_r(PC-1));
+}
+
+static void add_a_r0(void)		{ execute_add(R0); }
+static void add_a_r1(void)		{ execute_add(R1); }
+static void add_a_r2(void)		{ execute_add(R2); }
+static void add_a_r3(void)		{ execute_add(R3); }
+static void add_a_r4(void)		{ execute_add(R4); }
+static void add_a_r5(void)		{ execute_add(R5); }
+static void add_a_r6(void)		{ execute_add(R6); }
+static void add_a_r7(void)		{ execute_add(R7); }
+static void add_a_xr0(void)		{ execute_add(ram_r(R0)); }
+static void add_a_xr1(void)		{ execute_add(ram_r(R1)); }
+static void add_a_n(void)		{ execute_add(argument_fetch(PC++)); }
+
+static void adc_a_r0(void)		{ execute_addc(R0); }
+static void adc_a_r1(void)		{ execute_addc(R1); }
+static void adc_a_r2(void)		{ execute_addc(R2); }
+static void adc_a_r3(void)		{ execute_addc(R3); }
+static void adc_a_r4(void)		{ execute_addc(R4); }
+static void adc_a_r5(void)		{ execute_addc(R5); }
+static void adc_a_r6(void)		{ execute_addc(R6); }
+static void adc_a_r7(void)		{ execute_addc(R7); }
+static void adc_a_xr0(void)		{ execute_addc(ram_r(R0)); }
+static void adc_a_xr1(void)		{ execute_addc(ram_r(R1)); }
+static void adc_a_n(void)		{ execute_addc(argument_fetch(PC++)); }
+
+static void anl_a_r0(void)		{ A &= R0; }
+static void anl_a_r1(void)		{ A &= R1; }
+static void anl_a_r2(void)		{ A &= R2; }
+static void anl_a_r3(void)		{ A &= R3; }
+static void anl_a_r4(void)		{ A &= R4; }
+static void anl_a_r5(void)		{ A &= R5; }
+static void anl_a_r6(void)		{ A &= R6; }
+static void anl_a_r7(void)		{ A &= R7; }
+static void anl_a_xr0(void)		{ A &= ram_r(R0); }
+static void anl_a_xr1(void)		{ A &= ram_r(R1); }
+static void anl_a_n(void)		{ A &= argument_fetch(PC++); }
+static void anl_bus_n(void)		{ bus_w(bus_r() & argument_fetch(PC++)); }
+static void anl_p1_n(void)		{ port_w(1, mcs48.p1 &= argument_fetch(PC++)); }
+static void anl_p2_n(void)		{ port_w(2, mcs48.p2 &= argument_fetch(PC++)); }
+
+static void anld_p4_a(void)		{ port_w(4, port_r(4) & A & 0x0f); }
+static void anld_p5_a(void)		{ port_w(5, port_r(5) & A & 0x0f); }
+static void anld_p6_a(void)		{ port_w(6, port_r(6) & A & 0x0f); }
+static void anld_p7_a(void)		{ port_w(7, port_r(7) & A & 0x0f); }
+
+static void call_0(void)		{ execute_call(argument_fetch(PC++) | 0x000); }
+static void call_1(void)		{ execute_call(argument_fetch(PC++) | 0x100); }
+static void call_2(void)		{ execute_call(argument_fetch(PC++) | 0x200); }
+static void call_3(void)		{ execute_call(argument_fetch(PC++) | 0x300); }
+static void call_4(void)		{ execute_call(argument_fetch(PC++) | 0x400); }
+static void call_5(void)		{ execute_call(argument_fetch(PC++) | 0x500); }
+static void call_6(void)		{ execute_call(argument_fetch(PC++) | 0x600); }
+static void call_7(void)		{ execute_call(argument_fetch(PC++) | 0x700); }
+
+static void clr_a(void)			{ A = 0; }
+static void clr_c(void)			{ PSW &= ~C_FLAG; }
+static void clr_f0(void)		{ PSW &= ~F_FLAG; }
+static void clr_f1(void)		{ mcs48.f1 = 0; }
+
+static void cpl_a(void)			{ A ^= 0xff; }
+static void cpl_c(void)			{ PSW ^= C_FLAG; }
+static void cpl_f0(void)		{ PSW ^= F_FLAG; }
+static void cpl_f1(void)		{ mcs48.f1 ^= 1; }
+
+static void da_a(void)
+{
+	if ((A & 0x0f) > 0x09 || (PSW & A_FLAG))
 	{
-		R.A += 0x60;
-		SET(C_FLAG);
-	} else CLR(C_FLAG);
+		A += 0x06;
+		if ((A & 0xf0) == 0x00)
+			PSW |= C_FLAG;
+	}
+	if ((A & 0xf0) > 0x90 || (PSW & C_FLAG))
+	{
+		A += 0x60;
+		PSW |= C_FLAG;
+	}
+	else
+		PSW &= ~C_FLAG;
 }
 
-INLINE void M_ADD(UINT8 dat)
+static void dec_a(void)			{ A--; }
+static void dec_r0(void)		{ R0--; }
+static void dec_r1(void)		{ R1--; }
+static void dec_r2(void)		{ R2--; }
+static void dec_r3(void)		{ R3--; }
+static void dec_r4(void)		{ R4--; }
+static void dec_r5(void)		{ R5--; }
+static void dec_r6(void)		{ R6--; }
+static void dec_r7(void)		{ R7--; }
+
+static void dis_i(void)			{ mcs48.xirq_enabled = FALSE; }
+static void dis_tcnti(void)		{ mcs48.tirq_enabled = FALSE; mcs48.timer_overflow = FALSE; }
+
+static void djnz_r0(void)		{ execute_jcc(--R0 != 0); }
+static void djnz_r1(void)		{ execute_jcc(--R1 != 0); }
+static void djnz_r2(void)		{ execute_jcc(--R2 != 0); }
+static void djnz_r3(void)		{ execute_jcc(--R3 != 0); }
+static void djnz_r4(void)		{ execute_jcc(--R4 != 0); }
+static void djnz_r5(void)		{ execute_jcc(--R5 != 0); }
+static void djnz_r6(void)		{ execute_jcc(--R6 != 0); }
+static void djnz_r7(void)		{ execute_jcc(--R7 != 0); }
+
+static void en_i(void)			{ mcs48.xirq_enabled = TRUE; check_irqs(); }
+static void en_tcnti(void)		{ mcs48.tirq_enabled = TRUE; check_irqs(); }
+
+static void ento_clk(void)
 {
-	UINT16 temp;
-
-	CLR(C_FLAG | A_FLAG);
-	if ((R.A & 0xf) + (dat & 0xf) > 0xf) SET(A_FLAG);
-	temp = R.A + dat;
-	if (temp > 0xff) SET(C_FLAG);
-	R.A  = temp & 0xff;
+	logerror("I8039:  pc = %04x,  Unimplemented opcode = %02x\n", PC-1, program_r(PC-1));
 }
 
-INLINE void M_ADDC(UINT8 dat)
-{
-	UINT16 temp;
+static void in_a_p1(void)		{ A = port_r(1) & mcs48.p1; }
+static void in_a_p2(void)		{ A = port_r(2) & mcs48.p2; }
+static void ins_a_bus(void)		{ A = bus_r(); }
 
-	CLR(A_FLAG);
-	if ((R.A & 0xf) + (dat & 0xf) + M_Cy > 0xf) SET(A_FLAG);
-	temp = R.A + dat + M_Cy;
-	CLR(C_FLAG);
-	if (temp > 0xff) SET(C_FLAG);
-	R.A  = temp & 0xff;
-}
+static void inc_a(void)			{ A++; }
+static void inc_r0(void)		{ R0++; }
+static void inc_r1(void)		{ R1++; }
+static void inc_r2(void)		{ R2++; }
+static void inc_r3(void)		{ R3++; }
+static void inc_r4(void)		{ R4++; }
+static void inc_r5(void)		{ R5++; }
+static void inc_r6(void)		{ R6++; }
+static void inc_r7(void)		{ R7++; }
+static void inc_xr0(void)		{ ram_w(R0, ram_r(R0) + 1); }
+static void inc_xr1(void)		{ ram_w(R1, ram_r(R1) + 1); }
 
-INLINE void M_CALL(UINT16 addr)
-{
-	push(R.PC.b.l);
-	push((R.PC.b.h & 0x0f) | (R.PSW & 0xf0));
-	R.PC.w.l = addr;
-	change_pc(addr);
-}
+static void jb_0(void)			{ execute_jcc((A & 0x01) != 0); }
+static void jb_1(void)			{ execute_jcc((A & 0x02) != 0); }
+static void jb_2(void)			{ execute_jcc((A & 0x04) != 0); }
+static void jb_3(void)			{ execute_jcc((A & 0x08) != 0); }
+static void jb_4(void)			{ execute_jcc((A & 0x10) != 0); }
+static void jb_5(void)			{ execute_jcc((A & 0x20) != 0); }
+static void jb_6(void)			{ execute_jcc((A & 0x40) != 0); }
+static void jb_7(void)			{ execute_jcc((A & 0x80) != 0); }
+static void jc(void)			{ execute_jcc((PSW & C_FLAG) != 0); }
+static void jf0(void)			{ execute_jcc((PSW & F_FLAG) != 0); }
+static void jf1(void)			{ execute_jcc(mcs48.f1 != 0); }
 
-INLINE void M_XCHD(UINT8 addr)
-{
-	UINT8 dat = R.A & 0x0f;
-	UINT8 val = INTRAM_R(addr);
-	R.A &= 0xf0;
-	R.A |= val & 0x0f;
-	val &= 0xf0;
-	val |= dat;
-	INTRAM_W(addr, val);
-}
+static void jmp_0(void)			{ execute_jmp(argument_fetch(PC) | 0x000); }
+static void jmp_1(void)			{ execute_jmp(argument_fetch(PC) | 0x100); }
+static void jmp_2(void)			{ execute_jmp(argument_fetch(PC) | 0x200); }
+static void jmp_3(void)			{ execute_jmp(argument_fetch(PC) | 0x300); }
+static void jmp_4(void)			{ execute_jmp(argument_fetch(PC) | 0x400); }
+static void jmp_5(void)			{ execute_jmp(argument_fetch(PC) | 0x500); }
+static void jmp_6(void)			{ execute_jmp(argument_fetch(PC) | 0x600); }
+static void jmp_7(void)			{ execute_jmp(argument_fetch(PC) | 0x700); }
+static void jmpp_xa(void)		{ PC &= 0xf00; PC |= program_r(PC | A); change_pc(PC); }
 
+static void jnc(void)			{ execute_jcc((PSW & C_FLAG) == 0); }
+static void jni(void)			{ execute_jcc(mcs48.irq_state != 0); }
+static void jnt_0(void)  		{ execute_jcc(test_r(0) == 0); }
+static void jnt_1(void)  		{ execute_jcc(test_r(1) == 0); }
+static void jnz(void)			{ execute_jcc(A != 0); }
+static void jtf(void)			{ execute_jcc(mcs48.timer_flag); mcs48.timer_flag = FALSE; }
+static void jt_0(void)  		{ execute_jcc(test_r(0) != 0); }
+static void jt_1(void)  		{ execute_jcc(test_r(1) != 0); }
+static void jz(void)			{ execute_jcc(A == 0); }
 
-INLINE void M_ILLEGAL(void)
-{
-	logerror("I8039:  PC = %04x,  Illegal opcode = %02x\n", R.PC.w.l-1, M_RDMEM(R.PC.w.l-1));
-}
+static void mov_a_n(void)		{ A = argument_fetch(PC++); }
+static void mov_a_psw(void)		{ A = PSW; }
+static void mov_a_r0(void)		{ A = R0; }
+static void mov_a_r1(void)		{ A = R1; }
+static void mov_a_r2(void)		{ A = R2; }
+static void mov_a_r3(void)		{ A = R3; }
+static void mov_a_r4(void)		{ A = R4; }
+static void mov_a_r5(void)		{ A = R5; }
+static void mov_a_r6(void)		{ A = R6; }
+static void mov_a_r7(void)		{ A = R7; }
+static void mov_a_xr0(void)		{ A = ram_r(R0); }
+static void mov_a_xr1(void)		{ A = ram_r(R1); }
+static void mov_a_t(void)		{ A = mcs48.timer; }
 
-INLINE void M_UNDEFINED(void)
-{
-	logerror("I8039:  PC = %04x,  Unimplemented opcode = %02x\n", R.PC.w.l-1, M_RDMEM(R.PC.w.l-1));
-}
+static void mov_psw_a(void)		{ PSW = A; update_regptr(); }
+static void mov_r0_a(void)		{ R0 = A; }
+static void mov_r1_a(void)		{ R1 = A; }
+static void mov_r2_a(void)		{ R2 = A; }
+static void mov_r3_a(void)		{ R3 = A; }
+static void mov_r4_a(void)		{ R4 = A; }
+static void mov_r5_a(void)		{ R5 = A; }
+static void mov_r6_a(void)		{ R6 = A; }
+static void mov_r7_a(void)		{ R7 = A; }
+static void mov_r0_n(void)		{ R0 = argument_fetch(PC++); }
+static void mov_r1_n(void)		{ R1 = argument_fetch(PC++); }
+static void mov_r2_n(void)		{ R2 = argument_fetch(PC++); }
+static void mov_r3_n(void)		{ R3 = argument_fetch(PC++); }
+static void mov_r4_n(void)		{ R4 = argument_fetch(PC++); }
+static void mov_r5_n(void)		{ R5 = argument_fetch(PC++); }
+static void mov_r6_n(void)		{ R6 = argument_fetch(PC++); }
+static void mov_r7_n(void)		{ R7 = argument_fetch(PC++); }
+static void mov_t_a(void)		{ mcs48.timer = A; }
+static void mov_xr0_a(void)		{ ram_w(R0, A); }
+static void mov_xr1_a(void)		{ ram_w(R1, A); }
+static void mov_xr0_n(void)		{ ram_w(R0, argument_fetch(PC++)); }
+static void mov_xr1_n(void)		{ ram_w(R1, argument_fetch(PC++)); }
 
-static void illegal(void)	 { M_ILLEGAL(); }
+static void movd_a_p4(void)		{ A = port_r(4) & 0x0f; }
+static void movd_a_p5(void)		{ A = port_r(5) & 0x0f; }
+static void movd_a_p6(void)		{ A = port_r(6) & 0x0f; }
+static void movd_a_p7(void)		{ A = port_r(7) & 0x0f; }
+static void movd_p4_a(void)		{ port_w(4, A & 0x0f); }
+static void movd_p5_a(void)		{ port_w(5, A & 0x0f); }
+static void movd_p6_a(void)		{ port_w(6, A & 0x0f); }
+static void movd_p7_a(void)		{ port_w(7, A & 0x0f); }
 
-static void add_a_n(void)	 { M_ADD(M_RDMEM_OPCODE()); }
-static void add_a_r0(void)	 { M_ADD(R0); }
-static void add_a_r1(void)	 { M_ADD(R1); }
-static void add_a_r2(void)	 { M_ADD(R2); }
-static void add_a_r3(void)	 { M_ADD(R3); }
-static void add_a_r4(void)	 { M_ADD(R4); }
-static void add_a_r5(void)	 { M_ADD(R5); }
-static void add_a_r6(void)	 { M_ADD(R6); }
-static void add_a_r7(void)	 { M_ADD(R7); }
-static void add_a_xr0(void)	 { M_ADD(INTRAM_R(R0)); }
-static void add_a_xr1(void)	 { M_ADD(INTRAM_R(R1)); }
-static void adc_a_n(void)	 { M_ADDC(M_RDMEM_OPCODE()); }
-static void adc_a_r0(void)	 { M_ADDC(R0); }
-static void adc_a_r1(void)	 { M_ADDC(R1); }
-static void adc_a_r2(void)	 { M_ADDC(R2); }
-static void adc_a_r3(void)	 { M_ADDC(R3); }
-static void adc_a_r4(void)	 { M_ADDC(R4); }
-static void adc_a_r5(void)	 { M_ADDC(R5); }
-static void adc_a_r6(void)	 { M_ADDC(R6); }
-static void adc_a_r7(void)	 { M_ADDC(R7); }
-static void adc_a_xr0(void)	 { M_ADDC(INTRAM_R(R0)); }
-static void adc_a_xr1(void)	 { M_ADDC(INTRAM_R(R1)); }
-static void anl_a_n(void)	 { R.A &= M_RDMEM_OPCODE(); }
-static void anl_a_r0(void)	 { R.A &= R0; }
-static void anl_a_r1(void)	 { R.A &= R1; }
-static void anl_a_r2(void)	 { R.A &= R2; }
-static void anl_a_r3(void)	 { R.A &= R3; }
-static void anl_a_r4(void)	 { R.A &= R4; }
-static void anl_a_r5(void)	 { R.A &= R5; }
-static void anl_a_r6(void)	 { R.A &= R6; }
-static void anl_a_r7(void)	 { R.A &= R7; }
-static void anl_a_xr0(void)	 { R.A &= INTRAM_R(R0); }
-static void anl_a_xr1(void)	 { R.A &= INTRAM_R(R1); }
-static void anl_bus_n(void)	 { bus_w( bus_r() & M_RDMEM_OPCODE() ); }
+static void movp_a_xa(void)		{ A = program_r((PC & 0xf00) | A); }
+static void movp3_a_xa(void)	{ A = program_r(0x300 | A); }
 
-static void anl_p1_n(void)
-{
-	R.P1 &= M_RDMEM_OPCODE();
-	port_w( 1, R.P1 );
-}
+static void movx_a_xr0(void)	{ A = ext_r(R0); }
+static void movx_a_xr1(void)	{ A = ext_r(R1); }
+static void movx_xr0_a(void)	{ ext_w(R0, A); }
+static void movx_xr1_a(void)	{ ext_w(R1, A); }
 
-static void anl_p2_n(void)
-{
-	R.P2 &= M_RDMEM_OPCODE();
-	port_w( 2, R.P2 );
-}
+static void nop(void)			{ }
 
-static void anld_p4_a(void)	 { port_w( 4, (port_r(4) & M_RDMEM_OPCODE()) & 0x0f ); }
-static void anld_p5_a(void)	 { port_w( 5, (port_r(5) & M_RDMEM_OPCODE()) & 0x0f ); }
-static void anld_p6_a(void)	 { port_w( 6, (port_r(6) & M_RDMEM_OPCODE()) & 0x0f ); }
-static void anld_p7_a(void)	 { port_w( 7, (port_r(7) & M_RDMEM_OPCODE()) & 0x0f ); }
-static void call(void)		 { UINT8 i=M_RDMEM_OPCODE(); UINT16 a11 = (R.irq_executing == I8039_NO_INT) ? R.A11 : 0; M_CALL(i | a11); }
-static void call_1(void)	 { UINT8 i=M_RDMEM_OPCODE(); UINT16 a11 = (R.irq_executing == I8039_NO_INT) ? R.A11 : 0; M_CALL(i | 0x100 | a11); }
-static void call_2(void)	 { UINT8 i=M_RDMEM_OPCODE(); UINT16 a11 = (R.irq_executing == I8039_NO_INT) ? R.A11 : 0; M_CALL(i | 0x200 | a11); }
-static void call_3(void)	 { UINT8 i=M_RDMEM_OPCODE(); UINT16 a11 = (R.irq_executing == I8039_NO_INT) ? R.A11 : 0; M_CALL(i | 0x300 | a11); }
-static void call_4(void)	 { UINT8 i=M_RDMEM_OPCODE(); UINT16 a11 = (R.irq_executing == I8039_NO_INT) ? R.A11 : 0; M_CALL(i | 0x400 | a11); }
-static void call_5(void)	 { UINT8 i=M_RDMEM_OPCODE(); UINT16 a11 = (R.irq_executing == I8039_NO_INT) ? R.A11 : 0; M_CALL(i | 0x500 | a11); }
-static void call_6(void)	 { UINT8 i=M_RDMEM_OPCODE(); UINT16 a11 = (R.irq_executing == I8039_NO_INT) ? R.A11 : 0; M_CALL(i | 0x600 | a11); }
-static void call_7(void)	 { UINT8 i=M_RDMEM_OPCODE(); UINT16 a11 = (R.irq_executing == I8039_NO_INT) ? R.A11 : 0; M_CALL(i | 0x700 | a11); }
-static void clr_a(void)		 { R.A=0; }
-static void clr_c(void)		 { CLR(C_FLAG); }
-static void clr_f0(void)	 { CLR(F_FLAG); }
-static void clr_f1(void)	 { R.f1 = 0; }
-static void cpl_a(void)		 { R.A ^= 0xff; }
-static void cpl_c(void)		 { R.PSW ^= C_FLAG; }
-static void cpl_f0(void)	 { R.PSW ^= F_FLAG; }
-static void cpl_f1(void)	 { R.f1 ^= 1; }
-static void dec_a(void)		 { R.A--; }
-static void dec_r0(void)	 { R0--; }
-static void dec_r1(void)	 { R1--; }
-static void dec_r2(void)	 { R2--; }
-static void dec_r3(void)	 { R3--; }
-static void dec_r4(void)	 { R4--; }
-static void dec_r5(void)	 { R5--; }
-static void dec_r6(void)	 { R6--; }
-static void dec_r7(void)	 { R7--; }
-static void dis_i(void)		 { R.xirq_en = 0; }
-static void dis_tcnti(void)	 { R.tirq_en = 0; R.pending_irq &= ~I8039_TIMCNT_INT; }
-static void djnz_r0(void)	{ UINT8 i=M_RDMEM_OPCODE(); R0--; if (R0 != 0) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void djnz_r1(void)	{ UINT8 i=M_RDMEM_OPCODE(); R1--; if (R1 != 0) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void djnz_r2(void)	{ UINT8 i=M_RDMEM_OPCODE(); R2--; if (R2 != 0) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void djnz_r3(void)	{ UINT8 i=M_RDMEM_OPCODE(); R3--; if (R3 != 0) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void djnz_r4(void)	{ UINT8 i=M_RDMEM_OPCODE(); R4--; if (R4 != 0) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void djnz_r5(void)	{ UINT8 i=M_RDMEM_OPCODE(); R5--; if (R5 != 0) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void djnz_r6(void)	{ UINT8 i=M_RDMEM_OPCODE(); R6--; if (R6 != 0) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void djnz_r7(void)	{ UINT8 i=M_RDMEM_OPCODE(); R7--; if (R7 != 0) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void en_i(void)		 { R.xirq_en = 1; if (R.irq_state == I8039_EXTERNAL_INT) { R.irq_extra_cycles += Ext_IRQ(); } }
-static void en_tcnti(void)	 { R.tirq_en = 1; }
-static void ento_clk(void)	 { M_UNDEFINED(); }
-static void in_a_p1(void)	 { R.A = port_r(1) & R.P1; }
-static void in_a_p2(void)	 { R.A = port_r(2) & R.P2; }
-static void ins_a_bus(void)	 { R.A = bus_r(); }
-static void inc_a(void)		 { R.A++; }
-static void inc_r0(void)	 { R0++; }
-static void inc_r1(void)	 { R1++; }
-static void inc_r2(void)	 { R2++; }
-static void inc_r3(void)	 { R3++; }
-static void inc_r4(void)	 { R4++; }
-static void inc_r5(void)	 { R5++; }
-static void inc_r6(void)	 { R6++; }
-static void inc_r7(void)	 { R7++; }
-static void inc_xr0(void)	 { INTRAM_W(R0, INTRAM_R(R0) + 1); }
-static void inc_xr1(void)	 { INTRAM_W(R1, INTRAM_R(R1) + 1); }
+static void orl_a_r0(void)		{ A |= R0; }
+static void orl_a_r1(void)		{ A |= R1; }
+static void orl_a_r2(void)		{ A |= R2; }
+static void orl_a_r3(void)		{ A |= R3; }
+static void orl_a_r4(void)		{ A |= R4; }
+static void orl_a_r5(void)		{ A |= R5; }
+static void orl_a_r6(void)		{ A |= R6; }
+static void orl_a_r7(void)		{ A |= R7; }
+static void orl_a_xr0(void)		{ A |= ram_r(R0); }
+static void orl_a_xr1(void)		{ A |= ram_r(R1); }
+static void orl_a_n(void)		{ A |= argument_fetch(PC++); }
+static void orl_bus_n(void)		{ bus_w(bus_r() | argument_fetch(PC++)); }
+static void orl_p1_n(void)		{ port_w(1, mcs48.p1 |= argument_fetch(PC++)); }
+static void orl_p2_n(void)		{ port_w(2, mcs48.p2 |= argument_fetch(PC++)); }
+static void orld_p4_a(void)		{ port_w(4, port_r(4) | A); }
+static void orld_p5_a(void)		{ port_w(5, port_r(5) | A); }
+static void orld_p6_a(void)		{ port_w(6, port_r(6) | A); }
+static void orld_p7_a(void)		{ port_w(7, port_r(7) | A); }
 
-static void jmp(void)
-{
-	UINT8 i=M_RDOP(R.PC.w.l);
-	UINT16 oldpc,newpc;
-	UINT16 a11 = (R.irq_executing == I8039_NO_INT) ? R.A11 : 0;
-
-	oldpc = R.PC.w.l-1;
-	R.PC.w.l = i | a11;
-	change_pc(R.PC.w.l);
-	newpc = R.PC.w.l;
-	if (newpc == oldpc) { if (i8039_ICount > 0) i8039_ICount = 0; } /* speed up busy loop */
-	else if (newpc == oldpc-1 && M_RDOP(newpc) == 0x00)	/* NOP - Gyruss */
-		{ if (i8039_ICount > 0) i8039_ICount = 0; }
-}
-
-static void jmp_1(void)	 	 { UINT8 i=M_RDOP(R.PC.w.l); UINT16 a11 = (R.irq_executing == I8039_NO_INT) ? R.A11 : 0; R.PC.w.l = i | 0x100 | a11; change_pc(R.PC.w.l); }
-static void jmp_2(void)	 	 { UINT8 i=M_RDOP(R.PC.w.l); UINT16 a11 = (R.irq_executing == I8039_NO_INT) ? R.A11 : 0; R.PC.w.l = i | 0x200 | a11; change_pc(R.PC.w.l); }
-static void jmp_3(void)	 	 { UINT8 i=M_RDOP(R.PC.w.l); UINT16 a11 = (R.irq_executing == I8039_NO_INT) ? R.A11 : 0; R.PC.w.l = i | 0x300 | a11; change_pc(R.PC.w.l); }
-static void jmp_4(void)	 	 { UINT8 i=M_RDOP(R.PC.w.l); UINT16 a11 = (R.irq_executing == I8039_NO_INT) ? R.A11 : 0; R.PC.w.l = i | 0x400 | a11; change_pc(R.PC.w.l); }
-static void jmp_5(void)	 	 { UINT8 i=M_RDOP(R.PC.w.l); UINT16 a11 = (R.irq_executing == I8039_NO_INT) ? R.A11 : 0; R.PC.w.l = i | 0x500 | a11; change_pc(R.PC.w.l); }
-static void jmp_6(void)	 	 { UINT8 i=M_RDOP(R.PC.w.l); UINT16 a11 = (R.irq_executing == I8039_NO_INT) ? R.A11 : 0; R.PC.w.l = i | 0x600 | a11; change_pc(R.PC.w.l); }
-static void jmp_7(void)	 	 { UINT8 i=M_RDOP(R.PC.w.l); UINT16 a11 = (R.irq_executing == I8039_NO_INT) ? R.A11 : 0; R.PC.w.l = i | 0x700 | a11; change_pc(R.PC.w.l); }
-static void jmpp_xa(void)	 { UINT16 addr = (R.PC.w.l & 0xf00) | R.A; R.PC.w.l = (R.PC.w.l & 0xf00) | M_RDMEM(addr); change_pc(R.PC.w.l); }
-static void jb_0(void)	 	 { UINT8 i=M_RDMEM_OPCODE(); if (R.A & 0x01) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void jb_1(void)	 	 { UINT8 i=M_RDMEM_OPCODE(); if (R.A & 0x02) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void jb_2(void)	 	 { UINT8 i=M_RDMEM_OPCODE(); if (R.A & 0x04) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void jb_3(void)	 	 { UINT8 i=M_RDMEM_OPCODE(); if (R.A & 0x08) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void jb_4(void)	 	 { UINT8 i=M_RDMEM_OPCODE(); if (R.A & 0x10) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void jb_5(void)	 	 { UINT8 i=M_RDMEM_OPCODE(); if (R.A & 0x20) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void jb_6(void)	 	 { UINT8 i=M_RDMEM_OPCODE(); if (R.A & 0x40) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void jb_7(void)	 	 { UINT8 i=M_RDMEM_OPCODE(); if (R.A & 0x80) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void jf0(void)	 	 { UINT8 i=M_RDMEM_OPCODE(); if (M_F0y) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void jf1(void)	 	 { UINT8 i=M_RDMEM_OPCODE(); if (R.f1)	{ R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void jnc(void)	 	 { UINT8 i=M_RDMEM_OPCODE(); if (M_Cn)	{ R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void jc(void)	 	 { UINT8 i=M_RDMEM_OPCODE(); if (M_Cy)	{ R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void jni(void)	 	 { UINT8 i=M_RDMEM_OPCODE(); if (R.irq_state == I8039_EXTERNAL_INT) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void jnt_0(void)  	 { UINT8 i=M_RDMEM_OPCODE(); if (!test_r(0)) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void jt_0(void)	 	 { UINT8 i=M_RDMEM_OPCODE(); if (test_r(0))  { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void jnt_1(void)  	 { UINT8 i=M_RDMEM_OPCODE(); if (!test_r(1)) { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void jt_1(void)	 	 { UINT8 i=M_RDMEM_OPCODE(); if (test_r(1))  { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void jnz(void)	 	 { UINT8 i=M_RDMEM_OPCODE(); if (R.A != 0)	 { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void jz(void)	 	 { UINT8 i=M_RDMEM_OPCODE(); if (R.A == 0)	 { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); } else ADJUST_CYCLES }
-static void jtf(void)	 	 { UINT8 i=M_RDMEM_OPCODE(); if (R.t_flag)	 { R.PC.w.l = ((R.PC.w.l-1) & 0xf00) | i; change_pc(R.PC.w.l); R.t_flag = 0; } else ADJUST_CYCLES }
-static void mov_a_n(void)	 { R.A = M_RDMEM_OPCODE(); }
-static void mov_a_r0(void)	 { R.A = R0; }
-static void mov_a_r1(void)	 { R.A = R1; }
-static void mov_a_r2(void)	 { R.A = R2; }
-static void mov_a_r3(void)	 { R.A = R3; }
-static void mov_a_r4(void)	 { R.A = R4; }
-static void mov_a_r5(void)	 { R.A = R5; }
-static void mov_a_r6(void)	 { R.A = R6; }
-static void mov_a_r7(void)	 { R.A = R7; }
-static void mov_a_psw(void)	 { R.A = R.PSW; }
-static void mov_a_xr0(void)	 { R.A = INTRAM_R(R0); }
-static void mov_a_xr1(void)	 { R.A = INTRAM_R(R1); }
-static void mov_r0_a(void)	 { R0 = R.A; }
-static void mov_r1_a(void)	 { R1 = R.A; }
-static void mov_r2_a(void)	 { R2 = R.A; }
-static void mov_r3_a(void)	 { R3 = R.A; }
-static void mov_r4_a(void)	 { R4 = R.A; }
-static void mov_r5_a(void)	 { R5 = R.A; }
-static void mov_r6_a(void)	 { R6 = R.A; }
-static void mov_r7_a(void)	 { R7 = R.A; }
-static void mov_psw_a(void)	 { R.PSW = R.A; update_regptr(); R.SP = (R.PSW & 7) << 1; }
-static void mov_r0_n(void)	 { R0 = M_RDMEM_OPCODE(); }
-static void mov_r1_n(void)	 { R1 = M_RDMEM_OPCODE(); }
-static void mov_r2_n(void)	 { R2 = M_RDMEM_OPCODE(); }
-static void mov_r3_n(void)	 { R3 = M_RDMEM_OPCODE(); }
-static void mov_r4_n(void)	 { R4 = M_RDMEM_OPCODE(); }
-static void mov_r5_n(void)	 { R5 = M_RDMEM_OPCODE(); }
-static void mov_r6_n(void)	 { R6 = M_RDMEM_OPCODE(); }
-static void mov_r7_n(void)	 { R7 = M_RDMEM_OPCODE(); }
-static void mov_a_t(void)	 { R.A = R.timer; }
-static void mov_t_a(void)	 { R.timer = R.A; }
-static void mov_xr0_a(void)	 { INTRAM_W(R0, R.A); }
-static void mov_xr1_a(void)	 { INTRAM_W(R1, R.A); }
-static void mov_xr0_n(void)	 { INTRAM_W(R0, M_RDMEM_OPCODE()); }
-static void mov_xr1_n(void)	 { INTRAM_W(R1, M_RDMEM_OPCODE()); }
-static void movd_a_p4(void)	 { R.A = port_r(4) & 0x0F; }
-static void movd_a_p5(void)	 { R.A = port_r(5) & 0x0F; }
-static void movd_a_p6(void)	 { R.A = port_r(6) & 0x0F; }
-static void movd_a_p7(void)	 { R.A = port_r(7) & 0x0F; }
-static void movd_p4_a(void)	 { port_w(4, R.A & 0x0F); }
-static void movd_p5_a(void)	 { port_w(5, R.A & 0x0F); }
-static void movd_p6_a(void)	 { port_w(6, R.A & 0x0F); }
-static void movd_p7_a(void)	 { port_w(7, R.A & 0x0F); }
-static void movp_a_xa(void)	 { R.A = M_RDMEM((R.PC.w.l & 0x0f00) | R.A); }
-static void movp3_a_xa(void) { R.A = M_RDMEM(0x300 | R.A); }
-static void movx_a_xr0(void) { R.A = M_IN(R0); }
-static void movx_a_xr1(void) { R.A = M_IN(R1); }
-static void movx_xr0_a(void) { M_OUT(R0, R.A); }
-static void movx_xr1_a(void) { M_OUT(R1, R.A); }
-static void nop(void) { }
-static void orl_a_n(void)	 { R.A |= M_RDMEM_OPCODE(); }
-static void orl_a_r0(void)	 { R.A |= R0; }
-static void orl_a_r1(void)	 { R.A |= R1; }
-static void orl_a_r2(void)	 { R.A |= R2; }
-static void orl_a_r3(void)	 { R.A |= R3; }
-static void orl_a_r4(void)	 { R.A |= R4; }
-static void orl_a_r5(void)	 { R.A |= R5; }
-static void orl_a_r6(void)	 { R.A |= R6; }
-static void orl_a_r7(void)	 { R.A |= R7; }
-static void orl_a_xr0(void)	 { R.A |= INTRAM_R(R0); }
-static void orl_a_xr1(void)	 { R.A |= INTRAM_R(R1); }
-static void orl_bus_n(void)	 { bus_w( bus_r() | M_RDMEM_OPCODE() ); }
-static void orl_p1_n(void)
-{
-	R.P1 |= M_RDMEM_OPCODE();
-	port_w(1, R.P1);
-}
-
-static void orl_p2_n(void)
-{
-	R.P2 |= M_RDMEM_OPCODE();
-	port_w(2, R.P2);
-}
-
-static void orld_p4_a(void)	 { port_w(4, port_r(4) | R.A ); }
-static void orld_p5_a(void)	 { port_w(5, port_r(5) | R.A ); }
-static void orld_p6_a(void)	 { port_w(6, port_r(6) | R.A ); }
-static void orld_p7_a(void)	 { port_w(7, port_r(7) | R.A ); }
-static void outl_bus_a(void) { bus_w(R.A); }
-static void outl_p1_a(void)	 { port_w(1, R.A); R.P1 = R.A; }
-static void outl_p2_a(void)	 { port_w(2, R.A); R.P2 = R.A; }
-static void ret(void)	 { R.PC.w.l = ((pull() & 0x0f) << 8); R.PC.w.l |= pull(); change_pc(R.PC.w.l); }
+static void outl_bus_a(void)	{ bus_w(A); }
+static void outl_p1_a(void)		{ port_w(1, mcs48.p1 = A); }
+static void outl_p2_a(void)		{ port_w(2, mcs48.p2 = A); }
+static void ret(void)			{ pull_pc(); }
 
 static void retr(void)
 {
-	UINT8 i=pull();
-	R.PC.w.l = ((i & 0x0f) << 8) | pull();
-	change_pc(R.PC.w.l);
-	R.PSW = (R.PSW & 0x0f) | (i & 0xf0);	/* Stack is already changed by pull */
-	update_regptr();
-
-	R.irq_executing = I8039_NO_INT;
-
-	/* Take an interrupt if a request is still being made */
-	if (R.irq_state == I8039_EXTERNAL_INT) {
-		R.irq_extra_cycles += Ext_IRQ();			/* Service External IRQ */
-	}
-	else if (R.pending_irq == I8039_TIMCNT_INT) {
-		R.irq_extra_cycles += Timer_IRQ();			/* Service pending Timer/Counter IRQ */
-	}
+	pull_pc_psw();
+	
+	/* implicitly clear the IRQ in progress flip flop and re-check interrupts */
+	mcs48.irq_in_progress = FALSE;
+	check_irqs();
 }
-static void rl_a(void)		 { UINT8 i=R.A & 0x80; R.A <<= 1; if (i) R.A |= 0x01; else R.A &= 0xfe; }
-/* NS990113 */
-static void rlc_a(void) 	 { UINT8 i=M_Cy; if (R.A & 0x80) SET(C_FLAG); else CLR(C_FLAG); R.A <<= 1; if (i) R.A |= 0x01; else R.A &= 0xfe; }
-static void rr_a(void)		 { UINT8 i=R.A & 1; R.A >>= 1; if (i) R.A |= 0x80; else R.A &= 0x7f; }
-/* NS990113 */
-static void rrc_a(void)		 { UINT8 i=M_Cy; if (R.A & 1) SET(C_FLAG); else CLR(C_FLAG); R.A >>= 1; if (i) R.A |= 0x80; else R.A &= 0x7f; }
-static void sel_mb0(void)	 { R.A11 = 0x000; }
-static void sel_mb1(void)	 { R.A11 = 0x800; }
-static void sel_rb0(void)	 { CLR(B_FLAG); update_regptr();  }
-static void sel_rb1(void)	 { SET(B_FLAG); update_regptr(); }
-static void stop_tcnt(void)	 { R.timerON = R.countON = 0; }
-static void strt_cnt(void)	 { R.countON = 1; R.timerON = 0; R.Old_T1 = test_r(1); }	/* NS990113 */
-static void strt_t(void)	 { R.timerON = 1; R.countON = 0; R.masterClock = 0; }	/* NS990113 */
-static void swap_a(void)	 { UINT8 i=R.A >> 4; R.A <<= 4; R.A |= i; }
-static void xch_a_r0(void)	 { UINT8 i=R.A; R.A=R0; R0=i; }
-static void xch_a_r1(void)	 { UINT8 i=R.A; R.A=R1; R1=i; }
-static void xch_a_r2(void)	 { UINT8 i=R.A; R.A=R2; R2=i; }
-static void xch_a_r3(void)	 { UINT8 i=R.A; R.A=R3; R3=i; }
-static void xch_a_r4(void)	 { UINT8 i=R.A; R.A=R4; R4=i; }
-static void xch_a_r5(void)	 { UINT8 i=R.A; R.A=R5; R5=i; }
-static void xch_a_r6(void)	 { UINT8 i=R.A; R.A=R6; R6=i; }
-static void xch_a_r7(void)	 { UINT8 i=R.A; R.A=R7; R7=i; }
-static void xch_a_xr0(void)	 { UINT8 i=R.A; R.A=INTRAM_R(R0); INTRAM_W(R0, i); }
-static void xch_a_xr1(void)	 { UINT8 i=R.A; R.A=INTRAM_R(R1); INTRAM_W(R1, i); }
-static void xchd_a_xr0(void) { M_XCHD(R0); }
-static void xchd_a_xr1(void) { M_XCHD(R1); }
-static void xrl_a_n(void)	 { R.A ^= M_RDMEM_OPCODE(); }
-static void xrl_a_r0(void)	 { R.A ^= R0; }
-static void xrl_a_r1(void)	 { R.A ^= R1; }
-static void xrl_a_r2(void)	 { R.A ^= R2; }
-static void xrl_a_r3(void)	 { R.A ^= R3; }
-static void xrl_a_r4(void)	 { R.A ^= R4; }
-static void xrl_a_r5(void)	 { R.A ^= R5; }
-static void xrl_a_r6(void)	 { R.A ^= R6; }
-static void xrl_a_r7(void)	 { R.A ^= R7; }
-static void xrl_a_xr0(void)	 { R.A ^= INTRAM_R(R0); }
-static void xrl_a_xr1(void)	 { R.A ^= INTRAM_R(R1); }
 
-static const s_opcode opcode_main[256]=
+static void rl_a(void)			{ A = (A << 1) | (A >> 7); }
+static void rlc_a(void) 		{ UINT8 newc = A & C_FLAG; A = (A << 1) | (PSW >> 7); PSW = (PSW & ~C_FLAG) | newc; }
+
+static void rr_a(void)			{ A = (A >> 1) | (A << 7); }
+static void rrc_a(void)			{ UINT8 newc = (A << 7) & C_FLAG; A = (A >> 1) | (PSW & C_FLAG); PSW = (PSW & ~C_FLAG) | newc; }
+
+static void sel_mb0(void)		{ mcs48.a11 = 0x000; }
+static void sel_mb1(void)		{ mcs48.a11 = 0x800; }
+
+static void sel_rb0(void)		{ PSW &= ~B_FLAG; update_regptr();  }
+static void sel_rb1(void)		{ PSW |=  B_FLAG; update_regptr(); }
+
+static void stop_tcnt(void)		{ mcs48.timecount_enabled = 0; }
+
+static void strt_cnt(void)		{ mcs48.timecount_enabled = COUNTER_ENABLED; mcs48.t1_history = test_r(1); }
+static void strt_t(void)		{ mcs48.timecount_enabled = TIMER_ENABLED; mcs48.prescaler = 0; }
+
+static void swap_a(void)		{ A = (A << 4) | (A >> 4); }
+
+static void xch_a_r0(void)		{ UINT8 tmp = A; A = R0; R0 = tmp; }
+static void xch_a_r1(void)		{ UINT8 tmp = A; A = R1; R1 = tmp; }
+static void xch_a_r2(void)		{ UINT8 tmp = A; A = R2; R2 = tmp; }
+static void xch_a_r3(void)		{ UINT8 tmp = A; A = R3; R3 = tmp; }
+static void xch_a_r4(void)		{ UINT8 tmp = A; A = R4; R4 = tmp; }
+static void xch_a_r5(void)		{ UINT8 tmp = A; A = R5; R5 = tmp; }
+static void xch_a_r6(void)		{ UINT8 tmp = A; A = R6; R6 = tmp; }
+static void xch_a_r7(void)		{ UINT8 tmp = A; A = R7; R7 = tmp; }
+static void xch_a_xr0(void)		{ UINT8 tmp = A; A = ram_r(R0); ram_w(R0, tmp); }
+static void xch_a_xr1(void)		{ UINT8 tmp = A; A = ram_r(R1); ram_w(R1, tmp); }
+
+static void xchd_a_xr0(void)	{ UINT8 oldram = ram_r(R0); ram_w(R0, (oldram & 0xf0) | (A & 0x0f)); A = (A & 0xf0) | (oldram & 0x0f); }
+static void xchd_a_xr1(void)	{ UINT8 oldram = ram_r(R1); ram_w(R1, (oldram & 0xf0) | (A & 0x0f)); A = (A & 0xf0) | (oldram & 0x0f); }
+
+static void xrl_a_r0(void)		{ A ^= R0; }
+static void xrl_a_r1(void)		{ A ^= R1; }
+static void xrl_a_r2(void)		{ A ^= R2; }
+static void xrl_a_r3(void)		{ A ^= R3; }
+static void xrl_a_r4(void)		{ A ^= R4; }
+static void xrl_a_r5(void)		{ A ^= R5; }
+static void xrl_a_r6(void)		{ A ^= R6; }
+static void xrl_a_r7(void)		{ A ^= R7; }
+static void xrl_a_xr0(void)		{ A ^= ram_r(R0); }
+static void xrl_a_xr1(void)		{ A ^= ram_r(R1); }
+static void xrl_a_n(void)		{ A ^= argument_fetch(PC++); }
+
+
+
+/***************************************************************************
+    OPCODE TABLES
+***************************************************************************/
+
+static const mcs48_opcode opcode_table[256]=
 {
-	{1, nop	 	   },{0, illegal	},{2, outl_bus_a},{2, add_a_n	},{2, jmp 	   	},{1, en_i		},{0, illegal	},{1, dec_a		},
-	{2, ins_a_bus  },{2, in_a_p1	},{2, in_a_p2	},{0, illegal	},{2, movd_a_p4 },{2, movd_a_p5	},{2, movd_a_p6	},{2, movd_a_p7 },
-	{1, inc_xr0    },{1, inc_xr1	},{2, jb_0		},{2, adc_a_n	},{2, call	   	},{1, dis_i		},{2, jtf		},{1, inc_a		},
+	{1, nop	 	   },{1, illegal	},{2, outl_bus_a},{2, add_a_n	},{2, jmp_0	   	},{1, en_i		},{1, illegal	},{1, dec_a		},
+	{2, ins_a_bus  },{2, in_a_p1	},{2, in_a_p2	},{1, illegal	},{2, movd_a_p4 },{2, movd_a_p5	},{2, movd_a_p6	},{2, movd_a_p7 },
+	{1, inc_xr0    },{1, inc_xr1	},{2, jb_0		},{2, adc_a_n	},{2, call_0   	},{1, dis_i		},{2, jtf		},{1, inc_a		},
 	{1, inc_r0	   },{1, inc_r1 	},{1, inc_r2	},{1, inc_r3	},{1, inc_r4	},{1, inc_r5 	},{1, inc_r6	},{1, inc_r7	},
-	{1, xch_a_xr0  },{1, xch_a_xr1	},{0, illegal	},{2, mov_a_n	},{2, jmp_1	   	},{1, en_tcnti	},{2, jnt_0 	},{1, clr_a	  	},
+	{1, xch_a_xr0  },{1, xch_a_xr1	},{1, illegal	},{2, mov_a_n	},{2, jmp_1	   	},{1, en_tcnti	},{2, jnt_0 	},{1, clr_a	  	},
 	{1, xch_a_r0   },{1, xch_a_r1	},{1, xch_a_r2	},{1, xch_a_r3  },{1, xch_a_r4  },{1, xch_a_r5	},{1, xch_a_r6	},{1, xch_a_r7  },
-	{1, xchd_a_xr0 },{1, xchd_a_xr1	},{2, jb_1		},{0, illegal	},{2, call_1	},{1, dis_tcnti	},{2, jt_0		},{1, cpl_a	  	},
-	{0, illegal    },{2, outl_p1_a	},{2, outl_p2_a	},{0, illegal	},{2, movd_p4_a },{2, movd_p5_a	},{2, movd_p6_a },{2, movd_p7_a },
+	{1, xchd_a_xr0 },{1, xchd_a_xr1	},{2, jb_1		},{1, illegal	},{2, call_1	},{1, dis_tcnti	},{2, jt_0		},{1, cpl_a	  	},
+	{0, illegal    },{2, outl_p1_a	},{2, outl_p2_a	},{1, illegal	},{2, movd_p4_a },{2, movd_p5_a	},{2, movd_p6_a },{2, movd_p7_a },
 	{1, orl_a_xr0  },{1, orl_a_xr1	},{1, mov_a_t	},{2, orl_a_n	},{2, jmp_2	   	},{1, strt_cnt	},{2, jnt_1 	},{1, swap_a	},
 	{1, orl_a_r0   },{1, orl_a_r1	},{1, orl_a_r2	},{1, orl_a_r3  },{1, orl_a_r4  },{1, orl_a_r5	},{1, orl_a_r6	},{1, orl_a_r7  },
-	{1, anl_a_xr0  },{1, anl_a_xr1	},{2, jb_2		},{2, anl_a_n	},{2, call_2	},{1, strt_t 	},{2, jt_1		},{1, daa_a	  	},
+	{1, anl_a_xr0  },{1, anl_a_xr1	},{2, jb_2		},{2, anl_a_n	},{2, call_2	},{1, strt_t 	},{2, jt_1		},{1, da_a	  	},
 	{1, anl_a_r0   },{1, anl_a_r1	},{1, anl_a_r2	},{1, anl_a_r3  },{1, anl_a_r4  },{1, anl_a_r5	},{1, anl_a_r6	},{1, anl_a_r7  },
-	{1, add_a_xr0  },{1, add_a_xr1	},{1, mov_t_a	},{0, illegal	},{2, jmp_3	   	},{1, stop_tcnt	},{0, illegal	},{1, rrc_a	  	},
+	{1, add_a_xr0  },{1, add_a_xr1	},{1, mov_t_a	},{1, illegal	},{2, jmp_3	   	},{1, stop_tcnt	},{1, illegal	},{1, rrc_a	  	},
 	{1, add_a_r0   },{1, add_a_r1	},{1, add_a_r2	},{1, add_a_r3  },{1, add_a_r4  },{1, add_a_r5	},{1, add_a_r6	},{1, add_a_r7  },
-	{1, adc_a_xr0  },{1, adc_a_xr1	},{2, jb_3		},{0, illegal	},{2, call_3	},{1, ento_clk	},{2, jf1		},{1, rr_a 	  	},
+	{1, adc_a_xr0  },{1, adc_a_xr1	},{2, jb_3		},{1, illegal	},{2, call_3	},{1, ento_clk	},{2, jf1		},{1, rr_a 	  	},
 	{1, adc_a_r0   },{1, adc_a_r1	},{1, adc_a_r2	},{1, adc_a_r3  },{1, adc_a_r4  },{1, adc_a_r5	},{1, adc_a_r6	},{1, adc_a_r7  },
-	{2, movx_a_xr0 },{2, movx_a_xr1 },{0, illegal	},{2, ret		},{2, jmp_4	   	},{1, clr_f0 	},{2, jni		},{0, illegal	},
-	{2, orl_bus_n  },{2, orl_p1_n	},{2, orl_p2_n	},{0, illegal	},{2, orld_p4_a },{2, orld_p5_a	},{2, orld_p6_a },{2, orld_p7_a },
+	{2, movx_a_xr0 },{2, movx_a_xr1 },{1, illegal	},{2, ret		},{2, jmp_4	   	},{1, clr_f0 	},{2, jni		},{1, illegal	},
+	{2, orl_bus_n  },{2, orl_p1_n	},{2, orl_p2_n	},{1, illegal	},{2, orld_p4_a },{2, orld_p5_a	},{2, orld_p6_a },{2, orld_p7_a },
 	{2, movx_xr0_a },{2, movx_xr1_a },{2, jb_4		},{2, retr		},{2, call_4	},{1, cpl_f0 	},{2, jnz		},{1, clr_c	  	},
-	{2, anl_bus_n  },{2, anl_p1_n	},{2, anl_p2_n	},{0, illegal	},{2, anld_p4_a },{2, anld_p5_a	},{2, anld_p6_a },{2, anld_p7_a },
-	{1, mov_xr0_a  },{1, mov_xr1_a	},{0, illegal	},{2, movp_a_xa },{2, jmp_5	   	},{1, clr_f1 	},{0, illegal	},{1, cpl_c	  	},
+	{2, anl_bus_n  },{2, anl_p1_n	},{2, anl_p2_n	},{1, illegal	},{2, anld_p4_a },{2, anld_p5_a	},{2, anld_p6_a },{2, anld_p7_a },
+	{1, mov_xr0_a  },{1, mov_xr1_a	},{1, illegal	},{2, movp_a_xa },{2, jmp_5	   	},{1, clr_f1 	},{1, illegal	},{1, cpl_c	  	},
 	{1, mov_r0_a   },{1, mov_r1_a	},{1, mov_r2_a	},{1, mov_r3_a  },{1, mov_r4_a  },{1, mov_r5_a	},{1, mov_r6_a	},{1, mov_r7_a  },
-	{2, mov_xr0_n  },{2, mov_xr1_n	},{2, jb_5		},{2, jmpp_xa	},{2, call_5	},{1, cpl_f1 	},{2, jf0		},{0, illegal	},
+	{2, mov_xr0_n  },{2, mov_xr1_n	},{2, jb_5		},{2, jmpp_xa	},{2, call_5	},{1, cpl_f1 	},{2, jf0		},{1, illegal	},
 	{2, mov_r0_n   },{2, mov_r1_n	},{2, mov_r2_n	},{2, mov_r3_n  },{2, mov_r4_n  },{2, mov_r5_n	},{2, mov_r6_n	},{2, mov_r7_n  },
-	{0, illegal    },{0, illegal	},{0, illegal	},{0, illegal	},{2, jmp_6	   	},{1, sel_rb0	},{2, jz		},{1, mov_a_psw },
+	{0, illegal    },{1, illegal	},{1, illegal	},{1, illegal	},{2, jmp_6	   	},{1, sel_rb0	},{2, jz		},{1, mov_a_psw },
 	{1, dec_r0	   },{1, dec_r1 	},{1, dec_r2	},{1, dec_r3	},{1, dec_r4	},{1, dec_r5 	},{1, dec_r6	},{1, dec_r7	},
-	{1, xrl_a_xr0  },{1, xrl_a_xr1	},{2, jb_6		},{2, xrl_a_n	},{2, call_6	},{1, sel_rb1	},{0, illegal	},{1, mov_psw_a },
+	{1, xrl_a_xr0  },{1, xrl_a_xr1	},{2, jb_6		},{2, xrl_a_n	},{2, call_6	},{1, sel_rb1	},{1, illegal	},{1, mov_psw_a },
 	{1, xrl_a_r0   },{1, xrl_a_r1	},{1, xrl_a_r2	},{1, xrl_a_r3  },{1, xrl_a_r4  },{1, xrl_a_r5	},{1, xrl_a_r6	},{1, xrl_a_r7  },
-	{0, illegal    },{0, illegal	},{0, illegal	},{2, movp3_a_xa},{2, jmp_7		},{1, sel_mb0	},{2, jnc		},{1, rl_a 	  	},
+	{0, illegal    },{1, illegal	},{1, illegal	},{2, movp3_a_xa},{2, jmp_7		},{1, sel_mb0	},{2, jnc		},{1, rl_a 	  	},
 	{2, djnz_r0    },{2, djnz_r1	},{2, djnz_r2	},{2, djnz_r3	},{2, djnz_r4   },{2, djnz_r5	},{2, djnz_r6	},{2, djnz_r7	},
-	{1, mov_a_xr0  },{1, mov_a_xr1	},{2, jb_7		},{0, illegal	},{2, call_7	},{1, sel_mb1	},{2, jc		},{1, rlc_a	  	},
+	{1, mov_a_xr0  },{1, mov_a_xr1	},{2, jb_7		},{1, illegal	},{2, call_7	},{1, sel_mb1	},{2, jc		},{1, rlc_a	  	},
 	{1, mov_a_r0   },{1, mov_a_r1	},{1, mov_a_r2	},{1, mov_a_r3  },{1, mov_a_r4  },{1, mov_a_r5	},{1, mov_a_r6	},{1, mov_a_r7  }
 };
 
 
 
+/***************************************************************************
+    INITIALIZATION/RESET
+***************************************************************************/
 
-/****************************************************************************
- * Initialize emulation
- ****************************************************************************/
+/*-------------------------------------------------
+    mcs48_init - generic MCS-48 initialization
+-------------------------------------------------*/
 
-static void generic_init(int index, int clock, const void *config, int (*irqcallback)(int), UINT16 romsize)
+static void mcs48_init(int index, int clock, const void *config, int (*irqcallback)(int), UINT16 romsize)
 {
-	R.int_rom_size = romsize;
+	memset(&mcs48, 0, sizeof(mcs48));
 	
-	R.irq_callback = irqcallback;
+	mcs48.irq_callback = irqcallback;
+	mcs48.int_rom_size = romsize;
 
-	state_save_register_item("i8039", index, R.PC.w.l);
-	state_save_register_item("i8039", index, R.PREVPC.w.l);
-	state_save_register_item("i8039", index, R.A);
-	state_save_register_item("i8039", index, R.SP);
-	state_save_register_item("i8039", index, R.PSW);
-	state_save_register_item("i8039", index, R.bus);
-	state_save_register_item("i8039", index, R.f1);
-	state_save_register_item("i8039", index, R.P1);
-	state_save_register_item("i8039", index, R.P2);
-	state_save_register_item("i8039", index, R.pending_irq);
-	state_save_register_item("i8039", index, R.irq_executing);
-	state_save_register_item("i8039", index, R.masterClock);
-	state_save_register_item("i8039", index, R.t_flag);
-	state_save_register_item("i8039", index, R.timer);
-	state_save_register_item("i8039", index, R.timerON);
-	state_save_register_item("i8039", index, R.countON);
-	state_save_register_item("i8039", index, R.xirq_en);
-	state_save_register_item("i8039", index, R.tirq_en);
-	state_save_register_item("i8039", index, R.A11);
-	state_save_register_item("i8039", index, R.irq_state);
-	state_save_register_item("i8039", index, R.irq_extra_cycles);
-	state_save_register_item("i8039", index, R.Old_T1);
-
-	R.cpu_feature = 0;
-	R.timer = 0;
+	state_save_register_item("mcs48", index, mcs48.prevpc.w.l);
+	state_save_register_item("mcs48", index, PC);
+	state_save_register_item("mcs48", index, A);
+	state_save_register_item("mcs48", index, PSW);
+	state_save_register_item("mcs48", index, mcs48.p1);
+	state_save_register_item("mcs48", index, mcs48.p2);
+	state_save_register_item("mcs48", index, mcs48.f1);
+	state_save_register_item("mcs48", index, mcs48.ea);
+	state_save_register_item("mcs48", index, mcs48.timer);
+	state_save_register_item("mcs48", index, mcs48.prescaler);
+	state_save_register_item("mcs48", index, mcs48.t1_history);
+	state_save_register_item("mcs48", index, mcs48.irq_state);
+	state_save_register_item("mcs48", index, mcs48.irq_in_progress);
+	state_save_register_item("mcs48", index, mcs48.timer_overflow);
+	state_save_register_item("mcs48", index, mcs48.timer_flag);
+	state_save_register_item("mcs48", index, mcs48.tirq_enabled);
+	state_save_register_item("mcs48", index, mcs48.xirq_enabled);
+	state_save_register_item("mcs48", index, mcs48.timecount_enabled);
+	state_save_register_item("mcs48", index, mcs48.a11);
 }
 
-#if (HAS_I8035 || HAS_I8041 || HAS_I8048 || HAS_I8648 || HAS_I8748 || HAS_MB8884)
-static void i8035_init (int index, int clock, const void *config, int (*irqcallback)(int))
-{
-	generic_init(index, clock, config, irqcallback, 0x400);
-}
-#endif
 
-#if (HAS_I8039 || HAS_I8049 || HAS_I8749 || HAS_N7751)
-static void i8039_init (int index, int clock, const void *config, int (*irqcallback)(int))
-{
-	generic_init(index, clock, config, irqcallback, 0x800);
-}
-#endif
+/*-------------------------------------------------
+    i8035_init - initialization for systems with
+    1k of internal ROM and 64 bytes of internal
+    RAM
+-------------------------------------------------*/
 
-#if (HAS_M58715)
-static void m58715_init (int index, int clock, const void *config, int (*irqcallback)(int))
+#if (HAS_I8035 || HAS_I8041 || HAS_I8048 || HAS_I8648 || HAS_I8748 || HAS_MB8884 || HAS_N7751)
+static void i8035_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	generic_init(index, clock, config, irqcallback, 0x800);
-	R.cpu_feature = FEATURE_M58715;
+	mcs48_init(index, clock, config, irqcallback, 0x400);
 }
 #endif
 
 
+/*-------------------------------------------------
+    i8039_init - initialization for systems with
+    2k of internal ROM and 128 bytes of internal
+    RAM
+-------------------------------------------------*/
 
-/****************************************************************************
- * Reset registers to their initial values
- ****************************************************************************/
-static void i8039_reset (void)
+#if (HAS_I8039 || HAS_I8049 || HAS_I8749 || HAS_M58715)
+static void i8039_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	R.PC.w.l = 0;
-	R.SP  = 0;
-	R.A   = 0;
-	R.PSW = 0x08;		/* Start with No Carry, Bit 4 is always SET */
-	//R.PSW = C_FLAG | 0x08;
-	R.P1  = 0xff;
-	R.P2  = 0xff;
-	R.bus = 0;
-	R.irq_executing = I8039_NO_INT;
-	R.pending_irq	= I8039_NO_INT;
+	mcs48_init(index, clock, config, irqcallback, 0x800);
+}
+#endif
 
-	R.A11     = 0;
-	R.tirq_en = R.xirq_en = 0;
-	R.timerON = R.countON = 0;
 
-	if (R.cpu_feature & FEATURE_M58715)
+/*-------------------------------------------------
+    mcs48_reset - general reset routine
+-------------------------------------------------*/
+
+static void mcs48_reset(void)
+{
+	/* confirmed from reset description */
+	PC = 0;
+	PSW = (PSW & (C_FLAG | A_FLAG)) | 0x08;
+	mcs48.a11 = 0x000;
+	bus_w(0xff);
+	mcs48.p1 = 0xff;
+	mcs48.p2 = 0xff;
+	mcs48.tirq_enabled = FALSE;
+	mcs48.xirq_enabled = FALSE;
+	mcs48.timecount_enabled = 0;
+	mcs48.timer_flag = FALSE;
+	mcs48.f1 = 0;
+
+	/* confirmed from interrupt logic description */
+	mcs48.irq_in_progress = FALSE;
+	mcs48.timer_overflow = FALSE;
+}
+
+
+
+/***************************************************************************
+    EXECUTION
+***************************************************************************/
+
+/*-------------------------------------------------
+    check_irqs - check for and process IRQs
+-------------------------------------------------*/
+
+static void check_irqs(void)
+{
+	/* if something is in progress, we do nothing */
+	if (mcs48.irq_in_progress)
+		return;
+
+	/* external interrupts take priority */
+	if (mcs48.irq_state && mcs48.xirq_enabled)
 	{
-		//R.timerON = 1;  /* Mario Bros. doesn't work without this */
-		//R.PSW |= C_FLAG; //MB will play startup sound, but wrong # */
+		mcs48.irq_in_progress = TRUE;
+		
+		/* transfer to location 0x03 */
+		push_pc_psw();
+		PC = 0x03;
+		change_pc(0x03);
+		mcs48.inst_cycles += 2;
+		
+		/* indicate we took the external IRQ */
+		if (mcs48.irq_callback != NULL)
+			(*mcs48.irq_callback)(0);
 	}
-	R.irq_extra_cycles = 0;
-	R.masterClock = 0;
+	
+	/* timer overflow interrupts follow */
+	if (mcs48.timer_overflow && mcs48.tirq_enabled)
+	{
+		mcs48.irq_in_progress = TRUE;
+
+		/* transfer to location 0x07 */
+		push_pc_psw();
+		PC = 0x07;
+		change_pc(0x07);
+		mcs48.inst_cycles += 2;
+		
+		/* timer overflow flip-flop is reset once taken */
+		mcs48.timer_overflow = FALSE;
+	}
 }
 
 
-/****************************************************************************
- * Shut down CPU emulation
- ****************************************************************************/
-static void i8039_exit (void)
+/*-------------------------------------------------
+    burn_cycles - burn cycles, processing timers
+    and counters
+-------------------------------------------------*/
+
+static void burn_cycles(int count)
 {
-	/* nothing to do ? */
-}
+	int timerover = FALSE;
+	
+	/* if the timer is enabled, accumulate prescaler cycles */
+	if (mcs48.timecount_enabled & TIMER_ENABLED)
+	{
+		mcs48.prescaler += count;
+		mcs48.timer += mcs48.prescaler >> 5;
+		mcs48.prescaler &= 0x1f;
+		timerover = (mcs48.timer == 0);
+	}
+	
+	/* if the counter is enabled, poll the T1 test input once for each cycle */
+	else if (mcs48.timecount_enabled & COUNTER_ENABLED)
+		for ( ; count > 0; count--)
+		{
+			mcs48.t1_history = (mcs48.t1_history << 1) | (test_r(1) & 1);
+			if ((mcs48.t1_history & 3) == 2)
+				timerover = (++mcs48.timer == 0);
+		}
 
-/****************************************************************************
- * Issue an interrupt if necessary
- ****************************************************************************/
-static int Ext_IRQ(void)
-{
-	int extra_cycles = 0;
-
-	if (R.xirq_en) {
-		if (R.irq_executing == I8039_NO_INT) {
-//          logerror("I8039:  EXT INTERRUPT being serviced\n");
-			R.irq_executing = I8039_EXTERNAL_INT;
-			push(R.PC.b.l);
-			push((R.PC.b.h & 0x0f) | (R.PSW & 0xf0));
-			R.PC.w.l = 0x03;
-
-			extra_cycles = 2;		/* 2 clock cycles used */
-
-			if (R.timerON)	/* NS990113 */
-				R.masterClock += extra_cycles;
-			if (R.irq_callback) (*R.irq_callback)(0);
+	/* if either source caused a timer overflow, set the flags and check IRQs */
+	if (timerover)
+	{
+		mcs48.timer_flag = TRUE;
+		
+		/* according to the docs, if an overflow occurs with interrupts disabled, the overflow is not stored */
+		if (mcs48.tirq_enabled)
+		{
+			mcs48.timer_overflow = TRUE;
+			check_irqs();
 		}
 	}
-
-	return extra_cycles;
-}
-
-static int Timer_IRQ(void)
-{
-	int extra_cycles = 0;
-
-	if (R.tirq_en) {
-		if (R.irq_executing == I8039_NO_INT) {
-//          logerror("I8039:  TIMER/COUNTER INTERRUPT\n");
-			R.irq_executing = I8039_TIMCNT_INT;
-			R.pending_irq &= ~I8039_TIMCNT_INT;
-			push(R.PC.b.l);
-			push((R.PC.b.h & 0x0f) | (R.PSW & 0xf0));
-			R.PC.w.l = 0x07;
-			change_pc(0x07);
-
-			extra_cycles = 2;		/* 2 clock cycles used */
-
-			if (R.timerON)	/* NS990113 */
-				R.masterClock += extra_cycles;
-		}
-		else {
-			if (R.irq_executing == I8039_EXTERNAL_INT) {
-				R.pending_irq |= I8039_TIMCNT_INT;
-			}
-		}
-	}
-
-	R.t_flag = 1;
-
-	return extra_cycles;
 }
 
 
-/****************************************************************************
- * Execute cycles CPU cycles. Return number of cycles really executed
- ****************************************************************************/
-static int i8039_execute(int cycles)
+/*-------------------------------------------------
+    mcs48_execute - execute until we run out
+    of cycles
+-------------------------------------------------*/
+
+static int mcs48_execute(int cycles)
 {
-	unsigned opcode, T1, timerInt;
-	int count;
+	unsigned opcode;
 
-	i8039_ICount = (cycles - R.irq_extra_cycles);
-	R.irq_extra_cycles = 0;
+	mcs48_icount = cycles;
 
+	/* external interrupts may have been set since we last checked */
+	mcs48.inst_cycles = 0;
+	check_irqs();
+	mcs48_icount -= mcs48.inst_cycles;
+	if (mcs48.timecount_enabled != 0)
+		burn_cycles(mcs48.inst_cycles);
+
+	/* iterate over remaining cycles, guaranteeing at least one instruction */
 	do
 	{
-		R.PREVPC = R.PC;
+		/* fetch next opcode */		
+		mcs48.prevpc = mcs48.pc;
+		debugger_instruction_hook(Machine, PC);
+		opcode = opcode_fetch(PC++);
 
-		debugger_instruction_hook(Machine, R.PC.w.l);
+		/* process opcode and count cycles */
+		mcs48.inst_cycles = opcode_table[opcode].cycles;
+		(*opcode_table[opcode].function)();
+		
+		/* burn the cycles */
+		mcs48_icount -= mcs48.inst_cycles;
+		if (mcs48.timecount_enabled != 0)
+			burn_cycles(mcs48.inst_cycles);
 
-		opcode=M_RDOP(R.PC.w.l);
+	} while (mcs48_icount > 0);
 
-/*      logerror("I8039:  PC = %04x,  opcode = %02x\n", R.PC.w.l, opcode); */
-
-		R.PC.w.l++;
-		R.inst_cycles = opcode_main[opcode].cycles;
-		(*(opcode_main[opcode].function))();
-		i8039_ICount -= R.inst_cycles; ///
-
-		timerInt = 0;
-		if (R.countON)	/* NS990113 */
-		{
-			for ( ; R.inst_cycles > 0; R.inst_cycles-- )
-			{
-				T1 = test_r(1);
-				if (POSITIVE_EDGE_T1)
-				{
-					R.timer++;
-					if (R.timer == 0)
-						timerInt = 1;
-				}
-				R.Old_T1 = T1;
-			}
-		}
-
-		if (R.timerON) {
-			R.masterClock += opcode_main[opcode].cycles;
-			if (R.masterClock >= 32) {	/* NS990113 */
-				R.masterClock -= 32;
-				R.timer++;
-				if (R.timer == 0)
-					timerInt = 1;
-			}
-		}
-
-		if (timerInt)
-		{
-			count = Timer_IRQ();	/* Handle Timer IRQ */
-			i8039_ICount -= count;
-		}
-
-	} while (i8039_ICount>0);
-
-	i8039_ICount -= R.irq_extra_cycles;
-	R.irq_extra_cycles = 0;
-
-	return cycles - i8039_ICount;
-}
-
-/****************************************************************************
- * Get all registers in given buffer
- ****************************************************************************/
-static void i8039_get_context (void *dst)
-{
-	if( dst )
-		*(I8039_Regs*)dst = R;
-}
-
-
-/****************************************************************************
- * Set all registers to given values
- ****************************************************************************/
-static void i8039_set_context (void *src)
-{
-	if( src )
-	{
-		R = *(I8039_Regs*)src;
-		update_regptr();
-		R.SP = (R.PSW << 1) & 0x0f;
-		change_pc(R.PC.w.l);
-	}
-	/* Handle forced Interrupts throught the Debugger */
-	if (R.irq_state != I8039_NO_INT) {
-		R.irq_extra_cycles += Ext_IRQ();		/* Handle External IRQ */
-	}
-	if (R.timer == 0) {
-		R.irq_extra_cycles += Timer_IRQ();		/* Handle Timer IRQ */
-	}
-}
-
-
-/****************************************************************************
- * Set IRQ line state
- ****************************************************************************/
-static void set_irq_line(int irqline, int state)
-{
-	if (state != CLEAR_LINE) {
-		R.irq_state = I8039_EXTERNAL_INT;
-		R.irq_extra_cycles += Ext_IRQ();		/* Handle External IRQ */
-	}
-	else {
-		R.irq_state = I8039_NO_INT;
-	}
+	return cycles - mcs48_icount;
 }
 
 
 
-/**************************************************************************
- * Generic set_info
- **************************************************************************/
-
-static void i8039_set_info(UINT32 state, cpuinfo *info)
-{
-	switch (state)
-	{
-		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + 0:				set_irq_line(0, info->i);				break;
-
-		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + I8039_PC:			R.PC.w.l = info->i;						break;
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + I8039_SP:			R.SP = info->i;							break;
-		case CPUINFO_INT_REGISTER + I8039_PSW:			R.PSW = info->i;						break;
-		case CPUINFO_INT_REGISTER + I8039_A:			R.A = info->i;							break;
-		case CPUINFO_INT_REGISTER + I8039_TC:			R.timer = info->i;						break;
-		case CPUINFO_INT_REGISTER + I8039_P1:			R.P1 = info->i;							break;
-		case CPUINFO_INT_REGISTER + I8039_P2:			R.P2 = info->i;							break;
-		case CPUINFO_INT_REGISTER + I8039_R0:			R0 = info->i;							break;
-		case CPUINFO_INT_REGISTER + I8039_R1:			R1 = info->i;							break;
-		case CPUINFO_INT_REGISTER + I8039_R2:			R2 = info->i;							break;
-		case CPUINFO_INT_REGISTER + I8039_R3:			R3 = info->i;							break;
-		case CPUINFO_INT_REGISTER + I8039_R4:			R4 = info->i;							break;
-		case CPUINFO_INT_REGISTER + I8039_R5:			R5 = info->i;							break;
-		case CPUINFO_INT_REGISTER + I8039_R6:			R6 = info->i;							break;
-		case CPUINFO_INT_REGISTER + I8039_R7:			R7 = info->i;							break;
-		case CPUINFO_INT_REGISTER + I8039_EA:			R.EA = info->i;							break;
-	}
-}
-
-
-
-/**************************************************************************
- * Generic get_info
- **************************************************************************/
+/***************************************************************************
+    ADDRESS MAPS
+***************************************************************************/
 
 static ADDRESS_MAP_START(program_10bit, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00, 0x3ff) AM_ROM
@@ -933,114 +939,183 @@ static ADDRESS_MAP_START(data_7bit, ADDRESS_SPACE_DATA, 8)
 ADDRESS_MAP_END
 
 
-static void generic_get_info(UINT32 state, cpuinfo *info)
+
+/***************************************************************************
+    GENERAL CONTEXT ACCESS
+***************************************************************************/
+
+/*-------------------------------------------------
+    mcs48_get_context - copy the context to the
+    destination
+-------------------------------------------------*/
+
+static void mcs48_get_context(void *dst)
+{
+	if (dst != NULL)
+		*(mcs48_regs *)dst = mcs48;
+}
+
+
+/*-------------------------------------------------
+    mcs48_set_context - set the current context
+    from the source
+-------------------------------------------------*/
+
+static void mcs48_set_context(void *src)
+{
+	if (src != NULL)
+	{
+		mcs48 = *(mcs48_regs *)src;
+		update_regptr();
+		change_pc(PC);
+	}
+}
+
+
+/*-------------------------------------------------
+    mcs48_set_info - set a piece of information
+    on the CPU core
+-------------------------------------------------*/
+
+static void mcs48_set_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are set as 64-bit signed integers --- */
+		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_IRQ:	mcs48.irq_state = (info->i != CLEAR_LINE);	break;
+		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_EA:	mcs48.ea = info->i;							break;
+
+		case CPUINFO_INT_PC:
+		case CPUINFO_INT_REGISTER + MCS48_PC:			PC = info->i;								break;
+		case CPUINFO_INT_SP:
+		case CPUINFO_INT_REGISTER + MCS48_PSW:			PSW = info->i;								break;
+		case CPUINFO_INT_REGISTER + MCS48_A:			A = info->i;								break;
+		case CPUINFO_INT_REGISTER + MCS48_TC:			mcs48.timer = info->i;						break;
+		case CPUINFO_INT_REGISTER + MCS48_P1:			mcs48.p1 = info->i;							break;
+		case CPUINFO_INT_REGISTER + MCS48_P2:			mcs48.p2 = info->i;							break;
+		case CPUINFO_INT_REGISTER + MCS48_R0:			R0 = info->i;								break;
+		case CPUINFO_INT_REGISTER + MCS48_R1:			R1 = info->i;								break;
+		case CPUINFO_INT_REGISTER + MCS48_R2:			R2 = info->i;								break;
+		case CPUINFO_INT_REGISTER + MCS48_R3:			R3 = info->i;								break;
+		case CPUINFO_INT_REGISTER + MCS48_R4:			R4 = info->i;								break;
+		case CPUINFO_INT_REGISTER + MCS48_R5:			R5 = info->i;								break;
+		case CPUINFO_INT_REGISTER + MCS48_R6:			R6 = info->i;								break;
+		case CPUINFO_INT_REGISTER + MCS48_R7:			R7 = info->i;								break;
+		case CPUINFO_INT_REGISTER + MCS48_EA:			mcs48.ea = info->i;							break;
+	}
+}
+
+
+/*-------------------------------------------------
+    mcs48_get_info - retrieve a piece of 
+    information from the CPU core
+-------------------------------------------------*/
+
+static void mcs48_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(R);					break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 3*5;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 2;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 3;							break;
+		case CPUINFO_INT_CONTEXT_SIZE:							info->i = sizeof(mcs48);				break;
+		case CPUINFO_INT_INPUT_LINES:							info->i = 2;							break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:					info->i = MCS48_INPUT_IRQ;				break;
+		case CPUINFO_INT_ENDIANNESS:							info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:						info->i = 1;							break;
+		case CPUINFO_INT_CLOCK_DIVIDER:							info->i = 3*5;							break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:					info->i = 1;							break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:					info->i = 2;							break;
+		case CPUINFO_INT_MIN_CYCLES:							info->i = 1;							break;
+		case CPUINFO_INT_MAX_CYCLES:							info->i = 3;							break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: /*info->i = 10 or 11 or 12;*/	break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	/*info->i = 6 or 7;*/			break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 9;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: /*info->i = 10 or 11 or 12;*/			break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	/*info->i = 6 or 7;*/					break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;							break;
+		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 9;							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;							break;
 
-		case CPUINFO_INT_INPUT_STATE + 0:				info->i = (R.irq_state == I8039_EXTERNAL_INT) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_IRQ:			info->i = mcs48.irq_state ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_EA:			info->i = mcs48.ea;						break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = R.PREVPC.w.l;					break;
+		case CPUINFO_INT_PREVIOUSPC:							info->i = mcs48.prevpc.w.l;				break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + I8039_PC:			info->i = R.PC.w.l;						break;
-		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + I8039_SP:			info->i = R.SP;							break;
-		case CPUINFO_INT_REGISTER + I8039_PSW:			info->i = R.PSW;						break;
-		case CPUINFO_INT_REGISTER + I8039_A:			info->i = R.A;							break;
-		case CPUINFO_INT_REGISTER + I8039_TC:			info->i = R.timer;						break;
-		case CPUINFO_INT_REGISTER + I8039_P1:			info->i = R.P1;							break;
-		case CPUINFO_INT_REGISTER + I8039_P2:			info->i = R.P2;							break;
-		case CPUINFO_INT_REGISTER + I8039_R0:			info->i = R0;							break;
-		case CPUINFO_INT_REGISTER + I8039_R1:			info->i = R1;							break;
-		case CPUINFO_INT_REGISTER + I8039_R2:			info->i = R2;							break;
-		case CPUINFO_INT_REGISTER + I8039_R3:			info->i = R3;							break;
-		case CPUINFO_INT_REGISTER + I8039_R4:			info->i = R4;							break;
-		case CPUINFO_INT_REGISTER + I8039_R5:			info->i = R5;							break;
-		case CPUINFO_INT_REGISTER + I8039_R6:			info->i = R6;							break;
-		case CPUINFO_INT_REGISTER + I8039_R7:			info->i = R7;							break;
-		case CPUINFO_INT_REGISTER + I8039_EA:			info->i = R.EA;							break;
+		case CPUINFO_INT_REGISTER + MCS48_PC:					info->i = PC;							break;
+		case CPUINFO_INT_REGISTER + MCS48_PSW:					info->i = PSW;							break;
+		case CPUINFO_INT_REGISTER + MCS48_A:					info->i = A;							break;
+		case CPUINFO_INT_REGISTER + MCS48_TC:					info->i = mcs48.timer;					break;
+		case CPUINFO_INT_REGISTER + MCS48_P1:					info->i = mcs48.p1;						break;
+		case CPUINFO_INT_REGISTER + MCS48_P2:					info->i = mcs48.p2;						break;
+		case CPUINFO_INT_REGISTER + MCS48_R0:					info->i = R0;							break;
+		case CPUINFO_INT_REGISTER + MCS48_R1:					info->i = R1;							break;
+		case CPUINFO_INT_REGISTER + MCS48_R2:					info->i = R2;							break;
+		case CPUINFO_INT_REGISTER + MCS48_R3:					info->i = R3;							break;
+		case CPUINFO_INT_REGISTER + MCS48_R4:					info->i = R4;							break;
+		case CPUINFO_INT_REGISTER + MCS48_R5:					info->i = R5;							break;
+		case CPUINFO_INT_REGISTER + MCS48_R6:					info->i = R6;							break;
+		case CPUINFO_INT_REGISTER + MCS48_R7:					info->i = R7;							break;
+		case CPUINFO_INT_REGISTER + MCS48_EA:					info->i = mcs48.ea;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = i8039_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = i8039_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = i8039_set_context;	break;
-		case CPUINFO_PTR_INIT:							/*info->init = i8039_init;*/			break;
-		case CPUINFO_PTR_RESET:							info->reset = i8039_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = i8039_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = i8039_execute;			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i8039_dasm;			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &i8039_ICount;			break;
+		case CPUINFO_PTR_SET_INFO:								info->setinfo = mcs48_set_info;			break;
+		case CPUINFO_PTR_GET_CONTEXT:							info->getcontext = mcs48_get_context;	break;
+		case CPUINFO_PTR_SET_CONTEXT:							info->setcontext = mcs48_set_context;	break;
+		case CPUINFO_PTR_INIT:									/*info->init = i8039_init;*/			break;
+		case CPUINFO_PTR_RESET:									info->reset = mcs48_reset;				break;
+		case CPUINFO_PTR_EXECUTE:								info->execute = mcs48_execute;			break;
+		case CPUINFO_PTR_BURN:									info->burn = NULL;						break;
+		case CPUINFO_PTR_DISASSEMBLE:							info->disassemble = mcs48_dasm;			break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:					info->icount = &mcs48_icount;			break;
 		
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	/*info->internal_map8 = address_map_program_10bit;*/ break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		/*info->internal_map8 = address_map_data_7bit;*/ break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: /*info->internal_map8 = address_map_program_10bit;*/ break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 	/*info->internal_map8 = address_map_data_7bit;*/ break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							/*strcpy(info->s, "I8039");*/			break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Intel 8039");			break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.2");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Mirko Buffoni\nBased on the original work Copyright Dan Boris"); break;
+		case CPUINFO_STR_NAME:									/*strcpy(info->s, "I8039");*/			break;
+		case CPUINFO_STR_CORE_FAMILY:							strcpy(info->s, "Intel 8039");			break;
+		case CPUINFO_STR_CORE_VERSION:							strcpy(info->s, "1.2");					break;
+		case CPUINFO_STR_CORE_FILE:								strcpy(info->s, __FILE__);				break;
+		case CPUINFO_STR_CORE_CREDITS:							strcpy(info->s, "Copyright Mirko Buffoni\nBased on the original work Copyright Dan Boris"); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c %c%c%c%c%c%c%c%c",
-				R.A11        ? 'M':'.',
-				R.PSW & 0x80 ? 'C':'.',
-				R.PSW & 0x40 ? 'A':'.',
-				R.PSW & 0x20 ? 'F':'.',
-				R.PSW & 0x10 ? 'B':'.',
-				R.PSW & 0x08 ? '?':'.',
-				R.PSW & 0x04 ? '4':'.',
-				R.PSW & 0x02 ? '2':'.',
-				R.PSW & 0x01 ? '1':'.');
+				mcs48.a11        ? 'M':'.',
+				PSW & 0x80 ? 'C':'.',
+				PSW & 0x40 ? 'a':'.',
+				PSW & 0x20 ? 'F':'.',
+				PSW & 0x10 ? 'B':'.',
+				PSW & 0x08 ? '?':'.',
+				PSW & 0x04 ? '4':'.',
+				PSW & 0x02 ? '2':'.',
+				PSW & 0x01 ? '1':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + I8039_PC:			sprintf(info->s, "PC:%04X", R.PC.w.l); break;
-		case CPUINFO_STR_REGISTER + I8039_SP:			sprintf(info->s, "SP:%02X", R.SP); break;
-		case CPUINFO_STR_REGISTER + I8039_PSW:			sprintf(info->s, "PSW:%02X", R.PSW); break;
-		case CPUINFO_STR_REGISTER + I8039_A:			sprintf(info->s, "A:%02X", R.A); break;
-		case CPUINFO_STR_REGISTER + I8039_TC:			sprintf(info->s, "TC:%02X", R.timer); break;
-		case CPUINFO_STR_REGISTER + I8039_P1:			sprintf(info->s, "P1:%02X", R.P1); break;
-		case CPUINFO_STR_REGISTER + I8039_P2:			sprintf(info->s, "P2:%02X", R.P2); break;
-		case CPUINFO_STR_REGISTER + I8039_R0:			sprintf(info->s, "R0:%02X", R0); break;
-		case CPUINFO_STR_REGISTER + I8039_R1:			sprintf(info->s, "R1:%02X", R1); break;
-		case CPUINFO_STR_REGISTER + I8039_R2:			sprintf(info->s, "R2:%02X", R2); break;
-		case CPUINFO_STR_REGISTER + I8039_R3:			sprintf(info->s, "R3:%02X", R3); break;
-		case CPUINFO_STR_REGISTER + I8039_R4:			sprintf(info->s, "R4:%02X", R4); break;
-		case CPUINFO_STR_REGISTER + I8039_R5:			sprintf(info->s, "R5:%02X", R5); break;
-		case CPUINFO_STR_REGISTER + I8039_R6:			sprintf(info->s, "R6:%02X", R6); break;
-		case CPUINFO_STR_REGISTER + I8039_R7:			sprintf(info->s, "R7:%02X", R7); break;
-		case CPUINFO_STR_REGISTER + I8039_EA:			sprintf(info->s, "EA:%02X", R.EA); break;
+		case CPUINFO_STR_REGISTER + MCS48_PC:					sprintf(info->s, "PC:%04X", PC); 		break;
+		case CPUINFO_STR_REGISTER + MCS48_PSW:					sprintf(info->s, "PSW:%02X", PSW); 		break;
+		case CPUINFO_STR_REGISTER + MCS48_A:					sprintf(info->s, "A:%02X", A); 			break;
+		case CPUINFO_STR_REGISTER + MCS48_TC:					sprintf(info->s, "TC:%02X", mcs48.timer); break;
+		case CPUINFO_STR_REGISTER + MCS48_P1:					sprintf(info->s, "P1:%02X", mcs48.p1); 	break;
+		case CPUINFO_STR_REGISTER + MCS48_P2:					sprintf(info->s, "P2:%02X", mcs48.p2); 	break;
+		case CPUINFO_STR_REGISTER + MCS48_R0:					sprintf(info->s, "R0:%02X", R0);		break;
+		case CPUINFO_STR_REGISTER + MCS48_R1:					sprintf(info->s, "R1:%02X", R1); 		break;
+		case CPUINFO_STR_REGISTER + MCS48_R2:					sprintf(info->s, "R2:%02X", R2); 		break;
+		case CPUINFO_STR_REGISTER + MCS48_R3:					sprintf(info->s, "R3:%02X", R3); 		break;
+		case CPUINFO_STR_REGISTER + MCS48_R4:					sprintf(info->s, "R4:%02X", R4); 		break;
+		case CPUINFO_STR_REGISTER + MCS48_R5:					sprintf(info->s, "R5:%02X", R5); 		break;
+		case CPUINFO_STR_REGISTER + MCS48_R6:					sprintf(info->s, "R6:%02X", R6); 		break;
+		case CPUINFO_STR_REGISTER + MCS48_R7:					sprintf(info->s, "R7:%02X", R7); 		break;
+		case CPUINFO_STR_REGISTER + MCS48_EA:					sprintf(info->s, "EA:%02X", mcs48.ea); 	break;
 	}
 }
 
 
 
-/**************************************************************************
- * CPU-specific get_info/set_info
- **************************************************************************/
+/***************************************************************************
+    CPU-SPECIFIC CONTEXT ACCESS
+***************************************************************************/
 
 #if (HAS_I8035)
 void i8035_get_info(UINT32 state, cpuinfo *info)
@@ -1052,7 +1127,7 @@ void i8035_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = i8035_init;							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8035");							break;
-		default:														generic_get_info(state, info);						break;
+		default:														mcs48_get_info(state, info);						break;
 	}
 }
 #endif
@@ -1068,7 +1143,7 @@ void i8041_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = i8035_init;							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8041");							break;
-		default:														generic_get_info(state, info);						break;
+		default:														mcs48_get_info(state, info);						break;
 	}
 }
 #endif
@@ -1084,7 +1159,7 @@ void i8048_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = i8035_init;							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8048");							break;
-		default:														generic_get_info(state, info);						break;
+		default:														mcs48_get_info(state, info);						break;
 	}
 }
 #endif
@@ -1100,7 +1175,7 @@ void i8648_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = i8035_init;							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8648");							break;
-		default:														generic_get_info(state, info);						break;
+		default:														mcs48_get_info(state, info);						break;
 	}
 }
 #endif
@@ -1116,7 +1191,7 @@ void i8748_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = i8035_init;							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8748");							break;
-		default:														generic_get_info(state, info);						break;
+		default:														mcs48_get_info(state, info);						break;
 	}
 }
 #endif
@@ -1132,7 +1207,7 @@ void mb8884_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = i8035_init;							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "MB8884");							break;
-		default:														generic_get_info(state, info);						break;
+		default:														mcs48_get_info(state, info);						break;
 	}
 }
 #endif
@@ -1148,7 +1223,7 @@ void n7751_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = i8035_init;							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "N7751");							break;
-		default:														generic_get_info(state, info);						break;
+		default:														mcs48_get_info(state, info);						break;
 	}
 }
 #endif
@@ -1165,7 +1240,7 @@ void i8039_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = i8039_init;							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8039");							break;
-		default:														generic_get_info(state, info);						break;
+		default:														mcs48_get_info(state, info);						break;
 	}
 }
 #endif
@@ -1181,7 +1256,7 @@ void i8049_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = i8039_init;							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8049");							break;
-		default:														generic_get_info(state, info);						break;
+		default:														mcs48_get_info(state, info);						break;
 	}
 }
 #endif
@@ -1197,7 +1272,7 @@ void i8749_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = i8039_init;							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8749");							break;
-		default:														generic_get_info(state, info);						break;
+		default:														mcs48_get_info(state, info);						break;
 	}
 }
 #endif
@@ -1210,9 +1285,9 @@ void m58715_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 12;										break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 7;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
-		case CPUINFO_PTR_INIT:											info->init = m58715_init;							break;
+		case CPUINFO_PTR_INIT:											info->init = i8039_init;							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "M58715");							break;
-		default:														generic_get_info(state, info);						break;
+		default:														mcs48_get_info(state, info);						break;
 	}
 }
 #endif

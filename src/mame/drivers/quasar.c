@@ -125,8 +125,6 @@ static WRITE8_HANDLER( quasar_bullet_w )
 	cvs_bullet_ram[offset] = (data ^ 0xff);
 }
 
-static int Quasar_T1=0;
-static int Quasar_Command=0;
 //static int sh_page=0;
 
 static WRITE8_HANDLER( quasar_sh_command_w )
@@ -137,30 +135,22 @@ static WRITE8_HANDLER( quasar_sh_command_w )
 	// lower nibble = command to I8035
 	// not necessarily like this, but it seems to work better than direct mapping
 	// (although schematics has it as direct - but then the schematics are wrong elsewhere to!)
-	Quasar_Command = (data & 8) + ((data >> 1) & 3) + ((data << 2) & 4);
-	Quasar_T1      = (Quasar_Command != 15);
+	soundlatch_w(machine, 0, (data & 8) + ((data >> 1) & 3) + ((data << 2) & 4));
 }
 
 static READ8_HANDLER( quasar_sh_command_r )
 {
-	// Clear T1 signal
-	Quasar_T1 = 0;
-
-	// Testing ...
-	// return input_port_read(machine, "DSW2");
-
-	// Add in sound DIP switch
-	return (Quasar_Command) + (input_port_read(machine, "DSW2") & 0x30);
+	return soundlatch_r(machine, 0) + (input_port_read(machine, "DSW2") & 0x30);
 }
 
-static READ8_HANDLER( Quasar_T1_r )
+static READ8_HANDLER( audio_t1_r )
 {
-	return Quasar_T1;
+	return (soundlatch_r(machine, 0) == 0);
 }
 
-static WRITE8_HANDLER( Quasar_DAC_w )
+static WRITE8_HANDLER( audio_dac_w )
 {
-	dac_0_signed_data_w(machine,0,data);
+	dac_0_signed_data_w(machine, 0, data);
 }
 
 // memory map taken from the manual
@@ -192,23 +182,15 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_ROM)
+static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_ROM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readport_sound, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00    , 0x7F    ) AM_READ(SMH_RAM)
-	AM_RANGE(0x80    , 0x80    ) AM_READ(quasar_sh_command_r)
-	AM_RANGE(I8039_t1, I8039_t1) AM_READ(Quasar_T1_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport_sound, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00    , 0x7F    ) AM_WRITE(SMH_RAM)
-  	AM_RANGE(I8039_p1, I8039_p1) AM_WRITE(Quasar_DAC_w)
+static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x7f) AM_RAM
+	AM_RANGE(0x80, 0x80) AM_READ(quasar_sh_command_r)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(audio_t1_r)
+  	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(audio_dac_w)
 ADDRESS_MAP_END
 
 /************************************************************************
@@ -348,8 +330,8 @@ static MACHINE_DRIVER_START( quasar )
 	MDRV_CPU_VBLANK_INT("main", quasar_interrupt)
 
 	MDRV_CPU_ADD("sound",I8035,6000000)			/* 6MHz crystal divide by 15 in CPU */
-	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
-	MDRV_CPU_IO_MAP(readport_sound,writeport_sound)
+	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_IO_MAP(sound_portmap,0)
 
 	MDRV_MACHINE_START( cvs )
 

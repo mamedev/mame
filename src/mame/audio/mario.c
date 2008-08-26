@@ -23,7 +23,8 @@
 #define I8035_P1_R(M) (soundlatch3_r(M,0))
 #define I8035_P2_R(M) (soundlatch4_r(M,0))
 #define I8035_P1_W(M,D) soundlatch3_w(M,0,D)
-#define I8035_P2_W(M,D) soundlatch4_w(M,0,D)
+#define I8035_P2_W(M,D) do { soundlatch4_w(M,0,D); cputag_set_input_line(machine, "audio", MCS48_INPUT_EA, ((D) & 0x20) ? ASSERT_LINE : CLEAR_LINE); } while (0)
+
 
 #define I8035_P1_W_AH(M,B,D) I8035_P1_W(M,ACTIVEHIGH_PORT_BIT(I8035_P1_R(M),B,(D)))
 #define I8035_P2_W_AH(M,B,D) I8035_P2_W(M,ACTIVEHIGH_PORT_BIT(I8035_P2_R(M),B,(D)))
@@ -286,16 +287,6 @@ static READ8_HANDLER( mario_sh_t1_r )
 	return I8035_T_R(machine,1);
 }
 
-static READ8_HANDLER( mario_sh_ea_r )
-{
-#if USE_8039
-	return 1;
-#else
-	int p2 = (I8035_P2_R(machine) >> 5) & 1;
-	return p2 ^ 1;
-#endif
-}
-
 static READ8_HANDLER( mario_sh_tune_r )
 {
 	UINT8 *SND = memory_region(machine, "audio");
@@ -336,7 +327,7 @@ WRITE8_HANDLER( masao_sh_irqtrigger_w )
 	if (state->last == 1 && data == 0)
 	{
 		/* setting bit 0 high then low triggers IRQ on the sound CPU */
-		cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
+		cputag_set_input_line_and_vector(machine, "audio",0,HOLD_LINE,0xff);
 	}
 
 	state->last = data;
@@ -368,9 +359,9 @@ WRITE8_HANDLER( mario_sh3_w )
 	{
 		case 0: /* death */
 			if (data)
-				cpunum_set_input_line(machine, 1,0,ASSERT_LINE);
+				cputag_set_input_line(machine, "audio",0,ASSERT_LINE);
 			else
-				cpunum_set_input_line(machine, 1,0,CLEAR_LINE);
+				cputag_set_input_line(machine, "audio",0,CLEAR_LINE);
 			break;
 		case 1: /* get coin */
 			I8035_T_W_AH(machine,0,data & 1);
@@ -408,11 +399,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mario_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READWRITE(mario_sh_tune_r, mario_sh_sound_w)
-	AM_RANGE(I8039_p1, I8039_p1) AM_READWRITE(mario_sh_p1_r, mario_sh_p1_w)
-	AM_RANGE(I8039_p2, I8039_p2) AM_READWRITE(mario_sh_p2_r, mario_sh_p2_w)
-	AM_RANGE(I8039_t0, I8039_t0) AM_READ(mario_sh_t0_r)
-	AM_RANGE(I8039_t1, I8039_t1) AM_READ(mario_sh_t1_r)
-	AM_RANGE(I8039_ea, I8039_ea) AM_READ(mario_sh_ea_r)	/* only for documentation purposes right now */
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(mario_sh_p1_r, mario_sh_p1_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(mario_sh_p2_r, mario_sh_p2_w)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(mario_sh_t0_r)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(mario_sh_t1_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( masao_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
