@@ -2807,7 +2807,6 @@ static void menu_select_game(running_machine *machine, ui_menu *menu, void *para
 {
 	select_game_state *menustate;
 	const ui_menu_event *event;
-	int changed = FALSE;
 
 	/* if no state, allocate some */
 	if (state == NULL)
@@ -2865,7 +2864,7 @@ static void menu_select_game(running_machine *machine, ui_menu *menu, void *para
 				/* otherwise, display an error */
 				else
 				{
-					changed = TRUE;
+					ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_REF);
 					menustate->error = TRUE;
 				}
 			}
@@ -2888,7 +2887,7 @@ static void menu_select_game(running_machine *machine, ui_menu *menu, void *para
 			{
 				*(char *)utf8_previous_char(&menustate->search[buflen]) = 0;
 				menustate->rerandomize = TRUE;
-				changed = TRUE;
+				ui_menu_reset(menu, UI_MENU_RESET_SELECT_FIRST);
 			}
 
 			/* if it's any other key and we're not maxed out, update */
@@ -2896,7 +2895,7 @@ static void menu_select_game(running_machine *machine, ui_menu *menu, void *para
 			{
 				buflen += utf8_from_uchar(&menustate->search[buflen], ARRAY_LENGTH(menustate->search) - buflen, event->unichar);
 				menustate->search[buflen] = 0;
-				changed = TRUE;
+				ui_menu_reset(menu, UI_MENU_RESET_SELECT_FIRST);
 			}
 		}
 	}
@@ -2906,10 +2905,6 @@ static void menu_select_game(running_machine *machine, ui_menu *menu, void *para
 		ui_draw_text_box("The selected game is missing one or more required ROM or CHD images. "
 		                 "Please select a different game.\n\nPress any key to continue.",
 		                 JUSTIFY_CENTER, 0.5f, 0.5f, UI_REDCOLOR);
-
-	/* if we changed, force a redraw on the next go */
-	if (changed)
-		ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_REF);
 }
 
 
