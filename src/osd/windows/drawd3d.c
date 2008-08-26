@@ -1689,6 +1689,7 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 		DWORD usage = d3d->dynamic_supported ? D3DUSAGE_DYNAMIC : 0;
 		DWORD pool = d3d->dynamic_supported ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
 		int maxdim = MAX(d3d->presentation.BackBufferWidth, d3d->presentation.BackBufferHeight);
+		int attempt;
 
 		// pick the format
 		if (PRIMFLAG_GET_TEXFORMAT(flags) == TEXFORMAT_YUY16)
@@ -1710,45 +1711,62 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 		if (texture->xprescale != video_config.prescale || texture->yprescale != video_config.prescale)
 			mame_printf_verbose("Direct3D: adjusting prescale from %dx%d to %dx%d\n", video_config.prescale, video_config.prescale, texture->xprescale, texture->yprescale);
 
-		// screen textures with no prescaling are pretty easy
-		if (texture->xprescale == 1 && texture->yprescale == 1)
+		// loop until we allocate something or error
+		for (attempt = 0; attempt < 2; attempt++)
 		{
-			result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, usage, format, pool, &texture->d3dtex);
-			if (result != D3D_OK)
-				goto error;
-			texture->d3dfinaltex = texture->d3dtex;
-			texture->type = d3d->dynamic_supported ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
-		}
+			// second attempt is always 1:1
+			if (attempt == 1)
+				texture->xprescale = texture->yprescale = 1;
 
-		// screen textures with prescaling require two allocations
-		else
-		{
-			int scwidth, scheight;
-
-			// use an offscreen plain surface for stretching if supported
-			if (d3d->stretch_supported)
-			{
-				result = (*d3dintf->device.create_offscreen_plain_surface)(d3d->device, texture->rawwidth, texture->rawheight, format, D3DPOOL_DEFAULT, &texture->d3dsurface);
-				if (result != D3D_OK)
-					goto error;
-				texture->type = TEXTURE_TYPE_SURFACE;
-			}
-
-			// otherwise, we allocate a dynamic texture for the source
-			else
+			// screen textures with no prescaling are pretty easy
+			if (texture->xprescale == 1 && texture->yprescale == 1)
 			{
 				result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, usage, format, pool, &texture->d3dtex);
-				if (result != D3D_OK)
-					goto error;
-				texture->type = d3d->dynamic_supported ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
+				if (result == D3D_OK)
+				{
+					texture->d3dfinaltex = texture->d3dtex;
+					texture->type = d3d->dynamic_supported ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
+					break;
+				}
 			}
 
-			// for the target surface, we allocate a render target texture
-			scwidth = texture->rawwidth * texture->xprescale;
-			scheight = texture->rawheight * texture->yprescale;
-			result = (*d3dintf->device.create_texture)(d3d->device, scwidth, scheight, 1, D3DUSAGE_RENDERTARGET, format, D3DPOOL_DEFAULT, &texture->d3dfinaltex);
-			if (result != D3D_OK)
-				goto error;
+			// screen textures with prescaling require two allocations
+			else
+			{
+				int scwidth, scheight;
+				int finalfmt;
+
+				// use an offscreen plain surface for stretching if supported
+				// (won't work for YUY textures)
+				if (d3d->stretch_supported && PRIMFLAG_GET_TEXFORMAT(flags) != TEXFORMAT_YUY16)
+				{
+					result = (*d3dintf->device.create_offscreen_plain_surface)(d3d->device, texture->rawwidth, texture->rawheight, format, D3DPOOL_DEFAULT, &texture->d3dsurface);
+					if (result != D3D_OK)
+						continue;
+					texture->type = TEXTURE_TYPE_SURFACE;
+				}
+
+				// otherwise, we allocate a dynamic texture for the source
+				else
+				{
+					result = (*d3dintf->device.create_texture)(d3d->device, texture->rawwidth, texture->rawheight, 1, usage, format, pool, &texture->d3dtex);
+					if (result != D3D_OK)
+						continue;
+					texture->type = d3d->dynamic_supported ? TEXTURE_TYPE_DYNAMIC : TEXTURE_TYPE_PLAIN;
+				}
+
+				// for the target surface, we allocate a render target texture
+				scwidth = texture->rawwidth * texture->xprescale;
+				scheight = texture->rawheight * texture->yprescale;
+				
+				// target surfaces typically cannot be YCbCr, so we always pick RGB in that case
+ 				finalfmt = (format != d3d->yuv_format) ? format : D3DFMT_A8R8G8B8;
+				result = (*d3dintf->device.create_texture)(d3d->device, scwidth, scheight, 1, D3DUSAGE_RENDERTARGET, finalfmt, D3DPOOL_DEFAULT, &texture->d3dfinaltex);
+				if (result == D3D_OK)
+					break;
+				(*d3dintf->texture.release)(texture->d3dtex);
+				texture->d3dtex = NULL;
+			}
 		}
 	}
 
