@@ -5,7 +5,7 @@ various SNK triple Z80 games
 
 
 ym3526
-Tank
+ASO, Tank
 
 ym3526x2
 Athena, Ikari
@@ -665,7 +665,6 @@ static ADDRESS_MAP_START( aso_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE(2)
 	AM_RANGE(0xd800, 0xe7ff) AM_RAM_WRITE(aso_bg_videoram_w) AM_SHARE(3)
-	AM_RANGE(0xe800, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(4)
 ADDRESS_MAP_END
 
