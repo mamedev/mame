@@ -46,8 +46,11 @@ Notes:
   1987 worldwar: keep F2 pressed during boot
   1987 gwar: keep F2 pressed during boot
   1987 psychos: use the service mode dip switch
-  1988 fitegolf: use the service mode dip switch
+  1987 tdfever: keep F2 pressed during boot
+  1988 tdfever2: keep F2 pressed during boot
   1988 chopper: keep F2 pressed during boot
+  1988 fsoccer: use the service mode dip switch
+  1988 fitegolf: use the service mode dip switch
 
 - the I/O area (C000-CFFF) is probably mirrored in large part on the two main
   CPUs, however I mapped only the addresses actually used by the games.
@@ -121,6 +124,23 @@ Notes:
   bermudaa/worldwar. Perhaps they realised that as a protection device it was
   useless since the game doesn't use the hardware after the check.
 
+- tdfever2: though the gfx appear strange on the vs. screens / choose number of
+  players screens eg. the numbers aren't in the boxes, they're in the lower
+  right corners, and there is no background color like there is in tdfever, this
+  is not a bug, it is confirmed to be correct against the pcb.
+
+- the gwarb bootleg has two Y8950 instead of YM3526+Y8950. However, the sound
+  program ROM is identical to gwar, so the replacement Y8950 is definitely used
+  only in its YM3526 compatible part, without using its additional ADPCM
+  capabilities. It should be noted that the gwara sound program has a small
+  patch that apparently would set two extra bits in register 04 which should
+  only exist in the Y8950, not in the YM3526.
+
+- while tdfever2 does write to the addresses where the YM3526 is mapped in
+  tdfever, those seem to be bogus writes since it causes sound to malfunction
+  (a continuous scale is played by the Y8950). Taking the YM3526 out appears to
+  fix the problem since all game sounds are apparently played by the Y8950 alone.
+
 
 TODO:
 -----
@@ -139,128 +159,22 @@ TODO:
 
 - gwar: unknown writes to CA00/CA40. Always 0?
 
+- tdfever/fsoccer: the dots in the radar flicker. In fsoccer, this is greatly
+  improved by forcing partial screen updates when the sprite RAM is changed (see
+  snk68.c for another game that needs this). tdfever dots still flicker a lot,
+  however I'm not sure if this is an emulation bug or the real game behaviour.
 
-
-Bryan McPhail, 27/01/00:
-
-Oct. 5, 2003:
-
-  Added tdfever2, all ROMs are replacements for those in tdfever except
-  td22.6l, td21.6k, and td20.8k. Though the gfx appear strange on the vs.
-  screens / choose number of players screens eg. the numbers aren't in the
-  boxes, they're in the lower right corners, and there is no background color
-  like there is in tdfever, this is not a bug, we have confirmed it to be
-  correct against my pcb.
-
-
-Stephh's notes (based on the games Z80 code and some tests) :
-
-1)  'fsoccerb'
-
-  - The code to support the rotary jotsticks has been removed and/or patched
-    in this version (check the 'jmp' instruction at 0x00f1).
-    I'm SURE that I've played a version in France with the rotary joysticks,
-    and IMO it isn't dumped at the moment 8(
-
-  - DEF_STR( Game_Time ) Dip Switch is the time for match type A. Here is what you
-    have to add for games B to E :
-
-      Match Type       B        C        D        E
-      Time to add    00:30    01:00    01:30    02:00
-
-  - When "Game Mode" Dip Switch is set to "Win Match Against CPU", this has an
-    effect on matches types A and B : player is awarded 99 goals at the end of
-    the round, which is enough to win all matches then see the ending credits.
-
-  - Here are the buttons mapped to start a game :
-      * IPT_START1    : starts game A
-      * IPT_START2    : starts game B
-      * IPT_START3    : starts game C
-      * IPT_START4    : starts game D
-      * IPT_SERVICE2  : starts game E
-
-
-AT042903:
- - fixed Psycho Soldier lyrics tempo
- - cleaned garbage tiles in Bermuda Triangle and improved sprite priority
- - corrected tile ROM loading in Bermuda(alt)/Worldwar
- - corrected sound ROM loading and palette in Touchdown Fever
- - various sprite adjustments from MAME32 plus
-
-AT08XX03:
- - revamped CPU handshaking, improved clipping and made changes public to
-   marvins.c, hal21.c and sgladiat.c
-
- - notes:
-    Mad Crasher and Gladiator(sgladiat.c) have different memory maps but
-    their code base and port layouts are quite similar. The following are
-    some distinctive designs of these two games common to many other SNK
-    triple Z80 boards made in the mid-80's.
-
-    1) Shared RAM
-
-        The "shared" RAM in Mad Crasher is more appropriately
-        "switched" RAM. Marvin's schematics indicate selector
-        circuits and when a CPU wants to access specific part of
-        the memory it will write to the first byte of the 4k page
-        and give the selector a few cycles to settle.
-
-        It is not known what exactly happens when more than one CPU
-        try to access the same page.
-
-    2) IRQ
-
-        CPUA starts recalculating game logic and constructing
-        sprites for the next frame upon receiving IRQ0. When CPUB
-        receives its own IRQ0 it copies sprite data prepared by
-        CPUA in the previous frame to VRAM and updates scroll
-        registers. The process takes about 2ms which fits in vblank
-        nicely. However, if CPUA modifies sprite data before
-        blitting is complete sprites for the current frame may get
-        overwritten by those for the next and it creates a funny
-        rubber-band effect.
-
-        In essence CPUA's IRQ0 should fire 1-2ms later than CPUB's
-        to maintain visual stability. Increasing the delay will only
-        waste cycles in idle loops. Note that certain games may have
-        CPUA and B switched roles.
-
-    3) NMI
-
-        CPUA and B handshake through NMIs. They were implemented in
-        all SNK triple Z80 drivers as
-
-            ENABLE->SIGNAL->HOLDUP->MAKEUP->ACKNOWLEDGE
-
-        but upon close examination of the games code no evidence of
-        any game relying on this behavior to function correctly was
-        found. Sometimes it even has adverse effects by triggering
-        extra NMI's therefore handshaking has been reduced to basic
-
-            SIGNAL->ACKNOWLEDGE
-
-    4) Sound Latching
-
-        Each game has a byte-size sound command port being
-        represented by Marvin's scheme as a single unit consists
-        of one flip-flop and two latches. The flip-flop may be
-        responsible for the sound busy flag but the second latch's
-        function is unclear. HAL21 seems to have the most complex
-        soundlatch circuit and the hardware is able to report
-        playback status in six different bits.
-
-        The sound busy flag is raised when CPUA writes to the
-        soundlatch and is lowered when a designated port is read.
-        For games based on Marvin's hardware the designated port is
-        the soundlatch itself. Most games clear the flag within the
-        alerting IRQ autonomously but some like ASO and HAL21 do it
-        shortly after the sound CPU has finished modulating an effect.
+- psychos: in all games using the gwar video, palette colors 0x180-0x1ff are not
+  used because bit 3 of the sprite attribute is used for tile bank select instead.
+  In all games, those colors 0x180-0x1ff are a copy of 0x100-0x17f so even if the
+  bit was wired to the palette, it would make no difference. In psychos, however,
+  the colors are different. Game colors appear to be correct as they are, and
+  connecting bit 3 would break them, so it's unknown if colors 0x180-0x1ff should
+  be used and how.
 
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
-#include "cpu/z80/z80.h"
 #include "snk.h"
 #include "sound/3812intf.h"
 
@@ -268,27 +182,7 @@ AT08XX03:
 static int countryc_trackball;
 
 /*********************************************************************/
-// Variables and Interrupt Handlers Common to All SNK Triple Z80 Games
-
-int snk_gamegroup = 0;
-int snk_sound_busy_bit = 0;
-int snk_irq_delay = 1500;
-
-// see IRQ notes in drivers\marvins.c
-static TIMER_CALLBACK( irq_trigger_callback ) { cpunum_set_input_line(machine, param, 0, HOLD_LINE); }
-
-INTERRUPT_GEN( snk_irq_AB )
-{
-	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
-	timer_set(ATTOTIME_IN_USEC(snk_irq_delay), NULL, 1, irq_trigger_callback);
-}
-
-INTERRUPT_GEN( snk_irq_BA )
-{
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
-	timer_set(ATTOTIME_IN_USEC(snk_irq_delay), NULL, 0, irq_trigger_callback);
-}
-
+// Interrupt Handlers Common to All SNK Triple Z80 Games
 
 READ8_HANDLER ( snk_cpuA_nmi_trigger_r )
 {
@@ -314,78 +208,29 @@ WRITE8_HANDLER( snk_cpuB_nmi_ack_w )
 
 /*********************************************************************/
 
-#define SNK_MAX_INPUT_PORTS 13
-
-typedef enum {
-	SNK_UNUSED,
-	SNK_INP0,
-	SNK_INP1,SNK_INP2,SNK_INP3,SNK_INP4,
-	SNK_INP5,SNK_INP6,SNK_INP7,SNK_INP8,
-	SNK_DSW1,SNK_DSW2,SNK_INP9,
-	SNK_ROT_PLAYER1, SNK_ROT_PLAYER2
-} SNK_INPUT_PORT_TYPE;
-
-UINT8 *snk_rambase;
-static UINT8 *io_ram;
-static const SNK_INPUT_PORT_TYPE *snk_io; /* input port configuration */
-
-/*********************************************************************/
-
 /*
-    This 4 bit register is mapped at 0xf800.
+	All games except for tnk3 have the same sound status flag handling.
 
-    Writes to this register always contain 0x0f in the lower nibble.
-    The upper nibble contains a mask, which clears bits
+	This 4 bit register is mapped at 0xf800.
 
-    bit 0:  set by YM3526/YM3812 callback?
-    bit 1:  set by Y8950 callback?
-    bit 2:  sound cpu busy
-    bit 3:  sound command pending
+	Writes to this register always contain 0x0f in the lower nibble.
+	The upper nibble contains a mask, which clears bits
+
+	bit 0:  irq request from first YM chip
+	bit 1:  irq request from second YM chip
+	bit 2:  sound cpu busy
+	bit 3:  sound command pending
+
+	The main CPU can read the busy flag using an input port.
+
+	tnk3 is an earlier design and is different. There are only three status
+	bits since there is only one YM chip, and the bits are cleared using
+	separate memory addresses. Additionally, clearing the cmd irq also
+	clears the sound latch.
 */
-static int snk_sound_register;
 
-/*********************************************************************/
-
-
-static int snk_rot( running_machine *machine, int which )
-{
-	static const char *ports[] = { "IN1", "IN2" };
-
-	return input_port_read(machine, ports[which]);
-}
-
-static int snk_input_port_r( running_machine *machine, int which ){
-	switch( snk_io[which] )
-	{
-		case SNK_INP0:
-		{
-			int value = input_port_read(machine, "IN0");
-			if( (snk_sound_register & 0x04) == 0 ) value &= ~snk_sound_busy_bit;
-			return value;
-		}
-
-		case SNK_ROT_PLAYER1: return snk_rot(machine, 0);
-		case SNK_ROT_PLAYER2: return snk_rot(machine, 1);
-
-		case SNK_INP1: return input_port_read(machine, "IN1");
-		case SNK_INP2: return input_port_read(machine, "IN2");
-		case SNK_INP3: return input_port_read(machine, "IN3");
-		case SNK_INP4: return input_port_read(machine, "IN4");
-		case SNK_INP5: return input_port_read(machine, "IN5");
-		case SNK_INP6: return input_port_read(machine, "IN6");
-		case SNK_INP7: return input_port_read(machine, "IN7");
-		case SNK_INP8: return input_port_read(machine, "IN8");
-		case SNK_INP9: return input_port_read(machine, "IN9");
-
-		case SNK_DSW1: return input_port_read(machine, "DSW1");
-		case SNK_DSW2: return input_port_read(machine, "DSW2");
-
-		default:
-		logerror("read from unmapped input port:%d\n", which );
-		break;
-	}
-	return 0;
-}
+// FIXME this should be initialised on machine reset
+static int sound_status;
 
 /*********************************************************************/
 
@@ -400,58 +245,44 @@ enum
 	CMDIRQ_CLEAR
 };
 
-// FIXME this should be initialised on machine reset
-static int irqstatus;
 
 static TIMER_CALLBACK( sndirq_update_callback )
 {
 	switch(param)
 	{
 		case YM1IRQ_ASSERT:
-			irqstatus |= 1;
+			sound_status |= 1;
 			break;
 
 		case YM1IRQ_CLEAR:
-			irqstatus &= ~1;
+			sound_status &= ~1;
 			break;
 
 		case YM2IRQ_ASSERT:
-			irqstatus |= 2;
+			sound_status |= 2;
 			break;
 
 		case YM2IRQ_CLEAR:
-			irqstatus &= ~2;
+			sound_status &= ~2;
 			break;
 
 		case CMDIRQ_BUSY_ASSERT:
-			irqstatus |= 8|4;
+			sound_status |= 8|4;
 			break;
 
 		case BUSY_CLEAR:
-			irqstatus &= ~4;
+			sound_status &= ~4;
 			break;
 
 		case CMDIRQ_CLEAR:
-			irqstatus &= ~8;
+			sound_status &= ~8;
 			break;
 	}
 
-	cpunum_set_input_line(machine, 2, 0, (irqstatus & 0xb) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 2, 0, (sound_status & 0xb) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
-static WRITE8_HANDLER( tnk3_soundlatch_w )
-{
-	soundlatch_w(machine, offset, data);
-	timer_call_after_resynch(NULL, CMDIRQ_BUSY_ASSERT, sndirq_update_callback);
-}
-
-static READ8_HANDLER(tnk3_cmdirq_ack_r)
-{
-	soundlatch_w(machine, 0, 0);
-	timer_call_after_resynch(NULL, CMDIRQ_CLEAR, sndirq_update_callback);
-	return 0xff;
-}
 
 static void ymirq_callback_1(running_machine *machine, int irq)
 {
@@ -465,24 +296,13 @@ static void ymirq_callback_2(running_machine *machine, int irq)
 		timer_call_after_resynch(NULL, YM2IRQ_ASSERT, sndirq_update_callback);
 }
 
-static READ8_HANDLER(tnk3_ymirq_ack_r)
-{
-	timer_call_after_resynch(NULL, YM1IRQ_CLEAR, sndirq_update_callback);
-	return 0xff;
-}
 
-static READ8_HANDLER(tnk3_busy_clear_r)
-{
-	timer_call_after_resynch(NULL, BUSY_CLEAR, sndirq_update_callback);
-	return 0xff;
-}
-
-static const ym3526_interface athena_ym3526_config_1 =
+static const ym3526_interface ym3526_config_1 =
 {
 	ymirq_callback_1
 };
 
-static const ym3526_interface athena_ym3526_config_2 =
+static const ym3526_interface ym3526_config_2 =
 {
 	ymirq_callback_2
 };
@@ -492,29 +312,32 @@ static const ym3812_interface ym3812_config_1 =
 	ymirq_callback_1
 };
 
-static const y8950_interface victroad_y8950_config_2 =
+static const y8950_interface y8950_config_2 =
 {
 	ymirq_callback_2
 };
 
-static CUSTOM_INPUT( soundcmd_status )
+
+
+static WRITE8_HANDLER( snk_soundlatch_w )
 {
-	return (irqstatus & 4) ? 1 : 0;
+	soundlatch_w(machine, offset, data);
+	timer_call_after_resynch(NULL, CMDIRQ_BUSY_ASSERT, sndirq_update_callback);
+}
+
+static CUSTOM_INPUT( snk_sound_busy )
+{
+	return (sound_status & 4) ? 1 : 0;
 }
 
 
 
-static READ8_HANDLER(athena_sound_status_r)
+static READ8_HANDLER(snk_sound_status_r)
 {
-	return irqstatus;
+	return sound_status;
 }
 
-static READ8_HANDLER(athena_soundlatch_r)
-{
-	return soundlatch_r(machine, 0);
-}
-
-static WRITE8_HANDLER(athena_irq_ack_w)
+static WRITE8_HANDLER(snk_sound_status_w)
 {
 	if (~data & 0x10)	// ack YM1 irq
 		timer_call_after_resynch(NULL, YM1IRQ_CLEAR, sndirq_update_callback);
@@ -531,33 +354,23 @@ static WRITE8_HANDLER(athena_irq_ack_w)
 
 
 
-static WRITE8_HANDLER( snk_sound_register_w ){
-	snk_sound_register &= (data>>4);
+static READ8_HANDLER(tnk3_cmdirq_ack_r)
+{
+	soundlatch_w(machine, 0, 0);
+	timer_call_after_resynch(NULL, CMDIRQ_CLEAR, sndirq_update_callback);
+	return 0xff;
 }
 
-static READ8_HANDLER( snk_sound_register_r ){
-	return snk_sound_register;// | 0x2; /* hack; lets chopper1 play music */
+static READ8_HANDLER(tnk3_ymirq_ack_r)
+{
+	timer_call_after_resynch(NULL, YM1IRQ_CLEAR, sndirq_update_callback);
+	return 0xff;
 }
 
-static void snk_sound_callback0_w( running_machine *machine, int state ){ /* ? */
-	if( state ) snk_sound_register |= 0x01;
-}
-
-static void snk_sound_callback1_w( running_machine *machine, int state ){ /* ? */
-	if( state ) snk_sound_register |= 0x02;
-}
-
-static const ym3526_interface ym3526_interface_0 = {
-	snk_sound_callback0_w /* ? */
-};
-
-static const y8950_interface y8950_config = {
-	snk_sound_callback1_w /* ? */
-};
-
-static WRITE8_HANDLER( snk_soundlatch_w ){
-	snk_sound_register |= 0x08 | 0x04;
-	soundlatch_w( machine, offset, data );
+static READ8_HANDLER(tnk3_busy_clear_r)
+{
+	timer_call_after_resynch(NULL, BUSY_CLEAR, sndirq_update_callback);
+	return 0xff;
 }
 
 
@@ -734,6 +547,7 @@ static READ8_HANDLER(turbocheck32_3_r)	{ return turbofront_check8(0, 2*8); }
 static READ8_HANDLER(turbocheck32_4_r)	{ return turbofront_check8(0, 3*8); }
 
 
+
 /*****************************************************************************
 
 Guerrilla War protection
@@ -760,7 +574,8 @@ CUSTOM_INPUT( gwar_rotary )
 
 	if ((last_value[which] == 0x5 && value == 0x6) || (last_value[which] == 0x6 && value == 0x5))
 	{
-		if (!cp_count[which]) value = 0xf;
+		if (!cp_count[which])
+			value = 0xf;
 		cp_count[which] = (cp_count[which] + 1) & 0x07;
 	}
 	last_value[which] = value;
@@ -769,69 +584,8 @@ CUSTOM_INPUT( gwar_rotary )
 }
 
 
-/**********************  Tnk3, Athena, Fighting Golf ********************/
+/************************************************************************/
 
-static READ8_HANDLER( cpuA_io_r )
-{
-	switch( offset )
-	{
-		case 0x000: return snk_input_port_r(machine, 0);	// coin input, player start
-		case 0x100: return snk_input_port_r(machine, 1);	// joy1
-		case 0x180: return snk_input_port_r(machine, 2);	// joy2
-		case 0x200: return snk_input_port_r(machine, 3);	// joy3
-		case 0x280: return snk_input_port_r(machine, 4);	// joy4
-		case 0x300: return snk_input_port_r(machine, 5);	// aim1
-		case 0x380: return snk_input_port_r(machine, 6);	// aim2
-		case 0x400: return snk_input_port_r(machine, 7);	// aim3
-		case 0x480: return snk_input_port_r(machine, 8);	// aim4
-		case 0x500: return snk_input_port_r(machine, 9);	// unused by tdfever
-		case 0x580: return snk_input_port_r(machine, 10);	// dsw
-		case 0x600: return snk_input_port_r(machine, 11);	// dsw
-		case 0x080: return snk_input_port_r(machine, 12);	// player start (types C and D in 'fsoccer')
-
-		case 0x700: return(snk_cpuB_nmi_trigger_r(machine, 0));
-	}
-	return io_ram[offset];
-}
-
-static WRITE8_HANDLER( cpuA_io_w )
-{
-	switch( offset )
-	{
-		case 0x000:
-		break;
-
-		case 0x400: /* most games */
-		case 0x500: /* tdfever */
-		snk_soundlatch_w( machine, 0, data );
-		break;
-
-		case 0x700:
-		snk_cpuA_nmi_ack_w(machine, 0, 0);
-		break;
-
-		default:
-		io_ram[offset] = data;
-		break;
-	}
-}
-
-static READ8_HANDLER( cpuB_io_r )
-{
-	switch( offset )
-	{
-		case 0x000:
-		case 0x700: return(snk_cpuA_nmi_trigger_r(machine, 0));
-	}
-	return io_ram[offset];
-}
-
-static WRITE8_HANDLER( cpuB_io_w )
-{
-	io_ram[offset] = data;
-
-	if (offset==0 || offset==0x700) snk_cpuB_nmi_ack_w(machine, 0, 0);
-}
 
 static WRITE8_HANDLER( athena_coin_counter_w )
 {
@@ -854,6 +608,12 @@ static WRITE8_HANDLER( ikari_coin_counter_w )
 	}
 }
 
+static WRITE8_HANDLER( tdfever_coin_counter_w )
+{
+	coin_counter_w(0, data & 1);
+	coin_counter_w(1, data & 2);
+}
+
 static WRITE8_HANDLER( countryc_trackball_w )
 {
 	countryc_trackball = data & 1;
@@ -870,7 +630,7 @@ static CUSTOM_INPUT( countryc_trackball_y )
 }
 
 
-/**********************  Tnk3, Athena, Fighting Golf ********************/
+/************************************************************************/
 
 static ADDRESS_MAP_START( tnk3_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
@@ -880,7 +640,7 @@ static ADDRESS_MAP_START( tnk3_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	// c300 is an input in tnk3, output in athena/fitegolf (coin counter)
 	// and in countryc (trackball select) (see DRIVER_INIT).
 	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE(athena_coin_counter_w)
-	AM_RANGE(0xc400, 0xc400) AM_WRITE(tnk3_soundlatch_w)
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(snk_soundlatch_w)
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
@@ -912,7 +672,7 @@ static ADDRESS_MAP_START( ikari_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")
 	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE(ikari_coin_counter_w)	// ikarijp doesn't use the coin counter
-	AM_RANGE(0xc400, 0xc400) AM_WRITE(tnk3_soundlatch_w)
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(snk_soundlatch_w)
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
@@ -967,7 +727,7 @@ static ADDRESS_MAP_START( bermudat_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")
 	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE(ikari_coin_counter_w)
-	AM_RANGE(0xc400, 0xc400) AM_WRITE(tnk3_soundlatch_w)
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(snk_soundlatch_w)
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
@@ -999,9 +759,10 @@ static ADDRESS_MAP_START( bermudat_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xccd0, 0xccd0) AM_READ(turbocheck32_2_r)
 	AM_RANGE(0xcce0, 0xcce0) AM_READ(turbocheck32_3_r)
 	AM_RANGE(0xccf0, 0xccf0) AM_READ(turbocheck32_4_r)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(1) AM_BASE(&snk_bg_videoram)	// + work RAM
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(2) AM_BASE(&spriteram)	// + work ram
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(3) AM_BASE(&snk_fg_videoram)	// + work RAM
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(1) AM_BASE(&snk_bg_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(3) AM_BASE(&spriteram)	// + work ram
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(4) AM_BASE(&snk_fg_videoram)	// + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bermudat_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1016,9 +777,10 @@ static ADDRESS_MAP_START( bermudat_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc980, 0xc980) AM_WRITE(snk_sp32_scrolly_w)
 	AM_RANGE(0xc9c0, 0xc9c0) AM_WRITE(snk_sp32_scrollx_w)
 	AM_RANGE(0xca80, 0xca80) AM_WRITE(gwara_sp_scroll_msb_w)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(1)
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(3)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(1)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(3)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(4)
 ADDRESS_MAP_END
 
 
@@ -1028,7 +790,7 @@ static ADDRESS_MAP_START( gwar_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")
 	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE(ikari_coin_counter_w)
-	AM_RANGE(0xc400, 0xc400) AM_WRITE(tnk3_soundlatch_w)
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(snk_soundlatch_w)
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
@@ -1043,18 +805,20 @@ static ADDRESS_MAP_START( gwar_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xca00, 0xca00) AM_WRITENOP	// always 0?
 	AM_RANGE(0xca40, 0xca40) AM_WRITENOP	// always 0?
 	AM_RANGE(0xcac0, 0xcac0) AM_WRITE(gwar_sprite_split_point_w)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(1) AM_BASE(&snk_bg_videoram)	// + work RAM
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(2) AM_BASE(&spriteram)	// + work ram
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(3) AM_BASE(&snk_fg_videoram)	// + work RAM
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(1) AM_BASE(&snk_bg_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(3) AM_BASE(&spriteram)	// + work ram
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(4) AM_BASE(&snk_fg_videoram)	// + work RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gwar_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_fg_bank_w)	// char and palette bank
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(1)
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(3)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(1)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(3)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(4)
 ADDRESS_MAP_END
 
 
@@ -1064,13 +828,14 @@ static ADDRESS_MAP_START( gwara_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN1")
 	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN2")
 	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN3") AM_WRITE(ikari_coin_counter_w)
-	AM_RANGE(0xc400, 0xc400) AM_WRITE(tnk3_soundlatch_w)
+	AM_RANGE(0xc400, 0xc400) AM_WRITE(snk_soundlatch_w)
 	AM_RANGE(0xc500, 0xc500) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
 	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(1) AM_BASE(&snk_fg_videoram)	// + work RAM
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(2) AM_BASE(&snk_bg_videoram)	// + work RAM
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(3) AM_BASE(&spriteram)	// + work ram
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(2) AM_BASE(&snk_bg_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE(3)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(4) AM_BASE(&spriteram)	// + work ram
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(snk_bg_scrolly_w)
 	AM_RANGE(0xf840, 0xf840) AM_WRITE(snk_bg_scrollx_w)
 	AM_RANGE(0xf880, 0xf880) AM_WRITE(gwara_videoattrs_w)	// flip screen, scroll msb
@@ -1087,30 +852,57 @@ static ADDRESS_MAP_START( gwara_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(1)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(2)
-	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(3) AM_BASE(&spriteram)	// + work ram
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(2)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE(3)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM AM_SHARE(4) AM_BASE(&spriteram)	// + work ram
 	AM_RANGE(0xf8c0, 0xf8c0) AM_WRITE(gwar_fg_bank_w)	// char and palette bank
 ADDRESS_MAP_END
 
 
-
-/* Chopper I, T.D.Fever, Psycho S., Bermuda T. */
-
-static ADDRESS_MAP_START( cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tdfever_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(cpuA_io_r, cpuA_io_w) AM_BASE(&io_ram)
-	AM_RANGE(0xd000, 0xffff) AM_RAM AM_SHARE(1) AM_BASE(&snk_rambase)
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("IN0")
+	AM_RANGE(0xc080, 0xc080) AM_READ_PORT("IN1")
+	AM_RANGE(0xc100, 0xc100) AM_READ_PORT("IN2")
+	AM_RANGE(0xc180, 0xc180) AM_READ_PORT("IN3")
+	AM_RANGE(0xc200, 0xc200) AM_READ_PORT("IN4")
+	AM_RANGE(0xc280, 0xc280) AM_READ_PORT("IN5")
+	AM_RANGE(0xc300, 0xc300) AM_READ_PORT("IN6")
+	AM_RANGE(0xc380, 0xc380) AM_READ_PORT("IN7")
+	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("IN8")
+	AM_RANGE(0xc480, 0xc480) AM_READ_PORT("IN9")
+	AM_RANGE(0xc500, 0xc500) AM_WRITE(snk_soundlatch_w)
+	AM_RANGE(0xc580, 0xc580) AM_READ_PORT("DSW1")
+	AM_RANGE(0xc600, 0xc600) AM_READ_PORT("DSW2")
+	AM_RANGE(0xc680, 0xc680) AM_WRITE(tdfever_coin_counter_w)
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0xc800, 0xc800) AM_WRITE(snk_bg_scrolly_w)
+	AM_RANGE(0xc840, 0xc840) AM_WRITE(snk_bg_scrollx_w)
+	AM_RANGE(0xc880, 0xc880) AM_WRITE(gwara_videoattrs_w)	// flip screen, scroll msb
+	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_fg_bank_w)	// char and palette bank
+	AM_RANGE(0xc900, 0xc900) AM_WRITE(tdfever_sp_scroll_msb_w)
+	AM_RANGE(0xc980, 0xc980) AM_WRITE(snk_sp32_scrolly_w)
+	AM_RANGE(0xc9c0, 0xc9c0) AM_WRITE(snk_sp32_scrollx_w)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(1) AM_BASE(&snk_bg_videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(tdfever_spriteram_w) AM_SHARE(3) AM_BASE(&spriteram)	// + work ram
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(4) AM_BASE(&snk_fg_videoram)	// + work RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tdfever_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(cpuB_io_r, cpuB_io_w)
-	AM_RANGE(0xd000, 0xffff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xc000, 0xc000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// tdfever, tdfever2
+	AM_RANGE(0xc700, 0xc700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)	// fsoccer
+	AM_RANGE(0xc8c0, 0xc8c0) AM_WRITE(gwar_fg_bank_w)	// char and palette bank
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(snk_bg_videoram_w) AM_SHARE(1)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xe000, 0xf7ff) AM_RAM_WRITE(tdfever_spriteram_w) AM_SHARE(3)
+	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(4)
 ADDRESS_MAP_END
 
 /***********************************************************************/
 
-static ADDRESS_MAP_START( YM3526_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( tnk3_YM3526_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
@@ -1124,35 +916,22 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( YM3526_YM3526_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(athena_soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
 	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3526_write_port_0_w)
 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(ym3526_status_port_1_r, ym3526_control_port_1_w)
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(ym3526_write_port_1_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(athena_sound_status_r, athena_irq_ack_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( YM3812_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(athena_soundlatch_r)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
 	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3812_write_port_0_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(athena_sound_status_r, athena_irq_ack_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( victroad_YM3526_Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe800, 0xe800) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
-	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3526_write_port_0_w)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(y8950_status_port_0_r, y8950_control_port_0_w)
-	AM_RANGE(0xf400, 0xf400) AM_WRITE(y8950_write_port_0_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(athena_sound_status_r, athena_irq_ack_w)
-ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( YM3526_Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
@@ -1162,9 +941,8 @@ static ADDRESS_MAP_START( YM3526_Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3526_write_port_0_w)
 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(y8950_status_port_0_r, y8950_control_port_0_w)
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(y8950_write_port_0_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_register_r, snk_sound_register_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( YM3812_Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
@@ -1174,9 +952,8 @@ static ADDRESS_MAP_START( YM3812_Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3812_write_port_0_w)
 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(y8950_status_port_0_r, y8950_control_port_0_w)
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(y8950_write_port_0_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(athena_sound_status_r, athena_irq_ack_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
@@ -1184,7 +961,7 @@ static ADDRESS_MAP_START( Y8950_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(y8950_status_port_0_r, y8950_control_port_0_w)
 	AM_RANGE(0xf400, 0xf400) AM_WRITE(y8950_write_port_0_w)
-	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_register_r, snk_sound_register_w)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(snk_sound_status_r, snk_sound_status_w)
 ADDRESS_MAP_END
 
 /*********************************************************************/
@@ -1196,7 +973,7 @@ static INPUT_PORTS_START( tnk3 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundcmd_status, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1276,7 +1053,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( athena )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundcmd_status, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1360,7 +1137,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( fitegolf )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundcmd_status, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )  /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )	// same as the dip switch
@@ -1476,7 +1253,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( ikari )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundcmd_status, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1567,7 +1344,7 @@ static INPUT_PORTS_START( ikarijp )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundcmd_status, 0)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_TILT )  /* reset */
 
@@ -1601,7 +1378,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( victroad )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundcmd_status, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )  /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1703,7 +1480,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( bermudat )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundcmd_status, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT ) /* tilt? */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1824,7 +1601,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( gwar )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundcmd_status, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )	/* tilt? causes reset */
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
@@ -1914,7 +1691,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( psychos )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundcmd_status, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )  /* reset */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1996,7 +1773,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( chopper )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(soundcmd_status, 0)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )  /* Reset */
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
@@ -2107,23 +1884,169 @@ static INPUT_PORTS_START( choppera )
 INPUT_PORTS_END
 
 
-
-
-
-
-
-static INPUT_PORTS_START( fsoccer )
+static INPUT_PORTS_START( tdfever )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound CPU status */
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start Game A")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Start Game B")
 
 	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 ) PORT_NAME("Start Game C")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 ) PORT_NAME("Start Game D")
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+
+	PORT_START("IN4")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START5 ) PORT_NAME("Start Game E")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+
+	PORT_START("IN5")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
+
+	PORT_START("IN6")
+	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN7")
+	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN8")
+	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(3)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN9")
+	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(4)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x02, "2 Player Upright" )
+	PORT_DIPSETTING(    0x00, "4 Player Cocktail" )
+	PORT_DIPNAME( 0x0c, 0x00, "1st Down Bonus Time" ) PORT_DIPLOCATION("DSW1:3,4")
+	PORT_DIPSETTING(    0x00, "Every 1st Down" )
+	PORT_DIPSETTING(    0x04, "Every 4 1st Downs" )
+	PORT_DIPSETTING(    0x08, "Every 6 1st Downs" )
+	PORT_DIPSETTING(    0x0c, "Every 8 1st Downs" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DSW1:5,6")
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DSW1:7,8")	/* Manual shows these two as blank */
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:1,2")
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" ) PORT_DIPLOCATION("DSW2:3,4")
+	PORT_DIPSETTING(    0x0c, "Demo Sound Off" )
+	PORT_DIPSETTING(    0x08, "Demo Sound On" )
+	PORT_DIPSETTING(    0x00, "Freeze" )
+	PORT_DIPSETTING(    0x04, "Never Finish (Cheat)")
+/*
+Actual Play Times listed in manual based on Players & cabinet type:
+
+                Upright/Cocktail     Cocktail Only
+ Dip Switch       A       B         C      D      E    <-- Start button "MODE"
+ SW6 SW7 SW8    1PvsCPU 2PvsCPU   1Pvs2P 2Pvs1P 2Pvs2P
+ OFF OFF OFF     1:00    1:10      2:00   2:10   3:00
+ ON  OFF OFF     1:10    1:20      2:10   2:20   3:10
+ OFF ON  OFF     1:20    1:30      2:20   2:30   3:20
+ ON  ON  OFF     1:30    1:40      2:30   2:40   3:30
+ OFF OFF ON      1:40    1:50      2:40   2:50   3:40
+ ON  OFF ON      1:50    2:00      2:50   3:00   3:50
+ OFF ON  ON      2:00    2:10      3:00   3:10   4:00
+ ON  ON  ON      2:10    2:20      3:10   3:20   4:10
+*/
+	PORT_DIPNAME( 0x70, 0x70, "Play Time (Type A)" ) PORT_DIPLOCATION("DSW2:5,6,7")
+	PORT_DIPSETTING(    0x70, "1:00" )
+	PORT_DIPSETTING(    0x60, "1:10" )
+	PORT_DIPSETTING(    0x50, "1:20" )
+	PORT_DIPSETTING(    0x40, "1:30" )
+	PORT_DIPSETTING(    0x30, "1:40" )
+	PORT_DIPSETTING(    0x20, "1:50" )
+	PORT_DIPSETTING(    0x10, "2:00" )
+	PORT_DIPSETTING(    0x00, "2:10" )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( fsoccer )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )	// same as the dip switch
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start Game A")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Start Game B")
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 ) PORT_NAME("Start Game C")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 ) PORT_NAME("Start Game D")
+
+	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2133,7 +2056,7 @@ static INPUT_PORTS_START( fsoccer )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 
-	PORT_START("IN2")
+	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2143,17 +2066,17 @@ static INPUT_PORTS_START( fsoccer )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 
-	PORT_START("IN3")
+	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Start Game E")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START5 ) PORT_NAME("Start Game E")
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
 
-	PORT_START("IN4")
+	PORT_START("IN5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -2163,57 +2086,64 @@ static INPUT_PORTS_START( fsoccer )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
 
-	PORT_START("IN5")	/* Only used in the "test mode" in this version */
+	PORT_START("IN6")
 	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN6")	/* Only used in the "test mode" in this version */
+	PORT_START("IN7")
 	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN7")	/* Only used in the "test mode" in this version */
+	PORT_START("IN8")
 	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN8")	/* Only used in the "test mode" in this version */
+	PORT_START("IN9")
 	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x03, "Upright (With VS)" )
 	PORT_DIPSETTING(    0x02, "Upright (Without VS)" )
 	PORT_DIPSETTING(    0x00, "Cocktail (2 Players)" )
 	PORT_DIPSETTING(    0x01, "Cocktail (4 Players)" )
-	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Version ) )
+	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Version ) ) PORT_DIPLOCATION("DSW1:3,4")
 	PORT_DIPSETTING(    0x04, DEF_STR( Europe ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Japan ) )
-/*  PORT_DIPSETTING(    0x0c, DEF_STR( Europe ) ) */
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
+//	PORT_DIPSETTING(    0x0c, DEF_STR( Europe ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DSW1:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("DSW1:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_6C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("DSW2:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW2:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Game Mode" ) PORT_DIPLOCATION("DSW2:3,4")
 	PORT_DIPSETTING(    0x08, "Demo Sound Off" )
 	PORT_DIPSETTING(    0x0c, "Demo Sound On" )
 	PORT_DIPSETTING(    0x00, "Freeze" )
 	PORT_DIPSETTING(    0x04, "Win Match Against CPU (Cheat)")
-	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Game_Time ) )	/* See notes */
+/*
+Dip Switch settings are the time for match type A. Here is what you
+have to add for games B to E :
+
+Match Type       B        C        D        E
+Time to add    00:30    01:00    01:30    02:00
+*/
+	PORT_DIPNAME( 0x70, 0x70, "Play Time (Type A)" ) PORT_DIPLOCATION("DSW2:5,6,7")
 	PORT_DIPSETTING(    0x10, "1:00" )
 	PORT_DIPSETTING(    0x60, "1:10" )
 	PORT_DIPSETTING(    0x50, "1:20" )
@@ -2222,300 +2152,30 @@ static INPUT_PORTS_START( fsoccer )
 	PORT_DIPSETTING(    0x20, "1:50" )
 	PORT_DIPSETTING(    0x70, "2:00" )
 	PORT_DIPSETTING(    0x00, "2:10" )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
-
-	PORT_START("IN9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 ) PORT_NAME("Start Game C")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 ) PORT_NAME("Start Game D")
+	PORT_SERVICE( 0x80, IP_ACTIVE_LOW ) PORT_DIPLOCATION("DSW2:8")
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( tdfever )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound CPU status */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start Game A")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Start Game B")
 
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+static INPUT_PORTS_START( fsoccerb )
 
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_INCLUDE( fsoccer )
 
-	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Start Game E")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
+	// no spinners in this version. Player shoots in the direction he's facing
+	// (see the 'jmp' instruction at 0x00f1)
 
-	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
+	PORT_MODIFY("IN6")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN5")
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("IN7")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN6")
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_MODIFY("IN8")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("IN7")
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(3)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN8")
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x02, "2 Player Upright" )
-	PORT_DIPSETTING(    0x00, "4 Player Cocktail" )
-	PORT_DIPNAME( 0x0c, 0x00, "1st Down Bonus Time" )
-	PORT_DIPSETTING(    0x00, "Every 1st Down" )
-	PORT_DIPSETTING(    0x04, "Every 4 1st Downs" )
-	PORT_DIPSETTING(    0x08, "Every 6 1st Downs" )
-	PORT_DIPSETTING(    0x0c, "Every 8 1st Downs" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )	/* Manual shows these two as blank */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" )
-	PORT_DIPSETTING(    0x0c, "Demo Sound Off" )
-	PORT_DIPSETTING(    0x08, "Demo Sound On" )
-	PORT_DIPSETTING(    0x00, "Freeze" )
-	PORT_DIPSETTING(    0x04, "Never Finish (Cheat)")
-	PORT_DIPNAME( 0x70, 0x70, "Play Time" )
-	PORT_DIPSETTING(    0x70, "1:00" )
-	PORT_DIPSETTING(    0x60, "1:10" )
-	PORT_DIPSETTING(    0x50, "1:20" )
-	PORT_DIPSETTING(    0x40, "1:30" )
-	PORT_DIPSETTING(    0x30, "1:40" )
-	PORT_DIPSETTING(    0x20, "1:50" )
-	PORT_DIPSETTING(    0x10, "2:00" )
-	PORT_DIPSETTING(    0x00, "2:10" )
-/*
-Actual Play Times listed in manual based on Players & cabinet type:
-
-                Upright/Cocktail     Cocktail Only
- Dip Switch       A       B         C      D      E    <-- Start button "MODE"
- SW6 SW7 SW8    1PvsCPU 2PvsCPU   1Pvs2P 2Pvs1P 2Pvs2P
- OFF OFF OFF     1:00    1:10      2:00   2:10   3:00
- ON  OFF OFF     1:10    1:20      2:10   2:20   3:10
- OFF ON  OFF     1:20    1:30      2:20   2:30   3:20
- ON  ON  OFF     1:30    1:40      2:30   2:40   3:30
- OFF OFF ON      1:40    1:50      2:40   2:50   3:40
- ON  OFF ON      1:50    2:00      2:50   3:00   3:50
- OFF ON  ON      2:00    2:10      3:00   3:10   4:00
- ON  ON  ON      2:10    2:20      3:10   3:20   4:10
-*/
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 ) PORT_NAME("Start Game C")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 ) PORT_NAME("Start Game D")
+	PORT_MODIFY("IN9")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( tdfeverj )
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )  /* sound CPU status */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 ) PORT_NAME("Start Game A")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Start Game B")
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-
-	PORT_START("IN3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(3)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE2 ) PORT_NAME("Start Game E")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(3)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(3)
-
-	PORT_START("IN4")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(4)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(4)
-
-	PORT_START("IN5")
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_Z) PORT_CODE_INC(KEYCODE_X)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN6")
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_CODE_DEC(KEYCODE_N) PORT_CODE_INC(KEYCODE_M) PORT_PLAYER(2)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN7")
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(3)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN8")
-	PORT_BIT( 0x7f, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10) PORT_PLAYER(4)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, "2 Player Upright" )
-	PORT_DIPSETTING(    0x02, "4 Player Cocktail" )
-	PORT_DIPNAME( 0x0c, 0x00, "1st Down Bonus Time" )
-	PORT_DIPSETTING(    0x00, "Every 1st Down" )
-	PORT_DIPSETTING(    0x04, "Every 4 1st Downs" )
-	PORT_DIPSETTING(    0x08, "Every 6 1st Downs" )
-	PORT_DIPSETTING(    0x0c, "Every 8 1st Downs" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unused ) )	/* Manual shows these two as blank */
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x08, "Game Mode" )
-	PORT_DIPSETTING(    0x0c, "Demo Sound Off" )
-	PORT_DIPSETTING(    0x08, "Demo Sound On" )
-	PORT_DIPSETTING(    0x00, "Freeze" )
-	PORT_DIPSETTING(    0x04, "Never Finish (Cheat)")
-	PORT_DIPNAME( 0x70, 0x70, "Play Time" )
-	PORT_DIPSETTING(    0x70, "1:00" )
-	PORT_DIPSETTING(    0x60, "1:10" )
-	PORT_DIPSETTING(    0x50, "1:20" )
-	PORT_DIPSETTING(    0x40, "1:30" )
-	PORT_DIPSETTING(    0x30, "1:40" )
-	PORT_DIPSETTING(    0x20, "1:50" )
-	PORT_DIPSETTING(    0x10, "2:00" )
-	PORT_DIPSETTING(    0x00, "2:10" )
-/*
-Actual Play Times listed in manual based on Players & cabinet type:
-
-                Upright/Cocktail     Cocktail Only
- Dip Switch       A       B         C      D      E    <-- Start button "MODE"
- SW6 SW7 SW8    1PvsCPU 2PvsCPU   1Pvs2P 2Pvs1P 2Pvs2P
- OFF OFF OFF     1:00    1:10      2:00   2:10   3:00
- ON  OFF OFF     1:10    1:20      2:10   2:20   3:10
- OFF ON  OFF     1:20    1:30      2:20   2:30   3:20
- ON  ON  OFF     1:30    1:40      2:30   2:40   3:30
- OFF OFF ON      1:40    1:50      2:40   2:50   3:40
- ON  OFF ON      1:50    2:00      2:50   3:00   3:50
- OFF ON  ON      2:00    2:10      3:00   3:10   4:00
- ON  ON  ON      2:10    2:20      3:10   3:20   4:10
-*/
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN9")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START3 ) PORT_NAME("Start Game C")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START4 ) PORT_NAME("Start Game D")
-INPUT_PORTS_END
 
 /*********************************************************************/
 
@@ -2636,8 +2296,9 @@ GFXDECODE_END
 static GFXDECODE_START( gwar )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout_4bpp,      0x000, 0x100>>4 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_4bpp,      0x300, 0x100>>4 )
-	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_4bpp,    0x100, 0x100>>4 )
+	GFXDECODE_ENTRY( "gfx3", 0, spritelayout_4bpp,    0x100, 0x080>>4 )
 	GFXDECODE_ENTRY( "gfx4", 0, bigspritelayout_4bpp, 0x200, 0x100>>4 )
+	/* what about colors 0x180-0x1ff? */
 GFXDECODE_END
 
 static GFXDECODE_START( tdfever )
@@ -2661,7 +2322,7 @@ static MACHINE_DRIVER_START( tnk3 )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(YM3526_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(tnk3_YM3526_sound_map,0)
 
 	MDRV_INTERLEAVE(100)
 
@@ -2685,7 +2346,7 @@ static MACHINE_DRIVER_START( tnk3 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM3526, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(athena_ym3526_config_1)
+	MDRV_SOUND_CONFIG(ym3526_config_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_DRIVER_END
 
@@ -2700,7 +2361,7 @@ static MACHINE_DRIVER_START( athena )
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("ym2", YM3526, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(athena_ym3526_config_2)
+	MDRV_SOUND_CONFIG(ym3526_config_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_DRIVER_END
 
@@ -2757,11 +2418,11 @@ static MACHINE_DRIVER_START( ikari )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM3526, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(athena_ym3526_config_1)
+	MDRV_SOUND_CONFIG(ym3526_config_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
 	MDRV_SOUND_ADD("ym2", YM3526, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(athena_ym3526_config_2)
+	MDRV_SOUND_CONFIG(ym3526_config_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_DRIVER_END
 
@@ -2772,11 +2433,11 @@ static MACHINE_DRIVER_START( victroad )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("audio")
-	MDRV_CPU_PROGRAM_MAP(victroad_YM3526_Y8950_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map,0)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("ym2", Y8950, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(victroad_y8950_config_2)
+	MDRV_SOUND_CONFIG(y8950_config_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_DRIVER_END
 
@@ -2793,7 +2454,7 @@ static MACHINE_DRIVER_START( bermudat )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(victroad_YM3526_Y8950_sound_map,0)
+	MDRV_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map,0)
 
 	MDRV_INTERLEAVE(100)
 
@@ -2801,8 +2462,10 @@ static MACHINE_DRIVER_START( bermudat )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	// visible area uncertain but this size avoids glitches at the bottom of the screen
+	// in worldwar at the beginning of the game
 	MDRV_SCREEN_SIZE(50*8, 28*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 49*8-1, 0*8, 28*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(2*8, 48*8-1, 0*8, 28*8-1)
 
 	MDRV_GFXDECODE(gwar)
 	MDRV_PALETTE_LENGTH(0x400)
@@ -2815,11 +2478,11 @@ static MACHINE_DRIVER_START( bermudat )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM3526, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(athena_ym3526_config_1)
+	MDRV_SOUND_CONFIG(ym3526_config_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
 	MDRV_SOUND_ADD("ym2", Y8950, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(victroad_y8950_config_2)
+	MDRV_SOUND_CONFIG(y8950_config_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_DRIVER_END
 
@@ -2834,6 +2497,12 @@ static MACHINE_DRIVER_START( gwar )
 
 	MDRV_CPU_MODIFY("sub")
 	MDRV_CPU_PROGRAM_MAP(gwar_cpuB_map,0)
+
+	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
+	// this visible area matches pcb screenshots
+	MDRV_SCREEN_SIZE(49*8, 28*8)
+	MDRV_SCREEN_VISIBLE_AREA(1*8, 48*8-1, 0*8, 28*8-1)
 MACHINE_DRIVER_END
 
 
@@ -2861,6 +2530,12 @@ static MACHINE_DRIVER_START( chopper1 )
 	MDRV_CPU_MODIFY("audio")
 	MDRV_CPU_PROGRAM_MAP(YM3812_Y8950_sound_map,0)
 
+	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
+	// this visible area matches the flyer
+	MDRV_SCREEN_SIZE(51*8, 28*8)
+	MDRV_SCREEN_VISIBLE_AREA(1*8, 50*8-1, 0*8, 28*8-1)
+
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("ym1", YM3812, 4000000)
 	MDRV_SOUND_CONFIG(ym3812_config_1)
@@ -2882,62 +2557,15 @@ static MACHINE_DRIVER_START( tdfever )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(cpuA_map,0)
-	MDRV_CPU_VBLANK_INT("main", snk_irq_AB)
+	MDRV_CPU_PROGRAM_MAP(tdfever_cpuA_map,0)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(cpuB_map,0)
-//	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	snk_irq_AB replaces this
+	MDRV_CPU_PROGRAM_MAP(tdfever_cpuB_map,0)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(YM3526_Y8950_sound_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-
-	MDRV_INTERLEAVE(300)
-
-	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
-
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(50*8, 28*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 49*8-1, 0*8, 28*8-1)
-
-	MDRV_GFXDECODE(tdfever)
-	MDRV_PALETTE_LENGTH(0x400)
-
-	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_VIDEO_START(snk_4bpp_shadow)
-	MDRV_VIDEO_UPDATE(tdfever)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("ym1", YM3526, 4000000)
-	MDRV_SOUND_CONFIG(ym3526_interface_0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
-	MDRV_SOUND_ADD("ym2", Y8950, 4000000)
-	MDRV_SOUND_CONFIG(y8950_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( fsoccer )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpuA_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-
-	MDRV_CPU_ADD("sub", Z80, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpuB_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
-
-	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(Y8950_sound_map, 0)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
 	MDRV_INTERLEAVE(100)
 
@@ -2948,21 +2576,41 @@ static MACHINE_DRIVER_START( fsoccer )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(50*8, 28*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 49*8-1, 0*8, 28*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 50*8-1, 0*8, 28*8-1)
 
 	MDRV_GFXDECODE(tdfever)
 	MDRV_PALETTE_LENGTH(0x400)
 
 	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_VIDEO_START(snk_4bpp_shadow)
+	MDRV_VIDEO_START(tdfever)
 	MDRV_VIDEO_UPDATE(tdfever)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", Y8950, XTAL_8MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(y8950_config)
+	MDRV_SOUND_ADD("ym1", YM3526, 4000000)
+	MDRV_SOUND_CONFIG(ym3526_config_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_SOUND_ADD("ym2", Y8950, 4000000)
+	MDRV_SOUND_CONFIG(y8950_config_2)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( tdfever2 )
+
+	MDRV_IMPORT_FROM(tdfever)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("audio")
+	MDRV_CPU_PROGRAM_MAP(Y8950_sound_map,0)
+
+	/* sound hardware */
+
+	// apparently, no "ym1" in tdfever2
+	// (registers are written to but they cause sound not to work)
+	MDRV_SOUND_REMOVE("ym1")
 MACHINE_DRIVER_END
 
 
@@ -4462,7 +4110,7 @@ ROM_START( fsoccer )
 	ROM_LOAD( "fs6.2k",  0x60000, 0x10000, CRC(588d14b3) SHA1(c0489b061503677a38e4c5800ea8be17aabf4039) )
 	ROM_LOAD( "fs5.2j",  0x70000, 0x10000, CRC(def2f1d8) SHA1(b72e4dec3306d8afe461ac812b2de67ee85f9dd9) )
 
-	ROM_REGION( 0x10000, "ym", 0 )
+	ROM_REGION( 0x10000, "ym2", 0 )
 	ROM_LOAD( "fs4.bin",  0x00000, 0x10000, CRC(435c3716) SHA1(42053741f60594e7ae8516b3ba600f5badb3620f) )
 ROM_END
 
@@ -4498,7 +4146,7 @@ ROM_START( fsoccerj )
 	ROM_LOAD( "fs6.2k",  0x60000, 0x10000, CRC(588d14b3) SHA1(c0489b061503677a38e4c5800ea8be17aabf4039) )
 	ROM_LOAD( "fs5.2j",  0x70000, 0x10000, CRC(def2f1d8) SHA1(b72e4dec3306d8afe461ac812b2de67ee85f9dd9) )
 
-	ROM_REGION( 0x10000, "ym", 0 )
+	ROM_REGION( 0x10000, "ym2", 0 )
 	ROM_LOAD( "fs4.7p",  0x00000, 0x10000, CRC(435c3716) SHA1(42053741f60594e7ae8516b3ba600f5badb3620f) )
 ROM_END
 
@@ -4534,7 +4182,7 @@ ROM_START( fsoccerb )
 	ROM_LOAD( "fs6.2k",  0x60000, 0x10000, CRC(588d14b3) SHA1(c0489b061503677a38e4c5800ea8be17aabf4039) )
 	ROM_LOAD( "fs5.2j",  0x70000, 0x10000, CRC(def2f1d8) SHA1(b72e4dec3306d8afe461ac812b2de67ee85f9dd9) )
 
-	ROM_REGION( 0x10000, "ym", 0 )
+	ROM_REGION( 0x10000, "ym2", 0 )
 	ROM_LOAD( "fs4.bin",  0x00000, 0x10000, CRC(435c3716) SHA1(42053741f60594e7ae8516b3ba600f5badb3620f) )
 ROM_END
 
@@ -4665,42 +4313,6 @@ ROM_END
 
 /***********************************************************************/
 
-/* input port configuration */
-
-static const SNK_INPUT_PORT_TYPE tdfever_io[SNK_MAX_INPUT_PORTS] = {
-	/* c000 */ SNK_INP0,
-	/* c100 */ SNK_INP1, SNK_INP2, SNK_INP3, SNK_INP4, /* joy1..joy4 */
-	/* c300 */ SNK_INP5, SNK_INP6, SNK_INP7, SNK_INP8, /* aim1..aim4 */
-	/* c500 */ SNK_UNUSED,
-	/* c580 */ SNK_DSW1,	/* DSW1 */
-	/* c600 */ SNK_DSW2,	/* DSW2 */
-	/* c080 */ SNK_INP9		/* Start games type C & D */
-};
-
-static DRIVER_INIT( tdfever ){
-	snk_sound_busy_bit = 0x08;
-	snk_io = tdfever_io;
-	videoram = snk_rambase + 0x800;
-	snk_gamegroup = (!strcmp(machine->gamedrv->name,"tdfeverj")) ? 5 : 3;
-	snk_irq_delay = 1000;
-}
-
-static DRIVER_INIT( tdfever2 ){
-	snk_sound_busy_bit = 0x08;
-	snk_io = tdfever_io;
-	videoram = snk_rambase + 0x800;
-	snk_gamegroup = (!strcmp(machine->gamedrv->name,"tdfeverj")) ? 5 : 3;
-	snk_irq_delay = 1000;
-}
-
-static DRIVER_INIT( fsoccer ){
-	snk_sound_busy_bit = 0x08;
-	snk_io = tdfever_io;
-	videoram = snk_rambase + 0x800;
-	snk_gamegroup = 7;
-}
-
-
 static DRIVER_INIT( countryc )
 {
 	// replace coin counter with trackball select
@@ -4708,13 +4320,13 @@ static DRIVER_INIT( countryc )
 }
 
 
-/* screen size 288x216 */
 GAME( 1985, tnk3,     0,        tnk3,     tnk3,     0,        ROT270, "SNK", "T.N.K III (US)", 0 )
 GAME( 1985, tnk3j,    tnk3,     tnk3,     tnk3,     0,        ROT270, "SNK", "T.A.N.K (Japan)", 0 )
 GAME( 1986, athena,   0,        athena,   athena,   0,        ROT0,   "SNK", "Athena", 0 )
 GAME( 1988, fitegolf, 0,        fitegolf, fitegolf, 0,        ROT0,   "SNK", "Fighting Golf (World?)", 0 )
 GAME( 1988, fitegol2, fitegolf, fitegolf, fitegolf, 0,        ROT0,   "SNK", "Fighting Golf (US)", 0 )
 GAME( 1988, countryc, 0,        fitegolf, countryc, countryc, ROT0,   "SNK", "Country Club", 0 )
+
 GAME( 1986, ikari,    0,        ikari,    ikari,    0,        ROT270, "SNK", "Ikari Warriors (US JAMMA)", 0 )
 GAME( 1986, ikaria,   ikari,    ikari,    ikarijp,  0,        ROT270, "SNK", "Ikari Warriors (US)", 0 )
 GAME( 1986, ikarijp,  ikari,    ikari,    ikarijp,  0,        ROT270, "SNK", "Ikari (Japan)", 0 )
@@ -4723,7 +4335,6 @@ GAME( 1986, victroad, 0,        victroad, victroad, 0,        ROT270, "SNK", "Vi
 GAME( 1986, dogosoke, victroad, victroad, victroad, 0,        ROT270, "SNK", "Dogou Souken", 0 )
 GAME( 1986, dogosokb, victroad, victroad, dogosokb, 0,        ROT270, "bootleg", "Dogou Souken (Joystick hack bootleg)", 0 )
 
-/* screen size 384x224 */
 GAME( 1987, bermudat, 0,        bermudat, bermudat, 0,        ROT270, "SNK", "Bermuda Triangle (World?)", 0 )
 GAME( 1987, bermudaj, bermudat, bermudat, bermudat, 0,        ROT270, "SNK", "Bermuda Triangle (Japan)", 0 )
 GAME( 1987, worldwar, 0,        bermudat, worldwar, 0,        ROT270, "SNK", "World Wars (World?)", 0 )
@@ -4738,9 +4349,10 @@ GAME( 1988, chopper,  0,        chopper1, chopper,  0,        ROT270, "SNK", "Ch
 GAME( 1988, choppera, chopper,  choppera, choppera, 0,        ROT270, "SNK", "Chopper I (US set 2)", 0 )
 GAME( 1988, chopperb, chopper,  chopper1, chopper,  0,        ROT270, "SNK", "Chopper I (US set 3)", 0 )
 GAME( 1988, legofair, chopper,  chopper1, chopper,  0,        ROT270, "SNK", "Koukuu Kihei Monogatari - The Legend of Air Cavalry (Japan)", 0 )
-GAME( 1987, tdfever,  0,        tdfever,  tdfever,  tdfever,  ROT270, "SNK", "TouchDown Fever", GAME_NO_COCKTAIL )
-GAME( 1987, tdfeverj, tdfever,  tdfever,  tdfeverj, tdfever,  ROT270, "SNK", "TouchDown Fever (Japan)", GAME_NO_COCKTAIL )
-GAME( 1988, tdfever2, tdfever,  tdfever,  tdfever,  tdfever2, ROT270, "SNK", "TouchDown Fever 2", GAME_NO_COCKTAIL ) /* upgrade kit for Touchdown Fever */
-GAME( 1988, fsoccer,  0,        fsoccer,  fsoccer,  fsoccer,  ROT0,   "SNK", "Fighting Soccer (version 4)", GAME_NO_COCKTAIL )
-GAME( 1988, fsoccerj, fsoccer,  fsoccer,  fsoccer,  fsoccer,  ROT0,   "SNK", "Fighting Soccer (Japan)", GAME_NO_COCKTAIL )
-GAME( 1988, fsoccerb, fsoccer,  fsoccer,  fsoccer,  fsoccer,  ROT0,   "bootleg", "Fighting Soccer (joystick hack bootleg)", GAME_NO_COCKTAIL )
+
+GAME( 1987, tdfever,  0,        tdfever,  tdfever,  0,        ROT90,  "SNK", "TouchDown Fever", 0 )
+GAME( 1987, tdfeverj, tdfever,  tdfever,  tdfever,  0,        ROT90,  "SNK", "TouchDown Fever (Japan)", 0 )
+GAME( 1988, tdfever2, tdfever,  tdfever2, tdfever,  0,        ROT90,  "SNK", "TouchDown Fever 2", 0 ) /* upgrade kit for Touchdown Fever */
+GAME( 1988, fsoccer,  0,        tdfever2, fsoccer,  0,        ROT0,   "SNK", "Fighting Soccer (version 4)", 0 )
+GAME( 1988, fsoccerj, fsoccer,  tdfever2, fsoccer,  0,        ROT0,   "SNK", "Fighting Soccer (Japan)", 0 )
+GAME( 1988, fsoccerb, fsoccer,  tdfever2, fsoccerb, 0,        ROT0,   "bootleg", "Fighting Soccer (joystick hack bootleg)", 0 )

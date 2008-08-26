@@ -24,7 +24,12 @@ AT08XX03:
 #include "snk.h"
 #include "sound/ay8910.h"
 
-extern UINT8 *snk_rambase;
+extern VIDEO_START( sgladiat );
+extern VIDEO_UPDATE( sgladiat );
+
+static int snk_sound_busy_bit;
+
+UINT8 *snk_rambase;
 
 static const gfx_layout tile_layout =
 {
@@ -146,11 +151,11 @@ static MACHINE_DRIVER_START( sgladiat )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sgladiat_cpuA_map,0)
-//  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(sgladiat_cpuB_map,0)
-	MDRV_CPU_VBLANK_INT("main", snk_irq_BA)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sgladiat_sound_map,0)
@@ -296,9 +301,6 @@ static INPUT_PORTS_START( sgladiat )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-static DRIVER_INIT( sgladiat )
-{
-	snk_irq_delay = 2000;
-}
 
-GAME( 1984, sgladiat, 0, sgladiat, sgladiat, sgladiat, 0, "SNK", "Gladiator 1984", GAME_NO_COCKTAIL )
+
+GAME( 1984, sgladiat, 0, sgladiat, sgladiat, 0, ROT0, "SNK", "Gladiator 1984", GAME_NO_COCKTAIL )

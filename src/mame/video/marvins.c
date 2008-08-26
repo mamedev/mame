@@ -2,6 +2,8 @@
 #include "cpu/z80/z80.h"
 #include "snk.h"
 
+int marvins_gamegroup;
+
 static int flipscreen, sprite_flip_adjust;
 static tilemap *fg_tilemap, *bg_tilemap, *tx_tilemap;
 static UINT8 bg_color, fg_color, old_bg_color, old_fg_color;
@@ -170,7 +172,7 @@ VIDEO_START( marvins )
 
 	{
 		tilemap_clip = *video_screen_get_visible_area(machine->primary_screen);
-		if (snk_gamegroup != 1) // not Mad Crasher
+		if (marvins_gamegroup != 1) // not Mad Crasher
 		{
 			tilemap_clip.max_x-=16;
 			tilemap_clip.min_x+=16;
@@ -180,7 +182,7 @@ VIDEO_START( marvins )
 		tilemap_set_transparent_pen(bg_tilemap,0xf);
 		tilemap_set_transparent_pen(tx_tilemap,0xf);
 
-		switch (snk_gamegroup)
+		switch (marvins_gamegroup)
 		{
 			case 0:	// Marvin's Maze
 				tilemap_set_scrolldx( bg_tilemap, 271, 287  );
@@ -418,7 +420,7 @@ VIDEO_UPDATE( madcrash )
 
 	cpuintrf_push_context(0);
 	{
-		int madcrash_vreg = (snk_gamegroup == 1) ? 0x00 : 0xf1; // Mad Crasher=0x00, VanguardII=0xf1
+		int madcrash_vreg = (marvins_gamegroup == 1) ? 0x00 : 0xf1; // Mad Crasher=0x00, VanguardII=0xf1
 
 		UINT8 sprite_partition = program_read_byte(0xfa00);
 

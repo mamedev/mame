@@ -38,6 +38,21 @@ the gameplay difficulty
 
 #define CREDITS "Phil Stroffolino\nTim Lindquist\nCarlos A. Lozano"
 
+extern int marvins_gamegroup;
+
+// FIXME this is definitely wrong, schematics clearly show that vblank triggers interrupt
+// on both CPU at the same time.
+static int snk_irq_delay = 1500;
+
+// see IRQ notes in drivers\marvins.c
+static TIMER_CALLBACK( irq_trigger_callback ) { cpunum_set_input_line(machine, param, 0, HOLD_LINE); }
+
+static INTERRUPT_GEN( snk_irq_BA )
+{
+	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	timer_set(ATTOTIME_IN_USEC(snk_irq_delay), NULL, 0, irq_trigger_callback);
+}
+
 
 /***************************************************************************
 **
@@ -739,7 +754,7 @@ ROM_END
 static DRIVER_INIT( marvins )
 {
 	sound_cpu_busy = 0;
-	snk_gamegroup = 0;
+	marvins_gamegroup = 0;
 }
 
 static DRIVER_INIT( madcrash )
@@ -753,14 +768,14 @@ static DRIVER_INIT( madcrash )
     mem[0x3a5d] = 0; mem[0x3a5e] = 0; mem[0x3a5f] = 0;
 */
 	sound_cpu_busy = 0;
-	snk_gamegroup = 1;
+	marvins_gamegroup = 1;
 	snk_irq_delay = 1700;
 }
 
 static DRIVER_INIT( vangrd2 )
 {
 	sound_cpu_busy = 0;
-	snk_gamegroup = 2;
+	marvins_gamegroup = 2;
 }
 
 

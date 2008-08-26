@@ -15,18 +15,12 @@
 
  those using tnk3_vh_screenrefresh (tnk3, athena, fitegolf) sgladiat is similar
     (0-7  , 6  is shadow, 7  is transparent) * these are using aso colour prom convert *
- those using tdfever_vh_screenrefresh (tdfever)
-    (0-15 , 14(13 for tdfeverj) is shadow, 15 is transparent)
- those using ftsoccer_vh_screenrefresh (ftsoccer)
-    (0-15 , 14 is shadow/highlight, 15 is transparent)
  those using ikari_vh_screenrefresh (ikari, victroad)
     (0-7  , 6  is shadow, 7  is transparent)
+ those using tdfever_vh_screenrefresh (tdfever, fsoccer)
+    (0-15 , 14 is shadow, 15 is transparent)
 
 *******************************************************************************/
-
-
-#define MAX_VRAM_SIZE (64*64*2) /* 0x2000 */
-
 
 UINT8 *snk_fg_videoram;
 UINT8 *snk_bg_videoram;
@@ -118,6 +112,7 @@ static TILE_GET_INFO( gwar_get_fg_tile_info )
 			0);
 }
 
+
 static TILE_GET_INFO( tnk3_get_bg_tile_info )
 {
 	int attr = snk_bg_videoram[2*tile_index+1];
@@ -143,36 +138,26 @@ static TILE_GET_INFO( ikari_get_bg_tile_info )
 static TILE_GET_INFO( gwar_get_bg_tile_info )
 {
 	int attr = snk_bg_videoram[2*tile_index+1];
-	int code = snk_bg_videoram[2*tile_index] | ((attr & 0x07) << 8);
+	int code = snk_bg_videoram[2*tile_index] | ((attr & 0x0f) << 8);
 	int color = (attr & 0xf0) >> 4;
 	SET_TILE_INFO(1,
 			code,
 			color,
 			0);
 
-	// bermudat uses FFFF to blank the background. A possible explanation is that
-	// ROM selection is performed by a 3-to-8 demuxer connected to bits 1,2,3
-	// (bit 0 goes to A15) so when bit 3 is set none of the ROMs is selected.
+	// bermudat, tdfever use FFFF to blank the background.
 	// (still call SET_TILE_INFO, otherwise problems might occur on boot when
 	// the tile data hasn't been initialised)
-	if (attr & 8)
+	if (code >= machine->gfx[1]->total_elements)
 		tileinfo->pen_data = empty_tile;
 }
 
 
 /**************************************************************************************/
 
-VIDEO_START( snk )
-{
-	tmpbitmap = auto_bitmap_alloc(512, 512, video_screen_get_format(machine->primary_screen));
-}
-
-
-VIDEO_START( snk_3bpp_shadow )
+static VIDEO_START( snk_3bpp_shadow )
 {
 	int i;
-
-	VIDEO_START_CALL(snk);
 
 	if(!(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
 		fatalerror("driver should use VIDEO_HAS_SHADOWS");
@@ -186,11 +171,9 @@ VIDEO_START( snk_3bpp_shadow )
 		machine->shadow_table[i] = i | 0x200;
 }
 
-VIDEO_START( snk_4bpp_shadow )
+static VIDEO_START( snk_4bpp_shadow )
 {
 	int i;
-
-	VIDEO_START_CALL(snk);
 
 	if(!(machine->config->video_attributes & VIDEO_HAS_SHADOWS))
 		fatalerror("driver should use VIDEO_HAS_SHADOWS");
@@ -201,7 +184,7 @@ VIDEO_START( snk_4bpp_shadow )
 	gfx_drawmode_table[15] = DRAWMODE_NONE;
 
 	/* all palette entries are not affected by shadow sprites... */
-	for (i = 0x00;i < 0x400;i++)
+	for (i = 0x000;i < 0x400;i++)
 		machine->shadow_table[i] = i;
 	/* ... except for tilemap colors */
 	for (i = 0x200;i < 0x300;i++)
@@ -240,15 +223,20 @@ VIDEO_START( gwar )
 {
 	memset(empty_tile,0xf,sizeof(empty_tile));
 
-	VIDEO_START_CALL(snk);
-
 	fg_tilemap = tilemap_create(gwar_get_fg_tile_info, tilemap_scan_cols,  8,  8, 50, 32);
 	bg_tilemap = tilemap_create(gwar_get_bg_tile_info, tilemap_scan_cols, 16, 16, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 
-	tilemap_set_scrolldx(bg_tilemap, 16, 142);
+	tilemap_set_scrolldx(bg_tilemap, 16, 143);
 	tilemap_set_scrolldy(bg_tilemap,  0, -32);
+}
+
+VIDEO_START( tdfever )
+{
+	VIDEO_START_CALL(snk_4bpp_shadow);
+
+	VIDEO_START_CALL(gwar);
 }
 
 /**************************************************************************************/
@@ -412,12 +400,32 @@ WRITE8_HANDLER( gwar_sprite_split_point_w )
 	sprite_split_point = data;
 }
 
+WRITE8_HANDLER( tdfever_sp_scroll_msb_w )
+{
+	sp32_scrolly = (sp32_scrolly & 0xff) | ((data & 0x80) << 1);
+	sp32_scrollx = (sp32_scrollx & 0xff) | ((data & 0x40) << 2);
+}
+
+WRITE8_HANDLER( tdfever_spriteram_w )
+{
+	/*	partial updates avoid flickers in the fsoccer radar. */
+	if (offset < 0x80 && spriteram[offset] != data)
+	{
+		int vpos = video_screen_get_vpos(machine->primary_screen);
+
+		if (vpos > 0)
+			video_screen_update_partial(machine->primary_screen, vpos - 1);
+	}
+
+	spriteram[offset] = data;
+}
+
 /**************************************************************************************/
 
-static void tnk3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xscroll, int yscroll)
+static void tnk3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const int xscroll, const int yscroll)
 {
 	const gfx_element *gfx = machine->gfx[2];
-
+	const int size = gfx->width;
 	int tile_number, attributes, color, sx, sy;
 	int xflip,yflip;
 	int offs;
@@ -426,18 +434,19 @@ static void tnk3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const 
 	/* athena has 1024 tiles, attribute bit 5 is extra bank bit */
 	int is_athena = (gfx->total_elements > 512);
 
-	for(offs = 0; offs < 50*4; offs+=4)
+	for (offs = 0; offs < 50*4; offs += 4)
 	{
 		tile_number = spriteram[offs+1];
 		attributes  = spriteram[offs+3];
-		tile_number |= (attributes & 0x40) << 2;
 		color = attributes & 0xf;
-		sx =  xscroll + 45 - 16 - spriteram[offs+2];
-		if (!(attributes & 0x80)) sx += 256;
-		sy = -yscroll + 7 - 16 + spriteram[offs];
-		if (attributes & 0x10) sy += 256;
+		sx =  xscroll + 301 - size - spriteram[offs+2];
+		sy = -yscroll + 7 - size + spriteram[offs];
+		sx += (attributes & 0x80) << 1;
+		sy += (attributes & 0x10) << 4;
 		xflip = 0;
 		yflip = 0;
+
+		tile_number |= (attributes & 0x40) << 2;
 
 		if (is_athena)
 		{
@@ -450,16 +459,16 @@ static void tnk3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const 
 
 		if (flip_screen_get())
 		{
-			sx = 73 - sx;	// this causes slight misalignment in tnk3 but is correct for athena and fitegolf
-			sy = 246 - sy;
+			sx = 89 - size - sx;	// this causes slight misalignment in tnk3 but is correct for athena and fitegolf
+			sy = 262 - size - sy;
 			xflip = !xflip;
 			yflip = !yflip;
 		}
 
 		sx &= 0x1ff;
 		sy &= 0x1ff;
-		if (sx > 512-16) sx -= 512;
-		if (sy > 512-16) sy -= 512;
+		if (sx > 512-size) sx -= 512;
+		if (sy > 512-size) sy -= 512;
 
 		drawgfx(bitmap,gfx,
 				tile_number,
@@ -471,39 +480,41 @@ static void tnk3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const 
 }
 
 
-
-static void ikari_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int start, int xscroll, int yscroll,
-				UINT8 *source, int mode )
+static void ikari_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
+		const int start, const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum )
 {
-	gfx_element *gfx = machine->gfx[mode];
+	const gfx_element *gfx = machine->gfx[gfxnum];
+	const int size = gfx->width;
 	int tile_number, attributes, color, sx, sy;
 	int which, finish;
-	int size = (mode == 2) ? 16 : 32;
 
 	finish = (start+25)*4;
 
-	for(which = start*4; which < finish; which+=4)
+	for (which = start*4; which < finish; which += 4)
 	{
 		tile_number = source[which+1];
 		attributes  = source[which+3];
-		switch(mode)
+		color = attributes & 0xf;
+		sx =  xscroll + 300 - size - source[which+2];
+		sy = -yscroll + 7 - size + source[which];
+		sx += (attributes & 0x80) << 1;
+		sy += (attributes & 0x10) << 4;
+
+		switch (size)
 		{
-			case 2:
+			case 16:
 				tile_number |= (attributes & 0x60) << 3;
 				break;
-			case 3:
+
+			case 32:
 				tile_number |= (attributes & 0x40) << 2;
 				break;
 		}
-		color = attributes & 0xf;
-		sx =  xscroll + 44 - size - source[which+2];
-		if (!(attributes & 0x80)) sx += 256;
-		sy = -yscroll + 7 - size + source[which];
-		if (attributes & 0x10) sy += 256;
+
 		sx &= 0x1ff;
 		sy &= 0x1ff;
-		if (sx > 512-32) sx -= 512;
-		if (sy > 512-32) sy -= 512;
+		if (sx > 512-size) sx -= 512;
+		if (sy > 512-size) sy -= 512;
 
 		drawgfx(bitmap,gfx,
 				tile_number,
@@ -516,35 +527,6 @@ static void ikari_draw_sprites(running_machine *machine, bitmap_t *bitmap, const
 
 /**************************************************************/
 
-static void tdfever_draw_bg(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xscroll, int yscroll )
-{
-	const UINT8 *source = snk_rambase + 0x000;
-	const gfx_element *gfx = machine->gfx[1];
-
-	int tile_number, attributes, color, sx, sy;
-	int offs, x, y;
-
-	for(x = 0; x < 32; x++) for(y = 0; y < 32; y++)
-	{
-		offs = (x<<6)+(y<<1);
-		tile_number = source[offs];
-		attributes  = source[offs+1];
-
-		tile_number |= (attributes & 0xf) << 8;
-
-		color = attributes >> 4;
-		sx = x << 4;
-		sy = y << 4;
-
-		// intercept overflown tile indices
-		if(tile_number >= gfx->total_elements)
-			plot_box(tmpbitmap, sx, sy, gfx->width, gfx->height, get_black_pen(machine));
-		else
-			drawgfx(tmpbitmap,gfx,tile_number,color,0,0,sx,sy,0,TRANSPARENCY_NONE,0);
-	}
-	copyscrollbitmap(bitmap,tmpbitmap,1,&xscroll,1,&yscroll,cliprect);
-}
-
 /*
 Sprite Format
 -------------
@@ -553,7 +535,7 @@ byte1: tile number
 byte2: x offset
 byte3: attributes
 
-    mode 0/1 attributes:
+    32x32 attributes:
 
     76543210
     ----xxxx (color)
@@ -561,7 +543,7 @@ byte3: attributes
     -xx----- (bank number)
     x------- (x offset bit8)
 
-    mode 2 attributes:
+    16x16 attributes:
 
     76543210
     -----xxx (color)
@@ -569,67 +551,57 @@ byte3: attributes
     -xx-x--- (bank number)
     x------- (x offset bit8)
 */
-static void tdfever_draw_sp(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int xscroll, int yscroll, int mode,
-		int flip, int from, int to )
+static void tdfever_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,
+		const int xscroll, const int yscroll, const UINT8 *source, const int gfxnum, const int hw_xflip, const int from, const int to )
 {
-	const UINT8 *source = spriteram + ((mode==2)?0x800:0x000);
-	const gfx_element *gfx = machine->gfx[(mode==1)?3:2];
+	const gfx_element *gfx = machine->gfx[gfxnum];
+	const int size = gfx->width;
 	int tile_number, attributes, sx, sy, color, pen_mode;
-	int which, sp_size;
+	int which;
 	int flipx, flipy;
 
-	if(mode < 0 || mode > 2) return;
-
-	pen_mode = (snk_gamegroup & 1) ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN;
-
-	if(mode == 2)
-	{
-		sp_size = 16;
-	}
-	else
-	{
-		sp_size = 32;
-	}
+	pen_mode = (machine->config->video_attributes & VIDEO_HAS_SHADOWS) ? TRANSPARENCY_PEN_TABLE : TRANSPARENCY_PEN;
 
 	for(which = from*4; which < to*4; which+=4)
 	{
-		if(*(UINT32*)(source+which) == 0 || *(UINT32*)(source+which) == -1) continue;
-
 		tile_number = source[which+1];
 		attributes  = source[which+3];
+		color = attributes & 0x0f;
+		sx = -xscroll - 9 + source[which+2];
+		sy = -yscroll + 1 - size + source[which];
+		sx += (attributes & 0x80) << 1;
+		sy += (attributes & 0x10) << 4;
 
-		sx = xscroll + source[which+2]; if(mode==0) sx = 256-sx;
-		sy = yscroll + source[which];
-		sx += attributes<<1 & 0x100;
-		sy += attributes<<4 & 0x100;
+		switch (size)
+		{
+			case 16:
+				tile_number |= ((attributes & 0x08) << 5) | ((attributes & 0x60) << 4);
+				color &= 7;	// attribute bit 3 is used for bank select
+				break;
 
-		flipx = flip;
+			case 32:
+				tile_number |= (attributes & 0x60) << 3;
+				break;
+		}
+
+		flipx = hw_xflip;
 		flipy = 0;
+
+		if (hw_xflip)
+			sx = 495 - size - sx;
 
 		if (flip_screen_get())
 		{
-			sx = 495 - sp_size - sx;
-			sy = 258 - sp_size - sy;
+			sx = 495 - size - sx;
+			sy = 258 - size - sy;
 			flipx = !flipx;
 			flipy = !flipy;
 		}
 
 		sx &= 0x1ff;
 		sy &= 0x1ff;
-		if(sx > 512-sp_size) sx -= 512;
-		if(sy > 512-sp_size) sy -= 512;
-
-		switch(mode)
-		{
-			case 2:
-				tile_number |= (attributes<<4 & 0x600) | (attributes<<5 & 0x100);
-				color = attributes & 0x07;
-			break;
-
-			default:
-				tile_number |= attributes<<3 & 0x300;
-				color = attributes & 0x0f;
-		}
+		if (sx > 512-size) sx -= 512;
+		if (sy > 512-size) sy -= 512;
 
 		drawgfx(bitmap,gfx,
 				tile_number,
@@ -640,70 +612,7 @@ static void tdfever_draw_sp(running_machine *machine, bitmap_t *bitmap, const re
 	}
 }
 
-static void tdfever_draw_tx(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int attributes, int dx, int dy, int base )
-{
-	const UINT8 *source = snk_rambase - 0xd000 + base;
-	const gfx_element *gfx = machine->gfx[0];
-
-	int tile_high = (attributes & 0xf0) << 4;
-	int color = attributes & 0xf;
-	int tile_number, sx, sy;
-	int x, y;
-
-	for(x = 0; x < 64; x++) for(y = 0; y < 32; y++)
-	{
-		tile_number = source[(x<<5)+y];
-
-		if(tile_number == 0x20) continue;
-
-		sx = dx + x*8;
-		sy = dy + y*8;
-
-		drawgfx(bitmap,gfx,tile_high|tile_number,color,0,0,sx,sy,cliprect,TRANSPARENCY_PEN,15);
-	}
-}
-
 /**************************************************************/
-
-VIDEO_UPDATE( tdfever )
-{
-	const UINT8 *ram = snk_rambase - 0xd000;
-
-	UINT8 bg_attributes = ram[0xc880];
-	UINT8 sp_attributes = ram[0xc900];
-	UINT8 tx_attributes = ram[0xc8c0];
-	int bg_scroll_x = -ram[0xc840] + ((bg_attributes & 0x02) ? 256:0);
-	int bg_scroll_y = -ram[0xc800] + ((bg_attributes & 0x01) ? 256:0);
-	int sp16_scroll_x = -ram[0xc9c0] + ((sp_attributes & 0x40) ? 0:256);
-	int sp16_scroll_y = -ram[0xc980] + ((sp_attributes & 0x80) ? 256:0);
-
-	// TODO bg_attribute & 0x10 is screen flip
-
-	if(snk_gamegroup == 3 || snk_gamegroup == 5) // tdfever, tdfeverj
-	{
-			bg_scroll_x += 143;
-			bg_scroll_y += -32;
-			sp16_scroll_x += 135;
-			sp16_scroll_y += -65;
-	}
-	else if(snk_gamegroup == 7) // ftsoccer
-	{
-			bg_scroll_x += 16;
-			bg_scroll_y += 0;
-			sp16_scroll_x += 40;
-			sp16_scroll_y += -31;
-	}
-	tdfever_draw_bg(screen->machine, bitmap, cliprect, bg_scroll_x, bg_scroll_y );
-
-	spriteram = snk_rambase + 0x1000;
-	tdfever_draw_sp(screen->machine, bitmap, cliprect, sp16_scroll_x, sp16_scroll_y, 0, 1, 0, 32 );
-
-	tdfever_draw_tx(screen->machine, bitmap, cliprect, tx_attributes, 0, 0, 0xf800 );
-	return 0;
-}
-
-
-
 
 VIDEO_UPDATE( tnk3 )
 {
@@ -726,7 +635,7 @@ VIDEO_UPDATE( ikari )
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	ikari_draw_sprites(screen->machine, bitmap, cliprect,  0, sp16_scrollx, sp16_scrolly, spriteram + 0x800, 2 );
-	ikari_draw_sprites(screen->machine, bitmap, cliprect,  0, sp32_scrollx, sp32_scrolly, spriteram, 3 );
+	ikari_draw_sprites(screen->machine, bitmap, cliprect,  0, sp32_scrollx, sp32_scrolly, spriteram,         3 );
 	ikari_draw_sprites(screen->machine, bitmap, cliprect, 25, sp16_scrollx, sp16_scrolly, spriteram + 0x800, 2 );
 
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
@@ -741,9 +650,24 @@ VIDEO_UPDATE( gwar )
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
-	tdfever_draw_sp(screen->machine, bitmap, cliprect, -sp16_scrollx - 9, -sp16_scrolly - 15, 2, 0, 0, sprite_split_point );
-	tdfever_draw_sp(screen->machine, bitmap, cliprect, -sp32_scrollx - 9, -sp32_scrolly - 31, 1, 0, 0, 32 );
-	tdfever_draw_sp(screen->machine, bitmap, cliprect, -sp16_scrollx - 9, -sp16_scrolly - 15, 2, 0, sprite_split_point, 64 );
+	tdfever_draw_sprites(screen->machine, bitmap, cliprect, sp16_scrollx, sp16_scrolly, spriteram + 0x800, 2, 0, 0, sprite_split_point );
+	tdfever_draw_sprites(screen->machine, bitmap, cliprect, sp32_scrollx, sp32_scrolly, spriteram,         3, 0, 0, 32 );
+	tdfever_draw_sprites(screen->machine, bitmap, cliprect, sp16_scrollx, sp16_scrolly, spriteram + 0x800, 2, 0, sprite_split_point, 64 );
+
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+
+	return 0;
+}
+
+
+VIDEO_UPDATE( tdfever )
+{
+	tilemap_set_scrollx(bg_tilemap, 0, bg_scrollx);
+	tilemap_set_scrolly(bg_tilemap, 0, bg_scrolly);
+
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+
+	tdfever_draw_sprites(screen->machine, bitmap, cliprect, sp32_scrollx, sp32_scrolly, spriteram, 2, 1, 0, 32 );
 
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 
