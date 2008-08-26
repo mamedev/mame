@@ -16,7 +16,6 @@ Notes:
 
 UINT16* pow_fg_videoram;
 
-static int pow_charbank;
 static int sprite_flip_axis;
 static tilemap *fg_tilemap;
 static int flipscreen;
@@ -29,7 +28,7 @@ static int flipscreen;
 
 static TILE_GET_INFO( get_pow_tile_info )
 {
-	int tile = (pow_fg_videoram[2*tile_index] & 0xff) | (pow_charbank << 8);
+	int tile = (pow_fg_videoram[2*tile_index] & 0xff);
 	int color = pow_fg_videoram[2*tile_index+1] & 0x07;
 
 	SET_TILE_INFO(0, tile, color, 0);
@@ -140,11 +139,7 @@ WRITE16_HANDLER( pow_flipscreen16_w )
 
 		sprite_flip_axis = data & 0x04;	// for streetsm? though might not be present on this board
 
-		if (pow_charbank != ((data & 0x70) >> 4))
-		{
-			pow_charbank = (data & 0x70) >> 4;
-			tilemap_mark_all_tiles_dirty(fg_tilemap);
-		}
+		tilemap_set_pen_data_offset(fg_tilemap, ((data & 0x70) << 4) * machine->gfx[0]->char_modulo);
 	}
 }
 

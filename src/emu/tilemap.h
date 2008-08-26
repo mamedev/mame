@@ -131,6 +131,9 @@
             * setting a global palette offset via
                 tilemap_set_palette_offset()
 
+            * setting a global pen data offset via
+                tilemap_set_pen_data_offset()
+
     3. In your memory write handlers for the tile memory, anytime tile
         data is modified, you need to mark the tile dirty so that it is
         re-rendered with the new data the next time the tilemap is drawn.
@@ -432,11 +435,16 @@ tilemap *tilemap_create(tile_get_info_func tile_get_info, tilemap_mapper_func ma
 /* specify a parameter to be passed into the tile_get_info callback */
 void tilemap_set_user_data(tilemap *tmap, void *user_data);
 
-/* specify an offset to be added to each pixel before looking up the palette
+/* specify an offset to be added to each pixel before looking up the palette.
  * The offset only applies at final rendering time (e.g., tilemap_draw())
  * It does not apply to the cached pixmap, which is provided by tilemap_get_pixmap().
  */
 void tilemap_set_palette_offset(tilemap *tmap, UINT32 offset);
+
+/* specify an offset to be added to pen_data while rendering tiles.
+ * This will automatically mark all tiles dirty if the offset changes.
+ */
+void tilemap_set_pen_data_offset(tilemap *tmap, UINT32 offset);
 
 /* set an enable flag for the tilemap; if 0, requests to draw the tilemap are ignored */
 void tilemap_set_enable(tilemap *tmap, int enable);

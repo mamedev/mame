@@ -27,7 +27,6 @@ UINT8 *snk_bg_videoram;
 
 static tilemap *fg_tilemap;
 static tilemap *bg_tilemap;
-static int fg_bank, bg_bank;
 static int bg_scrollx, bg_scrolly, sp16_scrollx, sp16_scrolly, sp32_scrollx, sp32_scrolly;
 static UINT8 sprite_split_point;
 
@@ -88,7 +87,7 @@ static TILE_GET_INFO( tnk3_get_fg_tile_info )
 	int code = snk_fg_videoram[tile_index];
 	int color = code >> 5;
 	SET_TILE_INFO(0,
-			code | (fg_bank << 8),
+			code,
 			color,
 			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
 }
@@ -97,7 +96,7 @@ static TILE_GET_INFO( ikari_get_fg_tile_info )
 {
 	int code = snk_fg_videoram[tile_index];
 	SET_TILE_INFO(0,
-			code | (fg_bank << 8),
+			code,
 			0,
 			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
 }
@@ -106,7 +105,7 @@ static TILE_GET_INFO( gwar_get_fg_tile_info )
 {
 	int code = snk_fg_videoram[tile_index];
 	SET_TILE_INFO(0,
-			code | (fg_bank << 8),
+			code,
 			0,
 			0);
 }
@@ -116,7 +115,7 @@ static TILE_GET_INFO( aso_get_bg_tile_info )
 {
 	int code = snk_bg_videoram[tile_index];
 	SET_TILE_INFO(1,
-			code | (bg_bank << 8),
+			code,
 			0,
 			0);
 }
@@ -325,15 +324,9 @@ WRITE8_HANDLER( tnk3_videoattrs_w )
         -------X    scrollx MSB (sprites)
     */
 
-	int bank = (data & 0x40) >> 6;
-
-	if (fg_bank != bank)
-	{
-		tilemap_mark_all_tiles_dirty(fg_tilemap);
-		fg_bank = bank;
-	}
-
 	flip_screen_set(data & 0x80);
+
+	tilemap_set_pen_data_offset(fg_tilemap, ((data & 0x40) << 2) * machine->gfx[0]->char_modulo);
 
 	bg_scrolly =   (bg_scrolly   & 0xff) | ((data & 0x10) << 4);
 	sp16_scrolly = (sp16_scrolly & 0xff) | ((data & 0x08) << 5);
@@ -365,15 +358,8 @@ WRITE8_HANDLER( aso_videoattrs_w )
 
 WRITE8_HANDLER( aso_bg_bank_w )
 {
-	int bank = (data & 0x30) >> 4;
-
-	if (bg_bank != bank)
-	{
-		tilemap_mark_all_tiles_dirty(bg_tilemap);
-		bg_bank = bank;
-	}
-
 	tilemap_set_palette_offset(bg_tilemap, ((data & 0xf) ^ 8) << 4);
+	tilemap_set_pen_data_offset(bg_tilemap, ((data & 0x30) << 4) * machine->gfx[1]->char_modulo);
 }
 
 WRITE8_HANDLER( ikari_bg_scroll_msb_w )
@@ -398,36 +384,19 @@ WRITE8_HANDLER( ikari_unknown_video_w )
 	   hard flags test and the test grid.
 	   Changing palette bank is necessary to fix colors in test mode. */
 
-	int bank = (data & 0x10) >> 4;
-
 if (data != 0x20 &&	// normal
 	data != 0x31 &&	// ikari test
 	data != 0xaa)	// victroad spurious during boot
 	popmessage("attrs %02x contact MAMEDEV", data);
 
-	if (fg_bank != bank)
-	{
-		tilemap_mark_all_tiles_dirty(fg_tilemap);
-		fg_bank = bank;
-	}
-
-	if (data & 1)
-		tilemap_set_palette_offset(fg_tilemap, 16);
-	else
-		tilemap_set_palette_offset(fg_tilemap, 0);
+	tilemap_set_palette_offset(fg_tilemap, (data & 0x01) << 4);
+	tilemap_set_pen_data_offset(fg_tilemap, ((data & 0x10) << 4) * machine->gfx[0]->char_modulo);
 }
 
 WRITE8_HANDLER( gwar_fg_bank_w )
 {
-	int bank = (data & 0x30) >> 4;
-
-	if (fg_bank != bank)
-	{
-		tilemap_mark_all_tiles_dirty(fg_tilemap);
-		fg_bank = bank;
-	}
-
 	tilemap_set_palette_offset(fg_tilemap, (data & 0xf) << 4);
+	tilemap_set_pen_data_offset(fg_tilemap, ((data & 0x30) << 4) * machine->gfx[0]->char_modulo);
 }
 
 WRITE8_HANDLER( gwar_videoattrs_w )

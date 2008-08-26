@@ -96,6 +96,7 @@ struct _tilemap
 	UINT8						all_tiles_dirty;	/* true if all tiles are dirty */
 	UINT8						all_tiles_clean;	/* true if all tiles are clean */
 	UINT32						palette_offset;		/* palette offset */
+	UINT32						pen_data_offset;	/* pen data offset */
 
 	/* scroll information */
 	UINT32						scrollrows;			/* number of independently scrolled rows */
@@ -344,6 +345,7 @@ tilemap *tilemap_create(tile_get_info_func tile_get_info, tilemap_mapper_func ma
 	state_save_register_item("tilemap", tilemap_instance, tmap->enable);
 	state_save_register_item("tilemap", tilemap_instance, tmap->attributes);
 	state_save_register_item("tilemap", tilemap_instance, tmap->palette_offset);
+	state_save_register_item("tilemap", tilemap_instance, tmap->pen_data_offset);
 	state_save_register_item("tilemap", tilemap_instance, tmap->scrollrows);
 	state_save_register_item("tilemap", tilemap_instance, tmap->scrollcols);
 	state_save_register_item_pointer("tilemap", tilemap_instance, tmap->rowscroll, rows * tileheight);
@@ -380,6 +382,21 @@ void tilemap_set_user_data(tilemap *tmap, void *user_data)
 void tilemap_set_palette_offset(tilemap *tmap, UINT32 offset)
 {
 	tmap->palette_offset = offset;
+}
+
+
+/*-------------------------------------------------
+    tilemap_set_pen_data_offset - specify an offset
+    to be added to pen_data while rendering tiles
+-------------------------------------------------*/
+
+void tilemap_set_pen_data_offset(tilemap *tmap, UINT32 offset)
+{
+	if (tmap->pen_data_offset != offset)
+	{
+		tmap->pen_data_offset = offset;
+		tilemap_mark_all_tiles_dirty(tmap);
+	}
 }
 
 
@@ -1248,7 +1265,7 @@ profiler_mark(PROFILER_TILEMAP_UPDATE);
 	flags = tmap->tileinfo.flags ^ (tmap->attributes & 0x03);
 
 	/* draw the tile, using either direct or transparent */
-	tmap->tileflags[logindex] = tile_draw(tmap, tmap->tileinfo.pen_data, x0, y0, tmap->tileinfo.palette_base, tmap->tileinfo.category, tmap->tileinfo.group, flags);
+	tmap->tileflags[logindex] = tile_draw(tmap, tmap->tileinfo.pen_data + tmap->pen_data_offset, x0, y0, tmap->tileinfo.palette_base, tmap->tileinfo.category, tmap->tileinfo.group, flags);
 
 	/* if mask data is specified, apply it */
 	if ((flags & (TILE_FORCE_LAYER0 | TILE_FORCE_LAYER1 | TILE_FORCE_LAYER2)) == 0 && tmap->tileinfo.mask_data != NULL)
