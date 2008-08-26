@@ -43,7 +43,7 @@ static READ8_HANDLER( trvquest_question_r )
 {
 	gameplan_state *state = machine->driver_data;
 
-	return memory_region(machine, "user1")[*state->trvquest_question * 0x2000 + offset];
+	return memory_region(machine, "questions")[*state->trvquest_question * 0x2000 + offset];
 }
 
 static WRITE8_HANDLER( trvquest_coin_w )
@@ -203,7 +203,7 @@ static MACHINE_DRIVER_START( trvquest )
 
 	MDRV_DRIVER_DATA(gameplan_state)
 
-	MDRV_CPU_ADD("main", M6809,6000000)
+	MDRV_CPU_ADD("main", M6809,XTAL_6MHz/4)
 	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
 	MDRV_CPU_VBLANK_INT("main", trvquest_interrupt)
 
@@ -217,10 +217,10 @@ static MACHINE_DRIVER_START( trvquest )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
+	MDRV_SOUND_ADD("ay1", AY8910, XTAL_6MHz/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
+	MDRV_SOUND_ADD("ay2", AY8910, XTAL_6MHz/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
@@ -232,7 +232,7 @@ ROM_START( trvquest )
 	ROM_LOAD( "rom6", 0xe000, 0x1000, CRC(fabf4846) SHA1(862cac32de78f2ff4afef398b864d5533d302a4f) )
 	ROM_LOAD( "rom7", 0xf000, 0x1000, CRC(a9f56551) SHA1(fb6fc3b17a6e66571a5ba837befbfac1ac26cc39) )
 
-	ROM_REGION( 0x18000, "user1", ROMREGION_ERASEFF ) /* Question roms */
+	ROM_REGION( 0x18000, "questions", ROMREGION_ERASEFF ) /* Question roms */
 	/* 0x00000 - 0x07fff empty */
 	ROM_LOAD( "romi", 0x06000, 0x2000, CRC(c8368f69) SHA1(c1dfb701482c5ae922df0a93665a519995a2f4f1) )
 	ROM_LOAD( "romh", 0x08000, 0x2000, CRC(f3aa8a08) SHA1(2bf8f878cc1df84806a6fb8e7be2656c422d61b9) )
