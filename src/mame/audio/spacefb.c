@@ -5,7 +5,7 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "cpu/i8039/i8039.h"
+#include "cpu/mcs48/mcs48.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
 #include "includes/spacefb.h"

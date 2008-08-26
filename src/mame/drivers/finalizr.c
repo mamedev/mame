@@ -10,7 +10,7 @@ driver by Nicola Salmoria
 #include "deprecat.h"
 #include "machine/konami1.h"
 #include "cpu/m6809/m6809.h"
-#include "cpu/i8039/i8039.h"
+#include "cpu/mcs48/mcs48.h"
 #include "sound/sn76496.h"
 #include "sound/dac.h"
 

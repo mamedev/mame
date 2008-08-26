@@ -84,7 +84,7 @@ DM81LS95 = TriState buffer
 **************************************************************************/
 
 #include "driver.h"
-#include "cpu/i8039/i8039.h"
+#include "cpu/mcs48/mcs48.h"
 #include "sound/5220intf.h"
 
 extern UINT8 *portrait_bgvideoram,*portrait_fgvideoram;

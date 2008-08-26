@@ -11,7 +11,7 @@
 
 #include "driver.h"
 #include "uimenu.h"
-#include "cpu/i8039/i8039.h"
+#include "cpu/mcs48/mcs48.h"
 #include "machine/laserdsc.h"
 #include <ctype.h>
 

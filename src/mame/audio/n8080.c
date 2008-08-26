@@ -6,7 +6,7 @@
 
 #include "driver.h"
 #include "deprecat.h"
-#include "cpu/i8039/i8039.h"
+#include "cpu/mcs48/mcs48.h"
 #include "sound/sn76477.h"
 #include "sound/dac.h"
 #include "includes/n8080.h"

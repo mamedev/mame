@@ -619,13 +619,13 @@ CPUDEFS += -DHAS_N7751=$(if $(filter N7751,$(CPUS)),1,0)
 CPUDEFS += -DHAS_M58715=$(if $(filter M58715,$(CPUS)),1,0)
 
 ifneq ($(filter I8035 I8041 I8048 I8648 I8748 MB8884 I8039 I8049 I8749 N7751 M58715,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/i8039
-CPUOBJS += $(CPUOBJ)/i8039/i8039.o
-DBGOBJS += $(CPUOBJ)/i8039/8039dasm.o
+OBJDIRS += $(CPUOBJ)/mcs48
+CPUOBJS += $(CPUOBJ)/mcs48/mcs48.o
+DBGOBJS += $(CPUOBJ)/mcs48/mcs48dsm.o
 endif
 
-$(CPUOBJ)/i8039/i8039.o:	$(CPUSRC)/i8039/i8039.c \
-							$(CPUSRC)/i8039/i8039.h
+$(CPUOBJ)/mcs48/mcs48.o:	$(CPUSRC)/mcs48/mcs48.c \
+							$(CPUSRC)/mcs48/mcs48.h
 
 
 

@@ -10,7 +10,7 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "streams.h"
-#include "cpu/i8039/i8039.h"
+#include "cpu/mcs48/mcs48.h"
 #include "segag80r.h"
 #include "machine/8255ppi.h"
 #include "sound/samples.h"

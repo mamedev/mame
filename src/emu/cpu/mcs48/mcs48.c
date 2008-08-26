@@ -1,8 +1,8 @@
 /****************************************************************************
- *                      Intel 8039 Portable Emulator                        *
+ *                     Intel MCS-48 Portable Emulator                       *
  *                                                                          *
- *                   Copyright Mirko Buffoni                             *
- *  Based on the original work Copyright Dan Boris, an 8048 emulator     *
+ *                   Copyright Mirko Buffoni                                *
+ *  Based on the original work Copyright Dan Boris, an 8048 emulator        *
  *      You are not allowed to distribute this software commercially        *
  *        Please, notify me, if you make any changes to this file           *
  *                                                                          *
@@ -58,7 +58,7 @@
 
 
 #include "debugger.h"
-#include "i8039.h"
+#include "mcs48.h"
 
 
 /*** Cycle times for the jump on condition instructions, are unusual.
