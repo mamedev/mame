@@ -457,6 +457,7 @@ WRITE64_HANDLER( dc_maple_w )
 										maple0x86data2[pos+8] = 1;
 										maple0x86data2[pos+1] = 0x8e;
 										maple0x86data2[pos+9] = 1;
+										maple0x86data2[pos+5] = 0xe0;
 										// 4 + 1 + 0x10 + ?,8e,addr,0,?,?,addr?,len,status,report1,jvsbytes...
 										ddtdata.length=11;
 										tocopy += 10;

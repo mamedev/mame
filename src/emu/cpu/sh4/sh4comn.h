@@ -74,8 +74,9 @@ typedef struct
 	emu_timer *rtc_timer;
 	emu_timer *timer[3];
 	UINT32	refresh_timer_base;
-	int     dma_timer_active[2];
+	int     dma_timer_active[4];
 
+	int 	sh4_icount;
 	int     is_slave, cpu_number;
 	int		cpu_clock, bus_clock, pm_clock;
 	int		fpu_sz, fpu_pr;
@@ -85,7 +86,6 @@ typedef struct
 	void	(*ftcsr_read_callback)(UINT32 data);
 } SH4;
 
-extern int sh4_icount;
 extern SH4 sh4;
 
 enum

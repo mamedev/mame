@@ -300,7 +300,7 @@ INLINE void ANDM(UINT32 i)
 	sh4.ea = sh4.gbr + sh4.r[0];
 	temp = i & RB( sh4.ea );
 	WB( sh4.ea, temp );
-	sh4_icount -= 2;
+	sh4.sh4_icount -= 2;
 }
 
 /*  code                 cycles  t-bit
@@ -314,7 +314,7 @@ INLINE void BF(UINT32 d)
 		INT32 disp = ((INT32)d << 24) >> 24;
 		sh4.pc = sh4.ea = sh4.pc + disp * 2 + 2;
 		change_pc(sh4.pc & AM);
-		sh4_icount -= 2;
+		sh4.sh4_icount -= 2;
 	}
 }
 
@@ -329,7 +329,7 @@ INLINE void BFS(UINT32 d)
 		INT32 disp = ((INT32)d << 24) >> 24;
 		sh4.delay = sh4.pc;
 		sh4.pc = sh4.ea = sh4.pc + disp * 2 + 2;
-		sh4_icount--;
+		sh4.sh4_icount--;
 	}
 }
 
@@ -349,12 +349,12 @@ INLINE void BRA(UINT32 d)
          * NOP
          */
 		if (next_opcode == 0x0009)
-			sh4_icount %= 3;	/* cycles for BRA $ and NOP taken (3) */
+			sh4.sh4_icount %= 3;	/* cycles for BRA $ and NOP taken (3) */
 	}
 #endif
 	sh4.delay = sh4.pc;
 	sh4.pc = sh4.ea = sh4.pc + disp * 2 + 2;
-	sh4_icount--;
+	sh4.sh4_icount--;
 }
 
 /*  code                 cycles  t-bit
@@ -365,7 +365,7 @@ INLINE void BRAF(UINT32 m)
 {
 	sh4.delay = sh4.pc;
 	sh4.pc += sh4.r[m] + 2;
-	sh4_icount--;
+	sh4.sh4_icount--;
 }
 
 /*  code                 cycles  t-bit
@@ -379,7 +379,7 @@ INLINE void BSR(UINT32 d)
 	sh4.pr = sh4.pc + 2;
 	sh4.delay = sh4.pc;
 	sh4.pc = sh4.ea = sh4.pc + disp * 2 + 2;
-	sh4_icount--;
+	sh4.sh4_icount--;
 }
 
 /*  code                 cycles  t-bit
@@ -391,7 +391,7 @@ INLINE void BSRF(UINT32 m)
 	sh4.pr = sh4.pc + 2;
 	sh4.delay = sh4.pc;
 	sh4.pc += sh4.r[m] + 2;
-	sh4_icount--;
+	sh4.sh4_icount--;
 }
 
 /*  code                 cycles  t-bit
@@ -405,7 +405,7 @@ INLINE void BT(UINT32 d)
 		INT32 disp = ((INT32)d << 24) >> 24;
 		sh4.pc = sh4.ea = sh4.pc + disp * 2 + 2;
 		change_pc(sh4.pc & AM);
-		sh4_icount -= 2;
+		sh4.sh4_icount -= 2;
 	}
 }
 
@@ -420,7 +420,7 @@ INLINE void BTS(UINT32 d)
 		INT32 disp = ((INT32)d << 24) >> 24;
 		sh4.delay = sh4.pc;
 		sh4.pc = sh4.ea = sh4.pc + disp * 2 + 2;
-		sh4_icount--;
+		sh4.sh4_icount--;
 	}
 }
 
@@ -732,7 +732,7 @@ INLINE void DMULS(UINT32 m, UINT32 n)
 	}
 	sh4.mach = Res2;
 	sh4.macl = Res0;
-	sh4_icount--;
+	sh4.sh4_icount--;
 }
 
 /*  DMULU.L Rm,Rn */
@@ -760,7 +760,7 @@ INLINE void DMULU(UINT32 m, UINT32 n)
 	Res2 = Res2 + ((Res1 >> 16) & 0x0000ffff) + temp3;
 	sh4.mach = Res2;
 	sh4.macl = Res0;
-	sh4_icount--;
+	sh4.sh4_icount--;
 }
 
 /*  DT      Rn */
@@ -779,10 +779,10 @@ INLINE void DT(UINT32 n)
          */
 		if (next_opcode == 0x8bfd)
 		{
-			while (sh4.r[n] > 1 && sh4_icount > 4)
+			while (sh4.r[n] > 1 && sh4.sh4_icount > 4)
 			{
 				sh4.r[n]--;
-				sh4_icount -= 4;	/* cycles for DT (1) and BF taken (3) */
+				sh4.sh4_icount -= 4;	/* cycles for DT (1) and BF taken (3) */
 			}
 		}
 	}
@@ -826,18 +826,21 @@ INLINE void JSR(UINT32 m)
 	sh4.delay = sh4.pc;
 	sh4.pr = sh4.pc + 2;
 	sh4.pc = sh4.ea = sh4.r[m];
-	sh4_icount--;
+	sh4.sh4_icount--;
 }
 
 
 /*  LDC     Rm,SR */
 INLINE void LDCSR(UINT32 m)
 {
+UINT32 reg;
+
+	reg = sh4.r[m];
 	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		sh4_syncronize_register_bank((sh4.sr & sRB) >> 29);
 	if ((sh4.r[m] & sRB) != (sh4.sr & sRB))
 		sh4_change_register_bank(sh4.r[m] & sRB ? 1 : 0);
-	sh4.sr = sh4.r[m] & FLAGS;
+	sh4.sr = reg & FLAGS;
 	sh4_exception_recompute();
 }
 
@@ -866,7 +869,7 @@ UINT32 old;
 	if ((old & sRB) != (sh4.sr & sRB))
 		sh4_change_register_bank(sh4.sr & sRB ? 1 : 0);
 	sh4.r[m] += 4;
-	sh4_icount -= 2;
+	sh4.sh4_icount -= 2;
 	sh4_exception_recompute();
 }
 
@@ -876,7 +879,7 @@ INLINE void LDCMGBR(UINT32 m)
 	sh4.ea = sh4.r[m];
 	sh4.gbr = RL( sh4.ea );
 	sh4.r[m] += 4;
-	sh4_icount -= 2;
+	sh4.sh4_icount -= 2;
 }
 
 /*  LDC.L   @Rm+,VBR */
@@ -885,7 +888,7 @@ INLINE void LDCMVBR(UINT32 m)
 	sh4.ea = sh4.r[m];
 	sh4.vbr = RL( sh4.ea );
 	sh4.r[m] += 4;
-	sh4_icount -= 2;
+	sh4.sh4_icount -= 2;
 }
 
 /*  LDS     Rm,MACH */
@@ -1004,7 +1007,7 @@ INLINE void MAC_L(UINT32 m, UINT32 n)
 		sh4.mach = Res2;
 		sh4.macl = Res0;
 	}
-	sh4_icount -= 2;
+	sh4.sh4_icount -= 2;
 }
 
 /*  MAC.W   @Rm+,@Rn+ */
@@ -1056,7 +1059,7 @@ INLINE void MAC_W(UINT32 m, UINT32 n)
 		if (templ > sh4.macl)
 			sh4.mach += 1;
 		}
-	sh4_icount -= 2;
+	sh4.sh4_icount -= 2;
 }
 
 /*  MOV     Rm,Rn */
@@ -1337,7 +1340,7 @@ INLINE void MOVT(UINT32 n)
 INLINE void MULL(UINT32 m, UINT32 n)
 {
 	sh4.macl = sh4.r[n] * sh4.r[m];
-	sh4_icount--;
+	sh4.sh4_icount--;
 }
 
 /*  MULS    Rm,Rn */
@@ -1392,7 +1395,7 @@ INLINE void OR(UINT32 m, UINT32 n)
 INLINE void ORI(UINT32 i)
 {
 	sh4.r[0] |= i;
-	sh4_icount -= 2;
+	sh4.sh4_icount -= 2;
 }
 
 /*  OR.B    #imm,@(R0,GBR) */
@@ -1452,7 +1455,7 @@ INLINE void RTE(void)
 	if ((sh4.ssr & sRB) != (sh4.sr & sRB))
 		sh4_change_register_bank(sh4.ssr & sRB ? 1 : 0);
 	sh4.sr = sh4.ssr;
-	sh4_icount--;
+	sh4.sh4_icount--;
 	sh4_exception_recompute();
 }
 
@@ -1461,7 +1464,7 @@ INLINE void RTS(void)
 {
 	sh4.delay = sh4.pc;
 	sh4.pc = sh4.ea = sh4.pr;
-	sh4_icount--;
+	sh4.sh4_icount--;
 }
 
 /*  SETT */
@@ -1538,7 +1541,7 @@ INLINE void SHLR16(UINT32 n)
 INLINE void SLEEP(void)
 {
 	sh4.pc -= 2;
-	sh4_icount -= 2;
+	sh4.sh4_icount -= 2;
 	/* Wait_for_exception; */
 }
 
@@ -1566,7 +1569,7 @@ INLINE void STCMSR(UINT32 n)
 	sh4.r[n] -= 4;
 	sh4.ea = sh4.r[n];
 	WL( sh4.ea, sh4.sr );
-	sh4_icount--;
+	sh4.sh4_icount--;
 }
 
 /*  STC.L   GBR,@-Rn */
@@ -1575,7 +1578,7 @@ INLINE void STCMGBR(UINT32 n)
 	sh4.r[n] -= 4;
 	sh4.ea = sh4.r[n];
 	WL( sh4.ea, sh4.gbr );
-	sh4_icount--;
+	sh4.sh4_icount--;
 }
 
 /*  STC.L   VBR,@-Rn */
@@ -1584,7 +1587,7 @@ INLINE void STCMVBR(UINT32 n)
 	sh4.r[n] -= 4;
 	sh4.ea = sh4.r[n];
 	WL( sh4.ea, sh4.vbr );
-	sh4_icount--;
+	sh4.sh4_icount--;
 }
 
 /*  STS     MACH,Rn */
@@ -1716,7 +1719,7 @@ INLINE void TAS(UINT32 n)
 	temp |= 0x80;
 	/* Bus Lock disable */
 	WB( sh4.ea, temp );
-	sh4_icount -= 3;
+	sh4.sh4_icount -= 3;
 }
 
 /*  TRAPA   #imm */
@@ -1742,7 +1745,7 @@ INLINE void TRAPA(UINT32 i)
 	sh4.pc = sh4.vbr + 0x00000100;
 	change_pc(sh4.pc & AM);
 
-	sh4_icount -= 7;
+	sh4.sh4_icount -= 7;
 }
 
 /*  TST     Rm,Rn */
@@ -1775,7 +1778,7 @@ INLINE void TSTM(UINT32 i)
 		sh4.sr |= T;
 	else
 		sh4.sr &= ~T;
-	sh4_icount -= 2;
+	sh4.sh4_icount -= 2;
 }
 
 /*  XOR     Rm,Rn */
@@ -1801,7 +1804,7 @@ INLINE void XORM(UINT32 i)
 	temp = RB( sh4.ea );
 	temp ^= imm;
 	WB( sh4.ea, temp );
-	sh4_icount -= 2;
+	sh4.sh4_icount -= 2;
 }
 
 /*  XTRCT   Rm,Rn */
@@ -1862,7 +1865,7 @@ INLINE void STCMRBANK(UINT32 m, UINT32 n)
 	sh4.r[n] -= 4;
 	sh4.ea = sh4.r[n];
 	WL( sh4.ea, sh4.rbnk[sh4.sr&sRB ? 0 : 1][m & 7]);
-	sh4_icount--;
+	sh4.sh4_icount--;
 }
 
 /*  MOVCA.L     R0,@Rn */
@@ -3313,7 +3316,7 @@ static void sh4_reset(void)
 /* Execute cycles - returns number of cycles actually run */
 static int sh4_execute(int cycles)
 {
-	sh4_icount = cycles;
+	sh4.sh4_icount = cycles;
 
 	if (sh4.cpu_off)
 		return 0;
@@ -3361,10 +3364,10 @@ static int sh4_execute(int cycles)
 		{
 			sh4_check_pending_irq("mame_sh4_execute");
 		}
-		sh4_icount--;
-	} while( sh4_icount > 0 );
+		sh4.sh4_icount--;
+	} while( sh4.sh4_icount > 0 );
 
-	return cycles - sh4_icount;
+	return cycles - sh4.sh4_icount;
 }
 
 /* Get registers, return context size */
@@ -3706,7 +3709,7 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXECUTE:						info->execute = sh4_execute;			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = sh4_dasm;			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sh4_icount;				break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sh4.sh4_icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:						strcpy(info->s, "SH-4");				break;

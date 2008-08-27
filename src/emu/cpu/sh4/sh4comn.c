@@ -12,7 +12,6 @@
 #include "sh4regs.h"
 #include "sh4comn.h"
 
-int sh4_icount;
 SH4 sh4;
 
 static const int tcnt_div[8] = { 4, 16, 64, 256, 1024, 1, 1, 1 };
@@ -886,11 +885,11 @@ WRITE32_HANDLER( sh4_internal_w )
 		sh4.ioport16_direction &= 0xffff;
 		sh4.ioport16_pullup = (sh4.ioport16_pullup | sh4.ioport16_direction) ^ 0xffff;
 		if (sh4.m[BCR2] & 1)
-			io_write_dword_64le(SH4_IOPORT_16, sh4.m[PDTRA] & sh4.ioport16_direction);
+			io_write_dword_64le(SH4_IOPORT_16, (UINT64)(sh4.m[PDTRA] & sh4.ioport16_direction) | ((UINT64)sh4.m[PCTRA] << 16));
 		break;
 	case PDTRA:
 		if (sh4.m[BCR2] & 1)
-			io_write_dword_64le(SH4_IOPORT_16, sh4.m[PDTRA] & sh4.ioport16_direction);
+			io_write_dword_64le(SH4_IOPORT_16, (UINT64)(sh4.m[PDTRA] & sh4.ioport16_direction) | ((UINT64)sh4.m[PCTRA] << 16));
 		break;
 	case PCTRB:
 		sh4.ioport4_pullup = 0;
@@ -902,11 +901,11 @@ WRITE32_HANDLER( sh4_internal_w )
 		sh4.ioport4_direction &= 0xf;
 		sh4.ioport4_pullup = (sh4.ioport4_pullup | sh4.ioport4_direction) ^ 0xf;
 		if (sh4.m[BCR2] & 1)
-			io_write_dword_64le(SH4_IOPORT_4, sh4.m[PDTRB] & sh4.ioport4_direction);
+			io_write_dword_64le(SH4_IOPORT_4, (sh4.m[PDTRB] & sh4.ioport4_direction) | (sh4.m[PCTRB] << 16));
 		break;
 	case PDTRB:
 		if (sh4.m[BCR2] & 1)
-			io_write_dword_64le(SH4_IOPORT_4, sh4.m[PDTRB] & sh4.ioport4_direction);
+			io_write_dword_64le(SH4_IOPORT_4, (sh4.m[PDTRB] & sh4.ioport4_direction) | (sh4.m[PCTRB] << 16));
 		break;
 
 	case SCBRR2:
