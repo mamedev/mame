@@ -1,4 +1,4 @@
-*
+/*
 snk.c
 
 various SNK triple Z80 games
