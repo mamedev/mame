@@ -574,7 +574,7 @@ CUSTOM_INPUT( gwar_rotary )
 	static int last_value[2] = {0, 0};
 	static int cp_count[2] = {0, 0};
 	static const char *ports[] = { "P1ROT", "P2ROT" };
-	int which = (int)param;
+	int which = (int)(FPTR)param;
 	int value = input_port_read(field->port->machine, ports[which]);
 
 	if ((last_value[which] == 0x5 && value == 0x6) || (last_value[which] == 0x6 && value == 0x5))
