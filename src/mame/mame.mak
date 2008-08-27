@@ -1265,7 +1265,6 @@ $(MAMEOBJ)/snk.a: \
 	$(DRIVERS)/dmndrby.o \
 	$(DRIVERS)/hal21.o \
 	$(DRIVERS)/hng64.o $(VIDEO)/hng64.o \
-	$(DRIVERS)/jcross.o $(VIDEO)/jcross.o \
 	$(DRIVERS)/lasso.o $(VIDEO)/lasso.o \
 	$(DRIVERS)/mainsnk.o $(VIDEO)/mainsnk.o \
 	$(DRIVERS)/marvins.o $(VIDEO)/marvins.o \

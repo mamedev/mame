@@ -29,7 +29,7 @@ static tilemap *fg_tilemap;
 static tilemap *bg_tilemap;
 static int bg_scrollx, bg_scrolly, sp16_scrollx, sp16_scrolly, sp32_scrollx, sp32_scrolly;
 static UINT8 sprite_split_point;
-static int yscroll_mask;
+static int num_sprites, yscroll_mask;
 
 static UINT8 empty_tile[16*16];
 
@@ -200,6 +200,23 @@ static VIDEO_START( snk_4bpp_shadow )
 }
 
 
+VIDEO_START( jcross )
+{
+	VIDEO_START_CALL(snk_3bpp_shadow);
+
+	fg_tilemap = tilemap_create(tnk3_get_fg_tile_info, tnk3_fg_scan_cols, 8, 8, 36, 28);
+	bg_tilemap = tilemap_create(aso_get_bg_tile_info,  tilemap_scan_cols, 8, 8, 64, 64);
+
+	tilemap_set_transparent_pen(fg_tilemap, 15);
+	tilemap_set_scrolldy(fg_tilemap, 8, 8);
+
+	tilemap_set_scrolldx(bg_tilemap, 15, 24);
+	tilemap_set_scrolldy(bg_tilemap,  8, -32);
+
+	num_sprites = 25;
+	yscroll_mask = 0x1ff;
+}
+
 VIDEO_START( sgladiat )
 {
 	VIDEO_START_CALL(snk_3bpp_shadow);
@@ -213,6 +230,7 @@ VIDEO_START( sgladiat )
 	tilemap_set_scrolldx(bg_tilemap, 15, 24);
 	tilemap_set_scrolldy(bg_tilemap,  8, -32);
 
+	num_sprites = 25;
 	yscroll_mask = 0x0ff;
 }
 
@@ -229,6 +247,7 @@ VIDEO_START( aso )
 	tilemap_set_scrolldx(bg_tilemap, 15+256, 24+256);
 	tilemap_set_scrolldy(bg_tilemap,  8, -32);
 
+	num_sprites = 50;
 	yscroll_mask = 0x1ff;
 }
 
@@ -245,6 +264,7 @@ VIDEO_START( tnk3 )
 	tilemap_set_scrolldx(bg_tilemap, 15, 24);
 	tilemap_set_scrolldy(bg_tilemap,  8, -32);
 
+	num_sprites = 50;
 	yscroll_mask = 0x1ff;
 }
 
@@ -337,7 +357,17 @@ WRITE8_HANDLER( sgladiat_flipscreen_w )
 {
 	flip_screen_set(data & 0x80);
 
+	tilemap_set_palette_offset(bg_tilemap, ((data & 0xf) ^ 8) << 4);
+
 	// other bits unknown
+}
+
+WRITE8_HANDLER( jcross_scroll_msb_w )
+{
+	bg_scrolly =   (bg_scrolly   & 0xff) | ((data & 0x10) << 4);
+	sp16_scrolly = (sp16_scrolly & 0xff) | ((data & 0x08) << 5);
+	bg_scrollx =   (bg_scrollx   & 0xff) | ((data & 0x02) << 7);
+	sp16_scrollx = (sp16_scrollx & 0xff) | ((data & 0x01) << 8);
 }
 
 WRITE8_HANDLER( sgladiat_scroll_msb_w )
@@ -498,11 +528,13 @@ static void tnk3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const 
 	int xflip,yflip;
 	int offs;
 
-	/* tnk3 has 512 tiles, attribute bit 5 is y-flip */
-	/* athena has 1024 tiles, attribute bit 5 is extra bank bit */
-	int is_athena = (gfx->total_elements > 512);
+	/* jcross and sgladiat have only 25 sprites, the others 50 */
 
-	for (offs = 0; offs < 50*4; offs += 4)
+	/* jcross has 256 tiles, attribute bit 6 MIGHT be x-flip (uncertain) */
+	/* sgladiat and tnk3 have 512 tiles, bit 6 is bank and bit 5 is y-flip */
+	/* athena has 1024 tiles, bit 6 and bit 5 are bank */
+
+	for (offs = 0; offs < num_sprites*4; offs += 4)
 	{
 		tile_number = spriteram[offs+1];
 		attributes  = spriteram[offs+3];
@@ -514,13 +546,20 @@ static void tnk3_draw_sprites(running_machine *machine, bitmap_t *bitmap, const 
 		xflip = 0;
 		yflip = 0;
 
-		tile_number |= (attributes & 0x40) << 2;
+		if (gfx->total_elements > 256)	// all except jcross
+		{
+			tile_number |= (attributes & 0x40) << 2;
+		}
+		else	// jcross
+		{
+			xflip = attributes & 0x40;	// uncertain (not used?)
+		}
 
-		if (is_athena)
+		if (gfx->total_elements > 512)	// athena
 		{
 			tile_number |= (attributes & 0x20) << 4;
 		}
-		else	// tnk3, sgladiat
+		else	// all others
 		{
 			yflip = attributes & 0x20;
 		}

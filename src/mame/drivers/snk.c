@@ -1,7 +1,10 @@
-/*
+*
 snk.c
 
 various SNK triple Z80 games
+
+ay8910x2 + namco wave
+Jumping Cross
 
 ay8910x2
 Gladiator 1984
@@ -29,17 +32,19 @@ Credits (in alphabetical order)
     Marco Cassili
     Ernesto Corvi
     Carlos A. Lozano
-	 Bryan McPhail
+    Bryan McPhail
     Jarek Parchanski
-	 Nicola Salmoria
+    Nicola Salmoria
+    Tomasz Slanina
     Phil Stroffolino
-	 Acho A. Tang
+    Acho A. Tang
     Victor Trucco
 
 
 Notes:
 ------
 - How to enter test mode:
+  1984 jcross: n/a
   1984 sgladiat: n/a
   1985 tnk3: keep 1 pressed during boot
   1985 aso: keep 1 pressed during boot
@@ -58,6 +63,8 @@ Notes:
 
 - the I/O area (C000-CFFF) is probably mirrored in large part on the two main
   CPUs, however I mapped only the addresses actually used by the games.
+
+- sgladiat runs on a modified jcross pcb (same pcb ID with flying wires).
 
 - the original sgladiat pcb is verified to have huge sprite lag.
 
@@ -151,11 +158,14 @@ Notes:
 TODO:
 -----
 
-- sgladiat: unknown writes to D200/DA00, probably video related. Also most bits
-  of A600 are unknown.
+- jcross might be a bad dump. The current ROM set is made by mixing two sets
+  which were marked as 'bad'.
 
-- sgladiat: bg only uses palette 0, and colors seem to be fine. Is there some
-  place where it should switch to a different palette?
+- jcross: only the first bank of the fg charset is used. The second bank is
+  almost identical apart from a few characters. Should it be used? When?
+
+- sgladiat: unknown writes to D200/DA00, probably video related. Also some bits
+  of A600 are unknown.
 
 - ASO: unknown writes to CE00, probably video related. Always 05?
   Also unknown writes to F002 by the sound CPU, during reset.
@@ -192,6 +202,7 @@ TODO:
 #include "driver.h"
 #include "snk.h"
 #include "sound/ay8910.h"
+#include "sound/namco.h"
 #include "sound/3812intf.h"
 
 
@@ -347,6 +358,13 @@ static TIMER_CALLBACK( sndirq_update_callback )
 	cpunum_set_input_line(machine, 2, 0, (sound_status & 0xb) ? ASSERT_LINE : CLEAR_LINE);
 }
 
+
+
+static const namco_interface snkwave_interface =
+{
+	1,
+	0					/* stereo */
+};
 
 
 static void ymirq_callback_1(running_machine *machine, int irq)
@@ -698,6 +716,36 @@ static CUSTOM_INPUT( countryc_trackball_y )
 
 /************************************************************************/
 
+static ADDRESS_MAP_START( jcross_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x9fff) AM_ROM
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
+	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("IN1")
+	AM_RANGE(0xa200, 0xa200) AM_READ_PORT("IN2")
+	AM_RANGE(0xa300, 0xa300) AM_WRITE(sgladiat_soundlatch_w)
+	AM_RANGE(0xa400, 0xa400) AM_READ_PORT("DSW1")
+	AM_RANGE(0xa500, 0xa500) AM_READ_PORT("DSW2")
+	AM_RANGE(0xa600, 0xa600) AM_WRITE(sgladiat_flipscreen_w)
+	AM_RANGE(0xa700, 0xa700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
+	AM_RANGE(0xd300, 0xd300) AM_WRITE(jcross_scroll_msb_w)
+	AM_RANGE(0xd400, 0xd400) AM_WRITE(snk_sp16_scrolly_w)
+	AM_RANGE(0xd500, 0xd500) AM_WRITE(snk_sp16_scrollx_w)
+	AM_RANGE(0xd600, 0xd600) AM_WRITE(snk_bg_scrolly_w)
+	AM_RANGE(0xd700, 0xd700) AM_WRITE(snk_bg_scrollx_w)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE(&spriteram) AM_SHARE(1)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(aso_bg_videoram_w) AM_SHARE(2) AM_BASE(&snk_bg_videoram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(3) AM_BASE(&snk_fg_videoram)	// + work RAM
+	AM_RANGE(0xffff, 0xffff) AM_WRITENOP	// simply a program patch to not write to two not existing video registers?
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( jcross_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xa700, 0xa700) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE(1)
+	AM_RANGE(0xc800, 0xd7ff) AM_RAM_WRITE(aso_bg_videoram_w) AM_SHARE(2)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(snk_fg_videoram_w) AM_SHARE(3)
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( sgladiat_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x9fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("IN0")
@@ -1038,6 +1086,18 @@ ADDRESS_MAP_END
 
 /***********************************************************************/
 
+static ADDRESS_MAP_START( jcross_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_BASE(&namco_wavedata)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0xa000, 0xa000) AM_READ(sgladiat_soundlatch_r)
+	AM_RANGE(0xc000, 0xc000) AM_READ(sgladiat_sound_nmi_ack_r)
+	AM_RANGE(0xe000, 0xe000) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xe001, 0xe001) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xe002, 0xe007) AM_WRITE(snkwave_w)
+	AM_RANGE(0xe008, 0xe008) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0xe009, 0xe009) AM_WRITE(ay8910_write_port_1_w)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( sgladiat_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
@@ -1050,7 +1110,7 @@ static ADDRESS_MAP_START( sgladiat_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe005, 0xe005) AM_WRITE(ay8910_write_port_1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sgladiat_sound_portmap, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( jcross_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(sgladiat_sound_irq_ack_r)
 ADDRESS_MAP_END
@@ -1131,11 +1191,93 @@ ADDRESS_MAP_END
 
 /*********************************************************************/
 
+static INPUT_PORTS_START( jcross )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) ) PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW1:3")
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW1:4,5,6")
+	/* PORT_DIPSETTING(    0x10,  )  ???? 'insert more coin'*/
+	PORT_DIPSETTING(    0x28, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("DSW1:7,8")
+	PORT_DIPSETTING(    0xc0, "20000 60000" )
+	PORT_DIPSETTING(    0x80, "40000 90000" )
+	PORT_DIPSETTING(    0x40, "50000 120000" )
+	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, "Bonus Life Occurence?" ) PORT_DIPLOCATION("DSW2:1") /* not verified */
+	PORT_DIPSETTING(    0x01, "1st, 2nd, then every 2nd?" )
+	PORT_DIPSETTING(    0x00, "1st and 2nd only?" )
+	PORT_DIPNAME( 0x06, 0x04, "Scrolling Speed" ) PORT_DIPLOCATION("DSW2:2,3")
+	PORT_DIPSETTING(    0x06, "Slow" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x02, "Fast" )
+	PORT_DIPSETTING(    0x00, "Fastest" )
+	PORT_DIPNAME( 0x18, 0x10, "Game mode" ) PORT_DIPLOCATION("DSW2:4,5")
+	PORT_DIPSETTING(    0x18, "Demo Sounds Off" )
+	PORT_DIPSETTING(    0x10, "Demo Sounds On" )
+	PORT_DIPSETTING(    0x08, "Infinite Lives (Cheat)" )
+	PORT_DIPSETTING(    0x00, "Freeze" )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("DSW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x80, 0x80, "Disable BG Collisions (Cheat)" ) PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( sgladiat )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
@@ -1213,9 +1355,9 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( aso )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
@@ -2637,20 +2779,20 @@ GFXDECODE_END
 
 /**********************************************************************/
 
-static MACHINE_DRIVER_START( sgladiat )
+static MACHINE_DRIVER_START( jcross )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000) /* NOT verified (probably lower?) */
-	MDRV_CPU_PROGRAM_MAP(sgladiat_cpuA_map,0)
+	MDRV_CPU_ADD("main", Z80, 3250000) /* NOT verified */
+	MDRV_CPU_PROGRAM_MAP(jcross_cpuA_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD("sub", Z80, 4000000) /* NOT verified (probably lower?) */
-	MDRV_CPU_PROGRAM_MAP(sgladiat_cpuB_map,0)
+	MDRV_CPU_ADD("sub", Z80, 3250000) /* NOT verified */
+	MDRV_CPU_PROGRAM_MAP(jcross_cpuB_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80, 4000000) /* NOT verified */
-	MDRV_CPU_PROGRAM_MAP(sgladiat_sound_map,0)
-	MDRV_CPU_IO_MAP(sgladiat_sound_portmap,0)
+	MDRV_CPU_PROGRAM_MAP(jcross_sound_map,0)
+	MDRV_CPU_IO_MAP(jcross_sound_portmap,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_assert, 244)	// Marvin's frequency, sounds ok
 
 	MDRV_INTERLEAVE(100)
@@ -2662,25 +2804,52 @@ static MACHINE_DRIVER_START( sgladiat )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(36*8, 28*8)
-	/* visible area is correct. Debug info is shown in the black bars at the sides
-	   of the screen when the Debug dip switch is on */
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 1*8, 28*8-1)
 
 	MDRV_GFXDECODE(tnk3)
 	MDRV_PALETTE_LENGTH(0x400)
 
 	MDRV_PALETTE_INIT(tnk3)
-	MDRV_VIDEO_START(sgladiat)
+	MDRV_VIDEO_START(jcross)
 	MDRV_VIDEO_UPDATE(tnk3)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ay1", AY8910, 2000000)	/* NOT verified */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
 	MDRV_SOUND_ADD("ay2", AY8910, 2000000)	/* NOT verified */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+
+	MDRV_SOUND_ADD("namco", NAMCO, 24000)
+	MDRV_SOUND_CONFIG(snkwave_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( sgladiat )
+
+	MDRV_IMPORT_FROM(jcross)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(sgladiat_cpuA_map,0)
+
+	MDRV_CPU_MODIFY("sub")
+	MDRV_CPU_PROGRAM_MAP(sgladiat_cpuB_map,0)
+
+	MDRV_CPU_MODIFY("audio")
+	MDRV_CPU_PROGRAM_MAP(sgladiat_sound_map,0)
+
+	/* video hardware */
+	/* visible area is correct. Debug info is shown in the black bars at the sides
+	   of the screen when the Debug dip switch is on */
+
+	MDRV_VIDEO_START(sgladiat)
+
+	/* sound hardware */
+	MDRV_SOUND_REMOVE("namco")
 MACHINE_DRIVER_END
 
 
@@ -3009,6 +3178,44 @@ MACHINE_DRIVER_END
 
 /***********************************************************************/
 
+ROM_START( jcross )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "jcrossa0.10b",  0x0000, 0x2000, CRC(0e79bbcd) SHA1(7088a8effd30080529b797991e24e9807bf90475) )
+	ROM_LOAD( "jcrossa1.12b",  0x2000, 0x2000, CRC(999b2bcc) SHA1(e5d13c9c11a82cedee15777341e6424639ecf2f5) )
+	ROM_LOAD( "jcrossa2.13b",  0x4000, 0x2000, CRC(ac89e49c) SHA1(9b9a0eec8ad341ce7af58bffe55f10bec696af62) )
+	ROM_LOAD( "jcrossa3.14b",  0x6000, 0x2000, CRC(4fd7848d) SHA1(870aea0b8e027616814df87afd24418fd140f736) )
+	ROM_LOAD( "jcrossa4.15b",  0x8000, 0x2000, CRC(8500575d) SHA1(b8751b86508de484f2eb8a6702c63a47ec882036) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "jcrossb0.15a",  0x0000, 0x2000, CRC(77ed51e7) SHA1(56b457846f71f442da6f99889231d4b71d5fcb6c) )
+	ROM_LOAD( "jcrossb1.14a",  0x2000, 0x2000, CRC(23cf0f70) SHA1(f258e899f332a026eeb0db92330fd60c478218af) )
+	ROM_LOAD( "jcrossb2.13a",  0x4000, 0x2000, CRC(5bed3118) SHA1(f105ca55223a4bfbc8e2d61c365c76cf2153254c) )
+	ROM_LOAD( "jcrossb3.12a",  0x6000, 0x2000, CRC(cd75dc95) SHA1(ef03d2b0f66f30fad5132e7b6aee9ec978650b53) )
+
+	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_LOAD( "jcrosss0.f1",   0x0000, 0x2000, CRC(9ae8ea93) SHA1(1d824302305a41bf5c354c36e2e11981d1aa5ea4) )
+	ROM_LOAD( "jcrosss1.h2",   0x2000, 0x2000, CRC(83785601) SHA1(cd3d484ef5464090c4b543b1edbbedcc52b15071) )
+
+	ROM_REGION( 0x4000, "fg_tiles", ROMREGION_DISPOSE )
+	ROM_LOAD( "jcrossb4.10a",  0x0000, 0x2000, CRC(08ad93fe) SHA1(04baf2d9735b0d794b114abeced5a6b899958ce7) )
+	ROM_LOAD( "jcrosss.d2",    0x2000, 0x2000, CRC(3ebb5beb) SHA1(de0a1f0fdb5b08b76dab9fa64d9ae3047c4ff84b) )
+
+	ROM_REGION( 0x2000, "bg_tiles", ROMREGION_DISPOSE )
+	ROM_LOAD( "jcrossb1.a2",   0x0000, 0x2000, CRC(ea3dfbc9) SHA1(eee56acd1c9dbc6c3ecdee4ffe860273e65cc09b) )
+
+	ROM_REGION( 0x6000, "sp16_tiles", ROMREGION_DISPOSE )
+	ROM_LOAD( "jcrossf0.l2",   0x0000, 0x2000, CRC(4532509b) SHA1(c99f87e2b06b94d815e6099bccb2aee0edf8c98d) )
+	ROM_LOAD( "jcrossf1.k2",   0x2000, 0x2000, CRC(70d219bf) SHA1(9ff9f88221edd141e8204ac810434b4290db7cff) )
+	ROM_LOAD( "jcrossf2.j2",   0x4000, 0x2000, CRC(42a12b9d) SHA1(9f2bdb1f84f444442282cf0fc1f7b3c7f9a9bf48) )
+
+	ROM_REGION( 0x0c00, "proms", 0 )
+	ROM_LOAD( "jcrossp2.j7",  0x000, 0x400, CRC(b72a96a5) SHA1(20d40e4b6a2652e61dc3ad0c4afaec04e3c7cf74) )
+	ROM_LOAD( "jcrossp1.j8",  0x400, 0x400, CRC(35650448) SHA1(17e4a661ff304c093bb0253efceaf4e9b2498924) )
+	ROM_LOAD( "jcrossp0.j9",  0x800, 0x400, CRC(99f54d48) SHA1(9bd20eaa9706d28eaca9f5e195204d89e302272f) )
+ROM_END
+
+/***********************************************************************/
+
 ROM_START( sgladiat )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "glad.005",	0x0000, 0x4000, CRC(4bc60f0b) SHA1(19baf7533b8fc6bab372f1d35603068a6b93627c) )
@@ -3040,6 +3247,7 @@ ROM_START( sgladiat )
 	ROM_LOAD( "82s137.003",  0x800, 0x400, CRC(c0e70308) SHA1(d7dbc500bc9991c2d1b95850f3723a2a224fbfbb) )
 ROM_END
 
+/***********************************************************************/
 
 ROM_START( aso )
 	ROM_REGION( 0x10000, "main", 0 )
@@ -4868,6 +5076,7 @@ static DRIVER_INIT( countryc )
 
 
 
+GAME( 1984, jcross,   0,        jcross,   jcross,   0,        ROT270, "SNK", "Jumping Cross", 0 )
 GAME( 1984, sgladiat, 0,        sgladiat, sgladiat, 0,        ROT0,   "SNK", "Gladiator 1984", 0 )
 
 GAME( 1985, aso,      0,        aso,      aso,      0,        ROT270, "SNK", "ASO - Armored Scrum Object", 0 )

@@ -19,6 +19,7 @@ extern WRITE8_HANDLER( snk_cpuB_nmi_ack_w );
 
 extern PALETTE_INIT( tnk3 );
 
+extern VIDEO_START( jcross );
 extern VIDEO_START( sgladiat );
 extern VIDEO_START( tnk3 );
 extern VIDEO_START( aso );
@@ -38,6 +39,7 @@ extern WRITE8_HANDLER( snk_sp16_scrolly_w );
 extern WRITE8_HANDLER( snk_sp32_scrollx_w );
 extern WRITE8_HANDLER( snk_sp32_scrolly_w );
 
+extern WRITE8_HANDLER( jcross_scroll_msb_w );
 extern WRITE8_HANDLER( sgladiat_scroll_msb_w );
 extern WRITE8_HANDLER( sgladiat_flipscreen_w );
 extern WRITE8_HANDLER( tnk3_videoattrs_w );
