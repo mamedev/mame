@@ -12,12 +12,15 @@
  * DST_FILTER1           - Generic 1st order filter
  * DST_FILTER2           - Generic 2nd order filter
  * DST_OP_AMP_FILT       - Op Amp filter circuits
- * DST_RCFILTER          - Simple RC filter & also lowpass filter
  * DST_RCDISC            - Simple discharging RC
  * DST_RCDISC2           - Simple charge R1/C, discharge R0/C
  * DST_RCDISC3           - Simple charge R1/c, discharge R0*R1/(R0+R1)/C
  * DST_RCDISC4           - Various charge/discharge circuits
  * DST_RCDISC5           - Diode in series with R//C
+ * DST_RCDISC_MOD        - RC triggered by logic and modulated
+ * DST_RCFILTER          - Simple RC filter & also lowpass filter
+ * DST_RCINTEGRATE       - Two diode inputs, transistor and a R/C charge
+ *                         discharge network
  *
  ************************************************************************/
 
@@ -65,17 +68,17 @@ struct dst_rcdisc_context
 {
 	int state;
 	double t;           /* time */
-	double f;			/* RCINTEGRATE */
-	double R1;			/* RCINTEGRATE */
-	double R2;			/* RCINTEGRATE */
-	double R3;			/* RCINTEGRATE */
-	double C;			/* RCINTEGRATE */
-	double vCap;		/* RCDISC_MOD */
-	double vCE;			/* RCINTEGRATE */
 	double exponent0;
 	double exponent1;
-	double exp_exponent0;/* RCINTEGRATE */
-	double exp_exponent1;/* RCINTEGRATE */
+};
+
+struct dst_rcdisc_mod_context
+{
+	double	v_cap;
+	double	exp_low[2];
+	double	exp_high[4];
+	double	gain[2];
+	double	vd_gain[4];
 };
 
 struct dst_rcdisc4_context
@@ -96,6 +99,23 @@ struct dst_rcfilter_context
 struct dst_rcfilter_sw_context
 {
 	double	vCap[4];
+};
+
+struct dst_rcintegrate_context
+{
+	int state;
+	double t;           /* time */
+	double f;			/* RCINTEGRATE */
+	double R1;			/* RCINTEGRATE */
+	double R2;			/* RCINTEGRATE */
+	double R3;			/* RCINTEGRATE */
+	double C;			/* RCINTEGRATE */
+	double vCap;		/* RCDISC_MOD */
+	double vCE;			/* RCINTEGRATE */
+	double exponent0;
+	double exponent1;
+	double exp_exponent0;/* RCINTEGRATE */
+	double exp_exponent1;/* RCINTEGRATE */
 };
 
 /************************************************************************
@@ -186,7 +206,7 @@ static void calculate_filter1_coefficients(double fc, double type,
 static void dst_filter1_step(node_description *node)
 {
 	struct dss_filter1_context *context = node->context;
-\
+
 	double gain = 1.0;
 
 	if (DST_FILTER1__ENABLE == 0.0)
@@ -584,9 +604,11 @@ static void dst_rcdisc_step(node_description *node)
 {
 	struct dst_rcdisc_context *context = node->context;
 
-	switch (context->state) {
+	switch (context->state)
+	{
 		case 0:     /* waiting for trigger  */
-			if(DST_RCDISC__ENABLE) {
+			if(DST_RCDISC__ENABLE)
+			{
 				context->state = 1;
 				context->t = 0;
 			}
@@ -594,11 +616,13 @@ static void dst_rcdisc_step(node_description *node)
 			break;
 
 		case 1:
-			if (DST_RCDISC__ENABLE) {
+			if (DST_RCDISC__ENABLE)
+			{
 				node->output[0] = DST_RCDISC__IN * exp(context->t / context->exponent0);
 				context->t += discrete_current_context->sample_time;
-				} else {
-					context->state = 0;
+			} else
+			{
+				context->state = 0;
 			}
 		}
 }
@@ -645,7 +669,7 @@ static void dst_rcdisc2_step(node_description *node)
 	/* exponential based in difference between input/output   */
 
 	diff = ((DST_RCDISC2__ENABLE == 0) ? DST_RCDISC2__IN0 : DST_RCDISC2__IN1) - node->output[0];
-	diff = diff - (diff * ((DST_RCDISC2__ENABLE == 0) ? context->exp_exponent0 : context->exp_exponent1));
+	diff = diff - (diff * ((DST_RCDISC2__ENABLE == 0) ? context->exponent0 : context->exponent1));
 	node->output[0] += diff;
 }
 
@@ -653,14 +677,14 @@ static void dst_rcdisc2_reset(node_description *node)
 {
 	struct dst_rcdisc_context *context = node->context;
 
-	node->output[0]=0;
+	node->output[0] = 0;
 
 	context->state = 0;
 	context->t = 0;
-	context->exponent0 =-1.0 * DST_RCDISC2__R0 * DST_RCDISC2__C;
-	context->exponent1 =-1.0 * DST_RCDISC2__R1 * DST_RCDISC2__C;
-	context->exp_exponent0 = exp(discrete_current_context->sample_time/context->exponent0);
-	context->exp_exponent1 = exp(discrete_current_context->sample_time/context->exponent1);
+	context->exponent0 = -1.0 * DST_RCDISC2__R0 * DST_RCDISC2__C;
+	context->exponent1 = -1.0 * DST_RCDISC2__R1 * DST_RCDISC2__C;
+	context->exponent0 = exp(discrete_current_context->sample_time/context->exponent0);
+	context->exponent1 = exp(discrete_current_context->sample_time/context->exponent1);
 }
 
 /************************************************************************
@@ -706,7 +730,7 @@ static void dst_rcdisc3_step(node_description *node)
 	}
 	else
 	{
-		node->output[0]=0;
+		node->output[0] = 0;
 	}
 }
 
@@ -899,139 +923,6 @@ static void  dst_rcdisc5_reset(node_description *node)
 	context->exponent0 = -1.0 * DST_RCDISC5__R * DST_RCDISC5__C;
 }
 
-/************************************************************************
- *
- * DST_RCINTEGRATE -  Two diode inputs, transistor and a R/C charge
- *                discharge network
- *
- * input[0]    - Enable input value
- * input[1]    - input value 1
- * input[2]    - input value 2
- * input[3]    - Resistor 1 value (initialization only)
- * input[4]    - Resistor 2 value (initialization only)
- * input[5]    - Capacitor Value (initialization only)
- *
- ************************************************************************/
-#define DST_RCINTEGRATE__ENABLE	(*(node->input[0]))
-#define DST_RCINTEGRATE__IN1	(*(node->input[1]))
-#define DST_RCINTEGRATE__R1		(*(node->input[2]))
-#define DST_RCINTEGRATE__R2		(*(node->input[3]))
-#define DST_RCINTEGRATE__R3		(*(node->input[4]))
-#define DST_RCINTEGRATE__C		(*(node->input[5]))
-#define DST_RCINTEGRATE__VP		(*(node->input[6]))
-#define DST_RCINTEGRATE__TYPE	(*(node->input[7]))
-
-/* Ebers-Moll large signal model
- * Couriersud:
- * The implementation avoids all iterative approaches in order not to burn cycles
- * We will calculate Ic from vBE and use this as an indication where to go.
- * The implementation may oscillate if you change the weighting factors at the
- * end.
- *
- * This implementation is not perfect, but does it's job in dkong'
- */
-
-/* reverse saturation current */
-#define IES		7e-15
-#define ALPHAT	0.99
-#define KT		0.026
-#define EM_IC(x) (ALPHAT * IES * exp( (x) / KT - 1.0 ))
-
-static void  dst_rcintegrate_step(node_description *node)
-{
-	struct dst_rcdisc_context *context = node->context;
-
-	double diff, u, iQ, iQc, iC, RG, vE;
-	double dt, vP;
-
-	if(DST_RCINTEGRATE__ENABLE)
-	{
-		u  = DST_RCINTEGRATE__IN1;
-		vP = DST_RCINTEGRATE__VP;
-		dt = discrete_current_context->sample_time;
-		if ( u-0.7  < context->vCap*context->R2/(context->R1+context->R2))
-		{
-			/* discharge .... */
-			diff = 0.0 - context->vCap;
-			iC   = 0.0 - context->C / context->exponent1 * diff * context->exp_exponent1; /* iC */
-			diff = diff - (diff * context->exp_exponent1);
-			context->vCap += diff;
-			iQ = 0;
-			vE = context->vCap*context->R2/(context->R1+context->R2);
-			RG = vE/(-iC);
-		}
-		else
-		{
-			/* charging */
-			diff = (vP - context->vCE) * context->f - context->vCap;
-			iC   = 0.0 - context->C / context->exponent0 * diff * context->exp_exponent0; /* iC */
-			diff = diff - (diff * context->exp_exponent0);
-			context->vCap += diff;
-			iQ = iC + (iC * context->R1 + context->vCap) / context->R2;
-			RG = (vP - context->vCE)/iQ;
-			vE = (RG - context->R3) / RG * (vP - context->vCE);
-		}
-
-
-		u = DST_RCINTEGRATE__IN1;
-		if (u > 0.7+vE)
-			vE = u-0.7;
-		iQc = EM_IC(u - vE);
-		context->vCE = MIN(vP - 0.1, vP - RG * iQc);
-
-		/* Avoid oscillations
-         * The method tends to largely overshoot - no wonder without
-         * iterative solution approximation
-         */
-
-		context->vCE = MAX(context->vCE, 0.1 );
-		context->vCE = 0.1 * context->vCE + 0.9 * (vP - vE - iQ * context->R3);
-
-		switch (context->state)
-		{
-			case DISC_RC_INTEGRATE_TYPE1:
-				node->output[0] = context->vCap;
-				break;
-			case DISC_RC_INTEGRATE_TYPE2:
-				node->output[0] = vE;
-				break;
-			case DISC_RC_INTEGRATE_TYPE3:
-				node->output[0] = MAX(0, vP - iQ * context->R3);
-				break;
-		}
-	}
-	else
-	{
-		node->output[0] = 0;
-	}
-}
-static void dst_rcintegrate_reset(node_description *node)
-{
-	struct dst_rcdisc_context *context = node->context;
-
-	double r;
-	double dt = discrete_current_context->sample_time;
-
-	node->output[0]=0;
-
-	context->state = DST_RCINTEGRATE__TYPE;
-	context->R1 = DST_RCINTEGRATE__R1;
-	context->R2 = DST_RCINTEGRATE__R2;
-	context->R3 = DST_RCINTEGRATE__R3;
-	context->C  = DST_RCINTEGRATE__C;
-
-	context->vCap = 0;
-	context->vCE  = 0;
-
-	r = context->R1 / context->R2 * context->R3 + context->R1 + context->R3;
-
-	context->f = DST_RCINTEGRATE__R2/(DST_RCINTEGRATE__R2+DST_RCINTEGRATE__R3);
-	context->exponent0 = -1.0 * r * context->f * DST_RCINTEGRATE__C;
-	context->exponent1 = -1.0 * (DST_RCINTEGRATE__R1 + DST_RCINTEGRATE__R2) * DST_RCINTEGRATE__C;
-	context->exp_exponent0 = exp(dt / context->exponent0);
-	context->exp_exponent1 = exp(dt / context->exponent1);
-}
-
 
 /************************************************************************
  *
@@ -1049,8 +940,8 @@ static void dst_rcintegrate_reset(node_description *node)
  *
  ************************************************************************/
 #define DST_RCDISC_MOD__ENABLE	(*(node->input[0]))
-#define DST_RCDISC_MOD__IN1	(*(node->input[1]))
-#define DST_RCDISC_MOD__IN2	(*(node->input[2]))
+#define DST_RCDISC_MOD__IN1		(*(node->input[1]))
+#define DST_RCDISC_MOD__IN2		(*(node->input[2]))
 #define DST_RCDISC_MOD__R1		(*(node->input[3]))
 #define DST_RCDISC_MOD__R2		(*(node->input[4]))
 #define DST_RCDISC_MOD__R3		(*(node->input[5]))
@@ -1060,39 +951,40 @@ static void dst_rcintegrate_reset(node_description *node)
 
 static void dst_rcdisc_mod_step(node_description *node)
 {
-	struct dst_rcdisc_context *context = node->context;
+	struct dst_rcdisc_mod_context *context = node->context;
 
-	double diff, Rc, Rc2, vCap, u, vD=0.0;
-
-	/* Exponential based in difference between input/output   */
-	vCap = context->vCap;
+	double	diff, v_cap, u, vD;
+	int		mod_state, mod1_state, mod2_state;
 
 	if(DST_RCDISC_MOD__ENABLE)
 	{
-		Rc = (DST_RCDISC_MOD__IN1 > 0.5) ? DST_RCDISC_MOD__R2 : DST_RCDISC_MOD__R1 + DST_RCDISC_MOD__R2;
-		if (Rc < 1.0)
-			Rc = 1.0;
-		u = (DST_RCDISC_MOD__IN1 > 0.5) ? 0 : DST_RCDISC_MOD__VP;
-		Rc2 = (DST_RCDISC_MOD__IN2 > 0.6) ? (DST_RCDISC_MOD__R3 * DST_RCDISC_MOD__R4 / (DST_RCDISC_MOD__R3 + DST_RCDISC_MOD__R4)) : DST_RCDISC_MOD__R4;
+
+		/* Exponential based in difference between input/output   */
+		v_cap = context->v_cap;
+
+		mod1_state = DST_RCDISC_MOD__IN1 > 0.5;
+		mod2_state = DST_RCDISC_MOD__IN2 > 0.6;
+		mod_state  = (mod2_state << 1) + mod1_state;
+
+		u = mod1_state ? 0 : DST_RCDISC_MOD__VP;
 		/* Clamp */
-		diff = u - vCap;
-		vD = diff * Rc2 / (Rc + Rc2);
+		diff = u - v_cap;
+		vD = diff * context->vd_gain[mod_state];
 		if (vD < -0.6)
 		{
-			Rc2   = 0;
-			diff  = u + 0.6 - vCap;
-			diff  = diff - (diff * exp(0.0 - discrete_current_context->sample_time / (DST_RCDISC_MOD__C * Rc)));
-			vCap += diff;
-			node->output[0] = (DST_RCDISC_MOD__IN2 <= 0.6) ? -0.6 : 0;
+			diff  = u + 0.6 - v_cap;
+			diff -= diff * context->exp_low[mod1_state];
+			v_cap += diff;
+			node->output[0] = mod2_state ? 0 : -0.6;
 		}
 		else
 		{
-			diff = diff - (diff * exp(0.0-discrete_current_context->sample_time / (DST_RCDISC_MOD__C*(Rc+Rc2))));
-			vCap += diff;
-			/* neglecting current through R3 drawn by next node */
-			node->output[0] = (DST_RCDISC_MOD__IN2 <= 0.6) ? (u - vCap) * DST_RCDISC_MOD__R4 / (DST_RCDISC_MOD__R4 + Rc) : 0;
+			diff  -= diff * context->exp_high[mod_state];
+			v_cap += diff;
+			/* neglecting current through R3 drawn by next8 node */
+			node->output[0] = mod2_state ? 0: (u - v_cap) * context->gain[mod1_state];
 		}
-		context->vCap = vCap;
+		context->v_cap = v_cap;
 	}
 	else
 	{
@@ -1102,10 +994,41 @@ static void dst_rcdisc_mod_step(node_description *node)
 
 static void dst_rcdisc_mod_reset(node_description *node)
 {
-	struct dst_rcdisc_context *context = node->context;
+	struct dst_rcdisc_mod_context *context = node->context;
 
+	double	rc[2], rc2[2];
+	double	neg_dt = 0.0 - discrete_current_context->sample_time;
+
+	/* pre-calculate fixed values */
+	/* DST_RCDISC_MOD__IN1 <= 0.5 */
+	rc[0] = DST_RCDISC_MOD__R1 + DST_RCDISC_MOD__R2;
+	if (rc[0] < 1) rc[0] = 1;
+	context->exp_low[0]  = exp(neg_dt / (DST_RCDISC_MOD__C * rc[0]));
+	context->gain[0]     = RES_VOLTAGE_DIVIDER(rc[0], DST_RCDISC_MOD__R4);
+	/* DST_RCDISC_MOD__IN1 > 0.5 */
+	rc[1] = DST_RCDISC_MOD__R2;
+	if (rc[1] < 1) rc[1] = 1;
+	context->exp_low[1]  = exp(neg_dt / (DST_RCDISC_MOD__C * rc[1]));
+	context->gain[1]     = RES_VOLTAGE_DIVIDER(rc[1], DST_RCDISC_MOD__R4);
+	/* DST_RCDISC_MOD__IN2 <= 0.6 */
+	rc2[0] = DST_RCDISC_MOD__R4;
+	/* DST_RCDISC_MOD__IN2 > 0.6 */
+	rc2[1] = DST_RCDISC_MOD__R3 * DST_RCDISC_MOD__R4 / (DST_RCDISC_MOD__R3 + DST_RCDISC_MOD__R4);
+	/* DST_RCDISC_MOD__IN1 <= 0.5 && DST_RCDISC_MOD__IN2 <= 0.6 */
+	context->exp_high[0] = exp(neg_dt / (DST_RCDISC_MOD__C * (rc[0] + rc2[0])));
+	context->vd_gain[0]  = RES_VOLTAGE_DIVIDER(rc[0], rc2[0]);
+	/* DST_RCDISC_MOD__IN1 > 0.5  && DST_RCDISC_MOD__IN2 <= 0.6 */
+	context->exp_high[1] = exp(neg_dt / (DST_RCDISC_MOD__C * (rc[1] + rc2[0])));
+	context->vd_gain[1]  = RES_VOLTAGE_DIVIDER(rc[1], rc2[0]);
+	/* DST_RCDISC_MOD__IN1 <= 0.5 && DST_RCDISC_MOD__IN2 > 0.6 */
+	context->exp_high[2] = exp(neg_dt / (DST_RCDISC_MOD__C * (rc[0] + rc2[1])));
+	context->vd_gain[2]  = RES_VOLTAGE_DIVIDER(rc[0], rc2[1]);
+	/* DST_RCDISC_MOD__IN1 > 0.5  && DST_RCDISC_MOD__IN2 > 0.6 */
+	context->exp_high[3] = exp(neg_dt / (DST_RCDISC_MOD__C * (rc[1] + rc2[1])));
+	context->vd_gain[3]  = RES_VOLTAGE_DIVIDER(rc[1], rc2[1]);
+
+	context->v_cap  = 0;
 	node->output[0] = 0;
-	context->vCap   = 0;
 }
 
 /************************************************************************
@@ -1218,6 +1141,141 @@ static void dst_rcfilter_sw_reset(node_description *node)
 		context->vCap[i] = 0;
 	node->output[0] = 0;
 }
+
+
+/************************************************************************
+ *
+ * DST_RCINTEGRATE - Two diode inputs, transistor and a R/C charge
+ *                   discharge network
+ *
+ * input[0]    - Enable input value
+ * input[1]    - input value 1
+ * input[2]    - input value 2
+ * input[3]    - Resistor 1 value (initialization only)
+ * input[4]    - Resistor 2 value (initialization only)
+ * input[5]    - Capacitor Value (initialization only)
+ *
+ ************************************************************************/
+#define DST_RCINTEGRATE__ENABLE	(*(node->input[0]))
+#define DST_RCINTEGRATE__IN1	(*(node->input[1]))
+#define DST_RCINTEGRATE__R1		(*(node->input[2]))
+#define DST_RCINTEGRATE__R2		(*(node->input[3]))
+#define DST_RCINTEGRATE__R3		(*(node->input[4]))
+#define DST_RCINTEGRATE__C		(*(node->input[5]))
+#define DST_RCINTEGRATE__VP		(*(node->input[6]))
+#define DST_RCINTEGRATE__TYPE	(*(node->input[7]))
+
+/* Ebers-Moll large signal model
+ * Couriersud:
+ * The implementation avoids all iterative approaches in order not to burn cycles
+ * We will calculate Ic from vBE and use this as an indication where to go.
+ * The implementation may oscillate if you change the weighting factors at the
+ * end.
+ *
+ * This implementation is not perfect, but does it's job in dkong'
+ */
+
+/* reverse saturation current */
+#define IES		7e-15
+#define ALPHAT	0.99
+#define KT		0.026
+#define EM_IC(x) (ALPHAT * IES * exp( (x) / KT - 1.0 ))
+
+static void  dst_rcintegrate_step(node_description *node)
+{
+	struct dst_rcintegrate_context *context = node->context;
+
+	double diff, u, iQ, iQc, iC, RG, vE;
+	double dt, vP;
+
+	if(DST_RCINTEGRATE__ENABLE)
+	{
+		u  = DST_RCINTEGRATE__IN1;
+		vP = DST_RCINTEGRATE__VP;
+		dt = discrete_current_context->sample_time;
+		if ( u-0.7  < context->vCap*context->R2/(context->R1+context->R2))
+		{
+			/* discharge .... */
+			diff = 0.0 - context->vCap;
+			iC   = 0.0 - context->C / context->exponent1 * diff * context->exp_exponent1; /* iC */
+			diff = diff - (diff * context->exp_exponent1);
+			context->vCap += diff;
+			iQ = 0;
+			vE = context->vCap*context->R2/(context->R1+context->R2);
+			RG = vE/(-iC);
+		}
+		else
+		{
+			/* charging */
+			diff = (vP - context->vCE) * context->f - context->vCap;
+			iC   = 0.0 - context->C / context->exponent0 * diff * context->exp_exponent0; /* iC */
+			diff = diff - (diff * context->exp_exponent0);
+			context->vCap += diff;
+			iQ = iC + (iC * context->R1 + context->vCap) / context->R2;
+			RG = (vP - context->vCE)/iQ;
+			vE = (RG - context->R3) / RG * (vP - context->vCE);
+		}
+
+
+		u = DST_RCINTEGRATE__IN1;
+		if (u > 0.7+vE)
+			vE = u-0.7;
+		iQc = EM_IC(u - vE);
+		context->vCE = MIN(vP - 0.1, vP - RG * iQc);
+
+		/* Avoid oscillations
+         * The method tends to largely overshoot - no wonder without
+         * iterative solution approximation
+         */
+
+		context->vCE = MAX(context->vCE, 0.1 );
+		context->vCE = 0.1 * context->vCE + 0.9 * (vP - vE - iQ * context->R3);
+
+		switch (context->state)
+		{
+			case DISC_RC_INTEGRATE_TYPE1:
+				node->output[0] = context->vCap;
+				break;
+			case DISC_RC_INTEGRATE_TYPE2:
+				node->output[0] = vE;
+				break;
+			case DISC_RC_INTEGRATE_TYPE3:
+				node->output[0] = MAX(0, vP - iQ * context->R3);
+				break;
+		}
+	}
+	else
+	{
+		node->output[0] = 0;
+	}
+}
+static void dst_rcintegrate_reset(node_description *node)
+{
+	struct dst_rcintegrate_context *context = node->context;
+
+	double r;
+	double dt = discrete_current_context->sample_time;
+
+	node->output[0]=0;
+
+	context->state = DST_RCINTEGRATE__TYPE;
+	context->R1 = DST_RCINTEGRATE__R1;
+	context->R2 = DST_RCINTEGRATE__R2;
+	context->R3 = DST_RCINTEGRATE__R3;
+	context->C  = DST_RCINTEGRATE__C;
+
+	context->vCap = 0;
+	context->vCE  = 0;
+
+	r = context->R1 / context->R2 * context->R3 + context->R1 + context->R3;
+
+	context->f = DST_RCINTEGRATE__R2/(DST_RCINTEGRATE__R2+DST_RCINTEGRATE__R3);
+	context->exponent0 = -1.0 * r * context->f * DST_RCINTEGRATE__C;
+	context->exponent1 = -1.0 * (DST_RCINTEGRATE__R1 + DST_RCINTEGRATE__R2) * DST_RCINTEGRATE__C;
+	context->exp_exponent0 = exp(dt / context->exponent0);
+	context->exp_exponent1 = exp(dt / context->exponent1);
+}
+
 
 /* !!!!!!!!!!! NEW FILTERS for testing !!!!!!!!!!!!!!!!!!!!! */
 

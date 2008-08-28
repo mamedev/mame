@@ -7,7 +7,7 @@ driver by Mike Coates
 0000-00FF Base Page RAM
 0100-01FF Stack RAM
 1000-1FFF ROM
-2000      Clown Verticle Position
+2000      Clown Vertical Position
 3000      Clown Horizontal Position
 4000-43FF Video RAM
 8000      Clown Rotation and Audio Controls
@@ -275,7 +275,7 @@ static INTERRUPT_GEN( ripcord_interrupt )
 static MACHINE_DRIVER_START( circus )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502,11289000/16) /* 705.562kHz */
+	MDRV_CPU_ADD("main", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -310,7 +310,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( robotbwl )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502,11289000/16) /* 705.562kHz */
+	MDRV_CPU_ADD("main", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -344,7 +344,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( crash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502,11289000/16) /* 705.562kHz */
+	MDRV_CPU_ADD("main", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
@@ -378,7 +378,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ripcord )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6502, 705562)        /* 11.289MHz / 16 */
+	MDRV_CPU_ADD("main", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	//MDRV_CPU_VBLANK_INT("main", ripcord_interrupt) //AT
 

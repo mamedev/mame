@@ -13,11 +13,6 @@
 
 #define OP_AMP_NON_INVERT_GAIN(ri, rf)	((double)rf / (double)ri + 1)
 
-/*  vin --/\r1/\-- out --/\r2/\-- gnd  */
-#define RES_VOLTAGE_DIVIDER(r1, r2)	((double)r2 / ((double)r1 + (double)r2))
-
-#define RES_2_PARALLEL(r1, r2)			(1.0 / (1.0 / r1 + 1.0 / r2))
-
 /* Discrete Sound Input Nodes */
 /* see "starshp1.h" */
 

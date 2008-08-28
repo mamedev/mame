@@ -241,8 +241,8 @@ static const discrete_module module_list[] =
 	{ DST_RCDISC3     ,"DST_RCDISC3"     , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc3_reset     ,dst_rcdisc3_step     },
 	{ DST_RCDISC4     ,"DST_RCDISC4"     , 1 ,sizeof(struct dst_rcdisc4_context)     ,dst_rcdisc4_reset     ,dst_rcdisc4_step     },
 	{ DST_RCDISC5     ,"DST_RCDISC5"     , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc5_reset     ,dst_rcdisc5_step     },
-	{ DST_RCINTEGRATE ,"DST_RCINTEGRATE" , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcintegrate_reset ,dst_rcintegrate_step },
-	{ DST_RCDISC_MOD  ,"DST_RCDISC_MOD"  , 1 ,sizeof(struct dst_rcdisc_context)      ,dst_rcdisc_mod_reset  ,dst_rcdisc_mod_step  },
+	{ DST_RCINTEGRATE ,"DST_RCINTEGRATE" , 1 ,sizeof(struct dst_rcintegrate_context) ,dst_rcintegrate_reset ,dst_rcintegrate_step },
+	{ DST_RCDISC_MOD  ,"DST_RCDISC_MOD"  , 1 ,sizeof(struct dst_rcdisc_mod_context)  ,dst_rcdisc_mod_reset  ,dst_rcdisc_mod_step  },
 	{ DST_RCFILTER    ,"DST_RCFILTER"    , 1 ,sizeof(struct dst_rcfilter_context)    ,dst_rcfilter_reset    ,dst_rcfilter_step    },
 	{ DST_RCFILTER_SW ,"DST_RCFILTER_SW" , 1 ,sizeof(struct dst_rcfilter_sw_context) ,dst_rcfilter_sw_reset ,dst_rcfilter_sw_step },
 	/* For testing - seem to be buggered.  Use versions not ending in N. */
@@ -704,13 +704,19 @@ static void find_input_nodes(discrete_info *info, discrete_sound_block *block_li
 			{
 				node_description *node_ref = info->indexed_node[NODE_INDEX(inputnode)];
 				if (!node_ref)
-					fatalerror("discrete_start - Node NODE_%02d referenced a non existent node NODE_%02d", NODE_INDEX(node->node), NODE_INDEX(inputnode));
+					fatalerror("discrete_start - NODE_%02d referenced a non existent node NODE_%02d", NODE_INDEX(node->node), NODE_INDEX(inputnode));
 
 				if (NODE_CHILD_NODE_NUM(inputnode) >= node_ref->module.num_output)
-					fatalerror("discrete_start - Node NODE_%02d referenced non existent output %d on node NODE_%02d", NODE_INDEX(node->node), NODE_CHILD_NODE_NUM(inputnode), NODE_INDEX(inputnode));
+					fatalerror("discrete_start - NODE_%02d referenced non existent output %d on node NODE_%02d", NODE_INDEX(node->node), NODE_CHILD_NODE_NUM(inputnode), NODE_INDEX(inputnode));
 
 				node->input[inputnum] = &(node_ref->output[NODE_CHILD_NODE_NUM(inputnode)]);	/* Link referenced node out to input */
 				node->input_is_node |= 1 << inputnum;			/* Bit flag if input is node */
+			}
+			else
+			{
+				/* warn if trying to use a node for an input that can only be static */
+				if IS_VALUE_A_NODE(block->initial[inputnum])
+					discrete_log("Warning - discrete_start - NODE_%02d trying to use a node on static input %d",  NODE_INDEX(node->node), inputnum);
 			}
 		}
 	}

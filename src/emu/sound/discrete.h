@@ -45,7 +45,7 @@
  * a logic block representation.
  *
  * There is the possibility to support multiple outputs per module.
- * In this case, NODE_XXX is the default ouput. Alternative outputs may
+ * In this case, NODE_XXX is the default output. Alternative outputs may
  * be accessed by using NODE_XXX_YY where 00<=Y<08.
  *
  * You may also access nodes with a macros:
@@ -57,7 +57,7 @@
  * One node point may feed a number of inputs, for example you could
  * connect the output of a DISCRETE_SINEWAVE to the AMPLITUDE input
  * of another DISCRETE_SINEWAVE to amplitude modulate its output and
- * also connect it to the frequecy input of another to frequency
+ * also connect it to the frequency input of another to frequency
  * modulate its output, the combinations are endless....
  *
  * Consider the circuit below:
@@ -99,7 +99,7 @@
  * To aid simulation speed it is preferable to use the enable/disable
  * inputs to a block rather than setting the output amplitude to zero
  *
- * Feedback loops are allowed BUT they will always feeback one time
+ * Feedback loops are allowed BUT they will always feedback one time
  * step later, the loop over the netlist is only performed once per
  * deltaT so feedback occurs in the next deltaT step. This is not
  * the perfect solution but saves repeatedly traversing the netlist
@@ -112,7 +112,7 @@
  *
  * Node numbers NODE_01 to NODE_299 are defined at present.
  *
- * It is recomended to put all Inputs at the start of the interface.
+ * It is recommended to put all Inputs at the start of the interface.
  * That way they are updated first.
  *
  * Each sound effects final node should come after all nodes that
@@ -121,10 +121,10 @@
  *
  ***********************************************************************
  *
- * x_time - ANTI-ALSING features.
+ * x_time - ANTI-ALIASING features.
  *
  * Certain modules make use of x_time.  This is a feature that passes
- * infomation between modules about how long in the current sample, the
+ * information between modules about how long in the current sample, the
  * switch in state happened.  This is a decimal value of the % of the
  * full sample period that it has been in the new state.
  * 0 means it has been at the same state the whole sample.
@@ -282,6 +282,7 @@
  * DISCRETE_RCDISC4(NODE,ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE)
  * DISCRETE_RCDISC5(NODE,ENAB,IN0,RVAL,CVAL)
  * DISCRETE_RCINTEGRATE(NODE,ENAB,IN0,IN1,RVAL0,RVAL1,CVAL)
+ * DISCRETE_RCDISC_MODULATED(NODE,ENAB,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP)
  * DISCRETE_RCFILTER(NODE,ENAB,IN0,RVAL,CVAL)
  * DISCRETE_RCFILTER_VREF(NODE,ENAB,IN0,RVAL,CVAL,VREF)
  *
@@ -2597,61 +2598,14 @@
  *                      enable,
  *                      INPUT1 node (or value),
  *                      INPUT2 node (or value),
- *                      R1 value in OHMS,
- *                      R2 value in OHMS,
- *                      R3 value in OHMS,
- *                      R4 value in OHMS,
- *                      C1 value in FARADS,
+ *                      R1 value in OHMS (static value),
+ *                      R2 value in OHMS (static value),
+ *                      R3 value in OHMS (static value),
+ *                      R4 value in OHMS (static value),
+ *                      C1 value in FARADS (static value),
  *                      vP value in VOLTS)
  *
  * EXAMPLES: dkong
- *
- ***********************************************************************
- *
- * DISCRETE_RCINTEGRATE - RC integration circuit/amplifier
- *
- *
- *  vP    >-------------------+
- *                            |
- *                            Z
- *                            Z R3
- *                            Z
- *                            |
- *                            +-----------------> node (Type 3)
- *                           /
- *                         |/
- *  INPUT  >---------------| NPN
- *                          \    .--------------> node (Type 2)
- *                           >   |  R1
- *                            +--+--ZZZ-+-------> node (Type 1)
- *                            |         |
- *                            Z        ---
- *                            Z R2    C---
- *                            Z         |
- *                            |         |
- *                           gnd       gnd
- *
- *  Declaration syntax
- *
- *     DISCRETE_RCINTEGRATE(name of node,
- *                          enable,
- *                          INPUT node (or value),
- *                          R1 value in OHMS,
- *                          R2 value in OHMS,
- *                          R3 value in OHMS,
- *                          C  value in FARADS,
- *                          vP node (or value in VOLTS)
- *                          TYPE)
- *
- * TYPE: RC_INTEGRATE_TYPE1, RC_INTEGRATE_TYPE2, RC_INTEGRATE_TYPE3
- *
- * Actually an amplifier as well. Primary reason for implementation was integration.
- * The integration configuration (TYPE3, R3=0) works quite well, the amplifying
- * configuration is missing a good, yet simple ( :-) ) transistor model. Around the
- * defined working point the amplifier delivers results.
- *
- * EXAMPLES: dkong
- *
  *
  ***********************************************************************
  *
@@ -2740,8 +2694,55 @@
  * EXAMPLES: see circusc
  *
  ***********************************************************************
+ *
+ * DISCRETE_RCINTEGRATE - RC integration circuit/amplifier
+ *
+ *
+ *  vP    >-------------------+
+ *                            |
+ *                            Z
+ *                            Z R3
+ *                            Z
+ *                            |
+ *                            +-----------------> node (Type 3)
+ *                           /
+ *                         |/
+ *  INPUT  >---------------| NPN
+ *                          \    .--------------> node (Type 2)
+ *                           >   |  R1
+ *                            +--+--ZZZ-+-------> node (Type 1)
+ *                            |         |
+ *                            Z        ---
+ *                            Z R2    C---
+ *                            Z         |
+ *                            |         |
+ *                           gnd       gnd
+ *
+ *  Declaration syntax
+ *
+ *     DISCRETE_RCINTEGRATE(name of node,
+ *                          enable,
+ *                          INPUT node (or value),
+ *                          R1 value in OHMS,
+ *                          R2 value in OHMS,
+ *                          R3 value in OHMS,
+ *                          C  value in FARADS,
+ *                          vP node (or value in VOLTS)
+ *                          TYPE)
+ *
+ * TYPE: RC_INTEGRATE_TYPE1, RC_INTEGRATE_TYPE2, RC_INTEGRATE_TYPE3
+ *
+ * Actually an amplifier as well. Primary reason for implementation was integration.
+ * The integration configuration (TYPE3, R3=0) works quite well, the amplifying
+ * configuration is missing a good, yet simple ( :-) ) transistor model. Around the
+ * defined working point the amplifier delivers results.
+ *
+ * EXAMPLES: dkong
+ *
+ *
+ ***********************************************************************
  =======================================================================
- * from from disc_flt.c
+ * from from disc_dev.c
  * Component specific modules
  =======================================================================
  ***********************************************************************
@@ -4133,11 +4134,11 @@ enum
 #define DISCRETE_RCDISC3(NODE,ENAB,INP0,RVAL0,RVAL1,CVAL)               { NODE, DST_RCDISC3     , 5, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,CVAL }, NULL, "RC Discharge 3" },
 #define DISCRETE_RCDISC4(NODE,ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE) { NODE, DST_RCDISC4     , 8, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE }, NULL, "RC Discharge 4" },
 #define DISCRETE_RCDISC5(NODE,ENAB,INP0,RVAL,CVAL)                      { NODE, DST_RCDISC5     , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "RC Discharge 5" },
-#define DISCRETE_RCINTEGRATE(NODE,ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE)		{ NODE, DST_RCINTEGRATE     , 8, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE }, NULL, "RC Discharge 6" },
-#define DISCRETE_RCDISC_MODULATED(NODE,ENAB,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP)			{ NODE, DST_RCDISC_MOD     , 9, { ENAB,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP }, { ENAB,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP }, NULL, "Modulated RC Discharge" },
+#define DISCRETE_RCDISC_MODULATED(NODE,ENAB,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP)			{ NODE, DST_RCDISC_MOD     , 9, { ENAB,INP0,INP1,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP }, NULL, "Modulated RC Discharge" },
 #define DISCRETE_RCFILTER(NODE,ENAB,INP0,RVAL,CVAL)                     { NODE, DST_RCFILTER    , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "RC Filter" },
 #define DISCRETE_RCFILTER_SW(NODE,ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4) { NODE, DST_RCFILTER_SW, 8, { ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4 }, { ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4 }, NULL, "RC Filter Switch" },
 #define DISCRETE_RCFILTER_VREF(NODE,ENAB,INP0,RVAL,CVAL,VREF)           { NODE, DST_RCFILTER    , 5, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL,VREF }, NULL, "RC Filter to VREF" },
+#define DISCRETE_RCINTEGRATE(NODE,ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE)		{ NODE, DST_RCINTEGRATE     , 8, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE }, NULL, "RC Discharge 6" },
 /* For testing - seem to be buggered.  Use versions not ending in N. */
 #define DISCRETE_RCDISCN(NODE,ENAB,INP0,RVAL,CVAL)                      { NODE, DST_RCDISCN     , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "RC Discharge (New Type)" },
 #define DISCRETE_RCDISC2N(NODE,SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL)       { NODE, DST_RCDISC2N    , 6, { SWITCH,INP0,NODE_NC,INP1,NODE_NC,NODE_NC }, { SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL }, NULL, "RC Discharge 2 (New Type)" },
