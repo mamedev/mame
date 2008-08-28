@@ -1165,7 +1165,7 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/gpworld.o \
 	$(DRIVERS)/hshavoc.o \
 	$(DRIVERS)/kopunch.o $(VIDEO)/kopunch.o \
-	$(DRIVERS)/megadriv.o $(DRIVERS)/md_games.o $(DRIVERS)/md_gamul.o $(DRIVERS)/md_gam32.o \
+	$(DRIVERS)/megadriv.o \
 	$(DRIVERS)/megaplay.o \
 	$(DRIVERS)/megatech.o \
 	$(DRIVERS)/model1.o $(MACHINE)/model1.o $(VIDEO)/model1.o \
