@@ -103,19 +103,17 @@ struct dst_rcfilter_sw_context
 
 struct dst_rcintegrate_context
 {
-	int state;
-	double t;           /* time */
-	double f;			/* RCINTEGRATE */
-	double R1;			/* RCINTEGRATE */
-	double R2;			/* RCINTEGRATE */
-	double R3;			/* RCINTEGRATE */
-	double C;			/* RCINTEGRATE */
-	double vCap;		/* RCDISC_MOD */
-	double vCE;			/* RCINTEGRATE */
-	double exponent0;
-	double exponent1;
-	double exp_exponent0;/* RCINTEGRATE */
-	double exp_exponent1;/* RCINTEGRATE */
+	int		type;
+	double	gain_r1_r2;
+	double	f;				/* r2,r3 gain */
+	double	vCap;
+	double	vCE;
+	double	exponent0;
+	double	exponent1;
+	double	exp_exponent0;
+	double	exp_exponent1;
+	double	c_exp0;
+	double	c_exp1;
 };
 
 /************************************************************************
@@ -1186,40 +1184,40 @@ static void  dst_rcintegrate_step(node_description *node)
 	struct dst_rcintegrate_context *context = node->context;
 
 	double diff, u, iQ, iQc, iC, RG, vE;
-	double dt, vP;
+	double vP;
 
 	if(DST_RCINTEGRATE__ENABLE)
 	{
 		u  = DST_RCINTEGRATE__IN1;
 		vP = DST_RCINTEGRATE__VP;
-		dt = discrete_current_context->sample_time;
-		if ( u-0.7  < context->vCap*context->R2/(context->R1+context->R2))
+
+		if ( u - 0.7  < context->vCap * context->gain_r1_r2)
 		{
 			/* discharge .... */
-			diff = 0.0 - context->vCap;
-			iC   = 0.0 - context->C / context->exponent1 * diff * context->exp_exponent1; /* iC */
-			diff = diff - (diff * context->exp_exponent1);
+			diff  = 0.0 - context->vCap;
+			iC    = 0.0 - context->c_exp1 * diff; /* iC */
+			diff -= diff * context->exp_exponent1;
 			context->vCap += diff;
 			iQ = 0;
-			vE = context->vCap*context->R2/(context->R1+context->R2);
-			RG = vE/(-iC);
+			vE = context->vCap * context->gain_r1_r2;
+			RG = vE / (-iC);
 		}
 		else
 		{
 			/* charging */
-			diff = (vP - context->vCE) * context->f - context->vCap;
-			iC   = 0.0 - context->C / context->exponent0 * diff * context->exp_exponent0; /* iC */
-			diff = diff - (diff * context->exp_exponent0);
+			diff  = (vP - context->vCE) * context->f - context->vCap;
+			iC    = 0.0 - context->c_exp0 * diff; /* iC */
+			diff -= diff * context->exp_exponent0;
 			context->vCap += diff;
-			iQ = iC + (iC * context->R1 + context->vCap) / context->R2;
-			RG = (vP - context->vCE)/iQ;
-			vE = (RG - context->R3) / RG * (vP - context->vCE);
+			iQ = iC + (iC * DST_RCINTEGRATE__R1 + context->vCap) / DST_RCINTEGRATE__R2;
+			RG = (vP - context->vCE) / iQ;
+			vE = (RG - DST_RCINTEGRATE__R3) / RG * (vP - context->vCE);
 		}
 
 
 		u = DST_RCINTEGRATE__IN1;
-		if (u > 0.7+vE)
-			vE = u-0.7;
+		if (u > 0.7 + vE)
+			vE = u - 0.7;
 		iQc = EM_IC(u - vE);
 		context->vCE = MIN(vP - 0.1, vP - RG * iQc);
 
@@ -1229,9 +1227,9 @@ static void  dst_rcintegrate_step(node_description *node)
          */
 
 		context->vCE = MAX(context->vCE, 0.1 );
-		context->vCE = 0.1 * context->vCE + 0.9 * (vP - vE - iQ * context->R3);
+		context->vCE = 0.1 * context->vCE + 0.9 * (vP - vE - iQ * DST_RCINTEGRATE__R3);
 
-		switch (context->state)
+		switch (context->type)
 		{
 			case DISC_RC_INTEGRATE_TYPE1:
 				node->output[0] = context->vCap;
@@ -1240,7 +1238,7 @@ static void  dst_rcintegrate_step(node_description *node)
 				node->output[0] = vE;
 				break;
 			case DISC_RC_INTEGRATE_TYPE3:
-				node->output[0] = MAX(0, vP - iQ * context->R3);
+				node->output[0] = MAX(0, vP - iQ * DST_RCINTEGRATE__R3);
 				break;
 		}
 	}
@@ -1256,24 +1254,25 @@ static void dst_rcintegrate_reset(node_description *node)
 	double r;
 	double dt = discrete_current_context->sample_time;
 
-	node->output[0]=0;
-
-	context->state = DST_RCINTEGRATE__TYPE;
-	context->R1 = DST_RCINTEGRATE__R1;
-	context->R2 = DST_RCINTEGRATE__R2;
-	context->R3 = DST_RCINTEGRATE__R3;
-	context->C  = DST_RCINTEGRATE__C;
+	context->type = DST_RCINTEGRATE__TYPE;
 
 	context->vCap = 0;
 	context->vCE  = 0;
 
-	r = context->R1 / context->R2 * context->R3 + context->R1 + context->R3;
+	/* pre-calculate fixed values */
+	context->gain_r1_r2 = RES_VOLTAGE_DIVIDER(DST_RCINTEGRATE__R1, DST_RCINTEGRATE__R2);
 
-	context->f = DST_RCINTEGRATE__R2/(DST_RCINTEGRATE__R2+DST_RCINTEGRATE__R3);
+	r = DST_RCINTEGRATE__R1 / DST_RCINTEGRATE__R2 * DST_RCINTEGRATE__R3 + DST_RCINTEGRATE__R1 + DST_RCINTEGRATE__R3;
+
+	context->f = RES_VOLTAGE_DIVIDER(DST_RCINTEGRATE__R3, DST_RCINTEGRATE__R2);
 	context->exponent0 = -1.0 * r * context->f * DST_RCINTEGRATE__C;
 	context->exponent1 = -1.0 * (DST_RCINTEGRATE__R1 + DST_RCINTEGRATE__R2) * DST_RCINTEGRATE__C;
 	context->exp_exponent0 = exp(dt / context->exponent0);
 	context->exp_exponent1 = exp(dt / context->exponent1);
+	context->c_exp0 =  DST_RCINTEGRATE__C / context->exponent0 * context->exp_exponent0;
+	context->c_exp1 =  DST_RCINTEGRATE__C / context->exponent1 * context->exp_exponent1;
+
+	node->output[0] = 0;
 }
 
 

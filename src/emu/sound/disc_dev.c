@@ -38,6 +38,12 @@ struct dsd_555_astbl_context
 	double	v_out_high;			/* Logic 1 voltage level */
 	double	v_charge;
 	double *v_charge_node;		/* point to output of node */
+	int		has_rc_nodes;
+	double	exp_bleed;
+	double	exp_charge;
+	double	exp_discharge;
+	double	t_rc_charge;
+	double	t_rc_discharge;
 };
 
 struct dsd_555_mstbl_context
@@ -127,6 +133,12 @@ struct dsd_ls624_context
 #define DSD_555_ASTBL__C		(*(node->input[3]))
 #define DSD_555_ASTBL__CTRLV	(*(node->input[4]))
 
+/* charge/discharge constants */
+#define DSD_555_ASTBL_T_RC_BLEED		(DEFAULT_555_CAP_BLEED * DSD_555_ASTBL__C)
+/* Use quick charge if specified. */
+#define DSD_555_ASTBL_T_RC_CHARGE		((DSD_555_ASTBL__R1 + ((info->options & DISC_555_ASTABLE_HAS_FAST_CHARGE_DIODE) ? 0 : DSD_555_ASTBL__R2)) * DSD_555_ASTBL__C)
+#define DSD_555_ASTBL_T_RC_DISCHARGE	(DSD_555_ASTBL__R2 * DSD_555_ASTBL__C)
+
 static void dsd_555_astbl_step(node_description *node)
 {
 	const  discrete_555_desc     *info    = node->custom;
@@ -139,7 +151,8 @@ static void dsd_555_astbl_step(node_description *node)
 	double	t_rc    = 0;					/* RC time constant */
 	double	v_cap   = context->cap_voltage;	/* Current voltage on capacitor, before dt */
 	double	v_cap_next = 0;					/* Voltage on capacitor, after dt */
-	double	v_charge;
+	double	v_charge, exponent;
+	int		update_exponent, update_t_rc;
 
 	if(DSD_555_ASTBL__RESET)
 	{
@@ -217,6 +230,8 @@ static void dsd_555_astbl_step(node_description *node)
 	else
 	{
 		/* Keep looping until all toggling in time sample is used up. */
+		update_t_rc = context->has_rc_nodes;
+		update_exponent = update_t_rc;
 		do
 		{
 			if (context->flip_flop)
@@ -225,16 +240,28 @@ static void dsd_555_astbl_step(node_description *node)
 				{
 					/* Oscillation disabled because there is no longer any charge resistor. */
 					/* Bleed the cap due to circuit losses. */
-					t_rc       = DEFAULT_555_CAP_BLEED * DSD_555_ASTBL__C;
-					v_cap_next = v_cap - (v_cap * (1.0 - exp(-(dt / t_rc ))));
+					if (update_exponent)
+					{
+						t_rc     = DSD_555_ASTBL_T_RC_BLEED;
+						exponent = 1.0 - exp(-(dt / t_rc));
+					}
+					else
+						exponent = context->exp_bleed;
+					v_cap_next = v_cap - (v_cap * exponent);
 					dt = 0;
 				}
 				else
 				{
 					/* Charging */
-					/* Use quick charge if specified. */
-					t_rc       = (DSD_555_ASTBL__R1 + ((info->options & DISC_555_ASTABLE_HAS_FAST_CHARGE_DIODE) ? 0 : DSD_555_ASTBL__R2)) * DSD_555_ASTBL__C;
-					v_cap_next = v_cap + ((v_charge - v_cap) * (1.0 - exp(-(dt / t_rc ))));
+					if (update_t_rc)
+						t_rc = DSD_555_ASTBL_T_RC_CHARGE;
+					else
+						t_rc = context->t_rc_charge;
+					if (update_exponent)
+						exponent = 1.0 - exp(-(dt / t_rc ));
+					else
+						exponent = context->exp_charge;
+					v_cap_next = v_cap + ((v_charge - v_cap) * exponent);
 					dt = 0;
 
 					/* has it charged past upper limit? */
@@ -246,6 +273,7 @@ static void dsd_555_astbl_step(node_description *node)
 						v_cap  = context->threshold;
 						context->flip_flop = 0;
 						count_f++;
+						update_exponent = 1;
 					}
 				}
 			}
@@ -254,8 +282,15 @@ static void dsd_555_astbl_step(node_description *node)
 				/* Discharging */
 				if(DSD_555_ASTBL__R2 != 0)
 				{
-					t_rc       = DSD_555_ASTBL__R2 * DSD_555_ASTBL__C;
-					v_cap_next = v_cap - (v_cap * (1 - exp(-(dt / t_rc ))));
+					if (update_t_rc)
+						t_rc = DSD_555_ASTBL_T_RC_DISCHARGE;
+					else
+						t_rc = context->t_rc_discharge;
+					if (update_exponent)
+						exponent = 1.0 - exp(-(dt / t_rc ));
+					else
+						exponent = context->exp_discharge;
+					v_cap_next = v_cap - (v_cap * exponent);
 					dt = 0;
 				}
 				else
@@ -268,12 +303,12 @@ static void dsd_555_astbl_step(node_description *node)
 				if (v_cap_next <= context->trigger)
 				{
 					/* calculate the overshoot time */
-					if (dt == 0)
-						dt = t_rc  * log(1.0 / (1.0 - ((context->trigger - v_cap_next) / v_cap)));
+					dt = t_rc  * log(1.0 / (1.0 - ((context->trigger - v_cap_next) / v_cap)));
 					x_time = dt;
 					v_cap  = context->trigger;
 					context->flip_flop = 1;
 					count_r++;
+					update_exponent = 1;
 				}
 			}
 		} while(dt);
@@ -324,6 +359,9 @@ static void dsd_555_astbl_reset(node_description *node)
 	struct dsd_555_astbl_context *context = node->context;
 	node_description *v_charge_node;
 
+	double	neg_dt = 0.0 - discrete_current_context->sample_time;
+	double	t_rc;
+
 	context->use_ctrlv   = (node->input_is_node >> 4) & 1;
 	context->output_type = info->options & DISC_555_OUT_MASK;
 
@@ -353,6 +391,22 @@ static void dsd_555_astbl_reset(node_description *node)
 		/* Setup based on v_pos power source */
 		context->threshold = info->v_pos * 2.0 / 3.0;
 		context->trigger   = info->v_pos / 3.0;
+	}
+
+	/* optimization if none of the values are nodes */
+	context->has_rc_nodes = 0;
+	if (node->input_is_node & 0x0e)
+		context->has_rc_nodes = 1;
+	else
+	{
+		t_rc = DSD_555_ASTBL_T_RC_BLEED;
+		context->exp_bleed  = 1.0 - exp(neg_dt / t_rc);
+		t_rc = DSD_555_ASTBL_T_RC_CHARGE;
+		context->exp_charge  = 1.0 - exp(neg_dt / t_rc);
+		context->t_rc_charge = t_rc;
+		t_rc = DSD_555_ASTBL_T_RC_DISCHARGE;
+		context->exp_discharge  = 1.0 - exp(neg_dt / t_rc);
+		context->t_rc_discharge = t_rc;
 	}
 
 	context->output_is_ac = info->options & DISC_555_OUT_AC;
