@@ -63,25 +63,6 @@ enum
 
 
 /***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-typedef INT32 (*slider_update)(running_machine *machine, INT32 newval, char *buffer, void *arg);
-
-typedef struct _slider_state slider_state;
-struct _slider_state
-{
-	INT32			minval;				/* minimum value */
-	INT32			defval;				/* default value */
-	INT32			maxval;				/* maximum value */
-	INT32			incval;				/* increment value */
-	slider_update	update;				/* callback */
-	void *			arg;				/* argument */
-};
-
-
-
-/***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
 
@@ -110,9 +91,8 @@ static astring *messagebox_text;
 static rgb_t messagebox_backcolor;
 
 /* slider info */
-static slider_state slider_list[100];
-static int slider_count;
-static int slider_current;
+static slider_state *slider_list;
+static slider_state *slider_current;
 
 static int display_rescale_message;
 static int allow_rescale;
@@ -135,36 +115,34 @@ static UINT32 handler_messagebox(running_machine *machine, UINT32 state);
 static UINT32 handler_messagebox_ok(running_machine *machine, UINT32 state);
 static UINT32 handler_messagebox_anykey(running_machine *machine, UINT32 state);
 static UINT32 handler_ingame(running_machine *machine, UINT32 state);
-static UINT32 handler_slider(running_machine *machine, UINT32 state);
 static UINT32 handler_load_save(running_machine *machine, UINT32 state);
 
 /* slider controls */
-static void slider_init(running_machine *machine);
-static void slider_display(const char *text, int minval, int maxval, int defval, int curval);
-static void slider_draw_bar(float leftx, float topy, float width, float height, float percentage, float default_percentage);
-static INT32 slider_volume(running_machine *machine, INT32 newval, char *buffer, void *arg);
-static INT32 slider_mixervol(running_machine *machine, INT32 newval, char *buffer, void *arg);
-static INT32 slider_adjuster(running_machine *machine, INT32 newval, char *buffer, void *arg);
-static INT32 slider_overclock(running_machine *machine, INT32 newval, char *buffer, void *arg);
-static INT32 slider_refresh(running_machine *machine, INT32 newval, char *buffer, void *arg);
-static INT32 slider_brightness(running_machine *machine, INT32 newval, char *buffer, void *arg);
-static INT32 slider_contrast(running_machine *machine, INT32 newval, char *buffer, void *arg);
-static INT32 slider_gamma(running_machine *machine, INT32 newval, char *buffer, void *arg);
-static INT32 slider_xscale(running_machine *machine, INT32 newval, char *buffer, void *arg);
-static INT32 slider_yscale(running_machine *machine, INT32 newval, char *buffer, void *arg);
-static INT32 slider_xoffset(running_machine *machine, INT32 newval, char *buffer, void *arg);
-static INT32 slider_yoffset(running_machine *machine, INT32 newval, char *buffer, void *arg);
-static INT32 slider_overxscale(running_machine *machine, INT32 newval, char *buffer, void *arg);
-static INT32 slider_overyscale(running_machine *machine, INT32 newval, char *buffer, void *arg);
-static INT32 slider_overxoffset(running_machine *machine, INT32 newval, char *buffer, void *arg);
-static INT32 slider_overyoffset(running_machine *machine, INT32 newval, char *buffer, void *arg);
-static INT32 slider_flicker(running_machine *machine, INT32 newval, char *buffer, void *arg);
-static INT32 slider_beam(running_machine *machine, INT32 newval, char *buffer, void *arg);
+static slider_state *slider_alloc(const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg);
+static slider_state *slider_init(running_machine *machine);
+static INT32 slider_volume(running_machine *machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_mixervol(running_machine *machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_adjuster(running_machine *machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_overclock(running_machine *machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_refresh(running_machine *machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_brightness(running_machine *machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_contrast(running_machine *machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_gamma(running_machine *machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_xscale(running_machine *machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_yscale(running_machine *machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_xoffset(running_machine *machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_yoffset(running_machine *machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_overxscale(running_machine *machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_overyscale(running_machine *machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_overxoffset(running_machine *machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_overyoffset(running_machine *machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_flicker(running_machine *machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_beam(running_machine *machine, void *arg, astring *string, INT32 newval);
 static char *slider_get_screen_desc(const device_config *screen);
 static char *slider_get_laserdisc_desc(const device_config *screen);
 #ifdef MAME_DEBUG
-static INT32 slider_crossscale(running_machine *machine, INT32 newval, char *buffer, void *arg);
-static INT32 slider_crossoffset(running_machine *machine, INT32 newval, char *buffer, void *arg);
+static INT32 slider_crossscale(running_machine *machine, void *arg, astring *string, INT32 newval);
+static INT32 slider_crossoffset(running_machine *machine, void *arg, astring *string, INT32 newval);
 #endif
 
 
@@ -182,22 +160,6 @@ INLINE UINT32 ui_set_handler(UINT32 (*callback)(running_machine *, UINT32), UINT
 	ui_handler_callback = callback;
 	ui_handler_param = param;
 	return param;
-}
-
-
-/*-------------------------------------------------
-    slider_config - configure a slider entry
--------------------------------------------------*/
-
-INLINE void slider_config(slider_state *state, INT32 minval, INT32 defval, INT32 maxval, INT32 incval,
-						  INT32 (*update)(running_machine *, INT32, char *, void *), void *arg)
-{
-	state->minval = minval;
-	state->defval = defval;
-	state->maxval = maxval;
-	state->incval = incval;
-	state->update = update;
-	state->arg = arg;
 }
 
 
@@ -336,7 +298,7 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 		show_gameinfo = show_warnings = show_disclaimer = FALSE;
 
 	/* initialize the on-screen display system */
-	slider_init(machine);
+	slider_list = slider_current = slider_init(machine);
 
 	/* loop over states */
 	ui_set_handler(handler_ingame, 0);
@@ -931,17 +893,6 @@ int ui_is_menu_active(void)
 }
 
 
-/*-------------------------------------------------
-    ui_is_slider_active - return TRUE if the slider
-    UI handler is active
--------------------------------------------------*/
-
-int ui_is_slider_active(void)
-{
-	return (ui_handler_callback == handler_slider);
-}
-
-
 
 /***************************************************************************
     TEXT GENERATORS
@@ -1274,8 +1225,8 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 		return ui_set_handler(ui_menu_ui_handler, 0);
 
 	/* if the on-screen display isn't up and the user has toggled it, turn it on */
-	if ((machine->debug_flags & DEBUG_FLAG_ENABLED)  == 0 && ui_input_pressed(machine, IPT_UI_ON_SCREEN_DISPLAY))
-		return ui_set_handler(handler_slider, 0);
+//	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) == 0 && ui_input_pressed(machine, IPT_UI_ON_SCREEN_DISPLAY))
+//		return ui_set_handler(ui_slider_ui_handler, 0);
 
 	/* handle a reset request */
 	if (ui_input_pressed(machine, IPT_UI_RESET_MACHINE))
@@ -1393,71 +1344,6 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 
 
 /*-------------------------------------------------
-    handler_slider - displays the current slider
-    and calls the slider handler
--------------------------------------------------*/
-
-static UINT32 handler_slider(running_machine *machine, UINT32 state)
-{
-	slider_state *cur = &slider_list[slider_current];
-	INT32 increment = 0, newval;
-	char textbuf[256];
-
-	/* left/right control the increment */
-	if (ui_input_pressed_repeat(machine, IPT_UI_LEFT,6))
-		increment = -cur->incval;
-	if (ui_input_pressed_repeat(machine, IPT_UI_RIGHT,6))
-		increment = cur->incval;
-
-	/* alt goes to 1, shift goes 10x smaller, control goes 10x larger */
-	if (increment != 0)
-	{
-		if (input_code_pressed(KEYCODE_LALT) || input_code_pressed(KEYCODE_RALT))
-			increment = (increment < 0) ? -1 : 1;
-		if (input_code_pressed(KEYCODE_LSHIFT) || input_code_pressed(KEYCODE_RSHIFT))
-			increment = (increment < -10 || increment > 10) ? (increment / 10) : ((increment < 0) ? -1 : 1);
-		if (input_code_pressed(KEYCODE_LCONTROL) || input_code_pressed(KEYCODE_RCONTROL))
-			increment *= 10;
-	}
-
-	/* determine the new value */
-	newval = (*cur->update)(machine, 0, NULL, cur->arg) + increment;
-
-	/* select resets to the default value */
-	if (ui_input_pressed(machine, IPT_UI_SELECT))
-		newval = cur->defval;
-
-	/* clamp within bounds */
-	if (newval < cur->minval)
-		newval = cur->minval;
-	if (newval > cur->maxval)
-		newval = cur->maxval;
-
-	/* update the new data and get the text */
-	(*cur->update)(machine, newval, textbuf, cur->arg);
-
-	/* display the UI */
-	slider_display(textbuf, cur->minval, cur->maxval, cur->defval, newval);
-
-	/* up/down select which slider to control */
-	if (ui_input_pressed_repeat(machine, IPT_UI_DOWN,6))
-		slider_current = (slider_current + 1) % slider_count;
-	if (ui_input_pressed_repeat(machine, IPT_UI_UP,6))
-		slider_current = (slider_current + slider_count - 1) % slider_count;
-
-	/* the slider toggle or ESC will cancel out of our display */
-	if (ui_input_pressed(machine, IPT_UI_ON_SCREEN_DISPLAY) || ui_input_pressed(machine, IPT_UI_CANCEL))
-		return UI_HANDLER_CANCEL;
-
-	/* the menu key will take us directly to the menu */
-	if (ui_input_pressed(machine, IPT_UI_CONFIGURE))
-		return ui_set_handler(ui_menu_ui_handler, 0);
-
-	return 0;
-}
-
-
-/*-------------------------------------------------
     handler_load_save - leads the user through
     specifying a game to save or load
 -------------------------------------------------*/
@@ -1532,21 +1418,55 @@ static UINT32 handler_load_save(running_machine *machine, UINT32 state)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    ui_get_slider_list - get the list of sliders
+-------------------------------------------------*/
+
+const slider_state *ui_get_slider_list(void)
+{
+	return slider_list;
+}
+
+
+/*-------------------------------------------------
+    slider_alloc - allocate a new slider entry
+-------------------------------------------------*/
+
+static slider_state *slider_alloc(const char *title, INT32 minval, INT32 defval, INT32 maxval, INT32 incval, slider_update update, void *arg)
+{
+	int size = sizeof(slider_state) + strlen(title);
+	slider_state *state = auto_malloc(size);
+	memset(state, 0, size);
+
+	state->minval = minval;
+	state->defval = defval;
+	state->maxval = maxval;
+	state->incval = incval;
+	state->update = update;
+	state->arg = arg;
+	strcpy(state->description, title);
+
+	return state;
+}
+
+
+/*-------------------------------------------------
     slider_init - initialize the list of slider
     controls
 -------------------------------------------------*/
 
-static void slider_init(running_machine *machine)
+static slider_state *slider_init(running_machine *machine)
 {
 	const input_field_config *field;
 	const input_port_config *port;
 	const device_config *device;
+	slider_state *listhead = NULL;
+	slider_state **tailptr = &listhead;
+	astring *string = astring_alloc();
 	int numitems, item;
 
-	slider_count = 0;
-
 	/* add overall volume */
-	slider_config(&slider_list[slider_count++], -32, 0, 0, 1, slider_volume, NULL);
+	*tailptr = slider_alloc("Master Volume", -32, 0, 0, 1, slider_volume, NULL);
+	tailptr = &(*tailptr)->next;
 
 	/* add per-channel volume */
 	numitems = sound_get_user_gain_count();
@@ -1558,7 +1478,9 @@ static void slider_init(running_machine *machine)
 		if (defval > 1000)
 			maxval = 2 * defval;
 
-		slider_config(&slider_list[slider_count++], 0, defval, maxval, 20, slider_mixervol, (void *)(FPTR)item);
+		astring_printf(string, "%s Volume", sound_get_user_gain_name(item));
+		*tailptr = slider_alloc(astring_c(string), 0, defval, maxval, 20, slider_mixervol, (void *)(FPTR)item);
+		tailptr = &(*tailptr)->next;
 	}
 
 	/* add analog adjusters */
@@ -1567,17 +1489,23 @@ static void slider_init(running_machine *machine)
 			if (field->type == IPT_ADJUSTER)
 			{
 				void *param = (void *)field;
-				slider_config(&slider_list[slider_count++], 0, field->defvalue, 100, 1, slider_adjuster, param);
+				*tailptr = slider_alloc(field->name, 0, field->defvalue, 100, 1, slider_adjuster, param);
+				tailptr = &(*tailptr)->next;
 			}
 
+	/* add CPU overclocking (cheat only) */
 	if (options_get_bool(mame_options(), OPTION_CHEAT))
 	{
-		/* add CPU overclocking */
 		numitems = cpu_gettotalcpu();
 		for (item = 0; item < numitems; item++)
-			slider_config(&slider_list[slider_count++], 10, 1000, 2000, 1, slider_overclock, (void *)(FPTR)item);
+		{
+			astring_printf(string, "Overclock CPU %s", machine->config->cpu[item].tag);
+			*tailptr = slider_alloc(astring_c(string), 10, 1000, 2000, 1, slider_overclock, (void *)(FPTR)item);
+			tailptr = &(*tailptr)->next;
+		}
 	}
 
+	/* add screen parameters */
 	for (device = video_screen_first(machine->config); device != NULL; device = video_screen_next(device))
 	{
 		const screen_config *scrconfig = device->inline_config;
@@ -1589,18 +1517,36 @@ static void slider_init(running_machine *machine)
 
 		/* add refresh rate tweaker */
 		if (options_get_bool(mame_options(), OPTION_CHEAT))
-			slider_config(&slider_list[slider_count++], -10000, 0, 10000, 1000, slider_refresh, param);
+		{
+			astring_printf(string, "%s Refresh Rate", slider_get_screen_desc(device));
+			*tailptr = slider_alloc(astring_c(string), -10000, 0, 10000, 1000, slider_refresh, param);
+			tailptr = &(*tailptr)->next;
+		}
 
 		/* add standard brightness/contrast/gamma controls per-screen */
-		slider_config(&slider_list[slider_count++], 100, 1000, 2000, 10, slider_brightness, param);
-		slider_config(&slider_list[slider_count++], 100, 1000, 2000, 50, slider_contrast, param);
-		slider_config(&slider_list[slider_count++], 100, 1000, 3000, 50, slider_gamma, param);
+		astring_printf(string, "%s Brightness", slider_get_screen_desc(device));
+		*tailptr = slider_alloc(astring_c(string), 100, 1000, 2000, 10, slider_brightness, param);
+		tailptr = &(*tailptr)->next;
+		astring_printf(string, "%s Contrast", slider_get_screen_desc(device));
+		*tailptr = slider_alloc(astring_c(string), 100, 1000, 2000, 50, slider_contrast, param);
+		tailptr = &(*tailptr)->next;
+		astring_printf(string, "%s Gamma", slider_get_screen_desc(device));
+		*tailptr = slider_alloc(astring_c(string), 100, 1000, 3000, 50, slider_gamma, param);
+		tailptr = &(*tailptr)->next;
 
 		/* add scale and offset controls per-screen */
-		slider_config(&slider_list[slider_count++], 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_xscale, param);
-		slider_config(&slider_list[slider_count++], -500, defxoffset, 500, 2, slider_xoffset, param);
-		slider_config(&slider_list[slider_count++], 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_yscale, param);
-		slider_config(&slider_list[slider_count++], -500, defyoffset, 500, 2, slider_yoffset, param);
+		astring_printf(string, "%s Horiz Stretch", slider_get_screen_desc(device));
+		*tailptr = slider_alloc(astring_c(string), 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_xscale, param);
+		tailptr = &(*tailptr)->next;
+		astring_printf(string, "%s Horiz Position", slider_get_screen_desc(device));
+		*tailptr = slider_alloc(astring_c(string), -500, defxoffset, 500, 2, slider_xoffset, param);
+		tailptr = &(*tailptr)->next;
+		astring_printf(string, "%s Vert Stretch", slider_get_screen_desc(device));
+		*tailptr = slider_alloc(astring_c(string), 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_yscale, param);
+		tailptr = &(*tailptr)->next;
+		astring_printf(string, "%s Vert Position", slider_get_screen_desc(device));
+		*tailptr = slider_alloc(astring_c(string), -500, defyoffset, 500, 2, slider_yoffset, param);
+		tailptr = &(*tailptr)->next;
 	}
 
 	for (device = device_list_first(machine->config->devicelist, LASERDISC); device != NULL; device = device_list_next(device, LASERDISC))
@@ -1615,10 +1561,18 @@ static void slider_init(running_machine *machine)
 			void *param = (void *)device;
 
 			/* add scale and offset controls per-overlay */
-			slider_config(&slider_list[slider_count++], 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_overxscale, param);
-			slider_config(&slider_list[slider_count++], -500, defxoffset, 500, 2, slider_overxoffset, param);
-			slider_config(&slider_list[slider_count++], 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_overyscale, param);
-			slider_config(&slider_list[slider_count++], -500, defyoffset, 500, 2, slider_overyoffset, param);
+			astring_printf(string, "%s Horiz Stretch", slider_get_laserdisc_desc(device));
+			*tailptr = slider_alloc(astring_c(string), 500, (defxscale == 0) ? 1000 : defxscale, 1500, 2, slider_overxscale, param);
+			tailptr = &(*tailptr)->next;
+			astring_printf(string, "%s Horiz Position", slider_get_laserdisc_desc(device));
+			*tailptr = slider_alloc(astring_c(string), -500, defxoffset, 500, 2, slider_overxoffset, param);
+			tailptr = &(*tailptr)->next;
+			astring_printf(string, "%s Vert Stretch", slider_get_laserdisc_desc(device));
+			*tailptr = slider_alloc(astring_c(string), 500, (defyscale == 0) ? 1000 : defyscale, 1500, 2, slider_overyscale, param);
+			tailptr = &(*tailptr)->next;
+			astring_printf(string, "%s Vert Position", slider_get_laserdisc_desc(device));
+			*tailptr = slider_alloc(astring_c(string), -500, defyoffset, 500, 2, slider_overyoffset, param);
+			tailptr = &(*tailptr)->next;
 		}
 	}
 
@@ -1628,8 +1582,10 @@ static void slider_init(running_machine *machine)
 		if (scrconfig->type == SCREEN_TYPE_VECTOR)
 		{
 			/* add flicker control */
-			slider_config(&slider_list[slider_count++], 0, 0, 1000, 10, slider_flicker, NULL);
-			slider_config(&slider_list[slider_count++], 10, 100, 1000, 10, slider_beam, NULL);
+			*tailptr = slider_alloc("Vector Flicker", 0, 0, 1000, 10, slider_flicker, NULL);
+			tailptr = &(*tailptr)->next;
+			*tailptr = slider_alloc("Beam Width", 10, 100, 1000, 10, slider_beam, NULL);
+			tailptr = &(*tailptr)->next;
 			break;
 		}
 	}
@@ -1641,76 +1597,17 @@ static void slider_init(running_machine *machine)
 			if (field->crossaxis != CROSSHAIR_AXIS_NONE && field->player == 0)
 			{
 				void *param = (void *)field;
-				slider_config(&slider_list[slider_count++], -3000, 1000, 3000, 100, slider_crossscale, param);
-				slider_config(&slider_list[slider_count++], -3000, 0, 3000, 100, slider_crossoffset, param);
+				astring_printf(string, "Crosshair Scale %s", (field->crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y");
+				*tailptr = slider_alloc(astring_c(string), -3000, 1000, 3000, 100, slider_crossscale, param);
+				tailptr = &(*tailptr)->next;
+				astring_printf(string, "Crosshair Offset %s", (field->crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y");
+				*tailptr = slider_alloc(astring_c(string), -3000, 0, 3000, 100, slider_crossoffset, param);
+				tailptr = &(*tailptr)->next;
 			}
 #endif
-}
 
-
-/*-------------------------------------------------
-    slider_display - display a slider box with
-    text
--------------------------------------------------*/
-
-static void slider_display(const char *text, int minval, int maxval, int defval, int curval)
-{
-	float percentage = (float)(curval - minval) / (float)(maxval - minval);
-	float default_percentage = (float)(defval - minval) / (float)(maxval - minval);
-	float space_width = ui_get_char_width(' ');
-	float line_height = ui_get_line_height();
-	float ui_width, ui_height;
-	float text_height;
-
-	/* leave a spaces' worth of room along the left/right sides, and a lines' worth on the top/bottom */
-	ui_width = 1.0f - 2.0f * space_width;
-	ui_height = 1.0f - 2.0f * line_height;
-
-	/* determine the text height */
-	ui_draw_text_full(text, 0, 0, ui_width - 2 * UI_BOX_LR_BORDER,
-				JUSTIFY_CENTER, WRAP_WORD, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, NULL, &text_height);
-
-	/* add a box around the whole area */
-	ui_draw_outlined_box(space_width,
-					 line_height + ui_height - text_height - line_height - 2 * UI_BOX_TB_BORDER,
-					 space_width + ui_width,
-					 line_height + ui_height, UI_FILLCOLOR);
-
-	/* draw the thermometer */
-	slider_draw_bar(2.0f * space_width, line_height + ui_height - UI_BOX_TB_BORDER - text_height - line_height * 0.75f,
-			ui_width - 2.0f * space_width, line_height * 0.75f, percentage, default_percentage);
-
-	/* draw the actual text */
-	ui_draw_text_full(text, space_width + UI_BOX_LR_BORDER, line_height + ui_height - UI_BOX_TB_BORDER - text_height, ui_width - 2.0f * UI_BOX_LR_BORDER,
-				JUSTIFY_CENTER, WRAP_WORD, DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, &text_height);
-}
-
-
-/*-------------------------------------------------
-    slider_draw_bar - draw a slider thermometer
--------------------------------------------------*/
-
-static void slider_draw_bar(float leftx, float topy, float width, float height, float percentage, float default_percentage)
-{
-	float current_x, default_x;
-	float bar_top, bar_bottom;
-
-	/* compute positions */
-	bar_top = topy + 0.125f * height;
-	bar_bottom = topy + 0.875f * height;
-	default_x = leftx + width * default_percentage;
-	current_x = leftx + width * percentage;
-
-	/* fill in the percentage */
-	render_ui_add_rect(leftx, bar_top, current_x, bar_bottom, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-
-	/* draw the top and bottom lines */
-	render_ui_add_line(leftx, bar_top, leftx + width, bar_top, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	render_ui_add_line(leftx, bar_bottom, leftx + width, bar_bottom, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-
-	/* draw default marker */
-	render_ui_add_line(default_x, topy, default_x, bar_top, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
-	render_ui_add_line(default_x, bar_bottom, default_x, topy + height, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+	astring_free(string);
+	return listhead;
 }
 
 
@@ -1718,13 +1615,12 @@ static void slider_draw_bar(float leftx, float topy, float width, float height, 
     slider_volume - global volume slider callback
 -------------------------------------------------*/
 
-static INT32 slider_volume(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_volume(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	if (buffer != NULL)
-	{
+	if (newval != SLIDER_NOCHANGE)
 		sound_set_attenuation(newval);
-		sprintf(buffer, "Master Volume %3ddB", sound_get_attenuation());
-	}
+	if (string != NULL)
+		astring_printf(string, "%3ddB", sound_get_attenuation());
 	return sound_get_attenuation();
 }
 
@@ -1734,14 +1630,13 @@ static INT32 slider_volume(running_machine *machine, INT32 newval, char *buffer,
     slider callback
 -------------------------------------------------*/
 
-static INT32 slider_mixervol(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_mixervol(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
 	int which = (FPTR)arg;
-	if (buffer != NULL)
-	{
+	if (newval != SLIDER_NOCHANGE)
 		sound_set_user_gain(which, (float)newval * 0.001f);
-		sprintf(buffer, "%s Volume %4.2f", sound_get_user_gain_name(which), sound_get_user_gain(which));
-	}
+	if (string != NULL)
+		astring_printf(string, "%4.2f", sound_get_user_gain(which));
 	return floor(sound_get_user_gain(which) * 1000.0f + 0.5f);
 }
 
@@ -1751,18 +1646,19 @@ static INT32 slider_mixervol(running_machine *machine, INT32 newval, char *buffe
     callback
 -------------------------------------------------*/
 
-static INT32 slider_adjuster(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_adjuster(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
 	const input_field_config *field = arg;
 	input_field_user_settings settings;
 
 	input_field_get_user_settings(field, &settings);
-	if (buffer != NULL)
+	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.value = newval;
 		input_field_set_user_settings(field, &settings);
-		sprintf(buffer, "%s %d%%", field->name, settings.value);
 	}
+	if (string != NULL)
+		astring_printf(string, "%d%%", settings.value);
 	return settings.value;
 }
 
@@ -1772,14 +1668,13 @@ static INT32 slider_adjuster(running_machine *machine, INT32 newval, char *buffe
     callback
 -------------------------------------------------*/
 
-static INT32 slider_overclock(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_overclock(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
 	int which = (FPTR)arg;
-	if (buffer != NULL)
-	{
+	if (newval != SLIDER_NOCHANGE)
 		cpunum_set_clockscale(machine, which, (float)newval * 0.001f);
-		sprintf(buffer, "Overclock CPU %d %3.0f%%", which, floor(cpunum_get_clockscale(which) * 100.0f + 0.5f));
-	}
+	if (string != NULL)
+		astring_printf(string, "%3.0f%%", floor(cpunum_get_clockscale(which) * 100.0f + 0.5f));
 	return floor(cpunum_get_clockscale(which) * 1000.0f + 0.5f);
 }
 
@@ -1788,22 +1683,23 @@ static INT32 slider_overclock(running_machine *machine, INT32 newval, char *buff
     slider_refresh - refresh rate slider callback
 -------------------------------------------------*/
 
-static INT32 slider_refresh(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_refresh(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
 	const device_config *screen = arg;
 	const screen_config *scrconfig = screen->inline_config;
 	double defrefresh = ATTOSECONDS_TO_HZ(scrconfig->refresh);
 	double refresh;
 
-	if (buffer != NULL)
+	if (newval != SLIDER_NOCHANGE)
 	{
 		int width = video_screen_get_width(screen);
 		int height = video_screen_get_height(screen);
 		const rectangle *visarea = video_screen_get_visible_area(screen);
 
 		video_screen_configure(screen, width, height, visarea, HZ_TO_ATTOSECONDS(defrefresh + (double)newval * 0.001));
-		sprintf(buffer, "%s Refresh Rate %.3ffps", slider_get_screen_desc(screen), ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds));
 	}
+	if (string != NULL)
+		astring_printf(string, "%.3ffps", ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds));
 	refresh = ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds);
 	return floor((refresh - defrefresh) * 1000.0f + 0.5f);
 }
@@ -1814,19 +1710,20 @@ static INT32 slider_refresh(running_machine *machine, INT32 newval, char *buffer
     callback
 -------------------------------------------------*/
 
-static INT32 slider_brightness(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_brightness(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
 
 	render_container_get_user_settings(container, &settings);
-	if (buffer != NULL)
+	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.brightness = (float)newval * 0.001f;
 		render_container_set_user_settings(container, &settings);
-		sprintf(buffer, "%s Brightness %.3f", slider_get_screen_desc(screen), settings.brightness);
 	}
+	if (string != NULL)
+		astring_printf(string, "%.3f", settings.brightness);
 	return floor(settings.brightness * 1000.0f + 0.5f);
 }
 
@@ -1836,19 +1733,20 @@ static INT32 slider_brightness(running_machine *machine, INT32 newval, char *buf
     callback
 -------------------------------------------------*/
 
-static INT32 slider_contrast(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_contrast(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
 
 	render_container_get_user_settings(container, &settings);
-	if (buffer != NULL)
+	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.contrast = (float)newval * 0.001f;
 		render_container_set_user_settings(container, &settings);
-		sprintf(buffer, "%s Contrast %.3f", slider_get_screen_desc(screen), settings.contrast);
 	}
+	if (string != NULL)
+		astring_printf(string, "%.3f", settings.contrast);
 	return floor(settings.contrast * 1000.0f + 0.5f);
 }
 
@@ -1857,19 +1755,20 @@ static INT32 slider_contrast(running_machine *machine, INT32 newval, char *buffe
     slider_gamma - screen gamma slider callback
 -------------------------------------------------*/
 
-static INT32 slider_gamma(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_gamma(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
 
 	render_container_get_user_settings(container, &settings);
-	if (buffer != NULL)
+	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.gamma = (float)newval * 0.001f;
 		render_container_set_user_settings(container, &settings);
-		sprintf(buffer, "%s Gamma %.3f", slider_get_screen_desc(screen), settings.gamma);
 	}
+	if (string != NULL)
+		astring_printf(string, "%.3f", settings.gamma);
 	return floor(settings.gamma * 1000.0f + 0.5f);
 }
 
@@ -1879,19 +1778,20 @@ static INT32 slider_gamma(running_machine *machine, INT32 newval, char *buffer, 
     callback
 -------------------------------------------------*/
 
-static INT32 slider_xscale(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_xscale(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
 
 	render_container_get_user_settings(container, &settings);
-	if (buffer != NULL)
+	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.xscale = (float)newval * 0.001f;
 		render_container_set_user_settings(container, &settings);
-		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(screen), "Horiz Stretch", settings.xscale);
 	}
+	if (string != NULL)
+		astring_printf(string, "%.3f", settings.xscale);
 	return floor(settings.xscale * 1000.0f + 0.5f);
 }
 
@@ -1901,19 +1801,20 @@ static INT32 slider_xscale(running_machine *machine, INT32 newval, char *buffer,
     callback
 -------------------------------------------------*/
 
-static INT32 slider_yscale(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_yscale(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
 
 	render_container_get_user_settings(container, &settings);
-	if (buffer != NULL)
+	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.yscale = (float)newval * 0.001f;
 		render_container_set_user_settings(container, &settings);
-		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(screen), "Vert Stretch", settings.yscale);
 	}
+	if (string != NULL)
+		astring_printf(string, "%.3f", settings.yscale);
 	return floor(settings.yscale * 1000.0f + 0.5f);
 }
 
@@ -1923,19 +1824,20 @@ static INT32 slider_yscale(running_machine *machine, INT32 newval, char *buffer,
     slider callback
 -------------------------------------------------*/
 
-static INT32 slider_xoffset(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_xoffset(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
 
 	render_container_get_user_settings(container, &settings);
-	if (buffer != NULL)
+	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.xoffset = (float)newval * 0.001f;
 		render_container_set_user_settings(container, &settings);
-		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(screen), "Horiz Position", settings.xoffset);
 	}
+	if (string != NULL)
+		astring_printf(string, "%.3f", settings.xoffset);
 	return floor(settings.xoffset * 1000.0f + 0.5f);
 }
 
@@ -1945,19 +1847,20 @@ static INT32 slider_xoffset(running_machine *machine, INT32 newval, char *buffer
     slider callback
 -------------------------------------------------*/
 
-static INT32 slider_yoffset(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_yoffset(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
 	const device_config *screen = arg;
 	render_container *container = render_container_get_screen(screen);
 	render_container_user_settings settings;
 
 	render_container_get_user_settings(container, &settings);
-	if (buffer != NULL)
+	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.yoffset = (float)newval * 0.001f;
 		render_container_set_user_settings(container, &settings);
-		sprintf(buffer, "%s %s %.3f", slider_get_screen_desc(screen), "Vert Position", settings.yoffset);
 	}
+	if (string != NULL)
+		astring_printf(string, "%.3f", settings.yoffset);
 	return floor(settings.yoffset * 1000.0f + 0.5f);
 }
 
@@ -1967,18 +1870,19 @@ static INT32 slider_yoffset(running_machine *machine, INT32 newval, char *buffer
     callback
 -------------------------------------------------*/
 
-static INT32 slider_overxscale(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_overxscale(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
 	const device_config *laserdisc = arg;
 	laserdisc_config settings;
 
 	laserdisc_get_config(laserdisc, &settings);
-	if (buffer != NULL)
+	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.overscalex = (float)newval * 0.001f;
 		laserdisc_set_config(laserdisc, &settings);
-		sprintf(buffer, "%s %s %.3f", slider_get_laserdisc_desc(laserdisc), "Overlay Horiz Stretch", settings.overscalex);
 	}
+	if (string != NULL)
+		astring_printf(string, "%.3f", settings.overscalex);
 	return floor(settings.overscalex * 1000.0f + 0.5f);
 }
 
@@ -1988,18 +1892,19 @@ static INT32 slider_overxscale(running_machine *machine, INT32 newval, char *buf
     callback
 -------------------------------------------------*/
 
-static INT32 slider_overyscale(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_overyscale(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
 	const device_config *laserdisc = arg;
 	laserdisc_config settings;
 
 	laserdisc_get_config(laserdisc, &settings);
-	if (buffer != NULL)
+	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.overscaley = (float)newval * 0.001f;
 		laserdisc_set_config(laserdisc, &settings);
-		sprintf(buffer, "%s %s %.3f", slider_get_laserdisc_desc(laserdisc), "Overlay Vert Stretch", settings.overscaley);
 	}
+	if (string != NULL)
+		astring_printf(string, "%.3f", settings.overscaley);
 	return floor(settings.overscaley * 1000.0f + 0.5f);
 }
 
@@ -2009,18 +1914,19 @@ static INT32 slider_overyscale(running_machine *machine, INT32 newval, char *buf
     slider callback
 -------------------------------------------------*/
 
-static INT32 slider_overxoffset(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_overxoffset(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
 	const device_config *laserdisc = arg;
 	laserdisc_config settings;
 
 	laserdisc_get_config(laserdisc, &settings);
-	if (buffer != NULL)
+	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.overposx = (float)newval * 0.001f;
 		laserdisc_set_config(laserdisc, &settings);
-		sprintf(buffer, "%s %s %.3f", slider_get_laserdisc_desc(laserdisc), "Overlay Horiz Position", settings.overposx);
 	}
+	if (string != NULL)
+		astring_printf(string, "%.3f", settings.overposx);
 	return floor(settings.overposx * 1000.0f + 0.5f);
 }
 
@@ -2030,18 +1936,19 @@ static INT32 slider_overxoffset(running_machine *machine, INT32 newval, char *bu
     slider callback
 -------------------------------------------------*/
 
-static INT32 slider_overyoffset(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_overyoffset(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
 	const device_config *laserdisc = arg;
 	laserdisc_config settings;
 
 	laserdisc_get_config(laserdisc, &settings);
-	if (buffer != NULL)
+	if (newval != SLIDER_NOCHANGE)
 	{
 		settings.overposy = (float)newval * 0.001f;
 		laserdisc_set_config(laserdisc, &settings);
-		sprintf(buffer, "%s %s %.3f", slider_get_laserdisc_desc(laserdisc), "Overlay Vert Position", settings.overposy);
 	}
+	if (string != NULL)
+		astring_printf(string, "%.3f", settings.overposy);
 	return floor(settings.overposy * 1000.0f + 0.5f);
 }
 
@@ -2051,13 +1958,12 @@ static INT32 slider_overyoffset(running_machine *machine, INT32 newval, char *bu
     callback
 -------------------------------------------------*/
 
-static INT32 slider_flicker(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_flicker(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	if (buffer != NULL)
-	{
+	if (newval != SLIDER_NOCHANGE)
 		vector_set_flicker((float)newval * 0.1f);
-		sprintf(buffer, "Vector Flicker %1.2f", vector_get_flicker());
-	}
+	if (string != NULL)
+		astring_printf(string, "%1.2f", vector_get_flicker());
 	return floor(vector_get_flicker() * 10.0f + 0.5f);
 }
 
@@ -2067,13 +1973,12 @@ static INT32 slider_flicker(running_machine *machine, INT32 newval, char *buffer
     callback
 -------------------------------------------------*/
 
-static INT32 slider_beam(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_beam(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
-	if (buffer != NULL)
-	{
+	if (newval != SLIDER_NOCHANGE)
 		vector_set_beam((float)newval * 0.01f);
-		sprintf(buffer, "%s %1.2f", "Beam Width", vector_get_beam());
-	}
+	if (string != NULL)
+		astring_printf(string, "%1.2f", vector_get_beam());
 	return floor(vector_get_beam() * 100.0f + 0.5f);
 }
 
@@ -2122,15 +2027,14 @@ static char *slider_get_laserdisc_desc(const device_config *laserdisc)
 -------------------------------------------------*/
 
 #ifdef MAME_DEBUG
-static INT32 slider_crossscale(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_crossscale(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
 	input_field_config *field = arg;
 
-	if (buffer != NULL)
-	{
+	if (newval != SLIDER_NOCHANGE)
 		field->crossscale = (float)newval * 0.001f;
-		sprintf(buffer, "%s %s %1.3f", "Crosshair Scale", (field->crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y", (float)newval * 0.001f);
-	}
+	if (string != NULL)
+		astring_printf(string, "%s %s %1.3f", "Crosshair Scale", (field->crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y", (float)newval * 0.001f);
 	return floor(field->crossscale * 1000.0f + 0.5f);
 }
 #endif
@@ -2142,15 +2046,14 @@ static INT32 slider_crossscale(running_machine *machine, INT32 newval, char *buf
 -------------------------------------------------*/
 
 #ifdef MAME_DEBUG
-static INT32 slider_crossoffset(running_machine *machine, INT32 newval, char *buffer, void *arg)
+static INT32 slider_crossoffset(running_machine *machine, void *arg, astring *string, INT32 newval)
 {
 	input_field_config *field = arg;
 
-	if (buffer != NULL)
-	{
+	if (newval != SLIDER_NOCHANGE)
 		field->crossoffset = (float)newval * 0.001f;
-		sprintf(buffer, "%s %s %1.3f", "Crosshair Offset", (field->crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y", (float)newval * 0.001f);
-	}
+	if (string != NULL)
+		astring_printf(string, "%s %s %1.3f", "Crosshair Offset", (field->crossaxis == CROSSHAIR_AXIS_X) ? "X" : "Y", (float)newval * 0.001f);
 	return field->crossoffset;
 }
 #endif

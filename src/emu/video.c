@@ -269,7 +269,7 @@ INLINE int effective_frameskip(void)
 INLINE int effective_throttle(running_machine *machine)
 {
 	/* if we're paused, or if the UI is active, we always throttle */
-	if (mame_is_paused(machine) || ui_is_menu_active() || ui_is_slider_active())
+	if (mame_is_paused(machine) || ui_is_menu_active())
 		return TRUE;
 
 	/* if we're fast forwarding, we don't throttle */

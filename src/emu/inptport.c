@@ -1984,7 +1984,7 @@ static void frame_update_callback(running_machine *machine)
 static void frame_update(running_machine *machine)
 {
 	input_port_private *portdata = machine->input_port_data;
-	int ui_visible = ui_is_menu_active() || ui_is_slider_active();
+	int ui_visible = ui_is_menu_active();
 	attotime curtime = timer_get_time();
 	const input_port_config *port;
 

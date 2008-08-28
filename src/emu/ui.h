@@ -69,6 +69,29 @@ enum
 	DRAW_OPAQUE
 };
 
+#define SLIDER_NOCHANGE		0x12345678
+
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef INT32 (*slider_update)(running_machine *machine, void *arg, astring *string, INT32 newval);
+
+typedef struct _slider_state slider_state;
+struct _slider_state
+{
+	slider_state *	next;				/* pointer to next slider */
+	slider_update	update;				/* callback */
+	void *			arg;				/* argument */
+	INT32			minval;				/* minimum value */
+	INT32			defval;				/* default value */
+	INT32			maxval;				/* maximum value */
+	INT32			incval;				/* increment value */
+	char			description[1];		/* textual description */
+};
+
 
 
 /***************************************************************************
@@ -132,11 +155,13 @@ int ui_get_show_profiler(void);
 /* force the menus to display */
 void ui_show_menu(void);
 
-/* return true if a menu or the slider is displayed */
+/* return true if a menu is displayed */
 int ui_is_menu_active(void);
-int ui_is_slider_active(void);
 
 /* print the game info string into a buffer */
 astring *game_info_astring(running_machine *machine, astring *string);
+
+/* get the list of sliders */
+const slider_state *ui_get_slider_list(void);
 
 #endif	/* __USRINTRF_H__ */

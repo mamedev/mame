@@ -1,6 +1,4 @@
 /*
-gyruss - busted
-
 EA pin - defined by architecture, must implement:
    1 means external access, bypassing internal ROM
    reimplement as a push, not a pull

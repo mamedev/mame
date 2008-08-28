@@ -35,6 +35,7 @@
 /* flags to pass to ui_menu_process */
 #define UI_MENU_PROCESS_NOKEYS		1
 #define UI_MENU_PROCESS_LR_REPEAT	2
+#define UI_MENU_PROCESS_CUSTOM_ONLY	4
 
 /* options for ui_menu_reset */
 enum _ui_menu_reset_options
@@ -141,6 +142,9 @@ void ui_menu_stack_pop(running_machine *machine);
 
 /* master handler */
 UINT32 ui_menu_ui_handler(running_machine *machine, UINT32 state);
+
+/* slider handler */
+UINT32 ui_slider_ui_handler(running_machine *machine, UINT32 state);
 
 /* force game select menu */
 void ui_menu_force_game_select(void);
