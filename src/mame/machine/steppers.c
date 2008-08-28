@@ -37,7 +37,7 @@ typedef struct _stepper
 			index_patt;	/* pattern needed on coils (0=don't care) */
 
 	UINT8 optic;
-} stepper; 
+} stepper;
 
 static stepper step[MAX_STEPPERS];
 /* step table, use previouspattern::newpattern as index */
@@ -593,8 +593,8 @@ static const int BarcrestStepTab[] =
 
 /* useful interfaces */
 
-const stepper_interface starpoint_interface_48step = 
-{ 
+const stepper_interface starpoint_interface_48step =
+{
 	STARPOINT_48STEP_REEL,
 	16,
 	24,

@@ -744,8 +744,8 @@ static void radarscp_step(running_machine *machine, int line_cnt)
 		state->sig30Hz = (1-state->sig30Hz);
 
 	/* Now mix with SND02 (sound 2) line - on 74ls259, bit2 */
-	state->rflip_sig = latch8_bit2_r(dev6h, 0) & state->sig30Hz; 
-	
+	state->rflip_sig = latch8_bit2_r(dev6h, 0) & state->sig30Hz;
+
 	sig = state->rflip_sig ^ ((line_cnt & 0x80)>>7);
 
 	if (state->hardware_type == HARDWARE_TRS01)
@@ -774,10 +774,10 @@ static void radarscp_step(running_machine *machine, int line_cnt)
 	state->blue_level = (int)(vg3/5.0*255);
 
 	/*
-	 * Grid signal
-	 * 
-	 * Mixed with ANS line (bit 5) from Port B of 8039 
-	 */
+     * Grid signal
+     *
+     * Mixed with ANS line (bit 5) from Port B of 8039
+     */
 	if (state->grid_on && latch8_bit5_r(devvp2, 0))
 	{
 		diff = (0.0 - cv3);

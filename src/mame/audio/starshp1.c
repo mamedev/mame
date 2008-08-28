@@ -141,7 +141,7 @@ static const discrete_555_desc starshp1_555_b10 =
 	DEFAULT_TTL_V_LOGIC_1	/* cheat and use and anti-alias IC A10 level */
 };
 
-static const discrete_mixer_desc starshp1_final_mix = 
+static const discrete_mixer_desc starshp1_final_mix =
 {
 	DISC_MIXER_IS_RESISTOR,
 	{STARSHP1_R66, STARSHP1_R126, STARSHP1_R59 + STARSHP1_R60, STARSHP1_R74, STARSHP1_R75},
@@ -160,7 +160,7 @@ DISCRETE_SOUND_START( starshp1 )
 	/************************************************
      * Input register mapping
      ************************************************/
-//	DISCRETE_INPUTX_DATA(STARSHP1_NOISE_AMPLITUDE, STARSHP1_MC1408_GAIN * STARSHP1_NOISE_AMPLITUDE_GAIN, 0, 0)
+//  DISCRETE_INPUTX_DATA(STARSHP1_NOISE_AMPLITUDE, STARSHP1_MC1408_GAIN * STARSHP1_NOISE_AMPLITUDE_GAIN, 0, 0)
 	/* Fake the MC1408, no where near correct */
 	DISCRETE_INPUTX_DATA(STARSHP1_NOISE_AMPLITUDE, -4.0/255, 4, 0)
 	DISCRETE_INPUTX_DATA(STARSHP1_TONE_PITCH,      STARSHP1_MC1408_GAIN * STARSHP1_TONE_PITCH_GAIN, 0, 0)
@@ -280,7 +280,7 @@ DISCRETE_SOUND_START( starshp1 )
 						STARSHP1_C47,
 						&starshp1_555_b10)
 	/* use switch instead of logic AND, so we can switch between
-	 * 0V and the anti-aliased TTL level out that we set NODE_51 to. */
+     * 0V and the anti-aliased TTL level out that we set NODE_51 to. */
 	DISCRETE_SWITCH(	STARSHP1_SL1_SND,			/* IC A10, pin 11 */
 						1,							/* ENAB */
 						STARSHP1_SL1,

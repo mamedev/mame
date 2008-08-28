@@ -1249,15 +1249,15 @@ static MACHINE_DRIVER_START( cps2 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_8MHz, 518, 64, 448, 259, 16, 240)
 /*
-	Measured clocks:
-		V = 59.6376Hz
-		H = 15.4445kHz
-		H/V = 258.973 ~ 259 lines
-	
-	Possible video clocks:
-		60MHz / 15.4445kHz = 3884.878 / 8 = 485.610 -> unlikely
-		 8MHz / 15.4445kHz =  517.983 ~ 518 -> likely
-		16MHz -> same as 8 but with a /2 divider; also a possibility
+    Measured clocks:
+        V = 59.6376Hz
+        H = 15.4445kHz
+        H/V = 258.973 ~ 259 lines
+
+    Possible video clocks:
+        60MHz / 15.4445kHz = 3884.878 / 8 = 485.610 -> unlikely
+         8MHz / 15.4445kHz =  517.983 ~ 518 -> likely
+        16MHz -> same as 8 but with a /2 divider; also a possibility
 */
 	MDRV_GFXDECODE(cps2)
 	MDRV_PALETTE_LENGTH(0xc00)

@@ -301,13 +301,13 @@ static void dst_dac_r1_step(node_description *node)
 				if ((x_time != 0) && (bit_val != ((context->last_data >> bit) & 0x01)))
 				{
 					/* there is x_time and a change in bit,
-					 * so anti-alias the current */
+                     * so anti-alias the current */
 					i_bit *= bit_val ? x_time : 1.0 - x_time;
 				}
 				else
 				{
 					/* there is no x_time or a change in bit,
-					 * so 0 the current if the bit value is 0 */
+                     * so 0 the current if the bit value is 0 */
 					 if (bit_val == 0) i_bit = 0;
 				}
 			i_total += i_bit;
@@ -1014,7 +1014,7 @@ static void dst_mixer_step(node_description *node)
 				rTemp     = info->r[bit];
 				connected = 1;
 				vTemp     = DST_MIXER__IN(bit);
-	
+
 				if (context->r_node[bit] != NULL)
 				{
 					/* a node has the posibility of being disconnected from the circuit. */
@@ -1049,7 +1049,7 @@ static void dst_mixer_step(node_description *node)
 						}
 					}
 				}
-	
+
 				if (connected)
 				{
 					if (info->c[bit] != 0)

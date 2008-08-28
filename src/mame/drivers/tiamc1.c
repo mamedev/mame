@@ -7,7 +7,7 @@
 
   Games supported:
       * Konek-Gorbunok
-	  * S.O.S.
+      * S.O.S.
 
   Other games known to exist on this hardware (interchangeable by the ROM swap):
       * Avtogonki

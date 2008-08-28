@@ -35,7 +35,7 @@ static void update(const device_config *device, UINT8 new_val, UINT8 mask)
 {
 	latch8_t *latch8 = get_safe_token(device);
 	UINT8 old_val = latch8->value;
-	
+
 	latch8->value = (latch8->value & ~mask) | (new_val & mask);
 
 	if (latch8->has_node_map)
@@ -53,7 +53,7 @@ static TIMER_CALLBACK( latch8_timerproc )
 	const device_config *device = ptr;
 	UINT8 new_val = param & 0xFF;
 	UINT8 mask = param >> 8;
-	
+
 	update(device, new_val, mask);
 }
 
@@ -63,7 +63,7 @@ READ8_DEVICE_HANDLER( latch8_r )
 {
 	latch8_t *latch8 = get_safe_token(device);
 	UINT8 res;
-	
+
 	assert(offset == 0);
 
 	res = latch8->value;
@@ -119,14 +119,14 @@ WRITE8_DEVICE_HANDLER( latch8_reset)
 }
 
 /* read bit x                 */
-/* return (latch >> x) & 0x01 */ 
+/* return (latch >> x) & 0x01 */
 
 INLINE UINT8 latch8_bitx_r(const device_config *device, offs_t offset, int bit)
 {
 	latch8_t *latch8 = get_safe_token(device);
 
 	assert( offset == 0);
-	
+
 	return (latch8->value >> bit) & 0x01;
 }
 
@@ -158,7 +158,7 @@ INLINE void latch8_bitx_w(const device_config *device, int bit, offs_t offset, U
 	UINT8 masked_data = (((data >> bit) & 0x01) << offset);
 
 	assert( offset < 8);
-	
+
 	/* No need to synchronize ? */
 	if (latch8->intf->nosync & mask)
 		update(device, masked_data, mask);
@@ -191,7 +191,7 @@ static DEVICE_START( latch8 )
 	latch8->intf = device->inline_config;
 
 	latch8->value = 0x0;
-	
+
 	/* setup nodemap */
 	for (i=0; i<8; i++)
 		if (latch8->intf->node_map[i] )
@@ -203,7 +203,7 @@ static DEVICE_START( latch8 )
 		{
 			if (latch8->devices[i] != NULL)
 				fatalerror("Device %s: Bit %d already has a handler.\n", device->tag, i);
-			latch8->devices[i] = devtag_get_device(device->machine, 
+			latch8->devices[i] = devtag_get_device(device->machine,
 					latch8->intf->devread[i].type,
 					latch8->intf->devread[i].tag);
 			if (latch8->devices[i] == NULL)

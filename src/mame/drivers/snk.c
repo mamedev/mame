@@ -99,7 +99,7 @@ Notes:
     button (new style: newer games like gwar do it).
   - some of the tiles in the fg ROM (letters saying "standard", "power",
     "hyper", "safety", "danger") are present in all sets, but are actually used
-	only in bermudat/bermudaj.
+    only in bermudat/bermudaj.
   - the worldwar test mode shows wrong descriptions for the dip switches, which
     are actually correct for bermudaj.
 
@@ -303,24 +303,24 @@ static READ8_HANDLER( sgladiat_sound_irq_ack_r )
 
 
 /*
-	All the later games (from athena onwards) have the same sound status flag handling.
+    All the later games (from athena onwards) have the same sound status flag handling.
 
-	This 4 bit register is mapped at 0xf800.
+    This 4 bit register is mapped at 0xf800.
 
-	Writes to this register always contain 0x0f in the lower nibble.
-	The upper nibble contains a mask, which clears bits
+    Writes to this register always contain 0x0f in the lower nibble.
+    The upper nibble contains a mask, which clears bits
 
-	bit 0:  irq request from first YM chip
-	bit 1:  irq request from second YM chip
-	bit 2:  sound cpu busy
-	bit 3:  sound command pending
+    bit 0:  irq request from first YM chip
+    bit 1:  irq request from second YM chip
+    bit 2:  sound cpu busy
+    bit 3:  sound command pending
 
-	The main CPU can read the busy flag using an input port.
+    The main CPU can read the busy flag using an input port.
 
-	The earlier games are different. E.g. in tnk3 there are only three status
-	bits since there is only one YM chip, and the bits are cleared using
-	separate memory addresses. Additionally, clearing the cmd irq also
-	clears the sound latch.
+    The earlier games are different. E.g. in tnk3 there are only three status
+    bits since there is only one YM chip, and the bits are cleared using
+    separate memory addresses. Additionally, clearing the cmd irq also
+    clears the sound latch.
 */
 
 /*********************************************************************/
@@ -1172,7 +1172,7 @@ static ADDRESS_MAP_START( aso_YM3526_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe000) AM_READ(tnk3_busy_clear_r)
 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(ym3526_status_port_0_r, ym3526_control_port_0_w)
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(ym3526_write_port_0_w)
-//	AM_RANGE(0xf002, 0xf002) AM_READNOP unknown
+//  AM_RANGE(0xf002, 0xf002) AM_READNOP unknown
 	AM_RANGE(0xf004, 0xf004) AM_READ(tnk3_cmdirq_ack_r)
 	AM_RANGE(0xf006, 0xf006) AM_READ(tnk3_ymirq_ack_r)
 ADDRESS_MAP_END
@@ -1264,7 +1264,7 @@ static INPUT_PORTS_START( jcross )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:1,2")
 	PORT_DIPSETTING(    0x03, "Upright, Single Controls" )
-//	PORT_DIPSETTING(    0x01, "Upright, Single Controls" )  /* duplicated setting + unknown additional stuff (code at 0x03ff) */
+//  PORT_DIPSETTING(    0x01, "Upright, Single Controls" )  /* duplicated setting + unknown additional stuff (code at 0x03ff) */
 	PORT_DIPSETTING(    0x00, "Upright, Dual Controls" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:3")
@@ -1277,8 +1277,8 @@ static INPUT_PORTS_START( jcross )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-//	PORT_DIPSETTING(    0x10, "INVALID !" )                 /* settings table at 0x0378 is only 5 bytes wide */
-//	PORT_DIPSETTING(    0x08, "INVALID !" )                 /* settings table at 0x0378 is only 5 bytes wide */
+//  PORT_DIPSETTING(    0x10, "INVALID !" )                 /* settings table at 0x0378 is only 5 bytes wide */
+//  PORT_DIPSETTING(    0x08, "INVALID !" )                 /* settings table at 0x0378 is only 5 bytes wide */
 	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_older_bonus_r, (void *)0xc0)
 
 	PORT_START("DSW2")
@@ -1309,7 +1309,7 @@ static INPUT_PORTS_START( jcross )
 	PORT_DIPSETTING(    0xc0, "20k" )
 	PORT_DIPSETTING(    0x80, "40k" )
 	PORT_DIPSETTING(    0x40, "60k" )
-//	PORT_DIPSETTING(    0x01, DEF_STR( None ) )             /* duplicated setting */
+//  PORT_DIPSETTING(    0x01, DEF_STR( None ) )             /* duplicated setting */
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 INPUT_PORTS_END
 
@@ -1355,7 +1355,7 @@ static INPUT_PORTS_START( sgladiat )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coinage ) )          PORT_DIPLOCATION("DSW1:4,5,6")
 	PORT_DIPSETTING(    0x10, DEF_STR( 5C_1C ) )
-//	PORT_DIPSETTING(    0x08, DEF_STR( 5C_1C ) )            /* duplicated setting */
+//  PORT_DIPSETTING(    0x08, DEF_STR( 5C_1C ) )            /* duplicated setting */
 	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
@@ -1378,7 +1378,7 @@ static INPUT_PORTS_START( sgladiat )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )      PORT_DIPLOCATION("DSW2:6")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW2:7")    /* code at 0x4169 */	
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW2:7")    /* code at 0x4169 */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Debug Mode (No Opponents)" ) PORT_DIPLOCATION("DSW2:8")
@@ -1393,7 +1393,7 @@ static INPUT_PORTS_START( sgladiat )
 	PORT_DIPSETTING(    0xc0, "20k" )
 	PORT_DIPSETTING(    0x80, "40k" )
 	PORT_DIPSETTING(    0x40, "50k" )
-//	PORT_DIPSETTING(    0x01, DEF_STR( None ) )             /* duplicated setting */
+//  PORT_DIPSETTING(    0x01, DEF_STR( None ) )             /* duplicated setting */
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 INPUT_PORTS_END
 
@@ -2626,7 +2626,7 @@ static INPUT_PORTS_START( fsoccer )
 	PORT_DIPSETTING(    0x04, DEF_STR( Europe ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( USA ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Japan ) )
-//	PORT_DIPSETTING(    0x0c, DEF_STR( Europe ) )
+//  PORT_DIPSETTING(    0x0c, DEF_STR( Europe ) )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DSW1:5,6")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
@@ -2889,7 +2889,7 @@ static MACHINE_DRIVER_START( sgladiat )
 
 	/* video hardware */
 	/* visible area is correct. Debug info is shown in the black bars at the sides
-	   of the screen when the Debug dip switch is on */
+       of the screen when the Debug dip switch is on */
 
 	MDRV_VIDEO_START(sgladiat)
 

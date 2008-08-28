@@ -384,7 +384,7 @@ CUSTOM_INPUT( nb1413m3_busyflag_r )
 
 
 /* 2008-08 FP:
- * In ALL games (but pastelg, hyhoo & hyhoo2) nb1413m3_outcoin_flag is read at inputport0.      
+ * In ALL games (but pastelg, hyhoo & hyhoo2) nb1413m3_outcoin_flag is read at inputport0.
  * However, a few games (lovehous, maiko, mmaiko, hanaoji and the ones using inputport3_r below)
  * read nb1413m3_outcoin_flag also at inputport3! Is this the correct behaviour for these games
  * or should they only check the flag at inputport3? */

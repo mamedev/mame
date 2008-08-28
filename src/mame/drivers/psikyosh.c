@@ -684,7 +684,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( s1945ii )
-	PORT_INCLUDE( common ) 
+	PORT_INCLUDE( common )
 
 	PORT_MODIFY("INPUTS")
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* No button 3 */
@@ -698,7 +698,7 @@ static INPUT_PORTS_START( s1945ii )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( soldivid )
-	PORT_INCLUDE( common ) 
+	PORT_INCLUDE( common )
 
 	PORT_START("JP4")	/* jumper pads on the PCB */
 	PORT_DIPNAME( 0x01000000, 0x01000000, DEF_STR( Region ) )
@@ -708,7 +708,7 @@ static INPUT_PORTS_START( soldivid )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( daraku )
-	PORT_INCLUDE( common ) 
+	PORT_INCLUDE( common )
 
 	PORT_MODIFY("INPUTS")
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
@@ -726,7 +726,7 @@ static INPUT_PORTS_START( daraku )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( sbomberb )
-	PORT_INCLUDE( common ) 
+	PORT_INCLUDE( common )
 	/* If Debug is HIGH then you can perform rom test, but EEPROM resets? */
 
 	PORT_MODIFY("INPUTS")
@@ -741,7 +741,7 @@ static INPUT_PORTS_START( sbomberb )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gunbird2 ) /* Different Region */
-	PORT_INCLUDE( common ) 
+	PORT_INCLUDE( common )
 	/* If Debug is HIGH then you can perform rom test, but EEPROM resets */
 
 	PORT_START("JP4")	/* jumper pads on the PCB */
@@ -753,7 +753,7 @@ static INPUT_PORTS_START( gunbird2 ) /* Different Region */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( s1945iii ) /* Different Region again */
-	PORT_INCLUDE( common ) 
+	PORT_INCLUDE( common )
 	/* If Debug is HIGH then you can perform rom test, EEPROM doesn't reset */
 
 	PORT_START("JP4")	/* jumper pads on the PCB */
@@ -765,7 +765,7 @@ static INPUT_PORTS_START( s1945iii ) /* Different Region again */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( dragnblz ) /* Security requires bit high */
-	PORT_INCLUDE( common ) 
+	PORT_INCLUDE( common )
 
 	PORT_MODIFY("INPUTS")
 	PORT_DIPNAME( 0x00000040, 0x00000000, "Debug" )		/* Must be HIGH (Or Security Error), so can perform test */
@@ -781,7 +781,7 @@ static INPUT_PORTS_START( dragnblz ) /* Security requires bit high */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( gnbarich ) /* Same as S1945iii except only one button */
-	PORT_INCLUDE( common ) 
+	PORT_INCLUDE( common )
 	/* If Debug is HIGH then you can perform rom test, but EEPROM resets? */
 
 	PORT_START("JP4")	/* jumper pads on the PCB */
@@ -793,13 +793,13 @@ static INPUT_PORTS_START( gnbarich ) /* Same as S1945iii except only one button 
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( mjgtaste ) /* This will need the Mahjong inputs */
-	PORT_INCLUDE( common ) 
+	PORT_INCLUDE( common )
 
 	PORT_START("JP4")	/* jumper pads on the PCB */
-//	PORT_DIPNAME( 0x03000000, 0x01000000, DEF_STR( Region ) )
-//	PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
-//	PORT_DIPSETTING(          0x02000000, "International Ver A." )
-//	PORT_DIPSETTING(          0x01000000, "International Ver B." )
+//  PORT_DIPNAME( 0x03000000, 0x01000000, DEF_STR( Region ) )
+//  PORT_DIPSETTING(          0x00000000, DEF_STR( Japan ) )
+//  PORT_DIPSETTING(          0x02000000, "International Ver A." )
+//  PORT_DIPSETTING(          0x01000000, "International Ver B." )
 	PORT_BIT( 0x10000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)
 INPUT_PORTS_END
 

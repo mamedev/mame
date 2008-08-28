@@ -803,7 +803,7 @@ static ADDRESS_MAP_START( dkongjr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7400, 0x77ff) AM_RAM_WRITE(dkong_videoram_w)
 									AM_BASE_MEMBER(dkong_state, video_ram)
 	AM_RANGE(0x7800, 0x780f) AM_DEVREADWRITE(DMA8257, "dma8257", dma8257_r, dma8257_w)	/* P8257 control registers */
-	
+
 	AM_RANGE(0x7c00, 0x7c00) AM_READ_PORT("IN0") AM_LATCH8_WRITE("ls174.3d")    /* IN0, sound interface */
 
 	AM_RANGE(0x7c80, 0x7c80) AM_READ_PORT("IN1") AM_WRITE(dkongjr_gfxbank_w)
@@ -1910,9 +1910,9 @@ ROM_START( radarsc1 )
 	ROM_LOAD( "trs01c2k.bin",    0x0100, 0x0100, CRC(650c5daf) SHA1(72f91ee2fab9eee58ee42881327e6345aa70b7f9) ) /* green */
 	ROM_LOAD( "trs01c2l.bin",    0x0200, 0x0100, CRC(23087910) SHA1(afc05c322b11fefaf0af857fee06a5afd0d4593e) ) /* red */
 	/* Hack! The prom at pos 1D on video board has not been dumped
-	 * Rom 1D is a MB7051, only 5 address lines
-	 * Rom below from TRS02 dump: rs2-v.1hc
-	 */
+     * Rom 1D is a MB7051, only 5 address lines
+     * Rom below from TRS02 dump: rs2-v.1hc
+     */
 	ROM_LOAD( "trs01v1d.bin",    0x0300, 0x0100, BAD_DUMP CRC(1b828315) SHA1(00c9f8c5ae86b68d38c66f9071b5f1ef421c1005) ) /* character color codes on a per-column basis */
 ROM_END
 

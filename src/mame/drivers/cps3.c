@@ -2671,14 +2671,14 @@ static MACHINE_DRIVER_START( cps3 )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(XTAL_60MHz/8, 486, 0, 384, 259, 0, 224)
 /*
-	Measured clocks:
-		V = 59.5992Hz
-		H = 15.4335kHz
-		H/V = 258.955 ~ 259 lines
-	
-	Possible video clocks:
-		60MHz       / 15.4335kHz = 3887.647 / 8 = 485.956 ~ 486 -> likely
-		 42.9545MHz / 15.4445kHz = 2781.217 / 6 = 463.536 -> unlikely
+    Measured clocks:
+        V = 59.5992Hz
+        H = 15.4335kHz
+        H/V = 258.955 ~ 259 lines
+
+    Possible video clocks:
+        60MHz       / 15.4335kHz = 3887.647 / 8 = 485.956 ~ 486 -> likely
+         42.9545MHz / 15.4445kHz = 2781.217 / 6 = 463.536 -> unlikely
 */
 
 	MDRV_MACHINE_START(cps3)

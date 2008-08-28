@@ -1109,11 +1109,11 @@ static const nes_interface nes_interface_2 = { "n2a03b" };
 MACHINE_DRIVER_START( dkong2b_audio )
 
 	/* sound latches */
-	
+
 	MDRV_LATCH8_ADD("ls175.3d") /* sound cmd latch */
 	MDRV_LATCH8_MASKOUT(0xf0)
 	MDRV_LATCH8_INVERT(0x0F)
-	
+
 	MDRV_LATCH8_ADD("ls259.6h")
 	MDRV_LATCH8_DISCRETE_NODE(0, DS_SOUND0_INP)
 	MDRV_LATCH8_DISCRETE_NODE(1, DS_SOUND1_INP)
@@ -1122,11 +1122,11 @@ MACHINE_DRIVER_START( dkong2b_audio )
 	MDRV_LATCH8_DISCRETE_NODE(7, DS_SOUND7_INP)
 
 	/*   If P2.Bit7 -> is apparently an external signal decay or other output control
-	 *   If P2.Bit6 -> activates the external compressed sample ROM (not radarsc1)
-	 *   If P2.Bit5 -> Signal ANSN ==> Grid enable (radarsc1)
-	 *   If P2.Bit4 -> status code to main cpu
-	 *   P2.Bit2-0  -> select the 256 byte bank for external ROM
-	 */
+     *   If P2.Bit6 -> activates the external compressed sample ROM (not radarsc1)
+     *   If P2.Bit5 -> Signal ANSN ==> Grid enable (radarsc1)
+     *   If P2.Bit4 -> status code to main cpu
+     *   P2.Bit2-0  -> select the 256 byte bank for external ROM
+     */
 
 	MDRV_LATCH8_ADD( "virtual_p2" )	/* virtual latch for port B */
 	MDRV_LATCH8_INVERT( 0x20 )		/* signal is inverted       */
@@ -1159,7 +1159,7 @@ MACHINE_DRIVER_START( radarsc1_audio )
 	MDRV_IMPORT_FROM( radarscp_audio )
 	MDRV_CPU_MODIFY("sound")
 	MDRV_CPU_IO_MAP(radarsc1_sound_io_map, 0)
-	
+
 	/* virtual_p2 is not read -see memory map-, all bits are output bits */
 	MDRV_LATCH8_ADD( "virtual_p1" )	/* virtual latch for port A */
 	MDRV_LATCH8_INVERT( 0x80 )		/* signal is inverted       */
@@ -1174,10 +1174,10 @@ MACHINE_DRIVER_END
 MACHINE_DRIVER_START( dkongjr_audio )
 
 	/* sound latches */
-	
+
 	MDRV_LATCH8_ADD("ls174.3d")
 	MDRV_LATCH8_MASKOUT(0xE0)
-	
+
 	MDRV_LATCH8_ADD( "ls259.6h")
 	MDRV_LATCH8_DISCRETE_NODE(0, DS_SOUND0_INP)
 	MDRV_LATCH8_DISCRETE_NODE(1, DS_SOUND1_INP)
@@ -1195,7 +1195,7 @@ MACHINE_DRIVER_START( dkongjr_audio )
 	MDRV_LATCH8_DEVREAD(5, LATCH8, "ls259.6h", latch8_r, 3)
 	MDRV_LATCH8_DEVREAD(4, LATCH8, "ls259.6h", latch8_r, 6)
 	MDRV_LATCH8_DISCRETE_NODE(7, DS_DISCHARGE_INV)
-	
+
 	MDRV_CPU_ADD("sound", I8035,I8035_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(dkong_sound_map,0)
 	MDRV_CPU_IO_MAP(dkongjr_sound_io_map, 0)
@@ -1222,7 +1222,7 @@ MACHINE_DRIVER_START( dkong3_audio )
 	MDRV_LATCH8_ADD( "latch1")
 	MDRV_LATCH8_ADD( "latch2")
 	MDRV_LATCH8_ADD( "latch3")
-	
+
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("nes1", NES, N2A03_DEFAULTCLOCK)
 	MDRV_SOUND_CONFIG(nes_interface_1)

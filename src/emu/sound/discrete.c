@@ -668,7 +668,7 @@ static void init_nodes(discrete_info *info, discrete_sound_block *block_list)
 			node->context = NULL;
 			info->discrete_input_streams++;
 		}
-		
+
 	}
 
 	/* if no outputs, give an error */

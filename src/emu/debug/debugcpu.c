@@ -2140,11 +2140,11 @@ UINT64 debug_read_opcode(offs_t address, int size, int arg)
 static int expression_cpu_index(running_machine *machine, const char *tag)
 {
 	int index;
-	
+
 	for (index = 0; index < ARRAY_LENGTH(machine->config->cpu); index++)
 		if (machine->config->cpu[index].tag != NULL && mame_stricmp(machine->config->cpu[index].tag, tag) == 0)
 			return index;
-	
+
 	return -1;
 }
 

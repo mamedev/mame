@@ -859,10 +859,10 @@ static INPUT_PORTS_START( pgm )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 )
-//  PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 )	// test 1p+2p
+//  PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 )  // test 1p+2p
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )	// what should i use?
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SERVICE1 )	// service 1p+2p
-//  PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 )	// test 3p+4p
+//  PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 )  // test 3p+4p
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )	// what should i use?
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_SERVICE2 )	// service 3p+4p
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
@@ -934,8 +934,8 @@ static INPUT_PORTS_START( olds )
 	PORT_MODIFY("Region")	/* Region - supplied by protection device */
 	PORT_DIPNAME( 0x000f, 0x0006, DEF_STR( Region ) )
 	/* includes the following regions:
-	1 = taiwan, 2 = china, 3 = japan (title = orlegend special), 
-	4 = korea, 5 = hong kong, 6 = world */
+    1 = taiwan, 2 = china, 3 = japan (title = orlegend special),
+    4 = korea, 5 = hong kong, 6 = world */
 	PORT_DIPSETTING(      0x0001, "Taiwan" )
 	PORT_DIPSETTING(      0x0002, "China" )
 	PORT_DIPSETTING(      0x0003, DEF_STR( Japan ) )
@@ -979,7 +979,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( ddp2 )
 	PORT_INCLUDE ( pgm )
 
-/*	// probably not dsw related anyway
+/*  // probably not dsw related anyway
     PORT_START("UNK0")
     PORT_DIPNAME( 0x0001, 0x0001, "4" )
     PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )

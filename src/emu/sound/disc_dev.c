@@ -1068,7 +1068,7 @@ static void dsd_555_vco1_step(node_description *node)
 			else
 			{
 				/* if we are out of reset and the cap voltage is less then
-				 * the lower threshold, toggle f/f and start charging */
+                 * the lower threshold, toggle f/f and start charging */
 				if (v_cap <= context->trigger)
 				{
 					if (context->flip_flop == 0)

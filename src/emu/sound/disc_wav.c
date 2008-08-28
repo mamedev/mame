@@ -697,7 +697,7 @@ static void dss_note_reset(node_description *node)
 
 	context->clock_type = (int)DSS_NOTE__CLOCK_TYPE & DISC_CLK_MASK;
 	context->out_type   = (int)DSS_NOTE__CLOCK_TYPE & DISC_OUT_MASK;
-	
+
 	context->last    = (DSS_NOTE__CLOCK != 0);
 	context->t_left  = 0;
 	context->t_clock = 1.0 / DSS_NOTE__CLOCK;
@@ -754,7 +754,7 @@ static void dss_op_amp_osc_step(node_description *node)
 		case DISC_OP_AMP_OSCILLATOR_VCO_1:
 			/* Work out the charge rates. */
 			/* i is not a current.  It is being used as a temp variable. */
-			i = DSS_OP_AMP_OSC__VMOD1 * context->temp1;	
+			i = DSS_OP_AMP_OSC__VMOD1 * context->temp1;
 			iCharge[0] = (DSS_OP_AMP_OSC__VMOD1 - i) / info->r1;
 			iCharge[1] = (i - (DSS_OP_AMP_OSC__VMOD1 * context->temp2)) / context->temp3;
 			break;

@@ -2667,14 +2667,14 @@ static void menu_sliders(running_machine *machine, ui_menu *menu, void *paramete
 			const slider_state *slider = event->itemref;
 			INT32 curvalue = (*slider->update)(machine, slider->arg, NULL, SLIDER_NOCHANGE);
 			INT32 increment = 0;
-			
+
 			switch (event->iptkey)
 			{
 				/* toggle visibility */
 				case IPT_UI_ON_SCREEN_DISPLAY:
 					*hidden = !*hidden;
 					break;
-				
+
 				/* decrease value */
 				case IPT_UI_LEFT:
 					if (input_code_pressed(KEYCODE_LALT) || input_code_pressed(KEYCODE_RALT))
@@ -2686,7 +2686,7 @@ static void menu_sliders(running_machine *machine, ui_menu *menu, void *paramete
 					else
 						increment = -slider->incval;
 					break;
-				
+
 				/* increase value */
 				case IPT_UI_RIGHT:
 					if (input_code_pressed(KEYCODE_LALT) || input_code_pressed(KEYCODE_RALT))
@@ -2698,7 +2698,7 @@ static void menu_sliders(running_machine *machine, ui_menu *menu, void *paramete
 					else
 						increment = slider->incval;
 					break;
-				
+
 				/* restore default */
 				case IPT_UI_SELECT:
 					increment = slider->defval - curvalue;
@@ -2721,7 +2721,7 @@ static void menu_sliders(running_machine *machine, ui_menu *menu, void *paramete
 				ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_REF);
 			}
 		}
-		
+
 		/* if we are selecting an invalid item and we are hidden, skip to the next one */
 		else if (*hidden)
 		{
@@ -2752,7 +2752,7 @@ static void menu_sliders_populate(running_machine *machine, ui_menu *menu)
 {
 	astring *tempstring = astring_alloc();
 	const slider_state *curslider;
-	
+
 	/* add all sliders */
 	for (curslider = ui_get_slider_list(); curslider != NULL; curslider = curslider->next)
 	{
@@ -2834,7 +2834,7 @@ static void menu_sliders_custom_render(running_machine *machine, ui_menu *menu, 
 		/* draw the actual text */
 		ui_draw_text_full(astring_c(tempstring), space_width + UI_BOX_LR_BORDER, line_height + ui_height - UI_BOX_TB_BORDER - text_height, ui_width - 2.0f * UI_BOX_LR_BORDER,
 					JUSTIFY_CENTER, WRAP_WORD, DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, &text_height);
-					
+
 		astring_free(tempstring);
 	}
 }

@@ -126,7 +126,7 @@ INLINE float round_nearest(float f)
 
 INLINE UINT8 clamp16_shift8(UINT32 x)
 {
-	return (((INT32) x < 0) ? 0 : (x > 65535 ? 255: x >> 8));	
+	return (((INT32) x < 0) ? 0 : (x > 65535 ? 255: x >> 8));
 }
 
 INLINE UINT32 ycc_to_rgb(UINT32 ycc)
@@ -152,19 +152,19 @@ INLINE UINT32 ycc_to_rgb(UINT32 ycc)
         R = clip(( 298 * Y - 298 * 16                        + 409 * Cr - 409 * 128 + 128) >> 8)
         G = clip(( 298 * Y - 298 * 16 - 100 * Cb + 100 * 128 - 208 * Cr + 208 * 128 + 128) >> 8)
         B = clip(( 298 * Y - 298 * 16 + 516 * Cb - 516 * 128                        + 128) >> 8)
-        
+
         Now combine constants:
-        
+
         R = clip(( 298 * Y            + 409 * Cr - 56992) >> 8)
         G = clip(( 298 * Y - 100 * Cb - 208 * Cr + 34784) >> 8)
         B = clip(( 298 * Y + 516 * Cb            - 70688) >> 8)
-        
-        Define common = 298 * y - 56992. This will save one addition 
-        
+
+        Define common = 298 * y - 56992. This will save one addition
+
         R = clip(( common            + 409 * Cr -     0) >> 8)
         G = clip(( common - 100 * Cb - 208 * Cr + 91776) >> 8)
         B = clip(( common + 516 * Cb            - 13696) >> 8)
-                
+
     */
     UINT8 y = ycc;
     UINT8 cb = ycc >> 8;

@@ -1,36 +1,36 @@
 /*
 
-	Megadrive / Genesis support
-	PRELIMINARY
+    Megadrive / Genesis support
+    PRELIMINARY
 
-	The Megadrive / Genesis form the basis of a number of official Sega Arcade PCBs
-	as well as a selection of bootlegs.
+    The Megadrive / Genesis form the basis of a number of official Sega Arcade PCBs
+    as well as a selection of bootlegs.
 
-	Current Issues
+    Current Issues
 
-	Timing is wrong
-	 -- DMA timing not emulated
-	 -- Sprite render timing incorrect
-	 -- Interrupt Timing Problems
+    Timing is wrong
+     -- DMA timing not emulated
+     -- Sprite render timing incorrect
+     -- Interrupt Timing Problems
 
-	Known Problems
-	 -- g_lem / Lemmings (JU) (REV01) [!]
-	  Rasters are off
-	 -- g_drac / Bram Stoker's Dracula (U) [!]
-	  Doesn't work, Timing Sensisitve
-	 -- g_sscc / Sesame Street Counting Cafe (U) [!]
-	  Doesn't work
-	 -- g_fatr / Fatal Rewind (UE) [!] (and clones)
-	  Doesn't work. Timing Sensitive
+    Known Problems
+     -- g_lem / Lemmings (JU) (REV01) [!]
+      Rasters are off
+     -- g_drac / Bram Stoker's Dracula (U) [!]
+      Doesn't work, Timing Sensisitve
+     -- g_sscc / Sesame Street Counting Cafe (U) [!]
+      Doesn't work
+     -- g_fatr / Fatal Rewind (UE) [!] (and clones)
+      Doesn't work. Timing Sensitive
 
-	 -- various
-	  Rasters off by 1 line, bottom line corrupt? bad frame timing?
+     -- various
+      Rasters off by 1 line, bottom line corrupt? bad frame timing?
 
-	  + more
+      + more
 
     ToDo:
 
-	Fix bugs - comprehensive testing!
+    Fix bugs - comprehensive testing!
 
     Add SegaCD / 32X support (not used by any arcade systems?)
     Add PicoDrive support (not arcade)

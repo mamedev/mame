@@ -316,7 +316,7 @@ static DRIVER_INIT( lhzb2 )
 	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
 
 	int rom_size = 0x80000;
-	
+
 	for (i=0; i<rom_size/2; i++)
 	{
 		UINT16 x = src[i];
@@ -396,7 +396,7 @@ static DRIVER_INIT( lhzb2 )
 		src[i] = x;
 	}
 
-	
+
 }
 
 static DRIVER_INIT( lhzb2a )
@@ -405,11 +405,11 @@ static DRIVER_INIT( lhzb2a )
 	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
 
 	int rom_size = 0x80000;
-	
+
 	for (i=0; i<rom_size/2; i++)
 	{
 		UINT16 x = src[i];
-		
+
 		/* bit 0 xor layer */
 
 		if( i & 0x20/2 )
@@ -465,7 +465,7 @@ static DRIVER_INIT( mgcs )
 	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
 
 	int rom_size = 0x80000;
-	
+
 	for (i=0; i<rom_size/2; i++)
 	{
 		UINT16 x = src[i];
@@ -515,7 +515,7 @@ static DRIVER_INIT( slqz2 )
 	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
 
 	int rom_size = 0x80000;
-	
+
 	for (i=0; i<rom_size/2; i++)
 	{
 		UINT16 x = src[i];
@@ -546,7 +546,7 @@ static DRIVER_INIT( slqz2 )
 			{
 				x ^= 0x4000;
 			}
-			else 
+			else
 			{
 				if( i & 0x200/2 )
 				{
@@ -592,7 +592,7 @@ static DRIVER_INIT( sdmg2 )
 	UINT16 *src = (UINT16 *) (memory_region(machine, "main"));
 
 	int rom_size = 0x80000;
-	
+
 	for (i=0; i<rom_size/2; i++)
 	{
 		UINT16 x = src[i];

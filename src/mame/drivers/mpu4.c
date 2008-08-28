@@ -1229,8 +1229,8 @@ static INPUT_PORTS_START( connect4 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
 INPUT_PORTS_END
 
-static const stepper_interface barcrest_reel_interface = 
-{ 
+static const stepper_interface barcrest_reel_interface =
+{
 	BARCREST_48STEP_REEL,
 	0,
 	8,

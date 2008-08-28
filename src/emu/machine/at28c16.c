@@ -50,11 +50,11 @@ WRITE8_DEVICE_HANDLER( at28c16_w )
 
 	if( c->last_write >= 0 )
 	{
-//		logerror( "%08x: at28c16_write( %d, %04x, %02x ) busy\n", activecpu_get_pc(), chip, offset, data );
+//      logerror( "%08x: at28c16_write( %d, %04x, %02x ) busy\n", activecpu_get_pc(), chip, offset, data );
 	}
 	else if( c->oe_12v )
 	{
-//		logerror( "%08x: at28c16_write( %d, %04x, %02x ) erase\n", activecpu_get_pc(), chip, offset, data );
+//      logerror( "%08x: at28c16_write( %d, %04x, %02x ) erase\n", activecpu_get_pc(), chip, offset, data );
 		memset( c->data, 0xff, SIZE_DATA );
 		memset( c->id, 0xff, SIZE_ID );
 		c->last_write = 0xff;
@@ -62,7 +62,7 @@ WRITE8_DEVICE_HANDLER( at28c16_w )
 	}
 	else if( offset >= OFFSET_ID && c->a9_12v )
 	{
-//		logerror( "%08x: at28c16_write( %d, %04x, %02x ) id\n", activecpu_get_pc(), chip, offset, data );
+//      logerror( "%08x: at28c16_write( %d, %04x, %02x ) id\n", activecpu_get_pc(), chip, offset, data );
 		c->id[ offset - OFFSET_ID ] = data;
 		c->last_write = data;
 		timer_adjust_oneshot( c->write_timer, ATTOTIME_IN_USEC( 200 ), 0 );
@@ -83,12 +83,12 @@ READ8_DEVICE_HANDLER( at28c16_r )
 
 	if( c->last_write >= 0 )
 	{
-//		logerror( "at28c16_read( %04x ) write status\n", offset );
+//      logerror( "at28c16_read( %04x ) write status\n", offset );
 		return c->last_write ^ 0x80;
 	}
 	else if( offset >= OFFSET_ID && c->a9_12v )
 	{
-//		logerror( "at28c16_read( %04x ) id\n", offset );
+//      logerror( "at28c16_read( %04x ) id\n", offset );
 		return c->id[ offset - OFFSET_ID ];
 	}
 	else
@@ -124,7 +124,7 @@ static DEVICE_START(at28c16)
 
 	/* validate some basic stuff */
 	assert(device != NULL);
-//	assert(device->static_config != NULL);
+//  assert(device->static_config != NULL);
 	assert(device->inline_config == NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);

@@ -122,20 +122,20 @@ static CUSTOM_INPUT( mcu_status_r )
 	int ret = 0x00;
 
 	/* Don't know exactly what this bit is, but s1945 and tengai
-		both spin waiting for it to go low during POST.  Also,
-		the following code in tengai (don't know where or if it is
-		reached) waits for it to pulse:
+        both spin waiting for it to go low during POST.  Also,
+        the following code in tengai (don't know where or if it is
+        reached) waits for it to pulse:
 
-		01A546:  move.b  (A2), D0    ; A2 = $c00003
-		01A548:  andi.b  #$4, D0
-		01A54C:  beq     $1a546
-		01A54E:  move.b  (A2), D0
-		01A550:  andi.b  #$4, D0
-		01A554:  bne     $1a54e
+        01A546:  move.b  (A2), D0    ; A2 = $c00003
+        01A548:  andi.b  #$4, D0
+        01A54C:  beq     $1a546
+        01A54E:  move.b  (A2), D0
+        01A550:  andi.b  #$4, D0
+        01A554:  bne     $1a54e
 
-		Interestingly, s1945jn has the code that spins on this bit,
-		but said code is never reached.  Prototype? */
-	if (mcu_status) 
+        Interestingly, s1945jn has the code that spins on this bit,
+        but said code is never reached.  Prototype? */
+	if (mcu_status)
 		ret = 0x01;
 
 	mcu_status = !mcu_status;	/* hack */
@@ -678,7 +678,7 @@ static INPUT_PORTS_START( sngkace )
 	PORT_DIPSETTING(          0x000000bf, "Hong Kong" )
 	PORT_DIPSETTING(          0x0000007f, "Taiwan" )
 #endif
-	PORT_BIT( 0x000000ff, IP_ACTIVE_LOW, IPT_UNKNOWN )	
+	PORT_BIT( 0x000000ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 

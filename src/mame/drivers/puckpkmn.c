@@ -160,7 +160,7 @@ static ADDRESS_MAP_START( puckpkmn_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xffffff) AM_READ(SMH_RAM)					/* Main Ram */
 
 	/* Unknown reads: */
-//	AM_RANGE(0xa10000, 0xa10001) AM_READ(SMH_NOP)					/* ? once */
+//  AM_RANGE(0xa10000, 0xa10001) AM_READ(SMH_NOP)                   /* ? once */
 	AM_RANGE(0xa10002, 0xa10005) AM_READ(SMH_NOP)					/* ? alternative way of reading inputs ? */
 	AM_RANGE(0xa11100, 0xa11101) AM_READ(SMH_NOP)					/* ? */
 ADDRESS_MAP_END

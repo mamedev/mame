@@ -496,8 +496,8 @@ static INTERRUPT_GEN(skns_interrupt)
 
     Input port definitions
 
-    NOTE: The driver reads data from eight 8bit input ports, even if they 
-           are unused. So I left them mapped. 
+    NOTE: The driver reads data from eight 8bit input ports, even if they
+           are unused. So I left them mapped.
 
 **********************************************************************************/
 

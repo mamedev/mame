@@ -355,32 +355,32 @@ return 0x4;
 /*
 static READ16_HANDLER(test1_r)
 {
-	if (input_code_pressed(KEYCODE_Q)) return 0x0001;
-	if (input_code_pressed(KEYCODE_W)) return 0x0002;
-	if (input_code_pressed(KEYCODE_E)) return 0x0004;
-	if (input_code_pressed(KEYCODE_R)) return 0x0008;
-	if (input_code_pressed(KEYCODE_T)) return 0x0010;
-	if (input_code_pressed(KEYCODE_Y)) return 0x0020;
-	if (input_code_pressed(KEYCODE_U)) return 0x0040;
-	if (input_code_pressed(KEYCODE_I)) return 0x0080;
-	if (input_code_pressed(KEYCODE_A)) return 0x0100;
-	if (input_code_pressed(KEYCODE_S)) return 0x0200;
-	if (input_code_pressed(KEYCODE_D)) return 0x0400;
-	if (input_code_pressed(KEYCODE_F)) return 0x0800;
-	if (input_code_pressed(KEYCODE_G)) return 0x1000;
-	if (input_code_pressed(KEYCODE_H)) return 0x2000;
-	if (input_code_pressed(KEYCODE_J)) return 0x4000;
-	if (input_code_pressed(KEYCODE_K)) return 0x8000;
+    if (input_code_pressed(KEYCODE_Q)) return 0x0001;
+    if (input_code_pressed(KEYCODE_W)) return 0x0002;
+    if (input_code_pressed(KEYCODE_E)) return 0x0004;
+    if (input_code_pressed(KEYCODE_R)) return 0x0008;
+    if (input_code_pressed(KEYCODE_T)) return 0x0010;
+    if (input_code_pressed(KEYCODE_Y)) return 0x0020;
+    if (input_code_pressed(KEYCODE_U)) return 0x0040;
+    if (input_code_pressed(KEYCODE_I)) return 0x0080;
+    if (input_code_pressed(KEYCODE_A)) return 0x0100;
+    if (input_code_pressed(KEYCODE_S)) return 0x0200;
+    if (input_code_pressed(KEYCODE_D)) return 0x0400;
+    if (input_code_pressed(KEYCODE_F)) return 0x0800;
+    if (input_code_pressed(KEYCODE_G)) return 0x1000;
+    if (input_code_pressed(KEYCODE_H)) return 0x2000;
+    if (input_code_pressed(KEYCODE_J)) return 0x4000;
+    if (input_code_pressed(KEYCODE_K)) return 0x8000;
 
-	switch (mame_rand(machine) & 3)
-	{
-		case 0:
-			return 0;
-		case 1:
-			return 0xffff;
-		default:
-			return mame_rand(machine) % 0xffff;
-	}
+    switch (mame_rand(machine) & 3)
+    {
+        case 0:
+            return 0;
+        case 1:
+            return 0xffff;
+        default:
+            return mame_rand(machine) % 0xffff;
+    }
 }
 */
 
@@ -388,26 +388,26 @@ static READ16_HANDLER(rh1_r)
 {
 // printf("ra=%04x ",register_active);
 /*
-	if ((register_active == 0x0e) || (register_active == 0x0e) || (register_active == 0x0e))
-		{
-	if (input_code_pressed(KEYCODE_1)) return 0x0001 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_2)) return 0x0002 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_3)) return 0x0004 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_4)) return 0x0008 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_5)) return 0x0010 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_6)) return 0x0020 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_7)) return 0x0040 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_8)) return 0x0080 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_A)) return 0x0100 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_S)) return 0x0200 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_D)) return 0x0400 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_F)) return 0x0800 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_G)) return 0x1000 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_H)) return 0x2000 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_J)) return 0x4000 ^ 0xffff;
-	if (input_code_pressed(KEYCODE_K)) return 0x8000 ^ 0xffff;
+    if ((register_active == 0x0e) || (register_active == 0x0e) || (register_active == 0x0e))
+        {
+    if (input_code_pressed(KEYCODE_1)) return 0x0001 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_2)) return 0x0002 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_3)) return 0x0004 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_4)) return 0x0008 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_5)) return 0x0010 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_6)) return 0x0020 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_7)) return 0x0040 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_8)) return 0x0080 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_A)) return 0x0100 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_S)) return 0x0200 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_D)) return 0x0400 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_F)) return 0x0800 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_G)) return 0x1000 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_H)) return 0x2000 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_J)) return 0x4000 ^ 0xffff;
+    if (input_code_pressed(KEYCODE_K)) return 0x8000 ^ 0xffff;
 
-		}
+        }
 */
 	switch (mame_rand(machine) & 3)
 	{

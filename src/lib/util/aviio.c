@@ -1720,7 +1720,7 @@ static avi_error chunk_write(avi_file *file, UINT32 type, const void *data, UINT
 
 	/* if we are getting too big, split the RIFF */
 	/* note that we ignore writes before the current RIFF base, as those are assumed to be
-	   overwrites of a chunk from the previous RIFF */
+       overwrites of a chunk from the previous RIFF */
 	if ((file->riffbase == 0 && file->writeoffs + length + compute_idx1_size(file) >= MAX_RIFF_SIZE) ||
 		(file->writeoffs >= file->riffbase && file->writeoffs + length - file->riffbase >= MAX_RIFF_SIZE))
 	{

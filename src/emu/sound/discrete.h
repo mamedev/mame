@@ -160,13 +160,13 @@
  *          Consider the following counter outputs vs DAC_R1
  *          calculations.  The count changes from 9 to 10.  It has
  *          been at the new state for 75% of the sample.
- *          
+ *
  *          counter    binary   x_time    -- DAC_R1 bit energy --
  *            out       count              D3    D2    D1    D0
  *            9.0       1001     0.0      1.0   0.0   0.0   1.0
- *           10.75      1010     0.75     1.0   0.0   0.75  0.25  
+ *           10.75      1010     0.75     1.0   0.0   0.75  0.25
  *           10.0       1010     0.0      1.0   0.0   1.0   0.0
- *           
+ *
  *           The DAC_R1 uses these energy calculations to scale the
  *           voltages created on each of its resistors.  This
  *           anti-aliases the waveform no mater what the resistor
@@ -2968,7 +2968,7 @@
  *                     address of discrete_555_cc_desc structure)
  *
  *     discrete_555_cc_desc =
- * {    
+ * {
  *         options;         - bit mapped options
  *         v_pos;           - B+ voltage of 555
  *         v_cc_source;     - Voltage of the Constant Current source
@@ -2982,7 +2982,7 @@
  *     DEFAULT_555_HIGH      - to use the normal output voltage based on v_pos
  * or combine both as:
  *     DEFAULT_555_VALUES
- * 
+ *
  *  Output Types:
  *     See DISCRETE_555_ASTABLE for description.
  *
@@ -3745,7 +3745,7 @@ typedef struct _discrete_555_vco1_desc discrete_555_vco1_desc;
 struct _discrete_555_vco1_desc
 {
 	int    options;				/* bit mapped options */
-	double r1, r2, r3, r4, c;     
+	double r1, r2, r3, r4, c;
 	double v_pos;				/* B+ voltage of 555 */
 	double v_charge;			/* (ignored) */
 	double v_out_high;			/* High output voltage of 555 (Defaults to v_pos - 1.2V) */

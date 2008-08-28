@@ -1,15 +1,15 @@
 /**********************************************************************
 
     8 bit latch interface and emulation
-    
+
     Generic emulation of 74LS174/175, 74LS259 and other latches.
     Apart from providing synched latch operation, these
     latches can be configured to read their input bitwise from other
     devices as well and individual bits can be connected to
     discrete nodes.
-    
+
     Please see audio/dkong.c for examples.
-    
+
 **********************************************************************/
 
 #ifndef __LATCH8_H_
@@ -36,7 +36,7 @@ typedef struct _latch8_config latch8_config;
 struct _latch8_config
 {
 	/* only for byte reads, does not affect bit reads and node_map */
-	UINT32					maskout; 
+	UINT32					maskout;
 	UINT32					xor;  /* after mask */
 	UINT32					nosync;
 	UINT32					node_map[8];
@@ -57,11 +57,11 @@ struct _latch8_config
 
 /* Bit mask specifying bits to be inverted */
 #define MDRV_LATCH8_INVERT(_xor) \
-	MDRV_DEVICE_CONFIG_DATA32(latch8_config, xor, _xor) 
+	MDRV_DEVICE_CONFIG_DATA32(latch8_config, xor, _xor)
 
 /* Bit mask specifying bits not needing cpu synchronization. */
 #define MDRV_LATCH8_NOSYNC(_nosync) \
-	MDRV_DEVICE_CONFIG_DATA32(latch8_config, nosync, _nosync) 
+	MDRV_DEVICE_CONFIG_DATA32(latch8_config, nosync, _nosync)
 
 /* Write bit to discrete node */
 #define MDRV_LATCH8_DISCRETE_NODE(_bit, _node) \
@@ -110,7 +110,7 @@ WRITE8_DEVICE_HANDLER( latch8_w );
 WRITE8_DEVICE_HANDLER( latch8_reset );
 
 /* read bit x                 */
-/* return (latch >> x) & 0x01 */ 
+/* return (latch >> x) & 0x01 */
 
 READ8_DEVICE_HANDLER( latch8_bit0_r );
 READ8_DEVICE_HANDLER( latch8_bit1_r );
@@ -122,7 +122,7 @@ READ8_DEVICE_HANDLER( latch8_bit6_r );
 READ8_DEVICE_HANDLER( latch8_bit7_r );
 
 /* read inverted bit x        */
-/* return (latch >> x) & 0x01 */ 
+/* return (latch >> x) & 0x01 */
 
 READ8_DEVICE_HANDLER( latch8_bit0_q_r );
 READ8_DEVICE_HANDLER( latch8_bit1_q_r );

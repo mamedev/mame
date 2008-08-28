@@ -1,12 +1,12 @@
 /***************************************************************************
 
-	mcs48.c
-	
-	Intel MCS-48 Portable Emulator
-	
-	Copyright Mirko Buffoni
-	Based on the original work Copyright Dan Boris, an 8048 emulator
-	You are not allowed to distribute this software commercially
+    mcs48.c
+
+    Intel MCS-48 Portable Emulator
+
+    Copyright Mirko Buffoni
+    Based on the original work Copyright Dan Boris, an 8048 emulator
+    You are not allowed to distribute this software commercially
 
 ***************************************************************************/
 
@@ -31,13 +31,13 @@ enum
 	MCS48_TC,
 	MCS48_P1,
 	MCS48_P2,
-	MCS48_R0,  
-	MCS48_R1, 
+	MCS48_R0,
+	MCS48_R1,
 	MCS48_R2,
-	MCS48_R3,   
-	MCS48_R4, 
-	MCS48_R5,  
-	MCS48_R6, 
+	MCS48_R3,
+	MCS48_R4,
+	MCS48_R5,
+	MCS48_R6,
 	MCS48_R7,
 	MCS48_EA
 };

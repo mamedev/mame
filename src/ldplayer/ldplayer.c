@@ -50,7 +50,7 @@ enum
 	CMD_9,
 	CMD_SEARCH
 };
-	
+
 
 
 /*************************************
@@ -215,7 +215,7 @@ INLINE void pr8210_add_command(UINT8 command)
 static TIMER_CALLBACK( pr8210_bit_off_callback )
 {
 	const device_config *laserdisc = ptr;
-	
+
 	/* deassert the control line */
 	laserdisc_line_w(laserdisc, LASERDISC_LINE_CONTROL, CLEAR_LINE);
 }
@@ -227,7 +227,7 @@ static TIMER_CALLBACK( pr8210_bit_callback )
 	const device_config *laserdisc = ptr;
 	UINT8 bitsleft = param >> 16;
 	UINT8 data = param;
-	
+
 	/* if we have bits, process */
 	if (bitsleft != 0)
 	{
@@ -274,7 +274,7 @@ static void pr8210_execute(const device_config *laserdisc, int command)
 {
 	static const UINT8 digits[10] = { 0x01, 0x11, 0x09, 0x19, 0x05, 0x15, 0x0d, 0x1d, 0x03, 0x13 };
 	int prev_was_number = pr8210_last_was_number;
-	
+
 	pr8210_last_was_number = FALSE;
 	switch (command)
 	{
@@ -282,12 +282,12 @@ static void pr8210_execute(const device_config *laserdisc, int command)
 			pr8210_add_command(0x1c);
 			playing = TRUE;
 			break;
-		
+
 		case CMD_SCAN_REVERSE_END:
 			pr8210_add_command(0x14);
 			playing = TRUE;
 			break;
-		
+
 		case CMD_STEP_REVERSE:
 			pr8210_add_command(0x12);
 			playing = FALSE;
@@ -302,32 +302,32 @@ static void pr8210_execute(const device_config *laserdisc, int command)
 			pr8210_add_command(0x14);
 			playing = TRUE;
 			break;
-		
+
 		case CMD_STEP_FORWARD:
 			pr8210_add_command(0x04);
 			playing = FALSE;
 			break;
-		
+
 		case CMD_PLAY:
 			pr8210_add_command(0x14);
 			playing = TRUE;
 			break;
-		
+
 		case CMD_PAUSE:
 			pr8210_add_command(0x0a);
 			playing = FALSE;
 			break;
 
 		case CMD_DISPLAY_ON:
-//			pr8210_add_command(digits[1]);
-//			pr8210_add_command(0xf1);
+//          pr8210_add_command(digits[1]);
+//          pr8210_add_command(0xf1);
 			break;
 
 		case CMD_DISPLAY_OFF:
-//			pr8210_add_command(digits[0]);
-//			pr8210_add_command(0xf1);
+//          pr8210_add_command(digits[0]);
+//          pr8210_add_command(0xf1);
 			break;
-		
+
 		case CMD_0:
 		case CMD_1:
 		case CMD_2:
@@ -343,7 +343,7 @@ static void pr8210_execute(const device_config *laserdisc, int command)
 			pr8210_add_command(digits[command - CMD_0]);
 			pr8210_last_was_number = TRUE;
 			break;
-		
+
 		case CMD_SEARCH:
 			pr8210_add_command(0x1a);
 			playing = FALSE;
@@ -368,12 +368,12 @@ static void ldv1000_execute(const device_config *laserdisc, int command)
 			laserdisc_data_w(laserdisc, 0xf8);
 			playing = TRUE;
 			break;
-		
+
 		case CMD_SCAN_REVERSE_END:
 			laserdisc_data_w(laserdisc, 0xfd);
 			playing = TRUE;
 			break;
-		
+
 		case CMD_STEP_REVERSE:
 			laserdisc_data_w(laserdisc, 0xfe);
 			playing = FALSE;
@@ -388,17 +388,17 @@ static void ldv1000_execute(const device_config *laserdisc, int command)
 			laserdisc_data_w(laserdisc, 0xfd);
 			playing = TRUE;
 			break;
-		
+
 		case CMD_STEP_FORWARD:
 			laserdisc_data_w(laserdisc, 0xf6);
 			playing = FALSE;
 			break;
-		
+
 		case CMD_PLAY:
 			laserdisc_data_w(laserdisc, 0xfd);
 			playing = TRUE;
 			break;
-		
+
 		case CMD_PAUSE:
 			laserdisc_data_w(laserdisc, 0xa0);
 			playing = FALSE;
@@ -413,7 +413,7 @@ static void ldv1000_execute(const device_config *laserdisc, int command)
 			laserdisc_data_w(laserdisc, digits[0]);
 			laserdisc_data_w(laserdisc, 0xf1);
 			break;
-		
+
 		case CMD_0:
 		case CMD_1:
 		case CMD_2:
@@ -426,7 +426,7 @@ static void ldv1000_execute(const device_config *laserdisc, int command)
 		case CMD_9:
 			laserdisc_data_w(laserdisc, digits[command - CMD_0]);
 			break;
-		
+
 		case CMD_SEARCH:
 			laserdisc_data_w(laserdisc, 0xf7);
 			playing = FALSE;
@@ -479,11 +479,11 @@ static READ8_HANDLER( pr8210_pia_r )
 	switch (offset)
 	{
 		case 0xa0:
-//			printf("%03X:pia_r(%02X) = %02X\n", activecpu_get_pc(), offset, pr8210_pia_porta);
+//          printf("%03X:pia_r(%02X) = %02X\n", activecpu_get_pc(), offset, pr8210_pia_porta);
 			result = pr8210_pia_porta;
 			pr8210_pia_porta = 0;
 			break;
-			
+
 		default:
 			printf("%03X:pia_r(%02X)\n", activecpu_get_pc(), offset);
 			break;
@@ -494,32 +494,32 @@ static READ8_HANDLER( pr8210_pia_r )
 static WRITE8_HANDLER( pr8210_pia_w )
 {
 	/*
-	   $22-26 (R) = read and copied to memory $23-27
-	   $23 (R) = something compared against $F4
-	   $22-26 (W) = SRCH. text
-	   $27-2B (W) = FRAME/CHAP. text
-	   $2C-30 (W) = frame or chapter number
-	   $40 (W) = $CF at initialization, tracked by ($78)
-	   $60 (W) = port B output, tracked by ($77)
-		   $80 = n/c
-		   $40 = (out) LED3
-		   $20 = (out) LED2
-		   $10 = (out) LED1
-		   			123 -> LHL = Play
-		   			    -> HLL = Slow fwd
-		   			    -> LLL = Slow rev
-		   			    -> HHL = Still
-		   			    -> LLH = Pause
-		   			    -> HHH = all off
-		   $08 = (out) CAV LED
-		   $04 = (out) CLV LED
-		   $02 = (out) A2 LED/AUDIO 2
-		   $01 = (out) A1 LED/AUDIO 1
-	   $80 (W) = 0 or 1
-	   $A0 (R) = port A input
-	   $C0 (R) = stored to ($2E)
-	   $E0 (R) = stored to ($2F)
-	*/
+       $22-26 (R) = read and copied to memory $23-27
+       $23 (R) = something compared against $F4
+       $22-26 (W) = SRCH. text
+       $27-2B (W) = FRAME/CHAP. text
+       $2C-30 (W) = frame or chapter number
+       $40 (W) = $CF at initialization, tracked by ($78)
+       $60 (W) = port B output, tracked by ($77)
+           $80 = n/c
+           $40 = (out) LED3
+           $20 = (out) LED2
+           $10 = (out) LED1
+                    123 -> LHL = Play
+                        -> HLL = Slow fwd
+                        -> LLL = Slow rev
+                        -> HHL = Still
+                        -> LLH = Pause
+                        -> HHH = all off
+           $08 = (out) CAV LED
+           $04 = (out) CLV LED
+           $02 = (out) A2 LED/AUDIO 2
+           $01 = (out) A1 LED/AUDIO 1
+       $80 (W) = 0 or 1
+       $A0 (R) = port A input
+       $C0 (R) = stored to ($2E)
+       $E0 (R) = stored to ($2F)
+    */
 	if (pia[offset] != data)
 	{
 		switch (offset)
@@ -535,7 +535,7 @@ static WRITE8_HANDLER( pr8210_pia_w )
 				printf(")\n");
 				pr8210_pia_portb = data;
 				break;
-			
+
 			default:
 				printf("%03X:pia_w(%02X) = %02X\n", activecpu_get_pc(), offset, data);
 				break;
@@ -547,19 +547,19 @@ static WRITE8_HANDLER( pr8210_pia_w )
 static READ8_HANDLER( pr8210_bus_r )
 {
 	/*
-	   $80 = n/c
-	   $40 = (in) slide pot interrupt source (slider position limit detector, inside and outside)
-	   $20 = n/c
-	   $10 = (in) /FOCUS LOCK
-	   $08 = (in) /SPDL LOCK
-	   $04 = (in) SIZE 8/12
-	   $02 = (in) FG via op-amp (spindle motor stop detector)
-	   $01 = (in) SLOW TIMER OUT
-	*/
+       $80 = n/c
+       $40 = (in) slide pot interrupt source (slider position limit detector, inside and outside)
+       $20 = n/c
+       $10 = (in) /FOCUS LOCK
+       $08 = (in) /SPDL LOCK
+       $04 = (in) SIZE 8/12
+       $02 = (in) FG via op-amp (spindle motor stop detector)
+       $01 = (in) SLOW TIMER OUT
+    */
 	offs_t pc = activecpu_get_pc();
 	if (pc != 0x11c)
 		printf("%03X:bus_r\n", pc);
-	
+
 	/* loop at beginning waits for $40=0, $02=1 */
 	return 0xff & ~0x40 & ~0x04;
 }
@@ -567,15 +567,15 @@ static READ8_HANDLER( pr8210_bus_r )
 static WRITE8_HANDLER( pr8210_porta_w )
 {
 	/*
-	   $80 = (out) SCAN C (F/R)
-	   $40 = (out) AUDIO SQ
-	   $20 = (out) VIDEO SQ
-	   $10 = (out) /SPDL ON
-	   $08 = (out) /FOCUS ON
-	   $04 = (out) SCAN B (L/H)
-	   $02 = (out) SCAN A (/SCAN)
-	   $01 = (out) JUMP TRG (jump back trigger, clock on high->low)
-	*/
+       $80 = (out) SCAN C (F/R)
+       $40 = (out) AUDIO SQ
+       $20 = (out) VIDEO SQ
+       $10 = (out) /SPDL ON
+       $08 = (out) /FOCUS ON
+       $04 = (out) SCAN B (L/H)
+       $02 = (out) SCAN A (/SCAN)
+       $01 = (out) JUMP TRG (jump back trigger, clock on high->low)
+    */
 	if (data != pr8210_porta)
 	{
 		printf("%03X:porta_w = %02X", activecpu_get_pc(), data);
@@ -596,15 +596,15 @@ static WRITE8_HANDLER( pr8210_porta_w )
 static WRITE8_HANDLER( pr8210_portb_w )
 {
 	/*
-	   $80 = (out) /CS on PIA
-	   $40 = (out) 0 to self-generate IRQ
-	   $20 = (out) SLOW TRG
-	   $10 = (out) STANDBY LED
-	   $08 = (out) TP2
-	   $04 = (out) TP1
-	   $02 = (out) ???
-	   $01 = (out) LASER ON
-	*/
+       $80 = (out) /CS on PIA
+       $40 = (out) 0 to self-generate IRQ
+       $20 = (out) SLOW TRG
+       $10 = (out) STANDBY LED
+       $08 = (out) TP2
+       $04 = (out) TP1
+       $02 = (out) ???
+       $01 = (out) LASER ON
+    */
 	cputag_set_input_line(machine, "pr8210", 0, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	if ((data & 0x7f) != (pr8210_portb & 0x7f))
 	{
@@ -616,7 +616,7 @@ static WRITE8_HANDLER( pr8210_portb_w )
 		if (!(data & 0x10)) printf(" STANDBYLED");
 		if (!(data & 0x20)) printf(" SLOWTRG");
 		if (!(data & 0x40)) printf(" IRQGEN");
-//		if (data & 0x80) printf(" PIASEL");
+//      if (data & 0x80) printf(" PIASEL");
 		printf("\n");
 		pr8210_portb = data;
 	}

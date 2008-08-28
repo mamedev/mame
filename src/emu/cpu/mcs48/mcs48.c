@@ -7,38 +7,38 @@ T0 output clock
 
 /***************************************************************************
 
-	mcs48.c
-	
-	Intel MCS-48 Portable Emulator
-	
-	Copyright Mirko Buffoni
-	Based on the original work Copyright Dan Boris, an 8048 emulator
-	You are not allowed to distribute this software commercially
+    mcs48.c
+
+    Intel MCS-48 Portable Emulator
+
+    Copyright Mirko Buffoni
+    Based on the original work Copyright Dan Boris, an 8048 emulator
+    You are not allowed to distribute this software commercially
 
 ****************************************************************************
 
-	Note that the default internal divisor for this chip is by 3 and
-	then again by 5, or by 15 total.
+    Note that the default internal divisor for this chip is by 3 and
+    then again by 5, or by 15 total.
 
 ****************************************************************************
 
-	Chip   RAM  ROM  I/O
-	----   ---  ---  ---
-	8021    64   1k   21  (ROM, reduced instruction set) 
+    Chip   RAM  ROM  I/O
+    ----   ---  ---  ---
+    8021    64   1k   21  (ROM, reduced instruction set)
 
-	8035    64    0   27  (external ROM)
-	8041    64   1k   18  (ROM)
-	8048    64   1k   27  (ROM)
-	8648    64   1k   27  (OTPROM)
-	8741    64   1k   18  (EPROM)
-	8748    64   1k   27  (EPROM) 
-	8884    64   1k
-	N7751  128   2k
+    8035    64    0   27  (external ROM)
+    8041    64   1k   18  (ROM)
+    8048    64   1k   27  (ROM)
+    8648    64   1k   27  (OTPROM)
+    8741    64   1k   18  (EPROM)
+    8748    64   1k   27  (EPROM)
+    8884    64   1k
+    N7751  128   2k
 
-	8039   128    0   27  (external ROM)
-	8049   128   2k   27  (ROM)
-	8749   128   2k   27  (EPROM)
-	M58715 128    0       (external ROM)
+    8039   128    0   27  (external ROM)
+    8049   128   2k   27  (ROM)
+    8749   128   2k   27  (EPROM)
+    M58715 128    0       (external ROM)
 
 ***************************************************************************/
 
@@ -331,7 +331,7 @@ INLINE void execute_call(UINT16 address)
 
 
 /*-------------------------------------------------
-    execute_jcc - perform the logic of a 
+    execute_jcc - perform the logic of a
     conditional jump instruction
 -------------------------------------------------*/
 
@@ -599,7 +599,7 @@ static void ret(void)			{ pull_pc(); }
 static void retr(void)
 {
 	pull_pc_psw();
-	
+
 	/* implicitly clear the IRQ in progress flip flop and re-check interrupts */
 	mcs48.irq_in_progress = FALSE;
 	check_irqs();
@@ -705,7 +705,7 @@ static const mcs48_opcode opcode_table[256]=
 static void mcs48_init(int index, int clock, const void *config, int (*irqcallback)(int), UINT16 romsize)
 {
 	memset(&mcs48, 0, sizeof(mcs48));
-	
+
 	mcs48.irq_callback = irqcallback;
 	mcs48.int_rom_size = romsize;
 
@@ -803,18 +803,18 @@ static void check_irqs(void)
 	if (mcs48.irq_state && mcs48.xirq_enabled)
 	{
 		mcs48.irq_in_progress = TRUE;
-		
+
 		/* transfer to location 0x03 */
 		push_pc_psw();
 		PC = 0x03;
 		change_pc(0x03);
 		mcs48.inst_cycles += 2;
-		
+
 		/* indicate we took the external IRQ */
 		if (mcs48.irq_callback != NULL)
 			(*mcs48.irq_callback)(0);
 	}
-	
+
 	/* timer overflow interrupts follow */
 	if (mcs48.timer_overflow && mcs48.tirq_enabled)
 	{
@@ -825,7 +825,7 @@ static void check_irqs(void)
 		PC = 0x07;
 		change_pc(0x07);
 		mcs48.inst_cycles += 2;
-		
+
 		/* timer overflow flip-flop is reset once taken */
 		mcs48.timer_overflow = FALSE;
 	}
@@ -840,7 +840,7 @@ static void check_irqs(void)
 static void burn_cycles(int count)
 {
 	int timerover = FALSE;
-	
+
 	/* if the timer is enabled, accumulate prescaler cycles */
 	if (mcs48.timecount_enabled & TIMER_ENABLED)
 	{
@@ -849,7 +849,7 @@ static void burn_cycles(int count)
 		mcs48.prescaler &= 0x1f;
 		timerover = (mcs48.timer == 0);
 	}
-	
+
 	/* if the counter is enabled, poll the T1 test input once for each cycle */
 	else if (mcs48.timecount_enabled & COUNTER_ENABLED)
 		for ( ; count > 0; count--)
@@ -863,7 +863,7 @@ static void burn_cycles(int count)
 	if (timerover)
 	{
 		mcs48.timer_flag = TRUE;
-		
+
 		/* according to the docs, if an overflow occurs with interrupts disabled, the overflow is not stored */
 		if (mcs48.tirq_enabled)
 		{
@@ -895,7 +895,7 @@ static int mcs48_execute(int cycles)
 	/* iterate over remaining cycles, guaranteeing at least one instruction */
 	do
 	{
-		/* fetch next opcode */		
+		/* fetch next opcode */
 		mcs48.prevpc = mcs48.pc;
 		debugger_instruction_hook(Machine, PC);
 		opcode = opcode_fetch(PC++);
@@ -903,7 +903,7 @@ static int mcs48_execute(int cycles)
 		/* process opcode and count cycles */
 		mcs48.inst_cycles = opcode_table[opcode].cycles;
 		(*opcode_table[opcode].function)();
-		
+
 		/* burn the cycles */
 		mcs48_icount -= mcs48.inst_cycles;
 		if (mcs48.timecount_enabled != 0)
@@ -1005,7 +1005,7 @@ static void mcs48_set_info(UINT32 state, cpuinfo *info)
 
 
 /*-------------------------------------------------
-    mcs48_get_info - retrieve a piece of 
+    mcs48_get_info - retrieve a piece of
     information from the CPU core
 -------------------------------------------------*/
 
@@ -1067,7 +1067,7 @@ static void mcs48_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_BURN:									info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:							info->disassemble = mcs48_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:					info->icount = &mcs48_icount;			break;
-		
+
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: /*info->internal_map8 = address_map_program_10bit;*/ break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 	/*info->internal_map8 = address_map_data_7bit;*/ break;
 

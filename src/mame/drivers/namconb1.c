@@ -442,10 +442,10 @@ static void namconb1_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 			vblank_irq_active = 0;
 		}
 		break;
-		
+
 	case 0x16: // Watchdog
 		break;
-		
+
 	case 0x18: // C75 Control
 		if(data & 1) {
 			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);

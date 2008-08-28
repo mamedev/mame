@@ -1758,7 +1758,7 @@ static texture_info *texture_create(d3d_info *d3d, const render_texinfo *texsour
 				// for the target surface, we allocate a render target texture
 				scwidth = texture->rawwidth * texture->xprescale;
 				scheight = texture->rawheight * texture->yprescale;
-				
+
 				// target surfaces typically cannot be YCbCr, so we always pick RGB in that case
  				finalfmt = (format != d3d->yuv_format) ? format : D3DFMT_A8R8G8B8;
 				result = (*d3dintf->device.create_texture)(d3d->device, scwidth, scheight, 1, D3DUSAGE_RENDERTARGET, finalfmt, D3DPOOL_DEFAULT, &texture->d3dfinaltex);

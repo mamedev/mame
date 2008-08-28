@@ -747,8 +747,8 @@ static ADDRESS_MAP_START( guwange_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb00000, 0xb00005) AM_WRITE(SMH_RAM) AM_BASE(&cave_vctrl_2		)	// Layer 2 Control
 	AM_RANGE(0xc00000, 0xc0ffff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram16) AM_SIZE(&cave_paletteram_size)	// Palette
 	AM_RANGE(0xd00010, 0xd00011) AM_WRITE(cave_eeprom_lsb_w				)	// EEPROM
-//  AM_RANGE(0xd00012, 0xd00013) AM_WRITE(SMH_NOP             			)   // ?
-//  AM_RANGE(0xd00014, 0xd00015) AM_WRITE(SMH_NOP             			)   // ? $800068 in dfeveron ? probably Watchdog
+//  AM_RANGE(0xd00012, 0xd00013) AM_WRITE(SMH_NOP                       )   // ?
+//  AM_RANGE(0xd00014, 0xd00015) AM_WRITE(SMH_NOP                       )   // ? $800068 in dfeveron ? probably Watchdog
 ADDRESS_MAP_END
 
 
@@ -1371,7 +1371,7 @@ static ADDRESS_MAP_START( pwrinst2_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x40, 0x40) AM_WRITE(ym2203_control_port_0_w	)	// YM2203
 	AM_RANGE(0x41, 0x41) AM_WRITE(ym2203_write_port_0_w		)	//
 	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch_ack_w			)   // To Main CPU
-//  AM_RANGE(0x51, 0x51) AM_WRITE(SMH_NOP      				)   // ?? volume
+//  AM_RANGE(0x51, 0x51) AM_WRITE(SMH_NOP                   )   // ?? volume
 	AM_RANGE(0x80, 0x80) AM_WRITE(pwrinst2_rombank_w		)	// ROM bank
 ADDRESS_MAP_END
 

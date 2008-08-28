@@ -710,7 +710,7 @@ static INPUT_PORTS_START( sunaq )
     PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
-	PORT_START("DSW2") /* Unused? */ 
+	PORT_START("DSW2") /* Unused? */
 INPUT_PORTS_END
 
 /***************************************************************************

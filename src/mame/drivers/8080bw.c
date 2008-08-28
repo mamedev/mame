@@ -479,8 +479,8 @@ static INPUT_PORTS_START( spclaser )
 	//PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2) /* This is not 2 Player ??? */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
-//	PORT_START("IN2")	/* referenced by invaders_io_map, used in several drivers; this is fairly hacky */
-//	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+//  PORT_START("IN2")   /* referenced by invaders_io_map, used in several drivers; this is fairly hacky */
+//  PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_MODIFY("IN2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x00, "SW1:1" )

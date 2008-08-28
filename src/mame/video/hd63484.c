@@ -666,13 +666,13 @@ static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
 			case 0x0000: dst_step1_x =  1; dst_step1_y =  0; dst_step2_x = -ax_neg*ax; dst_step2_y =  1; break;
 			case 0x0100: logerror("PTN: not supported"); break;
 			case 0x0200: dst_step1_x =  0; dst_step1_y =  1; dst_step2_x = -1; dst_step2_y = -ax_neg*ax; break;
-			case 0x0300: logerror("PTN: not supported"); break; 
+			case 0x0300: logerror("PTN: not supported"); break;
 			case 0x0400: dst_step1_x = -1; dst_step1_y =  0; dst_step2_x =  ax_neg*ax; dst_step2_y = -1; break;
-			case 0x0500: logerror("PTN: not supported"); break; 
+			case 0x0500: logerror("PTN: not supported"); break;
 			case 0x0600: dst_step1_x =  0; dst_step1_y = -1; dst_step2_x =  1; dst_step2_y =  ax_neg*ax; break;
-			case 0x0700: logerror("PTN: not supported"); break; 
+			case 0x0700: logerror("PTN: not supported"); break;
 		}
-	 
+
 	src_step1_x =  1; src_step1_y =  0; src_step2_x = -ax; src_step2_y =  1;
 
 	for (;;)
@@ -680,7 +680,7 @@ static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
 		for (;;)
 		{
 			getpixel = get_pixel_ptn(xxs,yys);
-			switch ((opcode & 0x0018) >> 3) 
+			switch ((opcode & 0x0018) >> 3)
 			{
 				case 0x0000:
 					if (getpixel)

@@ -379,7 +379,7 @@ WRITE8_HANDLER( sgladiat_scroll_msb_w )
 WRITE8_HANDLER( aso_videoattrs_w )
 {
 	/*
-		video attributes:
+        video attributes:
         X-------
         -X------
         --X-----    flip screen
@@ -401,7 +401,7 @@ WRITE8_HANDLER( aso_videoattrs_w )
 WRITE8_HANDLER( tnk3_videoattrs_w )
 {
 	/*
-		video attributes:
+        video attributes:
         X-------    flip screen
         -X------    character bank (for text layer)
         --X-----
@@ -445,10 +445,10 @@ WRITE8_HANDLER( ikari_sp_scroll_msb_w )
 WRITE8_HANDLER( ikari_unknown_video_w )
 {
 	/* meaning of 0xc980 uncertain.
-	   Normally 0x20, ikaria/ikarijp sets it to 0x31 during test mode.
-	   Changing char bank is necessary to fix the display during the
-	   hard flags test and the test grid.
-	   Changing palette bank is necessary to fix colors in test mode. */
+       Normally 0x20, ikaria/ikarijp sets it to 0x31 during test mode.
+       Changing char bank is necessary to fix the display during the
+       hard flags test and the test grid.
+       Changing palette bank is necessary to fix colors in test mode. */
 
 if (data != 0x20 &&	// normal
 	data != 0x31 &&	// ikari test
@@ -506,7 +506,7 @@ WRITE8_HANDLER( tdfever_sp_scroll_msb_w )
 
 WRITE8_HANDLER( tdfever_spriteram_w )
 {
-	/*	partial updates avoid flickers in the fsoccer radar. */
+	/*  partial updates avoid flickers in the fsoccer radar. */
 	if (offset < 0x80 && spriteram[offset] != data)
 	{
 		int vpos = video_screen_get_vpos(machine->primary_screen);
