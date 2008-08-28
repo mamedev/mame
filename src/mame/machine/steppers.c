@@ -16,31 +16,31 @@
 
 #include "driver.h"
 #include "steppers.h"
+#include "deprecat.h"
+/* local prototypes */
 
-// local prototypes ///////////////////////////////////////////////////////
+static void update_optic(int which);
 
-static void update_optic(int id);
+/* local vars */
 
-// local vars /////////////////////////////////////////////////////////////
-
-static struct
+typedef struct _stepper
 {
-	UINT8	pattern,	// coil pattern
-		old_pattern,	// old coil pattern
-				type;	// reel type
-	INT16 step_pos,		// step position 0 - max_steps
-		max_steps;		// maximum step position
+	const stepper_interface *intf;
+	UINT8	 pattern,	/* coil pattern */
+		 old_pattern,	/* old coil pattern */
+				type;	/* reel type */
+	INT16 	step_pos,	/* step position 0 - max_steps */
+			max_steps;	/* maximum step position */
 
-	INT16 index_pos,	// position of index (in steps)
-			index_len,	// length of index   (in steps)
-			index_patt;	// pattern needed on coils (0=don't care)
+	INT16 index_start,	/* start position of index (in half steps) */
+			index_end,	/* end position of index (in half steps) */
+			index_patt;	/* pattern needed on coils (0=don't care) */
 
 	UINT8 optic;
+} stepper; 
 
-} steppers[MAX_STEPPERS];
-
-
-// step table, use previouspattern::newpattern as index
+static stepper step[MAX_STEPPERS];
+/* step table, use previouspattern::newpattern as index */
 static const int StarpointStepTab[] =
 {
 	0, //0000->0000 0->0
@@ -316,8 +316,6 @@ static const int StarpointStepTab[] =
 	0  //1111->1111 F->F
 };
 
-///////////////////////////////////////////////////////////////////////////
-
 static const int BarcrestStepTab[] =
 {
 	0, //0000->0000 0->0
@@ -341,8 +339,8 @@ static const int BarcrestStepTab[] =
 	0, //0001->0001 1->1
 	0, //0001->0010 1->2
 	1, //0001->0011 1->3
-	0,//0001->0100 1->4
-	0,//0001->0101 1->5
+	0, //0001->0100 1->4
+	0, //0001->0101 1->5
 	0, //0001->0110 1->6
 	0, //0001->0111 1->7
 	0, //0001->1000 1->8
@@ -593,101 +591,107 @@ static const int BarcrestStepTab[] =
 	0  //1111->1111 F->F
 };
 
-///////////////////////////////////////////////////////////////////////////
+/* useful interfaces */
 
-void Stepper_init(int id, int type)
+const stepper_interface starpoint_interface_48step = 
+{ 
+	STARPOINT_48STEP_REEL,
+	16,
+	24,
+	0x09
+};
+
+///////////////////////////////////////////////////////////////////////////
+void stepper_config(int which, const stepper_interface *intf)
 {
-	if ( id < MAX_STEPPERS )
+
+	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call stepper_config at init time!");
+	assert_always((which >= 0) && (which < MAX_STEPPERS), "stepper_config called on an invalid stepper motor!");
+	assert_always(intf, "stepper_config called with an invalid interface!");
+
+	step[which].intf = intf;
+
+	step[which].type = intf->type;
+	step[which].index_start = intf->index_start;/* location of first index value in half steps */
+	step[which].index_end 	= intf->index_end; 	/* location of last index value in half steps */
+	step[which].index_patt 	= intf->index_patt; /* hex value of coil pattern (0 if not needed)*/
+	step[which].pattern     = 0;
+	step[which].old_pattern = 0;
+	step[which].step_pos    = 0;
+
+	switch ( step[which].type )
 	{
-		steppers[id].index_pos   = 16;
-		steppers[id].index_len   = 8;
-		steppers[id].index_patt  = 0x09;
-		steppers[id].pattern     = 0;
-		steppers[id].old_pattern = 0;
-		steppers[id].step_pos    = 0;
-		steppers[id].max_steps   = (48*2);
-		steppers[id].type		 = type;
-
-		switch ( steppers[id].type )
-		{
-			case STARPOINT_48STEP_REEL :  // STARPOINT RMxxx
-			break;
-			case BARCREST_48STEP_REEL :	  // Barcrest reel units have different coil windings and optic tabs
-			Stepper_set_index(id,0,16,0x09);
-			break;
-			case STARPOINT_144STEPS_DICE :// STARPOINT 1DCU DICE mechanism
-			steppers[id].max_steps = (144*2);
-			break;
-		}
-		state_save_register_item("Stepper", id, steppers[id].index_pos);
-		state_save_register_item("Stepper", id, steppers[id].index_len);
-		state_save_register_item("Stepper", id, steppers[id].index_patt);
-		state_save_register_item("Stepper", id, steppers[id].pattern);
-		state_save_register_item("Stepper", id, steppers[id].old_pattern);
-		state_save_register_item("Stepper", id, steppers[id].step_pos);
-		state_save_register_item("Stepper", id, steppers[id].max_steps);
-		state_save_register_item("Stepper", id, steppers[id].type);
+		case STARPOINT_48STEP_REEL:  /* STARPOINT RMxxx */
+		case BARCREST_48STEP_REEL :  /* Barcrest Reel unit */
+		step[which].max_steps = (48*2);
+		break;
+		case STARPOINT_144STEPS_DICE :/* STARPOINT 1DCU DICE mechanism */
+		step[which].max_steps = (144*2);
+		break;
 	}
+
+	state_save_register_item("stepper", which, step[which].index_start);
+	state_save_register_item("stepper", which, step[which].index_end);
+	state_save_register_item("stepper", which, step[which].index_patt);
+	state_save_register_item("stepper", which, step[which].pattern);
+	state_save_register_item("stepper", which, step[which].old_pattern);
+	state_save_register_item("stepper", which, step[which].step_pos);
+	state_save_register_item("stepper", which, step[which].max_steps);
+	state_save_register_item("stepper", which, step[which].type);
 }
 
 ///////////////////////////////////////////////////////////////////////////
-void Stepper_set_index(int id,int position,int length,int pattern)
+int stepper_get_position(int which)
 {
-	steppers[id].index_pos   = position;//location of first index value in half steps
-	steppers[id].index_len   = length;  //number of half steps the index lasts
-	steppers[id].index_patt  = pattern; //hex value of coil pattern
-}
-
-int Stepper_get_position(int id)
-{
-	return steppers[id].step_pos;
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-int Stepper_get_max(int id)
-{
-	return steppers[id].max_steps;
+	return step[which].step_pos;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-static void update_optic(int id)
+int stepper_get_max(int which)
 {
-	int pos   = steppers[id].step_pos,
-		index = steppers[id].index_pos;
+	return step[which].max_steps;
+}
 
-	if ( ( pos >= index ) && ( pos <  index + steppers[id].index_len ) &&
-		( ( steppers[id].pattern == steppers[id].index_patt || steppers[id].index_patt==0) ||
-		( steppers[id].pattern == 0 &&
-		(steppers[id].old_pattern == steppers[id].index_patt || steppers[id].index_patt==0)
+///////////////////////////////////////////////////////////////////////////
+
+static void update_optic(int which)
+{
+	int pos   = step[which].step_pos,
+		start = step[which].index_start,
+		end = step[which].index_end;
+
+	if ( (( pos >= start ) && ( pos <= end )) &&
+		( ( step[which].pattern == step[which].index_patt || step[which].index_patt==0) ||
+		( step[which].pattern == 0 &&
+		(step[which].old_pattern == step[which].index_patt || step[which].index_patt==0)
 		) ) )
 	{
-		steppers[id].optic = 1;
+		step[which].optic = 1;
 	}
-	else steppers[id].optic = 0;
+	else step[which].optic = 0;
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-void Stepper_reset_position(int id)
+void stepper_reset_position(int which)
 {
-	steppers[id].step_pos    = 0;
-	steppers[id].pattern     = 0x00;
-	steppers[id].old_pattern = 0x00;
+	step[which].step_pos    = 0;
+	step[which].pattern     = 0x00;
+	step[which].old_pattern = 0x00;
 
-	update_optic(id);
+	update_optic(which);
 }
 
 ///////////////////////////////////////////////////////////////////////////
 
-int Stepper_optic_state(int id)
+int stepper_optic_state(int which)
 {
 	int result = 0;
 
-	if ( id < MAX_STEPPERS )
+	if ( which < MAX_STEPPERS )
 	{
-		result = steppers[id].optic;
+		result = step[which].optic;
 	}
 
 	return result;
@@ -695,47 +699,49 @@ int Stepper_optic_state(int id)
 
 ///////////////////////////////////////////////////////////////////////////
 
-int Stepper_update(int id, UINT8 pattern)
+int stepper_update(int which, UINT8 pattern)
 {
 	int changed = 0;
 
 	pattern &= 0x0F;
 
-	if ( steppers[id].pattern != pattern )
-	{ // pattern changed
+	if ( step[which].pattern != pattern )
+	{ /* pattern changed */
 		int index,
 			steps,
 			pos;
 
-		if ( steppers[id].pattern )
+		if ( step[which].pattern )
 		{
-			steppers[id].old_pattern = steppers[id].pattern;
+			step[which].old_pattern = step[which].pattern;
 		}
-		steppers[id].pattern = pattern;
+		step[which].pattern = pattern;
 
-		index = (steppers[id].old_pattern << 4) | pattern;
-		switch ( steppers[id].type )
+		index = (step[which].old_pattern << 4) | pattern;
+		switch ( step[which].type )
 		{
 			default:
-			case STARPOINT_48STEP_REEL :	// STARPOINT RMxxx
-			case STARPOINT_144STEPS_DICE :  // STARPOINT 1DCU DICE mechanism
+			case STARPOINT_48STEP_REEL :	/* STARPOINT RMxxx */
+			case STARPOINT_144STEPS_DICE :  /* STARPOINT 1DCU DICE mechanism */
 			steps = StarpointStepTab[ index ];
 			break;
-			case BARCREST_48STEP_REEL :	    // Barcrest reel units have different windings
+			case BARCREST_48STEP_REEL :	    /* Barcrest reel units have different windings */
 			steps = BarcrestStepTab[ index ];
 			break;
 		}
-//      if ( id ==0 )logerror("Id %d Index %d Steps %d Pattern Old %02X New %02X\n",id,index,steps,steppers[id].old_pattern,steppers[id].pattern);
+		#if 0 /* Assists with new index generation */
+		if ( which ==0 )logerror("which %d Index %d Steps %d Pattern Old %02X New %02X\n",which,index,steps,step[which].old_pattern,step[which].pattern);
+		#endif
 
 		if ( steps )
 		{
-			pos = steppers[id].step_pos + steps;
+			pos = step[which].step_pos + steps;
 
-			if ( pos > steppers[id].max_steps ) pos -= steppers[id].max_steps;
-			else if ( pos < 0 )                 pos += steppers[id].max_steps;
+			if ( pos > step[which].max_steps ) pos -= step[which].max_steps;
+			else if ( pos < 0 )                 pos += step[which].max_steps;
 
-			steppers[id].step_pos = pos;
-			update_optic(id);
+			step[which].step_pos = pos;
+			update_optic(which);
 
 			changed++;
 		}

@@ -356,8 +356,8 @@ send data to them, although obviously there's no response. */
 
 		for ( i = 0; i < 6; i++)
 		{
-			Stepper_reset_position(i);
-			if ( Stepper_optic_state(i) ) pattern |= 1<<i;
+			stepper_reset_position(i);
+			if ( stepper_optic_state(i) ) pattern |= 1<<i;
 		}
 
 		optic_pattern = pattern;
@@ -567,12 +567,12 @@ static WRITE8_HANDLER( reel34_w )
 {
 	reel34_latch = data;
 
-	if ( Stepper_update(2, data   ) ) reel_changed |= 0x04;
-	if ( Stepper_update(3, data>>4) ) reel_changed |= 0x08;
+	if ( stepper_update(2, data   ) ) reel_changed |= 0x04;
+	if ( stepper_update(3, data>>4) ) reel_changed |= 0x08;
 
-	if ( Stepper_optic_state(2) ) optic_pattern |=  0x04;
+	if ( stepper_optic_state(2) ) optic_pattern |=  0x04;
 	else                          optic_pattern &= ~0x04;
-	if ( Stepper_optic_state(3) ) optic_pattern |=  0x08;
+	if ( stepper_optic_state(3) ) optic_pattern |=  0x08;
 	else                          optic_pattern &= ~0x08;
 
 	draw_reel((2));
@@ -585,12 +585,12 @@ static WRITE8_HANDLER( reel56_w )
 {
 	reel56_latch = data;
 
-	if ( Stepper_update(4, data   ) ) reel_changed |= 0x10;
-	if ( Stepper_update(5, data>>4) ) reel_changed |= 0x20;
+	if ( stepper_update(4, data   ) ) reel_changed |= 0x10;
+	if ( stepper_update(5, data>>4) ) reel_changed |= 0x20;
 
-	if ( Stepper_optic_state(4) ) optic_pattern |=  0x10;
+	if ( stepper_optic_state(4) ) optic_pattern |=  0x10;
 	else                          optic_pattern &= ~0x10;
-	if ( Stepper_optic_state(5) ) optic_pattern |=  0x20;
+	if ( stepper_optic_state(5) ) optic_pattern |=  0x20;
 	else                          optic_pattern &= ~0x20;
 
 	draw_reel((4));

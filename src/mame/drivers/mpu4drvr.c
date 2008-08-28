@@ -1364,10 +1364,10 @@ MACHINE_START( mpu4_vid )
 
 	/* setup 4 reels (for hybrid machines) */
 
-	Stepper_init(0, BARCREST_48STEP_REEL);
-	Stepper_init(1, BARCREST_48STEP_REEL);
-	Stepper_init(2, BARCREST_48STEP_REEL);
-	Stepper_init(3, BARCREST_48STEP_REEL);
+	stepper_config(0, &barcrest_reel_interface);
+	stepper_config(1, &barcrest_reel_interface);
+	stepper_config(2, &barcrest_reel_interface);
+	stepper_config(3, &barcrest_reel_interface);
 
 	/* setup the standard oki MSC1937 display */
 

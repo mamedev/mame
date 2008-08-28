@@ -401,8 +401,8 @@ static void mpu4_stepper_reset(void)
 	int pattern = 0,reel;
 	for (reel = 0; reel < 6; reel++)
 	{
-		Stepper_reset_position(reel);
-		if (Stepper_optic_state(reel)) pattern |= 1<<reel;
+		stepper_reset_position(reel);
+		if (stepper_optic_state(reel)) pattern |= 1<<reel;
 	}
 	optic_pattern = pattern;
 }
@@ -806,15 +806,15 @@ static const pia6821_interface pia_ic5_intf =
 static WRITE8_HANDLER( pia_ic6_portb_w )
 {
 	LOG(("%04x IC6 PIA Port B Set to %2x (Reel A and B)\n", activecpu_get_previouspc(),data));
-	Stepper_update(0, data & 0x0F );
-	Stepper_update(1, (data>>4) & 0x0F );
+	stepper_update(0, data & 0x0F );
+	stepper_update(1, (data>>4) & 0x0F );
 
 /*  if ( pia_get_output_cb2(1)) */
 	{
-		if ( Stepper_optic_state(0) ) optic_pattern |=  0x01;
+		if ( stepper_optic_state(0) ) optic_pattern |=  0x01;
 		else                          optic_pattern &= ~0x01;
 
-		if ( Stepper_optic_state(1) ) optic_pattern |=  0x02;
+		if ( stepper_optic_state(1) ) optic_pattern |=  0x02;
 		else                          optic_pattern &= ~0x02;
 	}
 	draw_reel((0));
@@ -869,14 +869,14 @@ static const pia6821_interface pia_ic6_intf =
 static WRITE8_HANDLER( pia_ic7_porta_w )
 {
 	LOG(("%04x IC7 PIA Port A Set to %2x (Reel C and D)\n", activecpu_get_previouspc(),data));
-	Stepper_update(2, data & 0x0F );
-	Stepper_update(3, (data >> 4)& 0x0F );
+	stepper_update(2, data & 0x0F );
+	stepper_update(3, (data >> 4)& 0x0F );
 
 /*  if ( pia_get_output_cb2(1)) */
 	{
-		if ( Stepper_optic_state(2) ) optic_pattern |=  0x04;
+		if ( stepper_optic_state(2) ) optic_pattern |=  0x04;
 		else                          optic_pattern &= ~0x04;
-		if ( Stepper_optic_state(3) ) optic_pattern |=  0x08;
+		if ( stepper_optic_state(3) ) optic_pattern |=  0x08;
 		else                          optic_pattern &= ~0x08;
 	}
 	draw_reel((2));
@@ -1229,6 +1229,13 @@ static INPUT_PORTS_START( connect4 )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_COIN4) PORT_NAME("100p")PORT_IMPULSE(5)
 INPUT_PORTS_END
 
+static const stepper_interface barcrest_reel_interface = 
+{ 
+	BARCREST_48STEP_REEL,
+	0,
+	8,
+	0x00
+};
 
 /* Common configurations */
 static void mpu4_config_common(void)
@@ -1257,10 +1264,10 @@ static MACHINE_START( mpu4mod2 )
 	Mechmtr_init(8);
 
 	/* setup 4 reels */
-	Stepper_init(0, BARCREST_48STEP_REEL);
-	Stepper_init(1, BARCREST_48STEP_REEL);
-	Stepper_init(2, BARCREST_48STEP_REEL);
-	Stepper_init(3, BARCREST_48STEP_REEL);
+	stepper_config(0, &barcrest_reel_interface);
+	stepper_config(1, &barcrest_reel_interface);
+	stepper_config(2, &barcrest_reel_interface);
+	stepper_config(3, &barcrest_reel_interface);
 
 	/* setup the standard oki MSC1937 display */
 	ROC10937_init(0, MSC1937,0);
