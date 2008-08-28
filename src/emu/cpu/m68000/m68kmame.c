@@ -22,7 +22,7 @@ void m68k_set_encrypted_opcode_range(int cpunum, offs_t start, offs_t end)
 
 static UINT16 m68008_read_immediate_16(offs_t address)
 {
-	offs_t addr = (address) ^ m68k_memory_intf.opcode_xor;
+	offs_t addr = address;
 	return (cpu_readop(addr) << 8) | (cpu_readop(addr + 1));
 }
 
@@ -52,7 +52,7 @@ static UINT16 read_immediate_16(offs_t address)
 static const m68k_memory_interface interface_d16 =
 {
 	0,
-	read_immediate_16,
+	cpu_readop16,
 	program_read_byte_16be,
 	program_read_word_16be,
 	program_read_dword_16be,
