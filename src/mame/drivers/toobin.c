@@ -119,7 +119,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8500, 0xff8501) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0xff8600, 0xff8601) AM_WRITE(toobin_xscroll_w) AM_BASE(&atarigen_xscroll)
 	AM_RANGE(0xff8700, 0xff8701) AM_WRITE(toobin_yscroll_w) AM_BASE(&atarigen_yscroll)
-	AM_RANGE(0xff8800, 0xff8801) AM_READ(input_port_0_word_r)
+	AM_RANGE(0xff8800, 0xff8801) AM_READ_PORT("FF8800")
 	AM_RANGE(0xff9000, 0xff9001) AM_READ(special_port1_r)
 	AM_RANGE(0xff9800, 0xff9801) AM_READ(atarigen_sound_r)
 	AM_RANGE(0xffa000, 0xffafff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
@@ -135,7 +135,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( toobin )
-	PORT_START("FF8800")	/* ff8800 */
+	PORT_START("FF8800")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 R Paddle Forward") PORT_CODE(KEYCODE_L) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("P2 L Paddle Forward") PORT_CODE(KEYCODE_J) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("P2 L Paddle Backward") PORT_CODE(KEYCODE_U) PORT_PLAYER(2)
@@ -148,7 +148,7 @@ static INPUT_PORTS_START( toobin )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P2 Throw") PORT_CODE(KEYCODE_RCONTROL) PORT_PLAYER(2)
 	PORT_BIT( 0xfc00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("FF9000")	/* ff9000 */
+	PORT_START("FF9000")
 	PORT_BIT( 0x03ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )

@@ -247,17 +247,17 @@ static ADDRESS_MAP_START( main_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xec00, 0xec01) AM_RAM_WRITE(tehkanwc_scroll_x_w)
 	AM_RANGE(0xec02, 0xec02) AM_RAM_WRITE(tehkanwc_scroll_y_w)
 	AM_RANGE(0xf800, 0xf801) AM_READWRITE(tehkanwc_track_0_r, tehkanwc_track_0_reset_w)	/* track 0 x/y */
-	AM_RANGE(0xf802, 0xf802) AM_READWRITE(input_port_9_r, gridiron_led0_w)	/* Coin & Start */
-	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("P1BUT")							/* joy0 - button */
-	AM_RANGE(0xf806, 0xf806) AM_READ_PORT("SYSTEM")							/* Start */
+	AM_RANGE(0xf802, 0xf802) AM_READ_PORT("SYSTEM")	AM_WRITE(gridiron_led0_w)
+	AM_RANGE(0xf803, 0xf803) AM_READ_PORT("P1BUT")
+	AM_RANGE(0xf806, 0xf806) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xf810, 0xf811) AM_READWRITE(tehkanwc_track_1_r, tehkanwc_track_1_reset_w)	/* track 1 x/y */
 	AM_RANGE(0xf812, 0xf812) AM_WRITE(gridiron_led1_w)
-	AM_RANGE(0xf813, 0xf813) AM_READ_PORT("P2BUT")							/* joy1 - button */
+	AM_RANGE(0xf813, 0xf813) AM_READ_PORT("P2BUT")
 	AM_RANGE(0xf820, 0xf820) AM_READWRITE(soundlatch2_r, sound_command_w)	/* answer from the sound CPU */
-	AM_RANGE(0xf840, 0xf840) AM_READ_PORT("DSW1") AM_WRITE(sub_cpu_halt_w)	/* DSW1 */
-	AM_RANGE(0xf850, 0xf850) AM_READ_PORT("DSW2") AM_WRITE(SMH_NOP)			/* DSW2, ?? writes 0x00 or 0xff */
+	AM_RANGE(0xf840, 0xf840) AM_READ_PORT("DSW1") AM_WRITE(sub_cpu_halt_w)
+	AM_RANGE(0xf850, 0xf850) AM_READ_PORT("DSW2") AM_WRITE(SMH_NOP)			/* ?? writes 0x00 or 0xff */
 	AM_RANGE(0xf860, 0xf860) AM_READWRITE(watchdog_reset_r, tehkanwc_flipscreen_x_w)
-	AM_RANGE(0xf870, 0xf870) AM_READ_PORT("DSW3") AM_WRITE(tehkanwc_flipscreen_y_w)	/* DSW3 */
+	AM_RANGE(0xf870, 0xf870) AM_READ_PORT("DSW3") AM_WRITE(tehkanwc_flipscreen_y_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sub_mem, ADDRESS_SPACE_PROGRAM, 8 )

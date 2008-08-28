@@ -97,7 +97,7 @@ static READ16_HANDLER( control1_r )
 	/* bit 1 is EEPROM ready */
 	/* bit 3 is service button */
 	/* bits 4-7 are DIP switches */
-	res = eeprom_read_bit() | input_port_read(machine, "IN1");
+	res = input_port_read(machine, "IN1");
 
 	if (init_eeprom_count)
 	{
@@ -480,13 +480,13 @@ static INPUT_PORTS_START( moo )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE4 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_SERVICE_NO_TOGGLE(0x08, IP_ACTIVE_LOW)
 	PORT_DIPNAME( 0x10, 0x00, "Sound Output")
-	PORT_DIPSETTING(    0x10, DEF_STR( Mono ))
-	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ))
+	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
 	PORT_DIPNAME( 0x20, 0x20, "Coin Mechanism")
 	PORT_DIPSETTING(    0x20, "Common")
 	PORT_DIPSETTING(    0x00, "Independent")

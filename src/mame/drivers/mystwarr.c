@@ -119,7 +119,7 @@ static READ16_HANDLER( mweeprom_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		int res = input_port_read(machine, "IN1") | eeprom_read_bit();
+		int res = input_port_read(machine, "IN1");
 
 		if (init_eeprom_count)
 		{
@@ -139,7 +139,7 @@ static READ16_HANDLER( vseeprom_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		int res = input_port_read(machine, "IN1") | eeprom_read_bit();
+		int res = input_port_read(machine, "IN1");
 
 		if (init_eeprom_count)
 		{
@@ -173,7 +173,7 @@ static READ16_HANDLER( dddeeprom_r )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		return (input_port_read(machine, "IN1") | eeprom_read_bit())<<8;
+		return input_port_read(machine, "IN1") << 8;
 	}
 
 	return input_port_read(machine, "P2");
@@ -1101,19 +1101,19 @@ static INPUT_PORTS_START( mystwarr )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* game loops if this is set */
-	PORT_DIPNAME( 0x10, 0x00, "Sound Output")
-	PORT_DIPSETTING(    0x10, DEF_STR( Mono ))
-	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ))
-	PORT_DIPNAME( 0x20, 0x20, "Coin Mechanism")
-	PORT_DIPSETTING(    0x20, "Common")
-	PORT_DIPSETTING(    0x00, "Independant")
-	PORT_DIPNAME( 0x40, 0x40, "Number of Players")
-	PORT_DIPSETTING(    0x00, "4")
-	PORT_DIPSETTING(    0x40, "2")
+	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
+	PORT_DIPNAME( 0x20, 0x20, "Coin Mechanism" )
+	PORT_DIPSETTING(    0x20, "Common" )
+	PORT_DIPSETTING(    0x00, "Independant" )
+	PORT_DIPNAME( 0x40, 0x40, "Number of Players" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x40, "2" )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P1")
@@ -1169,22 +1169,22 @@ static INPUT_PORTS_START( metamrph )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x10, 0x00, "Sound Output")
-	PORT_DIPSETTING(    0x10, DEF_STR( Mono ))
-	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ))
-	PORT_DIPNAME( 0x20, 0x20, "Coin Mechanism")
-	PORT_DIPSETTING(    0x20, "Common")
-	PORT_DIPSETTING(    0x00, "Independant")
-	PORT_DIPNAME( 0x40, 0x40, "Number of Players")
-	PORT_DIPSETTING(    0x00, "4")
-	PORT_DIPSETTING(    0x40, "2")
-	PORT_DIPNAME( 0x80, 0x80, "Continuous Energy Increment")
-	PORT_DIPSETTING(    0x80, DEF_STR( No ))
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ))
+	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
+	PORT_DIPNAME( 0x20, 0x20, "Coin Mechanism" )
+	PORT_DIPSETTING(    0x20, "Common" )
+	PORT_DIPSETTING(    0x00, "Independant" )
+	PORT_DIPNAME( 0x40, 0x40, "Number of Players" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x40, "2" )
+	PORT_DIPNAME( 0x80, 0x80, "Continuous Energy Increment" )
+	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1239,22 +1239,22 @@ static INPUT_PORTS_START( viostorm )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x10, 0x00, "Sound Output")
-	PORT_DIPSETTING(    0x10, DEF_STR( Mono ))
-	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ))
+	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Coin Mechanism")
-	PORT_DIPSETTING(    0x40, "Common")
-	PORT_DIPSETTING(    0x00, "Independant")
-	PORT_DIPNAME( 0x80, 0x80, "Number of Players")
-	PORT_DIPSETTING(    0x00, "3")
-	PORT_DIPSETTING(    0x80, "2")
+	PORT_DIPNAME( 0x40, 0x40, "Coin Mechanism" )
+	PORT_DIPSETTING(    0x40, "Common" )
+	PORT_DIPSETTING(    0x00, "Independant" )
+	PORT_DIPNAME( 0x80, 0x80, "Number of Players" )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x80, "2" )
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
@@ -1309,13 +1309,13 @@ static INPUT_PORTS_START( dadandrn )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )
 	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x10, 0x00, "Sound Output")
-	PORT_DIPSETTING(    0x10, DEF_STR( Mono ))
-	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ))
+	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -1375,13 +1375,13 @@ static INPUT_PORTS_START( martchmp )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* EEPROM data */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SPECIAL )	/* EEPROM ready (always 1) */
 	PORT_SERVICE_NO_TOGGLE( 0x04, IP_ACTIVE_LOW )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL )   /* game loops if this is set */
-	PORT_DIPNAME( 0x10, 0x00, "Sound Output")
-	PORT_DIPSETTING(    0x10, DEF_STR( Mono ))
-	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ))
+	PORT_DIPNAME( 0x10, 0x00, "Sound Output" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Mono ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Stereo ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )

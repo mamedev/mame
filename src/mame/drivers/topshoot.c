@@ -191,13 +191,13 @@ INPUT_PORTS_END
 
 static ADDRESS_MAP_START( topshoot_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)					/* Cartridge Program Rom */
-//  AM_RANGE(0x200000, 0x20007f) AM_READ(SMH_RAM)
-//  AM_RANGE(0x200040, 0x200041) AM_READ(input_port_0_word_r)       // ??
-//  AM_RANGE(0x200050, 0x200051) AM_READ(input_port_0_word_r)       // ??
+//	AM_RANGE(0x200000, 0x20007f) AM_READ(SMH_RAM)
+//	AM_RANGE(0x200040, 0x200041) AM_READ_PORT("IN0")		// ??
+//	AM_RANGE(0x200050, 0x200051) AM_READ_PORT("IN0")		// ??
 	AM_RANGE(0x202000, 0x2023ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x400004, 0x400005) AM_READ(input_port_0_word_r)       // ??
-	AM_RANGE(0xa10000, 0xa1001f) AM_READ(input_port_0_word_r)
-	AM_RANGE(0xa11100, 0xa11101) AM_READ(input_port_0_word_r)		// ??
+	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("IN0")		// ??
+	AM_RANGE(0xa10000, 0xa1001f) AM_READ_PORT("IN0")
+	AM_RANGE(0xa11100, 0xa11101) AM_READ_PORT("IN0")		// ??
 
 
 	AM_RANGE(0xa00000, 0xa0ffff) AM_READ(genesis_68k_to_z80_r)

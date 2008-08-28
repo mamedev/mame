@@ -744,7 +744,7 @@ static WRITE16_HANDLER( toaplan2_hd647180_cpu_w )
 	}
 }
 
-static READ16_HANDLER( c2map_port_6_r )
+static CUSTOM_INPUT( c2map_r )
 {
 	/* For Teki Paki hardware */
 	/* bit 4 high signifies secondary CPU is ready */
@@ -755,9 +755,8 @@ static READ16_HANDLER( c2map_port_6_r )
 		case CPU_2_HD647180:	mcu_data = 0xff; break;					  /* Teki Paki */
 		default:				mcu_data = 0x00; break;
 	}
-	if (mcu_data == 0xff) mcu_data = 0x10;
-	else mcu_data = 0x00;
-	return ( mcu_data | input_port_read(machine, "JMPR") );
+
+	return (mcu_data == 0xff) ? 0x01 : 0x00;
 }
 
 static READ16_HANDLER( pipibibi_z80_status_r )
@@ -994,9 +993,9 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 			/* from/to nvram to store the settings (a 93C45 EEPROM) */
 			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f002, 0x28fbff, 0, 0, SMH_BANK2, SMH_BANK2);
 			memory_set_bankptr(2, fixeight_sec_cpu_mem);
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f004, 0x28f005, 0, 0, input_port_5_word_r, SMH_NOP);	/* Dip Switch A - Wrong !!! */
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f006, 0x28f007, 0, 0, input_port_6_word_r, SMH_NOP);	/* Dip Switch B - Wrong !!! */
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f008, 0x28f009, 0, 0, input_port_7_word_r, SMH_NOP);	/* Territory Jumper block - Wrong !!! */
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f004, 0x28f005, 0, 0, input_port_read_handler16(machine->portconfig, "DSWA"), SMH_NOP);	/* Dip Switch A - Wrong !!! */
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f006, 0x28f007, 0, 0, input_port_read_handler16(machine->portconfig, "DSWB"), SMH_NOP);	/* Dip Switch B - Wrong !!! */
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f008, 0x28f009, 0, 0, input_port_read_handler16(machine->portconfig, "JMPR"), SMH_NOP);	/* Territory Jumper block - Wrong !!! */
 
 			mcu_data = data;
 		}
@@ -1397,7 +1396,7 @@ static ADDRESS_MAP_START( tekipaki_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSWA")
 	AM_RANGE(0x180010, 0x180011) AM_READ_PORT("DSWB")
 	AM_RANGE(0x180020, 0x180021) AM_READ_PORT("SYS")
-	AM_RANGE(0x180030, 0x180031) AM_READ(c2map_port_6_r)		/* CPU 2 busy and Territory Jumper block */
+	AM_RANGE(0x180030, 0x180031) AM_READ_PORT("JMPR")			/* CPU 2 busy and Territory Jumper block */
 	AM_RANGE(0x180040, 0x180041) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
 	AM_RANGE(0x180050, 0x180051) AM_READ_PORT("IN1")
 	AM_RANGE(0x180060, 0x180061) AM_READ_PORT("IN2")
@@ -2181,7 +2180,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( tekipaki )
-	PORT_INCLUDE(toaplan2)
+	PORT_INCLUDE( toaplan2 )
 
 	PORT_MODIFY("DSWA")
 	/* Various features on bit mask 0x000f - see above */
@@ -2221,11 +2220,12 @@ static INPUT_PORTS_START( tekipaki )
 	PORT_DIPSETTING(		0x0008, "Hong Kong (Honest Trading Co.)" )
 	PORT_DIPSETTING(		0x0005, "Taiwan" )
 	PORT_DIPSETTING(		0x0006, "Taiwan (Spacy Co. Ltd)" )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(c2map_r, NULL)
 INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( ghox )
-	PORT_INCLUDE(toaplan2)
+	PORT_INCLUDE( toaplan2 )
 
 	PORT_MODIFY("DSWA")
 	/* Various features on bit mask 0x000f - see above */
@@ -2281,7 +2281,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( dogyuun )
-	PORT_INCLUDE(toaplan2)
+	PORT_INCLUDE( toaplan2 )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
@@ -2338,7 +2338,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( kbash )
-	PORT_INCLUDE(toaplan2)
+	PORT_INCLUDE( toaplan2 )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
@@ -2402,7 +2402,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( truxton2 )
-	PORT_INCLUDE(toaplan2)
+	PORT_INCLUDE( toaplan2 )
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(1)
@@ -2450,7 +2450,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( pipibibs )
-	PORT_INCLUDE(toaplan2)
+	PORT_INCLUDE( toaplan2 )
 
 	PORT_MODIFY("DSWA")
 	/* Various features on bit mask 0x000f - see above */
@@ -2496,7 +2496,7 @@ static INPUT_PORTS_START( whoopee )
 	PORT_INCLUDE(pipibibs)
 
 	PORT_MODIFY("JMPR")
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* bit 0x10 sound ready */
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(c2map_r, NULL)	/* bit 0x10 sound ready */
 INPUT_PORTS_END
 
 
@@ -2527,7 +2527,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( fixeight )
-	PORT_INCLUDE(toaplan2)
+	PORT_INCLUDE( toaplan2 )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(3) PORT_8WAY
@@ -2615,7 +2615,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( grindstm )
-	PORT_INCLUDE(toaplan2)
+	PORT_INCLUDE( toaplan2 )
 
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Cabinet ) )		PORT_DIPLOCATION("SW1:1")
@@ -2677,7 +2677,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( batsugun )
-	PORT_INCLUDE(toaplan2)
+	PORT_INCLUDE( toaplan2 )
 
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x0001,	0x0000, "Continue Mode" )			PORT_DIPLOCATION("SW1:1")
@@ -2729,7 +2729,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( snowbro2 )
-	PORT_INCLUDE(toaplan2)
+	PORT_INCLUDE( toaplan2 )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(3) PORT_8WAY
@@ -2797,7 +2797,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( sstriker )
-	PORT_INCLUDE(toaplan2)
+	PORT_INCLUDE( toaplan2 )
 
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Free_Play ) )	PORT_DIPLOCATION("SW1:1")
@@ -2850,7 +2850,7 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( kingdmgp )
-	PORT_INCLUDE(toaplan2)
+	PORT_INCLUDE( toaplan2 )
 
 	PORT_MODIFY("DSWA")
 	PORT_DIPNAME( 0x0001,	0x0000, DEF_STR( Free_Play ) )		PORT_DIPLOCATION("SW1:1")

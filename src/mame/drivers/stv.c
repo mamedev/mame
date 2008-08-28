@@ -2209,6 +2209,9 @@ static INPUT_PORTS_START( batmanfr )
 
 	PORT_MODIFY("P2")
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+
+	PORT_MODIFY("EXTRA")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 /* Same as the regular one, but with an additional & optional mahjong panel */

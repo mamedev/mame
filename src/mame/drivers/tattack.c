@@ -54,13 +54,13 @@ static VIDEO_START( tattack )
 
 static ADDRESS_MAP_START( mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
-//  AM_RANGE(0x4000, 0x4000) AM_READNOP $315
+//	AM_RANGE(0x4000, 0x4000) AM_READNOP $315
 	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE(&videoram)
-	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE(&colorram) //color map ? something else .. only bits 1-3 are used
-	AM_RANGE(0x6000, 0x6000) AM_READ(input_port_2_r)
-	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_1_r)  //dsw ? something else ?
-	AM_RANGE(0xc000, 0xc000) AM_READ(input_port_0_r)  AM_WRITENOP
-	AM_RANGE(0xc001, 0xc002) AM_WRITENOP //bit 7 = strobe ($302)
+	AM_RANGE(0x7000, 0x73ff) AM_RAM AM_BASE(&colorram)	// color map ? something else .. only bits 1-3 are used
+	AM_RANGE(0x6000, 0x6000) AM_READ_PORT("DSW2")
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("DSW1")		// dsw ? something else ?
+	AM_RANGE(0xc000, 0xc000) AM_READ_PORT("INPUTS") AM_WRITENOP
+	AM_RANGE(0xc001, 0xc002) AM_WRITENOP				// bit 7 = strobe ($302)
 	AM_RANGE(0xc005, 0xc007) AM_WRITENOP
 	AM_RANGE(0xe000, 0xe3ff) AM_RAM
 ADDRESS_MAP_END
@@ -137,7 +137,6 @@ static INPUT_PORTS_START( tattack )
 	PORT_DIPNAME( 0x80, 0x00, "DSW2 8" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 

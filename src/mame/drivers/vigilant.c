@@ -82,11 +82,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vigilant_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, m72_sound_command_byte_w)	/* SD */
-	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_1_r, vigilant_out2_w) 			/* OUT2 */
-	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r)
-	AM_RANGE(0x03, 0x03) AM_READ(input_port_3_r)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(input_port_4_r, vigilant_bank_select_w)	/* PBANK */
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(m72_sound_command_byte_w)	/* SD */
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1") AM_WRITE(vigilant_out2_w) 			/* OUT2 */
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2") AM_WRITE(vigilant_bank_select_w)	/* PBANK */
 	AM_RANGE(0x80, 0x81) AM_WRITE(vigilant_horiz_scroll_w) 		/* HSPL, HSPH */
 	AM_RANGE(0x82, 0x83) AM_WRITE(vigilant_rear_horiz_scroll_w) /* RHSPL, RHSPH */
 	AM_RANGE(0x84, 0x84) AM_WRITE(vigilant_rear_color_w) 		/* RCOD */
@@ -103,11 +103,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( kikcubic_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_3_r, kikcubic_coin_w)	/* also flip screen, and...? */
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_4_r)
-	AM_RANGE(0x02, 0x02) AM_READ(input_port_0_r)
-	AM_RANGE(0x03, 0x03) AM_READ(input_port_1_r)
-	AM_RANGE(0x04, 0x04) AM_READWRITE(input_port_2_r, vigilant_bank_select_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_WRITE(kikcubic_coin_w)	/* also flip screen, and...? */
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW2")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN1")
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2") AM_WRITE(vigilant_bank_select_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(m72_sound_command_byte_w)
 //  AM_RANGE(0x07, 0x07) AM_WRITE(SMH_NOP) /* ?? */
 ADDRESS_MAP_END
@@ -169,7 +169,7 @@ static INPUT_PORTS_START( vigilant )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 
-	PORT_START("DSW0")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(	0x02, "2" )
 	PORT_DIPSETTING(	0x03, "3" )
@@ -200,7 +200,7 @@ static INPUT_PORTS_START( vigilant )
 	PORT_DIPSETTING(	0x50, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Free_Play ) )
 
-	PORT_START("DSW1")
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
@@ -260,7 +260,7 @@ static INPUT_PORTS_START( kikcubic )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
-	PORT_START("DSW0")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
@@ -290,7 +290,7 @@ static INPUT_PORTS_START( kikcubic )
 //  PORT_DIPSETTING(    0x80, "Undefined" )
 //  PORT_DIPSETTING(    0x90, "Undefined" )
 
-	PORT_START("DSW1")
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
@@ -343,7 +343,7 @@ static INPUT_PORTS_START( buccanrs )
 	PORT_BIT(0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT(0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
-	PORT_START("DSW0")
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0f, 0x0f, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(	0x04, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(	0x07, DEF_STR( 3C_1C ) )
@@ -371,7 +371,7 @@ static INPUT_PORTS_START( buccanrs )
 	PORT_DIPSETTING(	0xc0, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(	0xb0, DEF_STR( 1C_5C ) )
 
-	PORT_START("DSW1")
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
