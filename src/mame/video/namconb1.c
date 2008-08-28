@@ -4,6 +4,7 @@
 #include "namconb1.h"
 #include "namcoic.h"
 #include "namcos2.h"
+#include "audio/namcoc7x.h"
 
 static UINT32 tilemap_tile_bank[4];
 
@@ -111,18 +112,24 @@ handle_mcu( running_machine *machine )
 	static int toggle;
 	static UINT16 credits;
 	static int old_coin_state;
-	static int old_p1;
-	static int old_p2;
-	static int old_p3;
-	static int old_p4;
+	static UINT16 old_p1;
+	static UINT16 old_p2;
+	static UINT16 old_p3;
+	static UINT16 old_p4;
 	int new_coin_state = input_port_read(machine, "COIN") & 0x3;	/* coin1,2 */
-	unsigned dsw = input_port_read(machine, "DSW")<<16;
-	unsigned p1 = input_port_read(machine, "P1");
-	unsigned p2 = input_port_read(machine, "P2");
-	unsigned p3;
-	unsigned p4;
+	UINT16 dsw = input_port_read(machine, "DSW");
+	UINT16 p1 = input_port_read(machine, "P1");
+	UINT16 p2 = input_port_read(machine, "P2");
+	UINT16 p3;
+	UINT16 p4;
+
 	toggle = !toggle;
-	if( toggle ) dsw &= ~(0x80<<16);
+	if(toggle)
+		dsw &= ~0x80;
+
+	if(cpunum_is_suspended(1, SUSPEND_REASON_HALT))
+		return;
+
 	if( namcos2_gametype == NAMCONB2_MACH_BREAKERS )
 	{
 		p3 = input_port_read_safe(machine, "P3", 0);
@@ -144,17 +151,18 @@ handle_mcu( running_machine *machine )
 	old_p3 = p3;
 	old_p4 = p4;
 
-	namconb1_workram32[0x6000/4] = dsw|p1;
-	namconb1_workram32[0x6004/4] = (p2<<16)|p3;
-	namconb1_workram32[0x6008/4] = p4<<16;
+	namcoc7x_soundram16_w(machine, 0x6000/2, dsw, 0xffff);
+	namcoc7x_soundram16_w(machine, 0x6002/2, p1, 0xffff);
+	namcoc7x_soundram16_w(machine, 0x6004/2, p2, 0xffff);
+	namcoc7x_soundram16_w(machine, 0x6006/2, p3, 0xffff);
+	namcoc7x_soundram16_w(machine, 0x6008/2, p4, 0xffff);
 
 	if( new_coin_state && !old_coin_state )
 	{
 		credits++;
 	}
 	old_coin_state = new_coin_state;
-	namconb1_workram32[0x601e/4] &= 0xffff0000;
-	namconb1_workram32[0x601e/4] |= credits;
+ 	namcoc7x_soundram16_w(machine, 0x601e/2, credits, 0xffff);
 } /* handle_mcu */
 
 static void

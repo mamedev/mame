@@ -12,7 +12,7 @@ ToDo:
 Main CPU : Motorola 68020 32-bit processor @ 25MHz
 Secondary CPUs : C329 + 137 (both custom)
 Custom Graphics Chips : GFX:123,145,156,C116 - Motion Objects:C355,187,C347
-Sound CPU : C351 (custom)
+Sound CPU : C75 (custom)
 PCM Sound chip : C352 (custom)
 I/O Chip : 160 (custom)
 Board composition : Single board
@@ -52,7 +52,7 @@ Main processor    - MC68EC020FG25 25MHz   (100 pin PQFP)
                   - 137  custom PLD       (28 pin NDIP)
                   - C366 Key Custom
 
-Sound processor   - C351 custom           (160 pin PQFP)
+Sound processor   - C75  custom
  (PCM)            - C352 custom           (100 pin PQFP)
  (control inputs) - 160  custom           (80 pin PQFP)
 
@@ -161,7 +161,7 @@ Main processor    - MC68EC020FG25 25MHz   (100 pin PQFP)
                   - 137  custom PLD       (28 pin NDIP)
                   - C366 Key Custom
 
-Sound processor   - C351 custom           (160 pin PQFP)
+Sound processor   - C75  custom
  (PCM)            - C352 custom           (100 pin PQFP)
  (control inputs) - 160  custom           (80 pin PQFP)
 
@@ -285,69 +285,19 @@ UINT32 *namconb1_tilebank32;
 
 /****************************************************************************/
 
-static UINT32 *namconb_cpureg32;
-
-static int
-GetCPURegister(int which)
-{
-	return (namconb_cpureg32[which/4]<<((which&3)*8))>>24;
-}
+static UINT8 namconb_cpureg[32];
+static int vblank_irq_active, pos_irq_active;
 
 static TIMER_CALLBACK( namconb1_TriggerPOSIRQ )
 {
-	int irqlevel = GetCPURegister(0x04)>>4;
+	if(pos_irq_active || !(namconb_cpureg[0x02] & 0xf0))
+		return;
+
 	video_screen_update_partial(machine->primary_screen, param);
-	cpunum_set_input_line(machine, 0, irqlevel, PULSE_LINE);
+	pos_irq_active = 1;
+	cpunum_set_input_line(machine, 0, namconb_cpureg[0x02] & 0xf, ASSERT_LINE);
 }
 
-static TIMER_CALLBACK( namconb2_TriggerPOSIRQ )
-{
-	int irqlevel = GetCPURegister(0x02);
-	video_screen_update_partial(machine->primary_screen, param);
-	cpunum_set_input_line(machine, 0, irqlevel, PULSE_LINE);
-} /* namconb2_TriggerPOSIRQ */
-
-static INTERRUPT_GEN( namconb2_interrupt )
-{
-	/**
-     * f00000 0x01 // VBLANK irq level
-     * f00001 0x00
-     * f00002 0x05 // POSIRQ level
-     * f00003 0x00
-     *
-     * f00004 VBLANK ack
-     * f00005
-     * f00006 POSIRQ ack
-     * f00007
-     *
-     * f00008
-     *
-     * f00009 0x62
-     * f0000a 0x0f
-     * f0000b 0x41
-     * f0000c 0x70
-     * f0000d 0x70
-     * f0000e 0x23
-     * f0000f 0x50
-     * f00010 0x00
-     * f00011 0x64
-     * f00012 0x18
-     * f00013 0xe7
-     * f00014 (watchdog)
-     * f00016 0x00
-     * f0001e 0x00
-     * f0001f 0x01
-     */
-	int scanline = (paletteram32[0x1808/4]&0xffff)-32;
-	int irqlevel = GetCPURegister(0x00);
-	cpunum_set_input_line(machine, 0, irqlevel, HOLD_LINE);
-
-	if( scanline<0 )
-		scanline = 0;
-
-	if( scanline < NAMCONB1_VBSTART )
-		timer_set( video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, namconb2_TriggerPOSIRQ );
-} /* namconb2_interrupt */
 static INTERRUPT_GEN( namconb1_interrupt )
 {
 	/**
@@ -385,8 +335,12 @@ static INTERRUPT_GEN( namconb1_interrupt )
      * 40001f 0x00
      */
 	int scanline = (paletteram32[0x1808/4]&0xffff)-32;
-	int irqlevel = GetCPURegister(0x04)&0xf;
-	cpunum_set_input_line(machine, 0, irqlevel, HOLD_LINE);
+
+	if((!vblank_irq_active) && (namconb_cpureg[0x04] & 0xf0)) {
+		cpunum_set_input_line(machine, 0, namconb_cpureg[0x04] & 0xf, ASSERT_LINE);
+		vblank_irq_active = 1;
+	}
+
 	if( scanline<0 )
 	{
 		scanline = 0;
@@ -397,10 +351,197 @@ static INTERRUPT_GEN( namconb1_interrupt )
 	}
 } /* namconb1_interrupt */
 
-static WRITE32_HANDLER( namconb_cpureg_w )
+
+static TIMER_CALLBACK( namconb2_TriggerPOSIRQ )
 {
-	COMBINE_DATA( &namconb_cpureg32[offset] );
-} /* namconb_cpureg_w */
+	video_screen_update_partial(machine->primary_screen, param);
+	pos_irq_active = 1;
+	cpunum_set_input_line(machine, 0, namconb_cpureg[0x02], ASSERT_LINE);
+}
+
+static INTERRUPT_GEN( namconb2_interrupt )
+{
+	/**
+     * f00000 0x01 // VBLANK irq level
+     * f00001 0x00
+     * f00002 0x05 // POSIRQ level
+     * f00003 0x00
+     *
+     * f00004 VBLANK ack
+     * f00005
+     * f00006 POSIRQ ack
+     * f00007
+     *
+     * f00008
+     *
+     * f00009 0x62
+     * f0000a 0x0f
+     * f0000b 0x41
+     * f0000c 0x70
+     * f0000d 0x70
+     * f0000e 0x23
+     * f0000f 0x50
+     * f00010 0x00
+     * f00011 0x64
+     * f00012 0x18
+     * f00013 0xe7
+     * f00014 (watchdog)
+     * f00016 0x00
+     * f0001e 0x00
+     * f0001f 0x01
+     */
+	int scanline = (paletteram32[0x1808/4]&0xffff)-32;
+
+	if((!vblank_irq_active) && namconb_cpureg[0x00]) {
+		cpunum_set_input_line(machine, 0, namconb_cpureg[0x00], ASSERT_LINE);
+		vblank_irq_active = 1;
+	}
+
+	if( scanline<0 )
+		scanline = 0;
+
+	if( scanline < NAMCONB1_VBSTART )
+		timer_set( video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, namconb2_TriggerPOSIRQ );
+} /* namconb2_interrupt */
+
+static void namconb1_cpureg8_w(running_machine *machine, int reg, UINT8 data)
+{
+	UINT8 prev = namconb_cpureg[reg];
+	namconb_cpureg[reg] = data;
+	switch(reg) {
+	case 0x02: // POS IRQ level/enable
+		if(pos_irq_active && (((prev & 0xf) != (data & 0xf)) || !(data & 0xf0))) {
+			cpunum_set_input_line(machine, 0, prev & 0xf, CLEAR_LINE);
+			if(data & 0xf0)
+				cpunum_set_input_line(machine, 0, data & 0xf, ASSERT_LINE);
+			else
+				pos_irq_active = 0;
+		}
+		break;
+
+	case 0x04: // VBLANK IRQ level/enable
+		if(vblank_irq_active && (((prev & 0xf) != (data & 0xf)) || !(data & 0xf0))) {
+			cpunum_set_input_line(machine, 0, prev & 0xf, CLEAR_LINE);
+			if(data & 0xf0)
+				cpunum_set_input_line(machine, 0, data & 0xf, ASSERT_LINE);
+			else
+				vblank_irq_active = 0;
+		}
+		break;
+
+	case 0x07: // POS ack
+		if(pos_irq_active) {
+			cpunum_set_input_line(machine, 0, namconb_cpureg[0x02] & 0xf, CLEAR_LINE);
+			pos_irq_active = 0;
+		}
+		break;
+
+	case 0x09: // VBLANK ack
+		if(vblank_irq_active) {
+			cpunum_set_input_line(machine, 0, namconb_cpureg[0x04] & 0xf, CLEAR_LINE);
+			vblank_irq_active = 0;
+		}
+		break;
+		
+	case 0x16: // Watchdog
+		break;
+		
+	case 0x18: // C75 Control
+		if(data & 1) {
+			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+		} else
+			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+		break;
+	}
+}
+
+static WRITE32_HANDLER( namconb1_cpureg_w )
+{
+	if(mem_mask & 0xff000000)
+		namconb1_cpureg8_w(machine, offset*4, data >> 24);
+	if(mem_mask & 0x00ff0000)
+		namconb1_cpureg8_w(machine, offset*4+1, data >> 16);
+	if(mem_mask & 0x0000ff00)
+		namconb1_cpureg8_w(machine, offset*4+2, data >> 8);
+	if(mem_mask & 0x000000ff)
+		namconb1_cpureg8_w(machine, offset*4+3, data);
+}
+
+
+static void namconb2_cpureg8_w(running_machine *machine, int reg, UINT8 data)
+{
+	UINT8 prev = namconb_cpureg[reg];
+	namconb_cpureg[reg] = data;
+	switch(reg) {
+	case 0x00: // VBLANK IRQ level
+		if(vblank_irq_active && (prev != data)) {
+			cpunum_set_input_line(machine, 0, prev, CLEAR_LINE);
+			if(data)
+				cpunum_set_input_line(machine, 0, data, ASSERT_LINE);
+			else
+				vblank_irq_active = 0;
+		}
+		break;
+
+	case 0x02: // POS IRQ level
+		if(pos_irq_active && (prev != data)) {
+			cpunum_set_input_line(machine, 0, prev, CLEAR_LINE);
+			if(data)
+				cpunum_set_input_line(machine, 0, data, ASSERT_LINE);
+			else
+				pos_irq_active = 0;
+		}
+		break;
+
+	case 0x04: // VBLANK ack
+		if(vblank_irq_active) {
+			cpunum_set_input_line(machine, 0, namconb_cpureg[0x00], CLEAR_LINE);
+			vblank_irq_active = 0;
+		}
+		break;
+
+	case 0x06: // POS ack
+		if(pos_irq_active) {
+			cpunum_set_input_line(machine, 0, namconb_cpureg[0x02], CLEAR_LINE);
+			pos_irq_active = 0;
+		}
+		break;
+
+	case 0x14: // Watchdog
+		break;
+
+	case 0x16: // C75 Control
+		if(data & 1) {
+			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+		} else {
+			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+		}
+		break;
+	}
+}
+
+static WRITE32_HANDLER( namconb2_cpureg_w )
+{
+	if(mem_mask & 0xff000000)
+		namconb2_cpureg8_w(machine, offset*4, data >> 24);
+	if(mem_mask & 0x00ff0000)
+		namconb2_cpureg8_w(machine, offset*4+1, data >> 16);
+	if(mem_mask & 0x0000ff00)
+		namconb2_cpureg8_w(machine, offset*4+2, data >> 8);
+	if(mem_mask & 0x000000ff)
+		namconb2_cpureg8_w(machine, offset*4+3, data);
+}
+
+static READ32_HANDLER(namconb_cpureg_r)
+{
+	return (namconb_cpureg[offset*4] << 24) | (namconb_cpureg[offset*4+1] << 16)
+		| (namconb_cpureg[offset*4+2] << 8) | namconb_cpureg[offset*4+3];
+}
+
 
 /****************************************************************************/
 
@@ -440,6 +581,13 @@ static NVRAM_HANDLER( namconb1 )
 		}
 	}
 } /* namconb1 */
+
+static MACHINE_START(namconb)
+{
+	vblank_irq_active = 0;
+	pos_irq_active = 0;
+	memset(namconb_cpureg, 0, sizeof(namconb_cpureg));
+}
 
 static DRIVER_INIT( nebulray )
 {
@@ -669,30 +817,14 @@ WRITE32_HANDLER( srand_w )
      */
 } /* srand_w */
 
-static WRITE32_HANDLER( sharedram_w )
-{
-	if (offset < 0xb0)
-	{
-		if (mem_mask == 0xffff0000)
-		{
-			namcoc7x_sound_write16((data>>16), offset*2);
-		}
-		else if (mem_mask == 0x0000ffff)
-		{
-			namcoc7x_sound_write16((data&0xffff), (offset*2)+1);
-		}
-	}
-
-	COMBINE_DATA(&namconb1_workram32[offset]);
-}
-
 static ADDRESS_MAP_START( namconb1_am, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x100000, 0x10001f) AM_READ(gunbulet_gun_r)
 	AM_RANGE(0x1c0000, 0x1cffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE(randgen_r,srand_w)
-	AM_RANGE(0x200000, 0x2fffff) AM_READ(SMH_RAM) AM_WRITE(sharedram_w) AM_BASE(&namconb1_workram32) /* shared with MCU) */
-	AM_RANGE(0x400000, 0x40001f) AM_READ(SMH_RAM) AM_WRITE(namconb_cpureg_w) AM_BASE(&namconb_cpureg32)
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(namcoc7x_soundram32_r, namcoc7x_soundram32_w)
+	AM_RANGE(0x208000, 0x2fffff) AM_RAM
+	AM_RANGE(0x400000, 0x40001f) AM_READWRITE(namconb_cpureg_r, namconb1_cpureg_w)
 	AM_RANGE(0x580000, 0x5807ff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&nvmem32)
 	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE(namco_obj32_r,namco_obj32_w)
 	AM_RANGE(0x620000, 0x620007) AM_READWRITE(namco_spritepos32_r,namco_spritepos32_w)
@@ -707,8 +839,9 @@ static ADDRESS_MAP_START( namconb2_am, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x1c0000, 0x1cffff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM)
 	AM_RANGE(0x1e4000, 0x1e4003) AM_READWRITE(randgen_r,srand_w)
-	AM_RANGE(0x200000, 0x2fffff) AM_READ(SMH_RAM) AM_WRITE(sharedram_w) AM_BASE(&namconb1_workram32) /* shared with MCU */
-	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("user1", 0)
+	AM_RANGE(0x200000, 0x207fff) AM_READWRITE(namcoc7x_soundram32_r, namcoc7x_soundram32_w)
+	AM_RANGE(0x208000, 0x2fffff) AM_RAM
+	AM_RANGE(0x400000, 0x4fffff) AM_ROM AM_REGION("data", 0)
 	AM_RANGE(0x600000, 0x61ffff) AM_READWRITE(namco_obj32_r,namco_obj32_w)
 	AM_RANGE(0x620000, 0x620007) AM_READWRITE(namco_spritepos32_r,namco_spritepos32_w)
 	AM_RANGE(0x640000, 0x64000f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) /* unknown xy offset */
@@ -722,7 +855,7 @@ static ADDRESS_MAP_START( namconb2_am, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x980000, 0x98000f) AM_READ(namco_rozbank32_r) AM_WRITE(namco_rozbank32_w)
 	AM_RANGE(0xa00000, 0xa007ff) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&nvmem32)
 	AM_RANGE(0xc00000, 0xc0001f) AM_READ(custom_key_r) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xf00000, 0xf0001f) AM_READ(SMH_RAM) AM_WRITE(SMH_RAM) AM_BASE(&namconb_cpureg32)
+	AM_RANGE(0xf00000, 0xf0001f) AM_READWRITE(namconb_cpureg_r, namconb2_cpureg_w)
 ADDRESS_MAP_END /* namconb2_readmem */
 
 #define MASTER_CLOCK_HZ 48384000
@@ -735,6 +868,7 @@ static MACHINE_DRIVER_START( namconb1 )
 	NAMCO_C7X_MCU(MASTER_CLOCK_HZ/3)
 
 	MDRV_NVRAM_HANDLER(namconb1)
+	MDRV_MACHINE_START(namconb)
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -759,6 +893,7 @@ static MACHINE_DRIVER_START( namconb2 )
 	NAMCO_C7X_MCU(MASTER_CLOCK_HZ/3)
 
 	MDRV_NVRAM_HANDLER(namconb1)
+	MDRV_MACHINE_START(namconb)
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -782,7 +917,7 @@ ROM_START( ptblank )
 	ROM_LOAD32_WORD( "gn2mprlb.15b", 0x00002, 0x80000, CRC(fe2d9425) SHA1(51b166a629cbb522720d63720558816b496b6b76) )
 	ROM_LOAD32_WORD( "gn2mprub.13b", 0x00000, 0x80000, CRC(3bf4985a) SHA1(f559e0d5f55d23d886fe61bd7d5ca556acc7f87c) )
 
-	ROM_REGION16_LE( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x100000, "c7x", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD( "gn1-spr0.bin", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) )
 	NAMCO_C7X_BIOS
 
@@ -810,7 +945,7 @@ ROM_START( gunbulet )
 	ROM_LOAD32_WORD( "gn1-mprl.bin", 0x00002, 0x80000, CRC(f99e309e) SHA1(3fe0ddf756e6849f8effc7672456cbe32f65c98a) )
 	ROM_LOAD32_WORD( "gn1-mpru.bin", 0x00000, 0x80000, CRC(72a4db07) SHA1(8c5e1e51cd961b311d03f7b21f36a5bd5e8e9104) )
 
-	ROM_REGION16_LE( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x100000, "c7x", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD( "gn1-spr0.bin", 0, 0x20000, CRC(6836ba38) SHA1(6ea17ea4bbb59be108e8887acd7871409580732f) )
 	NAMCO_C7X_BIOS
 
@@ -838,7 +973,7 @@ ROM_START( nebulray )
 	ROM_LOAD32_WORD( "nr2-mpru.13b", 0x00000, 0x80000, CRC(049b97cb) SHA1(0e344b29a4d4bdc854fa9849589772df2eeb0a05) )
 	ROM_LOAD32_WORD( "nr2-mprl.15b", 0x00002, 0x80000, CRC(0431b6d4) SHA1(54c96e8ac9e753956c31bdef79d390f1c20e10ff) )
 
-	ROM_REGION16_LE( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x100000, "c7x", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD( "nr1-spr0", 0, 0x20000, CRC(1cc2b44b) SHA1(161f4ed39fabe89d7ee1d539f8b9f08cd0ff3111) )
 	NAMCO_C7X_BIOS
 
@@ -873,7 +1008,7 @@ ROM_START( nebulryj )
 	ROM_LOAD32_WORD( "nr1-mpru", 0x00000, 0x80000, CRC(42ef71f9) SHA1(20e3cb63e1fde293c60c404b378d901d635c4b79) )
 	ROM_LOAD32_WORD( "nr1-mprl", 0x00002, 0x80000, CRC(fae5f62c) SHA1(143d716abbc834aac6270db3bbb89ec71ea3804d) )
 
-	ROM_REGION16_LE( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x100000, "c7x", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD( "nr1-spr0", 0, 0x20000, CRC(1cc2b44b) SHA1(161f4ed39fabe89d7ee1d539f8b9f08cd0ff3111) )
 	NAMCO_C7X_BIOS
 
@@ -908,7 +1043,7 @@ ROM_START( gslgr94u )
 	ROM_LOAD32_WORD( "gse2mprl.bin", 0x00002, 0x80000, CRC(a514349c) SHA1(1f7ec81cd6193410d2f01e6f0f84878561fc8035) )
 	ROM_LOAD32_WORD( "gse2mpru.bin", 0x00000, 0x80000, CRC(b6afd238) SHA1(438a3411ac8ce3d22d5da8c0800738cb8d2994a9) )
 
-	ROM_REGION16_LE( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x100000, "c7x", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD( "gse2spr0.bin", 0, 0x20000, CRC(17e87cfc) SHA1(9cbeadb6dfcb736e8c80eab344f70fc2f58469d6) )
 	NAMCO_C7X_BIOS
 
@@ -1060,7 +1195,7 @@ ROM_START( gslugrsj )
 	ROM_LOAD32_WORD( "gs1mprl.15b", 0x00002, 0x80000, CRC(1e6c3626) SHA1(56abe21884fd87df10996db19c49ce14214d4b73) )
 	ROM_LOAD32_WORD( "gs1mpru.13b", 0x00000, 0x80000, CRC(ef355179) SHA1(0ab0ef4301a318681bb5827d35734a0732b35484) )
 
-	ROM_REGION16_LE( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x100000, "c7x", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD( "gs1spr0.5b", 0, 0x80000, CRC(561ea20f) SHA1(adac6b77effc3a82079a9b228bafca0fcef72ba5) )
 	NAMCO_C7X_BIOS
 
@@ -1086,7 +1221,7 @@ ROM_START( sws95 )
 	ROM_LOAD32_WORD( "ss51mprl.bin", 0x00002, 0x80000, CRC(c9e0107d) SHA1(0f10582416023a86ea1ef2679f3f06016c086e08) )
 	ROM_LOAD32_WORD( "ss51mpru.bin", 0x00000, 0x80000, CRC(0d93d261) SHA1(5edef26e2c86dbc09727d910af92747d022e4fed) )
 
-	ROM_REGION16_LE( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x100000, "c7x", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD( "ss51spr0.bin", 0, 0x80000, CRC(71cb12f5) SHA1(6e13bd16a5ba14d6e47a21875db3663ada3c06a5) )
 	NAMCO_C7X_BIOS
 
@@ -1113,7 +1248,7 @@ ROM_START( sws96 )
 	ROM_LOAD32_WORD( "ss61mprl.bin", 0x00002, 0x80000, CRC(06f55e73) SHA1(6be26f8a2ef600bf07c580f210d7b265ac464002) )
 	ROM_LOAD32_WORD( "ss61mpru.bin", 0x00000, 0x80000, CRC(0abdbb83) SHA1(67e8b712291f9bcf2c3a52fbc451fad54679cab8) )
 
-	ROM_REGION16_LE( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x100000, "c7x", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD( "ss61spr0.bin", 0, 0x80000, CRC(71cb12f5) SHA1(6e13bd16a5ba14d6e47a21875db3663ada3c06a5) )
 	NAMCO_C7X_BIOS
 
@@ -1139,7 +1274,7 @@ ROM_START( sws97 )
 	ROM_LOAD32_WORD( "ss71mprl.bin", 0x00002, 0x80000, CRC(bd60b50e) SHA1(9e00bacd506182ab2af2c0efdd5cc401b3e46485) )
 	ROM_LOAD32_WORD( "ss71mpru.bin", 0x00000, 0x80000, CRC(3444f5a8) SHA1(8d0f35b3ba8f65dbc67c3b2d273833227a8b8b2a) )
 
-	ROM_REGION16_LE( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x100000, "c7x", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD( "ss71spr0.bin", 0, 0x80000, CRC(71cb12f5) SHA1(6e13bd16a5ba14d6e47a21875db3663ada3c06a5) )
 	NAMCO_C7X_BIOS
 
@@ -1165,7 +1300,7 @@ ROM_START( vshoot )
 	ROM_LOAD32_WORD( "vsj1mprl.15b", 0x00002, 0x80000, CRC(83a60d92) SHA1(c3db0c79f772a79418914353a3d6ecc4883ea54e) )
 	ROM_LOAD32_WORD( "vsj1mpru.13b", 0x00000, 0x80000, CRC(c63eb92d) SHA1(f93bd4b91daee645677955020dc8df14dc9bfd27) )
 
-	ROM_REGION16_LE( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x100000, "c7x", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD( "vsj1spr0.5b", 0, 0x80000, CRC(b0c71aa6) SHA1(a94fae02b46a645ff728d2f98827c85ff155892b) )
 	NAMCO_C7X_BIOS
 
@@ -1351,7 +1486,7 @@ ROM_START( outfxies )
 	ROM_LOAD32_WORD( "ou2mprl.11c", 0x00002, 0x80000, CRC(f414a32e) SHA1(9733ab087cfde1b8fb5b676d8a2eb5325ebdbb56) )
 	ROM_LOAD32_WORD( "ou2mpru.11d", 0x00000, 0x80000, CRC(ab5083fb) SHA1(cb2e7a4838c2b80057edb83ea63116bccb1394d3) )
 
-	ROM_REGION16_LE( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x100000, "c7x", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD( "ou1spr0.5b", 0, 0x80000, CRC(60cee566) SHA1(2f3b96793816d90011586e0f9f71c58b636b6d4c) )
 	NAMCO_C7X_BIOS
 
@@ -1384,7 +1519,7 @@ ROM_START( outfxies )
 	ROM_REGION( 0x200000, NAMCONB1_TILEGFXREGION, ROMREGION_DISPOSE )
 	ROM_LOAD( "ou1-scr0", 0x000000, 0x200000, CRC(b3b3f2e9) SHA1(541bd7e9ba12aff4ec4033bd9c6bb19476acb3c4) )
 
-	ROM_REGION32_BE( 0x100000, "user1", 0 )
+	ROM_REGION32_BE( 0x100000, "data", 0 )
 	ROM_LOAD16_WORD_SWAP( "ou1dat0.20a", 0x00000, 0x80000, CRC(1a49aead) SHA1(df243aff1a6fb5bcf4d5d883c5af2374a4aff477) )
 	ROM_LOAD16_WORD_SWAP( "ou1dat1.20b", 0x80000, 0x80000, CRC(63bb119d) SHA1(d4c2820243b84c3f5cdf7f9e66bb50f53d0efed2) )
 ROM_END
@@ -1394,7 +1529,7 @@ ROM_START( outfxesj )
 	ROM_LOAD32_WORD( "ou1-mprl.11c", 0x00002, 0x80000, CRC(d3b9e530) SHA1(3f5fe5eea817a23dfe42e76f32912ce94d4c49c9) )
 	ROM_LOAD32_WORD( "ou1-mpru.11d", 0x00000, 0x80000, CRC(d98308fb) SHA1(fdefeebf56464a20e3aaefd88df4eee9f7b5c4f3) )
 
-	ROM_REGION16_LE( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x100000, "c7x", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD( "ou1spr0.5b", 0, 0x80000, CRC(60cee566) SHA1(2f3b96793816d90011586e0f9f71c58b636b6d4c) )
 	NAMCO_C7X_BIOS
 
@@ -1427,7 +1562,7 @@ ROM_START( outfxesj )
 	ROM_REGION( 0x200000, NAMCONB1_TILEGFXREGION, ROMREGION_DISPOSE )
 	ROM_LOAD( "ou1-scr0", 0x000000, 0x200000, CRC(b3b3f2e9) SHA1(541bd7e9ba12aff4ec4033bd9c6bb19476acb3c4) )
 
-	ROM_REGION32_BE( 0x100000, "user1", 0 )
+	ROM_REGION32_BE( 0x100000, "data", 0 )
 	ROM_LOAD16_WORD_SWAP( "ou1dat0.20a", 0x00000, 0x80000, CRC(1a49aead) SHA1(df243aff1a6fb5bcf4d5d883c5af2374a4aff477) )
 	ROM_LOAD16_WORD_SWAP( "ou1dat1.20b", 0x80000, 0x80000, CRC(63bb119d) SHA1(d4c2820243b84c3f5cdf7f9e66bb50f53d0efed2) )
 ROM_END
@@ -1438,7 +1573,7 @@ ROM_START( machbrkr )
 	ROM_LOAD32_WORD( "mb1_mprl.11c", 0x00002, 0x80000, CRC(86cf0644) SHA1(07eeadda1d94c9be2f882edb6f2eb0b98292e500) )
 	ROM_LOAD32_WORD( "mb1_mpru.11d", 0x00000, 0x80000, CRC(fb1ff916) SHA1(e0ba96c1f26a60f87d8050e582e164d91e132183) )
 
-	ROM_REGION16_LE( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION16_LE( 0x100000, "c7x", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD( "mb1_spr0.5b", 0, 0x80000, CRC(d10f6272) SHA1(cb99e06e050dbf86998ea51ef2ca130b2acfb2f6) )
 	NAMCO_C7X_BIOS
 
@@ -1475,7 +1610,7 @@ ROM_START( machbrkr )
 	ROM_LOAD( "mb1_scr1.1c", 0x200000, 0x200000, CRC(fb2b1939) SHA1(bf9d7b93205e7012aa86693f3d2ba8f4d729bc97) )
 	ROM_LOAD( "mb1_scr2.1b", 0x400000, 0x200000, CRC(0e6097a5) SHA1(b6c64b3e34ba913138b6b7c3d99d2be4f3ceda08) )
 
-	ROM_REGION32_BE( 0x100000, "user1", 0 )
+	ROM_REGION32_BE( 0x100000, "data", 0 )
 	ROM_LOAD16_WORD_SWAP( "mb1_dat0.20a", 0x00000, 0x80000, CRC(fb2e3cd1) SHA1(019b1d645a07619036522f42e0b9a537f39b6b93) )
 ROM_END
 

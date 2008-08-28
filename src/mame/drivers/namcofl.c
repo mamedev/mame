@@ -442,7 +442,7 @@ ROM_START( speedrcr )
 	ROM_REGION( 0x100000, NAMCONB1_TILEMASKREGION, 0 ) // "SSHAPE" (mask for other tiles?)
 	ROM_LOAD("se1_ssh.18u",    0x000000, 0x100000, CRC(7a8e0bda) SHA1(f6a508d90274d0205fec0c46f5f783a2715c0c6e) )
 
-	ROM_REGION( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION( 0x100000, "c7x", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD("se1_spr.21l",   0x000000,  0x80000, CRC(850a27ac) SHA1(7d5db840ec67659a1f2e69a62cdb03ce6ee0b47b) )
 	NAMCO_C7X_BIOS
 
@@ -479,7 +479,7 @@ ROM_START( finalapb )
 	ROM_REGION( 0x80000, NAMCONB1_TILEMASKREGION, 0 ) // "SSHAPE" (mask for other tiles?)
 	ROM_LOAD("flr1ssh.18u",    0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
-	ROM_REGION( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION( 0x100000, "c7x", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD("flr1spr.21l",   0x000000,  0x20000, CRC(69bb0f5e) SHA1(6831d618de42a165e508ad37db594d3aa290c530) )
 	NAMCO_C7X_BIOS
 
@@ -516,7 +516,7 @@ ROM_START( finalapo )
 	ROM_REGION( 0x80000, NAMCONB1_TILEMASKREGION, 0 ) // "SSHAPE" (mask for other tiles?)
 	ROM_LOAD("flr1ssh.18u",    0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
-	ROM_REGION( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION( 0x100000, "c7x", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD("flr1spr.21l",   0x000000,  0x20000, CRC(69bb0f5e) SHA1(6831d618de42a165e508ad37db594d3aa290c530) )
 	NAMCO_C7X_BIOS
 
@@ -553,7 +553,7 @@ ROM_START( finalapr )
 	ROM_REGION( 0x80000, NAMCONB1_TILEMASKREGION, 0 ) // "SSHAPE" (mask for other tiles?)
 	ROM_LOAD("flr1ssh.18u",    0x000000, 0x080000, CRC(f70cb2bf) SHA1(dbddda822287783a43415172b81d0382a8ac43d8) )
 
-	ROM_REGION( 0x100000, "user4", 0 ) /* sound data and MCU BIOS */
+	ROM_REGION( 0x100000, "c7x", 0 ) /* sound data and MCU BIOS */
 	ROM_LOAD("flr1spr.21l",   0x000000,  0x20000, CRC(69bb0f5e) SHA1(6831d618de42a165e508ad37db594d3aa290c530) )
 	NAMCO_C7X_BIOS
 
