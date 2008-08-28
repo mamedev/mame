@@ -84,11 +84,6 @@ WRITE16_HANDLER( stlforce_mhigh_videoram_w );
 WRITE16_HANDLER( stlforce_mlow_videoram_w );
 WRITE16_HANDLER( stlforce_bg_videoram_w );
 
-static READ16_HANDLER( stlforce_input_port_1_r )
-{
-	return (input_port_read(machine, "SYSTEM") & ~0x40) | (eeprom_read_bit() << 6);
-}
-
 static WRITE16_HANDLER( eeprom_w )
 {
 	if( ACCESSING_BITS_0_7 )
@@ -120,7 +115,7 @@ static ADDRESS_MAP_START( stlforce_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x108000, 0x108fff) AM_RAM AM_BASE(&stlforce_spriteram)
 	AM_RANGE(0x109000, 0x11ffff) AM_RAM
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("INPUT")
-	AM_RANGE(0x400002, 0x400003) AM_READ(stlforce_input_port_1_r)
+	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x400010, 0x400011) AM_WRITE(eeprom_w)
 	AM_RANGE(0x400012, 0x400013) AM_WRITE(oki_bank_w)
 	AM_RANGE(0x40001e, 0x40001f) AM_WRITENOP // sprites buffer commands
@@ -153,7 +148,7 @@ static INPUT_PORTS_START( stlforce )
 	PORT_SERVICE_NO_TOGGLE( 0x0008, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_VBLANK )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_SPECIAL ) /* eeprom */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL) /* eeprom */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END

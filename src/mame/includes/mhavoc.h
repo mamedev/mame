@@ -31,10 +31,12 @@ READ8_HANDLER( mhavoc_gamma_r );
 WRITE8_HANDLER( mhavoc_ram_banksel_w );
 WRITE8_HANDLER( mhavoc_rom_banksel_w );
 
-READ8_HANDLER( mhavoc_port_0_r );
-READ8_HANDLER( alphaone_port_0_r );
-READ8_HANDLER( mhavoc_port_1_r );
-READ8_HANDLER( mhavoc_port_1_sp_r );
+CUSTOM_INPUT( tms5220_r );
+CUSTOM_INPUT( gamma_rcvd_r );
+CUSTOM_INPUT( gamma_xmtd_r );
+CUSTOM_INPUT( alpha_rcvd_r );
+CUSTOM_INPUT( alpha_xmtd_r );
+CUSTOM_INPUT( mhavoc_bit67_r );
 
 WRITE8_HANDLER( mhavoc_out_0_w );
 WRITE8_HANDLER( alphaone_out_0_w );

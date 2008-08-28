@@ -134,7 +134,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff4800, 0xff4fff) AM_WRITE(skullxbo_mobwr_w)
 	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE(atarigen_eeprom_w) AM_BASE(&atarigen_eeprom) AM_SIZE(&atarigen_eeprom_size)
 	AM_RANGE(0xff5000, 0xff5001) AM_READ(atarigen_sound_r)
-	AM_RANGE(0xff5800, 0xff5801) AM_READ(input_port_0_word_r)
+	AM_RANGE(0xff5800, 0xff5801) AM_READ_PORT("FF5800")
 	AM_RANGE(0xff5802, 0xff5803) AM_READ(special_port1_r)
 	AM_RANGE(0xff6000, 0xff6fff) AM_READ(atarigen_eeprom_r)
 	AM_RANGE(0xff8000, 0xff9fff) AM_RAM_WRITE(atarigen_playfield_latched_lsb_w) AM_BASE(&atarigen_playfield)
@@ -154,7 +154,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static INPUT_PORTS_START( skullxbo )
-	PORT_START("FF5800")      /* ff5800 */
+	PORT_START("FF5800")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -165,7 +165,7 @@ static INPUT_PORTS_START( skullxbo )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
-	PORT_START("FF5802")      /* ff5802 */
+	PORT_START("FF5802")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNUSED )	/* HBLANK */
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_VBLANK )

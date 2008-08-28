@@ -97,11 +97,11 @@ static READ8_HANDLER( suprgolf_random )
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(input_port_0_r) // Player 1 controls
-	AM_RANGE(0x01, 0x01) AM_READ(input_port_1_r) // Player 2 controls
-	AM_RANGE(0x02, 0x02) AM_READ(input_port_2_r) // ??
-	AM_RANGE(0x04, 0x04) AM_READ(input_port_3_r) // extra controls + coin + test
-	AM_RANGE(0x05, 0x05) AM_READ(input_port_4_r) AM_WRITE(rom_bank_select_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") // ??
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN4") AM_WRITE(rom_bank_select_w)
 	AM_RANGE(0x06, 0x06) AM_READ(suprgolf_random) // game locks up or crashes? if this doesn't return right values?
 
 	AM_RANGE(0x08, 0x08) AM_READ(ym2203_status_port_0_r) AM_WRITE(ym2203_control_port_0_w)
@@ -109,7 +109,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
  ADDRESS_MAP_END
 
 static INPUT_PORTS_START( suprgolf )
-	PORT_START("P1")	/* PLAY1 */
+	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -119,7 +119,7 @@ static INPUT_PORTS_START( suprgolf )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)			/* CNT */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)			/* SEL */
 
-	PORT_START("P2")	/* PLAY2 */
+	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -129,7 +129,7 @@ static INPUT_PORTS_START( suprgolf )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)			/* CNT */
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)			/* SEL */
 
-	PORT_START("IN2")	/* 8bit */
+	PORT_START("IN2")
 	PORT_DIPNAME( 0x01, 0x01, "2" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -155,7 +155,7 @@ static INPUT_PORTS_START( suprgolf )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("SYSTEM")	/* 8bit */
+	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )               			/* 1P */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)			/* POW */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )  	                	/* 1P */
@@ -169,7 +169,7 @@ static INPUT_PORTS_START( suprgolf )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("IN4")	/* 8bit */
+	PORT_START("IN4")
 	PORT_DIPNAME( 0x01, 0x01, "4" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -195,7 +195,7 @@ static INPUT_PORTS_START( suprgolf )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW0")	/* 8bit */
+	PORT_START("DSW0")
 	PORT_DIPNAME( 0x01, 0x01, "DSW0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -221,7 +221,7 @@ static INPUT_PORTS_START( suprgolf )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW1")	/* 8bit */
+	PORT_START("DSW1")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x02, 0x02, "DSW1" )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )

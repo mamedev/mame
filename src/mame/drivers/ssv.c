@@ -420,22 +420,22 @@ static WRITE16_HANDLER( dsp_w )
 static READ16_HANDLER( fake_r )   {   return ssv_scroll[offset];  }
 #endif
 
-#define SSV_READMEM( _ROM  )										\
+#define SSV_READMEM( _ROM  )														\
 	AM_RANGE(0x000000, 0x00ffff) AM_READ(SMH_RAM				)	/*  RAM     */	\
 	AM_RANGE(0x100000, 0x13ffff) AM_READ(SMH_RAM				)	/*  Sprites */	\
 	AM_RANGE(0x140000, 0x15ffff) AM_READ(SMH_RAM				)	/*  Palette */	\
 	AM_RANGE(0x160000, 0x17ffff) AM_READ(SMH_RAM				)	/*          */	\
 	AM_RANGE(0x1c0000, 0x1c0001) AM_READ(ssv_vblank_r			)	/*  Vblank? */	\
 /**/AM_RANGE(0x1c0002, 0x1c007f) AM_READ(SMH_RAM				)	/*  Scroll  */	\
-	AM_RANGE(0x210002, 0x210003) AM_READ(input_port_0_word_r	)	/*  DSW     */	\
-	AM_RANGE(0x210004, 0x210005) AM_READ(input_port_1_word_r	)	/*  DSW     */	\
-	AM_RANGE(0x210008, 0x210009) AM_READ(input_port_2_word_r	)	/*  P1      */	\
-	AM_RANGE(0x21000a, 0x21000b) AM_READ(input_port_3_word_r	)	/*  P2      */	\
-	AM_RANGE(0x21000c, 0x21000d) AM_READ(input_port_4_word_r	)	/*  Coins   */	\
+	AM_RANGE(0x210002, 0x210003) AM_READ_PORT("DSW1")								\
+	AM_RANGE(0x210004, 0x210005) AM_READ_PORT("DSW2")								\
+	AM_RANGE(0x210008, 0x210009) AM_READ_PORT("P1")									\
+	AM_RANGE(0x21000a, 0x21000b) AM_READ_PORT("P2")									\
+	AM_RANGE(0x21000c, 0x21000d) AM_READ_PORT("SYSTEM")								\
 	AM_RANGE(0x21000e, 0x21000f) AM_READ(SMH_NOP				)	/*          */	\
 	AM_RANGE(0x300000, 0x30007f) AM_READ(es5506_data_0_word_r	)	/*  Sound   */	\
-	AM_RANGE(0x482000, 0x482fff) AM_RAM_WRITE(dsp_w) AM_BASE(&dsp_ram)   \
-	AM_RANGE(_ROM, 0xffffff) AM_READ(SMH_BANK1			)	/*  ROM     */	    \
+	AM_RANGE(0x482000, 0x482fff) AM_RAM_WRITE(dsp_w) AM_BASE(&dsp_ram)				\
+	AM_RANGE(_ROM, 0xffffff) AM_READ(SMH_BANK1					)	/*  ROM  */	    \
 //AM_RANGE(0x990000, 0x99007f) AM_READ(fake_r)
 
 #define SSV_WRITEMEM														                                \

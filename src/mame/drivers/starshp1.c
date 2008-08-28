@@ -64,33 +64,33 @@ static WRITE8_HANDLER( starshp1_collision_reset_w )
 }
 
 
-static READ8_HANDLER( starshp1_port_1_r )
+static CUSTOM_INPUT( starshp1_analog_r )
 {
 	int val = 0;
 
 	switch (starshp1_analog_in_select)
 	{
 	case 0:
-		val = input_port_read(machine, "STICKY");
+		val = input_port_read(field->port->machine, "STICKY");
 		break;
 	case 1:
-		val = input_port_read(machine, "STICKX");
+		val = input_port_read(field->port->machine, "STICKX");
 		break;
 	case 2:
 		val = 0x20; /* DAC feedback, not used */
 		break;
 	case 3:
-		val = input_port_read(machine, "PLAYTIME");
+		val = input_port_read(field->port->machine, "PLAYTIME");
 		break;
 	}
 
-	return (val & 0x3f) | input_port_read(machine, "VBLANK");
+	return val & 0x3f;
 }
 
 
-static READ8_HANDLER( starshp1_port_2_r )
+static CUSTOM_INPUT( collision_latch_r )
 {
-	return input_port_read(machine, "COINAGE") | (starshp1_collision_latch & 0x0f);
+	return starshp1_collision_latch & 0x0f;
 }
 
 
@@ -166,9 +166,9 @@ static WRITE8_HANDLER( starshp1_misc_w )
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_READ(SMH_RAM) AM_MIRROR(0x100)
 	AM_RANGE(0x2c00, 0x3fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
-	AM_RANGE(0xb000, 0xb000) AM_READ(starshp1_port_1_r)
-	AM_RANGE(0xc400, 0xc400) AM_READ(starshp1_port_2_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("VBLANK")
+	AM_RANGE(0xc400, 0xc400) AM_READ_PORT("COINAGE")
 	AM_RANGE(0xd800, 0xd800) AM_READ(starshp1_rng_r)
 	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
@@ -205,16 +205,16 @@ static INPUT_PORTS_START( starshp1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("VBLANK")
-	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_UNUSED ) /* analog in */
+	PORT_BIT( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(starshp1_analog_r, NULL)	/* analog in */
 	PORT_SERVICE( 0x40, IP_ACTIVE_LOW )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 
 	PORT_START("COINAGE")
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_UNUSED ) /* collision latch */
-	PORT_DIPNAME( 0x70, 0x20, DEF_STR( Coinage ))
-	PORT_DIPSETTING(	0x10, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(	0x20, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(	0x40, DEF_STR( 1C_2C ))
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(collision_latch_r, NULL)	/* collision latch */
+	PORT_DIPNAME( 0x70, 0x20, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(	0x10, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(	0x20, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(	0x40, DEF_STR( 1C_2C ) )
 	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_UNUSED ) /* ground */
 
 	PORT_START("PLAYTIME")

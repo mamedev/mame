@@ -168,11 +168,11 @@ static ADDRESS_MAP_START( srmp5_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_RAM //maybe 0 - 2fffff ?
 	AM_RANGE(0x002f0000, 0x002f7fff) AM_RAM
 	AM_RANGE(0x01000000, 0x01000003) AM_WRITE(SMH_RAM)  // 0xaa .. watchdog ?
-	AM_RANGE(0x01800004, 0x01800007) AM_READ(input_port_0_dword_r)
-	AM_RANGE(0x01800008, 0x0180000b) AM_READ(input_port_1_dword_r)
+	AM_RANGE(0x01800004, 0x01800007) AM_READ_PORT("IN0")
+	AM_RANGE(0x01800008, 0x0180000b) AM_READ_PORT("IN1")
 	AM_RANGE(0x0180000c, 0x0180000f) AM_WRITE(bank_w)
-	AM_RANGE(0x01800010, 0x01800013) AM_READ(input_port_2_dword_r) //multiplexed controls (selected by writes to 1c)
-	AM_RANGE(0x01800014, 0x01800017) AM_READ(input_port_3_dword_r)
+	AM_RANGE(0x01800010, 0x01800013) AM_READ_PORT("IN2") //multiplexed controls (selected by writes to 1c)
+	AM_RANGE(0x01800014, 0x01800017) AM_READ_PORT("IN3")
 	AM_RANGE(0x0180001c, 0x0180001f) AM_WRITE(SMH_RAM)//c1 c2 c4 c8 => mahjong inputs (at $10) - bits 0-3
 	AM_RANGE(0x01800200, 0x0180020f) AM_RAM  //sound related ? only few writes after boot
 	AM_RANGE(0x01a00000, 0x01bfffff) AM_READ(data_r)

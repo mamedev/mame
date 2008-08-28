@@ -1152,7 +1152,7 @@ static ym2610_interface ym2610_config =
 
 
 #define STANDARD_IN1														\
-	PORT_START("IN1")													\
+	PORT_START("IN1")														\
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )							\
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)		\
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)		\
@@ -1165,30 +1165,30 @@ static ym2610_interface ym2610_config =
 
 
 #define STANDARD_IN2																				\
-	PORT_START("IN2")																			\
+	PORT_START("IN2")																				\
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )													\
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )   												\
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Next Game") PORT_CODE(KEYCODE_7)		\
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_START2 )   												\
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Previous Game") PORT_CODE(KEYCODE_8)	\
-	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_memcard_status, 0)				\
+	PORT_BIT( 0x7000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_memcard_status, NULL)			\
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 
 #define STANDARD_IN3																				\
-	PORT_START("IN3")																			\
+	PORT_START("IN3")																				\
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )													\
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )													\
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_SERVICE1 )													\
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* having this ACTIVE_HIGH causes you to start with 2 credits using USA bios roms */	\
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* having this ACTIVE_HIGH causes you to start with 2 credits using USA bios roms */	\
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_SPECIAL ) /* what is this? */ 								\
-	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_calendar_status, 0)				\
-	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_audio_result, 0)
+	PORT_BIT( 0x00c0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_calendar_status, NULL)			\
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(get_audio_result, NULL)
 
 
 #define STANDARD_IN4																			\
-	PORT_START("IN4")																		\
+	PORT_START("IN4")																			\
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\
 	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_UNKNOWN )												\

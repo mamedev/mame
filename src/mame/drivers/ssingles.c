@@ -144,10 +144,10 @@ static WRITE8_HANDLER(c001_w)
 	prot_data^=data^0x11;
 }
 
-static READ8_HANDLER(controls_r)
+static CUSTOM_INPUT(controls_r)
 {
-	int data=7;
-	switch(input_port_read(machine, "IN1"))		//multiplexed
+	int data = 7;
+	switch(input_port_read(field->port->machine, "EXTRA"))		//multiplexed
 	{
 		case 0x01: data = 1; break;
 		case 0x02: data = 2; break;
@@ -157,7 +157,8 @@ static READ8_HANDLER(controls_r)
 		case 0x20: data = 6; break;
 		case 0x40: data = 0; break;
 	}
-	return (input_port_read(machine, "IN0") & (~0x1c)) | (data << 2);
+
+	return data;
 }
 
 static ADDRESS_MAP_START( ssingles_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -179,7 +180,7 @@ static ADDRESS_MAP_START( ssingles_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0a, 0x0a) AM_WRITE(ay8910_write_port_1_w)
 	AM_RANGE(0x16, 0x16) AM_READ_PORT("DSW0")
 	AM_RANGE(0x18, 0x18) AM_READ_PORT("DSW1")
-	AM_RANGE(0x1c, 0x1c) AM_READ(controls_r)
+	AM_RANGE(0x1c, 0x1c) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x1a, 0x1a) AM_WRITENOP //video/crt related
 	AM_RANGE(0xfe, 0xfe) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0xff, 0xff) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
@@ -187,14 +188,15 @@ static ADDRESS_MAP_START( ssingles_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ssingles )
-	PORT_START("IN0")
+	PORT_START("INPUTS")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN ) //must be LOW
+	PORT_BIT( 0x1c, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(controls_r, NULL)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON4 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON3 )
 
-	PORT_START("IN1")
+	PORT_START("EXTRA")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )

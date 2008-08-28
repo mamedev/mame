@@ -13,7 +13,6 @@ INTERRUPT_GEN( asterock_interrupt );
 INTERRUPT_GEN( llander_interrupt );
 
 READ8_HANDLER( asteroid_IN0_r );
-READ8_HANDLER( asteroib_IN0_r );
 READ8_HANDLER( asterock_IN0_r );
 READ8_HANDLER( asteroid_IN1_r );
 READ8_HANDLER( asteroid_DSW1_r );
@@ -23,8 +22,6 @@ WRITE8_HANDLER( astdelux_bank_switch_w );
 WRITE8_HANDLER( astdelux_led_w );
 
 MACHINE_RESET( asteroid );
-
-READ8_HANDLER( llander_IN0_r );
 
 extern UINT8 *asteroid_ram1, *asteroid_ram2;
 

@@ -265,7 +265,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( llander_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x1f00)
-	AM_RANGE(0x2000, 0x2000) AM_READ(llander_IN0_r)		/* IN0 */
+	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("IN0")
 	AM_RANGE(0x2400, 0x2407) AM_READ(asteroid_IN1_r)	/* IN1 */
 	AM_RANGE(0x2800, 0x2803) AM_READ(asteroid_DSW1_r)	/* DSW1 */
 	AM_RANGE(0x2c00, 0x2c00) AM_READ_PORT("PADDLE")
@@ -287,13 +287,17 @@ ADDRESS_MAP_END
  *
  *************************************/
 
+static CUSTOM_INPUT( clock_r )
+{
+	return (cpunum_gettotalcycles(0) & 0x100) ? 1 : 0;
+}
+
 static INPUT_PORTS_START( asteroid )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	/* Bit 2 and 3 are handled in the machine dependent part. */
 	/* Bit 2 is the 3 KHz source and Bit 3 the VG_HALT bit    */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(clock_r, NULL)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)		/* hyperspace */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1)	/* fire */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
@@ -346,8 +350,8 @@ static INPUT_PORTS_START( asteroib )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	/* Bit 7 is VG_HALT, handled in the machine dependent part */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	/* Bit 7 is VG_HALT */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
 
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START1 )
@@ -371,8 +375,10 @@ static INPUT_PORTS_START( asterock )
 	PORT_INCLUDE( asteroid )
 
 	PORT_MODIFY("IN0")
-	/* Bit 0 is VG_HALT, handled in the machine dependent part */
-	/* Bit 2 is the 3 KHz source */
+	/* Bit 0 is VG_HALT and Bit 2 is the 3 KHz source */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(clock_r, NULL)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)		/* hyperspace */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1)		/* fire */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
@@ -411,10 +417,9 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( astdelux )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED ) /* According to schematics */
-	/* Bit 2 and 3 are handled in the machine dependent part. */
 	/* Bit 2 is the 3 KHz source and Bit 3 the VG_HALT bit    */
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(clock_r, NULL)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_CODE(KEYCODE_SPACE) PORT_CODE(JOYCODE_BUTTON3)		/* hyperspace */
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_CODE(KEYCODE_LCONTROL) PORT_CODE(JOYCODE_BUTTON1)	/* fire */
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
@@ -494,12 +499,13 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( llander )
 	PORT_START("IN0")
-	/* Bit 0 is VG_HALT, handled in the machine dependent part */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	/* Bit 0 is VG_HALT */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
 	PORT_SERVICE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
 	/* Of the rest, Bit 6 is the 3KHz source. 3,4 and 5 are unknown */
-	PORT_BIT( 0x78, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x38, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(clock_r, NULL)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diagnostic Step") PORT_CODE(KEYCODE_F1)
 
 	PORT_START("IN1")
@@ -873,7 +879,7 @@ ROM_END
 
 static DRIVER_INIT( asteroib )
 {
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2000, 0, 0, asteroib_IN0_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2000, 0, 0, input_port_read_handler8(machine->portconfig, "IN0"));
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2003, 0x2003, 0, 0, input_port_read_handler8(machine->portconfig, "HS"));
 }
 

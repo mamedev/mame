@@ -159,10 +159,10 @@ static ADDRESS_MAP_START( skyarmy_readmem, ADDRESS_SPACE_PROGRAM, 8 )
         AM_RANGE(0x8800, 0x93FF) AM_READ(SMH_RAM) /* Video RAM */
         AM_RANGE(0x9800, 0x983F) AM_READ(SMH_RAM) /* Sprites */
         AM_RANGE(0x9840, 0x985F) AM_READ(skyarmy_scrollram_r) /* Sroll RAM */
-        AM_RANGE(0xA000, 0xA000) AM_READ(input_port_0_r)
-        AM_RANGE(0xA001, 0xA001) AM_READ(input_port_1_r)
-        AM_RANGE(0xA002, 0xA002) AM_READ(input_port_2_r)
-        AM_RANGE(0xA003, 0xA003) AM_READ(input_port_3_r)
+        AM_RANGE(0xA000, 0xA000) AM_READ_PORT("DSW")
+        AM_RANGE(0xA001, 0xA001) AM_READ_PORT("P1")
+        AM_RANGE(0xA002, 0xA002) AM_READ_PORT("P2")
+        AM_RANGE(0xA003, 0xA003) AM_READ_PORT("SYSTEM")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( skyarmy_writemem, ADDRESS_SPACE_PROGRAM, 8 )

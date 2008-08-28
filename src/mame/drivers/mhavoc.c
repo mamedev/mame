@@ -253,22 +253,22 @@ static ADDRESS_MAP_START( alpha_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0200, 0x07ff) AM_RAMBANK(1) AM_BASE(&mhavoc_zram0)
 	AM_RANGE(0x0800, 0x09ff) AM_RAM
 	AM_RANGE(0x0a00, 0x0fff) AM_RAMBANK(1) AM_BASE(&mhavoc_zram1)
-	AM_RANGE(0x1000, 0x1000) AM_READ(mhavoc_gamma_r)          /* Gamma Read Port */
-	AM_RANGE(0x1200, 0x1200) AM_READWRITE(mhavoc_port_0_r, SMH_NOP) /* Alpha Input Port 0 */
-	AM_RANGE(0x1400, 0x141f) AM_RAM AM_BASE(&mhavoc_colorram)        /* ColorRAM */
-	AM_RANGE(0x1600, 0x1600) AM_WRITE(mhavoc_out_0_w)         /* Control Signals */
-	AM_RANGE(0x1640, 0x1640) AM_WRITE(avgdvg_go_w)		      /* Vector Generator GO */
-	AM_RANGE(0x1680, 0x1680) AM_WRITE(watchdog_reset_w)	      /* Watchdog Clear */
-	AM_RANGE(0x16c0, 0x16c0) AM_WRITE(avgdvg_reset_w)		  /* Vector Generator Reset */
-	AM_RANGE(0x1700, 0x1700) AM_WRITE(mhavoc_alpha_irq_ack_w) /* IRQ ack */
-	AM_RANGE(0x1740, 0x1740) AM_WRITE(mhavoc_rom_banksel_w)   /* Program ROM Page Select */
-	AM_RANGE(0x1780, 0x1780) AM_WRITE(mhavoc_ram_banksel_w)   /* Program RAM Page Select */
-	AM_RANGE(0x17c0, 0x17c0) AM_WRITE(mhavoc_gamma_w)		  /* Gamma Communication Write Port */
-	AM_RANGE(0x1800, 0x1fff) AM_RAM			                  /* Shared Beta Ram */
-	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(2)			          /* Paged Program ROM (32K) */
-	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("alpha", 0x4000)/* Vector Generator RAM */
-	AM_RANGE(0x5000, 0x7fff) AM_ROM			                  /* Vector ROM */
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)			      /* Program ROM (32K) */
+	AM_RANGE(0x1000, 0x1000) AM_READ(mhavoc_gamma_r)			/* Gamma Read Port */
+	AM_RANGE(0x1200, 0x1200) AM_READ_PORT("IN0") AM_WRITENOP	/* Alpha Input Port 0 */
+	AM_RANGE(0x1400, 0x141f) AM_RAM AM_BASE(&mhavoc_colorram)	/* ColorRAM */
+	AM_RANGE(0x1600, 0x1600) AM_WRITE(mhavoc_out_0_w)			/* Control Signals */
+	AM_RANGE(0x1640, 0x1640) AM_WRITE(avgdvg_go_w)				/* Vector Generator GO */
+	AM_RANGE(0x1680, 0x1680) AM_WRITE(watchdog_reset_w)			/* Watchdog Clear */
+	AM_RANGE(0x16c0, 0x16c0) AM_WRITE(avgdvg_reset_w)			/* Vector Generator Reset */
+	AM_RANGE(0x1700, 0x1700) AM_WRITE(mhavoc_alpha_irq_ack_w)	/* IRQ ack */
+	AM_RANGE(0x1740, 0x1740) AM_WRITE(mhavoc_rom_banksel_w)		/* Program ROM Page Select */
+	AM_RANGE(0x1780, 0x1780) AM_WRITE(mhavoc_ram_banksel_w)		/* Program RAM Page Select */
+	AM_RANGE(0x17c0, 0x17c0) AM_WRITE(mhavoc_gamma_w)			/* Gamma Communication Write Port */
+	AM_RANGE(0x1800, 0x1fff) AM_RAM								/* Shared Beta Ram */
+	AM_RANGE(0x2000, 0x3fff) AM_ROMBANK(2)						/* Paged Program ROM (32K) */
+	AM_RANGE(0x4000, 0x4fff) AM_RAM AM_BASE(&vectorram) AM_SIZE(&vectorram_size) AM_REGION("alpha", 0x4000)	/* Vector Generator RAM */
+	AM_RANGE(0x5000, 0x7fff) AM_ROM								/* Vector ROM */
+	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_ROM)					/* Program ROM (32K) */
 ADDRESS_MAP_END
 
 
@@ -283,7 +283,7 @@ static ADDRESS_MAP_START( gamma_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM								/* Program RAM (2K) */
     AM_RANGE(0x0800, 0x0fff) AM_RAM AM_MIRROR (0x1800)
 	AM_RANGE(0x2000, 0x203f) AM_READWRITE(quad_pokey_r, quad_pokey_w)	/* Quad Pokey read  */
-	AM_RANGE(0x2800, 0x2800) AM_READ(mhavoc_port_1_r)			/* Gamma Input Port */
+	AM_RANGE(0x2800, 0x2800) AM_READ_PORT("IN1")				/* Gamma Input Port */
 	AM_RANGE(0x3000, 0x3000) AM_READ(mhavoc_alpha_r)			/* Alpha Comm. Read Port*/
 	AM_RANGE(0x3800, 0x3803) AM_READ_PORT("DIAL")				/* Roller Controller Input*/
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("DSW2") AM_WRITE(mhavoc_gamma_irq_ack_w)	/* DSW at 8S, IRQ Acknowledge*/
@@ -308,7 +308,7 @@ static ADDRESS_MAP_START( alphaone_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x09ff) AM_RAM
 	AM_RANGE(0x0a00, 0x0fff) AM_RAMBANK(1) AM_BASE(&mhavoc_zram1)
 	AM_RANGE(0x1020, 0x103f) AM_READWRITE(dual_pokey_r, dual_pokey_w)
-	AM_RANGE(0x1040, 0x1040) AM_READWRITE(alphaone_port_0_r, SMH_NOP) /* Alpha Input Port 0 */
+	AM_RANGE(0x1040, 0x1040) AM_READ_PORT("IN0") AM_WRITENOP	/* Alpha Input Port 0 */
 	AM_RANGE(0x1060, 0x1060) AM_READ_PORT("IN1")				/* Gamma Input Port */
 	AM_RANGE(0x1080, 0x1080) AM_READ_PORT("DIAL")				/* Roller Controller Input*/
 	AM_RANGE(0x10a0, 0x10a0) AM_WRITE(alphaone_out_0_w)			/* Control Signals */
@@ -334,24 +334,46 @@ ADDRESS_MAP_END
  *
  *************************************/
 
+static CUSTOM_INPUT( clock_r )
+{
+	/* 2.4kHz (divide 2.5MHz by 1024) */
+	return (cpunum_gettotalcycles(0) & 0x400) ? 0 : 1;
+}
+
+
+/* 2008-08 FP:
+   IN0 Bit 4 is tested in the second input test, but it's not clear its effect.
+   According to the memory map at top it should be Diagnostic Step, but it's
+   actually IN0 Bit 5 to have this function. I marked it as UNKNOWN for the moment */
 static INPUT_PORTS_START( mhavoc )
-	PORT_START("IN0")	/* IN0 - alpha (player_1 = 0) */
-	PORT_BIT ( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
-	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
-	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diag Step/Coin C") PORT_CODE(KEYCODE_F1)
-	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )	/* Left Coin Switch  */
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )	/* Right Coin */
+	PORT_START("IN0")	/* alpha */
+	/* Bits 7-6 = selected based on player_1 */
+	/* Bits 5-4 = common */
+	/* Bit 3 = Gamma rcvd flag */
+	/* Bit 2 = Gamma xmtd flag */
+	/* Bit 1 = 2.4kHz (divide 2.5MHz by 1024) */
+	/* Bit 0 = Vector generator halt flag */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(clock_r, NULL)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gamma_xmtd_r, NULL)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gamma_rcvd_r, NULL)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("Diag Step/Coin C") PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(mhavoc_bit67_r, "COIN\0SERVICE")
 
-	PORT_START("IN1")	/* IN1 - gamma */
-	PORT_BIT ( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_START("IN1")	/* gamma */
+	/* Bits 7-2 = input switches */
+	/* Bit 1 = Alpha rcvd flag */
+	/* Bit 0 = Alpha xmtd flag */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(alpha_xmtd_r, NULL)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(alpha_rcvd_r, NULL)
+	PORT_BIT( 0x0c, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START("DIAL")	/* IN2 - gamma */
+	PORT_START("DIAL")	/* gamma */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_REVERSE
 
 	PORT_START("DSW1")	/* DIP Switch at position 13/14S */
@@ -398,99 +420,51 @@ static INPUT_PORTS_START( mhavoc )
 	PORT_DIPSETTING(    0x60, "1 each 5" )
 	PORT_DIPSETTING(    0xe0, DEF_STR( None ) )
 
-	PORT_START("IN2")	/* IN5 - dummy for player_1 = 1 on alpha */
-	PORT_BIT ( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_DIPNAME( 0x40, 0x40, "Credit to start" )
-	PORT_DIPSETTING(    0x40, "1" )
+	PORT_START("COIN")		/* dummy for player_1 = 0 on alpha */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )		/* Left Coin Switch  */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )		/* Right Coin */
+
+	PORT_START("SERVICE")	/* dummy for player_1 = 1 on alpha */
+	PORT_DIPNAME( 0x01, 0x01, "Credit to start" )
+	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x00, "2" )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_SERVICE( 0x02, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( mhavocrv )
+	PORT_INCLUDE( mhavoc )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(tms5220_r, NULL)
+	PORT_BIT( 0x0b, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( mhavocp )
-	PORT_START("IN0")	/* IN0 - alpha (player_1 = 0) */
-	PORT_BIT ( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Diag Step/Coin C") PORT_CODE(KEYCODE_F1)
-	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )	/* Left Coin Switch  */
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )	/* Right Coin */
+	PORT_INCLUDE( mhavoc )
 
-	PORT_START("IN1")	/* IN1 - gamma */
-	PORT_BIT ( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT ( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START("DIAL")	/* IN2 - gamma */
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_REVERSE
-
-	PORT_START("DSW1") /* DIP Switch at position 13/14S */
+	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:7,8")
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x01, "2" )
 	PORT_DIPSETTING(    0x02, "3" )
 	PORT_DIPSETTING(    0x03, "4" )
-	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW1:5,6")
-	PORT_DIPSETTING(    0x0c, "50000")
-	PORT_DIPSETTING(    0x00, "100000")
-	PORT_DIPSETTING(    0x04, "200000")
-	PORT_DIPSETTING(    0x08, DEF_STR( None ))
-	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW1:3,4")
-	PORT_DIPSETTING(    0x10, DEF_STR( Easy ))
-	PORT_DIPSETTING(    0x00, DEF_STR( Medium ))
-	PORT_DIPSETTING(    0x30, DEF_STR( Hard ))
-	PORT_DIPSETTING(    0x20, "Demo")
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Lives ) )		PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x00, "3 (2 in Free Play)")
-	PORT_DIPSETTING(    0xc0, "4 (3 in Free Play)")
-	PORT_DIPSETTING(    0x80, "5 (4 in Free Play)")
-	PORT_DIPSETTING(    0x40, "6 (5 in Free Play)")
-
-	PORT_START("DSW2") /* DIP Switch at position 8S */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW2:7,8")
-	PORT_DIPSETTING(    0x02, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0c, 0x0c, "Right Coin Mechanism" )	PORT_DIPLOCATION("SW2:5,6")
-	PORT_DIPSETTING(    0x0c, "x1" )
-	PORT_DIPSETTING(    0x08, "x4" )
-	PORT_DIPSETTING(    0x04, "x5" )
-	PORT_DIPSETTING(    0x00, "x6" )
-	PORT_DIPNAME( 0x10, 0x10, "Left Coin Mechanism" )	PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(    0x10, "x1" )
-	PORT_DIPSETTING(    0x00, "x2" )
-	PORT_DIPNAME( 0xe0, 0xe0, "Bonus Credits" )			PORT_DIPLOCATION("SW2:1,2,3")
-	PORT_DIPSETTING(    0x80, "2 each 4" )
-	PORT_DIPSETTING(    0x40, "1 each 3" )
-	PORT_DIPSETTING(    0xa0, "1 each 4" )
-	PORT_DIPSETTING(    0x60, "1 each 5" )
-	PORT_DIPSETTING(    0xe0, DEF_STR( None ) )
-
-	PORT_START("IN2")	/* IN5 - dummy for player_1 = 1 on alpha */
-	PORT_BIT ( 0x3f, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_DIPNAME( 0x40, 0x40, "Credit to start" )
-	PORT_DIPSETTING(    0x40, "1" )
-	PORT_DIPSETTING(    0x00, "2" )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( alphaone )
-	PORT_START("IN0")	/* IN0 - alpha (player_1 = 0) */
-	PORT_BIT ( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL )
-	PORT_BIT ( 0x7c, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_START("IN0")	/* alpha (player_1 = 0) */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(avgdvg_done_r, NULL)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(clock_r, NULL)
+	PORT_BIT( 0x7c, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
-	PORT_START("IN1")	/* IN1 - gamma */
-	PORT_BIT ( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("IN1")	/* gamma */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_SERVICE( 0x10, IP_ACTIVE_LOW )
-	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN3 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
-	PORT_START("DIAL")	/* IN2 - gamma */
+	PORT_START("DIAL")	/* gamma */
 	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(100) PORT_KEYDELTA(40) PORT_REVERSE
 INPUT_PORTS_END
 
@@ -787,7 +761,6 @@ static DRIVER_INIT( mhavocrv )
 {
 	/* install the speech support that was only optionally stuffed for use */
 	/* in the Return to Vax hack */
-	memory_install_read8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x2800, 0x2800, 0, 0, mhavoc_port_1_sp_r);
 	memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x5800, 0x5800, 0, 0, speech_data_w);
 	memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x5900, 0x5900, 0, 0, speech_strobe_w);
 }
@@ -802,7 +775,7 @@ static DRIVER_INIT( mhavocrv )
 
 GAME( 1983, mhavoc,   0,      mhavoc,   mhavoc,   0,        ROT0, "Atari", "Major Havoc (rev 3)", GAME_SUPPORTS_SAVE )
 GAME( 1983, mhavoc2,  mhavoc, mhavoc,   mhavoc,   0,        ROT0, "Atari", "Major Havoc (rev 2)", GAME_SUPPORTS_SAVE )
-GAME( 1983, mhavocrv, mhavoc, mhavocrv, mhavoc,   mhavocrv, ROT0, "JMA",   "Major Havoc (Return to Vax)", GAME_SUPPORTS_SAVE )
+GAME( 1983, mhavocrv, mhavoc, mhavocrv, mhavocrv, mhavocrv, ROT0, "JMA",   "Major Havoc (Return to Vax)", GAME_SUPPORTS_SAVE )
 GAME( 1983, mhavocp,  mhavoc, mhavoc,   mhavocp,  0,        ROT0, "Atari", "Major Havoc (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1983, alphaone, mhavoc, alphaone, alphaone, 0,        ROT0, "Atari", "Alpha One (prototype, 3 lives)", GAME_SUPPORTS_SAVE )
 GAME( 1983, alphaona, mhavoc, alphaone, alphaone, 0,        ROT0, "Atari", "Alpha One (prototype, 5 lives)", GAME_SUPPORTS_SAVE )

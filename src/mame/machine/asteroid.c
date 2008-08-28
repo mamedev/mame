@@ -35,21 +35,10 @@ INTERRUPT_GEN( llander_interrupt )
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-
 READ8_HANDLER( asteroid_IN0_r )
 {
-
-	int res;
-	int bitmask;
-
-	res=input_port_read(machine, "IN0");
-
-	bitmask = (1 << offset);
-
-	if (activecpu_gettotalcycles() & 0x100)
-		res |= 0x02;
-	if (!avgdvg_done())
-		res |= 0x04;
+	int res = input_port_read(machine, "IN0");
+	int bitmask = (1 << offset);
 
 	if (res & bitmask)
 		res = 0x80;
@@ -60,33 +49,10 @@ READ8_HANDLER( asteroid_IN0_r )
 }
 
 
-READ8_HANDLER( asteroib_IN0_r )
-{
-	int res;
-
-	res=input_port_read(machine, "IN0");
-
-//  if (activecpu_gettotalcycles() & 0x100)
-//      res |= 0x02;
-	if (!avgdvg_done())
-		res |= 0x80;
-
-	return res;
-}
-
 READ8_HANDLER( asterock_IN0_r )
 {
-	int res;
-	int bitmask;
-
-	res=input_port_read(machine, "IN0");
-
-	bitmask = (1 << offset);
-
-	if (activecpu_gettotalcycles() & 0x100)
-		res |= 0x04;
-	if (!avgdvg_done())
-		res |= 0x01;
+	int res = input_port_read(machine, "IN0");
+	int bitmask = (1 << offset);
 
 	if (res & bitmask)
 		res = ~0x80;
@@ -103,17 +69,15 @@ READ8_HANDLER( asterock_IN0_r )
 
 READ8_HANDLER( asteroid_IN1_r )
 {
-	int res;
-	int bitmask;
-
-	res=input_port_read(machine, "IN1");
-	bitmask = (1 << (offset & 0x7));
+	int res = input_port_read(machine, "IN1");
+	int bitmask = (1 << (offset & 0x7));
 
 	if (res & bitmask)
 		res = 0x80;
 	else
 	 	res = ~0x80;
-	return (res);
+
+	return res;
 }
 
 
@@ -172,27 +136,4 @@ MACHINE_RESET( asteroid )
 {
 	asteroid_bank_switch_w(machine,0,0);
 	avgdvg_reset_w(machine,0,0);
-}
-
-
-/*
- * This is Lunar Lander's Inputport 0.
- */
-READ8_HANDLER( llander_IN0_r )
-{
-	int res;
-
-	res = input_port_read(machine, "IN0");
-
-	if (avgdvg_done())
-		res |= 0x01;
-	else
-		res &= ~0x01;
-
-	if (activecpu_gettotalcycles() & 0x100)
-		res |= 0x40;
-	else
-		res &= ~0x40;
-
-	return res;
 }

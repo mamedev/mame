@@ -217,92 +217,41 @@ WRITE8_HANDLER( mhavoc_rom_banksel_w )
  *
  *************************************/
 
-READ8_HANDLER( mhavoc_port_0_r )
+CUSTOM_INPUT( tms5220_r )
 {
-	UINT8 res;
-
-	/* Bits 7-6 = selected based on Player 1 */
-	/* Bits 5-4 = common */
-	if (player_1)
-		res = (input_port_read(machine, "IN0") & 0x30) | (input_port_read(machine, "IN2") & 0xc0);
-	else
-		res = input_port_read(machine, "IN0") & 0xf0;
-
-	/* Bit 3 = Gamma rcvd flag */
-	if (gamma_rcvd)
-		res |= 0x08;
-
-	/* Bit 2 = Gamma xmtd flag */
-	if (gamma_xmtd)
-		res |= 0x04;
-
-	/* Bit 1 = 2.4kHz (divide 2.5MHz by 1024) */
-	if (!(activecpu_gettotalcycles() & 0x400))
-		res |= 0x02;
-
-	/* Bit 0 = Vector generator halt flag */
-	if (avgdvg_done())
-		res |= 0x01;
-
-	return res;
+	return tms5220_ready_r() ? 0 : 1;
 }
 
-
-READ8_HANDLER( alphaone_port_0_r )
+CUSTOM_INPUT( mhavoc_bit67_r )
 {
-	/* Bits 7-2 = common */
-	UINT8 res = input_port_read(machine, "IN0") & 0xfc;
-
-	/* Bit 1 = 2.4kHz (divide 2.5MHz by 1024) */
-	if (!(activecpu_gettotalcycles() & 0x400))
-		res |= 0x02;
-
-	/* Bit 0 = Vector generator halt flag */
-	if (avgdvg_done())
-		res |= 0x01;
-
-	return res;
+	const char *tag1 = param;
+	const char *tag2 = tag1 + strlen(tag1) + 1;
+	return input_port_read(field->port->machine, player_1 ? tag2 : tag1) & 0x03;
 }
 
-
-READ8_HANDLER( mhavoc_port_1_r )
+CUSTOM_INPUT( gamma_rcvd_r )
 {
-	/* Bits 7-2 = input switches */
-	UINT8 res = input_port_read(machine, "IN1") & 0xfc;
-
-	/* Bit 1 = Alpha rcvd flag */
-	if (has_gamma_cpu && alpha_rcvd)
-		res |= 0x02;
-
-	/* Bit 0 = Alpha xmtd flag */
-	if (has_gamma_cpu && alpha_xmtd)
-		res |= 0x01;
-
-	return res;
+	/* Gamma rcvd flag */
+	return gamma_rcvd;
 }
 
-READ8_HANDLER( mhavoc_port_1_sp_r )
+CUSTOM_INPUT( gamma_xmtd_r )
 {
-	/* Bits 7-3 = input switches */
-	UINT8 res = input_port_read(machine, "IN1") & 0xf8;
-
-	/* Bit 2 = TMS5220 ready flag */
-	if (!tms5220_ready_r())
-			res |= 0x04;
-
-	/* Bit 1 = Alpha rcvd flag */
-	if (has_gamma_cpu && alpha_rcvd)
-		res |= 0x02;
-
-	/* Bit 0 = Alpha xmtd flag */
-	if (has_gamma_cpu && alpha_xmtd)
-		res |= 0x01;
-
-	return res;
+	/* Gamma xmtd flag */
+	return gamma_xmtd;
 }
 
+CUSTOM_INPUT( alpha_rcvd_r )
+{
+	/* Alpha rcvd flag */
+	return (has_gamma_cpu && alpha_rcvd);
+}
 
-
+CUSTOM_INPUT( alpha_xmtd_r )
+{
+	/* Alpha xmtd flag */
+	return (has_gamma_cpu && alpha_xmtd);
+}
 
 /*************************************
  *

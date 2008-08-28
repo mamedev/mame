@@ -292,10 +292,10 @@ static ADDRESS_MAP_START( supertnk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
 	AM_RANGE(0x0800, 0x17ff) AM_ROMBANK(1)
 	AM_RANGE(0x1800, 0x1bff) AM_RAM
-	AM_RANGE(0x1efc, 0x1efc) AM_READ(input_port_0_r)
-	AM_RANGE(0x1efd, 0x1efd) AM_READ(input_port_1_r)
-	AM_RANGE(0x1efe, 0x1efe) AM_READWRITE(input_port_2_r, ay8910_control_port_0_w)
-	AM_RANGE(0x1eff, 0x1eff) AM_READWRITE(input_port_3_r, ay8910_write_port_0_w)
+	AM_RANGE(0x1efc, 0x1efc) AM_READ_PORT("JOYS")
+	AM_RANGE(0x1efd, 0x1efd) AM_READ_PORT("INPUTS")
+	AM_RANGE(0x1efe, 0x1efe) AM_READ_PORT("DSW") AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x1eff, 0x1eff) AM_READ_PORT("UNK") AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x2000, 0x3fff) AM_READWRITE(supertnk_videoram_r, supertnk_videoram_w) AM_SIZE(&supertnk_videoram_size)
 ADDRESS_MAP_END
 
