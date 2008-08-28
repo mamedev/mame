@@ -529,8 +529,8 @@ static int DebugTextureDisplay( running_machine *machine, bitmap_t *bitmap )
 				}
 				else if( m_n_debuginterleave == 1 )
 				{
-					n_xi = ( n_x & ~0x78 ) + ( ( n_x << 3 ) & 0x40 ) + ( ( n_y << 3 ) & 0x38 ); \
-					n_yi = ( n_y & ~0x7 ) + ( ( n_x >> 4 ) & 0x7 ); \
+					n_xi = ( n_x & ~0x78 ) + ( ( n_x << 3 ) & 0x40 ) + ( ( n_y << 3 ) & 0x38 );
+					n_yi = ( n_y & ~0x7 ) + ( ( n_x >> 4 ) & 0x7 );
 				}
 				else
 				{

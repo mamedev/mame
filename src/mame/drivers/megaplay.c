@@ -202,7 +202,7 @@ static INPUT_PORTS_START ( megaplay )
     PORT_DIPSETTING( 0x01, "1 coin/1 credit - 2 coins/3 credits" )
     PORT_DIPSETTING( 0x00, DEF_STR( Free_Play ) )
 
-	PORT_DIPNAME( 0xf0, 0xf0, "Coin slot 2" ) PORT_DIPLOCATION("SW2:1,2,3,4")\
+	PORT_DIPNAME( 0xf0, 0xf0, "Coin slot 2" ) PORT_DIPLOCATION("SW2:1,2,3,4")
     PORT_DIPSETTING( 0x70, DEF_STR( 4C_1C ) )
     PORT_DIPSETTING( 0x80, DEF_STR( 3C_1C ) )
     PORT_DIPSETTING( 0x90, DEF_STR( 2C_1C ) )

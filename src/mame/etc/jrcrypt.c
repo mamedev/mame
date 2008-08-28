@@ -352,16 +352,14 @@ hardware and RAM is */
 		}
 	}
 	printf("  Non mapped, Probably not encrypted: %d\n",unmapped);
-	printf("  Non mapped, but Probably encrypted:
-%d\n",unmapped_encrypted);
+	printf("  Non mapped, but Probably encrypted: %d\n",unmapped_encrypted);
 
 	while (1)
 	{
 		void write_rom_section(char *prefix,char *suffix,int
 start,int end);
 		char c;
-		printf(" Enter D to Merge mapped and unmapped and dump to
-rom file,\n");
+		printf(" Enter D to Merge mapped and unmapped and dump to rom file,\n");
 		printf(" Enter Q to quit.\n");
 		c=tolower(getchar());
 		while (getchar()!='\n') {}
@@ -371,8 +369,7 @@ rom file,\n");
 		{
 			char line[100],*l;
 			int i;
-			printf("Enter file prefix (files will be named
-'prefix'.8d 'prefix'.8e, etc.\n");
+			printf("Enter file prefix (files will be named 'prefix'.8d 'prefix'.8e, etc.\n");
 			gets(line);
 			// kill newline:
 			for (l=line;*l!='\n' && *l!='\0';l++)

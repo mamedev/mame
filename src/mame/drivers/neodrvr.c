@@ -4009,7 +4009,7 @@ ROM_START( irrmaze )
 
 	ROM_REGION16_BE( 0x20000, "mainbios", 0 )
 	/* special BIOS with trackball support, we only have one Irritating Maze bios and thats asia */
-	ROM_LOAD16_WORD_SWAP("236-bios.bin", 0x00000, 0x020000, CRC(853e6b96) SHA1(de369cb4a7df147b55168fa7aaf0b98c753b735e) ) \
+	ROM_LOAD16_WORD_SWAP("236-bios.bin", 0x00000, 0x020000, CRC(853e6b96) SHA1(de369cb4a7df147b55168fa7aaf0b98c753b735e) )
 
 	ROM_REGION( 0x20000, "audiobios", 0 )
 	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(97cf998b) SHA1(977387a7c76ef9b21d0b01fa69830e949a9a9626) )

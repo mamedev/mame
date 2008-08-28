@@ -259,7 +259,7 @@
 	IREM_COIN_MODE_2_DSW1_LOC(DIPBANK)
 
 
-/* New Coin Mode 1, introduced in later m72 games (m72 early games have different Coinage) */ \
+/* New Coin Mode 1, introduced in later m72 games (m72 early games have different Coinage) */
 
 #define IREM_COIN_MODE_1_NEW \
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coinage ) ) PORT_DIPLOCATION("SW2:5,6,7,8") \

@@ -603,8 +603,7 @@ for( v = 0, m = 1, V = 0; v < 8; v++, V += 16, m <<= 1 )
 #ifdef DBG_INTRP
         fprintf(
                stderr,
-               "V%d: mixfrac=%d: [%d]*%d + [%d]*%d + [%d]*%d + [%d]*%d "\
-                "= %d\n",
+               "V%d: mixfrac=%d: [%d]*%d + [%d]*%d + [%d]*%d + [%d]*%d = %d\n",
                v,
                vl,
                G1[ vl ],

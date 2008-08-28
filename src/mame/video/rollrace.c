@@ -89,7 +89,7 @@ VIDEO_UPDATE( rollrace )
 
 			drawgfx(bitmap,
 				screen->machine->gfx[RA_BGCHAR_BASE],
-				mem[offs + ( ra_bkgpage * 1024 )] \
+				mem[offs + ( ra_bkgpage * 1024 )]
 				+ ((( mem[offs + 0x4000 + ( ra_bkgpage * 1024 )] & 0xc0 ) >> 6 ) * 256 ) ,
 				ra_bkgcol,
 				ra_flipx,(ra_bkgflip^ra_flipy),

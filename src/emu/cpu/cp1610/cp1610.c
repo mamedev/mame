@@ -101,6 +101,7 @@ static cp1610_Regs cp1610;
   }
 
 #if 0
+#define SET_COV(n,m)         \
 	if ((n&0x7fff)+(m&0x7fff) > 0x7fff)	\
 	{							\
 		if (!(cp1610.flags & C))\
