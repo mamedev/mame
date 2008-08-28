@@ -8032,6 +8032,7 @@ Other Sun games
 	DRIVER( egghunt )	/* (c) 1995 Invi Image */
 	DRIVER( magic10 )	/* (c) 1995 A.W.P. Games */
 	DRIVER( magic10a )	/* (c) 1995 A.W.P. Games */
+	DRIVER( magic10b )	/* (c) 1995 A.W.P. Games */
 	DRIVER( magic102 )	/* (c) 1997 ABM Games */
 	DRIVER( suprpool )	/* (c) 1997 ABM Games */
 	DRIVER( hotslot )	/* (c) 1996 ABM Electronics */

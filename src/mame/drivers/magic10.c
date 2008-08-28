@@ -1,26 +1,44 @@
-/*
-    Magic's 10                 (c) 1995 AWP Games
-    Magic's 10 2               (c) 1997 ABM Games
-    Super Pool (9743 Rev.01)   (c) 1997 ABM Games
-    Hot Slot (ver 05.01)       (c) 1996 ABM Electronics
-    Magic Colors (ver 1.7a)        1999 Unknown
+/****************************************************************************
 
-    Driver by Pierpaolo Prazzoli
-    Aditional work by Roberto Fresca
+    MAGIC'S 10
+    ----------
+
+    Driver by Pierpaolo Prazzoli.
+    Additional work by Roberto Fresca.
+
+
+    Supported games:
+
+    Magic's 10 (ver. 16.15)    (c) 1995 AWP Games
+    Magic's 10 (ver. 16.45)    (c) 1995 AWP Games
+    Magic's 10 (ver. 16.55)    (c) 1995 AWP Games
+    Magic's 10 2               (c) 1997 ABM Games
+    Super Pool (9743 rev.01)   (c) 1997 ABM Games
+    Hot Slot (ver. 05.01)      (c) 1996 ABM Electronics
+    Magic Colors (ver. 1.7a)       1999 Unknown
+
+
+*****************************************************************************
+
+
+    Magic's 10 instruction for the 1st boot:
+
+    - Switch "Disable Free Play" to ON
+    - Enter a coin
+    - Press Collect to get the 1st game over
+
 
     TODO:
+
     - ticket / coin dispenser
     - some unknown writes
     - finish magic10_2 (association coin - credits handling its inputs
       and some reads that drive the note displayed?)
     - protection (suprpool, hotslot, mcolors)
 
-Magic's 10 instruction for the 1st boot:
-- Switch "Disable Free Play" to ON
-- Enter a coin
-- Press Collect to get the 1st game over
 
-*/
+****************************************************************************/
+
 
 #include "driver.h"
 #include "sound/okim6295.h"
@@ -174,22 +192,22 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( magic10 )
 	PORT_START("INPUTS")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Play") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Play") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Lots FC") PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_NAME("Note A")
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN3 ) PORT_NAME("Note B")
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN4 ) PORT_NAME("Note C")
 	PORT_SERVICE_NO_TOGGLE( 0x1000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Out Hole") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME("Note D")
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Collect") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Out Hole") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_COIN5 ) PORT_NAME("Note D") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Collect") PORT_CODE(KEYCODE_M)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x0001, 0x0001, "Display Logo" )
@@ -250,14 +268,14 @@ static INPUT_PORTS_START( magic102 )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Bet") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Collect") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Bet") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Collect") PORT_CODE(KEYCODE_M)
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 /*
@@ -545,6 +563,55 @@ ROM_END
 
 /*
 
+Magic's 10 (ver. 16.15)
+
+1995, A.W.P. Games
+Version: 16.15
+
+CPU:
+1x TS68000P12 (main)(u1)
+2x TPC1020AFN-084C (PLD)(not dumped)(u41,u60)
+
+Sound:
+1x OKI M6295 (u21)
+1x TDA2003 (u24)
+1x LM358N
+
+1x oscillator 20.000000MHz (close to main)(osc1)
+1x oscillator 30.000MHz (close to sound)(osc2)
+1x orange resonator 1000J (close to sound)(xtal1)
+
+ROMs:
+1x M27C2001 (1)
+6x M27C1001 (2,3,5,6,7)
+1x TMS27C010A (4)
+1x PALCE16V8H (read protected)
+
+Note:
+1x 28x2 edge connector
+1x trimmer (volume)
+1x 8x2 switches dip
+1x battery
+
+*/
+
+ROM_START( magic10b )
+	ROM_REGION( 0x40000, "cpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "2.u3", 0x000000, 0x20000, CRC(32c12ad6) SHA1(93340df2c0f4c260837bd6649008e26a17a22015) )
+	ROM_LOAD16_BYTE( "3.u2", 0x000001, 0x20000, CRC(a9945aaa) SHA1(97d4f6441b96618f2e3ce14095ffc5628cb14f0e) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE ) /* Tiles */
+	ROM_LOAD( "6.u25", 0x00000, 0x20000, CRC(7abb8136) SHA1(1d4daf6a4477853d89d08afb524516ef79f60dd6) )
+	ROM_LOAD( "4.u26", 0x20000, 0x20000, CRC(fd0b912d) SHA1(1cd15fa3459e7fece9fc37595f2b6848c00ffa43) )
+	ROM_LOAD( "5.u27", 0x40000, 0x20000, CRC(8178c907) SHA1(8c3440769ed4e113d84d1f8f9079783497791859) )
+	ROM_LOAD( "7.u28", 0x60000, 0x20000, CRC(dfd41aab) SHA1(82248c7fa4febb1c453f35a0e4cfae062c5da2d5) )
+
+	ROM_REGION( 0x40000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "1.u22", 0x00000, 0x40000, CRC(98885246) SHA1(752d549e6248074f2a7f6c5cc4d0bbc44c7fa4c3) )
+ROM_END
+
+/*
+
 pcb is marked: Copyright ABM - 9605 Rev.02
 
 1x 68000
@@ -787,7 +854,8 @@ static DRIVER_INIT( hotslot )
 
 GAME( 1995, magic10,   0,       magic10,   magic10,   magic10,   ROT0, "A.W.P. Games",    "Magic's 10 (ver. 16.55)",  0 )
 GAME( 1995, magic10a,  magic10, magic10a,  magic10,   magic10,   ROT0, "A.W.P. Games",    "Magic's 10 (ver. 16.45)",  0 )
+GAME( 1995, magic10b,  magic10, magic10a,  magic10,   magic10,   ROT0, "A.W.P. Games",    "Magic's 10 (ver. 16.15)",  0 )
 GAME( 1997, magic102,  0,       magic102,  magic102,  magic102,  ROT0, "ABM Games",       "Magic's 10 2 (ver 1.1)",   GAME_NOT_WORKING )
-GAME( 1997, suprpool,  0,       magic102,  magic102,  suprpool,  ROT0, "ABM Games",       "Super Pool (9743 Rev.01)", GAME_NOT_WORKING )
-GAME( 1996, hotslot,   0,       hotslot,   hotslot,   hotslot,   ROT0, "ABM Electronics", "Hot Slot (ver 05.01)",     GAME_NOT_WORKING )
-GAME( 1999, mcolors,   0,       magic102,  magic102,  magic102,  ROT0, "unknown",         "Magic Colors (ver 1.7a)",  GAME_NOT_WORKING )
+GAME( 1997, suprpool,  0,       magic102,  magic102,  suprpool,  ROT0, "ABM Games",       "Super Pool (9743 rev.01)", GAME_NOT_WORKING )
+GAME( 1996, hotslot,   0,       hotslot,   hotslot,   hotslot,   ROT0, "ABM Electronics", "Hot Slot (ver. 05.01)",     GAME_NOT_WORKING )
+GAME( 1999, mcolors,   0,       magic102,  magic102,  magic102,  ROT0, "unknown",         "Magic Colors (ver. 1.7a)",  GAME_NOT_WORKING )
