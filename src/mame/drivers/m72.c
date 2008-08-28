@@ -3236,7 +3236,7 @@ ROM_END
 
 
 GAME( 1987, rtype,    0,        rtype,    rtype,    0,        ROT0,   "Irem", "R-Type (World)", GAME_NO_COCKTAIL )
-GAME( 1987, rtypej,   rtype,    rtype,    rtypep,   0,        ROT0,   "Irem", "R-Type (Japan)", GAME_NO_COCKTAIL )
+GAME( 1987, rtypej,   rtype,    rtype,    rtype,    0,        ROT0,   "Irem", "R-Type (Japan)", GAME_NO_COCKTAIL )
 GAME( 1987, rtypejp,  rtype,    rtype,    rtypep,   0,        ROT0,   "Irem", "R-Type (Japan prototype)", GAME_NO_COCKTAIL )
 GAME( 1987, rtypeu,   rtype,    rtype,    rtype,    0,        ROT0,   "Irem (Nintendo of America license)", "R-Type (US)", GAME_NO_COCKTAIL )
 GAME( 1987, bchopper, 0,        m72,      bchopper, bchopper, ROT0,   "Irem", "Battle Chopper", GAME_NO_COCKTAIL )
