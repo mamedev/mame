@@ -73,6 +73,16 @@ struct dsd_555_cc_context
 	double			trigger;
 	double			v_out_high;		/* Logic 1 voltage level */
 	double			v_cc_source;
+	int				has_rc_nodes;
+	double			exp_bleed;
+	double			exp_charge;
+	double			exp_discharge;
+	double			exp_discharge_01;
+	double			exp_discharge_no_i;
+	double			t_rc_charge;
+	double			t_rc_discharge;
+	double			t_rc_discharge_01;
+	double			t_rc_discharge_no_i;
 };
 
 struct dsd_555_vco1_context
@@ -132,6 +142,9 @@ struct dsd_ls624_context
 #define DSD_555_ASTBL__R2		(*(node->input[2]))
 #define DSD_555_ASTBL__C		(*(node->input[3]))
 #define DSD_555_ASTBL__CTRLV	(*(node->input[4]))
+
+/* bit mask of the above RC inputs */
+#define DSD_555_ASTBL_RC_MASK	0x0e
 
 /* charge/discharge constants */
 #define DSD_555_ASTBL_T_RC_BLEED		(DEFAULT_555_CAP_BLEED * DSD_555_ASTBL__C)
@@ -399,7 +412,7 @@ static void dsd_555_astbl_reset(node_description *node)
 
 	/* optimization if none of the values are nodes */
 	context->has_rc_nodes = 0;
-	if (node->input_is_node & 0x0e)
+	if (node->input_is_node & DSD_555_ASTBL_RC_MASK)
 		context->has_rc_nodes = 1;
 	else
 	{
@@ -586,6 +599,17 @@ static void dsd_555_mstbl_reset(node_description *node)
 #define DSD_555_CC__RGND	(*(node->input[5]))
 #define DSD_555_CC__RDIS	(*(node->input[6]))
 
+/* bit mask of the above RC inputs not including DSD_555_CC__R */
+#define DSD_555_CC_RC_MASK	0x78
+
+/* charge/discharge constants */
+#define DSD_555_CC_T_RC_BLEED			(DEFAULT_555_CAP_BLEED * DSD_555_CC__C)
+#define DSD_555_CC_T_RC_DISCHARGE_01	(DSD_555_CC__RDIS * DSD_555_CC__C)
+#define DSD_555_CC_T_RC_DISCHARGE_NO_I	(DSD_555_CC__RGND * DSD_555_CC__C)
+#define DSD_555_CC_T_RC_CHARGE			(r_charge * DSD_555_CC__C)
+#define DSD_555_CC_T_RC_DISCHARGE		(r_discharge * DSD_555_CC__C)
+
+
 static void dsd_555_cc_step(node_description *node)
 {
 	const  discrete_555_cc_desc *info    = node->custom;
@@ -606,6 +630,8 @@ static void dsd_555_cc_step(node_description *node)
 	double	v_cap_next = 0;		/* Voltage on capacitor, after dt */
 	double	v_vcharge_limit;	/* vIn and the junction voltage limit the max charging voltage from i */
 	double	r_temp;				/* play thing */
+	double	exponent;
+	int		update_exponent, update_t_rc;
 
 
 	if (DSD_555_CC__RESET)
@@ -629,46 +655,50 @@ static void dsd_555_cc_step(node_description *node)
 		vi = i * DSD_555_CC__RDIS;
 	}
 	else
-	switch (context->type)	/* see dsd_555_cc_reset for descriptions */
 	{
-		case 1:
-			r_discharge = DSD_555_CC__RDIS;
-		case 0:
-			break;
-		case 3:
-			r_discharge = (DSD_555_CC__RDIS * DSD_555_CC__RGND) / (DSD_555_CC__RDIS + DSD_555_CC__RGND);
-		case 2:
-			r_charge = DSD_555_CC__RGND;
-			vi       = i * r_charge;
-			break;
-		case 4:
-			r_charge = DSD_555_CC__RBIAS;
-			vi       = i * r_charge;
-			v_bias   = info->v_pos;
-			break;
-		case 5:
-			r_charge = DSD_555_CC__RBIAS + DSD_555_CC__RDIS;
-			vi       = i * DSD_555_CC__RBIAS;
-			v_bias   = info->v_pos;
-			r_discharge = DSD_555_CC__RDIS;
-			break;
-		case 6:
-			r_charge = (DSD_555_CC__RBIAS * DSD_555_CC__RGND) / (DSD_555_CC__RBIAS + DSD_555_CC__RGND);
-			vi       = i * r_charge;
-			v_bias   = info->v_pos * (DSD_555_CC__RGND / (DSD_555_CC__RBIAS + DSD_555_CC__RGND));
-			break;
-		case 7:
-			r_temp   = DSD_555_CC__RBIAS + DSD_555_CC__RDIS;
-			r_charge = (r_temp * DSD_555_CC__RGND) / (r_temp + DSD_555_CC__RGND);
-			r_temp  += DSD_555_CC__RGND;
-			r_temp   = DSD_555_CC__RGND / r_temp;	/* now has voltage divider ratio, not resistance */
-			vi       = i * DSD_555_CC__RBIAS * r_temp;
-			v_bias   = info->v_pos * r_temp;
-			r_discharge = (DSD_555_CC__RGND * DSD_555_CC__RDIS) / (DSD_555_CC__RGND + DSD_555_CC__RDIS);
-			break;
+		switch (context->type)	/* see dsd_555_cc_reset for descriptions */
+		{
+			case 1:
+				r_discharge = DSD_555_CC__RDIS;
+			case 0:
+				break;
+			case 3:
+				r_discharge = RES_2_PARALLEL(DSD_555_CC__RDIS, DSD_555_CC__RGND);
+			case 2:
+				r_charge = DSD_555_CC__RGND;
+				vi       = i * r_charge;
+				break;
+			case 4:
+				r_charge = DSD_555_CC__RBIAS;
+				vi       = i * r_charge;
+				v_bias   = info->v_pos;
+				break;
+			case 5:
+				r_charge = DSD_555_CC__RBIAS + DSD_555_CC__RDIS;
+				vi      = i * DSD_555_CC__RBIAS;
+				v_bias  = info->v_pos;
+				r_discharge = DSD_555_CC__RDIS;
+				break;
+			case 6:
+				r_charge = RES_2_PARALLEL(DSD_555_CC__RBIAS, DSD_555_CC__RGND);
+				vi      = i * r_charge;
+				v_bias  = info->v_pos * RES_VOLTAGE_DIVIDER(DSD_555_CC__RGND, DSD_555_CC__RBIAS);
+				break;
+			case 7:
+				r_temp   = DSD_555_CC__RBIAS + DSD_555_CC__RDIS;
+				r_charge = RES_2_PARALLEL(r_temp, DSD_555_CC__RGND);
+				r_temp  += DSD_555_CC__RGND;
+				r_temp   = DSD_555_CC__RGND / r_temp;	/* now has voltage divider ratio, not resistance */
+				vi      = i * DSD_555_CC__RBIAS * r_temp;
+				v_bias  = info->v_pos * r_temp;
+				r_discharge = RES_2_PARALLEL(DSD_555_CC__RGND, DSD_555_CC__RDIS);
+				break;
+		}
 	}
 
 	/* Keep looping until all toggling in time sample is used up. */
+	update_t_rc = context->has_rc_nodes;
+	update_exponent = update_t_rc;
 	do
 	{
 		if (context->type <= 1)
@@ -681,8 +711,14 @@ static void dsd_555_cc_step(node_description *node)
 					/* No charging current, so we have to discharge the cap
                      * due to cap and circuit losses.
                      */
-					t_rc       = DEFAULT_555_CAP_BLEED * DSD_555_CC__C;
-					v_cap_next = v_cap - (v_cap * (1.0 - exp(-(dt / t_rc ))));
+					if (update_exponent)
+					{
+						t_rc     = DSD_555_CC_T_RC_BLEED;
+						exponent = 1.0 - exp(-(dt / t_rc));
+					}
+					else
+						exponent = context->exp_bleed;
+					v_cap_next = v_cap - (v_cap * exponent);
 					dt = 0;
 				}
 				else
@@ -707,13 +743,21 @@ static void dsd_555_cc_step(node_description *node)
 						v_cap  = context->threshold;
 						context->flip_flop = 0;
 						count_f++;
+						update_exponent = 1;
 					}
 				}
 			}
-			else if (DSD_555_CC__RDIS)
+			else if (DSD_555_CC__RDIS != 0)
 			{
 				/* Discharging */
-				t_rc  = DSD_555_CC__RDIS * DSD_555_CC__C;
+				if (update_t_rc)
+					t_rc = DSD_555_CC_T_RC_DISCHARGE_01;
+				else
+					t_rc = context->t_rc_discharge_01;
+				if (update_exponent)
+					exponent = 1.0 - exp(-(dt / t_rc));
+				else
+					exponent = context->exp_discharge_01;
 
 				if (info->options & DISCRETE_555_CC_TO_CAP)
 				{
@@ -722,11 +766,11 @@ static void dsd_555_cc_step(node_description *node)
 					/* If the cap voltage is past the current source charging limit
                      * then only the bias voltage will charge the cap. */
 					v          = (v_cap < v_vcharge_limit) ? vi : v_vcharge_limit;
-					v_cap_next = v_cap + ((v - v_cap) * (1.0 - exp(-(dt / t_rc ))));
+					v_cap_next = v_cap + ((v - v_cap) * exponent);
 				}
 				else
 				{
-					v_cap_next = v_cap - (v_cap * (1.0 - exp(-(dt / t_rc ))));
+					v_cap_next = v_cap - (v_cap * exponent);
 				}
 
 				dt = 0;
@@ -738,6 +782,7 @@ static void dsd_555_cc_step(node_description *node)
 					v_cap  = context->trigger;
 					context->flip_flop = 1;
 					count_r++;
+					update_exponent = 1;
 				}
 			}
 			else	/* Immediate discharge. No change in dt. */
@@ -758,8 +803,16 @@ static void dsd_555_cc_step(node_description *node)
 					/* No charging current, so we have to discharge the cap
                      * due to rGnd.
                      */
-					t_rc       = DSD_555_CC__RGND * DSD_555_CC__C;
-					v_cap_next = v_cap - (v_cap * (1.0 - exp(-(dt / t_rc ))));
+					if (update_t_rc)
+						t_rc = DSD_555_CC_T_RC_DISCHARGE_NO_I;
+					else
+						t_rc = context->t_rc_discharge_no_i;
+					if (update_exponent)
+						exponent = 1.0 - exp(-(dt / t_rc));
+					else
+						exponent = context->exp_discharge_no_i;
+
+					v_cap_next = v_cap - (v_cap * exponent);
 					dt = 0;
 				}
 				else
@@ -771,8 +824,16 @@ static void dsd_555_cc_step(node_description *node)
 					if (v_cap < v_vcharge_limit) v += vi;
 					else if (context->type <= 3) v = v_vcharge_limit;
 
-					t_rc       = r_charge * DSD_555_CC__C;
-					v_cap_next = v_cap + ((v - v_cap) * (1.0 - exp(-(dt / t_rc ))));
+					if (update_t_rc)
+						t_rc = DSD_555_CC_T_RC_CHARGE;
+					else
+						t_rc = context->t_rc_charge;
+					if (update_exponent)
+						exponent = 1.0 - exp(-(dt / t_rc));
+					else
+						exponent = context->exp_charge;
+
+					v_cap_next = v_cap + ((v - v_cap) * exponent);
 					dt         = 0;
 
 					/* has it charged past upper limit? */
@@ -784,14 +845,23 @@ static void dsd_555_cc_step(node_description *node)
 						v_cap  = context->threshold;
 						context->flip_flop = 0;
 						count_f++;
+						update_exponent = 1;
 					}
 				}
 			}
 			else /* Discharging */
 			if (r_discharge)
 			{
-				t_rc       = r_discharge * DSD_555_CC__C;
-				v_cap_next = v_cap - (v_cap * (1.0 - exp(-(dt / t_rc ))));
+				if (update_t_rc)
+					t_rc = DSD_555_CC_T_RC_DISCHARGE;
+				else
+					t_rc = context->t_rc_discharge;
+				if (update_exponent)
+					exponent = 1.0 - exp(-(dt / t_rc));
+				else
+					exponent = context->exp_discharge;
+
+				v_cap_next = v_cap - (v_cap * exponent);
 				dt = 0;
 
 				/* has it discharged past lower limit? */
@@ -803,6 +873,7 @@ static void dsd_555_cc_step(node_description *node)
 					v_cap  = context->trigger;
 					context->flip_flop = 1;
 					count_r++;
+					update_exponent = 1;
 				}
 			}
 			else	/* Immediate discharge. No change in dt. */
@@ -864,6 +935,9 @@ static void dsd_555_cc_reset(node_description *node)
 	const  discrete_555_cc_desc *info    = node->custom;
 	struct dsd_555_cc_context   *context = node->context;
 
+	double	neg_dt = 0.0 - discrete_current_context->sample_time;
+	double	r_temp, r_discharge = 0, r_charge = 0, t_rc;
+
 	context->flip_flop   = 1;
 	context->cap_voltage = 0;
 
@@ -884,9 +958,63 @@ static void dsd_555_cc_reset(node_description *node)
 	/* There are 8 different types of basic oscillators
      * depending on the resistors used.  We will determine
      * the type of circuit at reset, because the ciruit type
-     * is constant.
+     * is constant.  See Below.
      */
 	context->type = (DSD_555_CC__RDIS > 0) | ((DSD_555_CC__RGND  > 0) << 1) | ((DSD_555_CC__RBIAS  > 0) << 2);
+
+	/* optimization if none of the values are nodes */
+	context->has_rc_nodes = 0;
+	if (node->input_is_node & DSD_555_CC_RC_MASK)
+		context->has_rc_nodes = 1;
+	else
+	{
+		switch (context->type)	/* see dsd_555_cc_reset for descriptions */
+		{
+			case 1:
+				r_discharge = DSD_555_CC__RDIS;
+			case 0:
+				break;
+			case 3:
+				r_discharge = RES_2_PARALLEL(DSD_555_CC__RDIS, DSD_555_CC__RGND);
+			case 2:
+				r_charge = DSD_555_CC__RGND;
+				break;
+			case 4:
+				r_charge = DSD_555_CC__RBIAS;
+				break;
+			case 5:
+				r_charge = DSD_555_CC__RBIAS + DSD_555_CC__RDIS;
+				r_discharge = DSD_555_CC__RDIS;
+				break;
+			case 6:
+				r_charge = RES_2_PARALLEL(DSD_555_CC__RBIAS, DSD_555_CC__RGND);
+				break;
+			case 7:
+				r_temp   = DSD_555_CC__RBIAS + DSD_555_CC__RDIS;
+				r_charge = RES_2_PARALLEL(r_temp, DSD_555_CC__RGND);
+				r_discharge = RES_2_PARALLEL(DSD_555_CC__RGND, DSD_555_CC__RDIS);
+				break;
+		}
+
+		t_rc = DSD_555_CC_T_RC_BLEED;
+		context->exp_bleed  = 1.0 - exp(neg_dt / t_rc);
+		t_rc = DSD_555_CC_T_RC_DISCHARGE_01;
+		context->exp_discharge_01  = 1.0 - exp(neg_dt / t_rc);
+		context->t_rc_discharge_01 = t_rc;
+		t_rc = DSD_555_CC_T_RC_DISCHARGE_NO_I;
+		context->exp_discharge_no_i  = 1.0 - exp(neg_dt / t_rc);
+		context->t_rc_discharge_no_i = t_rc;
+		t_rc = DSD_555_CC_T_RC_CHARGE;
+		context->exp_charge  = 1.0 - exp(neg_dt / t_rc);
+		context->t_rc_charge = t_rc;
+		t_rc = DSD_555_CC_T_RC_DISCHARGE;
+		context->exp_discharge  = 1.0 - exp(neg_dt / t_rc);
+		context->t_rc_discharge = t_rc;
+	}
+
+	/* Step to set the output */
+	dsd_555_cc_step(node);
+
 	/*
      * TYPES:
      * Note: These are equivalent circuits shown without the 555 circuitry.
@@ -1019,9 +1147,6 @@ static void dsd_555_cc_reset(node_description *node)
      *   |       |      |                       v = vi = i * rGnd
      *  gnd     gnd   discharge                 Rc = rDischarge
      */
-
-	/* Step to set the output */
-	dsd_555_cc_step(node);
 }
 
 

@@ -270,7 +270,7 @@ static void dst_clamp_step(node_description *node)
  * Mar 2004, D Renaud.
  ************************************************************************/
 #define DST_DAC_R1__ENABLE		(*(node->input[0]))
-#define DST_DAC_R1__DATA		(int)(*(node->input[1]))
+#define DST_DAC_R1__DATA		(*(node->input[1]))
 #define DST_DAC_R1__VON			(*(node->input[2]))
 
 static void dst_dac_r1_step(node_description *node)
@@ -283,7 +283,7 @@ static void dst_dac_r1_step(node_description *node)
 
 	i_total = context->i_bias;
 
-	data  = (int)DST_DAC_R1__DATA;
+	data   = (int)DST_DAC_R1__DATA;
 	x_time = DST_DAC_R1__DATA - data;
 
 	if (DST_DAC_R1__ENABLE)
@@ -315,6 +315,7 @@ static void dst_dac_r1_step(node_description *node)
 		}
 
 		v = i_total * context->r_total;
+		context->last_data = data;
 
 		/* Filter if needed, else just output voltage */
 		node->output[0] = info->cFilter ? node->output[0] + ((v - node->output[0]) * context->exponent) : v;
@@ -365,7 +366,7 @@ static void dst_dac_r1_reset(node_description *node)
 	context->r_total = 0;
 	for(bit = 0; bit < info->ladderLength; bit++)
 	{
-		if (info->r[bit])
+		if (info->r[bit] != 0)
 			context->r_total += 1.0 / info->r[bit];
 	}
 	if (info->rBias) context->r_total += 1.0 / info->rBias;
@@ -1143,10 +1144,10 @@ static void dst_mixer_reset(node_description *node)
 	for (bit = 0; bit < 8; bit++)
 	{
 		r_node = discrete_find_node(NULL, info->r_node[bit]);
-		if (r_node)
+		if (r_node != NULL)
 		{
 			context->r_node[bit] = &(r_node->output[NODE_CHILD_NODE_NUM(info->r_node[bit])]);
-			context->r_node_bit_flag |= bit << 1;
+			context->r_node_bit_flag |= 1 << bit;
 		}
 		else
 			context->r_node[bit] = NULL;
