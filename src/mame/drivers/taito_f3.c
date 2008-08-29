@@ -1959,7 +1959,7 @@ ROM_START( bubsympb )
 	ROM_REGION(0x300000, "gfx1" , ROMREGION_DISPOSE) /* Sprites (5bpp) */
 	ROM_FILL       (        0x000000, 0x080000, 0 )
 	ROM_LOAD("bsb_d18.bin", 0x080000, 0x080000, CRC(22d7eeb5) SHA1(30aa4493c5bc98d9256817b9e3341b20d2b76f1f) )
-	ROM_LOAD("bsb_d19.bin", 0x100000, 0x080000, BAD_DUMP CRC(34185806) SHA1(dcb61f07aa3c0c274243797312c04b0f8dbfd9ea) ) // some bad bits (could probably be fixed using original set)
+	ROM_LOAD("bsb_d19.bin", 0x100000, 0x080000, CRC(d36801fd) SHA1(5dc00942dbd9bb29214c206ea192f158b71b09dc) )
 	ROM_LOAD("bsb_d20.bin", 0x180000, 0x080000, CRC(20222e15) SHA1(41f2f94afd65d0c106752f254f20b593906cba28) )
 	ROM_LOAD("bsb_d17.bin", 0x200000, 0x080000, CRC(ea2eadfc) SHA1(2c4176e89f816166f410888cd2e837891a4289a3) )
 	ROM_LOAD("bsb_d16.bin", 0x280000, 0x080000, CRC(edccd4e0) SHA1(e00d3c1a91f9a96e1ae7d45842315d839c9cd440) )
@@ -1968,8 +1968,8 @@ ROM_START( bubsympb )
 	ROM_LOAD32_BYTE("bsb_d13b.bin", 0x000000, 0x080000, CRC(430af2aa) SHA1(e935f9f4e0558a25bd4010b44dbb4f38a9d359e0) )
 	ROM_LOAD32_BYTE("bsb_d14b.bin", 0x000001, 0x080000, CRC(c006e832) SHA1(4aebbac188af1ef9176581ac68ac12ce397f2f08) )
 	ROM_LOAD32_BYTE("bsb_d15b.bin", 0x000002, 0x080000, CRC(74644ad4) SHA1(c7610e413c965eb4e40b548d13efdcbc3dde23be) )
-	ROM_LOAD32_BYTE("bsb_d12b.bin", 0x000003, 0x080000, BAD_DUMP CRC(6760ac05) SHA1(65725bcc9aa94a1d800b8d569fef30df542f3c4d) ) // bad lines in places
-	ROM_LOAD32_BYTE("bsb_d11b.bin", 0x200000, 0x080000, BAD_DUMP CRC(d854a38b) SHA1(79fa66b72d526c8270ba2a356d2b44447f4c0a5c) ) // bad lines in places
+	ROM_LOAD32_BYTE("bsb_d12b.bin", 0x000003, 0x080000, CRC(cb2e2abb) SHA1(7e3a90cb8af298bac2aef80778341833e473b671) )
+	ROM_LOAD32_BYTE("bsb_d11b.bin", 0x200000, 0x080000, CRC(d0607829) SHA1(546c629ec22bb98202c7127ccb77df0b8f3a1966) )
 
 	ROM_REGION(0x100000, "oki" , ROMREGION_ERASE00 ) // OKI6295 samples
 	ROM_LOAD("bsb_d11.bin", 0x000000, 0x080000, CRC(26bdc617) SHA1(993e7a52128fdd58f22d95521a629beb71ca7b91) ) // I haven't verified this dump.. but given how bad the rest is I'm not confident
