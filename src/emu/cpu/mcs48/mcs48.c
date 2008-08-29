@@ -772,6 +772,8 @@ static void mcs48_reset(void)
 	bus_w(0xff);
 	mcs48.p1 = 0xff;
 	mcs48.p2 = 0xff;
+	port_w(1, mcs48.p1);
+	port_w(2, mcs48.p2);
 	mcs48.tirq_enabled = FALSE;
 	mcs48.xirq_enabled = FALSE;
 	mcs48.timecount_enabled = 0;
