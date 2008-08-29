@@ -716,7 +716,11 @@ static void find_input_nodes(discrete_info *info, discrete_sound_block *block_li
 			{
 				/* warn if trying to use a node for an input that can only be static */
 				if IS_VALUE_A_NODE(block->initial[inputnum])
+				{
 					discrete_log("Warning - discrete_start - NODE_%02d trying to use a node on static input %d",  NODE_INDEX(node->node), inputnum);
+					/* also report it in the error log so it is not missed */
+					logerror("Warning - discrete_start - NODE_%02d trying to use a node on static input %d",  NODE_INDEX(node->node), inputnum);
+				}
 			}
 		}
 	}

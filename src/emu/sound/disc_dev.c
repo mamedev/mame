@@ -154,6 +154,10 @@ static void dsd_555_astbl_step(node_description *node)
 	double	v_charge, exponent;
 	int		update_exponent, update_t_rc;
 
+	/* put commonly used stuff in local variables for speed */
+	double	threshold = context->threshold;
+	double	trigger   = context->trigger;
+
 	if(DSD_555_ASTBL__RESET)
 	{
 		/* We are in RESET */
@@ -170,16 +174,16 @@ static void dsd_555_astbl_step(node_description *node)
          * So we will just ignore it when it happens. */
 		if (DSD_555_ASTBL__CTRLV < .25) return;
 		/* If it is a node then calculate thresholds based on Control Voltage */
-		context->threshold = DSD_555_ASTBL__CTRLV;
-		context->trigger   = DSD_555_ASTBL__CTRLV / 2.0;
+		threshold = DSD_555_ASTBL__CTRLV;
+		trigger   = DSD_555_ASTBL__CTRLV / 2.0;
 		/* Since the thresholds may have changed we need to update the FF */
-		if (v_cap >= context->threshold)
+		if (v_cap >= threshold)
 		{
 			context->flip_flop = 0;
 			count_f++;
 		}
 		else
-		if (v_cap <= context->trigger)
+		if (v_cap <= trigger)
 		{
 			context->flip_flop = 1;
 			count_r++;
@@ -265,12 +269,12 @@ static void dsd_555_astbl_step(node_description *node)
 					dt = 0;
 
 					/* has it charged past upper limit? */
-					if (v_cap_next >= context->threshold)
+					if (v_cap_next >= threshold)
 					{
 						/* calculate the overshoot time */
-						dt     = t_rc  * log(1.0 / (1.0 - ((v_cap_next - context->threshold) / (v_charge - v_cap))));
+						dt     = t_rc  * log(1.0 / (1.0 - ((v_cap_next - threshold) / (v_charge - v_cap))));
 						x_time = dt;
-						v_cap  = context->threshold;
+						v_cap  = threshold;
 						context->flip_flop = 0;
 						count_f++;
 						update_exponent = 1;
@@ -296,16 +300,16 @@ static void dsd_555_astbl_step(node_description *node)
 				else
 				{
 					/* no discharge resistor so we imediately discharge */
-					v_cap_next = context->trigger;
+					v_cap_next = trigger;
 				}
 
 				/* has it discharged past lower limit? */
-				if (v_cap_next <= context->trigger)
+				if (v_cap_next <= trigger)
 				{
 					/* calculate the overshoot time */
-					dt = t_rc  * log(1.0 / (1.0 - ((context->trigger - v_cap_next) / v_cap)));
+					dt = t_rc  * log(1.0 / (1.0 - ((trigger - v_cap_next) / v_cap)));
 					x_time = dt;
-					v_cap  = context->trigger;
+					v_cap  = trigger;
 					context->flip_flop = 1;
 					count_r++;
 					update_exponent = 1;
@@ -328,7 +332,7 @@ static void dsd_555_astbl_step(node_description *node)
 			node->output[0] = v_cap_next;
 			/* Fake it to AC if needed */
 			if (context->output_is_ac)
-				node->output[0] -= context->threshold * 3.0 /4.0;
+				node->output[0] -= threshold * 3.0 /4.0;
 			break;
 		case DISC_555_OUT_ENERGY:
 			if (x_time == 0) x_time = 1.0;
