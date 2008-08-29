@@ -94,7 +94,7 @@ DISCRETE_SOUND_START(poolshrk)
 	                 15750.0/2.0/64.0,		// 64V signal
 	                 15, 1,					// 4 bit binary up counter
 	                 0, DISC_CLK_IS_FREQ)	// Cleared to 0
-	DISCRETE_TRANSFORM2(NODE_31, 1, NODE_30, 15, "01=!")	// TC output of E8, pin 15. (inverted)
+	DISCRETE_TRANSFORM2(NODE_31, NODE_30, 15, "01=!")	// TC output of E8, pin 15. (inverted)
 
 	DISCRETE_DAC_R1(NODE_32, 1,	// Base of Q3
 			NODE_30,	// IC E8, Q0-Q3
@@ -138,8 +138,8 @@ DISCRETE_SOUND_START(poolshrk)
 	                 15750.0/2.0/2.0,		// 2V signal
 	                 15, 1,					// 4 bit binary up counter
 	                 0, DISC_CLK_IS_FREQ)	// Cleared to 0
-	DISCRETE_TRANSFORM2(NODE_42, 1, NODE_41, 15, "01=!")	// TC output of J9, pin 15. Modified to function as F8 clock enable
-	DISCRETE_TRANSFORM3(POOLSHRK_CLICK_SND, 1, NODE_41, 1, 3.4, "01&2*")	// Q0 output of J9, pin 14.  Set to proper amplitude
+	DISCRETE_TRANSFORM2(NODE_42, NODE_41, 15, "01=!")	// TC output of J9, pin 15. Modified to function as F8 clock enable
+	DISCRETE_TRANSFORM3(POOLSHRK_CLICK_SND, NODE_41, 1, 3.4, "01&2*")	// Q0 output of J9, pin 14.  Set to proper amplitude
 
 	/************************************************/
 	/* Final mix and output.                        */

@@ -108,7 +108,7 @@ DISCRETE_SOUND_START(atarifb)
 	DISCRETE_555_ASTABLE(NODE_30, ATARIFB_WHISTLE_EN,
 							RES_K(2.2), RES_K(2.2), CAP_U(0.1),	// r34, r33, c44
 							&atarifbWhistl555)
-	DISCRETE_TRANSFORM3(ATARIFB_WHISTLE_SND, 1, NODE_30, .5, 0, "01-P2>*")	// Q10 drop
+	DISCRETE_TRANSFORM3(ATARIFB_WHISTLE_SND, NODE_30, .5, 0, "01-P2>*")	// Q10 drop
 
 	/************************************************/
 	/* Mixing stage - A9                            */
@@ -198,7 +198,7 @@ DISCRETE_SOUND_START(abaseb)
 	DISCRETE_555_ASTABLE(NODE_30, ATARIFB_WHISTLE_EN,
 							RES_K(2.2), RES_K(2.2), CAP_U(0.1),	// r34, r33, c44
 							&atarifbWhistl555)
-	DISCRETE_TRANSFORM3(ABASEB_WHISTLE_SND, 1, NODE_30, .5, 0, "01-P2>*")	// Q10 drop
+	DISCRETE_TRANSFORM3(ABASEB_WHISTLE_SND, NODE_30, .5, 0, "01-P2>*")	// Q10 drop
 
 	/************************************************/
 	/* Mixing stage - A9                            */

@@ -394,7 +394,6 @@ DISCRETE_SOUND_START(phoenix)
 						&phoenix_effect2_cap_sel)
 	/* Part of the frequency select also effects the gain */
 	DISCRETE_TRANSFORM2(NODE_31,				/* 0/1 state of PHOENIX_EFFECT_2_FREQ high bit */
-						1,						/* ENAB */
 						PHOENIX_EFFECT_2_FREQ, 2, "01&1/") // get bit 0x02
 	DISCRETE_SWITCH(NODE_32,					/* voltage level */
 					1,							/* ENAB */

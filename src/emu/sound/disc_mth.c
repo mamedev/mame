@@ -395,9 +395,9 @@ static void dst_dac_r1_reset(node_description *node)
  *
  * Dec 2004, D Renaud.
  ************************************************************************/
-#define DST_DIODE_MIX__ENABLE		(*(node->input[0]))
-#define DST_DIODE_MIX__VJUNC		(*(node->input[1]))
-#define DST_DIODE_MIX__INP(addr)	(*(node->input[2 + addr]))
+#define DST_DIODE_MIX__VJUNC		(*(node->input[0]))
+#define DST_DIODE_MIX_INP_OFFSET	1
+#define DST_DIODE_MIX__INP(addr)	(*(node->input[DST_DIODE_MIX_INP_OFFSET + addr]))
 
 static void dst_diode_mix_step(node_description *node)
 {
@@ -406,26 +406,19 @@ static void dst_diode_mix_step(node_description *node)
 	double	max = 0;
 	int		addr;
 
-	if (DST_DIODE_MIX__ENABLE)
+	for (addr = 0; addr < context->size; addr++)
 	{
-		for (addr = 0; addr < context->size; addr++)
-		{
-			if (DST_DIODE_MIX__INP(addr) > max) max = DST_DIODE_MIX__INP(addr);
-		}
-		node->output[0] = max - DST_DIODE_MIX__VJUNC;
-		if (node->output[0] < 0) node->output[0] = 0;
+		if (DST_DIODE_MIX__INP(addr) > max) max = DST_DIODE_MIX__INP(addr);
 	}
-	else
-	{
-		node->output[0] = 0;
-	}
+	node->output[0] = max - DST_DIODE_MIX__VJUNC;
+	if (node->output[0] < 0) node->output[0] = 0;
 }
 
 static void dst_diode_mix_reset(node_description *node)
 {
 	struct dst_size_context *context = node->context;
 
-	context->size = node->active_inputs - 2;
+	context->size = node->active_inputs - DST_DIODE_MIX_INP_OFFSET;
 
 	dst_diode_mix_step(node);
 }
@@ -1566,12 +1559,11 @@ static void dst_aswitch_step(node_description *node)
  * input[5]    - Channel4 input value
  *
  ************************************************************************/
-#define DST_TRANSFORM__ENABLE	(*(node->input[0]))
-#define DST_TRANSFORM__IN0		(*(node->input[1]))
-#define DST_TRANSFORM__IN1		(*(node->input[2]))
-#define DST_TRANSFORM__IN2		(*(node->input[3]))
-#define DST_TRANSFORM__IN3		(*(node->input[4]))
-#define DST_TRANSFORM__IN4		(*(node->input[5]))
+#define DST_TRANSFORM__IN0		(*(node->input[0]))
+#define DST_TRANSFORM__IN1		(*(node->input[1]))
+#define DST_TRANSFORM__IN2		(*(node->input[2]))
+#define DST_TRANSFORM__IN3		(*(node->input[3]))
+#define DST_TRANSFORM__IN4		(*(node->input[4]))
 
 #define MAX_TRANS_STACK	16
 
@@ -1592,102 +1584,95 @@ INLINE void dst_transform_push(double *stack, int *pointer, double value)
 
 static void dst_transform_step(node_description *node)
 {
-	if(DST_TRANSFORM__ENABLE)
+	double	trans_stack[MAX_TRANS_STACK];
+	double	number1,top;
+	int		trans_stack_ptr = 0;
+
+	const char *fPTR = node->custom;
+	node->output[0]  = 0;
+
+	top = HUGE_VAL;
+
+	while(*fPTR != 0)
 	{
-		double	trans_stack[MAX_TRANS_STACK];
-		double	number1,top;
-		int		trans_stack_ptr = 0;
-
-		const char *fPTR = node->custom;
-		node->output[0]  = 0;
-
-		top = HUGE_VAL;
-
-		while(*fPTR != 0)
+		switch (*fPTR++)
 		{
-			switch (*fPTR++)
-			{
-				case '*':
-					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = number1 * top;
-					break;
-				case '/':
-					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = number1 / top;
-					break;
-				case '+':
-					number1=dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = number1 + top;
-					break;
-				case '-':
-					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = number1 - top;
-					break;
-				case '0':
-					dst_transform_push(trans_stack, &trans_stack_ptr, top);
-					top = DST_TRANSFORM__IN0;
-					break;
-				case '1':
-					dst_transform_push(trans_stack, &trans_stack_ptr, top);
-					top = DST_TRANSFORM__IN1;
-					break;
-				case '2':
-					dst_transform_push(trans_stack, &trans_stack_ptr, top);
-					top = DST_TRANSFORM__IN2;
-					break;
-				case '3':
-					dst_transform_push(trans_stack, &trans_stack_ptr, top);
-					top = DST_TRANSFORM__IN3;
-					break;
-				case '4':
-					dst_transform_push(trans_stack, &trans_stack_ptr, top);
-					top = DST_TRANSFORM__IN4;
-					break;
-				case 'P':
-					dst_transform_push(trans_stack, &trans_stack_ptr, top);
-					break;
-				case 'i':	/* * -1 */
-					top = -top;
-					break;
-				case '!':	/* Logical NOT of Last Value */
-					top = !top;
-					break;
-				case '=':	/* Logical = */
-					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = (int)number1 == (int)top;
-					break;
-				case '>':	/* Logical > */
-					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = number1 > top;
-					break;
-				case '<':	/* Logical < */
-					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = number1 < top;
-					break;
-				case '&':	/* Bitwise AND */
-					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = (int)number1 & (int)top;
-					break;
-				case '|':	/* Bitwise OR */
-					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = (int)number1 | (int)top;
-					break;
-				case '^':	/* Bitwise XOR */
-					number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
-					top = (int)number1 ^ (int)top;
-					break;
-				default:
-					discrete_log("dst_transform_step - Invalid function type/variable passed");
-					node->output[0] = 0;
-					break;
-			}
+			case '*':
+				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = number1 * top;
+				break;
+			case '/':
+				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = number1 / top;
+				break;
+			case '+':
+				number1=dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = number1 + top;
+				break;
+			case '-':
+				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = number1 - top;
+				break;
+			case '0':
+				dst_transform_push(trans_stack, &trans_stack_ptr, top);
+				top = DST_TRANSFORM__IN0;
+				break;
+			case '1':
+				dst_transform_push(trans_stack, &trans_stack_ptr, top);
+				top = DST_TRANSFORM__IN1;
+				break;
+			case '2':
+				dst_transform_push(trans_stack, &trans_stack_ptr, top);
+				top = DST_TRANSFORM__IN2;
+				break;
+			case '3':
+				dst_transform_push(trans_stack, &trans_stack_ptr, top);
+				top = DST_TRANSFORM__IN3;
+				break;
+			case '4':
+				dst_transform_push(trans_stack, &trans_stack_ptr, top);
+				top = DST_TRANSFORM__IN4;
+				break;
+			case 'P':
+				dst_transform_push(trans_stack, &trans_stack_ptr, top);
+				break;
+			case 'i':	/* * -1 */
+				top = -top;
+				break;
+			case '!':	/* Logical NOT of Last Value */
+				top = !top;
+				break;
+			case '=':	/* Logical = */
+				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = (int)number1 == (int)top;
+				break;
+			case '>':	/* Logical > */
+				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = number1 > top;
+				break;
+			case '<':	/* Logical < */
+				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = number1 < top;
+				break;
+			case '&':	/* Bitwise AND */
+				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = (int)number1 & (int)top;
+				break;
+			case '|':	/* Bitwise OR */
+				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = (int)number1 | (int)top;
+				break;
+			case '^':	/* Bitwise XOR */
+				number1 = dst_transform_pop(trans_stack, &trans_stack_ptr);
+				top = (int)number1 ^ (int)top;
+				break;
+			default:
+				discrete_log("dst_transform_step - Invalid function type/variable passed");
+				node->output[0] = 0;
+				break;
 		}
-		node->output[0] = top;
 	}
-	else
-	{
-		node->output[0] = 0;
-	}
+	node->output[0] = top;
 }
 
 

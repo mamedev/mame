@@ -19,8 +19,13 @@
  *
  ***********************************************************************
  *
- * For good free text books on electronic theory check out:
+ * For free text books on electronic theory check out:
  * http://www.ibiblio.org/obp/electricCircuits/
+ * For a free circuit simulator:
+ * http://qucs.sourceforge.net/index.html
+ * For a free waveform editor to view DISCRETE_WAVELOG dumps:
+ * http://audacity.sourceforge.net/
+ * http://www.sonicvisualiser.org/
  *
  ***********************************************************************
  *
@@ -228,16 +233,16 @@
  * DISCRETE_RAMP(NODE,ENAB,RAMP,GRAD,MIN,MAX,CLAMP)
  * DISCRETE_SAMPLHOLD(NODE,ENAB,INP0,CLOCK,CLKTYPE)
  * DISCRETE_SWITCH(NODE,ENAB,SWITCH,INP0,INP1)
- * DISCRETE_TRANSFORM2(NODE,ENAB,INP0,INP1,FUNCT)
- * DISCRETE_TRANSFORM3(NODE,ENAB,INP0,INP1,INP2,FUNCT)
- * DISCRETE_TRANSFORM4(NODE,ENAB,INP0,INP1,INP2,INP3,FUNCT)
- * DISCRETE_TRANSFORM5(NODE,ENAB,INP0,INP1,INP2,INP3,INP4,FUNCT)
+ * DISCRETE_TRANSFORM2(NODE,INP0,INP1,FUNCT)
+ * DISCRETE_TRANSFORM3(NODE,INP0,INP1,INP2,FUNCT)
+ * DISCRETE_TRANSFORM4(NODE,INP0,INP1,INP2,INP3,FUNCT)
+ * DISCRETE_TRANSFORM5(NODE,INP0,INP1,INP2,INP3,INP4,FUNCT)
  *
  * DISCRETE_COMP_ADDER(NODE,ENAB,DATA,TABLE)
  * DISCRETE_DAC_R1(NODE,ENAB,DATA,VDATA,LADDER)
- * DISCRETE_DIODE_MIXER2(NODE,ENAB,VJUNC,IN0,IN1)
- * DISCRETE_DIODE_MIXER3(NODE,ENAB,VJUNC,IN0,IN1,IN2)
- * DISCRETE_DIODE_MIXER4(NODE,ENAB,VJUNC,IN0,IN1,IN2,IN3)
+ * DISCRETE_DIODE_MIXER2(NODE,VJUNC,IN0,IN1)
+ * DISCRETE_DIODE_MIXER3(NODE,VJUNC,IN0,IN1,IN2)
+ * DISCRETE_DIODE_MIXER4(NODE,VJUNC,IN0,IN1,IN2,IN3)
  * DISCRETE_INTEGRATE(NODE,TRG0,TRG1,INFO)
  * DISCRETE_MIXER2(NODE,ENAB,IN0,IN1,INFO)
  * DISCRETE_MIXER3(NODE,ENAB,IN0,IN1,IN2,INFO)
@@ -282,8 +287,8 @@
  * DISCRETE_RCDISC3(NODE,ENAB,INP0,RVAL0,RVAL1,CVAL)
  * DISCRETE_RCDISC4(NODE,ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE)
  * DISCRETE_RCDISC5(NODE,ENAB,IN0,RVAL,CVAL)
- * DISCRETE_RCINTEGRATE(NODE,ENAB,IN0,IN1,RVAL0,RVAL1,CVAL)
- * DISCRETE_RCDISC_MODULATED(NODE,ENAB,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP)
+ * DISCRETE_RCINTEGRATE(NODE,INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE)
+ * DISCRETE_RCDISC_MODULATED(NODE,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP)
  * DISCRETE_RCFILTER(NODE,ENAB,IN0,RVAL,CVAL)
  * DISCRETE_RCFILTER_VREF(NODE,ENAB,IN0,RVAL,CVAL,VREF)
  *
@@ -1603,24 +1608,21 @@
  *     (n=2,3,4,5)
  *                        .------------.
  *                        |            |
- *    ENAB       -0------>|            |
+ *    INPUT0     -0------>|            |
  *                        |            |
- *    INPUT0     -1------>|            |
- *                        |            |
- *    INPUT1     -2------>|  Postfix   |
+ *    INPUT1     -1------>|  Postfix   |
  *                        |   stack    |----> Netlist node
- *    INPUT2     -3------>|   maths    |
+ *    INPUT2     -2------>|   maths    |
  *                        |            |
- *    INPUT3     -4------>|            |
+ *    INPUT3     -3------>|            |
  *                        |            |
- *    INPUT4     -5------>|            |
+ *    INPUT4     -4------>|            |
  *                        |            |
  *                        '------------'
  *
  *  Declaration syntax
  *
  *     DISCRETE_TRANSFORMn(name of node,
- *                         enable node or static value,
  *                         input0 node or static value,
  *                         input1 node or static value,
  *                         input2 node or static value,  [optional]
@@ -1630,7 +1632,7 @@
  *
  *  Example config line
  *
- *  DISCRETE_TRANSFORM4(NODE_12,1,NODE_22,50.0,120.0,33.33,"01*2+3/")
+ *  DISCRETE_TRANSFORM4(NODE_12,NODE_22,50.0,120.0,33.33,"01*2+3/")
  *
  *  Arithmetic uses stack based arithmetic similar to Forth, the maths
  *  has 5 registers 0-4 and various arithmetic operations. The math
@@ -1758,13 +1760,12 @@
  *  Declaration syntax
  *
  *     DISCRETE_DIODE_MIXERx(name of node,
- *         (x = 2/3/4)       enable node or static value,
- *                           voltage drop of the diode junction (static value),
+ *         (x = 2/3/4)       voltage drop of the diode junction (static value),
  *                           input 0 node,
  *                           input 1 node,
  *                           ...)
  *
- * EXAMPLES: see
+ * EXAMPLES: see dkong
  *
  ***********************************************************************
  *
@@ -2596,7 +2597,6 @@
  *  Declaration syntax
  *
  *     DISCRETE_RCDISC_MODULATED(name of node,
- *                      enable,
  *                      INPUT1 node (or value),
  *                      INPUT2 node (or value),
  *                      R1 value in OHMS (static value),
@@ -2722,7 +2722,6 @@
  *  Declaration syntax
  *
  *     DISCRETE_RCINTEGRATE(name of node,
- *                          enable,
  *                          INPUT node (or value),
  *                          R1 value in OHMS,
  *                          R2 value in OHMS,
@@ -4098,16 +4097,16 @@ enum
 #define DISCRETE_SAMPLHOLD(NODE,ENAB,INP0,CLOCK,CLKTYPE)                { NODE, DST_SAMPHOLD    , 4, { ENAB,INP0,CLOCK,NODE_NC }, { ENAB,INP0,CLOCK,CLKTYPE }, NULL, "DISCRETE_SAMPLHOLD" },
 #define DISCRETE_SWITCH(NODE,ENAB,SWITCH,INP0,INP1)                     { NODE, DST_SWITCH      , 4, { ENAB,SWITCH,INP0,INP1 }, { ENAB,SWITCH,INP0,INP1 }, NULL, "DISCRETE_SWITCH" },
 #define DISCRETE_ASWITCH(NODE,ENAB,CTRL,INP,THRESHOLD)                  { NODE, DST_ASWITCH     , 3, { ENAB,CTRL,INP,THRESHOLD }, { ENAB,CTRL,INP, THRESHOLD}, NULL, "Analog Switch" },
-#define DISCRETE_TRANSFORM2(NODE,ENAB,INP0,INP1,FUNCT)                  { NODE, DST_TRANSFORM   , 3, { ENAB,INP0,INP1 }, { ENAB,INP0,INP1 }, FUNCT, "DISCRETE_TRANSFORM2" },
-#define DISCRETE_TRANSFORM3(NODE,ENAB,INP0,INP1,INP2,FUNCT)             { NODE, DST_TRANSFORM   , 4, { ENAB,INP0,INP1,INP2 }, { ENAB,INP0,INP1,INP2 }, FUNCT, "DISCRETE_TRANSFORM3" },
-#define DISCRETE_TRANSFORM4(NODE,ENAB,INP0,INP1,INP2,INP3,FUNCT)        { NODE, DST_TRANSFORM   , 5, { ENAB,INP0,INP1,INP2,INP3 }, { ENAB,INP0,INP1,INP2,INP3 }, FUNCT, "DISCRETE_TRANSFORM4" },
-#define DISCRETE_TRANSFORM5(NODE,ENAB,INP0,INP1,INP2,INP3,INP4,FUNCT)   { NODE, DST_TRANSFORM   , 6, { ENAB,INP0,INP1,INP2,INP3,INP4 }, { ENAB,INP0,INP1,INP2,INP3,INP4 }, FUNCT, "DISCRETE_TRANSFORM5" },
+#define DISCRETE_TRANSFORM2(NODE,INP0,INP1,FUNCT)                       { NODE, DST_TRANSFORM   , 2, { INP0,INP1 }, { INP0,INP1 }, FUNCT, "DISCRETE_TRANSFORM2" },
+#define DISCRETE_TRANSFORM3(NODE,INP0,INP1,INP2,FUNCT)                  { NODE, DST_TRANSFORM   , 3, { INP0,INP1,INP2 }, { INP0,INP1,INP2 }, FUNCT, "DISCRETE_TRANSFORM3" },
+#define DISCRETE_TRANSFORM4(NODE,INP0,INP1,INP2,INP3,FUNCT)             { NODE, DST_TRANSFORM   , 4, { INP0,INP1,INP2,INP3 }, { INP0,INP1,INP2,INP3 }, FUNCT, "DISCRETE_TRANSFORM4" },
+#define DISCRETE_TRANSFORM5(NODE,INP0,INP1,INP2,INP3,INP4,FUNCT)        { NODE, DST_TRANSFORM   , 5, { INP0,INP1,INP2,INP3,INP4 }, { INP0,INP1,INP2,INP3,INP4 }, FUNCT, "DISCRETE_TRANSFORM5" },
 /* Component specific */
 #define DISCRETE_COMP_ADDER(NODE,ENAB,DATA,TABLE)                       { NODE, DST_COMP_ADDER  , 2, { ENAB,DATA }, { ENAB,DATA }, TABLE, "DISCRETE_COMP_ADDER" },
 #define DISCRETE_DAC_R1(NODE,ENAB,DATA,VDATA,LADDER)                    { NODE, DST_DAC_R1      , 3, { ENAB,DATA,VDATA }, { ENAB,DATA,VDATA }, LADDER, "DISCRETE_DAC_R1" },
-#define DISCRETE_DIODE_MIXER2(NODE,ENAB,VJUNC,IN0,IN1)                  { NODE, DST_DIODE_MIX   , 4, { ENAB,NODE_NC,IN0,IN1 }, { ENAB,VJUNC,IN0,IN1 }, NULL, "DISCRETE_DIODE_MIXER2" },
-#define DISCRETE_DIODE_MIXER3(NODE,ENAB,VJUNC,IN0,IN1,IN2)              { NODE, DST_DIODE_MIX   , 5, { ENAB,NODE_NC,IN0,IN1,IN2 }, { ENAB,VJUNC,IN0,IN1,IN2 }, INFO, "DISCRETE_DIODE_MIXER3" },
-#define DISCRETE_DIODE_MIXER4(NODE,ENAB,VJUNC,IN0,IN1,IN2,IN3)          { NODE, DST_DIODE_MIX   , 6, { ENAB,NODE_NC,IN0,IN1,IN2,IN3 }, { ENAB,VJUNC,IN0,IN1,IN2,IN3 }, INFO, "DISCRETE_DIODE_MIXER4" },
+#define DISCRETE_DIODE_MIXER2(NODE,VJUNC,IN0,IN1)                       { NODE, DST_DIODE_MIX   , 3, { NODE_NC,IN0,IN1 }, { VJUNC,IN0,IN1 }, NULL, "DISCRETE_DIODE_MIXER2" },
+#define DISCRETE_DIODE_MIXER3(NODE,VJUNC,IN0,IN1,IN2)                   { NODE, DST_DIODE_MIX   , 4, { NODE_NC,IN0,IN1,IN2 }, { VJUNC,IN0,IN1,IN2 }, INFO, "DISCRETE_DIODE_MIXER3" },
+#define DISCRETE_DIODE_MIXER4(NODE,VJUNC,IN0,IN1,IN2,IN3)               { NODE, DST_DIODE_MIX   , 5, { NODE_NC,IN0,IN1,IN2,IN3 }, { VJUNC,IN0,IN1,IN2,IN3 }, INFO, "DISCRETE_DIODE_MIXER4" },
 #define DISCRETE_INTEGRATE(NODE,TRG0,TRG1,INFO)                         { NODE, DST_INTEGRATE   , 2, { TRG0,TRG1 }, { TRG0,TRG1 }, INFO, "DISCRETE_INTEGRATE" },
 #define DISCRETE_MIXER2(NODE,ENAB,IN0,IN1,INFO)                         { NODE, DST_MIXER       , 3, { ENAB,IN0,IN1 }, { ENAB,IN0,IN1 }, INFO, "DISCRETE_MIXER2" },
 #define DISCRETE_MIXER3(NODE,ENAB,IN0,IN1,IN2,INFO)                     { NODE, DST_MIXER       , 4, { ENAB,IN0,IN1,IN2 }, { ENAB,IN0,IN1,IN2 }, INFO, "DISCRETE_MIXER3" },
@@ -4135,11 +4134,11 @@ enum
 #define DISCRETE_RCDISC3(NODE,ENAB,INP0,RVAL0,RVAL1,CVAL)               { NODE, DST_RCDISC3     , 5, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,CVAL }, NULL, "DISCRETE_RCDISC3" },
 #define DISCRETE_RCDISC4(NODE,ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE) { NODE, DST_RCDISC4     , 8, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,VP,TYPE }, NULL, "DISCRETE_RCDISC4" },
 #define DISCRETE_RCDISC5(NODE,ENAB,INP0,RVAL,CVAL)                      { NODE, DST_RCDISC5     , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_RCDISC5" },
-#define DISCRETE_RCDISC_MODULATED(NODE,ENAB,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP)			{ NODE, DST_RCDISC_MOD     , 9, { ENAB,INP0,INP1,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP }, NULL, "DISCRETE_RCDISC_MODULATED" },
+#define DISCRETE_RCDISC_MODULATED(NODE,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP)	{ NODE, DST_RCDISC_MOD, 8, { INP0,INP1,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP }, NULL, "DISCRETE_RCDISC_MODULATED" },
 #define DISCRETE_RCFILTER(NODE,ENAB,INP0,RVAL,CVAL)                     { NODE, DST_RCFILTER    , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_RCFILTER" },
 #define DISCRETE_RCFILTER_SW(NODE,ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4) { NODE, DST_RCFILTER_SW, 8, { ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4 }, { ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4 }, NULL, "DISCRETE_RCFILTER_SW" },
 #define DISCRETE_RCFILTER_VREF(NODE,ENAB,INP0,RVAL,CVAL,VREF)           { NODE, DST_RCFILTER    , 5, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL,VREF }, NULL, "DISCRETE_RCFILTER_VREF" },
-#define DISCRETE_RCINTEGRATE(NODE,ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE) { NODE, DST_RCINTEGRATE, 8, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE }, NULL, "DISCRETE_RCINTEGRATE" },
+#define DISCRETE_RCINTEGRATE(NODE,INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE)  { NODE, DST_RCINTEGRATE , 7, { INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE }, NULL, "DISCRETE_RCINTEGRATE" },
 /* For testing - seem to be buggered.  Use versions not ending in N. */
 #define DISCRETE_RCDISCN(NODE,ENAB,INP0,RVAL,CVAL)                      { NODE, DST_RCDISCN     , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_RCDISCN" },
 #define DISCRETE_RCDISC2N(NODE,SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL)       { NODE, DST_RCDISC2N    , 6, { SWITCH,INP0,NODE_NC,INP1,NODE_NC,NODE_NC }, { SWITCH,INP0,RVAL0,INP1,RVAL1,CVAL }, NULL, "DISCRETE_RCDISC2N" },

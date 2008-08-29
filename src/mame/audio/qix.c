@@ -56,16 +56,16 @@ static DISCRETE_SOUND_START(qix)
 	DISCRETE_INPUT_DATA (QIX_VOL_DATA)
 
 	/* Seperate the two 4-bit channels. */
-	DISCRETE_TRANSFORM3(QIX_VOL_DATA_L, 1, QIX_VOL_DATA, 16, 0x0f, "01/2&")
-	DISCRETE_TRANSFORM2(QIX_VOL_DATA_R, 1, QIX_VOL_DATA, 0x0f, "01&")
+	DISCRETE_TRANSFORM3(QIX_VOL_DATA_L, QIX_VOL_DATA, 16, 0x0f, "01/2&")
+	DISCRETE_TRANSFORM2(QIX_VOL_DATA_R, QIX_VOL_DATA, 0x0f, "01&")
 
 	/* Work out the parallel resistance of the selected resistors. */
 	DISCRETE_COMP_ADDER(NODE_10, 1, QIX_VOL_DATA_L, &qix_attn_table)
 	DISCRETE_COMP_ADDER(NODE_20, 1, QIX_VOL_DATA_R, &qix_attn_table)
 
 	/* Then use it for the resistor divider network. */
-	DISCRETE_TRANSFORM3(NODE_11, 1, NODE_10, RES_K(10), QIX_DAC_DATA, "001+/2*")
-	DISCRETE_TRANSFORM3(NODE_21, 1, NODE_20, RES_K(10), QIX_DAC_DATA, "001+/2*")
+	DISCRETE_TRANSFORM3(NODE_11, NODE_10, RES_K(10), QIX_DAC_DATA, "001+/2*")
+	DISCRETE_TRANSFORM3(NODE_21, NODE_20, RES_K(10), QIX_DAC_DATA, "001+/2*")
 
 	/* If no resistors are selected (0), then the volume is full. */
 	DISCRETE_SWITCH(NODE_12, 1, QIX_VOL_DATA_L, QIX_DAC_DATA, NODE_11)

@@ -52,7 +52,7 @@ DISCRETE_SOUND_START(hitme)
      * 1.0/(0.45*R*C). We compute that frequency and use a standard 50% duty cycle square wave.
      * This is because the "off time" of the clock is very small (559kHz), and we will miss
      * edges if we model it perfectly accurately. */
-	DISCRETE_TRANSFORM3(NODE_16,1,1,0.45*6.8e-6,HITME_GAME_SPEED,"012*/")
+	DISCRETE_TRANSFORM3(NODE_16,1,0.45*6.8e-6,HITME_GAME_SPEED,"012*/")
 	DISCRETE_SQUAREWAVE(NODE_17,1,NODE_16,1,50,0.5,0)
 
 	/* There are 2 cascaded 4-bit downcounters (2R = low, 2P = high), effectively
@@ -60,7 +60,7 @@ DISCRETE_SOUND_START(hitme)
      * The initial count is latched by writing OUT0. */
 	DISCRETE_COUNTER(NODE_20,1,HITME_OUT0,NODE_17,255,0,HITME_DOWNCOUNT_VAL,DISC_CLK_ON_F_EDGE)
 	/* When the counter rolls over from 0->255, we clock a D-type flipflop at 2N. */
-	DISCRETE_TRANSFORM2(NODE_21,1,NODE_20,255,"01=!")
+	DISCRETE_TRANSFORM2(NODE_21,NODE_20,255,"01=!")
 
 	/* This flipflop represents the latch at 1L. It is clocked when OUT1 is written and latches
      * the value from the processor. When the downcounter above rolls over, it clears the latch. */
