@@ -844,10 +844,11 @@ static void burn_cycles(int count)
 	/* if the timer is enabled, accumulate prescaler cycles */
 	if (mcs48.timecount_enabled & TIMER_ENABLED)
 	{
+		UINT8 oldtimer = mcs48.timer;
 		mcs48.prescaler += count;
 		mcs48.timer += mcs48.prescaler >> 5;
 		mcs48.prescaler &= 0x1f;
-		timerover = (mcs48.timer == 0);
+		timerover = (oldtimer != 0 && mcs48.timer == 0);
 	}
 
 	/* if the counter is enabled, poll the T1 test input once for each cycle */
