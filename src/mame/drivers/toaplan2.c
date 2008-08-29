@@ -49,15 +49,14 @@ Supported games:
 
     SET NOTES:
 
-    sstriker - might be a bootleg / hack, the region jumper is read with this set but even when set
-               to Japan you get all english text etc which seems a little odd, but might be correct.
+    sstriker - The region jumper is read with this set but even when set to Japan you get all english
+               text etc which seems a little odd. However this has been verified correct on two boards.
     kingdmgp - might be a bootleg / hack, some of the tiles needed for the credits screen have been
                stripped out, doesn't seem very professional, since its rare and should probably only
                have a different graphics rom its nearly impossible for us to verify, a lot of boards
                being sold as 'Kingdom Grand Prix' are infact conversions using Neill Corlett's hack
 
-               ** update the above two look like genuine Korean release
-          ??      boards, Raizing probably just missed a few things
+            ** The above two look like genuine Korean release boards, Raizing probably just missed a few things
 
     bgaregga - the clones have fewer types of enemy bullets (not fewer bullets, just fewer types!)
                and Stage Edit is disabled - the dipswitch is still listed in service mode but it
@@ -168,6 +167,11 @@ Sound CPU/MCU:
  Z84C0006PEC (Z80)
 
 
+Sound CPU/MCU:
+ HD647180X0FS6 (Hitachi Z180 Compatible CPU with internal 16k ROM)
+ Z84C0006PEC (Z80)
+ NEC V25+
+
 Sound Chips:
  YM3812
  YM2151
@@ -190,41 +194,6 @@ Battle Garegga
 Mahou Daisakusen
 Battle Bakraid
 
-**********************************************************************
-
-Fix Eight (bootleg)
-Toaplan, 1992
-
-PCB Layout
-----------
-
-|--------------------------------------------|
-|   1.BIN        PAL               14MHz  PAL|
-|   M6295        PAL                         |
-|   PAL     6116 4.BIN          681000 681000|
-|           6116                             |
-|           6116                681000 681000|
-|J          6116        PAL                  |
-|A                             PAL           |
-|M                                           |
-|M   62256  62256              PAL           |
-|A   2.BIN  3.BIN       PAL                  |
-|                       PAL                  |
-|       68000           PAL                  |
-| DSW2        |------|  5.BIN                |
-| DSW1   6264 |TPC   |                       |
-| 3.579545MHz |1020  |  6.BIN                |
-| 10MHz  6264 |------|  7.BIN                |
-|--------------------------------------------|
-Notes:
-      68000 clock at 10.000MHz
-      M6295 clock at 875kHz [14M/16]. Sample rate = 875000 / 165
-      VSync at 60Hz
-      6116  - 2k   x8 SRAM (x4)
-      6264  - 8k   x8 SRAM (x2)
-      62256 - 32k  x8 SRAM (x2)
-      681000- 128k x8 SRAM (x4)
-
 *********************************************************************
 
 Game status:
@@ -232,12 +201,13 @@ Game status:
 Teki Paki                      Working, but no sound. Missing sound MCU dump. Chip is protected. It's a QFP80 Hitachi HD647180.
 Ghox                           Working, but no sound. Missing sound MCU dump. It's a QFP80 Hitachi HD647180.
 Dogyuun                        Working, but no sound. MCU type is likely a NEC V25+. Chip is a PLCC94 stamped 'TS-002-MACH'.
-Knuckle Bash                   Working, but sound FX only (missing music). MCU type is a NEC V25+. Chip is a PLCC94 stamped 'TS-004-DASH'. Some PCBs use another version stamped 'NITRO' which is the same chip type.
+Knuckle Bash                   Working, but sound FX only (missing music). MCU type is a NEC V25+. Chip is a PLCC94 stamped 'TS-004-DASH'.
+                                        Some PCBs use another version stamped 'NITRO' which is the same chip type.
 Truxton 2                      Working.
 Pipi & Bibis                   Working.
 Whoopee                        Working. Missing sound MCU dump. It's a Hitachi HD647180. Using bootleg sound CPU dump for now.
 Pipi & Bibis (Ryouta Kikaku)   Working.
-FixEight                       Not working properly. Missing background GFX, and sound FX only (missing music). Both controlled by MCU. MCU type is a NEC V25+. Chip is a PLCC94 stamped 'TS-001-TURBO'
+FixEight                       Not working properly. Missing background GFX, and sound FX only (missing music). Both controlled by PLCC94 NEC V25+ MCU stamped 'TS-001-TURBO'
 FixEight bootleg               Working. One unknown ROM (same as pipibibi one). Region hardcoded to Korea (@ $4d8)
 Grind Stormer                  Working, but no sound. MCU type is a NEC V25+. Chip is a PLCC94 stamped 'TS-007-SPY'.
 VFive                          Working, but no sound. MCU type is a NEC V25+. Chip is a PLCC94 stamped 'TS-007-SPY'.
@@ -271,6 +241,7 @@ To Do / Unknowns:
     - Need to sort out the video status register.
     - Find out how exactly how sound CPU communication really works in bgaregga/batrider/bbakraid
         current emulation seems to work (plays all sounds), but there are still some unknown reads/writes
+
 
 *****************************************************************************/
 
@@ -4463,6 +4434,42 @@ ROM_START( fixeight )
 ROM_END
 
 
+/*
+Fix Eight (bootleg)
+Toaplan, 1992
+
+PCB Layout
+----------
+
+|--------------------------------------------|
+|   1.BIN        PAL               14MHz  PAL|
+|   M6295        PAL                         |
+|   PAL     6116 4.BIN          681000 681000|
+|           6116                             |
+|           6116                681000 681000|
+|J          6116        PAL                  |
+|A                             PAL           |
+|M                                           |
+|M   62256  62256              PAL           |
+|A   2.BIN  3.BIN       PAL                  |
+|                       PAL                  |
+|       68000           PAL                  |
+| DSW2        |------|  5.BIN                |
+| DSW1   6264 |TPC   |                       |
+| 3.579545MHz |1020  |  6.BIN                |
+| 10MHz  6264 |------|  7.BIN                |
+|--------------------------------------------|
+Notes:
+      68000 clock at 10.000MHz
+      M6295 clock at 875kHz [14M/16]. Sample rate = 875000 / 165
+      VSync at 60Hz
+      6116  - 2k   x8 SRAM (x4)
+      6264  - 8k   x8 SRAM (x2)
+      62256 - 32k  x8 SRAM (x2)
+      681000- 128k x8 SRAM (x4)
+*/
+
+
 ROM_START( fixeighb )
 	ROM_REGION( 0x100000, "main", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "3.bin", 0x000000, 0x80000, CRC(cc77d4b4) SHA1(4d3376cbae13d90c6314d8bb9236c2183fc6253c) )
@@ -4629,62 +4636,87 @@ ROM_END
 
 
 /* -------------------------- Raizing games ------------------------- */
-/* one of these sstriker sets might be bad .. they're very similar    */
+
+
+/* 
+For the two sets of Sorcer Striker (World) the only differences
+are 2 bytes plus a corrected checksum for each set:
+
+File Offset     sstriker   sstrikra
+  0x160            17         0B   <-- Rom checksum value
+  0x161            79         6D   <-- Rom checksum value
+
+  0x92C            18         0C   <-- Unknown, but surrounding bytes are 0x18
+  0x92D            18         0C   <-- Unknown, but surrounding bytes are 0x18
+
+So it looks like sstriker was a slightly revised "final" version of the World set.
+sstrikra has been verified on two boards as being correct.
+
+Printed labels for the eproms look like:
+
+RA-MA-01
+   01
+RAIZING
+
+Both English and Japanese sets use the same labels and numbers for the roms
+even if the roms contain different code / data
+
+*/
 
 ROM_START( sstriker )
 	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
-	ROM_LOAD16_WORD_SWAP( "ra-ma-01.01", 0x000000, 0x080000, CRC(92259f84) SHA1(127e62e407d95efd360bfe2cac9577f326abf6ef) )
+	ROM_LOAD16_WORD_SWAP( "ra-ma-01_01.u65", 0x000000, 0x080000, CRC(92259f84) SHA1(127e62e407d95efd360bfe2cac9577f326abf6ef) )
 
 	ROM_REGION( 0x10000, "audio", 0 )			/* Sound Z80 code */
-	ROM_LOAD( "ra_ma_01.02", 0x00000, 0x10000, CRC(eabfa46d) SHA1(402c99ebf88f9025f74f0a28ced22b7882a65eb3) )
+	ROM_LOAD( "ra-ma-01_02.u66", 0x00000, 0x10000, CRC(eabfa46d) SHA1(402c99ebf88f9025f74f0a28ced22b7882a65eb3) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "ra_ma_01.03",  0x000000, 0x100000, CRC(54e2bd95) SHA1(341359dd46152615675bb90e8a184216c8feebff) )
-	ROM_LOAD( "ra_ma_01.04",  0x100000, 0x100000, CRC(21cd378f) SHA1(e1695bccec949d18b1c03e9c42dca384554b0d7c) )
+	ROM_LOAD( "ra-ma01-rom2.u2",  0x000000, 0x100000, CRC(54e2bd95) SHA1(341359dd46152615675bb90e8a184216c8feebff) )
+	ROM_LOAD( "ra-ma01-rom3.u1",  0x100000, 0x100000, CRC(21cd378f) SHA1(e1695bccec949d18b1c03e9c42dca384554b0d7c) )
 
 	ROM_REGION( 0x008000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "ra-ma-01.05",  0x000000, 0x008000, CRC(88b58841) SHA1(1d16b538c11a291bd1f46a510bfbd6259b45a0b5) )
+	ROM_LOAD( "ra-ma-01_05.u81",  0x000000, 0x008000, CRC(88b58841) SHA1(1d16b538c11a291bd1f46a510bfbd6259b45a0b5) )
 
 	ROM_REGION( 0x40000, "oki", 0 )			/* ADPCM Samples */
-	ROM_LOAD( "ra_ma_01.06", 0x00000, 0x40000, CRC(6edb2ab8) SHA1(e3032e8eda2686f30df4b7a088c5a4d4d45782ed) )
+	ROM_LOAD( "ra-ma01-rom1.u57", 0x00000, 0x40000, CRC(6edb2ab8) SHA1(e3032e8eda2686f30df4b7a088c5a4d4d45782ed) )
 ROM_END
 
 
 ROM_START( sstrikra )
 	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
-	ROM_LOAD16_WORD_SWAP( "rama1_01.bin", 0x000000, 0x080000, CRC(708fd51d) SHA1(167186d4cf13af37ec0fa6a59c738c54dbbf3c7c) )
+	ROM_LOAD16_WORD_SWAP( "ra-ma_01_01.u65", 0x000000, 0x080000, CRC(708fd51d) SHA1(167186d4cf13af37ec0fa6a59c738c54dbbf3c7c) )
 
 	ROM_REGION( 0x10000, "audio", 0 )			/* Sound Z80 code */
-	ROM_LOAD( "ra_ma_01.02", 0x00000, 0x10000, CRC(eabfa46d) SHA1(402c99ebf88f9025f74f0a28ced22b7882a65eb3) )
+	ROM_LOAD( "ra-ma-01_02.u66", 0x00000, 0x10000, CRC(eabfa46d) SHA1(402c99ebf88f9025f74f0a28ced22b7882a65eb3) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "ra_ma_01.03",  0x000000, 0x100000, CRC(54e2bd95) SHA1(341359dd46152615675bb90e8a184216c8feebff) )
-	ROM_LOAD( "ra_ma_01.04",  0x100000, 0x100000, CRC(21cd378f) SHA1(e1695bccec949d18b1c03e9c42dca384554b0d7c) )
+	ROM_LOAD( "ra-ma01-rom2.u2",  0x000000, 0x100000, CRC(54e2bd95) SHA1(341359dd46152615675bb90e8a184216c8feebff) )
+	ROM_LOAD( "ra-ma01-rom3.u1",  0x100000, 0x100000, CRC(21cd378f) SHA1(e1695bccec949d18b1c03e9c42dca384554b0d7c) )
 
 	ROM_REGION( 0x008000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "ra-ma-01.05",  0x000000, 0x008000, CRC(88b58841) SHA1(1d16b538c11a291bd1f46a510bfbd6259b45a0b5) )
+	ROM_LOAD( "ra-ma-01_05.u81",  0x000000, 0x008000, CRC(88b58841) SHA1(1d16b538c11a291bd1f46a510bfbd6259b45a0b5) )
 
 	ROM_REGION( 0x40000, "oki", 0 )			/* ADPCM Samples */
-	ROM_LOAD( "ra_ma_01.06", 0x00000, 0x40000, CRC(6edb2ab8) SHA1(e3032e8eda2686f30df4b7a088c5a4d4d45782ed) )
+	ROM_LOAD( "ra-ma01-rom1.u57", 0x00000, 0x40000, CRC(6edb2ab8) SHA1(e3032e8eda2686f30df4b7a088c5a4d4d45782ed) )
 ROM_END
 
 
 ROM_START( mahoudai )
 	ROM_REGION( 0x080000, "main", 0 )			/* Main 68K code */
-	ROM_LOAD16_WORD_SWAP( "ra_ma_01.01", 0x000000, 0x080000, CRC(970ccc5c) SHA1(c87cab83bde0284e631f02e50068407fee81d941) )
+	ROM_LOAD16_WORD_SWAP( "ra_ma_01_01.u65", 0x000000, 0x080000, CRC(970ccc5c) SHA1(c87cab83bde0284e631f02e50068407fee81d941) )
 
 	ROM_REGION( 0x10000, "audio", 0 )			/* Sound Z80 code */
-	ROM_LOAD( "ra_ma_01.02", 0x00000, 0x10000, CRC(eabfa46d) SHA1(402c99ebf88f9025f74f0a28ced22b7882a65eb3) )
+	ROM_LOAD( "ra-ma-01_02.u66", 0x00000, 0x10000, CRC(eabfa46d) SHA1(402c99ebf88f9025f74f0a28ced22b7882a65eb3) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "ra_ma_01.03",  0x000000, 0x100000, CRC(54e2bd95) SHA1(341359dd46152615675bb90e8a184216c8feebff) )
-	ROM_LOAD( "ra_ma_01.04",  0x100000, 0x100000, CRC(21cd378f) SHA1(e1695bccec949d18b1c03e9c42dca384554b0d7c) )
+	ROM_LOAD( "ra-ma01-rom2.u2",  0x000000, 0x100000, CRC(54e2bd95) SHA1(341359dd46152615675bb90e8a184216c8feebff) )
+	ROM_LOAD( "ra-ma01-rom3.u1",  0x100000, 0x100000, CRC(21cd378f) SHA1(e1695bccec949d18b1c03e9c42dca384554b0d7c) )
 
 	ROM_REGION( 0x008000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "ra_ma_01.05",  0x000000, 0x008000, CRC(c00d1e80) SHA1(53e64c4c0c6309130b37597d13b44a9e95b717d8) )
+	ROM_LOAD( "ra_ma_01_05.u81",  0x000000, 0x008000, CRC(c00d1e80) SHA1(53e64c4c0c6309130b37597d13b44a9e95b717d8) )
 
 	ROM_REGION( 0x40000, "oki", 0 )			/* ADPCM Samples */
-	ROM_LOAD( "ra_ma_01.06", 0x00000, 0x40000, CRC(6edb2ab8) SHA1(e3032e8eda2686f30df4b7a088c5a4d4d45782ed) )
+	ROM_LOAD( "ra-ma01-rom1.u57", 0x00000, 0x40000, CRC(6edb2ab8) SHA1(e3032e8eda2686f30df4b7a088c5a4d4d45782ed) )
 ROM_END
 
 
@@ -5042,7 +5074,7 @@ GAME( 1993, batugnsp, batsugun, batsugun, batsugun, T2_V25,   ROT270, "Toaplan",
 GAME( 1994, snowbro2, 0,        snowbro2, snowbro2, T2_noZ80, ROT0,   "[Toaplan] Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise", 0 )
 GAME( 1993, mahoudai, 0,        mahoudai, mahoudai, T2_Z80,   ROT270, "Raizing (Able license)", "Mahou Daisakusen (Japan)", 0 )
 GAME( 1993, sstriker, mahoudai, mahoudai, sstriker, T2_Z80,   ROT270, "Raizing", "Sorcer Striker (World)" , 0) // from korean board
-GAME( 1993, sstrikra, mahoudai, mahoudai, sstriker, T2_Z80,   ROT270, "Raizing", "Sorcer Striker (World, alt)" , 0) // from korean board
+GAME( 1993, sstrikra, mahoudai, mahoudai, sstriker, T2_Z80,   ROT270, "Raizing", "Sorcer Striker (World, alt)" , 0) // verified on two different PCBs
 GAME( 1994, shippumd, 0,        shippumd, shippumd, T2_Z80,   ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", 0 )
 GAME( 1994, kingdmgp, shippumd, shippumd, kingdmgp, T2_Z80,   ROT270, "Raizing / Eighting", "Kingdom Grandprix (World)" , 0) // from korean board, missing letters on credits screen but this is correct
 GAME( 1996, bgaregga, 0,        bgaregga, bgaregga, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)", 0 )
