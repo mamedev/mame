@@ -27,7 +27,7 @@
 #if (USE_8039)
 #define I8035_P2_W(M,D) do { soundlatch4_w(M,0,D); } while (0)
 #else
-#define I8035_P2_W(M,D) do { cputag_set_input_line(machine, "audio", MCS48_INPUT_EA, ((D) & 0x20) ? CLEAR_LINE : ASSERT_LINE);  soundlatch4_w(M,0,D); } while (0)
+#define I8035_P2_W(M,D) do { set_ea(M, ((D) & 0x20) ? 0 : 1);  soundlatch4_w(M,0,D); } while (0)
 #endif
 
 #define I8035_P1_W_AH(M,B,D) I8035_P1_W(M,ACTIVEHIGH_PORT_BIT(I8035_P1_R(M),B,(D)))
@@ -234,6 +234,19 @@ DISCRETE_SOUND_END
 
 /****************************************************************
  *
+ * EA / Banking
+ *
+ ****************************************************************/
+
+static void set_ea(running_machine *machine, int ea)
+{
+	//printf("ea: %d\n", ea);
+	cputag_set_input_line(machine, "audio", MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
+	//memory_set_bank(MCS48_INTERNAL_ROMBANK, ea);
+}
+
+/****************************************************************
+ *
  * Initialization
  *
  ****************************************************************/
@@ -244,10 +257,13 @@ static SOUND_START( mario )
 #if USE_8039
 	UINT8 *SND = memory_region(machine, "audio");
 
-	SND[1] = 0x01;
+	SND[0x1001] = 0x01;
 #endif
 
-	state_save_register_global(state->last);
+	memory_configure_bank(MCS48_INTERNAL_ROMBANK, 0, 1, memory_region(machine, "audio"), 0);
+    memory_configure_bank(MCS48_INTERNAL_ROMBANK, 1, 1, memory_region(machine, "audio") + 0x1000, 0x800);
+
+    state_save_register_global(state->last);
 	state_save_register_global(state->portT);
 }
 
@@ -255,6 +271,10 @@ static SOUND_RESET( mario )
 {
 	mario_state	*state = machine->driver_data;
 
+#if USE_8039
+    set_ea(machine, 1);
+#endif
+    
 	soundlatch_clear_w(machine,0,0);
 	soundlatch2_clear_w(machine,0,0);
 	soundlatch3_clear_w(machine,0,0);
@@ -398,7 +418,10 @@ WRITE8_HANDLER( mario_sh3_w )
  *************************************/
 
 static ADDRESS_MAP_START( mario_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
+#if USE_8039
+	AM_RANGE(0x0000, 0x07ff) AM_ROMBANK(MCS48_INTERNAL_ROMBANK)
+#endif
+	AM_RANGE(0x0800, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mario_sound_io_map, ADDRESS_SPACE_IO, 8 )

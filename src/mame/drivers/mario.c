@@ -405,9 +405,14 @@ ROM_START( mario )
 	ROM_LOAD( "tma1-c.7d_e-1",     0x4000, 0x2000, CRC(dcceb6c1) SHA1(b19804e69ce2c98cf276c6055c3a250316b96b45) )
 	ROM_LOAD( "tma1-c.7c_e-3",     0xf000, 0x1000, CRC(0d31bd1c) SHA1(a2e238470ba2ea3c81225fec687f61f047c68c59) )
 
-	ROM_REGION( 0x1000, "audio", 0 )	/* sound */
-	ROM_LOAD( "tma1c-a.6k",   0x0000, 0x1000, CRC(06b9ff85) SHA1(111a29bcb9cda0d935675fa26eca6b099a88427f) )
-
+	ROM_REGION( 0x2000, "audio", 0 )	/* sound */
+	/* internal rom */
+	ROM_FILL(                 0x0000, 0x0800, 0x00)
+	/* first half banked */
+	ROM_LOAD( "tma1c-a.6k",   0x1000, 0x0800, CRC(06b9ff85) SHA1(111a29bcb9cda0d935675fa26eca6b099a88427f) )
+	/* second half always read */
+	ROM_CONTINUE(             0x0800, 0x0800)
+	
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mario.3f",     0x0000, 0x1000, CRC(28b0c42c) SHA1(46749568aff88a28c3b6a1ac423abd1b90742a4d) )
 	ROM_LOAD( "mario.3j",     0x1000, 0x1000, CRC(0c8cc04d) SHA1(15fae47d701dc1ef15c943cee6aa991776ecffdf) )
