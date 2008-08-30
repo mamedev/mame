@@ -666,7 +666,7 @@ CUSTOM_INPUT( gwar_rotary )
 		cp_count[which] = (cp_count[which] + 1) & 0x07;
 	}
 	last_value[which] = value;
-return 0xf;
+
 	return value;
 }
 
