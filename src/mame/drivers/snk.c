@@ -666,10 +666,34 @@ CUSTOM_INPUT( gwar_rotary )
 		cp_count[which] = (cp_count[which] + 1) & 0x07;
 	}
 	last_value[which] = value;
-
+return 0xf;
 	return value;
 }
 
+CUSTOM_INPUT( gwarb_rotary )
+{
+	if (input_port_read(field->port->machine, "JOYSTICK_MODE") == 1)
+	{
+		static int last_value[2] = {0, 0};
+		static int cp_count[2] = {0, 0};
+		static const char *ports[] = { "P1ROT", "P2ROT" };
+		int which = (int)(FPTR)param;
+		int value = input_port_read(field->port->machine, ports[which]);
+
+		if ((last_value[which] == 0x5 && value == 0x6) || (last_value[which] == 0x6 && value == 0x5))
+		{
+			if (!cp_count[which])
+				value = 0xf;
+			cp_count[which] = (cp_count[which] + 1) & 0x07;
+		}
+		last_value[which] = value;
+		return value;
+	}
+	else
+	{
+		return 0x0f;
+	}
+}
 
 /************************************************************************/
 
@@ -2202,6 +2226,17 @@ static INPUT_PORTS_START( gwar )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( gwarb )
+	PORT_INCLUDE( gwar )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gwarb_rotary, (void*)0)
+
+	PORT_START("JOYSTICK_MODE")
+	PORT_CONFNAME( 0x01, 0x01, "Joystick mode" )
+	PORT_CONFSETTING( 0x01, "Rotary Joystick" )
+	PORT_CONFSETTING( 0x00, "Normal Joystick" )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( psychos )
 	PORT_START("IN0")
@@ -5119,8 +5154,6 @@ static DRIVER_INIT( countryc )
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc300, 0xc300, 0, 0, countryc_trackball_w);
 }
 
-
-
 GAME( 1984, jcross,   0,        jcross,   jcross,   0,        ROT270, "SNK", "Jumping Cross", 0 )
 GAME( 1984, sgladiat, 0,        sgladiat, sgladiat, 0,        ROT0,   "SNK", "Gladiator 1984", 0 )
 
@@ -5151,7 +5184,7 @@ GAME( 1987, psychosj, psychos,  bermudat, psychos,  0,        ROT0,   "SNK", "Ps
 GAME( 1987, gwar,     0,        gwar,     gwar,     0,        ROT270, "SNK", "Guerrilla War (US)", 0 )
 GAME( 1987, gwarj,    gwar,     gwar,     gwar,     0,        ROT270, "SNK", "Guevara (Japan)", 0 )
 GAME( 1987, gwara,    gwar,     gwara,    gwar,     0,        ROT270, "SNK", "Guerrilla War (Version 1)", 0 )
-GAME( 1987, gwarb,    gwar,     gwar,     gwar,     0,        ROT270, "bootleg", "Guerrilla War (bootleg)", 0 )
+GAME( 1987, gwarb,    gwar,     gwar,     gwarb,    0,        ROT270, "bootleg", "Guerrilla War (bootleg)", 0 )
 GAME( 1988, chopper,  0,        chopper1, chopper,  0,        ROT270, "SNK", "Chopper I (US set 1)", 0 )
 GAME( 1988, choppera, chopper,  choppera, choppera, 0,        ROT270, "SNK", "Chopper I (US set 2)", 0 )
 GAME( 1988, chopperb, chopper,  chopper1, chopper,  0,        ROT270, "SNK", "Chopper I (US set 3)", 0 )
