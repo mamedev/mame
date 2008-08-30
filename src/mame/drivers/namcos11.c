@@ -603,8 +603,6 @@ static INTERRUPT_GEN( namcos11_vblank )
 	}
 	m_n_oldcoin = ~n_coin;
 
-	psx_vblank(machine, cpunum);
-
 	if( strcmp( machine->gamedrv->name, "pocketrc" ) == 0 )
  	{
 		if( g_p_n_psxram[ 0x12c74 / 4 ] == 0x1440fff9 )
@@ -626,9 +624,11 @@ static INTERRUPT_GEN( namcos11_vblank )
 
 		SHRAM( 0xbd30 ) = ( SHRAM( 0xbd30 ) & 0x0000ffff ) | ( 0x0080 << 16 );
 
-		SHRAM( 0xbd08 ) = ( SHRAM( 0xbd08 ) & 0x0000ffff ) | ( input_port_read(machine,  "STEERING" ) << 16 );
+		SHRAM( 0xbd08 ) = ( SHRAM( 0xbd08 ) & 0x0000ffff ) | ( ( input_port_read(machine,  "STEERING" ) - 0x8000 ) << 16 );
 		SHRAM( 0xbd0c ) = ( SHRAM( 0xbd0c ) & 0xffff0000 ) | ( input_port_read(machine,  "GAS" ) << 0 );
 	}
+
+	psx_vblank(machine, cpunum);
 }
 
 static TIMER_CALLBACK( mcu_timer )
@@ -1162,7 +1162,7 @@ static INPUT_PORTS_START( pocketrc )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_UNUSED )
 
 	PORT_START( "STEERING" )
-	PORT_BIT( 0xffff, 0x0000, IPT_PADDLE ) PORT_MINMAX( 0xff00, 0x00ff ) PORT_SENSITIVITY( 100 ) PORT_KEYDELTA( 3 ) PORT_CENTERDELTA( 128 ) PORT_PLAYER( 1 ) PORT_REVERSE
+	PORT_BIT( 0xffff, 0x8000, IPT_PADDLE ) PORT_MINMAX( 0x7f00, 0x80ff ) PORT_SENSITIVITY( 100 ) PORT_KEYDELTA( 3 ) PORT_CENTERDELTA( 128 ) PORT_PLAYER( 1 ) PORT_REVERSE
 
 	PORT_START( "GAS" )
 	PORT_BIT( 0x00ff, 0x0000, IPT_PEDAL ) PORT_MINMAX( 0x0000, 0x00ff ) PORT_SENSITIVITY( 100 ) PORT_KEYDELTA( 15 ) PORT_PLAYER( 1 ) PORT_REVERSE
