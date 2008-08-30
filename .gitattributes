@@ -2114,6 +2114,7 @@ src/mame/drivers/vertigo.c svneol=native#text/plain
 src/mame/drivers/vicdual.c svneol=native#text/plain
 src/mame/drivers/victory.c svneol=native#text/plain
 src/mame/drivers/videopin.c svneol=native#text/plain
+src/mame/drivers/videopkr.c svneol=native#text/plain
 src/mame/drivers/vigilant.c svneol=native#text/plain
 src/mame/drivers/vindictr.c svneol=native#text/plain
 src/mame/drivers/viper.c svneol=native#text/plain

@@ -1655,6 +1655,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/usgames.o $(VIDEO)/usgames.o \
 	$(DRIVERS)/vamphalf.o \
 	$(DRIVERS)/vcombat.o \
+	$(DRIVERS)/videopkr.o \
 	$(DRIVERS)/vroulet.o \
 	$(DRIVERS)/wldarrow.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \

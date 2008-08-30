@@ -1,0 +1,959 @@
+/*************************************************************************
+
+    VIDEO POKER - INTERFLIP
+    -----------------------
+
+    Original driver by Grull Osgo.
+    Rewrite and additional work by Roberto Fresca.
+
+
+    Games running on this hardware:
+
+    * Video Poker,   1984, InterFlip.
+    * Black Jack,    1984, InterFlip.
+    * Video Dado,    1987, InterFlip.
+    * Video Cordoba, 1987, InterFlip.
+
+
+***************************************************************************
+
+
+    History:
+    ========
+
+    InterFlip (Spain), is a subsidiary of Recreativos Franco.
+    This company was created mainly with the purpose of manufacture
+    and distribute export-class games.
+
+    These machines were build in upright wood style cabinets, and compliment
+    with class "C" (for casinos) spanish gaming regulations.
+
+
+***************************************************************************
+
+
+    Hardware Info
+    =============
+
+    This is a two board system: Main & Sound board.
+
+
+    * Main board:
+
+    1x Intel 8039 CPU               Clocked @ 6/8 MHz.
+    2x 2716 EPROM                   Program ROM.
+    2x 2716 EPROM                   Character/graphics ROM.
+    1x 5101 (256 x 4) SRAM          Data Memory (Battery Backed RAM).
+    2x 2114 (1024 x 4) SRAM         8-Bit Char. RAM.
+    1x 2114 (1024 x 4) SRAM         4-Bit Color RAM.
+    1x 74s287 (256 x 4) TTL PROM   	Color PROM.
+
+    1x 6 MHz.(or 8 MHz.) Crystal    CPU clock.
+    1x 7.8643 MHz. Crystal          Video System.
+
+    1x 3.6 Ni-Cd Battery            Data Memory.
+
+    TTL type Raster video           Configurable HIGH-LOW resolution through hardware jumper.
+                                    Configurable 50Hz-60Hz V-Sync through hardware jumper.
+
+    I/O System                      Buffered, latched & optocoupled.
+
+
+    * Sound board:
+
+    1x Intel 8039 CPU               Clocked @ 8 MHz.
+    2x 2716 EPROM                   Program ROM.
+    1x 1408 DAC
+    1x 8.0000 MHz. Crystal
+
+
+********************************************************************************
+
+
+    Main CPU Memory Map
+    ===================
+
+    0x0000 - 0x0FFF         Program ROM.
+
+    Data & Video RAM are mapped through I/O hardware implementations due to
+    I8039 memory addressing restrictions.
+
+
+    Main CPU I/0 Map
+    ================
+
+    P1.0          ; Used at bit level, Aux_0 signal.
+    P1.1          ; Used at bit level, Aux_1 signal.
+    P1.2          ; Used at bit level, Aux_2 signal.
+    P1.3          ; Used at bit level, Aux_3 signal.
+    P1.4          ; Used at bit level, Aux_4 signal & Sound Latch bit 3
+    P1.5          ; Used at bit level, Aux_5 signal & Sound Latch bit 0
+    P1.6          ; Expands address bus for video and color RAM access (V.A8)
+    P1.7          ; Expands address bus for video and color RAM access (V.A9)
+
+    P2.0 - P2.3:  ; I8039 as address bus expansion (Program memory - High address nibble).
+
+    P2.4:         ; Reads 8 bits from data buffer input port (interface for switch encoder).
+                        Bit 0: Lamp_1.
+                        Bit 1: Lamp_2.
+                        Bit 2: Lamp_3.
+                        Bit 3: Lamp_4.
+                        Bit 4: Coin Acceptor.
+                        Bit 5: Hopper 1 & Sound Latch bit 1.
+                        Bit 6: Hopper 2 & Sound Latch bit 2.
+                        Bit 7: Diverter.
+
+                    Writes 8 bits to data latch out port (lamps, relays and coils).
+                        Bit 0: SW_encoder_0.
+                        Bit 1: SW_encoder_1.
+                        Bit 2: SW_encoder_2.
+                        Bit 3: SW_encoder_3.
+                        Bit 4: Coin Out.
+                        Bit 5: Undocumented jumper.
+                        Bit 6: N/U (pulled up).
+                        Bit 7: N/U (pulled up).
+
+    P2.5:         ; Enable access to data RAM.
+    P2.6:         ; Enable access to video RAM (write mode) - no read mode.
+    P2.7:         ; Enable access to color RAM (write Mode) - no read mode.
+
+
+********************************************************************************
+
+
+    Game Info
+    =========
+
+    Pay Tables:
+
+    These machines had its pay tables out of screen, in the upper front panel (backlighted).
+
+
+                        Video Poker (Spanish text only)
+    ----------------------------------------------------------------------------
+    Fichas Jugadas       1 Ficha    2 Fichas    3 Fichas    4 Fichas    5 Fichas
+    ----------------------------------------------------------------------------
+    Escalera Maxima         250        500         750        1000        4000
+    de color
+
+    Escalera de Color       100        200         300         400         500
+
+    Poker                    50        100         150         200         250
+
+    Full                     11         22          33          44          55
+
+    Color                     7         14          21          28          35
+
+    Escalera                  5         10          15          20          25
+
+    Trio                      3          6           9          12          15
+
+    Doble Pareja              2          4           6           8          10
+    ----------------------------------------------------------------------------
+
+
+                        Black Jack (Spanish text only)
+    ----------------------------------------------------------------------------
+    Fichas Jugadas       1 Ficha    2 Fichas    3 Fichas    4 Fichas    5 Fichas
+    ----------------------------------------------------------------------------
+    Empate                   1          2           3           4            5
+
+    La Banca se pasa         2          4           6           8           10
+
+    Jugador tiene mas        2          4           6           8           10
+    que la banca
+
+	Jugador tiene menos      2          4           6           8           10
+    de 22 con 6 cartas
+
+    Jugador tiene blackjack  2          5           7          10           12
+	y la Banca no
+    ----------------------------------------------------------------------------
+
+
+								Video Cordoba
+    ----------------------------------------------------------------------------
+    Fichas Jugadas       1 Ficha    2 Fichas    3 Fichas    4 Fichas    5 Fichas
+    ----------------------------------------------------------------------------
+    TRIPLE BAR				250        250         250         250        2000
+    ............................................................................
+    3 x Doble Bar        - 100            |    Olive-Olive-Any Bar        - 18
+    3 x Single Bar       -  50            |    3 x Orange                 - 14
+    3 x Any Bar          -  20            |    Orange-Orange-Any Bar      - 14
+    3 x Bell             -  20            |    3 x Cherry                 - 10
+    Bell-Bell-Any Bar    -  20            |    2 x Cherry                 -  5
+    3 x Olive            -  10            |    1 x Cherry                 -  2
+    ............................................................................
+    All combinations are valid only from left to rigth
+    ----------------------------------------------------------------------------
+
+
+                     Video Dado
+    ---------------------------------------------
+    Twelve      (12)                    33 x 1
+    Eleven      (11)                    16 x 1
+    Crap        (2,3,12)                 8 x 1
+    Seven       (7)                      5 x 1
+    Field       (2,12)                   3 x 1
+    8 or More   (8,9,10,11,12)           2 x 1
+    6 or Less   (2,3,4,5,6)              2 x 1
+
+    Winnings less or equal to 25 can be re-played
+    ---------------------------------------------
+
+
+    All payments with less than 400 coins are done through hopper.
+    (you need to press "Coin Out" button once per coin due to the lack of hopper emulation)
+
+    Payments over 400 coins are manual.
+
+
+**************************************************************************
+
+
+    TO DO
+    =====
+
+    * Fix the bug on bookeeping mode (videodad & videocba).
+    * Figure out the undocumented jumper.
+    * Properly dump the videocba color PROM.
+    * Button-lamps layout.
+    * Hopper simulation.
+    * Decode output ports for electromechanical counters.
+
+
+**************************************************************************/
+
+
+#define CPU_CLOCK		(XTAL_6MHz)			/* main cpu clock */
+#define CPU_CLOCK_ALT	(XTAL_8MHz)			/* alternative main cpu clock for newer games */
+#define SOUND_CLOCK		(XTAL_8MHz)			/* sound cpu clock */
+#define VIDEO_CLOCK		(XTAL_7.8643MHz)
+
+
+#include "driver.h"
+#include "cpu/mcs48/mcs48.c"
+#include "sound/dac.h"
+
+#define DATA_NVRAM_SIZE     0x100
+
+static UINT8 data_ram[0x100];
+static UINT8 video_ram[0x0400];
+static UINT8 color_ram[0x0400];
+static UINT16 p1, p2;
+static UINT8 t0_latch;
+static UINT16 n_offs;
+static emu_timer *t1_timer;
+
+static UINT8 vp_sound_p2;
+static UINT8 p24_data;
+static UINT8 sound_latch;
+static UINT8 sound_ant;
+static UINT8 dc_4020;
+static UINT8 dc_40103;
+static UINT8 te_40103;
+static UINT8 ld_40103;
+
+UINT8 c_io, hp_1, hp_2, bell, aux3;
+
+
+/*************************
+*     Video Hardware     *
+*************************/
+
+static tilemap *bg_tilemap;
+
+
+PALETTE_INIT( videopkr )
+{
+	int i;
+
+	for (i = 0; i < machine->config->total_colors; i++)
+	{
+		int r, g, b, j;
+
+		j = 0x30 * ((color_prom[i] >> 3) & 0x01);
+
+		/* red component */
+		r = j + 0xbf - (0xbf * ((color_prom[i] >> 0) & 0x01));
+
+		/* green component */
+		g = j + 0xbf - (0xbf * ((color_prom[i] >> 1) & 0x01));
+
+		/* blue component */
+		b = j + 0xbf - (0xbf * ((color_prom[i] >> 2) & 0x01));
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
+	}
+}
+
+
+static TILE_GET_INFO( get_bg_tile_info )
+{
+	int offs = tile_index;
+	int attr = color_ram[offs];
+	int code = video_ram[offs];
+	int color = attr;
+
+	SET_TILE_INFO(0, code, color, 0);
+}
+
+
+VIDEO_START( videopkr )
+{
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+}
+
+VIDEO_START( vidadcba )
+{
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 16, 8, 32, 32);
+}
+
+
+VIDEO_UPDATE( videopkr )
+{
+	tilemap_mark_all_tiles_dirty(bg_tilemap);
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	return 0;
+}
+
+
+/********************
+*   NVRAM Handler   *
+********************/
+
+static NVRAM_HANDLER( videopkr )
+{
+	if (read_or_write)
+	{
+		mame_fwrite(file, data_ram, DATA_NVRAM_SIZE);
+	}
+	else
+	{
+		if (file)
+		{
+			mame_fread(file, data_ram, DATA_NVRAM_SIZE);
+		}
+		else
+		{
+			memset(data_ram, 0, DATA_NVRAM_SIZE);
+		}
+	}
+}
+
+
+/*************************
+*      R/W Handlers      *
+*************************/
+
+static READ8_HANDLER( videopkr_io_r )
+{
+	UINT8 valor = 0xff;
+	UINT16 kbdin = 0x0000;
+
+	switch (p2)
+	{
+		case 0xef:	/* inputs are multiplexed through a diode matrix */
+		{
+			kbdin = (input_port_read(machine, "IN1") << 8) + input_port_read(machine, "IN0");
+
+			switch (kbdin)
+			{
+				case 0x0001: valor = 0x01; break;
+				case 0x0002: valor = 0x04; break;
+				case 0x0004: valor = 0x05; break;
+				case 0x0008: valor = 0x07; break;
+				case 0x0010: valor = 0x08; break;
+				case 0x0020: valor = 0x09; break;
+				case 0x0040: valor = 0x0a; break;
+				case 0x0080: valor = 0x0b; break;
+				case 0x0100: valor = 0x0c; break;
+				case 0x0200: valor = 0x0d; break;
+				case 0x0400: valor = 0x0e; break;
+				case 0x0800: valor = 0x0f; break;
+				case 0x1000: valor = 0x10; break;
+
+				default: valor = 0x00;
+			}
+			break;
+		}
+		case 0xdf:
+		{
+			n_offs = ((p1 & 0xc0) << 2 ) + offset;
+			valor = data_ram[offset];
+			break;
+		}
+		case 0x5f:
+		{
+			n_offs = ((p1 & 0xc0) << 2 ) + offset;
+			valor = data_ram[offset];
+			break;
+		}
+		case 0x7c:
+		case 0x7d:
+		case 0x7e:
+		case 0x7f:
+		{
+			n_offs = ((p1 & 0xc0) << 2 ) + offset;
+			valor = color_ram[n_offs] & 0x0f;
+			break;
+		}
+		case 0xbc:
+		case 0xbd:
+		case 0xbe:
+		case 0xbf:
+		{
+			n_offs = ((p1 & 0xc0) << 2 ) + offset;
+			valor = video_ram[n_offs];
+			break;
+		}
+	}
+
+	return valor;
+}
+
+static WRITE8_HANDLER( videopkr_io_w )
+{
+	switch (p2)
+	{
+		case 0x3c:
+		case 0x3d:
+		case 0x3e:
+		case 0x3f:
+		{
+			n_offs = ((p1 & 0xc0) << 2 ) + offset;
+			color_ram[n_offs] = data & 0x0f;
+			video_ram[n_offs] = data;
+			tilemap_mark_tile_dirty(bg_tilemap, n_offs);
+			break;
+		}   
+		case 0xdf:
+		{
+			data_ram[offset] = (data & 0x0f) + 0xf0;
+			break;
+		}
+		case 0x7c:
+		case 0x7d:
+		case 0x7e:
+		case 0x7f:
+		{
+			n_offs = ((p1 & 0xc0) << 2 ) + offset;
+			color_ram[n_offs] = data & 0x0f;
+			tilemap_mark_tile_dirty(bg_tilemap, n_offs);
+			break;
+		}
+		case 0xbc:
+		case 0xbd:
+		case 0xbe:
+		case 0xbf:
+		{
+			n_offs = ((p1 & 0xc0) << 2 ) + offset;
+			video_ram[n_offs] = data;
+			tilemap_mark_tile_dirty(bg_tilemap, n_offs);
+			break;
+		}
+		case 0xef:	/* Port 2.4 */
+		{
+			output_set_lamp_value(0, (data & 1));			/* L_1 */
+			output_set_lamp_value(1, ((data >> 1)& 1));		/* L_2 */
+			output_set_lamp_value(2, ((data >> 2) & 1));	/* L_3 */
+			output_set_lamp_value(3, ((data >> 3) & 1));	/* L_4 */
+			output_set_lamp_value(4, ((data >> 4) & 1));	/* Coin */
+			output_set_lamp_value(5, ((data >> 5) & 1));	/* Hopper_1 */
+			output_set_lamp_value(6, ((data >> 6) & 1));	/* Hopper_2 */
+			output_set_lamp_value(7, ((data >> 7) & 1));	/* Diverter */
+			p24_data = data;
+
+			break;
+		}
+		case 0xff:
+		{
+			t0_latch = t0_latch ^ 0x01;		/* fix the bookkeeping mode */
+			break;
+		}
+	}
+}
+
+static READ8_HANDLER( videopkr_p1_data_r )
+{
+	return p1;
+}
+
+static READ8_HANDLER( videopkr_p2_data_r )
+{
+	return p2;
+}
+
+static WRITE8_HANDLER( videopkr_p1_data_w )
+{
+	p1 = data;
+
+	output_set_lamp_value(8, (data & 1));			/* Aux_0 - */
+	output_set_lamp_value(9, ((data >> 1) & 1));	/* Aux_1 - */
+	output_set_lamp_value(10, ((data >> 2) & 1));	/* Aux_2 - */
+	output_set_lamp_value(11, ((data >> 3) & 1));	/* Aux_3 - */
+	output_set_lamp_value(12, ((data >> 4) & 1));	/* Aux_4 - Bell */
+	output_set_lamp_value(13, ((data >> 5) & 1));	/* Aux_5 - /CIO */
+}
+
+static WRITE8_HANDLER( videopkr_p2_data_w )
+{
+	p2 = data;
+}
+
+static READ8_HANDLER( videopkr_t0_latch )
+{
+	return t0_latch;
+}
+
+static WRITE8_HANDLER(p4_w)
+{
+	cputag_set_input_line(machine, "main", 0, CLEAR_LINE);	/* clear interrupt FF */
+}
+
+/*************************
+*     Sound Handlers     *
+*************************/
+/*
+
+  Sound Data ( Sound Board latch )
+
+    Data Bit     Comes from
+    ---------------------------------------------
+    bit 0        Coin I/O     Port 1.5
+    bit 1        Hopper2      Port 2.4 Data Bit 6
+    bit 2        Hopper1      Port 2.4 Data Bit 5
+    bit 3        Bell         Port 1.4
+    bit 4        Aux_3        Port 1.3
+    bit 5        N/U          Pulled Up
+    bit 6        N/U          Pulled Up
+    bit 7        N/U          Pulled Up
+
+
+  Sound Codes
+
+    Hex     Bin         Sound                       Game
+    --------------------------------------------------------------------------
+    0xFF    11111111    No Sound (default state)    All Games.
+    0xFE    11111110    Coin In sound               All Games.
+    0xEF    11101111    Cards draw sound            Video Poker & Black Jack.
+    0xF9    11111001    Hopper run                  Video Poker & Black Jack.
+    0xF8    11111000    Coin Out sound              Video Poker & Black Jack.
+    0xF6    11110110    Coin Out sound              Video Dado  & Video Cordoba.
+    0xFA    11111010    Dice rolling sound          Video Dado.
+    0xFA    11111010    Spinning reels sound        Video Cordoba.
+    0xFB    11111011    Dice rolling sound          Video Dado.
+    0xFB    11111011    Stopping reels sound        Video Cordoba.
+	
+*/
+
+static READ8_HANDLER(sound_io_r)
+{
+	switch (vp_sound_p2)
+	{
+		case 0xbf:
+		{
+			c_io = (p1 >> 5) & 1;
+			hp_1 = (~p24_data >> 6) & 1;
+			hp_2 = (~p24_data >> 5) & 1;
+			bell = (p1 >> 4) & 1;
+
+			sound_ant = sound_latch;
+			sound_latch = c_io + (hp_1 << 1) + (hp_2 << 2) + (bell << 3) + 0xf0;
+
+			break;
+		}
+	}
+
+	return sound_latch;
+}
+
+static WRITE8_HANDLER(sound_io_w)
+{
+	if (vp_sound_p2 == 0x5f || vp_sound_p2 == 0xdf)
+	{
+		dc_40103 = data;
+		dc_4020 = 0;
+	}
+}
+
+static READ8_HANDLER(sound_p2_r)
+{
+	return vp_sound_p2;
+}
+
+static WRITE8_HANDLER(sound_p2_w)
+{
+	vp_sound_p2 = data;
+
+	switch (data)
+	{
+		case 0x5f:
+		{
+			te_40103 = 0;	/* p2.7 LOW */
+			ld_40103 = 0;	/* p2.5 LOW */
+			break;
+		}
+		case 0x7f:
+		{
+			te_40103 = 0;
+			ld_40103 = 1;
+			break;
+		}
+		case 0xff:
+		{
+			te_40103 = 1;
+			ld_40103 = 1;
+			break;
+		}
+	}
+}
+
+static TIMER_CALLBACK(sound_t1_callback)
+{
+	if (te_40103 == 1)
+	{
+		dc_40103++;
+
+		if (dc_40103 == 0)
+		{
+			cpunum_set_input_line(machine, 1, 0, 1);
+		}
+	}
+}
+
+/*************************
+* Memory Map Information *
+*************************/
+
+static ADDRESS_MAP_START( i8039_readmem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( i8039_io_port, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00,          0xff         ) AM_READWRITE(videopkr_io_r, videopkr_io_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(videopkr_p1_data_r, videopkr_p1_data_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(videopkr_p2_data_r, videopkr_p2_data_w)
+	AM_RANGE(MCS48_PORT_P4, MCS48_PORT_P4) AM_WRITE(p4_w)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(videopkr_t0_latch)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( i8039_sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( i8039_sound_port, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00,          0xff         ) AM_READWRITE(sound_io_r, sound_io_w)
+	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(dac_0_data_w)
+	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(sound_p2_r, sound_p2_w)
+ADDRESS_MAP_END
+
+
+/************************
+*      Input Ports      *
+************************/
+
+static INPUT_PORTS_START( videopkr )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Door")    PORT_TOGGLE PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Books")   PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )   PORT_IMPULSE(4)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Start")   PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Discard") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Cancel")  PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Hold 1")  PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Hold 2")  PORT_CODE(KEYCODE_X)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Hold 3")  PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Hold 4")  PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Hold 5")  PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Hopper")  PORT_TOGGLE PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Payout")  PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( blckjack )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Door")   PORT_TOGGLE PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Books")  PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )   PORT_IMPULSE(4)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Start")  PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Hit")    PORT_CODE(KEYCODE_Z) 
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Stand")  PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Double") PORT_CODE(KEYCODE_C)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Hopper") PORT_TOGGLE PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Payout") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( videodad )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Door")  PORT_TOGGLE PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Books") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )   PORT_IMPULSE(4)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Get Credits") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Crap")        PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("6 or Less")   PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Seven")       PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("8 or More")   PORT_CODE(KEYCODE_C)
+
+	PORT_START("IN1")      
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Field")  PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Eleven") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Twelve") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Hopper") PORT_TOGGLE PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Payout") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( videocba )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Door")  PORT_TOGGLE PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Books") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )   PORT_IMPULSE(4)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Start") PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Hopper") PORT_TOGGLE PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Payout") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+/*************************
+*    Graphics Layouts    *
+*************************/
+
+static const gfx_layout tilelayout_16 =
+{
+	16, 8,
+	RGN_FRAC(1,4),
+	2,
+	{ 0, RGN_FRAC(1,2) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
+		RGN_FRAC(1,4), RGN_FRAC(1,4) + 1, RGN_FRAC(1,4) + 2, RGN_FRAC(1,4) + 3,
+		RGN_FRAC(1,4) + 4, RGN_FRAC(1,4) + 5, RGN_FRAC(1,4) + 6, RGN_FRAC(1,4) + 7
+	},
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+static const gfx_layout tilelayout_8 =
+{
+	8,8,
+	RGN_FRAC(1,2),
+	2,
+	{ 0, RGN_FRAC(1,2) },
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
+
+/******************************
+* Graphics Decode Information *
+******************************/
+
+static GFXDECODE_START( videopkr )
+	GFXDECODE_ENTRY( "tiles", 0, tilelayout_8, 0, 64 )
+GFXDECODE_END
+
+
+static GFXDECODE_START( videodad )
+	GFXDECODE_ENTRY( "tiles", 0, tilelayout_16, 0, 64 )
+GFXDECODE_END
+
+
+/*******************************
+*    Machine Start / Reset     *
+*******************************/
+
+static MACHINE_START(videopkr)
+{
+	vp_sound_p2 = 0xff;	/* default P2 latch value */
+	sound_latch = 0xff;	/* default sound data latch value */
+	p24_data = 0xff;
+	p1 = 0xff;
+	t1_timer = timer_alloc(sound_t1_callback, NULL);
+	timer_adjust_periodic(t1_timer, attotime_zero, 0, ATTOTIME_IN_HZ(50));	/* yep, 50Hz. */
+}
+
+
+/************************
+*    Machine Drivers    *
+************************/
+
+static MACHINE_DRIVER_START( videopkr )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", I8039, CPU_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(i8039_readmem, 0)
+	MDRV_CPU_IO_MAP(i8039_io_port, 0)
+
+	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
+
+	MDRV_CPU_ADD("sound", I8039, SOUND_CLOCK)
+	MDRV_CPU_PROGRAM_MAP(i8039_sound_mem, 0)
+	MDRV_CPU_IO_MAP(i8039_sound_port, 0)
+
+	MDRV_MACHINE_START(videopkr)
+	MDRV_NVRAM_HANDLER(videopkr)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(5*8, 31*8-1, 3*8, 29*8-1)
+
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(2080)
+	MDRV_GFXDECODE(videopkr)
+	MDRV_PALETTE_INIT(videopkr)
+	MDRV_PALETTE_LENGTH(256)
+	MDRV_VIDEO_START(videopkr)
+	MDRV_VIDEO_UPDATE(videopkr)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("sound",	DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( blckjack )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(videopkr)
+
+	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(4*8, 31*8-1, 2*8, 30*8-1)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( videodad )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(videopkr)
+	MDRV_CPU_REPLACE("main", I8039, CPU_CLOCK_ALT)
+
+	/* video hardware */
+	MDRV_SCREEN_MODIFY("main")
+	MDRV_SCREEN_SIZE(32*16, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(4*16, 31*16-1, 2*8, 30*8-1)
+
+	MDRV_GFXDECODE(videodad)
+	MDRV_VIDEO_START(vidadcba)
+MACHINE_DRIVER_END
+
+
+/*************************
+*        Rom Load        *
+*************************/
+
+ROM_START( videopkr )
+	ROM_REGION( 0x1000, "main", 0 )
+	ROM_LOAD( "vpoker.c5",	0x0000, 0x0800,	CRC(200d21e4) SHA1(d991c9f10a36a02491bb0aba32129675fed77a10) )
+	ROM_LOAD( "vpoker.c7",	0x0800, 0x0800,	CRC(f72c2a90) SHA1(e9c54d1f895cde0aaca4121a252da40594195a25) )
+
+	ROM_REGION( 0x1000, "sound", 0 )	/* sound cpu program */
+	ROM_LOAD( "vpsona3.pbj",	0x0000, 0x0800,	CRC(a4f7bf7f) SHA1(a08287821f3471cb3e1ae0528811da930fd57387) )
+	ROM_LOAD( "vpsona2.pbj",	0x0800, 0x0800,	CRC(583a9b95) SHA1(a10e85452e285b2a63f885f4e39b7f76ee8b2407) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_DISPOSE )
+	ROM_LOAD( "vpbj_b15.org",	0x0000, 0x0800,	CRC(67468e3a) SHA1(761766f0fb92693d32179a914e11da517cc5747d) )
+	ROM_LOAD( "vpbj_b12.org",	0x0800, 0x0800,	CRC(4aba166e) SHA1(930cea2216a39b5d72021d1b449db018a121adce) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "vpbjorg.col",	0x0000, 0x0100,	CRC(09abf5f1) SHA1(f2d6b4f2f08b47b93728dafb50576d5ca859255f) )
+ROM_END
+
+ROM_START( blckjack )
+	ROM_REGION( 0x1000, "main", 0 )
+	ROM_LOAD( "bjc5org.old",	0x0000, 0x0800,	CRC(e266a28a) SHA1(1f90c85a2a817f1927c9ab2cbf79cfa2dd116dc8) )
+	ROM_LOAD( "bjc7org.old",	0x0800, 0x0800,	CRC(c60c565f) SHA1(c9ed232301750288bd000ac4e2dcf2253745ff0a) )
+
+	ROM_REGION( 0x1000, "sound", 0 )	/* sound cpu program */
+	ROM_LOAD( "vpsona3.pbj",	0x0000, 0x0800,	CRC(a4f7bf7f) SHA1(a08287821f3471cb3e1ae0528811da930fd57387) )
+	ROM_LOAD( "vpsona2.pbj",	0x0800, 0x0800,	CRC(583a9b95) SHA1(a10e85452e285b2a63f885f4e39b7f76ee8b2407) )
+
+	ROM_REGION( 0x1000, "tiles", ROMREGION_DISPOSE )
+	ROM_LOAD( "vpbj_b15.org",	0x0000, 0x0800,	CRC(67468e3a) SHA1(761766f0fb92693d32179a914e11da517cc5747d) )
+	ROM_LOAD( "vpbj_b12.org",	0x0800, 0x0800,	CRC(4aba166e) SHA1(930cea2216a39b5d72021d1b449db018a121adce) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "vpbjorg.col",	0x0000, 0x0100,	CRC(09abf5f1) SHA1(f2d6b4f2f08b47b93728dafb50576d5ca859255f) )
+ROM_END
+
+ROM_START( videodad )
+	ROM_REGION( 0x1000, "main", 0 )
+	ROM_LOAD( "dac5org.old",	0x0000, 0x0800,	CRC(b373c8e9) SHA1(7a99d6aa152f8e6adeddbfdfd13278edeaa529bc) )
+	ROM_LOAD( "dac7org.old",	0x0800, 0x0800,	CRC(afabae30) SHA1(c4198ba8de6811e3367b0154ff479f6738721bfa) )
+
+	ROM_REGION( 0x1000, "sound", 0 )	/* sound cpu program */
+	ROM_LOAD( "vdsona3.dad",	0x0000, 0x0800,	CRC(13f7a462) SHA1(2e2e904637ca7873a2ed67d7ab1524e51b324660) )
+	ROM_LOAD( "vdsona2.dad",	0x0800, 0x0800,	CRC(120e4512) SHA1(207748d4f5793180305bb115af877042517d901f) )
+
+	ROM_REGION( 0x2000, "tiles", ROMREGION_DISPOSE )
+	ROM_LOAD( "vdadob15.bin",	0x0000, 0x0800,	CRC(caa6a4b0) SHA1(af99da30b8ee63d54ac1f1e6737ed707501a5a25) )
+	ROM_LOAD( "vdadob14.bin",	0x0800, 0x0800,	CRC(eabfae6b) SHA1(189b38da5e9c99f99c5425cdfefccc6991e3f85e) )
+	ROM_LOAD( "vdadob12.bin",	0x1000, 0x0800,	CRC(176f7b31) SHA1(613521ed9caf904db22860686e0424d0c0e0cba6) )
+	ROM_LOAD( "vdadob11.bin",	0x1800, 0x0800,	CRC(259492c7) SHA1(003cc40a88f2b9fad0089574963e7e654211bb16) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "vdvcorg.col",	0x0000, 0x0100,	CRC(741b1a22) SHA1(50983ea37f0479793ba38a112a0266c2edc4b5ef) )
+ROM_END
+
+ROM_START( videocba )
+	ROM_REGION( 0x1000, "main", 0 )
+	ROM_LOAD( "vcc5org.old",	0x0000, 0x0800,	CRC(e6a6a4e4) SHA1(ada1e241a2d39e5a9cf400559e825b0b7d88fca5) )
+	ROM_LOAD( "vcc7org.old",	0x0800, 0x0800,	CRC(fdec55c1) SHA1(19b740f3b7f2acaa0fc09f4c0a2fe69721ebbcaf) )
+
+	ROM_REGION( 0x1000, "sound", 0 )	/* sound cpu program */
+	ROM_LOAD( "vcsona3.rod",	0x0000, 0x0800,	CRC(b0948d6c) SHA1(6c45d350288f69b4b2b5ac16ab2b418f14c6eded) )
+	ROM_LOAD( "vcsona2.rod",	0x0800, 0x0800,	CRC(44ff9e85) SHA1(5d7988d2d3bca932b77e014dc61f7a2347b01603) )
+
+	ROM_REGION( 0x2000, "tiles", ROMREGION_DISPOSE )
+	ROM_LOAD( "vcbab15.bin",	0x0000, 0x0800,	CRC(f31281cb) SHA1(bd4743c328f56334ac015c1f10de01ac25810756) )
+	ROM_LOAD( "vcbab14.bin",	0x0800, 0x0800,	CRC(6fd66330) SHA1(0ee3b3329b94ded81f028ebb687e580787c74ded) )
+	ROM_LOAD( "vcbab12.bin",	0x1000, 0x0800,	CRC(eace907a) SHA1(c81fb5eb838fea809729edc8ab2f637fffd0b2d1) )
+	ROM_LOAD( "vcbab11.bin",	0x1800, 0x0800,	CRC(e2069a6d) SHA1(2d4e71f2838451215e6f9629e2d1a35808510353) )
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "vdcbaorg.col",	0x0000, 0x0100,	BAD_DUMP CRC(5b8e78b1) SHA1(ac5a1d7ab9dac7b4994d2f543801bf57e8573ba6) )
+ROM_END
+
+
+/*************************
+*      Game Drivers      *
+*************************/
+ 
+/*    YEAR  NAME      PARENT    MACHINE   INPUT     INIT  ROT    COMPANY      FULLNAME        FLAGS  */
+GAME( 1984, videopkr, 0,        videopkr, videopkr, 0,    ROT0, "InterFlip", "Video Poker",   0 )
+GAME( 1984, blckjack, videopkr, blckjack, blckjack, 0,    ROT0, "InterFlip", "Black Jack",    0 )
+GAME( 1987, videodad, videopkr, videodad, videodad, 0,    ROT0, "InterFlip", "Video Dado",    0 )
+GAME( 1987, videocba, videopkr, videodad, videocba, 0,    ROT0, "InterFlip", "Video Cordoba", GAME_IMPERFECT_COLORS )
