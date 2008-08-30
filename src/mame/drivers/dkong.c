@@ -1704,7 +1704,7 @@ static MACHINE_DRIVER_START( dkong3 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, XTAL_8MHz / 2)	/* verified in schematics */
 	MDRV_CPU_PROGRAM_MAP(dkong3_map, 0)
-	MDRV_CPU_IO_MAP(0, dkong3_io_map)
+	MDRV_CPU_IO_MAP(dkong3_io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_MACHINE_START(dkong3)

@@ -330,7 +330,7 @@ static ADDRESS_MAP_START( rallyx_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa180, 0xa187) AM_WRITE(rallyx_latch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0, 0) AM_WRITE(rallyx_interrupt_vector_w)
 ADDRESS_MAP_END
@@ -854,7 +854,7 @@ static MACHINE_DRIVER_START( rallyx )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(rallyx_map,0)
-	MDRV_CPU_IO_MAP(0,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	/* video hardware */

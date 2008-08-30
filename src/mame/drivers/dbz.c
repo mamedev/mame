@@ -201,7 +201,7 @@ static ADDRESS_MAP_START( dbz_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd001) AM_WRITE(okim6295_data_0_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dbz_sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( dbz_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
@@ -347,7 +347,7 @@ static MACHINE_DRIVER_START( dbz )
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(dbz_sound_readmem, dbz_sound_writemem)
-	MDRV_CPU_IO_MAP(0,dbz_sound_writeport)
+	MDRV_CPU_IO_MAP(dbz_sound_io_map, 0)
 
 	MDRV_GFXDECODE(dbz)
 

@@ -187,7 +187,7 @@ static ADDRESS_MAP_START( masao_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mario_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mario_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE(Z80DMA, "z80dma", z80dma_r, z80dma_w)	/* dma controller */
 ADDRESS_MAP_END
@@ -347,7 +347,7 @@ static MACHINE_DRIVER_START( mario_base )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, Z80_CLOCK)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mario_map, 0)
-	MDRV_CPU_IO_MAP(0,mario_writeport)
+	MDRV_CPU_IO_MAP(mario_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* devices */
@@ -384,7 +384,7 @@ static MACHINE_DRIVER_START( masao )
 
 	MDRV_CPU_REPLACE("main", Z80, 4000000)        /* 4.000 MHz (?) */
 	MDRV_CPU_PROGRAM_MAP(masao_map, 0)
-	MDRV_CPU_IO_MAP(0,mario_writeport)
+	MDRV_CPU_IO_MAP(mario_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* sound hardware */

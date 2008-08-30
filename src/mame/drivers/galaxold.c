@@ -710,7 +710,7 @@ static ADDRESS_MAP_START( ozon1_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8103, 0x8103) AM_WRITE(SMH_NOP) //only one 9b at reset
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( ozon1_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( ozon1_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_control_port_0_w)
@@ -2461,7 +2461,7 @@ static MACHINE_DRIVER_START( ozon1 )
 	MDRV_IMPORT_FROM(galaxold_base)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(ozon1_readmem,ozon1_writemem)
-	MDRV_CPU_IO_MAP(0,ozon1_writeport)
+	MDRV_CPU_IO_MAP(ozon1_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(NULL)

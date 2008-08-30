@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ym2203_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
@@ -457,7 +457,7 @@ static MACHINE_DRIVER_START( pushman )
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(0,sound_writeport)
+	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	/* ElSemi. Reversed the CPU order so the sound callback works with bballs */
 	MDRV_CPU_ADD("mcu", M68705, 4000000)	/* No idea */
@@ -499,7 +499,7 @@ static MACHINE_DRIVER_START( bballs )
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(0,sound_writeport)
+	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	MDRV_INTERLEAVE(60)
 

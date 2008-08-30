@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x6000) AM_WRITE(soundlatch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
@@ -319,7 +319,7 @@ static MACHINE_DRIVER_START( espial )
 
 	MDRV_CPU_ADD("audio", Z80, 3072000)	/* 2 MHz?????? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(0,sound_writeport)
+	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(espial_sound_nmi_gen,4)
 
 	MDRV_MACHINE_RESET(espial)

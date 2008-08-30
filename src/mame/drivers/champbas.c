@@ -347,7 +347,7 @@ static ADDRESS_MAP_START( exctsccr_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0xc00f, 0xc00f) AM_WRITENOP /* ??? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( exctsccr_sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( exctsccr_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK( 0x00ff )
 	AM_RANGE(0x82, 0x82) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x83, 0x83) AM_WRITE(ay8910_control_port_0_w)
@@ -650,7 +650,7 @@ static MACHINE_DRIVER_START( exctsccr )
 
 	MDRV_CPU_ADD("audio", Z80, 4123456)	/* ??? with 4 MHz, nested NMIs might happen */
 	MDRV_CPU_PROGRAM_MAP(exctsccr_sub_map,0)
-	MDRV_CPU_IO_MAP(0,exctsccr_sound_writeport)
+	MDRV_CPU_IO_MAP(exctsccr_sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 4000) /* 4 kHz, updates the dac */
 
 	/* MCU */
