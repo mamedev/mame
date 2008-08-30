@@ -16,28 +16,47 @@
 
 ****************************************************************************
 
-         EU21     EU18     EU20   32.000MHz
-         M6295    M6295    M6295       Xilinx
-   Dip-8 2.000Mhz 2.000Mhz 2.000Mhz
-J        VC9                 GUNCN
-A  Dip-4 VC8                 Xilinx     EGR4
-M               Mach210                 EGR6.3
-M   M5M442256x4 Mach210 Mach210 Mach210 EGR3
-A          11.2896MHz                   EGR2
-     TMS34010           W241024x4       EGR1
- 2803A                                  EGR5.3
-    40.000MHz   Bt121 Mach210 Mach210 Mach210
+Egg Venture
+The Gameroom, 1997
 
+PCB Layout
+----------
 
-Chips:
- TMS34010FNL-40     Main CPU
- Xilinx XC3042-70   Field Programmable Gate Array
- Bt121KPJ80         Triple 8-bit 80MHz VideoDAC
- AMD Mach210A-10JC  Programmable Logic Device (CPLD)
- ST ULN2803A        8 Darlington Transistor Array with common emitter
+(C) 1996 I.C.E.
+|-------------------------------------------------------|
+|           EU21.U21  EU18.U18  EU20.U20        32MHz   |
+|                                             |-------| |
+|           M6295     M6295     M6295         |XILINX | |
+|           2MHz      2MHz      2MHz          |XC3042 | |
+|  DSW(8)                        KYLR1        |-------| |
+|J       EGR9.VC9                             EGR4.GR4  |
+|A DSW(4)EGR8.VC8               |-------|               |
+|M      M5M442256               |XILINX |     EGR6.GR6  |
+|M      M5M442256   11.0592MHz  |XC3042 |               |
+|A      M5M442256     MACH210   |-------|     EGR3.GR3  |
+|4116R  M5M442256     MACH210 MACH210 MACH210           |
+|4116R  |--------|               W241024      EGR1.GR2  |
+|       |TMS34010|               W241024                |
+|2803A  |-50     |               W241024      EGR1.GR1  |
+|       |        |               W241024                |
+| 40MHz |--------|                            EGR5.GR5  |
+|                         BT121 MACH210 MACH210 MACH210 |
+|-------------------------------------------------------|
 
-Note 1: Lethal Justice uses a 11.0592MHz OSC instead of the 11.2896MHz
-Note 2: Lethal Justice uses a TMS34010FNL-50 instead of the TMS34010FNL-40
+Notes:
+      TMS34010  - TMS34010FNL-50 CPU, clock input 20.000MHz [40/2] (PLCC68)
+      M6295     - Clock input 2.000MHz, pin 7 HIGH (QFP44)
+      XC3042    - XILINX XC3042 FPGA (PLCC84)
+      BT121     - BT121KPJ80 Triple 8-bit 80MHz Video DAC (PLCC44)
+      MACH210   - AMD MACH210A-10JC Complex Programmable Logic Device (CPLD, PLCC44)
+      2803A     - ST ULN2803A Eight Darlington Transistor Arrays With Common Emitters (DIP18)
+      4116R     - 4116R-001 Bourns Type 4100R Series Resistor Network (DIP16)
+      M5M442256 - Mitsubishi M5M442256AL-8 256k x4 DRAM (ZIP28)
+      W241024   - Winbond W241024AK-20 128 x8 SRAM (NDIP32)
+      KYLR1     - 8 Pin Gun Connector
+
+Note 1: Some PCBs use a 11.2896MHz OSC instead of the 11.0592MHz
+Note 2: Some PCBs use a TMS34010FNL-40 instead of the TMS34010FNL-50
 
 ***************************************************************************/
 
