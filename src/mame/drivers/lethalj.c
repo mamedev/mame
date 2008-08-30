@@ -649,6 +649,30 @@ ROM_START( eggvent7 )
 ROM_END
 
 
+ROM_START( eggventa ) /* Allied Leisure Australia, official license? */
+	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
+	ROM_LOAD16_BYTE( "eggvc8.7", 0x000000, 0x080000, CRC(a62c4143) SHA1(a21d6b7efdba4965285265426ed79f3249a86685) )
+	ROM_LOAD16_BYTE( "eggvc9.7", 0x000001, 0x080000, CRC(bc55bc7a) SHA1(d6e3fc76b4a0a20176af1338a32bb81f0599fdc0) )
+
+	ROM_REGION16_LE( 0x600000, "gfx1", 0 )			/* graphics data */
+	ROM_LOAD16_BYTE( "egr1.bin",  0x000000, 0x100000, CRC(f73f80d9) SHA1(6278b45579a256b9576ba6d4f5a15fab26797c3d) )
+	ROM_LOAD16_BYTE( "egr2.bin",  0x000001, 0x100000, CRC(3a9ba910) SHA1(465aa3119af103aa65b25042b3572fdcb9c1887a) )
+	ROM_LOAD16_BYTE( "egr4.bin",  0x200000, 0x100000, CRC(4ea5900e) SHA1(20341337ee3c6c22580c52312156b818f4187693) )
+	ROM_LOAD16_BYTE( "egr3.bin",  0x200001, 0x100000, CRC(3f8dfc73) SHA1(83a168069f896ea7e67a97c6d591d09b19d5f486) )
+	ROM_LOAD16_BYTE( "egr6.gr6",  0x400000, 0x100000, CRC(0d73dd85) SHA1(d99a95ace89483688bae48021b416fc0a3c531d6) )
+	ROM_LOAD16_BYTE( "egr5.gr5",  0x400001, 0x100000, CRC(6d89c4e3) SHA1(613703a3f194af3ed44a58610d99b7dc99382725) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )				/* sound data */
+	ROM_LOAD( "eu20.bin", 0x00000, 0x40000, CRC(3760b1db) SHA1(70e258a6036f9ce26b354c4df57e0e4d2c871bcb) )
+
+	ROM_REGION( 0x40000, "oki2", 0 )				/* sound data */
+	ROM_LOAD( "eu21.bin", 0x00000, 0x40000, CRC(3760b1db) SHA1(70e258a6036f9ce26b354c4df57e0e4d2c871bcb) )
+
+	ROM_REGION( 0x40000, "oki3", 0 )				/* sound data */
+	ROM_LOAD( "eu18.bin", 0x00000, 0x40000, CRC(3760b1db) SHA1(70e258a6036f9ce26b354c4df57e0e4d2c871bcb) )
+ROM_END
+
+
 ROM_START( eggvntdx )
 	ROM_REGION16_LE( 0x100000, "user1", 0 )		/* 34010 code */
 	ROM_LOAD16_BYTE( "eggdlx.vc8", 0x000000, 0x080000, CRC(d7f56141) SHA1(3c16b509fd1c763e452c27084fb0e90cde3947f7) )
@@ -807,6 +831,7 @@ static DRIVER_INIT( cclownz )
 GAME( 1996, lethalj,  0,        lethalj,  lethalj,  0,        ROT0,  "The Game Room", "Lethal Justice", 0 )
 GAME( 1997, eggventr, 0,        gameroom, eggventr, 0,        ROT0,  "The Game Room", "Egg Venture (Release 10)", 0 )
 GAME( 1997, eggvent7, eggventr, gameroom, eggventr, 0,        ROT0,  "The Game Room", "Egg Venture (Release 7)", 0 )
+GAME( 1997, eggventa, eggventr, gameroom, eggventr, 0,        ROT0,  "The Game Room (Allied Leisure license)", "Egg Venture (A.L. Release)", 0 )
 GAME( 1997, eggvntdx, eggventr, gameroom, eggvntdx, 0,        ROT0,  "The Game Room", "Egg Venture Deluxe", 0 )
 GAME( 1997, ripribit, 0,        gameroom, ripribit, ripribit, ROT0,  "LAI Games",     "Ripper Ribbit (Version 2.8.4)", 0 )
 GAME( 1999, cfarm,    0,        gameroom, cfarm,    cfarm,    ROT90, "LAI Games",     "Chicken Farm (Version 2.0)", 0 )
