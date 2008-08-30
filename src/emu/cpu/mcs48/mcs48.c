@@ -196,7 +196,7 @@ static void check_irqs(void);
 INLINE UINT8 opcode_fetch(offs_t address)
 {
 	/* fix me - need to figure out how to bypass internal ROM in this case */
-	if (mcs48.ea && address < mcs48.int_rom_size)
+	if (!mcs48.ea && address < mcs48.int_rom_size)
 		return 0x00;
 	return cpu_readop(address);
 }
@@ -210,7 +210,7 @@ INLINE UINT8 opcode_fetch(offs_t address)
 INLINE UINT8 argument_fetch(offs_t address)
 {
 	/* fix me - need to figure out how to bypass internal ROM in this case */
-	if (mcs48.ea && address < mcs48.int_rom_size)
+	if (!mcs48.ea && address < mcs48.int_rom_size)
 		return 0x00;
 	return cpu_readop_arg(address);
 }
@@ -705,6 +705,14 @@ static const mcs48_opcode opcode_table[256]=
 static void mcs48_init(int index, int clock, const void *config, int (*irqcallback)(int), UINT16 romsize)
 {
 	memset(&mcs48, 0, sizeof(mcs48));
+	
+	/* External access line
+	 * EA=1 : read from external rom
+	 * EA=0 : read from internal rom
+	 */
+	
+	/* FIXME: Current implementation suboptimal */
+	mcs48.ea = 1;
 
 	mcs48.irq_callback = irqcallback;
 	mcs48.int_rom_size = romsize;
@@ -923,6 +931,7 @@ static int mcs48_execute(int cycles)
     ADDRESS MAPS
 ***************************************************************************/
 
+/* FIXME: the memory maps should probably support rom banking for EA */
 static ADDRESS_MAP_START(program_10bit, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00, 0x3ff) AM_ROM
 ADDRESS_MAP_END
@@ -1202,9 +1211,8 @@ void mb8884_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 10;										break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 12;										break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = i8035_init;							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "MB8884");							break;
@@ -1285,6 +1293,7 @@ void m58715_get_info(UINT32 state, cpuinfo *info)
 	{
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 12;										break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 7;										break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_11bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = i8039_init;							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "M58715");							break;
