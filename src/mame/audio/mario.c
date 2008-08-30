@@ -23,8 +23,12 @@
 #define I8035_P1_R(M) (soundlatch3_r(M,0))
 #define I8035_P2_R(M) (soundlatch4_r(M,0))
 #define I8035_P1_W(M,D) soundlatch3_w(M,0,D)
-#define I8035_P2_W(M,D) do { soundlatch4_w(M,0,D); cputag_set_input_line(machine, "audio", MCS48_INPUT_EA, ((D) & 0x20) ? ASSERT_LINE : CLEAR_LINE); } while (0)
 
+#if (USE_8039)
+#define I8035_P2_W(M,D) do { soundlatch4_w(M,0,D); } while (0)
+#else
+#define I8035_P2_W(M,D) do { cputag_set_input_line(machine, "audio", MCS48_INPUT_EA, ((D) & 0x20) ? CLEAR_LINE : ASSERT_LINE);  soundlatch4_w(M,0,D); } while (0)
+#endif
 
 #define I8035_P1_W_AH(M,B,D) I8035_P1_W(M,ACTIVEHIGH_PORT_BIT(I8035_P1_R(M),B,(D)))
 #define I8035_P2_W_AH(M,B,D) I8035_P2_W(M,ACTIVEHIGH_PORT_BIT(I8035_P2_R(M),B,(D)))
