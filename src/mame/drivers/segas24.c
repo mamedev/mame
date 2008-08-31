@@ -1948,7 +1948,7 @@ ROM_START( hotrod )
 	ROM_LOAD16_BYTE( "epr-11338.ic1", 0x000001, 0x20000, CRC(7d4a7ff3) SHA1(3d3af04d990d232ba0a8fe155de59bc632a0a461) )
 
 	ROM_REGION( 0x1d6000, "user2", 0)
-	ROM_LOAD( "ds3-5000-01d_3p_turbo.bin", 0x000000, 0x1d6000, CRC(627e8053) SHA1(d1a95f99078f5a29cccacfb1b30c3c9ead7b605c) )
+	ROM_LOAD( "ds3-5000-01d_3p_turbo.img", 0x000000, 0x1d6000, CRC(627e8053) SHA1(d1a95f99078f5a29cccacfb1b30c3c9ead7b605c) )
 ROM_END
 
 ROM_START( hotroda )
@@ -1957,7 +1957,7 @@ ROM_START( hotroda )
 	ROM_LOAD16_BYTE( "epr-11338.ic1", 0x000001, 0x20000, CRC(7d4a7ff3) SHA1(3d3af04d990d232ba0a8fe155de59bc632a0a461) )
 
 	ROM_REGION( 0x1d6000, "user2", 0)
-	ROM_LOAD( "ds3-5000-01d.bin", 0x000000, 0x1d6000, CRC(abf67b02) SHA1(f397435eaad691ff5a38d6d1d27840ed95a62df3) ) // World? 3 Playe TURBO
+	ROM_LOAD( "ds3-5000-01d.img", 0x000000, 0x1d6000, CRC(abf67b02) SHA1(f397435eaad691ff5a38d6d1d27840ed95a62df3) ) // World? 3 Player TURBO
 ROM_END
 
 ROM_START( hotrodj )
@@ -1966,7 +1966,7 @@ ROM_START( hotrodj )
 	ROM_LOAD16_BYTE( "epr-11338.ic1", 0x000001, 0x20000, CRC(7d4a7ff3) SHA1(3d3af04d990d232ba0a8fe155de59bc632a0a461) )
 
 	ROM_REGION( 0x1d6000, "user2", 0)
-	ROM_LOAD( "ds3-5000-01a-revb.bin", 0x000000, 0x1d6000, CRC(a39a0c2d) SHA1(ea8104c2266c48f480837aa7679c0a6f0c5e5452) ) // Japanese 4 Player
+	ROM_LOAD( "ds3-5000-01a-rev-b.img", 0x000000, 0x1d6000, CRC(a39a0c2d) SHA1(ea8104c2266c48f480837aa7679c0a6f0c5e5452) ) // Japanese 4 Player
 ROM_END
 
 ROM_START( qgh )
@@ -2041,7 +2041,7 @@ ROM_START( bnzabros )
 	ROM_RELOAD ( 0x180001, 0x40000)
 
 	ROM_REGION( 0x1c2000, "user2", 0)
-	ROM_LOAD( "ds3-5000-07d.img",        0x000000, 0x1c2000, CRC(ea7a3302) SHA1(5f92efb2e1135c1f3eeca38ba5789739a22dbd11) ) /* Region letter needs to be verfied */
+	ROM_LOAD( "ds3-5000-07d.img", 0x000000, 0x1c2000, CRC(ea7a3302) SHA1(5f92efb2e1135c1f3eeca38ba5789739a22dbd11) ) /* Region letter needs to be verfied */
 ROM_END
 
 ROM_START( bnzabrsj )
@@ -2058,7 +2058,7 @@ ROM_START( bnzabrsj )
 	ROM_RELOAD ( 0x180001, 0x40000)
 
 	ROM_REGION( 0x1c2000, "user2", 0)
-	ROM_LOAD( "ds3-5000-07b.img",        0x000000, 0x1c2000, CRC(efa7f2a7) SHA1(eb905bff88fa40324fb92b91ac8a5878648c26e5) )
+	ROM_LOAD( "ds3-5000-07b.img", 0x000000, 0x1c2000, CRC(efa7f2a7) SHA1(eb905bff88fa40324fb92b91ac8a5878648c26e5) )
 ROM_END
 
 ROM_START( quizmeku ) // Quiz Mekuromeku Story
@@ -2081,7 +2081,7 @@ ROM_START( sspirits )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
 	ROM_REGION( 0x1c2000, "user2", 0)
-	ROM_LOAD( "ds3-5000-02-.img",         0x000000, 0x1c2000, CRC(cefbda69) SHA1(5b47ae0f1584ce1eb697246273ba761bd9e981c1)  )
+	ROM_LOAD( "ds3-5000-02-.img", 0x000000, 0x1c2000, CRC(cefbda69) SHA1(5b47ae0f1584ce1eb697246273ba761bd9e981c1)  )
 ROM_END
 
 ROM_START( sspiritj )
@@ -2090,7 +2090,7 @@ ROM_START( sspiritj )
 	ROM_LOAD16_BYTE( "epr-11338.ic1", 0x000001, 0x20000, CRC(7d4a7ff3) SHA1(3d3af04d990d232ba0a8fe155de59bc632a0a461) )
 
 	ROM_REGION( 0x1d6000, "user2", 0)
-	ROM_LOAD( "ds3-5000-02-rev-a.img",         0x000000, 0x1d6000, CRC(0385470f) SHA1(62c1bfe3a88b2dee44629809e08b4b8a5770eaab)  )
+	ROM_LOAD( "ds3-5000-02-rev-a.img", 0x000000, 0x1d6000, CRC(0385470f) SHA1(62c1bfe3a88b2dee44629809e08b4b8a5770eaab)  )
 ROM_END
 
 ROM_START( sspirtfc )
@@ -2102,7 +2102,7 @@ ROM_START( sspirtfc )
 	ROM_LOAD( "317-0058-02c.key", 0x0000, 0x2000,  CRC(ebae170e) SHA1(b6d1e1b6943a35b96e98e426ecb39bb5a42fb643) )
 
 	ROM_REGION( 0x1c2000, "user2", 0)
-	ROM_LOAD( "ds3-5000-02c.img",         0x000000, 0x1c2000, NO_DUMP )
+	ROM_LOAD( "ds3-5000-02c.img", 0x000000, 0x1c2000, NO_DUMP )
 ROM_END
 
 ROM_START( sgmast )
@@ -2130,7 +2130,7 @@ ROM_START( sgmastc )
 	ROM_LOAD( "317-0058-05c.key", 0x0000, 0x2000, CRC(ae0eabe5) SHA1(692d7565bf9c5b32cc80bb4bd88c9193aa04cbb0) )
 
 	ROM_REGION( 0x1c2000, "user2", 0)
-	ROM_LOAD( "ds3-5000-05c.img",      0x000000, 0x1c2000, CRC(06c4f834) SHA1(5e178ed0edff7721c93f76da2e03ae188dc5efa4) )
+	ROM_LOAD( "ds3-5000-05c.img", 0x000000, 0x1c2000, CRC(06c4f834) SHA1(5e178ed0edff7721c93f76da2e03ae188dc5efa4) )
 ROM_END
 
 ROM_START( sgmastj )
@@ -2142,7 +2142,7 @@ ROM_START( sgmastj )
 	ROM_LOAD( "317-0058-05b.key", 0x0000, 0x2000, CRC(adc0c83b) SHA1(2328d82d5057062eeb0072fd57f0422218cf24fc) )
 
 	ROM_REGION( 0x1c2000, "user2", 0)
-	ROM_LOAD( "ds3-5000-05b.img",      0x000000, 0x1c2000,  CRC(a136668c) SHA1(7203f9d11023605a0a4b52a4be330785c8f7b623) )
+	ROM_LOAD( "ds3-5000-05b.img", 0x000000, 0x1c2000,  CRC(a136668c) SHA1(7203f9d11023605a0a4b52a4be330785c8f7b623) )
 ROM_END
 
 ROM_START( qsww )
@@ -2154,7 +2154,7 @@ ROM_START( qsww )
 	ROM_LOAD( "317-0058-08b.key", 0x0000, 0x2000,  CRC(fe0a336a) SHA1(f7a5b2c1a057d0bb8c1ae0453c58aa8f5fb731b9) )
 
 	ROM_REGION( 0x1c2000, "user2", 0)
-	ROM_LOAD( "ds3-5000-08b.img",    0x000000, 0x1c2000, CRC(5a886d38) SHA1(2e974a9ffe3534da4fb117c579b8b0e61a63542c) )
+	ROM_LOAD( "ds3-5000-08b.img", 0x000000, 0x1c2000, CRC(5a886d38) SHA1(2e974a9ffe3534da4fb117c579b8b0e61a63542c) )
 ROM_END
 
 ROM_START( gground )
@@ -2163,10 +2163,10 @@ ROM_START( gground )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
 	ROM_REGION( 0x2000, "user3", 0 )	/* decryption key */
-	ROM_LOAD( "317-0058-03c.key", 0x0000, 0x2000,  CRC(e1785bbd) SHA1(b4bebb2829299f1c0815d6a5f317a2526b322f63) ) /* Region letter needs to be verfied */
+	ROM_LOAD( "317-0058-03d.key", 0x0000, 0x2000,  CRC(e1785bbd) SHA1(b4bebb2829299f1c0815d6a5f317a2526b322f63) ) /* Also labeled "rev-A" but is it different? */
 
 	ROM_REGION( 0x1c2000, "user2", 0)
-	ROM_LOAD( "ds3-5000-03c.img",         0x000000, 0x1c2000, CRC(5c5910f2) SHA1(9ed564a03c0d4ca4a207f3ecfb7336c6cbcaa70f) ) /* Region letter needs to be verfied */
+	ROM_LOAD( "ds3-5000-03d-rev-a.img", 0x000000, 0x1c2000, CRC(5c5910f2) SHA1(9ed564a03c0d4ca4a207f3ecfb7336c6cbcaa70f) )
 ROM_END
 
 ROM_START( ggroundj )
@@ -2178,7 +2178,7 @@ ROM_START( ggroundj )
 	ROM_LOAD( "317-0058-03b.key", 0x0000, 0x2000,  CRC(84aecdba) SHA1(ceddf967359a6e76543fe1ab00be53d0a11fe1ab) )
 
 	ROM_REGION( 0x1c2000, "user2", 0)
-	ROM_LOAD( "ds3-5000-03b.img",         0x000000, 0x1c2000, CRC(7200dac9) SHA1(07cf33bf2a0da36e3852de409959f30128cdbf77) )
+	ROM_LOAD( "ds3-5000-03b.img", 0x000000, 0x1c2000, CRC(7200dac9) SHA1(07cf33bf2a0da36e3852de409959f30128cdbf77) )
 ROM_END
 
 ROM_START( crkdown )
@@ -2190,7 +2190,7 @@ ROM_START( crkdown )
 	ROM_LOAD( "317-0058-04c.key", 0x0000, 0x2000,  CRC(16e978cc) SHA1(0e1482b5efa93b732d4cf0990919cb3fc903dca7) )
 
 	ROM_REGION( 0x1c2000, "user2", 0)
-	ROM_LOAD( "ds3-5000-04c.img",    0x000000, 0x1c2000, CRC(5edc01a5) SHA1(8eb1bf41f533d16c12930f5831f8bccd4d8de4f7) )
+	ROM_LOAD( "ds3-5000-04c.img", 0x000000, 0x1c2000, CRC(5edc01a5) SHA1(8eb1bf41f533d16c12930f5831f8bccd4d8de4f7) )
 ROM_END
 
 ROM_START( crkdownu )
@@ -2202,7 +2202,7 @@ ROM_START( crkdownu )
 	ROM_LOAD( "317-0058-04d.key", 0x0000, 0x2000,  CRC(934ac358) SHA1(73418e22c9d201bc3fec5c63284858958c010e05) )
 
 	ROM_REGION( 0x1c2000, "user2", 0)
-	ROM_LOAD( "ds3-5000-04d.img",    0x000000, 0x1c2000, CRC(8679032c) SHA1(887b245a70652897fbda736b60e81a123866ec12) )
+	ROM_LOAD( "ds3-5000-04d.img", 0x000000, 0x1c2000, CRC(8679032c) SHA1(887b245a70652897fbda736b60e81a123866ec12) )
 ROM_END
 
 ROM_START( crkdownj )
@@ -2211,10 +2211,10 @@ ROM_START( crkdownj )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
 	ROM_REGION( 0x2000, "user3", 0 )	/* decryption key */
-	ROM_LOAD( "317-0058-04b.key", 0x0000, 0x2000,  CRC(4a99a202) SHA1(d7375f09e7246ecd60ba0e48f049e9e252af92a8) )
+	ROM_LOAD( "317-0058-04b.key", 0x0000, 0x2000,  CRC(4a99a202) SHA1(d7375f09e7246ecd60ba0e48f049e9e252af92a8) ) /* Also labeled "rev-A" but is it different? */
 
 	ROM_REGION( 0x1c2000, "user2", 0)
-	ROM_LOAD( "ds3-5000-04b.img",    0x000000, 0x1c2000, CRC(5daa1a9a) SHA1(ce2f07b83b607bbbdb70f1ae344c1d897d601809) )
+	ROM_LOAD( "ds3-5000-04b-rev-a.img", 0x000000, 0x1c2000, CRC(5daa1a9a) SHA1(ce2f07b83b607bbbdb70f1ae344c1d897d601809) )
 ROM_END
 
 ROM_START( dcclub )
@@ -2284,11 +2284,11 @@ ROM_END
 /* 02 */GAME( 1988, sspirits, 0,        system24, sspirits, sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based)", 0 )
 /* 02 */GAME( 1988, sspiritj, sspirits, system24, sspirits, sspiritj, ROT270, "Sega", "Scramble Spirits (Japan, Floppy DS3-5000-02-REV-A Based)", 0 )
 /* 02 */GAME( 1988, sspirtfc, sspirits, system24, sspirits, sspirits, ROT270, "Sega", "Scramble Spirits (World, Floppy Based, FD1094 317-0058-02c)",GAME_NOT_WORKING ) /* MISSING disk image */
-/* 03 */GAME( 1988, gground,  0,        system24, gground,  gground,  ROT270, "Sega", "Gain Ground (World, 3 Players, Floppy Based, FD1094 317-0058-03c?)", 0 )
+/* 03 */GAME( 1988, gground,  0,        system24, gground,  gground,  ROT270, "Sega", "Gain Ground (World, 3 Players, Floppy Based, FD1094 317-0058-03d Rev A)", 0 )
 /* 03 */GAME( 1988, ggroundj, gground,  system24, gground,  gground,  ROT270, "Sega", "Gain Ground (Japan, 2 Players, Floppy Based, FD1094 317-0058-03b)", 0 )
 /* 04 */GAME( 1989, crkdown,  0,        system24, crkdown,  crkdown,  ROT0,   "Sega", "Crack Down (World, Floppy Based, FD1094 317-0058-04c)", GAME_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
 /* 04 */GAME( 1989, crkdownu, crkdown,  system24, crkdown,  crkdown,  ROT0,   "Sega", "Crack Down (US, Floppy Based, FD1094 317-0058-04d)", GAME_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
-/* 04 */GAME( 1989, crkdownj, crkdown,  system24, crkdown,  crkdown,  ROT0,   "Sega", "Crack Down (Japan, Floppy Based, FD1094 317-0058-04b)", GAME_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
+/* 04 */GAME( 1989, crkdownj, crkdown,  system24, crkdown,  crkdown,  ROT0,   "Sega", "Crack Down (Japan, Floppy Based, FD1094 317-0058-04b Rev A)", GAME_IMPERFECT_GRAPHICS ) // clipping probs / solid layer probs? (radar display)
 /* 05 */GAME( 1989, sgmast,   0,        system24, sgmast,   sgmast,   ROT0,   "Sega", "Super Masters Golf (World?, Floppy Based, FD1094 317-0058-05d?)", GAME_NOT_WORKING|GAME_UNEMULATED_PROTECTION ) // NOT decrypted
 /* 05 */GAME( 1989, sgmastc,  sgmast,   system24, sgmast,   sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (World, Floppy Based, FD1094 317-0058-05c)", GAME_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
 /* 05 */GAME( 1989, sgmastj,  sgmast,   system24, sgmastj,  sgmast,   ROT0,   "Sega", "Jumbo Ozaki Super Masters Golf (Japan, Floppy Based, FD1094 317-0058-05b)", GAME_IMPERFECT_GRAPHICS ) // some gfx offset / colour probs?
