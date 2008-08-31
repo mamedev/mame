@@ -165,11 +165,6 @@ CPU:
 Sound CPU/MCU:
  HD647180X0FS6 (Hitachi Z180 Compatible CPU with internal 16k ROM)
  Z84C0006PEC (Z80)
-
-
-Sound CPU/MCU:
- HD647180X0FS6 (Hitachi Z180 Compatible CPU with internal 16k ROM)
- Z84C0006PEC (Z80)
  NEC V25+
 
 Sound Chips:
@@ -3400,12 +3395,12 @@ static const ymz280b_interface ymz280b_config =
 static MACHINE_DRIVER_START( tekipaki )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000)			/* 10MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(tekipaki_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 #if USE_HD64x180
-	MDRV_CPU_ADD("mcu", Z180, 10000000)			/* HD647180 CPU actually */
+	MDRV_CPU_ADD("mcu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
 	MDRV_CPU_PROGRAM_MAP(hd647180_mem, 0)
 #endif
 
@@ -3430,7 +3425,7 @@ static MACHINE_DRIVER_START( tekipaki )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, 27000000/8)
+	MDRV_SOUND_ADD("ym", YM3812, XTAL_27MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -3493,7 +3488,7 @@ static MACHINE_DRIVER_START( dogyuun )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz   / 4) / (432 * 263) )
+	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
@@ -3520,13 +3515,13 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( kbash )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)			/* 16MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)			/* 16MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(kbash_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 	/* ROM based v25 */
 #if USE_V25
-	MDRV_CPU_ADD("mcu", V25, 16000000)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_ADD("mcu", V25, XTAL_16MHz)			/* NEC V25+ type Toaplan marked CPU ??? */
 	MDRV_CPU_PROGRAM_MAP(V25_mem, 0)
 	MDRV_CPU_IO_MAP(V25_port, 0)
 #endif
@@ -3552,10 +3547,10 @@ static MACHINE_DRIVER_START( kbash )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, 27000000/8)
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 32000000/32)
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32MHz/32)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -3563,7 +3558,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( kbash2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)			/* 16MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)			/* 16MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(kbash2_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
@@ -3588,11 +3583,11 @@ static MACHINE_DRIVER_START( kbash2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 16000000/16)
+	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_16MHz/16)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 16000000/16)
+	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_16MHz/16)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -3611,7 +3606,7 @@ static MACHINE_DRIVER_START( truxton2 )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) ) /* 27MHz Oscillator */
+	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
@@ -3677,11 +3672,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( whoopee )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000)			/* 10MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(tekipaki_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audio", Z80, 27000000/8)			/* This should be a HD647180 */
+	MDRV_CPU_ADD("audio", Z80, XTAL_27MHz/8)			/* This should be a HD647180 */
 											/* Change this to 10MHz when HD647180 gets dumped. 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(sound_z80_mem, 0)
 
@@ -3708,7 +3703,7 @@ static MACHINE_DRIVER_START( whoopee )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, 27000000/8)
+	MDRV_SOUND_ADD("ym", YM3812, XTAL_27MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -3717,11 +3712,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pipibibi )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000)			/* 10MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(pipibibi_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audio", Z80,27000000/8)			/* ??? 3.37MHz */
+	MDRV_CPU_ADD("audio", Z80, XTAL_27MHz/8)			/* ??? 3.37MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_z80_mem, 0)
 
 	MDRV_INTERLEAVE(10)
@@ -3747,7 +3742,7 @@ static MACHINE_DRIVER_START( pipibibi )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM3812, 27000000/8)
+	MDRV_SOUND_ADD("ym", YM3812, XTAL_27MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -3773,7 +3768,7 @@ static MACHINE_DRIVER_START( fixeight )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )
+	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
@@ -3799,7 +3794,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( fixeighb )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000)			/* 10MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(fixeighb_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq2)
 
@@ -3824,7 +3819,7 @@ static MACHINE_DRIVER_START( fixeighb )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 14000000/16)
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_14MHz/16)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -3833,12 +3828,12 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vfive )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 10000000)			/* 10MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(vfive_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 #if USE_V25
-	MDRV_CPU_ADD("audio", V25, 32000000/2)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_ADD("audio", V25, XTAL_32MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
 	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem, 0)
 	//MDRV_CPU_IO_MAP(V25_port, 0)
 #endif
@@ -3849,7 +3844,7 @@ static MACHINE_DRIVER_START( vfive )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( (27000000.0 / 4) / (432 * 263) )
+	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(432, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
@@ -3864,7 +3859,7 @@ static MACHINE_DRIVER_START( vfive )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, 27000000/8)
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -3889,12 +3884,12 @@ static const ym2151_interface batsugun_ym2151_interface =
 static MACHINE_DRIVER_START( batsugun )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000, XTAL_32MHz/2)			/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(batsugun_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
 #if USE_V25
-	MDRV_CPU_ADD("audio", V25, 32000000/2)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MDRV_CPU_ADD("audio", V25, XTAL_32MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
 	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem, 0)
 	//MDRV_CPU_IO_MAP(V25_port, 0)
 #endif
@@ -3920,11 +3915,11 @@ static MACHINE_DRIVER_START( batsugun )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, 27000000/8)
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_SOUND_CONFIG(batsugun_ym2151_interface)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 32000000/8)
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32MHz/8)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -3933,7 +3928,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( snowbro2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(snowbro2_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
@@ -3958,10 +3953,10 @@ static MACHINE_DRIVER_START( snowbro2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, 27000000/8)
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 27000000/10)
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_27MHz/10)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -3970,11 +3965,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mahoudai )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(mahoudai_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audio", Z80,32000000/8)			/* 4MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("audio", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(raizing_sound_z80_mem, 0)
 
 	MDRV_INTERLEAVE(10)
@@ -4000,10 +3995,10 @@ static MACHINE_DRIVER_START( mahoudai )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, 27000000/8)
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 32000000/32)
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32MHz/32)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -4012,11 +4007,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( shippumd )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(shippumd_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audio", Z80,32000000/8)			/* 4MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("audio", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(raizing_sound_z80_mem, 0)
 
 	MDRV_INTERLEAVE(10)
@@ -4042,10 +4037,10 @@ static MACHINE_DRIVER_START( shippumd )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, 27000000/8)
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_27MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono",1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 32000000/32)
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32MHz/32)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -4054,11 +4049,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bgaregga )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(bgaregga_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audio", Z80,32000000/8)			/* 4MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("audio", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(bgaregga_sound_z80_mem, 0)
 
 	MDRV_INTERLEAVE(100)
@@ -4084,10 +4079,10 @@ static MACHINE_DRIVER_START( bgaregga )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, 32000000/8)
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_32MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 32000000/16)
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_32MHz/16)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -4096,11 +4091,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( batrider )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,32000000/2)			/* 16MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("main", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(batrider_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq2)
 
-	MDRV_CPU_ADD("audio", Z80,32000000/8)			/* 4MHz , 32MHz Oscillator */
+	MDRV_CPU_ADD("audio", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(batrider_sound_z80_mem, 0)
 	MDRV_CPU_IO_MAP(batrider_sound_z80_port, 0)
 
@@ -4126,14 +4121,14 @@ static MACHINE_DRIVER_START( batrider )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2151, 32000000/8)
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_32MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 32000000/10)
+	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_32MHz/10)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 32000000/10)
+	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_32MHz/10)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
@@ -4141,11 +4136,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( bbakraid )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,32000000/2)
+	MDRV_CPU_ADD("main", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(bbakraid_68k_mem, 0)
 	MDRV_CPU_VBLANK_INT("main", toaplan2_vblank_irq1)
 
-	MDRV_CPU_ADD("audio", Z80,32000000/4)
+	MDRV_CPU_ADD("audio", Z80, XTAL_32MHz/6)		/* 5.3333MHz , 32MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(bbakraid_sound_z80_mem, 0)
 	MDRV_CPU_IO_MAP(bbakraid_sound_z80_port, 0)
 	MDRV_CPU_PERIODIC_INT(bbakraid_snd_interrupt, 448)
@@ -4173,7 +4168,7 @@ static MACHINE_DRIVER_START( bbakraid )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MDRV_SOUND_CONFIG(ymz280b_config)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
