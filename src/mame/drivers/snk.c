@@ -675,31 +675,6 @@ CUSTOM_INPUT( gwar_rotary )
 	return value;
 }
 
-CUSTOM_INPUT( gwarb_rotary )
-{
-	if (input_port_read(field->port->machine, "JOYSTICK_MODE") == 1)
-	{
-		static int last_value[2] = {0, 0};
-		static int cp_count[2] = {0, 0};
-		static const char *ports[] = { "P1ROT", "P2ROT" };
-		int which = (int)(FPTR)param;
-		int value = input_port_read(field->port->machine, ports[which]);
-
-		if ((last_value[which] == 0x5 && value == 0x6) || (last_value[which] == 0x6 && value == 0x5))
-		{
-			if (!cp_count[which])
-				value = 0xf;
-			cp_count[which] = (cp_count[which] + 1) & 0x07;
-		}
-		last_value[which] = value;
-		return value;
-	}
-	else
-	{
-		return 0x0f;
-	}
-}
-
 /************************************************************************/
 
 
@@ -2314,13 +2289,12 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( gwarb )
 	PORT_INCLUDE( gwar )
 
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gwarb_rotary, (void*)0)
+	// no rotary joystick in this version. Player fires in the direction he's facing.
+	// the code is patched to handle that, however the rotary joystick input must
+	// be F for the patched code to kick in.
 
-	PORT_START("JOYSTICK_MODE")
-	PORT_CONFNAME( 0x01, 0x01, "Joystick mode" )
-	PORT_CONFSETTING( 0x01, "Rotary Joystick" )
-	PORT_CONFSETTING( 0x00, "Normal Joystick" )
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_SPECIAL )	// must be F to turn off rotary joystick handling
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( psychos )
