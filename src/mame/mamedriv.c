@@ -8039,6 +8039,7 @@ Other Sun games
 	DRIVER( hotslot )	/* (c) 1996 ABM Electronics */
 	DRIVER( mcolors )	/* 1999 unknown */
 	DRIVER( galaxi )	/* (c) 2000 BRL S.R.L. Bologna */
+	DRIVER( magjoker )	/* (c) 2000 BRL S.R.L. Bologna */
 	DRIVER( dwarfd )	/* (c) 198? Electro-Sports */
 	DRIVER( trvquest )	/* (c) 1984 Sunn / Techstar */
 	DRIVER( wheelfir )	/* (c) 199? TCH */

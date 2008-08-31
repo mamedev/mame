@@ -25,6 +25,14 @@ Notes:
 
 - This hardware is almost identical to that in magic10.c
 
+
+[31/08/2008] (Roberto Fresca)
+
+- Added Magic Joker.
+- Fixed the 3rd background offset to Galaxi.
+- Remapped inputs to match the standard poker games.
+
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -109,7 +117,7 @@ static VIDEO_START(galaxi)
 
 	tilemap_set_transparent_pen(fg_tmap, 0);
 
-	tilemap_set_scrolldx( bg3_tmap, -16, 0);
+	tilemap_set_scrolldx( bg3_tmap, -8, 0);
 }
 
 static VIDEO_UPDATE(galaxi)
@@ -117,14 +125,14 @@ static VIDEO_UPDATE(galaxi)
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
-	if (input_code_pressed(KEYCODE_Z))
+	if (input_code_pressed(KEYCODE_R))	// remapped due to inputs changes.
 	{
 		int msk = 0;
-		if (input_code_pressed(KEYCODE_Q))	msk |= 1;
-		if (input_code_pressed(KEYCODE_W))	msk |= 2;
-		if (input_code_pressed(KEYCODE_E))	msk |= 4;
-		if (input_code_pressed(KEYCODE_R))	msk |= 8;
-		if (input_code_pressed(KEYCODE_A))	msk |= 16;
+		if (input_code_pressed(KEYCODE_T))	msk |= 1;
+		if (input_code_pressed(KEYCODE_Y))	msk |= 2;
+		if (input_code_pressed(KEYCODE_U))	msk |= 4;
+		if (input_code_pressed(KEYCODE_I))	msk |= 8;
+		if (input_code_pressed(KEYCODE_O))	msk |= 16;
 		if (msk != 0) layers_ctrl &= msk;
 	}
 #endif
@@ -208,6 +216,7 @@ static ADDRESS_MAP_START( galaxi_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x100c00, 0x100fff ) AM_RAM_WRITE( galaxi_bg4_w ) AM_BASE( &bg4_ram )
 
 	AM_RANGE( 0x101000, 0x101fff ) AM_RAM_WRITE( galaxi_fg_w  ) AM_BASE( &fg_ram  )
+	AM_RANGE( 0x102000, 0x1047ff ) AM_READNOP	// unknown
 
 	AM_RANGE( 0x300000, 0x3007ff ) AM_RAM_WRITE( paletteram16_xRRRRRGGGGGBBBBB_word_w ) AM_BASE( &paletteram16 )
 
@@ -228,11 +237,11 @@ ADDRESS_MAP_END
 INPUT_PORTS_START( galaxi )
 
 	PORT_START("INPUTS")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_NAME("Hold 1")
-	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2  ) PORT_NAME("Hold 2")
-	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3  ) PORT_NAME("Hold 3")
-	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4  ) PORT_NAME("Hold 4")
-	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5  ) PORT_NAME("Hold 5")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2  ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3  ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4  ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5  ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1   )
 	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START2   ) PORT_NAME("Pay Out")
 	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_CUSTOM( hopper_r, (void *)0 )	// hopper sensor
@@ -247,9 +256,31 @@ INPUT_PORTS_START( galaxi )
 
 INPUT_PORTS_END
 
+INPUT_PORTS_START( magjoker )
+
+	PORT_START("INPUTS")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON2  ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_BUTTON3  ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_BUTTON4  ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_BUTTON5  ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_START1   )
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_START2   ) PORT_NAME("Pay Out")
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_CUSTOM( hopper_r, (void *)0 )	// hopper sensor
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1    ) PORT_IMPULSE(5)	// coin a
+	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_COIN2    ) PORT_IMPULSE(5)	// coin b (token)
+	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_SERVICE  ) PORT_NAME("Hopper Refill") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_SPECIAL  ) PORT_CUSTOM( ticket_r, (void *)0 )	// ticket sensor
+	PORT_BIT( 0x1000, IP_ACTIVE_HIGH, IPT_SPECIAL  )	// hopper out (pin 14LS)
+	PORT_SERVICE_NO_TOGGLE( 0x2000, IP_ACTIVE_HIGH )	// test
+	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_SERVICE  ) PORT_NAME("Key Out") PORT_CODE(KEYCODE_W)	// (pin 26LC)
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL  )	// (pin 15LS)
+
+INPUT_PORTS_END
+
 
 /***************************************************************************
-                                Graphics Layout
+                               Graphics Layout
 ***************************************************************************/
 
 static const gfx_layout layout_8x8x4 =
@@ -281,7 +312,7 @@ GFXDECODE_END
 
 
 /***************************************************************************
-                                Machine Drivers
+                              Machine Drivers
 ***************************************************************************/
 
 static MACHINE_DRIVER_START( galaxi )
@@ -315,6 +346,18 @@ static MACHINE_DRIVER_START( galaxi )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( magjoker )
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM(galaxi)
+
+	/* sound hardware */
+	MDRV_SOUND_MODIFY("oki")
+
+	/* ADPCM samples are recorded with extremely low volume */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 4.0)
+MACHINE_DRIVER_END
+
+
 /***************************************************************************
                                 ROMs Loading
 ***************************************************************************/
@@ -332,5 +375,23 @@ ROM_START( galaxi )
 	ROM_LOAD( "1.u38", 0x00000, 0x40000, CRC(50e289db) SHA1(43c576c014f4c3d22bfa4c932e161d7558d483f6) )
 ROM_END
 
+ROM_START( magjoker )
+	ROM_REGION( 0x40000, "main", 0 )
+	ROM_LOAD16_BYTE( "25.u48", 0x00000, 0x20000, CRC(505bdef2) SHA1(9c2a525f2eb3cc39bdd6219bad7c5a1a8bc0b274) )
+	ROM_LOAD16_BYTE( "24.u47", 0x00001, 0x20000, CRC(380fd0cd) SHA1(bcd6d23e41e249c7e587b253958eec180440639a) )
 
-GAME( 2000, galaxi, 0, galaxi, galaxi, 0, ROT0, "B.R.L.", "Galaxi (v2.0)", 0 )
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "23.u34", 0x00000, 0x80000, CRC(952b7c84) SHA1(a28e1b79444331837ffc07c8d3c16c1d9a3c974c) )
+	ROM_LOAD16_BYTE( "22.u33", 0x00001, 0x80000, CRC(41866733) SHA1(257d77f89fcf1e8f36fb6a8fcb8ad48b1127e457) )
+
+	ROM_REGION( 0x40000, "oki", 0 )	/* 4-bit ADPCM mono @ 6 kHz.*/
+	ROM_LOAD( "21.u38", 0x00000, 0x40000, CRC(199baf33) SHA1(006708d955481fe1ae44555d27896d18e1ff8440) )
+ROM_END
+
+
+/***************************************************************************
+                               Game Drivers
+***************************************************************************/
+
+GAME( 2000, galaxi,   0,  galaxi,   galaxi,   0, ROT0, "B.R.L.", "Galaxi (v2.0)",               0 )
+GAME( 2000, magjoker, 0,  magjoker, magjoker, 0, ROT0, "B.R.L.", "Magic Joker (v1.25.10.2000)", 0 )
