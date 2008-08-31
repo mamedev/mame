@@ -1060,6 +1060,64 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
+/*
+Cruis'n USA
+Midway, 1994
+
+PCB Layout
+----------
+
+5770-14365-02 (C) 1994 NINTENDO
+|-------------------------------------------------------------------------------|
+|  SOUND.U5  SOUND.U9   BATTERY          GAME.U26  GAME.U27  GAME.U28  GAME.U29 |
+|  SOUND.U4  SOUND.U8                    GAME.U22  GAME.U23  GAME.U24  GAME.U25 |
+|  SOUND.U3  SOUND.U7   6264  RESET_SW   GAME.U18  GAME.U19  GAME.U20  GAME.U21 |
+|  SOUND.U2  SOUND.U6                    GAME.U14  GAME.U15  GAME.U16  GAME.U17 |
+|                                        GAME.U10  GAME.U11  GAME.U12  GAME.U13 |
+|            6116            PAL2              IDT7204      IDT7204             |
+|                                          LH521007 LH521007   LH521007 LH521007|
+|            6116   6116     PAL3                                               |
+|             PAL1           PAL4      |----------|    4C4001 4C4001  |-------| |
+|AD1851                      33.3333MHz|LSI       |    4C4001 4C4001  |TMS    | |
+|                                      |L1A7968   |    4C4001 4C4001  |320C31 | |
+|                                 40MHz|5410-1346500   4C4001 4C4001  |DSP    | |
+|                                      |MIDWAY    |                   |-------| |
+|      10MHz   ADSP-2105   CY7C199     |----------|                   50MHz     |
+|TDA2030                   CY7C199                                        DSW(8)|
+|       TL084                             D482234  D482234                      |
+|     TL084                               D482234  D482234                DSW(8)|
+|TDA2030                        PAL5            SN75160   SN75160   PAL6        |
+|          P5                             P7      SN75176  SN75176    P11       |
+|P3      P4  |--|        JAMMA         |--|P8 P9  SN75176  SN75176 P10   ADC0844|
+|------------|  |----------------------|  |-------------------------------------|
+Notes:
+      TMS320C31 - Texas Instruments TMS320C31 32-bit Floating-Point DSP, clock input 50.000MHz
+      ADSP-2105 - Analog Devices ADSP-2105 16-bit Fixed-Point DSP Microprocessor with On-Chip Memory, clock input 10.000MHz
+      IDT7204   - IDT7204 4k x9 Async. FIFO
+      LH521007  - Sharp LH521007AK-17 128k x8 SRAM (SOJ32)
+      D482234   - NEC D482234LE-70 (possibly 256k x8 ?) DRAM (SOJ40)
+      4C4001    - Micron Technology 4C4001JDJ-6 1M x4 DRAM (SOJ24/20)
+      CY7C199   - Cypress CY7C199-20PC 32k x8 SRAM
+      6264      - 8k x8 SRAM (battery-backed)
+      6116      - 2k x8 SRAM
+      AD1851    - Analog Devices AD1851 16 bit PCM Audio DAC
+      TDA2030   - ST TDA2030 Audio AMP
+      TL084     - Texas Instruments TL084 JFET-Input Operational Amplifier
+      ADC0844   - National Semiconductor ADC0844 8-Bit Microprocessor Compatible A/D Converter with Multiplexer Option
+      PAL1      - GAL20V8 labeleld 'A-19668'
+      PAL2      - PALC22V10 (no label)
+      PAL3      - TIBPAL20L8 labelled 'A-19670'
+      PAL4      - TIBPAL22V10 labelled 'A-19671'
+      PAL5      - TIBPAL22V10 labelled 'A-19672'
+      PAL6      - TIBPAL22V10 labelled 'A-19673'
+      P3 - P11  - various connectors for controls
+      VSync     - 57.7090Hz  \
+      HSync     - 15.3544kHz / measured via EL4583
+      ROMs      - All ROMs 27C040
+                  SOUND.Uxx - Sound ROMs
+                  GAME.Uxx  - PROGRAM ROMs (including GFX)
+*/
+
 ROM_START( crusnusa ) /* Version 4.1, Mon Feb 13 1995 - 16:53:40 */
 	ROM_REGION16_LE( 0x1000000, "dcs", ROMREGION_ERASEFF )	/* sound data */
 	ROM_LOAD16_BYTE( "cusa.u2",  0x000000, 0x80000, CRC(b9338332) SHA1(e5c420e63c4eba0010a68c7e0a57ef210e2c83d2) )

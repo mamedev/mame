@@ -9,7 +9,85 @@
 */
 
 /*
-Raiden 2 Hardware
+Raiden DX
+Seibu Kaihatsu, 1994
+
+This readme covers Raiden DX and to some extent Raiden II
+which uses an almost identical PCB.
+
+PCB Layout
+----------
+
+(C) 1993 RAIDEN II DX SEIBU KAIHATSU INC.,o
+|----------------------------------------------------------|
+|      1    2   3   4   5   6    7      8      9     10    |
+|LA4460    M6295  PCM  Z80     6116                       A|
+|   YM2151 M6295   6    5      6116    28.63636MHz        B|
+|     VOL   YM3012                                         |
+|HB-45A            |------|                               C|
+|HB-2       4560   |SIE150| 6116      |---------|          |
+|RC220             |      | 6116      | SEI252  |         D|
+|                  |------| 6116      |SB05-106 |          |
+|                           6116      |(QFP208) |         E|
+|J                                    |         |         F|
+|A    DSW2(8)                         |---------|          |
+|M                                                        G|
+|M    DSW1(8)                                   CXK58258   |
+|A          |---------|OBJ-1    OBJ-2           CXK58258  H|
+|           | SEI360  |                         CXK58258  J|
+|           |SB06-1937|DX_OBJ-3 DX_OBJ-4        CXK58258  K|
+|           |(QFP160) |  PAL1               |---------|   L|
+|           |         |                     |SEI1000  |   M|
+| |------|  |---------|  1H      3H         |SB01-001 |   N|
+| |SEI200|         32MHz                    |(QFP184) |    |
+| |      |CY7C185        2H      4H         |         |   P|
+| |------|CY7C185                           |---------|    |
+|                                                         Q|
+|                        PAL2 PAL3             |----|     R|
+|                                              |V30 |      |
+| DX_BACK-1  DX_BACK-2   7   COPX-D2           |----|     S|
+|----------------------------------------------------------|
+Notes:
+      V30 clock    - 16.000MHz [32/2]. Chip is stamped "NEC D70116HG-16 V30 NEC '84" (QFP52)
+      Z80 clock    - 3.579545MHz [28.63636/8]
+      YM2151 clock - 3.579545MHz [28.63636/8]
+      M6295 clocks - 1.022MHz [28.63636/28] and pin 7 HIGH (both)
+      CXK58258     - Sony CXK58258 32k x8 SRAM (= 62256)
+      CY7C185      - Cypress CY7C185 8k x8 SRAM (= 6264)
+      6116         - 2k x8 SRAM
+      HB-45A       - Seibu custom ceramic module sound DAC (SIP20)
+      HB-2         - Seibu custom ceramic module connected to coin counters (SIP10)
+      RC220        - Custom resistor network module used for inputs (SIP14)
+      VSync        - 55.4859Hz  \
+      HSync        - 15.5586kHz / measured via EL4583
+      PAL1         - AMI 18CV8 stamped 'JJ5004' (DIP20)
+      PAL2         - AMI 18CV8 stamped 'JJ5002' (DIP20)
+      PAL3         - AMI 18CV8 stamped 'JJ5001' (DIP20)
+      ROMs         - *PCM      - 2M MaskROM stamped 'RAIDEN 2 PCM' at location U1018 (DIP32)
+                     6         - 27C020 EPROM labelled 'SEIBU 6' at location U1017 (DIP32)
+                     5         - 27C512 EPROM labelled 'SEIBU 5' at location U1110 (DIP28)
+                     *OBJ-1    - 16M MaskROM stamped 'RAIDEN 2 OBJ-1' at location U0811 (DIP42)
+                     *OBJ-2    - 16M MaskROM stamped 'RAIDEN 2 OBJ-2' at location U082 (DIP42)
+                     DX_OBJ-3  - 16M MaskROM stamped 'DX OBJ-3' at location U0837 (DIP42)
+                     DX_OBJ-4  - 16M MaskROM stamped 'DX OBJ-4' at location U0836 (DIP42)
+                     1H        - 27C4001 EPROM labelled 'SEIBU 1H' at location U1210 (DIP32)
+                     2H        - 27C4001 EPROM labelled 'SEIBU 2H' at location U1211 (DIP32)
+                     3H        - 27C4001 EPROM labelled 'SEIBU 3H' at location U129 (DIP32)
+                     4H        - 27C4001 EPROM labelled 'SEIBU 4H' at location U1212 (DIP32)
+                     DX_BACK-1 - 16M MaskROM stamped 'DX BACK-1' at location U075 (DIP42)
+                     DX_BACK-2 - 16M MaskROM stamped 'DX BACK-2' at location U0714 (DIP42)
+                     7         - 27C210 EPROM labelled 'SEIBU 7' at location U0724 (DIP40)
+                     *COPX-D2  - 2M MaskROM stamped 'COPX-D2' at location U0313 (DIP40)
+
+                     * = these ROMs are soldered-in and match ROMs from the original Raiden II PCB
+
+      SEIBU Custom ICs -
+                        SIE150 (QFP100)
+                        SEI252 SB05-106 (QFP208)
+                        SEI0200 TC110G21AF 0076 (QFP100)
+                        SEI360 SB06-1937 (QFP160)
+                        SEI1000 SB01-001 (QFP184)
+
 
 Games on this PCB / Similar PCBs
  Raiden 2
@@ -1091,8 +1169,6 @@ Raiden II by SEIBU KAIHATSU INC. (1993)
 ---------------------------------------
 malcor
 
-
-
 Location      Type      File ID    Checksum
 -------------------------------------------
 M6 U0211     27C240      ROM1        F9A9
@@ -1283,31 +1359,7 @@ on a black background whereas the hard version has a sepia shot
 of an ascending fighter.
 
 The entire FAQ is available here:
-
 http://www.gamefaqs.com/coinop/arcade/game/10729.html
-
-Note:
-This dump only contains the ROMS which differ from
-the current available dump.
-
-Documentation:
-
-Name         Size     CRC32
---------------------------------
-raiden2.jpg   822390  0x6babdbaf
-
-Roms:
-
-Name         Size     CRC32       Chip Type
--------------------------------------------
-r2_prg_0.bin  524288  0x2abc848c  27C240
-r2_prg_1.bin  524288  0x509ade43  27C240
-r2_fx0.bin    131072  0xc709bdf6  27C1024
-r2_snd.bin     65536  0x6bad0a3e  27C512
-r2_voi1.bin   262144  0x488d050f  27C020
-r2_voi2.bin   262144  0x8cf0d17e  TC534000P Dumped as 27C040. 1'st and
-                                            2'nd half identical. Cut in
-                                            half.
 
 */
 
@@ -1376,83 +1428,6 @@ ROM_END
 
 /* Raiden DX sets */
 
-/*
-Raiden DX
-Seibu Kaihatsu, 1994
-
-PCB Layout
-----------
-
-(C) 1993 RAIDEN II DX SEIBU KAIHATSU INC.,o
-|----------------------------------------------------------|
-|      1    2   3   4   5   6    7      8      9     10    |
-|LA4460    M6295  PCM  Z80     6116                       A|
-|   YM2151 M6295   6    5      6116    28.63636MHz        B|
-|     VOL   YM3012                                         |
-|                  |------|                               C|
-|           4560   |SIE150| 6116      |---------|          |
-|                  |      | 6116      | SEI252  |         D|
-|J                 |------| 6116      |SB05-106 |          |
-|A                          6116      |(QFP208) |         E|
-|M                                    |         |         F|
-|M    DSW2(8)                         |---------|          |
-|A                                                        G|
-|     DSW1(8)                                   CXK58258   |
-|           |---------|OBJ-1    OBJ-2           CXK58258  H|
-|           | SEI360  |                         CXK58258  J|
-|           |SB06-1937|DX_OBJ-3 DX_OBJ-4        CXK58258  K|
-|           |(QFP160) |  PAL1               |---------|   L|
-|           |         |                     |SEI1000  |   M|
-| |------|  |---------|  1H      3H         |SB01-001 |   N|
-| |SEI200|         32MHz                    |(QFP184) |    |
-| |      |CY7C185        2H      4H         |         |   P|
-| |------|CY7C185                           |---------|    |
-|                                                         Q|
-|                        PAL2 PAL3             |----|     R|
-|                                              |V30 |      |
-| DX_BACK-1  DX_BACK-2   7   COPX-D2           |----|     S|
-|----------------------------------------------------------|
-Notes:
-      V30 clock    - 16.000MHz [32/2]. Chip is stamped "NEC D70116HG-16 V30 NEC '84" (QFP52)
-      Z80 clock    - 3.579545MHz [28.63636/8]
-      YM2151 clock - 3.579545MHz [28.63636/8]
-      M6295 clocks - 1.022MHz [28.63636/28]. Sample rate 1022000 / 132
-      VSync - 58Hz
-      HSync - 15.59kHz
-      PAL1  - AMI 18CV8 stamped 'JJ5004' (DIP20)
-      PAL2  - AMI 18CV8 stamped 'JJ5002' (DIP20)
-      PAL3  - AMI 18CV8 stamped 'JJ5001' (DIP20)
-      ROMs  -
-              *PCM      - 2M MaskROM stamped 'RAIDEN 2 PCM' at location U1018 (DIP32)
-              6         - 27C020 EPROM labelled 'SEIBU 6' at location U1017 (DIP32)
-              5         - 27C512 EPROM labelled 'SEIBU 5' at location U1110 (DIP28)
-              *OBJ-1    - 16M MaskROM stamped 'RAIDEN 2 OBJ-1' at location U0811 (DIP42)
-              *OBJ-2    - 16M MaskROM stamped 'RAIDEN 2 OBJ-2' at location U082 (DIP42)
-              DX_OBJ-3  - 16M MaskROM stamped 'DX OBJ-3' at location U0837 (DIP42)
-              DX_OBJ-4  - 16M MaskROM stamped 'DX OBJ-4' at location U0836 (DIP42)
-              1H        - 27C4001 EPROM labelled 'SEIBU 1H' at location U1210 (DIP32)
-              2H        - 27C4001 EPROM labelled 'SEIBU 2H' at location U1211 (DIP32)
-              3H        - 27C4001 EPROM labelled 'SEIBU 3H' at location U129 (DIP32)
-              4H        - 27C4001 EPROM labelled 'SEIBU 4H' at location U1212 (DIP32)
-              DX_BACK-1 - 16M MaskROM stamped 'DX BACK-1' at location U075 (DIP42)
-              DX_BACK-2 - 16M MaskROM stamped 'DX BACK-2' at location U0714 (DIP42)
-              7         - 27C210 EPROM labelled 'SEIBU 7' at location U0724 (DIP40)
-              *COPX-D2  - 2M MaskROM stamped 'COPX-D2' at location U0313 (DIP40)
-              * means these ROMs are soldered-in and match ROMs from the original Raiden II PCB
-
-      SEIBU Custom ICs -
-                         SIE150 (QFP100)
-                         SEI252 SB05-106 (QFP208)
-                         SEI0200 TC110G21AF 0076 (QFP100)
-                         SEI360 SB06-1937 (QFP160)
-                         SEI1000 SB01-001 (QFP184)
-
-      NOTE! DX_1H.4N is bad (ROM was blown, I get a different read each time). The rest of the program ROMs are ok.
-      The PCB was only partially working originally (locks up almost immediately on power-up). I replaced the program ROMs from a
-      different set and it works, but locks up after a few minutes and the colors are bad ;-(
-      The intention of this particular dump is to complete the archive of the BG and OBJ ROMs that are soldered-in and are
-      not in the other dumps, and to better document the hardware :-)
-*/
 ROM_START( raidndx )
 	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
 	ROM_LOAD32_BYTE("dx_1h.4n",   0x000000, 0x80000, BAD_DUMP CRC(7624c36b) SHA1(84c17f2988031210d06536710e1eac558f4290a1) ) // bad
@@ -1485,44 +1460,6 @@ ROM_START( raidndx )
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPDX */
 	ROM_LOAD( "copx-d2.6s",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 ROM_END
-/*
-
-Raiden DX, Seibu License, Japan Version
-
-Note:
-This dump only contains dumps from
-the EPROMS. I have not dumped the OTP's.
-
-This dump is from the first revision
-of the PCB. The board is labeled:
-
-"(C) 1993 RAIDEN II DX SEIBU KAIHATSU INC.,o"
-
-As far as I can see this PCB is exactly the same
-as the RAIDEN 2 PCB I have dumped earlier.
-
-There exists a newer version which only contains SMD chips.
-
-Documentation:
-
-Name          Size    CRC32
---------------------------------
-rdx_pcb.jpg   662446  0x282a5e53
-rdx_dip.jpg   541975  0x340664ec  200 DPI
-
-Roms:
-
-Name          Size    CRC32       Chip Type
--------------------------------------------
-rdxj_1.bin    524288  0xb5b32885  27C4001
-rdxj_2.bin    524288  0x7efd581d  27C4001
-rdxj_3.bin    524288  0x55ec0e1d  27C4001
-rdxj_4.bin    524288  0xf8fb31b4  27C4001
-rdxj_5.bin     65536  0x8c46857a  27C512
-rdxj_6.bin    262144  0x9a9196da  27C020
-rdxj_7.bin    131072  0xc73986d4  27C210
-
-*/
 
 ROM_START( raidndxj )
 	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
@@ -1557,87 +1494,45 @@ ROM_START( raidndxj )
 	ROM_LOAD( "dx_pcm.3a", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPDX */
-		/* not from this set, assumed to be the same */
+	/* not from this set, assumed to be the same */
 	ROM_LOAD( "copx-d2.6s",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 ROM_END
 
-/*
-
-Raiden DX, 1993 Seibu
-
-CPU: NEC V30
-SND: YM2151, 2x OKI 6295
-OSC: 32.000Mhz, 28.6360 Mhz
-Dips: 2x 8position. see attached zip DIPS.ZIP, for Dip info
-
-Other (square socket mounted) chips, SEI1000SB01-001, SEI360 SB06-1937, SEI252 SB05-106, SEI0200 TC110G21AF, SIE150 W (then a triangle symbol then)40101
-btw, the last chip is labelled SIE, its not a typo  :)
-
-
-I also see a chip labelled COPX-D2 (C) Rise Corp. 1992, likely a protection CPU  :(
-
-Raiden DX is actually Raiden II with some changed BG and OBJ roms.
-It uses many of the roms from Raiden II, including some chips labelled....
-
-RAIDEN II-PCM
-RAIDEN 2 OBJ1
-RAIDEN 2 OBJ2
-
-
-These chips are particular to Raiden DX...
-
-DX BACK-1  TC5316200CP
-DX BACK-2  TC5316200CP
-DX OBJ3    TC5316200CP
-DX OBJ4    TC5316200CP
-
-DX-1D      27C4000
-DX-2D      27C4000
-DX-3D      27C4000
-DX-4D      27C4000
-DX-5       27C512
-DX-6       27020
-DX-7       27C1024
-
-Unfortunately, my reader doesnt support 42 pin roms, so i can not dump the BACK and OBJ roms.
-
-*/
-
-ROM_START( raidndxa )
+ROM_START( raidndxt )
 	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
-	ROM_LOAD32_BYTE("dx-1d.bin",   0x000000, 0x80000, CRC(14d725fc) SHA1(f12806f64f069fdc4ee29b309a32f7ca00b36f93) )
-	ROM_LOAD32_BYTE("dx-2d.bin",   0x000001, 0x80000, CRC(5e7e45cb) SHA1(94eff893b5335c522f1c063c3175b9bac87b0a25) )
-	ROM_LOAD32_BYTE("dx-3d.bin",   0x000002, 0x80000, CRC(f0a47e67) SHA1(8cbd21993077b2e01295db6e343cae9e0e4bfefe) )
-	ROM_LOAD32_BYTE("dx-4d.bin",   0x000003, 0x80000, CRC(6bde6edc) SHA1(c3565a55b858c10659fd9b93b1cd92bc39e6446d) )
+	ROM_LOAD32_BYTE("1d.u1210",   0x000000, 0x80000, CRC(14d725fc) SHA1(f12806f64f069fdc4ee29b309a32f7ca00b36f93) )
+	ROM_LOAD32_BYTE("2d.u1211",   0x000001, 0x80000, CRC(5e7e45cb) SHA1(94eff893b5335c522f1c063c3175b9bac87b0a25) )
+	ROM_LOAD32_BYTE("3d.u129",   0x000002, 0x80000, CRC(f0a47e67) SHA1(8cbd21993077b2e01295db6e343cae9e0e4bfefe) )
+	ROM_LOAD32_BYTE("4d.u1212",   0x000003, 0x80000, CRC(6bde6edc) SHA1(c3565a55b858c10659fd9b93b1cd92bc39e6446d) )
 
 	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
-	ROM_LOAD( "dx_5.5b",  0x000000, 0x10000,  CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
+	ROM_LOAD( "5.u1110",  0x000000, 0x10000,  CRC(8c46857a) SHA1(8b269cb20adf960ba4eb594d8add7739dbc9a837) )
 
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE ) /* chars */
-	ROM_LOAD( "dx_7.4s",	0x000000,	0x020000,	CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
+	ROM_LOAD( "7.u0724",	0x000000,	0x020000,	CRC(c73986d4) SHA1(d29345077753bda53560dedc95dd23f329e521d9) )
 
 	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE ) /* background gfx */
 	/* not from this set, assumed to be the same */
-	ROM_LOAD( "dx_back1.1s",   0x000000, 0x200000, CRC(90970355) SHA1(d71d57cd550a800f583550365102adb7b1b779fc) )
-	ROM_LOAD( "dx_back2.2s",   0x200000, 0x200000, CRC(5799af3e) SHA1(85d6532abd769da77bcba70bd2e77915af40f987) )
+	ROM_LOAD( "dx_back-1.u075",   0x000000, 0x200000, CRC(90970355) SHA1(d71d57cd550a800f583550365102adb7b1b779fc) )
+	ROM_LOAD( "dx_back-2.u0714",   0x200000, 0x200000, CRC(5799af3e) SHA1(85d6532abd769da77bcba70bd2e77915af40f987) )
 
 	ROM_REGION( 0x800000, "gfx3", ROMREGION_DISPOSE ) /* sprite gfx (encrypted) */
 	/* not from this set, assumed to be the same */
-	ROM_LOAD32_WORD( "obj1",        0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Shared with original Raiden 2 */
-	ROM_LOAD32_WORD( "obj2",        0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Shared with original Raiden 2 */
-	ROM_LOAD32_WORD( "dx_obj3.4k",  0x400000, 0x200000, CRC(ba381227) SHA1(dfc4d659aca1722a981fa56a31afabe66f444d5d) )
-	ROM_LOAD32_WORD( "dx_obj4.6k",  0x400002, 0x200000, CRC(65e50d19) SHA1(c46147b4132abce7314b46bf419ce4773e024b05) )
+	ROM_LOAD32_WORD( "obj-1.u0811", 0x000000, 0x200000, CRC(ff08ef0b) SHA1(a1858430e8171ca8bab785457ef60e151b5e5cf1) ) /* Shared with original Raiden 2 */
+	ROM_LOAD32_WORD( "obj-2.u082",  0x000002, 0x200000, CRC(638eb771) SHA1(9774cc070e71668d7d1d20795502dccd21ca557b) ) /* Shared with original Raiden 2 */
+	ROM_LOAD32_WORD( "dx_obj-3.u0837",  0x400000, 0x200000, CRC(ba381227) SHA1(dfc4d659aca1722a981fa56a31afabe66f444d5d) )
+	ROM_LOAD32_WORD( "dx_obj-4.u0836",  0x400002, 0x200000, CRC(65e50d19) SHA1(c46147b4132abce7314b46bf419ce4773e024b05) )
 
 	ROM_REGION( 0x100000, "oki1", 0 )	/* ADPCM samples */
-	ROM_LOAD( "dx_6.3b",   0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 	/* not from this set, assumed to be the same */
+	ROM_LOAD( "6.u1017", 0x00000, 0x40000, CRC(9a9196da) SHA1(3d1ee67fb0d40a231ce04d10718f07ffb76db455) )
 
 	ROM_REGION( 0x100000, "oki2", 0 )	/* ADPCM samples */
-	ROM_LOAD( "dx_pcm.3a", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
+	ROM_LOAD( "pcm.u1018", 0x00000, 0x40000, CRC(8cf0d17e) SHA1(0fbe0b1e1ca5360c7c8329331408e3d799b4714c) )
 
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPDX */
-		/* not from this set, assumed to be the same */
-	ROM_LOAD( "copx-d2.6s",   0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
+	/* not from this set, assumed to be the same */
+	ROM_LOAD( "copx-d2.u0313", 0x00000, 0x40000, CRC(a6732ff9) SHA1(c4856ec77869d9098da24b1bb3d7d58bb74b4cda) )
 ROM_END
 
 ROM_START( raidndxm )
@@ -1679,7 +1574,6 @@ ROM_END
 
 
 /* Zero Team sets */
-
 
 ROM_START( zeroteam )
 	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
@@ -2216,9 +2110,9 @@ GAME( 1993, raiden2d, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaih
 GAME( 1993, raiden2e, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu", "Raiden 2 (set 6, Easy Version)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, raiden2f, raiden2, raiden2,  raiden2,  raiden2,  ROT270, "Seibu Kaihatsu", "Raiden 2 (set 7)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, raidndx,  0,       raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden DX (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1993, raidndxa, raidndx, raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden DX (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, raidndxm, raidndx, raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden DX (Metrotainment license)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, raidndxj, raidndx, raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden DX (Japan)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1993, raidndxt, raidndx, raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu", "Raiden DX (Tuning license)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, zeroteam, 0,       raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, zeroteaa, zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1993, zeroteab, zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND)
