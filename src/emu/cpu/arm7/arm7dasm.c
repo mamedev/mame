@@ -586,10 +586,7 @@ UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 	else if( (opcode&0x0e000000)==0x0c000000 )		//bits 27-25 == 110
 	{
 		/* co processor data transfer */
-		if(arm7_dasm_cop_dt_callback)
-			arm7_dasm_cop_dt_callback(pBuf,opcode,(char*)pConditionCode,(char*)pBuf0);
-		else
-			DasmCoProc_DT(pBuf,opcode,(char*)pConditionCode,(char*)pBuf0);
+		DasmCoProc_DT(pBuf,opcode,(char*)pConditionCode,(char*)pBuf0);
 	}
 	else if( (opcode&0x0f000000)==0x0e000000 )		//bits 27-24 == 1110
 	{
@@ -598,18 +595,12 @@ UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 		//Register Transfer
 		if(opcode&0x10)
 		{
-			if(arm7_dasm_cop_rt_callback)
-				arm7_dasm_cop_rt_callback(pBuf,opcode,(char*)pConditionCode,(char*)pBuf0);
-			else
-				DasmCoProc_RT(pBuf,opcode,pConditionCode,pBuf0);
+			DasmCoProc_RT(pBuf,opcode,pConditionCode,pBuf0);
 		}
 		//Data Op
 		else
 		{
-			if(arm7_dasm_cop_do_callback)
-				arm7_dasm_cop_do_callback(pBuf,opcode,(char*)pConditionCode,(char*)pBuf0);
-			else
-				DasmCoProc_DO(pBuf,opcode,pConditionCode,pBuf0);
+			DasmCoProc_DO(pBuf,opcode,pConditionCode,pBuf0);
 		}
 	}
 	else if( (opcode&0x0f000000) == 0x0f000000 )	//bits 27-24 == 1111

@@ -48,9 +48,6 @@ static READ32_HANDLER(test_rt_r_callback);
 static WRITE32_HANDLER(test_rt_w_callback);
 static void test_dt_r_callback(UINT32 insn, UINT32 *prn, UINT32 (*read32)(UINT32 addr));
 static void test_dt_w_callback(UINT32 insn, UINT32 *prn, void (*write32)(UINT32 addr, UINT32 data));
-static char *Spec_RT(char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
-static char *Spec_DT(char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
-static char *Spec_DO(char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
 #endif
 
 /* Macros that can be re-defined for custom cpu implementations - The core expects these to be defined */
@@ -99,10 +96,6 @@ static void arm7_init(int index, int clock, const void *config, int (*irqcallbac
     arm7_coproc_rt_w_callback = test_rt_w_callback;
     arm7_coproc_dt_r_callback = test_dt_r_callback;
     arm7_coproc_dt_w_callback = test_dt_w_callback;
-    // setup dasm callbacks - direct method example
-    arm7_dasm_cop_dt_callback = Spec_DT;
-    arm7_dasm_cop_rt_callback = Spec_RT;
-    arm7_dasm_cop_do_callback = Spec_DO;
 #endif
 }
 
@@ -431,22 +424,5 @@ static void test_dt_r_callback(UINT32 insn, UINT32 *prn, UINT32 (*read32)(UINT32
 static void test_dt_w_callback(UINT32 insn, UINT32 *prn, void (*write32)(UINT32 addr, UINT32 data))
 {
     LOG(("test_dt_w_callback: opcode = %x\n", insn));
-}
-
-/* Custom Co-proc DASM handlers */
-static char *Spec_RT(char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0)
-{
-    pBuf += sprintf(pBuf, "SPECRT");
-    return pBuf;
-}
-static char *Spec_DT(char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0)
-{
-    pBuf += sprintf(pBuf, "SPECDT");
-    return pBuf;
-}
-static char *Spec_DO(char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0)
-{
-    pBuf += sprintf(pBuf, "SPECDO");
-    return pBuf;
 }
 #endif
