@@ -1104,7 +1104,7 @@ Notes:
       TDA2030   - ST TDA2030 Audio AMP
       TL084     - Texas Instruments TL084 JFET-Input Operational Amplifier
       ADC0844   - National Semiconductor ADC0844 8-Bit Microprocessor Compatible A/D Converter with Multiplexer Option
-      PAL1      - GAL20V8 labeleld 'A-19668'
+      PAL1      - GAL20V8 labelled 'A-19668'
       PAL2      - PALC22V10 (no label)
       PAL3      - TIBPAL20L8 labelled 'A-19670'
       PAL4      - TIBPAL22V10 labelled 'A-19671'
