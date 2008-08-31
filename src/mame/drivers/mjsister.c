@@ -162,18 +162,14 @@ static ADDRESS_MAP_START( mjsister_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(mjsister_videoram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mjsister_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x11, 0x11) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x20, 0x20) AM_READ(mjsister_keys_r)
-	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN0")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mjsister_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mjsister_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(SMH_NOP) /* HD46505? */
 	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x11, 0x11) AM_READ(ay8910_read_port_0_r)
 	AM_RANGE(0x12, 0x12) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x20, 0x20) AM_READ(mjsister_keys_r)
+	AM_RANGE(0x21, 0x21) AM_READ_PORT("IN0")
 	AM_RANGE(0x30, 0x30) AM_WRITE(mjsister_banksel1_w)
 	AM_RANGE(0x31, 0x31) AM_WRITE(mjsister_banksel2_w)
 	AM_RANGE(0x32, 0x32) AM_WRITE(mjsister_input_sel1_w)
@@ -313,7 +309,7 @@ static MACHINE_DRIVER_START( mjsister )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, MCLK/2) /* 6.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(mjsister_readmem,mjsister_writemem)
-	MDRV_CPU_IO_MAP(mjsister_readport,mjsister_writeport)
+	MDRV_CPU_IO_MAP(mjsister_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
 	MDRV_MACHINE_RESET(mjsister)
@@ -367,3 +363,4 @@ ROM_START( mjsister )
 ROM_END
 
 GAME( 1986, mjsister, 0, mjsister, mjsister, 0, ROT0, "Toaplan", "Mahjong Sisters (Japan)", 0 )
+

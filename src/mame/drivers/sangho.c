@@ -76,38 +76,30 @@ static WRITE8_HANDLER(pzlestar_bank_w)
 
 /* Puzzle Star Ports */
 
-static ADDRESS_MAP_START (readport_pzlestar, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( pzlestar_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x98, 0x98) AM_READ( v9938_0_vram_r )
-	AM_RANGE( 0x99, 0x99) AM_READ( v9938_0_status_r )
+	AM_RANGE( 0x7c, 0x7c) AM_WRITE( ym2413_register_port_0_w )
+	AM_RANGE( 0x7d, 0x7d) AM_WRITE( ym2413_data_port_0_w )
+	AM_RANGE( 0x91, 0x91) AM_WRITE( pzlestar_bank_w )
+	AM_RANGE( 0x98, 0x98) AM_READWRITE( v9938_0_vram_r, v9938_0_vram_w )
+	AM_RANGE( 0x99, 0x99) AM_READWRITE( v9938_0_status_r, v9938_0_command_w )
+	AM_RANGE( 0x9a, 0x9a) AM_WRITE( v9938_0_palette_w )
+	AM_RANGE( 0x9b, 0x9b) AM_WRITE( v9938_0_register_w )
 	AM_RANGE( 0xa0, 0xa0) AM_READ_PORT("P1")
 	AM_RANGE( 0xa1, 0xa1) AM_READ_PORT("P2")
 	AM_RANGE( 0xf7, 0xf7) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (writeport_pzlestar, ADDRESS_SPACE_IO, 8)
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE( 0x91, 0x91) AM_WRITE( pzlestar_bank_w )
-	AM_RANGE( 0x7c, 0x7c) AM_WRITE( ym2413_register_port_0_w )
-	AM_RANGE( 0x7d, 0x7d) AM_WRITE( ym2413_data_port_0_w )
-	AM_RANGE( 0x98, 0x98) AM_WRITE( v9938_0_vram_w )
-	AM_RANGE( 0x99, 0x99) AM_WRITE( v9938_0_command_w )
-	AM_RANGE( 0x9a, 0x9a) AM_WRITE( v9938_0_palette_w )
-	AM_RANGE( 0x9b, 0x9b) AM_WRITE( v9938_0_register_w )
-ADDRESS_MAP_END
-
 /* Sexy Boom Ports */
 
-static ADDRESS_MAP_START (readport_sexyboom, ADDRESS_SPACE_IO, 8)
+static ADDRESS_MAP_START( sexyboom_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0xa0, 0xa0) AM_READ_PORT("P1")
 	AM_RANGE( 0xa1, 0xa1) AM_READ_PORT("P2")
 	AM_RANGE( 0xf7, 0xf7) AM_READ_PORT("DSW")
 	AM_RANGE( 0xf0, 0xf0) AM_READ( v9938_0_vram_r )
 	AM_RANGE( 0xf1, 0xf1) AM_READ( v9938_0_status_r )
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START (writeport_sexyboom, ADDRESS_SPACE_IO, 8)
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE( 0x7c, 0x7c) AM_WRITE( ym2413_register_port_0_w )
 	AM_RANGE( 0x7d, 0x7d) AM_WRITE( ym2413_data_port_0_w )
@@ -117,7 +109,6 @@ static ADDRESS_MAP_START (writeport_sexyboom, ADDRESS_SPACE_IO, 8)
 	AM_RANGE( 0xf3, 0xf3) AM_WRITE( v9938_0_register_w )
 	//bank f8-ff ???
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( sangho )
@@ -235,7 +226,7 @@ static MACHINE_DRIVER_START(pzlestar)
 
 	MDRV_CPU_ADD("main", Z80,8000000) // ?
 	MDRV_CPU_PROGRAM_MAP(readmem, 0)
-	MDRV_CPU_IO_MAP(readport_pzlestar,writeport_pzlestar)
+	MDRV_CPU_IO_MAP(pzlestar_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(sangho_interrupt,262)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -268,7 +259,7 @@ static MACHINE_DRIVER_START(sexyboom )
 
 	MDRV_CPU_ADD("main", Z80,8000000) // ?
 	MDRV_CPU_PROGRAM_MAP(readmem, 0)
-	MDRV_CPU_IO_MAP(readport_sexyboom,writeport_sexyboom)
+	MDRV_CPU_IO_MAP(sexyboom_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(sangho_interrupt,262)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -340,3 +331,4 @@ static DRIVER_INIT(sangho)
 
 GAME( 1991, pzlestar,  0,    pzlestar, sangho, sangho, ROT270, "Sang Ho Soft", "Puzzle Star (Sang Ho Soft)", GAME_NOT_WORKING )
 GAME( 1992, sexyboom,  0,    sexyboom, sangho, sangho, ROT270, "Sang Ho Soft", "Sexy Boom", GAME_NOT_WORKING | GAME_NO_SOUND )
+

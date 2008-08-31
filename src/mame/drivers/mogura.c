@@ -86,28 +86,21 @@ static WRITE8_HANDLER( mogura_tileram_w )
 	tilemap_mark_tile_dirty(mogura_tilemap,offset&0x7ff);
 }
 
-
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x08) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("P1")
-	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("P2")
-	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("P3")
-	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("P4")
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("SERVICE")
-ADDRESS_MAP_END
-
-
 static WRITE8_HANDLER(dac_w)
 {
 	dac_0_data_w(machine, 0, data & 0xf0 );	/* left */
 	dac_1_data_w(machine, 0, (data & 0x0f)<<4 );	/* right */
 }
 
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP) // ??
+	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)	// ??
+	AM_RANGE(0x08, 0x08) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("P1")
+	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("P2")
+	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("P3")
+	AM_RANGE(0x0f, 0x0f) AM_READ_PORT("P4")
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("SERVICE")
 	AM_RANGE(0x14, 0x14) AM_WRITE(dac_w)	/* 4 bit DAC x 2. MSB = left, LSB = right */
 ADDRESS_MAP_END
 
@@ -214,7 +207,7 @@ static MACHINE_DRIVER_START( mogura )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80,3000000)		 /* 3 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_GFXDECODE(mogura)
@@ -252,3 +245,4 @@ ROM_START( mogura )
 ROM_END
 
 GAME( 1991, mogura, 0, mogura, mogura, 0, ROT0, "Konami", "Mogura Desse", 0 )
+

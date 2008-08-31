@@ -173,24 +173,19 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xf7ff) AM_WRITE(mjkjidai_videoram_w) AM_BASE(&mjkjidai_videoram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(keyboard_r)
 	AM_RANGE(0x01, 0x01) AM_READ(SMH_NOP)	// ???
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")
-	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0")
-	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN1")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x02) AM_WRITE(keyboard_select_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE(mjkjidai_ctrl_w)	// rom bank, coin counter, flip screen etc
+	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN0")
+	AM_RANGE(0x12, 0x12) AM_READ_PORT("IN1")
 	AM_RANGE(0x20, 0x20) AM_WRITE(sn76496_0_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(sn76496_1_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(adpcm_w)
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( mjkjidai )
@@ -357,7 +352,7 @@ static MACHINE_DRIVER_START( mjkjidai )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80,10000000/2)	/* 5 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	MDRV_NVRAM_HANDLER(mjkjidai)
@@ -425,3 +420,4 @@ ROM_END
 
 
 GAME( 1986, mjkjidai, 0, mjkjidai, mjkjidai, 0, ROT0, "Sanritsu",  "Mahjong Kyou Jidai (Japan)", GAME_IMPERFECT_GRAPHICS )
+

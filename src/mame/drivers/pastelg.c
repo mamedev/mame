@@ -68,30 +68,23 @@ static ADDRESS_MAP_START( writemem_pastelg, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( readport_pastelg, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
-	AM_RANGE(0x81, 0x81) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xa0, 0xa0) AM_READ(nb1413m3_inputport1_r)
-	AM_RANGE(0xb0, 0xb0) AM_READ(nb1413m3_inputport2_r)
-	AM_RANGE(0xc0, 0xc0) AM_READ(pastelg_sndrom_r)
-	AM_RANGE(0xd0, 0xd0) AM_READ(SMH_NOP)					// unknown
-	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("DSWC")
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writeport_pastelg, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( pastelg_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
+	AM_RANGE(0x81, 0x81) AM_READ(ay8910_read_port_0_r)
 	AM_RANGE(0x82, 0x82) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x83, 0x83) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x90, 0x96) AM_WRITE(pastelg_blitter_w)
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(pastelg_romsel_w)
+	AM_RANGE(0xa0, 0xa0) AM_READWRITE(nb1413m3_inputport1_r, nb1413m3_inputportsel_w)
+	AM_RANGE(0xb0, 0xb0) AM_READWRITE(nb1413m3_inputport2_r, pastelg_romsel_w)
+	AM_RANGE(0xc0, 0xc0) AM_READ(pastelg_sndrom_r)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(pastelg_clut_w)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_READWRITE(SMH_NOP, DAC_0_WRITE)					// unknown
+	AM_RANGE(0xe0, 0xe0) AM_READ_PORT("DSWC")
 ADDRESS_MAP_END
-
 
 static INPUT_PORTS_START( pastelg )
 	PORT_START("DSWA")
@@ -197,7 +190,7 @@ static MACHINE_DRIVER_START( pastelg )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 19968000/8)	/* 2.496 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem_pastelg, writemem_pastelg)
-	MDRV_CPU_IO_MAP(readport_pastelg, writeport_pastelg)
+	MDRV_CPU_IO_MAP(pastelg_io_map,0)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt,96)  // nmiclock not written, chip is 1411M1 instead of 1413M3
 	MDRV_CPU_VBLANK_INT("main", nb1413m3_interrupt)
 
@@ -255,3 +248,4 @@ ROM_END
 
 
 GAME( 1985, pastelg, 0, pastelg, pastelg, pastelg, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", 0 )
+

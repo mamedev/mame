@@ -183,8 +183,7 @@ static ADDRESS_MAP_START( tiamc1_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( tiamc1_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( tiamc1_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x4f) AM_WRITE(tiamc1_sprite_y_w) /* sprites Y */
 	AM_RANGE(0x50, 0x5f) AM_WRITE(tiamc1_sprite_x_w) /* sprites X */
@@ -196,17 +195,13 @@ static ADDRESS_MAP_START( tiamc1_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xbe, 0xbe) AM_WRITE(tiamc1_bankswitch_w) /* VRAM selector */
 	AM_RANGE(0xbf, 0xbf) AM_WRITENOP                 /* charset control */
 	AM_RANGE(0xc0, 0xc3) AM_WRITE(tiamc1_timer0_w)   /* timer 0 */
+	AM_RANGE(0xd0, 0xd0) AM_READ_PORT("IN0")
+	AM_RANGE(0xd1, 0xd1) AM_READ_PORT("IN1")
+	AM_RANGE(0xd2, 0xd2) AM_READ_PORT("IN2")
 	AM_RANGE(0xd2, 0xd2) AM_WRITE(tiamc1_control_w)  /* coin counter and lockout */
 	AM_RANGE(0xd3, 0xd3) AM_WRITENOP                 /* 8255 ctrl. Used for i/o ports */
 	AM_RANGE(0xd4, 0xd7) AM_WRITE(tiamc1_timer1_w)   /* timer 1 */
 	AM_RANGE(0xda, 0xda) AM_WRITE(tiamc1_timer1_gate_w) /* timer 1 gate control */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( tiamc1_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xd0, 0xd0) AM_READ_PORT("IN0")
-	AM_RANGE(0xd1, 0xd1) AM_READ_PORT("IN1")
-	AM_RANGE(0xd2, 0xd2) AM_READ_PORT("IN2")
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( tiamc1 )
@@ -278,7 +273,7 @@ static MACHINE_DRIVER_START( tiamc1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", 8080,16000000/9)		 /* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(tiamc1_readmem,tiamc1_writemem)
-	MDRV_CPU_IO_MAP(tiamc1_readport,tiamc1_writeport)
+	MDRV_CPU_IO_MAP(tiamc1_io_map,0)
 
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
@@ -353,3 +348,4 @@ ROM_END
 
 GAME( 1988, konek, 0, tiamc1, tiamc1, tiamc1, ROT0, "Terminal", "Konek-Gorbunok", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1988, sosterm, 0, tiamc1, tiamc1, tiamc1, ROT0, "Terminal", "S.O.S.", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+

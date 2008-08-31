@@ -44,18 +44,12 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x1000, 0x10ff) AM_WRITE(SMH_RAM) /* RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-    AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
-    AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
-    AM_RANGE(0x02, 0x02) AM_READ(starcrus_coll_det_r)
-    AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-    AM_RANGE(0x00, 0x00) AM_WRITE(starcrus_s1_x_w)
-    AM_RANGE(0x01, 0x01) AM_WRITE(starcrus_s1_y_w)
-    AM_RANGE(0x02, 0x02) AM_WRITE(starcrus_s2_x_w)
-    AM_RANGE(0x03, 0x03) AM_WRITE(starcrus_s2_y_w)
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+    AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(starcrus_s1_x_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_WRITE(starcrus_s1_y_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(starcrus_coll_det_r, starcrus_s2_x_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW") AM_WRITE(starcrus_s2_y_w)
     AM_RANGE(0x04, 0x04) AM_WRITE(starcrus_p1_x_w)
     AM_RANGE(0x05, 0x05) AM_WRITE(starcrus_p1_y_w)
     AM_RANGE(0x06, 0x06) AM_WRITE(starcrus_p2_x_w)
@@ -65,7 +59,6 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
     AM_RANGE(0x0a, 0x0a) AM_WRITE(starcrus_proj_parm_1_w)
     AM_RANGE(0x0b, 0x0b) AM_WRITE(starcrus_proj_parm_2_w)
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( starcrus )
@@ -172,7 +165,7 @@ static MACHINE_DRIVER_START( starcrus )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", 8080,9750000/9)  /* 8224 chip is a divide by 9 */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
@@ -228,3 +221,4 @@ ROM_END
 
 
 GAME( 1977, starcrus, 0, starcrus, starcrus, 0, ROT0, "RamTek", "Star Cruiser", 0 )
+

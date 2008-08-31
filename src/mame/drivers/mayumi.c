@@ -86,20 +86,15 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xf7ff) AM_WRITE(mayumi_videoram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x30, 0x30) AM_READ_PORT("IN0")
-	AM_RANGE(0xc1, 0xc2) AM_READ(key_matrix_r)	// 0xc0-c3 8255ppi
-	AM_RANGE(0xd1, 0xd1) AM_READ(ym2203_read_port_0_r)
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x30, 0x30) AM_WRITE(bank_sel_w)
+	AM_RANGE(0x30, 0x30) AM_READ_PORT("IN0") AM_WRITE(bank_sel_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(input_sel_w)
+	AM_RANGE(0xc1, 0xc2) AM_READ(key_matrix_r)	// 0xc0-c3 8255ppi
 	AM_RANGE(0xc3, 0xc3) AM_WRITE(SMH_NOP)		// 0xc0-c3 8255ppi
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0xd1, 0xd1) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0xd1, 0xd1) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
 ADDRESS_MAP_END
 
 /****************************************************************************/
@@ -284,7 +279,7 @@ static MACHINE_DRIVER_START( mayumi )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, MCLK/2) /* 5.000 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", mayumi_interrupt)
 
 	MDRV_MACHINE_RESET( mayumi )
@@ -338,3 +333,4 @@ ROM_START( mayumi )
 ROM_END
 
 GAME( 1988, mayumi, 0, mayumi, mayumi, 0, ROT0, "[Sanritsu] Victory L.L.C.",  "Kikiippatsu Mayumi-chan (Japan)", 0 )
+

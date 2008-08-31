@@ -83,21 +83,14 @@ static READ8_HANDLER( io_0x03_r )
 	return 0x00;
 }
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P2")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW")
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P2") AM_WRITE(io_0x00_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(sn76496_0_w)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("DSW") AM_WRITE(sn76496_1_w)
 	AM_RANGE(0x03, 0x03) AM_READ(io_0x03_r)		// Unknown
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(io_0x00_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(sn76496_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(sn76496_1_w)
-ADDRESS_MAP_END
-
 
 static INPUT_PORTS_START( mrjong )
 	PORT_START("P2")
@@ -181,7 +174,7 @@ static MACHINE_DRIVER_START( mrjong )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80,15468000/6)	/* 2.578 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* video hardware */
@@ -267,3 +260,4 @@ ROM_END
 GAME( 1983, mrjong,   0,      mrjong, mrjong, 0, ROT90, "Kiwako", "Mr. Jong (Japan)", 0 )
 GAME( 1983, crazyblk, mrjong, mrjong, mrjong, 0, ROT90, "Kiwako (ECI license)", "Crazy Blocks", 0 )
 GAME( 1983, blkbustr, mrjong, mrjong, mrjong, 0, ROT90, "Kiwako (ECI license)", "BlockBuster", 0 )
+

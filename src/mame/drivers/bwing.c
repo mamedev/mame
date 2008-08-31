@@ -235,12 +235,9 @@ static ADDRESS_MAP_START( bwp3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM) AM_BASE(&bwp3_rombase) AM_SIZE(&bwp3_romsize)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bwp3_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("VBLANK")
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bwp3_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_WRITE(bwp3_u8F_w)
+static ADDRESS_MAP_START( bwp3_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("VBLANK") AM_WRITE(bwp3_u8F_w)
 ADDRESS_MAP_END
 
 //****************************************************************************
@@ -399,7 +396,7 @@ static MACHINE_DRIVER_START( bwing )
 
 	MDRV_CPU_ADD("audio", DECO16, 2000000)
 	MDRV_CPU_PROGRAM_MAP(bwp3_readmem, bwp3_writemem)
-	MDRV_CPU_IO_MAP(bwp3_readport, bwp3_writeport)
+	MDRV_CPU_IO_MAP(bwp3_io_map,0)
 	MDRV_CPU_PERIODIC_INT(bwp3_interrupt, 1000)
 
 	MDRV_INTERLEAVE(300)		// high enough?
@@ -628,3 +625,4 @@ GAME( 1984, bwingsa, bwings, bwing, bwing, bwing, ROT90, "Data East Corporation"
 
 GAME( 1984, zaviga,       0, bwing, bwing, bwing, ROT90, "Data East Corporation", "Zaviga", 0 )
 GAME( 1984, zavigaj, zaviga, bwing, bwing, bwing, ROT90, "Data East Corporation", "Zaviga (Japan)", 0 )
+

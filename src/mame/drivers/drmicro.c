@@ -87,23 +87,14 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x05, 0x05) AM_READ(SMH_NOP) // unused?
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sn76496_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(sn76496_1_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(sn76496_0_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_WRITE(sn76496_1_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(sn76496_2_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(pcm_set_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(nmi_enable_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(SMH_NOP) // watchdog?
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(pcm_set_w)
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2") AM_WRITE(nmi_enable_w)
+	AM_RANGE(0x05, 0x05) AM_READWRITE(SMH_NOP, SMH_NOP) // unused? / watchdog?
 ADDRESS_MAP_END
 
 /****************************************************************************/
@@ -230,7 +221,7 @@ static MACHINE_DRIVER_START( drmicro )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80,MCLK/6)	/* 3.072MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", drmicro_interrupt)
 
 	MDRV_INTERLEAVE(1)
@@ -298,3 +289,4 @@ ROM_START( drmicro )
 ROM_END
 
 GAME( 1983, drmicro, 0, drmicro, drmicro, 0, ROT270, "Sanritsu", "Dr. Micro", 0 )
+

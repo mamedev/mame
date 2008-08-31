@@ -92,11 +92,7 @@ static ADDRESS_MAP_START( writemem2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(SMH_NOP)	/* watchdog? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport2, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport2, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map_2, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_control_port_0_w)
@@ -206,7 +202,7 @@ static MACHINE_DRIVER_START( mouser )
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem2,writemem2)
-	MDRV_CPU_IO_MAP(readport2,writeport2)
+	MDRV_CPU_IO_MAP(io_map_2,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4) /* ??? This controls the sound tempo */
 
 	/* video hardware */
@@ -302,3 +298,4 @@ static DRIVER_INIT( mouser )
 
 GAME( 1983, mouser,   0,      mouser, mouser, mouser, ROT90, "UPL", "Mouser", 0 )
 GAME( 1983, mouserc,  mouser, mouser, mouser, mouser, ROT90, "[UPL] (Cosmos license)", "Mouser (Cosmos)", 0 )
+

@@ -91,18 +91,15 @@ static ADDRESS_MAP_START( carjmbre_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( carjmbre_sound_readport, ADDRESS_SPACE_IO, 8 )
+
+static ADDRESS_MAP_START( carjmbre_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
-	AM_RANGE(0x24, 0x24) AM_READ(SMH_NOP)				//??
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( carjmbre_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(SMH_NOP)				//?? written on init/0xff sound command reset
 	AM_RANGE(0x20, 0x20) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x21, 0x21) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x22, 0x22) AM_WRITE(SMH_NOP)				//?? written before and after 0x21 with same value
+	AM_RANGE(0x24, 0x24) AM_READ(SMH_NOP)				//??
 	AM_RANGE(0x30, 0x30) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0x31, 0x31) AM_WRITE(ay8910_write_port_1_w)
 	AM_RANGE(0x32, 0x32) AM_WRITE(SMH_NOP)				//?? written before and after 0x31 with same value
@@ -190,7 +187,7 @@ static MACHINE_DRIVER_START( carjmbre )
 
 	MDRV_CPU_ADD("audio", Z80, 1500000)
 	MDRV_CPU_PROGRAM_MAP(carjmbre_sound_readmem,carjmbre_sound_writemem)
-	MDRV_CPU_IO_MAP(carjmbre_sound_readport,carjmbre_sound_writeport)
+	MDRV_CPU_IO_MAP(carjmbre_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
@@ -248,3 +245,4 @@ ROM_START( carjmbre )
 ROM_END
 
 GAME( 1983, carjmbre, 0, carjmbre, carjmbre, 0, ROT90, "Omori Electric Co., Ltd.", "Car Jamboree", GAME_IMPERFECT_COLORS )
+

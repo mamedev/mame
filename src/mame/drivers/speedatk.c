@@ -169,20 +169,15 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb3ff) AM_WRITE(speedatk_colorram_w) AM_BASE(&colorram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSW")
+	AM_RANGE(0x01, 0x01) AM_WRITE(speedatk_flip_screen_w)
+	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSW") AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x41, 0x41) AM_WRITE(ay8910_write_port_0_w)
 	/* are these not used? after they're read it sets bit 7 */
 	AM_RANGE(0x60, 0x60) AM_READ(SMH_NOP)
 	AM_RANGE(0x61, 0x61) AM_READ(SMH_NOP)
 	AM_RANGE(0x68, 0x68) AM_READ(SMH_NOP)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_WRITE(speedatk_flip_screen_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x41, 0x41) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( speedatk )
@@ -269,7 +264,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( speedatk )
 	MDRV_CPU_ADD("main", Z80,12000000/2)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
@@ -316,3 +311,4 @@ ROM_START( speedatk )
 ROM_END
 
 GAME( 1984, speedatk, 0, speedatk, speedatk, 0, ROT0, "Seta Kikaku Corp.", "Speed Attack!", 0 )
+

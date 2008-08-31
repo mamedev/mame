@@ -126,34 +126,29 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc807, 0xc807) AM_WRITE(pitnrun_ha_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
+
+static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_w)
 	AM_RANGE(0x8c, 0x8c) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0x8d, 0x8d) AM_WRITE(ay8910_write_port_1_w)
 	AM_RANGE(0x8e, 0x8e) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x8f, 0x8f) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x8f, 0x8f) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
 	AM_RANGE(0x90, 0x96) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x97, 0x97) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x98, 0x98) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x8f, 0x8f) AM_READ(ay8910_read_port_0_r)
-ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x3800, 0x3bff) AM_READ(SMH_RAM)
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x3800, 0x3bff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( mcu_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
@@ -163,7 +158,6 @@ static ADDRESS_MAP_START( mcu_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0003, 0x007f) AM_READ(SMH_RAM)
 	AM_RANGE(0x0080, 0x07ff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( mcu_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
@@ -265,7 +259,7 @@ static MACHINE_DRIVER_START( pitnrun )
 
 	MDRV_CPU_ADD("audio", Z80, XTAL_5MHz/2)		 /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("mcu", M68705,XTAL_18_432MHz/6)		 /* verified on pcb */
@@ -374,3 +368,4 @@ ROM_END
 
 GAME( 1984, pitnrun,  0,       pitnrun, pitnrun, 0, ROT90, "Taito Corporation", "Pit & Run (set 1)", GAME_IMPERFECT_SOUND )
 GAME( 1984, pitnruna, pitnrun, pitnrun, pitnrun, 0, ROT90, "Taito Corporation", "Pit & Run (set 2)", GAME_IMPERFECT_SOUND )
+

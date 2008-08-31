@@ -74,18 +74,15 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe03f) AM_WRITE(battlex_palette_w) /* probably palette */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW2")
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(battlex_flipscreen_w)
+
 	/* verify all of these */
 	AM_RANGE(0x22, 0x22) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x23, 0x23) AM_WRITE(ay8910_control_port_0_w)
@@ -210,7 +207,7 @@ static MACHINE_DRIVER_START( battlex )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80,10000000/2 )		 /* 10 MHz, divided ? (Z80A CPU) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8) /* controls game speed? */
 
 	/* video hardware */
@@ -296,3 +293,4 @@ static DRIVER_INIT( battlex )
 /*** GAME DRIVERS ************************************************************/
 
 GAME( 1982, battlex, 0, battlex, battlex, battlex, ROT180, "Omori Electric", "Battle Cross", GAME_IMPERFECT_GRAPHICS )
+

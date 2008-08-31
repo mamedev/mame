@@ -63,7 +63,8 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_RAM) AM_BASE(&carrera_tileram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
@@ -71,16 +72,10 @@ static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN3")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN4")
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("IN5")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP) // ?
-
 	AM_RANGE(0x08, 0x08) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
-
 
 static INPUT_PORTS_START( carrera )
 	PORT_START("IN0")	/* Port 0 */
@@ -292,7 +287,7 @@ static MACHINE_DRIVER_START( carrera )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80,MASTER_CLOCK/6)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* video hardware */
@@ -340,3 +335,4 @@ ROM_END
 
 
 GAME( 19??, carrera, 0, carrera, carrera,0, ROT0, "BS Electronics", "Carrera (Version 6.7)", GAME_WRONG_COLORS )
+

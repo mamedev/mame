@@ -134,22 +134,15 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xBE, 0xBE) AM_READ(TMS9928A_vram_r)
-	AM_RANGE(0xBF, 0xBF) AM_READ(TMS9928A_register_r)
+	AM_RANGE(0x7f, 0x7F) AM_WRITE(sn76496_0_w)
+	AM_RANGE(0xBE, 0xBE) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
+	AM_RANGE(0xBF, 0xBF) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
 	AM_RANGE(0xDC, 0xDC) AM_READ_PORT("P1")
 	AM_RANGE(0xDD, 0xDD) AM_READ_PORT("P2")
 	AM_RANGE(0xDE, 0xDE) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xBE, 0xBE) AM_WRITE(TMS9928A_vram_w)
-	AM_RANGE(0xBF, 0xBF) AM_WRITE(TMS9928A_register_w)
 	AM_RANGE(0xDF, 0xDF) AM_WRITE(SMH_NOP)  //? 8255 ?
-	AM_RANGE(0x7f, 0x7F) AM_WRITE(sn76496_0_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -268,7 +261,7 @@ static const TMS9928a_interface tms9928a_interface =
 static MACHINE_DRIVER_START( sg1000a )
 	MDRV_CPU_ADD("main", Z80, 3579545)       /* 3.579545 Mhz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", sg100a_interrupt)
 
 	/* video hardware */
@@ -337,5 +330,6 @@ static DRIVER_INIT(chwrestl)
 GAME( 1984, chboxing, 0, sg1000a, chboxing, sg1000a,  ROT0, "Sega", "Champion Boxing", 0)
 GAME( 1985, chwrestl, 0, sg1000a, chwrestl, chwrestl, ROT0, "Sega", "Champion Pro Wrestling", 0)
 GAME( 1985, dokidoki, 0, sg1000a, dokidoki, sg1000a,  ROT0, "Sega", "Doki Doki Penguin Land", 0)
+
 
 

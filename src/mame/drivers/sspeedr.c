@@ -108,19 +108,14 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2")
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(sspeedr_sound_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(sspeedr_lamp_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW")
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("IN2")
 	AM_RANGE(0x04, 0x05) AM_WRITE(sspeedr_time_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE(sspeedr_driver_horz_w)
@@ -220,7 +215,7 @@ static MACHINE_DRIVER_START( sspeedr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 19968000 / 8)
 	MDRV_CPU_PROGRAM_MAP(readmem, writemem)
-	MDRV_CPU_IO_MAP(readport, writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	/* video hardware */
@@ -260,3 +255,4 @@ ROM_END
 
 
 GAMEL( 1979, sspeedr, 0, sspeedr, sspeedr, 0, ROT270, "Midway", "Super Speed Race", GAME_NO_SOUND, layout_sspeedr )
+
