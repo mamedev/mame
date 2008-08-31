@@ -315,6 +315,8 @@ Donkey Kong Junior Notes
 #define DEBUG_PROTECTION	(0)
 #define DEBUG_DISC_SOUND	(0)
 
+#define COMBINE_TYPE_PC(_tyn, _pc) ((_tyn)<<16 | (_pc))
+
 /*************************************
  *
  *  Prototypes
@@ -376,7 +378,7 @@ static const dma8257_interface hb_dma =
  *
  *************************************/
 
-static INTERRUPT_GEN( hunchbkd_interrupt )
+static INTERRUPT_GEN( s2650_interrupt )
 {
 	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x03);
 }
@@ -398,12 +400,12 @@ static MACHINE_START( dkong2b )
 
 }
 
-static MACHINE_START( hunchbkd )
+static MACHINE_START( s2650 )
 {
-	UINT8	*p = memory_region(machine, "user1");
-	int i;
-
 	dkong_state *state = machine->driver_data;
+	UINT8	*p = memory_region(machine, "user1");
+	const char *game_name = machine->gamedrv->name;
+	int i;
 
 	MACHINE_START_CALL(dkong2b);
 
@@ -412,10 +414,22 @@ static MACHINE_START( hunchbkd )
 	for (i=0;i<0x200;i++)
 		state->rev_map[p[0x0000+i]] = i;
 
-	state_save_register_global(state->hunchloopback);
-
 	state->hunchloopback = 0;
 
+	state_save_register_global(state->hunchloopback);
+
+	if (strcmp(game_name,"herbiedk") == 0) state->protect_type = DK2650_HERBIEDK;
+	else if (strcmp(game_name,"hunchbkd") == 0) state->protect_type = DK2650_HUNCHBKD;
+	else if (strcmp(game_name,"sbdk") == 0) state->protect_type = DK2650_HUNCHBKD;
+	else if (strcmp(game_name,"herodk") == 0) state->protect_type = DK2650_HUNCHBKD;
+	else if (strcmp(game_name,"herodku") == 0) state->protect_type = DK2650_HUNCHBKD;
+	else if (strcmp(game_name,"8ballact") == 0) state->protect_type = DK2650_EIGHTACT;
+	else if (strcmp(game_name,"8ballat2") == 0) state->protect_type = DK2650_EIGHTACT;
+	else if (strcmp(game_name,"shootgal") == 0) state->protect_type = DK2650_SHOOTGAL;
+	else if (strcmp(game_name,"spclforc") == 0) state->protect_type = DK2650_SPCLFORC;
+	else if (strcmp(game_name,"spcfrcii") == 0) state->protect_type = DK2650_SPCLFORC;
+	else
+		fatalerror("Unknown game <%s> in S2650 start.", game_name);
 }
 
 static MACHINE_START( radarscp )
@@ -590,23 +604,14 @@ static READ8_HANDLER( dkongjr_in2_r )
 	return r;
 }
 
-static READ8_HANDLER( hunchbkd_mirror_r )
+static READ8_HANDLER( s2650_mirror_r )
 {
-	int data = program_read_byte(0x1000+offset);
-#if DEBUG_PROTECTION
-	if (offset >= 0xc04 && offset < 0xc14)
-		logerror("prot read %x, %x (%x)\n", offset, data, activecpu_get_pc());
-#endif
-	return data;
+	return program_read_byte(0x1000+offset);
 }
 
 
-static WRITE8_HANDLER( hunchbkd_mirror_w )
+static WRITE8_HANDLER( s2650_mirror_w )
 {
-#if DEBUG_PROTECTION
-	if (offset >= 0xc04 && offset < 0xc14)
-		logerror("prot write %x\n", data);
-#endif
 	program_write_byte(0x1000+offset,data);
 }
 
@@ -641,85 +646,66 @@ static READ8_HANDLER( epos_decrypt_rom )
 }
 
 
-static WRITE8_HANDLER( hunchbkd_data_w )
+static WRITE8_HANDLER( s2650_data_w )
 {
 	dkong_state *state = machine->driver_data;
+#if DEBUG_PROTECTION
+	logerror("write : pc = %04x, loopback = %02x\n",activecpu_get_pc(), data);
+#endif
 
 	state->hunchloopback = data;
 }
 
-
-static READ8_HANDLER( hunchbkd_port0_r )
+static READ8_HANDLER( s2650_port0_r )
 {
 	dkong_state *state = machine->driver_data;
 #if DEBUG_PROTECTION
-	logerror("port 0 : pc = %4x\n",activecpu_get_pc());
+	logerror("port 0 : pc = %04x, loopback = %02x\n",activecpu_get_pc(), state->hunchloopback);
 #endif
 
-	switch (activecpu_get_pc())
+	switch (COMBINE_TYPE_PC(state->protect_type, activecpu_get_pc()))
 	{
-		case 0x00e9:  return 0xff;
-		case 0x0114:  return 0xfb;
-		case 0x209b:  return state->hunchloopback; /* this at least prevents reset after super bonus */
+		case COMBINE_TYPE_PC(DK2650_HUNCHBKD, 0x00e9):  return 0xff;
+		case COMBINE_TYPE_PC(DK2650_HUNCHBKD, 0x0114):  return 0xfb; //fb
+		case COMBINE_TYPE_PC(DK2650_HUNCHBKD, 0x209b):  return state->hunchloopback; /* this at least prevents reset after super bonus */
+		case COMBINE_TYPE_PC(DK2650_SHOOTGAL, 0x0079):  return 0xff;
+		case COMBINE_TYPE_PC(DK2650_SPCLFORC, 0x00a3):  return 0x01;
+		case COMBINE_TYPE_PC(DK2650_SPCLFORC, 0x007b):  return 0x01;
 	}
-
-    return 0;
+    
+	switch (state->protect_type)
+	{
+		case DK2650_HUNCHBKD:  return 0x00;
+		case DK2650_SHOOTGAL:  return 0x00;
+		case DK2650_SPCLFORC:  return 0x00;
+	}
+	fatalerror("Unhandled read from port 0 : pc = %4x\n",activecpu_get_pc());
 }
 
 
-static READ8_HANDLER( hunchbkd_port1_r )
+static READ8_HANDLER( s2650_port1_r )
 {
 	dkong_state *state = machine->driver_data;
+#if DEBUG_PROTECTION
+	logerror("port 1 : pc = %04x, loopback = %02x\n",activecpu_get_pc(), state->hunchloopback);
+#endif
 
-	return state->hunchloopback;
-}
-
-
-static READ8_HANDLER( herbiedk_port1_r )
-{
-	switch (activecpu_get_pc())
+	switch (COMBINE_TYPE_PC(state->protect_type, activecpu_get_pc()))
 	{
-        case 0x002b:
-		case 0x09dc:  return 0x0;
+		case COMBINE_TYPE_PC(DK2650_EIGHTACT, 0x0021):  return 0x00;
+		case COMBINE_TYPE_PC(DK2650_HERBIEDK, 0x002b):  return 0x00;
+		case COMBINE_TYPE_PC(DK2650_HERBIEDK, 0x09dc):  return 0x00;
 	}
 
-    return 1;
-}
-
-
-static READ8_HANDLER( spclforc_port0_r )
-{
-	switch (activecpu_get_pc())
+	switch (state->protect_type)
 	{
-		case 0x00a3: /* spclforc */
-		case 0x007b: /* spcfrcii */
-			return 1;
+		case DK2650_HUNCHBKD:  return state->hunchloopback;
+		case DK2650_EIGHTACT:  return 1;
+		case DK2650_HERBIEDK:  return 1;
 	}
-
-    return 0;
+	fatalerror("Unhandled read from port 1 : pc = %4x\n",activecpu_get_pc());
 }
 
-static READ8_HANDLER( eightact_port1_r )
-{
-	switch (activecpu_get_pc())
-	{
-		case 0x0021:
-			return 0;
-	}
-
-    return 1;
-}
-
-static READ8_HANDLER( shootgal_port0_r )
-{
-	switch (activecpu_get_pc())
-	{
-		case 0x0079:
-			return 0xff;
-	}
-
-    return 0;
-}
 
 static WRITE8_HANDLER( dkong3_2a03_reset_w )
 {
@@ -861,7 +847,7 @@ ADDRESS_MAP_END
 
 /* S2650 conversions */
 
-static ADDRESS_MAP_START( hunchbkd_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( s2650_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_MEMBER(dkong_state, sprite_ram)
 									AM_SIZE_MEMBER(dkong_state, sprite_ram_size)  /* 0x7000 */
@@ -882,43 +868,20 @@ static ADDRESS_MAP_START( hunchbkd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1f80, 0x1f8f) AM_DEVREADWRITE(DMA8257, "dma8257", dma8257_r, dma8257_w)	/* P8257 control registers */
 	/* 0x6800 not remapped */
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(hunchbkd_mirror_r, hunchbkd_mirror_w)
+	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(s2650_mirror_r, s2650_mirror_w)
 	AM_RANGE(0x4000, 0x4fff) AM_ROM
-	AM_RANGE(0x5000, 0x5fff) AM_READWRITE(hunchbkd_mirror_r, hunchbkd_mirror_w)
+	AM_RANGE(0x5000, 0x5fff) AM_READWRITE(s2650_mirror_r, s2650_mirror_w)
 	AM_RANGE(0x6000, 0x6fff) AM_ROM
-	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(hunchbkd_mirror_r, hunchbkd_mirror_w)
+	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(s2650_mirror_r, s2650_mirror_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hunchbkd_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(hunchbkd_port0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(hunchbkd_port1_r)
+static ADDRESS_MAP_START( s2650_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READ(s2650_port0_r)
+	AM_RANGE(0x01, 0x01) AM_READ(s2650_port1_r)
 	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(hunchbkd_data_w)
+	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(s2650_data_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( herbiedk_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_READ(herbiedk_port1_r)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(hunchbkd_data_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( spclforc_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(spclforc_port0_r)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(hunchbkd_data_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( eightact_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_READ(eightact_port1_r)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT)AM_READ_PORT("SENSE")
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(hunchbkd_data_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( shootgal_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(shootgal_port0_r)
-	AM_RANGE(S2650_SENSE_PORT, S2650_SENSE_PORT) AM_READ_PORT("SENSE")
-	AM_RANGE(S2650_DATA_PORT, S2650_DATA_PORT) AM_WRITE(hunchbkd_data_w)
-ADDRESS_MAP_END
 
 
 /*************************************
@@ -1678,24 +1641,6 @@ static MACHINE_DRIVER_START( dkong2b )
 
 MACHINE_DRIVER_END
 
-
-static MACHINE_DRIVER_START( hunchbkd )
-
-	MDRV_IMPORT_FROM(dkong2b)
-
-	/* basic machine hardware */
-	MDRV_CPU_REPLACE("main", S2650, CLOCK_1H / 2)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(hunchbkd_map, 0)
-	MDRV_CPU_IO_MAP(hunchbkd_io_map, 0)
-	MDRV_CPU_VBLANK_INT("main", hunchbkd_interrupt)
-
-	MDRV_DEVICE_MODIFY("dma8257", DMA8257)
-	MDRV_DEVICE_CONFIG(hb_dma)
-
-	MDRV_MACHINE_START(hunchbkd)
-
-MACHINE_DRIVER_END
-
 static MACHINE_DRIVER_START( dkong3 )
 
 	/* driver data */
@@ -1751,51 +1696,45 @@ static MACHINE_DRIVER_START( pestplce )
 
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( herbiedk )
+static MACHINE_DRIVER_START( dkong3b )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hunchbkd)
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_IO_MAP(herbiedk_io_map, 0)
+	MDRV_IMPORT_FROM(dkongjr)
+	MDRV_PALETTE_INIT(dkong3)
+MACHINE_DRIVER_END
+
+/*************************************
+ *
+ * S2650 Machine drivers
+ *
+ *************************************/
+
+static MACHINE_DRIVER_START( s2650 )
+
+	MDRV_IMPORT_FROM(dkong2b)
+
+	/* basic machine hardware */
+	MDRV_CPU_REPLACE("main", S2650, CLOCK_1H / 2)	/* ??? */
+	MDRV_CPU_PROGRAM_MAP(s2650_map, 0)
+	MDRV_CPU_IO_MAP(s2650_io_map, 0)
+	MDRV_CPU_VBLANK_INT("main", s2650_interrupt)
+
+	MDRV_DEVICE_MODIFY("dma8257", DMA8257)
+	MDRV_DEVICE_CONFIG(hb_dma)
+
+	MDRV_MACHINE_START(s2650)
 
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( spclforc )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hunchbkd)
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_IO_MAP(spclforc_io_map,0)
-
+	MDRV_IMPORT_FROM(s2650)
 	MDRV_CPU_REMOVE("sound")
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(spclforc)
 
-	/* analog sound */
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( eightact )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hunchbkd)
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_IO_MAP(eightact_io_map, 0)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( shootgal )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hunchbkd)
-	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_IO_MAP(shootgal_io_map, 0)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( dkong3b )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(dkongjr)
-	MDRV_PALETTE_INIT(dkong3)
 MACHINE_DRIVER_END
 
 /*************************************
@@ -3001,25 +2940,21 @@ GAME( 1983, dkong3,   0,        dkong3,   dkong3,         0,  ROT90, "Nintendo o
 GAME( 1983, dkong3j,  dkong3,   dkong3,   dkong3,         0,  ROT90, "Nintendo", "Donkey Kong 3 (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1984, dkong3b,  dkong3,	dkong3b,  dkong3b,        0,  ROT90, "bootleg", "Donkey Kong 3 (bootleg on Donkey Kong Jr. hardware)", GAME_SUPPORTS_SAVE )
 
-GAME( 1984, herbiedk, huncholy, herbiedk, herbiedk,       0,  ROT90, "CVS", "Herbie at the Olympics (DK conversion)", GAME_SUPPORTS_SAVE )
-
-GAME( 1983, hunchbkd, hunchbak, hunchbkd, hunchbkd,       0,  ROT90, "Century Electronics", "Hunchback (DK conversion)", GAME_SUPPORTS_SAVE )
-
-GAME( 1984, sbdk,	  superbik,	hunchbkd, sbdk,		      0,  ROT90, "Century Electronics", "Super Bike (DK conversion)", GAME_SUPPORTS_SAVE )
-
-GAME( 1984, herodk,   hero,     hunchbkd, herodk,   herodk,   ROT90, "Seatongrove Ltd (Crown license)", "Hero in the Castle of Doom (DK conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1984, herodku,  hero,     hunchbkd, herodk,         0,  ROT90, "Seatongrove Ltd (Crown license)", "Hero in the Castle of Doom (DK conversion not encrypted)", GAME_SUPPORTS_SAVE )
-
-GAME( 1984, 8ballact, 0,    	eightact, 8ballact,       0,  ROT90, "Seatongrove Ltd (Magic Eletronics USA licence)", "Eight Ball Action (DK conversion)", GAME_SUPPORTS_SAVE )
-GAME( 1984, 8ballat2, 8ballact,	eightact, 8ballact,       0,  ROT90, "Seatongrove Ltd (Magic Eletronics USA licence)", "Eight Ball Action (DKJr conversion)", GAME_SUPPORTS_SAVE )
-
-GAME( 1984, shootgal, 0,		shootgal, shootgal,       0,  ROT180, "Seatongrove Ltd (Zaccaria licence)", "Shooting Gallery", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-
 GAME( 1983, pestplce, mario,	pestplce, pestplce,       0,  ROT180, "bootleg", "Pest Place", GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
+/* 2650 based */
+GAME( 1984, herbiedk, huncholy, s2650,    herbiedk,       0,  ROT90, "CVS", "Herbie at the Olympics (DK conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1983, hunchbkd, hunchbak, s2650,    hunchbkd,       0,  ROT90, "Century Electronics", "Hunchback (DK conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1984, sbdk,	  superbik,	s2650,    sbdk,		      0,  ROT90, "Century Electronics", "Super Bike (DK conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1984, herodk,   hero,     s2650,    herodk,    herodk,  ROT90, "Seatongrove Ltd (Crown license)", "Hero in the Castle of Doom (DK conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1984, herodku,  hero,     s2650,    herodk,         0,  ROT90, "Seatongrove Ltd (Crown license)", "Hero in the Castle of Doom (DK conversion not encrypted)", GAME_SUPPORTS_SAVE )
+GAME( 1984, 8ballact, 0,    	s2650,    8ballact,       0,  ROT90, "Seatongrove Ltd (Magic Eletronics USA licence)", "Eight Ball Action (DK conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1984, 8ballat2, 8ballact,	s2650,    8ballact,       0,  ROT90, "Seatongrove Ltd (Magic Eletronics USA licence)", "Eight Ball Action (DKJr conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1984, shootgal, 0,		s2650,    shootgal,       0,  ROT180, "Seatongrove Ltd (Zaccaria licence)", "Shooting Gallery", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1985, spclforc, 0,		spclforc, spclforc,       0,  ROT90, "Senko Industries (Magic Eletronics Inc. licence)", "Special Forces", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1985, spcfrcii, 0,		spclforc, spclforc,       0,  ROT90, "Senko Industries (Magic Eletronics Inc. licence)", "Special Forces II", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
+/* EPOS */
 GAME( 1984, drakton,  0,        drakton,  drakton,  drakton,  ROT90, "Epos Corporation", "Drakton (DK conversion)", GAME_SUPPORTS_SAVE )
 GAME( 1984, drktnjr,  drakton,  drktnjr,  drakton,  drakton,  ROT90, "Epos Corporation", "Drakton (DKJr conversion)", GAME_SUPPORTS_SAVE )
 GAME( 1985, strtheat, 0,        strtheat, strtheat, strtheat, ROT90, "Epos Corporation", "Street Heat - Cardinal Amusements", GAME_SUPPORTS_SAVE )
