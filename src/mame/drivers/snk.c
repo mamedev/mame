@@ -69,7 +69,7 @@ Notes:
 
 - the original sgladiat pcb is verified to have huge sprite lag.
 
-- RAM test fails in sgladiat when "Debug" Dip Switch is ON. Correct behaviour ?
+- RAM test fails in sgladiat when "Debug" Dip Switch is ON. Correct behaviour?
 
 - there are no "Bonus Lives" settings in alphamis and arian (always 50k 100k)
   and only an "Occurence" Dip Switch.
@@ -174,6 +174,8 @@ TODO:
 
 - sgladiat: unknown writes to D200/DA00, probably video related. Also some bits
   of A600 are unknown.
+
+- one unknown dip switch in sgladiat.
 
 - ASO: unknown writes to CE00, probably video related. Always 05?
   Also unknown writes to F002 by the sound CPU, during reset.
@@ -673,6 +675,18 @@ CUSTOM_INPUT( gwar_rotary )
 	last_value[which] = value;
 
 	return value;
+}
+
+CUSTOM_INPUT( gwarb_rotary )
+{
+	if (input_port_read(field->port->machine, "JOYSTICK_MODE") == 1)
+	{
+		return gwar_rotary(field, param);
+	}
+	else
+	{
+		return 0x0f;
+	}
 }
 
 /************************************************************************/
@@ -1254,10 +1268,11 @@ static INPUT_PORTS_START( jcross )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:1,2")
-	PORT_DIPSETTING(    0x03, "Upright, Single Controls" )
-//  PORT_DIPSETTING(    0x01, "Upright, Single Controls" )  /* duplicated setting + unknown additional stuff (code at 0x03ff) */
-	PORT_DIPSETTING(    0x00, "Upright, Dual Controls" )
+	PORT_DIPNAME( 0x01, 0x01, "Upright Controls" )          PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:2")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Lives ) )            PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, "3" )
@@ -1315,7 +1330,7 @@ static INPUT_PORTS_START( sgladiat )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )            /* code at 0x054e */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE )	/* code at 0x054e */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
@@ -1373,7 +1388,7 @@ static INPUT_PORTS_START( sgladiat )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )          PORT_DIPLOCATION("DSW2:7")    /* code at 0x4169 */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "No Opponents (Cheat)" ) PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPNAME( 0x80, 0x80, "No Opponents (Cheat)" )      PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
@@ -2163,7 +2178,7 @@ static INPUT_PORTS_START( worldwar )
 	PORT_INCLUDE( bermudat )
 
 	PORT_MODIFY("IN0")
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("DSW1:1")
@@ -2202,7 +2217,7 @@ static INPUT_PORTS_START( gwar )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )	/* tilt? causes reset */
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
@@ -2289,12 +2304,16 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( gwarb )
 	PORT_INCLUDE( gwar )
 
-	// no rotary joystick in this version. Player fires in the direction he's facing.
-	// the code is patched to handle that, however the rotary joystick input must
-	// be F for the patched code to kick in.
+	// This version is modified to work either with or without a rotary joystick
+	// connected. If rotary is not connected, player fires in the direction he's facing.
 
 	PORT_MODIFY("IN1")
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_SPECIAL )	// must be F to turn off rotary joystick handling
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gwarb_rotary, (void*)0)
+
+	PORT_START("JOYSTICK_MODE")
+	PORT_CONFNAME( 0x01, 0x00, "Joystick mode" )
+	PORT_CONFSETTING( 0x00, "Normal Joystick" )
+	PORT_CONFSETTING( 0x01, "Rotary Joystick" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( psychos )
@@ -2384,7 +2403,7 @@ static INPUT_PORTS_START( chopper )
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )  /* Reset */
-	PORT_SERVICE_NO_TOGGLE( 0x08, IP_ACTIVE_LOW )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
@@ -2495,7 +2514,7 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( tdfever )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -5243,7 +5262,7 @@ GAME( 1987, psychosj, psychos,  bermudat, psychos,  0,        ROT0,   "SNK", "Ps
 GAME( 1987, gwar,     0,        gwar,     gwar,     0,        ROT270, "SNK", "Guerrilla War (US)", 0 )
 GAME( 1987, gwarj,    gwar,     gwar,     gwar,     0,        ROT270, "SNK", "Guevara (Japan)", 0 )
 GAME( 1987, gwara,    gwar,     gwara,    gwar,     0,        ROT270, "SNK", "Guerrilla War (Version 1)", 0 )
-GAME( 1987, gwarb,    gwar,     gwar,     gwarb,    0,        ROT270, "bootleg", "Guerrilla War (bootleg)", 0 )
+GAME( 1987, gwarb,    gwar,     gwar,     gwarb,    0,        ROT270, "bootleg", "Guerrilla War (Joystick hack bootleg)", 0 )
 GAME( 1988, chopper,  0,        chopper1, chopper,  0,        ROT270, "SNK", "Chopper I (US set 1)", 0 )
 GAME( 1988, choppera, chopper,  choppera, choppera, 0,        ROT270, "SNK", "Chopper I (US set 2)", 0 )
 GAME( 1988, chopperb, chopper,  chopper1, chopper,  0,        ROT270, "SNK", "Chopper I (US set 3)", 0 )
