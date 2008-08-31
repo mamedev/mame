@@ -576,7 +576,20 @@ static void m37710_internal_w(int offset, UINT8 data)
 
 static READ16_HANDLER( m37710_internal_word_r )
 {
-	return (m37710_internal_r(offset*2) | m37710_internal_r((offset*2)+1)<<8);
+	if (mem_mask == 0xffff)
+	{
+		return (m37710_internal_r(offset*2) | m37710_internal_r((offset*2)+1)<<8);
+	}
+	else if (mem_mask == 0xff00)
+	{
+		return m37710_internal_r((offset*2)+1)<<8;
+	}
+	else if (mem_mask == 0x00ff)
+	{
+		return m37710_internal_r((offset*2));
+	}
+
+	return 0;
 }
 
 static WRITE16_HANDLER( m37710_internal_word_w )
