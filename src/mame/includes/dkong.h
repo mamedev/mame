@@ -41,11 +41,28 @@
 
 #define I8035_CLOCK				(XTAL_6MHz)
 
+/****************************************************************************
+ * CONSTANTS
+ ****************************************************************************/
+
 #define HARDWARE_TYPE_TAG		"HARDWARE_TYPE"
-#define HARDWARE_TKG04			0
-#define HARDWARE_TRS01			1
-#define HARDWARE_TRS02			2
-#define HARDWARE_TKG02			3
+
+enum
+{
+	HARDWARE_TKG04 = 0,
+	HARDWARE_TRS01,
+	HARDWARE_TRS02,
+	HARDWARE_TKG02
+};
+
+enum
+{
+	DK2650_HERBIEDK = 0,
+	DK2650_HUNCHBKD,
+	DK2650_EIGHTACT,
+	DK2650_SHOOTGAL,
+	DK2650_SPCLFORC
+};
 
 #define DK2B_PALETTE_LENGTH		(256+256+8+1) /*  (256) */
 #define DK4B_PALETTE_LENGTH		(256+256+8+1) /*  (256) */
@@ -84,6 +101,9 @@ struct _dkong_state
 
 	/* Specific states */
 	INT8 decrypt_counter;
+	
+	/* 2650 protection */
+	UINT8 protect_type;
 	UINT8 hunchloopback;
 
 	/* Save state relevant */
