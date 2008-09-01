@@ -2,7 +2,8 @@
 
 static tilemap *shadfrce_fgtilemap, *shadfrce_bg0tilemap,  *shadfrce_bg1tilemap;
 extern UINT16 *shadfrce_fgvideoram, *shadfrce_bg0videoram,  *shadfrce_bg1videoram,   *shadfrce_spvideoram;
-/* extern UINT16 *shadfrce_videoregs; */
+
+extern int shadfrce_video_enable;
 
 static UINT16 *shadfrce_spvideoram_old; /* I *think* the sprites need to be delayed anyway */
 
@@ -66,11 +67,11 @@ WRITE16_HANDLER( shadfrce_bg1videoram_w )
 
 VIDEO_START( shadfrce )
 {
-	shadfrce_fgtilemap = tilemap_create(get_shadfrce_fgtile_info,tilemap_scan_rows, 8, 8,64,32);
-		tilemap_set_transparent_pen(shadfrce_fgtilemap,0);
+	shadfrce_fgtilemap = tilemap_create(get_shadfrce_fgtile_info,tilemap_scan_rows,    8,  8,64,32);
+	tilemap_set_transparent_pen(shadfrce_fgtilemap,0);
 
 	shadfrce_bg0tilemap = tilemap_create(get_shadfrce_bg0tile_info,tilemap_scan_rows, 16, 16,32,32);
-		tilemap_set_transparent_pen(shadfrce_bg0tilemap,0);
+	tilemap_set_transparent_pen(shadfrce_bg0tilemap,0);
 
 	shadfrce_bg1tilemap = tilemap_create(get_shadfrce_bg1tile_info,tilemap_scan_rows, 16, 16,32,32);
 
@@ -152,23 +153,17 @@ VIDEO_UPDATE( shadfrce )
 {
 	fillbitmap(priority_bitmap,0,cliprect);
 
-	tilemap_draw(bitmap,cliprect,shadfrce_bg1tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,shadfrce_bg0tilemap,0,1);
-
-	draw_sprites(screen->machine, bitmap,cliprect);
-
-	tilemap_draw(bitmap,cliprect,shadfrce_fgtilemap, 0,0);
-
-/*
-    popmessage ("Regs %04x %04x %04x %04x %04x %04x %04x",
-    shadfrce_videoregs[0],
-    shadfrce_videoregs[1],
-    shadfrce_videoregs[2],
-    shadfrce_videoregs[3],
-    shadfrce_videoregs[4],
-    shadfrce_videoregs[5],
-    shadfrce_videoregs[6]);
-*/
+	if(shadfrce_video_enable)
+	{
+		tilemap_draw(bitmap,cliprect,shadfrce_bg1tilemap,0,0);
+		tilemap_draw(bitmap,cliprect,shadfrce_bg0tilemap,0,1);
+		draw_sprites(screen->machine, bitmap,cliprect);
+		tilemap_draw(bitmap,cliprect,shadfrce_fgtilemap, 0,0);
+	}
+	else
+	{
+		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	}
 
 	return 0;
 }

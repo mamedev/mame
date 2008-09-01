@@ -10,13 +10,15 @@ Stephh's notes :
     such as 'mugsmash'), the Inputs and the Dip Switches are mangled, so you need
     a specific read handler so end-uers can see them in a "standard" order.
     IMO you should set the USE_SHADFRCE_FAKE_INPUT_PORTS macro to 1.
-  - Why do "Coin 2" and "Service 1" buttons only work in "test mode" ?
 
- To Do:
+ 01-Sept-2008 - Pierpaolo Prazzoli
+ - Added irqs ack
+ - Implemented raster irq
+ - Fixed coin2 and service input not working during the game
+ - Added watchdog
+ - Fixed visible area
+ - Added video enable and irqs enable flags
 
- Graphic Glitches
-  Spurious sprite at the top right of the title screen. Visible area too large?
- Other Interrupt?
 
 *******************************************************************************
 
@@ -67,9 +69,9 @@ Samples:
 
 /*
 68k interrupts
-lev 1 : 0x64 : 0004 fd00 - ?
-lev 2 : 0x68 : 0000 1f32 - vblank?
-lev 3 : 0x6c : 0000 10f4 - ?
+lev 1 : 0x64 : 0004 fd00 - raster irq
+lev 2 : 0x68 : 0000 1f32 - inputs irq (reads inputs, ...)
+lev 3 : 0x6c : 0000 10f4 - vblank irq
 lev 4 : 0x70 : 0000 11d0 - just rte
 lev 5 : 0x74 : 0000 11d0 - just rte
 lev 6 : 0x78 : 0000 11d0 - just rte
@@ -82,7 +84,6 @@ lev 7 : 0x7c : 0000 11d0 - just rte
 #include "sound/okim6295.h"
 
 UINT16 *shadfrce_fgvideoram, *shadfrce_bg0videoram,  *shadfrce_bg1videoram,   *shadfrce_spvideoram;
-/* UINT16 *shadfrce_videoregs; */
 
 /* in video */
 WRITE16_HANDLER ( shadfrce_bg0scrollx_w );
@@ -95,6 +96,12 @@ VIDEO_UPDATE( shadfrce );
 WRITE16_HANDLER( shadfrce_fgvideoram_w );
 WRITE16_HANDLER( shadfrce_bg0videoram_w );
 WRITE16_HANDLER( shadfrce_bg1videoram_w );
+
+int shadfrce_video_enable = 0;
+static int shadfrce_irqs_enable = 0;
+static int shadfrce_scanline = 0;
+static emu_timer *raster_irq_timer;
+static int vblank = 0;
 
 
 static WRITE16_HANDLER( shadfrce_flip_screen )
@@ -184,6 +191,7 @@ static WRITE16_HANDLER( shadfrce_flip_screen )
 #define USE_SHADFRCE_FAKE_INPUT_PORTS	1
 
 #if USE_SHADFRCE_FAKE_INPUT_PORTS
+
 static READ16_HANDLER( shadfrce_input_ports_r )
 {
 	UINT16 data = 0xffff;
@@ -200,12 +208,20 @@ static READ16_HANDLER( shadfrce_input_ports_r )
 			data = (input_port_read(machine, "EXTRA") & 0xff) | ((input_port_read(machine, "DSW1") & 0x3f) << 8);
 			break;
 		case 3 :
-			data = (input_port_read(machine, "OTHER") & 0xff) | ((input_port_read(machine, "DSW1") & 0xc0) << 2) | ((input_port_read(machine, "MISC") & 0x3c) << 8);
+			data = (input_port_read(machine, "OTHER") & 0xff) | ((input_port_read(machine, "DSW1") & 0xc0) << 2) | ((input_port_read(machine, "MISC") & 0x38) << 8) | (vblank << 8);
 			break;
 	}
 
 	return (data);
 }
+
+#else
+
+static READ16_HANDLER( shadfrce_input_ports_3_r )
+{
+	return (input_port_read(machine, "IN3") & ~0x0400) | (vblank << 8);
+}
+
 #endif
 
 static WRITE16_HANDLER ( shadfrce_sound_brt_w )
@@ -225,59 +241,98 @@ static WRITE16_HANDLER ( shadfrce_sound_brt_w )
 	}
 }
 
-/* Memory Maps - ToDo, Work Out Unknowns */
+static TIMER_CALLBACK( raster_interrupt )
+{
+	shadfrce_scanline++;
+	
+	if( shadfrce_scanline == 256 )
+		shadfrce_scanline = 0;
 
-static ADDRESS_MAP_START( shadfrce_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x100fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x101000, 0x101fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x102000, 0x1027ff) AM_READ(SMH_RAM)
-	AM_RANGE(0x102800, 0x103fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x140000, 0x141fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x142000, 0x143fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x180000, 0x187fff) AM_READ(SMH_RAM)
-	/* inputs, dipswitches etc. */
-	AM_RANGE(0x1c000a, 0x1c000b) AM_READ(SMH_NOP) /* ?? */
-	AM_RANGE(0x1d000c, 0x1d000d) AM_READ(SMH_NOP) /* ?? */
+	cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
+
+	timer_adjust_oneshot(raster_irq_timer, video_screen_get_time_until_pos(machine->primary_screen, shadfrce_scanline, 0), 0);
+}
+
+static WRITE16_HANDLER( shadfrce_irq_ack_w )
+{
+	cpunum_set_input_line(machine, 0, offset ^ 3, CLEAR_LINE);
+
+	// force a screen partial update on the raster irq ack
+	if( (offset ^ 3) == 1 )
+		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+}
+
+static WRITE16_HANDLER( shadfrce_irq_w )
+{
+	static int prev_value = 0;
+
+	shadfrce_irqs_enable = data & 1; // maybe, it's set/unset inside every trap instruction which is executed
+	shadfrce_video_enable = data & 8; // probably
+
+	// check if there's a high transition to enable the raster timer
+	if((~prev_value & 4) && (data & 4))
+	{
+		if( !timer_enabled(raster_irq_timer) )
+		{
+			timer_enable(raster_irq_timer, 1);
+			timer_adjust_oneshot(raster_irq_timer, video_screen_get_time_until_pos(machine->primary_screen, shadfrce_scanline, 0), 0);
+		}
+	}
+
+	// check if there's a low transition to disable the raster timer
+	if((prev_value & 4) && (~data & 4))
+	{
+		if( timer_enabled(raster_irq_timer) )
+		{
+			timer_enable(raster_irq_timer, 0);
+		}
+	}
+
+	prev_value = data;
+}
+
+static WRITE16_HANDLER( shadfrce_scanline_w )
+{
+	shadfrce_scanline = data; // guess, 0 is always written
+}
+
+
+
+/* Memory Maps */
+
+static ADDRESS_MAP_START( shadfrce_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(shadfrce_bg0videoram_w) AM_BASE(&shadfrce_bg0videoram) /* video */
+	AM_RANGE(0x101000, 0x101fff) AM_RAM
+	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(shadfrce_bg1videoram_w) AM_BASE(&shadfrce_bg1videoram) /* bg 2 */
+	AM_RANGE(0x102800, 0x103fff) AM_RAM
+	AM_RANGE(0x140000, 0x141fff) AM_RAM_WRITE(shadfrce_fgvideoram_w) AM_BASE(&shadfrce_fgvideoram)
+	AM_RANGE(0x142000, 0x143fff) AM_RAM AM_BASE(&shadfrce_spvideoram) AM_SIZE(&spriteram_size) /* sprites */
+	AM_RANGE(0x180000, 0x187fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(shadfrce_bg0scrollx_w) /* SCROLL X */
+	AM_RANGE(0x1c0002, 0x1c0003) AM_WRITE(shadfrce_bg0scrolly_w) /* SCROLL Y */
+	AM_RANGE(0x1c0004, 0x1c0005) AM_WRITE(shadfrce_bg1scrollx_w) /* SCROLL X */
+	AM_RANGE(0x1c0006, 0x1c0007) AM_WRITE(shadfrce_bg1scrolly_w) /* SCROLL Y */
+	AM_RANGE(0x1c0008, 0x1c0009) AM_WRITENOP /* ?? */
+	AM_RANGE(0x1c000a, 0x1c000b) AM_READNOP AM_WRITE(shadfrce_flip_screen)
+	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITENOP /* ?? */
+	AM_RANGE(0x1d0000, 0x1d0005) AM_WRITE(shadfrce_irq_ack_w)
+	AM_RANGE(0x1d0006, 0x1d0007) AM_WRITE(shadfrce_irq_w)
+	AM_RANGE(0x1d0008, 0x1d0009) AM_WRITE(shadfrce_scanline_w)
+	AM_RANGE(0x1d000c, 0x1d000d) AM_READNOP AM_WRITE(shadfrce_sound_brt_w)	/* sound command + screen brightness */
+	AM_RANGE(0x1d0010, 0x1d0011) AM_WRITENOP /* ?? */
+	AM_RANGE(0x1d0012, 0x1d0013) AM_WRITENOP /* ?? */
+	AM_RANGE(0x1d0014, 0x1d0015) AM_WRITENOP /* ?? */
+	AM_RANGE(0x1d0016, 0x1d0017) AM_WRITE(watchdog_reset16_w)
 #if USE_SHADFRCE_FAKE_INPUT_PORTS
 	AM_RANGE(0x1d0020, 0x1d0027) AM_READ(shadfrce_input_ports_r)
 #else
 	AM_RANGE(0x1d0020, 0x1d0021) AM_READ_PORT("IN0")
 	AM_RANGE(0x1d0022, 0x1d0023) AM_READ_PORT("IN1")
 	AM_RANGE(0x1d0024, 0x1d0025) AM_READ_PORT("IN2")
-	AM_RANGE(0x1d0026, 0x1d0027) AM_READ_PORT("IN3")
+	AM_RANGE(0x1d0026, 0x1d0027) AM_READ(shadfrce_input_ports_3_r)
 #endif
-	AM_RANGE(0x1F0000, 0x1FFFFF) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( shadfrce_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x100fff) AM_WRITE(shadfrce_bg0videoram_w) AM_BASE(&shadfrce_bg0videoram) /* video */
-	AM_RANGE(0x101000, 0x101fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x102000, 0x1027ff) AM_WRITE(shadfrce_bg1videoram_w) AM_BASE(&shadfrce_bg1videoram) /* bg 2 */
-	AM_RANGE(0x102800, 0x103fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x140000, 0x141fff) AM_WRITE(shadfrce_fgvideoram_w) AM_BASE(&shadfrce_fgvideoram)
-	AM_RANGE(0x142000, 0x143fff) AM_WRITE(SMH_RAM) AM_BASE(&shadfrce_spvideoram) AM_SIZE(&spriteram_size) /* sprites */
-	AM_RANGE(0x180000, 0x187fff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16) /* ?? */
-	/* probably video registers etc. */
-//  AM_RANGE(0x1c0000, 0x1d000d) AM_WRITE(SMH_RAM) AM_BASE(&shadfrce_videoregs)
-	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITE(shadfrce_bg0scrollx_w) /* SCROLL X */
-	AM_RANGE(0x1c0002, 0x1c0003) AM_WRITE(shadfrce_bg0scrolly_w) /* SCROLL Y */
-	AM_RANGE(0x1c0004, 0x1c0005) AM_WRITE(shadfrce_bg1scrollx_w) /* SCROLL X */
-	AM_RANGE(0x1c0006, 0x1c0007) AM_WRITE(shadfrce_bg1scrolly_w) /* SCROLL Y */
-	AM_RANGE(0x1c0008, 0x1c0009) AM_WRITE(SMH_NOP) /* ?? */
-	AM_RANGE(0x1c000a, 0x1c000b) AM_WRITE(shadfrce_flip_screen)
-	AM_RANGE(0x1c000c, 0x1c000d) AM_WRITE(SMH_NOP) /* ?? */
-	AM_RANGE(0x1d0000, 0x1d0001) AM_WRITE(SMH_NOP) /* ?? */
-	AM_RANGE(0x1d0002, 0x1d0003) AM_WRITE(SMH_NOP) /* ?? */
-	AM_RANGE(0x1d0006, 0x1d0007) AM_WRITE(SMH_NOP) /* ?? */
-	AM_RANGE(0x1d0008, 0x1d0009) AM_WRITE(SMH_NOP) /* ?? */
-	AM_RANGE(0x1d000c, 0x1d000d) AM_WRITE(shadfrce_sound_brt_w)	/* sound command + screen brightness */
-	AM_RANGE(0x1d0010, 0x1d0011) AM_WRITE(SMH_NOP) /* ?? */
-	AM_RANGE(0x1d0012, 0x1d0013) AM_WRITE(SMH_NOP) /* ?? */
-	AM_RANGE(0x1d0014, 0x1d0015) AM_WRITE(SMH_NOP) /* ?? */
-	AM_RANGE(0x1d0016, 0x1d0017) AM_WRITE(SMH_NOP) /* ?? */
-	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
 
 /* and the sound cpu */
@@ -287,23 +342,15 @@ static WRITE8_HANDLER( oki_bankswitch_w )
 	okim6295_set_bank_base(0, (data & 1) * 0x40000);
 }
 
-static ADDRESS_MAP_START( readmem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xc801, 0xc801) AM_READ(ym2151_status_port_0_r)
-	AM_RANGE(0xd800, 0xd800) AM_READ(okim6295_status_0_r)
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xf000, 0xffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( shadfrce_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xc800) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0xc801, 0xc801) AM_WRITE(ym2151_data_port_0_w)
-	AM_RANGE(0xd800, 0xd800) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0xc801, 0xc801) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
+	AM_RANGE(0xd800, 0xd800) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(oki_bankswitch_w)
-	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -349,7 +396,7 @@ static INPUT_PORTS_START( shadfrce )
 	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("MISC")	/* Fake IN5 (misc) */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_VBLANK )                  /* guess */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SPECIAL )				 /* guess */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )                 /* must be ACTIVE_LOW or 'shadfrcj' jumps to the end (code at 0x04902e) */
 	PORT_BIT( 0xeb, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -480,6 +527,7 @@ static INPUT_PORTS_START( shadfrce )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( On ) )
 	PORT_SERVICE( 0x0200, IP_ACTIVE_LOW )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SPECIAL )				 /* guess */
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_VBLANK )                /* guess */
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )               /* must be ACTIVE_LOW or 'shadfrcj' jumps to the end (code at 0x04902e) */
@@ -542,32 +590,63 @@ static const ym2151_interface ym2151_config =
 	irq_handler
 };
 
-static INTERRUPT_GEN( shadfrce_interrupt ) {
-	if( cpu_getiloops() == 0 )
-		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
-	else
-		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+/*
+	Interrupts generation is guessed, but it requires the same hack as in wwfsstar.c
+*/
+static INTERRUPT_GEN( shadfrce_interrupt )
+{
+	int scanline = 271 - cpu_getiloops();
+
+	/* Vblank is lowered on scanline 0 (8) */
+	if (scanline == 0)
+	{
+		vblank = 0;
+	}
+	/* Hack */
+	else if (scanline==(256-1))
+	{
+		vblank = 4;
+	}
+	/* Vblank is raised on scanline 256 (264) */
+	else if (scanline==256)
+	{
+		if(shadfrce_irqs_enable)
+			cpunum_set_input_line(machine, 0, 3, ASSERT_LINE);
+	}
+
+	/* An interrupt is generated every 16 scanlines */
+	if (scanline%16 == 0)
+	{
+		if(shadfrce_irqs_enable)
+			cpunum_set_input_line(machine, 0, 2, ASSERT_LINE);
+	}
 }
 
+static MACHINE_RESET( shadfrce )
+{
+	raster_irq_timer = timer_alloc(raster_interrupt, NULL);
+	timer_enable(raster_irq_timer, 0);
+	shadfrce_scanline = 0;
+}
 
 static MACHINE_DRIVER_START( shadfrce )
 	MDRV_CPU_ADD("main", M68000, 28000000/2) /* ? Guess - CPU is rated for 16MHz */
-	MDRV_CPU_PROGRAM_MAP(shadfrce_readmem,shadfrce_writemem)
-	MDRV_CPU_VBLANK_INT_HACK(shadfrce_interrupt,2)
+	MDRV_CPU_PROGRAM_MAP(shadfrce_map,0)
+	MDRV_CPU_VBLANK_INT_HACK(shadfrce_interrupt,272)
 
 	MDRV_CPU_ADD("audio", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
+	MDRV_CPU_PROGRAM_MAP(shadfrce_sound_map,0)
 
-	MDRV_GFXDECODE(shadfrce)
-
+	MDRV_MACHINE_RESET(shadfrce)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 32*8-1)
+	MDRV_SCREEN_SIZE(64*8, 34*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 32*8-1)
 
+	MDRV_GFXDECODE(shadfrce)
 	MDRV_PALETTE_LENGTH(0x4000)
 
 	MDRV_VIDEO_START(shadfrce)
