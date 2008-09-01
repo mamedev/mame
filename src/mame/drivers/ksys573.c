@@ -266,8 +266,6 @@ static NVRAM_HANDLER( konami573 )
 {
 	int i;
 
-	NVRAM_HANDLER_CALL(timekeeper_0);
-
 	if( nvram_handler_security_cart_0 != NULL )
 	{
 		NVRAM_HANDLER_CALL(security_cart_0);
@@ -1299,7 +1297,7 @@ static ADDRESS_MAP_START( konami573_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f500000, 0x1f500003) AM_READWRITE( control_r, control_w )	// Konami can't make a game without a "control" register.
 	AM_RANGE(0x1f560000, 0x1f560003) AM_WRITE( atapi_reset_w )
 	AM_RANGE(0x1f5c0000, 0x1f5c0003) AM_WRITENOP 				// watchdog?
-	AM_RANGE(0x1f620000, 0x1f623fff) AM_READWRITE8(timekeeper_0_r, timekeeper_0_w, 0x00ff00ff)
+	AM_RANGE(0x1f620000, 0x1f623fff) AM_DEVREADWRITE8(M48T58, "m48t58", timekeeper_r, timekeeper_w, 0x00ff00ff)
 	AM_RANGE(0x1f680000, 0x1f68001f) AM_READWRITE(mb89371_r, mb89371_w)
 	AM_RANGE(0x1f6a0000, 0x1f6a0003) AM_READWRITE( security_r, security_w )
 	AM_RANGE(0x1f800000, 0x1f8003ff) AM_RAM /* scratchpad */
@@ -1502,8 +1500,6 @@ static DRIVER_INIT( konami573 )
 	{
 		m_p_timer_root[i] = timer_alloc(root_finished, NULL);
 	}
-
-	timekeeper_init( machine, 0, TIMEKEEPER_M48T58, memory_region( machine, "user11" ) );
 
 	state_save_register_global( m_n_security_control );
 
@@ -2722,6 +2718,11 @@ static DRIVER_INIT( salarymc )
 	state_save_register_global( salarymc_lamp_clk );
 }
 
+static const timekeeper_config timekeeper_intf =
+{
+	"m48t58"
+};
+
 static MACHINE_DRIVER_START( konami573 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main",  PSXCPU, XTAL_67_7376MHz )
@@ -2756,6 +2757,9 @@ static MACHINE_DRIVER_START( konami573 )
 	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
 	MDRV_SOUND_ROUTE( 0, "left", 1.0 )
 	MDRV_SOUND_ROUTE( 1, "right", 1.0 )
+
+	MDRV_DEVICE_ADD( "m48t58", M48T58 )
+	MDRV_DEVICE_CONFIG( timekeeper_intf )
 MACHINE_DRIVER_END
 
 static INPUT_PORTS_START( konami573 )
@@ -3500,7 +3504,7 @@ ROM_START( ddr4mp )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gca34ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	ROM_REGION( 0x002000, "user11", 0 ) /* timekeeper */
+	ROM_REGION( 0x002000, "m48t58", 0 ) /* timekeeper */
 	ROM_LOAD( "gca34ja.22h",  0x000000, 0x002000, CRC(80575c1f) SHA1(a0594ca0f75bc7d49b645e835e9fa48a73c3c9c7) )
 
 	DISK_REGION( "cdrom0" )
@@ -3529,7 +3533,7 @@ ROM_START( ddr4mps )
 	ROM_REGION( 0x000008, "user10", 0 ) /* game security cart id */
 	ROM_LOAD( "gca34jb.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
-	ROM_REGION( 0x002000, "user11", 0 ) /* timekeeper */
+	ROM_REGION( 0x002000, "m48t58", 0 ) /* timekeeper */
 	ROM_LOAD( "gca34jb.22h",  0x000000, 0x002000, CRC(bc6c8bd7) SHA1(10ceec5c7bc5ca9fca88f3c083a7d97012982079) )
 
 	DISK_REGION( "cdrom0" )
@@ -3708,7 +3712,7 @@ ROM_START( drmn )
 	ROM_LOAD( "gq881ja.31h",  0xc00000, 0x200000, CRC(a5b86ece) SHA1(9696f0c512501574bae6e436306675894bb2352e) )
 	ROM_LOAD( "gq881ja.27h",  0xe00000, 0x200000, CRC(fc0b94c1) SHA1(967d374288db757d161d0e9e8e396a1176071c5f) )
 
-	ROM_REGION( 0x002000, "user11", 0 ) /* timekeeper */
+	ROM_REGION( 0x002000, "m48t58", 0 ) /* timekeeper */
 	ROM_LOAD( "gq881ja.22h",  0x000000, 0x002000, CRC(e834d5ec) SHA1(1c845811e43d7dfec657da288b5a38b8bc9c8366) )
 
 	DISK_REGION( "cdrom0" )

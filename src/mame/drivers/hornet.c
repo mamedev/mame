@@ -323,7 +323,6 @@ static UINT32 *workram;
 static UINT32 *sharc_dataram[2];
 static UINT8 *jvs_sdata;
 static UINT32 jvs_sdata_ptr = 0;
-static UINT8 *backup_ram;
 
 
 /* K037122 Tilemap chip (move to konamiic.c ?) */
@@ -817,7 +816,7 @@ static ADDRESS_MAP_START( hornet_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7d000000, 0x7d00ffff) AM_READ8(sysreg_r, 0xffffffff)
 	AM_RANGE(0x7d010000, 0x7d01ffff) AM_WRITE8(sysreg_w, 0xffffffff)
-	AM_RANGE(0x7d020000, 0x7d021fff) AM_READWRITE8(timekeeper_0_r, timekeeper_0_w, 0xffffffff)	/* M48T58Y RTC/NVRAM */
+	AM_RANGE(0x7d020000, 0x7d021fff) AM_DEVREADWRITE8(M48T58, "m48t58", timekeeper_r, timekeeper_w, 0xffffffff)	/* M48T58Y RTC/NVRAM */
 	AM_RANGE(0x7d030000, 0x7d030007) AM_READWRITE(K056800_host_r, K056800_host_w)
 	AM_RANGE(0x7d042000, 0x7d043fff) AM_RAM				/* COMM BOARD 0 */
 	AM_RANGE(0x7d044000, 0x7d044007) AM_READ(comm0_unk_r)
@@ -1040,9 +1039,13 @@ static MACHINE_RESET( hornet )
 
 static NVRAM_HANDLER( hornet )
 {
-	NVRAM_HANDLER_CALL(timekeeper_0);
 	NVRAM_HANDLER_CALL(93C46);
 }
+
+static const timekeeper_config timekeeper_intf =
+{
+	"m48t58"
+};
 
 static MACHINE_DRIVER_START( hornet )
 
@@ -1086,6 +1089,8 @@ static MACHINE_DRIVER_START( hornet )
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
+	MDRV_DEVICE_ADD( "m48t58", M48T58 )
+	MDRV_DEVICE_CONFIG( timekeeper_intf )
 MACHINE_DRIVER_END
 
 static MACHINE_RESET( hornet_2board )
@@ -1307,7 +1312,7 @@ static void sound_irq_callback(running_machine *machine, int irq)
 		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ2, PULSE_LINE);
 }
 
-static void init_hornet(running_machine *machine)
+static DRIVER_INIT(hornet)
 {
 	init_konami_cgboard(1, CGBOARD_TYPE_HORNET);
 	set_cgboard_texture_bank(0, 5, memory_region(machine, "user5"));
@@ -1316,12 +1321,11 @@ static void init_hornet(running_machine *machine)
 	K033906_init();
 
 	led_reg0 = led_reg1 = 0x7f;
-	timekeeper_init(machine, 0, TIMEKEEPER_M48T58, backup_ram);
 
 	ppc4xx_spu_set_tx_handler(0, jamma_jvs_w);
 }
 
-static void init_hornet_2board(running_machine *machine)
+static DRIVER_INIT(hornet_2board)
 {
 	init_konami_cgboard(2, CGBOARD_TYPE_HORNET);
 	set_cgboard_texture_bank(0, 5, memory_region(machine, "user5"));
@@ -1331,218 +1335,8 @@ static void init_hornet_2board(running_machine *machine)
 	K033906_init();
 
 	led_reg0 = led_reg1 = 0x7f;
-	timekeeper_init(machine, 0, TIMEKEEPER_M48T58, backup_ram);
 
 	ppc4xx_spu_set_tx_handler(0, jamma_jvs_w);
-}
-
-static DRIVER_INIT(gradius4)
-{
-	UINT8 *backupdef;
-
-	backupdef = auto_malloc(0x2000);
-	memset(backupdef, 0, 0x2000);
-
-	/* RTC data */
-	backupdef[0x00] = 0x47;	// 'G'
-	backupdef[0x01] = 0x58;	// 'X'
-	backupdef[0x02] = 0x38;	// '8'
-	backupdef[0x03] = 0x33;	// '3'
-	backupdef[0x04] = 0x37;	// '7'
-	backupdef[0x05] = 0x00;	//
-	backupdef[0x06] = 0x11;	//
-	backupdef[0x07] = 0x06;	// 06 / 11
-	backupdef[0x08] = 0x19;	//
-	backupdef[0x09] = 0x98;	// 1998
-	backupdef[0x0a] = 0x4a;	// 'J'
-	backupdef[0x0b] = 0x41;	// 'A'
-	backupdef[0x0c] = 0x43;	// 'C'
-	backupdef[0x0d] = 0x00;	//
-	backupdef[0x0e] = 0x02;	// checksum
-	backupdef[0x0f] = 0xd7;	// checksum
-
-	backup_ram = backupdef;
-	init_hornet(machine);
-}
-
-static DRIVER_INIT(nbapbp)
-{
-	UINT8 *backupdef;
-	int i;
-	UINT16 checksum;
-
-	backupdef = auto_malloc(0x2000);
-	memset(backupdef, 0, 0x2000);
-
-	/* RTC data */
-	backupdef[0x00] = 0x47;	// 'G'
-	backupdef[0x01] = 0x58;	// 'X'
-	backupdef[0x02] = 0x37;	// '7'
-	backupdef[0x03] = 0x37;	// '7'
-	backupdef[0x04] = 0x38;	// '8'
-	backupdef[0x05] = 0x00;	//
-	backupdef[0x06] = 0x00;	//
-	backupdef[0x07] = 0x00;	//
-	backupdef[0x08] = 0x19;	//
-	backupdef[0x09] = 0x98;	// 1998
-	backupdef[0x0a] = 0x4a;	// 'J'
-	backupdef[0x0b] = 0x41;	// 'A'
-	backupdef[0x0c] = 0x41;	// 'A'
-	backupdef[0x0d] = 0x00;	//
-
-	checksum = 0;
-	for (i=0; i < 14; i++)
-	{
-		checksum += backupdef[i];
-		checksum &= 0xffff;
-	}
-	backupdef[0x0e] = (checksum >> 8) & 0xff;	// checksum
-	backupdef[0x0f] = (checksum >> 0) & 0xff;	// checksum
-
-	backup_ram = backupdef;
-	init_hornet(machine);
-}
-
-static DRIVER_INIT(terabrst)
-{
-	UINT8 *backupdef;
-	int i;
-	UINT16 checksum;
-
-	backupdef = auto_malloc(0x2000);
-	memset(backupdef, 0, 0x2000);
-
-	/* RTC data */
-	backupdef[0x00] = 0x47;	// 'G'
-	backupdef[0x01] = 0x4e;	// 'N'
-	backupdef[0x02] = 0x37;	// '7'
-	backupdef[0x03] = 0x31;	// '1'
-	backupdef[0x04] = 0x35;	// '5'
-	backupdef[0x05] = 0x00;	//
-	backupdef[0x06] = 0x00;	//
-	backupdef[0x07] = 0x00;	//
-	backupdef[0x08] = 0x19;	//
-	backupdef[0x09] = 0x98;	// 1998
-	backupdef[0x0a] = 0x41;	// 'J'
-	backupdef[0x0b] = 0x41;	// 'A'
-	backupdef[0x0c] = 0x45;	// 'E'
-	backupdef[0x0d] = 0x00;	//
-
-	checksum = 0;
-	for (i=0; i < 14; i+=2)
-	{
-		checksum += (backupdef[i] << 8) | (backupdef[i+1]);
-	}
-	checksum = ~checksum - 0;
-	backupdef[0x0e] = (checksum >> 8) & 0xff;	// checksum
-	backupdef[0x0f] = (checksum >> 0) & 0xff;	// checksum
-
-	backup_ram = backupdef;
-	init_hornet_2board(machine);
-}
-
-static DRIVER_INIT(sscope)
-{
-	UINT8 *backupdef;
-	int i;
-	UINT16 checksum;
-
-	backupdef = auto_malloc(0x2000);
-	memset(backupdef, 0, 0x2000);
-
-	/* RTC data */
-	backupdef[0x00] = 0x47;	// 'G'
-	backupdef[0x01] = 0x51;	// 'Q'
-	backupdef[0x02] = 0x38;	// '8'
-	backupdef[0x03] = 0x33;	// '3'
-	backupdef[0x04] = 0x30;	// '0'
-	backupdef[0x05] = 0x00;	//
-	backupdef[0x06] = 0x00;	//
-	backupdef[0x07] = 0x00;	//
-	backupdef[0x08] = 0x20;	//
-	backupdef[0x09] = 0x00;	// 2000
-	backupdef[0x0a] = 0x55;	// 'U'
-	backupdef[0x0b] = 0x41;	// 'A'
-	backupdef[0x0c] = 0x41;	// 'A'
-	backupdef[0x0d] = 0x00;	//
-
-	checksum = 0;
-	for (i=0; i < 14; i+=2)
-	{
-		checksum += (backupdef[i] << 8) | (backupdef[i+1]);
-	}
-	checksum = ~checksum - 1;
-	backupdef[0x0e] = (checksum >> 8) & 0xff;	// checksum
-	backupdef[0x0f] = (checksum >> 0) & 0xff;	// checksum
-
-	backup_ram = backupdef;
-	init_hornet_2board(machine);
-}
-
-static DRIVER_INIT(sscope2)
-{
-	UINT8 *backupdef;
-	int i;
-	int checksum;
-
-	backupdef = auto_malloc(0x2000);
-	memset(backupdef, 0, 0x2000);
-
-	/* RTC data */
-	backupdef[0x00] = 0x47;	// 'G'
-	backupdef[0x01] = 0x4b;	// 'K'
-	backupdef[0x02] = 0x39;	// '9'
-	backupdef[0x03] = 0x33;	// '3'
-	backupdef[0x04] = 0x31;	// '1'
-	backupdef[0x05] = 0x00;	//
-	backupdef[0x06] = 0x00;	//
-	backupdef[0x07] = 0x00;	//
-	backupdef[0x08] = 0x20;	//
-	backupdef[0x09] = 0x00;	// 2000
-	backupdef[0x0a] = 0x55;	// 'U'
-	backupdef[0x0b] = 0x41;	// 'A'
-	backupdef[0x0c] = 0x41;	// 'A'
-	backupdef[0x0d] = 0x00;	//
-
-	checksum = 0;
-	for (i=0; i < 14; i+=2)
-	{
-		checksum += (backupdef[i] << 8) | (backupdef[i+1]);
-		checksum &= 0xffff;
-	}
-	checksum = (-1 - checksum) - 1;
-	backupdef[0x0e] = (checksum >> 8) & 0xff;	// checksum
-	backupdef[0x0f] = (checksum >> 0) & 0xff;	// checksum
-
-
-	/* Silent Scope data */
-	backupdef[0x1f40] = 0x47;	// 'G'
-	backupdef[0x1f41] = 0x4b;	// 'Q'
-	backupdef[0x1f42] = 0x38;	// '8'
-	backupdef[0x1f43] = 0x33;	// '3'
-	backupdef[0x1f44] = 0x30;	// '0'
-	backupdef[0x1f45] = 0x00;	//
-	backupdef[0x1f46] = 0x00;	//
-	backupdef[0x1f47] = 0x00;	//
-	backupdef[0x1f48] = 0x20;	//
-	backupdef[0x1f49] = 0x00;	// 2000
-	backupdef[0x1f4a] = 0x55;	// 'U'
-	backupdef[0x1f4b] = 0x41;	// 'A'
-	backupdef[0x1f4c] = 0x41;	// 'A'
-	backupdef[0x1f4d] = 0x00;	//
-
-	checksum = 0;
-	for (i=0x1f40; i < 0x1f4e; i+=2)
-	{
-		checksum += (backupdef[i] << 8) | (backupdef[i+1]);
-		checksum &= 0xffff;
-	}
-	checksum = (-1 - checksum) - 1;
-	backupdef[0x1f4e] = (checksum >> 8) & 0xff;	// checksum
-	backupdef[0x1f4f] = (checksum >> 0) & 0xff;	// checksum
-
-	backup_ram = backupdef;
-	init_hornet_2board(machine);
 }
 
 /*****************************************************************************/
@@ -1558,12 +1352,15 @@ ROM_START(sscope)
 	ROM_LOAD16_WORD_SWAP("ss1-1.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1))
 
 	ROM_REGION(0x1000000, "user5", 0)		/* CG Board texture roms */
-    	ROM_LOAD32_WORD( "ss1-3.u32",    0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
-    	ROM_LOAD32_WORD( "ss1-3.u24",    0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
+	ROM_LOAD32_WORD( "ss1-3.u32",    0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
+	ROM_LOAD32_WORD( "ss1-3.u24",    0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
 	ROM_REGION(0x1000000, "rf", 0)		/* PCM sample roms */
-        ROM_LOAD( "830a09.16p",    0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
-        ROM_LOAD( "830a10.14p",    0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
+	ROM_LOAD( "830a09.16p",    0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
+	ROM_LOAD( "830a10.14p",    0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
+
+	ROM_REGION(0x2000, "m48t58",0)
+	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(ee815325) SHA1(91b10802791b68a8360c0cd6c376c0c4bbbc6fa0) ) 
 ROM_END
 
 ROM_START(sscopea)
@@ -1577,12 +1374,15 @@ ROM_START(sscopea)
 	ROM_LOAD16_WORD_SWAP("ss1-1.7s", 0x000000, 0x80000, CRC(2805ea1d) SHA1(2556a51ee98cb8f59bf081e916c69a24532196f1))
 
 	ROM_REGION(0x1000000, "user5", 0)		/* CG Board texture roms */
-    	ROM_LOAD32_WORD( "ss1-3.u32",    0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
-    	ROM_LOAD32_WORD( "ss1-3.u24",    0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
+	ROM_LOAD32_WORD( "ss1-3.u32",    0x000000, 0x400000, CRC(335793e1) SHA1(d582b53c3853abd59bc728f619a30c27cfc9497c) )
+	ROM_LOAD32_WORD( "ss1-3.u24",    0x000002, 0x400000, CRC(d6e7877e) SHA1(b4d0e17ada7dd126ec564a20e7140775b4b3fdb7) )
 
 	ROM_REGION(0x1000000, "rf", 0)		/* PCM sample roms */
-        ROM_LOAD( "830a09.16p",    0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
-        ROM_LOAD( "830a10.14p",    0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
+	ROM_LOAD( "830a09.16p",    0x000000, 0x400000, CRC(e4b9f305) SHA1(ce2c6f63bdc9374dde48d8359102b57e48b4fdeb) )
+	ROM_LOAD( "830a10.14p",    0x400000, 0x400000, CRC(8b8aaf7e) SHA1(49b694dc171c149056b87c15410a6bf37ff2987f) )
+
+	ROM_REGION(0x2000, "m48t58",0)
+	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(ee815325) SHA1(91b10802791b68a8360c0cd6c376c0c4bbbc6fa0) ) 
 ROM_END
 
 ROM_START(sscope2)
@@ -1591,7 +1391,7 @@ ROM_START(sscope2)
 	ROM_RELOAD(0x000000, 0x200000)
 
 	ROM_REGION32_BE(0x800000, "user2", 0)	/* Data roms */
-		ROM_LOAD32_WORD_SWAP("931a04.bin", 0x000000, 0x200000, CRC(4f5917e6) SHA1(a63a107f1d6d9756e4ab0965d72ea446f0692814))
+	ROM_LOAD32_WORD_SWAP("931a04.bin", 0x000000, 0x200000, CRC(4f5917e6) SHA1(a63a107f1d6d9756e4ab0965d72ea446f0692814))
 
 	ROM_REGION32_BE(0x800000, "user3", 0)	/* Comm board roms */
 	ROM_LOAD("931a19.bin", 0x000000, 0x400000, BAD_DUMP CRC(8e8bb6af) SHA1(1bb399f7897fbcbe6852fda3215052b2810437d8))
@@ -1603,88 +1403,100 @@ ROM_START(sscope2)
 	ROM_LOAD16_WORD_SWAP("931a08.bin", 0x000000, 0x80000, CRC(1597d604) SHA1(a1eab4d25907930b59ea558b484c3b6ddcb9303c))
 
 	ROM_REGION(0xc00000, "rf", 0)		/* PCM sample roms */
-        ROM_LOAD( "931a09.bin",   0x000000, 0x400000, CRC(694c354c) SHA1(42f54254a5959e1b341f2801f1ad032c4ed6f329) )
-        ROM_LOAD( "931a10.bin",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
-        ROM_LOAD( "931a11.bin",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
+	ROM_LOAD( "931a09.bin",   0x000000, 0x400000, CRC(694c354c) SHA1(42f54254a5959e1b341f2801f1ad032c4ed6f329) )
+	ROM_LOAD( "931a10.bin",   0x400000, 0x400000, CRC(78ceb519) SHA1(e61c0d21b6dc37a9293e72814474f5aee59115ad) )
+	ROM_LOAD( "931a11.bin",   0x800000, 0x400000, CRC(9c8362b2) SHA1(a8158c4db386e2bbd61dc9a600720f07a1eba294) )
+
+	ROM_REGION(0x2000, "m48t58",0)
+	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(d4e69d7a) SHA1(1e29eecf4886e5e098a388dedd5f3901c2bb65e5) ) 
 ROM_END
 
 ROM_START(gradius4)
 	ROM_REGION32_BE(0x400000, "user1", 0)	/* PowerPC program */
-        ROM_LOAD16_WORD_SWAP( "837c01.27p",   0x200000, 0x200000, CRC(ce003123) SHA1(15e33997be2c1b3f71998627c540db378680a7a1) )
-        ROM_RELOAD(0x000000, 0x200000)
+	ROM_LOAD16_WORD_SWAP( "837c01.27p",   0x200000, 0x200000, CRC(ce003123) SHA1(15e33997be2c1b3f71998627c540db378680a7a1) )
+	ROM_RELOAD(0x000000, 0x200000)
 
 	ROM_REGION32_BE(0x800000, "user2", 0)	/* Data roms */
-        ROM_LOAD32_WORD_SWAP( "837a04.16t",   0x000000, 0x200000, CRC(18453b59) SHA1(3c75a54d8c09c0796223b42d30fb3867a911a074) )
-        ROM_LOAD32_WORD_SWAP( "837a05.14t",   0x000002, 0x200000, CRC(77178633) SHA1(ececdd501d0692390325c8dad6dbb068808a8b26) )
+	ROM_LOAD32_WORD_SWAP( "837a04.16t",   0x000000, 0x200000, CRC(18453b59) SHA1(3c75a54d8c09c0796223b42d30fb3867a911a074) )
+	ROM_LOAD32_WORD_SWAP( "837a05.14t",   0x000002, 0x200000, CRC(77178633) SHA1(ececdd501d0692390325c8dad6dbb068808a8b26) )
 
 	ROM_REGION32_BE(0x1000000, "user5", 0)	/* CG Board texture roms */
-        ROM_LOAD32_WORD_SWAP( "837a14.32u",   0x000002, 0x400000, CRC(ff1b5d18) SHA1(7a38362170133dcc6ea01eb62981845917b85c36) )
-        ROM_LOAD32_WORD_SWAP( "837a13.24u",   0x000000, 0x400000, CRC(d86e10ff) SHA1(6de1179d7081d9a93ab6df47692d3efc190c38ba) )
-        ROM_LOAD32_WORD_SWAP( "837a16.32v",   0x800002, 0x400000, CRC(bb7a7558) SHA1(8c8cc062793c2dcfa72657b6ea0813d7223a0b87) )
-        ROM_LOAD32_WORD_SWAP( "837a15.24v",   0x800000, 0x400000, CRC(e0620737) SHA1(c14078cdb44f75c7c956b3627045d8494941d6b4) )
+	ROM_LOAD32_WORD_SWAP( "837a14.32u",   0x000002, 0x400000, CRC(ff1b5d18) SHA1(7a38362170133dcc6ea01eb62981845917b85c36) )
+	ROM_LOAD32_WORD_SWAP( "837a13.24u",   0x000000, 0x400000, CRC(d86e10ff) SHA1(6de1179d7081d9a93ab6df47692d3efc190c38ba) )
+	ROM_LOAD32_WORD_SWAP( "837a16.32v",   0x800002, 0x400000, CRC(bb7a7558) SHA1(8c8cc062793c2dcfa72657b6ea0813d7223a0b87) )
+	ROM_LOAD32_WORD_SWAP( "837a15.24v",   0x800000, 0x400000, CRC(e0620737) SHA1(c14078cdb44f75c7c956b3627045d8494941d6b4) )
 
 	ROM_REGION(0x80000, "audio", 0)		/* 68K Program */
-        ROM_LOAD16_WORD_SWAP( "837a08.7s",    0x000000, 0x080000, CRC(c3a7ff56) SHA1(9d8d033277d560b58da151338d14b4758a9235ea) )
+	ROM_LOAD16_WORD_SWAP( "837a08.7s",    0x000000, 0x080000, CRC(c3a7ff56) SHA1(9d8d033277d560b58da151338d14b4758a9235ea) )
 
 	ROM_REGION(0x800000, "rf", 0)		/* PCM sample roms */
-        ROM_LOAD( "837a09.16p",   0x000000, 0x400000, CRC(fb8f3dc2) SHA1(69e314ac06308c5a24309abc3d7b05af6c0302a8) )
-        ROM_LOAD( "837a10.14p",   0x400000, 0x400000, CRC(1419cad2) SHA1(a6369a5c29813fa51e8246d0c091736f32994f3d) )
+	ROM_LOAD( "837a09.16p",   0x000000, 0x400000, CRC(fb8f3dc2) SHA1(69e314ac06308c5a24309abc3d7b05af6c0302a8) )
+	ROM_LOAD( "837a10.14p",   0x400000, 0x400000, CRC(1419cad2) SHA1(a6369a5c29813fa51e8246d0c091736f32994f3d) )
+
+	ROM_REGION(0x2000, "m48t58",0)
+	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(935f9d05) SHA1(c3a787dff1b2ac4942858ffa1574405db01292b6) )
 ROM_END
 
 ROM_START(nbapbp)
 	ROM_REGION32_BE(0x400000, "user1", 0)	/* PowerPC program */
-        ROM_LOAD16_WORD_SWAP( "778a01.27p",   0x200000, 0x200000, CRC(e70019ce) SHA1(8b187b6e670fdc88771da08a56685cd621b139dc) )
-        ROM_RELOAD(0x000000, 0x200000)
+	ROM_LOAD16_WORD_SWAP( "778a01.27p",   0x200000, 0x200000, CRC(e70019ce) SHA1(8b187b6e670fdc88771da08a56685cd621b139dc) )
+	ROM_RELOAD(0x000000, 0x200000)
 
 	ROM_REGION32_BE(0x800000, "user2", 0)	/* Data roms */
-        ROM_LOAD32_WORD_SWAP( "778a04.16t",   0x000000, 0x400000, CRC(62c70132) SHA1(405aed149fc51e0adfa3ace3c644e47d53cf1ee3) )
-        ROM_LOAD32_WORD_SWAP( "778a05.14t",   0x000002, 0x400000, CRC(03249803) SHA1(f632a5f1dfa0a8500407214df0ec8d98ce09bc2b) )
+	ROM_LOAD32_WORD_SWAP( "778a04.16t",   0x000000, 0x400000, CRC(62c70132) SHA1(405aed149fc51e0adfa3ace3c644e47d53cf1ee3) )
+	ROM_LOAD32_WORD_SWAP( "778a05.14t",   0x000002, 0x400000, CRC(03249803) SHA1(f632a5f1dfa0a8500407214df0ec8d98ce09bc2b) )
 
 	ROM_REGION32_BE(0x1000000, "user5", 0)	/* CG Board texture roms */
-        ROM_LOAD32_WORD_SWAP( "778a14.32u",   0x000002, 0x400000, CRC(db0c278d) SHA1(bb9884b6cdcdb707fff7e56e92e2ede062abcfd3) )
-        ROM_LOAD32_WORD_SWAP( "778a13.24u",   0x000000, 0x400000, CRC(47fda9cc) SHA1(4aae01c1f1861b4b12a3f9de6b39eb4d11a9736b) )
-        ROM_LOAD32_WORD_SWAP( "778a16.32v",   0x800002, 0x400000, CRC(6c0f46ea) SHA1(c6b9fbe14e13114a91a5925a0b46496260539687) )
-        ROM_LOAD32_WORD_SWAP( "778a15.24v",   0x800000, 0x400000, CRC(d176ad0d) SHA1(2be755dfa3f60379d396734809bbaaaad49e0db5) )
+	ROM_LOAD32_WORD_SWAP( "778a14.32u",   0x000002, 0x400000, CRC(db0c278d) SHA1(bb9884b6cdcdb707fff7e56e92e2ede062abcfd3) )
+	ROM_LOAD32_WORD_SWAP( "778a13.24u",   0x000000, 0x400000, CRC(47fda9cc) SHA1(4aae01c1f1861b4b12a3f9de6b39eb4d11a9736b) )
+	ROM_LOAD32_WORD_SWAP( "778a16.32v",   0x800002, 0x400000, CRC(6c0f46ea) SHA1(c6b9fbe14e13114a91a5925a0b46496260539687) )
+	ROM_LOAD32_WORD_SWAP( "778a15.24v",   0x800000, 0x400000, CRC(d176ad0d) SHA1(2be755dfa3f60379d396734809bbaaaad49e0db5) )
 
 	ROM_REGION(0x80000, "audio", 0)		/* 68K Program */
-        ROM_LOAD16_WORD_SWAP( "778a08.7s",    0x000000, 0x080000, CRC(6259b4bf) SHA1(d0c38870495c9a07984b4b85e736d6477dd44832) )
+	ROM_LOAD16_WORD_SWAP( "778a08.7s",    0x000000, 0x080000, CRC(6259b4bf) SHA1(d0c38870495c9a07984b4b85e736d6477dd44832) )
 
 	ROM_REGION(0x1000000, "rf", 0)		/* PCM sample roms */
-        ROM_LOAD( "778a09.16p",   0x000000, 0x400000, CRC(e8c6fd93) SHA1(dd378b67b3b7dd932e4b39fbf4321e706522247f) )
-        ROM_LOAD( "778a10.14p",   0x400000, 0x400000, CRC(c6a0857b) SHA1(976734ba56460fcc090619fbba043a3d888c4f4e) )
-        ROM_LOAD( "778a11.12p",   0x800000, 0x400000, CRC(40199382) SHA1(bee268adf9b6634a4f6bb39278ecd02f2bdcb1f4) )
-        ROM_LOAD( "778a12.9p",    0xc00000, 0x400000, CRC(27d0c724) SHA1(48e48cbaea6db0de8c3471a2eda6faaa16eed46e) )
+	ROM_LOAD( "778a09.16p",   0x000000, 0x400000, CRC(e8c6fd93) SHA1(dd378b67b3b7dd932e4b39fbf4321e706522247f) )
+	ROM_LOAD( "778a10.14p",   0x400000, 0x400000, CRC(c6a0857b) SHA1(976734ba56460fcc090619fbba043a3d888c4f4e) )
+	ROM_LOAD( "778a11.12p",   0x800000, 0x400000, CRC(40199382) SHA1(bee268adf9b6634a4f6bb39278ecd02f2bdcb1f4) )
+	ROM_LOAD( "778a12.9p",    0xc00000, 0x400000, CRC(27d0c724) SHA1(48e48cbaea6db0de8c3471a2eda6faaa16eed46e) )
+
+	ROM_REGION(0x2000, "m48t58",0)
+	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(3cff1b1d) SHA1(bed0fc657a785be0c69bb21ad52365635c83d751) )
 ROM_END
 
 ROM_START(terabrst)
 	ROM_REGION32_BE(0x400000, "user1", 0)	/* PowerPC program */
-        ROM_LOAD32_WORD_SWAP( "715a02.25p",   0x000000, 0x200000, CRC(070c48b3) SHA1(066cefbd34d8f6476083417471114f782bef97fb) )
-        ROM_LOAD32_WORD_SWAP( "715a03.22p",   0x000002, 0x200000, CRC(f77d242f) SHA1(7680e4abcccd549b3f6d1d245f64631fab57e80d) )
+	ROM_LOAD32_WORD_SWAP( "715a02.25p",   0x000000, 0x200000, CRC(070c48b3) SHA1(066cefbd34d8f6476083417471114f782bef97fb) )
+	ROM_LOAD32_WORD_SWAP( "715a03.22p",   0x000002, 0x200000, CRC(f77d242f) SHA1(7680e4abcccd549b3f6d1d245f64631fab57e80d) )
 
 	ROM_REGION32_BE(0x800000, "user2", 0)	/* Data roms */
-        ROM_LOAD32_WORD_SWAP( "715a04.16t",   0x000000, 0x200000, CRC(00d9567e) SHA1(fe372399ad0ae89d557c93c3145b38e3ed0f714d) )
-        ROM_LOAD32_WORD_SWAP( "715a05.14t",   0x000002, 0x200000, CRC(462d53bf) SHA1(0216a84358571de6791365c69a1fa8fe2784148d) )
+	ROM_LOAD32_WORD_SWAP( "715a04.16t",   0x000000, 0x200000, CRC(00d9567e) SHA1(fe372399ad0ae89d557c93c3145b38e3ed0f714d) )
+	ROM_LOAD32_WORD_SWAP( "715a05.14t",   0x000002, 0x200000, CRC(462d53bf) SHA1(0216a84358571de6791365c69a1fa8fe2784148d) )
 
 	ROM_REGION32_BE(0x1000000, "user5", 0)	/* CG Board texture roms */
-        ROM_LOAD32_WORD_SWAP( "715a14.32u",   0x000002, 0x400000, CRC(bbb36be3) SHA1(c828d0af0546db02e87afe68423b9447db7c7e51) )
-        ROM_LOAD32_WORD_SWAP( "715a13.24u",   0x000000, 0x400000, CRC(dbff58a1) SHA1(f0c60bb2cbf268cfcbdd65606ebb18f1b4839c0e) )
+	ROM_LOAD32_WORD_SWAP( "715a14.32u",   0x000002, 0x400000, CRC(bbb36be3) SHA1(c828d0af0546db02e87afe68423b9447db7c7e51) )
+	ROM_LOAD32_WORD_SWAP( "715a13.24u",   0x000000, 0x400000, CRC(dbff58a1) SHA1(f0c60bb2cbf268cfcbdd65606ebb18f1b4839c0e) )
 
 	ROM_REGION(0x80000, "audio", 0)		/* 68K Program */
-        ROM_LOAD16_WORD_SWAP( "715a08.7s",    0x000000, 0x080000, CRC(3aa2f4a5) SHA1(bb43e5f5ef4ac51f228d4d825be66d3c720d51ea) )
+	ROM_LOAD16_WORD_SWAP( "715a08.7s",    0x000000, 0x080000, CRC(3aa2f4a5) SHA1(bb43e5f5ef4ac51f228d4d825be66d3c720d51ea) )
 
 	ROM_REGION(0x1000000, "rf", 0)		/* PCM sample roms */
-        ROM_LOAD( "715a09.16p",   0x000000, 0x400000, CRC(65845866) SHA1(d2a63d0deef1901e6fa21b55c5f96e1f781dceda) )
-        ROM_LOAD( "715a10.14p",   0x400000, 0x400000, CRC(294fe71b) SHA1(ac5fff5627df1cee4f1e1867377f208b34334899) )
+	ROM_LOAD( "715a09.16p",   0x000000, 0x400000, CRC(65845866) SHA1(d2a63d0deef1901e6fa21b55c5f96e1f781dceda) )
+	ROM_LOAD( "715a10.14p",   0x400000, 0x400000, CRC(294fe71b) SHA1(ac5fff5627df1cee4f1e1867377f208b34334899) )
 
 	ROM_REGION(0x20000, "dsp", 0)		/* 68K Program */
-        ROM_LOAD16_WORD_SWAP( "715a17.20k",    0x000000, 0x020000, CRC(f0b7ba0c) SHA1(863b260824b0ae2f890ba84d1c9a8f436891b1ff) )
+	ROM_LOAD16_WORD_SWAP( "715a17.20k",    0x000000, 0x020000, CRC(f0b7ba0c) SHA1(863b260824b0ae2f890ba84d1c9a8f436891b1ff) )
+
+	ROM_REGION(0x2000, "m48t58",0)
+	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(62fecb78) SHA1(09509be8a947cf2d38e12a6ea755ec0de4aa9bd4) ) 
 ROM_END
 
 /*************************************************************************/
 
-GAME( 1998, gradius4,	0,		hornet,			  hornet,	gradius4,	ROT0,	"Konami",	"Gradius 4: Fukkatsu", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1998, nbapbp,		0,		hornet,			  hornet,	nbapbp,		ROT0,	"Konami",	"NBA Play By Play", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAMEL( 1998, terabrst,  0,      hornet_2board,    hornet,   terabrst,   ROT0,   "Konami",   "Teraburst", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 2000, sscope,	0,		hornet_2board,	  sscope,	sscope,		ROT0,	"Konami",	"Silent Scope (ver UAB)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 2000, sscopea,	sscope, hornet_2board,	  sscope,	sscope,		ROT0,	"Konami",	"Silent Scope (ver UAA)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
-GAMEL( 2000, sscope2,	0,		hornet_2board_v2, sscope,	sscope2,	ROT0,	"Konami",	"Silent Scope 2", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAME(  1998, gradius4, 0,      hornet,           hornet, hornet,        ROT0, "Konami", "Gradius 4: Fukkatsu", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME(  1998, nbapbp,   0,      hornet,           hornet, hornet,        ROT0, "Konami", "NBA Play By Play", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAMEL( 1998, terabrst, 0,      hornet_2board,    hornet, hornet_2board, ROT0, "Konami", "Teraburst", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscope,   0,      hornet_2board,    sscope, hornet_2board, ROT0, "Konami", "Silent Scope (ver UAB)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscopea,  sscope, hornet_2board,    sscope, hornet_2board, ROT0, "Konami", "Silent Scope (ver UAA)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )
+GAMEL( 2000, sscope2,  0,      hornet_2board_v2, sscope, hornet_2board, ROT0, "Konami", "Silent Scope 2", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE, layout_dualhsxs )

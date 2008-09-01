@@ -37,8 +37,6 @@
 
 
 
-static UINT8 backup_ram[0x2000];
-
 static VIDEO_UPDATE(viper)
 {
 	const device_config *device = device_list_find_by_tag(screen->machine->config->devicelist, VOODOO_GRAPHICS, "voodoo");
@@ -561,7 +559,7 @@ static ADDRESS_MAP_START(viper_map, ADDRESS_SPACE_PROGRAM, 64)
 	AM_RANGE(0xfee00000, 0xfeefffff) AM_READWRITE(pci_config_data_r, pci_config_data_w)
 	AM_RANGE(0xff300000, 0xff300fff) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ata_r, ata_w)
 	AM_RANGE(0xffe10000, 0xffe10007) AM_READ(unk1_r)
-	AM_RANGE(0xffe30000, 0xffe31fff) AM_READWRITE8(timekeeper_0_r, timekeeper_0_w, U64(0xffffffffffffffff))
+	AM_RANGE(0xffe30000, 0xffe31fff) AM_DEVREADWRITE8(M48T58,"m48t58",timekeeper_r, timekeeper_w, U64(0xffffffffffffffff))
 	AM_RANGE(0xffe40000, 0xffe4000f) AM_NOP
 	AM_RANGE(0xffe50000, 0xffe50007) AM_WRITE(unk2_w)
 	AM_RANGE(0xffe80000, 0xffe80007) AM_WRITE(unk1a_w)
@@ -592,6 +590,11 @@ static MACHINE_RESET(viper)
 	devtag_reset(machine, IDE_CONTROLLER, "ide");
 }
 
+static const timekeeper_config timekeeper_intf =
+{
+	"m48t58"
+};
+
 static MACHINE_DRIVER_START(viper)
 
 	/* basic machine hardware */
@@ -601,8 +604,6 @@ static MACHINE_DRIVER_START(viper)
 	MDRV_CPU_VBLANK_INT("main", viper_vblank)
 
 	MDRV_MACHINE_RESET(viper)
-
-	MDRV_NVRAM_HANDLER(timekeeper_0)
 
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 	MDRV_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "main")
@@ -621,6 +622,8 @@ static MACHINE_DRIVER_START(viper)
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
+	MDRV_DEVICE_ADD( "m48t58", M48T58 )
+	MDRV_DEVICE_CONFIG( timekeeper_intf )
 MACHINE_DRIVER_END
 
 /*****************************************************************************/
@@ -639,16 +642,9 @@ static const struct pci_device_info voodoo3 =
 
 static DRIVER_INIT(viper)
 {
-	UINT8 *nvram;
-
 	pci_init();
 	pci_add_device(0, 0, &mpc8240);
 	pci_add_device(0, 12, &voodoo3);
-
-	timekeeper_init(machine, 0, TIMEKEEPER_M48T58, backup_ram);
-
-	nvram = memory_region(machine, "user2");
-	memcpy(backup_ram, nvram, 0x2000);
 }
 
 static DRIVER_INIT(vipercf)
@@ -659,35 +655,6 @@ static DRIVER_INIT(vipercf)
 
 	memory_install_readwrite64_device_handler( ide, 0, ADDRESS_SPACE_PROGRAM, 0xff000000, 0xff000fff, 0, 0, cf_card_data_r, cf_card_data_w );
 	memory_install_readwrite64_device_handler( ide, 0, ADDRESS_SPACE_PROGRAM, 0xff200000, 0xff200fff, 0, 0, cf_card_r, cf_card_w );
-}
-
-static DRIVER_INIT(ppp2nd)
-{
-	DRIVER_INIT_CALL(viper);
-
-	/*
-    backup_ram[0x0000] = 0x50;  // P
-    backup_ram[0x0001] = 0x33;  // 3
-    backup_ram[0x0002] = 0x5f;  // _
-    backup_ram[0x0003] = 0x32;  // 2
-    backup_ram[0x0004] = 0x6e;  // n
-    backup_ram[0x0005] = 0x64;  // d
-    backup_ram[0x0006] = 0x4d;  // M
-    backup_ram[0x0007] = 0x49;  // I
-    backup_ram[0x0008] = 0x58;  // X
-    backup_ram[0x0009] = 0x00;  //
-    backup_ram[0x000a] = 0x00;  //
-    backup_ram[0x000b] = 0x00;  //
-    backup_ram[0x000c] = 0x00;  //
-    backup_ram[0x000d] = 0x00;  //
-    backup_ram[0x000e] = 0x00;  //
-    backup_ram[0x000f] = 0x00;  //
-
-    backup_ram[0x0100] = 0x39;
-    backup_ram[0x0101] = 0x89;
-    backup_ram[0x0102] = 0x3a;
-    backup_ram[0x0103] = 0xaa;
-    */
 }
 
 
@@ -705,7 +672,7 @@ static DRIVER_INIT(ppp2nd)
 ROM_START(kviper)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 ROM_END
 
 
@@ -713,243 +680,243 @@ ROM_END
 ROM_START(ppp2nd)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "ppp2nd", 0, MD5(06012243d4b64ebd9b81e9781fb5624d) SHA1(54b45e2df3f4239191000900181a94227a351c67))
+	DISK_IMAGE( "ppp2nd", 0, MD5(06012243d4b64ebd9b81e9781fb5624d) SHA1(54b45e2df3f4239191000900181a94227a351c67))
 ROM_END
 
 /* Viper games with Compact Flash card */
 ROM_START(boxingm)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-		ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(c24e29fc) SHA1(efb6ecaf25cbdf9d8dfcafa85e38a195fa5ff6c4))
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(c24e29fc) SHA1(efb6ecaf25cbdf9d8dfcafa85e38a195fa5ff6c4))
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "a45jaa02", 0, MD5(db0e9de39e2b4e6bd9f6f768472ab24a) SHA1(046c766fdb1b6607e794c598d5d603215b8e81a3) )
+	DISK_IMAGE( "a45jaa02", 0, MD5(db0e9de39e2b4e6bd9f6f768472ab24a) SHA1(046c766fdb1b6607e794c598d5d603215b8e81a3) )
 ROM_END
 
 ROM_START(code1d)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "gk922d02", 0, MD5(c2713080273300a963fbf96dc22f70d7) SHA1(fcf451e8d49a93ca25a2177f2eb014da6ca6bcb3) )
+	DISK_IMAGE( "gk922d02", 0, MD5(c2713080273300a963fbf96dc22f70d7) SHA1(fcf451e8d49a93ca25a2177f2eb014da6ca6bcb3) )
 ROM_END
 
 ROM_START(code1db)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "gk922b02", 0, MD5(c1a9b406300c2e258be1cca00746ad6c) SHA1(ce949cdbe16ff8539e7fa46ccc58a06a90c7edde) )
+	DISK_IMAGE( "gk922b02", 0, MD5(c1a9b406300c2e258be1cca00746ad6c) SHA1(ce949cdbe16ff8539e7fa46ccc58a06a90c7edde) )
 ROM_END
 
 ROM_START(gticlub2)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-		ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(d0604e84) SHA1(18d1183f1331af3e655a56692eb7ab877b4bc239))
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(d0604e84) SHA1(18d1183f1331af3e655a56692eb7ab877b4bc239))
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "gm941b02", 0, MD5(8403c7f5fa5c254a30d87b59f8d1fedc) SHA1(217ef1628e8a377d22f537507dbe18fa9fe01fa2) )
+	DISK_IMAGE( "gm941b02", 0, MD5(8403c7f5fa5c254a30d87b59f8d1fedc) SHA1(217ef1628e8a377d22f537507dbe18fa9fe01fa2) )
 ROM_END
 
 ROM_START(jpark3)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-		ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(55d1681d) SHA1(26868cf0d14f23f06b81f2df0b4186924439bb43))
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(55d1681d) SHA1(26868cf0d14f23f06b81f2df0b4186924439bb43))
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "b41c02", 0, MD5(4909b6c4007cc24f8cc514aa0ea26170) SHA1(386059033832c70063ff38363d473050162835e9) )
+	DISK_IMAGE( "b41c02", 0, MD5(4909b6c4007cc24f8cc514aa0ea26170) SHA1(386059033832c70063ff38363d473050162835e9) )
 ROM_END
 
 ROM_START(mocapglf)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "b33a02", 0, MD5(5e7d62ab51dae4e9ace35d7e52b08b5d) SHA1(a56df1917fb476cbacfe24f1a2f2cacc770eb80a) )
+	DISK_IMAGE( "b33a02", 0, MD5(5e7d62ab51dae4e9ace35d7e52b08b5d) SHA1(a56df1917fb476cbacfe24f1a2f2cacc770eb80a) )
 ROM_END
 
 ROM_START(mocapb)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-		ROM_LOAD("nvram.u39", 0x000000, 0x2000, CRC(14b9fe68) SHA1(3c59e6df1bb46bc1835c13fd182b1bb092c08759))
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("nvram.u39", 0x000000, 0x2000, CRC(14b9fe68) SHA1(3c59e6df1bb46bc1835c13fd182b1bb092c08759))
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "a29b02", 0, MD5(18f7070bbde3c3ca38d71425bdc074ab) SHA1(167b4b9f0960503db37c22e81ce4149925c5ec71) )
+	DISK_IMAGE( "a29b02", 0, MD5(18f7070bbde3c3ca38d71425bdc074ab) SHA1(167b4b9f0960503db37c22e81ce4149925c5ec71) )
 ROM_END
 
 ROM_START(mocapbj)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-		ROM_LOAD("nvram.u39", 0x000000, 0x2000, CRC(2f7cdf27) SHA1(0b69d8728be12909e235268268a312982f81d46a))
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("nvram.u39", 0x000000, 0x2000, CRC(2f7cdf27) SHA1(0b69d8728be12909e235268268a312982f81d46a))
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "a29a02", 0, MD5(ba06338534dbad61071d39907a3aed85) SHA1(8ab0b63f6e4d1401380a286736964f0cd668a70e) )
+	DISK_IMAGE( "a29a02", 0, MD5(ba06338534dbad61071d39907a3aed85) SHA1(8ab0b63f6e4d1401380a286736964f0cd668a70e) )
 ROM_END
 
 ROM_START(p911)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-		ROM_LOAD("nvram.u39", 0x000000, 0x2000, CRC(cca056ca) SHA1(de1a00d84c1311d48bbe6d24f5b36e22ecf5e85a))
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("nvram.u39", 0x000000, 0x2000, CRC(cca056ca) SHA1(de1a00d84c1311d48bbe6d24f5b36e22ecf5e85a))
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "a00aad02", 0, MD5(894ec7584841d7e1775e76edc53e739e) SHA1(2fc73fdaf9bc9ab6942672458206517bf8d851e1) )
+	DISK_IMAGE( "a00aad02", 0, MD5(894ec7584841d7e1775e76edc53e739e) SHA1(2fc73fdaf9bc9ab6942672458206517bf8d851e1) )
 ROM_END
 
 ROM_START(p911uc)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "a00aac02", 0, MD5(c1d1a18932490c9d6185d0c3b55b50cf) SHA1(5cbdfce13ce2cb5c45ea66e20e092d5a5fe69c5d) )
+	DISK_IMAGE( "a00aac02", 0, MD5(c1d1a18932490c9d6185d0c3b55b50cf) SHA1(5cbdfce13ce2cb5c45ea66e20e092d5a5fe69c5d) )
 ROM_END
 
 ROM_START(p911e)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "a00eaa02", 0, MD5(5c870c38a408591e080516ae6a5f28e5) SHA1(8ff93666c33c7ee3ac2e4eeca9077c8296036187) )
+	DISK_IMAGE( "a00eaa02", 0, MD5(5c870c38a408591e080516ae6a5f28e5) SHA1(8ff93666c33c7ee3ac2e4eeca9077c8296036187) )
 ROM_END
 
 ROM_START(p911j)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-		ROM_LOAD("nvram.u39", 0x000000, 0x2000, CRC(9ecf70dc) SHA1(4769a99b0cc28563e219860b8d480f32d1e21f60))
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("nvram.u39", 0x000000, 0x2000, CRC(9ecf70dc) SHA1(4769a99b0cc28563e219860b8d480f32d1e21f60))
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "a00jac02", 0, MD5(6c4b7c934159a54c93d5aa386e44969a) SHA1(80217103ad96b06855a57763c702140cbe4a2494) )
+	DISK_IMAGE( "a00jac02", 0, MD5(6c4b7c934159a54c93d5aa386e44969a) SHA1(80217103ad96b06855a57763c702140cbe4a2494) )
 ROM_END
 
 ROM_START(p9112)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "b11a02", 0, MD5(7ddf6139577bce2062b2f9a9ac99e56a) SHA1(56d9c47f3c7fceb2d8c36a8fa205c90595923c6f) )
+	DISK_IMAGE( "b11a02", 0, MD5(7ddf6139577bce2062b2f9a9ac99e56a) SHA1(56d9c47f3c7fceb2d8c36a8fa205c90595923c6f) )
 ROM_END
 
 ROM_START(popn9)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "c00jab", 0, MD5(f16cfaae05d29fdeeb7289265bf45712) SHA1(fd5b374731975e956b6e4e7102bc8350bfd8b5f4) )
+	DISK_IMAGE( "c00jab", 0, MD5(f16cfaae05d29fdeeb7289265bf45712) SHA1(fd5b374731975e956b6e4e7102bc8350bfd8b5f4) )
 ROM_END
 
 ROM_START(sscopex)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-		ROM_LOAD("nvram.u39", 0x000000, 0x2000, CRC(7b0e1ac8) SHA1(1ea549964539e27f87370e9986bfa44eeed037cd))
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("nvram.u39", 0x000000, 0x2000, CRC(7b0e1ac8) SHA1(1ea549964539e27f87370e9986bfa44eeed037cd))
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "gka13c02", 0, MD5(994ced1f61dfe5ea10eac4b407359392) SHA1(179145b0e98c2ab5a7fc5c93cbc0c5398f961f65) )
+	DISK_IMAGE( "gka13c02", 0, MD5(994ced1f61dfe5ea10eac4b407359392) SHA1(179145b0e98c2ab5a7fc5c93cbc0c5398f961f65) )
 ROM_END
 
 ROM_START(sogeki)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-		ROM_LOAD("nvram.u39", 0x000000, 0x2000, CRC(2f325c55) SHA1(0bc44f40f981a815c8ce64eae95ae55db510c565))
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("nvram.u39", 0x000000, 0x2000, CRC(2f325c55) SHA1(0bc44f40f981a815c8ce64eae95ae55db510c565))
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "a13b02", 0, MD5(b476764d13ebf3fc3ec52e1fc2b36f96) SHA1(16965f5f164f4f8191e93274f8c99d84def15c70) )
+	DISK_IMAGE( "a13b02", 0, MD5(b476764d13ebf3fc3ec52e1fc2b36f96) SHA1(16965f5f164f4f8191e93274f8c99d84def15c70) )
 ROM_END
 
 ROM_START(thrild2)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-		ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(d5de9b8e) SHA1(768bcd46a6ad20948f60f5e0ecd2f7b9c2901061))
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(d5de9b8e) SHA1(768bcd46a6ad20948f60f5e0ecd2f7b9c2901061))
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "gma41b02", 0, MD5(a3c39be28464fa737390e2e1e2aeb683) SHA1(0a451e33f5a6b708a54b70cc247e4d49ada0025a) )
+	DISK_IMAGE( "gma41b02", 0, MD5(a3c39be28464fa737390e2e1e2aeb683) SHA1(0a451e33f5a6b708a54b70cc247e4d49ada0025a) )
 ROM_END
 
 ROM_START(thrild2a)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-		ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(3b7b0969) SHA1(3f11b6420ad3e3ee6f807e1ae14908bdc6e86d8f))
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(3b7b0969) SHA1(3f11b6420ad3e3ee6f807e1ae14908bdc6e86d8f))
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "gma41a02", 0, MD5(e73843d28afaef6c6af2513b6cf064e6) SHA1(abdaba1f539cf5d723fa51e939c0ffcbf5cdf28f) )
+	DISK_IMAGE( "gma41a02", 0, MD5(e73843d28afaef6c6af2513b6cf064e6) SHA1(abdaba1f539cf5d723fa51e939c0ffcbf5cdf28f) )
 ROM_END
 
 ROM_START(tsurugi)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-		ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(c123342c) SHA1(55416767608fe0311a362854a16b214b04435a31))
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(c123342c) SHA1(55416767608fe0311a362854a16b214b04435a31))
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "a30eab02", 0, MD5(81593f4d5a10f7dea124bef0b02d15e6) SHA1(2202d8f8fa7cc752d4ebae16eac6818a5de06b98) )
+	DISK_IMAGE( "a30eab02", 0, MD5(81593f4d5a10f7dea124bef0b02d15e6) SHA1(2202d8f8fa7cc752d4ebae16eac6818a5de06b98) )
 ROM_END
 
 ROM_START(tsurugij)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "a30jac02", 0, MD5(c7400ccdb4b045bbf2de4fa9d63a9e87) SHA1(64cc19941c2f3b39cbbe158042f3b312a678752d) )
+	DISK_IMAGE( "a30jac02", 0, MD5(c7400ccdb4b045bbf2de4fa9d63a9e87) SHA1(64cc19941c2f3b39cbbe158042f3b312a678752d) )
 ROM_END
 
 ROM_START(wcombat)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-		ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(4f8b5858) SHA1(68066241c6f9db7f45e55b3c5da101987f4ce53c))
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(4f8b5858) SHA1(68066241c6f9db7f45e55b3c5da101987f4ce53c))
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "c22d02", 0, MD5(f3b63ac0b2f613c9183356e7cf966ba6) SHA1(f7a6e8eba877f213075bd4836a62a898f17a27dc) )
+	DISK_IMAGE( "c22d02", 0, MD5(f3b63ac0b2f613c9183356e7cf966ba6) SHA1(f7a6e8eba877f213075bd4836a62a898f17a27dc) )
 ROM_END
 
 ROM_START(wcombak)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-		ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(ebd4d645) SHA1(2fa7e2c6b113214f3eb1900c8ceef4d5fcf0bb76))
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(ebd4d645) SHA1(2fa7e2c6b113214f3eb1900c8ceef4d5fcf0bb76))
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "c22c02", 0, MD5(e108a01a0a3ada065f42b0b4b16a4480) SHA1(6caff33b9b22fc56a619d58cfb8fb5aca2ecd289) )
+	DISK_IMAGE( "c22c02", 0, MD5(e108a01a0a3ada065f42b0b4b16a4480) SHA1(6caff33b9b22fc56a619d58cfb8fb5aca2ecd289) )
 ROM_END
 
 ROM_START(wcombaj)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-		ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(bd8a6640) SHA1(2d409197ef3fb07d984d27fa943f29c7a711d715))
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(bd8a6640) SHA1(2d409197ef3fb07d984d27fa943f29c7a711d715))
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "c22a02", 0, MD5(0df54ceaa46c00e9b849af4bea6df1eb) SHA1(63ba75403ff714b2169f3c2e8ae3246a035da2d3) )
+	DISK_IMAGE( "c22a02", 0, MD5(0df54ceaa46c00e9b849af4bea6df1eb) SHA1(63ba75403ff714b2169f3c2e8ae3246a035da2d3) )
 ROM_END
 
 ROM_START(xtrial)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-		ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(33708a93) SHA1(715968e3c9c15edf628fa6ac655dc0864e336c6c))
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(33708a93) SHA1(715968e3c9c15edf628fa6ac655dc0864e336c6c))
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "b4xb02", 0, MD5(c915e4946231fee8d3df00d5be08c177) SHA1(8631efafc19cc34ab8fbee2ed912d35de1f8b161) )
+	DISK_IMAGE( "b4xb02", 0, MD5(c915e4946231fee8d3df00d5be08c177) SHA1(8631efafc19cc34ab8fbee2ed912d35de1f8b161) )
 ROM_END
 
 /* Viper Satellite Terminal games */
@@ -1002,20 +969,20 @@ CF card and NVRAM are swapped....
 ROM_START(mfightc)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
-		ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(9fb551a5) SHA1(a33d185e186d404c3bf62277d7e34e5ad0000b09))
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_LOAD("nvram.u39", 0x00000, 0x2000, CRC(9fb551a5) SHA1(a33d185e186d404c3bf62277d7e34e5ad0000b09))
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "c09jad04", 0, MD5(a858ca8f04838e8b5b603ea12526016c) SHA1(97e9b57c72787737c976cf9d7e997aee50befd53) )
+	DISK_IMAGE( "c09jad04", 0, MD5(a858ca8f04838e8b5b603ea12526016c) SHA1(97e9b57c72787737c976cf9d7e997aee50befd53) )
 ROM_END
 
 ROM_START(mfightcc)
 	VIPER_BIOS
 
-	ROM_REGION(0x2000, "user2", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
+	ROM_REGION(0x2000, "m48t58", ROMREGION_ERASE00)		/* M48T58 Timekeeper NVRAM */
 
 	DISK_REGION( "ide" )
-		DISK_IMAGE( "c09jac04", 0, MD5(3d502e1f9c8dbd7a9179ffd754a3de1b) SHA1(d27f04cc25df9955c014b7b97f768324f8e47c5c) )
+	DISK_IMAGE( "c09jac04", 0, MD5(3d502e1f9c8dbd7a9179ffd754a3de1b) SHA1(d27f04cc25df9955c014b7b97f768324f8e47c5c) )
 ROM_END
 
 /*****************************************************************************/
@@ -1023,7 +990,7 @@ ROM_END
 /* Viper BIOS */
 GAME(1999, kviper,   0,       viper, 0, viper,    ROT0, "Konami", "Konami Viper BIOS", GAME_IS_BIOS_ROOT)
 
-GAME(2001, ppp2nd,   kviper,  viper, 0, ppp2nd,   ROT0,  "Konami", "ParaParaParadise 2nd Mix", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME(2001, ppp2nd,   kviper,  viper, 0, viper,    ROT0,  "Konami", "ParaParaParadise 2nd Mix", GAME_NOT_WORKING|GAME_NO_SOUND)
 
 GAME(2001, boxingm,  kviper,  viper, 0, vipercf,  ROT0,  "Konami", "Boxing Mania", GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME(2000, code1d,   kviper,  viper, 0, vipercf,  ROT0,  "Konami", "Code One Dispatch", GAME_NOT_WORKING|GAME_NO_SOUND)

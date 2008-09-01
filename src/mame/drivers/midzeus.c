@@ -89,13 +89,6 @@ static MACHINE_START( midzeus )
 }
 
 
-static MACHINE_START( midzeus2 )
-{
-	timekeeper_init(machine, 0, TIMEKEEPER_M48T35, NULL);
-	MACHINE_START_CALL(midzeus);
-}
-
-
 static MACHINE_RESET( midzeus )
 {
 	memcpy(ram_base, memory_region(machine, "user1"), 0x40000*4);
@@ -161,18 +154,18 @@ static WRITE32_HANDLER( cmos_protect_w )
  *
  *************************************/
 
-static READ32_HANDLER( timekeeper_r )
+static READ32_DEVICE_HANDLER( zeus2_timekeeper_r )
 {
-	return timekeeper_0_r(machine, offset) | 0xffffff00;
+	return timekeeper_r(device, offset) | 0xffffff00;
 }
 
 
-static WRITE32_HANDLER( timekeeper_w )
+static WRITE32_DEVICE_HANDLER( zeus2_timekeeper_w )
 {
 	if (bitlatch[2] && !cmos_protected)
-		timekeeper_0_w(machine, offset, data);
+		timekeeper_w(device, offset, data);
 	else
-		logerror("%06X:timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", activecpu_get_pc(), bitlatch[2], cmos_protected);
+		logerror("%06X:zeus2_timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", activecpu_get_pc(), bitlatch[2], cmos_protected);
 	cmos_protected = TRUE;
 }
 
@@ -201,8 +194,6 @@ static WRITE32_HANDLER( zpram_w )
 
 static NVRAM_HANDLER( midzeus2 )
 {
-	NVRAM_HANDLER_CALL(timekeeper_0);
-
 	if (read_or_write)
 		mame_fwrite(file, zpram, zpram_size);
 	else if (file)
@@ -612,7 +603,7 @@ static ADDRESS_MAP_START( zeus2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
 	AM_RANGE(0x9c0000, 0x9c000f) AM_READWRITE(analog_r, analog_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?
-	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(timekeeper_r, timekeeper_w)
+	AM_RANGE(0x9f0000, 0x9f7fff) AM_DEVREADWRITE(M48T35, "m48t35", zeus2_timekeeper_r, zeus2_timekeeper_w)
 	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
 	AM_RANGE(0xa00000, 0xbfffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0xc00000, 0xffffff) AM_ROMBANK(1) AM_REGION("user2", 0)
@@ -1143,7 +1134,7 @@ static MACHINE_DRIVER_START( midzeus2 )
 	MDRV_CPU_PROGRAM_MAP(zeus2_map,0)
 	MDRV_CPU_VBLANK_INT("main", display_irq)
 
-	MDRV_MACHINE_START(midzeus2)
+	MDRV_MACHINE_START(midzeus)
 	MDRV_MACHINE_RESET(midzeus)
 	MDRV_NVRAM_HANDLER(midzeus2)
 
@@ -1157,6 +1148,8 @@ static MACHINE_DRIVER_START( midzeus2 )
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(dcs2_audio_2104)
+
+	MDRV_DEVICE_ADD( "m48t35", M48T35 )
 MACHINE_DRIVER_END
 
 

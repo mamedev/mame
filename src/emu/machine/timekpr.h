@@ -1,29 +1,38 @@
 /*
  * STmicroelectronics TIMEKEEPER SRAM
  *
- * Supports: MK48T08, M48T02 & M48T58
+ * Supports:
+ *           M48T02
+ *           M48T35
+ *           M48T58
+ *           MK48T08
  *
  */
 
 #if !defined( TIMEKPR_H )
 #define TIMEKPR_H ( 1 )
 
-extern void timekeeper_init( running_machine *machine, int chip, int type, UINT8 *data );
+typedef struct _timekeeper_config timekeeper_config;
+struct _timekeeper_config
+{
+	const char *data;
+};
 
-#define MAX_TIMEKEEPER_CHIPS ( 1 )
+#define M48T02 DEVICE_GET_INFO_NAME(m48t02)
+DEVICE_GET_INFO(m48t02);
 
-#define TIMEKEEPER_M48T02 ( 1 )
-#define TIMEKEEPER_M48T35 ( 2 )
-#define TIMEKEEPER_M48T58 ( 3 )
-#define TIMEKEEPER_MK48T08 ( 4 )
+#define M48T35 DEVICE_GET_INFO_NAME(m48t35)
+DEVICE_GET_INFO(m48t35);
 
-/* nvram handlers */
+#define M48T58 DEVICE_GET_INFO_NAME(m48t58)
+DEVICE_GET_INFO(m48t58);
 
-extern NVRAM_HANDLER( timekeeper_0 );
+#define MK48T08 DEVICE_GET_INFO_NAME(mk48t08)
+DEVICE_GET_INFO(mk48t08);
 
 /* memory handlers */
 
-extern READ8_HANDLER( timekeeper_0_r );
-extern WRITE8_HANDLER( timekeeper_0_w );
+WRITE8_DEVICE_HANDLER( timekeeper_w );
+READ8_DEVICE_HANDLER( timekeeper_r );
 
 #endif

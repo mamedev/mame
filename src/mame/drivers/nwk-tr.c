@@ -226,7 +226,6 @@ Thrill Drive 713A13  -       713A14  -
 static UINT8 led_reg0, led_reg1;
 
 static UINT32 *work_ram;
-static UINT8 *backup_ram;
 
 
 static WRITE32_HANDLER( paletteram32_w )
@@ -970,7 +969,7 @@ static ADDRESS_MAP_START( nwktr_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x780c0000, 0x780c0003) AM_READWRITE(cgboard_dsp_comm_r_ppc, cgboard_dsp_comm_w_ppc)
 	AM_RANGE(0x7d000000, 0x7d00ffff) AM_READ(sysreg_r)
 	AM_RANGE(0x7d010000, 0x7d01ffff) AM_WRITE(sysreg_w)
-	AM_RANGE(0x7d020000, 0x7d021fff) AM_READWRITE8(timekeeper_0_r, timekeeper_0_w, 0xffffffff)	/* M48T58Y RTC/NVRAM */
+	AM_RANGE(0x7d020000, 0x7d021fff) AM_DEVREADWRITE8(M48T58, "m48t58", timekeeper_r, timekeeper_w, 0xffffffff)	/* M48T58Y RTC/NVRAM */
 	AM_RANGE(0x7d030000, 0x7d030007) AM_READ(K056800_host_r)
 	AM_RANGE(0x7d030000, 0x7d030007) AM_WRITE(K056800_host_w)
 	AM_RANGE(0x7d030008, 0x7d03000f) AM_WRITE(K056800_host_w)
@@ -1091,6 +1090,11 @@ static MACHINE_RESET( nwktr )
 	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
 }
 
+static const timekeeper_config timekeeper_intf =
+{
+	"m48t58"
+};
+
 static MACHINE_DRIVER_START( nwktr )
 
 	/* basic machine hardware */
@@ -1108,7 +1112,6 @@ static MACHINE_DRIVER_START( nwktr )
 
 	MDRV_MACHINE_START(nwktr)
 	MDRV_MACHINE_RESET(nwktr)
-	MDRV_NVRAM_HANDLER( timekeeper_0 )
 
 	MDRV_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, 2, "main")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 2)
@@ -1133,6 +1136,8 @@ static MACHINE_DRIVER_START( nwktr )
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 
+	MDRV_DEVICE_ADD( "m48t58", M48T58 )
+	MDRV_DEVICE_CONFIG( timekeeper_intf )
 MACHINE_DRIVER_END
 
 /*****************************************************************************/
@@ -1145,14 +1150,13 @@ static void sound_irq_callback(running_machine *machine, int irq)
 		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ2, PULSE_LINE);
 }
 
-static void init_nwktr(running_machine *machine)
+static DRIVER_INIT(nwktr)
 {
 	init_konami_cgboard(1, CGBOARD_TYPE_NWKTR);
 	set_cgboard_texture_bank(0, 5, memory_region(machine, "user5"));
 
 	sharc_dataram = auto_malloc(0x100000);
 	led_reg0 = led_reg1 = 0x7f;
-	timekeeper_init(machine, 0, TIMEKEEPER_M48T58, backup_ram);
 
 	K056800_init(sound_irq_callback);
 	K033906_init();
@@ -1164,118 +1168,6 @@ static void init_nwktr(running_machine *machine)
 	lanc2_init();
 }
 
-static DRIVER_INIT(thrilld)
-{
-	int i;
-	UINT16 checksum;
-
-	backup_ram = auto_malloc(0x2000);
-	memset(backup_ram, 0, 0x2000);
-
-	/* RTC data */
-	backup_ram[0x00] = 0x47;	// 'G'
-	backup_ram[0x01] = 0x43;	// 'C'
-	backup_ram[0x02] = 0x36;	// '6'
-	backup_ram[0x03] = 0x37;	// '7'
-	backup_ram[0x04] = 0x36;	// '6'
-	backup_ram[0x05] = 0x00;	//
-	backup_ram[0x06] = 0x00;	// ?
-	backup_ram[0x07] = 0x00;	// ?
-	backup_ram[0x08] = 0x19;	//
-	backup_ram[0x09] = 0x99;	// 1999
-	backup_ram[0x0a] = 0x4a;	// 'J'
-	backup_ram[0x0b] = 0x41;	// 'A'
-	backup_ram[0x0c] = 0x41;	//
-	backup_ram[0x0d] = 0x00;	//
-
-	checksum = 0;
-	for (i=0; i < 14; i+=2)
-	{
-		checksum += (backup_ram[i] << 8) | (backup_ram[i+1]);
-		checksum &= 0xffff;
-	}
-	checksum = -1 - checksum;
-
-	backup_ram[0x0e] = (checksum >> 8) & 0xff;	// checksum
-	backup_ram[0x0f] = (checksum >> 0) & 0xff;	// checksum
-
-	init_nwktr(machine);
-}
-
-static DRIVER_INIT(racingj)
-{
-	int i;
-	UINT32 checksum;
-
-	backup_ram = auto_malloc(0x2000);
-	memset(backup_ram, 0, 0x2000);
-
-	/* RTC data */
-	backup_ram[0x00] = 0x47;	// 'G'
-	backup_ram[0x01] = 0x6e;	// 'n'
-	backup_ram[0x02] = 0x36;	// '6'
-	backup_ram[0x03] = 0x37;	// '7'
-	backup_ram[0x04] = 0x36;	// '6'
-	backup_ram[0x05] = 0x00;	//
-	backup_ram[0x06] = 0x00;	//
-	backup_ram[0x07] = 0x00;	//
-	backup_ram[0x08] = 0x00;	//
-	backup_ram[0x09] = 0x00;	//
-	backup_ram[0x0a] = 0x4a;	// 'J'
-	backup_ram[0x0b] = 0x41;	// 'A'
-	backup_ram[0x0c] = 0x45;	// 'E'
-	backup_ram[0x0d] = 0x00;	//
-
-	checksum = 0;
-	for (i=0; i < 14; i+=2)
-	{
-		checksum += (backup_ram[i] << 8) | (backup_ram[i+1]);
-		checksum &= 0xffff;
-	}
-	checksum = -1 - checksum;
-	backup_ram[0x0e] = (checksum >> 8) & 0xff;	// checksum
-	backup_ram[0x0f] = (checksum >> 0) & 0xff;	// checksum
-
-	init_nwktr(machine);
-}
-
-static DRIVER_INIT(racingj2)
-{
-	int i;
-	UINT32 checksum;
-
-	backup_ram = auto_malloc(0x2000);
-	memset(backup_ram, 0, 0x2000);
-
-	/* RTC data */
-	backup_ram[0x00] = 0x47;	// 'G'
-	backup_ram[0x01] = 0x6e;	// 'n'
-	backup_ram[0x02] = 0x38;	// '8'
-	backup_ram[0x03] = 0x38;	// '8'
-	backup_ram[0x04] = 0x38;	// '8'
-	backup_ram[0x05] = 0x00;	//
-	backup_ram[0x06] = 0x00;	//
-	backup_ram[0x07] = 0x00;	//
-	backup_ram[0x08] = 0x00;	//
-	backup_ram[0x09] = 0x00;	//
-	backup_ram[0x0a] = 0x4a;	// 'J'
-	backup_ram[0x0b] = 0x41;	// 'A'
-	backup_ram[0x0c] = 0x45;	// 'E'
-	backup_ram[0x0d] = 0x00;	//
-
-	checksum = 0;
-	for (i=0; i < 14; i+=2)
-	{
-		checksum += (backup_ram[i] << 8) | (backup_ram[i+1]);
-		checksum &= 0xffff;
-	}
-	checksum = -1 - checksum;
-	backup_ram[0x0e] = (checksum >> 8) & 0xff;	// checksum
-	backup_ram[0x0f] = (checksum >> 0) & 0xff;	// checksum
-
-	init_nwktr(machine);
-}
-
 
 /*****************************************************************************/
 
@@ -1284,19 +1176,22 @@ ROM_START(racingj)
 	ROM_LOAD16_WORD_SWAP("676nc01.bin", 0x000000, 0x200000, CRC(690346b5) SHA1(157ab6788382ef4f5a8772f08819f54d0856fcc8))
 
 	ROM_REGION32_BE(0x800000, "user2", 0)		/* Data roms */
-		ROM_LOAD32_WORD_SWAP("676a04.bin", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f))
-		ROM_LOAD32_WORD_SWAP("676a05.bin", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5))
+	ROM_LOAD32_WORD_SWAP("676a04.bin", 0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f))
+	ROM_LOAD32_WORD_SWAP("676a05.bin", 0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5))
 
 	ROM_REGION32_BE(0x800000, "user5", 0)	/* CG Board texture roms */
-	    ROM_LOAD32_WORD_SWAP( "676a13.8x",    0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
-        ROM_LOAD32_WORD_SWAP( "676a14.16x",   0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
+	ROM_LOAD32_WORD_SWAP( "676a13.8x",    0x000000, 0x400000, CRC(29077763) SHA1(ee087ca0d41966ca0fd10727055bb1dcd05a0873) )
+	ROM_LOAD32_WORD_SWAP( "676a14.16x",   0x000002, 0x400000, CRC(50a7e3c0) SHA1(7468a66111a3ddf7c043cd400fa175cae5f65632) )
 
 	ROM_REGION(0x80000, "audio", 0)		/* 68k program roms */
-        ROM_LOAD16_WORD_SWAP( "676gna08.7s", 0x000000, 0x080000, CRC(8973f6f2) SHA1(f5648a7e0205f7e979ccacbb52936809ce14a184) )
+	ROM_LOAD16_WORD_SWAP( "676gna08.7s", 0x000000, 0x080000, CRC(8973f6f2) SHA1(f5648a7e0205f7e979ccacbb52936809ce14a184) )
 
 	ROM_REGION(0x1000000, "rf", 0) 		/* other roms (textures?) */
-        ROM_LOAD( "676a09.16p",   0x000000, 0x400000, CRC(f85c8dc6) SHA1(8b302c80be309b5cc68b75945fcd7b87a56a4c9b) )
-        ROM_LOAD( "676a10.14p",   0x400000, 0x400000, CRC(7b5b7828) SHA1(aec224d62e4b1e8fdb929d7947ce70d84ba676cf) )
+	ROM_LOAD( "676a09.16p",   0x000000, 0x400000, CRC(f85c8dc6) SHA1(8b302c80be309b5cc68b75945fcd7b87a56a4c9b) )
+	ROM_LOAD( "676a10.14p",   0x400000, 0x400000, CRC(7b5b7828) SHA1(aec224d62e4b1e8fdb929d7947ce70d84ba676cf) )
+
+	ROM_REGION(0x2000, "m48t58",0)
+	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(47e1628c) SHA1(7c42d06ae2f2cd24d083890f333552cbf4f1d3c9) ) 
 ROM_END
 
 ROM_START(racingj2)
@@ -1304,20 +1199,23 @@ ROM_START(racingj2)
 	ROM_LOAD16_WORD_SWAP("888a01.27p", 0x000000, 0x200000, CRC(d077890a) SHA1(08b252324cf46fbcdb95e8f9312287920cd87c5d))
 
 	ROM_REGION32_BE(0x800000, "user2", 0)		/* Data roms */
-		ROM_LOAD32_WORD_SWAP( "676a04.bin",	0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f))
-		ROM_LOAD32_WORD_SWAP( "676a05.bin",	0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5))
+	ROM_LOAD32_WORD_SWAP( "676a04.bin",	0x000000, 0x200000, CRC(d7808cb6) SHA1(0668fae5bb94cc120fe196d4b18200f7b512317f))
+	ROM_LOAD32_WORD_SWAP( "676a05.bin",	0x000002, 0x200000, CRC(fb4de1ad) SHA1(f6aa4eb1b5d22901a2aaf899ed3237a9dfdc55b5))
 	ROM_LOAD32_WORD_SWAP( "888a06.12t",	0x400000, 0x200000, CRC(00cbec4d) SHA1(1ce7807d86e90edbf4eecba462a27c725f5ad862))
 
 	ROM_REGION32_BE(0x800000, "user5", 0)	/* CG Board Texture roms */
-	    ROM_LOAD32_WORD_SWAP( "888a13.8x",    0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
-        ROM_LOAD32_WORD_SWAP( "888a14.16x",   0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
+	ROM_LOAD32_WORD_SWAP( "888a13.8x",    0x000000, 0x400000, CRC(2292f530) SHA1(0f4d1332708fd5366a065e0a928cc9610558b42d) )
+	ROM_LOAD32_WORD_SWAP( "888a14.16x",   0x000002, 0x400000, CRC(6a834a26) SHA1(d1fbd7ae6afd05f0edac4efde12a5a45aa2bc7df) )
 
 	ROM_REGION(0x80000, "audio", 0)		/* 68k program roms */
-        ROM_LOAD16_WORD_SWAP( "888a08.7s",    0x000000, 0x080000, CRC(55fbea65) SHA1(ad953f758181731efccadcabc4326e6634c359e8) )
+	ROM_LOAD16_WORD_SWAP( "888a08.7s",    0x000000, 0x080000, CRC(55fbea65) SHA1(ad953f758181731efccadcabc4326e6634c359e8) )
 
 	ROM_REGION(0x1000000, "rf", 0) 		/* PCM sample roms */
-        ROM_LOAD( "888a09.16p",   0x000000, 0x400000, CRC(11e2fed2) SHA1(24b8a367b59fedb62c56f066342f2fa87b135fc5) )
-        ROM_LOAD( "888a10.14p",   0x400000, 0x400000, CRC(328ce610) SHA1(dbbc779a1890c53298c0db129d496df048929496) )
+	ROM_LOAD( "888a09.16p",   0x000000, 0x400000, CRC(11e2fed2) SHA1(24b8a367b59fedb62c56f066342f2fa87b135fc5) )
+	ROM_LOAD( "888a10.14p",   0x400000, 0x400000, CRC(328ce610) SHA1(dbbc779a1890c53298c0db129d496df048929496) )
+
+	ROM_REGION(0x2000, "m48t58",0)
+	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(f691f5ab) SHA1(e81f652c5caa2caa8bd1c6d6db488d849bda058e) ) 
 ROM_END
 
 ROM_START(thrilld)
@@ -1325,23 +1223,26 @@ ROM_START(thrilld)
 	ROM_LOAD16_WORD_SWAP("713be01.27p", 0x000000, 0x200000, CRC(d84a7723) SHA1(f4e9e08591b7e5e8419266dbe744d56a185384ed))
 
 	ROM_REGION32_BE(0x800000, "user2", 0)		/* Data roms */
-		ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a))
-		ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69))
+	ROM_LOAD32_WORD_SWAP("713a04.16t", 0x000000, 0x200000, CRC(c994aaa8) SHA1(d82b9930a11e5384ad583684a27c95beec03cd5a))
+	ROM_LOAD32_WORD_SWAP("713a05.14t", 0x000002, 0x200000, CRC(6f1e6802) SHA1(91f8a170327e9b4ee6a64aee0c106b981a317e69))
 
 	ROM_REGION32_BE(0x800000, "user5", 0)	/* CG Board Texture roms */
-        ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
-        ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
+	ROM_LOAD32_WORD_SWAP( "713a13.8x",    0x000000, 0x400000, CRC(b795c66b) SHA1(6e50de0d5cc444ffaa0fec7ada8c07f643374bb2) )
+	ROM_LOAD32_WORD_SWAP( "713a14.16x",   0x000002, 0x400000, CRC(5275a629) SHA1(16fadef06975f0f3625cac8f84e2e77ed7d75e15) )
 
 	ROM_REGION(0x80000, "audio", 0)		/* 68k program roms */
-        ROM_LOAD16_WORD_SWAP( "713a08.7s",    0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
+	ROM_LOAD16_WORD_SWAP( "713a08.7s",    0x000000, 0x080000, CRC(6a72a825) SHA1(abeac99c5343efacabcb0cdff6d34f9f967024db) )
 
 	ROM_REGION(0x1000000, "rf", 0) 		/* PCM sample roms */
-        ROM_LOAD( "713a09.16p",   0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
-        ROM_LOAD( "713a10.14p",   0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
+	ROM_LOAD( "713a09.16p",   0x000000, 0x400000, CRC(058f250a) SHA1(63b8e60004ec49009633e86b4992c00083def9a8) )
+	ROM_LOAD( "713a10.14p",   0x400000, 0x400000, CRC(27f9833e) SHA1(1540f00d2571ecb81b914c553682b67fca94bbbd) )
+
+	ROM_REGION(0x2000, "m48t58",0)
+	ROM_LOAD( "m48t58y-70pc1", 0x000000, 0x002000, CRC(5d8fbcb2) SHA1(74ad91544d2a200cf599a565005476623075e7d6) ) 
 ROM_END
 
 /*****************************************************************************/
 
-GAME( 1998, racingj,	0,		nwktr,	nwktr,	racingj,	ROT0,	"Konami",	"Racing Jam", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1999, racingj2,	racingj,nwktr,	nwktr,	racingj2,	ROT0,	"Konami",	"Racing Jam: Chapter 2", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1998, thrilld,	0,		nwktr,	nwktr,	thrilld,	ROT0,	"Konami",	"Thrill Drive", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
+GAME( 1998, racingj,    0,       nwktr, nwktr, nwktr, ROT0, "Konami", "Racing Jam", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1999, racingj2,   racingj, nwktr, nwktr, nwktr, ROT0, "Konami", "Racing Jam: Chapter 2", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1998, thrilld,    0,       nwktr, nwktr, nwktr, ROT0, "Konami", "Thrill Drive", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )

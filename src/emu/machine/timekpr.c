@@ -12,7 +12,7 @@
 #include "driver.h"
 #include "machine/timekpr.h"
 
-struct timekeeper_chip
+typedef struct
 {
 	UINT8 control;
 	UINT8 seconds;
@@ -24,7 +24,8 @@ struct timekeeper_chip
 	UINT8 year;
 	UINT8 century;
 	UINT8 *data;
-	int type;
+	UINT8 *default_data;
+	const device_config *device;
 	int size;
 	int offset_control;
 	int offset_seconds;
@@ -36,9 +37,7 @@ struct timekeeper_chip
 	int offset_year;
 	int offset_century;
 	int offset_flags;
-};
-
-static struct timekeeper_chip timekeeper[ MAX_TIMEKEEPER_CHIPS ];
+} timekeeper_state;
 
 #define MASK_SECONDS ( 0x7f )
 #define MASK_MINUTES ( 0x7f )
@@ -106,7 +105,7 @@ static void counter_to_ram( UINT8 *data, int offset, int counter )
 	}
 }
 
-static void counters_to_ram( struct timekeeper_chip *c )
+static void counters_to_ram( timekeeper_state *c )
 {
 	counter_to_ram( c->data, c->offset_control, c->control );
 	counter_to_ram( c->data, c->offset_seconds, c->seconds );
@@ -128,10 +127,8 @@ static int counter_from_ram( UINT8 *data, int offset )
 	return 0;
 }
 
-static void counters_from_ram( int chip )
+static void counters_from_ram( timekeeper_state *c )
 {
-	struct timekeeper_chip *c = &timekeeper[ chip ];
-
 	c->control = counter_from_ram( c->data, c->offset_control );
 	c->seconds = counter_from_ram( c->data, c->offset_seconds );
 	c->minutes = counter_from_ram( c->data, c->offset_minutes );
@@ -145,7 +142,7 @@ static void counters_from_ram( int chip )
 
 static TIMER_CALLBACK( timekeeper_tick )
 {
-	struct timekeeper_chip *c = ptr;
+	timekeeper_state *c = (timekeeper_state *) ptr;
 
 	int carry;
 
@@ -203,15 +200,14 @@ static TIMER_CALLBACK( timekeeper_tick )
 	if( carry )
 	{
 		carry = inc_bcd( &c->century, MASK_CENTURY, 0x00, 0x99 );
-		switch( c->type )
+
+		if( c->device->type == M48T35 ||
+			c->device->type == M48T58 )
 		{
-		case TIMEKEEPER_M48T35:
-		case TIMEKEEPER_M48T58:
 			if( ( c->day & DAY_CEB ) != 0 )
 			{
 				c->day ^= DAY_CB;
 			}
-			break;
 		}
 	}
 
@@ -221,87 +217,90 @@ static TIMER_CALLBACK( timekeeper_tick )
 	}
 }
 
-void timekeeper_init( running_machine *machine, int chip, int type, UINT8 *data )
+/*-------------------------------------------------
+    get_safe_token - makes sure that the passed
+    in device is the right type
+-------------------------------------------------*/
+
+INLINE timekeeper_state *get_safe_token(const device_config *device)
 {
+	assert(device != NULL);
+	assert(device->token != NULL);
+ 	assert((device->type == M48T02) ||
+		   (device->type == M48T35) ||
+		   (device->type == M48T58) ||
+		   (device->type == MK48T08));
+
+	return (timekeeper_state *)device->token;
+}
+
+/* memory handlers */
+
+WRITE8_DEVICE_HANDLER( timekeeper_w )
+{
+	timekeeper_state *c = get_safe_token(device);
+
+	if( offset == c->offset_control )
+	{
+		if( ( c->control & CONTROL_W ) != 0 &&
+			( data & CONTROL_W ) == 0 )
+		{
+			counters_from_ram( c );
+		}
+		c->control = data;
+	}
+	else if( offset == c->offset_day )
+	{
+		if( c->device->type == M48T35 ||
+			c->device->type == M48T58 )
+		{
+			c->day = ( c->day & ~DAY_CEB ) | ( data & DAY_CEB );
+		}
+	}
+	else if( offset == c->offset_date && c->device->type == M48T58 )
+	{
+		data &= ~DATE_BL;
+	}
+	else if( offset == c->offset_flags && c->device->type == MK48T08 )
+	{
+		data &= ~FLAGS_BL;
+	}
+
+  logerror( "%08x: timekeeper_write( %s, %04x, %02x )\n", activecpu_get_pc(), c->device->token, offset, data );
+	c->data[ offset ] = data;
+}
+
+READ8_DEVICE_HANDLER( timekeeper_r )
+{
+	timekeeper_state *c = get_safe_token(device);
+	UINT8 data = c->data[ offset ];
+  logerror( "%08x: timekeeper_read( %s, %04x ) %02x\n", activecpu_get_pc(), c->device->token, offset, data );
+	return data;
+}
+
+/*-------------------------------------------------
+    device start callback
+-------------------------------------------------*/
+
+static DEVICE_START(timekeeper)
+{
+	timekeeper_state *c = get_safe_token(device);
+	const timekeeper_config *config;
+	char unique_tag[50];
 	emu_timer *timer;
 	attotime duration;
 	mame_system_time systime;
-	struct timekeeper_chip *c;
 
-	if( chip >= MAX_TIMEKEEPER_CHIPS )
-	{
-		logerror( "timekeeper_init( %d ) invalid chip\n", chip );
-		return;
-	}
-	c = &timekeeper[ chip ];
+	/* validate some basic stuff */
+	assert(device != NULL);
+//  assert(device->static_config != NULL);
+	assert(device->inline_config == NULL);
+	assert(device->machine != NULL);
+	assert(device->machine->config != NULL);
 
-	c->type = type;
+	mame_get_base_datetime(device->machine, &systime);
 
-	switch( c->type )
-	{
-	case TIMEKEEPER_M48T02:
-		c->offset_control = 0x7f8;
-		c->offset_seconds = 0x7f9;
-		c->offset_minutes = 0x7fa;
-		c->offset_hours = 0x7fb;
-		c->offset_day = 0x7fc;
-		c->offset_date = 0x7fd;
-		c->offset_month = 0x7fe;
-		c->offset_year = 0x7ff;
-		c->offset_century = -1;
-		c->offset_flags = -1;
-		c->size = 0x800;
-		break;
-	case TIMEKEEPER_M48T35:
-		c->offset_control = 0x7ff8;
-		c->offset_seconds = 0x7ff9;
-		c->offset_minutes = 0x7ffa;
-		c->offset_hours = 0x7ffb;
-		c->offset_day = 0x7ffc;
-		c->offset_date = 0x7ffd;
-		c->offset_month = 0x7ffe;
-		c->offset_year = 0x7fff;
-		c->offset_century = -1;
-		c->offset_flags = -1;
-		c->size = 0x8000;
-		break;
-	case TIMEKEEPER_M48T58:
-		c->offset_control = 0x1ff8;
-		c->offset_seconds = 0x1ff9;
-		c->offset_minutes = 0x1ffa;
-		c->offset_hours = 0x1ffb;
-		c->offset_day = 0x1ffc;
-		c->offset_date = 0x1ffd;
-		c->offset_month = 0x1ffe;
-		c->offset_year = 0x1fff;
-		c->offset_century = -1;
-		c->offset_flags = -1;
-		c->size = 0x2000;
-		break;
-	case TIMEKEEPER_MK48T08:
-		c->offset_control = 0x1ff8;
-		c->offset_seconds = 0x1ff9;
-		c->offset_minutes = 0x1ffa;
-		c->offset_hours = 0x1ffb;
-		c->offset_day = 0x1ffc;
-		c->offset_date = 0x1ffd;
-		c->offset_month = 0x1ffe;
-		c->offset_year = 0x1fff;
-		c->offset_century = 0x1ff1;
-		c->offset_flags = 0x1ff0;
-		c->size = 0x2000;
-		break;
-	}
-
-	if( data == NULL )
-	{
-		data = auto_malloc( c->size );
-		memset( data, 0xff, c->size );
-	}
-	c->data = data;
-
-	mame_get_base_datetime(machine, &systime);
-
+	c->device = device;
 	c->control = 0;
 	c->seconds = make_bcd( systime.local_time.second );
 	c->minutes = make_bcd( systime.local_time.minute );
@@ -311,32 +310,124 @@ void timekeeper_init( running_machine *machine, int chip, int type, UINT8 *data 
 	c->month = make_bcd( systime.local_time.month + 1 );
 	c->year = make_bcd( systime.local_time.year % 100 );
 	c->century = make_bcd( systime.local_time.year / 100 );
+	c->data = auto_malloc( c->size );
 
-	state_save_register_item( "timekeeper", chip, c->control );
-	state_save_register_item( "timekeeper", chip, c->seconds );
-	state_save_register_item( "timekeeper", chip, c->minutes );
-	state_save_register_item( "timekeeper", chip, c->hours );
-	state_save_register_item( "timekeeper", chip, c->day );
-	state_save_register_item( "timekeeper", chip, c->date );
-	state_save_register_item( "timekeeper", chip, c->month );
-	state_save_register_item( "timekeeper", chip, c->year );
-	state_save_register_item( "timekeeper", chip, c->century );
-	state_save_register_item_pointer( "timekeeper", chip, c->data, c->size );
+	config = device->static_config;
+	if( config != NULL && config->data != NULL )
+	{
+		c->default_data = memory_region( device->machine, config->data );
+		if( c->default_data != NULL )
+		{
+			assert( memory_region_length( device->machine, config->data ) == c->size );
+		}
+	}
+
+	assert( strlen( device->tag ) < 30 );
+	state_save_combine_module_and_tag( unique_tag, "timekeeper", device->tag );
+
+	state_save_register_item( unique_tag, 0, c->control );
+	state_save_register_item( unique_tag, 0, c->seconds );
+	state_save_register_item( unique_tag, 0, c->minutes );
+	state_save_register_item( unique_tag, 0, c->hours );
+	state_save_register_item( unique_tag, 0, c->day );
+	state_save_register_item( unique_tag, 0, c->date );
+	state_save_register_item( unique_tag, 0, c->month );
+	state_save_register_item( unique_tag, 0, c->year );
+	state_save_register_item( unique_tag, 0, c->century );
+	state_save_register_item_pointer( unique_tag, 0, c->data, c->size );
 
 	timer = timer_alloc( timekeeper_tick, c );
 	duration = ATTOTIME_IN_SEC(1);
 	timer_adjust_periodic( timer, duration, 0, duration );
 }
 
-static void timekeeper_nvram( int chip, mame_file *file, int read_or_write )
+static DEVICE_START(m48t02)
 {
-	struct timekeeper_chip *c;
-	if( chip >= MAX_TIMEKEEPER_CHIPS )
-	{
-		logerror( "timekeeper_nvram( %d ) invalid chip\n", chip );
-		return;
-	}
-	c = &timekeeper[ chip ];
+	timekeeper_state *c = get_safe_token(device);
+
+	c->offset_control = 0x7f8;
+	c->offset_seconds = 0x7f9;
+	c->offset_minutes = 0x7fa;
+	c->offset_hours = 0x7fb;
+	c->offset_day = 0x7fc;
+	c->offset_date = 0x7fd;
+	c->offset_month = 0x7fe;
+	c->offset_year = 0x7ff;
+	c->offset_century = -1;
+	c->offset_flags = -1;
+	c->size = 0x800;
+
+	DEVICE_START_CALL( timekeeper );
+}
+
+static DEVICE_START(m48t35)
+{
+	timekeeper_state *c = get_safe_token(device);
+
+	c->offset_control = 0x7ff8;
+	c->offset_seconds = 0x7ff9;
+	c->offset_minutes = 0x7ffa;
+	c->offset_hours = 0x7ffb;
+	c->offset_day = 0x7ffc;
+	c->offset_date = 0x7ffd;
+	c->offset_month = 0x7ffe;
+	c->offset_year = 0x7fff;
+	c->offset_century = -1;
+	c->offset_flags = -1;
+	c->size = 0x8000;
+
+	DEVICE_START_CALL( timekeeper );
+}
+
+static DEVICE_START(m48t58)
+{
+	timekeeper_state *c = get_safe_token(device);
+
+	c->offset_control = 0x1ff8;
+	c->offset_seconds = 0x1ff9;
+	c->offset_minutes = 0x1ffa;
+	c->offset_hours = 0x1ffb;
+	c->offset_day = 0x1ffc;
+	c->offset_date = 0x1ffd;
+	c->offset_month = 0x1ffe;
+	c->offset_year = 0x1fff;
+	c->offset_century = -1;
+	c->offset_flags = -1;
+	c->size = 0x2000;
+
+	DEVICE_START_CALL( timekeeper );
+}
+
+static DEVICE_START(mk48t08)
+{
+	timekeeper_state *c = get_safe_token(device);
+
+	c->offset_control = 0x1ff8;
+	c->offset_seconds = 0x1ff9;
+	c->offset_minutes = 0x1ffa;
+	c->offset_hours = 0x1ffb;
+	c->offset_day = 0x1ffc;
+	c->offset_date = 0x1ffd;
+	c->offset_month = 0x1ffe;
+	c->offset_year = 0x1fff;
+	c->offset_century = 0x1ff1;
+	c->offset_flags = 0x1ff0;
+	c->size = 0x2000;
+
+	DEVICE_START_CALL( timekeeper );
+}
+
+/*-------------------------------------------------
+    device reset callback
+-------------------------------------------------*/
+
+static DEVICE_RESET(timekeeper)
+{
+}
+
+static DEVICE_NVRAM(timekeeper)
+{
+	timekeeper_state *c = get_safe_token(device);
 
 	if( read_or_write )
 	{
@@ -348,78 +439,115 @@ static void timekeeper_nvram( int chip, mame_file *file, int read_or_write )
 		{
 			mame_fread( file, c->data, c->size );
 		}
+		else
+		{
+			if( c->default_data != NULL )
+			{
+				memcpy( c->data, c->default_data, c->size );
+			}
+			else
+			{
+				memset( c->data, 0xff, c->size );
+			}
+		}
+
 		counters_to_ram( c );
 	}
 }
 
-NVRAM_HANDLER( timekeeper_0 ) { timekeeper_nvram( 0, file, read_or_write ); }
+/*-------------------------------------------------
+    device set info callback
+-------------------------------------------------*/
 
-static UINT8 timekeeper_read( UINT32 chip, offs_t offset )
+static DEVICE_SET_INFO(timekeeper)
 {
-	UINT8 data;
-	struct timekeeper_chip *c;
-	if( chip >= MAX_TIMEKEEPER_CHIPS )
+	switch (state)
 	{
-		logerror( "%08x: timekeeper_read( %d, %04x ) chip out of range\n", activecpu_get_pc(), chip, offset );
-		return 0;
+		/* no parameters to set */
 	}
-	c = &timekeeper[ chip ];
-
-	data = c->data[ offset ];
-//  logerror( "%08x: timekeeper_read( %d, %04x ) %02x\n", activecpu_get_pc(), chip, offset, data );
-	return data;
 }
 
-static void timekeeper_write( UINT32 chip, offs_t offset, UINT8 data )
+/*-------------------------------------------------
+    device get info callback
+-------------------------------------------------*/
+
+static DEVICE_GET_INFO(timekeeper)
 {
-	struct timekeeper_chip *c;
-	if( chip >= MAX_TIMEKEEPER_CHIPS )
+	switch (state)
 	{
-		logerror( "%08x: timekeeper_write( %d, %04x, %02x ) chip out of range\n", activecpu_get_pc(), chip, offset, data );
-		return;
-	}
-	c = &timekeeper[ chip ];
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(timekeeper_state); break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0; break; // sizeof(timekeeper_config)
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL; break;
 
-	if( offset == c->offset_control )
-	{
-		if( ( c->control & CONTROL_W ) != 0 &&
-			( data & CONTROL_W ) == 0 )
-		{
-			counters_from_ram( chip );
-		}
-		c->control = data;
-	}
-	else if( offset == c->offset_day )
-	{
-		switch( c->type )
-		{
-		case TIMEKEEPER_M48T35:
-		case TIMEKEEPER_M48T58:
-			c->day = ( c->day & ~DAY_CEB ) | ( data & DAY_CEB );
-			break;
-		}
-	}
-	else if( c->type == TIMEKEEPER_M48T58 && offset == c->offset_date )
-	{
-		data &= ~DATE_BL;
-	}
-	else if( c->type == TIMEKEEPER_MK48T08 && offset == c->offset_flags )
-	{
-		data &= ~FLAGS_BL;
-	}
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(timekeeper); break;
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(timekeeper); break;
+		case DEVINFO_FCT_STOP:					/* nothing */ break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(timekeeper); break;
+		case DEVINFO_FCT_NVRAM:					info->nvram = DEVICE_NVRAM_NAME(timekeeper); break;
 
-//  logerror( "%08x: timekeeper_write( %d, %04x, %02x )\n", activecpu_get_pc(), chip, offset, data );
-	c->data[ offset ] = data;
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:					info->s = "Timekeeper"; break;
+		case DEVINFO_STR_FAMILY:				info->s = "EEPROM"; break;
+		case DEVINFO_STR_VERSION:				info->s = "1.0"; break;
+		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__; break;
+		case DEVINFO_STR_CREDITS:				info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+	}
 }
 
-/* memory handlers */
-
-READ8_HANDLER( timekeeper_0_r )
+DEVICE_GET_INFO( m48t02 )
 {
-	return timekeeper_read(0, offset);
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "M48T02";					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(m48t02);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(timekeeper);				break;
+	}
 }
 
-WRITE8_HANDLER( timekeeper_0_w )
+DEVICE_GET_INFO( m48t35 )
 {
-	timekeeper_write(0, offset, data);
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "M48T35";					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(m48t35);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(timekeeper);				break;
+	}
+}
+
+DEVICE_GET_INFO( m48t58 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "M48T58";					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(m48t58);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(timekeeper);				break;
+	}
+}
+
+DEVICE_GET_INFO( mk48t08 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "MK48T08";					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mk48t08);	break;
+
+		default: 										DEVICE_GET_INFO_CALL(timekeeper);				break;
+	}
 }

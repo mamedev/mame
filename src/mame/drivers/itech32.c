@@ -219,7 +219,7 @@ Notes:
 #include "itech32.h"
 #include "sound/es5506.h"
 #include "machine/timekpr.h"
-#include "memconv.h"
+#include "devconv.h"
 
 
 #define FULL_LOGGING				0
@@ -766,14 +766,14 @@ static WRITE32_HANDLER( int1_ack32_w )
 	int1_ack_w(machine, offset, data, mem_mask);
 }
 
-static WRITE32_HANDLER( timekeeper_0_32be_w )
+static WRITE32_DEVICE_HANDLER( timekeeper_32be_w )
 {
-	write32be_with_write8_handler( timekeeper_0_w, machine, offset, data, mem_mask );
+	write32be_with_write8_device_handler( timekeeper_w, device, offset, data, mem_mask );
 }
 
-static READ32_HANDLER( timekeeper_0_32be_r )
+static READ32_DEVICE_HANDLER( timekeeper_32be_r )
 {
-	return read32be_with_read8_handler( timekeeper_0_r, machine, offset, mem_mask );
+	return read32be_with_read8_device_handler( timekeeper_r, device, offset, mem_mask );
 }
 
 
@@ -818,14 +818,6 @@ static NVRAM_HANDLER( itech020 )
 			((UINT8 *)nvram)[i] = mame_rand(machine);
 	}
 }
-
-
-static NVRAM_HANDLER( tournament )
-{
-	NVRAM_HANDLER_CALL(itech020);
-	NVRAM_HANDLER_CALL(timekeeper_0);
-}
-
 
 
 /*************************************
@@ -1699,7 +1691,7 @@ static MACHINE_DRIVER_START( tourny )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(sftm)
 
-	MDRV_NVRAM_HANDLER( tournament ) /* Make Tournament sets load/store the Timekeeper info */
+	MDRV_DEVICE_ADD( "m48t02", M48T02 )
 MACHINE_DRIVER_END
 
 
@@ -3892,13 +3884,18 @@ static DRIVER_INIT( wcbowln )	/* PIC 16C54 labeled as ITBWL-3 */
 	init_shuffle_bowl_common(machine, 0x1116);
 }
 
+static void install_timekeeper(running_machine *machine)
+{
+	const device_config *device = device_list_find_by_tag(machine->config->devicelist, M48T02, "m48t02");
+	memory_install_readwrite32_device_handler(device, 0, ADDRESS_SPACE_PROGRAM, 0x681000, 0x6817ff, 0, 0, timekeeper_32be_r, timekeeper_32be_w);
+}
+
 static DRIVER_INIT( wcbowlt )	/* PIC 16C54 labeled as ITBWL-3 */
 {
 	/* Tournament Version, Same protection memory address as WCB Deluxe, but uses the standard WCB pic ITBWL-3 */
 	init_shuffle_bowl_common(machine, 0x111a);
 
-	timekeeper_init( machine, 0, TIMEKEEPER_M48T02, NULL );
-	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x681000, 0x6817ff, 0, 0, timekeeper_0_32be_r, timekeeper_0_32be_w);
+	install_timekeeper(machine);
 }
 
 static void init_gt_common(running_machine *machine)
@@ -3946,8 +3943,8 @@ static DRIVER_INIT( aamat )
         Tournament Version - So install needed handler for the TimeKeeper ram
     */
 	DRIVER_INIT_CALL(aama);
-	timekeeper_init( machine, 0, TIMEKEEPER_M48T02, NULL );
-	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x681000, 0x6817ff, 0, 0, timekeeper_0_32be_r, timekeeper_0_32be_w);
+
+	install_timekeeper(machine);
 }
 
 
