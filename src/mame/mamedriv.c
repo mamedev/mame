@@ -8134,6 +8134,7 @@ Other Sun games
 	DRIVER( tetriunk )
 	DRIVER( smstrv )	/* (c) 1984 SMS MFG CORP */
 	DRIVER( skylncr )	/* (c) 1995 Bordun International */
+	DRIVER( madzoo )	/* (c) 1995 Bordun International */
 	DRIVER( livequiz )	/* (c) 1999 Andamiro */
 	DRIVER( cowrace )	/* (c) 19?? unknown */
 	DRIVER( mjsiyoub )	/* (c) 1986 Visco */
