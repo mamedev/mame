@@ -1062,7 +1062,7 @@ static void mcs48_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_MAX_CYCLES:							info->i = 3;							break;
 
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;							break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: /*info->i = 10 or 11 or 12;*/			break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 12;							break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;							break;
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 8;							break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	/*info->i = 6 or 7;*/					break;
@@ -1156,7 +1156,6 @@ void i8035_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 12;										break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = i8035_init;							break;
@@ -1171,7 +1170,6 @@ void i8041_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 10;										break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
@@ -1187,7 +1185,6 @@ void i8048_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 10;										break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
@@ -1203,7 +1200,6 @@ void i8648_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 10;										break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
@@ -1219,7 +1215,6 @@ void i8748_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 10;										break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
@@ -1235,7 +1230,6 @@ void mb8884_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 12;										break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = i8035_init;							break;
@@ -1250,7 +1244,6 @@ void n7751_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 10;										break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
@@ -1268,7 +1261,6 @@ void i8039_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 12;										break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 7;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = i8039_init;							break;
@@ -1283,7 +1275,6 @@ void i8049_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 11;										break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 7;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_11bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
@@ -1299,7 +1290,6 @@ void i8749_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 11;										break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 7;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_11bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
@@ -1315,7 +1305,6 @@ void m58715_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: 		info->i = 12;										break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 7;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_11bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
