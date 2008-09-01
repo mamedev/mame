@@ -186,11 +186,8 @@ static ADDRESS_MAP_START( i8039_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8039_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( i8039_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch2_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( i8039_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(dac_0_data_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
@@ -393,7 +390,7 @@ static MACHINE_DRIVER_START( pandoras )
 
 	MDRV_CPU_ADD("mcu", I8039,14318000/2)
 	MDRV_CPU_PROGRAM_MAP(i8039_readmem,i8039_writemem)
-	MDRV_CPU_IO_MAP(i8039_readport,i8039_writeport)
+	MDRV_CPU_IO_MAP(i8039_io_map,0)
 
 	MDRV_INTERLEAVE(50)	/* slices per frame */
 
@@ -466,3 +463,4 @@ ROM_END
 
 
 GAME( 1984, pandoras, 0, pandoras, pandoras, 0, ROT90, "Konami/Interlogic", "Pandora's Palace", 0 )
+

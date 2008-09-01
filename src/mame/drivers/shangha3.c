@@ -193,22 +193,16 @@ static ADDRESS_MAP_START( heberpop_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( heberpop_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(ym3438_status_port_0_a_r)
-	AM_RANGE(0x80, 0x80) AM_READ(okim6295_status_0_r)
-	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( heberpop_sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( heberpop_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym3438_control_port_0_a_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(ym3438_status_port_0_a_r, ym3438_control_port_0_a_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ym3438_data_port_0_a_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(ym3438_control_port_0_b_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(ym3438_data_port_0_b_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( shangha3 )
@@ -542,11 +536,10 @@ static MACHINE_DRIVER_START( heberpop )
 
 	MDRV_CPU_ADD("audio", Z80, 6000000)	/* 6 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(heberpop_sound_readmem,heberpop_sound_writemem)
-	MDRV_CPU_IO_MAP(heberpop_sound_readport,heberpop_sound_writeport)
-								/* NMI triggered by YM3438 */
+	MDRV_CPU_IO_MAP(heberpop_sound_io_map,0)	/* NMI triggered by YM3438 */
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS )
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -584,8 +577,7 @@ static MACHINE_DRIVER_START( blocken )
 
 	MDRV_CPU_ADD("audio", Z80, 6000000)	/* 6 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(heberpop_sound_readmem,heberpop_sound_writemem)
-	MDRV_CPU_IO_MAP(heberpop_sound_readport,heberpop_sound_writeport)
-								/* NMI triggered by YM3438 */
+	MDRV_CPU_IO_MAP(heberpop_sound_io_map,0)	/* NMI triggered by YM3438 */
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
@@ -690,3 +682,4 @@ static DRIVER_INIT( heberpop )
 GAME( 1993, shangha3, 0, shangha3, shangha3, shangha3, ROT0, "Sunsoft", "Shanghai III (Japan)", 0 )
 GAME( 1994, heberpop, 0, heberpop, heberpop, heberpop, ROT0, "Sunsoft / Atlus", "Hebereke no Popoon (Japan)", 0 )
 GAME( 1994, blocken,  0, blocken,  blocken,  heberpop, ROT0, "KID / Visco", "Blocken (Japan)", 0 )
+

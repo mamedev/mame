@@ -225,12 +225,7 @@ static ADDRESS_MAP_START( magmax_soundwritemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x67ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magmax_soundreadport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x06, 0x06) AM_READ(magmax_sound_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( magmax_soundwriteport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( magmax_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
@@ -238,6 +233,7 @@ static ADDRESS_MAP_START( magmax_soundwriteport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_WRITE(ay8910_write_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(ay8910_control_port_2_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(ay8910_write_port_2_w)
+	AM_RANGE(0x06, 0x06) AM_READ(magmax_sound_r)
 ADDRESS_MAP_END
 
 
@@ -362,7 +358,7 @@ static MACHINE_DRIVER_START( magmax )
 
 	MDRV_CPU_ADD("audio", Z80,XTAL_20MHz/8) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(magmax_soundreadmem,magmax_soundwritemem)
-	MDRV_CPU_IO_MAP(magmax_soundreadport,magmax_soundwriteport)
+	MDRV_CPU_IO_MAP(magmax_sound_io_map,0)
 
 	MDRV_INTERLEAVE(10)
 
@@ -448,3 +444,4 @@ ROM_END
 
 
 GAME( 1985, magmax, 0, magmax, magmax, 0, ROT0, "Nichibutsu", "Mag Max", GAME_SUPPORTS_SAVE )
+

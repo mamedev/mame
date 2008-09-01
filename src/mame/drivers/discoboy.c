@@ -303,29 +303,20 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
+
 static READ8_HANDLER( discoboy_port_06_r )
 {
 	return 0x00;
 }
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSWA") AM_WRITE(discoboy_port_00_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(discoboy_port_01_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("P1")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2")
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2") AM_WRITE(discoboy_port_03_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSWB")
-
-	AM_RANGE(0x06, 0x06) AM_READ(discoboy_port_06_r) // ???
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(discoboy_port_00_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(discoboy_port_01_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(discoboy_port_03_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(discoboy_port_06_w) // ?? unk
-
+	AM_RANGE(0x06, 0x06) AM_READWRITE(discoboy_port_06_r, discoboy_port_06_w) // ???
 	AM_RANGE(0x07, 0x07) AM_WRITE(rambank_select_w) // 0x20 is palette bank bit.. others?
 ADDRESS_MAP_END
 
@@ -341,8 +332,6 @@ static void splash_msm5205_int(running_machine *machine, int data)
 //  adpcm_data = (adpcm_data << 4) & 0xf0;
 }
 
-
-
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0xf000, 0xf7ff) AM_READ(SMH_RAM)
@@ -355,15 +344,6 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xec00, 0xec00) AM_WRITE(ym3812_control_port_0_w)
 	AM_RANGE(0xec01, 0xec01) AM_WRITE(ym3812_write_port_0_w)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( discoboy )
@@ -481,12 +461,12 @@ static MACHINE_DRIVER_START( discoboy )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80,12000000/2)		 /* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80,10000000/2)		 /* 5 MHz? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+//	MDRV_CPU_IO_MAP(sound_io_map,0)
 //  MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,32)
 
@@ -576,3 +556,4 @@ ROM_END
 
 
 GAME( 1993, discoboy,  0,    discoboy, discoboy, discoboy, ROT270, "Soft Art Co.", "Disco Boy", 0 )
+

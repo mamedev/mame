@@ -157,29 +157,26 @@ static ADDRESS_MAP_START( sauro_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc00, 0xffff) AM_WRITE(tecfri_colorram2_w) AM_BASE(&tecfri_colorram2)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sauro_readport, ADDRESS_SPACE_IO, 8 )
+
+static ADDRESS_MAP_START( sauro_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
 	AM_RANGE(0x20, 0x20) AM_READ_PORT("DSW2")
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("P1")
 	AM_RANGE(0x60, 0x60) AM_READ_PORT("P2")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sauro_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x80) AM_WRITE(sauro_sound_command_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(tecfri_scroll_bg_w)
 	AM_RANGE(0xa1, 0xa1) AM_WRITE(sauro_scroll_fg_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(sauro_sound_command_w)
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xc2, 0xc2) AM_WRITE(SMH_NOP) 	/* coin reset */
+	AM_RANGE(0xc2, 0xc2) AM_WRITE(SMH_NOP)		/* coin reset */
 	AM_RANGE(0xc3, 0xc3) AM_WRITE(sauro_coin1_w)
 	AM_RANGE(0xc4, 0xc4) AM_WRITE(SMH_NOP)		/* coin reset */
 	AM_RANGE(0xc5, 0xc5) AM_WRITE(sauro_coin2_w)
 	AM_RANGE(0xc6, 0xc7) AM_WRITE(SMH_NOP)		/* same as 0x80 - verified with debugger */
 	AM_RANGE(0xc8, 0xc8) AM_WRITE(SMH_NOP)		/* written every int: 0 written at end   of isr */
 	AM_RANGE(0xc9, 0xc9) AM_WRITE(SMH_NOP)		/* written every int: 1 written at start of isr */
-	AM_RANGE(0xca, 0xcb) AM_WRITE(sauro_palette_bank_w)		/* 1 written upon death, cleared 2 vblanks later */
-															/* Sequence 3,2,1 written during intro screen */
+	AM_RANGE(0xca, 0xcb) AM_WRITE(sauro_palette_bank_w)	/* 1 written upon death, cleared 2 vblanks later */
+														/* Sequence 3,2,1 written during intro screen */
 	AM_RANGE(0xcc, 0xcc) AM_WRITE(SMH_NOP)		/* same as 0xca */
 	AM_RANGE(0xcd, 0xcd) AM_WRITE(SMH_NOP)		/* same as 0xcb */
 	AM_RANGE(0xce, 0xce) AM_WRITE(SMH_NOP)		/* only written at startup */
@@ -393,6 +390,7 @@ static MACHINE_DRIVER_START( trckydoc )
 
 	MDRV_VIDEO_START(trckydoc)
 	MDRV_VIDEO_UPDATE(trckydoc)
+
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sauro )
@@ -400,7 +398,7 @@ static MACHINE_DRIVER_START( sauro )
 
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(sauro_readmem, sauro_writemem)
-	MDRV_CPU_IO_MAP(sauro_readport, sauro_writeport)
+	MDRV_CPU_IO_MAP(sauro_io_map,0)
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)	// 4 MHz?
 	MDRV_CPU_PROGRAM_MAP(sauro_sound_readmem, sauro_sound_writemem)
@@ -517,3 +515,4 @@ static DRIVER_INIT( tecfri )
 GAME( 1987, sauro,    0,        sauro,    tecfri, tecfri, ROT0, "Tecfri", "Sauro", 0 )
 GAME( 1987, trckydoc, 0,        trckydoc, tecfri, tecfri, ROT0, "Tecfri", "Tricky Doc (Set 1)", 0 )
 GAME( 1987, trckydca, trckydoc, trckydoc, tecfri, tecfri, ROT0, "Tecfri", "Tricky Doc (Set 2)", 0 )
+

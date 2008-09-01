@@ -306,23 +306,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( arwritemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-
-
 	AM_RANGE(0xc500, 0xc500) AM_WRITE(cshooter_c500_w)
 	AM_RANGE(0xc600, 0xc600) AM_WRITE(SMH_NOP)			// see notes
 	AM_RANGE(0xc700, 0xc700) AM_WRITE(cshooter_c700_w)
 	AM_RANGE(0xc801, 0xc801) AM_WRITE(SMH_NOP)			// see notes
 	AM_RANGE(0xd000, 0xd7ff) AM_WRITE(cshooter_txram_w) AM_BASE(&cshooter_txram)
-
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 
@@ -348,24 +336,12 @@ static ADDRESS_MAP_START( s2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( s2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(SMH_NOP) // ym2203_control_port_0_w ?
 	AM_RANGE(0x4001, 0x4001) AM_WRITE(SMH_NOP) // ym2203_write_port_0_w
 
 	AM_RANGE(0x4008, 0x4008) AM_WRITE(SMH_NOP) // ym2203_control_port_0_w ?
 	AM_RANGE(0x4009, 0x4009) AM_WRITE(SMH_NOP) // ym2203_write_port_0_w
-
-
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( s_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( s_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-
 
 
 
@@ -471,12 +447,10 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( cshooter )
 	MDRV_CPU_ADD("main", Z80,XTAL_12MHz/2)		 /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)
 
 	MDRV_CPU_ADD("audio", Z80,XTAL_14_31818MHz/4)		 /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(s_readmem,s_writemem)
-	MDRV_CPU_IO_MAP(s_readport,s_writeport)
 
 	MDRV_MACHINE_RESET(cshooter)
 
@@ -502,12 +476,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( airraid )
 	MDRV_CPU_ADD("main", Z80,XTAL_12MHz/2)		 /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(arreadmem,arwritemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)
 
 	MDRV_CPU_ADD("audio", Z80,XTAL_14_31818MHz/4)		 /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(s2_readmem,s2_writemem)
-	MDRV_CPU_IO_MAP(s_readport,s_writeport)
 
 	MDRV_MACHINE_RESET(cshooter)
 
@@ -756,3 +728,4 @@ static DRIVER_INIT( cshootre )
 GAME( 1987, cshooter, 0,        cshooter, cshooter, cshooter, ROT270, "[Seibu Kaihatsu] (Taito license)",  "Cross Shooter (not encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1987, cshootre, cshooter, airraid, cshooter, cshootre, ROT270, "[Seibu Kaihatsu] (J.K.H. license)", "Cross Shooter (encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
 GAME( 1987, airraid,  cshooter, airraid, cshooter, cshootre, ROT270, "Seibu Kaihatsu",                    "Air Raid (encrypted)", GAME_NOT_WORKING | GAME_NO_SOUND )
+

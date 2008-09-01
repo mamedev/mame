@@ -119,16 +119,11 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READ(ay8910_read_port_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
 
 
@@ -305,7 +300,7 @@ static MACHINE_DRIVER_START( funkybee )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 3072000)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
@@ -441,3 +436,4 @@ GAME( 1982, funkybee, 0,        funkybee, funkybee, 0, ROT90, "Orca",           
 GAME( 1982, funkbeeb, funkybee, funkybee, funkbeeb, 0, ROT90, "bootleg",                        "Funky Bee (bootleg, harder)",          0 )
 GAME( 1983, skylancr, 0,        funkybee, skylancr, 0, ROT90, "Orca",                           "Sky Lancer",                           0 )
 GAME( 1983, skylance, skylancr, funkybee, skylance, 0, ROT90, "Orca (Esco Trading Co license)", "Sky Lancer (Esco Trading Co license)", 0 )
+

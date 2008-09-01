@@ -134,19 +134,14 @@ static ADDRESS_MAP_START( crospang_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crospang_sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( crospang_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(ym3812_status_port_0_r)
-	AM_RANGE(0x02, 0x02) AM_READ(okim6295_status_0_r)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym3812_write_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( crospang_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym3812_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym3812_write_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(okim6295_data_0_w)
-ADDRESS_MAP_END
 
 static INPUT_PORTS_START( crospang )
 	PORT_START("P1_P2")
@@ -338,7 +333,7 @@ static MACHINE_DRIVER_START( crospang )
 
 	MDRV_CPU_ADD("audio", Z80, 14318180/4)
 	MDRV_CPU_PROGRAM_MAP(crospang_sound_readmem,crospang_sound_writemem)
-	MDRV_CPU_IO_MAP(crospang_sound_readport,crospang_sound_writeport)
+	MDRV_CPU_IO_MAP(crospang_sound_io_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -375,7 +370,7 @@ static MACHINE_DRIVER_START( bestri )
 
 	MDRV_CPU_ADD("audio", Z80, 14318180/4)
 	MDRV_CPU_PROGRAM_MAP(crospang_sound_readmem,crospang_sound_writemem)
-	MDRV_CPU_IO_MAP(crospang_sound_readport,crospang_sound_writeport)
+	MDRV_CPU_IO_MAP(crospang_sound_io_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -595,3 +590,4 @@ static DRIVER_INIT( crospang )
 GAME( 1998, crospang, 0, crospang, crospang, crospang, ROT0, "F2 System", "Cross Pang", 0 )
 GAME( 199?, heuksun,  0, crospang, heuksun,  crospang, ROT0, "Oksan / F2 System", "Heuk Sun Baek Sa (Korea)", 0 )
 GAME( 199?, bestri,   0, bestri,   bestri,   crospang, ROT0, "F2 System", "Bestri (Korea)", 0 )
+

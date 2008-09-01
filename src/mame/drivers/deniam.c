@@ -126,20 +126,14 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_r)
-	AM_RANGE(0x05, 0x05) AM_READ(okim6295_status_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x02) AM_WRITE(ym3812_control_port_0_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(ym3812_write_port_0_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0x05, 0x05) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(deniam16b_oki_rom_bank_w)
 ADDRESS_MAP_END
-
 
 /* identical to 16b, but handles sound directly */
 static ADDRESS_MAP_START( deniam16c_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -288,7 +282,7 @@ static MACHINE_DRIVER_START( deniam16b )
 
 	MDRV_CPU_ADD("audio", Z80,25000000/4)	/* (makes logicpro music tempo correct) */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	MDRV_MACHINE_RESET(deniam)
 
@@ -451,3 +445,4 @@ GAME( 1996, logicpro, 0,        deniam16b, logicpr2, logicpro, ROT0, "Deniam", "
 GAME( 1996, croquis,  logicpro, deniam16b, logicpr2, logicpro, ROT0, "Deniam", "Croquis (Germany)", 0 )
 GAME( 1996, karianx,  0,        deniam16b, karianx,  karianx,  ROT0, "Deniam", "Karian Cross (Rev. 1.0)", 0 )
 GAME( 1997, logicpr2, 0,        deniam16c, logicpr2, logicpro, ROT0, "Deniam", "Logic Pro 2 (Japan)", GAME_IMPERFECT_SOUND )
+

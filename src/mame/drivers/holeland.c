@@ -60,21 +60,14 @@ static ADDRESS_MAP_START( crzrally_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf801) AM_WRITE(holeland_pal_offs_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_READ(watchdog_reset_r)	/* ? */
-	AM_RANGE(0x04, 0x04) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x06, 0x06) AM_READ(ay8910_read_port_1_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x04, 0x04) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x06, 0x06) AM_READWRITE(ay8910_read_port_1_r, ay8910_control_port_1_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(ay8910_write_port_1_w)
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( holeland )
@@ -307,7 +300,7 @@ static MACHINE_DRIVER_START( holeland )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 4000000)        /* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
@@ -376,7 +369,7 @@ static MACHINE_DRIVER_START( crzrally )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 20000000/4)        /* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(crzrally_readmem,crzrally_writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
@@ -530,3 +523,4 @@ GAME( 1984, holeland, 0,        holeland, holeland, 0, ROT0,   "Tecfri", "Hole L
 GAME( 1985, crzrally, 0,        crzrally, crzrally, 0, ROT270, "Tecfri", "Crazy Rally (set 1)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1985, crzralla, crzrally, crzrally, crzrally, 0, ROT270, "Tecfri", "Crazy Rally (set 2)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1985, crzrallg, crzrally, crzrally, crzrally, 0, ROT270, "Tecfri (Gecas license)", "Crazy Rally (Gecas license)", GAME_IMPERFECT_GRAPHICS )
+

@@ -185,27 +185,14 @@ static READ8_HANDLER( marinedt_obj1_yq_r )
 	return cyq | (cyqh<<4);
 }
 
+static WRITE8_HANDLER( marinedt_obj1_a_w ) { marinedt_obj1_a = data; }
+static WRITE8_HANDLER( marinedt_obj1_x_w ) { marinedt_obj1_x = data; }
+static WRITE8_HANDLER( marinedt_obj1_y_w ) { marinedt_obj1_y = data; }
+static WRITE8_HANDLER( marinedt_obj2_a_w ) { marinedt_obj2_a = data; }
+static WRITE8_HANDLER( marinedt_obj2_x_w ) { marinedt_obj2_x = data; }
+static WRITE8_HANDLER( marinedt_obj2_y_w ) { marinedt_obj2_y = data; }
 
-static ADDRESS_MAP_START( marinedt_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW0")		//dips coinage
-	AM_RANGE(0x01, 0x01) AM_READ(marinedt_port1_r)	//trackball xy muxed
-	AM_RANGE(0x02, 0x02) AM_READ(marinedt_obj1_x_r)
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN0")		//buttons
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")		//dips
-	AM_RANGE(0x06, 0x06) AM_READ(marinedt_obj1_yr_r)
-	AM_RANGE(0x0a, 0x0a) AM_READ(marinedt_obj1_yq_r)
-	AM_RANGE(0x0e, 0x0e) AM_READ(marinedt_coll_r)
-ADDRESS_MAP_END
-
-static WRITE8_HANDLER( marinedt_obj1_a_w ) {	marinedt_obj1_a = data; }
-static WRITE8_HANDLER( marinedt_obj1_x_w ) {	marinedt_obj1_x = data; }
-static WRITE8_HANDLER( marinedt_obj1_y_w ) {	marinedt_obj1_y = data; }
-static WRITE8_HANDLER( marinedt_obj2_a_w ) {	marinedt_obj2_a = data; }
-static WRITE8_HANDLER( marinedt_obj2_x_w ) {	marinedt_obj2_x = data; }
-static WRITE8_HANDLER( marinedt_obj2_y_w ) {	marinedt_obj2_y = data; }
-
-static WRITE8_HANDLER( marinedt_music_w ){	marinedt_music = data; }
+static WRITE8_HANDLER( marinedt_music_w ){ marinedt_music = data; }
 
 static WRITE8_HANDLER( marinedt_sound_w )
 {
@@ -282,20 +269,24 @@ static WRITE8_HANDLER( marinedt_pf_w )
 
 }
 
-static ADDRESS_MAP_START( marinedt_writeport, ADDRESS_SPACE_IO, 8 )
+
+static ADDRESS_MAP_START( marinedt_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_WRITE(marinedt_obj1_a_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(marinedt_obj1_x_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(marinedt_obj1_y_w)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW0")		//dips coinage
+	AM_RANGE(0x01, 0x01) AM_READ(marinedt_port1_r)	//trackball xy muxed
+	AM_RANGE(0x02, 0x02) AM_READWRITE(marinedt_obj1_x_r, marinedt_obj1_a_w)
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("IN0") AM_WRITE(marinedt_obj1_x_w)
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1") AM_WRITE(marinedt_obj1_y_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(marinedt_music_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(marinedt_sound_w)
+	AM_RANGE(0x06, 0x06) AM_READWRITE(marinedt_obj1_yr_r, marinedt_sound_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(marinedt_obj2_a_w)
 	AM_RANGE(0x09, 0x09) AM_WRITE(marinedt_obj2_x_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(marinedt_obj2_y_w)
+	AM_RANGE(0x0a, 0x0a) AM_READWRITE(marinedt_obj1_yq_r, marinedt_obj2_y_w)
 	AM_RANGE(0x0d, 0x0d) AM_WRITE(marinedt_pd_w)
-	AM_RANGE(0x0e, 0x0e) AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x0e, 0x0e) AM_READWRITE(marinedt_coll_r, watchdog_reset_w)
 	AM_RANGE(0x0f, 0x0f) AM_WRITE(marinedt_pf_w)
 ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( marinedt )
 	PORT_START("DSW0")		/* IN0 */
@@ -586,7 +577,7 @@ static MACHINE_DRIVER_START( marinedt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80,10000000/4)
 	MDRV_CPU_PROGRAM_MAP(marinedt_readmem,marinedt_writemem)
-	MDRV_CPU_IO_MAP(marinedt_readport,marinedt_writeport)
+	MDRV_CPU_IO_MAP(marinedt_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
@@ -644,3 +635,4 @@ ROM_START( marinedt )
 ROM_END
 
 GAME( 1981, marinedt, 0, marinedt, marinedt, 0, ROT270, "Taito", "Marine Date", GAME_NO_SOUND )
+

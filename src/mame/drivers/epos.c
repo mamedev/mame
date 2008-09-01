@@ -90,36 +90,23 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("INPUTS")
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW") AM_WRITE(watchdog_reset_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(epos_port_1_w)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("INPUTS") AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x03, 0x03) AM_READ_PORT("UNK")
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(epos_port_1_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( dealer_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( dealer_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVREAD(PPI8255, "ppi8255", ppi8255_r)
-	AM_RANGE(0x38, 0x38) AM_READ_PORT("DSW")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( dealer_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_DEVWRITE(PPI8255, "ppi8255", ppi8255_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
 	AM_RANGE(0x20, 0x24) AM_WRITE(dealer_decrypt_rom)
+	AM_RANGE(0x38, 0x38) AM_READ_PORT("DSW")
 //  AM_RANGE(0x40, 0x40) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
+
 
 /*
    ROMs U01-U03 are checked with the same code in a loop.
@@ -360,7 +347,7 @@ static MACHINE_DRIVER_START( epos )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 11000000/4)	/* 2.75 MHz (see notes) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
@@ -384,7 +371,7 @@ static MACHINE_DRIVER_START( dealer )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 11000000/4)	/* 2.75 MHz (see notes) */
 	MDRV_CPU_PROGRAM_MAP(dealer_readmem,dealer_writemem)
-	MDRV_CPU_IO_MAP(dealer_readport,dealer_writeport)
+	MDRV_CPU_IO_MAP(dealer_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
@@ -633,3 +620,4 @@ GAME( 1983, theglob3, suprglob, epos,   suprglob, 0,	     ROT270, "Epos Corporat
 GAME( 1984, igmo,     0,        epos,   igmo,     0,	     ROT270, "Epos Corporation", "IGMO", GAME_WRONG_COLORS )
 GAME( 1984, dealer,   0,        dealer, dealer,   dealer,   ROT270, "Epos Corporation", "The Dealer", GAME_WRONG_COLORS )
 GAME( 1984, revenger, 0,        dealer, dealer,   dealer,   ROT270, "Epos Corporation", "Revenger", GAME_NOT_WORKING )
+

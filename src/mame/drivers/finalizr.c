@@ -141,17 +141,13 @@ static ADDRESS_MAP_START( i8039_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8039_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0xff) AM_READ(soundlatch_r)
-	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(i8039_T1_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( i8039_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( i8039_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0xff)				   AM_READ(soundlatch_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(dac_0_data_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_w)
 	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_WRITE(i8039_T0_w)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(i8039_T1_r)
 ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( finalizr )
@@ -323,7 +319,7 @@ static MACHINE_DRIVER_START( finalizr )
 
 	MDRV_CPU_ADD("audio", I8039,18432000/2)	/* 9.216MHz clkin ?? */
 	MDRV_CPU_PROGRAM_MAP(i8039_readmem,i8039_writemem)
-	MDRV_CPU_IO_MAP(i8039_readport,i8039_writeport)
+	MDRV_CPU_IO_MAP(i8039_io_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -417,3 +413,4 @@ static DRIVER_INIT( finalizr )
 
 GAME( 1985, finalizr, 0,        finalizr, finalizr, finalizr, ROT90, "Konami", "Finalizer - Super Transformation", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
 GAME( 1985, finalizb, finalizr, finalizr, finalizb, finalizr, ROT90, "bootleg", "Finalizer - Super Transformation (bootleg)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
+
