@@ -126,42 +126,28 @@ static ADDRESS_MAP_START( gfire2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x24000, 0x241ff) AM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE(&paletteram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x3f) AM_WRITE(SMH_NOP)	/* Z180 internal registers */
 	AM_RANGE(0x30, 0x30) AM_READ(SMH_NOP)	/* Z180 internal registers */
-	AM_RANGE(0x70, 0x70) AM_READ(ym2203_status_port_0_r)
-	AM_RANGE(0x71, 0x71) AM_READ(ym2203_read_port_0_r)
-	AM_RANGE(0x72, 0x72) AM_READ(protection_r)
+	AM_RANGE(0x70, 0x70) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
+	AM_RANGE(0x71, 0x71) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0x72, 0x72) AM_READWRITE(protection_r, protection_w)
 	AM_RANGE(0x74, 0x74) AM_READ_PORT("P1")
 	AM_RANGE(0x76, 0x76) AM_READ_PORT("P2")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( gfire2_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x3f) AM_WRITE(SMH_NOP)	/* Z180 internal registers */
-	AM_RANGE(0x70, 0x70) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x71, 0x71) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0x72, 0x72) AM_WRITE(protection_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( gfire2_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x30, 0x30) AM_READ(SMH_NOP)	/* Z180 internal registers */
-	AM_RANGE(0x70, 0x70) AM_READ(ym2203_status_port_0_r)
-	AM_RANGE(0x71, 0x71) AM_READ(ym2203_read_port_0_r)
-	AM_RANGE(0x72, 0x72) AM_READ(gfire2_protection_r)
+	AM_RANGE(0x70, 0x70) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
+	AM_RANGE(0x71, 0x71) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0x72, 0x72) AM_READWRITE(gfire2_protection_r, gfire2_protection_w)
 	AM_RANGE(0x74, 0x74) AM_READ_PORT("P1")
 	AM_RANGE(0x76, 0x76) AM_READ_PORT("P2")
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( gfire2_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x3f) AM_WRITE(SMH_NOP)	/* Z180 internal registers */
-	AM_RANGE(0x70, 0x70) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x71, 0x71) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0x72, 0x72) AM_WRITE(gfire2_protection_w)
-ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( mosaic )
@@ -292,7 +278,7 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( mosaic )
 	MDRV_CPU_ADD("main", Z180, 7000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
@@ -321,7 +307,7 @@ static MACHINE_DRIVER_START( gfire2 )
 	MDRV_IMPORT_FROM(mosaic)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(gfire2_readmem,gfire2_writemem)
-	MDRV_CPU_IO_MAP(gfire2_readport,gfire2_writeport)
+	MDRV_CPU_IO_MAP(gfire2_io_map,0)
 MACHINE_DRIVER_END
 
 
@@ -388,3 +374,4 @@ ROM_END
 GAME( 1990, mosaic,  0,      mosaic, mosaic, 0, ROT0, "Space", "Mosaic", 0 )
 GAME( 1990, mosaica, mosaic, mosaic, mosaic, 0, ROT0, "Space (Fuuki license)", "Mosaic (Fuuki)", 0 )
 GAME( 1992, gfire2,  0,      gfire2, gfire2, 0, ROT0, "Topis Corp", "Golden Fire II", 0 )
+

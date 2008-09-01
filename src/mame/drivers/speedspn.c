@@ -137,24 +137,17 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_ROM)	/* banked ROM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x07, 0x07) AM_WRITE(speedspn_global_display_w)
-	AM_RANGE(0x12, 0x12) AM_WRITE(speedspn_banked_rom_change)
-	AM_RANGE(0x13, 0x13) AM_WRITE(speedspn_sound_w)
-	AM_RANGE(0x17, 0x17) AM_WRITE(speedspn_banked_vidram_change)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("P1")
-	AM_RANGE(0x12, 0x12) AM_READ_PORT("P2")
-	AM_RANGE(0x13, 0x13) AM_READ_PORT("DSW1")
+	AM_RANGE(0x12, 0x12) AM_READ_PORT("P2") AM_WRITE(speedspn_banked_rom_change)
+	AM_RANGE(0x13, 0x13) AM_READ_PORT("DSW1") AM_WRITE(speedspn_sound_w)
 	AM_RANGE(0x14, 0x14) AM_READ_PORT("DSW2")
 	AM_RANGE(0x16, 0x16) AM_READ(speedspn_irq_ack_r) // @@@ could be watchdog, value is discarded
+	AM_RANGE(0x17, 0x17) AM_WRITE(speedspn_banked_vidram_change)
 ADDRESS_MAP_END
-
 
 /* sound cpu */
 
@@ -304,7 +297,7 @@ static MACHINE_DRIVER_START( speedspn )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main",Z80,6000000)		 /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport, writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80,6000000)		 /* 6 MHz */
@@ -374,3 +367,4 @@ ROM_END
 /*** GAME DRIVERS ************************************************************/
 
 GAME( 1994, speedspn, 0, speedspn, speedspn, 0, ROT180, "TCH", "Speed Spin", GAME_IMPERFECT_GRAPHICS )
+

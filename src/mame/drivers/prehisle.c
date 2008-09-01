@@ -76,14 +76,9 @@ static ADDRESS_MAP_START( prehisle_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(SMH_NOP)	// ???
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( prehisle_sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( prehisle_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(ym3812_status_port_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( prehisle_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(ym3812_write_port_0_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(D7759_write_port_0_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(upd7759_0_reset_w)
@@ -235,7 +230,7 @@ static MACHINE_DRIVER_START( prehisle )
 
 	MDRV_CPU_ADD("audio", Z80, XTAL_4MHz)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(prehisle_sound_readmem,prehisle_sound_writemem)
-	MDRV_CPU_IO_MAP(prehisle_sound_readport,prehisle_sound_writeport)
+	MDRV_CPU_IO_MAP(prehisle_sound_io_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -354,3 +349,4 @@ ROM_END
 GAME( 1989, prehisle, 0,		prehisle, prehisle, 0, ROT0, "SNK", "Prehistoric Isle in 1930 (World)", GAME_SUPPORTS_SAVE )
 GAME( 1989, prehislu, prehisle, prehisle, prehisle, 0, ROT0, "SNK of America", "Prehistoric Isle in 1930 (US)", GAME_SUPPORTS_SAVE )
 GAME( 1989, gensitou, prehisle, prehisle, prehisle, 0, ROT0, "SNK", "Genshi-Tou 1930's", GAME_SUPPORTS_SAVE )
+

@@ -52,6 +52,7 @@ static WRITE8_HANDLER( sound_reset_w )
 		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE );
 }
 
+/***************************************************************************/
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)		/* rom */
@@ -81,7 +82,7 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc804, 0xc804) AM_WRITE(SMH_NOP)		/* ???? not used */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(watchdog_reset_r)
 ADDRESS_MAP_END
@@ -96,18 +97,14 @@ static ADDRESS_MAP_START( writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3800, 0x3bff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport_sound, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x8c, 0x8d) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x8e, 0x8f) AM_READ(ay8910_read_port_1_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport_sound, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(soundlatch_clear_w)
 	AM_RANGE(0x8c, 0x8c) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x8c, 0x8d) AM_READ(ay8910_read_port_0_r)
 	AM_RANGE(0x8d, 0x8d) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x8e, 0x8e) AM_WRITE(ay8910_control_port_1_w)
+	AM_RANGE(0x8e, 0x8f) AM_READ(ay8910_read_port_1_r)
 	AM_RANGE(0x8f, 0x8f) AM_WRITE(ay8910_write_port_1_w)
 ADDRESS_MAP_END
 
@@ -265,12 +262,12 @@ static MACHINE_DRIVER_START( timelimt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 5000000)	/* 5.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,0)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", timelimt_irq)
 
 	MDRV_CPU_ADD("audio", Z80,18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem_sound,writemem_sound)
-	MDRV_CPU_IO_MAP(readport_sound,writeport_sound)
+	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) /* ? */
 
 	MDRV_INTERLEAVE(50)
@@ -380,3 +377,4 @@ ROM_END
 
 GAME( 1983, timelimt, 0, timelimt, timelimt, 0, ROT90, "Chuo Co. Ltd", "Time Limit", GAME_IMPERFECT_COLORS )
 GAME( 1984, progress, 0, progress, progress, 0, ROT90, "Chuo Co. Ltd", "Progress", 0 )
+

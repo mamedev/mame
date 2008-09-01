@@ -202,25 +202,17 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("P1")
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2")
-	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
-	AM_RANGE(0x06, 0x06) AM_READ_PORT("UNK")
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(egghunt_vidram_bank_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(egghunt_gfx_banking_w)
-	AM_RANGE(0x03, 0x03) AM_WRITE(egghunt_soundlatch_w)
-	AM_RANGE(0x06, 0x06) AM_WRITENOP
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("DSW1") AM_WRITE(egghunt_vidram_bank_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("SYSTEM") AM_WRITE(egghunt_gfx_banking_w)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("P1")
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("P2") AM_WRITE(egghunt_soundlatch_w)
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
+	AM_RANGE(0x06, 0x06) AM_READ_PORT("UNK") AM_WRITENOP
 	AM_RANGE(0x07, 0x07) AM_WRITENOP
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
@@ -387,7 +379,7 @@ static MACHINE_DRIVER_START( egghunt )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80,12000000/2)		 /* 6 MHz ?*/
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) // or 2 like mitchell.c?
 
 	MDRV_CPU_ADD("audio", Z80,12000000/2)		 /* 6 MHz ?*/
@@ -441,3 +433,4 @@ ROM_START( egghunt )
 ROM_END
 
 GAME( 1995, egghunt, 0, egghunt, egghunt, 0, ROT0, "Invi Image", "Egg Hunt", 0 )
+

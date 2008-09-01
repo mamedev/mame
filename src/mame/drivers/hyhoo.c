@@ -64,34 +64,25 @@ static ADDRESS_MAP_START( writemem_hyhoo, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_RAM) AM_BASE(&nb1413m3_nvram) AM_SIZE(&nb1413m3_nvram_size)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( readport_hyhoo, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
-	AM_RANGE(0x81, 0x81) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xa0, 0xa0) AM_READ(nb1413m3_inputport1_r)
-	AM_RANGE(0xb0, 0xb0) AM_READ(nb1413m3_inputport2_r)
-	AM_RANGE(0xd0, 0xd0) AM_READ(SMH_NOP)					// unknown
-	AM_RANGE(0xe0, 0xe1) AM_READ(nb1413m3_gfxrom_r)
-	AM_RANGE(0xf0, 0xf0) AM_READ(nb1413m3_dipsw1_r)
-	AM_RANGE(0xf1, 0xf1) AM_READ(nb1413m3_dipsw2_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport_hyhoo, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( hyhoo_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 //  AM_RANGE(0x00, 0x00) AM_WRITE(nb1413m3_nmi_clock_w)
+	AM_RANGE(0x00, 0x7f) AM_READ(nb1413m3_sndrom_r)
+	AM_RANGE(0x81, 0x81) AM_READ(ay8910_read_port_0_r)
 	AM_RANGE(0x82, 0x82) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x83, 0x83) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x90, 0x97) AM_WRITE(hyhoo_blitter_w)
-	AM_RANGE(0xa0, 0xa0) AM_WRITE(nb1413m3_inputportsel_w)
-	AM_RANGE(0xb0, 0xb0) AM_WRITE(nb1413m3_sndrombank1_w)
+	AM_RANGE(0xa0, 0xa0) AM_READWRITE(nb1413m3_inputport1_r, nb1413m3_inputportsel_w)
+	AM_RANGE(0xb0, 0xb0) AM_READWRITE(nb1413m3_inputport2_r, nb1413m3_sndrombank1_w)
 	AM_RANGE(0xc0, 0xcf) AM_WRITE(SMH_RAM) AM_BASE(&hyhoo_clut)
-	AM_RANGE(0xd0, 0xd0) AM_WRITE(DAC_0_WRITE)
+	AM_RANGE(0xd0, 0xd0) AM_READWRITE(SMH_NOP, DAC_0_WRITE)		// unknown read
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(hyhoo_romsel_w)
+	AM_RANGE(0xe0, 0xe1) AM_READ(nb1413m3_gfxrom_r)
+	AM_RANGE(0xf0, 0xf0) AM_READ(nb1413m3_dipsw1_r)
 //  AM_RANGE(0xf0, 0xf0) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xf1, 0xf1) AM_READ(nb1413m3_dipsw2_r)
 ADDRESS_MAP_END
-
 
 static INPUT_PORTS_START( hyhoo )
 	PORT_START("DSWA")
@@ -271,7 +262,7 @@ static MACHINE_DRIVER_START( hyhoo )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 5000000/1)	/* 5.00 MHz ?? */
 	MDRV_CPU_PROGRAM_MAP(readmem_hyhoo, writemem_hyhoo)
-	MDRV_CPU_IO_MAP(readport_hyhoo, writeport_hyhoo)
+	MDRV_CPU_IO_MAP(hyhoo_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", nb1413m3_interrupt)
 
 	MDRV_MACHINE_RESET(nb1413m3)
@@ -345,3 +336,4 @@ ROM_END
 
 GAME( 1987, hyhoo,  0, hyhoo,  hyhoo,  hyhoo,  ROT90, "Nichibutsu", "Taisen Quiz HYHOO (Japan)", 0 )
 GAME( 1987, hyhoo2, 0, hyhoo,  hyhoo2, hyhoo2, ROT90, "Nichibutsu", "Taisen Quiz HYHOO 2 (Japan)", 0 )
+

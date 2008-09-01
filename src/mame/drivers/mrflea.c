@@ -170,16 +170,12 @@ static READ8_HANDLER( mrflea_interrupt_type_r ){
 
 /*******************************************************/
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x41, 0x41) AM_READ(mrflea_main_r)
-	AM_RANGE(0x42, 0x42) AM_READ(mrflea_main_status_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP) /* watchdog? */
 	AM_RANGE(0x40, 0x40) AM_WRITE(mrflea_io_w)
+	AM_RANGE(0x41, 0x41) AM_READ(mrflea_main_r)
+	AM_RANGE(0x42, 0x42) AM_READ(mrflea_main_status_r)
 	AM_RANGE(0x43, 0x43) AM_WRITE(SMH_NOP) /* 0xa6,0x0d,0x05 */
 	AM_RANGE(0x60, 0x60) AM_WRITE(mrflea_gfx_bank_w)
 ADDRESS_MAP_END
@@ -230,17 +226,6 @@ static READ8_HANDLER( mrflea_input3_r )
 
 /*******************************************************/
 
-static ADDRESS_MAP_START( readport_io, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x10) AM_READ(mrflea_interrupt_type_r) /* ? */
-	AM_RANGE(0x20, 0x20) AM_READ(mrflea_io_r)
-	AM_RANGE(0x22, 0x22) AM_READ(mrflea_io_status_r)
-	AM_RANGE(0x40, 0x40) AM_READ(mrflea_input0_r)
-	AM_RANGE(0x42, 0x42) AM_READ(mrflea_input1_r)
-	AM_RANGE(0x44, 0x44) AM_READ(mrflea_input2_r)
-	AM_RANGE(0x46, 0x46) AM_READ(mrflea_input3_r)
-ADDRESS_MAP_END
-
 static WRITE8_HANDLER( mrflea_data0_w ){
 	ay8910_control_port_0_w( machine, offset, mrflea_select0 );
 	ay8910_write_port_0_w( machine, offset, data );
@@ -259,34 +244,38 @@ static WRITE8_HANDLER( mrflea_data3_w ){
 	ay8910_write_port_2_w( machine, offset, data );
 }
 
-static ADDRESS_MAP_START( writeport_io, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( inout_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP) /* watchdog */
-	AM_RANGE(0x10, 0x10) AM_WRITE(SMH_NOP) /* irq ACK */
+	AM_RANGE(0x10, 0x10) AM_READWRITE(mrflea_interrupt_type_r, SMH_NOP) /* ? / irq ACK */
 	AM_RANGE(0x11, 0x11) AM_WRITE(SMH_NOP) /* 0x83,0x00,0xfc */
+	AM_RANGE(0x20, 0x20) AM_READ(mrflea_io_r)
 	AM_RANGE(0x21, 0x21) AM_WRITE(mrflea_main_w)
+	AM_RANGE(0x22, 0x22) AM_READ(mrflea_io_status_r)
 	AM_RANGE(0x23, 0x23) AM_WRITE(SMH_NOP) /* 0xb4,0x09,0x05 */
-	AM_RANGE(0x40, 0x40) AM_WRITE(mrflea_data0_w)
+	AM_RANGE(0x40, 0x40) AM_READWRITE(mrflea_input0_r, mrflea_data0_w)
 	AM_RANGE(0x41, 0x41) AM_WRITE(mrflea_select0_w)
-	AM_RANGE(0x42, 0x42) AM_WRITE(mrflea_data1_w)
+	AM_RANGE(0x42, 0x42) AM_READWRITE(mrflea_input1_r, mrflea_data1_w)
 	AM_RANGE(0x43, 0x43) AM_WRITE(mrflea_select1_w)
-	AM_RANGE(0x44, 0x44) AM_WRITE(mrflea_data2_w)
+	AM_RANGE(0x44, 0x44) AM_READWRITE(mrflea_input2_r, mrflea_data2_w)
 	AM_RANGE(0x45, 0x45) AM_WRITE(mrflea_select2_w)
-	AM_RANGE(0x46, 0x46) AM_WRITE(mrflea_data3_w)
+	AM_RANGE(0x46, 0x46) AM_READWRITE(mrflea_input3_r, mrflea_data3_w)
 	AM_RANGE(0x47, 0x47) AM_WRITE(mrflea_select3_w)
 ADDRESS_MAP_END
+
+/*******************************************************/
 
 static MACHINE_DRIVER_START( mrflea )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 4000000) /* 4 MHz? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold) /* NMI resets the game */
 
 	MDRV_CPU_ADD("sub", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_io,writemem_io)
-	MDRV_CPU_IO_MAP(readport_io,writeport_io)
+	MDRV_CPU_IO_MAP(inout_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(mrflea_io_interrupt,2)
 
 	MDRV_INTERLEAVE(100)
@@ -425,3 +414,4 @@ INPUT_PORTS_END
 
 
 GAME( 1982, mrflea,   0,        mrflea,   mrflea,   0,        ROT270, "Pacific Novelty", "The Amazing Adventures of Mr. F. Lea" , 0 )
+
