@@ -5476,6 +5476,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( countryc )	/* A7004 'CC' (c) 1988 */
 	DRIVER( ikari )		/* A5004 'IW' (c) 1986 */
 	DRIVER( ikaria )	/* A5004 'IW' (c) 1986 */
+	DRIVER( ikarinc )	/* A5004 'IW' (c) 1986 */
 	DRIVER( ikarijp )	/* A5004 'IW' (c) 1986 (Japan) */
 	DRIVER( ikarijpb )	/* bootleg */
 	DRIVER( victroad )	/* A6002      (c) 1986 */
