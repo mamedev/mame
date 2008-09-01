@@ -266,7 +266,7 @@ WRITE8_DEVICE_HANDLER( timekeeper_w )
 		data &= ~FLAGS_BL;
 	}
 
-  logerror( "%08x: timekeeper_write( %s, %04x, %02x )\n", activecpu_get_pc(), c->device->token, offset, data );
+//  logerror( "%08x: timekeeper_write( %s, %04x, %02x )\n", activecpu_get_pc(), c->device->tag, offset, data );
 	c->data[ offset ] = data;
 }
 
@@ -274,7 +274,7 @@ READ8_DEVICE_HANDLER( timekeeper_r )
 {
 	timekeeper_state *c = get_safe_token(device);
 	UINT8 data = c->data[ offset ];
-  logerror( "%08x: timekeeper_read( %s, %04x ) %02x\n", activecpu_get_pc(), c->device->token, offset, data );
+//  logerror( "%08x: timekeeper_read( %s, %04x ) %02x\n", activecpu_get_pc(), c->device->tag, offset, data );
 	return data;
 }
 
