@@ -595,7 +595,7 @@ static const ym2151_interface ym2151_config =
 */
 static INTERRUPT_GEN( shadfrce_interrupt )
 {
-	int scanline = 271 - cpu_getiloops();
+	int scanline = 255 - cpu_getiloops();
 
 	/* Vblank is lowered on scanline 0 (8) */
 	if (scanline == 0)
@@ -603,12 +603,12 @@ static INTERRUPT_GEN( shadfrce_interrupt )
 		vblank = 0;
 	}
 	/* Hack */
-	else if (scanline==(256-1))
+	else if (scanline==(248-1))
 	{
 		vblank = 4;
 	}
-	/* Vblank is raised on scanline 256 (264) */
-	else if (scanline==256)
+	/* Vblank is raised on scanline 248 (256) */
+	else if (scanline==248)
 	{
 		if(shadfrce_irqs_enable)
 			cpunum_set_input_line(machine, 0, 3, ASSERT_LINE);
@@ -632,7 +632,7 @@ static MACHINE_RESET( shadfrce )
 static MACHINE_DRIVER_START( shadfrce )
 	MDRV_CPU_ADD("main", M68000, 28000000/2) /* ? Guess - CPU is rated for 16MHz */
 	MDRV_CPU_PROGRAM_MAP(shadfrce_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(shadfrce_interrupt,272)
+	MDRV_CPU_VBLANK_INT_HACK(shadfrce_interrupt,256)
 
 	MDRV_CPU_ADD("audio", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(shadfrce_sound_map,0)
@@ -643,8 +643,8 @@ static MACHINE_DRIVER_START( shadfrce )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 34*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 32*8-1)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 
 	MDRV_GFXDECODE(shadfrce)
 	MDRV_PALETTE_LENGTH(0x4000)
