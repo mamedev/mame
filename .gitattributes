@@ -1543,7 +1543,6 @@ src/mame/drivers/gundealr.c svneol=native#text/plain
 src/mame/drivers/gunpey.c svneol=native#text/plain
 src/mame/drivers/gunsmoke.c svneol=native#text/plain
 src/mame/drivers/gyruss.c svneol=native#text/plain
-src/mame/drivers/hal21.c svneol=native#text/plain
 src/mame/drivers/halleys.c svneol=native#text/plain
 src/mame/drivers/hanaawas.c svneol=native#text/plain
 src/mame/drivers/hanaroku.c svneol=native#text/plain

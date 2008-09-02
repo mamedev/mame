@@ -21,8 +21,9 @@ extern PALETTE_INIT( tnk3 );
 
 extern VIDEO_START( jcross );
 extern VIDEO_START( sgladiat );
-extern VIDEO_START( tnk3 );
+extern VIDEO_START( hal21 );
 extern VIDEO_START( aso );
+extern VIDEO_START( tnk3 );
 extern VIDEO_START( ikari );
 extern VIDEO_START( gwar );
 extern VIDEO_START( tdfever );
@@ -42,6 +43,7 @@ extern WRITE8_HANDLER( snk_sp32_scrolly_w );
 extern WRITE8_HANDLER( jcross_scroll_msb_w );
 extern WRITE8_HANDLER( sgladiat_scroll_msb_w );
 extern WRITE8_HANDLER( sgladiat_flipscreen_w );
+extern WRITE8_HANDLER( hal21_flipscreen_w );
 extern WRITE8_HANDLER( tnk3_videoattrs_w );
 extern WRITE8_HANDLER( aso_videoattrs_w );
 extern WRITE8_HANDLER( aso_bg_bank_w );

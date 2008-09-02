@@ -219,37 +219,32 @@ VIDEO_START( jcross )
 
 VIDEO_START( sgladiat )
 {
-	VIDEO_START_CALL(snk_3bpp_shadow);
-
-	fg_tilemap = tilemap_create(tnk3_get_fg_tile_info, tnk3_fg_scan_cols, 8, 8, 36, 28);
-	bg_tilemap = tilemap_create(aso_get_bg_tile_info,  tilemap_scan_cols, 8, 8, 64, 32);
-
-	tilemap_set_transparent_pen(fg_tilemap, 15);
-	tilemap_set_scrolldy(fg_tilemap, 8, 8);
-
-	tilemap_set_scrolldx(bg_tilemap, 15, 24);
-	tilemap_set_scrolldy(bg_tilemap,  8, -32);
+	VIDEO_START_CALL(jcross);
 
 	num_sprites = 25;
 	yscroll_mask = 0x0ff;
 }
 
-VIDEO_START( aso )
+VIDEO_START( hal21 )
 {
-	VIDEO_START_CALL(snk_3bpp_shadow);
+	VIDEO_START_CALL(jcross);
 
-	fg_tilemap = tilemap_create(tnk3_get_fg_tile_info, tnk3_fg_scan_cols, 8, 8, 36, 28);
-	bg_tilemap = tilemap_create(aso_get_bg_tile_info,  tilemap_scan_cols, 8, 8, 64, 64);
-
-	tilemap_set_transparent_pen(fg_tilemap, 15);
-	tilemap_set_scrolldy(fg_tilemap, 8, 8);
-
-	tilemap_set_scrolldx(bg_tilemap, 15+256, 24+256);
-	tilemap_set_scrolldy(bg_tilemap,  8, -32);
+	tilemap_set_scrolldy(bg_tilemap,  8, -32+256);
 
 	num_sprites = 50;
 	yscroll_mask = 0x1ff;
 }
+
+VIDEO_START( aso )
+{
+	VIDEO_START_CALL(jcross);
+
+	tilemap_set_scrolldx(bg_tilemap, 15+256, 24+256);
+
+	num_sprites = 50;
+	yscroll_mask = 0x1ff;
+}
+
 
 VIDEO_START( tnk3 )
 {
@@ -358,6 +353,16 @@ WRITE8_HANDLER( sgladiat_flipscreen_w )
 	flip_screen_set(data & 0x80);
 
 	tilemap_set_palette_offset(bg_tilemap, ((data & 0xf) ^ 8) << 4);
+
+	// other bits unknown
+}
+
+WRITE8_HANDLER( hal21_flipscreen_w )
+{
+	flip_screen_set(data & 0x80);
+
+	tilemap_set_palette_offset(bg_tilemap, ((data & 0xf) ^ 8) << 4);
+	tilemap_set_pen_data_offset(bg_tilemap, ((data & 0x20) << 3) * machine->gfx[1]->char_modulo);
 
 	// other bits unknown
 }
