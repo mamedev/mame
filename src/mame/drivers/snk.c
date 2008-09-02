@@ -4,11 +4,8 @@ snk.c
 
 various SNK triple Z80 games
 
-ay8910x2 + namco wave
-Jumping Cross
-
 ay8910x2
-Gladiator 1984
+Jumping Cross, Gladiator 1984
 
 ym3526
 ASO, Tank
@@ -212,7 +209,6 @@ TODO:
 #include "driver.h"
 #include "snk.h"
 #include "sound/ay8910.h"
-#include "sound/namco.h"
 #include "sound/3812intf.h"
 
 
@@ -368,13 +364,6 @@ static TIMER_CALLBACK( sndirq_update_callback )
 	cpunum_set_input_line(machine, 2, 0, (sound_status & 0xb) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-
-
-static const namco_interface snkwave_interface =
-{
-	1,
-	0					/* stereo */
-};
 
 
 static void ymirq_callback_1(running_machine *machine, int irq)
@@ -769,7 +758,7 @@ static ADDRESS_MAP_START( jcross_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa300, 0xa300) AM_WRITE(sgladiat_soundlatch_w)
 	AM_RANGE(0xa400, 0xa400) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa500, 0xa500) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa600, 0xa600) AM_WRITE(sgladiat_flipscreen_w)
+	AM_RANGE(0xa600, 0xa600) AM_WRITE(sgladiat_flipscreen_w)	// flip screen, bg palette bank
 	AM_RANGE(0xa700, 0xa700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xd300, 0xd300) AM_WRITE(jcross_scroll_msb_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(snk_sp16_scrolly_w)
@@ -799,7 +788,7 @@ static ADDRESS_MAP_START( sgladiat_cpuA_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa300, 0xa300) AM_WRITE(sgladiat_soundlatch_w)
 	AM_RANGE(0xa400, 0xa400) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa500, 0xa500) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa600, 0xa600) AM_WRITE(sgladiat_flipscreen_w)
+	AM_RANGE(0xa600, 0xa600) AM_WRITE(sgladiat_flipscreen_w)	// flip screen, bg palette bank
 	AM_RANGE(0xa700, 0xa700) AM_READWRITE(snk_cpuB_nmi_trigger_r, snk_cpuA_nmi_ack_w)
 	AM_RANGE(0xd200, 0xd200) AM_WRITENOP	// unknown
 	AM_RANGE(0xd300, 0xd300) AM_WRITE(sgladiat_scroll_msb_w)
@@ -816,7 +805,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sgladiat_cpuB_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_READWRITE(snk_cpuA_nmi_trigger_r, snk_cpuB_nmi_ack_w)
-	AM_RANGE(0xa600, 0xa600) AM_WRITE(sgladiat_flipscreen_w)
+	AM_RANGE(0xa600, 0xa600) AM_WRITE(sgladiat_flipscreen_w)	// flip screen, bg palette bank
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(aso_bg_videoram_w) AM_SHARE(2)
 	AM_RANGE(0xda00, 0xda00) AM_WRITENOP	// unknown
@@ -1132,25 +1121,13 @@ ADDRESS_MAP_END
 /***********************************************************************/
 
 static ADDRESS_MAP_START( jcross_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_ROM AM_BASE(&namco_wavedata)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0xa000, 0xa000) AM_READ(sgladiat_soundlatch_r)
-	AM_RANGE(0xc000, 0xc000) AM_READ(sgladiat_sound_nmi_ack_r)
-	AM_RANGE(0xe000, 0xe000) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xe001, 0xe001) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0xe002, 0xe007) AM_WRITE(snkwave_w)
-	AM_RANGE(0xe008, 0xe008) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0xe009, 0xe009) AM_WRITE(ay8910_write_port_1_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sgladiat_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(sgladiat_soundlatch_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ(sgladiat_sound_nmi_ack_r)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0xe002, 0xe003) AM_WRITENOP	// leftover wave generator ports?
+	AM_RANGE(0xe002, 0xe003) AM_WRITENOP	// ? always FFFF
 	AM_RANGE(0xe004, 0xe004) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0xe005, 0xe005) AM_WRITE(ay8910_write_port_1_w)
 ADDRESS_MAP_END
@@ -1325,7 +1302,7 @@ static INPUT_PORTS_START( sgladiat )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
@@ -1409,7 +1386,7 @@ static INPUT_PORTS_START( aso )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
@@ -1437,7 +1414,7 @@ static INPUT_PORTS_START( aso )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, "3 Times" )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:2")
@@ -1524,7 +1501,7 @@ static INPUT_PORTS_START( alphamis )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW1:1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x01, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, "3 Times" )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Cabinet ) )          PORT_DIPLOCATION("DSW1:2")
@@ -1578,7 +1555,7 @@ static INPUT_PORTS_START( tnk3 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(snk_sound_busy, 0)
@@ -1646,7 +1623,7 @@ static INPUT_PORTS_START( tnk3 )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "DSW2:7" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW2:8")
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )   PORT_DIPLOCATION("DSW2:8")
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, "5 Times" )
 
@@ -1790,7 +1767,7 @@ static INPUT_PORTS_START( fitegolf )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("DSW1:3")
-	PORT_DIPSETTING(    0x04, "Upright 2 Players" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("DSW1:4,5")
 	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
@@ -2073,7 +2050,7 @@ static INPUT_PORTS_START( victroad )
 	PORT_DIPSETTING(    0x20, "60k 120k" )
 	PORT_DIPSETTING(    0x10, "100k 200k" )
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
-	PORT_DIPNAME( 0x40 ,0x00, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("DSW2:7")
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x80, 0x80, "Credits Buy Lives During Play" ) PORT_DIPLOCATION("DSW2:8")
@@ -2988,10 +2965,6 @@ static MACHINE_DRIVER_START( jcross )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 2000000)	/* NOT verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
-
-	MDRV_SOUND_ADD("namco", NAMCO, 24000)
-	MDRV_SOUND_CONFIG(snkwave_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
 MACHINE_DRIVER_END
 
 
@@ -3006,17 +2979,11 @@ static MACHINE_DRIVER_START( sgladiat )
 	MDRV_CPU_MODIFY("sub")
 	MDRV_CPU_PROGRAM_MAP(sgladiat_cpuB_map,0)
 
-	MDRV_CPU_MODIFY("audio")
-	MDRV_CPU_PROGRAM_MAP(sgladiat_sound_map,0)
-
 	/* video hardware */
 	/* visible area is correct. Debug info is shown in the black bars at the sides
        of the screen when the Debug dip switch is on */
 
 	MDRV_VIDEO_START(sgladiat)
-
-	/* sound hardware */
-	MDRV_SOUND_REMOVE("namco")
 MACHINE_DRIVER_END
 
 
