@@ -145,21 +145,13 @@ static ADDRESS_MAP_START( popeyebl_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe01f) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN0")
 	AM_RANGE(0x03, 0x03) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
-ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( skyskipr )
@@ -485,7 +477,7 @@ static MACHINE_DRIVER_START( skyskipr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 8000000/2)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(skyskipr_readmem,skyskipr_writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", popeye_interrupt)
 
 	/* video hardware */
@@ -708,3 +700,4 @@ GAME( 1982, popeye,   0,      popeye,   popeye,   popeye,   ROT0, "Nintendo", "P
 GAME( 1982, popeyeu,  popeye, popeye,   popeye,   popeye,   ROT0, "Nintendo", "Popeye (revision D not protected)", 0 )
 GAME( 1982, popeyef,  popeye, popeye,   popeyef,  popeye,   ROT0, "Nintendo", "Popeye (revision F)", 0 )
 GAME( 1982, popeyebl, popeye, popeyebl, popeye,   0,        ROT0, "bootleg",  "Popeye (bootleg)", 0 )
+

@@ -454,16 +454,10 @@ static ADDRESS_MAP_START( tharrier_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf700, 0xf700) AM_WRITE(tharrier_oki6295_bankswitch_1_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tharrier_sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( tharrier_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(ym2203_status_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(ym2203_read_port_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( tharrier_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tharrier_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1095,20 +1089,12 @@ static ADDRESS_MAP_START( macross2_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch2_w)	/* to 68000 */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( macross2_sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( macross2_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(ym2203_status_port_0_r)
-	AM_RANGE(0x01, 0x01) AM_READ(ym2203_read_port_0_r)
-	AM_RANGE(0x80, 0x80) AM_READ(okim6295_status_0_r)
-	AM_RANGE(0x88, 0x88) AM_READ(okim6295_status_1_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( macross2_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(okim6295_data_0_w)
-	AM_RANGE(0x88, 0x88) AM_WRITE(okim6295_data_1_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
+	AM_RANGE(0x88, 0x88) AM_READWRITE(okim6295_status_1_r, okim6295_data_1_w)
 	AM_RANGE(0x90, 0x97) AM_WRITE(NMK112_okibank_w)
 ADDRESS_MAP_END
 
@@ -3532,7 +3518,7 @@ static MACHINE_DRIVER_START( tharrier )
 
 	MDRV_CPU_ADD("audio", Z80, 3000000)
 	MDRV_CPU_PROGRAM_MAP(tharrier_sound_readmem,tharrier_sound_writemem)
-	MDRV_CPU_IO_MAP(tharrier_sound_readport,tharrier_sound_writeport)
+	MDRV_CPU_IO_MAP(tharrier_sound_io_map,0)
 
 	MDRV_MACHINE_RESET(mustang_sound)
 
@@ -3581,7 +3567,7 @@ static MACHINE_DRIVER_START( manybloc )
 
 	MDRV_CPU_ADD("audio", Z80, 3000000)
 	MDRV_CPU_PROGRAM_MAP(tharrier_sound_readmem,tharrier_sound_writemem)
-	MDRV_CPU_IO_MAP(tharrier_sound_readport,tharrier_sound_writeport)
+	MDRV_CPU_IO_MAP(tharrier_sound_io_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -4218,7 +4204,7 @@ static MACHINE_DRIVER_START( macross2 )
 
 	MDRV_CPU_ADD("audio", Z80, 4000000) /* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(macross2_sound_readmem,macross2_sound_writemem)
-	MDRV_CPU_IO_MAP(macross2_sound_readport,macross2_sound_writeport)
+	MDRV_CPU_IO_MAP(macross2_sound_io_map,0)
 
 	MDRV_MACHINE_RESET(nmk16)
 
@@ -4263,7 +4249,7 @@ static MACHINE_DRIVER_START( tdragon2 )
 
 	MDRV_CPU_ADD("audio", Z80, 4000000) /* 4 MHz  */
 	MDRV_CPU_PROGRAM_MAP(macross2_sound_readmem,macross2_sound_writemem)
-	MDRV_CPU_IO_MAP(macross2_sound_readport,macross2_sound_writeport)
+	MDRV_CPU_IO_MAP(macross2_sound_io_map,0)
 
 	MDRV_MACHINE_RESET(nmk16)
 
@@ -6988,3 +6974,4 @@ GAME( 2001, firehawk, 0,        firehawk, firehawk, 0,        ORIENTATION_FLIP_Y
 
 // bee-oh board - different display / interrupt timing to others?
 GAME( 1991, manybloc, 0,        manybloc, manybloc, 0,        ROT270,             "Bee-Oh",            "Many Block", GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
+

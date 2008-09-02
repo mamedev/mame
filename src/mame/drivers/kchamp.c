@@ -139,31 +139,20 @@ static WRITE8_HANDLER( sound_msm_w ) {
 	msm_play_lo_nibble = 1;
 }
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("P2")
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(kchamp_flipscreen_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(control_w)
+	AM_RANGE(0x02, 0x02) AM_WRITE(sound_reset_w)
+	AM_RANGE(0x40, 0x40) AM_READ_PORT("P2") AM_WRITE(sound_command_w)
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xC0, 0xC0) AM_READ_PORT("DSW")
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(kchamp_flipscreen_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(control_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(sound_reset_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(sound_command_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(soundlatch_r, ay8910_control_port_0_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_write_port_1_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(sound_msm_w)
@@ -214,28 +203,17 @@ static WRITE8_HANDLER( kc_sound_control_w ) {
 //      DAC_set_volume(0,( data == 1 ) ? 255 : 0,0);
 }
 
-static ADDRESS_MAP_START( kc_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( kc_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW") AM_WRITE(kchamp_flipscreen_w)
+	AM_RANGE(0x81, 0x81) AM_WRITE(control_w)
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("P1")
 	AM_RANGE(0x98, 0x98) AM_READ_PORT("P2")
 	AM_RANGE(0xa0, 0xa0) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x80, 0x80) AM_READ_PORT("DSW")
-	AM_RANGE(0xa8, 0xa8) AM_READ(sound_reset_r)
+	AM_RANGE(0xa8, 0xa8) AM_READWRITE(sound_reset_r, sound_command_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kc_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_WRITE(kchamp_flipscreen_w)
-	AM_RANGE(0x81, 0x81) AM_WRITE(control_w)
-	AM_RANGE(0xa8, 0xa8) AM_WRITE(sound_command_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( kc_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( kc_sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( kc_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_control_port_0_w)
@@ -243,8 +221,8 @@ static ADDRESS_MAP_START( kc_sound_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x03, 0x03) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(dac_0_data_w)
 	AM_RANGE(0x05, 0x05) AM_WRITE(kc_sound_control_w)
+	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
-
 
 static INPUT_PORTS_START( kchampvs )
 	PORT_START("P1")
@@ -442,14 +420,13 @@ static MACHINE_DRIVER_START( kchampvs )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", kc_interrupt)
 
 	MDRV_CPU_ADD("audio", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
-			/* irq's triggered from main cpu */
-			/* nmi's from msm5205 */
+	MDRV_CPU_IO_MAP(sound_io_map,0)		/* irq's triggered from main cpu */
+										/* nmi's from msm5205 */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -489,15 +466,15 @@ static MACHINE_DRIVER_START( kchamp )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(kc_readmem,kc_writemem)
-	MDRV_CPU_IO_MAP(kc_readport,kc_writeport)
+	MDRV_CPU_IO_MAP(kc_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", kc_interrupt)
 
 	MDRV_CPU_ADD("audio", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(kc_sound_readmem,kc_sound_writemem)
-	MDRV_CPU_IO_MAP(kc_sound_readport,kc_sound_writeport)
-	MDRV_CPU_PERIODIC_INT(sound_int, 125) /* Hz */
-			/* irq's triggered from main cpu */
-			/* nmi's from 125 Hz clock */
+	MDRV_CPU_IO_MAP(kc_sound_io_map,0)
+	MDRV_CPU_PERIODIC_INT(sound_int, 125)	/* Hz */
+											/* irq's triggered from main cpu */
+											/* nmi's from 125 Hz clock */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -739,3 +716,4 @@ GAME( 1984, kchamp,   0,      kchamp,   kchamp,   0,        ROT90, "Data East US
 GAME( 1984, karatedo, kchamp, kchamp,   kchamp,   0,        ROT90, "Data East Corporation", "Karate Dou (Japan)", 0 )
 GAME( 1984, kchampvs, kchamp, kchampvs, kchampvs, kchampvs, ROT90, "Data East USA", "Karate Champ (US VS version)", 0 )
 GAME( 1984, karatevs, kchamp, kchampvs, kchampvs, kchampvs, ROT90, "Data East Corporation", "Taisen Karate Dou (Japan VS version)", 0 )
+

@@ -361,23 +361,17 @@ static ADDRESS_MAP_START( fuuki32_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM		)	// ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fuuki32_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_READ(ymf262_status_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fuuki32_sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( fuuki32_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fuuki32_sound_bw_w)
 	AM_RANGE(0x30, 0x30) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x40, 0x40) AM_WRITE(ymf262_register_a_0_w)
+	AM_RANGE(0x40, 0x40) AM_READWRITE(ymf262_status_0_r, ymf262_register_a_0_w)
 	AM_RANGE(0x41, 0x41) AM_WRITE(ymf262_data_a_0_w)
 	AM_RANGE(0x42, 0x42) AM_WRITE(ymf262_register_b_0_w)
 	AM_RANGE(0x43, 0x43) AM_WRITE(ymf262_data_b_0_w)
 	AM_RANGE(0x44, 0x44) AM_WRITE(ymf278b_control_port_0_c_w)
 	AM_RANGE(0x45, 0x45) AM_WRITE(ymf278b_data_port_0_c_w)
 ADDRESS_MAP_END
-
 
 /***************************************************************************
 
@@ -604,7 +598,7 @@ static MACHINE_DRIVER_START( fuuki32 )
 
 	MDRV_CPU_ADD("sound", Z80, SOUND_CPU_CLOCK) /* 6MHz verified */
 	MDRV_CPU_PROGRAM_MAP(fuuki32_sound_readmem,fuuki32_sound_writemem)
-	MDRV_CPU_IO_MAP(fuuki32_sound_readport,fuuki32_sound_writeport)
+	MDRV_CPU_IO_MAP(fuuki32_sound_io_map,0)
 
 	MDRV_MACHINE_START(fuuki32)
 	MDRV_MACHINE_RESET(fuuki32)
@@ -753,3 +747,4 @@ ROM_END
 
 GAME( 1998, asurabld,	0, fuuki32, asurabld, 0, ROT0, "Fuuki", "Asura Blade - Sword of Dynasty (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 2000, asurabus,	0, fuuki32, asurabld, 0, ROT0, "Fuuki", "Asura Buster - Eternal Warriors (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ) // sounds loop forever?
+

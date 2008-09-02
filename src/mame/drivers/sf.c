@@ -276,15 +276,10 @@ static ADDRESS_MAP_START( sound2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound2_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( sound2_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound2_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(msm5205_w)
+	AM_RANGE(0x01, 0x01) AM_READ(soundlatch_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(sound2_bank_w)
 ADDRESS_MAP_END
 
@@ -827,7 +822,7 @@ static MACHINE_DRIVER_START( sf )
 
 	MDRV_CPU_ADD("audio2", Z80, 3579545)	/* ? xtal is 3.579545MHz */
 	MDRV_CPU_PROGRAM_MAP(sound2_readmem,sound2_writemem)
-	MDRV_CPU_IO_MAP(sound2_readport,sound2_writeport)
+	MDRV_CPU_IO_MAP(sound2_io_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,8000)
 
 	/* video hardware */
@@ -1142,7 +1137,8 @@ ROM_END
 
 
 
-GAME( 1987, sf,   0,   sf,   sf,   0, ROT0, "Capcom", "Street Fighter (World)", 0 )
+GAME( 1987, sf,   0,  sf,   sf,   0, ROT0, "Capcom", "Street Fighter (World)", 0 )
 GAME( 1987, sfus, sf, sfus, sfus, 0, ROT0, "Capcom", "Street Fighter (US)", 0 )
 GAME( 1987, sfjp, sf, sfjp, sfjp, 0, ROT0, "Capcom", "Street Fighter (Japan)", 0 )
 GAME( 1987, sfp,  sf, sfp,  sf,   0, ROT0, "Capcom", "Street Fighter (prototype)", 0 )
+

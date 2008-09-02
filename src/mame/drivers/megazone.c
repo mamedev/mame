@@ -132,14 +132,10 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc001, 0xc001) AM_WRITE(watchdog_reset_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x02) AM_READ(ay8910_read_port_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x00, 0x02) AM_READ(ay8910_read_port_0_r)
 	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
@@ -151,11 +147,8 @@ static ADDRESS_MAP_START( i8039_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8039_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( i8039_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0xff) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( i8039_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(dac_0_data_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(i8039_irqen_and_status_w)
 ADDRESS_MAP_END
@@ -320,12 +313,12 @@ static MACHINE_DRIVER_START( megazone )
 
 	MDRV_CPU_ADD("audio", Z80,18432000/6)     /* Z80 Clock is derived from the H1 signal */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("dac", I8039,14318000/2)	/* 1/2 14MHz crystal */
 	MDRV_CPU_PROGRAM_MAP(i8039_readmem,i8039_writemem)
-	MDRV_CPU_IO_MAP(i8039_readport,i8039_writeport)
+	MDRV_CPU_IO_MAP(i8039_io_map,0)
 
 	MDRV_INTERLEAVE(15)
 
@@ -599,3 +592,4 @@ GAME( 1983, megazonc, megazone, megazone, megazone, megazone, ROT90, "Konami / K
 
 /* this displays Konami and Kosuka copyright with a Konami / Interlogic logo */
 GAME( 1983, megaznik, megazone, megazone, megazone, megazone, ROT90, "Konami / Interlogic + Kosuka", "Mega Zone (Interlogic + Kosuka)", 0 )
+

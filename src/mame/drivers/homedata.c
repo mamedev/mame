@@ -606,12 +606,9 @@ static ADDRESS_MAP_START( mrokumei_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(mrokumei_sound_bank_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mrokumei_sound_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_READ(mrokumei_sound_io_r)
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mrokumei_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(mrokumei_sound_io_w)	/* read address is 16-bit, write address is only 8-bit */
+static ADDRESS_MAP_START( mrokumei_sound_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x0000, 0xffff) AM_READWRITE(mrokumei_sound_io_r, mrokumei_sound_io_w) /* read address is 16-bit, write address is only 8-bit */
 ADDRESS_MAP_END
 
 /********************************************************************************/
@@ -653,17 +650,12 @@ static ADDRESS_MAP_START( reikaids_upd7807_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff00, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( reikaids_upd7807_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_READ(reikaids_upd7807_porta_r)
-	AM_RANGE(UPD7807_PORTT, UPD7807_PORTT) AM_READ(reikaids_snd_command_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( reikaids_upd7807_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_WRITE(reikaids_upd7807_porta_w)
+static ADDRESS_MAP_START( reikaids_upd7807_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_READWRITE(reikaids_upd7807_porta_r, reikaids_upd7807_porta_w)
 	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_WRITE(dac_0_signed_data_w)
 	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_WRITE(reikaids_upd7807_portc_w)
+	AM_RANGE(UPD7807_PORTT, UPD7807_PORTT) AM_READ(reikaids_snd_command_r)
 ADDRESS_MAP_END
-
 
 /**************************************************************************/
 
@@ -706,18 +698,12 @@ static ADDRESS_MAP_START( pteacher_upd7807_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff00, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( pteacher_upd7807_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_READ(pteacher_upd7807_porta_r)
-	AM_RANGE(UPD7807_PORTT, UPD7807_PORTT) AM_READ(pteacher_keyboard_r)
-	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_READ_PORT("COIN")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( pteacher_upd7807_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_WRITE(pteacher_upd7807_porta_w)
+static ADDRESS_MAP_START( pteacher_upd7807_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(UPD7807_PORTA, UPD7807_PORTA) AM_READWRITE(pteacher_upd7807_porta_r, pteacher_upd7807_porta_w)
 	AM_RANGE(UPD7807_PORTB, UPD7807_PORTB) AM_WRITE(dac_0_signed_data_w)
-	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_WRITE(pteacher_upd7807_portc_w)
+	AM_RANGE(UPD7807_PORTC, UPD7807_PORTC) AM_READ_PORT("COIN") AM_WRITE(pteacher_upd7807_portc_w)
+	AM_RANGE(UPD7807_PORTT, UPD7807_PORTT) AM_READ(pteacher_keyboard_r)
 ADDRESS_MAP_END
-
 
 /**************************************************************************/
 
@@ -1231,7 +1217,7 @@ static MACHINE_DRIVER_START( mrokumei )
 
 	MDRV_CPU_ADD("audio", Z80, 16000000/4)	/* 4MHz ? */
 	MDRV_CPU_PROGRAM_MAP(mrokumei_sound_readmem,mrokumei_sound_writemem)
-	MDRV_CPU_IO_MAP(mrokumei_sound_readport,mrokumei_sound_writeport)
+	MDRV_CPU_IO_MAP(mrokumei_sound_io_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1295,7 +1281,7 @@ static MACHINE_DRIVER_START( reikaids )
 	MDRV_CPU_ADD("audio", UPD7807, 8000000)	/* ??? MHz (max speed for the 7807 is 12MHz) */
 	MDRV_CPU_CONFIG(upd_config)
 	MDRV_CPU_PROGRAM_MAP(reikaids_upd7807_readmem,reikaids_upd7807_writemem)
-	MDRV_CPU_IO_MAP(reikaids_upd7807_readport,reikaids_upd7807_writeport)
+	MDRV_CPU_IO_MAP(reikaids_upd7807_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", upd7807_irq)
 
 	MDRV_INTERLEAVE(500)	// very high interleave required to sync for startup tests
@@ -1345,7 +1331,7 @@ static MACHINE_DRIVER_START( pteacher )
 	MDRV_CPU_ADD("audio", UPD7807, 9000000)	/* 9MHz ? */
 	MDRV_CPU_CONFIG(upd_config)
 	MDRV_CPU_PROGRAM_MAP(pteacher_upd7807_readmem,pteacher_upd7807_writemem)
-	MDRV_CPU_IO_MAP(pteacher_upd7807_readport,pteacher_upd7807_writeport)
+	MDRV_CPU_IO_MAP(pteacher_upd7807_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", upd7807_irq)
 
 	MDRV_INTERLEAVE(100)	// should be enough
@@ -1838,6 +1824,4 @@ GAME( 1992?,jogakuen, 0, pteacher, jogakuen, jogakuen,   ROT0, "Windom",    "Mah
 GAME( 1990, lemnangl, 0, lemnangl, pteacher, 0,          ROT0, "Home Data", "Mahjong Lemon Angel (Japan)", 0 )
 
 GAME( 1991?,mjikaga,  0, lemnangl, mjikaga,  mjikaga,    ROT0, "Mitchell",  "Mahjong Ikaga Desu ka (Japan)", GAME_NOT_WORKING | GAME_NO_SOUND )
-
-
 

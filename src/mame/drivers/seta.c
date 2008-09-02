@@ -3004,21 +3004,16 @@ static ADDRESS_MAP_START( utoukond_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(seta_sound_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( utoukond_sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( utoukond_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(ym3438_status_port_0_a_r)
-	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-static ADDRESS_MAP_START( utoukond_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym3438_control_port_0_a_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(ym3438_status_port_0_a_r, ym3438_control_port_0_a_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ym3438_data_port_0_a_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(ym3438_control_port_0_b_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(ym3438_data_port_0_b_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(SMH_NOP) //?
+	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-/* it has a series of tests on startup, if they don't pass it causes an address error */
 static UINT16 pairslove_protram[0x200];
 static UINT16 pairslove_protram_old[0x200];
 
@@ -7920,7 +7915,7 @@ static MACHINE_DRIVER_START( utoukond )
 
 	MDRV_CPU_ADD("audio", Z80, 16000000/4)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(utoukond_sound_readmem,utoukond_sound_writemem)
-	MDRV_CPU_IO_MAP(utoukond_sound_readport,utoukond_sound_writeport)
+	MDRV_CPU_IO_MAP(utoukond_sound_io_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -9596,3 +9591,4 @@ GAME( 1995, sokonuke, 0,        extdwnhl, sokonuke, 0,        ROT0,   "Sammy Ind
 GAME( 1995, zombraid, 0,        gundhara, zombraid, zombraid, ROT0,   "American Sammy",         "Zombie Raid (US)", GAME_NO_COCKTAIL )
 GAME( 1996, crazyfgt, 0,        crazyfgt, crazyfgt, crazyfgt, ROT0,   "Subsino",                "Crazy Fight", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1998, inttoote, 0,        inttoote, inttoote, inttoote, ROT0,   "Coinmaster",             "International Toote (Germany)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+
