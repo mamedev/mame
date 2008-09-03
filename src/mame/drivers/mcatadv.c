@@ -258,14 +258,9 @@ static ADDRESS_MAP_START( mcatadv_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(mcatadv_sound_bw_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mcatadv_sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mcatadv_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mcatadv_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_WRITE(soundlatch2_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(soundlatch_r, soundlatch2_w)
 ADDRESS_MAP_END
 
 
@@ -281,21 +276,16 @@ static ADDRESS_MAP_START( nost_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(SMH_RAM		)	// RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( nost_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x05) AM_READ(ym2610_status_port_0_a_r)
-	AM_RANGE(0x06, 0x07) AM_READ(ym2610_status_port_0_b_r)
-	AM_RANGE(0x80, 0x80) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( nost_sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( nost_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ym2610_control_port_0_a_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ym2610_data_port_0_a_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(ym2610_control_port_0_b_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(ym2610_data_port_0_b_w)
+	AM_RANGE(0x04, 0x05) AM_READ(ym2610_status_port_0_a_r)
+	AM_RANGE(0x06, 0x07) AM_READ(ym2610_status_port_0_b_r)
 	AM_RANGE(0x40, 0x40) AM_WRITE(mcatadv_sound_bw_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(soundlatch2_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(soundlatch_r, soundlatch2_w)
 ADDRESS_MAP_END
 
 /*** Inputs ***/
@@ -494,7 +484,7 @@ static MACHINE_DRIVER_START( mcatadv )
 
 	MDRV_CPU_ADD("sound", Z80, XTAL_16MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(mcatadv_sound_readmem,mcatadv_sound_writemem)
-	MDRV_CPU_IO_MAP(mcatadv_sound_readport,mcatadv_sound_writeport)
+	MDRV_CPU_IO_MAP(mcatadv_sound_io_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -529,7 +519,7 @@ static MACHINE_DRIVER_START( nost )
 
 	MDRV_CPU_MODIFY("sound")
 	MDRV_CPU_PROGRAM_MAP(nost_sound_readmem,nost_sound_writemem)
-	MDRV_CPU_IO_MAP(nost_sound_readport,nost_sound_writeport)
+	MDRV_CPU_IO_MAP(nost_sound_io_map,0)
 MACHINE_DRIVER_END
 
 
@@ -725,3 +715,4 @@ GAME( 1993, catt,     mcatadv, mcatadv, mcatadv, mcatadv, ROT0,   "Wintechno", "
 GAME( 1993, nost,     0,       nost,    nost,    mcatadv, ROT270, "Face",      "Nostradamus", GAME_NO_COCKTAIL )
 GAME( 1993, nostj,    nost,    nost,    nost,    mcatadv, ROT270, "Face",      "Nostradamus (Japan)", GAME_NO_COCKTAIL )
 GAME( 1993, nostk,    nost,    nost,    nost,    mcatadv, ROT270, "Face",      "Nostradamus (Korea)", GAME_NO_COCKTAIL )
+

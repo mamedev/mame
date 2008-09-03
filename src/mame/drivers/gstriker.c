@@ -326,23 +326,16 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(ym2610_status_port_0_a_r)
-	AM_RANGE(0x02, 0x02) AM_READ(ym2610_status_port_0_b_r)
-	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2610_control_port_0_a_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2610_status_port_0_a_r, ym2610_control_port_0_a_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ym2610_data_port_0_a_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(ym2610_control_port_0_b_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(ym2610_status_port_0_b_r, ym2610_control_port_0_b_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(ym2610_data_port_0_b_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(gs_sh_bankswitch_w)
 	AM_RANGE(0x08, 0x08) AM_WRITE(gs_sh_pending_command_clear_w)
+	AM_RANGE(0x0c, 0x0c) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
-
 
 
 static ADDRESS_MAP_START( vgoal_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -578,7 +571,7 @@ static MACHINE_DRIVER_START( gstriker )
 
 	MDRV_CPU_ADD("audio", Z80,8000000/2)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
@@ -618,7 +611,7 @@ static MACHINE_DRIVER_START( vgoal )
 
 	MDRV_CPU_ADD("audio", Z80,8000000/2)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
@@ -1030,3 +1023,4 @@ GAME( 199?, vgoalsoc, 0,        vgoal,    vgoalsoc, vgoalsoc,   ROT0, "Tecmo", "
 GAME( 199?, vgoalsca, vgoalsoc, vgoal,    vgoalsoc, vgoalsoc,   ROT0, "Tecmo", "V Goal Soccer (set 2)", GAME_NOT_WORKING )
 GAME( 1994, twrldc94, 0,        twrldc94, twrldc94, twrldc94,   ROT0, "Tecmo", "Tecmo World Cup '94 (set 1)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, twrdc94a, twrldc94, twrldc94, twrldc94, twrldc94a,  ROT0, "Tecmo", "Tecmo World Cup '94 (set 2)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_GRAPHICS )
+

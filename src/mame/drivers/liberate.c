@@ -125,12 +125,8 @@ static ADDRESS_MAP_START( liberate_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( deco16_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( deco16_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_WRITE(deco16_bank_w)
+static ADDRESS_MAP_START( deco16_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(deco16_bank_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( liberatb_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -522,7 +518,7 @@ static MACHINE_DRIVER_START( liberate )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main",DECO16, 2000000)
 	MDRV_CPU_PROGRAM_MAP(liberate_readmem,liberate_writemem)
-	MDRV_CPU_IO_MAP(deco16_readport,deco16_writeport)
+	MDRV_CPU_IO_MAP(deco16_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", deco16_interrupt)
 
 	MDRV_CPU_ADD("audio",M6502, 1500000)
@@ -579,7 +575,7 @@ static MACHINE_DRIVER_START( prosoccr )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", DECO16, 3000000)
 	MDRV_CPU_PROGRAM_MAP(liberate_readmem,liberate_writemem)
-	MDRV_CPU_IO_MAP(deco16_readport,deco16_writeport)
+	MDRV_CPU_IO_MAP(deco16_io_map,0)
 
 	MDRV_IMPORT_FROM(liberate)
 	MDRV_CPU_REMOVE("main")
@@ -593,7 +589,7 @@ static MACHINE_DRIVER_START( prosport )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", DECO16, 2000000)
 	MDRV_CPU_PROGRAM_MAP(prosport_readmem,prosport_writemem)
-	MDRV_CPU_IO_MAP(deco16_readport,deco16_writeport)
+	MDRV_CPU_IO_MAP(deco16_io_map,0)
 
 	MDRV_CPU_ADD("audio", M6502, 1500000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
@@ -965,3 +961,4 @@ GAME( 1984, yellowcb, kamikcab, boomrang,  yellowcb, yellowcb, ROT270, "bootleg"
 GAME( 1984, liberate, 0,        liberate,  liberate, liberate, ROT270, "Data East Corporation", "Liberation", 0 )
 GAME( 1984, dualaslt, liberate, liberate,  dualaslt, liberate, ROT270, "Data East USA",         "Dual Assault", 0 )
 GAME( 1984, liberatb, liberate, liberatb,  liberatb, prosport, ROT270, "bootleg",               "Liberation (bootleg)", 0 )
+

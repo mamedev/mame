@@ -449,17 +449,11 @@ static ADDRESS_MAP_START( fromanc2_writemem_sub, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_WRITE(SMH_BANK2)					// RAM(BANK)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromanc2_readport_sub, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READ(fromanc2_maincpu_r_l)			// to MAIN CPU
-	AM_RANGE(0x04, 0x04) AM_READ(fromanc2_maincpu_r_h)			// to MAIN CPU
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fromanc2_writeport_sub, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( fromanc2_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(fromanc2_subcpu_rombank_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(fromanc2_maincpu_w_l)			// from MAIN CPU
-	AM_RANGE(0x04, 0x04) AM_WRITE(fromanc2_maincpu_w_h)			// from MAIN CPU
+	AM_RANGE(0x02, 0x02) AM_READWRITE(fromanc2_maincpu_r_l, fromanc2_maincpu_w_l)	// to/from MAIN CPU
+	AM_RANGE(0x04, 0x04) AM_READWRITE(fromanc2_maincpu_r_h, fromanc2_maincpu_w_h)	// to/from MAIN CPU
 	AM_RANGE(0x06, 0x06) AM_WRITE(fromanc2_subcpu_nmi_clr)
 ADDRESS_MAP_END
 
@@ -478,25 +472,16 @@ static ADDRESS_MAP_START( fromanc2_writemem_sound, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromanc2_readport_sound, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( fromanc2_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)					// snd cmd (1P)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch2_r)					// snd cmd (2P)
-	AM_RANGE(0x09, 0x09) AM_READ(SMH_NOP)						// ?
-	AM_RANGE(0x08, 0x08) AM_READ(ym2610_status_port_0_a_r)
-	AM_RANGE(0x0a, 0x0a) AM_READ(ym2610_status_port_0_b_r)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(soundlatch_r, SMH_NOP)			// snd cmd (1P) / ?
+	AM_RANGE(0x04, 0x04) AM_READ(soundlatch2_r)							// snd cmd (2P)
+	AM_RANGE(0x08, 0x08) AM_READWRITE(ym2610_status_port_0_a_r, ym2610_control_port_0_a_w)
+	AM_RANGE(0x09, 0x09) AM_READWRITE(SMH_NOP, ym2610_data_port_0_a_w)	// ?
+	AM_RANGE(0x0a, 0x0a) AM_READWRITE(ym2610_status_port_0_b_r, ym2610_control_port_0_b_w)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(ym2610_data_port_0_b_w)
 	AM_RANGE(0x0c, 0x0c) AM_READ(fromanc2_sndcpu_nmi_clr)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( fromanc2_writeport_sound, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)						// ?
-	AM_RANGE(0x08, 0x08) AM_WRITE(ym2610_control_port_0_a_w)
-	AM_RANGE(0x09, 0x09) AM_WRITE(ym2610_data_port_0_a_w)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(ym2610_control_port_0_b_w)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(ym2610_data_port_0_b_w)
-ADDRESS_MAP_END
-
 
 /* ----------------------------------------------------------------------------
         Input Ports
@@ -679,11 +664,11 @@ static MACHINE_DRIVER_START( fromanc2 )
 
 	MDRV_CPU_ADD("audio", Z80,32000000/4)		/* 8.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_sound,fromanc2_writemem_sound)
-	MDRV_CPU_IO_MAP(fromanc2_readport_sound,fromanc2_writeport_sound)
+	MDRV_CPU_IO_MAP(fromanc2_sound_io_map,0)
 
 	MDRV_CPU_ADD("sub", Z80,32000000/4)		/* 8.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_sub,fromanc2_writemem_sub)
-	MDRV_CPU_IO_MAP(fromanc2_readport_sub,fromanc2_writeport_sub)
+	MDRV_CPU_IO_MAP(fromanc2_sub_io_map,0)
 
 
 	MDRV_MACHINE_RESET(fromanc2)
@@ -731,11 +716,11 @@ static MACHINE_DRIVER_START( fromancr )
 
 	MDRV_CPU_ADD("audio", Z80,32000000/4)		/* 8.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_sound,fromanc2_writemem_sound)
-	MDRV_CPU_IO_MAP(fromanc2_readport_sound,fromanc2_writeport_sound)
+	MDRV_CPU_IO_MAP(fromanc2_sound_io_map,0)
 
 	MDRV_CPU_ADD("sub", Z80,32000000/4)		/* 8.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_sub,fromanc2_writemem_sub)
-	MDRV_CPU_IO_MAP(fromanc2_readport_sub,fromanc2_writeport_sub)
+	MDRV_CPU_IO_MAP(fromanc2_sub_io_map,0)
 
 	MDRV_MACHINE_RESET(fromancr)
 	MDRV_NVRAM_HANDLER(93C46)
@@ -782,7 +767,7 @@ static MACHINE_DRIVER_START( fromanc4 )
 
 	MDRV_CPU_ADD("audio", Z80,32000000/4)		/* 8.00 MHz */
 	MDRV_CPU_PROGRAM_MAP(fromanc2_readmem_sound,fromanc2_writemem_sound)
-	MDRV_CPU_IO_MAP(fromanc2_readport_sound,fromanc2_writeport_sound)
+	MDRV_CPU_IO_MAP(fromanc2_sound_io_map,0)
 
 	MDRV_MACHINE_RESET(fromanc4)
 	MDRV_NVRAM_HANDLER(93C46)
@@ -930,3 +915,4 @@ ROM_END
 GAME( 1995, fromanc2, 0, fromanc2, fromanc2, fromanc2, ROT0, "Video System Co.", "Taisen Idol-Mahjong Final Romance 2 (Japan)", 0 )
 GAME( 1995, fromancr, 0, fromancr, fromanc2, fromancr, ROT0, "Video System Co.", "Taisen Mahjong FinalRomance R (Japan)", 0 )
 GAME( 1998, fromanc4, 0, fromanc4, fromanc4, fromanc4, ROT0, "Video System Co.", "Taisen Mahjong FinalRomance 4 (Japan)", 0 )
+

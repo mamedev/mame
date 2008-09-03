@@ -542,6 +542,16 @@ static WRITE8_HANDLER( deroon_bankswitch_w )
 	memory_set_bankptr( 1, memory_region(machine, "audio") + ((data-2) & 0x0f) * 0x4000 + 0x10000 );
 }
 
+static WRITE8_HANDLER( tecmosys_oki_bank_w )
+{
+	UINT8 upperbank = (data & 0x30) >> 4;
+	UINT8 lowerbank = (data & 0x03) >> 0;
+	UINT8* region = memory_region(machine, "oki");
+
+	memcpy( region+0x00000, region+0x80000 + lowerbank * 0x20000, 0x20000  );
+	memcpy( region+0x20000, region+0x80000 + upperbank * 0x20000, 0x20000  );
+}
+
 static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
@@ -553,41 +563,21 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xf7ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(ymf262_status_0_r)
-	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r)
-	AM_RANGE(0x60, 0x60) AM_READ(ymz280b_status_0_r)
-ADDRESS_MAP_END
-
-
-static WRITE8_HANDLER( tecmosys_oki_bank_w )
-{
-	UINT8 upperbank = (data & 0x30) >> 4;
-	UINT8 lowerbank = (data & 0x03) >> 0;
-	UINT8* region = memory_region(machine, "oki");
-
-	memcpy( region+0x00000, region+0x80000 + lowerbank * 0x20000, 0x20000  );
-	memcpy( region+0x20000, region+0x80000 + upperbank * 0x20000, 0x20000  );
-}
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ymf262_register_a_0_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(ymf262_status_0_r, ymf262_register_a_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ymf262_data_a_0_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(ymf262_register_b_0_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(ymf262_data_b_0_w)
-
 	AM_RANGE(0x10, 0x10) AM_WRITE(okim6295_data_0_w)
 	AM_RANGE(0x20, 0x20) AM_WRITE(tecmosys_oki_bank_w)
-
 	AM_RANGE(0x30, 0x30) AM_WRITE(deroon_bankswitch_w)
-
+	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_r)
 	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch2_w)
-
-	AM_RANGE(0x60, 0x60) AM_WRITE(ymz280b_register_0_w)
+	AM_RANGE(0x60, 0x60) AM_READWRITE(ymz280b_status_0_r, ymz280b_register_0_w)
 	AM_RANGE(0x61, 0x61) AM_WRITE(ymz280b_data_0_w)
 ADDRESS_MAP_END
+
 
 static VIDEO_START(deroon)
 {
@@ -918,7 +908,7 @@ static MACHINE_DRIVER_START( deroon )
 
 	MDRV_CPU_ADD("audio", Z80, 16000000/2 )	/* 8 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 
 	MDRV_GFXDECODE(tecmosys)
 
@@ -1140,3 +1130,4 @@ static DRIVER_INIT( tkdensha )
 GAME( 1995, deroon,      0, deroon, deroon, deroon,     ROT0, "Tecmo", "Deroon DeroDero", 0 )
 GAME( 1996, tkdensho,    0, deroon, deroon, tkdensho,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes- (VER. 960614)", 0 )
 GAME( 1996, tkdensha,    tkdensho, deroon, deroon, tkdensha,   ROT0, "Tecmo", "Touki Denshou -Angel Eyes- (VER. 960427)", 0 )
+
