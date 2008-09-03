@@ -504,6 +504,152 @@ Virtua Striker 2 2000      840-0010C  21929C       15         315-6213   317-025
 * denotes not dumped yet
 
 
+
+
+
+
+
+
+
+
+
+
+Atomiswave cart PCB layout and game usage
+-----------------------------------------
+
+Type 1 ROM Board:
+
+
+AM3AGB-04
+MROM PCB
+2002
+|----------------------------|
+| XC9536                     |
+|         IC18 IC17*   IC10  |
+|                            |
+|                            |
+|              IC16*   IC11  |
+|                            |
+|                            |
+||-|           IC15*   IC12  |
+|| |                         |
+|| |                         |
+|| |CN1        IC14*   IC13  |
+|| |                         |
+||-|                         |
+|----------------------------|
+Notes:
+           * - Denotes those devices are on the other side of the PCB
+      CN1    - This connector plugs into the main board.
+      XC9536 - Xilinx XC9536 in-system programmable CPLD (PLCC44), stamped with a
+               game code. This code is different for each different game.
+               The last 3 digits seems to be for the usage.
+               F01 = CPLD/protection device and M01 = MASKROM
+
+               Game (sorted by code)            Code
+               ------------------------------------------
+               Dolphin Blue                     AX0401F01
+               Demolish Fist                    AX0601F01
+               Guilt Gear Isuka                 AX1201F01
+               Knights Of Valour Seven Spirits  AX1301F01
+               Salaryman Kintaro                AX1401F01
+               Fist Of The North Star           AX1901F01
+               King Of Fighters NEOWAVE         AX2201F01
+
+
+        IC18 - Fujitsu 29DL640E 64M TSOP48 FlashROM. This ROM has no additional custom markings
+               The name in the archive has been devised purely for convenience.
+               This ROM holds the main program.
+
+IC10 to IC17 - Custom-badged 128M TSOP48 maskROMs. I suspect they are Macronix
+               ROMs because the ROM on the main board is also a custom Macronix
+               ROM and they have a history of producing custom ROMs for other
+               companies that hide their ROM types like Nintendo etc.
+               The ROMs match a pinout that is identical to....
+               Macronix MX26F128J3 (TSOP48)
+               Oki MR27V12800 (TSOP48)
+               More importantly the size is standard TSOP48 20mm long.
+               They have been read as Oki MR27V12800
+               The pinout also matches the same ROMs found on Namco Mr Driller 2
+               and some Namco and Capcom NAOMI carts where these ROMs are used,
+               although in all cases those ROMs are 18mm long, not 20mm.
+
+               IC10 - Not Populated for 7 ROMs or less (ROM 01 if 8 ROMs are populated)
+               IC11 - ROM 01 (or ROM 02 if 8 ROMs are populated)
+               IC12 - ROM 02 (or ROM 03 if 8 ROMs are populated)
+               IC13 - ROM 03 (or ROM 04 if 8 ROMs are populated)
+               IC14 - ROM 04 (or ROM 05 if 8 ROMs are populated)
+               IC15 - ROM 05 (or ROM 06 if 8 ROMs are populated)
+               IC16 - ROM 06 (or ROM 07 if 8 ROMs are populated)
+               IC17 - ROM 07 (or ROM 08 if 8 ROMs are populated)
+
+               ROM Codes
+               ---------
+                                                                          Number
+               Game (sorted by code)            Code                      of ROMs
+               ------------------------------------------------------------------
+               Dolphin Blue                     AX0401M01 to AX0405M01    5
+               Demolish Fist                    AX0601M01 to AX0607M01    7
+               Guilty Gear Isuka                AX1201M01 to AX1208M01    8
+               Knights Of Valour Seven Spirits  AX1301M01 to AX1307M01    7
+               Salaryman Kintaro                AX1401M01 to AX1407M01    7
+               Fist Of The North Star           AX1901M01 to AX1907M01    7
+               King Of Fighters NEOWAVE         AX2201M01 to AX2206M01    6
+
+
+
+Type 2 ROM Board:
+
+
+AM3ALW-02
+MROM2 PCB
+2005
+|----------------------------|
+|     FMEM1                  |
+|     FMEM2*   MROM12        |
+|              MROM11*       |
+|                      MROM9 |
+|              MROM10  MROM8*|
+| XCR3128XL*   MROM7*        |
+|                            |
+||-|           MROM6         |
+|| |           MROM3*  MROM4 |
+|| |                   MROM5*|
+|| |CN1        MROM2         |
+|| |           MROM1*        |
+||-|                         |
+|----------------------------|
+Notes:
+           * - Denotes those devices are on the other side of the PCB
+         CN1 - This connector plugs into the main board.
+   XCR3128XL - Xilinx XCR3128XL in-system programmable 128 Macro-cell CPLD (TQFP100)
+               stamped with a game code. This code is different for each different game.
+               The last 3 digits seems to be for the usage.
+               F01 = CPLD/protection device and M01 = MASKROM
+
+               Game (sorted by code)            Code
+               ------------------------------------------
+               Neogeo Battle Coliseum           AX3301F01
+
+
+ FMEM1/FMEM2 - Fujitsu 29DL640E 64M TSOP48 FlashROM. This ROM has no additional custom markings
+               The name in the archive has been devised purely for convenience.
+               This ROM holds the main program.
+               This location is wired to accept TSOP56 ROMs, however the actual chip populated
+               is a TSOP48, using the middle pins. The other 2 pins on each side of the ROM
+               are not connected to anything.
+
+       MROM* - Custom-badged SSOP70 maskROMs. These may be OKI MR26V25605 or MR26V25655 (256M)
+               or possibly 26V51253 (512M) or something else similar.
+
+               ROM Codes
+               ---------
+                                                                          Number
+               Game (sorted by code)            Code                      of ROMs
+               ------------------------------------------------------------------
+               Neogeo Battle Coliseum           AX3301M01 to AX3307M01    7
+
+
 */
 
 #include "driver.h"
@@ -1085,6 +1231,148 @@ ROM_START( awbios )
 
 	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
 ROM_END
+
+
+ROM_START( fotns )
+	ROM_REGION( 0x200000, "main", 0)
+	AW_BIOS
+
+	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
+	ROM_LOAD("ax1901p01.ic18", 0x0000000, 0x0800000,  CRC(a06998b0) SHA1(d617691db5170f6db176e40fc732966d523fd8cf) )
+	ROM_LOAD("ax1901m01.ic11", 0x1000000, 0x1000000,  CRC(ff5a1642) SHA1(49cefcce173f9a811fe9c0c07bee53aeba2bc3a8) )
+	ROM_LOAD("ax1902m01.ic12", 0x2000000, 0x1000000,  CRC(d9aae8a9) SHA1(bf87034088be0847b6e297b7665e0ea4d8cba631) )
+	ROM_LOAD("ax1903m01.ic13", 0x3000000, 0x1000000,  CRC(1711b23d) SHA1(ab628b2ec678839c75245e245297818ef1592d3b) )
+	ROM_LOAD("ax1904m01.ic14", 0x4000000, 0x1000000,  CRC(443bfb26) SHA1(6f7751afa0ca55dd0679758b27bed92b31c1b050) )
+	ROM_LOAD("ax1905m01.ic15", 0x5000000, 0x1000000,  CRC(eb1cada0) SHA1(459d21d622c72606f1d3095e8a25b6c4adccf8ab) )
+	ROM_LOAD("ax1906m01.ic16", 0x6000000, 0x1000000,  CRC(fe6da168) SHA1(d4ab6443383469bb5a4337005de917627a2e21cc) )
+	ROM_LOAD("ax1907m01.ic17", 0x7000000, 0x1000000,  CRC(9d3a0520) SHA1(78583fd171b34439f77a04a97ebe3c9d1bab61cc) )
+ROM_END
+
+ROM_START( demofist )
+	ROM_REGION( 0x200000, "main", 0)
+	AW_BIOS
+
+	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
+	ROM_LOAD("ax0601p01.ic18", 0x0000000, 0x0800000,  CRC(0efb38ad) SHA1(9400e37efe3e936474d74400ebdf28ad0869b67b) )
+	/* incomplete, other rom names / sizes are.. ? */
+ROM_END
+
+
+
+struct AtomiswaveKey
+{
+    int P0[16];
+    int P1[16];
+    int S0[32];
+    int S1[16];
+    int S2[16];
+    int S3[8];
+};
+
+struct AtomiswaveKey fotns_key = {
+    {0,2,7,11,12,1,5,6,15,4,8,9,14,3,10,13},
+    {12,8,3,7,0,15,1,11,6,10,4,14,9,5,13,2},
+    {4,1,10,16,9,25,26,31,13,0,14,15,24,6,30,18,7,20,5,12,22,17,27,3,8,11,21,29,19,23,28,2},
+    {3,2,11,14,10,13,12,0,7,6,8,15,5,1,4,9},
+    {10,3,6,12,7,11,4,14,0,2,8,1,15,13,5,9},
+    {7,1,6,5,4,2,0,3}
+};
+
+struct AtomiswaveKey df_key = {
+    {1,4,5,6,9,7,10,11,13,0,8,12,14,2,3,15},
+    {12,0,3,8,7,6,15,11,1,4,14,10,9,5,13,2},
+    {9,27,15,6,28,30,7,12,21,0,1,25,22,3,16,29,13,4,24,20,2,5,23,19,18,10,8,14,17,11,31,26},
+    {5,13,4,0,8,12,14,7,2,11,3,10,6,1,15,9},
+    {11,6,2,9,12,1,7,4,10,0,13,3,8,14,15,5},
+    {1,6,4,3,5,2,7,0}
+};
+
+
+UINT16 atomiswave_decrypt(UINT16 cipherText, int address, struct AtomiswaveKey* key)
+{
+    int b0,b1,b2,b3;
+    int aux;
+
+    aux = BITSWAP16(cipherText,
+                    key->P0[15],key->P0[14],key->P0[13],key->P0[12],key->P0[11],key->P0[10],key->P0[9],key->P0[8],
+                    key->P0[7],key->P0[6],key->P0[5],key->P0[4],key->P0[3],key->P0[2],key->P0[1],key->P0[0]);
+    aux = aux ^ BITSWAP16(address/2,
+                          key->P1[15],key->P1[14],key->P1[13],key->P1[12],key->P1[11],key->P1[10],key->P1[9],key->P1[8],
+                          key->P1[7],key->P1[6],key->P1[5],key->P1[4],key->P1[3],key->P1[2],key->P1[1],key->P1[0]);
+
+    b0 = aux&0x1f;
+    b1 = (aux>>5)&0xf;
+    b2 = (aux>>9)&0xf;
+    b3 = aux>>13;
+
+    b0 = key->S0[b0];
+    b1 = key->S1[b1];
+    b2 = key->S2[b2];
+    b3 = key->S3[b3];
+
+    return (b3<<13)|(b2<<9)|(b1<<5)|b0;
+}
+
+
+DRIVER_INIT(fotns)
+{
+  	int i;
+	UINT16 *src = (UINT16 *)(memory_region(machine, "user1"));
+
+	long rom_size = memory_region_length(machine, "user1");
+
+	for(i=0; i<rom_size/2; i++)
+	{
+		src[i] = atomiswave_decrypt(src[i], i*2, &fotns_key);
+	}
+
+
+	{
+		FILE *fp;
+		const char *gamename = machine->gamedrv->name;
+		char filename[256];
+		sprintf(filename, "%s.dump", gamename);
+
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(src, rom_size, 1, fp);
+			fclose(fp);
+		}
+	}
+}
+
+
+
+DRIVER_INIT(demofist)
+{
+  	int i;
+	UINT16 *src = (UINT16 *)(memory_region(machine, "user1"));
+
+	long rom_size = memory_region_length(machine, "user1");
+
+	for(i=0; i<rom_size/2; i++)
+	{
+		src[i] = atomiswave_decrypt(src[i], i*2, &df_key);
+	}
+
+
+	{
+		FILE *fp;
+		const char *gamename = machine->gamedrv->name;
+		char filename[256];
+		sprintf(filename, "%s.dump", gamename);
+
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(src, rom_size, 1, fp);
+			fclose(fp);
+		}
+	}
+}
+
+
 
 /* Info above each set is automatically generated from the IC22 rom and may not be accurate */
 
@@ -2627,4 +2915,6 @@ GAME( 2001, naomi2,   0,        naomi,    naomi,    0, ROT0, "Sega",            
 
 /* Atomiswave */
 GAME( 2001, awbios,   0,        naomi,    naomi,    0, ROT0, "Sammy",           "Atomiswave Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
-/* No Supported Sets */
+GAME( 2005, fotns,    awbios,   naomi,    naomi,    fotns, ROT0, "Sammy",           "Fist Of The North Star", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2003, demofist, awbios,   naomi,    naomi,    demofist, ROT0, "Sammy",           "Demolish Fist", GAME_NO_SOUND|GAME_NOT_WORKING )
+

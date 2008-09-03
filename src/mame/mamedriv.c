@@ -4085,6 +4085,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
+	DRIVER( fotns )
+	DRIVER( demofist )
 
 	/* Hikaru */
 	DRIVER( hikaru ) 	/* BIOS (c)2000 */
