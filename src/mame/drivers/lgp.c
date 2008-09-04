@@ -88,9 +88,6 @@ static VIDEO_UPDATE( lgp )
 	/* clear */
 	fillbitmap(bitmap, 0, cliprect);
 
-	/* display disc information */
-	popmessage("%s", laserdisc_describe_state(laserdisc));
-
 	/* Draw tiles */
 	for (charx = 0; charx < 32; charx++)
 	{

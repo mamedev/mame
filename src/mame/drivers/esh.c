@@ -47,10 +47,6 @@ static VIDEO_UPDATE( esh )
 	/* clear */
 	fillbitmap(bitmap, 0, cliprect);
 
-	/* display disc information */
-	if (ld_video_visible)
-		popmessage("%s", laserdisc_describe_state(laserdisc));
-
 	/* Draw tiles */
 	for (charx = 0; charx < 32; charx++)
 	{

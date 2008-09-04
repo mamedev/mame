@@ -52,9 +52,6 @@ static VIDEO_UPDATE( superdq )
 
 	tilemap_draw(bitmap,cliprect,superdq_tilemap,0,0);
 
-	/* display disc information */
-	popmessage("%s", laserdisc_describe_state(laserdisc));
-
 	return 0;
 }
 

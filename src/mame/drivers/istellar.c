@@ -49,9 +49,6 @@ static VIDEO_UPDATE( istellar )
 	/* clear */
 	fillbitmap(bitmap, 0, cliprect);
 
-	/* display disc information */
-	popmessage("%s", laserdisc_describe_state(laserdisc));
-
 	/* DEBUG */
 	/*
     for (charx = 0; charx < 0x400; charx ++)

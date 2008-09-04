@@ -161,9 +161,6 @@ extern const custom_sound_interface laserdisc_custom_interface;
 /* call this once per field (i.e., 59.94 times/second for NTSC) */
 void laserdisc_vsync(const device_config *device);
 
-/* return a textual description of the current state (for debugging) */
-const char *laserdisc_describe_state(const device_config *device);
-
 /* get a bitmap for the current frame (and the frame number) */
 UINT32 laserdisc_get_video(const device_config *device, bitmap_t **bitmap);
 

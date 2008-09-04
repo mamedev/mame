@@ -29,10 +29,8 @@
 enum
 {
 	CMD_SCAN_REVERSE,
-	CMD_SCAN_REVERSE_END,
 	CMD_STEP_REVERSE,
 	CMD_SCAN_FORWARD,
-	CMD_SCAN_FORWARD_END,
 	CMD_STEP_FORWARD,
 	CMD_PLAY,
 	CMD_PAUSE,
@@ -96,31 +94,27 @@ static void process_commands(const device_config *laserdisc)
  	int number;
 
 	/* scan/step backwards */
-	if (!(last_controls & 0x01) && (controls & 0x01))
+	if (playing)
 	{
-		if (playing)
+		if (controls & 0x01)
 			(*execute_command)(laserdisc, CMD_SCAN_REVERSE);
-		else
-			(*execute_command)(laserdisc, CMD_STEP_REVERSE);
 	}
-	else if ((last_controls & 0x01) && !(controls & 0x01))
+	else
 	{
-		if (playing)
-			(*execute_command)(laserdisc, CMD_SCAN_REVERSE_END);
+		if (!(last_controls & 0x01) && (controls & 0x01))
+			(*execute_command)(laserdisc, CMD_STEP_REVERSE);
 	}
 
 	/* scan/step forwards */
-	if (!(last_controls & 0x02) && (controls & 0x02))
+	if (playing)
 	{
-		if (playing)
+		if (controls & 0x02)
 			(*execute_command)(laserdisc, CMD_SCAN_FORWARD);
-		else
-			(*execute_command)(laserdisc, CMD_STEP_FORWARD);
 	}
-	else if ((last_controls & 0x02) && !(controls & 0x02))
+	else
 	{
-		if (playing)
-			(*execute_command)(laserdisc, CMD_SCAN_FORWARD_END);
+		if (!(last_controls & 0x02) && (controls & 0x02))
+			(*execute_command)(laserdisc, CMD_STEP_FORWARD);
 	}
 
 	/* play/pause */
@@ -158,10 +152,12 @@ static TIMER_CALLBACK( vsync_update )
 
 	/* handle commands */
 	if (!param)
+	{
 		process_commands(laserdisc);
 
-	/* update the laserdisc */
-	laserdisc_vsync(laserdisc);
+		/* update the laserdisc */
+		laserdisc_vsync(laserdisc);
+	}
 
 	/* set a timer to go off on the next VBLANK */
 	vblank_scanline = video_screen_get_visible_area(machine->primary_screen)->max_y + 1;
@@ -279,13 +275,11 @@ static void pr8210_execute(const device_config *laserdisc, int command)
 	switch (command)
 	{
 		case CMD_SCAN_REVERSE:
-			pr8210_add_command(0x1c);
-			playing = TRUE;
-			break;
-
-		case CMD_SCAN_REVERSE_END:
-			pr8210_add_command(0x14);
-			playing = TRUE;
+			if (pr8210_command_buffer_in == pr8210_command_buffer_out)
+			{
+				pr8210_add_command(0x1c);
+				playing = TRUE;
+			}
 			break;
 
 		case CMD_STEP_REVERSE:
@@ -294,13 +288,11 @@ static void pr8210_execute(const device_config *laserdisc, int command)
 			break;
 
 		case CMD_SCAN_FORWARD:
-			pr8210_add_command(0x08);
-			playing = TRUE;
-			break;
-
-		case CMD_SCAN_FORWARD_END:
-			pr8210_add_command(0x14);
-			playing = TRUE;
+			if (pr8210_command_buffer_in == pr8210_command_buffer_out)
+			{
+				pr8210_add_command(0x08);
+				playing = TRUE;
+			}
 			break;
 
 		case CMD_STEP_FORWARD:
@@ -369,11 +361,6 @@ static void ldv1000_execute(const device_config *laserdisc, int command)
 			playing = TRUE;
 			break;
 
-		case CMD_SCAN_REVERSE_END:
-			laserdisc_data_w(laserdisc, 0xfd);
-			playing = TRUE;
-			break;
-
 		case CMD_STEP_REVERSE:
 			laserdisc_data_w(laserdisc, 0xfe);
 			playing = FALSE;
@@ -381,11 +368,6 @@ static void ldv1000_execute(const device_config *laserdisc, int command)
 
 		case CMD_SCAN_FORWARD:
 			laserdisc_data_w(laserdisc, 0xf0);
-			playing = TRUE;
-			break;
-
-		case CMD_SCAN_FORWARD_END:
-			laserdisc_data_w(laserdisc, 0xfd);
 			playing = TRUE;
 			break;
 

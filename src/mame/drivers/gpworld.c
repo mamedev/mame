@@ -210,9 +210,6 @@ static VIDEO_UPDATE( gpworld )
 	gpworld_draw_tiles(screen->machine, bitmap, cliprect);
 	gpworld_draw_sprites(screen->machine, bitmap, cliprect);
 
-	/* display disc information */
-	popmessage("%s", laserdisc_describe_state(laserdisc));
-
 	return 0;
 }
 

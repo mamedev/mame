@@ -139,7 +139,9 @@ EMUMACHINEOBJS = \
  	$(EMUMACHINE)/idectrl.o \
  	$(EMUMACHINE)/intelfsh.o \
 	$(EMUMACHINE)/latch8.o \
-	$(EMUMACHINE)/laserdsc.o \
+	$(EMUMACHINE)/ldcore.o \
+	$(EMUMACHINE)/ldpr8210.o \
+	$(EMUMACHINE)/ldv1000.o \
 	$(EMUMACHINE)/mb3773.o \
 	$(EMUMACHINE)/mb87078.o \
 	$(EMUMACHINE)/mc146818.o \

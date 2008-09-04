@@ -87,9 +87,6 @@ static VIDEO_UPDATE( astron )
 	astron_draw_characters(screen->machine, bitmap, cliprect);
 	astron_draw_sprites(bitmap, cliprect);
 
-	/* display disc information */
-	popmessage("%s", laserdisc_describe_state(laserdisc));
-
 	return 0;
 }
 
