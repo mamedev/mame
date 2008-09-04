@@ -194,6 +194,15 @@ static INPUT_PORTS_START( scregg )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( rockduck )
+	PORT_INCLUDE( scregg )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x01, "2" )
+	PORT_DIPSETTING(    0x00, "3" )
+
+INPUT_PORTS_END
 
 
 
@@ -400,4 +409,4 @@ static DRIVER_INIT( rockduck )
 GAME( 198?, dommy,    0,        dommy,  scregg, 0, ROT270, "Technos", "Dommy", 0 )
 GAME( 1983, scregg,   0,        scregg, scregg, 0, ROT270, "Technos", "Scrambled Egg", 0 )
 GAME( 1983, eggs,     scregg,   scregg, scregg, 0, ROT270, "[Technos] Universal USA", "Eggs", 0 )
-GAME( 1983, rockduck, 0,        scregg, scregg, rockduck, ROT270, "Datel SAS", "Rock Duck (prototype?)", GAME_WRONG_COLORS )
+GAME( 1983, rockduck, 0,        scregg, rockduck, rockduck, ROT270, "Datel SAS", "Rock Duck (prototype?)", GAME_WRONG_COLORS )
