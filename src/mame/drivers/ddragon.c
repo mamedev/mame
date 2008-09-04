@@ -1442,6 +1442,46 @@ ROM_START( ddragnba )
 	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown */
 ROM_END
 
+ROM_START( ddragob2 )
+	ROM_REGION( 0x30000, "main", 0 )	/* 64k for code + bankswitched memory */
+	ROM_LOAD( "4.bin",        0x08000, 0x08000, CRC(668dfa19) SHA1(9b2ff1b66eeba0989e4ed850b7df1f5719ba5572) )
+	ROM_LOAD( "5.bin",        0x10000, 0x08000, CRC(5779705e) SHA1(4b8f22225d10f5414253ce0383bbebd6f720f3af) ) /* banked at 0x4000-0x8000 */
+	ROM_LOAD( "6.bin",        0x18000, 0x08000, CRC(3bdea613) SHA1(d9038c80646a6ce3ea61da222873237b0383680e) ) /* banked at 0x4000-0x8000 */
+	ROM_LOAD( "7.bin",        0x20000, 0x08000, CRC(728f87b9) SHA1(d7442be24d41bb9fc021587ef44ae5b830e4503d) ) /* banked at 0x4000-0x8000 */
+
+	ROM_REGION( 0x10000, "sub", 0 ) /* sprite cpu */
+	ROM_LOAD( "63701.bin",    0xc000, 0x4000, CRC(f5232d03) SHA1(e2a194e38633592fd6587690b3cb2669d93985c7) )
+
+	ROM_REGION( 0x10000, "sound", 0 ) /* audio cpu */
+	ROM_LOAD( "3.bin",        0x08000, 0x08000, CRC(9efa95bb) SHA1(da997d9cc7b9e7b2c70a4b6d30db693086a6f7d8) )
+
+	ROM_REGION( 0x08000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "8.bin",        0x00000, 0x08000, CRC(7a8b8db4) SHA1(8368182234f9d4d763d4714fd7567a9e31b7ebeb) )	/* chars */
+
+	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "11.bin",       0x00000, 0x10000, CRC(574face3) SHA1(481fe574cb79d0159a65ff7486cbc945d50538c5) )	/* sprites */
+	ROM_LOAD( "12.bin",       0x10000, 0x10000, CRC(40507a76) SHA1(74581a4b6f48100bddf20f319903af2fe36f39fa) )
+	ROM_LOAD( "13.bin",       0x20000, 0x10000, CRC(c8b91e17) SHA1(0ce6f6ef68ecc7309a2923f7e756d5e2bf5c7a4a) )
+	ROM_LOAD( "14.bin",       0x30000, 0x10000, CRC(cb4f231b) SHA1(9f2270f9ceedfe51c5e9a9bbb00d6f43dbc4a3ea) )	ROM_LOAD( "15.bin",        0x40000, 0x10000, CRC(a0a0c261) SHA1(25c534d82bd237386d447d72feee8d9541a5ded4) )
+	ROM_LOAD( "15.bin",       0x40000, 0x10000, CRC(a0a0c261) SHA1(25c534d82bd237386d447d72feee8d9541a5ded4) )
+	ROM_LOAD( "16.bin",       0x50000, 0x10000, CRC(6ba152f6) SHA1(a301ff809be0e1471f4ff8305b30c2fa4aa57fae) )
+	ROM_LOAD( "17.bin",       0x60000, 0x10000, CRC(3220a0b6) SHA1(24a16ea509e9aff82b9ddd14935d61bb71acff84) )
+	ROM_LOAD( "18.bin",       0x70000, 0x10000, CRC(65c7517d) SHA1(f177ba9c1c7cc75ff04d5591b9865ee364788f94) )
+
+	ROM_REGION( 0x40000, "gfx3", ROMREGION_DISPOSE )
+	ROM_LOAD( "9.bin",        0x00000, 0x10000, CRC(7c435887) SHA1(ecb76f2148fa9773426f05aac208eb3ac02747db) )	/* tiles */
+	ROM_LOAD( "10.bin",       0x10000, 0x10000, CRC(c6640aed) SHA1(f156c337f48dfe4f7e9caee9a72c7ea3d53e3098) )
+	ROM_LOAD( "19.bin",       0x20000, 0x10000, CRC(22d65df2) SHA1(2f286a24ea7af438b39126a4ed0c515745981416) )
+	ROM_LOAD( "20.bin",       0x30000, 0x10000, CRC(5fb42e7c) SHA1(7953316712c56c6f8ca6bba127319e24b618b646) )
+
+	ROM_REGION( 0x20000, "adpcm", 0 ) /* adpcm samples */
+	ROM_LOAD( "1.bin",        0x00000, 0x10000, CRC(34755de3) SHA1(57c06d6ce9497901072fa50a92b6ed0d2d4d6528) )
+	ROM_LOAD( "2.bin",        0x10000, 0x10000, CRC(904de6f8) SHA1(3623e5ea05fd7c455992b7ed87e605b87c3850aa) )
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "21j-k-0",      0x0000, 0x0100, CRC(fdb130a9) SHA1(4c4f214229b9fab2b5d69c745ec5428787b89e1f) )	/* unknown */
+	ROM_LOAD( "21j-l-0",      0x0100, 0x0200, CRC(46339529) SHA1(64f4c42a826d67b7cbaa8a23a45ebc4eb6248891) )	/* unknown */
+ROM_END
 
 /* this is a well known italian bootleg of Double Dragon it can be identified by the following gameplay trait
  -- The Boss of level 4 is coloured like level 1 and 5 instead of green, and is invulnerable to rocks attack.
@@ -1957,6 +1997,7 @@ GAME( 1987, ddragonw, ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos] (
 GAME( 1987, ddragnw1, ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos] (Taito license)", "Double Dragon (World Set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ddragonu, ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos] (Taito America license)", "Double Dragon (US Set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ddragoua, ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "[Technos] (Taito America license)", "Double Dragon (US Set 2)", GAME_SUPPORTS_SAVE )
+GAME( 1987, ddragob2, ddragon,  ddragon,  ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ddragonb, ddragon,  ddragonb, ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg with HD6309)", GAME_SUPPORTS_SAVE ) // according to dump notes
 GAME( 1987, ddragnba, ddragon,  ddragnba, ddragon,  ddragon,  ROT0, "bootleg", "Double Dragon (bootleg with M6803)", GAME_SUPPORTS_SAVE )
 GAME( 1987, ddgn6809, ddragon,  ddgn6809, ddragon,  ddgn6809, ROT0, "bootleg", "Double Dragon (bootleg with 3xM6809, set 1)", GAME_NOT_WORKING )
