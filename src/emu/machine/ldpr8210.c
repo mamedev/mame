@@ -31,7 +31,7 @@ enum
 {
 	LDSTATE_STEPPING_BY_PARAMETER = LDSTATE_OTHER
 };
-	
+
 /* Pioneer PR-8210 specific information */
 #define PR8210_SCAN_SPEED			(2000 / 30)			/* 2000 frames/second */
 #define PR8210_SCAN_DURATION		(10)				/* scan for 10 vsyncs each time */
@@ -197,7 +197,7 @@ static void pr8210_soft_reset(laserdisc_state *ld)
 	player->accumulator = 0;
 	player->firstbittime = curtime;
 	player->lastbittime = curtime;
-	
+
 	pr8210_switch_state(ld, LDSTATE_PARKED, 0);
 }
 
@@ -218,7 +218,7 @@ static void pr8210_update_squelch(laserdisc_state *ld)
 			ldcore_set_audio_squelch(ld, player->audio1disable, player->audio2disable);
 			ldcore_set_video_squelch(ld, FALSE);
 			break;
-		
+
 		/* video on, audio off */
 		case LDSTATE_PAUSING:
 		case LDSTATE_PAUSED:
@@ -232,7 +232,7 @@ static void pr8210_update_squelch(laserdisc_state *ld)
 			ldcore_set_audio_squelch(ld, TRUE, TRUE);
 			ldcore_set_video_squelch(ld, FALSE);
 			break;
-		
+
 		/* video off, audio off */
 		case LDSTATE_NONE:
 		case LDSTATE_EJECTED:
@@ -262,15 +262,15 @@ static void pr8210_update_squelch(laserdisc_state *ld)
 static int pr8210_switch_state(laserdisc_state *ld, UINT8 newstate, INT32 parameter)
 {
 	attotime curtime = timer_get_time();
-	
+
 	/* if this is the same state, ignore */
 	if (ld->state.state == newstate)
 		return TRUE;
-	
+
 	/* if we're in a timed state, we ignore changes until the time elapses */
 	if (attotime_compare(curtime, ld->state.endtime) < 0)
 		return FALSE;
-	
+
 	/* if moving to a state that requires it, save the old state */
 	if (requires_state_save(newstate) && !requires_state_save(ld->state.state))
 		ld->savestate = ld->state;
@@ -288,15 +288,15 @@ static int pr8210_switch_state(laserdisc_state *ld, UINT8 newstate, INT32 parame
 		case LDSTATE_EJECTING:
 			ld->state.endtime = attotime_add(curtime, GENERIC_EJECT_TIME);
 			break;
-			
+
 		case LDSTATE_LOADING:
 			ld->state.endtime = attotime_add(curtime, GENERIC_LOAD_TIME);
 			break;
-			
+
 		case LDSTATE_SPINUP:
 			ld->state.endtime = attotime_add(curtime, GENERIC_SPINUP_TIME);
 			break;
-		
+
 		case LDSTATE_SEEKING:
 			ld->state.endtime = attotime_add(curtime, PR8210_MINIMUM_SEEK_TIME);
 			break;
@@ -315,7 +315,7 @@ static INT32 pr8210_update(laserdisc_state *ld, const vbi_metadata *vbi, int fie
 	ldplayer_state newstate;
 	INT32 advanceby = 0;
 	int frame;
-	
+
 	/* handle things based on the state */
 	switch (ld->state.state)
 	{
@@ -344,25 +344,25 @@ static INT32 pr8210_update(laserdisc_state *ld, const vbi_metadata *vbi, int fie
 			frame = frame_from_metadata(vbi);
 			if (ld->state.substate == 3 && is_start_of_frame(vbi) && frame == ld->state.param)
 				pr8210_switch_state(ld, LDSTATE_PAUSED, fieldnum);
-			
+
 			/* otherwise, if we got frame data from the VBI, update our seeking logic */
 			else if (ld->state.substate < 3 && frame != FRAME_NOT_PRESENT)
 			{
 				static const INT32 seekspeed[] = { -PR8210_SEEK_FAST_SPEED, PR8210_SEEK_FAST_SPEED, -PR8210_JUMP_REV_SPEED };
 				INT32 curseekspeed = seekspeed[ld->state.substate];
 				INT32 delta = (ld->state.param - 1) - frame;
-				
+
 				if ((curseekspeed < 0 && delta <= 0) || (curseekspeed > 0 && delta >= 0))
 					advanceby = curseekspeed;
 				else
 					ld->state.substate++;
 			}
-			
+
 			/* otherwise, keep advancing until we know what's up */
 			else if (fieldnum == 1)
 				advanceby = 1;
 			break;
-		
+
 		case LDSTATE_STEPPING_BY_PARAMETER:
 			/* advance after the second field of each frame */
 			if (fieldnum == 1)
@@ -373,7 +373,7 @@ static INT32 pr8210_update(laserdisc_state *ld, const vbi_metadata *vbi, int fie
 			}
 			break;
 	}
-		
+
 	return advanceby;
 }
 
@@ -393,7 +393,7 @@ static void pr8210_command(laserdisc_state *ld)
 		case 0x00:	CMDPRINTF(("pr8210: EOC\n"));
 			/* EOC marker - can be safely ignored */
 			break;
-		
+
 		case 0x01:	CMDPRINTF(("pr8210: 0\n"));
 			player->parameter = (player->parameter == -1) ? 0 : (player->parameter * 10 + 0);
 			break;

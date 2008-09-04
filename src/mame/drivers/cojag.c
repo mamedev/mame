@@ -883,13 +883,13 @@ ADDRESS_MAP_END
  *************************************/
 
 /* "FAKE0" is read at 0x04f17000
-	D23-20 = /SER-4-1
-	D19-16 = COINR4-1
-	D7     = /VSYNCNEQ
-	D6     = /S-TEST
-	D5     = /VOLUMEUP
-	D4     = /VOLUMEDOWN
-	D3-D0  = ACTC4-1
+    D23-20 = /SER-4-1
+    D19-16 = COINR4-1
+    D7     = /VSYNCNEQ
+    D6     = /S-TEST
+    D5     = /VOLUMEUP
+    D4     = /VOLUMEDOWN
+    D3-D0  = ACTC4-1
 */
 static INPUT_PORTS_START( area51 )
 	PORT_START("P1_P2")

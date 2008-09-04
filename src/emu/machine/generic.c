@@ -856,9 +856,9 @@ READ32_HANDLER( input_port_31_dword_r ) { return input_port_read_indexed(machine
 
 /*-------------------------------------------------
     custom_port_read - act like input_port_read
-	but it is a custom port, it is useful for
-	e.g. input ports which expect the same port 
-	repeated both in the upper and lower half
+    but it is a custom port, it is useful for
+    e.g. input ports which expect the same port
+    repeated both in the upper and lower half
 -------------------------------------------------*/
 
 CUSTOM_INPUT( custom_port_read )

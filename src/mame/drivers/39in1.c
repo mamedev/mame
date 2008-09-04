@@ -14,9 +14,9 @@
  *
  * PCB also contains a custom ASIC, probably used for the decryption
  *
- * TODO: 
- *	 Figure out weird memory test subroutine at 1c8
- *	 PXA255 MMU and peripherals
+ * TODO:
+ *   Figure out weird memory test subroutine at 1c8
+ *   PXA255 MMU and peripherals
  *
  **************************************************************************/
 
@@ -95,28 +95,28 @@ GAME(2004, 39in1, 0, 39in1, 39in1, 0, ROT0, "????", "39 in 1 MAME bootleg", GAME
 
 /*
 
-cpu #0 (PC=00000010): unmapped program memory dword write to 40E00024 = FFFFFFFF & FFFFFFFF	     GPIO pin output clear 31:0
-cpu #0 (PC=00000014): unmapped program memory dword write to 40E00028 = FFFFFFFF & FFFFFFFF				   63:32
-cpu #0 (PC=00000018): unmapped program memory dword write to 40E0002C = FFFFFFFF & FFFFFFFF				   80:64
-cpu #0 (PC=00000028): unmapped program memory dword write to 40E00018 = 01008000 & FFFFFFFF	     GPIO pin direction register 63:32
-cpu #0 (PC=0000002C): unmapped program memory dword write to 40E0001C = 00020802 & FFFFFFFF	          pin output set   63:32
-cpu #0 (PC=00000030): unmapped program memory dword write to 40E00020 = 0001CC00 & FFFFFFFF				   80:64
-cpu #0 (PC=00000040): unmapped program memory dword write to 40E0000C = DFE3FFDC & FFFFFFFF	     GPIO pin direction    31:0
-cpu #0 (PC=00000044): unmapped program memory dword write to 40E00010 = FC9FAF83 & FFFFFFFF				   63:32
+cpu #0 (PC=00000010): unmapped program memory dword write to 40E00024 = FFFFFFFF & FFFFFFFF      GPIO pin output clear 31:0
+cpu #0 (PC=00000014): unmapped program memory dword write to 40E00028 = FFFFFFFF & FFFFFFFF                63:32
+cpu #0 (PC=00000018): unmapped program memory dword write to 40E0002C = FFFFFFFF & FFFFFFFF                80:64
+cpu #0 (PC=00000028): unmapped program memory dword write to 40E00018 = 01008000 & FFFFFFFF      GPIO pin direction register 63:32
+cpu #0 (PC=0000002C): unmapped program memory dword write to 40E0001C = 00020802 & FFFFFFFF           pin output set   63:32
+cpu #0 (PC=00000030): unmapped program memory dword write to 40E00020 = 0001CC00 & FFFFFFFF                80:64
+cpu #0 (PC=00000040): unmapped program memory dword write to 40E0000C = DFE3FFDC & FFFFFFFF      GPIO pin direction    31:0
+cpu #0 (PC=00000044): unmapped program memory dword write to 40E00010 = FC9FAF83 & FFFFFFFF                63:32
 cpu #0 (PC=00000048): unmapped program memory dword write to 40E00014 = 0001FFFF & FFFFFFFF
-cpu #0 (PC=00000064): unmapped program memory dword write to 40E00054 = 80000000 & FFFFFFFF	     GPIO alternate function
+cpu #0 (PC=00000064): unmapped program memory dword write to 40E00054 = 80000000 & FFFFFFFF      GPIO alternate function
 cpu #0 (PC=00000068): unmapped program memory dword write to 40E00058 = 59000110 & FFFFFFFF
 cpu #0 (PC=0000006C): unmapped program memory dword write to 40E0005C = 600A9559 & FFFFFFFF
 cpu #0 (PC=00000070): unmapped program memory dword write to 40E00060 = AAA00008 & FFFFFFFF
 cpu #0 (PC=00000074): unmapped program memory dword write to 40E00064 = AAAAAAAA & FFFFFFFF
 cpu #0 (PC=00000078): unmapped program memory dword write to 40E00068 = 00000002 & FFFFFFFF
-cpu #0 (PC=00000084): unmapped program memory dword write to 40F00004 = 00000020 & FFFFFFFF	     power manager sleep status
+cpu #0 (PC=00000084): unmapped program memory dword write to 40F00004 = 00000020 & FFFFFFFF      power manager sleep status
 test_rt_r_callback opcode=ee160e10
 test_rt_w_callback opcode=ee060e10, data from ARM7 register=2
-cpu #0 (PC=0000009C): unmapped program memory dword write to 41300000 = 00000141 & FFFFFFFF	     core clock configure (multiplier=27, RAM is 99.53 MHz + multiplier = 2 * memory + turbo = 1x)
+cpu #0 (PC=0000009C): unmapped program memory dword write to 41300000 = 00000141 & FFFFFFFF      core clock configure (multiplier=27, RAM is 99.53 MHz + multiplier = 2 * memory + turbo = 1x)
 test_rt_w_callback opcode=ee060e10, data from ARM7 register=3
 test_rt_w_callback opcode=ee060e10, data from ARM7 register=1
-cpu #0 (PC=000000B4): unmapped program memory dword read from 40A00010 & FFFFFFFF		     OS timer/counter
+cpu #0 (PC=000000B4): unmapped program memory dword read from 40A00010 & FFFFFFFF            OS timer/counter
 cpu #0 (PC=000000B8): unmapped program memory dword read from 40A00010 & FFFFFFFF
 cpu #0 (PC=000000B8): unmapped program memory dword read from 40A00010 & FFFFFFFF
 

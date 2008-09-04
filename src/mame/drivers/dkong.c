@@ -672,7 +672,7 @@ static READ8_HANDLER( s2650_port0_r )
 		case COMBINE_TYPE_PC(DK2650_SPCLFORC, 0x00a3):  return 0x01;
 		case COMBINE_TYPE_PC(DK2650_SPCLFORC, 0x007b):  return 0x01;
 	}
-    
+
 	switch (state->protect_type)
 	{
 		case DK2650_HUNCHBKD:  return 0x00;

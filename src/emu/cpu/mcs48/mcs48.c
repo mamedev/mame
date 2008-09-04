@@ -700,12 +700,12 @@ static const mcs48_opcode opcode_table[256]=
 static void mcs48_init(int index, int clock, const void *config, int (*irqcallback)(int), UINT16 romsize)
 {
 	memset(&mcs48, 0, sizeof(mcs48));
-	
+
 	/* External access line
-	 * EA=1 : read from external rom
-	 * EA=0 : read from internal rom
-	 */
-	
+     * EA=1 : read from external rom
+     * EA=0 : read from internal rom
+     */
+
 	/* FIXME: Current implementation suboptimal */
 	mcs48.ea = (romsize ? 0 : 1);
 

@@ -1,11 +1,11 @@
 /*************************************************************************
 
-	ldcore.h
+    ldcore.h
 
-	Private core laserdisc player implementation.
+    Private core laserdisc player implementation.
 
-	Copyright Nicola Salmoria and the MAME Team.
-	Visit http://mamedev.org for licensing and usage restrictions.
+    Copyright Nicola Salmoria and the MAME Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
 
 *************************************************************************/
 
@@ -20,7 +20,7 @@
 
 
 /***************************************************************************
-	CONSTANTS
+    CONSTANTS
 ***************************************************************************/
 
 /* common laserdisc states */
@@ -77,7 +77,7 @@ enum
 
 
 /***************************************************************************
-	MACROS
+    MACROS
 ***************************************************************************/
 
 #define SCANNING_PARAM(speed,duration)	(((speed) << 8) | ((duration) & 0xff))
@@ -85,7 +85,7 @@ enum
 
 
 /***************************************************************************
-	TYPE DEFINITIONS
+    TYPE DEFINITIONS
 ***************************************************************************/
 
 /* core-specific and player-specific data */
@@ -111,7 +111,7 @@ struct _laserdisc_state
 	const device_config *	device;					/* pointer to owning device */
 	ldcore_data *			core;					/* private core data */
 	ldplayer_data *			player;					/* private player data */
-	
+
 	ldplayer_state			state;					/* active state */
 	ldplayer_state			savestate;				/* saved state during temporary operations */
 };
@@ -142,7 +142,7 @@ struct _ldplayer_interface
 
 
 /***************************************************************************
-	GLOBAL VARIABLES
+    GLOBAL VARIABLES
 ***************************************************************************/
 
 /* defined by each player */
@@ -156,7 +156,7 @@ extern const ldplayer_interface vp932_interface;
 
 
 /***************************************************************************
-	FUNCTION PROTOTYPES
+    FUNCTION PROTOTYPES
 ***************************************************************************/
 
 
@@ -181,27 +181,27 @@ INT32 ldcore_generic_update(laserdisc_state *ld, const vbi_metadata *vbi, int fi
 
 
 /***************************************************************************
-	INLINE FUNCTIONS
+    INLINE FUNCTIONS
 ***************************************************************************/
 
 /*-------------------------------------------------
-	is_start_of_frame - return TRUE if this is
-	the start of a frame
+    is_start_of_frame - return TRUE if this is
+    the start of a frame
 -------------------------------------------------*/
 
 INLINE int is_start_of_frame(const vbi_metadata *vbi)
 {
 	/* is it not known if the white flag or the presence of a frame code
-	   determines the start of frame; the former seems to be the "official"
-	   way, but the latter seems to be the practical implementation */
+       determines the start of frame; the former seems to be the "official"
+       way, but the latter seems to be the practical implementation */
 	return (vbi->white || (vbi->line1718 & 0xf80000) == 0xf80000);
 }
 
 
 /*-------------------------------------------------
-	frame_from_metadata - return the frame number
-	encoded in the metadata, if present, or
-	FRAME_NOT_PRESENT
+    frame_from_metadata - return the frame number
+    encoded in the metadata, if present, or
+    FRAME_NOT_PRESENT
 -------------------------------------------------*/
 
 INLINE int frame_from_metadata(const vbi_metadata *metadata)
@@ -222,9 +222,9 @@ INLINE int frame_from_metadata(const vbi_metadata *metadata)
 
 
 /*-------------------------------------------------
-	chapter_from_metadata - return the chapter
-	number encoded in the metadata, if present,
-	or CHAPTER_NOT_PRESENT
+    chapter_from_metadata - return the chapter
+    number encoded in the metadata, if present,
+    or CHAPTER_NOT_PRESENT
 -------------------------------------------------*/
 
 INLINE int chapter_from_metadata(const vbi_metadata *metadata)

@@ -1349,7 +1349,7 @@ static ADDRESS_MAP_START( hal21_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc000) AM_READ(sgladiat_sound_nmi_ack_r)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(ay8910_write_port_0_w)
-//	AM_RANGE(0xe002, 0xe002) AM_WRITENOP	// bitfielded(0-5) details unknown. Filter enable?
+//  AM_RANGE(0xe002, 0xe002) AM_WRITENOP    // bitfielded(0-5) details unknown. Filter enable?
 	AM_RANGE(0xe008, 0xe008) AM_WRITE(ay8910_control_port_1_w)
 	AM_RANGE(0xe009, 0xe009) AM_WRITE(ay8910_write_port_1_w)
 ADDRESS_MAP_END
@@ -1893,8 +1893,8 @@ static INPUT_PORTS_START( hal21 )
 	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )            /* duplicated setting */
-//	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )            /* duplicated setting */
+//  PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )            /* duplicated setting */
+//  PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )            /* duplicated setting */
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
@@ -2151,8 +2151,8 @@ static INPUT_PORTS_START( tnk3 )
 	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )            /* duplicated setting */
-//	PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )            /* duplicated setting */
+//  PORT_DIPSETTING(    0x10, DEF_STR( 1C_1C ) )            /* duplicated setting */
+//  PORT_DIPSETTING(    0x08, DEF_STR( 1C_1C ) )            /* duplicated setting */
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )

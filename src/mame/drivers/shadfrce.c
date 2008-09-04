@@ -588,7 +588,7 @@ static const ym2151_interface ym2151_config =
 };
 
 /*
-	Interrupts generation is guessed, but it requires the same hack as in wwfsstar.c
+    Interrupts generation is guessed, but it requires the same hack as in wwfsstar.c
 */
 static INTERRUPT_GEN( shadfrce_interrupt )
 {

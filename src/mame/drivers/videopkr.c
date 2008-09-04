@@ -46,7 +46,7 @@
     1x 5101 (256 x 4) SRAM          Data Memory (Battery Backed RAM).
     2x 2114 (1024 x 4) SRAM         8-Bit Char. RAM.
     1x 2114 (1024 x 4) SRAM         4-Bit Color RAM.
-    1x 74s287 (256 x 4) TTL PROM   	Color PROM.
+    1x 74s287 (256 x 4) TTL PROM    Color PROM.
 
     1x 6 MHz.(or 8 MHz.) Crystal    CPU clock.
     1x 7.8643 MHz. Crystal          Video System.
@@ -163,19 +163,19 @@
     Jugador tiene mas        2          4           6           8           10
     que la banca
 
-	Jugador tiene menos      2          4           6           8           10
+    Jugador tiene menos      2          4           6           8           10
     de 22 con 6 cartas
 
     Jugador tiene blackjack  2          5           7          10           12
-	y la Banca no
+    y la Banca no
     ----------------------------------------------------------------------------
 
 
-								Video Cordoba
+                                Video Cordoba
     ----------------------------------------------------------------------------
     Fichas Jugadas       1 Ficha    2 Fichas    3 Fichas    4 Fichas    5 Fichas
     ----------------------------------------------------------------------------
-    TRIPLE BAR				250        250         250         250        2000
+    TRIPLE BAR              250        250         250         250        2000
     ............................................................................
     3 x Doble Bar        - 100            |    Olive-Olive-Any Bar        - 18
     3 x Single Bar       -  50            |    3 x Orange                 - 14
@@ -426,7 +426,7 @@ static WRITE8_HANDLER( videopkr_io_w )
 			video_ram[n_offs] = data;
 			tilemap_mark_tile_dirty(bg_tilemap, n_offs);
 			break;
-		}   
+		}
 		case 0xdf:
 		{
 			data_ram[offset] = (data & 0x0f) + 0xf0;
@@ -544,7 +544,7 @@ static WRITE8_HANDLER(p4_w)
     0xFA    11111010    Spinning reels sound        Video Cordoba.
     0xFB    11111011    Dice rolling sound          Video Dado.
     0xFB    11111011    Stopping reels sound        Video Cordoba.
-	
+
 */
 
 static READ8_HANDLER(sound_io_r)
@@ -682,7 +682,7 @@ static INPUT_PORTS_START( blckjack )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Books")  PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )   PORT_IMPULSE(4)
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Start")  PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Hit")    PORT_CODE(KEYCODE_Z) 
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Hit")    PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Stand")  PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Double") PORT_CODE(KEYCODE_C)
 
@@ -708,7 +708,7 @@ static INPUT_PORTS_START( videodad )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Seven")       PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("8 or More")   PORT_CODE(KEYCODE_C)
 
-	PORT_START("IN1")      
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Field")  PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Eleven") PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Twelve") PORT_CODE(KEYCODE_B)
@@ -951,7 +951,7 @@ ROM_END
 /*************************
 *      Game Drivers      *
 *************************/
- 
+
 /*    YEAR  NAME      PARENT    MACHINE   INPUT     INIT  ROT    COMPANY      FULLNAME        FLAGS  */
 GAME( 1984, videopkr, 0,        videopkr, videopkr, 0,    ROT0, "InterFlip", "Video Poker",   0 )
 GAME( 1984, blckjack, videopkr, blckjack, blckjack, 0,    ROT0, "InterFlip", "Black Jack",    0 )

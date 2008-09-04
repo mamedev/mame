@@ -46,7 +46,7 @@ struct _ldcore_data
 {
 	/* general config */
 	laserdisc_config	config;					/* copy of the inline config */
-	ldplayer_interface	intf;					/* interface to the player */		
+	ldplayer_interface	intf;					/* interface to the player */
 
 	/* disc parameters */
 	chd_file *			disc;					/* handle to the disc itself */
@@ -130,14 +130,14 @@ static void configuration_save(running_machine *machine, int config_type, xml_da
     GLOBAL VARIABLES
 ***************************************************************************/
 
-static const ldplayer_interface *player_interfaces[] = 
+static const ldplayer_interface *player_interfaces[] =
 {
-//	&pr7820_interface,
+//  &pr7820_interface,
 	&pr8210_interface,
 	&simutrek_interface,
 	&ldv1000_interface,
-//	&ldp1450_interface,
-//	&vp932_interface
+//  &ldp1450_interface,
+//  &vp932_interface
 };
 
 const custom_sound_interface laserdisc_custom_interface =
@@ -346,7 +346,7 @@ void laserdisc_vsync(const device_config *device)
 
 	/* wait for previous read and decode to finish */
 	process_track_data(device);
-	
+
 	/* update the state */
 	if (ldcore->intf.update != NULL)
 	{
@@ -534,7 +534,7 @@ UINT32 laserdisc_get_field_code(const device_config *device, UINT8 code)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    ldcore_get_safe_token - return a token with 
+    ldcore_get_safe_token - return a token with
     type checking from a device
 -------------------------------------------------*/
 
@@ -545,7 +545,7 @@ laserdisc_state *ldcore_get_safe_token(const device_config *device)
 
 
 /*-------------------------------------------------
-    ldcore_set_audio_squelch - set the left/right 
+    ldcore_set_audio_squelch - set the left/right
     audio squelch states
 -------------------------------------------------*/
 
@@ -556,7 +556,7 @@ void ldcore_set_audio_squelch(laserdisc_state *ld, UINT8 squelchleft, UINT8 sque
 
 
 /*-------------------------------------------------
-    ldcore_set_video_squelch - set the video 
+    ldcore_set_video_squelch - set the video
     squelch state
 -------------------------------------------------*/
 
@@ -572,7 +572,7 @@ void ldcore_set_video_squelch(laserdisc_state *ld, UINT8 squelch)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    ldcore_generic_update - generically update in 
+    ldcore_generic_update - generically update in
     a way that works for most situations
 -------------------------------------------------*/
 
@@ -580,10 +580,10 @@ INT32 ldcore_generic_update(laserdisc_state *ld, const vbi_metadata *vbi, int fi
 {
 	INT32 advanceby = 0;
 	int frame;
-	
+
 	/* start by assuming the state doesn't change */
 	*newstate = ld->state;
-	
+
 	/* handle things based on the state */
 	switch (ld->state.state)
 	{
@@ -592,29 +592,29 @@ INT32 ldcore_generic_update(laserdisc_state *ld, const vbi_metadata *vbi, int fi
 			if (attotime_compare(curtime, ld->state.endtime) >= 0)
 			    newstate->state = LDSTATE_EJECTED;
 			break;
-		
+
 		case LDSTATE_EJECTED:
 			/* do nothing */
 			break;
-		
+
 		case LDSTATE_PARKED:
 			/* do nothing */
 			break;
-		
+
 		case LDSTATE_LOADING:
 			/* when time expires, switch to the spinup state */
 			if (attotime_compare(curtime, ld->state.endtime) >= 0)
 			    newstate->state = LDSTATE_SPINUP;
 			advanceby = -GENERIC_SEARCH_SPEED;
 			break;
-		
+
 		case LDSTATE_SPINUP:
 			/* when time expires, switch to the playing state */
 			if (attotime_compare(curtime, ld->state.endtime) >= 0)
 			    newstate->state = LDSTATE_PLAYING;
 			advanceby = -GENERIC_SEARCH_SPEED;
 			break;
-		
+
 		case LDSTATE_PAUSING:
 			/* if he hit the start of a frame, switch to paused state */
 			if (is_start_of_frame(vbi))
@@ -622,18 +622,18 @@ INT32 ldcore_generic_update(laserdisc_state *ld, const vbi_metadata *vbi, int fi
 			    newstate->state = LDSTATE_PAUSED;
 			    newstate->param = fieldnum;
 			}
-			
+
 			/* else advance until we hit it */
 			else if (fieldnum == 1)
 				advanceby = 1;
 			break;
-		
+
 		case LDSTATE_PAUSED:
 			/* if we paused on field 1, we must flip back and forth */
 			if (ld->state.param == 1)
 				advanceby = (fieldnum == 1) ? 1 : -1;
 			break;
-		
+
 		case LDSTATE_PLAYING:
 			/* if we hit the target frame, switch to the paused state */
 			if (ld->state.param > 0 && is_start_of_frame(vbi) && frame_from_metadata(vbi) == ld->state.param)
@@ -646,7 +646,7 @@ INT32 ldcore_generic_update(laserdisc_state *ld, const vbi_metadata *vbi, int fi
 			else if (fieldnum == 1)
 				advanceby = 1;
 			break;
-		
+
 		case LDSTATE_PLAYING_SLOW_REVERSE:
 			/* after the second field of each frame, see if we need to advance */
 			if (fieldnum == 1 && ++ld->state.substate > ld->state.param)
@@ -655,7 +655,7 @@ INT32 ldcore_generic_update(laserdisc_state *ld, const vbi_metadata *vbi, int fi
 				ld->state.substate = 0;
 			}
 			break;
-		
+
 		case LDSTATE_PLAYING_SLOW_FORWARD:
 			/* after the second field of each frame, see if we need to advance */
 			if (fieldnum == 1 && ++ld->state.substate > ld->state.param)
@@ -664,7 +664,7 @@ INT32 ldcore_generic_update(laserdisc_state *ld, const vbi_metadata *vbi, int fi
 				ld->state.substate = 0;
 			}
 			break;
-		
+
 		case LDSTATE_PLAYING_FAST_REVERSE:
 			/* advance after the second field of each frame */
 			if (fieldnum == 1)
@@ -676,17 +676,17 @@ INT32 ldcore_generic_update(laserdisc_state *ld, const vbi_metadata *vbi, int fi
 			if (fieldnum == 1)
 				advanceby = ld->state.param;
 			break;
-		
+
 		case LDSTATE_SCANNING:
 			/* advance after the second field of each frame */
 			if (fieldnum == 1)
 				advanceby = ld->state.param >> 8;
-			
+
 			/* after we run out of vsyncs, revert to the saved state */
 			if (++ld->state.substate >= (ld->state.param & 0xff))
 				*newstate = ld->savestate;
 			break;
-		
+
 		case LDSTATE_STEPPING_REVERSE:
 			/* wait for the first field of the frame and then leap backwards */
 			if (is_start_of_frame(vbi))
@@ -695,13 +695,13 @@ INT32 ldcore_generic_update(laserdisc_state *ld, const vbi_metadata *vbi, int fi
 			    newstate->state = LDSTATE_PAUSING;
 			}
 			break;
-		
+
 		case LDSTATE_STEPPING_FORWARD:
 			/* wait for the first field of the frame and then switch to pausing state */
 			if (is_start_of_frame(vbi))
 			    newstate->state = LDSTATE_PAUSING;
 			break;
-		
+
 		case LDSTATE_SEEKING:
 			/* if we're in the final state, look for a matching frame and pause there */
 			frame = frame_from_metadata(vbi);
@@ -710,7 +710,7 @@ INT32 ldcore_generic_update(laserdisc_state *ld, const vbi_metadata *vbi, int fi
 			    newstate->state = LDSTATE_PAUSED;
 			    newstate->param = fieldnum;
 			}
-			
+
 			/* otherwise, if we got frame data from the VBI, update our seeking logic */
 			else if (ld->state.substate == 0 && frame != FRAME_NOT_PRESENT)
 			{
@@ -719,7 +719,7 @@ INT32 ldcore_generic_update(laserdisc_state *ld, const vbi_metadata *vbi, int fi
 				/* if we're within a couple of frames, just play until we hit it */
 				if (delta >= 0 && delta <= 2)
 					ld->state.substate++;
-				
+
 				/* otherwise, compute the delta assuming 1:1 track to frame; this will correct eventually */
 				else
 				{
@@ -730,7 +730,7 @@ INT32 ldcore_generic_update(laserdisc_state *ld, const vbi_metadata *vbi, int fi
 					advanceby = MAX(advanceby, -GENERIC_SEARCH_SPEED);
 				}
 			}
-			
+
 			/* otherwise, keep advancing until we know what's up */
 			else
 			{
@@ -739,7 +739,7 @@ INT32 ldcore_generic_update(laserdisc_state *ld, const vbi_metadata *vbi, int fi
 			}
 			break;
 	}
-		
+
 	return advanceby;
 }
 
@@ -755,7 +755,7 @@ static void read_track_data(laserdisc_state *ld)
 	UINT32 tracknum = ldcore->curtrack;
 	UINT32 fieldnum = ldcore->fieldnum;
 	chd_error err;
-	
+
 	/* if the previous field had the white flag, force the new field to pair with it */
 	if (ldcore->metadata[fieldnum ^ 1].white)
 		ldcore->videofields[ldcore->videoindex] = 1;
@@ -856,8 +856,8 @@ static void process_track_data(const device_config *device)
 		ldcore->last_chapter = chapter;
 
 	/* render the display if present */
-//	if (ldcore->display && ldcore->avconfig.video != NULL)
-//		render_display((UINT16 *)ldcore->avconfig.video->base, ldcore->avconfig.video->rowpixels, ldcore->avconfig.video->width, ldcore->last_frame);
+//  if (ldcore->display && ldcore->avconfig.video != NULL)
+//      render_display((UINT16 *)ldcore->avconfig.video->base, ldcore->avconfig.video->rowpixels, ldcore->avconfig.video->width, ldcore->last_frame);
 
 	/* update video field */
 	if (ldcore->avconfig.video != NULL)
@@ -1326,10 +1326,10 @@ static DEVICE_START( laserdisc )
 	int sndnum, index;
 	int statesize;
 	chd_error err;
-	
+
 	/* save a copy of the device pointer */
 	ld->device = device;
-	
+
 	/* allocate memory for the core state */
 	ld->core = auto_malloc(sizeof(*ld->core));
 	memset(ld->core, 0, sizeof(*ld->core));
@@ -1341,7 +1341,7 @@ static DEVICE_START( laserdisc )
 		statesize = MAX(statesize, player_interfaces[index]->statesize);
 	ld->player = auto_malloc(statesize);
 	memset(ld->player, 0, statesize);
-	
+
 	/* copy config data to the live state */
 	ldcore->config = *config;
 	if (ldcore->config.overclip.max_x == ldcore->config.overclip.min_x || ldcore->config.overclip.max_y == ldcore->config.overclip.min_y)
@@ -1399,7 +1399,7 @@ static DEVICE_START( laserdisc )
 		/* first allocate a YUY16 bitmap at 2x the height */
 		ldcore->videoframe[index] = auto_bitmap_alloc(width, height * 2, BITMAP_FORMAT_YUY16);
 		fillbitmap_yuy16(ldcore->videoframe[index], 40, 109, 240);
-		
+
 		/* make a copy of the bitmap that clips out the VBI and horizontal blanking areas */
 		ldcore->videovisframe[index] = auto_malloc(sizeof(*ldcore->videovisframe[index]));
 		*ldcore->videovisframe[index] = *ldcore->videoframe[index];
@@ -1407,7 +1407,7 @@ static DEVICE_START( laserdisc )
 		ldcore->videovisframe[index]->height -= 44;
 		ldcore->videovisframe[index]->width -= 2 * ldcore->videoframe[index]->width * 8 / 720;
 	}
-	
+
 	/* allocate an empty frame of the same size */
 	ldcore->emptyframe = auto_bitmap_alloc(width, height * 2, BITMAP_FORMAT_YUY16);
 	fillbitmap_yuy16(ldcore->emptyframe, 0, 128, 128);
@@ -1503,7 +1503,7 @@ static DEVICE_RESET( laserdisc )
 		ldcore->linein[line] = CLEAR_LINE;
 	for (line = 0; line < LASERDISC_OUTPUT_LINES; line++)
 		ldcore->lineout[line] = CLEAR_LINE;
-	
+
 	/* call the initialization */
 	if (ldcore->intf.init != NULL)
 		(*ldcore->intf.init)(ld);

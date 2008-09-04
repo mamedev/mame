@@ -101,7 +101,7 @@ struct _dkong_state
 
 	/* Specific states */
 	INT8 decrypt_counter;
-	
+
 	/* 2650 protection */
 	UINT8 protect_type;
 	UINT8 hunchloopback;

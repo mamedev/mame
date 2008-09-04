@@ -4633,7 +4633,7 @@ ROM_END
 /* -------------------------- Raizing games ------------------------- */
 
 
-/* 
+/*
 For the two sets of Sorcer Striker (World) the only differences
 are 2 bytes plus a corrected checksum for each set:
 

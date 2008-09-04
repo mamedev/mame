@@ -135,9 +135,9 @@ static void *snkwave_start(const char *tag, int sndindex, int clock, const void 
 /********************************************************************************/
 
 /* SNK wave register map
-	all registers are 6-bit
-	0-1			frequency (12-bit)
-	2-5			waveform (8 3-bit nibbles)
+    all registers are 6-bit
+    0-1         frequency (12-bit)
+    2-5         waveform (8 3-bit nibbles)
 */
 
 WRITE8_HANDLER( snkwave_w )

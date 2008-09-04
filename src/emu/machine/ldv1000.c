@@ -32,7 +32,7 @@ enum
 	LDSTATE_SKIPPING = LDSTATE_OTHER,
 	LDSTATE_WAITING
 };
-	
+
 /* Pioneer LD-V1000 specific information */
 enum
 {
@@ -201,7 +201,7 @@ static void ldv1000_soft_reset(laserdisc_state *ld)
 	player->readtotal = 0;
 	memset(player->readbuf, 0, sizeof(player->readbuf));
 	player->lastvsynctime = curtime;
-	
+
 	ldv1000_switch_state(ld, LDSTATE_PARKED, 0);
 }
 
@@ -222,7 +222,7 @@ static void ldv1000_update_squelch(laserdisc_state *ld)
 			ldcore_set_audio_squelch(ld, player->audio1disable, player->audio2disable);
 			ldcore_set_video_squelch(ld, FALSE);
 			break;
-		
+
 		/* video on, audio off */
 		case LDSTATE_PAUSING:
 		case LDSTATE_PAUSED:
@@ -238,7 +238,7 @@ static void ldv1000_update_squelch(laserdisc_state *ld)
 			ldcore_set_audio_squelch(ld, TRUE, TRUE);
 			ldcore_set_video_squelch(ld, FALSE);
 			break;
-		
+
 		/* video off, audio off */
 		case LDSTATE_NONE:
 		case LDSTATE_EJECTING:
@@ -263,15 +263,15 @@ static void ldv1000_update_squelch(laserdisc_state *ld)
 static int ldv1000_switch_state(laserdisc_state *ld, UINT8 newstate, INT32 parameter)
 {
 	attotime curtime = timer_get_time();
-	
+
 	/* if this is the same state, ignore */
 	if (ld->state.state == newstate)
 		return TRUE;
-	
+
 	/* if we're in a timed state, we ignore changes until the time elapses */
 	if (attotime_compare(curtime, ld->state.endtime) < 0)
 		return FALSE;
-	
+
 	/* if moving to a state that requires it, save the old state */
 	if (requires_state_save(newstate) && !requires_state_save(ld->state.state))
 		ld->savestate = ld->state;
@@ -289,15 +289,15 @@ static int ldv1000_switch_state(laserdisc_state *ld, UINT8 newstate, INT32 param
 		case LDSTATE_EJECTING:
 			ld->state.endtime = attotime_add(curtime, GENERIC_EJECT_TIME);
 			break;
-			
+
 		case LDSTATE_LOADING:
 			ld->state.endtime = attotime_add(curtime, GENERIC_LOAD_TIME);
 			break;
-			
+
 		case LDSTATE_SPINUP:
 			ld->state.endtime = attotime_add(curtime, GENERIC_SPINUP_TIME);
 			break;
-		
+
 		case LDSTATE_WAITING:
 			ld->state.endtime = attotime_add(curtime, attotime_mul(ATTOTIME_IN_MSEC(100), ld->state.param));
 			break;
@@ -317,7 +317,7 @@ static INT32 ldv1000_update(laserdisc_state *ld, const vbi_metadata *vbi, int fi
 	ldplayer_state newstate;
 	INT32 advanceby = 0;
 	int frame, chapter;
-	
+
 	/* remember the last frame and chapter */
 	player->lastvsynctime = curtime;
 	frame = frame_from_metadata(vbi);
@@ -350,19 +350,19 @@ static INT32 ldv1000_update(laserdisc_state *ld, const vbi_metadata *vbi, int fi
 			advanceby = ldcore_generic_update(ld, vbi, fieldnum, curtime, &newstate);
 			ldv1000_switch_state(ld, newstate.state, newstate.param);
 			break;
-		
+
 		case LDSTATE_SKIPPING:
 			/* just advance and return to previous state */
 			advanceby = ld->state.param;
 			ldv1000_switch_state(ld, ld->savestate.state, ld->savestate.param);
 			break;
-		
+
 		case LDSTATE_WAITING:
 			/* keep trying to switch to the previous state until we succeed */
 			ldv1000_switch_state(ld, ld->savestate.state, ld->savestate.param);
 			break;
 	}
-		
+
 	return advanceby;
 }
 
@@ -387,43 +387,43 @@ static void ldv1000_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 		case 0x3f:	CMDPRINTF(("ldv1000: 0\n"));
 			player->parameter = (player->parameter == -1) ? 0 : (player->parameter * 10 + 0);
 			return;
-		
+
 		case 0x0f:	CMDPRINTF(("ldv1000: 1\n"));
 			player->parameter = (player->parameter == -1) ? 1 : (player->parameter * 10 + 1);
 			return;
-		
+
 		case 0x8f:	CMDPRINTF(("ldv1000: 2\n"));
 			player->parameter = (player->parameter == -1) ? 2 : (player->parameter * 10 + 2);
 			return;
-		
+
 		case 0x4f:	CMDPRINTF(("ldv1000: 3\n"));
 			player->parameter = (player->parameter == -1) ? 3 : (player->parameter * 10 + 3);
 			return;
-		
+
 		case 0x2f:	CMDPRINTF(("ldv1000: 4\n"));
 			player->parameter = (player->parameter == -1) ? 4 : (player->parameter * 10 + 4);
 			return;
-		
+
 		case 0xaf:	CMDPRINTF(("ldv1000: 5\n"));
 			player->parameter = (player->parameter == -1) ? 5 : (player->parameter * 10 + 5);
 			return;
-		
+
 		case 0x6f:	CMDPRINTF(("ldv1000: 6\n"));
 			player->parameter = (player->parameter == -1) ? 6 : (player->parameter * 10 + 6);
 			return;
-		
+
 		case 0x1f:	CMDPRINTF(("ldv1000: 7\n"));
 			player->parameter = (player->parameter == -1) ? 7 : (player->parameter * 10 + 7);
 			return;
-		
+
 		case 0x9f:	CMDPRINTF(("ldv1000: 8\n"));
 			player->parameter = (player->parameter == -1) ? 8 : (player->parameter * 10 + 8);
 			return;
-		
+
 		case 0x5f:	CMDPRINTF(("ldv1000: 9\n"));
 			player->parameter = (player->parameter == -1) ? 9 : (player->parameter * 10 + 9);
 			return;
-		
+
 		case 0x7f:  CMDPRINTF(("ldv1000: %d Recall\n", player->parameter));
 			/* set the active register */
 			player->activereg = player->parameter;
@@ -728,8 +728,8 @@ static UINT8 ldv1000_status_r(laserdisc_state *ld)
 				case LDSTATE_STEPPING_REVERSE:		status = 0xe5;		break;
 				case LDSTATE_SCANNING:				status = 0x4c;		break;
 				case LDSTATE_SEEKING:				status = 0x50;		break;
-//				case LASERDISC_SEARCH_FINISHED:		status = 0xd0;		break;
-//				case LASERDISC_AUTOSTOPPED:			status = 0x54;		break;
+//              case LASERDISC_SEARCH_FINISHED:     status = 0xd0;      break;
+//              case LASERDISC_AUTOSTOPPED:         status = 0x54;      break;
 				default:
 					fatalerror("Unexpected disc state in ldv1000_status_r\n");
 					break;

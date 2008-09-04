@@ -274,7 +274,7 @@ static SOUND_RESET( mario )
 #if USE_8039
     set_ea(machine, 1);
 #endif
-    
+
 	soundlatch_clear_w(machine,0,0);
 	soundlatch2_clear_w(machine,0,0);
 	soundlatch3_clear_w(machine,0,0);

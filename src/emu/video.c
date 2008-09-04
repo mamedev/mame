@@ -2074,7 +2074,7 @@ static void update_refresh_speed(running_machine *machine)
 
 			/* compute a target speed as an integral percentage */
 			/* note that we lop 0.25Hz off of the minrefresh when doing the computation to allow for
-			   the fact that most refresh rates are not accurate to 10 digits... */
+               the fact that most refresh rates are not accurate to 10 digits... */
 			target_speed = floor((minrefresh - 0.25f) * 100.0 / ATTOSECONDS_TO_HZ(min_frame_period));
 			target_speed = MIN(target_speed, original_speed);
 
