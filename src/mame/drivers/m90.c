@@ -22,10 +22,6 @@ Notes:
   selection moves too fast with the clock set at 16 MHz. It's still fast at
   8 MHz, but at least it's usable.
 
-To do:
-
-- Risky Challenge / Gussun Oyoyo use a raster effect to split the screen at the line water
-
 *****************************************************************************/
 
 #include "driver.h"
@@ -1309,7 +1305,7 @@ GAME( 1992, bbmanwj,  bbmanw,   bbmanw,   bbmanwj,  0,        ROT0, "Irem", "Bom
 GAME( 1992, newapunk, bbmanw,   bbmanw,   bbmanwj,  0,        ROT0, "Irem America", "New Atomic Punk - Global Quest (US)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
 GAME( 1992, bomblord, bbmanw,   bomblord, bbmanw,   bomblord, ROT0, "bootleg", "Bomber Lord (bootleg)", GAME_IMPERFECT_SOUND | GAME_NO_COCKTAIL )
 GAME( 1992, quizf1,   0,        quizf1,   quizf1,   quizf1,   ROT0, "Irem", "Quiz F-1 1,2finish", GAME_NO_COCKTAIL )
-GAME( 1993, riskchal, 0,        riskchal, riskchal, 0,        ROT0, "Irem", "Risky Challenge", GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, gussun,   riskchal, riskchal, riskchal, 0,        ROT0, "Irem", "Gussun Oyoyo (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, riskchal, 0,        riskchal, riskchal, 0,        ROT0, "Irem", "Risky Challenge", GAME_NO_COCKTAIL )
+GAME( 1993, gussun,   riskchal, riskchal, riskchal, 0,        ROT0, "Irem", "Gussun Oyoyo (Japan)", GAME_NO_COCKTAIL )
 GAME( 1993, matchit2, 0,        matchit2, matchit2, 0,        ROT0, "Tamtex", "Match It II", GAME_NO_COCKTAIL )
 GAME( 1993, shisen2,  matchit2, matchit2, shisen2,  0,        ROT0, "Tamtex", "Shisensho II", GAME_NO_COCKTAIL )
