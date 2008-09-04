@@ -493,6 +493,18 @@ endif
 
 
 #-------------------------------------------------
+# SNK custom wave generator
+#-------------------------------------------------
+
+SOUNDDEFS += -DHAS_SNKWAVE=$(if $(filter SNKWAVE,$(SOUNDS)),1,0)
+
+ifneq ($(filter SNKWAVE,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/snkwave.o
+endif
+
+
+
+#-------------------------------------------------
 # Sony custom sound chips
 #-------------------------------------------------
 

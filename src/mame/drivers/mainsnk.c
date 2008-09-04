@@ -72,7 +72,7 @@ cc_p14.j2 8192 0xedc6a1eb M5L2764k
 
 #include "driver.h"
 #include "sound/ay8910.h"
-#include "sound/namco.h"
+#include "sound/snkwave.h"
 
 extern UINT8 *mainsnk_fgram;
 extern UINT8 *mainsnk_bgram;
@@ -135,7 +135,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_BASE(&namco_wavedata)
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ(sound_command_r)
 	AM_RANGE(0xc000, 0xc000) AM_READ(sound_ack_r)
@@ -356,12 +356,6 @@ static const gfx_layout sprite_layout =
 	256
 };
 
-static const namco_interface snkwave_interface =
-{
-	1,
-	0					/* stereo */
-};
-
 
 static GFXDECODE_START( mainsnk )
 	GFXDECODE_ENTRY( "gfx1", 0x0, tile_layout,	0,  8 )
@@ -400,8 +394,7 @@ static MACHINE_DRIVER_START( mainsnk )
 	MDRV_SOUND_ADD("ay2", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MDRV_SOUND_ADD("namco", NAMCO, 24000)
-	MDRV_SOUND_CONFIG(snkwave_interface)
+	MDRV_SOUND_ADD("wave", SNKWAVE, 8000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.08)
 MACHINE_DRIVER_END
 

@@ -799,29 +799,6 @@ WRITE8_HANDLER( _20pacgal_wavedata_w )
 	}
 }
 
-/********************************************************************************/
-
-WRITE8_HANDLER( snkwave_w )
-{
-	struct namco_sound *chip = sndti_token(SOUND_NAMCO, 0);
-	static int freq0 = 0xff;
-	sound_channel *voice = chip->channel_list;
-	if( offset==0 ) freq0 = data;
-	if( offset==1 )
-	{
-		stream_update(chip->stream);
-		if( data==0xff || freq0==0 )
-		{
-			voice->volume[0] = 0x0;
-		}
-		else
-		{
-			voice->volume[0] = 0x8;
-			voice->frequency = (data<<16)/freq0;
-		}
-	}
-}
-
 
 
 
