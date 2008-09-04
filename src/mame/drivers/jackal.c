@@ -414,7 +414,7 @@ ROM_START( topgunbl )
 	ROM_LOAD16_BYTE( "tgnr13h.bin",  0x40001, 0x20000, CRC(22effcc8) SHA1(4d174b0ce64def32050f87343c4b1424e0fef6f7) )
 
 #if 0
-	same data, different layout (and one bad ROM)
+	/* same data, different layout (and one bad ROM) */
 	ROM_LOAD16_WORD_SWAP( "t-17.n12",     0x00000, 0x08000, CRC(e8875110) )
 	ROM_LOAD16_WORD_SWAP( "t-18.n13",     0x08000, 0x08000, CRC(cf14471d) )
 	ROM_LOAD16_WORD_SWAP( "t-19.n14",     0x10000, 0x08000, CRC(46ee5dd2) )
