@@ -351,9 +351,9 @@ static WRITE16_HANDLER( sound_command_w )
 	}
 }
 
-static READ16_HANDLER( in0_r )
+static CUSTOM_INPUT( pending_sound_r )
 {
-	return input_port_read(machine, "SYSTEM") | (pending_command ? 0x80 : 0);
+	return pending_command ? 1 : 0;
 }
 
 static WRITE8_HANDLER( pending_command_clear_w )
@@ -377,12 +377,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfff004, 0xfff005) AM_READ_PORT("P3")					/* Left Side Ctrls */
 	AM_RANGE(0xfff004, 0xfff007) AM_WRITE(welltris_scrollreg_w)
 	AM_RANGE(0xfff006, 0xfff007) AM_READ_PORT("P4")					/* Right Side Ctrls */
-	AM_RANGE(0xfff008, 0xfff009) AM_READ(in0_r)						/* Coinage, Start Buttons, pending sound command etc. */  /* Bit 5 Tested at start of irq 1 */
+	AM_RANGE(0xfff008, 0xfff009) AM_READ_PORT("SYSTEM")				/* Bit 5 Tested at start of irq 1 */
 	AM_RANGE(0xfff008, 0xfff009) AM_WRITE(sound_command_w)
 	AM_RANGE(0xfff00a, 0xfff00b) AM_READ_PORT("EXTRA")				/* P3+P4 Coin + Start Buttons */
-	AM_RANGE(0xfff00c, 0xfff00d) AM_READ_PORT("DSW1")				/* DSW1 Coinage */
+	AM_RANGE(0xfff00c, 0xfff00d) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfff00c, 0xfff00d) AM_WRITE(SMH_NOP)					/* ?? */
-	AM_RANGE(0xfff00e, 0xfff00f) AM_READ_PORT("DSW2")				/* DSW2 Game Options */
+	AM_RANGE(0xfff00e, 0xfff00f) AM_READ_PORT("DSW2")
 	AM_RANGE(0xfff00e, 0xfff00f) AM_WRITE(SMH_NOP)					/* ?? */
 ADDRESS_MAP_END
 
@@ -412,7 +412,7 @@ static INPUT_PORTS_START( welltris )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE2 )	/* Test (used to go through tests in service mode) */
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )		/* Tested at start of irq 1 */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )	/* Service (adds a coin) */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* pending sound command */
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(pending_sound_r, NULL)	/* pending sound command */
 
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY

@@ -190,25 +190,19 @@ static READ32_HANDLER( dreamwld_protdata_r )
 }
 
 
-static READ32_HANDLER( dreamwld_dips_r )
-{
-	return input_port_read(machine, "DSW") | (input_port_read(machine, "DSW")<<16);
-}
-
 static WRITE32_HANDLER( dreamwld_palette_w )
 {
 	UINT16 dat;
 	int color;
 
 	COMBINE_DATA(&paletteram32[offset]);
-	color = offset*2;
+	color = offset * 2;
 
-	dat = paletteram32[offset]&0x7fff;
-	palette_set_color_rgb(machine,color+1,pal5bit(dat >> 10),pal5bit(dat >> 5),pal5bit(dat >> 0));
+	dat = paletteram32[offset] & 0x7fff;
+	palette_set_color_rgb(machine, color + 1, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
 
-	dat = (paletteram32[offset]>>16)&0x7fff;
-	palette_set_color_rgb(machine,color,pal5bit(dat >> 10),pal5bit(dat >> 5),pal5bit(dat >> 0));
-
+	dat = (paletteram32[offset] >> 16) & 0x7fff;
+	palette_set_color_rgb(machine, color, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
 }
 
 static READ32_HANDLER(dreamwld_6295_0_r)
@@ -289,8 +283,7 @@ static ADDRESS_MAP_START( dreamwld_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x804000, 0x805fff) AM_RAM AM_BASE( &dreamwld_bg_scroll )  // scroll regs etc.
 
 	AM_RANGE(0xc00000, 0xc00003) AM_READ_PORT("INPUTS")
-	AM_RANGE(0xc00004, 0xc00007) AM_READ(dreamwld_dips_r)
-
+	AM_RANGE(0xc00004, 0xc00007) AM_READ_PORT("c00004")
 
 	AM_RANGE(0xc0000c, 0xc0000f) AM_WRITE( dreamwld_6295_0_bank_w ) // sfx
 	AM_RANGE(0xc00018, 0xc0001b) AM_READWRITE( dreamwld_6295_0_r, dreamwld_6295_0_w) // sfx
@@ -368,6 +361,10 @@ static INPUT_PORTS_START(dreamwld)
 	PORT_BIT( 0x20000000, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
 	PORT_BIT( 0x40000000, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+
+	PORT_START("c00004")	/* 32bit */
+	PORT_BIT( 0x0000ffff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "DSW")
+	PORT_BIT( 0xffff0000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "DSW")
 
 	PORT_START("DSW")	/* 16bit */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")

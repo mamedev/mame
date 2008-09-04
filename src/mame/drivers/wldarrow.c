@@ -160,14 +160,14 @@ static WRITE8_HANDLER( wldarrow_dac_4_w )
 
 static ADDRESS_MAP_START( wldarrow_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3800, 0x3800) AM_READ(input_port_0_r)
+	AM_RANGE(0x3800, 0x3800) AM_READ_PORT("IN0")
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&wldarrow_videoram_0) AM_SIZE(&wldarrow_videoram_size)
 	AM_RANGE(0x6000, 0x7fff) AM_RAM AM_BASE(&wldarrow_videoram_1)
 	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_BASE(&wldarrow_videoram_2)
 	AM_RANGE(0xcd00, 0xcdff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0xf000, 0xf000) AM_READWRITE(input_port_1_r, wldarrow_dac_1_w)
-	AM_RANGE(0xf004, 0xf004) AM_READWRITE(input_port_2_r, lights_1_w)
-	AM_RANGE(0xf006, 0xf006) AM_READWRITE(input_port_3_r, lights_2_w)
+	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("BITSW") AM_WRITE(wldarrow_dac_1_w)
+	AM_RANGE(0xf004, 0xf004) AM_READ_PORT("IN1") AM_WRITE(lights_1_w)
+	AM_RANGE(0xf006, 0xf006) AM_READ_PORT("IN2") AM_WRITE(lights_2_w)
 	AM_RANGE(0xf008, 0xf008) AM_WRITE(counter_w)
 	AM_RANGE(0xf00f, 0xf00f) AM_WRITE(wldarrow_dac_2_w)
 	AM_RANGE(0xf0f0, 0xf0f0) AM_WRITE(wldarrow_dac_3_w)
@@ -231,7 +231,7 @@ static INPUT_PORTS_START( wldarrow )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("IN2")
+	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Stop Reel 3") /* Skill Stop only? */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Stop Reel 2") /* Skill Stop only? */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Stop Reel 1") /* Skill Stop only? */
@@ -247,9 +247,8 @@ static INPUT_PORTS_START( wldarrow )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN3")
+	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED)
-
 INPUT_PORTS_END
 
 
@@ -302,7 +301,7 @@ static INPUT_PORTS_START( mdrawpkr )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("IN2")
+	PORT_START("IN1")
 	PORT_DIPNAME( 0x01, 0x01, "2-0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -328,9 +327,8 @@ static INPUT_PORTS_START( mdrawpkr )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN3")
+	PORT_START("IN2")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED)
-
 INPUT_PORTS_END
 
 

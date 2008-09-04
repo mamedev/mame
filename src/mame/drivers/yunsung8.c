@@ -107,11 +107,11 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READWRITE(input_port_0_r, yunsung8_videobank_w	)	// read = coins . write = video RAM bank
-	AM_RANGE(0x01, 0x01) AM_READWRITE(input_port_1_r, yunsung8_bankswitch_w	)	// read = P1 . write = ROM Bank + Layers Enable
-	AM_RANGE(0x02, 0x02) AM_READWRITE(input_port_2_r, soundlatch_w			)	// read = P2 . write = To Sound CPU
-	AM_RANGE(0x03, 0x03) AM_READ(input_port_3_r								)	// DSW 1
-	AM_RANGE(0x04, 0x04) AM_READ(input_port_4_r								)	// DSW 2
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("SYSTEM") AM_WRITE(yunsung8_videobank_w)	// video RAM bank
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P1") AM_WRITE(yunsung8_bankswitch_w	)	// ROM Bank + Layers Enable
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("P2") AM_WRITE(soundlatch_w			)	// To Sound CPU
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")
 	AM_RANGE(0x06, 0x06) AM_WRITE(yunsung8_flipscreen_w						)	// Flip Screen
 	AM_RANGE(0x07, 0x07) AM_WRITE(SMH_NOP									)	// ? (end of IRQ, random value)
 ADDRESS_MAP_END
@@ -179,8 +179,7 @@ ADDRESS_MAP_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( magix )
-
-	PORT_START("SYSTEM")	// IN0 - Coins
+	PORT_START("SYSTEM")
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_START2   )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -190,7 +189,7 @@ static INPUT_PORTS_START( magix )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_COIN1    )
 
-	PORT_START("P1")	// IN1 - Player 1
+	PORT_START("P1")
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)	// same as button1 !?
@@ -200,7 +199,7 @@ static INPUT_PORTS_START( magix )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
-	PORT_START("P2")	// IN2 - Player 2
+	PORT_START("P2")
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)	// same as button1 !?
@@ -210,7 +209,7 @@ static INPUT_PORTS_START( magix )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 
-	PORT_START("DSW1")	// IN3 - DSW 1
+	PORT_START("DSW1")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
@@ -233,7 +232,7 @@ static INPUT_PORTS_START( magix )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
 
-	PORT_START("DSW2")	// IN4 - DSW 2
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Title" )
 	PORT_DIPSETTING(    0x01, "Magix" )
 	PORT_DIPSETTING(    0x00, "Rock" )
@@ -258,7 +257,6 @@ static INPUT_PORTS_START( magix )
 	PORT_DIPNAME( 0x80, 0x80, "Unknown 2-7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 
@@ -267,8 +265,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( cannball )
-
-	PORT_START("SYSTEM")	// IN0 - Coins
+	PORT_START("SYSTEM")
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_START2   )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -278,7 +275,7 @@ static INPUT_PORTS_START( cannball )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_COIN1    )
 
-	PORT_START("P1")	// IN1 - Player 1
+	PORT_START("P1")
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
@@ -288,7 +285,7 @@ static INPUT_PORTS_START( cannball )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
-	PORT_START("P2")	// IN2 - Player 2
+	PORT_START("P2")
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
@@ -298,7 +295,7 @@ static INPUT_PORTS_START( cannball )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 
-	PORT_START("DSW1")	// IN3 - DSW 1
+	PORT_START("DSW1")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
@@ -321,7 +318,7 @@ static INPUT_PORTS_START( cannball )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
 
-	PORT_START("DSW2")	// IN4 - DSW 2
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-0" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -345,7 +342,6 @@ static INPUT_PORTS_START( cannball )
 	PORT_DIPNAME( 0x80, 0x80, "Unknown 2-7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 /***************************************************************************
@@ -353,8 +349,7 @@ INPUT_PORTS_END
 ***************************************************************************/
 
 static INPUT_PORTS_START( rocktris )
-
-	PORT_START("SYSTEM")	// IN0 - Coins
+	PORT_START("SYSTEM")
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_START2   )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )
@@ -364,7 +359,7 @@ static INPUT_PORTS_START( rocktris )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_COIN1    ) PORT_IMPULSE(1)
 
-	PORT_START("P1")	// IN1 - Player 1
+	PORT_START("P1")
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)	// same as button1 !?
@@ -374,7 +369,7 @@ static INPUT_PORTS_START( rocktris )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
 
-	PORT_START("P2")	// IN2 - Player 2
+	PORT_START("P2")
 	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)	// same as button1 !?
@@ -384,7 +379,7 @@ static INPUT_PORTS_START( rocktris )
 	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
 	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
 
-	PORT_START("DSW1")	// IN3 - DSW 1
+	PORT_START("DSW1")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
@@ -407,7 +402,7 @@ static INPUT_PORTS_START( rocktris )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
 
-	PORT_START("DSW2")	// IN4 - DSW 2
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Unknown 2-0" ) 	// the rest seems unused
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -432,7 +427,6 @@ static INPUT_PORTS_START( rocktris )
 	PORT_DIPNAME( 0x80, 0x80, "Unknown 2-7" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
 INPUT_PORTS_END
 
 /***************************************************************************

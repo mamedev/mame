@@ -263,11 +263,10 @@ static READ8_HANDLER( cosmica_pixel_clock_r )
 	return pixel_clock;
 }
 
-static READ8_HANDLER( cosmicg_port_0_r )
+static CUSTOM_INPUT( crtc_r )
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
-
-	return (input_port_read(machine, "IN0") & 0xf0) | ((video_screen_get_vpos(machine->primary_screen) & 0xf0) >> 4);
+	return (video_screen_get_vpos(field->port->machine->primary_screen) & 0xf0) >> 4;
 }
 
 static READ8_HANDLER( magspot_coinage_dip_r )
@@ -359,7 +358,7 @@ static ADDRESS_MAP_START( cosmicg_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cosmicg_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ(cosmicg_port_0_r)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
 ADDRESS_MAP_END
 
@@ -504,7 +503,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( cosmicg )
 	PORT_START("IN0")	/* 4-7 */
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL )	/* pixel clock */
+	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(crtc_r, NULL)	/* pixel clock */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )

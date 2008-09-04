@@ -741,7 +741,7 @@ READ32_HANDLER( cojag_gun_input_r )
 			return (beamy << 16) | (beamx ^ 0x1ff);
 
 		case 2:
-			return input_port_read(machine, "IN3") << 16;
+			return input_port_read(machine, "IN3");
 	}
 	return 0;
 }

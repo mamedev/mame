@@ -152,7 +152,6 @@ WRITE16_HANDLER( wwfsstar_bg0_videoram_w );
 
 extern UINT16 *wwfsstar_fg0_videoram, *wwfsstar_bg0_videoram;
 
-static READ16_HANDLER( input_port_2_word_r_cust );
 static WRITE16_HANDLER( wwfsstar_irqack_w );
 static WRITE16_HANDLER( wwfsstar_flipscreen_w );
 static WRITE16_HANDLER ( wwfsstar_soundwrite );
@@ -173,12 +172,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x1003ff) AM_RAM AM_BASE(&spriteram16)		/* SPR Ram */
 	AM_RANGE(0x140000, 0x140fff) AM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x180000, 0x180003) AM_WRITE(wwfsstar_irqack_w)
-	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW0")				/* DSW0 */
-	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW1")				/* DSW1 */
-	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("P1")					/* CTRLS0 */
+	AM_RANGE(0x180000, 0x180001) AM_READ_PORT("DSW1")
+	AM_RANGE(0x180002, 0x180003) AM_READ_PORT("DSW2")
+	AM_RANGE(0x180004, 0x180005) AM_READ_PORT("P1")
 	AM_RANGE(0x180004, 0x180007) AM_WRITE(wwfsstar_scrollwrite)
-	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("P2")					/* CTRLS1 */
-	AM_RANGE(0x180008, 0x180009) AM_READ(input_port_2_word_r_cust)	/* MISC */
+	AM_RANGE(0x180006, 0x180007) AM_READ_PORT("P2")
+	AM_RANGE(0x180008, 0x180009) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x180008, 0x180009) AM_WRITE(wwfsstar_soundwrite)
 	AM_RANGE(0x18000a, 0x18000b) AM_WRITE(wwfsstar_flipscreen_w)
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM								/* Work Ram */
@@ -277,9 +276,9 @@ static INTERRUPT_GEN( wwfsstars_interrupt )
 	}
 }
 
-static READ16_HANDLER( input_port_2_word_r_cust )
+static CUSTOM_INPUT( wwfsstar_vblank_r )
 {
-	return input_port_read(machine, "SYSTEM") | vblank;
+	return vblank;
 }
 
 /*******************************************************************************
@@ -312,7 +311,7 @@ static INPUT_PORTS_START( wwfsstar )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 ) PORT_NAME("Button B (1P VS 2P - Buy-in)")
 
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) /* VBlank */
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(wwfsstar_vblank_r, NULL)	/* VBlank */
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -321,7 +320,7 @@ static INPUT_PORTS_START( wwfsstar )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW0")	/* DSW0 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x00,  DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x01,  DEF_STR( 3C_1C ) )
@@ -347,7 +346,7 @@ static INPUT_PORTS_START( wwfsstar )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW1")	/* DSW1 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )

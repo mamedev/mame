@@ -76,30 +76,13 @@ logerror("%06x eeprom_r\n",activecpu_get_pc());
 	/* bit 6 is EEPROM data */
 	/* bit 7 is EEPROM ready */
 	/* bit 14 is service button */
-	res = (eeprom_read_bit() << 6) | input_port_read(machine, "EEPROM");
+	res = input_port_read(machine, "EEPROM");
 	if (init_eeprom_count)
 	{
 		init_eeprom_count--;
 		res &= 0xbfff;
 	}
 	return res;
-}
-
-static READ16_HANDLER( xmen6p_eeprom_r )
-{
-	int res;
-
-logerror("%06x xmen6p_eeprom_r\n",activecpu_get_pc());
-	/* bit 6 is EEPROM data */
-	/* bit 7 is EEPROM ready */
-	/* bit 14 is service button */
-	res = (eeprom_read_bit() << 6) | input_port_read(machine, "EEPROM");
-	if (init_eeprom_count)
-	{
-		init_eeprom_count--;
-		res &= 0xbfff;
-	}
-	return (res & 0x7fff) | xmen_current_frame;
 }
 
 
@@ -227,7 +210,7 @@ static ADDRESS_MAP_START( 6p_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x108060, 0x10807f) AM_WRITE(K053251_lsb_w)
 	AM_RANGE(0x10a000, 0x10a001) AM_READ_PORT("P2_P4") AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x10a002, 0x10a003) AM_READ_PORT("P1_P3")
-	AM_RANGE(0x10a004, 0x10a005) AM_READ(xmen6p_eeprom_r)
+	AM_RANGE(0x10a004, 0x10a005) AM_READ(eeprom_r)
 	AM_RANGE(0x10a006, 0x10a007) AM_READ_PORT("P5_P6")
 	AM_RANGE(0x10a00c, 0x10a00d) AM_READ(K053246_word_r) /* sprites */
 	AM_RANGE(0x110000, 0x113fff) AM_RAM		/* main RAM */
@@ -306,9 +289,9 @@ static INPUT_PORTS_START( xmen )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN3 )
 
-	PORT_START("EEPROM")	/* COIN  EEPROM and service */
+	PORT_START("EEPROM")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* EEPROM data */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* EEPROM status - always 1 */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
@@ -318,6 +301,12 @@ static INPUT_PORTS_START( xmen )
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
 INPUT_PORTS_END
+
+
+static CUSTOM_INPUT( xmen_frame_r )
+{
+	return xmen_current_frame;
+}
 
 static INPUT_PORTS_START( xmen6p )
 	PORT_START("P2_P4")
@@ -356,9 +345,9 @@ static INPUT_PORTS_START( xmen6p )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(3)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN3 )
 
-	PORT_START("EEPROM")	/* COIN  EEPROM and service */
+	PORT_START("EEPROM")
 	PORT_BIT( 0x003f, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* EEPROM data */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* EEPROM status - always 1 */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
@@ -367,7 +356,7 @@ static INPUT_PORTS_START( xmen6p )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_START5 ) /* not verified */
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_START6 ) /* not verified */
 	PORT_SERVICE_NO_TOGGLE( 0x4000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* screen indicator? */
+	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xmen_frame_r, NULL)	/* screen indicator? */
 
 	PORT_START("P5_P6")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(5)
@@ -411,11 +400,11 @@ static INPUT_PORTS_START( xmen2p )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("EEPROM")	/* COIN  EEPROM and service */
+	PORT_START("EEPROM")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE2 )
 	PORT_BIT( 0x003c, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* unused? */
-	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* EEPROM data */
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* EEPROM data */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* EEPROM status - always 1 */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
@@ -488,7 +477,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_RESET(xmen6p)
 {
-	xmen_current_frame = 0x0000;
+	xmen_current_frame = 0x00;
 }
 
 static INTERRUPT_GEN( xmen6p_interrupt )
@@ -504,7 +493,7 @@ static INTERRUPT_GEN( xmen6p_interrupt )
 //      if (xmen_irqenabled&0x04)
 //      {
 			irq3_line_hold(machine, cpunum);
-//          xmen_current_frame = 0x0000;
+//          xmen_current_frame = 0x00;
 
 //      }
 	}

@@ -284,5 +284,7 @@ READ32_HANDLER( input_port_29_dword_r );
 READ32_HANDLER( input_port_30_dword_r );
 READ32_HANDLER( input_port_31_dword_r );
 
+/* custom handler */
+CUSTOM_INPUT( custom_port_read );
 
 #endif	/* __MACHINE_GENERIC_H__ */

@@ -174,7 +174,7 @@ VIDEO_EOF( xmen6p )
 	rectangle cliprect;
 	int offset;
 
-	xmen_current_frame ^=0x8000;
+	xmen_current_frame ^= 0x01;
 
 //  const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 //  cliprect.min_x = visarea->min_x;
@@ -190,7 +190,7 @@ VIDEO_EOF( xmen6p )
 
 
 
-	if (xmen_current_frame&0x8000)
+	if (xmen_current_frame & 0x01)
 	{
 
 			/* copy the desired spritelist to the chip */

@@ -2725,10 +2725,10 @@ static DRIVER_INIT( spdball )
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc808, 0xc80b, 0, 0, pia_3_r, pia_3_w);
 
 	/* install extra input handlers */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xc800, 0, 0, input_port_5_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc801, 0xc801, 0, 0, input_port_6_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc802, 0xc802, 0, 0, input_port_7_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc803, 0xc803, 0, 0, input_port_8_r);
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xc800, 0, 0, input_port_read_handler8(machine->portconfig, "AN0"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc801, 0xc801, 0, 0, input_port_read_handler8(machine->portconfig, "AN1"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc802, 0xc802, 0, 0, input_port_read_handler8(machine->portconfig, "AN2"));
+	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc803, 0xc803, 0, 0, input_port_read_handler8(machine->portconfig, "AN3"));
 }
 
 

@@ -30,13 +30,13 @@ static READ16_HANDLER( stadhero_control_r )
 {
 	switch (offset<<1)
 	{
-		case 0: /* Player 1 & 2 joystick & buttons */
+		case 0:
 			return input_port_read(machine, "INPUTS");
 
-		case 2: /* Credits, start buttons */
-			return (input_port_read(machine, "COIN") | (input_port_read(machine, "COIN") << 8));
+		case 2:
+			return input_port_read(machine, "COIN");
 
-		case 4: /* Dip switches */
+		case 4:
 			return input_port_read(machine, "DSW");
 	}
 
@@ -131,16 +131,6 @@ static INPUT_PORTS_START( stadhero )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_START2 )
 
-	PORT_START("COIN")	/* 0x30c002 & 0x30c003 : Credits, start buttons */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
-
 	PORT_START("DSW")	/* 0x30c004 - 0x30c005 */
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
@@ -177,6 +167,20 @@ static INPUT_PORTS_START( stadhero )
 	PORT_DIPSETTING(      0x0000, "6 Credits" )
 	PORT_DIPUNUSED( 0x4000, IP_ACTIVE_LOW )
 	PORT_DIPUNUSED( 0x8000, IP_ACTIVE_LOW )
+
+	PORT_START("COIN")	/* 0x30c002 & 0x30c003 */
+	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "FAKE")
+	PORT_BIT( 0xff00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(custom_port_read, "FAKE")
+
+	PORT_START("FAKE")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* related to music/sound */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )	
 INPUT_PORTS_END
 
 /******************************************************************************/

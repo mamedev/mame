@@ -50,7 +50,6 @@ static READ16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r );
 static WRITE16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w );
 static WRITE16_HANDLER( wwfwfest_1410_write ); /* priority write */
 static WRITE16_HANDLER( wwfwfest_scroll_write ); /* scrolling write */
-static READ16_HANDLER( wwfwfest_inputs_read );
 static WRITE8_HANDLER( oki_bankswitch_w );
 static WRITE16_HANDLER ( wwfwfest_soundwrite );
 
@@ -77,9 +76,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x10000a, 0x10000b) AM_WRITE(wwfwfest_flipscreen_w)
 	AM_RANGE(0x140000, 0x140001) AM_WRITE(SMH_NOP) /* Irq 3 ack */
 	AM_RANGE(0x140002, 0x140003) AM_WRITE(SMH_NOP) /* Irq 2 ack */
-	AM_RANGE(0x14000C, 0x14000D) AM_WRITE(wwfwfest_soundwrite)
+	AM_RANGE(0x14000c, 0x14000d) AM_WRITE(wwfwfest_soundwrite)
 	AM_RANGE(0x140010, 0x140011) AM_WRITE(wwfwfest_1410_write)
-	AM_RANGE(0x140020, 0x140027) AM_READ(wwfwfest_inputs_read) /* Inputs */
+	AM_RANGE(0x140020, 0x140021) AM_READ_PORT("P1")
+	AM_RANGE(0x140022, 0x140023) AM_READ_PORT("P2")
+	AM_RANGE(0x140024, 0x140025) AM_READ_PORT("P3")
+	AM_RANGE(0x140026, 0x140027) AM_READ_PORT("P4")
 	AM_RANGE(0x180000, 0x18ffff) AM_READWRITE(wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r,wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x1c0000, 0x1c3fff) AM_RAM /* Work Ram */
 ADDRESS_MAP_END
@@ -142,37 +144,6 @@ static WRITE16_HANDLER( wwfwfest_scroll_write )
 	}
 }
 
-static READ16_HANDLER( wwfwfest_inputs_read )
-{
-	int tmp = 0;
-
-	switch (offset)
-	{
-	case 0x00:
-	tmp = input_port_read(machine, "P1") | input_port_read(machine, "SYSTEM") << 8;
-	tmp &= 0xcfff;
-	tmp |= ((input_port_read(machine, "DSW2") & 0xc0) << 6);
-	break;
-	case 0x01:
-	tmp = input_port_read(machine, "P2");
-	tmp &= 0xc0ff;
-	tmp |= ((input_port_read(machine, "DSW2") & 0x3f)<<8);
-	break;
-	case 0x02:
-	tmp = input_port_read(machine, "P3");
-	tmp &= 0xc0ff;
-	tmp |= ((input_port_read(machine, "DSW1") & 0x3f)<<8);
-	break;
-	case 0x03:
-	tmp = (input_port_read(machine, "P4") | input_port_read(machine, "VBLANK") << 8) ;
-	tmp &= 0xfcff;
-	tmp |= ((input_port_read(machine, "DSW1") & 0xc0) << 2);
-	break;
-	}
-
-	return tmp;
-}
-
 /*- Sound Related (from dd3) -*/
 
 static WRITE8_HANDLER( oki_bankswitch_w )
@@ -192,8 +163,22 @@ static WRITE16_HANDLER ( wwfwfest_soundwrite )
  There are 4 players, 2 sets of dipswitches and 2 misc
 *******************************************************************************/
 
+/* DIPs are spread accross the other input ports */
+static CUSTOM_INPUT( dsw_3f_r )
+{
+	const char *tag = param;
+	return input_port_read(field->port->machine, tag) & 0x3f;
+}
+
+static CUSTOM_INPUT( dsw_c0_r )
+{
+	const char *tag = param;
+	return (input_port_read(field->port->machine, tag) & 0xc0) >> 6;
+}
+
+
 static INPUT_PORTS_START( wwfwfest )
-	PORT_START("P1")	/* Player 1 */
+	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -202,8 +187,15 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x3000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(dsw_c0_r, "DSW2")
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("P2")	/* Player 2 */
+	PORT_START("P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
@@ -212,8 +204,9 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x3f00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(dsw_3f_r, "DSW2")
 
-	PORT_START("P3")	/* Player 3 */
+	PORT_START("P3")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(3)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(3)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(3)
@@ -222,8 +215,9 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x3f00, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(dsw_3f_r, "DSW1")
 
-	PORT_START("P4")	/* Player 4 */
+	PORT_START("P4")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(4)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(4)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(4)
@@ -232,30 +226,16 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START4 )
-
-	PORT_START("SYSTEM")	/* Misc 1 */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("VBLANK")	/* Misc 2 */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_VBLANK )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0300, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(dsw_c0_r, "DSW1")
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	/* Nb:  There are actually 3 dips on the board, 2 * 8, and 1 *4 */
-
-	PORT_START("DSW1")	/* Dips 1 */
+	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C )  )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_1C )  )
@@ -280,7 +260,7 @@ static INPUT_PORTS_START( wwfwfest )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
-	PORT_START("DSW2")	/* Dips 2 */
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )

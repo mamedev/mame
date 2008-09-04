@@ -146,10 +146,10 @@ static ADDRESS_MAP_START( wallc_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x83ff) AM_RAM_WRITE(wallc_videoram_w) AM_MIRROR(0xc00) AM_BASE(&videoram)	/* 2114, 2114 */
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM		/* 2114, 2114 */
 
-	AM_RANGE(0xb000, 0xb000) AM_READ(input_port_0_r)
-	AM_RANGE(0xb200, 0xb200) AM_READ(input_port_1_r)
-	AM_RANGE(0xb400, 0xb400) AM_READ(input_port_2_r)
-	AM_RANGE(0xb600, 0xb600) AM_READ(input_port_3_r)
+	AM_RANGE(0xb000, 0xb000) AM_READ_PORT("DSW1")
+	AM_RANGE(0xb200, 0xb200) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xb400, 0xb400) AM_READ_PORT("DIAL")
+	AM_RANGE(0xb600, 0xb600) AM_READ_PORT("DSW2")
 
 	AM_RANGE(0xb000, 0xb000) AM_WRITENOP
 	AM_RANGE(0xb100, 0xb100) AM_WRITE(wallc_coin_counter_w)
@@ -160,7 +160,20 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( wallc )
-	PORT_START("DSW1")	/* DSW - read from b000 */
+	PORT_START("SYSTEM")	/* b200 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )	//Right curve button; select current playfield in test mode
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	//not used ?
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )	//service?? plays loud,high-pitched sound
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )	//Left curve button; browse playfields in test mode
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )	//ok
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )	//ok
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )	//ok
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )	//ok
+
+	PORT_START("DIAL")		/* b400 - player position 8 bit analog input - value read is used as position of the player directly - what type of input is that ? DIAL ?*/
+	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(3) PORT_REVERSE PORT_PLAYER(1)
+
+	PORT_START("DSW1")		/* b000 */
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
 	PORT_DIPSETTING(	0x03, "5" )
 	PORT_DIPSETTING(	0x02, "4" )
@@ -183,20 +196,7 @@ static INPUT_PORTS_START( wallc )
 	PORT_DIPSETTING(	0x80, "Free Play With Level Select" )
 	PORT_DIPSETTING(	0x00, DEF_STR( Normal ) )
 
-	PORT_START("SYSTEM")	/* b200 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON2 )	//Right curve button; select current playfield in test mode
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	//not used ?
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )	//service?? plays loud,high-pitched sound
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )	//Left curve button; browse playfields in test mode
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )	//ok
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )	//ok
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN3 )	//ok
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )	//ok
-
-	PORT_START("DIAL")	/* b400 - player position 8 bit analog input - value read is used as position of the player directly - what type of input is that ? DIAL ?*/
-	PORT_BIT( 0xff, 0x00, IPT_DIAL ) PORT_SENSITIVITY(50) PORT_KEYDELTA(3) PORT_REVERSE PORT_PLAYER(1)
-
-	PORT_START("DSW2")	/* b600 - bits 0-5: coinage */
+	PORT_START("DSW2")		/* b600 */
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )

@@ -74,12 +74,6 @@ static NVRAM_HANDLER( xorworld )
                 EEPROM read/write/control
 ****************************************************************/
 
-/* the EEPROM is read thru bit 4 */
-static READ16_HANDLER( xorworld_input_r )
-{
-	return input_port_read(machine, "DSW") | ((eeprom_read_bit() & 0x01) << 4);
-}
-
 static WRITE16_HANDLER( eeprom_chip_select_w )
 {
 	/* bit 0 is CS (active low) */
@@ -103,7 +97,7 @@ static ADDRESS_MAP_START( xorworld_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("P1")
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P2")
-	AM_RANGE(0x600000, 0x600001) AM_READ(xorworld_input_r)				// DIPSW #1 + EEPROM data
+	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("DSW")
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(saa1099_write_port_0_lsb_w)
 	AM_RANGE(0x800002, 0x800003) AM_WRITE(saa1099_control_port_0_lsb_w)
 	AM_RANGE(0xa00008, 0xa00009) AM_WRITE(eeprom_chip_select_w)
@@ -118,7 +112,7 @@ ADDRESS_MAP_END
 
 
 static INPUT_PORTS_START( xorworld )
-	PORT_START("DSW")	// DSW0
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 2C_2C ) )
@@ -131,7 +125,7 @@ static INPUT_PORTS_START( xorworld )
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	//PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SPECIAL )  // used for accessing the NVRAM
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL)	/* used for accessing the NVRAM */
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x60, DEF_STR( Normal ) )
@@ -139,7 +133,7 @@ static INPUT_PORTS_START( xorworld )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
 
-	PORT_START("P1")	// IN0
+	PORT_START("P1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
@@ -149,7 +143,7 @@ static INPUT_PORTS_START( xorworld )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("P2")	// IN1
+	PORT_START("P2")
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)

@@ -53,10 +53,10 @@ static WRITE8_HANDLER( zodiack_control_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x4fff) AM_ROM
 	AM_RANGE(0x5800, 0x5fff) AM_RAM
-	AM_RANGE(0x6081, 0x6081) AM_READWRITE(input_port_0_r, zodiack_control_w)
-	AM_RANGE(0x6082, 0x6082) AM_READ(input_port_1_r)
-	AM_RANGE(0x6083, 0x6083) AM_READ(input_port_2_r)
-	AM_RANGE(0x6084, 0x6084) AM_READ(input_port_3_r)
+	AM_RANGE(0x6081, 0x6081) AM_READ_PORT("DSW0") AM_WRITE(zodiack_control_w)
+	AM_RANGE(0x6082, 0x6082) AM_READ_PORT("DSW1")
+	AM_RANGE(0x6083, 0x6083) AM_READ_PORT("IN0")
+	AM_RANGE(0x6084, 0x6084) AM_READ_PORT("IN1")
 	AM_RANGE(0x6090, 0x6090) AM_READWRITE(soundlatch_r, zodiac_master_soundlatch_w)
 	AM_RANGE(0x7000, 0x7000) AM_READWRITE(SMH_NOP,watchdog_reset_w)  /* NOP??? */
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(zodiac_master_interrupt_enable_w)

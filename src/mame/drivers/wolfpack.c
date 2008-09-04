@@ -51,20 +51,10 @@ static MACHINE_RESET( wolfpack )
 }
 
 
-static READ8_HANDLER( wolfpack_input_r )
+static CUSTOM_INPUT( wolfpack_dial_r )
 {
-	UINT8 val = input_port_read(machine, "INPUTS");
-
-	if (((input_port_read(machine, "DIAL") + 0) / 2) & 1)
-	{
-		val |= 1;
-	}
-	if (((input_port_read(machine, "DIAL") + 1) / 2) & 1)
-	{
-		val |= 2;
-	}
-
-	return val;
+	int bit = (FPTR)param;
+	return ((input_port_read(field->port->machine, "DIAL") + bit) / 2) & 0x01;
 }
 
 
@@ -139,7 +129,7 @@ static WRITE8_HANDLER( wolfpack_coldetres_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x100)
-	AM_RANGE(0x1000, 0x1000) AM_READ(wolfpack_input_r)		/* Fallthrough */
+	AM_RANGE(0x1000, 0x1000) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x1000, 0x10ff) AM_WRITE(SMH_RAM) AM_BASE(&wolfpack_alpha_num_ram)
 	AM_RANGE(0x2000, 0x2000) AM_READ(wolfpack_misc_r)
 	AM_RANGE(0x2000, 0x2000) AM_WRITE(wolfpack_high_explo_w)
@@ -179,13 +169,14 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( wolfpack )
 	PORT_START("INPUTS")
-	PORT_BIT ( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED ) /* dial connects here */
-	PORT_BIT ( 0x04, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT ( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(wolfpack_dial_r, (void *)0)	/* dial connects here */
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(wolfpack_dial_r, (void *)1)	/* dial connects here */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_SERVICE( 0x10, IP_ACTIVE_HIGH )
-	PORT_BIT ( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Coinage ) )

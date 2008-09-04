@@ -243,28 +243,28 @@ static WRITE8_HANDLER( xain_68705_w )
 //  logerror("write %02x to 68705\n",data);
 }
 
-static READ8_HANDLER( xain_input_port_4_r )
+static CUSTOM_INPUT( xain_vblank_r )
 {
-	return input_port_read(machine, "VBLANK") | vblank;
+	return vblank;
 }
 
 static INTERRUPT_GEN( xain_interrupt )
 {
-	int scanline=255-cpu_getiloops();
+	int scanline = 255 - cpu_getiloops();
 
 	/* FIRQ (IMS) fires every on every 8th scanline (except 0) */
-	if (scanline&0x08)
+	if (scanline & 0x08)
 		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* NMI fires on scanline 248 (VBL) and is latched */
-	if (scanline==248)
+	if (scanline == 248)
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
 
 	/* VBLANK input bit is held high from scanlines 248-255 */
-	if (scanline>=248-1) // -1 is a hack - see notes above
-		vblank=0x20;
+	if (scanline >= 248-1) // -1 is a hack - see notes above
+		vblank = 1;
 	else
-		vblank=0;
+		vblank = 0;
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -282,7 +282,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3a03, 0x3a03) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3a04, 0x3a04) AM_READ(xain_68705_r)	/* from the 68705 */
 	AM_RANGE(0x3a04, 0x3a05) AM_WRITE(xain_scrollxP0_w)
-	AM_RANGE(0x3a05, 0x3a05) AM_READ(xain_input_port_4_r)
+	AM_RANGE(0x3a05, 0x3a05) AM_READ_PORT("VBLANK")
 //  AM_RANGE(0x3a06, 0x3a06) AM_READ(SMH_NOP)  /* ?? read (and discarded) on startup. Maybe reset the 68705 */
 	AM_RANGE(0x3a06, 0x3a07) AM_WRITE(xain_scrollyP0_w)
 	AM_RANGE(0x3a08, 0x3a08) AM_WRITE(xain_sound_command_w)
@@ -394,7 +394,7 @@ static INPUT_PORTS_START( xsleena )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_COIN3 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* when 0, 68705 is ready to send data */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_UNKNOWN )	/* when 1, 68705 is ready to receive data */
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* VBLANK */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xain_vblank_r, NULL)	/* VBLANK */
 	PORT_BIT( 0xc0, IP_ACTIVE_LOW,  IPT_UNUSED )
 INPUT_PORTS_END
 

@@ -36,10 +36,10 @@ static WRITE8_HANDLER( xxmissio_bank_sel_w )
 	memory_set_bank(1, data & 7);
 }
 
-static READ8_HANDLER( xxmissio_status_r )
+static CUSTOM_INPUT( xxmissio_status_r )
 {
-	xxmissio_status = (xxmissio_status | 2) & ( input_port_read(machine, "IN2") | 0xfd );
-	return xxmissio_status;
+	int bit_mask = (FPTR)param;
+	return (xxmissio_status & bit_mask) ? 1 : 0;
 }
 
 static WRITE8_HANDLER ( xxmissio_status_m_w )
@@ -108,9 +108,9 @@ static ADDRESS_MAP_START( map1, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8002, 0x8002) AM_READWRITE(ym2203_status_port_1_r, ym2203_control_port_1_w)
 	AM_RANGE(0x8003, 0x8003) AM_READWRITE(ym2203_read_port_1_r, ym2203_write_port_1_w)
 
-	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
-	AM_RANGE(0xa001, 0xa001) AM_READ(input_port_1_r)
-	AM_RANGE(0xa002, 0xa002) AM_READ(xxmissio_status_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
+	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P2")
+	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("STATUS")
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(xxmissio_status_m_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(xxmissio_flipscreen_w)
 
@@ -135,9 +135,9 @@ static ADDRESS_MAP_START( map2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8003, 0x8003) AM_READWRITE(ym2203_read_port_1_r, ym2203_write_port_1_w)
 	AM_RANGE(0x8006, 0x8006) AM_WRITE(xxmissio_bank_sel_w)
 
-	AM_RANGE(0xa000, 0xa000) AM_READ(input_port_0_r)
-	AM_RANGE(0xa001, 0xa001) AM_READ(input_port_1_r)
-	AM_RANGE(0xa002, 0xa002) AM_READ(xxmissio_status_r)
+	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
+	AM_RANGE(0xa001, 0xa001) AM_READ_PORT("P2")
+	AM_RANGE(0xa002, 0xa002) AM_READ_PORT("STATUS")
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(xxmissio_status_s_w)
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(xxmissio_flipscreen_w)
 
@@ -155,7 +155,7 @@ ADDRESS_MAP_END
 /****************************************************************************/
 
 static INPUT_PORTS_START( xxmissio )
-	PORT_START("IN0")
+	PORT_START("P1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
@@ -165,7 +165,7 @@ static INPUT_PORTS_START( xxmissio )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
 
-	PORT_START("IN1")
+	PORT_START("P2")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
@@ -222,8 +222,15 @@ static INPUT_PORTS_START( xxmissio )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN2")
+	PORT_START("STATUS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xxmissio_status_r, (void *)0x01)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_VBLANK )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xxmissio_status_r, (void *)0x04)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xxmissio_status_r, (void *)0x08)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xxmissio_status_r, (void *)0x10)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xxmissio_status_r, (void *)0x20)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xxmissio_status_r, (void *)0x40)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(xxmissio_status_r, (void *)0x80)
 INPUT_PORTS_END
 
 /****************************************************************************/
