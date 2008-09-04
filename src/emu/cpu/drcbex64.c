@@ -173,6 +173,7 @@
 #include "drcuml.h"
 #include "drcbeut.h"
 #include "debugger.h"
+#include "deprecat.h"
 #include "x86emit.h"
 #include "eminline.h"
 #undef REG_SP
