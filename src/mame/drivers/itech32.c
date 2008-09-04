@@ -2030,7 +2030,7 @@ ROM_START( hardyd10 )	/* Version 1.0 (3-tier board set: P/N 1059 Rev 3, P/N 1061
 	ROM_LOAD16_BYTE( "fb01v10.u88", 0x00001, 0x40000, CRC(ca444702) SHA1(49bcc0994da9cd2c31c0cd78b822aceeaffd035f) )
 
 	ROM_REGION( 0x28000, "sound", 0 )
-	ROM_LOAD( "fbsndv10.u17.u17", 0x10000, 0x18000, CRC(6c6db5b8) SHA1(925e7c7cc7c3d290f4a334f24eef574aaac3150c) )
+	ROM_LOAD( "fbsndv10.u17", 0x10000, 0x18000, CRC(6c6db5b8) SHA1(925e7c7cc7c3d290f4a334f24eef574aaac3150c) )
 	ROM_CONTINUE(             0x08000, 0x08000 )
 
 	ROM_REGION( 0x880000, "gfx1", 0 )
