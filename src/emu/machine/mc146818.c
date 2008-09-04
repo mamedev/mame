@@ -90,6 +90,8 @@ struct mc146818_chip
 	UINT16 eindex;
 	UINT8 edata[0x2000];
 
+	int updated;  /* update ended interrupt flag */
+
 	attotime last_refresh;
 };
 
@@ -189,7 +191,7 @@ static TIMER_CALLBACK( mc146818_timer )
 			}
 		}
 	}
-
+	mc146818->updated = 1;  /* clock has been updated */
 	mc146818->last_refresh = timer_get_time();
 }
 
@@ -324,6 +326,12 @@ READ8_HANDLER(mc146818_port_r)
 #endif
 			break;
 
+		case 0xc:
+			if(mc146818->updated != 0) /* the clock has been updated */
+				data = 0x10;
+			else
+				data = 0x00;
+			break;
 		case 0xd:
 			/* battery ok */
 			data = mc146818->data[mc146818->index % MC146818_DATA_SIZE] | 0x80;
@@ -354,7 +362,16 @@ WRITE8_HANDLER(mc146818_port_w)
 		break;
 
 	case 1:
-		mc146818->data[mc146818->index % MC146818_DATA_SIZE] = data;
+		switch(mc146818->index % MC146818_DATA_SIZE)
+		{
+		case 0x0b:
+			if(data & 0x80)
+				mc146818->updated = 0;
+			mc146818->data[mc146818->index % MC146818_DATA_SIZE] = data;
+			break;
+		default:
+			mc146818->data[mc146818->index % MC146818_DATA_SIZE] = data;
+		}
 		break;
 	}
 }
