@@ -243,23 +243,20 @@ static WRITE16_HANDLER ( shadfrce_sound_brt_w )
 
 static TIMER_CALLBACK( raster_interrupt )
 {
-	shadfrce_scanline++;
-	
-	if( shadfrce_scanline == 256 )
-		shadfrce_scanline = 0;
+	// force a screen partial update on the previous scanline
+	if (shadfrce_scanline != 0)
+    	video_screen_update_partial(machine->primary_screen, shadfrce_scanline - 1);
 
+	shadfrce_scanline = (shadfrce_scanline + 1) % 256;
+
+	// fire another raster irq for the next scanline
 	cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
-
 	timer_adjust_oneshot(raster_irq_timer, video_screen_get_time_until_pos(machine->primary_screen, shadfrce_scanline, 0), 0);
 }
 
 static WRITE16_HANDLER( shadfrce_irq_ack_w )
 {
 	cpunum_set_input_line(machine, 0, offset ^ 3, CLEAR_LINE);
-
-	// force a screen partial update on the raster irq ack
-	if( (offset ^ 3) == 1 )
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
 }
 
 static WRITE16_HANDLER( shadfrce_irq_w )
