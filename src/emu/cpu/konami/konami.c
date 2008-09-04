@@ -35,6 +35,7 @@
 *****************************************************************************/
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "konami.h"
 
 #define VERBOSE 0

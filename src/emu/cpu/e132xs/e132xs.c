@@ -212,6 +212,7 @@
 *********************************************************************/
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "eminline.h"
 #include "e132xs.h"
 #include "osd_cpu.h"

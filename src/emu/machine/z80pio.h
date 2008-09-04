@@ -46,7 +46,7 @@ void z80pio_reset(int which);
     CONTROL REGISTER READ/WRITE
 ***************************************************************************/
 
-void z80pio_c_w(int which, int ch, UINT8 data);
+void z80pio_c_w(running_machine *machine, int which, int ch, UINT8 data);
 UINT8 z80pio_c_r(int which, int ch);
 
 
@@ -55,8 +55,8 @@ UINT8 z80pio_c_r(int which, int ch);
     DATA REGISTER READ/WRITE
 ***************************************************************************/
 
-void z80pio_d_w(int which, int ch, UINT8 data);
-UINT8 z80pio_d_r(int which, int ch);
+void z80pio_d_w(running_machine *machine, int which, int ch, UINT8 data);
+UINT8 z80pio_d_r(running_machine *machine, int which, int ch);
 
 
 
@@ -64,8 +64,8 @@ UINT8 z80pio_d_r(int which, int ch);
     PORT I/O
 ***************************************************************************/
 
-void z80pio_p_w(int which, UINT8 ch, UINT8 data);
-int z80pio_p_r(int which, UINT8 ch);
+void z80pio_p_w(running_machine *machine, int which, UINT8 ch, UINT8 data);
+int z80pio_p_r(running_machine *machine, int which, UINT8 ch);
 
 WRITE8_HANDLER( z80pioA_0_p_w );
 WRITE8_HANDLER( z80pioB_0_p_w );
@@ -82,8 +82,8 @@ READ8_HANDLER( z80pioB_1_p_r );
     STROBE STATE MANAGEMENT
 ***************************************************************************/
 
-void z80pio_astb_w(int which, int state);
-void z80pio_bstb_w(int which, int state);
+void z80pio_astb_w(running_machine *machine, int which, int state);
+void z80pio_bstb_w(running_machine *machine, int which, int state);
 
 
 

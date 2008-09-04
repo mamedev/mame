@@ -5,6 +5,7 @@
 */
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "cpuintrf.h"
 #include "tms32051.h"
 

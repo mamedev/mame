@@ -1,4 +1,5 @@
 #include "debugger.h"
+#include "deprecat.h"
 #include "i960.h"
 #include "i960dis.h"
 #include <math.h>

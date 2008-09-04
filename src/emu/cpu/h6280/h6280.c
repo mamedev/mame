@@ -108,6 +108,7 @@
 
 ******************************************************************************/
 #include "debugger.h"
+#include "deprecat.h"
 #include "h6280.h"
 
 static int 	h6280_ICount = 0;

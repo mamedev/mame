@@ -38,6 +38,7 @@
 */
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "m65ce02.h"
 
 #include "mincce02.h"

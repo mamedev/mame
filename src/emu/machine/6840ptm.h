@@ -23,10 +23,10 @@ struct _ptm6840_interface
 	void (*irq_func)(running_machine *machine, int state);	// function called if IRQ line changes
 };
 
-void ptm6840_config( int which, const ptm6840_interface *intf);
+void ptm6840_config( running_machine *machine, int which, const ptm6840_interface *intf);
 void ptm6840_reset(  int which);
-int  ptm6840_read(   int which, int offset);
-void ptm6840_write(  int which, int offset, int data);
+int  ptm6840_read(   running_machine *machine, int which, int offset);
+void ptm6840_write(  running_machine *machine, int which, int offset, int data);
 
 int ptm6840_get_status(int which, int clock);	// get whether timer is enabled
 int ptm6840_get_irq(int which);					// get IRQ state
@@ -34,14 +34,14 @@ UINT16 ptm6840_get_count(int which,int counter);// get counter value
 void ptm6840_set_ext_clock(int which, int counter, int clock); // set clock frequency
 int ptm6840_get_ext_clock(int which, int counter);// get clock frequency
 
-void ptm6840_set_g1(int which, int state);		// set gate1  state
-void ptm6840_set_c1(int which, int state);		// set clock1 state
+void ptm6840_set_g1(running_machine *machine, int which, int state);		// set gate1  state
+void ptm6840_set_c1(running_machine *machine, int which, int state);		// set clock1 state
 
-void ptm6840_set_g2(int which, int state);		// set gate2  state
-void ptm6840_set_c2(int which, int state);		// set clock2 state
+void ptm6840_set_g2(running_machine *machine, int which, int state);		// set gate2  state
+void ptm6840_set_c2(running_machine *machine, int which, int state);		// set clock2 state
 
-void ptm6840_set_g3(int which, int state);		// set gate3  state
-void ptm6840_set_c3(int which, int state);		// set clock3 state
+void ptm6840_set_g3(running_machine *machine, int which, int state);		// set gate3  state
+void ptm6840_set_c3(running_machine *machine, int which, int state);		// set clock3 state
 
 /*-------------------------------------------------------------------------*/
 

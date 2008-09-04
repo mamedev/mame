@@ -221,7 +221,7 @@ void z80pio_reset(int which)
     CONTROL REGISTER READ/WRITE
 ***************************************************************************/
 
-void z80pio_c_w(int which, int ch, UINT8 data)
+void z80pio_c_w(running_machine *machine, int which, int ch, UINT8 data)
 {
 	z80pio *pio = pios + which;
 
@@ -278,7 +278,7 @@ void z80pio_c_w(int which, int ch, UINT8 data)
 	}
 
 	/* interrupt check */
-	update_irq_state(Machine, pio, ch);
+	update_irq_state(machine, pio, ch);
 }
 
 
@@ -294,20 +294,20 @@ UINT8 z80pio_c_r(int which, int ch)
     DATA REGISTER READ/WRITE
 ***************************************************************************/
 
-void z80pio_d_w(int which, int ch, UINT8 data)
+void z80pio_d_w(running_machine *machine, int which, int ch, UINT8 data)
 {
 	z80pio *pio = pios + which;
 
 	pio->out[ch] = data;	/* latch out data */
 	if(pio->port_write[ch])
-		pio->port_write[ch](Machine, 0, data);
+		pio->port_write[ch](machine, 0, data);
 
 	switch (pio->mode[ch])
 	{
 		case PIO_MODE0:			/* mode 0 output */
 		case PIO_MODE2:			/* mode 2 i/o */
 			set_rdy(pio, ch, 1); /* ready = H */
-			update_irq_state(Machine, pio, ch);
+			update_irq_state(machine, pio, ch);
 			return;
 
 		case PIO_MODE1:			/* mode 1 input */
@@ -320,7 +320,7 @@ void z80pio_d_w(int which, int ch, UINT8 data)
 }
 
 
-UINT8 z80pio_d_r(int which, int ch)
+UINT8 z80pio_d_r(running_machine *machine, int which, int ch)
 {
 	z80pio *pio = pios + which;
 
@@ -332,21 +332,21 @@ UINT8 z80pio_d_r(int which, int ch)
 		case PIO_MODE1:			/* mode 1 input */
 			set_rdy(pio, ch, 1);	/* ready = H */
 			if(pio->port_read[ch])
-				pio->in[ch] = pio->port_read[ch](Machine, 0);
-			update_irq_state(Machine, pio, ch);
+				pio->in[ch] = pio->port_read[ch](machine, 0);
+			update_irq_state(machine, pio, ch);
 			return pio->in[ch];
 
 		case PIO_MODE2:			/* mode 2 i/o */
 			if (ch) VPRINTF(("PIO-B mode 2 \n"));
 			set_rdy(pio, 1, 1); /* brdy = H */
 			if(pio->port_read[ch])
-				pio->in[ch] = pio->port_read[ch](Machine, 0);
-			update_irq_state(Machine, pio, ch);
+				pio->in[ch] = pio->port_read[ch](machine, 0);
+			update_irq_state(machine, pio, ch);
 			return pio->in[ch];
 
 		case PIO_MODE3:			/* mode 3 bit */
 			if(pio->port_read[ch])
-				pio->in[ch] = pio->port_read[ch](Machine, 0);
+				pio->in[ch] = pio->port_read[ch](machine, 0);
 			return (pio->in[ch] & pio->dir[ch]) | (pio->out[ch] & ~pio->dir[ch]);
 	}
 	VPRINTF(("PIO-%c data read,bad mode\n",'A'+ch ));
@@ -359,7 +359,7 @@ UINT8 z80pio_d_r(int which, int ch)
     PORT I/O
 ***************************************************************************/
 
-void z80pio_p_w(int which, UINT8 ch, UINT8 data)
+void z80pio_p_w(running_machine *machine, int which, UINT8 ch, UINT8 data)
 {
 	z80pio *pio = pios + which;
 
@@ -375,18 +375,18 @@ void z80pio_p_w(int which, UINT8 ch, UINT8 data)
 
 		case PIO_MODE1:
 			set_rdy(pio, ch, 0);
-			update_irq_state(Machine, pio, ch);
+			update_irq_state(machine, pio, ch);
 			break;
 
 		case PIO_MODE3:
 			/* irq check */
-			update_irq_state(Machine, pio, ch);
+			update_irq_state(machine, pio, ch);
 			break;
 	}
 }
 
 
-int z80pio_p_r(int which, UINT8 ch)
+int z80pio_p_r(running_machine *machine, int which, UINT8 ch)
 {
 	z80pio *pio = pios + which;
 
@@ -395,7 +395,7 @@ int z80pio_p_r(int which, UINT8 ch)
 		case PIO_MODE2:		/* port A only */
 		case PIO_MODE0:
 			set_rdy(pio, ch, 0);
-			update_irq_state(Machine, pio, ch);
+			update_irq_state(machine, pio, ch);
 			break;
 
 		case PIO_MODE1:
@@ -409,15 +409,15 @@ int z80pio_p_r(int which, UINT8 ch)
 }
 
 
-WRITE8_HANDLER( z80pioA_0_p_w ) { z80pio_p_w(0, 0, data);   }
-WRITE8_HANDLER( z80pioB_0_p_w ) { z80pio_p_w(0, 1, data);   }
-READ8_HANDLER( z80pioA_0_p_r )  { return z80pio_p_r(0, 0);  }
-READ8_HANDLER( z80pioB_0_p_r )  { return z80pio_p_r(0, 1);  }
+WRITE8_HANDLER( z80pioA_0_p_w ) { z80pio_p_w(machine, 0, 0, data);   }
+WRITE8_HANDLER( z80pioB_0_p_w ) { z80pio_p_w(machine, 0, 1, data);   }
+READ8_HANDLER( z80pioA_0_p_r )  { return z80pio_p_r(machine, 0, 0);  }
+READ8_HANDLER( z80pioB_0_p_r )  { return z80pio_p_r(machine, 0, 1);  }
 
-WRITE8_HANDLER( z80pioA_1_p_w ) { z80pio_p_w(1, 0, data);   }
-WRITE8_HANDLER( z80pioB_1_p_w ) { z80pio_p_w(1, 1, data);   }
-READ8_HANDLER( z80pioA_1_p_r )  { return z80pio_p_r(1, 0);  }
-READ8_HANDLER( z80pioB_1_p_r )  { return z80pio_p_r(1, 1);  }
+WRITE8_HANDLER( z80pioA_1_p_w ) { z80pio_p_w(machine, 1, 0, data);   }
+WRITE8_HANDLER( z80pioB_1_p_w ) { z80pio_p_w(machine, 1, 1, data);   }
+READ8_HANDLER( z80pioA_1_p_r )  { return z80pio_p_r(machine, 1, 0);  }
+READ8_HANDLER( z80pioB_1_p_r )  { return z80pio_p_r(machine, 1, 1);  }
 
 
 
@@ -425,7 +425,7 @@ READ8_HANDLER( z80pioB_1_p_r )  { return z80pio_p_r(1, 1);  }
     STROBE STATE MANAGEMENT
 ***************************************************************************/
 
-static void z80pio_update_strobe(int which, int ch, int state)
+static void z80pio_update_strobe(running_machine *machine, int which, int ch, int state)
 {
 	z80pio *pio = pios + which;
 
@@ -463,7 +463,7 @@ static void z80pio_update_strobe(int which, int ch, int state)
 			pio->strobe[ch] = state;
 
 			/* check interrupt */
-			interrupt_check(Machine, which);
+			interrupt_check(machine, which);
 		}
 		break;
 
@@ -476,8 +476,8 @@ static void z80pio_update_strobe(int which, int ch, int state)
 }
 
 
-void z80pio_astb_w(int which, int state) { z80pio_update_strobe(which, 0, state); }
-void z80pio_bstb_w(int which, int state) { z80pio_update_strobe(which, 1, state); }
+void z80pio_astb_w(running_machine *machine, int which, int state) { z80pio_update_strobe(machine, which, 0, state); }
+void z80pio_bstb_w(running_machine *machine, int which, int state) { z80pio_update_strobe(machine, which, 1, state); }
 
 
 
@@ -553,26 +553,26 @@ void z80pio_irq_reti(int which)
 ***************************************************************************/
 READ8_HANDLER(z80pio_0_r)
 {
-	return (offset & 2) ? z80pio_c_r(0, offset & 1) : z80pio_d_r(0, offset & 1);
+	return (offset & 2) ? z80pio_c_r(0, offset & 1) : z80pio_d_r(machine, 0, offset & 1);
 }
 
 WRITE8_HANDLER(z80pio_0_w)
 {
 	if (offset & 2)
-		z80pio_c_w(0, offset & 1, data);
+		z80pio_c_w(machine, 0, offset & 1, data);
 	else
-		z80pio_d_w(0, offset & 1, data);
+		z80pio_d_w(machine, 0, offset & 1, data);
 }
 
 READ8_HANDLER(z80pio_1_r)
 {
-	return (offset & 2) ? z80pio_c_r(1, offset & 1) : z80pio_d_r(1, offset & 1);
+	return (offset & 2) ? z80pio_c_r(1, offset & 1) : z80pio_d_r(machine, 1, offset & 1);
 }
 
 WRITE8_HANDLER(z80pio_1_w)
 {
 	if (offset & 2)
-		z80pio_c_w(1, offset & 1, data);
+		z80pio_c_w(machine, 1, offset & 1, data);
 	else
-		z80pio_d_w(1, offset & 1, data);
+		z80pio_d_w(machine, 1, offset & 1, data);
 }

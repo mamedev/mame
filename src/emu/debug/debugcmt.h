@@ -21,8 +21,8 @@
 int debug_comment_init(running_machine *machine);
 
 /* load and save */
-int debug_comment_save(void);
-int debug_comment_load(void);
+int debug_comment_save(running_machine *machine);
+int debug_comment_load(running_machine *machine);
 
 /* comment interface functions */
 int debug_comment_add(int cpu_num, offs_t addr, const char *comment, rgb_t color, UINT32 c_crc);

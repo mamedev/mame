@@ -4,6 +4,7 @@
 // Portability fixes by Richter Belmont
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "v60.h"
 
 // memory accessors

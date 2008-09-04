@@ -367,16 +367,16 @@ static WRITE8_HANDLER( laserdisc_w )
 
 static READ8_HANDLER( sio_r )
 {
-	return (offset & 1) ? z80sio_c_r(0, (offset >> 1) & 1) : z80sio_d_r(0, (offset >> 1) & 1);
+	return (offset & 1) ? z80sio_c_r(0, (offset >> 1) & 1) : z80sio_d_r(machine, 0, (offset >> 1) & 1);
 }
 
 
 static WRITE8_HANDLER( sio_w )
 {
 	if (offset & 1)
-		z80sio_c_w(0, (offset >> 1) & 1, data);
+		z80sio_c_w(machine, 0, (offset >> 1) & 1, data);
 	else
-		z80sio_d_w(0, (offset >> 1) & 1, data);
+		z80sio_d_w(machine, 0, (offset >> 1) & 1, data);
 }
 
 

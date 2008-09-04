@@ -325,6 +325,7 @@ field:      X address   D           Function    Y address   D (part 2)
 
 #include "cpuintrf.h"
 #include "debugger.h"
+#include "deprecat.h"
 #include "apexc.h"
 
 typedef struct

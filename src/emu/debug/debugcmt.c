@@ -26,7 +26,6 @@
 #include "debugcpu.h"
 #include "debugvw.h"
 #include "info.h"
-#include "deprecat.h"
 #include <zlib.h>
 
 
@@ -84,7 +83,7 @@ static comment_group *debug_comments;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static int debug_comment_load_xml(mame_file *file);
+static int debug_comment_load_xml(running_machine *machine, mame_file *file);
 static void debug_comment_exit(running_machine *machine);
 static void debug_comment_free(void);
 
@@ -110,7 +109,7 @@ int debug_comment_init(running_machine *machine)
 		memset(debug_comments, 0, cpu_gettotalcpu() * sizeof(comment_group));
 
 		/* automatically load em up */
-		debug_comment_load();
+		debug_comment_load(machine);
 
 		add_exit_callback(machine, debug_comment_exit);
 	}
@@ -379,7 +378,7 @@ void debug_comment_dump(int cpu_num, offs_t addr)
     debug_comment_save - comment file saving
 -------------------------------------------------------------------------*/
 
-int debug_comment_save(void)
+int debug_comment_save(running_machine *machine)
 {
 	int i, j;
 	char crc_buf[20];
@@ -401,7 +400,7 @@ int debug_comment_save(void)
 	systemnode = xml_add_child(commentnode, "system", NULL);
 	if (!systemnode)
 		goto error;
-	xml_set_attribute(systemnode, "name", Machine->gamedrv->name);
+	xml_set_attribute(systemnode, "name", machine->gamedrv->name);
 
 	/* for each cpu */
 	for (i = 0; i < cpu_gettotalcpu(); i++)
@@ -431,7 +430,7 @@ int debug_comment_save(void)
 		astring *fname;
  		mame_file *fp;
 
- 		fname = astring_assemble_2(astring_alloc(), Machine->basename, ".cmt");
+ 		fname = astring_assemble_2(astring_alloc(), machine->basename, ".cmt");
  		filerr = mame_fopen(SEARCHPATH_COMMENT, astring_c(fname), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &fp);
  		astring_free(fname);
 
@@ -456,24 +455,24 @@ error:
     debug_comment_load(_xml) - comment file loading
 -------------------------------------------------------------------------*/
 
-int debug_comment_load(void)
+int debug_comment_load(running_machine *machine)
 {
 	file_error filerr;
 	mame_file *fp;
 	astring *fname;
 
-	fname = astring_assemble_2(astring_alloc(), Machine->basename, ".cmt");
+	fname = astring_assemble_2(astring_alloc(), machine->basename, ".cmt");
 	filerr = mame_fopen(SEARCHPATH_COMMENT, astring_c(fname), OPEN_FLAG_READ, &fp);
 	astring_free(fname);
 
 	if (filerr != FILERR_NONE) return 0;
-	debug_comment_load_xml(fp);
+	debug_comment_load_xml(machine, fp);
 	mame_fclose(fp);
 
 	return 1;
 }
 
-static int debug_comment_load_xml(mame_file *fp)
+static int debug_comment_load_xml(running_machine *machine, mame_file *fp)
 {
 	int i, j;
 	xml_data_node *root, *commentnode, *systemnode, *cpunode, *datanode;
@@ -498,7 +497,7 @@ static int debug_comment_load_xml(mame_file *fp)
 	/* check to make sure the file is applicable */
 	systemnode = xml_get_sibling(commentnode->child, "system");
 	name = xml_get_attribute_string(systemnode, "name", "");
-	if (strcmp(name, Machine->gamedrv->name) != 0)
+	if (strcmp(name, machine->gamedrv->name) != 0)
 		goto error;
 
 	i = 0;
@@ -544,7 +543,7 @@ error:
 
 static void debug_comment_exit(running_machine *machine)
 {
-	debug_comment_save();
+	debug_comment_save(machine);
 	debug_comment_free();
 }
 

@@ -406,6 +406,7 @@ STOP            01001000  10111011          12  stop
 
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "upd7810.h"
 
 static UPD7810 upd7810;

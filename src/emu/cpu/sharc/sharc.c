@@ -5,6 +5,7 @@
 
 #include "sharc.h"
 #include "debugger.h"
+#include "deprecat.h"
 
 static offs_t sharc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 

@@ -54,6 +54,7 @@
 
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "pic16c5x.h"
 
 

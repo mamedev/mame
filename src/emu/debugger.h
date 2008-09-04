@@ -15,7 +15,6 @@
 #define __DEBUGGER_H__
 
 #include "mame.h"
-#include "deprecat.h"
 #include "debug/debugcpu.h"
 
 

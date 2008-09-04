@@ -291,14 +291,14 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( pio_w )
 {
 	if (offset & 1)
-		z80pio_c_w(0, (offset >> 1) & 1, data);
+		z80pio_c_w(machine, 0, (offset >> 1) & 1, data);
 	else
-		z80pio_d_w(0, (offset >> 1) & 1, data);
+		z80pio_d_w(machine, 0, (offset >> 1) & 1, data);
 }
 
 static READ8_HANDLER( pio_r )
 {
-	return (offset & 1) ? z80pio_c_r(0, (offset >> 1) & 1) : z80pio_d_r(0, (offset >> 1) & 1);
+	return (offset & 1) ? z80pio_c_r(0, (offset >> 1) & 1) : z80pio_d_r(machine, 0, (offset >> 1) & 1);
 }
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )

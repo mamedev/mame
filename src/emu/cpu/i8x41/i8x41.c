@@ -103,6 +103,7 @@
  *****************************************************************************/
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "i8x41.h"
 
 typedef struct {

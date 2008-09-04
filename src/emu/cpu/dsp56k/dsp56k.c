@@ -30,6 +30,7 @@
 ***************************************************************************/
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "dsp56k.h"
 
 #include "dsp56def.h"

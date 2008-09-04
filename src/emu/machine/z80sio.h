@@ -46,7 +46,7 @@ void z80sio_reset(int which);
     CONTROL REGISTER READ/WRITE
 ***************************************************************************/
 
-void z80sio_c_w(int which, int ch, UINT8 data);
+void z80sio_c_w(running_machine *machine, int which, int ch, UINT8 data);
 UINT8 z80sio_c_r(int which, int ch);
 
 
@@ -55,8 +55,8 @@ UINT8 z80sio_c_r(int which, int ch);
     DATA REGISTER READ/WRITE
 ***************************************************************************/
 
-void z80sio_d_w(int which, int ch, UINT8 data);
-UINT8 z80sio_d_r(int which, int ch);
+void z80sio_d_w(running_machine *machine, int which, int ch, UINT8 data);
+UINT8 z80sio_d_r(running_machine *machine, int which, int ch);
 
 
 

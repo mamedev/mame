@@ -329,7 +329,7 @@ static void cpu1_ptm_irq(running_machine *machine, int state)
 
 static WRITE8_HANDLER( vid_o1_callback )
 {
-	ptm6840_set_c2(   1, data); /* this output is the clock for timer2 */
+	ptm6840_set_c2(   machine, 1, data); /* this output is the clock for timer2 */
 
 	if (data)
 	{
@@ -343,13 +343,13 @@ static WRITE8_HANDLER( vid_o1_callback )
 
 static WRITE8_HANDLER( vid_o2_callback )
 {
-	ptm6840_set_c3(   1, data); /* this output is the clock for timer3 */
+	ptm6840_set_c3(   machine, 1, data); /* this output is the clock for timer3 */
 }
 
 
 static WRITE8_HANDLER( vid_o3_callback )
 {
-	ptm6840_set_c1(   1, data); /* this output is the clock for timer1 */
+	ptm6840_set_c1(   machine, 1, data); /* this output is the clock for timer1 */
 }
 
 
@@ -1349,10 +1349,10 @@ static INTERRUPT_GEN(mpu4_vid_irq)
 /* machine start (called only once) */
 MACHINE_START( mpu4_vid )
 {
-	mpu4_config_common();
+	mpu4_config_common(machine);
 	pia_reset();
 
-	ptm6840_config(1, &ptm_vid_intf );
+	ptm6840_config(machine, 1, &ptm_vid_intf );
 
 	/* setup communications */
 	serial_card_connected=1;

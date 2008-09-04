@@ -43,6 +43,7 @@ T0 output clock
 ***************************************************************************/
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "mcs48.h"
 
 

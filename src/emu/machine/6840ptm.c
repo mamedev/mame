@@ -33,7 +33,6 @@
 **********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "6840ptm.h"
 
 // Defines /////////////////////////////////////////////////////////////
@@ -376,12 +375,12 @@ static void reload_count(running_machine *machine, int which, int idx)
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-void ptm6840_config(int which, const ptm6840_interface *intf)
+void ptm6840_config(running_machine *machine, int which, const ptm6840_interface *intf)
 {
 	int i;
 	ptm6840 *currptr = ptm + which;
 
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call ptm6840_config at init time!");
+	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call ptm6840_config at init time!");
 	assert_always((which >= 0) && (which < PTM_6840_MAX), "ptm6840_config called on an invalid PTM!");
 	assert_always(intf, "ptm6840_config called with an invalid interface!");
 	ptm[which].intf = intf;
@@ -457,7 +456,7 @@ void ptm6840_reset(int which)
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-int ptm6840_read(int which, int offset)
+int ptm6840_read(running_machine *machine, int which, int offset)
 {
 	int val;
 	ptm6840 *currptr = ptm + which;
@@ -489,7 +488,7 @@ int ptm6840_read(int which, int offset)
 			if (currptr->status_read_since_int & (1 << idx))
 			{
 				currptr->status_reg &= ~(1 << idx);
-				update_interrupts(Machine, which);
+				update_interrupts(machine, which);
 			}
 
 			currptr->lsb_buffer = result & 0xff;
@@ -523,7 +522,7 @@ int ptm6840_read(int which, int offset)
 //                                                                       //
 ///////////////////////////////////////////////////////////////////////////
 
-void ptm6840_write (int which, int offset, int data)
+void ptm6840_write (running_machine *machine, int which, int offset, int data)
 {
 	ptm6840 *currptr = ptm + which;
 
@@ -553,7 +552,7 @@ void ptm6840_write (int which, int offset, int data)
 				if ( currptr->intf )
 				{
 					if ( currptr->intf->out_func[idx] )
-						currptr->intf->out_func[idx](Machine, 0, 0);
+						currptr->intf->out_func[idx](machine, 0, 0);
 				}
 			}
 			/* Reset? */
@@ -573,15 +572,15 @@ void ptm6840_write (int which, int offset, int data)
 				else
 				{
 					for (i = 0; i < 3; i++)
-						reload_count(Machine, which, i);
+						reload_count(machine, which, i);
 				}
 
 				currptr->status_reg = 0;
-				update_interrupts(Machine, which);
+				update_interrupts(machine, which);
 
 				/* Changing the clock source? (e.g. Zwackery) */
 				if (diffs & 0x02)
-					reload_count(Machine, which, idx);
+					reload_count(machine, which, idx);
 			}
 			break;
 		}
@@ -604,11 +603,11 @@ void ptm6840_write (int which, int offset, int data)
 
 			/* Clear the interrupt */
 			currptr->status_reg &= ~(1 << idx);
-			update_interrupts(Machine, which);
+			update_interrupts(machine, which);
 
 			/* Reload the count if in an appropriate mode */
 			if (!(currptr->control_reg[idx] & 0x10))
-				reload_count(Machine, which,idx);
+				reload_count(machine, which,idx);
 
 			PLOG(("%06X:MC6840 #%d: Counter %d latch = %04X\n", activecpu_get_previouspc(), which, idx, currptr->latch[idx]));
 			break;
@@ -689,9 +688,9 @@ INLINE void ptm6840_set_gate(running_machine *machine, int which, int state, int
 	p->gate[idx] = state;
 }
 
-void ptm6840_set_g1(int which, int state) { ptm6840_set_gate(Machine, which, state, 0); }
-void ptm6840_set_g2(int which, int state) { ptm6840_set_gate(Machine, which, state, 1); }
-void ptm6840_set_g3(int which, int state) { ptm6840_set_gate(Machine, which, state, 2); }
+void ptm6840_set_g1(running_machine *machine, int which, int state) { ptm6840_set_gate(machine, which, state, 0); }
+void ptm6840_set_g2(running_machine *machine, int which, int state) { ptm6840_set_gate(machine, which, state, 1); }
+void ptm6840_set_g3(running_machine *machine, int which, int state) { ptm6840_set_gate(machine, which, state, 2); }
 
 ///////////////////////////////////////////////////////////////////////////
 //                                                                       //
@@ -778,38 +777,38 @@ int ptm6840_get_ext_clock(int which, int counter)
 	return currptr->external_clock[counter];
 }
 
-void ptm6840_set_c1(int which, int state) { ptm6840_set_clock(Machine, which, state, 0); }
-void ptm6840_set_c2(int which, int state) { ptm6840_set_clock(Machine, which, state, 1); }
-void ptm6840_set_c3(int which, int state) { ptm6840_set_clock(Machine, which, state, 2); }
+void ptm6840_set_c1(running_machine *machine, int which, int state) { ptm6840_set_clock(machine, which, state, 0); }
+void ptm6840_set_c2(running_machine *machine, int which, int state) { ptm6840_set_clock(machine, which, state, 1); }
+void ptm6840_set_c3(running_machine *machine, int which, int state) { ptm6840_set_clock(machine, which, state, 2); }
 
 /////////////////////////////////////////////////////////////////////////////////
 
-READ8_HANDLER( ptm6840_0_r ) { return ptm6840_read(0, offset); }
-READ8_HANDLER( ptm6840_1_r ) { return ptm6840_read(1, offset); }
-READ8_HANDLER( ptm6840_2_r ) { return ptm6840_read(2, offset); }
-READ8_HANDLER( ptm6840_3_r ) { return ptm6840_read(3, offset); }
+READ8_HANDLER( ptm6840_0_r ) { return ptm6840_read(machine, 0, offset); }
+READ8_HANDLER( ptm6840_1_r ) { return ptm6840_read(machine, 1, offset); }
+READ8_HANDLER( ptm6840_2_r ) { return ptm6840_read(machine, 2, offset); }
+READ8_HANDLER( ptm6840_3_r ) { return ptm6840_read(machine, 3, offset); }
 
-WRITE8_HANDLER( ptm6840_0_w ) { ptm6840_write(0, offset, data); }
-WRITE8_HANDLER( ptm6840_1_w ) { ptm6840_write(1, offset, data); }
-WRITE8_HANDLER( ptm6840_2_w ) { ptm6840_write(2, offset, data); }
-WRITE8_HANDLER( ptm6840_3_w ) { ptm6840_write(3, offset, data); }
+WRITE8_HANDLER( ptm6840_0_w ) { ptm6840_write(machine, 0, offset, data); }
+WRITE8_HANDLER( ptm6840_1_w ) { ptm6840_write(machine, 1, offset, data); }
+WRITE8_HANDLER( ptm6840_2_w ) { ptm6840_write(machine, 2, offset, data); }
+WRITE8_HANDLER( ptm6840_3_w ) { ptm6840_write(machine, 3, offset, data); }
 
-READ16_HANDLER( ptm6840_0_msb_r ) { return ptm6840_read(0, offset) << 8; }
-READ16_HANDLER( ptm6840_1_msb_r ) { return ptm6840_read(1, offset) << 8; }
-READ16_HANDLER( ptm6840_2_msb_r ) { return ptm6840_read(2, offset) << 8; }
-READ16_HANDLER( ptm6840_3_msb_r ) { return ptm6840_read(3, offset) << 8; }
+READ16_HANDLER( ptm6840_0_msb_r ) { return ptm6840_read(machine, 0, offset) << 8; }
+READ16_HANDLER( ptm6840_1_msb_r ) { return ptm6840_read(machine, 1, offset) << 8; }
+READ16_HANDLER( ptm6840_2_msb_r ) { return ptm6840_read(machine, 2, offset) << 8; }
+READ16_HANDLER( ptm6840_3_msb_r ) { return ptm6840_read(machine, 3, offset) << 8; }
 
-WRITE16_HANDLER( ptm6840_0_msb_w ) { if (ACCESSING_BITS_8_15) ptm6840_write(0, offset, data >> 8); }
-WRITE16_HANDLER( ptm6840_1_msb_w ) { if (ACCESSING_BITS_8_15) ptm6840_write(1, offset, data >> 8); }
-WRITE16_HANDLER( ptm6840_2_msb_w ) { if (ACCESSING_BITS_8_15) ptm6840_write(2, offset, data >> 8); }
-WRITE16_HANDLER( ptm6840_3_msb_w ) { if (ACCESSING_BITS_8_15) ptm6840_write(3, offset, data >> 8); }
+WRITE16_HANDLER( ptm6840_0_msb_w ) { if (ACCESSING_BITS_8_15) ptm6840_write(machine, 0, offset, data >> 8); }
+WRITE16_HANDLER( ptm6840_1_msb_w ) { if (ACCESSING_BITS_8_15) ptm6840_write(machine, 1, offset, data >> 8); }
+WRITE16_HANDLER( ptm6840_2_msb_w ) { if (ACCESSING_BITS_8_15) ptm6840_write(machine, 2, offset, data >> 8); }
+WRITE16_HANDLER( ptm6840_3_msb_w ) { if (ACCESSING_BITS_8_15) ptm6840_write(machine, 3, offset, data >> 8); }
 
-READ16_HANDLER( ptm6840_0_lsb_r ) { return ptm6840_read(0, offset); }
-READ16_HANDLER( ptm6840_1_lsb_r ) { return ptm6840_read(1, offset); }
-READ16_HANDLER( ptm6840_2_lsb_r ) { return ptm6840_read(2, offset); }
-READ16_HANDLER( ptm6840_3_lsb_r ) { return ptm6840_read(3, offset); }
+READ16_HANDLER( ptm6840_0_lsb_r ) { return ptm6840_read(machine, 0, offset); }
+READ16_HANDLER( ptm6840_1_lsb_r ) { return ptm6840_read(machine, 1, offset); }
+READ16_HANDLER( ptm6840_2_lsb_r ) { return ptm6840_read(machine, 2, offset); }
+READ16_HANDLER( ptm6840_3_lsb_r ) { return ptm6840_read(machine, 3, offset); }
 
-WRITE16_HANDLER( ptm6840_0_lsb_w ) { if (ACCESSING_BITS_0_7) ptm6840_write(0, offset, data & 0xff); }
-WRITE16_HANDLER( ptm6840_1_lsb_w ) { if (ACCESSING_BITS_0_7) ptm6840_write(1, offset, data & 0xff); }
-WRITE16_HANDLER( ptm6840_2_lsb_w ) { if (ACCESSING_BITS_0_7) ptm6840_write(2, offset, data & 0xff); }
-WRITE16_HANDLER( ptm6840_3_lsb_w ) { if (ACCESSING_BITS_0_7) ptm6840_write(3, offset, data & 0xff); }
+WRITE16_HANDLER( ptm6840_0_lsb_w ) { if (ACCESSING_BITS_0_7) ptm6840_write(machine, 0, offset, data & 0xff); }
+WRITE16_HANDLER( ptm6840_1_lsb_w ) { if (ACCESSING_BITS_0_7) ptm6840_write(machine, 1, offset, data & 0xff); }
+WRITE16_HANDLER( ptm6840_2_lsb_w ) { if (ACCESSING_BITS_0_7) ptm6840_write(machine, 2, offset, data & 0xff); }
+WRITE16_HANDLER( ptm6840_3_lsb_w ) { if (ACCESSING_BITS_0_7) ptm6840_write(machine, 3, offset, data & 0xff); }

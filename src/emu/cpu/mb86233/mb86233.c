@@ -15,6 +15,7 @@
 
 #include "mb86233.h"
 #include "debugger.h"
+#include "deprecat.h"
 
 /***************************************************************************
     STRUCTURES & TYPEDEFS

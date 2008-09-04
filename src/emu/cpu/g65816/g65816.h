@@ -81,6 +81,7 @@ void g65816_branching(unsigned int new_pc);
 
 #include "cpuintrf.h"
 #include "debugger.h"
+#include "deprecat.h"
 
 enum
 {

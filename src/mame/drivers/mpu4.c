@@ -480,7 +480,7 @@ static READ8_HANDLER( bankswitch_r )
 /* IC2 6840 PTM handler */
 static WRITE8_HANDLER( ic2_o1_callback )
 {
-	ptm6840_set_c2(0,data);
+	ptm6840_set_c2(machine,0,data);
 
 	/* copy output value to IC2 c2
     this output is the clock for timer2 */
@@ -492,7 +492,7 @@ static WRITE8_HANDLER( ic2_o2_callback )
 	pia_set_input_ca1(0, data); /* copy output value to IC3 ca1 */
 
 	/* the output from timer2 is the input clock for timer3 */
-	ptm6840_set_c3(   0, data);
+	ptm6840_set_c3(   machine, 0, data);
 }
 
 
@@ -501,7 +501,7 @@ static WRITE8_HANDLER( ic2_o3_callback )
 	/* the output from timer3 is used as a square wave for the alarm output
     and as an external clock source for timer 1! */
 
-	ptm6840_set_c1(   0, data);
+	ptm6840_set_c1(    machine, 0, data);
 }
 
 
@@ -1238,7 +1238,7 @@ static const stepper_interface barcrest_reel_interface =
 };
 
 /* Common configurations */
-static void mpu4_config_common(void)
+static void mpu4_config_common(running_machine *machine)
 {
 	pia_config(0,&pia_ic3_intf);
 	pia_config(1,&pia_ic4_intf);
@@ -1249,12 +1249,12 @@ static void mpu4_config_common(void)
 
 	ic24_timer = timer_alloc(ic24_timeout, NULL);
 	/* setup 6840ptm */
-	ptm6840_config(0, &ptm_ic2_intf );
+	ptm6840_config(machine, 0, &ptm_ic2_intf );
 }
 
 static MACHINE_START( mpu4mod2 )
 {
-	mpu4_config_common();
+	mpu4_config_common(machine);
 	pia_reset();
 
 	serial_card_connected=0;

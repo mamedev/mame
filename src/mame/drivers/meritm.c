@@ -297,7 +297,7 @@ static void meritm_vdp0_interrupt(running_machine *machine, int i)
 			meritm_vint |= 0x08;
 
 		if(i)
-			z80pio_p_w(0, 0, meritm_vint);
+			z80pio_p_w(machine, 0, 0, meritm_vint);
 	}
 }
 
@@ -312,7 +312,7 @@ static void meritm_vdp1_interrupt(running_machine *machine, int i)
 			meritm_vint |= 0x10;
 
 		if(i)
-			z80pio_p_w(0, 0, meritm_vint);
+			z80pio_p_w(machine, 0, 0, meritm_vint);
 	}
 }
 
@@ -822,7 +822,7 @@ static const z80pio_interface meritm_io_pio_intf =
 #ifdef UNUSED_FUNCTION
 static void meritm_pio1_portb_input_changed_callback(void *param, UINT32 oldval, UINT32 newval)
 {
-    z80pio_p_w(1, 1, (UINT8)newval);
+    z80pio_p_w(Machine, 1, 1, (UINT8)newval);
 }
 #endif
 

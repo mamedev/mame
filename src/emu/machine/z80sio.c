@@ -360,7 +360,7 @@ void z80sio_reset(int which)
     z80sio_c_w - write to a control register
 -------------------------------------------------*/
 
-void z80sio_c_w(int which, int ch, UINT8 data)
+void z80sio_c_w(running_machine *machine, int which, int ch, UINT8 data)
 {
 	z80sio *sio = sios + which;
 	sio_channel *chan = &sio->chan[ch];
@@ -386,44 +386,44 @@ void z80sio_c_w(int which, int ch, UINT8 data)
 			{
 				case SIO_WR0_COMMAND_CH_RESET:
 					VPRINTF(("%04X:SIO reset channel %c\n", activecpu_get_pc(), 'A' + ch));
-					reset_channel(Machine, sio, ch);
+					reset_channel(machine, sio, ch);
 					break;
 
 				case SIO_WR0_COMMAND_RES_STATUS_INT:
 					sio->int_state[INT_CHA_STATUS - 4*ch] &= ~Z80_DAISY_INT;
-					interrupt_check(Machine, sio);
+					interrupt_check(machine, sio);
 					break;
 
 				case SIO_WR0_COMMAND_ENA_RX_INT:
 					chan->int_on_next_rx = TRUE;
-					interrupt_check(Machine, sio);
+					interrupt_check(machine, sio);
 					break;
 
 				case SIO_WR0_COMMAND_RES_TX_INT:
 					sio->int_state[INT_CHA_TRANSMIT - 4*ch] &= ~Z80_DAISY_INT;
-					interrupt_check(Machine, sio);
+					interrupt_check(machine, sio);
 					break;
 
 				case SIO_WR0_COMMAND_RES_ERROR:
 					sio->int_state[INT_CHA_ERROR - 4*ch] &= ~Z80_DAISY_INT;
-					interrupt_check(Machine, sio);
+					interrupt_check(machine, sio);
 					break;
 			}
 			break;
 
 		/* SIO write register 1 */
 		case 1:
-			interrupt_check(Machine, sio);
+			interrupt_check(machine, sio);
 			break;
 
 		/* SIO write register 5 */
 		case 5:
 			if (((old ^ data) & SIO_WR5_DTR) && sio->dtr_changed_cb)
-				(*sio->dtr_changed_cb)(Machine, ch, (data & SIO_WR5_DTR) != 0);
+				(*sio->dtr_changed_cb)(machine, ch, (data & SIO_WR5_DTR) != 0);
 			if (((old ^ data) & SIO_WR5_SEND_BREAK) && sio->break_changed_cb)
-				(*sio->break_changed_cb)(Machine, ch, (data & SIO_WR5_SEND_BREAK) != 0);
+				(*sio->break_changed_cb)(machine, ch, (data & SIO_WR5_SEND_BREAK) != 0);
 			if (((old ^ data) & SIO_WR5_RTS) && sio->rts_changed_cb)
-				(*sio->rts_changed_cb)(Machine, ch, (data & SIO_WR5_RTS) != 0);
+				(*sio->rts_changed_cb)(machine, ch, (data & SIO_WR5_RTS) != 0);
 			break;
 	}
 }
@@ -467,7 +467,7 @@ UINT8 z80sio_c_r(int which, int ch)
     z80sio_d_w - write to a data register
 -------------------------------------------------*/
 
-void z80sio_d_w(int which, int ch, UINT8 data)
+void z80sio_d_w(running_machine *machine, int which, int ch, UINT8 data)
 {
 	z80sio *sio = sios + which;
 	sio_channel *chan = &sio->chan[ch];
@@ -483,7 +483,7 @@ void z80sio_d_w(int which, int ch, UINT8 data)
 
 	/* reset the transmit interrupt */
 	sio->int_state[INT_CHA_TRANSMIT - 4*ch] &= ~Z80_DAISY_INT;
-	interrupt_check(Machine, sio);
+	interrupt_check(machine, sio);
 
 	/* stash the character */
 	chan->outbuf = data;
@@ -494,7 +494,7 @@ void z80sio_d_w(int which, int ch, UINT8 data)
     z80sio_d_r - read from a data register
 -------------------------------------------------*/
 
-UINT8 z80sio_d_r(int which, int ch)
+UINT8 z80sio_d_r(running_machine *machine, int which, int ch)
 {
 	z80sio *sio = sios + which;
 	sio_channel *chan = &sio->chan[ch];
@@ -504,7 +504,7 @@ UINT8 z80sio_d_r(int which, int ch)
 
 	/* reset the receive interrupt */
 	sio->int_state[INT_CHA_RECEIVE - 4*ch] &= ~Z80_DAISY_INT;
-	interrupt_check(Machine, sio);
+	interrupt_check(machine, sio);
 
 	VPRINTF(("%04X:sio_data_r(%c) = %02X\n", activecpu_get_pc(), 'A' + ch, chan->inbuf));
 

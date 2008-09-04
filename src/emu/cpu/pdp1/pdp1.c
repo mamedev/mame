@@ -336,6 +336,7 @@
 
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "pdp1.h"
 
 #define LOG 0

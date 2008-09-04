@@ -125,6 +125,7 @@
 /*int survival_prot = 0; */
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "i8085.h"
 #include "i8085cpu.h"
 #include "i8085daa.h"

@@ -44,6 +44,7 @@ TODO:
 
 #include "minx.h"
 #include "debugger.h"
+#include "deprecat.h"
 
 #define FLAG_I  0x80
 #define FLAG_D  0x40

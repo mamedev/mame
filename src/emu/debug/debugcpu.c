@@ -94,7 +94,7 @@ static void perform_trace(debug_cpu_info *info);
 static void prepare_for_step_overout(debug_cpu_info *info);
 static void process_source_file(void);
 static void breakpoint_check(debug_cpu_info *info, offs_t pc);
-static void watchpoint_check(int cpunum, int spacenum, int type, offs_t address, UINT64 value_to_write, UINT64 mem_mask);
+static void watchpoint_check(running_machine *machine, int cpunum, int spacenum, int type, offs_t address, UINT64 value_to_write, UINT64 mem_mask);
 static void check_hotspots(int cpunum, int spacenum, offs_t address);
 
 /* expression handlers */
@@ -331,14 +331,14 @@ static void debug_cpu_exit(running_machine *machine)
 
 		/* free all breakpoints */
 		while (info->bplist)
-			debug_cpu_breakpoint_clear(info->bplist->index);
+			debug_cpu_breakpoint_clear(machine, info->bplist->index);
 
 		/* loop over all address spaces */
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
 			/* free all watchpoints */
 			while (info->space[spacenum].wplist)
-				debug_cpu_watchpoint_clear(info->space[spacenum].wplist->index);
+				debug_cpu_watchpoint_clear(machine, info->space[spacenum].wplist->index);
 		}
 	}
 
@@ -645,7 +645,7 @@ void debug_cpu_memory_read_hook(running_machine *machine, int cpunum, int spacen
 
 	/* check watchpoints */
 	if ((info->flags & (DEBUG_FLAG_LIVE_WPR_PROGRAM << spacenum)) != 0)
-		watchpoint_check(cpunum, spacenum, WATCHPOINT_READ, address, 0, mem_mask);
+		watchpoint_check(machine, cpunum, spacenum, WATCHPOINT_READ, address, 0, mem_mask);
 
 	/* check hotspots */
 	if (info->hotspots != NULL)
@@ -665,7 +665,7 @@ void debug_cpu_memory_write_hook(running_machine *machine, int cpunum, int space
 
 	/* check watchpoints */
 	if ((info->flags & (DEBUG_FLAG_LIVE_WPW_PROGRAM << spacenum)) != 0)
-		watchpoint_check(cpunum, spacenum, WATCHPOINT_WRITE, address, data, mem_mask);
+		watchpoint_check(machine, cpunum, spacenum, WATCHPOINT_WRITE, address, data, mem_mask);
 }
 
 
@@ -1148,7 +1148,7 @@ void debug_cpu_set_instruction_hook(int cpunum, int (*hook)(offs_t pc))
     breakpoint flags
 -------------------------------------------------*/
 
-static void breakpoint_update_flags(debug_cpu_info *info)
+static void breakpoint_update_flags(running_machine *machine, debug_cpu_info *info)
 {
 	debug_cpu_breakpoint *bp;
 
@@ -1163,7 +1163,7 @@ static void breakpoint_update_flags(debug_cpu_info *info)
 
 	/* push the flags out globally */
 	if (global.livecpu != NULL)
-		compute_debug_flags(Machine, global.livecpu);
+		compute_debug_flags(machine, global.livecpu);
 }
 
 
@@ -1203,7 +1203,7 @@ static void breakpoint_check(debug_cpu_info *info, offs_t pc)
     debug_cpu_breakpoint_set - set a new breakpoint
 -------------------------------------------------*/
 
-int debug_cpu_breakpoint_set(int cpunum, offs_t address, parsed_expression *condition, const char *action)
+int debug_cpu_breakpoint_set(running_machine *machine, int cpunum, offs_t address, parsed_expression *condition, const char *action)
 {
 	debug_cpu_info *info = &global.cpuinfo[cpunum];
 	debug_cpu_breakpoint *bp;
@@ -1228,7 +1228,7 @@ int debug_cpu_breakpoint_set(int cpunum, offs_t address, parsed_expression *cond
 	info->bplist = bp;
 
 	/* ensure the live breakpoint flag is set */
-	breakpoint_update_flags(info);
+	breakpoint_update_flags(machine, info);
 	return bp->index;
 }
 
@@ -1237,7 +1237,7 @@ int debug_cpu_breakpoint_set(int cpunum, offs_t address, parsed_expression *cond
     debug_cpu_breakpoint_clear - clear a breakpoint
 -------------------------------------------------*/
 
-int debug_cpu_breakpoint_clear(int bpnum)
+int debug_cpu_breakpoint_clear(running_machine *machine, int bpnum)
 {
 	debug_cpu_breakpoint *bp, *pbp;
 	int cpunum;
@@ -1263,7 +1263,7 @@ int debug_cpu_breakpoint_clear(int bpnum)
 				free(bp);
 
 				/* update the flags */
-				breakpoint_update_flags(info);
+				breakpoint_update_flags(machine, info);
 				return 1;
 			}
 	}
@@ -1278,7 +1278,7 @@ int debug_cpu_breakpoint_clear(int bpnum)
     breakpoint
 -------------------------------------------------*/
 
-int debug_cpu_breakpoint_enable(int bpnum, int enable)
+int debug_cpu_breakpoint_enable(running_machine *machine, int bpnum, int enable)
 {
 	debug_cpu_breakpoint *bp;
 	int cpunum;
@@ -1291,7 +1291,7 @@ int debug_cpu_breakpoint_enable(int bpnum, int enable)
 			if (bp->index == bpnum)
 			{
 				bp->enabled = (enable != 0);
-				breakpoint_update_flags(info);
+				breakpoint_update_flags(machine, info);
 				return 1;
 			}
 	}
@@ -1310,7 +1310,7 @@ int debug_cpu_breakpoint_enable(int bpnum, int enable)
     watchpoint flags
 -------------------------------------------------*/
 
-static void watchpoint_update_flags(debug_cpu_info *info, int spacenum)
+static void watchpoint_update_flags(running_machine *machine, debug_cpu_info *info, int spacenum)
 {
 	UINT32 writeflag = DEBUG_FLAG_LIVE_WPW_PROGRAM << spacenum;
 	UINT32 readflag = DEBUG_FLAG_LIVE_WPR_PROGRAM << spacenum;
@@ -1344,7 +1344,7 @@ static void watchpoint_update_flags(debug_cpu_info *info, int spacenum)
 
 	/* push the flags out globally */
 	if (global.livecpu != NULL)
-		compute_debug_flags(Machine, global.livecpu);
+		compute_debug_flags(machine, global.livecpu);
 }
 
 
@@ -1353,7 +1353,7 @@ static void watchpoint_update_flags(debug_cpu_info *info, int spacenum)
     for a given CPU and address space
 -------------------------------------------------*/
 
-static void watchpoint_check(int cpunum, int spacenum, int type, offs_t address, UINT64 value_to_write, UINT64 mem_mask)
+static void watchpoint_check(running_machine *machine, int cpunum, int spacenum, int type, offs_t address, UINT64 value_to_write, UINT64 mem_mask)
 {
 	const debug_cpu_info *info = &global.cpuinfo[cpunum];
 	debug_cpu_watchpoint *wp;
@@ -1430,7 +1430,7 @@ static void watchpoint_check(int cpunum, int spacenum, int type, offs_t address,
 					else
 						sprintf(buffer, "Stopped at watchpoint %X reading %s from %08X (PC=%X)", wp->index, sizes[size], BYTE2ADDR(address, &global.cpuinfo[cpunum], spacenum), activecpu_get_pc());
 					debug_console_printf("%s\n", buffer);
-					compute_debug_flags(Machine, info);
+					compute_debug_flags(machine, info);
 				}
 				break;
 			}
@@ -1443,7 +1443,7 @@ static void watchpoint_check(int cpunum, int spacenum, int type, offs_t address,
     debug_cpu_watchpoint_set - set a new watchpoint
 -------------------------------------------------*/
 
-int debug_cpu_watchpoint_set(int cpunum, int spacenum, int type, offs_t address, offs_t length, parsed_expression *condition, const char *action)
+int debug_cpu_watchpoint_set(running_machine *machine, int cpunum, int spacenum, int type, offs_t address, offs_t length, parsed_expression *condition, const char *action)
 {
 	debug_cpu_info *info = &global.cpuinfo[cpunum];
 	debug_cpu_watchpoint *wp = malloc_or_die(sizeof(*wp));
@@ -1466,7 +1466,7 @@ int debug_cpu_watchpoint_set(int cpunum, int spacenum, int type, offs_t address,
 	wp->next = info->space[spacenum].wplist;
 	info->space[spacenum].wplist = wp;
 
-	watchpoint_update_flags(info, spacenum);
+	watchpoint_update_flags(machine, info, spacenum);
 
 	return wp->index;
 }
@@ -1476,7 +1476,7 @@ int debug_cpu_watchpoint_set(int cpunum, int spacenum, int type, offs_t address,
     debug_cpu_watchpoint_clear - clear a watchpoint
 -------------------------------------------------*/
 
-int debug_cpu_watchpoint_clear(int wpnum)
+int debug_cpu_watchpoint_clear(running_machine *machine, int wpnum)
 {
 	debug_cpu_watchpoint *wp, *pwp;
 	int cpunum, spacenum;
@@ -1503,7 +1503,7 @@ int debug_cpu_watchpoint_clear(int wpnum)
 						free(wp->action);
 					free(wp);
 
-					watchpoint_update_flags(info, spacenum);
+					watchpoint_update_flags(machine, info, spacenum);
 					return 1;
 				}
 	}
@@ -1518,7 +1518,7 @@ int debug_cpu_watchpoint_clear(int wpnum)
     watchpoint
 -------------------------------------------------*/
 
-int debug_cpu_watchpoint_enable(int wpnum, int enable)
+int debug_cpu_watchpoint_enable(running_machine *machine, int wpnum, int enable)
 {
 	debug_cpu_watchpoint *wp;
 	int cpunum, spacenum;
@@ -1533,7 +1533,7 @@ int debug_cpu_watchpoint_enable(int wpnum, int enable)
 				if (wp->index == wpnum)
 				{
 					wp->enabled = (enable != 0);
-					watchpoint_update_flags(info, spacenum);
+					watchpoint_update_flags(machine, info, spacenum);
 					return 1;
 				}
 	}
@@ -1551,7 +1551,7 @@ int debug_cpu_watchpoint_enable(int wpnum, int enable)
     of hotspots
 -------------------------------------------------*/
 
-int debug_cpu_hotspot_track(int cpunum, int numspots, int threshhold)
+int debug_cpu_hotspot_track(running_machine *machine, int cpunum, int numspots, int threshhold)
 {
 	debug_cpu_info *info = &global.cpuinfo[cpunum];
 
@@ -1572,7 +1572,7 @@ int debug_cpu_hotspot_track(int cpunum, int numspots, int threshhold)
 		info->hotspot_threshhold = threshhold;
 	}
 
-	watchpoint_update_flags(info, ADDRESS_SPACE_PROGRAM);
+	watchpoint_update_flags(machine, info, ADDRESS_SPACE_PROGRAM);
 	return 1;
 }
 
@@ -2661,7 +2661,7 @@ void debug_cpu_trace_printf(int cpunum, const char *fmt, ...)
     script to use
 -------------------------------------------------*/
 
-void debug_cpu_source_script(const char *file)
+void debug_cpu_source_script(running_machine *machine, const char *file)
 {
 	if (debug_source_file)
 	{
@@ -2674,7 +2674,7 @@ void debug_cpu_source_script(const char *file)
 		debug_source_file = fopen(file, "r");
 		if (!debug_source_file)
 		{
-			if (mame_get_phase(Machine) == MAME_PHASE_RUNNING)
+			if (mame_get_phase(machine) == MAME_PHASE_RUNNING)
 				debug_console_printf("Cannot open command file '%s'\n", file);
 			else
 				fatalerror("Cannot open command file '%s'", file);

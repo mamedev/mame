@@ -32,6 +32,7 @@
 
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "m6805.h"
 
 #define IRQ_LEVEL_DETECT 0

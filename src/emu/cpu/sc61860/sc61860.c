@@ -28,6 +28,7 @@
  *****************************************************************************/
 
 #include "debugger.h"
+#include "deprecat.h"
 
 #include "sc61860.h"
 #include "sc.h"

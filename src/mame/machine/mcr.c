@@ -936,46 +936,46 @@ static WRITE8_HANDLER( ipu_break_changed )
 
 READ8_HANDLER( mcr_ipu_pio_0_r )
 {
-	return (offset & 2) ? z80pio_c_r(0, offset & 1) : z80pio_d_r(0, offset & 1);
+	return (offset & 2) ? z80pio_c_r(0, offset & 1) : z80pio_d_r(machine, 0, offset & 1);
 }
 
 
 READ8_HANDLER( mcr_ipu_pio_1_r )
 {
-	return (offset & 2) ? z80pio_c_r(1, offset & 1) : z80pio_d_r(1, offset & 1);
+	return (offset & 2) ? z80pio_c_r(1, offset & 1) : z80pio_d_r(machine, 1, offset & 1);
 }
 
 
 READ8_HANDLER( mcr_ipu_sio_r )
 {
-	return (offset & 2) ? z80sio_c_r(0, offset & 1) : z80sio_d_r(0, offset & 1);
+	return (offset & 2) ? z80sio_c_r(0, offset & 1) : z80sio_d_r(machine, 0, offset & 1);
 }
 
 
 WRITE8_HANDLER( mcr_ipu_pio_0_w )
 {
 	if (offset & 2)
-		z80pio_c_w(0, offset & 1, data);
+		z80pio_c_w(machine, 0, offset & 1, data);
 	else
-		z80pio_d_w(0, offset & 1, data);
+		z80pio_d_w(machine, 0, offset & 1, data);
 }
 
 
 WRITE8_HANDLER( mcr_ipu_pio_1_w )
 {
 	if (offset & 2)
-		z80pio_c_w(1, offset & 1, data);
+		z80pio_c_w(machine, 1, offset & 1, data);
 	else
-		z80pio_d_w(1, offset & 1, data);
+		z80pio_d_w(machine, 1, offset & 1, data);
 }
 
 
 WRITE8_HANDLER( mcr_ipu_sio_w )
 {
 	if (offset & 2)
-		z80sio_c_w(0, offset & 1, data);
+		z80sio_c_w(machine, 0, offset & 1, data);
 	else
-		z80sio_d_w(0, offset & 1, data);
+		z80sio_d_w(machine, 0, offset & 1, data);
 }
 
 

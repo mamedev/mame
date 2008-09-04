@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "tms32031.h"
 #include "eminline.h"
 

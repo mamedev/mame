@@ -10,6 +10,7 @@
 */
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "sm8500.h"
 
 #define FLAG_C	0x80

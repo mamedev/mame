@@ -2602,8 +2602,8 @@ static void *allocate_memory_block(running_machine *machine, int cpunum, int spa
 	/* register for saving, but only if we're not part of a memory region */
 	for (region = memory_region_next(machine, NULL); region != NULL; region = memory_region_next(machine, region))
 	{
-		UINT8 *region_base = memory_region(Machine, region);
-		UINT32 region_length = memory_region_length(Machine, region);
+		UINT8 *region_base = memory_region(machine, region);
+		UINT32 region_length = memory_region_length(machine, region);
 		if (region_base != NULL && region_length != 0 && (UINT8 *)memory >= region_base && ((UINT8 *)memory + (byteend - bytestart + 1)) < region_base + region_length)
 		{
 			VPRINTF(("skipping save of this memory block as it is covered by a memory region\n"));

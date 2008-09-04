@@ -250,7 +250,7 @@ const debug_cpu_info *debug_get_cpu_info(int cpunum);
 void debug_cpu_halt_on_next_instruction(running_machine *machine, const char *fmt, ...) ATTR_PRINTF(2,3);
 int	debug_cpu_is_stopped(running_machine *machine);
 void debug_cpu_trace_printf(int cpunum, const char *fmt, ...) ATTR_PRINTF(2,3);
-void debug_cpu_source_script(const char *file);
+void debug_cpu_source_script(running_machine *machine, const char *file);
 void debug_cpu_flush_traces(void);
 
 /* debugging hooks */
@@ -272,17 +272,17 @@ void				debug_cpu_ignore_cpu(int cpunum, int ignore);
 void				debug_cpu_trace(int cpunum, FILE *file, int trace_over, const char *action);
 
 /* breakpoints */
-int					debug_cpu_breakpoint_set(int cpunum, offs_t address, parsed_expression *condition, const char *action);
-int					debug_cpu_breakpoint_clear(int bpnum);
-int					debug_cpu_breakpoint_enable(int bpnum, int enable);
+int					debug_cpu_breakpoint_set(running_machine *machine, int cpunum, offs_t address, parsed_expression *condition, const char *action);
+int					debug_cpu_breakpoint_clear(running_machine *machine, int bpnum);
+int					debug_cpu_breakpoint_enable(running_machine *machine, int bpnum, int enable);
 
 /* watchpoints */
-int					debug_cpu_watchpoint_set(int cpunum, int spacenum, int type, offs_t address, offs_t length, parsed_expression *condition, const char *action);
-int					debug_cpu_watchpoint_clear(int wpnum);
-int					debug_cpu_watchpoint_enable(int wpnum, int enable);
+int					debug_cpu_watchpoint_set(running_machine *machine, int cpunum, int spacenum, int type, offs_t address, offs_t length, parsed_expression *condition, const char *action);
+int					debug_cpu_watchpoint_clear(running_machine *machine, int wpnum);
+int					debug_cpu_watchpoint_enable(running_machine *machine, int wpnum, int enable);
 
 /* hotspots */
-int					debug_cpu_hotspot_track(int cpunum, int numspots, int threshhold);
+int					debug_cpu_hotspot_track(running_machine *machine, int cpunum, int numspots, int threshhold);
 
 /* memory accessors */
 UINT8				debug_read_byte(int spacenum, offs_t address, int apply_translation);

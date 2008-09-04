@@ -37,6 +37,7 @@
 /**                                                         **/
 /*************************************************************/
 #include "debugger.h"
+#include "deprecat.h"
 #include "lr35902.h"
 
 #define FLAG_Z	0x80
