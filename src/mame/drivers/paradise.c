@@ -95,29 +95,21 @@ static ADDRESS_MAP_START( torus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_RAM	// RAM
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( paradise_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_READ(SMH_RAM			)	// Palette
-	AM_RANGE(0x2010, 0x2010) AM_READ(okim6295_status_0_r)	// OKI 0
-	AM_RANGE(0x2030, 0x2030) AM_READ(okim6295_status_1_r)	// OKI 1
-	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2021, 0x2021) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2022, 0x2022) AM_READ_PORT("P1")
-	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2")
-	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x8000, 0xffff) AM_READ(SMH_RAM			)	// Pixmap
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( paradise_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x17ff) AM_WRITE(paradise_palette_w	) AM_BASE(&paletteram)	// Palette
+static ADDRESS_MAP_START( paradise_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x0000, 0x17ff) AM_RAM_WRITE(paradise_palette_w) AM_BASE(&paletteram)	// Palette
 	AM_RANGE(0x1800, 0x1800) AM_WRITE(paradise_priority_w	)	// Layers priority
 	AM_RANGE(0x2001, 0x2001) AM_WRITE(paradise_flipscreen_w	)	// Flip Screen
 	AM_RANGE(0x2004, 0x2004) AM_WRITE(paradise_palbank_w	)	// Layers palette bank
 	AM_RANGE(0x2006, 0x2006) AM_WRITE(paradise_rombank_w	)	// ROM bank
 	AM_RANGE(0x2007, 0x2007) AM_WRITE(paradise_okibank_w	)	// OKI 1 samples bank
-	AM_RANGE(0x2010, 0x2010) AM_WRITE(okim6295_data_0_w		)	// OKI 0
-	AM_RANGE(0x2030, 0x2030) AM_WRITE(okim6295_data_1_w		)	// OKI 1
-	AM_RANGE(0x8000, 0xffff) AM_WRITE(paradise_pixmap_w		) AM_BASE(&videoram) 	// Pixmap
+	AM_RANGE(0x2010, 0x2010) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)	// OKI 0
+	AM_RANGE(0x2020, 0x2020) AM_READ_PORT("DSW1"			)
+	AM_RANGE(0x2021, 0x2021) AM_READ_PORT("DSW2"			)
+	AM_RANGE(0x2022, 0x2022) AM_READ_PORT("P1"				)
+	AM_RANGE(0x2023, 0x2023) AM_READ_PORT("P2"				)
+	AM_RANGE(0x2024, 0x2024) AM_READ_PORT("SYSTEM"			)
+	AM_RANGE(0x2030, 0x2030) AM_READWRITE(okim6295_status_1_r, okim6295_data_1_w)	// OKI 1
+	AM_RANGE(0x8000, 0xffff) AM_RAM_WRITE(paradise_pixmap_w	) AM_BASE(&videoram) 	// Pixmap
 ADDRESS_MAP_END
 
 
@@ -538,7 +530,7 @@ static MACHINE_DRIVER_START( paradise )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, XTAL_12MHz/2)			/* Z8400B - 6mhz Verified */
 	MDRV_CPU_PROGRAM_MAP(paradise_map,0)
-	MDRV_CPU_IO_MAP(paradise_readport,paradise_writeport)
+	MDRV_CPU_IO_MAP(paradise_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No nmi routine */
 
 	/* video hardware */
@@ -1009,3 +1001,4 @@ GAME( 1995,  tgtballa, tgtball, tgtball,  tgtball,  tgtball,  ROT0,  "Yun Sung",
 GAME( 1996,  torus,    0,       torus,    torus,    torus,    ROT90, "Yun Sung", "Torus", 0 )
 GAME( 1998,  madball,  0,       madball,  madball,  tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0", 0 )
 GAME( 1997,  madballn, madball, madball,  madball,  tgtball,  ROT0,  "Yun Sung", "Mad Ball V2.0 (With Nudity)", 0 )
+

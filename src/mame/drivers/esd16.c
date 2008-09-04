@@ -302,21 +302,15 @@ static READ8_HANDLER( esd16_sound_command_r )
 	return soundlatch_r(machine,0);
 }
 
-static ADDRESS_MAP_START( multchmp_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READ(okim6295_status_0_r		)	// M6295
-	AM_RANGE(0x03, 0x03) AM_READ(esd16_sound_command_r		)	// From Main CPU
-	AM_RANGE(0x06, 0x06) AM_READ(SMH_NOP					)	// ? At the start
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( multchmp_sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( multchmp_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ym3812_control_port_0_w	)	// YM3812
 	AM_RANGE(0x01, 0x01) AM_WRITE(ym3812_write_port_0_w		)
-	AM_RANGE(0x02, 0x02) AM_WRITE(okim6295_data_0_w			)	// M6295
+	AM_RANGE(0x02, 0x02) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)	// M6295
+	AM_RANGE(0x03, 0x03) AM_READ(esd16_sound_command_r		)	// From Main CPU
 	AM_RANGE(0x04, 0x04) AM_WRITE(SMH_NOP					)	// ? $00, $30
 	AM_RANGE(0x05, 0x05) AM_WRITE(esd16_sound_rombank_w 	)	// ROM Bank
-	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP					)	// ? 1 (End of NMI routine)
+	AM_RANGE(0x06, 0x06) AM_READWRITE(SMH_NOP, SMH_NOP		)	// ? At the start / ? 1 (End of NMI routine)
 ADDRESS_MAP_END
 
 
@@ -576,7 +570,7 @@ static MACHINE_DRIVER_START( multchmp )
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(multchmp_sound_readmem,multchmp_sound_writemem)
-	MDRV_CPU_IO_MAP(multchmp_sound_readport,multchmp_sound_writeport)
+	MDRV_CPU_IO_MAP(multchmp_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,32)	/* IRQ By Main CPU */
 
 	/* video hardware */
@@ -1143,3 +1137,4 @@ GAME( 2000, hedpanif, hedpanic, hedpanic, hedpanic, 0, ROT0, "ESD / Fuuki", "Hea
 /* ESD - This PCB looks identical to the ESD 08-26-1999 PCB */
 GAME( 2000, tangtang, 0,        tangtang, hedpanic, 0, ROT0, "ESD",         "Tang Tang (ver. 0526, 26/05/2000)", 0 ) // 26/05/2000 ?
 GAME( 2001, swatpolc, 0,        swatpolc, swatpolc, 0, ROT0, "ESD",         "SWAT Police ", 0 )
+

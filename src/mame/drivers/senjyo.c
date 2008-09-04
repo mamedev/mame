@@ -301,18 +301,11 @@ static READ8_HANDLER( pio_r )
 	return (offset & 1) ? z80pio_c_r(0, (offset >> 1) & 1) : z80pio_d_r(0, (offset >> 1) & 1);
 }
 
-static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_READ(pio_r)
-	AM_RANGE(0x08, 0x0b) AM_READ(z80ctc_0_r)
+	AM_RANGE(0x00, 0x03) AM_READWRITE(pio_r, pio_w)
+	AM_RANGE(0x08, 0x0b) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_WRITE(pio_w)
-	AM_RANGE(0x08, 0x0b) AM_WRITE(z80ctc_0_w)
-ADDRESS_MAP_END
-
 
 
 
@@ -654,7 +647,7 @@ static MACHINE_DRIVER_START( senjyo )
 	MDRV_CPU_ADD("sub", Z80, 2000000)	/* 2 MHz? */
 	MDRV_CPU_CONFIG(daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	MDRV_MACHINE_RESET(senjyo)
 
@@ -1023,3 +1016,4 @@ GAME( 1984, starforb, starforc, starforb,starforc, starfore, ROT90, "[Tehkan] (b
 GAME( 1984, starfora, starforc, senjyo,  starforc, starfora, ROT90, "Tehkan", "Star Force (encrypted, set 2)", 0 )
 GAME( 1985, megaforc, starforc, senjyo,  starforc, starforc, ROT90, "Tehkan (Video Ware license)", "Mega Force", 0 )
 GAME( 1986, baluba,   0,        senjyo,  baluba,   starforc, ROT90, "Able Corp, Ltd.", "Baluba-louk no Densetsu", GAME_IMPERFECT_COLORS )
+

@@ -153,15 +153,10 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0xc000, 0xc3ff) AM_WRITE(SMH_RAM) /* work ram */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x08) AM_READ(ay8910_read_port_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(dac_0_data_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x08, 0x08) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
 	AM_RANGE(0x0c, 0x0c) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
@@ -229,15 +224,10 @@ static ADDRESS_MAP_START( rk_sprite_writemem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0xa400, 0xa43f) AM_WRITE(SMH_RAM)  /* something related to scroll? */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rk_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READ(ay8910_read_port_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( rk_sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( rk_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(dac_0_data_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
@@ -566,7 +556,7 @@ static MACHINE_DRIVER_START( kingofb )
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+	MDRV_CPU_IO_MAP(sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 6000)	/* Hz */
 
 	MDRV_INTERLEAVE(100) /* We really need heavy synching among the processors */
@@ -616,7 +606,7 @@ static MACHINE_DRIVER_START( ringking )
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)        /* 4.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(rk_sound_readport,rk_sound_writeport)
+	MDRV_CPU_IO_MAP(rk_sound_io_map,0)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 6000)	/* Hz */
 
 	MDRV_INTERLEAVE(100) /* We really need heavy synching among the processors */
@@ -898,3 +888,4 @@ GAME( 1985, ringking, kingofb, ringking, ringking, 0,        ROT90, "Data East U
 GAME( 1985, ringkin2, kingofb, ringking, ringking, 0,        ROT90, "Data East USA", "Ring King (US set 2)", 0 )
 GAME( 1985, ringkin3, kingofb, kingofb,  kingofb,  ringkin3, ROT90, "Data East USA", "Ring King (US set 3)", 0 )
 GAME( 1985, ringkinw, kingofb, kingofb,  kingofb,  ringkinw, ROT90, "Woodplace", "Ring King (US, Woodplace license)", 0 )
+

@@ -560,18 +560,12 @@ static WRITE8_HANDLER( adpcm_data_w )
 	msm5205_reset_w(0, !(data & 0x20) );	/* my best guess, but it could be output enable as well */
 }
 
-static ADDRESS_MAP_START( darius_sound2_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( darius_sound2_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(adpcm_command_read)
-	AM_RANGE(0x02, 0x02) AM_READ(readport2)	/* ??? */
-	AM_RANGE(0x03, 0x03) AM_READ(readport3)	/* ??? */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( darius_sound2_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(adpcm_nmi_disable)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(adpcm_command_read, adpcm_nmi_disable)
 	AM_RANGE(0x01, 0x01) AM_WRITE(adpcm_nmi_enable)
-	AM_RANGE(0x02, 0x02) AM_WRITE(adpcm_data_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(readport2, adpcm_data_w)	/* readport2 ??? */
+	AM_RANGE(0x03, 0x03) AM_READ(readport3)	/* ??? */
 ADDRESS_MAP_END
 
 
@@ -849,7 +843,7 @@ static MACHINE_DRIVER_START( darius )
 
 	MDRV_CPU_ADD("adpcm", Z80,8000000/2) /* 4 MHz ? */	/* ADPCM player using MSM5205 */
 	MDRV_CPU_PROGRAM_MAP(darius_sound2_readmem,darius_sound2_writemem)
-	MDRV_CPU_IO_MAP(darius_sound2_readport,darius_sound2_writeport)
+	MDRV_CPU_IO_MAP(darius_sound2_io_map,0)
 
 	MDRV_INTERLEAVE(10)	/* 10 CPU slices per frame ? */
 
@@ -1245,3 +1239,4 @@ GAME( 1986, darius,   0,        darius,   darius,   darius,   ROT0, "Taito Corpo
 GAME( 1986, dariusj,  darius,   darius,   dariusj,  darius,   ROT0, "Taito Corporation", "Darius (Japan)", 0 )
 GAME( 1986, dariuso,  darius,   darius,   dariusj,  darius,   ROT0, "Taito Corporation", "Darius (Japan old version)", 0 )
 GAME( 1986, dariuse,  darius,   darius,   dariuse,  darius,   ROT0, "Taito Corporation", "Darius (Extra) (Japan)", 0 )
+
