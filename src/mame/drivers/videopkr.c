@@ -232,7 +232,7 @@
 
 
 #include "driver.h"
-#include "cpu/mcs48/mcs48.c"
+#include "cpu/mcs48/mcs48.h"
 #include "sound/dac.h"
 
 #define DATA_NVRAM_SIZE     0x100
