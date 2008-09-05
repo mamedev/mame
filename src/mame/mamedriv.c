@@ -4083,6 +4083,13 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( senko )
 	DRIVER( ss2005 )
 
+	DRIVER( sprtjam )
+	DRIVER( slashout )
+	DRIVER( spkrbtl )
+	DRIVER( dygolf )
+	DRIVER( wsbbgd )
+	DRIVER( vathlete )
+
 	DRIVER( hod2bios )
 
 	DRIVER( naomi2 )

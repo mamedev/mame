@@ -2971,13 +2971,138 @@ ROM_START( ss2005 )
 	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
 	//PIC16C622A (317-5108-JPN)
 	//(sticker 253-5509-5108J)
-	//ROM_LOAD("317-5108-jpn.daa", 0x00, 0x50, CRC(1) SHA1(1) )
+	//ROM_LOAD("317-5108-jpn.data", 0x00, 0x50, CRC(1) SHA1(1) )
 ROM_END
 
 DRIVER_INIT( ss2005 )
 {
 	naomi_game_decrypt( 0xDC25738CAEBAB0F7ULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
 }
+
+
+ROM_START( sprtjam )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("rom.enc", 0x0000000,   0xb000000, CRC(1f6daa8d) SHA1(41c40da36c0448d0a8695fef2fd304b9caaf7562) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0003", 0, SHA1(bfabb0da1d4f0422e0b62d8a7bb67dbcdb0d5954) MD5(3a8d3cbc4067f9b5f50be9b9abdc689b) )
+
+	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
+	//PIC16C622A (317-0300-COM)
+	//(sticker 253-5508-0300)
+	//ROM_LOAD("317-0300-com.data", 0x00, 0x50, CRC(1) SHA1(1) )
+ROM_END
+
+DRIVER_INIT( sprtjam )
+{
+	naomi_game_decrypt( 0x018C861337BAC44AULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
+}
+
+ROM_START( slashout )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x9000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("slash.bin", 0x0000000,   0x9000000, CRC(e1f9320f) SHA1(09f1a69aee6e401acbe2099e10193d3fb575eeeb) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0004", 0, SHA1(ec1758f5ae359bcb3c66c7ce9ebcb7443c4fd967) MD5(f5228f26e661ab0cb67414f51fe1a5bc) )
+
+	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
+	//PIC16C622A (317-0302-COM)
+	//(sticker 253-5508-0302)
+	//ROM_LOAD("317-0302-com.data", 0x00, 0x50, CRC(1) SHA1(1) )
+ROM_END
+
+DRIVER_INIT( slashout )
+{
+	naomi_game_decrypt( 0x86D61519B983258FULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
+}
+
+
+ROM_START( spkrbtl )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("spkb.bin", 0x0000000,   0xb000000, CRC(ca11d20e) SHA1(e2e2710a8c69eeb970e131be80e0ec19e91d90c6) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0005", 0, SHA1(ca6e7ed2e161acad8600898e1b83aded9bb31d3b) MD5(a8a05ce6ab7d9ea67e015cd4853a5b80) )
+
+	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
+	//PIC16C622A (317-0303-COM)
+	//(sticker 253-5508-0303)
+	//ROM_LOAD("317-0303-com.data", 0x00, 0x50, CRC(1) SHA1(1) )
+ROM_END
+
+DRIVER_INIT( spkrbtl )
+{
+	naomi_game_decrypt( 0x9EDACDB6855BE046ULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
+}
+
+ROM_START( dygolf )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x6000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("game.enc", 0x0000000,   0x6000000, CRC(ab02d769) SHA1(3d96d43522357950a3928717464ecf854dd6e385) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0009", 0, SHA1(d58a42586c65dcb44282bf930631ea8b663c6aa7) MD5(e553e1811f28b67fd57fa8e34d978d87) )
+
+	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
+	//PIC16C622A (317-0308-COM)
+	//(sticker 253-5508-0308)
+	//ROM_LOAD("317-0308-com.data", 0x00, 0x50, CRC(1) SHA1(1) )
+ROM_END
+
+
+
+DRIVER_INIT( dygolf )
+{
+	naomi_game_decrypt( 0xB93B6704B03E9B4AULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
+}
+
+ROM_START( wsbbgd )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0xa000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("wsb_sl.bin", 0x0000000,   0xa000000, CRC(e61f37f1) SHA1(ba7b97eec6df672b520c57422287f699438267c5) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0010", 0,  SHA1(8ce36c9710a8d55e8c19d7f218500b7074b66dec) MD5(bfb8c5ead5ac9e2a82bca9114390a99f) )
+
+	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
+	//PIC16C622A (317-0309-COM)
+	//(sticker 253-5508-0309)
+	//ROM_LOAD("317-0309-com.data", 0x00, 0x50, CRC(1) SHA1(1) )
+ROM_END
+
+DRIVER_INIT( wsbbgd )
+{
+	naomi_game_decrypt( 0xC4A75486E015B316ULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
+}
+
+ROM_START( vathlete )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x7000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("va.bin", 0x0000000,   0x7000000, CRC(82992bf8) SHA1(1c36e1d8e5bf392b760c934b358963b92fc716cf) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0019", 0, SHA1(2167bbdde987c16949c5814ab7cff6eefd9f9326) MD5(67499591f2c61cda14fa581db9294315) )
+
+	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
+	//PIC16C622A (317-0330-COM)
+	//(sticker 253-5508-0330)
+	//ROM_LOAD("317-0330-com.data", 0x00, 0x50, CRC(1) SHA1(1) )
+ROM_END
+
+DRIVER_INIT( vathlete )
+{
+	naomi_game_decrypt( 0xC1071AB097B323DCULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
+}
+
 
 
 // GDL-xxxx (licensed games?)
@@ -2989,12 +3114,12 @@ GAME( 200?, senko,     naomigd,  naomi,    naomi,    senko,    ROT0,   "unknown"
 GAME( 2005, ss2005,    naomigd,  naomi,    naomi,    ss2005,   ROT0,   "unknown",        "Super Shanghai 2005 (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 // GDS-xxxx (first party games?)
-//GAME( 200?, sprtjam,   naomigd,  naomi,    naomi,    0,  ROT0, "Sega",          "Sports Jam (GDS-0003)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GAME( 200?, spkrbtl,   naomigd,  naomi,    naomi,    0,  ROT0, "Sega",          "Spikers Battle (GDS-0005)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GAME( 200?, slashout,  naomigd,  naomi,    naomi,    0,  ROT0, "Sega",          "Slashout (GDS-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GAME( 200?, dygolf,    naomigd,  naomi,    naomi,    0,  ROT0, "Sega",          "Dynamic Golf (GDS-0009)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GAME( 200?, wsbbgd,    naomigd,  naomi,    naomi,    0,  ROT0, "Sega",          "World Series Baseball (GDS-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
-//GAME( 200?, vathlete,  naomigd,  naomi,    naomi,    0,  ROT0, "Sega",          "Virtua Athelete (GDS-0019)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, sprtjam,   naomigd,  naomi,    naomi,    sprtjam,  ROT0, "Sega",          "Sports Jam (GDS-0003)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, slashout,  naomigd,  naomi,    naomi,    slashout, ROT0, "Sega",          "Slashout (GDS-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, spkrbtl,   naomigd,  naomi,    naomi,    spkrbtl,  ROT0, "Sega",          "Spikers Battle (GDS-0005)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, dygolf,    naomigd,  naomi,    naomi,    dygolf,   ROT0, "Sega",          "Dynamic Golf (GDS-0009)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, wsbbgd,    naomigd,  naomi,    naomi,    wsbbgd,   ROT0, "Sega",          "World Series Baseball (GDS-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, vathlete,  naomigd,  naomi,    naomi,    vathlete, ROT0, "Sega",          "Virtua Athelete (GDS-0019)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Naomi 2 & Naomi 2 GD-ROM */
 GAME( 2001, naomi2,   0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi 2 Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
