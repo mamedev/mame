@@ -58,6 +58,84 @@ Notes:
 Note 1: Some PCBs use a 11.2896MHz OSC instead of the 11.0592MHz
 Note 2: Some PCBs use a TMS34010FNL-40 instead of the TMS34010FNL-50
 
+                Egg Venture & Lethal Justice JAMMA Pinout
+
+                          Main Jamma Connector
+            Solder Side          |             Parts Side
+------------------------------------------------------------------
+             GND             | A | 1 |             GND
+             GND             | B | 2 |             GND
+             +5              | C | 3 |             +5
+             +5              | D | 4 |             +5
+             -5              | E | 5 |             -5
+             +12             | F | 6 |             +12
+------------ KEY ------------| H | 7 |------------ KEY -----------
+                             | J | 8 |      Coin Counter # 1
+                             | K | 9 |
+        L Speaker (-)        | L | 10|        L Speaker (+)
+        R Speaker (-)        | M | 11|        R Speaker (+)
+        Video Green          | N | 12|        Video Red
+        Video Sync           | P | 13|        Video Blue
+       Service Switch        | R | 14|        Video GND
+                             | S | 15|
+        Coin Switch 2        | T | 16|         Coin Switch 1
+       Start Player 2        | U | 17|        Start Player 1 
+                             | V | 18|
+                             | W | 19|
+                             | X | 20|
+                             | Y | 21|
+                             | Z | 22|
+                             | a | 23|
+                             | b | 24|
+                             | c | 25|
+                             | d | 26|
+             GND             | e | 27|             GND
+             GND             | f | 28|             GND
+
+
+ Gun Connector Pinout
+
+   1| +5 Volts
+   2| Gun OPTO Player 1
+   3| Gun OPTO Player 2
+   4| NOT USED
+   5| Gun Trigger Player 1
+   6| NOT USED
+   7| Gun Trigger Player 2
+   8| KEY
+   9| Ground
+
++5v and GND are wired to both player 1 & 2
+
+
+The Egg Venture/Lethal Justice PCB does NOT supply an amplified
+sound signal.  An external sound AMP is required
+
+Addition information for Sound & AMP hookup:
+
+                 Power AMP                 /|
+           +-------------------+          / |
+           |                   |   -------| | Right Speaker
+          [| Volume/Gain       |   |  ----| |
+           |                 R+|]--|  |   \ |
+          [| BASS            R-|]-----|    \|
+           |                   |
+          [| Treble          L+|]-----|    /|
+           |                 L-|]--|  |   / |
+           |                   |   |  ----| | Left Speaker
+Pin #L (-) |                   |   -------| |
+ --------->|\                  |          \ |
+Pin #10(+) | | L I             |           \|
+ --------->|/    N             |
+           |     P             |
+Pin #M (-) |     U             |
+ --------->|\    T             |
+Pin #11(+) | | R               |
+ --------->|/               RMT|]--|           +12 Volts
+           |                +12|]--+----------- To Power Source
+           |                GND|]--------------
+           +-------------------+               Ground
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -67,11 +145,11 @@ Note 2: Some PCBs use a TMS34010FNL-40 instead of the TMS34010FNL-50
 #include "sound/okim6295.h"
 
 
-#define MASTER_CLOCK		XTAL_40MHz
-#define SOUND_CLOCK			XTAL_2MHz
+#define MASTER_CLOCK            XTAL_40MHz
+#define SOUND_CLOCK             XTAL_2MHz
 
-#define VIDEO_CLOCK			XTAL_11_289MHz
-#define VIDEO_CLOCK_LETHALJ	XTAL_11_0592MHz
+#define VIDEO_CLOCK             XTAL_11_289MHz
+#define VIDEO_CLOCK_LETHALJ     XTAL_11_0592MHz
 
 
 
@@ -174,12 +252,12 @@ static INPUT_PORTS_START( lethalj )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x00c0, 0x0000, DEF_STR( Coinage ))
-	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(      0x00c0, DEF_STR( Free_Play ))
-	PORT_DIPNAME( 0x0300, 0x0100, DEF_STR( Lives ))
+	PORT_DIPNAME( 0x00c0, 0x0000, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x00c0, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0300, 0x0100, DEF_STR( Lives ) )
 	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x0100, "3" )
 	PORT_DIPSETTING(      0x0200, "4" )
@@ -229,15 +307,15 @@ static INPUT_PORTS_START( eggventr )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x0070, 0x0000, DEF_STR( Coinage ))
-	PORT_DIPSETTING(      0x0040, DEF_STR( 8C_1C ))
-	PORT_DIPSETTING(      0x0030, DEF_STR( 4C_1C ))
-	PORT_DIPSETTING(      0x0020, DEF_STR( 3C_1C ))
-	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(      0x0050, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(      0x0070, DEF_STR( Free_Play ))
+	PORT_DIPNAME( 0x0070, 0x0000, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(      0x0030, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0050, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0070, DEF_STR( Free_Play ) )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) // Verified Correct
 	PORT_DIPSETTING(      0x0000, "3" )
@@ -283,15 +361,15 @@ static INPUT_PORTS_START( eggvntdx )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_DIPNAME( 0x0070, 0x0000, DEF_STR( Coinage ))
-	PORT_DIPSETTING(      0x0040, DEF_STR( 8C_1C ))
-	PORT_DIPSETTING(      0x0030, DEF_STR( 4C_1C ))
-	PORT_DIPSETTING(      0x0020, DEF_STR( 3C_1C ))
-	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(      0x0050, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(      0x0070, DEF_STR( Free_Play ))
+	PORT_DIPNAME( 0x0070, 0x0000, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(      0x0030, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0050, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0060, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0070, DEF_STR( Free_Play ) )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) // Verified Correct
 	PORT_DIPSETTING(      0x0000, "3" )
@@ -346,11 +424,11 @@ static INPUT_PORTS_START( ripribit )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00c0, 0x0000, DEF_STR( Coinage ))
-	PORT_DIPSETTING(      0x0080, DEF_STR( 3C_1C ))
-	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_2C ))
+	PORT_DIPNAME( 0x00c0, 0x0000, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x0700, 0x0200, "Starting Jackpot" )
 	PORT_DIPSETTING(      0x0000, "0" )
 	PORT_DIPSETTING(      0x0100, "5" )
@@ -383,40 +461,40 @@ static INPUT_PORTS_START( cfarm )
 	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00c0, 0x0000, DEF_STR( Coinage ))
-	PORT_DIPSETTING(      0x0080, DEF_STR( 3C_1C ))
-	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_2C ))
-    PORT_DIPNAME( 0x0700, 0x0300, "Starting Jackpot" )
-    PORT_DIPSETTING(      0x0000, "0" )
-    PORT_DIPSETTING(      0x0100, "5" )
-    PORT_DIPSETTING(      0x0200, "8" )
-    PORT_DIPSETTING(      0x0300, "10" )
-    PORT_DIPSETTING(      0x0400, "12" )
-    PORT_DIPSETTING(      0x0500, "15" )
-    PORT_DIPSETTING(      0x0600, "18" )
-    PORT_DIPSETTING(      0x0700, "20" )
-    PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0000, "0" )
-    PORT_DIPSETTING(      0x0800, "1" )
-    PORT_DIPSETTING(      0x1000, "2" )
-    PORT_DIPSETTING(      0x1800, "3" )
-    PORT_DIPNAME( 0xe000, 0x8000, "Eggs per Ticket" )
-    PORT_DIPSETTING(      0xe000, "1" )
-    PORT_DIPSETTING(      0xc000, "2" )
-    PORT_DIPSETTING(      0xa000, "3" )
-    PORT_DIPSETTING(      0x8000, "4" )
-    PORT_DIPSETTING(      0x6000, "5" )
-    PORT_DIPSETTING(      0x4000, "6" )
-    PORT_DIPSETTING(      0x2000, "8" )
-    PORT_DIPSETTING(      0x0000, "10" )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00c0, 0x0000, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x0700, 0x0300, "Starting Jackpot" )
+	PORT_DIPSETTING(      0x0000, "0" )
+	PORT_DIPSETTING(      0x0100, "5" )
+	PORT_DIPSETTING(      0x0200, "8" )
+	PORT_DIPSETTING(      0x0300, "10" )
+	PORT_DIPSETTING(      0x0400, "12" )
+	PORT_DIPSETTING(      0x0500, "15" )
+	PORT_DIPSETTING(      0x0600, "18" )
+	PORT_DIPSETTING(      0x0700, "20" )
+	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, "0" )
+	PORT_DIPSETTING(      0x0800, "1" )
+	PORT_DIPSETTING(      0x1000, "2" )
+	PORT_DIPSETTING(      0x1800, "3" )
+	PORT_DIPNAME( 0xe000, 0x8000, "Eggs per Ticket" )
+	PORT_DIPSETTING(      0xe000, "1" )
+	PORT_DIPSETTING(      0xc000, "2" )
+	PORT_DIPSETTING(      0xa000, "3" )
+	PORT_DIPSETTING(      0x8000, "4" )
+	PORT_DIPSETTING(      0x6000, "5" )
+	PORT_DIPSETTING(      0x4000, "6" )
+	PORT_DIPSETTING(      0x2000, "8" )
+	PORT_DIPSETTING(      0x0000, "10" )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(ticket_status, NULL)
@@ -434,40 +512,39 @@ static INPUT_PORTS_START( cclownz )
 	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_HIGH )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-    PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-    PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x00c0, 0x0000, DEF_STR( Coinage ))
-	PORT_DIPSETTING(      0x0080, DEF_STR( 3C_1C ))
-	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ))
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ))
-	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_2C ))
-    PORT_DIPNAME( 0x0700, 0x0700, "Starting Jackpot" )
-    PORT_DIPSETTING(      0x0000, "0" )
-    PORT_DIPSETTING(      0x0100, "2" )
-    PORT_DIPSETTING(      0x0200, "5" )
-    PORT_DIPSETTING(      0x0300, "8" )
-    PORT_DIPSETTING(      0x0400, "10" )
-    PORT_DIPSETTING(      0x0500, "15" )
-    PORT_DIPSETTING(      0x0600, "20" )
-    PORT_DIPSETTING(      0x0700, "30" )
-    PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x0000, "0" )
-    PORT_DIPSETTING(      0x0800, "1" )
-    PORT_DIPSETTING(      0x1000, "2" )
-    PORT_DIPSETTING(      0x1800, "3" )
-    PORT_DIPNAME( 0xe000, 0x8000, "Points per Ticket" )
-    PORT_DIPSETTING(      0xe000, "700" )
-    PORT_DIPSETTING(      0xc000, "900" )
-    PORT_DIPSETTING(      0xa000, "1200" )
-    PORT_DIPSETTING(      0x8000, "1500" )
-    PORT_DIPSETTING(      0x6000, "1800" )
-    PORT_DIPSETTING(      0x4000, "2100" )
-    PORT_DIPSETTING(      0x2000, "2400" )
-    PORT_DIPSETTING(      0x0000, "3000" )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x00c0, 0x0000, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x0700, 0x0700, "Starting Jackpot" )
+	PORT_DIPSETTING(      0x0000, "0" )
+	PORT_DIPSETTING(      0x0100, "2" )
+	PORT_DIPSETTING(      0x0200, "5" )
+	PORT_DIPSETTING(      0x0300, "8" )
+	PORT_DIPSETTING(      0x0400, "10" )
+	PORT_DIPSETTING(      0x0500, "15" )
+	PORT_DIPSETTING(      0x0600, "20" )
+	PORT_DIPSETTING(      0x0700, "30" )
+	PORT_DIPNAME( 0x1800, 0x1800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0000, "0" )
+	PORT_DIPSETTING(      0x0800, "1" )
+	PORT_DIPSETTING(      0x1800, "3" )
+	PORT_DIPNAME( 0xe000, 0x8000, "Points per Ticket" )
+	PORT_DIPSETTING(      0xe000, "700" )
+	PORT_DIPSETTING(      0xc000, "900" )
+	PORT_DIPSETTING(      0xa000, "1200" )
+	PORT_DIPSETTING(      0x8000, "1500" )
+	PORT_DIPSETTING(      0x6000, "1800" )
+	PORT_DIPSETTING(      0x4000, "2100" )
+	PORT_DIPSETTING(      0x2000, "2400" )
+	PORT_DIPSETTING(      0x0000, "3000" )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0f0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(cclownz_paddle, NULL)
@@ -590,7 +667,7 @@ ROM_START( lethalj )
 	ROM_LOAD( "sound1.u20", 0x00000, 0x40000, CRC(7d93ca66) SHA1(9e1dc0efa5d0f770c7e1f10de56fbf5620dea437) )
 
 	ROM_REGION( 0x40000, "oki2", 0 )				/* sound data */
-	ROM_LOAD( "sound1.u21",    0x00000, 0x40000, CRC(7d3beae0) SHA1(5ec753c5fd5ca0f9492c9e274703a1aa758062a7) )
+	ROM_LOAD( "sound1.u21", 0x00000, 0x40000, CRC(7d3beae0) SHA1(5ec753c5fd5ca0f9492c9e274703a1aa758062a7) )
 
 	ROM_REGION( 0x40000, "oki3", 0 )				/* sound data */
 	ROM_LOAD( "sound1.u18", 0x00000, 0x40000, CRC(7d93ca66) SHA1(9e1dc0efa5d0f770c7e1f10de56fbf5620dea437) )
