@@ -48,15 +48,6 @@ WRITE8_HANDLER( mnchmobl_flipscreen_w )
 }
 
 
-READ8_HANDLER( mnchmobl_sprite_xpos_r ){ return mnchmobl_sprite_xpos[offset]; }
-WRITE8_HANDLER( mnchmobl_sprite_xpos_w ){ mnchmobl_sprite_xpos[offset] = data; }
-
-READ8_HANDLER( mnchmobl_sprite_attr_r ){ return mnchmobl_sprite_attr[offset]; }
-WRITE8_HANDLER( mnchmobl_sprite_attr_w ){ mnchmobl_sprite_attr[offset] = data; }
-
-READ8_HANDLER( mnchmobl_sprite_tile_r ){ return mnchmobl_sprite_tile[offset]; }
-WRITE8_HANDLER( mnchmobl_sprite_tile_w ){ mnchmobl_sprite_tile[offset] = data; }
-
 VIDEO_START( mnchmobl )
 {
 	tmpbitmap = auto_bitmap_alloc(512,512,video_screen_get_format(machine->primary_screen));
