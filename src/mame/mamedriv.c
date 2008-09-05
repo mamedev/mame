@@ -4076,9 +4076,15 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( dybbnao )
 
 	DRIVER( naomigd )
+
+	DRIVER( gundmgd )
 	DRIVER( sfz3ugd )
+	DRIVER( cvsgd )
+	DRIVER( gundmxgd )
 	DRIVER( cvs2gd )
 	DRIVER( ikaruga )
+	DRIVER( ggxx )
+	DRIVER( chocomk )
 	DRIVER( meltybld )
 	DRIVER( senko )
 	DRIVER( ss2005 )

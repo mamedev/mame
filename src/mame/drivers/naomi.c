@@ -1195,7 +1195,7 @@ Region byte encoding is as follows:
 #define AW_BIOS \
 	ROM_SYSTEM_BIOS( 0, "bios0", "Atomiswave BIOS" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios.ic23_l",                         0x000000, 0x010000, BAD_DUMP CRC(e5693ce3) SHA1(1bde3ed87af64b0f675ebd47f12a53e1fc5709c1) ) /* Might be bad.. especially. bytes 0x0000, 0x6000, 0x8000 which gave different reads */ \
-	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios.ic23_h-dolhpin_blue_settings",   0x010000, 0x010000, BAD_DUMP CRC(5d5687c7) SHA1(2600ce09c44872d1793f6b55bf44342673da5ad1) ) /* it appears to flash settings game data here */ /* this is one flashrom, however the second half looks like it's used for game settings, may differ between dumps, and may not be needed / could be blanked */
+	ROM_LOAD16_WORD_SWAP_BIOS( 0, "bios.ic23_h-dolphin_blue_settings",   0x010000, 0x010000, BAD_DUMP CRC(5d5687c7) SHA1(2600ce09c44872d1793f6b55bf44342673da5ad1) ) /* it appears to flash settings game data here */ /* this is one flashrom, however the second half looks like it's used for game settings, may differ between dumps, and may not be needed / could be blanked */
 
 
 ROM_START( naomi )
@@ -2861,6 +2861,24 @@ GAME( 2001, naomigd,   0,        naomi,    naomi,    0,       ROT0, "Sega",     
 
 
 
+
+ROM_START( gundmgd )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0xa000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD_OPTIONAL("gdmgd_sl.bin", 0x0000000,  0xa000000, CRC(d07ee020) SHA1(751033d48e021908958757125cf3b96a89d0e765) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0001", 0, SHA1(f525111e2762e5895fd0016a9bd41210c1125499) MD5(dcba598e76646a5a6b6e6da70552a7c5) )
+
+	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
+ROM_END
+
+DRIVER_INIT( gundmgd )
+{
+	naomi_game_decrypt( 0x469E978626263E5EULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
+}
+
 ROM_START( sfz3ugd )
 	NAOMIGD_BIOS
 
@@ -2879,6 +2897,41 @@ DRIVER_INIT( sfz3ugd )
 {
 	naomi_game_decrypt( 0x4FF16D1A9E0BFBCDULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
 }
+
+ROM_START( cvsgd )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x7800000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD_OPTIONAL("snkgd_sl.bin", 0x0000000, 0x7800000, CRC(83ec3894) SHA1(d07271d964bf6421ea9f13e10ecec57c6e995b2e) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0004", 0,  SHA1(8f8651527463aa01d40c280c0d9b03b7a0650a32) MD5(2d17eaf881c06bd95847e54878bc2ba9) )
+
+	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
+ROM_END
+
+DRIVER_INIT( cvsgd )
+{
+	naomi_game_decrypt( 0xB0D33EFD58A8E0D0ULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
+}
+
+ROM_START( gundmxgd )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0xc800000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD_OPTIONAL("gdmgd_sl.bin", 0x0000000, 0xc800000, CRC(322e503c) SHA1(10a0e3e079d9724e6bc2d4916a4f64384d00d202) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0006", 0, SHA1(b95bc07e61e57a62e276ba7fef0ae9a5c19667d9) MD5(90b1980605e7f53b38292ae32d547c8b) )
+
+	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
+ROM_END
+
+DRIVER_INIT( gundmxgd )
+{
+	naomi_game_decrypt( 0xC2B5627649DCC27CULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
+}
+
 
 ROM_START( cvs2gd )
 	NAOMIGD_BIOS
@@ -2917,6 +2970,41 @@ DRIVER_INIT( ikaruga )
 {
 	naomi_game_decrypt( 0x6B7ADA6134C8F140ULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
 }
+
+ROM_START( ggxx )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0xf000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("ggx2.bin", 0x0000000, 0xf000000, CRC(666676ee) SHA1(24302e6f10e0d4d41f432cabf9d2743c0aa8fa7c) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0011", 0, SHA1(c08a19acb5641d2fd14b54cc149459c345dae013) MD5(25ab6d42bf07dd26e7033cf201322d9c) )
+
+	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
+ROM_END
+
+DRIVER_INIT( ggxx )
+{
+	naomi_game_decrypt( 0x1C0138385B312CE3ULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
+}
+
+ROM_START( chocomk )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0x3f1f000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("typ.bin", 0x0000000, 0x3f1f000,  CRC(d3976ae9) SHA1(764675d0b612b856dab95caa3000b31206439db4) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0014a", 0, SHA1(ee71e76f136b1a25855233a614d5c60a6a3e587d) MD5(1e5a028b0ae5cf3c5602cdc657fa2bc4) )
+
+	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
+ROM_END
+
+DRIVER_INIT( chocomk )
+{
+	naomi_game_decrypt( 0x945B898F983EBC10ULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
+}
+
 
 ROM_START( meltybld )
 	NAOMIGD_BIOS
@@ -3105,10 +3193,20 @@ DRIVER_INIT( vathlete )
 
 
 
+
+
 // GDL-xxxx (licensed games?)
+GAME( 200?, gundmgd,   naomigd,  naomi,    naomi,    gundmgd,  ROT0,   "unknown",         "Mobile Suit Gundam: Federation VS Zeon (GDL-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 200?, sfz3ugd,   naomigd,  naomi,    naomi,    sfz3ugd,  ROT0,   "Capcom",         "Street Fighter Zero 3 Upper (GDL-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, cvs2gd,    naomigd,  naomi,    naomi,    cvs2gd,   ROT0,   "Capcom",         "Capcom Vs. SNK 2 (GDL-0007A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, cvsgd,     naomigd,  naomi,    naomi,    cvsgd,    ROT0,   "Capcom",         "Capcom vs SNK Millenium Fight 2000 Pro (GDL-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, gundmxgd,  naomigd,  naomi,    naomi,    gundmxgd, ROT0,   "unknown",         "Mobile Suit Gundam: Federation VS Zeon DX  (GDL-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, cvs2gd,    naomigd,  naomi,    naomi,    cvs2gd,   ROT0,   "Capcom",         "Capcom vs SNK 2 Millionaire Fighting 2001 (GDL-0007A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2001, ikaruga,   naomigd,  naomi,    naomi,    ikaruga,  ROT270, "Treasure",       "Ikaruga (GDL-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, ggxx,      naomigd,  naomi,    naomi,    ggxx,     ROT0,   "unknown",       "Guilty Gear XX (GDL-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, chocomk,   naomigd,  naomi,    naomi,    chocomk,  ROT0,   "unknown",       "Musapey's Choco Marker (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+//GAME( 200?, quizqgd,   naomigd,  naomi,    naomi,    quizqgd,  ROT0, "unknown",       "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
+//GAME( 200?, ggxxrl,    naomigd,  naomi,    naomi,    ggxxrl,  ROT0, "unknown",       "Guilty Gear XX #Reload (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+//GAME( 200?, shikgam2,  naomigd,  naomi,    naomi,    shikgam2,  ROT0, "unknown",       "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2004, meltybld,  naomigd,  naomi,    naomi,    meltybld, ROT0,   "Ecole",          "Melty Blood Act Cadenza (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 200?, senko,     naomigd,  naomi,    naomi,    senko,    ROT0,   "unknown",        "Senko No Ronde (GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ss2005,    naomigd,  naomi,    naomi,    ss2005,   ROT0,   "unknown",        "Super Shanghai 2005 (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
