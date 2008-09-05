@@ -1,122 +1,95 @@
 #include "driver.h"
 
-static UINT8 bg_color,  old_bg_color;
-#define mainsnk_offset 8
-static tilemap *me_fg_tilemap;
-static tilemap *me_bg_tilemap;
+static tilemap *tx_tilemap;
+static tilemap *bg_tilemap;
 UINT8 *mainsnk_fgram;
 UINT8 *mainsnk_bgram;
-static int me_gfx_ctrl;
 
-WRITE8_HANDLER(mainsnk_c600_w)
+
+
+static TILEMAP_MAPPER( marvins_tx_scan_cols )
 {
-	bg_color = data&0xf;
-	me_gfx_ctrl=data;
-	tilemap_mark_all_tiles_dirty (me_bg_tilemap);
-	mame_printf_debug("canvas %04x\n",data&=0xf0);
+	// tilemap is 36x28, the central part is from the first RAM page and the
+	// extra 4 columns are from the second page
+	col -= 2;
+	if (col & 0x20)
+		return 0x400 + row + ((col & 0x1f) << 5);
+	else
+		return row + (col << 5);
 }
 
-static TILE_GET_INFO( get_me_fg_tile_info )
+static TILE_GET_INFO( get_tx_tile_info )
 {
-	int code = (mainsnk_fgram[tile_index]);
-
-	SET_TILE_INFO(
-			0,
+	int code = mainsnk_fgram[tile_index];
+	SET_TILE_INFO(0,
 			code,
-			0x10,
-			0);
+			0,
+			tile_index & 0x400 ? TILE_FORCE_LAYER0 : 0);
 }
 
-static void stuff_palette( running_machine *machine, int source_index, int dest_index, int num_colors )
-{
-
-
-
-	UINT8 *color_prom = memory_region(machine, "proms") + source_index;
-	int i;
-	for( i=0; i<num_colors; i++ )
-	{
-		int bit0=0,bit1,bit2,bit3;
-		int red, green, blue;
-
-		bit0 = (color_prom[0x1000] >> 2) & 0x01; // ?
-		bit1 = (color_prom[0x000] >> 1) & 0x01;
-		bit2 = (color_prom[0x000] >> 2) & 0x01;
-		bit3 = (color_prom[0x000] >> 3) & 0x01;
-		red = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		bit0 = (color_prom[0x1000] >> 1) & 0x01; // ?
-		bit1 = (color_prom[0x800] >> 2) & 0x01;
-		bit2 = (color_prom[0x800] >> 3) & 0x01;
-		bit3 = (color_prom[0x000] >> 0) & 0x01;
-		green = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		bit0 = (color_prom[0x1000] >> 0) & 0x01; // ?
-		bit1 = (color_prom[0x1000] >> 3) & 0x01; // ?
-		bit2 = (color_prom[0x800] >> 0) & 0x01;
-		bit3 = (color_prom[0x800] >> 1) & 0x01;
-		blue = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
-
-		palette_set_color( machine, dest_index++, MAKE_RGB(red, green, blue) );
-		color_prom++;
-	}
-
-}
-
-static void update_palette( running_machine *machine, int type )
-{
-	if( bg_color!=old_bg_color )
-	{
-		stuff_palette( machine, 256+16*(bg_color&0x7), (0x11-type)*16, 16 );
-		old_bg_color = bg_color;
-	}
-}
-
-
-WRITE8_HANDLER( mainsnk_fgram_w )
-{
-	mainsnk_fgram[offset] = data;
-	tilemap_mark_tile_dirty(me_fg_tilemap,offset);
-}
-
-
-static TILE_GET_INFO( get_me_bg_tile_info )
+static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = (mainsnk_bgram[tile_index]);
 
 	SET_TILE_INFO(
 			0,
-			code  + ((me_gfx_ctrl<<4)&0x700),
-			0x10,
+			code,
+			0,
 			0);
-}
-
-
-WRITE8_HANDLER( mainsnk_bgram_w )
-{
-	mainsnk_bgram[offset] = data;
-	tilemap_mark_tile_dirty(me_bg_tilemap,offset);
 }
 
 
 VIDEO_START(mainsnk)
 {
-	old_bg_color = -1;
-	stuff_palette( machine, 0, 0, 16*8 );
-	stuff_palette( machine, 16*8*3, 16*8, 16*8 );
-	me_fg_tilemap = tilemap_create(get_me_fg_tile_info,tilemap_scan_cols,8,8,32, 32);
-	tilemap_set_transparent_pen(me_fg_tilemap,15);
-	me_bg_tilemap = tilemap_create(get_me_bg_tile_info,tilemap_scan_cols,8,8,32, 32);
-	tilemap_set_scrollx( me_fg_tilemap, 0, -mainsnk_offset );
-	tilemap_set_scrollx( me_bg_tilemap, 0, -mainsnk_offset );
+	tx_tilemap = tilemap_create(get_tx_tile_info, marvins_tx_scan_cols, 8, 8, 36, 28);
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,    8, 8, 32, 32);
+
+	tilemap_set_transparent_pen(tx_tilemap,15);
+	tilemap_set_scrolldy(tx_tilemap, 8, 8);
+
+	tilemap_set_scrolldx(bg_tilemap, 16, 16);
+	tilemap_set_scrolldy(bg_tilemap,  8,  8);
 }
+
+
+WRITE8_HANDLER(mainsnk_c600_w)
+{
+	int bank;
+
+	flip_screen_set(~data & 0x80);
+
+	tilemap_set_palette_offset(bg_tilemap, (data & 0x07) << 4);
+	tilemap_set_palette_offset(tx_tilemap, (data & 0x07) << 4);
+
+	bank = 0;
+	if (machine->gfx[0]->total_elements == 0x400)	// mainsnk
+		bank = ((data & 0x30) >> 4);
+	else if (machine->gfx[0]->total_elements == 0x800)	// canvas
+		bank = ((data & 0x40) >> 6) | ((data & 0x30) >> 3);
+
+	tilemap_set_pen_data_offset(bg_tilemap, (bank << 8) * machine->gfx[0]->char_modulo);
+}
+
+WRITE8_HANDLER( mainsnk_fgram_w )
+{
+	mainsnk_fgram[offset] = data;
+	tilemap_mark_tile_dirty(tx_tilemap,offset);
+}
+
+WRITE8_HANDLER( mainsnk_bgram_w )
+{
+	mainsnk_bgram[offset] = data;
+	tilemap_mark_tile_dirty(bg_tilemap,offset);
+}
+
+
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int scrollx, int scrolly )
 {
 	const gfx_element *gfx = machine->gfx[1];
 	const UINT8 *source, *finish;
 	source =  spriteram;
-	finish =  source + 0x64;
+	finish =  source + 25*4;
 
 	while( source<finish )
 	{
@@ -125,15 +98,28 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		int sy = source[0];
 		int sx = source[2];
 		int color = attributes&0xf;
+		int flipx = 0;
+		int flipy = 0;
 		if( sy>240 ) sy -= 256;
 
 		tile_number |= attributes<<4 & 0x300;
 
+		sx = 288-16 - sx;
+		sy += 8;
+
+		if (flip_screen_get())
+		{
+			sx = 288-16 - sx;
+			sy = 224-16 - sy;
+			flipx = !flipx;
+			flipy = !flipy;
+		}
+
 		drawgfx( bitmap,gfx,
 			tile_number,
 			color,
-			0,0,
-			256-sx+mainsnk_offset,sy,
+			flipx,flipy,
+			sx,sy,
 			cliprect,TRANSPARENCY_PEN,7);
 
 		source+=4;
@@ -141,65 +127,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 }
 
 
-static void draw_status(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect,int dx,int off )
-{
-	const UINT8 *base = mainsnk_fgram+off;
-	const gfx_element *gfx = machine->gfx[0];
-	int row;
-	for( row=0; row<4; row++ )
-	{
-		int sy,sx = (row&1)*8;
-		const UINT8 *source = base + (row&1)*32;
-		if( row>1 )
-		{
-			sx+=256+16;
-		}
-		else
-		{
-			source+=30*32;
-		}
-
-		for( sy=0; sy<256; sy+=8 )
-		{
-			int tile_number = *source++;
-			drawgfx( bitmap, gfx,
-			    tile_number, tile_number>>5,
-			    0,0,
-			    sx+dx,sy,
-			    cliprect,
-			    TRANSPARENCY_NONE, 0xf );
-		}
-	}
-}
-
 VIDEO_UPDATE(mainsnk)
 {
-	rectangle myclip;
-	myclip.min_x = cliprect->min_x+8;
-	myclip.max_x = cliprect->max_x-8;
-	myclip.min_y = cliprect->min_y;
-	myclip.max_y = cliprect->max_y;
-	tilemap_draw(bitmap,&myclip,me_bg_tilemap,0,0);
-	draw_sprites(screen->machine,bitmap,&myclip, 0,0 );
-	tilemap_draw(bitmap,&myclip,me_fg_tilemap,0,0);
-	draw_status(screen->machine,bitmap,cliprect,0,0x400 );
-	draw_status(screen->machine,bitmap,cliprect,32*8,0x40 );
-	update_palette(screen->machine, 1);
-	return 0;
-}
+	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+	draw_sprites(screen->machine,bitmap,cliprect, 0,0 );
+	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 
-VIDEO_UPDATE(canvas)
-{
-	rectangle myclip;
-	myclip.min_x = cliprect->min_x+8;
-	myclip.max_x = cliprect->max_x-8;
-	myclip.min_y = cliprect->min_y;
-	myclip.max_y = cliprect->max_y;
-	tilemap_draw(bitmap,&myclip,me_bg_tilemap,0,0);
-	draw_sprites(screen->machine,bitmap,&myclip, 0,0 );
-//  tilemap_draw(bitmap,&myclip,me_fg_tilemap,0,0);
-//  draw_status(screen->machine,bitmap,cliprect,0,0x400 );
-//  draw_status(screen->machine,bitmap,cliprect,32*8,0x40 );
-	update_palette(screen->machine, 1);
 	return 0;
 }

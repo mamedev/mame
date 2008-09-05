@@ -5480,8 +5480,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( marvins )	/* A2003      (c) 1983 */
 	DRIVER( madcrash )	/* A2005      (c) 1984 */
 	DRIVER( vangrd2 )	/* A2005      (c) 1984 */
-	DRIVER( mainsnk )	/* fill in */
-	DRIVER( canvas )	/*            (c) 1985 */
+	DRIVER( mainsnk )	/*            (c) 1984 */
+	DRIVER( canvas )	/* A3008      (c) 1985 */
 	DRIVER( jcross )	/* A3006      (c) 1984 */
 	DRIVER( sgladiat )	/* A3006      (c) 1984 */
 	DRIVER( hal21 )		/* A4031      (c) 1985 */
