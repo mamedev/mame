@@ -322,7 +322,8 @@ const game_driver * const drivers[] =
 	DRIVER( jumpcoat )	/* (c) 1983 Taito */
 	DRIVER( boggy84 )	/* bootleg, original is (c)1983 Taito/Kaneko */
 	DRIVER( redrobin )	/* (c) 1986 Elettronolo */
-	DRIVER( imago )		/* (c) 1983 Acom */
+	DRIVER( imago )		/* (c) 1984 Acom */
+	DRIVER( imagoa )	/* (c) 1983 Acom */
 	DRIVER( scorpion )	/* (c) 1982 Zaccaria */
 	DRIVER( scrpiona )	/* (c) 1982 Zaccaria */
 	DRIVER( scrpionb )	/* (c) 1982 Zaccaria */

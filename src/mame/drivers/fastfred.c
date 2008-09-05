@@ -179,8 +179,8 @@ static ADDRESS_MAP_START( imago_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf003, 0xf003) AM_WRITE(fastfred_colorbank2_w)
 	AM_RANGE(0xf004, 0xf004) AM_WRITE(SMH_NOP) // initialized with 0 then when written always 1
 	AM_RANGE(0xf005, 0xf005) AM_WRITE(imago_charbank_w)
-	AM_RANGE(0xf006, 0xf006) AM_WRITE(fastfred_flip_screen_x_w) // always 0
-	AM_RANGE(0xf007, 0xf007) AM_WRITE(fastfred_flip_screen_y_w) // always 0
+	AM_RANGE(0xf006, 0xf006) AM_WRITE(fastfred_flip_screen_x_w)
+	AM_RANGE(0xf007, 0xf007) AM_WRITE(fastfred_flip_screen_y_w)
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(SMH_NOP, soundlatch_w)
 ADDRESS_MAP_END
 
@@ -422,6 +422,42 @@ static INPUT_PORTS_START( imago )
 
 	PORT_MODIFY("BUTTONS")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x38, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x38, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x28, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( imagoa )
+	PORT_INCLUDE( common )
+
+	PORT_MODIFY("BUTTONS")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -784,6 +820,43 @@ ROM_START( imago )
 	ROM_LOAD( "imago11.82", 0x0000, 0x1000, CRC(3cce69b4) SHA1(e7d52e388e09e86abb597493f5807ee088cf7a40) )
 	ROM_CONTINUE(	        0x2000, 0x1000 )
 	ROM_LOAD( "imago12.83", 0x3000, 0x2000, CRC(8dff98c0) SHA1(e7311d9ca4544f1263e894e6d93ca52c87fc83bf) )
+	ROM_LOAD( "13.bin",     0x5000, 0x2000, CRC(ae684602) SHA1(d187abbe62ee58a8190d9f428ded0feeb9484abd) )
+
+	ROM_REGION( 0x10000, "audio", 0 )
+	ROM_LOAD( "imago08.60", 0x0000, 0x1000, CRC(4f77c2c9) SHA1(1e046786fbad7fb8c7c462b7bd5d80152c6b8779) )
+
+	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "1.bin",      0x0000, 0x1000, CRC(f80a0b69) SHA1(2b85179942586316eb61614d8697588aa9d26f9a) )
+	ROM_LOAD( "imago02.40", 0x1000, 0x1000, CRC(71354480) SHA1(f5f5e1cc336cae1778b7f6c744eb1bdc4226f138) )
+	ROM_LOAD( "3.bin",      0x2000, 0x1000, CRC(722fd625) SHA1(6f9a9f4f000cc0b251ca8d496a2ea4a708665dda) )
+
+	ROM_REGION( 0x6000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "imago04.51", 0x0000, 0x1000, CRC(ed987b3e) SHA1(2f88a0463b4323adb27467fb3d022144a4943793) )
+	ROM_LOAD( "imago05.52", 0x1000, 0x1000, CRC(77ee68ce) SHA1(a47af1bec81977d0f47463bd88e9f526fd2d6611) )
+	ROM_LOAD( "imago07.56", 0x2000, 0x1000, CRC(48b35190) SHA1(3a000264aad03f55fe67eed7c868acf87e804c0f) )
+	ROM_LOAD( "imago06.55", 0x3000, 0x1000, CRC(136990fc) SHA1(f3ecba92db25fbeb7df83c26667b7447c2d03b58) )
+	ROM_LOAD( "imago09.64", 0x4000, 0x1000, CRC(9efb806d) SHA1(504cc27cf071873714ec61835d9da676884fe1c8) )
+	ROM_LOAD( "imago10.65", 0x5000, 0x1000, CRC(801a18d3) SHA1(f798978a47124f50be25ab4e5c6a4974d9003634) )
+
+	ROM_REGION( 0x3000, "gfx3", ROMREGION_DISPOSE )
+	ROM_LOAD( "imago14.170", 0x0000, 0x1000, CRC(eded37f6) SHA1(c2ff5d4c1b001740ec4453467f879035db196a9b) )
+	ROM_FILL(                0x1000, 0x2000, 0 )
+
+	ROM_REGION( 0x1000, "gfx4", ROMREGION_DISPOSE )
+	ROM_LOAD( "imago15.191", 0x0000, 0x1000, CRC(85fcc195) SHA1(a76f24201c037d1e6f909fb0ea4ad59b1d6ddd57) )		
+
+	ROM_REGION( 0x0300, "proms", 0 )
+	ROM_LOAD( "imago.96", 0x0000, 0x0100, CRC(5ba81edc) SHA1(b64ebbe054052583688cdf0f064794436c095e7e) )
+	ROM_LOAD( "imago.95", 0x0100, 0x0100, CRC(e2b7aa09) SHA1(f8edfccdd698793d9a9f423953a582b0f7b9b697) )
+	ROM_LOAD( "imago.97", 0x0200, 0x0100, CRC(e28a7f00) SHA1(05b4882c5ea5da332735866d858872bc5eeaca24) )
+ROM_END
+
+/* this set has patched out the code to enable the cocktail mode for 2nd player at $5b24 */
+ROM_START( imagoa )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "imago11.82", 0x0000, 0x1000, CRC(3cce69b4) SHA1(e7d52e388e09e86abb597493f5807ee088cf7a40) )
+	ROM_CONTINUE(	        0x2000, 0x1000 )
+	ROM_LOAD( "imago12.83", 0x3000, 0x2000, CRC(8dff98c0) SHA1(e7311d9ca4544f1263e894e6d93ca52c87fc83bf) )
 	ROM_LOAD( "imago13.84", 0x5000, 0x2000, CRC(f0f14b4d) SHA1(92b82080575a9c95df926c404c19875ac66c2b00) )
 
 	ROM_REGION( 0x10000, "audio", 0 )
@@ -814,6 +887,7 @@ ROM_START( imago )
 	ROM_LOAD( "imago.95", 0x0100, 0x0100, CRC(e2b7aa09) SHA1(f8edfccdd698793d9a9f423953a582b0f7b9b697) )
 	ROM_LOAD( "imago.97", 0x0200, 0x0100, CRC(e28a7f00) SHA1(05b4882c5ea5da332735866d858872bc5eeaca24) )
 ROM_END
+
 
 static DRIVER_INIT( flyboy )
 {
@@ -857,4 +931,5 @@ GAME( 1983, jumpcoas, 0,        jumpcoas, jumpcoas, jumpcoas, ROT90, "Kaneko", "
 GAME( 1983, jumpcoat, jumpcoas, jumpcoas, jumpcoas, jumpcoas, ROT90, "Taito", "Jump Coaster (Taito)", 0 )
 GAME( 1983, boggy84,  0,        jumpcoas, boggy84,  boggy84,  ROT90, "bootleg", "Boggy '84", 0 )
 GAME( 1986, redrobin, 0,        fastfred, redrobin, flyboyb,  ROT90, "Elettronolo", "Red Robin", 0 )
-GAME( 1983, imago,	  0,	    imago,    imago,    imago,    ROT90, "Acom", "Imago", GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, imago,	  0,		imago,    imago,    imago,    ROT90, "Acom", "Imago (cocktail set)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1983, imagoa,	  imago,	imago,    imagoa,   imago,    ROT90, "Acom", "Imago (no cocktail set)", GAME_IMPERFECT_GRAPHICS )
