@@ -1767,6 +1767,7 @@ const game_driver * const drivers[] =
 	DRIVER( kabukiz )	/* B50 (c) 1988 Taito Corporation Japan (World) */
 	DRIVER( kabukizj )	/* B50 (c) 1988 Taito Corporation (Japan) */
 	DRIVER( tnzs )		/* B53 (c) 1988 Taito Corporation Japan (World) (new logo) */
+	DRIVER( tnzsjn )	/* B53 (c) 1988 Taito Corporation (Japan) (new logo) */
 	DRIVER( tnzsj )		/* B53 (c) 1988 Taito Corporation (Japan) (new logo) */
 	DRIVER( tnzso )		/* B53?(c) 1988 Taito Corporation Japan (World) (old logo) */
 	DRIVER( insectx )	/* B97 (c) 1989 Taito Corporation Japan (World) */

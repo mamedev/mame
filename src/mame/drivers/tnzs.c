@@ -2215,6 +2215,8 @@ Notes:
       All ROMs are 27010 (DIP32)
 */
 
+/* tnzs - new style PCB sets */
+
 ROM_START( tnzs )
 	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b53-24.1",   0x00000, 0x08000, CRC(d66824c6) SHA1(fd381ac0dc52ce670c3fde320ea60a209e288a52) )
@@ -2227,16 +2229,41 @@ ROM_START( tnzs )
 	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the third CPU */
 	ROM_LOAD( "b53-26.34",  0x00000, 0x10000, CRC(cfd5649c) SHA1(4f6afccd535d39b41661dc3ccd17af125bfac015) )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "b53-08.8",	0x00000, 0x20000, CRC(c3519c2a) SHA1(30fe7946fbc95ab6b3ccb6944fb24bf47bf3d743) )	// b53-16
-	ROM_LOAD( "b53-07.7",	0x20000, 0x20000, CRC(2bf199e8) SHA1(4ed73e4f00ae2f5f4028a0ea5ae3cd238863a370) )	// b53-17
-	ROM_LOAD( "b53-06.6",	0x40000, 0x20000, CRC(92f35ed9) SHA1(5fdd8d6ddbb7be9887af3c8dea9ad3b58c4e86f9) )	// b53-18
-	ROM_LOAD( "b53-05.5",	0x60000, 0x20000, CRC(edbb9581) SHA1(539396a01ca0b69455f000d446759b232530b542) )	// b53-19
-	ROM_LOAD( "b53-04.4",	0x80000, 0x20000, CRC(59d2aef6) SHA1(b657b7603c3eb5f169000d38497ebb93f26f7832) )	// b53-22
-	ROM_LOAD( "b53-03.3",	0xa0000, 0x20000, CRC(74acfb9b) SHA1(90b544ed7ede7565660bdd13c94c15c54423cda9) )	// b53-23
-	ROM_LOAD( "b53-02.2",	0xc0000, 0x20000, CRC(095d0dc0) SHA1(ced2937d0594fa00ae344a4e3a3cba23772dc160) )	// b53-20
-	ROM_LOAD( "b53-01.1",	0xe0000, 0x20000, CRC(9800c54d) SHA1(761647177d621ac2cdd8b009876eed35809f3c92) )	// b53-21
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE ) /* the newer PCBs have updated GFX rom labels, content is the same */
+	ROM_LOAD( "b53-16.8",	0x00000, 0x20000, CRC(c3519c2a) SHA1(30fe7946fbc95ab6b3ccb6944fb24bf47bf3d743) )
+	ROM_LOAD( "b53-17.7",	0x20000, 0x20000, CRC(2bf199e8) SHA1(4ed73e4f00ae2f5f4028a0ea5ae3cd238863a370) )
+	ROM_LOAD( "b53-18.6",	0x40000, 0x20000, CRC(92f35ed9) SHA1(5fdd8d6ddbb7be9887af3c8dea9ad3b58c4e86f9) )
+	ROM_LOAD( "b53-19.5",	0x60000, 0x20000, CRC(edbb9581) SHA1(539396a01ca0b69455f000d446759b232530b542) )
+	ROM_LOAD( "b53-22.4",	0x80000, 0x20000, CRC(59d2aef6) SHA1(b657b7603c3eb5f169000d38497ebb93f26f7832) )
+	ROM_LOAD( "b53-23.3",	0xa0000, 0x20000, CRC(74acfb9b) SHA1(90b544ed7ede7565660bdd13c94c15c54423cda9) )
+	ROM_LOAD( "b53-20.2",	0xc0000, 0x20000, CRC(095d0dc0) SHA1(ced2937d0594fa00ae344a4e3a3cba23772dc160) )
+	ROM_LOAD( "b53-21.1",	0xe0000, 0x20000, CRC(9800c54d) SHA1(761647177d621ac2cdd8b009876eed35809f3c92) )
 ROM_END
+
+ROM_START( tnzsjn )
+	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
+	ROM_LOAD( "b53-24.1",   0x00000, 0x08000, CRC(d66824c6) SHA1(fd381ac0dc52ce670c3fde320ea60a209e288a52) )
+	ROM_CONTINUE(           0x18000, 0x18000 )		/* banked at 8000-bfff */
+
+	ROM_REGION( 0x18000, "sub", 0 )	/* 64k for the second CPU */
+	ROM_LOAD( "b53-27.u3",   0x00000, 0x08000, CRC(b3415fc3) SHA1(a12b1788509e2ac2b05a083f432eecdce00769f6) )
+	ROM_CONTINUE(           0x10000, 0x08000 )		/* banked at 8000-9fff */
+
+	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for the third CPU */
+	ROM_LOAD( "b53-26.34",  0x00000, 0x10000, CRC(cfd5649c) SHA1(4f6afccd535d39b41661dc3ccd17af125bfac015) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE ) /* the newer PCBs have updated GFX rom labels, content is the same */
+	ROM_LOAD( "b53-16.8",	0x00000, 0x20000, CRC(c3519c2a) SHA1(30fe7946fbc95ab6b3ccb6944fb24bf47bf3d743) )
+	ROM_LOAD( "b53-17.7",	0x20000, 0x20000, CRC(2bf199e8) SHA1(4ed73e4f00ae2f5f4028a0ea5ae3cd238863a370) )
+	ROM_LOAD( "b53-18.6",	0x40000, 0x20000, CRC(92f35ed9) SHA1(5fdd8d6ddbb7be9887af3c8dea9ad3b58c4e86f9) )
+	ROM_LOAD( "b53-19.5",	0x60000, 0x20000, CRC(edbb9581) SHA1(539396a01ca0b69455f000d446759b232530b542) )
+	ROM_LOAD( "b53-22.4",	0x80000, 0x20000, CRC(59d2aef6) SHA1(b657b7603c3eb5f169000d38497ebb93f26f7832) )
+	ROM_LOAD( "b53-23.3",	0xa0000, 0x20000, CRC(74acfb9b) SHA1(90b544ed7ede7565660bdd13c94c15c54423cda9) )
+	ROM_LOAD( "b53-20.2",	0xc0000, 0x20000, CRC(095d0dc0) SHA1(ced2937d0594fa00ae344a4e3a3cba23772dc160) )
+	ROM_LOAD( "b53-21.1",	0xe0000, 0x20000, CRC(9800c54d) SHA1(761647177d621ac2cdd8b009876eed35809f3c92) )
+ROM_END
+
+/* tnzs - old style PCB sets */
 
 ROM_START( tnzsj )
 	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
@@ -2401,9 +2428,10 @@ GAME( 1992, kagekia,  kageki,   kageki,   kageki,   kageki,   ROT90,  "Taito Cor
 GAME( 1988, chukatai, 0,        tnzs,     chukatai, chukatai, ROT0,   "Taito Corporation Japan", "Chuka Taisen (World)", 0 ) /* Possible region hack */
 GAME( 1988, chukatau, chukatai, tnzs,     chukatau, chukatai, ROT0,   "Taito America Corporation", "Chuka Taisen (US)", 0 ) /* Possible region hack */
 GAME( 1988, chukataj, chukatai, tnzs,     chukatau, chukatai, ROT0,   "Taito Corporation", "Chuka Taisen (Japan)", 0 )
-GAME( 1988, tnzs,     0,        tnzsb,    tnzsb,    tnzsb,    ROT0,   "Taito Corporation Japan", "The NewZealand Story (World, newer)", 0 )
-GAME( 1988, tnzsj,    tnzs,     tnzs,     tnzs,     tnzs,     ROT0,   "Taito Corporation", "The NewZealand Story (Japan)", 0 )
-GAME( 1988, tnzso,    tnzs,     tnzs,     tnzs2,    tnzs,     ROT0,   "Taito Corporation Japan", "The NewZealand Story (World, older)", 0 )
+GAME( 1988, tnzs,     0,        tnzsb,    tnzsb,    tnzsb,    ROT0,   "Taito Corporation Japan", "The NewZealand Story (World, newer) (newer PCB)", 0 )
+GAME( 1988, tnzsjn,   tnzs,     tnzsb,    tnzsb,    tnzsb,    ROT0,   "Taito Corporation", "The NewZealand Story (Japan) (newer PCB)", 0 )
+GAME( 1988, tnzsj,    tnzs,     tnzs,     tnzs,     tnzs,     ROT0,   "Taito Corporation", "The NewZealand Story (Japan) (older PCB)", 0 )
+GAME( 1988, tnzso,    tnzs,     tnzs,     tnzs2,    tnzs,     ROT0,   "Taito Corporation Japan", "The NewZealand Story (World, older) (older PCB)", 0 )
 GAME( 1988, kabukiz,  0,        kabukiz,  kabukiz,  kabukiz,  ROT0,   "Taito Corporation Japan", "Kabuki-Z (World)", 0 )
 GAME( 1988, kabukizj, kabukiz,  kabukiz,  kabukiz,  kabukiz,  ROT0,   "Taito Corporation", "Kabuki-Z (Japan)", 0 )
 GAME( 1989, insectx,  0,        insectx,  insectx,  insectx,  ROT0,   "Taito Corporation Japan", "Insector X (World)", 0 )
