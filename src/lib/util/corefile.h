@@ -49,6 +49,9 @@ file_error core_fopen(const char *filename, UINT32 openflags, core_file **file);
 /* open a RAM-based "file" using the given data and length (read-only) */
 file_error core_fopen_ram(const void *data, size_t length, UINT32 openflags, core_file **file);
 
+/* open a RAM-based "file" using the given data and length (read-only), copying the data */
+file_error core_fopen_ram_copy(const void *data, size_t length, UINT32 openflags, core_file **file);
+
 /* close an open file */
 void core_fclose(core_file *file);
 

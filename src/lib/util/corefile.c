@@ -133,11 +133,12 @@ file_error core_fopen(const char *filename, UINT32 openflags, core_file **file)
 
 
 /*-------------------------------------------------
-    core_fopen_ram - open a RAM-based buffer for
-    file-like access and return an error code
+    core_fopen_ram_internal - open a RAM-based buffer
+    for file-like access, possibly copying the data,
+	and return an error code
 -------------------------------------------------*/
 
-file_error core_fopen_ram(const void *data, size_t length, UINT32 openflags, core_file **file)
+static file_error core_fopen_ram_internal(const void *data, size_t length, int copy_buffer, UINT32 openflags, core_file **file)
 {
 	/* can only do this for read access */
 	if ((openflags & OPEN_FLAG_WRITE) != 0)
@@ -146,10 +147,18 @@ file_error core_fopen_ram(const void *data, size_t length, UINT32 openflags, cor
 		return FILERR_INVALID_ACCESS;
 
 	/* allocate the file itself */
-	*file = malloc(sizeof(**file));
+	*file = malloc(sizeof(**file) + (copy_buffer ? length : 0));
 	if (*file == NULL)
 		return FILERR_OUT_OF_MEMORY;
 	memset(*file, 0, sizeof(**file));
+
+	/* copy the buffer, if we're asked to */
+	if (copy_buffer)
+	{
+		void *dest = ((UINT8 *) *file) + sizeof(**file);
+		memcpy(dest, data, length);
+		data = dest;
+	}
 
 	/* claim the buffer */
 	(*file)->data = (UINT8 *)data;
@@ -157,6 +166,28 @@ file_error core_fopen_ram(const void *data, size_t length, UINT32 openflags, cor
 	(*file)->openflags = openflags;
 
 	return FILERR_NONE;
+}
+
+
+/*-------------------------------------------------
+    core_fopen_ram - open a RAM-based buffer for
+    file-like access and return an error code
+-------------------------------------------------*/
+
+file_error core_fopen_ram(const void *data, size_t length, UINT32 openflags, core_file **file)
+{
+	return core_fopen_ram_internal(data, length, FALSE, openflags, file);
+}
+
+
+/*-------------------------------------------------
+    core_fopen_ram_copy - open a copy of a RAM-based
+    buffer for file-like access and return an error code
+-------------------------------------------------*/
+
+file_error core_fopen_ram_copy(const void *data, size_t length, UINT32 openflags, core_file **file)
+{
+	return core_fopen_ram_internal(data, length, TRUE, openflags, file);
 }
 
 
