@@ -2856,8 +2856,6 @@ GAME( 2001, hod2bios, 0,        naomi,    naomi,    0, ROT0, "Sega",            
 /* HOTD2 isn't dumped */
 
 
-/* No GD-Rom Sets Supported */
-GAME( 2001, naomigd,   0,        naomi,    naomi,    0,       ROT0, "Sega",            "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
 DRIVER_INIT( ngdkey )
 {
@@ -2891,12 +2889,9 @@ ROM_START( gundmgd )
 	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
 	//PIC16C622A (317-5069-COM)
 	//(sticker 253-5509-5069)
+	ROM_LOAD("317-5069-com.data", 0x00, 0x50, CRC(8e2f0cbd) SHA1(a5f3a990a03bfa50a1a742593c5ec07645c8718d) )
 ROM_END
 
-DRIVER_INIT( gundmgd )
-{
-	naomi_game_decrypt( 0x469E978626263E5EULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
-}
 
 ROM_START( sfz3ugd )
 	NAOMIGD_BIOS
@@ -2925,12 +2920,9 @@ ROM_START( cvsgd )
 	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
 	//PIC16C622A (317-5076-JPN)
 	//(sticker 253-5509-5076J)
+	ROM_LOAD("317-5076-jpn.data", 0x00, 0x50, CRC(5004161b) SHA1(8b2cdfec12ffd9160bc74659e08d07cbc46a4011) )
 ROM_END
 
-DRIVER_INIT( cvsgd )
-{
-	naomi_game_decrypt( 0xB0D33EFD58A8E0D0ULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
-}
 
 ROM_START( gundmxgd )
 	NAOMIGD_BIOS
@@ -2944,12 +2936,8 @@ ROM_START( gundmxgd )
 	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
 	//PIC16C622A (317-5079-COM)
 	//(sticker 253-5509-5079)
+	ROM_LOAD("317-5079-com.data", 0x00, 0x50, CRC(e6abe978) SHA1(700e610d84e517793a22d6cabd1aef9c3b8bc092) )
 ROM_END
-
-DRIVER_INIT( gundmxgd )
-{
-	naomi_game_decrypt( 0xC2B5627649DCC27CULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
-}
 
 
 ROM_START( cvs2gd )
@@ -2979,13 +2967,9 @@ ROM_START( ikaruga )
 	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
 	//PIC16C622A (317-5081-JPN)
 	//(sticker 253-5509-5081J)
-	//ROM_LOAD("317-5081-jpn.data", 0x00, 0x50, CRC(1) SHA1(1) )
+	ROM_LOAD("317-5081-jpn.data", 0x00, 0x50, CRC(d4cc5c8c) SHA1(44c0c5c2744fbd419b684cbc36f01973487bafbc) )
 ROM_END
 
-DRIVER_INIT( ikaruga )
-{
-	naomi_game_decrypt( 0x6B7ADA6134C8F140ULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
-}
 
 ROM_START( ggxx )
 	NAOMIGD_BIOS
@@ -2999,13 +2983,9 @@ ROM_START( ggxx )
 	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
 	//PIC16C622A (317-5082-COM)
 	//(sticker 253-5509-5082)
-
+	ROM_LOAD("317-5082-com.data", 0x00, 0x50, CRC(fa31209d) SHA1(bb18e6412a02510832f7200a06a3179ef1695ef2) )
 ROM_END
 
-DRIVER_INIT( ggxx )
-{
-	naomi_game_decrypt( 0x1C0138385B312CE3ULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
-}
 
 ROM_START( chocomk )
 	NAOMIGD_BIOS
@@ -3019,13 +2999,9 @@ ROM_START( chocomk )
 	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
 	//PIC16C622A (317-5085-JPN)
 	//(sticker 253-5509-5085J)
-
+	ROM_LOAD("317-5085-jpn.data", 0x00, 0x50, CRC(eecd8140) SHA1(471fb6b242eff646173265df891109e3e0a37a7d) )
 ROM_END
 
-DRIVER_INIT( chocomk )
-{
-	naomi_game_decrypt( 0x945B898F983EBC10ULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
-}
 
 ROM_START( quizqgd )
 	NAOMIGD_BIOS
@@ -3039,12 +3015,8 @@ ROM_START( quizqgd )
 	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
 	//PIC16C622A (317-5090-JPN)
 	//(sticker 253-5509-5090J)
+	ROM_LOAD("317-5090-jpn.data", 0x00, 0x50, CRC(b4dd88f6) SHA1(c9aacd79c1088225fa5a69b7bd31a7c1286160e1) )
 ROM_END
-
-DRIVER_INIT( quizqgd )
-{
-	naomi_game_decrypt( 0xAD4A3D4986F81C4FULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
-}
 
 ROM_START( ggxxrl )
 	NAOMIGD_BIOS
@@ -3058,12 +3030,8 @@ ROM_START( ggxxrl )
 	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
 	//PIC16C622A (317-5092-JPN)
 	//(sticker 253-5509-5092J)
+	ROM_LOAD("317-5092-jpn.data", 0x00, 0x50, CRC(7c8cca4b) SHA1(92c5a0fd8916744eefc023e64daea69803573928) )
 ROM_END
-
-DRIVER_INIT( ggxxrl )
-{
-	naomi_game_decrypt( 0x3EE92354DC68642FLL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
-}
 
 ROM_START( shikgam2 )
 	NAOMIGD_BIOS
@@ -3077,12 +3045,8 @@ ROM_START( shikgam2 )
 	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
 	//PIC16C622A (317-5095-JPN)
 	//(sticker 253-5509-5095J)
+	ROM_LOAD("317-5095-jpn.data", 0x00, 0x50, CRC(6033ec89) SHA1(9e99a8ad43fa29296dbf2e13b3a3d4552130b4e8) )
 ROM_END
-
-DRIVER_INIT( shikgam2 )
-{
-	naomi_game_decrypt( 0x61C107C18A2F34A7ULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
-}
 
 
 ROM_START( meltybld )
@@ -3149,13 +3113,9 @@ ROM_START( sprtjam )
 	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
 	//PIC16C622A (317-0300-COM)
 	//(sticker 253-5508-0300)
-	//ROM_LOAD("317-0300-com.data", 0x00, 0x50, CRC(1) SHA1(1) )
+	ROM_LOAD("317-0300-com.data", 0x00, 0x50, CRC(9a08413f) SHA1(d57649dcc3af578d55a93dd7a3f41da62d580f54) )
 ROM_END
 
-DRIVER_INIT( sprtjam )
-{
-	naomi_game_decrypt( 0x018C861337BAC44AULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
-}
 
 ROM_START( slashout )
 	NAOMIGD_BIOS
@@ -3169,13 +3129,8 @@ ROM_START( slashout )
 	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
 	//PIC16C622A (317-0302-COM)
 	//(sticker 253-5508-0302)
-	//ROM_LOAD("317-0302-com.data", 0x00, 0x50, CRC(1) SHA1(1) )
+	ROM_LOAD("317-0302-com.data", 0x00, 0x50, CRC(4bf6cd62) SHA1(c1fdf12a4d80fa3008170c89d2dc583f19e0450b) )
 ROM_END
-
-DRIVER_INIT( slashout )
-{
-	naomi_game_decrypt( 0x86D61519B983258FULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
-}
 
 
 ROM_START( spkrbtl )
@@ -3190,13 +3145,9 @@ ROM_START( spkrbtl )
 	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
 	//PIC16C622A (317-0303-COM)
 	//(sticker 253-5508-0303)
-	//ROM_LOAD("317-0303-com.data", 0x00, 0x50, CRC(1) SHA1(1) )
+	ROM_LOAD("317-0303-com.data", 0x00, 0x50, CRC(6e7888a3) SHA1(5ca78052bcfd9e9f81934cbddd9c173e88973e0e) )
 ROM_END
 
-DRIVER_INIT( spkrbtl )
-{
-	naomi_game_decrypt( 0x9EDACDB6855BE046ULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
-}
 
 ROM_START( dygolf )
 	NAOMIGD_BIOS
@@ -3210,15 +3161,8 @@ ROM_START( dygolf )
 	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
 	//PIC16C622A (317-0308-COM)
 	//(sticker 253-5508-0308)
-	//ROM_LOAD("317-0308-com.data", 0x00, 0x50, CRC(1) SHA1(1) )
+	ROM_LOAD("317-0308-com.data", 0x00, 0x50,  CRC(56f63af0) SHA1(3c453226fc53d2f700b3634db3ef8ce206d94392) )
 ROM_END
-
-
-
-DRIVER_INIT( dygolf )
-{
-	naomi_game_decrypt( 0xB93B6704B03E9B4AULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
-}
 
 ROM_START( wsbbgd )
 	NAOMIGD_BIOS
@@ -3232,13 +3176,9 @@ ROM_START( wsbbgd )
 	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
 	//PIC16C622A (317-0309-COM)
 	//(sticker 253-5508-0309)
-	//ROM_LOAD("317-0309-com.data", 0x00, 0x50, CRC(1) SHA1(1) )
+	ROM_LOAD("317-0309-com.data", 0x00, 0x50, CRC(8792c550) SHA1(e8d6d91583d1673d8d3fa9ccb0ab1097c5c5ad08) )
 ROM_END
 
-DRIVER_INIT( wsbbgd )
-{
-	naomi_game_decrypt( 0xC4A75486E015B316ULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
-}
 
 ROM_START( vathlete )
 	NAOMIGD_BIOS
@@ -3252,41 +3192,35 @@ ROM_START( vathlete )
 	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
 	//PIC16C622A (317-0330-COM)
 	//(sticker 253-5508-0330)
-	//ROM_LOAD("317-0330-com.data", 0x00, 0x50, CRC(1) SHA1(1) )
+	ROM_LOAD("317-0330-com.data", 0x00, 0x50, CRC(f5e7f7d4) SHA1(3903337e82011d132993e4366475586866bd39b1) )
 ROM_END
 
-DRIVER_INIT( vathlete )
-{
-	naomi_game_decrypt( 0xC1071AB097B323DCULL, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
-}
-
-
-
-
+/* Naomi GD-Rom Sets */
+GAME( 2001, naomigd,   0,        naomi,    naomi,    0,       ROT0, "Sega",            "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
 // GDL-xxxx (licensed games?)
-GAME( 200?, gundmgd,   naomigd,  naomi,    naomi,    gundmgd,  ROT0,   "unknown",         "Mobile Suit Gundam: Federation VS Zeon (GDL-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, sfz3ugd,   naomigd,  naomi,    naomi,    ngdkey,  ROT0,   "Capcom",         "Street Fighter Zero 3 Upper (GDL-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, cvsgd,     naomigd,  naomi,    naomi,    cvsgd,    ROT0,   "Capcom",         "Capcom vs SNK Millenium Fight 2000 Pro (GDL-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, gundmxgd,  naomigd,  naomi,    naomi,    gundmxgd, ROT0,   "unknown",         "Mobile Suit Gundam: Federation VS Zeon DX  (GDL-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, cvs2gd,    naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "Capcom",         "Capcom vs SNK 2 Millionaire Fighting 2001 (GDL-0007A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, ikaruga,   naomigd,  naomi,    naomi,    ikaruga,  ROT270, "Treasure",       "Ikaruga (GDL-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, ggxx,      naomigd,  naomi,    naomi,    ggxx,     ROT0,   "unknown",       "Guilty Gear XX (GDL-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, chocomk,   naomigd,  naomi,    naomi,    chocomk,  ROT0,   "unknown",       "Musapey's Choco Marker (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, quizqgd,   naomigd,  naomi,    naomi,    quizqgd,  ROT0, "unknown",       "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, ggxxrl,    naomigd,  naomi,    naomi,    ggxxrl,   ROT0, "unknown",       "Guilty Gear XX #Reload (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, shikgam2,  naomigd,  naomi,    naomi,    shikgam2, ROT0, "unknown",       "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2004, meltybld,  naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "Ecole",          "Melty Blood Act Cadenza (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, senko,     naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",        "Senko No Ronde (GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, ss2005,    naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",        "Super Shanghai 2005 (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, gundmgd,   naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Mobile Suit Gundam: Federation VS Zeon (GDL-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, sfz3ugd,   naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "Capcom",        "Street Fighter Zero 3 Upper (GDL-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, cvsgd,     naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "Capcom",        "Capcom vs SNK Millenium Fight 2000 Pro (GDL-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, gundmxgd,  naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Mobile Suit Gundam: Federation VS Zeon DX  (GDL-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, cvs2gd,    naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "Capcom",        "Capcom vs SNK 2 Millionaire Fighting 2001 (GDL-0007A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, ikaruga,   naomigd,  naomi,    naomi,    ngdkey,   ROT270, "Treasure",      "Ikaruga (GDL-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, ggxx,      naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Guilty Gear XX (GDL-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, chocomk,   naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Musapey's Choco Marker (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, quizqgd,   naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, ggxxrl,    naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Guilty Gear XX #Reload (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, shikgam2,  naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, meltybld,  naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "Ecole",         "Melty Blood Act Cadenza (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, senko,     naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Senko No Ronde (GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, ss2005,    naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Super Shanghai 2005 (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 // GDS-xxxx (first party games?)
-GAME( 200?, sprtjam,   naomigd,  naomi,    naomi,    sprtjam,  ROT0, "Sega",          "Sports Jam (GDS-0003)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, slashout,  naomigd,  naomi,    naomi,    slashout, ROT0, "Sega",          "Slashout (GDS-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, spkrbtl,   naomigd,  naomi,    naomi,    spkrbtl,  ROT0, "Sega",          "Spikers Battle (GDS-0005)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, dygolf,    naomigd,  naomi,    naomi,    dygolf,   ROT0, "Sega",          "Dynamic Golf (GDS-0009)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, wsbbgd,    naomigd,  naomi,    naomi,    wsbbgd,   ROT0, "Sega",          "World Series Baseball (GDS-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, vathlete,  naomigd,  naomi,    naomi,    vathlete, ROT0, "Sega",          "Virtua Athelete (GDS-0019)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, sprtjam,   naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Sports Jam (GDS-0003)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, slashout,  naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Slashout (GDS-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, spkrbtl,   naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Spikers Battle (GDS-0005)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, dygolf,    naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Virtua Golf / Dynamic Golf (GDS-0009)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, wsbbgd,    naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "World Series Baseball (GDS-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, vathlete,  naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Naomi 2 & Naomi 2 GD-ROM */
 GAME( 2001, naomi2,   0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi 2 Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
