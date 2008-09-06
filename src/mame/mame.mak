@@ -1720,6 +1720,8 @@ $(DRIVERS)/lazercmd.o:	$(LAYOUT)/lazercmd.lh
 
 $(DRIVERS)/lucky74.o:	$(LAYOUT)/lucky74.lh
 
+$(DRIVERS)/magic10.o:	$(LAYOUT)/sgsafari.lh
+
 $(DRIVERS)/maxaflex.o:	$(LAYOUT)/maxaflex.lh
 
 $(DRIVERS)/mpu4.o:		$(LAYOUT)/mpu4.lh \

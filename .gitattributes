@@ -2484,6 +2484,7 @@ src/mame/layout/pyramid.lay svneol=native#text/plain
 src/mame/layout/quintoon.lay svneol=native#text/plain
 src/mame/layout/rocknms.lay svneol=native#text/plain
 src/mame/layout/sbrkout.lay svneol=native#text/plain
+src/mame/layout/sgsafari.lay svneol=native#text/plain
 src/mame/layout/shuttlei.lay svneol=native#text/plain
 src/mame/layout/sidewndr.lay svneol=native#text/plain
 src/mame/layout/sigmapkr.lay svneol=native#text/plain
