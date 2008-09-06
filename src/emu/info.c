@@ -357,131 +357,129 @@ static void print_game_bios(FILE *out, const game_driver *game)
     the XML output
 -------------------------------------------------*/
 
-static void print_game_rom(FILE *out, const game_driver *game)
+static void print_game_rom(FILE *out, const game_driver *game, const machine_config *config)
 {
 	const game_driver *clone_of = driver_get_clone(game);
 	int rom_type;
 
-	/* if no roms, just exit early */
-	if (game->rom == NULL)
-		return;
-
 	/* iterate over 3 different ROM "types": BIOS, ROMs, DISKs */
 	for (rom_type = 0; rom_type < 3; rom_type++)
 	{
+		const rom_source *source;
 		const rom_entry *region;
-
-		/* iterate first through regions */
-		for (region = rom_first_region(game); region != NULL; region = rom_next_region(region))
-		{
-			int is_disk = ROMREGION_ISDISKDATA(region);
-			const rom_entry *rom;
-
-			/* disk regions only work for disks */
-			if ((is_disk && rom_type != 2) || (!is_disk && rom_type == 2))
-				continue;
-
-			/* iterate through ROM entries */
-			for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
+		
+		/* iterate over ROM sources: first the game, then any devices */
+		for (source = rom_first_source(game, config); source != NULL; source = rom_next_source(game, config, source))
+			for (region = rom_first_region(game, source); region != NULL; region = rom_next_region(region))
 			{
-				int is_bios = ROM_GETBIOSFLAGS(rom);
-				const char *name = ROM_GETNAME(rom);
-				int offset = ROM_GETOFFSET(rom);
-				const rom_entry *parent_rom = NULL;
-				const rom_entry *chunk;
-				char bios_name[100];
-				int length;
+				int is_disk = ROMREGION_ISDISKDATA(region);
+				const rom_entry *rom;
 
-				/* BIOS ROMs only apply to bioses */
-				if ((is_bios && rom_type != 0) || (!is_bios && rom_type == 0))
+				/* disk regions only work for disks */
+				if ((is_disk && rom_type != 2) || (!is_disk && rom_type == 2))
 					continue;
 
-				/* compute the total length of all chunks */
-				length = 0;
-				for (chunk = rom_first_chunk(rom); chunk; chunk = rom_next_chunk(chunk))
-					length += ROM_GETLENGTH(chunk);
-
-				/* if we have a valid ROM and we are a clone, see if we can find the parent ROM */
-				if (!ROM_NOGOODDUMP(rom) && clone_of != NULL)
+				/* iterate through ROM entries */
+				for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
 				{
-					const rom_entry *pregion, *prom;
+					int is_bios = ROM_GETBIOSFLAGS(rom);
+					const char *name = ROM_GETNAME(rom);
+					int offset = ROM_GETOFFSET(rom);
+					const rom_entry *parent_rom = NULL;
+					const rom_entry *chunk;
+					char bios_name[100];
+					int length;
 
-					/* scan the clone_of ROM for a matching ROM entry */
-					for (pregion = rom_first_region(clone_of); pregion != NULL; pregion = rom_next_region(pregion))
-						for (prom = rom_first_file(pregion); prom != NULL; prom = rom_next_file(prom))
-							if (hash_data_is_equal(ROM_GETHASHDATA(rom), ROM_GETHASHDATA(prom), 0))
+					/* BIOS ROMs only apply to bioses */
+					if ((is_bios && rom_type != 0) || (!is_bios && rom_type == 0))
+						continue;
+
+					/* compute the total length of all chunks */
+					length = 0;
+					for (chunk = rom_first_chunk(rom); chunk; chunk = rom_next_chunk(chunk))
+						length += ROM_GETLENGTH(chunk);
+
+					/* if we have a valid ROM and we are a clone, see if we can find the parent ROM */
+					if (!ROM_NOGOODDUMP(rom) && clone_of != NULL)
+					{
+						const rom_entry *pregion, *prom;
+
+						/* scan the clone_of ROM for a matching ROM entry */
+						for (pregion = rom_first_region(clone_of, NULL); pregion != NULL; pregion = rom_next_region(pregion))
+							for (prom = rom_first_file(pregion); prom != NULL; prom = rom_next_file(prom))
+								if (hash_data_is_equal(ROM_GETHASHDATA(rom), ROM_GETHASHDATA(prom), 0))
+								{
+									parent_rom = prom;
+									break;
+								}
+					}
+
+					/* scan for a BIOS name */
+					bios_name[0] = 0;
+					if (!is_disk && is_bios)
+					{
+						const rom_entry *brom;
+
+						/* scan backwards through the ROM entries */
+						for (brom = rom - 1; brom != game->rom; brom--)
+							if (ROMENTRY_ISSYSTEM_BIOS(brom))
 							{
-								parent_rom = prom;
+								strcpy(bios_name, ROM_GETNAME(brom));
 								break;
 							}
+					}
+
+					/* opening tag */
+					if (!is_disk)
+						fprintf(out, "\t\t<rom");
+					else
+						fprintf(out, "\t\t<disk");
+
+					/* add name, merge, bios, and size tags */
+					if (name != NULL && name[0] != 0)
+						fprintf(out, " name=\"%s\"", xml_normalize_string(name));
+					if (parent_rom != NULL)
+						fprintf(out, " merge=\"%s\"", xml_normalize_string(ROM_GETNAME(parent_rom)));
+					if (bios_name[0] != 0)
+						fprintf(out, " bios=\"%s\"", xml_normalize_string(bios_name));
+					if (!is_disk)
+						fprintf(out, " size=\"%d\"", length);
+
+					/* dump checksum information only if there is a known dump */
+					if (!hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP))
+					{
+						char checksum[HASH_BUF_SIZE];
+						int hashtype;
+
+						/* iterate over hash function types and print out their values */
+						for (hashtype = 0; hashtype < HASH_NUM_FUNCTIONS; hashtype++)
+							if (hash_data_extract_printable_checksum(ROM_GETHASHDATA(rom), 1 << hashtype, checksum))
+								fprintf(out, " %s=\"%s\"", hash_function_name(1 << hashtype), checksum);
+					}
+
+					/* append a region name */
+					fprintf(out, " region=\"%s\"", ROMREGION_GETTAG(region));
+
+					/* add nodump/baddump flags */
+					if (hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP))
+						fprintf(out, " status=\"nodump\"");
+					if (hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_BAD_DUMP))
+						fprintf(out, " status=\"baddump\"");
+
+					/* for non-disk entries, print dispose flag and offset */
+					if (!is_disk)
+					{
+						if (ROMREGION_GETFLAGS(region) & ROMREGION_DISPOSE)
+							fprintf(out, " dispose=\"yes\"");
+						fprintf(out, " offset=\"%x\"", offset);
+					}
+
+					/* for disk entries, add the disk index */
+					else
+						fprintf(out, " index=\"%x\"", DISK_GETINDEX(rom));
+					fprintf(out, "/>\n");
 				}
-
-				/* scan for a BIOS name */
-				bios_name[0] = 0;
-				if (!is_disk && is_bios)
-				{
-					const rom_entry *brom;
-
-					/* scan backwards through the ROM entries */
-					for (brom = rom - 1; brom != game->rom; brom--)
-						if (ROMENTRY_ISSYSTEM_BIOS(brom))
-						{
-							strcpy(bios_name, ROM_GETNAME(brom));
-							break;
-						}
-				}
-
-				/* opening tag */
-				if (!is_disk)
-					fprintf(out, "\t\t<rom");
-				else
-					fprintf(out, "\t\t<disk");
-
-				/* add name, merge, bios, and size tags */
-				if (name != NULL && name[0] != 0)
-					fprintf(out, " name=\"%s\"", xml_normalize_string(name));
-				if (parent_rom != NULL)
-					fprintf(out, " merge=\"%s\"", xml_normalize_string(ROM_GETNAME(parent_rom)));
-				if (bios_name[0] != 0)
-					fprintf(out, " bios=\"%s\"", xml_normalize_string(bios_name));
-				if (!is_disk)
-					fprintf(out, " size=\"%d\"", length);
-
-				/* dump checksum information only if there is a known dump */
-				if (!hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP))
-				{
-					char checksum[HASH_BUF_SIZE];
-					int hashtype;
-
-					/* iterate over hash function types and print out their values */
-					for (hashtype = 0; hashtype < HASH_NUM_FUNCTIONS; hashtype++)
-						if (hash_data_extract_printable_checksum(ROM_GETHASHDATA(rom), 1 << hashtype, checksum))
-							fprintf(out, " %s=\"%s\"", hash_function_name(1 << hashtype), checksum);
-				}
-
-				/* append a region name */
-				fprintf(out, " region=\"%s\"", ROMREGION_GETTAG(region));
-
-				/* add nodump/baddump flags */
-				if (hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_NO_DUMP))
-					fprintf(out, " status=\"nodump\"");
-				if (hash_data_has_info(ROM_GETHASHDATA(rom), HASH_INFO_BAD_DUMP))
-					fprintf(out, " status=\"baddump\"");
-
-				/* for non-disk entries, print dispose flag and offset */
-				if (!is_disk)
-				{
-					if (ROMREGION_GETFLAGS(region) & ROMREGION_DISPOSE)
-						fprintf(out, " dispose=\"yes\"");
-					fprintf(out, " offset=\"%x\"", offset);
-				}
-
-				/* for disk entries, add the disk index */
-				else
-					fprintf(out, " index=\"%x\"", DISK_GETINDEX(rom));
-				fprintf(out, "/>\n");
 			}
-		}
 	}
 }
 
@@ -843,7 +841,7 @@ static void print_game_info(FILE *out, const game_driver *game)
 
 	/* now print various additional information */
 	print_game_bios(out, game);
-	print_game_rom(out, game);
+	print_game_rom(out, game, config);
 	print_game_sample(out, game, config);
 	print_game_chips(out, game, config);
 	print_game_display(out, game, config);

@@ -504,23 +504,23 @@ static int validate_driver(int drivnum, const machine_config *config)
 static int validate_roms(int drivnum, const machine_config *config, region_info *rgninfo)
 {
 	const game_driver *driver = drivers[drivnum];
-	const device_config *device = NULL;
-	const rom_entry *romp;
-	const char *last_name = "???";
-	int error = FALSE;
-	int items_since_region = 1;
 	int bios_flags = 0, last_bios = 0;
+	const char *last_name = "???";
 	region_entry *currgn = NULL;
+	int items_since_region = 1;
+	const rom_source *source;
+	int error = FALSE;
 
 	/* reset region info */
 	memset(rgninfo, 0, sizeof(*rgninfo));
 	
 	/* iterate, starting with the driver's ROMs and continuing with device ROMs */
-	romp = driver->rom;
-	while (romp != NULL)
+	for (source = rom_first_source(driver, config); source != NULL; source = rom_next_source(driver, config, source))
 	{
+		const rom_entry *romp;
+
 		/* scan the ROM entries */
-		for ( ; !ROMENTRY_ISEND(romp); romp++)
+		for (romp = rom_first_region(driver, source); !ROMENTRY_ISEND(romp); romp++)
 		{
 			/* if this is a region, make sure it's valid, and record the length */
 			if (ROMENTRY_ISREGION(romp))
@@ -644,15 +644,6 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 		/* final check for empty regions */
 		if (items_since_region == 0)
 			mame_printf_warning("%s: %s has empty ROM region (warning)\n", driver->source_file, driver->name);
-
-		/* look for more devices with regions */
-		romp = NULL;
-		for (device = (device == NULL) ? config->devicelist : device->next; device != NULL; device = device->next)
-		{
-			romp = device_get_info_ptr(device, DEVINFO_PTR_ROM_REGION);
-			if (romp != NULL)
-				break;
-		}
 	}
 
 	return error;

@@ -22,7 +22,7 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static int audit_one_rom(core_options *options, const rom_entry *rom, const game_driver *gamedrv, UINT32 validation, audit_record *record);
+static int audit_one_rom(core_options *options, const rom_entry *rom, const char *regiontag, const game_driver *gamedrv, UINT32 validation, audit_record *record);
 static int audit_one_disk(core_options *options, const rom_entry *rom, const game_driver *gamedrv, UINT32 validation, audit_record *record);
 static int rom_used_by_parent(const game_driver *gamedrv, const rom_entry *romentry, const game_driver **parent);
 
@@ -56,7 +56,9 @@ INLINE void set_status(audit_record *record, UINT8 status, UINT8 substatus)
 
 int audit_images(core_options *options, const game_driver *gamedrv, UINT32 validation, audit_record **audit)
 {
+	machine_config *config = machine_config_alloc(gamedrv->machine_config);
 	const rom_entry *region, *rom;
+	const rom_source *source;
 	audit_record *record;
 	int foundany = FALSE;
 	int allshared = TRUE;
@@ -64,14 +66,18 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 
 	/* determine the number of records we will generate */
 	records = 0;
-	for (region = rom_first_region(gamedrv); region != NULL; region = rom_next_region(region))
-		for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
-			if (ROMREGION_ISROMDATA(region) || ROMREGION_ISDISKDATA(region))
-			{
-				if (allshared && !rom_used_by_parent(gamedrv, rom, NULL))
-					allshared = FALSE;
-				records++;
-			}
+	for (source = rom_first_source(gamedrv, config); source != NULL; source = rom_next_source(gamedrv, config, source))
+	{
+		int source_is_gamedrv = rom_source_is_gamedrv(gamedrv, source);
+		for (region = rom_first_region(gamedrv, source); region != NULL; region = rom_next_region(region))
+			for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
+				if (ROMREGION_ISROMDATA(region) || ROMREGION_ISDISKDATA(region))
+				{
+					if (source_is_gamedrv && allshared && !rom_used_by_parent(gamedrv, rom, NULL))
+						allshared = FALSE;
+					records++;
+				}
+	}
 
 	if (records > 0)
 	{
@@ -80,35 +86,45 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 		memset(*audit, 0, sizeof(**audit) * records);
 		record = *audit;
 
-		/* iterate over regions and ROMs */
-		for (region = rom_first_region(gamedrv); region; region = rom_next_region(region))
-			for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+		/* iterate over ROM sources and regions */
+		for (source = rom_first_source(gamedrv, config); source != NULL; source = rom_next_source(gamedrv, config, source))
+		{
+			int source_is_gamedrv = rom_source_is_gamedrv(gamedrv, source);
+			for (region = rom_first_region(gamedrv, source); region != NULL; region = rom_next_region(region))
 			{
-				int shared = rom_used_by_parent(gamedrv, rom, NULL);
-
-				/* audit a file */
-				if (ROMREGION_ISROMDATA(region))
+				const char *regiontag = ROMREGION_ISLOADBYNAME(region) ? ROM_GETNAME(region) : NULL;
+				for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				{
-					if (audit_one_rom(options, rom, gamedrv, validation, record++) && (!shared || allshared))
-						foundany = TRUE;
-				}
+					int shared = rom_used_by_parent(gamedrv, rom, NULL);
 
-				/* audit a disk */
-				else if (ROMREGION_ISDISKDATA(region))
-				{
-					if (audit_one_disk(options, rom, gamedrv, validation, record++) && (!shared || allshared))
-						foundany = TRUE;
+					/* audit a file */
+					if (ROMREGION_ISROMDATA(region))
+					{
+						if (audit_one_rom(options, rom, regiontag, gamedrv, validation, record++) && source_is_gamedrv && (!shared || allshared))
+							foundany = TRUE;
+					}
+
+					/* audit a disk */
+					else if (ROMREGION_ISDISKDATA(region))
+					{
+						if (audit_one_disk(options, rom, gamedrv, validation, record++) && source_is_gamedrv && (!shared || allshared))
+							foundany = TRUE;
+					}
 				}
 			}
 
-		/* if we found nothing, we don't have the set at all */
-		if (!foundany)
-		{
-			free(*audit);
-			*audit = NULL;
-			records = 0;
+			/* if we found nothing, we don't have the set at all */
+			if (rom_source_is_gamedrv(gamedrv, source) && !foundany)
+			{
+				free(*audit);
+				*audit = NULL;
+				records = 0;
+				break;
+			}
 		}
 	}
+	
+	machine_config_free(config);
 	return records;
 }
 
@@ -310,7 +326,7 @@ int audit_summary(const game_driver *gamedrv, int count, const audit_record *rec
     audit_one_rom - validate a single ROM entry
 -------------------------------------------------*/
 
-static int audit_one_rom(core_options *options, const rom_entry *rom, const game_driver *gamedrv, UINT32 validation, audit_record *record)
+static int audit_one_rom(core_options *options, const rom_entry *rom, const char *regiontag, const game_driver *gamedrv, UINT32 validation, audit_record *record)
 {
 	const game_driver *drv;
 	const rom_entry *chunk;
@@ -322,6 +338,7 @@ static int audit_one_rom(core_options *options, const rom_entry *rom, const game
 	record->type = AUDIT_FILE_ROM;
 	record->name = ROM_GETNAME(rom);
 	record->exphash = ROM_GETHASHDATA(rom);
+	record->length = 0;
 
 	/* compute the expected length by summing the chunks */
 	for (chunk = rom_first_chunk(rom); chunk; chunk = rom_next_chunk(chunk))
@@ -356,9 +373,33 @@ static int audit_one_rom(core_options *options, const rom_entry *rom, const game
 			break;
 		}
 	}
+	
+	/* if not found, check the region as a backup */
+	if (record->length == 0 && regiontag != NULL)
+	{
+		file_error filerr;
+		mame_file *file;
+		astring *fname;
+
+		/* open the file if we can */
+		fname = astring_assemble_3(astring_alloc(), regiontag, PATH_SEPARATOR, ROM_GETNAME(rom));
+	    if (has_crc)
+			filerr = mame_fopen_crc_options(options, SEARCHPATH_ROM, astring_c(fname), crc, OPEN_FLAG_READ, &file);
+		else
+			filerr = mame_fopen_options(options, SEARCHPATH_ROM, astring_c(fname), OPEN_FLAG_READ, &file);
+		astring_free(fname);
+
+		/* if we got it, extract the hash and length */
+		if (filerr == FILERR_NONE)
+		{
+			hash_data_copy(record->hash, mame_fhash(file, validation));
+			record->length = (UINT32)mame_fsize(file);
+			mame_fclose(file);
+		}
+	}
 
 	/* if we failed to find the file, set the appropriate status */
-	if (drv == NULL)
+	if (record->length == 0)
 	{
 		const game_driver *parent;
 
@@ -496,7 +537,7 @@ static int rom_used_by_parent(const game_driver *gamedrv, const rom_entry *romen
 		const rom_entry *rom;
 
 		/* see if the parent has the same ROM or not */
-		for (region = rom_first_region(drv); region; region = rom_next_region(region))
+		for (region = rom_first_region(drv, NULL); region; region = rom_next_region(region))
 			for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
 				if (hash_data_is_equal(ROM_GETHASHDATA(rom), hash, 0))
 				{

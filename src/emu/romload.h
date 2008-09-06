@@ -126,6 +126,9 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef struct _rom_source rom_source;
+
+
 typedef struct _rom_entry rom_entry;
 struct _rom_entry
 {
@@ -290,12 +293,14 @@ void set_disk_handle(const char *region, mame_file *file, chd_file *chd);
 /* ROM processing */
 void rom_init(running_machine *machine, const rom_entry *romp);
 int rom_load_warnings(void);
-const rom_entry *rom_first_region(const game_driver *drv);
+int rom_source_is_gamedrv(const game_driver *drv, const rom_source *source);
+const rom_source *rom_first_source(const game_driver *drv, const machine_config *config);
+const rom_source *rom_next_source(const game_driver *drv, const machine_config *config, const rom_source *previous);
+const rom_entry *rom_first_region(const game_driver *drv, const rom_source *romp);
 const rom_entry *rom_next_region(const rom_entry *romp);
 const rom_entry *rom_first_file(const rom_entry *romp);
 const rom_entry *rom_next_file(const rom_entry *romp);
 const rom_entry *rom_first_chunk(const rom_entry *romp);
 const rom_entry *rom_next_chunk(const rom_entry *romp);
-
 
 #endif	/* __ROMLOAD_H__ */

@@ -100,13 +100,83 @@ void set_disk_handle(const char *region, mame_file *file, chd_file *chdfile)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    rom_source_is_gamedrv - return TRUE if the
+    given rom_source refers to the game driver
+    itself
+-------------------------------------------------*/
+
+int rom_source_is_gamedrv(const game_driver *drv, const rom_source *source)
+{
+	return ((const game_driver *)source == drv);
+}
+
+
+/*-------------------------------------------------
+    rom_first_source - return pointer to first ROM
+    source
+-------------------------------------------------*/
+
+const rom_source *rom_first_source(const game_driver *drv, const machine_config *config)
+{
+	const device_config *device;
+	
+	/* if the driver has a ROM pointer, that's what we want */
+	if (drv->rom != NULL)
+		return (rom_source *)drv;
+	
+	/* otherwise, look through devices */
+	if (config != NULL)
+		for (device = config->devicelist; device != NULL; device = device->next)
+		{
+			const rom_entry *devromp = device_get_info_ptr(device, DEVINFO_PTR_ROM_REGION);
+			if (devromp != NULL)
+				return (rom_source *)device;
+		}
+	return NULL;
+}
+
+
+/*-------------------------------------------------
+    rom_next_source - return pointer to next ROM
+    source
+-------------------------------------------------*/
+
+const rom_source *rom_next_source(const game_driver *drv, const machine_config *config, const rom_source *previous)
+{
+	const device_config *device;
+	
+	/* if the previous was the driver, we want the first device */
+	if (rom_source_is_gamedrv(drv, previous))
+		device = (config != NULL) ? config->devicelist : NULL;
+	else
+		device = ((const device_config *)previous)->next;
+
+	/* look for further devices with ROM definitions */
+	for ( ; device != NULL; device = device->next)
+	{
+		const rom_entry *devromp = device_get_info_ptr(device, DEVINFO_PTR_ROM_REGION);
+		if (devromp != NULL)
+			return (rom_source *)device;
+	}
+	return NULL;
+}
+
+
+/*-------------------------------------------------
     rom_first_region - return pointer to first ROM
     region
 -------------------------------------------------*/
 
-const rom_entry *rom_first_region(const game_driver *drv)
+const rom_entry *rom_first_region(const game_driver *drv, const rom_source *source)
 {
-	return (drv->rom != NULL && !ROMENTRY_ISEND(drv->rom)) ? drv->rom : NULL;
+	const rom_entry *romp;
+	
+	if (source == NULL || rom_source_is_gamedrv(drv, source))
+		romp = drv->rom;
+	else
+		romp = device_get_info_ptr((const device_config *)source, DEVINFO_PTR_ROM_REGION);
+
+	return (romp != NULL && !ROMENTRY_ISEND(romp)) ? romp : NULL;
 }
 
 
@@ -868,6 +938,7 @@ chd_error open_disk_image_options(core_options *options, const game_driver *game
 {
 	const game_driver *drv, *searchdrv;
 	const rom_entry *region, *rom;
+	const rom_source *source;
 	file_error filerr;
 	chd_error err;
 
@@ -901,36 +972,37 @@ chd_error open_disk_image_options(core_options *options, const game_driver *game
 	/* otherwise, look at our parents for a CHD with an identical checksum */
 	/* and try to open that */
 	for (drv = gamedrv; drv != NULL; drv = driver_get_clone(drv))
-		for (region = rom_first_region(drv); region != NULL; region = rom_next_region(region))
-			if (ROMREGION_ISDISKDATA(region))
-				for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
+		for (source = rom_first_source(drv, NULL); source != NULL; source = rom_next_source(drv, NULL, source))
+			for (region = rom_first_region(drv, source); region != NULL; region = rom_next_region(region))
+				if (ROMREGION_ISDISKDATA(region))
+					for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
 
-					/* look for a differing name but with the same hash data */
-					if (strcmp(ROM_GETNAME(romp), ROM_GETNAME(rom)) != 0 &&
-						hash_data_is_equal(ROM_GETHASHDATA(romp), ROM_GETHASHDATA(rom), 0))
-					{
-						/* attempt to open the properly named file, scanning up through parent directories */
-						filerr = FILERR_NOT_FOUND;
-						for (searchdrv = drv; searchdrv != NULL && filerr != FILERR_NONE; searchdrv = driver_get_clone(searchdrv))
+						/* look for a differing name but with the same hash data */
+						if (strcmp(ROM_GETNAME(romp), ROM_GETNAME(rom)) != 0 &&
+							hash_data_is_equal(ROM_GETHASHDATA(romp), ROM_GETHASHDATA(rom), 0))
 						{
-							astring *fname = astring_assemble_4(astring_alloc(), searchdrv->name, PATH_SEPARATOR, ROM_GETNAME(rom), ".chd");
-							filerr = mame_fopen_options(options, SEARCHPATH_IMAGE, astring_c(fname), OPEN_FLAG_READ, image_file);
-							astring_free(fname);
-						}
+							/* attempt to open the properly named file, scanning up through parent directories */
+							filerr = FILERR_NOT_FOUND;
+							for (searchdrv = drv; searchdrv != NULL && filerr != FILERR_NONE; searchdrv = driver_get_clone(searchdrv))
+							{
+								astring *fname = astring_assemble_4(astring_alloc(), searchdrv->name, PATH_SEPARATOR, ROM_GETNAME(rom), ".chd");
+								filerr = mame_fopen_options(options, SEARCHPATH_IMAGE, astring_c(fname), OPEN_FLAG_READ, image_file);
+								astring_free(fname);
+							}
 
-						/* did the file open succeed? */
-						if (filerr == FILERR_NONE)
-						{
-							/* try to open the CHD */
-							err = chd_open_file(mame_core_file(*image_file), CHD_OPEN_READ, NULL, image_chd);
-							if (err == CHDERR_NONE)
-								return err;
+							/* did the file open succeed? */
+							if (filerr == FILERR_NONE)
+							{
+								/* try to open the CHD */
+								err = chd_open_file(mame_core_file(*image_file), CHD_OPEN_READ, NULL, image_chd);
+								if (err == CHDERR_NONE)
+									return err;
 
-							/* close the file on failure */
-							mame_fclose(*image_file);
-							*image_file = NULL;
+								/* close the file on failure */
+								mame_fclose(*image_file);
+								*image_file = NULL;
+							}
 						}
-					}
 
 	return err;
 }
