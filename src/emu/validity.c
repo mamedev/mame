@@ -504,6 +504,7 @@ static int validate_driver(int drivnum, const machine_config *config)
 static int validate_roms(int drivnum, const machine_config *config, region_info *rgninfo)
 {
 	const game_driver *driver = drivers[drivnum];
+	const device_config *device = NULL;
 	const rom_entry *romp;
 	const char *last_name = "???";
 	int error = FALSE;
@@ -513,125 +514,146 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 
 	/* reset region info */
 	memset(rgninfo, 0, sizeof(*rgninfo));
-
-	/* scan the ROM entries */
-	for (romp = driver->rom; romp && !ROMENTRY_ISEND(romp); romp++)
+	
+	/* iterate, starting with the driver's ROMs and continuing with device ROMs */
+	romp = driver->rom;
+	while (romp != NULL)
 	{
-		/* if this is a region, make sure it's valid, and record the length */
-		if (ROMENTRY_ISREGION(romp))
+		/* scan the ROM entries */
+		for ( ; !ROMENTRY_ISEND(romp); romp++)
 		{
-			const char *region = ROMREGION_GETTAG(romp);
-
-			/* if we haven't seen any items since the last region, print a warning */
-			if (items_since_region == 0)
-				mame_printf_warning("%s: %s has empty ROM region (warning)\n", driver->source_file, driver->name);
-			items_since_region = (ROMREGION_ISERASE(romp) || ROMREGION_ISDISPOSE(romp) || ROMREGION_ISDISKDATA(romp)) ? 1 : 0;
-			currgn = NULL;
-
-			/* check for an invalid tag */
-			if (region == NULL || region[0] == 0)
+			/* if this is a region, make sure it's valid, and record the length */
+			if (ROMENTRY_ISREGION(romp))
 			{
-				mame_printf_error("%s: %s has duplicate ROM_REGION tag \"%s\"\n", driver->source_file, driver->name, region);
-				error = TRUE;
+				const char *region = ROMREGION_GETTAG(romp);
+
+				/* if we haven't seen any items since the last region, print a warning */
+				if (items_since_region == 0)
+					mame_printf_warning("%s: %s has empty ROM region (warning)\n", driver->source_file, driver->name);
+				items_since_region = (ROMREGION_ISERASE(romp) || ROMREGION_ISDISPOSE(romp) || ROMREGION_ISDISKDATA(romp)) ? 1 : 0;
+				currgn = NULL;
+
+				/* check for an invalid tag */
+				if (region == NULL || region[0] == 0)
+				{
+					mame_printf_error("%s: %s has duplicate ROM_REGION tag \"%s\"\n", driver->source_file, driver->name, region);
+					error = TRUE;
+				}
+
+				/* find any empty entry, checking for duplicates */
+				else
+				{
+					int rgnnum;
+
+					/* iterate over all regions found so far */
+					for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries); rgnnum++)
+					{
+						/* stop when we hit an empty */
+						if (rgninfo->entries[rgnnum].tag == NULL)
+						{
+							currgn = &rgninfo->entries[rgnnum];
+							currgn->tag = region;
+							currgn->length = ROMREGION_GETLENGTH(romp);
+							break;
+						}
+
+						/* fail if we hit a duplicate */
+						if (strcmp(rgninfo->entries[rgnnum].tag, region) == 0)
+						{
+							mame_printf_error("%s: %s has duplicate ROM_REGION type \"%s\"\n", driver->source_file, driver->name, region);
+							error = TRUE;
+							break;
+						}
+					}
+				}
+				
+				/* load by name entries must be 8 characters or less */
+				if (ROMREGION_ISLOADBYNAME(romp) && strlen(region) > 8)
+				{
+					mame_printf_error("%s: %s has load-by-name region \"%s\" with name >8 characters\n", driver->source_file, driver->name, region);
+					error = TRUE;
+				}
 			}
 
-			/* find any empty entry, checking for duplicates */
-			else
+			/* If this is a system bios, make sure it is using the next available bios number */
+			else if (ROMENTRY_ISSYSTEM_BIOS(romp))
 			{
-				int rgnnum;
-
-				/* iterate over all regions found so far */
-				for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries); rgnnum++)
+				bios_flags = ROM_GETBIOSFLAGS(romp);
+				if (last_bios+1 != bios_flags)
 				{
-					/* stop when we hit an empty */
-					if (rgninfo->entries[rgnnum].tag == NULL)
-					{
-						currgn = &rgninfo->entries[rgnnum];
-						currgn->tag = region;
-						currgn->length = ROMREGION_GETLENGTH(romp);
-						break;
-					}
+					const char *name = ROM_GETNAME(romp);
+					mame_printf_error("%s: %s has non-sequential bios %s\n", driver->source_file, driver->name, name);
+					error = TRUE;
+				}
+				last_bios = bios_flags;
+			}
 
-					/* fail if we hit a duplicate */
-					if (strcmp(rgninfo->entries[rgnnum].tag, region) == 0)
+			/* if this is a file, make sure it is properly formatted */
+			else if (ROMENTRY_ISFILE(romp))
+			{
+				const char *hash;
+				const char *s;
+
+				items_since_region++;
+
+				/* track the last filename we found */
+				last_name = ROM_GETNAME(romp);
+
+				/* make sure it's all lowercase */
+				for (s = last_name; *s; s++)
+					if (tolower(*s) != *s)
 					{
-						mame_printf_error("%s: %s has duplicate ROM_REGION type \"%s\"\n", driver->source_file, driver->name, region);
+						mame_printf_error("%s: %s has upper case ROM name %s\n", driver->source_file, driver->name, last_name);
 						error = TRUE;
 						break;
 					}
-				}
-			}
-		}
 
-		/* If this is a system bios, make sure it is using the next available bios number */
-		else if (ROMENTRY_ISSYSTEM_BIOS(romp))
-		{
-			bios_flags = ROM_GETBIOSFLAGS(romp);
-			if (last_bios+1 != bios_flags)
-			{
-				const char *name = ROM_GETNAME(romp);
-				mame_printf_error("%s: %s has non-sequential bios %s\n", driver->source_file, driver->name, name);
-				error = TRUE;
-			}
-			last_bios = bios_flags;
-		}
-
-		/* if this is a file, make sure it is properly formatted */
-		else if (ROMENTRY_ISFILE(romp))
-		{
-			const char *hash;
-			const char *s;
-
-			items_since_region++;
-
-			/* track the last filename we found */
-			last_name = ROM_GETNAME(romp);
-
-			/* make sure it's all lowercase */
-			for (s = last_name; *s; s++)
-				if (tolower(*s) != *s)
+				/* if this is a bios rom, make sure it has the same flags as the last system bios entry */
+				bios_flags = ROM_GETBIOSFLAGS(romp);
+				if (bios_flags != 0)
 				{
-					mame_printf_error("%s: %s has upper case ROM name %s\n", driver->source_file, driver->name, last_name);
-					error = TRUE;
-					break;
+					if (bios_flags != last_bios)
+					{
+						mame_printf_error("%s: %s has bios rom name %s without preceding matching system bios definition\n", driver->source_file, driver->name, last_name);
+						error = TRUE;
+					}
 				}
 
-			/* if this is a bios rom, make sure it has the same flags as the last system bios entry */
-			bios_flags = ROM_GETBIOSFLAGS(romp);
-			if (bios_flags != 0)
-			{
-				if (bios_flags != last_bios)
+				/* make sure the has is valid */
+				hash = ROM_GETHASHDATA(romp);
+				if (!hash_verify_string(hash))
 				{
-					mame_printf_error("%s: %s has bios rom name %s without preceding matching system bios definition\n", driver->source_file, driver->name, last_name);
+					mame_printf_error("%s: rom '%s' has an invalid hash string '%s'\n", driver->name, last_name, hash);
 					error = TRUE;
 				}
 			}
 
-			/* make sure the has is valid */
-			hash = ROM_GETHASHDATA(romp);
-			if (!hash_verify_string(hash))
+			/* for any non-region ending entries, make sure they don't extend past the end */
+			if (!ROMENTRY_ISREGIONEND(romp) && currgn != NULL)
 			{
-				mame_printf_error("%s: rom '%s' has an invalid hash string '%s'\n", driver->name, last_name, hash);
-				error = TRUE;
+				items_since_region++;
+
+				if (ROM_GETOFFSET(romp) + ROM_GETLENGTH(romp) > currgn->length)
+				{
+					mame_printf_error("%s: %s has ROM %s extending past the defined memory region\n", driver->source_file, driver->name, last_name);
+					error = TRUE;
+				}
 			}
 		}
 
-		/* for any non-region ending entries, make sure they don't extend past the end */
-		if (!ROMENTRY_ISREGIONEND(romp) && currgn != NULL)
-		{
-			items_since_region++;
+		/* final check for empty regions */
+		if (items_since_region == 0)
+			mame_printf_warning("%s: %s has empty ROM region (warning)\n", driver->source_file, driver->name);
 
-			if (ROM_GETOFFSET(romp) + ROM_GETLENGTH(romp) > currgn->length)
-			{
-				mame_printf_error("%s: %s has ROM %s extending past the defined memory region\n", driver->source_file, driver->name, last_name);
-				error = TRUE;
-			}
+		/* look for more devices with regions */
+		romp = NULL;
+		for (device = (device == NULL) ? config->devicelist : device->next; device != NULL; device = device->next)
+		{
+			romp = device_get_info_ptr(device, DEVINFO_PTR_ROM_REGION);
+			if (romp != NULL)
+				break;
 		}
 	}
-
-	/* final check for empty regions */
-	if (items_since_region == 0)
-		mame_printf_warning("%s: %s has empty ROM region (warning)\n", driver->source_file, driver->name);
 
 	return error;
 }

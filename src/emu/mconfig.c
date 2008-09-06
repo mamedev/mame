@@ -18,7 +18,7 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void machine_config_detokenize(machine_config *config, const machine_config_token *tokens);
+static void machine_config_detokenize(machine_config *config, const machine_config_token *tokens, int depth);
 
 
 
@@ -41,7 +41,7 @@ machine_config *machine_config_alloc(const machine_config_token *tokens)
 	memset(config, 0, sizeof(*config));
 
 	/* parse tokens into the config */
-	machine_config_detokenize(config, tokens);
+	machine_config_detokenize(config, tokens, 0);
 	return config;
 }
 
@@ -62,14 +62,12 @@ void machine_config_free(machine_config *config)
 }
 
 
-
-
 /*-------------------------------------------------
-    machine_config_add_cpu - add a CPU during machine
-    driver expansion
+    cpu_add - add a CPU during machine driver
+    expansion
 -------------------------------------------------*/
 
-cpu_config *machine_config_add_cpu(machine_config *machine, const char *tag, cpu_type type, int cpuclock)
+static cpu_config *cpu_add(machine_config *machine, const char *tag, cpu_type type, int cpuclock)
 {
 	int cpunum;
 
@@ -88,11 +86,11 @@ cpu_config *machine_config_add_cpu(machine_config *machine, const char *tag, cpu
 
 
 /*-------------------------------------------------
-    machine_config_find_cpu - find a tagged CPU during
-    machine driver expansion
+    cpu_find - find a tagged CPU during machine 
+    driver expansion
 -------------------------------------------------*/
 
-cpu_config *machine_config_find_cpu(machine_config *machine, const char *tag)
+static cpu_config *cpu_find(machine_config *machine, const char *tag)
 {
 	int cpunum;
 
@@ -106,11 +104,11 @@ cpu_config *machine_config_find_cpu(machine_config *machine, const char *tag)
 
 
 /*-------------------------------------------------
-    machine_config_remove_cpu - remove a tagged CPU
-    during machine driver expansion
+    cpu_remove - remove a tagged CPU during
+    machine driver expansion
 -------------------------------------------------*/
 
-void machine_config_remove_cpu(machine_config *machine, const char *tag)
+static void cpu_remove(machine_config *machine, const char *tag)
 {
 	int cpunum;
 
@@ -127,11 +125,11 @@ void machine_config_remove_cpu(machine_config *machine, const char *tag)
 
 
 /*-------------------------------------------------
-    machine_config_add_sound - add a sound system during
+    sound_add - add a sound system during
     machine driver expansion
 -------------------------------------------------*/
 
-sound_config *machine_config_add_sound(machine_config *machine, const char *tag, sound_type type, int clock)
+static sound_config *sound_add(machine_config *machine, const char *tag, sound_type type, int clock)
 {
 	int soundnum;
 
@@ -152,11 +150,11 @@ sound_config *machine_config_add_sound(machine_config *machine, const char *tag,
 
 
 /*-------------------------------------------------
-    machine_config_find_sound - find a tagged sound
-    system during machine driver expansion
+    sound_find - find a tagged sound system during 
+    machine driver expansion
 -------------------------------------------------*/
 
-sound_config *machine_config_find_sound(machine_config *machine, const char *tag)
+static sound_config *sound_find(machine_config *machine, const char *tag)
 {
 	int soundnum;
 
@@ -170,11 +168,11 @@ sound_config *machine_config_find_sound(machine_config *machine, const char *tag
 
 
 /*-------------------------------------------------
-    machine_config_remove_sound - remove a tagged sound
-    system during machine driver expansion
+    sound_remove - remove a tagged sound system 
+    during machine driver expansion
 -------------------------------------------------*/
 
-void machine_config_remove_sound(machine_config *machine, const char *tag)
+static void sound_remove(machine_config *machine, const char *tag)
 {
 	int soundnum;
 
@@ -195,20 +193,20 @@ void machine_config_remove_sound(machine_config *machine, const char *tag)
     machine config
 -------------------------------------------------*/
 
-static void machine_config_detokenize(machine_config *config, const machine_config_token *tokens)
+static void machine_config_detokenize(machine_config *config, const machine_config_token *tokens, int depth)
 {
 	UINT32 entrytype = MCONFIG_TOKEN_INVALID;
 	device_config *device = NULL;
-	cpu_config *cpu = NULL;
 	sound_config *sound = NULL;
-
+	cpu_config *cpu = NULL;
+	
 	/* loop over tokens until we hit the end */
 	while (entrytype != MCONFIG_TOKEN_END)
 	{
-		device_type devtype;
-		const char *tag;
 		int size, offset, type, bits, in, out;
 		UINT32 data32, clock, gain;
+		device_type devtype;
+		const char *tag;
 		UINT64 data64;
 
 		/* unpack the token from the first entry */
@@ -221,7 +219,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 
 			/* including */
 			case MCONFIG_TOKEN_INCLUDE:
-				machine_config_detokenize(config, TOKEN_GET_PTR(tokens, tokenptr));
+				machine_config_detokenize(config, TOKEN_GET_PTR(tokens, tokenptr), depth + 1);
 				break;
 
 			/* device management */
@@ -308,17 +306,17 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, type, 24, clock, 32);
 				tag = TOKEN_GET_STRING(tokens);
-				cpu = machine_config_add_cpu(config, tag, type, clock);
+				cpu = cpu_add(config, tag, type, clock);
 				break;
 
 			case MCONFIG_TOKEN_CPU_MODIFY:
 				tag = TOKEN_GET_STRING(tokens);
-				cpu = machine_config_find_cpu(config, tag);
+				cpu = cpu_find(config, tag);
 				break;
 
 			case MCONFIG_TOKEN_CPU_REMOVE:
 				tag = TOKEN_GET_STRING(tokens);
-				machine_config_remove_cpu(config, tag);
+				cpu_remove(config, tag);
 				cpu = NULL;
 				break;
 
@@ -326,7 +324,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, type, 24, clock, 32);
 				tag = TOKEN_GET_STRING(tokens);
-				cpu = machine_config_find_cpu(config, tag);
+				cpu = cpu_find(config, tag);
 				if (cpu == NULL)
 					fatalerror("Unable to find CPU: tag=%s\n", tag);
 				cpu->type = type;
@@ -479,16 +477,16 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, type, 24, clock, 32);
 				tag = TOKEN_GET_STRING(tokens);
-				sound = machine_config_add_sound(config, tag, type, clock);
+				sound = sound_add(config, tag, type, clock);
 				break;
 
 			case MCONFIG_TOKEN_SOUND_REMOVE:
-				machine_config_remove_sound(config, TOKEN_GET_STRING(tokens));
+				sound_remove(config, TOKEN_GET_STRING(tokens));
 				break;
 
 			case MCONFIG_TOKEN_SOUND_MODIFY:
 				tag = TOKEN_GET_STRING(tokens);
-				sound = machine_config_find_sound(config, tag);
+				sound = sound_find(config, tag);
 				if (sound == NULL)
 					fatalerror("Unable to find sound: tag=%s\n", tag);
 				sound->routes = 0;
@@ -503,7 +501,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, type, 24, clock, 32);
 				tag = TOKEN_GET_STRING(tokens);
-				sound = machine_config_find_sound(config, tag);
+				sound = sound_find(config, tag);
 				if (sound == NULL)
 					fatalerror("Unable to find sound: tag=%s\n", tag);
 				sound->type = type;
@@ -528,4 +526,13 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				break;
 		}
 	}
+	
+	/* if we are the outermost level, process any device-specific machine configurations */
+	if (depth == 0)
+		for (device = config->devicelist; device != NULL; device = device->next)
+		{
+			tokens = device_get_info_ptr(device, DEVINFO_PTR_MACHINE_CONFIG);
+			if (tokens != NULL)
+				machine_config_detokenize(config, tokens, depth + 1);
+		}
 }

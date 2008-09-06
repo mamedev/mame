@@ -58,6 +58,7 @@ enum
 	DEVINFO_PTR_FIRST = 0x10000,
 
 		DEVINFO_PTR_ROM_REGION = DEVINFO_PTR_FIRST,		/* R/O: pointer to device-specific ROM region */
+		DEVINFO_PTR_MACHINE_CONFIG,						/* R/O: pointer to device-specific machine config */
 
 	DEVINFO_PTR_DEVICE_SPECIFIC = 0x18000,				/* R/W: device-specific values start here */
 	DEVINFO_PTR_LAST = 0x1ffff,
@@ -162,6 +163,7 @@ union _deviceinfo
 	device_validity_check_func validity_check;		/* DEVINFO_FCT_VALIDITY_CHECK */
 	device_nvram_func		nvram;					/* DEVINFO_FCT_NVRAM */
 	const rom_entry *		romregion;				/* DEVINFO_PTR_ROM_REGION */
+	const union _machine_config_token *machine_config;/* DEVINFO_PTR_MACHINE_CONFIG */
 };
 
 

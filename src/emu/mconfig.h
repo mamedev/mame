@@ -462,16 +462,4 @@ machine_config *machine_config_alloc(const machine_config_token *tokens);
 void machine_config_free(machine_config *config);
 
 
-
-
-
-cpu_config *machine_config_add_cpu(machine_config *machine, const char *tag, cpu_type type, int cpuclock);
-cpu_config *machine_config_find_cpu(machine_config *machine, const char *tag);
-void machine_config_remove_cpu(machine_config *machine, const char *tag);
-
-sound_config *machine_config_add_sound(machine_config *machine, const char *tag, sound_type type, int clock);
-sound_config *machine_config_find_sound(machine_config *machine, const char *tag);
-void machine_config_remove_sound(machine_config *machine, const char *tag);
-
-
 #endif	/* __MCONFIG_H__ */

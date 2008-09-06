@@ -703,7 +703,6 @@ void *device_get_info_ptr(const device_config *device, UINT32 state)
 	deviceinfo info;
 
 	assert(device != NULL);
-	assert(device->token != NULL);
 	assert(device->type != NULL);
 	assert(state >= DEVINFO_PTR_FIRST && state <= DEVINFO_PTR_LAST);
 
