@@ -13,7 +13,7 @@
 
     <mamecheat version="1">
         <cheat desc="blah">
-           <parameter min="minval(0)" max="maxval(numitems)" step="stepval(1)" default="defvalue(minval)">
+           <parameter min="minval(0)" max="maxval(numitems)" step="stepval(1)">
               <item value="itemval(previtemval|minval+stepval)">text</item>
               ...
            </parameter>
@@ -110,8 +110,6 @@ struct _cheat_parameter
 	int					maxformat;						/* format of maximum value */
 	UINT64				stepval;						/* step value */
 	int					stepformat;						/* format of step value */
-	UINT64				defval;							/* default value */
-	int					defformat;						/* format of default value */
 	UINT64				value;							/* live value of the parameter */
 	char				valuestring[32];				/* small space for a value string */
 	parameter_item *	itemlist;						/* list of items */
@@ -394,38 +392,54 @@ void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const 
 	/* if we have a value parameter, compute it */
 	else if (cheat->parameter->itemlist == NULL)
 	{
-		if (state != NULL)
+		if (cheat->state == SCRIPT_STATE_OFF)
 		{
-			sprintf(cheat->parameter->valuestring, "%d", (UINT32)cheat->parameter->value);
-			*state = cheat->parameter->valuestring;
+			if (state != NULL)
+				*state = "Off";
+			if (flags != NULL)
+				*flags = MENU_FLAG_RIGHT_ARROW;
 		}
-		if (flags != NULL)
+		else
 		{
-			*flags = 0;
-			if (cheat->parameter->value > cheat->parameter->minval)
-				*flags |= MENU_FLAG_LEFT_ARROW;
-			if (cheat->parameter->value < cheat->parameter->maxval)
-				*flags |= MENU_FLAG_RIGHT_ARROW;
+			if (state != NULL)
+			{
+				sprintf(cheat->parameter->valuestring, "%d", (UINT32)cheat->parameter->value);
+				*state = cheat->parameter->valuestring;
+			}
+			if (flags != NULL)
+			{
+				*flags = MENU_FLAG_LEFT_ARROW;
+				if (cheat->parameter->value < cheat->parameter->maxval)
+					*flags |= MENU_FLAG_RIGHT_ARROW;
+			}
 		}
 	}
 
 	/* if we have an item list, pick the index */
 	else
 	{
-		parameter_item *item, *prev = NULL;
-
-		for (item = cheat->parameter->itemlist; item != NULL; prev = item, item = item->next)
-			if (item->value == cheat->parameter->value)
-				break;
-		if (state != NULL)
-			*state = (item != NULL) ? astring_c(item->text) : "??Invalid??";
-		if (flags != NULL)
+		if (cheat->state == SCRIPT_STATE_OFF)
 		{
-			*flags = 0;
-			if (item == NULL || prev != NULL)
-				*flags |= MENU_FLAG_LEFT_ARROW;
-			if (item == NULL || item->next != NULL)
-				*flags |= MENU_FLAG_RIGHT_ARROW;
+			if (state != NULL)
+				*state = "Off";
+			if (flags != NULL)
+				*flags = MENU_FLAG_RIGHT_ARROW;
+		}
+		else
+		{
+			parameter_item *item = NULL, *prev = NULL;
+		
+			for (item = cheat->parameter->itemlist; item != NULL; prev = item, item = item->next)
+				if (item->value == cheat->parameter->value)
+					break;
+			if (state != NULL)
+				*state = (item != NULL) ? astring_c(item->text) : "??Invalid??";
+			if (flags != NULL)
+			{
+				*flags = MENU_FLAG_LEFT_ARROW;
+				if (item == NULL || item->next != NULL)
+					*flags |= MENU_FLAG_RIGHT_ARROW;
+			}
 		}
 	}
 
@@ -473,22 +487,12 @@ int cheat_select_default_state(running_machine *machine, void *entry)
 		;
 
 	/* if we have no parameter, it's just on/off; default to off */
-	else if (cheat->parameter == NULL)
+	else
 	{
 		if (cheat->state != SCRIPT_STATE_OFF)
 		{
 			cheat->state = SCRIPT_STATE_OFF;
 			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_OFF);
-			changed = TRUE;
-		}
-	}
-
-	/* if we have a value parameter, fall back to the default */
-	else
-	{
-		if (cheat->parameter->value != cheat->parameter->defval)
-		{
-			cheat->parameter->value = cheat->parameter->defval;
 			changed = TRUE;
 		}
 	}
@@ -534,6 +538,12 @@ int cheat_select_previous_state(running_machine *machine, void *entry)
 			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
 			changed = TRUE;
 		}
+		else if (cheat->state != SCRIPT_STATE_OFF)
+		{
+			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_OFF);
+			cheat->state = SCRIPT_STATE_OFF;
+			changed = TRUE;
+		}
 	}
 
 	/* if we have an item list, pick the index */
@@ -546,8 +556,19 @@ int cheat_select_previous_state(running_machine *machine, void *entry)
 				break;
 		if (prev != NULL)
 		{
+			if (cheat->state == SCRIPT_STATE_OFF)
+			{
+				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
+				cheat->state = SCRIPT_STATE_RUN;
+			}
 			cheat->parameter->value = prev->value;
 			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
+			changed = TRUE;
+		}
+		else if (cheat->state != SCRIPT_STATE_OFF)
+		{
+			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_OFF);
+			cheat->state = SCRIPT_STATE_OFF;
 			changed = TRUE;
 		}
 	}
@@ -584,7 +605,15 @@ int cheat_select_next_state(running_machine *machine, void *entry)
 	/* if we have a value parameter, compute it */
 	else if (cheat->parameter->itemlist == NULL)
 	{
-		if (cheat->parameter->value < cheat->parameter->maxval)
+		if (cheat->state == SCRIPT_STATE_OFF)
+		{
+			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
+			cheat->state = SCRIPT_STATE_RUN;
+			cheat->parameter->value = cheat->parameter->minval;
+			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
+			changed = TRUE;
+		}
+		else if (cheat->parameter->value < cheat->parameter->maxval)
 		{
 			if (cheat->parameter->value > cheat->parameter->maxval - cheat->parameter->stepval)
 				cheat->parameter->value = cheat->parameter->maxval;
@@ -600,14 +629,25 @@ int cheat_select_next_state(running_machine *machine, void *entry)
 	{
 		parameter_item *item;
 
-		for (item = cheat->parameter->itemlist; item != NULL; item = item->next)
-			if (item->value == cheat->parameter->value)
-				break;
-		if (item->next != NULL)
+		if (cheat->state == SCRIPT_STATE_OFF)
 		{
-			cheat->parameter->value = item->next->value;
+			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
+			cheat->state = SCRIPT_STATE_RUN;
+			cheat->parameter->value = cheat->parameter->itemlist->value;
 			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
 			changed = TRUE;
+		}
+		else
+		{
+			for (item = cheat->parameter->itemlist; item != NULL; item = item->next)
+				if (item->value == cheat->parameter->value)
+					break;
+			if (item->next != NULL)
+			{
+				cheat->parameter->value = item->next->value;
+				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
+				changed = TRUE;
+			}
 		}
 	}
 	return changed;
@@ -973,7 +1013,7 @@ static cheat_entry *cheat_entry_load(running_machine *machine, const char *filen
 	}
 
 	/* set the initial state */
-	cheat->state = (cheat->parameter != NULL) ? SCRIPT_STATE_RUN : SCRIPT_STATE_OFF;
+	cheat->state = SCRIPT_STATE_OFF;
 	return cheat;
 
 error:
@@ -1078,8 +1118,6 @@ static cheat_parameter *cheat_parameter_load(const char *filename, xml_data_node
 	param->maxformat = xml_get_attribute_int_format(paramnode, "max");
 	param->stepval = xml_get_attribute_int(paramnode, "step", 1);
 	param->stepformat = xml_get_attribute_int_format(paramnode, "step");
-	param->defval = xml_get_attribute_int(paramnode, "default", param->minval);
-	param->defformat = xml_get_attribute_int_format(paramnode, "default");
 
 	/* iterate over items */
 	itemtailptr = &param->itemlist;
@@ -1116,10 +1154,8 @@ static cheat_parameter *cheat_parameter_load(const char *filename, xml_data_node
 		itemtailptr = &curitem->next;
 	}
 
-	/* if no default, pick the minimum */
-	if (xml_get_attribute_string(paramnode, "default", NULL) == NULL)
-		param->defval = (param->itemlist != NULL) ? param->itemlist->value : param->minval;
-	param->value = param->defval;
+	/* start at the minimum */
+	param->value = param->minval;
 
 	return param;
 
@@ -1150,7 +1186,6 @@ static void cheat_parameter_save(mame_file *cheatfile, const cheat_parameter *pa
 			mame_fprintf(cheatfile, " max=\"%s\"", format_int(string, param->maxval, param->maxformat));
 		if (param->stepval != 1)
 			mame_fprintf(cheatfile, " step=\"%s\"", format_int(string, param->stepval, param->stepformat));
-		mame_fprintf(cheatfile, " default=\"%s\"", format_int(string, param->defval, param->defformat));
 		mame_fprintf(cheatfile, "/>\n");
 	}
 
@@ -1159,7 +1194,6 @@ static void cheat_parameter_save(mame_file *cheatfile, const cheat_parameter *pa
 	{
 		const parameter_item *curitem;
 
-		mame_fprintf(cheatfile, " default=\"%s\">\n", format_int(string, param->defval, param->defformat));
 		for (curitem = param->itemlist; curitem != NULL; curitem = curitem->next)
 			mame_fprintf(cheatfile, "\t\t\t<item value=\"%s\">%s</item>\n", format_int(string, curitem->value, curitem->valformat), astring_c(curitem->text));
 		mame_fprintf(cheatfile, "\t\t</parameter>\n");
