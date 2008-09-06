@@ -91,24 +91,18 @@ static ADDRESS_MAP_START( kingpin_program_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( kingpin_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( kingpin_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(io_read_missing_dips)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("DSW")
 /*  AM_RANGE(0x02, 0x02) AM_READ(io_read_missing_dips) */
+/*  AM_RANGE(0x02, 0x02) AM_WRITE(NO IDEA) */
 	AM_RANGE(0x10, 0x10) AM_READ_PORT("IN0")
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("IN1")
-	AM_RANGE(0x20, 0x20) AM_READ(TMS9928A_vram_r)
-	AM_RANGE(0x21, 0x21) AM_READ(TMS9928A_register_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( kingpin_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-/*  AM_RANGE(0x02, 0x02) AM_WRITE(NO IDEA) */
 /*  AM_RANGE(0x12, 0x12) AM_WRITE(NO IDEA) */
 /*  AM_RANGE(0x13, 0x13) AM_WRITE(NO IDEA) */
-	AM_RANGE(0x20, 0x20) AM_WRITE(TMS9928A_vram_w)
-	AM_RANGE(0x21, 0x21) AM_WRITE(TMS9928A_register_w)
+	AM_RANGE(0x20, 0x20) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
+	AM_RANGE(0x21, 0x21) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
 /*  AM_RANGE(0x30, 0x30) AM_WRITE(LIKELY LIGHTS) */
 /*  AM_RANGE(0x40, 0x40) AM_WRITE(LIKELY LIGHTS) */
 /*  AM_RANGE(0x50, 0x50) AM_WRITE(LIKELY LIGHTS) */
@@ -147,13 +141,13 @@ static MACHINE_DRIVER_START( kingpin )
 /*  MAIN CPU */
 	MDRV_CPU_ADD("main", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(kingpin_program_map,0)
-	MDRV_CPU_IO_MAP(kingpin_readport,kingpin_writeport)
+	MDRV_CPU_IO_MAP(kingpin_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", kingpin_video_interrupt)
 
 /*  SOUND CPU */
 	MDRV_CPU_ADD("audio", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(kingpin_sound_map,0)
-	/*MDRV_CPU_IO_MAP(readport2,writeport2)*/
+	/*MDRV_CPU_IO_MAP(sound_io_map,0)*/
 
 /*  VIDEO */
 	MDRV_IMPORT_FROM(tms9928a)

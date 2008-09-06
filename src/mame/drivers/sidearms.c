@@ -226,17 +226,12 @@ static ADDRESS_MAP_START( whizz_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( whizz_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(ym2151_status_port_0_r)
-	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( whizz_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( whizz_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ym2151_register_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym2151_data_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2151_status_port_0_r, ym2151_data_port_0_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 
@@ -814,7 +809,7 @@ static MACHINE_DRIVER_START( whizz )
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(whizz_sound_readmem,whizz_sound_writemem)
-	MDRV_CPU_IO_MAP(whizz_readport,whizz_writeport)
+	MDRV_CPU_IO_MAP(whizz_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_INTERLEAVE(1000)
@@ -1226,5 +1221,6 @@ GAME( 1989, dyger,    0,        turtship, dyger,    dyger,    ROT270, "Philko", 
 GAME( 1989, dygera,   dyger,    turtship, dyger,    dyger,    ROT270, "Philko", "Dyger (Korea set 2)", 0 )
 GAME( 1989, twinfalc, 0,        whizz,    whizz,    whizz,    ROT0,   "Philko (Poara Enterprises license)", "Twin Falcons", 0 )
 GAME( 1989, whizz,    twinfalc, whizz,    whizz,    whizz,    ROT0,   "Philko", "Whizz", 0 )
+
 
 

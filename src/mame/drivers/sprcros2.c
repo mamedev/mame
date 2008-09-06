@@ -138,20 +138,13 @@ static ADDRESS_MAP_START( sprcros2_m_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM) AM_BASE(&sprcros2_sharedram)	//shared with slave cpu
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sprcros2_m_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2")
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("EXTRA")
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") AM_WRITE(sn76496_0_w)
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("P2") AM_WRITE(sn76496_1_w)
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("EXTRA") AM_WRITE(sn76496_2_w)
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW1")
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSW2")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sprcros2_m_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(sn76496_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(sn76496_1_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(sn76496_2_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(sprcros2_m_port7_w)
 ADDRESS_MAP_END
 
@@ -173,7 +166,7 @@ static ADDRESS_MAP_START( sprcros2_s_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(sprcros2_sharedram_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sprcros2_s_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( audio_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(sprcros2_bgscrollx_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(sprcros2_bgscrolly_w)
@@ -303,12 +296,12 @@ static MACHINE_DRIVER_START( sprcros2 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80,10000000/2)
 	MDRV_CPU_PROGRAM_MAP(sprcros2_m_readmem,sprcros2_m_writemem)
-	MDRV_CPU_IO_MAP(sprcros2_m_readport,sprcros2_m_writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(sprcros2_m_interrupt,2)	//1 nmi + 1 irq
 
 	MDRV_CPU_ADD("audio", Z80,10000000/2)
 	MDRV_CPU_PROGRAM_MAP(sprcros2_s_readmem,sprcros2_s_writemem)
-	MDRV_CPU_IO_MAP(0,sprcros2_s_writeport)
+	MDRV_CPU_IO_MAP(audio_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(sprcros2_s_interrupt,2)	//2 nmis
 
 	MDRV_MACHINE_START(sprcros2)

@@ -263,10 +263,11 @@ static READ8_HANDLER( cosmica_pixel_clock_r )
 	return pixel_clock;
 }
 
-static CUSTOM_INPUT( crtc_r )
+static READ8_HANDLER( cosmicg_port_0_r )
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
-	return (video_screen_get_vpos(field->port->machine->primary_screen) & 0xf0) >> 4;
+
+	return (input_port_read(machine, "IN0") & 0xf0) | ((video_screen_get_vpos(machine->primary_screen) & 0xf0) >> 4);
 }
 
 static READ8_HANDLER( magspot_coinage_dip_r )
@@ -357,12 +358,9 @@ static ADDRESS_MAP_START( cosmicg_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( cosmicg_readport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")
+static ADDRESS_MAP_START( cosmicg_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x00, 0x00) AM_READ(cosmicg_port_0_r)
 	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( cosmicg_writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x15) AM_WRITE(cosmicg_output_w)
 	AM_RANGE(0x16, 0x17) AM_WRITE(cosmic_color_register_w)
 ADDRESS_MAP_END
@@ -503,7 +501,7 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( cosmicg )
 	PORT_START("IN0")	/* 4-7 */
-	PORT_BIT( 0x0f, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(crtc_r, NULL)	/* pixel clock */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_SPECIAL )	/* pixel clock */
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1 )
@@ -966,7 +964,7 @@ static MACHINE_DRIVER_START( cosmicg )
             fed to the tms9904 or tms9980.  Also, I have never heard of a tms9900/9980 operating under
             1.5MHz.  So, if someone can check this... */
 	MDRV_CPU_PROGRAM_MAP(cosmicg_readmem,cosmicg_writemem)
-	MDRV_CPU_IO_MAP(cosmicg_readport,cosmicg_writeport)
+	MDRV_CPU_IO_MAP(cosmicg_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", cosmicg_interrupt)
 
 	/* video hardware */
@@ -1421,3 +1419,4 @@ GAME( 1980, panich,   panic,   panic,    panic,    0,       ROT270, "Universal",
 GAME( 1980, panicger, panic,   panic,    panic,    0,       ROT270, "Universal (ADP Automaten license)", "Space Panic (German)", 0 )
 GAME( 1980, devzone,  0,       devzone,  devzone,  devzone, ROT270, "Universal", "Devil Zone", GAME_IMPERFECT_SOUND )
 GAME( 1980, devzone2, devzone, devzone,  devzone2, devzone, ROT270, "Universal", "Devil Zone (easier)", GAME_IMPERFECT_SOUND )
+

@@ -582,25 +582,18 @@ static ADDRESS_MAP_START( srmp3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_3)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( srmp3_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( srmp3_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_READ_PORT("SYSTEM")							/* coin, service */
-	AM_RANGE(0xa1, 0xa1) AM_READ(srmp3_cchip_status_0_r)				/* custom chip status ??? */
-	AM_RANGE(0xc0, 0xc0) AM_READ(srmp3_input_r)						/* key matrix */
-	AM_RANGE(0xc1, 0xc1) AM_READ(srmp3_cchip_status_1_r)				/* custom chip status ??? */
-	AM_RANGE(0xe2, 0xe2) AM_READ(ay8910_read_port_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( srmp3_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_WRITE(SMH_NOP)							/* elapsed interrupt signal */
-	AM_RANGE(0x40, 0x40) AM_WRITE(srmp3_flags_w)						/* GFX bank, counter, lockout */
-	AM_RANGE(0x60, 0x60) AM_WRITE(srmp3_rombank_w)					/* ROM bank select */
+	AM_RANGE(0x20, 0x20) AM_WRITE(SMH_NOP)								/* elapsed interrupt signal */
+	AM_RANGE(0x40, 0x40) AM_READ_PORT("SYSTEM")	AM_WRITE(srmp3_flags_w)	/* coin, service | GFX bank, counter, lockout */
+	AM_RANGE(0x60, 0x60) AM_WRITE(srmp3_rombank_w)						/* ROM bank select */
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(srmp3_adpcm_code_w)					/* ADPCM number */
-	AM_RANGE(0xc0, 0xc0) AM_WRITE(srmp3_input_1_w)					/* I/O ??? */
-	AM_RANGE(0xc1, 0xc1) AM_WRITE(srmp3_input_2_w)					/* I/O ??? */
+	AM_RANGE(0xa1, 0xa1) AM_READ(srmp3_cchip_status_0_r)				/* custom chip status ??? */
+	AM_RANGE(0xc0, 0xc0) AM_READWRITE(srmp3_input_r, srmp3_input_1_w)	/* key matrix | I/O ??? */
+	AM_RANGE(0xc1, 0xc1) AM_READWRITE(srmp3_cchip_status_1_r, srmp3_input_2_w)	/* custom chip status ??? | I/O ??? */
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0xe1, 0xe1) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xe2, 0xe2) AM_READ(ay8910_read_port_0_r)
 ADDRESS_MAP_END
 
 
@@ -1107,7 +1100,7 @@ static MACHINE_DRIVER_START( srmp3 )
 	MDRV_CPU_ADD("main", Z80, 3500000)		/* 3.50 MHz ? */
 	//      4000000,                /* 4.00 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(srmp3_readmem,srmp3_writemem)
-	MDRV_CPU_IO_MAP(srmp3_readport,srmp3_writeport)
+	MDRV_CPU_IO_MAP(srmp3_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(srmp3)
@@ -1376,3 +1369,5 @@ GAME( 1990, mjyuugi,   0,        mjyuugi,  mjyuugi,  0,       ROT0, "Visco", "Ma
 GAME( 1990, mjyuugia,  mjyuugi,  mjyuugi,  mjyuugi,  0,       ROT0, "Visco", "Mahjong Yuugi (Japan set 2)",        0 )
 GAME( 1991, ponchin,   0,        mjyuugi,  ponchin,  0,       ROT0, "Visco", "Mahjong Pon Chin Kan (Japan set 1)", 0 )
 GAME( 1991, ponchina,  ponchin,  mjyuugi,  ponchin,  0,       ROT0, "Visco", "Mahjong Pon Chin Kan (Japan set 2)", 0 )
+
+

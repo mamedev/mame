@@ -183,15 +183,10 @@ static ADDRESS_MAP_START( reaktor_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* Reaktor reads / writes some I/O ports, no idea what they're connected to, if anything */
-static ADDRESS_MAP_START( reaktor_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(SMH_NOP)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( reaktor_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( reaktor_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x01, 0x01) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(SMH_NOP, SMH_NOP)
 	AM_RANGE(0x02, 0x02) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x03, 0x03) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
@@ -903,7 +898,7 @@ static MACHINE_DRIVER_START( reaktor )
 	MDRV_IMPORT_FROM(trackfld)
 	MDRV_CPU_REPLACE("main",Z80,18432000/6)
 	MDRV_CPU_PROGRAM_MAP(reaktor_readmem,reaktor_writemem)
-	MDRV_CPU_IO_MAP(reaktor_readport,reaktor_writeport)
+	MDRV_CPU_IO_MAP(reaktor_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 MACHINE_DRIVER_END
 
@@ -1307,3 +1302,4 @@ GAME( 1988, mastkin,  0,        mastkin,  mastkin,  mastkin,  ROT0,  "Du Tech", 
 GAME( 1985, wizzquiz, 0,        wizzquiz, wizzquiz, wizzquiz, ROT0,  "Konami", "Wizz Quiz (Konami version)", 0 )
 GAME( 1985, wizzquza, wizzquiz, wizzquiz, wizzquiz, wizzquiz, ROT0,  "Zilec - Zenitone", "Wizz Quiz (version 4)", 0 )
 GAME( 1987, reaktor,  0,        reaktor,  reaktor,  0,        ROT90, "Zilec", "Reaktor (Track & Field conversion)", 0 )
+

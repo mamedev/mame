@@ -66,53 +66,54 @@ static ADDRESS_MAP_START( gekiretu_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf200, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( quizdna_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( quizdna_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x02, 0x03) AM_WRITE(quizdna_bg_xscroll_w)
+	AM_RANGE(0x04, 0x04) AM_WRITE(quizdna_bg_yscroll_w)
+	AM_RANGE(0x05, 0x06) AM_WRITE(SMH_NOP) /* unknown */
 	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
 	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
 	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x91, 0x91) AM_READ_PORT("SERVICE")
-	AM_RANGE(0xe0, 0xe0) AM_READ(ym2203_status_port_0_r)
-	AM_RANGE(0xe1, 0xe1) AM_READ(ym2203_read_port_0_r)
-	AM_RANGE(0xf0, 0xf0) AM_READ(okim6295_status_0_r)
-
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( quizdna_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x03) AM_WRITE(quizdna_bg_xscroll_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(quizdna_bg_yscroll_w)
-	AM_RANGE(0x05, 0x06) AM_WRITE(SMH_NOP) /* unknown */
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(quizdna_rombank_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0xe0, 0xe0) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
+	AM_RANGE(0xe1, 0xe1) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0xf0, 0xf0) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gakupara_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( gakupara_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x01) AM_WRITE(quizdna_bg_xscroll_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(quizdna_bg_yscroll_w)
 	AM_RANGE(0x03, 0x04) AM_WRITE(SMH_NOP) /* unknown */
+	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
+	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
+	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x91, 0x91) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(quizdna_rombank_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0xe0, 0xe0) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
+	AM_RANGE(0xe1, 0xe1) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0xf0, 0xf0) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( gekiretu_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( gekiretu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x02, 0x03) AM_WRITE(quizdna_bg_xscroll_w)
 	AM_RANGE(0x04, 0x04) AM_WRITE(quizdna_bg_yscroll_w)
 	AM_RANGE(0x05, 0x06) AM_WRITE(SMH_NOP) /* unknown */
+	AM_RANGE(0x80, 0x80) AM_READ_PORT("P1")
+	AM_RANGE(0x81, 0x81) AM_READ_PORT("P2")
+	AM_RANGE(0x90, 0x90) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x91, 0x91) AM_READ_PORT("SERVICE")
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(gekiretu_rombank_w)
 	AM_RANGE(0xd0, 0xd0) AM_WRITE(quizdna_screen_ctrl_w)
-	AM_RANGE(0xe0, 0xe0) AM_WRITE(ym2203_control_port_0_w)
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(ym2203_write_port_0_w)
-	AM_RANGE(0xf0, 0xf0) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0xe0, 0xe0) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
+	AM_RANGE(0xe1, 0xe1) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0xf0, 0xf0) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 ADDRESS_MAP_END
+
 
 /****************************************************************************/
 
@@ -462,7 +463,7 @@ static MACHINE_DRIVER_START( quizdna )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, MCLK/2) /* 8.000 MHz */
 	MDRV_CPU_PROGRAM_MAP(quizdna_readmem,quizdna_writemem)
-	MDRV_CPU_IO_MAP(quizdna_readport,quizdna_writeport)
+	MDRV_CPU_IO_MAP(quizdna_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
@@ -500,7 +501,7 @@ static MACHINE_DRIVER_START( gakupara )
 	MDRV_IMPORT_FROM(quizdna)
 
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_IO_MAP(quizdna_readport,gakupara_writeport)
+	MDRV_CPU_IO_MAP(gakupara_io_map,0)
 
 MACHINE_DRIVER_END
 
@@ -511,7 +512,7 @@ static MACHINE_DRIVER_START( gekiretu )
 
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(quizdna_readmem,gekiretu_writemem)
-	MDRV_CPU_IO_MAP(quizdna_readport,gekiretu_writeport)
+	MDRV_CPU_IO_MAP(gekiretu_io_map,0)
 
 MACHINE_DRIVER_END
 
@@ -541,7 +542,6 @@ ROM_START( quizdna )
 
 	ROM_REGION( 0x00020, "user1", 0 ) /* fg control */
 	ROM_LOAD( "quiz2.148",    0x000000,  0x000020, CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
-
 ROM_END
 
 ROM_START( gakupara )
@@ -567,7 +567,6 @@ ROM_START( gakupara )
 
 	ROM_REGION( 0x00020, "user1", 0 ) /* fg control */
 	ROM_LOAD( "u148.bin", 0x000000,  0x000020, CRC(971df9d2) SHA1(280f5b386922b9902ca9211c719642c2bd0ba899) )
-
 ROM_END
 
 ROM_START( gekiretu )
@@ -593,7 +592,6 @@ ROM_START( gekiretu )
 
 	ROM_REGION( 0x00020, "user1", 0 ) /* fg control */
 	ROM_LOAD( "quiz3.148",    0x000000,  0x000020, CRC(91267e8a) SHA1(ae5bd8efea5322c4d9986d06680a781392f9a642) )
-
 ROM_END
 
 GAME( 1991, gakupara, 0, gakupara, gakupara, 0, ROT0, "NMK",  "Quiz Gakuen Paradise (Japan)", 0 )
