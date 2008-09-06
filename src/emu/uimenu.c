@@ -2482,10 +2482,14 @@ static void menu_cheat(running_machine *machine, ui_menu *menu, void *parameter,
 		{
 			switch (event->iptkey)
 			{
-				/* if selected, reset to default value or activate a oneshot */
+				/* if selected, activate a oneshot */
 				case IPT_UI_SELECT:
+					changed = cheat_activate(machine, event->itemref);
+					break;
+
+				/* if cleared, reset to default value */
+				case IPT_UI_CLEAR:
 					changed = cheat_select_default_state(machine, event->itemref);
-					changed |= cheat_activate(machine, event->itemref);
 					break;
 
 				/* left decrements */
