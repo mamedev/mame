@@ -260,19 +260,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if (fastfred_hardware_type == 3)
 		{
 			// Imago
-
-			//fastfred_spriteram[offs + 2] & 0xf8 get only set at startup
-			//the code is greater than 0x3f only at startup
-
-			/* TODO: find correct sprites banking */
-
-			code  = (fastfred_spriteram[offs + 1]) & 0x1f;
-
-			code |= fastfred_spriteram[offs + 2]<<5;
-
-			if(fastfred_spriteram[offs + 1] & 0x20)
-				code ^= 0xff;
-
+			code  = (fastfred_spriteram[offs + 1]) & 0x3f;
 			flipx = 0;
 			flipy = 0;
 		}

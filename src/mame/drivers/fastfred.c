@@ -109,6 +109,46 @@ static READ8_HANDLER( jumpcoas_custom_io_r )
 	return 0x00;
 }
 
+/*
+	Imago sprites DMA
+*/
+
+static UINT8 imago_sprites[0x800*3];
+static UINT16 imago_sprites_address;
+static UINT8 imago_sprites_bank = 0;
+
+static WRITE8_HANDLER( imago_dma_irq_w )
+{
+	cpunum_set_input_line(machine, 0, 0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static WRITE8_HANDLER( imago_sprites_bank_w )
+{
+	imago_sprites_bank = (data & 2) >> 1;
+}
+
+static WRITE8_HANDLER( imago_sprites_dma_w )
+{
+	UINT8 *rom = (UINT8 *)memory_region(machine, "gfx2");
+	UINT8 sprites_data;
+
+	sprites_data = rom[imago_sprites_address + 0x2000*0 + imago_sprites_bank * 0x1000];
+	imago_sprites[offset + 0x800*0] = sprites_data;
+
+	sprites_data = rom[imago_sprites_address + 0x2000*1 + imago_sprites_bank * 0x1000];
+	imago_sprites[offset + 0x800*1] = sprites_data;
+
+	sprites_data = rom[imago_sprites_address + 0x2000*2 + imago_sprites_bank * 0x1000];
+	imago_sprites[offset + 0x800*2] = sprites_data;
+
+	decodechar(machine->gfx[1], offset/32, imago_sprites);
+}
+
+static READ8_HANDLER( imago_sprites_offset_r )
+{
+	imago_sprites_address = offset;
+	return 0xff; //not really used
+}
 
 static ADDRESS_MAP_START( fastfred_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
@@ -163,8 +203,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( imago_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
+	AM_RANGE(0x1000, 0x1fff) AM_READ(imago_sprites_offset_r)
 	AM_RANGE(0x2000, 0x6fff) AM_ROM
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM // same fg videoram (which one of the 2 is really used?)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM_WRITE(imago_sprites_dma_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcbff) AM_RAM_WRITE(imago_fg_videoram_w) AM_BASE(&imago_fg_videoram)
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(fastfred_videoram_w) AM_BASE(&fastfred_videoram)
@@ -177,10 +219,12 @@ static ADDRESS_MAP_START( imago_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf001, 0xf001) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0xf002, 0xf002) AM_WRITE(fastfred_colorbank1_w)
 	AM_RANGE(0xf003, 0xf003) AM_WRITE(fastfred_colorbank2_w)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE(SMH_NOP) // initialized with 0 then when written always 1
+	AM_RANGE(0xf004, 0xf004) AM_WRITE(imago_dma_irq_w)
 	AM_RANGE(0xf005, 0xf005) AM_WRITE(imago_charbank_w)
 	AM_RANGE(0xf006, 0xf006) AM_WRITE(fastfred_flip_screen_x_w)
 	AM_RANGE(0xf007, 0xf007) AM_WRITE(fastfred_flip_screen_y_w)
+	AM_RANGE(0xf400, 0xf400) AM_WRITENOP // writes 0 or 2
+	AM_RANGE(0xf401, 0xf401) AM_WRITE(imago_sprites_bank_w)
 	AM_RANGE(0xf800, 0xf800) AM_READWRITE(SMH_NOP, soundlatch_w)
 ADDRESS_MAP_END
 
@@ -518,6 +562,19 @@ static const gfx_layout spritelayout =
 	32*8
 };
 
+static const gfx_layout imago_spritelayout =
+{
+	16,16,
+	0x40,
+	3,
+	{ 0x800*8*2, 0x800*8*1, 0x800*8*0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,
+	  8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
+	  16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
+	32*8
+};
+
 static const gfx_layout imago_char_1bpp =
 {
 	8,8,
@@ -540,10 +597,10 @@ static GFXDECODE_START( jumpcoas )
 GFXDECODE_END
 
 static GFXDECODE_START( imago )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,	        0, 32 )
-	GFXDECODE_ENTRY( "gfx2", 0, spritelayout,        0, 32 )
-	GFXDECODE_ENTRY( "gfx3", 0, charlayout,          0, 32 )
-	GFXDECODE_ENTRY( "gfx4", 0, imago_char_1bpp, 0x140,  1 )
+	GFXDECODE_ENTRY( "gfx1", 0,		 charlayout,	      0, 32 )
+	GFXDECODE_ENTRY( NULL,	 0xb800, imago_spritelayout,  0, 32 )
+	GFXDECODE_ENTRY( "gfx3", 0,		 charlayout,          0, 32 )
+	GFXDECODE_ENTRY( "gfx4", 0,		 imago_char_1bpp, 0x140,  1 )
 GFXDECODE_END
 
 #define CLOCK 18432000  /* The crystal is 18.432MHz */
@@ -830,7 +887,7 @@ ROM_START( imago )
 	ROM_LOAD( "imago02.40", 0x1000, 0x1000, CRC(71354480) SHA1(f5f5e1cc336cae1778b7f6c744eb1bdc4226f138) )
 	ROM_LOAD( "3.bin",      0x2000, 0x1000, CRC(722fd625) SHA1(6f9a9f4f000cc0b251ca8d496a2ea4a708665dda) )
 
-	ROM_REGION( 0x6000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, "gfx2", 0 )
 	ROM_LOAD( "imago04.51", 0x0000, 0x1000, CRC(ed987b3e) SHA1(2f88a0463b4323adb27467fb3d022144a4943793) )
 	ROM_LOAD( "imago05.52", 0x1000, 0x1000, CRC(77ee68ce) SHA1(a47af1bec81977d0f47463bd88e9f526fd2d6611) )
 	ROM_LOAD( "imago07.56", 0x2000, 0x1000, CRC(48b35190) SHA1(3a000264aad03f55fe67eed7c868acf87e804c0f) )
@@ -867,7 +924,7 @@ ROM_START( imagoa )
 	ROM_LOAD( "imago02.40", 0x1000, 0x1000, CRC(71354480) SHA1(f5f5e1cc336cae1778b7f6c744eb1bdc4226f138) )
 	ROM_LOAD( "imago03.41", 0x2000, 0x1000, CRC(7aba3d98) SHA1(5d058f39bf1339d523fe015b67083d44ff6a81d4) )
 
-	ROM_REGION( 0x6000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, "gfx2", 0 )
 	ROM_LOAD( "imago04.51", 0x0000, 0x1000, CRC(ed987b3e) SHA1(2f88a0463b4323adb27467fb3d022144a4943793) )
 	ROM_LOAD( "imago05.52", 0x1000, 0x1000, CRC(77ee68ce) SHA1(a47af1bec81977d0f47463bd88e9f526fd2d6611) )
 	ROM_LOAD( "imago07.56", 0x2000, 0x1000, CRC(48b35190) SHA1(3a000264aad03f55fe67eed7c868acf87e804c0f) )
@@ -931,5 +988,5 @@ GAME( 1983, jumpcoas, 0,        jumpcoas, jumpcoas, jumpcoas, ROT90, "Kaneko", "
 GAME( 1983, jumpcoat, jumpcoas, jumpcoas, jumpcoas, jumpcoas, ROT90, "Taito", "Jump Coaster (Taito)", 0 )
 GAME( 1983, boggy84,  0,        jumpcoas, boggy84,  boggy84,  ROT90, "bootleg", "Boggy '84", 0 )
 GAME( 1986, redrobin, 0,        fastfred, redrobin, flyboyb,  ROT90, "Elettronolo", "Red Robin", 0 )
-GAME( 1984, imago,	  0,		imago,    imago,    imago,    ROT90, "Acom", "Imago (cocktail set)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1983, imagoa,	  imago,	imago,    imagoa,   imago,    ROT90, "Acom", "Imago (no cocktail set)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1984, imago,	  0,		imago,    imago,    imago,    ROT90, "Acom", "Imago (cocktail set)", 0 )
+GAME( 1983, imagoa,	  imago,	imago,    imagoa,   imago,    ROT90, "Acom", "Imago (no cocktail set)", 0 )
