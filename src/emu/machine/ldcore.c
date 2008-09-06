@@ -1571,8 +1571,8 @@ DEVICE_GET_INFO( laserdisc )
 		case LDINFO_INT_TYPE:					info->i = config->type;								break;
 
 		/* --- the following bits of info are returned as pointers --- */
-		case DEVINFO_PTR_ROM_REGION:			info->romregion = intf->romregion;					break;
-		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = intf->machine_config;		break;
+		case DEVINFO_PTR_ROM_REGION:			info->romregion = (intf != NULL) ? intf->romregion : NULL; break;
+		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = (intf != NULL) ? intf->machine_config : NULL; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(laserdisc); 	break;
@@ -1581,7 +1581,7 @@ DEVICE_GET_INFO( laserdisc )
 		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(laserdisc);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					info->s = intf->name;								break;
+		case DEVINFO_STR_NAME:					info->s = (intf != NULL) ? intf->name : "Unknown Laserdisc Player";	break;
 		case DEVINFO_STR_FAMILY:				info->s = "Laserdisc Player";						break;
 		case DEVINFO_STR_VERSION:				info->s = "1.0";									break;
 		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__;									break;
