@@ -257,14 +257,10 @@ static ADDRESS_MAP_START(shdancbl_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( shdancbl_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0xc0, 0xdf) AM_READ(SMH_NOP)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( shdancbl_sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( shdancbl_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0xa0, 0xbf) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xc0, 0xdf) AM_READ(SMH_NOP)
 ADDRESS_MAP_END
 
 /***************************************************************************/
@@ -306,27 +302,21 @@ static WRITE8_HANDLER( sys18_soundbank_w )
 	else sys18_SoundMemBank = NULL;
 }
 
-
-static ADDRESS_MAP_START( sound_readport_18, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_18_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_READ(ym3438_status_port_0_a_r)
-//  AM_RANGE(0x82, 0x82) AM_READ(ym3438_status_port_0_b_r)
-//  AM_RANGE(0x90, 0x90) AM_READ(ym3438_status_port_1_a_r)
-//  AM_RANGE(0x92, 0x92) AM_READ(ym3438_status_port_1_b_r)
-	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writeport_18, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_WRITE(ym3438_control_port_0_a_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(ym3438_status_port_0_a_r, ym3438_control_port_0_a_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(ym3438_data_port_0_a_w)
+//  AM_RANGE(0x82, 0x82) AM_READ(ym3438_status_port_0_b_r)
 	AM_RANGE(0x82, 0x82) AM_WRITE(ym3438_control_port_0_b_w)
 	AM_RANGE(0x83, 0x83) AM_WRITE(ym3438_data_port_0_b_w)
+//  AM_RANGE(0x90, 0x90) AM_READ(ym3438_status_port_1_a_r)
 	AM_RANGE(0x90, 0x90) AM_WRITE(ym3438_control_port_1_a_w)
 	AM_RANGE(0x91, 0x91) AM_WRITE(ym3438_data_port_1_a_w)
+//  AM_RANGE(0x92, 0x92) AM_READ(ym3438_status_port_1_b_r)
 	AM_RANGE(0x92, 0x92) AM_WRITE(ym3438_control_port_1_b_w)
 	AM_RANGE(0x93, 0x93) AM_WRITE(ym3438_data_port_1_b_w)
 	AM_RANGE(0xa0, 0xa0) AM_WRITE(sys18_soundbank_w)
+	AM_RANGE(0xc0, 0xc0) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static WRITE16_HANDLER( sound_command_nmi_w ){
@@ -1095,7 +1085,7 @@ static MACHINE_DRIVER_START( system18 )
 
 	MDRV_CPU_ADD("sound", Z80, 8000000)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_18,sound_writemem_18)
-	MDRV_CPU_IO_MAP(sound_readport_18,sound_writeport_18)
+	MDRV_CPU_IO_MAP(sound_18_io_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1163,7 +1153,7 @@ static MACHINE_DRIVER_START( shdancbl )
 
 	MDRV_CPU_MODIFY("sound")
 	MDRV_CPU_PROGRAM_MAP(shdancbl_sound_readmem,shdancbl_sound_writemem)
-	MDRV_CPU_IO_MAP(shdancbl_sound_readport,shdancbl_sound_writeport)
+	MDRV_CPU_IO_MAP(shdancbl_sound_io_map,0)
 	MDRV_SOUND_REMOVE("5c68")
 
 	MDRV_SOUND_ADD("5205", MSM5205, 200000)
@@ -1545,3 +1535,4 @@ GAME( 1990, astormb2, astorm,   astormbl, astormbl, astormbl, ROT0, "bootleg", "
 GAME( 1990, mwalkbl,  mwalk,    mwalkbl,  mwalkbl,  mwalkbl,  ROT0, "bootleg", "Michael Jackson's Moonwalker (bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1989, shdancbl, shdancer, shdancbl, mwalkbl,  shdancbl, ROT0, "bootleg", "Shadow Dancer (bootleg)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+

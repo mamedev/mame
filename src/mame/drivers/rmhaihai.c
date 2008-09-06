@@ -198,17 +198,11 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_ROM)	/* rmhaisei only */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
-	AM_RANGE(0x8000, 0x8000) AM_READ(keyboard_r)
-	AM_RANGE(0x8001, 0x8001) AM_READ(SMH_NOP)	// ??
-	AM_RANGE(0x8020, 0x8020) AM_READ(ay8910_read_port_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(SMH_NOP)	// ??
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(keyboard_w)
-	AM_RANGE(0x8020, 0x8020) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x8000, 0x8000) AM_READWRITE(keyboard_r, SMH_NOP)	// ??
+	AM_RANGE(0x8001, 0x8001) AM_READWRITE(SMH_NOP, keyboard_w)	// ??
+	AM_RANGE(0x8020, 0x8020) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
 	AM_RANGE(0x8021, 0x8021) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x8040, 0x8040) AM_WRITE(adpcm_w)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
@@ -217,11 +211,11 @@ static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xbc0c, 0xbc0c) AM_WRITE(SMH_NOP)	// ??
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( themj_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(SMH_NOP)	// ??
-	AM_RANGE(0x8001, 0x8001) AM_WRITE(keyboard_w)
-	AM_RANGE(0x8020, 0x8020) AM_WRITE(ay8910_control_port_0_w)
+static ADDRESS_MAP_START( themj_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_READ(samples_r)
+	AM_RANGE(0x8000, 0x8000) AM_READWRITE(keyboard_r, SMH_NOP)	// ??
+	AM_RANGE(0x8001, 0x8001) AM_READWRITE(SMH_NOP, keyboard_w)	// ??
+	AM_RANGE(0x8020, 0x8020) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
 	AM_RANGE(0x8021, 0x8021) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x8040, 0x8040) AM_WRITE(adpcm_w)
 	AM_RANGE(0x8060, 0x8060) AM_WRITE(ctrl_w)
@@ -451,7 +445,7 @@ static MACHINE_DRIVER_START( rmhaihai )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main",Z80,20000000/4)	/* 5 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
@@ -498,7 +492,7 @@ static MACHINE_DRIVER_START( themj )
 
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(themj_readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,themj_writeport)
+	MDRV_CPU_IO_MAP(themj_io_map,0)
 
 	MDRV_MACHINE_RESET(themj)
 

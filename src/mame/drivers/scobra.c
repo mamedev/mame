@@ -403,18 +403,12 @@ static ADDRESS_MAP_START( hustlerb_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( scobra_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x80, 0x80) AM_READ(ay8910_read_port_1_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( scobra_sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( scobra_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x20, 0x20) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hustler_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -428,27 +422,17 @@ static ADDRESS_MAP_START( hustler_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x6000, 0x6fff) AM_WRITE(frogger_filter_w)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( hustler_sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( hustler_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_READ(ay8910_read_port_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hustler_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x40, 0x40) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hustlerb_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x80, 0x80) AM_READ(ay8910_read_port_0_r)
-ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hustlerb_sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( hustlerb_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( scobra )
@@ -1103,7 +1087,7 @@ static MACHINE_DRIVER_START( type1 )
 
 	MDRV_CPU_ADD("audio", Z80,14318000/8)	/* 1.78975 MHz */
 	MDRV_CPU_PROGRAM_MAP(scobra_sound_readmem,scobra_sound_writemem)
-	MDRV_CPU_IO_MAP(scobra_sound_readport,scobra_sound_writeport)
+	MDRV_CPU_IO_MAP(scobra_sound_io_map,0)
 
 	MDRV_MACHINE_RESET(scramble)
 
@@ -1241,7 +1225,7 @@ static MACHINE_DRIVER_START( hustler )
 
 	MDRV_CPU_ADD("audio",Z80,14318000/8)	/* 1.78975 MHz */
 	MDRV_CPU_PROGRAM_MAP(hustler_sound_readmem,hustler_sound_writemem)
-	MDRV_CPU_IO_MAP(hustler_sound_readport,hustler_sound_writeport)
+	MDRV_CPU_IO_MAP(hustler_sound_io_map,0)
 
 	MDRV_MACHINE_RESET(scramble)
 
@@ -1284,7 +1268,7 @@ static MACHINE_DRIVER_START( hustlerb )
 
 	MDRV_CPU_MODIFY("audio")
 	MDRV_CPU_PROGRAM_MAP(scobra_sound_readmem,hustlerb_sound_writemem)
-	MDRV_CPU_IO_MAP(hustlerb_sound_readport,hustlerb_sound_writeport)
+	MDRV_CPU_IO_MAP(hustlerb_sound_io_map,0)
 MACHINE_DRIVER_END
 
 
@@ -1800,3 +1784,4 @@ GAME( 1981, billiard, hustler,  hustler,  hustler,  billiard,     ROT90,  "bootl
 GAME( 1981, hustlerb, hustler,  hustlerb, hustler,  scramble_ppi, ROT90,  "bootleg", "Video Hustler (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 198?, mimonkey, 0,		mimonkey, mimonkey,	mimonkey,	  ROT90,  "Universal Video Games", "Mighty Monkey", GAME_SUPPORTS_SAVE )
 GAME( 198?, mimonsco, mimonkey, mimonkey, mimonsco, mimonsco,     ROT90,  "bootleg", "Mighty Monkey (bootleg on Super Cobra hardware)", GAME_SUPPORTS_SAVE )
+

@@ -414,24 +414,16 @@ static ADDRESS_MAP_START( sngkace_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xffff) AM_WRITE(SMH_ROM		)	// Banked ROM
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( sngkace_sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sngkace_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(ym2610_status_port_0_a_r		)
-	AM_RANGE(0x02, 0x02) AM_READ(ym2610_status_port_0_b_r		)
-	AM_RANGE(0x08, 0x08) AM_READ(psikyo_soundlatch_r			)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2610_status_port_0_a_r, ym2610_control_port_0_a_w	)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ym2610_data_port_0_a_w									)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(ym2610_status_port_0_b_r, ym2610_control_port_0_b_w	)
+	AM_RANGE(0x03, 0x03) AM_WRITE(ym2610_data_port_0_b_w									)
+	AM_RANGE(0x04, 0x04) AM_WRITE(sngkace_sound_bankswitch_w								)
+	AM_RANGE(0x08, 0x08) AM_READ(psikyo_soundlatch_r										)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(psikyo_clear_nmi_w										)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sngkace_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2610_control_port_0_a_w		)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ym2610_data_port_0_a_w		)
-	AM_RANGE(0x02, 0x02) AM_WRITE(ym2610_control_port_0_b_w		)
-	AM_RANGE(0x03, 0x03) AM_WRITE(ym2610_data_port_0_b_w		)
-	AM_RANGE(0x04, 0x04) AM_WRITE(sngkace_sound_bankswitch_w	)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(psikyo_clear_nmi_w			)
-ADDRESS_MAP_END
-
 
 /***************************************************************************
                                 Gun Bird
@@ -460,48 +452,34 @@ static ADDRESS_MAP_START( gunbird_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8200, 0xffff) AM_WRITE(SMH_ROM		)	// Banked ROM
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( gunbird_sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( gunbird_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_READ(ym2610_status_port_0_a_r		)
-	AM_RANGE(0x06, 0x06) AM_READ(ym2610_status_port_0_b_r		)
-	AM_RANGE(0x08, 0x08) AM_READ(psikyo_soundlatch_r			)
+	AM_RANGE(0x00, 0x00) AM_WRITE(gunbird_sound_bankswitch_w								)
+	AM_RANGE(0x04, 0x04) AM_READWRITE(ym2610_status_port_0_a_r, ym2610_control_port_0_a_w	)
+	AM_RANGE(0x05, 0x05) AM_WRITE(ym2610_data_port_0_a_w									)
+	AM_RANGE(0x06, 0x06) AM_READWRITE(ym2610_status_port_0_b_r, ym2610_control_port_0_b_w	)
+	AM_RANGE(0x07, 0x07) AM_WRITE(ym2610_data_port_0_b_w									)
+	AM_RANGE(0x08, 0x08) AM_READ(psikyo_soundlatch_r										)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(psikyo_clear_nmi_w										)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( gunbird_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(gunbird_sound_bankswitch_w	)
-	AM_RANGE(0x04, 0x04) AM_WRITE(ym2610_control_port_0_a_w		)
-	AM_RANGE(0x05, 0x05) AM_WRITE(ym2610_data_port_0_a_w		)
-	AM_RANGE(0x06, 0x06) AM_WRITE(ym2610_control_port_0_b_w		)
-	AM_RANGE(0x07, 0x07) AM_WRITE(ym2610_data_port_0_b_w		)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(psikyo_clear_nmi_w			)
-ADDRESS_MAP_END
-
 
 /***************************************************************************
                         Strikers 1945 / Tengai
 ***************************************************************************/
 
-static ADDRESS_MAP_START( s1945_sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( s1945_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x08, 0x08) AM_READ(ymf278b_status_port_0_r		)
-	AM_RANGE(0x10, 0x10) AM_READ(psikyo_soundlatch_r			)
+	AM_RANGE(0x00, 0x00) AM_WRITE(gunbird_sound_bankswitch_w								)
+	AM_RANGE(0x02, 0x03) AM_WRITE(SMH_NOP													)
+	AM_RANGE(0x08, 0x08) AM_READWRITE(ymf278b_status_port_0_r, ymf278b_control_port_0_a_w	)
+	AM_RANGE(0x09, 0x09) AM_WRITE(ymf278b_data_port_0_a_w									)
+	AM_RANGE(0x0a, 0x0a) AM_WRITE(ymf278b_control_port_0_b_w								)
+	AM_RANGE(0x0b, 0x0b) AM_WRITE(ymf278b_data_port_0_b_w									)
+	AM_RANGE(0x0c, 0x0c) AM_WRITE(ymf278b_control_port_0_c_w								)
+	AM_RANGE(0x0d, 0x0d) AM_WRITE(ymf278b_data_port_0_c_w									)
+	AM_RANGE(0x10, 0x10) AM_READ(psikyo_soundlatch_r										)
+	AM_RANGE(0x18, 0x18) AM_WRITE(psikyo_clear_nmi_w										)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( s1945_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(gunbird_sound_bankswitch_w	)
-	AM_RANGE(0x02, 0x03) AM_WRITE(SMH_NOP						)
-	AM_RANGE(0x08, 0x08) AM_WRITE(ymf278b_control_port_0_a_w	)
-	AM_RANGE(0x09, 0x09) AM_WRITE(ymf278b_data_port_0_a_w		)
-	AM_RANGE(0x0a, 0x0a) AM_WRITE(ymf278b_control_port_0_b_w	)
-	AM_RANGE(0x0b, 0x0b) AM_WRITE(ymf278b_data_port_0_b_w		)
-	AM_RANGE(0x0c, 0x0c) AM_WRITE(ymf278b_control_port_0_c_w	)
-	AM_RANGE(0x0d, 0x0d) AM_WRITE(ymf278b_data_port_0_c_w		)
-	AM_RANGE(0x18, 0x18) AM_WRITE(psikyo_clear_nmi_w			)
-ADDRESS_MAP_END
-
 
 /***************************************************************************
 
@@ -1252,7 +1230,7 @@ static MACHINE_DRIVER_START( sngkace )
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(sngkace_sound_readmem,sngkace_sound_writemem)
-	MDRV_CPU_IO_MAP(sngkace_sound_readport,sngkace_sound_writeport)
+	MDRV_CPU_IO_MAP(sngkace_sound_io_map,0)
 
 	MDRV_MACHINE_RESET(psikyo)
 
@@ -1303,7 +1281,7 @@ static MACHINE_DRIVER_START( gunbird )
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
 	MDRV_CPU_PROGRAM_MAP(gunbird_sound_readmem,gunbird_sound_writemem)
-	MDRV_CPU_IO_MAP(gunbird_sound_readport,gunbird_sound_writeport)
+	MDRV_CPU_IO_MAP(gunbird_sound_io_map,0)
 
 	MDRV_MACHINE_RESET(psikyo)
 
@@ -1363,7 +1341,7 @@ static MACHINE_DRIVER_START( s1945 )
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
 	MDRV_CPU_PROGRAM_MAP(gunbird_sound_readmem,gunbird_sound_writemem)
-	MDRV_CPU_IO_MAP(s1945_sound_readport,s1945_sound_writeport)
+	MDRV_CPU_IO_MAP(s1945_sound_io_map,0)
 
 	/* MCU should go here */
 
@@ -2057,3 +2035,4 @@ GAME( 1995, s1945j,   s1945,    s1945,    s1945j,   s1945j,   ROT270, "Psikyo", 
 GAME( 1995, s1945jn,  s1945,    gunbird,  s1945j,   s1945jn,  ROT270, "Psikyo", "Strikers 1945 (Japan, unprotected)", 0 )
 GAME( 1995, s1945k,   s1945,    s1945,    s1945j,   s1945,    ROT270, "Psikyo", "Strikers 1945 (Korea)", 0 )
 GAME( 1996, tengai,   0,        s1945,    tengai,   tengai,   ROT0,   "Psikyo", "Tengai / Sengoku Blade: Sengoku Ace Episode II", 0 )
+

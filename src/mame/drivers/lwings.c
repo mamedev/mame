@@ -370,18 +370,15 @@ static ADDRESS_MAP_START( adpcm_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_WRITE(SMH_NOP)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( avengers_adpcm_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( avengers_adpcm_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(avengers_adpcm_r)
+	AM_RANGE(0x01, 0x01) AM_WRITE(msm5205_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( adpcm_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( adpcm_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( adpcm_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_WRITE(msm5205_w)
 ADDRESS_MAP_END
 
@@ -806,7 +803,7 @@ static MACHINE_DRIVER_START( trojan )
 
 	MDRV_CPU_ADD("adpcm", Z80, 4000000) // 3.579545 Mhz (?)
 	MDRV_CPU_PROGRAM_MAP(adpcm_readmem,adpcm_writemem)
-	MDRV_CPU_IO_MAP(adpcm_readport,adpcm_writeport)
+	MDRV_CPU_IO_MAP(adpcm_io_map,0)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 4000)
 
 	/* video hardware */
@@ -829,7 +826,7 @@ static MACHINE_DRIVER_START( avengers )
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse) // RST 38h triggered by software
 
 	MDRV_CPU_MODIFY("adpcm")
-	MDRV_CPU_IO_MAP(avengers_adpcm_readport,adpcm_writeport)
+	MDRV_CPU_IO_MAP(avengers_adpcm_io_map,0)
 
 	/* video hardware */
 	MDRV_VIDEO_START(avengers)
@@ -1333,3 +1330,4 @@ GAME( 1986, trojanj,  trojan,   trojan,   trojan,   0, ROT0,  "Capcom", "Tatakai
 GAME( 1987, avengers, 0,        avengers, avengers, 0, ROT90, "Capcom", "Avengers (US set 1)", 0 )
 GAME( 1987, avenger2, avengers, avengers, avengers, 0, ROT90, "Capcom", "Avengers (US set 2)", 0 )
 GAME( 1987, buraiken, avengers, avengers, avengers, 0, ROT90, "Capcom", "Hissatsu Buraiken (Japan)", 0 )
+

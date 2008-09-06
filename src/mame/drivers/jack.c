@@ -193,16 +193,10 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x6fff) AM_WRITE(SMH_NOP)  /* R/C filter ??? */
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x40, 0x40) AM_READ(ay8910_read_port_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x40, 0x40) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 
@@ -866,7 +860,7 @@ static MACHINE_DRIVER_START( jack )
 
 	MDRV_CPU_ADD("audio", Z80,18000000/12)	/* 1.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1463,3 +1457,4 @@ GAME( 1981, tripoola, tripool,  tripool, tripool,  jack,     ROT90, "Noma (Costa
 GAME( 1986, joinem,   0,        joinem,  joinem,   zzyzzyxx, ROT90, "Global Corporation", "Joinem", 0 )
 GAME( 1983, loverboy, 0,        loverboy,loverboy, loverboy, ROT90, "G.T Enterprise Inc", "Lover Boy", 0 )
 GAME( 1985, striv,    0,        jack,    striv,    striv,    ROT270,"Hara Industries", "Super Triv", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS )
+

@@ -343,11 +343,7 @@ static ADDRESS_MAP_START( systeme_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0xc000 , 0xdfff) AM_WRITE(SMH_RAM) AM_MIRROR(0x2000)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sms_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sms_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sms_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -2052,7 +2048,7 @@ static VIDEO_UPDATE(systeme)
 static MACHINE_DRIVER_START( systeme )
 	MDRV_CPU_ADD("z80", Z80, 10738600/2) /* correct for hangonjr, and astroflash/transformer at least  */
 	MDRV_CPU_PROGRAM_MAP(systeme_readmem,systeme_writemem)
-	MDRV_CPU_IO_MAP(sms_readport,sms_writeport)
+	MDRV_CPU_IO_MAP(sms_io_map,0)
 
 	/* IRQ handled via the timers */
 	MDRV_MACHINE_RESET(systeme)
@@ -2379,3 +2375,4 @@ GAME( 1986, ridleofp, 0,        systeme, ridleofp, ridleofp, ROT90, "Sega / Nasc
 GAME( 1987, opaopa,   0,        systeme, opaopa,   opaopa,   ROT0,  "Sega", "Opa Opa (MC-8123, 317-0042)", 0 )
 GAME( 1988, fantzn2,  0,        systeme, fantzn2,  fantzn2,  ROT0,  "Sega", "Fantasy Zone 2 (MC-8123, 317-0057)", 0 )
 GAME( 1988, tetrisse, 0,        systeme, tetrisse, segasyse, ROT0,  "Sega", "Tetris (Japan, System E)", 0 )
+
