@@ -9,7 +9,6 @@ Stephh's notes :
   - As for some other M68000 Technos games (or games running on similar hardware
     such as 'mugsmash'), the Inputs and the Dip Switches are mangled, so you need
     a specific read handler so end-uers can see them in a "standard" order.
-    IMO you should set the USE_SHADFRCE_FAKE_INPUT_PORTS macro to 1.
 
  01-Sept-2008 - Pierpaolo Prazzoli
  - Added irqs ack
@@ -188,9 +187,6 @@ static WRITE16_HANDLER( shadfrce_flip_screen )
 
 */
 
-#define USE_SHADFRCE_FAKE_INPUT_PORTS	1
-
-#if USE_SHADFRCE_FAKE_INPUT_PORTS
 
 static READ16_HANDLER( shadfrce_input_ports_r )
 {
@@ -215,14 +211,6 @@ static READ16_HANDLER( shadfrce_input_ports_r )
 	return (data);
 }
 
-#else
-
-static READ16_HANDLER( shadfrce_input_ports_3_r )
-{
-	return (input_port_read(machine, "IN3") & ~0x0400) | (vblank << 8);
-}
-
-#endif
 
 static WRITE16_HANDLER ( shadfrce_sound_brt_w )
 {
@@ -321,14 +309,7 @@ static ADDRESS_MAP_START( shadfrce_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x1d0012, 0x1d0013) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1d0014, 0x1d0015) AM_WRITENOP /* ?? */
 	AM_RANGE(0x1d0016, 0x1d0017) AM_WRITE(watchdog_reset16_w)
-#if USE_SHADFRCE_FAKE_INPUT_PORTS
 	AM_RANGE(0x1d0020, 0x1d0027) AM_READ(shadfrce_input_ports_r)
-#else
-	AM_RANGE(0x1d0020, 0x1d0021) AM_READ_PORT("IN0")
-	AM_RANGE(0x1d0022, 0x1d0023) AM_READ_PORT("IN1")
-	AM_RANGE(0x1d0024, 0x1d0025) AM_READ_PORT("IN2")
-	AM_RANGE(0x1d0026, 0x1d0027) AM_READ(shadfrce_input_ports_3_r)
-#endif
 	AM_RANGE(0x1f0000, 0x1fffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -365,7 +346,6 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, start )
 
 
-#if USE_SHADFRCE_FAKE_INPUT_PORTS
 static INPUT_PORTS_START( shadfrce )
 	PORT_START("P1")	/* Fake IN0 (player 1 inputs) */
 	SHADFRCE_PLAYER_INPUT( 1, IPT_START1 )
@@ -444,95 +424,6 @@ static INPUT_PORTS_START( shadfrce )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
-#else
-static INPUT_PORTS_START( shadfrce )
-	PORT_START("IN0")	/* IN0 - $1d0020.w */
-	SHADFRCE_PLAYER_INPUT( 1, IPT_START1 )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )                 /* only in "test mode" ? */
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE1 )              /* only in "test mode" ? */
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x1000, 0x1000, "Unused DIP 2-7" )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, "Unused DIP 2-8" )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN1")	/* IN1 - $1d0022.w */
-	SHADFRCE_PLAYER_INPUT( 2, IPT_START2 )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Hard ) )              /* "Advanced" */
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )           /* "Expert" */
-	PORT_DIPNAME( 0x0c00, 0x0c00, "Stage Clear Energy Regain" )
-	PORT_DIPSETTING(      0x0400, "50%" )
-	PORT_DIPSETTING(      0x0c00, "25%" )
-	PORT_DIPSETTING(      0x0800, "10%" )
-	PORT_DIPSETTING(      0x0000, "0%" )
-	PORT_DIPNAME( 0x1000, 0x1000, "Unused DIP 2-5" )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, "Unused DIP 2-6" )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN2")	/* IN2 - $1d0024.w */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0100, 0x0100, "Unused DIP 1-1" )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0600, 0x0600, DEF_STR( Coinage ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0600, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Continue_Price ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN3")	/* IN3 - $1d0026.w */
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( On ) )
-	PORT_SERVICE( 0x0200, IP_ACTIVE_LOW )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SPECIAL )				 /* guess */
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_VBLANK )                /* guess */
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )               /* must be ACTIVE_LOW or 'shadfrcj' jumps to the end (code at 0x04902e) */
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-#endif
 
 /* Graphic Decoding */
 
