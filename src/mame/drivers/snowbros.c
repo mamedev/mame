@@ -194,17 +194,11 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READ(ym3812_status_port_0_r)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_WRITE(ym3812_control_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(ym3812_write_port_0_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(soundlatch_w)	/* goes back to the main CPU, checked during boot */
+	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, soundlatch_w)	/* goes back to the main CPU, checked during boot */
 ADDRESS_MAP_END
 
 /* Winter Bobble - bootleg GFX chip */
@@ -270,17 +264,11 @@ static ADDRESS_MAP_START( honeydol_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe010, 0xe010) AM_WRITE(okim6295_data_0_w)
 	ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( honeydol_sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( honeydol_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READ(ym3812_status_port_0_r) // not connected?
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( honeydol_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_WRITE(ym3812_control_port_0_w) // not connected?
-	AM_RANGE(0x03, 0x03) AM_WRITE(ym3812_write_port_0_w) // not connected?
-	AM_RANGE(0x04, 0x04) AM_WRITE(soundlatch_w)	/* goes back to the main CPU, checked during boot */
+	AM_RANGE(0x02, 0x02) AM_READWRITE(ym3812_status_port_0_r, ym3812_control_port_0_w)	// not connected?
+	AM_RANGE(0x03, 0x03) AM_WRITE(ym3812_write_port_0_w)								// not connected?
+	AM_RANGE(0x04, 0x04) AM_READWRITE(soundlatch_r, soundlatch_w)	/* goes back to the main CPU, checked during boot */
 ADDRESS_MAP_END
 
 /* Twin Adventure */
@@ -340,17 +328,11 @@ static WRITE8_HANDLER( twinadv_oki_bank_w )
 	okim6295_set_bank_base(0, bank * 0x40000);
 }
 
-static ADDRESS_MAP_START( twinadv_sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( twinadv_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
-	AM_RANGE(0x06, 0x06) AM_READ(okim6295_status_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( twinadv_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x02, 0x02) AM_WRITE(soundlatch_w) // back to 68k?
+	AM_RANGE(0x02, 0x02) AM_READWRITE(soundlatch_r, soundlatch_w) // back to 68k?
 	AM_RANGE(0x04, 0x04) AM_WRITE(twinadv_oki_bank_w) // oki bank?
-	AM_RANGE(0x06, 0x06) AM_WRITE(okim6295_data_0_w)
+	AM_RANGE(0x06, 0x06) AM_READWRITE(okim6295_status_0_r, okim6295_data_0_w)
 ADDRESS_MAP_END
 
 
@@ -1559,7 +1541,7 @@ static MACHINE_DRIVER_START( snowbros )
 
 	MDRV_CPU_ADD("sound", Z80, 6000000) /* 6 MHz - confirmed */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1655,7 +1637,7 @@ static MACHINE_DRIVER_START( honeydol )
 
 	MDRV_CPU_ADD("sound", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(honeydol_sound_readmem,honeydol_sound_writemem)
-	MDRV_CPU_IO_MAP(honeydol_sound_readport,honeydol_sound_writeport)
+	MDRV_CPU_IO_MAP(honeydol_sound_io_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1694,7 +1676,7 @@ static MACHINE_DRIVER_START( twinadv )
 
 	MDRV_CPU_ADD("sound", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(twinadv_sound_readmem,twinadv_sound_writemem)
-	MDRV_CPU_IO_MAP(twinadv_sound_readport,twinadv_sound_writeport)
+	MDRV_CPU_IO_MAP(twinadv_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
@@ -2781,3 +2763,5 @@ GAME( 1999, moremorp, 0,        semiprot, moremore, moremorp, ROT0, "SemiCom / E
 GAME( 2002, 4in1boot, 0,        _4in1,    4in1boot, 4in1boot, ROT0, "K1 Soft", "Puzzle King (includes bootleg of Snow Bros.)" , 0)
 GAME( 2002, snowbro3, snowbros, snowbro3, snowbroj, snowbro3, ROT0, "Syrmex (bootleg/hack)", "Snow Brothers 3 - Magical Adventure", GAME_IMPERFECT_SOUND ) // its basically snowbros code?...
 GAME( 1993, finalttr, 0,        finalttr, finalttr, 0,        ROT0, "Jeil Computer System", "Final Tetris", 0 )
+
+

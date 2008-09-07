@@ -511,16 +511,11 @@ static ADDRESS_MAP_START( kabukiz_cpu2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tnzsb_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( tnzsb_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(ym2203_status_port_0_r)
-	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( tnzsb_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
+	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 
@@ -534,15 +529,12 @@ static ADDRESS_MAP_START( i8742_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x08ff) AM_WRITE(SMH_RAM)	/* Internal i8742 RAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8742_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( i8742_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0x02, 0x02) AM_WRITE(tnzs_port2_w)
 	AM_RANGE(I8X41_p1, I8X41_p1) AM_READ(tnzs_port1_r)
 	AM_RANGE(I8X41_p2, I8X41_p2) AM_READ(tnzs_port2_r)
 	AM_RANGE(I8X41_t0, I8X41_t0) AM_READ_PORT("COIN1")
 	AM_RANGE(I8X41_t1, I8X41_t1) AM_READ_PORT("COIN2")
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( i8742_writeport, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x02, 0x02) AM_WRITE(tnzs_port2_w)
 ADDRESS_MAP_END
 
 
@@ -1471,7 +1463,7 @@ static MACHINE_DRIVER_START( tnzs )
 
 	MDRV_CPU_ADD("mcu", I8X41,12000000/2)	/* 400KHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(i8742_readmem,i8742_writemem)
-	MDRV_CPU_IO_MAP(i8742_readport,i8742_writeport)
+	MDRV_CPU_IO_MAP(i8742_io_map,0)
 	MDRV_CPU_CONFIG( i8042_config )
 
 	MDRV_INTERLEAVE(100)
@@ -1597,7 +1589,7 @@ static MACHINE_DRIVER_START( tnzsb )
 
 	MDRV_CPU_ADD("audio", Z80, XTAL_12MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(tnzsb_cpu2_map,0)
-	MDRV_CPU_IO_MAP(tnzsb_readport,tnzsb_writeport)
+	MDRV_CPU_IO_MAP(tnzsb_io_map,0)
 
 	MDRV_INTERLEAVE(100)
 
@@ -2436,3 +2428,4 @@ GAME( 1988, kabukiz,  0,        kabukiz,  kabukiz,  kabukiz,  ROT0,   "Taito Cor
 GAME( 1988, kabukizj, kabukiz,  kabukiz,  kabukiz,  kabukiz,  ROT0,   "Taito Corporation", "Kabuki-Z (Japan)", 0 )
 GAME( 1989, insectx,  0,        insectx,  insectx,  insectx,  ROT0,   "Taito Corporation Japan", "Insector X (World)", 0 )
 GAME( 1992, jpopnics, 0,        jpopnics, jpopnics, 0,        ROT0,   "Nics", "Jumping Pop (Nics, Korean bootleg of Plump Pop)", GAME_IMPERFECT_GRAPHICS )
+

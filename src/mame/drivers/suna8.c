@@ -554,15 +554,11 @@ static ADDRESS_MAP_START( hardhead_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(suna8_spriteram_w) AM_BASE(&spriteram	)	// Sprites
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hardhead_readport, ADDRESS_SPACE_IO, 8 )
+
+static ADDRESS_MAP_START( hardhead_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(SMH_NOP	)	// ? IRQ Ack
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hardhead_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-
 
 /***************************************************************************
                                 Rough Ranger
@@ -629,15 +625,11 @@ static ADDRESS_MAP_START( rranger_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(suna8_spriteram_w) AM_BASE(&spriteram	)	// Sprites
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( rranger_readport, ADDRESS_SPACE_IO, 8 )
+
+static ADDRESS_MAP_START( rranger_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(SMH_NOP	)	// ? IRQ Ack
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( rranger_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-
 
 /***************************************************************************
                                 Brick Zone
@@ -718,14 +710,6 @@ static ADDRESS_MAP_START( brickzn_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc600, 0xc7ff) AM_WRITE(brickzn_banked_paletteram_w	)	// Palette (Banked)
 	AM_RANGE(0xc800, 0xdfff) AM_WRITE(SMH_RAM						)	// RAM
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(suna8_banked_spriteram_w		)	// Sprites (Banked)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( brickzn_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( brickzn_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 
@@ -895,14 +879,6 @@ static ADDRESS_MAP_START( starfigh_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(suna8_banked_spriteram_w		)	// Sprites (Banked)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( starfigh_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( starfigh_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-
 
 /***************************************************************************
                                 Spark Man
@@ -1021,15 +997,11 @@ static ADDRESS_MAP_START( hardhead_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(ay8910_write_port_0_w		)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( hardhead_sound_readport, ADDRESS_SPACE_IO, 8 )
+
+static ADDRESS_MAP_START( hardhead_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_READ(SMH_NOP	)	// ? IRQ Ack
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hardhead_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-
 
 
 /***************************************************************************
@@ -1050,14 +1022,6 @@ static ADDRESS_MAP_START( rranger_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa001, 0xa001) AM_WRITE(ym2203_write_port_0_w		)
 	AM_RANGE(0xa002, 0xa002) AM_WRITE(ym2203_control_port_1_w	)	// AY8910
 	AM_RANGE(0xa003, 0xa003) AM_WRITE(ym2203_write_port_1_w		)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( rranger_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( rranger_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
 
@@ -1081,14 +1045,6 @@ static ADDRESS_MAP_START( brickzn_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch2_w				)	// To PCM CPU
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( brickzn_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( brickzn_sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-
 
 /* PCM Z80 , 4 DACs (4 bits per sample), NO RAM !! */
 
@@ -1105,16 +1061,12 @@ static WRITE8_HANDLER( brickzn_pcm_w )
 	dac_signed_data_w( offset, (data & 0xf) * 0x11 );
 }
 
-static ADDRESS_MAP_START( brickzn_pcm_readport, ADDRESS_SPACE_IO, 8 )
+
+static ADDRESS_MAP_START( brickzn_pcm_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r		)	// From Sound CPU
+	AM_RANGE(0x00, 0x03) AM_WRITE(brickzn_pcm_w		)	// 4 x DAC
 ADDRESS_MAP_END
-static ADDRESS_MAP_START( brickzn_pcm_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_WRITE(brickzn_pcm_w			)	// 4 x DAC
-ADDRESS_MAP_END
-
-
 
 /***************************************************************************
 
@@ -1554,12 +1506,12 @@ static MACHINE_DRIVER_START( hardhead )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 24000000 / 4)			/* ? */
 	MDRV_CPU_PROGRAM_MAP(hardhead_readmem,hardhead_writemem)
-	MDRV_CPU_IO_MAP(hardhead_readport,hardhead_writeport)
+	MDRV_CPU_IO_MAP(hardhead_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* No NMI */
 
 	MDRV_CPU_ADD("audio", Z80, 24000000 / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(hardhead_sound_readmem,hardhead_sound_writemem)
-	MDRV_CPU_IO_MAP(hardhead_sound_readport,hardhead_sound_writeport)
+	MDRV_CPU_IO_MAP(hardhead_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
 
 	/* video hardware */
@@ -1608,12 +1560,11 @@ static MACHINE_DRIVER_START( rranger )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 24000000 / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(rranger_readmem,rranger_writemem)
-	MDRV_CPU_IO_MAP(rranger_readport,rranger_writeport)
+	MDRV_CPU_IO_MAP(rranger_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	/* IRQ & NMI ! */
 
 	MDRV_CPU_ADD("audio", Z80, 24000000 / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(rranger_sound_readmem,rranger_sound_writemem)
-	MDRV_CPU_IO_MAP(rranger_sound_readport,rranger_sound_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* NMI = retn */
 
 	/* video hardware */
@@ -1665,17 +1616,15 @@ static MACHINE_DRIVER_START( brickzn )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 24000000 / 4)		/* SUNA PROTECTION BLOCK */
 	MDRV_CPU_PROGRAM_MAP(brickzn_readmem,brickzn_writemem)
-	MDRV_CPU_IO_MAP(brickzn_readport,brickzn_writeport)
 //  MDRV_CPU_VBLANK_INT_HACK(brickzn_interrupt, 2)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)	// nmi breaks ramtest but is needed!
 
 	MDRV_CPU_ADD("sound", Z80, 24000000 / 4)	/* Z0840006PSC */
 	MDRV_CPU_PROGRAM_MAP(brickzn_sound_readmem,brickzn_sound_writemem)
-	MDRV_CPU_IO_MAP(brickzn_sound_readport,brickzn_sound_writeport)
 
 	MDRV_CPU_ADD("pcm", Z80, 24000000 / 4)	/* Z0840006PSC */
 	MDRV_CPU_PROGRAM_MAP(brickzn_pcm_readmem,brickzn_pcm_writemem)
-	MDRV_CPU_IO_MAP(brickzn_pcm_readport,brickzn_pcm_writeport)
+	MDRV_CPU_IO_MAP(brickzn_pcm_io_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1768,13 +1717,12 @@ static MACHINE_DRIVER_START( starfigh )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 24000000 / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(starfigh_readmem,starfigh_writemem)
-	MDRV_CPU_IO_MAP(starfigh_readport,starfigh_writeport)
 	MDRV_CPU_VBLANK_INT_HACK(brickzn_interrupt,2)	/* IRQ & NMI */
 
 	/* The sound section is identical to that of hardhead */
 	MDRV_CPU_ADD("audio", Z80, 24000000 / 4)					/* ? */
 	MDRV_CPU_PROGRAM_MAP(hardhead_sound_readmem,hardhead_sound_writemem)
-	MDRV_CPU_IO_MAP(hardhead_sound_readport,hardhead_sound_writeport)
+	MDRV_CPU_IO_MAP(hardhead_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
 
 	/* video hardware */
@@ -1832,7 +1780,7 @@ static MACHINE_DRIVER_START( sparkman )
 
 	MDRV_CPU_ADD("audio", Z80, 24000000 / 4)				/* ? */
 	MDRV_CPU_PROGRAM_MAP(hardhead_sound_readmem,hardhead_sound_writemem)
-	MDRV_CPU_IO_MAP(hardhead_sound_readport,hardhead_sound_writeport)
+	MDRV_CPU_IO_MAP(hardhead_sound_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
 
 	/* video hardware */
@@ -2412,3 +2360,4 @@ GAME( 1989, sparkman, 0,       sparkman, sparkman, sparkman, ROT0,  "SunA",    "
 GAME( 1990, starfigh, 0,       starfigh, hardhea2, starfigh, ROT90, "SunA",    "Star Fighter (v1)",             GAME_NOT_WORKING )
 GAME( 1992, brickzn,  0,       brickzn,  brickzn,  brickzn,  ROT90, "SunA",    "Brick Zone (v5.0)",             GAME_NOT_WORKING )
 GAME( 1992, brickzn3, brickzn, brickzn,  brickzn,  brickzn3, ROT90, "SunA",    "Brick Zone (v4.0)",             GAME_NOT_WORKING )
+

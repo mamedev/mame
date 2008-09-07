@@ -408,31 +408,19 @@ static ADDRESS_MAP_START( ad2083_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe800, 0xebff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( triplep_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( triplep_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_READ(ay8910_read_port_0_r)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
 	AM_RANGE(0x02, 0x02) AM_READ(triplep_pip_r)
 	AM_RANGE(0x03, 0x03) AM_READ(triplep_pap_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( triplep_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_control_port_0_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( hotshock_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x40, 0x40) AM_READ(ay8910_read_port_1_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hotshock_sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( hotshock_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(ay8910_write_port_0_w)
-	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x20, 0x20) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
+	AM_RANGE(0x40, 0x40) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(ay8910_control_port_1_w)
 ADDRESS_MAP_END
 
@@ -1845,20 +1833,13 @@ static ADDRESS_MAP_START( scramble_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x9fff) AM_WRITE(scramble_filter_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( scramble_sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x20, 0x20) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0x80, 0x80) AM_READ(ay8910_read_port_1_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( scramble_sound_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( scramble_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x20, 0x20) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0x20, 0x20) AM_READWRITE(ay8910_read_port_0_r, ay8910_write_port_0_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(ay8910_control_port_1_w)
-	AM_RANGE(0x80, 0x80) AM_WRITE(ay8910_write_port_1_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
 ADDRESS_MAP_END
-
 
 static MACHINE_DRIVER_START( scramble )
 
@@ -1868,7 +1849,7 @@ static MACHINE_DRIVER_START( scramble )
 
 	MDRV_CPU_ADD("audio", Z80, 14318000/8)	/* 1.78975 MHz */
 	MDRV_CPU_PROGRAM_MAP(scramble_sound_readmem,scramble_sound_writemem)
-	MDRV_CPU_IO_MAP(scramble_sound_readport,scramble_sound_writeport)
+	MDRV_CPU_IO_MAP(scramble_sound_io_map,0)
 
 	MDRV_MACHINE_RESET(scramble)
 
@@ -2083,7 +2064,7 @@ static MACHINE_DRIVER_START( hotshock )
 	MDRV_DEVICE_REMOVE( "ppi8255_1", PPI8255 )
 
 	MDRV_CPU_MODIFY("audio")
-	MDRV_CPU_IO_MAP(hotshock_sound_readport,hotshock_sound_writeport)
+	MDRV_CPU_IO_MAP(hotshock_sound_io_map,0)
 
 	MDRV_MACHINE_RESET(galaxold)
 
@@ -2133,7 +2114,7 @@ static MACHINE_DRIVER_START( triplep )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("main")
-	MDRV_CPU_IO_MAP(triplep_readport,triplep_writeport)
+	MDRV_CPU_IO_MAP(triplep_io_map,0)
 
 	MDRV_CPU_REMOVE("audio")
 
@@ -2999,3 +2980,4 @@ GAME( 1983, cavelon,  0,        cavelon,  cavelon,  cavelon,      ROT90, "Jetsof
 GAME( 198?, mimonscr, mimonkey, mimonscr, mimonscr, mimonscr,     ROT90, "bootleg", "Mighty Monkey (bootleg on Scramble hardware)", GAME_SUPPORTS_SAVE )
 GAME( 1983, ad2083,   0,        ad2083,   ad2083,   ad2083,       ROT90, "Midcoin", "A. D. 2083", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE)
 GAME( 1981, turpins,  turtles,  turpins,  turpins,  0,		      ROT90, "[Sega] (bootleg)", "Turpin (bootleg on Scramble hardware)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // haven't hooked up the sound CPU yet
+

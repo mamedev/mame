@@ -528,20 +528,11 @@ static ADDRESS_MAP_START( sound_writemem_z80, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf000) AM_WRITE(SMH_NOP) /* ?? */
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(ym2203_status_port_0_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(ym2203_control_port_0_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
 ADDRESS_MAP_END
-
-
-
 
 
 
@@ -783,7 +774,7 @@ static MACHINE_DRIVER_START( system_Z )
 
 	MDRV_CPU_ADD("audio", Z80, 3000000) /* OSC 12MHz divided by 4 ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem_z80,sound_writemem_z80)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport)
+	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -4093,3 +4084,4 @@ GAME( 1993, chimerab, 0,        system_C,          chimerab, chimerab, ROT0,   "
 GAME( 1993, cybattlr, 0,        system_C,          cybattlr, cybattlr, ROT90,  "Jaleco", "Cybattler", 0 )
 GAME( 1993, hayaosi1, 0,        system_B_hayaosi1, hayaosi1, hayaosi1, ROT0,   "Jaleco", "Hayaoshi Quiz Ouza Ketteisen - The King Of Quiz", GAME_IMPERFECT_GRAPHICS )
 GAME( 1993, peekaboo, 0,        system_D,          peekaboo, peekaboo, ROT0,   "Jaleco", "Peek-a-Boo!", 0 )
+

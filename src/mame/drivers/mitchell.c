@@ -384,30 +384,22 @@ static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x02) AM_READ(input_r)	/* Super Pang needs a kludge to initialize EEPROM.
-                        The Mahjong games and Block Block need special input treatment */
-	AM_RANGE(0x03, 0x03) AM_READ(input_port_12_r)	/* mgakuen only */
-	AM_RANGE(0x04, 0x04) AM_READ(input_port_13_r)	/* mgakuen only */
-	AM_RANGE(0x05, 0x05) AM_READ(pang_port5_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
+	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)	/* Palette bank, layer enable, coin counters, more */
+	AM_RANGE(0x00, 0x02) AM_READ(input_r)			/* Super Pang needs a kludge to initialize EEPROM.
+													   The Mahjong games and Block Block need special input treatment */
 	AM_RANGE(0x01, 0x01) AM_WRITE(input_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)      /* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_WRITE(ym2413_data_port_0_w)
-	AM_RANGE(0x04, 0x04) AM_WRITE(ym2413_register_port_0_w)
-	AM_RANGE(0x05, 0x05) AM_WRITE(okim6295_data_0_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)	/* watchdog? irq ack? */
-	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)      /* Video RAM bank register */
+	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)	/* Code bank register */
+	AM_RANGE(0x03, 0x03) AM_READWRITE(input_port_12_r, ym2413_data_port_0_w)		/* mgakuen only */
+	AM_RANGE(0x04, 0x04) AM_READWRITE(input_port_13_r, ym2413_register_port_0_w)	/* mgakuen only */
+	AM_RANGE(0x05, 0x05) AM_READWRITE(pang_port5_r, okim6295_data_0_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)				/* watchdog? irq ack? */
+	AM_RANGE(0x07, 0x07) AM_WRITE(pang_video_bank_w)	/* Video RAM bank register */
 	AM_RANGE(0x08, 0x08) AM_WRITE(eeprom_cs_w)
 	AM_RANGE(0x10, 0x10) AM_WRITE(eeprom_clock_w)
 	AM_RANGE(0x18, 0x18) AM_WRITE(eeprom_serial_w)
 ADDRESS_MAP_END
-
 
 /* spangbl */
 
@@ -487,24 +479,17 @@ static WRITE8_HANDLER(mstworld_sound_w)
 extern WRITE8_HANDLER( mstworld_gfxctrl_w );
 extern WRITE8_HANDLER( mstworld_video_bank_w );
 
-static ADDRESS_MAP_START( mstworld_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( mstworld_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0")	/* coins */
-	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")	/* p1 */
-	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2")	/* p2 */
-	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1")	/* dips? */
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("IN0") AM_WRITE(mstworld_gfxctrl_w)	/* Palette bank, layer enable, coin counters, more */
+	AM_RANGE(0x01, 0x01) AM_READ_PORT("IN1")
+	AM_RANGE(0x02, 0x02) AM_READ_PORT("IN2") AM_WRITE(pang_bankswitch_w)	/* Code bank register */
+	AM_RANGE(0x03, 0x03) AM_READ_PORT("DSW1") AM_WRITE(mstworld_sound_w)	/* write to sound cpu */
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("DSW2")	/* dips? */
 	AM_RANGE(0x05, 0x05) AM_READ_PORT("DSW0")	/* special? */
 	AM_RANGE(0x06, 0x06) AM_READ_PORT("DSW3")	/* dips? */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mstworld_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(mstworld_gfxctrl_w)    /* Palette bank, layer enable, coin counters, more */
-	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)      /* Code bank register */
-	AM_RANGE(0x03, 0x03) AM_WRITE(mstworld_sound_w)      /* write to sound cpu */
-	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)	/* watchdog? irq ack? */
-	AM_RANGE(0x07, 0x07) AM_WRITE(mstworld_video_bank_w)      /* Video RAM bank register */
+	AM_RANGE(0x06, 0x06) AM_WRITE(SMH_NOP)		/* watchdog? irq ack? */
+	AM_RANGE(0x07, 0x07) AM_WRITE(mstworld_video_bank_w)	/* Video RAM bank register */
 ADDRESS_MAP_END
 
 /**** End Monsters World ****/
@@ -1133,7 +1118,7 @@ static MACHINE_DRIVER_START( mgakuen )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 6000000)	/* ??? */
 	MDRV_CPU_PROGRAM_MAP(mgakuen_readmem,mgakuen_writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	/* video hardware */
@@ -1167,7 +1152,7 @@ static MACHINE_DRIVER_START( pang )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main",Z80, 8000000)	/* (verified on pcb) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	MDRV_NVRAM_HANDLER(mitchell)
@@ -1266,7 +1251,7 @@ static MACHINE_DRIVER_START( mstworld )
 	MDRV_CPU_ADD("main", Z80, 6000000*4)
 
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(mstworld_readport,mstworld_writeport)
+	MDRV_CPU_IO_MAP(mstworld_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80,6000000)		 /* 6 MHz? */
@@ -1300,7 +1285,7 @@ static MACHINE_DRIVER_START( marukin )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 8000000)	/* Super Pang says 8MHZ ORIGINAL BOARD */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* ??? one extra irq seems to be needed for music (see input5_r) */
 
 	MDRV_NVRAM_HANDLER(mitchell)
@@ -2234,3 +2219,4 @@ GAME( 1991, block,    0,        pang,    block,    block,    ROT270, "Capcom", "
 GAME( 1991, blockj,   block,    pang,    block,    block,    ROT270, "Capcom", "Block Block (Japan 910910)", 0 )
 GAME( 1991, blockjoy, block,    pang,    blockjoy, block,    ROT270, "Capcom", "Block Block (World 911106 Joystick)", 0 )
 GAME( 1991, blockbl,  block,    pang,    block,    blockbl,  ROT270, "bootleg", "Block Block (bootleg)", 0 )
+
