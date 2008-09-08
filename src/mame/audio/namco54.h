@@ -3,7 +3,7 @@
 
 #include "sound/discrete.h"
 
-#define CPUTAG_54XX "54XX"
+#define CPUTAG_54XX "54xx"
 
 ADDRESS_MAP_EXTERN( namco_54xx_map_program, 8 );
 ADDRESS_MAP_EXTERN( namco_54xx_map_data, 8 );

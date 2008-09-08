@@ -246,6 +246,24 @@ const rom_entry *rom_next_chunk(const rom_entry *romp)
 
 
 /*-------------------------------------------------
+    rom_region_name - return the appropriate name
+    for a rom region
+-------------------------------------------------*/
+
+astring *rom_region_name(astring *result, const game_driver *drv, const rom_source *source, const rom_entry *romp)
+{
+	if (rom_source_is_gamedrv(drv, source))
+		astring_cpyc(result, ROMREGION_GETTAG(romp));
+	else
+	{
+		const device_config *device = (const device_config *)source;
+		astring_printf(result, "%s:%s", device->tag, ROMREGION_GETTAG(romp));
+	}
+	return result;
+}
+
+
+/*-------------------------------------------------
     debugload - log data to a file
 -------------------------------------------------*/
 
@@ -317,19 +335,21 @@ static int determine_bios_rom(rom_load_data *romdata, const rom_entry *romp)
     that will need to be loaded
 -------------------------------------------------*/
 
-static int count_roms(const rom_entry *romp)
+static int count_roms(running_machine *machine)
 {
 	const rom_entry *region, *rom;
+	const rom_source *source;
 	int count = 0;
 
 	/* loop over regions, then over files */
-	for (region = romp; region; region = rom_next_region(region))
-		for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
-		{
-			int bios_flags = ROM_GETBIOSFLAGS(rom);
-			if (!bios_flags || (bios_flags == system_bios)) /* alternate bios sets */
-				count++;
-		}
+	for (source = rom_first_source(machine->gamedrv, machine->config); source != NULL; source = rom_next_source(machine->gamedrv, machine->config, source))
+		for (region = rom_first_region(machine->gamedrv, source); region != NULL; region = rom_next_region(region))
+			for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
+			{
+				int bios_flags = ROM_GETBIOSFLAGS(rom);
+				if (!bios_flags || (bios_flags == system_bios)) /* alternate bios sets */
+					count++;
+			}
 
 	/* return the total count */
 	return count;
@@ -1184,55 +1204,61 @@ static UINT32 normalize_flags_for_cpu(running_machine *machine, UINT32 startflag
     process_region_list - process a region list
 -------------------------------------------------*/
 
-static void process_region_list(running_machine *machine, rom_load_data *romdata, const rom_entry *romp)
+static void process_region_list(running_machine *machine, rom_load_data *romdata)
 {
+	astring *regiontag = astring_alloc();
+	const rom_source *source;
 	const rom_entry *region;
 
 	/* loop until we hit the end */
-	for (region = romp; region; region = rom_next_region(region))
-	{
-		UINT32 regionlength = ROMREGION_GETLENGTH(region);
-		UINT32 regionflags = ROMREGION_GETFLAGS(region);
-		const char *regiontag = ROMREGION_GETTAG(region);
+	for (source = rom_first_source(machine->gamedrv, machine->config); source != NULL; source = rom_next_source(machine->gamedrv, machine->config, source))
+		for (region = rom_first_region(machine->gamedrv, source); region != NULL; region = rom_next_region(region))
+		{
+			UINT32 regionlength = ROMREGION_GETLENGTH(region);
+			UINT32 regionflags = ROMREGION_GETFLAGS(region);
 
-		LOG(("Processing region \"%s\" (length=%X)\n", regiontag, regionlength));
+			rom_region_name(regiontag, machine->gamedrv, source, region);
+			LOG(("Processing region \"%s\" (length=%X)\n", astring_c(regiontag), regionlength));
 
-		/* the first entry must be a region */
-		assert(ROMENTRY_ISREGION(region));
+			/* the first entry must be a region */
+			assert(ROMENTRY_ISREGION(region));
 
-		/* if this is a CPU region, override with the CPU width and endianness */
-		if (mame_find_cpu_index(machine, regiontag) >= 0)
-			regionflags = normalize_flags_for_cpu(machine, regionflags, regiontag);
+			/* if this is a CPU region, override with the CPU width and endianness */
+			if (mame_find_cpu_index(machine, astring_c(regiontag)) >= 0)
+				regionflags = normalize_flags_for_cpu(machine, regionflags, astring_c(regiontag));
 
-		/* remember the base and length */
-		romdata->regionbase = memory_region_alloc(machine, regiontag, regionlength, regionflags);
-		romdata->regionlength = regionlength;
-		LOG(("Allocated %X bytes @ %p\n", romdata->regionlength, romdata->regionbase));
+			/* remember the base and length */
+			romdata->regionbase = memory_region_alloc(machine, astring_c(regiontag), regionlength, regionflags);
+			romdata->regionlength = regionlength;
+			LOG(("Allocated %X bytes @ %p\n", romdata->regionlength, romdata->regionbase));
 
-		/* clear the region if it's requested */
-		if (ROMREGION_ISERASE(region))
-			memset(romdata->regionbase, ROMREGION_GETERASEVAL(region), romdata->regionlength);
+			/* clear the region if it's requested */
+			if (ROMREGION_ISERASE(region))
+				memset(romdata->regionbase, ROMREGION_GETERASEVAL(region), romdata->regionlength);
 
-		/* or if it's sufficiently small (<= 4MB) */
-		else if (romdata->regionlength <= 0x400000)
-			memset(romdata->regionbase, 0, romdata->regionlength);
+			/* or if it's sufficiently small (<= 4MB) */
+			else if (romdata->regionlength <= 0x400000)
+				memset(romdata->regionbase, 0, romdata->regionlength);
 
-#ifdef MAME_DEBUG
-		/* if we're debugging, fill region with random data to catch errors */
-		else
-			fill_random(romdata->regionbase, romdata->regionlength);
-#endif
+	#ifdef MAME_DEBUG
+			/* if we're debugging, fill region with random data to catch errors */
+			else
+				fill_random(romdata->regionbase, romdata->regionlength);
+	#endif
 
-		/* now process the entries in the region */
-		if (ROMREGION_ISROMDATA(region))
-			process_rom_entries(romdata, ROMREGION_ISLOADBYNAME(region) ? regiontag : NULL, region + 1);
-		else if (ROMREGION_ISDISKDATA(region))
-			process_disk_entries(romdata, regiontag, region + 1);
-	}
+			/* now process the entries in the region */
+			if (ROMREGION_ISROMDATA(region))
+				process_rom_entries(romdata, ROMREGION_ISLOADBYNAME(region) ? ROMREGION_GETTAG(region) : NULL, region + 1);
+			else if (ROMREGION_ISDISKDATA(region))
+				process_disk_entries(romdata, ROMREGION_GETTAG(region), region + 1);
+		}
 
 	/* now go back and post-process all the regions */
-	for (region = romp; region != NULL; region = rom_next_region(region))
-		region_post_process(machine, romdata, ROMREGION_GETTAG(region));
+	for (source = rom_first_source(machine->gamedrv, machine->config); source != NULL; source = rom_next_source(machine->gamedrv, machine->config, source))
+		for (region = rom_first_region(machine->gamedrv, source); region != NULL; region = rom_next_region(region))
+			region_post_process(machine, romdata, ROMREGION_GETTAG(region));
+	
+	astring_free(regiontag);
 }
 
 
@@ -1241,14 +1267,9 @@ static void process_region_list(running_machine *machine, rom_load_data *romdata
     loading system
 -------------------------------------------------*/
 
-void rom_init(running_machine *machine, const rom_entry *romp)
+void rom_init(running_machine *machine)
 {
 	static rom_load_data romdata;
-	const device_config *device;
-
-	/* if no roms, bail */
-	if (romp == NULL)
-		return;
 
 	/* make sure we get called back on the way out */
 	add_exit_callback(machine, rom_exit);
@@ -1257,31 +1278,17 @@ void rom_init(running_machine *machine, const rom_entry *romp)
 	memset(&romdata, 0, sizeof(romdata));
 
 	/* determine the correct biosset to load based on OPTION_BIOS string */
-	system_bios = determine_bios_rom(&romdata, romp);
+	system_bios = determine_bios_rom(&romdata, machine->gamedrv->rom);
 
 	/* count the total number of ROMs */
-	romdata.romstotal = count_roms(romp);
-	for (device = machine->config->devicelist; device != NULL; device = device->next)
-	{
-		const rom_entry *devromp = device_get_info_ptr(device, DEVINFO_PTR_ROM_REGION);
-		if (devromp != NULL)
-			romdata.romstotal += count_roms(devromp);
-	}
+	romdata.romstotal = count_roms(machine);
 
 	/* reset the disk list */
 	chd_list = NULL;
 	chd_list_tailptr = &chd_list;
 	
 	/* process the ROM entries we were passed */
-	process_region_list(machine, &romdata, romp);
-	
-	/* look through the devices and process any ROM entries they have */
-	for (device = machine->config->devicelist; device != NULL; device = device->next)
-	{
-		const rom_entry *devromp = device_get_info_ptr(device, DEVINFO_PTR_ROM_REGION);
-		if (devromp != NULL)
-			process_region_list(machine, &romdata, devromp);
-	}
+	process_region_list(machine, &romdata);
 
 	/* display the results and exit */
 	total_rom_load_warnings = romdata.warnings;

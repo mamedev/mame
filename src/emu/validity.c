@@ -55,7 +55,7 @@ UINT8 your_ptr64_flag_is_wrong[(int)(5 - sizeof(void *))];
 typedef struct _region_entry region_entry;
 struct _region_entry
 {
-	const char *tag;
+	astring *tag;
 	UINT32 length;
 };
 
@@ -148,6 +148,50 @@ INLINE void quark_add(quark_table *table, int index, UINT32 crc)
 INLINE quark_entry *quark_table_get_first(quark_table *table, UINT32 crc)
 {
 	return table->hash[crc % table->hashsize];
+}
+
+
+/*-------------------------------------------------
+    validate_tag - ensure that the given tag
+    meets the general requirements
+-------------------------------------------------*/
+
+INLINE int validate_tag(const game_driver *driver, const char *object, const char *tag)
+{
+	const char *validchars = "abcdefghijklmnopqrstuvwxyz0123456789_.:";
+	const char *begin = strrchr(tag, ':');
+	const char *p;
+
+	for (p = tag; *p != 0; p++)
+	{
+		if (*p != tolower(*p))
+		{
+			mame_printf_warning("%s: %s has %s with tag '%s' containing upper-case characters (warning)\n", driver->source_file, driver->name, object, tag);
+			break;
+		}
+		if (*p == ' ')
+		{
+			mame_printf_warning("%s: %s has %s with tag '%s' containing spaces (warning)\n", driver->source_file, driver->name, object, tag);
+			break;
+		}
+		if (strchr(validchars, *p) == NULL)
+		{
+			mame_printf_warning("%s: %s has %s with tag '%s' containing invalid character '%c' (warning)\n", driver->source_file, driver->name, object, tag, *p);
+			break;
+		}
+	}
+	
+	if (begin == NULL)
+		begin = tag;
+	else
+		begin += 1;
+
+	if (strlen(begin) == 0)
+		mame_printf_warning("%s: %s has %s with 0-length tag (warning)\n", driver->source_file, driver->name, object);
+	if (strlen(begin) > MAX_TAG_LENGTH)
+		mame_printf_warning("%s: %s has %s with tag '%s' > %d characters (warning)\n", driver->source_file, driver->name, object, tag, MAX_TAG_LENGTH);
+
+	return 0;
 }
 
 
@@ -511,9 +555,6 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 	const rom_source *source;
 	int error = FALSE;
 
-	/* reset region info */
-	memset(rgninfo, 0, sizeof(*rgninfo));
-	
 	/* iterate, starting with the driver's ROMs and continuing with device ROMs */
 	for (source = rom_first_source(driver, config); source != NULL; source = rom_next_source(driver, config, source))
 	{
@@ -525,24 +566,32 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 			/* if this is a region, make sure it's valid, and record the length */
 			if (ROMENTRY_ISREGION(romp))
 			{
-				const char *region = ROMREGION_GETTAG(romp);
+				const char *regiontag = ROMREGION_GETTAG(romp);
 
 				/* if we haven't seen any items since the last region, print a warning */
 				if (items_since_region == 0)
 					mame_printf_warning("%s: %s has empty ROM region (warning)\n", driver->source_file, driver->name);
 				items_since_region = (ROMREGION_ISERASE(romp) || ROMREGION_ISDISPOSE(romp) || ROMREGION_ISDISKDATA(romp)) ? 1 : 0;
 				currgn = NULL;
-
-				/* check for an invalid tag */
-				if (region == NULL || region[0] == 0)
+				
+				/* check for a valid tag */
+				if (regiontag == NULL)
 				{
-					mame_printf_error("%s: %s has duplicate ROM_REGION tag \"%s\"\n", driver->source_file, driver->name, region);
+					mame_printf_error("%s: %s has NULL ROM_REGION tag\n", driver->source_file, driver->name);
+					error = TRUE;
+				}
+
+				/* load by name entries must be 8 characters or less */
+				else if (ROMREGION_ISLOADBYNAME(romp) && strlen(regiontag) > 8)
+				{
+					mame_printf_error("%s: %s has load-by-name region \"%s\" with name >8 characters\n", driver->source_file, driver->name, regiontag);
 					error = TRUE;
 				}
 
 				/* find any empty entry, checking for duplicates */
 				else
 				{
+					astring *fulltag = rom_region_name(astring_alloc(), driver, source, romp);
 					int rgnnum;
 
 					/* iterate over all regions found so far */
@@ -552,27 +601,24 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 						if (rgninfo->entries[rgnnum].tag == NULL)
 						{
 							currgn = &rgninfo->entries[rgnnum];
-							currgn->tag = region;
+							currgn->tag = fulltag;
 							currgn->length = ROMREGION_GETLENGTH(romp);
 							break;
 						}
 
 						/* fail if we hit a duplicate */
-						if (strcmp(rgninfo->entries[rgnnum].tag, region) == 0)
+						if (astring_cmp(fulltag, rgninfo->entries[rgnnum].tag) == 0)
 						{
-							mame_printf_error("%s: %s has duplicate ROM_REGION type \"%s\"\n", driver->source_file, driver->name, region);
+							mame_printf_error("%s: %s has duplicate ROM_REGION tag \"%s\"\n", driver->source_file, driver->name, astring_c(fulltag));
 							error = TRUE;
+							astring_free(fulltag);
 							break;
 						}
 					}
 				}
 				
-				/* load by name entries must be 8 characters or less */
-				if (ROMREGION_ISLOADBYNAME(romp) && strlen(region) > 8)
-				{
-					mame_printf_error("%s: %s has load-by-name region \"%s\" with name >8 characters\n", driver->source_file, driver->name, region);
-					error = TRUE;
-				}
+				/* validate the region tag */
+				validate_tag(driver, "region", regiontag);
 			}
 
 			/* If this is a system bios, make sure it is using the next available bios number */
@@ -673,9 +719,9 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 			continue;
 
 		/* check for valid tag */
-		if (cpu->tag == NULL || cpu->tag[0] == 0)
+		if (cpu->tag == NULL)
 		{
-			mame_printf_error("%s: %s has NULL or empty CPU tag\n", driver->source_file, driver->name);
+			mame_printf_error("%s: %s has NULL CPU tag\n", driver->source_file, driver->name);
 			error = TRUE;
 		}
 
@@ -689,6 +735,9 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 					error = TRUE;
 				}
 		}
+				
+		/* validate the CPU tag */
+		validate_tag(driver, "CPU", cpu->tag);
 
 		/* checks to see if this driver is using a dummy CPU */
 		if (cputype_get_interface(cpu->type)->get_info == dummy_get_info)
@@ -801,7 +850,7 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 						}
 
 						/* if we hit a match, check against the length */
-						if (strcmp(rgninfo->entries[rgnnum].tag, entry->region) == 0)
+						if (astring_cmpc(rgninfo->entries[rgnnum].tag, entry->region) == 0)
 						{
 							offs_t length = rgninfo->entries[rgnnum].length;
 							if (entry->rgnoffs + (byteend - bytestart + 1) > length)
@@ -1000,7 +1049,7 @@ static int validate_gfx(int drivnum, const machine_config *config, region_info *
 				}
 
 				/* if we hit a match, check against the length */
-				if (strcmp(rgninfo->entries[rgnnum].tag, region) == 0)
+				if (astring_cmpc(rgninfo->entries[rgnnum].tag, region) == 0)
 				{
 					/* if we have a valid region, and we're not using auto-sizing, check the decode against the region length */
 					if (!IS_FRAC(total))
@@ -1488,6 +1537,9 @@ static int validate_sound(int drivnum, const machine_config *config)
 					error = TRUE;
 				}
 
+		/* validate the sound tag */
+		validate_tag(driver, "sound", config->sound[sndnum].tag);
+
 		/* loop over all the routes */
 		for (routenum = 0; routenum < config->sound[sndnum].routes; routenum++)
 		{
@@ -1533,11 +1585,13 @@ static int validate_devices(int drivnum, const machine_config *config)
 	for (device = device_list_first(config->devicelist, DEVICE_TYPE_WILDCARD); device != NULL; device = device_list_next(device, DEVICE_TYPE_WILDCARD))
 	{
 		device_validity_check_func validity_check = (device_validity_check_func) device_get_info_fct(device, DEVINFO_FCT_VALIDITY_CHECK);
-		if (validity_check != NULL)
-		{
-			if ((*validity_check)(driver, device))
-				error = TRUE;
-		}
+
+		/* validate the device tag */
+		validate_tag(driver, device_get_info_string(device, DEVINFO_STR_NAME), device->tag);
+
+		/* call the device-specific validity check */
+		if (validity_check != NULL && (*validity_check)(driver, device))
+			error = TRUE;
 	}
 	return error;
 }
@@ -1617,13 +1671,12 @@ int mame_validitychecks(const game_driver *curdriver)
 		const input_port_config *portlist = NULL;
 		machine_config *config;
 		region_info rgninfo;
+		int rgnnum;
 
-/* ASG -- trying this for a while to see if submission failures increase */
-#if 1
 		/* non-debug builds only care about games in the same driver */
 		if (curdriver != NULL && strcmp(curdriver->source_file, driver->source_file) != 0)
 			continue;
-#endif
+		memset(&rgninfo, 0, sizeof(rgninfo));
 
 		/* expand the machine driver */
 		expansion -= osd_profiling_ticks();
@@ -1670,6 +1723,9 @@ int mame_validitychecks(const game_driver *curdriver)
 		error = validate_devices(drivnum, config) || error;
 		device_checks += osd_profiling_ticks();
 
+		for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo.entries); rgnnum++)
+			if (rgninfo.entries[rgnnum].tag != NULL)
+				astring_free(rgninfo.entries[rgnnum].tag);
 		if (portlist != NULL)
 			input_port_config_free(portlist);
 		machine_config_free(config);

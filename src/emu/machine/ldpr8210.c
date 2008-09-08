@@ -74,6 +74,7 @@ struct _ldplayer_data
 	void				(*cmd_ack_callback)(void); /* callback to clear game command write flag */
 	
 	/* low-level emulation data */
+	int					cpunum;
 	UINT8 				pia[0x100];
 	UINT8 				porta;
 	UINT8 				portb;
@@ -204,6 +205,13 @@ INLINE int requires_state_save(UINT8 state)
 
 static void pr8210_init(laserdisc_state *ld)
 {
+	astring *tempstring = astring_alloc();
+	
+	/* find our CPU */
+	astring_printf(tempstring, "%s:%s", ld->device->tag, "pr8210");
+	ld->player->cpunum = mame_find_cpu_index(ld->device->machine, astring_c(tempstring));
+	astring_free(tempstring);
+	
 	/* do a soft reset */
 	pr8210_soft_reset(ld);
 }
@@ -917,7 +925,7 @@ static WRITE8_HANDLER( pr8210_portb_w )
        $01 = (out) LASER ON
     */
 	ldplayer_data *player = find_pr8210(machine);
-	cputag_set_input_line(machine, "pr8210", 0, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(machine, player->cpunum, 0, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	if ((data & 0x7f) != (player->portb & 0x7f))
 	{
 		printf("%03X:portb_w = %02X", activecpu_get_pc(), data);

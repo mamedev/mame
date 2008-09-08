@@ -1539,7 +1539,7 @@ static void init_machine(running_machine *machine)
 
 	/* first load ROMs, then populate memory, and finally initialize CPUs */
 	/* these operations must proceed in this order */
-	rom_init(machine, machine->gamedrv->rom);
+	rom_init(machine);
 	memory_init(machine);
 	cpuexec_init(machine);
 	watchdog_init(machine);

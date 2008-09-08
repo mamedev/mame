@@ -775,7 +775,6 @@ const char *device_get_info_string(const device_config *device, UINT32 state)
 	deviceinfo info;
 
 	assert(device != NULL);
-	assert(device->token != NULL);
 	assert(device->type != NULL);
 	assert(state >= DEVINFO_STR_FIRST && state <= DEVINFO_STR_LAST);
 

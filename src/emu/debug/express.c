@@ -816,7 +816,7 @@ static EXPRERR parse_string_into_tokens(const char *stringstart, parsed_expressi
 
 			default:
 			{
-				static const char valid[] = "abcdefghijklmnopqrstuvwxyz0123456789_$#.";
+				static const char valid[] = "abcdefghijklmnopqrstuvwxyz0123456789_$#.:";
 				static const char numbers[] = "0123456789abcdef";
 				int bufindex = 0, must_be_number = 0, numbase = DEFAULT_BASE;
 				char buffer[MAX_SYMBOL_LENGTH];

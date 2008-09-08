@@ -18,7 +18,27 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void machine_config_detokenize(machine_config *config, const machine_config_token *tokens, int depth);
+static void machine_config_detokenize(machine_config *config, const machine_config_token *tokens, const char *tagprefix, int depth);
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    create_tag - create a combined tag, 
+    allocating strings as necessary
+-------------------------------------------------*/
+
+INLINE const char *create_tag(astring *result, const char *prefix, const char *tag)
+{
+	if (prefix != NULL && prefix[0] != 0)
+		astring_printf(result, "%s:%s", prefix, tag);
+	else
+		astring_cpyc(result, tag);
+	return astring_c(result);
+}
 
 
 
@@ -41,7 +61,7 @@ machine_config *machine_config_alloc(const machine_config_token *tokens)
 	memset(config, 0, sizeof(*config));
 
 	/* parse tokens into the config */
-	machine_config_detokenize(config, tokens, 0);
+	machine_config_detokenize(config, tokens, "", 0);
 	return config;
 }
 
@@ -53,9 +73,19 @@ machine_config *machine_config_alloc(const machine_config_token *tokens)
 
 void machine_config_free(machine_config *config)
 {
+	int cpunum, soundnum;
+	
 	/* release the device list */
 	while (config->devicelist != NULL)
 		device_list_remove(&config->devicelist, config->devicelist->type, config->devicelist->tag);
+	
+	/* release the strings */
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(config->cputag); cpunum++)
+		if (config->cputag[cpunum] != NULL)
+			astring_free(config->cputag[cpunum]);
+	for (soundnum = 0; soundnum < ARRAY_LENGTH(config->soundtag); soundnum++)
+		if (config->soundtag[soundnum] != NULL)
+			astring_free(config->soundtag[soundnum]);
 
 	/* release the configuration itself */
 	free(config);
@@ -74,7 +104,10 @@ static cpu_config *cpu_add(machine_config *machine, const char *tag, cpu_type ty
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 		if (machine->cpu[cpunum].type == CPU_DUMMY)
 		{
-			machine->cpu[cpunum].tag = tag;
+			if (machine->cputag[cpunum] == NULL)
+				machine->cputag[cpunum] = astring_alloc();
+			astring_cpyc(machine->cputag[cpunum], tag);
+			machine->cpu[cpunum].tag = astring_c(machine->cputag[cpunum]);
 			machine->cpu[cpunum].type = type;
 			machine->cpu[cpunum].clock = cpuclock;
 			return &machine->cpu[cpunum];
@@ -115,8 +148,12 @@ static void cpu_remove(machine_config *machine, const char *tag)
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 		if (machine->cpu[cpunum].tag && strcmp(machine->cpu[cpunum].tag, tag) == 0)
 		{
+			if (machine->cputag[cpunum] != NULL)
+				astring_free(machine->cputag[cpunum]);
 			memmove(&machine->cpu[cpunum], &machine->cpu[cpunum + 1], sizeof(machine->cpu[0]) * (MAX_CPU - cpunum - 1));
+			memmove(&machine->cputag[cpunum], &machine->cputag[cpunum + 1], sizeof(machine->cputag[0]) * (MAX_CPU - cpunum - 1));
 			memset(&machine->cpu[MAX_CPU - 1], 0, sizeof(machine->cpu[0]));
+			memset(&machine->cputag[MAX_CPU - 1], 0, sizeof(machine->cputag[0]));
 			return;
 		}
 
@@ -136,7 +173,10 @@ static sound_config *sound_add(machine_config *machine, const char *tag, sound_t
 	for (soundnum = 0; soundnum < MAX_SOUND; soundnum++)
 		if (machine->sound[soundnum].type == SOUND_DUMMY)
 		{
-			machine->sound[soundnum].tag = tag;
+			if (machine->soundtag[soundnum] == NULL)
+				machine->soundtag[soundnum] = astring_alloc();
+			astring_cpyc(machine->soundtag[soundnum], tag);
+			machine->sound[soundnum].tag = astring_c(machine->soundtag[soundnum]);
 			machine->sound[soundnum].type = type;
 			machine->sound[soundnum].clock = clock;
 			machine->sound[soundnum].config = NULL;
@@ -179,8 +219,12 @@ static void sound_remove(machine_config *machine, const char *tag)
 	for (soundnum = 0; soundnum < MAX_SOUND; soundnum++)
 		if (machine->sound[soundnum].tag && strcmp(machine->sound[soundnum].tag, tag) == 0)
 		{
+			if (machine->soundtag[soundnum] != NULL)
+				astring_free(machine->soundtag[soundnum]);
 			memmove(&machine->sound[soundnum], &machine->sound[soundnum + 1], sizeof(machine->sound[0]) * (MAX_SOUND - soundnum - 1));
+			memmove(&machine->soundtag[soundnum], &machine->soundtag[soundnum + 1], sizeof(machine->soundtag[0]) * (MAX_SOUND - soundnum - 1));
 			memset(&machine->sound[MAX_SOUND - 1], 0, sizeof(machine->sound[0]));
+			memset(&machine->soundtag[MAX_SOUND - 1], 0, sizeof(machine->soundtag[0]));
 			return;
 		}
 
@@ -193,9 +237,10 @@ static void sound_remove(machine_config *machine, const char *tag)
     machine config
 -------------------------------------------------*/
 
-static void machine_config_detokenize(machine_config *config, const machine_config_token *tokens, int depth)
+static void machine_config_detokenize(machine_config *config, const machine_config_token *tokens, const char *tagprefix, int depth)
 {
 	UINT32 entrytype = MCONFIG_TOKEN_INVALID;
+	astring *tempstring = astring_alloc();
 	device_config *device = NULL;
 	sound_config *sound = NULL;
 	cpu_config *cpu = NULL;
@@ -219,29 +264,29 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 
 			/* including */
 			case MCONFIG_TOKEN_INCLUDE:
-				machine_config_detokenize(config, TOKEN_GET_PTR(tokens, tokenptr), depth + 1);
+				machine_config_detokenize(config, TOKEN_GET_PTR(tokens, tokenptr), tagprefix, depth + 1);
 				break;
 
 			/* device management */
 			case MCONFIG_TOKEN_DEVICE_ADD:
 				devtype = TOKEN_GET_PTR(tokens, devtype);
 				tag = TOKEN_GET_STRING(tokens);
-				device = device_list_add(&config->devicelist, devtype, tag);
+				device = device_list_add(&config->devicelist, devtype, create_tag(tempstring, tagprefix, tag));
 				break;
 
 			case MCONFIG_TOKEN_DEVICE_REMOVE:
 				devtype = TOKEN_GET_PTR(tokens, devtype);
 				tag = TOKEN_GET_STRING(tokens);
-				device_list_remove(&config->devicelist, devtype, tag);
+				device_list_remove(&config->devicelist, devtype, create_tag(tempstring, tagprefix, tag));
 				device = NULL;
 				break;
 
 			case MCONFIG_TOKEN_DEVICE_MODIFY:
 				devtype = TOKEN_GET_PTR(tokens, devtype);
 				tag = TOKEN_GET_STRING(tokens);
-				device = (device_config *)device_list_find_by_tag(config->devicelist, devtype, tag);
+				device = (device_config *)device_list_find_by_tag(config->devicelist, devtype, create_tag(tempstring, tagprefix, tag));
 				if (device == NULL)
-					fatalerror("Unable to find device: type=%s tag=%s\n", devtype_name(devtype), tag);
+					fatalerror("Unable to find device: type=%s tag=%s\n", devtype_name(devtype), astring_c(tempstring));
 				break;
 
 			case MCONFIG_TOKEN_DEVICE_CONFIG:
@@ -306,17 +351,17 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, type, 24, clock, 32);
 				tag = TOKEN_GET_STRING(tokens);
-				cpu = cpu_add(config, tag, type, clock);
+				cpu = cpu_add(config, create_tag(tempstring, tagprefix, tag), type, clock);
 				break;
 
 			case MCONFIG_TOKEN_CPU_MODIFY:
 				tag = TOKEN_GET_STRING(tokens);
-				cpu = cpu_find(config, tag);
+				cpu = cpu_find(config, create_tag(tempstring, tagprefix, tag));
 				break;
 
 			case MCONFIG_TOKEN_CPU_REMOVE:
 				tag = TOKEN_GET_STRING(tokens);
-				cpu_remove(config, tag);
+				cpu_remove(config, create_tag(tempstring, tagprefix, tag));
 				cpu = NULL;
 				break;
 
@@ -324,9 +369,9 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, type, 24, clock, 32);
 				tag = TOKEN_GET_STRING(tokens);
-				cpu = cpu_find(config, tag);
+				cpu = cpu_find(config, create_tag(tempstring, tagprefix, tag));
 				if (cpu == NULL)
-					fatalerror("Unable to find CPU: tag=%s\n", tag);
+					fatalerror("Unable to find CPU: tag=%s\n", astring_c(tempstring));
 				cpu->type = type;
 				cpu->clock = clock;
 				break;
@@ -477,7 +522,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, type, 24, clock, 32);
 				tag = TOKEN_GET_STRING(tokens);
-				sound = sound_add(config, tag, type, clock);
+				sound = sound_add(config, create_tag(tempstring, tagprefix, tag), type, clock);
 				break;
 
 			case MCONFIG_TOKEN_SOUND_REMOVE:
@@ -486,9 +531,9 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 
 			case MCONFIG_TOKEN_SOUND_MODIFY:
 				tag = TOKEN_GET_STRING(tokens);
-				sound = sound_find(config, tag);
+				sound = sound_find(config, create_tag(tempstring, tagprefix, tag));
 				if (sound == NULL)
-					fatalerror("Unable to find sound: tag=%s\n", tag);
+					fatalerror("Unable to find sound: tag=%s\n", astring_c(tempstring));
 				sound->routes = 0;
 				break;
 
@@ -501,9 +546,9 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, type, 24, clock, 32);
 				tag = TOKEN_GET_STRING(tokens);
-				sound = sound_find(config, tag);
+				sound = sound_find(config, create_tag(tempstring, tagprefix, tag));
 				if (sound == NULL)
-					fatalerror("Unable to find sound: tag=%s\n", tag);
+					fatalerror("Unable to find sound: tag=%s\n", astring_c(tempstring));
 				sound->type = type;
 				sound->clock = clock;
 				sound->config = NULL;
@@ -533,6 +578,8 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 		{
 			tokens = device_get_info_ptr(device, DEVINFO_PTR_MACHINE_CONFIG);
 			if (tokens != NULL)
-				machine_config_detokenize(config, tokens, depth + 1);
+				machine_config_detokenize(config, tokens, create_tag(tempstring, tagprefix, device->tag), depth + 1);
 		}
+	
+	astring_free(tempstring);
 }
