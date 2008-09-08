@@ -326,62 +326,50 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( nekkyoku_readport_sub, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x12, 0x12) AM_READ(SMH_NOP)				// unknown
-	AM_RANGE(0xe1, 0xe1) AM_READ(fromance_busycheck_sub_r)
-	AM_RANGE(0xe6, 0xe6) AM_READ(fromance_commanddata_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( nekkyoku_writeport_sub, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( nekkyoku_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
+	AM_RANGE(0x12, 0x12) AM_READ(SMH_NOP)				// unknown
 	AM_RANGE(0xe0, 0xe0) AM_WRITE(fromance_rombank_w)
-	AM_RANGE(0xe1, 0xe1) AM_WRITE(fromance_gfxreg_w)
+	AM_RANGE(0xe1, 0xe1) AM_READWRITE(fromance_busycheck_sub_r, fromance_gfxreg_w)
 	AM_RANGE(0xe2, 0xe5) AM_WRITE(fromance_scroll_w)
-	AM_RANGE(0xe6, 0xe6) AM_WRITE(fromance_busycheck_sub_w)
+	AM_RANGE(0xe6, 0xe6) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
 	AM_RANGE(0xe7, 0xe7) AM_WRITE(fromance_adpcm_reset_w)
 	AM_RANGE(0xe8, 0xe8) AM_WRITE(fromance_adpcm_w)
 	AM_RANGE(0xe9, 0xe9) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0xea, 0xea) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromance_readport_sub, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x12, 0x12) AM_READ(SMH_NOP)				// unknown
-	AM_RANGE(0x21, 0x21) AM_READ(fromance_busycheck_sub_r)
-	AM_RANGE(0x26, 0x26) AM_READ(fromance_commanddata_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( idolmj_writeport_sub, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( idolmj_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
+	AM_RANGE(0x12, 0x12) AM_READ(SMH_NOP)				// unknown
 	AM_RANGE(0x20, 0x20) AM_WRITE(fromance_rombank_w)
-	AM_RANGE(0x21, 0x21) AM_WRITE(fromance_gfxreg_w)
+	AM_RANGE(0x21, 0x21) AM_READWRITE(fromance_busycheck_sub_r, fromance_gfxreg_w)
 	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
-	AM_RANGE(0x26, 0x26) AM_WRITE(fromance_busycheck_sub_w)
+	AM_RANGE(0x26, 0x26) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
 	AM_RANGE(0x27, 0x27) AM_WRITE(fromance_adpcm_reset_w)
 	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)
 	AM_RANGE(0x29, 0x29) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x2a, 0x2a) AM_WRITE(ay8910_control_port_0_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( fromance_writeport_sub, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( fromance_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x10, 0x10) AM_WRITE(fromance_crtc_data_w)
 	AM_RANGE(0x11, 0x11) AM_WRITE(fromance_crtc_register_w)
+	AM_RANGE(0x12, 0x12) AM_READ(SMH_NOP)				// unknown
 	AM_RANGE(0x20, 0x20) AM_WRITE(fromance_rombank_w)
-	AM_RANGE(0x21, 0x21) AM_WRITE(fromance_gfxreg_w)
+	AM_RANGE(0x21, 0x21) AM_READWRITE(fromance_busycheck_sub_r, fromance_gfxreg_w)
 	AM_RANGE(0x22, 0x25) AM_WRITE(fromance_scroll_w)
-	AM_RANGE(0x26, 0x26) AM_WRITE(fromance_busycheck_sub_w)
+	AM_RANGE(0x26, 0x26) AM_READWRITE(fromance_commanddata_r, fromance_busycheck_sub_w)
 	AM_RANGE(0x27, 0x27) AM_WRITE(fromance_adpcm_reset_w)
 	AM_RANGE(0x28, 0x28) AM_WRITE(fromance_adpcm_w)
 	AM_RANGE(0x2a, 0x2a) AM_WRITE(ym2413_register_port_0_w)
 	AM_RANGE(0x2b, 0x2b) AM_WRITE(ym2413_data_port_0_w)
 ADDRESS_MAP_END
-
 
 
 /*************************************
@@ -1032,7 +1020,7 @@ static MACHINE_DRIVER_START( nekkyoku )
 
 	MDRV_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(nekkyoku_readmem_sub,nekkyoku_writemem_sub)
-	MDRV_CPU_IO_MAP(nekkyoku_readport_sub,nekkyoku_writeport_sub)
+	MDRV_CPU_IO_MAP(nekkyoku_sub_io_map,0)
 
 	MDRV_MACHINE_RESET(fromance)
 
@@ -1070,7 +1058,7 @@ static MACHINE_DRIVER_START( idolmj )
 
 	MDRV_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_readmem_sub,fromance_writemem_sub)
-	MDRV_CPU_IO_MAP(fromance_readport_sub,idolmj_writeport_sub)
+	MDRV_CPU_IO_MAP(idolmj_sub_io_map,0)
 
 	MDRV_MACHINE_RESET(fromance)
 
@@ -1108,7 +1096,7 @@ static MACHINE_DRIVER_START( fromance )
 
 	MDRV_CPU_ADD("sub", Z80,12000000/2)		/* 6.00 Mhz ? */
 	MDRV_CPU_PROGRAM_MAP(fromance_readmem_sub,fromance_writemem_sub)
-	MDRV_CPU_IO_MAP(fromance_readport_sub,fromance_writeport_sub)
+	MDRV_CPU_IO_MAP(fromance_sub_io_map,0)
 
 	MDRV_MACHINE_RESET(fromance)
 
@@ -1357,3 +1345,4 @@ GAME( 1989, mfunclub,        0, fromance, mfunclub, 0, ROT0, "Video System Co.",
 GAME( 1990, daiyogen,        0, fromance, daiyogen, 0, ROT0, "Video System Co.", "Mahjong Daiyogen (Japan)", 0 )
 GAME( 1991, nmsengen,        0, fromance, nmsengen, 0, ROT0, "Video System Co.", "Nekketsu Mahjong Sengen! AFTER 5 (Japan)", 0 )
 GAME( 1991, fromance,        0, fromance, fromance, 0, ROT0, "Video System Co.", "Idol-Mahjong Final Romance (Japan)", 0 )
+

@@ -385,28 +385,19 @@ static WRITE8_HANDLER( bssoccer_DAC_2_w )
 	dac_data_w( 2 + (offset & 1), (data & 0xf) * 0x11 );
 }
 
-
-
-static ADDRESS_MAP_START( bssoccer_pcm_1_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( bssoccer_pcm_1_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r 				)	// From The Sound Z80
-ADDRESS_MAP_END
-static ADDRESS_MAP_START( bssoccer_pcm_1_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r 					)	// From The Sound Z80
 	AM_RANGE(0x00, 0x01) AM_WRITE(bssoccer_DAC_1_w				)	// 2 x DAC
 	AM_RANGE(0x03, 0x03) AM_WRITE(bssoccer_pcm_1_bankswitch_w	)	// Rom Bank
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( bssoccer_pcm_2_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( bssoccer_pcm_2_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch3_r 				)	// From The Sound Z80
-ADDRESS_MAP_END
-static ADDRESS_MAP_START( bssoccer_pcm_2_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch3_r 					)	// From The Sound Z80
 	AM_RANGE(0x00, 0x01) AM_WRITE(bssoccer_DAC_2_w				)	// 2 x DAC
 	AM_RANGE(0x03, 0x03) AM_WRITE(bssoccer_pcm_2_bankswitch_w	)	// Rom Bank
 ADDRESS_MAP_END
-
 
 
 /***************************************************************************
@@ -426,24 +417,20 @@ static WRITE8_HANDLER( uballoon_pcm_1_bankswitch_w )
 /* Memory maps: Yes, *no* RAM */
 
 static ADDRESS_MAP_START( uballoon_pcm_1_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_READ(SMH_ROM			)	// ROM
+	AM_RANGE(0x0000, 0x03ff) AM_READ(SMH_ROM		)	// ROM
 	AM_RANGE(0x0400, 0xffff) AM_READ(SMH_BANK1 		)	// Banked ROM
 ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( uballoon_pcm_1_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xffff) AM_WRITE(SMH_ROM			)	// ROM
+	AM_RANGE(0x0000, 0xffff) AM_WRITE(SMH_ROM		)	// ROM
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( uballoon_pcm_1_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( uballoon_pcm_1_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r 				)	// From The Sound Z80
-ADDRESS_MAP_END
-static ADDRESS_MAP_START( uballoon_pcm_1_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ(soundlatch2_r 					)	// From The Sound Z80
 	AM_RANGE(0x00, 0x01) AM_WRITE(bssoccer_DAC_1_w				)	// 2 x DAC
 	AM_RANGE(0x03, 0x03) AM_WRITE(uballoon_pcm_1_bankswitch_w	)	// Rom Bank
 ADDRESS_MAP_END
-
 
 static MACHINE_RESET(uballoon)
 {
@@ -859,11 +846,11 @@ static MACHINE_DRIVER_START( bssoccer )
 
 	MDRV_CPU_ADD("pcm1", Z80, 5000000)		/* Z80B */
 	MDRV_CPU_PROGRAM_MAP(bssoccer_pcm_1_readmem,bssoccer_pcm_1_writemem)
-	MDRV_CPU_IO_MAP(bssoccer_pcm_1_readport,bssoccer_pcm_1_writeport)
+	MDRV_CPU_IO_MAP(bssoccer_pcm_1_io_map,0)
 
 	MDRV_CPU_ADD("pcm2", Z80, 5000000)		/* Z80B */
 	MDRV_CPU_PROGRAM_MAP(bssoccer_pcm_2_readmem,bssoccer_pcm_2_writemem)
-	MDRV_CPU_IO_MAP(bssoccer_pcm_2_readport,bssoccer_pcm_2_writeport)
+	MDRV_CPU_IO_MAP(bssoccer_pcm_2_io_map,0)
 
 	MDRV_INTERLEAVE(100)
 
@@ -919,7 +906,7 @@ static MACHINE_DRIVER_START( uballoon )
 
 	MDRV_CPU_ADD("pcm", Z80, 5000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(uballoon_pcm_1_readmem,uballoon_pcm_1_writemem)
-	MDRV_CPU_IO_MAP(uballoon_pcm_1_readport,uballoon_pcm_1_writeport)
+	MDRV_CPU_IO_MAP(uballoon_pcm_1_io_map,0)
 
 	/* 2nd PCM Z80 missing */
 
@@ -970,7 +957,7 @@ static MACHINE_DRIVER_START( sunaq )
 
 	MDRV_CPU_ADD("pcm", Z80, 24000000/4)		/* Z80B */
 	MDRV_CPU_PROGRAM_MAP(bssoccer_pcm_1_readmem,bssoccer_pcm_1_writemem)
-	MDRV_CPU_IO_MAP(bssoccer_pcm_1_readport,bssoccer_pcm_1_writeport)
+	MDRV_CPU_IO_MAP(bssoccer_pcm_1_io_map,0)
 
 	/* 2nd PCM Z80 missing */
 
@@ -1345,3 +1332,4 @@ GAME( 1994, bestbest, 0, bestbest, bestbest, 0,        ROT0, "SunA", "Best Of Be
 GAME( 1994, sunaq,    0, sunaq,    sunaq,    0,        ROT0, "SunA", "SunA Quiz 6000 Academy (940620-6)", 0 )	// Date/Version on-screen is 940620-6, but in the program rom it's 1994,6,30  K.H.T  V6.00
 GAME( 1996, bssoccer, 0, bssoccer, bssoccer, 0,        ROT0, "SunA", "Back Street Soccer", 0 )
 GAME( 1996, uballoon, 0, uballoon, uballoon, uballoon, ROT0, "SunA", "Ultra Balloon", 0 )
+

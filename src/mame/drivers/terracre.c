@@ -263,27 +263,24 @@ static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xcfff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( sound_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
-	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_writeport_3526, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_3526_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ym3526_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ym3526_write_port_0_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(dac_0_signed_data_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(dac_1_signed_data_w)
+	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
+	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writeport_2203, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound_2203_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ym2203_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(dac_0_signed_data_w)
 	AM_RANGE(0x03, 0x03) AM_WRITE(dac_1_signed_data_w)
+	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_clear_r)
+	AM_RANGE(0x06, 0x06) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( terracre )
@@ -568,7 +565,7 @@ static MACHINE_DRIVER_START( amazon )
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz???? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport_3526)
+	MDRV_CPU_IO_MAP(sound_3526_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)	/* ??? */
 
 	MDRV_MACHINE_START(amazon)
@@ -607,7 +604,7 @@ static MACHINE_DRIVER_START( ym3526 )
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz???? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport_3526)
+	MDRV_CPU_IO_MAP(sound_3526_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)	/* ??? */
 
 
@@ -644,7 +641,7 @@ static MACHINE_DRIVER_START( ym2203 )
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)	/* 4 MHz???? */
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_readport,sound_writeport_2203)
+	MDRV_CPU_IO_MAP(sound_2203_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,128)	/* ??? */
 
 
@@ -1034,3 +1031,4 @@ GAME( 1986, amatelas, amazon,   amazon,  amazon,   amatelas, ROT270,  "Nichibuts
 GAME( 1987, horekid,  0,        amazon,  horekid,  horekid,  ROT270,  "Nichibutsu", "Kid no Hore Hore Daisakusen", GAME_SUPPORTS_SAVE )
 GAME( 1987, horekidb, horekid,  amazon,  horekid,  horekid,  ROT270,  "bootleg", "Kid no Hore Hore Daisakusen (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1987, boobhack, horekid,  amazon,  horekid,  horekid,  ROT270,  "bootleg", "Booby Kids (Italian manufactured graphic hack / bootleg of Kid no Hore Hore Daisakusen (bootleg))", GAME_SUPPORTS_SAVE )
+
