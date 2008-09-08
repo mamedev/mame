@@ -38,7 +38,7 @@ PALETTE_INIT( jackal )
 
 	for (i = 0x200; i < 0x300; i++)
 	{
-		UINT16 ctabentry = (color_prom[i - 0x200] & 0x0f) | 0x10;
+		UINT16 ctabentry = (color_prom[i - 0x100] & 0x0f) | 0x10;
 		colortable_entry_set_value(machine->colortable, i, ctabentry);
 	}
 }
