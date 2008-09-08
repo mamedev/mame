@@ -118,32 +118,42 @@ static READ16_HANDLER( roulette_input_r )
 
 }
 
-static ADDRESS_MAP_START( sderby_readmem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
-	AM_RANGE(0x100000, 0x103fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x200000, 0x200fff) AM_READ(SMH_RAM)
-	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
-	AM_RANGE(0x30800e, 0x30800f) AM_READ(okim6295_status_0_lsb_r)
-	AM_RANGE(0xd00000, 0xd001ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf00000, 0xffffff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sderby_writemem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x100000, 0x100fff) AM_WRITE(sderby_videoram_w) AM_BASE(&sderby_videoram) // bg
-	AM_RANGE(0x101000, 0x101fff) AM_WRITE(sderby_md_videoram_w) AM_BASE(&sderby_md_videoram) // mid
-	AM_RANGE(0x102000, 0x103fff) AM_WRITE(sderby_fg_videoram_w) AM_BASE(&sderby_fg_videoram) // fg
+static ADDRESS_MAP_START( sderby_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_WRITE(sderby_videoram_w) AM_BASE(&sderby_videoram) // bg
+	AM_RANGE(0x101000, 0x101fff) AM_RAM AM_WRITE(sderby_md_videoram_w) AM_BASE(&sderby_md_videoram) // mid
+	AM_RANGE(0x102000, 0x103fff) AM_RAM AM_WRITE(sderby_fg_videoram_w) AM_BASE(&sderby_fg_videoram) // fg
 	AM_RANGE(0x104000, 0x10400b) AM_WRITE(sderby_scroll_w)
 	AM_RANGE(0x10400c, 0x10400d) AM_WRITE(SMH_NOP)	// ??? - check code at 0x000456 (executed once at startup)
 	AM_RANGE(0x10400e, 0x10400f) AM_WRITE(SMH_NOP)	// ??? - check code at 0x000524 (executed once at startup)
-    AM_RANGE(0x200000, 0x200fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+    AM_RANGE(0x200000, 0x200fff) AM_RAM AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
 	AM_RANGE(0x308008, 0x308009) AM_WRITE(SMH_NOP)	// ???
-	AM_RANGE(0x30800e, 0x30800f) AM_WRITE(okim6295_data_0_lsb_w)
+	AM_RANGE(0x30800e, 0x30800f) AM_READWRITE(okim6295_status_0_lsb_r,okim6295_data_0_lsb_w)
 	AM_RANGE(0x380000, 0x380fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x500000, 0x500001) AM_WRITE(SMH_NOP)	// ??? - check code at 0x00042e (executed once at startup)
-	AM_RANGE(0xd00000, 0xd001ff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf00000, 0xffffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xd00000, 0xd001ff) AM_RAM // NVRAM?
+	AM_RANGE(0xf00000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( spacewin_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_WRITE(sderby_videoram_w) AM_BASE(&sderby_videoram) // bg
+	AM_RANGE(0x101000, 0x101fff) AM_RAM AM_WRITE(sderby_md_videoram_w) AM_BASE(&sderby_md_videoram) // mid
+	AM_RANGE(0x102000, 0x103fff) AM_RAM AM_WRITE(sderby_fg_videoram_w) AM_BASE(&sderby_fg_videoram) // fg
+	AM_RANGE(0x104000, 0x10400b) AM_WRITE(sderby_scroll_w)
+	AM_RANGE(0x10400c, 0x10400d) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x10400e, 0x10400f) AM_WRITE(SMH_NOP)
+    AM_RANGE(0x200000, 0x200fff) AM_RAM AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
+	AM_RANGE(0x308008, 0x308009) AM_WRITE(SMH_NOP)	// ???
+	AM_RANGE(0x30800e, 0x30800f) AM_READWRITE(okim6295_status_0_lsb_r,okim6295_data_0_lsb_w)
+	AM_RANGE(0x380000, 0x380fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x500000, 0x500001) AM_WRITE(SMH_NOP)	// ??? - check code at 0x00042e (executed once at startup)
+	AM_RANGE(0xd00000, 0xd001ff) AM_RAM
+	AM_RANGE(0x800000, 0x8fffff) AM_RAM
+ADDRESS_MAP_END
+
 
 static ADDRESS_MAP_START( roulette_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -252,11 +262,37 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( sderby )
 	MDRV_CPU_ADD("main", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(sderby_readmem,sderby_writemem)
+	MDRV_CPU_PROGRAM_MAP(sderby_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_GFXDECODE(sderby)
 
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 64*8)
+	MDRV_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
+
+	MDRV_PALETTE_LENGTH(0x1000)
+
+	MDRV_VIDEO_START(sderby)
+	MDRV_VIDEO_UPDATE(sderby)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( spacewin )
+	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_PROGRAM_MAP(spacewin_map,0)
+	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
+
+	MDRV_GFXDECODE(sderby)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -340,6 +376,25 @@ ROM_START( pmroulet )
 	ROM_LOAD( "8.bin", 0x200000, 0x80000, CRC(d4c2b7da) SHA1(515be861443acc5b911241dbaafa42e02f79985a))
 ROM_END
 
+ROM_START( spacewin )
+	ROM_REGION( 0x40000, "main", 0 ) /* 68000 Code */
+    ROM_LOAD16_BYTE( "2.u16", 0x00000, 0x20000, CRC(2d17c2ab) SHA1(833ab39081fbc3d114103055e3a3f2ea2a28f158) )
+	ROM_LOAD16_BYTE( "3.u15", 0x00001, 0x20000, CRC(fd6f93ef) SHA1(1dc35fd92a0185434b44aa3c7da47a408fb2ce27) )
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* Samples */
+	ROM_LOAD( "1.u147", 0x00000, 0x40000,  CRC(eedc7090) SHA1(fc8cabf7a11a1de3ccc3b8860afd8f32669608b8) )
+
+	ROM_REGION( 0xa0000, "gfx1", 0 ) /* Sprites */
+	ROM_LOAD( "4.u141", 0x000000, 0x20000, CRC(ce20c599) SHA1(93358c3a891c66ca944eb684bd47e9c25bfcb88d) )
+	ROM_LOAD( "5.u142", 0x020000, 0x20000, CRC(ae4f8e06) SHA1(cb3b941c67ae5c9df005d9f8b2105dc5a114f19f) )
+	ROM_LOAD( "6.u143", 0x040000, 0x20000, CRC(b99afc96) SHA1(589270dbd5022db2d032da85a9813c271fa71a90) )
+	ROM_LOAD( "7.u144", 0x060000, 0x20000, CRC(30f212ad) SHA1(ecafd93b11ff15386ef02e9f6657a52baf7932b4) )
+	ROM_LOAD( "8.u145", 0x080000, 0x20000, CRC(541a73fd) SHA1(fede5e2fcbb18e90cc50995d44e831c3f9b56614) )
+ROM_END
+
+
+
 GAME( 1996, sderby, 0, sderby, sderby, 0, ROT0, "Playmark", "Super Derby", 0 )
 GAME( 1997, pmroulet, 0, pmroulet, pmroulet, 0, ROT0, "Playmark", "Croupier (Playmark Roulette)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 199?, spacewin, 0, spacewin, sderby, 0, ROT0, "Playmark", "Space Win / Scacco Matto", GAME_NOT_WORKING ) // title depends on game type in test mode
 
