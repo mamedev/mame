@@ -410,6 +410,9 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 /* attempts to map a point on the specified render_target to the specified container, if possible */
 int render_target_map_point_container(render_target *target, INT32 target_x, INT32 target_y, render_container *container, float *container_x, float *container_y);
 
+/* attempts to map a point on the specified render_target to the specified container, if possible */
+int render_target_map_point_input(render_target *target, INT32 target_x, INT32 target_y, const char **input_tag, UINT32 *input_mask, float *input_x, float *input_y);
+
 
 
 /* ----- render texture management ----- */

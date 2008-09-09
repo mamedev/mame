@@ -1221,7 +1221,7 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 		case WM_LBUTTONDOWN:
 		{
 			DWORD ticks = GetTickCount();
-			ui_input_push_mouse_click_event(Machine, window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			ui_input_push_mouse_down_event(Machine, window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
 
 			// check for a double-click
 			if (ticks - window->lastclicktime < GetDoubleClickTime() &&
@@ -1239,6 +1239,10 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 			}
 			break;
 		}
+
+		case WM_LBUTTONUP:
+			ui_input_push_mouse_up_event(Machine, window->target, GET_X_LPARAM(lparam), GET_Y_LPARAM(lparam));
+			break;
 
 		case WM_CHAR:
 			ui_input_push_char_event(Machine, window->target, (unicode_char) wparam);

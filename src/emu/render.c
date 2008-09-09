@@ -1606,9 +1606,14 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 					if (item->element != NULL)
 					{
 						int state = 0;
-						if (item->name[0] != '\0')
-							state = output_get_value(item->name);
-
+						if (item->output_name[0] != 0)
+							state = output_get_value(item->output_name);
+						else if (item->input_tag[0] != 0)
+						{
+							const input_field_config *field = input_field_by_tag_and_mask(Machine->portconfig, item->input_tag, item->input_mask);
+							if (field != NULL)
+								state = ((input_port_read_safe(Machine, item->input_tag, 0) ^ field->defvalue) & item->input_mask) ? 1 : 0;
+						}
 						add_element_primitives(target, &target->primlist[listnum], &item_xform, item->element, state, blendmode);
 					}
 					else
@@ -1673,14 +1678,12 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
     logic for mapping points
 -------------------------------------------------*/
 
-static int render_target_map_point_internal(render_target *target, INT32 target_x, INT32 target_y,
-	render_container *container, const char *input_tag, UINT32 input_mask, float *mapped_x, float *mapped_y)
+static int render_target_map_point_internal(render_target *target, INT32 target_x, INT32 target_y, render_container *container, float *mapped_x, float *mapped_y, view_item **mapped_item)
 {
-	int layernum;
-	view_item *item;
 	float target_fx, target_fy;
+	view_item *item;
+	int layernum;
 	float dummy;
-	int hit;
 
 	/* sanity check */
 	if (mapped_x == NULL)
@@ -1688,10 +1691,15 @@ static int render_target_map_point_internal(render_target *target, INT32 target_
 	if (mapped_y == NULL)
 		mapped_y = &dummy;
 
+	/* default to point not mapped */
+	*mapped_x = -1.0;
+	*mapped_y = -1.0;
+
 	/* convert target coordinates to float */
 	target_fx = (float)target_x / target->width;
 	target_fy = (float)target_y / target->height;
 
+	/* explicitly check for the UI container */
 	if (container != NULL && container == ui_container)
 	{
 		/* this hit test went against the UI container */
@@ -1700,46 +1708,43 @@ static int render_target_map_point_internal(render_target *target, INT32 target_
 			/* this point was successfully mapped */
 			*mapped_x = target_fx;
 			*mapped_y = target_fy;
+			*mapped_item = NULL;
 			return TRUE;
 		}
+		return FALSE;
 	}
-	else
-	{
-		/* loop through each layer */
-		for (layernum = 0; layernum < ITEM_LAYER_MAX; layernum++)
-		{
-			int layer = get_layer_and_blendmode(target->curview, layernum, NULL);
-			if (target->curview->layenabled[layer])
-			{
-				/* iterate over items in the layer */
-				for (item = target->curview->itemlist[layer]; item != NULL; item = item->next)
-				{
-					/* perform the hit test */
-					if (item->element == NULL && container != NULL)
-						hit = (container == get_screen_container_by_index(item->index));
-					else
-						hit = FALSE;
 
-					/* is this item the container in which we are interested? */
-					if (hit)
-					{
-						/* this target contains the specified container; now check the point */
-						if (target_fx >= item->bounds.x0 && target_fx < item->bounds.x1 && target_fy >= item->bounds.y0 && target_fy < item->bounds.y1)
-						{
-							/* point successfully mapped */
-							*mapped_x = (target_fx - item->bounds.x0) / (item->bounds.x1 - item->bounds.x0);
-							*mapped_y = (target_fy - item->bounds.y0) / (item->bounds.y1 - item->bounds.y0);
-							return TRUE;
-						}
-					}
+	/* loop through each layer */
+	for (layernum = 0; layernum < ITEM_LAYER_MAX; layernum++)
+	{
+		int layer = get_layer_and_blendmode(target->curview, layernum, NULL);
+		if (target->curview->layenabled[layer])
+		{
+			/* iterate over items in the layer */
+			for (item = target->curview->itemlist[layer]; item != NULL; item = item->next)
+			{
+				int checkit;
+				
+				/* if we're looking for a particular container, verify that we have the right one */
+				if (container != NULL)
+					checkit = (item->element == NULL && container == get_screen_container_by_index(item->index));
+				
+				/* otherwise, assume we're looking for an input */
+				else
+					checkit = (item->input_tag[0] != 0);
+			
+				/* this target is worth looking at; now check the point */
+				if (checkit && target_fx >= item->bounds.x0 && target_fx < item->bounds.x1 && target_fy >= item->bounds.y0 && target_fy < item->bounds.y1)
+				{
+					/* point successfully mapped */
+					*mapped_x = (target_fx - item->bounds.x0) / (item->bounds.x1 - item->bounds.x0);
+					*mapped_y = (target_fy - item->bounds.y0) / (item->bounds.y1 - item->bounds.y0);
+					*mapped_item = item;
+					return TRUE;
 				}
 			}
 		}
 	}
-
-	/* point not mapped */
-	*mapped_x = -1.0;
-	*mapped_y = -1.0;
 	return FALSE;
 }
 
@@ -1752,7 +1757,29 @@ static int render_target_map_point_internal(render_target *target, INT32 target_
 
 int render_target_map_point_container(render_target *target, INT32 target_x, INT32 target_y, render_container *container, float *container_x, float *container_y)
 {
-	return render_target_map_point_internal(target, target_x, target_y, container, NULL, 0, container_x, container_y);
+	view_item *item;
+	return render_target_map_point_internal(target, target_x, target_y, container, container_x, container_y, &item);
+}
+
+
+/*-------------------------------------------------
+    render_target_map_point_input - attempts to map
+	a point on the specified render_target to the
+	specified container, if possible
+-------------------------------------------------*/
+
+int render_target_map_point_input(render_target *target, INT32 target_x, INT32 target_y, const char **input_tag, UINT32 *input_mask, float *input_x, float *input_y)
+{
+	view_item *item = NULL;
+	int result;
+	
+	result = render_target_map_point_internal(target, target_x, target_y, NULL, input_x, input_y, &item);
+	if (result && item != NULL)
+	{
+		*input_tag = item->input_tag;
+		*input_mask = item->input_mask;
+	}
+	return result;
 }
 
 

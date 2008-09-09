@@ -54,6 +54,7 @@
 
 ***************************************************************************/
 
+#include <ctype.h>
 #include "render.h"
 #include "rendfont.h"
 #include "rendlay.h"
@@ -1451,9 +1452,15 @@ static int xml_get_attribute_int_with_subst(xml_data_node *node, const char *att
 	const char *string = xml_get_attribute_string_with_subst(node, attribute, NULL);
 	int value;
 
-	if (!string || sscanf(string, "%d", &value) != 1)
+	if (string == NULL)
 		return defvalue;
-	return value;
+	if (string[0] == '$')
+		return (sscanf(&string[1], "%X", &value) == 1) ? value : defvalue;
+	if (string[0] == '0' && string[1] == 'x')
+		return (sscanf(&string[2], "%X", &value) == 1) ? value : defvalue;
+	if (string[0] == '#')
+		return (sscanf(&string[1], "%d", &value) == 1) ? value : defvalue;
+	return (sscanf(&string[0], "%d", &value) == 1) ? value : defvalue;
 }
 
 
@@ -1558,6 +1565,7 @@ layout_file *layout_file_load(const char *dirname, const char *filename)
 		*viewnext = view;
 		viewnext = &view->next;
 	}
+
 	xml_file_free(rootnode);
 	return file;
 
@@ -1821,8 +1829,11 @@ static view_item *load_view_item(xml_data_node *itemnode, layout_element *elemli
 	item = malloc_or_die(sizeof(*item));
 	memset(item, 0, sizeof(*item));
 
-	/* allocate a copy of the name */
-	item->name = copy_string(xml_get_attribute_string_with_subst(itemnode, "name", ""));
+	/* allocate a copy of the output name */
+	item->output_name = copy_string(xml_get_attribute_string_with_subst(itemnode, "name", ""));
+
+	/* allocate a copy of the input tag */
+	item->input_tag = copy_string(xml_get_attribute_string_with_subst(itemnode, "inputtag", ""));
 
 	/* find the associated element */
 	name = xml_get_attribute_string_with_subst(itemnode, "element", NULL);
@@ -1843,8 +1854,9 @@ static view_item *load_view_item(xml_data_node *itemnode, layout_element *elemli
 
 	/* fetch common data */
 	item->index = xml_get_attribute_int_with_subst(itemnode, "index", -1);
-	if (item->name[0] != 0 && item->element != 0)
-		output_set_value(item->name, item->element->defstate);
+	item->input_mask = xml_get_attribute_int_with_subst(itemnode, "inputmask", 0);
+	if (item->output_name[0] != 0 && item->element != 0)
+		output_set_value(item->output_name, item->element->defstate);
 	if (load_bounds(xml_get_sibling(itemnode->child, "bounds"), &item->rawbounds))
 		goto error;
 	if (load_color(xml_get_sibling(itemnode->child, "color"), &item->color))
@@ -1867,8 +1879,8 @@ static view_item *load_view_item(xml_data_node *itemnode, layout_element *elemli
 	return item;
 
 error:
-	if (item->name != NULL)
-		free((void *)item->name);
+	if (item->output_name != NULL)
+		free((void *)item->output_name);
 	free(item);
 	return NULL;
 }
@@ -2075,8 +2087,8 @@ static void layout_view_free(layout_view *view)
 		{
 			view_item *temp = view->itemlist[layer];
 			view->itemlist[layer] = temp->next;
-			if (temp->name != NULL)
-				free((void *)temp->name);
+			if (temp->output_name != NULL)
+				free((void *)temp->output_name);
 			free(temp);
 		}
 

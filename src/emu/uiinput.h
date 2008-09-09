@@ -28,7 +28,8 @@ enum _ui_event_type
 	UI_EVENT_NONE,
 	UI_EVENT_MOUSE_MOVE,
 	UI_EVENT_MOUSE_LEAVE,
-	UI_EVENT_MOUSE_CLICK,
+	UI_EVENT_MOUSE_DOWN,
+	UI_EVENT_MOUSE_UP,
 	UI_EVENT_MOUSE_DOUBLE_CLICK,
 	UI_EVENT_CHAR
 };
@@ -72,7 +73,7 @@ int ui_input_pop_event(running_machine *machine, ui_event *event);
 void ui_input_reset(running_machine *machine);
 
 /* retrieves the current location of the mouse */
-render_target *ui_input_find_mouse(running_machine *machine, INT32 *x, INT32 *y);
+render_target *ui_input_find_mouse(running_machine *machine, INT32 *x, INT32 *y, int *button);
 
 
 
@@ -122,14 +123,30 @@ INLINE void ui_input_push_mouse_leave_event(running_machine *machine, render_tar
 
 
 /*-------------------------------------------------
-    ui_input_push_mouse_click_event - pushes a mouse
-    click event to the specified render_target
+    ui_input_push_mouse_down_event - pushes a mouse
+    down event to the specified render_target
 -------------------------------------------------*/
 
-INLINE void ui_input_push_mouse_click_event(running_machine *machine, render_target *target, INT32 x, INT32 y)
+INLINE void ui_input_push_mouse_down_event(running_machine *machine, render_target *target, INT32 x, INT32 y)
 {
 	ui_event event = { UI_EVENT_NONE };
-	event.event_type = UI_EVENT_MOUSE_CLICK;
+	event.event_type = UI_EVENT_MOUSE_DOWN;
+	event.target = target;
+	event.mouse_x = x;
+	event.mouse_y = y;
+	ui_input_push_event(machine, event);
+}
+
+
+/*-------------------------------------------------
+    ui_input_push_mouse_down_event - pushes a mouse
+    down event to the specified render_target
+-------------------------------------------------*/
+
+INLINE void ui_input_push_mouse_up_event(running_machine *machine, render_target *target, INT32 x, INT32 y)
+{
+	ui_event event = { UI_EVENT_NONE };
+	event.event_type = UI_EVENT_MOUSE_UP;
 	event.target = target;
 	event.mouse_x = x;
 	event.mouse_y = y;

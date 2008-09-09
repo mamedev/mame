@@ -120,7 +120,9 @@ struct _view_item
 {
 	view_item *			next;				/* link to next item */
 	layout_element *	element;			/* pointer to the associated element (non-screens only) */
-	const char *		name;				/* name of this item */
+	const char *		output_name;		/* name of this item */
+	const char *		input_tag;			/* input tag of this item */
+	UINT32				input_mask;			/* input mask of this item */
 	int					index;				/* index for this item (screens only) */
 	int					orientation;		/* orientation of this item */
 	render_bounds		bounds;				/* bounds of the item */

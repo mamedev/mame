@@ -47,6 +47,7 @@ struct _ui_input_private
 	render_target *				current_mouse_target;
 	INT32						current_mouse_x;
 	INT32						current_mouse_y;
+	int							current_mouse_down;
 
 	/* popped states; ring buffer of ui_events */
 	ui_event					events[EVENT_QUEUE_SIZE];
@@ -143,6 +144,14 @@ int ui_input_push_event(running_machine *machine, ui_event evt)
 			}
 			break;
 
+		case UI_EVENT_MOUSE_DOWN:
+			uidata->current_mouse_down = TRUE;
+			break;
+
+		case UI_EVENT_MOUSE_UP:
+			uidata->current_mouse_down = FALSE;
+			break;
+
 		default:
 			/* do nothing */
 			break;
@@ -207,13 +216,15 @@ void ui_input_reset(running_machine *machine)
     location of the mouse
 -------------------------------------------------*/
 
-render_target *ui_input_find_mouse(running_machine *machine, INT32 *x, INT32 *y)
+render_target *ui_input_find_mouse(running_machine *machine, INT32 *x, INT32 *y, int *button)
 {
 	ui_input_private *uidata = machine->ui_input_data;
 	if (x != NULL)
 		*x = uidata->current_mouse_x;
 	if (y != NULL)
 		*y = uidata->current_mouse_y;
+	if (button != NULL)
+		*button = uidata->current_mouse_down;
 	return uidata->current_mouse_target;
 }
 

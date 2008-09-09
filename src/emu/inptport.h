@@ -947,6 +947,9 @@ const input_port_config *input_port_by_tag(const input_port_config *portlist, co
 /* return the config that matches the given tag */
 const input_port_config *input_port_by_index(const input_port_config *portlist, int index);
 
+/* return the field that matches the given tag and mask */
+const input_field_config *input_field_by_tag_and_mask(const input_port_config *portlist, const char *tag, input_port_value mask);
+
 
 
 /* ----- accessors for input types ----- */

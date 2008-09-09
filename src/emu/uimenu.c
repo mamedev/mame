@@ -737,7 +737,7 @@ static void ui_menu_draw(ui_menu *menu, int customonly)
 	int visible_lines;
 	int top_line;
 	int itemnum, linenum;
-	int mouse_hit;
+	int mouse_hit, mouse_button;
 	render_target *mouse_target;
 	INT32 mouse_target_x, mouse_target_y;
 	float mouse_x = -1, mouse_y = -1;
@@ -811,9 +811,10 @@ static void ui_menu_draw(ui_menu *menu, int customonly)
 
 	/* locate mouse */
 	mouse_hit = FALSE;
+	mouse_button = FALSE;
 	if (!customonly)
 	{
-		mouse_target = ui_input_find_mouse(Machine, &mouse_target_x, &mouse_target_y);
+		mouse_target = ui_input_find_mouse(Machine, &mouse_target_x, &mouse_target_y, &mouse_button);
 		if (mouse_target != NULL)
 			if (render_target_map_point_container(mouse_target, mouse_target_x, mouse_target_y, render_container_get_ui(), &mouse_x, &mouse_y))
 				mouse_hit = TRUE;
@@ -847,7 +848,7 @@ static void ui_menu_draw(ui_menu *menu, int customonly)
 			}
 
 			/* else if the mouse is over this item, draw with a different background */
-			else if (menu->hover == itemnum)
+			else if (itemnum == menu->hover)
 			{
 				fgcolor = mouseover_fgcolor;
 				bgcolor = mouseover_bgcolor;
@@ -1067,7 +1068,7 @@ static void ui_menu_handle_events(ui_menu *menu)
 		switch (event.event_type)
 		{
 			/* if we are hovering over a valid item, select it with a single click */
-			case UI_EVENT_MOUSE_CLICK:
+			case UI_EVENT_MOUSE_DOWN:
 				if (menu->hover >= 0 && menu->hover < menu->numitems)
 					menu->selected = menu->hover;
 				else if (menu->hover == -2)

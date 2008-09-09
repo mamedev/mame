@@ -98,6 +98,7 @@
 #include "profiler.h"
 #include "inputseq.h"
 #include "ui.h"
+#include "uiinput.h"
 #include <ctype.h>
 #include <time.h>
 #include <stdarg.h>
@@ -480,7 +481,7 @@ static void frame_update_callback(running_machine *machine);
 static void frame_update(running_machine *machine);
 static void frame_update_digital_joysticks(running_machine *machine);
 static void frame_update_analog_field(analog_field_state *analog);
-static int frame_get_digital_field_state(const input_field_config *field);
+static int frame_get_digital_field_state(const input_field_config *field, int mouse_down);
 
 /* port configuration helpers */
 static input_port_config *port_config_detokenize(input_port_config *listhead, const input_port_token *ipt, char *errorbuf, int errorbuflen);
@@ -785,6 +786,27 @@ const input_port_config *input_port_by_index(const input_port_config *portlist, 
 		if (index-- == 0)
 			return port;
 
+	return NULL;
+}
+
+
+/*-------------------------------------------------
+    input_field_by_tag_and_mask - return a pointer
+    to the first field that intersects the given
+    mask on the tagged port
+-------------------------------------------------*/
+
+const input_field_config *input_field_by_tag_and_mask(const input_port_config *portlist, const char *tag, input_port_value mask)
+{
+	const input_port_config *port = input_port_by_tag(portlist, tag);
+	const input_field_config *field;
+	
+	/* if we got the port, look for the field */
+	if (port != NULL)
+		for (field = port->fieldlist; field != NULL; field = field->next)
+			if ((field->mask & mask) != 0)
+				return field;
+	
 	return NULL;
 }
 
@@ -1984,9 +2006,14 @@ static void frame_update_callback(running_machine *machine)
 static void frame_update(running_machine *machine)
 {
 	input_port_private *portdata = machine->input_port_data;
+	const input_field_config *mouse_field = NULL;
 	int ui_visible = ui_is_menu_active();
 	attotime curtime = timer_get_time();
 	const input_port_config *port;
+	render_target *mouse_target;
+	INT32 mouse_target_x;
+	INT32 mouse_target_y;
+	int mouse_button;
 
 profiler_mark(PROFILER_INPUT);
 
@@ -2003,6 +2030,16 @@ profiler_mark(PROFILER_INPUT);
 
 	/* compute default values for all the ports */
 	input_port_update_defaults(machine);
+
+	/* perform the mouse hit test */
+	mouse_target = ui_input_find_mouse(machine, &mouse_target_x, &mouse_target_y, &mouse_button);
+	if (mouse_button)
+	{
+		const char *tag = NULL;
+		input_port_value mask;
+		if (render_target_map_point_input(mouse_target, mouse_target_x, mouse_target_y, &tag, &mask, NULL, NULL))
+			mouse_field = input_field_by_tag_and_mask(machine->portconfig, tag, mask);
+	}
 
 	/* loop over all input ports */
 	for (port = machine->portconfig; port != NULL; port = port->next)
@@ -2028,7 +2065,7 @@ profiler_mark(PROFILER_INPUT);
 					frame_update_analog_field(field->state->analog);
 
 				/* handle non-analog types, but only when the UI isn't visible */
-				else if (!ui_visible && frame_get_digital_field_state(field))
+				else if (!ui_visible && frame_get_digital_field_state(field, field == mouse_field))
 					port->state->digital |= field->mask;
 			}
 
@@ -2298,9 +2335,9 @@ static void frame_update_analog_field(analog_field_state *analog)
     of a digital field
 -------------------------------------------------*/
 
-static int frame_get_digital_field_state(const input_field_config *field)
+static int frame_get_digital_field_state(const input_field_config *field, int mouse_down)
 {
-	int curstate = input_seq_pressed(input_field_seq(field, SEQ_TYPE_STANDARD));
+	int curstate = mouse_down || input_seq_pressed(input_field_seq(field, SEQ_TYPE_STANDARD));
 	int changed = FALSE;
 
 	/* if the state changed, look for switch down/switch up */
@@ -2351,7 +2388,7 @@ static int frame_get_digital_field_state(const input_field_config *field)
 		curstate = FALSE;
 
 	/* additional logic to restrict digital joysticks */
-	if (curstate && field->state->joystick != NULL && field->way != 16)
+	if (curstate && !mouse_down && field->state->joystick != NULL && field->way != 16)
 	{
 		UINT8 mask = (field->way == 4) ? field->state->joystick->current4way : field->state->joystick->current;
 		if (!(mask & (1 << field->state->joydir)))
