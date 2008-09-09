@@ -225,21 +225,23 @@ static ADDRESS_MAP_START( writemem_m660, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfc07, 0xfc07) AM_WRITE(tsamurai_textbank2_w)/* Mission 660 uses a bit here */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_readport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( z80_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( z80_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( z80_writeport_m660, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( z80_m660_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)		       /* ? */
-	AM_RANGE(0x01, 0x01) AM_WRITE(SMH_NOP)               /* Written continuously. Increments with level. */
-	AM_RANGE(0x02, 0x02) AM_WRITE(SMH_NOP)               /* Always follows above with 0x01 data */
+	AM_RANGE(0x00, 0x00) AM_WRITE(SMH_NOP)		/* ? */
+	AM_RANGE(0x01, 0x01) AM_WRITE(SMH_NOP)		/* Written continuously. Increments with level. */
+	AM_RANGE(0x02, 0x02) AM_WRITE(SMH_NOP)		/* Always follows above with 0x01 data */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( vsgongf_audio_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 static READ8_HANDLER( sound_command1_r )
@@ -326,11 +328,7 @@ ADDRESS_MAP_END
 
 /*******************************************************************************/
 
-static ADDRESS_MAP_START( readport_sound3_m660, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport_sound3_m660, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sound3_m660_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ay8910_write_port_0_w)
@@ -735,7 +733,7 @@ static MACHINE_DRIVER_START( tsamurai )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(z80_readport,z80_writeport)
+	MDRV_CPU_IO_MAP(z80_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", samurai_interrupt)
 
 	MDRV_CPU_ADD("audio", Z80, 2000000)
@@ -778,7 +776,7 @@ static MACHINE_DRIVER_START( m660 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_m660,writemem_m660)
-	MDRV_CPU_IO_MAP(z80_readport,z80_writeport_m660)
+	MDRV_CPU_IO_MAP(z80_m660_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", samurai_interrupt)
 
 	MDRV_CPU_ADD("audio", Z80, 2000000)
@@ -789,7 +787,7 @@ static MACHINE_DRIVER_START( m660 )
 
 	MDRV_CPU_ADD("audio3", Z80, 2000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound3_m660,writemem_sound3_m660)
-	MDRV_CPU_IO_MAP(readport_sound3_m660,writeport_sound3_m660)
+	MDRV_CPU_IO_MAP(sound3_m660_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
 	/* video hardware */
@@ -830,7 +828,7 @@ static MACHINE_DRIVER_START( vsgongf )
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(readmem_sound_vsgongf,writemem_sound_vsgongf)
-	MDRV_CPU_IO_MAP(0,z80_writeport)
+	MDRV_CPU_IO_MAP(vsgongf_audio_io_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(vsgongf_sound_interrupt,3)
 
 	/* video hardware */
@@ -1273,3 +1271,5 @@ GAME( 1986, m660,     0,        m660,     m660,     0, ROT90, "[Woodplace Inc.] 
 GAME( 1986, m660j,    m660,     m660,     m660,     0, ROT90, "[Woodplace Inc.] Taito Corporation", "Mission 660 (Japan)", 0 )
 GAME( 1986, m660b,    m660,     m660,     m660,     0, ROT90, "bootleg", "Mission 660 (bootleg)", 0 )
 GAME( 1986, alphaxz,  m660,     m660,     m660,     0, ROT90, "Ed / Woodplace Inc.", "The Alphax Z (Japan)", 0 )
+
+

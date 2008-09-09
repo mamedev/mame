@@ -498,9 +498,17 @@ static ADDRESS_MAP_START( slapbtuk_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_WRITE(slapfight_fixcol_w) AM_BASE(&slapfight_colorram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(slapfight_port_00_r)	/* status register */
+	AM_RANGE(0x00, 0x00) AM_READWRITE(slapfight_port_00_r, slapfight_port_00_w)	/* status register */
+	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(slapfight_flipscreen_w)
+//  AM_RANGE(0x04, 0x04) AM_WRITE(getstar_port_04_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(slapfight_port_06_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(slapfight_port_07_w)
+	AM_RANGE(0x08, 0x08) AM_WRITE(slapfight_port_08_w)	/* select bank 0 */
+	AM_RANGE(0x09, 0x09) AM_WRITE(slapfight_port_09_w)	/* select bank 1 */
+	AM_RANGE(0x0c, 0x0d) AM_WRITE(slapfight_palette_bank_w)
 ADDRESS_MAP_END
 
 static READ8_HANDLER(tigerh_status_r)
@@ -508,9 +516,13 @@ static READ8_HANDLER(tigerh_status_r)
 	return (slapfight_port_00_r(machine,0)&0xf9)| ((tigerh_mcu_status_r(machine,0)));
 }
 
-static ADDRESS_MAP_START( tigerh_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( tigerh_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_READ(tigerh_status_r)	/* status register */
+	AM_RANGE(0x00, 0x00) AM_READWRITE(tigerh_status_r, slapfight_port_00_w)	/* status register */
+	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
+	AM_RANGE(0x02, 0x03) AM_WRITE(slapfight_flipscreen_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(slapfight_port_06_w)
+	AM_RANGE(0x07, 0x07) AM_WRITE(slapfight_port_07_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m68705_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -534,28 +546,14 @@ static ADDRESS_MAP_START( m68705_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0080, 0x07ff) AM_WRITE(SMH_ROM)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( tigerh_writeport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( tigerhb_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(slapfight_port_00_w)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(slapfight_port_00_r, slapfight_port_00_w)	/* status register */
 	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
 	AM_RANGE(0x02, 0x03) AM_WRITE(slapfight_flipscreen_w)
 	AM_RANGE(0x06, 0x06) AM_WRITE(slapfight_port_06_w)
 	AM_RANGE(0x07, 0x07) AM_WRITE(slapfight_port_07_w)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_WRITE(slapfight_port_00_w)
-	AM_RANGE(0x01, 0x01) AM_WRITE(slapfight_port_01_w)
-	AM_RANGE(0x02, 0x03) AM_WRITE(slapfight_flipscreen_w)
-//  AM_RANGE(0x04, 0x04) AM_WRITE(getstar_port_04_w)
-	AM_RANGE(0x06, 0x06) AM_WRITE(slapfight_port_06_w)
-	AM_RANGE(0x07, 0x07) AM_WRITE(slapfight_port_07_w)
-	AM_RANGE(0x08, 0x08) AM_WRITE(slapfight_port_08_w)	/* select bank 0 */
-	AM_RANGE(0x09, 0x09) AM_WRITE(slapfight_port_09_w)	/* select bank 1 */
-	AM_RANGE(0x0c, 0x0d) AM_WRITE(slapfight_palette_bank_w)
-ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( perfrman_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READ(SMH_ROM)
@@ -926,7 +924,7 @@ static MACHINE_DRIVER_START( perfrman )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80,16000000/4)			/* 4MHz ???, 16MHz Oscillator */
 	MDRV_CPU_PROGRAM_MAP(perfrman_readmem,perfrman_writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80,16000000/8)			/* 2MHz ???, 16MHz Oscillator */
@@ -973,7 +971,7 @@ static MACHINE_DRIVER_START( tigerhb )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(tigerh_readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,tigerh_writeport)
+	MDRV_CPU_IO_MAP(tigerhb_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80, 6000000)
@@ -1019,7 +1017,7 @@ static MACHINE_DRIVER_START( tigerh )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, XTAL_36MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(tigerh_readmem,writemem)
-	MDRV_CPU_IO_MAP(tigerh_readport,tigerh_writeport)
+	MDRV_CPU_IO_MAP(tigerh_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80, XTAL_36MHz/12) /* verified on pcb */
@@ -1069,7 +1067,7 @@ static MACHINE_DRIVER_START( slapfigh )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main",Z80, XTAL_36MHz/6) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80, XTAL_36MHz/12) /* verified on pcb */
@@ -1926,3 +1924,4 @@ GAME( 1986, getstar,  0,        slapfigh, getstar,  getstar,  ROT0,   "Taito Ame
 GAME( 1986, getstarj, getstar,  slapfigh, getstarj, getstarj, ROT0,   "Taito",   "Get Star (Japan)", GAME_NO_COCKTAIL )
 GAME( 1986, gtstarb1, getstar,  slapfigh, getstarj, gtstarb1, ROT0,   "bootleg", "Get Star (bootleg set 1)", GAME_NO_COCKTAIL )
 GAME( 1986, gtstarb2, getstar,  slapfigh, gtstarb2, gtstarb2, ROT0,   "bootleg", "Get Star (bootleg set 2)", GAME_NO_COCKTAIL )
+
