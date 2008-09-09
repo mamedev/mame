@@ -1,50 +1,33 @@
-/*
+/*******************************************************************************************
+
   Playmark 'Super Derby' Hardware
+  -------------------------------
+
+  Driver by David Haywood.
+  Additional work by Roberto Fresca.
 
 
-  Super Derby - Playmark
-  Roulette(?) - Playmark
+  Supported games:
 
- Payout / hopper controls not connected
-
- Roulette appears to have some kind of MCU device
- between the processor and the hopper
+  Super Derby,                  1996, Playmark.
+  Scacco Matto / Space Win,     1996, Playmark.
+  Croupier (Playmark Roulette), 1997, Playmark.
 
 
-*/
+********************************************************************************************
+
+  NOTES:
+  -----
+
+  Payout / hopper controls not connected
+
+  Roulette appears to have some kind of MCU device
+  between the processor and the hopper
 
 
-/*
+  Working notes: (Relating to SDERBY)
 
-Super Derby
-Playmark '96
-
-mc 68k 12mhz
-OKI m6295
-
-2x GM 76c88al (8kx8 6264) near program ROMs
-2x 6264 near gfx ROMs
-16k nonvolatile SRAM (Dallas 1220Y)
-two FPGA chips - one labelled 'Playmark 010412'
-4x hm3-65728bk-5
---
-21.bin 6F9F2F2B - near OKI (samples?)
-
-22.bin A319F1E0 - program code
-23.bin 1D6E2321 /
-
-24.bin 93C917DF  - gfx
-25.bin 7BA485CD
-26.bin BEABE4F7
-27.bin 672CE5DF
-28.bin 39CA3B52
---
-
-*/
-
-/* working notes: (Relating to SDERBY)
-
-Stephh's notes :
+  Stephh's notes :
 
   - The game is playable, but :
 
@@ -56,24 +39,28 @@ Stephh's notes :
     input ports.
 
 
-EC notes :
+  EC notes :
 
-Thinks... Those three reads at the beginning - hopper, ticket and note acceptor tests?
-The system certainly performs those before printing the error.
-(There are three different error graphics in the ROM, depending on what is wrong)
-Also, hardware freezes if we try to turn the dispenser or acceptor on, because it's waiting
-for the response back from NOP?
+  Thinks... Those three reads at the beginning - hopper, ticket and note acceptor tests?
+  The system certainly performs those before printing the error.
+  (There are three different error graphics in the ROM, depending on what is wrong)
+  Also, hardware freezes if we try to turn the dispenser or acceptor on, because it's waiting
+  for the response back from NOP?
 
 
-TO DO :
+********************************************************************************************
+
+  TO DO :
 
   - figure out the reads from 0x308002.w and 0x30800e.w (see sderby_input_r read handler)
   (by default, demo sounds are OFF, so change this in the "test mode")
 
-*/
+
+*******************************************************************************************/
 
 #include "driver.h"
 #include "sound/okim6295.h"
+#include "sderby.lh"
 #include "spacewin.lh"
 
 UINT16 *sderby_fg_videoram;
@@ -88,6 +75,10 @@ VIDEO_UPDATE( sderby );
 VIDEO_UPDATE( pmroulet );
 WRITE16_HANDLER( sderby_scroll_w );
 
+
+/***************************
+*       R/W Handlers       *
+***************************/
 
 static READ16_HANDLER ( sderby_input_r )
 {
@@ -108,16 +99,64 @@ static READ16_HANDLER( roulette_input_r )
 {
 	switch (offset)
 	{
-	case 0x00 >>1:
+	case 0x00 >> 1:
 		return input_port_read(machine, "IN0");
-	case 0x02 >>1:
+	case 0x02 >> 1:
 		return input_port_read(machine, "IN1");
-	case 0x04 >>1:
+	case 0x04 >> 1:
 		return input_port_read(machine, "IN2");
 	}
 	return 0xffff;
 
 }
+
+/******************************
+*       Outputs / Lamps       *
+******************************/
+
+static WRITE16_HANDLER( sderby_out_w )
+{
+/*
+  ---------------------------
+  --- Super Derby Outputs ---
+  ---------------------------
+
+  0x0000 - Normal State (lamps off).
+  0x0001 - Start lamp.
+  0x0002 - Bet lamp.
+
+  0x0100 - Ticket dispenser out.
+  0x0800 - Unknown (always activated).
+  0x1000 - Hopper out.
+  0x2000 - Coin counter.
+  0x4000 - Unknown.
+  0x8000 - End of Race lamp.
+
+
+    - Lbits -
+    7654 3210
+    =========
+    ---- ---x  Start lamp.
+    ---- --x-  Bet lamp.
+ 
+    - Hbits -
+    7654 3210
+    =========
+    ---- ---x  Ticket dispenser out.
+    ---- x---  unknown (always activated).
+    ---x ----  Hopper out.
+    --x- ----  Coin counter.
+    -x-- ----  unknown.
+    x--- ----  End of Race lamp.
+
+*/
+	output_set_lamp_value(1, (data & 1));			/* Lamp 1 - START */
+	output_set_lamp_value(2, (data >> 1) & 1);		/* Lamp 2 - BET */
+	output_set_lamp_value(3, (data >> 15) & 1);		/* Lamp 3 - END OF RACE */
+
+	coin_counter_w(0, data & 0x2000);
+}
+
 
 static WRITE16_HANDLER( scmatto_out_w )
 {
@@ -134,6 +173,7 @@ static WRITE16_HANDLER( scmatto_out_w )
   0x0010 - Hold 5 lamp.
   0x0020 - Start lamp.
   0x0040 - Bet lamp.
+  0x1000 - Hopper out.
   0x2000 - Coin counter.
 
 
@@ -151,6 +191,7 @@ static WRITE16_HANDLER( scmatto_out_w )
     - Hbits -
     7654 3210
     =========
+    ---x ----  Hopper out.
     --x- ----  Coin counter.
 
 */
@@ -165,22 +206,27 @@ static WRITE16_HANDLER( scmatto_out_w )
 	coin_counter_w(0, data & 0x2000);
 }
 
+
+/***************************
+*       Memory Maps        *
+***************************/
+
 static ADDRESS_MAP_START( sderby_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_WRITE(sderby_videoram_w) AM_BASE(&sderby_videoram) // bg
-	AM_RANGE(0x101000, 0x101fff) AM_RAM AM_WRITE(sderby_md_videoram_w) AM_BASE(&sderby_md_videoram) // mid
-	AM_RANGE(0x102000, 0x103fff) AM_RAM AM_WRITE(sderby_fg_videoram_w) AM_BASE(&sderby_fg_videoram) // fg
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_WRITE(sderby_videoram_w) AM_BASE(&sderby_videoram)		/* bg */
+	AM_RANGE(0x101000, 0x101fff) AM_RAM AM_WRITE(sderby_md_videoram_w) AM_BASE(&sderby_md_videoram)	/* mid */
+	AM_RANGE(0x102000, 0x103fff) AM_RAM AM_WRITE(sderby_fg_videoram_w) AM_BASE(&sderby_fg_videoram)	/* fg */
 	AM_RANGE(0x104000, 0x10400b) AM_WRITE(sderby_scroll_w)
-	AM_RANGE(0x10400c, 0x10400d) AM_WRITE(SMH_NOP)	// ??? - check code at 0x000456 (executed once at startup)
-	AM_RANGE(0x10400e, 0x10400f) AM_WRITE(SMH_NOP)	// ??? - check code at 0x000524 (executed once at startup)
+	AM_RANGE(0x10400c, 0x10400d) AM_WRITE(SMH_NOP)	/* ??? - check code at 0x000456 (executed once at startup) */
+	AM_RANGE(0x10400e, 0x10400f) AM_WRITE(SMH_NOP)	/* ??? - check code at 0x000524 (executed once at startup) */
     AM_RANGE(0x200000, 0x200fff) AM_RAM AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
-	AM_RANGE(0x308008, 0x308009) AM_WRITE(SMH_NOP)	// ???
-	AM_RANGE(0x30800e, 0x30800f) AM_READWRITE(okim6295_status_0_lsb_r,okim6295_data_0_lsb_w)
+	AM_RANGE(0x308008, 0x308009) AM_WRITE(sderby_out_w)	/* output port */
+	AM_RANGE(0x30800e, 0x30800f) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0x380000, 0x380fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(SMH_NOP)	// ??? - check code at 0x00042e (executed once at startup)
-	AM_RANGE(0xd00000, 0xd001ff) AM_RAM // NVRAM?
-	AM_RANGE(0xf00000, 0xffffff) AM_RAM
+	AM_RANGE(0x500000, 0x500001) AM_WRITE(SMH_NOP)	/* unknown... write 0x01 in game, and 0x00 on reset */
+	AM_RANGE(0xd00000, 0xd007ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spacewin_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -195,33 +241,37 @@ static ADDRESS_MAP_START( spacewin_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x300001) AM_WRITE(SMH_NOP)	/* unknown... write 0x01 in game, and 0x00 on reset */
 	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
 	AM_RANGE(0x308008, 0x308009) AM_WRITE(scmatto_out_w)	/* output port */
-	AM_RANGE(0x30800e, 0x30800f) AM_READWRITE(okim6295_status_0_lsb_r,okim6295_data_0_lsb_w)
+	AM_RANGE(0x30800e, 0x30800f) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0x380000, 0x380fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xd00000, 0xd001ff) AM_RAM
     AM_RANGE(0x800000, 0x800fff) AM_RAM AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x801000, 0x80100d) AM_WRITE(SMH_NOP)	/* unknown */
-	AM_RANGE(0x8f0000, 0x8f3fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)	/* 16K Dallas DS1220Y-200 NVRAM */
+	AM_RANGE(0x8f0000, 0x8f07ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)	/* 16K Dallas DS1220Y-200 NVRAM */
 	AM_RANGE(0x8fc000, 0x8fffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roulette_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
     AM_RANGE(0x440000, 0x440fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(sderby_videoram_w) AM_BASE(&sderby_videoram) // bg
-	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_BASE(&sderby_md_videoram) // mid
-	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(sderby_fg_videoram_w) AM_BASE(&sderby_fg_videoram) // fg
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(sderby_videoram_w) AM_BASE(&sderby_videoram)			/* bg */
+	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_BASE(&sderby_md_videoram)	/* mid */
+	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(sderby_fg_videoram_w) AM_BASE(&sderby_fg_videoram)	/* fg */
 	AM_RANGE(0x504000, 0x50400b) AM_RAM_WRITE(sderby_scroll_w)
 	AM_RANGE(0x50400e, 0x50400f) AM_WRITE( SMH_NOP )
 
-	AM_RANGE(0x708000, 0x70800d) AM_READ(roulette_input_r) AM_WRITE(SMH_NOP) // what are the writes?
-	AM_RANGE(0x708008, 0x708009) AM_WRITE(SMH_NOP)	// ???
-	AM_RANGE(0x70800e, 0x70800f) AM_READ(okim6295_status_0_lsb_r) AM_WRITE(okim6295_data_0_lsb_w) // ?? it only ever plays 1 sound
+	AM_RANGE(0x708000, 0x70800d) AM_READ(roulette_input_r) AM_WRITE(SMH_NOP) /* what are the writes? */
+	AM_RANGE(0x70800e, 0x70800f) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)	/* ROM seems to be bad */
 	AM_RANGE(0x780000, 0x780fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
 
-	AM_RANGE(0xf00000, 0xffffff) AM_RAM
+	AM_RANGE(0xff0000, 0xff07ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 
+
+/***************************
+*       Input Ports        *
+***************************/
 
 static INPUT_PORTS_START( sderby )
 	PORT_START("IN0")	/* 0x308000.w */
@@ -265,19 +315,19 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( pmroulet )
 	PORT_START("IN0")
-	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_VBLANK ) // it must be toggled to boot anyway
-	PORT_SERVICE_NO_TOGGLE(0x0020, IP_ACTIVE_LOW) // seems to be ..
-	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
-	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
-	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
+	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_VBLANK ) /* it must be toggled to boot anyway */
+	PORT_SERVICE_NO_TOGGLE(0x0020, IP_ACTIVE_LOW)
+	PORT_BIT( 0x00c0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x000e, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
-	PORT_BIT( 0x00f0, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
-	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
-	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
+	PORT_BIT( 0x000e, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x00f0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
@@ -286,15 +336,20 @@ static INPUT_PORTS_START( pmroulet )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) /* to cancel bets in 3-button mode */
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
-  	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
-	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
+	PORT_BIT( 0x0f00, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xf000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
+
+
+/****************************
+*     Graphics Layouts      *
+****************************/
 
 static const gfx_layout tiles8x8_layout =
 {
-	8,8,
+	8, 8,
 	RGN_FRAC(1,5),
 	5,
 	{ RGN_FRAC(4,5), RGN_FRAC(3,5), RGN_FRAC(2,5), RGN_FRAC(1,5), RGN_FRAC(0,5) },
@@ -303,10 +358,9 @@ static const gfx_layout tiles8x8_layout =
 	8*8
 };
 
-
 static const gfx_layout tiles16x16_layout =
 {
-	16,16,
+	16, 16,
 	RGN_FRAC(1,5),
 	5,
 	{ RGN_FRAC(4,5), RGN_FRAC(3,5), RGN_FRAC(2,5), RGN_FRAC(1,5), RGN_FRAC(0,5) },
@@ -320,18 +374,26 @@ static const gfx_layout tiles16x16_layout =
 };
 
 
+/****************************
+*      Graphics Decode      *
+****************************/
+
 static GFXDECODE_START( sderby )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0x000, 256  ) /* sprites */
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0x000, 256  ) /* sprites */
 GFXDECODE_END
 
 
+/****************************
+*      Machine Drivers      *
+****************************/
+
 static MACHINE_DRIVER_START( sderby )
 	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(sderby_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
-	MDRV_GFXDECODE(sderby)
+	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -340,17 +402,15 @@ static MACHINE_DRIVER_START( sderby )
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
 
+	MDRV_GFXDECODE(sderby)
 	MDRV_PALETTE_LENGTH(0x1000)
-
 	MDRV_VIDEO_START(sderby)
 	MDRV_VIDEO_UPDATE(sderby)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( spacewin )
@@ -360,8 +420,6 @@ static MACHINE_DRIVER_START( spacewin )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_GFXDECODE(sderby)
-
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -369,17 +427,15 @@ static MACHINE_DRIVER_START( spacewin )
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
 
+	MDRV_GFXDECODE(sderby)
 	MDRV_PALETTE_LENGTH(0x1000)
-
 	MDRV_VIDEO_START(sderby)
 	MDRV_VIDEO_UPDATE(pmroulet)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( pmroulet )
@@ -387,29 +443,56 @@ static MACHINE_DRIVER_START( pmroulet )
 	MDRV_CPU_PROGRAM_MAP(roulette_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
-	MDRV_GFXDECODE(sderby)
+	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(4*8, 44*8-1, 3*8, 33*8-1)
 
+	MDRV_GFXDECODE(sderby)
 	MDRV_PALETTE_LENGTH(0x1000)
-
 	MDRV_VIDEO_START(sderby)
 	MDRV_VIDEO_UPDATE(pmroulet)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-
 	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-
 MACHINE_DRIVER_END
 
 
+/****************************
+*        Rom Loads          *
+****************************/
+/*
+
+Super Derby
+Playmark '96
+
+mc 68k 12mhz
+OKI m6295
+
+2x GM 76c88al (8kx8 6264) near program ROMs
+2x 6264 near gfx ROMs
+16k nonvolatile SRAM (Dallas 1220Y)
+two FPGA chips - one labelled 'Playmark 010412'
+4x hm3-65728bk-5
+--
+21.bin 6F9F2F2B - near OKI (samples?)
+
+22.bin A319F1E0 - program code
+23.bin 1D6E2321 /
+
+24.bin 93C917DF  - gfx
+25.bin 7BA485CD
+26.bin BEABE4F7
+27.bin 672CE5DF
+28.bin 39CA3B52
+
+*/
 ROM_START( sderby )
 	ROM_REGION( 0x80000, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "22.bin", 0x00000, 0x20000, CRC(a319f1e0) SHA1(d932cc7e990aa87308dcd9ffa5af2aaea333aa9a) )
@@ -424,23 +507,6 @@ ROM_START( sderby )
 	ROM_LOAD( "26.bin", 0x40000, 0x20000, CRC(beabe4f7) SHA1(a5615450fae930cb2408f201a9faa12551de0d70) )
 	ROM_LOAD( "27.bin", 0x60000, 0x20000, CRC(672ce5df) SHA1(cdf3af842cbcbf53cc73d9986744dc9cfa92c71a) )
 	ROM_LOAD( "28.bin", 0x80000, 0x20000, CRC(39ca3b52) SHA1(9a03e73d88a1551cd3cfe616ab71e67dced1272a) )
-ROM_END
-
-
-ROM_START( pmroulet )
-	ROM_REGION( 0x40000, "main", 0 ) /* 68000 Code */
-    ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x20000, CRC(1677a2de) SHA1(4dcbb3c1ce9b65e06ba7e0cffa00c0c8016538f5))
-	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x20000, CRC(11acaac2) SHA1(19e7bbbf4356fc9a866f9f36d0568c42d6a36c07))
-
-	ROM_REGION( 0x080000, "oki", 0 ) /* Samples */
-	ROM_LOAD( "1.bin", 0x00000, 0x40000, CRC(6673de85) SHA1(df390cd6268efc0e743a9020f19bc0cbeb757cfa))
-
-	ROM_REGION( 0x280000, "gfx1", 0 ) /* Sprites */
-	ROM_LOAD( "4.bin", 0x000000, 0x80000, CRC(efcddac9) SHA1(72435ec478b70a067d47f3daf7c224169ee5827a))
-	ROM_LOAD( "5.bin", 0x080000, 0x80000, CRC(bc75ef8f) SHA1(1f3dc457e5ae143d53cfef0e1fcb4586dceefb67))
-	ROM_LOAD( "6.bin", 0x100000, 0x80000, CRC(e47d5f55) SHA1(a341e24f98125265cb3986f8c7ce84eedd056b71))
-	ROM_LOAD( "7.bin", 0x180000, 0x80000, CRC(0fa6ce7d) SHA1(5ba96c9c0625a131d890d9c0c0f65cb2a03fa084))
-	ROM_LOAD( "8.bin", 0x200000, 0x80000, CRC(d4c2b7da) SHA1(515be861443acc5b911241dbaafa42e02f79985a))
 ROM_END
 
 /* Scacco Matto / Space Win
@@ -496,13 +562,29 @@ ROM_START( spacewin )
 	ROM_LOAD( "8.u145", 0x080000, 0x20000, CRC(541a73fd) SHA1(fede5e2fcbb18e90cc50995d44e831c3f9b56614) )
 ROM_END
 
+ROM_START( pmroulet )
+	ROM_REGION( 0x40000, "main", 0 ) /* 68000 code */
+    ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x20000, CRC(1677a2de) SHA1(4dcbb3c1ce9b65e06ba7e0cffa00c0c8016538f5))
+	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x20000, CRC(11acaac2) SHA1(19e7bbbf4356fc9a866f9f36d0568c42d6a36c07))
+
+	ROM_REGION( 0x080000, "oki", 0 ) /* samples. seems to be wrong (only 6 samples?) */
+	ROM_LOAD( "1.bin", 0x00000, 0x40000, CRC(6673de85) SHA1(df390cd6268efc0e743a9020f19bc0cbeb757cfa))
+
+	ROM_REGION( 0x280000, "gfx1", 0 ) /* sprites */
+	ROM_LOAD( "4.bin", 0x000000, 0x80000, CRC(efcddac9) SHA1(72435ec478b70a067d47f3daf7c224169ee5827a))
+	ROM_LOAD( "5.bin", 0x080000, 0x80000, CRC(bc75ef8f) SHA1(1f3dc457e5ae143d53cfef0e1fcb4586dceefb67))
+	ROM_LOAD( "6.bin", 0x100000, 0x80000, CRC(e47d5f55) SHA1(a341e24f98125265cb3986f8c7ce84eedd056b71))
+	ROM_LOAD( "7.bin", 0x180000, 0x80000, CRC(0fa6ce7d) SHA1(5ba96c9c0625a131d890d9c0c0f65cb2a03fa084))
+	ROM_LOAD( "8.bin", 0x200000, 0x80000, CRC(d4c2b7da) SHA1(515be861443acc5b911241dbaafa42e02f79985a))
+ROM_END
+
 
 /******************************
 *        Game Drivers         *
 ******************************/
 
 /*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT   ROT    COMPANY     FULLNAME                       FLAGS            LAYOUT  */
-GAME(  1996, sderby,   0,      sderby,   sderby,   0,     ROT0, "Playmark", "Super Derby",                  0 )
+GAMEL( 1996, sderby,   0,      sderby,   sderby,   0,     ROT0, "Playmark", "Super Derby",                  0,               layout_sderby   )
 GAMEL( 1996, spacewin, 0,      spacewin, spacewin, 0,     ROT0, "Playmark", "Scacco Matto / Space Win",     0,               layout_spacewin )
 GAME(  1997, pmroulet, 0,      pmroulet, pmroulet, 0,     ROT0, "Playmark", "Croupier (Playmark Roulette)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 
