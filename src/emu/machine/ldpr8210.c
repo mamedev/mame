@@ -76,6 +76,7 @@ struct _ldplayer_data
 	/* low-level emulation data */
 	int					cpunum;
 	UINT8 				pia[0x100];
+	UINT8				vsync;
 	UINT8 				porta;
 	UINT8 				portb;
 	UINT8 				pia_porta;
@@ -92,9 +93,12 @@ static void pr8210_init(laserdisc_state *ld);
 static void pr8210_soft_reset(laserdisc_state *ld);
 static void pr8210_update_squelch(laserdisc_state *ld);
 static int pr8210_switch_state(laserdisc_state *ld, UINT8 newstate, INT32 stateparam);
+static INT32 pr8210_hle_update(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime);
+#if (EMULATE_PR8210_ROM)
+static void pr8210_vsync(laserdisc_state *ld);
 static INT32 pr8210_update(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime);
-#if (!EMULATE_PR8210_ROM)
-static void pr8210_command(laserdisc_state *ld);
+#else
+static void pr8210_hle_command(laserdisc_state *ld);
 #endif
 static void pr8210_control_w(laserdisc_state *ld, UINT8 prev, UINT8 data);
 
@@ -131,12 +135,16 @@ const ldplayer_interface pr8210_interface =
 #if EMULATE_PR8210_ROM
 	rom_pr8210,									/* pointer to ROM region information */
 	machine_config_pr8210,						/* pointer to machine configuration */
+	pr8210_init,								/* initialization callback */
+	pr8210_vsync,								/* vsync callback */
+	pr8210_update,								/* update callback */
 #else
 	NULL,										/* pointer to ROM region information */
 	NULL,										/* pointer to machine configuration */
-#endif
 	pr8210_init,								/* initialization callback */
-	pr8210_update,								/* update callback */
+	NULL,										/* vsync callback */
+	pr8210_hle_update,							/* update callback */
+#endif
 	NULL,										/* parallel data write */
 	{											/* single line write: */
 		NULL,									/*    LASERDISC_LINE_ENTER */
@@ -160,7 +168,8 @@ const ldplayer_interface simutrek_interface =
 	NULL,										/* pointer to ROM region information */
 	NULL,										/* pointer to machine configuration */
 	simutrek_init,								/* initialization callback */
-	pr8210_update,								/* update callback */
+	NULL,										/* vsync callback */
+	pr8210_hle_update,							/* update callback */
 	simutrek_data_w,							/* parallel data write */
 	{											/* single line write: */
 		NULL,									/*    LASERDISC_LINE_ENTER */
@@ -178,7 +187,7 @@ const ldplayer_interface simutrek_interface =
 
 
 /***************************************************************************
-    PIONEER PR-8210 IMPLEMENTATION
+    INLINE FUNCTIONS
 ***************************************************************************/
 
 /*-------------------------------------------------
@@ -191,6 +200,20 @@ INLINE int requires_state_save(UINT8 state)
 {
 	return (state == LDSTATE_SCANNING);
 }
+
+
+/*-------------------------------------------------
+    requires_state_save - returns TRUE if the
+    given state will return to the previous
+    state when done
+-------------------------------------------------*/
+
+INLINE void update_audio_squelch(laserdisc_state *ld)
+{
+	ldplayer_data *player = ld->player;
+	ldcore_set_audio_squelch(ld, (player->porta & 0x40) || !(player->pia_portb & 0x01), (player->porta & 0x40) || !(player->pia_portb & 0x02));
+}
+
 
 
 
@@ -350,11 +373,102 @@ static int pr8210_switch_state(laserdisc_state *ld, UINT8 newstate, INT32 parame
 
 
 /*-------------------------------------------------
-    pr8210_update - Pioneer PR-8210-specific
-    update callback
+    pr8210_vsync - Start of VSYNC callback
 -------------------------------------------------*/
 
+#if (EMULATE_PR8210_ROM)
+static TIMER_CALLBACK( vsync_off )
+{
+	ldplayer_data *player = ptr;
+	player->vsync = FALSE;
+}
+
+static void pr8210_vsync(laserdisc_state *ld)
+{
+	ldplayer_data *player = ld->player;
+	player->vsync = TRUE;
+	timer_set(attotime_mul(video_screen_get_scan_period(ld->screen), 4), player, 0, vsync_off);
+}
+#endif
+
+
+/*-------------------------------------------------
+    pr8210_update - Pioneer PR-8210-specific
+    update callback when using a ROM
+-------------------------------------------------*/
+
+#if (EMULATE_PR8210_ROM)
+
 static INT32 pr8210_update(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime)
+{
+	ldplayer_data *player = ld->player;
+	UINT8 focus_on = !(player->porta & 0x08);
+	UINT8 laser_on = !(player->portb & 0x01);
+	UINT8 spdl_on = !(player->porta & 0x10);
+	INT32 advanceby = 0;
+	int frame, chapter;
+
+	/* update PIA registers based on vbi code */
+	frame = frame_from_metadata(vbi);
+	chapter = chapter_from_metadata(vbi);
+	if (focus_on && laser_on && !(player->pia[0x80] & 1))
+	{
+		if (frame == FRAME_LEAD_IN)
+			player->pia[0xc0] = 0x10; /* or 0x12 */
+		else if (frame == FRAME_LEAD_OUT)
+			player->pia[0xc0] = 0x11;
+		else if (frame != FRAME_NOT_PRESENT)
+		{
+			player->pia[0xc0] = 0x00;
+			player->pia[0x22] = 0xf0 | ((frame / 10000) % 10);
+			player->pia[0x23] = 0xf0 | ((frame / 1000) % 10);
+			player->pia[0x24] = 0xf0 | ((frame / 100) % 10);
+			player->pia[0x25] = 0xf0 | ((frame / 10) % 10);
+			player->pia[0x26] = 0xf0 | ((frame / 1) % 10);
+		}
+		else if (chapter != CHAPTER_NOT_PRESENT)
+		{
+			player->pia[0xc0] = 0x13;
+			player->pia[0x20] = 0xf0 | ((chapter / 10) % 10);
+			player->pia[0x21] = 0xf0 | ((chapter / 1) % 10);
+		}
+	}
+	player->pia[0xc0] |= 4;//fieldnum << 2;
+
+	if (spdl_on)
+		advanceby = fieldnum;
+
+	/* update overlay */
+	if ((player->pia[0x80] & 1) || player->framedisplay)
+	{
+		char buffer[16] = { 0 };
+		int i;
+		for (i = 0; i < 15; i++)
+		{
+			UINT8 c = player->pia[0x22 + i];
+			if (c >= 0xf0 && c <= 0xf9)
+				c = '0' + (c - 0xf0);
+			else if (c < 0x20 || c > 0x7f)
+				c = '?';
+			buffer[i] = c;
+		}
+		popmessage("%s", buffer);
+	}
+	player->framedisplay = 0;
+
+if (advanceby != 0)
+	printf("Advancing by %d\n", advanceby);
+	return advanceby;
+}
+#endif
+
+
+/*-------------------------------------------------
+    pr8210_hle_update - Pioneer PR-8210-specific
+    update callback when using HLE
+-------------------------------------------------*/
+
+static INT32 pr8210_hle_update(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime)
 {
 	ldplayer_state newstate;
 	INT32 advanceby = 0;
@@ -422,13 +536,14 @@ static INT32 pr8210_update(laserdisc_state *ld, const vbi_metadata *vbi, int fie
 }
 
 
+
 /*-------------------------------------------------
-    pr8210_command - Pioneer PR-8210-specific
+    pr8210_hle_command - Pioneer PR-8210-specific
     command processing
 -------------------------------------------------*/
 
 #if (!EMULATE_PR8210_ROM)
-static void pr8210_command(laserdisc_state *ld)
+static void pr8210_hle_command(laserdisc_state *ld)
 {
 	ldplayer_data *player = ld->player;
 	UINT8 cmd = player->lastcommand;
@@ -623,12 +738,14 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 //printf("New command = %02X (last=%02X)\n", newcommand, player->lastcommand);
 
 #if EMULATE_PR8210_ROM
+			printf("Command = %02X\n", newcommand);
+//			player->pia_porta = BITSWAP8(newcommand, 4,3,2,1,0,5,6,7);
 			player->pia_porta = BITSWAP8(newcommand, 0,1,2,3,4,5,6,7);
 #else
 			/* if we got a double command, act on it */
 			if (newcommand == player->lastcommand)
 			{
-				pr8210_command(ld);
+				pr8210_hle_command(ld);
 				player->lastcommand = 0;
 			}
 			else
@@ -783,22 +900,33 @@ void simutrek_set_cmd_ack_callback(const device_config *device, void (*callback)
  *
  *************************************/
 
-static ldplayer_data *find_pr8210(running_machine *machine)
+static laserdisc_state *find_pr8210(running_machine *machine)
 {
-	return ldcore_get_safe_token(device_list_first(machine->config->devicelist, LASERDISC))->player;
+	return ldcore_get_safe_token(device_list_first(machine->config->devicelist, LASERDISC));
 }
 
 
 static READ8_HANDLER( pr8210_pia_r )
 {
-	ldplayer_data *player = find_pr8210(machine);
+	laserdisc_state *ld = find_pr8210(machine);
+	ldplayer_data *player = ld->player;
 	UINT8 result = player->pia[offset];
 	switch (offset)
 	{
+		case 0x22:
+		case 0x23:
+		case 0x24:
+		case 0x25:
+		case 0x26:
+		case 0x27:
+		case 0xc0:
+		case 0xe0:
+			break;
+	
 		case 0xa0:
 //          printf("%03X:pia_r(%02X) = %02X\n", activecpu_get_pc(), offset, player->pia_porta);
 			result = player->pia_porta;
-			player->pia_porta = 0;
+//			player->pia_porta = 0;
 			break;
 
 		default:
@@ -837,21 +965,30 @@ static WRITE8_HANDLER( pr8210_pia_w )
        $C0 (R) = stored to ($2E)
        $E0 (R) = stored to ($2F)
     */
-	ldplayer_data *player = find_pr8210(machine);
+	laserdisc_state *ld = find_pr8210(machine);
+	ldplayer_data *player = ld->player;
 	if (player->pia[offset] != data)
 	{
 		switch (offset)
 		{
+			case 0x40:
+				if (!(data & 0x02) && (player->pia[offset] & 0x02))
+					player->framedisplay = 1;
+				break;
+				
 			case 0x60:
 				printf("%03X:pia_w(%02X) = %02X (PORT B LEDS:", activecpu_get_pc(), offset, data);
-				if (!(data & 0x01)) printf(" AUDIO1");
-				if (!(data & 0x02)) printf(" AUDIO2");
-				if (!(data & 0x04)) printf(" CLV");
-				if (!(data & 0x08)) printf(" CAV");
-				printf(" LED123=%c%c%c", (data & 0x10) ? 'H' : 'L', (data & 0x20) ? 'H' : 'L', (data & 0x40) ? 'H' : 'L');
+				output_set_value("pr8210_audio1", (data & 0x01) != 0);
+				output_set_value("pr8210_audio2", (data & 0x02) != 0);
+				output_set_value("pr8210_clv", (data & 0x04) != 0);
+				output_set_value("pr8210_cav", (data & 0x08) != 0);
+				output_set_value("pr8210_led1", (data & 0x10) == 0);
+				output_set_value("pr8210_led2", (data & 0x20) == 0);
+				output_set_value("pr8210_led3", (data & 0x40) == 0);
 				if (!(data & 0x80)) printf(" ???");
 				printf(")\n");
 				player->pia_portb = data;
+				update_audio_squelch(ld);
 				break;
 
 			default:
@@ -866,7 +1003,7 @@ static READ8_HANDLER( pr8210_bus_r )
 {
 	/*
        $80 = n/c
-       $40 = (in) slide pot interrupt source (slider position limit detector, inside and outside)
+       $40 = (in) slider pot interrupt source (slider position limit detector, inside and outside)
        $20 = n/c
        $10 = (in) /FOCUS LOCK
        $08 = (in) /SPDL LOCK
@@ -874,12 +1011,31 @@ static READ8_HANDLER( pr8210_bus_r )
        $02 = (in) FG via op-amp (spindle motor stop detector)
        $01 = (in) SLOW TIMER OUT
     */
-	offs_t pc = activecpu_get_pc();
-	if (pc != 0x11c)
-		printf("%03X:bus_r\n", pc);
+	laserdisc_state *ld = find_pr8210(machine);
+	ldplayer_data *player = ld->player;
+	slider_position sliderpos = ldcore_get_slider_position(ld);
+	UINT8 focus_on = !(player->porta & 0x08);
+	UINT8 spdl_on = !(player->porta & 0x10);
+	UINT8 result = 0x00;
+
+	/* bus bit 6: slider position limit detector, inside and outside */
+	if (sliderpos != SLIDER_MINIMUM && sliderpos != SLIDER_MAXIMUM)
+		result |= 0x40;
+	
+	/* bus bit 4: /FOCUS LOCK */
+	if (!focus_on)
+		result |= 0x10;
+	
+	/* bus bit 3: /SPDL LOCK */
+	if (!spdl_on)
+		result |= 0x08;
+	
+	/* bus bit 1: spindle motor stop detector */
+	if (!spdl_on)
+		result |= 0x02;
 
 	/* loop at beginning waits for $40=0, $02=1 */
-	return 0xff & ~0x40 & ~0x04;
+	return result;
 }
 
 static WRITE8_HANDLER( pr8210_porta_w )
@@ -894,21 +1050,33 @@ static WRITE8_HANDLER( pr8210_porta_w )
        $02 = (out) SCAN A (/SCAN)
        $01 = (out) JUMP TRG (jump back trigger, clock on high->low)
     */
-	ldplayer_data *player = find_pr8210(machine);
-	if (data != player->porta)
+	laserdisc_state *ld = find_pr8210(machine);
+	ldplayer_data *player = ld->player;
+	if ((data & 0xfe) != (player->porta & 0xfe))
 	{
+		int direction = (data & 0x80) ? 1 : -1;
+
 		printf("%03X:porta_w = %02X", activecpu_get_pc(), data);
-		if (!(data & 0x01)) printf(" JUMPTRG");
+		if (!(data & 0x01) && (player->porta & 0x01))
+			ldcore_advance_slider(ld, direction);
 		if (!(data & 0x02))
-		{
 			printf(" SCAN:%c:%c", (data & 0x80) ? 'F' : 'R', (data & 0x04) ? 'L' : 'H');
-		}
 		if (!(data & 0x08)) printf(" /FOCUSON");
 		if (!(data & 0x10)) printf(" /SPDLON");
 		if (data & 0x20) printf(" VIDEOSQ");
 		if (data & 0x40) printf(" AUDIOSQ");
 		printf("\n");
 		player->porta = data;
+
+		ldcore_set_video_squelch(ld, (data & 0x20) != 0);
+		update_audio_squelch(ld);
+		if (!(data & 0x02))
+		{
+			int delta = (data & 0x04) ? PR8210_SCAN_SPEED : PR8210_SEEK_FAST_SPEED;
+			ldcore_set_slider_speed(ld, delta * direction);
+		}
+		else
+			ldcore_set_slider_speed(ld, 0);
 	}
 }
 
@@ -924,7 +1092,8 @@ static WRITE8_HANDLER( pr8210_portb_w )
        $02 = (out) ???
        $01 = (out) LASER ON
     */
-	ldplayer_data *player = find_pr8210(machine);
+	laserdisc_state *ld = find_pr8210(machine);
+	ldplayer_data *player = ld->player;
 	cpunum_set_input_line(machine, player->cpunum, 0, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	if ((data & 0x7f) != (player->portb & 0x7f))
 	{
@@ -933,13 +1102,28 @@ static WRITE8_HANDLER( pr8210_portb_w )
 		if (!(data & 0x02)) printf(" ???");
 		if (!(data & 0x04)) printf(" TP1");
 		if (!(data & 0x08)) printf(" TP2");
-		if (!(data & 0x10)) printf(" STANDBYLED");
+		output_set_value("pr8210_standby", !(data & 0x10));
 		if (!(data & 0x20)) printf(" SLOWTRG");
 		if (!(data & 0x40)) printf(" IRQGEN");
 //      if (data & 0x80) printf(" PIASEL");
 		printf("\n");
 		player->portb = data;
 	}
+}
+
+
+static READ8_HANDLER( pr8210_t0_r )
+{
+	/* returns VSYNC state */
+	laserdisc_state *ld = find_pr8210(machine);
+	return !ld->player->vsync;
+}
+
+
+static READ8_HANDLER( pr8210_t1_r )
+{
+	/* must return 1 or else it tries to jump to an external ROM */
+	return 1;
 }
 
 
@@ -953,6 +1137,8 @@ static ADDRESS_MAP_START( pr8210_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(MCS48_PORT_BUS, MCS48_PORT_BUS) AM_READ(pr8210_bus_r)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(pr8210_porta_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_WRITE(pr8210_portb_w)
+	AM_RANGE(MCS48_PORT_T0, MCS48_PORT_T0) AM_READ(pr8210_t0_r)
+	AM_RANGE(MCS48_PORT_T1, MCS48_PORT_T1) AM_READ(pr8210_t1_r)
 ADDRESS_MAP_END
 
 

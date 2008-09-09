@@ -72,8 +72,7 @@ struct _laserdisc_config
 {
 	UINT32					type;
 	laserdisc_audio_func	audio;
-
-	/* rendering information */
+	const char *			sound;
 	const char *			screen;
 
 	/* overlay information */
@@ -90,15 +89,14 @@ struct _laserdisc_config
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_LASERDISC_ADD(_tag, _type) \
+#define MDRV_LASERDISC_ADD(_tag, _type, _screen, _sound) \
 	MDRV_DEVICE_ADD(_tag, LASERDISC) \
-	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, type, LASERDISC_TYPE_##_type)
+	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, type, LASERDISC_TYPE_##_type) \
+	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, screen, _screen) \
+	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, sound, _sound) \
 
 #define MDRV_LASERDISC_AUDIO(_func) \
 	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, audio, _func)
-
-#define MDRV_LASERDISC_SCREEN(_tag) \
-	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, screen, _tag)
 
 #define MDRV_LASERDISC_OVERLAY(_update, _width, _height, _format) \
 	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, overupdate, video_update_##_update) \
@@ -158,9 +156,6 @@ extern const custom_sound_interface laserdisc_custom_interface;
 
 
 /* ----- core control and status ----- */
-
-/* call this once per field (i.e., 59.94 times/second for NTSC) */
-void laserdisc_vsync(const device_config *device);
 
 /* get a bitmap for the current frame (and the frame number) */
 UINT32 laserdisc_get_video(const device_config *device, bitmap_t **bitmap);

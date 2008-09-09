@@ -585,7 +585,8 @@ static DEVICE_START(duart68681)
 	state_save_register_item(unique_tag, 0, duart68681->channel[1].tx_enabled);
 	state_save_register_item(unique_tag, 0, duart68681->channel[1].tx_data);
 	state_save_register_item(unique_tag, 0, duart68681->channel[1].tx_ready);
-
+	
+	return DEVICE_START_OK;
 }
 
 /*-------------------------------------------------

@@ -102,6 +102,7 @@ const ldplayer_interface ldv1000_interface =
 	NULL,										/* pointer to ROM region information */
 	NULL,										/* pointer to machine configuration */
 	ldv1000_init,								/* initialization callback */
+	NULL,										/* vsync callback */
 	ldv1000_update,								/* update callback */
 	ldv1000_data_w,								/* parallel data write */
 	{											/* single line write: */

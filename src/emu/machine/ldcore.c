@@ -33,6 +33,7 @@
 
 /* we simulate extra lead-in and lead-out tracks */
 #define VIRTUAL_LEAD_IN_TRACKS		200
+#define MAX_TOTAL_TRACKS			54000
 #define VIRTUAL_LEAD_OUT_TRACKS		200
 
 
@@ -50,15 +51,22 @@ struct _ldcore_data
 
 	/* disc parameters */
 	chd_file *			disc;					/* handle to the disc itself */
-	av_codec_decompress_config avconfig;		/* decompression configuration */
+	int					width;					/* width of video */
+	int					height;					/* height of video */
+	UINT32				fps_times_1million;		/* frame rate of video */
+	int					samplerate;				/* audio samplerate */
 	UINT8				readpending;			/* true if a read is pending */
-	UINT32				maxtrack;				/* maximum track number */
+	UINT32				chdtracks;				/* number of tracks in the CHD */
+	av_codec_decompress_config avconfig;		/* decompression configuration */
 
 	/* core states */
 	UINT8				audiosquelch;			/* audio squelch state: bit 0 = audio 1, bit 1 = audio 2 */
 	UINT8				videosquelch;			/* video squelch state: bit 0 = on/off */
 	UINT8				fieldnum;				/* field number (0 or 1) */
-	INT32				curtrack;				/* current track */
+	INT32				curtrack;				/* current track at this end of this vsync */
+	UINT32				maxtrack;				/* maximum track number */
+	attoseconds_t		attospertrack;			/* attoseconds per track, or 0 if not moving */
+	attotime			sliderupdate;			/* time of last slider update */
 
 	/* video data */
 	bitmap_t *			videoframe[3];			/* currently cached frames */
@@ -77,7 +85,6 @@ struct _ldcore_data
 	UINT32				audiocursamples;		/* current samples this track */
 	UINT32				audiomaxsamples;		/* maximum samples per track */
 	int					audiocustom;			/* custom sound index */
-	int					samplerate;				/* playback samplerate */
 
 	/* metadata */
 	vbi_metadata		metadata[2];			/* metadata parsed from the stream, for each field */
@@ -261,47 +268,31 @@ INLINE laserdisc_state *get_safe_token(const device_config *device)
 
 
 /*-------------------------------------------------
-    audio_channel_active - return TRUE if the
-    given audio channel should be output
+    update_audio - update the audio stream to the
+    current time
 -------------------------------------------------*/
 
-INLINE int audio_channel_active(ldcore_data *ldcore, int channel)
+INLINE void update_audio(ldcore_data *ldcore)
 {
-	return (~ldcore->audiosquelch >> channel) & 1;
+	if (ldcore->audiocustom != -1)
+	{
+		sound_token *token = custom_get_token(ldcore->audiocustom);
+		stream_update(token->stream);
+	}
 }
 
 
 /*-------------------------------------------------
-    video_active - return TRUE if the video should
-    be output
+    add_and_clamp_track - add a delta to the 
+    current track and clamp to minimum/maximum 
+    values
 -------------------------------------------------*/
 
-INLINE int video_active(ldcore_data *ldcore)
-{
-	return !ldcore->videosquelch;
-}
-
-
-/*-------------------------------------------------
-    add_to_current_track - add a value to the
-    current track, stopping if we hit the min or
-    max
--------------------------------------------------*/
-
-INLINE int add_to_current_track(ldcore_data *ldcore, INT32 delta)
+INLINE void add_and_clamp_track(ldcore_data *ldcore, INT32 delta)
 {
 	ldcore->curtrack += delta;
-	if (ldcore->curtrack < 1)
-	{
-		ldcore->curtrack = 1;
-		return TRUE;
-	}
-	else if (ldcore->curtrack >= ldcore->maxtrack - 1)
-	{
-		ldcore->curtrack = ldcore->maxtrack - 1;
-		return TRUE;
-	}
-	return FALSE;
+	ldcore->curtrack = MAX(ldcore->curtrack, 1);
+	ldcore->curtrack = MIN(ldcore->curtrack, ldcore->maxtrack - 1);
 }
 
 
@@ -335,31 +326,75 @@ INLINE void fillbitmap_yuy16(bitmap_t *bitmap, UINT8 yval, UINT8 cr, UINT8 cb)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    laserdisc_vsync - call this once per field
-    on the VSYNC signal
+    update_slider_pos - based on the current
+    speed and elapsed time, update the current
+    track position
 -------------------------------------------------*/
 
-void laserdisc_vsync(const device_config *device)
+static void update_slider_pos(ldcore_data *ldcore, attotime curtime)
 {
+	/* if not moving, update to now */
+	if (ldcore->attospertrack == 0)
+		ldcore->sliderupdate = curtime;
+	
+	/* otherwise, compute the number of tracks covered */
+	else
+	{
+		attoseconds_t delta = attotime_to_attoseconds(attotime_sub(curtime, ldcore->sliderupdate));
+		INT32 tracks_covered;
+
+		/* determine how many tracks we covered and advance */		
+		if (ldcore->attospertrack >= 0)
+		{
+			tracks_covered = delta / ldcore->attospertrack;
+			add_and_clamp_track(ldcore, tracks_covered);
+			if (tracks_covered != 0)
+				ldcore->sliderupdate = attotime_add_attoseconds(ldcore->sliderupdate, tracks_covered * ldcore->attospertrack);
+		}
+		else
+		{
+			tracks_covered = delta / -ldcore->attospertrack;
+			add_and_clamp_track(ldcore, -tracks_covered);
+			if (tracks_covered != 0)
+				ldcore->sliderupdate = attotime_add_attoseconds(ldcore->sliderupdate, tracks_covered * -ldcore->attospertrack);
+		}
+	}
+}
+
+
+/*-------------------------------------------------
+    vblank_state_changed - called on each state
+    change of the VBLANK signal
+-------------------------------------------------*/
+
+static void vblank_state_changed(const device_config *screen, void *param, int vblank_state)
+{
+	const device_config *device = param;
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
+	attotime curtime = timer_get_time();
+	
+	/* update current track based on slider speed */
+	update_slider_pos(ldcore, curtime);
 
+	/* on rising edge, call the player-specific VSYNC function */
+	if (vblank_state)
+	{
+		if (ldcore->intf.vsync != NULL)
+			(*ldcore->intf.vsync)(ld);
+		return;
+	}
+	
+	/* on falling edge, do the bulk of the processing */
 	/* wait for previous read and decode to finish */
 	process_track_data(device);
 
 	/* update the state */
 	if (ldcore->intf.update != NULL)
-	{
-		INT32 advanceby = (*ldcore->intf.update)(ld, &ldcore->metadata[ldcore->fieldnum], ldcore->fieldnum, timer_get_time());
-		add_to_current_track(ldcore, advanceby);
-	}
+		add_and_clamp_track(ldcore, (*ldcore->intf.update)(ld, &ldcore->metadata[ldcore->fieldnum], ldcore->fieldnum, curtime));
 
 	/* flush any audio before we read more */
-	if (ldcore->audiocustom != -1)
-	{
-		sound_token *token = custom_get_token(ldcore->audiocustom);
-		stream_update(token->stream);
-	}
+	update_audio(ldcore);
 
 	/* start reading the track data for the next round */
 	ldcore->fieldnum ^= 1;
@@ -481,7 +516,7 @@ UINT32 laserdisc_get_video(const device_config *device, bitmap_t **bitmap)
 		frameindex = (frameindex + ARRAY_LENGTH(ldcore->videofields) - 1) % ARRAY_LENGTH(ldcore->videofields);
 
 	/* if no video present, return the empty frame */
-	if (!video_active(ldcore) || ldcore->videofields[frameindex] < 2)
+	if (ldcore->videosquelch || ldcore->videofields[frameindex] < 2)
 	{
 		*bitmap = ldcore->emptyframe;
 		return 0;
@@ -506,7 +541,7 @@ UINT32 laserdisc_get_field_code(const device_config *device, UINT8 code)
 	int field = ldcore->fieldnum ^ 1;
 
 	/* if no video present, return */
-	if (!video_active(ldcore))
+	if (ldcore->videosquelch)
 		return 0;
 
 	switch (code)
@@ -551,6 +586,7 @@ laserdisc_state *ldcore_get_safe_token(const device_config *device)
 
 void ldcore_set_audio_squelch(laserdisc_state *ld, UINT8 squelchleft, UINT8 squelchright)
 {
+	update_audio(ld->core);
 	ld->core->audiosquelch = (squelchleft ? 1 : 0) | (squelchright ? 2 : 0);
 }
 
@@ -563,6 +599,77 @@ void ldcore_set_audio_squelch(laserdisc_state *ld, UINT8 squelchleft, UINT8 sque
 void ldcore_set_video_squelch(laserdisc_state *ld, UINT8 squelch)
 {
 	ld->core->videosquelch = squelch;
+}
+
+
+/*-------------------------------------------------
+    ldcore_set_slider_speed - dynamically change 
+    the slider speed
+-------------------------------------------------*/
+
+void ldcore_set_slider_speed(laserdisc_state *ld, INT32 tracks_per_vsync)
+{
+	ldcore_data *ldcore = ld->core;
+	attotime vsyncperiod = video_screen_get_frame_period(ld->screen);
+
+	update_slider_pos(ldcore, timer_get_time());
+	
+	/* if 0, set the time to 0 */
+	if (tracks_per_vsync == 0)
+		ldcore->attospertrack = 0;
+	
+	/* positive values store positive times */
+	else if (tracks_per_vsync > 0)
+		ldcore->attospertrack = attotime_to_attoseconds(attotime_div(vsyncperiod, tracks_per_vsync));
+	
+	/* negative values store negative times */
+	else
+		ldcore->attospertrack = -attotime_to_attoseconds(attotime_div(vsyncperiod, -tracks_per_vsync));
+
+printf("Slider speed = %d\n", tracks_per_vsync);
+}
+
+
+/*-------------------------------------------------
+    ldcore_advance_slider - advance the slider by 
+    a certain number of tracks
+-------------------------------------------------*/
+
+void ldcore_advance_slider(laserdisc_state *ld, INT32 numtracks)
+{
+	ldcore_data *ldcore = ld->core;
+
+	update_slider_pos(ldcore, timer_get_time());
+	add_and_clamp_track(ldcore, numtracks);
+printf("Advance by %d\n", numtracks);
+}
+
+
+/*-------------------------------------------------
+    ldcore_get_slider_position - get the current 
+    slider position
+-------------------------------------------------*/
+
+slider_position ldcore_get_slider_position(laserdisc_state *ld)
+{
+	ldcore_data *ldcore = ld->core;
+
+	/* update the slider position first */
+	update_slider_pos(ldcore, timer_get_time());
+	
+	/* return the status */
+	if (ldcore->curtrack == 1)
+		return SLIDER_MINIMUM;
+	else if (ldcore->curtrack < VIRTUAL_LEAD_IN_TRACKS)
+		return SLIDER_VIRTUAL_LEADIN;
+	else if (ldcore->curtrack < VIRTUAL_LEAD_IN_TRACKS + ldcore->chdtracks)
+		return SLIDER_CHD;
+	else if (ldcore->curtrack < VIRTUAL_LEAD_IN_TRACKS + MAX_TOTAL_TRACKS)
+		return SLIDER_OUTSIDE_CHD;
+	else if (ldcore->curtrack < ldcore->maxtrack - 1)
+		return SLIDER_VIRTUAL_LEADOUT;
+	else
+		return SLIDER_MAXIMUM;
 }
 
 
@@ -792,10 +899,6 @@ static void read_track_data(laserdisc_state *ld)
 	ldcore->avconfig.maxsamples = ldcore->audiomaxsamples;
 	ldcore->avconfig.actsamples = &ldcore->audiocursamples;
 	ldcore->audiocursamples = 0;
-	if (!audio_channel_active(ldcore, 0))
-		ldcore->avconfig.audio[0] = NULL;
-	if (!audio_channel_active(ldcore, 1))
-		ldcore->avconfig.audio[1] = NULL;
 
 	/* configure the codec and then read */
 	if (ldcore->disc != NULL)
@@ -803,12 +906,11 @@ static void read_track_data(laserdisc_state *ld)
 		err = chd_codec_config(ldcore->disc, AV_CODEC_DECOMPRESS_CONFIG, &ldcore->avconfig);
 		if (err == CHDERR_NONE)
 		{
-			INT32 maxtrack = chd_get_header(ldcore->disc)->totalhunks / 2;
 			INT32 chdtrack = tracknum - 1 - VIRTUAL_LEAD_IN_TRACKS;
 
 			/* clamp the track */
 			chdtrack = MAX(chdtrack, 0);
-			chdtrack = MIN(chdtrack, maxtrack - 1);
+			chdtrack = MIN(chdtrack, ldcore->chdtracks - 1);
 			err = chd_read_async(ldcore->disc, chdtrack * 2 + fieldnum, NULL);
 			ldcore->readpending = TRUE;
 		}
@@ -1005,7 +1107,12 @@ static void custom_stream_callback(void *param, stream_sample_t **inputs, stream
 	ldcore_data *ldcore = ld->core;
 	stream_sample_t *dst0 = outputs[0];
 	stream_sample_t *dst1 = outputs[1];
+	INT16 leftand, rightand;
 	int samples_avail = 0;
+	
+	/* compute AND values based on the squelch */
+	leftand = (ldcore->audiosquelch & 1) ? 0x0000 : 0xffff;
+	rightand = (ldcore->audiosquelch & 2) ? 0x0000 : 0xffff;
 
 	/* see if we have enough samples to fill the buffer; if not, drop out */
 	if (ld != NULL)
@@ -1032,8 +1139,8 @@ static void custom_stream_callback(void *param, stream_sample_t **inputs, stream
 		/* copy samples, clearing behind us as we go */
 		while (sampout != ldcore->audiobufin && samples-- > 0)
 		{
-			*dst0++ = buffer0[sampout];
-			*dst1++ = buffer1[sampout];
+			*dst0++ = buffer0[sampout] & leftand;
+			*dst1++ = buffer1[sampout] & rightand;
 			buffer0[sampout] = 0;
 			buffer1[sampout] = 0;
 			sampout++;
@@ -1046,8 +1153,8 @@ static void custom_stream_callback(void *param, stream_sample_t **inputs, stream
 		if (samples > 0)
 		{
 			int sampout = (ldcore->audiobufout == 0) ? ldcore->audiobufsize - 1 : ldcore->audiobufout - 1;
-			stream_sample_t fill0 = buffer0[sampout];
-			stream_sample_t fill1 = buffer1[sampout];
+			stream_sample_t fill0 = buffer0[sampout] & leftand;
+			stream_sample_t fill1 = buffer1[sampout] & rightand;
 
 			while (samples-- > 0)
 			{
@@ -1308,6 +1415,148 @@ void laserdisc_set_config(const device_config *device, const laserdisc_config *c
 
 
 /***************************************************************************
+    INITIALIZATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    init_disc - initialize the state of the
+    CHD disc
+-------------------------------------------------*/
+
+static void init_disc(const device_config *device)
+{
+	laserdisc_state *ld = get_safe_token(device);
+	ldcore_data *ldcore = ld->core;
+	chd_error err;
+
+	/* find the disc */
+	ldcore->disc = get_disk_handle(device->tag);
+	
+	/* set default parameters */
+	ldcore->width = 720;
+	ldcore->height = 240;
+	ldcore->fps_times_1million = 59940000;
+	ldcore->samplerate = 48000;
+
+	/* get the disc metadata and extract the ld */
+	ldcore->chdtracks = 0;
+	ldcore->maxtrack = VIRTUAL_LEAD_IN_TRACKS + MAX_TOTAL_TRACKS + VIRTUAL_LEAD_OUT_TRACKS;
+	if (ldcore->disc != NULL)
+	{
+		int fps, fpsfrac, interlaced, channels;
+		char metadata[256];
+
+		/* require the A/V codec */
+		if (chd_get_header(ldcore->disc)->compression != CHDCOMPRESSION_AV)
+			fatalerror("Laserdisc video must be compressed with the A/V codec!");
+
+		/* read the metadata */
+		err = chd_get_metadata(ldcore->disc, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL);
+		if (err != CHDERR_NONE)
+			fatalerror("Non-A/V CHD file specified");
+		
+		/* extract the metadata */
+		if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &ldcore->width, &ldcore->height, &interlaced, &channels, &ldcore->samplerate) != 7)
+			fatalerror("Invalid metadata in CHD file");
+		else
+			ldcore->fps_times_1million = fps * 1000000 + fpsfrac;
+
+		/* require interlaced video */
+		if (!interlaced)
+			fatalerror("Laserdisc video must be interlaced!");
+
+		/* determine the maximum track and allocate a frame buffer */
+		ldcore->chdtracks = chd_get_header(ldcore->disc)->totalhunks / 2;
+	}
+	ldcore->maxtrack = MAX(ldcore->maxtrack, VIRTUAL_LEAD_IN_TRACKS + VIRTUAL_LEAD_OUT_TRACKS + ldcore->chdtracks);
+}
+
+
+/*-------------------------------------------------
+    init_video - initialize the state of the
+    video rendering
+-------------------------------------------------*/
+
+static void init_video(const device_config *device)
+{
+	laserdisc_state *ld = get_safe_token(device);
+	ldcore_data *ldcore = ld->core;
+	int index;
+	
+	/* register for VBLANK callbacks */
+	video_screen_register_vblank_callback(ld->screen, vblank_state_changed, (void *)device);
+
+	/* allocate video frames */
+	for (index = 0; index < ARRAY_LENGTH(ldcore->videofields); index++)
+	{
+		/* first allocate a YUY16 bitmap at 2x the height */
+		ldcore->videoframe[index] = auto_bitmap_alloc(ldcore->width, ldcore->height * 2, BITMAP_FORMAT_YUY16);
+		fillbitmap_yuy16(ldcore->videoframe[index], 40, 109, 240);
+
+		/* make a copy of the bitmap that clips out the VBI and horizontal blanking areas */
+		ldcore->videovisframe[index] = auto_malloc(sizeof(*ldcore->videovisframe[index]));
+		*ldcore->videovisframe[index] = *ldcore->videoframe[index];
+		ldcore->videovisframe[index]->base = BITMAP_ADDR16(ldcore->videovisframe[index], 44, ldcore->videoframe[index]->width * 8 / 720);
+		ldcore->videovisframe[index]->height -= 44;
+		ldcore->videovisframe[index]->width -= 2 * ldcore->videoframe[index]->width * 8 / 720;
+	}
+
+	/* allocate an empty frame of the same size */
+	ldcore->emptyframe = auto_bitmap_alloc(ldcore->width, ldcore->height * 2, BITMAP_FORMAT_YUY16);
+	fillbitmap_yuy16(ldcore->emptyframe, 0, 128, 128);
+
+	/* allocate texture for rendering */
+	ldcore->videoenable = TRUE;
+	ldcore->videotex = render_texture_alloc(NULL, NULL);
+	if (ldcore->videotex == NULL)
+		fatalerror("Out of memory allocating video texture");
+
+	/* allocate overlay */
+	if (ldcore->config.overwidth > 0 && ldcore->config.overheight > 0 && ldcore->config.overupdate != NULL)
+	{
+		ldcore->overenable = TRUE;
+		ldcore->overbitmap[0] = auto_bitmap_alloc(ldcore->config.overwidth, ldcore->config.overheight, ldcore->config.overformat);
+		ldcore->overbitmap[1] = auto_bitmap_alloc(ldcore->config.overwidth, ldcore->config.overheight, ldcore->config.overformat);
+		ldcore->overtex = render_texture_alloc(NULL, NULL);
+		if (ldcore->overtex == NULL)
+			fatalerror("Out of memory allocating overlay texture");
+	}
+}
+
+
+/*-------------------------------------------------
+    init_audio - initialize the state of the
+    audio rendering
+-------------------------------------------------*/
+
+static void init_audio(const device_config *device)
+{
+	laserdisc_state *ld = get_safe_token(device);
+	ldcore_data *ldcore = ld->core;
+	int sndnum;
+
+	/* find the custom audio */
+	ldcore->audiocustom = 0;
+	for (sndnum = 0; sndnum < MAX_SOUND; sndnum++)
+	{
+		if (device->machine->config->sound[sndnum].tag != NULL && strcmp(device->machine->config->sound[sndnum].tag, ldcore->config.sound) == 0)
+			break;
+		if (device->machine->config->sound[sndnum].type == SOUND_CUSTOM)
+			ldcore->audiocustom++;
+	}
+	if (sndnum == MAX_SOUND)
+		ldcore->audiocustom = -1;
+
+	/* allocate audio buffers */
+	ldcore->audiomaxsamples = ((UINT64)ldcore->samplerate * 1000000 + ldcore->fps_times_1million - 1) / ldcore->fps_times_1million;
+	ldcore->audiobufsize = ldcore->audiomaxsamples * 4;
+	ldcore->audiobuffer[0] = auto_malloc(ldcore->audiobufsize * sizeof(ldcore->audiobuffer[0][0]));
+	ldcore->audiobuffer[1] = auto_malloc(ldcore->audiobufsize * sizeof(ldcore->audiobuffer[1][0]));
+}
+
+
+
+/***************************************************************************
     DEVICE INTERFACE
 ***************************************************************************/
 
@@ -1317,15 +1566,17 @@ void laserdisc_set_config(const device_config *device, const laserdisc_config *c
 
 static DEVICE_START( laserdisc )
 {
-	int fps = 30, fpsfrac = 0, width = 720, height = 240, interlaced = 1, channels = 2, rate = 44100;
 	const laserdisc_config *config = device->inline_config;
 	laserdisc_state *ld = get_safe_token(device);
-	UINT32 fps_times_1million;
 	ldcore_data *ldcore;
-	char metadata[256];
-	int sndnum, index;
 	int statesize;
-	chd_error err;
+	int index;
+
+	/* ensure that our screen is started first */
+	ld->screen = devtag_get_device(device->machine, VIDEO_SCREEN, config->screen);
+	assert(ld->screen != NULL);
+	if (!ld->screen->started)
+		return DEVICE_START_MISSING_DEPENDENCY;
 
 	/* save a copy of the device pointer */
 	ld->device = device;
@@ -1354,91 +1605,16 @@ static DEVICE_START( laserdisc )
 		ldcore->config.overscalex = 1.0f;
 	if (ldcore->config.overscaley == 0)
 		ldcore->config.overscaley = 1.0f;
-
-	/* find the disc */
-	ldcore->disc = get_disk_handle(device->tag);
-	ldcore->audiocustom = 0;
-	for (sndnum = 0; sndnum < MAX_SOUND; sndnum++)
-	{
-		if (device->machine->config->sound[sndnum].tag != NULL && strcmp(device->machine->config->sound[sndnum].tag, device->tag) == 0)
-			break;
-		if (device->machine->config->sound[sndnum].type == SOUND_CUSTOM)
-			ldcore->audiocustom++;
-	}
-	if (sndnum == MAX_SOUND)
-		ldcore->audiocustom = -1;
-
-	/* get the disc metadata and extract the ld */
-	if (ldcore->disc != NULL)
-	{
-		/* require the A/V codec */
-		if (chd_get_header(ldcore->disc)->compression != CHDCOMPRESSION_AV)
-			fatalerror("Laserdisc video must be compressed with the A/V codec!");
-
-		/* read and extract the metadata */
-		err = chd_get_metadata(ldcore->disc, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL);
-		if (err != CHDERR_NONE)
-			fatalerror("Non-A/V CHD file specified");
-		if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
-			fatalerror("Invalid metadata in CHD file");
-
-		/* require interlaced video */
-		if (!interlaced)
-			fatalerror("Laserdisc video must be interlaced!");
-
-		/* determine the maximum track and allocate a frame buffer */
-		ldcore->maxtrack = chd_get_header(ldcore->disc)->totalhunks / 2;
-	}
-	else
-		ldcore->maxtrack = 54000;
-	ldcore->maxtrack += VIRTUAL_LEAD_IN_TRACKS + VIRTUAL_LEAD_OUT_TRACKS;
-
-	/* allocate video frames */
-	for (index = 0; index < ARRAY_LENGTH(ldcore->videofields); index++)
-	{
-		/* first allocate a YUY16 bitmap at 2x the height */
-		ldcore->videoframe[index] = auto_bitmap_alloc(width, height * 2, BITMAP_FORMAT_YUY16);
-		fillbitmap_yuy16(ldcore->videoframe[index], 40, 109, 240);
-
-		/* make a copy of the bitmap that clips out the VBI and horizontal blanking areas */
-		ldcore->videovisframe[index] = auto_malloc(sizeof(*ldcore->videovisframe[index]));
-		*ldcore->videovisframe[index] = *ldcore->videoframe[index];
-		ldcore->videovisframe[index]->base = BITMAP_ADDR16(ldcore->videovisframe[index], 44, ldcore->videoframe[index]->width * 8 / 720);
-		ldcore->videovisframe[index]->height -= 44;
-		ldcore->videovisframe[index]->width -= 2 * ldcore->videoframe[index]->width * 8 / 720;
-	}
-
-	/* allocate an empty frame of the same size */
-	ldcore->emptyframe = auto_bitmap_alloc(width, height * 2, BITMAP_FORMAT_YUY16);
-	fillbitmap_yuy16(ldcore->emptyframe, 0, 128, 128);
-
-	/* allocate audio buffers */
-	fps_times_1million = fps * 1000000 + fpsfrac;
-	ldcore->audiomaxsamples = ((UINT64)rate * 1000000 + fps_times_1million - 1) / fps_times_1million;
-	ldcore->audiobufsize = ldcore->audiomaxsamples * 4;
-	ldcore->audiobuffer[0] = auto_malloc(ldcore->audiobufsize * sizeof(ldcore->audiobuffer[0][0]));
-	ldcore->audiobuffer[1] = auto_malloc(ldcore->audiobufsize * sizeof(ldcore->audiobuffer[1][0]));
-	ldcore->samplerate = rate;
-
-	/* allocate texture for rendering */
-	ldcore->videoenable = TRUE;
-	ldcore->videotex = render_texture_alloc(NULL, NULL);
-	if (ldcore->videotex == NULL)
-		fatalerror("Out of memory allocating video texture");
-
-	/* allocate overlay */
-	if (ldcore->config.overwidth > 0 && ldcore->config.overheight > 0 && ldcore->config.overupdate != NULL)
-	{
-		ldcore->overenable = TRUE;
-		ldcore->overbitmap[0] = auto_bitmap_alloc(ldcore->config.overwidth, ldcore->config.overheight, ldcore->config.overformat);
-		ldcore->overbitmap[1] = auto_bitmap_alloc(ldcore->config.overwidth, ldcore->config.overheight, ldcore->config.overformat);
-		ldcore->overtex = render_texture_alloc(NULL, NULL);
-		if (ldcore->overtex == NULL)
-			fatalerror("Out of memory allocating overlay texture");
-	}
+		
+	/* initialize the various pieces */
+	init_disc(device);
+	init_video(device);
+	init_audio(device);
 
 	/* register callbacks */
 	config_register(device->machine, "laserdisc", configuration_load, configuration_save);
+	
+	return DEVICE_START_OK;
 }
 
 
@@ -1470,6 +1646,7 @@ static DEVICE_STOP( laserdisc )
 static DEVICE_RESET( laserdisc )
 {
 	laserdisc_state *ld = get_safe_token(device);
+	attotime curtime = timer_get_time();
 	ldcore_data *ldcore = ld->core;
 	int pltype, line;
 
@@ -1490,11 +1667,14 @@ static DEVICE_RESET( laserdisc )
 	}
 
 	/* set up the general ld */
-	ldcore->videosquelch = 1;
 	ldcore->audiosquelch = 3;
-
-	/* default to track 1 */
+	ldcore->videosquelch = 1;
+	ldcore->fieldnum = 0;
 	ldcore->curtrack = 1;
+	ldcore->attospertrack = 0;
+	ldcore->sliderupdate = curtime;
+
+	/* reset metadata */
 	ldcore->last_frame = 0;
 	ldcore->last_chapter = 0;
 

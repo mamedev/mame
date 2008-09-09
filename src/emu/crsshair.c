@@ -121,7 +121,7 @@ static const rgb_t crosshair_colors[] =
 ***************************************************************************/
 
 static void crosshair_exit(running_machine *machine);
-static void animate(const device_config *device, int vblank_state);
+static void animate(const device_config *device, void *param, int vblank_state);
 
 
 /***************************************************************************
@@ -212,7 +212,7 @@ void crosshair_init(running_machine *machine)
 
 	/* register the animation callback */
 	if (machine->primary_screen != NULL)
-		video_screen_register_vblank_callback(machine->primary_screen, animate);
+		video_screen_register_vblank_callback(machine->primary_screen, animate, NULL);
 }
 
 
@@ -272,7 +272,7 @@ void crosshair_toggle(running_machine *machine)
     animate - animates the crosshair once a frame
 -------------------------------------------------*/
 
-static void animate(const device_config *device, int vblank_state)
+static void animate(const device_config *device, void *param, int vblank_state)
 {
 	int player;
 

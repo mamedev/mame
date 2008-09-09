@@ -111,8 +111,6 @@ static MACHINE_RESET( superdq )
 
 static INTERRUPT_GEN( superdq_vblank )
 {
-	laserdisc_vsync(laserdisc);
-
 	/* status is read when the STATUS line from the laserdisc
        toggles (600usec after the vblank). We could set up a
        timer to do that, but this works as well */
@@ -305,7 +303,7 @@ static MACHINE_DRIVER_START( superdq )
 	MDRV_MACHINE_START(superdq)
 	MDRV_MACHINE_RESET(superdq)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000)
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "main", "ldsound")
 	MDRV_LASERDISC_OVERLAY(superdq, 256, 256, BITMAP_FORMAT_INDEXED16)
 
 	/* video hardware */
@@ -323,7 +321,7 @@ static MACHINE_DRIVER_START( superdq )
 	MDRV_SOUND_ADD("sn", SN76496, MASTER_CLOCK/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.8)
 
-	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
+	MDRV_SOUND_ADD("ldsound", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

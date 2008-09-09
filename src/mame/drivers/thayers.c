@@ -747,11 +747,6 @@ static MACHINE_RESET( thayers )
 	device_set_info_int(laserdisc, LDINFO_INT_TYPE, newtype);
 }
 
-static INTERRUPT_GEN( vblank_callback_thayers )
-{
-	laserdisc_vsync(laserdisc);
-}
-
 /* COP400 Interface */
 
 static COP400_INTERFACE( thayers_cop_intf )
@@ -768,7 +763,6 @@ static MACHINE_DRIVER_START( thayers )
 	MDRV_CPU_ADD("main", Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(thayers_map, 0)
 	MDRV_CPU_IO_MAP(thayers_io_map, 0)
-	MDRV_CPU_VBLANK_INT("main", vblank_callback_thayers)
 
 	MDRV_CPU_ADD("mcu", COP421, XTAL_4MHz/2) // COP421L-PCA/N
 	MDRV_CPU_PROGRAM_MAP(thayers_cop_map, 0)
@@ -778,7 +772,7 @@ static MACHINE_DRIVER_START( thayers )
 	MDRV_MACHINE_START(thayers)
 	MDRV_MACHINE_RESET(thayers)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR7820)
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR7820, "main", "ldsound")
 
 	/* video hardware */
 	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_RGB32)
@@ -786,7 +780,13 @@ static MACHINE_DRIVER_START( thayers )
 	MDRV_PALETTE_LENGTH(256)
 
 	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 	// SSI 263 @ 2MHz
+
+	MDRV_SOUND_ADD("ldsound", CUSTOM, 0)
+	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
+	MDRV_SOUND_ROUTE(0, "left", 1.0)
+	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
 
 /* ROMs */

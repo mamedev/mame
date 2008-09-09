@@ -13,8 +13,11 @@
 LDPSRC = $(SRC)/ldplayer
 LDPOBJ = $(OBJ)/ldplayer
 
+LAYOUT = $(LDPOBJ)/layout
+
 OBJDIRS += \
 	$(LDPOBJ) \
+	$(LAYOUT) \
 
 
 
@@ -42,3 +45,10 @@ SOUNDS += CUSTOM
 DRVLIBS = \
 	$(LDPOBJ)/ldpdriv.o \
 	$(LDPOBJ)/ldplayer.o \
+
+
+#-------------------------------------------------
+# layout dependencies
+#-------------------------------------------------
+
+$(LDPOBJ)/ldplayer.o:	$(LAYOUT)/pr8210.lh \

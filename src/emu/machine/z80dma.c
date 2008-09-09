@@ -447,6 +447,8 @@ static DEVICE_START( z80dma )
 	state_save_register_item(unique_tag, 0, z80dma->is_read);
 	state_save_register_item(unique_tag, 0, z80dma->cur_cycle);
 	state_save_register_item(unique_tag, 0, z80dma->latch);
+	
+	return DEVICE_START_OK;
 }
 
 

@@ -59,6 +59,7 @@ struct _debugger_private
 	UINT8			within_instruction_hook;
 	UINT8			vblank_occurred;
 	UINT8			memory_modified;
+	UINT8			debugger_access;
 
 	int				execution_state;
 
@@ -158,7 +159,7 @@ int debug_cpu_within_instruction_hook(running_machine *machine)
     on_vblank - called when a VBLANK hits
 -------------------------------------------------*/
 
-static void on_vblank(const device_config *device, int vblank_state)
+static void on_vblank(const device_config *device, void *param, int vblank_state)
 {
 	/* just set a global flag to be consumed later */
 	if (vblank_state)
@@ -300,7 +301,7 @@ void debug_cpu_init(running_machine *machine)
 
 	/* add callback for breaking on VBLANK */
 	if (machine->primary_screen != NULL)
-		video_screen_register_vblank_callback(machine->primary_screen, on_vblank);
+		video_screen_register_vblank_callback(machine->primary_screen, on_vblank, NULL);
 
 	add_exit_callback(machine, debug_cpu_exit);
 }
@@ -1361,7 +1362,7 @@ static void watchpoint_check(running_machine *machine, int cpunum, int spacenum,
 	UINT64 result;
 
 	/* if we're within debugger code, don't stop */
-	if (global.within_instruction_hook)
+	if (global.within_instruction_hook || global.debugger_access)
 		return;
 
 	global.within_instruction_hook = TRUE;
@@ -1642,7 +1643,7 @@ UINT8 debug_read_byte(int spacenum, offs_t address, int apply_translation)
 	address &= info->space[spacenum].logbytemask;
 
 	/* all accesses from this point on are for the debugger */
-	memory_set_debugger_access(1);
+	memory_set_debugger_access(global.debugger_access = TRUE);
 
 	/* translate if necessary; if not mapped, return 0xff */
 	if (apply_translation && info->translate != NULL && !(*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &address))
@@ -1657,7 +1658,7 @@ UINT8 debug_read_byte(int spacenum, offs_t address, int apply_translation)
 		result = (*active_address_space[spacenum].accessors->read_byte)(address);
 
 	/* no longer accessing via the debugger */
-	memory_set_debugger_access(0);
+	memory_set_debugger_access(global.debugger_access = FALSE);
 	return result;
 }
 
@@ -1693,7 +1694,7 @@ UINT16 debug_read_word(int spacenum, offs_t address, int apply_translation)
 	else
 	{
 		/* all accesses from this point on are for the debugger */
-		memory_set_debugger_access(1);
+		memory_set_debugger_access(global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, return 0xffff */
 		if (apply_translation && info->translate != NULL && !(*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &address))
@@ -1708,7 +1709,7 @@ UINT16 debug_read_word(int spacenum, offs_t address, int apply_translation)
 			result = (*active_address_space[spacenum].accessors->read_word)(address);
 
 		/* no longer accessing via the debugger */
-		memory_set_debugger_access(0);
+		memory_set_debugger_access(global.debugger_access = FALSE);
 	}
 
 	return result;
@@ -1746,7 +1747,7 @@ UINT32 debug_read_dword(int spacenum, offs_t address, int apply_translation)
 	else
 	{
 		/* all accesses from this point on are for the debugger */
-		memory_set_debugger_access(1);
+		memory_set_debugger_access(global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, return 0xffffffff */
 		if (apply_translation && info->translate != NULL && !(*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &address))
@@ -1761,7 +1762,7 @@ UINT32 debug_read_dword(int spacenum, offs_t address, int apply_translation)
 			result = (*active_address_space[spacenum].accessors->read_dword)(address);
 
 		/* no longer accessing via the debugger */
-		memory_set_debugger_access(0);
+		memory_set_debugger_access(global.debugger_access = FALSE);
 	}
 
 	return result;
@@ -1799,7 +1800,7 @@ UINT64 debug_read_qword(int spacenum, offs_t address, int apply_translation)
 	else
 	{
 		/* all accesses from this point on are for the debugger */
-		memory_set_debugger_access(1);
+		memory_set_debugger_access(global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, return 0xffffffffffffffff */
 		if (apply_translation && info->translate != NULL && !(*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &address))
@@ -1814,7 +1815,7 @@ UINT64 debug_read_qword(int spacenum, offs_t address, int apply_translation)
 			result = (*active_address_space[spacenum].accessors->read_qword)(address);
 
 		/* no longer accessing via the debugger */
-		memory_set_debugger_access(0);
+		memory_set_debugger_access(global.debugger_access = FALSE);
 	}
 
 	return result;
@@ -1834,7 +1835,7 @@ void debug_write_byte(int spacenum, offs_t address, UINT8 data, int apply_transl
 	address &= info->space[spacenum].logbytemask;
 
 	/* all accesses from this point on are for the debugger */
-	memory_set_debugger_access(1);
+	memory_set_debugger_access(global.debugger_access = TRUE);
 
 	/* translate if necessary; if not mapped, we're done */
 	if (apply_translation && info->translate != NULL && !(*info->translate)(spacenum, TRANSLATE_WRITE_DEBUG, &address))
@@ -1849,7 +1850,7 @@ void debug_write_byte(int spacenum, offs_t address, UINT8 data, int apply_transl
 		(*active_address_space[spacenum].accessors->write_byte)(address, data);
 
 	/* no longer accessing via the debugger */
-	memory_set_debugger_access(0);
+	memory_set_debugger_access(global.debugger_access = FALSE);
 	global.memory_modified = TRUE;
 }
 
@@ -1885,7 +1886,7 @@ void debug_write_word(int spacenum, offs_t address, UINT16 data, int apply_trans
 	else
 	{
 		/* all accesses from this point on are for the debugger */
-		memory_set_debugger_access(1);
+		memory_set_debugger_access(global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, we're done */
 		if (apply_translation && info->translate && !(*info->translate)(spacenum, TRANSLATE_WRITE_DEBUG, &address))
@@ -1900,7 +1901,7 @@ void debug_write_word(int spacenum, offs_t address, UINT16 data, int apply_trans
 			(*active_address_space[spacenum].accessors->write_word)(address, data);
 
 		/* no longer accessing via the debugger */
-		memory_set_debugger_access(0);
+		memory_set_debugger_access(global.debugger_access = FALSE);
 		global.memory_modified = TRUE;
 	}
 }
@@ -1937,7 +1938,7 @@ void debug_write_dword(int spacenum, offs_t address, UINT32 data, int apply_tran
 	else
 	{
 		/* all accesses from this point on are for the debugger */
-		memory_set_debugger_access(1);
+		memory_set_debugger_access(global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, we're done */
 		if (apply_translation && info->translate && !(*info->translate)(spacenum, TRANSLATE_WRITE_DEBUG, &address))
@@ -1952,7 +1953,7 @@ void debug_write_dword(int spacenum, offs_t address, UINT32 data, int apply_tran
 			(*active_address_space[spacenum].accessors->write_dword)(address, data);
 
 		/* no longer accessing via the debugger */
-		memory_set_debugger_access(0);
+		memory_set_debugger_access(global.debugger_access = FALSE);
 		global.memory_modified = TRUE;
 	}
 }
@@ -1988,7 +1989,7 @@ void debug_write_qword(int spacenum, offs_t address, UINT64 data, int apply_tran
 	else
 	{
 		/* all accesses from this point on are for the debugger */
-		memory_set_debugger_access(1);
+		memory_set_debugger_access(global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, we're done */
 		if (apply_translation && info->translate && !(*info->translate)(spacenum, TRANSLATE_WRITE_DEBUG, &address))
@@ -2003,7 +2004,7 @@ void debug_write_qword(int spacenum, offs_t address, UINT64 data, int apply_tran
 			(*active_address_space[spacenum].accessors->write_qword)(address, data);
 
 		/* no longer accessing via the debugger */
-		memory_set_debugger_access(0);
+		memory_set_debugger_access(global.debugger_access = FALSE);
 		global.memory_modified = TRUE;
 	}
 }

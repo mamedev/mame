@@ -156,6 +156,8 @@ static DEVICE_START( cdp1852 )
 	state_save_register_item(unique_tag, 0, cdp1852->next_data);
 	state_save_register_item(unique_tag, 0, cdp1852->sr);
 	state_save_register_item(unique_tag, 0, cdp1852->next_sr);
+	
+	return DEVICE_START_OK;
 }
 
 static DEVICE_RESET( cdp1852 )

@@ -87,7 +87,7 @@ static TIMER_CALLBACK( watchdog_callback )
     timers
 -------------------------------------------------*/
 
-static void on_vblank(const device_config *screen, int vblank_state)
+static void on_vblank(const device_config *screen, void *param, int vblank_state)
 {
 	/* VBLANK starting */
 	if (vblank_state && watchdog_enabled)
@@ -121,7 +121,7 @@ void watchdog_reset(running_machine *machine)
 
 		/* register a VBLANK callback for the primary screen */
 		if (machine->primary_screen != NULL)
-			video_screen_register_vblank_callback(machine->primary_screen, on_vblank);
+			video_screen_register_vblank_callback(machine->primary_screen, on_vblank, NULL);
 	}
 
 	/* timer-based watchdog? */

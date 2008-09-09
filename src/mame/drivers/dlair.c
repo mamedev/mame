@@ -222,9 +222,6 @@ static MACHINE_RESET( dlair )
 
 static INTERRUPT_GEN( vblank_callback )
 {
-	/* update the laserdisc */
-	laserdisc_vsync(laserdisc);
-
 	/* also update the speaker on the European version */
 	if (sndti_exists(SOUND_BEEP, 0))
 	{
@@ -727,7 +724,7 @@ static MACHINE_DRIVER_START( dlair_base )
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.33)
 
-	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
+	MDRV_SOUND_ADD("ldsound", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -736,13 +733,13 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( dlair_pr7820 )
 	MDRV_IMPORT_FROM(dlair_base)
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR7820)
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR7820, "main", "ldsound")
 MACHINE_DRIVER_END
 
 
 static MACHINE_DRIVER_START( dlair_ldv1000 )
 	MDRV_IMPORT_FROM(dlair_base)
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000)
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "main", "ldsound")
 MACHINE_DRIVER_END
 
 
@@ -760,7 +757,7 @@ static MACHINE_DRIVER_START( dleuro )
 	MDRV_MACHINE_START(dleuro)
 	MDRV_MACHINE_RESET(dlair)
 
-	MDRV_LASERDISC_ADD("laserdisc", PHILLIPS_22VP932)
+	MDRV_LASERDISC_ADD("laserdisc", PHILLIPS_22VP932, "main", "ldsound")
 	MDRV_LASERDISC_OVERLAY(dleuro, 256, 256, BITMAP_FORMAT_INDEXED16)
 
 	/* video hardware */

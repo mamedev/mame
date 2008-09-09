@@ -210,7 +210,6 @@ static INTERRUPT_GEN( vblank )
 	cpunum_set_input_line(machine, MAIN_CPU, int_level, HOLD_LINE);
 
 	/* Update the laserdisc */
-	laserdisc_vsync(laserdisc);
 	video_field ^= 1;
 }
 
@@ -577,14 +576,14 @@ static MACHINE_DRIVER_START( cubeqst )
 	MDRV_PALETTE_LENGTH(8192 + 1)
 	MDRV_PALETTE_INIT(cubeqst)
 
-	MDRV_LASERDISC_ADD("laserdisc", SIMUTREK_SPECIAL)
+	MDRV_LASERDISC_ADD("laserdisc", SIMUTREK_SPECIAL, "main", "ldsound")
 	MDRV_LASERDISC_OVERLAY(cubeqst, CUBEQST_HBLANK, CUBEQST_VCOUNT, BITMAP_FORMAT_INDEXED16)
 	MDRV_LASERDISC_OVERLAY_CLIP(0, 320-1, 0, 256-8)
 	MDRV_LASERDISC_OVERLAY_POSITION(0.002, -0.018)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
+	MDRV_SOUND_ADD("ldsound", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

@@ -87,7 +87,7 @@ struct _screen_config
     in the VBLANK state
 -------------------------------------------------*/
 
-typedef void (*vblank_state_changed_func)(const device_config *device, int vblank_state);
+typedef void (*vblank_state_changed_func)(const device_config *device, void *param, int vblank_state);
 
 
 
@@ -209,7 +209,7 @@ attotime video_screen_get_frame_period(const device_config *screen);
 UINT64 video_screen_get_frame_number(const device_config *screen);
 
 /* registers a VBLANK callback for the given screen */
-void video_screen_register_vblank_callback(const device_config *screen, vblank_state_changed_func vblank_callback);
+void video_screen_register_vblank_callback(const device_config *screen, vblank_state_changed_func vblank_callback, void *param);
 
 
 /* ----- video screen device interface ----- */

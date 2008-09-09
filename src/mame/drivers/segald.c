@@ -321,11 +321,6 @@ static INPUT_PORTS_START( astron )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )         								  /* SW15 = nonJAMMA pin W  = unused? */
 INPUT_PORTS_END
 
-static INTERRUPT_GEN( vblank_callback_astron )
-{
-	laserdisc_vsync(laserdisc);
-}
-
 static GFXDECODE_START( segald )
     GFXDECODE_ENTRY( "gfx1", 0, gfx_8x8x1,  0, 1 )		/* CHARACTERS */
 	/* SPRITES are apparently non-uniform in width - not straightforward to decode */
@@ -345,12 +340,11 @@ static MACHINE_DRIVER_START( astron )
 	MDRV_CPU_ADD("main", Z80, SCHEMATIC_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(mainmem,0)
 	MDRV_CPU_IO_MAP(mainport,0)
-	MDRV_CPU_VBLANK_INT("main", vblank_callback_astron)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 1000.0/59.94)
 
 	MDRV_MACHINE_START(astron)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000)
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "main", "ldsound")
 	MDRV_LASERDISC_OVERLAY(astron, 256, 256, BITMAP_FORMAT_INDEXED16)
 
 	/* video hardware */
@@ -362,7 +356,7 @@ static MACHINE_DRIVER_START( astron )
 	/* sound hardare */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
+	MDRV_SOUND_ADD("ldsound", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

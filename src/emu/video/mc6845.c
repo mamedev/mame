@@ -675,7 +675,7 @@ void mc6845_update(const device_config *device, bitmap_t *bitmap, const rectangl
 
 
 /* device interface */
-static void common_start(const device_config *device, int device_type)
+static device_start_err common_start(const device_config *device, int device_type)
 {
 	mc6845_t *mc6845 = get_safe_token(device);
 	char unique_tag[30];
@@ -746,41 +746,43 @@ static void common_start(const device_config *device, int device_type)
 	state_save_register_item(unique_tag, 0, mc6845->light_pen_latched);
 	state_save_register_item(unique_tag, 0, mc6845->cursor_state);
 	state_save_register_item(unique_tag, 0, mc6845->cursor_blink_count);
+	
+	return DEVICE_START_OK;
 }
 
 static DEVICE_START( mc6845 )
 {
-	common_start(device, TYPE_MC6845);
+	return common_start(device, TYPE_MC6845);
 }
 
 static DEVICE_START( mc6845_1 )
 {
-	common_start(device, TYPE_MC6845_1);
+	return common_start(device, TYPE_MC6845_1);
 }
 
 static DEVICE_START( c6545_1 )
 {
-	common_start(device, TYPE_C6545_1);
+	return common_start(device, TYPE_C6545_1);
 }
 
 static DEVICE_START( r6545_1 )
 {
-	common_start(device, TYPE_R6545_1);
+	return common_start(device, TYPE_R6545_1);
 }
 
 static DEVICE_START( h46505 )
 {
-	common_start(device, TYPE_H46505);
+	return common_start(device, TYPE_H46505);
 }
 
 static DEVICE_START( hd6845 )
 {
-	common_start(device, TYPE_HD6845);
+	return common_start(device, TYPE_HD6845);
 }
 
 static DEVICE_START( sy6545_1 )
 {
-	common_start(device, TYPE_SY6545_1);
+	return common_start(device, TYPE_SY6545_1);
 }
 
 

@@ -55,6 +55,20 @@ enum
 	LDSTATE_OTHER							/* other states start here */
 };
 
+
+/* slider position */
+enum _slider_position
+{
+	SLIDER_MINIMUM,							/* at the minimum value */
+	SLIDER_VIRTUAL_LEADIN,					/* within the virtual lead-in area */
+	SLIDER_CHD,								/* within the boundaries of the CHD */
+	SLIDER_OUTSIDE_CHD,						/* outside of the CHD area but before the virtual lead-out area */
+	SLIDER_VIRTUAL_LEADOUT,					/* within the virtual lead-out area */
+	SLIDER_MAXIMUM							/* at the maximum value */
+};
+typedef enum _slider_position slider_position;
+
+
 /* special frame and chapter numbers from VBI conversion */
 #define FRAME_NOT_PRESENT			-2						/* no frame number information present */
 #define FRAME_LEAD_IN				-1						/* lead-in code detected */
@@ -109,6 +123,7 @@ typedef struct _laserdisc_state laserdisc_state;
 struct _laserdisc_state
 {
 	const device_config *	device;					/* pointer to owning device */
+	const device_config *	screen;					/* pointer to the screen device */
 	ldcore_data *			core;					/* private core data */
 	ldplayer_data *			player;					/* private player data */
 
@@ -119,6 +134,7 @@ struct _laserdisc_state
 
 /* player-specific callbacks */
 typedef void (*laserdisc_init_func)(laserdisc_state *ld);
+typedef void (*laserdisc_vsync_func)(laserdisc_state *ld);
 typedef INT32 (*laserdisc_update_func)(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime);
 typedef void (*laserdisc_w_func)(laserdisc_state *ld, UINT8 prev, UINT8 new);
 typedef UINT8 (*laserdisc_r_func)(laserdisc_state *ld);
@@ -134,7 +150,8 @@ struct _ldplayer_interface
 	const rom_entry *		romregion;				/* pointer to ROM region information */
 	const machine_config_token *machine_config;		/* pointer to machine configuration */
 	laserdisc_init_func		init;					/* initialization callback */
-	laserdisc_update_func	update;					/* update callback */
+	laserdisc_vsync_func	vsync;					/* vsync begin callback */
+	laserdisc_update_func	update;					/* update callback (vblank end) */
 	laserdisc_w_func		writedata;				/* parallel data write */
 	laserdisc_w_func		writeline[LASERDISC_INPUT_LINES]; /* single line write */
 	laserdisc_r_func		readdata;				/* parallel data read */
@@ -172,6 +189,15 @@ void ldcore_set_audio_squelch(laserdisc_state *ld, UINT8 squelchleft, UINT8 sque
 
 /* set the video squelch state */
 void ldcore_set_video_squelch(laserdisc_state *ld, UINT8 squelch);
+
+/* dynamically change the slider speed */
+void ldcore_set_slider_speed(laserdisc_state *ld, INT32 tracks_per_vsync);
+
+/* advance the slider by a certain number of tracks */
+void ldcore_advance_slider(laserdisc_state *ld, INT32 numtracks);
+
+/* get the current slider position */
+slider_position ldcore_get_slider_position(laserdisc_state *ld);
 
 
 

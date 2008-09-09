@@ -372,6 +372,8 @@ static DEVICE_START( pic8259 ) {
 	pic8259_t	*pic8259 = get_safe_token(device);
 
 	pic8259->intf = device->static_config;
+	
+	return DEVICE_START_OK;
 }
 
 

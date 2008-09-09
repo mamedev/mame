@@ -15,6 +15,9 @@
 #include "machine/laserdsc.h"
 #include <ctype.h>
 
+#include "pr8210.lh"
+
+
 
 /*************************************
  *
@@ -59,7 +62,6 @@ static input_port_value last_controls;
 static UINT8 playing;
 static UINT8 displaying;
 
-static UINT8 pr8210_last_was_number;
 static emu_timer *pr8210_bit_timer;
 static UINT32 pr8210_command_buffer_in, pr8210_command_buffer_out;
 static UINT8 pr8210_command_buffer[10];
@@ -138,12 +140,7 @@ static TIMER_CALLBACK( vsync_update )
 
 	/* handle commands */
 	if (!param)
-	{
 		process_commands(laserdisc);
-
-		/* update the laserdisc */
-		laserdisc_vsync(laserdisc);
-	}
 
 	/* set a timer to go off on the next VBLANK */
 	vblank_scanline = video_screen_get_visible_area(machine->primary_screen)->max_y + 1;
@@ -251,9 +248,7 @@ static MACHINE_RESET( pr8210 )
 static void pr8210_execute(const device_config *laserdisc, int command)
 {
 	static const UINT8 digits[10] = { 0x01, 0x11, 0x09, 0x19, 0x05, 0x15, 0x0d, 0x1d, 0x03, 0x13 };
-	int prev_was_number = pr8210_last_was_number;
 
-	pr8210_last_was_number = FALSE;
 	switch (command)
 	{
 		case CMD_SCAN_REVERSE:
@@ -293,13 +288,8 @@ static void pr8210_execute(const device_config *laserdisc, int command)
 			break;
 
 		case CMD_DISPLAY_ON:
-//          pr8210_add_command(digits[1]);
-//          pr8210_add_command(0xf1);
-			break;
-
 		case CMD_DISPLAY_OFF:
-//          pr8210_add_command(digits[0]);
-//          pr8210_add_command(0xf1);
+			pr8210_add_command(0x0b);
 			break;
 
 		case CMD_0:
@@ -312,10 +302,7 @@ static void pr8210_execute(const device_config *laserdisc, int command)
 		case CMD_7:
 		case CMD_8:
 		case CMD_9:
-			if (!prev_was_number)
-				pr8210_add_command(0x1a);
 			pr8210_add_command(digits[command - CMD_0]);
-			pr8210_last_was_number = TRUE;
 			break;
 
 		case CMD_SEARCH:
@@ -443,7 +430,7 @@ static MACHINE_DRIVER_START( ldplayer_core )
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
+	MDRV_SOUND_ADD("ldsound", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -458,7 +445,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( ldv1000 )
 	MDRV_IMPORT_FROM(ldplayer_ntsc)
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000)
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "main", "ldsound")
 MACHINE_DRIVER_END
 
 
@@ -466,7 +453,7 @@ static MACHINE_DRIVER_START( pr8210 )
 	MDRV_IMPORT_FROM(ldplayer_ntsc)
 	MDRV_MACHINE_START(pr8210)
 	MDRV_MACHINE_RESET(pr8210)
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210)
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210, "main", "ldsound")
 MACHINE_DRIVER_END
 
 
@@ -569,4 +556,4 @@ static DRIVER_INIT( pr8210 )  { execute_command = pr8210_execute; DRIVER_INIT_CA
  *************************************/
 
 GAME( 2008, ldv1000, 0, ldv1000, ldplayer, ldv1000, ROT0, "MAME", "Pioneer LDV-1000 Simulator", 0 )
-GAME( 2008, pr8210,  0, pr8210,  ldplayer, pr8210,  ROT0, "MAME", "Pioneer PR-8210 Simulator", 0 )
+GAMEL( 2008, pr8210,  0, pr8210,  ldplayer, pr8210,  ROT0, "MAME", "Pioneer PR-8210 Simulator", 0, layout_pr8210 )

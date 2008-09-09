@@ -126,9 +126,6 @@ static TIMER_CALLBACK( response_timer )
 
 static void vsync_callback(void)
 {
-	/* only clock the disc every other frame */
-	laserdisc_vsync(laserdisc);
-
 	/* if we have data available, set a timer to read it */
 	if (!serial_timer_active && laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 	{
@@ -400,7 +397,7 @@ static MACHINE_DRIVER_START( alg_r1 )
 	MDRV_MACHINE_RESET(alg)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_LASERDISC_ADD("laserdisc", SONY_LDP1450)
+	MDRV_LASERDISC_ADD("laserdisc", SONY_LDP1450, "main", "ldsound")
 	MDRV_LASERDISC_OVERLAY(amiga, 512*2, 262, BITMAP_FORMAT_INDEXED16)
 	MDRV_LASERDISC_OVERLAY_CLIP((129-8)*2, (449+8-1)*2, 44-8, 244+8-1)
 
@@ -425,7 +422,7 @@ static MACHINE_DRIVER_START( alg_r1 )
 	MDRV_SOUND_ROUTE(2, "right", 0.25)
 	MDRV_SOUND_ROUTE(3, "left", 0.25)
 
-	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
+	MDRV_SOUND_ADD("ldsound", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

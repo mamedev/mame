@@ -107,8 +107,11 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 	device->class = devtype_get_info_int(type, DEVINFO_INT_CLASS);
 	device->static_config = NULL;
 	device->inline_config = (configlen == 0) ? NULL : (device->tag + strlen(tag) + 1);
+	device->started = FALSE;
 	device->token = NULL;
 	device->machine = NULL;
+	device->region = NULL;
+	device->regionbytes = 0;
 	strcpy(device->tag, tag);
 
 	/* reset the inline_config to 0 */
@@ -450,6 +453,8 @@ const device_config *device_list_class_find_by_index(const device_config *listhe
 void device_list_start(running_machine *machine)
 {
 	device_config *device;
+	int numstarted = 0;
+	int devcount = 0;
 
 	assert(machine != NULL);
 
@@ -457,14 +462,17 @@ void device_list_start(running_machine *machine)
 	add_reset_callback(machine, device_list_reset);
 	add_exit_callback(machine, device_list_stop);
 
-	/* iterate over devices and start them */
+	/* iterate over devices and allocate memory for them */
 	for (device = (device_config *)machine->config->devicelist; device != NULL; device = device->next)
 	{
 		UINT32 tokenlen;
 
+		assert(!device->started);
 		assert(device->token == NULL);
 		assert(device->type != NULL);
 		assert(device->start != NULL);
+
+		devcount++;
 
 		/* get the size of the token data */
 		tokenlen = (UINT32)devtype_get_info_int(device->type, DEVINFO_INT_TOKEN_BYTES);
@@ -479,9 +487,25 @@ void device_list_start(running_machine *machine)
 		device->machine = machine;
 		device->region = memory_region(machine, device->tag);
 		device->regionbytes = memory_region_length(machine, device->tag);
+	}
+	
+	/* iterate until we've started everything */
+	while (numstarted < devcount)
+	{
+		int prevstarted = numstarted;
+		numstarted = 0;
 
-		/* call the start function */
-		(*device->start)(device);
+		/* iterate over devices and start them */
+		for (device = (device_config *)machine->config->devicelist; device != NULL; device = device->next)
+		{
+			if (!device->started && (*device->start)(device) == DEVICE_START_OK)
+				device->started = TRUE;
+			numstarted += device->started;
+		}
+		
+		/* if we didn't start anything new, we're in trouble */
+		if (numstarted == prevstarted)
+			fatalerror("Circular dependency in device startup; unable to start %d/%d devices\n", devcount - numstarted, devcount);
 	}
 }
 

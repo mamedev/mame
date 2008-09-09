@@ -172,8 +172,7 @@ static WRITE8_HANDLER( cliff_ldwire_w )
 
 static INTERRUPT_GEN( cliff_vsync )
 {
-	/* clock the laserdisc and video chip every 60Hz */
-	laserdisc_vsync(laserdisc);
+	/* clock the video chip every 60Hz */
 	TMS9928A_interrupt(machine);
 }
 
@@ -691,7 +690,7 @@ static MACHINE_DRIVER_START( cliffhgr )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210)
+	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210, "main", "ldsound")
 	MDRV_LASERDISC_OVERLAY(tms9928a, 15+32*8+15, 27+24*8+24, BITMAP_FORMAT_INDEXED16)
 	MDRV_LASERDISC_OVERLAY_CLIP(15-12, 15+32*8+12-1, 27-9, 27+24*8+9-1)
 
@@ -705,7 +704,7 @@ static MACHINE_DRIVER_START( cliffhgr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("laserdisc", CUSTOM, 0)
+	MDRV_SOUND_ADD("ldsound", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)

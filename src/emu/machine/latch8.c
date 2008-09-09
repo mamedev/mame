@@ -223,6 +223,8 @@ static DEVICE_START( latch8 )
 	state_save_combine_module_and_tag(unique_tag, "latch8", device->tag);
 
 	state_save_register_item(unique_tag, 0, latch8->value);
+	
+	return DEVICE_START_OK;
 }
 
 
