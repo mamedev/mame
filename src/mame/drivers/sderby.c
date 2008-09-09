@@ -74,6 +74,7 @@ TO DO :
 
 #include "driver.h"
 #include "sound/okim6295.h"
+#include "spacewin.lh"
 
 UINT16 *sderby_fg_videoram;
 UINT16 *sderby_md_videoram;
@@ -118,6 +119,52 @@ static READ16_HANDLER( roulette_input_r )
 
 }
 
+static WRITE16_HANDLER( scmatto_out_w )
+{
+/*
+  ----------------------------------------
+  --- Scacco Matto / Space Win Outputs ---
+  ----------------------------------------
+
+  0x0000 - Normal State (lamps off).
+  0x0001 - Hold 1 lamp.
+  0x0002 - Hold 2 lamp.
+  0x0004 - Hold 3 lamp.
+  0x0008 - Hold 4 lamp.
+  0x0010 - Hold 5 lamp.
+  0x0020 - Start lamp.
+  0x0040 - Bet lamp.
+  0x2000 - Coin counter.
+
+
+    - Lbits -
+    7654 3210
+    =========
+    ---- ---x  Hold1 lamp.
+    ---- --x-  Hold2 lamp.
+    ---- -x--  Hold3 lamp.
+    ---- x---  Hold4 lamp.
+    ---x ----  Hold5 lamp.
+    --x- ----  Start lamp.
+    -x-- ----  Bet lamp.
+ 
+    - Hbits -
+    7654 3210
+    =========
+    --x- ----  Coin counter.
+
+*/
+	output_set_lamp_value(1, (data & 1));			/* Lamp 1 - HOLD 1 */
+	output_set_lamp_value(2, (data >> 1) & 1);		/* Lamp 2 - HOLD 2 */
+	output_set_lamp_value(3, (data >> 2) & 1);		/* Lamp 3 - HOLD 3 */
+	output_set_lamp_value(4, (data >> 3) & 1);		/* Lamp 4 - HOLD 4 */
+	output_set_lamp_value(5, (data >> 4) & 1);		/* Lamp 5 - HOLD 5 */
+	output_set_lamp_value(6, (data >> 5) & 1);		/* Lamp 6 - START  */
+	output_set_lamp_value(7, (data >> 6) & 1);		/* Lamp 7 - BET    */
+
+	coin_counter_w(0, data & 0x2000);
+}
+
 static ADDRESS_MAP_START( sderby_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_WRITE(sderby_videoram_w) AM_BASE(&sderby_videoram) // bg
@@ -138,22 +185,24 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spacewin_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_WRITE(sderby_videoram_w) AM_BASE(&sderby_videoram) // bg
-	AM_RANGE(0x101000, 0x101fff) AM_RAM AM_WRITE(sderby_md_videoram_w) AM_BASE(&sderby_md_videoram) // mid
-	AM_RANGE(0x102000, 0x103fff) AM_RAM AM_WRITE(sderby_fg_videoram_w) AM_BASE(&sderby_fg_videoram) // fg
-	AM_RANGE(0x104000, 0x10400b) AM_WRITE(sderby_scroll_w)
-	AM_RANGE(0x10400c, 0x10400d) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x10400e, 0x10400f) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_WRITE(sderby_videoram_w) AM_BASE(&sderby_videoram)		/* bg */
+	AM_RANGE(0x101000, 0x101fff) AM_RAM AM_WRITE(sderby_md_videoram_w) AM_BASE(&sderby_md_videoram)	/* mid */
+	AM_RANGE(0x102000, 0x103fff) AM_RAM AM_WRITE(sderby_fg_videoram_w) AM_BASE(&sderby_fg_videoram)	/* fg */
+	AM_RANGE(0x104000, 0x10400b) AM_WRITE(sderby_scroll_w)	/* tilemaps offset control */
+	AM_RANGE(0x10400c, 0x10400d) AM_WRITE(SMH_NOP)	/* seems another video register. constantly used */
+	AM_RANGE(0x10400e, 0x10400f) AM_WRITE(SMH_NOP)	/* seems another video register. constantly used */
+	AM_RANGE(0x104010, 0x105fff) AM_WRITE(SMH_NOP)	/* unknown */
+	AM_RANGE(0x300000, 0x300001) AM_WRITE(SMH_NOP)	/* unknown... write 0x01 in game, and 0x00 on reset */
 	AM_RANGE(0x308000, 0x30800d) AM_READ(sderby_input_r)
-	AM_RANGE(0x308008, 0x308009) AM_WRITE(SMH_NOP)	// ???
+	AM_RANGE(0x308008, 0x308009) AM_WRITE(scmatto_out_w)	/* output port */
 	AM_RANGE(0x30800e, 0x30800f) AM_READWRITE(okim6295_status_0_lsb_r,okim6295_data_0_lsb_w)
 	AM_RANGE(0x380000, 0x380fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x500000, 0x500001) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xd00000, 0xd001ff) AM_RAM
     AM_RANGE(0x800000, 0x800fff) AM_RAM AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
-	AM_RANGE(0x801000, 0x8fffff) AM_RAM
+	AM_RANGE(0x801000, 0x80100d) AM_WRITE(SMH_NOP)	/* unknown */
+	AM_RANGE(0x8f0000, 0x8f3fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)	/* 16K Dallas DS1220Y-200 NVRAM */
+	AM_RANGE(0x8fc000, 0x8fffff) AM_RAM
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( roulette_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
@@ -194,6 +243,26 @@ static INPUT_PORTS_START( sderby )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( spacewin )
+	PORT_START("IN0")	/* 0x308000.w */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START )   PORT_NAME("Start")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Bet") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE_NO_TOGGLE(0x1000, IP_ACTIVE_LOW)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( pmroulet )
 	PORT_START("IN0")
 	PORT_BIT( 0x000f, IP_ACTIVE_LOW, IPT_UNKNOWN ) // ?
@@ -228,7 +297,7 @@ static const gfx_layout tiles8x8_layout =
 	8,8,
 	RGN_FRAC(1,5),
 	5,
-	{ RGN_FRAC(4,5),RGN_FRAC(3,5),RGN_FRAC(2,5),RGN_FRAC(1,5),RGN_FRAC(0,5) },
+	{ RGN_FRAC(4,5), RGN_FRAC(3,5), RGN_FRAC(2,5), RGN_FRAC(1,5), RGN_FRAC(0,5) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7 },
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
 	8*8
@@ -240,25 +309,22 @@ static const gfx_layout tiles16x16_layout =
 	16,16,
 	RGN_FRAC(1,5),
 	5,
-	{ RGN_FRAC(4,5),RGN_FRAC(3,5),RGN_FRAC(2,5),RGN_FRAC(1,5),RGN_FRAC(0,5) },
+	{ RGN_FRAC(4,5), RGN_FRAC(3,5), RGN_FRAC(2,5), RGN_FRAC(1,5), RGN_FRAC(0,5) },
 	{ 0, 1, 2, 3, 4, 5, 6, 7,
-	 128+0, 128+1,128+2,128+3,128+4,128+5,128+6,128+7
+	 128+0, 128+1, 128+2, 128+3, 128+4, 128+5, 128+6, 128+7
 	},
 	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-	64+0*8,64+1*8,64+2*8,64+3*8,64+4*8,64+5*8,64+6*8,64+7*8
-
-	 },
-
+	  64+0*8,64+1*8,64+2*8,64+3*8,64+4*8,64+5*8,64+6*8,64+7*8
+	},
 	256,
 };
 
 
-
 static GFXDECODE_START( sderby )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout,   0x000, 256  ) /* sprites */
-	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout,   0x000, 256  ) /* sprites */
-
+	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0x000, 256  ) /* sprites */
 GFXDECODE_END
+
 
 static MACHINE_DRIVER_START( sderby )
 	MDRV_CPU_ADD("main", M68000, 12000000)
@@ -292,6 +358,8 @@ static MACHINE_DRIVER_START( spacewin )
 	MDRV_CPU_PROGRAM_MAP(spacewin_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
+	MDRV_NVRAM_HANDLER(generic_0fill)
+
 	MDRV_GFXDECODE(sderby)
 
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -320,7 +388,6 @@ static MACHINE_DRIVER_START( pmroulet )
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
 	MDRV_GFXDECODE(sderby)
-
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -376,6 +443,43 @@ ROM_START( pmroulet )
 	ROM_LOAD( "8.bin", 0x200000, 0x80000, CRC(d4c2b7da) SHA1(515be861443acc5b911241dbaafa42e02f79985a))
 ROM_END
 
+/* Scacco Matto / Space Win
+   Playmark, 1996.
+  
+CPU:
+1x MC68000P12 (main)(u24)
+
+Sound:
+1x M6295 (sound)(u146)
+1x TDA2003 (sound)(td1)
+1x 358D (sound)(u155)
+
+PLDs:
+2x A1020B-PL84C (u110,u137)(not dumped)
+
+Xtals:
+1x oscillator 24.000000MHz (xl1)
+1x oscillator 28.000000MHz (xl2)
+1x blu resonator 1000J (sound)(y1)
+
+ROMs:
+1x M27C2001 (1)
+7x M27C1001 (2,3,4,5,6,7,8)
+
+4x PALCE22V10H (not dumped)
+1x PALCE16V8H (not dumped)
+1x DS1220Y-200 (non volatile ram)
+
+Note:
+1x JAMMA edge connector
+1x 12 legs connector
+2x 6 legs connector
+1x pushbutton (cb1)
+1x trimmer (volume)
+
+Title depends on graphics type in test mode.
+
+*/
 ROM_START( spacewin )
 	ROM_REGION( 0x40000, "main", 0 ) /* 68000 Code */
     ROM_LOAD16_BYTE( "2.u16", 0x00000, 0x20000, CRC(2d17c2ab) SHA1(833ab39081fbc3d114103055e3a3f2ea2a28f158) )
@@ -393,8 +497,12 @@ ROM_START( spacewin )
 ROM_END
 
 
+/******************************
+*        Game Drivers         *
+******************************/
 
-GAME( 1996, sderby, 0, sderby, sderby, 0, ROT0, "Playmark", "Super Derby", 0 )
-GAME( 1997, pmroulet, 0, pmroulet, pmroulet, 0, ROT0, "Playmark", "Croupier (Playmark Roulette)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 199?, spacewin, 0, spacewin, sderby, 0, ROT0, "Playmark", "Space Win / Scacco Matto", GAME_NOT_WORKING ) // title depends on game type in test mode
+/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT   ROT    COMPANY     FULLNAME                       FLAGS            LAYOUT  */
+GAME(  1996, sderby,   0,      sderby,   sderby,   0,     ROT0, "Playmark", "Super Derby",                  0 )
+GAMEL( 1996, spacewin, 0,      spacewin, spacewin, 0,     ROT0, "Playmark", "Scacco Matto / Space Win",     0,               layout_spacewin )
+GAME(  1997, pmroulet, 0,      pmroulet, pmroulet, 0,     ROT0, "Playmark", "Croupier (Playmark Roulette)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 

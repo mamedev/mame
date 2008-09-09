@@ -1755,6 +1755,8 @@ $(DRIVERS)/qix.o:		$(LAYOUT)/elecyoyo.lh
 
 $(DRIVERS)/sbrkout.o:	$(LAYOUT)/sbrkout.lh
 
+$(DRIVERS)/sderby.o:	$(LAYOUT)/spacewin.lh
+
 $(DRIVERS)/snookr10.o:	$(LAYOUT)/snookr10.lh
 
 $(DRIVERS)/sspeedr.o:	$(LAYOUT)/sspeedr.lh
