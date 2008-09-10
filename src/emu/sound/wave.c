@@ -26,16 +26,14 @@
 static void wave_sound_update(void *param,stream_sample_t **inputs, stream_sample_t **_buffer,int length)
 {
 #ifdef MESS
-	const device_config *image;
+	const device_config *image = param;
 	cassette_image *cassette;
 	cassette_state state;
 	double time_index;
 	double duration;
-	int num = ((FPTR)param) & ~WAVE_TOKEN_MASK;
 	stream_sample_t *buffer = _buffer[0];
 	int i;
 
-	image = image_from_devtype_and_index(IO_CASSETTE, num);
 	state = cassette_get_state(image);
 
 	state &= CASSETTE_MASK_UISTATE | CASSETTE_MASK_MOTOR | CASSETTE_MASK_SPEAKER;
@@ -61,7 +59,12 @@ static void wave_sound_update(void *param,stream_sample_t **inputs, stream_sampl
 
 static void *wave_start(const char *tag, int sndindex, int clock, const void *config)
 {
-	stream_create(0, 1, Machine->sample_rate, (void *) (FPTR)sndindex, wave_sound_update);
+	const device_config *image = NULL;
+
+#ifdef MESS
+	image = device_list_find_by_tag( Machine->config->devicelist, CASSETTE, tag );
+#endif MESS
+	stream_create(0, 1, Machine->sample_rate, (void *)image, wave_sound_update);
 	return (void *) (FPTR)(sndindex | WAVE_TOKEN_MASK);
 }
 
