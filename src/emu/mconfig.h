@@ -23,7 +23,7 @@
 ***************************************************************************/
 
 /* by convention, tags should all lowercase and this length or less */
-#define MAX_TAG_LENGTH			12
+#define MAX_TAG_LENGTH			10
 
 
 /* token types */

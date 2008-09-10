@@ -2908,7 +2908,7 @@ ROM_START( ad2083 )
 	ROM_REGION( 0x0020, "proms", 0 )
 	ROM_LOAD( "prom-am27s19dc.1m", 0x0000, 0x0020, CRC(2759aebd) SHA1(644fd2c95ca49cbbc0ee1b88ca2563451ddd4fe0) )
 
-	ROM_REGION( 0x0020, "tms5110_ctrl", 0 ) /* data to program TMS5110 speech chip 3x Reset 1x speak */
+	ROM_REGION( 0x0020, "5110ctrl", 0 ) /* data to program TMS5110 speech chip 3x Reset 1x speak */
 	ROM_LOAD( "prom-sn74s188.8a",  0x0000, 0x0020, BAD_DUMP CRC(c58a4f6a) SHA1(35ef244b3e94032df2610aa594ea5670b91e1449) )
 ROM_END
 

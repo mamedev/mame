@@ -1922,7 +1922,7 @@ ROM_START( afighter )
 	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
 	ROM_LOAD( "10284", 0x00000, 0x8000, CRC(8ff09116) SHA1(8b99b6d2499897cfbd037a7e7cf5bc53bce8a63a) )
 
-	ROM_REGION( 0x2000, "fd1089a_key", 0 ) /* decryption key */
+	ROM_REGION( 0x2000, "fd1089a", 0 ) /* decryption key */
 	ROM_LOAD( "317-0018.key", 0x0000, 0x2000, CRC(fee04be8) SHA1(c58d78299ef4cede517be823a8a8a90e46c6ba0d) )
 ROM_END
 
@@ -2002,7 +2002,7 @@ ROM_START( alexkid1 )
 	ROM_LOAD( "10435.1", 0x0000, 0x8000, CRC(ad89f6e3) SHA1(812a132142065b0fe13b5f0ac534b6d8830ba102) )
 	ROM_LOAD( "10436.2", 0x8000, 0x8000, CRC(96c76613) SHA1(fe3e4e649fd2cb2453eec0c92015bd54b3b9a1b5) )
 
-	ROM_REGION( 0x2000, "fd1089a_key", 0 ) /* decryption key */
+	ROM_REGION( 0x2000, "fd1089a", 0 ) /* decryption key */
 	ROM_LOAD( "317-0021.key", 0x0000, 0x2000, BAD_DUMP CRC(85be8eac) SHA1(3857bf43b3b0ab60c04223e2393d99504a730d73) )
 ROM_END
 
@@ -2056,7 +2056,7 @@ ROM_START( aliensy5 )
 	ROM_LOAD( "10707", 0x08000, 0x8000, CRC(800c1d82) SHA1(aac4123bd35f87da09264649f4cf8326b2ba3cb8) )
 	ROM_LOAD( "10708", 0x10000, 0x8000, CRC(5921ef52) SHA1(eff9978361692e6e60a9c6caf5740dd6182cfe4a) )
 
-	ROM_REGION( 0x2000, "fd1089b_key", 0 ) /* decryption key */
+	ROM_REGION( 0x2000, "fd1089b", 0 ) /* decryption key */
 	ROM_LOAD( "317-0037.key", 0x0000, 0x2000, CRC(49e882e5) SHA1(29d87af8fc775b22a9a546c112f8f5e7f700ac1a) )
 ROM_END
 
@@ -2110,7 +2110,7 @@ ROM_START( aliensy2 )
 	ROM_LOAD( "10707", 0x08000, 0x8000, CRC(800c1d82) SHA1(aac4123bd35f87da09264649f4cf8326b2ba3cb8) )
 	ROM_LOAD( "10708", 0x10000, 0x8000, CRC(5921ef52) SHA1(eff9978361692e6e60a9c6caf5740dd6182cfe4a) )
 
-	ROM_REGION( 0x2000, "fd1089a_key", 0 ) /* decryption key */
+	ROM_REGION( 0x2000, "fd1089a", 0 ) /* decryption key */
 	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(49e882e5) SHA1(29d87af8fc775b22a9a546c112f8f5e7f700ac1a) )
 ROM_END
 
@@ -2161,7 +2161,7 @@ ROM_START( aliensy1 )
 	ROM_LOAD( "10707", 0x08000, 0x8000, CRC(800c1d82) SHA1(aac4123bd35f87da09264649f4cf8326b2ba3cb8) )
 	ROM_LOAD( "10708", 0x10000, 0x8000, CRC(5921ef52) SHA1(eff9978361692e6e60a9c6caf5740dd6182cfe4a) )
 
-	ROM_REGION( 0x2000, "fd1089a_key", 0 ) /* decryption key */
+	ROM_REGION( 0x2000, "fd1089a", 0 ) /* decryption key */
 	ROM_LOAD( "317-0033.key", 0x0000, 0x2000, CRC(49e882e5) SHA1(29d87af8fc775b22a9a546c112f8f5e7f700ac1a) )
 ROM_END
 
@@ -2642,7 +2642,7 @@ ROM_START( sdi )
 	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
 	ROM_LOAD( "epr10759.12", 0x0000, 0x8000, CRC(d7f9649f) SHA1(ce4abe7dd7e33da048569d7817063345fab75ea7) )
 
-	ROM_REGION( 0x2000, "fd1089b_key", 0 ) /* decryption key */
+	ROM_REGION( 0x2000, "fd1089b", 0 ) /* decryption key */
 	ROM_LOAD( "317-0027.key", 0x0000, 0x2000, BAD_DUMP CRC(9a5307b2) SHA1(2fcc576ed95b96ff6ea71252c3fab33b8b3fc1f5) )
 ROM_END
 
@@ -2845,7 +2845,7 @@ ROM_START( sjryuko1 )
 	ROM_LOAD( "epr12230.4", 0x10000, 0x8000, CRC(d0f61fd4) SHA1(e6f29459d7395122f26957f56e38926aebd9004c) )
 	ROM_LOAD( "epr12231.5", 0x18000, 0x8000, CRC(780bdc57) SHA1(8c859043bba389292604385b88c743728180f9a9) )
 
-	ROM_REGION( 0x2000, "fd1089b_key", 0 ) /* decryption key */
+	ROM_REGION( 0x2000, "fd1089b", 0 ) /* decryption key */
 	ROM_LOAD( "317-5021.key", 0x0000, 0x2000, BAD_DUMP CRC(4a3422e4) SHA1(69a32a6987ff2481f6d6cbbe399269a2461b8bad) )
 ROM_END
 
@@ -3014,7 +3014,7 @@ ROM_START( timesca1 )
 	ROM_REGION( 0x08000, "n7751data", 0 ) /* 7751 sound data */
 	ROM_LOAD( "epr10547.1", 0x0000, 0x8000, CRC(d24ffc4b) SHA1(3b250e1f026664f7a37f65d1c1a07381e88f11e8) )
 
-	ROM_REGION( 0x2000, "fd1089b_key", 0 ) /* decryption key */
+	ROM_REGION( 0x2000, "fd1089b", 0 ) /* decryption key */
 	ROM_LOAD( "317-0024.key", 0x0000, 0x2000, BAD_DUMP CRC(ee42ec18) SHA1(cb65dd681f38ce20440ddcb01a935c2c8eecc77f) )
 ROM_END
 
@@ -3101,7 +3101,7 @@ ROM_START( wb35 )
 	ROM_REGION( 0x10000, "sound", 0 ) /* sound CPU */
 	ROM_LOAD( "epr12089.12", 0x0000, 0x8000, CRC(8321eb0b) SHA1(61cf95833c0aa38e35fc18db39d4ec74e4aaf01e) )
 
-	ROM_REGION( 0x2000, "fd1089a_key", 0 ) /* decryption key */
+	ROM_REGION( 0x2000, "fd1089a", 0 ) /* decryption key */
 	ROM_LOAD( "317-wb35.key", 0x0000, 0x2000, BAD_DUMP CRC(8a2e0575) SHA1(e43a2c8ca102ec38871067685a860da53d748765) )
 ROM_END
 

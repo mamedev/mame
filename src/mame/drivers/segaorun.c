@@ -1545,7 +1545,7 @@ ROM_START( shangon3 )
 	ROM_LOAD( "epr-10646.69", 0x30000, 0x08000, CRC(473cc411) SHA1(04ca2d047eb59581cd5d76e0ac6eca8b19eef497) )
 	ROM_RELOAD(               0x38000, 0x08000 )
 
-	ROM_REGION( 0x2000, "fd1089b_key", 0 ) /* decryption key */
+	ROM_REGION( 0x2000, "fd1089b", 0 ) /* decryption key */
 	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(263ca773) SHA1(8e80d69d61cf54fd02b0ca59dd397fa60c713f3d) )
 ROM_END
 
@@ -1606,7 +1606,7 @@ ROM_START( shangon2 )
 	ROM_LOAD( "epr-10646.69", 0x30000, 0x08000, CRC(473cc411) SHA1(04ca2d047eb59581cd5d76e0ac6eca8b19eef497) )
 	ROM_RELOAD(               0x38000, 0x08000 )
 
-	ROM_REGION( 0x2000, "fd1089b_key", 0 ) /* decryption key */
+	ROM_REGION( 0x2000, "fd1089b", 0 ) /* decryption key */
 	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(263ca773) SHA1(8e80d69d61cf54fd02b0ca59dd397fa60c713f3d) )
 ROM_END
 
@@ -1667,7 +1667,7 @@ ROM_START( shangon1 )
 	ROM_LOAD( "epr-10646.69", 0x30000, 0x08000, CRC(473cc411) SHA1(04ca2d047eb59581cd5d76e0ac6eca8b19eef497) )
 	ROM_RELOAD(               0x38000, 0x08000 )
 
-	ROM_REGION( 0x2000, "fd1089b_key", 0 ) /* decryption key */
+	ROM_REGION( 0x2000, "fd1089b", 0 ) /* decryption key */
 	ROM_LOAD( "317-0034.key", 0x0000, 0x2000, CRC(263ca773) SHA1(8e80d69d61cf54fd02b0ca59dd397fa60c713f3d) )
 ROM_END
 

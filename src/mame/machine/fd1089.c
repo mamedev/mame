@@ -426,11 +426,11 @@ void *fd1089_get_decrypted_base(void)
 
 void fd1089a_decrypt(running_machine *machine)
 {
-	sys16_decrypt(machine, memory_region(machine, "fd1089a_key"), FD1089A);
+	sys16_decrypt(machine, memory_region(machine, "fd1089a"), FD1089A);
 }
 
 void fd1089b_decrypt(running_machine *machine)
 {
-	sys16_decrypt(machine, memory_region(machine, "fd1089b_key"), FD1089B);
+	sys16_decrypt(machine, memory_region(machine, "fd1089b"), FD1089B);
 }
 
