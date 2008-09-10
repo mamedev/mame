@@ -224,20 +224,6 @@ INLINE const char *copy_string(const char *string)
 }
 
 
-/*-------------------------------------------------
-    view_has_art - true if a render_view contains
-    any non-screen elements
--------------------------------------------------*/
-
-#ifdef UNUSED_FUNCTION
-INLINE int view_has_art(layout_view *view)
-{
-	return (view->itemlist[ITEM_LAYER_BACKDROP] != 0 ||
-			view->itemlist[ITEM_LAYER_OVERLAY] != 0 ||
-			view->itemlist[ITEM_LAYER_BEZEL] != 0);
-}
-#endif
-
 
 /***************************************************************************
     LAYOUT VIEWS
@@ -1881,6 +1867,8 @@ static view_item *load_view_item(xml_data_node *itemnode, layout_element *elemli
 error:
 	if (item->output_name != NULL)
 		free((void *)item->output_name);
+	if (item->input_tag != NULL)
+		free((void *)item->input_tag);
 	free(item);
 	return NULL;
 }
@@ -2089,6 +2077,8 @@ static void layout_view_free(layout_view *view)
 			view->itemlist[layer] = temp->next;
 			if (temp->output_name != NULL)
 				free((void *)temp->output_name);
+			if (temp->input_tag != NULL)
+				free((void *)temp->input_tag);
 			free(temp);
 		}
 
