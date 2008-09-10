@@ -3250,9 +3250,12 @@ ROM_START( vf4 )
 	DISK_IMAGE_READONLY( "gds-0012", 0, SHA1(d68436ee72ea5db40e184b7ff38903a9cadb6df7) MD5(5a18300646a68f2994ed8c81abe9bdd8) )
 
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	// this key is wrong! not for this game
+	// (it's for game with a BDR.bin file on the GD-ROM, vf4 has BDM.bin)
+
 	//PIC16C622A (317-0317-COM)
 	//(sticker 253-5508-0317)
-	ROM_LOAD("317-0317-com.data", 0x00, 0x50, CRC(66efe433) SHA1(7f7b52202ed9b1e20516aaa7553cc3cc677a70b5) )
+	ROM_LOAD("317-0317-com.data", 0x00, 0x50, BAD_DUMP CRC(66efe433) SHA1(7f7b52202ed9b1e20516aaa7553cc3cc677a70b5) )
 ROM_END
 
 ROM_START( initd )
