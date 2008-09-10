@@ -209,7 +209,7 @@ void decrypt_kf10thep(running_machine *machine)
 	int i;
 	UINT16 *rom = (UINT16*)memory_region(machine, "main");
 	UINT8  *src = memory_region(machine, "main");
-	UINT16 *buf = (UINT16*)memory_region(machine, "audioencrypted");
+	UINT16 *buf = (UINT16*)memory_region(machine, "audiocrypt");
 	UINT8 *srom = (UINT8*)memory_region(machine, "fixed");
 	UINT8 *sbuf = malloc_or_die(0x20000);
 

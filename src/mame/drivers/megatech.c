@@ -224,7 +224,7 @@ static UINT8 mt_cart_select_reg;
 
 static READ8_HANDLER( megatech_instr_r )
 {
-	UINT8* instr = memory_region(machine, "megatech_bios")+0x8000;
+	UINT8* instr = memory_region(machine, "mtbios")+0x8000;
 
 	return instr[offset/2];
 //  else
@@ -376,7 +376,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	/* if the regions exist we're fine */
 	if (game_region && bios_region)
 	{
-		memcpy(memory_region(machine, "megatech_bios")+0x8000, bios_region, 0x8000);
+		memcpy(memory_region(machine, "mtbios")+0x8000, bios_region, 0x8000);
 		memcpy(memory_region(machine, "main"), game_region, 0x300000);
 
 		// I store an extra byte at the end of the instruction rom region when loading
@@ -413,7 +413,7 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	//  cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* no cart.. */
-		memset(memory_region(machine, "megatech_bios")+0x8000, 0x00, 0x8000);
+		memset(memory_region(machine, "mtbios")+0x8000, 0x00, 0x8000);
 		memset(memory_region(machine, "main"), 0x00, 0x300000);
 	}
 
@@ -438,21 +438,21 @@ static WRITE8_HANDLER( megatech_cart_select_w )
     if (mt_cart_select_reg==2)
     {
         printf("game 2 selected\n");
-        memcpy(memory_region(machine, "megatech_bios")+0x8000, memory_region(machine, "inst0"), 0x8000);
+        memcpy(memory_region(machine, "mtbios")+0x8000, memory_region(machine, "inst0"), 0x8000);
     }
 //  else if (mt_cart_select_reg==0)
 //  {
 //      printf("game 0 selected\n");
-//      memcpy(memory_region(machine, "megatech_bios")+0x8000, memory_region(machine, "inst2"), 0x8000);
+//      memcpy(memory_region(machine, "mtbios")+0x8000, memory_region(machine, "inst2"), 0x8000);
 //  }
     else if (mt_cart_select_reg==6)
     {
         printf("game 6 selected\n");
-        memcpy(memory_region(machine, "megatech_bios")+0x8000, memory_region(machine, "user6"), 0x8000);
+        memcpy(memory_region(machine, "mtbios")+0x8000, memory_region(machine, "user6"), 0x8000);
     }
     else
     {
-        memset(memory_region(machine, "megatech_bios")+0x8000, 0x00, 0x8000);
+        memset(memory_region(machine, "mtbios")+0x8000, 0x00, 0x8000);
     }
 */
 
@@ -616,7 +616,7 @@ static MACHINE_DRIVER_START( megatech )
 	MDRV_IMPORT_FROM(megadriv)
 
 	/* Megatech has an extra SMS based bios *and* an additional screen */
-	MDRV_CPU_ADD("megatech_bios", Z80, MASTER_CLOCK / 15) /* ?? */
+	MDRV_CPU_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
 	MDRV_CPU_PROGRAM_MAP(megatech_bios_map, 0)
 	MDRV_CPU_IO_MAP(megatech_bios_portmap,0)
 
@@ -657,7 +657,7 @@ MACHINE_DRIVER_END
 
 #define MEGATECH_BIOS \
 	ROM_REGION( 0x400000, "main", ROMREGION_ERASEFF ) \
-	ROM_REGION( 0x10000, "megatech_bios", 0 ) \
+	ROM_REGION( 0x10000, "mtbios", 0 ) \
 	ROM_LOAD( "epr12664.20", 0x000000, 0x8000, CRC(f71e9526) SHA1(1c7887541d02c41426992d17f8e3db9e03975953) ) \
 
 /* no games */

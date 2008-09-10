@@ -2,7 +2,7 @@
 #include "sound/2151intf.h"
 
 
-#define CPUTAG_T5182 "T5182"
+#define CPUTAG_T5182 "t5182"
 #define T5182COINPORT "T5182_COIN"
 
 ADDRESS_MAP_EXTERN( t5182_map, 8 );

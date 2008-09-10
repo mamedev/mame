@@ -1589,7 +1589,7 @@ static MACHINE_DRIVER_START( centiped )
 	MDRV_NVRAM_HANDLER(atari_vg)
 
 	/* timer */
-	MDRV_TIMER_ADD_SCANLINE("32V", generate_interrupt, "main", 0, 16)
+	MDRV_TIMER_ADD_SCANLINE("32v", generate_interrupt, "main", 0, 16)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

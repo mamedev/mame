@@ -501,12 +501,12 @@ static MACHINE_DRIVER_START( chainrec )
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
 
-	MDRV_SOUND_ADD("OKIM6295_EFFECTS", OKIM6295, 32220000/32)
+	MDRV_SOUND_ADD("okisfx", OKIM6295, 32220000/32)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.6)
 
-	MDRV_SOUND_ADD("OKIM6295_MUSIC", OKIM6295, 32220000/16)
+	MDRV_SOUND_ADD("okimusic", OKIM6295, 32220000/16)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.2)
@@ -539,7 +539,7 @@ static MACHINE_DRIVER_START( mitchell156 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(mitchell156_map,0)
 
-	MDRV_SOUND_REPLACE("OKIM6295_MUSIC", OKIM6295, 32220000/32)
+	MDRV_SOUND_REPLACE("okimusic", OKIM6295, 32220000/32)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.2)
@@ -548,8 +548,8 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT(simpl156)
 {
-	UINT8 *rom = memory_region(machine, "OKIM6295_MUSIC");
-	int length = memory_region_length(machine, "OKIM6295_MUSIC");
+	UINT8 *rom = memory_region(machine, "okimusic");
+	int length = memory_region_length(machine, "okimusic");
 	UINT8 *buf1 = malloc_or_die(length);
 
 	UINT32 x;
@@ -623,10 +623,10 @@ ROM_START( joemacr )
 	ROM_LOAD16_BYTE( "mbn01",    0x000001, 0x080000, CRC(a3a37353) SHA1(c4509c8268afb647c20e71b42ae8ebd2bdf075e6) ) /* 03.u11 */
 	ROM_LOAD16_BYTE( "mbn02",    0x000000, 0x080000, CRC(aa2230c5) SHA1(43b7ac5c69cde1840a5255a8897e1c5d5f89fd7b) ) /* 04.u12 */
 
-	ROM_REGION( 0x80000, "OKIM6295_EFFECTS", 0 ) /* Oki samples */
+	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "mbn04",    0x00000, 0x40000,  CRC(dcbd4771) SHA1(2a1ab6b0fc372333c7eb17aab077fe1ca5ba1dea) ) /* 07.u46 */
 
-	ROM_REGION( 0x200000, "OKIM6295_MUSIC", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
 	ROM_LOAD( "mbn03",    0x00000, 0x200000, CRC(70b71a2a) SHA1(45851b0692de73016fc9b913316001af4690534c) ) /* 06.u45 */
 ROM_END
 
@@ -659,10 +659,10 @@ ROM_START( joemacra )
 	ROM_LOAD16_BYTE( "mbn01",    0x000001, 0x080000, CRC(a3a37353) SHA1(c4509c8268afb647c20e71b42ae8ebd2bdf075e6) )
 	ROM_LOAD16_BYTE( "mbn02",    0x000000, 0x080000, CRC(aa2230c5) SHA1(43b7ac5c69cde1840a5255a8897e1c5d5f89fd7b) )
 
-	ROM_REGION( 0x80000, "OKIM6295_EFFECTS", 0 ) /* Oki samples */
+	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "mbn04",    0x00000, 0x40000,  CRC(dcbd4771) SHA1(2a1ab6b0fc372333c7eb17aab077fe1ca5ba1dea) )
 
-	ROM_REGION( 0x200000, "OKIM6295_MUSIC", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
 	ROM_LOAD( "mbn03",    0x00000, 0x200000, CRC(70b71a2a) SHA1(45851b0692de73016fc9b913316001af4690534c) )
 ROM_END
 
@@ -705,10 +705,10 @@ ROM_START( chainrec )
 	ROM_LOAD32_BYTE( "u5",    0x000001, 0x080000, CRC(1b6f01ea) SHA1(753fc670707432e317d035b09b0bad0762fea731) )
 	ROM_LOAD32_BYTE( "u6",    0x000003, 0x080000, CRC(531a56f2) SHA1(89602bb873a3b110bffc216f921ba228e53380f9) )
 
-	ROM_REGION( 0x80000, "OKIM6295_EFFECTS", 0 ) /* Oki samples */
+	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "mcc-04",    0x00000, 0x40000,  CRC(86ee6ade) SHA1(56ad3f432c7f430f19fcba7c89940c63da165906) )
 
-	ROM_REGION( 0x200000, "OKIM6295_MUSIC", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
 	ROM_LOAD( "mcc-03",    0x00000, 0x100000, CRC(da2ebba0) SHA1(96d31dea4c7226ee1d386b286919fa334388c7a1) )
 ROM_END
 
@@ -747,10 +747,10 @@ ROM_START( magdrop )
 	ROM_LOAD16_BYTE( "mcc-01.a13",    0x000001, 0x100000, CRC(13d88745) SHA1(0ce4ec1481f31be860ee80322de6e32f9a566229) )
 	ROM_LOAD16_BYTE( "mcc-02.a14",    0x000000, 0x100000, CRC(d0f97126) SHA1(3848a6f00d0e57aaf383298c4d111eb63a88b073) )
 
-	ROM_REGION( 0x80000, "OKIM6295_EFFECTS", 0 ) /* Oki samples */
+	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "mcc-04",    0x00000, 0x40000,  CRC(86ee6ade) SHA1(56ad3f432c7f430f19fcba7c89940c63da165906) )
 
-	ROM_REGION( 0x200000, "OKIM6295_MUSIC", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
 	ROM_LOAD( "mcc-03",    0x00000, 0x100000, CRC(da2ebba0) SHA1(96d31dea4c7226ee1d386b286919fa334388c7a1) )
 
 	ROM_REGION( 0x80, "user1", 0 ) /* eeprom */
@@ -768,10 +768,10 @@ ROM_START( magdropp )
 	ROM_LOAD16_BYTE( "mcc-01.a13",    0x000001, 0x100000, CRC(13d88745) SHA1(0ce4ec1481f31be860ee80322de6e32f9a566229) )
 	ROM_LOAD16_BYTE( "mcc-02.a14",    0x000000, 0x100000, CRC(d0f97126) SHA1(3848a6f00d0e57aaf383298c4d111eb63a88b073) )
 
-	ROM_REGION( 0x80000, "OKIM6295_EFFECTS", 0 ) /* Oki samples */
+	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "mcc-04",    0x00000, 0x40000,  CRC(86ee6ade) SHA1(56ad3f432c7f430f19fcba7c89940c63da165906) )
 
-	ROM_REGION( 0x200000, "OKIM6295_MUSIC", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
 	ROM_LOAD( "mcc-03",    0x00000, 0x100000, CRC(da2ebba0) SHA1(96d31dea4c7226ee1d386b286919fa334388c7a1) )
 
 	ROM_REGION( 0x80, "user1", 0 ) /* eeprom */
@@ -834,10 +834,10 @@ ROM_START( charlien )
 	ROM_LOAD16_BYTE( "mbr-01.14a",    0x000001, 0x100000, CRC(46c90215) SHA1(152acdeea34ec1db3f761066a0c1ff6e43e47f9d) )
 	ROM_LOAD16_BYTE( "mbr-03.14h",    0x000000, 0x100000, CRC(c448a68a) SHA1(4b607dfee269abdfeb710b74b73ef87dc2b30e8c) )
 
-	ROM_REGION( 0x80000, "OKIM6295_EFFECTS", 0 ) /* Oki samples */
+	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "nd01-0.13h",    0x00000, 0x40000,  CRC(635a100a) SHA1(f6ec70890892e7557097ccd519de37247bb8c98d) )
 
-	ROM_REGION( 0x200000, "OKIM6295_MUSIC", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
 	ROM_LOAD( "mbr-02.12f",    0x00000, 0x100000, CRC(4f67d333) SHA1(608f921bfa6b7020c0ce72e5229b3f1489208b23) ) // 00, 01, 04, 05
 ROM_END
 
@@ -917,10 +917,10 @@ ROM_START( prtytime )
 	ROM_LOAD16_BYTE( "mcb-01.13a",    0x400001, 0x200000, CRC(06f40a57) SHA1(896f1d373e911dcff7223bf21756ad35b28b4c5d) )
 	ROM_LOAD16_BYTE( "mcb-03.14d",    0x400000, 0x200000, CRC(0aef73af) SHA1(76cf13f53da5202da80820f98660edee1eef7f1a) )
 
-	ROM_REGION( 0x80000, "OKIM6295_EFFECTS", 0 ) /* Oki samples */
+	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "pz_01-0.13h",    0x00000, 0x40000,  CRC(8925bce2) SHA1(0ff2d5db7a24a2af30bd753eba274572c32cc2e7) )
 
-	ROM_REGION( 0x200000, "OKIM6295_MUSIC", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
 	ROM_LOAD( "mcb-04.12f",    0x00000, 0x200000, CRC(e23d3590) SHA1(dc8418edc525f56e84f26e9334d5576000b14e5f) )
 ROM_END
 
@@ -940,10 +940,10 @@ ROM_START( gangonta )
 	ROM_LOAD16_BYTE( "mcb-01.13a",    0x400001, 0x200000, CRC(06f40a57) SHA1(896f1d373e911dcff7223bf21756ad35b28b4c5d) )
 	ROM_LOAD16_BYTE( "mcb-03.14d",    0x400000, 0x200000, CRC(0aef73af) SHA1(76cf13f53da5202da80820f98660edee1eef7f1a) )
 
-	ROM_REGION( 0x80000, "OKIM6295_EFFECTS", 0 ) /* Oki samples */
+	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "rd_01-0.13h",    0x00000, 0x40000,  CRC(70fd18c6) SHA1(368cd8e10c5f5a13eb3813974a7e6b46a4fa6b6c) )
 
-	ROM_REGION( 0x200000, "OKIM6295_MUSIC", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
 	ROM_LOAD( "mcb-04.12f",    0x00000, 0x200000, CRC(e23d3590) SHA1(dc8418edc525f56e84f26e9334d5576000b14e5f) )
 ROM_END
 
@@ -1002,10 +1002,10 @@ ROM_START( osman )
 	ROM_LOAD16_BYTE( "mcf-01.13a",    0x400001, 0x200000, CRC(83881e25) SHA1(ae82cf0f704e6efea94c6c1d276d4e3e5b3ebe43) )
 	ROM_LOAD16_BYTE( "mcf-03.14d",    0x400000, 0x200000, CRC(faf1d51d) SHA1(675dbbfe15b8010d54b2b3af26d42cdd753c2ce2) )
 
-	ROM_REGION( 0x80000, "OKIM6295_EFFECTS", 0 ) /* Oki samples */
+	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "sa01-0.13h",    0x00000, 0x40000,  CRC(cea8368e) SHA1(1fcc641381fdc29bd50d3a4b23e67647f79e505a))
 
-	ROM_REGION( 0x200000, "OKIM6295_MUSIC", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
 	ROM_LOAD( "mcf-05.12f",    0x00000, 0x200000, CRC(f007d376) SHA1(4ba20e5dabeacc3278b7f30c4462864cbe8f6984) )
 ROM_END
 
@@ -1027,10 +1027,10 @@ ROM_START( candance )
 	ROM_LOAD16_BYTE( "mcf-01.13a",    0x400001, 0x200000, CRC(83881e25) SHA1(ae82cf0f704e6efea94c6c1d276d4e3e5b3ebe43) )
 	ROM_LOAD16_BYTE( "mcf-03.14d",    0x400000, 0x200000, CRC(faf1d51d) SHA1(675dbbfe15b8010d54b2b3af26d42cdd753c2ce2) )
 
-	ROM_REGION( 0x80000, "OKIM6295_EFFECTS", 0 ) /* Oki samples */
+	ROM_REGION( 0x80000, "okisfx", 0 ) /* Oki samples */
 	ROM_LOAD( "sa01-0.13h",    0x00000, 0x40000,  CRC(cea8368e) SHA1(1fcc641381fdc29bd50d3a4b23e67647f79e505a))
 
-	ROM_REGION( 0x200000, "OKIM6295_MUSIC", 0 ) /* samples? (banked?) */
+	ROM_REGION( 0x200000, "okimusic", 0 ) /* samples? (banked?) */
 	ROM_LOAD( "mcf-05.12f",    0x00000, 0x200000, CRC(f007d376) SHA1(4ba20e5dabeacc3278b7f30c4462864cbe8f6984) )
 ROM_END
 

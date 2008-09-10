@@ -2228,7 +2228,7 @@ static MACHINE_DRIVER_START( scorpion2_vid )
 	MDRV_NVRAM_HANDLER(bfm_sc2)
 	MDRV_DEFAULT_LAYOUT(layout_bfm_sc2)
 
-	MDRV_SCREEN_ADD("ADDER", RASTER)
+	MDRV_SCREEN_ADD("adder", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE( 400, 280)
 	MDRV_SCREEN_VISIBLE_AREA(  0, 400-1, 0, 280-1)
@@ -2244,7 +2244,7 @@ static MACHINE_DRIVER_START( scorpion2_vid )
 
 	MDRV_CPU_ADD("adder2", M6809, MASTER_CLOCK/4 )	// adder2 board 6809 CPU at 2 Mhz
 	MDRV_CPU_PROGRAM_MAP(adder2_memmap,0)				// setup adder2 board memorymap
-	MDRV_CPU_VBLANK_INT("ADDER", adder2_vbl)			// board has a VBL IRQ
+	MDRV_CPU_VBLANK_INT("adder", adder2_vbl)			// board has a VBL IRQ
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)

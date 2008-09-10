@@ -1,8 +1,8 @@
 #ifndef NAMCO50_H
 #define NAMCO50_H
 
-#define CPUTAG_50XX "50XX"
-#define CPUTAG_50XX_2 "50XX_2"
+#define CPUTAG_50XX "50xx"
+#define CPUTAG_50XX_2 "50xx_2"
 
 ADDRESS_MAP_EXTERN( namco_50xx_map_program, 8 );
 ADDRESS_MAP_EXTERN( namco_50xx_map_data, 8 );

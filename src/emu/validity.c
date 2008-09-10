@@ -161,22 +161,26 @@ INLINE int validate_tag(const game_driver *driver, const char *object, const cha
 	const char *validchars = "abcdefghijklmnopqrstuvwxyz0123456789_.:";
 	const char *begin = strrchr(tag, ':');
 	const char *p;
+	int error = FALSE;
 
 	for (p = tag; *p != 0; p++)
 	{
 		if (*p != tolower(*p))
 		{
-			mame_printf_warning("%s: %s has %s with tag '%s' containing upper-case characters (warning)\n", driver->source_file, driver->name, object, tag);
+			mame_printf_error("%s: %s has %s with tag '%s' containing upper-case characters\n", driver->source_file, driver->name, object, tag);
+			error = TRUE;
 			break;
 		}
 		if (*p == ' ')
 		{
-			mame_printf_warning("%s: %s has %s with tag '%s' containing spaces (warning)\n", driver->source_file, driver->name, object, tag);
+			mame_printf_error("%s: %s has %s with tag '%s' containing spaces\n", driver->source_file, driver->name, object, tag);
+			error = TRUE;
 			break;
 		}
 		if (strchr(validchars, *p) == NULL)
 		{
-			mame_printf_warning("%s: %s has %s with tag '%s' containing invalid character '%c' (warning)\n", driver->source_file, driver->name, object, tag, *p);
+			mame_printf_error("%s: %s has %s with tag '%s' containing invalid character '%c'\n", driver->source_file, driver->name, object, tag, *p);
+			error = TRUE;
 			break;
 		}
 	}
@@ -187,11 +191,17 @@ INLINE int validate_tag(const game_driver *driver, const char *object, const cha
 		begin += 1;
 
 	if (strlen(begin) == 0)
-		mame_printf_warning("%s: %s has %s with 0-length tag (warning)\n", driver->source_file, driver->name, object);
+	{
+		mame_printf_error("%s: %s has %s with 0-length tag\n", driver->source_file, driver->name, object);
+		error = TRUE;
+	}
 	if (strlen(begin) > MAX_TAG_LENGTH)
-		mame_printf_warning("%s: %s has %s with tag '%s' > %d characters (warning)\n", driver->source_file, driver->name, object, tag, MAX_TAG_LENGTH);
+	{
+		mame_printf_error("%s: %s has %s with tag '%s' > %d characters\n", driver->source_file, driver->name, object, tag, MAX_TAG_LENGTH);
+		error = TRUE;
+	}
 
-	return 0;
+	return error;
 }
 
 
@@ -618,7 +628,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 				}
 				
 				/* validate the region tag */
-				validate_tag(driver, "region", regiontag);
+				error |= validate_tag(driver, "region", regiontag);
 			}
 
 			/* If this is a system bios, make sure it is using the next available bios number */
@@ -737,7 +747,7 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 		}
 				
 		/* validate the CPU tag */
-		validate_tag(driver, "CPU", cpu->tag);
+		error |= validate_tag(driver, "CPU", cpu->tag);
 
 		/* checks to see if this driver is using a dummy CPU */
 		if (cputype_get_interface(cpu->type)->get_info == dummy_get_info)
@@ -1538,7 +1548,7 @@ static int validate_sound(int drivnum, const machine_config *config)
 				}
 
 		/* validate the sound tag */
-		validate_tag(driver, "sound", config->sound[sndnum].tag);
+		error |= validate_tag(driver, "sound", config->sound[sndnum].tag);
 
 		/* loop over all the routes */
 		for (routenum = 0; routenum < config->sound[sndnum].routes; routenum++)
@@ -1587,7 +1597,7 @@ static int validate_devices(int drivnum, const machine_config *config)
 		device_validity_check_func validity_check = (device_validity_check_func) device_get_info_fct(device, DEVINFO_FCT_VALIDITY_CHECK);
 
 		/* validate the device tag */
-		validate_tag(driver, device_get_info_string(device, DEVINFO_STR_NAME), device->tag);
+		error |= validate_tag(driver, device_get_info_string(device, DEVINFO_STR_NAME), device->tag);
 
 		/* call the device-specific validity check */
 		if (validity_check != NULL && (*validity_check)(driver, device))

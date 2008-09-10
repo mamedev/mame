@@ -740,18 +740,18 @@ static MACHINE_DRIVER_START( tx1 )
 	MDRV_VIDEO_START(tx1)
 	MDRV_VIDEO_UPDATE(tx1)
 
-	MDRV_SPEAKER_STANDARD_STEREO("Front Left", "Front Right")
-//  MDRV_SPEAKER_STANDARD_STEREO("Rear Left", "Rear Right")
+	MDRV_SPEAKER_STANDARD_STEREO("frontleft", "frontright")
+//  MDRV_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
 
 	MDRV_SOUND_ADD("ay", AY8910, TX1_PIXEL_CLOCK / 8)
 	MDRV_SOUND_CONFIG(tx1_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "Front Left", 0.1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "Front Right", 0.1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.1)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.1)
 
 	MDRV_SOUND_ADD("tx1", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(tx1_custom_interface)
-	MDRV_SOUND_ROUTE(0, "Front Left", 0.2)
-	MDRV_SOUND_ROUTE(1, "Front Right", 0.2)
+	MDRV_SOUND_ROUTE(0, "frontleft", 0.2)
+	MDRV_SOUND_ROUTE(1, "frontright", 0.2)
 MACHINE_DRIVER_END
 
 
@@ -795,21 +795,21 @@ static MACHINE_DRIVER_START( buggyboy )
 	MDRV_VIDEO_START(buggyboy)
 	MDRV_VIDEO_UPDATE(buggyboy)
 
-	MDRV_SPEAKER_STANDARD_STEREO("Front Left", "Front Right")
-//  MDRV_SPEAKER_STANDARD_STEREO("Rear Left", "Rear Right")
+	MDRV_SPEAKER_STANDARD_STEREO("frontleft", "frontright")
+//  MDRV_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
 
 	MDRV_SOUND_ADD("ym1", YM2149, BUGGYBOY_ZCLK / 4)
 	MDRV_SOUND_CONFIG(buggyboy_ym2149_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "Front Left", 0.15)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.15)
 
 	MDRV_SOUND_ADD("ym2", YM2149, BUGGYBOY_ZCLK / 4)
 	MDRV_SOUND_CONFIG(buggyboy_ym2149_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "Front Right", 0.15)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
 
 	MDRV_SOUND_ADD("buggyboy", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(bb_custom_interface)
-	MDRV_SOUND_ROUTE(0, "Front Left", 0.2)
-	MDRV_SOUND_ROUTE(1, "Front Right", 0.2)
+	MDRV_SOUND_ROUTE(0, "frontleft", 0.2)
+	MDRV_SOUND_ROUTE(1, "frontright", 0.2)
 MACHINE_DRIVER_END
 
 
@@ -848,21 +848,21 @@ static MACHINE_DRIVER_START( buggybjr )
 	MDRV_VIDEO_UPDATE(buggybjr)
 	MDRV_VIDEO_EOF(buggyboy)
 
-	MDRV_SPEAKER_STANDARD_STEREO("Front Left", "Front Right")
-//  MDRV_SPEAKER_STANDARD_STEREO("Rear Left", "Rear Right")
+	MDRV_SPEAKER_STANDARD_STEREO("frontleft", "frontright")
+//  MDRV_SPEAKER_STANDARD_STEREO("rearleft", "rearright")
 
 	MDRV_SOUND_ADD("ym1", YM2149, BUGGYBOY_ZCLK / 4)
 	MDRV_SOUND_CONFIG(buggyboy_ym2149_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "Front Left", 0.15)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "frontleft", 0.15)
 
 	MDRV_SOUND_ADD("ym2", YM2149, BUGGYBOY_ZCLK / 4)
 	MDRV_SOUND_CONFIG(buggyboy_ym2149_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "Front Right", 0.15)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "frontright", 0.15)
 
 	MDRV_SOUND_ADD("buggyboy", CUSTOM, 0)
 	MDRV_SOUND_CONFIG(bb_custom_interface)
-	MDRV_SOUND_ROUTE(0, "Front Left", 0.2)
-	MDRV_SOUND_ROUTE(1, "Front Right", 0.2)
+	MDRV_SOUND_ROUTE(0, "frontleft", 0.2)
+	MDRV_SOUND_ROUTE(1, "frontright", 0.2)
 MACHINE_DRIVER_END
 
 /*************************************

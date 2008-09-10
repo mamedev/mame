@@ -85,7 +85,7 @@ TODO:
 #include "sound/dac.h"
 
 
-#define CPUTAG_MCU "MCU"
+#define CPUTAG_MCU "mcu"
 
 extern UINT8 *champbas_bg_videoram;
 
@@ -743,7 +743,7 @@ ROM_START( talbot )
 	ROM_LOAD( "15.10i", 0x4000, 0x1000, CRC(0225b7ef) SHA1(9adee4831eb633b0a31580596205a655df94c2b2) )
 	ROM_LOAD( "16.11i", 0x5000, 0x1000, CRC(1612adf5) SHA1(9adeb21d5d1692f6e31460062f03f2008076b307) )
 
-	ROM_REGION( 0x2000, "MCU", 0 )
+	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "8201.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
 
 	ROM_REGION( 0x1000, "gfx1", ROMREGION_DISPOSE )	// chars
@@ -790,7 +790,7 @@ ROM_START( champbbj )
 	ROM_LOAD( "17.2l", 0x2000, 0x2000, CRC(f10b148b) SHA1(d66516d509f6f16e51ee59d27c4867e276064c3f) )
 	ROM_LOAD( "18.2n", 0x4000, 0x2000, CRC(2dc484dd) SHA1(28bd68c787d7e6989849ca52009948dbd5cdcc79) )
 
-	ROM_REGION( 0x2000, "MCU", 0 )
+	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "8201.bin", 0x0000, 0x2000, CRC(b77931ac) SHA1(405b02585e80d95a2821455538c5c2c31ce262d1) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )	// chars + sprites: rearranged by DRIVER_INIT to leave only chars
@@ -839,7 +839,7 @@ ROM_START( champbb2 )
 	ROM_LOAD( "epr5935", 0x4000, 0x2000, CRC(3c911786) SHA1(eea0c467e213d237b5bb9d04b19a418d6090c2dc) )
 
 	// the pcb has a 8302 on it, though only the 8201 instructions are used
-	ROM_REGION( 0x2000, "MCU", 0 )
+	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "8302.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )	// chars + sprites: rearranged by DRIVER_INIT to leave only chars
@@ -867,7 +867,7 @@ ROM_START( champb2a )
 	ROM_LOAD( "epr5935", 0x4000, 0x2000, CRC(3c911786) SHA1(eea0c467e213d237b5bb9d04b19a418d6090c2dc) )
 
 	// the pcb has a 8302 on it, though only the 8201 instructions are used
-	ROM_REGION( 0x2000, "MCU", 0 )
+	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "8302.bin", 0x0000, 0x2000, CRC(edabac6c) SHA1(eaf1c51b63023256df526b0d3fd53cffc919c901) )
 
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )	// chars + sprites: rearranged by DRIVER_INIT to leave only chars
@@ -1000,7 +1000,7 @@ ROM_START( exctscc2 )
 	ROM_LOAD( "7_c6.bin",     0x6000, 0x2000, CRC(6d51521e) SHA1(2809bd2e61f40dcd31d43c62520982bdcfb0a865) )	/* vr.7h */
 	ROM_LOAD( "1_a6.bin",     0x8000, 0x1000, CRC(20f2207e) SHA1(b1ed2237d0bd50ddbe593fd2fbff9f1d67c1eb11) )	/* vr.7k */
 
-	ROM_REGION( 0x2000, "MCU", 0 )
+	ROM_REGION( 0x2000, "mcu", 0 )
 	ROM_LOAD( "8303.bin", 0x0000, 0x2000, CRC(66adcb37) SHA1(e1c72ecb161129dcbddc0b16dd90e716d0c79311) )
 
 	ROM_REGION( 0x04000, "gfx1", ROMREGION_DISPOSE )	// 3bpp chars + sprites: rearranged by DRIVER_INIT to leave only chars

@@ -285,7 +285,7 @@ ROM_START( darkmist )
 
 	ROM_LOAD( "dm_16.rom", 0x10000, 0x08000, CRC(094579d9) SHA1(2449bc9ba38396912ee9b72dd870ea9fcff95776) )
 
-	ROM_REGION( 0x10000, "T5182", 0 ) /* Toshiba T5182 module */
+	ROM_REGION( 0x10000, "t5182", 0 ) /* Toshiba T5182 module */
 	ROM_LOAD( "t5182.rom", 0x0000, 0x2000, CRC(d354c8fc) SHA1(a1c9e1ac293f107f69cc5788cf6abc3db1646e33) )
 	ROM_LOAD( "dm_17.rom", 0x8000, 0x8000, CRC(7723dcae) SHA1(a0c69e7a7b6fd74f7ed6b9c6419aed94aabcd4b0) )
 
@@ -414,7 +414,7 @@ static void decrypt_gfx(running_machine *machine)
 static void decrypt_snd(running_machine *machine)
 {
 	int i;
-	UINT8 *ROM = memory_region(machine, "T5182");
+	UINT8 *ROM = memory_region(machine, "t5182");
 
 	for(i=0x8000;i<0x10000;i++)
 		ROM[i] = BITSWAP8(ROM[i], 7,1,2,3,4,5,6,0);

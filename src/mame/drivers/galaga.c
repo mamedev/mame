@@ -1705,7 +1705,7 @@ static MACHINE_DRIVER_START( bosco )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	/* discrete circuit on the 54XX outputs */
-	MDRV_SOUND_ADD("Discrete", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(bosco)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_DRIVER_END
@@ -1760,7 +1760,7 @@ static MACHINE_DRIVER_START( galaga )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 
 	/* discrete circuit on the 54XX outputs */
-	MDRV_SOUND_ADD("Discrete", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(galaga)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_DRIVER_END
@@ -1776,7 +1776,7 @@ static MACHINE_DRIVER_START( galagab )
 	MDRV_CPU_PROGRAM_MAP(readmem4_galaga,writemem4_galaga)
 
 	/* sound hardware */
-	MDRV_SOUND_REMOVE("Discrete")
+	MDRV_SOUND_REMOVE("discrete")
 MACHINE_DRIVER_END
 
 
@@ -1833,7 +1833,7 @@ static MACHINE_DRIVER_START( xevious )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 
 	/* discrete circuit on the 54XX outputs */
-	MDRV_SOUND_ADD("Discrete", DISCRETE, 0)
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(galaga)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_DRIVER_END
@@ -1856,7 +1856,7 @@ static MACHINE_DRIVER_START( battles )
 	MDRV_PALETTE_INIT(battles)
 
 	/* sound hardware */
-	MDRV_SOUND_REMOVE("Discrete")
+	MDRV_SOUND_REMOVE("discrete")
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(battles_samples_interface)

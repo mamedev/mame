@@ -4999,7 +4999,7 @@ ROM_START( kof2000 ) /* Original Version, Encrypted Code + Sound + GFX Roms */
 	ROM_LOAD( "sfix.sfx",  0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
 	/* The M1 ROM is encrypted, we load it here for reference and replace it with a decrypted version */
-	ROM_REGION( 0x40000, "audioencrypted", 0 )
+	ROM_REGION( 0x40000, "audiocrypt", 0 )
 	ROM_LOAD( "257-m1.bin", 0x00000, 0x40000, CRC(4b749113) SHA1(2af2361146edd0ce3966614d90165a5c1afb8de4) )
 	NEO_BIOS_AUDIO_256K( "257-m1_decrypted.bin", CRC(d404db70) SHA1(8cd1f3e140a9a367de23544e76371b0491287909) )
 
@@ -5036,7 +5036,7 @@ ROM_START( kof2000n ) /* Original Version, Encrypted Sound + GFX Roms */
 	ROM_LOAD( "sfix.sfx",  0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
 	/* The M1 ROM is encrypted, we load it here for reference and replace it with a decrypted version */
-	ROM_REGION( 0x40000, "audioencrypted", 0 )
+	ROM_REGION( 0x40000, "audiocrypt", 0 )
 	ROM_LOAD( "257-m1.bin", 0x00000, 0x40000, CRC(4b749113) SHA1(2af2361146edd0ce3966614d90165a5c1afb8de4) )
 	NEO_BIOS_AUDIO_256K( "257-m1_decrypted.bin", CRC(d404db70) SHA1(8cd1f3e140a9a367de23544e76371b0491287909) )
 
@@ -5205,7 +5205,7 @@ ROM_START( kof2001 ) /* MVS VERSION */
 	ROM_LOAD( "sfix.sfx",  0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
 	/* The M1 ROM is encrypted, we load it here for reference and replace it with a decrypted version */
-	ROM_REGION( 0x40000, "audioencrypted", 0 )
+	ROM_REGION( 0x40000, "audiocrypt", 0 )
 	ROM_LOAD( "265-262-m1.bin", 0x00000, 0x40000, CRC(a7f8119f) SHA1(71805b39b8b09c32425cf39f9de59b2f755976c2) ) /* yes it really does have a strange name */
 	/* Decrypted */
 	NEO_BIOS_AUDIO_256K( "265-262_decrypted-m1.bin", CRC(4bcc537b) SHA1(9fcf1342bcd53d5eec12c46ee41a51bf543256c2) )
@@ -5244,7 +5244,7 @@ ROM_START( kof2001h ) /* AES VERSION */
 	ROM_LOAD( "sfix.sfx",  0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
 	/* The M1 ROM is encrypted, we load it here for reference and replace it with a decrypted version */
-	ROM_REGION( 0x40000, "audioencrypted", 0 )
+	ROM_REGION( 0x40000, "audiocrypt", 0 )
 	ROM_LOAD( "265-262-m1.bin", 0x00000, 0x40000, CRC(a7f8119f) SHA1(71805b39b8b09c32425cf39f9de59b2f755976c2) ) /* yes it really does have a strange name */
 	/* Decrypted */
 	NEO_BIOS_AUDIO_256K( "265-262_decrypted-m1.bin", CRC(4bcc537b) SHA1(9fcf1342bcd53d5eec12c46ee41a51bf543256c2) )
@@ -5283,7 +5283,7 @@ ROM_START( mslug4 ) /* Original Version - Encrypted GFX */ /* MVS VERSION */
 	ROM_LOAD( "sfix.sfx",  0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
 	/* The M1 ROM is encrypted, we load it here for reference and replace it with a decrypted version */
-	ROM_REGION( 0x20000, "audioencrypted", 0 )
+	ROM_REGION( 0x20000, "audiocrypt", 0 )
 	ROM_LOAD( "263-m1.bin", 0x00000, 0x20000, CRC(46ac8228) SHA1(5aeea221050c98e4bb0f16489ce772bf1c80f787) )
 	/* Decrypted */
 	NEO_BIOS_AUDIO_128K( "263-m1_decrypted.bin", CRC(ef5db532) SHA1(4aeba9e206b8f309610eb7e1891644f39aa61830) )
@@ -5344,7 +5344,7 @@ ROM_START( rotd ) /* Encrypted Set */ /* MVS VERSION */
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfx", 0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
-	ROM_REGION( 0x20000, "audioencrypted", 0 )
+	ROM_REGION( 0x20000, "audiocrypt", 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
 	ROM_LOAD( "264-m1.bin", 0x00000, 0x20000, CRC(4dbd7b43) SHA1(6b63756b0d2d30bbf13fbd219833c81fd060ef96) )
 	/* Decrypted */
@@ -5382,7 +5382,7 @@ ROM_START( kof2002 ) /* Encrypted Set */
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfx", 0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
-	ROM_REGION( 0x20000, "audioencrypted", 0 )
+	ROM_REGION( 0x20000, "audiocrypt", 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
 	ROM_LOAD( "265-m1.bin", 0x00000, 0x20000, CRC(85aaa632) SHA1(744fba4ca3bc3a5873838af886efb97a8a316104) )
 	/* Decrypted */
@@ -5414,7 +5414,7 @@ ROM_START( kf2k2pls ) /* bootleg */
 
 	NEO_SFIX_128K( "265-s1p.bin", CRC(595e0006) SHA1(ff086bdaa6f40e9ad963e1100a27f44618d684ed) )
 
-	ROM_REGION( 0x20000, "audioencrypted", 0 )
+	ROM_REGION( 0x20000, "audiocrypt", 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
 	ROM_LOAD( "265-m1.bin", 0x00000, 0x20000, CRC(85aaa632) SHA1(744fba4ca3bc3a5873838af886efb97a8a316104) )
 	/* Decrypted */
@@ -5446,7 +5446,7 @@ ROM_START( kf2k2pla ) /* bootleg */
 
 	NEO_SFIX_128K( "265-s1pa.bin",  CRC(1a3ed064) SHA1(9749bb55c750e6b65d651998c2649c5fb68db68e))
 
-	ROM_REGION( 0x20000, "audioencrypted", 0 )
+	ROM_REGION( 0x20000, "audiocrypt", 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
 	ROM_LOAD( "265-m1.bin", 0x00000, 0x20000, CRC(85aaa632) SHA1(744fba4ca3bc3a5873838af886efb97a8a316104) )
 	/* Decrypted */
@@ -5538,7 +5538,7 @@ ROM_START( matrim ) /* Encrypted Set */ /* MVS AND AES VERSION */
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfx", 0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
-	ROM_REGION( 0x20000, "audioencrypted", 0 )
+	ROM_REGION( 0x20000, "audiocrypt", 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
 	ROM_LOAD( "266-m1.bin", 0x00000, 0x20000, CRC(456c3e6c) SHA1(5a07d0186198a18d2dda1331093cf29b0b9b2984) )
 	/* Decrypted */
@@ -5575,7 +5575,7 @@ ROM_START( pnyaa ) /* Encrypted Set */ /* MVS VERSION */
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfx", 0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
-	ROM_REGION( 0x80000, "audioencrypted", 0 )
+	ROM_REGION( 0x80000, "audiocrypt", 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
 	ROM_LOAD( "267-m1.bin", 0x00000, 0x80000, CRC(c7853ccd) SHA1(1b7a4c5093cf0fe3861ce44fd1d3b30c71ad0abe) )
 	/* Decrypted */
@@ -5606,7 +5606,7 @@ ROM_START( mslug5 ) /* Encrypted Set */ /* MVS VERSION */
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfx", 0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
-	ROM_REGION( 0x80000, "audioencrypted", 0 )
+	ROM_REGION( 0x80000, "audiocrypt", 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
 	ROM_LOAD( "268-m1.bin", 0x00000, 0x80000, CRC(4a5a6e0e) SHA1(df0f660f2465e1db7be5adfcaf5e88ad61a74a42) )
 	/* Decrypted */
@@ -5644,7 +5644,7 @@ ROM_START( mslug5h ) /* Encrypted Set */ /* AES release of the game but is also 
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfx", 0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
-	ROM_REGION( 0x80000, "audioencrypted", 0 )
+	ROM_REGION( 0x80000, "audiocrypt", 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
 	ROM_LOAD( "268-m1h.bin", 0x00000, 0x80000, CRC(4a5a6e0e) SHA1(df0f660f2465e1db7be5adfcaf5e88ad61a74a42) ) /* Same as MVS above, but different label */
 	/* Decrypted */
@@ -5721,7 +5721,7 @@ ROM_START( ms5plus )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfx", 0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
-	ROM_REGION( 0x80000, "audioencrypted", 0 )
+	ROM_REGION( 0x80000, "audiocrypt", 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
 	ROM_LOAD( "268-m1.bin", 0x00000, 0x80000, CRC(4a5a6e0e) SHA1(df0f660f2465e1db7be5adfcaf5e88ad61a74a42) )
 	/* Decrypted */
@@ -5828,7 +5828,7 @@ ROM_START( svc ) /* Encrypted Set */ /* MVS AND AES VERSION */
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfx", 0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
-	ROM_REGION( 0x80000, "audioencrypted", 0 )
+	ROM_REGION( 0x80000, "audiocrypt", 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
 	ROM_LOAD( "269-m1.bin", 0x00000, 0x80000, CRC(f6819d00) SHA1(d3bbe09df502464f104e53501708ac6e2c1832c6) )
 	/* Decrypted */
@@ -6020,7 +6020,7 @@ ROM_START( samsho5 ) /* Encrypted Set */ /* MVS VERSION */
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfx", 0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
-	ROM_REGION( 0x80000, "audioencrypted", 0 )
+	ROM_REGION( 0x80000, "audiocrypt", 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
 	ROM_LOAD( "270-m1.bin", 0x00000, 0x80000, CRC(49c9901a) SHA1(2623e9765a0eba58fee2de72851e9dc502344a3d) )
 	/* Decrypted */
@@ -6058,7 +6058,7 @@ ROM_START( samsho5h ) /* Encrypted Set, Alternate Set */
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfx", 0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
-	ROM_REGION( 0x80000, "audioencrypted", 0 )
+	ROM_REGION( 0x80000, "audiocrypt", 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
 	ROM_LOAD( "270-m1.bin", 0x00000, 0x80000, CRC(49c9901a) SHA1(2623e9765a0eba58fee2de72851e9dc502344a3d) )
 	/* Decrypted */
@@ -6096,7 +6096,7 @@ ROM_START( samsho5b ) /* bootleg */
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfx", 0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
-	ROM_REGION( 0x80000, "audioencrypted", 0 )
+	ROM_REGION( 0x80000, "audiocrypt", 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
 	ROM_LOAD( "270-m1.bin", 0x00000, 0x80000, CRC(49c9901a) SHA1(2623e9765a0eba58fee2de72851e9dc502344a3d) )
 	/* Decrypted */
@@ -6174,7 +6174,7 @@ ROM_START( kof2003 ) /* Encrypted Code + Sound + GFX Roms */ /* MVS VERSION */
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfx",  0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
-	ROM_REGION( 0x080000, "audioencrypted", 0 )
+	ROM_REGION( 0x080000, "audiocrypt", 0 )
 	/* The M1 ROM is encrypted, we load it here for reference and replace it with a decrypted version */
 	ROM_LOAD( "271-m1c.bin", 0x00000, 0x080000, CRC(f5515629) SHA1(7516bf1b0207a3c8d41dc30c478f8d8b1f71304b) )
 	/* Decrypted */
@@ -6329,7 +6329,7 @@ ROM_START( samsh5sp ) /* Encrypted Set */
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfx", 0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
-	ROM_REGION( 0x80000, "audioencrypted", 0 )
+	ROM_REGION( 0x80000, "audiocrypt", 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
 	ROM_LOAD( "272-m1.bin", 0x00000, 0x80000, CRC(adeebf40) SHA1(8cbd63dda3fff4de38060405bf70cd9308c9e66e) )
 	/* Decrypted */
@@ -6367,7 +6367,7 @@ ROM_START( samsh5sh ) /* Encrypted Set */
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfx", 0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
-	ROM_REGION( 0x80000, "audioencrypted", 0 )
+	ROM_REGION( 0x80000, "audiocrypt", 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
 	ROM_LOAD( "272-m1.bin", 0x00000, 0x80000, CRC(adeebf40) SHA1(8cbd63dda3fff4de38060405bf70cd9308c9e66e) )
 	/* Decrypted */
@@ -6405,7 +6405,7 @@ ROM_START( samsh5sn ) /* Encrypted Set */
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfx", 0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
-	ROM_REGION( 0x80000, "audioencrypted", 0 )
+	ROM_REGION( 0x80000, "audiocrypt", 0 )
 	/* Encrypted, we load it here for reference and replace with decrypted ROM */
 	ROM_LOAD( "272-m1.bin", 0x00000, 0x80000, CRC(adeebf40) SHA1(8cbd63dda3fff4de38060405bf70cd9308c9e66e) )
 	/* Decrypted */
@@ -6443,7 +6443,7 @@ ROM_START( jockeygp )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
 	ROM_LOAD( "sfix.sfx", 0x000000, 0x20000, CRC(354029fc) SHA1(4ae4bf23b4c2acff875775d4cbff5583893ce2a1) )
 
-	ROM_REGION( 0x80000, "audioencrypted", 0 )
+	ROM_REGION( 0x80000, "audiocrypt", 0 )
 	 /* encrypted, we load it here for reference and replace with decrypted ROM */
 	ROM_LOAD( "jgp-m1.bin", 0x00000, 0x80000, CRC(d163c690) SHA1(1dfd04d20c5985037f07cd01000d0b04f3a8f4f4) )
 	/* Decrypted */
@@ -6722,7 +6722,7 @@ ROM_START( kf10thep ) /* this is a hack of kof2002 much like the various korean 
 	ROM_LOAD16_WORD_SWAP( "5008-p2.rom", 0x100000, 0x400000, CRC(a649ec38) SHA1(5c63ed5e5c848940f587c966da4908d04cf1293c) )
 	ROM_LOAD16_WORD_SWAP( "5008-p3.rom", 0x500000, 0x200000, CRC(e629e13c) SHA1(6ebe080ce01c51064cb2f4d89315ba98a45ae727) )
 
-	ROM_REGION( 0x200000, "audioencrypted", 0 )
+	ROM_REGION( 0x200000, "audiocrypt", 0 )
 	ROM_LOAD( "5008-p1.rom", 0x000000, 0x200000, CRC(bf5469ba) SHA1(f05236d8fffab5836c0d27becdeeb80def32ee49) )
 
 	NEO_SFIX_128K( "5008-s1.rom", CRC(92410064) SHA1(1fb800b46341858207d3b6961a760289fbec7faa) )

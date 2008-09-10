@@ -450,7 +450,7 @@ static const at28c16_config at28c16_intf =
 
 static MACHINE_DRIVER_START( zn1_1mb_vram )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "MAIN", PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD( "main", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
@@ -489,7 +489,7 @@ MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( zn2 )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "MAIN", PSXCPU, XTAL_100MHz )
+	MDRV_CPU_ADD( "main", PSXCPU, XTAL_100MHz )
 	MDRV_CPU_PROGRAM_MAP( zn_map, 0 )
 	MDRV_CPU_VBLANK_INT("main", psx_vblank)
 
@@ -2353,7 +2353,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( coh1000a_ide )
 	MDRV_IMPORT_FROM( zn1_2mb_vram )
 
-	MDRV_CPU_MODIFY( "MAIN" )
+	MDRV_CPU_MODIFY( "main" )
 	MDRV_CPU_VBLANK_INT("main", jdredd_vblank)
 
 	MDRV_MACHINE_RESET( coh1000a )

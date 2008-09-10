@@ -295,7 +295,7 @@ static MACHINE_DRIVER_START( orbit )
 	MDRV_CPU_PROGRAM_MAP(orbit_map, 0)
 	MDRV_CPU_VBLANK_INT("main", orbit_interrupt)
 
-	MDRV_TIMER_ADD_SCANLINE("32V", nmi_32v, "main", 0, 32)
+	MDRV_TIMER_ADD_SCANLINE("32v", nmi_32v, "main", 0, 32)
 
 	MDRV_MACHINE_RESET(orbit)
 

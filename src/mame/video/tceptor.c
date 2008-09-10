@@ -550,9 +550,9 @@ VIDEO_UPDATE( tceptor )
 	int pri;
 	int bg_center = 144 - ((((bg1_scroll_x + bg2_scroll_x ) & 0x1ff) - 288) / 2);
 
-	const device_config *_2d_screen       = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "2D");
-	const device_config *_3d_left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "3D Left");
-	const device_config *_3d_right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "3D Right");
+	const device_config *_2d_screen       = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "2d");
+	const device_config *_3d_left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "3dleft");
+	const device_config *_3d_right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "3dright");
 
 	if (screen != _2d_screen)
 	{

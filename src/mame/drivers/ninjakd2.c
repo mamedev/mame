@@ -971,7 +971,7 @@ static MACHINE_DRIVER_START( ninjakd2 )
 	MDRV_SOUND_ROUTE(2, "mono", 0.10)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD("PCM", SAMPLES, 0)
+	MDRV_SOUND_ADD("pcm", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(ninjakd2_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_DRIVER_END
@@ -988,7 +988,7 @@ static MACHINE_DRIVER_START( mnight )
 	MDRV_VIDEO_START(mnight)
 
 	/* sound hardware */
-	MDRV_SOUND_REMOVE("PCM")
+	MDRV_SOUND_REMOVE("pcm")
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( robokid )
