@@ -3223,8 +3223,53 @@ GAME( 200?, wsbbgd,    naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",     
 GAME( 200?, vathlete,  naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Naomi 2 & Naomi 2 GD-ROM */
+
+
+ROM_START( vstrik3 )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("vs3.bin", 0x0000000,   0xb000000, CRC(79d44ff4) SHA1(af0b892531c60999f0ef5db7525de50836764c77) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0006", 0, SHA1(293b84c7f4547060f57598b796b6fc49513cc839) MD5(060d9fef55d8f0fc1986ecc991478942) )
+
+	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
+	// todo
+ROM_END
+
+ROM_START( vf4 )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0xf000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("vf4.bin", 0x0000000,   0xf000000, CRC(a81e3277) SHA1(fb162f34720d6ba49297ecb5e2869b2afffc307b) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0012", 0, SHA1(d68436ee72ea5db40e184b7ff38903a9cadb6df7) MD5(5a18300646a68f2994ed8c81abe9bdd8) )
+
+	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
+	// todo
+ROM_END
+
+ROM_START( initd )
+	NAOMIGD_BIOS
+
+	ROM_REGION( 0xc2ed000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
+	ROM_LOAD("inid.bin", 0x0000000,    0xc2ed000, CRC(524ca451) SHA1(cc8dd06e4fe50e70f277043bd1b817e41c5db8cf) )
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0020b", 0, SHA1(5f386183e856722fee4a6ddb0146350b73349181) MD5(b085005215e2766e0fc1e3bd16b2fd95) )
+
+	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
+	// todo
+ROM_END
+
 GAME( 2001, naomi2,   0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi 2 Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
-/* No Supported Sets */
+// GDS-xxxx (first party games?)
+GAME( 200?, vstrik3, naomi2,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Virtua Striker 3 (GDS-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, vf4,     naomi2,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Virtua Fighter 4 (GDS-0012)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, initd,   naomi2,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Initial D (GDS-0020b)", GAME_NO_SOUND|GAME_NOT_WORKING )
+
 
 /* Atomiswave */
 GAME( 2001, awbios,   0,        naomi,    naomi,    0, ROT0, "Sammy",           "Atomiswave Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
