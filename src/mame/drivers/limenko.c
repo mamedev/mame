@@ -24,13 +24,21 @@
 */
 
 #include "driver.h"
-#include "sound/okim6295.h"
 #include "machine/eeprom.h"
+#include "sound/okim6295.h"
 
 static tilemap *bg_tilemap, *md_tilemap, *fg_tilemap;
 static UINT32 *bg_videoram, *md_videoram, *fg_videoram, *limenko_videoreg;
 
 static UINT32 *mainram;
+static int spriteram_bit;
+
+static bitmap_t *sprites_bitmap;
+static bitmap_t *sprites_bitmap_pri;
+
+static int prev_sprites_count = 0;
+
+static void draw_sprites(running_machine *machine, UINT32 *sprites, const rectangle *cliprect, int count);
 
 /*****************************************************************************************************
   MISC FUNCTIONS
@@ -91,6 +99,40 @@ static WRITE32_HANDLER( spotty_soundlatch_w )
 	soundlatch_w(machine, 0, (data >> 16) & 0xff);
 }
 
+static CUSTOM_INPUT( spriteram_bit_r )
+{
+	return spriteram_bit;
+}
+
+static WRITE32_HANDLER( spriteram_buffer_w )
+{
+	rectangle clip;
+	clip.min_x = 0;
+	clip.max_x = 383;
+	clip.min_y = 0;
+	clip.max_y = 239;
+
+	fillbitmap(sprites_bitmap_pri,0,&clip);
+	fillbitmap(sprites_bitmap,0,&clip);
+
+	// toggle spriterams location in the memory map
+	spriteram_bit ^= 1;
+
+	if(spriteram_bit)
+	{
+		// draw the sprites to the frame buffer
+		draw_sprites(machine,spriteram32_2,&clip,prev_sprites_count);
+	}
+	else
+	{
+		// draw the sprites to the frame buffer
+		draw_sprites(machine,spriteram32,&clip,prev_sprites_count);	
+	}
+
+	// buffer the next number of sprites to draw
+	prev_sprites_count = (limenko_videoreg[0] & 0x1ff0000) >> 16;
+}
+
 /*****************************************************************************************************
   MEMORY MAPS
 *****************************************************************************************************/
@@ -101,12 +143,12 @@ static ADDRESS_MAP_START( limenko_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
 	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_BASE(&md_videoram)
 	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
-	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE(&spriteram32)
+	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE(&spriteram32_2)
 	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE(limenko_paletteram_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
 	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE(&limenko_videoreg)
-	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITENOP // video reg? background pen?
+	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE(spriteram_buffer_w)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
@@ -128,12 +170,12 @@ static ADDRESS_MAP_START( spotty_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x80000000, 0x80007fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE(&fg_videoram)
 	AM_RANGE(0x80008000, 0x8000ffff) AM_RAM_WRITE(md_videoram_w) AM_BASE(&md_videoram)
 	AM_RANGE(0x80010000, 0x80017fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE(&bg_videoram)
-	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE(&spriteram32)
+	AM_RANGE(0x80018000, 0x80018fff) AM_RAM AM_BASE(&spriteram32) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x80019000, 0x80019fff) AM_RAM AM_BASE(&spriteram32_2)
 	AM_RANGE(0x8001c000, 0x8001dfff) AM_RAM_WRITE(limenko_paletteram_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x8001e000, 0x8001ebff) AM_RAM // ? not used
 	AM_RANGE(0x8001ffec, 0x8001ffff) AM_RAM AM_BASE(&limenko_videoreg)
-	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITENOP // video reg? background pen?
+	AM_RANGE(0x8003e000, 0x8003e003) AM_WRITE(spriteram_buffer_w)
 	AM_RANGE(0xfff00000, 0xffffffff) AM_ROM AM_REGION("user1",0)
 ADDRESS_MAP_END
 
@@ -150,11 +192,30 @@ static ADDRESS_MAP_START( spotty_sound_prg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
+static UINT8 spotty_sound_cmd=0;
+static WRITE8_HANDLER( spotty_sound_cmd_w )
+{
+	spotty_sound_cmd = data;
+}
+
+static READ8_HANDLER( spotty_sound_cmd_r )
+{
+	return 0; //??? some status bit? if set it executes a jump in the code
+}
+
+static READ8_HANDLER( spotty_sound_r )
+{
+	// check spotty_sound_cmd bits...
+
+	if(spotty_sound_cmd == 0xf7)
+		return soundlatch_r(machine,0);
+	else
+		return okim6295_status_0_r(machine,0);
+}
+
 static ADDRESS_MAP_START( spotty_sound_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0001, 0x0001) AM_READ(soundlatch_r)
-	AM_RANGE(0x0003, 0x0003) AM_READ(okim6295_status_0_r)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(okim6295_data_0_w)
-	AM_RANGE(0x0003, 0x0003) AM_WRITENOP
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(spotty_sound_r, okim6295_data_0_w) //? sound latch and ?	
+	AM_RANGE(0x0003, 0x0003) AM_READWRITE(spotty_sound_cmd_r, spotty_sound_cmd_w) //not sure about anything...
 ADDRESS_MAP_END
 
 /*****************************************************************************************************
@@ -182,11 +243,110 @@ static TILE_GET_INFO( get_fg_tile_info )
 	SET_TILE_INFO(0,tile,color,0);
 }
 
+static void draw_single_sprite(bitmap_t *dest_bmp,const gfx_element *gfx,
+		UINT32 code,UINT32 color,int flipx,int flipy,int sx,int sy,
+		const rectangle *clip,int priority)
+{
+	int pal_base = gfx->color_base + gfx->color_granularity * (color % gfx->total_colors);
+	UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
+
+	int sprite_screen_height = ((1<<16)*gfx->height+0x8000)>>16;
+	int sprite_screen_width = ((1<<16)*gfx->width+0x8000)>>16;
+
+	if (sprite_screen_width && sprite_screen_height)
+	{
+		/* compute sprite increment per screen pixel */
+		int dx = (gfx->width<<16)/sprite_screen_width;
+		int dy = (gfx->height<<16)/sprite_screen_height;
+
+		int ex = sx+sprite_screen_width;
+		int ey = sy+sprite_screen_height;
+
+		int x_index_base;
+		int y_index;
+
+		if( flipx )
+		{
+			x_index_base = (sprite_screen_width-1)*dx;
+			dx = -dx;
+		}
+		else
+		{
+			x_index_base = 0;
+		}
+
+		if( flipy )
+		{
+			y_index = (sprite_screen_height-1)*dy;
+			dy = -dy;
+		}
+		else
+		{
+			y_index = 0;
+		}
+
+		if( clip )
+		{
+			if( sx < clip->min_x)
+			{ /* clip left */
+				int pixels = clip->min_x-sx;
+				sx += pixels;
+				x_index_base += pixels*dx;
+			}
+			if( sy < clip->min_y )
+			{ /* clip top */
+				int pixels = clip->min_y-sy;
+				sy += pixels;
+				y_index += pixels*dy;
+			}
+			/* NS 980211 - fixed incorrect clipping */
+			if( ex > clip->max_x+1 )
+			{ /* clip right */
+				int pixels = ex-clip->max_x-1;
+				ex -= pixels;
+			}
+			if( ey > clip->max_y+1 )
+			{ /* clip bottom */
+				int pixels = ey-clip->max_y-1;
+				ey -= pixels;
+			}
+		}
+
+		if( ex>sx )
+		{ /* skip if inner loop doesn't draw anything */
+			int y;
+
+			for( y=sy; y<ey; y++ )
+			{
+				UINT8 *source = source_base + (y_index>>16) * gfx->line_modulo;
+				UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
+				UINT8 *pri = BITMAP_ADDR8(sprites_bitmap_pri, y, 0);
+
+				int x, x_index = x_index_base;
+				for( x=sx; x<ex; x++ )
+				{
+					int c = source[x_index>>16];
+					if( c != 0 )
+					{
+						if (pri[x]<priority)
+							dest[x] = pal_base+c;
+
+						pri[x] = priority;
+						
+					}
+					x_index += dx;
+				}
+
+				y_index += dy;
+			}
+		}
+	}
+}
+
 // sprites aren't tile based (except for 8x8 ones)
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void draw_sprites(running_machine *machine, UINT32 *sprites, const rectangle *cliprect, int count)
 {
 	int i;
-	int sprites_on_screen = (limenko_videoreg[0] & 0x1ff0000) >> 16;
 
 	UINT8 *base_gfx	= memory_region(machine, "gfx1");
 	UINT8 *gfx_max	= base_gfx + memory_region_length(machine, "gfx1");
@@ -194,27 +354,33 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	UINT8 *gfxdata;
 	gfx_element gfx;
 
-	for(i = 0; i <= sprites_on_screen*2; i += 2)
+	for(i = 0; i <= count*2; i += 2)
 	{
 		int x, width, flipx, y, height, flipy, code, color, pri;
 
-		if(~spriteram32[i] & 0x80000000) continue;
+		if(~sprites[i] & 0x80000000) continue;
 
-		x = ((spriteram32[i] & 0x1ff0000) >> 16) - 1;
-		width = (((spriteram32[i] & 0xe000000) >> 25) + 1) * 8;
-		flipx = spriteram32[i] & 0x10000000;
-		y = (spriteram32[i] & 0x1ff) + 1;
-		height = (((spriteram32[i] & 0xe00) >> 9) + 1) * 8;
-		flipy = spriteram32[i] & 0x1000;
-		code = spriteram32[i + 1] & 0x7ffff;
-		color = (spriteram32[i + 1] & 0xf0000000) >> 28;
+		x = ((sprites[i] & 0x1ff0000) >> 16);
+		width = (((sprites[i] & 0xe000000) >> 25) + 1) * 8;
+		flipx = sprites[i] & 0x10000000;
+		y = sprites[i] & 0x1ff;
+		height = (((sprites[i] & 0xe00) >> 9) + 1) * 8;
+		flipy = sprites[i] & 0x1000;
+		code = sprites[i + 1] & 0x7ffff;
+		color = (sprites[i + 1] & 0xf0000000) >> 28;
 
-		if(spriteram32[i + 1] & 0x04000000)
-			pri = 0xfffe; // below fg
+		if(sprites[i + 1] & 0x04000000)
+		{
+			// below fg
+			pri = 1;
+		}
 		else
-			pri = 0; // above everything
+		{
+			// above everything
+			pri = 2;
+		}
 
-		gfxdata	= base_gfx + (64*8/8) * code;
+		gfxdata	= base_gfx + 64 * code;
 
 		/* prepare GfxElement on the fly */
 		gfx.width = width;
@@ -234,36 +400,38 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		if ( (gfxdata + width * height - 1) >= gfx_max )
 			continue;
 
-		pdrawgfx(bitmap,&gfx,
-				 0,
-				 color,
-				 flipx,flipy,
-				 x,y,
-				 cliprect,TRANSPARENCY_PEN,0,pri);
-
-		// wrap around y
-		pdrawgfx(bitmap,&gfx,
-				 0,
-				 color,
-				 flipx,flipy,
-				 x,y - 512,
-				 cliprect,TRANSPARENCY_PEN,0,pri);
-
+		draw_single_sprite(sprites_bitmap,&gfx,0,color,flipx,flipy,x,y,cliprect,pri);
+		
 		// wrap around x
-		pdrawgfx(bitmap,&gfx,
-				 0,
-				 color,
-				 flipx,flipy,
-				 x - 512,y,
-				 cliprect,TRANSPARENCY_PEN,0,pri);
-
+		draw_single_sprite(sprites_bitmap,&gfx,0,color,flipx,flipy,x-512,y,cliprect,pri);
+		
+		// wrap around y
+		draw_single_sprite(sprites_bitmap,&gfx,0,color,flipx,flipy,x,y-512,cliprect,pri);
+		
 		// wrap around x and y
-		pdrawgfx(bitmap,&gfx,
-				 0,
-				 color,
-				 flipx,flipy,
-				 x - 512,y - 512,
-				 cliprect,TRANSPARENCY_PEN,0,pri);
+		draw_single_sprite(sprites_bitmap,&gfx,0,color,flipx,flipy,x-512,y-512,cliprect,pri);
+	}
+}
+
+static void copy_sprites(running_machine *machine, bitmap_t *bitmap, bitmap_t *sprites_bitmap, const rectangle *cliprect)
+{
+	int y;
+	for( y=cliprect->min_y; y<=cliprect->max_y; y++ )
+	{
+		UINT16 *source = BITMAP_ADDR16(sprites_bitmap, y, 0);
+		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT8 *dest_pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+		UINT8 *source_pri = BITMAP_ADDR8(sprites_bitmap_pri, y, 0);
+
+		int x;
+		for( x=cliprect->min_x; x<=cliprect->max_x; x++ )
+		{
+			if( source[x]!= 0 )
+			{
+				if(dest_pri[x] < source_pri[x])
+					dest[x] = source[x];
+			}
+		}
 	}
 }
 
@@ -275,10 +443,15 @@ static VIDEO_START( limenko )
 
 	tilemap_set_transparent_pen(md_tilemap,0);
 	tilemap_set_transparent_pen(fg_tilemap,0);
+
+	sprites_bitmap     = auto_bitmap_alloc(384,240,BITMAP_FORMAT_INDEXED16);
+	sprites_bitmap_pri = auto_bitmap_alloc(384,240,BITMAP_FORMAT_INDEXED8);
 }
 
 static VIDEO_UPDATE( limenko )
 {
+	// limenko_videoreg[4] ???? It always has this value: 0xffeffff8 (2 signed bytes? values: -17 and -8 ?)
+
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	tilemap_set_enable(bg_tilemap, limenko_videoreg[0] & 4);
@@ -296,9 +469,9 @@ static VIDEO_UPDATE( limenko )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,md_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
-
+	
 	if(limenko_videoreg[0] & 8)
-		draw_sprites(screen->machine, bitmap, cliprect);
+		copy_sprites(screen->machine, bitmap, sprites_bitmap, cliprect);
 
 	return 0;
 }
@@ -363,7 +536,7 @@ static INPUT_PORTS_START( legendoh )
 	PORT_DIPNAME( 0x20000000, 0x00000000, "Sound Enable" )
 	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) //changes spriteram location, pointing to spriteram32_2
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(spriteram_bit_r, NULL) //changes spriteram location
 	PORT_BIT( 0x4000ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -401,7 +574,7 @@ static INPUT_PORTS_START( sb2003 )
 	PORT_DIPNAME( 0x20000000, 0x00000000, "Sound Enable" )
 	PORT_DIPSETTING(          0x20000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( On ) )
-	PORT_BIT( 0x80000000, IP_ACTIVE_LOW, IPT_SPECIAL ) //changes spriteram location, pointing to spriteram32_2
+	PORT_BIT( 0x80000000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(spriteram_bit_r, NULL) //changes spriteram location
 	PORT_BIT( 0x5f10ffff, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -432,9 +605,9 @@ static INPUT_PORTS_START( spotty )
 	PORT_BIT( 0x00010000, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x00020000, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x00040000, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x00080000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00080000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(spriteram_bit_r, NULL) //changes spriteram location
 	PORT_SERVICE_NO_TOGGLE( 0x00200000, IP_ACTIVE_LOW )
-	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x00400000, IP_ACTIVE_LOW, IPT_SPECIAL ) //security bit
 	PORT_BIT( 0x00800000, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(eeprom_bit_r, NULL) //eeprom
 	PORT_DIPNAME( 0x20000000, 0x20000000, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(          0x00000000, DEF_STR( Off ) )
@@ -840,16 +1013,22 @@ static READ32_HANDLER( spotty_speedup_r )
 static DRIVER_INIT( dynabomb )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe2784, 0xe2787, 0, 0, dynabomb_speedup_r );
+
+	spriteram_bit = 1;
 }
 
 static DRIVER_INIT( legendoh )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x32ab0, 0x32ab3, 0, 0, legendoh_speedup_r );
+
+	spriteram_bit = 1;
 }
 
 static DRIVER_INIT( sb2003 )
 {
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x135800, 0x135803, 0, 0, sb2003_speedup_r );
+
+	spriteram_bit = 1;
 }
 
 static DRIVER_INIT( spotty )
@@ -868,6 +1047,8 @@ static DRIVER_INIT( spotty )
 	}
 
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6626c, 0x6626f, 0, 0, spotty_speedup_r );
+
+	spriteram_bit = 1;
 }
 
 GAME( 2000, dynabomb, 0,      limenko, sb2003,   dynabomb, ROT0, "Limenko", "Dynamite Bomber (Korea, Rev 1.5)",   GAME_NO_SOUND )
@@ -876,4 +1057,4 @@ GAME( 2003, sb2003,   0,      limenko, sb2003,   sb2003,   ROT0, "Limenko", "Sup
 GAME( 2003, sb2003a,  sb2003, limenko, sb2003,   sb2003,   ROT0, "Limenko", "Super Bubble 2003 (Asia, Ver 1.0)",  GAME_NO_SOUND )
 
 // this game only use the same graphics chip used in limenko's system
-GAME( 2001, spotty,   0,      spotty,  spotty,   spotty,   ROT0, "Prince Co.", "Spotty (Ver. 2.0.2)",              GAME_IMPERFECT_GRAPHICS | GAME_NO_SOUND )
+GAME( 2001, spotty,   0,      spotty,  spotty,   spotty,   ROT0, "Prince Co.", "Spotty (Ver. 2.0.2)",             GAME_NO_SOUND )
