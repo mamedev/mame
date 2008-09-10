@@ -1176,6 +1176,7 @@ Region byte encoding is as follows:
 */
 
 #define NAOMI2_BIOS \
+	ROM_REGION( 0x200000, "main", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "epr-23608b (Export)" ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 0, "epr-23608b.bin",   0x000000, 0x200000, CRC(a554b1e3) SHA1(343b727a3619d1c75a9b6d4cc156a9050447f155) ) \
 	ROM_SYSTEM_BIOS( 1, "bios1", "epr-23608 (Export)"  ) \
@@ -1219,7 +1220,6 @@ ROM_START( hod2bios )
 ROM_END
 
 ROM_START( naomi2 )
-	ROM_REGION( 0x200000, "main", 0)
 	NAOMI2_BIOS
 
 	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
@@ -3226,7 +3226,7 @@ GAME( 200?, vathlete,  naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",     
 
 
 ROM_START( vstrik3 )
-	NAOMIGD_BIOS
+	NAOMI2_BIOS
 
 	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
 	ROM_LOAD("vs3.bin", 0x0000000,   0xb000000, CRC(79d44ff4) SHA1(af0b892531c60999f0ef5db7525de50836764c77) )
@@ -3234,12 +3234,14 @@ ROM_START( vstrik3 )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0006", 0, SHA1(293b84c7f4547060f57598b796b6fc49513cc839) MD5(060d9fef55d8f0fc1986ecc991478942) )
 
-	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
-	// todo
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0304-COM)
+	//(sticker 253-5508-0304)
+	ROM_LOAD("317-0304-com.data", 0x00, 0x50, CRC(a181c601) SHA1(6a489904941e638ac1069b66e76ee0bcec7d0bab) )
 ROM_END
 
 ROM_START( vf4 )
-	NAOMIGD_BIOS
+	NAOMI2_BIOS
 
 	ROM_REGION( 0xf000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
 	ROM_LOAD("vf4.bin", 0x0000000,   0xf000000, CRC(a81e3277) SHA1(fb162f34720d6ba49297ecb5e2869b2afffc307b) )
@@ -3247,12 +3249,14 @@ ROM_START( vf4 )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0012", 0, SHA1(d68436ee72ea5db40e184b7ff38903a9cadb6df7) MD5(5a18300646a68f2994ed8c81abe9bdd8) )
 
-	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
-	// todo
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0317-COM)
+	//(sticker 253-5508-0317)
+	ROM_LOAD("317-0317-com.data", 0x00, 0x50, CRC(66efe433) SHA1(7f7b52202ed9b1e20516aaa7553cc3cc677a70b5) )
 ROM_END
 
 ROM_START( initd )
-	NAOMIGD_BIOS
+	NAOMI2_BIOS
 
 	ROM_REGION( 0xc2ed000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
 	ROM_LOAD("inid.bin", 0x0000000,    0xc2ed000, CRC(524ca451) SHA1(cc8dd06e4fe50e70f277043bd1b817e41c5db8cf) )
@@ -3260,8 +3264,10 @@ ROM_START( initd )
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0020b", 0, SHA1(5f386183e856722fee4a6ddb0146350b73349181) MD5(b085005215e2766e0fc1e3bd16b2fd95) )
 
-	ROM_REGION( 0x50, "pic_response", ROMREGION_ERASE)
-	// todo
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+	//PIC16C622A (317-0331-JPN)
+	//(sticker 253-5508-0331J)
+	ROM_LOAD("317-0331-jpn.data", 0x00, 0x50, CRC(bb39742e) SHA1(b3100b18aeb80ebfd5312ba5c320e7e647710b55) )
 ROM_END
 
 GAME( 2001, naomi2,   0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi 2 Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
