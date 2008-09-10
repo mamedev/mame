@@ -1757,6 +1757,7 @@ $(DRIVERS)/sbrkout.o:	$(LAYOUT)/sbrkout.lh
 
 $(DRIVERS)/sderby.o:	$(LAYOUT)/sderby.lh \
 						$(LAYOUT)/spacewin.lh \
+						$(LAYOUT)/pmroulet.lh \
 
 $(DRIVERS)/snookr10.o:	$(LAYOUT)/snookr10.lh
 

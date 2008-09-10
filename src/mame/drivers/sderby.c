@@ -62,6 +62,7 @@
 #include "sound/okim6295.h"
 #include "sderby.lh"
 #include "spacewin.lh"
+#include "pmroulet.lh"
 
 UINT16 *sderby_fg_videoram;
 UINT16 *sderby_md_videoram;
@@ -99,16 +100,58 @@ static READ16_HANDLER( roulette_input_r )
 {
 	switch (offset)
 	{
-	case 0x00 >> 1:
-		return input_port_read(machine, "IN0");
-	case 0x02 >> 1:
-		return input_port_read(machine, "IN1");
-	case 0x04 >> 1:
-		return input_port_read(machine, "IN2");
+		case 0x00 >> 1:
+			return input_port_read(machine, "IN0");
+		case 0x02 >> 1:
+			return input_port_read(machine, "IN1");
+		case 0x04 >> 1:
+			return input_port_read(machine, "IN2");
 	}
-	return 0xffff;
 
+	return 0xffff;
 }
+
+
+/***************************************************************
+
+    Roulette MCU communication.
+    ---------------------------
+
+    Defeating the 'always win' protection...
+
+    Offset: 0x70800e - 0x70800f.
+
+    Writes to the MCU are always the same values.
+    At begining, the code writes 3 values: 0x53, 0x5a and 0x0d.
+    Then, whith each placed bet the code normally writes 0x4e.
+    After that, there are 2 reads expecting the MCU response.
+
+    Most probably there is a shared RAM there for communication,
+    but for now, I temporarily simulated the MCU response till
+    we can get the MCU decapped.
+
+
+****************************************************************/
+
+static READ16_HANDLER( rprot_r )
+{
+	logerror("rprot_r : offset = %02x\n",activecpu_get_pc());
+
+/* This is the only mask I found that allow a normal play.
+   Using other values, the game hangs waiting for response,
+   or simply throw a deliberated losing number.
+
+   If someone more skilled in 68K code can help to trace it,
+   searching for an accurated response, I'll appreciate. 
+*/
+	return mame_rand(machine) & 0x1f;
+}
+
+static WRITE16_HANDLER( rprot_w )
+{
+	logerror("rprot_w %02x\n", data);
+}
+
 
 /******************************
 *       Outputs / Lamps       *
@@ -207,6 +250,35 @@ static WRITE16_HANDLER( scmatto_out_w )
 }
 
 
+static WRITE16_HANDLER( roulette_out_w )
+{
+/*
+  -----------------------------------
+  --- Croupier (Roulette) Outputs ---
+  -----------------------------------
+
+  0x708006 - 0x708007
+  ===================
+
+  0x0000 - Normal State (lamps off).
+  0x0001 - Start lamp.
+  0x0002 - Bet lamp.
+  0x0008 - Unknown (always activated).
+
+
+    - Lbits -
+    7654 3210
+    =========
+    ---- ---x  Start lamp.
+    ---- --x-  Bet lamp.
+    ---- x---  Unknown (always activated).
+ 
+*/
+	output_set_lamp_value(1, (data & 1));			/* Lamp 1 - START */
+	output_set_lamp_value(2, (data >> 1) & 1);		/* Lamp 2 - BET   */
+}
+
+
 /***************************
 *       Memory Maps        *
 ***************************/
@@ -257,10 +329,13 @@ static ADDRESS_MAP_START( roulette_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(sderby_md_videoram_w) AM_BASE(&sderby_md_videoram)	/* mid */
 	AM_RANGE(0x502000, 0x503fff) AM_RAM_WRITE(sderby_fg_videoram_w) AM_BASE(&sderby_fg_videoram)	/* fg */
 	AM_RANGE(0x504000, 0x50400b) AM_RAM_WRITE(sderby_scroll_w)
-	AM_RANGE(0x50400e, 0x50400f) AM_WRITE( SMH_NOP )
+	AM_RANGE(0x50400e, 0x50400f) AM_WRITE(SMH_NOP)
 
-	AM_RANGE(0x708000, 0x70800d) AM_READ(roulette_input_r) AM_WRITE(SMH_NOP) /* what are the writes? */
-	AM_RANGE(0x70800e, 0x70800f) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)	/* ROM seems to be bad */
+	AM_RANGE(0x708000, 0x708009) AM_READ(roulette_input_r)
+	AM_RANGE(0x708006, 0x708007) AM_WRITE(roulette_out_w)
+	AM_RANGE(0x70800a, 0x70800b) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
+	AM_RANGE(0x70800c, 0x70800d) AM_WRITE(SMH_NOP)	/* watchdog?? (0x0003) */
+	AM_RANGE(0x70800e, 0x70800f) AM_READWRITE(rprot_r, rprot_w)	/* MCU communication */
 	AM_RANGE(0x780000, 0x780fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
 
 	AM_RANGE(0xff0000, 0xff07ff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
@@ -567,7 +642,7 @@ ROM_START( pmroulet )
     ROM_LOAD16_BYTE( "2.bin", 0x00000, 0x20000, CRC(1677a2de) SHA1(4dcbb3c1ce9b65e06ba7e0cffa00c0c8016538f5))
 	ROM_LOAD16_BYTE( "3.bin", 0x00001, 0x20000, CRC(11acaac2) SHA1(19e7bbbf4356fc9a866f9f36d0568c42d6a36c07))
 
-	ROM_REGION( 0x080000, "oki", 0 ) /* samples. seems to be wrong (only 6 samples?) */
+	ROM_REGION( 0x080000, "oki", 0 ) /* samples are ok */
 	ROM_LOAD( "1.bin", 0x00000, 0x40000, CRC(6673de85) SHA1(df390cd6268efc0e743a9020f19bc0cbeb757cfa))
 
 	ROM_REGION( 0x280000, "gfx1", 0 ) /* sprites */
@@ -583,8 +658,8 @@ ROM_END
 *        Game Drivers         *
 ******************************/
 
-/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT   ROT    COMPANY     FULLNAME                       FLAGS            LAYOUT  */
-GAMEL( 1996, sderby,   0,      sderby,   sderby,   0,     ROT0, "Playmark", "Super Derby",                  0,               layout_sderby   )
-GAMEL( 1996, spacewin, 0,      spacewin, spacewin, 0,     ROT0, "Playmark", "Scacco Matto / Space Win",     0,               layout_spacewin )
-GAME(  1997, pmroulet, 0,      pmroulet, pmroulet, 0,     ROT0, "Playmark", "Croupier (Playmark Roulette)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT   ROT    COMPANY     FULLNAME                       FLAGS                                          LAYOUT  */
+GAMEL( 1996, sderby,   0,      sderby,   sderby,   0,     ROT0, "Playmark", "Super Derby",                  0,                                             layout_sderby   )
+GAMEL( 1996, spacewin, 0,      spacewin, spacewin, 0,     ROT0, "Playmark", "Scacco Matto / Space Win",     0,                                             layout_spacewin )
+GAMEL( 1997, pmroulet, 0,      pmroulet, pmroulet, 0,     ROT0, "Playmark", "Croupier (Playmark Roulette)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING, layout_pmroulet )
 
