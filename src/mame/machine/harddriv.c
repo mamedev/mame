@@ -432,8 +432,8 @@ READ16_HANDLER( hd68k_sound_reset_r )
 
 WRITE16_HANDLER( hd68k_adc_control_w )
 {
-	static const char *adc8names[] = { "8BADC0", "8BADC1", "8BADC2", "8BADC3", "8BADC4", "8BADC5", "8BADC6", "8BADC7" };
-	static const char *adc12names[] = { "12BADC0", "12BADC1", "12BADC2", "12BADC3" };
+	static const char *const adc8names[] = { "8BADC0", "8BADC1", "8BADC2", "8BADC3", "8BADC4", "8BADC5", "8BADC6", "8BADC7" };
+	static const char *const adc12names[] = { "12BADC0", "12BADC1", "12BADC2", "12BADC3" };
 
 	COMBINE_DATA(&adc_control);
 

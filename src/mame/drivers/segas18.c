@@ -215,7 +215,7 @@ static MACHINE_RESET( system18 )
 
 static READ16_HANDLER( io_chip_r )
 {
-	static const char *portnames[] = { "P1", "P2", "PORTC", "PORTD", "SERVICE", "COINAGE", "DSW", "PORTH" };
+	static const char *const portnames[] = { "P1", "P2", "PORTC", "PORTD", "SERVICE", "COINAGE", "DSW", "PORTH" };
 	offset &= 0x1f/2;
 
 	switch (offset)
@@ -318,7 +318,7 @@ static WRITE16_HANDLER( io_chip_w )
 
 static READ16_HANDLER( misc_io_r )
 {
-	static const char *portnames[] = { "SERVICE", "COINAGE" };
+	static const char *const portnames[] = { "SERVICE", "COINAGE" };
 
 	offset &= 0x1fff;
 

@@ -57,6 +57,12 @@ Code disassembling
 #include "sound/ay8910.h"
 
 static tilemap *bg_tilemap;
+static UINT8 mux_data;
+static int bank;
+static UINT8 *cus_ram;
+static UINT8 prot_lock;
+
+
 
 static TILE_GET_INFO( y_get_bg_tile_info )
 {
@@ -114,9 +120,6 @@ static WRITE8_HANDLER( yumefuda_cram_w )
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
-static UINT8 *cus_ram;
-static UINT8 prot_lock;
-
 /*Custom RAM (Protection)*/
 static READ8_HANDLER( custom_ram_r )
 {
@@ -155,8 +158,6 @@ static READ8_HANDLER( eeprom_r )
 	return ((~eeprom_read_bit() & 0x01)<<6) | (0xff & ~0x40);
 }
 
-static UINT8 mux_data;
-
 static READ8_HANDLER( mux_r )
 {
 	switch(mux_data)
@@ -175,8 +176,6 @@ static READ8_HANDLER( mux_r )
 
 static WRITE8_HANDLER( mux_w )
 {
-	static int bank=-1;
-
 	int new_bank = (data&0xc0)>>6;
 
 	//0x10000 service mode
@@ -220,6 +219,13 @@ static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(port_c0_w) /*watchdog write?*/
 ADDRESS_MAP_END
 
+static MACHINE_RESET( yumefuda )
+{
+	mux_data = 0;
+	bank = -1;
+	prot_lock = 0;
+}
+
 static MACHINE_DRIVER_START( yumefuda )
 
 	/* basic machine hardware */
@@ -228,6 +234,7 @@ static MACHINE_DRIVER_START( yumefuda )
 	MDRV_CPU_IO_MAP(port_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
+	MDRV_MACHINE_RESET(yumefuda)
 	MDRV_NVRAM_HANDLER(93C46)
 
 	/* video hardware */

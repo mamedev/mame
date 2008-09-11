@@ -939,7 +939,7 @@ static READ32_HANDLER( type3_sync_r )
 	return sync_frame;
 }
 
-static int last_prot_op = -1, last_prot_clk;
+static int last_prot_op, last_prot_clk;
 
 /*
     Run and Gun 2, Rushing Heroes, Winning Spike, and Vs. Net Soccer contain a XILINX FPGA that serves as security.

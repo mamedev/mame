@@ -20,7 +20,7 @@
 ***************************************************************************/
 
 /* Am2901 Instruction Fields */
-static const char* ins[] =
+static const char *const ins[] =
 {
 	"ADD  ",
 	"SUBR ",
@@ -32,7 +32,7 @@ static const char* ins[] =
 	"EXNOR",
 };
 
-static const char* src[] =
+static const char *const src[] =
 {
 	"A,Q",
 	"A,B",
@@ -44,7 +44,7 @@ static const char* src[] =
 	"D,0",
 };
 
-static const char* dst[] =
+static const char *const dst[] =
 {
 	"QREG ",
 	"NOP  ",
@@ -749,7 +749,7 @@ static int cquestsnd_execute(int cycles)
 
 static offs_t cquestsnd_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	static const char* jmps[] =
+	static const char *const jmps[] =
 	{
 		"JUMP ",
 		"     ",
@@ -762,7 +762,7 @@ static offs_t cquestsnd_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const 
 	};
 
 
-	static const char* latches[] =
+	static const char *const latches[] =
 	{
 		"PLTCH  ",
 		"DAC    ",
@@ -1202,7 +1202,7 @@ static int cquestrot_execute(int cycles)
 
 static offs_t cquestrot_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	static const char* jmps[] =
+	static const char *const jmps[] =
 	{
 		"       ",
 		"JSEQ   ",
@@ -1223,7 +1223,7 @@ static offs_t cquestrot_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const 
 		"JNZERO ",
 	};
 
-	static const char* youts[] =
+	static const char *const youts[] =
 	{
 		"     ",
 		"     ",
@@ -1235,7 +1235,7 @@ static offs_t cquestrot_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const 
 		"Y2D  ",
 	};
 
-	static const char* spfs[] =
+	static const char *const spfs[] =
 	{
 		"      ",
 		"      ",
@@ -1760,7 +1760,7 @@ static int cquestlin_execute(int cycles)
 
 static offs_t cquestlin_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	static const char* jmps[] =
+	static const char *const jmps[] =
 	{
 		"     ",
 		"JMSB ",
@@ -1781,7 +1781,7 @@ static offs_t cquestlin_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const 
 		"?????",
 	};
 
-	static const char* latches[] =
+	static const char *const latches[] =
 	{
 		"       ",
 		"SEQLTCH",
@@ -1793,7 +1793,7 @@ static offs_t cquestlin_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const 
 		"ZLTCH  ",
 	};
 
-	static const char* spfs[] =
+	static const char *const spfs[] =
 	{
 		"      ",
 		"FSTOP ",

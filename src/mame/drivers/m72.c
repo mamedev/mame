@@ -620,7 +620,7 @@ static WRITE16_HANDLER( soundram_w )
 static READ16_HANDLER( poundfor_trackball_r )
 {
 	static int prev[4],diff[4];
-	static const char *axisnames[] = { "TRACK0_X", "TRACK0_Y", "TRACK1_X", "TRACK1_Y" };
+	static const char *const axisnames[] = { "TRACK0_X", "TRACK0_Y", "TRACK1_X", "TRACK1_Y" };
 
 	if (offset == 0)
 	{

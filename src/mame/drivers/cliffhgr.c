@@ -107,7 +107,7 @@ static WRITE8_HANDLER( cliff_port_bank_w )
 
 static READ8_HANDLER( cliff_port_r )
 {
-	static const char *banknames[] = { "BANK0", "BANK1", "BANK2", "BANK3", "BANK4", "BANK5", "BANK6" };
+	static const char *const banknames[] = { "BANK0", "BANK1", "BANK2", "BANK3", "BANK4", "BANK5", "BANK6" };
 
 	if ( port_bank < 7 )
 	{

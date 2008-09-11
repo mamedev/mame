@@ -227,7 +227,7 @@ static READ8_HANDLER( sound_data_r )
 
 static READ16_HANDLER( io_chip_r )
 {
-	static const char *portnames[] = { "P1", "GENERAL", "PORTC", "PORTD", "PORTE", "DSW", "COINAGE", "PORTH" };
+	static const char *const portnames[] = { "P1", "GENERAL", "PORTC", "PORTD", "PORTE", "DSW", "COINAGE", "PORTH" };
 	offset &= 0x1f/2;
 
 	switch (offset)

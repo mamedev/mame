@@ -134,7 +134,7 @@ static WRITE8_HANDLER( mjsister_input_sel2_w )
 static READ8_HANDLER( mjsister_keys_r )
 {
 	int p,i,ret = 0;
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 
 	p = mjsister_input_sel1 & 0x3f;
 //  p |= ((mjsister_input_sel2 & 8) << 4) | ((mjsister_input_sel2 & 0x20) << 1);

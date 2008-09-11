@@ -120,7 +120,7 @@ static PIT8253_OUTPUT_CHANGED( v_irq3_w )
 
 READ16_HANDLER( vertigo_io_convert )
 {
-	static const char *adcnames[] = { "P1X", "P1Y", "PADDLE" };
+	static const char *const adcnames[] = { "P1X", "P1Y", "PADDLE" };
 
 	if (offset > 2)
 		adc_result = 0;

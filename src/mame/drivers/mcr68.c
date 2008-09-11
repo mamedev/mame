@@ -135,7 +135,7 @@ static WRITE16_HANDLER( blasted_control_w )
 
 static READ16_HANDLER( spyhunt2_port_0_r )
 {
-	static const char *portnames[] = { "AN1", "AN2", "AN3", "AN4" };
+	static const char *const portnames[] = { "AN1", "AN2", "AN3", "AN4" };
 	int result = input_port_read(machine, "IN0");
 	int which = (control_word >> 3) & 3;
 	int analog = input_port_read(machine, portnames[which]);

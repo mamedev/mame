@@ -2074,7 +2074,7 @@ static void execute_map(int ref, int params, const char *param[])
 	/* do the translation first */
 	for (intention = TRANSLATE_READ_DEBUG; intention <= TRANSLATE_FETCH_DEBUG; intention++)
 	{
-		static const char *intnames[] = { "Read", "Write", "Fetch" };
+		static const char *const intnames[] = { "Read", "Write", "Fetch" };
 		taddress = ADDR2BYTE_MASKED(address, info, spacenum);
 		if (info->translate != NULL)
 		{

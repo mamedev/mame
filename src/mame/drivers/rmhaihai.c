@@ -74,7 +74,7 @@ static int keyboard_cmd;
 
 static READ8_HANDLER( keyboard_r )
 {
-	static const char *keynames[] = { "KEY0", "KEY1" };
+	static const char *const keynames[] = { "KEY0", "KEY1" };
 
 	logerror("%04x: keyboard_r\n",activecpu_get_pc());
 	switch(activecpu_get_pc())

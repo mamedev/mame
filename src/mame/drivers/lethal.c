@@ -176,7 +176,7 @@ maybe some priority issues / sprite placement issues..
 #define SOUND_CLOCK		XTAL_18_432MHz
 
 
-static const char *gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y" };
+static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y" };
 
 /* a = 1, 2 = player # */
 #define GUNX( a ) (( ( input_port_read(machine, gunnames[2 * (a - 1)]) * 287 ) / 0xff ) + 16)

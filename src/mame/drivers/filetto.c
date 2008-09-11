@@ -82,6 +82,10 @@ static UINT8 *vga_vram,*work_ram;
 static UINT8 video_regs[0x19];
 static UINT8 *vga_mode;
 static UINT8 hv_blank;
+
+static int bank;
+static int lastvalue;
+
 /*Add here Video regs defines...*/
 
 
@@ -328,8 +332,6 @@ static WRITE8_HANDLER( disk_iobank_w )
     sets the selected rom that appears in $C0000-$CFFFF
 
 */
-	static int bank = -1;
-	static int lastvalue = -1;
 	int newbank = 0;
 
 	printf("bank %d set to %02X\n", offset,data);
@@ -732,11 +734,20 @@ static INTERRUPT_GEN( filetto_irq )
 }
 
 
+static MACHINE_RESET( filetto )
+{
+	bank = -1;
+	lastvalue = -1;
+	hv_blank = 0;
+}
+
 static MACHINE_DRIVER_START( filetto )
 	MDRV_CPU_ADD("main", I8088, 8000000)
 	MDRV_CPU_PROGRAM_MAP(filetto_map,0)
 	MDRV_CPU_IO_MAP(filetto_io,0)
 	MDRV_CPU_VBLANK_INT_HACK(filetto_irq,200)
+
+	MDRV_MACHINE_RESET( filetto )
 
 	MDRV_DEVICE_ADD( "pit8253", PIT8253 )
 	MDRV_DEVICE_CONFIG( pc_pit8253_config )

@@ -194,7 +194,7 @@ static WRITE16_HANDLER( digital_w )
 
 static READ16_HANDLER( analog_r )
 {
-	static const char *portnames[] = { "STICK0_X", "STICK1_X", "STICK0_Y", "STICK1_Y" };
+	static const char *const portnames[] = { "STICK0_X", "STICK1_X", "STICK0_Y", "STICK1_Y" };
 
 	return input_port_read(machine, portnames[whichport]);
 }

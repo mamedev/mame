@@ -35,7 +35,7 @@ static UINT8 blank_palette;
 
 INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *y)
 {
-	static const char *gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y" };
+	static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y" };
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 	int width = visarea->max_x + 1 - visarea->min_x;
 	int height = visarea->max_y + 1 - visarea->min_y;

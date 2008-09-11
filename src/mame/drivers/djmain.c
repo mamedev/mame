@@ -287,7 +287,7 @@ static READ32_HANDLER( v_rom_r )
 static READ32_HANDLER( turntable_r )
 {
 	UINT32 result = 0;
-	static const char *ttnames[] = { "TT1", "TT2" };
+	static const char *const ttnames[] = { "TT1", "TT2" };
 
 	if (ACCESSING_BITS_8_15)
 	{

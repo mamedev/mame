@@ -179,7 +179,7 @@ WRITE16_HANDLER( midxunit_unknown_w )
 
 READ16_HANDLER( midwunit_io_r )
 {
-	static const char *portnames[] = { "IN0", "IN1", "DSW", "IN2" };
+	static const char *const portnames[] = { "IN0", "IN1", "DSW", "IN2" };
 
 	/* apply I/O shuffling */
 	offset = ioshuffle[offset % 16];
@@ -205,7 +205,7 @@ READ16_HANDLER( midwunit_io_r )
 
 READ16_HANDLER( midxunit_io_r )
 {
-	static const char *portnames[] = { "IN0", "IN1", "IN2", "DSW" };
+	static const char *const portnames[] = { "IN0", "IN1", "IN2", "DSW" };
 
 	offset = (offset / 2) % 8;
 
@@ -227,7 +227,7 @@ READ16_HANDLER( midxunit_io_r )
 
 READ16_HANDLER( midxunit_analog_r )
 {
-	static const char *portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5" };
+	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5" };
 
 	return input_port_read(machine, portnames[midxunit_analog_port]);
 }

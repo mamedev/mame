@@ -55,7 +55,7 @@ static READ8_HANDLER( trackball_r )
 {
 	static int last[4];
 	int curr,delta;
-	static const char *port[] = { "TRACKBALL_P1_1", "TRACKBALL_P1_2", "TRACKBALL_P2_1", "TRACKBALL_P1_2" };
+	static const char *const port[] = { "TRACKBALL_P1_1", "TRACKBALL_P1_2", "TRACKBALL_P2_1", "TRACKBALL_P1_2" };
 
 	curr = input_port_read(machine, port[offset]);
 	delta = (curr - last[offset]) & 0xff;

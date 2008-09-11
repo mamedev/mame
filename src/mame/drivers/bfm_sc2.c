@@ -647,7 +647,7 @@ static WRITE8_HANDLER( mux_output_w )
 static READ8_HANDLER( mux_input_r )
 {
 	int result = 0xFF,t1,t2;
-	static const char *port[] = { "STROBE0", "STROBE1", "STROBE2", "STROBE3", "STROBE4", "STROBE5", "STROBE6", "STROBE7", "STROBE8", "STROBE9", "STROBE10", "STROBE11" };
+	static const char *const port[] = { "STROBE0", "STROBE1", "STROBE2", "STROBE3", "STROBE4", "STROBE5", "STROBE6", "STROBE7", "STROBE8", "STROBE9", "STROBE10", "STROBE11" };
 
 	if (offset < 8)
 	{

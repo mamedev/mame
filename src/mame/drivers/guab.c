@@ -540,7 +540,7 @@ static READ16_HANDLER( wd1770_r )
 
 static READ16_HANDLER( io_r )
 {
-	static const char *portnames[] = { "IN0", "IN1", "IN2" };
+	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 
 	switch (offset)
 	{

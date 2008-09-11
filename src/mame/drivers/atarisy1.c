@@ -198,7 +198,7 @@ static TIMER_CALLBACK( delayed_joystick_int )
 static READ16_HANDLER( joystick_r )
 {
 	int newval = 0xff;
-	static const char *portnames[] = { "IN0", "IN1" };
+	static const char *const portnames[] = { "IN0", "IN1" };
 
 	/* digital joystick type */
 	if (joystick_type == 1)

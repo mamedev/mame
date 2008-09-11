@@ -64,8 +64,8 @@ The End
 #include "deprecat.h"
 #include "sound/ay8910.h"
 
-static int nSndNum=0x10;
-static int nAyCtrl, nAyData;
+static UINT8 nSndNum;
+static UINT8 nAyCtrl, nAyData;
 
 static VIDEO_START(mirax)
 {
@@ -84,6 +84,13 @@ static VIDEO_UPDATE(mirax)
 	return 0;
 }
 
+
+static SOUND_START(mirax)
+{
+	nSndNum = 0x10;
+	nAyCtrl = 0x00;
+	nAyData = 0x00;
+}
 
 static READ8_HANDLER(snd_read)
 {
@@ -194,6 +201,8 @@ static MACHINE_DRIVER_START( mirax )
 	MDRV_GFXDECODE(mirax)
 	MDRV_VIDEO_START(mirax)
 	MDRV_VIDEO_UPDATE(mirax)
+
+	MDRV_SOUND_START(mirax)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay1", AY8910, 12000000/6 /* guess */)

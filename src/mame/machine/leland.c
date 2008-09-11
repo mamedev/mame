@@ -293,7 +293,7 @@ READ8_HANDLER( offroad_wheel_3_r )
 
 READ8_HANDLER( ataxx_trackball_r )
 {
-	static const char *tracknames[] = { "AN0", "AN1", "AN2", "AN3" };
+	static const char *const tracknames[] = { "AN0", "AN1", "AN2", "AN3" };
 
 	return dial_compute_value(input_port_read(machine, tracknames[offset]), offset);
 }
@@ -308,7 +308,7 @@ READ8_HANDLER( ataxx_trackball_r )
 
 READ8_HANDLER( indyheat_wheel_r )
 {
-	static const char *tracknames[] = { "AN0", "AN1", "AN2" };
+	static const char *const tracknames[] = { "AN0", "AN1", "AN2" };
 
 	return dial_compute_value(input_port_read(machine, tracknames[offset]), offset);
 }
@@ -337,7 +337,7 @@ READ8_HANDLER( indyheat_analog_r )
 
 WRITE8_HANDLER( indyheat_analog_w )
 {
-	static const char *tracknames[] = { "AN3", "AN4", "AN5" };
+	static const char *const tracknames[] = { "AN3", "AN4", "AN5" };
 
 	switch (offset)
 	{
@@ -1113,7 +1113,7 @@ READ8_HANDLER( leland_master_analog_key_r )
 
 WRITE8_HANDLER( leland_master_analog_key_w )
 {
-	static const char *portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5" };
+	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5" };
 
 	switch (offset)
 	{

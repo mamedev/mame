@@ -1397,7 +1397,7 @@ static WRITE8_HANDLER( latch_w )
 		case 0:
 		{
 			int changed = mux_outputlatch ^ data;
-			static const char *port[] = { "STROBE0", "STROBE1", "STROBE2", "STROBE3", "STROBE4", "STROBE5", "STROBE6", "STROBE7" };
+			static const char *const port[] = { "STROBE0", "STROBE1", "STROBE2", "STROBE3", "STROBE4", "STROBE5", "STROBE6", "STROBE7" };
 
 			mux_outputlatch = data;
 

@@ -116,7 +116,7 @@ static WRITE16_HANDLER( a2d_select_w )
 
 static READ16_HANDLER( a2d_data_r )
 {
-	static const char *adcnames[] = { "ADC0", "ADC1", "ADC2" };
+	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2" };
 
 	/* Pit Fighter has no A2D, just another input port */
 	if (atarig1_pitfight)

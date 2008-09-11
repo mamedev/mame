@@ -158,7 +158,7 @@ static READ16_HANDLER( hangon_io_r )
 
 		case 0x1000/2: /* Input ports and DIP switches */
 		{
-			static const char *sysports[] = { "SERVICE", "COINAGE", "DSW", "UNKNOWN" };
+			static const char *const sysports[] = { "SERVICE", "COINAGE", "DSW", "UNKNOWN" };
 			return input_port_read(machine, sysports[offset & 3]);
 		}
 
@@ -167,7 +167,7 @@ static READ16_HANDLER( hangon_io_r )
 
 		case 0x3020/2: /* ADC0804 data output */
 		{
-			static const char *adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
+			static const char *const adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
 			return input_port_read_safe(machine, adcports[adc_select], 0);
 		}
 	}
@@ -209,7 +209,7 @@ static READ16_HANDLER( sharrier_io_r )
 
 		case 0x0010/2: /* Input ports and DIP switches */
 		{
-			static const char *sysports[] = { "SERVICE", "UNKNOWN", "COINAGE", "DSW" };
+			static const char *const sysports[] = { "SERVICE", "UNKNOWN", "COINAGE", "DSW" };
 			return input_port_read(machine, sysports[offset & 3]);
 		}
 
@@ -219,7 +219,7 @@ static READ16_HANDLER( sharrier_io_r )
 
 		case 0x0030/2: /* ADC0804 data output */
 		{
-			static const char *adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
+			static const char *const adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
 			return input_port_read_safe(machine, adcports[adc_select], 0);
 		}
 	}

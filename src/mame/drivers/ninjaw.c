@@ -205,7 +205,7 @@ static MACHINE_RESET( ninjaw );
 VIDEO_START( ninjaw );
 VIDEO_UPDATE( ninjaw );
 
-static UINT16 cpua_ctrl = 0xff;
+static UINT16 cpua_ctrl;
 
 static void parse_control(running_machine *machine)	/* assumes Z80 sandwiched between 68Ks */
 {
@@ -232,7 +232,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )
             SOUND
 *****************************************/
 
-static INT32 banknum = -1;
+static INT32 banknum;
 
 static void reset_sound_region(running_machine *machine)
 {
@@ -931,6 +931,9 @@ static STATE_POSTLOAD( ninjaw_postload )
 static MACHINE_START( ninjaw )
 {
 	cpua_ctrl = 0xff;
+	banknum = -1;
+	memset(ninjaw_pandata, 0, sizeof(ninjaw_pandata));
+
 	state_save_register_global(cpua_ctrl);
 	state_save_register_global(banknum);
 	state_save_register_postload(machine, ninjaw_postload, NULL);

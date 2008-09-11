@@ -949,7 +949,7 @@ static const pia6821_interface pia_ic7_intf =
 /* IC8, Inputs, TRIACS, alpha clock */
 static READ8_HANDLER( pia_ic8_porta_r )
 {
-	static const char *portnames[] = { "ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2" };
+	static const char *const portnames[] = { "ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2" };
 
 	LOG_IC8(("%04x IC8 PIA Read of Port A (MUX input data)\n", activecpu_get_previouspc()));
 /* The orange inputs are polled twice as often as the black ones, for reasons of efficiency.

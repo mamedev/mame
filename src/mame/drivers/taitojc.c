@@ -745,7 +745,7 @@ static void debug_dsp_command(void)
 }
 #endif
 
-static int first_dsp_reset = 1;
+static int first_dsp_reset;
 static WRITE32_HANDLER(dsp_shared_w)
 {
 	//mame_printf_debug("dsp_shared_ram: %08X, %04X at %08X\n", offset, data >> 16, activecpu_get_pc());
@@ -866,7 +866,7 @@ static WRITE8_HANDLER(hc11_data_w)
 
 static READ8_HANDLER(hc11_analog_r)
 {
-	static const char *portnames[] = { "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4",
+	static const char *const portnames[] = { "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4",
 										"ANALOG5", "ANALOG6", "ANALOG7", "ANALOG8" };
 
 	return input_port_read_safe(machine, portnames[offset], 0);
@@ -1252,6 +1252,27 @@ INPUT_PORTS_END
 
 static MACHINE_RESET( taitojc )
 {
+	first_dsp_reset = 1;
+
+	mcu_comm_main = 0;
+	mcu_comm_hc11 = 0;
+	mcu_data_main = 0;
+	mcu_data_hc11 = 0;
+
+	texture_x = 0;
+	texture_y = 0;
+
+	dsp_rom_pos = 0;
+	dsp_tex_address = 0;
+	dsp_tex_offset = 0;
+
+	projected_point_x = 0;
+	projected_point_y = 0;
+
+	memset(viewport_data, 0, sizeof(viewport_data));
+	memset(projection_data, 0, sizeof(projection_data));
+	memset(intersection_data, 0, sizeof(intersection_data));
+
 	taito_f3_soundsystem_reset(machine);
 
 	f3_68681_reset();

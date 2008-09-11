@@ -89,7 +89,7 @@ static READ16_HANDLER( special_port1_r )
 static READ16_HANDLER( adc_r )
 {
 	static int last_offset;
-	static const char *adcnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
+	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
 	int result = input_port_read(machine, adcnames[last_offset & 3]);
 
 	last_offset = offset;

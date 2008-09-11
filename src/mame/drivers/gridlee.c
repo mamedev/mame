@@ -172,7 +172,7 @@ static READ8_HANDLER( analog_port_r )
 {
 	int delta, sign, magnitude;
 	UINT8 newval;
-	static const char *portnames[] = { "TRACK0_Y", "TRACK0_X", "TRACK1_Y", "TRACK1_X" };
+	static const char *const portnames[] = { "TRACK0_Y", "TRACK0_X", "TRACK1_Y", "TRACK1_X" };
 
 	/* first read the new trackball value and compute the signed delta */
 	newval = input_port_read(machine, portnames[offset + 2 * gridlee_cocktail_flip]);

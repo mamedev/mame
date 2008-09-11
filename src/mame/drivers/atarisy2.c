@@ -423,7 +423,7 @@ static WRITE16_HANDLER( adc_strobe_w )
 
 static READ16_HANDLER( adc_r )
 {
-	static const char *adcnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
+	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
 
 	if (which_adc < pedal_count)
 		return ~input_port_read(machine, adcnames[which_adc]);
@@ -434,7 +434,7 @@ static READ16_HANDLER( adc_r )
 
 static READ8_HANDLER( leta_r )
 {
-	static const char *letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
+	static const char *const letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
 
     if (pedal_count == -1)   /* 720 */
 	{

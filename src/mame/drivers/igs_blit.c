@@ -351,7 +351,7 @@ static READ16_HANDLER( igs_##NUM##_dips_r )												\
 {																						\
 	int i;																				\
 	UINT16 ret=0;																		\
-	static const char *dipnames[] = { "DSW1", "DSW2", "DSW3", "DSW4", "DSW5" };			\
+	static const char *const dipnames[] = { "DSW1", "DSW2", "DSW3", "DSW4", "DSW5" };	\
 																						\
 	for (i = 0; i < NUM; i++)															\
 		if ((~igs_dips_sel) & (1 << i) )												\

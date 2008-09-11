@@ -610,8 +610,8 @@ static WRITE8_HANDLER( yarunara_input_w )
 
 static READ8_HANDLER( yarunara_input_r )
 {
-	static const char *keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
-	static const char *keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
+	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
+	static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
 
 	switch (offset)
 	{
@@ -966,7 +966,7 @@ static READ8_HANDLER( mjelctrn_keyboard_1_r )
 static READ8_HANDLER( mjelctrn_dsw_r )
 {
 	int dsw = (keyb & 0xc0) >> 6;
-	static const char *dswnames[] = { "DSW2", "DSW1", "DSW3", "DSW4" };
+	static const char *const dswnames[] = { "DSW2", "DSW1", "DSW3", "DSW4" };
 
 	return input_port_read(machine, dswnames[dsw]);
 }
@@ -1069,8 +1069,8 @@ static WRITE8_HANDLER( htengoku_coin_w )
 
 static READ8_HANDLER( htengoku_input_r )
 {
-	static const char *keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
-	static const char *keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
+	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
+	static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
 
 	switch( htengoku_select )
 	{
@@ -1199,8 +1199,8 @@ static WRITE8_HANDLER( tenkai_ip_w )
 
 static READ8_HANDLER( tenkai_ip_r )
 {
-	static const char *keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
-//  static const char *keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
+	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
+	//static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
 
 	switch (offset)
 	{

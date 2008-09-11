@@ -71,7 +71,7 @@ static WRITE8_HANDLER( poolshrk_watchdog_w )
 
 static READ8_HANDLER( poolshrk_input_r )
 {
-	static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3" };
+	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 	UINT8 val = input_port_read(machine, portnames[offset & 3]);
 
 	int x = input_port_read(machine, (offset & 1) ? "AN1" : "AN0");

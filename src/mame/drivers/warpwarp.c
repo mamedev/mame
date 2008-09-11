@@ -144,7 +144,7 @@ static int handle_joystick;
 static READ8_HANDLER( geebee_in_r )
 {
 	int res;
-	static const char *portnames[] = { "SW0", "SW1", "DSW2", "PLACEHOLDER" };	// "IN1" & "IN2" are read separately when offset==3
+	static const char *const portnames[] = { "SW0", "SW1", "DSW2", "PLACEHOLDER" };	// "IN1" & "IN2" are read separately when offset==3
 
 	offset &= 3;
 	res = input_port_read_safe(machine, portnames[offset], 0);

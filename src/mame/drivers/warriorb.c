@@ -164,7 +164,7 @@ VIDEO_UPDATE( warriorb );
                           SOUND
 ***********************************************************/
 
-static INT32 banknum = -1;
+static INT32 banknum;
 
 static void reset_sound_region(running_machine *machine)
 {
@@ -703,6 +703,8 @@ static MACHINE_START( warriorb )
 
 static MACHINE_RESET( taito_dualscreen )
 {
+	banknum = -1;
+
 	/**** mixer control enable ****/
 	sound_global_enable( 1 );	/* mixer enabled */
 }

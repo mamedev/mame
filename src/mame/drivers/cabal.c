@@ -88,7 +88,7 @@ static int last[4];
 static WRITE16_HANDLER( track_reset_w )
 {
 	int i;
-	static const char *track_names[] = { "IN0", "IN1", "IN2", "IN3" };
+	static const char *const track_names[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	for (i = 0; i < 4; i++)
 		last[i] = input_port_read(machine, track_names[i]);

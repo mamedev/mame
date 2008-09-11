@@ -25,7 +25,7 @@ static int taitojc_gfx_index;
 static UINT8 *taitojc_dirty_map;
 static UINT32 *taitojc_char_ram;
 static UINT32 *taitojc_tile_ram;
-static int taitojc_char_dirty = 1;
+static int taitojc_char_dirty;
 static tilemap *taitojc_tilemap;
 
 static poly_manager *poly;
@@ -195,6 +195,8 @@ static void taitojc_exit(running_machine *machine)
 VIDEO_START( taitojc )
 {
 	int width, height;
+
+	taitojc_char_dirty = 1;
 
 	poly = poly_alloc(4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	add_exit_callback(machine, taitojc_exit);

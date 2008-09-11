@@ -152,7 +152,7 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 
 	/* initialize JSA III ADPCM */
 	{
-		static const char *regions[] = { "adpcm", "adcpml", "adpcmr" };
+		static const char *const regions[] = { "adpcm", "adcpml", "adpcmr" };
 		int rgn;
 
 		/* expand the ADPCM data to avoid lots of memcpy's during gameplay */

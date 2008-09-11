@@ -292,7 +292,7 @@ ADDRESS_MAP_END
                         SOUND
 *****************************************************/
 
-static INT32 banknum = -1;
+static INT32 banknum;
 static UINT8 adpcm_command = 0;
 static UINT8 nmi_enable = 0;
 
@@ -1183,9 +1183,6 @@ static DRIVER_INIT( darius )
 {
 //  taitosnd_setz80_soundcpu( 2 );
 
-	cpua_ctrl = 0xff;
-
-	banknum = -1;
 }
 
 
@@ -1197,6 +1194,11 @@ static STATE_POSTLOAD( darius_postload )
 
 static MACHINE_START( darius )
 {
+	cpua_ctrl = 0xff;
+	banknum = -1;
+	adpcm_command = 0;
+	nmi_enable = 0;
+
 	state_save_register_global(cpua_ctrl);
 
 	// (there are other sound vars that may need saving too) //

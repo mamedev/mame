@@ -109,7 +109,7 @@ static WRITE8_HANDLER( ajax_lamps_w )
 READ8_HANDLER( ajax_ls138_f10_r )
 {
 	int data = 0, index;
-	static const char *portnames[] = { "SYSTEM", "P1", "DSW1", "DSW2" };
+	static const char *const portnames[] = { "SYSTEM", "P1", "DSW1", "DSW2" };
 
 	switch ((offset & 0x01c0) >> 6)
 	{

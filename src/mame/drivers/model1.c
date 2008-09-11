@@ -642,8 +642,8 @@ static int to_68k[FIFO_SIZE], fifo_wptr, fifo_rptr;
 
 static READ16_HANDLER( io_r )
 {
-	static const char *analognames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
-	static const char *inputnames[] = { "IN0", "IN1", "IN2" };
+	static const char *const analognames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
+	static const char *const inputnames[] = { "IN0", "IN1", "IN2" };
 
 	if(offset < 0x8)
 		return input_port_read_safe(machine, analognames[offset], 0x00);

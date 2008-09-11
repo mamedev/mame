@@ -211,7 +211,7 @@ static READ16_HANDLER( slapshot_service_input_r )
 
 static READ16_HANDLER( opwolf3_adc_r )
 {
-	static const char *adcnames[] = { "GUN1X", "GUN1Y", "GUN2X", "GUN2Y" };
+	static const char *const adcnames[] = { "GUN1X", "GUN1Y", "GUN2X", "GUN2Y" };
 
 	return input_port_read(machine, adcnames[offset]) << 8;
 }
@@ -226,7 +226,7 @@ static WRITE16_HANDLER( opwolf3_adc_req_w )
                 SOUND
 *****************************************************/
 
-static INT32 banknum = -1;
+static INT32 banknum;
 
 static void reset_sound_region(running_machine *machine)
 {
@@ -240,6 +240,7 @@ static STATE_POSTLOAD( slapshot_postload )
 
 static MACHINE_START( slapshot )
 {
+	banknum = -1;
 	state_save_register_global(banknum);
 	state_save_register_postload(machine, slapshot_postload, NULL);
 }

@@ -46,7 +46,7 @@ VIDEO_UPDATE( amspdwy );
 static READ8_HANDLER( amspdwy_wheel_##_n_##_r ) \
 { \
 	static UINT8 wheel_old, ret; \
-	static const char *portnames[] = { "WHEEL1", "WHEEL2", "AN1", "AN2" };\
+	static const char *const portnames[] = { "WHEEL1", "WHEEL2", "AN1", "AN2" };\
 	UINT8 wheel; \
 	wheel = input_port_read(machine, portnames[2 + _n_]); \
 	if (wheel != wheel_old) \

@@ -1481,7 +1481,7 @@ static const int keyboard_notes[24] =
 static TIMER_CALLBACK( keyboard_timer_callback )
 {
 	static const int kb_uart_channel[2] = { 1, 0 };
-	static const char *keynames[] = { "KEYBOARD_P1", "KEYBOARD_P2" };
+	static const char *const keynames[] = { "KEYBOARD_P1", "KEYBOARD_P2" };
 	int keyboard;
 	int i;
 

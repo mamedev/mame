@@ -37,6 +37,9 @@ static UINT8 *dac_data;
 static UINT8 *psg_latch;
 static UINT8 *sp0250_latch;
 
+static int score_sample;
+static int random_offset;
+
 
 static void gottlieb1_sh_w(const device_config *riot, UINT8 data);
 static void gottlieb2_sh_w(running_machine *machine, UINT8 data);
@@ -145,9 +148,6 @@ static void play_sample(const char *phonemes)
 
 static void trigger_sample(running_machine *machine, UINT8 data)
 {
-	static int score_sample = 7;
-	static int random_offset = 0;
-
 	/* Reactor samples */
 	if (strcmp(machine->gamedrv->name, "reactor") == 0)
 	{
@@ -255,7 +255,7 @@ logerror("Votrax: intonation %d, phoneme %02x %s\n",data >> 6,data & 0x3f,Phonem
 			phonemes[0] = 0;
 			for (i = 0;i < votrax_queuepos-1;i++)
 			{
-				static const char *inf[4] = { "[0]", "[1]", "[2]", "[3]" };
+				static const char *const inf[4] = { "[0]", "[1]", "[2]", "[3]" };
 				int phoneme = votrax_queue[i] & 0x3f;
 				int inflection = votrax_queue[i] >> 6;
 				if (inflection != last) strcat(phonemes, inf[inflection]);
@@ -295,6 +295,9 @@ last = data;
 
 static SOUND_START( gottlieb1 )
 {
+	score_sample = 7;
+	random_offset = 0;
+
 	state_save_register_global_array(votrax_queue);
 	state_save_register_global(votrax_queuepos);
 }

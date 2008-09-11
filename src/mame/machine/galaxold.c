@@ -248,7 +248,7 @@ WRITE8_HANDLER( _4in1_bank_w )
 
 CUSTOM_INPUT( _4in1_fake_port_r )
 {
-	static const char *portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
+	static const char *const portnames[] = { "FAKE1", "FAKE2", "FAKE3", "FAKE4" };
 	int bit_mask = (FPTR)param;
 
 	return (input_port_read(field->port->machine, portnames[_4in1_bank]) & bit_mask) ? 0x01 : 0x00;

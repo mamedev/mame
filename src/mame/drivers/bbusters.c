@@ -260,7 +260,7 @@ static int gun_select;
 
 static READ16_HANDLER( control_3_r )
 {
-	static const char *port[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2", "GUNX3", "GUNY3" };
+	static const char *const port[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2", "GUNX3", "GUNY3" };
 
 	return input_port_read(machine, port[gun_select]);
 }

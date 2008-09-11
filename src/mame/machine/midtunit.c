@@ -105,7 +105,7 @@ READ16_HANDLER( midtunit_cmos_r )
 
 READ16_HANDLER( midtunit_input_r )
 {
-	static const char *portnames[] = { "IN0", "IN1", "IN2", "DSW" };
+	static const char *const portnames[] = { "IN0", "IN1", "IN2", "DSW" };
 
 	return input_port_read(machine, portnames[offset]);
 }

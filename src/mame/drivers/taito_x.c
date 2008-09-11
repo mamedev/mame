@@ -393,7 +393,7 @@ static WRITE16_HANDLER( kyustrkr_input_w )
 
 /**************************************************************************/
 
-static INT32 banknum = -1;
+static INT32 banknum;
 
 static void reset_sound_region(running_machine *machine)
 {
@@ -986,6 +986,7 @@ static STATE_POSTLOAD( taitox_postload )
 
 static MACHINE_START( taitox )
 {
+	banknum = -1;
 	state_save_register_global(banknum);
 	state_save_register_postload(machine, taitox_postload, NULL);
 }

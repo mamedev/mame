@@ -187,7 +187,7 @@ static const int lordgun_gun_x_table[] =
 };
 
 
-static const char *gunnames[] = { "LIGHT0_X", "LIGHT1_X", "LIGHT0_Y", "LIGHT1_Y" };
+static const char *const gunnames[] = { "LIGHT0_X", "LIGHT1_X", "LIGHT0_Y", "LIGHT1_Y" };
 
 static void lorddgun_calc_gun_scr(running_machine *machine, int i)
 {

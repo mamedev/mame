@@ -167,13 +167,13 @@ static WRITE16_HANDLER(bigfight_a60000_w) { COMBINE_DATA(&bigfight_a60000[offset
 
 static READ16_HANDLER(cyclwarr_input_r)
 {
-	static const char *port[] = { "SERVICE", "P1", "P2", "DSW3" };
+	static const char *const port[] = { "SERVICE", "P1", "P2", "DSW3" };
 	return input_port_read(machine, port[offset]);
 }
 
 static READ16_HANDLER(cyclwarr_input2_r)
 {
-	static const char *port2[] = { "DSW1", "DSW2", "P3", "P4" };
+	static const char *const port2[] = { "DSW1", "DSW2", "P3", "P4" };
 	return input_port_read(machine, port2[offset]);
 }
 

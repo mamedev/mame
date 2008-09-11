@@ -89,7 +89,7 @@ static WRITE8_HANDLER( laserbat_input_mux_w )
 
 static READ8_HANDLER( laserbat_input_r )
 {
-	static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3" };
+	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	return input_port_read(machine, portnames[laserbat_input_mux]);
 }

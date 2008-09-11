@@ -1973,7 +1973,7 @@ static UINT32 chardma_source;
 static UINT32 chardma_other;
 
 //static UINT8* current_table;
-static UINT32 current_table_address = -1;
+static UINT32 current_table_address;
 
 static int cps3_rle_length = 0;
 
@@ -2459,6 +2459,8 @@ static MACHINE_START( cps3 )
 
 static MACHINE_RESET( cps3 )
 {
+	current_table_address = -1;
+
 	if (cps3_use_fastboot)
 	{
 		fastboot_timer = timer_alloc(fastboot_timer_callback, NULL);

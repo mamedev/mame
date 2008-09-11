@@ -203,7 +203,7 @@ static int multigam3_mmc3_scanline_counter;
 static int multigam3_mmc3_scanline_latch;
 static int multigam3_mmc3_banks[2];
 static int multigam3_mmc3_4screen;
-static int multigam3_mmc3_last_bank = 0xff;
+static int multigam3_mmc3_last_bank;
 static UINT8* multigmc_mmc3_6000_ram;
 
 static void multigam3_mmc3_scanline_cb( int num, int scanline, int vblank, int blanked )

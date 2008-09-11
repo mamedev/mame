@@ -1137,11 +1137,11 @@ void drcuml_add_comment(drcuml_block *block, const char *format, ...)
 
 void drcuml_disasm(const drcuml_instruction *inst, char *buffer, drcuml_state *drcuml)
 {
-	static const char *conditions[] = { "z", "nz", "s", "ns", "c", "nc", "v", "nv", "u", "nu", "a", "be", "g", "le", "l", "ge" };
-	static const char *pound_size[] = { "?", "?", "?", "?", "s", "?", "?", "?", "d" };
-	static const char *bang_size[] = { "?", "b", "h", "?", "", "?", "?", "?", "d" };
-	static const char *fmods[] = { "trunc", "round", "ceil", "floor", "default" };
-	static const char *sizes[] = { "byte", "word", "dword", "qword" };
+	static const char *const conditions[] = { "z", "nz", "s", "ns", "c", "nc", "v", "nv", "u", "nu", "a", "be", "g", "le", "l", "ge" };
+	static const char *const pound_size[] = { "?", "?", "?", "?", "s", "?", "?", "?", "d" };
+	static const char *const bang_size[] = { "?", "b", "h", "?", "", "?", "?", "?", "d" };
+	static const char *const fmods[] = { "trunc", "round", "ceil", "floor", "default" };
+	static const char *const sizes[] = { "byte", "word", "dword", "qword" };
 	const drcuml_opcode_info *opinfo = opcode_info_table[inst->opcode];
 	char *dest = buffer;
 	const char *opsrc;

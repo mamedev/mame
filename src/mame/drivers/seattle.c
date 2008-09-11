@@ -1396,7 +1396,7 @@ static READ32_HANDLER( analog_port_r )
 
 static WRITE32_HANDLER( analog_port_w )
 {
-	static const char *portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
+	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
 
 	if (data < 8 || data > 15)
 		logerror("%08X:Unexpected analog port select = %08X\n", activecpu_get_pc(), data);

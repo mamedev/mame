@@ -718,7 +718,7 @@ CUSTOM_INPUT( gwar_rotary )
 {
 	static int last_value[2] = {0, 0};
 	static int cp_count[2] = {0, 0};
-	static const char *ports[] = { "P1ROT", "P2ROT" };
+	static const char *const ports[] = { "P1ROT", "P2ROT" };
 	int which = (int)(FPTR)param;
 	int value = input_port_read(field->port->machine, ports[which]);
 

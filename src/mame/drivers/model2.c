@@ -473,7 +473,7 @@ static READ32_HANDLER(analog_2b_r)
 	UINT32 iptval=0x00ff;
 	if(analog_channel<4)
 	{
-		static const char *ports[] = { "ANA0", "ANA1", "ANA2", "ANA3" };
+		static const char *const ports[] = { "ANA0", "ANA1", "ANA2", "ANA3" };
 		iptval=input_port_read_safe(machine, ports[analog_channel], 0);
 		++analog_channel;
 	}

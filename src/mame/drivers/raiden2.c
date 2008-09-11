@@ -146,7 +146,8 @@ Current Problem(s) - in order of priority
 
 static tilemap *background_layer,*midground_layer,*foreground_layer,*text_layer;
 static UINT16 *back_data,*fore_data,*mid_data, *w1ram;
-static int bg_bank=0, fg_bank=6, mid_bank=1, bg_col=0, fg_col=1, mid_col=2;
+static int bg_bank, fg_bank, mid_bank;
+static int bg_col, fg_col, mid_col;
 
 static int tick;
 static UINT16 *mainram;
@@ -812,8 +813,19 @@ static void r2_6f6c(UINT16 cc, UINT16 v1, UINT16 v2)
 }
 #endif
 
+static void common_reset(void)
+{
+	bg_bank=0;
+	fg_bank=6;
+	mid_bank=1;
+	bg_col=0;
+	fg_col=1;
+	mid_col=2;
+}
+
 static MACHINE_RESET(raiden2)
 {
+	common_reset();
 	sprcpt_init();
 	MACHINE_RESET_CALL(seibu_sound);
 
@@ -2041,6 +2053,11 @@ static INTERRUPT_GEN( rdx_v33_interrupt )
 	logerror("VSYNC\n");
 }
 
+static MACHINE_RESET( rdx_v33 )
+{
+	common_reset();
+}
+
 static MACHINE_DRIVER_START( rdx_v33 )
 
 	/* basic machine hardware */
@@ -2048,6 +2065,7 @@ static MACHINE_DRIVER_START( rdx_v33 )
 	MDRV_CPU_PROGRAM_MAP(rdx_v33_map, 0)
 	MDRV_CPU_VBLANK_INT("main", rdx_v33_interrupt)
 
+	MDRV_MACHINE_RESET(rdx_v33)
 	MDRV_NVRAM_HANDLER(rdx_v33)
 
 	/* video hardware */

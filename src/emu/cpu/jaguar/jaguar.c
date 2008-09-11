@@ -116,7 +116,7 @@ static int bankswitch_icount;
 static jaguar_regs	jaguar;
 static UINT16 *		mirror_table;
 static UINT8 *		condition_table;
-static int			executing_cpu = -1;
+static int			executing_cpu;
 
 static const UINT32 convert_zero[32] =
 { 32,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31 };
@@ -460,6 +460,7 @@ INLINE void common_reset(void)
 {
 	init_tables();
 
+	executing_cpu = -1;
 	jaguar.b0 = jaguar.r;
 	jaguar.b1 = jaguar.a;
 

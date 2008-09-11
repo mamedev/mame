@@ -22,6 +22,8 @@ extern PALETTE_INIT ( compgolf );
 extern VIDEO_START  ( compgolf );
 extern VIDEO_UPDATE ( compgolf );
 
+static int bank;
+
 static WRITE8_HANDLER( compgolf_scrollx_lo_w )
 {
 	compgolf_scrollx_lo = data;
@@ -36,7 +38,6 @@ static WRITE8_HANDLER( compgolf_ctrl_w )
 {
 	/* bit 4 and 6 are always set */
 
-	static int bank = -1;
 	int new_bank = (data & 4) >> 2;
 
 	if( bank != new_bank )
@@ -304,6 +305,7 @@ static void compgolf_expand_bg(running_machine *machine)
 
 static DRIVER_INIT( compgolf )
 {
+	bank = -1;
 	compgolf_expand_bg(machine);
 }
 

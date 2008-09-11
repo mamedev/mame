@@ -236,7 +236,7 @@ static READ16_HANDLER( syvalion_input_bypass_r )
 }
 
 
-static INT32 banknum = -1;
+static INT32 banknum;
 
 static void reset_sound_region(running_machine *machine)
 {
@@ -564,6 +564,11 @@ static STATE_POSTLOAD( taitoh_postload )
 	reset_sound_region(machine);
 }
 
+static MACHINE_RESET( taitoh )
+{
+	banknum = -1;
+}
+
 static MACHINE_START( taitoh )
 {
 	state_save_register_global(banknum);
@@ -582,6 +587,7 @@ static MACHINE_DRIVER_START( syvalion )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_START(taitoh)
+	MDRV_MACHINE_RESET(taitoh)
 
 	MDRV_INTERLEAVE(10)
 
@@ -621,6 +627,7 @@ static MACHINE_DRIVER_START( recordbr )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_START(taitoh)
+	MDRV_MACHINE_RESET(taitoh)
 
 	MDRV_INTERLEAVE(10)
 
@@ -660,6 +667,7 @@ static MACHINE_DRIVER_START( dleague )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 
 	MDRV_MACHINE_START(taitoh)
+	MDRV_MACHINE_RESET(taitoh)
 
 	MDRV_INTERLEAVE(10)
 

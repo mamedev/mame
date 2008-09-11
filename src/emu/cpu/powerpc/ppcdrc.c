@@ -4037,7 +4037,7 @@ static const char *log_desc_flags_to_string(UINT32 flags)
 
 static void log_register_list(drcuml_state *drcuml, const char *string, const UINT32 *reglist, const UINT32 *regnostarlist)
 {
-	static const char *crtext[4] = { "lt", "gt", "eq", "so" };
+	static const char *const crtext[4] = { "lt", "gt", "eq", "so" };
 	int count = 0;
 	int regnum;
 	int crnum;

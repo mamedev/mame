@@ -17,7 +17,7 @@ static int dragrace_gear[2];
 static TIMER_CALLBACK( dragrace_frame_callback )
 {
 	int i;
-	static const char *portnames[] = { "P1", "P2" };
+	static const char *const portnames[] = { "P1", "P2" };
 
 	for (i = 0; i < 2; i++)
 	{
@@ -118,7 +118,7 @@ static WRITE8_HANDLER( dragrace_misc_clear_w )
 static READ8_HANDLER( dragrace_input_r )
 {
 	int val = input_port_read(machine, "IN2");
-	static const char *portnames[] = { "IN0", "IN1" };
+	static const char *const portnames[] = { "IN0", "IN1" };
 
 	UINT8 maskA = 1 << (offset % 8);
 	UINT8 maskB = 1 << (offset / 8);
@@ -148,7 +148,7 @@ static READ8_HANDLER( dragrace_steering_r )
 {
 	int bitA[2];
 	int bitB[2];
-	static const char *dialnames[] = { "DIAL1", "DIAL2" };
+	static const char *const dialnames[] = { "DIAL1", "DIAL2" };
 
 	int i;
 

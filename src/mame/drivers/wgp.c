@@ -415,7 +415,7 @@ extern UINT16 *wgp_piv_ctrlram;
 READ16_HANDLER ( wgp_piv_ctrl_word_r );
 WRITE16_HANDLER( wgp_piv_ctrl_word_w );
 
-static UINT16 cpua_ctrl = 0xff;
+static UINT16 cpua_ctrl;
 static UINT16 port_sel=0;
 extern UINT16 wgp_rotate_ctrl[8];
 
@@ -619,7 +619,7 @@ static WRITE16_HANDLER( wgp_adinput_w )
                           SOUND
 **********************************************************/
 
-static INT32 banknum = -1;
+static INT32 banknum;
 
 static void reset_sound_region(running_machine *machine)	/* assumes Z80 sandwiched between the 68Ks */
 {
@@ -938,6 +938,13 @@ static STATE_POSTLOAD( wgp_postload )
 	reset_sound_region(machine);
 }
 
+static MACHINE_RESET( wgp )
+{
+	banknum = -1;
+	cpua_ctrl = 0xff;
+	port_sel=0;
+}
+
 static MACHINE_START( wgp )
 {
 	state_save_register_global(cpua_ctrl);
@@ -960,6 +967,7 @@ static MACHINE_DRIVER_START( wgp )
 	MDRV_CPU_VBLANK_INT("main", wgp_cpub_interrupt)
 
 	MDRV_MACHINE_START(wgp)
+	MDRV_MACHINE_RESET(wgp)
 
 	MDRV_INTERLEAVE(250)
 
@@ -1213,7 +1221,6 @@ static DRIVER_INIT( wgp )
 #endif
 
 //  taitosnd_setz80_soundcpu( 2 );
-	cpua_ctrl = 0xff;
 }
 
 static DRIVER_INIT( wgp2 )
@@ -1222,8 +1229,6 @@ static DRIVER_INIT( wgp2 )
 	UINT16 *ROM = (UINT16 *)memory_region(machine, "sub");
 	ROM[0x8008 / 2] = 0x0;
 	ROM[0x8010 / 2] = 0x0;
-
-	cpua_ctrl = 0xff;
 }
 
 /* Working Games with some graphics problems - e.g. missing rotation */

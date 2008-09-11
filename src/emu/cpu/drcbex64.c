@@ -340,7 +340,7 @@ static opcode_generate_func opcode_table[DRCUML_OP_MAX];
 static const UINT64 size_to_mask[] = { 0, 0xff, 0xffff, 0, 0xffffffff, 0, 0, 0, U64(0xffffffffffffffff) };
 
 /* register mapping tables */
-static UINT8 int_register_map[DRCUML_REG_I_END - DRCUML_REG_I0] =
+static const UINT8 int_register_map[DRCUML_REG_I_END - DRCUML_REG_I0] =
 {
 #ifdef X64_WINDOWS_ABI
 	REG_RBX, REG_RSI, REG_RDI, REG_R12, REG_R13, REG_R14, REG_R15
@@ -355,7 +355,7 @@ static UINT8 float_register_map[DRCUML_REG_F_END - DRCUML_REG_F0] =
 };
 
 /* condition mapping table */
-static UINT8 condition_map[DRCUML_COND_MAX - DRCUML_COND_Z] =
+static const UINT8 condition_map[DRCUML_COND_MAX - DRCUML_COND_Z] =
 {
 	COND_Z,		/* DRCUML_COND_Z = 0x80,    requires Z */
 	COND_NZ,	/* DRCUML_COND_NZ,          requires Z */

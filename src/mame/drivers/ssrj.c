@@ -45,7 +45,7 @@ VIDEO_START( ssrj );
 VIDEO_UPDATE( ssrj );
 PALETTE_INIT( ssrj );
 
-static int oldport=0x80;
+static int oldport;
 
 static MACHINE_RESET(ssrj)
 {

@@ -506,7 +506,7 @@ simulate_mcu( running_machine *machine )
 	int i;
 	UINT16 data;
 	UINT8 poll_coins;
-	static const char *portnames[] = { "P1", "P2", "P3", "P4" };
+	static const char *const portnames[] = { "P1", "P2", "P3", "P4" };
 
 	namcona1_workram[0xf60/2] = 0x0000; /* mcu ready */
 

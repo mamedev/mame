@@ -891,10 +891,10 @@ static const UINT8 port_ad[] =
 };
 
 static UINT8 port_sel,mux_data;
+static int port_i;
 
 static READ32_HANDLER ( stv_io_r32 )
 {
-	static int i= -1;
 	//if(LOG_IOGA) logerror("(PC=%08X): I/O r %08X & %08X\n", activecpu_get_pc(), offset*4, mem_mask);
 
 	switch(offset)
@@ -984,8 +984,8 @@ static READ32_HANDLER ( stv_io_r32 )
 		case 7:
 		if(LOG_IOGA) logerror("(PC %d=%06x) Warning: READ from PORT_AD\n",cpu_getactivecpu(), activecpu_get_pc());
 		popmessage("Read from PORT_AD");
-		i++;
-		return port_ad[i & 7];
+		port_i++;
+		return port_ad[port_i & 7];
 		default:
 		return ioga[offset];
 	}
@@ -2576,6 +2576,9 @@ static MACHINE_RESET( stv )
 	en_68k = 0;
 	NMI_reset = 1;
 	smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
+
+	port_sel = mux_data = 0;
+	port_i = -1;
 
 	cpunum_set_clock(machine, 0, MASTER_CLOCK_320/2);
 	cpunum_set_clock(machine, 1, MASTER_CLOCK_320/2);

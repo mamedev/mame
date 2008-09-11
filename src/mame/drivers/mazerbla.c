@@ -435,7 +435,7 @@ Vertical movement of gun is Strobe 9, Bits 0-7.
 
 static READ8_HANDLER( zpu_inputs_r )
 {
-	static const char *strobenames[] = { "ZPU", "DSW0", "DSW1", "DSW2", "DSW3", "BUTTONS", "STICK0_X", "STICK0_Y", "STICK1_X", "STICK1_Y" };
+	static const char *const strobenames[] = { "ZPU", "DSW0", "DSW1", "DSW2", "DSW3", "BUTTONS", "STICK0_X", "STICK0_Y", "STICK1_X", "STICK1_Y" };
 	UINT8 ret = 0;
 
 	if (bcd_7445<10)

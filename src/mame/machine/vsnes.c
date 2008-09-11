@@ -21,6 +21,8 @@ static int input_latch[4];
 static const UINT8 *remapped_colortable;
 
 static int sound_fix=0;
+static UINT8 last_bank;
+
 /*************************************
  *
  *  Color Mapping
@@ -220,6 +222,8 @@ READ8_HANDLER( vsnes_in1_1_r )
 
 MACHINE_RESET( vsnes )
 {
+	last_bank = 0xff;
+	sound_fix = 0;
 	input_latch[0] = input_latch[1] = 0;
 	input_latch[2] = input_latch[3] = 0;
 
@@ -854,8 +858,6 @@ static void mapper4_irq ( int num, int scanline, int vblank, int blanked )
 
 static WRITE8_HANDLER( mapper4_w )
 {
-	static UINT8 last_bank = 0xff;
-
 	switch (offset & 0x7001)
 	{
 		case 0x0000: /* $8000 */

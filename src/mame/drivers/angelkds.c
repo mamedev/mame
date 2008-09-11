@@ -181,8 +181,8 @@ these make the game a bit easier for testing purposes
 static READ8_HANDLER( angelkds_input_r )
 {
 	int fake;
-	static const char *portnames[] = { "I81", "I82" };
-	static const char *fakenames[] = { "FAKE1", "FAKE2" };
+	static const char *const portnames[] = { "I81", "I82" };
+	static const char *const fakenames[] = { "FAKE1", "FAKE2" };
 
 	fake = input_port_read(machine, fakenames[offset]);
 
@@ -193,7 +193,7 @@ static READ8_HANDLER( angelkds_input_r )
 
 static READ8_HANDLER( angelkds_input_r )
 {
-	static const char *portnames[] = { "I81", "I82" };
+	static const char *const portnames[] = { "I81", "I82" };
 
 	return input_port_read(machine, portnames[offset]);
 }

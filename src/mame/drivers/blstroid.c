@@ -62,7 +62,7 @@ static MACHINE_RESET( blstroid )
 
 static READ16_HANDLER( inputs_r )
 {
-	static const char *iptnames[] = { "IN0", "IN1" };
+	static const char *const iptnames[] = { "IN0", "IN1" };
 	int temp = input_port_read(machine, iptnames[offset & 1]);
 
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0040;

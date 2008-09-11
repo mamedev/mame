@@ -1698,7 +1698,7 @@ INPUT_PORTS_START( aladbl )
 INPUT_PORTS_END
 
 /* xxx_BUTTONs are used with player = 0, 1, 2, 3 so we need to return 0 for the missing 4th I/O port  */
-static const char *padnames[] = { "PAD1", "PAD2", "IN0", "UNK" };
+static const char *const padnames[] = { "PAD1", "PAD2", "IN0", "UNK" };
 
 #define MODE_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0800) >> 11)
 #define Z_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0400) >> 10)

@@ -211,7 +211,7 @@ static int scrollx=0;
 static int scrolly=0;
 
 static UINT8 reg_a002=0;
-static int bank=-1;
+static int bank;
 
 static TILE_GET_INFO( get_gfx0b_tile_info )
 {
@@ -853,6 +853,7 @@ static DRIVER_INIT(witch)
 	memory_set_bankptr(1,&ROM[0x10000+UNBANKED_SIZE]);
 
 	memory_install_read8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x7000, 0x700f, 0, 0, prot_read_700x);
+	bank = -1;
 }
 
 GAME( 1992, witch,    0,     witch, witch, witch, ROT0, "Sega / Vic Tokai", "Witch", 0 )

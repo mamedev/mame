@@ -433,7 +433,7 @@ static WRITE16_HANDLER( othunder_lightgun_w )
             SOUND
 *****************************************/
 
-static INT32 banknum = -1;
+static INT32 banknum;
 
 static void reset_sound_region(running_machine *machine)
 {
@@ -447,6 +447,7 @@ static STATE_POSTLOAD( othunder_postload )
 
 static MACHINE_START( othunder )
 {
+	banknum = -1;
 	state_save_register_global(banknum);
 	state_save_register_postload(machine, othunder_postload, NULL);
 }

@@ -165,7 +165,7 @@ static WRITE8_HANDLER( punchout_2a03_reset_w )
 		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
 }
 
-static int prot_mode_sel = -1; /* Mode selector */
+static int prot_mode_sel; /* Mode selector */
 static int prot_mem[16];
 
 static READ8_HANDLER( spunchout_prot_r ) {
@@ -669,6 +669,12 @@ static const nes_interface nes_config =
 	"audio"
 };
 
+static MACHINE_RESET( punchout )
+{
+	prot_mode_sel = -1;
+	memset(prot_mem, 0, sizeof(prot_mem));
+}
+
 
 static MACHINE_DRIVER_START( punchout )
 
@@ -682,6 +688,7 @@ static MACHINE_DRIVER_START( punchout )
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_VBLANK_INT("top", nmi_line_pulse)
 
+	MDRV_MACHINE_RESET(punchout)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */

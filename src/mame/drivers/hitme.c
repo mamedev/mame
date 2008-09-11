@@ -128,7 +128,7 @@ static VIDEO_UPDATE(barricad)
 
 static UINT8 read_port_and_t0(running_machine *machine, int port)
 {
-	static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3" };
+	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	UINT8 val = input_port_read(machine, portnames[port]);
 	if (attotime_compare(timer_get_time(), timeout_time) > 0)

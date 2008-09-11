@@ -1173,7 +1173,7 @@ static int pif_channel_handle_command(running_machine *machine, int channel, int
 			UINT16 buttons = 0;
 			INT8 x = 0, y = 0;
 			/* add here tags for P2, P3 and P4 when implemented */
-			static const char *portnames[] = { "P1", "P1_ANALOG_X", "P1_ANALOG_Y" };
+			static const char *const portnames[] = { "P1", "P1_ANALOG_X", "P1_ANALOG_Y" };
 
 			if (slength != 1 || rlength != 4)
 			{

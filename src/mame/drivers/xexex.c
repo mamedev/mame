@@ -83,6 +83,7 @@ static int init_eeprom_count;
 static INT32 cur_sound_region, xexex_strip0x1a;
 static int suspension_active, resume_trigger;
 static emu_timer *dmadelay_timer;
+static int frame;
 
 
 static const eeprom_interface eeprom_intf =
@@ -147,8 +148,6 @@ static WRITE16_HANDLER( K053247_scattered_word_w )
 
 static void xexex_objdma(running_machine *machine, int limiter)
 {
-	static int frame = -1;
-
 	int counter, num_inactive;
 	UINT16 *src, *dst;
 
@@ -602,8 +601,12 @@ ROM_END
 
 static MACHINE_RESET( xexex )
 {
+	cur_control2 = 0;
+	init_eeprom_count = 0;
 	cur_sound_region = 0;
 	suspension_active = 0;
+	resume_trigger = 0;
+	frame = -1;
 	k054539_init_flags(0, K054539_REVERSE_STEREO);
 }
 

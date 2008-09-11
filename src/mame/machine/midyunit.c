@@ -141,7 +141,7 @@ READ16_HANDLER( midyunit_protection_r )
 
 READ16_HANDLER( midyunit_input_r )
 {
-	static const char *portnames[] = { "IN0", "IN1", "IN2", "DSW", "UNK0", "UNK1" };
+	static const char *const portnames[] = { "IN0", "IN1", "IN2", "DSW", "UNK0", "UNK1" };
 
 	return input_port_read(machine, portnames[offset]);
 }
@@ -156,7 +156,7 @@ READ16_HANDLER( midyunit_input_r )
 
 static READ16_HANDLER( term2_input_r )
 {
-	static const char *portnames[] = { "IN0", "IN1", NULL, "DSW", "UNK0", "UNK1" };
+	static const char *const portnames[] = { "IN0", "IN1", NULL, "DSW", "UNK0", "UNK1" };
 
 	if (offset != 2)
 		return input_port_read(machine, portnames[offset]);

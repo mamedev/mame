@@ -885,7 +885,7 @@ WRITE16_HANDLER( sci_spriteframe_w );
 READ16_HANDLER ( TC0150ROD_word_r );	/* Road generator */
 WRITE16_HANDLER( TC0150ROD_word_w );
 
-static UINT16 cpua_ctrl = 0xff;
+static UINT16 cpua_ctrl;
 static INT32 sci_int6 = 0;
 static INT32 dblaxle_int6 = 0;
 static INT32 ioc220_port = 0;
@@ -1412,7 +1412,7 @@ static READ16_HANDLER( aquajack_unknown_r )
                         SOUND
 *****************************************************/
 
-static INT32 banknum = -1;
+static INT32 banknum;
 
 static void reset_sound_region(running_machine *machine)	/* assumes Z80 sandwiched between 68Ks */
 {
@@ -1510,6 +1510,12 @@ static STATE_POSTLOAD( taitoz_postload )
 
 static MACHINE_START( taitoz )
 {
+	banknum = -1;
+	cpua_ctrl = 0xff;
+	sci_int6 = 0;
+	dblaxle_int6 = 0;
+	ioc220_port = 0;
+
 	state_save_register_global(cpua_ctrl);
 
 	/* these are specific to various games: we ought to split the inits */
@@ -4764,8 +4770,6 @@ ROM_END
 static DRIVER_INIT( taitoz )
 {
 //  taitosnd_setz80_soundcpu( 2 );
-
-	cpua_ctrl = 0xff;
 }
 
 static STATE_POSTLOAD( bshark_postload )
@@ -4775,7 +4779,7 @@ static STATE_POSTLOAD( bshark_postload )
 
 static DRIVER_INIT( bshark )
 {
-	cpua_ctrl = 0xff;
+	eep_latch = 0;
 	state_save_register_postload(machine, bshark_postload, NULL);
 
 	state_save_register_global(eep_latch);

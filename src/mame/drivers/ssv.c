@@ -491,7 +491,7 @@ static UINT16 *gdfs_blitram;
 
 static READ16_HANDLER( gdfs_eeprom_r )
 {
-	static const char *gunnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
+	static const char *const gunnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
 
 	return (((gdfs_lightgun_select & 1) ? 0 : 0xff) ^ input_port_read(machine, gunnames[gdfs_lightgun_select])) | (eeprom_read_bit() << 8);
 }

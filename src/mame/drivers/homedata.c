@@ -255,7 +255,7 @@ static int keyb;
 static READ8_HANDLER( mrokumei_keyboard_r )
 {
 	int res = 0x3f,i;
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 
 	/* offset 0 is player 1, offset 1 player 2 (not supported) */
 	if (offset == 0)
@@ -468,7 +468,7 @@ static READ8_HANDLER( pteacher_io_r )
 
 static READ8_HANDLER( pteacher_keyboard_r )
 {
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 	int dips = input_port_read(machine, "DSW");
 
 //  logerror("%04x: keyboard_r with port A = %02x\n",activecpu_get_pc(),upd7807_porta);

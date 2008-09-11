@@ -793,7 +793,7 @@ static READ8_HANDLER( analog_data_r )
 
 static WRITE8_HANDLER( analog_select_w )
 {
-	static const char *analog_port[] = { "AN0", "AN1", "AN2" };
+	static const char *const analog_port[] = { "AN0", "AN1", "AN2" };
 
 	if (offset <= 2)
 		analog_data = input_port_read(machine, analog_port[offset]);

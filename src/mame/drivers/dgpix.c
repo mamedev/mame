@@ -56,6 +56,7 @@ static int vbuffer = 0;
 
 static int flash_roms;
 static UINT32 flash_cmd = 0;
+static INT32 first_offset;
 
 static READ32_HANDLER( flash_r )
 {
@@ -90,8 +91,6 @@ static READ32_HANDLER( flash_r )
 
 static WRITE32_HANDLER( flash_w )
 {
-	static INT32 first_offset = -1;
-
 	if(flash_cmd == 0x20200000)
 	{
 		// erase game settings
@@ -295,6 +294,14 @@ static VIDEO_UPDATE( dgpix )
 	return 0;
 }
 
+static MACHINE_RESET( dgpix )
+{
+	vbuffer = 0;
+	flash_cmd = 0;
+	first_offset = -1;
+}
+
+
 static MACHINE_DRIVER_START( dgpix )
 	MDRV_CPU_ADD("main", E132XT, 20000000*4)	/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
@@ -305,6 +312,7 @@ static MACHINE_DRIVER_START( dgpix )
     running at 16.9MHz
 */
 
+	MDRV_MACHINE_RESET(dgpix)
 	MDRV_NVRAM_HANDLER(flashroms)
 
 	/* video hardware */

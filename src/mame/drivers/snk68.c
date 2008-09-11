@@ -102,7 +102,7 @@ static READ16_HANDLER( rotary_lsb_r )
 
 static READ16_HANDLER( protcontrols_r )
 {
-	static const char *portnames[] = { "P1", "P2", "SYSTEM" };
+	static const char *const portnames[] = { "P1", "P2", "SYSTEM" };
 	return input_port_read(machine, portnames[offset]) ^ invert_controls;
 }
 

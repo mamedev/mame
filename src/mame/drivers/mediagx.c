@@ -503,7 +503,7 @@ static WRITE32_HANDLER( io20_w )
 static READ32_HANDLER( parallel_port_r )
 {
 	UINT32 r = 0;
-//  static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7", "IN8" }; // but parallel_pointer takes values 0 -> 23
+	//static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7", "IN8" }; // but parallel_pointer takes values 0 -> 23
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -535,7 +535,7 @@ static READ32_HANDLER( parallel_port_r )
 
 static WRITE32_HANDLER( parallel_port_w )
 {
-	static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7", "IN8" };	// but parallel_pointer takes values 0 -> 23
+	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7", "IN8" };	// but parallel_pointer takes values 0 -> 23
 
 	COMBINE_DATA( &parport );
 

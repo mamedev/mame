@@ -28,7 +28,7 @@ void sprint8_set_collision(running_machine *machine, int n)
 static TIMER_CALLBACK( input_callback )
 {
 	static UINT8 dial[8];
-	static const char *dialnames[] = { "DIAL1", "DIAL2", "DIAL3", "DIAL4", "DIAL5", "DIAL6", "DIAL7", "DIAL8" };
+	static const char *const dialnames[] = { "DIAL1", "DIAL2", "DIAL3", "DIAL4", "DIAL5", "DIAL6", "DIAL7", "DIAL8" };
 
 	int i;
 
@@ -71,7 +71,7 @@ static READ8_HANDLER( sprint8_collision_r )
 
 static READ8_HANDLER( sprint8_input_r )
 {
-	static const char *portnames[] = { "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8" };
+	static const char *const portnames[] = { "P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8" };
 	UINT8 val = input_port_read(machine, portnames[offset]);
 
 	if (steer_dir[offset])

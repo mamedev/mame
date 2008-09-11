@@ -1966,7 +1966,7 @@ static int gun_input_bit = 0, gun_input_src = 0;
 
 static READ16_HANDLER( zombraid_gun_r ) // Serial interface
 {
-	static const char *portnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
+	static const char *const portnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
 
 	int data = input_port_read(machine, portnames[gun_input_src]);	// Input Ports 5-8
 	return (data >> gun_input_bit) & 1;
@@ -2604,7 +2604,7 @@ static READ16_HANDLER( kiwame_input_r )
 {
 	int row_select = kiwame_nvram_r( machine,0x10a/2,0x00ff ) & 0x1f;
 	int i;
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 
 	for(i = 0; i < 5; i++)
 		if (row_select & (1<<i))	break;

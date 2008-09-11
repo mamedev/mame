@@ -11,7 +11,7 @@
 UINT8 *fortyl_video_ctrl;
 
 static UINT8 fortyl_flipscreen,fortyl_pix_redraw;
-static UINT8 fortyl_xoffset = 128;
+static const UINT8 fortyl_xoffset = 128;
 
 static UINT8 *fortyl_pixram1;
 static UINT8 *fortyl_pixram2;

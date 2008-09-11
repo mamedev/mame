@@ -259,7 +259,7 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 	{
 		int movement_flip_flop = TTL7474_1F_1 + (2 * player);
 		int dir_flip_flop      = movement_flip_flop + 1;
-		static const char *portnames[] = { "DIAL0", "DIAL1", "DIAL2", "DIAL3" };
+		static const char *const portnames[] = { "DIAL0", "DIAL1", "DIAL2", "DIAL3" };
 
 		port_value = input_port_read(machine, portnames[player]);
 

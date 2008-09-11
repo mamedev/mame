@@ -341,7 +341,7 @@ static READ16_HANDLER( stick2_input_r )
 }
 
 
-static INT32 banknum = -1;
+static INT32 banknum;
 
 static void reset_sound_region(running_machine *machine)
 {
@@ -362,6 +362,7 @@ static STATE_POSTLOAD( taitoair_postload )
 static MACHINE_START( taitoair )
 {
 	dsp_HOLD_signal = ASSERT_LINE;
+	banknum = -1;
 
 	state_save_register_global(banknum);
 	state_save_register_postload(machine, taitoair_postload, NULL);

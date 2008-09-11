@@ -184,10 +184,10 @@ static READ8_HANDLER( read_from_unmapped_memory )
 }
 #endif
 
-static int variable_data=0x11;
+static UINT8 variable_data;
 static READ8_HANDLER( some_changing_input )
 {
-	variable_data = (variable_data+8) & 0xff;
+	variable_data += 8;
 	return variable_data;
 }
 
@@ -333,6 +333,12 @@ static const ay8910_interface ay8910_config =
 	NULL
 };
 
+static MACHINE_RESET( tankbust )
+{
+	variable_data = 0x11;
+}
+
+
 static MACHINE_DRIVER_START( tankbust )
 
 	/* basic machine hardware */
@@ -346,7 +352,7 @@ static MACHINE_DRIVER_START( tankbust )
 
 	MDRV_INTERLEAVE(100)
 
-//MDRV_MACHINE_RESET( ... )
+	MDRV_MACHINE_RESET( tankbust )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

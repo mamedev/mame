@@ -326,7 +326,7 @@ static WRITE32_DEVICE_HANDLER( kinst_ide_extra_w )
 static READ32_HANDLER( kinst_control_r )
 {
 	UINT32 result;
-	static const char *portnames[] = { "P1", "P2", "VOLUME", "UNUSED", "DSW" };
+	static const char *const portnames[] = { "P1", "P2", "VOLUME", "UNUSED", "DSW" };
 
 	/* apply shuffling */
 	offset = control_map[offset / 2];

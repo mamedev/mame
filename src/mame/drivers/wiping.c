@@ -74,11 +74,11 @@ static WRITE8_HANDLER( shared2_w )
 static READ8_HANDLER( ports_r )
 {
 	int i,res;
-	static const char *port[] = { "P1", "P2", "IN2", "IN3", "IN4", "IN5", "SYSTEM", "DSW" };
+	static const char *const portnames[] = { "P1", "P2", "IN2", "IN3", "IN4", "IN5", "SYSTEM", "DSW" };
 
 	res = 0;
 	for (i = 0; i < 8; i++)
-		res |= ((input_port_read(machine, port[i]) >> offset) & 1) << i;
+		res |= ((input_port_read(machine, portnames[i]) >> offset) & 1) << i;
 
 	return res;
 }

@@ -29,7 +29,7 @@ static void tourtabl_led_w(const device_config *device, UINT8 newdata, UINT8 old
 
 static READ16_HANDLER( tourtabl_read_input_port )
 {
-	static const char *tianames[] = { "PADDLE4", "PADDLE3", "PADDLE2", "PADDLE1", "TIA_IN4", "TIA_IN5" };
+	static const char *const tianames[] = { "PADDLE4", "PADDLE3", "PADDLE2", "PADDLE1", "TIA_IN4", "TIA_IN5" };
 
 	return input_port_read(machine, tianames[offset]);
 }

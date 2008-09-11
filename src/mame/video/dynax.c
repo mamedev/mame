@@ -250,7 +250,7 @@ WRITE8_HANDLER( dynax_flipscreen_w )
 }
 
 
-static const char *gfxregions[] = { "gfx1", "gfx2", "gfx3", "gfx4", "gfx5", "gfx6", "gfx7", "gfx8" };
+static const char *const gfxregions[] = { "gfx1", "gfx2", "gfx3", "gfx4", "gfx5", "gfx6", "gfx7", "gfx8" };
 
 WRITE8_HANDLER( dynax_blit_romregion_w )
 {

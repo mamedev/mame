@@ -295,7 +295,7 @@ static READ32_HANDLER( darkhors_input_sel_r )
 	// from bit mask to bit number
 	int bit_p1 = mask_to_bit((input_sel & 0x00ff0000) >> 16);
 	int bit_p2 = mask_to_bit((input_sel & 0xff000000) >> 24);
-	static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
+	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
 	return	(input_port_read(machine, portnames[bit_p1]) & 0x00ffffff) |
 			(input_port_read(machine, portnames[bit_p2]) & 0xff000000) ;

@@ -66,10 +66,10 @@ Technology = NMOS
 static tilemap *bg_tilemap;
 static UINT8 *trvmadns_gfxram;
 static UINT8 *trvmadns_tileram;
+static int old_data;
 
 static WRITE8_HANDLER( trvmadns_banking_w )
 {
-	static int old = -1;
 
 	UINT8 *rom;
 	int address = 0;
@@ -100,10 +100,11 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 	}
 	else
 	{
-			if(data != old)
+			if(data != old_data)
 			{
-				printf("port80 = %02X\n",old=data);
-		//      logerror("port80 = %02X\n",old=data);
+				old_data = data;
+				printf("port80 = %02X\n",data);
+				//logerror("port80 = %02X\n",data);
 			}
 
 		rom = memory_region(machine, "user1");
@@ -277,11 +278,18 @@ static VIDEO_UPDATE( trvmadns )
 	return 0;
 }
 
+static MACHINE_RESET( trvmadns )
+{
+	old_data = -1;
+}
+
 static MACHINE_DRIVER_START( trvmadns )
 	MDRV_CPU_ADD("main", Z80,10000000/2) // ?
 	MDRV_CPU_PROGRAM_MAP(cpu_map,0)
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
+
+	MDRV_MACHINE_RESET(trvmadns)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

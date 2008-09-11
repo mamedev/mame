@@ -459,7 +459,7 @@ static TIMER_CALLBACK( blitter_done )
 READ8_HANDLER( itech8_blitter_r )
 {
 	int result = blitter_data[offset / 2];
-	static const char *portnames[] = { "AN_C", "AN_D", "AN_E", "AN_F" };
+	static const char *const portnames[] = { "AN_C", "AN_D", "AN_E", "AN_F" };
 
 	/* debugging */
 	if (FULL_LOGGING) logerror("%04x:blitter_r(%02x)\n", activecpu_get_previouspc(), offset / 2);

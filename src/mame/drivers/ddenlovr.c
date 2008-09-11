@@ -2830,8 +2830,8 @@ static WRITE8_HANDLER( hginga_coins_w )
 
 static READ8_HANDLER( hginga_input_r )
 {
-	static const char *keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
-	static const char *keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
+	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
+	static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
 
 	switch( hginga_select )
 	{
@@ -3043,8 +3043,8 @@ static WRITE8_HANDLER( hparadis_select_w )
 
 static READ8_HANDLER( hparadis_input_r )
 {
-	static const char *keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
-	static const char *keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
+	static const char *const keynames0[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
+	static const char *const keynames1[] = { "KEY5", "KEY6", "KEY7", "KEY8", "KEY9" };
 
 	switch (hginga_select)
 	{

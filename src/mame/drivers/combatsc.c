@@ -167,7 +167,7 @@ static READ8_HANDLER( trackball_r )
 	if (offset == 0)
 	{
 		int i,dir[4];
-		static const char *tracknames[] = { "TRACK0_Y", "TRACK0_X", "TRACK1_Y", "TRACK1_X" };
+		static const char *const tracknames[] = { "TRACK0_Y", "TRACK0_X", "TRACK1_Y", "TRACK1_X" };
 
 		for (i = 0; i < 4; i++)
 		{

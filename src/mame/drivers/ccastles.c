@@ -290,7 +290,7 @@ static WRITE8_HANDLER( bankswitch_w )
 
 static READ8_HANDLER( leta_r )
 {
-	static const char *letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
+	static const char *const letanames[] = { "LETA0", "LETA1", "LETA2", "LETA3" };
 
 	return input_port_read(machine, letanames[offset]);
 }

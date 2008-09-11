@@ -212,8 +212,8 @@ static int dial[2],dial_selected;
 static READ8_HANDLER( block_input_r )
 {
 	static int dir[2];
-	static const char *dialnames[] = { "DIAL1", "DIAL2" };
-	static const char *portnames[] = { "IN1", "IN2" };
+	static const char *const dialnames[] = { "DIAL1", "DIAL2" };
+	static const char *const portnames[] = { "IN1", "IN2" };
 
 	if (dial_selected)
 	{
@@ -295,7 +295,7 @@ static int input_type;
 
 static READ8_HANDLER( input_r )
 {
-	static const char *portnames[] = { "IN0", "IN1", "IN2" };
+	static const char *const portnames[] = { "IN0", "IN1", "IN2" };
 
 	switch (input_type)
 	{

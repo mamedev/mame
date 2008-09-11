@@ -74,7 +74,7 @@ static WRITE8_HANDLER( sidearms_bankswitch_w )
 static READ8_HANDLER( turtship_ports_r )
 {
 	int i,res;
-	static const char *portnames[] = { "SYSTEM", "P1", "P2", "DSW0", "DSW1", "NOT_PRESENT", "NOT_PRESENT", "NOT_PRESENT" };	// only inputs 0-4 are present
+	static const char *const portnames[] = { "SYSTEM", "P1", "P2", "DSW0", "DSW1", "NOT_PRESENT", "NOT_PRESENT", "NOT_PRESENT" };	// only inputs 0-4 are present
 
 	res = 0;
 	for (i = 0;i < 8;i++)

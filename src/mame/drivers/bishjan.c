@@ -221,7 +221,7 @@ static READ16_HANDLER( bishjan_input_r )
 {
 	int i;
 	UINT16 res = 0xff;
-	static const char *port[] = { "KEYB_0", "KEYB_1", "KEYB_2", "KEYB_3", "KEYB_4" };
+	static const char *const port[] = { "KEYB_0", "KEYB_1", "KEYB_2", "KEYB_3", "KEYB_4" };
 
 	for (i = 0; i < 5; i++)
 		if (bishjan_input & (1 << i))

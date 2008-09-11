@@ -288,7 +288,7 @@ static READ16_HANDLER( srmp2_input_1_r )
     ---x xxxx : Key code
     --x- ---- : Player 1 and 2 side flag
 */
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
 	if (!ACCESSING_BITS_0_7)
 	{
@@ -512,7 +512,7 @@ static READ8_HANDLER( srmp3_input_r )
 	/* Currently I/O port of srmp3 is fully understood. */
 
 	int keydata = 0xff;
-	static const char *keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
+	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
 	logerror("PC:%04X          srmp3_input_r\n", activecpu_get_pc());
 

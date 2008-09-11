@@ -95,7 +95,7 @@ static WRITE8_HANDLER( io_select_w )
 
 static READ8_HANDLER( io_port_r )
 {
-	static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3", "DSW0", "DSW1" };
+	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "DSW0", "DSW1" };
 	gameplan_state *state = machine->driver_data;
 
 	return input_port_read(machine, portnames[state->current_port]);

@@ -355,7 +355,7 @@ static void recompute_palette_tables(void)
 
 static READ16_HANDLER( io_chip_r )
 {
-	static const char *portnames[] = { "P1", "P2", "PORTC", "PORTD", "SERVICE", "COINAGE", "DSW", "PORTH" };
+	static const char *const portnames[] = { "P1", "P2", "PORTC", "PORTD", "SERVICE", "COINAGE", "DSW", "PORTH" };
 	offset &= 0x1f/2;
 
 	switch (offset)

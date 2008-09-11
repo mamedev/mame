@@ -78,7 +78,7 @@ static WRITE8_HANDLER( zaccaria_dsw_sel_w )
 
 static READ8_HANDLER( zaccaria_dsw_r )
 {
-	static const char *dswnames[] = { "IN0", "DSW0", "DSW1" };
+	static const char *const dswnames[] = { "IN0", "DSW0", "DSW1" };
 
 	return input_port_read(machine, dswnames[dsw]);
 }

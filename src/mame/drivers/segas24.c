@@ -561,7 +561,7 @@ static int cur_input_line;
 
 static UINT8 mahmajn_io_r(running_machine *machine, int port)
 {
-	static const char *keynames[] = { "MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5", "P1", "P2" };
+	static const char *const keynames[] = { "MJ0", "MJ1", "MJ2", "MJ3", "MJ4", "MJ5", "P1", "P2" };
 
 	switch(port)
 	{
@@ -619,7 +619,7 @@ static UINT8 hotrod_ctrl_cur;
 
 static WRITE16_HANDLER( hotrod3_ctrl_w )
 {
-	static const char *portnames[] = { "PEDAL1", "PEDAL2", "PEDAL3", "PEDAL4" };
+	static const char *const portnames[] = { "PEDAL1", "PEDAL2", "PEDAL3", "PEDAL4" };
 
 	if(ACCESSING_BITS_0_7)
 	{

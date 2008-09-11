@@ -309,7 +309,7 @@ static CUSTOM_INPUT( adcdo_r )
 static READ8_HANDLER( sysreg_r )
 {
 	UINT32 r = 0;
-	static const char *portnames[] = { "IN0", "IN1", "IN2", "IN3" };
+	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	switch (offset)
 	{

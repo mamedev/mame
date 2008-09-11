@@ -83,7 +83,7 @@ static MACHINE_START( crgolf )
 
 static READ8_HANDLER( switch_input_r )
 {
-	static const char *portnames[] = { "IN0", "IN1", "P1", "P2", "DSW", "UNUSED0", "UNUSED1" };
+	static const char *const portnames[] = { "IN0", "IN1", "P1", "P2", "DSW", "UNUSED0", "UNUSED1" };
 
 	return input_port_read(machine, portnames[port_select]);
 }

@@ -20,6 +20,7 @@ static tilemap *bg0_tilemap, *bg1_tilemap, *bg2_tilemap;
 static int video_enable = 0;
 static int irq_enable = 0;
 static int bg1_bank = 0, bg2_bank = 0;
+static int old_bank;
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
@@ -110,7 +111,6 @@ static WRITE8_HANDLER( bg0_videoram_w )
 
 static WRITE8_HANDLER( misc_w )
 {
-	static int old_bank = -1;
 	int new_bank = data & 0xf;
 
 	if(old_bank != new_bank)
@@ -351,6 +351,11 @@ static INTERRUPT_GEN( cultures_interrupt )
 		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 }
 
+static MACHINE_RESET( cultures )
+{
+	old_bank = -1;
+}
+
 
 static MACHINE_DRIVER_START( cultures )
 
@@ -359,6 +364,8 @@ static MACHINE_DRIVER_START( cultures )
 	MDRV_CPU_PROGRAM_MAP(cultures_map,0)
 	MDRV_CPU_IO_MAP(cultures_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", cultures_interrupt)
+
+	MDRV_MACHINE_RESET( cultures )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
