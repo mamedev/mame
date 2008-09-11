@@ -4565,9 +4565,9 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( tp84b )		/* GX388 (c) 1984 */
 	DRIVER( hyperspt )	/* GX330 (c) 1984 + Centuri */
 	DRIVER( hpolym84 )	/* GX330 (c) 1984 */
-	DRIVER( sbasketb )	/* GX405 (c) 1984 */
-	DRIVER( sbasketo )	/* GX405 (c) 1984 */
-	DRIVER( sbasketu )	/* GX405 (c) 1984 */
+	DRIVER( sbasketb )	/* GX405 (c) 1984 (Version H, Unprotected) */
+	DRIVER( sbasketg )	/* GX405 (c) 1984 (Version G, Encrypted) */
+	DRIVER( sbaskete )	/* GX405 (c) 1984 (Version E, Encrypted) */
 	DRIVER( mikie )		/* GX469 (c) 1984 */
 	DRIVER( mikiej )	/* GX469 (c) 1984 */
 	DRIVER( mikiehs )	/* GX469 (c) 1984 */
@@ -5156,12 +5156,14 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( jedi )		/* 136030           (c) 1984 */
 
 	/* Atari System 1 games */
+	DRIVER( atarisy1 )	/* 136033           (c) 1984 */
 	DRIVER( peterpak )	/* 136028           (c) 1984 */
 	/* Marble Madness */
 	DRIVER( marble )	/* 136033           (c) 1984 */
 	DRIVER( marble2 )	/* 136033           (c) 1984 */
 	DRIVER( marble3 )	/* 136033           (c) 1984 */
 	DRIVER( marble4 )	/* 136033           (c) 1984 */
+    DRIVER( marble5 )   /* 136033           (c) 1984   (LSI Cartridge) */
 	/* Indiana Jones and the Temple of Doom */
 	DRIVER( indytemp )	/* 136036           (c) 1985 */
 	DRIVER( indytem2 )	/* 136036           (c) 1985 */

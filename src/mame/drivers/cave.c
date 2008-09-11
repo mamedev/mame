@@ -1989,7 +1989,7 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( dfeveron )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(dfeveron_readmem,dfeveron_writemem)
 	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
@@ -2014,7 +2014,7 @@ static MACHINE_DRIVER_START( dfeveron )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -2028,7 +2028,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ddonpach )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(ddonpach_readmem,ddonpach_writemem)
 	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
@@ -2053,7 +2053,7 @@ static MACHINE_DRIVER_START( ddonpach )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -2067,7 +2067,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( donpachi )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(donpachi_readmem,donpachi_writemem)
 	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
@@ -2092,7 +2092,7 @@ static MACHINE_DRIVER_START( donpachi )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_1_056MHz)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.60)
@@ -2111,7 +2111,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( esprade )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(esprade_readmem,esprade_writemem)
 	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
@@ -2136,7 +2136,7 @@ static MACHINE_DRIVER_START( esprade )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -2150,7 +2150,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( gaia )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(gaia_readmem,gaia_writemem)
 	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
@@ -2174,7 +2174,7 @@ static MACHINE_DRIVER_START( gaia )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -2188,7 +2188,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( guwange )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(guwange_readmem,guwange_writemem)
 	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
@@ -2213,7 +2213,7 @@ static MACHINE_DRIVER_START( guwange )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -2226,11 +2226,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( hotdogst )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(hotdogst_readmem,hotdogst_writemem)
 	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000)
+	MDRV_CPU_ADD("audio", Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(hotdogst_sound_readmem,hotdogst_sound_writemem)
 	MDRV_CPU_IO_MAP(hotdogst_sound_readport,hotdogst_sound_writeport)
 
@@ -2255,7 +2255,7 @@ static MACHINE_DRIVER_START( hotdogst )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ym", YM2203, 4000000)
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_4MHz)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.20)
 	MDRV_SOUND_ROUTE(0, "right", 0.20)
@@ -2266,7 +2266,7 @@ static MACHINE_DRIVER_START( hotdogst )
 	MDRV_SOUND_ROUTE(3, "left",  0.80)
 	MDRV_SOUND_ROUTE(3, "right", 0.80)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_1_056MHz)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
@@ -2280,7 +2280,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( korokoro )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(korokoro_readmem,korokoro_writemem)
 	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
@@ -2305,7 +2305,7 @@ static MACHINE_DRIVER_START( korokoro )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -2319,11 +2319,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( mazinger )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(mazinger_readmem,mazinger_writemem)
 	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000) // Bidirectional communication
+	MDRV_CPU_ADD("audio", Z80, XTAL_4MHz) // Bidirectional communication
 	MDRV_CPU_PROGRAM_MAP(mazinger_sound_readmem,mazinger_sound_writemem)
 	MDRV_CPU_IO_MAP(mazinger_sound_readport,mazinger_sound_writeport)
 
@@ -2350,7 +2350,7 @@ static MACHINE_DRIVER_START( mazinger )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ym", YM2203, 4000000)
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_4MHz)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.20)
 	MDRV_SOUND_ROUTE(0, "right", 0.20)
@@ -2361,7 +2361,7 @@ static MACHINE_DRIVER_START( mazinger )
 	MDRV_SOUND_ROUTE(3, "left",  0.60)
 	MDRV_SOUND_ROUTE(3, "right", 0.60)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_1_056MHz)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 2.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 2.0)
@@ -2375,11 +2375,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( metmqstr )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000,32000000 / 2)
+	MDRV_CPU_ADD("main", M68000, XTAL_32MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(metmqstr_readmem,metmqstr_writemem)
 	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80,32000000 / 4)
+	MDRV_CPU_ADD("audio", Z80, XTAL_32MHz / 4)
 	MDRV_CPU_PROGRAM_MAP(metmqstr_sound_readmem,metmqstr_sound_writemem)
 	MDRV_CPU_IO_MAP(metmqstr_sound_readport,metmqstr_sound_writeport)
 
@@ -2406,17 +2406,17 @@ static MACHINE_DRIVER_START( metmqstr )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ym", YM2151, 16000000/4)
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_16MHz / 4)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 1.20)
 	MDRV_SOUND_ROUTE(1, "right", 1.20)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 32000000 / 16 )
+	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_32MHz / 16 )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 32000000 / 16 )
+	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_32MHz / 16 )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
@@ -2432,11 +2432,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( pwrinst2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)	/* 16 MHz */
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(pwrinst2_readmem,pwrinst2_writemem)
 	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80,16000000 / 2)	/* 8 MHz */
+	MDRV_CPU_ADD("audio", Z80,XTAL_16MHz / 2)	/* 8 MHz */
 	MDRV_CPU_PROGRAM_MAP(pwrinst2_sound_readmem,pwrinst2_sound_writemem)
 	MDRV_CPU_IO_MAP(pwrinst2_sound_readport,pwrinst2_sound_writeport)
 
@@ -2461,7 +2461,7 @@ static MACHINE_DRIVER_START( pwrinst2 )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ym", YM2203, 16000000 / 4)
+	MDRV_SOUND_ADD("ym", YM2203, XTAL_16MHz / 4)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "left",  0.40)
 	MDRV_SOUND_ROUTE(0, "right", 0.40)
@@ -2472,12 +2472,12 @@ static MACHINE_DRIVER_START( pwrinst2 )
 	MDRV_SOUND_ROUTE(3, "left",  0.80)
 	MDRV_SOUND_ROUTE(3, "right", 0.80)
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 3000000 )
+	MDRV_SOUND_ADD("oki1", OKIM6295, XTAL_3MHz )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.80)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 3000000 )
+	MDRV_SOUND_ADD("oki2", OKIM6295, XTAL_3MHz )
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.00)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.00)
@@ -2491,11 +2491,11 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( sailormn )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(sailormn_readmem,sailormn_writemem)
 	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
-	MDRV_CPU_ADD("audio", Z80, 8000000) // Bidirectional Communication
+	MDRV_CPU_ADD("audio", Z80, XTAL_8MHz) // Bidirectional Communication
 	MDRV_CPU_PROGRAM_MAP(sailormn_sound_readmem,sailormn_sound_writemem)
 	MDRV_CPU_IO_MAP(sailormn_sound_readport,sailormn_sound_writeport)
 
@@ -2521,7 +2521,7 @@ static MACHINE_DRIVER_START( sailormn )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
-	MDRV_SOUND_ADD("ym", YM2151, 16000000/4)
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_16MHz/4)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.30)
 	MDRV_SOUND_ROUTE(1, "right", 0.30)
@@ -2545,7 +2545,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( uopoko )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(uopoko_readmem,uopoko_writemem)
 	MDRV_CPU_VBLANK_INT("main", cave_interrupt)
 
@@ -2569,7 +2569,7 @@ static MACHINE_DRIVER_START( uopoko )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
@@ -3320,6 +3320,12 @@ ROM_START( guwange )
 
 	ROM_REGION( 0x400000, "ymz", 0 )	/* Samples */
 	ROM_LOAD( "u0462.bin", 0x000000, 0x400000, CRC(b3d75691) SHA1(71d8dae92be1542a3cff50efeec0bf3c14ab59f5) )
+
+    ROM_REGION( 0x0004, "plds", ROMREGION_DISPOSE )
+    ROM_LOAD( "atc05-1.bin", 0x0000, 0x0001, NO_DUMP ) /* GAL16V8D-15LP located at U159 */
+    ROM_LOAD( "u0259.bin",   0x0000, 0x0001, NO_DUMP ) /* XC9536-15PC44C Located at U0249. (Chip label different then label silk screened onto the board.) */
+    ROM_LOAD( "u108.bin",    0x0000, 0x0001, NO_DUMP ) /* XC9536-15PC44C Located at U108. */
+    ROM_LOAD( "u084.bin",    0x0000, 0x0001, NO_DUMP ) /* XC9536-15PC44C Located at U084. */
 ROM_END
 
 

@@ -656,7 +656,7 @@ static int get_bank(running_machine *machine, UINT8 prom1, UINT8 prom2, int bpp)
 		return bank_gfx[bpp - 4][bank_index];
 
 	/* if the bank is out of range, call it 0 */
-	if (0x80000 * (bank_index - 1) >= memory_region_length(machine, "gfx2"))
+	if (0x80000 * (bank_index - 1) >= memory_region_length(machine, "tiles"))
 		return 0;
 
 	/* don't have one? let's make it ... first find any empty slot */
@@ -683,7 +683,7 @@ static int get_bank(running_machine *machine, UINT8 prom1, UINT8 prom2, int bpp)
 	default:
 		fatalerror("Unsupported bpp");
 	}
-	decodegfx(machine->gfx[gfx_index], &memory_region(machine, "gfx2")[0x80000 * (bank_index - 1)], 0, machine->gfx[gfx_index]->total_elements);
+	decodegfx(machine->gfx[gfx_index], &memory_region(machine, "tiles")[0x80000 * (bank_index - 1)], 0, machine->gfx[gfx_index]->total_elements);
 
 	/* set the color information */
 	machine->gfx[gfx_index]->color_base = 256;

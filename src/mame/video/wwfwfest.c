@@ -10,10 +10,10 @@
 #include "includes/wwfwfest.h"
 
 static tilemap *fg0_tilemap, *bg0_tilemap, *bg1_tilemap;
-int wwfwfest_pri;
-int wwfwfest_bg0_scrollx, wwfwfest_bg0_scrolly, wwfwfest_bg1_scrollx, wwfwfest_bg1_scrolly;
+UINT16 wwfwfest_pri;
+UINT16 wwfwfest_bg0_scrollx, wwfwfest_bg0_scrolly, wwfwfest_bg1_scrollx, wwfwfest_bg1_scrolly;
 UINT16 *wwfwfest_fg0_videoram, *wwfwfest_bg0_videoram, *wwfwfest_bg1_videoram;
-static int sprite_xoff, bg0_dx, bg1_dx[2];
+static UINT16 sprite_xoff, bg0_dx, bg1_dx[2];
 
 /*******************************************************************************
  Write Handlers
@@ -224,6 +224,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_START( wwfwfest )
 {
+    state_save_register_global(wwfwfest_pri);
+    state_save_register_global(wwfwfest_bg0_scrollx);
+    state_save_register_global(wwfwfest_bg0_scrolly);
+    state_save_register_global(wwfwfest_bg1_scrollx);
+    state_save_register_global(wwfwfest_bg1_scrolly);
+
 	fg0_tilemap = tilemap_create(get_fg0_tile_info,tilemap_scan_rows, 8, 8,64,32);
 	bg1_tilemap = tilemap_create(get_bg1_tile_info,tilemap_scan_rows, 16, 16,32,32);
 	bg0_tilemap = tilemap_create(get_bg0_tile_info,tilemap_scan_rows, 16, 16,32,32);

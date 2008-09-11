@@ -665,7 +665,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 					}
 
 				/* if this is a bios rom, make sure it has the same flags as the last system bios entry */
-				bios_flags = ROM_GETBIOSFLAGS(romp);
+/*				bios_flags = ROM_GETBIOSFLAGS(romp);
 				if (bios_flags != 0)
 				{
 					if (bios_flags != last_bios)
@@ -673,7 +673,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 						mame_printf_error("%s: %s has bios rom name %s without preceding matching system bios definition\n", driver->source_file, driver->name, last_name);
 						error = TRUE;
 					}
-				}
+				}*/
 
 				/* make sure the has is valid */
 				hash = ROM_GETHASHDATA(romp);

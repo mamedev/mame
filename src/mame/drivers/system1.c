@@ -1808,12 +1808,12 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( system1 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 4000000)	/* My Hero has 2 OSCs 8 & 20 MHz (Cabbe Info) */
+	MDRV_CPU_ADD("main", Z80, XTAL_4MHz)	/* My Hero has 2 OSCs 8 & 20 MHz (Cabbe Info) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
 	MDRV_CPU_IO_MAP(readport,writeport)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD("sound", Z80, 4000000)
+	MDRV_CPU_ADD("sound", Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)		 /* NMIs are caused by the main CPU */
 
@@ -3243,6 +3243,45 @@ ROM_END
     Choplifter (Bootleg)
     Year: 1985
     System 2
+
+
+
+    Small Daughterboard marked 600A
+
+      |--------------------------------------------------------|
+      |                                                        |
+    A |  74ls244  74ls244  74ls669  74ls669  74ls669  74ls669  |
+      |                                                        |
+    B |  74ls240  74ls240  74ls283  74ls283  74ls283  74ls283  |
+      |                                                        |
+    C |  74ls10   74ls86   74ls157  74ls157  74ls157  74ls157  |
+      |                                                        |
+    D |  74ls157  74ls157  74ls157  74ls139  74ls74            |
+      |                                                        |
+    E |  pal16r4  pal16l8  74ls161  74ls161  74ls109           |
+      |                                                        |
+    F |  74ls27   74ls08   74ls04   74ls74   74ls00            |
+      |                                                 600A   |
+      |--------------------------------------------------------|
+           1        2        3        4        5        6
+
+
+    Small Daughterboard marked 600B
+
+      |--------------------------------------|
+      |                              600B    |
+    A |  74ls74            74ls174  pal20r4  |
+      |                                      |
+    B |  pal16l8  pal16l8  74ls374  74ls374  |
+      |                                      |
+    C |  74ls283  pal16l8  pal16l8  74ls32   |
+      |                                      |
+    D |  74ls283  74ls283  74ls85   74ls283  |
+      |                                      |
+    E |  74ls04   74ls00   74ls00   74ls32   |
+      |                                      |
+      |--------------------------------------|
+           1        2        3        4
 */
 
 ROM_START( chplftbl )
@@ -3271,11 +3310,28 @@ ROM_START( chplftbl )
 	ROM_LOAD( "pr7117.8",		0x0200, 0x0100, CRC(4124307e) SHA1(cee28d891e6ce732c43a61acb5beeafd2200cf37) ) /* palette blue component */
 	ROM_LOAD( "pr5317.28",		0x0300, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 
-	ROM_REGION( 0x0800, "plds", ROMREGION_DISPOSE )
+	ROM_REGION( 0x0003, "plds_main", ROMREGION_DISPOSE )
+    ROM_LOAD( "pal16r4.bin",    0x00000, 0x0001, NO_DUMP ) /* PAL16R4 located at IC13. */
+    ROM_LOAD( "pal16r4.bin",    0x00000, 0x0001, NO_DUMP ) /* PAL16R4 located at IC14. */
+    ROM_LOAD( "pal16l8.bin",    0x00000, 0x0001, NO_DUMP ) /* PAL16L8 located at IC62. */
+
+	ROM_REGION( 0x0002, "plds_600a", ROMREGION_DISPOSE )
+    ROM_LOAD( "pal16r4.bin",    0x00000, 0x0001, NO_DUMP ) /* PAL16R4 located at E1. */
+    ROM_LOAD( "pal16l8.bin",    0x00000, 0x0001, NO_DUMP ) /* PAL16L8 located at E2. */
+
+	ROM_REGION( 0x0005, "plds_600b", ROMREGION_DISPOSE )
+    ROM_LOAD( "pal20r4.bin",    0x00000, 0x0001, NO_DUMP ) /* PAL20R4 located at A4. */
+    ROM_LOAD( "pal16l8.bin",    0x00000, 0x0001, NO_DUMP ) /* PAL16L8 located at B1. */
+    ROM_LOAD( "pal16l8.bin",    0x00000, 0x0001, NO_DUMP ) /* PAL16L8 located at B2. */
+    ROM_LOAD( "pal16l8.bin",    0x00000, 0x0001, NO_DUMP ) /* PAL16L8 located at C2. */
+    ROM_LOAD( "pal16l8.bin",    0x00000, 0x0001, NO_DUMP ) /* PAL16L8 located at C3. */
+
+	ROM_REGION( 0x0410, "plds_unk", ROMREGION_DISPOSE )
+    /* Do any of these dumps match what's on the physical boards? */
 	ROM_LOAD( "pal16r4a.ic9",         0x0000, 0x0104, CRC(dd223015) SHA1(8d70f91b118e8653dda1efee3eaea287ae63809f) )
-	ROM_LOAD( "pal16r4a.ic10",        0x0200, 0x0104, CRC(2c9229b4) SHA1(9755013afcf89f99d7a399c7e223e027761cf89a) )
-	ROM_LOAD( "pal16r4a-chopbl1.bin", 0x0400, 0x0104, CRC(e1628a8e) SHA1(6b6df079cfadec71b38a53f107475f0dda428b00) )
-	ROM_LOAD( "pal16l8a-chopbl2.bin", 0x0600, 0x0104, CRC(afa7425d) SHA1(09d8607b69ecfc0b12c8610751d489500b63c7d6) )
+	ROM_LOAD( "pal16r4a.ic10",        0x0104, 0x0104, CRC(2c9229b4) SHA1(9755013afcf89f99d7a399c7e223e027761cf89a) )
+	ROM_LOAD( "pal16r4a-chopbl1.bin", 0x0208, 0x0104, CRC(e1628a8e) SHA1(6b6df079cfadec71b38a53f107475f0dda428b00) )
+	ROM_LOAD( "pal16l8a-chopbl2.bin", 0x030c, 0x0104, CRC(afa7425d) SHA1(09d8607b69ecfc0b12c8610751d489500b63c7d6) )
 ROM_END
 
 ROM_START( 4dwarrio )
