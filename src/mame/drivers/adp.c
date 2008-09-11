@@ -15,7 +15,7 @@ Supported games :
 - Skat TV v. TS3  ("COPYRIGHT BY ADP LUEBBECKE GERMANY 1995")
 - Fashion Gambler ("COPYRIGHT BY ADP LUEBBECKE GERMANY 1997")
 - Backgammon        ("COPYRIGHT BY ADP LUEBBECKE GERMANY 1994")
-
+- Funny Land de Luxe ("Copyright 1992-99 by Stella International Germany")
 
 
 Skat TV (Version TS3)
@@ -130,6 +130,16 @@ Connectors:
  P21 - Tuerschalter
 
 There's also (external) JAMMA adapter - 4th board filled with resistors and diodes.
+
+
+
+Funny Land de Luxe 
+------------------
+
+Video board has additional chips:
+  - Altera EPM7032 (PLD)
+  - SG-615PH (32.0000M oscillator)
+  - Bt481 (RAMDAC)
 
 */
 
@@ -621,9 +631,19 @@ ROM_START( fashiong )
 	ROM_LOAD16_BYTE( "m48z08posz.bin", 0x0001, 0x2000, CRC(7c5a4b78) SHA1(262d0d7f5b24e356ab54eb2450bbaa90e3fb5464) )
 ROM_END
 
+ROM_START( funlddlx )
+	ROM_REGION( 0x100000, "main", 0 )
+	ROM_LOAD16_BYTE( "fldl_f6_1.bin", 0x00001, 0x80000, CRC(85c74040) SHA1(24a7d3e6acbaf73ef9817379bef64c38a9ff7896) )
+	ROM_LOAD16_BYTE( "fldl_f6_2.bin", 0x00000, 0x80000, CRC(93bf1a4b) SHA1(5b4353feba1e0d4402cd26f4855e3803e6be43b9) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "flv_f1_i.bin", 0x00000, 0x80000, CRC(286fccdc) SHA1(dd23deda625e486a7cfe1f3268731d10053a96e9) )
+	ROM_LOAD16_BYTE( "flv_f1_ii.bin", 0x00001, 0x80000, CRC(2aa904e6) SHA1(864530b136dd488d619cc95f48e7dce8d93d88e0) )
+ROM_END
+
 GAME( 1990, backgamn,        0, backgamn,    adp,    0, ROT0,  "ADP", "Backgammon", GAME_NOT_WORKING )
 GAME( 1993, quickjac,        0, quickjac,    skattv,    0, ROT0,  "ADP", "Quick Jack", GAME_NOT_WORKING )
 GAME( 1994, skattv,          0, skattv,      skattv,    0, ROT0,  "ADP", "Skat TV", GAME_NOT_WORKING )
 GAME( 1995, skattva,    skattv, skattv,      skattv,    0, ROT0,  "ADP", "Skat TV (version TS3)", GAME_NOT_WORKING )
 GAME( 1997, fashiong,        0, skattv,      adp,    0, ROT0,  "ADP", "Fashion Gambler", GAME_NOT_WORKING )
-
+GAME( 1999, funlddlx,        0, skattv,      adp,    0, ROT0,  "Stella", "Funny Land de Luxe", GAME_NOT_WORKING )
