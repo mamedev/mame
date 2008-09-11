@@ -78,7 +78,7 @@ attotime stream_get_sample_period(sound_stream *stream);
 /* ----- stream information and control ----- */
 
 /* find a stream using a tag and index */
-sound_stream *stream_find_by_tag(void *streamtag, int streamindex);
+sound_stream *stream_find_by_tag(running_machine *machine, void *streamtag, int streamindex);
 
 /* return the number of inputs for a given stream */
 int stream_get_inputs(sound_stream *stream);

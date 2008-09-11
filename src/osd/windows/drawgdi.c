@@ -14,6 +14,7 @@
 // MAME headers
 #include "mamecore.h"
 #include "restrack.h"
+#include "deprecat.h"
 
 // MAMEOS headers
 #include "window.h"

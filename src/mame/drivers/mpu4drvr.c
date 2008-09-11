@@ -668,7 +668,7 @@ static UINT8 scn2674_gfx_enabled;
 static UINT8 scn2674_display_enabled;
 static UINT8 scn2674_cursor_enabled;
 
-static void scn2674_write_command(UINT8 data)
+static void scn2674_write_command(running_machine *machine, UINT8 data)
 {
 	UINT8 oprand;
 	int i;
@@ -777,7 +777,7 @@ static void scn2674_write_command(UINT8 data)
 		{
 			scn2674_irq_state = 1;
 		}
-		update_mpu68_interrupts(Machine);
+		update_mpu68_interrupts(machine);
 	}
 	if ((data&0xe0)==0x80)
 	{
@@ -803,7 +803,7 @@ static void scn2674_write_command(UINT8 data)
 				scn2674_irq_state = 1;
 			}
 		}
-		update_mpu68_interrupts(Machine);
+		update_mpu68_interrupts(machine);
 
 	}
 
@@ -828,7 +828,7 @@ static void scn2674_write_command(UINT8 data)
 				scn2674_irq_state = 1;
 			}
 		}
-		update_mpu68_interrupts(Machine);
+		update_mpu68_interrupts(machine);
 	}
 
 	/* Delayed Commands */
@@ -962,7 +962,7 @@ static WRITE16_HANDLER( mpu4_vid_scn2674_w )
 			break;
 
 		case 1:
-			scn2674_write_command(data);
+			scn2674_write_command(machine, data);
 			break;
 
 		case 2: scn2674_screen1_l = data; break;

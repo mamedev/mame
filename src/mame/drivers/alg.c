@@ -660,7 +660,7 @@ static void alg_init(running_machine *machine)
 
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(Machine, "user1"), 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, "user1"), 0);
 }
 
 

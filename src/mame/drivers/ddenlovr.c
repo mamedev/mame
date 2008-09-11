@@ -360,10 +360,10 @@ INLINE void log_draw_error(int src, int cmd)
     06 blit_pen_mode (replace values stored in ROM)
 */
 
-static int blit_draw(int src,int sx)
+static int blit_draw(running_machine *machine, int src,int sx)
 {
-	UINT8 *src_data = memory_region(Machine, "gfx1");
-	int src_len = memory_region_length(Machine, "gfx1");
+	UINT8 *src_data = memory_region(machine, "gfx1");
+	int src_len = memory_region_length(machine, "gfx1");
 	int bit_addr = (src & 0xffffff) * ddenlovr_blit_rom_bits;	/* convert to bit address */
 	int pen_size, arg_size, cmd;
 	int x;
@@ -712,7 +712,7 @@ profiler_mark(PROFILER_VIDEO);
 				case 0x14:	blit_fill_xy(ddenlovr_blit_x, ddenlovr_blit_y);
 							break;
 
-				case 0x10:	ddenlovr_blit_address = blit_draw(ddenlovr_blit_address,ddenlovr_blit_x);
+				case 0x10:	ddenlovr_blit_address = blit_draw(machine,ddenlovr_blit_address,ddenlovr_blit_x);
 							break;
 
 				case 0x13:	blit_horiz_line();
@@ -879,7 +879,7 @@ profiler_mark(PROFILER_VIDEO);
 //              case 0x14:  blit_fill_xy(ddenlovr_blit_x, ddenlovr_blit_y);
 //                          break;
 
-				case 0x00/*0x10*/:	ddenlovr_blit_address = blit_draw(ddenlovr_blit_address,ddenlovr_blit_x);
+				case 0x00/*0x10*/:	ddenlovr_blit_address = blit_draw(machine,ddenlovr_blit_address,ddenlovr_blit_x);
 							break;
 
 				case 0x0b:	// same as 03? see the drawing of the R in "cRoss hatch" (key test)
@@ -1079,7 +1079,7 @@ profiler_mark(PROFILER_VIDEO);
 				case 0x14:	blit_fill_xy(ddenlovr_blit_x, ddenlovr_blit_y);
 							break;
 
-				case 0x10:	ddenlovr_blit_address = blit_draw(ddenlovr_blit_address,ddenlovr_blit_x);
+				case 0x10:	ddenlovr_blit_address = blit_draw(machine,ddenlovr_blit_address,ddenlovr_blit_x);
 							break;
 
 				case 0x13:	blit_horiz_line();
@@ -1232,7 +1232,7 @@ VIDEO_UPDATE(ddenlovr)
 	ddenlovr_blit_pen_mode = 0;
 	ddenlovr_blit_y = 5;
 	ddenlovr_clip_ctrl = 0x0f;
-	next = blit_draw(base,0);
+	next = blit_draw(screen->machine,base,0);
 	popmessage("GFX %06x",base);
 	if (input_code_pressed(KEYCODE_S)) base = next;
 	if (input_code_pressed_once(KEYCODE_X)) base = next;
@@ -2495,10 +2495,10 @@ static WRITE8_HANDLER( mjchuuka_blitter_w )
 
 static UINT8 mjchuuka_romdata[2];
 
-static void mjchuuka_get_romdata(void)
+static void mjchuuka_get_romdata(running_machine *machine)
 {
-	UINT8 *rom	=	memory_region( Machine, "gfx1" );
-	size_t size		=	memory_region_length( Machine, "gfx1" );
+	UINT8 *rom	=	memory_region( machine, "gfx1" );
+	size_t size		=	memory_region_length( machine, "gfx1" );
 	int address		=	(ddenlovr_blit_address & 0xffffff) * 2;
 
 	if (address >= size)
@@ -2513,7 +2513,7 @@ static void mjchuuka_get_romdata(void)
 
 static READ8_HANDLER( mjchuuka_gfxrom_0_r )
 {
-	mjchuuka_get_romdata();
+	mjchuuka_get_romdata(machine);
 	ddenlovr_blit_address++;
 	return mjchuuka_romdata[0];
 }

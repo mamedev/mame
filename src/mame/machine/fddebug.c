@@ -261,24 +261,24 @@ static void fd1094_regenerate_key(void);
 
 static int instruction_hook(offs_t curpc);
 
-static void execute_fdsave(int ref, int params, const char **param);
-static void execute_fdoutput(int ref, int params, const char **param);
-static void execute_fdseed(int ref, int params, const char **param);
-static void execute_fdlockguess(int ref, int params, const char **param);
-static void execute_fdeliminate(int ref, int params, const char **param);
-static void execute_fdunlock(int ref, int params, const char **param);
-static void execute_fdignore(int ref, int params, const char **param);
-static void execute_fdundo(int ref, int params, const char **param);
-static void execute_fdstatus(int ref, int params, const char **param);
-static void execute_fdstate(int ref, int params, const char **param);
-static void execute_fdpc(int ref, int params, const char **param);
-static void execute_fdsearch(int ref, int params, const char **param);
-static void execute_fddasm(int ref, int params, const char **param);
-static void execute_fdcset(int ref, int params, const char **param);
-static void execute_fdclist(int ref, int params, const char **param);
-static void execute_fdcsearch(int ref, int params, const char **param);
+static void execute_fdsave(running_machine *machine, int ref, int params, const char **param);
+static void execute_fdoutput(running_machine *machine, int ref, int params, const char **param);
+static void execute_fdseed(running_machine *machine, int ref, int params, const char **param);
+static void execute_fdlockguess(running_machine *machine, int ref, int params, const char **param);
+static void execute_fdeliminate(running_machine *machine, int ref, int params, const char **param);
+static void execute_fdunlock(running_machine *machine, int ref, int params, const char **param);
+static void execute_fdignore(running_machine *machine, int ref, int params, const char **param);
+static void execute_fdundo(running_machine *machine, int ref, int params, const char **param);
+static void execute_fdstatus(running_machine *machine, int ref, int params, const char **param);
+static void execute_fdstate(running_machine *machine, int ref, int params, const char **param);
+static void execute_fdpc(running_machine *machine, int ref, int params, const char **param);
+static void execute_fdsearch(running_machine *machine, int ref, int params, const char **param);
+static void execute_fddasm(running_machine *machine, int ref, int params, const char **param);
+static void execute_fdcset(running_machine *machine, int ref, int params, const char **param);
+static void execute_fdclist(running_machine *machine, int ref, int params, const char **param);
+static void execute_fdcsearch(running_machine *machine, int ref, int params, const char **param);
 
-static fd1094_possibility *try_all_possibilities(int basepc, int offset, int length, UINT8 *instrbuffer, UINT8 *keybuffer, fd1094_possibility *possdata);
+static fd1094_possibility *try_all_possibilities(running_machine *machine, int basepc, int offset, int length, UINT8 *instrbuffer, UINT8 *keybuffer, fd1094_possibility *possdata);
 static void tag_possibility(fd1094_possibility *possdata, UINT8 status);
 
 static void perform_constrained_search(void);
@@ -288,8 +288,8 @@ static int does_key_work_for_constraints(const UINT16 *base, UINT8 *key);
 static UINT32 reconstruct_base_seed(int keybaseaddr, UINT32 startseed);
 
 static void build_optable(void);
-static int validate_ea(UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 flags);
-static int validate_opcode(UINT32 pc, const UINT8 *opdata, int maxwords);
+static int validate_ea(running_machine *machine, UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 flags);
+static int validate_opcode(running_machine *machine, UINT32 pc, const UINT8 *opdata, int maxwords);
 
 
 
@@ -430,14 +430,14 @@ INLINE void print_possibilities(void)
     0=no, 1=yes, 2=unlikely
 -----------------------------------------------*/
 
-INLINE int pc_is_valid(UINT32 pc, UINT32 flags)
+INLINE int pc_is_valid(running_machine *machine, UINT32 pc, UINT32 flags)
 {
 	/* if we're odd or out of range, fail */
 	if ((pc & 1) == 1)
 		return 0;
 	if (pc & 0xff000000)
 		return 0;
-	if (memory_get_op_ptr(cpu_getactivecpu(), pc, 0) == NULL)
+	if (memory_get_op_ptr(machine, cpu_getactivecpu(), pc, 0) == NULL)
 		return 0;
 	return 1;
 }
@@ -448,11 +448,11 @@ INLINE int pc_is_valid(UINT32 pc, UINT32 flags)
     valid? 0=no, 1=yes, 2=unlikely
 -----------------------------------------------*/
 
-INLINE int addr_is_valid(UINT32 addr, UINT32 flags)
+INLINE int addr_is_valid(running_machine *machine, UINT32 addr, UINT32 flags)
 {
 	/* if this a JMP, the address is a PC */
 	if (flags & OF_JMP)
-		return pc_is_valid(addr, flags);
+		return pc_is_valid(machine, addr, flags);
 
 	/* if we're odd or out of range, fail */
 	if ((flags & OF_SIZEMASK) != OF_BYTE && (addr & 1) == 1)
@@ -518,23 +518,23 @@ void fd1094_init_debugging(running_machine *machine, const char *cpureg, const c
 	load_overlay_file(machine);
 
 	/* add some commands */
-	debug_console_register_command("fdsave", CMDFLAG_NONE, 0, 0, 0, execute_fdsave);
-	debug_console_register_command("fdoutput", CMDFLAG_NONE, 0, 1, 1, execute_fdoutput);
-	debug_console_register_command("fdseed", CMDFLAG_NONE, 0, 2, 2, execute_fdseed);
-	debug_console_register_command("fdguess", CMDFLAG_NONE, STATUS_GUESS, 1, 1, execute_fdlockguess);
-	debug_console_register_command("fdlock", CMDFLAG_NONE, STATUS_LOCKED, 1, 1, execute_fdlockguess);
-	debug_console_register_command("fdeliminate", CMDFLAG_NONE, 0, 1, 10, execute_fdeliminate);
-	debug_console_register_command("fdunlock", CMDFLAG_NONE, 0, 1, 1, execute_fdunlock);
-	debug_console_register_command("fdignore", CMDFLAG_NONE, 0, 0, 1, execute_fdignore);
-	debug_console_register_command("fdundo", CMDFLAG_NONE, 0, 0, 0, execute_fdundo);
-	debug_console_register_command("fdstatus", CMDFLAG_NONE, 0, 0, 0, execute_fdstatus);
-	debug_console_register_command("fdstate", CMDFLAG_NONE, 0, 0, 1, execute_fdstate);
-	debug_console_register_command("fdpc", CMDFLAG_NONE, 0, 0, 1, execute_fdpc);
-	debug_console_register_command("fdsearch", CMDFLAG_NONE, 0, 0, 0, execute_fdsearch);
-	debug_console_register_command("fddasm", CMDFLAG_NONE, 0, 1, 1, execute_fddasm);
-	debug_console_register_command("fdcset", CMDFLAG_NONE, 0, 2, 4, execute_fdcset);
-	debug_console_register_command("fdclist", CMDFLAG_NONE, 0, 0, 0, execute_fdclist);
-	debug_console_register_command("fdcsearch", CMDFLAG_NONE, 0, 0, 0, execute_fdcsearch);
+	debug_console_register_command(machine, "fdsave", CMDFLAG_NONE, 0, 0, 0, execute_fdsave);
+	debug_console_register_command(machine, "fdoutput", CMDFLAG_NONE, 0, 1, 1, execute_fdoutput);
+	debug_console_register_command(machine, "fdseed", CMDFLAG_NONE, 0, 2, 2, execute_fdseed);
+	debug_console_register_command(machine, "fdguess", CMDFLAG_NONE, STATUS_GUESS, 1, 1, execute_fdlockguess);
+	debug_console_register_command(machine, "fdlock", CMDFLAG_NONE, STATUS_LOCKED, 1, 1, execute_fdlockguess);
+	debug_console_register_command(machine, "fdeliminate", CMDFLAG_NONE, 0, 1, 10, execute_fdeliminate);
+	debug_console_register_command(machine, "fdunlock", CMDFLAG_NONE, 0, 1, 1, execute_fdunlock);
+	debug_console_register_command(machine, "fdignore", CMDFLAG_NONE, 0, 0, 1, execute_fdignore);
+	debug_console_register_command(machine, "fdundo", CMDFLAG_NONE, 0, 0, 0, execute_fdundo);
+	debug_console_register_command(machine, "fdstatus", CMDFLAG_NONE, 0, 0, 0, execute_fdstatus);
+	debug_console_register_command(machine, "fdstate", CMDFLAG_NONE, 0, 0, 1, execute_fdstate);
+	debug_console_register_command(machine, "fdpc", CMDFLAG_NONE, 0, 0, 1, execute_fdpc);
+	debug_console_register_command(machine, "fdsearch", CMDFLAG_NONE, 0, 0, 0, execute_fdsearch);
+	debug_console_register_command(machine, "fddasm", CMDFLAG_NONE, 0, 1, 1, execute_fddasm);
+	debug_console_register_command(machine, "fdcset", CMDFLAG_NONE, 0, 2, 4, execute_fdcset);
+	debug_console_register_command(machine, "fdclist", CMDFLAG_NONE, 0, 0, 0, execute_fdclist);
+	debug_console_register_command(machine, "fdcsearch", CMDFLAG_NONE, 0, 0, 0, execute_fdcsearch);
 
 	/* set up the instruction hook */
 	debug_cpu_set_instruction_hook(0, instruction_hook);
@@ -722,7 +722,7 @@ static int instruction_hook(offs_t curpc)
 	}
 
 	/* try all possible decodings at the current pc */
-	posscount = try_all_possibilities(curpc, 0, 0, instrbuffer, keybuffer, posslist) - posslist;
+	posscount = try_all_possibilities(Machine, curpc, 0, 0, instrbuffer, keybuffer, posslist) - posslist;
 	if (keydirty)
 		fd1094_regenerate_key();
 
@@ -744,9 +744,9 @@ static int instruction_hook(offs_t curpc)
     execute_fdsave - handle the 'fdsave' command
 -----------------------------------------------*/
 
-static void execute_fdsave(int ref, int params, const char **param)
+static void execute_fdsave(running_machine *machine, int ref, int params, const char **param)
 {
-	save_overlay_file(Machine);
+	save_overlay_file(machine);
 	debug_console_printf("File saved\n");
 }
 
@@ -756,7 +756,7 @@ static void execute_fdsave(int ref, int params, const char **param)
     to a file
 -----------------------------------------------*/
 
-static void execute_fdoutput(int ref, int params, const char **param)
+static void execute_fdoutput(running_machine *machine, int ref, int params, const char **param)
 {
 	file_error filerr;
 	mame_file *file;
@@ -780,7 +780,7 @@ static void execute_fdoutput(int ref, int params, const char **param)
     execute_fdseed - handle the 'fdseed' command
 -----------------------------------------------*/
 
-static void execute_fdseed(int ref, int params, const char **param)
+static void execute_fdseed(running_machine *machine, int ref, int params, const char **param)
 {
 	UINT64 num1, num2;
 
@@ -807,7 +807,7 @@ static void execute_fdseed(int ref, int params, const char **param)
     and 'fdguess' commands
 -----------------------------------------------*/
 
-static void execute_fdlockguess(int ref, int params, const char **param)
+static void execute_fdlockguess(running_machine *machine, int ref, int params, const char **param)
 {
 	UINT64 num1;
 
@@ -836,7 +836,7 @@ static void execute_fdlockguess(int ref, int params, const char **param)
     'fdeliminate' command
 -----------------------------------------------*/
 
-static void execute_fdeliminate(int ref, int params, const char **param)
+static void execute_fdeliminate(running_machine *machine, int ref, int params, const char **param)
 {
 	int pnum, posssrc, possdst;
 	int plist[10];
@@ -887,7 +887,7 @@ static void execute_fdeliminate(int ref, int params, const char **param)
     command
 -----------------------------------------------*/
 
-static void execute_fdunlock(int ref, int params, const char **param)
+static void execute_fdunlock(running_machine *machine, int ref, int params, const char **param)
 {
 	int reps = keystatus_words / KEY_SIZE;
 	int keyaddr, repnum;
@@ -924,7 +924,7 @@ static void execute_fdunlock(int ref, int params, const char **param)
     command
 -----------------------------------------------*/
 
-static void execute_fdignore(int ref, int params, const char **param)
+static void execute_fdignore(running_machine *machine, int ref, int params, const char **param)
 {
 	UINT64 offset;
 
@@ -957,7 +957,7 @@ static void execute_fdignore(int ref, int params, const char **param)
     command
 -----------------------------------------------*/
 
-static void execute_fdundo(int ref, int params, const char **param)
+static void execute_fdundo(running_machine *machine, int ref, int params, const char **param)
 {
 	/* copy the undobuffer back and regenerate the key */
 	memcpy(keystatus, undobuff, keystatus_words * 2);
@@ -971,7 +971,7 @@ static void execute_fdundo(int ref, int params, const char **param)
     command
 -----------------------------------------------*/
 
-static void execute_fdstatus(int ref, int params, const char **param)
+static void execute_fdstatus(running_machine *machine, int ref, int params, const char **param)
 {
 	int numreps = keystatus_words / KEY_SIZE;
 	int locked = 4, nomatter = 0, guesses = 0;
@@ -1003,7 +1003,7 @@ static void execute_fdstatus(int ref, int params, const char **param)
     command
 -----------------------------------------------*/
 
-static void execute_fdstate(int ref, int params, const char **param)
+static void execute_fdstate(running_machine *machine, int ref, int params, const char **param)
 {
 	UINT64 newstate;
 
@@ -1028,7 +1028,7 @@ static void execute_fdstate(int ref, int params, const char **param)
     command
 -----------------------------------------------*/
 
-static void execute_fdpc(int ref, int params, const char **param)
+static void execute_fdpc(running_machine *machine, int ref, int params, const char **param)
 {
 	UINT64 newpc;
 
@@ -1049,7 +1049,7 @@ static void execute_fdpc(int ref, int params, const char **param)
     command
 -----------------------------------------------*/
 
-static void execute_fdsearch(int ref, int params, const char **param)
+static void execute_fdsearch(running_machine *machine, int ref, int params, const char **param)
 {
 	int pc = activecpu_get_pc();
 	int length, first = TRUE;
@@ -1102,7 +1102,7 @@ static void execute_fdsearch(int ref, int params, const char **param)
 		instrdata[1] = decoded;
 
 		/* get the opcode */
-		length = validate_opcode(pc, instrdata, 1);
+		length = validate_opcode(machine, pc, instrdata, 1);
 		if (length < 0)
 			length = -length;
 		if (length == 0)
@@ -1174,7 +1174,7 @@ static void execute_fdsearch(int ref, int params, const char **param)
     command
 -----------------------------------------------*/
 
-static void execute_fddasm(int ref, int params, const char **param)
+static void execute_fddasm(running_machine *machine, int ref, int params, const char **param)
 {
 	int origstate = fd1094_set_state(keyregion, -1);
 	const char *filename;
@@ -1262,7 +1262,7 @@ static void execute_fddasm(int ref, int params, const char **param)
 		if (unknowns > 0)
 		{
 			UINT8 keybuffer[5];
-			int posscount = try_all_possibilities(pcaddr * 2, 0, 0, instrbuffer, keybuffer, posslist) - posslist;
+			int posscount = try_all_possibilities(machine, pcaddr * 2, 0, 0, instrbuffer, keybuffer, posslist) - posslist;
 			for (pnum = 0; pnum < posscount; pnum++)
 				if (strcmp(disasm, posslist[pnum].dasm) != 0)
 				{
@@ -1291,7 +1291,7 @@ static void execute_fddasm(int ref, int params, const char **param)
     command
 -----------------------------------------------*/
 
-static void execute_fdcset(int ref, int params, const char **param)
+static void execute_fdcset(running_machine *machine, int ref, int params, const char **param)
 {
 	UINT64 pc, value, mask = 0xffff, state = FD1094_STATE_RESET;
 	int cnum;
@@ -1349,7 +1349,7 @@ static void execute_fdcset(int ref, int params, const char **param)
     command
 -----------------------------------------------*/
 
-static void execute_fdclist(int ref, int params, const char **param)
+static void execute_fdclist(running_machine *machine, int ref, int params, const char **param)
 {
 	int cnum;
 
@@ -1368,7 +1368,7 @@ static void execute_fdclist(int ref, int params, const char **param)
     command
 -----------------------------------------------*/
 
-static void execute_fdcsearch(int ref, int params, const char **param)
+static void execute_fdcsearch(running_machine *machine, int ref, int params, const char **param)
 {
 //  debug_console_printf("Searching for possible global keys....\n");
 	perform_constrained_search();
@@ -1382,7 +1382,7 @@ static void execute_fdcsearch(int ref, int params, const char **param)
     length
 -----------------------------------------------*/
 
-static fd1094_possibility *try_all_possibilities(int basepc, int offset, int length, UINT8 *instrbuffer, UINT8 *keybuffer, fd1094_possibility *possdata)
+static fd1094_possibility *try_all_possibilities(running_machine *machine, int basepc, int offset, int length, UINT8 *instrbuffer, UINT8 *keybuffer, fd1094_possibility *possdata)
 {
 	UINT8 keymask, keystat;
 	UINT16 possvalue[4];
@@ -1457,7 +1457,7 @@ static fd1094_possibility *try_all_possibilities(int basepc, int offset, int len
 			/* first make sure we are a valid instruction */
 			if ((possvalue[i] & 0xf000) == 0xa000 || (possvalue[i] & 0xf000) == 0xf000)
 				continue;
-			length = validate_opcode(basepc, instrbuffer, 1);
+			length = validate_opcode(machine, basepc, instrbuffer, 1);
 			if (length == 0)
 				continue;
 			if (length < 0)
@@ -1466,7 +1466,7 @@ static fd1094_possibility *try_all_possibilities(int basepc, int offset, int len
 
 		/* if we're not at our target length, recursively call ourselves */
 		if (offset < length - 1)
-			possdata = try_all_possibilities(basepc, offset + 1, length, instrbuffer, keybuffer, possdata);
+			possdata = try_all_possibilities(machine, basepc, offset + 1, length, instrbuffer, keybuffer, possdata);
 
 		/* otherwise, output what we have */
 		else
@@ -1477,7 +1477,7 @@ static fd1094_possibility *try_all_possibilities(int basepc, int offset, int len
 			m68k_disassemble_raw(possdata->dasm, basepc, instrbuffer, instrbuffer, M68K_CPU_TYPE_68000);
 
 			/* validate the opcode */
-			tlen = validate_opcode(basepc, instrbuffer, length);
+			tlen = validate_opcode(machine, basepc, instrbuffer, length);
 			if (tlen == 0)
 			{
 				printf("Eliminated: %s [", possdata->dasm);
@@ -2223,7 +2223,7 @@ static void build_optable(void)
     valid or not, and return the length
 -----------------------------------------------*/
 
-static int validate_ea(UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 flags)
+static int validate_ea(running_machine *machine, UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 flags)
 {
 	UINT32 addr;
 	int valid;
@@ -2256,15 +2256,15 @@ static int validate_ea(UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 
 			{
 				case 0:	/* (xxx).W -- make sure it is not odd for word/long */
 					addr = (INT16)((parambase[0] << 8) | parambase[1]);
-					valid = addr_is_valid(addr & 0xffffff, flags);
+					valid = addr_is_valid(machine, addr & 0xffffff, flags);
 					return (valid == 0) ? 1000 : (valid == 2) ? -1 : 1;
 
 				case 1:	/* (xxx).L -- make sure it is not odd for word/long, and make sure upper byte of addr is 0 */
-					valid = addr_is_valid((parambase[0] << 24) | (parambase[1] << 16) | (parambase[2] << 8) | parambase[3], flags);
+					valid = addr_is_valid(machine, (parambase[0] << 24) | (parambase[1] << 16) | (parambase[2] << 8) | parambase[3], flags);
 					return (valid == 0) ? 1000 : (valid == 2) ? -2 : 2;
 
 				case 2:	/* (d16,PC) -- make sure it is not odd for word/long */
-					valid = addr_is_valid(pc + (INT16)((parambase[0] << 8) | parambase[1]), flags);
+					valid = addr_is_valid(machine, pc + (INT16)((parambase[0] << 8) | parambase[1]), flags);
 					return (valid == 0) ? 1000 : (valid == 2) ? -1 : 1;
 
 				case 3:	/* (d8,PC,Xn) -- odd displacements are a warning for word/long */
@@ -2293,7 +2293,7 @@ static int validate_ea(UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 
     the length specified
 -----------------------------------------------*/
 
-static int validate_opcode(UINT32 pc, const UINT8 *opdata, int maxwords)
+static int validate_opcode(running_machine *machine, UINT32 pc, const UINT8 *opdata, int maxwords)
 {
 	UINT32 immvalue = 0;
 	int iffy = FALSE;
@@ -2370,7 +2370,7 @@ static int validate_opcode(UINT32 pc, const UINT8 *opdata, int maxwords)
 			pc += immvalue;
 
 		/* if we're odd or out of range, fail */
-		valid = pc_is_valid(pc, flags);
+		valid = pc_is_valid(machine, pc, flags);
 		if (valid == 0)
 			return 0;
 		if (valid == 2)
@@ -2381,7 +2381,7 @@ static int validate_opcode(UINT32 pc, const UINT8 *opdata, int maxwords)
 	if (flags & (OF_EASRC | OF_EADST))
 	{
 		int modereg = opcode & 0x003f;
-		int ealen = validate_ea(pc + offset*2, modereg, &opdata[offset*2], flags);
+		int ealen = validate_ea(machine, pc + offset*2, modereg, &opdata[offset*2], flags);
 
 		/* if the ea was invalid, forward that result */
 		if (ealen == 1000)
@@ -2402,7 +2402,7 @@ static int validate_opcode(UINT32 pc, const UINT8 *opdata, int maxwords)
 	if (flags & OF_MOVE)
 	{
 		int modereg = ((opcode & 0x01c0) >> 3) | ((opcode & 0x0e00) >> 9);
-		int ealen = validate_ea(pc + offset*2, modereg, &opdata[offset*2], flags);
+		int ealen = validate_ea(machine, pc + offset*2, modereg, &opdata[offset*2], flags);
 
 		/* if the ea was invalid, forward that result */
 		if (ealen == 1000)

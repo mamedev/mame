@@ -1331,10 +1331,10 @@ ROM_START( striv )
 ROM_END
 
 
-static void treahunt_decode(void)
+static void treahunt_decode(running_machine *machine)
 {
 	int A;
-	UINT8 *rom = memory_region(Machine, "main");
+	UINT8 *rom = memory_region(machine, "main");
 	UINT8 *decrypt = auto_malloc(0x4000);
 	int data;
 
@@ -1383,7 +1383,7 @@ static DRIVER_INIT( jack )
 static DRIVER_INIT( treahunt )
 {
 	timer_rate = 128;
-	treahunt_decode();
+	treahunt_decode(machine);
 }
 
 static DRIVER_INIT( zzyzzyxx )

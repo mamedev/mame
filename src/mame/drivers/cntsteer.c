@@ -922,10 +922,10 @@ ROM_END
 
 /***************************************************************************/
 
-static void zerotrgt_rearrange_gfx(int romsize, int romarea)
+static void zerotrgt_rearrange_gfx(running_machine *machine, int romsize, int romarea)
 {
-	UINT8 *src = memory_region(Machine, "gfx4");
-	UINT8 *dst = memory_region(Machine, "gfx3");
+	UINT8 *src = memory_region(machine, "gfx4");
+	UINT8 *dst = memory_region(machine, "gfx3");
 	int rm;
 	int cnt1;
 
@@ -952,7 +952,7 @@ static void init_cntsteer(void)
 	RAM[0xc2f1]=0x43;
 	RAM[0xc2f2]=0x43;
 
-	zerotrgt_rearrange_gfx(0x02000, 0x10000);
+	zerotrgt_rearrange_gfx(machine, 0x02000, 0x10000);
 
 }
 #endif
@@ -963,7 +963,7 @@ static DRIVER_INIT( zerotrgt )
 	for (i=0; i<ARRAY_LENGTH(newdata); i++)
 		newdata[i] = -1;
 
-	zerotrgt_rearrange_gfx(0x02000, 0x10000);
+	zerotrgt_rearrange_gfx(machine, 0x02000, 0x10000);
 }
 
 

@@ -13,7 +13,6 @@
 #include "driver.h"
 #include "profiler.h"
 #include "pool.h"
-#include "deprecat.h"
 
 
 /***************************************************************************
@@ -328,7 +327,7 @@ attotime timer_next_fire_time(void)
     time; this is also where we fire the timers
 -------------------------------------------------*/
 
-void timer_set_global_time(attotime newbase)
+void timer_set_global_time(running_machine *machine, attotime newbase)
 {
 	emu_timer *timer;
 
@@ -357,7 +356,7 @@ void timer_set_global_time(attotime newbase)
 		{
 			LOG(("Timer %s:%d[%s] fired (expire=%s)\n", timer->file, timer->line, timer->func, attotime_string(timer->expire, 9)));
 			profiler_mark(PROFILER_TIMER_CALLBACK);
-			(*timer->callback)(Machine, timer->ptr, timer->param);
+			(*timer->callback)(machine, timer->ptr, timer->param);
 			profiler_mark(PROFILER_END);
 		}
 

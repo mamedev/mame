@@ -135,12 +135,12 @@ void kog_px_decrypt( running_machine *machine )
 
 static UINT16 kof10thExtraRAMB[0x01000];
 
-static void kof10thBankswitch(UINT16 nBank)
+static void kof10thBankswitch(running_machine *machine, UINT16 nBank)
 {
 	UINT32 bank = 0x100000 + ((nBank & 7) << 20);
 	if (bank >= 0x700000)
 		bank = 0x100000;
-	neogeo_set_main_cpu_bank_address(bank);
+	neogeo_set_main_cpu_bank_address(machine, bank);
 }
 
 static READ16_HANDLER( kof10th_RAMB_r )
@@ -163,7 +163,7 @@ static WRITE16_HANDLER( kof10th_bankswitch_w )
 {
 	if (offset >= 0x5F000) {
 		if (offset == 0x5FFF8) { // Standard bankswitch
-			kof10thBankswitch(data);
+			kof10thBankswitch(machine, data);
 		} else if (offset == 0x5FFFC && kof10thExtraRAMB[0xFFC] != data) { // Special bankswitch
 			UINT8 *src = memory_region( machine, "main" );
 			memcpy (src + 0x10000,  src + ((data & 1) ? 0x810000 : 0x710000), 0xcffff);
@@ -421,7 +421,7 @@ static WRITE16_HANDLER ( cthd2003_bankswitch_w )
 	if (offset == 0)
 	{
 		bankaddress = 0x100000 + cthd2003_banks[data&7]*0x100000;
-		neogeo_set_main_cpu_bank_address(bankaddress);
+		neogeo_set_main_cpu_bank_address(machine, bankaddress);
 	}
 }
 
@@ -647,7 +647,7 @@ static WRITE16_HANDLER ( ms5plus_bankswitch_w )
 	if ((offset == 0)&&(data == 0xa0))
 	{
 		bankaddress=0xa0;
-		neogeo_set_main_cpu_bank_address(bankaddress);
+		neogeo_set_main_cpu_bank_address(machine, bankaddress);
 		logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,activecpu_get_pc(),bankaddress);
 	}
 	else if(offset == 2)
@@ -655,7 +655,7 @@ static WRITE16_HANDLER ( ms5plus_bankswitch_w )
 		data=data>>4;
 		//data=data&7;
 		bankaddress=data*0x100000;
-		neogeo_set_main_cpu_bank_address(bankaddress);
+		neogeo_set_main_cpu_bank_address(machine, bankaddress);
 		logerror("offset: %06x PC %06x: set banking %04x\n\n",offset,activecpu_get_pc(),bankaddress);
 	}
 }
@@ -832,7 +832,7 @@ static WRITE16_HANDLER( mv0_bankswitch_w )
 {
     UINT32 bankaddress = (mv0_bank_ram[ 0 ] >> 8) + (mv0_bank_ram[ 1 ] << 8) + 0x100000;
 	COMBINE_DATA( &mv0_bank_ram[ offset ] );
-    neogeo_set_main_cpu_bank_address( bankaddress );
+    neogeo_set_main_cpu_bank_address( machine, bankaddress );
 }
 #endif
 
@@ -862,7 +862,7 @@ static WRITE16_HANDLER( kof2003_w )
 		cr[BYTE_XOR_LE(0x1ff0)] =  0xa0;
 		cr[BYTE_XOR_LE(0x1ff1)] &= 0xfe;
 		cr[BYTE_XOR_LE(0x1ff3)] &= 0x7f;
-		neogeo_set_main_cpu_bank_address(address+0x100000);
+		neogeo_set_main_cpu_bank_address(machine, address+0x100000);
 
 		mem[BYTE_XOR_LE(0x58196)] = prt;
 	}
@@ -879,7 +879,7 @@ static WRITE16_HANDLER( kof2003p_w )
 
 		cr[BYTE_XOR_LE(0x1ff0)] &= 0xfe;
 		cr[BYTE_XOR_LE(0x1ff3)] &= 0x7f;
-		neogeo_set_main_cpu_bank_address(address+0x100000);
+		neogeo_set_main_cpu_bank_address(machine, address+0x100000);
 
 		mem[BYTE_XOR_LE(0x58196)] = prt;
 	}

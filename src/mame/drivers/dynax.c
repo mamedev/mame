@@ -1280,9 +1280,9 @@ static WRITE8_HANDLER( tenkai_palette_w )
 	}
 }
 
-static void tenkai_update_rombank(void)
+static void tenkai_update_rombank(running_machine *machine)
 {
-	romptr = memory_region(Machine, "main") + 0x10000 + 0x8000 * rombank;
+	romptr = memory_region(machine, "main") + 0x10000 + 0x8000 * rombank;
 //  logerror("rombank = %02x\n",rombank);
 }
 
@@ -1293,12 +1293,12 @@ static READ8_HANDLER( tenkai_p3_r )
 static WRITE8_HANDLER( tenkai_p3_w )
 {
 	rombank = ((data & 0x04) << 1) | (rombank & 0x07);
-	tenkai_update_rombank();
+	tenkai_update_rombank(machine);
 }
 static WRITE8_HANDLER( tenkai_p4_w )
 {
 	rombank = (rombank & 0x08) | ((data & 0x0e) >> 1);
-	tenkai_update_rombank();
+	tenkai_update_rombank(machine);
 }
 // Added by Whistler - START
 static READ8_HANDLER( tenkai_p5_r )
@@ -1325,7 +1325,7 @@ static WRITE8_HANDLER( tenkai_p7_w )
 static WRITE8_HANDLER( tenkai_p8_w )
 {
 	rombank = ((data & 0x08) <<	 1) | (rombank & 0x0f);
-	tenkai_update_rombank();
+	tenkai_update_rombank(machine);
 }
 static READ8_HANDLER( tenkai_p8_r )
 {

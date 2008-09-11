@@ -1406,14 +1406,14 @@ ROM_END
  *
  *************************************/
 
-static void monsterb_expand_gfx(const char *region)
+static void monsterb_expand_gfx(running_machine *machine, const char *region)
 {
 	UINT8 *temp, *dest;
 	int i;
 
 	/* expand the background ROMs; A11/A12 of each ROM is independently controlled via */
 	/* banking */
-	dest = memory_region(Machine, region);
+	dest = memory_region(machine, region);
 	temp = malloc_or_die(0x4000);
 	memcpy(temp, dest, 0x4000);
 
@@ -1488,7 +1488,7 @@ static DRIVER_INIT( monsterb )
 
 	/* configure video */
 	segag80r_background_pcb = G80_BACKGROUND_MONSTERB;
-	monsterb_expand_gfx("gfx1");
+	monsterb_expand_gfx(machine, "gfx1");
 
 	/* install background board handlers */
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0xb8, 0xbd, 0, 0, monsterb_back_port_w);
@@ -1504,7 +1504,7 @@ static DRIVER_INIT( monster2 )
 
 	/* configure video */
 	segag80r_background_pcb = G80_BACKGROUND_PIGNEWT;
-	monsterb_expand_gfx("gfx1");
+	monsterb_expand_gfx(machine, "gfx1");
 
 	/* install background board handlers */
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0xb4, 0xb5, 0, 0, pignewt_back_color_w);
@@ -1520,7 +1520,7 @@ static DRIVER_INIT( pignewt )
 
 	/* configure video */
 	segag80r_background_pcb = G80_BACKGROUND_PIGNEWT;
-	monsterb_expand_gfx("gfx1");
+	monsterb_expand_gfx(machine, "gfx1");
 
 	/* install background board handlers */
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0xb4, 0xb5, 0, 0, pignewt_back_color_w);

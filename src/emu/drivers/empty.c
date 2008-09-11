@@ -22,7 +22,7 @@
 static MACHINE_START( empty )
 {
 	/* force the UI to show the game select screen */
-	ui_menu_force_game_select();
+	ui_menu_force_game_select(machine);
 }
 
 

@@ -134,15 +134,15 @@ static int complete_create(running_machine *machine, win_window_info *window);
 static void create_window_class(void);
 static void set_starting_view(running_machine *machine, int index, win_window_info *window, const char *view);
 
-static void constrain_to_aspect_ratio(win_window_info *window, RECT *rect, int adjustment);
-static void get_min_bounds(win_window_info *window, RECT *bounds, int constrain);
-static void get_max_bounds(win_window_info *window, RECT *bounds, int constrain);
-static void update_minmax_state(win_window_info *window);
-static void minimize_window(win_window_info *window);
-static void maximize_window(win_window_info *window);
+static void constrain_to_aspect_ratio(running_machine *machine, win_window_info *window, RECT *rect, int adjustment);
+static void get_min_bounds(running_machine *mchine, win_window_info *window, RECT *bounds, int constrain);
+static void get_max_bounds(running_machine *machine, win_window_info *window, RECT *bounds, int constrain);
+static void update_minmax_state(running_machine *machine, win_window_info *window);
+static void minimize_window(running_machine *machine, win_window_info *window);
+static void maximize_window(running_machine *machine, win_window_info *window);
 
-static void adjust_window_position_after_major_change(win_window_info *window);
-static void set_fullscreen(win_window_info *window, int fullscreen);
+static void adjust_window_position_after_major_change(running_machine *machine, win_window_info *window);
+static void set_fullscreen(running_machine *machine, win_window_info *window, int fullscreen);
 
 
 // temporary hacks
@@ -223,7 +223,7 @@ void winwindow_init(running_machine *machine)
 			fatalerror("Failed to create window thread ready event");
 
 		// create a thread to run the windows from
-		temp = _beginthreadex(NULL, 0, thread_entry, NULL, 0, (unsigned *)&window_threadid);
+		temp = _beginthreadex(NULL, 0, thread_entry, (void*)machine, 0, (unsigned *)&window_threadid);
 		window_thread = (HANDLE)temp;
 		if (window_thread == NULL)
 			fatalerror("Failed to create window thread");
@@ -994,6 +994,7 @@ INLINE int wnd_extra_height(win_window_info *window)
 static unsigned __stdcall thread_entry(void *param)
 {
 	MSG message;
+	running_machine *machine = (running_machine*)param;
 
 	// make a bogus user call to make us a message thread
 	PeekMessage(&message, NULL, 0, 0, PM_NOREMOVE);
@@ -1063,7 +1064,7 @@ static unsigned __stdcall thread_entry(void *param)
 				case WM_USER_FINISH_CREATE_WINDOW:
 				{
 					win_window_info *window = (win_window_info *)message.lParam;
-					window->init_state = complete_create(Machine, window) ? -1 : 1;
+					window->init_state = complete_create(machine, window) ? -1 : 1;
 					dispatch = FALSE;
 					break;
 				}
@@ -1137,10 +1138,10 @@ static int complete_create(running_machine *machine, win_window_info *window)
 
 	// maximum or minimize as appropriate
 	if (window->startmaximized)
-		maximize_window(window);
+		maximize_window(machine, window);
 	else
-		minimize_window(window);
-	adjust_window_position_after_major_change(window);
+		minimize_window(machine, window);
+	adjust_window_position_after_major_change(machine, window);
 
 	// show the window
 	if (!window->fullscreen || window->fullscreen_safe)
@@ -1175,7 +1176,7 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 	if (window != NULL)
 	{
 		assert(GetCurrentThreadId() == window_threadid);
-		update_minmax_state(window);
+		update_minmax_state(Machine, window);
 	}
 
 	// handle a few messages
@@ -1277,7 +1278,7 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 		{
 			RECT *rect = (RECT *)lparam;
 			if (video_config.keepaspect && !(GetAsyncKeyState(VK_CONTROL) & 0x8000))
-				constrain_to_aspect_ratio(window, rect, wparam);
+				constrain_to_aspect_ratio(Machine, window, rect, wparam);
 			InvalidateRect(wnd, NULL, FALSE);
 			break;
 		}
@@ -1295,11 +1296,11 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 			// handle maximize
 			if ((wparam & 0xfff0) == SC_MAXIMIZE)
 			{
-				update_minmax_state(window);
+				update_minmax_state(Machine, window);
 				if (window->ismaximized)
-					minimize_window(window);
+					minimize_window(Machine, window);
 				else
-					maximize_window(window);
+					maximize_window(Machine, window);
 				break;
 			}
 			return DefWindowProc(wnd, message, wparam, lparam);
@@ -1345,17 +1346,17 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 
 		// fullscreen set
 		case WM_USER_SET_FULLSCREEN:
-			set_fullscreen(window, wparam);
+			set_fullscreen(Machine, window, wparam);
 			break;
 
 		// minimum size set
 		case WM_USER_SET_MINSIZE:
-			minimize_window(window);
+			minimize_window(Machine, window);
 			break;
 
 		// maximum size set
 		case WM_USER_SET_MAXSIZE:
-			maximize_window(window);
+			maximize_window(Machine, window);
 			break;
 
 		// set focus: if we're not the primary window, switch back
@@ -1422,7 +1423,7 @@ static void draw_video_contents(win_window_info *window, HDC dc, int update)
 //  (window thread)
 //============================================================
 
-static void constrain_to_aspect_ratio(win_window_info *window, RECT *rect, int adjustment)
+static void constrain_to_aspect_ratio(running_machine *machine, win_window_info *window, RECT *rect, int adjustment)
 {
 	win_monitor_info *monitor = winwindow_video_window_monitor(window, rect);
 	INT32 extrawidth = wnd_extra_width(window);
@@ -1538,7 +1539,7 @@ static void constrain_to_aspect_ratio(win_window_info *window, RECT *rect, int a
 //  (window thread)
 //============================================================
 
-static void get_min_bounds(win_window_info *window, RECT *bounds, int constrain)
+static void get_min_bounds(running_machine *machine, win_window_info *window, RECT *bounds, int constrain)
 {
 	INT32 minwidth, minheight;
 
@@ -1566,13 +1567,13 @@ static void get_min_bounds(win_window_info *window, RECT *bounds, int constrain)
 		test1.top = test1.left = 0;
 		test1.right = minwidth;
 		test1.bottom = 10000;
-		constrain_to_aspect_ratio(window, &test1, WMSZ_BOTTOMRIGHT);
+		constrain_to_aspect_ratio(machine, window, &test1, WMSZ_BOTTOMRIGHT);
 
 		// then constrain with no width limit
 		test2.top = test2.left = 0;
 		test2.right = 10000;
 		test2.bottom = minheight;
-		constrain_to_aspect_ratio(window, &test2, WMSZ_BOTTOMRIGHT);
+		constrain_to_aspect_ratio(machine, window, &test2, WMSZ_BOTTOMRIGHT);
 
 		// pick the larger
 		if (rect_width(&test1) > rect_width(&test2))
@@ -1602,7 +1603,7 @@ static void get_min_bounds(win_window_info *window, RECT *bounds, int constrain)
 //  (window thread)
 //============================================================
 
-static void get_max_bounds(win_window_info *window, RECT *bounds, int constrain)
+static void get_max_bounds(running_machine *machine, win_window_info *window, RECT *bounds, int constrain)
 {
 	RECT maximum;
 
@@ -1628,7 +1629,7 @@ static void get_max_bounds(win_window_info *window, RECT *bounds, int constrain)
 
 	// constrain to fit
 	if (constrain)
-		constrain_to_aspect_ratio(window, &maximum, WMSZ_BOTTOMRIGHT);
+		constrain_to_aspect_ratio(machine, window, &maximum, WMSZ_BOTTOMRIGHT);
 	else
 	{
 		maximum.right -= wnd_extra_width(window);
@@ -1649,7 +1650,7 @@ static void get_max_bounds(win_window_info *window, RECT *bounds, int constrain)
 //  (window thread)
 //============================================================
 
-static void update_minmax_state(win_window_info *window)
+static void update_minmax_state(running_machine *machine, win_window_info *window)
 {
 	assert(GetCurrentThreadId() == window_threadid);
 
@@ -1658,8 +1659,8 @@ static void update_minmax_state(win_window_info *window)
 		RECT bounds, minbounds, maxbounds;
 
 		// compare the maximum bounds versus the current bounds
-		get_min_bounds(window, &minbounds, video_config.keepaspect);
-		get_max_bounds(window, &maxbounds, video_config.keepaspect);
+		get_min_bounds(machine, window, &minbounds, video_config.keepaspect);
+		get_max_bounds(machine, window, &maxbounds, video_config.keepaspect);
 		GetWindowRect(window->hwnd, &bounds);
 
 		// if either the width or height matches, we were maximized
@@ -1682,13 +1683,13 @@ static void update_minmax_state(win_window_info *window)
 //  (window thread)
 //============================================================
 
-static void minimize_window(win_window_info *window)
+static void minimize_window(running_machine *machine, win_window_info *window)
 {
 	RECT newsize;
 
 	assert(GetCurrentThreadId() == window_threadid);
 
-	get_min_bounds(window, &newsize, video_config.keepaspect);
+	get_min_bounds(machine, window, &newsize, video_config.keepaspect);
 	SetWindowPos(window->hwnd, NULL, newsize.left, newsize.top, rect_width(&newsize), rect_height(&newsize), SWP_NOZORDER);
 }
 
@@ -1699,13 +1700,13 @@ static void minimize_window(win_window_info *window)
 //  (window thread)
 //============================================================
 
-static void maximize_window(win_window_info *window)
+static void maximize_window(running_machine *machine, win_window_info *window)
 {
 	RECT newsize;
 
 	assert(GetCurrentThreadId() == window_threadid);
 
-	get_max_bounds(window, &newsize, video_config.keepaspect);
+	get_max_bounds(machine, window, &newsize, video_config.keepaspect);
 	SetWindowPos(window->hwnd, NULL, newsize.left, newsize.top, rect_width(&newsize), rect_height(&newsize), SWP_NOZORDER);
 }
 
@@ -1716,7 +1717,7 @@ static void maximize_window(win_window_info *window)
 //  (window thread)
 //============================================================
 
-static void adjust_window_position_after_major_change(win_window_info *window)
+static void adjust_window_position_after_major_change(running_machine *machine, win_window_info *window)
 {
 	RECT oldrect, newrect;
 
@@ -1731,7 +1732,7 @@ static void adjust_window_position_after_major_change(win_window_info *window)
 		// constrain the existing size to the aspect ratio
 		newrect = oldrect;
 		if (video_config.keepaspect)
-			constrain_to_aspect_ratio(window, &newrect, WMSZ_BOTTOMRIGHT);
+			constrain_to_aspect_ratio(machine, window, &newrect, WMSZ_BOTTOMRIGHT);
 	}
 
 	// in full screen, make sure it covers the primary display
@@ -1764,7 +1765,7 @@ static void adjust_window_position_after_major_change(win_window_info *window)
 //  (window thread)
 //============================================================
 
-static void set_fullscreen(win_window_info *window, int fullscreen)
+static void set_fullscreen(running_machine *machine, win_window_info *window, int fullscreen)
 {
 	assert(GetCurrentThreadId() == window_threadid);
 
@@ -1803,7 +1804,7 @@ static void set_fullscreen(win_window_info *window, int fullscreen)
 		else
 		{
 			SetWindowPos(window->hwnd, HWND_TOP, 0, 0, MIN_WINDOW_DIM, MIN_WINDOW_DIM, SWP_NOZORDER);
-			maximize_window(window);
+			maximize_window(machine, window);
 		}
 	}
 
@@ -1823,7 +1824,7 @@ static void set_fullscreen(win_window_info *window, int fullscreen)
 	}
 
 	// adjust the window to compensate for the change
-	adjust_window_position_after_major_change(window);
+	adjust_window_position_after_major_change(machine, window);
 
 	// show ourself
 	if (!window->fullscreen || window->fullscreen_safe)
@@ -1835,5 +1836,5 @@ static void set_fullscreen(win_window_info *window, int fullscreen)
 	}
 
 	// ensure we're still adjusted correctly
-	adjust_window_position_after_major_change(window);
+	adjust_window_position_after_major_change(machine, window);
 }

@@ -552,7 +552,7 @@ void mame_schedule_exit(running_machine *machine)
 	if (started_empty && options_get_string(mame_options(), OPTION_GAMENAME)[0] != 0)
 	{
 		options_set_string(mame_options(), OPTION_GAMENAME, "", OPTION_PRIORITY_CMDLINE);
-		ui_menu_force_game_select();
+		ui_menu_force_game_select(machine);
 	}
 
 	/* otherwise, exit for real */
@@ -1145,9 +1145,8 @@ void CLIB_DECL fatalerror(const char *text, ...)
 }
 
 
-void CLIB_DECL fatalerror_exitcode(int exitcode, const char *text, ...)
+void CLIB_DECL fatalerror_exitcode(running_machine *machine, int exitcode, const char *text, ...)
 {
-	running_machine *machine = Machine;
 	va_list arg;
 
 	/* dump to the buffer; assume no one writes >2k lines this way */
@@ -1647,7 +1646,7 @@ static TIMER_CALLBACK( soft_reset )
 
 	/* set the global time to the current time */
 	/* this allows 0-time queued callbacks to run before any CPUs execute */
-	timer_set_global_time(timer_get_time());
+	timer_set_global_time(machine, timer_get_time());
 }
 
 
@@ -1734,7 +1733,7 @@ static void handle_save(running_machine *machine)
 
 		/* write the default tag */
 		state_save_push_tag(0);
-		state_save_save_continue();
+		state_save_save_continue(machine);
 		state_save_pop_tag();
 
 		/* loop over CPUs */
@@ -1747,14 +1746,14 @@ static void handle_save(running_machine *machine)
 
 			/* save the CPU data */
 			state_save_push_tag(cpunum + 1);
-			state_save_save_continue();
+			state_save_save_continue(machine);
 			state_save_pop_tag();
 
 			cpuintrf_pop_context();
 		}
 
 		/* finish and close */
-		state_save_save_finish();
+		state_save_save_finish(machine);
 		mame_fclose(file);
 
 		/* pop a warning if the game doesn't support saves */
@@ -1816,7 +1815,7 @@ static void handle_load(running_machine *machine)
 
 			/* read tag 0 */
 			state_save_push_tag(0);
-			state_save_load_continue();
+			state_save_load_continue(machine);
 			state_save_pop_tag();
 
 			/* loop over CPUs */
@@ -1829,7 +1828,7 @@ static void handle_load(running_machine *machine)
 
 				/* load the CPU data */
 				state_save_push_tag(cpunum + 1);
-				state_save_load_continue();
+				state_save_load_continue(machine);
 				state_save_pop_tag();
 
 				/* make sure banking is set */

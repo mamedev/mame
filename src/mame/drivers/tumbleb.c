@@ -3282,10 +3282,10 @@ ROM_END
 /******************************************************************************/
 
 #if TUMBLEP_HACK
-void tumblepb_patch_code(UINT16 offset)
+void tumblepb_patch_code(running_machine *machine, UINT16 offset)
 {
 	/* A hack which enables all Dip Switches effects */
-	UINT16 *RAM = (UINT16 *)memory_region(Machine, "main");
+	UINT16 *RAM = (UINT16 *)memory_region(machine, "main");
 	RAM[(offset + 0)/2] = 0x0240;
 	RAM[(offset + 2)/2] = 0xffff;	// andi.w  #$f3ff, D0
 }
@@ -3318,7 +3318,7 @@ static DRIVER_INIT( tumblepb )
 	tumblepb_gfx1_rearrange(machine);
 
 	#if TUMBLEP_HACK
-	tumblepb_patch_code(0x000132);
+	tumblepb_patch_code(machine, 0x000132);
 	#endif
 }
 
@@ -3327,7 +3327,7 @@ static DRIVER_INIT( tumbleb2 )
 	tumblepb_gfx1_rearrange(machine);
 
 	#if TUMBLEP_HACK
-	tumblepb_patch_code(0x000132);
+	tumblepb_patch_code(machine, 0x000132);
 	#endif
 
 	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x100001, 0, 0, tumbleb2_soundmcu_w );
@@ -3339,7 +3339,7 @@ static DRIVER_INIT( jumpkids )
 	tumblepb_gfx1_rearrange(machine);
 
 	#if TUMBLEP_HACK
-	tumblepb_patch_code(0x00013a);
+	tumblepb_patch_code(machine, 0x00013a);
 	#endif
 }
 

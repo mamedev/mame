@@ -565,9 +565,9 @@ attotime stream_get_sample_period(sound_stream *stream)
     tag and index
 -------------------------------------------------*/
 
-sound_stream *stream_find_by_tag(void *streamtag, int streamindex)
+sound_stream *stream_find_by_tag(running_machine *machine, void *streamtag, int streamindex)
 {
-	streams_private *strdata = Machine->streams_data;
+	streams_private *strdata = machine->streams_data;
 	sound_stream *stream;
 
 	/* scan the list looking for the nth stream that matches the tag */

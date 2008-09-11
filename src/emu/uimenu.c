@@ -15,7 +15,6 @@
 #include "uiinput.h"
 #include "uimenu.h"
 #include "audit.h"
-#include "deprecat.h"
 #include "eminline.h"
 
 #ifdef MESS
@@ -240,7 +239,7 @@ static const rgb_t mousedown_bgcolor = MAKE_ARGB(0xB0,0x60,0x60,0x00);
 static void ui_menu_exit(running_machine *machine);
 
 /* internal menu processing */
-static void ui_menu_draw(ui_menu *menu, int customonly);
+static void ui_menu_draw(running_machine *machine, ui_menu *menu, int customonly);
 static void ui_menu_draw_text_box(ui_menu *menu);
 static void ui_menu_handle_events(ui_menu *menu);
 static void ui_menu_handle_keys(ui_menu *menu, UINT32 flags);
@@ -569,7 +568,7 @@ void ui_menu_item_append(ui_menu *menu, const char *text, const char *subtext, U
     and returning any interesting events
 -------------------------------------------------*/
 
-const ui_menu_event *ui_menu_process(ui_menu *menu, UINT32 flags)
+const ui_menu_event *ui_menu_process(running_machine *machine, ui_menu *menu, UINT32 flags)
 {
 	/* reset the event */
 	menu->event.iptkey = IPT_INVALID;
@@ -581,7 +580,7 @@ const ui_menu_event *ui_menu_process(ui_menu *menu, UINT32 flags)
 	if (menu->numitems > 1 && (menu->item[0].flags & MENU_FLAG_MULTILINE) != 0)
 		ui_menu_draw_text_box(menu);
 	else
-		ui_menu_draw(menu, (flags & UI_MENU_PROCESS_CUSTOM_ONLY) != 0);
+		ui_menu_draw(machine, menu, (flags & UI_MENU_PROCESS_CUSTOM_ONLY) != 0);
 
 	/* process input */
 	if (!(flags & UI_MENU_PROCESS_NOKEYS))
@@ -721,7 +720,7 @@ void ui_menu_set_selection(ui_menu *menu, void *selected_itemref)
     ui_menu_draw - draw a menu
 -------------------------------------------------*/
 
-static void ui_menu_draw(ui_menu *menu, int customonly)
+static void ui_menu_draw(running_machine *machine, ui_menu *menu, int customonly)
 {
 	float line_height = ui_get_line_height();
 	float lr_arrow_width = 0.4f * line_height * render_get_ui_aspect();
@@ -814,7 +813,7 @@ static void ui_menu_draw(ui_menu *menu, int customonly)
 	mouse_button = FALSE;
 	if (!customonly)
 	{
-		mouse_target = ui_input_find_mouse(Machine, &mouse_target_x, &mouse_target_y, &mouse_button);
+		mouse_target = ui_input_find_mouse(machine, &mouse_target_x, &mouse_target_y, &mouse_button);
 		if (mouse_target != NULL)
 			if (render_target_map_point_container(mouse_target, mouse_target_x, mouse_target_y, render_container_get_ui(), &mouse_x, &mouse_y))
 				mouse_hit = TRUE;
@@ -1359,22 +1358,22 @@ UINT32 ui_slider_ui_handler(running_machine *machine, UINT32 state)
     select menu to be visible and inescapable
 -------------------------------------------------*/
 
-void ui_menu_force_game_select(void)
+void ui_menu_force_game_select(running_machine *machine)
 {
 	char *gamename = (char *)options_get_string(mame_options(), OPTION_GAMENAME);
 
 	/* reset the menu stack */
-	ui_menu_stack_reset(Machine);
+	ui_menu_stack_reset(machine);
 
 	/* add the quit entry followed by the game select entry */
-	ui_menu_stack_push(ui_menu_alloc(Machine, menu_quit_game, NULL));
-	ui_menu_stack_push(ui_menu_alloc(Machine, menu_select_game, gamename));
+	ui_menu_stack_push(ui_menu_alloc(machine, menu_quit_game, NULL));
+	ui_menu_stack_push(ui_menu_alloc(machine, menu_select_game, gamename));
 
 	/* force the menus on */
 	ui_show_menu();
 
 	/* make sure MAME is paused */
-	mame_pause(Machine, TRUE);
+	mame_pause(machine, TRUE);
 }
 
 
@@ -1414,7 +1413,7 @@ static void menu_main(running_machine *machine, ui_menu *menu, void *parameter, 
 		menu_main_populate(machine, menu, state);
 
 	/* process the menu */
-	event = ui_menu_process(menu, 0);
+	event = ui_menu_process(machine, menu, 0);
 	if (event != NULL && event->iptkey == IPT_UI_SELECT)
 		ui_menu_stack_push(ui_menu_alloc(machine, event->itemref, NULL));
 }
@@ -1507,7 +1506,7 @@ static void menu_input_groups(running_machine *machine, ui_menu *menu, void *par
 		menu_input_groups_populate(machine, menu, state);
 
 	/* process the menu */
-	event = ui_menu_process(menu, 0);
+	event = ui_menu_process(machine, menu, 0);
 	if (event != NULL && event->iptkey == IPT_UI_SELECT)
 		ui_menu_stack_push(ui_menu_alloc(machine, menu_input_general, event->itemref));
 }
@@ -1707,7 +1706,7 @@ static void menu_input_common(running_machine *machine, ui_menu *menu, void *par
 	}
 
 	/* process the menu */
-	event = ui_menu_process(menu, (menustate->pollingitem != NULL) ? UI_MENU_PROCESS_NOKEYS : 0);
+	event = ui_menu_process(machine, menu, (menustate->pollingitem != NULL) ? UI_MENU_PROCESS_NOKEYS : 0);
 
 	/* if we are polling, handle as a special case */
 	if (menustate->pollingitem != NULL)
@@ -1934,7 +1933,7 @@ static void menu_settings_common(running_machine *machine, ui_menu *menu, void *
 		menu_settings_populate(machine, menu, menustate, type);
 
 	/* process the menu */
-	event = ui_menu_process(menu, 0);
+	event = ui_menu_process(machine, menu, 0);
 
 	/* handle events */
 	if (event != NULL && event->itemref != NULL)
@@ -2175,7 +2174,7 @@ static void menu_analog(running_machine *machine, ui_menu *menu, void *parameter
 		menu_analog_populate(machine, menu);
 
 	/* process the menu */
-	event = ui_menu_process(menu, UI_MENU_PROCESS_LR_REPEAT);
+	event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT);
 
 	/* handle events */
 	if (event != NULL && event->itemref != NULL)
@@ -2366,7 +2365,7 @@ static void menu_bookkeeping(running_machine *machine, ui_menu *menu, void *para
 	}
 
 	/* process the menu */
-	ui_menu_process(menu, 0);
+	ui_menu_process(machine, menu, 0);
 }
 #endif
 
@@ -2433,7 +2432,7 @@ static void menu_game_info(running_machine *machine, ui_menu *menu, void *parame
 	}
 
 	/* process the menu */
-	ui_menu_process(menu, 0);
+	ui_menu_process(machine, menu, 0);
 }
 
 
@@ -2450,7 +2449,7 @@ static void menu_cheat(running_machine *machine, ui_menu *menu, void *parameter,
 		menu_cheat_populate(machine, menu);
 
 	/* process the menu */
-	event = ui_menu_process(menu, UI_MENU_PROCESS_LR_REPEAT);
+	event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT);
 
 	/* handle events */
 	if (event != NULL && event->itemref != NULL)
@@ -2549,7 +2548,7 @@ static void menu_memory_card(running_machine *machine, ui_menu *menu, void *para
 		menu_memory_card_populate(machine, menu, *cardnum);
 
 	/* process the menu */
-	event = ui_menu_process(menu, UI_MENU_PROCESS_LR_REPEAT);
+	event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT);
 
 	/* if something was selected, act on it */
 	if (event != NULL && event->itemref != NULL)
@@ -2654,7 +2653,7 @@ static void menu_sliders(running_machine *machine, ui_menu *menu, void *paramete
 		menu_sliders_populate(machine, menu);
 
 	/* process the menu */
-	event = ui_menu_process(menu, UI_MENU_PROCESS_LR_REPEAT | (*hidden ? UI_MENU_PROCESS_CUSTOM_ONLY : 0));
+	event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT | (*hidden ? UI_MENU_PROCESS_CUSTOM_ONLY : 0));
 	if (event != NULL)
 	{
 		/* handle keys if there is a valid item selected */
@@ -2850,7 +2849,7 @@ static void menu_video_targets(running_machine *machine, ui_menu *menu, void *pa
 		menu_video_targets_populate(machine, menu);
 
 	/* process the menu */
-	event = ui_menu_process(menu, 0);
+	event = ui_menu_process(machine, menu, 0);
 	if (event != NULL && event->iptkey == IPT_UI_SELECT)
 		ui_menu_stack_push(ui_menu_alloc(machine, menu_video_options, event->itemref));
 }
@@ -2898,7 +2897,7 @@ static void menu_video_options(running_machine *machine, ui_menu *menu, void *pa
 		menu_video_options_populate(machine, menu, target);
 
 	/* process the menu */
-	event = ui_menu_process(menu, 0);
+	event = ui_menu_process(machine, menu, 0);
 	if (event != NULL && event->itemref != NULL)
 	{
 		switch ((FPTR)event->itemref)
@@ -3049,7 +3048,7 @@ static void menu_select_game(running_machine *machine, ui_menu *menu, void *para
 	ui_input_pressed(machine, IPT_UI_PAUSE);
 
 	/* process the menu */
-	event = ui_menu_process(menu, 0);
+	event = ui_menu_process(machine, menu, 0);
 	if (event != NULL && event->itemref != NULL)
 	{
 		/* reset the error on any future event */

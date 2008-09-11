@@ -62,7 +62,6 @@
 #define MAKE_CMDERR_EXPRESSION_ERROR(x)		MAKE_CMDERR(CMDERR_EXPRESSION_ERROR, (x))
 
 
-
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
@@ -81,9 +80,9 @@ void				debug_console_init(running_machine *machine);
 void				debug_console_exit(running_machine *machine);
 
 /* command handling */
-CMDERR				debug_console_execute_command(const char *command, int echo);
-CMDERR				debug_console_validate_command(const char *command);
-void				debug_console_register_command(const char *command, UINT32 flags, int ref, int minparams, int maxparams, void (*handler)(int ref, int params, const char **param));
+CMDERR				debug_console_execute_command(running_machine *machine, const char *command, int echo);
+CMDERR				debug_console_validate_command(running_machine *machine, const char *command);
+void				debug_console_register_command(running_machine *machine, const char *command, UINT32 flags, int ref, int minparams, int maxparams, void (*handler)(running_machine *machine, int ref, int params, const char **param));
 const char *		debug_cmderr_to_string(CMDERR error);
 
 /* console management */

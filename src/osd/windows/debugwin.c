@@ -2460,7 +2460,7 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 
 						active_address = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_ACTIVE_ADDRESS);
 						sprintf(command, "go %X", BYTE2ADDR(active_address, cpuinfo, ADDRESS_SPACE_PROGRAM));
-						debug_console_execute_command(command, 1);
+						debug_console_execute_command(Machine, command, 1);
 					}
 					return 1;
 
@@ -2494,7 +2494,7 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 							sprintf(command, "bpset %X", BYTE2ADDR(active_address, cpuinfo, ADDRESS_SPACE_PROGRAM));
 						else
 							sprintf(command, "bpclear %X", bp_num);
-						debug_console_execute_command(command, 1);
+						debug_console_execute_command(Machine, command, 1);
 					}
 					return 1;
 			}
@@ -2768,7 +2768,7 @@ static void console_process_string(debugwin_info *info, const char *string)
 
 	// otherwise, just process the command
 	else
-		debug_console_execute_command(string, 1);
+		debug_console_execute_command(Machine, string, 1);
 
 	// clear the edit text box
 	SendMessage(info->editwnd, WM_SETTEXT, 0, (LPARAM)&buffer);

@@ -15,7 +15,6 @@
 #include "debughlp.h"
 #include "debugvw.h"
 #include "textbuf.h"
-#include "deprecat.h"
 #include "debugger.h"
 #include <ctype.h>
 
@@ -44,7 +43,7 @@ struct _debug_command
 	char			command[32];
 	const char *	params;
 	const char *	help;
-	void			(*handler)(int ref, int params, const char **param);
+	void			(*handler)(running_machine *machine, int ref, int params, const char **param);
 	void			(*handler_ex)(int ref);
 	UINT32			flags;
 	int				ref;
@@ -186,7 +185,7 @@ static void trim_parameter(char **paramptr, int keep_quotes)
     command
 -------------------------------------------------*/
 
-static CMDERR internal_execute_command(int execute, int params, char **param)
+static CMDERR internal_execute_command(running_machine *machine, int execute, int params, char **param)
 {
 	debug_command *cmd, *found = NULL;
 	int i, foundcount = 0;
@@ -248,7 +247,7 @@ static CMDERR internal_execute_command(int execute, int params, char **param)
 
 	/* execute the handler */
 	if (execute)
-		(*found->handler)(found->ref, params, (const char **)param);
+		(*found->handler)(machine, found->ref, params, (const char **)param);
 	return CMDERR_NONE;
 }
 
@@ -258,7 +257,7 @@ static CMDERR internal_execute_command(int execute, int params, char **param)
     and either executes or just validates it
 -------------------------------------------------*/
 
-static CMDERR internal_parse_command(const char *original_command, int execute)
+static CMDERR internal_parse_command(running_machine *machine, const char *original_command, int execute)
 {
 	char command[MAX_COMMAND_LENGTH], parens[MAX_COMMAND_LENGTH];
 	char *params[MAX_COMMAND_PARAMS];
@@ -335,7 +334,7 @@ static CMDERR internal_parse_command(const char *original_command, int execute)
 		}
 		else
 		{
-			result = internal_execute_command(execute, paramcount, &params[0]);
+			result = internal_execute_command(machine, execute, paramcount, &params[0]);
 			if (result != CMDERR_NONE)
 				return MAKE_CMDERR(CMDERR_ERROR_CLASS(result), command_start - command);
 		}
@@ -349,7 +348,7 @@ static CMDERR internal_parse_command(const char *original_command, int execute)
     command string
 -------------------------------------------------*/
 
-CMDERR debug_console_execute_command(const char *command, int echo)
+CMDERR debug_console_execute_command(running_machine *machine, const char *command, int echo)
 {
 	CMDERR result;
 
@@ -358,7 +357,7 @@ CMDERR debug_console_execute_command(const char *command, int echo)
 		debug_console_printf(">%s\n", command);
 
 	/* parse and execute */
-	result = internal_parse_command(command, TRUE);
+	result = internal_parse_command(machine, command, TRUE);
 
 	/* display errors */
 	if (result != CMDERR_NONE)
@@ -373,7 +372,7 @@ CMDERR debug_console_execute_command(const char *command, int echo)
 	if (echo)
 	{
 		debug_view_update_all();
-		debugger_refresh_display(Machine);
+		debugger_refresh_display(machine);
 	}
 	return result;
 }
@@ -384,9 +383,9 @@ CMDERR debug_console_execute_command(const char *command, int echo)
     command string
 -------------------------------------------------*/
 
-CMDERR debug_console_validate_command(const char *command)
+CMDERR debug_console_validate_command(running_machine *machine, const char *command)
 {
-	return internal_parse_command(command, FALSE);
+	return internal_parse_command(machine, command, FALSE);
 }
 
 
@@ -395,12 +394,12 @@ CMDERR debug_console_validate_command(const char *command)
     command handler
 -------------------------------------------------*/
 
-void debug_console_register_command(const char *command, UINT32 flags, int ref, int minparams, int maxparams, void (*handler)(int ref, int params, const char **param))
+void debug_console_register_command(running_machine *machine, const char *command, UINT32 flags, int ref, int minparams, int maxparams, void (*handler)(running_machine *machine, int ref, int params, const char **param))
 {
 	debug_command *cmd;
 
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call debug_console_register_command() at init time!");
-	assert_always((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0, "Cannot call debug_console_register_command() when debugger is not running");
+	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call debug_console_register_command() at init time!");
+	assert_always((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0, "Cannot call debug_console_register_command() when debugger is not running");
 
 	cmd = auto_malloc(sizeof(*cmd));
 	memset(cmd, 0, sizeof(*cmd));

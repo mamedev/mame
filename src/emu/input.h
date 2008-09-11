@@ -592,7 +592,7 @@ int input_device_set_joystick_map(int devindex, const char *mapstring);
 /* ----- OSD configuration and access ----- */
 
 /* add a new input device */
-input_device *input_device_add(input_device_class devclass, const char *name, void *internal);
+input_device *input_device_add(running_machine *machine, input_device_class devclass, const char *name, void *internal);
 
 /* add a new item to an input device */
 void input_device_item_add(input_device *device, const char *name, void *internal, input_item_id itemid, item_get_state_func getstate);

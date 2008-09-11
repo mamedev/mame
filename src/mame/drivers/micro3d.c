@@ -93,7 +93,7 @@ static UINT8 ti_uart[9];
 static int ti_uart_mode_cycle=0;
 static int ti_uart_sync_cycle=0;
 
-static void m68901_int_gen(int source);
+static void m68901_int_gen(running_machine *machine, int source);
 
 /* 68901 */
 enum{   TMRB=0,TXERR,TBE,RXERR,RBF,TMRA,GPIP6,GPIP7,     // A Registers
@@ -125,15 +125,15 @@ static void data_from_i8031(int data)
 }
 
 
-static void changecolor_BBBBBRRRRRGGGGGG(pen_t color,int data)
+static void changecolor_BBBBBRRRRRGGGGGG(running_machine *machine,pen_t color,int data)
 {
-	palette_set_color_rgb(Machine,color,pal5bit(data >> 6),pal5bit(data >> 1),pal5bit(data >> 11));
+	palette_set_color_rgb(machine,color,pal5bit(data >> 6),pal5bit(data >> 1),pal5bit(data >> 11));
 }
 
 static WRITE16_HANDLER( paletteram16_BBBBBRRRRRGGGGGG_word_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	changecolor_BBBBBRRRRRGGGGGG(offset,paletteram16[offset]);
+	changecolor_BBBBBRRRRRGGGGGG(machine,offset,paletteram16[offset]);
 }
 
 
@@ -392,12 +392,12 @@ INPUT_PORTS_END
 
 static void tms_interrupt(int state)
 {
-   m68901_int_gen(GPIP4);
+   m68901_int_gen(Machine, GPIP4);
 }
 
 static INTERRUPT_GEN( micro3d_vblank )
 {
-   m68901_int_gen(GPIP7);
+   m68901_int_gen(machine, GPIP7);
 }
 
 
@@ -407,34 +407,34 @@ static TIMER_CALLBACK( timera_int )
 {
 //      timer_set(attotime_mul(ATTOTIME_IN_HZ(M68901_CLK), ((m68901_base[0xf]>>8) & 0xff) * 200),0,timera_int);     // Set the timer again.
         timer_set(ATTOTIME_IN_USEC(1000), NULL,0,timera_int);     // Set the timer again.
-        m68901_int_gen(TMRA);           // Fire an interrupt.
+        m68901_int_gen(machine, TMRA);           // Fire an interrupt.
 }
 
 #ifdef UNUSED_FUNCTION
 static TIMER_CALLBACK( timerb_int )
 {
         timer_set(attotime_mul(ATTOTIME_IN_HZ(M68901_CLK), ((m68901_base[0x10]>>8) & 0xff) * 200),0,timera_int);
-        m68901_int_gen(TMRB);           // Fire an interrupt.
+        m68901_int_gen(machine, TMRB);           // Fire an interrupt.
 }
 
 static TIMER_CALLBACK( timerc_int )
 {
         timer_set(attotime_mul(ATTOTIME_IN_HZ(M68901_CLK), ((m68901_base[0x11]>>8) & 0xff) * 200),0,timera_int);
-        m68901_int_gen(TMRC);           // Fire an interrupt.
+        m68901_int_gen(machine, TMRC);           // Fire an interrupt.
 }
 #endif
 
 static TIMER_CALLBACK( timerd_int )
 {
         timer_set(ATTOTIME_IN_USEC(250), NULL,0,timerd_int);
-        m68901_int_gen(TMRD);           // Fire an interrupt.
+        m68901_int_gen(machine, TMRD);           // Fire an interrupt.
 }
 
 
 /* Called by anything that generates a MFD interrupt */
 /* Requires: MFD line number */
 
-static void m68901_int_gen(int source)
+static void m68901_int_gen(running_machine *machine, int source)
 {
 // logerror("M68901 interrupt %d requested.\n",source);
 
@@ -451,7 +451,7 @@ int bit=1 << (source-8*(int)(source/8));
 
        if(m68901_base[IMASK_REG] & (bit<<8))              // If interrupt is not masked by MFD, trigger a 68k INT
        {
-                cpunum_set_input_line(Machine, 0,4, HOLD_LINE);
+                cpunum_set_input_line(machine, 0,4, HOLD_LINE);
             //    logerror("M68901 interrupt %d serviced.\n",source);
        }
 }

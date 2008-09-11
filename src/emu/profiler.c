@@ -12,7 +12,6 @@
 #include "osdepend.h"
 #include "driver.h"
 #include "profiler.h"
-#include "deprecat.h"
 
 
 /* in usrintf.c */
@@ -98,7 +97,7 @@ logerror("Profiler error: FILO buffer underflow\n");
 	}
 }
 
-const char *profiler_get_text(void)
+const char *profiler_get_text(running_machine *machine)
 {
 	int i,j;
 	UINT64 total,normalize;
@@ -174,7 +173,7 @@ const char *profiler_get_text(void)
 		}
 		if (computed || showdelay[i])
 		{
-			if (computed) showdelay[i] = ATTOSECONDS_TO_HZ(video_screen_get_frame_period(Machine->primary_screen).attoseconds);
+			if (computed) showdelay[i] = ATTOSECONDS_TO_HZ(video_screen_get_frame_period(machine->primary_screen).attoseconds);
 			showdelay[i]--;
 
 			if (i < PROFILER_PROFILER)

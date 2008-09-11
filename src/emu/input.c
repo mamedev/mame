@@ -22,7 +22,6 @@
 #include "mame.h"
 #include "emuopts.h"
 #include "profiler.h"
-#include "deprecat.h"
 
 
 
@@ -82,6 +81,7 @@ struct _joystick_map
 /* a single input device */
 struct _input_device
 {
+	running_machine *		machine;				/* machine we are attached to */
 	astring *				name;					/* string name of device */
 	input_device_class		devclass;				/* class of this device */
 	int						devindex;				/* device index of this device */
@@ -719,12 +719,12 @@ static void input_frame(running_machine *machine)
     input_device_add - add a new input device
 -------------------------------------------------*/
 
-input_device *input_device_add(input_device_class devclass, const char *name, void *internal)
+input_device *input_device_add(running_machine *machine, input_device_class devclass, const char *name, void *internal)
 {
 	input_device_list *devlist = &device_list[devclass];
 	input_device *device;
 
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call input_device_add at init time!");
+	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call input_device_add at init time!");
 	assert(name != NULL);
 	assert(devclass != DEVICE_CLASS_INVALID && devclass < DEVICE_CLASS_MAXIMUM);
 
@@ -734,6 +734,7 @@ input_device *input_device_add(input_device_class devclass, const char *name, vo
 	memset(device, 0, sizeof(*device));
 
 	/* fill in the data */
+	device->machine = machine;
 	device->name = astring_cpyc(auto_astring_alloc(), name);
 	device->devclass = devclass;
 	device->devindex = devlist->count - 1;
@@ -761,7 +762,7 @@ void input_device_item_add(input_device *device, const char *name, void *interna
 	input_device_item *item;
 	input_item_id itemid_std = itemid;
 
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call input_device_item_add at init time!");
+	assert_always(mame_get_phase(device->machine) == MAME_PHASE_INIT, "Can only call input_device_item_add at init time!");
 	assert(name != NULL);
 	assert(itemid > ITEM_ID_INVALID && itemid < ITEM_ID_MAXIMUM);
 	assert(getstate != NULL);

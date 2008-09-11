@@ -112,10 +112,10 @@ int  state_save_load_begin(mame_file *file);
 void state_save_push_tag(int tag);
 void state_save_pop_tag(void);
 
-void state_save_save_continue(void);
-void state_save_load_continue(void);
+void state_save_save_continue(running_machine *machine);
+void state_save_load_continue(running_machine *machine);
 
-void state_save_save_finish(void);
+void state_save_save_finish(running_machine *machine);
 void state_save_load_finish(void);
 
 /* Helper function for creating a unique name */

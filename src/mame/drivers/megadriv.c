@@ -2617,7 +2617,7 @@ INLINE void overwrite_write(UINT16 *dst, UINT16 d)
 	if (d & 0x000f) { *dst &= ~0x000f; *dst |= d & 0x000f; }
 }
 
-static UINT32 pm_io(int reg, int write, UINT32 d)
+static UINT32 pm_io(running_machine *machine, int reg, int write, UINT32 d)
 {
 	if (svp.emu_status & SSP_PMC_SET)
 	{
@@ -2672,7 +2672,7 @@ static UINT32 pm_io(int reg, int write, UINT32 d)
 			int addr = svp.pmac_read[reg]&0xffff;
 			if      ((mode & 0xfff0) == 0x0800) // ROM, inc 1, verified to be correct
 			{
-				UINT16 *ROM = (UINT16 *) memory_region(Machine, "main");
+				UINT16 *ROM = (UINT16 *) memory_region(machine, "main");
 				svp.pmac_read[reg] += 1;
 				d = ROM[addr|((mode&0xf)<<16)];
 			}
@@ -2701,7 +2701,7 @@ static UINT32 pm_io(int reg, int write, UINT32 d)
 
 static READ16_HANDLER( read_PM0 )
 {
-	UINT32 d = pm_io(0, 0, 0);
+	UINT32 d = pm_io(machine, 0, 0, 0);
 	if (d != (UINT32)-1) return d;
 	d = svp.XST2;
 	svp.XST2 &= ~2; // ?
@@ -2710,14 +2710,14 @@ static READ16_HANDLER( read_PM0 )
 
 static WRITE16_HANDLER( write_PM0 )
 {
-	UINT32 r = pm_io(0, 1, data);
+	UINT32 r = pm_io(machine, 0, 1, data);
 	if (r != (UINT32)-1) return;
 	svp.XST2 = data; // ?
 }
 
 static READ16_HANDLER( read_PM1 )
 {
-	UINT32 r = pm_io(1, 0, 0);
+	UINT32 r = pm_io(machine, 1, 0, 0);
 	if (r != (UINT32)-1) return r;
 	logerror("svp: PM1 acces in non PM mode?\n");
 	return 0;
@@ -2725,14 +2725,14 @@ static READ16_HANDLER( read_PM1 )
 
 static WRITE16_HANDLER( write_PM1 )
 {
-	UINT32 r = pm_io(1, 1, data);
+	UINT32 r = pm_io(machine, 1, 1, data);
 	if (r != (UINT32)-1) return;
 	logerror("svp: PM1 acces in non PM mode?\n");
 }
 
 static READ16_HANDLER( read_PM2 )
 {
-	UINT32 r = pm_io(2, 0, 0);
+	UINT32 r = pm_io(machine, 2, 0, 0);
 	if (r != (UINT32)-1) return r;
 	logerror("svp: PM2 acces in non PM mode?\n");
 	return 0;
@@ -2740,14 +2740,14 @@ static READ16_HANDLER( read_PM2 )
 
 static WRITE16_HANDLER( write_PM2 )
 {
-	UINT32 r = pm_io(2, 1, data);
+	UINT32 r = pm_io(machine, 2, 1, data);
 	if (r != (UINT32)-1) return;
 	logerror("svp: PM2 acces in non PM mode?\n");
 }
 
 static READ16_HANDLER( read_XST )
 {
-	UINT32 d = pm_io(3, 0, 0);
+	UINT32 d = pm_io(machine, 3, 0, 0);
 	if (d != (UINT32)-1) return d;
 
 	return svp.XST;
@@ -2755,7 +2755,7 @@ static READ16_HANDLER( read_XST )
 
 static WRITE16_HANDLER( write_XST )
 {
-	UINT32 r = pm_io(3, 1, data);
+	UINT32 r = pm_io(machine, 3, 1, data);
 	if (r != (UINT32)-1) return;
 
 	svp.XST2 |= 1;
@@ -2764,12 +2764,12 @@ static WRITE16_HANDLER( write_XST )
 
 static READ16_HANDLER( read_PM4 )
 {
-	return pm_io(4, 0, 0);
+	return pm_io(machine, 4, 0, 0);
 }
 
 static WRITE16_HANDLER( write_PM4 )
 {
-	pm_io(4, 1, data);
+	pm_io(machine, 4, 1, data);
 }
 
 static READ16_HANDLER( read_PMC )

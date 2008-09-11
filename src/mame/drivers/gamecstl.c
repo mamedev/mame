@@ -162,7 +162,7 @@ static UINT8 mxtc_config_r(int function, int reg)
 	return mxtc_config_reg[reg];
 }
 
-static void mxtc_config_w(int function, int reg, UINT8 data)
+static void mxtc_config_w(running_machine *machine, int function, int reg, UINT8 data)
 {
 //  mame_printf_debug("MXTC: write %d, %02X, %02X at %08X\n", function, reg, data, activecpu_get_pc());
 
@@ -176,7 +176,7 @@ static void mxtc_config_w(int function, int reg, UINT8 data)
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
-				memory_set_bankptr(1, memory_region(Machine, "user1") + 0x30000);
+				memory_set_bankptr(1, memory_region(machine, "user1") + 0x30000);
 			}
 			break;
 		}
@@ -221,19 +221,19 @@ static void intel82439tx_pci_w(int function, int reg, UINT32 data, UINT32 mem_ma
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		mxtc_config_w(function, reg + 3, (data >> 24) & 0xff);
+		mxtc_config_w(Machine, function, reg + 3, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		mxtc_config_w(function, reg + 2, (data >> 16) & 0xff);
+		mxtc_config_w(Machine, function, reg + 2, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		mxtc_config_w(function, reg + 1, (data >> 8) & 0xff);
+		mxtc_config_w(Machine, function, reg + 1, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		mxtc_config_w(function, reg + 0, (data >> 0) & 0xff);
+		mxtc_config_w(Machine, function, reg + 0, (data >> 0) & 0xff);
 	}
 }
 

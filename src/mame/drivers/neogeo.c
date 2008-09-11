@@ -80,7 +80,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "neogeo.h"
 #include "machine/pd4990a.h"
 #include "cpu/z80/z80.h"
@@ -625,13 +624,13 @@ static void _set_main_cpu_bank_address(running_machine *machine)
 }
 
 
-void neogeo_set_main_cpu_bank_address(UINT32 bank_address)
+void neogeo_set_main_cpu_bank_address(running_machine *machine, UINT32 bank_address)
 {
 	if (LOG_MAIN_CPU_BANKING) logerror("MAIN CPU PC %06x: neogeo_set_main_cpu_bank_address %06x\n", safe_activecpu_get_pc(), bank_address);
 
 	main_cpu_bank_address = bank_address;
 
-	_set_main_cpu_bank_address(Machine);
+	_set_main_cpu_bank_address(machine);
 }
 
 
@@ -652,7 +651,7 @@ static WRITE16_HANDLER( main_cpu_bank_select_w )
 			bank_address = 0x100000;
 		}
 
-		neogeo_set_main_cpu_bank_address(bank_address);
+		neogeo_set_main_cpu_bank_address(machine, bank_address);
 	}
 }
 
@@ -665,9 +664,9 @@ static void main_cpu_banking_init(running_machine *machine)
 
 	/* set initial main CPU bank */
 	if (memory_region_length(machine, "main") > 0x100000)
-		neogeo_set_main_cpu_bank_address(0x100000);
+		neogeo_set_main_cpu_bank_address(machine, 0x100000);
 	else
-		neogeo_set_main_cpu_bank_address(0x000000);
+		neogeo_set_main_cpu_bank_address(machine, 0x000000);
 }
 
 

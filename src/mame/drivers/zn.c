@@ -271,19 +271,19 @@ static WRITE32_HANDLER( znsecsel_w )
 	if( ( m_n_znsecsel & 0x80 ) == 0 )
 	{
 		psx_sio_install_handler( 0, sio_pad_handler );
-		psx_sio_input( Machine, 0, PSX_SIO_IN_DSR, 0 );
+		psx_sio_input( machine, 0, PSX_SIO_IN_DSR, 0 );
 	}
 	else if( ( m_n_znsecsel & 0x08 ) == 0 )
 	{
 		znsec_start( 1 );
 		psx_sio_install_handler( 0, sio_znsec1_handler );
-		psx_sio_input( Machine, 0, PSX_SIO_IN_DSR, 0 );
+		psx_sio_input( machine, 0, PSX_SIO_IN_DSR, 0 );
 	}
 	else if( ( m_n_znsecsel & 0x04 ) == 0 )
 	{
 		znsec_start( 0 );
 		psx_sio_install_handler( 0, sio_znsec0_handler );
-		psx_sio_input( Machine, 0, PSX_SIO_IN_DSR, 0 );
+		psx_sio_input( machine, 0, PSX_SIO_IN_DSR, 0 );
 	}
 	else
 	{
@@ -291,7 +291,7 @@ static WRITE32_HANDLER( znsecsel_w )
 		m_b_lastclock = 1;
 
 		psx_sio_install_handler( 0, sio_dip_handler );
-		psx_sio_input( Machine, 0, PSX_SIO_IN_DSR, 0 );
+		psx_sio_input( machine, 0, PSX_SIO_IN_DSR, 0 );
 
 		timer_adjust_oneshot( dip_timer, ATTOTIME_IN_CYCLES( 100, 0 ), 1 );
 	}
@@ -301,7 +301,7 @@ static WRITE32_HANDLER( znsecsel_w )
 
 static TIMER_CALLBACK( dip_timer_fired )
 {
-	psx_sio_input( Machine, 0, PSX_SIO_IN_DSR, param * PSX_SIO_IN_DSR );
+	psx_sio_input( machine, 0, PSX_SIO_IN_DSR, param * PSX_SIO_IN_DSR );
 
 	if( param )
 	{

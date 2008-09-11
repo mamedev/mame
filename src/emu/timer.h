@@ -170,7 +170,7 @@ void timer_destructor(void *ptr, size_t size);
 attotime timer_next_fire_time(void);
 
 /* adjust the global time; this is also where we fire the timers */
-void timer_set_global_time(attotime newbase);
+void timer_set_global_time(running_machine *machine, attotime newbase);
 
 
 

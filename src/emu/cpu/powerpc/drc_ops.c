@@ -132,7 +132,7 @@ static UINT32 *ppcdrc_getopptr(UINT32 address)
 		address &= ~0x07;
 	}
 
-	result = (UINT32 *) memory_get_op_ptr(cpu_getactivecpu(), address, 0);
+	result = (UINT32 *) memory_get_op_ptr(Machine, cpu_getactivecpu(), address, 0);
 	if (result)
 		result += offset;
 	return result;

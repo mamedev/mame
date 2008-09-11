@@ -73,13 +73,13 @@ void profiler_mark(int type);
 /* functions called by usrintf.c */
 void profiler_start(void);
 void profiler_stop(void);
-const char *profiler_get_text(void);
+const char *profiler_get_text(running_machine *machine);
 #else
 #define profiler_mark(type)
 
 #define profiler_start()
 #define profiler_stop()
-#define profiler_get_text() ""
+#define profiler_get_text(machine) ""
 #endif
 
 

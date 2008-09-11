@@ -734,19 +734,19 @@ static READ8_HANDLER( mjtensin_p3_r )
 	return 0xff;
 }
 
-static void mjtensin_update_rombank(void)
+static void mjtensin_update_rombank(running_machine *machine)
 {
-	memory_set_bankptr( 1, memory_region(Machine, "main") + 0x10000 + rombank * 0x8000 );
+	memory_set_bankptr( 1, memory_region(machine, "main") + 0x10000 + rombank * 0x8000 );
 }
 static WRITE8_HANDLER( mjtensin_p4_w )
 {
 	rombank = (rombank & 0xf0) | (data & 0x0f);
-	mjtensin_update_rombank();
+	mjtensin_update_rombank(machine);
 }
 static WRITE8_HANDLER( mjtensin_6ff3_w )
 {
 	rombank = (data << 4) | (rombank & 0x0f);
-	mjtensin_update_rombank();
+	mjtensin_update_rombank(machine);
 }
 
 static ADDRESS_MAP_START( mjtensin_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -776,19 +776,19 @@ ADDRESS_MAP_END
                                 Mahjong Cafe Time
 ****************************************************************************/
 
-static void cafetime_update_rombank(void)
+static void cafetime_update_rombank(running_machine *machine)
 {
-	memory_set_bankptr( 1, memory_region(Machine, "main") + 0x10000 + rombank * 0x8000 );
+	memory_set_bankptr( 1, memory_region(machine, "main") + 0x10000 + rombank * 0x8000 );
 }
 static WRITE8_HANDLER( cafetime_p4_w )
 {
 	rombank = (rombank & 0xf0) | (data & 0x0f);
-	cafetime_update_rombank();
+	cafetime_update_rombank(machine);
 }
 static WRITE8_HANDLER( cafetime_p3_w )
 {
 	rombank = (rombank & 0x0f) | ((data & 0x0c) << 2);
-	cafetime_update_rombank();
+	cafetime_update_rombank(machine);
 }
 
 static WRITE8_HANDLER( cafetime_dsw_w )

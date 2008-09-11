@@ -655,7 +655,7 @@ int state_save_save_begin(mame_file *file)
     current tag
 -------------------------------------------------*/
 
-void state_save_save_continue(void)
+void state_save_save_continue(running_machine *machine)
 {
 	ss_entry *entry;
 	ss_func *func;
@@ -671,7 +671,7 @@ void state_save_save_continue(void)
 		if (func->tag == ss_current_tag)
 		{
 			count++;
-			(*func->func.presave)(Machine, func->param);
+			(*func->func.presave)(machine, func->param);
 		}
 	LOG(("    %d functions called\n", count));
 
@@ -693,7 +693,7 @@ void state_save_save_continue(void)
     file by writing the header and closing
 -------------------------------------------------*/
 
-void state_save_save_finish(void)
+void state_save_save_finish(running_machine *machine)
 {
 	UINT32 signature;
 	UINT8 flags = 0;
@@ -710,7 +710,7 @@ void state_save_save_finish(void)
 	ss_dump_array[8] = SAVE_VERSION;
 	ss_dump_array[9] = flags;
 	memset(ss_dump_array+0xa, 0, 10);
-	strcpy((char *)ss_dump_array+0xa, Machine->gamedrv->name);
+	strcpy((char *)ss_dump_array+0xa, machine->gamedrv->name);
 
 	/* copy in the signature */
 	signature = get_signature();
@@ -768,7 +768,7 @@ int state_save_load_begin(mame_file *file)
     the current tag
 -------------------------------------------------*/
 
-void state_save_load_continue(void)
+void state_save_load_continue(running_machine *machine)
 {
 	ss_entry *entry;
 	ss_func *func;
@@ -801,7 +801,7 @@ void state_save_load_continue(void)
 		if (func->tag == ss_current_tag)
 		{
 			count++;
-			(*func->func.postload)(Machine, func->param);
+			(*func->func.postload)(machine, func->param);
 		}
 	LOG(("    %d functions called\n", count));
 }

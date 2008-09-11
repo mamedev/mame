@@ -1202,7 +1202,7 @@ static UINT32 handler_ingame(running_machine *machine, UINT32 state)
 
 	/* draw the profiler if visible */
 	if (show_profiler)
-		ui_draw_text_full(profiler_get_text(), 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
+		ui_draw_text_full(profiler_get_text(machine), 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 
 	/* if we're single-stepping, pause now */
 	if (single_step)
@@ -1469,16 +1469,16 @@ static slider_state *slider_init(running_machine *machine)
 	tailptr = &(*tailptr)->next;
 
 	/* add per-channel volume */
-	numitems = sound_get_user_gain_count();
+	numitems = sound_get_user_gain_count(machine);
 	for (item = 0; item < numitems; item++)
 	{
 		INT32 maxval = 2000;
-		INT32 defval = sound_get_default_gain(item) * 1000.0f + 0.5f;
+		INT32 defval = sound_get_default_gain(machine, item) * 1000.0f + 0.5f;
 
 		if (defval > 1000)
 			maxval = 2 * defval;
 
-		astring_printf(string, "%s Volume", sound_get_user_gain_name(item));
+		astring_printf(string, "%s Volume", sound_get_user_gain_name(machine, item));
 		*tailptr = slider_alloc(astring_c(string), 0, defval, maxval, 20, slider_mixervol, (void *)(FPTR)item);
 		tailptr = &(*tailptr)->next;
 	}
@@ -1634,10 +1634,10 @@ static INT32 slider_mixervol(running_machine *machine, void *arg, astring *strin
 {
 	int which = (FPTR)arg;
 	if (newval != SLIDER_NOCHANGE)
-		sound_set_user_gain(which, (float)newval * 0.001f);
+		sound_set_user_gain(machine, which, (float)newval * 0.001f);
 	if (string != NULL)
-		astring_printf(string, "%4.2f", sound_get_user_gain(which));
-	return floor(sound_get_user_gain(which) * 1000.0f + 0.5f);
+		astring_printf(string, "%4.2f", sound_get_user_gain(machine, which));
+	return floor(sound_get_user_gain(machine, which) * 1000.0f + 0.5f);
 }
 
 

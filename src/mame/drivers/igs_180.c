@@ -262,10 +262,10 @@ static VIDEO_UPDATE(igs_180)
                                 Decryption
 ***************************************************************************/
 
-static void decrypt_program_rom(int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0)
+static void decrypt_program_rom(running_machine *machine, int mask, int a7, int a6, int a5, int a4, int a3, int a2, int a1, int a0)
 {
-	int length = memory_region_length(Machine, "main");
-	UINT8 *rom = memory_region(Machine, "main");
+	int length = memory_region_length(machine, "main");
+	UINT8 *rom = memory_region(machine, "main");
 	UINT8 *tmp = auto_malloc(length);
 	int i;
 
@@ -342,7 +342,7 @@ static void iqblocka_patch_rom(running_machine *machine)
 
 static DRIVER_INIT( iqblocka )
 {
-	decrypt_program_rom(0x11, 7, 6, 5, 4, 3, 2, 1, 0);
+	decrypt_program_rom(machine, 0x11, 7, 6, 5, 4, 3, 2, 1, 0);
 	iqblocka_patch_rom(machine);
 
 	expand_sprites(machine);
@@ -352,7 +352,7 @@ static DRIVER_INIT( iqblocka )
 
 static DRIVER_INIT( iqblockf )
 {
-	decrypt_program_rom(0x11, 7, 6, 5, 4, 3, 2, 1, 0);
+	decrypt_program_rom(machine, 0x11, 7, 6, 5, 4, 3, 2, 1, 0);
 //  iqblockf_patch_rom(machine);
 
 	expand_sprites(machine);
@@ -398,7 +398,7 @@ static void tjsb_patch_rom(running_machine *machine)
 
 static DRIVER_INIT( tjsb )
 {
-	decrypt_program_rom(0x05, 7, 6, 3, 2, 5, 4, 1, 0);
+	decrypt_program_rom(machine, 0x05, 7, 6, 3, 2, 5, 4, 1, 0);
 	tjsb_patch_rom(machine);
 
 	tjsb_decrypt_sprites(machine);

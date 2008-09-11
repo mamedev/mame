@@ -10,6 +10,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 
 
 
@@ -910,7 +911,7 @@ static int temp_string_pool_index;
  *
  *************************************/
 
-INLINE void set_cpu_context(int cpunum)
+INLINE void set_cpu_context(running_machine *machine, int cpunum)
 {
 	int newfamily = cpu[cpunum].family;
 	int oldcontext = cpu_active_context[newfamily];
@@ -921,7 +922,7 @@ INLINE void set_cpu_context(int cpunum)
 
 	/* swap memory spaces */
 	activecpu = cpunum;
-	memory_set_context(cpunum);
+	memory_set_context(machine, cpunum);
 
 	/* if the new CPU's context is not swapped in, do it now */
 	if (oldcontext != cpunum)
@@ -946,7 +947,7 @@ void cpuintrf_push_context(int cpunum)
 
 	/* do the rest only if this isn't the activecpu */
 	if (cpunum != activecpu && cpunum != -1)
-		set_cpu_context(cpunum);
+		set_cpu_context(Machine, cpunum);
 
 	/* this is now the active CPU */
 	activecpu = cpunum;
@@ -960,7 +961,7 @@ void cpuintrf_pop_context(void)
 
 	/* do the rest only if this isn't the activecpu */
 	if (cpunum != activecpu && cpunum != -1)
-		set_cpu_context(cpunum);
+		set_cpu_context(Machine, cpunum);
 
 	/* this is now the active CPU */
 	activecpu = cpunum;

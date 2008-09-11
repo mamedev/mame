@@ -122,7 +122,7 @@ static UINT32 mux_outputlatch;
 /*
     Function prototypes
 */
-INLINE void z80_bank(int num, int data);
+INLINE void z80_bank(running_machine *machine, int num, int data);
 
 
 static void update_irqs(running_machine *machine)
@@ -380,19 +380,19 @@ static VIDEO_UPDATE( bfcobra )
 	return 0;
 }
 
-INLINE UINT8* blitter_get_addr(UINT32 addr)
+INLINE UINT8* blitter_get_addr(running_machine *machine, UINT32 addr)
 {
 	if (addr < 0x10000)
 	{
 		/* Is this region fixed? */
-		return (UINT8*)(memory_region(Machine, "user1") + addr);
+		return (UINT8*)(memory_region(machine, "user1") + addr);
 	}
 	else if(addr < 0x20000)
 	{
 		addr &= 0xffff;
 		addr += (bank[0] & 1) ? 0x10000 : 0;
 
-		return (UINT8*)(memory_region(Machine, "user1") + addr + ((bank[0] >> 1) * 0x20000));
+		return (UINT8*)(memory_region(machine, "user1") + addr + ((bank[0] >> 1) * 0x20000));
 	}
 	else if (addr >= 0x20000 && addr < 0x40000)
 	{
@@ -410,9 +410,9 @@ INLINE UINT8* blitter_get_addr(UINT32 addr)
     The Flare One blitter is a simpler design with slightly different parameters
     and will require hardware tests to figure everything out correctly.
 */
-static void RunBlit(void)
+static void RunBlit(running_machine *machine)
 {
-#define BLITPRG_READ(x)		blitter.x = *(blitter_get_addr(blitter.program.addr++))
+#define BLITPRG_READ(x)		blitter.x = *(blitter_get_addr(machine, blitter.program.addr++))
 
 	int cycles_used = 0;
 
@@ -522,7 +522,7 @@ static void RunBlit(void)
 						blitter.source.addr0 -=blitter.step;
 					}
 
-					*blitter_get_addr(blitter.dest.addr) = blitter.pattern;
+					*blitter_get_addr(machine, blitter.dest.addr) = blitter.pattern;
 					cycles_used++;
 
 				} while (--innercnt);
@@ -536,7 +536,7 @@ static void RunBlit(void)
 
 				if (LOOPTYPE == 3 && innercnt == blitter.innercnt)
 				{
-					srcdata = *(blitter_get_addr(blitter.source.addr & 0xfffff));
+					srcdata = *(blitter_get_addr(machine, blitter.source.addr & 0xfffff));
 					blitter.source.loword++;
 					cycles_used++;
 				}
@@ -546,7 +546,7 @@ static void RunBlit(void)
 				{
 					if (LOOPTYPE == 0 || LOOPTYPE == 1)
 					{
-						srcdata = *(blitter_get_addr(blitter.source.addr & 0xfffff));
+						srcdata = *(blitter_get_addr(machine, blitter.source.addr & 0xfffff));
 						cycles_used++;
 
 						if (blitter.modectl & MODE_SSIGN)
@@ -561,7 +561,7 @@ static void RunBlit(void)
 				/* Read destination pixel? */
 				if (LOOPTYPE == 0)
 				{
-					dstdata = *blitter_get_addr(blitter.dest.addr & 0xfffff);
+					dstdata = *blitter_get_addr(machine, blitter.dest.addr & 0xfffff);
 					cycles_used++;
 				}
 
@@ -630,10 +630,10 @@ static void RunBlit(void)
                             The existing destination pixel is used as a lookup
                             into the table and the colours is replaced.
                         */
-						UINT8 dest = *blitter_get_addr(blitter.dest.addr);
-						UINT8 newcol = *(blitter_get_addr((blitter.source.addr + dest) & 0xfffff));
+						UINT8 dest = *blitter_get_addr(machine, blitter.dest.addr);
+						UINT8 newcol = *(blitter_get_addr(machine, (blitter.source.addr + dest) & 0xfffff));
 
-						*blitter_get_addr(blitter.dest.addr) = newcol;
+						*blitter_get_addr(machine, blitter.dest.addr) = newcol;
 						cycles_used += 3;
 					}
 					else
@@ -652,7 +652,7 @@ static void RunBlit(void)
 						if (blitter.compfunc & CMPFUNC_LOG0)
 							final_result |= ~result & ~dstdata;
 
-						*blitter_get_addr(blitter.dest.addr) = final_result;
+						*blitter_get_addr(machine, blitter.dest.addr) = final_result;
 						cycles_used++;
 					}
 				}
@@ -888,7 +888,7 @@ static WRITE8_HANDLER( chipset_w )
 
 			data &= 0x3f;
 			bank[offset] = data;
-			z80_bank(offset, data);
+			z80_bank(machine, offset, data);
 			break;
 		}
 
@@ -945,7 +945,7 @@ static WRITE8_HANDLER( chipset_w )
 			blitter.command = data;
 
 			if (data & CMD_RUN)
-				RunBlit();
+				RunBlit(machine);
 			else
 				mame_printf_debug("Blitter stopped by IO.\n");
 
@@ -963,7 +963,7 @@ static WRITE8_HANDLER( chipset_w )
 	}
 }
 
-INLINE void z80_bank(int num, int data)
+INLINE void z80_bank(running_machine *machine, int num, int data)
 {
 	if (data < 0x08)
 	{
@@ -976,7 +976,7 @@ INLINE void z80_bank(int num, int data)
 
 		UINT32 offset = ((bank[0] >> 1) * 0x20000) + offs_table[bank[0] & 0x1][data];
 
-		memory_set_bankptr(num, memory_region(Machine, "user1") + offset);
+		memory_set_bankptr(num, memory_region(machine, "user1") + offset);
 	}
 	else if (data < 0x10)
 	{
@@ -991,9 +991,9 @@ INLINE void z80_bank(int num, int data)
 static WRITE8_HANDLER( rombank_w )
 {
 	bank[0] = data;
-	z80_bank(1, bank[1]);
-	z80_bank(2, bank[2]);
-	z80_bank(3, bank[3]);
+	z80_bank(machine, 1, bank[1]);
+	z80_bank(machine, 2, bank[2]);
+	z80_bank(machine, 3, bank[3]);
 }
 
 

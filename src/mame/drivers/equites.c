@@ -1800,9 +1800,9 @@ ROM_END
 /******************************************************************************/
 // Initializations
 
-static void unpack_block(const char *region, int offset, int size)
+static void unpack_block(running_machine *machine, const char *region, int offset, int size)
 {
-	UINT8 *rom = memory_region(Machine, region);
+	UINT8 *rom = memory_region(machine, region);
 	int i;
 
 	for (i = 0; i < size; ++i)
@@ -1812,35 +1812,35 @@ static void unpack_block(const char *region, int offset, int size)
 	}
 }
 
-static void unpack_region(const char *region)
+static void unpack_region(running_machine *machine, const char *region)
 {
-	unpack_block(region, 0x0000, 0x2000);
-	unpack_block(region, 0x4000, 0x2000);
+	unpack_block(machine, region, 0x0000, 0x2000);
+	unpack_block(machine, region, 0x4000, 0x2000);
 }
 
 
 static DRIVER_INIT( equites )
 {
-	unpack_region("gfx2");
-	unpack_region("gfx3");
+	unpack_region(machine, "gfx2");
+	unpack_region(machine, "gfx3");
 }
 
 static DRIVER_INIT( bullfgtr )
 {
-	unpack_region("gfx2");
-	unpack_region("gfx3");
+	unpack_region(machine, "gfx2");
+	unpack_region(machine, "gfx3");
 }
 
 static DRIVER_INIT( kouyakyu )
 {
-	unpack_region("gfx2");
-	unpack_region("gfx3");
+	unpack_region(machine, "gfx2");
+	unpack_region(machine, "gfx3");
 }
 
 static DRIVER_INIT( gekisou )
 {
-	unpack_region("gfx2");
-	unpack_region("gfx3");
+	unpack_region(machine, "gfx2");
+	unpack_region(machine, "gfx3");
 
 	// install special handlers for unknown device (protection?)
 	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x580000, 0x580001, 0, 0, gekisou_unknown_0_w);
@@ -1849,12 +1849,12 @@ static DRIVER_INIT( gekisou )
 
 static DRIVER_INIT( splndrbt )
 {
-	unpack_region("gfx3");
+	unpack_region(machine, "gfx3");
 }
 
 static DRIVER_INIT( hvoltage )
 {
-	unpack_region("gfx3");
+	unpack_region(machine, "gfx3");
 
 #if HVOLTAGE_DEBUG
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000038, 0x000039, 0, 0, hvoltage_debug_r);

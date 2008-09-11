@@ -18,7 +18,6 @@
 #include "debughlp.h"
 #include "debugvw.h"
 #include "render.h"
-#include "deprecat.h"
 #include <ctype.h>
 
 
@@ -65,51 +64,51 @@ static UINT64 execute_if(void *ref, UINT32 params, const UINT64 *param);
 static UINT64 global_get(void *ref);
 static void global_set(void *ref, UINT64 value);
 
-static void execute_help(int ref, int params, const char **param);
-static void execute_print(int ref, int params, const char **param);
-static void execute_printf(int ref, int params, const char **param);
-static void execute_logerror(int ref, int params, const char **param);
-static void execute_tracelog(int ref, int params, const char **param);
-static void execute_quit(int ref, int params, const char **param);
-static void execute_do(int ref, int params, const char **param);
-static void execute_step(int ref, int params, const char **param);
-static void execute_over(int ref, int params, const char **param);
-static void execute_out(int ref, int params, const char **param);
-static void execute_go(int ref, int params, const char **param);
-static void execute_go_vblank(int ref, int params, const char **param);
-static void execute_go_interrupt(int ref, int params, const char **param);
-static void execute_go_time(int ref, int params, const char *param[]);
-static void execute_focus(int ref, int params, const char **param);
-static void execute_ignore(int ref, int params, const char **param);
-static void execute_observe(int ref, int params, const char **param);
-static void execute_next(int ref, int params, const char **param);
-static void execute_comment(int ref, int params, const char **param);
-static void execute_comment_del(int ref, int params, const char **param);
-static void execute_comment_save(int ref, int params, const char **param);
-static void execute_bpset(int ref, int params, const char **param);
-static void execute_bpclear(int ref, int params, const char **param);
-static void execute_bpdisenable(int ref, int params, const char **param);
-static void execute_bplist(int ref, int params, const char **param);
-static void execute_wpset(int ref, int params, const char **param);
-static void execute_wpclear(int ref, int params, const char **param);
-static void execute_wpdisenable(int ref, int params, const char **param);
-static void execute_wplist(int ref, int params, const char **param);
-static void execute_hotspot(int ref, int params, const char **param);
-static void execute_save(int ref, int params, const char **param);
-static void execute_dump(int ref, int params, const char **param);
-static void execute_dasm(int ref, int params, const char **param);
-static void execute_find(int ref, int params, const char **param);
-static void execute_trace(int ref, int params, const char **param);
-static void execute_traceover(int ref, int params, const char **param);
-static void execute_traceflush(int ref, int params, const char **param);
-static void execute_history(int ref, int params, const char **param);
-static void execute_snap(int ref, int params, const char **param);
-static void execute_source(int ref, int params, const char **param);
-static void execute_map(int ref, int params, const char **param);
-static void execute_memdump(int ref, int params, const char **param);
-static void execute_symlist(int ref, int params, const char **param);
-static void execute_softreset(int ref, int params, const char **param);
-static void execute_hardreset(int ref, int params, const char **param);
+static void execute_help(running_machine *machine, int ref, int params, const char **param);
+static void execute_print(running_machine *machine, int ref, int params, const char **param);
+static void execute_printf(running_machine *machine, int ref, int params, const char **param);
+static void execute_logerror(running_machine *machine, int ref, int params, const char **param);
+static void execute_tracelog(running_machine *machine, int ref, int params, const char **param);
+static void execute_quit(running_machine *machine, int ref, int params, const char **param);
+static void execute_do(running_machine *machine, int ref, int params, const char **param);
+static void execute_step(running_machine *machine, int ref, int params, const char **param);
+static void execute_over(running_machine *machine, int ref, int params, const char **param);
+static void execute_out(running_machine *machine, int ref, int params, const char **param);
+static void execute_go(running_machine *machine, int ref, int params, const char **param);
+static void execute_go_vblank(running_machine *machine, int ref, int params, const char **param);
+static void execute_go_interrupt(running_machine *machine, int ref, int params, const char **param);
+static void execute_go_time(running_machine *machine, int ref, int params, const char *param[]);
+static void execute_focus(running_machine *machine, int ref, int params, const char **param);
+static void execute_ignore(running_machine *machine, int ref, int params, const char **param);
+static void execute_observe(running_machine *machine, int ref, int params, const char **param);
+static void execute_next(running_machine *machine, int ref, int params, const char **param);
+static void execute_comment(running_machine *machine, int ref, int params, const char **param);
+static void execute_comment_del(running_machine *machine, int ref, int params, const char **param);
+static void execute_comment_save(running_machine *machine, int ref, int params, const char **param);
+static void execute_bpset(running_machine *machine, int ref, int params, const char **param);
+static void execute_bpclear(running_machine *machine, int ref, int params, const char **param);
+static void execute_bpdisenable(running_machine *machine, int ref, int params, const char **param);
+static void execute_bplist(running_machine *machine, int ref, int params, const char **param);
+static void execute_wpset(running_machine *machine, int ref, int params, const char **param);
+static void execute_wpclear(running_machine *machine, int ref, int params, const char **param);
+static void execute_wpdisenable(running_machine *machine, int ref, int params, const char **param);
+static void execute_wplist(running_machine *machine, int ref, int params, const char **param);
+static void execute_hotspot(running_machine *machine, int ref, int params, const char **param);
+static void execute_save(running_machine *machine, int ref, int params, const char **param);
+static void execute_dump(running_machine *machine, int ref, int params, const char **param);
+static void execute_dasm(running_machine *machine, int ref, int params, const char **param);
+static void execute_find(running_machine *machine, int ref, int params, const char **param);
+static void execute_trace(running_machine *machine, int ref, int params, const char **param);
+static void execute_traceover(running_machine *machine, int ref, int params, const char **param);
+static void execute_traceflush(running_machine *machine, int ref, int params, const char **param);
+static void execute_history(running_machine *machine, int ref, int params, const char **param);
+static void execute_snap(running_machine *machine, int ref, int params, const char **param);
+static void execute_source(running_machine *machine, int ref, int params, const char **param);
+static void execute_map(running_machine *machine, int ref, int params, const char **param);
+static void execute_memdump(running_machine *machine, int ref, int params, const char **param);
+static void execute_symlist(running_machine *machine, int ref, int params, const char **param);
+static void execute_softreset(running_machine *machine, int ref, int params, const char **param);
+static void execute_hardreset(running_machine *machine, int ref, int params, const char **param);
 
 
 
@@ -157,93 +156,93 @@ void debug_command_init(running_machine *machine)
 	}
 
 	/* add all the commands */
-	debug_console_register_command("help",      CMDFLAG_NONE, 0, 0, 1, execute_help);
-	debug_console_register_command("print",     CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, execute_print);
-	debug_console_register_command("printf",    CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, execute_printf);
-	debug_console_register_command("logerror",  CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, execute_logerror);
-	debug_console_register_command("tracelog",  CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, execute_tracelog);
-	debug_console_register_command("quit",      CMDFLAG_NONE, 0, 0, 0, execute_quit);
-	debug_console_register_command("do",        CMDFLAG_NONE, 0, 1, 1, execute_do);
-	debug_console_register_command("step",      CMDFLAG_NONE, 0, 0, 1, execute_step);
-	debug_console_register_command("s",         CMDFLAG_NONE, 0, 0, 1, execute_step);
-	debug_console_register_command("over",      CMDFLAG_NONE, 0, 0, 1, execute_over);
-	debug_console_register_command("o",         CMDFLAG_NONE, 0, 0, 1, execute_over);
-	debug_console_register_command("out" ,      CMDFLAG_NONE, 0, 0, 0, execute_out);
-	debug_console_register_command("go",        CMDFLAG_NONE, 0, 0, 1, execute_go);
-	debug_console_register_command("g",         CMDFLAG_NONE, 0, 0, 1, execute_go);
-	debug_console_register_command("gvblank",   CMDFLAG_NONE, 0, 0, 0, execute_go_vblank);
-	debug_console_register_command("gv",        CMDFLAG_NONE, 0, 0, 0, execute_go_vblank);
-	debug_console_register_command("gint",      CMDFLAG_NONE, 0, 0, 1, execute_go_interrupt);
-	debug_console_register_command("gi",        CMDFLAG_NONE, 0, 0, 1, execute_go_interrupt);
-	debug_console_register_command("gtime",     CMDFLAG_NONE, 0, 0, 1, execute_go_time);
-	debug_console_register_command("gt",        CMDFLAG_NONE, 0, 0, 1, execute_go_time);
-	debug_console_register_command("next",      CMDFLAG_NONE, 0, 0, 0, execute_next);
-	debug_console_register_command("n",         CMDFLAG_NONE, 0, 0, 0, execute_next);
-	debug_console_register_command("focus",     CMDFLAG_NONE, 0, 1, 1, execute_focus);
-	debug_console_register_command("ignore",    CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, execute_ignore);
-	debug_console_register_command("observe",   CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, execute_observe);
+	debug_console_register_command(machine, "help",      CMDFLAG_NONE, 0, 0, 1, execute_help);
+	debug_console_register_command(machine, "print",     CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, execute_print);
+	debug_console_register_command(machine, "printf",    CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, execute_printf);
+	debug_console_register_command(machine, "logerror",  CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, execute_logerror);
+	debug_console_register_command(machine, "tracelog",  CMDFLAG_NONE, 0, 1, MAX_COMMAND_PARAMS, execute_tracelog);
+	debug_console_register_command(machine, "quit",      CMDFLAG_NONE, 0, 0, 0, execute_quit);
+	debug_console_register_command(machine, "do",        CMDFLAG_NONE, 0, 1, 1, execute_do);
+	debug_console_register_command(machine, "step",      CMDFLAG_NONE, 0, 0, 1, execute_step);
+	debug_console_register_command(machine, "s",         CMDFLAG_NONE, 0, 0, 1, execute_step);
+	debug_console_register_command(machine, "over",      CMDFLAG_NONE, 0, 0, 1, execute_over);
+	debug_console_register_command(machine, "o",         CMDFLAG_NONE, 0, 0, 1, execute_over);
+	debug_console_register_command(machine, "out" ,      CMDFLAG_NONE, 0, 0, 0, execute_out);
+	debug_console_register_command(machine, "go",        CMDFLAG_NONE, 0, 0, 1, execute_go);
+	debug_console_register_command(machine, "g",         CMDFLAG_NONE, 0, 0, 1, execute_go);
+	debug_console_register_command(machine, "gvblank",   CMDFLAG_NONE, 0, 0, 0, execute_go_vblank);
+	debug_console_register_command(machine, "gv",        CMDFLAG_NONE, 0, 0, 0, execute_go_vblank);
+	debug_console_register_command(machine, "gint",      CMDFLAG_NONE, 0, 0, 1, execute_go_interrupt);
+	debug_console_register_command(machine, "gi",        CMDFLAG_NONE, 0, 0, 1, execute_go_interrupt);
+	debug_console_register_command(machine, "gtime",     CMDFLAG_NONE, 0, 0, 1, execute_go_time);
+	debug_console_register_command(machine, "gt",        CMDFLAG_NONE, 0, 0, 1, execute_go_time);
+	debug_console_register_command(machine, "next",      CMDFLAG_NONE, 0, 0, 0, execute_next);
+	debug_console_register_command(machine, "n",         CMDFLAG_NONE, 0, 0, 0, execute_next);
+	debug_console_register_command(machine, "focus",     CMDFLAG_NONE, 0, 1, 1, execute_focus);
+	debug_console_register_command(machine, "ignore",    CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, execute_ignore);
+	debug_console_register_command(machine, "observe",   CMDFLAG_NONE, 0, 0, MAX_COMMAND_PARAMS, execute_observe);
 
-	debug_console_register_command("comadd",	CMDFLAG_NONE, 0, 1, 2, execute_comment);
-	debug_console_register_command("//",        CMDFLAG_NONE, 0, 1, 2, execute_comment);
-	debug_console_register_command("comdelete",	CMDFLAG_NONE, 0, 1, 1, execute_comment_del);
-	debug_console_register_command("comsave", 	CMDFLAG_NONE, 0, 0, 0, execute_comment_save);
+	debug_console_register_command(machine, "comadd",	CMDFLAG_NONE, 0, 1, 2, execute_comment);
+	debug_console_register_command(machine, "//",        CMDFLAG_NONE, 0, 1, 2, execute_comment);
+	debug_console_register_command(machine, "comdelete",	CMDFLAG_NONE, 0, 1, 1, execute_comment_del);
+	debug_console_register_command(machine, "comsave", 	CMDFLAG_NONE, 0, 0, 0, execute_comment_save);
 
-	debug_console_register_command("bpset",     CMDFLAG_NONE, 0, 1, 3, execute_bpset);
-	debug_console_register_command("bp",        CMDFLAG_NONE, 0, 1, 3, execute_bpset);
-	debug_console_register_command("bpclear",   CMDFLAG_NONE, 0, 0, 1, execute_bpclear);
-	debug_console_register_command("bpdisable", CMDFLAG_NONE, 0, 0, 1, execute_bpdisenable);
-	debug_console_register_command("bpenable",  CMDFLAG_NONE, 1, 0, 1, execute_bpdisenable);
-	debug_console_register_command("bplist",    CMDFLAG_NONE, 0, 0, 0, execute_bplist);
+	debug_console_register_command(machine, "bpset",     CMDFLAG_NONE, 0, 1, 3, execute_bpset);
+	debug_console_register_command(machine, "bp",        CMDFLAG_NONE, 0, 1, 3, execute_bpset);
+	debug_console_register_command(machine, "bpclear",   CMDFLAG_NONE, 0, 0, 1, execute_bpclear);
+	debug_console_register_command(machine, "bpdisable", CMDFLAG_NONE, 0, 0, 1, execute_bpdisenable);
+	debug_console_register_command(machine, "bpenable",  CMDFLAG_NONE, 1, 0, 1, execute_bpdisenable);
+	debug_console_register_command(machine, "bplist",    CMDFLAG_NONE, 0, 0, 0, execute_bplist);
 
-	debug_console_register_command("wpset",     CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 3, 5, execute_wpset);
-	debug_console_register_command("wp",        CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 3, 5, execute_wpset);
-	debug_console_register_command("wpdset",    CMDFLAG_NONE, ADDRESS_SPACE_DATA, 3, 5, execute_wpset);
-	debug_console_register_command("wpd",       CMDFLAG_NONE, ADDRESS_SPACE_DATA, 3, 5, execute_wpset);
-	debug_console_register_command("wpiset",    CMDFLAG_NONE, ADDRESS_SPACE_IO, 3, 5, execute_wpset);
-	debug_console_register_command("wpi",       CMDFLAG_NONE, ADDRESS_SPACE_IO, 3, 5, execute_wpset);
-	debug_console_register_command("wpclear",   CMDFLAG_NONE, 0, 0, 1, execute_wpclear);
-	debug_console_register_command("wpdisable", CMDFLAG_NONE, 0, 0, 1, execute_wpdisenable);
-	debug_console_register_command("wpenable",  CMDFLAG_NONE, 1, 0, 1, execute_wpdisenable);
-	debug_console_register_command("wplist",    CMDFLAG_NONE, 0, 0, 0, execute_wplist);
+	debug_console_register_command(machine, "wpset",     CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 3, 5, execute_wpset);
+	debug_console_register_command(machine, "wp",        CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 3, 5, execute_wpset);
+	debug_console_register_command(machine, "wpdset",    CMDFLAG_NONE, ADDRESS_SPACE_DATA, 3, 5, execute_wpset);
+	debug_console_register_command(machine, "wpd",       CMDFLAG_NONE, ADDRESS_SPACE_DATA, 3, 5, execute_wpset);
+	debug_console_register_command(machine, "wpiset",    CMDFLAG_NONE, ADDRESS_SPACE_IO, 3, 5, execute_wpset);
+	debug_console_register_command(machine, "wpi",       CMDFLAG_NONE, ADDRESS_SPACE_IO, 3, 5, execute_wpset);
+	debug_console_register_command(machine, "wpclear",   CMDFLAG_NONE, 0, 0, 1, execute_wpclear);
+	debug_console_register_command(machine, "wpdisable", CMDFLAG_NONE, 0, 0, 1, execute_wpdisenable);
+	debug_console_register_command(machine, "wpenable",  CMDFLAG_NONE, 1, 0, 1, execute_wpdisenable);
+	debug_console_register_command(machine, "wplist",    CMDFLAG_NONE, 0, 0, 0, execute_wplist);
 
-	debug_console_register_command("hotspot",   CMDFLAG_NONE, 0, 0, 3, execute_hotspot);
+	debug_console_register_command(machine, "hotspot",   CMDFLAG_NONE, 0, 0, 3, execute_hotspot);
 
-	debug_console_register_command("save",      CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 3, 4, execute_save);
-	debug_console_register_command("saved",     CMDFLAG_NONE, ADDRESS_SPACE_DATA, 3, 4, execute_save);
-	debug_console_register_command("savei",     CMDFLAG_NONE, ADDRESS_SPACE_IO, 3, 4, execute_save);
+	debug_console_register_command(machine, "save",      CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 3, 4, execute_save);
+	debug_console_register_command(machine, "saved",     CMDFLAG_NONE, ADDRESS_SPACE_DATA, 3, 4, execute_save);
+	debug_console_register_command(machine, "savei",     CMDFLAG_NONE, ADDRESS_SPACE_IO, 3, 4, execute_save);
 
-	debug_console_register_command("dump",      CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 3, 6, execute_dump);
-	debug_console_register_command("dumpd",     CMDFLAG_NONE, ADDRESS_SPACE_DATA, 3, 6, execute_dump);
-	debug_console_register_command("dumpi",     CMDFLAG_NONE, ADDRESS_SPACE_IO, 3, 6, execute_dump);
+	debug_console_register_command(machine, "dump",      CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 3, 6, execute_dump);
+	debug_console_register_command(machine, "dumpd",     CMDFLAG_NONE, ADDRESS_SPACE_DATA, 3, 6, execute_dump);
+	debug_console_register_command(machine, "dumpi",     CMDFLAG_NONE, ADDRESS_SPACE_IO, 3, 6, execute_dump);
 
-	debug_console_register_command("f",         CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_PROGRAM, 3, MAX_COMMAND_PARAMS, execute_find);
-	debug_console_register_command("find",      CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_PROGRAM, 3, MAX_COMMAND_PARAMS, execute_find);
-	debug_console_register_command("fd",        CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_DATA, 3, MAX_COMMAND_PARAMS, execute_find);
-	debug_console_register_command("findd",     CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_DATA, 3, MAX_COMMAND_PARAMS, execute_find);
-	debug_console_register_command("fi",        CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_IO, 3, MAX_COMMAND_PARAMS, execute_find);
-	debug_console_register_command("findi",     CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_IO, 3, MAX_COMMAND_PARAMS, execute_find);
+	debug_console_register_command(machine, "f",         CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_PROGRAM, 3, MAX_COMMAND_PARAMS, execute_find);
+	debug_console_register_command(machine, "find",      CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_PROGRAM, 3, MAX_COMMAND_PARAMS, execute_find);
+	debug_console_register_command(machine, "fd",        CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_DATA, 3, MAX_COMMAND_PARAMS, execute_find);
+	debug_console_register_command(machine, "findd",     CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_DATA, 3, MAX_COMMAND_PARAMS, execute_find);
+	debug_console_register_command(machine, "fi",        CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_IO, 3, MAX_COMMAND_PARAMS, execute_find);
+	debug_console_register_command(machine, "findi",     CMDFLAG_KEEP_QUOTES, ADDRESS_SPACE_IO, 3, MAX_COMMAND_PARAMS, execute_find);
 
-	debug_console_register_command("dasm",      CMDFLAG_NONE, 0, 3, 5, execute_dasm);
+	debug_console_register_command(machine, "dasm",      CMDFLAG_NONE, 0, 3, 5, execute_dasm);
 
-	debug_console_register_command("trace",     CMDFLAG_NONE, 0, 1, 3, execute_trace);
-	debug_console_register_command("traceover", CMDFLAG_NONE, 0, 1, 3, execute_traceover);
-	debug_console_register_command("traceflush",CMDFLAG_NONE, 0, 0, 0, execute_traceflush);
+	debug_console_register_command(machine, "trace",     CMDFLAG_NONE, 0, 1, 3, execute_trace);
+	debug_console_register_command(machine, "traceover", CMDFLAG_NONE, 0, 1, 3, execute_traceover);
+	debug_console_register_command(machine, "traceflush",CMDFLAG_NONE, 0, 0, 0, execute_traceflush);
 
-	debug_console_register_command("history",   CMDFLAG_NONE, 0, 0, 2, execute_history);
+	debug_console_register_command(machine, "history",   CMDFLAG_NONE, 0, 0, 2, execute_history);
 
-	debug_console_register_command("snap",      CMDFLAG_NONE, 0, 0, 1, execute_snap);
+	debug_console_register_command(machine, "snap",      CMDFLAG_NONE, 0, 0, 1, execute_snap);
 
-	debug_console_register_command("source",    CMDFLAG_NONE, 0, 1, 1, execute_source);
+	debug_console_register_command(machine, "source",    CMDFLAG_NONE, 0, 1, 1, execute_source);
 
-	debug_console_register_command("map",		CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 1, 1, execute_map);
-	debug_console_register_command("mapd",		CMDFLAG_NONE, ADDRESS_SPACE_DATA, 1, 1, execute_map);
-	debug_console_register_command("mapi",		CMDFLAG_NONE, ADDRESS_SPACE_IO, 1, 1, execute_map);
-	debug_console_register_command("memdump",	CMDFLAG_NONE, 0, 0, 1, execute_memdump);
+	debug_console_register_command(machine, "map",		CMDFLAG_NONE, ADDRESS_SPACE_PROGRAM, 1, 1, execute_map);
+	debug_console_register_command(machine, "mapd",		CMDFLAG_NONE, ADDRESS_SPACE_DATA, 1, 1, execute_map);
+	debug_console_register_command(machine, "mapi",		CMDFLAG_NONE, ADDRESS_SPACE_IO, 1, 1, execute_map);
+	debug_console_register_command(machine, "memdump",	CMDFLAG_NONE, 0, 0, 1, execute_memdump);
 
-	debug_console_register_command("symlist",	CMDFLAG_NONE, 0, 0, 1, execute_symlist);
+	debug_console_register_command(machine, "symlist",	CMDFLAG_NONE, 0, 0, 1, execute_symlist);
 
-	debug_console_register_command("softreset",	CMDFLAG_NONE, 0, 0, 1, execute_softreset);
-	debug_console_register_command("hardreset",	CMDFLAG_NONE, 0, 0, 1, execute_hardreset);
+	debug_console_register_command(machine, "softreset",	CMDFLAG_NONE, 0, 0, 1, execute_softreset);
+	debug_console_register_command(machine, "hardreset",	CMDFLAG_NONE, 0, 0, 1, execute_hardreset);
 
 	/* ask all the CPUs if they would like to register functions or symbols */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
@@ -402,9 +401,9 @@ static int debug_command_parameter_expression(const char *param, parsed_expressi
     command parameter
 -------------------------------------------------*/
 
-static int debug_command_parameter_command(const char *param)
+static int debug_command_parameter_command(running_machine *machine, const char *param)
 {
-	CMDERR err = debug_console_validate_command(param);
+	CMDERR err = debug_console_validate_command(machine, param);
 	if (err == CMDERR_NONE)
 		return 1;
 	debug_console_printf("Error in command: %s\n", param);
@@ -425,7 +424,7 @@ static int debug_command_parameter_command(const char *param)
     execute_help - execute the help command
 -------------------------------------------------*/
 
-static void execute_help(int ref, int params, const char *param[])
+static void execute_help(running_machine *machine, int ref, int params, const char *param[])
 {
 	if (params == 0)
 		debug_console_printf_wrap(80, "%s\n", debug_get_help(""));
@@ -438,7 +437,7 @@ static void execute_help(int ref, int params, const char *param[])
     execute_print - execute the print command
 -------------------------------------------------*/
 
-static void execute_print(int ref, int params, const char *param[])
+static void execute_print(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 values[MAX_COMMAND_PARAMS];
 	int i;
@@ -558,7 +557,7 @@ static int mini_printf(char *buffer, const char *format, int params, UINT64 *par
     execute_printf - execute the printf command
 -------------------------------------------------*/
 
-static void execute_printf(int ref, int params, const char *param[])
+static void execute_printf(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 values[MAX_COMMAND_PARAMS];
 	char buffer[1024];
@@ -579,7 +578,7 @@ static void execute_printf(int ref, int params, const char *param[])
     execute_logerror - execute the logerror command
 -------------------------------------------------*/
 
-static void execute_logerror(int ref, int params, const char *param[])
+static void execute_logerror(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 values[MAX_COMMAND_PARAMS];
 	char buffer[1024];
@@ -600,7 +599,7 @@ static void execute_logerror(int ref, int params, const char *param[])
     execute_tracelog - execute the tracelog command
 -------------------------------------------------*/
 
-static void execute_tracelog(int ref, int params, const char *param[])
+static void execute_tracelog(running_machine *machine, int ref, int params, const char *param[])
 {
 	FILE *file = debug_get_cpu_info(cpu_getactivecpu())->trace.file;
 	UINT64 values[MAX_COMMAND_PARAMS];
@@ -626,10 +625,10 @@ static void execute_tracelog(int ref, int params, const char *param[])
     execute_quit - execute the quit command
 -------------------------------------------------*/
 
-static void execute_quit(int ref, int params, const char *param[])
+static void execute_quit(running_machine *machine, int ref, int params, const char *param[])
 {
 	mame_printf_error("Exited via the debugger\n");
-	mame_schedule_exit(Machine);
+	mame_schedule_exit(machine);
 }
 
 
@@ -637,7 +636,7 @@ static void execute_quit(int ref, int params, const char *param[])
     execute_do - execute the do command
 -------------------------------------------------*/
 
-static void execute_do(int ref, int params, const char *param[])
+static void execute_do(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 dummy;
 	debug_command_parameter_number(param[0], &dummy);
@@ -648,7 +647,7 @@ static void execute_do(int ref, int params, const char *param[])
     execute_step - execute the step command
 -------------------------------------------------*/
 
-static void execute_step(int ref, int params, const char *param[])
+static void execute_step(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 steps = 1;
 
@@ -664,7 +663,7 @@ static void execute_step(int ref, int params, const char *param[])
     execute_over - execute the over command
 -------------------------------------------------*/
 
-static void execute_over(int ref, int params, const char *param[])
+static void execute_over(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 steps = 1;
 
@@ -680,7 +679,7 @@ static void execute_over(int ref, int params, const char *param[])
     execute_out - execute the out command
 -------------------------------------------------*/
 
-static void execute_out(int ref, int params, const char *param[])
+static void execute_out(running_machine *machine, int ref, int params, const char *param[])
 {
 	debug_cpu_single_step_out();
 }
@@ -690,7 +689,7 @@ static void execute_out(int ref, int params, const char *param[])
     execute_go - execute the go command
 -------------------------------------------------*/
 
-static void execute_go(int ref, int params, const char *param[])
+static void execute_go(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 addr = ~0;
 
@@ -707,7 +706,7 @@ static void execute_go(int ref, int params, const char *param[])
     command
 -------------------------------------------------*/
 
-static void execute_go_vblank(int ref, int params, const char *param[])
+static void execute_go_vblank(running_machine *machine, int ref, int params, const char *param[])
 {
 	debug_cpu_go_vblank();
 }
@@ -717,7 +716,7 @@ static void execute_go_vblank(int ref, int params, const char *param[])
     execute_go_interrupt - execute the goint command
 -------------------------------------------------*/
 
-static void execute_go_interrupt(int ref, int params, const char *param[])
+static void execute_go_interrupt(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 irqline = -1;
 
@@ -733,7 +732,7 @@ static void execute_go_interrupt(int ref, int params, const char *param[])
     execute_go_time - execute the gtime command
 -------------------------------------------------*/
 
-static void execute_go_time(int ref, int params, const char *param[])
+static void execute_go_time(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 milliseconds = -1;
 
@@ -749,7 +748,7 @@ static void execute_go_time(int ref, int params, const char *param[])
     execute_next - execute the next command
 -------------------------------------------------*/
 
-static void execute_next(int ref, int params, const char *param[])
+static void execute_next(running_machine *machine, int ref, int params, const char *param[])
 {
 	debug_cpu_next_cpu();
 }
@@ -759,7 +758,7 @@ static void execute_next(int ref, int params, const char *param[])
     execute_focus - execute the focus command
 -------------------------------------------------*/
 
-static void execute_focus(int ref, int params, const char *param[])
+static void execute_focus(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 cpuwhich;
 	int cpunum;
@@ -791,7 +790,7 @@ static void execute_focus(int ref, int params, const char *param[])
     execute_ignore - execute the ignore command
 -------------------------------------------------*/
 
-static void execute_ignore(int ref, int params, const char *param[])
+static void execute_ignore(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 cpuwhich[MAX_COMMAND_PARAMS];
 	int cpunum, paramnum;
@@ -862,7 +861,7 @@ static void execute_ignore(int ref, int params, const char *param[])
     execute_observe - execute the observe command
 -------------------------------------------------*/
 
-static void execute_observe(int ref, int params, const char *param[])
+static void execute_observe(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 cpuwhich[MAX_COMMAND_PARAMS];
 	int cpunum, paramnum;
@@ -920,7 +919,7 @@ static void execute_observe(int ref, int params, const char *param[])
     execute_comment - add a comment to a line
 -------------------------------------------------*/
 
-static void execute_comment(int ref, int params, const char *param[])
+static void execute_comment(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 address;
 
@@ -945,7 +944,7 @@ static void execute_comment(int ref, int params, const char *param[])
     execute_comment_del - remove a comment from an addr
 --------------------------------------------------------*/
 
-static void execute_comment_del(int ref, int params, const char *param[])
+static void execute_comment_del(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 address;
 
@@ -964,9 +963,9 @@ static void execute_comment_del(int ref, int params, const char *param[])
     execute_comment - add a comment to a line
 -------------------------------------------------*/
 
-static void execute_comment_save(int ref, int params, const char *param[])
+static void execute_comment_save(running_machine *machine, int ref, int params, const char *param[])
 {
-	if (debug_comment_save(Machine))
+	if (debug_comment_save(machine))
 		debug_console_printf("Comments successfully saved\n");
 }
 
@@ -976,7 +975,7 @@ static void execute_comment_save(int ref, int params, const char *param[])
     command
 -------------------------------------------------*/
 
-static void execute_bpset(int ref, int params, const char *param[])
+static void execute_bpset(running_machine *machine, int ref, int params, const char *param[])
 {
 	parsed_expression *condition = NULL;
 	const char *action = NULL;
@@ -999,11 +998,11 @@ static void execute_bpset(int ref, int params, const char *param[])
 		return;
 
 	/* param 3 is the action */
-	if (params > 2 && !debug_command_parameter_command(action = param[2]))
+	if (params > 2 && !debug_command_parameter_command(machine, action = param[2]))
 		return;
 
 	/* set the breakpoint */
-	bpnum = debug_cpu_breakpoint_set(Machine, cpu_getactivecpu(), address, condition, action);
+	bpnum = debug_cpu_breakpoint_set(machine, cpu_getactivecpu(), address, condition, action);
 	debug_console_printf("Breakpoint %X set\n", bpnum);
 }
 
@@ -1013,7 +1012,7 @@ static void execute_bpset(int ref, int params, const char *param[])
     clear command
 -------------------------------------------------*/
 
-static void execute_bpclear(int ref, int params, const char *param[])
+static void execute_bpclear(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 bpindex;
 
@@ -1029,7 +1028,7 @@ static void execute_bpclear(int ref, int params, const char *param[])
 			{
 				debug_cpu_breakpoint *bp;
 				while ((bp = cpuinfo->bplist) != NULL)
-					debug_cpu_breakpoint_clear(Machine, bp->index);
+					debug_cpu_breakpoint_clear(machine, bp->index);
 			}
 		}
 		debug_console_printf("Cleared all breakpoints\n");
@@ -1040,7 +1039,7 @@ static void execute_bpclear(int ref, int params, const char *param[])
 		return;
 	else
 	{
-		int found = debug_cpu_breakpoint_clear(Machine, bpindex);
+		int found = debug_cpu_breakpoint_clear(machine, bpindex);
 		if (found)
 			debug_console_printf("Breakpoint %X cleared\n", (UINT32)bpindex);
 		else
@@ -1054,7 +1053,7 @@ static void execute_bpclear(int ref, int params, const char *param[])
     disable/enable commands
 -------------------------------------------------*/
 
-static void execute_bpdisenable(int ref, int params, const char *param[])
+static void execute_bpdisenable(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 bpindex;
 
@@ -1070,7 +1069,7 @@ static void execute_bpdisenable(int ref, int params, const char *param[])
 			{
 				debug_cpu_breakpoint *bp;
 				for (bp = cpuinfo->bplist; bp != NULL; bp = bp->next)
-					debug_cpu_breakpoint_enable(Machine, bp->index, ref);
+					debug_cpu_breakpoint_enable(machine, bp->index, ref);
 			}
 		}
 		if (ref == 0)
@@ -1084,7 +1083,7 @@ static void execute_bpdisenable(int ref, int params, const char *param[])
 		return;
 	else
 	{
-		int found = debug_cpu_breakpoint_enable(Machine, bpindex, ref);
+		int found = debug_cpu_breakpoint_enable(machine, bpindex, ref);
 		if (found)
 			debug_console_printf("Breakpoint %X %s\n", (UINT32)bpindex, ref ? "enabled" : "disabled");
 		else
@@ -1098,7 +1097,7 @@ static void execute_bpdisenable(int ref, int params, const char *param[])
     command
 -------------------------------------------------*/
 
-static void execute_bplist(int ref, int params, const char *param[])
+static void execute_bplist(running_machine *machine, int ref, int params, const char *param[])
 {
 	int cpunum, printed = 0;
 	char buffer[256];
@@ -1139,7 +1138,7 @@ static void execute_bplist(int ref, int params, const char *param[])
     command
 -------------------------------------------------*/
 
-static void execute_wpset(int ref, int params, const char *param[])
+static void execute_wpset(running_machine *machine, int ref, int params, const char *param[])
 {
 	parsed_expression *condition = NULL;
 	const char *action = NULL;
@@ -1173,11 +1172,11 @@ static void execute_wpset(int ref, int params, const char *param[])
 		return;
 
 	/* param 5 is the action */
-	if (params > 4 && !debug_command_parameter_command(action = param[4]))
+	if (params > 4 && !debug_command_parameter_command(machine, action = param[4]))
 		return;
 
 	/* set the watchpoint */
-	wpnum = debug_cpu_watchpoint_set(Machine, cpu_getactivecpu(), ref, type, address, length, condition, action);
+	wpnum = debug_cpu_watchpoint_set(machine, cpu_getactivecpu(), ref, type, address, length, condition, action);
 	debug_console_printf("Watchpoint %X set\n", wpnum);
 }
 
@@ -1187,7 +1186,7 @@ static void execute_wpset(int ref, int params, const char *param[])
     clear command
 -------------------------------------------------*/
 
-static void execute_wpclear(int ref, int params, const char *param[])
+static void execute_wpclear(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 wpindex;
 
@@ -1207,7 +1206,7 @@ static void execute_wpclear(int ref, int params, const char *param[])
 				{
 					debug_cpu_watchpoint *wp;
 					while ((wp = cpuinfo->space[spacenum].wplist) != NULL)
-						debug_cpu_watchpoint_clear(Machine, wp->index);
+						debug_cpu_watchpoint_clear(machine, wp->index);
 				}
 			}
 		}
@@ -1219,7 +1218,7 @@ static void execute_wpclear(int ref, int params, const char *param[])
 		return;
 	else
 	{
-		int found = debug_cpu_watchpoint_clear(Machine, wpindex);
+		int found = debug_cpu_watchpoint_clear(machine, wpindex);
 		if (found)
 			debug_console_printf("Watchpoint %X cleared\n", (UINT32)wpindex);
 		else
@@ -1233,7 +1232,7 @@ static void execute_wpclear(int ref, int params, const char *param[])
     disable/enable commands
 -------------------------------------------------*/
 
-static void execute_wpdisenable(int ref, int params, const char *param[])
+static void execute_wpdisenable(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 wpindex;
 
@@ -1253,7 +1252,7 @@ static void execute_wpdisenable(int ref, int params, const char *param[])
 				{
 					debug_cpu_watchpoint *wp;
 					for (wp = cpuinfo->space[spacenum].wplist; wp != NULL; wp = wp->next)
-						debug_cpu_watchpoint_enable(Machine, wp->index, ref);
+						debug_cpu_watchpoint_enable(machine, wp->index, ref);
 				}
 			}
 		}
@@ -1268,7 +1267,7 @@ static void execute_wpdisenable(int ref, int params, const char *param[])
 		return;
 	else
 	{
-		int found = debug_cpu_watchpoint_enable(Machine, wpindex, ref);
+		int found = debug_cpu_watchpoint_enable(machine, wpindex, ref);
 		if (found)
 			debug_console_printf("Watchpoint %X %s\n", (UINT32)wpindex, ref ? "enabled" : "disabled");
 		else
@@ -1282,7 +1281,7 @@ static void execute_wpdisenable(int ref, int params, const char *param[])
     command
 -------------------------------------------------*/
 
-static void execute_wplist(int ref, int params, const char *param[])
+static void execute_wplist(running_machine *machine, int ref, int params, const char *param[])
 {
 	int cpunum, printed = 0;
 	char buffer[256];
@@ -1333,7 +1332,7 @@ static void execute_wplist(int ref, int params, const char *param[])
     command
 -------------------------------------------------*/
 
-static void execute_hotspot(int ref, int params, const char *param[])
+static void execute_hotspot(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 threshhold;
 	UINT64 cpunum;
@@ -1351,7 +1350,7 @@ static void execute_hotspot(int ref, int params, const char *param[])
 
 			if (cpuinfo->valid && cpuinfo->hotspots)
 			{
-				debug_cpu_hotspot_track(Machine, cpunum, 0, 0);
+				debug_cpu_hotspot_track(machine, cpunum, 0, 0);
 				debug_console_printf("Cleared hotspot tracking on CPU %d\n", (int)cpunum);
 				cleared = TRUE;
 			}
@@ -1374,7 +1373,7 @@ static void execute_hotspot(int ref, int params, const char *param[])
 		return;
 
 	/* attempt to install */
-	if (debug_cpu_hotspot_track(Machine, cpunum, count, threshhold))
+	if (debug_cpu_hotspot_track(machine, cpunum, count, threshhold))
 		debug_console_printf("Now tracking hotspots on CPU %d using %d slots with a threshhold of %d\n", (int)cpunum, (int)count, (int)threshhold);
 	else
 		debug_console_printf("Error setting up the hotspot tracking\n");
@@ -1385,7 +1384,7 @@ static void execute_hotspot(int ref, int params, const char *param[])
     execute_save - execute the save command
 -------------------------------------------------*/
 
-static void execute_save(int ref, int params, const char *param[])
+static void execute_save(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 offset, endoffset, length, cpunum = cpu_getactivecpu();
 	const debug_cpu_info *info;
@@ -1433,7 +1432,7 @@ static void execute_save(int ref, int params, const char *param[])
     execute_dump - execute the dump command
 -------------------------------------------------*/
 
-static void execute_dump(int ref, int params, const char *param[])
+static void execute_dump(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 offset, endoffset, length, width = 0, ascii = 1, cpunum = cpu_getactivecpu();
 	const debug_cpu_info *info;
@@ -1602,7 +1601,7 @@ static void execute_dump(int ref, int params, const char *param[])
     execute_find - execute the find command
 -------------------------------------------------*/
 
-static void execute_find(int ref, int params, const char *param[])
+static void execute_find(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 offset, endoffset, length, cpunum = cpu_getactivecpu();
 	const debug_cpu_info *info;
@@ -1708,7 +1707,7 @@ static void execute_find(int ref, int params, const char *param[])
     execute_dasm - execute the dasm command
 -------------------------------------------------*/
 
-static void execute_dasm(int ref, int params, const char *param[])
+static void execute_dasm(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 offset, length, bytes = 1, cpunum = cpu_getactivecpu();
 	const debug_cpu_info *info;
@@ -1855,7 +1854,7 @@ static void execute_dasm(int ref, int params, const char *param[])
     trace over and trace info
 -------------------------------------------------*/
 
-static void execute_trace_internal(int ref, int params, const char *param[], int trace_over)
+static void execute_trace_internal(running_machine *machine, int ref, int params, const char *param[], int trace_over)
 {
 	const char *action = NULL, *filename = param[0];
 	FILE *f = NULL;
@@ -1867,7 +1866,7 @@ static void execute_trace_internal(int ref, int params, const char *param[], int
 	/* validate parameters */
 	if (params > 1 && !debug_command_parameter_number(param[1], &cpunum))
 		return;
-	if (params > 2 && !debug_command_parameter_command(action = param[2]))
+	if (params > 2 && !debug_command_parameter_command(machine, action = param[2]))
 		return;
 
 	/* further validation */
@@ -1912,9 +1911,9 @@ static void execute_trace_internal(int ref, int params, const char *param[], int
     execute_trace - execute the trace command
 -------------------------------------------------*/
 
-static void execute_trace(int ref, int params, const char *param[])
+static void execute_trace(running_machine *machine, int ref, int params, const char *param[])
 {
-	execute_trace_internal(ref, params, param, 0);
+	execute_trace_internal(machine, ref, params, param, 0);
 }
 
 
@@ -1922,9 +1921,9 @@ static void execute_trace(int ref, int params, const char *param[])
     execute_traceover - execute the trace over command
 -------------------------------------------------*/
 
-static void execute_traceover(int ref, int params, const char *param[])
+static void execute_traceover(running_machine *machine, int ref, int params, const char *param[])
 {
-	execute_trace_internal(ref, params, param, 1);
+	execute_trace_internal(machine, ref, params, param, 1);
 }
 
 
@@ -1932,7 +1931,7 @@ static void execute_traceover(int ref, int params, const char *param[])
     execute_traceflush - execute the trace flush command
 -------------------------------------------------*/
 
-static void execute_traceflush(int ref, int params, const char *param[])
+static void execute_traceflush(running_machine *machine, int ref, int params, const char *param[])
 {
 	debug_cpu_flush_traces();
 }
@@ -1942,7 +1941,7 @@ static void execute_traceflush(int ref, int params, const char *param[])
     execute_history - execute the history command
 -------------------------------------------------*/
 
-static void execute_history(int ref, int params, const char *param[])
+static void execute_history(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 count = DEBUG_HISTORY_SIZE;
 	const debug_cpu_info *info;
@@ -1999,12 +1998,12 @@ static void execute_history(int ref, int params, const char *param[])
     execute_snap - execute the trace over command
 -------------------------------------------------*/
 
-static void execute_snap(int ref, int params, const char *param[])
+static void execute_snap(running_machine *machine, int ref, int params, const char *param[])
 {
 	/* if no params, use the default behavior */
 	if (params == 0)
 	{
-		video_save_active_screen_snapshots(Machine);
+		video_save_active_screen_snapshots(machine);
 		debug_console_printf("Saved snapshot\n");
 	}
 
@@ -2017,7 +2016,7 @@ static void execute_snap(int ref, int params, const char *param[])
 		int scrnum = (params > 1) ? atoi(param[1]) : 0;
 		astring *fname;
 
-		const device_config *screen = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, scrnum);
+		const device_config *screen = device_list_find_by_index(machine->config->devicelist, VIDEO_SCREEN, scrnum);
 
 		if ((screen == NULL) || !render_is_live_screen(screen))
 		{
@@ -2048,9 +2047,9 @@ static void execute_snap(int ref, int params, const char *param[])
     execute_source - execute the source command
 -------------------------------------------------*/
 
-static void execute_source(int ref, int params, const char *param[])
+static void execute_source(running_machine *machine, int ref, int params, const char *param[])
 {
-	debug_cpu_source_script(Machine, param[0]);
+	debug_cpu_source_script(machine, param[0]);
 }
 
 
@@ -2058,7 +2057,7 @@ static void execute_source(int ref, int params, const char *param[])
     execute_map - execute the map command
 -------------------------------------------------*/
 
-static void execute_map(int ref, int params, const char *param[])
+static void execute_map(running_machine *machine, int ref, int params, const char *param[])
 {
 	UINT64 address, cpunum = cpu_getactivecpu();
 	const debug_cpu_info *info;
@@ -2099,7 +2098,7 @@ static void execute_map(int ref, int params, const char *param[])
     execute_memdump - execute the memdump command
 -------------------------------------------------*/
 
-static void execute_memdump(int ref, int params, const char **param)
+static void execute_memdump(running_machine *machine, int ref, int params, const char **param)
 {
 	FILE *file;
 	const char *filename;
@@ -2128,7 +2127,7 @@ static int CLIB_DECL symbol_sort_compare(const void *item1, const void *item2)
 	return strcmp(str1, str2);
 }
 
-static void execute_symlist(int ref, int params, const char **param)
+static void execute_symlist(running_machine *machine, int ref, int params, const char **param)
 {
 	const char *namelist[1000];
 	symbol_table *symtable;
@@ -2197,9 +2196,9 @@ static void execute_symlist(int ref, int params, const char **param)
     execute_softreset - execute the softreset command
 -------------------------------------------------*/
 
-static void execute_softreset(int ref, int params, const char **param)
+static void execute_softreset(running_machine *machine, int ref, int params, const char **param)
 {
-	mame_schedule_soft_reset(Machine);
+	mame_schedule_soft_reset(machine);
 }
 
 
@@ -2207,7 +2206,7 @@ static void execute_softreset(int ref, int params, const char **param)
     execute_hardreset - execute the hardreset command
 -------------------------------------------------*/
 
-static void execute_hardreset(int ref, int params, const char **param)
+static void execute_hardreset(running_machine *machine, int ref, int params, const char **param)
 {
-	mame_schedule_hard_reset(Machine);
+	mame_schedule_hard_reset(machine);
 }

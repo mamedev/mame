@@ -81,7 +81,7 @@ INLINE UINT8 swap_bits_5_6(UINT8 data)
 }
 
 
-static void btime_decrypt(void)
+static void btime_decrypt(running_machine *machine)
 {
 	UINT8 *src, *src1;
 	int addr, addr1;
@@ -98,12 +98,12 @@ static void btime_decrypt(void)
 	/* however if the previous instruction was JSR (which caused a write to */
 	/* the stack), fetch the address of the next instruction. */
 	addr1 = activecpu_get_previouspc();
-	src1 = (addr1 < 0x9000) ? rambase : memory_region(Machine, "main");
+	src1 = (addr1 < 0x9000) ? rambase : memory_region(machine, "main");
 	if (decrypted[addr1] == 0x20)	/* JSR $xxxx */
 		addr = src1[addr1+1] + 256 * src1[addr1+2];
 
 	/* If the address of the next instruction is xxxx xxx1 xxxx x1xx, decode it. */
-	src = (addr < 0x9000) ? rambase : memory_region(Machine, "main");
+	src = (addr < 0x9000) ? rambase : memory_region(machine, "main");
 	if ((addr & 0x0104) == 0x0104)
 	{
 		/* 76543210 -> 65342710 bit rotation */
@@ -162,7 +162,7 @@ static WRITE8_HANDLER( btime_w )
 
 	rambase[offset] = data;
 
-	btime_decrypt();
+	btime_decrypt(machine);
 }
 
 static WRITE8_HANDLER( zoar_w )
@@ -180,7 +180,7 @@ static WRITE8_HANDLER( zoar_w )
 
 	rambase[offset] = data;
 
-	btime_decrypt();
+	btime_decrypt(machine);
 }
 
 static WRITE8_HANDLER( disco_w )
@@ -194,7 +194,7 @@ static WRITE8_HANDLER( disco_w )
 
 	rambase[offset] = data;
 
-	btime_decrypt();
+	btime_decrypt(machine);
 }
 
 
@@ -1640,10 +1640,10 @@ ROM_START( sdtennis )
 	ROM_LOAD( "ao_04.10f",   0x1000, 0x1000, CRC(921952af) SHA1(4e9248f3493a5f4651278f27c11f507571242317) )
 ROM_END
 
-static void decrypt_C10707_cpu(int cpu, const char *cputag)
+static void decrypt_C10707_cpu(running_machine *machine, int cpu, const char *cputag)
 {
 	UINT8 *decrypt = auto_malloc(0x10000);
-	UINT8 *rom = memory_region(Machine, cputag);
+	UINT8 *rom = memory_region(machine, cputag);
 	offs_t addr;
 
 	memory_set_decrypted_region(cpu, 0x0000, 0xffff, decrypt);
@@ -1669,9 +1669,9 @@ static READ8_HANDLER( wtennis_reset_hack_r )
 	return RAM[0xc15f];
 }
 
-static void init_rom1(void)
+static void init_rom1(running_machine *machine)
 {
-	UINT8 *rom = memory_region(Machine, "main");
+	UINT8 *rom = memory_region(machine, "main");
 
 	decrypted = auto_malloc(0x10000);
 	memory_set_decrypted_region(0, 0x0000, 0xffff, decrypted);
@@ -1684,7 +1684,7 @@ static void init_rom1(void)
 
 static DRIVER_INIT( btime )
 {
-	init_rom1();
+	init_rom1(machine);
 }
 
 static DRIVER_INIT( zoar )
@@ -1697,31 +1697,31 @@ static DRIVER_INIT( zoar )
        I'm NOPing it out for now. */
 	memset(&rom[0xd50a],0xea,8);
 
-	init_rom1();
+	init_rom1(machine);
 }
 
 static DRIVER_INIT( lnc )
 {
-	decrypt_C10707_cpu(0, "main");
+	decrypt_C10707_cpu(machine, 0, "main");
 }
 
 static DRIVER_INIT( cookrace )
 {
 	memcpy(&audio_rambase[0x200], memory_region(machine, "audio") + 0xf200, 0x200);
-	decrypt_C10707_cpu(0, "main");
+	decrypt_C10707_cpu(machine, 0, "main");
 }
 
 static DRIVER_INIT( wtennis )
 {
 	memcpy(&audio_rambase[0x200], memory_region(machine, "audio") + 0xf200, 0x200);
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc15f, 0xc15f, 0, 0, wtennis_reset_hack_r);
-	decrypt_C10707_cpu(0, "main");
+	decrypt_C10707_cpu(machine, 0, "main");
 }
 
 static DRIVER_INIT( sdtennis )
 {
-	decrypt_C10707_cpu(0, "main");
-	decrypt_C10707_cpu(1, "audio");
+	decrypt_C10707_cpu(machine, 0, "main");
+	decrypt_C10707_cpu(machine, 1, "audio");
 }
 
 

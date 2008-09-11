@@ -631,9 +631,9 @@ ROM_END
  *
  *************************************/
 
-INLINE void generic_decode(const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0)
+INLINE void generic_decode(running_machine *machine, const char *tag, int bit7, int bit6, int bit5, int bit4, int bit3, int bit2, int bit1, int bit0)
 {
-	UINT16 *rom = (UINT16 *)memory_region(Machine, tag);
+	UINT16 *rom = (UINT16 *)memory_region(machine, tag);
 	int i;
 
 	/* only the low byte of ROMs are encrypted in these games */
@@ -671,12 +671,12 @@ static void arcadia_init(running_machine *machine)
 
 	/* set up memory */
 	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(Machine, "user1"), 0);
+	memory_configure_bank(1, 1, 1, memory_region(machine, "user1"), 0);
 
 	/* OnePlay bios is encrypted, TenPlay is not */
-	biosrom = (UINT16 *)memory_region(Machine, "user2");
+	biosrom = (UINT16 *)memory_region(machine, "user2");
 	if (biosrom[0] != 0x4afc)
-		generic_decode("user2", 6, 1, 0, 2, 3, 4, 5, 7);
+		generic_decode(machine, "user2", 6, 1, 0, 2, 3, 4, 5, 7);
 }
 
 
@@ -688,16 +688,16 @@ static void arcadia_init(running_machine *machine)
  *************************************/
 
 static DRIVER_INIT( none )  {                                                arcadia_init(machine); }
-static DRIVER_INIT( airh )  { generic_decode("user3", 5, 0, 2, 4, 7, 6, 1, 3); arcadia_init(machine); }
-static DRIVER_INIT( bowl )  { generic_decode("user3", 7, 6, 0, 1, 2, 3, 4, 5); arcadia_init(machine); }
-static DRIVER_INIT( dart )  { generic_decode("user3", 4, 0, 7, 6, 3, 1, 2, 5); arcadia_init(machine); }
-static DRIVER_INIT( ldrba ) { generic_decode("user3", 2, 3, 4, 1, 0, 7, 5, 6); arcadia_init(machine); }
-static DRIVER_INIT( ninj )  { generic_decode("user3", 1, 6, 5, 7, 4, 2, 0, 3); arcadia_init(machine); }
-static DRIVER_INIT( rdwr )  { generic_decode("user3", 3, 1, 6, 4, 0, 5, 2, 7); arcadia_init(machine); }
-static DRIVER_INIT( sdwr )  { generic_decode("user3", 6, 3, 4, 5, 2, 1, 0, 7); arcadia_init(machine); }
-static DRIVER_INIT( socc )  { generic_decode("user3", 0, 7, 1, 6, 5, 4, 3, 2); arcadia_init(machine); }
-static DRIVER_INIT( sprg )  { generic_decode("user3", 4, 7, 3, 0, 6, 5, 2, 1); arcadia_init(machine); }
-static DRIVER_INIT( xeon )  { generic_decode("user3", 3, 1, 2, 4, 0, 5, 6, 7); arcadia_init(machine); }
+static DRIVER_INIT( airh )  { generic_decode(machine, "user3", 5, 0, 2, 4, 7, 6, 1, 3); arcadia_init(machine); }
+static DRIVER_INIT( bowl )  { generic_decode(machine, "user3", 7, 6, 0, 1, 2, 3, 4, 5); arcadia_init(machine); }
+static DRIVER_INIT( dart )  { generic_decode(machine, "user3", 4, 0, 7, 6, 3, 1, 2, 5); arcadia_init(machine); }
+static DRIVER_INIT( ldrba ) { generic_decode(machine, "user3", 2, 3, 4, 1, 0, 7, 5, 6); arcadia_init(machine); }
+static DRIVER_INIT( ninj )  { generic_decode(machine, "user3", 1, 6, 5, 7, 4, 2, 0, 3); arcadia_init(machine); }
+static DRIVER_INIT( rdwr )  { generic_decode(machine, "user3", 3, 1, 6, 4, 0, 5, 2, 7); arcadia_init(machine); }
+static DRIVER_INIT( sdwr )  { generic_decode(machine, "user3", 6, 3, 4, 5, 2, 1, 0, 7); arcadia_init(machine); }
+static DRIVER_INIT( socc )  { generic_decode(machine, "user3", 0, 7, 1, 6, 5, 4, 3, 2); arcadia_init(machine); }
+static DRIVER_INIT( sprg )  { generic_decode(machine, "user3", 4, 7, 3, 0, 6, 5, 2, 1); arcadia_init(machine); }
+static DRIVER_INIT( xeon )  { generic_decode(machine, "user3", 3, 1, 2, 4, 0, 5, 6, 7); arcadia_init(machine); }
 
 
 

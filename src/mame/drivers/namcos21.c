@@ -343,9 +343,9 @@ static struct
 } *mpDspState;
 
 static INT32
-ReadPointROMData( unsigned offset )
+ReadPointROMData( running_machine *machine, unsigned offset )
 {
-	const INT32 *pPointData = (INT32 *)memory_region( Machine, "user2" );
+	const INT32 *pPointData = (INT32 *)memory_region( machine, "user2" );
 	INT32 result = pPointData[offset];
 	return result;
 }
@@ -426,7 +426,7 @@ TransmitWordToSlave( UINT16 data )
 } /* TransmitWordToSlave */
 
 static void
-TransferDspData( void )
+TransferDspData( running_machine *machine )
 {
 	UINT16 addr = mpDspState->masterSourceAddr;
 	int mode = addr&0x8000;
@@ -479,20 +479,20 @@ TransferDspData( void )
 			}
 			else
 			{
-				INT32 masterAddr = ReadPointROMData(code);
+				INT32 masterAddr = ReadPointROMData(machine, code);
 				logerror( "OBJ TFR(0x%x)\n", code );
 				{
 					UINT16 len = namcos21_dspram16[addr++];
 					for(;;)
 					{
-						int subAddr = ReadPointROMData(masterAddr++);
+						int subAddr = ReadPointROMData(machine, masterAddr++);
 						if( subAddr==0xffffff )
 						{
 							break;
 						}
 						else
 						{
-							int primWords = (UINT16)ReadPointROMData(subAddr++);
+							int primWords = (UINT16)ReadPointROMData(machine, subAddr++);
 							if( primWords>2 )
 							{
 								TransmitWordToSlave( 0 ); /* pad1 */
@@ -505,7 +505,7 @@ TransferDspData( void )
 								TransmitWordToSlave( primWords+1 );
 								for( i=0; i<primWords; i++ )
 								{
-									TransmitWordToSlave( (UINT16)ReadPointROMData(subAddr+i) );
+									TransmitWordToSlave( (UINT16)ReadPointROMData(machine, subAddr+i) );
 								}
 							}
 							else
@@ -603,7 +603,7 @@ static WRITE16_HANDLER( dspram16_w )
 			offset == 1+(mpDspState->masterSourceAddr&0x7fff) )
 		{
 			logerror( "IDC-CONTINUE\n" );
-			TransferDspData();
+			TransferDspData(machine);
 		}
 		else if( namcos2_gametype == NAMCOS21_SOLVALOU &&
 					offset == 0x103 &&
@@ -617,9 +617,9 @@ static WRITE16_HANDLER( dspram16_w )
 /************************************************************************************/
 
 static int
-InitDSP( void )
+InitDSP( running_machine *machine )
 {
-	UINT16 *pMem = (UINT16 *)memory_region(Machine, "dspmaster");
+	UINT16 *pMem = (UINT16 *)memory_region(machine, "dspmaster");
 	/**
      * DSP BIOS tests "CPU ID" on startup
      * "JAPAN (C)1990 NAMCO LTD. by H.F "
@@ -643,7 +643,7 @@ static int mbPointRomDataAvailable;
 
 static READ16_HANDLER( dsp_port0_r )
 {
-	INT32 data = ReadPointROMData(pointrom_idx++);
+	INT32 data = ReadPointROMData(machine, pointrom_idx++);
 	mPointRomMSB = (UINT8)(data>>16);
 	mbPointRomDataAvailable = 1;
 	return (UINT16)data;
@@ -678,7 +678,7 @@ static WRITE16_HANDLER( dsp_port2_w )
 {
 	logerror( "IDC ADDR INIT(0x%04x)\n", data );
 	mpDspState->masterSourceAddr = data;
-	TransferDspData();
+	TransferDspData(machine);
 } /* dsp_port2_w */
 
 static READ16_HANDLER( dsp_port3_idc_rcv_enable_r )
@@ -2196,12 +2196,12 @@ ROM_START( winrun91 )
 	ROM_LOAD("avo3.11e",0x080000,0x80000,CRC(76e22f92) SHA1(0e1b8d35a5b9c20cc3192d935f0c9da1e69679d2) )
 ROM_END
 
-static void namcos21_init( int game_type )
+static void namcos21_init( running_machine *machine, int game_type )
 {
 	namcos2_gametype = game_type;
 	pointram = auto_malloc(PTRAM_SIZE);
-	mpDataROM = (UINT16 *)memory_region( Machine, "user1" );
-	InitDSP();
+	mpDataROM = (UINT16 *)memory_region( machine, "user1" );
+	InitDSP(machine);
 	mbNeedsKickstart = 20;
 	if( game_type==NAMCOS21_CYBERSLED )
 	{
@@ -2227,18 +2227,18 @@ static DRIVER_INIT( winrun )
 
 static DRIVER_INIT( aircombt )
 {
-	namcos21_init( NAMCOS21_AIRCOMBAT );
+	namcos21_init( machine, NAMCOS21_AIRCOMBAT );
 }
 
 static DRIVER_INIT( starblad )
 {
-	namcos21_init( NAMCOS21_STARBLADE );
+	namcos21_init( machine, NAMCOS21_STARBLADE );
 }
 
 
 static DRIVER_INIT( cybsled )
 {
-	namcos21_init( NAMCOS21_CYBERSLED );
+	namcos21_init( machine, NAMCOS21_CYBERSLED );
 }
 
 static DRIVER_INIT( solvalou )
@@ -2249,7 +2249,7 @@ static DRIVER_INIT( solvalou )
 	mem[0x20cf4/2+1] = 0x4e71;
 	mem[0x20cf4/2+2] = 0x4e71;
 
-	namcos21_init( NAMCOS21_SOLVALOU );
+	namcos21_init( machine, NAMCOS21_SOLVALOU );
 }
 
 static DRIVER_INIT( driveyes )

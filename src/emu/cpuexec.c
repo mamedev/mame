@@ -332,7 +332,7 @@ void cpuexec_timeslice(running_machine *machine)
 	}
 
 	/* update the global time */
-	timer_set_global_time(target);
+	timer_set_global_time(machine, target);
 }
 
 

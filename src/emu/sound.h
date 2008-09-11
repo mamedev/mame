@@ -88,11 +88,11 @@ int sound_get_attenuation(void);
 void sound_global_enable(int enable);
 
 /* user gain controls on speaker inputs for mixing */
-int sound_get_user_gain_count(void);
-void sound_set_user_gain(int index, float gain);
-float sound_get_user_gain(int index);
-float sound_get_default_gain(int index);
-const char *sound_get_user_gain_name(int index);
+int sound_get_user_gain_count(running_machine *machine);
+void sound_set_user_gain(running_machine *machine, int index, float gain);
+float sound_get_user_gain(running_machine *machine, int index);
+float sound_get_default_gain(running_machine *machine, int index);
+const char *sound_get_user_gain_name(running_machine *machine, int index);
 
 /* misc helpers */
 int sound_find_sndnum_by_tag(const char *tag);
