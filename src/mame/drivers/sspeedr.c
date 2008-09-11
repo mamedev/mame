@@ -155,7 +155,7 @@ static INPUT_PORTS_START( sspeedr )
 	PORT_START("IN1")
 	/* The gas pedal is adjusted physically so the encoder is at position 2 when the pedal is not pressed. */
 	/* It also only uses half of the encoder. */
-	PORT_BIT( 0x1f, 0x00, IPT_POSITIONAL ) PORT_POSITIONS(30) PORT_REMAP_TABLE(sspeedr_controller_table + 2) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
+	PORT_BIT( 0x1f, 0x00, IPT_POSITIONAL_V ) PORT_POSITIONS(30) PORT_REMAP_TABLE(sspeedr_controller_table + 2) PORT_SENSITIVITY(25) PORT_KEYDELTA(20)
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Coinage ) )
