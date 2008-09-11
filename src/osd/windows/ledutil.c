@@ -382,21 +382,26 @@ static LRESULT handle_copydata(WPARAM wparam, LPARAM lparam)
 
 	// allocate memory
 	entry = malloc(sizeof(*entry));
+	if (entry == NULL)
+		return 0;
+		
 	string = malloc(strlen(data->string) + 1);
+	if (string == NULL)
+	{
+		free(entry);
+		return 0;
+	}
 
 	// if all allocations worked, make a new entry
-	if (entry != NULL && string != NULL)
-	{
-		entry->next = idmaplist;
-		entry->name = string;
-		entry->id = data->id;
+	entry->next = idmaplist;
+	entry->name = string;
+	entry->id = data->id;
 
-		// copy the string and hook us into the list
-		strcpy(string, data->string);
-		idmaplist = entry;
+	// copy the string and hook us into the list
+	strcpy(string, data->string);
+	idmaplist = entry;
 
-		DEBUG_PRINTF(("  id %d = '%s'\n", entry->id, entry->name));
-	}
+	DEBUG_PRINTF(("  id %d = '%s'\n", entry->id, entry->name));
 
 	return 0;
 }
