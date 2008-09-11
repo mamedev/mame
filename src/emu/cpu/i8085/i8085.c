@@ -146,6 +146,7 @@ typedef struct {
 	UINT32	INTR;		/* vector for INTR */
 	UINT32	IRQ2;		/* scheduled interrupt address */
 	UINT32	IRQ1;		/* executed interrupt address */
+	UINT8   STATUS;		/* status word */
 	INT8	irq_state[4];
 	int 	(*irq_callback)(int);
 	void	(*sod_callback)(int state);
@@ -160,6 +161,7 @@ static UINT8 ZSP[256];
 static UINT8 RIM_IEN = 0; //AT: IEN status latch used by the RIM instruction
 static UINT8 ROP(void)
 {
+	I.STATUS = 0xa2; // instruction fetch
 	return cpu_readop(I.PC.w.l++);
 }
 
@@ -180,11 +182,13 @@ static UINT16 ARG16(void)
 
 static UINT8 RM(UINT32 a)
 {
+	I.STATUS = 0x82; // memory read
 	return program_read_byte_8le(a);
 }
 
 static void WM(UINT32 a, UINT8 v)
 {
+	I.STATUS = 0x00; // memory write
 	program_write_byte_8le(a, v);
 }
 
@@ -684,6 +688,7 @@ INLINE void execute_one(int opcode)
 		case 0x76: i8085_ICount -= (I.cputype) ? 5 : 7;	/* HLT */
 			I.PC.w.l--;
 			I.HALT = 1;
+			I.STATUS = 0x8a; // halt acknowledge
 			if (i8085_ICount > 0) i8085_ICount = 0;
 			break;
 		case 0x77: i8085_ICount -= 7;	/* MOV  M,A */
@@ -1216,6 +1221,10 @@ INLINE void execute_one(int opcode)
 			M_RST(7);
 			break;
 	}
+	/* For 8080 NF flag is not used but bit is always set */
+	if(!I.cputype ) {
+		I.AF.b.l = I.AF.b.l | NF;
+	}
 }
 
 static void Interrupt(void)
@@ -1225,6 +1234,9 @@ static void Interrupt(void)
 	{
 		I.PC.w.l++; 	/* skip HALT instr */
 		I.HALT = 0;
+		I.STATUS = 0x26; // int ack while halt
+	} else {
+		I.STATUS = 0x23; // int ack
 	}
 //AT
 	I.IREQ &= ~I.ISRV; // remove serviced IRQ flag
@@ -1367,6 +1379,7 @@ static void i8085_init(int index, int clock, const void *config, int (*irqcallba
 	state_save_register_item("i8085", index, I.INTR);
 	state_save_register_item("i8085", index, I.IRQ2);
 	state_save_register_item("i8085", index, I.IRQ1);
+	state_save_register_item("i8085", index, I.STATUS);
 	state_save_register_item_array("i8085", index, I.irq_state);
 }
 
@@ -1601,6 +1614,7 @@ static void i8080_init(int index, int clock, const void *config, int (*irqcallba
 	state_save_register_item("i8080", index, I.INTR);
 	state_save_register_item("i8080", index, I.IRQ2);
 	state_save_register_item("i8080", index, I.IRQ1);
+	state_save_register_item("i8080", index, I.STATUS);
 	state_save_register_item_array("i8080", index, I.irq_state);
 }
 
@@ -1657,6 +1671,7 @@ static void i8085_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + I8085_IREQ:			I.IREQ = info->i;						break;
 		case CPUINFO_INT_REGISTER + I8085_ISRV:			I.ISRV = info->i;						break;
 		case CPUINFO_INT_REGISTER + I8085_VECTOR:		I.INTR = info->i;						break;
+		case CPUINFO_INT_REGISTER + I8085_STATUS:		I.STATUS = info->i;						break;
 
 		case CPUINFO_INT_I8085_SID:						if (info->i) I.IM |= IM_SID; else I.IM &= ~IM_SID; break;
 
@@ -1719,6 +1734,7 @@ void i8085_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + I8085_IREQ:			info->i = I.IREQ;						break;
 		case CPUINFO_INT_REGISTER + I8085_ISRV:			info->i = I.ISRV;						break;
 		case CPUINFO_INT_REGISTER + I8085_VECTOR:		info->i = I.INTR;						break;
+		case CPUINFO_INT_REGISTER + I8085_STATUS:		info->i = I.STATUS;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = i8085_set_info;			break;
@@ -1762,6 +1778,7 @@ void i8085_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + I8085_IREQ:			sprintf(info->s, "IREQ:%02X", I.IREQ);	break;
 		case CPUINFO_STR_REGISTER + I8085_ISRV:			sprintf(info->s, "ISRV:%02X", I.ISRV);	break;
 		case CPUINFO_STR_REGISTER + I8085_VECTOR:		sprintf(info->s, "VEC:%02X", I.INTR);	break;
+		case CPUINFO_STR_REGISTER + I8085_STATUS:		sprintf(info->s, "SW:%02X", I.STATUS);	break;
 	}
 }
 

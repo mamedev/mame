@@ -41,7 +41,7 @@
 #define M_DCR(R) {UINT8 hc = ((R & 0x0f) == 0x00) ? HF : 0; --R; I.AF.b.l= (I.AF.b.l & CF ) | ZSP[R] | hc | NF; }
 #define M_MVI(R) R=ARG()
 
-#define M_ANA(R) { int i = ((I.AF.b.h | R)>>3)&1 * HF; I.AF.b.h&=R; I.AF.b.l=ZSP[I.AF.b.h]; if( I.cputype ) { I.AF.b.l |= HF; } else {I.AF.b.l |= i; } }
+#define M_ANA(R) { int i = (((I.AF.b.h | R)>>3) & 1)*HF; I.AF.b.h&=R; I.AF.b.l=ZSP[I.AF.b.h]; if( I.cputype ) { I.AF.b.l |= HF; } else {I.AF.b.l |= i; } }
 #define M_ORA(R) I.AF.b.h|=R; I.AF.b.l=ZSP[I.AF.b.h]
 #define M_XRA(R) I.AF.b.h^=R; I.AF.b.l=ZSP[I.AF.b.h]
 
@@ -107,10 +107,12 @@ int q = I.AF.b.h+R; 							\
 }
 
 #define M_IN													\
+	I.STATUS = 0x42; 											\
 	I.XX.d=ARG();												\
 	I.AF.b.h=io_read_byte_8le(I.XX.d);
 
 #define M_OUT													\
+	I.STATUS = 0x10; 											\
 	I.XX.d=ARG();												\
 	io_write_byte_8le(I.XX.d,I.AF.b.h)
 
@@ -123,13 +125,15 @@ int q = I.AF.b.h+R; 							\
 }
 
 #define M_PUSH(R) {                                             \
-	WM(--I.SP.w.l, I.R.b.h);									\
-	WM(--I.SP.w.l, I.R.b.l);									\
+	I.STATUS = 0x04; 											\
+	program_write_byte_8le(--I.SP.w.l, I.R.b.h);									\
+	program_write_byte_8le(--I.SP.w.l, I.R.b.l);									\
 }
 
 #define M_POP(R) {												\
-	I.R.b.l = RM(I.SP.w.l++);									\
-	I.R.b.h = RM(I.SP.w.l++);									\
+	I.STATUS = 0x86;											\
+	I.R.b.l = program_read_byte_8le(I.SP.w.l++);									\
+	I.R.b.h = program_read_byte_8le(I.SP.w.l++);									\
 }
 
 #define M_RET(cc)												\
