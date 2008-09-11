@@ -40,6 +40,7 @@ struct _mario_state
 	/* sound state */
 	UINT8	last;
 	UINT8	portT;
+	UINT8	eabank;
 
 	/* video state */
 	UINT8	gfx_bank;

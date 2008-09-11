@@ -956,11 +956,11 @@ static int mcs48_execute(int cycles)
 
 /* FIXME: the memory maps should probably support rom banking for EA */
 static ADDRESS_MAP_START(program_10bit, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x00, 0x3ff) AM_ROMBANK(MCS48_INTERNAL_ROMBANK)
+	AM_RANGE(0x00, 0x3ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(program_11bit, ADDRESS_SPACE_PROGRAM, 8)
-	AM_RANGE(0x00, 0x7ff) AM_ROMBANK(MCS48_INTERNAL_ROMBANK)
+	AM_RANGE(0x00, 0x7ff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(data_6bit, ADDRESS_SPACE_DATA, 8)
@@ -1016,9 +1016,7 @@ static void mcs48_set_info(UINT32 state, cpuinfo *info)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_IRQ:	mcs48.irq_state = (info->i != CLEAR_LINE);	break;
-		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_EA:	mcs48.ea = (info->i != CLEAR_LINE);
-														memory_set_bank(MCS48_INTERNAL_ROMBANK, mcs48.ea);
-														break;
+		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_EA:	mcs48.ea = (info->i != CLEAR_LINE);			break;
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + MCS48_PC:			PC = info->i;								break;

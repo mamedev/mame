@@ -240,9 +240,11 @@ DISCRETE_SOUND_END
 
 static void set_ea(running_machine *machine, int ea)
 {
+	mario_state	*state = machine->driver_data;
 	//printf("ea: %d\n", ea);
-	cputag_set_input_line(machine, "audio", MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
-	//memory_set_bank(MCS48_INTERNAL_ROMBANK, ea);
+	//cputag_set_input_line(machine, "audio", MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
+	if (state->eabank != 0)
+		memory_set_bank(state->eabank, ea);
 }
 
 /****************************************************************
@@ -254,14 +256,20 @@ static void set_ea(running_machine *machine, int ea)
 static SOUND_START( mario )
 {
 	mario_state	*state = machine->driver_data;
+	int audiocpu = mame_find_cpu_index(machine, "audio");
 #if USE_8039
 	UINT8 *SND = memory_region(machine, "audio");
 
 	SND[0x1001] = 0x01;
 #endif
 
-	memory_configure_bank(MCS48_INTERNAL_ROMBANK, 0, 1, memory_region(machine, "audio"), 0);
-    memory_configure_bank(MCS48_INTERNAL_ROMBANK, 1, 1, memory_region(machine, "audio") + 0x1000, 0x800);
+	state->eabank = 0;
+	if (audiocpu != -1 && machine->config->cpu[audiocpu].type != CPU_Z80)
+	{
+		state->eabank = 1;
+		memory_configure_bank(1, 0, 1, memory_region(machine, "audio"), 0);
+	    memory_configure_bank(1, 1, 1, memory_region(machine, "audio") + 0x1000, 0x800);
+	}
 
     state_save_register_global(state->last);
 	state_save_register_global(state->portT);
@@ -418,9 +426,7 @@ WRITE8_HANDLER( mario_sh3_w )
  *************************************/
 
 static ADDRESS_MAP_START( mario_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-#if USE_8039
-	AM_RANGE(0x0000, 0x07ff) AM_ROMBANK(MCS48_INTERNAL_ROMBANK)
-#endif
+	AM_RANGE(0x0000, 0x07ff) AM_ROMBANK(1) AM_REGION("audio", 0)
 	AM_RANGE(0x0800, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
