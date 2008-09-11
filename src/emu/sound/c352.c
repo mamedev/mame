@@ -30,7 +30,7 @@ enum {
 	C352_FLG_KEYOFF		= 0x2000,	// Keyoff
 	C352_FLG_LOOPTRG	= 0x1000,	// Loop Trigger
 	C352_FLG_LOOPHIST	= 0x0800,	// Loop History
-	C352_FLG_FM	 	= 0x0400,	// Frequency Modulation
+	C352_FLG_FM	 		= 0x0400,	// Frequency Modulation
 	C352_FLG_PHASERL	= 0x0200,	// Rear Left invert phase 180 degrees
 	C352_FLG_PHASEFL	= 0x0100,	// Front Left invert phase 180 degrees
 	C352_FLG_PHASEFR	= 0x0080,	// invert phase 180 degrees (e.g. flip sign of sample)
@@ -73,8 +73,6 @@ struct c352_info
 	unsigned char *c352_rom_samples;
 	UINT32 c352_rom_length;
 	int sample_rate_base;
-
-	INT16 level_table[256];
 
 	long	channel_l[2048*2];
 	long	channel_r[2048*2];
@@ -534,13 +532,6 @@ static void c352_init(struct c352_info *info, int sndindex)
 		state_save_register_item(cname, sndindex, info->c352_ch[i].repeat);
 		state_save_register_item(cname, sndindex, info->c352_ch[i].current_addr);
 		state_save_register_item(cname, sndindex, info->c352_ch[i].pos);
-	}
-
-	for (i = 0; i < 256; i++)
-	{
-	      double max_level = 255.0;
-
-	      info->level_table[255-i] = (int) (pow (10.0, (double) i / 256.0 * -20.0 / 20.0) * max_level);
 	}
 }
 
