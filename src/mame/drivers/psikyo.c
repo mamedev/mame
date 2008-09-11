@@ -1081,7 +1081,7 @@ static INPUT_PORTS_START( tengai )
         1 1 1 0 Taiwan
 
     ************************************************/
-	PORT_DIPNAME( 0x0000000f, 0x0000000e, "Country" )
+	PORT_DIPNAME( 0x0000000f, 0x0000000f, "Country" )
 	PORT_DIPSETTING(          0x0000000f, DEF_STR( World ) )
 	PORT_DIPSETTING(          0x0000000e, "U.S.A & Canada" )
 	PORT_DIPSETTING(          0x0000000d, "Korea" )
