@@ -570,6 +570,18 @@ static INPUT_PORTS_START( indytemp )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( indytemc )
+	PORT_INCLUDE( indytemp )
+
+	PORT_MODIFY("IN0")	/* F40000 */
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT )
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( roadrunn )
 	PORT_START("IN0")	/* F40000 */
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_Y ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10) PORT_PLAYER(1)
@@ -1196,11 +1208,12 @@ ROM_START( indytem4 )
 ROM_END
 
 
-ROM_START( indytemc )
+ROM_START( indytemc ) /* Dedicated boardset marked 'ATARI SYSTEM I LSI CARTRIDGE COCKTAIL A043310' */
 	ROM_REGION( 0x88000, "main", 0 )	/* 8.5*64k for 68000 code & slapstic ROM */
-    MOTHERBOARD_BIOS
-	ROM_LOAD16_BYTE( "136036.632",   0x10000, 0x08000, BAD_DUMP CRC(8af67d9b) SHA1(5777ed2048fe1a58a1cac8276185843396754d38) )
-	ROM_LOAD16_BYTE( "136036.631",   0x10001, 0x08000, CRC(9ac96ba8) SHA1(d80adabb4198461b5976577bdd8cc4e650de1c8e) )
+	ROM_LOAD16_BYTE( "136032.116",   0x00000, 0x04000, CRC(195c54ad) SHA1(d7cda3cd3db4c6f77074ca05e96ae11b62e048b7) )
+	ROM_LOAD16_BYTE( "136032.117",   0x00001, 0x04000, CRC(9af9fe29) SHA1(1d5077662e4111ece9f8a5124394dad8b1abdc13) )
+	ROM_LOAD16_BYTE( "136032.632",   0x10000, 0x08000, CRC(d3e1a611) SHA1(edbced6dd64ca44a59aff6a4acca0b3ddb233810) )
+	ROM_LOAD16_BYTE( "136032.631",   0x10001, 0x08000, CRC(9ac96ba8) SHA1(d80adabb4198461b5976577bdd8cc4e650de1c8e) )
 	ROM_LOAD16_BYTE( "136036.534",   0x20000, 0x08000, CRC(eae396be) SHA1(6d7a82a2fd43b91c6c1e2c07d33c81487b845bba) )
 	ROM_LOAD16_BYTE( "136036.533",   0x20001, 0x08000, CRC(06c66335) SHA1(848cd7d8c2d8da4d07ddc908676155e154ae764a) )
 	ROM_LOAD16_BYTE( "136036.568",   0x30000, 0x08000, CRC(2bbc16ed) SHA1(f20a07632679641f007caa44feb52272f8a2936d) )
@@ -1210,7 +1223,7 @@ ROM_START( indytemc )
 
 	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for 6502 code */
 	ROM_LOAD( "136036.153",   0x4000, 0x4000, CRC(95294641) SHA1(00f90a0d49d2c77d5288080036f81a74ad31f8bc) )
-	ROM_LOAD( "136036.170",   0x8000, 0x8000, BAD_DUMP CRC(8af67d9b) SHA1(5777ed2048fe1a58a1cac8276185843396754d38) )
+	ROM_LOAD( "136036.170",   0x8000, 0x8000, CRC(f318b321) SHA1(8fe9e88fa9f2104526f89926a7119b866051e4ef) )
 
 	ROM_REGION( 0x4000, "alpha", ROMREGION_DISPOSE )
 	ROM_LOAD( "136032.120",   0x00000, 0x04000, CRC(90a1950d) SHA1(fba32c255850312175d1e3c03d677ffb57e09e07) )  /* alpha font */
@@ -1238,7 +1251,7 @@ ROM_START( indytemc )
 
 	ROM_REGION( 0x400, "proms", 0 )	/* graphics mapping PROMs */
 	ROM_LOAD( "136036.152",   0x000, 0x200, CRC(4f96e57c) SHA1(271633a0aacd1d1efe2917728b73e90010c64d2c) )  /* remap */
-	ROM_LOAD( "136036.151",   0x200, 0x200, CRC(7daf351f) SHA1(95c13d81a47440f847af7b19632cc032380b9ff4) )  /* color */
+	ROM_LOAD( "136036.160",   0x200, 0x200, CRC(88c65843) SHA1(81fef378b3dbf4d7228beb7427e2f75cae371808) )  /* color */
 ROM_END
 
 
@@ -2220,7 +2233,7 @@ GAME( 1985, indytem2, indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games
 GAME( 1985, indytem3, indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 3)", 0 )
 GAME( 1985, indytem4, indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (set 4)", 0 )
 GAME( 1985, indytemd, indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (German)", 0 )
-GAME( 1985, indytemc, indytemp, atarisy1, indytemp, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (Cocktail)", 0 )
+GAME( 1985, indytemc, indytemp, atarisy1, indytemc, indytemp, ROT0, "Atari Games", "Indiana Jones and the Temple of Doom (Cocktail)", GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1985, roadrunn, atarisy1, atarisy1, roadrunn, roadrunn, ROT0, "Atari Games", "Road Runner (rev 2)", 0 )
 GAME( 1985, roadrun2, roadrunn, atarisy1, roadrunn, roadrunn, ROT0, "Atari Games", "Road Runner (rev 1+)", 0 )
