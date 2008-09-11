@@ -901,18 +901,6 @@ static INPUT_PORTS_START( gunbirdj )
 	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_VBLANK  )	// vblank
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )	// tested!
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )	// tested!
 INPUT_PORTS_END
 
 
@@ -1038,21 +1026,9 @@ static INPUT_PORTS_START( s1945a )
     Bit 0 1 2 3
         1 1 1 1 Japan, anything but 0x0f = "World"
     ************************************************/
-	PORT_DIPNAME( 0x0000000f, 0x0000000e, "Country" )
+	PORT_DIPNAME( 0x0000000f, 0x0000000f, "Country" )
 	PORT_DIPSETTING(          0x0000000f, DEF_STR( Japan ) )
 	PORT_DIPSETTING(          0x0000000e, DEF_STR( World ) )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_VBLANK  )	// vblank
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )	// tested!
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )	// tested!
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( s1945j )
@@ -1064,17 +1040,6 @@ static INPUT_PORTS_START( s1945j )
 	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_VBLANK  )	// vblank
-	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_UNKNOWN )	// tested!
-	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x00008000, IP_ACTIVE_LOW, IPT_UNKNOWN )	// tested!
 INPUT_PORTS_END
 
 
@@ -1108,13 +1073,20 @@ static INPUT_PORTS_START( tengai )
 
     This Dip port is bit based:
 
-    If any of the bits are set it becomes World.
-    Text for other regions is present though.
+    Bit 0 1 2 3
+        1 1 1 1 World
+        0 1 1 1 USA & Canada
+        1 0 1 1 Korea
+        1 1 0 1 Hong Kong
+        1 1 1 0 Taiwan
 
     ************************************************/
 	PORT_DIPNAME( 0x0000000f, 0x0000000e, "Country" )
-	PORT_DIPSETTING(          0x0000000f, DEF_STR( Japan ) )
-	PORT_DIPSETTING(          0x0000000e, DEF_STR( World ) )
+	PORT_DIPSETTING(          0x0000000f, DEF_STR( World ) )
+	PORT_DIPSETTING(          0x0000000e, "U.S.A & Canada" )
+	PORT_DIPSETTING(          0x0000000d, "Korea" )
+	PORT_DIPSETTING(          0x0000000b, "Hong Kong" )
+	PORT_DIPSETTING(          0x00000007, "Taiwan" )
 	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -1172,6 +1144,25 @@ static INPUT_PORTS_START( tengai )
 	PORT_DIPNAME( 0x80000000, 0x80000000, "2C Start, 1C Continue" )
 	PORT_DIPSETTING(          0x80000000, DEF_STR( Off ) )
 	PORT_DIPSETTING(          0x00000000, "On [Free Play]" ) // Forces 1C_1C
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tengaij )
+	PORT_INCLUDE( tengai )
+
+	PORT_MODIFY("DSW")
+	/***********************************************
+
+    This Dip port is bit based:
+
+    Bit 0 1 2 3
+        1 1 1 1 Japan, anything but 0x0f = "World"
+
+    Text for other regions is present though.
+
+    ************************************************/
+	PORT_DIPNAME( 0x0000000f, 0x0000000f, "Country" )
+	PORT_DIPSETTING(          0x0000000f, DEF_STR( Japan ) )
+	PORT_DIPSETTING(          0x0000000e, DEF_STR( World ) )
 INPUT_PORTS_END
 
 
@@ -1971,6 +1962,36 @@ Chips:  PS2001B
 ROM_START( tengai )
 
 	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
+	ROM_LOAD32_WORD_SWAP( "5-u40.bin", 0x000000, 0x080000, CRC(90088195) SHA1(8ec48d581ecd14b3dad36edc65d5a273324cf3c1) ) // 1&0
+	ROM_LOAD32_WORD_SWAP( "4-u41.bin", 0x000002, 0x080000, CRC(0d53196c) SHA1(454bb4695b13ce44ca5dac7c6d4142a8b9afa798) ) // 3&2
+
+	ROM_REGION( 0x030000, "audio", 0 )		/* Sound CPU Code */
+	ROM_LOAD( "1-u63.bin", 0x00000, 0x20000, CRC(2025e387) SHA1(334b0eb3b416d46ccaadff3eee6f1abba63285fb) )
+	ROM_RELOAD(            0x10000, 0x20000             )
+
+	ROM_REGION( 0x000100, "cpu2", 0 )		/* MCU */
+	ROM_LOAD( "4-u59.bin", 0x00000, 0x00100, NO_DUMP )
+
+	ROM_REGION( 0x600000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_LOAD16_WORD_SWAP( "u20.bin",  0x000000, 0x200000, CRC(ed42ef73) SHA1(74693fcc83a2654ddb18fd513d528033863d6116) )
+	ROM_LOAD16_WORD_SWAP( "u22.bin",  0x200000, 0x200000, CRC(8d21caee) SHA1(2a68af8b2be2158dcb152c434e91a75871478d41) )
+	ROM_LOAD16_WORD_SWAP( "u21.bin",  0x400000, 0x200000, CRC(efe34eed) SHA1(7891495b443a5acc7b2f17fe694584f6cb0afacc) )
+
+	ROM_REGION( 0x400000, "gfx2", ROMREGION_DISPOSE )	/* Layer 0 + 1 */
+	ROM_LOAD16_WORD_SWAP( "u34.bin",  0x000000, 0x400000, CRC(2a2e2eeb) SHA1(f1d99353c0affc5c908985e6f2a5724e5223cccc) ) /* four banks of 0x100000 */
+
+	ROM_REGION( 0x400000, "ymf", 0 )	/* Samples */
+	ROM_LOAD( "u61.bin",  0x000000, 0x200000, CRC(a63633c5) SHA1(89e75a40518926ebcc7d88dea86c01ba0bb496e5) )	// 8 bit signed pcm (16KHz)
+	ROM_LOAD( "u62.bin",  0x200000, 0x200000, CRC(3ad0c357) SHA1(35f78cfa2eafa93ab96b24e336f569ee84af06b6) )
+
+	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
+	ROM_LOAD( "u1.bin",  0x000000, 0x040000, CRC(681d7d55) SHA1(b0b28471440d747adbc4d22d1918f89f6ede1615) )
+
+ROM_END
+
+ROM_START( tengaij )
+
+	ROM_REGION( 0x100000, "main", 0 )		/* Main CPU Code */
 	ROM_LOAD32_WORD_SWAP( "2-u40.bin", 0x000000, 0x080000, CRC(ab6fe58a) SHA1(6687a3af192b3eab60d75ca286ebb8e0636297b5) ) // 1&0
 	ROM_LOAD32_WORD_SWAP( "3-u41.bin", 0x000002, 0x080000, CRC(02e42e39) SHA1(6cdb7b1cebab50c0a44cd60cd437f0e878ccac5c) ) // 3&2
 
@@ -2029,10 +2050,11 @@ GAME( 1994, gunbird,  0,        gunbird,  gunbird,  gunbird,  ROT270, "Psikyo", 
 GAME( 1994, gunbirdk, gunbird,  gunbird,  gunbirdj, gunbird,  ROT270, "Psikyo", "Gunbird (Korea)", 0 )
 GAME( 1994, gunbirdj, gunbird,  gunbird,  gunbirdj, gunbird,  ROT270, "Psikyo", "Gunbird (Japan)", 0 )
 GAME( 1994, btlkroad, 0,        gunbird,  btlkroad, gunbird,  ROT0,   "Psikyo", "Battle K-Road", 0 )
-GAME( 1995, s1945,    0,        s1945,    s1945,    s1945,    ROT270, "Psikyo", "Strikers 1945", 0 )
-GAME( 1995, s1945a,   s1945,    s1945,    s1945a,   s1945a,   ROT270, "Psikyo", "Strikers 1945 (Alt)", 0) // Region dip - 0x0f=Japan, anything else=World
+GAME( 1995, s1945,    0,        s1945,    s1945,    s1945,    ROT270, "Psikyo", "Strikers 1945 (World)", 0 )
+GAME( 1995, s1945a,   s1945,    s1945,    s1945a,   s1945a,   ROT270, "Psikyo", "Strikers 1945 (Japan / World)", 0) // Region dip - 0x0f=Japan, anything else=World
 GAME( 1995, s1945j,   s1945,    s1945,    s1945j,   s1945j,   ROT270, "Psikyo", "Strikers 1945 (Japan)", 0 )
 GAME( 1995, s1945jn,  s1945,    gunbird,  s1945j,   s1945jn,  ROT270, "Psikyo", "Strikers 1945 (Japan, unprotected)", 0 )
 GAME( 1995, s1945k,   s1945,    s1945,    s1945j,   s1945,    ROT270, "Psikyo", "Strikers 1945 (Korea)", 0 )
-GAME( 1996, tengai,   0,        s1945,    tengai,   tengai,   ROT0,   "Psikyo", "Tengai / Sengoku Blade: Sengoku Ace Episode II", 0 )
+GAME( 1996, tengai,   0,        s1945,    tengai,   tengai,   ROT0,   "Psikyo", "Tengai (World)", 0 )
+GAME( 1996, tengaij,  tengai,   s1945,    tengaij,  tengai,   ROT0,   "Psikyo", "Sengoku Blade: Sengoku Ace Episode II / Tengai", 0 ) // Region dip - 0x0f=Japan, anything else=World
 
