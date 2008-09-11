@@ -32,7 +32,8 @@
 /* Player-specific states */
 enum
 {
-	LDSTATE_STEPPING_BY_PARAMETER = LDSTATE_OTHER
+	LDSTATE_STEPPING_BY_PARAMETER = LDSTATE_OTHER,
+	LDSTATE_STEPPING_BY_PARAMETER_PAUSED
 };
 
 /* Pioneer PR-8210 specific information */
@@ -314,6 +315,7 @@ static void pr8210_update_squelch(laserdisc_state *ld)
 
 		/* Simutrek: stepping by parameter with explicit audio squelch controls */
 		case LDSTATE_STEPPING_BY_PARAMETER:
+		case LDSTATE_STEPPING_BY_PARAMETER_PAUSED:
 			ldcore_set_video_squelch(ld, FALSE);
 			break;
 	}
@@ -419,12 +421,13 @@ static INT32 pr8210_update(laserdisc_state *ld, const vbi_metadata *vbi, int fie
 			player->pia[0xc0] = 0x11;
 		else if (frame != FRAME_NOT_PRESENT)
 		{
-			player->pia[0xc0] = 0x00;
+			player->pia[0xc0] = 0x02;	/* bit 0x02 must be set for forward scanning to work */
 			player->pia[0x22] = 0xf0 | ((frame / 10000) % 10);
 			player->pia[0x23] = 0xf0 | ((frame / 1000) % 10);
 			player->pia[0x24] = 0xf0 | ((frame / 100) % 10);
 			player->pia[0x25] = 0xf0 | ((frame / 10) % 10);
 			player->pia[0x26] = 0xf0 | ((frame / 1) % 10);
+printf("Frame:%05d\n", frame);
 		}
 		else if (chapter != CHAPTER_NOT_PRESENT)
 		{
@@ -432,8 +435,10 @@ static INT32 pr8210_update(laserdisc_state *ld, const vbi_metadata *vbi, int fie
 			player->pia[0x20] = 0xf0 | ((chapter / 10) % 10);
 			player->pia[0x21] = 0xf0 | ((chapter / 1) % 10);
 		}
+//		else
+//			player->pia[0xc0] = 0x00;
 	}
-	player->pia[0xc0] |= 4;//fieldnum << 2;
+	player->pia[0xc0] |= 12;//4;//fieldnum << 2;
 
 	if (spdl_on)
 		advanceby = fieldnum;
@@ -527,8 +532,18 @@ static INT32 pr8210_hle_update(laserdisc_state *ld, const vbi_metadata *vbi, int
 			{
 				/* note that we switch directly to PAUSED as we are not looking for frames */
 				advanceby = ld->state.param;
-				pr8210_switch_state(ld, LDSTATE_PAUSED, 0);
+				pr8210_switch_state(ld, LDSTATE_STEPPING_BY_PARAMETER_PAUSED, 0);
 			}
+			break;
+		
+		case LDSTATE_STEPPING_BY_PARAMETER_PAUSED:
+			/* generic pause behavior */
+			ld->state.state = LDSTATE_PAUSED;
+			advanceby = ldcore_generic_update(ld, vbi, fieldnum, curtime, &newstate);
+			if (newstate.state != LDSTATE_PAUSED)
+				pr8210_switch_state(ld, newstate.state, newstate.param);
+			else
+				ld->state.state = LDSTATE_STEPPING_BY_PARAMETER_PAUSED;
 			break;
 	}
 
@@ -869,8 +884,11 @@ static void simutrek_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 void simutrek_set_audio_squelch(const device_config *device, int state)
 {
 	laserdisc_state *ld = ldcore_get_safe_token(device);
-	int squelch = (state != ASSERT_LINE);
-	ldcore_set_audio_squelch(ld, squelch, squelch);
+	int squelch = (state == 0);
+	if (squelch)
+		ldcore_set_audio_squelch(ld, squelch, squelch);
+	else
+		ldcore_set_audio_squelch(ld, squelch, squelch);
 }
 
 
@@ -974,6 +992,7 @@ static WRITE8_HANDLER( pr8210_pia_w )
 			case 0x40:
 				if (!(data & 0x02) && (player->pia[offset] & 0x02))
 					player->framedisplay = 1;
+				printf("%03X:pia_w(%02X) = %02X\n", activecpu_get_pc(), offset, data);
 				break;
 				
 			case 0x60:
