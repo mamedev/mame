@@ -283,8 +283,8 @@ INLINE void update_audio(ldcore_data *ldcore)
 
 
 /*-------------------------------------------------
-    add_and_clamp_track - add a delta to the 
-    current track and clamp to minimum/maximum 
+    add_and_clamp_track - add a delta to the
+    current track and clamp to minimum/maximum
     values
 -------------------------------------------------*/
 
@@ -336,14 +336,14 @@ static void update_slider_pos(ldcore_data *ldcore, attotime curtime)
 	/* if not moving, update to now */
 	if (ldcore->attospertrack == 0)
 		ldcore->sliderupdate = curtime;
-	
+
 	/* otherwise, compute the number of tracks covered */
 	else
 	{
 		attoseconds_t delta = attotime_to_attoseconds(attotime_sub(curtime, ldcore->sliderupdate));
 		INT32 tracks_covered;
 
-		/* determine how many tracks we covered and advance */		
+		/* determine how many tracks we covered and advance */
 		if (ldcore->attospertrack >= 0)
 		{
 			tracks_covered = delta / ldcore->attospertrack;
@@ -373,7 +373,7 @@ static void vblank_state_changed(const device_config *screen, void *param, int v
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
 	attotime curtime = timer_get_time();
-	
+
 	/* update current track based on slider speed */
 	update_slider_pos(ldcore, curtime);
 
@@ -384,7 +384,7 @@ static void vblank_state_changed(const device_config *screen, void *param, int v
 			(*ldcore->intf.vsync)(ld);
 		return;
 	}
-	
+
 	/* on falling edge, do the bulk of the processing */
 	/* wait for previous read and decode to finish */
 	process_track_data(device);
@@ -603,7 +603,7 @@ void ldcore_set_video_squelch(laserdisc_state *ld, UINT8 squelch)
 
 
 /*-------------------------------------------------
-    ldcore_set_slider_speed - dynamically change 
+    ldcore_set_slider_speed - dynamically change
     the slider speed
 -------------------------------------------------*/
 
@@ -613,15 +613,15 @@ void ldcore_set_slider_speed(laserdisc_state *ld, INT32 tracks_per_vsync)
 	attotime vsyncperiod = video_screen_get_frame_period(ld->screen);
 
 	update_slider_pos(ldcore, timer_get_time());
-	
+
 	/* if 0, set the time to 0 */
 	if (tracks_per_vsync == 0)
 		ldcore->attospertrack = 0;
-	
+
 	/* positive values store positive times */
 	else if (tracks_per_vsync > 0)
 		ldcore->attospertrack = attotime_to_attoseconds(attotime_div(vsyncperiod, tracks_per_vsync));
-	
+
 	/* negative values store negative times */
 	else
 		ldcore->attospertrack = -attotime_to_attoseconds(attotime_div(vsyncperiod, -tracks_per_vsync));
@@ -631,7 +631,7 @@ printf("Slider speed = %d\n", tracks_per_vsync);
 
 
 /*-------------------------------------------------
-    ldcore_advance_slider - advance the slider by 
+    ldcore_advance_slider - advance the slider by
     a certain number of tracks
 -------------------------------------------------*/
 
@@ -646,7 +646,7 @@ printf("Advance by %d\n", numtracks);
 
 
 /*-------------------------------------------------
-    ldcore_get_slider_position - get the current 
+    ldcore_get_slider_position - get the current
     slider position
 -------------------------------------------------*/
 
@@ -656,7 +656,7 @@ slider_position ldcore_get_slider_position(laserdisc_state *ld)
 
 	/* update the slider position first */
 	update_slider_pos(ldcore, timer_get_time());
-	
+
 	/* return the status */
 	if (ldcore->curtrack == 1)
 		return SLIDER_MINIMUM;
@@ -1109,7 +1109,7 @@ static void custom_stream_callback(void *param, stream_sample_t **inputs, stream
 	stream_sample_t *dst1 = outputs[1];
 	INT16 leftand, rightand;
 	int samples_avail = 0;
-	
+
 	/* compute AND values based on the squelch */
 	leftand = (ldcore->audiosquelch & 1) ? 0x0000 : 0xffff;
 	rightand = (ldcore->audiosquelch & 2) ? 0x0000 : 0xffff;
@@ -1431,7 +1431,7 @@ static void init_disc(const device_config *device)
 
 	/* find the disc */
 	ldcore->disc = get_disk_handle(device->tag);
-	
+
 	/* set default parameters */
 	ldcore->width = 720;
 	ldcore->height = 240;
@@ -1454,7 +1454,7 @@ static void init_disc(const device_config *device)
 		err = chd_get_metadata(ldcore->disc, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL);
 		if (err != CHDERR_NONE)
 			fatalerror("Non-A/V CHD file specified");
-		
+
 		/* extract the metadata */
 		if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &ldcore->width, &ldcore->height, &interlaced, &channels, &ldcore->samplerate) != 7)
 			fatalerror("Invalid metadata in CHD file");
@@ -1482,7 +1482,7 @@ static void init_video(const device_config *device)
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
 	int index;
-	
+
 	/* register for VBLANK callbacks */
 	video_screen_register_vblank_callback(ld->screen, vblank_state_changed, (void *)device);
 
@@ -1605,7 +1605,7 @@ static DEVICE_START( laserdisc )
 		ldcore->config.overscalex = 1.0f;
 	if (ldcore->config.overscaley == 0)
 		ldcore->config.overscaley = 1.0f;
-		
+
 	/* initialize the various pieces */
 	init_disc(device);
 	init_video(device);
@@ -1613,7 +1613,7 @@ static DEVICE_START( laserdisc )
 
 	/* register callbacks */
 	config_register(device->machine, "laserdisc", configuration_load, configuration_save);
-	
+
 	return DEVICE_START_OK;
 }
 
@@ -1732,7 +1732,7 @@ DEVICE_GET_INFO( laserdisc )
 			intf = &ld->core->intf;
 		}
 	}
-	
+
 	/* if we don't have an interface, but we have a config, look up the interface */
 	if (intf == NULL && config != NULL)
 		for (pltype = 0; pltype < ARRAY_LENGTH(player_interfaces); pltype++)

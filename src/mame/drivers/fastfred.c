@@ -110,7 +110,7 @@ static READ8_HANDLER( jumpcoas_custom_io_r )
 }
 
 /*
-	Imago sprites DMA
+    Imago sprites DMA
 */
 
 static UINT8 imago_sprites[0x800*3];
@@ -900,7 +900,7 @@ ROM_START( imago )
 	ROM_FILL(                0x1000, 0x2000, 0 )
 
 	ROM_REGION( 0x1000, "gfx4", ROMREGION_DISPOSE )
-	ROM_LOAD( "imago15.191", 0x0000, 0x1000, CRC(85fcc195) SHA1(a76f24201c037d1e6f909fb0ea4ad59b1d6ddd57) )		
+	ROM_LOAD( "imago15.191", 0x0000, 0x1000, CRC(85fcc195) SHA1(a76f24201c037d1e6f909fb0ea4ad59b1d6ddd57) )
 
 	ROM_REGION( 0x0300, "proms", 0 )
 	ROM_LOAD( "imago.96", 0x0000, 0x0100, CRC(5ba81edc) SHA1(b64ebbe054052583688cdf0f064794436c095e7e) )

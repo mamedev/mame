@@ -1070,7 +1070,7 @@ static DEVICE_START( timer )
 			fatalerror("Unknown timer device type");
 			break;
 	}
-	
+
 	return DEVICE_START_OK;
 }
 

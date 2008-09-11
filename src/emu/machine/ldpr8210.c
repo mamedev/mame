@@ -73,7 +73,7 @@ struct _ldplayer_data
 	UINT8				cmdcnt;					/* counter for multi-byte command */
 	UINT8				cmdbytes[3];			/* storage for multi-byte command */
 	void				(*cmd_ack_callback)(void); /* callback to clear game command write flag */
-	
+
 	/* low-level emulation data */
 	int					cpunum;
 	UINT8 				pia[0x100];
@@ -230,12 +230,12 @@ INLINE void update_audio_squelch(laserdisc_state *ld)
 static void pr8210_init(laserdisc_state *ld)
 {
 	astring *tempstring = astring_alloc();
-	
+
 	/* find our CPU */
 	astring_printf(tempstring, "%s:%s", ld->device->tag, "pr8210");
 	ld->player->cpunum = mame_find_cpu_index(ld->device->machine, astring_c(tempstring));
 	astring_free(tempstring);
-	
+
 	/* do a soft reset */
 	pr8210_soft_reset(ld);
 }
@@ -435,8 +435,8 @@ printf("Frame:%05d\n", frame);
 			player->pia[0x20] = 0xf0 | ((chapter / 10) % 10);
 			player->pia[0x21] = 0xf0 | ((chapter / 1) % 10);
 		}
-//		else
-//			player->pia[0xc0] = 0x00;
+//      else
+//          player->pia[0xc0] = 0x00;
 	}
 	player->pia[0xc0] |= 12;//4;//fieldnum << 2;
 
@@ -535,7 +535,7 @@ static INT32 pr8210_hle_update(laserdisc_state *ld, const vbi_metadata *vbi, int
 				pr8210_switch_state(ld, LDSTATE_STEPPING_BY_PARAMETER_PAUSED, 0);
 			}
 			break;
-		
+
 		case LDSTATE_STEPPING_BY_PARAMETER_PAUSED:
 			/* generic pause behavior */
 			ld->state.state = LDSTATE_PAUSED;
@@ -754,7 +754,7 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 
 #if EMULATE_PR8210_ROM
 			printf("Command = %02X\n", newcommand);
-//			player->pia_porta = BITSWAP8(newcommand, 4,3,2,1,0,5,6,7);
+//          player->pia_porta = BITSWAP8(newcommand, 4,3,2,1,0,5,6,7);
 			player->pia_porta = BITSWAP8(newcommand, 0,1,2,3,4,5,6,7);
 #else
 			/* if we got a double command, act on it */
@@ -940,11 +940,11 @@ static READ8_HANDLER( pr8210_pia_r )
 		case 0xc0:
 		case 0xe0:
 			break;
-	
+
 		case 0xa0:
 //          printf("%03X:pia_r(%02X) = %02X\n", activecpu_get_pc(), offset, player->pia_porta);
 			result = player->pia_porta;
-//			player->pia_porta = 0;
+//          player->pia_porta = 0;
 			break;
 
 		default:
@@ -994,7 +994,7 @@ static WRITE8_HANDLER( pr8210_pia_w )
 					player->framedisplay = 1;
 				printf("%03X:pia_w(%02X) = %02X\n", activecpu_get_pc(), offset, data);
 				break;
-				
+
 			case 0x60:
 				printf("%03X:pia_w(%02X) = %02X (PORT B LEDS:", activecpu_get_pc(), offset, data);
 				output_set_value("pr8210_audio1", (data & 0x01) != 0);
@@ -1040,15 +1040,15 @@ static READ8_HANDLER( pr8210_bus_r )
 	/* bus bit 6: slider position limit detector, inside and outside */
 	if (sliderpos != SLIDER_MINIMUM && sliderpos != SLIDER_MAXIMUM)
 		result |= 0x40;
-	
+
 	/* bus bit 4: /FOCUS LOCK */
 	if (!focus_on)
 		result |= 0x10;
-	
+
 	/* bus bit 3: /SPDL LOCK */
 	if (!spdl_on)
 		result |= 0x08;
-	
+
 	/* bus bit 1: spindle motor stop detector */
 	if (!spdl_on)
 		result |= 0x02;

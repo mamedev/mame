@@ -1963,7 +1963,7 @@ static DEVICE_START( laserdisc )
 
 	/* register callbacks */
 	config_register(device->machine, "laserdisc", configuration_load, configuration_save);
-	
+
 	return DEVICE_START_OK;
 }
 

@@ -79,7 +79,7 @@ Note 2: Some PCBs use a TMS34010FNL-40 instead of the TMS34010FNL-50
        Service Switch        | R | 14|        Video GND
                              | S | 15|
         Coin Switch 2        | T | 16|         Coin Switch 1
-       Start Player 2        | U | 17|        Start Player 1 
+       Start Player 2        | U | 17|        Start Player 1
                              | V | 18|
                              | W | 19|
                              | X | 20|

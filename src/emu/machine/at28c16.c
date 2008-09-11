@@ -156,7 +156,7 @@ static DEVICE_START(at28c16)
 	state_save_register_item( unique_tag, 0, c->a9_12v );
 	state_save_register_item( unique_tag, 0, c->oe_12v );
 	state_save_register_item( unique_tag, 0, c->last_write );
-	
+
 	return DEVICE_START_OK;
 }
 

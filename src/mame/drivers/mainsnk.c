@@ -230,8 +230,8 @@ static INPUT_PORTS_START( mainsnk )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW2:1,2,3")
-//	PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )	// duplicate
-//	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )	// duplicate
+//  PORT_DIPSETTING(    0x01, DEF_STR( 3C_1C ) )    // duplicate
+//  PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )    // duplicate
 	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
@@ -299,7 +299,7 @@ static INPUT_PORTS_START( canvas )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x00, "5" )
 	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW1:4,5,6")
-//	PORT_DIPSETTING(    0x08, DEF_STR( 5C_1C ) )	// duplicate
+//  PORT_DIPSETTING(    0x08, DEF_STR( 5C_1C ) )    // duplicate
 	PORT_DIPSETTING(    0x10, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( 2C_1C ) )

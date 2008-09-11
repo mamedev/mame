@@ -388,7 +388,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(pang_gfxctrl_w)	/* Palette bank, layer enable, coin counters, more */
 	AM_RANGE(0x00, 0x02) AM_READ(input_r)			/* Super Pang needs a kludge to initialize EEPROM.
-													   The Mahjong games and Block Block need special input treatment */
+                                                       The Mahjong games and Block Block need special input treatment */
 	AM_RANGE(0x01, 0x01) AM_WRITE(input_w)
 	AM_RANGE(0x02, 0x02) AM_WRITE(pang_bankswitch_w)	/* Code bank register */
 	AM_RANGE(0x03, 0x03) AM_READWRITE(input_port_12_r, ym2413_data_port_0_w)		/* mgakuen only */

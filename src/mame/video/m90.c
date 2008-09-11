@@ -13,13 +13,13 @@
         Bit 0x04 - Playfield 1 width (0 is 64 tiles, 0x4 is 128 tiles)
         Bit 0x10 - Playfield 1 disable
         Bit 0x20 - Playfield 1 rowscroll enable
-		Bit 0x40 - Playfield 1 y-offset table enable
+        Bit 0x40 - Playfield 1 y-offset table enable
     12: Playfield 2 control
         Bits0x03 - Playfield 2 VRAM base
         Bit 0x04 - Playfield 2 width (0 is 64 tiles, 0x4 is 128 tiles)
         Bit 0x10 - Playfield 2 disable
         Bit 0x20 - Playfield 2 rowscroll enable
-		Bit 0x40 - Playfield 1 y-offset table enable
+        Bit 0x40 - Playfield 1 y-offset table enable
     14: Bits0x03 - Sprite/Tile Priority (related to sprite color)
 
     Emulation by Bryan McPhail, mish@tendril.co.uk, thanks to Chris Hardy!
@@ -348,7 +348,7 @@ VIDEO_UPDATE( m90 )
 		tilemap_set_scrollx( pf2_layer,0, m90_video_control_data[3]-2);
 		tilemap_set_scrollx( pf2_wide_layer,0, m90_video_control_data[3]+256-2 );
 	}
-	
+
 	fillbitmap(priority_bitmap,0,cliprect);
 
 	if (video_enable) {
@@ -367,7 +367,7 @@ VIDEO_UPDATE( m90 )
 
 				for(line = 0; line < 512; line++)
 				{
-					clip.min_y = clip.max_y = line;					
+					clip.min_y = clip.max_y = line;
 
 					if (m90_video_control_data[6] & 0x4) {
 						tilemap_set_scrolly(pf2_wide_layer, 0, m90_video_control_data[2] + m90_video_data[0xfc00/2 + line] + 128);
@@ -422,7 +422,7 @@ VIDEO_UPDATE( m90 )
 			else
 			{
 				if (m90_video_control_data[5] & 0x4) {
-					tilemap_set_scrolly( pf1_wide_layer,0, m90_video_control_data[0] );	
+					tilemap_set_scrolly( pf1_wide_layer,0, m90_video_control_data[0] );
 					tilemap_draw(bitmap,cliprect,pf1_wide_layer,0,0);
 					tilemap_draw(bitmap,cliprect,pf1_wide_layer,1,1);
 				} else {

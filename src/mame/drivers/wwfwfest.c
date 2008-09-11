@@ -398,7 +398,7 @@ static MACHINE_DRIVER_START( wwfwfest )
 	MDRV_SOUND_ROUTE(0, "mono", 0.45)
 	MDRV_SOUND_ROUTE(1, "mono", 0.45)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1024188) 
+	MDRV_SOUND_ADD("oki", OKIM6295, 1024188)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* Verified - Pin 7 tied to +5VDC */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_DRIVER_END

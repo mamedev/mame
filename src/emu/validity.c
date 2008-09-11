@@ -184,7 +184,7 @@ INLINE int validate_tag(const game_driver *driver, const char *object, const cha
 			break;
 		}
 	}
-	
+
 	if (begin == NULL)
 		begin = tag;
 	else
@@ -583,7 +583,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 					mame_printf_warning("%s: %s has empty ROM region (warning)\n", driver->source_file, driver->name);
 				items_since_region = (ROMREGION_ISERASE(romp) || ROMREGION_ISDISPOSE(romp) || ROMREGION_ISDISKDATA(romp)) ? 1 : 0;
 				currgn = NULL;
-				
+
 				/* check for a valid tag */
 				if (regiontag == NULL)
 				{
@@ -626,7 +626,7 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 						}
 					}
 				}
-				
+
 				/* validate the region tag */
 				error |= validate_tag(driver, "region", regiontag);
 			}
@@ -665,15 +665,15 @@ static int validate_roms(int drivnum, const machine_config *config, region_info 
 					}
 
 				/* if this is a bios rom, make sure it has the same flags as the last system bios entry */
-/*				bios_flags = ROM_GETBIOSFLAGS(romp);
-				if (bios_flags != 0)
-				{
-					if (bios_flags != last_bios)
-					{
-						mame_printf_error("%s: %s has bios rom name %s without preceding matching system bios definition\n", driver->source_file, driver->name, last_name);
-						error = TRUE;
-					}
-				}*/
+/*              bios_flags = ROM_GETBIOSFLAGS(romp);
+                if (bios_flags != 0)
+                {
+                    if (bios_flags != last_bios)
+                    {
+                        mame_printf_error("%s: %s has bios rom name %s without preceding matching system bios definition\n", driver->source_file, driver->name, last_name);
+                        error = TRUE;
+                    }
+                }*/
 
 				/* make sure the has is valid */
 				hash = ROM_GETHASHDATA(romp);
@@ -745,7 +745,7 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 					error = TRUE;
 				}
 		}
-				
+
 		/* validate the CPU tag */
 		error |= validate_tag(driver, "CPU", cpu->tag);
 

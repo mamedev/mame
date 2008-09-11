@@ -488,7 +488,7 @@ void device_list_start(running_machine *machine)
 		device->region = memory_region(machine, device->tag);
 		device->regionbytes = memory_region_length(machine, device->tag);
 	}
-	
+
 	/* iterate until we've started everything */
 	while (numstarted < devcount)
 	{
@@ -502,7 +502,7 @@ void device_list_start(running_machine *machine)
 				device->started = TRUE;
 			numstarted += device->started;
 		}
-		
+
 		/* if we didn't start anything new, we're in trouble */
 		if (numstarted == prevstarted)
 			fatalerror("Circular dependency in device startup; unable to start %d/%d devices\n", devcount - numstarted, devcount);

@@ -1087,7 +1087,7 @@ static device_start_err common_start( const device_config *device, int device_ty
 		state_save_register_item(unique_tag, timerno, timer->programmed);
 		state_save_register_item(unique_tag, timerno, timer->clock);
 	}
-	
+
 	return DEVICE_START_OK;
 }
 

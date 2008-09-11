@@ -800,13 +800,13 @@ const input_field_config *input_field_by_tag_and_mask(const input_port_config *p
 {
 	const input_port_config *port = input_port_by_tag(portlist, tag);
 	const input_field_config *field;
-	
+
 	/* if we got the port, look for the field */
 	if (port != NULL)
 		for (field = port->fieldlist; field != NULL; field = field->next)
 			if ((field->mask & mask) != 0)
 				return field;
-	
+
 	return NULL;
 }
 

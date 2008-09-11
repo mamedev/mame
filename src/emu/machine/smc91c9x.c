@@ -539,7 +539,7 @@ static DEVICE_START( smc91c9x )
 	state_save_register_item_array(unique_tag, 0, smc->tx);
 	state_save_register_item(unique_tag, 0, smc->sent);
 	state_save_register_item(unique_tag, 0, smc->recd);
-	
+
 	return DEVICE_START_OK;
 }
 

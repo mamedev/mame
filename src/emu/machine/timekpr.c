@@ -339,7 +339,7 @@ static DEVICE_START(timekeeper)
 	timer = timer_alloc( timekeeper_tick, c );
 	duration = ATTOTIME_IN_SEC(1);
 	timer_adjust_periodic( timer, duration, 0, duration );
-	
+
 	return DEVICE_START_OK;
 }
 

@@ -367,7 +367,7 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 	{
 		const rom_source *source;
 		const rom_entry *region;
-		
+
 		/* iterate over ROM sources: first the game, then any devices */
 		for (source = rom_first_source(game, config); source != NULL; source = rom_next_source(game, config, source))
 			for (region = rom_first_region(game, source); region != NULL; region = rom_next_region(region))

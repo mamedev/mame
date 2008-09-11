@@ -388,7 +388,7 @@ static DEVICE_START( dma8257 )
 	state_save_register_item(unique_tag, 0, dma8257->msb);
 	state_save_register_item(unique_tag, 0, dma8257->drq);
 	state_save_register_item(unique_tag, 0, dma8257->status);
-	
+
 	return DEVICE_START_OK;
 }
 

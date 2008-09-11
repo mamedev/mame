@@ -135,7 +135,7 @@ file_error core_fopen(const char *filename, UINT32 openflags, core_file **file)
 /*-------------------------------------------------
     core_fopen_ram_internal - open a RAM-based buffer
     for file-like access, possibly copying the data,
-	and return an error code
+    and return an error code
 -------------------------------------------------*/
 
 static file_error core_fopen_ram_internal(const void *data, size_t length, int copy_buffer, UINT32 openflags, core_file **file)

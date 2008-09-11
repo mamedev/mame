@@ -1724,15 +1724,15 @@ static int render_target_map_point_internal(render_target *target, INT32 target_
 			for (item = target->curview->itemlist[layer]; item != NULL; item = item->next)
 			{
 				int checkit;
-				
+
 				/* if we're looking for a particular container, verify that we have the right one */
 				if (container != NULL)
 					checkit = (item->element == NULL && container == get_screen_container_by_index(item->index));
-				
+
 				/* otherwise, assume we're looking for an input */
 				else
 					checkit = (item->input_tag[0] != 0);
-			
+
 				/* this target is worth looking at; now check the point */
 				if (checkit && target_fx >= item->bounds.x0 && target_fx < item->bounds.x1 && target_fy >= item->bounds.y0 && target_fy < item->bounds.y1)
 				{
@@ -1764,15 +1764,15 @@ int render_target_map_point_container(render_target *target, INT32 target_x, INT
 
 /*-------------------------------------------------
     render_target_map_point_input - attempts to map
-	a point on the specified render_target to the
-	specified container, if possible
+    a point on the specified render_target to the
+    specified container, if possible
 -------------------------------------------------*/
 
 int render_target_map_point_input(render_target *target, INT32 target_x, INT32 target_y, const char **input_tag, UINT32 *input_mask, float *input_x, float *input_y)
 {
 	view_item *item = NULL;
 	int result;
-	
+
 	result = render_target_map_point_internal(target, target_x, target_y, NULL, input_x, input_y, &item);
 	if (result && item != NULL)
 	{

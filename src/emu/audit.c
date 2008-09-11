@@ -123,7 +123,7 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 			}
 		}
 	}
-	
+
 	machine_config_free(config);
 	return records;
 }
@@ -373,7 +373,7 @@ static int audit_one_rom(core_options *options, const rom_entry *rom, const char
 			break;
 		}
 	}
-	
+
 	/* if not found, check the region as a backup */
 	if (record->length == 0 && regiontag != NULL)
 	{

@@ -142,7 +142,7 @@ static READ16_HANDLER( rprot_r )
    or simply throw a deliberated losing number.
 
    If someone more skilled in 68K code can help to trace it,
-   searching for an accurated response, I'll appreciate. 
+   searching for an accurated response, I'll appreciate.
 */
 	return mame_rand(machine) & 0x1f;
 }
@@ -181,7 +181,7 @@ static WRITE16_HANDLER( sderby_out_w )
     =========
     ---- ---x  Start lamp.
     ---- --x-  Bet lamp.
- 
+
     - Hbits -
     7654 3210
     =========
@@ -230,7 +230,7 @@ static WRITE16_HANDLER( scmatto_out_w )
     ---x ----  Hold5 lamp.
     --x- ----  Start lamp.
     -x-- ----  Bet lamp.
- 
+
     - Hbits -
     7654 3210
     =========
@@ -272,7 +272,7 @@ static WRITE16_HANDLER( roulette_out_w )
     ---- ---x  Start lamp.
     ---- --x-  Bet lamp.
     ---- x---  Unknown (always activated).
- 
+
 */
 	output_set_lamp_value(1, (data & 1));			/* Lamp 1 - START */
 	output_set_lamp_value(2, (data >> 1) & 1);		/* Lamp 2 - BET   */
@@ -586,7 +586,7 @@ ROM_END
 
 /* Scacco Matto / Space Win
    Playmark, 1996.
-  
+
 CPU:
 1x MC68000P12 (main)(u24)
 

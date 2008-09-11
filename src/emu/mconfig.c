@@ -27,7 +27,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 ***************************************************************************/
 
 /*-------------------------------------------------
-    create_tag - create a combined tag, 
+    create_tag - create a combined tag,
     allocating strings as necessary
 -------------------------------------------------*/
 
@@ -74,11 +74,11 @@ machine_config *machine_config_alloc(const machine_config_token *tokens)
 void machine_config_free(machine_config *config)
 {
 	int cpunum, soundnum;
-	
+
 	/* release the device list */
 	while (config->devicelist != NULL)
 		device_list_remove(&config->devicelist, config->devicelist->type, config->devicelist->tag);
-	
+
 	/* release the strings */
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(config->cputag); cpunum++)
 		if (config->cputag[cpunum] != NULL)
@@ -119,7 +119,7 @@ static cpu_config *cpu_add(machine_config *machine, const char *tag, cpu_type ty
 
 
 /*-------------------------------------------------
-    cpu_find - find a tagged CPU during machine 
+    cpu_find - find a tagged CPU during machine
     driver expansion
 -------------------------------------------------*/
 
@@ -190,7 +190,7 @@ static sound_config *sound_add(machine_config *machine, const char *tag, sound_t
 
 
 /*-------------------------------------------------
-    sound_find - find a tagged sound system during 
+    sound_find - find a tagged sound system during
     machine driver expansion
 -------------------------------------------------*/
 
@@ -208,7 +208,7 @@ static sound_config *sound_find(machine_config *machine, const char *tag)
 
 
 /*-------------------------------------------------
-    sound_remove - remove a tagged sound system 
+    sound_remove - remove a tagged sound system
     during machine driver expansion
 -------------------------------------------------*/
 
@@ -244,7 +244,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 	device_config *device = NULL;
 	sound_config *sound = NULL;
 	cpu_config *cpu = NULL;
-	
+
 	/* loop over tokens until we hit the end */
 	while (entrytype != MCONFIG_TOKEN_END)
 	{
@@ -571,7 +571,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				break;
 		}
 	}
-	
+
 	/* if we are the outermost level, process any device-specific machine configurations */
 	if (depth == 0)
 		for (device = config->devicelist; device != NULL; device = device->next)
@@ -580,6 +580,6 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 			if (tokens != NULL)
 				machine_config_detokenize(config, tokens, create_tag(tempstring, tagprefix, device->tag), depth + 1);
 		}
-	
+
 	astring_free(tempstring);
 }

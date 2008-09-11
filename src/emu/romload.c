@@ -118,11 +118,11 @@ int rom_source_is_gamedrv(const game_driver *drv, const rom_source *source)
 const rom_source *rom_first_source(const game_driver *drv, const machine_config *config)
 {
 	const device_config *device;
-	
+
 	/* if the driver has a ROM pointer, that's what we want */
 	if (drv->rom != NULL)
 		return (rom_source *)drv;
-	
+
 	/* otherwise, look through devices */
 	if (config != NULL)
 		for (device = config->devicelist; device != NULL; device = device->next)
@@ -143,7 +143,7 @@ const rom_source *rom_first_source(const game_driver *drv, const machine_config 
 const rom_source *rom_next_source(const game_driver *drv, const machine_config *config, const rom_source *previous)
 {
 	const device_config *device;
-	
+
 	/* if the previous was the driver, we want the first device */
 	if (rom_source_is_gamedrv(drv, previous))
 		device = (config != NULL) ? config->devicelist : NULL;
@@ -169,7 +169,7 @@ const rom_source *rom_next_source(const game_driver *drv, const machine_config *
 const rom_entry *rom_first_region(const game_driver *drv, const rom_source *source)
 {
 	const rom_entry *romp;
-	
+
 	if (source == NULL || rom_source_is_gamedrv(drv, source))
 		romp = drv->rom;
 	else
@@ -610,7 +610,7 @@ static int open_rom_file(running_machine *machine, rom_load_data *romdata, const
 	/* update status display */
 	++romdata->romsloaded;
 	display_loading_rom_message(machine, ROM_GETNAME(romp), romdata);
-	
+
 	/* extract CRC to use for searching */
 	has_crc = hash_data_extract_binary_checksum(ROM_GETHASHDATA(romp), HASH_CRC, crcbytes);
 	if (has_crc)
@@ -629,7 +629,7 @@ static int open_rom_file(running_machine *machine, rom_load_data *romdata, const
 				filerr = mame_fopen(SEARCHPATH_ROM, astring_c(fname), OPEN_FLAG_READ, &romdata->file);
 			astring_free(fname);
 		}
-	
+
 	/* if the region is load by name, load the ROM from there */
 	if (regiontag != NULL)
 	{
@@ -1256,7 +1256,7 @@ static void process_region_list(running_machine *machine, rom_load_data *romdata
 	for (source = rom_first_source(machine->gamedrv, machine->config); source != NULL; source = rom_next_source(machine->gamedrv, machine->config, source))
 		for (region = rom_first_region(machine->gamedrv, source); region != NULL; region = rom_next_region(region))
 			region_post_process(machine, romdata, ROMREGION_GETTAG(region));
-	
+
 	astring_free(regiontag);
 }
 
@@ -1285,7 +1285,7 @@ void rom_init(running_machine *machine)
 	/* reset the disk list */
 	chd_list = NULL;
 	chd_list_tailptr = &chd_list;
-	
+
 	/* process the ROM entries we were passed */
 	process_region_list(machine, &romdata);
 

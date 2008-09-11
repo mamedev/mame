@@ -395,7 +395,7 @@ static DEVICE_START( dma8237 ) {
 	dma8237_t	*dma8237 = get_safe_token(device);
 
 	dma8237->intf = device->static_config;
-	
+
 	return DEVICE_START_OK;
 }
 

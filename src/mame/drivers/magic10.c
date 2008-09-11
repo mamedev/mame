@@ -219,7 +219,7 @@ static WRITE16_HANDLER( magic10_out_w )
     ---x ----  Hold5 lamp.
     --x- ----  Start lamp.
     -x-- ----  Play (Bet/Take/Cancel) lamp.
- 
+
     - Hbits -
     7654 3210
     =========
@@ -228,7 +228,7 @@ static WRITE16_HANDLER( magic10_out_w )
 
 */
 
-//	popmessage("lamps: %02X", data);
+//  popmessage("lamps: %02X", data);
 
 	output_set_lamp_value(1, (data & 1));			/* Lamp 1 - HOLD 1 */
 	output_set_lamp_value(2, (data >> 1) & 1);		/* Lamp 2 - HOLD 2 */
@@ -559,7 +559,7 @@ static INPUT_PORTS_START( sgsafari )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3")               PORT_CODE(KEYCODE_C)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4 / Tail")        PORT_CODE(KEYCODE_V)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5 / Half Gamble") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )  PORT_NAME("Start") 
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_START1 )  PORT_NAME("Start")
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Play (Bet/Take/Cancel)") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -1035,7 +1035,7 @@ ROMs:
 2x M27C512 (1,2)
 1x M27C2001 (3)
 4x M27C1001 (4,5,6,7)
-  
+
 Note:
 1x JAMMA edge connector
 1x 12 legs connector (j2)

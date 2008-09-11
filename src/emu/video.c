@@ -1268,7 +1268,7 @@ static DEVICE_START( video_screen )
 	state_save_register_item(unique_tag, 0, state->vblank_end_time.attoseconds);
 	state_save_register_item(unique_tag, 0, state->frame_number);
 	state_save_register_postload(device->machine, video_screen_postload, (void *)device);
-	
+
 	return DEVICE_START_OK;
 }
 

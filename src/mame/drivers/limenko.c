@@ -126,7 +126,7 @@ static WRITE32_HANDLER( spriteram_buffer_w )
 	else
 	{
 		// draw the sprites to the frame buffer
-		draw_sprites(machine,spriteram32,&clip,prev_sprites_count);	
+		draw_sprites(machine,spriteram32,&clip,prev_sprites_count);
 	}
 
 	// buffer the next number of sprites to draw
@@ -214,7 +214,7 @@ static READ8_HANDLER( spotty_sound_r )
 }
 
 static ADDRESS_MAP_START( spotty_sound_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(spotty_sound_r, okim6295_data_0_w) //? sound latch and ?	
+	AM_RANGE(0x0001, 0x0001) AM_READWRITE(spotty_sound_r, okim6295_data_0_w) //? sound latch and ?
 	AM_RANGE(0x0003, 0x0003) AM_READWRITE(spotty_sound_cmd_r, spotty_sound_cmd_w) //not sure about anything...
 ADDRESS_MAP_END
 
@@ -332,7 +332,7 @@ static void draw_single_sprite(bitmap_t *dest_bmp,const gfx_element *gfx,
 							dest[x] = pal_base+c;
 
 						pri[x] = priority;
-						
+
 					}
 					x_index += dx;
 				}
@@ -401,13 +401,13 @@ static void draw_sprites(running_machine *machine, UINT32 *sprites, const rectan
 			continue;
 
 		draw_single_sprite(sprites_bitmap,&gfx,0,color,flipx,flipy,x,y,cliprect,pri);
-		
+
 		// wrap around x
 		draw_single_sprite(sprites_bitmap,&gfx,0,color,flipx,flipy,x-512,y,cliprect,pri);
-		
+
 		// wrap around y
 		draw_single_sprite(sprites_bitmap,&gfx,0,color,flipx,flipy,x,y-512,cliprect,pri);
-		
+
 		// wrap around x and y
 		draw_single_sprite(sprites_bitmap,&gfx,0,color,flipx,flipy,x-512,y-512,cliprect,pri);
 	}
@@ -469,7 +469,7 @@ static VIDEO_UPDATE( limenko )
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,md_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
-	
+
 	if(limenko_videoreg[0] & 8)
 		copy_sprites(screen->machine, bitmap, sprites_bitmap, cliprect);
 

@@ -537,7 +537,7 @@ static DEVICE_START( ppi8255 ) {
 	state_save_register_item_array(unique_tag, 0, ppi8255->out_mask);
 	state_save_register_item_array(unique_tag, 0, ppi8255->read);
 	state_save_register_item_array(unique_tag, 0, ppi8255->latch);
-	
+
 	return DEVICE_START_OK;
 }
 

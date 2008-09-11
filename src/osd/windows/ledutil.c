@@ -384,7 +384,7 @@ static LRESULT handle_copydata(WPARAM wparam, LPARAM lparam)
 	entry = malloc(sizeof(*entry));
 	if (entry == NULL)
 		return 0;
-		
+
 	string = malloc(strlen(data->string) + 1);
 	if (string == NULL)
 	{

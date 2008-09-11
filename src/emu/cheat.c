@@ -428,7 +428,7 @@ void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const 
 		else
 		{
 			parameter_item *item = NULL, *prev = NULL;
-		
+
 			for (item = cheat->parameter->itemlist; item != NULL; prev = item, item = item->next)
 				if (item->value == cheat->parameter->value)
 					break;

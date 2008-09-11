@@ -984,7 +984,7 @@ static void match_roms(const char *hash, int length, int *found)
 						mame_printf_info("= %s%-20s  %s\n", baddump ? "(BAD) " : "", ROM_GETNAME(rom), drivers[drvindex]->description);
 						(*found)++;
 					}
-		
+
 		machine_config_free(config);
 	}
 }

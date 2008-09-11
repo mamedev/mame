@@ -746,7 +746,7 @@ static device_start_err common_start(const device_config *device, int device_typ
 	state_save_register_item(unique_tag, 0, mc6845->light_pen_latched);
 	state_save_register_item(unique_tag, 0, mc6845->cursor_state);
 	state_save_register_item(unique_tag, 0, mc6845->cursor_blink_count);
-	
+
 	return DEVICE_START_OK;
 }
 

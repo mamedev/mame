@@ -839,7 +839,7 @@ static DEVICE_START( cdp1869 )
 	state_save_register_item(unique_tag, 0, cdp1869->toneamp);
 	state_save_register_item(unique_tag, 0, cdp1869->wnfreq);
 	state_save_register_item(unique_tag, 0, cdp1869->wnamp);
-	
+
 	return DEVICE_START_OK;
 }
 
