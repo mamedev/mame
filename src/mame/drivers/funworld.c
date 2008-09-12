@@ -29,6 +29,7 @@
     * Pool 10 (italian, set 1),                         C.M.C.,             1996.
     * Pool 10 (italian, set 2),                         C.M.C.,             1996.
     * Pool 10 (italian, set 3),                         C.M.C.,             1996.
+    * Pool 10 (italian, set 4),                         C.M.C.,             1997.
     * Tortuga Family (italian),                         C.M.C.,             1997.
     * Pot Game (italian),                               C.M.C.,             1996.
     * Royal Card (austrian, set 1),                     TAB-Austria,        1991.
@@ -407,6 +408,7 @@
     ---------------------------------------------------
 
 
+
     Jolly Card (austrian, Funworld, bootleg)
     ----------------------------------------
 
@@ -421,6 +423,7 @@
     - 1x Crystal : 16.000 MHz
 
 
+
     Jolly Card (other)
     ------------------
 
@@ -433,6 +436,7 @@
           - 1x KM6264AL-10
 
     - 1x Crystal : 16.000 MHz
+
 
 
     Jolly Card (italian, blue Tab board, encrypted)
@@ -456,6 +460,7 @@
     - 1x trimmer (volume)(missing)
 
 
+
     Big Deal (hungarian)
     ------------------
 
@@ -463,6 +468,7 @@
     - 1x YM2149F
     - 2x MC6821P
     - 1x Crystal 16.000 MHz
+
 
 
     Magic Card II (bulgarian)
@@ -474,6 +480,7 @@
     - 2x MC6821P
     - 1x Crystal 16.000 MHz
     - 2x HY18CV85 (electrically-erasable PLD)
+
 
 
     Cuore Uno (italian)
@@ -495,6 +502,7 @@
     - 1x battery
 
 
+
     Elephant Family (italian, old)
     -----------------------------
 
@@ -512,6 +520,7 @@
     - 1x trimmer (volume)
     - 1x 8 DIP switches
     - 1x battery
+
 
 
     Pool 10 (italian)
@@ -535,6 +544,83 @@
     - 1x battery
 
 
+    Connector, DIPs and instructions,
+    copied from an original sheet...
+
+              Components |  | solder
+    ---------------------|--|-----------------
+                     gnd |01| gnd
+                     gnd |02| gnd
+                      +5 |03| +5
+                      +5 |04| +5
+                         |06|
+                     +12 |07| +5
+                         |08| contatore out
+            motor hopper |09| contatore in
+                   audio |10| audio
+               sw hopper |11| gnd
+                   rosso |12| verde
+                     blu |13| sync
+                     gnd |14| statistic
+              manegement |15|
+                  coin 1 |16| coin 2
+               sw ticket |17| motor ticket
+                  hold 3 |18| lamp hold 3
+                  hold 4 |19| lamp hold 4
+                  hold 2 |20| lamp hold 2
+                  hold 1 |21| lamp hold 1
+                  hold 5 |22| lamp hold 5
+                   start |23| lamp hold start
+                  cancel |24| lamp hold cancel
+                      nc |25| +5 lamp
+    ric. ticket + hopper |26| +12 lamp
+                     gnd |27| gnd
+                     gnd |28| gnd
+
+
+    DIPS
+                          1    2   3   4   5   6   7   8
+                         on
+                         off
+    ticket + hopper           on  on
+    hopper                    on  off
+    ticket                    off on
+    no ticket - no hopper     off off
+    1 coin 1 credit                   off off
+    1 coin 5 credits                  off on
+    1 coin 10 credits                 on  off
+    1 coin 50 credits                 on  on
+    five of kind yes                          off
+    five of kind no                           on
+    royal flush yes                               off
+    royal flush no                                on
+    in test                                           on
+    in game                                           off
+
+
+    Instructions:
+
+    STATISTICS = show in and out credits
+    MANEGEMENT = It's the general statistic. It shows in and out credits.
+
+    To cancel statistics press CANCEL for 5 seconds.
+    To change max and min value for play connect to GND the manegement pin,
+    at the same time press toghether HOLD 2 + HOLD 4 for some seconds.
+
+    The following menu will show up:
+
+    HOLD 1 = modify max value for play 1 to 10.
+    HOLD 2 = modify min value foe play 1 to 5.
+    Press start to exit from programming mode.
+
+    To unlock PCB from a possible lock:
+    connect GND to pins component15 and solder14 for 5 seconds
+
+    NB. Use lamps by 12V 0,15W
+    Memory version: V16
+
+
+
     Tortuga Family (italian) & Pot Game (italian)
     ---------------------------------------------
 
@@ -553,6 +639,7 @@
     - 1x trimmer (volume)
     - 1x 8 DIP switches
     - 1x battery
+
 
 
     Royal Card (set 1)
@@ -579,6 +666,7 @@
     - 1x trimmer (volume)
 
 
+
     Royal Card (set 2)
     ------------------
 
@@ -595,6 +683,7 @@
     - 1x 3 legs connector (solder side)
     - 1x 8 DIP Switches
     - 1x trimmer (volume)
+
 
 
     Royal Card (set 3, encrypted)
@@ -617,6 +706,7 @@
     - 1x 82S147 PROM (near Yamaha and unknown 40pin) - "82s147.bin"
     - 1x 27256 close to CPU module - "1.bin"
     - 2x 27256 - gfx - "2.bin", "3.bin"
+
 
 
     Mongolfier New
@@ -642,6 +732,7 @@
     - 1x green led
 
 
+
     Soccer New (italian)
     --------------------
 
@@ -664,6 +755,7 @@
     - 2x 8 DIP switches
     - 1x 4 DIP switches
     - 1x green led
+
 
 
     Saloon (France, encrypted)
@@ -870,6 +962,12 @@
 
     [2008/07/30]
     - Added new clone: Pool 10 (italian, set 3).
+    - Updated technical notes.
+
+    [2008/09/12]
+    - Added new clone: Pool 10 (italian, set 4).
+    - Improved lamps layout for all games.
+    - Added Pool 10 pinout and DIP switches info.
     - Updated technical notes.
 
 
@@ -1992,9 +2090,9 @@ ROM_START( pool10 )
 	ROM_LOAD( "n82s147an_p10.u25",    0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "palce16v8h_p10.u5",  0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "gal20v8b_p10.u22", 0x0200, 0x0157, NO_DUMP ) /* GAL is read protected */
-	ROM_LOAD( "gal20v8b_p10.u23", 0x0400, 0x0157, NO_DUMP ) /* GAL is read protected */
+	ROM_LOAD( "palce16v8h_p10.u5", 0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "gal20v8b_p10.u22",  0x0200, 0x0157, NO_DUMP ) /* GAL is read protected */
+	ROM_LOAD( "gal20v8b_p10.u23",  0x0400, 0x0157, NO_DUMP ) /* GAL is read protected */
 ROM_END
 
 ROM_START( pool10b )	/* this set should be the parent */
@@ -2028,9 +2126,26 @@ ROM_START( pool10c )
 	ROM_LOAD( "n82s147an_p10.u25",    0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
 
 	ROM_REGION( 0x0600, "plds", 0 )
-	ROM_LOAD( "palce16v8h_p10.u5",  0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
-	ROM_LOAD( "gal20v8b_p10.u22", 0x0200, 0x0157, NO_DUMP ) /* GAL is read protected */
-	ROM_LOAD( "gal20v8b_p10.u23", 0x0400, 0x0157, NO_DUMP ) /* GAL is read protected */
+	ROM_LOAD( "palce16v8h_p10.u5", 0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "gal20v8b_p10.u22",  0x0200, 0x0157, NO_DUMP ) /* GAL is read protected */
+	ROM_LOAD( "gal20v8b_p10.u23",  0x0400, 0x0157, NO_DUMP ) /* GAL is read protected */
+ROM_END
+
+ROM_START( pool10d )
+	ROM_REGION( 0x18000, "main", 0 )
+	ROM_LOAD( "3.50.u2", 0x8000, 0x10000, CRC(4c68e1f4) SHA1(bbab63a18e0c041ce519daa32e12dd1b6a672dce) )
+
+	ROM_REGION( 0x10000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "2.u21", 0x0000, 0x8000, CRC(99c8c074) SHA1(f8082b08e895cbcd028a2b7cd961a7a2c8b2762c) )
+	ROM_LOAD( "1.u20", 0x8000, 0x8000, CRC(9abedd0c) SHA1(f184a82e8ec2387069d631bcb77e890acd44b3f5) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "n82s147an_p10.u25",    0x0000, 0x0200, CRC(1de03d14) SHA1(d8eda20865c1d885a428931f4380032e103b252c) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "palce16v8h_p10.u5", 0x0000, 0x0117, NO_DUMP ) /* PAL is read protected */
+	ROM_LOAD( "gal20v8b_p10.u22",  0x0200, 0x0157, NO_DUMP ) /* GAL is read protected */
+	ROM_LOAD( "gal20v8b_p10.u23",  0x0400, 0x0157, NO_DUMP ) /* GAL is read protected */
 ROM_END
 
 ROM_START( tortufam )
@@ -2517,6 +2632,7 @@ GAME( 1996, elephfmb, elephfam, cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",   
 GAME( 1996, pool10,   0,        cuoreuno, pool10,   funworld, ROT0, "C.M.C.",          "Pool 10 (italian, set 1)",                        0 )
 GAME( 1996, pool10b,  pool10,   cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Pool 10 (italian, set 2)",                        0 )
 GAME( 1996, pool10c,  pool10,   cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Pool 10 (italian, set 3)",                        0 )
+GAME( 1997, pool10d,  pool10,   cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Pool 10 (italian, set 4)",                        0 )
 GAME( 1997, tortufam, 0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Tortuga Family (italian)",                        0 )
 GAME( 1996, potgame,  0,        cuoreuno, cuoreuno, funworld, ROT0, "C.M.C.",          "Pot Game (italian)",                              0 )
 GAME( 1991, royalcrd, 0,        royalcrd, royalcrd, funworld, ROT0, "TAB-Austria",     "Royal Card (austrian, set 1)",                    0 )

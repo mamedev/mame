@@ -8008,6 +8008,7 @@ Other Sun games
 	DRIVER( pool10 )	/* (c) 1996 C.M.C. */
 	DRIVER( pool10b )	/* (c) 1996 C.M.C. */
 	DRIVER( pool10c )	/* (c) 1996 C.M.C. */
+	DRIVER( pool10d )	/* (c) 1997 C.M.C. */
 	DRIVER( tortufam )	/* (c) 1997 C.M.C. */
 	DRIVER( potgame )	/* (c) 1996 C.M.C. */
 	DRIVER( royalcrd )	/* (c) 1991 TAB-Austria */
@@ -8075,7 +8076,7 @@ Other Sun games
 	DRIVER( suprpool )	/* (c) 1997 ABM Games */
 	DRIVER( hotslot )	/* (c) 1996 ABM Electronics */
 	DRIVER( mcolors )	/* 1999 unknown */
-	DRIVER( sgsafari )	/* 1996 New Impeuropex Corp. */
+	DRIVER( sgsafari )	/* (c) 1996 New Impeuropex Corp. */
 	DRIVER( galaxi )	/* (c) 2000 BRL S.R.L. Bologna */
 	DRIVER( magjoker )	/* (c) 2000 BRL S.R.L. Bologna */
 	DRIVER( dwarfd )	/* (c) 198? Electro-Sports */

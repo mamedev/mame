@@ -1,70 +1,91 @@
 <?xml version="1.0"?>
 <mamelayout version="2">
 	<element name="hold1" defstate="1">
-		<rect>
+		<rect state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
 		</rect>
-		<text string="HOLD 1" state="1">
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 1">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
 
 	<element name="hold2" defstate="1">
-		<rect>
+		<rect state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
 		</rect>
-		<text string="HOLD 2" state="1">
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 2">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
 
 	<element name="hold3" defstate="1">
-		<rect>
+		<rect state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
 		</rect>
-		<text string="HOLD 3" state="1">
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 3">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
 
 	<element name="hold4" defstate="1">
-		<rect>
+		<rect state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
 		</rect>
-		<text string="HOLD 4" state="1">
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 4">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
 
 	<element name="hold5" defstate="1">
-		<rect>
+		<rect state="1">
 			<color red="1.0" green="0.0" blue="0.0" />
 		</rect>
-		<text string="HOLD 5" state="1">
+		<rect state="0">
+			<color red="0.3" green="0.0" blue="0.0" />
+		</rect>
+		<text string="HOLD 5">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
 
 	<element name="cancel" defstate="1">
-		<rect>
+		<rect state="1">
 			<color red="0.0" green="1.0" blue="0.0" />
 		</rect>
-		<text string="CANCEL" state="1">
+		<rect state="0">
+			<color red="0.0" green="0.3" blue="0.0" />
+		</rect>
+		<text string="CANCEL">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
 	</element>
 
 	<element name="start" defstate="1">
-		<rect>
+		<rect state="1">
 			<color red="0.0" green="1.0" blue="0.0" />
 		</rect>
-		<text string="START" state="1">
+		<rect state="0">
+			<color red="0.0" green="0.3" blue="0.0" />
+		</rect>
+		<text string="START">
 			<color red="0.0" green="0.0" blue="0.0" />
 			<bounds x="0" y="0.1" width="1" height="0.8" />
 		</text>
