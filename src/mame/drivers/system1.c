@@ -121,6 +121,44 @@ static WRITE8_HANDLER( system1_soundport_w )
 	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));
 }
 
+/* protection values from real hardware, these were verified to be the same on the title
+   screen and in the first level... they're all jumps that the MCU appears to put in RAM
+   at some point */
+static const int shtngtab[]=
+{
+	0xC3,0xC1,0x39,
+	0xC3,0x6F,0x0A,
+	0xC3,0x56,0x39,
+	0xC3,0x57,0x0C,
+	0xC3,0xE2,0x0B,
+	0xC3,0x68,0x03,
+	0xC3,0xF1,0x06,
+	0xC3,0xCA,0x06,
+	0xC3,0xC4,0x06,
+	0xC3,0xD6,0x07,
+	0xC3,0x89,0x13,
+	0xC3,0x75,0x13,
+	0xC3,0x9F,0x13,
+	0xC3,0xFF,0x38,
+	0xC3,0x60,0x13,
+	0xC3,0x62,0x00,
+	0xC3,0x39,0x04,
+	-1
+};
+
+static WRITE8_HANDLER(mcuenable_hack_w)
+{
+	//in fact it's gun feedback write, not mcu related
+	int i=0;
+	while(shtngtab[i]>=0)
+	{
+		system1_ram[i+0x40]=shtngtab[i];
+		i++;
+	}
+
+	system1_ram[0x2ff]=0x49; // I ?
+	system1_ram[0x3ff]=0x54; // T ?
+}
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -238,7 +276,7 @@ static ADDRESS_MAP_START( nobo_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("P2")
@@ -246,158 +284,105 @@ static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("DSW2")	/* DIP2 */
 	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("DSW2")	/* DIP2 blckgalb reads it from here */
 	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("DSW1")	/* DIP1 some games read it from here... */
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")	/* DIP1 ... and some others from here */
-												/* but there are games which check BOTH! */
-
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")	/* DIP1 ... and some others from here but there are games which check BOTH! */
 	AM_RANGE(0x11, 0x11) AM_READ_PORT("DSW2")	/* DIP2 ... blockgal */
-
-
-	AM_RANGE(0x15, 0x15) AM_READ(system1_videomode_r)
-	AM_RANGE(0x19, 0x19) AM_READ(system1_videomode_r)    /* mirror address */
+	AM_RANGE(0x14, 0x14) AM_WRITE(system1_soundport_w)	/* sound commands */
+	AM_RANGE(0x15, 0x15) AM_READWRITE(system1_videomode_r, system1_videomode_w)	/* video control and (in some games) bank switching */
+	AM_RANGE(0x18, 0x18) AM_WRITE(system1_soundport_w)	/* mirror address */
+	AM_RANGE(0x19, 0x19) AM_READWRITE(system1_videomode_r, system1_videomode_w)    /* mirror address */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x14, 0x14) AM_WRITE(system1_soundport_w)    /* sound commands */
-	AM_RANGE(0x15, 0x15) AM_WRITE(system1_videomode_w)    /* video control and (in some games) bank switching */
-	AM_RANGE(0x18, 0x18) AM_WRITE(system1_soundport_w)    /* mirror address */
-	AM_RANGE(0x19, 0x19) AM_WRITE(system1_videomode_w)    /* mirror address */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( wbml_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( wbml_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("P2")
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("DSW2")	/* DIP2 */
 	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("DSW1")	/* DIP1 some games read it from here... */
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")	/* DIP1 ... and some others from here */
-												/* but there are games which check BOTH! */
-	AM_RANGE(0x15, 0x15) AM_READ(system1_videomode_r)
-	AM_RANGE(0x16, 0x16) AM_READ(wbml_videoram_bank_latch_r)
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")	/* DIP1 ... and some others from here but there are games which check BOTH! */
+	AM_RANGE(0x14, 0x14) AM_WRITE(system1_soundport_w)    /* sound commands */
+	AM_RANGE(0x15, 0x15) AM_READWRITE(system1_videomode_r, chplft_videomode_w)
+	AM_RANGE(0x16, 0x16) AM_READWRITE(wbml_videoram_bank_latch_r, wbml_videoram_bank_latch_w)
 	AM_RANGE(0x19, 0x19) AM_READ(system1_videomode_r)  /* mirror address */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sht_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( sht_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 /*  AM_RANGE(0x00, 0x00) AM_READ_PORT("P1") */
 /*  AM_RANGE(0x04, 0x04) AM_READ_PORT("P2") */
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("DSW2")	/* DIP2 */
 	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("DSW1")	/* DIP1 some games read it from here... */
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")	/* DIP1 ... and some others from here */
-												/* but there are games which check BOTH! */
-
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1") AM_WRITE(mcuenable_hack_w) 
+												/* DIP1 ... and some others from here but there are games which check BOTH! */
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("TRIGGER")
-
+	AM_RANGE(0x14, 0x14) AM_WRITE(system1_soundport_w)	/* sound commands */
+	AM_RANGE(0x15, 0x15) AM_READWRITE(system1_videomode_r, chplft_videomode_w)
+	AM_RANGE(0x16, 0x16) AM_READWRITE(wbml_videoram_bank_latch_r, wbml_videoram_bank_latch_w)
+	AM_RANGE(0x18, 0x18) AM_READ_PORT("18")				/* ?? */
+	AM_RANGE(0x19, 0x19) AM_READ(system1_videomode_r)	/* mirror address */
 	AM_RANGE(0x1c, 0x1c) AM_READ_PORT("GUNX")
 	AM_RANGE(0x1d, 0x1d) AM_READ_PORT("GUNY")
-
-	AM_RANGE(0x18, 0x18) AM_READ_PORT("18")		/* ?? */
-
-
-	AM_RANGE(0x15, 0x15) AM_READ(system1_videomode_r)
-	AM_RANGE(0x16, 0x16) AM_READ(wbml_videoram_bank_latch_r)
-	AM_RANGE(0x19, 0x19) AM_READ(system1_videomode_r)  /* mirror address */
 ADDRESS_MAP_END
 
-
-
-static ADDRESS_MAP_START( nobo_readport, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( nobo_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
 	AM_RANGE(0x04, 0x04) AM_READ_PORT("P2")
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("DSW2")			/* DIP2 */
-	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("DSW1")			/* DIP1 some games read it from here... */
-	AM_RANGE(0x15, 0x15) AM_READ(system1_videomode_r)
-	AM_RANGE(0x16, 0x16) AM_READ(inport16_r)			/* Used - check code at 0x05cb */
-	AM_RANGE(0x1c, 0x1c) AM_READ(inport1c_r)			/* Shouldn't be called ! */
-	AM_RANGE(0x22, 0x22) AM_READ(inport22_r)			/* Used - check code at 0xb253 */
-	AM_RANGE(0x23, 0x23) AM_READ(inport23_r)			/* Used - check code at 0xb275 and 0xb283 */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( wbml_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x14, 0x14) AM_WRITE(system1_soundport_w)    /* sound commands */
-	AM_RANGE(0x15, 0x15) AM_WRITE(chplft_videomode_w)
-	AM_RANGE(0x16, 0x16) AM_WRITE(wbml_videoram_bank_latch_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( hvymetal_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x18, 0x18) AM_WRITE(system1_soundport_w)    /* sound commands */
-	AM_RANGE(0x19, 0x19) AM_WRITE(hvymetal_videomode_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( brain_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x18, 0x18) AM_WRITE(system1_soundport_w)    /* sound commands */
-	AM_RANGE(0x19, 0x19) AM_WRITE(brain_videomode_w)
-ADDRESS_MAP_END
-
-/* protection values from real hardware, these were verified to be the same on the title
-   screen and in the first level... they're all jumps that the MCU appears to put in RAM
-   at some point */
-static const int shtngtab[]=
-{
-	0xC3,0xC1,0x39,
-	0xC3,0x6F,0x0A,
-	0xC3,0x56,0x39,
-	0xC3,0x57,0x0C,
-	0xC3,0xE2,0x0B,
-	0xC3,0x68,0x03,
-	0xC3,0xF1,0x06,
-	0xC3,0xCA,0x06,
-	0xC3,0xC4,0x06,
-	0xC3,0xD6,0x07,
-	0xC3,0x89,0x13,
-	0xC3,0x75,0x13,
-	0xC3,0x9F,0x13,
-	0xC3,0xFF,0x38,
-	0xC3,0x60,0x13,
-	0xC3,0x62,0x00,
-	0xC3,0x39,0x04,
-	-1
-};
-static WRITE8_HANDLER(mcuenable_hack_w)
-{
-	//in fact it's gun feedback write, not mcu related
-	int i=0;
-	while(shtngtab[i]>=0)
-	{
-		system1_ram[i+0x40]=shtngtab[i];
-		i++;
-	}
-
-	system1_ram[0x2ff]=0x49; // I ?
-	system1_ram[0x3ff]=0x54; // T ?
-}
-
-static ADDRESS_MAP_START( sht_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10,0x10) AM_WRITE(mcuenable_hack_w)
-
-	AM_RANGE(0x14, 0x14) AM_WRITE(system1_soundport_w)    /* sound commands */
-	AM_RANGE(0x15, 0x15) AM_WRITE(chplft_videomode_w)
-
-	AM_RANGE(0x16, 0x16) AM_WRITE(wbml_videoram_bank_latch_w)
-ADDRESS_MAP_END
-
-
-static ADDRESS_MAP_START( chplft_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x14, 0x14) AM_WRITE(system1_soundport_w)    /* sound commands */
-	AM_RANGE(0x15, 0x15) AM_WRITE(chplft_videomode_w)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( nobo_writeport, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("DSW2")		/* DIP2 */
+	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("DSW1")		/* DIP1 some games read it from here... */
 	AM_RANGE(0x14, 0x14) AM_WRITE(system1_soundport_w)	/* sound commands ? */
-	AM_RANGE(0x15, 0x15) AM_WRITE(brain_videomode_w)	/* video control + bank switching */
-	AM_RANGE(0x16, 0x16) AM_WRITE(outport16_w)			/* Used - check code at 0x05cb */
-	AM_RANGE(0x17, 0x17) AM_WRITE(outport17_w)			/* Not handled in emul. of other SS1/2 games */
+	AM_RANGE(0x15, 0x15) AM_READWRITE(system1_videomode_r, brain_videomode_w)	/* video control + bank switching */
+	AM_RANGE(0x16, 0x16) AM_READWRITE(inport16_r, outport16_w)	/* Used - check code at 0x05cb */
+	AM_RANGE(0x17, 0x17) AM_WRITE(outport17_w)		/* Not handled in emul. of other SS1/2 games */
+	AM_RANGE(0x1c, 0x1c) AM_READ(inport1c_r)		/* Shouldn't be called ! */
+	AM_RANGE(0x22, 0x22) AM_READ(inport22_r)		/* Used - check code at 0xb253 */
+	AM_RANGE(0x23, 0x23) AM_READ(inport23_r)		/* Used - check code at 0xb275 and 0xb283 */
 	AM_RANGE(0x24, 0x24) AM_WRITE(outport24_w)			/* Used - check code at 0xb24e and 0xb307 */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( hvymetal_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("P2")
+	AM_RANGE(0x08, 0x08) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("DSW2")	/* DIP2 */
+	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("DSW1")	/* DIP1 some games read it from here... */
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")	/* DIP1 ... and some others from here but there are games which check BOTH! */
+	AM_RANGE(0x15, 0x15) AM_READ(system1_videomode_r)
+	AM_RANGE(0x16, 0x16) AM_READ(wbml_videoram_bank_latch_r)
+	AM_RANGE(0x18, 0x18) AM_WRITE(system1_soundport_w)    /* sound commands */
+	AM_RANGE(0x19, 0x19) AM_READWRITE(system1_videomode_r, hvymetal_videomode_w)  /* mirror address */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( brain_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("P2")
+	AM_RANGE(0x08, 0x08) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("DSW2")	/* DIP2 */
+	AM_RANGE(0x0e, 0x0e) AM_READ_PORT("DSW2")	/* DIP2 blckgalb reads it from here */
+	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("DSW1")	/* DIP1 some games read it from here... */
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")	/* DIP1 ... and some others from here but there are games which check BOTH! */
+	AM_RANGE(0x11, 0x11) AM_READ_PORT("DSW2")	/* DIP2 ... blockgal */
+	AM_RANGE(0x15, 0x15) AM_READ(system1_videomode_r)
+	AM_RANGE(0x18, 0x18) AM_WRITE(system1_soundport_w)	/* sound commands */
+	AM_RANGE(0x19, 0x19) AM_READWRITE(system1_videomode_r, brain_videomode_w)	/* mirror address */
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( chplft_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READ_PORT("P1")
+	AM_RANGE(0x04, 0x04) AM_READ_PORT("P2")
+	AM_RANGE(0x08, 0x08) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("DSW2")	/* DIP2 */
+	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("DSW1")	/* DIP1 some games read it from here... */
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1")	/* DIP1 ... and some others from here but there are games which check BOTH! */
+	AM_RANGE(0x14, 0x14) AM_WRITE(system1_soundport_w)    /* sound commands */
+	AM_RANGE(0x15, 0x15) AM_READWRITE(system1_videomode_r, chplft_videomode_w)
+	AM_RANGE(0x16, 0x16) AM_READ(wbml_videoram_bank_latch_r)
+	AM_RANGE(0x19, 0x19) AM_READ(system1_videomode_r)  /* mirror address */
 ADDRESS_MAP_END
 
 
@@ -1810,7 +1795,7 @@ static MACHINE_DRIVER_START( system1 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", Z80, XTAL_4MHz)	/* My Hero has 2 OSCs 8 & 20 MHz (Cabbe Info) */
 	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,writeport)
+	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("sound", Z80, XTAL_4MHz)
@@ -1874,7 +1859,7 @@ static MACHINE_DRIVER_START( hvymetal )
 	MDRV_IMPORT_FROM( system1 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(brain_readmem,writemem)
-	MDRV_CPU_IO_MAP(wbml_readport,hvymetal_writeport)
+	MDRV_CPU_IO_MAP(hvymetal_io_map,0)
 
 	MDRV_MACHINE_RESET(system1_banked)
 
@@ -1887,7 +1872,7 @@ static MACHINE_DRIVER_START( chplft )
 	MDRV_IMPORT_FROM( system1 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(brain_readmem,chplft_writemem)
-	MDRV_CPU_IO_MAP(wbml_readport,chplft_writeport)
+	MDRV_CPU_IO_MAP(chplft_io_map,0)
 
 	MDRV_MACHINE_RESET(system1_banked)
 
@@ -1904,7 +1889,7 @@ static MACHINE_DRIVER_START( brain )
 	MDRV_IMPORT_FROM( system1 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(brain_readmem,writemem)
-	MDRV_CPU_IO_MAP(readport,brain_writeport)
+	MDRV_CPU_IO_MAP(brain_io_map,0)
 
 	MDRV_MACHINE_RESET(system1_banked)
 
@@ -1917,7 +1902,7 @@ static MACHINE_DRIVER_START( wbml )
 	MDRV_IMPORT_FROM( system1 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(wbml_readmem,wbml_writemem)
-	MDRV_CPU_IO_MAP(wbml_readport,wbml_writeport)
+	MDRV_CPU_IO_MAP(wbml_io_map,0)
 
 	MDRV_MACHINE_RESET(wbml)
 
@@ -1933,7 +1918,7 @@ static MACHINE_DRIVER_START( shtngmst )
 	MDRV_IMPORT_FROM( system1 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(brain_readmem,chplft_writemem)
-	MDRV_CPU_IO_MAP(sht_readport,sht_writeport)
+	MDRV_CPU_IO_MAP(sht_io_map,0)
 
 	MDRV_MACHINE_RESET(system1_banked)
 
@@ -1953,7 +1938,7 @@ static MACHINE_DRIVER_START( noboranb )
 	MDRV_IMPORT_FROM( system1 )
 	MDRV_CPU_REPLACE( "main", Z80, 8000000)    /* ? guess ? */
 	MDRV_CPU_PROGRAM_MAP(brain_readmem,nobo_writemem)
-	MDRV_CPU_IO_MAP(nobo_readport,nobo_writeport)
+	MDRV_CPU_IO_MAP(nobo_io_map,0)
 
 	MDRV_MACHINE_RESET(system1_banked)
 
