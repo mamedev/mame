@@ -102,74 +102,10 @@ static void namconb1_install_palette(running_machine *machine)
 	}
 } /* namconb1_install_palette */
 
-/**
- * MCU simulation.  It manages coinage, input ports, and presumably
- * communication with the sound CPU.
- */
-static void
-handle_mcu( running_machine *machine )
-{
-	static int toggle;
-	static UINT16 credits;
-	static int old_coin_state;
-	static UINT16 old_p1;
-	static UINT16 old_p2;
-	static UINT16 old_p3;
-	static UINT16 old_p4;
-	int new_coin_state = input_port_read(machine, "COIN") & 0x3;	/* coin1,2 */
-	UINT16 dsw = input_port_read(machine, "DSW");
-	UINT16 p1 = input_port_read(machine, "P1");
-	UINT16 p2 = input_port_read(machine, "P2");
-	UINT16 p3;
-	UINT16 p4;
-
-	toggle = !toggle;
-	if(toggle)
-		dsw &= ~0x80;
-
-	if(cpunum_is_suspended(1, SUSPEND_REASON_HALT))
-		return;
-
-	if( namcos2_gametype == NAMCONB2_MACH_BREAKERS )
-	{
-		p3 = input_port_read_safe(machine, "P3", 0);
-		p4 = input_port_read_safe(machine, "P4", 0);
-	}
-	else
-	{
-		p3 = 0;
-		p4 = 0;
-	}
-
-	p1 = (p1&(~old_p1))|(p1<<8);
-	p2 = (p2&(~old_p2))|(p2<<8);
-	p3 = (p3&(~old_p3))|(p3<<8);
-	p4 = (p4&(~old_p4))|(p4<<8);
-
-	old_p1 = p1;
-	old_p2 = p2;
-	old_p3 = p3;
-	old_p4 = p4;
-
-	namcoc7x_soundram16_w(machine, 0x6000/2, dsw, 0xffff);
-	namcoc7x_soundram16_w(machine, 0x6002/2, p1, 0xffff);
-	namcoc7x_soundram16_w(machine, 0x6004/2, p2, 0xffff);
-	namcoc7x_soundram16_w(machine, 0x6006/2, p3, 0xffff);
-	namcoc7x_soundram16_w(machine, 0x6008/2, p4, 0xffff);
-
-	if( new_coin_state && !old_coin_state )
-	{
-		credits++;
-	}
-	old_coin_state = new_coin_state;
- 	namcoc7x_soundram16_w(machine, 0x601e/2, credits, 0xffff);
-} /* handle_mcu */
-
 static void
 video_update_common(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int bROZ )
 {
 	int pri;
-	handle_mcu(machine);
 	namconb1_install_palette(machine);
 
 	if( bROZ )
