@@ -32,11 +32,16 @@ Notes:
 - Fixed the 3rd background offset to Galaxi.
 - Remapped inputs to match the standard poker games.
 
+[12/09/2008] (Roberto Fresca)
+
+- Added lamps support to magjoker & galaxi.
+
 
 ***************************************************************************/
 
 #include "driver.h"
 #include "sound/okim6295.h"
+#include "galaxi.lh"
 
 /***************************************************************************
                                 Video Hardware
@@ -177,14 +182,25 @@ static WRITE16_HANDLER( galaxi_500004_w )
 {
 	if ( ACCESSING_BITS_0_7 )
 	{
-		set_led_status(0, data & 0x0001);	// hold 1
-		set_led_status(1, data & 0x0002);	// hold 2
-		set_led_status(2, data & 0x0004);	// hold 3
-		set_led_status(3, data & 0x0008);	// hold 4
-		set_led_status(4, data & 0x0010);	// hold 5
-		set_led_status(5, data & 0x0020);	// start
-		set_led_status(6, data & 0x0020);	// payout
-		set_led_status(7, data & 0x0020);	// hopper
+	/*
+	    - Lbits -
+		7654 3210
+		=========
+		---- ---x  Hold1 lamp.
+		---- --x-  Hold2 lamp.
+		---- -x--  Hold3 lamp.
+		---- x---  Hold4 lamp.
+		---x ----  Hold5 lamp.
+		--x- ----  Start lamp.
+		-x-- ----  Payout.
+
+	*/
+		output_set_lamp_value(1, (data & 1));			/* Lamp 1 - HOLD 1 */
+		output_set_lamp_value(2, (data >> 1) & 1);		/* Lamp 2 - HOLD 2 */
+		output_set_lamp_value(3, (data >> 2) & 1);		/* Lamp 3 - HOLD 3 */
+		output_set_lamp_value(4, (data >> 3) & 1);		/* Lamp 4 - HOLD 4 */
+		output_set_lamp_value(5, (data >> 4) & 1);		/* Lamp 5 - HOLD 5 */
+		output_set_lamp_value(6, (data >> 5) & 1);		/* Lamp 6 - START  */
 	}
 	if ( ACCESSING_BITS_8_15 )
 	{
@@ -393,5 +409,6 @@ ROM_END
                                Game Drivers
 ***************************************************************************/
 
-GAME( 2000, galaxi,   0,  galaxi,   galaxi,   0, ROT0, "B.R.L.", "Galaxi (v2.0)",               0 )
-GAME( 2000, magjoker, 0,  magjoker, magjoker, 0, ROT0, "B.R.L.", "Magic Joker (v1.25.10.2000)", 0 )
+/*     YEAR  NAME      PARENT  MACHINE   INPUT     INIT  ROT    COMPANY   FULLNAME                      FLAGS  LAYOUT  */
+GAMEL( 2000, galaxi,   0,      galaxi,   galaxi,   0,    ROT0, "B.R.L.", "Galaxi (v2.0)",               0,     layout_galaxi )
+GAMEL( 2000, magjoker, 0,      magjoker, magjoker, 0,    ROT0, "B.R.L.", "Magic Joker (v1.25.10.2000)", 0,     layout_galaxi )

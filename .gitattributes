@@ -2455,6 +2455,7 @@ src/mame/layout/dlair.lay svneol=native#text/plain
 src/mame/layout/elecyoyo.lay svneol=native#text/plain
 src/mame/layout/firebeat.lay svneol=native#text/plain
 src/mame/layout/funworld.lay svneol=native#text/plain
+src/mame/layout/galaxi.lay -text svneol=native#plain/text
 src/mame/layout/geebee.lay svneol=native#text/plain
 src/mame/layout/gldncrwn.lay svneol=native#text/plain
 src/mame/layout/goldnpkr.lay svneol=native#text/plain

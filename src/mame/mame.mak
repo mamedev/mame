@@ -1713,6 +1713,8 @@ $(DRIVERS)/firebeat.o:	$(LAYOUT)/firebeat.lh
 
 $(DRIVERS)/funworld.o:	$(LAYOUT)/funworld.lh
 
+$(DRIVERS)/galaxi.o:	$(LAYOUT)/galaxi.lh
+
 $(DRIVERS)/gatron.o:	$(LAYOUT)/poker41.lh \
 						$(LAYOUT)/pulltabs.lh
 
