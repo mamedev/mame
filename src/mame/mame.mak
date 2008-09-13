@@ -502,6 +502,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/destroyr.o $(VIDEO)/destroyr.o \
 	$(DRIVERS)/dragrace.o $(AUDIO)/dragrace.o $(VIDEO)/dragrace.o \
 	$(DRIVERS)/eprom.o $(VIDEO)/eprom.o \
+	$(DRIVERS)/firefox.o \
 	$(DRIVERS)/firetrk.o $(AUDIO)/firetrk.o $(VIDEO)/firetrk.o \
 	$(DRIVERS)/flyball.o $(VIDEO)/flyball.o \
 	$(DRIVERS)/foodf.o $(VIDEO)/foodf.o \

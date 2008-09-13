@@ -1,0 +1,192 @@
+/*
+ * Xicor X2212
+ *
+ * 256 x 4 bit Nonvolatile Static RAM
+ *
+ */
+
+#include "driver.h"
+#include "machine/x2212.h"
+
+#define SIZE_DATA ( 0x100 )
+
+typedef struct
+{
+	UINT8 *sram;
+	UINT8 *e2prom;
+	UINT8 *default_data;
+	int store;
+	int array_recall;
+} x2212_state;
+
+/*-------------------------------------------------
+    get_safe_token - makes sure that the passed
+    in device is, in fact, an X2212
+-------------------------------------------------*/
+
+INLINE x2212_state *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == X2212);
+
+	return (x2212_state *)device->token;
+}
+
+void x2212_write( const device_config *device, int offset, int data )
+{
+	x2212_state *c = get_safe_token(device);
+
+	c->sram[ offset ] = data;
+}
+
+
+int x2212_read( const device_config *device, int offset )
+{
+	x2212_state *c = get_safe_token(device);
+
+	return c->sram[ offset ];
+}
+
+void x2212_store( const device_config *device, int store )
+{
+	x2212_state *c = get_safe_token(device);
+
+	if( !store && c->store )
+	{
+		memcpy( c->e2prom, c->sram, SIZE_DATA );
+	}
+
+	c->store = store;
+}
+
+void x2212_array_recall( const device_config *device, int array_recall )
+{
+	x2212_state *c = get_safe_token(device);
+
+	if( !array_recall && c->array_recall )
+	{
+		memcpy( c->sram, c->e2prom, SIZE_DATA );
+	}
+
+	c->array_recall = array_recall;
+}
+
+/*-------------------------------------------------
+    device start callback
+-------------------------------------------------*/
+
+static DEVICE_START(x2212)
+{
+	x2212_state *c = get_safe_token(device);
+	const x2212_config *config;
+	char unique_tag[50];
+
+	/* validate some basic stuff */
+	assert(device != NULL);
+//  assert(device->static_config != NULL);
+	assert(device->inline_config == NULL);
+	assert(device->machine != NULL);
+	assert(device->machine->config != NULL);
+
+	c->sram = auto_malloc( SIZE_DATA );
+	c->e2prom = auto_malloc( SIZE_DATA );
+	c->store = 1;
+	c->array_recall = 1;
+
+	config = device->static_config;
+	if( config != NULL && config->data != NULL )
+	{
+		c->default_data = memory_region( device->machine, config->data );
+	}
+
+	/* create the name for save states */
+	assert( strlen( device->tag ) < 30 );
+	state_save_combine_module_and_tag( unique_tag, "x2212", device->tag );
+
+	state_save_register_item_pointer( unique_tag, 0, c->sram, SIZE_DATA );
+	state_save_register_item_pointer( unique_tag, 0, c->e2prom, SIZE_DATA );
+	state_save_register_item( unique_tag, 0, c->store );
+	state_save_register_item( unique_tag, 0, c->array_recall );
+
+	return DEVICE_START_OK;
+}
+
+/*-------------------------------------------------
+    device reset callback
+-------------------------------------------------*/
+
+static DEVICE_RESET(x2212)
+{
+}
+
+static DEVICE_NVRAM(x2212)
+{
+	x2212_state *c = get_safe_token(device);
+
+	if( read_or_write )
+	{
+		mame_fwrite( file, c->sram, SIZE_DATA );
+	}
+	else
+	{
+		if( file )
+		{
+			mame_fread( file, c->e2prom, SIZE_DATA );
+		}
+		else
+		{
+			if( c->default_data != NULL )
+			{
+				memcpy( c->e2prom, c->default_data, SIZE_DATA );
+			}
+			else
+			{
+				memset( c->e2prom, 0xff, SIZE_DATA );
+			}
+		}
+
+		memcpy( c->sram, c->e2prom, SIZE_DATA );
+	}
+}
+
+/*-------------------------------------------------
+    device set info callback
+-------------------------------------------------*/
+
+static DEVICE_SET_INFO(x2212)
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+/*-------------------------------------------------
+    device get info callback
+-------------------------------------------------*/
+
+DEVICE_GET_INFO(x2212)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(x2212_state); break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0; break; // sizeof(x2212_config)
+		case DEVINFO_INT_CLASS:					info->i = DEVICE_CLASS_PERIPHERAL; break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:				info->set_info = DEVICE_SET_INFO_NAME(x2212); break;
+		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(x2212); break;
+		case DEVINFO_FCT_STOP:					/* nothing */ break;
+		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(x2212); break;
+		case DEVINFO_FCT_NVRAM:					info->nvram = DEVICE_NVRAM_NAME(x2212); break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:					info->s = "X2212"; break;
+		case DEVINFO_STR_FAMILY:				info->s = "EEPROM"; break;
+		case DEVINFO_STR_VERSION:				info->s = "1.0"; break;
+		case DEVINFO_STR_SOURCE_FILE:			info->s = __FILE__; break;
+		case DEVINFO_STR_CREDITS:				info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+	}
+}
