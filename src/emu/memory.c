@@ -1675,7 +1675,9 @@ static void memory_init_cpudata(running_machine *machine)
 			for (entrynum = 0; entrynum < ENTRY_COUNT; entrynum++)
 			{
 				space->read.handlers[entrynum].handler.generic = get_static_handler(space->dbits, 0, spacenum, entrynum);
+				space->read.handlers[entrynum].object = machine;
 				space->write.handlers[entrynum].handler.generic = get_static_handler(space->dbits, 1, spacenum, entrynum);
+				space->write.handlers[entrynum].object = machine;
 			}
 
 			/* make sure we fix up the mask for the unmap and watchpoint handlers */
