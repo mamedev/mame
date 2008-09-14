@@ -310,7 +310,6 @@ SOUNDDEFS += -DHAS_NAMCO_15XX=$(if $(filter NAMCO_15XX,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_NAMCO_CUS30=$(if $(filter NAMCO_CUS30,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_NAMCO_52XX=$(if $(filter NAMCO_52XX,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_NAMCO_63701X=$(if $(filter NAMCO_63701X,$(SOUNDS)),1,0)
-SOUNDDEFS += -DHAS_NAMCONA=$(if $(filter NAMCONA,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_C140=$(if $(filter C140,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_C352=$(if $(filter C352,$(SOUNDS)),1,0)
 
@@ -324,10 +323,6 @@ endif
 
 ifneq ($(filter NAMCO_63701X,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/n63701x.o
-endif
-
-ifneq ($(filter NAMCONA,$(SOUNDS)),)
-SOUNDOBJS += $(SOUNDOBJ)/namcona.o
 endif
 
 ifneq ($(filter C140,$(SOUNDS)),)
