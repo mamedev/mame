@@ -7061,6 +7061,7 @@ Other Sun games
 	DRIVER( powerbal )	/* (c) 1994 */
 	DRIVER( powerbls )	/* (c) 1994 */
 	DRIVER( magicstk )	/* (c) 1995 */
+	DRIVER( hotminda )	/* (c) 1995 */
 	DRIVER( bigtwin )	/* (c) 1995 */
 	DRIVER( wbeachvl )	/* (c) 1995 */
 	DRIVER( wbeachv2 )	/* (c) 1995 */
@@ -7651,9 +7652,9 @@ Other Sun games
 	DRIVER( skattv )	/* (c) 1994 */
 	DRIVER( skattva )	/* (c) 1995 */
 	DRIVER( fashiong )	/* (c) 1997 */
-	
+
 	/* Other games on adp hardware */
-	DRIVER( funlddlx )	/* (c) 1999 */	
+	DRIVER( funlddlx )	/* (c) 1999 */
 
 	/* JPM Give us a Break hardware */
 	DRIVER( guab )		/* (c) 1986 */
