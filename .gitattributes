@@ -2985,6 +2985,7 @@ src/mame/video/jagobj.c svneol=native#text/plain
 src/mame/video/jaguar.c svneol=native#text/plain
 src/mame/video/jailbrek.c svneol=native#text/plain
 src/mame/video/jalblend.c svneol=native#text/plain
+src/mame/video/jalblend.h svneol=native#text/plain
 src/mame/video/jedi.c svneol=native#text/plain
 src/mame/video/jpmimpct.c svneol=native#text/plain
 src/mame/video/kan_panb.c svneol=native#text/plain

@@ -1,12 +1,13 @@
 /***************************************************************************
   Psychic 5
+  Bombs Away
 
   Functions to emulate the video hardware of the machine.
 
 ***************************************************************************/
 
 #include "driver.h"
-#include "jalblend.c"
+#include "jalblend.h"
 
 #define	BG_SCROLLX_LSB		0x308
 #define	BG_SCROLLX_MSB		0x309
@@ -16,9 +17,12 @@
 #define	BG_PAL_INTENSITY_RG	0x1fe
 #define	BG_PAL_INTENSITY_BU	0x1ff
 
-static int ps5_vram_page;
-static int bg_clip_mode;
-static int title_screen;
+static UINT8 ps5_vram_page;
+static UINT8 bg_clip_mode;
+static UINT8 title_screen;
+static UINT8 psychic5_bg_status;
+
+static UINT8 *ps5_pagedram[2];
 
 /* Paged RAM 0 */
 static UINT8 *psychic5_bg_videoram;
@@ -31,287 +35,308 @@ static UINT8 *psychic5_fg_videoram;
 
 static tilemap *bg_tilemap, *fg_tilemap;
 
-MACHINE_RESET( psychic5 )
+static int bg_palette_ram_base;
+static int bg_palette_base;
+
+static UINT16 palette_intensity;
+
+static UINT8 bombsa_unknown;
+
+
+/***************************************************************************
+  Palette color
+***************************************************************************/
+
+static void psychic5_change_palette(running_machine *machine, int color, int offset)
 {
-	bg_clip_mode = -10;
-	flip_screen_set(0);
+	UINT8 lo = ps5_palette_ram[offset & ~1];
+	UINT8 hi = ps5_palette_ram[offset | 1];
+	if (jal_blend_table != NULL) jal_blend_table[color] = hi & 0x0f;
+	palette_set_color_rgb(machine, color, pal4bit(lo >> 4), pal4bit(lo), pal4bit(hi >> 4));
 }
 
-WRITE8_HANDLER( psychic5_vram_page_select_w )
+static void psychic5_change_bg_palette(running_machine *machine, int color, int lo_offs, int hi_offs)
 {
-	ps5_vram_page = data;
+	UINT8 r,g,b,lo,hi,ir,ig,ib,ix;
+	rgb_t irgb;
+
+	/* red,green,blue intensities */
+	ir = pal4bit(palette_intensity >> 12);
+	ig = pal4bit(palette_intensity >>  8);
+	ib = pal4bit(palette_intensity >>  4);
+	ix = palette_intensity & 0x0f;
+
+	irgb = MAKE_RGB(ir,ig,ib);
+
+	lo = ps5_palette_ram[lo_offs];
+	hi = ps5_palette_ram[hi_offs];
+
+	/* red,green,blue component */
+	r = pal4bit(lo >> 4);
+	g = pal4bit(lo);
+	b = pal4bit(hi >> 4);
+
+	/* Grey background enable */
+	if (psychic5_bg_status & 2)
+	{
+		UINT8 val = (r + g + b) / 3;		/* Grey */
+		/* Just leave plain grey */
+		palette_set_color(machine,color,jal_blend_func(MAKE_RGB(val,val,val),irgb,ix));
+	}
+	else
+	{
+		/* Seems fishy, but the title screen would be black otherwise... */
+		if (!(title_screen & 1))
+		{
+			/* Leave the world as-is */
+			palette_set_color(machine,color,jal_blend_func(MAKE_RGB(r,g,b),irgb,ix));
+		}
+	}
 }
+
+static void set_background_palette_intensity(running_machine *machine)
+{
+	int i;
+	palette_intensity = ps5_palette_ram[BG_PAL_INTENSITY_BU] |
+						(ps5_palette_ram[BG_PAL_INTENSITY_RG]<<8);
+
+	/* for all of the background palette */
+	for (i = 0; i < 0x100; i++)
+		psychic5_change_bg_palette(machine,bg_palette_base+i,bg_palette_ram_base+i*2,bg_palette_ram_base+i*2+1);
+}
+
+
+/***************************************************************************
+  Memory handler
+***************************************************************************/
 
 READ8_HANDLER( psychic5_vram_page_select_r )
 {
 	return ps5_vram_page;
 }
 
+WRITE8_HANDLER( psychic5_vram_page_select_w )
+{
+	ps5_vram_page = data & 1;
+}
+
 WRITE8_HANDLER( psychic5_title_screen_w )
 {
-	title_screen = data & 0x01;
-}
-
-static void psychic5_paletteram_w(running_machine *machine, int color_offs, int offset, int data)
-{
-	int r,g,b,a,val;
-
-	ps5_palette_ram[offset] = data;
-
-	/* red component */
-	r  = (ps5_palette_ram[offset & ~1] >> 4) & 0x0f ;
-
-	/* green component */
-	g  = (ps5_palette_ram[offset & ~1]) & 0x0f ;
-
-	/* blue component */
-	b  = (ps5_palette_ram[offset | 1] >> 4) & 0x0f ;
-
-	/* "alpha" component */
-	val  = (ps5_palette_ram[offset | 1] & 0x0f) & 0x0f ;
-	a = (val << 4) | val ;
-
-	jal_blend_table[(offset / 2)-color_offs] = a ;
-
-	palette_set_color_rgb(machine,(offset / 2)-color_offs,pal4bit(r),pal4bit(g),pal4bit(b));
-}
-
-static void set_background_palette_intensity(running_machine *machine)
-{
-	int i,r,g,b,val,lo,hi,ir,ig,ib,ix;
-
-	/* red,green,blue intensites */
-	ir = ps5_palette_ram[BG_PAL_INTENSITY_RG] >> 4 ;  ir = (ir << 4) | ir ;
-	ig = ps5_palette_ram[BG_PAL_INTENSITY_RG] & 15 ;  ig = (ig << 4) | ig ;
-	ib = ps5_palette_ram[BG_PAL_INTENSITY_BU] >> 4 ;  ib = (ib << 4) | ib ;
-	ix = ps5_palette_ram[0x1ff] & 0x0f ;
-
-	/* for all of the background palette */
-	for (i = 0; i < 0x100; i++)
-	{
-		lo = ps5_palette_ram[0x400+i*2];
-		hi = ps5_palette_ram[0x400+i*2+1];
-
-		/* red component */
-		val  = (lo  >> 4) & 0x0f;
-		r = (val << 4) | val ;
-
-		/* green component */
-		val  = (lo  & 15) & 0x0f;
-		g = (val << 4) | val ;
-
-		/* blue component */
-		val =  (hi  >> 4) & 0x0f;
-		b = (val << 4) | val ;
-
-		/* Grey background enable */
-		if (ps5_io_ram[BG_SCREEN_MODE] & 0x02)
-		{
-			val = (UINT8)((r + g + b) / 3);		/* Grey */
-
-			if (ix != 0x0)						/* Tint the grey */
-			{
-				UINT32 result = jal_blend_func(MAKE_RGB(val,val,val), MAKE_RGB(ir, ig, ib), jal_blend_table[0xff]) ;
-				palette_set_color(machine, 0x100+i, result) ;
-			}
-			else								/* Just leave plain grey */
-			{
-				palette_set_color(machine,0x100+i,MAKE_RGB(val,val,val));
-			}
-		}
-		else
-		{
-			/* Seems fishy, but the title screen would be black otherwise... */
-			if (!title_screen)
-			{
-				if (ix != 0x0)		/* Tint the world */
-				{
-					UINT32 result = jal_blend_func(MAKE_RGB(r, g, b), MAKE_RGB(ir, ig, ib), jal_blend_table[0xff]) ;
-					palette_set_color(machine, 0x100+i, result) ;
-				}
-				else				/* Leave the world as-is */
-				{
-					palette_set_color(machine,0x100+i,MAKE_RGB(r,g,b)) ;
-				}
-			}
-		}
-	}
-}
-
-
-static WRITE8_HANDLER( psychic5_bg_videoram_w )
-{
-	psychic5_bg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
-}
-
-static WRITE8_HANDLER( psychic5_fg_videoram_w )
-{
-	psychic5_fg_videoram[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset / 2);
+	title_screen = data;
 }
 
 READ8_HANDLER( psychic5_paged_ram_r )
 {
-	int val;
+	if (ps5_vram_page == 1)
+	{
+		switch (offset)
+		{
+			case 0x00: return input_port_read(machine, "SYSTEM");
+			case 0x01: return input_port_read(machine, "P1");
+			case 0x02: return input_port_read(machine, "P2");
+			case 0x03: return input_port_read(machine, "DSW1");
+			case 0x04: return input_port_read(machine, "DSW2");
+		}
+	}
 
-	if (!ps5_vram_page)
-	{
-		if (offset < 0x1000)
-			return psychic5_bg_videoram[offset];
-		else
-			return ps5_dummy_bg_ram[offset & 0xfff];
-	}
-	else
-	{
-		if (offset < 0x400)
-		{
-			val = 0;
-			switch(offset)
-			{
-				case 0x00:
-					val = input_port_read(machine, "IN0");
-					break;
-				case 0x01:
-					val = input_port_read(machine, "P1");
-					break;
-				case 0x02:
-					val = input_port_read(machine, "P2");
-					break;
-				case 0x03:
-					val = input_port_read(machine, "DSW0");
-					break;
-				case 0x04:
-					val = input_port_read(machine, "DSW1");
-					break;
-				default:
-					val = ps5_io_ram[offset];
-			}
-			return (val);
-		}
-		else if (offset < 0x1000)
-		{
-			return ps5_palette_ram[offset-0x400];
-		}
-		else
-		{
-			return psychic5_fg_videoram[offset & 0xfff];
-		}
-	}
+	return ps5_pagedram[ps5_vram_page][offset];
 }
 
 WRITE8_HANDLER( psychic5_paged_ram_w )
 {
-	if (!ps5_vram_page)
+	ps5_pagedram[ps5_vram_page][offset] = data;
+
+	if (ps5_vram_page == 0)
 	{
-		if (offset < 0x1000)
-			psychic5_bg_videoram_w(machine,offset,data);
-		else
-			ps5_dummy_bg_ram[offset & 0xfff] = data;
+		if (offset <= 0xfff)
+			tilemap_mark_tile_dirty(bg_tilemap, offset >> 1);
 	}
 	else
 	{
-		if (offset < 0x400)
+		if (offset == BG_SCROLLX_LSB || offset == BG_SCROLLX_MSB)
 		{
-			ps5_io_ram[offset] = data;
+			UINT16 bg_scrollx = ps5_io_ram[BG_SCROLLX_LSB] | (ps5_io_ram[BG_SCROLLX_MSB] << 8);
+			tilemap_set_scrollx(bg_tilemap, 0, bg_scrollx);
 		}
-		else if (offset < 0x600)
+		else if (offset == BG_SCROLLY_LSB || offset == BG_SCROLLY_MSB)
 		{
-			psychic5_paletteram_w(machine, 000, offset-0x400, data);
+			UINT16 bg_scrolly = ps5_io_ram[BG_SCROLLY_LSB] | (ps5_io_ram[BG_SCROLLY_MSB] << 8);
+			tilemap_set_scrolly(bg_tilemap, 0, bg_scrolly);
 		}
-		else if (offset > 0x5ff && offset< 0x800)
+		else if (offset == BG_SCREEN_MODE)
 		{
-			ps5_palette_ram[offset-0x400] = data;
+			psychic5_bg_status = ps5_io_ram[BG_SCREEN_MODE];
 		}
-		else if (offset > 0x7ff && offset < 0xa00)
-		{
-			psychic5_paletteram_w(machine, 256, offset-0x400, data);
-		}
-		else if (offset > 0x9ff && offset < 0xc00)
-		{
-			psychic5_paletteram_w(machine, 256, offset-0x400, data);
-		}
-		else if (offset < 0x1000)
-		{
-			ps5_palette_ram[offset-0x400] = data;
-		}
-		else
-		{
-			psychic5_fg_videoram_w(machine, offset & 0xfff, data);
-		}
+		else if (offset >= 0x400 && offset <= 0x5ff)	/* Sprite color */
+			psychic5_change_palette(machine,((offset >> 1) & 0xff)+0x000,offset-0x400);
+		else if (offset >= 0x800 && offset <= 0x9ff)	/* BG color */
+			psychic5_change_palette(machine,((offset >> 1) & 0xff)+0x100,offset-0x400);
+		else if (offset >= 0xa00 && offset <= 0xbff)	/* Text color */
+			psychic5_change_palette(machine,((offset >> 1) & 0xff)+0x200,offset-0x400);
+		else if (offset >= 0x1000)
+			tilemap_mark_tile_dirty(fg_tilemap, (offset-0x1000) >> 1);
 	}
 }
 
+WRITE8_HANDLER( bombsa_paged_ram_w )
+{
+	ps5_pagedram[ps5_vram_page][offset] = data;
+
+	if (ps5_vram_page == 0)
+	{
+		tilemap_mark_tile_dirty(bg_tilemap, offset >> 1);
+	}
+	else
+	{
+		if (offset == BG_SCROLLX_LSB || offset == BG_SCROLLX_MSB)
+		{
+			UINT16 bg_scrollx = ps5_io_ram[BG_SCROLLX_LSB] | (ps5_io_ram[BG_SCROLLX_MSB] << 8);
+			tilemap_set_scrollx(bg_tilemap, 0, bg_scrollx);
+		}
+		else if (offset == BG_SCROLLY_LSB || offset == BG_SCROLLY_MSB)
+		{
+			UINT16 bg_scrolly = ps5_io_ram[BG_SCROLLY_LSB] | (ps5_io_ram[BG_SCROLLY_MSB] << 8);
+			tilemap_set_scrolly(bg_tilemap, 0, bg_scrolly);
+		}
+		else if (offset == BG_SCREEN_MODE)
+		{
+			psychic5_bg_status = ps5_io_ram[BG_SCREEN_MODE];
+		}
+		else if (offset >= 0x0800 && offset <= 0x0fff)
+			tilemap_mark_tile_dirty(fg_tilemap, (offset & 0x7ff) >> 1);
+		else if (offset >= 0x1000 && offset <= 0x15ff)
+			psychic5_change_palette(machine, (offset >> 1) & 0x3ff, offset-0x1000);
+	}
+}
+
+WRITE8_HANDLER( bombsa_unknown_w )
+{
+	bombsa_unknown = data;
+}
+
+
+/***************************************************************************
+  Callbacks for the tilemap code
+***************************************************************************/
+
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int offs = tile_index * 2;
+	int offs = tile_index << 1;
 	int attr = psychic5_bg_videoram[offs + 1];
-	int code = psychic5_bg_videoram[offs] + ((attr & 0xc0) << 2);
+	int code = psychic5_bg_videoram[offs] | ((attr & 0xc0) << 2);
 	int color = attr & 0x0f;
-	int flags = ((attr & 0x10) ? TILE_FLIPX : 0) + ((attr & 0x20) ? TILE_FLIPY : 0);
+	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
 	SET_TILE_INFO(1, code, color, flags);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int offs = tile_index * 2;
+	int offs = tile_index << 1;
 	int attr = psychic5_fg_videoram[offs + 1];
-	int code = psychic5_fg_videoram[offs] + ((attr & 0xc0) << 2);
+	int code = psychic5_fg_videoram[offs] | ((attr & 0xc0) << 2);
 	int color = attr & 0x0f;
-	int flags = ((attr & 0x10) ? TILE_FLIPX : 0) + ((attr & 0x20) ? TILE_FLIPY : 0);
+	int flags = TILE_FLIPYX((attr & 0x30) >> 4);
 
 	SET_TILE_INFO(2, code, color, flags);
 }
 
+
+/***************************************************************************
+  Initialize and destroy video hardware emulation
+***************************************************************************/
+
 VIDEO_START( psychic5 )
 {
-	psychic5_bg_videoram = auto_malloc(0x1000);
-	psychic5_fg_videoram = auto_malloc(0x1000);
-	ps5_dummy_bg_ram = auto_malloc(0x1000);
-	ps5_io_ram = auto_malloc(0x400);
-	ps5_palette_ram = auto_malloc(0xc00);
-	jal_blend_table = auto_malloc(0xc00);
-
-	memset(psychic5_bg_videoram, 0,0x1000);
-	memset(psychic5_fg_videoram,0,0x1000);
-	memset(ps5_dummy_bg_ram,0,0x1000);
-	memset(ps5_io_ram,0,0x400);
-	memset(ps5_palette_ram,0,0xc00);
-	memset(jal_blend_table,0,0xc00) ;
-
-	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,
-		 16, 16, 64, 32);
-
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,
-		 8, 8, 32, 32);
+	/*                          info              offset             w   h  col  row */
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols, 16, 16, 64, 32);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,  8,  8, 32, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 15);
+
+	ps5_pagedram[0] = auto_malloc(0x2000);
+	ps5_pagedram[1] = auto_malloc(0x2000);
+
+	psychic5_bg_videoram  = &ps5_pagedram[0][0x0000];
+	ps5_dummy_bg_ram      = &ps5_pagedram[0][0x1000];
+	ps5_io_ram            = &ps5_pagedram[1][0x0000];
+	ps5_palette_ram       = &ps5_pagedram[1][0x0400];
+	psychic5_fg_videoram  = &ps5_pagedram[1][0x1000];
+
+	jal_blend_table = auto_malloc(0xc00);
+
+	bg_palette_ram_base = 0x400;
+	bg_palette_base = 0x100;
 }
 
-#define DRAW_SPRITE(code, sx, sy) jal_blend_drawgfx(machine, bitmap, machine->gfx[0], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 15);
-/* #define DRAW_SPRITE(code, sx, sy) drawgfx(bitmap, machine->gfx[0], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 15); */
+VIDEO_START( bombsa )
+{
+	/*                          info              offset             w   h   col  row */
+	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols, 16, 16, 128, 32);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_cols,  8,  8,  32, 32);
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+	tilemap_set_transparent_pen(fg_tilemap, 15);
+
+	ps5_pagedram[0] = auto_malloc(0x2000);
+	ps5_pagedram[1] = auto_malloc(0x2000);
+
+	psychic5_bg_videoram  = &ps5_pagedram[0][0x0000];
+	ps5_dummy_bg_ram      = &ps5_pagedram[0][0x1000];
+	ps5_io_ram            = &ps5_pagedram[1][0x0000];
+	psychic5_fg_videoram  = &ps5_pagedram[1][0x0800];
+	ps5_palette_ram       = &ps5_pagedram[1][0x1000];
+
+	//jal_blend_table = auto_malloc(0xc00);
+	jal_blend_table = NULL;
+
+	bg_palette_ram_base = 0x000;
+	bg_palette_base = 0x000;
+}
+
+VIDEO_RESET( psychic5 )
+{
+	bg_clip_mode = 0;
+	ps5_vram_page = 0;
+	psychic5_bg_status = 0;
+	memset(ps5_pagedram[0],0,0x2000);
+	memset(ps5_pagedram[1],0,0x2000);
+	palette_intensity = 0;
+	if (jal_blend_table != NULL) memset(jal_blend_table,0,0xc00);
+}
+
+VIDEO_RESET( bombsa )
+{
+	ps5_vram_page = 0;
+	psychic5_bg_status = 0;
+	title_screen = 0;
+	memset(ps5_pagedram[0],0,0x2000);
+	memset(ps5_pagedram[1],0,0x2000);
+	palette_intensity = 0;
+	if (jal_blend_table != NULL) memset(jal_blend_table,0,0xc00);
+}
+
+
+/***************************************************************************
+  Screen refresh
+***************************************************************************/
+
+#define DRAW_SPRITE(code, sx, sy) jal_blend_drawgfx(machine, bitmap, machine->gfx[0], code, color, flipx, flipy, sx, sy, cliprect, TRANSPARENCY_PEN, 15);
+
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 
-	if (title_screen)
-		return;
-	else
-		bg_clip_mode = -10;
-
-	for (offs = 11; offs < spriteram_size; offs += 16)
+	/* Draw the sprites */
+	for (offs = 0; offs < spriteram_size; offs += 16)
 	{
-		int tileofs0, tileofs1, tileofs2, tileofs3, temp1, temp2;
-		int attr = spriteram[offs + 2];
-		int code = spriteram[offs + 3] + ((attr & 0xc0) << 2);
-		int color = spriteram[offs + 4] & 0x0f;
+		int attr  = spriteram[offs + 13];
+		int code  = spriteram[offs + 14] | ((attr & 0xc0) << 2);
+		int color = spriteram[offs + 15] & 0x0f;
 		int flipx = attr & 0x10;
 		int flipy = attr & 0x20;
-		int sx = spriteram[offs + 1];
-		int sy = spriteram[offs];
-		int size32 = attr & 0x08;
+		int sx = spriteram[offs + 12];
+		int sy = spriteram[offs + 11];
+		int size = (attr & 0x08) ? 32:16;
 
 		if (attr & 0x01) sx -= 256;
 		if (attr & 0x04) sy -= 256;
@@ -324,31 +349,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			flipy = !flipy;
 		}
 
-		if (flipy)
+		if (size == 32)
 		{
-			tileofs0 = 1; tileofs1 = 0;	tileofs2 = 3; tileofs3 = 2;
-		}
-		else
-		{
-			tileofs0 = 0; tileofs1 = 1;	tileofs2 = 2; tileofs3 = 3;
-		}
+			int x0,x1,y0,y1;
 
-		if (flipx)
-		{
-			temp1 = tileofs0;
-			temp2 = tileofs1;
-			tileofs0 = tileofs2;
-			tileofs1 = tileofs3;
-			tileofs2 = temp1;
-			tileofs3 = temp2;
-		}
+			if (flipx) { x0 = 2; x1 = 0; }
+			else { x0 = 0; x1 = 2; }
 
-		if (size32)
-		{
-			DRAW_SPRITE(code + tileofs0, sx, sy)
-			DRAW_SPRITE(code + tileofs1, sx, sy + 16)
-			DRAW_SPRITE(code + tileofs2, sx + 16, sy)
-			DRAW_SPRITE(code + tileofs3, sx + 16, sy + 16)
+			if (flipy) { y0 = 1; y1 = 0; }
+			else { y0 = 0; y1 = 1; }
+
+			DRAW_SPRITE(code + x0 + y0, sx, sy)
+			DRAW_SPRITE(code + x0 + y1, sx, sy + 16)
+			DRAW_SPRITE(code + x1 + y0, sx + 16, sy)
+			DRAW_SPRITE(code + x1 + y1, sx + 16, sy + 16)
 		}
 		else
 		{
@@ -360,106 +374,89 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	}
 }
 
-static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
+static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	int bg_scrollx = (ps5_io_ram[BG_SCROLLX_LSB] + ((ps5_io_ram[BG_SCROLLX_MSB] & 0x03) << 8)) & 0x3ff;
-	int bg_scrolly = (ps5_io_ram[BG_SCROLLY_LSB] + ((ps5_io_ram[BG_SCROLLY_MSB] & 0x01) << 8)) & 0x1ff;
+	static int sx1 = 0, sy1 = 0, sy2 = 0;
 
-	tilemap_set_scrollx(bg_tilemap, 0, bg_scrollx);
-	tilemap_set_scrolly(bg_tilemap, 0, bg_scrolly);
+	rectangle clip = *cliprect;
 
 	set_background_palette_intensity(machine);
 
-	if (ps5_io_ram[BG_SCREEN_MODE] & 0x01)  /* background enable */
+	if (!(title_screen & 1))
 	{
-		if (title_screen)
-		{
-			rectangle clip = *cliprect;
-
-			int sx1 = spriteram[12];		/* sprite 0 */
-			int sy1 = spriteram[11];
-			int tile = spriteram[14];
-			int sy2 = spriteram[11+128];	/* sprite 8 */
-
-			if (bg_clip_mode >=0 && bg_clip_mode < 3 && sy1==240) bg_clip_mode = 0;
-			if (bg_clip_mode > 2 && bg_clip_mode < 5 && sy2==240) bg_clip_mode = -10;
-			if (bg_clip_mode > 4 && bg_clip_mode < 7 && sx1==240) bg_clip_mode = 0;
-			if (bg_clip_mode > 6 && bg_clip_mode < 9 && (sx1==240 || sx1==0)) bg_clip_mode = -10;
-
-			if (sy1!=240 && sy1!=0 && bg_clip_mode<=0)
-			{
-				if (sy1 > 128)
-					bg_clip_mode = 1;
-				else
-					bg_clip_mode = 2;
-			}
-
-			if (sy2!=240 && sy2!=0 && bg_clip_mode<=0)
-			{
-				if (sy2 > 128)
-					bg_clip_mode = 3;
-				else
-					bg_clip_mode = 4;
-			}
-
-			if (sx1!=240 && sx1!=0 && bg_clip_mode<=0 && tile==0x3c)
-			{
-				if (sx1 > 128)
-					bg_clip_mode = 5;
-				else
-					bg_clip_mode = 6;
-			}
-
-			if (sx1!=240 && sx1!=0 && bg_clip_mode<=0 && tile==0x1c)
-			{
-				if (sx1 > 128)
-					bg_clip_mode = 7;
-				else
-					bg_clip_mode = 8;
-			}
-
-			if (bg_clip_mode)
-			{
-				if (bg_clip_mode == 1)
-					clip.min_y = sy1;
-				else if (bg_clip_mode == 2)
- 					clip.max_y = sy1;
-				else if (bg_clip_mode == 3)
-					clip.max_y = sy2;
-				else if (bg_clip_mode == 4)
-					clip.min_y = sy2;
-				else if (bg_clip_mode == 5)
-					clip.min_x = sx1;
-				else if (bg_clip_mode == 6)
- 					clip.max_x = sx1;
-				else if (bg_clip_mode == 7)
-					clip.max_x = sx1;
-				else if (bg_clip_mode == 8)
-					clip.min_x = sx1;
-				else if (bg_clip_mode == -10)
-				{
-					clip.min_x = 0;
-					clip.min_y = 0;
-					clip.max_x = 0;
-					clip.max_y = 0;
-				}
-
-				fillbitmap(bitmap, get_black_pen(machine), cliprect);
-				tilemap_draw(bitmap, &clip, bg_tilemap, 0, 0);
-			}
-			else
-				tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-		}
-		else
-			tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+		bg_clip_mode = 0;
+		sx1 = sy1 = sy2 = 0;
 	}
 	else
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
+	{
+		int sy1_old = sy1;
+		int sx1_old = sx1;
+		int sy2_old = sy2;
+
+		sy1 = spriteram[11];		/* sprite 0 */
+		sx1 = spriteram[12];
+		sy2 = spriteram[11+128];	/* sprite 8 */
+
+		switch (bg_clip_mode)
+		{
+		case  0: case  4: if (sy1_old != sy1) bg_clip_mode++; break;
+		case  2: case  6: if (sy2_old != sy2) bg_clip_mode++; break;
+		case  8: case 10:
+		case 12: case 14: if (sx1_old != sx1) bg_clip_mode++; break;
+		case  1: case  5: if (sy1 == 0xf0) bg_clip_mode++; break;
+		case  3: case  7: if (sy2 == 0xf0) bg_clip_mode++; break;
+		case  9: case 11: if (sx1 == 0xf0) bg_clip_mode++; break;
+		case 13: case 15: if (sx1_old == 0xf0) bg_clip_mode++;
+		case 16: if (sy1 != 0x00) bg_clip_mode = 0; break;
+		}
+
+		switch (bg_clip_mode)
+		{
+		case  0: case  4: case  8: case 12: case 16:
+			clip.min_x = clip.max_x = clip.min_y = clip.max_y = 0;
+			break;
+		case  1: clip.min_y = sy1; break;
+		case  3: clip.max_y = sy2; break;
+		case  5: clip.max_y = sy1; break;
+		case  7: clip.min_y = sy2; break;
+		case  9: case 15: clip.min_x = sx1; break;
+		case 11: case 13: clip.max_x = sx1; break;
+		}
+
+		if (flip_screen_get())
+		{
+			int min_x,max_x,min_y,max_y;
+			min_x = 255 - clip.max_x;
+			max_x = 255 - clip.min_x;
+			min_y = 255 - clip.max_y;
+			max_y = 255 - clip.min_y;
+			clip.min_x = min_x;
+			clip.max_x = max_x;
+			clip.min_y = min_y;
+			clip.max_y = max_y;
+		}
+	}
+
+	tilemap_draw(bitmap, &clip, bg_tilemap, 0, 0);
 }
 
 VIDEO_UPDATE( psychic5 )
 {
-	draw_background(screen->machine, bitmap, cliprect);
+	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	if (psychic5_bg_status & 1)	/* Backgound enable */
+		draw_background(screen->machine, bitmap, cliprect);
+	if (!(title_screen & 1))
+		draw_sprites(screen->machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	return 0;
+}
+
+VIDEO_UPDATE( bombsa )
+{
+	if (psychic5_bg_status & 1)	/* Backgound enable */
+		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	else
+		fillbitmap(bitmap, screen->machine->pens[0x0ff], cliprect);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;

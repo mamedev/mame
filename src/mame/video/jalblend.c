@@ -11,9 +11,12 @@
 
 ****************************************************************************/
 
+#include "driver.h"
+#include "jalblend.h"
+
 
 /* each palette entry contains a fourth 'alpha' value */
-static UINT8 *jal_blend_table;
+UINT8 *jal_blend_table;
 
 /*
  * 'Alpha' Format
@@ -21,158 +24,163 @@ static UINT8 *jal_blend_table;
  *
  * Bytes     | Use
  * -76543210-+----------------
- *  xxxx---- | unknown - maybe special background?
- *  ----x--- | unknown - same as above
+ *  ----x--- | blend enable flag (?)
  *  -----x-- | red add/subtract
  *  ------x- | green add/subtract
  *  -------x | blue add/subtract
  */
 
 /* basically an add/subtract function with clamping */
-static rgb_t jal_blend_func(rgb_t dest, rgb_t addMe, UINT8 alpha)
+rgb_t jal_blend_func(rgb_t dest, rgb_t addMe, UINT8 alpha)
 {
-	int r  = (float)RGB_RED  (addMe) ;
-	int g  = (float)RGB_GREEN(addMe) ;
-	int b  = (float)RGB_BLUE (addMe) ;
+	int r, g, b;
+	int ir, ig, ib;
 
-	int rd = (float)RGB_RED  (dest) ;
-	int gd = (float)RGB_GREEN(dest) ;
-	int bd = (float)RGB_BLUE (dest) ;
+	r = (int)RGB_RED  (dest);
+	g = (int)RGB_GREEN(dest);
+	b = (int)RGB_BLUE (dest);
 
-	int finalR, finalG, finalB ;
+	ir = (int)RGB_RED  (addMe);
+	ig = (int)RGB_GREEN(addMe);
+	ib = (int)RGB_BLUE (addMe);
 
-	int subR = (alpha & 0x04) >> 2 ;
-	int subG = (alpha & 0x02) >> 1 ;
-	int subB = (alpha & 0x01) ;
+	if (alpha & 4)
+		{ r -= ir; if (r < 0) r = 0; }
+	else
+		{ r += ir; if (r > 255) r = 255; }
+	if (alpha & 2)
+		{ g -= ig; if (g < 0) g = 0; }
+	else
+		{ g += ig; if (g > 255) g = 255; }
+	if (alpha & 1)
+		{ b -= ib; if (b < 0) b = 0; }
+	else
+		{ b += ib; if (b > 255) b = 255; }
 
-	if (subR) finalR = rd - r ;
-	else      finalR = rd + r ;
-	if (finalR < 0) finalR = 0 ;
-	else if (finalR > 255) finalR = 255 ;
-
-
-	if (subG) finalG = gd - g ;
-	else      finalG = gd + g ;
-	if (finalG < 0) finalG = 0 ;
-	else if (finalG > 255) finalG = 255 ;
-
-
-	if (subB) finalB = bd - b ;
-	else      finalB = bd + b ;
-	if (finalB < 0) finalB = 0 ;
-	else if (finalB > 255) finalB = 255 ;
-
-	return MAKE_RGB((UINT8)finalR,(UINT8)finalG,(UINT8)finalB) ;
+	return MAKE_RGB(r,g,b);
 }
 
-static void jal_blend_drawgfx( running_machine *machine, bitmap_t *dest_bmp,const gfx_element *gfx,
-							   UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
-							   const rectangle *clip,int transparency,int transparent_color)
+void jal_blend_drawgfx(running_machine *machine,bitmap_t *dest_bmp,const gfx_element *gfx,
+							UINT32 code,UINT32 color,int flipx,int flipy,int offsx,int offsy,
+							const rectangle *clip,int transparency,int transparent_color)
 {
-	/* drawgfx(dest_bmp, gfx, code, color, flipx, flipy, offsx, offsy, clip, TRANSPARENCY_PEN, 15); */
-
-	int xstart, ystart, xend, yend, xinc, yinc;
-	int xtile, ytile ;
-	int code_offset = 0;
-
-	int wide = 1 ;
-	int high = 1 ;
-
-	if (flipx)	{ xstart = wide-1; xend = -1;   xinc = -1; }
-	else		{ xstart = 0;      xend = wide; xinc = +1; }
-
-	if (flipy)	{ ystart = high-1; yend = -1;   yinc = -1; }
-	else		{ ystart = 0;      yend = high; yinc = +1; }
+	if (jal_blend_table == NULL)
+	{
+		drawgfx(dest_bmp,gfx,code,color,flipx,flipy,offsx,offsy,clip,transparency,transparent_color);
+		return;
+	}
 
 	/* Start drawing */
-	if( gfx )
+	if (gfx)
 	{
-		for (ytile = ystart; ytile != yend; ytile += yinc )
+		const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
+		const UINT8 *alpha = &jal_blend_table[gfx->color_granularity * (color % gfx->total_colors)];
+		UINT8 *source_base = gfx->gfxdata + (code % gfx->total_elements) * gfx->char_modulo;
+		int x_index_base, y_index, sx, sy, ex, ey;
+		int xinc, yinc;
+
+		xinc = flipx ? -1 : 1;
+		yinc = flipy ? -1 : 1;
+
+		x_index_base = flipx ? gfx->width-1 : 0;
+		y_index = flipy ? gfx->height-1 : 0;
+
+		/* start coordinates */
+		sx = offsx;
+		sy = offsy;
+
+		/* end coordinates */
+		ex = sx + gfx->width;
+		ey = sy + gfx->height;
+
+		if (clip)
 		{
-			for (xtile = xstart; xtile != xend; xtile += xinc )
+			if (sx < clip->min_x)
+			{ /* clip left */
+				int pixels = clip->min_x-sx;
+				sx += pixels;
+				x_index_base += xinc*pixels;
+			}
+			if (sy < clip->min_y)
+			{ /* clip top */
+				int pixels = clip->min_y-sy;
+				sy += pixels;
+				y_index += yinc*pixels;
+			}
+			/* NS 980211 - fixed incorrect clipping */
+			if (ex > clip->max_x+1)
+			{ /* clip right */
+				ex = clip->max_x+1;
+			}
+			if (ey > clip->max_y+1)
+			{ /* clip bottom */
+				ey = clip->max_y+1;
+			}
+		}
+
+		if (ex > sx)
+		{ /* skip if inner loop doesn't draw anything */
+			int x, y;
+
+			/* 32-bit destination bitmap */
+			if (dest_bmp->bpp == 32)
 			{
-				const pen_t *pal = &machine->pens[gfx->color_base + gfx->color_granularity * (color % gfx->total_colors)];
-				const UINT8 *alpha = &jal_blend_table[gfx->color_granularity * (color % gfx->total_colors)];
-				int source_base = ((code + code_offset++) % gfx->total_elements) * gfx->height;
-
-				int x_index_base, y_index, sx, sy, ex, ey;
-
-				if (flipx)	{ x_index_base = gfx->width-1; }
-				else		{ x_index_base = 0; }
-
-				if (flipy)	{ y_index = gfx->height-1; }
-				else		{ y_index = 0; }
-
-				/* start coordinates */
-				sx = offsx + xtile*gfx->width;
-				sy = offsy + ytile*gfx->height;
-
-				/* end coordinates */
-				ex = sx + gfx->width;
-				ey = sy + gfx->height;
-
-				if( clip )
+				/* taken from case 7: TRANSPARENCY_ALPHARANGE */
+				for (y = sy; y < ey; y++)
 				{
-					if( sx < clip->min_x)
-					{ /* clip left */
-						int pixels = clip->min_x-sx;
-						sx += pixels;
-						x_index_base += xinc*pixels;
-					}
-					if( sy < clip->min_y )
-					{ /* clip top */
-						int pixels = clip->min_y-sy;
-						sy += pixels;
-						y_index += yinc*pixels;
-					}
-					/* NS 980211 - fixed incorrect clipping */
-					if( ex > clip->max_x+1 )
-					{ /* clip right */
-						int pixels = ex-clip->max_x-1;
-						ex -= pixels;
-					}
-					if( ey > clip->max_y+1 )
-					{ /* clip bottom */
-						int pixels = ey-clip->max_y-1;
-						ey -= pixels;
-					}
-				}
-
-				if( ex>sx )
-				{ /* skip if inner loop doesn't draw anything */
-					int y;
-
-					/* taken from case 7: TRANSPARENCY_ALPHARANGE */
-					UINT8 *source = gfx->gfxdata + (source_base + y_index)*gfx->line_modulo + x_index_base;
-					UINT32 *dest = (UINT32 *)dest_bmp->base + sy*dest_bmp->rowpixels + sx;
-					int src_modulo = yinc*gfx->line_modulo - xinc*(ex-sx);
-					int dst_modulo = dest_bmp->rowpixels - (ex-sx);
-
-					for( y=sy; y<ey; y++ )
+					UINT8 *source = source_base + y_index*gfx->line_modulo;
+					UINT32 *dest = BITMAP_ADDR32(dest_bmp, y, 0);
+					int x_index = x_index_base;
+					for (x = sx; x < ex; x++)
 					{
-						int x;
-						for( x=sx; x<ex; x++ )
+						int c = source[x_index];
+						if (c != transparent_color)
 						{
-							int c = *source;
-							if( c != transparent_color )
+							if (alpha[c] & 8)
 							{
-								if( alpha[c] == 0x00 )
-								{
-									/* Skip the costly alpha step altogether */
-									*dest = pal[c];
-								}
-								else
-								{
-									/* Comp with clamp */
-									*dest = jal_blend_func(*dest, pal[c], alpha[c]) ;
-								}
+								/* Comp with clamp */
+								dest[x] = jal_blend_func(dest[x], pal[c], alpha[c]);
 							}
-							dest++;
-							source += xinc;
+							else
+							{
+								/* Skip the costly alpha step altogether */
+								dest[x] = pal[c];
+							}
 						}
-						dest += dst_modulo;
-						source += src_modulo;
+						x_index += xinc;
 					}
+					y_index += yinc;
+				}
+			}
+
+			/* 16-bit destination bitmap */
+			else
+			{
+				/* taken from case 7: TRANSPARENCY_ALPHARANGE */
+				for (y = sy; y < ey; y++)
+				{
+					UINT8 *source = source_base + y_index*gfx->line_modulo;
+					UINT16 *dest = BITMAP_ADDR16(dest_bmp, y, 0);
+					int x_index = x_index_base;
+					for (x = sx; x < ex; x++)
+					{
+						int c = source[x_index];
+						if (c != transparent_color)
+						{
+							if (alpha[c] & 8)
+							{
+								/* Comp with clamp */
+								dest[x] = jal_blend_func(dest[x], pal[c], alpha[c]);
+							}
+							else
+							{
+								/* Skip the costly alpha step altogether */
+								dest[x] = pal[c];
+							}
+						}
+						x_index += xinc;
+					}
+					y_index += yinc;
 				}
 			}
 		}

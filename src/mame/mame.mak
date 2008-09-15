@@ -803,6 +803,7 @@ $(MAMEOBJ)/itech.a: \
 $(MAMEOBJ)/jaleco.a: \
 	$(DRIVERS)/aeroboto.o $(VIDEO)/aeroboto.o \
 	$(DRIVERS)/argus.o $(VIDEO)/argus.o \
+	$(VIDEO)/jalblend.o \
 	$(DRIVERS)/bestleag.o \
 	$(DRIVERS)/bigstrkb.o $(VIDEO)/bigstrkb.o \
 	$(DRIVERS)/blueprnt.o $(VIDEO)/blueprnt.o \

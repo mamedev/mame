@@ -3258,7 +3258,7 @@ ROM_END
 	// this is actually Beach Spikers...
 	//PIC16C622A (317-0317-COM)
 	//(sticker 253-5508-0317)
-	//ROM_LOAD("317-0317-com.data", 0x00, 0x50, BAD_DUMP CRC(66efe433) SHA1(7f7b52202ed9b1e20516aaa7553cc3cc677a70b5) )
+	//ROM_LOAD("317-0317-com.data", 0x00, 0x50, CRC(66efe433) SHA1(7f7b52202ed9b1e20516aaa7553cc3cc677a70b5) )
 
 
 ROM_START( initd )

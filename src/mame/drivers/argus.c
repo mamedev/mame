@@ -17,7 +17,6 @@ Supported games :
  Argus      (C) 1986 NMK / Jaleco
  Valtric    (C) 1986 NMK / Jaleco
  Butasan    (C) 1987 NMK / Jaleco
- Bombs Away (C) 1988 Jaleco
 
 
 System specs :
@@ -111,54 +110,46 @@ extern UINT8 *butasan_bg1ram;
 VIDEO_START( argus );
 VIDEO_START( valtric );
 VIDEO_START( butasan );
-VIDEO_START( bombsa );
 VIDEO_RESET( argus );
 VIDEO_RESET( valtric );
 VIDEO_RESET( butasan );
-VIDEO_RESET( bombsa );
 VIDEO_UPDATE( argus );
 VIDEO_UPDATE( valtric );
 VIDEO_UPDATE( butasan );
-VIDEO_UPDATE( bombsa );
-
-static UINT8 argus_bank_latch   = 0x00;
-static UINT8 butasan_page_latch = 0x00;
 
 READ8_HANDLER( argus_txram_r );
-READ8_HANDLER( butasan_txram_r );
-READ8_HANDLER( bombsa_txram_r );
 READ8_HANDLER( argus_bg1ram_r );
-READ8_HANDLER( butasan_bg0ram_r );
-READ8_HANDLER( butasan_bg1ram_r );
 READ8_HANDLER( argus_paletteram_r );
-READ8_HANDLER( bombsa_paletteram_r );
-READ8_HANDLER( butasan_txbackram_r );
-READ8_HANDLER( butasan_bg0backram_r );
 
 WRITE8_HANDLER( argus_txram_w );
-WRITE8_HANDLER( butasan_txram_w );
-WRITE8_HANDLER( bombsa_txram_w );
 WRITE8_HANDLER( argus_bg1ram_w );
-WRITE8_HANDLER( butasan_bg0ram_w );
-WRITE8_HANDLER( butasan_bg1ram_w );
 WRITE8_HANDLER( argus_bg0_scrollx_w );
 WRITE8_HANDLER( argus_bg0_scrolly_w );
-WRITE8_HANDLER( butasan_bg0_scrollx_w );
 WRITE8_HANDLER( argus_bg1_scrollx_w );
 WRITE8_HANDLER( argus_bg1_scrolly_w );
 WRITE8_HANDLER( argus_bg_status_w );
-WRITE8_HANDLER( valtric_bg_status_w );
-WRITE8_HANDLER( butasan_bg0_status_w );
 WRITE8_HANDLER( argus_flipscreen_w );
 WRITE8_HANDLER( argus_paletteram_w );
+
+WRITE8_HANDLER( valtric_bg_status_w );
 WRITE8_HANDLER( valtric_paletteram_w );
+WRITE8_HANDLER( valtric_mosaic_w );
+WRITE8_HANDLER( valtric_unknown_w );
+
+READ8_HANDLER( butasan_pagedram_r );
+READ8_HANDLER( butasan_bg1ram_r );
+READ8_HANDLER( butasan_txbackram_r );
+READ8_HANDLER( butasan_bg0backram_r );
+WRITE8_HANDLER( butasan_pageselect_w );
+WRITE8_HANDLER( butasan_pagedram_w );
+WRITE8_HANDLER( butasan_bg1ram_w );
+WRITE8_HANDLER( butasan_bg0_status_w );
 WRITE8_HANDLER( butasan_paletteram_w );
-WRITE8_HANDLER( bombsa_paletteram_w );
 WRITE8_HANDLER( butasan_txbackram_w );
 WRITE8_HANDLER( butasan_bg0backram_w );
 WRITE8_HANDLER( butasan_bg1_status_w );
-WRITE8_HANDLER( bombsa_pageselect_w );
-WRITE8_HANDLER( valtric_mosaic_w);
+WRITE8_HANDLER( butasan_unknown_w );
+
 
 /***************************************************************************
 
@@ -169,9 +160,9 @@ WRITE8_HANDLER( valtric_mosaic_w);
 static INTERRUPT_GEN( argus_interrupt )
 {
 	if (cpu_getiloops() == 0)
-	   cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xd7);	/* RST 10h */
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xd7);	/* RST 10h */
 	else
-	   cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xcf);	/* RST 08h */
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xcf);	/* RST 08h */
 }
 
 /* Handler called by the YM2203 emulator when the internal timers cause an IRQ */
@@ -197,81 +188,13 @@ static const ym2203_interface ym2203_config =
 
 ***************************************************************************/
 
-#if 0
-static READ8_HANDLER( argus_bankselect_r )
-{
-	return argus_bank_latch;
-}
-#endif
-
 static WRITE8_HANDLER( argus_bankselect_w )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 	int bankaddress;
 
-	argus_bank_latch = data;
 	bankaddress = 0x10000 + ((data & 7) * 0x4000);
 	memory_set_bankptr(1, &RAM[bankaddress]);	 /* Select 8 banks of 16k */
-}
-
-static WRITE8_HANDLER( butasan_pageselect_w )
-{
-	butasan_page_latch = data;
-}
-
-static READ8_HANDLER( butasan_pagedram_r )
-{
-	if (!(butasan_page_latch & 0x01))
-	{
-		if (offset < 0x0800)		/* BG0 RAM */
-		{
-			return butasan_bg0ram_r( machine, offset );
-		}
-		else if (offset < 0x1000)	/* Back BG0 RAM */
-		{
-			return butasan_bg0backram_r( machine, offset - 0x0800 );
-		}
-	}
-	else
-	{
-		if (offset < 0x0800)		/* Text RAM */
-		{
-			return butasan_txram_r( machine, offset );
-		}
-		else if (offset < 0x1000)	/* Back text RAM */
-		{
-			return butasan_txbackram_r( machine, offset - 0x0800 );
-		}
-	}
-
-	return 0;
-}
-
-static WRITE8_HANDLER( butasan_pagedram_w )
-{
-	if (!(butasan_page_latch & 0x01))
-	{
-		if (offset < 0x0800)		/* BG0 RAM */
-		{
-			butasan_bg0ram_w( machine, offset, data );
-		}
-		else if (offset < 0x1000)	/* Back BG0 RAM */
-		{
-			butasan_bg0backram_w( machine, offset - 0x0800, data );
-		}
-	}
-
-	else
-	{
-		if (offset < 0x0800)		/* Text RAM */
-		{
-			butasan_txram_w( machine, offset, data );
-		}
-		else if (offset < 0x1000)	/* Back text RAM */
-		{
-			butasan_txbackram_w( machine, offset - 0x0800, data );
-		}
-	}
 }
 
 
@@ -316,6 +239,7 @@ static ADDRESS_MAP_START( valtric_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc201, 0xc201) AM_WRITE(argus_flipscreen_w)
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
+	AM_RANGE(0xc300, 0xc300) AM_WRITE(valtric_unknown_w)
 	AM_RANGE(0xc308, 0xc309) AM_WRITE(argus_bg1_scrollx_w) AM_BASE(&argus_bg1_scrollx)
 	AM_RANGE(0xc30a, 0xc30b) AM_WRITE(argus_bg1_scrolly_w) AM_BASE(&argus_bg1_scrolly)
 	AM_RANGE(0xc30c, 0xc30c) AM_WRITE(valtric_bg_status_w)
@@ -336,11 +260,12 @@ static ADDRESS_MAP_START( butasan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc002, 0xc002) AM_READ_PORT("P2")
 	AM_RANGE(0xc003, 0xc003) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc004, 0xc004) AM_READ_PORT("DSW2")
+	AM_RANGE(0xc100, 0xc100) AM_WRITE(butasan_unknown_w)
 	AM_RANGE(0xc200, 0xc200) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xc201, 0xc201) AM_WRITE(argus_flipscreen_w)
 	AM_RANGE(0xc202, 0xc202) AM_WRITE(argus_bankselect_w)
 	AM_RANGE(0xc203, 0xc203) AM_WRITE(butasan_pageselect_w)
-	AM_RANGE(0xc300, 0xc301) AM_WRITE(butasan_bg0_scrollx_w) AM_BASE(&argus_bg0_scrollx)
+	AM_RANGE(0xc300, 0xc301) AM_WRITE(argus_bg0_scrollx_w) AM_BASE(&argus_bg0_scrollx)
 	AM_RANGE(0xc302, 0xc303) AM_WRITE(argus_bg0_scrolly_w) AM_BASE(&argus_bg0_scrolly)
 	AM_RANGE(0xc304, 0xc304) AM_WRITE(butasan_bg0_status_w)
 	AM_RANGE(0xc308, 0xc309) AM_WRITE(argus_bg1_scrollx_w) AM_BASE(&argus_bg1_scrollx)
@@ -352,35 +277,6 @@ static ADDRESS_MAP_START( butasan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf67f) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0xf680, 0xffff) AM_RAM
-ADDRESS_MAP_END
-
-WRITE8_HANDLER( bombsa_txram_w );
-READ8_HANDLER( bombsa_txram_r );
-
-static ADDRESS_MAP_START( bombsa_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(1)
-	AM_RANGE(0xc000, 0xcfff) AM_RAM
-
-	/* ports look like the other games */
-	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch_w) // confirmed
-//  AM_RANGE(0xd001, 0xd001) AM_WRITE(argus_flipscreen_w)
-	AM_RANGE(0xd002, 0xd002) AM_WRITE(argus_bankselect_w)
-	AM_RANGE(0xd003, 0xd003) AM_WRITE(bombsa_pageselect_w) // 0,1,0,1,0,1 etc.
-
-	AM_RANGE(0xd000, 0xd1ff) AM_RAM
-	AM_RANGE(0xd200, 0xd7ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM
-
-	/* Input ports */
-	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xe001, 0xe001) AM_READ_PORT("P1")
-	AM_RANGE(0xe002, 0xe002) AM_READ_PORT("P2")
-	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("DSW1")
-	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("DSW2")
-	AM_RANGE(0xe000, 0xe7ff) AM_WRITE(SMH_RAM) // ??
-	AM_RANGE(0xe800, 0xefff) AM_READWRITE(bombsa_txram_r, bombsa_txram_w) AM_BASE(&argus_txram) // banked? it gets corrupted at game start, maybe its banked and one layer can be 16x16 or 8x8?
-	AM_RANGE(0xf000, 0xffff) AM_READWRITE(bombsa_paletteram_r, bombsa_paletteram_w) AM_BASE(&argus_paletteram) // banked?
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map_a, ADDRESS_SPACE_PROGRAM, 8 )
@@ -395,18 +291,13 @@ static ADDRESS_MAP_START( sound_map_b, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_map_c, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
-	AM_RANGE(0xf000, 0xf000) AM_WRITEONLY								// Is this a confirm of some sort?
-ADDRESS_MAP_END
-
+#if 0
 static ADDRESS_MAP_START( sound_portmap_1, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
 ADDRESS_MAP_END
+#endif
 
 static ADDRESS_MAP_START( sound_portmap_2, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -461,13 +352,13 @@ static INPUT_PORTS_START( argus )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:6,7")
 	PORT_DIPSETTING(    0x04, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Free_Play ) )		PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet) )			PORT_DIPLOCATION("SW1:4")
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("SW1:4")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("SW1:3")
@@ -491,7 +382,7 @@ static INPUT_PORTS_START( argus )
 	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x14, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
-	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A) )			PORT_DIPLOCATION("SW2:1,2,3")
+	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW2:1,2,3")
 	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
@@ -505,8 +396,20 @@ INPUT_PORTS_END
 static INPUT_PORTS_START( valtric )
 	PORT_INCLUDE( argus )
 
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x06, 0x06, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("SW1:6,7")
+	PORT_DIPSETTING(    0x06, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Harder ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0xc0, "3" )
+	PORT_DIPSETTING(    0x80, "4" )
+	PORT_DIPSETTING(    0x40, "5" )
+
 	PORT_MODIFY("DSW2")
-	PORT_DIPNAME( 0x01, 0x01, "Invulnerability (Cheat")		PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x01, 0x01, "Invulnerability (Cheat)" )	PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW2:4,5,6")
@@ -533,13 +436,13 @@ static INPUT_PORTS_START( butasan )
 	PORT_INCLUDE( valtric )
 
 	PORT_MODIFY("SYSTEM")
-	PORT_SERVICE( 0x20,	IP_ACTIVE_LOW )
+	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
 
 	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Free_Play ) )		PORT_DIPLOCATION("SW1:8")
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, "Invulnerability (Cheat)")	PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x02, 0x02, "Invulnerability (Cheat)" )	PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )			PORT_DIPLOCATION("SW1:5,6")
@@ -561,35 +464,6 @@ static INPUT_PORTS_START( butasan )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( bombsa )
-	PORT_INCLUDE( argus )
-
-	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x20,	IP_ACTIVE_LOW, IPT_SERVICE1 )
-
-	PORT_MODIFY("DSW1")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:8" )			// Coin_B
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:6" )			// Coin_B
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:5" )			// Coin_B
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:3" )
-	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW1:1,2")
-	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, "2 Coins 1 Credit/4 Coins 3 Credits" )
-	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
-
-	PORT_MODIFY("DSW2")
-	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:8" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:6" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:5" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:4" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:3" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:2" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:1" )
-INPUT_PORTS_END
 
 /***************************************************************************
 
@@ -600,7 +474,7 @@ INPUT_PORTS_END
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8x8 characters */
-	1024,	/* 1024 characters */
+	1024,   /* 1024 characters */
 	4,      /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 0, 4, 8, 12, 16, 20, 24, 28 },
@@ -611,7 +485,7 @@ static const gfx_layout charlayout =
 static const gfx_layout tilelayout_256 =
 {
 	16,16,  /* 16x16 characters */
-	256,	/* 256 characters */
+	256,    /* 256 characters */
 	4,      /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 0, 4, 8, 12, 16, 20, 24, 28,
@@ -624,7 +498,7 @@ static const gfx_layout tilelayout_256 =
 static const gfx_layout tilelayout_512 =
 {
 	16,16,  /* 16x16 characters */
-	512,	/* 512 characters */
+	512,    /* 512 characters */
 	4,      /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 0, 4, 8, 12, 16, 20, 24, 28,
@@ -637,7 +511,7 @@ static const gfx_layout tilelayout_512 =
 static const gfx_layout tilelayout_1024 =
 {
 	16,16,  /* 16x16 characters */
-	1024,	/* 1024 characters */
+	1024,   /* 1024 characters */
 	4,      /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 0, 4, 8, 12, 16, 20, 24, 28,
@@ -650,7 +524,7 @@ static const gfx_layout tilelayout_1024 =
 static const gfx_layout tilelayout_2048 =
 {
 	16,16,  /* 16x16 characters */
-	2048,	/* 2048 characters */
+	2048,   /* 2048 characters */
 	4,      /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 0, 4, 8, 12, 16, 20, 24, 28,
@@ -663,7 +537,7 @@ static const gfx_layout tilelayout_2048 =
 static const gfx_layout tilelayout_4096 =
 {
 	16,16,  /* 16x16 characters */
-	4096,	/* 4096 characters */
+	4096,   /* 4096 characters */
 	4,      /* 4 bits per pixel */
 	{ 0, 1, 2, 3 },
 	{ 0, 4, 8, 12, 16, 20, 24, 28,
@@ -681,7 +555,7 @@ static GFXDECODE_START( argus )
 GFXDECODE_END
 
 static GFXDECODE_START( valtric )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout_1024, 0*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout_1024, 0*16,  16 )
 	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_2048, 16*16, 16 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,      32*16, 16 )
 GFXDECODE_END
@@ -693,11 +567,6 @@ static GFXDECODE_START( butasan )
 	GFXDECODE_ENTRY( "gfx4", 0, charlayout,      32*16, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( bombsa )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout_1024, 32*16, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_1024, 0*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, charlayout,      16*16, 16 )
-GFXDECODE_END
 
 static MACHINE_DRIVER_START( argus )
 
@@ -708,7 +577,11 @@ static MACHINE_DRIVER_START( argus )
 
 	MDRV_CPU_ADD("audio", Z80, 5000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map_a,0)
+#if 0
 	MDRV_CPU_IO_MAP(sound_portmap_1,0)
+#else
+	MDRV_CPU_IO_MAP(sound_portmap_2,0)
+#endif
 
 	MDRV_INTERLEAVE(10)
 
@@ -719,6 +592,7 @@ static MACHINE_DRIVER_START( argus )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+
 	MDRV_GFXDECODE(argus)
 	MDRV_PALETTE_LENGTH(896)
 
@@ -729,12 +603,27 @@ static MACHINE_DRIVER_START( argus )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
+#if 0
 	MDRV_SOUND_ADD("ym", YM2203, 6000000 / 4)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+#else
+	MDRV_SOUND_ADD("ym1", YM2203, 6000000 / 4)
+	MDRV_SOUND_CONFIG(ym2203_config)
+	MDRV_SOUND_ROUTE(0, "mono", 0.15)
+	MDRV_SOUND_ROUTE(1, "mono", 0.15)
+	MDRV_SOUND_ROUTE(2, "mono", 0.15)
+	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+
+	MDRV_SOUND_ADD("ym2", YM2203, 6000000 / 4)
+	MDRV_SOUND_ROUTE(0, "mono", 0.15)
+	MDRV_SOUND_ROUTE(1, "mono", 0.15)
+	MDRV_SOUND_ROUTE(2, "mono", 0.15)
+	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+#endif
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( valtric )
@@ -757,6 +646,7 @@ static MACHINE_DRIVER_START( valtric )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+
 	MDRV_GFXDECODE(valtric)
 	MDRV_PALETTE_LENGTH(768)
 
@@ -801,6 +691,7 @@ static MACHINE_DRIVER_START( butasan )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(32*16, 32*16)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+
 	MDRV_GFXDECODE(butasan)
 	MDRV_PALETTE_LENGTH(768)
 
@@ -825,50 +716,6 @@ static MACHINE_DRIVER_START( butasan )
 	MDRV_SOUND_ROUTE(3, "mono", 1.0)
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( bombsa )
-
-	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 5000000)			/* 5 MHz */
-	MDRV_CPU_PROGRAM_MAP(bombsa_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(argus_interrupt,2)
-
-	MDRV_CPU_ADD("audio", Z80, 12000000 / 2)		/* maybe CPU speeds are reversed? Probably not (ajg) */
-	MDRV_CPU_PROGRAM_MAP(sound_map_c,0)
-	MDRV_CPU_IO_MAP(sound_portmap_2,0)
-
-	MDRV_INTERLEAVE(10)
-
-	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(54)									/* Guru says : VSync - 54Hz . HSync - 15.25kHz */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*16, 32*16)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(bombsa)
-	MDRV_PALETTE_LENGTH(0x1000/2)
-
-	MDRV_VIDEO_START(bombsa)
-	MDRV_VIDEO_RESET(bombsa)
-	MDRV_VIDEO_UPDATE(bombsa)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("ym1", YM2203, 12000000 / 8)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.30)
-	MDRV_SOUND_ROUTE(1, "mono", 0.30)
-	MDRV_SOUND_ROUTE(2, "mono", 0.30)
-	MDRV_SOUND_ROUTE(3, "mono", 1.0)
-
-	MDRV_SOUND_ADD("ym2", YM2203, 12000000 / 8)
-	MDRV_SOUND_ROUTE(0, "mono", 0.30)
-	MDRV_SOUND_ROUTE(1, "mono", 0.30)
-	MDRV_SOUND_ROUTE(2, "mono", 0.30)
-	MDRV_SOUND_ROUTE(3, "mono", 1.0)
-MACHINE_DRIVER_END
-
 
 /***************************************************************************
 
@@ -878,37 +725,37 @@ MACHINE_DRIVER_END
 
 ROM_START( argus )
 	ROM_REGION( 0x28000, "main", 0 ) 					/* Main CPU */
-	ROM_LOAD( "ag_02.bin", 0x00000, 0x08000, CRC(278a3f3d) SHA1(c5ac5a004ebf0194c33f71dab4020fa636cefbc2) )
-	ROM_LOAD( "ag_03.bin", 0x10000, 0x08000, CRC(3a7f3bfa) SHA1(b11e134c084fc3c982dfe31836c1cf3fc0d481fd) )
-	ROM_LOAD( "ag_04.bin", 0x18000, 0x08000, CRC(76adc9f6) SHA1(e223a8b2371c51f121958ee3687c777f597334c9) )
-	ROM_LOAD( "ag_05.bin", 0x20000, 0x08000, CRC(f76692d6) SHA1(1dc353a042cdda909eb9f1b1ca749a3b3eaa01e4) )
+	ROM_LOAD( "ag_02.bin",    0x00000, 0x08000, CRC(278a3f3d) SHA1(c5ac5a004ebf0194c33f71dab4020fa636cefbc2) )
+	ROM_LOAD( "ag_03.bin",    0x10000, 0x08000, CRC(3a7f3bfa) SHA1(b11e134c084fc3c982dfe31836c1cf3fc0d481fd) )
+	ROM_LOAD( "ag_04.bin",    0x18000, 0x08000, CRC(76adc9f6) SHA1(e223a8b2371c51f121958ee3687c777f597334c9) )
+	ROM_LOAD( "ag_05.bin",    0x20000, 0x08000, CRC(f76692d6) SHA1(1dc353a042cdda909eb9f1b1ca749a3b3eaa01e4) )
 
 	ROM_REGION( 0x10000, "audio", 0 )					/* Sound CPU */
-	ROM_LOAD( "ag_01.bin", 0x00000, 0x04000, CRC(769e3f57) SHA1(209160a96486ab0b90967c015143ec28fba2e2a4) )
+	ROM_LOAD( "ag_01.bin",    0x00000, 0x04000, CRC(769e3f57) SHA1(209160a96486ab0b90967c015143ec28fba2e2a4) )
 
 	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )	/* Sprite */
-	ROM_LOAD( "ag_09.bin", 0x00000, 0x08000, CRC(6dbc1c58) SHA1(ef7b6901b702dd347b3a3f162162138175efe578) )
-	ROM_LOAD( "ag_08.bin", 0x08000, 0x08000, CRC(ce6e987e) SHA1(9de257d8061ec917f4d443ff509fd457f995d73b) )
-	ROM_LOAD( "ag_07.bin", 0x10000, 0x08000, CRC(bbb9638d) SHA1(61dec71d4d976bef3af26d0dc9c0355fd1098ffb) )
-	ROM_LOAD( "ag_06.bin", 0x18000, 0x08000, CRC(655b48f8) SHA1(4fce1dffe091b97e7055955743434e49e97b4b79) )
+	ROM_LOAD( "ag_09.bin",    0x00000, 0x08000, CRC(6dbc1c58) SHA1(ef7b6901b702dd347b3a3f162162138175efe578) )
+	ROM_LOAD( "ag_08.bin",    0x08000, 0x08000, CRC(ce6e987e) SHA1(9de257d8061ec917f4d443ff509fd457f995d73b) )
+	ROM_LOAD( "ag_07.bin",    0x10000, 0x08000, CRC(bbb9638d) SHA1(61dec71d4d976bef3af26d0dc9c0355fd1098ffb) )
+	ROM_LOAD( "ag_06.bin",    0x18000, 0x08000, CRC(655b48f8) SHA1(4fce1dffe091b97e7055955743434e49e97b4b79) )
 
 	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )	/* BG0 */
-	ROM_LOAD( "ag_13.bin", 0x00000, 0x08000, CRC(20274268) SHA1(9b7767d14bd169dabe6add0623d353bf4b59779b) )
-	ROM_LOAD( "ag_14.bin", 0x08000, 0x08000, CRC(ceb8860b) SHA1(90e094686d9d18e49e4848d18d1e31ac95f13937) )
-	ROM_LOAD( "ag_11.bin", 0x10000, 0x08000, CRC(99ce8556) SHA1(39caababd6e20ecb0375b85fb6490ee0b04f0949) )
-	ROM_LOAD( "ag_12.bin", 0x18000, 0x08000, CRC(e0e5377c) SHA1(b5981d832127d0b28b6a7bb0437716593e0ed71a) )
+	ROM_LOAD( "ag_13.bin",    0x00000, 0x08000, CRC(20274268) SHA1(9b7767d14bd169dabe6add0623d353bf4b59779b) )
+	ROM_LOAD( "ag_14.bin",    0x08000, 0x08000, CRC(ceb8860b) SHA1(90e094686d9d18e49e4848d18d1e31ac95f13937) )
+	ROM_LOAD( "ag_11.bin",    0x10000, 0x08000, CRC(99ce8556) SHA1(39caababd6e20ecb0375b85fb6490ee0b04f0949) )
+	ROM_LOAD( "ag_12.bin",    0x18000, 0x08000, CRC(e0e5377c) SHA1(b5981d832127d0b28b6a7bb0437716593e0ed71a) )
 
 	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE )	/* BG1 */
-	ROM_LOAD( "ag_17.bin", 0x00000, 0x08000, CRC(0f12d09b) SHA1(718db4ff016526dddacdf6f0088f247ee97c6543) )
+	ROM_LOAD( "ag_17.bin",    0x00000, 0x08000, CRC(0f12d09b) SHA1(718db4ff016526dddacdf6f0088f247ee97c6543) )
 
 	ROM_REGION( 0x08000, "gfx4", ROMREGION_DISPOSE )	/* Text */
-	ROM_LOAD( "ag_10.bin", 0x00000, 0x04000, CRC(2de696c4) SHA1(1ad0f1cde127a1618c2ea74a53e522963a79e5ce) )
+	ROM_LOAD( "ag_10.bin",    0x00000, 0x04000, CRC(2de696c4) SHA1(1ad0f1cde127a1618c2ea74a53e522963a79e5ce) )
 
 	ROM_REGION( 0x08000, "user1", 0 )					/* Map */
-	ROM_LOAD( "ag_15.bin", 0x00000, 0x08000, CRC(99834c1b) SHA1(330f271771b158493b28bb178c8cda98efd1d90c) )
+	ROM_LOAD( "ag_15.bin",    0x00000, 0x08000, CRC(99834c1b) SHA1(330f271771b158493b28bb178c8cda98efd1d90c) )
 
 	ROM_REGION( 0x08000, "user2", 0 )					/* Pattern */
-	ROM_LOAD( "ag_16.bin", 0x00000, 0x08000, CRC(39a51714) SHA1(ad89a630f1352eb4d8beeeebf909d5e2b5d7cc12) )
+	ROM_LOAD( "ag_16.bin",    0x00000, 0x08000, CRC(39a51714) SHA1(ad89a630f1352eb4d8beeeebf909d5e2b5d7cc12) )
 ROM_END
 
 ROM_START( valtric )
@@ -969,104 +816,7 @@ ROM_START( butasan )
 ROM_END
 
 
-/*
-Bombs Away
-Jaleco, 1988
-
-PCB Layout
-----------
-
-BB-8744
-|------------------------------------------|
-|         1      Z80(1)          4         |
-|         6116      5MHz                  |-|
-|VOL      YM2203                 5        | |
-|4558     YM2203      Z80(2)              | |
-|4558 YM3014                     6        | |
-|     YM3014                              | |
-|J          6116                6264      | |
-|A                                        |-|
-|M                                         |
-|M                                         |
-|A                                        |-|
-|                                         | |
-|                                         | |
-|                2   62256                | |
-| DSW1                                    | |
-|                3   62256                | |
-| DSW2    82S137                          |-|
-|                                          |
-|------------------------------------------|
-Notes:
-      Z80(1) clock - 5.000MHz
-      Z80(2) clock - 6.000MHz [12/2]
-      YM2203 clock - 1.500MHz [12/8, both]
-      VSync - 54Hz
-      HSync - 15.25kHz
-
-
-BB-8745
-|--------------------------------|
-|                                |
-|                      |-----|  |-|
-|                      |N8633|  | |
-|                      |-S   |  | |
-|                      |-----|  | |
-|  82S123                       | |
-|              |-----|          | |
-|              |N8633|          |-|
-|              |-V   |           |
-|2018          |     |           |
-|2018        7 |6116 |    12MHz |-|
-|              |-----|          | |
-|      |-----|                  | |
-|      |N8633|                  | |
-|      |-V64 |                  | |
-|      |     |                  | |
-| 9  8 |6264 |                  |-|
-|      |-----|                   |
-|--------------------------------|
-Notes:
-      3 soldered-in 'modules' are located on this PCB.
-      N-8633-V 6-7 TOYOCOM
-      N-8633-V64 6-7 TOYOCOM
-      N-8633-S 6-7 TOYOCOM
-      The 2 larger ones have 62 pins, 31 pins on each side of a small PCB. The PCB contains some
-      surface mounted logic chips and some surface mounted RAM.
-      The smaller module has 40 pins, 20 pins on each side of a small PCB. The PCB contains only
-      logic on both sides.
-*/
-
-ROM_START( bombsa )
-	ROM_REGION( 0x30000, "main", 0 )					/* Main CPU */
-	ROM_LOAD( "4.7a", 0x00000, 0x08000, CRC(0191f6a7) SHA1(10a0434abbf4be068751e65c81b1a211729e3742) )
-	/* these fail their self-test... should be checked on real hw (hold start1+start2 on boot) */
-	ROM_LOAD( "5.7c", 0x10000, 0x08000, BAD_DUMP CRC(095c451a) SHA1(892ca84376f89640ad4d28f1e548c26bc8f72c0e) ) // contains palettes etc. but fails rom check??
-	ROM_LOAD( "6.7d", 0x20000, 0x10000, BAD_DUMP CRC(89f9dc0f) SHA1(5cf6a7aade3d56bc229d3771bc4141ad0c0e8da2) )
-
-	ROM_REGION( 0x10000, "audio", 0 )					/* Sound CPU */
-	ROM_LOAD( "1.3a", 0x00000, 0x08000, CRC(92801404) SHA1(c4ff47989d355b18a909eaa88f138e2f68178ecc) )
-
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )	/* Sprite */
-	ROM_LOAD( "2.4p", 0x00000, 0x10000, CRC(bd972ff4) SHA1(63bfb455bc0ae1d31e6f1066864ec0c8d2d0cf99) )
-	ROM_LOAD( "3.4s", 0x10000, 0x10000, CRC(9a8a8a97) SHA1(13328631202c196c9d8791cc6063048eb6be0472) )
-
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )	/* BG0 */
-	/* some corrupt 'blank' characters, should also be checked with a redump */
-	ROM_LOAD( "8.2l", 0x00000, 0x10000, BAD_DUMP CRC(3391c769) SHA1(7ae7575ac81d6e0d915c279c1f57a9bc6d096bd6) )
-	ROM_LOAD( "9.2m", 0x10000, 0x10000, BAD_DUMP CRC(5b315976) SHA1(d17cc1926f926bdd88b66ea6af88dac30880e7d4) )
-
-	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE )	/* Text */
-	ROM_LOAD( "7.4f", 0x00000, 0x08000, CRC(400114b9) SHA1(db2f3ba05a2005ae0e0e7d19c8739353032cbeab) )
-
-	ROM_REGION( 0x08000, "user1", ROMREGION_DISPOSE )	/* Proms */
-	ROM_LOAD( "82s131.7l", 0x000, 0x200, CRC(6a7d13c0) SHA1(2a835a4ac1acb7663d0b915d0339af9800284da6) )
-	ROM_LOAD( "82s137.3t", 0x000, 0x400, CRC(59e44236) SHA1(f53d99694fa5acd7cc51dd78e09f0d2ef730e7a4) )
-ROM_END
-
-
-/*  ( YEAR   NAME     PARENT  MACHINE   INPUT     INIT  MONITOR  COMPANY                 FULLNAME ) */
+/*  ( YEAR   NAME     PARENT  MACHINE   INPUT     INIT  MONITOR  COMPANY                   FULLNAME ) */
 GAME( 1986, argus,    0,      argus,    argus,    0,    ROT270,  "[NMK] (Jaleco license)", "Argus"          , GAME_IMPERFECT_GRAPHICS )
 GAME( 1986, valtric,  0,      valtric,  valtric,  0,    ROT270,  "[NMK] (Jaleco license)", "Valtric"        , GAME_IMPERFECT_GRAPHICS )
 GAME( 1987, butasan,  0,      butasan,  butasan,  0,    ROT0,    "[NMK] (Jaleco license)", "Butasan (Japan)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1988, bombsa,   0,      bombsa,   bombsa,   0,    ROT270,  "Jaleco",                 "Bombs Away"     , GAME_NOT_WORKING )

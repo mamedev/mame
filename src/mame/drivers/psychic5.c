@@ -86,25 +86,25 @@ Video RAM is also banked at locations from c000 to dfff.
 
 3) MAIN CPU MEMORY MAP.
 
-0000-7fff       ROM
-8000-bfff       paged ROM
-c000-dfff       paged RAM (RAM/VRAM/IO)
+0000-7fff   ROM
+8000-bfff   paged ROM
+c000-dfff   paged RAM (RAM/VRAM/IO)
 f000-f1ff   I/O
 f200-f7ff   Sprites registers (misc RAM)
-f800-ffff       Work RAM
+f800-ffff   Work RAM
 
 -paged RAM memory map
 
 Bank 0
 
 c000-cfff   Background tile buffer
-e000-dfff   RAM (dummy background image for software collisions)
+d000-dfff   RAM (dummy background image for software collisions)
 
 Bank 1
 
 c000-c3ff   I/O
-c400-cbff   Palette RAM
-d000-d800   Foreground tile buffer
+c400-cfff   Palette RAM
+d000-dfff   Foreground tile buffer
 
 
 4) I/O
@@ -153,55 +153,55 @@ c308    BACKGROUND SCROLL Y  least significant 8 bits
 
 c309    BACKGROUND SCROLL Y  most significant 2 bits
 
-    76543210
-          ||
-          |^-- Y scroll bit 8
-          ^--- Y scroll bit 9
+        76543210
+              ||
+              |^-- Y scroll bit 8
+              ^--- Y scroll bit 9
 
 c30A    BACKGROUND SCROLL X  least significant 8 bits
 
 c30B    BACKGROUND SCROLL X  MSB
 
-    76543210
-    ||||||||
-    |||||||^-- X scroll bit 8
-    ||||||^--- Unknown (title screen)
-    ^^^^^^---- Unknown (title screen: 0xff)
+        76543210
+        ||||||||
+        |||||||^-- X scroll bit 8
+        ||||||^--- Unknown (title screen)
+        ^^^^^^---- Unknown (title screen: 0xff)
 
 c30C    SCREEN MODE
 
-    76543210
-          ||
-          |^-- background enable bit (0 means black BG)
-          ^--- grey background enable bit
+        76543210
+              ||
+              |^-- background enable bit (0 means black BG)
+              ^--- grey background enable bit
 
 c5fe    BACKGROUND PALETTE INTENSITY (red and green)
 
-    76543210
-    ||||||||
-    ||||^^^^-- green intensity
-    ^^^^------ red intensity
+        76543210
+        ||||||||
+        ||||^^^^-- green intensity
+        ^^^^------ red intensity
 
 c5ff    BACKGROUND PALETTE INTENSITY (blue)
 
-    76543210
-    ||||||||
+        76543210
+        ||||||||
         ||||^^^^-- unknown (?)
-    ^^^^------ blue intensity
+        ^^^^------ blue intensity
 
 -RAM f000-f1ff
 
 f000    SOUND COMMAND (?)
 
 f001    UNKNOWN
-    maybe some external HW like a flashing light
-    when a coin falls in slot (?)
+        maybe some external HW like a flashing light
+        when a coin falls in slot (?)
 
 f002    ROM PAGE SELECTOR
-    select four (0-3) ROM pages at 8000-bfff.
+        select four (0-3) ROM pages at 8000-bfff.
 
 f003    VRAM PAGE SELECTOR
-    selects two (0-1) VRAM pages at c000-dfff.
+        selects two (0-1) VRAM pages at c000-dfff.
 
 f004    UNKNOWN
 
@@ -234,7 +234,7 @@ color output is 736 colors.
 Some additional palette effects are provided for background.
 Sprite palette 15's transparent color (c5fe-c5ff) is the global
 background intensity.
-Background Intensity is encoded in the same way of colors,and
+Background intensity is encoded in the same way of colors,and
 affects the intensity of each color component (BGR).
 The least significant nibble of c5ff is unknown,it assumes value
 0xf occasionaly when the other nibbles are changed.The only
@@ -314,20 +314,55 @@ The first sprite data is located at f20b,then f21b and so on.
 #include "sound/2203intf.h"
 
 
-extern WRITE8_HANDLER( psychic5_paged_ram_w );
-extern WRITE8_HANDLER( psychic5_vram_page_select_w );
-extern WRITE8_HANDLER( psychic5_title_screen_w );
+WRITE8_HANDLER( psychic5_paged_ram_w );
+WRITE8_HANDLER( psychic5_vram_page_select_w );
+WRITE8_HANDLER( psychic5_title_screen_w );
 
-extern READ8_HANDLER( psychic5_paged_ram_r );
-extern READ8_HANDLER( psychic5_vram_page_select_r );
+READ8_HANDLER( psychic5_paged_ram_r );
+READ8_HANDLER( psychic5_vram_page_select_r );
 
-extern MACHINE_RESET( psychic5 );
+VIDEO_START( psychic5 );
+VIDEO_RESET( psychic5 );
+VIDEO_UPDATE( psychic5 );
 
-extern VIDEO_START( psychic5 );
-extern VIDEO_UPDATE( psychic5 );
 
-static int psychic5_bank_latch = 0x0;
+extern UINT8 *bombsa_paletteram;
+WRITE8_HANDLER( bombsa_paged_ram_w );
+WRITE8_HANDLER( bombsa_unknown_w );
 
+VIDEO_START( bombsa );
+VIDEO_RESET( bombsa );
+VIDEO_UPDATE( bombsa );
+
+
+static UINT8 psychic5_bank_latch;
+
+static MACHINE_RESET( psychic5 )
+{
+	psychic5_bank_latch = 0xff;
+	flip_screen_set(0);
+}
+
+/***************************************************************************
+
+  Interrupt(s)
+
+***************************************************************************/
+
+static INTERRUPT_GEN( psychic5_interrupt )
+{
+	if (cpu_getiloops() == 0)
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xd7);		/* RST 10h */
+	else
+		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xcf);		/* RST 08h */
+}
+
+
+/***************************************************************************
+
+  Memory Handler(s)
+
+***************************************************************************/
 
 static READ8_HANDLER( psychic5_bankselect_r )
 {
@@ -339,11 +374,24 @@ static WRITE8_HANDLER( psychic5_bankselect_w )
 	UINT8 *RAM = memory_region(machine, "main");
 	int bankaddress;
 
-	if (data != psychic5_bank_latch)
+	if (psychic5_bank_latch != data)
 	{
 		psychic5_bank_latch = data;
 		bankaddress = 0x10000 + ((data & 3) * 0x4000);
 		memory_set_bankptr(1,&RAM[bankaddress]);	 /* Select 4 banks of 16k */
+	}
+}
+
+static WRITE8_HANDLER( bombsa_bankselect_w )
+{
+	UINT8 *RAM = memory_region(machine, "main");
+	int bankaddress;
+
+	if (psychic5_bank_latch != data)
+	{
+		psychic5_bank_latch = data;
+		bankaddress = 0x10000 + ((data & 7) * 0x4000);
+		memory_set_bankptr(1, &RAM[bankaddress]);	 /* Select 8 banks of 16k */
 	}
 }
 
@@ -359,59 +407,45 @@ static WRITE8_HANDLER( psychic5_coin_counter_w )
 	}
 }
 
-static INTERRUPT_GEN( psychic5_interrupt )
+static WRITE8_HANDLER( bombsa_flipscreen_w )
 {
-	if (cpu_getiloops() == 0)
-	   cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xd7);		/* RST 10h */
-	else
-   	   cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xcf);		/* RST 08h */
+	// bit 7 toggles flip screen
+	if (data & 0x80)
+	{
+		flip_screen_set(!flip_screen_get());
+	}
 }
 
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_READ(SMH_BANK1)
-	AM_RANGE(0xc000, 0xdfff) AM_READ(psychic5_paged_ram_r)
-	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf000, 0xf000) AM_READ(SMH_RAM)
-	AM_RANGE(0xf001, 0xf001) AM_READ(SMH_NOP)	// ???
-	AM_RANGE(0xf002, 0xf002) AM_READ(psychic5_bankselect_r)
-	AM_RANGE(0xf003, 0xf003) AM_READ(psychic5_vram_page_select_r)
-	AM_RANGE(0xf004, 0xf004) AM_READ(SMH_NOP)	// ???
-	AM_RANGE(0xf005, 0xf005) AM_READ(SMH_NOP)	// ???
-	AM_RANGE(0xf006, 0xf1ff) AM_READ(SMH_NOP)
-	AM_RANGE(0xf200, 0xf7ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xf800, 0xffff) AM_READ(SMH_RAM)
+/***************************************************************************
+
+  Memory Map(s)
+
+***************************************************************************/
+
+static ADDRESS_MAP_START( psychic5_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(1)
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(psychic5_paged_ram_r, psychic5_paged_ram_w)
+	AM_RANGE(0xe000, 0xefff) AM_RAM
+	AM_RANGE(0xf000, 0xf000) AM_RAM_WRITE(soundlatch_w)
+	AM_RANGE(0xf001, 0xf001) AM_READWRITE(SMH_NOP, psychic5_coin_counter_w)
+	AM_RANGE(0xf002, 0xf002) AM_READWRITE(psychic5_bankselect_r, psychic5_bankselect_w)
+	AM_RANGE(0xf003, 0xf003) AM_READWRITE(psychic5_vram_page_select_r, psychic5_vram_page_select_w)
+	AM_RANGE(0xf004, 0xf004) AM_NOP	// ???
+	AM_RANGE(0xf005, 0xf005) AM_READWRITE(SMH_NOP, psychic5_title_screen_w)
+	AM_RANGE(0xf006, 0xf1ff) AM_NOP
+	AM_RANGE(0xf200, 0xf7ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0xbfff) AM_WRITE(SMH_BANK1)
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(psychic5_paged_ram_w)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xf000, 0xf000) AM_WRITE(soundlatch_w)
-	AM_RANGE(0xf001, 0xf001) AM_WRITE(psychic5_coin_counter_w)
-	AM_RANGE(0xf002, 0xf002) AM_WRITE(psychic5_bankselect_w)
-	AM_RANGE(0xf003, 0xf003) AM_WRITE(psychic5_vram_page_select_w)
-	AM_RANGE(0xf004, 0xf004) AM_WRITE(SMH_NOP)	// ???
-	AM_RANGE(0xf005, 0xf005) AM_WRITE(psychic5_title_screen_w)
-	AM_RANGE(0xf006, 0xf1ff) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xf200, 0xf7ff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
-	AM_RANGE(0xf800, 0xffff) AM_WRITE(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_READ(SMH_RAM)
+static ADDRESS_MAP_START( psychic5_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc7ff) AM_WRITE(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( psychic5_soundport_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_WRITE(ym2203_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_WRITE(ym2203_write_port_0_w)
@@ -420,87 +454,177 @@ static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( bombsa_main_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0xbfff) AM_RAMBANK(1)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
+
+	/* ports look like the other games */
+	AM_RANGE(0xd000, 0xd000) AM_WRITE(soundlatch_w) // confirmed
+	AM_RANGE(0xd001, 0xd001) AM_WRITE(bombsa_flipscreen_w)
+	AM_RANGE(0xd002, 0xd002) AM_READWRITE(psychic5_bankselect_r, bombsa_bankselect_w)
+	AM_RANGE(0xd003, 0xd003) AM_READWRITE(psychic5_vram_page_select_r, psychic5_vram_page_select_w)
+	AM_RANGE(0xd005, 0xd005) AM_WRITE(bombsa_unknown_w) // ?
+
+	AM_RANGE(0xd000, 0xd1ff) AM_RAM
+	AM_RANGE(0xd200, 0xd7ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM
+
+	AM_RANGE(0xe000, 0xffff) AM_READWRITE(psychic5_paged_ram_r, bombsa_paged_ram_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bombsa_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM
+	AM_RANGE(0xe000, 0xe000) AM_READ(soundlatch_r)
+	AM_RANGE(0xf000, 0xf000) AM_WRITEONLY								// Is this a confirm of some sort?
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( bombsa_soundport_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
+	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
+	AM_RANGE(0x80, 0x80) AM_READWRITE(ym2203_status_port_1_r, ym2203_control_port_1_w)
+	AM_RANGE(0x81, 0x81) AM_READWRITE(ym2203_read_port_1_r, ym2203_write_port_1_w)
+ADDRESS_MAP_END
+
+
 static INPUT_PORTS_START( psychic5 )
-    PORT_START("IN0")
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_START("SYSTEM")	/* system control */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-    PORT_START("P1")		/* player 1 controls */
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("P1")		/* player 1 controls */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-    PORT_START("P2")		/* player 2 controls */
-    PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-    PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-    PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-    PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-    PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-    PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-    PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-    PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_START("P2")		/* player 2 controls */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-    PORT_START("DSW0")
-    PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
-    PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )
-    PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-    PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-    PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
-    PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-    PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
-    PORT_DIPSETTING(    0x80, "2" )
-    PORT_DIPSETTING(    0xc0, "3" )
-    PORT_DIPSETTING(    0x40, "4" )
-    PORT_DIPSETTING(    0x00, "5" )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x80, "2" )
+	PORT_DIPSETTING(    0xc0, "3" )
+	PORT_DIPSETTING(    0x40, "4" )
+	PORT_DIPSETTING(    0x00, "5" )
 
-    PORT_START("DSW1")
-    PORT_DIPNAME( 0x01, 0x01, "Invulnerability (Cheat)")
-    PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
-    PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
-    PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
-    PORT_DIPSETTING(    0x60, DEF_STR( 2C_1C ) )
-    PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) )
-    PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
-    PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
-    PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
-    PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_B ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
-    PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
-    PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
-    PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )
-    PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )
-    PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
-    PORT_DIPSETTING(    0x14, DEF_STR( 1C_3C ) )
-    PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x01, 0x01, "Invulnerability (Cheat)" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0xe0, 0xe0, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x1c, 0x1c, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x18, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x14, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_4C ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( bombsa )
+	PORT_START("SYSTEM")	/* system control */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
+
+	PORT_START("P1")	 	/* player 1 control */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")		/* player 2 control */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW1")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW1:8" )			// Coin_B
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW1:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW1:6" )			// Coin_B
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW1:5" )			// Coin_B
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW1:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW1:3" )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, "2 Coins 1 Credit/4 Coins 3 Credits" )
+	PORT_DIPSETTING(    0x80, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
+
+	PORT_START("DSW2")
+	PORT_DIPUNKNOWN_DIPLOC( 0x01, 0x01, "SW2:8" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x02, 0x02, "SW2:7" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x04, "SW2:6" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x08, 0x08, "SW2:5" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x10, 0x10, "SW2:4" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x20, 0x20, "SW2:3" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x40, 0x40, "SW2:2" )
+	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW2:1" )			// flip screen ?
 INPUT_PORTS_END
 
 
@@ -533,6 +657,12 @@ static GFXDECODE_START( psychic5 )
 	GFXDECODE_ENTRY( "gfx3", 0, charlayout,   32*16, 16 )
 GFXDECODE_END
 
+static GFXDECODE_START( bombsa )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 32*16, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0*16,  16 )
+	GFXDECODE_ENTRY( "gfx3", 0, charlayout,   16*16, 16 )
+GFXDECODE_END
+
 
 
 static void irqhandler(running_machine *machine, int irq)
@@ -553,15 +683,15 @@ static const ym2203_interface ym2203_config =
 static MACHINE_DRIVER_START( psychic5 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
+	MDRV_CPU_ADD("main", Z80, XTAL_12MHz/2)
+	MDRV_CPU_PROGRAM_MAP(psychic5_main_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(psychic5_interrupt,2)
 
-	MDRV_CPU_ADD("audio", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
-	MDRV_CPU_IO_MAP(sound_io_map,0)
+	MDRV_CPU_ADD("audio", Z80, XTAL_12MHz/2)
+	MDRV_CPU_PROGRAM_MAP(psychic5_sound_map,0)
+	MDRV_CPU_IO_MAP(psychic5_soundport_map,0)
 
-	MDRV_INTERLEAVE(10)      /* Allow time for 2nd cpu to interleave*/
+	MDRV_INTERLEAVE(10)      /* Allow time for 2nd cpu to interleave */
 	MDRV_MACHINE_RESET(psychic5)
 
 	/* video hardware */
@@ -577,23 +707,70 @@ static MACHINE_DRIVER_START( psychic5 )
 	MDRV_PALETTE_LENGTH(768)
 
 	MDRV_VIDEO_START(psychic5)
+	MDRV_VIDEO_RESET(psychic5)
 	MDRV_VIDEO_UPDATE(psychic5)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 6000000/4)
+	MDRV_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD("ym2", YM2203, 6000000/4)
+	MDRV_SOUND_ADD("ym2", YM2203, XTAL_12MHz/8)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( bombsa )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", Z80, XTAL_12MHz/2 ) /* 6 MHz */
+	MDRV_CPU_PROGRAM_MAP(bombsa_main_map,0)
+	MDRV_CPU_VBLANK_INT_HACK(psychic5_interrupt,2)
+
+	MDRV_CPU_ADD("audio", Z80, XTAL_5MHz )
+	MDRV_CPU_PROGRAM_MAP(bombsa_sound_map,0)
+	MDRV_CPU_IO_MAP(bombsa_soundport_map,0)
+
+	MDRV_INTERLEAVE(10)
+	MDRV_MACHINE_RESET(psychic5)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(54)				/* Guru says : VSync - 54Hz . HSync - 15.25kHz */
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+
+	MDRV_GFXDECODE(bombsa)
+	MDRV_PALETTE_LENGTH(768)
+
+	MDRV_VIDEO_START(bombsa)
+	MDRV_VIDEO_RESET(bombsa)
+	MDRV_VIDEO_UPDATE(bombsa)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8)
+	MDRV_SOUND_CONFIG(ym2203_config)
+	MDRV_SOUND_ROUTE(0, "mono", 0.30)
+	MDRV_SOUND_ROUTE(1, "mono", 0.30)
+	MDRV_SOUND_ROUTE(2, "mono", 0.30)
+	MDRV_SOUND_ROUTE(3, "mono", 1.0)
+
+	MDRV_SOUND_ADD("ym2", YM2203, XTAL_12MHz/8)
+	MDRV_SOUND_ROUTE(0, "mono", 0.30)
+	MDRV_SOUND_ROUTE(1, "mono", 0.30)
+	MDRV_SOUND_ROUTE(2, "mono", 0.30)
+	MDRV_SOUND_ROUTE(3, "mono", 1.0)
 MACHINE_DRIVER_END
 
 
@@ -604,25 +781,121 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 ROM_START( psychic5 )
-	ROM_REGION( 0x20000, "main", 0 ) 				/* 2*64K for main CPU, Z80 */
+	ROM_REGION( 0x20000, "main", 0 ) 					/* Main CPU */
 	ROM_LOAD( "p5d",          0x00000, 0x08000, CRC(90259249) SHA1(ac2d8dd95f6c04b6ad726136931e37dcd537e977) )
 	ROM_LOAD( "p5e",          0x10000, 0x10000, CRC(72298f34) SHA1(725be2fbf5f3622f646c0fb8e6677cbddf0b1fc2) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) 				/*64K for 2nd z80 CPU*/
+	ROM_REGION( 0x10000, "audio", 0 ) 					/* Sound CPU */
 	ROM_LOAD( "p5a",          0x00000, 0x08000, CRC(50060ecd) SHA1(e6051fb4a1fa9429cfb6084e8a5dfe994a08280b) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "p5b",          0x00000, 0x10000, CRC(7e3f87d4) SHA1(b8e7fa3f96d2e3937e4cb530f105bb84d5743b43) )	/* sprite tiles */
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )	/* sprite tiles */
+	ROM_LOAD( "p5b",          0x00000, 0x10000, CRC(7e3f87d4) SHA1(b8e7fa3f96d2e3937e4cb530f105bb84d5743b43) )
 	ROM_LOAD( "p5c",          0x10000, 0x10000, CRC(8710fedb) SHA1(c7e8dc6b733e4ecce37d56fc429c00ade8736ff3) )
 
-	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "p5g",          0x00000, 0x10000, CRC(f9262f32) SHA1(bae2dc77be7024bd85f213e4da746c5903db6ea5) )	/* background tiles */
+	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )	/* background tiles */
+	ROM_LOAD( "p5g",          0x00000, 0x10000, CRC(f9262f32) SHA1(bae2dc77be7024bd85f213e4da746c5903db6ea5) )
 	ROM_LOAD( "p5h",          0x10000, 0x10000, CRC(c411171a) SHA1(d5893563715ba231e42b084b88f5176bb94a4da9) )
 
-	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE )
-	ROM_LOAD( "p5f",          0x00000, 0x08000, CRC(04d7e21c) SHA1(6046c506bdedc233e3730f90c7897e847bec8758) )	/* foreground tiles */
+	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE )	/* foreground tiles */
+	ROM_LOAD( "p5f",          0x00000, 0x08000, CRC(04d7e21c) SHA1(6046c506bdedc233e3730f90c7897e847bec8758) )
 ROM_END
 
 
+/*
+Bombs Away
+Jaleco, 1988
+
+PCB Layout
+----------
+
+BB-8744
+|------------------------------------------|
+|         1      Z80(1)          4         |
+|         6116      5MHz                  |-|
+|VOL      YM2203                 5        | |
+|4558     YM2203      Z80(2)              | |
+|4558 YM3014                     6        | |
+|     YM3014                              | |
+|J          6116                6264      | |
+|A                                        |-|
+|M                                         |
+|M                                         |
+|A                                        |-|
+|                                         | |
+|                                         | |
+|                2   62256                | |
+| DSW1                                    | |
+|                3   62256                | |
+| DSW2    82S137                          |-|
+|                                          |
+|------------------------------------------|
+Notes:
+      Z80(1) clock - 5.000MHz
+      Z80(2) clock - 6.000MHz [12/2]
+      YM2203 clock - 1.500MHz [12/8, both]
+      VSync - 54Hz
+      HSync - 15.25kHz
+
+
+BB-8745
+|--------------------------------|
+|                                |
+|                      |-----|  |-|
+|                      |N8633|  | |
+|                      |-S   |  | |
+|                      |-----|  | |
+|  82S123                       | |
+|              |-----|          | |
+|              |N8633|          |-|
+|              |-V   |           |
+|2018          |     |           |
+|2018        7 |6116 |    12MHz |-|
+|              |-----|          | |
+|      |-----|                  | |
+|      |N8633|                  | |
+|      |-V64 |                  | |
+|      |     |                  | |
+| 9  8 |6264 |                  |-|
+|      |-----|                   |
+|--------------------------------|
+Notes:
+      3 soldered-in 'modules' are located on this PCB.
+      N-8633-V 6-7 TOYOCOM
+      N-8633-V64 6-7 TOYOCOM
+      N-8633-S 6-7 TOYOCOM
+      The 2 larger ones have 62 pins, 31 pins on each side of a small PCB. The PCB contains some
+      surface mounted logic chips and some surface mounted RAM.
+      The smaller module has 40 pins, 20 pins on each side of a small PCB. The PCB contains only
+      logic on both sides.
+*/
+
+ROM_START( bombsa )
+	ROM_REGION( 0x30000, "main", 0 )					/* Main CPU */
+	ROM_LOAD( "4.7a",         0x00000, 0x08000, CRC(0191f6a7) SHA1(10a0434abbf4be068751e65c81b1a211729e3742) )
+	/* these fail their self-test... should be checked on real hw (hold start1+start2 on boot) */
+	ROM_LOAD( "5.7c",         0x10000, 0x08000, BAD_DUMP CRC(095c451a) SHA1(892ca84376f89640ad4d28f1e548c26bc8f72c0e) ) // contains palettes etc. but fails rom check??
+	ROM_LOAD( "6.7d",         0x20000, 0x10000, BAD_DUMP CRC(89f9dc0f) SHA1(5cf6a7aade3d56bc229d3771bc4141ad0c0e8da2) )
+
+	ROM_REGION( 0x10000, "audio", 0 )					/* Sound CPU */
+	ROM_LOAD( "1.3a",         0x00000, 0x08000, CRC(92801404) SHA1(c4ff47989d355b18a909eaa88f138e2f68178ecc) )
+
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )	/* sprite tiles */
+	ROM_LOAD( "2.4p",         0x00000, 0x10000, CRC(bd972ff4) SHA1(63bfb455bc0ae1d31e6f1066864ec0c8d2d0cf99) )
+	ROM_LOAD( "3.4s",         0x10000, 0x10000, CRC(9a8a8a97) SHA1(13328631202c196c9d8791cc6063048eb6be0472) )
+
+	ROM_REGION( 0x20000, "gfx2", ROMREGION_DISPOSE )	/* background tiles */
+	/* some corrupt 'blank' characters, should also be checked with a redump */
+	ROM_LOAD( "8.2l",         0x00000, 0x10000, BAD_DUMP CRC(3391c769) SHA1(7ae7575ac81d6e0d915c279c1f57a9bc6d096bd6) )
+	ROM_LOAD( "9.2m",         0x10000, 0x10000, BAD_DUMP CRC(5b315976) SHA1(d17cc1926f926bdd88b66ea6af88dac30880e7d4) )
+
+	ROM_REGION( 0x08000, "gfx3", ROMREGION_DISPOSE )	/* foreground tiles */
+	ROM_LOAD( "7.4f",         0x00000, 0x08000, CRC(400114b9) SHA1(db2f3ba05a2005ae0e0e7d19c8739353032cbeab) )
+
+	ROM_REGION( 0x08000, "proms", ROMREGION_DISPOSE )	/* Proms */
+	ROM_LOAD( "82s131.7l",    0x000, 0x200, CRC(6a7d13c0) SHA1(2a835a4ac1acb7663d0b915d0339af9800284da6) )
+	ROM_LOAD( "82s137.3t",    0x200, 0x400, CRC(59e44236) SHA1(f53d99694fa5acd7cc51dd78e09f0d2ef730e7a4) )
+ROM_END
+
 
 GAME( 1987, psychic5, 0, psychic5, psychic5, 0, ROT270, "Jaleco", "Psychic 5", 0 )
+GAME( 1988, bombsa,   0, bombsa,   bombsa,   0, ROT270, "Jaleco", "Bombs Away", GAME_NOT_WORKING )
