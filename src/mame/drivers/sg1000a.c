@@ -114,6 +114,7 @@ CN4               CN5
 #include "driver.h"
 #include "sound/sn76496.h"
 #include "video/tms9928a.h"
+#include "machine/8255ppi.h"
 #include "machine/segacrpt.h"
 
 /*************************************
@@ -122,27 +123,18 @@ CN4               CN5
  *
  *************************************/
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7FFF) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0xbFFF) AM_READ(SMH_ROM)
-	AM_RANGE(0xc000, 0xc3ff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7FFF) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0xbFFF) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xc000, 0xc3ff) AM_WRITE(SMH_RAM)
+static ADDRESS_MAP_START( program_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM // separate region needed for decrypting
+	AM_RANGE(0x8000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x7f, 0x7F) AM_WRITE(sn76496_0_w)
-	AM_RANGE(0xBE, 0xBE) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
-	AM_RANGE(0xBF, 0xBF) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
-	AM_RANGE(0xDC, 0xDC) AM_READ_PORT("P1")
-	AM_RANGE(0xDD, 0xDD) AM_READ_PORT("P2")
-	AM_RANGE(0xDE, 0xDE) AM_READ_PORT("DSW")
-	AM_RANGE(0xDF, 0xDF) AM_WRITE(SMH_NOP)  //? 8255 ?
+	AM_RANGE(0x7f, 0x7f) AM_WRITE(sn76496_0_w)
+	AM_RANGE(0xbe, 0xbe) AM_READWRITE(TMS9928A_vram_r, TMS9928A_vram_w)
+	AM_RANGE(0xbf, 0xbf) AM_READWRITE(TMS9928A_register_r, TMS9928A_register_w)
+	AM_RANGE(0xdc, 0xdf) AM_DEVREADWRITE(PPI8255, "ppi8255", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 /*************************************
@@ -213,7 +205,6 @@ static INPUT_PORTS_START( chwrestl )
 	PORT_BIT ( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( chboxing )
 	PORT_INCLUDE( sg1000 )
 
@@ -222,7 +213,6 @@ static INPUT_PORTS_START( chboxing )
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Japanese ) )
 INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( dokidoki )
 	PORT_INCLUDE( sg1000 )
@@ -233,15 +223,14 @@ static INPUT_PORTS_START( dokidoki )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-
-static INTERRUPT_GEN( sg100a_interrupt )
+static INTERRUPT_GEN( sg1000a_interrupt )
 {
 	TMS9928A_interrupt(machine);
 }
 
-static void vdp_interrupt (running_machine *machine, int state)
+static void vdp_interrupt(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 0,0, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, state);
 }
 
 static const TMS9928a_interface tms9928a_interface =
@@ -252,6 +241,21 @@ static const TMS9928a_interface tms9928a_interface =
 	vdp_interrupt
 };
 
+static WRITE8_HANDLER( sg1000a_coin_counter_w )
+{
+	coin_counter_w(0, data & 0x01);
+}
+
+static const ppi8255_interface ppi8255_intf =
+{
+	input_port_0_r,
+	input_port_1_r,
+	input_port_2_r,
+	NULL,
+	NULL,
+	sg1000a_coin_counter_w
+};
+
 /*************************************
  *
  *  Machine drivers
@@ -259,21 +263,26 @@ static const TMS9928a_interface tms9928a_interface =
  *************************************/
 
 static MACHINE_DRIVER_START( sg1000a )
-	MDRV_CPU_ADD("main", Z80, 3579545)       /* 3.579545 Mhz */
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(io_map,0)
-	MDRV_CPU_VBLANK_INT("main", sg100a_interrupt)
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", Z80, XTAL_3_579545MHz)
+	MDRV_CPU_PROGRAM_MAP(program_map, 0)
+	MDRV_CPU_IO_MAP(io_map, 0)
+	MDRV_CPU_VBLANK_INT("main", sg1000a_interrupt)
+
+	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
+	MDRV_DEVICE_CONFIG( ppi8255_intf )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
 	MDRV_SCREEN_MODIFY("main")
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn", SN76489, 3579545)
+	MDRV_SOUND_ADD("sn", SN76489, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -327,9 +336,6 @@ static DRIVER_INIT(chwrestl)
  *
  *************************************/
 
-GAME( 1984, chboxing, 0, sg1000a, chboxing, sg1000a,  ROT0, "Sega", "Champion Boxing", 0)
-GAME( 1985, chwrestl, 0, sg1000a, chwrestl, chwrestl, ROT0, "Sega", "Champion Pro Wrestling", 0)
-GAME( 1985, dokidoki, 0, sg1000a, dokidoki, sg1000a,  ROT0, "Sega", "Doki Doki Penguin Land", 0)
-
-
-
+GAME( 1984, chboxing, 0, sg1000a, chboxing, sg1000a,  ROT0, "Sega", "Champion Boxing", 0 )
+GAME( 1985, chwrestl, 0, sg1000a, chwrestl, chwrestl, ROT0, "Sega", "Champion Pro Wrestling", 0 )
+GAME( 1985, dokidoki, 0, sg1000a, dokidoki, sg1000a,  ROT0, "Sega", "Doki Doki Penguin Land", 0 )
