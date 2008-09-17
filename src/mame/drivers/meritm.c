@@ -1269,13 +1269,13 @@ ROM_START( megat4te ) /* Dallas DS1204V security key at U5 labeled 9255-50-01 U5
 	ROM_LOAD( "sc3981-0a.u51",  0x000, 0x117, CRC(4fc750d0) SHA1(d09ff7a8c66aeb5c49e9fec84bd1521e3f5d8d0a) )
 ROM_END
 
-ROM_START( megat5 ) /* U32 is a bad dump, the other 3 roms look to be ok */
+ROM_START( megat5 ) /* Dallas DS1204V security key at U5 labeled 9255-60-01 U5-B-RO1 C1998 MII */
 	ROM_REGION( 0x400000, "main", 0 )
-	ROM_LOAD( "megat5.u32",         0x000000, 0x80000, BAD_DUMP CRC(89932443) SHA1(68d2fbf2a5050fc5371595a105fe06f4276b0b67) )
+	ROM_LOAD( "9255-60-01_u32-r0",  0x000000, 0x80000, BAD_DUMP CRC(89932443) SHA1(68d2fbf2a5050fc5371595a105fe06f4276b0b67) ) /* U32 is a bad dump, the other 3 roms look to be ok */
 	ROM_RELOAD(                     0x080000, 0x80000)
-	ROM_LOAD( "megat5.u36",         0x100000, 0x80000, BAD_DUMP CRC(0bed9e27) SHA1(1414385ce562b127e1ddeccc20ea4ff2a7098b7e) )
+	ROM_LOAD( "qs9255-05_u36-r0",   0x100000, 0x80000, BAD_DUMP CRC(0bed9e27) SHA1(1414385ce562b127e1ddeccc20ea4ff2a7098b7e) )
 	ROM_RELOAD(                     0x180000, 0x80000)
-	ROM_LOAD( "megat5.u37",         0x200000, 0x80000, BAD_DUMP CRC(b713a1c5) SHA1(d6ccba2ea90fd0e2ecf15249514231eed54000c1) )
+	ROM_LOAD( "qs9255-05_u37-r0",   0x200000, 0x80000, BAD_DUMP CRC(b713a1c5) SHA1(d6ccba2ea90fd0e2ecf15249514231eed54000c1) )
 	ROM_RELOAD(                     0x280000, 0x80000)
 	ROM_LOAD( "9255-60-01_u38-r0c", 0x300000, 0x80000, BAD_DUMP CRC(018e36c7) SHA1(8e9b457238a40b10d59887d13bac9c0a05c73614) ) /* Location U38, 07/10/1997 16:27:51 */
 	ROM_RELOAD(                     0x380000, 0x80000)
