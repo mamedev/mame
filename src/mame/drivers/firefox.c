@@ -292,27 +292,16 @@ static int sprite_bank;
  *
  *************************************/
 
-VIDEO_UPDATE( firefox )
+static void draw_sprites( bitmap_t *bitmap, int priority, const rectangle *visarea )
 {
-	int x;
-	int y;
 	int sprite;
-	const rectangle *visarea = video_screen_get_visible_area( Machine->primary_screen );
-
-	for( y = 0; y < 64; y++ )
-	{
-		for( x = 0; x < 64; x++ )
-		{
-			drawgfx( bitmap, Machine->gfx[ 0 ], tileram[ x + ( y * 64 ) ], 0, 0, 0, x * 8, y * 8, visarea, TRANSPARENCY_NONE, 0 );
-		}
-	}
 
 	for( sprite = 0; sprite < 32; sprite++ )
 	{
 		UINT8 *sprite_data = spriteram + ( 0x200 * sprite_bank ) + ( sprite * 16 );
 		int flags = sprite_data[ 0 ];
-		y = sprite_data[ 1 ] + ( 256 * ( ( flags >> 0 ) & 1 ) );
-		x = sprite_data[ 2 ] + ( 256 * ( ( flags >> 1 ) & 1 ) );
+		int y = sprite_data[ 1 ] + ( 256 * ( ( flags >> 0 ) & 1 ) );
+		int x = sprite_data[ 2 ] + ( 256 * ( ( flags >> 1 ) & 1 ) );
 
 		if( x != 0 )
 		{
@@ -325,10 +314,35 @@ VIDEO_UPDATE( firefox )
 				int flipx = flags & 0x20;
 				int flipy = flags & 0x10;
 
-				drawgfx( bitmap, Machine->gfx[ 1 ], code, color, flipx, flipy, x + 16, 500 - y - ( row * 16 ), visarea, TRANSPARENCY_PEN, 0 );
+				if( ( flags & 1 ) == priority )
+				{
+					drawgfx( bitmap, Machine->gfx[ 1 ], code, color, flipx, flipy, x + 16, 500 - y - ( row * 16 ), visarea, TRANSPARENCY_PEN, 0 );
+				}
 			}
 		}
 	}
+
+}
+
+VIDEO_UPDATE( firefox )
+{
+	int x;
+	int y;
+	const rectangle *visarea = video_screen_get_visible_area( Machine->primary_screen );
+
+	fillbitmap( bitmap, 256, visarea );
+
+	draw_sprites( bitmap, 1, visarea );
+
+	for( y = 0; y < 64; y++ )
+	{
+		for( x = 0; x < 64; x++ )
+		{
+			drawgfx( bitmap, Machine->gfx[ 0 ], tileram[ x + ( y * 64 ) ], 0, 0, 0, x * 8, y * 8, visarea, TRANSPARENCY_PEN, 0 );
+		}
+	}
+
+	draw_sprites( bitmap, 0, visarea );
 
 	return 0;
 }
