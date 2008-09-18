@@ -129,7 +129,7 @@ struct _laserdisc_config
 	\
 	MDRV_SCREEN_ADD(_tag, RASTER) \
 	MDRV_SCREEN_FORMAT(_overlayformat) \
-	MDRV_SCREEN_RAW_PARAMS(XTAL_14_31818MHz*2, 910, 0, 704, 525, 0, 480) \
+	MDRV_SCREEN_RAW_PARAMS(XTAL_14_31818MHz*2, 910, 0, 704, 525, 44, 524) \
 
 /* not correct yet; fix me... */
 #define MDRV_LASERDISC_SCREEN_ADD_PAL(_tag, _format) \
@@ -157,8 +157,8 @@ extern const custom_sound_interface laserdisc_custom_interface;
 
 /* ----- core control and status ----- */
 
-/* get a bitmap for the current frame (and the frame number) */
-UINT32 laserdisc_get_video(const device_config *device, bitmap_t **bitmap);
+/* get a bitmap for the current frame; return TRUE if valid or FALSE if video off */
+int laserdisc_get_video(const device_config *device, bitmap_t **bitmap);
 
 /* return the raw philips or white flag codes */
 UINT32 laserdisc_get_field_code(const device_config *device, UINT8 code);
@@ -188,9 +188,6 @@ void pr7820_set_slow_speed(const device_config *device, double frame_rate_scaler
 
 /* control the audio squelch of the Simutrek modified players */
 void simutrek_set_audio_squelch(const device_config *device, int state);
-
-/* set the callback */
-void simutrek_set_cmd_ack_callback(const device_config *device, void (*callback)(void));
 
 
 

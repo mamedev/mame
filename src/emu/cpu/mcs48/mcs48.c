@@ -1114,10 +1114,11 @@ static void mcs48_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_CREDITS:							strcpy(info->s, "Copyright Mirko Buffoni\nBased on the original work Copyright Dan Boris"); break;
 
 		case CPUINFO_STR_FLAGS:
-			sprintf(info->s, "%c %c%c%c%c%c%c%c%c",
-				mcs48.a11        ? 'M':'.',
+			sprintf(info->s, "%c%c %c%c%c%c%c%c%c%c",
+				mcs48.irq_state ? 'I':'.',
+				mcs48.a11       ? 'M':'.',
 				PSW & 0x80 ? 'C':'.',
-				PSW & 0x40 ? 'a':'.',
+				PSW & 0x40 ? 'A':'.',
 				PSW & 0x20 ? 'F':'.',
 				PSW & 0x10 ? 'B':'.',
 				PSW & 0x08 ? '?':'.',

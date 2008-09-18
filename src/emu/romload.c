@@ -631,7 +631,7 @@ static int open_rom_file(running_machine *machine, rom_load_data *romdata, const
 		}
 
 	/* if the region is load by name, load the ROM from there */
-	if (regiontag != NULL)
+	if (romdata->file == NULL && regiontag != NULL)
 	{
 		astring *fname = astring_assemble_3(astring_alloc(), regiontag, PATH_SEPARATOR, ROM_GETNAME(romp));
 		if (has_crc)

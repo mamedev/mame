@@ -15,6 +15,7 @@
 #include "bitmap.h"
 #include "md5.h"
 #include "sha1.h"
+#include "vbiparse.h"
 #include <stdarg.h>
 #include <stdio.h>
 #include <time.h>
@@ -84,7 +85,8 @@ static clock_t lastprogress = 0;
 ***************************************************************************/
 
 /*-------------------------------------------------
-    print_big_int - 64-bit int printing with commas
+    print_big_int - 64-bit int printing with 
+    commas
 -------------------------------------------------*/
 
 static void print_big_int(UINT64 intvalue, char *output)
@@ -105,7 +107,8 @@ static void print_big_int(UINT64 intvalue, char *output)
 
 
 /*-------------------------------------------------
-    big_int_string - return a string for a big int
+    big_int_string - return a string for a big 
+    integer
 -------------------------------------------------*/
 
 static char *big_int_string(UINT64 intvalue)
@@ -162,6 +165,7 @@ static int usage(void)
 	printf("   or: chdman -merge parent.chd diff.chd output.chd\n");
 	printf("   or: chdman -diff parent.chd compare.chd diff.chd\n");
 	printf("   or: chdman -setchs inout.chd cylinders heads sectors\n");
+	printf("   or: chdman -fixavdata inout.chd\n");
 	return 1;
 }
 
@@ -755,6 +759,7 @@ static int do_createav(int argc, char *argv[], int param)
 	const char *inputfile, *outputfile;
 	bitmap_t *fullbitmap = NULL;
 	const avi_movie_info *info;
+	UINT8 *ldframedata = NULL;
 	const chd_header *header;
 	chd_file *chd = NULL;
 	avi_file *avi = NULL;
@@ -836,6 +841,19 @@ static int do_createav(int argc, char *argv[], int param)
 		height /= 2;
 		firstframe *= 2;
 		numframes *= 2;
+	}
+	
+	/* allocate space for the frame data */
+	if (height == 524/2 || height == 624/2)
+	{
+		ldframedata = malloc(numframes * VBI_PACKED_BYTES);
+		if (ldframedata == NULL)
+		{
+			fprintf(stderr, "Out of memory allocating frame metadata\n");
+			err = CHDERR_OUT_OF_MEMORY;
+			goto cleanup;
+		}
+		memset(ldframedata, 0, numframes * VBI_PACKED_BYTES);
 	}
 
 	/* determine the number of bytes per frame */
@@ -919,6 +937,15 @@ static int do_createav(int argc, char *argv[], int param)
 			fprintf(stderr, "Error reading frame %d from AVI file: %s\n", effframe, avi_error_string(avierr));
 			err = CHDERR_COMPRESSION_ERROR;
 		}
+		
+		/* update metadata for this frame */
+		if (ldframedata != NULL)
+		{
+			/* parse the data and pack it */
+			vbi_metadata vbi;
+			vbi_parse_all((const UINT16 *)avconfig.video->base, avconfig.video->rowpixels, avconfig.video->width, 8, &vbi);
+			vbi_metadata_pack(&ldframedata[framenum * VBI_PACKED_BYTES], framenum, &vbi);
+		}
 
 		/* configure the compressor for this frame */
 		chd_codec_config(chd, AV_CODEC_COMPRESS_CONFIG, &avconfig);
@@ -927,6 +954,17 @@ static int do_createav(int argc, char *argv[], int param)
 		err = chd_compress_hunk(chd, NULL, &ratio);
 		if (err != CHDERR_NONE)
 			goto cleanup;
+	}
+
+	/* write the final metadata */
+	if (ldframedata != NULL)
+	{
+		err = chd_set_metadata(chd, AV_LD_METADATA_TAG, 0, ldframedata, numframes * VBI_PACKED_BYTES);
+		if (err != CHDERR_NONE)
+		{
+			fprintf(stderr, "Error adding AVLD metadata: %s\n", chd_error_string(err));
+			goto cleanup;
+		}
 	}
 
 	/* finish compression */
@@ -947,6 +985,8 @@ cleanup:
 			free(avconfig.audio[chnum]);
 	if (fullbitmap != NULL)
 		bitmap_free(fullbitmap);
+	if (ldframedata != NULL)
+		free(ldframedata);
 	if (err != CHDERR_NONE)
 		osd_rmfile(outputfile);
 	return (err != CHDERR_NONE);
@@ -1466,7 +1506,7 @@ static int do_extractav(int argc, char *argv[], int param)
 	numframes = MIN(totalframes - firstframe, numframes);
 
 	/* allocate a video buffer */
-	fullbitmap = bitmap_alloc(width, height * (interlaced ? 2 : 1), BITMAP_FORMAT_YUY16);
+	fullbitmap = bitmap_alloc(width, height, BITMAP_FORMAT_YUY16);
 	if (fullbitmap ==  NULL)
 	{
 		fprintf(stderr, "Out of memory allocating temporary bitmap\n");
@@ -1719,6 +1759,236 @@ cleanup:
 	/* close everything down */
 	if (chd != NULL)
 		chd_close(chd);
+	return (err != CHDERR_NONE);
+}
+
+
+/*-------------------------------------------------
+    do_fixavdata - fix the AV metadata for an
+    A/V file
+-------------------------------------------------*/
+
+static int do_fixavdata(int argc, char *argv[], int param)
+{
+	int fps, fpsfrac, width, height, interlaced, channels, rate;
+	av_codec_decompress_config avconfig = { 0 };
+	bitmap_t *fullbitmap = NULL;
+	const char *inputfile;
+	UINT8 *vbidata = NULL;
+	int writeable = FALSE;
+	chd_file *chd = NULL;
+	bitmap_t fakebitmap;
+	char metadata[256];
+	chd_header header;
+	UINT32 actlength;
+	UINT32 framenum;
+	chd_error err;
+	int fixframes = 0;
+	int fixes = 0;
+
+	/* require 3 args total */
+	if (argc != 3)
+		return usage();
+
+	/* extract the data */
+	inputfile = argv[2];
+
+	/* print some info */
+	printf("Input file:   %s\n", inputfile);
+
+	/* get the header */
+	err = chd_open(inputfile, CHD_OPEN_READ, NULL, &chd);
+	if (err != CHDERR_NONE)
+	{
+		fprintf(stderr, "Error opening CHD file '%s': %s\n", inputfile, chd_error_string(err));
+		goto cleanup;
+	}
+	header = *chd_get_header(chd);
+	
+	/* get the metadata */
+	err = chd_get_metadata(chd, AV_METADATA_TAG, 0, metadata, sizeof(metadata), NULL, NULL);
+	if (err != CHDERR_NONE)
+	{
+		fprintf(stderr, "Error getting A/V metadata: %s\n", chd_error_string(err));
+		goto cleanup;
+	}
+
+	/* extract the info */
+	if (sscanf(metadata, AV_METADATA_FORMAT, &fps, &fpsfrac, &width, &height, &interlaced, &channels, &rate) != 7)
+	{
+		fprintf(stderr, "Improperly formatted metadata\n");
+		err = CHDERR_INVALID_METADATA;
+		goto cleanup;
+	}
+
+	/* allocate space for the frame data */
+	if ((height != 524/2 && height != 624/2) || !interlaced)
+	{
+		fprintf(stderr, "This file does not need VBI metadata\n");
+		err = CHDERR_INVALID_METADATA;
+		goto cleanup;
+	}
+
+	/* allocate a video buffer */
+	fullbitmap = bitmap_alloc(width, height, BITMAP_FORMAT_YUY16);
+	if (fullbitmap ==  NULL)
+	{
+		fprintf(stderr, "Out of memory allocating temporary bitmap\n");
+		err = CHDERR_OUT_OF_MEMORY;
+		goto cleanup;
+	}
+	avconfig.video = &fakebitmap;
+
+	/* allocate memory for VBI data */
+	vbidata = malloc(header.totalhunks * VBI_PACKED_BYTES);
+	if (vbidata == NULL)
+	{
+		fprintf(stderr, "Out of memory allocating VBI data\n");
+		err = CHDERR_OUT_OF_MEMORY;
+		goto cleanup;
+	}
+	
+	/* read the metadata */
+	err = chd_get_metadata(chd, AV_LD_METADATA_TAG, 0, vbidata, header.totalhunks * VBI_PACKED_BYTES, &actlength, NULL);
+	if (err != CHDERR_NONE)
+	{
+		fprintf(stderr, "Error getting VBI metadata: %s\n", chd_error_string(err));
+		memset(vbidata, 0, header.totalhunks * VBI_PACKED_BYTES);
+		fixes++;
+	}
+	if (actlength != header.totalhunks * VBI_PACKED_BYTES)
+	{
+		fprintf(stderr, "VBI metadata incorrect size\n");
+		memset(vbidata, 0, header.totalhunks * VBI_PACKED_BYTES);
+		fixes++;
+	}
+
+	/* loop over hunks, reading */
+	for (framenum = 0; framenum < header.totalhunks; framenum++)
+	{
+		vbi_metadata origvbi;
+		vbi_metadata vbi;
+		UINT32 vbiframe;
+
+		/* progress */
+		progress(framenum == 0, "Processing hunk %d/%d...  \r", framenum, header.totalhunks);
+
+		/* set up the fake bitmap for this frame */
+		*avconfig.video = *fullbitmap;
+
+		/* configure the decompressor for this frame */
+		chd_codec_config(chd, AV_CODEC_DECOMPRESS_CONFIG, &avconfig);
+
+		/* read the hunk into the buffers */
+		err = chd_read(chd, framenum, NULL);
+		if (err != CHDERR_NONE)
+		{
+			fprintf(stderr, "Error reading hunk %d from CHD file: %s\n", framenum, chd_error_string(err));
+			goto cleanup;
+		}
+
+		/* unpack the current data for this frame */
+		vbi_metadata_unpack(&origvbi, &vbiframe, &vbidata[framenum * VBI_PACKED_BYTES]);
+
+		/* parse the video data */
+		vbi_parse_all((const UINT16 *)avconfig.video->base, avconfig.video->rowpixels, avconfig.video->width, 8, &vbi);
+
+		/* verify the data */
+		if (vbiframe != 0 || origvbi.white != 0 || origvbi.line16 != 0 || origvbi.line17 != 0 || origvbi.line18 != 0 || origvbi.line1718 != 0)
+		{
+			int errors = 0;
+			
+			if (vbiframe != framenum)
+			{
+				fprintf(stderr, "%d:Frame mismatch in VBI data (%d, should be %d)\n", framenum, vbiframe, framenum);
+				errors++;
+			}
+			if (vbi.white != origvbi.white)
+			{
+				fprintf(stderr, "%d:White flag mismatch in VBI data (%d, should be %d)\n", framenum, origvbi.white, vbi.white);
+				errors++;
+			}
+			if (vbi.line16 != origvbi.line16)
+			{
+				fprintf(stderr, "%d:Line 16 mismatch in VBI data (%06X, should be %06X)\n", framenum, origvbi.line16, vbi.line16);
+				errors++;
+			}
+			if (vbi.line17 != origvbi.line17)
+			{
+				fprintf(stderr, "%d:Line 17 mismatch in VBI data (%06X, should be %06X)\n", framenum, origvbi.line17, vbi.line17);
+				errors++;
+			}
+			if (vbi.line18 != origvbi.line18)
+			{
+				fprintf(stderr, "%d:Line 18 mismatch in VBI data (%06X, should be %06X)\n", framenum, origvbi.line18, vbi.line18);
+				errors++;
+			}
+			if (vbi.line1718 != origvbi.line1718)
+			{
+				fprintf(stderr, "%d:Line 17/18 mismatch in VBI data (%06X, should be %06X)\n", framenum, origvbi.line1718, vbi.line1718);
+				errors++;
+			}
+			fixes += errors;
+			fixframes += (errors != 0);
+		}
+		
+		/* pack the new data */
+		vbi_metadata_pack(&vbidata[framenum * VBI_PACKED_BYTES], framenum, &vbi);
+	}
+	progress(TRUE, "Processing complete!                                     \n");
+
+	/* print final results */
+	if (fixes == 0)
+		printf("\nNo fixes required\n");
+	else
+		printf("\nFound %d errors on %d frames\n", fixes, fixframes);
+	
+	/* close the drive */
+	chd_close(chd);
+	chd = NULL;
+
+	/* apply fixes */
+	if (fixes > 0)
+	{
+		/* mark the CHD writeable */
+		header.flags |= CHDFLAGS_IS_WRITEABLE;
+		err = chd_set_header(inputfile, &header);
+		if (err != CHDERR_NONE)
+			fprintf(stderr, "Error writing new header: %s\n", chd_error_string(err));
+		header.flags &= ~CHDFLAGS_IS_WRITEABLE;
+		writeable = TRUE;
+		
+		/* open the file */
+		err = chd_open(inputfile, CHD_OPEN_READWRITE, NULL, &chd);
+		if (err != CHDERR_NONE)
+		{
+			fprintf(stderr, "Error opening CHD file '%s': %s\n", inputfile, chd_error_string(err));
+			goto cleanup;
+		}
+		
+		/* write new metadata */
+		err = chd_set_metadata(chd, AV_LD_METADATA_TAG, 0, vbidata, header.totalhunks * VBI_PACKED_BYTES);
+		if (err != CHDERR_NONE)
+		{
+			fprintf(stderr, "Error adding AVLD metadata: %s\n", chd_error_string(err));
+			goto cleanup;
+		}
+		else
+			printf("Updated metadata written successfully\n");
+		
+		/* allow cleanup code to close the file and revert the header */
+	}
+
+cleanup:
+	/* clean up our mess */
+	if (fullbitmap != NULL)
+		bitmap_free(fullbitmap);
+	if (vbidata != NULL)
+		free(vbidata);
+	if (chd != NULL)
+		chd_close(chd);
+	if (writeable)
+		chd_set_header(inputfile, &header);
 	return (err != CHDERR_NONE);
 }
 
@@ -2535,7 +2805,8 @@ int CLIB_DECL main(int argc, char **argv)
 		{ "-info",			do_info, 0 },
 		{ "-merge",			do_merge_update_chomp, OPERATION_MERGE },
 		{ "-diff",			do_diff, 0 },
-		{ "-setchs",		do_setchs, 0 }
+		{ "-setchs",		do_setchs, 0 },
+		{ "-fixavdata",		do_fixavdata, 0 }
 	};
 	extern char build_version[];
 	int i;

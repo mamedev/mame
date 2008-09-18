@@ -680,7 +680,7 @@ static INTERRUPT_GEN( gottlieb_interrupt )
 		bitmap_t *dummy;
 
 		/* set the "disc ready" bit, which basically indicates whether or not we have a proper video frame */
-		if (laserdisc_get_video(laserdisc, &dummy) == 0)
+		if (!laserdisc_get_video(laserdisc, &dummy))
 			laserdisc_status &= ~0x20;
 		else
 			laserdisc_status |= 0x20;

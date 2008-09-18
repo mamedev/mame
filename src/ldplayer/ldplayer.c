@@ -29,12 +29,18 @@ enum
 {
 	CMD_SCAN_REVERSE,
 	CMD_STEP_REVERSE,
+	CMD_SLOW_REVERSE,
+	CMD_FAST_REVERSE,
 	CMD_SCAN_FORWARD,
 	CMD_STEP_FORWARD,
+	CMD_SLOW_FORWARD,
+	CMD_FAST_FORWARD,
 	CMD_PLAY,
 	CMD_PAUSE,
-	CMD_DISPLAY_ON,
-	CMD_DISPLAY_OFF,
+	CMD_FRAME_TOGGLE,
+	CMD_CHAPTER_TOGGLE,
+	CMD_CH1_TOGGLE,
+	CMD_CH2_TOGGLE,
 	CMD_0,
 	CMD_1,
 	CMD_2,
@@ -60,7 +66,6 @@ static astring *filename;
 
 static input_port_value last_controls;
 static UINT8 playing;
-static UINT8 displaying;
 
 static emu_timer *pr8210_bit_timer;
 static UINT32 pr8210_command_buffer_in, pr8210_command_buffer_out;
@@ -81,51 +86,68 @@ static void process_commands(const device_config *laserdisc)
 	input_port_value controls = input_port_read(laserdisc->machine, "controls");
  	int number;
 
-	/* scan/step backwards */
-	if (playing)
-	{
-		if (controls & 0x01)
-			(*execute_command)(laserdisc, CMD_SCAN_REVERSE);
-	}
-	else
-	{
-		if (!(last_controls & 0x01) && (controls & 0x01))
-			(*execute_command)(laserdisc, CMD_STEP_REVERSE);
-	}
+	/* step backwards */
+	if (!(last_controls & 0x01) && (controls & 0x01))
+		(*execute_command)(laserdisc, CMD_STEP_REVERSE);
 
-	/* scan/step forwards */
-	if (playing)
-	{
-		if (controls & 0x02)
-			(*execute_command)(laserdisc, CMD_SCAN_FORWARD);
-	}
-	else
-	{
-		if (!(last_controls & 0x02) && (controls & 0x02))
-			(*execute_command)(laserdisc, CMD_STEP_FORWARD);
-	}
+	/* step forwards */
+	if (!(last_controls & 0x02) && (controls & 0x02))
+		(*execute_command)(laserdisc, CMD_STEP_FORWARD);
+
+	/* scan backwards */
+	if (controls & 0x04)
+		(*execute_command)(laserdisc, CMD_SCAN_REVERSE);
+
+	/* scan forwards */
+	if (controls & 0x08)
+		(*execute_command)(laserdisc, CMD_SCAN_FORWARD);
+
+	/* slow backwards */
+	if (!(last_controls & 0x10) && (controls & 0x10))
+		(*execute_command)(laserdisc, CMD_SLOW_REVERSE);
+
+	/* slow forwards */
+	if (!(last_controls & 0x20) && (controls & 0x20))
+		(*execute_command)(laserdisc, CMD_SLOW_FORWARD);
+
+	/* fast backwards */
+	if (controls & 0x40)
+		(*execute_command)(laserdisc, CMD_FAST_REVERSE);
+
+	/* fast forwards */
+	if (controls & 0x80)
+		(*execute_command)(laserdisc, CMD_FAST_FORWARD);
 
 	/* play/pause */
-	if (!(last_controls & 0x10) && (controls & 0x10))
+	if (!(last_controls & 0x100) && (controls & 0x100))
 	{
 		playing = !playing;
 		(*execute_command)(laserdisc, playing ? CMD_PLAY : CMD_PAUSE);
 	}
 
-	/* toggle display */
-	if (!(last_controls & 0x20) && (controls & 0x20))
-	{
-		displaying = !displaying;
-		(*execute_command)(laserdisc, displaying ? CMD_DISPLAY_ON : CMD_DISPLAY_OFF);
-	}
+	/* toggle frame display */
+	if (!(last_controls & 0x200) && (controls & 0x200))
+		(*execute_command)(laserdisc, CMD_FRAME_TOGGLE);
+
+	/* toggle chapter display */
+	if (!(last_controls & 0x400) && (controls & 0x400))
+		(*execute_command)(laserdisc, CMD_CHAPTER_TOGGLE);
+
+	/* toggle left channel */
+	if (!(last_controls & 0x800) && (controls & 0x800))
+		(*execute_command)(laserdisc, CMD_CH1_TOGGLE);
+
+	/* toggle right channel */
+	if (!(last_controls & 0x1000) && (controls & 0x1000))
+		(*execute_command)(laserdisc, CMD_CH2_TOGGLE);
 
 	/* numbers */
 	for (number = 0; number < 10; number++)
-		if (!(last_controls & (0x100 << number)) && (controls & (0x100 << number)))
+		if (!(last_controls & (0x10000 << number)) && (controls & (0x10000 << number)))
 			(*execute_command)(laserdisc, CMD_0 + number);
 
 	/* enter */
-	if (!(last_controls & 0x40000) && (controls & 0x40000))
+	if (!(last_controls & 0x4000000) && (controls & 0x4000000))
 		(*execute_command)(laserdisc, CMD_SEARCH);
 
 	last_controls = controls;
@@ -162,7 +184,6 @@ static TIMER_CALLBACK( autoplay )
 	/* start playing */
 	(*execute_command)(laserdisc, CMD_PLAY);
 	playing = TRUE;
-	displaying = FALSE;
 }
 
 
@@ -185,7 +206,6 @@ static MACHINE_RESET( ldplayer )
 
 INLINE void pr8210_add_command(UINT8 command)
 {
-	pr8210_command_buffer[pr8210_command_buffer_in++ % ARRAY_LENGTH(pr8210_command_buffer)] = (command & 0x1f) | 0x20;
 	pr8210_command_buffer[pr8210_command_buffer_in++ % ARRAY_LENGTH(pr8210_command_buffer)] = (command & 0x1f) | 0x20;
 	pr8210_command_buffer[pr8210_command_buffer_in++ % ARRAY_LENGTH(pr8210_command_buffer)] = 0x00 | 0x20;
 }
@@ -252,7 +272,8 @@ static void pr8210_execute(const device_config *laserdisc, int command)
 	switch (command)
 	{
 		case CMD_SCAN_REVERSE:
-			if (pr8210_command_buffer_in == pr8210_command_buffer_out)
+			if (pr8210_command_buffer_in == pr8210_command_buffer_out ||
+				pr8210_command_buffer_in == (pr8210_command_buffer_out + 1) % ARRAY_LENGTH(pr8210_command_buffer))
 			{
 				pr8210_add_command(0x1c);
 				playing = TRUE;
@@ -264,8 +285,23 @@ static void pr8210_execute(const device_config *laserdisc, int command)
 			playing = FALSE;
 			break;
 
+		case CMD_SLOW_REVERSE:
+			pr8210_add_command(0x02);
+			playing = TRUE;
+			break;
+
+		case CMD_FAST_REVERSE:
+			if (pr8210_command_buffer_in == pr8210_command_buffer_out ||
+				pr8210_command_buffer_in == (pr8210_command_buffer_out + 1) % ARRAY_LENGTH(pr8210_command_buffer))
+			{
+				pr8210_add_command(0x0c);
+				playing = TRUE;
+			}
+			break;
+
 		case CMD_SCAN_FORWARD:
-			if (pr8210_command_buffer_in == pr8210_command_buffer_out)
+			if (pr8210_command_buffer_in == pr8210_command_buffer_out ||
+				pr8210_command_buffer_in == (pr8210_command_buffer_out + 1) % ARRAY_LENGTH(pr8210_command_buffer))
 			{
 				pr8210_add_command(0x08);
 				playing = TRUE;
@@ -275,6 +311,20 @@ static void pr8210_execute(const device_config *laserdisc, int command)
 		case CMD_STEP_FORWARD:
 			pr8210_add_command(0x04);
 			playing = FALSE;
+			break;
+
+		case CMD_SLOW_FORWARD:
+			pr8210_add_command(0x18);
+			playing = TRUE;
+			break;
+
+		case CMD_FAST_FORWARD:
+			if (pr8210_command_buffer_in == pr8210_command_buffer_out ||
+				pr8210_command_buffer_in == (pr8210_command_buffer_out + 1) % ARRAY_LENGTH(pr8210_command_buffer))
+			{
+				pr8210_add_command(0x10);
+				playing = TRUE;
+			}
 			break;
 
 		case CMD_PLAY:
@@ -287,9 +337,20 @@ static void pr8210_execute(const device_config *laserdisc, int command)
 			playing = FALSE;
 			break;
 
-		case CMD_DISPLAY_ON:
-		case CMD_DISPLAY_OFF:
+		case CMD_FRAME_TOGGLE:
 			pr8210_add_command(0x0b);
+			break;
+
+		case CMD_CHAPTER_TOGGLE:
+			pr8210_add_command(0x06);
+			break;
+
+		case CMD_CH1_TOGGLE:
+			pr8210_add_command(0x0e);
+			break;
+
+		case CMD_CH2_TOGGLE:
+			pr8210_add_command(0x16);
 			break;
 
 		case CMD_0:
@@ -355,13 +416,7 @@ static void ldv1000_execute(const device_config *laserdisc, int command)
 			playing = FALSE;
 			break;
 
-		case CMD_DISPLAY_ON:
-			laserdisc_data_w(laserdisc, digits[1]);
-			laserdisc_data_w(laserdisc, 0xf1);
-			break;
-
-		case CMD_DISPLAY_OFF:
-			laserdisc_data_w(laserdisc, digits[0]);
+		case CMD_FRAME_TOGGLE:
 			laserdisc_data_w(laserdisc, 0xf1);
 			break;
 
@@ -395,23 +450,30 @@ static void ldv1000_execute(const device_config *laserdisc, int command)
 
 static INPUT_PORTS_START( ldplayer )
 	PORT_START("controls")
-	PORT_BIT( 0x00001, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )
-	PORT_BIT( 0x00002, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT )
-	PORT_BIT( 0x00004, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )
-	PORT_BIT( 0x00008, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )
-	PORT_BIT( 0x00010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_CODE(KEYCODE_SPACE)
-	PORT_BIT( 0x00020, IP_ACTIVE_HIGH, IPT_BUTTON2 )
-	PORT_BIT( 0x00100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_0)
-	PORT_BIT( 0x00200, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x00400, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x00800, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x01000, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_4_PAD) PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x02000, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_5)
-	PORT_BIT( 0x04000, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_6)
-	PORT_BIT( 0x08000, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_7)
-	PORT_BIT( 0x10000, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x20000, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_9_PAD) PORT_CODE(KEYCODE_9)
-	PORT_BIT( 0x40000, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_PLAYER(2) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CODE(KEYCODE_ENTER)
+	PORT_BIT( 0x0000001, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Step reverse") PORT_CODE(KEYCODE_LEFT)
+	PORT_BIT( 0x0000002, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Step forward") PORT_CODE(KEYCODE_RIGHT)
+	PORT_BIT( 0x0000004, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Scan reverse") PORT_CODE(KEYCODE_UP)
+	PORT_BIT( 0x0000008, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Scan forward") PORT_CODE(KEYCODE_DOWN)
+	PORT_BIT( 0x0000010, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Slow reverse") PORT_CODE(KEYCODE_OPENBRACE)
+	PORT_BIT( 0x0000020, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Slow forward") PORT_CODE(KEYCODE_CLOSEBRACE)
+	PORT_BIT( 0x0000040, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Fast reverse") PORT_CODE(KEYCODE_COMMA)
+	PORT_BIT( 0x0000080, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Fast forward") PORT_CODE(KEYCODE_STOP)
+	PORT_BIT( 0x0000100, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Play/Pause") PORT_CODE(KEYCODE_SPACE) 
+	PORT_BIT( 0x0000200, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Toggle frame display") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x0000400, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Toggle chapter display") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x0000800, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Toggle left channel") PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x0001000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Toggle right channel") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x0010000, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("0") PORT_PLAYER(2) PORT_CODE(KEYCODE_0_PAD) PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x0020000, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("1") PORT_PLAYER(2) PORT_CODE(KEYCODE_1_PAD) PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x0040000, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("2") PORT_PLAYER(2) PORT_CODE(KEYCODE_2_PAD) PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x0080000, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("3") PORT_PLAYER(2) PORT_CODE(KEYCODE_3_PAD) PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x0100000, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("4") PORT_PLAYER(2) PORT_CODE(KEYCODE_4_PAD) PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x0200000, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("5") PORT_PLAYER(2) PORT_CODE(KEYCODE_5_PAD) PORT_CODE(KEYCODE_5)
+	PORT_BIT( 0x0400000, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("6") PORT_PLAYER(2) PORT_CODE(KEYCODE_6_PAD) PORT_CODE(KEYCODE_6)
+	PORT_BIT( 0x0800000, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("7") PORT_PLAYER(2) PORT_CODE(KEYCODE_7_PAD) PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x1000000, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("8") PORT_PLAYER(2) PORT_CODE(KEYCODE_8_PAD) PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x2000000, IP_ACTIVE_HIGH, IPT_BUTTON10 ) PORT_NAME("9") PORT_PLAYER(2) PORT_CODE(KEYCODE_9_PAD) PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x4000000, IP_ACTIVE_HIGH, IPT_BUTTON11 ) PORT_NAME("Enter") PORT_PLAYER(2) PORT_CODE(KEYCODE_ENTER_PAD) PORT_CODE(KEYCODE_ENTER)
 INPUT_PORTS_END
 
 

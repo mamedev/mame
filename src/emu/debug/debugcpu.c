@@ -120,6 +120,7 @@ static UINT64 get_tempvar(void *ref);
 static UINT64 get_logunmap(void *ref);
 static UINT64 get_beamx(void *ref);
 static UINT64 get_beamy(void *ref);
+static UINT64 get_frame(void *ref);
 static void set_tempvar(void *ref, UINT64 value);
 static void set_logunmap(void *ref, UINT64 value);
 static UINT64 get_current_pc(void *ref);
@@ -200,6 +201,7 @@ void debug_cpu_init(running_machine *machine)
 	symtable_add_register(global_symtable, "logunmapi", (void *)ADDRESS_SPACE_IO, get_logunmap, set_logunmap);
 	symtable_add_register(global_symtable, "beamx", NULL, get_beamx, NULL);
 	symtable_add_register(global_symtable, "beamy", NULL, get_beamy, NULL);
+	symtable_add_register(global_symtable, "frame", NULL, get_frame, NULL);
 
 	/* add the temporary variables to the global symbol table */
 	for (regnum = 0; regnum < NUM_TEMP_VARIABLES; regnum++)
@@ -2810,6 +2812,22 @@ static UINT64 get_beamy(void *ref)
 
 	if (screen != NULL)
 		ret = video_screen_get_vpos(screen);
+
+	return ret;
+}
+
+
+/*-------------------------------------------------
+    get_frame - get current frame number
+-------------------------------------------------*/
+
+static UINT64 get_frame(void *ref)
+{
+	UINT64 ret = 0;
+	const device_config *screen = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, 0);
+
+	if (screen != NULL)
+		ret = video_screen_get_frame_number(screen);
 
 	return ret;
 }

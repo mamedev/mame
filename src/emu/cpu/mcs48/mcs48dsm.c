@@ -278,8 +278,8 @@ offs_t mcs48_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opra
 			cp++;
 			switch (*cp++)
 			{
-				case 'A': sprintf(num,"$%04X",a); break;
-				case 'J': sprintf(num,"$%04X",((pc+1) & 0xf00) | a); break;
+				case 'A': sprintf(num,"$%03X",a); break;
+				case 'J': sprintf(num,"$%03X",((pc+1) & 0xf00) | a); break;
 				case 'B': sprintf(num,"%d",b); break;
 				case 'D': sprintf(num,"%d",d); break;
 				case 'X': sprintf(num,"%X",d); break;

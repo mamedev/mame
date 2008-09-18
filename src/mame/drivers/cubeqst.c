@@ -5,7 +5,6 @@
     driver by Phil Bennett
 
     TODO:
-       * Emulate D8478 laserdisc interface MCU
        * Accurate video timings
         - Derive from PROMs
        * More accurate line fill circuitry emulation
@@ -61,7 +60,6 @@ static UINT8 io_latch;
 static UINT8 reset_latch;
 
 static int disk_on;
-static int ldp_command_flag;
 static const device_config *laserdisc;
 
 /*************************************
@@ -222,14 +220,7 @@ static INTERRUPT_GEN( vblank )
 
 static WRITE16_HANDLER( laserdisc_w )
 {
-	ldp_command_flag = 1;
 	laserdisc_data_w(laserdisc, data & 0xff);
-}
-
-/* Called by the player emulation to acknowledge the 68000 command */
-void ldp_ack_callback(void)
-{
-	ldp_command_flag = 0;
 }
 
 /*
@@ -238,6 +229,7 @@ void ldp_ack_callback(void)
 */
 static READ16_HANDLER( laserdisc_r )
 {
+	int ldp_command_flag = (laserdisc_line_r(laserdisc, LASERDISC_LINE_READY) == ASSERT_LINE) ? 0 : 1;
 	int ldp_seek_status = (laserdisc_line_r(laserdisc, LASERDISC_LINE_STATUS) == ASSERT_LINE) ? 1 : 0;
 
 	return (ldp_seek_status << 1) | ldp_command_flag;
@@ -444,15 +436,11 @@ ADDRESS_MAP_END
 static MACHINE_START( cubeqst )
 {
 	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
-	simutrek_set_cmd_ack_callback(laserdisc, ldp_ack_callback);
 }
 
 static MACHINE_RESET( cubeqst )
 {
 	reset_latch = 0;
-
-	/* Do this until we sort out the laserdisc interface properly */
-	ldp_command_flag = 0;
 
 	/* Auxillary CPUs are held in reset */
 	cpunum_set_input_line(machine, SOUND_CPU, INPUT_LINE_RESET, ASSERT_LINE);
@@ -558,12 +546,6 @@ static MACHINE_DRIVER_START( cubeqst )
 	MDRV_CPU_PROGRAM_MAP(line_sound_map, 0)
 	MDRV_CPU_CONFIG(snd_config)
 
-#if 0
-	MDRV_CPU_ADD("ldp_cpu", I8048, XTAL_10MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(ldp_mem, 0)
-	MDRV_CPU_IO_MAP(ldp_io, 0)
-#endif
-
 	MDRV_INTERLEAVE(700)
 
 	MDRV_MACHINE_START(cubeqst)
@@ -580,6 +562,7 @@ static MACHINE_DRIVER_START( cubeqst )
 	MDRV_LASERDISC_OVERLAY(cubeqst, CUBEQST_HBLANK, CUBEQST_VCOUNT, BITMAP_FORMAT_INDEXED16)
 	MDRV_LASERDISC_OVERLAY_CLIP(0, 320-1, 0, 256-8)
 	MDRV_LASERDISC_OVERLAY_POSITION(0.002, -0.018)
+	MDRV_LASERDISC_OVERLAY_SCALE(1.0, 1.030)
 
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
@@ -657,9 +640,6 @@ ROM_START( cubeqst )
 	ROMX_LOAD( "mother_sounds_82s129.10e", 0x3, 0x100, CRC(2aaf765e) SHA1(fafe96834f5323fca71b8ab0c013f45c5c47182d), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(7))
 	ROMX_LOAD( "mother_sounds_82s129.9e",  0x4, 0x100, CRC(598687e7) SHA1(c5045ddaab7123ff0a4c8f4c2489f9d70b63fc76), ROM_NIBBLE | ROM_SHIFT_NIBBLE_HI | ROM_SKIP(7))
 	ROMX_LOAD( "mother_sounds_82s129.8e",  0x4, 0x100, CRC(68de17ed) SHA1(efefcb4ccdd012b767c4765304c6022b0c091066), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(7))
-
-    ROM_REGION( 0x10000, "ldp_cpu", 0)
-    ROM_LOAD( "laser_player_interface_d8748_a308.bin", 0x0000, 0x0400, CRC(eed3e728) SHA1(1eb3467f1c41553375b2c21952cd593b167f5416) )
 
 	ROM_REGION16_BE( 0x1000, "soundproms", 0)
 	ROMX_LOAD( "mother_sounds_82s185.17f", 0x0, 0x800, CRC(0f49d40e) SHA1(40340833ab27ccb5b60baf44ad01930f204f5318), ROM_NIBBLE | ROM_SHIFT_NIBBLE_LO | ROM_SKIP(1) )

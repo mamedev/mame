@@ -1086,7 +1086,7 @@ UINT8 laserdisc_line_r(const device_config *device, UINT8 line)
     video frame
 -------------------------------------------------*/
 
-UINT32 laserdisc_get_video(const device_config *device, bitmap_t **bitmap)
+int laserdisc_get_video(const device_config *device, bitmap_t **bitmap)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	int frameindex;
@@ -1100,12 +1100,12 @@ UINT32 laserdisc_get_video(const device_config *device, bitmap_t **bitmap)
 	if (!video_active(ld) || ld->videofields[frameindex] < 2)
 	{
 		*bitmap = ld->emptyframe;
-		return 0;
+		return FALSE;
 	}
 	else
 	{
 		*bitmap = ld->videovisframe[frameindex];
-		return ld->videoframenum[frameindex];
+		return TRUE;
 	}
 }
 

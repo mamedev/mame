@@ -134,8 +134,9 @@ struct _laserdisc_state
 
 /* player-specific callbacks */
 typedef void (*laserdisc_init_func)(laserdisc_state *ld);
-typedef void (*laserdisc_vsync_func)(laserdisc_state *ld);
+typedef void (*laserdisc_vsync_func)(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime);
 typedef INT32 (*laserdisc_update_func)(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime);
+typedef void (*laserdisc_overlay_func)(laserdisc_state *ld, bitmap_t *bitmap);
 typedef void (*laserdisc_w_func)(laserdisc_state *ld, UINT8 prev, UINT8 new);
 typedef UINT8 (*laserdisc_r_func)(laserdisc_state *ld);
 
@@ -151,7 +152,8 @@ struct _ldplayer_interface
 	const machine_config_token *machine_config;		/* pointer to machine configuration */
 	laserdisc_init_func		init;					/* initialization callback */
 	laserdisc_vsync_func	vsync;					/* vsync begin callback */
-	laserdisc_update_func	update;					/* update callback (vblank end) */
+	laserdisc_update_func	update;					/* update callback (line 16) */
+	laserdisc_overlay_func	overlay;				/* overlay callback */
 	laserdisc_w_func		writedata;				/* parallel data write */
 	laserdisc_w_func		writeline[LASERDISC_INPUT_LINES]; /* single line write */
 	laserdisc_r_func		readdata;				/* parallel data read */
@@ -234,18 +236,13 @@ INLINE int is_start_of_frame(const vbi_metadata *vbi)
 
 INLINE int frame_from_metadata(const vbi_metadata *metadata)
 {
-	UINT32 data;
-
-	if ((metadata->line1718 & 0xf80000) == 0xf80000)
-		data = metadata->line1718 & 0x7ffff;
-	else if (metadata->line1718 == 0x88ffff)
+	if ((metadata->line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
+		return VBI_CAV_PICTURE(metadata->line1718);
+	else if (metadata->line1718 == VBI_CODE_LEADIN)
 		return FRAME_LEAD_IN;
-	else if (metadata->line1718 == 0x80eeee)
+	else if (metadata->line1718 == VBI_CODE_LEADOUT)
 		return FRAME_LEAD_OUT;
-	else
-		return FRAME_NOT_PRESENT;
-
-	return (((data >> 16) & 0x0f) * 10000) + (((data >> 12) & 0x0f) * 1000) + (((data >> 8) & 0x0f) * 100) + (((data >> 4) & 0x0f) * 10) + (data & 0x0f);
+	return FRAME_NOT_PRESENT;
 }
 
 
@@ -257,18 +254,13 @@ INLINE int frame_from_metadata(const vbi_metadata *metadata)
 
 INLINE int chapter_from_metadata(const vbi_metadata *metadata)
 {
-	UINT32 data;
-
 	if ((metadata->line1718 & 0xf00fff) == 0x800ddd)
-		data = metadata->line1718 & 0x7f000;
-	else if (metadata->line1718 == 0x88ffff)
+		return VBI_CHAPTER(metadata->line1718);
+	else if (metadata->line1718 == VBI_CODE_LEADIN)
 		return CHAPTER_LEAD_IN;
-	else if (metadata->line1718 == 0x80eeee)
+	else if (metadata->line1718 == VBI_CODE_LEADOUT)
 		return CHAPTER_LEAD_OUT;
-	else
-		return CHAPTER_NOT_PRESENT;
-
-	return (((data >> 16) & 0x0f) * 10) + ((data >> 12) & 0x0f);
+	return CHAPTER_NOT_PRESENT;
 }
 
 

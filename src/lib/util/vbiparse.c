@@ -318,7 +318,7 @@ void vbi_parse_all(const UINT16 *source, int sourcerowpixels, int sourcewidth, i
 	else
 	{
 		/* if both are frame numbers, and one is not valid BCD, pick the other */
-		if ((vbi->line17 & 0xf80000) == 0xf80000 && (vbi->line18 & 0xf80000) == 0xf80000)
+		if ((vbi->line17 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE && (vbi->line18 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
 		{
 			if ((vbi->line17 & 0xf000) > 0x9000 || (vbi->line17 & 0xf00) > 0x900 || (vbi->line17 & 0xf0) > 0x90 || (vbi->line17 & 0xf) > 0x9)
 				vbi->line1718 = vbi->line18;
@@ -332,3 +332,46 @@ void vbi_parse_all(const UINT16 *source, int sourcerowpixels, int sourcewidth, i
 				vbi->line1718 = (vbi->line1718 << 1) | ((bits[0][bitnum] > bits[1][bitnum]) ? (bits[0][bitnum] & 1) : (bits[1][bitnum] & 1));
 	}
 }
+
+
+/*-------------------------------------------------
+    vbi_metadata_pack - pack the VBI data down 
+    into a smaller form for storage
+-------------------------------------------------*/
+
+void vbi_metadata_pack(UINT8 *dest, UINT32 framenum, const vbi_metadata *vbi)
+{
+	dest[0] = framenum >> 16;
+	dest[1] = framenum >> 8;
+	dest[2] = framenum >> 0;
+	dest[3] = vbi->white;
+	dest[4] = vbi->line16 >> 16;
+	dest[5] = vbi->line16 >> 8;
+	dest[6] = vbi->line16 >> 0;
+	dest[7] = vbi->line17 >> 16;
+	dest[8] = vbi->line17 >> 8;
+	dest[9] = vbi->line17 >> 0;
+	dest[10] = vbi->line18 >> 16;
+	dest[11] = vbi->line18 >> 8;
+	dest[12] = vbi->line18 >> 0;
+	dest[13] = vbi->line1718 >> 16;
+	dest[14] = vbi->line1718 >> 8;
+	dest[15] = vbi->line1718 >> 0;
+}
+
+
+/*-------------------------------------------------
+    vbi_metadata_unpack - unpack the VBI data 
+    from a smaller form into the full structure
+-------------------------------------------------*/
+
+void vbi_metadata_unpack(vbi_metadata *vbi, UINT32 *framenum, const UINT8 *source)
+{
+	*framenum = (source[0] << 16) | (source[1] << 8) | source[2];
+	vbi->white = source[3];
+	vbi->line16 = (source[4] << 16) | (source[5] << 8) | source[6];
+	vbi->line17 = (source[7] << 16) | (source[8] << 8) | source[9];
+	vbi->line18 = (source[10] << 16) | (source[11] << 8) | source[12];
+	vbi->line1718 = (source[13] << 16) | (source[14] << 8) | source[15];
+}
+

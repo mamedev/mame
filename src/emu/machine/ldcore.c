@@ -23,7 +23,7 @@
     DEBUGGING
 ***************************************************************************/
 
-#define LOG_POSITION(x)				/*printf x*/
+#define LOG_SLIDER					0
 
 
 
@@ -42,6 +42,17 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+/* video frame data */
+typedef struct _frame_data frame_data;
+struct _frame_data
+{
+	bitmap_t *			bitmap;					/* cached bitmap */
+	bitmap_t *			visbitmap;				/* wrapper around bitmap with only visible lines */
+	UINT8				numfields;				/* number of fields in this frame */
+	INT32				lastfield;				/* last absolute field number */
+};
+
+
 /* core-specific data */
 struct _ldcore_data
 {
@@ -51,11 +62,12 @@ struct _ldcore_data
 
 	/* disc parameters */
 	chd_file *			disc;					/* handle to the disc itself */
+	UINT8 *				vbidata;				/* pointer to precomputed VBI data */
 	int					width;					/* width of video */
 	int					height;					/* height of video */
 	UINT32				fps_times_1million;		/* frame rate of video */
 	int					samplerate;				/* audio samplerate */
-	UINT8				readpending;			/* true if a read is pending */
+	chd_error			readresult;				/* result of the most recent read */
 	UINT32				chdtracks;				/* number of tracks in the CHD */
 	av_codec_decompress_config avconfig;		/* decompression configuration */
 
@@ -69,10 +81,7 @@ struct _ldcore_data
 	attotime			sliderupdate;			/* time of last slider update */
 
 	/* video data */
-	bitmap_t *			videoframe[3];			/* currently cached frames */
-	bitmap_t *			videovisframe[3];		/* wrapper around videoframe with only visible lines */
-	UINT8				videofields[3];			/* number of fields in each frame */
-	UINT32				videoframenum[3];		/* frame number contained in each frame */
+	frame_data			frame[3];				/* circular list of frames */
 	UINT8				videoindex;				/* index of the current video buffer */
 	bitmap_t			videotarget;			/* fake target bitmap for decompression */
 	bitmap_t *			emptyframe;				/* blank frame */
@@ -88,8 +97,6 @@ struct _ldcore_data
 
 	/* metadata */
 	vbi_metadata		metadata[2];			/* metadata parsed from the stream, for each field */
-	int					last_frame;				/* last seen frame number */
-	int					last_chapter;			/* last seen chapter number */
 
 	/* I/O data */
 	UINT8				datain;					/* current input data value */
@@ -122,9 +129,9 @@ struct _sound_token
 ***************************************************************************/
 
 /* generic helper functions */
+static TIMER_CALLBACK( perform_player_update );
 static void read_track_data(laserdisc_state *ld);
 static void process_track_data(const device_config *device);
-static void fake_metadata(UINT32 track, UINT8 which, vbi_metadata *metadata);
 //static void render_display(UINT16 *videodata, UINT32 rowpixels, UINT32 width, int frame);
 static void *custom_start(int clock, const custom_sound_interface *config);
 static void custom_stream_callback(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
@@ -377,17 +384,35 @@ static void vblank_state_changed(const device_config *screen, void *param, int v
 	/* update current track based on slider speed */
 	update_slider_pos(ldcore, curtime);
 
-	/* on rising edge, call the player-specific VSYNC function */
+	/* on rising edge, process previously-read frame and inform the player */
 	if (vblank_state)
 	{
+		/* call the player's VSYNC callback */
 		if (ldcore->intf.vsync != NULL)
-			(*ldcore->intf.vsync)(ld);
-		return;
+			(*ldcore->intf.vsync)(ld, &ldcore->metadata[ldcore->fieldnum], ldcore->fieldnum, curtime);
+		
+		/* set a timer to begin fetching the next frame just before the VBI data would be fetched */
+		timer_set(video_screen_get_time_until_pos(screen, 16*2, 0), ld, 0, perform_player_update);
 	}
+}
 
-	/* on falling edge, do the bulk of the processing */
+
+/*-------------------------------------------------
+    vblank_state_changed - called on each state
+    change of the VBLANK signal
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( perform_player_update )
+{
+	laserdisc_state *ld = ptr;
+	ldcore_data *ldcore = ld->core;
+	attotime curtime = timer_get_time();
+
 	/* wait for previous read and decode to finish */
-	process_track_data(device);
+	process_track_data(ld->device);
+
+	/* update current track based on slider speed */
+	update_slider_pos(ldcore, curtime);
 
 	/* update the state */
 	if (ldcore->intf.update != NULL)
@@ -501,30 +526,31 @@ UINT8 laserdisc_line_r(const device_config *device, UINT8 line)
 
 /*-------------------------------------------------
     laserdisc_get_video - return the current
-    video frame
+    video frame; return TRUE if valid or FALSE 
+    if video off
 -------------------------------------------------*/
 
-UINT32 laserdisc_get_video(const device_config *device, bitmap_t **bitmap)
+int laserdisc_get_video(const device_config *device, bitmap_t **bitmap)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
-	int frameindex;
+	frame_data *frame;
 
 	/* determine the most recent live set of frames */
-	frameindex = ldcore->videoindex;
-	if (ldcore->videofields[frameindex] < 2)
-		frameindex = (frameindex + ARRAY_LENGTH(ldcore->videofields) - 1) % ARRAY_LENGTH(ldcore->videofields);
+	frame = &ldcore->frame[ldcore->videoindex];
+	if (frame->numfields < 2)
+		frame = &ldcore->frame[(ldcore->videoindex + ARRAY_LENGTH(ldcore->frame) - 1) % ARRAY_LENGTH(ldcore->frame)];
 
 	/* if no video present, return the empty frame */
-	if (ldcore->videosquelch || ldcore->videofields[frameindex] < 2)
+	if (ldcore->videosquelch || frame->numfields < 2)
 	{
 		*bitmap = ldcore->emptyframe;
-		return 0;
+		return FALSE;
 	}
 	else
 	{
-		*bitmap = ldcore->videovisframe[frameindex];
-		return ldcore->videoframenum[frameindex];
+		*bitmap = frame->visbitmap;
+		return TRUE;
 	}
 }
 
@@ -538,11 +564,7 @@ UINT32 laserdisc_get_field_code(const device_config *device, UINT8 code)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
-	int field = ldcore->fieldnum ^ 1;
-
-	/* if no video present, return */
-	if (ldcore->videosquelch)
-		return 0;
+	int field = ldcore->fieldnum;
 
 	switch (code)
 	{
@@ -557,6 +579,9 @@ UINT32 laserdisc_get_field_code(const device_config *device, UINT8 code)
 
 		case LASERDISC_CODE_LINE18:
 			return ldcore->metadata[field].line18;
+
+		case LASERDISC_CODE_LINE1718:
+			return ldcore->metadata[field].line1718;
 	}
 
 	return 0;
@@ -626,7 +651,8 @@ void ldcore_set_slider_speed(laserdisc_state *ld, INT32 tracks_per_vsync)
 	else
 		ldcore->attospertrack = -attotime_to_attoseconds(attotime_div(vsyncperiod, -tracks_per_vsync));
 
-printf("Slider speed = %d\n", tracks_per_vsync);
+	if (LOG_SLIDER)
+		printf("Slider speed = %d\n", tracks_per_vsync);
 }
 
 
@@ -641,7 +667,8 @@ void ldcore_advance_slider(laserdisc_state *ld, INT32 numtracks)
 
 	update_slider_pos(ldcore, timer_get_time());
 	add_and_clamp_track(ldcore, numtracks);
-printf("Advance by %d\n", numtracks);
+	if (LOG_SLIDER)
+		printf("Advance by %d\n", numtracks);
 }
 
 
@@ -861,21 +888,38 @@ static void read_track_data(laserdisc_state *ld)
 	ldcore_data *ldcore = ld->core;
 	UINT32 tracknum = ldcore->curtrack;
 	UINT32 fieldnum = ldcore->fieldnum;
-	chd_error err;
+	frame_data *frame;
+	UINT32 vbiframe;
+	UINT32 readhunk;
+	INT32 chdtrack;
 
-	/* if the previous field had the white flag, force the new field to pair with it */
-	if (ldcore->metadata[fieldnum ^ 1].white)
-		ldcore->videofields[ldcore->videoindex] = 1;
+	/* if the previous field had a frame number, and the new field immediately follows it,
+	   force the new field to pair with the previous one */
+	frame = &ldcore->frame[ldcore->videoindex];
+	if ((ldcore->metadata[fieldnum ^ 1].line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE && (tracknum * 2 + fieldnum == frame->lastfield + 1))
+		frame->numfields = 1;
+
+	/* otherwise, keep the frames in sync with the absolute field numbers */
+	else if (frame->numfields == 2 && fieldnum != 0)
+		frame->numfields--;
 
 	/* if we already have both fields on the current videoindex, advance */
-	if (ldcore->videofields[ldcore->videoindex] >= 2)
+	else if (frame->numfields >= 2)
 	{
-		ldcore->videoindex = (ldcore->videoindex + 1) % ARRAY_LENGTH(ldcore->videofields);
-		ldcore->videofields[ldcore->videoindex] = 0;
+		ldcore->videoindex = (ldcore->videoindex + 1) % ARRAY_LENGTH(ldcore->frame);
+		frame = &ldcore->frame[ldcore->videoindex];
+		frame->numfields = 0;
 	}
+	
+	/* if we're squelched, reset the frame counter */
+	if (ldcore->videosquelch)
+		frame->numfields = 0;
+	
+	/* remember the last field number */
+	frame->lastfield = tracknum * 2 + fieldnum;
 
 	/* set the video target information */
-	ldcore->videotarget = *ldcore->videoframe[ldcore->videoindex];
+	ldcore->videotarget = *frame->bitmap;
 	ldcore->videotarget.base = BITMAP_ADDR16(&ldcore->videotarget, fieldnum, 0);
 	ldcore->videotarget.height /= 2;
 	ldcore->videotarget.rowpixels *= 2;
@@ -900,20 +944,23 @@ static void read_track_data(laserdisc_state *ld)
 	ldcore->avconfig.actsamples = &ldcore->audiocursamples;
 	ldcore->audiocursamples = 0;
 
-	/* configure the codec and then read */
-	if (ldcore->disc != NULL)
-	{
-		err = chd_codec_config(ldcore->disc, AV_CODEC_DECOMPRESS_CONFIG, &ldcore->avconfig);
-		if (err == CHDERR_NONE)
-		{
-			INT32 chdtrack = tracknum - 1 - VIRTUAL_LEAD_IN_TRACKS;
+	/* compute the chdhunk number we are going to read */
+	chdtrack = tracknum - 1 - VIRTUAL_LEAD_IN_TRACKS;
+	chdtrack = MAX(chdtrack, 0);
+	chdtrack = MIN(chdtrack, ldcore->chdtracks - 1);
+	readhunk = chdtrack * 2 + fieldnum;
+	
+	/* set the VBI data for the new field from our precomputed data */
+	if (ldcore->vbidata != NULL)
+		vbi_metadata_unpack(&ldcore->metadata[fieldnum], &vbiframe, &ldcore->vbidata[readhunk * VBI_PACKED_BYTES]);
 
-			/* clamp the track */
-			chdtrack = MAX(chdtrack, 0);
-			chdtrack = MIN(chdtrack, ldcore->chdtracks - 1);
-			err = chd_read_async(ldcore->disc, chdtrack * 2 + fieldnum, NULL);
-			ldcore->readpending = TRUE;
-		}
+	/* configure the codec and then read */
+	ldcore->readresult = CHDERR_FILE_NOT_FOUND;
+	if (ldcore->disc != NULL && !ldcore->videosquelch)
+	{
+		ldcore->readresult = chd_codec_config(ldcore->disc, AV_CODEC_DECOMPRESS_CONFIG, &ldcore->avconfig);
+		if (ldcore->readresult == CHDERR_NONE)
+			ldcore->readresult = chd_read_async(ldcore->disc, readhunk, NULL);
 	}
 }
 
@@ -927,46 +974,22 @@ static void process_track_data(const device_config *device)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
-	UINT32 tracknum = ldcore->curtrack;
-	UINT32 fieldnum = ldcore->fieldnum;
-	int frame, chapter;
-	chd_error chderr;
 
 	/* wait for the async operation to complete */
-	if (ldcore->disc != NULL && ldcore->readpending)
-	{
-		/* complete the async operation */
-		chderr = chd_async_complete(ldcore->disc);
-		if (chderr != CHDERR_NONE && chderr != CHDERR_NO_ASYNC_OPERATION)
-			ldcore->avconfig.video = NULL;
-	}
-	ldcore->readpending = FALSE;
+	if (ldcore->readresult == CHDERR_OPERATION_PENDING)
+		ldcore->readresult = chd_async_complete(ldcore->disc);
 
-	/* parse the metadata */
-	if (ldcore->disc != NULL && ldcore->avconfig.video != NULL)
-		vbi_parse_all((const UINT16 *)ldcore->avconfig.video->base, ldcore->avconfig.video->rowpixels, ldcore->avconfig.video->width, 8, &ldcore->metadata[fieldnum]);
-	else
-		fake_metadata(tracknum, fieldnum, &ldcore->metadata[fieldnum]);
-//  printf("Track %5d: Metadata = %d %08X %08X %08X %08X\n", tracknum, ldcore->metadata[fieldnum].white, ldcore->metadata[fieldnum].line16, ldcore->metadata[fieldnum].line17, ldcore->metadata[fieldnum].line18, ldcore->metadata[fieldnum].line1718);
-
-	/* update the last seen frame and chapter */
-	frame = frame_from_metadata(&ldcore->metadata[fieldnum]);
-	if (frame >= 1 && frame < 99999)
-		ldcore->last_frame = frame;
-	chapter = chapter_from_metadata(&ldcore->metadata[fieldnum]);
-	if (chapter != -1)
-		ldcore->last_chapter = chapter;
-
+	/* remove the video if we had an error */
+	if (ldcore->readresult != CHDERR_NONE)
+		ldcore->avconfig.video = NULL;
+	
+	/* count the field as read if we are successful */
+	if (ldcore->avconfig.video != NULL)
+		ldcore->frame[ldcore->videoindex].numfields++;
+	
 	/* render the display if present */
 //  if (ldcore->display && ldcore->avconfig.video != NULL)
 //      render_display((UINT16 *)ldcore->avconfig.video->base, ldcore->avconfig.video->rowpixels, ldcore->avconfig.video->width, ldcore->last_frame);
-
-	/* update video field */
-	if (ldcore->avconfig.video != NULL)
-	{
-		ldcore->videofields[ldcore->videoindex]++;
-		ldcore->videoframenum[ldcore->videoindex] = ldcore->last_frame;
-	}
 
 	/* pass the audio to the callback */
 	if (ldcore->config.audio != NULL)
@@ -996,29 +1019,6 @@ static void process_track_data(const device_config *device)
 
 	/* update the input buffer pointer */
 	ldcore->audiobufin = (ldcore->audiobufin + ldcore->audiocursamples) % ldcore->audiobufsize;
-}
-
-
-/*-------------------------------------------------
-    fake_metadata - fake metadata when there's
-    no disc present
--------------------------------------------------*/
-
-static void fake_metadata(UINT32 track, UINT8 which, vbi_metadata *metadata)
-{
-	if (which == 0)
-	{
-		metadata->white = 1;
-		metadata->line16 = 0;
-		metadata->line17 = metadata->line18 = 0xf80000 |
-				(((track / 10000) % 10) << 16) |
-				(((track / 1000) % 10) << 12) |
-				(((track / 100) % 10) << 8) |
-				(((track / 10) % 10) << 4) |
-				(((track / 1) % 10) << 0);
-	}
-	else
-		memset(metadata, 0, sizeof(*metadata));
 }
 
 
@@ -1321,6 +1321,7 @@ VIDEO_UPDATE( laserdisc )
 	const device_config *laserdisc = device_list_first(screen->machine->config->devicelist, LASERDISC);
 	if (laserdisc != NULL)
 	{
+		const rectangle *visarea = video_screen_get_visible_area(screen);
 		laserdisc_state *ld = laserdisc->token;
 		ldcore_data *ldcore = ld->core;
 		bitmap_t *overbitmap = ldcore->overbitmap[ldcore->overindex];
@@ -1335,12 +1336,14 @@ VIDEO_UPDATE( laserdisc )
 			clip.min_x = 0;
 			clip.max_x = ldcore->config.overwidth - 1;
 			clip.min_y = cliprect->min_y * overbitmap->height / bitmap->height;
+			if (cliprect->min_y == visarea->min_y)
+				clip.min_y = MIN(clip.min_y, ldcore->config.overclip.min_y);
 			clip.max_y = (cliprect->max_y + 1) * overbitmap->height / bitmap->height - 1;
 			(*ldcore->config.overupdate)(screen, overbitmap, &clip);
 		}
 
 		/* if this is the last update, do the rendering */
-		if (cliprect->max_y == video_screen_get_visible_area(screen)->max_y)
+		if (cliprect->max_y == visarea->max_y)
 		{
 			float x0, y0, x1, y1;
 
@@ -1443,8 +1446,10 @@ static void init_disc(const device_config *device)
 	ldcore->maxtrack = VIRTUAL_LEAD_IN_TRACKS + MAX_TOTAL_TRACKS + VIRTUAL_LEAD_OUT_TRACKS;
 	if (ldcore->disc != NULL)
 	{
+		UINT32 totalhunks = chd_get_header(ldcore->disc)->totalhunks;
 		int fps, fpsfrac, interlaced, channels;
 		char metadata[256];
+		UINT32 vbilength;
 
 		/* require the A/V codec */
 		if (chd_get_header(ldcore->disc)->compression != CHDCOMPRESSION_AV)
@@ -1466,7 +1471,13 @@ static void init_disc(const device_config *device)
 			fatalerror("Laserdisc video must be interlaced!");
 
 		/* determine the maximum track and allocate a frame buffer */
-		ldcore->chdtracks = chd_get_header(ldcore->disc)->totalhunks / 2;
+		ldcore->chdtracks = totalhunks / 2;
+		
+		/* allocate memory for the precomputed per-frame metadata */
+		ldcore->vbidata = auto_malloc(totalhunks * VBI_PACKED_BYTES);
+		err = chd_get_metadata(ldcore->disc, AV_LD_METADATA_TAG, 0, ldcore->vbidata, totalhunks * VBI_PACKED_BYTES, &vbilength, NULL);
+		if (err != CHDERR_NONE || vbilength != totalhunks * VBI_PACKED_BYTES)
+			fatalerror("Precomputed VBI metadata missing or incorrect size");
 	}
 	ldcore->maxtrack = MAX(ldcore->maxtrack, VIRTUAL_LEAD_IN_TRACKS + VIRTUAL_LEAD_OUT_TRACKS + ldcore->chdtracks);
 }
@@ -1487,18 +1498,20 @@ static void init_video(const device_config *device)
 	video_screen_register_vblank_callback(ld->screen, vblank_state_changed, (void *)device);
 
 	/* allocate video frames */
-	for (index = 0; index < ARRAY_LENGTH(ldcore->videofields); index++)
+	for (index = 0; index < ARRAY_LENGTH(ldcore->frame); index++)
 	{
+		frame_data *frame = &ldcore->frame[index];
+		
 		/* first allocate a YUY16 bitmap at 2x the height */
-		ldcore->videoframe[index] = auto_bitmap_alloc(ldcore->width, ldcore->height * 2, BITMAP_FORMAT_YUY16);
-		fillbitmap_yuy16(ldcore->videoframe[index], 40, 109, 240);
+		frame->bitmap = auto_bitmap_alloc(ldcore->width, ldcore->height * 2, BITMAP_FORMAT_YUY16);
+		fillbitmap_yuy16(frame->bitmap, 40, 109, 240);
 
 		/* make a copy of the bitmap that clips out the VBI and horizontal blanking areas */
-		ldcore->videovisframe[index] = auto_malloc(sizeof(*ldcore->videovisframe[index]));
-		*ldcore->videovisframe[index] = *ldcore->videoframe[index];
-		ldcore->videovisframe[index]->base = BITMAP_ADDR16(ldcore->videovisframe[index], 44, ldcore->videoframe[index]->width * 8 / 720);
-		ldcore->videovisframe[index]->height -= 44;
-		ldcore->videovisframe[index]->width -= 2 * ldcore->videoframe[index]->width * 8 / 720;
+		frame->visbitmap = auto_malloc(sizeof(*frame->visbitmap));
+		*frame->visbitmap = *frame->bitmap;
+		frame->visbitmap->base = BITMAP_ADDR16(frame->visbitmap, 44, frame->bitmap->width * 8 / 720);
+		frame->visbitmap->height -= 44;
+		frame->visbitmap->width -= 2 * frame->bitmap->width * 8 / 720;
 	}
 
 	/* allocate an empty frame of the same size */
@@ -1673,10 +1686,6 @@ static DEVICE_RESET( laserdisc )
 	ldcore->curtrack = 1;
 	ldcore->attospertrack = 0;
 	ldcore->sliderupdate = curtime;
-
-	/* reset metadata */
-	ldcore->last_frame = 0;
-	ldcore->last_chapter = 0;
 
 	/* reset the I/O lines */
 	for (line = 0; line < LASERDISC_INPUT_LINES; line++)
