@@ -465,7 +465,7 @@ static READ16_HANDLER( custom_key_r )
 			res = BITSWAP16(keyval, 22,26,31,23,18,20,16,30,24,21,25,19,17,29,28,27);
 
 			keyval >>= 1;
-printf("popcount(%08X) = %d\n", keyval & 0x58000c00, popcount(keyval & 0x58000c00));
+//			printf("popcount(%08X) = %d\n", keyval & 0x58000c00, popcount(keyval & 0x58000c00));
 			if((!keyval) || (popcount(keyval & 0x58000c00) & 1))
 				keyval ^= 0x80000000;
 
