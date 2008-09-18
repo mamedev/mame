@@ -13,7 +13,7 @@
         * TX-1 V8 (1984)
 
     Notes:
-        * 'buggyboy' and 'tx1' are preliminary
+        * TX-1 tyre screech noises are not implemented yet.
         * 'buggyboy' set is using ROMs from 'buggybjr' for testing purposes
         until the original set can be dumped.
 
@@ -47,17 +47,25 @@
 #include "rendlay.h"
 #include "tx1.h"
 
+
 /*************************************
  *
  *  Globals
  *
  *************************************/
-UINT16	*tx1_math_ram;
-static UINT8 *z80_ram;
+
+UINT16 *tx1_math_ram;
+static UINT8  *z80_ram;
 static UINT8  tx1_ppi_latch_a;
 static UINT8  tx1_ppi_latch_b;
 static UINT32 ts;
 
+
+/*************************************
+ *
+ *  CPU Control
+ *
+ *************************************/
 
 /* Main CPU and Z80 synchronisation */
 static WRITE16_HANDLER( z80_busreq_w )
@@ -75,7 +83,7 @@ static WRITE16_HANDLER( halt_math_w )
 	cpunum_set_input_line(machine, 1, INPUT_LINE_TEST, CLEAR_LINE);
 }
 
-/* Z80 can trigger an interrupt itself */
+/* Z80 can trigger its own interrupts */
 static WRITE8_HANDLER( z80_intreq_w )
 {
 	cpunum_set_input_line(machine, 2, 0, HOLD_LINE);
@@ -184,11 +192,10 @@ static INPUT_PORTS_START( tx1 )
 	PORT_DIPSETTING(    0x80, "4" )
 INPUT_PORTS_END
 
-
 static INPUT_PORTS_START( tx1a )
-	PORT_INCLUDE( tx1 )
+	PORT_INCLUDE(tx1)
 
-	PORT_MODIFY( "DSW" )
+	PORT_MODIFY("DSW")
 	PORT_DIPNAME( 0x000c, 0x0000, "Game Cost" )
 	PORT_DIPSETTING(      0x0000, "1 Coin Unit for 1 Credit" )
 	PORT_DIPSETTING(      0x0004, "2 Coin Units for 1 Credit" )
@@ -407,6 +414,75 @@ static READ8_HANDLER( ts_r )
 	return z80_ram[offset];
 }
 
+static WRITE8_HANDLER( tx1_coin_cnt )
+{
+	coin_counter_w(0, data & 0x80);
+	coin_counter_w(1, data & 0x40);
+}
+
+static WRITE8_HANDLER( tx1_ppi_latch_w )
+{
+	tx1_ppi_latch_a = ((input_port_read(machine, "AN_BRAKE") & 0xf) << 4) | (input_port_read(machine, "AN_ACCELERATOR") & 0xf);
+	tx1_ppi_latch_b = input_port_read(machine, "AN_STEERING");
+}
+
+static READ8_HANDLER( tx1_ppi_porta_r )
+{
+	return tx1_ppi_latch_a;
+}
+
+static READ8_HANDLER( tx1_ppi_portb_r )
+{
+	return input_port_read(machine, "PPI_PORTD") | tx1_ppi_latch_b;
+}
+
+/* TODO */
+static READ8_HANDLER( bb_analog_r )
+{
+	if ( offset == 1 )
+		return ((input_port_read(machine, "AN_ACCELERATOR") & 0xf) << 4) | input_port_read(machine, "AN_STEERING");
+	else
+		return (input_port_read(machine, "AN_BRAKE") & 0xf) << 4;
+}
+
+static READ8_HANDLER( bbjr_analog_r )
+{
+	if ( offset == 0 )
+		return ((input_port_read(machine, "AN_ACCELERATOR") & 0xf) << 4) | input_port_read(machine, "AN_STEERING");
+	else
+		return (input_port_read(machine, "AN_BRAKE") & 0xf) << 4;
+}
+
+
+/*************************************
+ *
+ *  8255 PPI Interfaces
+ *
+ *************************************/
+
+/* Buggy Boy uses an 8255 PPI instead of YM2149 ports for inputs! */
+static const ppi8255_interface buggyboy_ppi8255_intf =
+{
+	input_port_1_r,
+	NULL,
+	input_port_2_r,
+	NULL,
+	NULL,
+	NULL
+};
+
+
+static const ppi8255_interface tx1_ppi8255_intf =
+{
+	tx1_ppi_porta_r,
+	tx1_ppi_portb_r,
+	input_port_4_r,
+	NULL,
+	NULL,
+	tx1_coin_cnt
+};
+
+
 /*************************************
  *
  *  TX-1 Memory Maps
@@ -418,7 +494,7 @@ static ADDRESS_MAP_START( tx1_main, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x02000, 0x02fff) AM_MIRROR(0x1000) AM_RAM
 	AM_RANGE(0x04000, 0x04fff) AM_MIRROR(0x1000) AM_RAM	AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x06000, 0x06fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
-	AM_RANGE(0x08000, 0x09fff) AM_RAM_WRITE(tx1_vram_w) AM_BASE(&tx1_vram)
+	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_BASE(&tx1_vram)
 	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE(1) AM_BASE(&tx1_rcram)
 	AM_RANGE(0x0b000, 0x0b001) AM_READWRITE(dipswitches_r, z80_busreq_w)
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITE(tx1_scolst_w)
@@ -443,23 +519,6 @@ static ADDRESS_MAP_START( tx1_math, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c000, 0x0ffff) AM_ROM
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
-
-
-static WRITE8_HANDLER( tx1_ppi_latch_w )
-{
-	tx1_ppi_latch_a = ((input_port_read(machine, "AN_BRAKE") & 0xf) << 4) | (input_port_read(machine, "AN_ACCELERATOR") & 0xf);
-	tx1_ppi_latch_b = input_port_read(machine, "AN_STEERING");
-}
-
-static READ8_HANDLER( tx1_ppi_porta_r )
-{
-	return tx1_ppi_latch_a;
-}
-
-static READ8_HANDLER( tx1_ppi_portb_r )
-{
-	return input_port_read(machine, "PPI_PORTD") | tx1_ppi_latch_b;
-}
 
 static ADDRESS_MAP_START( tx1_sound_prg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
@@ -487,7 +546,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( buggyboy_main, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x04000, 0x04fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
-	AM_RANGE(0x08000, 0x09fff) AM_RAM_WRITE(buggyboy_vram_w) AM_BASE(&buggyboy_vram)
+	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_BASE(&buggyboy_vram)
 	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE(1) AM_BASE(&buggyboy_rcram) AM_SIZE(&buggyboy_rcram_size)
 	AM_RANGE(0x0b000, 0x0b001) AM_READWRITE(dipswitches_r, z80_busreq_w)
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITE(buggyboy_scolst_w)
@@ -502,7 +561,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( buggybjr_main, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x04000, 0x04fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
-	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_BASE(&buggybjr_vram)
+	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_BASE(&buggyboy_vram)
 	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE(1) AM_BASE(&buggyboy_rcram) AM_SIZE(&buggyboy_rcram_size)
 	AM_RANGE(0x0b000, 0x0b001) AM_READWRITE(dipswitches_r, z80_busreq_w)
 	AM_RANGE(0x0c000, 0x0c001) AM_WRITE(buggyboy_scolst_w)
@@ -527,32 +586,6 @@ static ADDRESS_MAP_START( buggyboy_math, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c000, 0x0ffff) AM_ROM
 	AM_RANGE(0xfc000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
-
-
-/* TODO */
-static READ8_HANDLER( bb_analog_r )
-{
-	if ( offset == 1 )
-	{
-		return ((input_port_read(machine, "AN_ACCELERATOR") & 0xf) << 4) | input_port_read(machine, "AN_STEERING");
-	}
-	else
-	{
-		return (input_port_read(machine, "AN_BRAKE") & 0xf) << 4;
-	}
-}
-
-static READ8_HANDLER( bbjr_analog_r )
-{
-	if ( offset == 0 )
-	{
-		return ((input_port_read(machine, "AN_ACCELERATOR") & 0xf) << 4) | input_port_read(machine, "AN_STEERING");
-	}
-	else
-	{
-		return (input_port_read(machine, "AN_BRAKE") & 0xf) << 4;
-	}
-}
 
 /* Buggy Boy Sound PCB TC033A */
 static ADDRESS_MAP_START( buggyboy_sound_prg, ADDRESS_SPACE_PROGRAM, 8 )
@@ -583,32 +616,6 @@ static ADDRESS_MAP_START( buggyboy_sound_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x80) AM_READWRITE(ay8910_read_port_1_r, ay8910_write_port_1_w)
 	AM_RANGE(0x81, 0x81) AM_WRITE(ay8910_control_port_1_w)
 ADDRESS_MAP_END
-
-
-/*************************************
- *
- *  Graphics definitions
- *
- *************************************/
-
-static const gfx_layout char_layout =
-{
-	8,8,
-	2048,
-	2,
-	{ 0, 8*8*2048 },
-	{ 0,1,2,3,4,5,6,7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
-static GFXDECODE_START( buggyboy )
-	GFXDECODE_ENTRY( "gfx1", 0, char_layout, 0, 256 )
-GFXDECODE_END
-
-static GFXDECODE_START( tx1 )
-	GFXDECODE_ENTRY( "gfx1", 0, char_layout, 0, 16 )
-GFXDECODE_END
 
 
 /*************************************
@@ -650,38 +657,11 @@ static const ay8910_interface buggyboy_ym2149_interface_2 =
 	bb_ym1_b_w,
 };
 
-static WRITE8_HANDLER( tx1_coin_cnt )
-{
-	coin_counter_w(0, data & 0x80);
-	coin_counter_w(1, data & 0x40);
-}
-
-static const ppi8255_interface tx1_ppi8255_intf =
-{
-	tx1_ppi_porta_r,
-	tx1_ppi_portb_r,
-	input_port_4_r,
-	NULL,
-	NULL,
-	tx1_coin_cnt
-};
-
 static const custom_sound_interface tx1_custom_interface =
 {
 	tx1_sh_start,
 	NULL,
 	tx1_sh_reset
-};
-
-/* Buggy Boy uses an 8255 PPI instead of YM2149 ports for inputs! */
-static const ppi8255_interface buggyboy_ppi8255_intf =
-{
-	input_port_1_r,
-	NULL,
-	input_port_2_r,
-	NULL,
-	NULL,
-	NULL
 };
 
 static const custom_sound_interface bb_custom_interface =
@@ -690,6 +670,7 @@ static const custom_sound_interface bb_custom_interface =
 	NULL,
 	buggyboy_sh_reset
 };
+
 
 /*************************************
  *
@@ -714,11 +695,10 @@ static MACHINE_DRIVER_START( tx1 )
 	MDRV_MACHINE_START(tx1)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( tx1_ppi8255_intf )
+	MDRV_DEVICE_ADD("ppi8255", PPI8255)
+	MDRV_DEVICE_CONFIG(tx1_ppi8255_intf)
 
-	MDRV_GFXDECODE(tx1)
-	MDRV_PALETTE_LENGTH(256+(256*4)+(2048*4))
+	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(tx1)
 	MDRV_VIDEO_EOF(tx1)
 
@@ -726,7 +706,6 @@ static MACHINE_DRIVER_START( tx1 )
 
 	MDRV_SCREEN_ADD("left", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_RAW_PARAMS(TX1_PIXEL_CLOCK, TX1_HTOTAL, TX1_HBEND, TX1_HBSTART, TX1_VTOTAL, TX1_VBEND, TX1_VBSTART)
 
 	MDRV_SCREEN_ADD("center", RASTER)
@@ -772,10 +751,9 @@ static MACHINE_DRIVER_START( buggyboy )
 	MDRV_MACHINE_START(buggyboy)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( buggyboy_ppi8255_intf )
+	MDRV_DEVICE_ADD("ppi8255", PPI8255)
+	MDRV_DEVICE_CONFIG(buggyboy_ppi8255_intf)
 
-	MDRV_GFXDECODE(buggyboy)
 	MDRV_DEFAULT_LAYOUT(layout_triphsxs)
 
 	MDRV_SCREEN_ADD("left", RASTER)
@@ -790,7 +768,7 @@ static MACHINE_DRIVER_START( buggyboy )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_RAW_PARAMS(BB_PIXEL_CLOCK, BB_HTOTAL, BB_HBEND, BB_HBSTART, BB_VTOTAL, BB_VBEND, BB_VBSTART)
 
-	MDRV_PALETTE_LENGTH(256+(256*4)+(2048*4))
+	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(buggyboy)
 	MDRV_VIDEO_START(buggyboy)
 	MDRV_VIDEO_UPDATE(buggyboy)
@@ -830,7 +808,6 @@ static MACHINE_DRIVER_START( buggybjr )
 	MDRV_MACHINE_START(buggybjr)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 #if 0
@@ -842,8 +819,8 @@ static MACHINE_DRIVER_START( buggybjr )
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 #endif
 
-	MDRV_PALETTE_LENGTH(512)
-	MDRV_PALETTE_INIT(buggybjr)
+	MDRV_PALETTE_LENGTH(256)
+	MDRV_PALETTE_INIT(buggyboy)
 	MDRV_VIDEO_START(buggybjr)
 	MDRV_VIDEO_UPDATE(buggybjr)
 	MDRV_VIDEO_EOF(buggyboy)
@@ -865,6 +842,7 @@ static MACHINE_DRIVER_START( buggybjr )
 	MDRV_SOUND_ROUTE(1, "frontright", 0.2)
 MACHINE_DRIVER_END
 
+
 /*************************************
  *
  *  ROM definition(s)
@@ -875,7 +853,6 @@ ROM_START( tx1 )
 	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_BYTE( "tx1_1c.ic22", 0xf0000, 0x4000, CRC(eedcee83) SHA1(7fa0590b142fb13c6562126a9bdd5a1e032880c7) )
 	ROM_LOAD16_BYTE( "tx1_2c.ic29", 0xf0001, 0x4000, CRC(294bf5bf) SHA1(02b425caba8a187c58211bab27988205eb044558) )
-
 	ROM_LOAD16_BYTE( "tx1_4c.ic54", 0xf8001, 0x4000, CRC(15bb8ef2) SHA1(83968f010ec555fcd0548a80562fb23a892b5afb) )
 	ROM_LOAD16_BYTE( "tx1_3c.ic45", 0xf8000, 0x4000, CRC(21a8aa55) SHA1(21bc4adefb22a95fcd7a4e305bf0b05e2cb34129) )
 
@@ -894,7 +871,7 @@ ROM_START( tx1 )
 	ROM_LOAD( "8411-136027-157.11", 0x00000, 0x2000, CRC(10ae3075) SHA1(69c5f62f2473aba848383eed3cecf15e273d86ca) )
 
 	/* 8x8 characters */
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "tx1_21a.ic204", 0x0000, 0x4000, CRC(cd3441ad) SHA1(8e6597b3177b8aaa34ed3373d85fc4b6231e1333) )
 	ROM_LOAD( "tx1_20a.ic174", 0x4000, 0x4000, CRC(dbe595fc) SHA1(1ed2f775f0a1b46a2ffbc056eb4ef732ed546d3c) )
 
@@ -902,14 +879,11 @@ ROM_START( tx1 )
 	ROM_REGION( 0x40000, "gfx2", 0 )
 	ROM_LOAD( "tx1_16b.ic203", 0x0000, 0x4000, CRC(1141c965) SHA1(4b90c1428bcbd72d0449c064856a5596269b3fc6) )
 	ROM_LOAD( "tx1_18b.ic258", 0x4000, 0x4000, NO_DUMP )
-
-	/* 8x8 object chunks */
-	ROM_REGION( 0x40000, "gfx3", 0 )
-	ROM_LOAD( "tx1_15b.ic173", 0x0000, 0x4000, CRC(30d1a8d5) SHA1(b4c585b7b8a8920bb3949d643e9e10c17d4009a0) )
-	ROM_LOAD( "tx1_17b.ic232", 0x4000, 0x4000, CRC(364bb354) SHA1(a26581ca1088b979285471e2c6595048df84d75e) )
+	ROM_LOAD( "tx1_15b.ic173", 0x8000, 0x4000, CRC(30d1a8d5) SHA1(b4c585b7b8a8920bb3949d643e9e10c17d4009a0) )
+	ROM_LOAD( "tx1_17b.ic232", 0xc000, 0x4000, CRC(364bb354) SHA1(a26581ca1088b979285471e2c6595048df84d75e) )
 
 	/* Road LUTs */
-	ROM_REGION( 0x40000, "gfx4", 0 )
+	ROM_REGION( 0x40000, "gfx3", 0 )
 	ROM_LOAD( "tx1_5a.ic56", 0x0000, 0x2000, CRC(5635b8c1) SHA1(5cc9437a2ff0843f1917f2451852d4561c240b24) )
 	ROM_LOAD( "tx1_6a.ic66", 0x2000, 0x2000, CRC(03d83cf8) SHA1(5c0cfc6bf02ad2b3f37e1ceb493f69eb9829ab1e) )
 	ROM_LOAD( "tx1_7a.ic76", 0x4000, 0x2000, CRC(ad56013a) SHA1(ae3a91f58f30daff334754476db33ad1d12569fc) )
@@ -965,12 +939,8 @@ ROM_START( tx1 )
 	ROM_LOAD( "xb10.ic40",  0x1300, 0x200, CRC(93deb894) SHA1(5ae9a21298c836fe649a52f3df2b4067f9012b91) )
 	ROM_LOAD( "xb11.ic49",  0x1500, 0x200, CRC(aa5ed232) SHA1(f33e7bc2dd33ac6d75fb06b93c4dd58e5d10010d) )
 
-	/* Road related */
+	/* Road stripes */
 	ROM_LOAD( "xb12.ic50",  0x1700, 0x200, CRC(6b424cea) SHA1(83127326c20116b0a4be1126e163f9c6755e19dc) )
-
-	/* Arithmetic unit instructions */
-	ROM_LOAD16_BYTE( "xb02b.ic223", 0x1800, 0x200, CRC(22c77af6) SHA1(1be8585b95316b4fc5712cdaef699e676320cd4d) )
-	ROM_LOAD16_BYTE( "xb01b.ic213", 0x1801, 0x200, CRC(f6b8b70b) SHA1(b79374acf11d71db1e4ad3c494ac5f500a52677b) )
 ROM_END
 
 /* Some PROMs haven't been confirmed to be the same as the Tatsumi set (but are very likely identical) */
@@ -996,7 +966,7 @@ ROM_START( tx1a )
 	ROM_LOAD( "8411-136027-157.11", 0x00000, 0x2000, CRC(10ae3075) SHA1(69c5f62f2473aba848383eed3cecf15e273d86ca) )
 
 	/* 8x8 characters */
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x20000, "gfx1", 0 )
 	ROM_LOAD( "8411-136027-156.204", 0x0000, 0x4000, CRC(60f3c616) SHA1(59c4361891e4274e27e6279c919e8fd6803af7cf) )
 	ROM_LOAD( "8411-136027-155.174", 0x4000, 0x4000, CRC(e59a6b72) SHA1(c10efa77ab421ac60b97227a8d547f50f8415670) )
 
@@ -1176,32 +1146,27 @@ ROM_START( buggyboy )
 	ROM_REGION( 0x10000, "audio", 0 )
 	ROM_LOAD( "bug35.11", 0x00000, 0x4000,  CRC(7aa16e9e) SHA1(ea54e56270f70351a62a78fa32027bb41ef9861e) )
 
-	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
+	/* 8x8 characters */
+	ROM_REGION( 0x8000, "gfx1", 0 )
 	ROM_LOAD( "bug34s.46", 0x00000, 0x4000, CRC(8ea8fec4) SHA1(75e67c9a59a86fcdedf2a70fafd303baa552aa18) )
 	ROM_LOAD( "bug33s.47", 0x04000, 0x4000, CRC(459c2b03) SHA1(ff62a86195042a349fbe799c638cf590fe9572bb) )
 
-	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "bug26s.147", 0x0000, 0x8000, CRC(14033710) SHA1(e05afeb557ce14055fa8b4f6d8805307feaa1660) )
-	ROM_LOAD( "bug19s.144", 0x8000, 0x8000, CRC(838e0697) SHA1(0e9aff2c4065d79350ddb55edff57a899c33ef1c) )
+	/* 8x8 object chunks */
+	ROM_REGION( 0x40000, "gfx2", 0 )
+	ROM_LOAD( "bug26s.147", 0x00000, 0x8000, CRC(14033710) SHA1(e05afeb557ce14055fa8b4f6d8805307feaa1660) )
+	ROM_LOAD( "bug19s.144", 0x08000, 0x8000, CRC(838e0697) SHA1(0e9aff2c4065d79350ddb55edff57a899c33ef1c) )
+	ROM_LOAD( "bug28s.146", 0x10000, 0x8000, CRC(8b47d227) SHA1(a3e57594ad0085e8b1bd327c580eb36237f3e3d2) )
+	ROM_LOAD( "bug21s.143", 0x18000, 0x8000, CRC(876a5666) SHA1(db485cdf35f63c080c919ee86374f63e577092c3) )
+	ROM_LOAD( "bug30s.145", 0x20000, 0x8000, CRC(11d8e2a8) SHA1(9bf198229a12d331e8e7352b7ee3f39f6891f517) )
+	ROM_LOAD( "bug23s.142", 0x28000, 0x8000, CRC(015db5d8) SHA1(39ef8b44f2eb9399fb1555cffa6763e06d59c181) )
 
-	ROM_REGION( 0x40000, "gfx3", ROMREGION_DISPOSE )
-	ROM_LOAD( "bug28s.146", 0x0000, 0x8000, CRC(8b47d227) SHA1(a3e57594ad0085e8b1bd327c580eb36237f3e3d2) )
-	ROM_LOAD( "bug21s.143", 0x8000, 0x8000, CRC(876a5666) SHA1(db485cdf35f63c080c919ee86374f63e577092c3) )
-
-	ROM_REGION( 0x40000, "gfx4", ROMREGION_DISPOSE )
-	ROM_LOAD( "bug30s.145", 0x0000, 0x8000, CRC(11d8e2a8) SHA1(9bf198229a12d331e8e7352b7ee3f39f6891f517) )
-	ROM_LOAD( "bug23s.142", 0x8000, 0x8000, CRC(015db5d8) SHA1(39ef8b44f2eb9399fb1555cffa6763e06d59c181) )
-
-	ROM_REGION( 0x40000, "gfx5", ROMREGION_DISPOSE )
-	ROM_LOAD( "bug16s.139", 0x0000,  0x8000, CRC(1903a9ad) SHA1(526c404c15e3f04b4afb27dee66e9deb0a6b9704) )
-	ROM_LOAD( "bug17s.140", 0x8000,  0x8000, CRC(82cabdd4) SHA1(94324fcf83c373621fc40553473ae3cb552ab704) )
-	ROM_LOAD( "bug18s.141", 0x10000, 0x4000, CRC(67786327) SHA1(32cc1f5bc654497c968ddcd4af29720c6d659482) )
-
-	ROM_REGION( 0x40000, "gfx6", 0)
-	ROM_LOAD( "bb3s", 0x000, 0x200, CRC(2ab3d5ff) SHA1(9f8359cb4ba2e7d15dbb9dc21cd71c0902cd2153) )
-	ROM_LOAD( "bb4s", 0x200, 0x200, CRC(630f68a4) SHA1(d730f050353c688f81d090e33e00cd35e7b7b6fa) )
-	ROM_LOAD( "bb5s", 0x400, 0x200, CRC(65925c9e) SHA1(d1ff1cb9f83c09e52a96632945e4edfedc335fd4) )
-	ROM_LOAD( "bug11s.225", 0x1000, 0x4000, CRC(771af4e1) SHA1(a42b164dd0567c78c0d308ee48d63e5a284897bb) )
+	/* Road */
+	ROM_REGION( 0x40000, "gfx6", 0 )
+	ROM_LOAD( "bug11s.225", 0x0000, 0x4000, CRC(771af4e1) SHA1(a42b164dd0567c78c0d308ee48d63e5a284897bb) )
+	ROM_LOAD( "bb3s", 0x4000, 0x200, CRC(2ab3d5ff) SHA1(9f8359cb4ba2e7d15dbb9dc21cd71c0902cd2153) )
+	ROM_LOAD( "bb4s", 0x4200, 0x200, CRC(630f68a4) SHA1(d730f050353c688f81d090e33e00cd35e7b7b6fa) )
+	ROM_LOAD( "bb5s", 0x4400, 0x200, CRC(65925c9e) SHA1(d1ff1cb9f83c09e52a96632945e4edfedc335fd4) )
+	ROM_LOAD( "bb6.224", 0x4600, 0x200, CRC(ad43e02a) SHA1(c50a398020508f52ddf8d45881f211d17d096fa1) )
 
 	ROM_REGION( 0x10000, "user1", ROMREGION_LE )
 	ROM_LOAD16_BYTE( "bug9.138", 0x0000, 0x4000, CRC(7d84135b) SHA1(3c669c4e796e83672aceeb6de1aeea28f9f2fef0) )
@@ -1230,13 +1195,14 @@ ROM_START( buggyboy )
 	ROM_LOAD( "bb8.31", 0x1600, 0x100, CRC(2330ff4f) SHA1(e86eb63ce47572bcbbf325f9bb749d10d96bf2e7) )
 ROM_END
 
+
 /*************************************
  *
  *  Game driver(s)
  *
  *************************************/
 
-GAME( 1983, tx1,      0,        tx1,      tx1,      0, ROT0, "Tatsumi", "TX-1",                                   GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1983, tx1a,     tx1,      tx1,      tx1a,     0, ROT0, "Tatsumi", "TX-1 (Atari/Namco/Taito license)",       GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1985, buggyboy, buggybjr, buggyboy, buggyboy, 0, ROT0, "Tatsumi", "Buggy Boy/Speed Buggy (Cockpit)",        GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1983, tx1,      0,        tx1,      tx1,      0, ROT0, "Tatsumi", "TX-1",                                   GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1983, tx1a,     tx1,      tx1,      tx1a,     0, ROT0, "Tatsumi", "TX-1 (Atari/Namco/Taito license)",       GAME_IMPERFECT_SOUND )
+GAME( 1985, buggyboy, buggybjr, buggyboy, buggyboy, 0, ROT0, "Tatsumi", "Buggy Boy/Speed Buggy (Cockpit)",        GAME_NOT_WORKING )
 GAME( 1986, buggybjr, 0,        buggybjr, buggybjr, 0, ROT0, "Tatsumi", "Buggy Boy Junior/Speed Buggy (Upright)", 0 )

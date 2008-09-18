@@ -3,17 +3,23 @@
     Tatsumi TX-1/Buggy Boy video hardware
 
 ****************************************************************************/
+
 #include "driver.h"
 #include "profiler.h"
 #include "render.h"
 #include "cpu/i86/i86.h"
+#include "video/resnet.h"
 #include "tx1.h"
 
-#define PRINT_CRTC_DATA 1
 
-/*
-    HD46505S-2 CRT Controller
-*/
+/*************************************
+ *
+ *  HD46505S-2 CRT Controller
+ *
+ *************************************/
+
+#define PRINT_CRTC_DATA 0
+
 READ16_HANDLER( tx1_crtc_r )
 {
 	return 0xffff;
@@ -35,17 +41,17 @@ if (PRINT_CRTC_DATA)
 			case 0x04: mame_printf_debug("Vertical total           "); break;
 			case 0x05: mame_printf_debug("Vertical total adjust    "); break;
 			case 0x06: mame_printf_debug("Vertical displayed       "); break;
-        	case 0x07: mame_printf_debug("Vertical sync position   "); break;
-        	case 0x08: mame_printf_debug("Interlace mode           "); break;
-        	case 0x09: mame_printf_debug("Max. scan line address   "); break;
-        	case 0x0a: mame_printf_debug("Cursror start            "); break;
-        	case 0x0b: mame_printf_debug("Cursor end               "); break;
-        	case 0x0c: mame_printf_debug("Start address (h)        "); break;
-        	case 0x0d: mame_printf_debug("Start address (l)        "); break;
-        	case 0x0e: mame_printf_debug("Cursor (h)               "); break;
-        	case 0x0f: mame_printf_debug("Cursor (l)               "); break;
-        	case 0x10: mame_printf_debug("Light pen (h))           "); break;
-        	case 0x11: mame_printf_debug("Light pen (l)            "); break;
+			case 0x07: mame_printf_debug("Vertical sync position   "); break;
+			case 0x08: mame_printf_debug("Interlace mode           "); break;
+			case 0x09: mame_printf_debug("Max. scan line address   "); break;
+			case 0x0a: mame_printf_debug("Cursror start            "); break;
+			case 0x0b: mame_printf_debug("Cursor end               "); break;
+			case 0x0c: mame_printf_debug("Start address (h)        "); break;
+			case 0x0d: mame_printf_debug("Start address (l)        "); break;
+			case 0x0e: mame_printf_debug("Cursor (h)               "); break;
+			case 0x0f: mame_printf_debug("Cursor (l)               "); break;
+			case 0x10: mame_printf_debug("Light pen (h))           "); break;
+			case 0x11: mame_printf_debug("Light pen (l)            "); break;
 		}
 	}
 	else if (offset == 1)
@@ -61,6 +67,17 @@ if (PRINT_CRTC_DATA)
   TX-1
 
 ***************************************************************************/
+
+enum
+{
+	TX1_RDFLAG_RVA8 = 0,
+	TX1_RDFLAG_RVA9,
+	TX1_RDFLAG_RVA7,
+	TX1_RDFLAG_TNLF,
+	TX1_RDFLAG_STLF,
+	TX1_RDFLAG_SCCHGF
+} tx1_roadreg;
+
 static struct
 {
 	UINT16	scol;		/* Road colours */
@@ -69,6 +86,7 @@ static struct
 
 	UINT32	ba_val;		/* Accumulator */
 	UINT32	ba_inc;
+	UINT32	bank_mode;
 
 	UINT16	h_val;		/* Accumulator */
 	UINT16	h_inc;
@@ -77,41 +95,22 @@ static struct
 	UINT8	slin_inc;
 } tx1_vregs;
 
-/* Offsets into the palette PROMs */
-#define TX1_COLORS_CHAR	0x00
-#define TX1_COLORS_OBJ	0x80
-#define TX1_COLORS_ROAD	0xC0
-
 UINT16 *tx1_vram;
 UINT16 *tx1_objram;
 UINT16 *tx1_rcram;
 size_t tx1_objram_size;
 
-static tilemap *tx1_tilemap;
+static UINT8 *tx1_chr_bmp;
+static UINT8 *tx1_obj_bmp;
+static UINT8 *tx1_rod_bmp;
+
 static bitmap_t *tx1_bitmap;
 static render_texture *tx1_texture;
 
-WRITE16_HANDLER( tx1_vram_w )
-{
-	COMBINE_DATA(&tx1_vram[offset]);
-	tilemap_mark_tile_dirty(tx1_tilemap, offset);
-}
-
-static TILE_GET_INFO( get_tx1_tile_info )
-{
-	int tilenum, color;
-
-	color = (tx1_vram[tile_index] >> 10) & 0x3f;
-	tilenum = (tx1_vram[tile_index]&0x03ff) | ((tx1_vram[tile_index] & 0x8000) >> 5);
-
-	SET_TILE_INFO(0, tilenum, color, 0);
-}
 
 /***************************************************************************
 
   Palette initialisation
-
-  TODO: Add some notes
 
   bit 3 -- 220 ohm resistor  -- RED/GREEN/BLUE
         -- 470 ohm resistor  -- RED/GREEN/BLUE
@@ -119,33 +118,39 @@ static TILE_GET_INFO( get_tx1_tile_info )
   bit 0 -- 2.2kohm resistor  -- RED/GREEN/BLUE
 
 ***************************************************************************/
+
 PALETTE_INIT( tx1 )
 {
 	int i;
 
-	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x100);
-
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x100; i++)
+	static const res_net_info tx1_net_info =
 	{
-		int r = pal4bit(color_prom[i + 0x000]);
-		int g = pal4bit(color_prom[i + 0x100]);
-		int b = pal4bit(color_prom[i + 0x200]);
+		RES_NET_VCC_5V | RES_NET_VIN_TTL_OUT,
+		{
+			{ RES_NET_AMP_NONE, 0, 0, 4, { 2200, 1000, 470, 220 } },
+			{ RES_NET_AMP_NONE, 0, 0, 4, { 2200, 1000, 470, 220 } },
+			{ RES_NET_AMP_NONE, 0, 0, 4, { 2200, 1000, 470, 220 } }
+		}
+	};
 
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
-	}
-
-	/* color_prom now points to the beginning of the lookup table */
-	color_prom += 0x300;
-
-	/* TODO */
-	for (i = 0; i < 0x100; i++)
+	for (i = 0; i < 256; ++i)
 	{
-		UINT8 ctabentry = (color_prom[i + 0x600] & 0x0f) | 0x00;
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		int r, g, b;
+
+		r = compute_res_net(color_prom[i + 0x300] & 0xf, 0, &tx1_net_info);
+		g = compute_res_net(color_prom[i + 0x400] & 0xf, 1, &tx1_net_info);
+		b = compute_res_net(color_prom[i + 0x500] & 0xf, 2, &tx1_net_info);
+
+		palette_set_color(machine, i, MAKE_RGB(r, g, b));
 	}
 }
+
+
+/*************************************
+ *
+ *  Video Control Registers
+ *
+ *************************************/
 
 WRITE16_HANDLER( tx1_bankcs_w )
 {
@@ -171,16 +176,17 @@ WRITE16_HANDLER( tx1_bankcs_w )
 		tx1_vregs.ba_inc &= ~0xffff0000;
 		tx1_vregs.ba_inc |= data << 16;
 
+		// TODO: Schems say D15.
+		tx1_vregs.bank_mode = BIT(data, 1);
+
 		if ( !(offset & 2)  )
 			tx1_vregs.ba_val &= ~0xffff0000;
 	}
-	if ( offset & 0x10 )
+	if ( !(offset & 0x10) )
 	{
 		/* Ignore data */
 		if ( offset & 2 )
-		{
 			tx1_vregs.ba_val = (tx1_vregs.ba_inc + tx1_vregs.ba_val) & 0x00ffffff;
-		}
 	}
 	if ( offset & 0x20 )
 	{
@@ -191,8 +197,8 @@ WRITE16_HANDLER( tx1_bankcs_w )
 	}
 	if ( !(offset & 0x40) )
 	{
-		/* Ignore data? */
-		if ( offset & 2 )
+		/* TODO: Looks safe to remove this */
+//		if ( offset & 2 )
 			tx1_vregs.h_val += tx1_vregs.h_inc;
 	}
 }
@@ -221,25 +227,651 @@ WRITE16_HANDLER( tx1_flgcs_w )
 }
 
 
-/* Preliminary */
-static void tx1_draw_objects(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+/*************************************
+ *
+ *  Characters
+ *
+ *************************************/
+
+static void tx1_draw_char(running_machine *machine, UINT8 *bitmap)
+{
+	INT32 x, y;
+	UINT32 scroll_x;
+	UINT8 *gfx1, *gfx2;
+
+	/* 2bpp characters */
+	gfx1 = memory_region(machine, "gfx1");
+	gfx2 = gfx1 + 0x4000;
+
+	/* X scroll value is the last word in char RAM */
+	scroll_x = tx1_vram[0xfff] & 0x3ff;
+
+	for (y = 0; y < 240; ++y)
+	{
+		UINT32 d0 = 0, d1 = 0;
+		UINT32 colour = 0;
+		UINT32 y_offs;
+		UINT32 x_offs;
+		UINT32 y_gran;
+
+		/* No y-scrolling? */
+		y_offs = y;
+
+		if ( (y_offs >= 64) && (y_offs < 128) )
+			x_offs = tx1_vregs.slock ? scroll_x : 0;
+		else
+			x_offs = 0;
+
+		y_gran = y_offs & 7;
+
+		if (x_offs & 7)
+		{
+			UINT32 tilenum;
+			UINT16 ram_val = tx1_vram[((y_offs << 4) & 0xf80) + ((x_offs >> 3) & 0x7f)];
+
+			tilenum = (ram_val & 0x03ff) | ((ram_val & 0x8000) >> 5);
+			colour = (ram_val & 0xfc00) >> 8;
+			d0 = *(gfx2 + (tilenum << 3) + y_gran);
+			d1 = *(gfx1 + (tilenum << 3) + y_gran);
+		}
+
+		for (x = 0; x < 256 * 3; ++x)
+		{
+			UINT32 x_gran = x_offs & 7;
+
+			if (!x_gran)
+			{
+				UINT32 tilenum;
+				UINT16 ram_val = tx1_vram[((y_offs << 4) & 0xf80) + ((x_offs >> 3) & 0x7f)];
+
+				tilenum = (ram_val & 0x03ff) | ((ram_val & 0x8000) >> 5);
+				colour = (ram_val & 0xfc00) >> 8;
+				d0 = *(gfx2 + (tilenum << 3) + y_gran);
+				d1 = *(gfx1 + (tilenum << 3) + y_gran);
+			}
+
+			*bitmap++ = colour |
+						(((d1 >> (7 ^ x_gran)) & 1) << 1) |
+						((d0 >> (7 ^ x_gran)) & 1);
+
+			x_offs = (x_offs + 1) & 0x3ff;
+		}
+	}
+}
+
+
+/*************************************
+ *
+ *  Road
+ *
+ *************************************/
+
+#define TX1_GET_ROADPIX(NUM) \
+{ \
+	UINT32 addr = (rva6_0 << 5) | (road##NUM##_hcnt & 0x1f); \
+	UINT8 promaddr1, promaddr2, promaddr3; \
+	promaddr1 = rom_a[addr]; \
+	promaddr2 = rom_b[addr]; \
+	promaddr3 = rom_c[addr]; \
+	pix[NUM][0][0] = prom_a[promaddr1]; pix[NUM][0][1] = prom_b[promaddr1]; pix[NUM][0][2] = prom_c[promaddr1]; \
+	pix[NUM][1][0] = prom_a[promaddr2]; pix[NUM][1][1] = prom_b[promaddr2]; pix[NUM][1][2] = prom_c[promaddr2]; \
+	pix[NUM][2][0] = prom_a[promaddr3]; pix[NUM][2][1] = prom_b[promaddr3]; pix[NUM][2][2] = prom_c[promaddr3]; \
+	pix[NUM][3][0] = prom_a[0];			pix[NUM][3][1] = prom_b[0];			pix[NUM][3][2] = prom_c[0]; \
+}
+
+INLINE void tx1_draw_road_pixel(int screen, UINT8 *bmpaddr,
+						 UINT8 apix[3], UINT8 bpix[3], UINT32 pixnuma, UINT32 pixnumb,
+						 UINT8 stl, UINT8 sld, UINT8 selb,
+						 UINT8 bnk, UINT8 rorev, UINT8 eb, UINT8 r, UINT8 delr,
+						 running_machine *machine)
+{
+	UINT8 a0 = BIT(apix[0], pixnuma);
+	UINT8 a1 = BIT(apix[1], pixnuma);
+	UINT8 a2 = BIT(apix[2], pixnuma);
+
+	UINT8 b0 = BIT(bpix[0], pixnumb);
+	UINT8 b1 = BIT(bpix[1], pixnumb);
+	UINT8 b2 = BIT(bpix[2], pixnumb);
+
+	UINT8 d3;
+	UINT8 d2;
+	UINT8 d1;
+	UINT8 d0;
+	UINT8 sel;
+	UINT8 c6 = BIT(sld, 6);
+	UINT8 c5 = BIT(sld, 5);
+	UINT8 c4 = BIT(sld, 4);
+	UINT8 c3 = BIT(sld, 2);
+
+	UINT32 addr_offset = screen * 256;
+
+	sel = !bnk && ( (a2 && !b0) || (!a0 && b2) || !a1 || !a2 || !b1 || !b2 );
+
+	d3 =
+		(a2 && a1 && a0 && b2 && b1 && b0 && !rorev)
+		|| (a1 && b1 && !b0 && stl && !bnk && !c6)
+		|| (a1 && !a0 && b1 && stl && !bnk && !c6)
+		|| (a1 && !b2 && b1 && stl && !bnk && !c6)
+		|| (a2 && b2 && !b1 && stl && !bnk && !c4)
+		|| (a2 && !a1 && b2 && stl && !bnk && !c4)
+		|| (!a2 && a1 && b2 && stl && !bnk && !c6)
+		|| (a2 && !b2 && b1 && stl && !bnk && !c6)
+		|| (!a2 && !a1 && stl && !bnk && !c5)
+		|| (!b2 && !b1 && stl && !bnk && !c5)
+		|| (!b0 && !stl && !bnk && !c3)
+		|| (!b1 && !stl && !bnk && !c3)
+		|| (!a0 && !stl && !bnk && !c3)
+		|| (!a1 && !stl && !bnk && !c3)
+		|| (!a2 && !stl && !bnk && !c3)
+		|| (!b2 && !stl && !bnk && !c3)
+		|| (bnk && !rorev);
+
+	if (eb == 0)
+	{
+		if (sel == 1)
+		{
+			d2 = stl && (!a2 || !b2);
+			d1 = !stl || (!a2 && !a1) || (!b1 && !b2) || (a2 && !b1) || (b2 && !a1);
+			d0 = !stl
+				|| (!a2 && !a0 && b1)
+				|| (a1 && !b2 && !b0)
+				|| (!a2 && !a1 && !a0)
+				|| (!b2 && !b1 && !b0)
+				|| (a2 && a1 && !b0)
+				|| (!a0 && b2 && b1)
+				|| (a2 && !b1 && !b0)
+				|| (!a1 && !a0 && b2)
+				|| (!a2 && !a0 && b2)
+				|| (a2 && !b2 && !b0);
+		}
+		else
+		{
+			d2 = BIT(tx1_vregs.scol, selb ? 2 : 10);
+			d1 = BIT(tx1_vregs.scol, selb ? 1 : 9);
+			d0 = BIT(tx1_vregs.scol, selb ? 0 : 8);
+		}
+	}
+	else
+		d2 = d1 = d0 = 0;
+
+	*(bmpaddr + addr_offset) = (bnk << 6) | (r << 5) | (!(sel && delr) << 4 ) | (d3 << 3) | (d2 << 2) | (d1 << 1) | d0;
+}
+
+/* This could do with a tidy up and more comments... */
+static void tx1_draw_road(running_machine *machine, UINT8 *bitmap)
+{
+	INT32	y;
+	UINT32	rva9_8;
+	UINT32	rva7;
+	UINT32	tnlf;
+	UINT32	stlf;
+	UINT32	scchgf;
+
+	UINT32	vc = 0;
+
+	UINT16	road0_hcnt;
+	UINT8	road0_pcnt;
+	UINT16	road1_hcnt;
+	UINT8	road1_pcnt;
+	UINT8	pix[2][4][3];
+
+	/* Road slice map ROMs */
+	const UINT8 *const gfx3 = memory_region(machine, "gfx3");
+	const UINT8 *const rom_a = gfx3;
+	const UINT8 *const rom_b = gfx3 + 0x2000;
+	const UINT8 *const rom_c = gfx3 + 0x4000;
+
+	/* Pixel data */
+	const UINT8 *const proms = memory_region(machine, "proms");
+	const UINT8 *const prom_a = proms + 0x1100;
+	const UINT8 *const prom_b = proms + 0x1300;
+	const UINT8 *const prom_c = proms + 0x1500;
+	const UINT8 *const vprom  = proms + 0x1700;
+
+	rva9_8	= (tx1_vregs.flags & 3) << 8;
+	rva7	= !BIT(tx1_vregs.flags, TX1_RDFLAG_RVA7) << 7;
+	tnlf	= BIT(tx1_vregs.flags, TX1_RDFLAG_TNLF);
+	scchgf	= BIT(tx1_vregs.flags, TX1_RDFLAG_SCCHGF);
+	stlf	= BIT(tx1_vregs.flags, TX1_RDFLAG_STLF);
+
+	for (y = 0; y < 240; ++y)
+	{
+		UINT32	x;
+		UINT8	sld;
+		UINT8	rva6_0;
+		UINT16	rcrdb15_0;
+		UINT16	rva_addr;
+		UINT32	bank_cnt;
+
+		UINT16	vat;
+		UINT16	vp0;
+		UINT16	vp1;
+		UINT16	vp2;
+		UINT16	vp3;
+		UINT16	vp4;
+
+		UINT32	va8, va9, va10, va11, va12, va13, va14, va15;
+		UINT32	v0, v1, v2;
+
+		UINT8	hc1_u, hc1_l;
+		UINT8	hc0_u, hc0_l;
+		
+		UINT32	bnkls, bnkcs, bnkrs;
+		UINT32	rl, rc, rr;
+
+		UINT32	stl;
+		UINT32	selb;
+		UINT32	ebls, ebcs, ebrs;
+
+		UINT8 *bmpaddr = bitmap + (y * 768);
+
+		UINT32 rltmp, rctmp, rrtmp;
+		UINT32 eltmp, ectmp, ertmp;
+
+		UINT32 tmpm;
+		UINT32 tmpn;
+		UINT32 tmpc;
+		UINT32 tmpd;
+
+		UINT8 scrcnt0;
+		UINT8 scrcnt1;
+
+		UINT8 rorevls = 0;
+		UINT8 rorevcs = 0;
+		UINT8 rorevrs = 0;
+
+		int febl[2] = { 0, 0 };
+		int febr[2] = { 0, 0 };
+		int febc[2] = { 0, 0 };
+
+		/* Road vertical address */
+		if ( BIT(tx1_vregs.h_val, 15) )
+			rva6_0 = 0x7f;
+		else
+			rva6_0 = (~tx1_vregs.h_val >> 7) & 0x7f;
+
+		rva_addr = rva9_8 | rva6_0;
+
+		/* Get the stripe data also */
+		sld = vprom[rva6_0] + tx1_vregs.slin_val;
+
+		/* Load the left road h-counter */
+		rcrdb15_0 = tx1_rcram[(0x80 + rva_addr) ^ 0x7ff];
+		road0_pcnt = rcrdb15_0 & 0x7;
+		road0_hcnt = (rcrdb15_0 >> 3) & 0x7f;
+		road0_hcnt |= rcrdb15_0 & 0xfc00 ? 0x80 : 0;
+		road0_hcnt |= (rcrdb15_0 & 0xfc00) == 0xfc00 ? 0x100 : 0x000;
+
+		/* Load the second road h-counter */
+		rcrdb15_0 = tx1_rcram[(rva7 + rva_addr) ^ 0x7ff];
+		road1_pcnt = rcrdb15_0 & 0x7;
+		road1_hcnt = (rcrdb15_0 >> 3) & 0x7f;
+		road1_hcnt |= rcrdb15_0 & 0xfc00 ? 0x80 : 0;
+		road1_hcnt |= (rcrdb15_0 & 0xfc00) == 0xfc00 ? 0x100 : 0x000;
+		road1_hcnt |= (rcrdb15_0 & 0x800);
+
+		scrcnt0 = (road0_hcnt >> 5) & 0xf;
+		scrcnt1 = (road1_hcnt >> 5) & 0xf;
+
+		if (road0_pcnt & 7)
+		{
+			TX1_GET_ROADPIX(0);
+
+			febl[0] = (scrcnt0 + 0) & 0xc;
+			febc[0] = (scrcnt0 + 1) & 0xc;
+			febr[0] = (scrcnt0 + 2) & 0xc;
+		}
+
+		if (road1_pcnt & 7)
+		{
+			UINT32 y4 = (road1_hcnt >> 4) & 1;
+			UINT32 temp = (road1_hcnt >> 5) & 0xf;
+			UINT32 x, u;
+			UINT32 fl11 = BIT(road1_hcnt, 15);
+
+			TX1_GET_ROADPIX(1);
+
+			x = (temp & 0xc);
+			u = !(((temp & 1) && y4) || (temp & 2));
+			rorevls = ((fl11 && !x) || (fl11 && x && u));
+			febl[1] = x;
+
+			temp += 1;
+			x = (temp & 0xc);
+			u = !(((temp & 1) && y4) || (temp & 2));
+			rorevcs = ((fl11 && !x) || (fl11 && x && u));
+			febc[1] = x;
+
+			temp += 1;
+			x = (temp & 0xc);
+			u = !(((temp & 1) && y4) || (temp & 2));
+			rorevrs = ((fl11 && !x) || (fl11 && x && u));
+			febr[1] = x;
+		}
+
+		/* Load the bank counter with accumulator bits 14-5 */
+		bank_cnt = (tx1_vregs.ba_val >> 5) & 0x3ff;
+
+		/* Load vertical position data */
+		vat = tx1_rcram[(rva9_8 + 7) ^ 0x7f8];
+		vp0 = tx1_rcram[(rva9_8 + 6) ^ 0x7f8];
+		vp1 = tx1_rcram[(rva9_8 + 5) ^ 0x7f8];
+		vp2 = tx1_rcram[(rva9_8 + 4) ^ 0x7f8];
+		vp3 = tx1_rcram[(rva9_8 + 3) ^ 0x7f8];
+		vp4 = tx1_rcram[(rva9_8 + 2) ^ 0x7f8];
+
+		/*  */
+		if (y-1 == vp0) vc++;
+		if (y-1 == vp1) vc++;
+		if (y-1 == vp2) vc++;
+		if (y-1 == vp3) vc++;
+		if (y-1 == vp4) vc++;
+
+		/* */
+		va8 = BIT(vat, 8);
+		va9 = BIT(vat, 9);
+		va10 = BIT(vat, 10);
+		va11 = BIT(vat, 11);
+		va12 = BIT(vat, 12);
+		va13 = BIT(vat, 13);
+		va14 = BIT(vat, 14);
+		va15 = BIT(vat, 15);
+
+		v0 = BIT(vc, 0);
+		v1 = BIT(vc, 1);
+		v2 = BIT(vc, 2);
+
+		/* Load the horizontal tunnel position counters */
+		hc1_u = tx1_rcram[(rva9_8 + 1) ^ 0x7f8] >> 8;
+		hc1_l = tx1_rcram[(rva9_8 + 1) ^ 0x7f8] & 0xff;
+		hc0_u = tx1_rcram[(rva9_8 + 0) ^ 0x7f8] >> 8;
+		hc0_l = tx1_rcram[(rva9_8 + 0) ^ 0x7f8] & 0xff;
+
+		stl = !stlf || v0 || (!v2 && !scchgf) || scchgf;
+		selb = (!v2 && !scchgf) || v2;
+
+		rltmp = 
+		(v2 && !v0 && !va10)
+		|| (!v2 && v0 && !va10)
+		|| (v2 && !v0 && !va11)
+		|| (v2 && !v1 && !v0)
+		|| (!v2 && v0 && !va11)
+		|| (!v2 && v1 && !v0)
+		|| (!v2 && !v1 && v0);
+
+		rctmp = 
+		(v2 && !v0 && va9 && va8)
+		|| (!v2 && v0 && va9 && va8)
+		|| (v2 && !v0 && !va11)
+		|| (v2 && !v1 && !v0)
+		|| (!v2 &&  v0 && !va11)
+		|| (!v2 &&  v1 && !v0)
+		|| (!v2 && !v1 &&  v0);
+
+		rrtmp = 
+		(v2 && !v0 && !va11 && !va10)
+		|| (!v2 && v0 && !va11 && !va10)
+		|| (v2 && !v0 && va9)
+		|| (!v2 && v0 && va9)
+		|| (v2 && !v1 && !v0)
+		|| (!v2 && v1 && !v0)
+		|| (!v2 && !v1 && v0);
+
+		ectmp =
+		(v2 && !v0 && va13 && va12)
+		|| (!v2 && v1 && va13 && va12)
+		|| (!v2 && !v1 && v0)
+		|| (v2 && !v0 && !va15)
+		|| (!v2 && v1 && !va15);
+
+		eltmp =
+		(v2 && !v0 && !va14)
+		|| (!v2 && v1 && !va14)
+		|| (!v2 && !v1 && v0)
+		|| (v2 && !v0 && !va15)
+		|| (!v2 && v1 && !va15);
+
+		ertmp =
+		(v2 && !v0 && !va15 && !va14)
+		|| (!v2 && v1 && !va15 && !va14)
+		|| (v2 && !v0 && va13)
+		|| (!v2 && v1 && va13)
+		|| (!v2 && !v1 && v0);
+
+		tmpn = (v2 && !v0) || (!v2 && v0);
+		tmpm = (v2 && !v0) || (!v2 && v1);
+		tmpc = (!v1 && !v0) || (v2);
+		tmpd = v1 && v0 && va11;
+
+		for (x = 0; x < 256; x++)
+		{
+			UINT32 pixnum0 = (road0_pcnt & 7) ^ 7;
+			UINT32 pixnum1 = (road1_pcnt & 7) ^ 7;
+
+			UINT32 cyu, cyl;
+			UINT32 delrl, delrc, delrr;
+
+			/* */
+			scrcnt0 = (road0_hcnt >> 5) & 0xf;
+			scrcnt1 = (road1_hcnt >> 5) & 0xf;
+
+			/* Get new pixel data? */
+			if ( !(road0_pcnt & 7) )
+			{
+				TX1_GET_ROADPIX(0);
+
+				/* Road 0 enables */
+				febl[0] = (scrcnt0 + 0) & 0xc;
+				febc[0] = (scrcnt0 + 1) & 0xc;
+				febr[0] = (scrcnt0 + 2) & 0xc;
+			}
+
+			if ( !(road1_pcnt & 7) )
+			{
+				UINT32 y4 = (road1_hcnt >> 4) & 1;
+				UINT32 temp = (road1_hcnt >> 5) & 0xf;
+				UINT32 x, u;
+				UINT32 fl11 = BIT(road1_hcnt, 15);
+
+				TX1_GET_ROADPIX(1);
+
+				x = (temp & 0xc);
+				u = !(((temp & 1) && y4) || (temp & 2));
+				rorevls = ((fl11 && !x) || (fl11 && x && u));
+				febl[1] = x;
+
+				temp += 1;
+				x = (temp & 0xc);
+				u = !(((temp & 1) && y4) || (temp & 2));
+				rorevcs = ((fl11 && !x) || (fl11 && x && u));
+				febc[1] = x;
+
+				temp += 1;
+				x = (temp & 0xc);
+				u = !(((temp & 1) && y4) || (temp & 2));
+				rorevrs = ((fl11 && !x) || (fl11 && x && u));
+				febr[1] = x;
+			}
+
+			/* Road camber/banking */
+			if ( BIT(tx1_vregs.ba_val, 23) )
+			{
+				bnkls = 1;
+				bnkcs = 1;
+				bnkrs = 1;
+			}
+			else if (tx1_vregs.ba_val & 0x007f8000)
+			{
+				bnkls = 0;
+				bnkcs = 0;
+				bnkrs = 0;
+			}
+			else
+			{
+				bnkls = bank_cnt < 0x400;
+				bnkcs = bank_cnt < 0x300;
+				bnkrs = bank_cnt < 0x200;
+			}
+
+			if (tx1_vregs.bank_mode)
+			{
+				bnkls ^= 1;
+				bnkcs ^= 1;
+				bnkrs ^= 1;
+			}
+
+			cyu = hc1_u == 0xff;
+			cyl = hc1_l == 0xff;
+
+			rl = tnlf && ( rltmp || (tmpn && (!cyl || (va8 && va9 && cyu))) );
+			rc = tnlf && ( rctmp || (tmpn && ((!va10 && !cyl) || (va9 && cyu))) );
+			rr = tnlf && ( rrtmp || (tmpn && ((!va11 && !cyl) || (va8 && cyu))) );
+
+			/* Evaluates to 0 for tunnels */
+			delrl = !tnlf || tmpc || ((tmpd && va10) && ((!va8 && cyl) || (!va9 && cyl) || (!cyu && !cyl)));
+
+			delrr =
+				!tnlf
+				|| tmpc
+				|| (v1 && v0 && va10 && !va9 && !va8 && cyl)
+				|| (v1 && v0 && va10 && !va9 && cyl && !cyu)
+				|| (tmpd && !va9 && !cyu)
+				|| (tmpd && !va9 && !va8);
+
+			delrc = !tnlf || tmpc || (tmpd && ((!va8 && cyl && !cyu) || (!va8 && va10 && !cyu) || (!va9 && cyl) || (va10 && !va9)));
+
+			cyu = hc0_u == 0xff;
+			cyl = hc0_l == 0xff;
+
+			ebls = tnlf && ( eltmp || (tmpm && (!cyl || (va12 && va13 && cyu))));
+			ebcs = tnlf && ( ectmp || (tmpm && ((!va14 && !cyl) || (va13 && cyu))));
+			ebrs = tnlf && ( ertmp || (tmpm && ((!va15 && !cyl) || (va12 && cyu))));
+
+			/* Carry for horizontal position counters */
+			cyu = hc0_u == 0xff;
+			cyl = hc0_l == 0xff;
+
+			if (!(bnkls && !rl))
+			{
+				int a, b;
+
+				if (!febl[0])
+					a = (scrcnt0) & 3;
+				else
+					a = 3;
+
+				if (!febl[1])
+					b = (scrcnt1) & 3;
+				else
+					b = 3;
+
+				tx1_draw_road_pixel(0, bmpaddr,
+						 &pix[0][a][0], &pix[1][b][0],
+						 pixnum0, pixnum1,
+						 stl, sld, selb, bnkls, rorevls, ebls, rl, delrl, machine);
+			}
+			else
+				*(bmpaddr) = (bnkls << 6) | (rl << 5);
+
+			if (!(bnkcs && !rc))
+			{
+				int a, b;
+
+				if (!febc[0])
+					a = (scrcnt0 + 1) & 3;
+				else
+					a = 3;
+
+				if (!febc[1])
+					b = (scrcnt1 + 1) & 3;
+				else
+					b = 3;
+
+				tx1_draw_road_pixel(1, bmpaddr,
+						 &pix[0][a][0], &pix[1][b][0],
+						 pixnum0, pixnum1,
+						 stl, sld, selb, bnkcs, rorevcs, ebcs, rc, delrc, machine);
+			}
+			else
+				*(bmpaddr + 256) = (bnkcs << 6) | (rc << 5);
+
+			if (!(bnkrs && !rr))
+			{
+				int a, b;
+
+				if (!febr[0])
+					a = (scrcnt0 + 2) & 3;
+				else
+					a = 3;
+
+				if (!febr[1])
+					b = (scrcnt1 + 2) & 3;
+				else
+					b = 3;
+
+				tx1_draw_road_pixel(2, bmpaddr,
+						 &pix[0][a][0], &pix[1][b][0],
+						 pixnum0, pixnum1,
+						 stl, sld, selb, bnkrs, rorevrs, ebrs, rr, delrr, machine);
+			}
+			else
+				*(bmpaddr + 512) = (bnkrs << 6) | (rr << 5);
+
+			++bmpaddr;
+
+			/* Update road counters */
+			if (!(++road0_pcnt & 7))
+				++road0_hcnt;
+
+			if (!(++road1_pcnt & 7))
+				++road1_hcnt;
+
+			/* Increment horizontal counters (stop at 0xff) */
+			if (hc0_u != 0xff) ++hc0_u;
+			if (hc0_l != 0xff) ++hc0_l;
+			if (hc1_u != 0xff) ++hc1_u;
+			if (hc1_l != 0xff) ++hc1_l;
+
+			/* Update bank counter */
+			bank_cnt = (bank_cnt + 1) & 0x7ff;
+		}		
+		
+		tx1_vregs.h_val += tx1_vregs.h_inc;
+
+		/* Finally, increment the bank accumulator */
+		tx1_vregs.ba_val = (tx1_vregs.ba_val + tx1_vregs.ba_inc) & 0x00ffffff;
+	}
+
+}
+
+/*************************************
+ *
+ *  Objects
+ *
+ *************************************/
+
+static void tx1_draw_objects(running_machine *machine, UINT8 *bitmap)
 {
 #define FRAC	16
 
 	UINT32 offs;
 
 	/* The many lookup table ROMs */
-	const UINT8 *const ic48  = (UINT8*)memory_region(machine, "user3");
-	const UINT8 *const ic281 = (UINT8*)memory_region(machine, "user3") + 0x2000;
-	const UINT8 *const ic25  = (UINT8*)memory_region(machine, "proms") + 0x1000;
+	const UINT8 *const user3 = memory_region(machine, "user3");
+	const UINT8 *const ic48  = user3;
+	const UINT8 *const ic281 = user3 + 0x2000;
 
-	const UINT8 *const ic106 = (UINT8*)memory_region(machine, "user2");
-	const UINT8 *const ic73  = (UINT8*)memory_region(machine, "user2") + 0x4000;
+	const UINT8 *const proms = memory_region(machine, "proms");
+	const UINT8 *const ic25  = proms + 0x1000;
 
-	const UINT8 *const ic190 = (UINT8*)memory_region(machine, "proms") + 0xc00;
-	const UINT8 *const ic162 = (UINT8*)memory_region(machine, "proms") + 0xe00;
+	const UINT8 *const user2 = memory_region(machine, "user2");
+	const UINT8 *const ic106 = user2;
+	const UINT8 *const ic73  = user2 + 0x4000;
 
-	const UINT8 *const pixdata_rgn = (UINT8*)memory_region(machine, "gfx2");
+	const UINT8 *const ic190 = proms + 0xc00;
+	const UINT8 *const ic162 = proms + 0xe00;
+
+	const UINT8 *const pixdata_rgn = memory_region(machine, "gfx2");
 
 	for (offs = 0x0; offs <= tx1_objram_size; offs += 8)
 	{
@@ -282,7 +914,7 @@ static void tx1_draw_objects(running_machine *machine, bitmap_t *bitmap, const r
 		/* Add 1 to account for line buffering */
 		y = (tx1_objram[offs] >> 8) + 1;
 
-		for (; y <= cliprect->max_y; ++y)
+		for (; y < 240; ++y)
 		{
 			UINT32	rom_addr2	= 0;
 			UINT8	ic106_data	= 0;
@@ -374,7 +1006,6 @@ static void tx1_draw_objects(running_machine *machine, bitmap_t *bitmap, const r
 						lut_data = (ic106_data << 8) | ic73_data;
 						psbb0_12 = lut_data & 0x1fff;
 
-						// 0000 1100 0011 1111
 						pscb0_14 = (psbb0_12 & 0xc3f);
 
 						/* Bits 9_6 are from PCTMP11-8 or PSBB9-6 */
@@ -416,7 +1047,7 @@ static void tx1_draw_objects(running_machine *machine, bitmap_t *bitmap, const r
 					}
 
 					/* Draw a pixel? */
-					if ( x <= cliprect->max_x )
+					if ( x < 768 )
 					{
 						UINT8	pix;
 						UINT8	bit;
@@ -442,7 +1073,8 @@ static void tx1_draw_objects(running_machine *machine, bitmap_t *bitmap, const r
 							else
 								color = ~ic162[prom_addr] & 0x3f;
 
-							*BITMAP_ADDR16(bitmap, y, x) = TX1_COLORS_OBJ + color;
+//							*BITMAP_ADDR16(bitmap, y, x) = machine->pens[TX1_COLORS_OBJ + color];
+							*(bitmap + 768*y + x) = 0x40 | color;
 						}
 					}
 
@@ -466,14 +1098,22 @@ static void tx1_draw_objects(running_machine *machine, bitmap_t *bitmap, const r
 }
 
 
+/*************************************
+ *
+ *  Core Functions
+ *
+ *************************************/
+
 VIDEO_START( tx1 )
 {
-	tx1_tilemap = tilemap_create(get_tx1_tile_info, tilemap_scan_rows,  8, 8, 128, 64);
-	tilemap_set_transparent_pen(tx1_tilemap, 0xff);
-
 	/* Allocate a large bitmap that covers the three screens */
 	tx1_bitmap = auto_bitmap_alloc(768, 256, BITMAP_FORMAT_INDEXED16);
 	tx1_texture = render_texture_alloc(NULL, NULL);
+
+	/* Allocate some bitmaps */
+	tx1_chr_bmp = auto_malloc(sizeof(UINT8) * 256 * 3 * 240);
+	tx1_obj_bmp = auto_malloc(sizeof(UINT8) * 256 * 3 * 240);
+	tx1_rod_bmp = auto_malloc(sizeof(UINT8) * 256 * 3 * 240);
 }
 
 VIDEO_EOF( tx1 )
@@ -482,35 +1122,80 @@ VIDEO_EOF( tx1 )
 	tx1_vregs.slin_val += tx1_vregs.slin_inc;
 }
 
+static void tx1_combine_layers(running_machine *machine, bitmap_t *bitmap, int screen)
+{
+	int x, y;
+	UINT8 *chr_pal = memory_region(machine, "proms") + 0x900;
 
-/* Experimental :) */
+	int x_offset = screen * 256;
+
+	for (y = 0; y < 240; ++y)
+	{
+		UINT16 *bmp_addr = BITMAP_ADDR16(bitmap, y, 0);
+
+		UINT32 bmp_offset = y * 768 + x_offset;
+
+		UINT8 *chr_addr = tx1_chr_bmp + bmp_offset;
+		UINT8 *rod_addr = tx1_rod_bmp + bmp_offset;
+		UINT8 *obj_addr = tx1_obj_bmp + bmp_offset;
+
+		for (x = 0; x < 256; ++x)
+		{
+			UINT8 out_val;
+			UINT32 char_val = chr_addr[x];
+			UINT32 c7 = BIT(char_val, 7);
+			UINT32 c1 = BIT(char_val, 1);
+			UINT32 c0 = BIT(char_val, 0);
+
+			UINT32 road_val = rod_addr[x];
+			UINT32 r6 = BIT(road_val, 6);
+			UINT32 r5 = BIT(road_val, 5);
+
+			UINT32 obj_val = obj_addr[x];
+			UINT32 obj6 = BIT(obj_val, 6);
+
+			UINT32 term1 = !(c7 && c1);
+			UINT32 term2 = !(c7 && c0);
+			UINT32 term3 = r5 || !r6;
+			UINT32 p12 = !(term1 && term2 && term3);
+			UINT32 p6 = !(obj6 && term1 && term2);
+			UINT32 sel =  p12 | (p6 << 1);
+
+			UINT32 psel =  (!(p6 && p12) << 1) | p6;
+
+			if		(sel == 3)	out_val = ((char_val & 0xc0) >> 2) | (chr_pal[char_val] & 0xf);
+			else if (sel == 2)	out_val = road_val & 0x3f;
+			else				out_val = obj_val & 0x3f;
+
+			*bmp_addr++ = (psel << 6) | out_val;
+		}
+	}
+}
+
 VIDEO_UPDATE( tx1 )
 {
-	int y;
-
-	const device_config *left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
-	const device_config *center_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "center");
-	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+	const device_config *left_screen   = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *centre_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "center");
+	const device_config *right_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
 
 	if ( screen == left_screen )
 	{
-		rectangle rect = { 0, 768 - 1, 0, 240 - 1 };
+		memset(tx1_obj_bmp, 0, 768*240);
 
-//      tilemap_set_scrollx(tx1_tilemap, 0, scroll);
-		tilemap_draw(tx1_bitmap, &rect, tx1_tilemap, 0, 0);
-//      tx1_draw_road(tx1_bitmap, &rect);
-		tx1_draw_objects(screen->machine, tx1_bitmap, &rect);
+		tx1_draw_char(screen->machine, tx1_chr_bmp);
+		tx1_draw_road(screen->machine, tx1_rod_bmp);
+		tx1_draw_objects(screen->machine, tx1_obj_bmp);
 
-		for (y = 0; y < 240; ++y)
-			memcpy(BITMAP_ADDR16(bitmap, y, 0), BITMAP_ADDR16(tx1_bitmap, y, 0 * 256), sizeof(UINT16) * 256);
+		tx1_combine_layers(screen->machine, bitmap, 0);
 	}
-	else if ( screen == center_screen )
-		for (y = 0; y < 240; ++y)
-			memcpy(BITMAP_ADDR16(bitmap, y, 0), BITMAP_ADDR16(tx1_bitmap, y, 1 * 256), sizeof(UINT16) * 256);
-	else if ( screen == right_screen )
-		for (y = 0; y < 240; ++y)
-			memcpy(BITMAP_ADDR16(bitmap, y, 0), BITMAP_ADDR16(tx1_bitmap, y, 2 * 256), sizeof(UINT16) * 256);
-
+	else if (screen == centre_screen)
+	{
+		tx1_combine_layers(screen->machine, bitmap, 1);
+	}
+	else if (screen == right_screen)
+	{
+		tx1_combine_layers(screen->machine, bitmap, 2);
+	}
 
 	return 0;
 }
@@ -566,11 +1251,10 @@ UINT16 *buggybjr_vram;
 size_t buggyboy_objram_size;
 size_t buggyboy_rcram_size;
 
-static tilemap *buggyboy_tilemap;
+static UINT8 *bb_chr_bmp;
+static UINT8 *bb_obj_bmp;
+static UINT8 *bb_rod_bmp;
 
-static UINT8 *chr_bmp;
-static UINT8 *obj_bmp;
-static UINT8 *rod_bmp;
 
 /***************************************************************************
 
@@ -592,7 +1276,8 @@ static UINT8 *rod_bmp;
   bit 2 -- 4.7kohm resistor  -- RED
 
 ***************************************************************************/
-PALETTE_INIT( buggybjr )
+
+PALETTE_INIT( buggyboy )
 {
 	int i;
 
@@ -626,74 +1311,114 @@ PALETTE_INIT( buggybjr )
 	}
 }
 
-PALETTE_INIT( buggyboy )
+
+/*************************************
+ *
+ *  Characters
+ *
+ *************************************/
+
+static void buggyboy_draw_char(running_machine *machine, UINT8 *bitmap, int wide)
 {
-	int i;
+	INT32 x, y;
+	UINT32 scroll_x, scroll_y;
+	UINT8 *gfx1, *gfx2;
+	UINT32 total_width;
+	UINT32 x_mask;
 
-	/* allocate the colortable */
-	machine->colortable = colortable_alloc(machine, 0x100);
+	/* 2bpp characters */
+	gfx1 = memory_region(machine, "gfx1");
+	gfx2 = memory_region(machine, "gfx1") + 0x4000;
 
-	/* create a lookup table for the palette */
-	for (i = 0; i < 0x100; i++)
+	/* X/Y scroll values are the last word in char RAM */
+	if (wide)
 	{
-		int bit0, bit1, bit2, bit3, bit4;
-		int r, g, b;
-
-		bit0 = BIT(color_prom[i + 0x000], 0);
-		bit1 = BIT(color_prom[i + 0x000], 1);
-		bit2 = BIT(color_prom[i + 0x000], 2);
-		bit3 = BIT(color_prom[i + 0x000], 3);
-		bit4 = BIT(color_prom[i + 0x300], 2);
-		r = 0x06 * bit4 + 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
-
-		bit0 = BIT(color_prom[i + 0x100], 0);
-		bit1 = BIT(color_prom[i + 0x100], 1);
-		bit2 = BIT(color_prom[i + 0x100], 2);
-		bit3 = BIT(color_prom[i + 0x100], 3);
-		bit4 = BIT(color_prom[i + 0x300], 1);
-		g = 0x06 * bit4 + 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
-
-		bit0 = BIT(color_prom[i + 0x200], 0);
-		bit1 = BIT(color_prom[i + 0x200], 1);
-		bit2 = BIT(color_prom[i + 0x200], 2);
-		bit3 = BIT(color_prom[i + 0x200], 3);
-		bit4 = BIT(color_prom[i + 0x300], 0);
-		b = 0x06 * bit4 + 0x0d * bit0 + 0x1e * bit1 + 0x41 * bit2 + 0x8a * bit3;
-
-		colortable_palette_set_color(machine->colortable, i, MAKE_RGB(r, g, b));
+		scroll_y = (buggyboy_vram[0xfff] >> 10) & 0x3f;
+		scroll_x = buggyboy_vram[0xfff] & 0x1ff;
+		total_width = 768;
+		x_mask = 0x3ff;
+	}
+	else
+	{
+		scroll_y = (buggyboy_vram[0x7ff] >> 10) & 0x3f;
+		scroll_x = buggyboy_vram[0x7ff] & 0x1ff;
+		total_width = 256;
+		x_mask = 0x1ff;
 	}
 
-	/* color_prom now points to the beginning of the lookup table */
-	color_prom += 0x400;
-
-	/* Characters use colours 192-255 */
-	for (i = 0; i < 0x100; i++)
+	for (y = 0; y < 240; ++y)
 	{
-		UINT8 ctabentry = 0xc0 | (((i & 0xc0) >> 2)) | (color_prom[i] & 0x0f);
-		colortable_entry_set_value(machine->colortable, i, ctabentry);
+		UINT32 d0 = 0, d1 = 0;
+		UINT32 colour = 0;
+		UINT32 y_offs;
+		UINT32 x_offs;
+		UINT32 y_gran;
+
+		/* There's no y-scrolling between scanlines 0 and 63 */
+		if (y < 64)
+			y_offs = y;
+		else
+		{
+			y_offs = (y + (scroll_y | 0xc0) + 1) & 0xff;
+
+			/* Clamp */
+			if (y_offs < 64)
+				y_offs |= 0xc0;
+		}
+
+		if ( (y_offs >= 64) && (y_offs < 128) )
+			x_offs = scroll_x;
+		else
+			x_offs = 0;
+
+
+		y_gran = y_offs & 7;
+
+		if (x_offs & 7)
+		{
+			UINT32 tilenum;
+			UINT16 ram_val;
+			
+			if (wide)
+				ram_val = buggyboy_vram[((y_offs << 4) & 0xf80) + ((x_offs >> 3) & 0x7f)];
+			else
+				ram_val = buggyboy_vram[((y_offs << 3) & 0x7c0) + ((x_offs >> 3) & 0x3f)];
+
+			tilenum = (ram_val & 0x03ff) | ((ram_val & 0x8000) >> 5);
+			colour = (ram_val & 0xfc00) >> 8;
+			d0 = *(gfx2 + (tilenum << 3) + y_gran);
+			d1 = *(gfx1 + (tilenum << 3) + y_gran);
+		}
+
+		for (x = 0; x < total_width; ++x)
+		{
+			UINT32 x_gran = x_offs & 7;
+
+			if (!x_gran)
+			{
+				UINT32 tilenum;
+				UINT16 ram_val;
+
+				if (wide)
+					ram_val = buggyboy_vram[((y_offs << 4) & 0xf80) + ((x_offs >> 3) & 0x7f)];
+				else
+					ram_val = buggyboy_vram[((y_offs << 3) & 0x7c0) + ((x_offs >> 3) & 0x3f)];
+
+				tilenum = (ram_val & 0x03ff) | ((ram_val & 0x8000) >> 5);
+				colour = (ram_val & 0xfc00) >> 8;
+				d0 = *(gfx2 + (tilenum << 3) + y_gran);
+				d1 = *(gfx1 + (tilenum << 3) + y_gran);
+			}
+
+			*bitmap++ = colour |
+						(((d1 >> (7 ^ x_gran)) & 1) << 1) |
+						((d0 >> (7 ^ x_gran)) & 1);
+
+			x_offs = (x_offs + 1) & x_mask;
+		}
 	}
 }
 
-WRITE16_HANDLER( buggyboy_vram_w )
-{
-	COMBINE_DATA(&buggyboy_vram[offset]);
-	tilemap_mark_tile_dirty(buggyboy_tilemap, offset);
-}
-
-WRITE16_HANDLER( buggybjr_vram_w )
-{
-	COMBINE_DATA(&buggybjr_vram[offset]);
-}
-
-static TILE_GET_INFO( get_buggyboy_tile_info )
-{
-	int color, tilenum;
-
-	color = (buggyboy_vram[tile_index] >> 10) & 0x3f;
-	tilenum = (buggyboy_vram[tile_index]&0x03ff) | ((buggyboy_vram[tile_index] & 0x8000) >> 5);
-
-	SET_TILE_INFO(0, tilenum, color, 0);
-}
 
 /***************************************************************************
 
@@ -732,7 +1457,8 @@ static TILE_GET_INFO( get_buggyboy_tile_info )
   http://philwip.mameworld.info/buggyboy/PAL16L8.150.htm
 
 ***************************************************************************/
-static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap)
+
+static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap, int wide)
 {
 #define X_ADJUST 384
 #define LOAD_HPOS_COUNTER( NUM )												\
@@ -833,6 +1559,7 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap)
 
 		UINT32	bank_cnt;
 		UINT8	roadpix;
+		UINT32	_rorevcs = 0;
 
 		rva8 = (vregs.h_val & 0x8000) || !(vregs.shift & 0x80);
 
@@ -907,7 +1634,6 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap)
 			UINT32	rom_en;
 			UINT32	pix;
 			UINT32	hp0_en, hp1_en, hp2_en, hp3_en;
-			UINT32	_rorevcs = 0;
 
 			/* The many PALs */
 
@@ -948,13 +1674,14 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap)
 			hp2_en = !(hp2_cy || hps22);
 			hp3_en = !(hp3_cy || hps32);
 
-			_rorevcs = !( (rom_en && rom_flip) || (!rom_en && (ls161 & 0x4000)) );
-
 			/* Load in a new road gfx strip */
 			if ( (ls161 & 7) == 0 )
 			{
 				UINT8 d0 = 0;
 				UINT8 d1 = 0;
+
+				/* I think it's correct to latch it here */
+				_rorevcs = !( (rom_en && rom_flip) || (!rom_en && (ls161 & 0x4000)) );
 
 				/* TODO: ROM data is 0xff if not enabled. */
 				if (rom_en)
@@ -1228,8 +1955,6 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap)
 		/* Finally, increment the banking accumulator */
 		vregs.ba_val = (vregs.ba_val + vregs.ba_inc) & 0x00ffffff;
 		}
-
-	profiler_mark(PROFILER_END);
 }
 
 
@@ -1255,11 +1980,15 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap)
     ------xx xxxxxxxx       X position
 
 **************************************************************************/
-static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap)
+
+static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap, int wide)
 {
 #define FRAC	16
 
 	UINT32 offs;
+
+	UINT32 x_mask;
+	UINT32 x_stride;
 
 	/* The many lookup table ROMs */
 	const UINT8 *const bug13  = (UINT8*)memory_region(machine, "user3");
@@ -1274,7 +2003,16 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap)
 
 	const UINT8 *const pixdata_rgn = (UINT8*)memory_region(machine, "gfx2");
 
-	profiler_mark(PROFILER_USER2);
+	if (wide)
+	{
+		x_mask = 0x7ff; // ???????
+		x_stride = 768;
+	}
+	else
+	{
+		x_mask = 0x3ff;
+		x_stride = 256;
+	}
 
 	for (offs = 0; offs <= buggyboy_objram_size; offs += 8)
 	{
@@ -1368,12 +2106,10 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap)
 				x_acc = (psa0_12 & 0xff) << (FRAC + 5);
 
 				/* TODO Add note */
-				x = buggyboy_objram[offs + 4] & 0x3ff;
+				x = buggyboy_objram[offs + 4] & x_mask;
 
 				for (;;)
 				{
-					#define MASK	0x3ff
-
 					/* Get data and attributes for an 8x8 tile */
 					if (newtile)
 					{
@@ -1383,14 +2119,14 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap)
 						UINT32	rombank;
 						UINT8	*romptr;
 						UINT32	bug18s_data;
-						UINT32	low_addr = ((x_acc >> (FRAC + 3)) & MASK);
+						UINT32	low_addr = ((x_acc >> (FRAC + 3)) & x_mask);
 
 						/*
-                            Objects are grouped by width (either 16, 8 or 4 tiles) in
-                            the LUT ROMs. The ROM address lines therefore indicate
-                            width and are used to determine the correct scan order
-                            when x-flip is set.
-                        */
+							Objects are grouped by width (either 16, 8 or 4 tiles) in
+							the LUT ROMs. The ROM address lines therefore indicate
+							width and are used to determine the correct scan order
+							when x-flip is set.
+						*/
 						if (gxflip)
 						{
 							UINT32	xor_mask;
@@ -1449,7 +2185,7 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap)
 					}
 
 					/* Draw a pixel? */
-					if (x < 256)
+					if (x < x_stride)
 					{
 						UINT8	pix;
 						UINT8	bit;
@@ -1476,12 +2212,12 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap)
 							else
 								color = ~(color | bb9e[bb9_addr]) & 0x3f;
 
-							*(bitmap + 256*y + x) = 0x40 | color;
+							*(bitmap + x_stride*y + x) = 0x40 | color;
 						}
 					}
 
 					/* Check if we've stepped into a new 8x8 tile */
-					if ( (((x_acc + x_step) >> (FRAC + 3)) & MASK) != ((x_acc >> (FRAC + 3)) & MASK) )
+					if ( (((x_acc + x_step) >> (FRAC + 3)) & x_mask) != ((x_acc >> (FRAC + 3)) & x_mask) )
 					{
 						if (lasttile)
 							break;
@@ -1489,17 +2225,21 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap)
 						newtile = 1;
 					}
 
-  					x = (x + 1) & 0x3ff;
+					x = (x + 1) & x_mask;
 					x_acc += x_step;
 				}
 			}// if (yscale)
 			y_scale += y_step;
 		} /* for (y) */
 	}/* for (offs) */
-
-	profiler_mark(PROFILER_END);
 }
 
+
+/*************************************
+ *
+ *  Video Control Registers
+ *
+ *************************************/
 
 /*
     2400-24FF is road control (R/W)
@@ -1524,7 +2264,7 @@ WRITE16_HANDLER( buggyboy_gas_w )
 			vregs.ba_inc &= ~0x0000ffff;
 			vregs.ba_inc |= data;
 
-			if ( !(offset & 2)  )
+			if (!(offset & 2))
 				vregs.ba_val &= ~0x0000ffff;
 
 			break;
@@ -1537,7 +2277,7 @@ WRITE16_HANDLER( buggyboy_gas_w )
 
 			vregs.bank_mode = data & 1;
 
-			if ( !(offset & 2)  )
+			if (!(offset & 2))
 				vregs.ba_val &= ~0xffff0000;
 
 			break;
@@ -1545,10 +2285,8 @@ WRITE16_HANDLER( buggyboy_gas_w )
 		case 0x40:
 		{
 			/* Ignore data? */
-			if ( offset & 2 )
-			{
+			if (offset & 2)
 				vregs.ba_val = (vregs.ba_inc + vregs.ba_val) & 0x00ffffff;
-			}
 
 			break;
 		}
@@ -1557,7 +2295,7 @@ WRITE16_HANDLER( buggyboy_gas_w )
 			vregs.h_inc = data;
 			vregs.shift = 0;
 
-			if ( !(offset & 2)  )
+			if (!(offset & 2))
 				vregs.h_val = 0;
 
 			break;
@@ -1565,7 +2303,7 @@ WRITE16_HANDLER( buggyboy_gas_w )
 		case 0x80:
 		{
 			/* Ignore data? */
-			if ( offset & 2 )
+			if (offset & 2)
 				vregs.h_val += vregs.h_inc;
 			break;
 		}
@@ -1607,161 +2345,44 @@ WRITE16_HANDLER( buggyboy_scolst_w )
 }
 
 
+/*************************************
+ *
+ *  Core Functions
+ *
+ *************************************/
 
-VIDEO_START( buggyboy )
+static void bb_combine_layers(running_machine *machine, bitmap_t *bitmap, int screen)
 {
-	buggyboy_tilemap = tilemap_create(get_buggyboy_tile_info, tilemap_scan_rows,  8, 8, 128, 64);
-	tilemap_set_transparent_pen(buggyboy_tilemap, 0);
-}
+	UINT8 *chr_pal = memory_region(machine, "proms") + 0x400;
+	UINT32 bmp_stride;
+	UINT32 x_offset;
+	UINT32 y;
 
-
-
-VIDEO_UPDATE( buggyboy )
-{
-	int xscrollamount = 0;
-
-	const device_config *left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
-	const device_config *center_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "center");
-	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
-
-	/* The video hardware seems to use one large tilemap, scroll it to the right position for each screen */
-	if ( screen == left_screen )
-		xscrollamount = 0 * 256;
-	else if ( screen == center_screen )
-		xscrollamount = 1 * 256;
-	else if ( screen == right_screen )
-		xscrollamount = 2 * 256;
-
-	tilemap_set_scrollx(buggyboy_tilemap, 0, xscrollamount);
-	tilemap_draw(bitmap, cliprect, buggyboy_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-	return 0;
-}
-
-
-VIDEO_EOF( buggyboy )
-{
-	/* /VSYNC: Update TZ113 @ 219 */
-	vregs.slin += vregs.slin_inc;
-
-	/* /VSYNC: Clear wave LFSR */
-	vregs.wave_lfsr = 0;
-}
-
-
-VIDEO_START( buggybjr )
-{
-	/* Allocate some bitmaps */
-	chr_bmp = auto_malloc(sizeof(UINT8) * 256 * 240);
-	obj_bmp = auto_malloc(sizeof(UINT8) * 256 * 240);
-	rod_bmp = auto_malloc(sizeof(UINT8) * 256 * 240);
-}
-
-/*
-    Draw the tilemap with scrolling
-*/
-static void buggyboy_draw_char(running_machine *machine, UINT8 *bitmap)
-{
-	INT32 x, y;
-	UINT32 scroll_x, scroll_y;
-	UINT8 *gfx1, *gfx2;
-
-	profiler_mark(PROFILER_USER3);
-
-	/* 2bpp characters */
-	gfx1 = memory_region(machine, "gfx1");
-	gfx2 = memory_region(machine, "gfx1") + 0x4000;
-
-	/* X/Y scroll values are the last word in char RAM */
-	scroll_y = (buggybjr_vram[0x7ff] >> 10) & 0x3f;
-	scroll_x = buggybjr_vram[0x7ff] & 0x1ff;
-
-	for (y = 0; y < 240; ++y)
+	if (screen < 0)
 	{
-		UINT32 d0 = 0, d1 = 0;
-		UINT32 colour = 0;
-		UINT32 y_offs;
-		UINT32 x_offs;
-		UINT32 y_gran;
-
-		/* There's no y-scrolling between scanlines 0 and 1 */
-		if (y < 64)
-			y_offs = y;
-		else
-		{
-			y_offs = (y + (scroll_y | 0xc0) + 1) & 0xff;
-
-			/* Clamp */
-			if (y_offs < 64)
-				y_offs |= 0xc0;
-		}
-
-		if ( (y_offs >= 64) && (y_offs < 128) )
-			x_offs = scroll_x;
-		else
-			x_offs = 0;
-
-
-		y_gran = y_offs & 7;
-
-		if (x_offs & 7)
-		{
-			UINT32 tilenum;
-			UINT16 ram_val = buggybjr_vram[((y_offs << 3) & 0x7c0) + ((x_offs >> 3) & 0x3f)];
-
-			tilenum = (ram_val & 0x03ff) | ((ram_val & 0x8000) >> 5);
-			colour = (ram_val & 0xfc00) >> 8;
-			d0 = *(gfx2 + (tilenum << 3) + y_gran);
-			d1 = *(gfx1 + (tilenum << 3) + y_gran);
-		}
-
-		for (x = 0; x < 256; ++x)
-		{
-			UINT32 x_gran = x_offs & 7;
-
-			if (!x_gran)
-			{
-				UINT32 tilenum;
-				UINT16 ram_val = buggybjr_vram[((y_offs << 3) & 0x7c0) + ((x_offs >> 3) & 0x3f)];
-
-				tilenum = (ram_val & 0x03ff) | ((ram_val & 0x8000) >> 5);
-				colour = (ram_val & 0xfc00) >> 8;
-				d0 = *(gfx2 + (tilenum << 3) + y_gran);
-				d1 = *(gfx1 + (tilenum << 3) + y_gran);
-			}
-
-			*bitmap++ = colour |
-						(((d1 >> (7 ^ x_gran)) & 1) << 1) |
-						((d0 >> (7 ^ x_gran)) & 1);
-
-			x_offs = (x_offs + 1) & 0x1ff;
-		}
-
+		bmp_stride = 256;
+		x_offset = 0;
+	}
+	else
+	{
+		bmp_stride = 768;
+		x_offset = 256 * screen;
 	}
 
-	profiler_mark(PROFILER_END);
-}
-
-VIDEO_UPDATE( buggybjr )
-{
-	int x, y;
-	UINT8 *chr_pal = (memory_region(screen->machine, "proms") + 0x400);
-
-	memset(obj_bmp, 0, 256*240);
-
-	buggyboy_draw_char(screen->machine, chr_bmp);
-	buggybjr_draw_road(screen->machine, rod_bmp);
-	buggyboy_draw_objs(screen->machine, obj_bmp);
-
 	for (y = 0; y < 240; ++y)
 	{
-		UINT16 *bmp_addr = BITMAP_ADDR16(bitmap, y, 0);
+		UINT32 x;
 
-		UINT8 *chr_addr = chr_bmp + (y * 256);
-		UINT8 *rod_addr = rod_bmp + (y * 256);
-		UINT8 *obj_addr = obj_bmp + (y * 256);
+		UINT32 bmp_offset = y * bmp_stride + x_offset;
+
+		UINT8 *chr_addr = bb_chr_bmp + bmp_offset;
+		UINT8 *rod_addr = bb_rod_bmp + bmp_offset;
+		UINT8 *obj_addr = bb_obj_bmp + bmp_offset;
 
 		UINT32 sky_en = BIT(vregs.sky, 7);
 		UINT32 sky_val = (((vregs.sky & 0x7f) + y) >> 2) & 0x3f;
+
+		UINT16 *bmp_addr = BITMAP_ADDR16(bitmap, y, 0);
 
 		for (x = 0; x < 256; ++x)
 		{
@@ -1795,6 +2416,71 @@ VIDEO_UPDATE( buggybjr )
 			*bmp_addr++ = (sel << 6) + out_val;
 		}
 	}
+}
 
+VIDEO_START( buggyboy )
+{
+	/* Allocate some bitmaps */
+	bb_chr_bmp = auto_malloc(sizeof(UINT8) * 3 * 256 * 240);
+	bb_obj_bmp = auto_malloc(sizeof(UINT8) * 3 * 256 * 240);
+	bb_rod_bmp = auto_malloc(sizeof(UINT8) * 3 * 256 * 240);
+}
+
+VIDEO_START( buggybjr )
+{
+	/* Allocate some bitmaps */
+	bb_chr_bmp = auto_malloc(sizeof(UINT8) * 256 * 240);
+	bb_obj_bmp = auto_malloc(sizeof(UINT8) * 256 * 240);
+	bb_rod_bmp = auto_malloc(sizeof(UINT8) * 256 * 240);
+}
+
+VIDEO_EOF( buggyboy )
+{
+	/* /VSYNC: Update TZ113 @ 219 */
+	vregs.slin += vregs.slin_inc;
+
+	/* /VSYNC: Clear wave LFSR */
+	vregs.wave_lfsr = 0;
+}
+
+
+VIDEO_UPDATE( buggyboy )
+{
+	const device_config *left_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *center_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "center");
+	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+
+	if (screen == left_screen)
+	{
+		memset(bb_obj_bmp, 0, 768*240);
+
+		buggyboy_draw_char(screen->machine, bb_chr_bmp, 1);
+//		buggyboy_draw_road(screen->machine, bb_rod_bmp, 1);
+		buggyboy_draw_objs(screen->machine, bb_obj_bmp, 1);
+
+		bb_combine_layers(screen->machine, bitmap, 0);
+	}
+	else if (screen == center_screen)
+	{
+		bb_combine_layers(screen->machine, bitmap, 1);
+	}
+	else if (screen == right_screen)
+	{
+		bb_combine_layers(screen->machine, bitmap, 2);
+	}
+
+	return 0;
+
+}
+
+VIDEO_UPDATE( buggybjr )
+{
+	memset(bb_obj_bmp, 0, 256*240);
+
+	buggyboy_draw_char(screen->machine, bb_chr_bmp, 0);
+	buggybjr_draw_road(screen->machine, bb_rod_bmp, 0);
+	buggyboy_draw_objs(screen->machine, bb_obj_bmp, 0);
+
+	bb_combine_layers(screen->machine, bitmap, -1);
 	return 0;
 }

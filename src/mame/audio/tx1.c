@@ -3,12 +3,14 @@
     Tatsumi TX-1/Buggy Boy sound hardware
 
 ***************************************************************************/
+
 #include "driver.h"
 #include "streams.h"
 #include "deprecat.h"
 #include "includes/tx1.h"
 #include "video/resnet.h"
 #include "sound/custom.h"
+
 
 /*************************************
  *
@@ -21,6 +23,7 @@ static UINT32 freq_to_step;
 static UINT32 step0;
 static UINT32 step1;
 static UINT32 step2;
+
 
 /*************************************
  *
@@ -166,12 +169,6 @@ WRITE8_HANDLER( tx1_ay8910_b_w )
 	sndti_set_output_gain(SOUND_AY8910, 0, 0, gain);
 	sndti_set_output_gain(SOUND_AY8910, 0, 1, gain);
 	sndti_set_output_gain(SOUND_AY8910, 0, 2, gain);
-
-	if (!BIT(ay_outputb, 6))
-		popmessage("Skid!");
-
-	if (!BIT(ay_outputb, 7))
-		popmessage("Screech!");
 }
 
 /***************************************************************************
@@ -199,7 +196,6 @@ WRITE8_HANDLER( tx1_ay8910_b_w )
      Opponent 2: ES2
 
  ***************************************************************************/
-
 
 INLINE void update_engine (int eng[4])
 {
@@ -231,7 +227,7 @@ static void tx1_stream_update(void *param, stream_sample_t **inputs, stream_samp
 	memset(buffer[0], 0, length * sizeof(*buffer[0]));
 	memset(buffer[1], 0, length * sizeof(*buffer[1]));
 
-	/* 8253 outputs for the player/opponent buggy engine sounds. */
+	/* 8253 outputs for the player/opponent engine sounds. */
 	step_0 = pit8253.counts[0].val ? (TX1_PIT_CLOCK / pit8253.counts[0].val) * freq_to_step : 0;
 	step_1 = pit8253.counts[1].val ? (TX1_PIT_CLOCK / pit8253.counts[1].val) * freq_to_step : 0;
 	step_2 = pit8253.counts[2].val ? (TX1_PIT_CLOCK / pit8253.counts[2].val) * freq_to_step : 0;
