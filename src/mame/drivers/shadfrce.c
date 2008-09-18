@@ -518,11 +518,11 @@ static MACHINE_RESET( shadfrce )
 }
 
 static MACHINE_DRIVER_START( shadfrce )
-	MDRV_CPU_ADD("main", M68000, 28000000/2) /* ? Guess - CPU is rated for 16MHz */
+	MDRV_CPU_ADD("main", M68000, XTAL_28MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(shadfrce_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(shadfrce_interrupt,256)
 
-	MDRV_CPU_ADD("audio", Z80, 3579545)
+	MDRV_CPU_ADD("audio", Z80, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(shadfrce_sound_map,0)
 
 	MDRV_MACHINE_RESET(shadfrce)
@@ -544,13 +544,13 @@ static MACHINE_DRIVER_START( shadfrce )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ym", YM2151, 3579545)
+	MDRV_SOUND_ADD("ym", YM2151, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 
-	MDRV_SOUND_ADD("oki", OKIM6295, 1584000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ADD("oki", OKIM6295, XTAL_13_4952MHz/8) /* verified on pcb */
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) /* verified on pcb, pin7 is at 2.4v */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 MACHINE_DRIVER_END
