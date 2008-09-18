@@ -861,15 +861,15 @@ address_map *address_map_alloc(const machine_config *config, const game_driver *
 	map = malloc_or_die(sizeof(*map));
 	memset(map, 0, sizeof(*map));
 
+	/* append the internal CPU map (first so it takes priority) */
+	if (internal_map != NULL)
+		address_map_detokenize(map, driver, internal_map);
+
 	/* construct the standard map */
 	if (config->cpu[cpunum].address_map[spacenum][0] != NULL)
 		address_map_detokenize(map, driver, config->cpu[cpunum].address_map[spacenum][0]);
 	if (config->cpu[cpunum].address_map[spacenum][1] != NULL)
 		address_map_detokenize(map, driver, config->cpu[cpunum].address_map[spacenum][1]);
-
-	/* append the internal CPU map (last so it can be overridden) */
-	if (internal_map != NULL)
-		address_map_detokenize(map, driver, internal_map);
 
 	return map;
 }
