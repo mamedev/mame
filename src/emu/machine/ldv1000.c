@@ -104,6 +104,7 @@ const ldplayer_interface ldv1000_interface =
 	ldv1000_init,								/* initialization callback */
 	NULL,										/* vsync callback */
 	ldv1000_update,								/* update callback */
+	NULL,										/* overlay callback */
 	ldv1000_data_w,								/* parallel data write */
 	{											/* single line write: */
 		NULL,									/*    LASERDISC_LINE_ENTER */
