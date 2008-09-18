@@ -313,7 +313,7 @@ static ADDRESS_MAP_START( sht_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x08, 0x08) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c, 0x0c) AM_READ_PORT("DSW2")	/* DIP2 */
 	AM_RANGE(0x0d, 0x0d) AM_READ_PORT("DSW1")	/* DIP1 some games read it from here... */
-	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1") AM_WRITE(mcuenable_hack_w) 
+	AM_RANGE(0x10, 0x10) AM_READ_PORT("DSW1") AM_WRITE(mcuenable_hack_w)
 												/* DIP1 ... and some others from here but there are games which check BOTH! */
 	AM_RANGE(0x12, 0x12) AM_READ_PORT("TRIGGER")
 	AM_RANGE(0x14, 0x14) AM_WRITE(system1_soundport_w)	/* sound commands */

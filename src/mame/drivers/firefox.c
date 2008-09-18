@@ -1,12 +1,12 @@
 /***************************************************************************
 
     Atari Fire Fox hardware
-    
+
     driver by smf, Aaron Giles, Chris Hardy & Scott Waye
 
 short term:
-	split driver/vidhrdw/sndhrdw/machine
-	add option to centre joystick to enter test menu
+    split driver/vidhrdw/sndhrdw/machine
+    add option to centre joystick to enter test menu
 
 it uses a quad pokey package 137323-1221-406???
 the laser disc is a philips lvp 22vp931
@@ -21,7 +21,7 @@ Laser Disc - 30 minutes - Color - 1983
 An interactive CAV laserdisc designed for use in the Atari video arcade game machine.
 Contains over 100 visual and sound segments that include all of the branching possibilities of this game.
 Each segment is two to five seconds long. This disc will play on any player,
-but requires a special level III player for proper control. Video: CAV. Audio: Analog. 
+but requires a special level III player for proper control. Video: CAV. Audio: Analog.
 
 */
 
@@ -45,15 +45,15 @@ fffc=??? e38d
 fffe=reset e7cc
 */
 
-/* 0x50-52 Used as a copy of the status 
-   0x59 = 6-length of laser disc return code 
+/* 0x50-52 Used as a copy of the status
+   0x59 = 6-length of laser disc return code
    0x53 = pointer to laser disc return
    ( LaserDiscBits & 0x80 ) != 0 when return code available
    DSKREAD = acknowledge
    ReadDiscData = return code
 */
 
-/* FXXXXX for first field 
+/* FXXXXX for first field
    AXXXXX for second field */
 
 static int m_n_disc_lock;
@@ -68,8 +68,8 @@ static int disc_reset;
 static int disk_opr = 0;
 static int dav = 0x80;
 static int dak_just_low = 0;  /* simulate the 15 uS time for the player to read the data */
-static int dak = 0x40; /* DAK or DSKFULL active low indicates player has data, 
-						  reset when player has read data */
+static int dak = 0x40; /* DAK or DSKFULL active low indicates player has data,
+                          reset when player has read data */
 static int disk_data; /* after a command is sent the first bit indicates an error, except of the data is 0x00 which indicates an invalid manchester data read (whatever that means) */
 
 int laser_disc_speed = 0;
@@ -89,8 +89,8 @@ READ8_HANDLER( firefox_disc_status_r )
 	n_data = dav | dak | disk_opr; /* always operational */
 	logerror( "%08x: disc status r %02x\n", activecpu_get_pc(), n_data & ( 0x80 | 0x40 | 0x20 ) );
 	/*
-	fprintf(stderr,  "%08x: reading disc status r %02x\n", activecpu_get_pc(), n_data & ( 0x80 | 0x40 | 0x20 ) );
-	*/
+    fprintf(stderr,  "%08x: reading disc status r %02x\n", activecpu_get_pc(), n_data & ( 0x80 | 0x40 | 0x20 ) );
+    */
 	if(dak_just_low)
 	{
 		/* assume that the next status read will be after 15uS */
@@ -175,14 +175,14 @@ WRITE8_HANDLER( firefox_disc_write_w )
 					( ( command_data[ 2 ] & 0x0f ) * 2 );
 				laser_seek_frame(laser_disc_field >> 1);
 				/*
-				fprintf(stderr, "CMD: goto frame #%01x%02x%02x & play forward disc_field %d\n", command_data[ 0 ] & 0x0f, command_data[ 1 ], command_data[ 2 ] , laser_disc_field);
-				*/
+                fprintf(stderr, "CMD: goto frame #%01x%02x%02x & play forward disc_field %d\n", command_data[ 0 ] & 0x0f, command_data[ 1 ], command_data[ 2 ] , laser_disc_field);
+                */
 				laser_disc_speed = 1;
 				return;
 			case 0xd0:
 				/*
-				fprintf(stderr,  "CMD: goto Frame #%01x%02x%02x & halt (first field)\n", command_data[ 0 ] & 0x0f, command_data[ 1 ], command_data[ 2 ] );
-				*/
+                fprintf(stderr,  "CMD: goto Frame #%01x%02x%02x & halt (first field)\n", command_data[ 0 ] & 0x0f, command_data[ 1 ], command_data[ 2 ] );
+                */
 				laser_disc_field =
 					( ( command_data[ 0 ] & 0x0f ) * 20000 ) +
 					( (( command_data[ 1 ] & 0xf0 ) >> 4) * 2000 ) +
@@ -386,7 +386,7 @@ WRITE8_HANDLER( firefox_objram_bank_w )
 
 /*************************************
  *
- *	Main <-> sound communication
+ *  Main <-> sound communication
  *
  *************************************/
 
@@ -394,12 +394,12 @@ static CUSTOM_INPUT( mainflag_r )
 {
 	return main_to_sound_flag;
 }
-	
+
 static CUSTOM_INPUT( soundflag_r )
 {
 	return sound_to_main_flag;
 }
-	
+
 static READ8_HANDLER( sound_to_main_r )
 {
 	sound_to_main_flag = 0;
@@ -436,7 +436,7 @@ static WRITE8_HANDLER( sound_to_main_w )
 
 /*************************************
  *
- *	6532 RIOT handlers
+ *  6532 RIOT handlers
  *
  *************************************/
 
@@ -603,7 +603,7 @@ MACHINE_START( firefox )
 
 /*************************************
  *
- *	Main CPU memory handlers
+ *  Main CPU memory handlers
  *
  *************************************/
 
@@ -652,7 +652,7 @@ ADDRESS_MAP_END
 
 /*************************************
  *
- *	Sound CPU memory handlers
+ *  Sound CPU memory handlers
  *
  *************************************/
 
@@ -673,7 +673,7 @@ ADDRESS_MAP_END
 
 /*************************************
  *
- *	Port definitions
+ *  Port definitions
  *
  *************************************/
 
@@ -755,7 +755,7 @@ INPUT_PORTS_END
 
 /*************************************
  *
- *	Graphics definitions
+ *  Graphics definitions
  *
  *************************************/
 
@@ -790,7 +790,7 @@ GFXDECODE_END
 
 /*************************************
  *
- *	Machine driver
+ *  Machine driver
  *
  *************************************/
 
@@ -865,7 +865,7 @@ MACHINE_DRIVER_END
 
 /*************************************
  *
- *	ROM definitions
+ *  ROM definitions
  *
  *************************************/
 
@@ -949,7 +949,7 @@ ROM_END
 
 /*************************************
  *
- *	Game drivers
+ *  Game drivers
  *
  *************************************/
 

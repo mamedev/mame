@@ -335,7 +335,7 @@ void vbi_parse_all(const UINT16 *source, int sourcerowpixels, int sourcewidth, i
 
 
 /*-------------------------------------------------
-    vbi_metadata_pack - pack the VBI data down 
+    vbi_metadata_pack - pack the VBI data down
     into a smaller form for storage
 -------------------------------------------------*/
 
@@ -361,7 +361,7 @@ void vbi_metadata_pack(UINT8 *dest, UINT32 framenum, const vbi_metadata *vbi)
 
 
 /*-------------------------------------------------
-    vbi_metadata_unpack - unpack the VBI data 
+    vbi_metadata_unpack - unpack the VBI data
     from a smaller form into the full structure
 -------------------------------------------------*/
 

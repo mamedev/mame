@@ -183,18 +183,18 @@ static WRITE16_HANDLER( galaxi_500004_w )
 	if ( ACCESSING_BITS_0_7 )
 	{
 	/*
-	    - Lbits -
-		7654 3210
-		=========
-		---- ---x  Hold1 lamp.
-		---- --x-  Hold2 lamp.
-		---- -x--  Hold3 lamp.
-		---- x---  Hold4 lamp.
-		---x ----  Hold5 lamp.
-		--x- ----  Start lamp.
-		-x-- ----  Payout.
+        - Lbits -
+        7654 3210
+        =========
+        ---- ---x  Hold1 lamp.
+        ---- --x-  Hold2 lamp.
+        ---- -x--  Hold3 lamp.
+        ---- x---  Hold4 lamp.
+        ---x ----  Hold5 lamp.
+        --x- ----  Start lamp.
+        -x-- ----  Payout.
 
-	*/
+    */
 		output_set_lamp_value(1, (data & 1));			/* Lamp 1 - HOLD 1 */
 		output_set_lamp_value(2, (data >> 1) & 1);		/* Lamp 2 - HOLD 2 */
 		output_set_lamp_value(3, (data >> 2) & 1);		/* Lamp 3 - HOLD 3 */

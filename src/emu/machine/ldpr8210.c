@@ -9,13 +9,13 @@
 
 **************************************************************************
 
-	Still to do:
-	
-		* add overlay properly (need capture)
-		* implement SLOW TRG
-		* figure out Simutrek without jump hack
-		* figure out serial protocol issues (current hack works nicely)
-		* determine actual slow/fast speeds
+    Still to do:
+
+        * add overlay properly (need capture)
+        * implement SLOW TRG
+        * figure out Simutrek without jump hack
+        * figure out serial protocol issues (current hack works nicely)
+        * determine actual slow/fast speeds
 
 *************************************************************************/
 
@@ -313,7 +313,7 @@ static INT32 pr8210_update(laserdisc_state *ld, const vbi_metadata *vbi, int fie
 {
 	ldplayer_data *player = ld->player;
 	UINT8 spdl_on = !(player->port1 & 0x10);
-	
+
 	/* logging */
 	if (LOG_VBLANK_VBI)
 		printf("%3d:Update(%d)\n", video_screen_get_vpos(ld->screen), fieldnum);
@@ -351,7 +351,7 @@ static INT32 pr8210_update(laserdisc_state *ld, const vbi_metadata *vbi, int fie
 
 void pr8210_overlay(laserdisc_state *ld, bitmap_t *bitmap)
 {
-//	ldplayer_data *player = ld->player;
+//  ldplayer_data *player = ld->player;
 }
 
 
@@ -403,13 +403,13 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 		{
 			UINT8 newcommand = (player->accumulator >> 2) & 0x1f;
 			attotime rejectuntil;
-			
+
 			/* data is stored to the PIA in bit-reverse order */
 			player->pia.porta = BITSWAP8(newcommand, 0,1,2,3,4,5,6,7);
-			
+
 			/* the MCU logic requires a 0 to execute many commands; however, nobody
-			   consistently sends a 0, whereas they do tend to send duplicate commands...
-			   if we assume that each duplicate causes a 0, we get the correct results */
+               consistently sends a 0, whereas they do tend to send duplicate commands...
+               if we assume that each duplicate causes a 0, we get the correct results */
 			rejectuntil = attotime_add(player->lastcommandtime, PR8210_REJECT_DUPLICATE_TIME);
 			player->lastcommandtime = curtime;
 			if (player->pia.porta == player->lastcommand && attotime_compare(curtime, rejectuntil) < 0)
@@ -424,7 +424,7 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 				while (input_code_pressed(KEYCODE_ENTER)) ;
 				while (!input_code_pressed(KEYCODE_ENTER)) ;
 			}
-			
+
 			/* reset the first bit time so that the accumulator clears on the next write */
 			player->firstbittime = attotime_sub(curtime, PR8210_MAX_WORD_TIME);
 		}
@@ -447,7 +447,7 @@ static TIMER_CALLBACK( vsync_off )
 /*-------------------------------------------------
     vbi_data_fetch - timer callback to update the
     VBI data in the PIA as soon as it is ready;
-    this must happy early in the frame because 
+    this must happy early in the frame because
     the player logic relies on fetching it here
 -------------------------------------------------*/
 
@@ -510,7 +510,7 @@ static READ8_HANDLER( pr8210_pia_r )
 	laserdisc_state *ld = find_pr8210(machine);
 	ldplayer_data *player = ld->player;
 	UINT8 result = 0xff;
-	
+
 	switch (offset)
 	{
 		/* (20-26) 7 characters for the chapter/frame */
@@ -518,19 +518,19 @@ static READ8_HANDLER( pr8210_pia_r )
 		case 0x22:	case 0x23:	case 0x24:	case 0x25:	case 0x26:
 			result = player->pia.frame[offset - 0x20];
 			break;
-		
+
 		/* (A0) port A value (from serial decoder) */
 		case 0xa0:
 			result = player->pia.porta;
 			break;
-		
+
 		/* (C0) VBI decoding state 1 */
 		case 0xc0:
 			if (LOG_VBLANK_VBI)
 				printf("%3d:PIA(C0)\n", video_screen_get_vpos(ld->screen));
 			result = player->pia.vbi1;
 			break;
-		
+
 		/* (E0) VBI decoding state 2 */
 		case 0xe0:
 			if (LOG_VBLANK_VBI)
@@ -556,7 +556,7 @@ static WRITE8_HANDLER( pr8210_pia_w )
 	laserdisc_state *ld = find_pr8210(machine);
 	ldplayer_data *player = ld->player;
 	UINT8 value;
-	
+
 	switch (offset)
 	{
 		/* (22-30) 15 characters for the display */
@@ -565,10 +565,10 @@ static WRITE8_HANDLER( pr8210_pia_w )
 		case 0x2c:	case 0x2d:	case 0x2e:	case 0x2f:	case 0x30:
 			player->pia.text[offset - 0x22] = data;
 			break;
-		
+
 		/* (40) control lines */
 		case 0x40:
-		
+
 			/* toggle bit 0 to latch chapter number into display area */
 			if (!(data & 0x01) && (player->pia.control & 0x01))
 			{
@@ -586,16 +586,16 @@ static WRITE8_HANDLER( pr8210_pia_w )
 			}
 			player->pia.control = data;
 			break;
-			
+
 		/* (60) port B value (LEDs) */
 		case 0x60:
-		
+
 			/* these 4 are direct-connect */
 			output_set_value("pr8210_audio1", (data & 0x01) != 0);
 			output_set_value("pr8210_audio2", (data & 0x02) != 0);
 			output_set_value("pr8210_clv", (data & 0x04) != 0);
 			output_set_value("pr8210_cav", (data & 0x08) != 0);
-			
+
 			/* remaining 3 bits select one of 5 LEDs via a mux */
 			value = ((data & 0x40) >> 6) | ((data & 0x20) >> 4) | ((data & 0x10) >> 2);
 			output_set_value("pr8210_srev", (value == 0));
@@ -607,12 +607,12 @@ static WRITE8_HANDLER( pr8210_pia_w )
 			player->pia.portb = data;
 			update_audio_squelch(ld);
 			break;
-		
+
 		/* (80) display enable */
 		case 0x80:
 			player->pia.display = data & 0x01;
 			break;
-		
+
 		/* no other writes known */
 		default:
 			mame_printf_debug("%03X:Unknown PR-8210 PIA write to offset %02X = %02X\n", activecpu_get_pc(), offset, data);
@@ -660,9 +660,9 @@ static READ8_HANDLER( pr8210_bus_r )
 	/* bus bit 1: spindle motor stop detector */
 	if (!spdl_on)
 		result |= 0x02;
-	
+
 	/* bus bit 0: SLOW TIMER OUT */
-//	if (attotime_compare(attotime_sub(timer_get_time(), player->slowtrg), 
+//  if (attotime_compare(attotime_sub(timer_get_time(), player->slowtrg),
 
 	/* loop at beginning waits for $40=0, $02=1 */
 	return result;
@@ -719,14 +719,14 @@ static WRITE8_HANDLER( pr8210_port1_w )
 		int delta = (data & 0x04) ? PR8210_SCAN_SPEED : PR8210_SEEK_FAST_SPEED;
 		ldcore_set_slider_speed(ld, delta * direction);
 	}
-	
+
 	/* bit 1 high stops scanning */
 	else
 		ldcore_set_slider_speed(ld, 0);
 
 	/* video squelch is controlled by bit 5 */
 	update_video_squelch(ld);
-	
+
 	/* audio squelch is controlled by bit 6 */
 	update_audio_squelch(ld);
 }
@@ -760,7 +760,7 @@ static WRITE8_HANDLER( pr8210_port2_w )
 	if (!(data & 0x20) && (prev & 0x20))
 		player->slowtrg = timer_get_time();
 
-	/* bit 6 when low triggers an IRQ on the MCU */ 
+	/* bit 6 when low triggers an IRQ on the MCU */
 	cpunum_set_input_line(machine, player->cpunum, MCS48_INPUT_IRQ, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* standby LED is set accordingl to bit 4 */
@@ -977,7 +977,7 @@ static TIMER_CALLBACK( simutrek_latched_data_w )
 {
 	laserdisc_state *ld = ptr;
 	ldplayer_data *player = ld->player;
-	
+
 	/* store the data and set the ready flag */
 	player->simutrek.data = param;
 	player->simutrek.data_ready = TRUE;
@@ -1009,14 +1009,14 @@ static WRITE8_HANDLER( simutrek_port2_w )
 	laserdisc_state *ld = find_pr8210(machine);
 	ldplayer_data *player = ld->player;
 	UINT8 prev = player->simutrek.port2;
-	
+
 	/* update stat */
 	player->simutrek.port2 = data;
 
 	/* bit $20 goes to the serial line */
 	if ((data ^ prev) & 0x20)
 		pr8210_control_w(ld, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
-	
+
 	/* bit $10 goes to JUMP TRG */
 	/* bit $08 controls direction */
 	if (!(data & 0x10) && (prev & 0x10))
@@ -1026,11 +1026,11 @@ static WRITE8_HANDLER( simutrek_port2_w )
 			printf("%3d:JUMP TRG (Simutrek PC=%03X)\n", video_screen_get_vpos(ld->screen), activecpu_get_pc());
 		ldcore_advance_slider(ld, direction);
 	}
-	
+
 	/* bit $04 controls who owns the JUMP TRG command */
 	if (!(data & 0x04) && (prev & 0x04))
 		player->simutrek.jumphack = 1;
-	
+
 	/* bits $03 control something (status?) */
 	if (LOG_SIMUTREK && ((data ^ prev) & 0x03))
 		printf("Simutrek Status = %d\n", data & 0x03);

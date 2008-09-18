@@ -133,7 +133,7 @@ There's also (external) JAMMA adapter - 4th board filled with resistors and diod
 
 
 
-Funny Land de Luxe 
+Funny Land de Luxe
 ------------------
 
 Video board has additional chips:

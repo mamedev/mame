@@ -726,7 +726,7 @@ static WRITE16_HANDLER( mcu_mailbox_w_68k )
 	COMBINE_DATA(&mcu_mailbox[offset%8]);
 
 	/* FIXME: This shouldn't be necessary now that the C70 BIOS is implemented,
-	but for some reason the MCU never responds to the version string command */
+    but for some reason the MCU never responds to the version string command */
 	if ( (namcona1_gametype == NAMCO_NUMANATH) || (namcona1_gametype == NAMCO_KNCKHEAD) )
 	{
 		if ((namcona1_workram[0xf72/2] >> 8) == 7)

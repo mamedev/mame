@@ -390,7 +390,7 @@ static void vblank_state_changed(const device_config *screen, void *param, int v
 		/* call the player's VSYNC callback */
 		if (ldcore->intf.vsync != NULL)
 			(*ldcore->intf.vsync)(ld, &ldcore->metadata[ldcore->fieldnum], ldcore->fieldnum, curtime);
-		
+
 		/* set a timer to begin fetching the next frame just before the VBI data would be fetched */
 		timer_set(video_screen_get_time_until_pos(screen, 16*2, 0), ld, 0, perform_player_update);
 	}
@@ -526,7 +526,7 @@ UINT8 laserdisc_line_r(const device_config *device, UINT8 line)
 
 /*-------------------------------------------------
     laserdisc_get_video - return the current
-    video frame; return TRUE if valid or FALSE 
+    video frame; return TRUE if valid or FALSE
     if video off
 -------------------------------------------------*/
 
@@ -894,7 +894,7 @@ static void read_track_data(laserdisc_state *ld)
 	INT32 chdtrack;
 
 	/* if the previous field had a frame number, and the new field immediately follows it,
-	   force the new field to pair with the previous one */
+       force the new field to pair with the previous one */
 	frame = &ldcore->frame[ldcore->videoindex];
 	if ((ldcore->metadata[fieldnum ^ 1].line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE && (tracknum * 2 + fieldnum == frame->lastfield + 1))
 		frame->numfields = 1;
@@ -910,11 +910,11 @@ static void read_track_data(laserdisc_state *ld)
 		frame = &ldcore->frame[ldcore->videoindex];
 		frame->numfields = 0;
 	}
-	
+
 	/* if we're squelched, reset the frame counter */
 	if (ldcore->videosquelch)
 		frame->numfields = 0;
-	
+
 	/* remember the last field number */
 	frame->lastfield = tracknum * 2 + fieldnum;
 
@@ -949,7 +949,7 @@ static void read_track_data(laserdisc_state *ld)
 	chdtrack = MAX(chdtrack, 0);
 	chdtrack = MIN(chdtrack, ldcore->chdtracks - 1);
 	readhunk = chdtrack * 2 + fieldnum;
-	
+
 	/* set the VBI data for the new field from our precomputed data */
 	if (ldcore->vbidata != NULL)
 		vbi_metadata_unpack(&ldcore->metadata[fieldnum], &vbiframe, &ldcore->vbidata[readhunk * VBI_PACKED_BYTES]);
@@ -982,11 +982,11 @@ static void process_track_data(const device_config *device)
 	/* remove the video if we had an error */
 	if (ldcore->readresult != CHDERR_NONE)
 		ldcore->avconfig.video = NULL;
-	
+
 	/* count the field as read if we are successful */
 	if (ldcore->avconfig.video != NULL)
 		ldcore->frame[ldcore->videoindex].numfields++;
-	
+
 	/* render the display if present */
 //  if (ldcore->display && ldcore->avconfig.video != NULL)
 //      render_display((UINT16 *)ldcore->avconfig.video->base, ldcore->avconfig.video->rowpixels, ldcore->avconfig.video->width, ldcore->last_frame);
@@ -1472,7 +1472,7 @@ static void init_disc(const device_config *device)
 
 		/* determine the maximum track and allocate a frame buffer */
 		ldcore->chdtracks = totalhunks / 2;
-		
+
 		/* allocate memory for the precomputed per-frame metadata */
 		ldcore->vbidata = auto_malloc(totalhunks * VBI_PACKED_BYTES);
 		err = chd_get_metadata(ldcore->disc, AV_LD_METADATA_TAG, 0, ldcore->vbidata, totalhunks * VBI_PACKED_BYTES, &vbilength, NULL);
@@ -1501,7 +1501,7 @@ static void init_video(const device_config *device)
 	for (index = 0; index < ARRAY_LENGTH(ldcore->frame); index++)
 	{
 		frame_data *frame = &ldcore->frame[index];
-		
+
 		/* first allocate a YUY16 bitmap at 2x the height */
 		frame->bitmap = auto_bitmap_alloc(ldcore->width, ldcore->height * 2, BITMAP_FORMAT_YUY16);
 		fillbitmap_yuy16(frame->bitmap, 40, 109, 240);
