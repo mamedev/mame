@@ -395,7 +395,7 @@ CUSTOM_INPUT( nb1413m3_outcoin_flag_r )
 
 READ8_HANDLER( nb1413m3_inputport0_r )
 {
-	return ((input_port_read(machine, "SYSTEM") & 0xfc) | ((nb1413m3_outcoin_flag & 0x01) << 1));
+	return ((input_port_read(machine, "SYSTEM") & 0xfd) | ((nb1413m3_outcoin_flag & 0x01) << 1));
 }
 
 READ8_HANDLER( nb1413m3_inputport1_r )
