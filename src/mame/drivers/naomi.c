@@ -1154,6 +1154,7 @@ Scan ROM for the text string "LOADING TEST MODE NOW" back up four (4) bytes for 
 EPR-23605  - NAOMI BOOT ROM 2001 01/19  1.50 (Japan)
 EPR-23605A - NAOMI BOOT ROM 2001 06/20  1.60 (Japan)
 EPR-23605B - NAOMI BOOT ROM 2001 09/10  1.70 (Japan)
+EPR-23605C - NAOMI BOOT ROM 2002 07/08  1.8- (Japan)
 EPR-23607  - NAOMI BOOT ROM 2001 01/19  1.50 (USA)
 EPR-23607B - NAOMI BOOT ROM 2001 09/10  1.70 (USA)
 EPR-23608  - NAOMI BOOT ROM 2001 01/19  1.50 (Export)
@@ -1185,12 +1186,14 @@ Region byte encoding is as follows:
 	ROM_LOAD16_WORD_SWAP_BIOS( 2, "epr-23607b.bin",   0x000000, 0x200000, CRC(f308c5e9) SHA1(5470ab1cee6afecbd8ca8cf40f8fbe4ec2cb1471) ) \
 	ROM_SYSTEM_BIOS( 3, "bios3", "epr-23607 (USA)"  ) \
 	ROM_LOAD16_WORD_SWAP_BIOS( 3, "epr-23607.bin",    0x000000, 0x200000, CRC(2b55add2) SHA1(547de5f97d3183c8cd069c4fa3c09f13d8b637d9) ) \
-	ROM_SYSTEM_BIOS( 4, "bios4", "epr-23605b (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-23605b.bin",   0x000000, 0x200000, CRC(3a3242d4) SHA1(aaca4df51ef91d926f8191d372f3dfe1d20d9484) ) \
-	ROM_SYSTEM_BIOS( 5, "bios5", "epr-23605a (Japan)" ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-23605a.bin",   0x000000, 0x200000, CRC(7bc3fc2d) SHA1(a4a9531a7c66ff30046908cf71f6c7b6fb59c392) ) \
-	ROM_SYSTEM_BIOS( 6, "bios6", "epr-23605 (Japan)"  ) \
-	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-23605.bin",    0x000000, 0x200000, CRC(5731e446) SHA1(787b0844fc408cf124c12405c095c59948709ea6) )
+	ROM_SYSTEM_BIOS( 4, "bios4", "epr-23605c (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 4, "epr-23605c.bin",   0x000000, 0x200000, CRC(297ea6ed) SHA1(cfbfe57c80e6ee86a101fa83aec0a01e00c0f42a) ) \
+	ROM_SYSTEM_BIOS( 5, "bios5", "epr-23605b (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 5, "epr-23605b.bin",   0x000000, 0x200000, CRC(3a3242d4) SHA1(aaca4df51ef91d926f8191d372f3dfe1d20d9484) ) \
+	ROM_SYSTEM_BIOS( 6, "bios6", "epr-23605a (Japan)" ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 6, "epr-23605a.bin",   0x000000, 0x200000, CRC(7bc3fc2d) SHA1(a4a9531a7c66ff30046908cf71f6c7b6fb59c392) ) \
+	ROM_SYSTEM_BIOS( 7, "bios7", "epr-23605 (Japan)"  ) \
+	ROM_LOAD16_WORD_SWAP_BIOS( 7, "epr-23605.bin",    0x000000, 0x200000, CRC(5731e446) SHA1(787b0844fc408cf124c12405c095c59948709ea6) )
 
 /* this is one flashrom, however the second half looks like it's used for game settings, may differ between dumps, and may not be needed / could be blanked */
 #define AW_BIOS \
