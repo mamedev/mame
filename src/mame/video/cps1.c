@@ -1258,6 +1258,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"3wonders", CPS_B_21_BT1, mapper_RT24B },
 	{"3wonderu", CPS_B_21_BT1, mapper_RT24B },
 	{"wonder3",  CPS_B_21_BT1, mapper_RT22B },	// equivalent to RT24B
+	{"3wonderh", CPS_B_02    , mapper_RT24B },	/* Not 100% sure of the CPS B-ID */
 	{"kod",      CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodu",     CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodj",     CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },

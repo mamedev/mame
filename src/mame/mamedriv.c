@@ -2449,6 +2449,7 @@ V-V                           TP-027
 	DRIVER( 3wonders )	/* 20/05/1991 (c) 1991 (World) */
 	DRIVER( 3wonderu )	/* 20/05/1991 (c) 1991 (US)    */
 	DRIVER( wonder3 )	/* 20/05/1991 (c) 1991 (Japan) */
+	DRIVER( 3wonderh )	/* hack? */
 	DRIVER( kod )		/* 11/07/1991 (c) 1991 (World) */
 	DRIVER( kodu )		/* 10/09/1991 (c) 1991 (US)    */
 	DRIVER( kodj )		/* 05/08/1991 (c) 1991 (Japan) */
@@ -2689,7 +2690,8 @@ V-V                           TP-027
 	DRIVER( vhunt2r1 )	/* 13/09/1997 (c) 1997 (Japan) */
 	DRIVER( vhunt2 )	/* 29/09/1997 (c) 1997 (Japan) */
 	DRIVER( vsav2 )		/* 13/09/1997 (c) 1997 (Japan) */
-	DRIVER( mvsc )		/* 12/01/1998 (c) 1998 (Euro) */
+	DRIVER( mvsc )		/* 23/01/1998 (c) 1998 (Euro) */
+	DRIVER( mvscr1 )	/* 12/01/1998 (c) 1998 (Euro) */
 	DRIVER( mvscu )		/* 23/01/1998 (c) 1998 (US) */
 	DRIVER( mvscj )		/* 23/01/1998 (c) 1998 (Japan) */
 	DRIVER( mvscjr1 )	/* 12/01/1998 (c) 1998 (Japan) */
