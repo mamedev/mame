@@ -6,50 +6,151 @@
 
 ***************************************************************************/
 
+/*
+NOTES:
+***	There seems to be a disagreement in dasm with bytes like this : 0500 0307
+	On one hand, you can dasm it like this :  add      Y1,A          X:(R2+00),Y0
+	On the other, you can dasm it like this : move(m)  P:(R2+00),B0
+	The interesting doc pages for this are the following : move(m) . A-155
+														   mem move + short displacement . A-139
+														   add . A-23
+	(POSSIBILITY : Maybe Add can't have a mem move + short displacement parallel move?)
+	(CURRENT SOLUTION : I'm completely ignoring mem move + short displacements for now)
+
+***	This disassembler has been 75% tested.  There may remain some bugs, but it disassembles
+	Polygonet Commanders' memtest code 100% accurate (to my knowledge).
+*/
+
 #include "dsp56k.h"
 
-/* Main opcode categories */
-static unsigned assemble_x_memory_data_move_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
-static unsigned assemble_dual_x_memory_data_read_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
-static unsigned assemble_no_parallel_move_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
-static unsigned assemble_parallel_register_to_register_moveALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
-static unsigned assemble_coorperative_x_memory_data_move_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
-static unsigned assemble_TCC_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
-static unsigned assemble_bitfield_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
-static unsigned assemble_no_parallel_move_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
-static unsigned assemble_immediate_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
-static unsigned assemble_movec_opcodes(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
-static unsigned assemble_misc_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
-static unsigned assemble_unique_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc);
+/*******************/
+/* Dasm prototypes */
+/*******************/
+static size_t dsp56k_dasm_add_2		(const UINT16 op_byte, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_mac_1		(const UINT16 op_byte, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_macr_1	(const UINT16 op_byte, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_move_1	(const UINT16 op_byte, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_mpy_1		(const UINT16 op_byte, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_mpyr_1	(const UINT16 op_byte, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_sub_1		(const UINT16 op_byte, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_tfr_2		(const UINT16 op_byte, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_mpy_2		(const UINT16 op_byte, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_mac_2		(const UINT16 op_byte, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_clr		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_add		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_move		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_tfr		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_rnd		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_tst		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_inc		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_inc24		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_or		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_asr		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_asl		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_lsr		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_lsl		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_eor		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_subl		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_sub		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_clr2		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_sbc		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_cmp		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_neg		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_not		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_dec		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_dec24		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_and		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_abs		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_ror		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_rol		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_cmpm		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_mpy		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_mpyr		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_mac		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_macr		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_adc		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_andi		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_asl4		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_asr4		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_asr16		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_bfop		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_bcc		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_bcc_1		(const UINT16 op, char* opcode_str, char* arg_str, const offs_t pc);
+static size_t dsp56k_dasm_bcc_2		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_bra		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_bra_1		(const UINT16 op, char* opcode_str, char* arg_str, const offs_t pc);
+static size_t dsp56k_dasm_bra_2		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_brkc		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_bscc		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_bscc_1	(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_bsr		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str, const offs_t pc);
+static size_t dsp56k_dasm_bsr_1		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_chkaau	(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_debug		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_debugcc	(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_div		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_dmac		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_do		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_do_1		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_do_2		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_doforever	(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_enddo		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_ext		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_illegal	(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_imac		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_impy		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_jcc		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_jcc_1		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_jmp		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_jmp_1		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_jscc		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_jscc_1	(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_jsr		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_jsr_1		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_jsr_2		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_lea		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_lea_1		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_macsuuu	(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_move_2	(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_movec		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_movec_1	(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_movec_2	(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_movec_3	(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_movec_4	(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_movec_5	(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_movei		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_movem		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_movem_1	(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_movem_2	(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_movep		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_movep_1	(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_moves		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_mpysuuu	(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_negc		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_nop		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_norm		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_ori		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_rep		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_rep_1		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_rep_2		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_repcc		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_reset		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_rti		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_rts		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_stop		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_swap		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_swi		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_tcc		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_tfr2		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_tfr3		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_tst2		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_wait		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_zero		(const UINT16 op, char* opcode_str, char* arg_str);
 
-/* Sub-opcode decoding */
-static void decode_data_ALU_opcode(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
-static void decode_data_ALU_opcode_dual_move(const UINT16 op_byte, char* opcode_str, char* arg_str);
 
-/* Direct opcode decoding */
-static unsigned decode_TCC_opcode(const UINT16 op, char* opcode_str, char* arg_str);
-static unsigned decode_bitfield_opcode(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
-static unsigned decode_no_parallel_move_opcode(const UINT16 op, const UINT16 op2, const UINT16 pc, char* opcode_str, char* arg_str);
-static unsigned decode_immediate_opcode(const UINT16 op, const UINT16 pc, char* opcode_str, char* arg_str);
-static unsigned decode_movec_opcodes(const UINT16 op, const UINT16 op2, const UINT16 pc, char* opcode_str, char* arg_str);
-static unsigned decode_misc_opcode(const UINT16 op, const UINT16 pc, char* opcode_str, char* arg_str);
-static unsigned decode_unique_opcode(const UINT16 op, const UINT16 op2, const UINT16 pc, char* opcode_str, char* arg_str);
-
-/* Parallel operation decoding */
-static void decode_x_memory_data_move(const UINT16 op_byte, char* parallel_move_str);
-static void decode_dual_x_memory_data_read(const UINT16 op, char* parallel_move_str, char* parallel_move_str2);
-static void decode_register_to_register_data_move(const UINT16 op_byte, char* parallel_move_str, char* d_register);
-static void decode_parallel_cooperative_x_memory_data_move(const UINT16 op_byte, char* parallel_move_str, char* d_register);
-
-
-/* Helper functions */
-#define BITS(CUR,MASK) (dsp56k_op_mask(CUR,MASK))
-static UINT16 dsp56k_op_mask(UINT16 op, UINT16 mask);
-static void pad_string(const int dest_length, char* string);
-
-enum bbbType  { BBB_UPPER, BBB_MIDDLE, BBB_LOWER };
-
+/***************************/
 /* Table decoder functions */
+/***************************/
 static int  decode_BBB_table  (UINT16 BBB);
 static void decode_cccc_table (UINT16 cccc, char *mnemonic);
 static void decode_DDDDD_table(UINT16 DDDDD, char *SD);
@@ -64,10 +165,11 @@ static void decode_IIII_table (UINT16 IIII, char *S, char *D);
 static void decode_JJJF_table (UINT16 JJJ, UINT16 F, char *S, char *D);
 static void decode_JJF_table  (UINT16 JJ, UINT16 F, char *S, char *D);
 static void decode_JF_table   (UINT16 J, UINT16 F, char *S, char *D);
-/* static void decode_k_table    (UINT16 k, char *Dnot); */
+static void decode_k_table    (UINT16 k, char *Dnot);
 static void decode_kSign_table(UINT16 k, char *plusMinus);
 static void decode_KKK_table  (UINT16 KKK, char *D1, char *D2);
-/* static int  decode_NN_table   (UINT16 NN); */
+static int  decode_NN_table   (UINT16 NN);
+static int  decode_TT_table   (UINT16 TT);
 static void decode_QQF_table  (UINT16 QQ, UINT16 F, char *S1, char *S2, char *D);
 static void decode_QQF_special_table(UINT16 QQ, UINT16 F, char *S1, char *S2, char *D);
 static void decode_QQQF_table (UINT16 QQQ, UINT16 F, char *S1, char *S2, char *D);
@@ -83,14 +185,35 @@ static void assemble_eas_from_m_table(UINT16 mm, int n1, int n2, char *ea1, char
 static void assemble_ea_from_MM_table(UINT16 MM, int n, char *ea);
 static void assemble_ea_from_t_table (UINT16 t, UINT16 val, char *ea);
 static void assemble_ea_from_q_table (UINT16 q, int n, char *ea);
-/* static void assemble_ea_from_z_table (UINT16 z, int n, char *ea); */
+static void assemble_ea_from_z_table (UINT16 z, int n, char *ea);
 
 static void assemble_D_from_P_table(UINT16 P, UINT16 ppppp, char *D);
 static void assemble_arguments_from_W_table(UINT16 W, char *args, char ma, char *SD, char *ea);
 static void assemble_reg_from_W_table(UINT16 W, char *args, char ma, char *SD, UINT8 xx);
 
 static void assemble_address_from_IO_short_address(UINT16 pp, char *ea);
-static INT8 get_6_bit_relative_value(UINT16 bits);
+static INT8 get_6_bit_signed_value(UINT16 bits);
+
+
+/**********************************/
+/* Parallel memory move functions */
+/**********************************/
+static void decode_x_memory_data_move(const UINT16 op, char* parallel_move_str);
+static void decode_x_memory_data_move2(const UINT16 op, char* parallel_move_str, char* d_register);
+static void decode_dual_x_memory_data_read(const UINT16 op, char* parallel_move_str, char* parallel_move_str2);
+static void decode_register_to_register_data_move(const UINT16 op, char* parallel_move_str, char* d_register);
+static void decode_x_memory_data_write_and_register_data_move(const UINT16 op, char* parallel_move_str, char* parallel_move_str2);
+static void decode_address_register_update(const UINT16 op, char* parallel_move_str);
+static void decode_x_memory_data_move_with_short_displacement(const UINT16 op, const UINT16 op2, char* parallel_move_str);
+
+/********************/
+/* Helper functions */
+/********************/
+#define BITS(CUR,MASK) (dsp56k_op_mask(CUR,MASK))
+static UINT16 dsp56k_op_mask(UINT16 op, UINT16 mask);
+static void pad_string(const int dest_length, char* string);
+
+enum bbbType  { BBB_UPPER, BBB_MIDDLE, BBB_LOWER };
 
 
 /*****************************/
@@ -98,757 +221,1463 @@ static INT8 get_6_bit_relative_value(UINT16 bits);
 /*****************************/
 offs_t dsp56k_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
+	/* ORDER: Handle parallel types in the ALU */
+	/*        Handle the rest */
 	unsigned size = 0;
-	const UINT16 op  = oprom[0] | (oprom[1] << 8);
-	const UINT16 op2 = oprom[2] | (oprom[3] << 8);
 
-	/* FILTER FOR PARALLEL DATA MOVES */
-	if (BITS(op,0x8000))
-	{
-		/* ALU opcode with a single parallel data move */
-		size = assemble_x_memory_data_move_ALU_opcode(buffer, op, op2, pc);
-	}
-	else if (BITS(op,0xe000) == 0x3)
-	{
-		/* ALU opcode with two parallel data moves */
-		size = assemble_dual_x_memory_data_read_ALU_opcode(buffer, op, op2, pc);
-	}
-	else if (BITS(op,0xff00) == 0x4a)
-	{
-		/* ALU opcode without any parallel data move */
-		size = assemble_no_parallel_move_ALU_opcode(buffer, op, op2, pc);
-	}
-	else if (BITS(op,0xf000) == 0x4)	/* TODO */
-	{
-		/* ALU opcode with a parallel register to register move */
-		size = assemble_parallel_register_to_register_moveALU_opcode(buffer, op, op2, pc);
-	}
-	else if (BITS(op,0xf800) == 0x6)	/* TODO */
-	{
-		/* ALU opcode with an address register update */
-		sprintf(buffer, "Parallel address register update unimplemented.");
-		size = 1;
-	}
-	else if (BITS(op,0xf000) == 0x5)
-	{
-		/* ALU opcode with an cooperative x data memory move */
-		size = assemble_coorperative_x_memory_data_move_ALU_opcode(buffer, op, op2, pc);
-	}
-	else if (BITS(op,0xff00) == 0x05)	/* TODO */
-	{
-		/* ALU opcode with x memory data move + short displacement */
-		sprintf(buffer, "Parallel x memory data move + short displacement unimplemented.");
-		size = 2;
-	}
-	else if (BITS(op,0xfe00) == 0xb)	/* TODO */
-	{
-		/* ALU opcode with x memory data write and register data move */
-		/* Don't forget these two, unique cases */
-		/* MPY             X       0001 0110 xxxx xxxx */
-		/* MAC             X       0001 0111 xxxx xxxx */
-		sprintf(buffer, "Parallel x memory data write and register data move unimplemented.");
-		size = 1;
-	}
-
-	/* Tcc is a unique critter */
-	if (BITS(op,0xfc00) == 0x4)
-	{
-		size = assemble_TCC_opcode(buffer, op, op2, pc);
-	}
-
-	/* Operations that do not allow a parallel move */
-	if (BITS(op,0xff00) == 0x14)
-	{
-		size = assemble_bitfield_opcode(buffer, op, op2, pc);
-	}
-	if (BITS(op,0xff00) == 0x15)
-	{
-		size = assemble_no_parallel_move_opcode(buffer, op, op2, pc);
-	}
-	if (BITS(op,0xf800) == 0x3)
-	{
-		size = assemble_immediate_opcode(buffer, op, op2, pc);
-	}
-	if (BITS(op,0xf800) == 0x7)
-	{
-		size = assemble_movec_opcodes(buffer, op, op2, pc);
-	}
-	if (BITS(op,0xf000) == 0x2)
-	{
-		size = assemble_misc_opcode(buffer, op, op2, pc);
-	}
-
-	if (BITS(op,0xf000) == 0x0)
-	{
-		size = assemble_unique_opcode(buffer, op, op2, pc);
-	}
-
-	/* Not recognized?  Nudge debugger onto the next opcode. */
-	if (size == 0)
-	{
-		sprintf(buffer, "unknown");
-		size = 1;
-	}
-
-	return size | DASMFLAG_SUPPORTED;
-}
-
-static unsigned assemble_x_memory_data_move_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
-{
-	/* All operations are of length 1 */
-	unsigned opSize = 1;
-
-	/* Recovered strings */
-	char arg_str[128] = "";
-	char opcode_str[128] = "";
-	char parallel_move_str[128] = "";
-	char d_register[128] = "";
-
-	/* Init */
-	sprintf(buffer, " ");
-
-	/* First, decode the Data ALU opcode */
-	decode_data_ALU_opcode(BITS(op,0x00ff), opcode_str, arg_str, d_register);
-
-	/* Next, decode the X Memory Data Move */
-	decode_x_memory_data_move(BITS(op,0xff00), parallel_move_str);
-
-	/* Finally, assemble the full opcode */
-	pad_string(11, opcode_str);
-	pad_string(15, arg_str);
-	sprintf(buffer, "%s%s%s", opcode_str, arg_str, parallel_move_str);
-
-	return opSize;
-}
-
-static unsigned assemble_dual_x_memory_data_read_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
-{
-	/* All operations are of length 1 */
-	unsigned opSize = 1;
-
-	/* Recovered strings */
 	char arg_str[128] = "";
 	char opcode_str[128] = "";
 	char parallel_move_str[128] = "";
 	char parallel_move_str2[128] = "";
-
-	/* Init */
-	sprintf(buffer, " ");
-
-	/* First, decode the Data ALU opcode */
-	decode_data_ALU_opcode_dual_move(BITS(op,0x00ff), opcode_str, arg_str);
-
-	/* Next, decode the Dual X Memory Data Read */
-	decode_dual_x_memory_data_read(op, parallel_move_str, parallel_move_str2);
-
-	/* Finally, assemble the full opcode */
-	pad_string(11, opcode_str);
-	pad_string(15, arg_str);
-	sprintf(buffer, "%s%s%s %s", opcode_str, arg_str, parallel_move_str, parallel_move_str2);
-
-	return opSize;
-}
-
-static unsigned assemble_no_parallel_move_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
-{
-	/* All operations are of length 1 */
-	unsigned opSize = 1;
-
-	/* Recovered strings */
-	char arg_str[128] = "";
-	char opcode_str[128] = "";
-	char d_register[128] = "";
-
-	/* Init */
-	sprintf(buffer, " ");
-
-	/* First, decode the Data ALU opcode */
-	decode_data_ALU_opcode(BITS(op,0x00ff), opcode_str, arg_str, d_register);
-
-	/* Finally, assemble the full opcode */
-	pad_string(11, opcode_str);
-	sprintf(buffer, "%s%s", opcode_str, arg_str);
-
-	return opSize;
-}
-
-static unsigned assemble_parallel_register_to_register_moveALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
-{
-	/* All operations are of length 1 */
-	unsigned opSize = 1;
-
-	/* Recovered strings */
-	char arg_str[128] = "";
-	char opcode_str[128] = "";
-	char d_register[128] = "";
-	char parallel_move_str[128] = "";
-
-	/* Init */
-	sprintf(buffer, " ");
-
-	/* First, decode the Data ALU opcode */
-	decode_data_ALU_opcode(BITS(op,0x00ff), opcode_str, arg_str, d_register);
-
-	/* Next, decode the X Memory Data Move */
-	decode_register_to_register_data_move(BITS(op,0xff00), parallel_move_str, d_register);
-
-	/* Finally, assemble the full opcode */
-	pad_string(11, opcode_str);
-	pad_string(15, arg_str);
-	sprintf(buffer, "%s%s%s", opcode_str, arg_str, parallel_move_str);
-
-	return opSize;
-}
-
-static unsigned assemble_coorperative_x_memory_data_move_ALU_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
-{
-	/* All operations are of length 1 */
-	unsigned opSize = 1;
-
-	/* Recovered strings */
-	char arg_str[128] = "";
-	char opcode_str[128] = "";
-	char parallel_move_str[128] = "";
-	char d_register[128] = "";
-
-	/* Init */
-	sprintf(buffer, " ");
-
-	/* First, decode the Data ALU opcode */
-	decode_data_ALU_opcode(BITS(op,0x00ff), opcode_str, arg_str, d_register);
-
-	/* Next, decode the X Memory Data Move */
-	decode_parallel_cooperative_x_memory_data_move(BITS(op,0xff00), parallel_move_str, d_register);
-
-	/* Finally, assemble the full opcode */
-	pad_string(11, opcode_str);
-	pad_string(15, arg_str);
-	sprintf(buffer, "%s%s%s", opcode_str, arg_str, parallel_move_str);
-
-	return opSize;
-}
-
-static unsigned assemble_TCC_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
-{
-	/* TCC is of length 1 */
-	unsigned opSize = 1;
-
-	/* Recovered strings */
-	char arg_str[128] = "";
-	char opcode_str[128] = "";
-
-	/* Init */
-	sprintf(buffer, " ");
-
-	/* Simply decode the opcode and its arguments */
-	opSize = decode_TCC_opcode(op, opcode_str, arg_str);
-
-	/* Finally, assemble the full opcode */
-	pad_string(11, opcode_str);
-	sprintf(buffer, "%s%s", opcode_str, arg_str);
-
-	return opSize;
-}
-
-static unsigned assemble_bitfield_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
-{
-	/* All bitfield ops are length 2 */
-	unsigned opSize = 2;
-
-	/* Recovered strings */
-	char arg_str[128] = "";
-	char opcode_str[128] = "";
-
-	/* Init */
-	sprintf(buffer, " ");
-
-	/* Simply decode the opcode and its arguments */
-	opSize = decode_bitfield_opcode(op, op2, opcode_str, arg_str);
-
-	/* Finally, assemble the full opcode */
-	pad_string(11, opcode_str);
-	sprintf(buffer, "%s%s", opcode_str, arg_str);
-
-	return opSize;
-}
-
-static unsigned assemble_no_parallel_move_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
-{
-	/* Length is variable */
-	unsigned opSize = 0;
-
-	/* Recovered strings */
-	char arg_str[128] = "";
-	char opcode_str[128] = "";
-
-	/* Init */
-	sprintf(buffer, " ");
-
-	/* Simply decode the opcode and its arguments */
-	opSize = decode_no_parallel_move_opcode(op, op2, pc, opcode_str, arg_str);
-
-	/* Finally, assemble the full opcode */
-	pad_string(11, opcode_str);
-	sprintf(buffer, "%s%s", opcode_str, arg_str);
-
-	return opSize;
-}
-
-static unsigned assemble_immediate_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
-{
-	/* Length is variable */
-	unsigned opSize = 0;
-
-	/* Recovered strings */
-	char arg_str[128] = "";
-	char opcode_str[128] = "";
-
-	/* Init */
-	sprintf(buffer, " ");
-
-	/* Decode the 4 opcode and their arguments */
-	opSize = decode_immediate_opcode(op, pc, opcode_str, arg_str);
-
-	/* Finally, assemble the full opcode */
-	pad_string(11, opcode_str);
-	sprintf(buffer, "%s%s", opcode_str, arg_str);
-
-	return opSize;
-}
-
-static unsigned assemble_movec_opcodes(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
-{
-	/* Length is variable */
-	unsigned opSize = 0;
-
-	/* Recovered strings */
-	char arg_str[128] = "";
-	char opcode_str[128] = "";
-
-	/* Init */
-	sprintf(buffer, " ");
-
-	/* Simply decode the opcode and its arguments */
-	opSize = decode_movec_opcodes(op, op2, pc, opcode_str, arg_str);
-
-	/* Finally, assemble the full opcode */
-	pad_string(11, opcode_str);
-	sprintf(buffer, "%s%s", opcode_str, arg_str);
-
-	return opSize;
-}
-
-static unsigned assemble_misc_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
-{
-	/* Length is variable */
-	unsigned opSize = 0;
-
-	/* Recovered strings */
-	char arg_str[128] = "";
-	char opcode_str[128] = "";
-
-	/* Init */
-	sprintf(buffer, " ");
-
-	/* Simply decode the opcode and its arguments */
-	opSize = decode_misc_opcode(op, pc, opcode_str, arg_str);
-
-	/* Finally, assemble the full opcode */
-	pad_string(11, opcode_str);
-	sprintf(buffer, "%s%s", opcode_str, arg_str);
-
-	return opSize;
-}
-
-/* Working except for a TODO */
-static unsigned assemble_unique_opcode(char* buffer, const UINT16 op, const UINT16 op2, const unsigned pc)
-{
-	/* Length is variable */
-	unsigned opSize = 0;
-
-	/* Recovered strings */
-	char arg_str[128] = "";
-	char opcode_str[128] = "";
-
-	/* Init */
-	sprintf(buffer, " ");
-
-	/* Simply decode the opcode and its arguments */
-	opSize = decode_unique_opcode(op, op2, pc, opcode_str, arg_str);
-
-	/* Finally, assemble the full opcode */
-	pad_string(11, opcode_str);
-	sprintf(buffer, "%s%s", opcode_str, arg_str);
-
-	return opSize;
-}
-
-
-/**************************/
-/* Actual opcode decoding */
-/**************************/
-static void decode_data_ALU_opcode(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
-{
-	char D[128];
-	char S1[128];
-
-	if (!BITS(op_byte, 0x80))
+	
+	const UINT16 op  = oprom[0] | (oprom[1] << 8);
+	const UINT16 op2 = oprom[2] | (oprom[3] << 8);
+	
+	/* Dual X Memory Data Read : 011m mKKK -rr- ---- : A-142*/
+	if ((op & 0xe000) == 0x6000)
 	{
-		switch(BITS(op_byte,0x70))
+		/* Quote: (MOVE, MAC(R), MPY(R), ADD, SUB, TFR) */
+		UINT16 op_byte = op & 0x00ff;
+		
+		/* ADD : 011m mKKK 0rru Fuuu : A-22 */
+		if ((op & 0xe080) == 0x6000)
 		{
-			case 0x0:
-				if (BITS(op_byte,0x07) == 0x1)
-				{
-					/* CLR - 1mRR HHHW 0000 F001 */
-					decode_F_table(BITS(op_byte,0x08), D);
-					sprintf(opcode_str, "clr");
-					sprintf(arg_str, "%s", D);
-				}
-				else
-				{
-					/* ADD - 1mRR HHHW 0000 FJJJ */
-					decode_JJJF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, D);
-					sprintf(opcode_str, "add");
-					sprintf(arg_str, "%s,%s", S1, D);
-				}
-				break;
-
-			case 0x1:
-				if (BITS(op_byte,0x0f) == 0x1)
-				{
-					/* MOVE - 1mRR HHHW 0001 0001 */
-					/* Equivalent to a NOP (+ parallel move) */
-					sprintf(opcode_str, "move");
-					sprintf(arg_str, " ");
-				}
-				else
-				{
-					/* TFR - 1mRR HHHW 0001 FJJJ */
-					decode_JJJF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, D);
-					sprintf(opcode_str, "tfr");
-					sprintf(arg_str, "%s,%s", S1, D);
-				}
-				break;
-
-			case 0x2:
-				if (BITS(op_byte,0x07) == 0x0)
-				{
-					/* RND - 1mRR HHHW 0010 F000 */
-					decode_F_table(BITS(op_byte,0x08), D);
-					sprintf(opcode_str, "rnd");
-					sprintf(arg_str, "%s", D);
-				}
-				else if (BITS(op_byte,0x07) == 0x1)
-				{
-					/* TST - 1mRR HHHW 0010 F001 */
-		            decode_F_table(BITS(op_byte,0x08), D);
-					sprintf(opcode_str, "tst");
-					sprintf(arg_str, "%s", D);
-				}
-				else if (BITS(op_byte,0x07) == 0x2)
-				{
-					/* INC - 1mRR HHHW 0010 F010 */
-					decode_F_table(BITS(op_byte,0x08), D);
-					sprintf(opcode_str, "inc");
-					sprintf(arg_str, "%s", D);
-				}
-				else if (BITS(op_byte,0x07) == 0x3)
-				{
-					/* INC24 - 1mRR HHHW 0010 F011 */
-					decode_F_table(BITS(op_byte,0x08), D);
-					sprintf(opcode_str, "inc24");
-					sprintf(arg_str, "%s", D);
-				}
-				else
-				{
-					/* OR - 1mRR HHHW 0010 F1JJ */
-					decode_JJF_table(BITS(op_byte,0x03),BITS(op_byte,0x08), S1, D);
-					sprintf(opcode_str, "or");
-					sprintf(arg_str, "%s,%s", S1, D);
-				}
-				break;
-
-			case 0x3:
-				if (BITS(op_byte,0x07) == 0x0)
-				{
-					/* ASR - 1mRR HHHW 0011 F000 */
-					decode_F_table(BITS(op_byte,0x08), D);
-					sprintf(opcode_str, "asr");
-					sprintf(arg_str, "%s", D);
-				}
-				else if (BITS(op_byte,0x07) == 0x1)
-				{
-	                /* ASL - 1mRR HHHW 0011 F001 */
-	                decode_F_table(BITS(op_byte,0x08), D);
-					sprintf(opcode_str, "asl");
-					sprintf(arg_str, "%s", D);
-				}
-				else if (BITS(op_byte,0x07) == 0x2)
-				{
-					/* LSR - 1mRR HHHW 0011 F010 */
-					decode_F_table(BITS(op_byte,0x08), D);
-					sprintf(opcode_str, "lsr");
-					sprintf(arg_str, "%s", D);
-				}
-				else if (BITS(op_byte,0x07) == 0x3)
-				{
-	                /* LSL - 1mRR HHHW 0011 F011 */
-	                decode_F_table(BITS(op_byte,0x08), D);
-					sprintf(opcode_str, "lsl");
-					sprintf(arg_str, "%s", D);
-				}
-				else
-				{
-					/* EOR - 1mRR HHHW 0011 F1JJ */
-					decode_JJF_table(BITS(op_byte,0x03),BITS(op_byte,0x08), S1, D);
-					sprintf(opcode_str, "eor");
-					sprintf(arg_str, "%s,%s", S1, D);
-				}
-				break;
-
-			case 0x4:
-				if (BITS(op_byte,0x07) == 0x1)
-				{
-					/* SUBL - 1mRR HHHW 0100 F001 */
-					sprintf(opcode_str, "subl");
-
-					/* Only one option for the F table */
-					if (!BITS(op_byte,0x08))
-						sprintf(arg_str, "B,A");
-					else
-						sprintf(arg_str, "!");
-				}
-				else
-				{
-					/* SUB - 1mRR HHHW 0100 FJJJ */
-					decode_JJJF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, D);
-					sprintf(opcode_str, "sub");
-					sprintf(arg_str, "%s,%s", S1, D);
-				}
-				break;
-
-			case 0x5:
-				if (BITS(op_byte,0x07) == 0x1)
-				{
-					/* CLR24 - 1mRR HHHW 0101 F001 */
-					decode_F_table(BITS(op_byte,0x08), D);
-					sprintf(opcode_str, "clr24");
-					sprintf(arg_str, "%s", D);
-				}
-				else if (BITS(op_byte,0x06) == 0x1)
-				{
-					/* SBC - 1mRR HHHW 0101 F01J */
-					decode_JF_table(BITS(op_byte,0x01), BITS(op_byte,0x08), S1, D);
-					sprintf(opcode_str, "sbc");
-					sprintf(arg_str, "%s,%s", S1, D);
-				}
-				else
-				{
-					/* CMP - 1mRR HHHW 0101 FJJJ */
-					decode_JJJF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, D);
-					/* TODO: This is a JJJF limited */
-					sprintf(opcode_str, "cmp");
-					sprintf(arg_str, "%s,%s", S1,D);
-				}
-				break;
-
-			case 0x6:
-				if (BITS(op_byte,0x07) == 0x0)
-				{
-					/* NEG - 1mRR HHHW 0110 F000 */
-					decode_F_table(BITS(op_byte,0x08), D);
-					sprintf(opcode_str, "neg");
-					sprintf(arg_str, "%s", D);
-				}
-				else if (BITS(op_byte,0x07) == 0x1)
-				{
-					/* NOT - 1mRR HHHW 0110 F001 */
-					decode_F_table(BITS(op_byte,0x08), D);
-					sprintf(opcode_str, "not");
-					sprintf(arg_str, "%s", D);
-				}
-				else if (BITS(op_byte,0x07) == 0x2)
-				{
-					/* DEC - 1mRR HHHW 0110 F010 */
-					decode_F_table(BITS(op_byte,0x08), D);
-					sprintf(opcode_str, "dec");
-					sprintf(arg_str, "%s", D);
-				}
-				else if (BITS(op_byte,0x07) == 0x3)
-				{
-					/* DEC24 - 1mRR HHHW 0110 F011 */
-					decode_F_table(BITS(op_byte,0x08), D);
-					sprintf(opcode_str, "dec24");
-					sprintf(arg_str, "%s", D);
-				}
-				else
-				{
-					/* AND - 1mRR HHHW 0110 F1JJ */
-					decode_JJF_table(BITS(op_byte,0x03),BITS(op_byte,0x08), S1, D);
-					sprintf(opcode_str, "and");
-					sprintf(arg_str, "%s,%s", S1, D);
-				}
-				break;
-
-			case 0x7:
-				if (BITS(op_byte,0x07) == 0x1)
-				{
-					/* ABS - 1mRR HHHW 0111 F001 */
-					decode_F_table(BITS(op_byte,0x08), D);
-					sprintf(opcode_str, "abs");
-					sprintf(arg_str, "%s", D);
-				}
-				else if (BITS(op_byte,0x07) == 0x2)
-				{
-					/* ROR - 1mRR HHHW 0111 F010 */
-					decode_F_table(BITS(op_byte,0x08), D);
-					sprintf(opcode_str, "ror");
-					sprintf(arg_str, "%s", D);
-				}
-				else if (BITS(op_byte,0x07) == 0x3)
-				{
-					/* ROL - 1mRR HHHW 0111 F011 */
-					decode_F_table(BITS(op_byte,0x08), D);
-					sprintf(opcode_str, "rol");
-					sprintf(arg_str, "%s", D);
-				}
-				else
-				{
-					/* CMPM - 1mRR HHHW 0111 FJJJ */
-					decode_JJJF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, D);
-					/* TODO: This is JJJF limited */
-					sprintf(opcode_str, "cmpm");
-					sprintf(arg_str, "%s,%s", S1,D);
-				}
-				break;
+			size = dsp56k_dasm_add_2(op_byte, opcode_str, arg_str);
 		}
+		/* MAC : 011m mKKK 1xx0 F1QQ : A-122 */
+		else if ((op & 0xe094) == 0x6084)  
+		{
+			size = dsp56k_dasm_mac_1(op_byte, opcode_str, arg_str);
+		}
+		/* MACR: 011m mKKK 1--1 F1QQ : A-124 */
+		else if ((op & 0xe094) == 0x6094)
+		{
+			size = dsp56k_dasm_macr_1(op_byte, opcode_str, arg_str);
+		}
+		/* MOVE : 011m mKKK 0rr1 0000 : A-128 */
+		else if ((op & 0xe09f) == 0x6010)
+		{
+			size = dsp56k_dasm_move_1(op_byte, opcode_str, arg_str);
+		}
+		/* MPY : 011m mKKK 1xx0 F0QQ : A-160 */
+		else if ((op & 0xe094) == 0x6080)  
+		{
+			size = dsp56k_dasm_mpy_1(op_byte, opcode_str, arg_str);
+		}
+		/* MPYR : 011m mKKK 1--1 F0QQ : A-162 */
+		else if ((op & 0xe094) == 0x6090)
+		{
+			size = dsp56k_dasm_mpyr_1(op_byte, opcode_str, arg_str);
+		}
+		/* SUB : 011m mKKK 0rru Fuuu : A-202 */
+		else if ((op & 0xe080) == 0x6000)
+		{
+			size = dsp56k_dasm_sub_1(op_byte, opcode_str, arg_str);
+		}
+		/* TFR : 011m mKKK 0rr1 F0DD : A-212 */
+		else if ((op & 0xe094) == 0x6010)
+		{
+			size = dsp56k_dasm_tfr_2(op_byte, opcode_str, arg_str);
+		}
+		
+		/* Now evaluate the parallel data move */
+		decode_dual_x_memory_data_read(op, parallel_move_str, parallel_move_str2);
 	}
+	/* X Memory Data Write and Register Data Move : 0001 011k RRDD ---- : A-140 */
+	else if ((op & 0xfe00) == 0x1600)
+	{
+		/* Quote: (MPY or MAC) */
+		UINT16 op_byte = op & 0x00ff;
+		
+		/* MPY : 0001 0110 RRDD FQQQ : A-160 */
+		if ((op & 0xff00) == 0x1600)
+		{
+			size = dsp56k_dasm_mpy_2(op_byte, opcode_str, arg_str);
+		}
+		/* MAC : 0001 0111 RRDD FQQQ : A-122 */
+		else if ((op & 0xff00) == 0x1700)
+		{
+			size = dsp56k_dasm_mac_2(op_byte, opcode_str, arg_str);
+		}
+		
+		/* Now evaluate the parallel data move */
+		decode_x_memory_data_write_and_register_data_move(op, parallel_move_str, parallel_move_str2);
+	}
+
+	/* Handle Other parallel types */
 	else
 	{
-		char S2[128];
-		char SIGN[128];
+		/***************************************/
+		/* 32 General parallel move operations */
+		/***************************************/
+		
+		enum pType { kNoParallelDataMove, 
+					 kRegisterToRegister,
+					 kAddressRegister,
+					 kXMemoryDataMove,
+					 kXMemoryDataMove2,
+					 kXMemoryDataMoveWithDisp };
 
-        decode_QQQF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, S2, D);
-        decode_kSign_table(BITS(op_byte,0x40), SIGN);
-
-        switch(BITS(op_byte,0x30))
-        {
-			/* MPY - 1mRR HHHH 1k00 FQQQ */
-            case 0x0:
-				sprintf(opcode_str, "mpy");
-				sprintf(arg_str, "(%s)%s,%s,%s", SIGN, S2, S1, D);
+		UINT16 op_byte = 0x0000;
+		char d_register[32] = "";
+		int parallelType = -1;
+		
+		/* Note: it's important that NPDM comes before RtRDM here */
+		/* No Parallel Data Move : 0100 1010 ---- ---- : A-131 */
+		if ((op & 0xff00) == 0x4a00)
+		{
+			op_byte = op & 0x00ff;
+			parallelType = kNoParallelDataMove;
+		}
+		/* Register to Register Data Move : 0100 IIII ---- ---- : A-133 */
+		else if ((op & 0xf000) == 0x4000)
+		{
+			op_byte = op & 0x00ff;
+			parallelType = kRegisterToRegister;
+		}
+		/* Address Register Update : 0011 0zRR ---- ---- : A-135 */
+		else if ((op & 0xf800) == 0x3000)
+		{
+			op_byte = op & 0x00ff;
+			parallelType = kAddressRegister;
+		}
+		/* X Memory Data Move : 1mRR HHHW ---- ---- : A-137 */
+		else if ((op & 0x8000) == 0x8000)
+		{
+			op_byte = op & 0x00ff;
+			parallelType = kXMemoryDataMove;
+		}
+		/* X Memory Data Move : 0101 HHHW ---- ---- : A-137 */
+		else if ((op & 0xf000) == 0x5000)
+		{
+			op_byte = op & 0x00ff;
+			parallelType = kXMemoryDataMove2;
+		}
+		/* X Memory Data Move with short displacement : 0000 0101 BBBB BBBB ---- HHHW ---- ---- : A-139 */
+		else if ((op & 0xff00) == 0x0500)
+		{
+			/* See notes at top of file! */
+			/* op_byte = op2 & 0x00ff; */
+			/* parallelType = kXMemoryDataMoveWithDisp; */
+			/* DO NOTHING FOR NOW */
+		}
+		
+		
+		if (parallelType != -1)
+		{
+			/* Note: There is much overlap between opcodes down here */
+			/*       To this end, certain ops must come before others in the list */
+			
+			/* CLR : .... .... 0000 F001 : A-60 */
+			if ((op_byte & 0x00f7) == 0x0001)
+			{
+				size = dsp56k_dasm_clr(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* ADD : .... .... 0000 FJJJ : A-22 */
+			else if ((op_byte & 0x00f0) == 0x0000)
+			{
+				size = dsp56k_dasm_add(op_byte, opcode_str, arg_str, d_register);
+			}
+			
+			
+			/* MOVE : .... .... 0001 0001 : A-128 */
+			else if ((op_byte & 0x00ff) == 0x0011)
+			{
+				size = dsp56k_dasm_move(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* TFR : .... .... 0001 FJJJ : A-212 */
+			else if ((op_byte & 0x00f0) == 0x0010)
+			{
+				size = dsp56k_dasm_tfr(op_byte, opcode_str, arg_str, d_register);
+			}
+			
+			
+			/* RND : .... .... 0010 F000 : A-188 */
+			else if ((op_byte & 0x00f7) == 0x0020)
+			{
+				size = dsp56k_dasm_rnd(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* TST : .... .... 0010 F001 : A-218 */
+			else if ((op_byte & 0x00f7) == 0x0021)
+			{
+				size = dsp56k_dasm_tst(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* INC : .... .... 0010 F010 : A-104 */
+			else if ((op_byte & 0x00f7) == 0x0022)
+			{
+				size = dsp56k_dasm_inc(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* INC24 : .... .... 0010 F011 : A-106 */
+			else if ((op_byte & 0x00f7) == 0x0023)
+			{
+				size = dsp56k_dasm_inc24(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* OR : .... .... 0010 F1JJ : A-176 */
+			else if ((op_byte & 0x00f4) == 0x0024)
+			{
+				size = dsp56k_dasm_or(op_byte, opcode_str, arg_str, d_register);
+			}
+			
+			
+			/* ASR : .... .... 0011 F000 : A-32 */
+			else if ((op_byte & 0x00f7) == 0x0030)
+			{
+				size = dsp56k_dasm_asr(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* ASL : .... .... 0011 F001 : A-28 */
+			else if ((op_byte & 0x00f7) == 0x0031)
+			{
+				size = dsp56k_dasm_asl(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* LSR : .... .... 0011 F010 : A-120 */
+			else if ((op_byte & 0x00f7) == 0x0032)
+			{
+				size = dsp56k_dasm_lsr(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* LSL : .... .... 0011 F011 : A-118 */
+			else if ((op_byte & 0x00f7) == 0x0033)
+			{
+				size = dsp56k_dasm_lsl(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* EOR : .... .... 0011 F1JJ : A-94 */
+			else if ((op_byte & 0x00f4) == 0x0034)
+			{
+				size = dsp56k_dasm_eor(op_byte, opcode_str, arg_str, d_register);
+			}
+			
+			
+			/* SUBL : .... .... 0100 F001 : A-204 */
+			else if ((op_byte & 0x00f7) == 0x0041)
+			{
+				size = dsp56k_dasm_subl(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* SUB : .... .... 0100 FJJJ : A-202 */
+			else if ((op_byte & 0x00f0) == 0x0040)
+			{
+				size = dsp56k_dasm_sub(op_byte, opcode_str, arg_str, d_register);
+			}
+			
+			
+			/* CLR24 : .... .... 0101 F001 : A-62 */
+			else if ((op_byte & 0x00f7) == 0x0051)
+			{
+				size = dsp56k_dasm_clr2(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* SBC : .... .... 0101 F01J : A-198 */
+			else if ((op_byte & 0x00f6) == 0x0052)
+			{
+				size = dsp56k_dasm_sbc(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* CMP : .... .... 0101 FJJJ : A-64 */
+			else if ((op_byte & 0x00f0) == 0x0050)
+			{
+				size = dsp56k_dasm_cmp(op_byte, opcode_str, arg_str, d_register);
+			}
+			
+			
+			/* NEG : .... .... 0110 F000 : A-166 */
+			else if ((op_byte & 0x00f7) == 0x0060)
+			{
+				size = dsp56k_dasm_neg(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* NOT : .... .... 0110 F001 : A-174 */
+			else if ((op_byte & 0x00f7) == 0x0061)
+			{
+				size = dsp56k_dasm_not(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* DEC : .... .... 0110 F010 : A-72 */
+			else if ((op_byte & 0x00f7) == 0x0062)
+			{
+				size = dsp56k_dasm_dec(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* DEC24 : .... .... 0110 F011 : A-74 */
+			else if ((op_byte & 0x00f7) == 0x0063)
+			{
+				size = dsp56k_dasm_dec24(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* AND : .... .... 0110 F1JJ : A-24 */
+			else if ((op_byte & 0x00f4) == 0x0064)
+			{
+				size = dsp56k_dasm_and(op_byte, opcode_str, arg_str, d_register);
+			}
+			
+			
+			/* ABS : .... .... 0111 F001 : A-18 */
+			if ((op_byte & 0x00f7) == 0x0071)
+			{
+				size = dsp56k_dasm_abs(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* ROR : .... .... 0111 F010 : A-192 */
+			else if ((op_byte & 0x00f7) == 0x0072)
+			{
+				size = dsp56k_dasm_ror(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* ROL : .... .... 0111 F011 : A-190 */
+			else if ((op_byte & 0x00f7) == 0x0073)
+			{
+				size = dsp56k_dasm_rol(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* CMPM : .... .... 0111 FJJJ : A-66 */
+			else if ((op_byte & 0x00f0) == 0x0070)
+			{
+				size = dsp56k_dasm_cmpm(op_byte, opcode_str, arg_str, d_register);
+			}
+			
+			
+			/* MPY : .... .... 1k00 FQQQ : A-160    -- CONFIRMED TYPO IN DOCS (HHHH vs HHHW) */
+			else if ((op_byte & 0x00b0) == 0x0080)
+			{
+				size = dsp56k_dasm_mpy(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* MPYR : .... .... 1k01 FQQQ : A-162 */
+			else if ((op_byte & 0x00b0) == 0x0090)
+			{
+				size = dsp56k_dasm_mpyr(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* MAC : .... .... 1k10 FQQQ : A-122 */
+			else if ((op_byte & 0x00b0) == 0x00a0)
+			{
+				size = dsp56k_dasm_mac(op_byte, opcode_str, arg_str, d_register);
+			}
+			/* MACR : .... .... 1k11 FQQQ : A-124   -- DRAMA - rr vs xx (805) */
+			else if ((op_byte & 0x00b0) == 0x00b0)
+			{
+				size = dsp56k_dasm_macr(op_byte, opcode_str, arg_str, d_register);
+			}
+			
+			
+			/* Now evaluate the parallel data move */
+			switch (parallelType)
+			{
+			case kNoParallelDataMove:
+				/* DO NOTHING */
+				size = 1;
 				break;
-
-            /* MPYR - 1mRR HHHH 1k01 FQQQ */
-            case 0x1:
-				sprintf(opcode_str, "mpyr");
-				sprintf(arg_str, "(%s)%s,%s,%s", SIGN, S2, S1, D);
+			case kRegisterToRegister:
+				decode_register_to_register_data_move(op, parallel_move_str, d_register);
+				size = 1;
 				break;
-
-            /* MAC - 1mRR HHHH 1k10 FQQQ */
-            case 0x2:
-				sprintf(opcode_str, "mac");
-				sprintf(arg_str, "(%s)%s,%s,%s", SIGN, S2, S1, D);
+			case kAddressRegister:
+				decode_address_register_update(op, parallel_move_str);
+				size = 1;
 				break;
-
-            /* MACR - 1mRR HHHH 1k11 FQQQ */
-            case 0x3:
-				sprintf(opcode_str, "macr");
-	            /* TODO: It's a little odd that macr is S1,S2 while everyone else is S2,S1.  Check! */
-				sprintf(arg_str, "(%s)%s,%s,%s", SIGN, S1, S2, D);
+			case kXMemoryDataMove:
+				decode_x_memory_data_move(op, parallel_move_str);
+				size = 1;
 				break;
-        }
+			case kXMemoryDataMove2:
+				decode_x_memory_data_move2(op, parallel_move_str, d_register);
+				size = 1;
+				break;
+			case kXMemoryDataMoveWithDisp: 
+				decode_x_memory_data_move_with_short_displacement(op, op2, parallel_move_str);
+				size = 2;
+				break;
+			}
+		}
 	}
+	
+	/* Assemble and return parallel move operation */
+	if (size > 0)
+	{
+		char space[32] = "";
 
-	/* For the cooperative x data memory move */
-	sprintf(d_register, "%s", D);
+		pad_string(11, opcode_str);
+		if (strlen(parallel_move_str) != 0)
+			pad_string(15, arg_str);
+		if (strlen(parallel_move_str2) != 0)
+			sprintf(space, " ");
+
+		sprintf(buffer, "%s%s%s%s%s", opcode_str, arg_str, parallel_move_str, space, parallel_move_str2);
+		
+		return (size | DASMFLAG_SUPPORTED);
+	}
+	
+	
+	/******************************/
+	/* Remaining non-parallel ops */
+	/******************************/
+	
+	/* ADC : 0001 0101 0000 F01J : A-20 */
+	if ((op & 0xfff6) == 0x1502)
+	{
+		size = dsp56k_dasm_adc(op, opcode_str, arg_str);
+	}
+	/* ANDI : 0001 1EE0 iiii iiii : A-26 */
+	/* (MoveP sneaks in here if you don't check 0x0600) */
+	else if (((op & 0xf900) == 0x1800) & ((op & 0x0600) != 0x0000))
+	{
+		size = dsp56k_dasm_andi(op, opcode_str, arg_str);
+	}
+	/* ASL4 : 0001 0101 0011 F001 : A-30 */
+	else if ((op & 0xfff7) == 0x1531)
+	{
+		size = dsp56k_dasm_asl4(op, opcode_str, arg_str);
+	}
+	/* ASR4 : 0001 0101 0011 F000 : A-34 */
+	else if ((op & 0xfff7) == 0x1530)
+	{
+		size = dsp56k_dasm_asr4(op, opcode_str, arg_str);
+	}
+	/* ASR16 : 0001 0101 0111 F000 : A-36 */
+	else if ((op & 0xfff7) == 0x1570)
+	{
+		size = dsp56k_dasm_asr16(op, opcode_str, arg_str);
+	}
+	/* BFCHG : 0001 0100 11Pp pppp BBB1 0010 iiii iiii : A-38 */
+	else if (((op & 0xffc0) == 0x14c0) && ((op2 & 0x1f00) == 0x1200))
+	{
+		size = dsp56k_dasm_bfop(op, op2, opcode_str, arg_str);
+	}
+	/* BFCHG : 0001 0100 101- --RR BBB1 0010 iiii iiii : A-38 */
+	else if (((op & 0xffe0) == 0x14a0) && ((op2 & 0x1f00) == 0x1200))
+	{
+		size = dsp56k_dasm_bfop(op, op2, opcode_str, arg_str);
+	}
+	/* BFCHG : 0001 0100 100D DDDD BBB1 0010 iiii iiii : A-38 */
+	else if (((op & 0xffe0) == 0x1480) && ((op2 & 0x1f00) == 0x1200))
+	{
+		size = dsp56k_dasm_bfop(op, op2, opcode_str, arg_str);
+	}
+	/* BFCLR : 0001 0100 11Pp pppp BBB0 0100 iiii iiii : A-40 */
+	else if (((op & 0xffc0) == 0x14c0) && ((op2 & 0x1f00) == 0x0400))
+	{
+		size = dsp56k_dasm_bfop(op, op2, opcode_str, arg_str);
+	}
+	/* BFCLR : 0001 0100 101- --RR BBB0 0100 iiii iiii : A-40 */
+	else if (((op & 0xffe0) == 0x14a0) && ((op2 & 0x1f00) == 0x0400))
+	{
+		size = dsp56k_dasm_bfop(op, op2, opcode_str, arg_str);
+	}
+	/* BFCLR : 0001 0100 100D DDDD BBB0 0100 iiii iiii : A-40 */
+	else if (((op & 0xffe0) == 0x1480) && ((op2 & 0x1f00) == 0x0400))
+	{
+		size = dsp56k_dasm_bfop(op, op2, opcode_str, arg_str);
+	}
+	/* BFSET : 0001 0100 11Pp pppp BBB1 1000 iiii iiii : A-42 */
+	else if (((op & 0xffc0) == 0x14c0) && ((op2 & 0x1f00) == 0x1800))
+	{
+		size = dsp56k_dasm_bfop(op, op2, opcode_str, arg_str);
+	}
+	/* BFSET : 0001 0100 101- --RR BBB1 1000 iiii iiii : A-42 */
+	else if (((op & 0xffe0) == 0x14a0) && ((op2 & 0x1f00) == 0x1800))
+	{
+		size = dsp56k_dasm_bfop(op, op2, opcode_str, arg_str);
+	}
+	/* BFSET : 0001 0100 100D DDDD BBB1 1000 iiii iiii : A-42 */
+	else if (((op & 0xffe0) == 0x1480) && ((op2 & 0x1f00) == 0x1800))
+	{
+		size = dsp56k_dasm_bfop(op, op2, opcode_str, arg_str);
+	}
+	/* BFTSTH : 0001 0100 01Pp pppp BBB1 0000 iiii iiii : A-44 */
+	else if (((op & 0xffc0) == 0x1440) && ((op2 & 0x1f00) == 0x1000))
+	{
+		size = dsp56k_dasm_bfop(op, op2, opcode_str, arg_str);
+	}
+	/* BFTSTH : 0001 0100 001- --RR BBB1 0000 iiii iiii : A-44 */
+	else if (((op & 0xffe0) == 0x1420) && ((op2 & 0x1f00) == 0x1000))
+	{
+		size = dsp56k_dasm_bfop(op, op2, opcode_str, arg_str);
+	}
+	/* BFTSTH : 0001 0100 000D DDDD BBB1 0000 iiii iiii : A-44 */
+	else if (((op & 0xffe0) == 0x1400) && ((op2 & 0x1f00) == 0x1000))
+	{
+		size = dsp56k_dasm_bfop(op, op2, opcode_str, arg_str);
+	}
+	/* BFTSTL : 0001 0100 01Pp pppp BBB0 0000 iiii iiii : A-46 */
+	else if (((op & 0xffc0) == 0x1440) && ((op2 & 0x1f00) == 0x0000))
+	{
+		size = dsp56k_dasm_bfop(op, op2, opcode_str, arg_str);
+	}
+	/* BFTSTL : 0001 0100 001- --RR BBB0 0000 iiii iiii : A-46 */
+	else if (((op & 0xffe0) == 0x1420) && ((op2 & 0x1f00) == 0x0000))
+	{
+		size = dsp56k_dasm_bfop(op, op2, opcode_str, arg_str);
+	}
+	/* BFTSTL : 0001 0100 000D DDDD BBB0 0000 iiii iiii : A-46 */
+	else if (((op & 0xffe0) == 0x1400) && ((op2 & 0x1f00) == 0x0000))
+	{
+		size = dsp56k_dasm_bfop(op, op2, opcode_str, arg_str);
+	}
+	/* Bcc : 0000 0111 --11 cccc xxxx xxxx xxxx xxxx : A-48 */
+	else if (((op & 0xff30) == 0x0730) && ((op2 & 0x0000) == 0x0000))
+	{
+		size = dsp56k_dasm_bcc(op, op2, opcode_str, arg_str);
+	}
+	/* Bcc : 0010 11cc ccee eeee : A-48 */
+	else if ((op & 0xfc00) == 0x2c00)
+	{
+		size = dsp56k_dasm_bcc_1(op, opcode_str, arg_str, pc);
+	}
+	/* Bcc : 0000 0111 RR10 cccc : A-48 */
+	else if ((op & 0xff30) == 0x0720)
+	{
+		size = dsp56k_dasm_bcc_2(op, opcode_str, arg_str);
+	}
+	/* BRA : 0000 0001 0011 11-- xxxx xxxx xxxx xxxx : A-50 */
+	else if (((op & 0xfffc) == 0x013c) && ((op2 & 0x0000) == 0x0000))
+	{
+		size = dsp56k_dasm_bra(op, op2, opcode_str, arg_str);
+	}
+	/* BRA : 0000 1011 aaaa aaaa : A-50 */
+	else if ((op & 0xff00) == 0x0b00)
+	{
+		size = dsp56k_dasm_bra_1(op, opcode_str, arg_str, pc);
+	}
+	/* BRA : 0000 0001 0010 11RR : A-50 */
+	else if ((op & 0xfffc) == 0x012c)
+	{
+		size = dsp56k_dasm_bra_2(op, opcode_str, arg_str);
+	}
+	/* BRKc : 0000 0001 0001 cccc : A-52 */
+	else if ((op & 0xfff0) == 0x0110)
+	{
+		size = dsp56k_dasm_brkc(op, opcode_str, arg_str);
+	}
+	/* BScc : 0000 0111 --01 cccc xxxx xxxx xxxx xxxx : A-54 */
+	else if (((op & 0xff30) == 0x0710) && ((op2 & 0x0000) == 0x0000))
+	{
+		size = dsp56k_dasm_bscc(op, op2, opcode_str, arg_str);
+	}
+	/* BScc: 0000 0111 RR00 cccc : A-54 */
+	else if ((op & 0xff30) == 0x0700)
+	{
+		size = dsp56k_dasm_bscc_1(op, opcode_str, arg_str);
+	}
+	/* BSR : 0000 0001 0011 10-- xxxx xxxx xxxx xxxx : A-56 */
+	else if (((op & 0xfffc) == 0x0138) && ((op2 & 0x0000) == 0x0000))
+	{
+		size = dsp56k_dasm_bsr(op, op2, opcode_str, arg_str, pc);
+	}
+	/* BSR : 0000 0001 0010 10RR : A-56 */
+	else if ((op & 0xfffc) == 0x0128)
+	{
+		size = dsp56k_dasm_bsr_1(op, opcode_str, arg_str);
+	}
+	/* CHKAAU : 0000 0000 0000 0100 : A-58 */
+	else if ((op & 0xffff) == 0x0004)
+	{
+		size = dsp56k_dasm_chkaau(op, opcode_str, arg_str);
+	}
+	/* DEBUG : 0000 0000 0000 0001 : A-68 */
+	else if ((op & 0xffff) == 0x0001)
+	{
+		size = dsp56k_dasm_debug(op, opcode_str, arg_str);
+	}
+	/* DEBUGcc : 0000 0000 0101 cccc : A-70 */
+	else if ((op & 0xfff0) == 0x0050)
+	{
+		size = dsp56k_dasm_debugcc(op, opcode_str, arg_str);
+	}
+	/* DIV : 0001 0101 0--0 F1DD : A-76 */
+	/* WARNING : DOCS SAY THERE IS A PARALLEL MOVE HERE !!! */
+	else if ((op & 0xff94) == 0x1504)
+	{
+		size = dsp56k_dasm_div(op, opcode_str, arg_str);
+	}
+	/* DMAC : 0001 0101 10s1 FsQQ : A-80 */
+	else if ((op & 0xffd0) == 0x1590)
+	{
+		size = dsp56k_dasm_dmac(op, opcode_str, arg_str);
+	}
+	/* DO : 0000 0000 110- --RR xxxx xxxx xxxx xxxx : A-82 */
+	else if (((op & 0xffe0) == 0x00c0) && ((op2 & 0x0000) == 0x0000))
+	{
+		size = dsp56k_dasm_do(op, op2, opcode_str, arg_str);
+	}
+	/* DO : 0000 1110 iiii iiii xxxx xxxx xxxx xxxx : A-82 */
+	else if (((op & 0xff00) == 0x0e00) && ((op2 & 0x0000) == 0x0000))
+	{
+		size = dsp56k_dasm_do_1(op, op2, opcode_str, arg_str);
+	}
+	/* DO : 0000 0100 000D DDDD xxxx xxxx xxxx xxxx : A-82 */
+	else if (((op & 0xffe0) == 0x0400) && ((op2 & 0x0000) == 0x0000))
+	{
+		size = dsp56k_dasm_do_2(op, op2, opcode_str, arg_str);
+	}
+	/* DO FOREVER : 0000 0000 0000 0010 xxxx xxxx xxxx xxxx : A-88 */
+	else if (((op & 0xffff) == 0x0002) && ((op2 & 0x0000) == 0x0000))
+	{
+		size = dsp56k_dasm_doforever(op, op2, opcode_str, arg_str);
+	}
+	/* ENDDO : 0000 0000 0000 1001 : A-92 */
+	else if ((op & 0xffff) == 0x0009)
+	{
+		size = dsp56k_dasm_enddo(op, opcode_str, arg_str);
+	}
+	/* EXT : 0001 0101 0101 F010 : A-96 */
+	else if ((op & 0xfff7) == 0x1552)
+	{
+		size = dsp56k_dasm_ext(op, opcode_str, arg_str);
+	}
+	/* ILLEGAL : 0000 0000 0000 1111 : A-98 */
+	else if ((op & 0xffff) == 0x000f)
+	{
+		size = dsp56k_dasm_illegal(op, opcode_str, arg_str);
+	}
+	/* IMAC : 0001 0101 1010 FQQQ : A-100 */
+	else if ((op & 0xfff0) == 0x15a0)
+	{
+		size = dsp56k_dasm_imac(op, opcode_str, arg_str);
+	}
+	/* IMPY : 0001 0101 1000 FQQQ : A-102 */
+	else if ((op & 0xfff0) == 0x1580)
+	{
+		size = dsp56k_dasm_impy(op, opcode_str, arg_str);
+	}
+	/* Jcc : 0000 0110 --11 cccc xxxx xxxx xxxx xxxx : A-108 */
+	else if (((op & 0xff30) == 0x0630) && ((op2 & 0x0000) == 0x0000))
+	{
+		size = dsp56k_dasm_jcc(op, op2, opcode_str, arg_str);
+	}
+	/* Jcc : 0000 0110 RR10 cccc : A-108 */
+	else if ((op & 0xff30) == 0x0620 )
+	{
+		size = dsp56k_dasm_jcc_1(op, opcode_str, arg_str);
+	}
+	/* JMP : 0000 0001 0011 01-- xxxx xxxx xxxx xxxx : A-110 */
+	else if (((op & 0xfffc) == 0x0134) && ((op2 & 0x0000) == 0x0000))
+	{
+		size = dsp56k_dasm_jmp(op, op2, opcode_str, arg_str);
+	}
+	/* JMP : 0000 0001 0010 01RR : A-110 */
+	else if ((op & 0xfffc) == 0x0124)
+	{
+		size = dsp56k_dasm_jmp_1(op, opcode_str, arg_str);
+	}
+	/* JScc : 0000 0110 --01 cccc xxxx xxxx xxxx xxxx : A-112 */
+	else if (((op & 0xff30) == 0x0610) && ((op2 & 0x0000) == 0x0000))
+	{
+		size = dsp56k_dasm_jscc(op, op2, opcode_str, arg_str);
+	}
+	/* JScc : 0000 0110 RR00 cccc : A-112 */
+	else if ((op & 0xff30) == 0x0600)
+	{
+		size = dsp56k_dasm_jscc_1(op, opcode_str, arg_str);
+	}
+	/* JSR : 0000 0001 0011 00-- xxxx xxxx xxxx xxxx : A-114 */
+	else if (((op & 0xfffc) == 0x0130) && ((op2 & 0x0000) == 0x0000))
+	{
+		size = dsp56k_dasm_jsr(op, op2, opcode_str, arg_str);
+	}
+	/* JSR : 0000 1010 AAAA AAAA : A-114 */
+	else if ((op & 0xff00) == 0x0a00)
+	{
+		size = dsp56k_dasm_jsr_1(op, opcode_str, arg_str);
+	}
+	/* JSR : 0000 0001 0010 00RR : A-114 */
+	else if ((op & 0xfffc) == 0x0120)
+	{
+		size = dsp56k_dasm_jsr_2(op, opcode_str, arg_str);
+	}
+	/* LEA : 0000 0001 11TT MMRR : A-116 */
+	else if ((op & 0xffc0) == 0x01c0)
+	{
+		size = dsp56k_dasm_lea(op, opcode_str, arg_str);
+	}
+	/* LEA : 0000 0001 10NN MMRR : A-116 */
+	else if ((op & 0xffc0) == 0x0180)
+	{
+		size = dsp56k_dasm_lea_1(op, opcode_str, arg_str);
+	}
+	/* MAC(su,uu) : 0001 0101 1110 FsQQ : A-126 */
+	else if ((op & 0xfff0) == 0x15e0)
+	{
+		size = dsp56k_dasm_macsuuu(op, opcode_str, arg_str);
+	}
+	/* MOVE : 0000 0101 BBBB BBBB ---- HHHW 0001 0001 : A-128 */
+	else if (((op & 0xff00) == 0x0500) && ((op2 & 0x00ff) == 0x0011))
+	{
+		size = dsp56k_dasm_move_2(op, op2, opcode_str, arg_str);
+	}
+	/* MOVE(C) : 0011 1WDD DDD0 MMRR : A-144 */
+	else if ((op & 0xf810) == 0x3800)
+	{
+		size = dsp56k_dasm_movec(op, opcode_str, arg_str);
+	}
+	/* MOVE(C) : 0011 1WDD DDD1 q0RR : A-144 */
+	else if ((op & 0xf814) == 0x3810)
+	{
+		size = dsp56k_dasm_movec_1(op, opcode_str, arg_str);
+	}
+	/* MOVE(C) : 0011 1WDD DDD1 Z11- : A-144 */
+	else if ((op & 0xf816) == 0x3816)
+	{
+		size = dsp56k_dasm_movec_2(op, opcode_str, arg_str);
+	}
+	/* MOVE(C) : 0011 1WDD DDD1 t10- xxxx xxxx xxxx xxxx : A-144 */
+	else if (((op & 0xf816) == 0x3814) && ((op2 & 0x0000) == 0x0000))
+	{
+		size = dsp56k_dasm_movec_3(op, op2, opcode_str, arg_str);
+	}
+	/* MOVE(C) : 0010 10dd dddD DDDD : A-144 */
+	else if ((op & 0xfc00) == 0x2800)
+	{
+		size = dsp56k_dasm_movec_4(op, opcode_str, arg_str);
+	}
+	/* MOVE(C) : 0000 0101 BBBB BBBB 0011 1WDD DDD0 ---- : A-144 */
+	else if (((op & 0xff00) == 0x0500) && ((op2 & 0xf810) == 0x3800))
+	{
+		size = dsp56k_dasm_movec_5(op, op2, opcode_str, arg_str);
+	}
+	/* MOVE(I) : 0010 00DD BBBB BBBB : A-150 */
+	else if ((op & 0xfc00) == 0x2000)
+	{
+		size = dsp56k_dasm_movei(op, opcode_str, arg_str);
+	}
+	/* MOVE(M) : 0000 001W RR0M MHHH : A-152 */
+	else if ((op & 0xfe20) == 0x0200)
+	{
+		size = dsp56k_dasm_movem(op, opcode_str, arg_str);
+	}
+	/* MOVE(M) : 0000 001W RR11 mmRR : A-152 */
+	else if ((op & 0xfe30) == 0x0230)
+	{
+		size = dsp56k_dasm_movem_1(op, opcode_str, arg_str);
+	}
+	/* MOVE(M) : 0000 0101 BBBB BBBB 0000 001W --0- -HHH : A-152 */
+	else if (((op & 0xff00) == 0x0500) && ((op2 & 0xfe20) == 0x0200))
+	{
+		size = dsp56k_dasm_movem_2(op, op2, opcode_str, arg_str);
+	}
+	/* MOVE(P) : 0001 100W HH1p pppp : A-156 */
+	else if ((op & 0xfe20) == 0x1820)
+	{
+		size = dsp56k_dasm_movep(op, opcode_str, arg_str);
+	}
+	/* MOVE(P) : 0000 110W RRmp pppp : A-156 */
+	else if ((op & 0xfe00) == 0x0c00)
+	{
+		size = dsp56k_dasm_movep_1(op, opcode_str, arg_str);
+	}
+	/* MOVE(S) : 0001 100W HH0a aaaa : A-158 */
+	else if ((op & 0xfe20) == 0x1800)
+	{
+		size = dsp56k_dasm_moves(op, opcode_str, arg_str);
+	}
+	/* MPY(su,uu) : 0001 0101 1100 FsQQ : A-164 */
+	else if ((op & 0xfff0) == 0x15c0)
+	{
+		size = dsp56k_dasm_mpysuuu(op, opcode_str, arg_str);
+	}
+	/* NEGC : 0001 0101 0110 F000 : A-168 */
+	else if ((op & 0xfff7) == 0x1560)
+	{
+		size = dsp56k_dasm_negc(op, opcode_str, arg_str);
+	}
+	/* NOP : 0000 0000 0000 0000 : A-170 */
+	else if ((op & 0xffff) == 0x0000)
+	{
+		size = dsp56k_dasm_nop(op, opcode_str, arg_str);
+	}
+	/* NORM : 0001 0101 0010 F0RR : A-172 */
+	else if ((op & 0xfff4) == 0x1520)
+	{
+		size = dsp56k_dasm_norm(op, opcode_str, arg_str);
+	}
+	/* ORI : 0001 1EE1 iiii iiii : A-178 */
+	else if ((op & 0xf900) == 0x1900)
+	{
+		size = dsp56k_dasm_ori(op, opcode_str, arg_str);
+	}
+	/* REP : 0000 0000 111- --RR : A-180 */
+	else if ((op & 0xffe0) == 0x00e0)
+	{
+		size = dsp56k_dasm_rep(op, opcode_str, arg_str);
+	}
+	/* REP : 0000 1111 iiii iiii : A-180 */
+	else if ((op & 0xff00) == 0x0f00)
+	{
+		size = dsp56k_dasm_rep_1(op, opcode_str, arg_str);
+	}
+	/* REP : 0000 0100 001D DDDD : A-180 */
+	else if ((op & 0xffe0) == 0x0420)
+	{
+		size = dsp56k_dasm_rep_2(op, opcode_str, arg_str);
+	}
+	/* REPcc : 0000 0001 0101 cccc : A-184 */
+	else if ((op & 0xfff0) == 0x0150)
+	{
+		size = dsp56k_dasm_repcc(op, opcode_str, arg_str);
+	}
+	/* RESET : 0000 0000 0000 1000 : A-186 */
+	else if ((op & 0xffff) == 0x0008)
+	{
+		size = dsp56k_dasm_reset(op, opcode_str, arg_str);
+	}
+	/* RTI : 0000 0000 0000 0111 : A-194 */
+	else if ((op & 0xffff) == 0x0007)
+	{
+		size = dsp56k_dasm_rti(op, opcode_str, arg_str);
+	}
+	/* RTS : 0000 0000 0000 0110 : A-196 */
+	else if ((op & 0xffff) == 0x0006)
+	{
+		size = dsp56k_dasm_rts(op, opcode_str, arg_str);
+	}
+	/* STOP : 0000 0000 0000 1010 : A-200 */
+	else if ((op & 0xffff) == 0x000a)
+	{
+		size = dsp56k_dasm_stop(op, opcode_str, arg_str);
+	}
+	/* SWAP : 0001 0101 0111 F001 : A-206 */
+	else if ((op & 0xfff7) == 0x1571)
+	{
+		size = dsp56k_dasm_swap(op, opcode_str, arg_str);
+	}
+	/* SWI : 0000 0000 0000 0101 : A-208 */
+	else if ((op & 0xffff) == 0x0005)
+	{
+		size = dsp56k_dasm_swi(op, opcode_str, arg_str);
+	}
+	/* Tcc : 0001 00cc ccTT Fh0h : A-210 */
+	else if ((op & 0xfc02) == 0x1000)
+	{
+		size = dsp56k_dasm_tcc(op, opcode_str, arg_str);
+	}
+	/* TFR(2) : 0001 0101 0000 F00J : A-214 */
+	else if ((op & 0xfff6) == 0x1500)
+	{
+		size = dsp56k_dasm_tfr2(op, opcode_str, arg_str);
+	}
+	/* TFR(3) : 0010 01mW RRDD FHHH : A-216 */
+	else if ((op & 0xfc00) == 0x2400)
+	{
+		size = dsp56k_dasm_tfr3(op, opcode_str, arg_str);
+	}
+	/* TST(2) : 0001 0101 0001 -1DD : A-220 */
+	else if ((op & 0xfff4) == 0x1514)
+	{
+		size = dsp56k_dasm_tst2(op, opcode_str, arg_str);
+	}
+	/* WAIT : 0000 0000 0000 1011 : A-222 */
+	else if ((op & 0xffff) == 0x000b)
+	{
+		size = dsp56k_dasm_wait(op, opcode_str, arg_str);
+	}
+	/* ZERO : 0001 0101 0101 F000 : A-224 */
+	else if ((op & 0xfff7) == 0x1550)
+	{
+		size = dsp56k_dasm_zero(op, opcode_str, arg_str);
+	}
+	
+	
+	/* Assemble opcode string buffer */
+	if (size >= 1)
+	{
+		pad_string(11, opcode_str);
+		sprintf(buffer, "%s%s", opcode_str, arg_str);
+	}
+	/* Not recognized?  Nudge debugger onto the next word */
+	else if (size == 0)
+	{
+		sprintf(buffer, "unknown");
+		size = 1;
+	}
+	
+	return (size | DASMFLAG_SUPPORTED);
 }
 
-/* TODO: Triple-check these.  There's weirdness around TFR & MOVE */
-static void decode_data_ALU_opcode_dual_move(const UINT16 op_byte, char* opcode_str, char* arg_str)
+
+/*******************************/
+/* 32 Parallel move operations */
+/*******************************/
+
+/* ADD : 011m mKKK 0rru Fuuu : A-22 */
+static size_t dsp56k_dasm_add_2(const UINT16 op_byte, char* opcode_str, char* arg_str)
+{
+	/* TODO: How strange.  Same as SUB?  Investigate */
+	char D[32];
+	char S1[32];
+	char arg[32];
+	decode_uuuuF_table(BITS(op_byte,0x17), BITS(op_byte,0x08), arg, S1, D);
+	sprintf(opcode_str, "%s", arg);
+	sprintf(arg_str, "%s,%s", S1, D);
+	return 1;
+}
+
+/* MAC : 011m mKKK 1xx0 F1QQ : A-122 */
+static size_t dsp56k_dasm_mac_1(const UINT16 op_byte, char* opcode_str, char* arg_str)
 {
 	char D[32];
 	char S1[32];
 	char S2[32];
-	char arg[32];
+	/* Oddly, these 4 mpxx ops have identical operand ordering as compared to single memory move equivalents */
+	decode_QQF_table(BITS(op_byte,0x03), BITS(op_byte,0x08), S1, S2, D);
+	sprintf(arg_str, "%s,%s,%s", S1, S2, D);
+	sprintf(opcode_str, "mac");
+	return 1;
+}
 
-	if (!BITS(op_byte,0x80))
+/* MACR: 011m mKKK 1--1 F1QQ : A-124 */
+static size_t dsp56k_dasm_macr_1(const UINT16 op_byte, char* opcode_str, char* arg_str)
+{
+	char D[32];
+	char S1[32];
+	char S2[32];
+	/* Oddly, these 4 mpxx ops have identical operand ordering as compared to single memory move equivalents */
+	decode_QQF_table(BITS(op_byte,0x03), BITS(op_byte,0x08), S1, S2, D);
+	sprintf(arg_str, "%s,%s,%s", S1, S2, D);
+	sprintf(opcode_str, "macr");
+	return 1;
+}
+
+/* MOVE : 011m mKKK 0rr1 0000 : A-128 */
+static size_t dsp56k_dasm_move_1(const UINT16 op_byte, char* opcode_str, char* arg_str)
+{
+	/* TODO: This MOVE opcode is .identical. to the TFR one.  Investigate */
+	char D[32];
+	char S1[32];
+	decode_DDF_table(BITS(op_byte,0x03), BITS(op_byte,0x08), S1, D);
+	sprintf(opcode_str, "tfr");
+	sprintf(arg_str, "%s,%s", S1, D);
+	return 1;
+}
+
+/* MPY : 011m mKKK 1xx0 F0QQ : A-160 */
+static size_t dsp56k_dasm_mpy_1(const UINT16 op_byte, char* opcode_str, char* arg_str)
+{
+	char D[32];
+	char S1[32];
+	char S2[32];
+	/* Oddly, these 4 mpxx ops have identical operand ordering as compared to single memory move equivalents */
+	decode_QQF_table(BITS(op_byte,0x03), BITS(op_byte,0x08), S1, S2, D);
+	sprintf(arg_str, "%s,%s,%s", S1, S2, D);
+	sprintf(opcode_str, "mpy");
+	return 1;
+}
+
+/* MPYR : 011m mKKK 1--1 F0QQ : A-162 */
+static size_t dsp56k_dasm_mpyr_1(const UINT16 op_byte, char* opcode_str, char* arg_str)
+{
+	char D[32];
+	char S1[32];
+	char S2[32];
+	/* Oddly, these 4 mpxx ops have identical operand ordering as compared to single memory move equivalents */
+	decode_QQF_table(BITS(op_byte,0x03), BITS(op_byte,0x08), S1, S2, D);
+	sprintf(arg_str, "%s,%s,%s", S1, S2, D);
+	sprintf(opcode_str, "mpyr");
+	return 1;
+}
+
+/* SUB : 011m mKKK 0rru Fuuu : A-202 */
+static size_t dsp56k_dasm_sub_1(const UINT16 op_byte, char* opcode_str, char* arg_str)
+{
+	/* TODO - overlap with ADD (up above) */
+	char D[32];
+	char S1[32];
+	char arg[32];
+	decode_uuuuF_table(BITS(op_byte,0x17), BITS(op_byte,0x08), arg, S1, D);
+	sprintf(opcode_str, "%s", arg);
+	sprintf(arg_str, "%s,%s", S1, D);
+	return 1;
+}
+
+/* TFR : 011m mKKK 0rr1 F0DD : A-212 */
+static size_t dsp56k_dasm_tfr_2(const UINT16 op_byte, char* opcode_str, char* arg_str)
+{
+	/* TODO - Same as move above. Investigate */
+	char D[32];
+	char S1[32];
+	decode_DDF_table(BITS(op_byte,0x03), BITS(op_byte,0x08), S1, D);
+	sprintf(opcode_str, "tfr");
+	sprintf(arg_str, "%s,%s", S1, D);
+	return 1;
+}
+
+/* MPY : 0001 0110 RRDD FQQQ : A-160 */
+static size_t dsp56k_dasm_mpy_2(const UINT16 op_byte, char* opcode_str, char* arg_str)
+{
+/*	TODO
+	// MPY - 0001 0110 RRDD FQQQ
+	decode_k_table(BITS(op,0x0100), Dnot);
+	Rnum = decode_RR_table(BITS(op,0x00c0));
+	decode_DD_table(BITS(op,0x0030), S);
+	decode_QQQF_table(BITS(op,0x0007), BITS(op,0x0008), S1, S2, D);
+	sprintf(buffer, "mpy       %s,%s,%s %s,(R%d)+N%d %s,%s", S1, S2, D, Dnot, Rnum, Rnum, S, Dnot);
+	// Strange, but not entirely out of the question - this 'k' parameter is hardcoded
+	// I cheat here and do the parallel memory data move above - this specific one is only used twice
+	retSize = 1;
+*/
+	return 0;
+}
+
+/* MAC : 0001 0111 RRDD FQQQ : A-122 */
+static size_t dsp56k_dasm_mac_2(const UINT16 op_byte, char* opcode_str, char* arg_str)
+{
+/*	TODO
+	// MAC - 0001 0111 RRDD FQQQ
+	decode_k_table(BITS(op,0x0100), Dnot);
+	Rnum = decode_RR_table(BITS(op,0x00c0));
+	decode_DD_table(BITS(op,0x0030), S);
+	decode_QQQF_table(BITS(op,0x0007), BITS(op,0x0008), S1, S2, D);
+	sprintf(buffer, "mac       %s,%s,%s %s,(R%d)+N%d %s,%s", S1, S2, D, Dnot, Rnum, Rnum, S, Dnot);
+	// Strange, but not entirely out of the question - this 'k' parameter is hardcoded
+	// I cheat here and do the parallel memory data move above - this specific one is only used twice
+	retSize = 1;
+*/
+	return 0;
+}
+
+/* CLR : .... .... 0000 F001 : A-60 */
+static size_t dsp56k_dasm_clr(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	decode_F_table(BITS(op_byte,0x08), D);
+	sprintf(opcode_str, "clr");
+	sprintf(arg_str, "%s", D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* ADD : .... .... 0000 FJJJ : A-22 */
+static size_t dsp56k_dasm_add(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	char S1[32];
+	decode_JJJF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, D);
+	sprintf(opcode_str, "add");
+	sprintf(arg_str, "%s,%s", S1, D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* MOVE : .... .... 0001 0001 : A-128 */
+static size_t dsp56k_dasm_move(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	/* Equivalent to a NOP (+ parallel move) */
+	sprintf(opcode_str, "move");
+	sprintf(arg_str, " ");
+	sprintf(d_register, " ");
+	return 1;
+}
+
+/* TFR : .... .... 0001 FJJJ : A-212 */
+static size_t dsp56k_dasm_tfr(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	char S1[32];
+	decode_JJJF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, D);
+	sprintf(opcode_str, "tfr");
+	sprintf(arg_str, "%s,%s", S1, D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* RND : .... .... 0010 F000 : A-188 */
+static size_t dsp56k_dasm_rnd(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	decode_F_table(BITS(op_byte,0x08), D);
+	sprintf(opcode_str, "rnd");
+	sprintf(arg_str, "%s", D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* TST : .... .... 0010 F001 : A-218 */
+static size_t dsp56k_dasm_tst(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	decode_F_table(BITS(op_byte,0x08), D);
+	sprintf(opcode_str, "tst");
+	sprintf(arg_str, "%s", D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* INC : .... .... 0010 F010 : A-104 */
+static size_t dsp56k_dasm_inc(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	decode_F_table(BITS(op_byte,0x08), D);
+	sprintf(opcode_str, "inc");
+	sprintf(arg_str, "%s", D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* INC24 : .... .... 0010 F011 : A-106 */
+static size_t dsp56k_dasm_inc24(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	decode_F_table(BITS(op_byte,0x08), D);
+	sprintf(opcode_str, "inc24");
+	sprintf(arg_str, "%s", D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* OR : .... .... 0010 F1JJ : A-176 */
+static size_t dsp56k_dasm_or(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	char S1[32];
+	decode_JJF_table(BITS(op_byte,0x03),BITS(op_byte,0x08), S1, D);
+	sprintf(opcode_str, "or");
+	sprintf(arg_str, "%s,%s", S1, D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* ASR : .... .... 0011 F000 : A-32 */
+static size_t dsp56k_dasm_asr(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	decode_F_table(BITS(op_byte,0x08), D);
+	sprintf(opcode_str, "asr");
+	sprintf(arg_str, "%s", D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* ASL : .... .... 0011 F001 : A-28 */
+static size_t dsp56k_dasm_asl(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	decode_F_table(BITS(op_byte,0x08), D);
+	sprintf(opcode_str, "asl");
+	sprintf(arg_str, "%s", D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* LSR : .... .... 0011 F010 : A-120 */
+static size_t dsp56k_dasm_lsr(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	decode_F_table(BITS(op_byte,0x08), D);
+	sprintf(opcode_str, "lsr");
+	sprintf(arg_str, "%s", D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* LSL : .... .... 0011 F011 : A-118 */
+static size_t dsp56k_dasm_lsl(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	decode_F_table(BITS(op_byte,0x08), D);
+	sprintf(opcode_str, "lsl");
+	sprintf(arg_str, "%s", D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* EOR : .... .... 0011 F1JJ : A-94 */
+static size_t dsp56k_dasm_eor(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	char S1[32];
+	decode_JJF_table(BITS(op_byte,0x03),BITS(op_byte,0x08), S1, D);
+	sprintf(opcode_str, "eor");
+	sprintf(arg_str, "%s,%s", S1, D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* SUBL : .... .... 0100 F001 : A-204 */
+static size_t dsp56k_dasm_subl(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	sprintf(opcode_str, "subl");
+
+	/* Only one option for the F table */
+	if (!BITS(op_byte,0x08))
 	{
-		if (BITS(op_byte,0x14) != 0x2)
-		{
-			/* ADD - 011m mKKK 0rru Fuuu */
-			/* SUB - 011m mKKK 0rru Fuuu */
-			/* These two opcodes are conflated */
-			decode_uuuuF_table(BITS(op_byte,0x17), BITS(op_byte,0x08), arg, S1, D);
-			sprintf(opcode_str, "%s", arg);
-			sprintf(arg_str, "%s,%s", S1, D);
-		}
-		else if (BITS(op_byte,0x14) == 0x2)
-		{
-			/* TFR - 011m mKKK 0rr1 F0DD */
-			/* MOVE - 011m mKKK 0rr1 0000 */
-			/* TODO: This MOVE opcode is .identical. to the TFR one.  Investigate. */
-			decode_DDF_table(BITS(op_byte,0x03), BITS(op_byte,0x08), S1, D);
-			sprintf(opcode_str, "tfr");
-			sprintf(arg_str, "%s,%s", S1, D);
-		}
+		sprintf(arg_str, "B,A");
+		sprintf(d_register, "A");
 	}
 	else
 	{
-		decode_QQF_table(BITS(op_byte,0x03), BITS(op_byte,0x08), S1, S2, D);
-		sprintf(arg_str, "%s,%s,%s", S1, S2, D);	/* Oddly, these 4 have identical operand ordering as */
-													/* compared to single memory move equivalents */
-		switch (BITS(op_byte,0x14))
-		{
-			case 0x0:
-				/* MPY - 011m mKKK 1rr0 F0QQ */
-				sprintf(opcode_str, "mpy");
-				break;
-
-			case 0x1:
-				/* MAC - 011m mKKK 1rr0 F1QQ */
-				sprintf(opcode_str, "mac");
-				break;
-
-			case 0x2:
-				/* MPYR - 011m mKKK 1rr1 F0QQ */
-				sprintf(opcode_str, "mpyr");
-				break;
-
-			case 0x3:
-				/* MACR - 011m mKKK 1rr1 F1QQ */
-				sprintf(opcode_str, "macr");
-				break;
-		}
+		sprintf(arg_str, "!");
 	}
-}
-
-static unsigned decode_TCC_opcode(const UINT16 op, char* opcode_str, char* arg_str)
-{
-	int Rnum = -1;
-	char M[32];
-	char D[32];
-	char S[32];
-
-	decode_cccc_table(BITS(op,0x03c0), M);
-	sprintf(opcode_str, "t.%s", M);
-
-	Rnum = decode_RR_table(BITS(op,0x0030));
-	decode_h0hF_table(BITS(op,0x0007),BITS(op,0x0008), S, D);
-	sprintf(arg_str, "%s,%s  R0,R%d", S, D, Rnum);
-
-	/* TODO: Investigate
-    if (S1[0] == D[0] && D[0] == 'A')
-        sprintf(buffer, "t.%s  %s,%s", M, S1, D);
-    else
-        sprintf(buffer, "t.%s  %s,%s  R0,R%d", M, S1, D, Rnum);
-    */
 
 	return 1;
 }
 
-/* TODO: Check all (dual-world) */
-static unsigned decode_bitfield_opcode(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
+/* SUB : .... .... 0100 FJJJ : A-202 */
+static size_t dsp56k_dasm_sub(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	char S1[32];
+	decode_JJJF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, D);
+	sprintf(opcode_str, "sub");
+	sprintf(arg_str, "%s,%s", S1, D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* CLR24 : .... .... 0101 F001 : A-62 */
+static size_t dsp56k_dasm_clr2(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	decode_F_table(BITS(op_byte,0x08), D);
+	sprintf(opcode_str, "clr24");
+	sprintf(arg_str, "%s", D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* SBC : .... .... 0101 F01J : A-198 */
+static size_t dsp56k_dasm_sbc(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	char S1[32];
+	decode_JF_table(BITS(op_byte,0x01), BITS(op_byte,0x08), S1, D);
+	sprintf(opcode_str, "sbc");
+	sprintf(arg_str, "%s,%s", S1, D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* CMP : .... .... 0101 FJJJ : A-64 */
+static size_t dsp56k_dasm_cmp(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	char S1[32];
+	decode_JJJF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, D);
+	/* TODO: This is a JJJF limited */
+	sprintf(opcode_str, "cmp");
+	sprintf(arg_str, "%s,%s", S1,D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* NEG : .... .... 0110 F000 : A-166 */
+static size_t dsp56k_dasm_neg(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	decode_F_table(BITS(op_byte,0x08), D);
+	sprintf(opcode_str, "neg");
+	sprintf(arg_str, "%s", D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* NOT : .... .... 0110 F001 : A-174 */
+static size_t dsp56k_dasm_not(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	decode_F_table(BITS(op_byte,0x08), D);
+	sprintf(opcode_str, "not");
+	sprintf(arg_str, "%s", D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* DEC : .... .... 0110 F010 : A-72 */
+static size_t dsp56k_dasm_dec(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	decode_F_table(BITS(op_byte,0x08), D);
+	sprintf(opcode_str, "dec");
+	sprintf(arg_str, "%s", D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* DEC24 : .... .... 0110 F011 : A-74 */
+static size_t dsp56k_dasm_dec24(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	decode_F_table(BITS(op_byte,0x08), D);
+	sprintf(opcode_str, "dec24");
+	sprintf(arg_str, "%s", D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* AND : .... .... 0110 F1JJ : A-24 */
+static size_t dsp56k_dasm_and(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	char S1[32];
+	decode_JJF_table(BITS(op_byte,0x03),BITS(op_byte,0x08), S1, D);
+	sprintf(opcode_str, "and");
+	sprintf(arg_str, "%s,%s", S1, D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* ABS : .... .... 0111 F001 : A-18 */
+static size_t dsp56k_dasm_abs(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	decode_F_table(BITS(op_byte,0x08), D);
+	sprintf(opcode_str, "abs");
+	sprintf(arg_str, "%s", D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* ROR : .... .... 0111 F010 : A-192 */
+static size_t dsp56k_dasm_ror(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	decode_F_table(BITS(op_byte,0x08), D);
+	sprintf(opcode_str, "ror");
+	sprintf(arg_str, "%s", D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* ROL : .... .... 0111 F011 : A-190 */
+static size_t dsp56k_dasm_rol(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	decode_F_table(BITS(op_byte,0x08), D);
+	sprintf(opcode_str, "rol");
+	sprintf(arg_str, "%s", D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* CMPM : .... .... 0111 FJJJ : A-66 */
+static size_t dsp56k_dasm_cmpm(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	char S1[32];
+	decode_JJJF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, D);
+	/* TODO: This is JJJF limited */
+	sprintf(opcode_str, "cmpm");
+	sprintf(arg_str, "%s,%s", S1,D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* MPY : .... .... 1k00 FQQQ : A-160    -- CONFIRMED TYPO IN DOCS (HHHH vs HHHW) */
+static size_t dsp56k_dasm_mpy(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	char S1[32];
+	char S2[32];
+	char SIGN[32];
+	decode_QQQF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, S2, D);
+	decode_kSign_table(BITS(op_byte,0x40), SIGN);
+	sprintf(opcode_str, "mpy");
+	sprintf(arg_str, "(%s)%s,%s,%s", SIGN, S2, S1, D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* MPYR : .... .... 1k01 FQQQ : A-162 */
+static size_t dsp56k_dasm_mpyr(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	char S1[32];
+	char S2[32];
+	char SIGN[32];
+	decode_QQQF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, S2, D);
+	decode_kSign_table(BITS(op_byte,0x40), SIGN);
+	sprintf(opcode_str, "mpyr");
+	sprintf(arg_str, "(%s)%s,%s,%s", SIGN, S2, S1, D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* MAC : .... .... 1k10 FQQQ : A-122 */
+static size_t dsp56k_dasm_mac(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	char S1[32];
+	char S2[32];
+	char SIGN[32];
+	decode_QQQF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, S2, D);
+	decode_kSign_table(BITS(op_byte,0x40), SIGN);
+	sprintf(opcode_str, "mac");
+	sprintf(arg_str, "(%s)%s,%s,%s", SIGN, S2, S1, D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+/* MACR : .... .... 1k11 FQQQ : A-124   -- DRAMA - rr vs xx (805) */
+static size_t dsp56k_dasm_macr(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+{
+	char D[32];
+	char S1[32];
+	char S2[32];
+	char SIGN[32];
+	decode_QQQF_table(BITS(op_byte,0x07), BITS(op_byte,0x08), S1, S2, D);
+	decode_kSign_table(BITS(op_byte,0x40), SIGN);
+	sprintf(opcode_str, "macr");
+	/* TODO: It's a little odd that macr is S1,S2 while everyone else (mac, mpy, mpyr) is S2,S1.  Check! */
+	sprintf(arg_str, "(%s)%s,%s,%s", SIGN, S1, S2, D);
+	sprintf(d_register, "%s", D);
+	return 1;
+}
+
+
+/******************************/
+/* Remaining non-parallel ops */
+/******************************/
+
+/* ADC : 0001 0101 0000 F01J : A-20 */
+static size_t dsp56k_dasm_adc(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char D[32];
+	char S1[32];
+	decode_JF_table(BITS(op,0x0001), BITS(op,0x0008), S1, D);
+	sprintf(opcode_str, "adc");
+	sprintf(arg_str, "%s,%s", S1, D);
+	return 1; 
+}
+
+/* ANDI : 0001 1EE0 iiii iiii : A-26 */
+static size_t dsp56k_dasm_andi(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char D[32];
+	decode_EE_table(BITS(op,0x0600), D);
+	sprintf(opcode_str, "and(i)");
+	sprintf(arg_str, "#%02x,%s", BITS(op,0x00ff), D);
+	return 1; 
+}
+
+/* ASL4 : 0001 0101 0011 F001 : A-30 */
+static size_t dsp56k_dasm_asl4(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char D[32];
+	decode_F_table(BITS(op,0x0008), D);
+	sprintf(opcode_str, "asl4");
+	sprintf(arg_str, "%s", D);
+	return 1; 
+}
+
+/* ASR4 : 0001 0101 0011 F000 : A-34 */
+static size_t dsp56k_dasm_asr4(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char D[32];
+	decode_F_table(BITS(op,0x0008), D);
+	sprintf(opcode_str, "asr4");
+	sprintf(arg_str, "%s", D);
+	return 1; 
+}
+
+/* ASR16 : 0001 0101 0111 F000 : A-36 */
+static size_t dsp56k_dasm_asr16(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char D[32];
+	decode_F_table(BITS(op,0x0008), D);
+	sprintf(opcode_str, "asr16");
+	sprintf(arg_str, "%s", D);
+	return 1; 
+}
+
+/* BFCHG  : 0001 0100 11Pp pppp BBB1 0010 iiii iiii : A-38 */
+/* BFCHG  : 0001 0100 101- --RR BBB1 0010 iiii iiii : A-38 */
+/* BFCHG  : 0001 0100 100D DDDD BBB1 0010 iiii iiii : A-38 */
+/* BFCLR  : 0001 0100 11Pp pppp BBB0 0100 iiii iiii : A-40 */
+/* BFCLR  : 0001 0100 101- --RR BBB0 0100 iiii iiii : A-40 */
+/* BFCLR  : 0001 0100 100D DDDD BBB0 0100 iiii iiii : A-40 */
+/* BFSET  : 0001 0100 11Pp pppp BBB1 1000 iiii iiii : A-42 */
+/* BFSET  : 0001 0100 101- --RR BBB1 1000 iiii iiii : A-42 */
+/* BFSET  : 0001 0100 100D DDDD BBB1 1000 iiii iiii : A-42 */
+/* BFTSTH : 0001 0100 01Pp pppp BBB1 0000 iiii iiii : A-44 */
+/* BFTSTH : 0001 0100 001- --RR BBB1 0000 iiii iiii : A-44 */
+/* BFTSTH : 0001 0100 000D DDDD BBB1 0000 iiii iiii : A-44 */
+/* BFTSTL : 0001 0100 01Pp pppp BBB0 0000 iiii iiii : A-46 */
+/* BFTSTL : 0001 0100 001- --RR BBB0 0000 iiii iiii : A-46 */
+/* BFTSTL : 0001 0100 000D DDDD BBB0 0000 iiii iiii : A-46 */
+static size_t dsp56k_dasm_bfop(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
 {
 	char D[32];
 	int upperMiddleLower = -1;
@@ -895,787 +1724,857 @@ static unsigned decode_bitfield_opcode(const UINT16 op, const UINT16 op2, char* 
 	return 2;
 }
 
-static unsigned decode_no_parallel_move_opcode(const UINT16 op, const UINT16 op2, const UINT16 pc, char* opcode_str, char* arg_str)
+/* Bcc : 0000 0111 --11 cccc xxxx xxxx xxxx xxxx : A-48 */
+static size_t dsp56k_dasm_bcc(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
 {
-	unsigned retSize = 1;
+	char M[32];
+	decode_cccc_table(BITS(op,0x000f), M);
+	sprintf(opcode_str, "b.%s", M);
+	sprintf(arg_str, "%04x (%d)", op2, op2);
+	return 2;
+}
 
-	int Rnum = -1;
+/* Bcc : 0010 11cc ccee eeee : A-48 */
+static size_t dsp56k_dasm_bcc_1(const UINT16 op, char* opcode_str, char* arg_str, const offs_t pc)
+{
+	char M[32];
+	INT8 relativeInt;
+	decode_cccc_table(BITS(op,0x3c0), M);
+	relativeInt = get_6_bit_signed_value(BITS(op,0x003f));
+	sprintf(opcode_str, "b.%s", M);
+	sprintf(arg_str, "%04x (%d)", (int)pc + relativeInt, relativeInt);
+	return 1; 
+}
+
+/* Bcc : 0000 0111 RR10 cccc : A-48 */
+static size_t dsp56k_dasm_bcc_2(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	int Rnum;
+	char M[32];
+	decode_cccc_table(BITS(op,0x000f), M);
+	Rnum = decode_RR_table(BITS(op,0x00c0));
+	sprintf(opcode_str, "b.%s", M);
+	sprintf(arg_str, "R%d", Rnum);
+	return 1; 
+}
+
+/* BRA : 0000 0001 0011 11-- xxxx xxxx xxxx xxxx : A-50 */
+static size_t dsp56k_dasm_bra(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
+{
+	sprintf(opcode_str, "bra");
+	sprintf(arg_str, "%d (0x%04x)", op2, op2);
+	return 2;
+}
+
+/* BRA : 0000 1011 aaaa aaaa : A-50 */
+static size_t dsp56k_dasm_bra_1(const UINT16 op, char* opcode_str, char* arg_str, const offs_t pc)
+{
+	sprintf(opcode_str, "bra");
+	sprintf(arg_str, "%d (0x%02x)", (INT8)BITS(op,0x00ff), pc + (INT8)BITS(op,0x00ff));
+	return 1; 
+}
+
+/* BRA : 0000 0001 0010 11RR : A-50 */
+static size_t dsp56k_dasm_bra_2(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	int Rnum;
+	Rnum = decode_RR_table(BITS(op,0x0003));
+	sprintf(opcode_str, "bra");
+	sprintf(arg_str, "R%d", Rnum);
+	return 1; 
+}
+
+/* BRKc : 0000 0001 0001 cccc : A-52 */
+static size_t dsp56k_dasm_brkc(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char M[32];
+	decode_cccc_table(BITS(op,0x000f), M);
+	sprintf(opcode_str, "brk.%s", M);
+	sprintf(arg_str, " ");
+	return 1; 
+}
+
+/* BScc : 0000 0111 --01 cccc xxxx xxxx xxxx xxxx : A-54 */
+static size_t dsp56k_dasm_bscc(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
+{
+	char M[32];
+	decode_cccc_table(BITS(op,0x000f), M);
+	sprintf(opcode_str, "bs.%s", M);
+	sprintf(arg_str, "%d (0x%04x)", (INT16)(op2), op2);
+	return (2 | DASMFLAG_STEP_OVER);	/* probably */
+}
+
+/* BScc: 0000 0111 RR00 cccc : A-54 */
+static size_t dsp56k_dasm_bscc_1(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	int Rnum;
+	char M[32];
+	decode_cccc_table(BITS(op,0x000f), M);
+	Rnum = decode_RR_table(BITS(op,0x00c0));
+	sprintf(opcode_str, "bs.%s", M);
+	sprintf(arg_str, "R%d", Rnum);
+	return (1 | DASMFLAG_STEP_OVER);	/* probably.  What's the diff between a branch and a jump? */
+}
+
+/* BSR : 0000 0001 0011 10-- xxxx xxxx xxxx xxxx : A-56 */
+static size_t dsp56k_dasm_bsr(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str, const offs_t pc)
+{
+	sprintf(opcode_str, "bsr");
+	sprintf(arg_str, "%d (0x%04x)", (INT16)op2, pc + (INT16)op2);
+	return (2 | DASMFLAG_STEP_OVER);
+}
+
+/* BSR : 0000 0001 0010 10RR : A-56 */
+static size_t dsp56k_dasm_bsr_1(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	int Rnum;
+	Rnum = decode_RR_table(BITS(op,0x0003));
+	sprintf(opcode_str, "bsr");
+	sprintf(arg_str, "R%d", Rnum);
+	return (1 | DASMFLAG_STEP_OVER);
+}
+
+/* CHKAAU : 0000 0000 0000 0100 : A-58 */
+static size_t dsp56k_dasm_chkaau(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	sprintf(opcode_str, "chkaau");
+	sprintf(arg_str, " ");
+	return 1;
+}
+
+/* DEBUG : 0000 0000 0000 0001 : A-68 */
+static size_t dsp56k_dasm_debug(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	sprintf(opcode_str, "debug");
+	sprintf(arg_str, " ");
+	return 1; 
+}
+
+/* DEBUGcc : 0000 0000 0101 cccc : A-70 */
+static size_t dsp56k_dasm_debugcc(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char M[32];
+	decode_cccc_table(BITS(op,0x000f), M);
+	sprintf(opcode_str, "debug.%s", M);
+	sprintf(arg_str, " ");
+	return 1;
+}
+
+/* DIV : 0001 0101 0--0 F1DD : A-76 */
+/* WARNING : DOCS SAY THERE IS A PARALLEL MOVE HERE !!! */
+static size_t dsp56k_dasm_div(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char D[32];
+	char S1[32];
+	decode_DDF_table(BITS(op,0x0003), BITS(op,0x0008), S1, D);
+	sprintf(opcode_str, "div");
+	sprintf(arg_str, "%s,%s", S1, D);
+	return 1;
+}
+
+/* DMAC : 0001 0101 10s1 FsQQ : A-80 */
+static size_t dsp56k_dasm_dmac(const UINT16 op, char* opcode_str, char* arg_str)
+{
 	char A[32];
 	char D[32];
 	char S1[32];
 	char S2[32];
-
-	switch(BITS(op,0x0074))
-	{
-		case 0x0:
-			if (BITS(op,0x0006) == 0x0)
-			{
-				/* TFR(2) - 0001 0101 0000 F00J */
-				decode_JF_table(BITS(op,0x0001),BITS(op,0x0008), D, S1);
-				sprintf(opcode_str, "tfr2");
-				sprintf(arg_str, "%s,%s", S1, D);
-			}
-			else if (BITS(op,0x0006) == 0x1)
-			{
-				/* ADC - 0001 0101 0000 F01J */
-				decode_JF_table(BITS(op,0x0001),BITS(op,0x0008), S1, D);
-				sprintf(opcode_str, "adc");
-				sprintf(arg_str, "%s,%s", S1, D);
-			}
-			break;
-
-		case 0x3:
-			/* TST(2) - 0001 0101 0001 -1DD */
-			decode_DD_table(BITS(op,0x0003), S1);
-			sprintf(opcode_str, "tst2");
-			sprintf(arg_str, "%s", S1);
-			break;
-
-		case 0x4:
-			/* NORM - 0001 0101 0010 F0RR */
-			decode_F_table(BITS(op,0x0008), D);
-			Rnum = decode_RR_table(BITS(op,0x0003));
-			sprintf(opcode_str, "norm");
-			sprintf(arg_str, "R%d,%s", Rnum, D);
-			break;
-
-		case 0x6:
-			if (BITS(op,0x0003) == 0x0)
-			{
-				/* ASR4 - 0001 0101 0011 F000 */
-				decode_F_table(BITS(op,0x0008), D);
-				sprintf(opcode_str, "asr4");
-				sprintf(arg_str, "%s", D);
-			}
-			else if (BITS(op,0x0003) == 0x1)
-			{
-				/* ASL4 - 0001 0101 0011 F001 */
-				decode_F_table(BITS(op,0x0008), D);
-				sprintf(opcode_str, "asl4");
-				sprintf(arg_str, "%s", D);
-			}
-			break;
-
-		case 0x1: case 0x5: case 0x9: case 0xd:
-			/* DIV - 0001 0101 0--0 F1DD */
-			decode_DDF_table(BITS(op,0x0003), BITS(op,0x0008), S1, D);
-			sprintf(opcode_str, "div");
-			sprintf(arg_str, "%s,%s", S1, D);
-			break;
-
-		case 0xa:
-			if (BITS(op,0x0003) == 0x0)
-			{
-				/* ZERO - 0001 0101 0101 F000 */
-				decode_F_table(BITS(op,0x0008), D);
-				sprintf(opcode_str, "zero");
-				sprintf(arg_str, "%s", D);
-			}
-			else if (BITS(op,0x0003) == 0x2)
-			{
-				/* EXT - 0001 0101 0101 F010 */
-				decode_F_table(BITS(op,0x0008), D);
-				sprintf(opcode_str, "ext");
-				sprintf(arg_str, "%s", D);
-			}
-			break;
-
-		case 0xc:
-			if (BITS(op,0x0003) == 0x0)
-			{
-				/* NEGC - 0001 0101 0110 F000 */
-				decode_F_table(BITS(op,0x0008), D);
-				sprintf(opcode_str, "negc");
-				sprintf(arg_str, "%s", D);
-			}
-			break;
-
-		case 0xe:
-			if (BITS(op,0x0003) == 0x0)
-			{
-				/* ASR16 - 0001 0101 0111 F000 */
-				decode_F_table(BITS(op,0x0008), D);
-				sprintf(opcode_str, "asr16");
-				sprintf(arg_str, "%s", D);
-			}
-			else if (BITS(op,0x0003) == 0x1)
-			{
-				/* SWAP - 0001 0101 0111 F001 */
-				decode_F_table(BITS(op,0x0008), D);
-				sprintf(opcode_str, "swap");
-				sprintf(arg_str, "%s", D);
-			}
-			break;
-	}
-
-	switch(BITS(op,0x00f0))
-	{
-		case 0x8:
-			/* IMPY - 0001 0101 1000 FQQQ */
-			decode_QQQF_table(BITS(op,0x0007), BITS(op,0x0008), S1, S2, D);
-			sprintf(opcode_str, "impy");
-			sprintf(arg_str, "%s,%s,%s", S1, S2, D);
-			break;
-		case 0xa:
-			/* IMAC - 0001 0101 1010 FQQQ */
-			decode_QQQF_table(BITS(op,0x0007), BITS(op,0x0008), S1, S2, D);
-			sprintf(opcode_str, "imac");
-			sprintf(arg_str, "%s,%s,%s", S1, S2, D);
-			break;
-		case 0x9: case 0xb:
-			/* DMAC(ss,su,uu) - 0001 0101 10s1 FsQQ */
-			decode_ss_table(BITS(op,0x0024), A);
-			decode_QQF_special_table(BITS(op,0x0003), BITS(op,0x0008), S1, S2, D);     /* Special QQF */
-			sprintf(opcode_str, "dmac(%s)", A);
-			sprintf(arg_str, "%s,%s,%s", S1, S2, D);
-			break;
-		case 0xc:
-			/* MPY(su,uu) - 0001 0101 1100 FsQQ */
-			decode_s_table(BITS(op,0x0004), A);
-			decode_QQF_special_table(BITS(op,0x0003), BITS(op,0x0008), S1, S2, D);     /* Special QQF */
-			sprintf(opcode_str, "mpy(%s)", A);
-			sprintf(arg_str, "%s,%s,%s", S1, S2, D);
-			break;
-		case 0xe:
-			/* MAC(su,uu) - 0001 0101 1110 FsQQ */
-			decode_s_table(BITS(op,0x0004), A);
-			decode_QQF_special_table(BITS(op,0x0003), BITS(op,0x0008), S1, S2, D);		/* Special QQF */
-			sprintf(opcode_str, "mac(%s)", A);
-			sprintf(arg_str, "%s,%s,%s", S1, S2, D);
-			break;
-	}
-
-	return retSize;
+	decode_ss_table(BITS(op,0x0024), A);
+	decode_QQF_special_table(BITS(op,0x0003), BITS(op,0x0008), S1, S2, D);     /* Special QQF */
+	sprintf(opcode_str, "dmac(%s)", A);
+	sprintf(arg_str, "%s,%s,%s", S1, S2, D);
+	return 1;
 }
 
-static unsigned decode_immediate_opcode(const UINT16 op, const UINT16 pc, char* opcode_str, char* arg_str)
+/* DO : 0000 0000 110- --RR xxxx xxxx xxxx xxxx : A-82 */
+static size_t dsp56k_dasm_do(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
 {
-	unsigned retSize = 1;
-
-	if (BITS(op,0x0600))
-	{
-		if (!BITS(op,0x0100))
-		{
-			/* ANDI - 0001 1EE0 iiii iiii */
-			char D[32];
-			decode_EE_table(BITS(op,0x0600), D);
-			sprintf(opcode_str, "and(i)");
-			sprintf(arg_str, "#%02x,%s", BITS(op,0x00ff), D);
-		}
-		else
-		{
-			/* ORI - 0001 1EE1 iiii iiii */
-			char D[32];
-            decode_EE_table(BITS(op,0x0600), D);
-			sprintf(opcode_str, "or(i)");
-			sprintf(arg_str, "#%02x,%s", BITS(op,0x00ff), D);
-		}
-	}
-	else
-	{
-		if (!BITS(op,0x0020))
-		{
-			/* MOVE(S) - 0001 100W HH0a aaaa */
-			char A[32];
-			char SD[32];
-			char args[32];
-			decode_HH_table(BITS(op,0x00c0), SD);
-			sprintf(A, "00%02x", BITS(op,0x001f));
-			assemble_arguments_from_W_table(BITS(op,0x0100), args, 'X', SD, A);
-			sprintf(opcode_str, "move(s)");
-			sprintf(arg_str, "%s", args);
-		}
-		else
-		{
-			/* MOVE(P) - 0001 100W HH1p pppp */
-			char A[32];
-			char SD[32];
-			char args[32];
-			char fullAddy[128];
-			decode_HH_table(BITS(op,0x00c0), SD);
-			assemble_address_from_IO_short_address(BITS(op,0x001f), fullAddy);	/* Convert Short Absolute Address to full 16-bit */
-			sprintf(A, "%02x (%s)", BITS(op,0x001f), fullAddy);
-			assemble_arguments_from_W_table(BITS(op,0x0100), args, 'X', SD, A);
-			sprintf(opcode_str, "move(p)");
-			sprintf(arg_str, "%s", args);
-		}
-	}
-
-	return retSize;
+	int Rnum;
+	Rnum = decode_RR_table(BITS(op,0x0003));
+	sprintf(opcode_str, "do");
+	sprintf(arg_str, "X:(R%d),%02x", Rnum, op2);
+	return 2;
 }
 
-static unsigned decode_movec_opcodes(const UINT16 op, const UINT16 op2, const UINT16 pc, char* opcode_str, char* arg_str)
+/* DO : 0000 1110 iiii iiii xxxx xxxx xxxx xxxx : A-82 */
+static size_t dsp56k_dasm_do_1(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
 {
-	unsigned retSize = 1;
-
-	char SD[32];
-	char ea[32];
-	char args[64];
-	int Rnum = -1;
-
-	if (BITS(op,0x0010) == 0x0)
-	{
-		/* MOVE(C) - 0011 1WDD DDD0 MMRR */
-		decode_DDDDD_table(BITS(op,0x03e0), SD);
-		Rnum = decode_RR_table(BITS(op,0x0003));
-		assemble_ea_from_MM_table(BITS(op,0x000c), Rnum, ea);
-		assemble_arguments_from_W_table(BITS(op,0x0400), args, 'X', SD, ea);
-		sprintf(opcode_str, "move(c)");
-		sprintf(arg_str, "%s", args);
-	}
-	else
-	{
-		if (BITS(op,0x0004) == 0x0)
-		{
-			/* MOVE(C) - 0011 1WDD DDD1 q0RR */
-			decode_DDDDD_table(BITS(op,0x03e0), SD);
-			Rnum = decode_RR_table(BITS(op,0x0003));
-			assemble_ea_from_q_table(BITS(op,0x0008), Rnum, ea);
-			assemble_arguments_from_W_table(BITS(op,0x0400), args, 'X', SD, ea);
-			sprintf(opcode_str, "move(c)");
-			sprintf(arg_str, "%s", args);
-		}
-		else
-		{
-			switch(BITS(op,0x0006))
-			{
-				/* MOVE(C) - 0011 1WDD DDD1 t10- xxxx xxxx xxxx xxxx */
-				case 0x2:
-					decode_DDDDD_table(BITS(op,0x03e0), SD);
-					assemble_ea_from_t_table(BITS(op,0x0008), op2, ea);
-					/* !!! I'm pretty sure this is  in the right order - same issue as the WTables !!! */
-					if (BITS(op,0x0400))												/* fixed - 02/03/05 */
-						sprintf(args, "%s,%s", ea, SD);
-					else
-						sprintf(args, "%s,%s", SD, ea);
-					sprintf(opcode_str, "move(c)");
-					sprintf(arg_str, "%s", args);
-					retSize = 2;
-					break;
-
-				/* MOVE(C) - 0011 1WDD DDD1 Z11- */
-				case 0x3:
-					decode_DDDDD_table(BITS(op,0x03e0), SD);
-					decode_Z_table(BITS(op,0x0008), ea);
-					assemble_arguments_from_W_table(BITS(op,0x0400), args, 'X', SD, ea);
-					sprintf(opcode_str, "move(c)");
-					sprintf(arg_str, "%s", args);
-					break;
-			}
-		}
-	}
-
-	return retSize;
+	sprintf(opcode_str, "do");
+	sprintf(arg_str, "#%02x,%04x", BITS(op,0x00ff), op2);
+	return 2;
 }
 
-static unsigned decode_misc_opcode(const UINT16 op, const UINT16 pc, char* opcode_str, char* arg_str)
+/* DO : 0000 0100 000D DDDD xxxx xxxx xxxx xxxx : A-82 */
+static size_t dsp56k_dasm_do_2(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
 {
-	unsigned retSize = 1;
-
-	char M[32];
 	char S1[32];
-	char SD[32];
-	char D1[32];
-	char ea[32];
-	char args[64];
-	int Rnum = -1;
-	int relativeInt = 666;
-
-	switch(BITS(op,0x0c00))
-	{
-		/* MOVE(I) - 0010 00DD BBBB BBBB */
-		case 0x0:
-			decode_DD_table(BITS(op,0x0300), D1);
-			sprintf(opcode_str, "move(i)");
-			sprintf(arg_str, "#%02x,%s", BITS(op,0x00ff), D1);
-			break;
-
-		/* TFR(3) - 0010 01mW RRDD FHHH */
-		case 0x1:
-            decode_DDF_table(BITS(op,0x0030), BITS(op,0x0008), D1, S1);          /* Intentionally switched */
-			decode_HHH_table(BITS(op,0x0007), SD);
-			Rnum = decode_RR_table(BITS(op,0x00c0));
-			assemble_ea_from_m_table(BITS(op,0x0200), Rnum, ea);
-			assemble_arguments_from_W_table(BITS(op,0x0100), args, 'X', SD, ea);
-			sprintf(opcode_str, "tfr3");
-			sprintf(arg_str, "%s,%s %s", S1, D1, args);
-			break;
-
-		/* MOVE(C) - 0010 10dd dddD DDDD */
-		case 0x2:
-			decode_DDDDD_table(BITS(op,0x03e0), S1);
-			decode_DDDDD_table(BITS(op,0x001f), D1);
-			sprintf(opcode_str, "move(c)");
-			sprintf(arg_str, "%s,%s", S1, D1);
-			break;
-
-		/* B.cc - 0010 11cc ccee eeee */
-		case 0x3:
-			decode_cccc_table(BITS(op,0x3c0), M);
-			relativeInt = get_6_bit_relative_value(BITS(op,0x003f));
-			sprintf(opcode_str, "b.%s", M);
-			sprintf(arg_str, "%04x (%d)", (int)pc + relativeInt, relativeInt);
-			break;
-	}
-
-	return retSize;
+	decode_DDDDD_table(BITS(op,0x001f), S1);
+	sprintf(opcode_str, "do");
+	sprintf(arg_str, "%s,%04x", S1, op2);
+	return 2;
 }
 
-/* TODO: Check all dual-word guys */
-static unsigned decode_unique_opcode(const UINT16 op, const UINT16 op2, const UINT16 pc, char* opcode_str, char* arg_str)
+/* DO FOREVER : 0000 0000 0000 0010 xxxx xxxx xxxx xxxx : A-88 */
+static size_t dsp56k_dasm_doforever(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
 {
-	unsigned retSize = 1;
+	sprintf(opcode_str, "doForever");
+	sprintf(arg_str, "%04x", op2);
+	return 2;
+}
 
+/* ENDDO : 0000 0000 0000 1001 : A-92 */
+static size_t dsp56k_dasm_enddo(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	sprintf(opcode_str, "enddo");
+	sprintf(arg_str, " ");
+	return 1;
+}
+
+/* EXT : 0001 0101 0101 F010 : A-96 */
+static size_t dsp56k_dasm_ext(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char D[32];
+	decode_F_table(BITS(op,0x0008), D);
+	sprintf(opcode_str, "ext");
+	sprintf(arg_str, "%s", D);
+	return 1;
+}
+
+/* ILLEGAL : 0000 0000 0000 1111 : A-98 */
+static size_t dsp56k_dasm_illegal(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	sprintf(opcode_str, "illegal");
+	sprintf(arg_str, " ");
+	return 1;
+}
+
+/* IMAC : 0001 0101 1010 FQQQ : A-100 */
+static size_t dsp56k_dasm_imac(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char D[32];
+	char S1[32];
+	char S2[32];
+	decode_QQQF_table(BITS(op,0x0007), BITS(op,0x0008), S1, S2, D);
+	sprintf(opcode_str, "imac");
+	sprintf(arg_str, "%s,%s,%s", S1, S2, D);
+	return 1;
+}
+
+/* IMPY : 0001 0101 1000 FQQQ : A-102 */
+static size_t dsp56k_dasm_impy(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char D[32];
+	char S1[32];
+	char S2[32];
+	decode_QQQF_table(BITS(op,0x0007), BITS(op,0x0008), S1, S2, D);
+	sprintf(opcode_str, "impy");
+	sprintf(arg_str, "%s,%s,%s", S1, S2, D);
+	return 1;
+}
+
+/* Jcc : 0000 0110 --11 cccc xxxx xxxx xxxx xxxx : A-108 */
+static size_t dsp56k_dasm_jcc(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
+{
+	char M[32];
+	decode_cccc_table(BITS(op,0x000f), M);
+	sprintf(opcode_str, "j.%s", M);
+	sprintf(arg_str, "%04x", op2);
+	return 2;
+}
+
+/* Jcc : 0000 0110 RR10 cccc : A-108 */
+static size_t dsp56k_dasm_jcc_1(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	int Rnum;
+	char M[32];
+	decode_cccc_table(BITS(op,0x000f), M);
+	Rnum = decode_RR_table(BITS(op,0x00c0));
+	sprintf(opcode_str, "j.%s", M);
+	sprintf(arg_str, "R%d", Rnum);
+	return 1;
+}
+
+/* JMP : 0000 0001 0011 01-- xxxx xxxx xxxx xxxx : A-110 */
+static size_t dsp56k_dasm_jmp(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
+{
+	sprintf(opcode_str, "jmp");
+	sprintf(arg_str, "%04x", op2);
+	return 2;
+}
+
+/* JMP : 0000 0001 0010 01RR : A-110 */
+static size_t dsp56k_dasm_jmp_1(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	int Rnum;
+	Rnum = decode_RR_table(BITS(op,0x0003));
+	sprintf(opcode_str, "jmp");
+	sprintf(arg_str, "R%d", Rnum);
+	return 1;
+}
+
+/* JScc : 0000 0110 --01 cccc xxxx xxxx xxxx xxxx : A-112 */
+static size_t dsp56k_dasm_jscc(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
+{
+	char M[32];
+	decode_cccc_table(BITS(op,0x000f), M);
+	sprintf(opcode_str, "js.%s", M);
+	sprintf(arg_str, "%04x", op2);
+	return (2 |DASMFLAG_STEP_OVER);	/* probably */
+}
+
+/* JScc : 0000 0110 RR00 cccc : A-112 */
+static size_t dsp56k_dasm_jscc_1(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	int Rnum;
+	char M[32];
+	decode_cccc_table(BITS(op,0x000f), M);
+	Rnum = decode_RR_table(BITS(op,0x00c0));
+	sprintf(opcode_str, "js.%s", M);
+	sprintf(arg_str, "R%d", Rnum);
+	return (1 | DASMFLAG_STEP_OVER);	/* probably.  What's the diff between a branch and a jump? */
+}
+
+/* JSR : 0000 0001 0011 00-- xxxx xxxx xxxx xxxx : A-114 */
+static size_t dsp56k_dasm_jsr(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
+{
+	sprintf(opcode_str, "jsr");
+	sprintf(arg_str, "%04x", op2);
+	return (2 | DASMFLAG_STEP_OVER);
+}
+
+/* JSR : 0000 1010 AAAA AAAA : A-114 */
+static size_t dsp56k_dasm_jsr_1(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	sprintf(opcode_str, "jsr");
+	sprintf(arg_str, "%d (0x%02x)", BITS(op,0x00ff), BITS(op,0x00ff));
+	return (1 | DASMFLAG_STEP_OVER);
+}
+
+/* JSR : 0000 0001 0010 00RR : A-114 */
+static size_t dsp56k_dasm_jsr_2(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	int Rnum;
+	Rnum = decode_RR_table(BITS(op,0x0003));
+	sprintf(opcode_str, "jsr");
+	sprintf(arg_str, "R%d", Rnum);
+	return (1 | DASMFLAG_STEP_OVER);
+}
+
+/* LEA : 0000 0001 11TT MMRR : A-116 */
+static size_t dsp56k_dasm_lea(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	int Rnum;
+	int Tnum;
 	char ea[32];
+	Tnum = decode_TT_table(BITS(op,0x0030));
+	Rnum = decode_RR_table(BITS(op,0x0003));
+	assemble_ea_from_MM_table(BITS(op,0x000c), Rnum, ea);
+	sprintf(opcode_str, "lea");
+	sprintf(arg_str, "%s,R%d", ea, Tnum);
+	return 1;
+}
+
+/* LEA : 0000 0001 10NN MMRR : A-116 */
+static size_t dsp56k_dasm_lea_1(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	int Nnum;
+	int Rnum;
+	char ea[32];
+	Nnum = decode_NN_table(BITS(op,0x0030));
+	Rnum = decode_RR_table(BITS(op,0x0003));
+	assemble_ea_from_MM_table(BITS(op,0x000c), Rnum, ea);
+	sprintf(opcode_str, "lea");
+	sprintf(arg_str, "%s,N%d", ea, Nnum);
+	return 1;
+}
+
+/* MAC(su,uu) : 0001 0101 1110 FsQQ : A-126 */
+static size_t dsp56k_dasm_macsuuu(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char A[32];
+	char D[32];
+	char S1[32];
+	char S2[32];
+	decode_s_table(BITS(op,0x0004), A);
+	decode_QQF_special_table(BITS(op,0x0003), BITS(op,0x0008), S1, S2, D);		/* Special QQF */
+	sprintf(opcode_str, "mac(%s)", A);
+	sprintf(arg_str, "%s,%s,%s", S1, S2, D);
+	return 1;
+}
+
+/* MOVE : 0000 0101 BBBB BBBB ---- HHHW 0001 0001 : A-128 */
+static size_t dsp56k_dasm_move_2(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
+{
+	UINT8 B;
+	char SD[32];
+	char args[32];
+	B = BITS(op,0x00ff);
+	decode_HHH_table(BITS(op2,0x0e00), SD);
+	assemble_reg_from_W_table(BITS(op2,0x0100), args, 'X', SD, B);
+	sprintf(opcode_str, "move");
+	sprintf(arg_str, "%s", args);
+	return 2;
+}
+
+/* MOVE(C) : 0011 1WDD DDD0 MMRR : A-144 */
+static size_t dsp56k_dasm_movec(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	int Rnum;
+	char ea[32];
+	char SD[32];
+	char args[32];
+	decode_DDDDD_table(BITS(op,0x03e0), SD);
+	Rnum = decode_RR_table(BITS(op,0x0003));
+	assemble_ea_from_MM_table(BITS(op,0x000c), Rnum, ea);
+	assemble_arguments_from_W_table(BITS(op,0x0400), args, 'X', SD, ea);
+	sprintf(opcode_str, "move(c)");
+	sprintf(arg_str, "%s", args);
+	return 1;
+}
+
+/* MOVE(C) : 0011 1WDD DDD1 q0RR : A-144 */
+static size_t dsp56k_dasm_movec_1(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	int Rnum;
+	char ea[32];
+	char SD[32];
+	char args[32];
+	decode_DDDDD_table(BITS(op,0x03e0), SD);
+	Rnum = decode_RR_table(BITS(op,0x0003));
+	assemble_ea_from_q_table(BITS(op,0x0008), Rnum, ea);
+	assemble_arguments_from_W_table(BITS(op,0x0400), args, 'X', SD, ea);
+	sprintf(opcode_str, "move(c)");
+	sprintf(arg_str, "%s", args);
+	return 1;
+}
+
+/* MOVE(C) : 0011 1WDD DDD1 Z11- : A-144 */
+static size_t dsp56k_dasm_movec_2(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char ea[32];
+	char SD[32];
+	char args[32];
+	decode_DDDDD_table(BITS(op,0x03e0), SD);
+	decode_Z_table(BITS(op,0x0008), ea);
+	assemble_arguments_from_W_table(BITS(op,0x0400), args, 'X', SD, ea);
+	sprintf(opcode_str, "move(c)");
+	sprintf(arg_str, "%s", args);
+	return 1;
+}
+
+/* MOVE(C) : 0011 1WDD DDD1 t10- xxxx xxxx xxxx xxxx : A-144 */
+static size_t dsp56k_dasm_movec_3(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
+{
+	char ea[32];
+	char SD[32];
+	char args[32];
+	decode_DDDDD_table(BITS(op,0x03e0), SD);
+	assemble_ea_from_t_table(BITS(op,0x0008), op2, ea);
+	if (BITS(op,0x0400))									/* order fixed - 02/03/05 */
+		sprintf(args, "%s,%s", ea, SD);
+	else
+		sprintf(args, "%s,%s", SD, ea);
+	sprintf(opcode_str, "move(c)");
+	sprintf(arg_str, "%s", args);
+	return 2;
+}
+
+/* MOVE(C) : 0010 10dd dddD DDDD : A-144 */
+static size_t dsp56k_dasm_movec_4(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char D1[32];
+	char S1[32];
+	decode_DDDDD_table(BITS(op,0x03e0), S1);
+	decode_DDDDD_table(BITS(op,0x001f), D1);
+	sprintf(opcode_str, "move(c)");
+	sprintf(arg_str, "%s,%s", S1, D1);
+	return 1;
+}
+
+/* MOVE(C) : 0000 0101 BBBB BBBB 0011 1WDD DDD0 ---- : A-144 */
+static size_t dsp56k_dasm_movec_5(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
+{
+	UINT8 B;
+	char SD[32];
+	char args[32];
+	B = BITS(op,0x00ff);
+	decode_DDDDD_table(BITS(op2,0x03e0), SD);
+	assemble_reg_from_W_table(BITS(op2,0x0400), args, 'X', SD, B);
+	sprintf(opcode_str, "move(c)");
+	sprintf(arg_str, "%s", args);
+	return 2;
+}
+
+/* MOVE(I) : 0010 00DD BBBB BBBB : A-150 */
+static size_t dsp56k_dasm_movei(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char D1[32];
+	decode_DD_table(BITS(op,0x0300), D1);
+	sprintf(opcode_str, "move(i)");
+	sprintf(arg_str, "#%02x,%s", BITS(op,0x00ff), D1);
+	return 1;
+}
+
+/* MOVE(M) : 0000 001W RR0M MHHH : A-152 */
+static size_t dsp56k_dasm_movem(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	int Rnum;
+	char ea[32];
+	char SD[32];
+	char args[32];
+	Rnum = decode_RR_table(BITS(op,0x00c0));
+	decode_HHH_table(BITS(op,0x0007), SD);
+	assemble_ea_from_MM_table(BITS(op,0x0018), Rnum, ea);
+	assemble_arguments_from_W_table(BITS(op,0x0100), args, 'P', SD, ea);
+	sprintf(opcode_str, "move(m)");
+	sprintf(arg_str, "%s", args);
+	return 1;
+}
+
+/* MOVE(M) : 0000 001W RR11 mmRR : A-152 */
+static size_t dsp56k_dasm_movem_1(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char ea[32];
+	char SD[32];
 	char ea2[32];
+	char args[32];
+	assemble_eas_from_m_table(BITS(op,0x000c), BITS(op,0x00c0), BITS(op,0x0003), ea, ea2);
+	sprintf(SD, "P:%s", ea);
+	assemble_arguments_from_W_table(BITS(op,0x0100), args, 'X', SD, ea2);
+	sprintf(opcode_str, "move(m)");
+	sprintf(arg_str, "%s", args);
+	return 1;
+}
+
+/* MOVE(M) : 0000 0101 BBBB BBBB 0000 001W --0- -HHH : A-152 */
+static size_t dsp56k_dasm_movem_2(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
+{
+	UINT8 B;
+	char SD[32];
+	char args[32];
+	B = BITS(op,0x00ff);
+	decode_HHH_table(BITS(op2,0x0007), SD);
+	assemble_reg_from_W_table(BITS(op2,0x0100), args, 'P', SD, B);
+	sprintf(opcode_str, "move(m)");
+	sprintf(arg_str, "%s", args);
+	/* !!! The docs list the read/write order backwards for all move(m)'s - crackbabies ??? */
+	return 2;
+}
+
+/* MOVE(P) : 0001 100W HH1p pppp : A-156 */
+static size_t dsp56k_dasm_movep(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char A[32];
+	char SD[32];
+	char args[32];
+	char fullAddy[128];
+	decode_HH_table(BITS(op,0x00c0), SD);
+	assemble_address_from_IO_short_address(BITS(op,0x001f), fullAddy);	/* Convert Short Absolute Address to full 16-bit */
+	sprintf(A, "%02x (%s)", BITS(op,0x001f), fullAddy);
+	assemble_arguments_from_W_table(BITS(op,0x0100), args, 'X', SD, A);
+	sprintf(opcode_str, "move(p)");
+	sprintf(arg_str, "%s", args);
+	return 1;
+}
+
+/* MOVE(P) : 0000 110W RRmp pppp : A-156 */
+static size_t dsp56k_dasm_movep_1(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	int Rnum;
+	char ea[32];
+	char SD[32];
+	char args[32];
+	char fullAddy[128];		/* Convert Short Absolute Address to full 16-bit */
+	Rnum = decode_RR_table(BITS(op,0x00c0));
+	assemble_ea_from_m_table(BITS(op,0x0020), Rnum, ea);
+	assemble_address_from_IO_short_address(BITS(op,0x001f), fullAddy);
+	sprintf(SD, "X:%02x (%s)", BITS(op,0x001f), fullAddy);
+	assemble_arguments_from_W_table(BITS(op,0x0100), args, 'X', SD, ea);
+	sprintf(opcode_str, "move(p)");
+	sprintf(arg_str, "%s", args);
+	return 1;
+}
+
+/* MOVE(S) : 0001 100W HH0a aaaa : A-158 */
+static size_t dsp56k_dasm_moves(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char A[32];
+	char SD[32];
+	char args[32];
+	decode_HH_table(BITS(op,0x00c0), SD);
+	sprintf(A, "00%02x", BITS(op,0x001f));
+	assemble_arguments_from_W_table(BITS(op,0x0100), args, 'X', SD, A);
+	sprintf(opcode_str, "move(s)");
+	sprintf(arg_str, "%s", args);
+	return 1;
+}
+
+/* MPY(su,uu) : 0001 0101 1100 FsQQ : A-164 */
+static size_t dsp56k_dasm_mpysuuu(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char A[32];
+	char D[32];
+	char S1[32];
+	char S2[32];
+	decode_s_table(BITS(op,0x0004), A);
+	decode_QQF_special_table(BITS(op,0x0003), BITS(op,0x0008), S1, S2, D);     /* Special QQF */
+	sprintf(opcode_str, "mpy(%s)", A);
+	sprintf(arg_str, "%s,%s,%s", S1, S2, D);
+	return 1;
+}
+
+/* NEGC : 0001 0101 0110 F000 : A-168 */
+static size_t dsp56k_dasm_negc(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char D[32];
+	decode_F_table(BITS(op,0x0008), D);
+	sprintf(opcode_str, "negc");
+	sprintf(arg_str, "%s", D);
+	return 1;
+}
+
+/* NOP : 0000 0000 0000 0000 : A-170 */
+static size_t dsp56k_dasm_nop(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	sprintf(opcode_str, "nop");
+	sprintf(arg_str, " ");
+	return 1;
+}
+
+/* NORM : 0001 0101 0010 F0RR : A-172 */
+static size_t dsp56k_dasm_norm(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	int Rnum;
+	char D[32];
+	decode_F_table(BITS(op,0x0008), D);
+	Rnum = decode_RR_table(BITS(op,0x0003));
+	sprintf(opcode_str, "norm");
+	sprintf(arg_str, "R%d,%s", Rnum, D);
+	return 1;
+}
+
+/* ORI : 0001 1EE1 iiii iiii : A-178 */
+static size_t dsp56k_dasm_ori(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char D[32];
+	decode_EE_table(BITS(op,0x0600), D);
+	sprintf(opcode_str, "or(i)");
+	sprintf(arg_str, "#%02x,%s", BITS(op,0x00ff), D);
+	return 1;
+}
+
+/* REP : 0000 0000 111- --RR : A-180 */
+static size_t dsp56k_dasm_rep(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	int Rnum;
+	Rnum = decode_RR_table(BITS(op,0x0003));
+	sprintf(opcode_str, "rep");
+	sprintf(arg_str, "X:(R%d)", Rnum);
+	return 1;
+}
+
+/* REP : 0000 1111 iiii iiii : A-180 */
+static size_t dsp56k_dasm_rep_1(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	sprintf(opcode_str, "rep");
+	sprintf(arg_str, "%d (0x%02x)", BITS(op,0x00ff), BITS(op,0x00ff));
+	return 1;
+}
+
+/* REP : 0000 0100 001D DDDD : A-180 */
+static size_t dsp56k_dasm_rep_2(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char S1[32];
+	decode_DDDDD_table(BITS(op,0x001f), S1);
+	sprintf(opcode_str, "rep");
+	sprintf(arg_str, "%s", S1);
+	return 1;
+}
+
+/* REPcc : 0000 0001 0101 cccc : A-184 */
+static size_t dsp56k_dasm_repcc(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char M[32];
+	decode_cccc_table(BITS(op,0x000f), M);
+	sprintf(opcode_str, "rep.%s", M);
+	sprintf(arg_str, " ");
+	return 1;
+}
+
+/* RESET : 0000 0000 0000 1000 : A-186 */
+static size_t dsp56k_dasm_reset(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	sprintf(opcode_str, "reset");
+	sprintf(arg_str, " ");
+	return 1;
+}
+
+/* RTI : 0000 0000 0000 0111 : A-194 */
+static size_t dsp56k_dasm_rti(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	sprintf(opcode_str, "rti");
+	sprintf(arg_str, " ");
+	return (1 | DASMFLAG_STEP_OUT);
+}
+
+/* RTS : 0000 0000 0000 0110 : A-196 */
+static size_t dsp56k_dasm_rts(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	sprintf(opcode_str, "rts");
+	sprintf(arg_str, " ");
+	return (1 | DASMFLAG_STEP_OUT);
+}
+
+/* STOP : 0000 0000 0000 1010 : A-200 */
+static size_t dsp56k_dasm_stop(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	sprintf(opcode_str, "stop");
+	sprintf(arg_str, " ");
+	return 1;
+}
+
+/* SWAP : 0001 0101 0111 F001 : A-206 */
+static size_t dsp56k_dasm_swap(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char D[32];
+	decode_F_table(BITS(op,0x0008), D);
+	sprintf(opcode_str, "swap");
+	sprintf(arg_str, "%s", D);
+	return 1;
+}
+
+/* SWI : 0000 0000 0000 0101 : A-208 */
+static size_t dsp56k_dasm_swi(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	sprintf(opcode_str, "swi");
+	sprintf(arg_str, " ");
+	return 1;
+}
+
+/* Tcc : 0001 00cc ccTT Fh0h : A-210 */
+static size_t dsp56k_dasm_tcc(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	int Rnum = -1;
+	char M[32];
+	char D[32];
+	char S[32];
+
+	decode_cccc_table(BITS(op,0x03c0), M);
+	sprintf(opcode_str, "t.%s", M);
+
+	Rnum = decode_RR_table(BITS(op,0x0030));
+	decode_h0hF_table(BITS(op,0x0007),BITS(op,0x0008), S, D);
+	sprintf(arg_str, "%s,%s  R0,R%d", S, D, Rnum);
+
+	/* TODO: Investigate
+    if (S1[0] == D[0] && D[0] == 'A')
+        sprintf(buffer, "t.%s  %s,%s", M, S1, D);
+    else
+        sprintf(buffer, "t.%s  %s,%s  R0,R%d", M, S1, D, Rnum);
+    */
+	return 1;
+}
+
+/* TFR(2) : 0001 0101 0000 F00J : A-214 */
+static size_t dsp56k_dasm_tfr2(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char D[32];
+	char S1[32];
+	decode_JF_table(BITS(op,0x0001),BITS(op,0x0008), D, S1);
+	sprintf(opcode_str, "tfr2");
+	sprintf(arg_str, "%s,%s", S1, D);
+	return 1;
+}
+
+/* TFR(3) : 0010 01mW RRDD FHHH : A-216 */
+static size_t dsp56k_dasm_tfr3(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	int Rnum;
+	char ea[32];
+	char D1[32];
 	char S1[32];
 	char SD[32];
 	char args[32];
+	decode_DDF_table(BITS(op,0x0030), BITS(op,0x0008), D1, S1);          /* Intentionally switched */
+	decode_HHH_table(BITS(op,0x0007), SD);
+	Rnum = decode_RR_table(BITS(op,0x00c0));
+	assemble_ea_from_m_table(BITS(op,0x0200), Rnum, ea);
+	assemble_arguments_from_W_table(BITS(op,0x0100), args, 'X', SD, ea);
+	sprintf(opcode_str, "tfr3");
+	sprintf(arg_str, "%s,%s %s", S1, D1, args);
+	return 1;
+}
 
-	if (BITS(op,0x0ff0) == 0x0)
-	{
-		switch (BITS(op,0x000f))
-		{
-			/* NOP - 0000 0000 0000 0000 */
-			case 0x0:
-				sprintf(opcode_str, "nop");
-				sprintf(arg_str, " ");
-				break;
+/* TST(2) : 0001 0101 0001 -1DD : A-220 */
+static size_t dsp56k_dasm_tst2(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char S1[32];
+	decode_DD_table(BITS(op,0x0003), S1);
+	sprintf(opcode_str, "tst2");
+	sprintf(arg_str, "%s", S1);
+	return 1;
+}
 
-			/* Debug - 0000 0000 0000 0001 */
-			case 0x1:
-				sprintf(opcode_str, "debug");
-				sprintf(arg_str, " ");
-				break;
+/* WAIT : 0000 0000 0000 1011 : A-222 */
+static size_t dsp56k_dasm_wait(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	sprintf(opcode_str, "wait");
+	sprintf(arg_str, " ");
+	return 1;
+}
 
-			/* DO FOREVER - 0000 0000 0000 0010 xxxx xxxx xxxx xxxx */
-			case 0x2:
-				sprintf(opcode_str, "doForever");
-				sprintf(arg_str, "%04x", op2);
-				retSize = 2;
-				break;
-
-			/* chkaau - 0000 0000 0000 0100 */
-			case 0x4:
-				sprintf(opcode_str, "chkaau");
-				sprintf(arg_str, " ");
-				break;
-
-			/* SWI - 0000 0000 0000 0101 */
-			case 0x5:
-				sprintf(opcode_str, "swi");
-				sprintf(arg_str, " ");
-				break;
-
-			/* RTS - 0000 0000 0000 0110 */
-			case 0x6:
-				sprintf(opcode_str, "rts");
-				sprintf(arg_str, " ");
-				retSize |= DASMFLAG_STEP_OUT;
-				break;
-
-			/* RTI - 0000 0000 0000 0111 */
-			case 0x7:
-				sprintf(opcode_str, "rti");
-				sprintf(arg_str, " ");
-                retSize |= DASMFLAG_STEP_OUT;
-				break;
-
-			/* RESET - 0000 0000 0000 1000 */
-			case 0x8:
-				sprintf(opcode_str, "reset");
-				sprintf(arg_str, " ");
-				break;
-
-			/* Enddo - 0000 0000 0000 1001 */
-			case 0x9:
-				sprintf(opcode_str, "enddo");
-				sprintf(arg_str, " ");
-				break;
-
-			/* STOP - 0000 0000 0000 1010 */
-			case 0xa:
-				sprintf(opcode_str, "stop");
-				sprintf(arg_str, " ");
-				break;
-
-			/* WAIT - 0000 0000 0000 1011 */
-			case 0xb:
-				sprintf(opcode_str, "wait");
-				sprintf(arg_str, " ");
-				break;
-
-			/* ILLEGAL - 0000 0000 0000 1111 */
-			case 0xf:
-				sprintf(opcode_str, "illegal");
-				sprintf(arg_str, " ");
-				break;
-		}
-	}
-	else if (BITS(op,0x0f00) == 0x0)
-	{
-		int Rnum = -1;
-		char M[32] = "";
-
-		switch(BITS(op,0x00e0))
-		{
-			case 0x2:
-				/* DEBUG.cc - 0000 0000 0101 cccc */
-				decode_cccc_table(BITS(op,0x000f), M);
-				sprintf(opcode_str, "debug.%s", M);
-				sprintf(arg_str, " ");
-				break;
-
-			case 0x6:
-				/* DO - 0000 0000 110- --RR xxxx xxxx xxxx xxxx */
-				Rnum = decode_RR_table(BITS(op,0x0003));
-				sprintf(opcode_str, "do");
-				sprintf(arg_str, "X:(R%d),%02x", Rnum, op2);
-                retSize = 2;
-				break;
-
-			case 0x7:
-				/* REP - 0000 0000 111- --RR */
-				Rnum = decode_RR_table(BITS(op,0x0003));
-				sprintf(opcode_str, "rep");
-				sprintf(arg_str, "X:(R%d)", Rnum);
-				break;
-		}
-	}
-	else if (BITS(op,0x0f00) == 0x1)
-	{
-		char M[32] = "";
-
-		if (BITS(op,0x00f0) == 0x1)
-		{
-			/* BRK.cc - 0000 0001 0001 cccc */
-			decode_cccc_table(BITS(op,0x000f), M);
-			sprintf(opcode_str, "brk.%s", M);
-			sprintf(arg_str, " ");
-		}
-		else if (BITS(op,0x00f0) == 0x2)
-		{
-			/* All 4 instructions have the same RR encoding */
-			int Rnum = decode_RR_table(BITS(op,0x0003));
-
-			switch(BITS(op,0x000c))
-			{
-				/* JSR - 0000 0001 0010 00RR */
-				case 0x0:
-                    sprintf(opcode_str, "jsr");
-                    sprintf(arg_str, "R%d", Rnum);
-                    retSize |= DASMFLAG_STEP_OVER;
-					break;
-
-				/* JMP - 0000 0001 0010 01RR */
-				case 0x1:
-                    sprintf(opcode_str, "jmp");
-                    sprintf(arg_str, "R%d", Rnum);
-					break;
-
-				/* BSR - 0000 0001 0010 10RR */
-				case 0x2:
-                    sprintf(opcode_str, "bsr");
-                    sprintf(arg_str, "R%d", Rnum);
-                    retSize |= DASMFLAG_STEP_OVER;
-					break;
-
-				/* BRA - 0000 0001 0010 11RR */
-				case 0x3:
-                    sprintf(opcode_str, "bra");
-                    sprintf(arg_str, "R%d", Rnum);
-					break;
-			}
-		}
-		else if (BITS(op,0x00f0) == 0x3)
-		{
-			switch(BITS(op,0x000c))
-			{
-				/* JSR - 0000 0001 0011 00-- xxxx xxxx xxxx xxxx */
-				case 0x0:
-					sprintf(opcode_str, "jsr");
-					sprintf(arg_str, "%04x", op2);
-					retSize = 2;
-                    retSize |= DASMFLAG_STEP_OVER;
-					break;
-
-				/* JMP - 0000 0001 0011 01-- xxxx xxxx xxxx xxxx */
-				case 0x1:
-					sprintf(opcode_str, "jmp");
-					sprintf(arg_str, "%04x", op2);
-					retSize = 2;
-					break;
-
-				/* BSR - 0000 0001 0011 10-- xxxx xxxx xxxx xxxx */
-				case 0x2:
-					sprintf(opcode_str, "bsr");
-					sprintf(arg_str, "%d (0x%04x)", (INT16)op2, pc + (INT16)op2);
-					retSize = 2;
-					retSize |= DASMFLAG_STEP_OVER;
-					break;
-
-				/* BRA - 0000 0001 0011 11-- xxxx xxxx xxxx xxxx */
-				case 0x3:
-					sprintf(opcode_str, "bra");
-					sprintf(arg_str, "%d (0x%04x)", op2, op2);
-                    retSize = 2;
-					break;
-			}
-		}
-		else if (BITS(op,0x00f0) == 0x5)
-		{
-			char M[32] = "";
-
-			/* REP.cc - 0000 0001 0101 cccc */
-			decode_cccc_table(BITS(op,0x000f), M);
-			sprintf(opcode_str, "rep.%s", M);
-			sprintf(arg_str, " ");
-			/* !!! Should I decode the next instruction and put it here ???  probably... */
-		}
-		else if (BITS(op,0x0080) == 0x1)
-		{
-			/* LEA - 0000 0001 10TT MMRR */
-			/*     - 0000 0001 11NN MMRR */
-			int Rnum = decode_RR_table(BITS(op,0x0030));
-            assemble_ea_from_MM_table(BITS(op,0x000c), BITS(op,0x0003), ea);
-			sprintf(opcode_str, "lea");
-            if (BITS(op,0x0040))
-				sprintf(arg_str, "%s,R%d", ea, Rnum);
-            else
-				sprintf(arg_str, "%s,N%d", ea, Rnum);
-		}
-	}
-	else if (BITS(op,0x0e00) == 0x1)
-	{
-		sprintf(opcode_str, "move(m)");
-
-		if (BITS(op,0x0020) == 0x0)
-		{
-			/* MOVE(M) - 0000 001W RR0M MHHH */
-			int Rnum = decode_RR_table(BITS(op,0x00c0));
-			decode_HHH_table(BITS(op,0x0007), SD);
-			assemble_ea_from_MM_table(BITS(op,0x0018), Rnum, ea);
-			assemble_arguments_from_W_table(BITS(op,0x0100), args, 'P', SD, ea);
-			sprintf(arg_str, "%s", args);
-		}
-		else
-		{
-			/* MOVE(M) - 0000 001W RR11 mmRR */
-			assemble_eas_from_m_table(BITS(op,0x000c), BITS(op,0x00c0), BITS(op,0x0003), ea, ea2);
-            sprintf(SD, "P:%s", ea);
-            assemble_arguments_from_W_table(BITS(op,0x0100), args, 'X', SD, ea2);
-			sprintf(arg_str, "%s", args);
-		}
-	}
-	else if (BITS(op,0x0f00) == 0x4)
-	{
-		if (BITS(op,0x0020) == 0x0)
-		{
-			/* DO - 0000 0100 000D DDDD xxxx xxxx xxxx xxxx */
-			decode_DDDDD_table(BITS(op,0x001f), S1);
-			sprintf(opcode_str, "do");
-			sprintf(arg_str, "%s,%04x", S1, op2);
-			retSize = 2;
-		}
-		else
-		{
-			/* REP - 0000 0100 001D DDDD */
-            decode_DDDDD_table(BITS(op,0x001f), S1);
-			sprintf(opcode_str, "rep");
-			sprintf(arg_str, "%s", S1);
-		}
-	}
-	else if (BITS(op,0x0f00) == 0x5)
-	{
-		UINT8 B;
-
-		if (BITS(op2,0xfe20) == 0x02)
-		{
-			/* MOVE(M) - 0000 0101 BBBB BBBB | 0000 001W --0- -HHH */
-			B = BITS(op,0x00ff);
-			decode_HHH_table(BITS(op2,0x0007), SD);
-			assemble_reg_from_W_table(BITS(op2,0x0100), args, 'P', SD, B);
-			sprintf(opcode_str, "move(m)");
-			sprintf(arg_str, "%s", args);
-			/* !!! The docs list the read/write order backwards for all move(m)'s - crackbabies ??? */
-			retSize = 2;
-		}
-		else if (BITS(op2,0xf810) == 0x0e)
-		{
-			/* MOVE(C) - 0000 0101 BBBB BBBB | 0011 1WDD DDD0 ---- */
-			B = BITS(op,0x00ff);
-            decode_DDDDD_table(BITS(op2,0x03e0), SD);
-            assemble_reg_from_W_table(BITS(op2,0x0400), args, 'X', SD, B);
-			sprintf(opcode_str, "move(c)");
-			sprintf(arg_str, "%s", args);
-            retSize = 2;
-		}
-		else if (BITS(op2,0x00ff) == 0x11)
-		{
-			/* MOVE - 0000 0101 BBBB BBBB | ---- HHHW 0001 0001 */
-			B = BITS(op,0x00ff);
-            decode_HHH_table(BITS(op2,0x0e00), SD);
-            assemble_reg_from_W_table(BITS(op2,0x0100), args, 'X', SD, B);
-			sprintf(opcode_str, "move");
-			sprintf(arg_str, "%s", args);
-            retSize = 2;
-		}
-	}
-	else if (BITS(op,0x0f00) == 0x6)
-	{
-		int Rnum = -1;
-		char M[32] = "";
-
-		switch(BITS(op,0x0030))
-		{
-			case 0x0:
-				/* JS.cc - 0000 0110 RR00 cccc */
-				decode_cccc_table(BITS(op,0x000f), M);
-                Rnum = decode_RR_table(BITS(op,0x00c0));
-				sprintf(opcode_str, "js.%s", M);
-				sprintf(arg_str, "R%d", Rnum);
-				retSize |= DASMFLAG_STEP_OVER;	/* probably.  What's the diff between a branch and a jump? */
-				break;
-
-			case 0x1:
-				/* JS.cc - 0000 0110 --01 cccc xxxx xxxx xxxx xxxx */
-				decode_cccc_table(BITS(op,0x000f), M);
-				sprintf(opcode_str, "js.%s", M);
-				sprintf(arg_str, "%04x", op2);
-                retSize = 2;
-				retSize |= DASMFLAG_STEP_OVER;	/* probably */
-				break;
-
-			case 0x2:
-				/* J.cc - 0000 0110 RR10 cccc */
-				decode_cccc_table(BITS(op,0x000f), M);
-                Rnum = decode_RR_table(BITS(op,0x00c0));
-				sprintf(opcode_str, "j.%s", M);
-                sprintf(arg_str, "R%d", Rnum);
-				break;
-
-			case 0x3:
-				/* J.cc - 0000 0110 --11 cccc xxxx xxxx xxxx xxxx */
-				decode_cccc_table(BITS(op,0x000f), M);
-				sprintf(opcode_str, "j.%s", M);
-				sprintf(arg_str, "%04x", op2);
-                retSize = 2;
-				break;
-		}
-	}
-	else if (BITS(op,0x0f00) == 0x7)
-	{
-		int Rnum = -1;
-		char M[32] = "";
-
-		switch(BITS(op,0x0030))
-		{
-			case 0x0:
-				/* BS.cc - 0000 0111 RR00 cccc */
-				decode_cccc_table(BITS(op,0x000f), M);
-                Rnum = decode_RR_table(BITS(op,0x00c0));
-				sprintf(opcode_str, "bs.%s", M);
-				sprintf(arg_str, "R%d", Rnum);
-				retSize |= DASMFLAG_STEP_OVER;	/* probably.  What's the diff between a branch and a jump? */
-				break;
-
-			case 0x1:
-				/* BS.cc - 0000 0111 --01 cccc xxxx xxxx xxxx xxxx */
-				decode_cccc_table(BITS(op,0x000f), M);
-				sprintf(opcode_str, "bs.%s", M);
-				sprintf(arg_str, "%d (0x%04x)", (INT16)(op2), op2);
-				retSize = 2;
-				retSize |= DASMFLAG_STEP_OVER;	/* probably */
-				break;
-
-			case 0x2:
-				/* B.cc - 0000 0111 RR10 cccc */
-				decode_cccc_table(BITS(op,0x000f), M);
-                Rnum = decode_RR_table(BITS(op,0x00c0));
-				sprintf(opcode_str, "b.%s", M);
-				sprintf(arg_str, "R%d", Rnum);
-				break;
-
-			case 0x3:
-				/* B.cc - 0000 0111 --11 cccc xxxx xxxx xxxx xxxx */
-				decode_cccc_table(BITS(op,0x000f), M);
-				sprintf(opcode_str, "b.%s", M);
-				sprintf(arg_str, "%04x (%d)", op2, op2);
-				retSize = 2;
-				break;
-		}
-	}
-	else if (BITS(op,0x0800))
-	{
-		int Rnum = -1;
-
-		switch (BITS(op,0x0700))
-		{
-			/* JSR - 0000 1010 AAAA AAAA */
-			case 0x2:
-				sprintf(opcode_str, "jsr");
-				sprintf(arg_str, "%d (0x%02x)", BITS(op,0x00ff), BITS(op,0x00ff));
-                retSize |= DASMFLAG_STEP_OVER;
-				break;
-
-			/* BRA - 0000 1011 aaaa aaaa */
-			case 0x3:
-				sprintf(opcode_str, "bra");
-				sprintf(arg_str, "%d (0x%02x)", (INT8)BITS(op,0x00ff), pc + (INT8)BITS(op,0x00ff));
-				break;
-
-			/* MOVE(P) - 0000 110W RRmp pppp */
-			case 0x4: case 0x5:
-			{
-				char fullAddy[128];		/* Convert Short Absolute Address to full 16-bit */
-				Rnum = decode_RR_table(BITS(op,0x00c0));
-				assemble_ea_from_m_table(BITS(op,0x0020), Rnum, ea);
-				assemble_address_from_IO_short_address(BITS(op,0x001f), fullAddy);
-				sprintf(SD, "X:%02x (%s)", BITS(op,0x001f), fullAddy);
-				assemble_arguments_from_W_table(BITS(op,0x0100), args, 'X', SD, ea);
-				sprintf(opcode_str, "move(p)");
-				sprintf(arg_str, "%s", args);
-				break;
-			}
-
-			/* DO - 0000 1110 iiii iiii xxxx xxxx xxxx xxxx */
-			case 0x6:
-				sprintf(opcode_str, "do");
-				sprintf(arg_str, "#%02x,%04x", BITS(op,0x00ff), op2);
-				retSize = 2;
-				break;
-
-			/* REP - 0000 1111 iiii iiii */
-			case 0x7:
-				sprintf(opcode_str, "rep");
-				sprintf(arg_str, "%d (0x%02x)", BITS(op,0x00ff), BITS(op,0x00ff));
-				break;
-		}
-	}
-
-	return retSize;
+/* ZERO : 0001 0101 0101 F000 : A-224 */
+static size_t dsp56k_dasm_zero(const UINT16 op, char* opcode_str, char* arg_str)
+{
+	char D[32];
+	decode_F_table(BITS(op,0x0008), D);
+	sprintf(opcode_str, "zero");
+	sprintf(arg_str, "%s", D);
+	return 1;
 }
 
 
-/*******************************/
-/* Parallel data move decoding */
-/*******************************/
-static void decode_x_memory_data_move(const UINT16 op_byte, char* parallel_move_str)
+
+/**********************************/
+/* Parallel memory move functions */
+/**********************************/
+/* X Memory Data Move : 1mRR HHHW ---- ---- : A-137 */
+static void decode_x_memory_data_move(const UINT16 op, char* parallel_move_str)
 {
 	int Rnum;
 	char SD[32];
 	char ea[32];
 	char args[32];
-
-	/* Byte: 1mRR HHHW ---- ---- */
-	Rnum = decode_RR_table(BITS(op_byte,0x30));
-	decode_HHH_table(BITS(op_byte,0x0e), SD);
-	assemble_ea_from_m_table(BITS(op_byte,0x40), Rnum, ea);
-	assemble_arguments_from_W_table(BITS(op_byte,0x01), args, 'X', SD, ea);
-
+	
+	Rnum = decode_RR_table(BITS(op,0x3000));
+	decode_HHH_table(BITS(op,0x0e00), SD);
+	assemble_ea_from_m_table(BITS(op,0x4000), Rnum, ea);
+	assemble_arguments_from_W_table(BITS(op,0x0100), args, 'X', SD, ea);
+	
 	sprintf(parallel_move_str, "%s", args);
 }
 
+/* X Memory Data Move : 0101 HHHW ---- ---- : A-137 */
+static void decode_x_memory_data_move2(const UINT16 op, char* parallel_move_str, char* d_register)
+{
+	char SD[32] ;
+	char args[32] ;
+	char dest[32] ;
+	
+	if (d_register[0] == 'B')
+		sprintf(dest, "(A1)");
+	else if (d_register[0] == 'A')
+		sprintf(dest, "(B1)");
+	else
+		sprintf(dest, "(A1)");
+	
+	decode_HHH_table(BITS(op,0x0e00), SD) ;
+	assemble_arguments_from_W_table(BITS(op,0x0100), args, 'X', SD, dest) ;
+	
+	sprintf(parallel_move_str, "%s", args);
+}
+
+/* Dual X Memory Data Read : 011m mKKK -rr- ---- : A-142*/
 static void decode_dual_x_memory_data_read(const UINT16 op, char* parallel_move_str, char* parallel_move_str2)
 {
 	int Rnum;
@@ -1683,30 +2582,30 @@ static void decode_dual_x_memory_data_read(const UINT16 op, char* parallel_move_
 	char D2[32] = "";
 	char ea1[32] = "";
 	char ea2[32] = "";
-
-	/* 011m mKKK -rr- ---- */
+	
 	Rnum = decode_rr_table(BITS(op,0x0060));
 	decode_KKK_table(BITS(op,0x0700), D1, D2);
 	assemble_eas_from_m_table(BITS(op,0x1800), Rnum, 3, ea1, ea2);
-
-	/* TODO : Should the ^F's be replaced? */
-
+	
+	/* TODO : The ^F's should likely be replaced */
+	
 	if (Rnum == -1)
 	{
 		sprintf(ea1, "(!!)!");
 	}
-
+	
 	sprintf(parallel_move_str,  "X:%s,%s", ea1, D1);
 	sprintf(parallel_move_str2, "X:%s,%s", ea2, D2);
 }
 
-static void decode_register_to_register_data_move(const UINT16 op_byte, char* parallel_move_str, char* d_register)
+/* Register to Register Data Move : 0100 IIII ---- ---- : A-133 */
+static void decode_register_to_register_data_move(const UINT16 op, char* parallel_move_str, char* d_register)
 {
 	char S[32];
 	char D[32];
-
-	decode_IIII_table(BITS(op_byte,0x0f), S, D);
-
+	
+	decode_IIII_table(BITS(op,0x0f00), S, D);
+	
 	if (D[0] == '^' && D[1] == 'F')
 	{
 		if (d_register[0] == 'B')
@@ -1716,64 +2615,58 @@ static void decode_register_to_register_data_move(const UINT16 op_byte, char* pa
 		else
 			sprintf(D, "A");
 	}
-
+	
 	sprintf(parallel_move_str, "%s,%s", S, D);
 }
 
-static void decode_parallel_cooperative_x_memory_data_move(const UINT16 op_byte, char* parallel_move_str, char* d_register)
+/* Address Register Update : 0011 0zRR ---- ---- : A-135 */
+static void decode_address_register_update(const UINT16 op, char* parallel_move_str)
 {
-	char SD[32] ;
-	char args[32] ;
-	char dest[32] ;
-
-	if (d_register[0] == 'B')
-		sprintf(dest, "(A1)");
-	else if (d_register[0] == 'A')
-		sprintf(dest, "(B1)");
-	else
-		sprintf(dest, "(A1)");
-
-	decode_HHH_table(BITS(op_byte,0x0e), SD) ;
-	assemble_arguments_from_W_table(BITS(op_byte,0x01), args, 'X', SD, dest) ;
-
-	sprintf(parallel_move_str, "%s", args);
+	char ea[32];
+	int Rnum;
+	Rnum = decode_RR_table(BITS(op,0x0300));
+	assemble_ea_from_z_table(BITS(op,0x0400), Rnum, ea);
+	sprintf(parallel_move_str, "%s", ea);
 }
 
-/* MISSING MPY */
-/*
-        char S[32];
+/* X Memory Data Write and Register Data Move : 0001 011k RRDD ---- : A-140 */
+static void decode_x_memory_data_write_and_register_data_move(const UINT16 op, char* parallel_move_str, char* parallel_move_str2)
+{
+	int Rnum;
+	char S[32];
+	char Dnot[32];
+	
+	/* TODO : Cross-check the Dnot stuff against the MPY & MAC things. */
+	/* It's likely correct as-is, since the ALU op and this guy probably decode the same bit, */
+	/* but i may have to pass in d_register just to be sure? */
+	decode_k_table(BITS(op,0x0100), Dnot);
+	Rnum = decode_RR_table(BITS(op,0x00c0));
+	decode_DD_table(BITS(op,0x0030), S);
 
-        // MPY - 0001 0110 RRDD FQQQ
-        decode_k_table(BITS(op,0x0100), Dnot);
-        Rnum = decode_RR_table(BITS(op,0x00c0));
-        decode_DD_table(BITS(op,0x0030), S);
-        decode_QQQF_table(BITS(op,0x0007), BITS(op,0x0008), S1, S2, D);
-        sprintf(buffer, "mpy       %s,%s,%s %s,(R%d)+N%d %s,%s", S1, S2, D, Dnot, Rnum, Rnum, S, Dnot);
-        // Strange, but not entirely out of the question - this 'k' parameter is hardcoded
-        // I cheat here and do the parallel memory data move above - this specific one is only used twice
-        retSize = 1;
-*/
+	/* TODO : is Nn correct here? */
+	sprintf(parallel_move_str,  "%s,X:(R%d)+N%d", Dnot, Rnum, Rnum);
+	sprintf(parallel_move_str2, "%s,%s", S, Dnot);
+}
 
-/* MISSING MAC */
-/*
-        char S[32];
-
-        // MAC - 0001 0111 RRDD FQQQ
-        decode_k_table(BITS(op,0x0100), Dnot);
-        Rnum = decode_RR_table(BITS(op,0x00c0));
-        decode_DD_table(BITS(op,0x0030), S);
-        decode_QQQF_table(BITS(op,0x0007), BITS(op,0x0008), S1, S2, D);
-        sprintf(buffer, "mac       %s,%s,%s %s,(R%d)+N%d %s,%s", S1, S2, D, Dnot, Rnum, Rnum, S, Dnot);
-        // Strange, but not entirely out of the question - this 'k' parameter is hardcoded
-        // I cheat here and do the parallel memory data move above - this specific one is only used twice
-        retSize = 1;
-*/
-
+/* X Memory Data Move with short displacement : 0000 0101 BBBB BBBB ---- HHHW ---- ---- : A-139 */
+static void decode_x_memory_data_move_with_short_displacement(const UINT16 op, const UINT16 op2, char* parallel_move_str)
+{
+	INT8 B;
+	char SD[32];
+	char args[32];
+	
+	/* TODO: Does this do the sign properly? */
+	B = (char)(op & 0x00ff);
+	decode_HHH_table(BITS(op2,0x0e00), SD);
+	assemble_reg_from_W_table(BITS(op2,0x0100), args, 'X', SD, B);
+	sprintf(parallel_move_str, "%s", args);
+}
 
 
 /******************/
 /* Table decoding */
 /******************/
+
 static int decode_BBB_table(UINT16 BBB)
 {
 	switch(BBB)
@@ -1782,7 +2675,7 @@ static int decode_BBB_table(UINT16 BBB)
 		case 0x2: return BBB_MIDDLE; break;
 		case 0x1: return BBB_LOWER ; break;
 	}
-
+	
 	return BBB_LOWER;                          /* Not really safe... */
 }
 
@@ -1829,7 +2722,7 @@ static void decode_DDDDD_table(UINT16 DDDDD, char *SD)
 		case 0x0d: sprintf(SD, "B1");  break;
 		case 0x0e: sprintf(SD, "A2");  break;
 		case 0x0f: sprintf(SD, "B2");  break;
-
+		
 		case 0x10: sprintf(SD, "R0");  break;
 		case 0x11: sprintf(SD, "R1");  break;
 		case 0x12: sprintf(SD, "R2");  break;
@@ -1863,7 +2756,7 @@ static void decode_DD_table(UINT16 DD, char *SD)
 static void decode_DDF_table(UINT16 DD, UINT16 F, char *S, char *D)
 {
 	UINT16 switchVal = (DD << 1) | F;
-
+	
 	switch (switchVal)
 	{
 		case 0x0: sprintf(S, "X0"); sprintf(D, "A"); break;
@@ -1899,7 +2792,7 @@ static void decode_F_table(UINT16 F, char *SD)
 static void decode_h0hF_table(UINT16 h0h, UINT16 F, char *S, char *D)
 {
 	UINT16 switchVal = (h0h << 1) | F;
-
+	
 	switch (switchVal)
 	{
 		case 0x8: sprintf(S, "X0"); sprintf(D, "A"); break;
@@ -1965,7 +2858,7 @@ static void decode_IIII_table(UINT16 IIII, char *S, char *D)
 static void decode_JJJF_table(UINT16 JJJ, UINT16 F, char *S, char *D)
 {
 	UINT16 switchVal = (JJJ << 1) | F;
-
+	
 	switch(switchVal)
 	{
 		case 0x0: sprintf(S, "B") ; sprintf(D, "A"); break;
@@ -1990,7 +2883,7 @@ static void decode_JJJF_table(UINT16 JJJ, UINT16 F, char *S, char *D)
 static void decode_JJF_table(UINT16 JJ, UINT16 F, char *S, char *D)
 {
 	UINT16 switchVal = (JJ << 1) | F;
-
+	
 	switch (switchVal)
 	{
 		case 0x0: sprintf(S, "X0"); sprintf(D, "A"); break;
@@ -2007,7 +2900,7 @@ static void decode_JJF_table(UINT16 JJ, UINT16 F, char *S, char *D)
 static void decode_JF_table(UINT16 J, UINT16 F, char *S, char *D)
 {
 	UINT16 switchVal = (J << 1) | F;
-
+	
 	switch(switchVal)
 	{
 		case 0x0: sprintf(S, "X"); sprintf(D, "A"); break;
@@ -2017,7 +2910,6 @@ static void decode_JF_table(UINT16 J, UINT16 F, char *S, char *D)
 	}
 }
 
-#ifdef UNUSED_FUNCTION
 static void decode_k_table(UINT16 k, char *Dnot)
 {
 	switch(k)
@@ -2026,7 +2918,6 @@ static void decode_k_table(UINT16 k, char *Dnot)
 		case 0x1: sprintf(Dnot, "A"); break;
 	}
 }
-#endif
 
 static void decode_kSign_table(UINT16 k, char *plusMinus)
 {
@@ -2052,17 +2943,20 @@ static void decode_KKK_table(UINT16 KKK, char *D1, char *D2)
 	}
 }
 
-#ifdef UNUSED_FUNCTION
 static int decode_NN_table(UINT16 NN)
 {
 	return NN;
 }
-#endif
+
+static int decode_TT_table(UINT16 TT)
+{
+	return TT;
+}
 
 static void decode_QQF_table(UINT16 QQ, UINT16 F, char *S1, char *S2, char *D)
 {
 	UINT16 switchVal = (QQ << 1) | F;
-
+	
 	switch(switchVal)
 	{
 		case 0x0: sprintf(S1, "X0"); sprintf(S2, "Y0"); sprintf(D, "A"); break;
@@ -2079,7 +2973,7 @@ static void decode_QQF_table(UINT16 QQ, UINT16 F, char *S1, char *S2, char *D)
 static void decode_QQF_special_table(UINT16 QQ, UINT16 F, char *S1, char *S2, char *D)
 {
 	UINT16 switchVal = (QQ << 1) | F;
-
+	
 	switch(switchVal)
 	{
 		case 0x0: sprintf(S1, "Y0"); sprintf(S2, "X0"); sprintf(D, "A"); break;
@@ -2096,7 +2990,7 @@ static void decode_QQF_special_table(UINT16 QQ, UINT16 F, char *S1, char *S2, ch
 static void decode_QQQF_table(UINT16 QQQ, UINT16 F, char *S1, char *S2, char *D)
 {
 	UINT16 switchVal = (QQQ << 1) | F;
-
+	
 	switch(switchVal)
 	{
 		case 0x0: sprintf(S1, "X0"); sprintf(S2, "X0"); sprintf(D, "A"); break;
@@ -2154,7 +3048,7 @@ static void decode_ss_table(UINT16 ss, char *arithmetic)
 static void decode_uuuuF_table(UINT16 uuuu, UINT16 F, char *arg, char *S, char *D)
 {
 	UINT16 switchVal = (uuuu << 1) | F;
-
+	
 	switch(switchVal)
 	{
 		case 0x00: sprintf(arg, "add"); sprintf(S, "X0"); sprintf(D, "A"); break;
@@ -2244,8 +3138,6 @@ static void assemble_ea_from_t_table(UINT16 t,  UINT16 val, char *ea)
 	}
 }
 
-
-#ifdef UNUSED_FUNCTION
 static void assemble_ea_from_z_table(UINT16 z, int n, char *ea)
 {
 	switch(z)
@@ -2254,12 +3146,11 @@ static void assemble_ea_from_z_table(UINT16 z, int n, char *ea)
 		case 0x1: sprintf(ea, "(R%d)+N%d", n, n); break;
 	}
 }
-#endif
 
 static void assemble_D_from_P_table(UINT16 P, UINT16 ppppp, char *D)
 {
 	char fullAddy[128];		/* Convert Short Absolute Address to full 16-bit */
-
+	
 	switch(P)
 	{
 		case 0x0: sprintf(D, "X:%02x", ppppp); break;
@@ -2292,16 +3183,16 @@ static void assemble_address_from_IO_short_address(UINT16 pp, char *ea)
 {
 	UINT16 fullAddy = 0xffe0;
 	fullAddy |= pp;
-
+	
 	sprintf(ea, "%.04x", fullAddy);
 }
 
-static INT8 get_6_bit_relative_value(UINT16 bits)
+static INT8 get_6_bit_signed_value(UINT16 bits)
 {
 	UINT16 fullAddy = bits;
 	if (fullAddy & 0x0020)
 		fullAddy |= 0xffc0;
-
+	
 	return (INT8)fullAddy;
 }
 
@@ -2313,11 +3204,11 @@ static INT8 get_6_bit_relative_value(UINT16 bits)
 static UINT16 dsp56k_op_mask(UINT16 cur, UINT16 mask)
 {
 	int i;
-
+	
 	UINT16 retVal = (cur & mask);
 	UINT16 temp = 0x0000;
 	int offsetCount = 0;
-
+	
 	/* Shift everything right, eliminating 'whitespace'... */
 	for (i = 0; i < 16; i++)
 	{
@@ -2327,7 +3218,7 @@ static UINT16 dsp56k_op_mask(UINT16 cur, UINT16 mask)
 			offsetCount++;
 		}
 	}
-
+	
 	return temp;
 }
 
@@ -2339,235 +3230,3 @@ static void pad_string(const int dest_length, char* string)
 	}
 }
 
-
-
-
-/*
-
-Data ALU Ops
---------------------
-
-CLR             X       1xxx xxxx 0000 x001
-ADD             X       1xxx xxxx 0000 xxxx
-
-MOVE            X       1xxx xxxx 0001 0001
-TFR             X       1xxx xxxx 0001 xxxx
-
-RND             X       1xxx xxxx 0010 x000
-TST             X       1xxx xxxx 0010 x001
-INC             X       1xxx xxxx 0010 x010
-INC24           X       1xxx xxxx 0010 x011
-OR              X       1xxx xxxx 0010 x1xx
-
-ASR             X       1xxx xxxx 0011 x000
-ASL             X       1xxx xxxx 0011 x001
-LSR             X       1xxx xxxx 0011 x010
-LSL             X       1xxx xxxx 0011 x011
-EOR             X       1xxx xxxx 0011 x1xx
-
-SUBL            X       1xxx xxxx 0100 x001
-SUB             X       1xxx xxxx 0100 xxxx
-
-CLR24           X       1xxx xxxx 0101 x001
-SBC             X       1xxx xxxx 0101 x01x
-CMP             X       1xxx xxxx 0101 xxxx
-
-NEG             X       1xxx xxxx 0110 x000
-NOT             X       1xxx xxxx 0110 x001
-DEC             X       1xxx xxxx 0110 x010
-DEC24           X       1xxx xxxx 0110 x011
-AND             X       1xxx xxxx 0110 x1xx
-
-ABS             X       1xxx xxxx 0111 x001
-ROR             X       1xxx xxxx 0111 x010
-ROL             X       1xxx xxxx 0111 x011
-CMPM            X       1xxx xxxx 0111 xxxx
-
-MPY             X       1xxx xxxx 1x00 xxxx
-MPYR            X       1xxx xxxx 1x01 xxxx
-MAC             X       1xxx xxxx 1x10 xxxx
-MACR            X       1xxx xxxx 1x11 xxxx
-
-
-VERY STRANGE XMDM!      0101 HHHW xxxx xxxx
-
-
-DXMDR
------------------
-
-ADD             X       011x xxxx 0xxx xxxx
-SUB             X       011x xxxx 0xxx xxxx
-TFR             X       011x xxxx 0xx1 x0xx
-MOVE            X       011x xxxx 0xx1 0000
-
-MPY             X       011x xxxx 1xx0 x0xx
-MAC             X       011x xxxx 1xx0 x1xx
-MPYR            X       011x xxxx 1XX1 x0xx
-MACR            X       011x xxxx 1XX1 x1xx
-
-TODO: don't forget us
-x memory data write and register data move - unique
------------------
-MPY             X       0001 0110 xxxx xxxx
-MAC             X       0001 0111 xxxx xxxx
-
-ODDBALL
--------
-Tcc             X       0001 00xx xxxx xx0x
-
-BITFIELD
------------------
-
-BFTSTL          X       0001 0100 000x xxxx . xxx0 0000 xxxx xxxx
-BFTSTH          X       0001 0100 000x xxxx . xxx1 0000 xxxx xxxx
-BFTSTL          X       0001 0100 001X XXxx . xxx0 0000 xxxx xxxx
-BFTSTH          X       0001 0100 001X XXxx . xxx1 0000 xxxx xxxx
-BFTSTL          X       0001 0100 01xx xxxx . xxx0 0000 xxxx xxxx
-BFTSTH          X       0001 0100 01xx xxxx . xxx1 0000 xxxx xxxx
-BFCLR           X       0001 0100 100x xxxx . xxx0 0100 xxxx xxxx
-BFCHG           X       0001 0100 100x xxxx . xxx1 0010 xxxx xxxx
-BFSET           X       0001 0100 100x xxxx . xxx1 1000 xxxx xxxx
-BFCLR           X       0001 0100 101X XXxx . xxx0 0100 xxxx xxxx
-BFCHG           X       0001 0100 101X XXxx . xxx1 0010 xxxx xxxx
-BFSET           X       0001 0100 101X XXxx . xxx1 1000 xxxx xxxx
-BFCHG           X       0001 0100 11xx xxxx . xxx1 0010 xxxx xxxx
-BFCLR           X       0001 0100 11xx xxxx . xxx0 0100 xxxx xxxx
-BFSET           X       0001 0100 11xx xxxx . xxx1 1000 xxxx xxxx
-
-
-NPM
------------------
-
-TFR2            X       0001 0101 0000 x00x
-ADC             X       0001 0101 0000 x01x
-
-TST2            X       0001 0101 0001 X1xx
-
-NORM            X       0001 0101 0010 x0xx
-
-ASR4            X       0001 0101 0011 x000
-ASL4            X       0001 0101 0011 x001
-
-DIV             X       0001 0101 0XX0 x1xx
-
-ZERO            X       0001 0101 0101 x000
-EXT             X       0001 0101 0101 x010
-
-NEGC            X       0001 0101 0110 x000
-
-ASR16           X       0001 0101 0111 x000
-SWAP            X       0001 0101 0111 x001
-
-IMPY            X       0001 0101 1000 xxxx
-IMAC            X       0001 0101 1010 xxxx
-DMAC(ss,su,uu)  X       0001 0101 10x1 xxxx
-MPY(su,uu)      X       0001 0101 1100 xxxx
-MAC(su,uu)      X       0001 0101 1110 xxxx
-
-IMMEDIATE
------------------
-
-ANDI            X       0001 1xx0 xxxx xxxx
-ORI             X       0001 1xx1 xxxx xxxx
-
-
-SPECIAL
------------------
-
-MOVE(S)         X       0001 100x xx0x xxxx
-MOVE(P)         X       0001 100x xx1x xxxx
-
------------------
-
-MOVE(I)         X       0010 00xx xxxx xxxx
-TFR3            X       0010 01xx xxxx xxxx
-MOVE(C)         X       0010 10xx xxxx xxxx
-Bcc             X       0010 11xx xxxx xxxx
-
------------------
-
-MOVE(C)         X       0011 1xxx xxx0 xxxx
-MOVE(C)         X       0011 1xxx xxx1 x0xx
-MOVE(C)         X       0011 1xxx xxx1 x10X xxxx xxxx xxxx xxxx
-MOVE(C)         X       0011 1xxx xxx1 x11X
-
-
-
-
-
-
-
-
------------------
-
-NOP             X       0000 0000 0000 0000
-DEBUG           X       0000 0000 0000 0001
-DO FOREVER      X       0000 0000 0000 0010 xxxx xxxx xxxx xxxx
-CHKAAU          X       0000 0000 0000 0100
-SWI             X       0000 0000 0000 0101
-RTS             X       0000 0000 0000 0110
-RTI             X       0000 0000 0000 0111
-RESET           X       0000 0000 0000 1000
-ENDDO           X       0000 0000 0000 1001
-STOP            X       0000 0000 0000 1010
-WAIT            X       0000 0000 0000 1011
-ILLEGAL         X       0000 0000 0000 1111
-
-DEBUGcc         X       0000 0000 0101 xxxx
-DOLoop          X       0000 0000 110X XXxx xxxx xxxx xxxx xxxx
-REP             X       0000 0000 111X XXxx
-
-BRKcc           X       0000 0001 0001 xxxx
-
-JSR             X       0000 0001 0010 00xx
-JMP             X       0000 0001 0010 01xx
-BSR             X       0000 0001 0010 10xx
-BRA             X       0000 0001 0010 11xx
-
-JSR             X       0000 0001 0011 00XX xxxx xxxx xxxx xxxx
-JMP             X       0000 0001 0011 01XX xxxx xxxx xxxx xxxx
-BSR             X       0000 0001 0011 10XX xxxx xxxx xxxx xxxx
-BRA             X       0000 0001 0011 11XX xxxx xxxx xxxx xxxx
-
-REPcc           X       0000 0001 0101 xxxx
-
-LEA             X       0000 0001 10xx xxxx
-LEA             X       0000 0001 11xx xxxx
-
------------------
-
-MOVE(M)         X       0000 001x xx0x xxxx
-MOVE(M)         X       0000 001x xx11 xxxx
-
------------------
-
-DOLoop          X       0000 0100 000x xxxx xxxx xxxx xxxx xxxx
-REP             X       0000 0100 001x xxxx
-
------------------
-
-MOVE(M)         X       0000 0101 xxxx xxxx 0000 001x XX0X Xxxx
-MOVE(C)         X       0000 0101 xxxx xxxx 0011 1xxx xxx0 XXXX
-MOVE            X       0000 0101 xxxx xxxx XXXX xxxx 0001 0001
-
------------------
-
-JScc            X       0000 0110 xx00 xxxx
-JScc            X       0000 0110 XX01 xxxx xxxx xxxx xxxx xxxx
-Jcc             X       0000 0110 xx10 xxxx
-Jcc             X       0000 0110 XX11 xxxx xxxx xxxx xxxx xxxx
-
-BScc            X       0000 0111 xx00 xxxx
-BScc            X       0000 0111 XX01 xxxx xxxx xxxx xxxx xxxx
-Bcc             X       0000 0111 xx10 xxxx
-Bcc             X       0000 0111 XX11 xxxx xxxx xxxx xxxx xxxx
-
------------------
-
-JSR             X       0000 1010 xxxx xxxx
-BRA             X       0000 1011 xxxx xxxx
-MOVE(P)         X       0000 110x xxxx xxxx
-DOLoop          X       0000 1110 xxxx xxxx xxxx xxxx xxxx xxxx
-REP             X       0000 1111 xxxx xxxx
-
-*/
