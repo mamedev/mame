@@ -77,7 +77,7 @@ static size_t dsp56k_dasm_bfop		(const UINT16 op, const UINT16 op2, char* opcode
 static size_t dsp56k_dasm_bcc		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
 static size_t dsp56k_dasm_bcc_1		(const UINT16 op, char* opcode_str, char* arg_str, const offs_t pc);
 static size_t dsp56k_dasm_bcc_2		(const UINT16 op, char* opcode_str, char* arg_str);
-static size_t dsp56k_dasm_bra		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_bra		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str, const offs_t pc);
 static size_t dsp56k_dasm_bra_1		(const UINT16 op, char* opcode_str, char* arg_str, const offs_t pc);
 static size_t dsp56k_dasm_bra_2		(const UINT16 op, char* opcode_str, char* arg_str);
 static size_t dsp56k_dasm_brkc		(const UINT16 op, char* opcode_str, char* arg_str);
@@ -717,7 +717,7 @@ offs_t dsp56k_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 	/* BRA : 0000 0001 0011 11-- xxxx xxxx xxxx xxxx : A-50 */
 	else if (((op & 0xfffc) == 0x013c) && ((op2 & 0x0000) == 0x0000))
 	{
-		size = dsp56k_dasm_bra(op, op2, opcode_str, arg_str);
+		size = dsp56k_dasm_bra(op, op2, opcode_str, arg_str, pc);
 	}
 	/* BRA : 0000 1011 aaaa aaaa : A-50 */
 	else if ((op & 0xff00) == 0x0b00)
@@ -1742,7 +1742,7 @@ static size_t dsp56k_dasm_bcc_1(const UINT16 op, char* opcode_str, char* arg_str
 	decode_cccc_table(BITS(op,0x3c0), M);
 	relativeInt = get_6_bit_signed_value(BITS(op,0x003f));
 	sprintf(opcode_str, "b.%s", M);
-	sprintf(arg_str, "%04x (%d)", (int)pc + relativeInt, relativeInt);
+	sprintf(arg_str, "%04x (%d)", pc + 1 + relativeInt, relativeInt);
 	return 1; 
 }
 
@@ -1759,10 +1759,10 @@ static size_t dsp56k_dasm_bcc_2(const UINT16 op, char* opcode_str, char* arg_str
 }
 
 /* BRA : 0000 0001 0011 11-- xxxx xxxx xxxx xxxx : A-50 */
-static size_t dsp56k_dasm_bra(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
+static size_t dsp56k_dasm_bra(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str, const offs_t pc)
 {
 	sprintf(opcode_str, "bra");
-	sprintf(arg_str, "%d (0x%04x)", op2, op2);
+	sprintf(arg_str, "%d (0x%04x)", (INT16)op2, pc + 2 + op2);
 	return 2;
 }
 
@@ -1770,7 +1770,7 @@ static size_t dsp56k_dasm_bra(const UINT16 op, const UINT16 op2, char* opcode_st
 static size_t dsp56k_dasm_bra_1(const UINT16 op, char* opcode_str, char* arg_str, const offs_t pc)
 {
 	sprintf(opcode_str, "bra");
-	sprintf(arg_str, "%d (0x%02x)", (INT8)BITS(op,0x00ff), pc + (INT8)BITS(op,0x00ff));
+	sprintf(arg_str, "%d (0x%02x)", (INT8)BITS(op,0x00ff), pc + 1 + (INT8)BITS(op,0x00ff));
 	return 1; 
 }
 
@@ -1820,7 +1820,7 @@ static size_t dsp56k_dasm_bscc_1(const UINT16 op, char* opcode_str, char* arg_st
 static size_t dsp56k_dasm_bsr(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str, const offs_t pc)
 {
 	sprintf(opcode_str, "bsr");
-	sprintf(arg_str, "%d (0x%04x)", (INT16)op2, pc + (INT16)op2);
+	sprintf(arg_str, "%d (0x%04x)", (INT16)op2, pc + 2 + (INT16)op2);
 	return (2 | DASMFLAG_STEP_OVER);
 }
 
@@ -2655,7 +2655,6 @@ static void decode_x_memory_data_move_with_short_displacement(const UINT16 op, c
 	char SD[32];
 	char args[32];
 	
-	/* TODO: Does this do the sign properly? */
 	B = (char)(op & 0x00ff);
 	decode_HHH_table(BITS(op2,0x0e00), SD);
 	assemble_reg_from_W_table(BITS(op2,0x0100), args, 'X', SD, B);
