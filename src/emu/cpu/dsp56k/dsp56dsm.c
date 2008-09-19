@@ -74,14 +74,14 @@ static size_t dsp56k_dasm_asl4		(const UINT16 op, char* opcode_str, char* arg_st
 static size_t dsp56k_dasm_asr4		(const UINT16 op, char* opcode_str, char* arg_str);
 static size_t dsp56k_dasm_asr16		(const UINT16 op, char* opcode_str, char* arg_str);
 static size_t dsp56k_dasm_bfop		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
-static size_t dsp56k_dasm_bcc		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_bcc		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str, const offs_t pc);
 static size_t dsp56k_dasm_bcc_1		(const UINT16 op, char* opcode_str, char* arg_str, const offs_t pc);
 static size_t dsp56k_dasm_bcc_2		(const UINT16 op, char* opcode_str, char* arg_str);
 static size_t dsp56k_dasm_bra		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str, const offs_t pc);
 static size_t dsp56k_dasm_bra_1		(const UINT16 op, char* opcode_str, char* arg_str, const offs_t pc);
 static size_t dsp56k_dasm_bra_2		(const UINT16 op, char* opcode_str, char* arg_str);
 static size_t dsp56k_dasm_brkc		(const UINT16 op, char* opcode_str, char* arg_str);
-static size_t dsp56k_dasm_bscc		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_bscc		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str, const offs_t pc);
 static size_t dsp56k_dasm_bscc_1	(const UINT16 op, char* opcode_str, char* arg_str);
 static size_t dsp56k_dasm_bsr		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str, const offs_t pc);
 static size_t dsp56k_dasm_bsr_1		(const UINT16 op, char* opcode_str, char* arg_str);
@@ -702,7 +702,7 @@ offs_t dsp56k_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 	/* Bcc : 0000 0111 --11 cccc xxxx xxxx xxxx xxxx : A-48 */
 	else if (((op & 0xff30) == 0x0730) && ((op2 & 0x0000) == 0x0000))
 	{
-		size = dsp56k_dasm_bcc(op, op2, opcode_str, arg_str);
+		size = dsp56k_dasm_bcc(op, op2, opcode_str, arg_str, pc);
 	}
 	/* Bcc : 0010 11cc ccee eeee : A-48 */
 	else if ((op & 0xfc00) == 0x2c00)
@@ -737,7 +737,7 @@ offs_t dsp56k_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 	/* BScc : 0000 0111 --01 cccc xxxx xxxx xxxx xxxx : A-54 */
 	else if (((op & 0xff30) == 0x0710) && ((op2 & 0x0000) == 0x0000))
 	{
-		size = dsp56k_dasm_bscc(op, op2, opcode_str, arg_str);
+		size = dsp56k_dasm_bscc(op, op2, opcode_str, arg_str, pc);
 	}
 	/* BScc: 0000 0111 RR00 cccc : A-54 */
 	else if ((op & 0xff30) == 0x0700)
@@ -1725,12 +1725,12 @@ static size_t dsp56k_dasm_bfop(const UINT16 op, const UINT16 op2, char* opcode_s
 }
 
 /* Bcc : 0000 0111 --11 cccc xxxx xxxx xxxx xxxx : A-48 */
-static size_t dsp56k_dasm_bcc(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
+static size_t dsp56k_dasm_bcc(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str, const offs_t pc)
 {
 	char M[32];
 	decode_cccc_table(BITS(op,0x000f), M);
 	sprintf(opcode_str, "b.%s", M);
-	sprintf(arg_str, "%04x (%d)", op2, op2);
+	sprintf(arg_str, "%d (0x%04x)", (INT16)op2, pc + 2 + (INT16)op2);
 	return 2;
 }
 
@@ -1742,7 +1742,7 @@ static size_t dsp56k_dasm_bcc_1(const UINT16 op, char* opcode_str, char* arg_str
 	decode_cccc_table(BITS(op,0x3c0), M);
 	relativeInt = get_6_bit_signed_value(BITS(op,0x003f));
 	sprintf(opcode_str, "b.%s", M);
-	sprintf(arg_str, "%04x (%d)", pc + 1 + relativeInt, relativeInt);
+	sprintf(arg_str, "%d (0x%04x)", relativeInt, pc + 1 + relativeInt);
 	return 1; 
 }
 
@@ -1795,12 +1795,12 @@ static size_t dsp56k_dasm_brkc(const UINT16 op, char* opcode_str, char* arg_str)
 }
 
 /* BScc : 0000 0111 --01 cccc xxxx xxxx xxxx xxxx : A-54 */
-static size_t dsp56k_dasm_bscc(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
+static size_t dsp56k_dasm_bscc(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str, const offs_t pc)
 {
 	char M[32];
 	decode_cccc_table(BITS(op,0x000f), M);
 	sprintf(opcode_str, "bs.%s", M);
-	sprintf(arg_str, "%d (0x%04x)", (INT16)(op2), op2);
+	sprintf(arg_str, "%d (0x%04x)", (INT16)op2, pc + 2 + (INT16)op2);
 	return (2 | DASMFLAG_STEP_OVER);	/* probably */
 }
 
