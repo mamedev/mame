@@ -1516,4 +1516,53 @@ void neogeo_cmc50_m1_decrypt(running_machine *machine, UINT16 key)
 
 }
 
+/* the ms5pcb encryption is slightly different, there are 2 possible approachs
+   we can take */
+
+#if 1
+// if using key 0x1543 (same as mslug5) we need a different bitswap here
+int m1_alt_address_scramble(int address/*, UINT16 key*/)
+{
+	int block;
+	int aux;
+	UINT16 key = 0x1543;
+
+	aux = address ^key;
+	aux = BITSWAP16(aux, 11,0,2,5,12,7,4,9,10,8,3,14,15,6,13,1); // only 1 64k block, so...
+	aux ^= m1_address_0_7_xor[(aux>>8)&0xff];
+	aux ^= m1_address_8_15_xor[aux&0xff]<<8;
+	aux = BITSWAP16(aux, 7,15,14,6,5,13,12,4,11,3,10,2,9,1,8,0);
+	return aux;
+}
+#else
+// using key 0xa528, we can rearrange the rom first..
+int m1_alt_address_scramble(int address/*, UINT16 key */)
+{
+	UINT16 key = 0xa528;
+	address = BITSWAP16(address, 1,13,12,4,7,6,2,10,15,5,0,11,8,3,14,9);
+	return m1_address_scramble(address, key);
+}
+#endif
+
+
+void neogeo_ms5pcb_m1_decrypt(running_machine *machine/*, UINT16 key*/)
+{
+	UINT8* rom = memory_region(machine, "audiocrypt");
+	size_t rom_size = 0x80000;
+	UINT8* rom2 = memory_region(machine, "audio");
+
+	UINT8* buffer = malloc_or_die(rom_size);
+
+	UINT32 i;
+
+	for (i=0; i<rom_size; i++)
+	{
+		buffer[i] = rom[m1_alt_address_scramble(i)];
+	}
+
+	memcpy(rom,buffer,rom_size);
+
+	memcpy(rom2,rom,0x10000);
+	memcpy(rom2+0x10000,rom,0x80000);
+}
 
