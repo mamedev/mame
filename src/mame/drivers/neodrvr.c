@@ -5672,10 +5672,14 @@ ROM_START( ms5pcb ) /* Encrypted Set */
 	/* this contains both an ASIA and JAPAN bios, HARDDIP3 on the PCB selects which to use */
 	ROM_LOAD16_WORD_SWAP( "268-bios.bin", 0x00000, 0x80000, CRC(b4590283) SHA1(47047ed5b6062babc0a0bebcc30e4b3f021e115a) )
 
-	/* Encrypted (slightly different encryption on this single board PCB) */
+
+	/* Encrypted */
 	ROM_REGION( 0x80000, "audiocrypt", 0 )
-	ROM_LOAD( "268-m1.bin", 0x00000, 0x10000, CRC(58b107d0) SHA1(cc7fe66ff4f9c026cde4df06f86c848eb21f7af8) )
+	ROM_LOAD( "271-m1.bin", 0x00000, 0x80000, CRC(4a5a6e0e) SHA1(df0f660f2465e1db7be5adfcaf5e88ad61a74a42) )
 	ROM_REGION( 0x90000, "audio", ROMREGION_ERASEFF )
+
+
+	/* Encrypted */
 
 	ROM_Y_ZOOM
 
@@ -7036,7 +7040,7 @@ static DRIVER_INIT( ms5pcb )
 	mslug5_decrypt_68k(machine);
 	svcpcb_gfx_decrypt(machine);
 	kof2000_neogeo_gfx_decrypt(machine, 0x19);
-	neogeo_ms5pcb_m1_decrypt(machine);
+	neogeo_cmc50_m1_decrypt(machine, 0x1543);
 
 	neogeo_fixed_layer_bank_type = 2;
 	svcpcb_s1data_decrypt(machine);
