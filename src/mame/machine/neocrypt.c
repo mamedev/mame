@@ -1523,7 +1523,6 @@ void neogeo_cmc50_m1_decrypt(running_machine *machine, UINT16 key)
 // if using key 0x1543 (same as mslug5) we need a different bitswap here
 int m1_alt_address_scramble(int address/*, UINT16 key*/)
 {
-	int block;
 	int aux;
 	UINT16 key = 0x1543;
 
