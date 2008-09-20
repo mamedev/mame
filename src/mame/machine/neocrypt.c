@@ -15,11 +15,8 @@
       Also contains 'S' (Text Layer) data on these games
       M1 (Z80) rom is also encrypted for CMC50
 
-     the M1 roms (at least for CMC50) appear to contain some additional
-      data at 0xf800.  It is unclear if this is related to the graphic
-      encryption, or possible the custom S1 layer banking.
-
-
+     the M1 roms contain some additional data at 0xf800.  Some of this
+     is said to be related to the C rom encryption.
 
       Later games use additional basic scrambling on top of the standard
       CMC scramble.

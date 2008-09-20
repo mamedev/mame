@@ -3,7 +3,7 @@
     Neo-Geo hardware protection devices
 
     unknown devices
-        ssideki, fatfury2, fatfury3, kof98, mslugx
+        ssideki, fatfury2, kof98 (some versions), mslugx
 
     SMA chip
         kof99, garou, garouo, mslug3, kof2002
