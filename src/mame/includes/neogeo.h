@@ -67,7 +67,7 @@ void samsh5p_decrypt_68k(running_machine *machine);
 void neo_pcm2_snk_1999(running_machine *machine, int value);
 void neo_pcm2_swap(running_machine *machine, int value);
 
-void neogeo_cmc50_m1_decrypt(running_machine *machine, UINT16 key);
+void neogeo_cmc50_m1_decrypt(running_machine *machine);
 
 /*----------- defined in machine/neoprot.c -----------*/
 

@@ -637,8 +637,6 @@ void kof2000_neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
 	address_0_7_xor =    kof2000_address_0_7_xor;
 	neogeo_gfx_decrypt(machine, extra_xor);
 	neogeo_sfix_decrypt(machine);
-
-	/* here I should also decrypt the sound ROM */
 }
 
 
@@ -671,8 +669,6 @@ void cmc50_neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
 	address_16_23_xor2 = kof2000_address_16_23_xor2;
 	address_0_7_xor =    kof2000_address_0_7_xor;
 	neogeo_gfx_decrypt(machine, extra_xor);
-
-	/* here I should also decrypt the sound ROM */
 }
 
 
@@ -1478,7 +1474,23 @@ int m1_address_scramble(int address, UINT16 key)
 }
 
 
-void neogeo_cmc50_m1_decrypt(running_machine *machine, UINT16 key)
+/* The CMC50 hardware does a checksum of the first 64kb of the M1 rom,
+   ,and uses this checksum as the basis of the key with which to decrypt
+   the rom */
+static UINT16 generate_cs16(UINT8 *rom, int size)
+{
+	UINT16 cs16;
+	int i;
+	cs16 = 0x0000;
+	for (i=0;i<size;i++ )
+	{
+		cs16 += rom[i];
+	}
+	return cs16&0xFFFF;
+}
+
+
+void neogeo_cmc50_m1_decrypt(running_machine *machine)
 {
 	UINT8* rom = memory_region(machine, "audiocrypt");
 	size_t rom_size = 0x80000;
@@ -1487,6 +1499,12 @@ void neogeo_cmc50_m1_decrypt(running_machine *machine, UINT16 key)
 	UINT8* buffer = malloc_or_die(rom_size);
 
 	UINT32 i;
+
+	UINT16 cs16=generate_cs16(rom,0x10000);
+	UINT16 key = BITSWAP16(cs16,12,0,2,4,8,15,7,13,10,1,3,6,11,9,14,5)^0xffff;
+
+	/* HACK! -- something is wrong in kf2k3pcb, is the m1 bad? */
+	if (!strcmp(machine->gamedrv->name,"kf2k3pcb")) key = 0x4b64;
 
 	for (i=0; i<rom_size; i++)
 	{
