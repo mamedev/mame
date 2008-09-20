@@ -1503,8 +1503,7 @@ void neogeo_cmc50_m1_decrypt(running_machine *machine)
 	UINT16 cs16=generate_cs16(rom,0x10000);
 	UINT16 key = BITSWAP16(cs16,12,0,2,4,8,15,7,13,10,1,3,6,11,9,14,5)^0xffff;
 
-	/* HACK! -- something is wrong in kf2k3pcb, is the m1 bad? */
-	if (!strcmp(machine->gamedrv->name,"kf2k3pcb")) key = 0x4b64;
+	//printf("key %04x\n",key);
 
 	for (i=0; i<rom_size; i++)
 	{

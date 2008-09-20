@@ -7160,18 +7160,20 @@ static DRIVER_INIT( kf2k3pcb )
 	kf2k3pcb_gfx_decrypt(machine);
 	kof2003biosdecode(machine);
 
-	/* extra little swap on the m1 */
+	neogeo_cmc50_m1_decrypt(machine);
 
+	/* extra little swap on the m1 - this must be performed AFTER the m1 decrypt
+	   or the m1 checksum (used to generate the key) for decrypting the m1 is
+	   incorrect */
 	{
 		int i;
-		UINT8* rom = memory_region(machine, "audiocrypt");
-		for (i=0;i<0x80000;i++)
+		UINT8* rom = memory_region(machine, "audio");
+		for (i=0;i<0x90000;i++)
 		{
 			rom[i] = BITSWAP8(rom[i], 5, 6, 1, 4, 3, 0, 7, 2);
 		}
 
 	}
-	neogeo_cmc50_m1_decrypt(machine);
 
 	kof2000_neogeo_gfx_decrypt(machine, 0x9d);
 	kf2k3pcb_decrypt_s1data(machine);
