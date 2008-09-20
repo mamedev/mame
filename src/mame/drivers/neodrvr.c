@@ -5675,7 +5675,7 @@ ROM_START( ms5pcb ) /* Encrypted Set */
 
 	/* Encrypted */
 	ROM_REGION( 0x80000, "audiocrypt", 0 )
-	ROM_LOAD( "271-m1.bin", 0x00000, 0x80000, CRC(4a5a6e0e) SHA1(df0f660f2465e1db7be5adfcaf5e88ad61a74a42) )
+	ROM_LOAD( "268-m1.bin", 0x00000, 0x80000, CRC(4a5a6e0e) SHA1(df0f660f2465e1db7be5adfcaf5e88ad61a74a42) )
 	ROM_REGION( 0x90000, "audio", ROMREGION_ERASEFF )
 
 
