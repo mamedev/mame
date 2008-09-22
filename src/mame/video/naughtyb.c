@@ -42,7 +42,26 @@ static const rectangle rightvisiblearea =
 	0*8, 28*8-1
 };
 
+static const res_net_decode_info naughtyb_decode_info =
+{
+	2,		/*  two proms          */
+	0,		/*  start at 0         */
+	255,	/*  end at 255         */
+	/*  R,   G,   B,   R,   G,   B */
+	{   0,   0,   0, 256, 256, 256},		/*  offsets */
+	{   0,   2,   1,  -1,   1,   0},		/*  shifts */
+	{0x01,0x01,0x01,0x02,0x02,0x02}		    /*  masks */
+};
 
+static const res_net_info naughtyb_net_info =
+{
+	RES_NET_VCC_5V | RES_NET_VBIAS_5V | RES_NET_VIN_OPEN_COL,
+	{
+		{ RES_NET_AMP_NONE, 130, 270, 2, { 270, 1 } }, /* no resistor for bit1 */
+		{ RES_NET_AMP_NONE, 130, 270, 2, { 270, 1 } }, /* no resistor for bit1 */
+		{ RES_NET_AMP_NONE, 130, 270, 2, { 270, 1 } }  /* no resistor for bit1 */
+	}
+};
 
 /***************************************************************************
 
@@ -50,7 +69,8 @@ static const rectangle rightvisiblearea =
 
   Naughty Boy has two 256x4 palette PROMs, one containing the high bits and
   the other the low bits (2x2x2 color space).
-  The palette PROMs are connected to the RGB output this way:
+  The palette PROMs are connected to a 7407 (hex open collector buffer),
+  which in turn is connected to the RGB output this way:
 
   bit 3 --
         -- 270 ohm resistor  -- GREEN
@@ -62,48 +82,22 @@ static const rectangle rightvisiblearea =
         -- BLUE
   bit 0 -- RED
 
-  plus 270 ohm pullup and pulldown resistors on all lines
+  plus 130 ohm pullup and 270 ohm pulldown resistors on all lines
 
 ***************************************************************************/
+
 PALETTE_INIT( naughtyb )
 {
-	/* note: there is no resistor on second PROM so we define second resistance as 0 */
-	static const int resistances[2] = { 270, 0 };
-	double rweights[2], gweights[2], bweights[2];
+	rgb_t	*rgb;
 	int i;
 
-	/* compute the color output resistor weights */
-	compute_resistor_weights(0,	255, -1.0,
-			2, resistances, rweights, 270, 270,
-			2, resistances, gweights, 270, 270,
-			2, resistances, bweights, 270, 270);
+	rgb = compute_res_net_all(color_prom, &naughtyb_decode_info, &naughtyb_net_info);
 
 	for (i = 0; i < 0x100; i++)
-	{
-		int bit0, bit1;
-		int r, g, b;
-		int swapped_i;
+		palette_set_color(machine, BITSWAP8(i,5,7,6,2,1,0,4,3), rgb[i]);
 
-		/* red component */
-		bit0 = (color_prom[i | 0x000] >> 0) & 0x01;
-		bit1 = (color_prom[i | 0x100] >> 0) & 0x01;
-		r = combine_2_weights(rweights, bit0, bit1);
-
-		/* green component */
-		bit0 = (color_prom[i | 0x000] >> 2) & 0x01;
-		bit1 = (color_prom[i | 0x100] >> 2) & 0x01;
-		g = combine_2_weights(gweights, bit0, bit1);
-
-		/* blue component */
-		bit0 = (color_prom[i | 0x000] >> 1) & 0x01;
-		bit1 = (color_prom[i | 0x100] >> 1) & 0x01;
-		b = combine_2_weights(bweights, bit0, bit1);
-
-		swapped_i = BITSWAP8(i,5,7,6,2,1,0,4,3);
-		palette_set_color(machine, swapped_i, MAKE_RGB(r, g, b));
-	}
+	palette_normalize_range(machine->palette, 0, 255, 0, 255);
 }
-
 
 
 /***************************************************************************
