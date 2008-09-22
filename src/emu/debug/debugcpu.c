@@ -55,6 +55,7 @@ struct _debugger_private
 	debug_cpu_info	cpuinfo[MAX_CPU];
 	debug_cpu_info *livecpu;
 	debug_cpu_info *visiblecpu;
+	debug_cpu_info *breakcpu;
 
 	UINT8			within_instruction_hook;
 	UINT8			vblank_occurred;
@@ -424,30 +425,38 @@ void debug_cpu_start_hook(running_machine *machine, int cpunum, attotime endtime
 	/* update the target execution end time */
 	info->endexectime = endtime;
 
-	/* if a VBLANK occurred, check on things */
-	if (global.vblank_occurred && global.execution_state != EXECUTION_STATE_STOPPED)
+	/* if we're running, do some periodic updating */
+	if (global.execution_state != EXECUTION_STATE_STOPPED)
 	{
-		global.vblank_occurred = FALSE;
-
-		/* if we were waiting for a VBLANK, signal it now */
-		if ((info->flags & DEBUG_FLAG_STOP_VBLANK) != 0)
-		{
-			global.execution_state = EXECUTION_STATE_STOPPED;
-			debug_console_printf("Stopped at VBLANK\n");
-		}
-
-		/* check for debug keypresses */
-		else if (ui_input_pressed(machine, IPT_UI_DEBUG_BREAK))
-		{
-			global.execution_state = EXECUTION_STATE_STOPPED;
-			debug_console_printf("User-initiated break\n");
-		}
-
-		/* while we're here, check for a periodic update */
-		else if (info == global.visiblecpu && osd_ticks() > global.last_periodic_update_time + osd_ticks_per_second()/4)
+		/* check for periodic updates */
+		if (info == global.visiblecpu && osd_ticks() > global.last_periodic_update_time + osd_ticks_per_second()/4)
 		{
 			debug_view_update_all();
 			global.last_periodic_update_time = osd_ticks();
+		}
+		
+		/* check for pending breaks */
+		else if (info == global.breakcpu)
+		{
+			global.execution_state = EXECUTION_STATE_STOPPED;
+			global.breakcpu = NULL;
+		}
+
+		/* if a VBLANK occurred, check on things */
+		if (global.vblank_occurred)
+		{
+			global.vblank_occurred = FALSE;
+
+			/* if we were waiting for a VBLANK, signal it now */
+			if ((info->flags & DEBUG_FLAG_STOP_VBLANK) != 0)
+			{
+				global.execution_state = EXECUTION_STATE_STOPPED;
+				debug_console_printf("Stopped at VBLANK\n");
+			}
+
+			/* check for debug keypresses */
+			else if (ui_input_pressed(machine, IPT_UI_DEBUG_BREAK))
+				debug_cpu_halt_on_next_instruction(machine, -1, "User-initiated break\n");
 		}
 	}
 
@@ -593,6 +602,7 @@ void debug_cpu_instruction_hook(running_machine *machine, offs_t curpc)
 
 		/* reset any transient state */
 		reset_transient_flags(machine);
+		global.breakcpu = NULL;
 
 		/* update all views */
 		debug_view_update_all();
@@ -928,17 +938,35 @@ const debug_cpu_info *debug_get_cpu_info(int cpunum)
     the debugger on the next instruction
 -------------------------------------------------*/
 
-void debug_cpu_halt_on_next_instruction(running_machine *machine, const char *fmt, ...)
+void debug_cpu_halt_on_next_instruction(running_machine *machine, int cpunum, const char *fmt, ...)
 {
+	debug_cpu_info *info;
 	va_list arg;
+	
+	/* pick the best CPU to land on */
+	if (cpunum != -1)
+		info = &global.cpuinfo[cpunum];
+	else if (global.visiblecpu != NULL)
+		info = global.visiblecpu;
+	else 
+		info = global.livecpu;
+
+	/* if something is pending on this CPU already, ignore this request */
+	if (info != NULL && info == global.breakcpu)
+		return;
 
 	va_start(arg, fmt);
 	debug_console_vprintf(fmt, arg);
 	va_end(arg);
 
-	global.execution_state = EXECUTION_STATE_STOPPED;
-	if (global.livecpu != NULL)
-		compute_debug_flags(machine, global.livecpu);
+	if (info == global.livecpu)
+	{
+		global.execution_state = EXECUTION_STATE_STOPPED;
+		if (global.livecpu != NULL)
+			compute_debug_flags(machine, global.livecpu);
+	}
+	else
+		global.breakcpu = info;
 }
 
 

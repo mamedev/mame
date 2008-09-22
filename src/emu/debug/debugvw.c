@@ -585,7 +585,7 @@ void debug_view_end_update(debug_view *view)
 			view->update_pending = 0;
 
 			/* resize the viewdata if needed */
-			size = view->visible_rows*view->visible_cols;
+			size = view->visible_rows * view->visible_cols;
 			if (size > view->viewdata_size)
 			{
 				view->viewdata_size = size;
