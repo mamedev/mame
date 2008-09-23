@@ -194,8 +194,10 @@ static void adpcm_int(running_machine *machine, int data)
  *************************************/
 
 /* All 6 (3*2) AY-3-8910 outputs are tied together
- * and put with 470 KOhm to gnd.
- * The following is a approximation */
+ * and put with 470 Ohm to gnd.
+ * The following is a approximation, since
+ * it does not take cross-chip mixing effects into account.
+ */
 
 static const ay8910_interface irem_ay8910_interface_1 =
 {
