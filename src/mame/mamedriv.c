@@ -4225,6 +4225,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( firetrap )	/* (c) 1986 Data East USA (US) */
 	DRIVER( firetpbl )	/* bootleg */
 	DRIVER( metlclsh )	/* (c) 1985 Data East */
+	DRIVER( chanbara )	/* (c) 1985 Data East */
 	DRIVER( brkthru )	/* (c) 1986 Data East USA (US) */
 	DRIVER( brkthruj )	/* (c) 1986 Data East Corporation (Japan) */
 	DRIVER( forcebrk )	/* (c) 1986 Data East Corporation (Japan) */

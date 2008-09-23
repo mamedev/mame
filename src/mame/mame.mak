@@ -628,6 +628,7 @@ $(MAMEOBJ)/dataeast.a: \
 	$(DRIVERS)/boogwing.o $(VIDEO)/boogwing.o \
 	$(DRIVERS)/brkthru.o $(VIDEO)/brkthru.o \
 	$(DRIVERS)/btime.o $(MACHINE)/btime.o $(VIDEO)/btime.o \
+	$(DRIVERS)/chanbara.o \
 	$(DRIVERS)/bwing.o $(VIDEO)/bwing.o \
 	$(DRIVERS)/cbuster.o $(VIDEO)/cbuster.o \
 	$(DRIVERS)/cninja.o $(VIDEO)/cninja.o \
