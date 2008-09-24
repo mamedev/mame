@@ -680,12 +680,17 @@ INPUT_PORTS_END
 
    Port A of both chips is connected to a banking control
    register.
+   
+   All 6 (3*2) AY-3-8910/12 outputs are tied together
+   and put with 1000 Ohm to gnd.
+   The following is a approximation, since
+   it does not take cross-chip mixing effects into account.
 */
 
 static const ay8910_interface ay8910_config =
 {
-	AY8910_LEGACY_OUTPUT,
-	AY8910_DEFAULT_LOADS,
+	AY8910_SINGLE_OUTPUT,
+	{1000, 0, 0},
 	leland_sound_port_r,
 	0,
 	leland_sound_port_w,
