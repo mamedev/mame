@@ -40,7 +40,41 @@ static struct vram_state_data vram_state[2];
 static UINT16 xscroll;
 static UINT16 yscroll;
 static UINT8 gfxbank;
+static UINT16 last_scanline;
 
+static timer_t scanline_timer;
+
+/*************************************
+ *
+ *  Scanline callback
+ *
+ *************************************/
+
+static TIMER_CALLBACK( scanline_callback )
+{
+	int scanline = param;
+
+	/* update the DACs */
+	
+	if (!(leland_dac_control & 0x01))
+		leland_dac_update(0, leland_video_ram[(last_scanline) * 256 + 160]);
+
+	if (!(leland_dac_control & 0x02))
+		leland_dac_update(1, leland_video_ram[(last_scanline) * 256 + 161]);
+	
+	last_scanline = scanline;
+
+	scanline = (scanline+1) % 256;
+	
+	if (scanline == 0)
+	{
+		/* turn off the DACs at the start of the frame */
+		leland_dac_control = 3;
+	}
+
+	/* come back at the next appropriate scanline */
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
+}
 
 
 /*************************************
@@ -56,6 +90,11 @@ static VIDEO_START( leland )
 
 	/* reset videoram */
 	memset(leland_video_ram, 0, VRAM_SIZE);
+	
+	/* scanline timer */
+	scanline_timer = timer_alloc(scanline_callback, NULL);
+	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+
 }
 
 
@@ -369,20 +408,6 @@ READ8_HANDLER( ataxx_svram_port_r )
 
 /*************************************
  *
- *  Resets the DAC
- *
- *************************************/
-
-static TIMER_CALLBACK( dac_reset )
-{
-	/* turn off the DACs at the start of the frame */
-	leland_dac_control = 3;
-}
-
-
-
-/*************************************
- *
  *  ROM-based refresh routine
  *
  *************************************/
@@ -442,17 +467,7 @@ static VIDEO_UPDATE( leland )
 			*dst++ = pen;
 		}
 
-		/* also update the DACs */
-		if (!(leland_dac_control & 0x01))
-			leland_dac_update(0, leland_video_ram[y * 256 + 160]);
-
-		if (!(leland_dac_control & 0x02))
-			leland_dac_update(1, leland_video_ram[y * 256 + 161]);
 	}
-
-	/* set a timer to go off at the top of the frame */
-	if (cliprect->max_y == video_screen_get_visible_area(screen)->max_y)
-		timer_set(video_screen_get_time_until_pos(screen, 0, 0), NULL, 0, dac_reset);
 
 	return 0;
 }
@@ -517,18 +532,7 @@ static VIDEO_UPDATE( ataxx )
 
 			*dst++ = pen;
 		}
-
-		/* also update the DACs */
-		if (!(leland_dac_control & 0x01))
-			leland_dac_update(0, leland_video_ram[y * 256 + 160]);
-
-		if (!(leland_dac_control & 0x02))
-			leland_dac_update(1, leland_video_ram[y * 256 + 161]);
 	}
-
-	/* set a timer to go off at the top of the frame */
-	if (cliprect->max_y == video_screen_get_visible_area(screen)->max_y)
-		timer_set(video_screen_get_time_until_pos(screen, 0, 0), NULL, 0, dac_reset);
 
 	return 0;
 }
