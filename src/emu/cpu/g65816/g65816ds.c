@@ -250,8 +250,8 @@ unsigned g65816_disassemble(char* buff, unsigned int pc, unsigned int pb, const 
 		case RELW:
 		case PER :
 			var = read_16(address+1);
-			sprintf(ptr, " %06x (%s)", pb | ((pc + 1 + var)&0xffff), int_16_str(var));
 			length += 2;
+			sprintf(ptr, " %06x (%s)", pb | ((pc + length + var)&0xffff), int_16_str(var));
 			break;
 		case IMM :
 			if((opcode->flag == M && !m_flag) || (opcode->flag == X && !x_flag))
