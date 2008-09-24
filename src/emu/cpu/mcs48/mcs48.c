@@ -276,9 +276,10 @@ INLINE void pull_pc(void)
 INLINE void execute_add(UINT8 dat)
 {
 	UINT16 temp = A + dat;
+	UINT16 temp4 = (A & 0x0f) + (dat & 0x0f);
 
 	PSW &= ~(C_FLAG | A_FLAG);
-	PSW |= ((A ^ temp) << 2) & A_FLAG;
+	PSW |= (temp4 << 2) & A_FLAG;
 	PSW |= (temp >> 1) & C_FLAG;
 	A = temp;
 }
@@ -292,9 +293,10 @@ INLINE void execute_add(UINT8 dat)
 INLINE void execute_addc(UINT8 dat)
 {
 	UINT16 temp = A + dat + CARRYIN;
+	UINT16 temp4 = (A & 0x0f) + (dat & 0x0f) + CARRYIN;
 
 	PSW &= ~(C_FLAG | A_FLAG);
-	PSW |= ((A ^ temp) << 2) & A_FLAG;
+	PSW |= (temp4 << 2) & A_FLAG;
 	PSW |= (temp >> 1) & C_FLAG;
 	A = temp;
 }
