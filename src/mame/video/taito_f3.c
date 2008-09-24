@@ -245,7 +245,7 @@ static const struct F3config *f3_game_config;
 static const struct F3config f3_config_table[] =
 {
 	/* Name    Extend  Lag   Bpp */
-	{ RINGRAGE,  0,     2,   5, 6 },
+	{ RINGRAGE,  0,     2,   4, 4 },
 	{ ARABIANM,  0,     2,   5, 5 },	/* sprites 1200-120F contain 6bpp pixels but this seems to be a data error */
 	{ RIDINGF,   1,     1,   4, 4 },
 	{ GSEEKER,   0,     1,   4, 4 },
@@ -270,11 +270,11 @@ static const struct F3config f3_config_table[] =
 	{ KTIGER2,   0,     0,   4, 4 },
 	{ BUBBLEM,   1,     1,   4, 5 },
 	{ CLEOPATR,  0,     1,   4, 6 },
-	{ PBOBBLE3,  0,     1,   4, 6 },
+	{ PBOBBLE3,  0,     1,   4, 4 },
 	{ ARKRETRN,  1,     1,   5, 6 },
 	{ KIRAMEKI,  0,     1,   5, 6 },
 	{ PUCHICAR,  1,     1,   5, 6 },
-	{ PBOBBLE4,  0,     1,   4, 6 },
+	{ PBOBBLE4,  0,     1,   4, 4 },
 	{ POPNPOP,   1,     1,   6, 6 },
 	{ LANDMAKR,  1,     1,   5, 6 },
 	{0}
@@ -690,8 +690,8 @@ VIDEO_START( f3 )
 	tilemap_set_transparent_pen(vram_layer,0);
 	tilemap_set_transparent_pen(pixel_layer,0);
 
-	// Palettes have 4 bpp indexes despite up to 6 bpp data. The unused
-	// top bits in the gfx data are cleared later.
+	/* Palettes have 4 bpp indexes despite up to 6 bpp data. The unused */
+	/* top bits in the gfx data are cleared later.                      */
 	machine->gfx[1]->color_granularity=16;
 	machine->gfx[2]->color_granularity=16;
 
