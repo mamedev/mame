@@ -42,7 +42,7 @@ static UINT16 yscroll;
 static UINT8 gfxbank;
 static UINT16 last_scanline;
 
-static timer_t scanline_timer;
+static emu_timer *scanline_timer;
 
 /*************************************
  *
