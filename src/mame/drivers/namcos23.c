@@ -494,6 +494,241 @@ Notes:
       ADM485   - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
 */
 
+/*
+Rapid River
+Namco, 1997
+
+This game runs on hardware called "GORGON". It appears to be similar to
+System 23 but the PCBs are slightly larger.
+
+The system comprises Main PCB, ROM PCB and I/O PCB all located inside
+a metal box with 3 separate power supplies for 5V, 12V and 3.3V. Main 
+input power is 115V.
+The game is controlled by rotating a paddle (for thrust) and turning it
+sideways (moves left/right).
+The rotation action is done with a 5K potentiometer whereby the thrust 
+is achieved by moving the pot from full left to full right continuously.
+The left/right turning movement is just another 5K potentiometer connected
+to the column of the paddle center shaft.
+There are also some buttons just for test mode, including SELECT, UP & DOWN
+The player's seat has movement controlled by a compressor and several 
+potentiometers. On bootup, the system tests the seat movement and displays 
+a warning if it's not working. Pressing START allows the game to continue
+and function normally without the seat movement.
+
+
+Main PCB
+--------
+
+8664960102 (8664970102) GORGON MAIN PCB
+|------------------------------------------------------------------------------------------------------|
+|                                   J4                       J5                         J6             |
+|                              |---------|           |---------| |------| |---------|                  |
+|         |---------| |------| |         |           |         | |C401  | |         |HM534251 HM534251 |
+| CXD1178Q|         | |C381  | |  C374   |  |------| |  C417   | |      | |  304    |HM534251 HM534251 |
+|         |  C404   | |      | |         |  |C435  | |         | |------| |         |HM534251 HM534251 |
+|         |         | |------| |         |  |      | |         | |------| |         |                  |
+|         |         |          |---------|  |------| |---------| |C400  | |---------|                  |
+|         |---------|     |---------|       |------|             |      | |---------|                  |
+|                         |         |       |C435  |    341256   |------| |         |HM534251 HM534251 |
+|                         |  C397   |       |      |             |------| |  304    |HM534251 HM534251 |
+|  341256 341256  341256  |         |       |------|    341256   |C401  | |         |HM534251 HM534251 |
+|  M5M51008       341256  |         |     |---------|            |      | |         |                  |
+|                         |---------|     |         | |------|   |------| |---------|                  |
+|  M5M51008       341256         |------| |  C403   | |C406  |   |------| |---------|                  |
+|ADM485              |---------| |C379  | |         | |      |   |C400  | |         |HM534251 HM534251 |
+|                    |         | |      | |         | |------|   |      | |  304    |HM534251 HM534251 |
+|    M5M51008        |  C300   | |------| |---------|            |------| |         |HM534251 HM534251 |
+|                    |         | LH540204  LH540204              |------| |         |                  |
+|    M5M51008        |         |341256                 |------|  |C401  | |---------|                  |
+|J1   HCPL0611       |---------|341256                 |C407  |  |      | |---------|                  |
+|         DS8921                  PST575  PST575       |      |  |------| |         |                  |
+|  DS8921                                              |------|  |------| |  304    |HM534251 HM534251 |
+|                 M5M51008                                       |C400  | |         |HM534251 HM534251 |
+|       CY7C128             CY2291S                              |      | |         |                  |
+|         |------|M5M51008  14.31818MHz                          |------| |---------|                  |
+|         |C422  |          J9           M5M5256                 |------| |---------|         3V_BATT  |
+|         |      |341256                                         |C400  | |         |                  |
+|         |------|341256                                         |      | |  C399   |341256  LEDS(8)   |
+|                                   |------|      |--------|     |------| |         |341256            |
+|                                   |C352  |      |ALTERA  |     |------| |         |                  |
+|  ADM485        DSW1(2)   |------| |      |      |EPM7128 |     |C401  | |---------| DSW3(2)   DSW5(8)|
+|    2061ASC               |C416  | |------|      |        |     |      |     |---------| |---------|  |
+|      14.7456MHz          |      |               |--------|     |------|     |         | |NKK      |  |
+|PAL             |-----|   |------|    |------|                   D4516161    |  C413   | |NR4650   |  |
+|                |H8/  |               |C361  |                   D4516161    |         | |LQF-133  |  |
+|                |3002 |               |      |LC321664                       |         | |         |  |
+|  J10           |-----|               |------|    J8                         |---------| |---------|  |
+|------------------------------------------------------------------------------------------------------|
+Notes:
+      NKK NR4650 - R4600-based 64bit RISC CPU (Main CPU, QFP208, clock input source = CY2291S)
+      H8/3002  - Hitachi H8/3002 HD6413002F17 (Sound CPU, QFP100, running at 14.7456MHz)
+      EPM7128  - Altera EPM7128 FPGA labelled 'GOR-M1' (PLCC84)
+      PAL      - PALCE16V8H stamped 'GOR-M3' (PLCC20)
+      HM534251 - Hitachi HM534251 256k x4 Dynamic Video RAM (SOJ28)
+      N341256  - NKK 32k x8 SRAM (SOJ28)
+      M5M5256  - Mitsubishi 32k x8 SRAM (SOP28)
+      D4516161 - NEC uPD4516161AG5-A80 1M x16 (16MBit) SDRAM (SSOP50)
+      LC321664 - Sanyo 64k x16 EDO DRAM (SOJ40)
+      M5M51008 - Mitsubishi 128k x8 SRAM (SOP32)
+      CY7C128  - Cypress 2k x8 SRAM (SOJ28)
+      LH540204 - Sharp CMOS 4096 x 9 Asynchronous FIFO (PLCC32)
+      2061ASC-1- IC Designs 2061ASC-1 programmable clock generator (SOIC16)
+      DS8921   - Dallas Semiconductor DS8921 RS-422/423 Differential Line Driver and Receiver Pair (SOIC8)
+      HCPL0611 - Fairchild HCPL0611 High Speed 10MBits/sec Logic Gate Optocoupler (SOIC8)
+      ADM485   - Analog Devices ADM485 5V Low Power EIA RS-485 Transceiver (SOIC8)
+      PST575   - System Reset IC (SOIC8)
+      CXD1178Q - Sony CXD1178Q 8-bit RGB 3-channel D/A converter (QFP48)
+      J1       - 64 pin connector for connection of I/O board
+      J4/J5/J6 \
+      J8/J9    / Custom NAMCO connectors for connection of MEM(M1) PCB
+      J10      - Custom NAMCO connector for MSPM(FR) PCB
+      
+
+      Namco Custom ICs
+      ----------------
+      C300 (QFP160)
+      304  (x4, QFP120)
+      C352 (QFP100)
+      C361 (QFP120)
+      C374 (QFP160)
+      C379 (QFP64)
+      C381 (QFP144)
+      C397 (QFP160)
+      C399 (QFP160)
+      C400 (QFP100)
+      C401 (x4, QFP64)
+      C403 (QFP136)
+      C404 (QFP208)
+      C406 (QFP120)
+      C407 (QFP64)
+      C413 (QFP208)
+      C416 (QFP176)
+      C417 (QFP208)
+      C422 (QFP64)
+      C435 (x2, TQFP144)
+
+
+Program ROM PCB
+---------------
+
+MSPM(FR) PCB 8699015200 (8699015100)
+|--------------------------|
+|            J1            |
+|                          |
+|  IC3               IC1   |
+|                          |
+|                          |
+|                    IC2   |
+|--------------------------|
+Notes:
+      J1 -  Connector to plug into Main PCB
+      IC1 \
+      IC2 / Main Program  (Fujitsu 29F016 16MBit FlashROM, TSOP48)
+      IC3 - Sound Program (Fujitsu 29F400T 4MBit FlashROM, TSOP48)
+
+      Games that use this PCB include...
+
+      Game           Code and revision
+      --------------------------------
+      Rapid River    RD3 Ver.C
+
+
+ROM PCB
+-------
+
+MEM(M1) PCB
+8664960202 (8664970202)
+|--------------------------------------------------------|
+|    J2(TEXTURE)        J3(POINT)           J5(SPRITE)   |
+| PAL1                                                   |
+|                                                        |
+|                                                        |
+|                                                        |
+| CCRL.11A                                               |
+|      CCRL.11E  PT3L.12J PT3H.12L  SPRLL.12P SPRLL.12T  |
+| CCRH.11B                                               |
+|      CCRH.11F                                          |
+|                PT2L.11J PT2H.11L  SPRLM.11P SPRLM.11T  |
+|                                                        |
+|                                                        |
+|                PT1L.10J PT1H.10L  SPRUM.10P SPRUM.10T  |
+|   PAL2        PAL3                                     |
+|                                                        |
+|                PT0L.9J  PT0H.9L   SPRUU.9P  SPRUU.9T   |
+|                                   JP7       JP9        |
+|                                   JP6       JP8        |
+| CGLL.8B     CGLL.8F                                    |
+|                                                        |
+|                                                        |
+| CGLM.7B     CGLM.7F                                    |
+|      JP2    JP4                                        |
+|      JP1    JP3                                        |
+| CGUM.6B     CGUM.6F                                    |
+|                                          J1(WAVE)      |
+|                                                        |
+| CGUU.5B     CGUU.5F                      WAVEH.3S      |
+|                                                        |
+|                    MTBH.5J               WAVEL.2S      |
+|                    MTAH.3J                      JP5    |
+|                    MTBL.2J                             |
+|                    MTAL.1J    KEYCUS                   |
+|                                                        |
+|                    J4(MOTION)                          |
+|--------------------------------------------------------|
+Notes:
+      PAL1 - PALCE16V8H stamped 'SS22M1' (PLCC20)
+      PAL2 - PALCE20V8H stamped 'SS22M2' (PLCC32)
+      PAL3 - PALCE20V8H stamped 'SS22M2' (PLCC32)
+      KEYCUS - MACH211 CPLD stamped 'KC012' (PLCC44)
+      J1->J5 - Custom NAMCO connectors for joining ROM PCB to Main PCB
+      JP1/JP2 \
+      JP3/JP4 |
+      JP5     | Jumpers to set ROM sizes (32M/64M)
+      JP6/JP7 |
+      JP8/JP9 /
+      
+      ROMs
+      ----
+           PT*  - Point ROMs, sizes configurable to either 16M or 32M (SOP44)
+           MT*  - Motion ROMs, sizes configurable to either 32M or 64M (SOP44)
+           CG*  - Texture ROMs, sizes configurable to either 32M or 64M (SOP44)
+           CCR* - Texture Tilemap ROMs, sizes fixed at 16M (SOP44)
+           SPR* - Sprite ROMs, sizes configurable to either 32M or 64M (SOP44)
+           WAVE*- Wave ROMs, sizes configurable to either 32M or 64M (SOP44)
+           
+I/O PCB
+-------
+
+V187 ASCA-2A PCB 
+2477960102 (2477970102)
+|--------------------------------------------------------|
+|                   J105                                 |
+|                           |-------|        14.7456MHz  |
+|   J104                    |ALTERA |    ADM485   PST592 |
+|                           |EPM7064|     |-------|      |
+|                           |       |     |       |      |
+|                           |-------|     | C78   |      |
+|     LC78815                             |       |      |
+|                                         |-------|      |
+|     MB87078                              |---|         |
+| LA4705                                   |IC1| 62256   |
+|                                          |---|         |
+|         J101                J102                       |
+|--------------------------------------------------------|
+Notes:
+      IC1  - Atmel AT29C020 2MBit EEPROM labelled 'ASCA1 I/O-A' (PLCC32)
+      C78  - Namco Custom MCU, positively identified as a Hitachi H8/3334 (PLCC84)
+      EPM7064 - Altera EPM7064LC68-15 FPGA, labelled 'ASCA DR0' (PLCC68)
+      PST592 - System Reset IC (SOIC4)
+      ADM485 - Analog Devices +ADM485 5V Low Power EIA RS-485 Transceiver (SOIC8)
+      MB87078 - Fujitsu MB87078 Electronic Volume Control IC (SOIC24)
+      LC78815 - Sanyo LM78815 2-Channel 16-Bit D/A Converter (SOIC20)
+      J101 - 34 pin flat cable connector for filter board
+      J102 - 50 pin flat cable connector for filter board
+      J104 - 8 pin power connector (+5V, +12V, +3.3V)
+      J105 - 64 pin connector for connection of Main PCB
+*/
 
 #include "driver.h"
 #include "cpu/mips/mips3.h"
@@ -1035,7 +1270,7 @@ static INTERRUPT_GEN( namcos23_interrupt )
 static MACHINE_DRIVER_START( gorgon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", R4650BE, 166000000)
+	MDRV_CPU_ADD("main", R4650BE, 133000000)
 	MDRV_CPU_CONFIG(config)
 	MDRV_CPU_PROGRAM_MAP(gorgon_map, 0)
 
@@ -1278,7 +1513,7 @@ ROM_START( timcrs2b )
         ROM_LOAD( "tss1waveh.2a", 0x800000, 0x800000, CRC(5c8758b4) SHA1(b85c8f6869900224ef83a2340b17f5bbb2801af9) )
 ROM_END
 
-ROM_START( gp500 )
+ROM_START( 500gp )
 	/* r4650-generic-xrom-generic: NMON 1.0.8-sys23-19990105 P for SYSTEM23 P1 */
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
         ROM_LOAD16_BYTE( "5gp3verc.2",   0x000000, 0x200000, CRC(e2d43468) SHA1(5e861dd223c7fa177febed9803ac353cba18e19d) )
@@ -1404,6 +1639,6 @@ ROM_END
 GAME( 1997, rapidrvr, 0,      gorgon, 0, ss23, ROT0, "Namco", "Rapid River (RD3 Ver. C)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1997, timecrs2, 0,         s23, 0, ss23, ROT0, "Namco", "Time Crisis 2 (TSS3 Ver. B)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1997, timcrs2b, timecrs2,  s23, 0, ss23, ROT0, "Namco", "Time Crisis 2 (TSS2 Ver. B)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
-GAME( 1999, gp500,    0,        ss23, 0, ss23, ROT0, "Namco", "GP500", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
+GAME( 1999, 500gp,    0,        ss23, 0, ss23, ROT0, "Namco", "500GP", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1999, finfurl2, 0,        ss23, 0, ss23, ROT0, "Namco", "Final Furlong 2 (World)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1999, finfrl2j, finfurl2, ss23, 0, ss23, ROT0, "Namco", "Final Furlong 2 (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )

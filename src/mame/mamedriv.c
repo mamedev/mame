@@ -864,7 +864,7 @@ const game_driver * const drivers[] =
 	DRIVER( rapidrvr )	/* (c) 1997 */
 	DRIVER( timecrs2 )	/* (c) 1997 */
 	DRIVER( timcrs2b )	/* (c) 1997 */
-	DRIVER( gp500 )		/* (c) 1999 */
+	DRIVER( 500gp )		/* (c) 1999 */
 	DRIVER( finfurl2 )	/* (c) 1999 */
 	DRIVER( finfrl2j )	/* (c) 1999 */
 

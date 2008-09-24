@@ -36,6 +36,27 @@
 
     0x05 0xFF 0xFF 0xFF 0xFF 0x02
 
+    CPUID info:
+    Original set:
+
+	CPUID Level:       EAX:           EBX:           ECX:           EDX:
+	00000000       00000003       756E6547       6C65746E       49656E69
+	00000001       0000068A       00000002       00000000       0387F9FF
+	00000002       03020101       00000000       00000000       0C040882
+	00000003       00000000       00000000       CA976D2E       000082F6
+	80000000       00000000       00000000       CA976D2E       000082F6
+	C0000000       00000000       00000000       CA976D2E       000082F6
+
+
+    Version 2:
+	CPUID Level:       EAX:           EBX:           ECX:           EDX:
+	00000000       00000003       756E6547       6C65746E       49656E69
+	00000001       0000068A       00000002       00000000       0387F9FF
+	00000002       03020101       00000000       00000000       0C040882
+	00000003       00000000       00000000       B8BA1941       00038881
+	80000000       00000000       00000000       B8BA1941       00038881
+	C0000000       00000000       00000000       B8BA1941       00038881
+
 */
 
 #include "driver.h"
@@ -735,7 +756,7 @@ static DRIVER_INIT( gamecstl )
 // not the correct BIOS, f205v owes me a dump of it...
 ROM_START(gamecstl)
 	ROM_REGION32_LE(0x40000, "user1", 0)
-	ROM_LOAD("p5tx-la.bin", 0x00000, 0x40000, BAD_DUMP CRC(072e6d51) SHA1(70414349b37e478fc28ecbaba47ad1033ae583b7))
+	ROM_LOAD( "bios.bin",     0x000000, 0x040000, CRC(27834ce9) SHA1(134c546dd75138c6f4bc5729b40e20e118454df9) )
 
 	ROM_REGION(0x08100, "gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
@@ -746,7 +767,7 @@ ROM_END
 
 ROM_START(gamecst2)
 	ROM_REGION32_LE(0x40000, "user1", 0)
-	ROM_LOAD("p5tx-la.bin", 0x00000, 0x40000, BAD_DUMP CRC(072e6d51) SHA1(70414349b37e478fc28ecbaba47ad1033ae583b7))
+	ROM_LOAD( "bios.bin",     0x000000, 0x040000, CRC(27834ce9) SHA1(134c546dd75138c6f4bc5729b40e20e118454df9) )
 
 	ROM_REGION(0x08100, "gfx1", 0)
 	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
