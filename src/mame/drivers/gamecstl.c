@@ -744,7 +744,19 @@ ROM_START(gamecstl)
 	DISK_IMAGE( "gamecstl", 0, MD5(501ddbebb530b8fd67eb64a4a2de3e35) SHA1(2477468ef1c1d4529057064a319ebfe9fd8facd7) )
 ROM_END
 
+ROM_START(gamecst2)
+	ROM_REGION32_LE(0x40000, "user1", 0)
+	ROM_LOAD("p5tx-la.bin", 0x00000, 0x40000, BAD_DUMP CRC(072e6d51) SHA1(70414349b37e478fc28ecbaba47ad1033ae583b7))
+
+	ROM_REGION(0x08100, "gfx1", 0)
+	ROM_LOAD("cga.chr",     0x00000, 0x01000, CRC(42009069) SHA1(ed08559ce2d7f97f68b9f540bddad5b6295294dd))
+
+	DISK_REGION( "ide" )
+	DISK_IMAGE( "gamecst2", 0, MD5(ef880a411521e0c6e10f715ad9dd796e) SHA1(8243d7d2eacedf358334821c9401c1b945524a69) )
+ROM_END
+
 /*****************************************************************************/
 
 GAME(2002, gamecstl, 0,	gamecstl, gamecstl, gamecstl,	ROT0,   "Cristaltec",  "GameCristal", GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME(2002, gamecst2, gamecstl, gamecstl, gamecstl, gamecstl, ROT0, "Cristaltec", "GameCristal (version 2.613)", GAME_NOT_WORKING | GAME_NO_SOUND)
 

@@ -861,7 +861,9 @@ const game_driver * const drivers[] =
 	DRIVER( propcycl )	/* (c) 1996 */
 
 	/* Namco System 23 */
+	DRIVER( rapidrvr )	/* (c) 1997 */
 	DRIVER( timecrs2 )	/* (c) 1997 */
+	DRIVER( timcrs2b )	/* (c) 1997 */
 	DRIVER( gp500 )		/* (c) 1999 */
 	DRIVER( finfurl2 )	/* (c) 1999 */
 	DRIVER( finfrl2j )	/* (c) 1999 */
@@ -8230,6 +8232,7 @@ Other Sun games
 	DRIVER( jongkyo )	/* (c) 1985 Kiwako */
 	DRIVER( gtipoker )	/* (c) 1983 GTI Inc */
 	DRIVER( gamecstl )	/* MAME based bootleg */
+	DRIVER( gamecst2 )	/* MAME based bootleg, version 2.613 */
 	DRIVER( drw80pkr )	/* (c) 1983 IGT */
 	DRIVER( blazlaz )	/* (c) 1989 Hudson Soft */
 	DRIVER( paranoia )	/* (c) 1990 Naxat Soft */
