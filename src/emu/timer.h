@@ -28,7 +28,8 @@
 enum
 {
 	TIMER_TYPE_PERIODIC = 0,
-	TIMER_TYPE_SCANLINE
+	TIMER_TYPE_SCANLINE,
+	TIMER_TYPE_GENERIC
 };
 
 
@@ -104,6 +105,11 @@ typedef struct _emu_timer emu_timer;
 /***************************************************************************
     TIMER DEVICE CONFIGURATION MACROS
 ***************************************************************************/
+
+#define MDRV_TIMER_ADD(_tag, _callback) \
+	MDRV_DEVICE_ADD(_tag, TIMER) \
+	MDRV_DEVICE_CONFIG_DATA32(timer_config, type, TIMER_TYPE_GENERIC) \
+	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, callback, _callback) \
 
 #define MDRV_TIMER_ADD_PERIODIC(_tag, _callback, _period) \
 	MDRV_DEVICE_ADD(_tag, TIMER) \
@@ -224,8 +230,17 @@ int timer_device_enabled(const device_config *timer);
 int timer_get_param(emu_timer *which);
 int timer_device_get_param(const device_config *timer);
 
-void *timer_get_param_ptr(emu_timer *which);
-void *timer_device_get_param_ptr(const device_config *timer);
+/* changes the callback parameter of a timer */
+void timer_set_param(emu_timer *which, int param);
+void timer_device_set_param(const device_config *timer, int param);
+
+/* returns the callback pointer of a timer */
+void *timer_get_ptr(emu_timer *which);
+void *timer_device_get_ptr(const device_config *timer);
+
+/* changes the callback pointer of a timer */
+void timer_set_ptr(emu_timer *which, void *ptr);
+void timer_device_set_ptr(const device_config *timer, void *ptr);
 
 
 

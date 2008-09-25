@@ -172,6 +172,7 @@ extern const ldplayer_interface pr8210_interface;
 extern const ldplayer_interface simutrek_interface;
 extern const ldplayer_interface ldv1000_interface;
 extern const ldplayer_interface ldp1450_interface;
+extern const ldplayer_interface vp931_interface;
 extern const ldplayer_interface vp932_interface;
 
 

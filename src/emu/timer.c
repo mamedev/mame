@@ -572,11 +572,11 @@ void timer_adjust_oneshot(emu_timer *which, attotime duration, INT32 param)
 
 void timer_device_adjust_oneshot(const device_config *timer, attotime duration, INT32 param)
 {
-#ifndef NDEBUG
+#ifdef MAME_DEBUG
 	timer_config *config = timer->inline_config;
 
-	/* only makes sense for periodic timers */
-	assert(config->type == TIMER_TYPE_PERIODIC);
+	/* doesn't make sense for scanline timers */
+	assert(config->type != TIMER_TYPE_SCANLINE);
 #endif
 
 	timer_device_adjust_periodic(timer, duration, param, attotime_never);
@@ -624,11 +624,11 @@ void timer_adjust_periodic(emu_timer *which, attotime start_delay, INT32 param, 
 void timer_device_adjust_periodic(const device_config *timer, attotime start_delay, INT32 param, attotime period)
 {
 	timer_state *state = get_safe_token(timer);
-#ifndef NDEBUG
+#ifdef MAME_DEBUG
 	timer_config *config = timer->inline_config;
 
-	/* only makes sense for periodic timers */
-	assert(config->type == TIMER_TYPE_PERIODIC);
+	/* doesn't make sense for scanline timers */
+	assert(config->type != TIMER_TYPE_SCANLINE);
 #endif
 
 	state->start_delay = start_delay;
@@ -688,11 +688,11 @@ void timer_reset(emu_timer *which, attotime duration)
 void timer_device_reset(const device_config *timer)
 {
 	timer_state *state = get_safe_token(timer);
-#ifndef NDEBUG
+#ifdef MAME_DEBUG
 	timer_config *config = timer->inline_config;
 
-	/* only makes sense for periodic timers */
-	assert(config->type == TIMER_TYPE_PERIODIC);
+	/* doesn't make sense for scanline timers */
+	assert(config->type != TIMER_TYPE_SCANLINE);
 #endif
 
 	timer_adjust_periodic(state->timer, state->start_delay, 0, state->period);
@@ -745,8 +745,7 @@ int timer_device_enabled(const device_config *timer)
 
 
 /*-------------------------------------------------
-    timer_get_param
-    timer_get_param_ptr - returns the callback
+    timer_get_param - returns the callback
     parameter of a timer
 -------------------------------------------------*/
 
@@ -759,28 +758,77 @@ int timer_get_param(emu_timer *which)
 int timer_device_get_param(const device_config *timer)
 {
 	timer_state *state = get_safe_token(timer);
-#ifndef NDEBUG
+#ifdef MAME_DEBUG
 	timer_config *config = timer->inline_config;
 
-	/* only makes sense for periodic timers */
-	assert(config->type == TIMER_TYPE_PERIODIC);
+	/* doesn't make sense for scanline timers */
+	assert(config->type != TIMER_TYPE_SCANLINE);
 #endif
 
 	return state->param;
 }
 
 
-void *timer_get_param_ptr(emu_timer *which)
+/*-------------------------------------------------
+    timer_set_param - changes the callback
+    parameter of a timer
+-------------------------------------------------*/
+
+void timer_set_param(emu_timer *which, int param)
+{
+	which->param = param;
+}
+
+
+void timer_device_set_param(const device_config *timer, int param)
+{
+	timer_state *state = get_safe_token(timer);
+#ifdef MAME_DEBUG
+	timer_config *config = timer->inline_config;
+
+	/* doesn't make sense for scanline timers */
+	assert(config->type != TIMER_TYPE_SCANLINE);
+#endif
+
+	state->param = param;
+}
+
+
+/*-------------------------------------------------
+    timer_get_ptr - returns the callback pointer
+    of a timer
+-------------------------------------------------*/
+
+void *timer_get_ptr(emu_timer *which)
 {
 	return which->ptr;
 }
 
 
-void *timer_device_get_param_ptr(const device_config *timer)
+void *timer_device_get_ptr(const device_config *timer)
 {
 	timer_state *state = get_safe_token(timer);
 	return state->ptr;
 }
+
+
+/*-------------------------------------------------
+    timer_set_ptr - changes the callback pointer
+    of a timer
+-------------------------------------------------*/
+
+void timer_set_ptr(emu_timer *which, void *ptr)
+{
+	which->ptr = ptr;
+}
+
+
+void timer_device_set_ptr(const device_config *timer, void *ptr)
+{
+	timer_state *state = get_safe_token(timer);
+	state->ptr = ptr;
+}
+
 
 
 /***************************************************************************
@@ -994,7 +1042,7 @@ static DEVICE_START( timer )
 
 	/* get and validate the configuration */
 	config = device->inline_config;
-	assert((config->type == TIMER_TYPE_PERIODIC) || (config->type == TIMER_TYPE_SCANLINE));
+	assert(config->type == TIMER_TYPE_PERIODIC || config->type == TIMER_TYPE_SCANLINE || config->type == TIMER_TYPE_GENERIC);
 	assert(config->callback != NULL);
 
 	/* copy the pointer parameter */
@@ -1007,6 +1055,29 @@ static DEVICE_START( timer )
 	/* type based configuration */
 	switch (config->type)
 	{
+		case TIMER_TYPE_GENERIC:
+			/* make sure that only the applicable parameters are filled in */
+			assert(config->screen == NULL);
+			assert(config->first_vpos == 0);
+			assert(config->increment == 0);
+			assert(config->start_delay == 0);
+			assert(config->period == 0);
+
+			/* copy the optional integer parameter */
+			state->param = config->param;
+
+			/* convert the start_delay and period into attotime */
+			state->period = attotime_never;
+			state->start_delay = attotime_zero;
+
+			/* register for state saves */
+			state_save_register_item(unique_tag, 0, state->param);
+
+			/* allocate the backing timer */
+			param = (void *)device;
+			state->timer = timer_alloc(periodic_timer_device_timer_callback, param);
+			break;
+
 		case TIMER_TYPE_PERIODIC:
 			/* make sure that only the applicable parameters are filled in */
 			assert(config->screen == NULL);

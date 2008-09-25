@@ -37,7 +37,8 @@ enum
 /* laserdisc control lines */
 #define LASERDISC_LINE_ENTER		0			/* "ENTER" key/line */
 #define LASERDISC_LINE_CONTROL		1			/* "CONTROL" line */
-#define LASERDISC_INPUT_LINES		2
+#define LASERDISC_LINE_RESET		2			/* "RESET" line */
+#define LASERDISC_INPUT_LINES		3
 
 /* laserdisc status lines */
 #define LASERDISC_LINE_READY		0			/* "READY" line */
@@ -47,11 +48,11 @@ enum
 #define LASERDISC_OUTPUT_LINES		4
 
 /* laserdisc field codes */
-#define LASERDISC_CODE_WHITE_FLAG	0			/* boolean white flag */
-#define LASERDISC_CODE_LINE16		1			/* 24-bit line 16 code */
-#define LASERDISC_CODE_LINE17		2			/* 24-bit line 17 code */
-#define LASERDISC_CODE_LINE18		3			/* 24-bit line 18 code */
-#define LASERDISC_CODE_LINE1718		4			/* 24-bit best of line 17/18 code */
+#define LASERDISC_CODE_WHITE_FLAG	11			/* boolean white flag */
+#define LASERDISC_CODE_LINE16		16			/* 24-bit line 16 code */
+#define LASERDISC_CODE_LINE17		17			/* 24-bit line 17 code */
+#define LASERDISC_CODE_LINE18		18			/* 24-bit line 18 code */
+#define LASERDISC_CODE_LINE1718		1718		/* 24-bit best of line 17/18 code */
 
 /* device configuration */
 enum
@@ -161,7 +162,7 @@ extern const custom_sound_interface laserdisc_custom_interface;
 int laserdisc_get_video(const device_config *device, bitmap_t **bitmap);
 
 /* return the raw philips or white flag codes */
-UINT32 laserdisc_get_field_code(const device_config *device, UINT8 code);
+UINT32 laserdisc_get_field_code(const device_config *device, UINT32 code);
 
 
 
@@ -185,6 +186,9 @@ UINT8 laserdisc_line_r(const device_config *device, UINT8 line);
 
 /* specify the "slow" speed of the Pioneer PR-7820 */
 void pr7820_set_slow_speed(const device_config *device, double frame_rate_scaler);
+
+/* set a callback for data ready on the Phillips 22VP931 */
+void vp931_set_data_ready_callback(const device_config *device, void (*callback)(const device_config *device, int state));
 
 /* control the audio squelch of the Simutrek modified players */
 void simutrek_set_audio_squelch(const device_config *device, int state);

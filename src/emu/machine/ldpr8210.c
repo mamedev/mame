@@ -349,7 +349,7 @@ static INT32 pr8210_update(laserdisc_state *ld, const vbi_metadata *vbi, int fie
     player data
 -------------------------------------------------*/
 
-void pr8210_overlay(laserdisc_state *ld, bitmap_t *bitmap)
+static void pr8210_overlay(laserdisc_state *ld, bitmap_t *bitmap)
 {
 //  ldplayer_data *player = ld->player;
 }

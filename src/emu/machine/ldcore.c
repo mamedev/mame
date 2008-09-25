@@ -151,7 +151,8 @@ static const ldplayer_interface *player_interfaces[] =
 	&simutrek_interface,
 	&ldv1000_interface,
 //  &ldp1450_interface,
-//  &vp932_interface
+//	&vp932_interface,
+	&vp931_interface
 };
 
 const custom_sound_interface laserdisc_custom_interface =
@@ -560,7 +561,7 @@ int laserdisc_get_video(const device_config *device, bitmap_t **bitmap)
     information read from the disc
 -------------------------------------------------*/
 
-UINT32 laserdisc_get_field_code(const device_config *device, UINT8 code)
+UINT32 laserdisc_get_field_code(const device_config *device, UINT32 code)
 {
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
@@ -888,27 +889,44 @@ static void read_track_data(laserdisc_state *ld)
 	ldcore_data *ldcore = ld->core;
 	UINT32 tracknum = ldcore->curtrack;
 	UINT32 fieldnum = ldcore->fieldnum;
+	UINT32 curfield = tracknum * 2 + fieldnum;
 	frame_data *frame;
 	UINT32 vbiframe;
 	UINT32 readhunk;
 	INT32 chdtrack;
-
-	/* if the previous field had a frame number, and the new field immediately follows it,
-       force the new field to pair with the previous one */
+	
 	frame = &ldcore->frame[ldcore->videoindex];
-	if ((ldcore->metadata[fieldnum ^ 1].line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE && (tracknum * 2 + fieldnum == frame->lastfield + 1))
-		frame->numfields = 1;
 
-	/* otherwise, keep the frames in sync with the absolute field numbers */
-	else if (frame->numfields == 2 && fieldnum != 0)
-		frame->numfields--;
-
-	/* if we already have both fields on the current videoindex, advance */
-	else if (frame->numfields >= 2)
+	/* special cases for playing forward */
+	if (curfield == frame->lastfield + 1)
 	{
-		ldcore->videoindex = (ldcore->videoindex + 1) % ARRAY_LENGTH(ldcore->frame);
-		frame = &ldcore->frame[ldcore->videoindex];
-		frame->numfields = 0;
+		/* if the previous field had a frame number, force the new field to pair with the previous one */
+		if ((ldcore->metadata[fieldnum ^ 1].line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
+			frame->numfields = 1;
+		
+		/* if the twice-previous field was a frame number, and we've moved one since then, consider this one done */
+		else if (frame->numfields >= 2 && (ldcore->metadata[fieldnum].line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
+		{
+			ldcore->videoindex = (ldcore->videoindex + 1) % ARRAY_LENGTH(ldcore->frame);
+			frame = &ldcore->frame[ldcore->videoindex];
+			frame->numfields = 0;
+		}
+	}
+	
+	/* all other cases */
+	else
+	{
+		/* otherwise, keep the frames in sync with the absolute field numbers */
+		if (frame->numfields == 2 && fieldnum != 0)
+			frame->numfields--;
+
+		/* if we already have both fields on the current videoindex, advance */
+		else if (frame->numfields >= 2)
+		{
+			ldcore->videoindex = (ldcore->videoindex + 1) % ARRAY_LENGTH(ldcore->frame);
+			frame = &ldcore->frame[ldcore->videoindex];
+			frame->numfields = 0;
+		}
 	}
 
 	/* if we're squelched, reset the frame counter */
@@ -1333,8 +1351,8 @@ VIDEO_UPDATE( laserdisc )
 			rectangle clip = *cliprect;
 
 			/* scale the cliprect to the overlay size and then call the update callback */
-			clip.min_x = 0;
-			clip.max_x = ldcore->config.overwidth - 1;
+			clip.min_x = ldcore->config.overclip.min_x;
+			clip.max_x = ldcore->config.overclip.max_x;
 			clip.min_y = cliprect->min_y * overbitmap->height / bitmap->height;
 			if (cliprect->min_y == visarea->min_y)
 				clip.min_y = MIN(clip.min_y, ldcore->config.overclip.min_y);
