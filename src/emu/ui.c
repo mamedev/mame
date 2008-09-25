@@ -262,8 +262,8 @@ static void ui_exit(running_machine *machine)
 
 static int rescale_notifier(running_machine *machine, int width, int height)
 {
-	/* always allow "small" rescaling */
-	if (width < 500 || height < 500)
+	/* always allow rescaling for a "small" area and for screenless drivers */
+	if (width < 500 || height < 500 || machine->primary_screen == NULL)
 		return TRUE;
 
 	/* if we've currently disallowed rescaling, turn on a message next frame */
