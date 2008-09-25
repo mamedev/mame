@@ -872,6 +872,13 @@ DISCRETE_SOUND_END
  *
  ****************************************************************/
 
+SOUND_START( dkong)
+{
+	dkong_state *state = machine->driver_data;
+	
+	state->snd_rom = memory_region(machine, "sound");
+	state->dev_vp2 = devtag_get_device(machine, LATCH8, "virtual_p2");
+}
 
 
 /****************************************************************
@@ -998,9 +1005,8 @@ static READ8_HANDLER( dkong_voice_status_r )
 
 static READ8_DEVICE_HANDLER( dkong_tune_r )
 {
-	const device_config *devvp2 = devtag_get_device(device->machine, LATCH8, "virtual_p2");
-	UINT8 *snd_rom = memory_region(device->machine, "sound");
-	UINT8 page = latch8_r(devvp2,0) & 0x47;
+	dkong_state *state = device->machine->driver_data;
+	UINT8 page = latch8_r(state->dev_vp2,0) & 0x47;
 
 	if ( page & 0x40 )
 	{
@@ -1009,7 +1015,7 @@ static READ8_DEVICE_HANDLER( dkong_tune_r )
 	else
 	{
 		/* printf("rom access at pc = %4x\n",activecpu_get_pc()); */
-		return (snd_rom[0x1000+(page & 7)*256+offset]);
+		return (state->snd_rom[0x1000+(page & 7)*256+offset]);
 	}
 }
 
@@ -1099,6 +1105,7 @@ ADDRESS_MAP_END
 static const nes_interface nes_interface_1 = { "n2a03a" };
 static const nes_interface nes_interface_2 = { "n2a03b" };
 
+
 /*************************************
  *
  *  Machine driver
@@ -1106,6 +1113,8 @@ static const nes_interface nes_interface_2 = { "n2a03b" };
  *************************************/
 
 MACHINE_DRIVER_START( dkong2b_audio )
+
+	MDRV_SOUND_START( dkong )
 
 	/* sound latches */
 

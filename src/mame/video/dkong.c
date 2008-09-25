@@ -817,7 +817,7 @@ static void radarscp_draw_background(running_machine *machine, dkong_state *stat
 	UINT16 			*pixel;
 
 	if (state->hardware_type == HARDWARE_TRS01)
-		htable = memory_region(machine, "gfx4");
+		htable = state->gfx4;
 
 	y = cliprect->min_y;
 	while (y <= cliprect->max_y)
@@ -840,8 +840,8 @@ static void radarscp_draw_background(running_machine *machine, dkong_state *stat
 static void radarscp_scanline(running_machine *machine, int scanline)
 {
 	dkong_state *state = machine->driver_data;
-	const UINT8 *table = memory_region(machine, "gfx3");
-	int 		table_len = memory_region_length(machine, "gfx3");
+	const UINT8 *table = state->gfx3;
+	int 		table_len = state->gfx3_len;
 	int 			x,y,offset;
 	UINT16 			*pixel;
 	static int		counter=0;
@@ -950,6 +950,8 @@ VIDEO_START( dkong )
 	{
 		case HARDWARE_TRS02:
 			state->bg_bits = video_screen_auto_bitmap_alloc(machine->primary_screen);
+			state->gfx3 = memory_region(machine, "gfx3");
+			state->gfx3_len = memory_region_length(machine, "gfx3");
 		    /* fall through */
 		case HARDWARE_TKG04:
 		case HARDWARE_TKG02:
@@ -961,6 +963,10 @@ VIDEO_START( dkong )
 			tilemap_set_scrolldx(state->bg_tilemap, 0, 128);
 
 			state->bg_bits = video_screen_auto_bitmap_alloc(machine->primary_screen);
+			state->gfx4 = memory_region(machine, "gfx4");
+			state->gfx3 = memory_region(machine, "gfx3");
+			state->gfx3_len = memory_region_length(machine, "gfx3");
+
 			break;
 		default:
 			fatalerror("Invalid hardware type in dkong_video_start");
