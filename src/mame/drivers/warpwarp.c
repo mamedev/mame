@@ -825,7 +825,7 @@ ROM_START( geebeeg )
 	ROM_LOAD( "geebee.1k",    0x0000, 0x1000, CRC(8a5577e0) SHA1(356d33e19c6b4f519816ee4b65ff9b59d6c1b565) )
 
 	ROM_REGION( 0x800, "gfx1", 0 )
-	ROM_LOAD( "geebee.3a",    0x0000, 0x0400, CRC(f257b21b) SHA1(c788fd923438f1bffbff9ff3cd4c5c8b547c0c14) )
+	ROM_LOAD( "geebeeg.3a",   0x0000, 0x0400, CRC(a45932ba) SHA1(48f70742c42a9377f31fac3a1e43123751e57656) )
 ROM_END
 
 ROM_START( navarone )
