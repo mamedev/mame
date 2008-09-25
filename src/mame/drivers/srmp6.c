@@ -546,8 +546,8 @@ static WRITE16_HANDLER(paletteram_w)
 static ADDRESS_MAP_START( srmp6, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x200000, 0x23ffff) AM_RAM					// work RAM
-	AM_RANGE(0x600000, 0x7fffff) AM_READ(SMH_BANK1)	// banked ROM (used by ROM check)
-	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("nile", 0)
+	AM_RANGE(0x600000, 0x7fffff) AM_READ(SMH_BANK1)		// banked ROM (used by ROM check)
+	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0)
 
 	AM_RANGE(0x300000, 0x300005) AM_READWRITE(srmp6_inputs_r, srmp6_input_select_w)		// inputs
 	AM_RANGE(0x480000, 0x480fff) AM_RAM_WRITE(paletteram_w) AM_BASE(&paletteram16)

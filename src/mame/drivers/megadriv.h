@@ -32,3 +32,10 @@ MACHINE_RESET( megadriv );
 VIDEO_START( megadriv );
 VIDEO_UPDATE( megadriv );
 VIDEO_EOF( megadriv );
+
+/* Needed to create external input handlers (see e.g. MESS) */
+
+extern UINT8 (*megadrive_io_read_data_port_ptr)(int offset);
+extern void (*megadrive_io_write_data_port_ptr)(int offset, UINT16 data);
+extern UINT8 megadrive_io_data_regs[3];
+extern UINT8 megadrive_io_ctrl_regs[3];

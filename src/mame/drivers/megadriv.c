@@ -1425,8 +1425,8 @@ static void init_megadri6_io(void)
 }
 
 /* pointers to our io data read/write functions */
-static UINT8 (*megadrive_io_read_data_port_ptr)(int offset);
-static void (*megadrive_io_write_data_port_ptr)(int offset, UINT16 data);
+UINT8 (*megadrive_io_read_data_port_ptr)(int offset);
+void (*megadrive_io_write_data_port_ptr)(int offset, UINT16 data);
 
 INPUT_PORTS_START( megadri6 )
 	PORT_START("PAD1")		/* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
@@ -1715,8 +1715,8 @@ static const char *const padnames[] = { "PAD1", "PAD2", "IN0", "UNK" };
 #define UP_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0001) >> 0 )
 #define MD_RESET_BUTTON		 ((input_port_read_safe(Machine, "RESET", 0x00) & 0x01) >> 0 )
 
-static UINT8 megadrive_io_data_regs[3];
-static UINT8 megadrive_io_ctrl_regs[3];
+UINT8 megadrive_io_data_regs[3];
+UINT8 megadrive_io_ctrl_regs[3];
 static UINT8 megadrive_io_tx_regs[3];
 
 static void megadrive_init_io(running_machine *machine)
