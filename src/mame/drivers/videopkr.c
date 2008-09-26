@@ -254,7 +254,7 @@ static UINT8 dc_40103;
 static UINT8 te_40103;
 static UINT8 ld_40103;
 
-UINT8 c_io, hp_1, hp_2, bell, aux3;
+static UINT8 c_io, hp_1, hp_2, bell;
 
 
 /*************************
@@ -264,7 +264,7 @@ UINT8 c_io, hp_1, hp_2, bell, aux3;
 static tilemap *bg_tilemap;
 
 
-PALETTE_INIT( videopkr )
+static PALETTE_INIT( videopkr )
 {
 	int i;
 
@@ -299,18 +299,18 @@ static TILE_GET_INFO( get_bg_tile_info )
 }
 
 
-VIDEO_START( videopkr )
+static VIDEO_START( videopkr )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-VIDEO_START( vidadcba )
+static VIDEO_START( vidadcba )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 16, 8, 32, 32);
 }
 
 
-VIDEO_UPDATE( videopkr )
+static VIDEO_UPDATE( videopkr )
 {
 	tilemap_mark_all_tiles_dirty(bg_tilemap);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);

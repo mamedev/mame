@@ -221,7 +221,7 @@ static UINT64 execute_tobcd(void *ref, UINT32 params, const UINT64 *param);
     the format
 -------------------------------------------------*/
 
-const char *format_int(astring *string, UINT64 value, int format)
+static const char *format_int(astring *string, UINT64 value, int format)
 {
 	switch (format)
 	{

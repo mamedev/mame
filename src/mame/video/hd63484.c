@@ -24,7 +24,7 @@ static UINT16 fifo[FIFO_LENGTH];
 static UINT16 readfifo;
 UINT16 *HD63484_ram;
 UINT16 HD63484_reg[256/2];
-UINT16 pattern[16];
+static UINT16 pattern[16];
 static int org,org_dpd,rwp;
 static UINT16 cl0,cl1,ccmp,edg,mask,ppy,pzcy,ppx,pzcx,psy,psx,pey,pzy,pex,pzx,xmin,ymin,xmax,ymax,rwp_dn;
 static INT16 cpx,cpy;
@@ -790,7 +790,7 @@ static void ptn(int opcode,int src_x,int src_y,INT16 _ax,INT16 _ay)
 	}
 }
 
-void line(INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col)
+static void line(INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col)
 {
 			INT16 ax,ay;
 
@@ -841,7 +841,7 @@ void line(INT16 sx, INT16 sy, INT16 ex, INT16 ey, INT16 col)
 
 }
 
-void paint(int sx, int sy, int col)
+static void paint(int sx, int sy, int col)
 {
 	int getpixel;
 	dot(sx,sy,0,col);

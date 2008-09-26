@@ -29,7 +29,7 @@ To enter test mode in smoto, keep F2 pressed during boot.
 ***************************************************************************/
 
 static tilemap *tmap;
-int tiles_offset;
+static int tiles_offset;
 
 static WRITE8_HANDLER( subsino_tiles_offset_w )
 {
@@ -148,7 +148,7 @@ ADDRESS_MAP_END
                                 Input Ports
 ***************************************************************************/
 
-INPUT_PORTS_START( smoto )
+static INPUT_PORTS_START( smoto )
 
 	PORT_START( "DSW1" )
 	PORT_DIPUNKNOWN( 0x01, 0x01 )

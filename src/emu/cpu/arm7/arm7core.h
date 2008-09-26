@@ -403,8 +403,10 @@ extern void (*arm7_coproc_dt_w_callback)(UINT32 insn, UINT32* prn, void (*write3
 extern UINT32 arm7_disasm(char *pBuf, UINT32 pc, UINT32 opcode);
 extern UINT32 thumb_disasm(char *pBuf, UINT32 pc, UINT16 opcode);
 
+#ifdef UNUSED_DEFINITION
 extern char *(*arm7_dasm_cop_dt_callback)(char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
 extern char *(*arm7_dasm_cop_rt_callback)(char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
 extern char *(*arm7_dasm_cop_do_callback)(char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
+#endif
 
 #endif /* __ARM7CORE_H__ */

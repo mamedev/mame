@@ -182,7 +182,7 @@ static int EG_Update(struct _SLOT *slot)
 	return lin2expvol[slot->EG.volume>>EG_SHIFT];
 }
 
-unsigned int Get_RATE(unsigned int *Steps,unsigned int rate,unsigned int val)
+static unsigned int Get_RATE(unsigned int *Steps,unsigned int rate,unsigned int val)
 {
 	int r=4*val+rate;
 	if(val==0)
@@ -312,7 +312,7 @@ static void LFO_ComputeStep(struct _MultiPCM *ptChip,struct _LFO *LFO,UINT32 LFO
 
 
 
-void WriteSlot(struct _MultiPCM *ptChip,struct _SLOT *slot,int reg,unsigned char data)
+static void WriteSlot(struct _MultiPCM *ptChip,struct _SLOT *slot,int reg,unsigned char data)
 {
 	slot->Regs[reg]=data;
 
@@ -481,7 +481,7 @@ static void MultiPCM_update(void *param, stream_sample_t **inputs, stream_sample
 	}
 }
 
-unsigned char multi_pcm_reg_r(int chip, int offset)
+static unsigned char multi_pcm_reg_r(int chip, int offset)
 {
 //  struct _MultiPCM *ptChip = sndti_token(SOUND_MULTIPCM, chip);
 	return 0;

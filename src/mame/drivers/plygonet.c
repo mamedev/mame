@@ -198,7 +198,7 @@ static READ32_HANDLER( dsp_r )
 }
 #endif
 
-READ32_HANDLER( dsp_host_interface_r )
+static READ32_HANDLER( dsp_host_interface_r )
 {
 	UINT32 value;
 	UINT8 hi_addr = offset << 1;

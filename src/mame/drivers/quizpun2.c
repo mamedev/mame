@@ -75,7 +75,7 @@ static WRITE8_HANDLER( fg_ram_w )
 	tilemap_mark_tile_dirty(fg_tmap, offset/4);
 }
 
-VIDEO_START(quizpun2)
+static VIDEO_START(quizpun2)
 {
 	bg_tmap = tilemap_create(	get_bg_tile_info, tilemap_scan_rows,	8,16, 0x20,0x20	);
 	fg_tmap = tilemap_create(	get_fg_tile_info, tilemap_scan_rows,	8,16, 0x20,0x20	);
@@ -84,7 +84,7 @@ VIDEO_START(quizpun2)
 	tilemap_set_transparent_pen(fg_tmap, 0);
 }
 
-VIDEO_UPDATE(quizpun2)
+static VIDEO_UPDATE(quizpun2)
 {
 	int layers_ctrl = -1;
 
@@ -335,7 +335,7 @@ ADDRESS_MAP_END
                                 Input Ports
 ***************************************************************************/
 
-INPUT_PORTS_START( quizpun2 )
+static INPUT_PORTS_START( quizpun2 )
 	PORT_START("DSW")
 	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPUNKNOWN( 0x02, 0x02 )

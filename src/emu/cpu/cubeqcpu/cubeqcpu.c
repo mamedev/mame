@@ -56,7 +56,7 @@ static const char *const dst[] =
 	"RAMU ",
 };
 
-enum
+enum alu_src
 {
 	AQ = 0,
 	AB = 1,
@@ -66,9 +66,9 @@ enum
 	DA = 5,
 	DQ = 6,
 	DZ = 7,
-} alu_src;
+};
 
-enum
+enum alu_ins
 {
 	ADD   = 0,
 	SUBR  = 1,
@@ -78,9 +78,9 @@ enum
 	NOTRS = 5,
 	EXOR  = 6,
 	EXNOR = 7,
-} alu_ins;
+};
 
-enum
+enum alu_dst
 {
 	QREG  = 0,
 	NOP   = 1,
@@ -90,7 +90,7 @@ enum
 	RAMD  = 5,
 	RAMQU = 6,
 	RAMU  = 7,
-} alu_dest;
+};
 
 /***************************************************************************
     MACROS
@@ -517,12 +517,12 @@ static void cquestlin_exit(void)
 #define SND_PC			(cquestsnd.pc)
 #define SND_DATA_IN		(_ramen ? cquestsnd.sound_data[cquestsnd.platch] : cquestsnd.dinlatch)
 
-enum
+enum snd_latch_type
 {
 	PLTCH = 0,
 	DAC = 1,
 	ADLATCH = 2,
-} snd_latch_type;
+};
 
 static int do_sndjmp(int jmp)
 {
@@ -820,7 +820,7 @@ static offs_t cquestsnd_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const 
 
 #define ROT_PC			(cquestrot.pc & 0x1ff)
 
-enum
+enum rot_spf
 {
 	SPF_UNUSED0 = 0,
 	SPF_UNUSED1 = 1,
@@ -832,9 +832,9 @@ enum
 	SPF_MULT	= 7,
 	SPF_DRED	= 8,
 	SPF_DWRT	= 9,
-} rot_spf;
+};
 
-enum
+enum rot_yout
 {
 	YOUT_UNUSED0 = 0,
 	YOUT_UNUSED1 = 1,
@@ -844,7 +844,7 @@ enum
 	YOUT_Y2DYN   = 5,
 	YOUT_Y2R	 = 6,
 	YOUT_Y2D	 = 7,
-} rot_yout;
+};
 
 /* Sync is asserted for the duration of every fourth cycle */
 /* The Dynamic RAM latch clocks in a value at the end of this cycle */
@@ -1297,7 +1297,7 @@ static offs_t cquestrot_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const 
 
 #define VISIBLE_FIELD	!cquestlin.field
 
-enum
+enum line_spf
 {
 	LSPF_UNUSUED = 0,
 	LSPF_FSTOP   = 1,
@@ -1307,9 +1307,9 @@ enum
 	LSPF_MULT    = 5,
 	LSPF_LSTOP   = 6,
 	LSPF_BRES    = 7,
-} line_spf;
+};
 
-enum
+enum line_latch
 {
 	LLATCH_UNUSED   = 0,
 	LLATCH_SEQLATCH = 1,
@@ -1319,9 +1319,9 @@ enum
 	LLATCH_FADLATCH = 5,
 	LLATCH_CLATCH   = 6,
 	LLATCH_ZLATCH   = 7,
-} line_latch;
+};
 
-enum
+enum sreg_bits
 {
 	SREG_E0     = 0,
 	SREG_DX_DY  = 1,
@@ -1331,7 +1331,7 @@ enum
 	SREG_LDX_DY = 5,
 	SREG_LDY    = 6,
 	SREG_LDX    = 7,
-} sreg_bits;
+};
 
 INLINE int do_linjmp(int jmp)
 {

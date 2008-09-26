@@ -979,12 +979,12 @@ ROM_START( baluba )
 ROM_END
 
 
-DRIVER_INIT( starforc )
+static DRIVER_INIT( starforc )
 {
 	is_senjyo = 0;
 	senjyo_scrollhack = 1;
 }
-DRIVER_INIT( starfore )
+static DRIVER_INIT( starfore )
 {
 	/* encrypted CPU */
 	suprloco_decode(machine, "main");
@@ -993,7 +993,7 @@ DRIVER_INIT( starfore )
 	senjyo_scrollhack = 0;
 }
 
-DRIVER_INIT( starfora )
+static DRIVER_INIT( starfora )
 {
 	/* encrypted CPU */
 	yamato_decode(machine, "main");
@@ -1002,7 +1002,7 @@ DRIVER_INIT( starfora )
 	senjyo_scrollhack = 1;
 }
 
-DRIVER_INIT( senjyo )
+static DRIVER_INIT( senjyo )
 {
 	is_senjyo = 1;
 	senjyo_scrollhack = 0;

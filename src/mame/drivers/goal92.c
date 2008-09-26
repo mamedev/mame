@@ -287,7 +287,7 @@ static const gfx_layout layout_16x16x4 =
 	16*16
 };
 
-#ifdef UNUSED_FUNCTON
+#ifdef UNUSED_FUNCTION
 static const gfx_layout layout_16x16x4_2 =
 {
 	16,16,

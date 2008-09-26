@@ -410,7 +410,7 @@ static const ym2203_interface sh_ym2203_interface =
 };
 
 
-const ym2203_interface kothello_ym2203_interface =
+static const ym2203_interface kothello_ym2203_interface =
 {
 	{
 		AY8910_LEGACY_OUTPUT,

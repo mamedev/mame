@@ -309,7 +309,7 @@ void osd_wait_for_debugger(running_machine *machine, int firststop)
 //  debugwin_seq_pressed
 //============================================================
 
-int debugwin_seq_pressed(void)
+static int debugwin_seq_pressed(void)
 {
 	const input_seq *seq = input_type_seq(Machine, IPT_UI_DEBUG_BREAK, 0, SEQ_TYPE_STANDARD);
 	int result = FALSE;

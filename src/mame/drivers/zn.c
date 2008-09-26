@@ -2243,7 +2243,7 @@ static CUSTOM_INPUT( jdredd_gun_mux_read )
 	return jdredd_gun_mux;
 }
 
-INTERRUPT_GEN( jdredd_vblank )
+static INTERRUPT_GEN( jdredd_vblank )
 {
 	int x;
 	int y;
@@ -2898,7 +2898,7 @@ static INPUT_PORTS_START( zn6b )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( jdredd )
+static INPUT_PORTS_START( jdredd )
 	PORT_INCLUDE( zn )
 
 	PORT_MODIFY("P1")
@@ -2936,7 +2936,7 @@ INPUT_PORTS_START( jdredd )
 	PORT_BIT( 0xffff, 0x0122, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_MINMAX(0x02d-1,0x217+1) PORT_SENSITIVITY(100) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
 
-INPUT_PORTS_START( primrag2 )
+static INPUT_PORTS_START( primrag2 )
 	PORT_INCLUDE( zn )
 
 	PORT_MODIFY("SYSTEM")

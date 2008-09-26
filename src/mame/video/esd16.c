@@ -68,7 +68,7 @@ VIDEO_UPDATE( esd16 );
 static tilemap *esdtilemap_0;
 static tilemap *esdtilemap_1;
 tilemap *esdtilemap_1_16x16;
-tilemap *esdtilemap_0_16x16;
+static tilemap *esdtilemap_0_16x16;
 
 static TILE_GET_INFO( get_tile_info_0 )
 {

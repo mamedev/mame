@@ -433,7 +433,7 @@ static DRIVER_INIT(kinstb)
 	DRIVER_INIT_CALL(snes_hirom);
 }
 
-DRIVER_INIT( ffight2b )
+static DRIVER_INIT( ffight2b )
 {
 	INT32 i;
 	UINT8 *rom = memory_region(machine, "user3");

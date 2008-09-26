@@ -1211,7 +1211,7 @@ DRIVER_INIT( tankfrce )
 }
 
 // Inputs are multiplexed, somehow
-READ8_HANDLER( tankfrc4_input_r )
+static READ8_HANDLER( tankfrc4_input_r )
 {
 
 	switch (offset)

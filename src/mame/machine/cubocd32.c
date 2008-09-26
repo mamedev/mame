@@ -260,7 +260,7 @@ static const char *const akiko_reg_names[] =
 	/*E*/	"C2P"
 };
 
-const char* get_akiko_reg_name(int reg)
+static const char* get_akiko_reg_name(int reg)
 {
 	if (reg < 0xf )
 	{

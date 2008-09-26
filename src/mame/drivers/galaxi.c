@@ -250,7 +250,7 @@ ADDRESS_MAP_END
                                 Input Ports
 ***************************************************************************/
 
-INPUT_PORTS_START( galaxi )
+static INPUT_PORTS_START( galaxi )
 
 	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
@@ -272,7 +272,7 @@ INPUT_PORTS_START( galaxi )
 
 INPUT_PORTS_END
 
-INPUT_PORTS_START( magjoker )
+static INPUT_PORTS_START( magjoker )
 
 	PORT_START("INPUTS")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_BUTTON1  ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)

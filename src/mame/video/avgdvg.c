@@ -1217,10 +1217,12 @@ static TIMER_CALLBACK( run_state_machine )
  *
  ************************************/
 
+#ifdef UNUSED_FUNCTION
 int avgdvg_done(void)
 {
 	return vg->sync_halt;
 }
+#endif
 
 CUSTOM_INPUT( avgdvg_done_r )
 {

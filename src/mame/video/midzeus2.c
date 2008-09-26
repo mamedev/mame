@@ -169,7 +169,7 @@ INLINE void *waveram1_ptr_from_expanded_addr(UINT32 addr)
 	return WAVERAM_BLOCK1(blocknum);
 }
 
-#ifdef UNUSED_FUNCTON
+#ifdef UNUSED_FUNCTION
 INLINE void *waveram0_ptr_from_texture_addr(UINT32 addr, int width)
 {
 	UINT32 blocknum = ((addr & ~1) * width) / 8;
@@ -184,7 +184,7 @@ INLINE void *waveram0_ptr_from_texture_addr(UINT32 addr, int width)
  *
  *************************************/
 
-#ifdef UNUSED_FUNCTON
+#ifdef UNUSED_FUNCTION
 INLINE void waveram_plot(int y, int x, UINT32 color)
 {
 	if (x >= 0 && x <= zeus_cliprect.max_x && y >= 0 && y < zeus_cliprect.max_y)
@@ -201,7 +201,7 @@ INLINE void waveram_plot_depth(int y, int x, UINT32 color, UINT16 depth)
 	}
 }
 
-#ifdef UNUSED_FUNCTON
+#ifdef UNUSED_FUNCTION
 INLINE void waveram_plot_check_depth(int y, int x, UINT32 color, UINT16 depth)
 {
 	if (x >= 0 && x <= zeus_cliprect.max_x && y >= 0 && y < zeus_cliprect.max_y)
@@ -216,7 +216,7 @@ INLINE void waveram_plot_check_depth(int y, int x, UINT32 color, UINT16 depth)
 }
 #endif
 
-#ifdef UNUSED_FUNCTON
+#ifdef UNUSED_FUNCTION
 INLINE void waveram_plot_check_depth_nowrite(int y, int x, UINT32 color, UINT16 depth)
 {
 	if (x >= 0 && x <= zeus_cliprect.max_x && y >= 0 && y < zeus_cliprect.max_y)
@@ -242,7 +242,7 @@ INLINE UINT8 get_texel_8bit(const void *base, int y, int x, int width)
 }
 
 
-#ifdef UNUSED_FUNCTON
+#ifdef UNUSED_FUNCTION
 INLINE UINT8 get_texel_4bit(const void *base, int y, int x, int width)
 {
 	UINT32 byteoffs = (y / 2) * (width * 2) + ((x / 8) << 3) + ((y & 1) << 2) + ((x / 2) & 3);

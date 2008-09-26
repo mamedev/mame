@@ -20,7 +20,7 @@ Memo:
 
 
 int nb1413m3_type;
-int nb1413m3_sndromregion;
+//int nb1413m3_sndromregion;
 const char * nb1413m3_sndromrgntag;
 int nb1413m3_sndrombank1;
 int nb1413m3_sndrombank2;

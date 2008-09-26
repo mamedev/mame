@@ -1272,7 +1272,7 @@ struct AtomiswaveKey
     int S3[8];
 };
 
-struct AtomiswaveKey fotns_key = {
+static const struct AtomiswaveKey fotns_key = {
     {0,2,7,11,12,1,5,6,15,4,8,9,14,3,10,13},
     {12,8,3,7,0,15,1,11,6,10,4,14,9,5,13,2},
     {4,1,10,16,9,25,26,31,13,0,14,15,24,6,30,18,7,20,5,12,22,17,27,3,8,11,21,29,19,23,28,2},
@@ -1281,7 +1281,7 @@ struct AtomiswaveKey fotns_key = {
     {7,1,6,5,4,2,0,3}
 };
 
-struct AtomiswaveKey df_key = {
+static const struct AtomiswaveKey df_key = {
     {1,4,5,6,9,7,10,11,13,0,8,12,14,2,3,15},
     {12,0,3,8,7,6,15,11,1,4,14,10,9,5,13,2},
     {9,27,15,6,28,30,7,12,21,0,1,25,22,3,16,29,13,4,24,20,2,5,23,19,18,10,8,14,17,11,31,26},
@@ -1291,7 +1291,7 @@ struct AtomiswaveKey df_key = {
 };
 
 
-UINT16 atomiswave_decrypt(UINT16 cipherText, int address, struct AtomiswaveKey* key)
+static UINT16 atomiswave_decrypt(UINT16 cipherText, int address, const struct AtomiswaveKey* key)
 {
     int b0,b1,b2,b3;
     int aux;
@@ -1317,7 +1317,7 @@ UINT16 atomiswave_decrypt(UINT16 cipherText, int address, struct AtomiswaveKey* 
 }
 
 
-DRIVER_INIT(fotns)
+static DRIVER_INIT(fotns)
 {
   	int i;
 	UINT16 *src = (UINT16 *)(memory_region(machine, "user1"));
@@ -1347,7 +1347,7 @@ DRIVER_INIT(fotns)
 
 
 
-DRIVER_INIT(demofist)
+static DRIVER_INIT(demofist)
 {
   	int i;
 	UINT16 *src = (UINT16 *)(memory_region(machine, "user1"));
@@ -2725,6 +2725,7 @@ time to go to sleep
 
 */
 
+#ifdef UNUSED_FUNCTION
 // rather crude function to write out a key file
 void naomi_write_keyfile(void)
 {
@@ -2795,6 +2796,8 @@ void naomi_write_keyfile(void)
 
 
 }
+#endif
+
 extern void naomi_game_decrypt(UINT64 key, UINT8* region, int length);
 
 
@@ -2860,7 +2863,7 @@ GAME( 2001, hod2bios, 0,        naomi,    naomi,    0, ROT0, "Sega",            
 
 
 
-DRIVER_INIT( ngdkey )
+static DRIVER_INIT( ngdkey )
 {
 	UINT8* picdata = memory_region(machine,"picreturn");
 	UINT64 key;

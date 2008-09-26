@@ -126,7 +126,7 @@ static UINT8 *empty_tiles;
 
 
 /* 8x8x4 tiles only */
-#ifdef UNUSED_FUNCTON
+#ifdef UNUSED_FUNCTION
 INLINE void get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int layer,UINT16 *vram)
 {
 	UINT16 code;
@@ -204,7 +204,7 @@ INLINE void get_tile_info_8bit(running_machine *machine,tile_data *tileinfo,int 
 
 /* 16x16x4 or 16x16x8 tiles. It's the tile's color that decides: if its low 4
    bits are high ($f,$1f,$2f etc) the tile is 8bpp, otherwise it's 4bpp */
-#ifdef UNUSED_FUNCTON
+#ifdef UNUSED_FUNCTION
 INLINE void get_tile_info_16x16_8bit(running_machine *machine,tile_data *tileinfo,int tile_index,int layer,UINT16 *vram)
 {
 	UINT16 code;

@@ -162,7 +162,7 @@ static void draw_rle_zoom_hflip(bitmap_t *bitmap, const atarirle_info *gfx,
     two.
 ---------------------------------------------------------------*/
 
-#ifdef UNUSED_FUNCTON
+#ifdef UNUSED_FUNCTION
 INLINE int compute_log(int value)
 {
 	int log = 0;
@@ -201,7 +201,7 @@ INLINE int round_to_powerof2(int value)
     value into the result, packing the bits along the way.
 ---------------------------------------------------------------*/
 
-#ifdef UNUSED_FUNCTON
+#ifdef UNUSED_FUNCTION
 INLINE int collapse_bits(int value, int mask)
 {
 	int testmask, ormask;

@@ -178,7 +178,7 @@ void system1_define_background_memory(int mode)
 }
 
 
-#ifdef UNUSED_FUNCTON
+#ifdef UNUSED_FUNCTION
 INLINE int get_sprite_bottom_y(int spr_number)
 {
 	return  spriteram[0x10 * spr_number + SPR_Y_BOTTOM];

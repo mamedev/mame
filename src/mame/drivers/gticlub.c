@@ -544,7 +544,7 @@ READ8_HANDLER( K056230_r )
 	return 0;
 }
 
-TIMER_CALLBACK( network_irq_clear )
+static TIMER_CALLBACK( network_irq_clear )
 {
 	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ2, CLEAR_LINE);
 }

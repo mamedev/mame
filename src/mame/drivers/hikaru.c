@@ -261,12 +261,12 @@ Network PCB
 //static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
 
-VIDEO_START(hikaru)
+static VIDEO_START(hikaru)
 {
 
 }
 
-VIDEO_UPDATE(hikaru)
+static VIDEO_UPDATE(hikaru)
 {
 	return 0;
 }

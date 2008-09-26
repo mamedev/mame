@@ -49,12 +49,12 @@
 *     Video Hardware     *
 *************************/
 
-VIDEO_START( itgambl3 )
+static VIDEO_START( itgambl3 )
 {
 }
 
 
-VIDEO_UPDATE( itgambl3 )
+static VIDEO_UPDATE( itgambl3 )
 {
 	return 0;
 }
@@ -158,7 +158,7 @@ GFXDECODE_END
 *      Machine Reset      *
 **************************/
 
-MACHINE_RESET( itgambl3 )
+static MACHINE_RESET( itgambl3 )
 {
 	/* stop the CPU, we have no code for it anyway */
 	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);

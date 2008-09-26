@@ -61,7 +61,7 @@ typedef struct {
 	UINT32 depthcomparemode,cullingmode,zwritedisable,cachebypass,dcalcctrl,volumeinstruction,mipmapped,vqcompressed,strideselect,paletteselector;
 } pvrta_state;
 
-pvrta_state state_ta;
+static pvrta_state state_ta;
 
 // register decode helper
 INLINE int decode_reg_64(UINT32 offset, UINT64 mem_mask, UINT64 *shift)

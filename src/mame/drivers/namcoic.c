@@ -693,7 +693,7 @@ nth_word32( const UINT32 *pSource, int which )
 /* nth_byte32 is a general-purpose utility function, which allows us to
  * read from 32-bit aligned memory as if it were an array of bytes.
  */
-#ifdef UNUSED_FUNCTON
+#ifdef UNUSED_FUNCTION
 INLINE UINT8
 nth_byte32( const UINT32 *pSource, int which )
 {

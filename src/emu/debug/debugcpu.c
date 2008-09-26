@@ -808,6 +808,7 @@ void debug_cpu_go_interrupt(int irqline)
     specified exception fires
 -------------------------------------------------*/
 
+#ifdef UNUSED_FUNCTION
 void debug_cpu_go_exception(int exception)
 {
 	debug_cpu_info *info = global.livecpu;
@@ -820,6 +821,7 @@ void debug_cpu_go_exception(int exception)
 	info->flags |= DEBUG_FLAG_STOP_EXCEPTION;
 	global.execution_state = EXECUTION_STATE_RUNNING;
 }
+#endif
 
 
 /*-------------------------------------------------

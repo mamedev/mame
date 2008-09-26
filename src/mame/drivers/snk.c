@@ -720,7 +720,7 @@ hand, always returning 0xf inbetween valid values confuses the game.
 
 *****************************************************************************/
 
-CUSTOM_INPUT( gwar_rotary )
+static CUSTOM_INPUT( gwar_rotary )
 {
 	static int last_value[2] = {0, 0};
 	static int cp_count[2] = {0, 0};
@@ -739,7 +739,7 @@ CUSTOM_INPUT( gwar_rotary )
 	return value;
 }
 
-CUSTOM_INPUT( gwarb_rotary )
+static CUSTOM_INPUT( gwarb_rotary )
 {
 	if (input_port_read(field->port->machine, "JOYSTICK_MODE") == 1)
 	{

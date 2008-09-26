@@ -295,7 +295,7 @@ ADDRESS_MAP_END
                                 Input Ports
 ***************************************************************************/
 
-INPUT_PORTS_START( jingbell )
+static INPUT_PORTS_START( jingbell )
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )

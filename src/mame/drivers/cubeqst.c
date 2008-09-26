@@ -37,13 +37,13 @@
 
 #define ALPHA_PEN			8192
 
-enum
+enum cpu_indices
 {
 	MAIN_CPU   = 0,
 	ROTATE_CPU = 1,
 	LINE_CPU   = 2,
 	SOUND_CPU  = 3,
-} cpu_indices;
+};
 
 
 /*************************************
@@ -469,7 +469,7 @@ static struct
 } cquest_sound;
 
 /* Called by the sound CPU emulation */
-void sound_dac_w(UINT16 data)
+static void sound_dac_w(UINT16 data)
 {
 	int side = data & 1;
 	int chan = (data >> 1) & 7;
@@ -504,7 +504,7 @@ static void cquest_stream_update(void *param, stream_sample_t **inputs, stream_s
 	}
 }
 
-void *cquest_sh_start(int clock, const custom_sound_interface *config)
+static void *cquest_sh_start(int clock, const custom_sound_interface *config)
 {
 	/* Allocate the stream */
 	cquest_stream = stream_create(0, 2, Machine->sample_rate, NULL, cquest_stream_update);

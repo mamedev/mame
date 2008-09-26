@@ -119,7 +119,7 @@ static int msf_to_frames( char *token )
 	return f;
 }
 
-chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_track_input_info *outinfo)
+static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_track_input_info *outinfo)
 {
 	FILE *infile;
 	int i, numtracks;
