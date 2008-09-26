@@ -198,11 +198,19 @@ void bitmap_fill(bitmap_t *dest, const rectangle *cliprect, UINT32 color)
 			}
 			else
 			{
-				for (y = fill.min_y; y <= fill.max_y; y++)
+				UINT16 *destrow, *destrow0;
+				
+				/* Fill the first line the hard way */
+				destrow  = BITMAP_ADDR16(dest, fill.min_y, 0);
+				for (x = fill.min_x; x <= fill.max_x; x++)
+					destrow[x] = (UINT16)color;
+				
+				/* For the other lines, just copy the first one */
+				destrow0 = BITMAP_ADDR16(dest, fill.min_y, fill.min_x);
+				for (y = fill.min_y + 1; y <= fill.max_y; y++)
 				{
-					UINT16 *destrow = BITMAP_ADDR16(dest, y, 0);
-					for (x = fill.min_x; x <= fill.max_x; x++)
-						destrow[x] = (UINT16)color;
+					destrow = BITMAP_ADDR16(dest, y, fill.min_x);
+					memcpy(destrow, destrow0, (fill.max_x + 1 - fill.min_x) * 2);
 				}
 			}
 			break;
@@ -216,11 +224,19 @@ void bitmap_fill(bitmap_t *dest, const rectangle *cliprect, UINT32 color)
 			}
 			else
 			{
-				for (y = fill.min_y; y <= fill.max_y; y++)
+				UINT32 *destrow, *destrow0;
+
+				/* Fill the first line the hard way */
+				destrow  = BITMAP_ADDR32(dest, fill.min_y, 0);
+				for (x = fill.min_x; x <= fill.max_x; x++)
+					destrow[x] = (UINT32)color;
+				
+				/* For the other lines, just copy the first one */
+				destrow0 = BITMAP_ADDR32(dest, fill.min_y, fill.min_x);
+				for (y = fill.min_y + 1; y <= fill.max_y; y++)
 				{
-					UINT32 *destrow = BITMAP_ADDR32(dest, y, 0);
-					for (x = fill.min_x; x <= fill.max_x; x++)
-						destrow[x] = (UINT32)color;
+					destrow = BITMAP_ADDR32(dest, y, fill.min_x);
+					memcpy(destrow, destrow0, (fill.max_x + 1 - fill.min_x) * 4);
 				}
 			}
 			break;
