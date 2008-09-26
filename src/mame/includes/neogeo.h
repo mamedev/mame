@@ -61,6 +61,7 @@ void kf2k3pcb_gfx_decrypt(running_machine *machine);
 void kf2k3pcb_decrypt_68k(running_machine *machine);
 void kf2k3pcb_decrypt_s1data(running_machine *machine);
 void kof2003_decrypt_68k(running_machine *machine);
+void kof2003h_decrypt_68k(running_machine *machine);
 void kof2003biosdecode(running_machine *machine);
 void samsh5p_decrypt_68k(running_machine *machine);
 
@@ -117,6 +118,7 @@ void kof2k3up_px_decrypt(running_machine *machine);
 void kof2k3up_install_protection(running_machine *machine);
 void kf2k3pl_install_protection(running_machine *machine);
 void samsh5bl_px_decrypt(running_machine *machine);
+void samsh5bl_vx_decrypt(running_machine *machine);
 
 
 /*----------- defined in video/neogeo.c -----------*/

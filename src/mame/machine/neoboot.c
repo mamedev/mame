@@ -998,4 +998,13 @@ void samsh5bl_px_decrypt( running_machine *machine )
 	free( buf );
 }
 
+void samsh5bl_vx_decrypt( running_machine *machine )
+{
+	int vx_size = memory_region_length( machine, "ym" );
+	UINT8 *rom = memory_region( machine, "ym" );
+	int i;
+
+	for( i = 0; i < vx_size; i++ )
+		rom[ i ] = BITSWAP8( rom[ i ], 0, 1, 5, 4, 3, 2, 6, 7 );
+}
 

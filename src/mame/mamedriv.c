@@ -5668,11 +5668,11 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( pbobblen )	/* 0083 (c) 1994 Taito */
 	DRIVER( pbobblna )	/* 0083 (c) 1994 Taito */
 	DRIVER( kof95 )		/* 0084 (c) 1995 SNK */
-	DRIVER( kof95a )	/* 0084 (c) 1995 SNK */
+	DRIVER( kof95h )	/* 0084 (c) 1995 SNK */
 				/* 0085 Shinsetsu Samurai Spirits Bushidoretsuden / Samurai Shodown RPG (CD only) */
 	DRIVER( tws96 )		/* 0086 (c) 1996 Tecmo */
 	DRIVER( samsho3 )	/* 0087 (c) 1995 SNK */
-	DRIVER( samsho3a )	/* 0087 (c) 1995 SNK */
+	DRIVER( samsho3h )	/* 0087 (c) 1995 SNK */
 	DRIVER( fswords )	/* Korean hack of samsho3 */
 	DRIVER( stakwin )	/* 0088 (c) 1995 Saurus */
 	DRIVER( pulstar )	/* 0089 (c) 1995 Aicom */
@@ -5810,6 +5810,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( samsho5b )	/* bootleg */
 	DRIVER( kf2k3pcb )	/* 0271 (c) 2003 Playmore - JAMMA PCB */
 	DRIVER( kof2003 )	/* 0271 (c) 2003 Playmore */
+	DRIVER( kof2003h )	/* 0271 (c) 2003 Playmore */
 	DRIVER( kf2k3bl )	/* bootleg */
 	DRIVER( kf2k3bla )	/* bootleg */
 	DRIVER( kf2k3pl )	/* bootleg */
