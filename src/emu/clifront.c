@@ -484,7 +484,9 @@ int cli_info_listroms(core_options *options, const char *gamename)
 	for (drvindex = 0; drivers[drvindex]; drvindex++)
 		if (mame_strwildcmp(gamename, drivers[drvindex]->name) == 0)
 		{
+			machine_config *config = machine_config_alloc(drivers[drvindex]->machine_config);
 			const rom_entry *region, *rom, *chunk;
+			const rom_source *source;
 
 			/* print the header */
 			if (count > 0)
@@ -492,49 +494,51 @@ int cli_info_listroms(core_options *options, const char *gamename)
 			mame_printf_info("This is the list of the ROMs required for driver \"%s\".\n"
 					"Name            Size Checksum\n", drivers[drvindex]->name);
 
-			/* iterate over regions and then ROMs within the region */
-			for (region = drivers[drvindex]->rom; region; region = rom_next_region(region))
-				for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
-				{
-					const char *name = ROM_GETNAME(rom);
-					const char* hash = ROM_GETHASHDATA(rom);
-					char hashbuf[HASH_BUF_SIZE];
-					int length = -1;
-
-					/* accumulate the total length of all chunks */
-					if (ROMREGION_ISROMDATA(region))
+			/* iterate over sources, regions and then ROMs within the region */
+			for (source = rom_first_source(drivers[drvindex], config); source != NULL; source = rom_next_source(drivers[drvindex], config, source))
+				for (region = rom_first_region(drivers[drvindex], source); region != NULL; region = rom_next_region(region))
+					for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
 					{
-						length = 0;
-						for (chunk = rom_first_chunk(rom); chunk; chunk = rom_next_chunk(chunk))
-							length += ROM_GETLENGTH(chunk);
+						const char *name = ROM_GETNAME(rom);
+						const char *hash = ROM_GETHASHDATA(rom);
+						char hashbuf[HASH_BUF_SIZE];
+						int length = -1;
+
+						/* accumulate the total length of all chunks */
+						if (ROMREGION_ISROMDATA(region))
+						{
+							length = 0;
+							for (chunk = rom_first_chunk(rom); chunk; chunk = rom_next_chunk(chunk))
+								length += ROM_GETLENGTH(chunk);
+						}
+
+						/* start with the name */
+						mame_printf_info("%-12s ", name);
+
+						/* output the length next */
+						if (length >= 0)
+							mame_printf_info("%7d", length);
+						else
+							mame_printf_info("       ");
+
+						/* output the hash data */
+						if (!hash_data_has_info(hash, HASH_INFO_NO_DUMP))
+						{
+							if (hash_data_has_info(hash, HASH_INFO_BAD_DUMP))
+								mame_printf_info(" BAD");
+
+							hash_data_print(hash, 0, hashbuf);
+							mame_printf_info(" %s", hashbuf);
+						}
+						else
+							mame_printf_info(" NO GOOD DUMP KNOWN");
+
+						/* end with a CR */
+						mame_printf_info("\n");
 					}
-
-					/* start with the name */
-					mame_printf_info("%-12s ", name);
-
-					/* output the length next */
-					if (length >= 0)
-						mame_printf_info("%7d", length);
-					else
-						mame_printf_info("       ");
-
-					/* output the hash data */
-					if (!hash_data_has_info(hash, HASH_INFO_NO_DUMP))
-					{
-						if (hash_data_has_info(hash, HASH_INFO_BAD_DUMP))
-							mame_printf_info(" BAD");
-
-						hash_data_print(hash, 0, hashbuf);
-						mame_printf_info(" %s", hashbuf);
-					}
-					else
-						mame_printf_info(" NO GOOD DUMP KNOWN");
-
-					/* end with a CR */
-					mame_printf_info("\n");
-				}
 
 			count++;
+			machine_config_free(config);
 		}
 
 	return (count > 0) ? MAMERR_NONE : MAMERR_NO_SUCH_GAME;
