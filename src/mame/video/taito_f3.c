@@ -2557,11 +2557,13 @@ static void scanline_draw(running_machine *machine, bitmap_t *bitmap, const rect
 
 				/*
                     sprite priority==playfield priority
+                    	GSEEKER (plane leaving hangar) --> sprite 
                         BUBSYMPH (title)       ---> sprite
                         DARIUSG (ZONE V' BOSS) ---> playfield
                 */
 
 				if (f3_game == BUBSYMPH ) sp++;		//BUBSYMPH (title)
+				if (f3_game == GSEEKER ) sp++;		//GSEEKER (plane leaving hangar)
 
 					 if(		  sp>l0) sprite[0]|=sflg;
 				else if(sp<=l0 && sp>l1) sprite[1]|=sflg;
