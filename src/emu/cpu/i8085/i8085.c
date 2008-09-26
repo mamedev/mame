@@ -1221,10 +1221,6 @@ INLINE void execute_one(int opcode)
 			M_RST(7);
 			break;
 	}
-	/* For 8080 NF flag is not used but bit is always set */
-	if(!I.cputype ) {
-		I.AF.b.l = I.AF.b.l | NF;
-	}
 }
 
 static void Interrupt(void)
