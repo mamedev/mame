@@ -1452,39 +1452,6 @@ static const UINT8 m1_address_0_7_xor[256] =
 };
 
 
-int m1_address_scramble_inv(int address, UINT16 key)
-{
-	int block;
-	int aux;
-
-	const int p1[8][16] = {
-		{8,4,5,6,15,14,12,3,7,13,2,10,9,11,1,0},
-		{13,1,6,7,10,8,14,0,2,5,12,3,15,9,11,4},
-		{9,7,10,3,8,11,1,5,0,15,4,13,14,12,2,6},
-		{10,12,0,4,5,15,9,7,1,3,11,6,13,8,14,2},
-		{14,0,13,5,9,12,2,10,6,8,7,15,11,1,4,3},
-		{5,11,7,2,3,13,8,4,12,6,14,0,10,15,9,1},
-		{11,6,15,10,14,1,4,13,3,9,0,8,12,2,7,5},
-		{3,14,4,1,6,10,15,2,11,0,9,7,5,13,8,12},
-	};
-
-	block = (address>>16)&7;
-	aux = address&0xffff;
-
-	aux = BITSWAP16(aux, 14,13,10,9,7,5,3,1,15,12,11,8,6,4,2,0);
-	aux ^= m1_address_8_15_xor[aux&0xff]<<8;
-	aux ^= m1_address_0_7_xor[(aux>>8)&0xff];
-	aux = BITSWAP16(aux,
-		p1[block][15],p1[block][14],p1[block][13],p1[block][12],
-		p1[block][11],p1[block][10],p1[block][9],p1[block][8],
-		p1[block][7],p1[block][6],p1[block][5],p1[block][4],
-		p1[block][3],p1[block][2],p1[block][1],p1[block][0]);
-	aux ^= key;
-
-	return (block<<16)|aux;
-}
-
-
 /* The CMC50 hardware does a checksum of the first 64kb of the M1 rom,
    ,and uses this checksum as the basis of the key with which to decrypt
    the rom */
