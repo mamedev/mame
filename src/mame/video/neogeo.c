@@ -35,6 +35,7 @@ static emu_timer *auto_animation_timer;
 
 static emu_timer *sprite_line_timer;
 
+static const UINT8 *region_zoomy;
 
 
 /*************************************
@@ -504,7 +505,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int scanlin
 				}
 			}
 
-			sprite_y_and_tile = memory_region(machine, "zoomy")[(zoom_y << 8) | zoom_line];
+			sprite_y_and_tile = region_zoomy[(zoom_y << 8) | zoom_line];
 			sprite_y = sprite_y_and_tile & 0x0f;
 			tile = sprite_y_and_tile >> 4;
 
@@ -902,6 +903,8 @@ VIDEO_START( neogeo )
 	state_save_register_global(auto_animation_frame_counter);
 
 	state_save_register_postload(machine, regenerate_pens, NULL);
+	
+	region_zoomy = memory_region(machine, "zoomy");
 }
 
 
