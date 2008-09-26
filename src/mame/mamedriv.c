@@ -7145,6 +7145,7 @@ Other Sun games
 	/* Yun Sung games */
 	DRIVER( paradise )	/* (c) >1994 Yun Sung */
 	DRIVER( paradlx )	/* (c) >1994 Yun Sung */
+	DRIVER( para2dx )	/* (c) >1994 Yun Sung */
 	DRIVER( tgtball )	/* (c) 1995 Yun Sung */
 	DRIVER( tgtballa )	/* (c) 1995 Yun Sung */
 	DRIVER( torus )		/* (c) 1996 Yun Sung */

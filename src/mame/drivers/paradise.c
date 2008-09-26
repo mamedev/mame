@@ -698,6 +698,35 @@ ROM_START( paradlx )
 	ROM_LOAD( "9.u113", 0x00000, 0x80000, CRC(9c5337f0) SHA1(4d7a8069be4551aad9d7d32d835dcf91be079359) )
 ROM_END
 
+
+
+ROM_START( para2dx )
+	ROM_REGION( 0x44000, "main", 0 )		/* Z80 Code */
+	ROM_LOAD( "pdx2_u128.bin", 0x00000, 0x0c000, CRC(4cbd22e1) SHA1(ad69663109d3127f6472797ec8763097da94b7d4) )
+	ROM_CONTINUE(     0x10000, 0x34000    )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE | ROMREGION_INVERT)	/* 16x16x8 Sprites */
+	ROM_LOAD( "pdx2_u114.bin", 0x00000, 0x40000, CRC(3634b086) SHA1(6d079efb7be4fbe51d95d1f6b2c44dafdacb6016) )
+	ROM_LOAD( "pdx2_u115.bin", 0x40000, 0x40000, CRC(404409f4) SHA1(0763da81a1eb57037edd816e49a56dc8609fa502) )
+
+	ROM_REGION( 0x40000, "gfx2", ROMREGION_DISPOSE | ROMREGION_INVERT)	/* 8x8x4 Background */
+	ROM_LOAD( "pdx2_u094.bin", 0x00000, 0x40000,  CRC(87c4521b) SHA1(3ebd1e475e6125e9361b21160736103471c7aa2b) )
+
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE | ROMREGION_INVERT)	/* 8x8x8 Foreground */
+	ROM_LOAD( "pdx2_u092.bin", 0x00000, 0x20000, BAD_DUMP CRC(5c26afce) SHA1(f0bdf1d68e5f2d05fd3ba742909a20908ac146da) )
+	ROM_LOAD( "pdx2_u093.bin", 0x80000, 0x20000, BAD_DUMP CRC(36f4f8b2) SHA1(7d6a6bdeb867ab5105097a6efbb219ce5e922bb9) )
+
+	ROM_REGION( 0x40000, "gfx4", ROMREGION_DISPOSE | ROMREGION_INVERT)	/* 8x8x8 Midground */
+	ROM_LOAD( "pdx2_u110.bin", 0x00000, 0x20000, CRC(59e828d1) SHA1(fd76c5a74e1be22bde52bcfbce179dc73591bec3) )
+	ROM_LOAD( "pdx2_u111.bin", 0x20000, 0x20000, CRC(619dd972) SHA1(c64d256d21da5821e27b1cd55351ad2a9b141f47) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )	/* Samples */
+	ROM_LOAD( "pdx2_u085.bin", 0x00000, 0x40000, CRC(398b842e) SHA1(933759d2907640e85f11f532096ee1a912f67b53) )
+
+	ROM_REGION( 0x80000, "oki2", 0 )	/* Samples (banked) */
+	ROM_LOAD( "pdx2_u113.bin", 0x00000, 0x80000, CRC(9c5337f0) SHA1(4d7a8069be4551aad9d7d32d835dcf91be079359) )
+ROM_END
+
 /***************************************************************************
 
                           Target Ball
@@ -996,6 +1025,7 @@ static DRIVER_INIT (torus)
 
 GAME( 1994+, paradise, 0,       paradise, paradise, paradise, ROT90, "Yun Sung", "Paradise", 0 )
 GAME( 1994+, paradlx,  0,       paradise, paradise, paradise, ROT90, "Yun Sung", "Paradise Deluxe", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994+, para2dx , 0,       paradise, paradise, paradise, ROT90, "Yun Sung", "Paradise 2 Deluxe", GAME_IMPERFECT_GRAPHICS )
 GAME( 1995,  tgtball,  0,       tgtball,  tgtball,  tgtball,  ROT0,  "Yun Sung", "Target Ball (Nude)", 0 )
 GAME( 1995,  tgtballa, tgtball, tgtball,  tgtball,  tgtball,  ROT0,  "Yun Sung", "Target Ball", 0 )
 GAME( 1996,  torus,    0,       torus,    torus,    torus,    ROT90, "Yun Sung", "Torus", 0 )
