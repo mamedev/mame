@@ -30,10 +30,6 @@ static UINT32 tafifo_buff[32];
 static emu_timer *vbout_timer;
 
 typedef struct {
-	int tafifo_pos, tafifo_mask, tafifo_vertexwords, tafifo_listtype;
-	int start_render_received;
-	int listtype_used;
-	int alloc_ctrl_OPB_Mode, alloc_ctrl_PT_OPB, alloc_ctrl_TM_OPB, alloc_ctrl_T_OPB, alloc_ctrl_OM_OPB, alloc_ctrl_O_OPB;
 	struct testsprites
 	{
 		int positionx, positiony;
@@ -51,7 +47,23 @@ typedef struct {
 		int endofstrip;
 	} showvertices[65536];
 #endif
-	int testsprites_size, toerasesprites, testvertices_size;
+	int testsprites_size, testsprites_toerase, testvertices_size;
+	UINT32 ispbase;
+	UINT32 fbwsof1;
+	UINT32 fbwsof2;
+	int busy;
+	int valid;
+} receiveddata;
+
+typedef struct {
+	int tafifo_pos, tafifo_mask, tafifo_vertexwords, tafifo_listtype;
+	int start_render_received;
+	int renderselect;
+	int listtype_used;
+	int alloc_ctrl_OPB_Mode, alloc_ctrl_PT_OPB, alloc_ctrl_TM_OPB, alloc_ctrl_T_OPB, alloc_ctrl_OM_OPB, alloc_ctrl_O_OPB;
+	receiveddata grab[4];
+	int grabsel;
+	int grabsellast;
 	UINT32 paracontrol,paratype,endofstrip,listtype,global_paratype,parameterconfig;
 	UINT32 groupcontrol,groupen,striplen,userclip;
 	UINT32 objcontrol,shadow,volume,coltype,texture,offfset,gouraud,uv16bit;
@@ -130,7 +142,8 @@ READ64_HANDLER( pvr_ta_r )
 	}
 
 	#if DEBUG_PVRTA_REGS
-	mame_printf_verbose("PVRTA: [%08x] read %x @ %x (reg %x), mask %llx (PC=%x)\n", 0x5f8000+reg*4, pvrta_regs[reg], offset, reg, mem_mask, activecpu_get_pc());
+	if (reg != 0x43)
+		mame_printf_verbose("PVRTA: [%08x] read %x @ %x (reg %x), mask %llx (PC=%x)\n", 0x5f8000+reg*4, pvrta_regs[reg], offset, reg, mem_mask, activecpu_get_pc());
 	#endif
 	return (UINT64)pvrta_regs[reg] << shift;
 }
@@ -140,6 +153,7 @@ WRITE64_HANDLER( pvr_ta_w )
 	int reg;
 	UINT64 shift;
 	UINT32 old,dat;
+	int a;
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
@@ -161,7 +175,12 @@ WRITE64_HANDLER( pvr_ta_w )
 			mame_printf_verbose("pvr_ta_w:  Core Pipeline soft reset\n");
 			#endif
 			if (state_ta.start_render_received == 1)
+			{
+				for (a=0;a < 4;a++)
+					if (state_ta.grab[a].busy == 1)
+						state_ta.grab[a].busy = 0;
 				state_ta.start_render_received = 0;
+			}
 		}
 		if (dat & 4)
 		{
@@ -176,14 +195,28 @@ WRITE64_HANDLER( pvr_ta_w )
 		mame_printf_verbose("  Region Array at %08x\n",pvrta_regs[REGION_BASE]);
 		mame_printf_verbose("  ISP/TSP Parameters at %08x\n",pvrta_regs[PARAM_BASE]);
 		#endif
-		state_ta.start_render_received=1;
+		// select buffer to draw using PARAM_BASE
+		for (a=0;a < 4;a++)
+		{
+			if ((state_ta.grab[a].ispbase == pvrta_regs[PARAM_BASE]) && (state_ta.grab[a].valid == 1) && (state_ta.grab[a].busy == 0))
+			{
+				state_ta.grab[a].busy = 1;
+				state_ta.renderselect = a;
+				state_ta.start_render_received=1;
+				state_ta.grab[a].fbwsof1=pvrta_regs[FB_W_SOF1];
+				state_ta.grab[a].fbwsof2=pvrta_regs[FB_W_SOF2];
+				break;
+			}
+		}
+		if (a != 4)
+			break;
+		assert_always(0, "TA grabber error!\n");
 		break;
 	case TA_LIST_INIT:
 		state_ta.tafifo_pos=0;
 		state_ta.tafifo_mask=7;
 		state_ta.tafifo_vertexwords=8;
 		state_ta.tafifo_listtype= -1;
-		state_ta.toerasesprites=1;
 	#if DEBUG_PVRTA
 		mame_printf_verbose("TA_OL_BASE       %08x TA_OL_LIMIT  %08x\n", pvrta_regs[TA_OL_BASE], pvrta_regs[TA_OL_LIMIT]);
 		mame_printf_verbose("TA_ISP_BASE      %08x TA_ISP_LIMIT %08x\n", pvrta_regs[TA_ISP_BASE], pvrta_regs[TA_ISP_LIMIT]);
@@ -199,6 +232,49 @@ WRITE64_HANDLER( pvr_ta_w )
 		state_ta.alloc_ctrl_OM_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 4) & 3)) & 0x38;
 		state_ta.alloc_ctrl_O_OPB = (4 << ((pvrta_regs[TA_ALLOC_CTRL] >> 0) & 3)) & 0x38;
 		state_ta.listtype_used |= (1+4);
+		// use TA_ISP_BASE and select buffer for grab data
+		state_ta.grabsel = -1;
+		// try to find already used buffer but not busy
+		for (a=0;a < 4;a++)
+		{
+			if ((state_ta.grab[a].ispbase == pvrta_regs[TA_ISP_BASE]) && (state_ta.grab[a].busy == 0) && (state_ta.grab[a].valid == 1))
+			{
+				state_ta.grabsel=a;
+				break;
+			}
+		}
+		// try a buffer not used yet
+		if (state_ta.grabsel < 0)
+		{
+			for (a=0;a < 4;a++)
+			{
+				if (state_ta.grab[a].valid == 0)
+				{
+					state_ta.grabsel=a;
+					break;
+				}
+			}
+		}
+		// find a non busy buffer starting from the last one used
+		if (state_ta.grabsel < 0)
+		{
+			for (a=0;a < 3;a++)
+			{
+				if (state_ta.grab[(state_ta.grabsellast+1+a) & 3].busy == 0)
+				{
+					state_ta.grabsel=a;
+					break;
+				}
+			}
+		}
+		if (state_ta.grabsel < 0)
+			assert_always(0, "TA grabber error!\n");
+		state_ta.grabsellast=state_ta.grabsel;
+		state_ta.grab[state_ta.grabsel].ispbase=pvrta_regs[TA_ISP_BASE];
+		state_ta.grab[state_ta.grabsel].busy=0;
+		state_ta.grab[state_ta.grabsel].valid=1;
+		state_ta.grab[state_ta.grabsel].testsprites_size=0;
+		state_ta.grab[state_ta.grabsel].testvertices_size=0;
 		break;
 	case TA_LIST_CONT:
 	#if DEBUG_PVRTA
@@ -210,7 +286,8 @@ WRITE64_HANDLER( pvr_ta_w )
 	}
 
 	#if DEBUG_PVRTA_REGS
-	mame_printf_verbose("PVRTA: [%08x=%x] write %llx to %x (reg %x %x), mask %llx\n", 0x5f8000+reg*4, dat, data>>shift, offset, reg, (reg*4)+0x8000, mem_mask);
+	if ((reg != 0x14) && (reg != 0x15))
+		mame_printf_verbose("PVRTA: [%08x=%x] write %llx to %x (reg %x %x), mask %llx\n", 0x5f8000+reg*4, dat, data>>shift, offset, reg, (reg*4)+0x8000, mem_mask);
 	#endif
 }
 
@@ -223,7 +300,7 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 		tafifo_buff[state_ta.tafifo_pos]=(UINT32)data;
 		tafifo_buff[state_ta.tafifo_pos+1]=(UINT32)(data >> 32);
 		#if DEBUG_FIFO_POLY
-		mame_printf_debug("ta_fifo_poly_w:  Unmapped write64 %08x = %llx -> %08x %08x\n", 0x10000000+offset*8, data, tafifo_buff[tafifo_pos], tafifo_buff[tafifo_pos+1]);
+		mame_printf_debug("ta_fifo_poly_w:  Unmapped write64 %08x = %llx -> %08x %08x\n", 0x10000000+offset*8, data, tafifo_buff[state_ta.tafifo_pos], tafifo_buff[state_ta.tafifo_pos+1]);
 		#endif
 		state_ta.tafifo_pos += 2;
 	}
@@ -264,15 +341,6 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 			state_ta.uv16bit=(state_ta.objcontrol >> 0) & 1;
 		}
 
-		if (state_ta.toerasesprites == 1)
-		{
-			state_ta.toerasesprites=0;
-			state_ta.testsprites_size=0;
-#if DEBUG_VERTICES
-			state_ta.testvertices_size=0;
-#endif
-		}
-
 		// check if we need 8 words more
 		if (state_ta.tafifo_mask == 7)
 		{
@@ -304,7 +372,8 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 		}
 
 		// now we heve all the needed words
-		// interpret their meaning
+		// here we should generate the data for the various tiles
+		// for now, just interpret their meaning
 		if (state_ta.paratype == 0)
 		{ // end of list
 			#if DEBUG_PVRDLIST
@@ -461,22 +530,22 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 						mame_printf_verbose(" A(%f,%f) B(%f,%f) C(%f,%f)\n",u2f(tafifo_buff[13] & 0xffff0000),u2f((tafifo_buff[13] & 0xffff) << 16),u2f(tafifo_buff[14] & 0xffff0000),u2f((tafifo_buff[14] & 0xffff) << 16),u2f(tafifo_buff[15] & 0xffff0000),u2f((tafifo_buff[15] & 0xffff) << 16));
 						#endif
 /* test video start */
-						state_ta.showsprites[state_ta.testsprites_size].positionx=u2f(tafifo_buff[1]);
-						state_ta.showsprites[state_ta.testsprites_size].positiony=u2f(tafifo_buff[2]);
-						state_ta.showsprites[state_ta.testsprites_size].sizex=u2f(tafifo_buff[4])-u2f(tafifo_buff[1]);
-						state_ta.showsprites[state_ta.testsprites_size].sizey=u2f(tafifo_buff[8])-u2f(tafifo_buff[2]);
-						state_ta.showsprites[state_ta.testsprites_size].u=u2f(tafifo_buff[13] & 0xffff0000);
-						state_ta.showsprites[state_ta.testsprites_size].v=u2f((tafifo_buff[13] & 0xffff) << 16);
-						state_ta.showsprites[state_ta.testsprites_size].du=u2f(tafifo_buff[14] & 0xffff0000)-state_ta.showsprites[state_ta.testsprites_size].u;
-						state_ta.showsprites[state_ta.testsprites_size].dv=u2f((tafifo_buff[15] & 0xffff) << 16)-state_ta.showsprites[state_ta.testsprites_size].v;
-						state_ta.showsprites[state_ta.testsprites_size].textureaddress=state_ta.textureaddress;
-						state_ta.showsprites[state_ta.testsprites_size].texturesizex=state_ta.textureusize;
-						state_ta.showsprites[state_ta.testsprites_size].texturesizey=state_ta.texturevsize;
-						state_ta.showsprites[state_ta.testsprites_size].texturemode=state_ta.scanorder+state_ta.vqcompressed*2;
-						state_ta.showsprites[state_ta.testsprites_size].texturesizes=state_ta.texturesizes;
-						state_ta.showsprites[state_ta.testsprites_size].texturepf=state_ta.pixelformat;
-						state_ta.showsprites[state_ta.testsprites_size].texturepalette=state_ta.paletteselector;
-						state_ta.testsprites_size=state_ta.testsprites_size+1;
+						state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size].positionx=u2f(tafifo_buff[1]);
+						state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size].positiony=u2f(tafifo_buff[2]);
+						state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size].sizex=u2f(tafifo_buff[4])-u2f(tafifo_buff[1]);
+						state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size].sizey=u2f(tafifo_buff[8])-u2f(tafifo_buff[2]);
+						state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size].u=u2f(tafifo_buff[13] & 0xffff0000);
+						state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size].v=u2f((tafifo_buff[13] & 0xffff) << 16);
+						state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size].du=u2f(tafifo_buff[14] & 0xffff0000)-state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size].u;
+						state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size].dv=u2f((tafifo_buff[15] & 0xffff) << 16)-state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size].v;
+						state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size].textureaddress=state_ta.textureaddress;
+						state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size].texturesizex=state_ta.textureusize;
+						state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size].texturesizey=state_ta.texturevsize;
+						state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size].texturemode=state_ta.scanorder+state_ta.vqcompressed*2;
+						state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size].texturesizes=state_ta.texturesizes;
+						state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size].texturepf=state_ta.pixelformat;
+						state_ta.grab[state_ta.grabsel].showsprites[state_ta.grab[state_ta.grabsel].testsprites_size].texturepalette=state_ta.paletteselector;
+						state_ta.grab[state_ta.grabsel].testsprites_size=state_ta.grab[state_ta.grabsel].testsprites_size+1;
 /* test video end */
 					}
 				}
@@ -488,13 +557,13 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 					mame_printf_verbose("\n");
 					#endif
 #if DEBUG_VERTICES
-					if (state_ta.testvertices_size < 65530)
+					if (state_ta.grab[state_ta.grabsel].testvertices_size <= 65530)
 					{
-						state_ta.showvertices[state_ta.testvertices_size].x=u2f(tafifo_buff[1]);
-						state_ta.showvertices[state_ta.testvertices_size].y=u2f(tafifo_buff[2]);
-						state_ta.showvertices[state_ta.testvertices_size].endofstrip=state_ta.endofstrip;
+						state_ta.grab[state_ta.grabsel].showvertices[state_ta.grab[state_ta.grabsel].testvertices_size].x=u2f(tafifo_buff[1]);
+						state_ta.grab[state_ta.grabsel].showvertices[state_ta.grab[state_ta.grabsel].testvertices_size].y=u2f(tafifo_buff[2]);
+						state_ta.grab[state_ta.grabsel].showvertices[state_ta.grab[state_ta.grabsel].testvertices_size].endofstrip=state_ta.endofstrip;
 					}
-					state_ta.testvertices_size=state_ta.testvertices_size+1;
+					state_ta.grab[state_ta.grabsel].testvertices_size=state_ta.grab[state_ta.grabsel].testvertices_size+1;
 #endif
 				}
 			}
@@ -562,110 +631,188 @@ static void computedilated(void)
 }
 
 #if DEBUG_VERTICES
-static void testdrawline(bitmap_t *bitmap,int from,int to)
+static void testdrawline(bitmap_t *bitmap, int index, int from, int to)
 {
+UINT32 *bmpaddr;
+int ix, iy, i, inc, x, y, dx, dy, plotx, ploty;  
+
+	if ((state_ta.grab[index].showvertices[to].x < 0) || (state_ta.grab[index].showvertices[to].x > 639))
+		return;
+	if ((state_ta.grab[index].showvertices[from].x < 0) || (state_ta.grab[index].showvertices[from].x > 639))
+		return;
+	if ((state_ta.grab[index].showvertices[to].y < 0) || (state_ta.grab[index].showvertices[to].y > 479))
+		return;
+	if ((state_ta.grab[index].showvertices[from].y < 0) || (state_ta.grab[index].showvertices[from].y > 479))
+		return;
+    dx = state_ta.grab[index].showvertices[to].x - state_ta.grab[index].showvertices[from].x;
+	dy = state_ta.grab[index].showvertices[to].y - state_ta.grab[index].showvertices[from].y;
+    plotx = state_ta.grab[index].showvertices[from].x;
+	ploty = state_ta.grab[index].showvertices[from].y;
+    ix = abs(dx);
+	iy = abs(dy);
+	inc = max(ix,iy);
+	x = y = 0;
+
+    for (i=0; i <= inc; ++i)
+    {
+		x += ix;  y += iy;
+
+		if (x > inc)
+		{
+			x -= inc;
+			plotx += (dx ? dx/ix : 0); 
+			bmpaddr = BITMAP_ADDR32(bitmap,ploty,plotx);
+			*bmpaddr = MAKE_RGB(0, 0, 255);
+		}
+		if (y > inc)
+		{
+			y -= inc;
+			ploty += (dy ? dy/iy : 0);
+			bmpaddr = BITMAP_ADDR32(bitmap,ploty,plotx);
+			*bmpaddr = MAKE_RGB(0, 0, 255);
+		}
+	}
+}
+#endif
+
+#if 0
+INLINE UINT32 alpha_blend_r16_565(UINT32 d, UINT32 s, UINT8 level)
+{
+	int alphad = 256 - level;
+	return ((((s & 0x001f) * level + (d & 0x001f) * alphad) >> 8)) |
+		   ((((s & 0x07e0) * level + (d & 0x07e0) * alphad) >> 8) & 0x07e0) |
+		   ((((s & 0xf800) * level + (d & 0xf800) * alphad) >> 8) & 0xf800);
 }
 #endif
 
 static void testdrawscreen(bitmap_t *bitmap,const rectangle *cliprect)
 {
-	int cs,x,y,dx,dy,xi,yi,a;
+	int cs,x,y,dx,dy,xi,yi,a,rs,ns;
 	float iu,iv,u,v;
 	UINT32 addrp;
 	UINT32 *bmpaddr;
 	int xt,yt,cd;
 	UINT32 c;
+#if 0
+	int stride;
+	UINT16 *bmpaddr16;
+	UINT32 k;
+#endif
 
+	if (state_ta.renderselect < 0)
+		return;
+	rs=state_ta.renderselect;
 	c=pvrta_regs[ISP_BACKGND_T];
-	fillbitmap(bitmap,program_read_dword_64le(0x05000000+((c&0xfffff8)>>1)+(3+3)*4),cliprect);
-
-	for (cs=0;cs < state_ta.testsprites_size;cs++)
+	c=program_read_dword_64le(0x05000000+((c&0xfffff8)>>1)+(3+3)*4);
+	fillbitmap(bitmap,c,cliprect);
+#if 0
+	stride=pvrta_regs[FB_W_LINESTRIDE] << 3;
+	c=pvrta_regs[ISP_BACKGND_T];
+	a=(c & 0xfffff8) >> 1;
+	cs=(c >> 24) & 7;
+	cs=cs+3; // cs*2+3
+	c=program_read_dword_64le(0x05000000+a+3*4+(cs-1)*4);
+	dx=(int)u2f(program_read_dword_64le(0x05000000+a+3*4+cs*4+0));
+	dy=(int)u2f(program_read_dword_64le(0x05000000+a+3*4+2*cs*4+4));
+	for (y=0;y < dy;y++)
 	{
-		dx=state_ta.showsprites[cs].sizex;
-		dy=state_ta.showsprites[cs].sizey;
-		iu=state_ta.showsprites[cs].du/dx;
-		iv=state_ta.showsprites[cs].dv/dy;
-		cd=dilatechose[state_ta.showsprites[cs].texturesizes];
+		addrp=state_ta.grab[rs].fbwsof1+y*stride;
+		for (x=0;x < dx;x++)
+		{
+			bmpaddr16=((UINT16 *)dc_texture_ram) + (WORD2_XOR_LE(addrp) >> 1);
+			*bmpaddr16=((c & 0xf80000) >> 8) | ((c & 0xfc00) >> 5) | ((c & 0xf8) >> 3);
+			addrp+=2;
+		}
+	}
+#endif
 
-		if ((state_ta.showsprites[cs].positionx+dx) > 640)
-			dx=640-state_ta.showsprites[cs].positionx;
-		if ((state_ta.showsprites[cs].positiony+dy) > 480)
-			dy=480-state_ta.showsprites[cs].positiony;
+	ns=state_ta.grab[rs].testsprites_size;
+	for (cs=0;cs < ns;cs++)
+	{
+		dx=state_ta.grab[rs].showsprites[cs].sizex;
+		dy=state_ta.grab[rs].showsprites[cs].sizey;
+		iu=state_ta.grab[rs].showsprites[cs].du/dx;
+		iv=state_ta.grab[rs].showsprites[cs].dv/dy;
+		cd=dilatechose[state_ta.grab[rs].showsprites[cs].texturesizes];
+
+		if ((state_ta.grab[rs].showsprites[cs].positionx+dx) > 640)
+			dx=640-state_ta.grab[rs].showsprites[cs].positionx;
+		if ((state_ta.grab[rs].showsprites[cs].positiony+dy) > 480)
+			dy=480-state_ta.grab[rs].showsprites[cs].positiony;
 		xi=0;
 		yi=0;
 
-		if (state_ta.showsprites[cs].positionx < 0)
-			xi=-state_ta.showsprites[cs].positionx;
-		if (state_ta.showsprites[cs].positiony < 0)
-			yi=-state_ta.showsprites[cs].positiony;
+		if (state_ta.grab[rs].showsprites[cs].positionx < 0)
+			xi=-state_ta.grab[rs].showsprites[cs].positionx;
+		if (state_ta.grab[rs].showsprites[cs].positiony < 0)
+			yi=-state_ta.grab[rs].showsprites[cs].positiony;
 
 		for (y = yi;y < dy;y++)
 		{
 			for (x = xi;x < dx;x++)
 			{
 				// find the coordinates
-				u=state_ta.showsprites[cs].u+iu*x;
-				v=state_ta.showsprites[cs].v+iv*y;
-				yt=v*(state_ta.showsprites[cs].texturesizey-1);
-				xt=u*(state_ta.showsprites[cs].texturesizex-1);
+				u=state_ta.grab[rs].showsprites[cs].u+iu*x;
+				v=state_ta.grab[rs].showsprites[cs].v+iv*y;
+				yt=v*(state_ta.grab[rs].showsprites[cs].texturesizey-1);
+				xt=u*(state_ta.grab[rs].showsprites[cs].texturesizex-1);
 
-				switch (state_ta.showsprites[cs].texturepf)
+				a=255;
+				switch (state_ta.grab[rs].showsprites[cs].texturepf)
 				{
 				case 0: // 1555
 					// find the address
-					if (state_ta.showsprites[cs].texturemode == 1)
-						addrp=state_ta.showsprites[cs].textureaddress+(state_ta.showsprites[cs].texturesizex*yt+xt)*2;
-					else if (state_ta.showsprites[cs].texturemode == 0) // twiddled
-						addrp=state_ta.showsprites[cs].textureaddress+(dilated1[cd][xt] + dilated0[cd][yt])*2;
+					if (state_ta.grab[rs].showsprites[cs].texturemode == 1)
+						addrp=state_ta.grab[rs].showsprites[cs].textureaddress+(state_ta.grab[rs].showsprites[cs].texturesizex*yt+xt)*2;
+					else if (state_ta.grab[rs].showsprites[cs].texturemode == 0) // twiddled
+						addrp=state_ta.grab[rs].showsprites[cs].textureaddress+(dilated1[cd][xt] + dilated0[cd][yt])*2;
 					else // vq-compressed
 					{
 						c=0x800+(dilated1[cd][xt >> 1] + dilated0[cd][yt >> 1]);
-						c=*(((UINT8 *)dc_texture_ram) + BYTE_XOR_LE(state_ta.showsprites[cs].textureaddress+c));
-						addrp=state_ta.showsprites[cs].textureaddress+c*8+(dilated1[cd][xt & 1] + dilated0[cd][yt & 1])*2;
+						c=*(((UINT8 *)dc_texture_ram) + BYTE_XOR_LE(state_ta.grab[rs].showsprites[cs].textureaddress+c));
+						addrp=state_ta.grab[rs].showsprites[cs].textureaddress+c*8+(dilated1[cd][xt & 1] + dilated0[cd][yt & 1])*2;
 					}
 					// read datum
 					c=*(((UINT16 *)dc_texture_ram) + (WORD2_XOR_LE(addrp) >> 1));
 					// find the color and draw
 					a=(((c & 0x8000) >> 8)*255)/0x80;
-					bmpaddr=BITMAP_ADDR32(bitmap,state_ta.showsprites[cs].positiony+y,state_ta.showsprites[cs].positionx+x);
-					*bmpaddr = alpha_blend_r32(*bmpaddr, MAKE_RGB((c&0x7c00) >> 7, (c&0x3e0) >> 2, (c&0x1f) << 3), a);
+					c=MAKE_RGB((c&0x7c00) >> 7, (c&0x3e0) >> 2, (c&0x1f) << 3);
 					break;
 				case 1: // 565
 					// find the address
-					if (state_ta.showsprites[cs].texturemode == 1)
-						addrp=state_ta.showsprites[cs].textureaddress+(state_ta.showsprites[cs].texturesizex*yt+xt)*2;
-					else if (state_ta.showsprites[cs].texturemode == 0) // twiddled
-						addrp=state_ta.showsprites[cs].textureaddress+(dilated1[cd][xt] + dilated0[cd][yt])*2;
+					if (state_ta.grab[rs].showsprites[cs].texturemode == 1)
+						addrp=state_ta.grab[rs].showsprites[cs].textureaddress+(state_ta.grab[rs].showsprites[cs].texturesizex*yt+xt)*2;
+					else if (state_ta.grab[rs].showsprites[cs].texturemode == 0) // twiddled
+						addrp=state_ta.grab[rs].showsprites[cs].textureaddress+(dilated1[cd][xt] + dilated0[cd][yt])*2;
 					else // vq-compressed
 					{
 						c=0x800+(dilated1[cd][xt >> 1] + dilated0[cd][yt >> 1]);
-						c=*(((UINT8 *)dc_texture_ram) + BYTE_XOR_LE(state_ta.showsprites[cs].textureaddress+c));
-						addrp=state_ta.showsprites[cs].textureaddress+c*8+(dilated1[cd][xt & 1] + dilated0[cd][yt & 1])*2;
+						c=*(((UINT8 *)dc_texture_ram) + BYTE_XOR_LE(state_ta.grab[rs].showsprites[cs].textureaddress+c));
+						addrp=state_ta.grab[rs].showsprites[cs].textureaddress+c*8+(dilated1[cd][xt & 1] + dilated0[cd][yt & 1])*2;
 					}
 					// read datum
 					c=*(((UINT16 *)dc_texture_ram) + (WORD2_XOR_LE(addrp) >> 1));
 					// find the color and draw
-					bmpaddr=BITMAP_ADDR32(bitmap,state_ta.showsprites[cs].positiony+y,state_ta.showsprites[cs].positionx+x);
-					*bmpaddr = alpha_blend_r32(*bmpaddr, MAKE_RGB((c&0xf800) >> 8, (c&0x7e0) >> 3, (c&0x1f) << 3), 255);
+					a=255;
+					c=MAKE_RGB((c&0xf800) >> 8, (c&0x7e0) >> 3, (c&0x1f) << 3);
 					break;
 				case 2: // 4444
 					// find the address
-					if (state_ta.showsprites[cs].texturemode == 1)
-						addrp=state_ta.showsprites[cs].textureaddress+(state_ta.showsprites[cs].texturesizex*yt+xt)*2;
-					else if (state_ta.showsprites[cs].texturemode == 0) // twiddled
-						addrp=state_ta.showsprites[cs].textureaddress+(dilated1[cd][xt] + dilated0[cd][yt])*2;
+					if (state_ta.grab[rs].showsprites[cs].texturemode == 1)
+						addrp=state_ta.grab[rs].showsprites[cs].textureaddress+(state_ta.grab[rs].showsprites[cs].texturesizex*yt+xt)*2;
+					else if (state_ta.grab[rs].showsprites[cs].texturemode == 0) // twiddled
+						addrp=state_ta.grab[rs].showsprites[cs].textureaddress+(dilated1[cd][xt] + dilated0[cd][yt])*2;
 					else // vq-compressed
 					{
 						c=0x800+(dilated1[cd][xt >> 1] + dilated0[cd][yt >> 1]);
-						c=*(((UINT8 *)dc_texture_ram) + BYTE_XOR_LE(state_ta.showsprites[cs].textureaddress+c));
-						addrp=state_ta.showsprites[cs].textureaddress+c*8+(dilated1[cd][xt & 1] + dilated0[cd][yt & 1])*2;
+						c=*(((UINT8 *)dc_texture_ram) + BYTE_XOR_LE(state_ta.grab[rs].showsprites[cs].textureaddress+c));
+						addrp=state_ta.grab[rs].showsprites[cs].textureaddress+c*8+(dilated1[cd][xt & 1] + dilated0[cd][yt & 1])*2;
 					}
 					// read datum
 					c=*(((UINT16 *)dc_texture_ram) + (WORD2_XOR_LE(addrp) >> 1));
 					// find the color and draw
 					a=(((c & 0xf000) >> 8)*255)/0xf0;
-					bmpaddr=BITMAP_ADDR32(bitmap,state_ta.showsprites[cs].positiony+y,state_ta.showsprites[cs].positionx+x);
-					*bmpaddr = alpha_blend_r32(*bmpaddr, MAKE_RGB((c&0xf00) >> 4, c&0xf0, (c&0xf) << 4), a);
+					c=MAKE_RGB((c&0xf00) >> 4, c&0xf0, (c&0xf) << 4);
 					break;
 				case 3: // yuv422
 					break;
@@ -674,63 +821,114 @@ static void testdrawscreen(bitmap_t *bitmap,const rectangle *cliprect)
 				case 5: // 4 bpp palette
 					break;
 				case 6: // 8 bpp palette
-					if (state_ta.showsprites[cs].texturemode & 2) // vq-compressed
+					if (state_ta.grab[rs].showsprites[cs].texturemode & 2) // vq-compressed
 					{
 						c=0x800+(dilated1[cd][xt >> 1] + dilated0[cd][yt >> 2]);
-						c=*(((UINT8 *)dc_texture_ram) + BYTE_XOR_LE(state_ta.showsprites[cs].textureaddress+c));
-						addrp=state_ta.showsprites[cs].textureaddress+c*8+(dilated1[cd][xt & 1] + dilated0[cd][yt & 3]);
+						c=*(((UINT8 *)dc_texture_ram) + BYTE_XOR_LE(state_ta.grab[rs].showsprites[cs].textureaddress+c));
+						addrp=state_ta.grab[rs].showsprites[cs].textureaddress+c*8+(dilated1[cd][xt & 1] + dilated0[cd][yt & 3]);
 					}
 					else
 					{
-						addrp=state_ta.showsprites[cs].textureaddress+(dilated1[cd][xt] + dilated0[cd][yt]);
+						addrp=state_ta.grab[rs].showsprites[cs].textureaddress+(dilated1[cd][xt] + dilated0[cd][yt]);
 					}
 					c=*(((UINT8 *)dc_texture_ram) + BYTE_XOR_LE(addrp));
-					c=((state_ta.showsprites[cs].texturepalette & 0x30) << 4) | c;
+					c=((state_ta.grab[rs].showsprites[cs].texturepalette & 0x30) << 4) | c;
 					c=pvrta_regs[0x1000/4+c];
 					switch (pvrta_regs[PAL_RAM_CTRL])
 					{
 					case 0: // argb1555
 						a=(((c & 0x8000) >> 8)*255)/0x80;
-						bmpaddr=BITMAP_ADDR32(bitmap,state_ta.showsprites[cs].positiony+y,state_ta.showsprites[cs].positionx+x);
-						*bmpaddr = alpha_blend_r32(*bmpaddr, MAKE_RGB((c&0x7c00) >> 7, (c&0x3e0) >> 2, (c&0x1f) << 3), a);
+						c=MAKE_RGB((c&0x7c00) >> 7, (c&0x3e0) >> 2, (c&0x1f) << 3);
 						break;
 					case 1: // rgb565
-						bmpaddr=BITMAP_ADDR32(bitmap,state_ta.showsprites[cs].positiony+y,state_ta.showsprites[cs].positionx+x);
-						*bmpaddr = alpha_blend_r32(*bmpaddr, MAKE_RGB((c&0xf800) >> 8, (c&0x7e0) >> 3, (c&0x1f) << 3), 255);
+						a=255;
+						c=MAKE_RGB((c&0xf800) >> 8, (c&0x7e0) >> 3, (c&0x1f) << 3);
 						break;
 					case 2: // argb4444
 						a=(((c & 0xf000) >> 8)*255)/0xf0;
-						bmpaddr=BITMAP_ADDR32(bitmap,state_ta.showsprites[cs].positiony+y,state_ta.showsprites[cs].positionx+x);
-						*bmpaddr = alpha_blend_r32(*bmpaddr, MAKE_RGB((c&0xf00) >> 4, c&0xf0, (c&0xf) << 4), a);
+						c=MAKE_RGB((c&0xf00) >> 4, c&0xf0, (c&0xf) << 4);
 						break;
 					case 3: // argb8888
 						a=(c & 0xff000000) >> 24;
-						bmpaddr=BITMAP_ADDR32(bitmap,state_ta.showsprites[cs].positiony+y,state_ta.showsprites[cs].positionx+x);
-						*bmpaddr = alpha_blend_r32(*bmpaddr, MAKE_RGB((c&0xff0000) >> 16, (c&0xff00) >> 8, c&0xff), a);
+						c=MAKE_RGB((c&0xff0000) >> 16, (c&0xff00) >> 8, c&0xff);
 						break;
 					}
 					break;
 				case 7: // reserved
 					break;
-				}
+				} // switch
+				bmpaddr=BITMAP_ADDR32(bitmap,state_ta.grab[rs].showsprites[cs].positiony+y,state_ta.grab[rs].showsprites[cs].positionx+x);
+				*bmpaddr = alpha_blend_r32(*bmpaddr, c, a);
+#if 0
+				// write into framebuffer
+				switch (pvrta_regs[FB_W_CTRL] & 7)
+				{
+				case 0: // 0555 KRGB 16 bit
+					k=pvrta_regs[FB_W_CTRL] & 0x8000;
+					addrp=state_ta.grab[s].fbwsof1+(state_ta.grab[s].showsprites[cs].positiony+y)*stride+(state_ta.grab[s].showsprites[cs].positionx+x)*2;
+					bmpaddr16=((UINT16 *)dc_texture_ram) + (WORD2_XOR_LE(addrp) >> 1);
+					*bmpaddr16=k | alpha_blend_r16(*bmpaddr16,((c & 0xf80000) >> 9) | ((c & 0xf800) >> 6) | ((c & 0xf8) >> 3),a);
+					break;
+				case 1: // 565 RGB 16 bit
+					addrp=state_ta.grab[rs].fbwsof1+(state_ta.grab[rs].showsprites[cs].positiony+y)*stride+(state_ta.grab[rs].showsprites[cs].positionx+x)*2;
+					bmpaddr16=((UINT16 *)dc_texture_ram) + (WORD2_XOR_LE(addrp) >> 1);
+					//*bmpaddr16=alpha_blend_r16_565(*bmpaddr16,((c & 0xf80000) >> 8) | ((c & 0xfc00) >> 5) | ((c & 0xf8) >> 3),a);
+					*bmpaddr16=((c & 0xf80000) >> 8) | ((c & 0xfc00) >> 5) | ((c & 0xf8) >> 3);
+					break;
+				case 2: // 4444 ARGB 16 bit
+					break;
+				case 3: // 1555 ARGB 16 bit
+					break;
+				case 4: // 888 RGB 24 bit packed
+					break;
+				case 5: // 0888 KRGB 32 bit
+					break;
+				case 6: // 8888 ARGB 32 bit
+					break;
+				case 7: // reserved
+					break;
+				} // switch
+#endif
 			}
 		}
 	}
+	state_ta.grab[rs].busy=0;
 #if DEBUG_VERTICES
-	xi = yi = -1;
-	a = state_ta.testvertices_size;
-	if (a > 65535)
-		a = 65535;
-	for (cs=0;cs < a;cs++)
+	a = state_ta.grab[rs].testvertices_size;
+	if (a > 65530)
+		a = 65530;
+	for (cs=1;cs < a;cs++)
 	{
-		xi=yi;
-		yi=cs;
-		if (xi >= 0)
-			testdrawline(bitmap,xi,yi);  // draw a segment from vertex xi to vertex yi
-		if (state_ta.showvertices[cs].endofstrip == 1)
-			xi = yi = -1;
+		testdrawline(bitmap,rs,cs-1,cs);  // draw a segment from vertex xi to vertex yi
+		if ((cs > 1) && (state_ta.grab[rs].showvertices[cs-2].endofstrip == 0))
+			testdrawline(bitmap,rs,cs-2,cs);
+		if (state_ta.grab[rs].showvertices[cs].endofstrip == 1)
+			cs++;
 	}
 #endif
+}
+
+static void testdrawscreenframebuffer(bitmap_t *bitmap,const rectangle *cliprect)
+{
+	int x,y,dy,xi;
+	UINT32 addrp;
+	UINT16 *fbaddr;
+	UINT32 c;
+
+	// only for rgb565 framebuffer
+	xi=((pvrta_regs[FB_R_SIZE] & 0x3ff)+1) << 1;
+	dy=((pvrta_regs[FB_R_SIZE] >> 10) & 0x3ff)+1;
+	for (y=0;y < dy;y++)
+	{
+		addrp=pvrta_regs[FB_R_SOF1]+y*xi*2;
+		for (x=0;x < xi;x++)
+		{
+			fbaddr=BITMAP_ADDR16(bitmap,y,x);
+			c=*(((UINT16 *)dc_texture_ram) + (WORD2_XOR_LE(addrp) >> 1));
+			*fbaddr = (UINT16)c;
+			addrp+=2;
+		}
+	}
 }
 /* test video end */
 
@@ -776,6 +974,7 @@ VIDEO_START(dc)
 {
 	memset(pvrctrl_regs, 0, sizeof(pvrctrl_regs));
 	memset(pvrta_regs, 0, sizeof(pvrta_regs));
+	memset(state_ta.grab, 0, sizeof(state_ta.grab));
 	pvr_build_parameterconfig();
 
 	// if the next 2 registers do not have the correct values, the naomi bios will hang
@@ -788,10 +987,9 @@ VIDEO_START(dc)
 	state_ta.tafifo_vertexwords=8;
 	state_ta.tafifo_listtype= -1;
 	state_ta.start_render_received=0;
+	state_ta.renderselect= -1;
+	state_ta.grabsel=0;
 
-	state_ta.testsprites_size=0;
-	state_ta.toerasesprites=0;
-	state_ta.testvertices_size=0;
 	computedilated();
 
 	vbout_timer = timer_alloc(vbout, 0);
@@ -800,21 +998,32 @@ VIDEO_START(dc)
 
 VIDEO_UPDATE(dc)
 {
+static int useframebuffer=1;
+
 	if (pvrta_regs[VO_CONTROL] & (1 << 3))
 	{
 		fillbitmap(bitmap,pvrta_regs[VO_BORDER_COL] & 0xFFFFFF,cliprect);
 		return 0;
 	}
 
-	testdrawscreen(bitmap,cliprect);
+	if ((useframebuffer) && !state_ta.start_render_received)
+	{
+		testdrawscreenframebuffer(bitmap,cliprect);
+		return 0;
+	}
 
 	if (state_ta.start_render_received)
 	{
+		useframebuffer=0;
+		testdrawscreen(bitmap,cliprect);
 		state_ta.start_render_received=0;
+		state_ta.renderselect= -1;
 		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;	// TSP end of render
 		update_interrupt_status();
+		return 0;
 	}
-	return 0;
+	else
+		return 1;
 }
 
 void dc_vblank(running_machine *machine)

@@ -16,6 +16,7 @@
 
 #define DEBUG_SYSCTRL	(0)
 #define DEBUG_MAPLE	(0)
+#define DEBUG_MAPLE_REGS	(0)
 
 #if DEBUG_SYSCTRL
 static const char *const sysctrl_names[] =
@@ -289,7 +290,7 @@ READ64_HANDLER( dc_maple_r )
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
-	#if DEBUG_MAPLE
+	#if DEBUG_MAPLE_REGS
 	mame_printf_verbose("MAPLE:  Unmapped read %08x\n", 0x5f6c00+reg*4);
 	#endif
 	return (UINT64)maple_regs[reg] << shift;
@@ -313,7 +314,7 @@ WRITE64_HANDLER( dc_maple_w )
 	dat = (UINT32)(data >> shift);
 	old = maple_regs[reg];
 
-	#if DEBUG_MAPLE
+	#if DEBUG_MAPLE_REGS
 	mame_printf_verbose("MAPLE: [%08x=%x] write %llx to %x (reg %x: %s), mask %llx\n", 0x5f6c00+reg*4, dat, data >> shift, offset, reg, maple_names[reg], mem_mask);
 	#endif
 
@@ -353,6 +354,8 @@ WRITE64_HANDLER( dc_maple_w )
 
 					if (pattern == 0)
 					{
+						if (port > 0)
+							buff[0]=0xffffffff;
 						switch (command)
 						{
 							case 1:
@@ -398,6 +401,9 @@ WRITE64_HANDLER( dc_maple_w )
 								cpunum_set_info_ptr(0,CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
 
 								subcommand = buff[0] & 0xff;
+								#if DEBUG_MAPLE
+								mame_printf_verbose("MAPLE: transfer command %d port %d subcommand %d\n", command, port, subcommand);
+								#endif
 								if (subcommand == 3) // read data
 								{
 									for (a=0;a < 0x80;a+=4)
@@ -594,6 +600,8 @@ WRITE64_HANDLER( dc_maple_w )
 								#if DEBUG_MAPLE
 								mame_printf_verbose("MAPLE: unknown transfer command %d port %d\n", command, port);
 								#endif
+								ddtdata.length=1;
+								buff[0]=0xffffffff;
 								break;
 						}
 					}
@@ -609,9 +617,15 @@ WRITE64_HANDLER( dc_maple_w )
 					// skip fixed packet header
 					dat += 8;
 					// skip transfer data
-					dat += ((command & 0xff) + 1) * 4;
+					dat += (length + 1) * 4;
 				} // do transfers
 				maple_regs[reg] = 0;
+			}
+			else
+			{
+				#if DEBUG_MAPLE
+				mame_printf_verbose("MAPLE: hardware trigger not supported yet\n");
+				#endif
 			}
 		}
 		break;

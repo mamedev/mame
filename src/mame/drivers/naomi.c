@@ -55,8 +55,8 @@ Notes:
                         on power-up.
       JP1             - set to 2-3. Alt setting is 1-2
       JP4             - set to 2-3. Alt setting is 1-2
-      93C46           - 128 bytes EEPROM
-      A179B 96K       - ?, made by TI
+      93C46           - 128 bytes serial EEPROM
+      A179B 96K       - TI SN75179B Differential driver and receiver pair (like RS485)
       ADM485          - Analog Devices ADM485
       BIOS.IC27       - 27C160 EPROM
       5264165         - Hitachi 5264165FTTA60 (video RAM)
@@ -662,11 +662,11 @@ Notes:
 #include "dc.h"
 
 #define CPU_CLOCK (200000000)
-                                 /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
+                                             /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
 static UINT32 *dc_sound_ram;
-static UINT32 rom_offset, dma_count;
+static UINT32 rom_offset, rom_offset_flags, dma_count;
 UINT32 dma_offset;
 
 static INTERRUPT_GEN( naomi_vblank )
@@ -716,18 +716,19 @@ static WRITE64_HANDLER( naomi_unknown1_w )
 
     Dimm board registers (add more information if you find it):
 
-    NAOMI_DIMM_COMMAND = 5f703c (16 bit):
+    Name:                   Naomi   Dimm Bd.
+    NAOMI_DIMM_COMMAND    = 5f703c  14000014 (16 bit):
         if bits all 1 no dimm board present and other registers not used
         bit 15: during an interrupt is 1 if the dimm board has a command to be executed
         bit 14-9: 6 bit command number (naomi bios understands 0 1 3 4 5 6 8 9 a)
-        bit 8-0: higher 9 bits of 25 bit offset parameter
-    NAOMI_DIMM_OFFSETL = 5f7040 (16 bit):
-        bit 15-0: lower 16 bits of 25 bit offset parameter
-    NAOMI_DIMM_PARAMETERL = 5f7044 (16 bit)
-    NAOMI_DIMM_PARAMETERH = 5f7048 (16 bit)
-    NAOMI_DIMM_STATUS = 5f704c (16 bit):
-        bit 0: when read as 1 means something has happened write it to 0 to clear
-        bit 8: written to 1 at the end of the interrupt routine (signals command response available to dimm board ?)
+        bit 7-0: higher 8 bits of 24 bit offset parameter
+    NAOMI_DIMM_OFFSETL    = 5f7040  14000018 (16 bit):
+        bit 15-0: lower 16 bits of 24 bit offset parameter
+    NAOMI_DIMM_PARAMETERL = 5f7044  1400001c (16 bit)
+    NAOMI_DIMM_PARAMETERH = 5f7048  14000020 (16 bit)
+    NAOMI_DIMM_STATUS     = 5f704c  14000024 (16 bit):
+        bit 0: when 0 signal interrupt from naomi to dimm board
+        bit 8: when 0 signal interrupt from dimm board to naomi
 */
 
 // NOTE: all accesses are 16 or 32 bits wide but only 16 bits are valid
@@ -812,12 +813,19 @@ static WRITE64_HANDLER( naomi_rom_board_w )
 		// ROM_OFFSETH
 		rom_offset &= 0xffff;
 		rom_offset |= (data & 0x1fff)<<16;
+		rom_offset_flags = data >> 13;
 	}
 	else if ((offset == 0) && ACCESSING_BITS_32_47)
 	{
 		// ROM_OFFSETL
 		rom_offset &= 0xffff0000;
 		rom_offset |= ((data >> 32) & 0xffff);
+	}
+	if ((offset == 1) && ACCESSING_BITS_0_15)
+	{
+		// ROM_DATA
+		// Doa2 writes here (16 bit decryption key ?)
+		mame_printf_verbose("ROM: write %llx to 5f7008 (PC=%x)\n", data, activecpu_get_pc());
 	}
 	else if ((offset == 15) && ACCESSING_BITS_0_15)
 	{
@@ -2529,7 +2537,7 @@ ROM_START( doa2 )
 	NAOMI_BIOS
 
 	ROM_REGION( 0xb000000, "user1", 0)
-	ROM_LOAD("epr22121.22", 0x0000000, 0x0400000,  CRC(30f93b5e) SHA1(0e33383e7ab9a721dab4708b063598f2e9c9f2e7) )
+	ROM_LOAD("epr22121.22", 0x0000000, 0x0400000,  CRC(30f93b5e) SHA1(0e33383e7ab9a721dab4708b063598f2e9c9f2e7) ) // partially encrypted
 
 	ROM_LOAD("mpr-22100.ic1", 0x0800000, 0x0800000, CRC(92a53e5e) SHA1(87fcdeee9c4e65a3eb6eb345eed85d4f2df26c3c) )
 	ROM_LOAD("mpr-22101.ic2", 0x1000000, 0x0800000, CRC(14cd7dce) SHA1(5df14a5dad14bc922b4f88881dc2e9c8e74d6170) )
