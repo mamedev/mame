@@ -12,7 +12,7 @@
     Still to do:
 
         * determine actual slow/fast speeds
-        * 
+        *
 
 *************************************************************************/
 
@@ -216,7 +216,7 @@ static void vp931_init(laserdisc_state *ld)
 	/* find our CPU */
 	astring_printf(tempstring, "%s:%s", ld->device->tag, "vp931");
 	player->cpunum = mame_find_cpu_index(ld->device->machine, astring_c(tempstring));
-	
+
 	/* find our timer */
 	astring_printf(tempstring, "%s:%s", ld->device->tag, "tracktimer");
 	player->tracktimer = device_list_find_by_tag(ld->device->machine->config->devicelist, TIMER, astring_c(tempstring));
@@ -277,7 +277,7 @@ static void vp931_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 static UINT8 vp931_data_r(laserdisc_state *ld)
 {
 	ldplayer_data *player = ld->player;
-	
+
 	/* if data is pending, clear the pending flag and notify any callbacks */
 	if (player->tocontroller_pending)
 	{
@@ -294,7 +294,7 @@ static UINT8 vp931_data_r(laserdisc_state *ld)
 
 /*-------------------------------------------------
     vp931_ready - return the status of "ready"
-    to the caller (ready to accept another 
+    to the caller (ready to accept another
     command)
 -------------------------------------------------*/
 
@@ -327,17 +327,17 @@ static WRITE8_HANDLER( output0_w )
 {
 	laserdisc_state *ld = find_vp931(machine);
 	ldplayer_data *player = ld->player;
-	
+
 	/*
-		$80 = n/c
-		$40 = LED (?) -> C335
-		$20 = LED (?)
-		$10 = LED (?) -> CX
-		$08 = EJECT
-		$04 = inverted -> AUDIO MUTE II
-		$02 = inverted -> AUDIO MUTE I
-		$01 = inverted -> VIDEO MUTE
-	*/
+        $80 = n/c
+        $40 = LED (?) -> C335
+        $20 = LED (?)
+        $10 = LED (?) -> CX
+        $08 = EJECT
+        $04 = inverted -> AUDIO MUTE II
+        $02 = inverted -> AUDIO MUTE I
+        $01 = inverted -> VIDEO MUTE
+    */
 
 	if (LOG_PORTS && (player->out0 ^ data) & 0xff)
 	{
@@ -371,15 +371,15 @@ static WRITE8_HANDLER( output1_w )
 	INT32 speed = 0;
 
 	/*
-		$80 = n/c
-		$40 = n/c
-		$20 = n/c
-		$10 = n/c
-		$08 = inverted -> SMS
-		$04 = inverted -> SSS
-		$02 = inverted -> SCAN CMD
-		$01 = OSM
-	*/
+        $80 = n/c
+        $40 = n/c
+        $20 = n/c
+        $10 = n/c
+        $08 = inverted -> SMS
+        $04 = inverted -> SSS
+        $02 = inverted -> SCAN CMD
+        $01 = OSM
+    */
 
 	if (LOG_PORTS && (player->out1 ^ data) & 0x08)
 	{
@@ -388,19 +388,19 @@ static WRITE8_HANDLER( output1_w )
 		mame_printf_debug("\n");
 		player->out1 = data;
 	}
-	
+
 	/* speed is 0 unless SCAN CMD is clear */
 	speed = 0;
 	if (!(data & 0x02))
 	{
 		/* fast/slow is based on bit 2 */
 		speed = (data & 0x04) ? VP931_SCAN_FAST_SPEED : VP931_SCAN_SPEED;
-		
+
 		/* direction is based on bit 0 */
 		if (data & 0x01)
 			speed = -speed;
 	}
-	
+
 	/* update the speed */
 	ldcore_set_slider_speed(ld, speed);
 }
@@ -413,9 +413,9 @@ static WRITE8_HANDLER( output1_w )
 static WRITE8_HANDLER( lcd_w )
 {
 	/*
-		Frame number is written as 5 digits here; however, it is not actually
-		connected
-	*/
+        Frame number is written as 5 digits here; however, it is not actually
+        connected
+    */
 }
 
 
@@ -426,16 +426,16 @@ static WRITE8_HANDLER( lcd_w )
 static READ8_HANDLER( keypad_r )
 {
 	/*
-		From the code, this is apparently a vestigial keypad with basic controls:
-			$01 = play
-			$02 = still
-			$04 = jump 25 frames backward
-			$08 = jump 25 frames forward
-			$10 = search for frame 50(?)
-			$20 = search for frame 350(?)
-			$40 = reset
-			$80 = play reverse
-	*/
+        From the code, this is apparently a vestigial keypad with basic controls:
+            $01 = play
+            $02 = still
+            $04 = jump 25 frames backward
+            $08 = jump 25 frames forward
+            $10 = search for frame 50(?)
+            $20 = search for frame 350(?)
+            $40 = reset
+            $80 = play reverse
+    */
 	return 0x00;
 }
 
@@ -461,7 +461,7 @@ static READ8_HANDLER( from_controller_r )
 {
 	laserdisc_state *ld = find_vp931(machine);
 	ldplayer_data *player = ld->player;
-	
+
 	/* clear the pending flag and return the data */
 	player->fromcontroller_pending = FALSE;
 	return player->fromcontroller;
@@ -477,11 +477,11 @@ static WRITE8_HANDLER( to_controller_w )
 {
 	laserdisc_state *ld = find_vp931(machine);
 	ldplayer_data *player = ld->player;
-	
+
 	/* set the pending flag and stash the data */
 	player->tocontroller_pending = TRUE;
 	player->tocontroller = data;
-	
+
 	/* signal to the callback if provided */
 	if (player->data_ready_cb != NULL)
 		(*player->data_ready_cb)(ld->device, TRUE);
@@ -502,14 +502,14 @@ static READ8_HANDLER( port1_r )
 	UINT8 result = 0x00;
 
 	/*
-		$80 = P17 = (in) unsure
-		$40 = P16 = (in) /ERP from datic circuit
-		$20 = P15 = (in) D105
-	*/
-	
+        $80 = P17 = (in) unsure
+        $40 = P16 = (in) /ERP from datic circuit
+        $20 = P15 = (in) D105
+    */
+
 	if (!player->daticerp)
 		result |= 0x40;
-	
+
 	return result;
 }
 
@@ -522,14 +522,14 @@ static WRITE8_HANDLER( port1_w )
 {
 	laserdisc_state *ld = find_vp931(machine);
 	ldplayer_data *player = ld->player;
-	
+
 	/*
-		$10 = P14 = (out) D104 -> /SPEED
-		$08 = P13 = (out) D103 -> /TIMER ENABLE
-		$04 = P12 = (out) D102 -> /REV
-		$02 = P11 = (out) D101 -> /FORW
-		$01 = P10 = (out) D100 -> some op-amp then to C334, B56, B332
-	*/
+        $10 = P14 = (out) D104 -> /SPEED
+        $08 = P13 = (out) D103 -> /TIMER ENABLE
+        $04 = P12 = (out) D102 -> /REV
+        $02 = P11 = (out) D101 -> /FORW
+        $01 = P10 = (out) D100 -> some op-amp then to C334, B56, B332
+    */
 
 	if (LOG_PORTS && (player->port1 ^ data) & 0x1f)
 	{
@@ -541,7 +541,7 @@ static WRITE8_HANDLER( port1_w )
 		if (!(data & 0x01)) printf(" OPAMP");
 		printf("\n");
 	}
-	
+
 	/* if bit 0 is set, we are not tracking */
 	if (data & 0x01)
 		player->trackdir = 0;
@@ -550,14 +550,14 @@ static WRITE8_HANDLER( port1_w )
 	else if (player->trackdir == 0)
 	{
 		player->advanced = 0;
-		
+
 		/* if bit 2 is clear, we are moving backwards */
 		if (!(data & 0x04))
 		{
 			player->trackdir = -1;
 			player->trackstate = 1;
 		}
-		
+
 		/* if bit 1 is clear, we are moving forward */
 		else if (!(data & 0x02))
 		{
@@ -572,13 +572,13 @@ static WRITE8_HANDLER( port1_w )
 		/* turn it off if we're not tracking */
 		if (player->trackdir == 0)
 			timer_device_adjust_periodic(player->tracktimer, attotime_never, 0, attotime_never);
-		
+
 		/* if we just started tracking, or if the speed was changed, reprime the timer */
 		else if (((player->port1 ^ data) & 0x11) != 0)
 		{
 			/* speeds here are just guesses, but work with the player logic; this is the time per half-track */
 			attotime speed = (data & 0x10) ? ATTOTIME_IN_USEC(60) : ATTOTIME_IN_USEC(10);
-			
+
 			/* always start with an initial long delay; the code expects this */
 			timer_device_adjust_periodic(player->tracktimer, ATTOTIME_IN_USEC(100), 0, speed);
 		}
@@ -599,16 +599,16 @@ static READ8_HANDLER( port2_r )
 	UINT8 result = 0x00;
 
 	/*
-		$80 = P27 = (in) set/reset latch; set by FOC LS, reset by IGR
-		$20 = P25 = (in) D125 -> 0 when data written to controller is preset, reset to 1 when read
-		$10 = P24 = (in) D124 -> 0 when data from controller is present, reset to 1 on a read
-	*/
-	
+        $80 = P27 = (in) set/reset latch; set by FOC LS, reset by IGR
+        $20 = P25 = (in) D125 -> 0 when data written to controller is preset, reset to 1 when read
+        $10 = P24 = (in) D124 -> 0 when data from controller is present, reset to 1 on a read
+    */
+
 	if (!player->tocontroller_pending)
 		result |= 0x20;
 	if (!player->fromcontroller_pending)
 		result |= 0x10;
-	
+
 	return result;
 }
 
@@ -620,9 +620,9 @@ static READ8_HANDLER( port2_r )
 static WRITE8_HANDLER( port2_w )
 {
 	/*
-		$40 = P26 = (out) cleared while data is sent back & forth; set afterwards
-					[Not actually connected, but this is done in the code]
-	*/
+        $40 = P26 = (out) cleared while data is sent back & forth; set afterwards
+                    [Not actually connected, but this is done in the code]
+    */
 }
 
 
@@ -664,18 +664,18 @@ static TIMER_CALLBACK( vbi_data_fetch )
 	int which = param & 3;
 	int line = param >> 2;
 	UINT32 code = 0;
-	
+
 	/* fetch the code and compute the DATIC latched value */
 	if (line >= LASERDISC_CODE_LINE16 && line <= LASERDISC_CODE_LINE18)
 		code = laserdisc_get_field_code(ld->device, line);
-	
+
 	/* at the start of each line, signal an interrupt and use a timer to turn it off */
 	if (which == 0)
 	{
 		cpunum_set_input_line(machine, player->cpunum, MCS48_INPUT_IRQ, ASSERT_LINE);
 		timer_set(ATTOTIME_IN_NSEC(5580), ld, 0, irq_off);
 	}
-		
+
 	/* clock the data strobe on each subsequent callback */
 	else if (code != 0)
 	{
@@ -683,7 +683,7 @@ static TIMER_CALLBACK( vbi_data_fetch )
 		player->datastrobe = 1;
 		timer_set(ATTOTIME_IN_NSEC(5000), ld, 0, datastrobe_off);
 	}
-	
+
 	/* determine the next bit to fetch and reprime ourself */
 	if (++which == 4)
 	{
@@ -708,7 +708,7 @@ static TIMER_CALLBACK( deferred_data_w )
 	/* set the value and mark it pending */
 	player->fromcontroller = param;
 	player->fromcontroller_pending = TRUE;
-	
+
 	/* track the commands for debugging purposes */
 	if (player->cmdcount < ARRAY_LENGTH(player->cmdbuf))
 	{
@@ -761,7 +761,7 @@ static TIMER_DEVICE_CALLBACK( track_timer )
 {
 	laserdisc_state *ld = ptr;
 	ldplayer_data *player = ld->player;
-	
+
 	/* advance by the count and toggle the state */
 	player->trackstate ^= 1;
 	if ((player->trackdir < 0 && !player->trackstate) || (player->trackdir > 0 && player->trackstate))

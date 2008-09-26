@@ -151,7 +151,7 @@ static const ldplayer_interface *player_interfaces[] =
 	&simutrek_interface,
 	&ldv1000_interface,
 //  &ldp1450_interface,
-//	&vp932_interface,
+//  &vp932_interface,
 	&vp931_interface
 };
 
@@ -894,7 +894,7 @@ static void read_track_data(laserdisc_state *ld)
 	UINT32 vbiframe;
 	UINT32 readhunk;
 	INT32 chdtrack;
-	
+
 	frame = &ldcore->frame[ldcore->videoindex];
 
 	/* special cases for playing forward */
@@ -903,7 +903,7 @@ static void read_track_data(laserdisc_state *ld)
 		/* if the previous field had a frame number, force the new field to pair with the previous one */
 		if ((ldcore->metadata[fieldnum ^ 1].line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
 			frame->numfields = 1;
-		
+
 		/* if the twice-previous field was a frame number, and we've moved one since then, consider this one done */
 		else if (frame->numfields >= 2 && (ldcore->metadata[fieldnum].line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
 		{
@@ -912,7 +912,7 @@ static void read_track_data(laserdisc_state *ld)
 			frame->numfields = 0;
 		}
 	}
-	
+
 	/* all other cases */
 	else
 	{

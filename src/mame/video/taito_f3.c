@@ -2557,7 +2557,7 @@ static void scanline_draw(running_machine *machine, bitmap_t *bitmap, const rect
 
 				/*
                     sprite priority==playfield priority
-                    	GSEEKER (plane leaving hangar) --> sprite 
+                        GSEEKER (plane leaving hangar) --> sprite
                         BUBSYMPH (title)       ---> sprite
                         DARIUSG (ZONE V' BOSS) ---> playfield
                 */

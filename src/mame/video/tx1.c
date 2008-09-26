@@ -198,7 +198,7 @@ WRITE16_HANDLER( tx1_bankcs_w )
 	if ( !(offset & 0x40) )
 	{
 		/* TODO: Looks safe to remove this */
-//		if ( offset & 2 )
+//      if ( offset & 2 )
 			tx1_vregs.h_val += tx1_vregs.h_inc;
 	}
 }
@@ -455,7 +455,7 @@ static void tx1_draw_road(running_machine *machine, UINT8 *bitmap)
 
 		UINT8	hc1_u, hc1_l;
 		UINT8	hc0_u, hc0_l;
-		
+
 		UINT32	bnkls, bnkcs, bnkrs;
 		UINT32	rl, rc, rr;
 
@@ -590,7 +590,7 @@ static void tx1_draw_road(running_machine *machine, UINT8 *bitmap)
 		stl = !stlf || v0 || (!v2 && !scchgf) || scchgf;
 		selb = (!v2 && !scchgf) || v2;
 
-		rltmp = 
+		rltmp =
 		(v2 && !v0 && !va10)
 		|| (!v2 && v0 && !va10)
 		|| (v2 && !v0 && !va11)
@@ -599,7 +599,7 @@ static void tx1_draw_road(running_machine *machine, UINT8 *bitmap)
 		|| (!v2 && v1 && !v0)
 		|| (!v2 && !v1 && v0);
 
-		rctmp = 
+		rctmp =
 		(v2 && !v0 && va9 && va8)
 		|| (!v2 && v0 && va9 && va8)
 		|| (v2 && !v0 && !va11)
@@ -608,7 +608,7 @@ static void tx1_draw_road(running_machine *machine, UINT8 *bitmap)
 		|| (!v2 &&  v1 && !v0)
 		|| (!v2 && !v1 &&  v0);
 
-		rrtmp = 
+		rrtmp =
 		(v2 && !v0 && !va11 && !va10)
 		|| (!v2 && v0 && !va11 && !va10)
 		|| (v2 && !v0 && va9)
@@ -834,8 +834,8 @@ static void tx1_draw_road(running_machine *machine, UINT8 *bitmap)
 
 			/* Update bank counter */
 			bank_cnt = (bank_cnt + 1) & 0x7ff;
-		}		
-		
+		}
+
 		tx1_vregs.h_val += tx1_vregs.h_inc;
 
 		/* Finally, increment the bank accumulator */
@@ -1073,7 +1073,7 @@ static void tx1_draw_objects(running_machine *machine, UINT8 *bitmap)
 							else
 								color = ~ic162[prom_addr] & 0x3f;
 
-//							*BITMAP_ADDR16(bitmap, y, x) = machine->pens[TX1_COLORS_OBJ + color];
+//                          *BITMAP_ADDR16(bitmap, y, x) = machine->pens[TX1_COLORS_OBJ + color];
 							*(bitmap + 768*y + x) = 0x40 | color;
 						}
 					}
@@ -1378,7 +1378,7 @@ static void buggyboy_draw_char(running_machine *machine, UINT8 *bitmap, int wide
 		{
 			UINT32 tilenum;
 			UINT16 ram_val;
-			
+
 			if (wide)
 				ram_val = buggyboy_vram[((y_offs << 4) & 0xf80) + ((x_offs >> 3) & 0x7f)];
 			else
@@ -2122,11 +2122,11 @@ static void buggyboy_draw_objs(running_machine *machine, UINT8 *bitmap, int wide
 						UINT32	low_addr = ((x_acc >> (FRAC + 3)) & x_mask);
 
 						/*
-							Objects are grouped by width (either 16, 8 or 4 tiles) in
-							the LUT ROMs. The ROM address lines therefore indicate
-							width and are used to determine the correct scan order
-							when x-flip is set.
-						*/
+                            Objects are grouped by width (either 16, 8 or 4 tiles) in
+                            the LUT ROMs. The ROM address lines therefore indicate
+                            width and are used to determine the correct scan order
+                            when x-flip is set.
+                        */
 						if (gxflip)
 						{
 							UINT32	xor_mask;
@@ -2455,7 +2455,7 @@ VIDEO_UPDATE( buggyboy )
 		memset(bb_obj_bmp, 0, 768*240);
 
 		buggyboy_draw_char(screen->machine, bb_chr_bmp, 1);
-//		buggyboy_draw_road(screen->machine, bb_rod_bmp, 1);
+//      buggyboy_draw_road(screen->machine, bb_rod_bmp, 1);
 		buggyboy_draw_objs(screen->machine, bb_obj_bmp, 1);
 
 		bb_combine_layers(screen->machine, bitmap, 0);

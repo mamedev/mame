@@ -434,7 +434,7 @@ void debug_cpu_start_hook(running_machine *machine, int cpunum, attotime endtime
 			debug_view_update_all();
 			global.last_periodic_update_time = osd_ticks();
 		}
-		
+
 		/* check for pending breaks */
 		else if (info == global.breakcpu)
 		{
@@ -944,13 +944,13 @@ void debug_cpu_halt_on_next_instruction(running_machine *machine, int cpunum, co
 {
 	debug_cpu_info *info;
 	va_list arg;
-	
+
 	/* pick the best CPU to land on */
 	if (cpunum != -1)
 		info = &global.cpuinfo[cpunum];
 	else if (global.visiblecpu != NULL)
 		info = global.visiblecpu;
-	else 
+	else
 		info = global.livecpu;
 
 	/* if something is pending on this CPU already, ignore this request */

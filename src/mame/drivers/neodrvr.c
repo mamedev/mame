@@ -7163,8 +7163,8 @@ static DRIVER_INIT( kf2k3pcb )
 	neogeo_cmc50_m1_decrypt(machine);
 
 	/* extra little swap on the m1 - this must be performed AFTER the m1 decrypt
-	   or the m1 checksum (used to generate the key) for decrypting the m1 is
-	   incorrect */
+       or the m1 checksum (used to generate the key) for decrypting the m1 is
+       incorrect */
 	{
 		int i;
 		UINT8* rom = memory_region(machine, "audio");

@@ -297,17 +297,17 @@ GFXDECODE_END
 
 static WRITE8_HANDLER(chanbara_ay_out_0_w)
 {
-//	printf("chanbara_ay_out_0_w %02x\n",data);
+//  printf("chanbara_ay_out_0_w %02x\n",data);
 	scroll=data;
 }
 
 static WRITE8_HANDLER(chanbara_ay_out_1_w)
 {
-//	printf("chanbara_ay_out_1_w %02x\n",data);
+//  printf("chanbara_ay_out_1_w %02x\n",data);
 	memory_set_bankptr(1, memory_region(machine, "user1") + ((data&4)?0x4000:0x0000) );
 	scrollhi = data & 0x03;
 
-	//if (data&0xf8) 	printf("chanbara_ay_out_1_w unused bits set %02x\n",data&0xf8);
+	//if (data&0xf8)    printf("chanbara_ay_out_1_w unused bits set %02x\n",data&0xf8);
 }
 
 static void sound_irq(running_machine *machine, int linestate)

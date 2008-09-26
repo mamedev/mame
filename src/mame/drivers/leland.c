@@ -680,7 +680,7 @@ INPUT_PORTS_END
 
    Port A of both chips is connected to a banking control
    register.
-   
+
    All 6 (3*2) AY-3-8910/12 outputs are tied together
    and put with 1000 Ohm to gnd.
    The following is a approximation, since

@@ -875,7 +875,7 @@ DISCRETE_SOUND_END
 SOUND_START( dkong)
 {
 	dkong_state *state = machine->driver_data;
-	
+
 	state->snd_rom = memory_region(machine, "sound");
 	state->dev_vp2 = devtag_get_device(machine, LATCH8, "virtual_p2");
 }

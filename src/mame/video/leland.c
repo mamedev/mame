@@ -55,17 +55,17 @@ static TIMER_CALLBACK( scanline_callback )
 	int scanline = param;
 
 	/* update the DACs */
-	
+
 	if (!(leland_dac_control & 0x01))
 		leland_dac_update(0, leland_video_ram[(last_scanline) * 256 + 160]);
 
 	if (!(leland_dac_control & 0x02))
 		leland_dac_update(1, leland_video_ram[(last_scanline) * 256 + 161]);
-	
+
 	last_scanline = scanline;
 
 	scanline = (scanline+1) % 256;
-	
+
 	if (scanline == 0)
 	{
 		/* turn off the DACs at the start of the frame */
@@ -90,7 +90,7 @@ static VIDEO_START( leland )
 
 	/* reset videoram */
 	memset(leland_video_ram, 0, VRAM_SIZE);
-	
+
 	/* scanline timer */
 	scanline_timer = timer_alloc(scanline_callback, NULL);
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);

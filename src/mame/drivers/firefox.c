@@ -73,13 +73,13 @@ static int m_n_disc_read_data;
 static READ8_HANDLER( firefox_disc_status_r )
 {
 	UINT8 result = 0xff;
-	
+
 	result ^= 0x20;
 	if (!laserdisc_line_r(laserdisc, LASERDISC_LINE_READY))
 		result ^= 0x40;
 	if (laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL))
 		result ^= 0x80;
-		
+
 	return result;
 }
 

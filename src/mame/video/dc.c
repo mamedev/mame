@@ -634,7 +634,7 @@ static void computedilated(void)
 static void testdrawline(bitmap_t *bitmap, int index, int from, int to)
 {
 UINT32 *bmpaddr;
-int ix, iy, i, inc, x, y, dx, dy, plotx, ploty;  
+int ix, iy, i, inc, x, y, dx, dy, plotx, ploty;
 
 	if ((state_ta.grab[index].showvertices[to].x < 0) || (state_ta.grab[index].showvertices[to].x > 639))
 		return;
@@ -660,7 +660,7 @@ int ix, iy, i, inc, x, y, dx, dy, plotx, ploty;
 		if (x > inc)
 		{
 			x -= inc;
-			plotx += (dx ? dx/ix : 0); 
+			plotx += (dx ? dx/ix : 0);
 			bmpaddr = BITMAP_ADDR32(bitmap,ploty,plotx);
 			*bmpaddr = MAKE_RGB(0, 0, 255);
 		}

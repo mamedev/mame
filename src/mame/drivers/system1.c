@@ -478,7 +478,7 @@ static INPUT_PORTS_START( system1_generic )
 	PORT_DIPSETTING(    0xd0, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
-	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )	
+	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
 /*  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) ) Not allowed by mame coinage sorting, but valid */
 INPUT_PORTS_END
 

@@ -903,7 +903,7 @@ VIDEO_START( neogeo )
 	state_save_register_global(auto_animation_frame_counter);
 
 	state_save_register_postload(machine, regenerate_pens, NULL);
-	
+
 	region_zoomy = memory_region(machine, "zoomy");
 }
 

@@ -502,17 +502,17 @@ This game runs on hardware called "GORGON". It appears to be similar to
 System 23 but the PCBs are slightly larger.
 
 The system comprises Main PCB, ROM PCB and I/O PCB all located inside
-a metal box with 3 separate power supplies for 5V, 12V and 3.3V. Main 
+a metal box with 3 separate power supplies for 5V, 12V and 3.3V. Main
 input power is 115V.
 The game is controlled by rotating a paddle (for thrust) and turning it
 sideways (moves left/right).
-The rotation action is done with a 5K potentiometer whereby the thrust 
+The rotation action is done with a 5K potentiometer whereby the thrust
 is achieved by moving the pot from full left to full right continuously.
 The left/right turning movement is just another 5K potentiometer connected
 to the column of the paddle center shaft.
 There are also some buttons just for test mode, including SELECT, UP & DOWN
-The player's seat has movement controlled by a compressor and several 
-potentiometers. On bootup, the system tests the seat movement and displays 
+The player's seat has movement controlled by a compressor and several
+potentiometers. On bootup, the system tests the seat movement and displays
 a warning if it's not working. Pressing START allows the game to continue
 and function normally without the seat movement.
 
@@ -583,7 +583,7 @@ Notes:
       J4/J5/J6 \
       J8/J9    / Custom NAMCO connectors for connection of MEM(M1) PCB
       J10      - Custom NAMCO connector for MSPM(FR) PCB
-      
+
 
       Namco Custom ICs
       ----------------
@@ -687,7 +687,7 @@ Notes:
       JP5     | Jumpers to set ROM sizes (32M/64M)
       JP6/JP7 |
       JP8/JP9 /
-      
+
       ROMs
       ----
            PT*  - Point ROMs, sizes configurable to either 16M or 32M (SOP44)
@@ -696,11 +696,11 @@ Notes:
            CCR* - Texture Tilemap ROMs, sizes fixed at 16M (SOP44)
            SPR* - Sprite ROMs, sizes configurable to either 32M or 64M (SOP44)
            WAVE*- Wave ROMs, sizes configurable to either 32M or 64M (SOP44)
-           
+
 I/O PCB
 -------
 
-V187 ASCA-2A PCB 
+V187 ASCA-2A PCB
 2477960102 (2477970102)
 |--------------------------------------------------------|
 |                   J105                                 |
@@ -873,7 +873,7 @@ static VIDEO_UPDATE( ss23 )
 
 	tilemap_mark_all_tiles_dirty(bgtilemap);
 	tilemap_draw( bitmap, cliprect, bgtilemap, 0/*flags*/, 0/*priority*/ ); /* opaque */
-  
+
 #if 0
 	static int bNew = 1;
 	static int code = 0x80;
@@ -1379,27 +1379,27 @@ MACHINE_DRIVER_END
 
 ROM_START( rapidrvr )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
-        ROM_LOAD16_BYTE( "rd3verc.ic2",  0x000000, 0x200000, CRC(c15c0f30) SHA1(9f529232818f3e184f81f62408a5cad615b05613) ) 
-        ROM_LOAD16_BYTE( "rd3verc.ic1",  0x000001, 0x200000, CRC(9d7f4411) SHA1(d049efaa539d36ed0f73ca3f50a8f7112e67f865) ) 
+        ROM_LOAD16_BYTE( "rd3verc.ic2",  0x000000, 0x200000, CRC(c15c0f30) SHA1(9f529232818f3e184f81f62408a5cad615b05613) )
+        ROM_LOAD16_BYTE( "rd3verc.ic1",  0x000001, 0x200000, CRC(9d7f4411) SHA1(d049efaa539d36ed0f73ca3f50a8f7112e67f865) )
 
 	ROM_REGION( 0x80000, "audio", 0 )	/* Hitachi H8/3002 MCU code */
-	ROM_LOAD16_WORD_SWAP( "rd3verc.ic3",  0x000000, 0x080000, CRC(6e26fbaf) SHA1(4ab6637d22f0d26f7e1d10e9c80059c56f64303d) ) 
+	ROM_LOAD16_WORD_SWAP( "rd3verc.ic3",  0x000000, 0x080000, CRC(6e26fbaf) SHA1(4ab6637d22f0d26f7e1d10e9c80059c56f64303d) )
 
 	ROM_REGION( 0x800000, "sprite", 0 )	/* sprite? tilemap? tiles */
-        ROM_LOAD16_BYTE( "rd1mtal.1j",   0x000000, 0x400000, CRC(8f0efa86) SHA1(9953461c258f2a96be275a7b18d6518ddfac3860) ) 
-        ROM_LOAD16_BYTE( "rd1mtah.3j",   0x000001, 0x400000, CRC(d8fa0f3d) SHA1(0d5bdb3a2e7be1dffe11b74baa2c10bfe011ae92) ) 
+        ROM_LOAD16_BYTE( "rd1mtal.1j",   0x000000, 0x400000, CRC(8f0efa86) SHA1(9953461c258f2a96be275a7b18d6518ddfac3860) )
+        ROM_LOAD16_BYTE( "rd1mtah.3j",   0x000001, 0x400000, CRC(d8fa0f3d) SHA1(0d5bdb3a2e7be1dffe11b74baa2c10bfe011ae92) )
 
 	ROM_REGION( 0x2000000, "textile", 0 )	/* texture tiles */
-        ROM_LOAD( "rd1cguu.5b",   0x0000000, 0x800000, CRC(611bab41) SHA1(84cddb2b63bf8336e92aecb06eddf1b34af73540) )	
+        ROM_LOAD( "rd1cguu.5b",   0x0000000, 0x800000, CRC(611bab41) SHA1(84cddb2b63bf8336e92aecb06eddf1b34af73540) )
         ROM_LOAD( "rd1cgum.6b",   0x0800000, 0x800000, CRC(c50de2ef) SHA1(24758a72b3569ce6a643a5786fce7c34b8aa692d) )
         ROM_LOAD( "rd1cgll.8b",   0x1000000, 0x800000, CRC(b58b92ac) SHA1(70ee6e0e5347e05817aa30d53d766b8ce0fc44e4) )
-        ROM_LOAD( "rd1cglm.7b",   0x1800000, 0x800000, CRC(447067fa) SHA1(e2052373773594feb303e1924a4a820cf34ab55b) ) 
+        ROM_LOAD( "rd1cglm.7b",   0x1800000, 0x800000, CRC(447067fa) SHA1(e2052373773594feb303e1924a4a820cf34ab55b) )
 
 	ROM_REGION( 0x2000000, "textile2", 0 )	/* texture tiles bank 2? */
         ROM_LOAD( "rd1spruu.9p",  0x0000000, 0x400000, CRC(f20a9673) SHA1(e5f1d552b0c42e102593ab578ff0b9ff814f8650) )
-        ROM_LOAD( "rd1sprum.10p", 0x0800000, 0x400000, CRC(8e08b2c6) SHA1(a17331a4e41f677f604d1b74e7694cf920b03b66) ) 
+        ROM_LOAD( "rd1sprum.10p", 0x0800000, 0x400000, CRC(8e08b2c6) SHA1(a17331a4e41f677f604d1b74e7694cf920b03b66) )
         ROM_LOAD( "rd1sprll.12t", 0x1000000, 0x400000, CRC(8d450259) SHA1(27cccd1e7dad8880147bb85185982d8d27076e69) )
-        ROM_LOAD( "rd1sprlm.11p", 0x1800000, 0x400000, CRC(6c8db3a5) SHA1(24d81fa11e9c835cddadec4cbd530738e258346c) )  
+        ROM_LOAD( "rd1sprlm.11p", 0x1800000, 0x400000, CRC(6c8db3a5) SHA1(24d81fa11e9c835cddadec4cbd530738e258346c) )
 
 	ROM_REGION( 0x2000000, "textiledup", 0 )	/* duplicate bank of texture tiles */
         ROM_LOAD( "rd1cguu.5f",   0x0800000, 0x800000, CRC(611bab41) SHA1(84cddb2b63bf8336e92aecb06eddf1b34af73540) )
@@ -1409,9 +1409,9 @@ ROM_START( rapidrvr )
 
 	ROM_REGION( 0x2000000, "textile2d", 0 )	/* duplicate of texture tiles bank 2? */
         ROM_LOAD( "rd1spruu.9t",  0x0000000, 0x400000, CRC(f20a9673) SHA1(e5f1d552b0c42e102593ab578ff0b9ff814f8650) )
-        ROM_LOAD( "rd1sprum.10t", 0x0800000, 0x400000, CRC(8e08b2c6) SHA1(a17331a4e41f677f604d1b74e7694cf920b03b66) ) 
+        ROM_LOAD( "rd1sprum.10t", 0x0800000, 0x400000, CRC(8e08b2c6) SHA1(a17331a4e41f677f604d1b74e7694cf920b03b66) )
         ROM_LOAD( "rd1sprll.12p", 0x1000000, 0x400000, CRC(8d450259) SHA1(27cccd1e7dad8880147bb85185982d8d27076e69) )
-        ROM_LOAD( "rd1sprlm.11t", 0x1800000, 0x400000, CRC(6c8db3a5) SHA1(24d81fa11e9c835cddadec4cbd530738e258346c) )  
+        ROM_LOAD( "rd1sprlm.11t", 0x1800000, 0x400000, CRC(6c8db3a5) SHA1(24d81fa11e9c835cddadec4cbd530738e258346c) )
 
 	ROM_REGION( 0x400000, "textilemap", 0 )	/* texture tilemap */
         ROM_LOAD( "rd1ccrl.11a",  0x000000, 0x200000, CRC(b0ea2b32) SHA1(0dc45846725b0de619bc6bae69e3eb166ed21bf0) )
@@ -1422,15 +1422,15 @@ ROM_START( rapidrvr )
         ROM_LOAD( "rd1ccrh.11f",  0x200000, 0x200000, CRC(fafffb86) SHA1(15b0ba0252b99d0cac29fcb374fb895643f528fe) )
 
 	ROM_REGION32_LE( 0x2000000, "pointrom", 0 )	/* 3D model data */
-        ROM_LOAD32_WORD( "rd1pt0l.9j",   0x0000000, 0x400000, CRC(47b1c5a5) SHA1(021d4ca7b8674d8ed5daa701bf41b4a7164d992a) )  
-        ROM_LOAD32_WORD( "rd1pt0h.9l",   0x0000002, 0x400000, CRC(6f280eff) SHA1(9dd8c8903581d7a412146e50f4009e1d2b743f06) )  
-        ROM_LOAD32_WORD( "rd1pt1l.10j",  0x0800000, 0x400000, CRC(91131cb3) SHA1(e42c5e190c719f1cf2d6e91444062ab901be0e73) ) 
-        ROM_LOAD32_WORD( "rd1pt1h.10l",  0x0800002, 0x400000, CRC(37bd9bdf) SHA1(b26c284024ea4ad4c67b2eefbfdd5ebb35a0118e) )  
-        ROM_LOAD32_WORD( "rd1pt2l.11j",  0x1000000, 0x400000, CRC(3423ff9f) SHA1(73823c179c866cbb601a23417acbbf5b3dc97213) )  
-        ROM_LOAD32_WORD( "rd1pt2h.11l",  0x1000002, 0x400000, CRC(fa601e83) SHA1(45c420538910f566e75d668306735f54c901669f) )  
-        ROM_LOAD32_WORD( "rd1pt3l.12j",  0x1800000, 0x400000, CRC(7216d63e) SHA1(77088ff05c2630996f4bdc87fe466f9b97611467) )  
-        ROM_LOAD32_WORD( "rd1pt3h.12l",  0x1800002, 0x400000, CRC(e82ff66a) SHA1(9e2c951136b26d969d2c9d030b7e0bad8bbbe3fb) ) 
-	
+        ROM_LOAD32_WORD( "rd1pt0l.9j",   0x0000000, 0x400000, CRC(47b1c5a5) SHA1(021d4ca7b8674d8ed5daa701bf41b4a7164d992a) )
+        ROM_LOAD32_WORD( "rd1pt0h.9l",   0x0000002, 0x400000, CRC(6f280eff) SHA1(9dd8c8903581d7a412146e50f4009e1d2b743f06) )
+        ROM_LOAD32_WORD( "rd1pt1l.10j",  0x0800000, 0x400000, CRC(91131cb3) SHA1(e42c5e190c719f1cf2d6e91444062ab901be0e73) )
+        ROM_LOAD32_WORD( "rd1pt1h.10l",  0x0800002, 0x400000, CRC(37bd9bdf) SHA1(b26c284024ea4ad4c67b2eefbfdd5ebb35a0118e) )
+        ROM_LOAD32_WORD( "rd1pt2l.11j",  0x1000000, 0x400000, CRC(3423ff9f) SHA1(73823c179c866cbb601a23417acbbf5b3dc97213) )
+        ROM_LOAD32_WORD( "rd1pt2h.11l",  0x1000002, 0x400000, CRC(fa601e83) SHA1(45c420538910f566e75d668306735f54c901669f) )
+        ROM_LOAD32_WORD( "rd1pt3l.12j",  0x1800000, 0x400000, CRC(7216d63e) SHA1(77088ff05c2630996f4bdc87fe466f9b97611467) )
+        ROM_LOAD32_WORD( "rd1pt3h.12l",  0x1800002, 0x400000, CRC(e82ff66a) SHA1(9e2c951136b26d969d2c9d030b7e0bad8bbbe3fb) )
+
 	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
         ROM_LOAD( "rd1wavel.2s",  0x000000, 0x800000, CRC(bf52c08c) SHA1(6745062e078e520484390fad1f723124aa4076d0) )
         ROM_LOAD( "rd1waveh.3s",  0x800000, 0x800000, CRC(ef0136b5) SHA1(a6d923ededca168fe555e0b86a72f53bec5424cc) )

@@ -93,11 +93,11 @@ struct _dkong_state
 	size_t 			sprite_ram_size;
 
 	/* radar scope */
-	
+
 	UINT8 *			gfx4;
 	UINT8 *			gfx3;
 	int				gfx3_len;
-	
+
 	UINT8	sig30Hz;
 	UINT8	grid_sig;
 	UINT8	rflip_sig;

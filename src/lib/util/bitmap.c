@@ -199,12 +199,12 @@ void bitmap_fill(bitmap_t *dest, const rectangle *cliprect, UINT32 color)
 			else
 			{
 				UINT16 *destrow, *destrow0;
-				
+
 				/* Fill the first line the hard way */
 				destrow  = BITMAP_ADDR16(dest, fill.min_y, 0);
 				for (x = fill.min_x; x <= fill.max_x; x++)
 					destrow[x] = (UINT16)color;
-				
+
 				/* For the other lines, just copy the first one */
 				destrow0 = BITMAP_ADDR16(dest, fill.min_y, fill.min_x);
 				for (y = fill.min_y + 1; y <= fill.max_y; y++)
@@ -230,7 +230,7 @@ void bitmap_fill(bitmap_t *dest, const rectangle *cliprect, UINT32 color)
 				destrow  = BITMAP_ADDR32(dest, fill.min_y, 0);
 				for (x = fill.min_x; x <= fill.max_x; x++)
 					destrow[x] = (UINT32)color;
-				
+
 				/* For the other lines, just copy the first one */
 				destrow0 = BITMAP_ADDR32(dest, fill.min_y, fill.min_x);
 				for (y = fill.min_y + 1; y <= fill.max_y; y++)
