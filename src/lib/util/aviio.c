@@ -643,14 +643,6 @@ avi_error avi_close(avi_file *file)
 		if (avierr == AVIERR_NONE && file->riffbase == 0)
 			avierr = write_idx1_chunk(file);
 
-		/* close the RIFF chunk */
-		if (avierr == AVIERR_NONE)
-			avierr = chunk_close(file);
-
-		/* update the avih chunk */
-		if (avierr == AVIERR_NONE)
-			avierr = write_avih_chunk(file, FALSE);
-
 		/* update the strh and indx chunks for each stream */
 		for (strnum = 0; strnum < file->streams; strnum++)
 		{
@@ -659,6 +651,14 @@ avi_error avi_close(avi_file *file)
 			if (avierr == AVIERR_NONE)
 				avierr = write_indx_chunk(file, &file->stream[strnum], FALSE);
 		}
+
+		/* update the avih chunk */
+		if (avierr == AVIERR_NONE)
+			avierr = write_avih_chunk(file, FALSE);
+
+		/* close the RIFF chunk */
+		if (avierr == AVIERR_NONE)
+			avierr = chunk_close(file);
 	}
 
 	/* close the file */

@@ -2539,8 +2539,8 @@ void video_avi_begin_recording(running_machine *machine, const char *name)
 	info.video_depth = 24;
 
 	info.audio_format = 0;
-	info.audio_timescale = 1;
-	info.audio_sampletime = machine->sample_rate;
+	info.audio_timescale = machine->sample_rate;
+	info.audio_sampletime = 1;
 	info.audio_numsamples = 0;
 	info.audio_channels = 2;
 	info.audio_samplebits = 16;
