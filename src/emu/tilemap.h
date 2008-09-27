@@ -390,12 +390,13 @@ typedef struct _tilemap tilemap;
 typedef struct _tile_data tile_data;
 struct _tile_data
 {
-	const UINT8 *	pen_data;		/* required */
-	const UINT8 *	mask_data;		/* required */
+	const UINT8*	pen_data;		/* required */
+	const UINT8*	mask_data;		/* required */
 	pen_t			palette_base;	/* defaults to 0 */
-	UINT8 			category;		/* defaults to 0; range from 0..15 */
+	UINT8			category;		/* defaults to 0; range from 0..15 */
 	UINT8			group;			/* defaults to 0; range from 0..TILEMAP_NUM_GROUPS */
-	UINT8 			flags;			/* defaults to 0; one or more of TILE_* flags above */
+	UINT8			flags;			/* defaults to 0; one or more of TILE_* flags above */
+	UINT8			pen_mask;		/* defaults to 0xff; mask to apply to pen_data while rendering the tile */
 };
 
 

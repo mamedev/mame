@@ -149,7 +149,7 @@ static void mappings_update(tilemap *tmap);
 /* tile rendering */
 static void pixmap_update(tilemap *tmap, const rectangle *cliprect);
 static void tile_update(tilemap *tmap, tilemap_logical_index logindex, UINT32 cached_col, UINT32 cached_row);
-static UINT8 tile_draw(tilemap *tmap, const UINT8 *pendata, UINT32 x0, UINT32 y0, UINT32 palette_base, UINT8 category, UINT8 group, UINT8 flags);
+static UINT8 tile_draw(tilemap *tmap, const UINT8 *pendata, UINT32 x0, UINT32 y0, UINT32 palette_base, UINT8 category, UINT8 group, UINT8 flags, UINT8 pen_mask);
 static UINT8 tile_apply_bitmask(tilemap *tmap, const UINT8 *maskdata, UINT32 x0, UINT32 y0, UINT8 category, UINT8 flags);
 
 /* drawing helpers */
@@ -314,6 +314,9 @@ tilemap *tilemap_create(tile_get_info_func tile_get_info, tilemap_mapper_func ma
 
 	/* set up the tile map callbacks */
 	tmap->tile_get_info = tile_get_info;
+
+	/* set up the default pen mask */
+	tmap->tileinfo.pen_mask = 0xff;
 
 	/* initialize global states */
 	tmap->enable = TRUE;
@@ -1265,7 +1268,8 @@ profiler_mark(PROFILER_TILEMAP_UPDATE);
 	flags = tmap->tileinfo.flags ^ (tmap->attributes & 0x03);
 
 	/* draw the tile, using either direct or transparent */
-	tmap->tileflags[logindex] = tile_draw(tmap, tmap->tileinfo.pen_data + tmap->pen_data_offset, x0, y0, tmap->tileinfo.palette_base, tmap->tileinfo.category, tmap->tileinfo.group, flags);
+	tmap->tileflags[logindex] = tile_draw(tmap, tmap->tileinfo.pen_data + tmap->pen_data_offset, x0, y0,
+		tmap->tileinfo.palette_base, tmap->tileinfo.category, tmap->tileinfo.group, flags, tmap->tileinfo.pen_mask);
 
 	/* if mask data is specified, apply it */
 	if ((flags & (TILE_FORCE_LAYER0 | TILE_FORCE_LAYER1 | TILE_FORCE_LAYER2)) == 0 && tmap->tileinfo.mask_data != NULL)
@@ -1282,7 +1286,7 @@ profiler_mark(PROFILER_END);
     the palette_base
 -------------------------------------------------*/
 
-static UINT8 tile_draw(tilemap *tmap, const UINT8 *pendata, UINT32 x0, UINT32 y0, UINT32 palette_base, UINT8 category, UINT8 group, UINT8 flags)
+static UINT8 tile_draw(tilemap *tmap, const UINT8 *pendata, UINT32 x0, UINT32 y0, UINT32 palette_base, UINT8 category, UINT8 group, UINT8 flags, UINT8 pen_mask)
 {
 	const UINT8 *penmap = tmap->pen_to_flags + group * MAX_PEN_TO_FLAGS;
 	bitmap_t *flagsmap = tmap->flagsmap;
@@ -1332,7 +1336,7 @@ static UINT8 tile_draw(tilemap *tmap, const UINT8 *pendata, UINT32 x0, UINT32 y0
 		{
 			for (tx = 0; tx < width; tx++)
 			{
-				UINT8 pen = *pendata++;
+				UINT8 pen = (*pendata++) & pen_mask;
 				UINT8 map = penmap[pen];
 				pixptr[xoffs] = palette_base + pen;
 				flagsptr[xoffs] = map | category;
@@ -1350,7 +1354,7 @@ static UINT8 tile_draw(tilemap *tmap, const UINT8 *pendata, UINT32 x0, UINT32 y0
 				UINT8 data = *pendata++;
 				UINT8 pen, map;
 
-				pen = data & 0x0f;
+				pen = (data & 0x0f) & pen_mask;
 				map = penmap[pen];
 				pixptr[xoffs] = palette_base + pen;
 				flagsptr[xoffs] = map | category;
@@ -1358,7 +1362,7 @@ static UINT8 tile_draw(tilemap *tmap, const UINT8 *pendata, UINT32 x0, UINT32 y0
 				ormask |= map;
 				xoffs += dx0;
 
-				pen = data >> 4;
+				pen = (data >> 4) & pen_mask;
 				map = penmap[pen];
 				pixptr[xoffs] = palette_base + pen;
 				flagsptr[xoffs] = map | category;

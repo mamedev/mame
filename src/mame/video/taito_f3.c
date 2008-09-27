@@ -198,8 +198,9 @@ Line ram memory map:
 Playfield tile info:
     0xc000 0000 - X/Y Flip
     0x3000 ffff - Tile index
-    0x0dff 0000 - Colour (top 2 bits use not clear, always set)
+    0x0c00 0000 - Extra planes enable (00 = 4bpp, 01 = 5bpp, 10 = unused?, 11 = 6bpp)
     0x0200 0000 - Alpha blend mode
+    0x01ff 0000 - Colour
 
 ***************************************************************************/
 
@@ -219,6 +220,8 @@ static int pivot_changed,vram_changed;
 static UINT32 f3_control_0[8];
 static UINT32 f3_control_1[8];
 static int flipscreen;
+static UINT8 sprite_extra_planes;
+static UINT8 sprite_pen_mask;
 
 static UINT8 *pivot_dirty;
 
@@ -236,47 +239,45 @@ struct F3config
 	int name;
 	int extend;
 	int sprite_lag;
-	int sprite_bpp;
-	int tile_bpp;
 };
 
 static const struct F3config *f3_game_config;
 
 static const struct F3config f3_config_table[] =
 {
-	/* Name    Extend  Lag   Bpp */
-	{ RINGRAGE,  0,     2,   4, 4 },
-	{ ARABIANM,  0,     2,   5, 5 },	/* sprites 1200-120F contain 6bpp pixels but this seems to be a data error */
-	{ RIDINGF,   1,     1,   4, 4 },
-	{ GSEEKER,   0,     1,   4, 4 },
-	{ COMMANDW,  1,     1,   5, 5 },
-	{ SCFINALS,  0,     1,   5, 5 },
-	{ TRSTAR,    1,     0,   5, 5 },
-	{ GUNLOCK,   1,     2,   5, 5 },
-	{ LIGHTBR,   1,     2,   5, 5 },
-	{ KAISERKN,  0,     2,   5, 5 },
-	{ DARIUSG,   0,     2,   5, 5 },
-	{ BUBSYMPH,  1,     1,   5, 5 },
-	{ SPCINVDX,  1,     1,   4, 4 },
-	{ HTHERO95,  0,     1,   6, 6 },
-	{ QTHEATER,  1,     1,   4, 4 },
-	{ EACTION2,  1,     2,   5, 5 },
-	{ RECALH,    1,     1,   4, 4 },
-	{ SPCINV95,  0,     1,   5, 5 },
-	{ TWINQIX,   1,     1,   4, 6 },
-	{ QUIZHUHU,  1,     1,   6, 6 },
-	{ PBOBBLE2,  0,     1,   4, 6 },
-	{ GEKIRIDO,  0,     1,   5, 5 },
-	{ KTIGER2,   0,     0,   4, 4 },
-	{ BUBBLEM,   1,     1,   4, 5 },
-	{ CLEOPATR,  0,     1,   4, 6 },
-	{ PBOBBLE3,  0,     1,   4, 4 },
-	{ ARKRETRN,  1,     1,   5, 6 },
-	{ KIRAMEKI,  0,     1,   5, 6 },
-	{ PUCHICAR,  1,     1,   5, 6 },
-	{ PBOBBLE4,  0,     1,   4, 4 },
-	{ POPNPOP,   1,     1,   6, 6 },
-	{ LANDMAKR,  1,     1,   5, 6 },
+	/* Name    Extend  Lag */
+	{ RINGRAGE,  0,     2 },
+	{ ARABIANM,  0,     2 },
+	{ RIDINGF,   1,     1 },
+	{ GSEEKER,   0,     1 },
+	{ COMMANDW,  1,     1 },
+	{ SCFINALS,  0,     1 },
+	{ TRSTAR,    1,     0 },
+	{ GUNLOCK,   1,     2 },
+	{ LIGHTBR,   1,     2 },
+	{ KAISERKN,  0,     2 },
+	{ DARIUSG,   0,     2 },
+	{ BUBSYMPH,  1,     1 },
+	{ SPCINVDX,  1,     1 },
+	{ HTHERO95,  0,     1 },
+	{ QTHEATER,  1,     1 },
+	{ EACTION2,  1,     2 },
+	{ RECALH,    1,     1 },
+	{ SPCINV95,  0,     1 },
+	{ TWINQIX,   1,     1 },
+	{ QUIZHUHU,  1,     1 },
+	{ PBOBBLE2,  0,     1 },
+	{ GEKIRIDO,  0,     1 },
+	{ KTIGER2,   0,     0 },
+	{ BUBBLEM,   1,     1 },
+	{ CLEOPATR,  0,     1 },
+	{ PBOBBLE3,  0,     1 },
+	{ ARKRETRN,  1,     1 },
+	{ KIRAMEKI,  0,     1 },
+	{ PUCHICAR,  1,     1 },
+	{ PBOBBLE4,  0,     1 },
+	{ POPNPOP,   1,     1 },
+	{ LANDMAKR,  1,     1 },
 	{0}
 };
 
@@ -491,19 +492,19 @@ static void print_debug_info(bitmap_t *bitmap)
 INLINE void get_tile_info(running_machine *machine, tile_data *tileinfo, int tile_index, UINT32 *gfx_base)
 {
 	UINT32 tile=gfx_base[tile_index];
-	UINT8 abtype=(tile>>(16+9))&0x1f;
-	int color_mask;
-
+	UINT8 abtype=(tile>>(16+9)) & 1;
+	// tiles can be configured to use 4, 5, or 6 bpp data.
 	// if tiles use more than 4bpp, the bottom bits of the color code must be masked out.
 	// This fixes (at least) the rain in round 6 of Arabian Magic.
-	color_mask = ~((1 << (f3_game_config->tile_bpp - 4)) - 1);
+	UINT8 extra_planes = ((tile>>(16+10)) & 3);	// 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
 
 	SET_TILE_INFO(
 			1,
 			tile&0xffff,
-			(tile>>16) & 0x1ff & color_mask,
+			(tile>>16) & 0x1ff & (~extra_planes),
 			TILE_FLIPYX( tile >> 30 ));
 	tileinfo->category =  abtype&1;		/* alpha blending type */
+	tileinfo->pen_mask = (extra_planes << 4) | 0x0f;
 }
 
 static TILE_GET_INFO( get_tile_info1 )
@@ -695,9 +696,6 @@ VIDEO_START( f3 )
 	machine->gfx[1]->color_granularity=16;
 	machine->gfx[2]->color_granularity=16;
 
-	assert(f3_game_config->tile_bpp >= 4 && f3_game_config->tile_bpp <= 6);
-	assert(f3_game_config->sprite_bpp >= 4 && f3_game_config->sprite_bpp <= 6);
-
 	flipscreen = 0;
 	memset(spriteram32_buffered,0,spriteram_size);
 	memset(spriteram32,0,spriteram_size);
@@ -719,7 +717,6 @@ VIDEO_START( f3 )
 	{
 		const gfx_element *sprite_gfx = machine->gfx[2];
 		int c;
-		int bpp_mask = (1 << f3_game_config->sprite_bpp) - 1;
 
 		for (c = 0;c < sprite_gfx->total_elements;c++)
 		{
@@ -730,9 +727,6 @@ VIDEO_START( f3 )
 			{
 				for (x = 0;x < sprite_gfx->width;x++)
 				{
-					// clear unused top bits from gfx data
-					dp[x] &= bpp_mask;
-
 					if(!dp[x]) chk_trans_or_opa|=2;
 					else	   chk_trans_or_opa|=1;
 				}
@@ -747,7 +741,6 @@ VIDEO_START( f3 )
 	{
 		const gfx_element *pf_gfx = machine->gfx[1];
 		int c;
-		int bpp_mask = (1 << f3_game_config->tile_bpp) - 1;
 
 		for (c = 0;c < pf_gfx->total_elements;c++)
 		{
@@ -758,9 +751,6 @@ VIDEO_START( f3 )
 			{
 				for (x = 0;x < pf_gfx->width;x++)
 				{
-					// clear unused top bits from gfx data
-					dp[x] &= bpp_mask;
-
 					if(!dp[x]) chk_trans_or_opa|=2;
 					else	   chk_trans_or_opa|=1;
 				}
@@ -2608,7 +2598,7 @@ static void scanline_draw(running_machine *machine, bitmap_t *bitmap, const rect
 /******************************************************************************/
 
 #define PSET_T					\
-	c = *source;				\
+	c = *source & sprite_pen_mask;	\
 	if(c)						\
 	{							\
 		p=*pri;					\
@@ -2623,7 +2613,7 @@ static void scanline_draw(running_machine *machine, bitmap_t *bitmap, const rect
 	p=*pri;						\
 	if(!p || p==0xff)			\
 	{							\
-		*dest = pal[*source];	\
+		*dest = pal[*source & sprite_pen_mask];	\
 		*pri = pri_dst;			\
 	}
 
@@ -2904,7 +2894,7 @@ INLINE void f3_drawgfxzoom(running_machine *machine,
 						int x, x_index = x_index_base;
 						for( x=sx; x<ex; x++ )
 						{
-							int c = source[x_index>>16];
+							int c = source[x_index>>16] & sprite_pen_mask;
 							if(c)
 							{
 								UINT8 p=pri[x];
@@ -2981,6 +2971,9 @@ static void get_sprite_info(running_machine *machine, const UINT32 *spriteram32_
                 cntrl&0x0010 = ???
                 cntrl&0x0020 = ???
             */
+
+			sprite_extra_planes = (cntrl & 0x0300) >> 8;	// 0 = 4bpp, 1 = 5bpp, 2 = unused?, 3 = 6bpp
+			sprite_pen_mask = (sprite_extra_planes << 4) | 0x0f;
 
 			/* Sprite bank select */
 			if (cntrl&1) {
@@ -3200,14 +3193,12 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	const struct tempsprite *sprite_ptr;
 	const gfx_element *sprite_gfx = machine->gfx[2];
-	int color_mask;
 
 	sprite_ptr = sprite_end;
 	sprite_pri_usage=0;
 
 	// if sprites use more than 4bpp, the bottom bits of the color code must be masked out.
 	// This fixes (at least) stage 1 battle ships and attract mode explosions in Ray Force.
-	color_mask = ~((1 << (f3_game_config->sprite_bpp - 4)) - 1);
 
 	while (sprite_ptr != spritelist)
 	{
@@ -3221,7 +3212,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			f3_drawgfx(machine,
 					bitmap,sprite_gfx,
 					sprite_ptr->code,
-					sprite_ptr->color & color_mask,
+					sprite_ptr->color & (~sprite_extra_planes),
 					sprite_ptr->flipx,sprite_ptr->flipy,
 					sprite_ptr->x,sprite_ptr->y,
 					cliprect,
@@ -3230,7 +3221,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			f3_drawgfxzoom(machine,
 					bitmap,sprite_gfx,
 					sprite_ptr->code,
-					sprite_ptr->color & color_mask,
+					sprite_ptr->color & (~sprite_extra_planes),
 					sprite_ptr->flipx,sprite_ptr->flipy,
 					sprite_ptr->x,sprite_ptr->y,
 					cliprect,
