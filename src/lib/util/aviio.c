@@ -1716,13 +1716,18 @@ static avi_error chunk_write(avi_file *file, UINT32 type, const void *data, UINT
 {
 	file_error filerr;
 	avi_error avierr;
+	UINT32 idxreserve;
 	UINT32 written;
+	
+	/* if we are the first RIFF, we must reserve enough space for the IDX chunk */
+	idxreserve = 0;
+	if (file->riffbase == 0 && type != CHUNKTYPE_IDX1)
+		idxreserve = compute_idx1_size(file);
 
 	/* if we are getting too big, split the RIFF */
 	/* note that we ignore writes before the current RIFF base, as those are assumed to be
        overwrites of a chunk from the previous RIFF */
-	if ((file->riffbase == 0 && file->writeoffs + length + compute_idx1_size(file) >= MAX_RIFF_SIZE) ||
-		(file->writeoffs >= file->riffbase && file->writeoffs + length - file->riffbase >= MAX_RIFF_SIZE))
+	if (file->writeoffs >= file->riffbase && file->writeoffs + length + idxreserve - file->riffbase >= MAX_RIFF_SIZE)
 	{
 		/* close the movi list */
 		avierr = chunk_close(file);
