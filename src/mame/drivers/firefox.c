@@ -153,7 +153,7 @@ static VIDEO_UPDATE( firefox )
 	int sprite;
 	int gfxtop = video_screen_get_visible_area(screen)->min_y;
 
-	fillbitmap( bitmap, 256, cliprect );
+	fillbitmap( bitmap, palette_get_color(screen->machine, 256), cliprect );
 
 	for( y = 0; y < 64; y++ )
 	{
@@ -203,8 +203,7 @@ static void set_rgba( running_machine *machine, int start, int index, unsigned c
 	int b = palette_ram[ index + 512 ];
 	int a = ( b & 3 ) * 0x55;
 
-	palette_set_color( machine, start + index, MAKE_RGB( r, g, b ) );
-	render_container_set_palette_alpha(render_container_get_screen(machine->primary_screen), start + index, a);
+	palette_set_color( machine, start + index, MAKE_ARGB( a, r, g, b ) );
 }
 
 static WRITE8_HANDLER( tile_palette_w )
@@ -654,13 +653,13 @@ static MACHINE_DRIVER_START( firefox )
 	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_HZ((double)MASTER_XTAL/8/16/16/16/16))
 
 	/* video hardware */
-	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_INDEXED16)
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_RGB32)
 
 	MDRV_GFXDECODE(firefox)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_LASERDISC_ADD("laserdisc", PHILLIPS_22VP931, "main", "ldsound")
-	MDRV_LASERDISC_OVERLAY(firefox, 64*8, 525, BITMAP_FORMAT_INDEXED16)
+	MDRV_LASERDISC_OVERLAY(firefox, 64*8, 525, BITMAP_FORMAT_RGB32)
 	MDRV_LASERDISC_OVERLAY_CLIP(7*8, 53*8-1, 44, 480+44)
 
 	MDRV_DEVICE_ADD("nvram_1c",X2212)

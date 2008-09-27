@@ -80,7 +80,8 @@ INLINE rgb_t adjust_palette_entry(rgb_t entry, float brightness, float contrast)
 	int r = rgb_clamp((float)RGB_RED(entry) * contrast + brightness);
 	int g = rgb_clamp((float)RGB_GREEN(entry) * contrast + brightness);
 	int b = rgb_clamp((float)RGB_BLUE(entry) * contrast + brightness);
-	return MAKE_RGB(r,g,b);
+	int a = RGB_ALPHA(entry);
+	return MAKE_ARGB(a,r,g,b);
 }
 
 
