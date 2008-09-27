@@ -247,31 +247,18 @@ VIDEO_UPDATE( othunder );
                 INTERRUPTS
 ***********************************************************/
 
-static int vblank_irq, ad_irq, last_irq_level;
+static int vblank_irq, ad_irq;
 
 static MACHINE_RESET( othunder )
 {
 	vblank_irq = 0;
 	ad_irq = 0;
-	last_irq_level = 0;
 }
 
 static void update_irq(running_machine *machine)
 {
-	int curr_level;
-
-	if (ad_irq)
-		curr_level = 6;
-	else if (vblank_irq)
-		curr_level = 5;
-	else
-		curr_level = 0;
-
-	if (curr_level != last_irq_level)
-	{
-		cpunum_set_input_line(machine, 0,curr_level,curr_level ? ASSERT_LINE : CLEAR_LINE);
-		last_irq_level = curr_level;
-	}
+	cpunum_set_input_line(machine, 0, 6, ad_irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, 5, vblank_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE16_HANDLER( irq_ack_w )
