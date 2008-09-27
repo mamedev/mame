@@ -147,20 +147,21 @@ static WRITE8_HANDLER( cliff_sound_overlay_w )
 	int overlay = ( data & 0x10 ) ? 1 : 0;
 
 	/* configure pen 0 and 1 as transparent in the renderer and use it as the compositing color */
-	render_container_set_palette_alpha(render_container_get_screen(machine->primary_screen), 0, overlay ? 0x00 : 0xff );
-	render_container_set_palette_alpha(render_container_get_screen(machine->primary_screen), 1, overlay ? 0x00 : 0xff );
+	if (overlay)
+	{
+		palette_set_color(machine, 0, palette_get_color(machine, 0) & MAKE_ARGB(0,255,255,255));
+		palette_set_color(machine, 1, palette_get_color(machine, 1) & MAKE_ARGB(0,255,255,255));
+	}
+	else
+	{
+		palette_set_color(machine, 0, palette_get_color(machine, 0) | MAKE_ARGB(255,0,0,0));
+		palette_set_color(machine, 1, palette_get_color(machine, 1) | MAKE_ARGB(255,0,0,0));
+	}
 
 	/* audio */
 	discrete_sound_w(machine, CLIFF_ENABLE_SND_1, sound&1);
 	discrete_sound_w(machine, CLIFF_ENABLE_SND_2, (sound>>1)&1);
 }
-
-#ifdef UNUSED_FUNCTION
-static WRITE8_HANDLER( cliff_irqack_w )
-{
-	phillips_code = 0;
-}
-#endif
 
 static WRITE8_HANDLER( cliff_ldwire_w )
 {

@@ -454,9 +454,6 @@ render_container *render_container_get_ui(void);
 /* return a pointer to the container for the given screen */
 render_container *render_container_get_screen(const device_config *screen);
 
-/* set the opacity of a given palette entry */
-void render_container_set_palette_alpha(render_container *container, UINT32 entry, UINT8 alpha);
-
 /* add a line item to the specified container */
 void render_container_add_line(render_container *container, float x0, float y0, float x1, float y1, float width, rgb_t argb, UINT32 flags);
 

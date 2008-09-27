@@ -81,8 +81,6 @@ static VIDEO_START( cubeqst )
 {
 	video_field = 0;
 	depth_buffer = auto_malloc(512);
-
-	render_container_set_palette_alpha(render_container_get_screen(machine->primary_screen), ALPHA_PEN, 0);
 }
 
 /* TODO: Use resistor values */
@@ -101,6 +99,9 @@ static PALETTE_INIT( cubeqst )
 
 		palette_set_color_rgb(machine, i, y*r, y*g, y*b);
 	}
+
+	/* use pen 8192 for transparent */
+	palette_set_color(machine, 8192, MAKE_ARGB(0,0,0,0));
 }
 
 /* TODO: This is a simplified version of what actually happens */

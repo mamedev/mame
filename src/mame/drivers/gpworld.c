@@ -203,8 +203,6 @@ static void gpworld_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 static VIDEO_UPDATE( gpworld )
 {
-	render_container_set_palette_alpha(render_container_get_screen(screen), 0, 0x00);
-
 	fillbitmap(bitmap, 0, cliprect);
 
 	gpworld_draw_tiles(screen->machine, bitmap, cliprect);
@@ -245,7 +243,7 @@ static WRITE8_HANDLER( misc_io_write )
 static WRITE8_HANDLER( palette_write )
 {
 	/* This is all just a (bad) guess */
-	int pal_index, r, g, b;
+	int pal_index, r, g, b, a;
 
 	palette_RAM[offset] = data;
 
@@ -255,11 +253,11 @@ static WRITE8_HANDLER( palette_write )
 	b = (palette_RAM[pal_index]   & 0xf0) << 0;
 	g = (palette_RAM[pal_index]   & 0x0f) << 4;
 	r = (palette_RAM[pal_index+1] & 0x0f) << 4;
-	/* int dunno = (palette_RAM[pal_index+1] & 0x80) >> 7; */
+	a = (palette_RAM[pal_index+1] & 0x80) ? 0 : 255;	/* guess */
 
 	/* logerror("PAL WRITE index : %x  rgb : %d %d %d (real %x) at %x\n", pal_index, r,g,b, data, offset); */
 
-	palette_set_color(machine, pal_index, MAKE_RGB(r, g, b));
+	palette_set_color(machine, pal_index, MAKE_ARGB(a, r, g, b));
 }
 
 /* PROGRAM MAP */

@@ -16,6 +16,7 @@ UINT8 gottlieb_gfxcharhi;
 
 static UINT8 background_priority = 0;
 static UINT8 spritebank;
+static UINT8 transparent0;
 
 static tilemap *bg_tilemap;
 static double weights[4];
@@ -29,7 +30,7 @@ static double weights[4];
 
 WRITE8_HANDLER( gottlieb_paletteram_w )
 {
-	int r, g, b, val;
+	int r, g, b, a, val;
 
 	paletteram[offset] = data;
 
@@ -42,7 +43,9 @@ WRITE8_HANDLER( gottlieb_paletteram_w )
 	val = paletteram[offset | 1];
 	r = combine_4_weights(weights, (val >> 0) & 1, (val >> 1) & 1, (val >> 2) & 1, (val >> 3) & 1);
 
-	palette_set_color(machine, offset / 2, MAKE_ARGB(((offset & ~1) == 0) ? 0x00 : 0xff, r, g, b));
+	/* alpha is set to 0 if laserdisc video is enabled */
+	a = (transparent0 && offset / 2 == 0) ? 0 : 255;
+	palette_set_color(machine, offset / 2, MAKE_ARGB(a, r, g, b));
 }
 
 
@@ -93,8 +96,10 @@ WRITE8_HANDLER( gottlieb_laserdisc_video_control_w )
 	/* bit 3 genlock control (1 = show laserdisc image) */
 	laserdisc_overlay_enable(laserdisc, (data & 0x04) ? TRUE : FALSE);
 	laserdisc_video_enable(laserdisc, ((data & 0x0c) == 0x0c) ? TRUE : FALSE);
-
-	render_container_set_palette_alpha(render_container_get_screen(machine->primary_screen), 0, (data & 0x08) ? 0x00 : 0xff);
+	
+	/* configure the palette if the laserdisc is enabled */
+	transparent0 = (data >> 3) & 1;
+	gottlieb_paletteram_w(machine, 0, paletteram[0]);
 }
 
 
@@ -151,6 +156,7 @@ VIDEO_START( gottlieb )
 			4, resistances, weights, 180, 0,
 			4, resistances, weights, 180, 0,
 			4, resistances, weights, 180, 0);
+	transparent0 = FALSE;
 
 	/* configure the background tilemap */
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -160,6 +166,7 @@ VIDEO_START( gottlieb )
 	/* save some state */
 	state_save_register_global(background_priority);
 	state_save_register_global(spritebank);
+	state_save_register_global(transparent0);
 }
 
 

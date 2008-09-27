@@ -71,7 +71,7 @@ static VIDEO_START( alg )
 	VIDEO_START_CALL(amiga);
 
 	/* configure pen 4096 as transparent in the renderer and use it for the genlock color */
-	render_container_set_palette_alpha(render_container_get_screen(machine->primary_screen), 4096, 0x00);
+	palette_set_color(machine, 4096, MAKE_ARGB(0,0,0,0));
 	amiga_set_genlock_color(4096);
 }
 

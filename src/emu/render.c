@@ -2827,18 +2827,6 @@ render_container *render_container_get_screen(const device_config *screen)
 
 
 /*-------------------------------------------------
-    render_container_set_palette_alpha - set the
-    opacity of a given palette entry
--------------------------------------------------*/
-
-void render_container_set_palette_alpha(render_container *container, UINT32 entry, UINT8 alpha)
-{
-	assert(entry < ARRAY_LENGTH(container->bcglookup));
-	container->bcglookup[entry] = (alpha << 24) | (container->bcglookup[entry] & 0x00ffffff);
-}
-
-
-/*-------------------------------------------------
     render_container_item_add_generic - add a
     generic item to a container
 -------------------------------------------------*/
@@ -2984,7 +2972,7 @@ static void render_container_recompute_lookups(render_container *container)
 		for (i = 0; i < colors; i++)
 		{
 			pen_t newval = adjusted_palette[i];
-			container->bcglookup[i] = (container->bcglookup[i] & 0xff000000) |
+			container->bcglookup[i] = (newval & 0xff000000) |
 									  container->bcglookup256[0x200 + RGB_RED(newval)] |
 									  container->bcglookup256[0x100 + RGB_GREEN(newval)] |
 									  container->bcglookup256[0x000 + RGB_BLUE(newval)];
@@ -3029,7 +3017,7 @@ static void render_container_update_palette(render_container *container)
 					{
 						UINT32 finalentry = entry32 * 32 + entry;
 						rgb_t newval = adjusted_palette[finalentry];
-						container->bcglookup[finalentry] = (container->bcglookup[finalentry] & 0xff000000) |
+						container->bcglookup[finalentry] = (newval & 0xff000000) |
 													  container->bcglookup256[0x200 + RGB_RED(newval)] |
 													  container->bcglookup256[0x100 + RGB_GREEN(newval)] |
 													  container->bcglookup256[0x000 + RGB_BLUE(newval)];

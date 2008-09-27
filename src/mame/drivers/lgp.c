@@ -83,7 +83,8 @@ static VIDEO_UPDATE( lgp )
 {
 	int charx, chary;
 
-	render_container_set_palette_alpha(render_container_get_screen(screen), 0, 0x00);
+	/* make color 0 transparent */
+	palette_set_color(screen->machine, 0, MAKE_ARGB(0,0,0,0));
 
 	/* clear */
 	fillbitmap(bitmap, 0, cliprect);

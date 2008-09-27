@@ -42,8 +42,6 @@ static VIDEO_UPDATE( esh )
 {
 	int charx, chary;
 
-	render_container_set_palette_alpha(render_container_get_screen(screen), 0, 0x00);
-
 	/* clear */
 	fillbitmap(bitmap, 0, cliprect);
 
@@ -239,6 +237,9 @@ static PALETTE_INIT( esh )
 
 		palette_set_color(machine,i,MAKE_RGB(r,g,b));
 	}
+
+	/* make color 0 transparent */
+	palette_set_color(machine, 0, MAKE_ARGB(0,0,0,0));
 }
 
 static const gfx_layout esh_gfx_layout =

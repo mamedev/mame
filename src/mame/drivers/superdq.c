@@ -48,8 +48,6 @@ static VIDEO_START( superdq )
 
 static VIDEO_UPDATE( superdq )
 {
-	render_container_set_palette_alpha(render_container_get_screen(screen), 0, 0x00);
-
 	tilemap_draw(bitmap,cliprect,superdq_tilemap,0,0);
 
 	return 0;
@@ -142,8 +140,14 @@ static WRITE8_HANDLER( superdq_io_w )
 
 	superdq_color_bank = ( data & 2 ) ? 1 : 0;
 
-	for( i = 0; i < sizeof( black_color_entries ); i++ )
-		render_container_set_palette_alpha(render_container_get_screen(machine->primary_screen), black_color_entries[i], (data&0x80) ? 0x00 : 0xff );
+	for( i = 0; i < ARRAY_LENGTH( black_color_entries ); i++ )
+	{
+		int index = black_color_entries[i];
+		if (data & 0x80)
+			palette_set_color(machine, index, palette_get_color(machine, index) & MAKE_ARGB(0,255,255,255));
+		else
+			palette_set_color(machine, index, palette_get_color(machine, index) | MAKE_ARGB(255,0,0,0));
+	}
 
 	/*
         bit 5 = DISP1?

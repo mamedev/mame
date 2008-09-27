@@ -80,8 +80,6 @@ static void astron_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect)
 
 static VIDEO_UPDATE( astron )
 {
-	render_container_set_palette_alpha(render_container_get_screen(screen), 0, 0x00);
-
 	fillbitmap(bitmap, 0, cliprect);
 
 	astron_draw_characters(screen->machine, bitmap, cliprect);
@@ -178,7 +176,7 @@ static WRITE8_HANDLER( astron_OBJ_write )
 
 static WRITE8_HANDLER( astron_COLOR_write )
 {
-	UINT8 r, g, b;
+	UINT8 r, g, b, a;
 	UINT8 highBits, lowBits;
 	const UINT8 palIndex = offset >> 1;
 
@@ -193,8 +191,9 @@ static WRITE8_HANDLER( astron_COLOR_write )
 	r = (lowBits  & 0x0f);
 	g = (lowBits  & 0xf0) >> 4;
 	b = (highBits & 0x0f);
+	a = (highBits & 0x80) ? 0 : 255;
 
-	/* palette_set_color(machine, palIndex, r, g, b); */
+	palette_set_color(machine, palIndex, MAKE_ARGB(a, r, g, b));
 	logerror("COLOR write : 0x%04x @   0x%04x [0x%x]\n", data, offset, activecpu_get_pc());
 }
 
