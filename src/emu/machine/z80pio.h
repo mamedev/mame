@@ -7,12 +7,8 @@
 
 ***************************************************************************/
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-#define MAX_PIO 2
-
+#ifndef __Z80PIO_H_
+#define __Z80PIO_H_
 
 
 /***************************************************************************
@@ -22,83 +18,87 @@
 struct _z80pio_interface
 {
 	void (*intr)(running_machine *machine, int which);    /* callback when change interrupt status */
-	read8_machine_func portAread;    /* port A read callback */
-	read8_machine_func portBread;    /* port B read callback */
-	write8_machine_func portAwrite;  /* port A write callback */
-	write8_machine_func portBwrite;  /* port B write callback */
+	read8_device_func portAread;    /* port A read callback */
+	read8_device_func portBread;    /* port B read callback */
+	write8_device_func portAwrite;  /* port A write callback */
+	write8_device_func portBwrite;  /* port B write callback */
 	void (*rdyA)(int data);     /* portA ready active callback (do not support yet)*/
 	void (*rdyB)(int data);     /* portB ready active callback (do not support yet)*/
 };
 typedef struct _z80pio_interface z80pio_interface;
 
 
-
 /***************************************************************************
-    INITIALIZATION/CONFIGURATION
+    DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-void z80pio_init(int which, const z80pio_interface *intf);
-void z80pio_reset(int which);
+#define MDRV_Z80PIO_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, Z80PIO) \
+	MDRV_DEVICE_CONFIG(_intrf)
 
+#define MDRV_Z80PIO_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, Z80PIO)
+
+
+
+/***************************************************************************
+    INITIALIZATION
+***************************************************************************/
+
+void z80pio_reset( const device_config *device );
 
 
 /***************************************************************************
     CONTROL REGISTER READ/WRITE
 ***************************************************************************/
 
-void z80pio_c_w(running_machine *machine, int which, int ch, UINT8 data);
-UINT8 z80pio_c_r(int which, int ch);
-
+WRITE8_DEVICE_HANDLER( z80pio_c_w );
+READ8_DEVICE_HANDLER( z80pio_c_r );
 
 
 /***************************************************************************
     DATA REGISTER READ/WRITE
 ***************************************************************************/
 
-void z80pio_d_w(running_machine *machine, int which, int ch, UINT8 data);
-UINT8 z80pio_d_r(running_machine *machine, int which, int ch);
-
+WRITE8_DEVICE_HANDLER( z80pio_d_w );
+READ8_DEVICE_HANDLER( z80pio_d_r );
 
 
 /***************************************************************************
     PORT I/O
 ***************************************************************************/
 
-void z80pio_p_w(running_machine *machine, int which, UINT8 ch, UINT8 data);
-int z80pio_p_r(running_machine *machine, int which, UINT8 ch);
-
-WRITE8_HANDLER( z80pioA_0_p_w );
-WRITE8_HANDLER( z80pioB_0_p_w );
-READ8_HANDLER( z80pioA_0_p_r );
-READ8_HANDLER( z80pioB_0_p_r );
-WRITE8_HANDLER( z80pioA_1_p_w );
-WRITE8_HANDLER( z80pioB_1_p_w );
-READ8_HANDLER( z80pioA_1_p_r );
-READ8_HANDLER( z80pioB_1_p_r );
-
+WRITE8_DEVICE_HANDLER( z80pio_p_w );
+READ8_DEVICE_HANDLER( z80pio_p_r );
 
 
 /***************************************************************************
     STROBE STATE MANAGEMENT
 ***************************************************************************/
 
-void z80pio_astb_w(running_machine *machine, int which, int state);
-void z80pio_bstb_w(running_machine *machine, int which, int state);
-
+void z80pio_astb_w(const device_config *device, int state);
+void z80pio_bstb_w(const device_config *device, int state);
 
 
 /***************************************************************************
     DAISY CHAIN INTERFACE
 ***************************************************************************/
 
-int z80pio_irq_state(int which);
-int z80pio_irq_ack(int which);
-void z80pio_irq_reti(int which);
+int z80pio_irq_state(const device_config *device);
+int z80pio_irq_ack(const device_config *device);
+void z80pio_irq_reti(const device_config *device);
+
 
 /***************************************************************************
     READ/WRITE HANDLERS
 ***************************************************************************/
-READ8_HANDLER(z80pio_0_r);
-WRITE8_HANDLER(z80pio_0_w);
-READ8_HANDLER(z80pio_1_r);
-WRITE8_HANDLER(z80pio_1_w);
+READ8_DEVICE_HANDLER(z80pio_r);
+WRITE8_DEVICE_HANDLER(z80pio_w);
+
+
+/* ----- device interface ----- */
+
+#define Z80PIO DEVICE_GET_INFO_NAME(z80pio)
+DEVICE_GET_INFO( z80pio );
+
+#endif

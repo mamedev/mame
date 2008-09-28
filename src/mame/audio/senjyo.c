@@ -1,8 +1,47 @@
 #include "driver.h"
 #include "deprecat.h"
+#include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
 #include "sound/samples.h"
+
+
+/* single tone generator */
+#define SINGLE_LENGTH 10000
+#define SINGLE_DIVIDER 8
+
+static INT16 *_single;
+static int single_rate = 1000;
+static int single_volume = 0;
+static const device_config *z80pio;
+
+
+static void senjyo_z80pio_reset(int which)
+{
+	z80pio_reset( z80pio );
+}
+
+static int senjyo_z80pio_irq_state(int which)
+{
+	return z80pio_irq_state( z80pio );
+}
+
+static int senjyo_z80pio_irq_ack(int which)
+{
+	return z80pio_irq_ack( z80pio );
+}
+
+static void senjyo_z80pio_irq_reti(int which)
+{
+	z80pio_irq_reti( z80pio );
+}
+
+const struct z80_irq_daisy_chain senjyo_daisy_chain[] =
+{
+	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti , 0 }, /* device 0 = CTC_0 , high priority */
+	{ senjyo_z80pio_reset, senjyo_z80pio_irq_state, senjyo_z80pio_irq_ack, senjyo_z80pio_irq_reti , 0 }, /* device 1 = PIO_0 , low  priority */
+	{ 0,0,0,0,-1} 	   /* end mark */
+};
 
 
 /* z80 pio */
@@ -11,11 +50,15 @@ static void pio_interrupt(running_machine *machine, int state)
 	cpunum_set_input_line(machine, 1, 0, state);
 }
 
-static const z80pio_interface pio_intf =
+const z80pio_interface senjyo_pio_intf =
 {
 	pio_interrupt,
-	0,
-	0
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL
 };
 
 /* z80 ctc */
@@ -33,15 +76,6 @@ static z80ctc_interface ctc_intf =
 	0,               /* ZC/TO1 callback */
 	0                /* ZC/TO2 callback */
 };
-
-
-/* single tone generator */
-#define SINGLE_LENGTH 10000
-#define SINGLE_DIVIDER 8
-
-static INT16 *_single;
-static int single_rate = 1000;
-static int single_volume = 0;
 
 
 WRITE8_HANDLER( senjyo_volume_w )
@@ -72,8 +106,7 @@ void senjyo_sh_start(void)
 	ctc_intf.baseclock = cpunum_get_clock(1);
 	z80ctc_init (0, &ctc_intf);
 
-	/* z80 pio init */
-	z80pio_init (0, &pio_intf);
+	z80pio = device_list_find_by_tag( Machine->config->devicelist, Z80PIO, "z80pio" );
 
 	_single = (INT16 *)auto_malloc(SINGLE_LENGTH*2);
 

@@ -22,6 +22,7 @@ extern attotime mcr68_timing_factor;
 
 extern const struct z80_irq_daisy_chain mcr_daisy_chain[];
 extern const struct z80_irq_daisy_chain mcr_ipu_daisy_chain[];
+extern const z80pio_interface nflfoot_pio_intf;
 extern UINT8 mcr_cocktail_flip;
 
 extern const gfx_layout mcr_bg_layout;
@@ -52,11 +53,7 @@ WRITE16_HANDLER( mcr68_6840_lower_w );
 READ16_HANDLER( mcr68_6840_upper_r );
 READ16_HANDLER( mcr68_6840_lower_r );
 
-READ8_HANDLER( mcr_ipu_pio_0_r );
-READ8_HANDLER( mcr_ipu_pio_1_r );
 READ8_HANDLER( mcr_ipu_sio_r );
-WRITE8_HANDLER( mcr_ipu_pio_0_w );
-WRITE8_HANDLER( mcr_ipu_pio_1_w );
 WRITE8_HANDLER( mcr_ipu_sio_w );
 WRITE8_HANDLER( mcr_ipu_laserdisk_w );
 READ8_HANDLER( mcr_ipu_watchdog_r );

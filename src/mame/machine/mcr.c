@@ -71,6 +71,7 @@ static attotime m6840_internal_counter_period;	/* 68000 CLK / 10 */
 
 static emu_timer *ipu_watchdog_timer;
 
+static const device_config *nflfoot_z80pio[2];
 
 
 /*************************************
@@ -207,12 +208,32 @@ const struct z80_irq_daisy_chain mcr_daisy_chain[] =
 };
 
 
+static void nflfoot_z80pio_reset(int which)
+{
+	z80pio_reset( nflfoot_z80pio[which] );
+}
+
+static int nflfoot_z80pio_irq_state(int which)
+{
+	return z80pio_irq_state( nflfoot_z80pio[which] );
+}
+
+static int nflfoot_z80pio_irq_ack(int which)
+{
+	return z80pio_irq_ack( nflfoot_z80pio[which] );
+}
+
+static void nflfoot_z80pio_irq_reti(int which)
+{
+	z80pio_irq_reti( nflfoot_z80pio[which] );
+}
+
 const struct z80_irq_daisy_chain mcr_ipu_daisy_chain[] =
 {
 	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 1 }, /* CTC number 1 */
-	{ z80pio_reset, z80pio_irq_state, z80pio_irq_ack, z80pio_irq_reti, 1 }, /* PIO number 1 */
+	{ nflfoot_z80pio_reset, nflfoot_z80pio_irq_state, nflfoot_z80pio_irq_ack, nflfoot_z80pio_irq_reti, 1 }, /* PIO number 1 */
 	{ z80sio_reset, z80sio_irq_state, z80sio_irq_ack, z80sio_irq_reti, 0 }, /* SIO number 0 */
-	{ z80pio_reset, z80pio_irq_state, z80pio_irq_ack, z80pio_irq_reti, 0 }, /* PIO number 0 */
+	{ nflfoot_z80pio_reset, nflfoot_z80pio_irq_state, nflfoot_z80pio_irq_ack, nflfoot_z80pio_irq_reti, 0 }, /* PIO number 0 */
 	{ 0, 0, 0, 0, -1 }		/* end mark */
 };
 
@@ -239,11 +260,15 @@ static z80ctc_interface nflfoot_ctc_intf =
 };
 
 
-static const z80pio_interface nflfoot_pio_intf =
+const z80pio_interface nflfoot_pio_intf =
 {
 	ipu_ctc_interrupt,
-	0,
-	0
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL,
+	NULL
 };
 
 
@@ -284,8 +309,8 @@ MACHINE_START( nflfoot )
 	nflfoot_ctc_intf.baseclock = cpunum_get_clock(3);
 	z80ctc_init(1, &nflfoot_ctc_intf);
 
-	z80pio_init(0, &nflfoot_pio_intf);
-	z80pio_init(1, &nflfoot_pio_intf);
+	nflfoot_z80pio[0] = device_list_find_by_tag( machine->config->devicelist, Z80PIO, "z80pio_0" );
+	nflfoot_z80pio[1] = device_list_find_by_tag( machine->config->devicelist, Z80PIO, "z80pio_1" );
 
 	nflfoot_sio_intf.baseclock = cpunum_get_clock(3);
 	z80sio_init(0, &nflfoot_sio_intf);
@@ -934,39 +959,9 @@ static WRITE8_HANDLER( ipu_break_changed )
 }
 
 
-READ8_HANDLER( mcr_ipu_pio_0_r )
-{
-	return (offset & 2) ? z80pio_c_r(0, offset & 1) : z80pio_d_r(machine, 0, offset & 1);
-}
-
-
-READ8_HANDLER( mcr_ipu_pio_1_r )
-{
-	return (offset & 2) ? z80pio_c_r(1, offset & 1) : z80pio_d_r(machine, 1, offset & 1);
-}
-
-
 READ8_HANDLER( mcr_ipu_sio_r )
 {
 	return (offset & 2) ? z80sio_c_r(0, offset & 1) : z80sio_d_r(machine, 0, offset & 1);
-}
-
-
-WRITE8_HANDLER( mcr_ipu_pio_0_w )
-{
-	if (offset & 2)
-		z80pio_c_w(machine, 0, offset & 1, data);
-	else
-		z80pio_d_w(machine, 0, offset & 1, data);
-}
-
-
-WRITE8_HANDLER( mcr_ipu_pio_1_w )
-{
-	if (offset & 2)
-		z80pio_c_w(machine, 1, offset & 1, data);
-	else
-		z80pio_d_w(machine, 1, offset & 1, data);
 }
 
 
@@ -995,8 +990,8 @@ static TIMER_CALLBACK( ipu_watchdog_reset )
 	logerror("ipu_watchdog_reset\n");
 	cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, PULSE_LINE);
 	z80ctc_reset(1);
-	z80pio_reset(0);
-	z80pio_reset(1);
+	z80pio_reset( nflfoot_z80pio[0] );
+	z80pio_reset( nflfoot_z80pio[1] );
 	z80sio_reset(0);
 }
 

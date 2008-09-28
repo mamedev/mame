@@ -701,10 +701,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( ipu_91695_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_MIRROR(0xe0) AM_READWRITE(mcr_ipu_pio_0_r, mcr_ipu_pio_0_w)
+	AM_RANGE(0x00, 0x03) AM_MIRROR(0xe0) AM_DEVREADWRITE(Z80PIO, "z80pio_0", z80pio_r,z80pio_w)
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xe0) AM_READWRITE(mcr_ipu_sio_r, mcr_ipu_sio_w)
 	AM_RANGE(0x08, 0x0b) AM_MIRROR(0xe0) AM_READWRITE(z80ctc_1_r, z80ctc_1_w)
-	AM_RANGE(0x0c, 0x0f) AM_MIRROR(0xe0) AM_READWRITE(mcr_ipu_pio_1_r, mcr_ipu_pio_1_w)
+	AM_RANGE(0x0c, 0x0f) AM_MIRROR(0xe0) AM_DEVREADWRITE(Z80PIO, "z80pio_1", z80pio_r, z80pio_w)
 	AM_RANGE(0x10, 0x13) AM_MIRROR(0xe0) AM_WRITE(mcr_ipu_laserdisk_w)
 	AM_RANGE(0x1c, 0x1f) AM_MIRROR(0xe0) AM_READWRITE(mcr_ipu_watchdog_r, mcr_ipu_watchdog_w)
 ADDRESS_MAP_END
@@ -1601,6 +1601,9 @@ static MACHINE_DRIVER_START( mcr_91490_ipu )
 	MDRV_CPU_PROGRAM_MAP(ipu_91695_map,0)
 	MDRV_CPU_IO_MAP(ipu_91695_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(mcr_ipu_interrupt,2)
+
+	MDRV_Z80PIO_ADD( "z80pio_0", nflfoot_pio_intf )
+	MDRV_Z80PIO_ADD( "z80pio_1", nflfoot_pio_intf )
 MACHINE_DRIVER_END
 
 

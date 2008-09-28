@@ -97,14 +97,10 @@ VIDEO_START( senjyo );
 VIDEO_UPDATE( senjyo );
 extern int is_senjyo, senjyo_scrollhack;
 
+/* in audio/senjyo.c */
+extern const struct z80_irq_daisy_chain senjyo_daisy_chain[];
+extern const z80pio_interface senjyo_pio_intf;
 void senjyo_sh_start(void);
-
-WRITE8_HANDLER( senjyo_sh_0_w );
-WRITE8_HANDLER( senjyo_sh_1_w );
-WRITE8_HANDLER( senjyo_sh_2_w );
-
-WRITE8_HANDLER( starforc_pio_w );
-READ8_HANDLER( starforc_pio_r );
 
 WRITE8_HANDLER( senjyo_volume_w );
 
@@ -199,7 +195,7 @@ AM_RANGE(0x9e00, 0x9e3f) AM_WRITE(SMH_RAM)
 	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(senjyo_bg1videoram_w) AM_BASE(&senjyo_bg1videoram)
 	AM_RANGE(0xb800, 0xbbff) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_radarram)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xd004, 0xd004) AM_WRITE(z80pioA_0_p_w)
+	AM_RANGE(0xd004, 0xd004) AM_DEVWRITE(Z80PIO, "z80pio", z80pio_p_w)
 ADDRESS_MAP_END
 
 
@@ -257,7 +253,7 @@ static ADDRESS_MAP_START( starforb_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb7ff) AM_WRITE(senjyo_bg1videoram_w) AM_BASE(&senjyo_bg1videoram)
 	AM_RANGE(0xb800, 0xbbff) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_radarram)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(flip_screen_w)
-	AM_RANGE(0xd004, 0xd004) AM_WRITE(z80pioA_0_p_w)
+	AM_RANGE(0xd004, 0xd004) AM_DEVWRITE(Z80PIO, "z80pio", z80pio_p_w)
 
 	/* these aren't used / written, left here to make sure memory is allocated */
 	AM_RANGE(0xfe00, 0xfe1f) AM_WRITE(SMH_RAM) AM_BASE(&senjyo_fgscroll)
@@ -288,22 +284,22 @@ static ADDRESS_MAP_START( starforb_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_WRITE(SMH_RAM)
 ADDRESS_MAP_END
 
-static WRITE8_HANDLER( pio_w )
+static WRITE8_DEVICE_HANDLER( pio_w )
 {
 	if (offset & 1)
-		z80pio_c_w(machine, 0, (offset >> 1) & 1, data);
+		z80pio_c_w(device, (offset >> 1) & 1, data);
 	else
-		z80pio_d_w(machine, 0, (offset >> 1) & 1, data);
+		z80pio_d_w(device, (offset >> 1) & 1, data);
 }
 
-static READ8_HANDLER( pio_r )
+static READ8_DEVICE_HANDLER( pio_r )
 {
-	return (offset & 1) ? z80pio_c_r(0, (offset >> 1) & 1) : z80pio_d_r(machine, 0, (offset >> 1) & 1);
+	return (offset & 1) ? z80pio_c_r(device, (offset >> 1) & 1) : z80pio_d_r(device, (offset >> 1) & 1);
 }
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_READWRITE(pio_r, pio_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80PIO, "z80pio", pio_r, pio_w)
 	AM_RANGE(0x08, 0x0b) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
 ADDRESS_MAP_END
 
@@ -619,15 +615,6 @@ GFXDECODE_END
 
 
 
-static const struct z80_irq_daisy_chain daisy_chain[] =
-{
-	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti , 0 }, /* device 0 = CTC_0 , high priority */
-	{ z80pio_reset, z80pio_irq_state, z80pio_irq_ack, z80pio_irq_reti , 0 }, /* device 1 = PIO_0 , low  priority */
-	{ 0,0,0,0,-1} 	   /* end mark */
-};
-
-
-
 static const samples_interface senjyo_samples_interface =
 {
 	1,
@@ -645,11 +632,13 @@ static MACHINE_DRIVER_START( senjyo )
 	MDRV_CPU_VBLANK_INT("main", senjyo_interrupt)
 
 	MDRV_CPU_ADD("sub", Z80, 2000000)	/* 2 MHz? */
-	MDRV_CPU_CONFIG(daisy_chain)
+	MDRV_CPU_CONFIG(senjyo_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem,sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	MDRV_MACHINE_RESET(senjyo)
+
+	MDRV_Z80PIO_ADD( "z80pio", senjyo_pio_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
