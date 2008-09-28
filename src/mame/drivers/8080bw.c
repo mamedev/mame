@@ -228,8 +228,11 @@ static MACHINE_DRIVER_START( invadpt2 )
     MDRV_IMPORT_FROM(mw8080bw_root)
     MDRV_CPU_MODIFY("main")
     MDRV_CPU_IO_MAP(invadpt2_io_map,0)
-    MDRV_WATCHDOG_VBLANK_INIT(255)
-
+    
+    /* 60 Hz signal clocks two LS161. Ripple carry will */
+    /* reset circuit, if LS161 not cleared before.      */
+    MDRV_WATCHDOG_VBLANK_INIT(255) 
+    
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(invadpt2)
 
