@@ -86,14 +86,29 @@ static void xboard_generic_init(running_machine *machine)
 
 static void update_main_irqs(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 2, timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	int irq = 0;
 
-	if(!gprider_hack)
-		cpunum_set_input_line(machine, 0, 6, timer_irq_state && vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	if (timer_irq_state)
+		irq |= 2;
+	else
+		cpunum_set_input_line(machine, 0, 2, CLEAR_LINE);
+	
+	if (vblank_irq_state)
+		irq |= 4;
+	else
+		cpunum_set_input_line(machine, 0, 4, CLEAR_LINE);
 
-	if(timer_irq_state || vblank_irq_state)
+	if (gprider_hack && irq > 4)
+		irq = 4;
+
+	if (!(irq==6))
+		cpunum_set_input_line(machine, 0, 6, CLEAR_LINE);
+
+	if (irq)
+	{
+		cpunum_set_input_line(machine, 0, irq, ASSERT_LINE);
 		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
+	}
 }
 
 
