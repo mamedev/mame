@@ -524,7 +524,6 @@ static const input_type_desc core_types[] =
 
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   KEYBOARD,            "Keyboard",               SEQ_DEF_0 )
 
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_ON_SCREEN_DISPLAY,"On Screen Display",      SEQ_DEF_1(KEYCODE_TILDE) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_DEBUG_BREAK,      "Break in Debugger",      SEQ_DEF_1(KEYCODE_TILDE) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_CONFIGURE,        "Config Menu",            SEQ_DEF_1(KEYCODE_TAB) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_PAUSE,            "Pause",                  SEQ_DEF_1(KEYCODE_P) )
@@ -563,12 +562,6 @@ static const input_type_desc core_types[] =
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_TOGGLE_DEBUG,     "Toggle Debugger",        SEQ_DEF_1(KEYCODE_F5) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_SAVE_STATE,       "Save State",             SEQ_DEF_2(KEYCODE_F7, KEYCODE_LSHIFT) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_LOAD_STATE,       "Load State",             SEQ_DEF_3(KEYCODE_F7, SEQCODE_NOT, KEYCODE_LSHIFT) )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_ADD_CHEAT,        "Add Cheat",              SEQ_DEF_1(KEYCODE_A) )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_DELETE_CHEAT,     "Delete Cheat",           SEQ_DEF_1(KEYCODE_D) )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_SAVE_CHEAT,       "Save Cheat",             SEQ_DEF_1(KEYCODE_S) )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_WATCH_VALUE,      "Watch Value",            SEQ_DEF_1(KEYCODE_W) )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_EDIT_CHEAT,       "Edit Cheat",             SEQ_DEF_1(KEYCODE_E) )
-	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_RELOAD_CHEAT,     "Reload Database",        SEQ_DEF_1(KEYCODE_L) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_TOGGLE_CROSSHAIR, "Toggle Crosshair",       SEQ_DEF_1(KEYCODE_F1) )
 
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      OSD_1,               NULL,                     SEQ_DEF_0 )
