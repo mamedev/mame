@@ -1481,48 +1481,6 @@ WRITE8_HANDLER( snes_w_io )
 	snes_ram[offset] = data;
 }
 
-/* This function checks everything is in a valid range and returns how
- * 'valid' this section is as an information block. */
-int snes_validate_infoblock( UINT8 *infoblock, UINT16 offset )
-{
-	INT8 valid = 6;
-
-	/* Check the CRC and inverse CRC */
-	if( ((infoblock[offset + 0x1c] + (infoblock[offset + 0x1d] << 8)) |
-		(infoblock[offset + 0x1e] + (infoblock[offset + 0x1f] << 8))) != 0xffff )
-	{
-		valid -= 3;
-	}
-	/* Check the ROM Size is in a valid range */
-	if( infoblock[offset + 0x17] > 13 )
-	{
-		valid--;
-	}
-	/* Check the SRAM size */
-	if( infoblock[offset + 0x18] > 8 )
-	{
-		valid--;
-	}
-	/* Check the Country is in a valid range */
-	if( infoblock[offset + 0x19] > 13 )
-	{
-		valid--;
-	}
-	/* Check the game version */
-	if( infoblock[offset + 0x1b] >= 128 )
-	{
-		valid--;
-	}
-
-	if( valid < 0 )
-	{
-		valid = 0;
-	}
-
-	return valid;
-}
-
-#ifndef MESS
 /* for mame we use an init, maybe we will need more for the different games */
 DRIVER_INIT( snes )
 {
@@ -1614,7 +1572,6 @@ DRIVER_INIT( snes_hirom )
 			snes_cart.sram = snes_cart.sram_max;
 	}
 }
-#endif	/* MESS */
 
 void snes_hdma_init()
 {

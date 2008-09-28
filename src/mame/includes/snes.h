@@ -38,10 +38,12 @@
 #define SNES_SCR_HEIGHT_PAL	274		/* ??? */
 #define SNES_VTOTAL_NTSC	262		/* Maximum number of lines for NTSC systems */
 #define SNES_VTOTAL_PAL		312		/* Maximum number of lines for PAL systems */
-#define SNES_HTOTAL		341		/* Maximum number pixels per line (incl. hblank) */
+#define SNES_HTOTAL			341		/* Maximum number pixels per line (incl. hblank) */
 #define SNES_DMA_BASE		0x4300	/* Base DMA register address */
 #define SNES_MODE_20		0x1		/* Lo-ROM cart */
 #define SNES_MODE_21		0x2		/* Hi-ROM cart */
+#define SNES_MODE_22		0x4		/* Extended Lo-ROM cart - SDD-1 */
+#define SNES_MODE_25		0x8		/* Extended Hi-ROM cart */
 #define SNES_NTSC			0x00
 #define SNES_PAL			0x10
 #define SNES_VRAM_SIZE		0x20000	/* 128kb of video ram */
@@ -370,8 +372,6 @@ extern WRITE8_HANDLER( snes_w_bank4 );
 extern WRITE8_HANDLER( snes_w_bank6 );
 extern WRITE8_HANDLER( snes_w_io );
 extern WRITE8_HANDLER( snes_w_sram );
-
-extern int snes_validate_infoblock( UINT8 *infoblock, UINT16 offset );
 
 extern void snes_gdma( UINT8 channels );
 extern void snes_hdma_init(void);
