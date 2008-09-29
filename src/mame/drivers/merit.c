@@ -8,8 +8,9 @@
   - Some other missing categories romsets and new / old revision
 
   TODO:
-  - finish video emulation (colors and flipped tiles?)
-
+  - finish video emulation (flipped tiles?)
+  - hook up 6845
+  
 Notes: it's important that "user1" is 0xa0000 bytes with empty space filled
        with 0xff, because the built-in roms test checks how many question roms
        the games has and the type of each one.
@@ -125,22 +126,43 @@ static WRITE8_HANDLER( phrcraze_bg_w )
 	tilemap_mark_tile_dirty(bg_tilemap,offset);
 }
 
-// I think this looks more like a colortable than a palette
+
+static TILE_GET_INFO( get_tile_info_bg )
+{
+	int attr = phrcraze_attr[tile_index];
+	int region = (attr & 0x40) >> 6;
+	int code = videoram[tile_index] | ((attr & 0x80) << 1);
+	int colour = attr & 0x7F;
+
+	//if(region == 0) /* not sure whether this applies to all games */
+		code |= extra_video_bank_bit;
+	if (region == 1)
+		colour = (colour<<2) | 0x03;
+
+	SET_TILE_INFO(region, code, colour, 0);
+}
+
+
+
 static WRITE8_HANDLER( palette_w )
 {
-	int i;
+	int dim, bit0, bit1, bit2;
+	int co;
+	
+	data &= 0x0f;
 
-	paletteram[offset] = data & 0x0f;
-	for (i = 0; i < 0x100; i++)
-	{
-//      int bit = (i & 0x300)>>8;
-		offset = ((i & 0x7f)<<3) | ((i & 0x80) >> 5);
-
-		palette_set_color_rgb(machine,i,
-				pal4bit(BIT(paletteram[offset],0)*0x1 + BIT(paletteram[offset+1],0)*0x2 + BIT(paletteram[offset+2],0)*0x4 + BIT(paletteram[offset+3],0)*0x8),
-				pal4bit(BIT(paletteram[offset],1)*0x1 + BIT(paletteram[offset+1],1)*0x2 + BIT(paletteram[offset+2],1)*0x4 + BIT(paletteram[offset+3],1)*0x8),
-				pal4bit(BIT(paletteram[offset],2)*0x1 + BIT(paletteram[offset+1],2)*0x2 + BIT(paletteram[offset+2],2)*0x4 + BIT(paletteram[offset+3],2)*0x8));
-	}
+	co = ((phrcraze_attr[offset] & 0x7F) << 3) | (offset & 0x07);
+	paletteram[co] = data;
+	
+	dim = BIT(data,3) ? 255 : 127;
+	bit0 = BIT(data,0);
+	bit1 = BIT(data,1);
+	bit2 = BIT(data,2);
+	
+	if (co & 0x200) /* character rom ==> A2, bit shift */
+		co = (co & 0x3F8) | ((co>>2) & 0x01) | ((co<<1) & 0x06);
+		
+	palette_set_color_rgb(machine, co, dim*bit0, dim*bit1, dim*bit2);
 }
 
 static WRITE8_HANDLER( led1_w )
@@ -716,19 +738,6 @@ static INPUT_PORTS_START( bigappg )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static TILE_GET_INFO( get_tile_info_bg )
-{
-	int attr = phrcraze_attr[tile_index];
-	int region = (attr & 0x40) >> 6;
-	int code = videoram[tile_index] | ((attr & 0x80) << 1);
-
-	if(region == 0)
-		code |= extra_video_bank_bit;
-
-	SET_TILE_INFO(region, code, 0, 0);
-}
-
-
 static VIDEO_START( merit )
 {
 	bg_tilemap = tilemap_create(get_tile_info_bg,tilemap_scan_rows,8,8,64,32);
@@ -821,7 +830,7 @@ static MACHINE_DRIVER_START( pitboss )
 	MDRV_SCREEN_VISIBLE_AREA(0, 64*8-1, 1*8, 32*8-1)
 
 	MDRV_GFXDECODE(merit)
-	MDRV_PALETTE_LENGTH(0x100)
+	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_START(merit)
 	MDRV_VIDEO_UPDATE(merit)
@@ -1243,18 +1252,18 @@ static DRIVER_INIT( key_7 )
 	decryption_key = 7;
 }
 
-GAME( 1983, pitboss,  0,       pitboss,  pitboss,  0,      ROT0,  "Merit", "Pit Boss",                                    GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1983, casino5,  0,       pitboss,  pitboss,  0,      ROT0,  "Merit", "Casino 5",                                    GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1985, trvwzh,   0,       trvwhiz,  trivia,   key_0,  ROT0,  "Merit", "Trivia ? Whiz (Horizontal - Question set 1)", GAME_WRONG_COLORS )
-GAME( 1985, trvwzha,  trvwzh,  trvwhiz,  trivia,   key_0,  ROT0,  "Merit", "Trivia ? Whiz (Horizontal - Question set 2)", GAME_WRONG_COLORS )
-GAME( 1985, trvwzv,   0,       trvwhiz,  trivia,   key_0,  ROT90, "Merit", "Trivia ? Whiz (Vertical - Question set 1)",   GAME_WRONG_COLORS )
-GAME( 1985, trvwzva,  trvwzv,  trvwhiz,  trivia,   key_0,  ROT90, "Merit", "Trivia ? Whiz (Vertical - Question set 2)",   GAME_WRONG_COLORS )
-GAME( 1985, trvwz2,   0,       trvwhiz,  trivia,   key_2,  ROT90, "Merit", "Trivia ? Whiz (Edition 2)",                   GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME( 1985, trvwz3h,  0,       trvwhiz,  trivia,   key_0,  ROT0,  "Merit", "Trivia ? Whiz (Edition 3 - Horizontal)",      GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME( 1985, trvwz3v,  0,       trvwhiz,  trivia,   key_0,  ROT90, "Merit", "Trivia ? Whiz (Edition 3 - Vertical)",        GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME( 1985, trvwz4,   0,       trvwhziv, trvwhziv, key_5,  ROT90, "Merit", "Trivia ? Whiz (Edition 4)",                   GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS )
-GAME( 1985, tictac,   0,       tictac,   tictac,   key_4,  ROT0,  "Merit", "Tic Tac Trivia",                              GAME_WRONG_COLORS )
-GAME( 1986, phrcraze, 0,       phrcraze, phrcraze, key_7,  ROT0,  "Merit", "Phraze Craze",                                GAME_WRONG_COLORS )
-GAME( 1986, phrcrazs, 0,       phrcraze, phrcrazs, key_7,  ROT90, "Merit", "Phraze Craze (Sex Kit)",                      GAME_WRONG_COLORS )
-GAME( 1986, bigappg,  0,       bigappg,  bigappg,  0,      ROT0,  "Merit", "Big Apple Games ?",                           GAME_WRONG_COLORS | GAME_NOT_WORKING )
-GAME( 1986, dodge,    0,       bigappg,  bigappg,  0,      ROT0,  "Merit", "Dodge City",                                  GAME_WRONG_COLORS | GAME_NOT_WORKING )
+GAME( 1983, pitboss,  0,       pitboss,  pitboss,  0,      ROT0,  "Merit", "Pit Boss",                                    GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1983, casino5,  0,       pitboss,  pitboss,  0,      ROT0,  "Merit", "Casino 5",                                    GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1985, trvwzh,   0,       trvwhiz,  trivia,   key_0,  ROT0,  "Merit", "Trivia ? Whiz (Horizontal - Question set 1)", 0 )
+GAME( 1985, trvwzha,  trvwzh,  trvwhiz,  trivia,   key_0,  ROT0,  "Merit", "Trivia ? Whiz (Horizontal - Question set 2)", 0 )
+GAME( 1985, trvwzv,   0,       trvwhiz,  trivia,   key_0,  ROT90, "Merit", "Trivia ? Whiz (Vertical - Question set 1)",   0 )
+GAME( 1985, trvwzva,  trvwzv,  trvwhiz,  trivia,   key_0,  ROT90, "Merit", "Trivia ? Whiz (Vertical - Question set 2)",   0 )
+GAME( 1985, trvwz2,   0,       trvwhiz,  trivia,   key_2,  ROT90, "Merit", "Trivia ? Whiz (Edition 2)",                   GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, trvwz3h,  0,       trvwhiz,  trivia,   key_0,  ROT0,  "Merit", "Trivia ? Whiz (Edition 3 - Horizontal)",      GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, trvwz3v,  0,       trvwhiz,  trivia,   key_0,  ROT90, "Merit", "Trivia ? Whiz (Edition 3 - Vertical)",        GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, trvwz4,   0,       trvwhziv, trvwhziv, key_5,  ROT90, "Merit", "Trivia ? Whiz (Edition 4)",                   GAME_IMPERFECT_GRAPHICS )
+GAME( 1985, tictac,   0,       tictac,   tictac,   key_4,  ROT0,  "Merit", "Tic Tac Trivia",                              GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, phrcraze, 0,       phrcraze, phrcraze, key_7,  ROT0,  "Merit", "Phraze Craze",                                GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, phrcrazs, 0,       phrcraze, phrcrazs, key_7,  ROT90, "Merit", "Phraze Craze (Sex Kit)",                      GAME_IMPERFECT_GRAPHICS )
+GAME( 1986, bigappg,  0,       bigappg,  bigappg,  0,      ROT0,  "Merit", "Big Apple Games ?",                           GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1986, dodge,    0,       bigappg,  bigappg,  0,      ROT0,  "Merit", "Dodge City",                                  GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
