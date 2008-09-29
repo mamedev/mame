@@ -47,7 +47,6 @@ struct _movie_info
     GLOBAL VARIABLES
 ***************************************************************************/
 
-static UINT8 *chdbuffer;
 static UINT8 chdinterlaced;
 
 static int video_first_whitefield = -1;
@@ -213,15 +212,6 @@ static void *open_chd(const char *filename, movie_info *info)
 		info->height *= 2;
 	}
 
-	/* allocate a buffer */
-	chdbuffer = malloc(chd_get_header(chd)->hunkbytes);
-	if (chdbuffer == NULL)
-	{
-		fprintf(stderr, "Out of memory allocating chd buffer\n");
-		chd_close(chd);
-		return NULL;
-	}
-
 	return chd;
 }
 
@@ -232,58 +222,40 @@ static void *open_chd(const char *filename, movie_info *info)
 
 static int read_chd(void *file, int frame, bitmap_t *bitmap, INT16 *lsound, INT16 *rsound, int *samples)
 {
+	av_codec_decompress_config avconfig = { 0 };
 	int interlace_factor = chdinterlaced ? 2 : 1;
-	int fieldnum, chnum, sampnum, x, y;
-	int channels, width, height;
+	bitmap_t fakebitmap;
+	UINT32 numsamples;
 	chd_error chderr;
-	UINT8 *source;
+	int fieldnum;
 
 	/* loop over fields */
 	*samples = 0;
 	for (fieldnum = 0; fieldnum < interlace_factor; fieldnum++)
 	{
-		int startsamples = *samples;
+		/* make a fake bitmap for this field */		
+		fakebitmap = *bitmap;
+		fakebitmap.base = BITMAP_ADDR16(&fakebitmap, fieldnum, 0);
+		fakebitmap.rowpixels *= interlace_factor;
+		fakebitmap.height /= interlace_factor;
+
+		/* configure the codec */
+		avconfig.video = &fakebitmap;
+		avconfig.maxsamples = 48000;
+		avconfig.actsamples = &numsamples;
+		avconfig.audio[0] = &lsound[*samples];
+		avconfig.audio[1] = &rsound[*samples];
+
+		/* configure the decompressor for this frame */
+		chd_codec_config(file, AV_CODEC_DECOMPRESS_CONFIG, &avconfig);
 
 		/* read the frame */
-		chderr = chd_read(file, frame * interlace_factor + fieldnum, chdbuffer);
+		chderr = chd_read(file, frame * interlace_factor + fieldnum, NULL);
 		if (chderr != CHDERR_NONE)
 			return FALSE;
-
-		/* parse out the info */
-		channels = chdbuffer[5];
-		*samples += (chdbuffer[6] << 8) | chdbuffer[7];
-		width = (chdbuffer[8] << 8) | chdbuffer[9];
-		height = ((chdbuffer[10] << 8) | chdbuffer[11]) & 0x7fff;
-		source = chdbuffer + 12 + chdbuffer[4];
-
-		/* make sure the data makes sense */
-		if (width != bitmap->width || height != bitmap->height / interlace_factor)
-		{
-			fprintf(stderr, "Inconsistent frame width/height!\n");
-			return FALSE;
-		}
-
-		/* copy in sample data */
-		for (chnum = 0; chnum < channels; chnum++)
-		{
-			INT16 *dest = (chnum == 0) ? lsound : rsound;
-			for (sampnum = startsamples; sampnum < *samples; sampnum++)
-			{
-				INT16 sample = *source++ << 8;
-				dest[sampnum] = sample | *source++;
-			}
-		}
-
-		/* copy in the bitmap data */
-		for (y = fieldnum; y < height * interlace_factor; y += interlace_factor)
-		{
-			UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
-			for (x = 0; x < width; x++)
-			{
-				UINT16 pixel = *source++;
-				*dest++ = pixel | (*source++ << 8);
-			}
-		}
+		
+		/* account for samples read */
+		*samples += numsamples;
 	}
 	return TRUE;
 }
@@ -295,8 +267,6 @@ static int read_chd(void *file, int frame, bitmap_t *bitmap, INT16 *lsound, INT1
 
 static void close_chd(void *file)
 {
-	if (chdbuffer != NULL)
-		free(chdbuffer);
 	chd_close(file);
 }
 
@@ -341,7 +311,7 @@ static void verify_video(int frame, bitmap_t *bitmap)
 		}
 
 		/* is this a lead-in code? */
-		if (metadata.line1718 == 0x88ffff)
+		if (metadata.line1718 == VBI_CODE_LEADIN)
 		{
 			/* if we haven't seen lead-in yet, detect it */
 			if (!video_saw_leadin)
@@ -356,7 +326,7 @@ static void verify_video(int frame, bitmap_t *bitmap)
 		}
 
 		/* is this a lead-out code? */
-		if (metadata.line1718 == 0x80eeee)
+		if (metadata.line1718 == VBI_CODE_LEADOUT)
 		{
 			/* if we haven't seen lead-in yet, detect it */
 			if (!video_saw_leadout)
@@ -375,9 +345,9 @@ static void verify_video(int frame, bitmap_t *bitmap)
 		}
 
 		/* is this a frame code? */
-		if ((metadata.line1718 & 0xf80000) == 0xf80000)
+		if ((metadata.line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
 		{
-			int framenum = ((metadata.line1718 >> 0) & 15) * 1 + ((metadata.line1718 >> 4) & 15) * 10 + ((metadata.line1718 >> 8) & 15) * 100 + ((metadata.line1718 >> 12) & 15) * 1000 + ((metadata.line1718 >> 16) & 7) * 10000;
+			int framenum = VBI_CAV_PICTURE(metadata.line1718);
 
 			/* did we see any leadin? */
 			if (!video_saw_leadin)
@@ -407,6 +377,10 @@ static void verify_video(int frame, bitmap_t *bitmap)
 
 			/* remember the frame number */
 			video_last_frame = framenum;
+			
+			/* if we've seen a white flag before, but it's not here, warn */
+			if (video_first_whitefield != -1 && !metadata.white)
+   				printf("%6d.%d: detected frame number but no white flag (WARNING)\n", frame, fieldnum);
 		}
 
 		/* is the whiteflag set? */
@@ -418,7 +392,15 @@ static void verify_video(int frame, bitmap_t *bitmap)
     			video_first_whitefield = field;
     			printf("%6d.%d: first white flag seen\n", frame, fieldnum);
     		}
-
+			
+			/* if we've seen frame numbers before, but not here, warn */
+			if (video_last_frame != -1 && (metadata.line1718 & VBI_MASK_CAV_PICTURE) != VBI_CODE_CAV_PICTURE)
+   				printf("%6d.%d: detected white flag but no frame number (WARNING)\n", frame, fieldnum);
+    	}
+    	
+    	/* if this is the start of a frame, handle cadence */
+    	if (metadata.white || (metadata.line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
+    	{
     		/* if we've seen frames, but we're not yet to the lead-out, check the cadence */
     		if (video_last_frame != -1 && !video_saw_leadout)
     		{
@@ -490,27 +472,21 @@ static void verify_video(int frame, bitmap_t *bitmap)
 
         /* remove the top/bottom 0.1% of Y */
         remaining = pixels / 1000;
-        for (yminval = 0; remaining >= 0; yminval++)
-        	remaining -= yhisto[yminval];
+        for (yminval = 0; (remaining -= yhisto[yminval]) >= 0; yminval++) ;
         remaining = pixels / 1000;
-        for (ymaxval = 255; remaining >= 0; ymaxval--)
-        	remaining -= yhisto[ymaxval];
+        for (ymaxval = 255; (remaining -= yhisto[ymaxval]) >= 0; ymaxval--) ;
 
         /* remove the top/bottom 0.1% of Cb */
         remaining = pixels / 500;
-        for (cbminval = 0; remaining >= 0; cbminval++)
-        	remaining -= cbhisto[cbminval];
+        for (cbminval = 0; (remaining -= cbhisto[cbminval]) >= 0; cbminval++) ;
         remaining = pixels / 500;
-        for (cbmaxval = 255; remaining >= 0; cbmaxval--)
-        	remaining -= cbhisto[cbmaxval];
+        for (cbmaxval = 255; (remaining -= cbhisto[cbmaxval]) >= 0; cbmaxval--) ;
 
         /* remove the top/bottom 0.1% of Cr */
         remaining = pixels / 500;
-        for (crminval = 0; remaining >= 0; crminval++)
-        	remaining -= crhisto[crminval];
+        for (crminval = 0; (remaining -= crhisto[crminval]) >= 0; crminval++) ;
         remaining = pixels / 500;
-        for (crmaxval = 255; remaining >= 0; crmaxval--)
-        	remaining -= crhisto[crmaxval];
+        for (crmaxval = 255; (remaining -= crhisto[crmaxval]) >= 0; crmaxval--) ;
 
         /* track blank frames */
 		if (ymaxval - yminval < 10 && cbmaxval - cbminval < 10 && crmaxval - cbmaxval < 10)
@@ -535,7 +511,7 @@ static void verify_video(int frame, bitmap_t *bitmap)
         video_max_overall = MAX(ymaxval, video_max_overall);
 
         /* track low fields */
-        if (yminval < 16)
+        if (yminval <= 0)
         {
         	if (video_first_low_frame == -1)
         	{
@@ -552,7 +528,7 @@ static void verify_video(int frame, bitmap_t *bitmap)
         }
 
         /* track high fields */
-        if (ymaxval > 236)
+        if (ymaxval >= 255)
         {
         	if (video_first_high_frame == -1)
         	{
@@ -582,7 +558,7 @@ static void verify_video_final(int frame, bitmap_t *bitmap)
 
 	/* did we ever see any white flags? */
 	if (video_first_whitefield == -1)
-		printf("Track %6d.%d: never saw any white flags; no cadence detection done (WARNING)\n", field / fields_per_frame, 0);
+		printf("Track %6d.%d: never saw any white flags (WARNING)\n", field / fields_per_frame, 0);
 
     /* did we ever see any lead-out? */
 	if (!video_saw_leadout)
