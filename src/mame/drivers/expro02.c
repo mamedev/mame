@@ -1,9 +1,11 @@
-/* Kaneko EXPRO-02 board
-  - used by the newer revisions of Gals Panic
+/* 
+
+   Kaneko EXPRO-02 board
+
+  Used by the newer revisions of Gals Panic
 
  Notes:
- Tile GFX seem to be encrypted / scrambled?  I can't decode them
- Dipswitches are wrong for these sets
+  - In gfx data banking function, some strange gfx are shown. Timing issue?
 
 
 Gals Panic
@@ -136,28 +138,62 @@ U78 (22CV10)
 #include "sound/okim6295.h"
 
 static INPUT_PORTS_START( galsnew )
-	PORT_START("DSW1/P1")
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x000C, 0x000C, DEF_STR( Lives ) )
+	PORT_DIPSETTING(      0x0004, "2" )
+	PORT_DIPSETTING(      0x000C, "3" )
+	PORT_DIPSETTING(      0x0008, "4" )
+	PORT_DIPSETTING(      0x0000, "5" )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unused ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )	/* flip screen? */
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )	/* flip screen? */
 	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_SERVICE( 0x0004, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Test ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	/* Coinage - World (0x03ffff.b = 03) */
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(      0x0028, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Coin B-1" )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Coin B-2" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	/* Coinage - Japan (0x03ffff.b = 01) and US (0x03ffff.b = 02)
     PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )
     PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
@@ -170,49 +206,16 @@ static INPUT_PORTS_START( galsnew )
     PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )
     PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )
     */
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)		/* "Shot2" in "test mode" */
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("DSW2/P2")
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Lives ) )
-	PORT_DIPSETTING(      0x0010, "2" )
-	PORT_DIPSETTING(      0x0030, "3" )
-	PORT_DIPSETTING(      0x0020, "4" )
-	PORT_DIPSETTING(      0x0000, "5" )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )	/* demo sounds? - see notes */
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Character Test" )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)		/* "Shot2" in "test mode" */
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)	/* "Shot2" in "test mode" */
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-	PORT_START("SYSTEM")
+	PORT_START("DSW3")
 	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
@@ -224,6 +227,88 @@ static INPUT_PORTS_START( galsnew )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( galsnewa )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_BIT( 0x000C, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Lives ) )
+	PORT_DIPSETTING(      0x0010, "2" )
+	PORT_DIPSETTING(      0x0030, "3" )
+	PORT_DIPSETTING(      0x0020, "4" )
+	PORT_DIPSETTING(      0x0000, "5" )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0xC000, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW2")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )	/* flip screen? */
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Test ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(      0x0028, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_6C ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Coin B-1" )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, "Coin B-2" )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	/* Coinage - Japan (0x03ffff.b = 01) and US (0x03ffff.b = 02)
+    PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )
+    PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
+    PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )
+    PORT_DIPSETTING(      0x0020, DEF_STR( 1C_2C ) )
+    PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) )
+    PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ) )
+    PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )
+    PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )
+    PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )
+    */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)	/* "Shot2" in "test mode" */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DSW3")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
 
 static WRITE16_HANDLER( galsnew_paletteram_w )
 {
@@ -237,6 +322,40 @@ static WRITE16_HANDLER( galsnew_6295_bankswitch_w )
 	{
 		UINT8 *rom = memory_region(machine, "oki");
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
+	}
+}
+
+static UINT16 vram_0_bank_num = 0, vram_1_bank_num = 0;
+
+WRITE16_HANDLER(galsnew_vram_0_bank_w)
+{
+	int i;
+	if(vram_0_bank_num != data)
+	{
+		for(i = 0; i < 0x1000 / 2; i += 2)
+		{
+			if(kaneko16_vram_0[i])
+			{
+				kaneko16_vram_0_w(machine, i+1, data << 8, 0xFF00);
+			}
+		}
+		vram_0_bank_num = data;
+	}
+}
+
+WRITE16_HANDLER(galsnew_vram_1_bank_w)
+{
+	int i;
+	if(vram_1_bank_num != data)
+	{
+		for(i = 0; i < 0x1000 / 2; i += 2)
+		{
+			if(kaneko16_vram_1[i])
+			{
+				kaneko16_vram_1_w(machine, i+1, data << 8, 0xFF00);
+			}
+		}
+		vram_1_bank_num = data;
 	}
 }
 
@@ -261,23 +380,23 @@ static ADDRESS_MAP_START( galsnew, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	 // sprites? 0x72f words tested
 
-	AM_RANGE(0x780000, 0x78001f) AM_READWRITE(SMH_RAM,kaneko16_sprites_regs_w) AM_BASE(&kaneko16_sprites_regs	) // sprite regs? tileregs?
+	AM_RANGE(0x780000, 0x78001f) AM_READWRITE(SMH_RAM,kaneko16_sprites_regs_w) AM_BASE(&kaneko16_sprites_regs) // sprite regs? tileregs?
 
-	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1/P1")
-	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2/P2")
-	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
+	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
+	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW3")
 
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(galsnew_6295_bankswitch_w)
 
-	AM_RANGE(0xa00000, 0xa00001) AM_WRITE(SMH_NOP)	/* ??? */
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP	/* ??? */
 
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
 
-	AM_RANGE(0xd80000, 0xd80001) AM_WRITE(SMH_NOP)	/* ??? */
+	AM_RANGE(0xd80000, 0xd80001) AM_WRITE(galsnew_vram_1_bank_w)	/* ??? */
 
 	AM_RANGE(0xe00000, 0xe00015) AM_READWRITE(galpanib_calc_r,galpanib_calc_w) /* CALC1 MCU interaction (simulated) */
 
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(SMH_NOP)	/* ??? */
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(galsnew_vram_0_bank_w)	/* ??? */
 ADDRESS_MAP_END
 
 
@@ -314,7 +433,7 @@ static const gfx_layout layout_16x16x4 =
 
 static GFXDECODE_START( 1x4bit_1x4bit )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x100,	    0x40 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0,			0x40 ) // [0] bg tiles
+	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x400,		0x40 ) // [0] bg tiles
 GFXDECODE_END
 
 static MACHINE_DRIVER_START( galsnew )
@@ -354,24 +473,67 @@ static MACHINE_DRIVER_START( galsnew )
 MACHINE_DRIVER_END
 
 /* the tile roms seem lineswapped.. but I don't know how to descramble them yet */
-static DRIVER_INIT(galsnew)
+DRIVER_INIT(galsnew)
 {
-	UINT8 *src    = memory_region       ( machine, "gfx3" );
-	UINT8 *dst    = memory_region       ( machine, "gfx2" );
-	int x;
+	UINT32 *src = (UINT32 *)memory_region(machine, "gfx3" );
+	UINT32 *dst = (UINT32 *)memory_region(machine, "gfx2" );
+	int x, source, offset,inv;
 
-	for (x=0; x<0x200000;x++)
+	for (x=0; x<0x80000;x++)
 	{
-		UINT32 y;
+		inv = ~x;
+		offset = x ^ (0xC30 | (inv >> 1 & 0x10200));
+		offset = (offset & ~0x07) | ((0x02 - (offset & 0x07)) & 0x07);
+		if(x&0x0010)
+			offset = (offset & ~0x60) | (((offset & 0x60) + 0x20) & 0x60);
+		if((x&((inv >> 1 & 0x10000) | 0x2000)) == 0x02000)
+			offset ^= 0x1000;
+		if(!(x&(0x1000 | (x >> 4 & 0x2000))))
+		{
+			offset ^= 0x100;
+			if(!(x&0x20000) && (x&0x12000) == 0x02000)
+			{
+				offset = (offset & ~0x180) | (((offset & 0x180) + 0x180) & 0x180);
+				if((x&0x180) == 0x100)
+				{
+					offset ^= 0x400;
+					if((x&0x480) == 0x400)
+						offset ^= 0x200;
+				}
+			}
+		}
+		else
+		{
+			offset = (offset & ~0x180) | (((offset & 0x180) + 0x80) & 0x180);
+			if((x&0x180) == 0x100)
+			{
+				offset ^= 0x400;
+				if((x&0x480) == 0x400)
+					offset ^= 0x200;
+			}
+		}
+		if((x&0x7) < 0x03)
+		{
+			if(!(x&0x800))
+			{
+				offset ^= 0x4000;
+				if(x&0x4000)
+				{
+					offset ^= 0x08;
+					if(x&0x08)
+						offset = (offset & ~0x70) | (((offset & 0x70) + 0x10) & 0x70);
+				}
+			}
+			offset ^= 0x800;
+		}
+		if((x & 0x30000) == 0x10000)
+			source = x;
+		else
+			source = x ^ 0x2000;
 
-		y = BITSWAP24(x, 23,22,21,20,19,18,17,16,15,14,13,12,11,10,9,8,7,6,5,4,3,2,1,0 );
-		y = x ^ 12;
-		dst[y] = src[x];
-
+		dst[source] = (src[offset] << 4 & 0xF0F0F0F0) | (src[offset] >> 4 & 0x0F0F0F0F);
 	}
-
 }
-
 
 ROM_START( galsnew ) /* EXPRO-02 PCB */
 	ROM_REGION( 0x40000, "main", 0 )	/* 68000 code */
@@ -398,11 +560,11 @@ ROM_START( galsnew ) /* EXPRO-02 PCB */
 
 	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* sprites - encrypted? */
-	ROM_LOAD( "pm013e.u89", 0x180000, 0x080000, CRC(10f27b05) SHA1(0f8ade713f6b430b5a23370a17326d53229951de) )
-	ROM_LOAD( "pm014e.u90", 0x100000, 0x080000, CRC(2f367106) SHA1(1cd16e286e77e8e1b7668bbb6f2978101656b720) )
-	ROM_LOAD( "pm015e.u91", 0x080000, 0x080000, CRC(a563f8ef) SHA1(6e4171746e4d401992bf3a7619d5bed0063d57e5) )
-	ROM_LOAD( "pm016e.u92", 0x000000, 0x080000, CRC(c0b9494c) SHA1(f0b066dd78eb9fcf947da90ddb6c7b62299c5743) )
+	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* sprites - encrypted */
+	ROM_LOAD( "pm013e.u89", 0x000000, 0x080000, CRC(10f27b05) SHA1(0f8ade713f6b430b5a23370a17326d53229951de) )
+	ROM_LOAD( "pm014e.u90", 0x080000, 0x080000, CRC(2f367106) SHA1(1cd16e286e77e8e1b7668bbb6f2978101656b720) )
+	ROM_LOAD( "pm015e.u91", 0x100000, 0x080000, CRC(a563f8ef) SHA1(6e4171746e4d401992bf3a7619d5bed0063d57e5) )
+	ROM_LOAD( "pm016e.u92", 0x180000, 0x080000, CRC(c0b9494c) SHA1(f0b066dd78eb9fcf947da90ddb6c7b62299c5743) )
 
 
 	ROM_REGION( 0x140000, "oki", 0 )	/* OKIM6295 samples */
@@ -438,11 +600,11 @@ ROM_START( galsnewa ) /* EXPRO-02 PCB */
 
 	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* tiles - encrypted? */
-	ROM_LOAD( "pm013e.u89", 0x180000, 0x080000, CRC(10f27b05) SHA1(0f8ade713f6b430b5a23370a17326d53229951de) )
-	ROM_LOAD( "pm014e.u90", 0x100000, 0x080000, CRC(2f367106) SHA1(1cd16e286e77e8e1b7668bbb6f2978101656b720) )
-	ROM_LOAD( "pm015e.u91", 0x080000, 0x080000, CRC(a563f8ef) SHA1(6e4171746e4d401992bf3a7619d5bed0063d57e5) )
-	ROM_LOAD( "pm016e.u92", 0x000000, 0x080000, CRC(c0b9494c) SHA1(f0b066dd78eb9fcf947da90ddb6c7b62299c5743) )
+	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* tiles - encrypted */
+	ROM_LOAD( "pm013e.u89", 0x000000, 0x080000, CRC(10f27b05) SHA1(0f8ade713f6b430b5a23370a17326d53229951de) )
+	ROM_LOAD( "pm014e.u90", 0x080000, 0x080000, CRC(2f367106) SHA1(1cd16e286e77e8e1b7668bbb6f2978101656b720) )
+	ROM_LOAD( "pm015e.u91", 0x100000, 0x080000, CRC(a563f8ef) SHA1(6e4171746e4d401992bf3a7619d5bed0063d57e5) )
+	ROM_LOAD( "pm016e.u92", 0x180000, 0x080000, CRC(c0b9494c) SHA1(f0b066dd78eb9fcf947da90ddb6c7b62299c5743) )
 
 	ROM_REGION( 0x140000, "oki", 0 )	/* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
@@ -477,11 +639,11 @@ ROM_START( galsnewj ) /* EXPRO-02 PCB */
 
 	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
 
-	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* tiles - encrypted? */
-	ROM_LOAD( "pm013e.u89", 0x180000, 0x080000, CRC(10f27b05) SHA1(0f8ade713f6b430b5a23370a17326d53229951de) )
-	ROM_LOAD( "pm014e.u90", 0x100000, 0x080000, CRC(2f367106) SHA1(1cd16e286e77e8e1b7668bbb6f2978101656b720) )
-	ROM_LOAD( "pm015e.u91", 0x080000, 0x080000, CRC(a563f8ef) SHA1(6e4171746e4d401992bf3a7619d5bed0063d57e5) )
-	ROM_LOAD( "pm016e.u92", 0x000000, 0x080000, CRC(c0b9494c) SHA1(f0b066dd78eb9fcf947da90ddb6c7b62299c5743) )
+	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* tiles - encrypted */
+	ROM_LOAD( "pm013e.u89", 0x000000, 0x080000, CRC(10f27b05) SHA1(0f8ade713f6b430b5a23370a17326d53229951de) )
+	ROM_LOAD( "pm014e.u90", 0x080000, 0x080000, CRC(2f367106) SHA1(1cd16e286e77e8e1b7668bbb6f2978101656b720) )
+	ROM_LOAD( "pm015e.u91", 0x100000, 0x080000, CRC(a563f8ef) SHA1(6e4171746e4d401992bf3a7619d5bed0063d57e5) )
+	ROM_LOAD( "pm016e.u92", 0x180000, 0x080000, CRC(c0b9494c) SHA1(f0b066dd78eb9fcf947da90ddb6c7b62299c5743) )
 
 	ROM_REGION( 0x140000, "oki", 0 )	/* OKIM6295 samples */
 	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
@@ -491,6 +653,6 @@ ROM_START( galsnewj ) /* EXPRO-02 PCB */
 ROM_END
 
 
-GAME( 1990, galsnew,  0,       galsnew, galsnew, galsnew, ROT90, "Kaneko", "Gals Panic (US, EXPRO-02 PCB)", GAME_NOT_WORKING )
-GAME( 1990, galsnewa, galsnew, galsnew, galsnew, galsnew, ROT90, "Kaneko", "Gals Panic (Export, EXPRO-02 PCB)", GAME_NOT_WORKING )
-GAME( 1990, galsnewj, galsnew, galsnew, galsnew, galsnew, ROT90, "Kaneko (Taito license)", "Gals Panic (Japan, EXPRO-02 PCB)", GAME_NOT_WORKING )
+GAME( 1990, galsnew,  0,       galsnew, galsnew,  galsnew, ROT90, "Kaneko", "Gals Panic (US, EXPRO-02 PCB)", 0 )
+GAME( 1990, galsnewa, galsnew, galsnew, galsnewa, galsnew, ROT90, "Kaneko", "Gals Panic (Export, EXPRO-02 PCB)", 0 )
+GAME( 1990, galsnewj, galsnew, galsnew, galsnewa, galsnew, ROT90, "Kaneko (Taito license)", "Gals Panic (Japan, EXPRO-02 PCB)", 0 )

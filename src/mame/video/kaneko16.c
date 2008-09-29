@@ -290,7 +290,37 @@ VIDEO_START( berlwall )
 
 VIDEO_START( galsnew )
 {
-	VIDEO_START_CALL(kaneko16_1xVIEW2);
+	VIDEO_START_CALL(kaneko16_sprites);
+
+	kaneko16_tmap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
+										 16,16, 0x20,0x20	);
+	kaneko16_tmap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
+										 16,16, 0x20,0x20	);
+
+	kaneko16_tmap_2 = 0;
+
+	kaneko16_tmap_3 = 0;
+
+	sprites_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
+
+	{
+		int dx = 0x5b, dy = 8;
+
+		int xdim = video_screen_get_width(machine->primary_screen);
+		int ydim = video_screen_get_height(machine->primary_screen);
+
+		tilemap_set_scrolldx( kaneko16_tmap_0, -dx,		xdim + dx -1        );
+		tilemap_set_scrolldx( kaneko16_tmap_1, -(dx+2),	xdim + (dx + 2) - 1 );
+
+		tilemap_set_scrolldy( kaneko16_tmap_0, -dy,		ydim + dy -1 );
+		tilemap_set_scrolldy( kaneko16_tmap_1, -dy,		ydim + dy -1 );
+
+		tilemap_set_transparent_pen(kaneko16_tmap_0, 0);
+		tilemap_set_transparent_pen(kaneko16_tmap_1, 0);
+
+		tilemap_set_scroll_rows(kaneko16_tmap_0, 0x200);	// Line Scroll
+		tilemap_set_scroll_rows(kaneko16_tmap_1, 0x200);
+	}
 }
 
 /***************************************************************************
