@@ -5,6 +5,7 @@
 **************************************************************************/
 
 #include "cpu/z80/z80daisy.h"
+#include "machine/z80ctc.h"
 #include "machine/z80pio.h"
 
 /* constants */
