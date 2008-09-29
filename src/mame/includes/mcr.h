@@ -5,6 +5,7 @@
 **************************************************************************/
 
 #include "cpu/z80/z80daisy.h"
+#include "machine/z80pio.h"
 
 /* constants */
 #define MAIN_OSC_MCR_I		XTAL_19_968MHz
@@ -22,7 +23,7 @@ extern attotime mcr68_timing_factor;
 
 extern const struct z80_irq_daisy_chain mcr_daisy_chain[];
 extern const struct z80_irq_daisy_chain mcr_ipu_daisy_chain[];
-extern const struct z80pio_interface nflfoot_pio_intf;
+extern const z80pio_interface nflfoot_pio_intf;
 extern UINT8 mcr_cocktail_flip;
 
 extern const gfx_layout mcr_bg_layout;
