@@ -94,9 +94,6 @@ static rgb_t messagebox_backcolor;
 static slider_state *slider_list;
 static slider_state *slider_current;
 
-static int display_rescale_message;
-static int allow_rescale;
-
 
 
 /***************************************************************************
@@ -104,7 +101,6 @@ static int allow_rescale;
 ***************************************************************************/
 
 static void ui_exit(running_machine *machine);
-static int rescale_notifier(running_machine *machine, int width, int height);
 
 /* text generators */
 static astring *disclaimer_string(running_machine *machine, astring *buffer);
@@ -228,11 +224,6 @@ int ui_init(running_machine *machine)
 	/* reset globals */
 	single_step = FALSE;
 	ui_set_handler(handler_messagebox, 0);
-
-	/* request callbacks when the renderer does resizing */
-	render_set_rescale_notify(machine, rescale_notifier);
-	allow_rescale = 0;
-	display_rescale_message = FALSE;
 	return 0;
 }
 
@@ -252,26 +243,6 @@ static void ui_exit(running_machine *machine)
 	if (messagebox_text != NULL)
 		astring_free(messagebox_text);
 	messagebox_text = NULL;
-}
-
-
-/*-------------------------------------------------
-    rescale_notifier - notifier to trigger a
-    rescale message during long operations
--------------------------------------------------*/
-
-static int rescale_notifier(running_machine *machine, int width, int height)
-{
-	/* always allow rescaling for a "small" area and for screenless drivers */
-	if (width < 500 || height < 500 || machine->primary_screen == NULL)
-		return TRUE;
-
-	/* if we've currently disallowed rescaling, turn on a message next frame */
-	if (allow_rescale == 0)
-		display_rescale_message = TRUE;
-
-	/* only allow rescaling once we're sure the message is visible */
-	return (allow_rescale == 1);
 }
 
 
@@ -416,19 +387,6 @@ void ui_update_and_render(running_machine *machine)
 	/* cancel takes us back to the ingame handler */
 	if (ui_handler_param == UI_HANDLER_CANCEL)
 		ui_set_handler(handler_ingame, 0);
-
-	/* add a message if we are rescaling */
-	if (display_rescale_message)
-	{
-		display_rescale_message = FALSE;
-		if (allow_rescale == 0)
-			allow_rescale = 2;
-		ui_draw_text_box("Updating Artwork...", JUSTIFY_CENTER, 0.5f, 0.5f, messagebox_backcolor);
-	}
-
-	/* decrement the frame counter if it is non-zero */
-	else if (allow_rescale != 0)
-		allow_rescale--;
 }
 
 

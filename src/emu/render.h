@@ -88,22 +88,22 @@ enum
 /* texture formats */
 enum
 {
-	TEXFORMAT_UNDEFINED = 0,				/* require a format to be specified */
-	TEXFORMAT_PALETTE16,				/* 16bpp palettized, alpha ignored */
-	TEXFORMAT_PALETTEA16,				/* 16bpp palettized, alpha respected */
-	TEXFORMAT_RGB15,				/* 16bpp 5-5-5 RGB */
-	TEXFORMAT_RGB32,				/* 32bpp 8-8-8 RGB */
-	TEXFORMAT_ARGB32,				/* 32bpp 8-8-8-8 ARGB */
-	TEXFORMAT_YUY16					/* 16bpp 8-8 Y/Cb, Y/Cr in sequence */
+	TEXFORMAT_UNDEFINED = 0,						/* require a format to be specified */
+	TEXFORMAT_PALETTE16,							/* 16bpp palettized, alpha ignored */
+	TEXFORMAT_PALETTEA16,							/* 16bpp palettized, alpha respected */
+	TEXFORMAT_RGB15,								/* 16bpp 5-5-5 RGB */
+	TEXFORMAT_RGB32,								/* 32bpp 8-8-8 RGB */
+	TEXFORMAT_ARGB32,								/* 32bpp 8-8-8-8 ARGB */
+	TEXFORMAT_YUY16									/* 16bpp 8-8 Y/Cb, Y/Cr in sequence */
 };
 
 /* blending modes */
 enum
 {
-	BLENDMODE_NONE = 0,				/* no blending */
-	BLENDMODE_ALPHA,				/* standard alpha blend */
-	BLENDMODE_RGB_MULTIPLY,				/* apply source alpha to source pix, then multiply RGB values */
-	BLENDMODE_ADD					/* apply source alpha to source pix, then add to destination */
+	BLENDMODE_NONE = 0,								/* no blending */
+	BLENDMODE_ALPHA,								/* standard alpha blend */
+	BLENDMODE_RGB_MULTIPLY,							/* apply source alpha to source pix, then multiply RGB values */
+	BLENDMODE_ADD									/* apply source alpha to source pix, then add to destination */
 };
 
 
@@ -350,7 +350,7 @@ int render_input_hit_test(render_target *target, INT32 target_x, INT32 target_y,
 /* ----- render target management ----- */
 
 /* allocate a new render target */
-render_target *render_target_alloc(const char *layout, UINT32 flags);
+render_target *render_target_alloc(running_machine *machine, const char *layout, UINT32 flags);
 
 /* free memory for a render target */
 void render_target_free(render_target *target);
@@ -424,7 +424,7 @@ render_texture *render_texture_alloc(texture_scaler_func scaler, void *param);
 void render_texture_free(render_texture *texture);
 
 /* set a new source bitmap */
-void render_texture_set_bitmap(render_texture *texture, bitmap_t *bitmap, const rectangle *sbounds, UINT32 palettebase, int format);
+void render_texture_set_bitmap(render_texture *texture, bitmap_t *bitmap, const rectangle *sbounds, int format, palette_t *palette);
 
 /* generic high quality resampling scaler */
 void render_texture_hq_scale(bitmap_t *dest, const bitmap_t *source, const rectangle *sbounds, void *param);

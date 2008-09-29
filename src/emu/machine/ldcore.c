@@ -1369,15 +1369,15 @@ VIDEO_UPDATE( laserdisc )
 			if (overbitmap != NULL)
 			{
 				if (overbitmap->format == BITMAP_FORMAT_INDEXED16)
-					render_texture_set_bitmap(ldcore->overtex, overbitmap, &ldcore->config.overclip, 0, TEXFORMAT_PALETTEA16);
+					render_texture_set_bitmap(ldcore->overtex, overbitmap, &ldcore->config.overclip, TEXFORMAT_PALETTEA16, laserdisc->machine->palette);
 				else if (overbitmap->format == BITMAP_FORMAT_RGB32)
-					render_texture_set_bitmap(ldcore->overtex, overbitmap, &ldcore->config.overclip, 0, TEXFORMAT_ARGB32);
+					render_texture_set_bitmap(ldcore->overtex, overbitmap, &ldcore->config.overclip, TEXFORMAT_ARGB32, NULL);
 			}
 
 			/* get the laserdisc video */
 			laserdisc_get_video(laserdisc, &vidbitmap);
 			if (vidbitmap != NULL)
-				render_texture_set_bitmap(ldcore->videotex, vidbitmap, NULL, 0, TEXFORMAT_YUY16);
+				render_texture_set_bitmap(ldcore->videotex, vidbitmap, NULL, TEXFORMAT_YUY16, NULL);
 
 			/* reset the screen contents */
 			render_container_empty(render_container_get_screen(screen));

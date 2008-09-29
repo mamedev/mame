@@ -10,6 +10,7 @@
 ******************************************************************************/
 
 #include "palette.h"
+#include <math.h>
 
 
 
@@ -44,6 +45,11 @@ struct _palette_t
 	UINT32			numcolors;					/* number of colors in the palette */
 	UINT32			numgroups;					/* number of groups in the palette */
 
+	float			brightness;					/* overall brightness value */
+	float			contrast;					/* overall contrast value */
+	float			gamma;						/* overall gamma value */
+	UINT8			gamma_map[256];				/* gamma map */
+
 	rgb_t *			entry_color;				/* array of raw colors */
 	float *			entry_contrast;				/* contrast value for each entry */
 	rgb_t *			adjusted_color;				/* array of adjusted colors */
@@ -75,11 +81,11 @@ static void update_adjusted_color(palette_t *palette, UINT32 group, UINT32 index
     entry for brightness
 -------------------------------------------------*/
 
-INLINE rgb_t adjust_palette_entry(rgb_t entry, float brightness, float contrast)
+INLINE rgb_t adjust_palette_entry(rgb_t entry, float brightness, float contrast, const UINT8 *gamma_map)
 {
-	int r = rgb_clamp((float)RGB_RED(entry) * contrast + brightness);
-	int g = rgb_clamp((float)RGB_GREEN(entry) * contrast + brightness);
-	int b = rgb_clamp((float)RGB_BLUE(entry) * contrast + brightness);
+	int r = rgb_clamp((float)gamma_map[RGB_RED(entry)] * contrast + brightness);
+	int g = rgb_clamp((float)gamma_map[RGB_GREEN(entry)] * contrast + brightness);
+	int b = rgb_clamp((float)gamma_map[RGB_BLUE(entry)] * contrast + brightness);
 	int a = RGB_ALPHA(entry);
 	return MAKE_ARGB(a,r,g,b);
 }
@@ -105,6 +111,13 @@ palette_t *palette_alloc(UINT32 numcolors, UINT32 numgroups)
 	if (palette == NULL)
 		goto error;
 	memset(palette, 0, sizeof(*palette));
+	
+	/* initialize overall controls */
+	palette->brightness = 0.0f;
+	palette->contrast = 1.0f;
+	palette->gamma = 1.0f;
+	for (index = 0; index < 256; index++)
+		palette->gamma_map[index] = index;
 
 	/* allocate an array of palette entries and individual contrasts for each */
 	palette->entry_color = malloc(sizeof(*palette->entry_color) * numcolors);
@@ -462,6 +475,81 @@ const rgb_t *palette_entry_list_adjusted_rgb15(palette_t *palette)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    palette_set_brightness - set the overall 
+    brightness for the palette
+-------------------------------------------------*/
+
+void palette_set_brightness(palette_t *palette, float brightness)
+{
+	int groupnum, index;
+
+	/* convert incoming value to normalized result */
+	brightness = (brightness - 1.0f) * 256.0f;
+
+	/* set the global brightness if changed */
+	if (palette->brightness == brightness)
+		return;
+	palette->brightness = brightness;
+
+	/* update across all indices in all groups */
+	for (groupnum = 0; groupnum < palette->numgroups; groupnum++)
+		for (index = 0; index < palette->numcolors; index++)
+			update_adjusted_color(palette, groupnum, index);
+}
+
+
+/*-------------------------------------------------
+    palette_set_contrast - set the overall 
+    contrast for the palette
+-------------------------------------------------*/
+
+void palette_set_contrast(palette_t *palette, float contrast)
+{
+	int groupnum, index;
+
+	/* set the global contrast if changed */
+	if (palette->contrast == contrast)
+		return;
+	palette->contrast = contrast;
+
+	/* update across all indices in all groups */
+	for (groupnum = 0; groupnum < palette->numgroups; groupnum++)
+		for (index = 0; index < palette->numcolors; index++)
+			update_adjusted_color(palette, groupnum, index);
+}
+
+
+/*-------------------------------------------------
+    palette_set_gamma - set the overall 
+    gamma for the palette
+-------------------------------------------------*/
+
+void palette_set_gamma(palette_t *palette, float gamma)
+{
+	int groupnum, index;
+
+	/* set the global gamma if changed */
+	if (palette->gamma == gamma)
+		return;
+	palette->gamma = gamma;
+	
+	/* recompute the gamma map */
+	gamma = 1.0f / gamma;
+	for (index = 0; index < 256; index++)
+	{
+		float fval = (float)index * (1.0f / 255.0f);
+		float fresult = pow(fval, gamma);
+		palette->gamma_map[index] = rgb_clamp(255.0f * fresult);
+	}
+
+	/* update across all indices in all groups */
+	for (groupnum = 0; groupnum < palette->numgroups; groupnum++)
+		for (index = 0; index < palette->numcolors; index++)
+			update_adjusted_color(palette, groupnum, index);
+}
+
+
+/*-------------------------------------------------
     palette_entry_set_contrast - set the contrast
     adjustment for a single palette index
 -------------------------------------------------*/
@@ -502,6 +590,9 @@ float palette_entry_get_contrast(palette_t *palette, UINT32 index)
 void palette_group_set_brightness(palette_t *palette, UINT32 group, float brightness)
 {
 	int index;
+	
+	/* convert incoming value to normalized result */
+	brightness = (brightness - 1.0f) * 256.0f;
 
 	/* if out of range, or unchanged, ignore */
 	if (group >= palette->numgroups || palette->group_bright[group] == brightness)
@@ -632,7 +723,10 @@ static void update_adjusted_color(palette_t *palette, UINT32 group, UINT32 index
 	rgb_t adjusted;
 
 	/* compute the adjusted value */
-	adjusted = adjust_palette_entry(palette->entry_color[index], palette->group_bright[group], palette->group_contrast[group] * palette->entry_contrast[index]);
+	adjusted = adjust_palette_entry(palette->entry_color[index], 
+				palette->group_bright[group] * palette->brightness, 
+				palette->group_contrast[group] * palette->entry_contrast[index] * palette->contrast,
+				palette->gamma_map);
 
 	/* if not different, ignore */
 	if (palette->adjusted_color[finalindex] == adjusted)

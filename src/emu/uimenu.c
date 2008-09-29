@@ -384,7 +384,7 @@ void ui_menu_init(running_machine *machine)
 		*BITMAP_ADDR32(hilight_bitmap, 0, x) = MAKE_ARGB(alpha,0xff,0xff,0xff);
 	}
 	hilight_texture = render_texture_alloc(NULL, NULL);
-	render_texture_set_bitmap(hilight_texture, hilight_bitmap, NULL, 0, TEXFORMAT_ARGB32);
+	render_texture_set_bitmap(hilight_texture, hilight_bitmap, NULL, TEXFORMAT_ARGB32, NULL);
 
 	/* create a texture for arrow icons */
 	arrow_texture = render_texture_alloc(menu_render_triangle, NULL);

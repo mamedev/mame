@@ -129,6 +129,15 @@ const rgb_t *palette_entry_list_adjusted_rgb15(palette_t *palette);
 
 /* ----- palette adjustments ----- */
 
+/* set the overall brightness for the palette */
+void palette_set_brightness(palette_t *palette, float brightness);
+
+/* set the overall contrast for the palette */
+void palette_set_contrast(palette_t *palette, float contrast);
+
+/* set the overall gamma for the palette */
+void palette_set_gamma(palette_t *palette, float gamma);
+
 /* set the contrast adjustment for a single palette index */
 void palette_entry_set_contrast(palette_t *palette, UINT32 index, float contrast);
 

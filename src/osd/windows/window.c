@@ -605,7 +605,7 @@ void winwindow_video_window_create(running_machine *machine, int index, win_moni
 	window->render_lock = osd_lock_alloc();
 
 	// load the layout
-	window->target = render_target_alloc(NULL, 0);
+	window->target = render_target_alloc(machine, NULL, 0);
 	if (window->target == NULL)
 		fatalerror("Error creating render target for window %d", index);
 

@@ -356,7 +356,7 @@ void video_init(running_machine *machine)
 	/* the native target is hard-coded to our internal layout and has all options disabled */
 	if (global.snap_native)
 	{
-		global.snap_target = render_target_alloc(layout_snap, RENDER_CREATE_SINGLE_FILE | RENDER_CREATE_HIDDEN);
+		global.snap_target = render_target_alloc(machine, layout_snap, RENDER_CREATE_SINGLE_FILE | RENDER_CREATE_HIDDEN);
 		assert(global.snap_target != NULL);
 		render_target_set_layer_config(global.snap_target, 0);
 	}
@@ -364,7 +364,7 @@ void video_init(running_machine *machine)
 	/* other targets select the specified view and turn off effects */
 	else
 	{
-		global.snap_target = render_target_alloc(NULL, RENDER_CREATE_HIDDEN);
+		global.snap_target = render_target_alloc(machine, NULL, RENDER_CREATE_HIDDEN);
 		assert(global.snap_target != NULL);
 		render_target_set_view(global.snap_target, video_get_view_for_target(machine, global.snap_target, viewname, 0, 1));
 		render_target_set_layer_config(global.snap_target, render_target_get_layer_config(global.snap_target) & ~LAYER_CONFIG_ENABLE_SCREEN_OVERLAY);
@@ -722,6 +722,7 @@ static void realloc_screen_bitmaps(const device_config *screen)
 		if (state->width > curwidth || state->height > curheight)
 		{
 			bitmap_format screen_format = config->format;
+			palette_t *palette;
 
 			/* free what we have currently */
 			if (state->texture[0] != NULL)
@@ -740,10 +741,10 @@ static void realloc_screen_bitmaps(const device_config *screen)
 			/* choose the texture format - convert the screen format to a texture format */
 			switch (screen_format)
 			{
-				case BITMAP_FORMAT_INDEXED16:	state->texture_format = TEXFORMAT_PALETTE16;		break;
-				case BITMAP_FORMAT_RGB15:		state->texture_format = TEXFORMAT_RGB15;			break;
-				case BITMAP_FORMAT_RGB32:		state->texture_format = TEXFORMAT_RGB32;			break;
-				default:						fatalerror("Invalid bitmap format!");	break;
+				case BITMAP_FORMAT_INDEXED16:	state->texture_format = TEXFORMAT_PALETTE16;	palette = screen->machine->palette;	break;
+				case BITMAP_FORMAT_RGB15:		state->texture_format = TEXFORMAT_RGB15;		palette = NULL;						break;
+				case BITMAP_FORMAT_RGB32:		state->texture_format = TEXFORMAT_RGB32;		palette = NULL;						break;
+				default:						fatalerror("Invalid bitmap format!");												break;
 			}
 
 			/* allocate bitmaps */
@@ -754,9 +755,9 @@ static void realloc_screen_bitmaps(const device_config *screen)
 
 			/* allocate textures */
 			state->texture[0] = render_texture_alloc(NULL, NULL);
-			render_texture_set_bitmap(state->texture[0], state->bitmap[0], &state->visarea, 0, state->texture_format);
+			render_texture_set_bitmap(state->texture[0], state->bitmap[0], &state->visarea, state->texture_format, palette);
 			state->texture[1] = render_texture_alloc(NULL, NULL);
-			render_texture_set_bitmap(state->texture[1], state->bitmap[1], &state->visarea, 0, state->texture_format);
+			render_texture_set_bitmap(state->texture[1], state->bitmap[1], &state->visarea, state->texture_format, palette);
 		}
 	}
 }
@@ -1572,9 +1573,11 @@ static int finish_screen_updates(running_machine *machine)
 				{
 					bitmap_t *bitmap = state->bitmap[state->curbitmap];
 					rectangle fixedvis = *video_screen_get_visible_area(screen);
+					palette_t *palette = (state->texture_format == TEXFORMAT_PALETTE16) ? machine->palette : NULL;
+
 					fixedvis.max_x++;
 					fixedvis.max_y++;
-					render_texture_set_bitmap(state->texture[state->curbitmap], bitmap, &fixedvis, 0, state->texture_format);
+					render_texture_set_bitmap(state->texture[state->curbitmap], bitmap, &fixedvis, state->texture_format, palette);
 					state->curtexture = state->curbitmap;
 					state->curbitmap = 1 - state->curbitmap;
 				}

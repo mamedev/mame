@@ -170,7 +170,7 @@ static void create_bitmap(int player)
 
 		/* create a texture to reference the bitmap */
 		global.texture[player] = render_texture_alloc(render_texture_hq_scale, NULL);
-		render_texture_set_bitmap(global.texture[player], global.bitmap[player], NULL, 0, TEXFORMAT_ARGB32);
+		render_texture_set_bitmap(global.texture[player], global.bitmap[player], NULL, TEXFORMAT_ARGB32, NULL);
 	}
 }
 

@@ -225,11 +225,11 @@ INLINE rgb_t palette_get_color(running_machine *machine, pen_t pen)
 
 
 /*-------------------------------------------------
-    palette_set_brightness - set the per-pen
-    brightness factor
+    palette_set_pen_contrast - set the per-pen
+    contrast factor
 -------------------------------------------------*/
 
-INLINE void palette_set_brightness(running_machine *machine, pen_t pen, double bright)
+INLINE void palette_set_pen_contrast(running_machine *machine, pen_t pen, double bright)
 {
 	palette_entry_set_contrast(machine->palette, pen, bright);
 }

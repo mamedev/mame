@@ -271,7 +271,7 @@ WRITE16_HANDLER( timekill_intensity_w )
 		double intensity = (double)(data & 0xff) / (double)0x60;
 		int i;
 		for (i = 0; i < 8192; i++)
-			palette_set_brightness(machine, i, intensity);
+			palette_set_pen_contrast(machine, i, intensity);
 	}
 }
 

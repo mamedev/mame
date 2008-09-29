@@ -299,7 +299,7 @@ static WRITE32_HANDLER( ps4_screen1_brt_w )
 			int i;
 
 			for (i = 0; i < 0x800; i++)
-				palette_set_brightness(machine,i,brt1);
+				palette_set_pen_contrast(machine,i,brt1);
 
 			oldbrt1 = brt1;
 		}
@@ -326,7 +326,7 @@ static WRITE32_HANDLER( ps4_screen2_brt_w )
 			int i;
 
 			for (i = 0x800; i < 0x1000; i++)
-				palette_set_brightness(machine,i,brt2);
+				palette_set_pen_contrast(machine,i,brt2);
 
 			oldbrt2 = brt2;
 		}

@@ -44,7 +44,6 @@
 #include "config.h"
 #include "output.h"
 #include "xmlfile.h"
-#include "deprecat.h"
 
 
 
@@ -55,7 +54,7 @@
 #define MAX_TEXTURE_SCALES		8
 #define TEXTURE_GROUP_SIZE		256
 
-#define NUM_PRIMLISTS			2
+#define NUM_PRIMLISTS			3
 
 #define MAX_CLEAR_EXTENTS		1000
 
@@ -133,12 +132,14 @@ struct _render_texture
 	render_texture *	base;				/* pointer to base of texture group */
 	bitmap_t *			bitmap;				/* pointer to the original bitmap */
 	rectangle			sbounds;			/* source bounds within the bitmap */
-	UINT32				palettebase;		/* palette base within the system palette */
+	palette_t *			palette;			/* palette associated with the texture */
 	int					format;				/* format of the texture data */
 	texture_scaler_func	scaler;				/* scaling callback */
 	void *				param;				/* scaling callback parameter */
 	UINT32				curseq;				/* current sequence number */
 	scaled_texture		scaled[MAX_TEXTURE_SCALES];	/* array of scaled variants of this texture */
+	rgb_t *				bcglookup;			/* dynamically allocated B/C/G lookup table */
+	UINT32				bcglookup_entries;	/* number of B/C/G lookup entries allocated */
 };
 
 
@@ -146,6 +147,7 @@ struct _render_texture
 struct _render_target
 {
 	render_target *		next;				/* keep a linked list of targets */
+	running_machine *	machine;			/* pointer to the machine we are connected with */
 	layout_view *		curview;			/* current view */
 	layout_file *		filelist;			/* list of layout files */
 	UINT32				flags;				/* creation flags */
@@ -213,9 +215,6 @@ struct _render_container
 static render_target *targetlist;
 static render_target *ui_target;
 
-/* notifier callbacks */
-static int (*rescale_notify)(running_machine *, int, int);
-
 /* free lists */
 static render_primitive *render_primitive_free_list;
 static container_item *container_item_free_list;
@@ -270,10 +269,11 @@ static void add_clear_and_optimize_primitive_list(render_target *target, render_
 static void invalidate_all_render_ref(void *refptr);
 
 /* render textures */
-static int render_texture_get_scaled(render_texture *texture, UINT32 dwidth, UINT32 dheight, render_texinfo *texinfo, render_ref **reflist);
+static int texture_get_scaled(render_texture *texture, UINT32 dwidth, UINT32 dheight, render_texinfo *texinfo, render_ref **reflist);
+static const rgb_t *texture_get_adjusted_palette(render_texture *texture, render_container *container);
 
 /* render containers */
-static render_container *render_container_alloc(void);
+static render_container *render_container_alloc(running_machine *machine);
 static void render_container_free(render_container *container);
 static container_item *render_container_item_add_generic(render_container *container, UINT8 type, float x0, float y0, float x1, float y1, rgb_t argb);
 static void render_container_overlay_scale(bitmap_t *dest, const bitmap_t *source, const rectangle *sbounds, void *param);
@@ -557,12 +557,12 @@ void render_init(running_machine *machine)
 	ui_target = NULL;
 
 	/* create a UI container */
-	ui_container = render_container_alloc();
+	ui_container = render_container_alloc(machine);
 
 	/* create a container for each screen and determine its orientation */
 	for (screen = video_screen_first(machine->config); screen != NULL; screen = video_screen_next(screen))
 	{
-		render_container *screen_container = render_container_alloc();
+		render_container *screen_container = render_container_alloc(machine);
 		render_container **temp = &screen_container->next;
 		render_container_user_settings settings;
 
@@ -947,18 +947,6 @@ static void render_save(running_machine *machine, int config_type, xml_data_node
 
 
 /*-------------------------------------------------
-    render_set_rescale_notify - set a notifier
-    that we call before doing long scaling
-    operations
--------------------------------------------------*/
-
-void render_set_rescale_notify(running_machine *machine, int (*notifier)(running_machine *, int, int))
-{
-	rescale_notify = notifier;
-}
-
-
-/*-------------------------------------------------
     render_is_live_screen - return if the screen
     is 'live'
 -------------------------------------------------*/
@@ -1078,7 +1066,7 @@ float render_get_ui_aspect(void)
     target
 -------------------------------------------------*/
 
-render_target *render_target_alloc(const char *layoutfile, UINT32 flags)
+render_target *render_target_alloc(running_machine *machine, const char *layoutfile, UINT32 flags)
 {
 	render_target *target;
 	render_target **nextptr;
@@ -1093,6 +1081,7 @@ render_target *render_target_alloc(const char *layoutfile, UINT32 flags)
 	*nextptr = target;
 
 	/* fill in the basics with reasonable defaults */
+	target->machine = machine;
 	target->flags = flags;
 	target->width = 640;
 	target->height = 480;
@@ -1112,12 +1101,12 @@ render_target *render_target_alloc(const char *layoutfile, UINT32 flags)
 	/* determine the base orientation based on options */
 	target->orientation = ROT0;
 	if (!options_get_bool(mame_options(), OPTION_ROTATE))
-		target->base_orientation = orientation_reverse(Machine->gamedrv->flags & ORIENTATION_MASK);
+		target->base_orientation = orientation_reverse(machine->gamedrv->flags & ORIENTATION_MASK);
 
 	/* rotate left/right */
-	if (options_get_bool(mame_options(), OPTION_ROR) || (options_get_bool(mame_options(), OPTION_AUTOROR) && (Machine->gamedrv->flags & ORIENTATION_SWAP_XY)))
+	if (options_get_bool(mame_options(), OPTION_ROR) || (options_get_bool(mame_options(), OPTION_AUTOROR) && (machine->gamedrv->flags & ORIENTATION_SWAP_XY)))
 		target->base_orientation = orientation_add(ROT90, target->base_orientation);
-	if (options_get_bool(mame_options(), OPTION_ROL) || (options_get_bool(mame_options(), OPTION_AUTOROL) && (Machine->gamedrv->flags & ORIENTATION_SWAP_XY)))
+	if (options_get_bool(mame_options(), OPTION_ROL) || (options_get_bool(mame_options(), OPTION_AUTOROL) && (machine->gamedrv->flags & ORIENTATION_SWAP_XY)))
 		target->base_orientation = orientation_add(ROT270, target->base_orientation);
 
 	/* flip X/Y */
@@ -1131,7 +1120,7 @@ render_target *render_target_alloc(const char *layoutfile, UINT32 flags)
 	target->layerconfig = target->base_layerconfig;
 
 	/* allocate a lock for the primitive list */
-	for (listnum = 0; listnum < NUM_PRIMLISTS; listnum++)
+	for (listnum = 0; listnum < ARRAY_LENGTH(target->primlist); listnum++)
 		target->primlist[listnum].lock = osd_lock_alloc();
 
 	/* load the layout files */
@@ -1166,7 +1155,7 @@ void render_target_free(render_target *target)
 	*curr = target->next;
 
 	/* free any primitives */
-	for (listnum = 0; listnum < NUM_PRIMLISTS; listnum++)
+	for (listnum = 0; listnum < ARRAY_LENGTH(target->primlist); listnum++)
 	{
 		release_render_list(&target->primlist[listnum]);
 		osd_lock_free(target->primlist[listnum].lock);
@@ -1478,7 +1467,7 @@ void render_target_get_minimum_size(render_target *target, INT32 *minwidth, INT3
 		for (item = target->curview->itemlist[layer]; item != NULL; item = item->next)
 			if (item->element == NULL)
 			{
-				const device_config *screen = device_list_find_by_index(Machine->config->devicelist, VIDEO_SCREEN, item->index);
+				const device_config *screen = device_list_find_by_index(target->machine->config->devicelist, VIDEO_SCREEN, item->index);
 				const screen_config *scrconfig = screen->inline_config;
 				const rectangle vectorvis = { 0, 639, 0, 479 };
 				const rectangle *visarea = NULL;
@@ -1486,7 +1475,7 @@ void render_target_get_minimum_size(render_target *target, INT32 *minwidth, INT3
 				render_bounds bounds;
 				float xscale, yscale;
 
-				/* we may be called very early, before Machine->visible_area is initialized; handle that case */
+				/* we may be called very early, before machine->visible_area is initialized; handle that case */
 				if (scrconfig->type == SCREEN_TYPE_VECTOR)
 					visarea = &vectorvis;
 				else if (screen->token != NULL)
@@ -1551,7 +1540,7 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 
 	/* switch to the next primitive list */
 	listnum = target->listindex;
-	target->listindex = (target->listindex + 1) % NUM_PRIMLISTS;
+	target->listindex = (target->listindex + 1) % ARRAY_LENGTH(target->primlist);
 	osd_lock_acquire(target->primlist[listnum].lock);
 
 	/* free any previous primitives */
@@ -1569,7 +1558,7 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 	root_xform.orientation = target->orientation;
 
 	/* iterate over layers back-to-front, but only if we're running */
-	if (mame_get_phase(Machine) >= MAME_PHASE_RESET)
+	if (mame_get_phase(target->machine) >= MAME_PHASE_RESET)
 		for (layernum = 0; layernum < ITEM_LAYER_MAX; layernum++)
 		{
 			int blendmode;
@@ -1610,9 +1599,9 @@ const render_primitive_list *render_target_get_primitives(render_target *target)
 							state = output_get_value(item->output_name);
 						else if (item->input_tag[0] != 0)
 						{
-							const input_field_config *field = input_field_by_tag_and_mask(Machine->portconfig, item->input_tag, item->input_mask);
+							const input_field_config *field = input_field_by_tag_and_mask(target->machine->portconfig, item->input_tag, item->input_mask);
 							if (field != NULL)
-								state = ((input_port_read_safe(Machine, item->input_tag, 0) ^ field->defvalue) & item->input_mask) ? 1 : 0;
+								state = ((input_port_read_safe(target->machine, item->input_tag, 0) ^ field->defvalue) & item->input_mask) ? 1 : 0;
 						}
 						add_element_primitives(target, &target->primlist[listnum], &item_xform, item->element, state, blendmode);
 					}
@@ -1796,7 +1785,7 @@ static int load_layout_files(render_target *target, const char *layoutfile, int 
 	/* if there's an explicit file, load that first */
 	if (layoutfile != NULL)
 	{
-		*nextfile = layout_file_load(Machine->basename, layoutfile);
+		*nextfile = layout_file_load(target->machine->basename, layoutfile);
 		if (*nextfile != NULL)
 			nextfile = &(*nextfile)->next;
 	}
@@ -1806,28 +1795,28 @@ static int load_layout_files(render_target *target, const char *layoutfile, int 
 		return (nextfile == &target->filelist) ? 1 : 0;
 
 	/* try to load a file based on the driver name */
-	*nextfile = layout_file_load(Machine->basename, Machine->gamedrv->name);
+	*nextfile = layout_file_load(target->machine->basename, target->machine->gamedrv->name);
 	if (*nextfile == NULL)
-		*nextfile = layout_file_load(Machine->basename, "default");
+		*nextfile = layout_file_load(target->machine->basename, "default");
 	if (*nextfile != NULL)
 		nextfile = &(*nextfile)->next;
 
 	/* if a default view has been specified, use that as a fallback */
-	if (Machine->gamedrv->default_layout != NULL)
+	if (target->machine->gamedrv->default_layout != NULL)
 	{
-		*nextfile = layout_file_load(NULL, Machine->gamedrv->default_layout);
+		*nextfile = layout_file_load(NULL, target->machine->gamedrv->default_layout);
 		if (*nextfile != NULL)
 			nextfile = &(*nextfile)->next;
 	}
-	if (Machine->config->default_layout != NULL)
+	if (target->machine->config->default_layout != NULL)
 	{
-		*nextfile = layout_file_load(NULL, Machine->config->default_layout);
+		*nextfile = layout_file_load(NULL, target->machine->config->default_layout);
 		if (*nextfile != NULL)
 			nextfile = &(*nextfile)->next;
 	}
 
 	/* try to load another file based on the parent driver name */
-	cloneof = driver_get_clone(Machine->gamedrv);
+	cloneof = driver_get_clone(target->machine->gamedrv);
 	if (cloneof != NULL)
 	{
 		*nextfile = layout_file_load(cloneof->name, cloneof->name);
@@ -1838,9 +1827,9 @@ static int load_layout_files(render_target *target, const char *layoutfile, int 
 	}
 
 	/* now do the built-in layouts for single-screen games */
-	if (video_screen_count(Machine->config) == 1)
+	if (video_screen_count(target->machine->config) == 1)
 	{
-		if (Machine->gamedrv->flags & ORIENTATION_SWAP_XY)
+		if (target->machine->gamedrv->flags & ORIENTATION_SWAP_XY)
 			*nextfile = layout_file_load(NULL, layout_vertical);
 		else
 			*nextfile = layout_file_load(NULL, layout_horizont);
@@ -1992,19 +1981,10 @@ static void add_container_primitives(render_target *target, render_primitive_lis
 					height = (finalorient & ORIENTATION_SWAP_XY) ? (prim->bounds.x1 - prim->bounds.x0) : (prim->bounds.y1 - prim->bounds.y0);
 					width = MIN(width, target->maxtexwidth);
 					height = MIN(height, target->maxtexheight);
-					if (render_texture_get_scaled(item->texture, width, height, &prim->texture, &list->reflist))
+					if (texture_get_scaled(item->texture, width, height, &prim->texture, &list->reflist))
 					{
-						/* override the palette with our adjusted palette */
-						switch (item->texture->format)
-						{
-							case TEXFORMAT_PALETTE16:	prim->texture.palette = &container->bcglookup[prim->texture.palette - palette_entry_list_adjusted(Machine->palette)]; break;
-							case TEXFORMAT_PALETTEA16:	prim->texture.palette = &container->bcglookup[prim->texture.palette - palette_entry_list_adjusted(Machine->palette)]; break;
-							case TEXFORMAT_RGB15:		prim->texture.palette = &container->bcglookup32[0];		break;
-							case TEXFORMAT_RGB32:		prim->texture.palette = &container->bcglookup256[0];	break;
-							case TEXFORMAT_ARGB32:		prim->texture.palette = &container->bcglookup256[0];	break;
-							case TEXFORMAT_YUY16:		prim->texture.palette = &container->bcglookup256[0];	break;
-							default:					assert(FALSE);
-						}
+						/* set the palette */
+						prim->texture.palette = texture_get_adjusted_palette(item->texture, container);
 
 						/* determine UV coordinates and apply clipping */
 						prim->texcoords = oriented_texcoords[finalorient];
@@ -2055,7 +2035,7 @@ static void add_container_primitives(render_target *target, render_primitive_lis
 		prim->color = container_xform.color;
 		width = render_round_nearest(prim->bounds.x1) - render_round_nearest(prim->bounds.x0);
 		height = render_round_nearest(prim->bounds.y1) - render_round_nearest(prim->bounds.y0);
-		if (render_texture_get_scaled(container->overlaytexture,
+		if (texture_get_scaled(container->overlaytexture,
 				(container_xform.orientation & ORIENTATION_SWAP_XY) ? height : width,
 				(container_xform.orientation & ORIENTATION_SWAP_XY) ? width : height, &prim->texture, &list->reflist))
 		{
@@ -2111,7 +2091,7 @@ static void add_element_primitives(render_target *target, render_primitive_list 
 		height = MIN(height, target->maxtexheight);
 
 		/* get the scaled texture and append it */
-		if (render_texture_get_scaled(texture, width, height, &prim->texture, &list->reflist))
+		if (texture_get_scaled(texture, width, height, &prim->texture, &list->reflist))
 		{
 			/* compute the clip rect */
 			cliprect.x0 = render_round_nearest(xform->xoffs);
@@ -2419,7 +2399,7 @@ static void invalidate_all_render_ref(void *refptr)
 
 	/* loop over targets */
 	for (target = targetlist; target != NULL; target = target->next)
-		for (listnum = 0; listnum < NUM_PRIMLISTS; listnum++)
+		for (listnum = 0; listnum < ARRAY_LENGTH(target->primlist); listnum++)
 		{
 			render_primitive_list *list = &target->primlist[listnum];
 			osd_lock_acquire(list->lock);
@@ -2495,6 +2475,14 @@ void render_texture_free(render_texture *texture)
 	if (texture->bitmap != NULL)
 		invalidate_all_render_ref(texture->bitmap);
 
+	/* release palette references */
+	if (texture->palette != NULL)
+		palette_deref(texture->palette);
+	
+	/* free any B/C/G lookup tables */
+	if (texture->bcglookup != NULL)
+		free(texture->bcglookup);
+
 	/* add ourself back to the free list */
 	base_save = texture->base;
 	memset(texture, 0, sizeof(*texture));
@@ -2509,13 +2497,26 @@ void render_texture_free(render_texture *texture)
     bitmap
 -------------------------------------------------*/
 
-void render_texture_set_bitmap(render_texture *texture, bitmap_t *bitmap, const rectangle *sbounds, UINT32 palettebase, int format)
+void render_texture_set_bitmap(render_texture *texture, bitmap_t *bitmap, const rectangle *sbounds, int format, palette_t *palette)
 {
 	int scalenum;
+	
+	/* ensure we have a valid palette for palettized modes */
+	if (format == TEXFORMAT_PALETTE16 || format == TEXFORMAT_PALETTEA16)
+		assert(palette != NULL);
 
 	/* invalidate references to the old bitmap */
 	if (bitmap != texture->bitmap && texture->bitmap != NULL)
 		invalidate_all_render_ref(texture->bitmap);
+	
+	/* if the palette is different, adjust references */
+	if (palette != texture->palette)
+	{
+		if (texture->palette != NULL)
+			palette_deref(texture->palette);
+		if (palette != NULL)
+			palette_ref(palette);
+	}
 
 	/* set the new bitmap/palette */
 	texture->bitmap = bitmap;
@@ -2523,7 +2524,7 @@ void render_texture_set_bitmap(render_texture *texture, bitmap_t *bitmap, const 
 	texture->sbounds.min_y = (sbounds != NULL) ? sbounds->min_y : 0;
 	texture->sbounds.max_x = (sbounds != NULL) ? sbounds->max_x : (bitmap != NULL) ? bitmap->width : 1000;
 	texture->sbounds.max_y = (sbounds != NULL) ? sbounds->max_y : (bitmap != NULL) ? bitmap->height : 1000;
-	texture->palettebase = palettebase;
+	texture->palette = palette;
 	texture->format = format;
 
 	/* invalidate all scaled versions */
@@ -2541,14 +2542,14 @@ void render_texture_set_bitmap(render_texture *texture, bitmap_t *bitmap, const 
 
 
 /*-------------------------------------------------
-    render_texture_get_scaled - get a scaled
+    texture_get_scaled - get a scaled
     bitmap (if we can)
 -------------------------------------------------*/
 
-static int render_texture_get_scaled(render_texture *texture, UINT32 dwidth, UINT32 dheight, render_texinfo *texinfo, render_ref **reflist)
+static int texture_get_scaled(render_texture *texture, UINT32 dwidth, UINT32 dheight, render_texinfo *texinfo, render_ref **reflist)
 {
 	UINT8 bpp = (texture->format == TEXFORMAT_PALETTE16 || texture->format == TEXFORMAT_PALETTEA16 || texture->format == TEXFORMAT_RGB15 || texture->format == TEXFORMAT_YUY16) ? 16 : 32;
-	const rgb_t *palbase = (texture->format == TEXFORMAT_PALETTE16 || texture->format == TEXFORMAT_PALETTEA16) ? palette_entry_list_adjusted(Machine->palette) + texture->palettebase : NULL;
+	const rgb_t *palbase = (texture->format == TEXFORMAT_PALETTE16 || texture->format == TEXFORMAT_PALETTEA16) ? palette_entry_list_adjusted(texture->palette) : NULL;
 	scaled_texture *scaled = NULL;
 	int swidth, sheight;
 	int scalenum;
@@ -2589,10 +2590,6 @@ static int render_texture_get_scaled(render_texture *texture, UINT32 dwidth, UIN
 	if (scalenum == ARRAY_LENGTH(texture->scaled))
 	{
 		int lowest = -1;
-
-		/* ask our notifier if we can scale now */
-		if (rescale_notify != NULL && !(*rescale_notify)(Machine, dwidth, dheight))
-			return FALSE;
 
 		/* didn't find one -- take the entry with the lowest seqnum */
 		for (scalenum = 0; scalenum < ARRAY_LENGTH(texture->scaled); scalenum++)
@@ -2640,6 +2637,119 @@ void render_texture_hq_scale(bitmap_t *dest, const bitmap_t *source, const recta
 }
 
 
+/*-------------------------------------------------
+    texture_get_adjusted_palette - return the
+    adjusted palette for a texture
+-------------------------------------------------*/
+
+static const rgb_t *texture_get_adjusted_palette(render_texture *texture, render_container *container)
+{
+	const rgb_t *adjusted;
+	int numentries;
+	int index;
+	
+	/* override the palette with our adjusted palette */
+	switch (texture->format)
+	{
+		case TEXFORMAT_PALETTE16:
+		case TEXFORMAT_PALETTEA16:
+		
+			/* if no adjustment necessary, return the raw palette */
+			assert(texture->palette != NULL);
+			adjusted = palette_entry_list_adjusted(texture->palette);
+			if (container->brightness == 1.0f && container->contrast == 1.0f && container->gamma == 1.0f)
+				return adjusted;
+			
+			/* if this is the machine palette, return our precomputed adjusted palette */
+			if (container->palclient != NULL && palette_client_get_palette(container->palclient) == texture->palette)
+				return container->bcglookup;
+			
+			/* otherwise, ensure we have memory allocated and compute the adjusted result ourself */
+			numentries = palette_get_num_colors(texture->palette) * palette_get_num_groups(texture->palette);
+			if (texture->bcglookup == NULL || texture->bcglookup_entries < numentries)
+			{
+				texture->bcglookup = realloc(texture->bcglookup, numentries * sizeof(*texture->bcglookup));
+				texture->bcglookup_entries = numentries;
+			}
+			for (index = 0; index < numentries; index++)
+			{
+				UINT8 r = apply_brightness_contrast_gamma(RGB_RED(adjusted[index]), container->brightness, container->contrast, container->gamma);
+				UINT8 g = apply_brightness_contrast_gamma(RGB_GREEN(adjusted[index]), container->brightness, container->contrast, container->gamma);
+				UINT8 b = apply_brightness_contrast_gamma(RGB_BLUE(adjusted[index]), container->brightness, container->contrast, container->gamma);
+				texture->bcglookup[index] = MAKE_ARGB(RGB_ALPHA(adjusted[index]), r, g, b);
+			}
+			return texture->bcglookup;
+
+		case TEXFORMAT_RGB15:
+		
+			/* if no adjustment necessary, return NULL */
+			if (container->brightness == 1.0f && container->contrast == 1.0f && container->gamma == 1.0f && texture->palette == NULL)
+				return NULL;
+			
+			/* if no palette, return the standard lookups */
+			if (texture->palette == NULL)
+				return container->bcglookup32;
+			
+			/* otherwise, ensure we have memory allocated and compute the adjusted result ourself */
+			assert(palette_get_num_colors(texture->palette) == 32);
+			adjusted = palette_entry_list_adjusted(texture->palette);
+			if (texture->bcglookup == NULL || texture->bcglookup_entries < 4 * 32)
+			{
+				texture->bcglookup = realloc(texture->bcglookup, 4 * 32 * sizeof(*texture->bcglookup));
+				texture->bcglookup_entries = 4 * 32;
+			}
+
+			/* otherwise, return the 32-entry BCG lookups */
+			for (index = 0; index < 32; index++)
+			{
+				UINT8 val = apply_brightness_contrast_gamma(RGB_GREEN(adjusted[index]), container->brightness, container->contrast, container->gamma);
+				texture->bcglookup[0x00 + index] = val << 0;
+				texture->bcglookup[0x20 + index] = val << 8;
+				texture->bcglookup[0x40 + index] = val << 16;
+				texture->bcglookup[0x60 + index] = val << 24;
+			}
+			return texture->bcglookup;
+			
+		case TEXFORMAT_RGB32:
+		case TEXFORMAT_ARGB32:
+		case TEXFORMAT_YUY16:
+		
+			/* if no adjustment necessary, return NULL */
+			if (container->brightness == 1.0f && container->contrast == 1.0f && container->gamma == 1.0f && texture->palette == NULL)
+				return NULL;
+			
+			/* if no palette, return the standard lookups */
+			if (texture->palette == NULL)
+				return container->bcglookup256;
+			
+			/* otherwise, ensure we have memory allocated and compute the adjusted result ourself */
+			assert(palette_get_num_colors(texture->palette) == 256);
+			adjusted = palette_entry_list_adjusted(texture->palette);
+			if (texture->bcglookup == NULL || texture->bcglookup_entries < 4 * 256)
+			{
+				texture->bcglookup = realloc(texture->bcglookup, 4 * 256 * sizeof(*texture->bcglookup));
+				texture->bcglookup_entries = 4 * 256;
+			}
+
+			/* otherwise, return the 32-entry BCG lookups */
+			for (index = 0; index < 256; index++)
+			{
+				UINT8 val = apply_brightness_contrast_gamma(RGB_GREEN(adjusted[index]), container->brightness, container->contrast, container->gamma);
+				texture->bcglookup[0x000 + index] = val << 0;
+				texture->bcglookup[0x100 + index] = val << 8;
+				texture->bcglookup[0x200 + index] = val << 16;
+				texture->bcglookup[0x300 + index] = val << 24;
+			}
+			return texture->bcglookup;
+
+		default:
+			assert(FALSE);
+	}
+	
+	return NULL;
+}
+
+
 
 /***************************************************************************
     RENDER CONTAINERS
@@ -2650,7 +2760,7 @@ void render_texture_hq_scale(bitmap_t *dest, const bitmap_t *source, const recta
     container
 -------------------------------------------------*/
 
-static render_container *render_container_alloc(void)
+static render_container *render_container_alloc(running_machine *machine)
 {
 	render_container *container;
 	int color;
@@ -2674,8 +2784,8 @@ static render_container *render_container_alloc(void)
 	render_container_empty(container);
 
 	/* allocate a client to the main palette */
-	if (Machine->palette != NULL)
-		container->palclient = palette_client_alloc(Machine->palette);
+	if (machine->palette != NULL)
+		container->palclient = palette_client_alloc(machine->palette);
 	render_container_recompute_lookups(container);
 	return container;
 }
@@ -2788,7 +2898,7 @@ void render_container_set_overlay(render_container *container, bitmap_t *bitmap)
 	if (container->overlaybitmap != NULL)
 	{
 		container->overlaytexture = render_texture_alloc(render_container_overlay_scale, NULL);
-		render_texture_set_bitmap(container->overlaytexture, bitmap, NULL, 0, TEXFORMAT_ARGB32);
+		render_texture_set_bitmap(container->overlaytexture, bitmap, NULL, TEXFORMAT_ARGB32, NULL);
 	}
 }
 

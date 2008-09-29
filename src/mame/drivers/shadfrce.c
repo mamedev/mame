@@ -225,7 +225,7 @@ static WRITE16_HANDLER ( shadfrce_sound_brt_w )
 		double brt = (data & 0xff) / 255.0;
 
 		for (i = 0; i < 0x4000; i++)
-			palette_set_brightness(machine,i,brt);
+			palette_set_pen_contrast(machine,i,brt);
 	}
 }
 

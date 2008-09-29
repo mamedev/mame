@@ -702,7 +702,7 @@ static void gfxset_update_bitmap(running_machine *machine, ui_gfx_state *state, 
 		/* allocate new stuff */
 		state->bitmap = bitmap_alloc(cellxpix * xcells, cellypix * ycells, BITMAP_FORMAT_ARGB32);
 		state->texture = render_texture_alloc(NULL, NULL);
-		render_texture_set_bitmap(state->texture, state->bitmap, NULL, 0, TEXFORMAT_ARGB32);
+		render_texture_set_bitmap(state->texture, state->bitmap, NULL, TEXFORMAT_ARGB32, NULL);
 
 		/* force a redraw */
 		state->bitmap_dirty = TRUE;
@@ -750,7 +750,7 @@ static void gfxset_update_bitmap(running_machine *machine, ui_gfx_state *state, 
 		}
 
 		/* reset the texture to force an update */
-		render_texture_set_bitmap(state->texture, state->bitmap, NULL, 0, TEXFORMAT_ARGB32);
+		render_texture_set_bitmap(state->texture, state->bitmap, NULL, TEXFORMAT_ARGB32, NULL);
 		state->bitmap_dirty = FALSE;
 	}
 }
@@ -1034,15 +1034,16 @@ static void tilemap_handle_keys(running_machine *machine, ui_gfx_state *state, i
 static void tilemap_update_bitmap(running_machine *machine, ui_gfx_state *state, int width, int height)
 {
 	bitmap_format screen_format = video_screen_get_format(machine->primary_screen);
+	palette_t *palette = NULL;
 	int screen_texformat;
 
 	/* convert the screen format to a texture format */
 	switch (screen_format)
 	{
-		case BITMAP_FORMAT_INDEXED16:	screen_texformat = TEXFORMAT_PALETTE16;		break;
-		case BITMAP_FORMAT_RGB15:		screen_texformat = TEXFORMAT_RGB15;			break;
-		case BITMAP_FORMAT_RGB32:		screen_texformat = TEXFORMAT_RGB32;			break;
-		default:						fatalerror("Invalid bitmap format!");		break;
+		case BITMAP_FORMAT_INDEXED16:	screen_texformat = TEXFORMAT_PALETTE16;	palette = machine->palette;	break;
+		case BITMAP_FORMAT_RGB15:		screen_texformat = TEXFORMAT_RGB15;		palette = NULL;				break;
+		case BITMAP_FORMAT_RGB32:		screen_texformat = TEXFORMAT_RGB32;		palette = NULL;				break;
+		default:						fatalerror("Invalid bitmap format!");								break;
 	}
 
 	/* swap the coordinates back if they were talking about a rotated surface */
@@ -1061,7 +1062,7 @@ static void tilemap_update_bitmap(running_machine *machine, ui_gfx_state *state,
 		/* allocate new stuff */
 		state->bitmap = bitmap_alloc(width, height, screen_format);
 		state->texture = render_texture_alloc(NULL, NULL);
-		render_texture_set_bitmap(state->texture, state->bitmap, NULL, 0, screen_texformat);
+		render_texture_set_bitmap(state->texture, state->bitmap, NULL, screen_texformat, palette);
 
 		/* force a redraw */
 		state->bitmap_dirty = TRUE;
@@ -1073,7 +1074,7 @@ static void tilemap_update_bitmap(running_machine *machine, ui_gfx_state *state,
 		tilemap_draw_by_index(state->bitmap, state->tilemap.which, state->tilemap.xoffs, state->tilemap.yoffs);
 
 		/* reset the texture to force an update */
-		render_texture_set_bitmap(state->texture, state->bitmap, NULL, 0, screen_texformat);
+		render_texture_set_bitmap(state->texture, state->bitmap, NULL, screen_texformat, palette);
 		state->bitmap_dirty = FALSE;
 	}
 }

@@ -756,15 +756,15 @@ VIDEO_UPDATE( tmnt2 )
 
 		// dim all colors before it
 		for (i=0; i<cb; i++)
-			palette_set_brightness(screen->machine,i,brt);
+			palette_set_pen_contrast(screen->machine,i,brt);
 
 		// reset all colors in range
 		for (i=cb; i<ce; i++)
-			palette_set_brightness(screen->machine,i,1.0);
+			palette_set_pen_contrast(screen->machine,i,1.0);
 
 		// dim all colors after it
 		for (i=ce; i<2048; i++)
-			palette_set_brightness(screen->machine,i,brt);
+			palette_set_pen_contrast(screen->machine,i,brt);
 
 		// toggle shadow/highlight
 		if (~dim_c & 0x10)
