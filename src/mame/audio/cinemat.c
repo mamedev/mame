@@ -1490,14 +1490,15 @@ static const ay8910_interface demon_ay8910_interface_3 =
 };
 
 
-static void ctc_interrupt(running_machine *machine, int state)
+static void ctc_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(machine, 1, 0, state);
+	cpunum_set_input_line(device->machine, 1, 0, state);
 }
 
 
 static z80ctc_interface demon_z80ctc_interface =
 {
+	"audio",		 /* clocked from the audio CPU */
 	0,               /* clock (filled in from the CPU clock) */
 	0,               /* timer disables */
 	ctc_interrupt,   /* interrupt handler */
@@ -1511,10 +1512,6 @@ static MACHINE_RESET( demon_sound )
 {
 	/* generic init */
 	generic_init(machine, demon_sound_w);
-
-	/* initialize the CTC interface */
-	demon_z80ctc_interface.baseclock = cpunum_get_clock(1);
-	z80ctc_init(0, &demon_z80ctc_interface);
 
 	/* reset the FIFO */
 	sound_fifo_in = sound_fifo_out = 0;
@@ -1543,15 +1540,15 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( demon_sound_ports, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_WRITE(z80ctc_0_w)
-	AM_RANGE(0x1c, 0x1f) AM_WRITE(z80ctc_0_w)
+	AM_RANGE(0x00, 0x03) AM_DEVWRITE(Z80CTC, "ctc", z80ctc_w)
+	AM_RANGE(0x1c, 0x1f) AM_DEVWRITE(Z80CTC, "ctc", z80ctc_w)
 ADDRESS_MAP_END
 
 
-static const struct z80_irq_daisy_chain daisy_chain[] =
+static const z80_daisy_chain daisy_chain[] =
 {
-	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 },
-	{ 0,0,0,0,-1 }
+	{ Z80CTC, "ctc" },
+	{ NULL }
 };
 
 
@@ -1562,6 +1559,8 @@ MACHINE_DRIVER_START( demon_sound )
 	MDRV_CPU_CONFIG(daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(demon_sound_map,0)
 	MDRV_CPU_IO_MAP(demon_sound_ports,0)
+	
+	MDRV_Z80CTC_ADD("ctc", demon_z80ctc_interface)
 
 	MDRV_MACHINE_RESET(demon_sound)
 

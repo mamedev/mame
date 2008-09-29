@@ -54,7 +54,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_READWRITE(z80ctc_0_r,z80ctc_0_w)
+	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80CTC, "ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 static void cchasm_6840_irq(running_machine *machine, int state)
@@ -134,10 +134,10 @@ static MACHINE_START( cchasm )
  *
  *************************************/
 
-static const struct z80_irq_daisy_chain daisy_chain[] =
+static const z80_daisy_chain daisy_chain[] =
 {
-	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 }, /* CTC number 0 */
-	{ 0,0,0,0,-1 } 		/* end mark */
+	{ Z80CTC, "ctc" },
+	{ NULL }
 };
 
 
@@ -148,9 +148,10 @@ static const struct z80_irq_daisy_chain daisy_chain[] =
  *
  *************************************/
 
+extern z80ctc_interface cchasm_ctc_intf;
+
 static MACHINE_DRIVER_START( cchasm )
 
-	MDRV_MACHINE_START(cchasm)
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M68000,CCHASM_68K_CLOCK)	/* 8 MHz (from schematics) */
 	MDRV_CPU_PROGRAM_MAP(memmap,0)
@@ -159,6 +160,10 @@ static MACHINE_DRIVER_START( cchasm )
 	MDRV_CPU_CONFIG(daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(sound_memmap,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
+
+	MDRV_Z80CTC_ADD("ctc", cchasm_ctc_intf)
+
+	MDRV_MACHINE_START(cchasm)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", VECTOR)

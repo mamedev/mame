@@ -7,11 +7,13 @@
 
 ***************************************************************************/
 
+#ifndef __Z80CTC_H__
+#define __Z80CTC_H__
+
+
 /***************************************************************************
     CONSTANTS
 ***************************************************************************/
-
-#define MAX_CTC 2
 
 #define NOTIMER_0 (1<<0)
 #define NOTIMER_1 (1<<1)
@@ -24,15 +26,30 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct
+typedef struct _z80ctc_interface z80ctc_interface;
+struct _z80ctc_interface
 {
-	int baseclock;                           /* timer clock */
-	int notimer;                         /* timer disablers */
-	void (*intr)(running_machine *machine, int which);             /* callback when change interrupt status */
-	write8_machine_func zc0;   /* ZC/TO0 callback */
-	write8_machine_func zc1;   /* ZC/TO1 callback */
-	write8_machine_func zc2;   /* ZC/TO2 callback */
-} z80ctc_interface;
+	const char *cpu;						/* CPU whose clock we use for our base */
+	int baseclock;							/* timer clock */
+	int notimer;							/* timer disablers */
+	void (*intr)(const device_config *device, int which); /* callback when change interrupt status */
+	write8_device_func zc0;					/* ZC/TO0 callback */
+	write8_device_func zc1;					/* ZC/TO1 callback */
+	write8_device_func zc2;					/* ZC/TO2 callback */
+};
+
+
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MDRV_Z80CTC_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, Z80CTC) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_Z80CTC_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, Z80CTC)
 
 
 
@@ -40,29 +57,17 @@ typedef struct
     INITIALIZATION/CONFIGURATION
 ***************************************************************************/
 
-void z80ctc_init(int which, z80ctc_interface *intf);
-void z80ctc_reset(int which);
-attotime z80ctc_getperiod (int which, int ch);
+void z80ctc_reset(const device_config *device);
+attotime z80ctc_getperiod(const device_config *device, int ch);
 
 
 
 /***************************************************************************
-    WRITE HANDLERS
+    READ/WRITE HANDLERS
 ***************************************************************************/
 
-void z80ctc_w(int which, int ch, UINT8 data);
-WRITE8_HANDLER( z80ctc_0_w );
-WRITE8_HANDLER( z80ctc_1_w );
-
-
-
-/***************************************************************************
-    READ HANDLERS
-***************************************************************************/
-
-UINT8 z80ctc_r(int which, int ch);
-READ8_HANDLER( z80ctc_0_r );
-READ8_HANDLER( z80ctc_1_r );
+WRITE8_DEVICE_HANDLER( z80ctc_w );
+READ8_DEVICE_HANDLER( z80ctc_r );
 
 
 
@@ -70,22 +75,17 @@ READ8_HANDLER( z80ctc_1_r );
     EXTERNAL TRIGGERS
 ***************************************************************************/
 
-void z80ctc_trg_w(running_machine *machine, int which, int trg, UINT8 data);
-WRITE8_HANDLER( z80ctc_0_trg0_w );
-WRITE8_HANDLER( z80ctc_0_trg1_w );
-WRITE8_HANDLER( z80ctc_0_trg2_w );
-WRITE8_HANDLER( z80ctc_0_trg3_w );
-WRITE8_HANDLER( z80ctc_1_trg0_w );
-WRITE8_HANDLER( z80ctc_1_trg1_w );
-WRITE8_HANDLER( z80ctc_1_trg2_w );
-WRITE8_HANDLER( z80ctc_1_trg3_w );
+void z80ctc_trg_w(const device_config *device, int trg, UINT8 data);
+WRITE8_DEVICE_HANDLER( z80ctc_trg0_w );
+WRITE8_DEVICE_HANDLER( z80ctc_trg1_w );
+WRITE8_DEVICE_HANDLER( z80ctc_trg2_w );
+WRITE8_DEVICE_HANDLER( z80ctc_trg3_w );
 
 
 
-/***************************************************************************
-    DAISY CHAIN INTERFACE
-***************************************************************************/
+/* ----- device interface ----- */
 
-int z80ctc_irq_state(int which);
-int z80ctc_irq_ack(int which);
-void z80ctc_irq_reti(int which);
+#define Z80CTC DEVICE_GET_INFO_NAME(z80ctc)
+DEVICE_GET_INFO( z80ctc );
+
+#endif

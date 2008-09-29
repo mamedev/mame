@@ -747,16 +747,16 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
-static void meritm_audio_pio_interrupt(running_machine *machine, int state)
+static void meritm_audio_pio_interrupt(const device_config *device, int state)
 {
 	//logerror( "PIO(0) interrupt line: %d, V = %d, H = %d\n", state, video_screen_get_vpos(0), video_screen_get_hpos(0) );
-	cpunum_set_input_line(machine, 0, 0, state);
+	cpunum_set_input_line(device->machine, 0, 0, state);
 }
 
-static void meritm_io_pio_interrupt(running_machine *machine, int state)
+static void meritm_io_pio_interrupt(const device_config *device, int state)
 {
 	//logerror( "PIO(1) interrupt line: %d, V = %d, H = %d\n", state, video_screen_get_vpos(0), video_screen_get_hpos(0) );
-	cpunum_set_input_line(machine, 0, 0, state);
+	cpunum_set_input_line(device->machine, 0, 0, state);
 }
 
 
@@ -828,37 +828,17 @@ static void meritm_pio1_portb_input_changed_callback(void *param, UINT32 oldval,
 }
 #endif
 
-static void meritm_z80pio_reset(int which)
+static const z80_daisy_chain meritm_daisy_chain[] =
 {
-	z80pio_reset( meritm_z80pio[which] );
-}
-
-static int meritm_z80pio_irq_state(int which)
-{
-	return z80pio_irq_state( meritm_z80pio[which] );
-}
-
-static int meritm_z80pio_irq_ack(int which)
-{
-	return z80pio_irq_ack( meritm_z80pio[which] );
-}
-
-static void meritm_z80pio_irq_reti(int which)
-{
-	z80pio_irq_reti( meritm_z80pio[which] );
-}
-
-static const struct z80_irq_daisy_chain meritm_daisy_chain[] =
-{
-	{ meritm_z80pio_reset, meritm_z80pio_irq_state, meritm_z80pio_irq_ack, meritm_z80pio_irq_reti, 1 }, /* PIO number 1 */
-	{ meritm_z80pio_reset, meritm_z80pio_irq_state, meritm_z80pio_irq_ack, meritm_z80pio_irq_reti, 0 }, /* PIO number 0 */
-	{ 0, 0, 0, 0, -1 }		/* end mark */
+	{ Z80PIO, "z80pio_1" },
+	{ Z80PIO, "z80pio_0" },
+	{ NULL }
 };
 
 static MACHINE_START(merit_common)
 {
-	meritm_z80pio[0] = device_list_find_by_tag( machine->config->devicelist, Z80PIO, "z80pio_0" );
-	meritm_z80pio[1] = device_list_find_by_tag( machine->config->devicelist, Z80PIO, "z80pio_1" );
+	meritm_z80pio[0] = devtag_get_device( machine, Z80PIO, "z80pio_0" );
+	meritm_z80pio[1] = devtag_get_device( machine, Z80PIO, "z80pio_1" );
 	//input_port_set_changed_callback(port_tag_to_index("PIO1_PORTB"), 0xff, meritm_pio1_portb_input_changed_callback, NULL);
 
 };

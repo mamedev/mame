@@ -184,27 +184,21 @@ static WRITE8_HANDLER( tmpz84c011_0_dir_pd_w )	{ pio_dir[3] = data; }
 static WRITE8_HANDLER( tmpz84c011_0_dir_pe_w )	{ pio_dir[4] = data; }
 
 
-static void ctc0_interrupt(running_machine *machine, int state)
+static void ctc0_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(machine, 1, 0, state);
+	cputag_set_input_line(device->machine, "audio", 0, state);
 }
 
 static z80ctc_interface ctc_intf =
 {
-	1,					/* clock */
+	"audio",			/* clock from the audio CPU */
+	0,					/* clock */
 	0,					/* timer disables */
 	ctc0_interrupt,		/* interrupt handler */
-	z80ctc_0_trg3_w,	/* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
+	z80ctc_trg3_w,		/* ZC/TO0 callback ctc1.zc0 -> ctc1.trg3 */
 	0,					/* ZC/TO1 callback */
 	0,					/* ZC/TO2 callback */
 };
-
-static void tmpz84c011_init(running_machine *machine)
-{
-	// initialize the CTC
-	ctc_intf.baseclock = cpunum_get_clock(1);
-	z80ctc_init(0, &ctc_intf);
-}
 
 static MACHINE_RESET( niyanpai )
 {
@@ -231,9 +225,6 @@ static DRIVER_INIT( niyanpai )
 
 	// sound program patch
 	SNDROM[0x0213] = 0x00;			// DI -> NOP
-
-	// initialize TMPZ84C011 PIO and CTC
-	tmpz84c011_init(machine);
 
 	// initialize sound rom bank
 	niyanpai_soundbank_w(machine, 0);
@@ -494,7 +485,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x10, 0x13) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
+	AM_RANGE(0x10, 0x13) AM_DEVREADWRITE(Z80CTC, "ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x50, 0x50) AM_READWRITE(tmpz84c011_0_pa_r, tmpz84c011_0_pa_w)
 	AM_RANGE(0x51, 0x51) AM_READWRITE(tmpz84c011_0_pb_r, tmpz84c011_0_pb_w)
 	AM_RANGE(0x52, 0x52) AM_READWRITE(tmpz84c011_0_pc_r, tmpz84c011_0_pc_w)
@@ -866,10 +857,10 @@ static INTERRUPT_GEN( niyanpai_interrupt )
 	cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
 }
 
-static const struct z80_irq_daisy_chain daisy_chain_sound[] =
+static const z80_daisy_chain daisy_chain_sound[] =
 {
-	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 },	/* device 0 = CTC_1 */
-	{ 0, 0, 0, 0, -1 }		/* end mark */
+	{ Z80CTC, "ctc" },
+	{ NULL }
 };
 
 
@@ -884,6 +875,8 @@ static MACHINE_DRIVER_START( niyanpai )
 	MDRV_CPU_CONFIG(daisy_chain_sound)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem, sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
+	
+	MDRV_Z80CTC_ADD("ctc", ctc_intf)
 
 	MDRV_MACHINE_RESET(niyanpai)
 	MDRV_NVRAM_HANDLER(generic_0fill)

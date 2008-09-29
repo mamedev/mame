@@ -490,14 +490,15 @@ static WRITE8_HANDLER( demndrgn_sound_w )
  *
  *************************************/
 
-static void ctc_interrupt(running_machine *machine, int state)
+static void ctc_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(machine, 1, 0, state);
+	cputag_set_input_line(device->machine, "sub", 0, state);
 }
 
 
 static z80ctc_interface ctc_intf =
 {
+	"sub",				/* clock comes from sub CPU */
 	0,              	/* clock (filled in from the CPU 0 clock) */
 	0,              	/* timer disables */
 	ctc_interrupt,  	/* interrupt handler */
@@ -518,19 +519,10 @@ static const ay8910_interface ay8912_interface =
 };
 
 
-static MACHINE_START( tenpindx )
-{
-	/* initialize the CTC */
-	ctc_intf.baseclock = cpunum_get_clock(0);
-	z80ctc_init(0, &ctc_intf);
-	MACHINE_START_CALL(astrocde);
-}
-
-
 static WRITE8_HANDLER( tenpindx_sound_w )
 {
 	soundlatch_w(machine, offset, data);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cputag_set_input_line(machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -714,7 +706,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tenpin_sub_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x90, 0x93) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
+	AM_RANGE(0x90, 0x93) AM_DEVREADWRITE(Z80CTC, "ctc", z80ctc_r, z80ctc_w)
 	AM_RANGE(0x97, 0x97) AM_READ(soundlatch_r)
 	AM_RANGE(0x98, 0x98) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x98, 0x98) AM_READ(ay8910_read_port_0_r)
@@ -1243,10 +1235,10 @@ static const samples_interface gorf_samples_interface =
  *
  *************************************/
 
-static const struct z80_irq_daisy_chain tenpin_daisy_chain[] =
+static const z80_daisy_chain tenpin_daisy_chain[] =
 {
-	{ z80ctc_reset, z80ctc_irq_state, z80ctc_irq_ack, z80ctc_irq_reti, 0 }, /* CTC number 0 */
-	{ 0, 0, 0, 0, -1 }		/* end mark */
+	{ Z80CTC, "ctc" },
+	{ NULL }
 };
 
 
@@ -1469,8 +1461,8 @@ static MACHINE_DRIVER_START( tenpindx )
 	MDRV_CPU_CONFIG(tenpin_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(tenpin_sub_map,0)
 	MDRV_CPU_IO_MAP(tenpin_sub_io_map,0)
-
-	MDRV_MACHINE_START(tenpindx)
+	
+	MDRV_Z80CTC_ADD("ctc", ctc_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

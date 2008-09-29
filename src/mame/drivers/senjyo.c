@@ -98,7 +98,7 @@ VIDEO_UPDATE( senjyo );
 extern int is_senjyo, senjyo_scrollhack;
 
 /* in audio/senjyo.c */
-extern const struct z80_irq_daisy_chain senjyo_daisy_chain[];
+extern const z80_daisy_chain senjyo_daisy_chain[];
 extern const z80pio_interface senjyo_pio_intf;
 void senjyo_sh_start(void);
 
@@ -300,7 +300,7 @@ static READ8_DEVICE_HANDLER( pio_r )
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_DEVREADWRITE(Z80PIO, "z80pio", pio_r, pio_w)
-	AM_RANGE(0x08, 0x0b) AM_READWRITE(z80ctc_0_r, z80ctc_0_w)
+	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE(Z80CTC, "z80ctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
 
 
@@ -623,6 +623,7 @@ static const samples_interface senjyo_samples_interface =
 };
 
 
+extern const z80ctc_interface senjyo_ctc_intf;
 
 static MACHINE_DRIVER_START( senjyo )
 
@@ -639,6 +640,7 @@ static MACHINE_DRIVER_START( senjyo )
 	MDRV_MACHINE_RESET(senjyo)
 
 	MDRV_Z80PIO_ADD( "z80pio", senjyo_pio_intf )
+	MDRV_Z80CTC_ADD( "z80ctc", senjyo_ctc_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

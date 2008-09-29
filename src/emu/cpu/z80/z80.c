@@ -127,8 +127,8 @@ typedef struct
 	UINT8	nmi_pending;		/* nmi pending */
 	UINT8	irq_state;			/* irq line state */
 	UINT8	after_ei;			/* are we in the EI shadow? */
-	const struct z80_irq_daisy_chain *daisy;
 	int		(*irq_callback)(int irqline);
+	z80_daisy_state *daisy;
 }	Z80_Regs;
 
 #define CF	0x01
@@ -3498,7 +3498,8 @@ static void z80_init(int index, int clock, const void *config, int (*irqcallback
 
 	/* Reset registers to their initial values */
 	memset(&Z80, 0, sizeof(Z80));
-	Z80.daisy = config;
+	if (config != NULL)
+		Z80.daisy = z80daisy_init(Machine, config);
 	Z80.irq_callback = irqcallback;
 	IX = IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	F = ZF;			/* Zero flag is set */

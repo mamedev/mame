@@ -6,31 +6,65 @@
 
 ***************************************************************************/
 
+#pragma once
 
-#ifndef Z80DAISY_H
-#define Z80DAISY_H
+#ifndef __Z80DAISY_H__
+#define __Z80DAISY_H__
+
+#include "devintrf.h"
 
 
-/* daisy-chain link */
-struct z80_irq_daisy_chain
-{
-	void (*reset)(int); 			/* reset callback */
-	int (*irq_state)(int);			/* get interrupt state */
-	int (*irq_ack)(int);			/* interrupt acknowledge callback */
-	void (*irq_reti)(int);			/* reti callback */
-	int param;						/* callback parameter (-1 ends list) */
-};
-
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
 
 /* these constants are returned from the irq_state function */
 #define Z80_DAISY_INT 	0x01		/* interrupt request mask */
 #define Z80_DAISY_IEO 	0x02		/* interrupt disable mask (IEO) */
 
 
-/* prototypes */
-void z80daisy_reset(const struct z80_irq_daisy_chain *daisy);
-int z80daisy_update_irq_state(const struct z80_irq_daisy_chain *chain);
-int z80daisy_call_ack_device(const struct z80_irq_daisy_chain *chain);
-void z80daisy_call_reti_device(const struct z80_irq_daisy_chain *chain);
+enum
+{
+	DEVINFO_FCT_IRQ_STATE = DEVINFO_FCT_DEVICE_SPECIFIC,	/* R/O: z80_daisy_irq_state */
+	DEVINFO_FCT_IRQ_ACK,									/* R/O: z80_daisy_irq_ack */
+	DEVINFO_FCT_IRQ_RETI									/* R/O: z80_daisy_irq_reti */
+};
+
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+/* per-device callback functions */
+typedef int (*z80_daisy_irq_state)(const device_config *device);
+typedef int (*z80_daisy_irq_ack)(const device_config *device);
+typedef int (*z80_daisy_irq_reti)(const device_config *device);
+
+
+/* opaque internal daisy chain state */
+typedef struct _z80_daisy_state z80_daisy_state;
+
+
+/* daisy chain structure */
+typedef struct _z80_daisy_chain z80_daisy_chain;
+struct _z80_daisy_chain
+{
+	device_type		devtype;					/* type of device */
+	const char *	devname;					/* name of the device */
+};
+
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+z80_daisy_state *z80daisy_init(running_machine *machine, const z80_daisy_chain *daisy);
+
+void z80daisy_reset(z80_daisy_state *daisy);
+int z80daisy_update_irq_state(z80_daisy_state *chain);
+int z80daisy_call_ack_device(z80_daisy_state *chain);
+void z80daisy_call_reti_device(z80_daisy_state *chain);
 
 #endif

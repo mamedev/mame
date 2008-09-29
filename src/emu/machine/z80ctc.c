@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "z80ctc.h"
 #include "cpu/z80/z80.h"
 #include "cpu/z80/z80daisy.h"
@@ -73,31 +72,54 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef struct _ctc_channel ctc_channel;
+struct _ctc_channel
+{
+	write8_device_func 	zc;					/* zero crossing callbacks */
+	UINT8				notimer;			/* no timer masks */
+	UINT16 				mode;				/* current mode */
+	UINT16 				tconst;				/* time constant */
+	UINT16 				down;				/* down counter (clock mode only) */
+	UINT8 				extclk;				/* current signal from the external clock */
+	emu_timer *			timer;				/* array of active timers */
+	UINT8				int_state;			/* interrupt status (for daisy chain) */
+};
+
+
 typedef struct _z80ctc z80ctc;
 struct _z80ctc
 {
-	UINT8 vector;				/* interrupt vector */
-	UINT32 clock;				/* system clock */
-	attotime period16;			/* 16/system clock */
-	attotime period256;		/* 256/system clock */
-	void (*intr)(running_machine *machine, int which);	/* interrupt callback */
-	write8_machine_func zc[4];		/* zero crossing callbacks */
-	UINT8 notimer;				/* no timer masks */
-	UINT16 mode[4];				/* current mode */
-	UINT16 tconst[4];			/* time constant */
-	UINT16 down[4];				/* down counter (clock mode only) */
-	UINT8 extclk[4];			/* current signal from the external clock */
-	emu_timer *timer[4];				/* array of active timers */
-	UINT8 int_state[4];			/* interrupt status (for daisy chain) */
+	UINT8				vector;				/* interrupt vector */
+	UINT32				clock;				/* system clock */
+	attotime			period16;			/* 16/system clock */
+	attotime			period256;			/* 256/system clock */
+	void (*intr)(const device_config *device, int which);	/* interrupt callback */
+	ctc_channel			channel[4];			/* data for each channel */
 };
 
 
 
 /***************************************************************************
-    GLOBAL VARIABLES
+    FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static z80ctc ctcs[MAX_CTC];
+static int z80ctc_irq_state(const device_config *device);
+static int z80ctc_irq_ack(const device_config *device);
+static void z80ctc_irq_reti(const device_config *device);
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE z80ctc *get_safe_token(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->token != NULL);
+	assert(device->type == Z80CTC);
+	return (z80ctc *)device->token;
+}
 
 
 
@@ -105,39 +127,39 @@ static z80ctc ctcs[MAX_CTC];
     INTERNAL STATE MANAGEMENT
 ***************************************************************************/
 
-static void interrupt_check(running_machine *machine, int which)
+static void interrupt_check(const device_config *device)
 {
-	z80ctc *ctc = ctcs + which;
+	z80ctc *ctc = get_safe_token(device);
 
 	/* if we have a callback, update it with the current state */
-	if (ctc->intr)
-		(*ctc->intr)(machine, (z80ctc_irq_state(which) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
+	if (ctc->intr != NULL)
+		(*ctc->intr)(device, (z80ctc_irq_state(device) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static TIMER_CALLBACK( timercallback )
 {
-	int which = param >> 2;
-	int ch = param & 3;
-	z80ctc *ctc = ctcs + which;
+	const device_config *device = ptr;
+	z80ctc *ctc = get_safe_token(device);
+	ctc_channel *channel = &ctc->channel[param];
 
 	/* down counter has reached zero - see if we should interrupt */
-	if ((ctc->mode[ch] & INTERRUPT) == INTERRUPT_ON)
+	if ((channel->mode & INTERRUPT) == INTERRUPT_ON)
 	{
-		ctc->int_state[ch] |= Z80_DAISY_INT;
-		VPRINTF(("CTC timer ch%d\n", ch));
-		interrupt_check(machine, which);
+		channel->int_state |= Z80_DAISY_INT;
+		VPRINTF(("CTC timer ch%d\n", param));
+		interrupt_check(device);
 	}
 
 	/* generate the clock pulse */
-	if (ctc->zc[ch])
+	if (channel->zc != NULL)
 	{
-		(*ctc->zc[ch])(machine,0,1);
-		(*ctc->zc[ch])(machine,0,0);
+		(*channel->zc)(device, 0, 1);
+		(*channel->zc)(device, 0, 0);
 	}
 
 	/* reset the down counter */
-	ctc->down[ch] = ctc->tconst[ch];
+	channel->down = channel->tconst;
 }
 
 
@@ -146,75 +168,26 @@ static TIMER_CALLBACK( timercallback )
     INITIALIZATION/CONFIGURATION
 ***************************************************************************/
 
-void z80ctc_init(int which, z80ctc_interface *intf)
+attotime z80ctc_getperiod(const device_config *device, int ch)
 {
-	z80ctc *ctc = &ctcs[which];
-
-	assert(which < MAX_CTC);
-
-	memset(ctc, 0, sizeof(*ctc));
-
-	ctc->clock = intf->baseclock;
-	ctc->period16 = attotime_mul(ATTOTIME_IN_HZ(intf->baseclock), 16);
-	ctc->period256 = attotime_mul(ATTOTIME_IN_HZ(intf->baseclock), 256);
-	ctc->notimer = intf->notimer;
-	ctc->intr = intf->intr;
-	ctc->timer[0] = timer_alloc(timercallback, NULL);
-	ctc->timer[1] = timer_alloc(timercallback, NULL);
-	ctc->timer[2] = timer_alloc(timercallback, NULL);
-	ctc->timer[3] = timer_alloc(timercallback, NULL);
-	ctc->zc[0] = intf->zc0;
-	ctc->zc[1] = intf->zc1;
-	ctc->zc[2] = intf->zc2;
-	ctc->zc[3] = 0;
-	z80ctc_reset(which);
-
-    state_save_register_item("z80ctc", which, ctc->vector);
-    state_save_register_item_array("z80ctc", which, ctc->mode);
-    state_save_register_item_array("z80ctc", which, ctc->tconst);
-    state_save_register_item_array("z80ctc", which, ctc->down);
-    state_save_register_item_array("z80ctc", which, ctc->extclk);
-    state_save_register_item_array("z80ctc", which, ctc->int_state);
-}
-
-
-void z80ctc_reset(int which)
-{
-	z80ctc *ctc = ctcs + which;
-	int i;
-
-	/* set up defaults */
-	for (i = 0; i < 4; i++)
-	{
-		ctc->mode[i] = RESET_ACTIVE;
-		ctc->tconst[i] = 0x100;
-		timer_adjust_oneshot(ctc->timer[i], attotime_never, 0);
-		ctc->int_state[i] = 0;
-	}
-	interrupt_check(Machine, which);
-	VPRINTF(("CTC Reset\n"));
-}
-
-
-attotime z80ctc_getperiod(int which, int ch)
-{
-	z80ctc *ctc = ctcs + which;
+	z80ctc *ctc = get_safe_token(device);
+	ctc_channel *channel = &ctc->channel[ch];
 	attotime period;
 
 	/* if reset active, no period */
-	if ((ctc->mode[ch] & RESET) == RESET_ACTIVE)
+	if ((channel->mode & RESET) == RESET_ACTIVE)
 		return attotime_zero;
 
 	/* if counter mode, no real period */
-	if ((ctc->mode[ch] & MODE) == MODE_COUNTER)
+	if ((channel->mode & MODE) == MODE_COUNTER)
 	{
 		logerror("CTC %d is CounterMode : Can't calculate period\n", ch );
 		return attotime_zero;
 	}
 
 	/* compute the period */
-	period = ((ctc->mode[ch] & PRESCALER) == PRESCALER_16) ? ctc->period16 : ctc->period256;
-	return attotime_mul(period, ctc->tconst[ch]);
+	period = ((channel->mode & PRESCALER) == PRESCALER_16) ? ctc->period16 : ctc->period256;
+	return attotime_mul(period, channel->tconst);
 }
 
 
@@ -223,13 +196,15 @@ attotime z80ctc_getperiod(int which, int ch)
     WRITE HANDLERS
 ***************************************************************************/
 
-void z80ctc_w(int which, int ch, UINT8 data)
+WRITE8_DEVICE_HANDLER( z80ctc_w )
 {
-	z80ctc *ctc = ctcs + which;
+	z80ctc *ctc = get_safe_token(device);
+	int ch = offset & 3;
+	ctc_channel *channel = &ctc->channel[ch];
 	int mode;
 
 	/* get the current mode */
-	mode = ctc->mode[ch];
+	mode = channel->mode;
 
 	/* if we're waiting for a time constant, this is it */
 	if ((mode & CONSTANT) == CONSTANT_LOAD)
@@ -237,13 +212,13 @@ void z80ctc_w(int which, int ch, UINT8 data)
 		VPRINTF(("CTC ch.%d constant = %02x\n", ch, data));
 
 		/* set the time constant (0 -> 0x100) */
-		ctc->tconst[ch] = data ? data : 0x100;
+		channel->tconst = data ? data : 0x100;
 
 		/* clear the internal mode -- we're no longer waiting */
-		ctc->mode[ch] &= ~CONSTANT;
+		channel->mode &= ~CONSTANT;
 
 		/* also clear the reset, since the constant gets it going again */
-		ctc->mode[ch] &= ~RESET;
+		channel->mode &= ~RESET;
 
 		/* if we're in timer mode.... */
 		if ((mode & MODE) == MODE_TIMER)
@@ -251,24 +226,24 @@ void z80ctc_w(int which, int ch, UINT8 data)
 			/* if we're triggering on the time constant, reset the down counter now */
 			if ((mode & TRIGGER) == TRIGGER_AUTO)
 			{
-				if (!(ctc->notimer & (1<<ch)))
+				if (!channel->notimer)
 				{
 					attotime period = ((mode & PRESCALER) == PRESCALER_16) ? ctc->period16 : ctc->period256;
-					period = attotime_mul(period, ctc->tconst[ch]);
+					period = attotime_mul(period, channel->tconst);
 
-					timer_adjust_periodic(ctc->timer[ch], period, (which << 2) + ch, period);
+					timer_adjust_periodic(channel->timer, period, ch, period);
 				}
 				else
-					timer_adjust_oneshot(ctc->timer[ch], attotime_never, 0);
+					timer_adjust_oneshot(channel->timer, attotime_never, 0);
 			}
 
 			/* else set the bit indicating that we're waiting for the appropriate trigger */
 			else
-				ctc->mode[ch] |= WAITING_FOR_TRIG;
+				channel->mode |= WAITING_FOR_TRIG;
 		}
 
 		/* also set the down counter in case we're clocking externally */
-		ctc->down[ch] = ctc->tconst[ch];
+		channel->down = channel->tconst;
 
 		/* all done here */
 		return;
@@ -292,13 +267,13 @@ void z80ctc_w(int which, int ch, UINT8 data)
 	if ((data & CONTROL) == CONTROL_WORD)
 	{
 		/* set the new mode */
-		ctc->mode[ch] = data;
+		channel->mode = data;
 		VPRINTF(("CTC ch.%d mode = %02x\n", ch, data));
 
 		/* if we're being reset, clear out any pending timers for this channel */
 		if ((data & RESET) == RESET_ACTIVE)
 		{
-			timer_adjust_oneshot(ctc->timer[ch], attotime_never, 0);
+			timer_adjust_oneshot(channel->timer, attotime_never, 0);
 			/* note that we don't clear the interrupt state here! */
 		}
 
@@ -307,39 +282,35 @@ void z80ctc_w(int which, int ch, UINT8 data)
 	}
 }
 
-WRITE8_HANDLER( z80ctc_0_w ) { z80ctc_w(0, offset, data); }
-WRITE8_HANDLER( z80ctc_1_w ) { z80ctc_w(1, offset, data); }
-
 
 
 /***************************************************************************
     READ HANDLERS
 ***************************************************************************/
 
-UINT8 z80ctc_r(int which, int ch)
+READ8_DEVICE_HANDLER( z80ctc_r )
 {
-	z80ctc *ctc = ctcs + which;
+	z80ctc *ctc = get_safe_token(device);
+	int ch = offset & 3;
+	ctc_channel *channel = &ctc->channel[ch];
 
 	/* if we're in counter mode, just return the count */
-	if ((ctc->mode[ch] & MODE) == MODE_COUNTER || (ctc->mode[ch] & WAITING_FOR_TRIG))
-		return ctc->down[ch];
+	if ((channel->mode & MODE) == MODE_COUNTER || (channel->mode & WAITING_FOR_TRIG))
+		return channel->down;
 
 	/* else compute the down counter value */
 	else
 	{
-		attotime period = ((ctc->mode[ch] & PRESCALER) == PRESCALER_16) ? ctc->period16 : ctc->period256;
+		attotime period = ((channel->mode & PRESCALER) == PRESCALER_16) ? ctc->period16 : ctc->period256;
 
 		VPRINTF(("CTC clock %f\n",ATTOSECONDS_TO_HZ(period.attoseconds)));
 
-		if (ctc->timer[ch])
-			return ((int)(attotime_to_double(timer_timeleft(ctc->timer[ch])) * attotime_to_double(period)) + 1) & 0xff;
+		if (channel->timer != NULL)
+			return ((int)(attotime_to_double(timer_timeleft(channel->timer)) * attotime_to_double(period)) + 1) & 0xff;
 		else
 			return 0;
 	}
 }
-
-READ8_HANDLER( z80ctc_0_r ) { return z80ctc_r(0, offset); }
-READ8_HANDLER( z80ctc_1_r ) { return z80ctc_r(1, offset); }
 
 
 
@@ -347,64 +318,63 @@ READ8_HANDLER( z80ctc_1_r ) { return z80ctc_r(1, offset); }
     EXTERNAL TRIGGERS
 ***************************************************************************/
 
-void z80ctc_trg_w(running_machine *machine, int which, int ch, UINT8 data)
+void z80ctc_trg_w(const device_config *device, int ch, UINT8 data)
 {
-	z80ctc *ctc = ctcs + which;
+	z80ctc *ctc = get_safe_token(device);
+	ctc_channel *channel = &ctc->channel[ch];
 
 	/* normalize data */
 	data = data ? 1 : 0;
 
 	/* see if the trigger value has changed */
-	if (data != ctc->extclk[ch])
+	if (data != channel->extclk)
 	{
-		ctc->extclk[ch] = data;
+		channel->extclk = data;
 
 		/* see if this is the active edge of the trigger */
-		if (((ctc->mode[ch] & EDGE) == EDGE_RISING && data) || ((ctc->mode[ch] & EDGE) == EDGE_FALLING && !data))
+		if (((channel->mode & EDGE) == EDGE_RISING && data) || ((channel->mode & EDGE) == EDGE_FALLING && !data))
 		{
 			/* if we're waiting for a trigger, start the timer */
-			if ((ctc->mode[ch] & WAITING_FOR_TRIG) && (ctc->mode[ch] & MODE) == MODE_TIMER)
+			if ((channel->mode & WAITING_FOR_TRIG) && (channel->mode & MODE) == MODE_TIMER)
 			{
-				if (!(ctc->notimer & (1<<ch)))
+				if (!channel->notimer)
 				{
-					attotime period = ((ctc->mode[ch] & PRESCALER) == PRESCALER_16) ? ctc->period16 : ctc->period256;
-					period = attotime_mul(period, ctc->tconst[ch]);
+					attotime period = ((channel->mode & PRESCALER) == PRESCALER_16) ? ctc->period16 : ctc->period256;
+					period = attotime_mul(period, channel->tconst);
 
 					VPRINTF(("CTC period %s\n", attotime_string(period, 9)));
-					timer_adjust_periodic(ctc->timer[ch], period, (which << 2) + ch, period);
+					timer_adjust_periodic(channel->timer, period, ch, period);
 				}
 				else
 				{
 					VPRINTF(("CTC disabled\n"));
 
-					timer_adjust_oneshot(ctc->timer[ch], attotime_never, 0);
+					timer_adjust_oneshot(channel->timer, attotime_never, 0);
 				}
 			}
 
 			/* we're no longer waiting */
-			ctc->mode[ch] &= ~WAITING_FOR_TRIG;
+			channel->mode &= ~WAITING_FOR_TRIG;
 
 			/* if we're clocking externally, decrement the count */
-			if ((ctc->mode[ch] & MODE) == MODE_COUNTER)
+			if ((channel->mode & MODE) == MODE_COUNTER)
 			{
-				ctc->down[ch]--;
+				channel->down--;
 
 				/* if we hit zero, do the same thing as for a timer interrupt */
-				if (!ctc->down[ch])
-					timercallback(machine, NULL, (which << 2) + ch);
+				if (!channel->down)
+				{
+					void *ptr = (void *)device;
+					timercallback(device->machine, ptr, ch);
+				}
 			}
 		}
 	}
 }
-
-WRITE8_HANDLER( z80ctc_0_trg0_w ) { z80ctc_trg_w(machine, 0, 0, data); }
-WRITE8_HANDLER( z80ctc_0_trg1_w ) { z80ctc_trg_w(machine, 0, 1, data); }
-WRITE8_HANDLER( z80ctc_0_trg2_w ) { z80ctc_trg_w(machine, 0, 2, data); }
-WRITE8_HANDLER( z80ctc_0_trg3_w ) { z80ctc_trg_w(machine, 0, 3, data); }
-WRITE8_HANDLER( z80ctc_1_trg0_w ) { z80ctc_trg_w(machine, 1, 0, data); }
-WRITE8_HANDLER( z80ctc_1_trg1_w ) { z80ctc_trg_w(machine, 1, 1, data); }
-WRITE8_HANDLER( z80ctc_1_trg2_w ) { z80ctc_trg_w(machine, 1, 2, data); }
-WRITE8_HANDLER( z80ctc_1_trg3_w ) { z80ctc_trg_w(machine, 1, 3, data); }
+WRITE8_DEVICE_HANDLER( z80ctc_trg0_w ) { z80ctc_trg_w(device, 0, data); }
+WRITE8_DEVICE_HANDLER( z80ctc_trg1_w ) { z80ctc_trg_w(device, 1, data); }
+WRITE8_DEVICE_HANDLER( z80ctc_trg2_w ) { z80ctc_trg_w(device, 2, data); }
+WRITE8_DEVICE_HANDLER( z80ctc_trg3_w ) { z80ctc_trg_w(device, 3, data); }
 
 
 
@@ -412,72 +382,183 @@ WRITE8_HANDLER( z80ctc_1_trg3_w ) { z80ctc_trg_w(machine, 1, 3, data); }
     DAISY CHAIN INTERFACE
 ***************************************************************************/
 
-int z80ctc_irq_state(int which)
+static int z80ctc_irq_state(const device_config *device)
 {
-	z80ctc *ctc = ctcs + which;
+	z80ctc *ctc = get_safe_token(device);
 	int state = 0;
 	int ch;
 
-	VPRINTF(("CTC IRQ state = %d%d%d%d\n", ctc->int_state[0], ctc->int_state[1], ctc->int_state[2], ctc->int_state[3]));
+	VPRINTF(("CTC IRQ state = %d%d%d%d\n", ctc->channel[0].int_state, ctc->channel[1].int_state, ctc->channel[2].int_state, ctc->channel[3].int_state));
 
 	/* loop over all channels */
 	for (ch = 0; ch < 4; ch++)
 	{
+		ctc_channel *channel = &ctc->channel[ch];
+
 		/* if we're servicing a request, don't indicate more interrupts */
-		if (ctc->int_state[ch] & Z80_DAISY_IEO)
+		if (channel->int_state & Z80_DAISY_IEO)
 		{
 			state |= Z80_DAISY_IEO;
 			break;
 		}
-		state |= ctc->int_state[ch];
+		state |= channel->int_state;
 	}
 
 	return state;
 }
 
 
-int z80ctc_irq_ack(int which)
+static int z80ctc_irq_ack(const device_config *device)
 {
-	z80ctc *ctc = ctcs + which;
+	z80ctc *ctc = get_safe_token(device);
 	int ch;
 
 	/* loop over all channels */
 	for (ch = 0; ch < 4; ch++)
+	{
+		ctc_channel *channel = &ctc->channel[ch];
 
 		/* find the first channel with an interrupt requested */
-		if (ctc->int_state[ch] & Z80_DAISY_INT)
+		if (channel->int_state & Z80_DAISY_INT)
 		{
 			VPRINTF(("CTC IRQAck ch%d\n", ch));
 
 			/* clear interrupt, switch to the IEO state, and update the IRQs */
-			ctc->int_state[ch] = Z80_DAISY_IEO;
-			interrupt_check(Machine, which);
+			channel->int_state = Z80_DAISY_IEO;
+			interrupt_check(device);
 			return ctc->vector + ch * 2;
 		}
+	}
 
 	logerror("z80ctc_irq_ack: failed to find an interrupt to ack!\n");
 	return ctc->vector;
 }
 
 
-void z80ctc_irq_reti(int which)
+static void z80ctc_irq_reti(const device_config *device)
 {
-	z80ctc *ctc = ctcs + which;
+	z80ctc *ctc = get_safe_token(device);
 	int ch;
 
 	/* loop over all channels */
 	for (ch = 0; ch < 4; ch++)
+	{
+		ctc_channel *channel = &ctc->channel[ch];
 
 		/* find the first channel with an IEO pending */
-		if (ctc->int_state[ch] & Z80_DAISY_IEO)
+		if (channel->int_state & Z80_DAISY_IEO)
 		{
 			VPRINTF(("CTC IRQReti ch%d\n", ch));
 
 			/* clear the IEO state and update the IRQs */
-			ctc->int_state[ch] &= ~Z80_DAISY_IEO;
-			interrupt_check(Machine, which);
+			channel->int_state &= ~Z80_DAISY_IEO;
+			interrupt_check(device);
 			return;
 		}
+	}
 
 	logerror("z80ctc_irq_reti: failed to find an interrupt to clear IEO on!\n");
 }
+
+static DEVICE_START( z80ctc )
+{
+	const z80ctc_interface *intf = device->static_config;
+	z80ctc *ctc = get_safe_token(device);
+	char unique_tag[30];
+	int cpunum = -1;
+	int ch;
+
+	if (intf->cpu != NULL)
+		cpunum = mame_find_cpu_index(device->machine, intf->cpu);
+	if (cpunum != -1)
+		ctc->clock = device->machine->config->cpu[cpunum].clock;
+	else
+		ctc->clock = intf->baseclock;
+	ctc->period16 = attotime_mul(ATTOTIME_IN_HZ(ctc->clock), 16);
+	ctc->period256 = attotime_mul(ATTOTIME_IN_HZ(ctc->clock), 256);
+	for (ch = 0; ch < 4; ch++)
+	{
+		ctc_channel *channel = &ctc->channel[ch];
+		void *ptr = (void *)device;
+		channel->notimer = (intf->notimer >> ch) & 1;
+		channel->timer = timer_alloc(timercallback, ptr);
+	}
+	ctc->intr = intf->intr;
+	ctc->channel[0].zc = intf->zc0;
+	ctc->channel[1].zc = intf->zc1;
+	ctc->channel[2].zc = intf->zc2;
+	ctc->channel[3].zc = NULL;
+
+	/* register for save states */
+	state_save_combine_module_and_tag(unique_tag, "z80ctc", device->tag);
+
+    state_save_register_item(unique_tag, 0, ctc->vector);
+    for (ch = 0; ch < 4; ch++)
+    {
+		ctc_channel *channel = &ctc->channel[ch];
+	    state_save_register_item(unique_tag, ch, channel->mode);
+	    state_save_register_item(unique_tag, ch, channel->tconst);
+	    state_save_register_item(unique_tag, ch, channel->down);
+	    state_save_register_item(unique_tag, ch, channel->extclk);
+	    state_save_register_item(unique_tag, ch, channel->int_state);
+	}
+
+	return DEVICE_START_OK;
+}
+
+
+static DEVICE_RESET( z80ctc )
+{
+	z80ctc *ctc = get_safe_token(device);
+	int ch;
+
+	/* set up defaults */
+	for (ch = 0; ch < 4; ch++)
+	{
+		ctc_channel *channel = &ctc->channel[ch];
+		channel->mode = RESET_ACTIVE;
+		channel->tconst = 0x100;
+		timer_adjust_oneshot(channel->timer, attotime_never, 0);
+		channel->int_state = 0;
+	}
+	interrupt_check(device);
+	VPRINTF(("CTC Reset\n"));
+}
+
+
+static DEVICE_SET_INFO( z80ctc )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+DEVICE_GET_INFO( z80ctc )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(z80ctc);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;							break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;		break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(z80ctc); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(z80ctc);break;
+		case DEVINFO_FCT_STOP:							/* Nothing */							break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(z80ctc);break;
+		case DEVINFO_FCT_IRQ_STATE:						info->f = (genf *)z80ctc_irq_state;		break;
+		case DEVINFO_FCT_IRQ_ACK:						info->f = (genf *)z80ctc_irq_ack;		break;
+		case DEVINFO_FCT_IRQ_RETI:						info->f = (genf *)z80ctc_irq_reti;		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "Zilog Z80 CTC";				break;
+		case DEVINFO_STR_FAMILY:						info->s = "Z80";						break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";						break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;						break;
+		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+	}
+}
+

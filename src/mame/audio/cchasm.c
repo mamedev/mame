@@ -13,6 +13,7 @@
 #include "sound/dac.h"
 
 static int sound_flags;
+static const device_config *ctc;
 
 READ8_HANDLER( cchasm_snd_io_r )
 {
@@ -36,7 +37,7 @@ READ8_HANDLER( cchasm_snd_io_r )
 
     case 0x41:
         sound_flags &= ~0x80;
-        z80ctc_0_trg2_w (machine, 0, 0);
+        z80ctc_trg2_w(ctc, 0, 0);
         return soundlatch2_r (machine, offset);
     default:
         logerror("Read from unmapped internal IO device at 0x%x\n", offset + 0x6000);
@@ -75,7 +76,7 @@ WRITE8_HANDLER( cchasm_snd_io_w )
         break;
 
     case 0x61:
-        z80ctc_0_trg0_w (machine, 0, 0);
+        z80ctc_trg0_w(ctc, 0, 0);
         break;
 
     default:
@@ -98,7 +99,7 @@ WRITE16_HANDLER( cchasm_io_w )
 		case 1:
 			sound_flags |= 0x80;
 			soundlatch2_w (machine, offset, data);
-			z80ctc_0_trg2_w (machine, 0, 1);
+			z80ctc_trg2_w (ctc, 0, 1);
 			cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 			break;
 		case 2:
@@ -131,12 +132,12 @@ READ16_HANDLER( cchasm_io_r )
 static int channel_active[2];
 static int output[2];
 
-static void ctc_interrupt (running_machine *machine, int state)
+static void ctc_interrupt (const device_config *device, int state)
 {
-	cpunum_set_input_line(machine, 1, 0, state);
+	cpunum_set_input_line(device->machine, 1, 0, state);
 }
 
-static WRITE8_HANDLER( ctc_timer_1_w )
+static WRITE8_DEVICE_HANDLER( ctc_timer_1_w )
 {
     if (data) /* rising edge */
     {
@@ -146,7 +147,7 @@ static WRITE8_HANDLER( ctc_timer_1_w )
     }
 }
 
-static WRITE8_HANDLER( ctc_timer_2_w )
+static WRITE8_DEVICE_HANDLER( ctc_timer_2_w )
 {
     if (data) /* rising edge */
     {
@@ -156,8 +157,9 @@ static WRITE8_HANDLER( ctc_timer_2_w )
     }
 }
 
-static z80ctc_interface ctc_intf =
+z80ctc_interface cchasm_ctc_intf =
 {
+	"audio",			/* clock from the audio CPU */
 	0,               /* clock (filled in from the CPU 0 clock */
 	0,               /* timer disables */
 	ctc_interrupt,   /* interrupt handler */
@@ -169,7 +171,7 @@ static z80ctc_interface ctc_intf =
 static TIMER_CALLBACK( cchasm_sh_update )
 {
     if ((input_port_read(machine, "IN3") & 0x70) != 0x70)
-        z80ctc_0_trg0_w (machine, 0, 1);
+        z80ctc_trg0_w (ctc, 0, 1);
 }
 
 SOUND_START( cchasm )
@@ -177,8 +179,7 @@ SOUND_START( cchasm )
     sound_flags = 0;
     output[0] = 0; output[1] = 0;
 
-	ctc_intf.baseclock = cpunum_get_clock(1);
-	z80ctc_init (0, &ctc_intf);
+	ctc = devtag_get_device(machine, Z80CTC, "ctc");
 
 	timer_pulse(video_screen_get_frame_period(machine->primary_screen), NULL, 0, cchasm_sh_update);
 }

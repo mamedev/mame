@@ -10,21 +10,51 @@
 #include "z80daisy.h"
 
 
-void z80daisy_reset(const struct z80_irq_daisy_chain *daisy)
+struct _z80_daisy_state
 {
-	/* loop over all devices and call their reset function */
-	for ( ; daisy->param != -1; daisy++)
-		if (daisy->reset)
-			(*daisy->reset)(daisy->param);
+	z80_daisy_state *		next;			/* next device */
+	const device_config *	device;			/* associated device */
+	z80_daisy_irq_state		irq_state;		/* IRQ state callback */
+	z80_daisy_irq_ack		irq_ack;		/* IRQ ack callback */
+	z80_daisy_irq_reti		irq_reti;		/* IRQ reti callback */
+};
+
+
+z80_daisy_state *z80daisy_init(running_machine *machine, const z80_daisy_chain *daisy)
+{
+	z80_daisy_state *head = NULL;
+	z80_daisy_state **tailptr = &head;
+
+	/* create a linked list of devices */	
+	for ( ; daisy->devtype != NULL; daisy++)
+	{
+		*tailptr = auto_malloc(sizeof(**tailptr));
+		(*tailptr)->next = NULL;
+		(*tailptr)->device = devtag_get_device(machine, daisy->devtype, daisy->devname);
+		(*tailptr)->irq_state = (z80_daisy_irq_state)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_IRQ_STATE);
+		(*tailptr)->irq_ack = (z80_daisy_irq_ack)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_IRQ_ACK);
+		(*tailptr)->irq_reti = (z80_daisy_irq_reti)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_IRQ_RETI);
+		tailptr = &(*tailptr)->next;
+	}
+	
+	return head;
 }
 
 
-int z80daisy_update_irq_state(const struct z80_irq_daisy_chain *daisy)
+void z80daisy_reset(z80_daisy_state *daisy)
+{
+	/* loop over all devices and call their reset function */
+	for ( ; daisy != NULL; daisy = daisy->next)
+		device_reset(daisy->device);
+}
+
+
+int z80daisy_update_irq_state(z80_daisy_state *daisy)
 {
 	/* loop over all devices; dev[0] is highest priority */
-	for ( ; daisy->param != -1; daisy++)
+	for ( ; daisy != NULL; daisy = daisy->next)
 	{
-		int state = (*daisy->irq_state)(daisy->param);
+		int state = (*daisy->irq_state)(daisy->device);
 
 		/* if this device is asserting the INT line, that's the one we want */
 		if (state & Z80_DAISY_INT)
@@ -39,16 +69,16 @@ int z80daisy_update_irq_state(const struct z80_irq_daisy_chain *daisy)
 }
 
 
-int z80daisy_call_ack_device(const struct z80_irq_daisy_chain *daisy)
+int z80daisy_call_ack_device(z80_daisy_state *daisy)
 {
 	/* loop over all devices; dev[0] is the highest priority */
-	for ( ; daisy->param != -1; daisy++)
+	for ( ; daisy != NULL; daisy = daisy->next)
 	{
-		int state = (*daisy->irq_state)(daisy->param);
+		int state = (*daisy->irq_state)(daisy->device);
 
 		/* if this device is asserting the INT line, that's the one we want */
 		if (state & Z80_DAISY_INT)
-			return (*daisy->irq_ack)(daisy->param);
+			return (*daisy->irq_ack)(daisy->device);
 	}
 
 	logerror("z80daisy_call_ack_device: failed to find an device to ack!\n");
@@ -56,17 +86,17 @@ int z80daisy_call_ack_device(const struct z80_irq_daisy_chain *daisy)
 }
 
 
-void z80daisy_call_reti_device(const struct z80_irq_daisy_chain *daisy)
+void z80daisy_call_reti_device(z80_daisy_state *daisy)
 {
 	/* loop over all devices; dev[0] is the highest priority */
-	for ( ; daisy->param != -1; daisy++)
+	for ( ; daisy != NULL; daisy = daisy->next)
 	{
-		int state = (*daisy->irq_state)(daisy->param);
+		int state = (*daisy->irq_state)(daisy->device);
 
 		/* if this device is asserting the IEO line, that's the one we want */
 		if (state & Z80_DAISY_IEO)
 		{
-			(*daisy->irq_reti)(daisy->param);
+			(*daisy->irq_reti)(daisy->device);
 			return;
 		}
 	}

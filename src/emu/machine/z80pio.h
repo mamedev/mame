@@ -7,17 +7,18 @@
 
 ***************************************************************************/
 
-#ifndef __Z80PIO_H_
-#define __Z80PIO_H_
+#ifndef __Z80PIO_H__
+#define __Z80PIO_H__
 
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef struct _z80pio_interface z80pio_interface;
 struct _z80pio_interface
 {
-	void (*intr)(running_machine *machine, int which);    /* callback when change interrupt status */
+	void (*intr)(const device_config *device, int which);    /* callback when change interrupt status */
 	read8_device_func portAread;    /* port A read callback */
 	read8_device_func portBread;    /* port B read callback */
 	write8_device_func portAwrite;  /* port A write callback */
@@ -25,7 +26,7 @@ struct _z80pio_interface
 	void (*rdyA)(int data);     /* portA ready active callback (do not support yet)*/
 	void (*rdyB)(int data);     /* portB ready active callback (do not support yet)*/
 };
-typedef struct _z80pio_interface z80pio_interface;
+
 
 
 /***************************************************************************
@@ -78,15 +79,6 @@ READ8_DEVICE_HANDLER( z80pio_p_r );
 
 void z80pio_astb_w(const device_config *device, int state);
 void z80pio_bstb_w(const device_config *device, int state);
-
-
-/***************************************************************************
-    DAISY CHAIN INTERFACE
-***************************************************************************/
-
-int z80pio_irq_state(const device_config *device);
-int z80pio_irq_ack(const device_config *device);
-void z80pio_irq_reti(const device_config *device);
 
 
 /***************************************************************************

@@ -53,10 +53,11 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
+typedef struct _z80pio z80pio_t;
 struct _z80pio
 {
 	UINT8 vector[2];                      /* interrupt vector               */
-	void (*intr)(running_machine *, int which);            /* interrupt callbacks            */
+	void (*intr)(const device_config *, int which);            /* interrupt callbacks            */
 	void (*rdyr[2])(int data);          /* RDY active callback            */
 	read8_device_func  port_read[2];     /* port read callbacks            */
 	write8_device_func port_write[2];    /* port write callbacks           */
@@ -70,7 +71,17 @@ struct _z80pio
 	UINT8 strobe[2];						/* strobe inputs */
 	UINT8 int_state[2];                   /* interrupt status (daisy chain) */
 };
-typedef struct _z80pio z80pio_t;
+
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+static int z80pio_irq_state(const device_config *device);
+static int z80pio_irq_ack(const device_config *device);
+static void z80pio_irq_reti(const device_config *device);
+
 
 
 /***************************************************************************
@@ -108,7 +119,7 @@ INLINE void interrupt_check(const device_config *device)
 
 	/* if we have a callback, update it with the current state */
 	if (z80pio->intr)
-		z80pio->intr(device->machine, (z80pio_irq_state(device) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
+		z80pio->intr(device, (z80pio_irq_state(device) & Z80_DAISY_INT) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -442,7 +453,7 @@ void z80pio_bstb_w(const device_config *device, int state) { z80pio_update_strob
     DAISY CHAIN INTERFACE
 ***************************************************************************/
 
-int z80pio_irq_state(const device_config *device)
+static int z80pio_irq_state(const device_config *device)
 {
 	z80pio_t *z80pio = get_safe_token( device );
 	int state = 0;
@@ -463,7 +474,7 @@ int z80pio_irq_state(const device_config *device)
 }
 
 
-int z80pio_irq_ack(const device_config *device)
+static int z80pio_irq_ack(const device_config *device)
 {
 	z80pio_t *z80pio = get_safe_token( device );
 	int ch;
@@ -485,7 +496,7 @@ int z80pio_irq_ack(const device_config *device)
 }
 
 
-void z80pio_irq_reti(const device_config *device)
+static void z80pio_irq_reti(const device_config *device)
 {
 	z80pio_t *z80pio = get_safe_token( device );
 	int ch;
@@ -604,10 +615,13 @@ DEVICE_GET_INFO( z80pio )
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(z80pio);break;
 		case DEVINFO_FCT_STOP:							/* Nothing */							break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(z80pio);break;
+		case DEVINFO_FCT_IRQ_STATE:						info->f = (genf *)z80pio_irq_state;		break;
+		case DEVINFO_FCT_IRQ_ACK:						info->f = (genf *)z80pio_irq_ack;		break;
+		case DEVINFO_FCT_IRQ_RETI:						info->f = (genf *)z80pio_irq_reti;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "Zilog Z80PIO";				break;
-		case DEVINFO_STR_FAMILY:						info->s = "Z80PIO";						break;
+		case DEVINFO_STR_NAME:							info->s = "Zilog Z80 PIO";				break;
+		case DEVINFO_STR_FAMILY:						info->s = "Z80";						break;
 		case DEVINFO_STR_VERSION:						info->s = "1.0";						break;
 		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;						break;
 		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;

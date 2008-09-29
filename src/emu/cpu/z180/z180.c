@@ -115,7 +115,7 @@ typedef struct {
 	UINT8	nmi_pending;		/* nmi pending */
 	UINT8	irq_state[3];		/* irq line states (INT0,INT1,INT2) */
 	UINT8	after_EI;			/* are we in the EI shadow? */
-	const struct z80_irq_daisy_chain *daisy;
+	z80_daisy_state *daisy;
 	int 	(*irq_callback)(int irqline);
 }	Z180_Regs;
 
@@ -1898,7 +1898,9 @@ static void z180_write_iolines(UINT32 data)
 
 static void z180_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	Z180.daisy = config;
+	Z180.daisy = NULL;
+	if (config)
+		Z180.daisy = z80daisy_init(Machine, config);
 	Z180.irq_callback = irqcallback;
 
 	state_save_register_item("z180", index, Z180.AF.w.l);
@@ -1933,7 +1935,7 @@ static void z180_init(int index, int clock, const void *config, int (*irqcallbac
  ****************************************************************************/
 static void z180_reset(void)
 {
-	const struct z80_irq_daisy_chain *save_daisy;
+	z80_daisy_state *save_daisy;
 	int (*save_irqcallback)(int);
 	int i, p;
 #if BIG_FLAGS_ARRAY
