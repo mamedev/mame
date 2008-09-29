@@ -107,6 +107,7 @@ struct _ldcore_data
 	/* video updating */
 	UINT8				videoenable;			/* is video enabled? */
 	render_texture *	videotex;				/* texture for the video */
+	palette_t *			videopalette;			/* palette for the video */
 	UINT8				overenable;				/* is the overlay enabled? */
 	bitmap_t *			overbitmap[2];			/* overlay bitmaps */
 	int					overindex;				/* index of the overlay bitmap */
@@ -889,44 +890,30 @@ static void read_track_data(laserdisc_state *ld)
 	ldcore_data *ldcore = ld->core;
 	UINT32 tracknum = ldcore->curtrack;
 	UINT32 fieldnum = ldcore->fieldnum;
-	UINT32 curfield = tracknum * 2 + fieldnum;
+	vbi_metadata vbidata;
 	frame_data *frame;
 	UINT32 vbiframe;
 	UINT32 readhunk;
 	INT32 chdtrack;
 
+	/* compute the chdhunk number we are going to read */
+	chdtrack = tracknum - 1 - VIRTUAL_LEAD_IN_TRACKS;
+	chdtrack = MAX(chdtrack, 0);
+	chdtrack = MIN(chdtrack, ldcore->chdtracks - 1);
+	readhunk = chdtrack * 2 + fieldnum;
+
+	/* cheat and look up the metadata we are about to retrieve */
+	if (ldcore->vbidata != NULL)
+		vbi_metadata_unpack(&vbidata, NULL, &ldcore->vbidata[readhunk * VBI_PACKED_BYTES]);
+
+	/* if we're about to read the first field in a frame, advance */
 	frame = &ldcore->frame[ldcore->videoindex];
-
-	/* special cases for playing forward */
-	if (curfield == frame->lastfield + 1)
+	if ((vbidata.line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
 	{
-		/* if the previous field had a frame number, force the new field to pair with the previous one */
-		if ((ldcore->metadata[fieldnum ^ 1].line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
-			frame->numfields = 1;
-
-		/* if the twice-previous field was a frame number, and we've moved one since then, consider this one done */
-		else if (frame->numfields >= 2 && (ldcore->metadata[fieldnum].line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
-		{
+		if (frame->numfields >= 2)
 			ldcore->videoindex = (ldcore->videoindex + 1) % ARRAY_LENGTH(ldcore->frame);
-			frame = &ldcore->frame[ldcore->videoindex];
-			frame->numfields = 0;
-		}
-	}
-
-	/* all other cases */
-	else
-	{
-		/* otherwise, keep the frames in sync with the absolute field numbers */
-		if (frame->numfields == 2 && fieldnum != 0)
-			frame->numfields--;
-
-		/* if we already have both fields on the current videoindex, advance */
-		else if (frame->numfields >= 2)
-		{
-			ldcore->videoindex = (ldcore->videoindex + 1) % ARRAY_LENGTH(ldcore->frame);
-			frame = &ldcore->frame[ldcore->videoindex];
-			frame->numfields = 0;
-		}
+		frame = &ldcore->frame[ldcore->videoindex];
+		frame->numfields = 0;
 	}
 
 	/* if we're squelched, reset the frame counter */
@@ -961,12 +948,6 @@ static void read_track_data(laserdisc_state *ld)
 	ldcore->avconfig.maxsamples = ldcore->audiomaxsamples;
 	ldcore->avconfig.actsamples = &ldcore->audiocursamples;
 	ldcore->audiocursamples = 0;
-
-	/* compute the chdhunk number we are going to read */
-	chdtrack = tracknum - 1 - VIRTUAL_LEAD_IN_TRACKS;
-	chdtrack = MAX(chdtrack, 0);
-	chdtrack = MIN(chdtrack, ldcore->chdtracks - 1);
-	readhunk = chdtrack * 2 + fieldnum;
 
 	/* set the VBI data for the new field from our precomputed data */
 	if (ldcore->vbidata != NULL)
@@ -1363,8 +1344,6 @@ VIDEO_UPDATE( laserdisc )
 		/* if this is the last update, do the rendering */
 		if (cliprect->max_y == visarea->max_y)
 		{
-			float x0, y0, x1, y1;
-
 			/* update the texture with the overlay contents */
 			if (overbitmap != NULL)
 			{
@@ -1377,7 +1356,7 @@ VIDEO_UPDATE( laserdisc )
 			/* get the laserdisc video */
 			laserdisc_get_video(laserdisc, &vidbitmap);
 			if (vidbitmap != NULL)
-				render_texture_set_bitmap(ldcore->videotex, vidbitmap, NULL, TEXFORMAT_YUY16, NULL);
+				render_texture_set_bitmap(ldcore->videotex, vidbitmap, NULL, TEXFORMAT_YUY16, ldcore->videopalette);
 
 			/* reset the screen contents */
 			render_container_empty(render_container_get_screen(screen));
@@ -1389,10 +1368,10 @@ VIDEO_UPDATE( laserdisc )
 			/* add the overlay */
 			if (ldcore->overenable && overbitmap != NULL)
 			{
-				x0 = 0.5f - 0.5f * ldcore->config.overscalex + ldcore->config.overposx;
-				y0 = 0.5f - 0.5f * ldcore->config.overscaley + ldcore->config.overposy;
-				x1 = x0 + ldcore->config.overscalex;
-				y1 = y0 + ldcore->config.overscaley;
+				float x0 = 0.5f - 0.5f * ldcore->config.overscalex + ldcore->config.overposx;
+				float y0 = 0.5f - 0.5f * ldcore->config.overscaley + ldcore->config.overposy;
+				float x1 = x0 + ldcore->config.overscalex;
+				float y1 = y0 + ldcore->config.overscaley;
 				render_screen_add_quad(screen, x0, y0, x1, y1, MAKE_ARGB(0xff,0xff,0xff,0xff), ldcore->overtex, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
 			}
 
@@ -1541,6 +1520,13 @@ static void init_video(const device_config *device)
 	ldcore->videotex = render_texture_alloc(NULL, NULL);
 	if (ldcore->videotex == NULL)
 		fatalerror("Out of memory allocating video texture");
+	
+	/* allocate palette for applying brightness/contrast/gamma */
+	ldcore->videopalette = palette_alloc(256, 1);
+	if (ldcore->videopalette == NULL)
+		fatalerror("Out of memory allocating video palette");
+	for (index = 0; index < 256; index++)
+		palette_entry_set_color(ldcore->videopalette, index, MAKE_RGB(index, index, index));
 
 	/* allocate overlay */
 	if (ldcore->config.overwidth > 0 && ldcore->config.overheight > 0 && ldcore->config.overupdate != NULL)
@@ -1662,9 +1648,11 @@ static DEVICE_STOP( laserdisc )
 	if (ldcore->disc != NULL)
 		chd_async_complete(ldcore->disc);
 
-	/* free any textures */
+	/* free any textures and palettes */
 	if (ldcore->videotex != NULL)
 		render_texture_free(ldcore->videotex);
+	if (ldcore->videopalette != NULL)
+		palette_deref(ldcore->videopalette);
 	if (ldcore->overtex != NULL)
 		render_texture_free(ldcore->overtex);
 }

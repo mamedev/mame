@@ -724,7 +724,7 @@ static void update_adjusted_color(palette_t *palette, UINT32 group, UINT32 index
 
 	/* compute the adjusted value */
 	adjusted = adjust_palette_entry(palette->entry_color[index], 
-				palette->group_bright[group] * palette->brightness, 
+				palette->group_bright[group] + palette->brightness, 
 				palette->group_contrast[group] * palette->entry_contrast[index] * palette->contrast,
 				palette->gamma_map);
 
