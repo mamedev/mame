@@ -88,23 +88,23 @@ static void dleuro_interrupt(const device_config *device, int state)
 }
 
 
-static WRITE8_HANDLER( serial_transmit )
+static WRITE8_DEVICE_HANDLER( serial_transmit )
 {
 	laserdisc_data_w(laserdisc, data);
 }
 
 
-static int serial_receive(int ch)
+static int serial_receive(const device_config *device, int channel)
 {
 	/* if we still have data to send, do it now */
-	if (ch == 0 && laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
+	if (channel == 0 && laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 		return laserdisc_data_r(laserdisc);
 
 	return -1;
 }
 
 
-static z80ctc_interface ctc_intf =
+static const z80ctc_interface ctc_intf =
 {
 	"main",				/* clock comes from main CPU's clock */
 	0,                  /* clock (filled in from the CPU clock) */
@@ -116,10 +116,11 @@ static z80ctc_interface ctc_intf =
 };
 
 
-static z80sio_interface sio_intf =
+static const z80sio_interface sio_intf =
 {
-	0,                  /* clock (filled in from the CPU 3 clock) */
-0,//	dleuro_interrupt,	/* interrupt handler */
+	"main",				/* clock comes from main CPU's clock */
+	0,                  /* clock (filled in from the CPU clock) */
+	dleuro_interrupt,	/* interrupt handler */
 	0,					/* DTR changed handler */
 	0,					/* RTS changed handler */
 	0,					/* BREAK changed handler */
@@ -130,7 +131,7 @@ static z80sio_interface sio_intf =
 
 static const z80_daisy_chain dleuro_daisy_chain[] =
 {
-//	{ Z80SIO, "sio" },
+	{ Z80SIO, "sio" },
 	{ Z80CTC, "ctc" },
 	{ NULL }
 };
@@ -188,16 +189,6 @@ static VIDEO_UPDATE( dleuro )
 static MACHINE_START( dlair )
 {
 	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
-}
-
-
-static MACHINE_START( dleuro )
-{
-	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
-
-	/* initialize the CTC and SIO peripherals */
-	sio_intf.baseclock = cpunum_get_clock(0);
-	z80sio_init(0, &sio_intf);
 }
 
 
@@ -362,18 +353,18 @@ static WRITE8_HANDLER( laserdisc_w )
  *
  *************************************/
 
-static READ8_HANDLER( sio_r )
+static READ8_DEVICE_HANDLER( sio_r )
 {
-	return (offset & 1) ? z80sio_c_r(0, (offset >> 1) & 1) : z80sio_d_r(machine, 0, (offset >> 1) & 1);
+	return (offset & 1) ? z80sio_c_r(device, (offset >> 1) & 1) : z80sio_d_r(device, (offset >> 1) & 1);
 }
 
 
-static WRITE8_HANDLER( sio_w )
+static WRITE8_DEVICE_HANDLER( sio_w )
 {
 	if (offset & 1)
-		z80sio_c_w(machine, 0, (offset >> 1) & 1, data);
+		z80sio_c_w(device, (offset >> 1) & 1, data);
 	else
-		z80sio_d_w(machine, 0, (offset >> 1) & 1, data);
+		z80sio_d_w(device, (offset >> 1) & 1, data);
 }
 
 
@@ -432,7 +423,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dleuro_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x03) AM_MIRROR(0x7c) AM_DEVREADWRITE(Z80CTC, "ctc", z80ctc_r, z80ctc_w)
-	AM_RANGE(0x80, 0x83) AM_MIRROR(0x7c) AM_READWRITE(sio_r, sio_w)
+	AM_RANGE(0x80, 0x83) AM_MIRROR(0x7c) AM_DEVREADWRITE(Z80SIO, "sio", sio_r, sio_w)
 ADDRESS_MAP_END
 
 
@@ -753,10 +744,11 @@ static MACHINE_DRIVER_START( dleuro )
 	MDRV_CPU_VBLANK_INT("main", vblank_callback)
 
 	MDRV_Z80CTC_ADD("ctc", ctc_intf)
+	MDRV_Z80SIO_ADD("sio", sio_intf)
 
 	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_HZ(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))
 
-	MDRV_MACHINE_START(dleuro)
+	MDRV_MACHINE_START(dlair)
 	MDRV_MACHINE_RESET(dlair)
 
 	MDRV_LASERDISC_ADD("laserdisc", PHILLIPS_22VP932, "main", "ldsound")

@@ -7,12 +7,8 @@
 
 ***************************************************************************/
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-#define MAX_SIO			2
-
+#ifndef __Z80SIO_H__
+#define __Z80SIO_H__
 
 
 /***************************************************************************
@@ -22,23 +18,28 @@
 typedef struct _z80sio_interface z80sio_interface;
 struct _z80sio_interface
 {
+	const char *cpu;						/* CPU whose clock we use for our base */
 	int baseclock;
-	void (*irq_cb)(running_machine *machine, int state);
-	write8_machine_func dtr_changed_cb;
-	write8_machine_func rts_changed_cb;
-	write8_machine_func break_changed_cb;
-	write8_machine_func transmit_cb;
-	int (*receive_poll_cb)(int which);
+	void (*irq_cb)(const device_config *device, int state);
+	write8_device_func dtr_changed_cb;
+	write8_device_func rts_changed_cb;
+	write8_device_func break_changed_cb;
+	write8_device_func transmit_cb;
+	int (*receive_poll_cb)(const device_config *device, int channel);
 };
 
 
 
 /***************************************************************************
-    INITIALIZATION/CONFIGURATION
+    DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-void z80sio_init(int which, z80sio_interface *intf);
-void z80sio_reset(int which);
+#define MDRV_Z80SIO_ADD(_tag, _intrf) \
+	MDRV_DEVICE_ADD(_tag, Z80SIO) \
+	MDRV_DEVICE_CONFIG(_intrf)
+
+#define MDRV_Z80SIO_REMOVE(_tag) \
+	MDRV_DEVICE_REMOVE(_tag, Z80SIO)
 
 
 
@@ -46,8 +47,8 @@ void z80sio_reset(int which);
     CONTROL REGISTER READ/WRITE
 ***************************************************************************/
 
-void z80sio_c_w(running_machine *machine, int which, int ch, UINT8 data);
-UINT8 z80sio_c_r(int which, int ch);
+WRITE8_DEVICE_HANDLER( z80sio_c_w );
+READ8_DEVICE_HANDLER( z80sio_c_r );
 
 
 
@@ -55,8 +56,8 @@ UINT8 z80sio_c_r(int which, int ch);
     DATA REGISTER READ/WRITE
 ***************************************************************************/
 
-void z80sio_d_w(running_machine *machine, int which, int ch, UINT8 data);
-UINT8 z80sio_d_r(running_machine *machine, int which, int ch);
+WRITE8_DEVICE_HANDLER( z80sio_d_w );
+READ8_DEVICE_HANDLER( z80sio_d_r );
 
 
 
@@ -64,18 +65,16 @@ UINT8 z80sio_d_r(running_machine *machine, int which, int ch);
     CONTROL LINE READ/WRITE
 ***************************************************************************/
 
-int z80sio_get_dtr(int which, int ch);
-int z80sio_get_rts(int which, int ch);
-void z80sio_set_cts(int which, int ch, int state);
-void z80sio_set_dcd(int which, int ch, int state);
-void z80sio_receive_data(int which, int ch, UINT8 data);
+READ8_DEVICE_HANDLER( z80sio_get_dtr );
+READ8_DEVICE_HANDLER( z80sio_get_rts );
+WRITE8_DEVICE_HANDLER( z80sio_set_cts );
+WRITE8_DEVICE_HANDLER( z80sio_set_dcd );
+WRITE8_DEVICE_HANDLER( z80sio_receive_data );
 
 
+/* ----- device interface ----- */
 
-/***************************************************************************
-    DAISY CHAIN INTERFACE
-***************************************************************************/
+#define Z80SIO DEVICE_GET_INFO_NAME(z80sio)
+DEVICE_GET_INFO( z80sio );
 
-int z80sio_irq_state(int which);
-int z80sio_irq_ack(int which);
-void z80sio_irq_reti(int which);
+#endif

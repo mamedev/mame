@@ -566,7 +566,7 @@ static DEVICE_START( z80pio )
 }
 
 
-void z80pio_reset( const device_config *device )
+static DEVICE_RESET( z80pio )
 {
 	z80pio_t	*z80pio = get_safe_token( device );
 	int i;
@@ -583,12 +583,6 @@ void z80pio_reset( const device_config *device )
 		z80pio->strobe[i] = 0;
 	}
 	interrupt_check(device);
-}
-
-
-static DEVICE_RESET( z80pio )
-{
-	z80pio_reset( device );
 }
 
 

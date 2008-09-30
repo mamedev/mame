@@ -7,6 +7,7 @@
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80ctc.h"
 #include "machine/z80pio.h"
+#include "machine/z80sio.h"
 
 /* constants */
 #define MAIN_OSC_MCR_I		XTAL_19_968MHz
@@ -14,7 +15,7 @@
 
 /*----------- defined in drivers/mcr.c -----------*/
 
-WRITE8_HANDLER( mcr_ipu_sio_transmit );
+WRITE8_DEVICE_HANDLER( mcr_ipu_sio_transmit );
 
 
 
@@ -27,6 +28,7 @@ extern const z80_daisy_chain mcr_ipu_daisy_chain[];
 extern const z80ctc_interface mcr_ctc_intf;
 extern const z80ctc_interface nflfoot_ctc_intf;
 extern const z80pio_interface nflfoot_pio_intf;
+extern const z80sio_interface nflfoot_sio_intf;
 extern UINT8 mcr_cocktail_flip;
 
 extern const gfx_layout mcr_bg_layout;
@@ -57,8 +59,8 @@ WRITE16_HANDLER( mcr68_6840_lower_w );
 READ16_HANDLER( mcr68_6840_upper_r );
 READ16_HANDLER( mcr68_6840_lower_r );
 
-READ8_HANDLER( mcr_ipu_sio_r );
-WRITE8_HANDLER( mcr_ipu_sio_w );
+READ8_DEVICE_HANDLER( mcr_ipu_sio_r );
+WRITE8_DEVICE_HANDLER( mcr_ipu_sio_w );
 WRITE8_HANDLER( mcr_ipu_laserdisk_w );
 READ8_HANDLER( mcr_ipu_watchdog_r );
 WRITE8_HANDLER( mcr_ipu_watchdog_w );
