@@ -888,6 +888,7 @@ static const struct game_keys keys_table[] =
 	{ "batcira",  { 0x1e5d80cb,0x98882ec7 }, 0x200000 },	// 0C81 0097 0131  cmpi.l  #$00970131,D1
 	{ "batcirj",  { 0x00ff4dd8,0x000008e8 }, 0x200000 },	// 0C81 0097 0131  cmpi.l  #$00970131,D1
 	{ "csclub",   { 0x662e9fa0,0x4210e7c1 }, 0x200000 },	// 0C81 0097 0310  cmpi.l  #$00970310,D1
+	{ "csclub1",  { 0x662e9fa0,0x4210e7c1 }, 0x200000 },	// 0C81 0097 0310  cmpi.l  #$00970310,D1
 	{ "cscluba",  { 0x1366de2a,0x9ab42937 }, 0x200000 },	// 0C81 0097 0310  cmpi.l  #$00970310,D1
 	{ "csclubj",  { 0x4a2d0be5,0x56c013c0 }, 0x200000 },	// 0C81 0097 0310  cmpi.l  #$00970310,D1
 	{ "csclubh",  { 0xf014a8a7,0x2e7794d0 }, 0x200000 },	// 0C81 0097 0310  cmpi.l  #$00970310,D1

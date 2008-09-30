@@ -2682,7 +2682,8 @@ V-V                           TP-027
 	DRIVER( mshvsfa1 )	/* 20/06/1997 (c) 1997 (Asia) */
 	DRIVER( mshvsfb )	/* 27/08/1997 (c) 1997 (Brazil) */
 	DRIVER( mshvsfb1 )	/* 25/06/1997 (c) 1997 (Brazil) */
-	DRIVER( csclub )	/* 22/07/1997 (c) 1997 (Euro) */
+	DRIVER( csclub )	/* 17/10/1997 (c) 1997 (Euro) */
+	DRIVER( csclub1 )	/* 22/07/1997 (c) 1997 (Euro) */
 	DRIVER( csclubj )	/* 22/07/1997 (c) 1997 (Japan) */
 	DRIVER( cscluba )	/* 22/07/1997 (c) 1997 (Asia) */
 	DRIVER( csclubh )	/* 22/07/1997 (c) 1997 (Hispanic) */
