@@ -176,7 +176,7 @@
 
 
 
-static READ8_HANDLER( turbo_analog_r );
+static READ8_DEVICE_HANDLER( turbo_analog_r );
 
 
 
@@ -208,60 +208,60 @@ static MACHINE_RESET( buckrog )
         3 = IC6 - CPU Board, Sheet 5, D7
 */
 
-static WRITE8_HANDLER( turbo_ppi0a_w )
+static WRITE8_DEVICE_HANDLER( turbo_ppi0a_w )
 {
 	/* bit0-7 = 0PA0-7 */
-	turbo_state *state = machine->driver_data;
+	turbo_state *state = device->machine->driver_data;
 	state->turbo_opa = data;
 }
 
 
-static WRITE8_HANDLER( turbo_ppi0b_w )
+static WRITE8_DEVICE_HANDLER( turbo_ppi0b_w )
 {
 	/* bit0-7 = 0PB0-7 */
-	turbo_state *state = machine->driver_data;
+	turbo_state *state = device->machine->driver_data;
 	state->turbo_opb = data;
 }
 
 
-static WRITE8_HANDLER( turbo_ppi0c_w )
+static WRITE8_DEVICE_HANDLER( turbo_ppi0c_w )
 {
 	/* bit0-7 = 0PC0-7 */
-	turbo_state *state = machine->driver_data;
+	turbo_state *state = device->machine->driver_data;
 	state->turbo_opc = data;
 }
 
 
-static WRITE8_HANDLER( turbo_ppi1a_w )
+static WRITE8_DEVICE_HANDLER( turbo_ppi1a_w )
 {
 	/* bit0-7 = 1PA0-7 */
-	turbo_state *state = machine->driver_data;
+	turbo_state *state = device->machine->driver_data;
 	state->turbo_ipa = data;
 }
 
 
-static WRITE8_HANDLER( turbo_ppi1b_w )
+static WRITE8_DEVICE_HANDLER( turbo_ppi1b_w )
 {
 	/* bit0-7 = 1PB0-7 */
-	turbo_state *state = machine->driver_data;
+	turbo_state *state = device->machine->driver_data;
 	state->turbo_ipb = data;
 }
 
 
-static WRITE8_HANDLER( turbo_ppi1c_w )
+static WRITE8_DEVICE_HANDLER( turbo_ppi1c_w )
 {
 	/* bit0-7 = 1PC0-7 */
-	turbo_state *state = machine->driver_data;
+	turbo_state *state = device->machine->driver_data;
 	state->turbo_ipc = data;
 }
 
 
-static WRITE8_HANDLER( turbo_ppi3c_w )
+static WRITE8_DEVICE_HANDLER( turbo_ppi3c_w )
 {
 	/* bit 0-3 = PLA0-3 */
 	/* bit 4-6 = COL0-2 */
 	/* bit   7 = n/c */
-	turbo_state *state = machine->driver_data;
+	turbo_state *state = device->machine->driver_data;
 	state->turbo_fbpla = data & 0x0f;
 	state->turbo_fbcol = (data >> 4) & 0x07;
 }
@@ -295,7 +295,7 @@ static const ppi8255_interface turbo_8255_intf[4] =
 	},
 	{
 		turbo_analog_r,
-		input_port_2_r,
+		DEVICE8_PORT("DSW2"),
 		NULL,
 		NULL,
 		NULL,
@@ -317,31 +317,31 @@ static const ppi8255_interface turbo_8255_intf[4] =
         1 = IC119 - CPU Board, Sheet 3, A5
 */
 
-static WRITE8_HANDLER( subroc3d_ppi0a_w )
+static WRITE8_DEVICE_HANDLER( subroc3d_ppi0a_w )
 {
 	/* bit 0-3 = PLY0-3 */
 	/* bit 4-7 = n/c */
-	turbo_state *state = machine->driver_data;
+	turbo_state *state = device->machine->driver_data;
 	state->subroc3d_ply = data & 0x0f;
 }
 
 
-static WRITE8_HANDLER( subroc3d_ppi0c_w )
+static WRITE8_DEVICE_HANDLER( subroc3d_ppi0c_w )
 {
 	/* bit 0-3 = COL0-3 */
-	turbo_state *state = machine->driver_data;
+	turbo_state *state = device->machine->driver_data;
 	state->subroc3d_col = data & 0x0f;
 }
 
 
-static WRITE8_HANDLER( subroc3d_ppi0b_w )
+static WRITE8_DEVICE_HANDLER( subroc3d_ppi0b_w )
 {
 	/* bit 0 = COM1 (COIN METER 1) */
 	/* bit 1 = COM2 (COIN METER 2) */
 	/* bit 2 = STLA (START LAMP) */
 	/* bit 3 = NOUSE (n/c) */
 	/* bit 4 = FLIP (not really flip, just offset) */
-	turbo_state *state = machine->driver_data;
+	turbo_state *state = device->machine->driver_data;
 	coin_counter_w(0, data & 0x01);
 	coin_counter_w(1, data & 0x02);
 	set_led_status(0, data & 0x04);
@@ -377,36 +377,36 @@ static const ppi8255_interface subroc3d_8255_intf[2] =
  *
  *************************************/
 
-static WRITE8_HANDLER( buckrog_ppi0a_w )
+static WRITE8_DEVICE_HANDLER( buckrog_ppi0a_w )
 {
 	/* bit 0-7 = data to be read on the /IOREQ */
-	turbo_state *state = machine->driver_data;
+	turbo_state *state = device->machine->driver_data;
 	state->buckrog_command = data;
 }
 
 
-static WRITE8_HANDLER( buckrog_ppi0b_w )
+static WRITE8_DEVICE_HANDLER( buckrog_ppi0b_w )
 {
 	/* bit 0-5 = MOV0-5 */
 	/* bit 6-7 = n/c */
-	turbo_state *state = machine->driver_data;
+	turbo_state *state = device->machine->driver_data;
 	state->buckrog_mov = data & 0x3f;
 }
 
 
-static WRITE8_HANDLER( buckrog_ppi0c_w )
+static WRITE8_DEVICE_HANDLER( buckrog_ppi0c_w )
 {
 	/* bit 0-2 = FCHG0 */
 	/* bit 3-5 = n/c */
 	/* bit   6 = /IOREQ on the 2nd CPU */
 	/* bit   7 = /INT on the 2nd CPU */
-	turbo_state *state = machine->driver_data;
+	turbo_state *state = device->machine->driver_data;
 	state->buckrog_fchg = data & 0x07;
-	cpunum_set_input_line(machine, 1, 0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(device->machine, 1, 0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
-static WRITE8_HANDLER( buckrog_ppi1c_w )
+static WRITE8_DEVICE_HANDLER( buckrog_ppi1c_w )
 {
 	/* bit 0-2 = OBCH0-2 */
 	/* bit   3 = n/c */
@@ -414,7 +414,7 @@ static WRITE8_HANDLER( buckrog_ppi1c_w )
 	/* bit   5 = COM2 (COIN METER 2) */
 	/* bit   6 = STLA (START LAMP) */
 	/* bit   7 = NOUSE (BODY SONIC) */
-	turbo_state *state = machine->driver_data;
+	turbo_state *state = device->machine->driver_data;
 	state->buckrog_obch = data & 0x07;
 	coin_counter_w(0, data & 0x10);
 	coin_counter_w(1, data & 0x20);
@@ -637,10 +637,10 @@ static WRITE8_HANDLER( turbo_collision_clear_w )
 }
 
 
-static READ8_HANDLER( turbo_analog_r )
+static READ8_DEVICE_HANDLER( turbo_analog_r )
 {
-	turbo_state *state = machine->driver_data;
-	return input_port_read(machine, "DIAL") - state->turbo_last_analog;
+	turbo_state *state = device->machine->driver_data;
+	return input_port_read(device->machine, "DIAL") - state->turbo_last_analog;
 }
 
 
@@ -679,7 +679,7 @@ static READ8_HANDLER( buckrog_cpu2_command_r )
 {
 	/* assert ACK */
 	turbo_state *state = machine->driver_data;
-	ppi8255_set_portC(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), 0x00);
+	ppi8255_set_port_c(devtag_get_device(machine, PPI8255, "ppi8255_0"), 0x00);
 	return state->buckrog_command;
 }
 
@@ -718,7 +718,7 @@ static READ8_HANDLER( buckrog_port_3_r )
 
 static TIMER_CALLBACK( delayed_ppi8255_w )
 {
-    ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), param >> 8, param & 0xff);
+    ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_0"), param >> 8, param & 0xff);
 }
 
 
@@ -1081,17 +1081,10 @@ static MACHINE_DRIVER_START( turbo )
 	MDRV_CPU_PROGRAM_MAP(turbo_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( turbo_8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( turbo_8255_intf[1] )
-
-	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
-	MDRV_DEVICE_CONFIG( turbo_8255_intf[2] )
-
-	MDRV_DEVICE_ADD( "ppi8255_3", PPI8255 )
-	MDRV_DEVICE_CONFIG( turbo_8255_intf[3] )
+	MDRV_PPI8255_ADD( "ppi8255_0", turbo_8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", turbo_8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_2", turbo_8255_intf[2] )
+	MDRV_PPI8255_ADD( "ppi8255_3", turbo_8255_intf[3] )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -1119,11 +1112,8 @@ static MACHINE_DRIVER_START( subroc3d )
 	MDRV_CPU_PROGRAM_MAP(subroc3d_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( subroc3d_8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( subroc3d_8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", subroc3d_8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", subroc3d_8255_intf[1] )
 
 	/* video hardware */
 	MDRV_GFXDECODE(turbo)
@@ -1157,11 +1147,8 @@ static MACHINE_DRIVER_START( buckrog )
 	MDRV_INTERLEAVE(10)
 	MDRV_MACHINE_RESET(buckrog)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( buckrog_8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( buckrog_8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", buckrog_8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", buckrog_8255_intf[1] )
 
 	/* video hardware */
 	MDRV_GFXDECODE(turbo)

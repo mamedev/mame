@@ -54,7 +54,7 @@ VIDEO_UPDATE( zaccaria );
 
 static int dsw;
 
-static WRITE8_HANDLER( zaccaria_dsw_sel_w )
+static WRITE8_DEVICE_HANDLER( zaccaria_dsw_sel_w )
 {
 	switch (data & 0xf0)
 	{
@@ -233,9 +233,9 @@ static const pia6821_interface pia_1_intf =
 
 static const ppi8255_interface ppi8255_intf =
 {
-	input_port_3_r,					/* Port A read */
-	input_port_4_r,					/* Port B read */
-	input_port_5_r,					/* Port C read */
+	DEVICE8_PORT("P1"),				/* Port A read */
+	DEVICE8_PORT("P2"),				/* Port B read */
+	DEVICE8_PORT("SYSTEM"),			/* Port C read */
 	NULL,							/* Port A write */
 	NULL,							/* Port B write */
 	zaccaria_dsw_sel_w, 			/* Port C write */
@@ -580,8 +580,7 @@ static MACHINE_DRIVER_START( zaccaria )
 	MDRV_MACHINE_START(zaccaria)
 	MDRV_MACHINE_RESET(zaccaria)
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf )
+	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -128,17 +128,17 @@ static const ay8910_interface ay8910_config =
 static const ppi8255_interface ppi8255_intf[2] =
 {
 	{
-		input_port_0_r,				/* Port A read */
-		input_port_2_r,				/* Port B read */
+		DEVICE8_PORT("P1"),			/* Port A read */
+		DEVICE8_PORT("SYSTEM"),		/* Port B read */
 		NULL,						/* Port C read */
 		NULL,						/* Port A write */
 		NULL,						/* Port B write */
 		NULL						/* Port C write */
 	},
 	{
-		input_port_1_r,				/* Port A read */
-		input_port_3_r,				/* Port B read */
-		input_port_4_r,				/* Port C read */
+		DEVICE8_PORT("DSW"),		/* Port A read */
+		DEVICE8_PORT("IN3"),		/* Port B read */
+		DEVICE8_PORT("IN4"),		/* Port C read */
 		NULL,						/* Port A write */
 		NULL,						/* Port B write */
 		NULL						/* Port C write */
@@ -360,11 +360,8 @@ static MACHINE_DRIVER_START( couple )
 	MDRV_CPU_IO_MAP(merit_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

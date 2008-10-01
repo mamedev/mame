@@ -672,13 +672,13 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static READ8_HANDLER(meritm_8255_port_c_r)
+static READ8_DEVICE_HANDLER(meritm_8255_port_c_r)
 {
 	//logerror( "8255 port C read\n" );
 	return 0xff;
 };
 
-static WRITE8_HANDLER(meritm_crt250_port_b_w)
+static WRITE8_DEVICE_HANDLER(meritm_crt250_port_b_w)
 {
 	//popmessage("Lamps: %d %d %d %d %d %d %d", BIT(data,0), BIT(data,1), BIT(data,2), BIT(data,3), BIT(data,4), BIT(data,5), BIT(data,6) );
 	output_set_value("P1 DISC 1 LAMP", !BIT(data,0));
@@ -906,8 +906,7 @@ static MACHINE_DRIVER_START(meritm_crt250)
 
 	MDRV_MACHINE_START(meritm_crt250)
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( crt250_ppi8255_intf )
+	MDRV_PPI8255_ADD( "ppi8255", crt250_ppi8255_intf )
 
 	MDRV_Z80PIO_ADD( "z80pio_0", meritm_audio_pio_intf )
 	MDRV_Z80PIO_ADD( "z80pio_1", meritm_io_pio_intf )
@@ -950,8 +949,7 @@ static MACHINE_DRIVER_START(meritm_crt260)
 	MDRV_CPU_PROGRAM_MAP(meritm_map,0)
 	MDRV_CPU_IO_MAP(meritm_io_map,0)
 
-	MDRV_DEVICE_MODIFY( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( crt260_ppi8255_intf )
+	MDRV_PPI8255_RECONFIG( "ppi8255", crt260_ppi8255_intf )
 
 	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_MSEC(1200))	// DS1232, TD connected to VCC
 	MDRV_MACHINE_START(meritm_crt260)

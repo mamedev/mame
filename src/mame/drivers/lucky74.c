@@ -755,7 +755,7 @@ static WRITE8_HANDLER( copro_sm7831_w )
 *    Lamps    *
 **************/
 
-static WRITE8_HANDLER(lamps_a_w)
+static WRITE8_DEVICE_HANDLER(lamps_a_w)
 {
 /*  LAMPSA:
 
@@ -770,7 +770,7 @@ static WRITE8_HANDLER(lamps_a_w)
 	output_set_lamp_value(11, (data >> 3) & 1);		/* SMALL */
 }
 
-static WRITE8_HANDLER(lamps_b_w)
+static WRITE8_DEVICE_HANDLER(lamps_b_w)
 {
 /*  LAMPSB:
 
@@ -1173,31 +1173,31 @@ static void lucky74_adpcm_int(running_machine *machine, int num)
 static const ppi8255_interface ppi8255_intf[4] =
 {
 	{	/* A & B set as input */
-		input_port_0_r,			/* Port A read, IN0 */
-		input_port_1_r,			/* Port B read, IN1 */
+		DEVICE8_PORT("IN0"),	/* Port A read, IN0 */
+		DEVICE8_PORT("IN1"),	/* Port B read, IN1 */
 		NULL,					/* Port C read */
 		NULL,					/* Port A write */
 		NULL,					/* Port B write */
 		NULL					/* Port C writes: 0x00 after reset, 0xff during game, and 0xfd when tap F2 for percentage and run count */
 	},
 	{	/* A & C set as input */
-		input_port_2_r,			/* Port A read, IN2 */
+		DEVICE8_PORT("IN2"),	/* Port A read, IN2 */
 		NULL,					/* Port B read */
-		input_port_4_r,			/* Port C read, IN4 */
+		DEVICE8_PORT("IN4"),	/* Port C read, IN4 */
 		NULL,					/* Port A write */
 		NULL,					/* Port B write */
 		NULL					/* Port C write */
 	},
 	{	/* A, B & C set as input */
-		input_port_5_r,			/* Port A read, DSW1 */
-		input_port_6_r,			/* Port B read, DSW2 */
-		input_port_7_r,			/* Port C read, DSW3 */
+		DEVICE8_PORT("DSW1"),	/* Port A read, DSW1 */
+		DEVICE8_PORT("DSW2"),	/* Port B read, DSW2 */
+		DEVICE8_PORT("DSW3"),	/* Port C read, DSW3 */
 		NULL,					/* Port A write */
 		NULL,					/* Port B write */
 		NULL					/* Port C write */
 	},
 	{	/* A set as input */
-		input_port_8_r,			/* Port A read, DSW4 */
+		DEVICE8_PORT("DSW4"),	/* Port A read, DSW4 */
 		NULL,					/* Port B read */
 		NULL,					/* Port C read */
 		NULL,					/* Port A write */
@@ -1244,19 +1244,11 @@ static MACHINE_DRIVER_START( lucky74 )
 
 	MDRV_SOUND_START(lucky74)
 
-
 	/* 2x 82c255 (4x 8255) */
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
-
-	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[2] )
-
-	MDRV_DEVICE_ADD( "ppi8255_3", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[3] )
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_2", ppi8255_intf[2] )
+	MDRV_PPI8255_ADD( "ppi8255_3", ppi8255_intf[3] )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

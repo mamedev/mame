@@ -550,19 +550,19 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static WRITE8_HANDLER( snd_rom_addr_l_w )
+static WRITE8_DEVICE_HANDLER( snd_rom_addr_l_w )
 {
 	romaddr = (romaddr & 0xff00) | data;
 }
 
-static WRITE8_HANDLER( snd_rom_addr_h_w )
+static WRITE8_DEVICE_HANDLER( snd_rom_addr_h_w )
 {
 	romaddr = (romaddr & 0x00ff) | (data << 8);
 }
 
-static READ8_HANDLER( snd_rom_r )
+static READ8_DEVICE_HANDLER( snd_rom_r )
 {
-	return memory_region(machine, "user1")[romaddr & 0x7fff];
+	return memory_region(device->machine, "user1")[romaddr & 0x7fff];
 }
 
 static const ppi8255_interface ppi8255_intf[2] =
@@ -576,9 +576,9 @@ static const ppi8255_interface ppi8255_intf[2] =
 		NULL							/* Port C write */
 	},
 	{
-		input_port_0_r,					/* Port A read */
-		input_port_1_r,					/* Port B read */
-		input_port_2_r,					/* Port C read */
+		DEVICE8_PORT("DSW1"),			/* Port A read */
+		DEVICE8_PORT("DSW2"),			/* Port B read */
+		DEVICE8_PORT("DSW3"),			/* Port C read */
 		NULL,							/* Port A write */
 		NULL,							/* Port B write */
 		NULL							/* Port C write */
@@ -681,11 +681,8 @@ static MACHINE_DRIVER_START( freekckb )
 	MDRV_CPU_PROGRAM_MAP(freekckb_readmem,freekckb_writemem)
 	MDRV_CPU_IO_MAP(freekckb_io_map,0)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
 	MDRV_VIDEO_UPDATE(freekick)
 MACHINE_DRIVER_END

@@ -113,15 +113,15 @@ ADDRESS_MAP_END
    There's a separate ROM check for banked U04 at 30F3.
    It looks like dealer/revenger uses ppi8255 to control bankswitching.
 */
-static WRITE8_HANDLER( write_prtc )
+static WRITE8_DEVICE_HANDLER( write_prtc )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(device->machine, "main");
 	memory_set_bankptr(2, rom + 0x6000 + (0x1000 * (data & 1)));
 }
 
 static const ppi8255_interface ppi8255_intf =
 {
-	input_port_2_r,	/* Port A read */
+	DEVICE8_PORT("INPUTS"),		/* Port A read */
 	NULL,			/* Port B read */
 	NULL,			/* Port C read */
 	NULL,			/* Port A write */
@@ -409,8 +409,7 @@ static MACHINE_DRIVER_START( dealer )
 	MDRV_CPU_IO_MAP(dealer_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf )
+	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(epos)

@@ -182,8 +182,9 @@ static UINT32 n7751_rom_address;
 static READ16_HANDLER( misc_io_r );
 static WRITE16_HANDLER( misc_io_w );
 
-static WRITE8_HANDLER( video_control_w );
-static WRITE8_HANDLER( tilemap_sound_w );
+static WRITE8_DEVICE_HANDLER( sound_latch_w );
+static WRITE8_DEVICE_HANDLER( video_control_w );
+static WRITE8_DEVICE_HANDLER( tilemap_sound_w );
 
 
 
@@ -198,7 +199,7 @@ static const ppi8255_interface single_ppi_intf =
 	NULL,
 	NULL,
 	NULL,
-	soundlatch_w,
+	sound_latch_w,
 	video_control_w,
 	tilemap_sound_w
 };
@@ -259,7 +260,7 @@ static MACHINE_RESET( system16a )
 
 static TIMER_CALLBACK( delayed_ppi8255_w )
 {
-	ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), param >> 8, param & 0xff);
+	ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255"), param >> 8, param & 0xff);
 }
 
 
@@ -269,7 +270,7 @@ static READ16_HANDLER( standard_io_r )
 	switch (offset & (0x3000/2))
 	{
 		case 0x0000/2:
-			return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3);
+			return ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255"), offset & 3);
 
 		case 0x1000/2:
 		{
@@ -326,7 +327,7 @@ static WRITE16_HANDLER( misc_io_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( video_control_w )
+static WRITE8_DEVICE_HANDLER( video_control_w )
 {
 	/*
         PPI port B
@@ -345,7 +346,7 @@ static WRITE8_HANDLER( video_control_w )
 	video_control = data;
 	segaic16_tilemap_set_flip(0, data & 0x80);
 	segaic16_sprites_set_flip(0, data & 0x80);
-	segaic16_set_display_enable(machine, data & 0x10);
+	segaic16_set_display_enable(device->machine, data & 0x10);
 	set_led_status(1, data & 0x08);
 	set_led_status(0, data & 0x04);
 	coin_counter_w(1, data & 0x02);
@@ -360,7 +361,13 @@ static WRITE8_HANDLER( video_control_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( tilemap_sound_w )
+static WRITE8_DEVICE_HANDLER( sound_latch_w )
+{
+	soundlatch_w(device->machine, offset, data);
+}
+
+
+static WRITE8_DEVICE_HANDLER( tilemap_sound_w )
 {
 	/*
         PPI port C
@@ -376,7 +383,7 @@ static WRITE8_HANDLER( tilemap_sound_w )
              0= Sound is disabled
              1= sound is enabled
     */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(device->machine, 1, INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	segaic16_tilemap_set_colscroll(0, ~data & 0x04);
 	segaic16_tilemap_set_rowscroll(0, ~data & 0x02);
 }
@@ -392,7 +399,7 @@ static WRITE8_HANDLER( tilemap_sound_w )
 static READ8_HANDLER( sound_data_r )
 {
 	/* assert ACK */
-	ppi8255_set_portC(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), 0x00);
+	ppi8255_set_port_c(devtag_get_device(machine, PPI8255, "ppi8255"), 0x00);
 	return soundlatch_r(machine, offset);
 }
 
@@ -1780,8 +1787,7 @@ static MACHINE_DRIVER_START( system16a )
 	MDRV_MACHINE_RESET(system16a)
 	MDRV_NVRAM_HANDLER(system16a)
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( single_ppi_intf )
+	MDRV_PPI8255_ADD( "ppi8255", single_ppi_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

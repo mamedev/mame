@@ -342,6 +342,8 @@ static SOUND_START( 005 );
 static void *sega005_custom_start(int clock, const custom_sound_interface *config);
 static void sega005_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 static TIMER_CALLBACK( sega005_auto_timer );
+static WRITE8_DEVICE_HANDLER( sega005_sound_a_w );
+static WRITE8_DEVICE_HANDLER( sega005_sound_b_w );
 
 /*
     005
@@ -438,8 +440,7 @@ static const ppi8255_interface ppi8255_005_intf =
 
 MACHINE_DRIVER_START( 005_sound_board )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_005_intf )
+	MDRV_PPI8255_ADD( "ppi8255", ppi8255_005_intf )
 
 	/* sound hardware */
 	MDRV_SOUND_START(005)
@@ -478,7 +479,7 @@ static SOUND_START( 005 )
  *
  *************************************/
 
-WRITE8_HANDLER( sega005_sound_a_w )
+static WRITE8_DEVICE_HANDLER( sega005_sound_a_w )
 {
 	UINT8 diff = data ^ sound_state[0];
 	sound_state[0] = data;
@@ -534,7 +535,7 @@ INLINE void sega005_update_sound_data(running_machine *machine)
 }
 
 
-WRITE8_HANDLER( sega005_sound_b_w )
+static WRITE8_DEVICE_HANDLER( sega005_sound_b_w )
 {
 	/*
            D6: manual timer clock (0->1)
@@ -565,7 +566,7 @@ WRITE8_HANDLER( sega005_sound_b_w )
 		sound_addr = (sound_addr & 0x780) | ((sound_addr + 1) & 0x07f);
 
 	/* update the sound data */
-	sega005_update_sound_data(machine);
+	sega005_update_sound_data(device->machine);
 }
 
 
@@ -747,10 +748,10 @@ WRITE8_HANDLER( spaceod_sound_w )
  *************************************/
 
 static SOUND_START( monsterb );
-static WRITE8_HANDLER( monsterb_sound_a_w );
-static WRITE8_HANDLER( monsterb_sound_b_w );
-static READ8_HANDLER( n7751_status_r );
-static WRITE8_HANDLER( n7751_command_w );
+static WRITE8_DEVICE_HANDLER( monsterb_sound_a_w );
+static WRITE8_DEVICE_HANDLER( monsterb_sound_b_w );
+static READ8_DEVICE_HANDLER( n7751_status_r );
+static WRITE8_DEVICE_HANDLER( n7751_command_w );
 static WRITE8_HANDLER( n7751_rom_offset_w );
 static WRITE8_HANDLER( n7751_rom_select_w );
 static READ8_HANDLER( n7751_rom_r );
@@ -830,8 +831,7 @@ static const ppi8255_interface monsterb_ppi_intf =
 
 MACHINE_DRIVER_START( monsterb_sound_board )
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( monsterb_ppi_intf )
+	MDRV_PPI8255_ADD( "ppi8255", monsterb_ppi_intf )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("audio", N7751, 6000000)
@@ -876,7 +876,7 @@ static SOUND_START( monsterb )
  *
  *************************************/
 
-static WRITE8_HANDLER( monsterb_sound_a_w )
+static WRITE8_DEVICE_HANDLER( monsterb_sound_a_w )
 {
 	int enable_val;
 
@@ -884,7 +884,7 @@ static WRITE8_HANDLER( monsterb_sound_a_w )
 	tms36xx_note_w(0, 0, data & 15);
 
 	/* Top four data lines address an 82S123 ROM that enables/disables voices */
-	enable_val = memory_region(machine, "prom")[(data & 0xF0) >> 4];
+	enable_val = memory_region(device->machine, "prom")[(data & 0xF0) >> 4];
 	tms3617_enable_w(0, enable_val >> 2);
 }
 
@@ -896,7 +896,7 @@ static WRITE8_HANDLER( monsterb_sound_a_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( monsterb_sound_b_w )
+static WRITE8_DEVICE_HANDLER( monsterb_sound_b_w )
 {
 	UINT8 diff = data ^ sound_state[1];
 	sound_state[1] = data;
@@ -918,13 +918,13 @@ static WRITE8_HANDLER( monsterb_sound_b_w )
  *
  *************************************/
 
-static READ8_HANDLER( n7751_status_r )
+static READ8_DEVICE_HANDLER( n7751_status_r )
 {
 	return n7751_busy << 4;
 }
 
 
-static WRITE8_HANDLER( n7751_command_w )
+static WRITE8_DEVICE_HANDLER( n7751_command_w )
 {
 	/*
         Z80 7751 control port
@@ -933,7 +933,7 @@ static WRITE8_HANDLER( n7751_command_w )
         D3    = /INT line
     */
 	n7751_command = data & 0x07;
-	cpunum_set_input_line(machine, 1, 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(device->machine, 1, 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
 	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
 }
 

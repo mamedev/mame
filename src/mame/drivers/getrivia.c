@@ -119,12 +119,7 @@ static WRITE8_HANDLER( getrivia_bitmap_w )
 	if (mask & 0x01) *BITMAP_ADDR16(tmpbitmap, sy, sx+7) = (bits & 0x01) ? fg : bg;
 }
 
-static READ8_HANDLER( port1_r )
-{
-	return input_port_read(machine, "IN0") | (ticket_dispenser_0_r(machine, 0) >> 5);
-}
-
-static WRITE8_HANDLER( lamps_w )
+static WRITE8_DEVICE_HANDLER( lamps_w )
 {
 	/* 5 button lamps */
 	set_led_status(0,data & 0x01);
@@ -140,23 +135,23 @@ static WRITE8_HANDLER( lamps_w )
 	set_led_status(6,data & 0x80);
 }
 
-static WRITE8_HANDLER( sound_w )
+static WRITE8_DEVICE_HANDLER( sound_w )
 {
 	/* bit 3 - coin lockout, lamp10 in poker / lamp6 in trivia test modes */
 	coin_lockout_global_w(~data & 0x08);
 	set_led_status(9,data & 0x08);
 
 	/* bit 5 - ticket out in trivia games */
-	ticket_dispenser_w(machine,0, (data & 0x20)<< 2);
+	ticket_dispenser_w(device->machine,0, (data & 0x20)<< 2);
 
 	/* bit 6 enables NMI */
-	interrupt_enable_w(machine,0,data & 0x40);
+	interrupt_enable_w(device->machine,0,data & 0x40);
 
 	/* bit 7 goes directly to the sound amplifier */
 	dac_data_w(0,((data & 0x80) >> 7) * 255);
 }
 
-static WRITE8_HANDLER( sound2_w )
+static WRITE8_DEVICE_HANDLER( sound2_w )
 {
 	/* bit 3,6 - coin lockout, lamp10+11 in selection test mode */
 	coin_lockout_w(0, ~data & 0x08);
@@ -173,19 +168,19 @@ static WRITE8_HANDLER( sound2_w )
 	dac_data_w(0,((data & 0x80) >> 7) * 255);
 }
 
-static WRITE8_HANDLER( lamps2_w )
+static WRITE8_DEVICE_HANDLER( lamps2_w )
 {
 	/* bit 4 - play/raise button lamp, lamp 9 in poker test mode  */
 	set_led_status(8,data & 0x10);
 }
 
-static WRITE8_HANDLER( nmi_w )
+static WRITE8_DEVICE_HANDLER( nmi_w )
 {
 	/* bit 4 - play/raise button lamp, lamp 9 in selection test mode  */
 	set_led_status(8,data & 0x10);
 
 	/* bit 6 enables NMI */
-	interrupt_enable_w(machine,0,data & 0x40);
+	interrupt_enable_w(device->machine,0,data & 0x40);
 }
 
 static WRITE8_HANDLER( banksel_1_1_w )
@@ -390,7 +385,7 @@ static INPUT_PORTS_START( getrivia )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_IMPULSE(2) PORT_CONDITION("DSWA", 0x40, PORTCOND_EQUALS, 0x00) PORT_NAME ("Start in no coins mode")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2) PORT_CONDITION("DSWA", 0x40, PORTCOND_EQUALS, 0x40)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) PORT_CONDITION("DSWA", 0x40, PORTCOND_EQUALS, 0x00)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* ticket status */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(ticket_dispenser_0_port_r, 0)		/* ticket status */
 	PORT_SERVICE( 0x08, IP_ACTIVE_LOW )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -417,19 +412,18 @@ static INPUT_PORTS_START( sextriv1 )
 INPUT_PORTS_END
 
 
-
 static const ppi8255_interface getrivia_ppi8255_intf[2] =
 {
 	{
-		input_port_0_r,			/* Port A read */
-		port1_r,				/* Port B read */
+		DEVICE8_PORT("DSWA"),	/* Port A read */
+		DEVICE8_PORT("IN0"),	/* Port B read */
 		NULL,					/* Port C read */
 		NULL,					/* Port A write */
 		NULL,					/* Port B write */
 		sound_w					/* Port C write */
 	},
 	{
-		input_port_2_r,			/* Port A read */
+		DEVICE8_PORT("IN1"),	/* Port A read */
 		NULL,					/* Port B read */
 		NULL,					/* Port C read */
 		NULL,					/* Port A write */
@@ -441,17 +435,17 @@ static const ppi8255_interface getrivia_ppi8255_intf[2] =
 static const ppi8255_interface gselect_ppi8255_intf[2] =
 {
 	{
-		input_port_0_r,			/* Port A read */
-		input_port_1_r,			/* Port B read */
+		DEVICE8_PORT("DSWA"),	/* Port A read */
+		DEVICE8_PORT("IN0"),	/* Port B read */
 		NULL,					/* Port C read */
 		NULL,					/* Port A write */
 		NULL,					/* Port B write */
 		sound2_w				/* Port C write */
 	},
 	{
-		input_port_2_r,			/* Port A read */
+		DEVICE8_PORT("IN1"),	/* Port A read */
 		NULL,					/* Port B read */
-		input_port_3_r,			/* Port C read */
+		DEVICE8_PORT("IN2"),	/* Port C read */
 		NULL,					/* Port A write */
 		lamps_w,				/* Port B write */
 		nmi_w					/* Port C write */
@@ -488,11 +482,8 @@ static MACHINE_DRIVER_START( getrivia )
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(generic_bitmapped)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( getrivia_ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( getrivia_ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", getrivia_ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", getrivia_ppi8255_intf[1] )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -511,11 +502,8 @@ static MACHINE_DRIVER_START( gselect )
 
 	MDRV_MACHINE_RESET(gselect)
 
-	MDRV_DEVICE_MODIFY( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( gselect_ppi8255_intf[0] )
-
-	MDRV_DEVICE_MODIFY( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( gselect_ppi8255_intf[1] )
+	MDRV_PPI8255_RECONFIG( "ppi8255_0", gselect_ppi8255_intf[0] )
+	MDRV_PPI8255_RECONFIG( "ppi8255_1", gselect_ppi8255_intf[1] )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( amuse )

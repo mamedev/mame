@@ -241,16 +241,16 @@ static const TMS9928a_interface tms9928a_interface =
 	vdp_interrupt
 };
 
-static WRITE8_HANDLER( sg1000a_coin_counter_w )
+static WRITE8_DEVICE_HANDLER( sg1000a_coin_counter_w )
 {
 	coin_counter_w(0, data & 0x01);
 }
 
 static const ppi8255_interface ppi8255_intf =
 {
-	input_port_0_r,
-	input_port_1_r,
-	input_port_2_r,
+	DEVICE8_PORT("P1"),
+	DEVICE8_PORT("P2"),
+	DEVICE8_PORT("DSW"),
 	NULL,
 	NULL,
 	sg1000a_coin_counter_w
@@ -269,8 +269,7 @@ static MACHINE_DRIVER_START( sg1000a )
 	MDRV_CPU_IO_MAP(io_map, 0)
 	MDRV_CPU_VBLANK_INT("main", sg1000a_interrupt)
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf )
+	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)

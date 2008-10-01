@@ -30,9 +30,9 @@ WRITE8_HANDLER( homerun_banking_w );
 VIDEO_START(homerun);
 VIDEO_UPDATE(homerun);
 
-static WRITE8_HANDLER(pa_w){homerun_xpa=data;}
-static WRITE8_HANDLER(pb_w){homerun_xpb=data;}
-static WRITE8_HANDLER(pc_w){homerun_xpc=data;}
+static WRITE8_DEVICE_HANDLER(pa_w){homerun_xpa=data;}
+static WRITE8_DEVICE_HANDLER(pb_w){homerun_xpb=data;}
+static WRITE8_DEVICE_HANDLER(pc_w){homerun_xpc=data;}
 
 static const ppi8255_interface ppi8255_intf =
 {
@@ -194,8 +194,7 @@ static MACHINE_DRIVER_START( homerun )
 
 	MDRV_MACHINE_RESET(homerun)
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf )
+	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

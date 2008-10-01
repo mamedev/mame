@@ -669,9 +669,9 @@ static INTERRUPT_GEN( igs_180_interrupt )
 // Dips are read through the 8255
 static const ppi8255_interface ppi8255_intf =
 {
-	input_port_0_r,	// Port A read
-	input_port_1_r,	// Port B read
-	input_port_2_r,	// Port C read
+	DEVICE8_PORT("DSW0"),			// Port A read
+	DEVICE8_PORT("DSW1"),			// Port B read
+	DEVICE8_PORT("DSW2"),			// Port C read
 	0,				// Port A write
 	0,				// Port B write
 	0,				// Port C write
@@ -691,8 +691,7 @@ static MACHINE_DRIVER_START( igs_180 )
 	MDRV_CPU_IO_MAP(igs_180_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(igs_180_interrupt,2)
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf )
+	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
 
 	MDRV_MACHINE_RESET(igs_180)
 

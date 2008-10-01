@@ -20,6 +20,8 @@
 #define PRINTF_COMMANDS				1
 #define CMDPRINTF(x)				do { if (PRINTF_COMMANDS) mame_printf_debug x; } while (0)
 
+#define EMULATE_ROM					0
+
 
 
 /***************************************************************************
@@ -91,6 +93,90 @@ static UINT8 ldv1000_status_r(laserdisc_state *ld);
 
 
 /***************************************************************************
+    22VP931 ROM AND MACHINE INTERFACES
+***************************************************************************/
+
+#if EMULATE_ROM
+static WRITE8_HANDLER( ld_controls )
+{
+	switch (offset)
+	{
+		case 0:
+			// write $00 at startup/reject
+			break;
+		
+		case 2:
+			// write $06 at startup/reject
+			break;
+		
+		case 3:
+			// write $8A at startup
+			break;
+		
+		case 5:
+			// write $9F at startup/reject
+			break;
+
+		case 6:
+			// write $C3 at startup/reject
+			break;
+		
+		case 7:
+			// write $90 at startup
+			break;
+	}
+}
+
+
+static READ8_HANDLER( ld_controls )
+{
+	switch (offset)
+	{
+		case 4:
+			
+	}
+}
+
+
+static WRITE8_HANDLER( unknown_port_w )
+{
+	// Writes to $00/$02/$00
+	// Values:
+	//	$04/$09/$0F
+	//  $04/$0E/$0F
+	//  $04/   /$0F
+}
+
+
+static ADDRESS_MAP_START( ldv1000_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x400) AM_RAM
+	AM_RANGE(0xc000, 0xc007) AM_READWRITE(ld_controls)
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( ldv1000_portmap, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x03) AM_WRITE(unknown_port_w)
+	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE(Z80CTC, "ctc", z80ctc_r, z80ctc_w)
+ADDRESS_MAP_END
+
+
+static MACHINE_DRIVER_START( ldv1000 )
+	MDRV_CPU_ADD("ldv1000", Z80, 4000000)
+	MDRV_CPU_PROGRAM_MAP(ldv1000_map,0)
+MACHINE_DRIVER_END
+
+
+ROM_START( ldv1000 )
+	ROM_REGION( 0x2000, "ldv1000", ROMREGION_LOADBYNAME )
+	ROM_LOAD( "z03_1001_vyw-053_v1-0.bin", 0x0000, 0x2000, CRC(31ec4687) SHA1(52f91c304a878ba02b2fa1cda1a9489d6dd5a34f) )
+ROM_END
+#endif
+
+
+
+/***************************************************************************
     INTERFACES
 ***************************************************************************/
 
@@ -99,8 +185,13 @@ const ldplayer_interface ldv1000_interface =
 	LASERDISC_TYPE_PIONEER_LDV1000,				/* type of the player */
 	sizeof(ldplayer_data),						/* size of the state */
 	"Pioneer LD-V1000",							/* name of the player */
-	NULL,										/* pointer to ROM region information */
-	NULL,										/* pointer to machine configuration */
+#if EMULATE_ROM
+	rom_ldv1000,								/* pointer to ROM region information */
+	machine_config_ldv1000,						/* pointer to machine configuration */
+#else
+	NULL,
+	NULL,
+#endif
 	ldv1000_init,								/* initialization callback */
 	NULL,										/* vsync callback */
 	ldv1000_update,								/* update callback */

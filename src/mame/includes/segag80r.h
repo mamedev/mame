@@ -20,9 +20,6 @@ MACHINE_DRIVER_EXTERN( monsterb_sound_board );
 
 WRITE8_HANDLER( astrob_sound_w );
 
-WRITE8_HANDLER( sega005_sound_a_w );
-WRITE8_HANDLER( sega005_sound_b_w );
-
 WRITE8_HANDLER( spaceod_sound_w );
 
 

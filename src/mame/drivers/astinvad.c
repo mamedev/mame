@@ -62,22 +62,22 @@ static UINT8 color_latch;
  *
  *************************************/
 
-static WRITE8_HANDLER( astinvad_sound1_w );
-static WRITE8_HANDLER( astinvad_sound2_w );
+static WRITE8_DEVICE_HANDLER( astinvad_sound1_w );
+static WRITE8_DEVICE_HANDLER( astinvad_sound2_w );
 
 static const ppi8255_interface ppi8255_intf[2] =
 {
 	{
-		input_port_0_r,
-		input_port_1_r,
-		input_port_2_r,
+		DEVICE8_PORT("IN0"),
+		DEVICE8_PORT("IN1"),
+		DEVICE8_PORT("IN2"),
 		NULL,
 		NULL,
 		NULL
 	},
 	{
 		NULL,
-		input_port_3_r,
+		DEVICE8_PORT("CABINET"),
 		NULL,
 		astinvad_sound1_w,
 		astinvad_sound2_w,
@@ -230,9 +230,9 @@ static READ8_HANDLER( kamikaze_ppi_r )
 
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		result &= ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset);
+		result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_0"), offset);
 	if (!(offset & 8))
-		result &= ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset);
+		result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset);
 	return result;
 }
 
@@ -241,9 +241,9 @@ static WRITE8_HANDLER( kamikaze_ppi_w )
 {
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset, data);
+		ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_0"), offset, data);
 	if (!(offset & 8))
-		ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset, data);
+		ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset, data);
 }
 
 
@@ -254,7 +254,7 @@ static WRITE8_HANDLER( kamikaze_ppi_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( astinvad_sound1_w )
+static WRITE8_DEVICE_HANDLER( astinvad_sound1_w )
 {
 	int bits_gone_hi = data & ~sound_state[0];
 	sound_state[0] = data;
@@ -270,7 +270,7 @@ static WRITE8_HANDLER( astinvad_sound1_w )
 }
 
 
-static WRITE8_HANDLER( astinvad_sound2_w )
+static WRITE8_DEVICE_HANDLER( astinvad_sound2_w )
 {
 	int bits_gone_hi = data & ~sound_state[1];
 	sound_state[1] = data;
@@ -281,7 +281,7 @@ static WRITE8_HANDLER( astinvad_sound2_w )
 	if (bits_gone_hi & 0x08) sample_start(5, SND_FLEET4, 0);
 	if (bits_gone_hi & 0x10) sample_start(4, SND_UFOHIT, 0);
 
-	screen_flip = (input_port_read(machine, "CABINET") & data & 0x20) ? 0xff : 0x00;
+	screen_flip = (input_port_read(device->machine, "CABINET") & data & 0x20) ? 0xff : 0x00;
 }
 
 
@@ -514,11 +514,8 @@ static MACHINE_DRIVER_START( kamikaze )
 
 	MDRV_MACHINE_START(kamikaze)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(astinvad)

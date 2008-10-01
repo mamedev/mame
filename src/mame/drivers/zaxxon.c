@@ -933,9 +933,11 @@ static const ppi8255_interface zaxxon_ppi_intf =
 };
 
 
+static READ8_DEVICE_HANDLER( sound_latch_r ) { return soundlatch_r(device->machine, offset); }
+
 static const ppi8255_interface congo_ppi_intf =
 {
-	soundlatch_r,
+	sound_latch_r,
 	NULL,
 	NULL,
 	NULL,
@@ -990,8 +992,7 @@ static MACHINE_DRIVER_START( root )
 
 	MDRV_MACHINE_START(zaxxon)
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( zaxxon_ppi_intf )
+	MDRV_PPI8255_ADD( "ppi8255", zaxxon_ppi_intf )
 
 	/* video hardware */
 	MDRV_GFXDECODE(zaxxon)
@@ -1049,8 +1050,7 @@ static MACHINE_DRIVER_START( congo )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(congo_map, 0)
 
-	MDRV_DEVICE_MODIFY( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( congo_ppi_intf )
+	MDRV_PPI8255_RECONFIG( "ppi8255", congo_ppi_intf )
 
 	MDRV_CPU_ADD("audio", Z80, SOUND_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(congo_sound_map,0)

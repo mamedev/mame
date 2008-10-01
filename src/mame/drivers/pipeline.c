@@ -168,7 +168,7 @@ static INPUT_PORTS_START( pipeline )
 
 INPUT_PORTS_END
 
-static WRITE8_HANDLER(vidctrl_w)
+static WRITE8_DEVICE_HANDLER(vidctrl_w)
 {
 	vidctrl=data;
 }
@@ -197,7 +197,7 @@ static WRITE8_HANDLER(vram1_w)
 	vram1[offset]=data;
 }
 
-static READ8_HANDLER(protection_r)
+static READ8_DEVICE_HANDLER(protection_r)
 {
 	return fromMCU;
 }
@@ -207,7 +207,7 @@ static TIMER_CALLBACK( protection_deferred_w )
 	toMCU = param;
 }
 
-static WRITE8_HANDLER(protection_w)
+static WRITE8_DEVICE_HANDLER(protection_w)
 {
 	timer_call_after_resynch(NULL, data, protection_deferred_w);
 	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
@@ -310,7 +310,7 @@ static const z80_daisy_chain daisy_chain_sound[] =
 static const ppi8255_interface ppi8255_intf[3] =
 {
 	{
-		input_port_0_r,				/* Port A read */
+		DEVICE8_PORT("P1"),			/* Port A read */
 		NULL,						/* Port B read */
 		NULL,						/* Port C read */
 		NULL,						/* Port A write */
@@ -318,8 +318,8 @@ static const ppi8255_interface ppi8255_intf[3] =
 		vidctrl_w					/* Port C write */
 	},
 	{
-		input_port_1_r,				/* Port A read */
-		input_port_2_r,				/* Port B read */
+		DEVICE8_PORT("DSW1"),		/* Port A read */
+		DEVICE8_PORT("DSW2"),		/* Port B read */
 		protection_r,				/* Port C read */
 		NULL,						/* Port A write */
 		NULL,						/* Port B write */
@@ -381,14 +381,9 @@ static MACHINE_DRIVER_START( pipeline )
 	
 	MDRV_Z80CTC_ADD( "ctc", ctc_intf )
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
-
-	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[2] )
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_2", ppi8255_intf[2] )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

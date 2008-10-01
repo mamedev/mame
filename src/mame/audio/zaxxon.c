@@ -121,7 +121,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-WRITE8_HANDLER( zaxxon_sound_a_w )
+WRITE8_DEVICE_HANDLER( zaxxon_sound_a_w )
 {
 	UINT8 diff = data ^ sound_state[0];
 	sound_state[0] = data;
@@ -155,7 +155,7 @@ WRITE8_HANDLER( zaxxon_sound_a_w )
 }
 
 
-WRITE8_HANDLER( zaxxon_sound_b_w )
+WRITE8_DEVICE_HANDLER( zaxxon_sound_b_w )
 {
 	UINT8 diff = data ^ sound_state[1];
 	sound_state[1] = data;
@@ -171,7 +171,7 @@ WRITE8_HANDLER( zaxxon_sound_b_w )
 }
 
 
-WRITE8_HANDLER( zaxxon_sound_c_w )
+WRITE8_DEVICE_HANDLER( zaxxon_sound_c_w )
 {
 	UINT8 diff = data ^ sound_state[2];
 	sound_state[2] = data;
@@ -227,7 +227,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-WRITE8_HANDLER( congo_sound_b_w )
+WRITE8_DEVICE_HANDLER( congo_sound_b_w )
 {
 	UINT8 diff = data ^ sound_state[1];
 	sound_state[1] = data;
@@ -239,7 +239,7 @@ WRITE8_HANDLER( congo_sound_b_w )
 }
 
 
-WRITE8_HANDLER( congo_sound_c_w )
+WRITE8_DEVICE_HANDLER( congo_sound_c_w )
 {
 	UINT8 diff = data ^ sound_state[2];
 	sound_state[2] = data;

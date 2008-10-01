@@ -414,7 +414,7 @@ static READ8_HANDLER( ts_r )
 	return z80_ram[offset];
 }
 
-static WRITE8_HANDLER( tx1_coin_cnt )
+static WRITE8_DEVICE_HANDLER( tx1_coin_cnt )
 {
 	coin_counter_w(0, data & 0x80);
 	coin_counter_w(1, data & 0x40);
@@ -426,14 +426,14 @@ static WRITE8_HANDLER( tx1_ppi_latch_w )
 	tx1_ppi_latch_b = input_port_read(machine, "AN_STEERING");
 }
 
-static READ8_HANDLER( tx1_ppi_porta_r )
+static READ8_DEVICE_HANDLER( tx1_ppi_porta_r )
 {
 	return tx1_ppi_latch_a;
 }
 
-static READ8_HANDLER( tx1_ppi_portb_r )
+static READ8_DEVICE_HANDLER( tx1_ppi_portb_r )
 {
-	return input_port_read(machine, "PPI_PORTD") | tx1_ppi_latch_b;
+	return input_port_read(device->machine, "PPI_PORTD") | tx1_ppi_latch_b;
 }
 
 /* TODO */
@@ -463,9 +463,9 @@ static READ8_HANDLER( bbjr_analog_r )
 /* Buggy Boy uses an 8255 PPI instead of YM2149 ports for inputs! */
 static const ppi8255_interface buggyboy_ppi8255_intf =
 {
-	input_port_1_r,
+	DEVICE8_PORT("PPI_PORTA"),
 	NULL,
-	input_port_2_r,
+	DEVICE8_PORT("PPI_PORTC"),
 	NULL,
 	NULL,
 	NULL
@@ -476,7 +476,7 @@ static const ppi8255_interface tx1_ppi8255_intf =
 {
 	tx1_ppi_porta_r,
 	tx1_ppi_portb_r,
-	input_port_4_r,
+	DEVICE8_PORT("PPI_PORTC"),
 	NULL,
 	NULL,
 	tx1_coin_cnt
@@ -695,8 +695,7 @@ static MACHINE_DRIVER_START( tx1 )
 	MDRV_MACHINE_START(tx1)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_DEVICE_ADD("ppi8255", PPI8255)
-	MDRV_DEVICE_CONFIG(tx1_ppi8255_intf)
+	MDRV_PPI8255_ADD("ppi8255", tx1_ppi8255_intf)
 
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(tx1)
@@ -751,8 +750,7 @@ static MACHINE_DRIVER_START( buggyboy )
 	MDRV_MACHINE_START(buggyboy)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_DEVICE_ADD("ppi8255", PPI8255)
-	MDRV_DEVICE_CONFIG(buggyboy_ppi8255_intf)
+	MDRV_PPI8255_ADD("ppi8255", buggyboy_ppi8255_intf)
 
 	MDRV_DEFAULT_LAYOUT(layout_triphsxs)
 

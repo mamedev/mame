@@ -92,51 +92,51 @@ ROM text showed...
 INPUT_PORTS_EXTERN(ettrivia);
 
 
-static READ8_HANDLER( r1 )
+static READ8_DEVICE_HANDLER( r1 )
 {
 	int pc = activecpu_get_pc();
 	if(pc != 0x81cb)
 		printf("r1 @ %X\n",activecpu_get_pc());
-	return mame_rand(machine);
+	return mame_rand(device->machine);
 }
-static READ8_HANDLER( r2 )
+static READ8_DEVICE_HANDLER( r2 )
 {
 	int pc = activecpu_get_pc();
 	if(pc != 0x81cb)
 		printf("r2 @ %X\n",activecpu_get_pc());
-	return mame_rand(machine);
+	return mame_rand(device->machine);
 }
-static READ8_HANDLER( r3 )
+static READ8_DEVICE_HANDLER( r3 )
 {
 	int pc = activecpu_get_pc();
 	if(pc != 0x81cb && pc != 0x90fa && pc != 0x911b && pc != 0x90d3 && pc != 0x90c4)
 		printf("r3 @ %X\n",activecpu_get_pc());
-	return mame_rand(machine) & ~1; //with 1 jumps back (infinite loop): a status ready for something?
+	return mame_rand(device->machine) & ~1; //with 1 jumps back (infinite loop): a status ready for something?
 }
-static READ8_HANDLER( r4 )
+static READ8_DEVICE_HANDLER( r4 )
 {
 	int pc = activecpu_get_pc();
 	if(pc != 0x81cb)
 		printf("r4 @ %X\n",activecpu_get_pc());
-	return mame_rand(machine);
+	return mame_rand(device->machine);
 }
-static READ8_HANDLER( r5 )
+static READ8_DEVICE_HANDLER( r5 )
 {
 	int pc = activecpu_get_pc();
 	if(pc != 0x81cb)
 		printf("r5 @ %X\n",activecpu_get_pc());
-	return mame_rand(machine);
+	return mame_rand(device->machine);
 }
-static READ8_HANDLER( r6 )
+static READ8_DEVICE_HANDLER( r6 )
 {
 	int pc = activecpu_get_pc();
 	if(pc != 0x81cb)
 		printf("r6 @ %X\n",activecpu_get_pc());
 
-	return mame_rand(machine);
+	return mame_rand(device->machine);
 }
 
-static WRITE8_HANDLER( w1 )
+static WRITE8_DEVICE_HANDLER( w1 )
 {
 	/*
     static int old = 0;
@@ -144,7 +144,7 @@ static WRITE8_HANDLER( w1 )
         printf("w1 = %02X\n",old=data);
         */
 }
-static WRITE8_HANDLER( w2 )
+static WRITE8_DEVICE_HANDLER( w2 )
 {
 	/*
     static int old = 0;
@@ -152,7 +152,7 @@ static WRITE8_HANDLER( w2 )
         printf("w2 = %02X\n",old=data);
         */
 }
-static WRITE8_HANDLER( w3 )
+static WRITE8_DEVICE_HANDLER( w3 )
 {
 	/*
     static int old = 0;
@@ -160,7 +160,7 @@ static WRITE8_HANDLER( w3 )
         printf("w3 = %02X\n",old=data);
         */
 }
-static WRITE8_HANDLER( w4 )
+static WRITE8_DEVICE_HANDLER( w4 )
 {
 	/*
     static int old = 0;
@@ -168,7 +168,7 @@ static WRITE8_HANDLER( w4 )
         printf("w4 = %02X\n",old=data);
         */
 }
-static WRITE8_HANDLER( w5 )
+static WRITE8_DEVICE_HANDLER( w5 )
 {
 	/*
     static int old = 0;
@@ -176,7 +176,7 @@ static WRITE8_HANDLER( w5 )
         printf("w5 = %02X\n",old=data);
         */
 }
-static WRITE8_HANDLER( w6 )
+static WRITE8_DEVICE_HANDLER( w6 )
 {
 	/*
     static int old = 0;
@@ -233,11 +233,8 @@ static MACHINE_DRIVER_START( smstrv )
 
 //  MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -63,7 +63,7 @@ MACHINE_RESET( explorer )
 }
 
 
-static READ8_HANDLER( darkplnt_input_port_1_r )
+CUSTOM_INPUT( darkplnt_custom_r )
 {
 	static const UINT8 remap[] = {0x03, 0x02, 0x00, 0x01, 0x21, 0x20, 0x22, 0x23,
 							  0x33, 0x32, 0x30, 0x31, 0x11, 0x10, 0x12, 0x13,
@@ -73,22 +73,20 @@ static READ8_HANDLER( darkplnt_input_port_1_r )
 							  0x2b, 0x2a, 0x28, 0x29, 0x09, 0x08, 0x0a, 0x0b,
 							  0x0f, 0x0e, 0x0c, 0x0d, 0x2d, 0x2c, 0x2e, 0x2f,
 							  0x27, 0x26, 0x24, 0x25, 0x05, 0x04, 0x06, 0x07 };
-	UINT8 val;
+	UINT8 val = input_port_read(field->port->machine, param);
 
-	val = input_port_read(machine, "IN1");
-
-	return ((val & 0x03) | (remap[val >> 2] << 2));
+	return remap[val >> 2];
 }
 
 /* state of the security PAL (6J) */
 static UINT8 xb;
 
-static WRITE8_HANDLER( scramble_protection_w )
+static WRITE8_DEVICE_HANDLER( scramble_protection_w )
 {
 	xb = data;
 }
 
-static READ8_HANDLER( scramble_protection_r )
+static READ8_DEVICE_HANDLER( scramble_protection_r )
 {
 	switch (activecpu_get_pc())
 	{
@@ -150,9 +148,9 @@ static READ8_HANDLER( cavelon_banksw_r )
 	cavelon_banksw();
 
 	if      ((offset >= 0x0100) && (offset <= 0x0103))
-		return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset - 0x0100);
+		return ppi8255_r((device_config*)devtag_get_device(machine, PPI8255, "ppi8255_0"), offset - 0x0100);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		return ppi8255_r((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset - 0x0200);
+		return ppi8255_r((device_config*)devtag_get_device(machine, PPI8255, "ppi8255_1"), offset - 0x0200);
 
 	return 0xff;
 }
@@ -162,9 +160,9 @@ static WRITE8_HANDLER( cavelon_banksw_w )
 	cavelon_banksw();
 
 	if      ((offset >= 0x0100) && (offset <= 0x0103))
-		ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset - 0x0100, data);
+		ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_0"), offset - 0x0100, data);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		ppi8255_w((device_config*)device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset - 0x0200, data);
+		ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset - 0x0200, data);
 }
 
 
@@ -178,151 +176,59 @@ WRITE8_HANDLER( hunchbks_mirror_w )
 	program_write_byte(0x1000+offset,data);
 }
 
+static WRITE8_DEVICE_HANDLER( sound_latch_w ) { soundlatch_w(device->machine, offset, data); }
 
-const ppi8255_interface scramble_ppi_ppi8255_intf[2] =
+const ppi8255_interface scramble_ppi_0_intf =
 {
-	{
-		input_port_0_r,				/* Port A read */
-		input_port_1_r,				/* Port B read */
-		input_port_2_r,				/* Port C read */
-		NULL,						/* Port A write */
-		NULL,						/* Port B write */
-		NULL 						/* Port C write */
-	},
-	{
-		NULL,						/* Port A read */
-		NULL,						/* Port B read */
-		NULL,						/* Port C read */
-		soundlatch_w,				/* Port A write */
-		scramble_sh_irqtrigger_w,	/* Port B write */
-		NULL						/* Port C write */
-	}
+	DEVICE8_PORT("IN0"),		/* Port A read */
+	DEVICE8_PORT("IN1"),		/* Port B read */
+	DEVICE8_PORT("IN2"),		/* Port C read */
+	NULL,						/* Port A write */
+	NULL,						/* Port B write */
+	NULL 						/* Port C write */
+};
+
+const ppi8255_interface scramble_ppi_1_intf =
+{
+	NULL,						/* Port A read */
+	NULL,						/* Port B read */
+	NULL,						/* Port C read */
+	sound_latch_w,				/* Port A write */
+	scramble_sh_irqtrigger_w,	/* Port B write */
+	NULL						/* Port C write */
 };
 
 
-const ppi8255_interface stratgyx_ppi8255_intf[2] =
+const ppi8255_interface stratgyx_ppi_1_intf =
 {
-	{
-		input_port_0_r,				/* Port A read */
-		input_port_1_r,				/* Port B read */
-		input_port_2_r,				/* Port C read */
-		NULL,						/* Port A write */
-		NULL,						/* Port B write */
-		NULL 						/* Port C write */
-	},
-	{
-		NULL,						/* Port A read */
-		NULL,						/* Port B read */
-		input_port_3_r,				/* Port C read */
-		soundlatch_w,				/* Port A write */
-		scramble_sh_irqtrigger_w,	/* Port B write */
-		NULL						/* Port C write */
-	}
+	NULL,						/* Port A read */
+	NULL,						/* Port B read */
+	DEVICE8_PORT("IN3"),		/* Port C read */
+	sound_latch_w,				/* Port A write */
+	scramble_sh_irqtrigger_w,	/* Port B write */
+	NULL						/* Port C write */
 };
 
 
-const ppi8255_interface darkplnt_ppi8255_intf[2] =
+const ppi8255_interface scramble_protection_ppi_1_intf =
 {
-	{
-		input_port_0_r,				/* Port A read */
-		darkplnt_input_port_1_r,	/* Port B read */
-		input_port_2_r,				/* Port C read */
-		NULL,						/* Port A write */
-		NULL,						/* Port B write */
-		NULL 						/* Port C write */
-	},
-	{
-		NULL,						/* Port A read */
-		NULL,						/* Port B read */
-		NULL,						/* Port C read */
-		soundlatch_w,				/* Port A write */
-		scramble_sh_irqtrigger_w,	/* Port B write */
-		NULL						/* Port C write */
-	}
+	NULL,						/* Port A read */
+	NULL,						/* Port B read */
+	scramble_protection_r,		/* Port C read */
+	sound_latch_w,				/* Port A write */
+	scramble_sh_irqtrigger_w,	/* Port B write */
+	scramble_protection_w		/* Port C write */
 };
 
 
-const ppi8255_interface scramble_ppi8255_intf[2] =
+const ppi8255_interface mrkougar_ppi_1_intf =
 {
-	{
-		input_port_0_r,				/* Port A read */
-		input_port_1_r,				/* Port B read */
-		input_port_2_r,				/* Port C read */
-		NULL,						/* Port A write */
-		NULL,						/* Port B write */
-		NULL 						/* Port C write */
-	},
-	{
-		NULL,						/* Port A read */
-		NULL,						/* Port B read */
-		scramble_protection_r,		/* Port C read */
-		soundlatch_w,				/* Port A write */
-		scramble_sh_irqtrigger_w,	/* Port B write */
-		scramble_protection_w		/* Port C write */
-	}
-};
-
-
-const ppi8255_interface ckongs_ppi8255_intf[2] =
-{
-	{
-		input_port_0_r,				/* Port A read */
-		input_port_1_r,				/* Port B read */
-		input_port_2_r,				/* Port C read */
-		NULL,						/* Port A write */
-		NULL,						/* Port B write */
-		NULL 						/* Port C write */
-	},
-	{
-		NULL,						/* Port A read */
-		NULL,						/* Port B read */
-		NULL,						/* Port C read */
-		soundlatch_w,				/* Port A write */
-		scramble_sh_irqtrigger_w,	/* Port B write */
-		NULL						/* Port C write */
-	}
-};
-
-
-const ppi8255_interface mars_ppi8255_intf[2] =
-{
-	{
-		input_port_0_r,				/* Port A read */
-		input_port_1_r,				/* Port B read */
-		input_port_2_r,				/* Port C read */
-		NULL,						/* Port A write */
-		NULL,						/* Port B write */
-		NULL 						/* Port C write */
-	},
-	{
-		NULL,						/* Port A read */
-		NULL,						/* Port B read */
-		input_port_3_r,				/* Port C read */
-		soundlatch_w,				/* Port A write */
-		scramble_sh_irqtrigger_w,	/* Port B write */
-		NULL						/* Port C write */
-	}
-};
-
-
-const ppi8255_interface mrkougar_ppi8255_intf[2] =
-{
-	{
-		input_port_0_r,				/* Port A read */
-		input_port_1_r,				/* Port B read */
-		input_port_2_r,				/* Port C read */
-		NULL,						/* Port A write */
-		NULL,						/* Port B write */
-		NULL 						/* Port C write */
-	},
-	{
-		NULL,						/* Port A read */
-		NULL,						/* Port B read */
-		NULL,						/* Port C read */
-		soundlatch_w,				/* Port A write */
-		mrkougar_sh_irqtrigger_w,	/* Port B write */
-		NULL						/* Port C write */
-	}
+	NULL,						/* Port A read */
+	NULL,						/* Port B read */
+	NULL,						/* Port C read */
+	sound_latch_w,				/* Port A write */
+	mrkougar_sh_irqtrigger_w,	/* Port B write */
+	NULL						/* Port C write */
 };
 
 

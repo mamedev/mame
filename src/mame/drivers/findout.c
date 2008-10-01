@@ -59,17 +59,17 @@ static WRITE8_HANDLER( findout_bitmap_w )
 }
 
 
-static READ8_HANDLER( portC_r )
+static READ8_DEVICE_HANDLER( portC_r )
 {
 	return 4;
 }
 
-static READ8_HANDLER( port1_r )
+static READ8_DEVICE_HANDLER( port1_r )
 {
-	return input_port_read(machine, "IN0") | (ticket_dispenser_0_r(machine, 0) >> 5);
+	return input_port_read(device->machine, "IN0") | (ticket_dispenser_0_r(device->machine, 0) >> 5);
 }
 
-static WRITE8_HANDLER( lamps_w )
+static WRITE8_DEVICE_HANDLER( lamps_w )
 {
 	/* 5 button lamps */
 	set_led_status(0,data & 0x01);
@@ -83,17 +83,17 @@ static WRITE8_HANDLER( lamps_w )
 	set_led_status(7,data & 0x80);
 }
 
-static WRITE8_HANDLER( sound_w )
+static WRITE8_DEVICE_HANDLER( sound_w )
 {
 	/* bit 3 - coin lockout (lamp6 in test modes, set to lamp 10 as in getrivia.c) */
 	coin_lockout_global_w(~data & 0x08);
 	set_led_status(9,data & 0x08);
 
 	/* bit 5 - ticket out in trivia games */
-	ticket_dispenser_w(machine, 0, (data & 0x20)<< 2);
+	ticket_dispenser_w(device->machine, 0, (data & 0x20)<< 2);
 
 	/* bit 6 enables NMI */
-	interrupt_enable_w(machine, 0,data & 0x40);
+	interrupt_enable_w(device->machine, 0,data & 0x40);
 
 	/* bit 7 goes directly to the sound amplifier */
 	dac_data_w(0,((data & 0x80) >> 7) * 255);
@@ -105,7 +105,7 @@ static WRITE8_HANDLER( sound_w )
 static const ppi8255_interface ppi8255_intf[2] =
 {
 	{
-		input_port_0_r,				/* Port A read */
+		DEVICE8_PORT("DSWA"),		/* Port A read */
 		port1_r,					/* Port B read */
 		NULL,						/* Port C read */
 		NULL,						/* Port A write */
@@ -113,7 +113,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 		sound_w,					/* Port C write */
 	},
 	{
-		input_port_2_r,				/* Port A read */
+		DEVICE8_PORT("IN1"),		/* Port A read */
 		NULL,						/* Port B read */
 		portC_r,					/* Port C read */
 		NULL,						/* Port A write */
@@ -471,11 +471,8 @@ static MACHINE_DRIVER_START( findout )
 	MDRV_VIDEO_START(generic_bitmapped)
 	MDRV_VIDEO_UPDATE(generic_bitmapped)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

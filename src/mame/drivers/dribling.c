@@ -66,22 +66,22 @@ static INTERRUPT_GEN( dribling_irq_gen )
  *
  *************************************/
 
-static READ8_HANDLER( dsr_r )
+static READ8_DEVICE_HANDLER( dsr_r )
 {
 	/* return DSR0-7 */
 	return (ds << sh) | (dr >> (8 - sh));
 }
 
 
-static READ8_HANDLER( input_mux0_r )
+static READ8_DEVICE_HANDLER( input_mux0_r )
 {
 	/* low value in the given bit selects */
 	if (!(input_mux & 0x01))
-		return input_port_read(machine, "MUX0");
+		return input_port_read(device->machine, "MUX0");
 	else if (!(input_mux & 0x02))
-		return input_port_read(machine, "MUX1");
+		return input_port_read(device->machine, "MUX1");
 	else if (!(input_mux & 0x04))
-		return input_port_read(machine, "MUX2");
+		return input_port_read(device->machine, "MUX2");
 	return 0xff;
 }
 
@@ -93,12 +93,12 @@ static READ8_HANDLER( input_mux0_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( misc_w )
+static WRITE8_DEVICE_HANDLER( misc_w )
 {
 	/* bit 7 = di */
 	di = (data >> 7) & 1;
 	if (!di)
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpunum_set_input_line(device->machine, 0, 0, CLEAR_LINE);
 
 	/* bit 6 = parata */
 
@@ -116,7 +116,7 @@ static WRITE8_HANDLER( misc_w )
 }
 
 
-static WRITE8_HANDLER( sound_w )
+static WRITE8_DEVICE_HANDLER( sound_w )
 {
 	/* bit 7 = stop palla */
 	/* bit 6 = contrasto */
@@ -130,18 +130,18 @@ static WRITE8_HANDLER( sound_w )
 }
 
 
-static WRITE8_HANDLER( pb_w )
+static WRITE8_DEVICE_HANDLER( pb_w )
 {
 	/* write PB0-7 */
 	logerror("%04X:pb_w(%02X)\n", activecpu_get_previouspc(), data);
 }
 
 
-static WRITE8_HANDLER( shr_w )
+static WRITE8_DEVICE_HANDLER( shr_w )
 {
 	/* bit 3 = watchdog */
 	if (data & 0x08)
-		watchdog_reset(machine);
+		watchdog_reset(device->machine);
 
 	/* bit 2-0 = SH0-2 */
 	sh = data & 0x07;
@@ -158,9 +158,9 @@ static WRITE8_HANDLER( shr_w )
 static READ8_HANDLER( ioread )
 {
 	if (offset & 0x08)
-		return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 3);
+		return ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_0"), offset & 3);
 	else if (offset & 0x10)
-		return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3);
+		return ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset & 3);
 	return 0xff;
 }
 
@@ -168,9 +168,9 @@ static READ8_HANDLER( ioread )
 static WRITE8_HANDLER( iowrite )
 {
 	if (offset & 0x08)
-		ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 3, data);
+		ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_0"), offset & 3, data);
 	else if (offset & 0x10)
-		ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3, data);
+		ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset & 3, data);
 	else if (offset & 0x40)
 	{
 		dr = ds;
@@ -199,7 +199,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 	{
 		NULL,
 		NULL,
-		input_port_3_r,
+		DEVICE8_PORT("IN0"),
 		sound_w,
 		pb_w,
 		shr_w
@@ -300,11 +300,8 @@ static MACHINE_DRIVER_START( dribling )
 	MDRV_CPU_IO_MAP(io_map,0)
 	MDRV_CPU_VBLANK_INT("main", dribling_irq_gen)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

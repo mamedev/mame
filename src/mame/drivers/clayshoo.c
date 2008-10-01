@@ -33,7 +33,7 @@ static emu_timer *analog_timer_2;
  *
  *************************************/
 
-static WRITE8_HANDLER( input_port_select_w )
+static WRITE8_DEVICE_HANDLER( input_port_select_w )
 {
 	input_port_select = data;
 }
@@ -57,18 +57,18 @@ static UINT8 difficulty_input_port_r(running_machine *machine, int bit)
 }
 
 
-static READ8_HANDLER( input_port_r )
+static READ8_DEVICE_HANDLER( input_port_r )
 {
 	UINT8 ret = 0;
 
 	switch (input_port_select)
 	{
-	case 0x01:	ret = input_port_read(machine, "IN0"); break;
-	case 0x02:	ret = input_port_read(machine, "IN1"); break;
-	case 0x04:	ret = (input_port_read(machine, "IN2") & 0xf0) |
-					   difficulty_input_port_r(machine, 0) |
-					  (difficulty_input_port_r(machine, 3) << 2); break;
-	case 0x08:	ret = input_port_read(machine, "IN3"); break;
+	case 0x01:	ret = input_port_read(device->machine, "IN0"); break;
+	case 0x02:	ret = input_port_read(device->machine, "IN1"); break;
+	case 0x04:	ret = (input_port_read(device->machine, "IN2") & 0xf0) |
+					   difficulty_input_port_r(device->machine, 0) |
+					  (difficulty_input_port_r(device->machine, 3) << 2); break;
+	case 0x08:	ret = input_port_read(device->machine, "IN3"); break;
 	case 0x10:
 	case 0x20:	break;	/* these two are not really used */
 	default: logerror("Unexpected port read: %02X\n", input_port_select);
@@ -320,11 +320,8 @@ static MACHINE_DRIVER_START( clayshoo )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 MACHINE_DRIVER_END
 
 

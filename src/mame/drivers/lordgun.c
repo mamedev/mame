@@ -100,20 +100,15 @@ static DRIVER_INIT( lordgun )
 
 ***************************************************************************/
 
-static WRITE8_HANDLER(fake_w)
+static WRITE8_DEVICE_HANDLER(fake_w)
 {
 }
-static WRITE8_HANDLER(fake2_w)
+static WRITE8_DEVICE_HANDLER(fake2_w)
 {
 //  popmessage("%02x",data);
 }
 
-static READ8_HANDLER( lordgun_port_0_r )
-{
-	return input_port_read(machine, "IN0");
-}
-
-static WRITE8_HANDLER( lordgun_eeprom_w )
+static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 {
 	static UINT8 old;
 	int i;
@@ -129,7 +124,7 @@ static WRITE8_HANDLER( lordgun_eeprom_w )
 	// Update light guns positions
 	for (i = 0; i < 2; i++)
 		if ( (data & (0x04 << i)) && !(old & (0x04 << i)) )
-			lordgun_update_gun(machine, i);
+			lordgun_update_gun(device->machine, i);
 
 	// latch the bit
 	eeprom_write_bit(data & 0x40);
@@ -409,17 +404,17 @@ INPUT_PORTS_END
 static const ppi8255_interface ppi8255_intf[2] =
 {
 	{
-		lordgun_port_0_r,			// Port A read
+		DEVICE8_PORT("IN0"),		// Port A read
 		NULL,						// Port B read
-		input_port_3_r,				// Port C read
+		DEVICE8_PORT("IN3"),		// Port C read
 		fake_w,						// Port A write
 		lordgun_eeprom_w,			// Port B write
 		fake2_w						// Port C write
 	},
 	{
-		input_port_1_r,				// Port A read
-		input_port_2_r,				// Port B read
-		input_port_4_r,				// Port C read
+		DEVICE8_PORT("IN1"),		// Port A read
+		DEVICE8_PORT("IN2"),		// Port B read
+		DEVICE8_PORT("IN4"),		// Port C read
 		fake_w,						// Port A write
 		fake_w,						// Port B write
 		fake_w						// Port C write
@@ -445,11 +440,8 @@ static MACHINE_DRIVER_START( lordgun )
 	MDRV_CPU_PROGRAM_MAP(lordgun_soundmem_map,0)
 	MDRV_CPU_IO_MAP(lordgun_soundio_map,0)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
 	MDRV_NVRAM_HANDLER(93C46)
 

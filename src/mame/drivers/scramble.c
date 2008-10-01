@@ -1853,11 +1853,8 @@ static MACHINE_DRIVER_START( scramble )
 
 	MDRV_MACHINE_RESET(scramble)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( scramble_ppi_ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( scramble_ppi_ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", scramble_ppi_0_intf )
+	MDRV_PPI8255_ADD( "ppi8255_1", scramble_ppi_1_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1953,12 +1950,6 @@ static MACHINE_DRIVER_START( mars )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(mars_readmem,mars_writemem)
 
-	MDRV_DEVICE_MODIFY( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( mars_ppi8255_intf[0] )
-
-	MDRV_DEVICE_MODIFY( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( mars_ppi8255_intf[1] )
-
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MDRV_PALETTE_INIT(galaxold)
@@ -1984,12 +1975,6 @@ static MACHINE_DRIVER_START( newsin7 )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(newsin7_readmem,newsin7_writemem)
 
-	MDRV_DEVICE_MODIFY( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( mars_ppi8255_intf[0] )
-
-	MDRV_DEVICE_MODIFY( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( mars_ppi8255_intf[1] )
-
 	/* video hardware */
 	MDRV_GFXDECODE(newsin7)
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
@@ -2004,11 +1989,7 @@ static MACHINE_DRIVER_START( mrkougar )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(mars_readmem,mrkougar_writemem)
 
-	MDRV_DEVICE_MODIFY( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( mrkougar_ppi8255_intf[0] )
-
-	MDRV_DEVICE_MODIFY( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( mrkougar_ppi8255_intf[1] )
+	MDRV_PPI8255_RECONFIG( "ppi8255_1", mrkougar_ppi_1_intf )
 
 	/* video hardware */
 	MDRV_GFXDECODE(mrkougar)
@@ -2023,11 +2004,7 @@ static MACHINE_DRIVER_START( mrkougb )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(mars_readmem,mrkougar_writemem)
 
-	MDRV_DEVICE_MODIFY( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( mrkougar_ppi8255_intf[0] )
-
-	MDRV_DEVICE_MODIFY( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( mrkougar_ppi8255_intf[1] )
+	MDRV_PPI8255_RECONFIG( "ppi8255_1", mrkougar_ppi_1_intf )
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
@@ -2040,12 +2017,6 @@ static MACHINE_DRIVER_START( ckongs )
 	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(ckongs_readmem,ckongs_writemem)
-
-	MDRV_DEVICE_MODIFY( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( ckongs_ppi8255_intf[0] )
-
-	MDRV_DEVICE_MODIFY( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( ckongs_ppi8255_intf[1] )
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
@@ -2060,8 +2031,8 @@ static MACHINE_DRIVER_START( hotshock )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(hotshock_readmem,hotshock_writemem)
 
-	MDRV_DEVICE_REMOVE( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_REMOVE( "ppi8255_1", PPI8255 )
+	MDRV_PPI8255_REMOVE( "ppi8255_0" )
+	MDRV_PPI8255_REMOVE( "ppi8255_1" )
 
 	MDRV_CPU_MODIFY("audio")
 	MDRV_CPU_IO_MAP(hotshock_sound_io_map,0)

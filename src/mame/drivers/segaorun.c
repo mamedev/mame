@@ -60,12 +60,12 @@ static const UINT8 *custom_map;
 static READ16_HANDLER( misc_io_r );
 static WRITE16_HANDLER( misc_io_w );
 
-static READ8_HANDLER( unknown_porta_r );
-static READ8_HANDLER( unknown_portb_r );
-static READ8_HANDLER( unknown_portc_r );
-static WRITE8_HANDLER( unknown_porta_w );
-static WRITE8_HANDLER( unknown_portb_w );
-static WRITE8_HANDLER( video_control_w );
+static READ8_DEVICE_HANDLER( unknown_porta_r );
+static READ8_DEVICE_HANDLER( unknown_portb_r );
+static READ8_DEVICE_HANDLER( unknown_portc_r );
+static WRITE8_DEVICE_HANDLER( unknown_porta_w );
+static WRITE8_DEVICE_HANDLER( unknown_portb_w );
+static WRITE8_DEVICE_HANDLER( video_control_w );
 
 
 
@@ -287,40 +287,40 @@ static void log_unknown_ppi_write( unsigned port, UINT8 data )
 }
 
 
-static READ8_HANDLER( unknown_porta_r )
+static READ8_DEVICE_HANDLER( unknown_porta_r )
 {
 	log_unknown_ppi_read(0);
 	return 0;
 }
 
 
-static READ8_HANDLER( unknown_portb_r )
+static READ8_DEVICE_HANDLER( unknown_portb_r )
 {
 	log_unknown_ppi_read(1);
 	return 0;
 }
 
 
-static READ8_HANDLER( unknown_portc_r )
+static READ8_DEVICE_HANDLER( unknown_portc_r )
 {
 	log_unknown_ppi_read(2);
 	return 0;
 }
 
 
-static WRITE8_HANDLER( unknown_porta_w )
+static WRITE8_DEVICE_HANDLER( unknown_porta_w )
 {
 	log_unknown_ppi_write(0, data);
 }
 
 
-static WRITE8_HANDLER( unknown_portb_w )
+static WRITE8_DEVICE_HANDLER( unknown_portb_w )
 {
 	log_unknown_ppi_write(1, data);
 }
 
 
-static WRITE8_HANDLER( video_control_w )
+static WRITE8_DEVICE_HANDLER( video_control_w )
 {
 	/* Output port:
         D7: SG1 -- connects to sprite chip
@@ -330,9 +330,9 @@ static WRITE8_HANDLER( video_control_w )
         D1: (CONT) - affects sprite hardware
         D0: Sound section reset (1= normal operation, 0= reset)
     */
-	segaic16_set_display_enable(machine, data & 0x20);
+	segaic16_set_display_enable(device->machine, data & 0x20);
 	adc_select = (data >> 2) & 7;
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	cpunum_set_input_line(device->machine, 2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -369,7 +369,7 @@ static READ16_HANDLER( outrun_custom_io_r )
 	switch (offset & 0x70/2)
 	{
 		case 0x00/2:
-			return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3);
+			return ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255"), offset & 3);
 
 		case 0x10/2:
 		{
@@ -399,7 +399,7 @@ static WRITE16_HANDLER( outrun_custom_io_w )
 	{
 		case 0x00/2:
 			if (ACCESSING_BITS_0_7)
-				ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255" ), offset & 3, data);
+				ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255"), offset & 3, data);
 			return;
 
 		case 0x20/2:
@@ -818,8 +818,7 @@ static MACHINE_DRIVER_START( outrundx )
 	MDRV_MACHINE_RESET(outrun)
 	MDRV_INTERLEAVE(100)
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( single_ppi_intf )
+	MDRV_PPI8255_ADD( "ppi8255", single_ppi_intf )
 
 	/* video hardware */
 	MDRV_GFXDECODE(segaorun)

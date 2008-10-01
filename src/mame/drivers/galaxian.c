@@ -318,7 +318,7 @@ static WRITE8_HANDLER( konami_ay8910_w )
 }
 
 
-static WRITE8_HANDLER( konami_sound_control_w )
+static WRITE8_DEVICE_HANDLER( konami_sound_control_w )
 {
 	UINT8 old = konami_sound_control;
 	konami_sound_control = data;
@@ -326,7 +326,7 @@ static WRITE8_HANDLER( konami_sound_control_w )
 	/* the inverse of bit 3 clocks the flip flop to signal an INT */
 	/* it is automatically cleared on the acknowledge */
 	if ((old & 0x08) && !(data & 0x08))
-		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+		cpunum_set_input_line(device->machine, 1, 0, HOLD_LINE);
 
 	/* bit 4 is sound disable */
 	sound_global_enable(~data & 0x10);
@@ -386,64 +386,43 @@ static WRITE8_HANDLER( konami_sound_filter_w )
 }
 
 
-static READ8_HANDLER( konami_porta_0_r )
-{
-//  logerror("%04X:ppi0_porta_r\n", activecpu_get_pc());
-	return input_port_read(machine, "IN0");
-}
-
-
-static READ8_HANDLER( konami_portb_0_r )
-{
-//  logerror("%04X:ppi0_portb_r\n", activecpu_get_pc());
-	return input_port_read(machine, "IN1");
-}
-
-
-static READ8_HANDLER( konami_portc_0_r )
-{
-	logerror("%04X:ppi0_portc_r\n", activecpu_get_pc());
-	return input_port_read(machine, "IN2");
-}
-
-
-static READ8_HANDLER( konami_portc_1_r )
-{
-	logerror("%04X:ppi1_portc_r\n", activecpu_get_pc());
-	return input_port_read(machine, "IN3");
-}
-
-
-static WRITE8_HANDLER( konami_portc_0_w )
+static WRITE8_DEVICE_HANDLER( konami_portc_0_w )
 {
 	logerror("%04X:ppi0_portc_w = %02X\n", activecpu_get_pc(), data);
 }
 
 
-static WRITE8_HANDLER( konami_portc_1_w )
+static WRITE8_DEVICE_HANDLER( konami_portc_1_w )
 {
 	logerror("%04X:ppi1_portc_w = %02X\n", activecpu_get_pc(), data);
 }
 
 
-static const ppi8255_interface konami_ppi8255_intf[2] =
+static WRITE8_DEVICE_HANDLER( sound_latch_w )
 {
-	{
-		konami_porta_0_r,				/* Port A read */
-		konami_portb_0_r,				/* Port B read */
-		konami_portc_0_r,				/* Port C read */
-		NULL,							/* Port A write */
-		NULL,							/* Port B write */
-		konami_portc_0_w				/* Port C write */
-	},
-	{
-		NULL,							/* Port A read */
-		NULL,							/* Port B read */
-		konami_portc_1_r,				/* Port C read */
-		soundlatch_w,					/* Port A write */
-		konami_sound_control_w,			/* Port B write */
-		konami_portc_1_w				/* Port C write */
-	}
+	soundlatch_w(device->machine, offset, data);
+}
+
+
+static const ppi8255_interface konami_ppi8255_0_intf =
+{
+	DEVICE8_PORT("IN0"),			/* Port A read */
+	DEVICE8_PORT("IN1"),			/* Port B read */
+	DEVICE8_PORT("IN2"),			/* Port C read */
+	NULL,							/* Port A write */
+	NULL,							/* Port B write */
+	konami_portc_0_w				/* Port C write */
+};
+
+
+static const ppi8255_interface konami_ppi8255_1_intf =
+{
+	NULL,							/* Port A read */
+	NULL,							/* Port B read */
+	DEVICE8_PORT("IN3"),			/* Port C read */
+	sound_latch_w,					/* Port A write */
+	konami_sound_control_w,			/* Port B write */
+	konami_portc_1_w				/* Port C write */
 };
 
 
@@ -458,8 +437,8 @@ static READ8_HANDLER( theend_ppi8255_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x0100) result &= ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 3);
-	if (offset & 0x0200) result &= ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3);
+	if (offset & 0x0100) result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_0"), offset & 3);
+	if (offset & 0x0200) result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset & 3);
 	return result;
 }
 
@@ -467,35 +446,25 @@ static READ8_HANDLER( theend_ppi8255_r )
 static WRITE8_HANDLER( theend_ppi8255_w )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x0100) ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), offset & 3, data);
-	if (offset & 0x0200) ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), offset & 3, data);
+	if (offset & 0x0100) ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_0"), offset & 3, data);
+	if (offset & 0x0200) ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset & 3, data);
 }
 
 
-static WRITE8_HANDLER( theend_coin_counter_w )
+static WRITE8_DEVICE_HANDLER( theend_coin_counter_w )
 {
 	coin_counter_w(0, data & 0x80);
 }
 
 
-static const ppi8255_interface theend_ppi8255_intf[2] =
+static const ppi8255_interface theend_ppi8255_0_intf =
 {
-	{
-		konami_porta_0_r,				/* Port A read */
-		konami_portb_0_r,				/* Port B read */
-		konami_portc_0_r,				/* Port C read */
-		NULL,							/* Port A write */
-		NULL,							/* Port B write */
-		theend_coin_counter_w			/* Port C write */
-	},
-	{
-		NULL,							/* Port A read */
-		NULL,							/* Port B read */
-		konami_portc_1_r,				/* Port C read */
-		soundlatch_w,					/* Port A write */
-		konami_sound_control_w,			/* Port B write */
-		konami_portc_1_w				/* Port C write */
-	}
+	DEVICE8_PORT("IN0"),			/* Port A read */
+	DEVICE8_PORT("IN1"),			/* Port B read */
+	DEVICE8_PORT("IN2"),			/* Port C read */
+	NULL,							/* Port A write */
+	NULL,							/* Port B write */
+	theend_coin_counter_w			/* Port C write */
 };
 
 
@@ -506,7 +475,7 @@ static const ppi8255_interface theend_ppi8255_intf[2] =
  *
  *************************************/
 
-static WRITE8_HANDLER( scramble_protection_w )
+static WRITE8_DEVICE_HANDLER( scramble_protection_w )
 {
 	/*
         This is not fully understood; the low 4 bits of port C are
@@ -530,7 +499,7 @@ static WRITE8_HANDLER( scramble_protection_w )
 }
 
 
-static READ8_HANDLER( scramble_protection_r )
+static READ8_DEVICE_HANDLER( scramble_protection_r )
 {
 	return protection_result;
 }
@@ -547,25 +516,16 @@ static CUSTOM_INPUT( scramble_protection_alt_r )
 }
 
 
-static const ppi8255_interface scramble_ppi8255_intf[2] =
+static const ppi8255_interface scramble_ppi8255_1_intf =
 {
-	{
-		konami_porta_0_r,				/* Port A read */
-		konami_portb_0_r,				/* Port B read */
-		konami_portc_0_r,				/* Port C read */
-		NULL,							/* Port A write */
-		NULL,							/* Port B write */
-		konami_portc_0_w				/* Port C write */
-	},
-	{
-		NULL,							/* Port A read */
-		NULL,							/* Port B read */
-		scramble_protection_r,			/* Port C read */
-		soundlatch_w,					/* Port A write */
-		konami_sound_control_w,			/* Port B write */
-		scramble_protection_w			/* Port C write */
-	}
+	NULL,							/* Port A read */
+	NULL,							/* Port B read */
+	scramble_protection_r,			/* Port C read */
+	sound_latch_w,					/* Port A write */
+	konami_sound_control_w,			/* Port B write */
+	scramble_protection_w			/* Port C write */
 };
+
 
 
 /*************************************
@@ -598,7 +558,7 @@ static READ8_HANDLER( sfx_sample_io_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x04) result &= ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_2" ), offset & 3);
+	if (offset & 0x04) result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_2"), offset & 3);
 	return result;
 }
 
@@ -606,7 +566,7 @@ static READ8_HANDLER( sfx_sample_io_r )
 static WRITE8_HANDLER( sfx_sample_io_w )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x04) ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_2" ), offset & 3, data);
+	if (offset & 0x04) ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_2"), offset & 3, data);
 	if (offset & 0x10) dac_0_signed_data_w(machine, offset, data);
 }
 
@@ -623,32 +583,20 @@ static WRITE8_HANDLER( sfx_sample_control_w )
 }
 
 
-static const ppi8255_interface sfx_ppi8255_intf[3] =
+static READ8_DEVICE_HANDLER( sound_data2_r )
 {
-	{
-		konami_porta_0_r,				/* Port A read */
-		konami_portb_0_r,				/* Port B read */
-		konami_portc_0_r,				/* Port C read */
-		NULL,							/* Port A write */
-		NULL,							/* Port B write */
-		konami_portc_0_w				/* Port C write */
-	},
-	{
-		NULL,							/* Port A read */
-		NULL,							/* Port B read */
-		konami_portc_1_r,				/* Port C read */
-		soundlatch_w,					/* Port A write */
-		konami_sound_control_w,			/* Port B write */
-		konami_portc_1_w				/* Port C write */
-	},
-	{
-		soundlatch2_r,					/* Port A read */
-		NULL,							/* Port B read */
-		NULL,							/* Port C read */
-		NULL,							/* Port A write */
-		NULL,							/* Port B write */
-		NULL							/* Port C write */
-	}
+	return soundlatch2_r(device->machine, offset);
+}
+
+
+static const ppi8255_interface sfx_ppi8255_2_intf =
+{
+	sound_data2_r,					/* Port A read */
+	NULL,							/* Port B read */
+	NULL,							/* Port C read */
+	NULL,							/* Port A write */
+	NULL,							/* Port B write */
+	NULL							/* Port C write */
 };
 
 
@@ -663,8 +611,8 @@ static READ8_HANDLER( frogger_ppi8255_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x1000) result &= ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), (offset >> 1) & 3);
-	if (offset & 0x2000) result &= ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), (offset >> 1) & 3);
+	if (offset & 0x1000) result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_1"), (offset >> 1) & 3);
+	if (offset & 0x2000) result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_0"), (offset >> 1) & 3);
 	return result;
 }
 
@@ -672,8 +620,8 @@ static READ8_HANDLER( frogger_ppi8255_r )
 static WRITE8_HANDLER( frogger_ppi8255_w )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x1000) ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), (offset >> 1) & 3, data);
-	if (offset & 0x2000) ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), (offset >> 1) & 3, data);
+	if (offset & 0x1000) ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_1"), (offset >> 1) & 3, data);
+	if (offset & 0x2000) ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_0"), (offset >> 1) & 3, data);
 }
 
 
@@ -721,8 +669,8 @@ static READ8_HANDLER( frogf_ppi8255_r )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
 	UINT8 result = 0xff;
-	if (offset & 0x1000) result &= ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), (offset >> 3) & 3);
-	if (offset & 0x2000) result &= ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), (offset >> 3) & 3);
+	if (offset & 0x1000) result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_0"), (offset >> 3) & 3);
+	if (offset & 0x2000) result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_1"), (offset >> 3) & 3);
 	return result;
 }
 
@@ -730,8 +678,8 @@ static READ8_HANDLER( frogf_ppi8255_r )
 static WRITE8_HANDLER( frogf_ppi8255_w )
 {
 	/* the decoding here is very simplistic, and you can address both simultaneously */
-	if (offset & 0x1000) ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), (offset >> 3) & 3, data);
-	if (offset & 0x2000) ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), (offset >> 3) & 3, data);
+	if (offset & 0x1000) ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_0"), (offset >> 3) & 3, data);
+	if (offset & 0x2000) ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_1"), (offset >> 3) & 3, data);
 }
 
 
@@ -742,10 +690,10 @@ static WRITE8_HANDLER( frogf_ppi8255_w )
  *
  *************************************/
 
-static READ8_HANDLER( turtles_ppi8255_0_r ) { return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), (offset >> 4) & 3); }
-static READ8_HANDLER( turtles_ppi8255_1_r ) { return ppi8255_r(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), (offset >> 4) & 3); }
-static WRITE8_HANDLER( turtles_ppi8255_0_w ) { ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_0" ), (offset >> 4) & 3, data); }
-static WRITE8_HANDLER( turtles_ppi8255_1_w ) { ppi8255_w(device_list_find_by_tag( machine->config->devicelist, PPI8255, "ppi8255_1" ), (offset >> 4) & 3, data); }
+static READ8_HANDLER( turtles_ppi8255_0_r ) { return ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_0"), (offset >> 4) & 3); }
+static READ8_HANDLER( turtles_ppi8255_1_r ) { return ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_1"), (offset >> 4) & 3); }
+static WRITE8_HANDLER( turtles_ppi8255_0_w ) { ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_0"), (offset >> 4) & 3, data); }
+static WRITE8_HANDLER( turtles_ppi8255_1_w ) { ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_1"), (offset >> 4) & 3, data); }
 
 
 
@@ -778,7 +726,7 @@ static WRITE8_HANDLER( scorpion_ay8910_w )
 }
 
 
-static READ8_HANDLER( scorpion_protection_r )
+static READ8_DEVICE_HANDLER( scorpion_protection_r )
 {
 	UINT16 paritybits;
 	UINT8 parity = 0;
@@ -793,7 +741,7 @@ static READ8_HANDLER( scorpion_protection_r )
 }
 
 
-static WRITE8_HANDLER( scorpion_protection_w )
+static WRITE8_DEVICE_HANDLER( scorpion_protection_w )
 {
 	/* bit 5 low is a reset */
 	if (!(data & 0x20))
@@ -803,7 +751,7 @@ static WRITE8_HANDLER( scorpion_protection_w )
 	if (!(data & 0x10))
 	{
 		/* each clock shifts left one bit and ORs in the inverse of the parity */
-		protection_state = (protection_state << 1) | (~scorpion_protection_r(machine, 0) & 1);
+		protection_state = (protection_state << 1) | (~scorpion_protection_r(device, 0) & 1);
 	}
 }
 
@@ -830,24 +778,14 @@ static WRITE8_HANDLER( scorpion_sound_control_w )
 }
 
 
-static const ppi8255_interface scorpion_ppi8255_intf[2] =
+static const ppi8255_interface scorpion_ppi8255_1_intf =
 {
-	{
-		konami_porta_0_r,				/* Port A read */
-		konami_portb_0_r,				/* Port B read */
-		konami_portc_0_r,				/* Port C read */
-		NULL,							/* Port A write */
-		NULL,							/* Port B write */
-		konami_portc_0_w				/* Port C write */
-	},
-	{
-		NULL,							/* Port A read */
-		NULL,							/* Port B read */
-		scorpion_protection_r,			/* Port C read */
-		soundlatch_w,					/* Port A write */
-		konami_sound_control_w,			/* Port B write */
-		scorpion_protection_w			/* Port C write */
-	}
+	NULL,							/* Port A read */
+	NULL,							/* Port B read */
+	scorpion_protection_r,			/* Port C read */
+	sound_latch_w,					/* Port A write */
+	konami_sound_control_w,			/* Port B write */
+	scorpion_protection_w			/* Port C write */
 };
 
 
@@ -1114,45 +1052,37 @@ static READ8_HANDLER( dingoe_3001_r )
  *
  *************************************/
 
-static WRITE8_HANDLER( moonwar_port_select_w )
+static WRITE8_DEVICE_HANDLER( moonwar_port_select_w )
 {
 	moonwar_port_select = data & 0x10;
 }
 
 
-static READ8_HANDLER( moonwar_input_port_0_r )
+static READ8_DEVICE_HANDLER( moonwar_input_port_0_r )
 {
 	UINT8 sign;
 	UINT8 delta;
 
-	delta = (moonwar_port_select ? input_port_read(machine, "IN3") : input_port_read(machine, "IN4"));
+	delta = (moonwar_port_select ? input_port_read(device->machine, "IN3") : input_port_read(device->machine, "IN4"));
 
 	sign = (delta & 0x80) >> 3;
 	delta &= 0x0f;
 
-	return ((input_port_read(machine, "IN0") & 0xe0) | delta | sign );
+	return ((input_port_read(device->machine, "IN0") & 0xe0) | delta | sign );
 }
 
 
-static const ppi8255_interface moonwar_ppi8255_intf[2] =
+static const ppi8255_interface moonwar_ppi8255_0_intf =
 {
-	{
-		moonwar_input_port_0_r,			/* Port A read */
-		konami_portb_0_r,				/* Port B read */
-		konami_portc_0_r,				/* Port C read */
-		NULL,							/* Port A write */
-		NULL,							/* Port B write */
-		moonwar_port_select_w 			/* Port C write */
-	},
-	{
-		NULL,							/* Port A read */
-		NULL,							/* Port B read */
-		konami_portc_1_r,				/* Port C read */
-		soundlatch_w,					/* Port A write */
-		konami_sound_control_w,			/* Port B write */
-		konami_portc_1_w				/* Port C write */
-	}
+	moonwar_input_port_0_r,			/* Port A read */
+	DEVICE8_PORT("IN1"),			/* Port B read */
+	DEVICE8_PORT("IN2"),			/* Port C read */
+	NULL,							/* Port A write */
+	NULL,							/* Port B write */
+	moonwar_port_select_w 			/* Port C write */
 };
+
+
 
 /*************************************
  *
@@ -1786,11 +1716,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( konami_base )
 	MDRV_IMPORT_FROM( galaxian_base )
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( konami_ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( konami_ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", konami_ppi8255_0_intf )
+	MDRV_PPI8255_ADD( "ppi8255_1", konami_ppi8255_1_intf )
 MACHINE_DRIVER_END
 
 
@@ -2028,11 +1955,8 @@ static MACHINE_DRIVER_START( theend )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(theend_map,0)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( theend_ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( theend_ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", theend_ppi8255_0_intf )
+	MDRV_PPI8255_ADD( "ppi8255_1", konami_ppi8255_1_intf )
 MACHINE_DRIVER_END
 
 
@@ -2044,11 +1968,8 @@ static MACHINE_DRIVER_START( scramble )
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(theend_map,0)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( scramble_ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( scramble_ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", konami_ppi8255_0_intf )
+	MDRV_PPI8255_ADD( "ppi8255_1", scramble_ppi8255_1_intf )
 MACHINE_DRIVER_END
 
 
@@ -2078,11 +1999,8 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( scorpion )
 	MDRV_IMPORT_FROM(theend)
 
-	MDRV_DEVICE_MODIFY( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( scorpion_ppi8255_intf[0] )
-
-	MDRV_DEVICE_MODIFY( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( scorpion_ppi8255_intf[1] )
+	MDRV_PPI8255_RECONFIG( "ppi8255_0", konami_ppi8255_0_intf )
+	MDRV_PPI8255_RECONFIG( "ppi8255_1", scorpion_ppi8255_1_intf )
 
 	/* extra AY8910 with I/O ports */
 	MDRV_SOUND_ADD("8910.2", AY8910, KONAMI_SOUND_CLOCK/8)
@@ -2106,14 +2024,9 @@ static MACHINE_DRIVER_START( sfx )
 	MDRV_CPU_PROGRAM_MAP(sfx_sample_map,0)
 	MDRV_CPU_IO_MAP(sfx_sample_portmap,0)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( sfx_ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( sfx_ppi8255_intf[1] )
-
-	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
-	MDRV_DEVICE_CONFIG( sfx_ppi8255_intf[2] )
+	MDRV_PPI8255_ADD( "ppi8255_0", konami_ppi8255_0_intf )
+	MDRV_PPI8255_ADD( "ppi8255_1", konami_ppi8255_1_intf )
+	MDRV_PPI8255_ADD( "ppi8255_2", sfx_ppi8255_2_intf )
 
 	/* port on 1st 8910 is used for communication */
 	MDRV_SOUND_MODIFY("8910.0")
@@ -2150,11 +2063,8 @@ static MACHINE_DRIVER_START( moonwar )
 	MDRV_IMPORT_FROM(scobra)
 
 	/* device config overrides */
-	MDRV_DEVICE_MODIFY( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( moonwar_ppi8255_intf[0] )
-
-	MDRV_DEVICE_MODIFY( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( moonwar_ppi8255_intf[1] )
+	MDRV_PPI8255_RECONFIG( "ppi8255_0", moonwar_ppi8255_0_intf )
+	MDRV_PPI8255_RECONFIG( "ppi8255_1", konami_ppi8255_1_intf )
 
 	MDRV_PALETTE_INIT(moonwar)
 MACHINE_DRIVER_END

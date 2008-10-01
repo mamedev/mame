@@ -255,7 +255,7 @@ static const mc6845_interface mc6845_intf =
 	vsync_changed			/* VSYNC callback */
 };
 
-static WRITE8_HANDLER( led1_w )
+static WRITE8_DEVICE_HANDLER( led1_w )
 {
 	/* 5 button lamps player 1 */
 	set_led_status(0,~data & 0x01);
@@ -278,7 +278,7 @@ static WRITE8_HANDLER( led2_w )
 	coin_counter_w(0,0x80-(data & 0x80));
 }
 
-static WRITE8_HANDLER( misc_w )
+static WRITE8_DEVICE_HANDLER( misc_w )
 {
 	flip_screen_set(~data & 0x10);
 	extra_video_bank_bit = (data & 2) << 8;
@@ -850,15 +850,15 @@ static VIDEO_UPDATE( merit )
 static const ppi8255_interface ppi8255_intf[2] =
 {
 	{
-		input_port_0_r,				/* Port A read */
-		input_port_1_r,				/* Port B read */
-		input_port_2_r,				/* Port C read */
+		DEVICE8_PORT("IN0"),		/* Port A read */
+		DEVICE8_PORT("IN1"),		/* Port B read */
+		DEVICE8_PORT("IN2"),		/* Port C read */
 		NULL,						/* Port A write */
 		NULL,						/* Port B write */
 		NULL						/* Port C write */
 	},
 	{
-		input_port_3_r,				/* Port A read */
+		DEVICE8_PORT("IN3"),		/* Port A read */
 		NULL,						/* Port B read */
 		NULL,						/* Port C read */
 		NULL,						/* Port A write */
@@ -881,11 +881,8 @@ static MACHINE_DRIVER_START( pitboss )
 	MDRV_CPU_PROGRAM_MAP(pitboss_map,0)
 	MDRV_CPU_IO_MAP(trvwhiz_io_map,0)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
 	MDRV_MACHINE_START(merit)
 	/* video hardware */

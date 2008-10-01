@@ -80,7 +80,7 @@ READ8_HANDLER( frogger_portB_r )
 }
 
 
-WRITE8_HANDLER( scramble_sh_irqtrigger_w )
+WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w )
 {
 	/* the complement of bit 3 is connected to the flip-flop's clock */
 	TTL7474_clock_w(2, ~data & 0x08);
@@ -97,7 +97,7 @@ WRITE8_HANDLER( sfx_sh_irqtrigger_w )
 	TTL7474_update(3);
 }
 
-WRITE8_HANDLER( mrkougar_sh_irqtrigger_w )
+WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w )
 {
 	/* the complement of bit 3 is connected to the flip-flop's clock */
 	TTL7474_clock_w(2, ~data & 0x08);

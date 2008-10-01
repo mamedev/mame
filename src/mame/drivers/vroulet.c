@@ -230,16 +230,16 @@ static const ay8910_interface ay8910_config =
 
 /* PPI8255 Interface */
 
-static WRITE8_HANDLER( ppi8255_a_w ){}// watchdog ?
-static WRITE8_HANDLER( ppi8255_b_w ){}// lamps ?
-static WRITE8_HANDLER( ppi8255_c_w ){}
+static WRITE8_DEVICE_HANDLER( ppi8255_a_w ){}// watchdog ?
+static WRITE8_DEVICE_HANDLER( ppi8255_b_w ){}// lamps ?
+static WRITE8_DEVICE_HANDLER( ppi8255_c_w ){}
 
 static const ppi8255_interface ppi8255_intf[2] =
 {
 	{
-		input_port_0_r,	        // Port A read
-		input_port_1_r,			// Port B read
-		input_port_2_r,			// Port C read
+		DEVICE8_PORT("IN0"),    // Port A read
+		DEVICE8_PORT("IN1"),	// Port B read
+		DEVICE8_PORT("IN2"),	// Port C read
 		NULL,					// Port A write
 		NULL,					// Port B write
 		NULL					// Port C write
@@ -265,11 +265,8 @@ static MACHINE_DRIVER_START( vroulet )
 
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
 	// video hardware
 

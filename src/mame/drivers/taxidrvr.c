@@ -11,37 +11,37 @@ Taxi Driver  (c) 1984 Graphic Techno
 
 
 
-static WRITE8_HANDLER( p2a_w ) { taxidrvr_spritectrl_w(machine,0,data); }
-static WRITE8_HANDLER( p2b_w ) { taxidrvr_spritectrl_w(machine,1,data); }
-static WRITE8_HANDLER( p2c_w ) { taxidrvr_spritectrl_w(machine,2,data); }
-static WRITE8_HANDLER( p3a_w ) { taxidrvr_spritectrl_w(machine,3,data); }
-static WRITE8_HANDLER( p3b_w ) { taxidrvr_spritectrl_w(machine,4,data); }
-static WRITE8_HANDLER( p3c_w ) { taxidrvr_spritectrl_w(machine,5,data); }
-static WRITE8_HANDLER( p4a_w ) { taxidrvr_spritectrl_w(machine,6,data); }
-static WRITE8_HANDLER( p4b_w ) { taxidrvr_spritectrl_w(machine,7,data); }
-static WRITE8_HANDLER( p4c_w ) { taxidrvr_spritectrl_w(machine,8,data); }
+static WRITE8_DEVICE_HANDLER( p2a_w ) { taxidrvr_spritectrl_w(device->machine,0,data); }
+static WRITE8_DEVICE_HANDLER( p2b_w ) { taxidrvr_spritectrl_w(device->machine,1,data); }
+static WRITE8_DEVICE_HANDLER( p2c_w ) { taxidrvr_spritectrl_w(device->machine,2,data); }
+static WRITE8_DEVICE_HANDLER( p3a_w ) { taxidrvr_spritectrl_w(device->machine,3,data); }
+static WRITE8_DEVICE_HANDLER( p3b_w ) { taxidrvr_spritectrl_w(device->machine,4,data); }
+static WRITE8_DEVICE_HANDLER( p3c_w ) { taxidrvr_spritectrl_w(device->machine,5,data); }
+static WRITE8_DEVICE_HANDLER( p4a_w ) { taxidrvr_spritectrl_w(device->machine,6,data); }
+static WRITE8_DEVICE_HANDLER( p4b_w ) { taxidrvr_spritectrl_w(device->machine,7,data); }
+static WRITE8_DEVICE_HANDLER( p4c_w ) { taxidrvr_spritectrl_w(device->machine,8,data); }
 
 
 
 
 static int s1,s2,s3,s4,latchA,latchB;
 
-static READ8_HANDLER( p0a_r )
+static READ8_DEVICE_HANDLER( p0a_r )
 {
 	return latchA;
 }
 
-static READ8_HANDLER( p0c_r )
+static READ8_DEVICE_HANDLER( p0c_r )
 {
 	return (s1 << 7);
 }
 
-static WRITE8_HANDLER( p0b_w )
+static WRITE8_DEVICE_HANDLER( p0b_w )
 {
 	latchB = data;
 }
 
-static WRITE8_HANDLER( p0c_w )
+static WRITE8_DEVICE_HANDLER( p0c_w )
 {
 	s2 = data & 1;
 
@@ -54,22 +54,22 @@ static WRITE8_HANDLER( p0c_w )
 //  popmessage("%02x",data&0x0f);
 }
 
-static READ8_HANDLER( p1b_r )
+static READ8_DEVICE_HANDLER( p1b_r )
 {
 	return latchB;
 }
 
-static READ8_HANDLER( p1c_r )
+static READ8_DEVICE_HANDLER( p1c_r )
 {
-	return (s2 << 7) | (s4 << 6) | ((input_port_read(machine, "SERVCOIN") & 1) << 4);
+	return (s2 << 7) | (s4 << 6) | ((input_port_read(device->machine, "SERVCOIN") & 1) << 4);
 }
 
-static WRITE8_HANDLER( p1a_w )
+static WRITE8_DEVICE_HANDLER( p1a_w )
 {
 	latchA = data;
 }
 
-static WRITE8_HANDLER( p1c_w )
+static WRITE8_DEVICE_HANDLER( p1c_w )
 {
 	s1 = data & 1;
 	s3 = (data & 2) >> 1;
@@ -376,20 +376,11 @@ static MACHINE_DRIVER_START( taxidrvr )
 	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[1] )
-
-	MDRV_DEVICE_ADD( "ppi8255_2", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[2] )
-
-	MDRV_DEVICE_ADD( "ppi8255_3", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[3] )
-
-	MDRV_DEVICE_ADD( "ppi8255_4", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf[4] )
+	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_2", ppi8255_intf[2] )
+	MDRV_PPI8255_ADD( "ppi8255_3", ppi8255_intf[3] )
+	MDRV_PPI8255_ADD( "ppi8255_4", ppi8255_intf[4] )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

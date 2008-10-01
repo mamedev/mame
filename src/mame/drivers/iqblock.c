@@ -92,7 +92,7 @@ static READ8_HANDLER( extrarom_r )
 }
 
 
-static WRITE8_HANDLER( port_C_w )
+static WRITE8_DEVICE_HANDLER( port_C_w )
 {
 	/* bit 4 unknown; it is pulsed at the end of every NMI */
 
@@ -107,9 +107,9 @@ static WRITE8_HANDLER( port_C_w )
 
 static const ppi8255_interface ppi8255_intf =
 {
-	input_port_0_r,			/* Port A read */
-	input_port_1_r,			/* Port B read */
-	input_port_2_r,			/* Port C read */
+	DEVICE8_PORT("P1"),		/* Port A read */
+	DEVICE8_PORT("P2"),		/* Port B read */
+	DEVICE8_PORT("EXTRA"),	/* Port C read */
 	NULL,					/* Port A write */
 	NULL,					/* Port B write */
 	port_C_w				/* Port C write */
@@ -276,8 +276,7 @@ static MACHINE_DRIVER_START( iqblock )
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(iqblock_interrupt,16)
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf )
+	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -308,8 +307,7 @@ static MACHINE_DRIVER_START( cabaret )
 	MDRV_CPU_IO_MAP(main_portmap,0)
 	MDRV_CPU_VBLANK_INT_HACK(iqblock_interrupt,16)
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf )
+	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

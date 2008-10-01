@@ -592,7 +592,7 @@ static INPUT_PORTS_START( darkplnt )
 	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
-	PORT_BIT( 0xfc, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)	/* scrambled dial */
+	PORT_BIT( 0xfc, 0x00, IPT_SPECIAL ) PORT_CUSTOM(darkplnt_custom_r, "DIAL")	/* scrambled dial */
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
@@ -608,6 +608,9 @@ static INPUT_PORTS_START( darkplnt )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("DIAL")
+	PORT_BIT( 0xfc, 0x00, IPT_DIAL ) PORT_SENSITIVITY(25) PORT_KEYDELTA(10)	/* scrambled dial */
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( tazmania )
@@ -1091,11 +1094,8 @@ static MACHINE_DRIVER_START( type1 )
 
 	MDRV_MACHINE_RESET(scramble)
 
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( scramble_ppi_ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( scramble_ppi_ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", scramble_ppi_0_intf )
+	MDRV_PPI8255_ADD( "ppi8255_1", scramble_ppi_1_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -1183,11 +1183,7 @@ static MACHINE_DRIVER_START( stratgyx )
 	MDRV_IMPORT_FROM(type2)
 
 	/* device config overrides */
-	MDRV_DEVICE_MODIFY( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( stratgyx_ppi8255_intf[0] )
-
-	MDRV_DEVICE_MODIFY( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( stratgyx_ppi8255_intf[1] )
+	MDRV_PPI8255_RECONFIG( "ppi8255_1", stratgyx_ppi_1_intf )
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+64+2+8)	/* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
@@ -1201,13 +1197,6 @@ static MACHINE_DRIVER_START( darkplnt )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(type2)
-
-	/* device config overrides */
-	MDRV_DEVICE_MODIFY( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( darkplnt_ppi8255_intf[0] )
-
-	MDRV_DEVICE_MODIFY( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( darkplnt_ppi8255_intf[1] )
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+64+2) /* 32 for characters, 64 (buffer) for stars, 2 for bullets */
@@ -1230,11 +1219,8 @@ static MACHINE_DRIVER_START( hustler )
 	MDRV_MACHINE_RESET(scramble)
 
 	/* device config overrides */
-	MDRV_DEVICE_ADD( "ppi8255_0", PPI8255 )
-	MDRV_DEVICE_CONFIG( scramble_ppi_ppi8255_intf[0] )
-
-	MDRV_DEVICE_ADD( "ppi8255_1", PPI8255 )
-	MDRV_DEVICE_CONFIG( scramble_ppi_ppi8255_intf[1] )
+	MDRV_PPI8255_ADD( "ppi8255_0", scramble_ppi_0_intf )
+	MDRV_PPI8255_ADD( "ppi8255_1", scramble_ppi_1_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

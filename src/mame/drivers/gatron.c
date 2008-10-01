@@ -297,7 +297,7 @@ static WRITE8_HANDLER( output_port_0_w )
 }
 
 
-static WRITE8_HANDLER( output_port_1_w )
+static WRITE8_DEVICE_HANDLER( output_port_1_w )
 {
 /*  ----------------
     Lamps & Counters
@@ -323,8 +323,8 @@ static WRITE8_HANDLER( output_port_1_w )
 
 static const ppi8255_interface ppi8255_intf =
 {
-	input_port_0_r,		/* Port A read */
-	input_port_1_r,		/* Port B read */
+	DEVICE8_PORT("IN0"),/* Port A read */
+	DEVICE8_PORT("IN1"),/* Port B read */
 	NULL,				/* Port C read */
 	NULL,				/* Port A write */
 	NULL,				/* Port B write */
@@ -441,8 +441,7 @@ static MACHINE_DRIVER_START( gat )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_DEVICE_ADD( "ppi8255", PPI8255 )
-	MDRV_DEVICE_CONFIG( ppi8255_intf )
+	MDRV_PPI8255_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
