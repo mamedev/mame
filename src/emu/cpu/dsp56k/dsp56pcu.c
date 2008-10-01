@@ -18,7 +18,48 @@ static void LF_bit_set(UINT8 value)
 	SR &= ~(0x8000);
 	SR |=  (value << 15);
 }
-//static UINT8 I_bits_set(void) {    }
+static void FV_bit_set(UINT8 value)
+{
+	value = value & 0x01;
+	SR &= ~(0x4000);
+	SR |=  (value << 14);
+}
+static void S_bits_set(UINT8 value)
+{
+	value = value & 0x03;
+	SR &= ~(0x0c00);
+	SR |=  (value << 10);
+}
+static void I_bits_set(UINT8 value)
+{
+	value = value & 0x03;
+	SR &= ~(0x0300);
+	SR |=  (value << 8);
+}
+static void S_bit_set(UINT8 value)
+{
+	value = value & 0x01;
+	SR &= ~(0x0080);
+	SR |=  (value << 7);
+}
+static void L_bit_set(UINT8 value)
+{
+	value = value & 0x01;
+	SR &= ~(0x0040);
+	SR |=  (value << 6);
+}
+static void E_bit_set(UINT8 value)
+{
+	value = value & 0x01;
+	SR &= ~(0x0020);
+	SR |=  (value << 5);
+}
+static void U_bit_set(UINT8 value)
+{
+	value = value & 0x01;
+	SR &= ~(0x0010);
+	SR |=  (value << 4);
+}
 static void N_bit_set(UINT8 value)
 {
 	value = value & 0x01;
@@ -49,9 +90,13 @@ static void C_bit_set(UINT8 value)
 static UINT8 MB_bit(void) { return ((OMR & 0x0002) != 0); } // #define mbBIT ((OMR & 0x0002) != 0)
 static UINT8 MA_bit(void) { return ((OMR & 0x0001) != 0); } // #define maBIT ((OMR & 0x0001) != 0)
 
-static void MC_bit_set(UINT8 value) { if (value) (OMR |= 0x0004); else (OMR &= (~0x0004)); } //#define mcBIT_CLEAR() (OMR &= (~0x0004)) //#define mcBIT_SET() (OMR |= 0x0004)
-static void MB_bit_set(UINT8 value) { if (value) (OMR |= 0x0002); else (OMR &= (~0x0002)); } //#define mbBIT_CLEAR() (OMR &= (~0x0002)) //#define mbBIT_SET() (OMR |= 0x0002)
-static void MA_bit_set(UINT8 value) { if (value) (OMR |= 0x0001); else (OMR &= (~0x0001)); } //#define maBIT_CLEAR() (OMR &= (~0x0001)) //#define maBIT_SET() (OMR |= 0x0001)
+static void CD_bit_set(UINT8 value) { if (value) (OMR |= 0x0080); else (OMR &= (~0x0080)); }
+static void SD_bit_set(UINT8 value) { if (value) (OMR |= 0x0040); else (OMR &= (~0x0040)); }
+static void R_bit_set(UINT8 value)  { if (value) (OMR |= 0x0020); else (OMR &= (~0x0020)); }
+static void SA_bit_set(UINT8 value) { if (value) (OMR |= 0x0010); else (OMR &= (~0x0010)); }
+static void MC_bit_set(UINT8 value) { if (value) (OMR |= 0x0004); else (OMR &= (~0x0004)); }
+static void MB_bit_set(UINT8 value) { if (value) (OMR |= 0x0002); else (OMR &= (~0x0002)); }
+static void MA_bit_set(UINT8 value) { if (value) (OMR |= 0x0001); else (OMR &= (~0x0001)); }
 
 
 /* Stack Pointer */
@@ -164,6 +209,32 @@ static void pcu_reset(void)
 	// Set registers properly
 	// 1-17 Clear Interrupt Priority Register (IPR)
 	IPR = 0x0000;
+
+	// FM.5-4
+//	I_bits_set(0x03); This is what the manual says, but i'm dubious!  Polygonet's HI interrupt wouldn't happen with the I bits set.
+	I_bits_set(0x00);
+	S_bits_set(0);
+	L_bit_set(0);
+	S_bit_set(0);
+	FV_bit_set(0);
+
+	// FM.7-25
+	E_bit_set(0);
+	U_bit_set(0);
+	N_bit_set(0);
+	V_bit_set(0);
+	Z_bit_set(0);
+
+	// FM.5-4+
+	C_bit_set(0);
+	LF_bit_set(0);
+	SP = 0x0000;
+
+	// FM.5-14 (OMR)
+	SA_bit_set(0);
+	R_bit_set(0);
+	SD_bit_set(0);
+	CD_bit_set(0);
 
 	// Clear out the pending interrupt list
 	dsp56k_clear_pending_interrupts();

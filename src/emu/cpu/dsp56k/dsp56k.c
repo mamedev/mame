@@ -125,6 +125,9 @@ typedef struct
 	// Used in loop processing
 	UINT16 temp;
 
+	// FM.4-5 - hmmm?
+	// UINT8 status;
+
 	// Basics
 } dsp56k_agu;
 
@@ -398,6 +401,36 @@ static void dsp56k_init(int index, int clock, const void *_config, int (*irqcall
 	//core.irq_callback = irqcallback;
 }
 
+static void agu_reset(void)
+{
+	// FM.4-3
+	R0 = 0x0000;
+	R1 = 0x0000;
+	R2 = 0x0000;
+	R3 = 0x0000;
+
+	N0 = 0x0000;
+	N1 = 0x0000;
+	N2 = 0x0000;
+	N3 = 0x0000;
+
+	M0 = 0xffff;
+	M1 = 0xffff;
+	M2 = 0xffff;
+	M3 = 0xffff;
+
+	TEMP = 0x0000;
+}
+
+static void alu_reset(void)
+{
+	X = 0x00000000;
+	Y = 0x00000000;
+	A = 0x0000000000;
+	B = 0x0000000000;
+}
+
+
 static void dsp56k_reset(void)
 {
 	logerror("Dsp56k reset\n");
@@ -410,8 +443,8 @@ static void dsp56k_reset(void)
 
 	pcu_reset();
 	mem_reset();
-	//agu_reset();
-	//alu_reset();
+	agu_reset();
+	alu_reset();
 
 	/* HACK - Put a jump to 0x0000 at 0x0000 - this keeps the CPU put in MAME */
 	program_write_word_16le(0x0000, 0x0124);

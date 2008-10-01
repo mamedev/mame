@@ -9,15 +9,15 @@ static void IPR_set(UINT16 value)
 	IPR = value;
 }
 
-static INT8 irqa_ipl(void)  { return ((IPR & 0x0003) >> 0) - 1; }
-static UINT8 irqa_trigger(void) { return (IPR & 0x0004) >> 2; }
-static INT8 irqb_ipl(void)  { return ((IPR & 0x0018) >> 3) - 1; }
-static UINT8 irqb_trigger(void) { return (IPR & 0x0002) >> 5; }
-static INT8 codec_ipl(void) { return ((IPR & 0x00c0) >> 6) - 1;  }
-static INT8 host_ipl(void)  { return ((IPR & 0x0300) >> 8) - 1;  }
-static INT8 ssi0_ipl(void)  { return ((IPR & 0x0c00) >> 10) - 1; }
-static INT8 ssi1_ipl(void)  { return ((IPR & 0x3000) >> 12) - 1; }
-static INT8 tm_ipl(void)    { return ((IPR & 0xc000) >> 14) - 1; }
+static INT8  irqa_ipl(void)		{ return ((IPR & 0x0003) >> 0) - 1;  }
+static UINT8 irqa_trigger(void)	{ return  (IPR & 0x0004) >> 2;       }
+static INT8  irqb_ipl(void)		{ return ((IPR & 0x0018) >> 3) - 1;  }
+static UINT8 irqb_trigger(void)	{ return  (IPR & 0x0002) >> 5;       }
+static INT8  codec_ipl(void)	{ return ((IPR & 0x00c0) >> 6) - 1;  }
+static INT8  host_ipl(void)		{ return ((IPR & 0x0300) >> 8) - 1;  }
+static INT8  ssi0_ipl(void)		{ return ((IPR & 0x0c00) >> 10) - 1; }
+static INT8  ssi1_ipl(void)		{ return ((IPR & 0x3000) >> 12) - 1; }
+static INT8  tm_ipl(void)		{ return ((IPR & 0xc000) >> 14) - 1; }
 
 static void mem_reset(void)
 {
@@ -795,8 +795,8 @@ static void dsp56k_host_interface_host_to_HTX(void)
 /* BCR */
 static void BCR_set(UINT16 value)
 {
-	RH_bit_set((value & 0x0001) >> 15);
-	BS_bit_set((value & 0x0001) >> 14);
+	RH_bit_set((value & 0x8000) >> 15);
+	BS_bit_set((value & 0x4000) >> 14);
 	external_x_wait_states_set((value & 0x03e0) >> 5);
 	external_p_wait_states_set((value & 0x001f) >> 0);
 }
@@ -923,7 +923,7 @@ static void PCD_set(UINT16 value)
 
 static void dsp56k_io_reset(void)
 {
-	/* The BCR */
+	/* The BCR = 0x43ff */
 	RH_bit_set(0);
 	BS_bit_set(1);
 	external_x_wait_states_set(0x1f);

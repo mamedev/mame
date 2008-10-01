@@ -76,10 +76,12 @@ static void pcu_reset(void);
 #define ST15	(SS[15].d)
 
 /* 1-25 STATUS REGISTER (SR) BITS */
+/* MR */
 static UINT8 LF_bit(void);
 static UINT8 FV_bit(void);
 //static UINT8 S_bits(void); #define s1BIT ((SR & 0x0800) != 0) #define s0BIT ((SR & 0x0400) != 0)
 static UINT8 I_bits(void);
+/* CCR */
 static UINT8 S_bit(void);
 static UINT8 L_bit(void);
 static UINT8 E_bit(void);
@@ -89,14 +91,16 @@ static UINT8 Z_bit(void);
 static UINT8 V_bit(void);
 static UINT8 C_bit(void);
 
+/* MR */
 static void LF_bit_set(UINT8 value);
-//static void FV_bit_set(UINT8 value); #define fvBIT_CLEAR() (SR &= (~0x4000))
-//static void S_bits_set(UINT8 value); #define s1BIT_CLEAR() (SR &= (~0x0800)) #define s0BIT_CLEAR() (SR &= (~0x0400))
-//static void I_bits_set(UINT8 value);
-//static void S_bit_set(UINT8 value); #define sBIT_CLEAR()  (SR &= (~0x0080))
-//static void L_bit_set(UINT8 value); #define lBIT_CLEAR()  (SR &= (~0x0040))
-//static void E_bit_set(UINT8 value); #define eBIT_CLEAR()  (SR &= (~0x0020))
-//static void U_bit_set(UINT8 value); #define uBIT_CLEAR()  (SR &= (~0x0010))
+static void FV_bit_set(UINT8 value);
+static void S_bits_set(UINT8 value);
+static void I_bits_set(UINT8 value);
+/* CCR */
+static void S_bit_set(UINT8 value);
+static void L_bit_set(UINT8 value);
+static void E_bit_set(UINT8 value);
+static void U_bit_set(UINT8 value);
 static void N_bit_set(UINT8 value);
 static void Z_bit_set(UINT8 value);
 static void V_bit_set(UINT8 value);
@@ -113,10 +117,10 @@ static void C_bit_set(UINT8 value);
 static UINT8 MB_bit(void);
 static UINT8 MA_bit(void);
 
-//static UINT8 CD_bit_set(UINT8 value); #define cdBIT_CLEAR() (OMR &= (~0x0080))
-//static UINT8 SD_bit_set(UINT8 value); #define sdBIT_CLEAR() (OMR &= (~0x0040))
-//static UINT8 R_bit_set(UINT8 value);  #define rBIT_CLEAR()  (OMR &= (~0x0020))
-//static UINT8 SA_bit_set(UINT8 value); #define saBIT_CLEAR() (OMR &= (~0x0010))
+static void CD_bit_set(UINT8 value);
+static void SD_bit_set(UINT8 value);
+static void R_bit_set(UINT8 value);
+static void SA_bit_set(UINT8 value);
 static void MC_bit_set(UINT8 value);
 static void MB_bit_set(UINT8 value);
 static void MA_bit_set(UINT8 value);
@@ -380,3 +384,4 @@ static void PCDDR_set(UINT16 value);
 
 /* Port C Dtaa Register (PCD) */
 static void PCD_set(UINT16 value);
+
