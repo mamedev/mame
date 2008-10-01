@@ -283,6 +283,58 @@ void cpunum_set_input_line_vector(int cpunum, int line, int vector)
 
 void cpunum_set_input_line_and_vector(running_machine *machine, int cpunum, int line, int state, int vector)
 {
+#ifdef MAME_DEBUG
+	/* catch errors where people use PULSE_LINE for CPUs that don't support it */
+	if (state == PULSE_LINE && line != INPUT_LINE_NMI && line != INPUT_LINE_RESET)
+	{
+		switch (machine->config->cpu[cpunum].type)
+		{
+			case CPU_Z80:
+			case CPU_Z180:
+			case CPU_M68000:
+			case CPU_M68008:
+			case CPU_M68010:
+			case CPU_M68EC020:
+			case CPU_M68020:
+			case CPU_M68040:
+			case CPU_R4600BE:
+			case CPU_R4600LE:
+			case CPU_R4650BE:
+			case CPU_R4650LE:
+			case CPU_R4700BE:
+			case CPU_R4700LE:
+			case CPU_R5000BE:
+			case CPU_R5000LE:
+			case CPU_QED5271BE:
+			case CPU_QED5271LE:
+			case CPU_RM7000BE:
+			case CPU_RM7000LE:
+			case CPU_PPC403GA:
+			case CPU_PPC403GCX:
+			case CPU_PPC601:
+			case CPU_PPC602:
+			case CPU_PPC603:
+			case CPU_PPC603E:
+			case CPU_PPC603R:
+			case CPU_PPC604:
+			case CPU_I8035:
+			case CPU_I8041:
+			case CPU_I8048:
+			case CPU_I8648:
+			case CPU_I8748:
+			case CPU_MB8884:
+			case CPU_N7751:
+			case CPU_TMS34010:
+			case CPU_TMS34020:
+			case CPU_TMS32010:
+			case CPU_TMS32025:
+			case CPU_TMS32026:
+				fatalerror("CPU %s: PULSE_LINE used with level-detected IRQ %d\n", machine->config->cpu[cpunum].tag, line);
+				break;
+		}
+	}
+#endif
+
 	if (line >= 0 && line < MAX_INPUT_LINES)
 	{
 		INT32 input_event = (state & 0xff) | (vector << 8);
