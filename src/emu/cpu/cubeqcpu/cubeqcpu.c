@@ -1520,12 +1520,12 @@ static int cquestlin_execute(int cycles)
 					vflag = (((r & 0x7ff) + (s & 0x7ff) + ci) >> 11) ^ cflag;
 					break;
 				case SUBR:
-					res = ~r + s + ci;
+					res = (r ^ 0x0FFF) + s + ci;
 					cflag = (res >> 12) & 1;
 					vflag = (((s & 0x7ff) + (~r & 0x7ff) + ci) >> 11) ^ cflag;
 					break;
 				case SUBS:
-					res = r + ~s + ci;
+					res = r + (s ^ 0x0FFF) + ci;
 					cflag = (res >> 12) & 1;
 					vflag = (((r & 0x7ff) + (~s & 0x7ff) + ci) >> 11) ^ cflag;
 					break;
