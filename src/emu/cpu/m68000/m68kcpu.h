@@ -333,7 +333,6 @@
 #define FLAG_INT_MASK    m68ki_cpu.int_mask
 
 #define CPU_INT_LEVEL    m68ki_cpu.int_level /* ASG: changed from CPU_INTS_PENDING */
-#define CPU_INT_CYCLES   m68ki_cpu.int_cycles /* ASG */
 #define CPU_STOPPED      m68ki_cpu.stopped
 #define CPU_PREF_ADDR    m68ki_cpu.pref_addr
 #define CPU_PREF_DATA    m68ki_cpu.pref_data
@@ -562,7 +561,6 @@
 			if(CPU_STOPPED) \
 			{ \
 				SET_CYCLES(0); \
-				CPU_INT_CYCLES = 0; \
 				return m68ki_initial_cycles; \
 			} \
 		}
@@ -877,7 +875,6 @@ struct _m68ki_cpu_core
 	uint c_flag;       /* Carry */
 	uint int_mask;     /* I0-I2 */
 	uint int_level;    /* State of interrupt pins IPL0-IPL2 -- ASG: changed from ints_pending */
-	uint int_cycles;   /* ASG: extra cycles from generated interrupts */
 	uint stopped;      /* Stopped state */
 	uint pref_addr;    /* Last prefetch address */
 	uint pref_data;    /* Data in the prefetch queue */
@@ -2027,7 +2024,7 @@ void m68ki_exception_interrupt(uint int_level)
 	m68ki_jump(new_pc);
 
 	/* Defer cycle counting until later */
-	CPU_INT_CYCLES += CYC_EXCEPTION[vector];
+	USE_CYCLES(CYC_EXCEPTION[vector]);
 
 #if !M68K_EMULATE_INT_ACK
 	/* Automatically clear IRQ if we are not using an acknowledge scheme */

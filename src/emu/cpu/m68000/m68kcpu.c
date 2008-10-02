@@ -783,19 +783,16 @@ void m68k_set_cpu_type(unsigned int cpu_type)
 /* ASG: removed per-instruction interrupt checks */
 int m68k_execute(int num_cycles)
 {
+	/* Set our pool of clock cycles available */
+	SET_CYCLES(num_cycles);
+	m68ki_initial_cycles = num_cycles;
+
+	/* See if interrupts came in */
+	m68ki_check_interrupts();
+	
 	/* Make sure we're not stopped */
 	if(!CPU_STOPPED)
 	{
-		/* Set our pool of clock cycles available */
-		SET_CYCLES(num_cycles);
-		m68ki_initial_cycles = num_cycles;
-
-		m68ki_check_interrupts();
-
-		/* ASG: update cycles */
-		USE_CYCLES(CPU_INT_CYCLES);
-		CPU_INT_CYCLES = 0;
-
 		/* Return point if we had an address error */
 		m68ki_set_address_error_trap(); /* auto-disable (see m68kcpu.h) */
 
@@ -825,20 +822,12 @@ int m68k_execute(int num_cycles)
 
 		/* set previous PC to current PC for the next entry into the loop */
 		REG_PPC = REG_PC;
-
-		/* ASG: update cycles */
-		USE_CYCLES(CPU_INT_CYCLES);
-		CPU_INT_CYCLES = 0;
-
-		/* return how many clocks we used */
-		return m68ki_initial_cycles - GET_CYCLES();
 	}
+	else
+		SET_CYCLES(0);
 
-	/* We get here if the CPU is stopped or halted */
-	SET_CYCLES(0);
-	CPU_INT_CYCLES = 0;
-
-	return num_cycles;
+	/* return how many clocks we used */
+	return m68ki_initial_cycles - GET_CYCLES();
 }
 
 
@@ -1034,7 +1023,6 @@ void m68k_state_register(const char *type, int index)
 	state_save_register_item(type, index, REG_CAAR);
 	state_save_register_item(type, index, m68k_substate.sr);
 	state_save_register_item(type, index, CPU_INT_LEVEL);
-	state_save_register_item(type, index, CPU_INT_CYCLES);
 	state_save_register_item(type, index, m68k_substate.stopped);
 	state_save_register_item(type, index, m68k_substate.halted);
 	state_save_register_item(type, index, CPU_PREF_ADDR);
