@@ -359,19 +359,25 @@ extern DRIVER_INIT( snes_hirom );
 extern MACHINE_START( snes );
 extern MACHINE_RESET( snes );
 
+extern READ8_HANDLER( snes_r_io );
+extern WRITE8_HANDLER( snes_w_io );
+
 extern READ8_HANDLER( snes_r_bank1 );
 extern READ8_HANDLER( snes_r_bank2 );
 extern READ8_HANDLER( snes_r_bank3 );
 extern READ8_HANDLER( snes_r_bank4 );
+extern READ8_HANDLER( snes_r_bank5 );
 extern READ8_HANDLER( snes_r_bank6 );
-extern READ8_HANDLER( snes_r_io );
-extern READ8_HANDLER( snes_r_sram );
+extern READ8_HANDLER( snes_r_bank7 );
 extern WRITE8_HANDLER( snes_w_bank1 );
 extern WRITE8_HANDLER( snes_w_bank2 );
+extern WRITE8_HANDLER( snes_w_bank3 );
 extern WRITE8_HANDLER( snes_w_bank4 );
+extern WRITE8_HANDLER( snes_w_bank5 );
 extern WRITE8_HANDLER( snes_w_bank6 );
-extern WRITE8_HANDLER( snes_w_io );
-extern WRITE8_HANDLER( snes_w_sram );
+extern WRITE8_HANDLER( snes_w_bank7 );
+
+
 
 extern void snes_gdma( UINT8 channels );
 extern void snes_hdma_init(void);
