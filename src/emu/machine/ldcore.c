@@ -890,7 +890,7 @@ static void read_track_data(laserdisc_state *ld)
 	ldcore_data *ldcore = ld->core;
 	UINT32 tracknum = ldcore->curtrack;
 	UINT32 fieldnum = ldcore->fieldnum;
-	vbi_metadata vbidata;
+	vbi_metadata vbidata = { 0 };
 	frame_data *frame;
 	UINT32 vbiframe;
 	UINT32 readhunk;
