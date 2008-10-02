@@ -233,7 +233,7 @@ static int read_chd(void *file, int frame, bitmap_t *bitmap, INT16 *lsound, INT1
 	*samples = 0;
 	for (fieldnum = 0; fieldnum < interlace_factor; fieldnum++)
 	{
-		/* make a fake bitmap for this field */		
+		/* make a fake bitmap for this field */
 		fakebitmap = *bitmap;
 		fakebitmap.base = BITMAP_ADDR16(&fakebitmap, fieldnum, 0);
 		fakebitmap.rowpixels *= interlace_factor;
@@ -253,7 +253,7 @@ static int read_chd(void *file, int frame, bitmap_t *bitmap, INT16 *lsound, INT1
 		chderr = chd_read(file, frame * interlace_factor + fieldnum, NULL);
 		if (chderr != CHDERR_NONE)
 			return FALSE;
-		
+
 		/* account for samples read */
 		*samples += numsamples;
 	}
@@ -377,7 +377,7 @@ static void verify_video(int frame, bitmap_t *bitmap)
 
 			/* remember the frame number */
 			video_last_frame = framenum;
-			
+
 			/* if we've seen a white flag before, but it's not here, warn */
 			if (video_first_whitefield != -1 && !metadata.white)
    				printf("%6d.%d: detected frame number but no white flag (WARNING)\n", frame, fieldnum);
@@ -392,12 +392,12 @@ static void verify_video(int frame, bitmap_t *bitmap)
     			video_first_whitefield = field;
     			printf("%6d.%d: first white flag seen\n", frame, fieldnum);
     		}
-			
+
 			/* if we've seen frame numbers before, but not here, warn */
 			if (video_last_frame != -1 && (metadata.line1718 & VBI_MASK_CAV_PICTURE) != VBI_CODE_CAV_PICTURE)
    				printf("%6d.%d: detected white flag but no frame number (WARNING)\n", frame, fieldnum);
     	}
-    	
+
     	/* if this is the start of a frame, handle cadence */
     	if (metadata.white || (metadata.line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
     	{

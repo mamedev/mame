@@ -331,7 +331,7 @@ void cpunum_set_input_line_and_vector(running_machine *machine, int cpunum, int 
 			case CPU_TMS32026:
 				fatalerror("CPU %s: PULSE_LINE used with level-detected IRQ %d\n", machine->config->cpu[cpunum].tag, line);
 				break;
-			
+
 			default:
 				break;
 		}

@@ -1520,7 +1520,7 @@ static void init_video(const device_config *device)
 	ldcore->videotex = render_texture_alloc(NULL, NULL);
 	if (ldcore->videotex == NULL)
 		fatalerror("Out of memory allocating video texture");
-	
+
 	/* allocate palette for applying brightness/contrast/gamma */
 	ldcore->videopalette = palette_alloc(256, 1);
 	if (ldcore->videopalette == NULL)

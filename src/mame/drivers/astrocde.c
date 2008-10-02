@@ -1461,7 +1461,7 @@ static MACHINE_DRIVER_START( tenpindx )
 	MDRV_CPU_CONFIG(tenpin_daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(tenpin_sub_map,0)
 	MDRV_CPU_IO_MAP(tenpin_sub_io_map,0)
-	
+
 	MDRV_Z80CTC_ADD("ctc", ctc_intf)
 
 	/* sound hardware */

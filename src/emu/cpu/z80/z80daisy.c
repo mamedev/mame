@@ -25,7 +25,7 @@ z80_daisy_state *z80daisy_init(running_machine *machine, const z80_daisy_chain *
 	z80_daisy_state *head = NULL;
 	z80_daisy_state **tailptr = &head;
 
-	/* create a linked list of devices */	
+	/* create a linked list of devices */
 	for ( ; daisy->devtype != NULL; daisy++)
 	{
 		*tailptr = auto_malloc(sizeof(**tailptr));
@@ -36,7 +36,7 @@ z80_daisy_state *z80daisy_init(running_machine *machine, const z80_daisy_chain *
 		(*tailptr)->irq_reti = (z80_daisy_irq_reti)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_IRQ_RETI);
 		tailptr = &(*tailptr)->next;
 	}
-	
+
 	return head;
 }
 

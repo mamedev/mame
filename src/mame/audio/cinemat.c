@@ -1559,7 +1559,7 @@ MACHINE_DRIVER_START( demon_sound )
 	MDRV_CPU_CONFIG(daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(demon_sound_map,0)
 	MDRV_CPU_IO_MAP(demon_sound_ports,0)
-	
+
 	MDRV_Z80CTC_ADD("ctc", demon_z80ctc_interface)
 
 	MDRV_MACHINE_RESET(demon_sound)

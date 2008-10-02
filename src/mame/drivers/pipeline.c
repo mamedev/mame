@@ -378,7 +378,7 @@ static MACHINE_DRIVER_START( pipeline )
 
 	MDRV_CPU_ADD("mcu", M68705, 7372800/2)
 	MDRV_CPU_PROGRAM_MAP(mcu_mem, 0)
-	
+
 	MDRV_Z80CTC_ADD( "ctc", ctc_intf )
 
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )

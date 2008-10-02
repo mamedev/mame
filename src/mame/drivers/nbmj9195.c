@@ -3656,7 +3656,7 @@ static MACHINE_DRIVER_START( NBMJDRV1 )
 	MDRV_CPU_CONFIG(daisy_chain_sound)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem, sound_writemem)
 	MDRV_CPU_IO_MAP(sound_readport, sound_writeport)
-	
+
 	MDRV_Z80CTC_ADD("main_ctc", ctc_intf_main)
 	MDRV_Z80CTC_ADD("audio_ctc", ctc_intf_audio)
 

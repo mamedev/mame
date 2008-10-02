@@ -1718,7 +1718,7 @@ static avi_error chunk_write(avi_file *file, UINT32 type, const void *data, UINT
 	avi_error avierr;
 	UINT32 idxreserve;
 	UINT32 written;
-	
+
 	/* if we are the first RIFF, we must reserve enough space for the IDX chunk */
 	idxreserve = 0;
 	if (file->riffbase == 0 && type != CHUNKTYPE_IDX1)

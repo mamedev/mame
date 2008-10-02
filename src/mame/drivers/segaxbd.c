@@ -92,7 +92,7 @@ static void update_main_irqs(running_machine *machine)
 		irq |= 2;
 	else
 		cpunum_set_input_line(machine, 0, 2, CLEAR_LINE);
-	
+
 	if (vblank_irq_state)
 		irq |= 4;
 	else

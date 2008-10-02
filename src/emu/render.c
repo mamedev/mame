@@ -2478,7 +2478,7 @@ void render_texture_free(render_texture *texture)
 	/* release palette references */
 	if (texture->palette != NULL)
 		palette_deref(texture->palette);
-	
+
 	/* free any B/C/G lookup tables */
 	if (texture->bcglookup != NULL)
 		free(texture->bcglookup);
@@ -2500,7 +2500,7 @@ void render_texture_free(render_texture *texture)
 void render_texture_set_bitmap(render_texture *texture, bitmap_t *bitmap, const rectangle *sbounds, int format, palette_t *palette)
 {
 	int scalenum;
-	
+
 	/* ensure we have a valid palette for palettized modes */
 	if (format == TEXFORMAT_PALETTE16 || format == TEXFORMAT_PALETTEA16)
 		assert(palette != NULL);
@@ -2508,7 +2508,7 @@ void render_texture_set_bitmap(render_texture *texture, bitmap_t *bitmap, const 
 	/* invalidate references to the old bitmap */
 	if (bitmap != texture->bitmap && texture->bitmap != NULL)
 		invalidate_all_render_ref(texture->bitmap);
-	
+
 	/* if the palette is different, adjust references */
 	if (palette != texture->palette)
 	{
@@ -2647,23 +2647,23 @@ static const rgb_t *texture_get_adjusted_palette(render_texture *texture, render
 	const rgb_t *adjusted;
 	int numentries;
 	int index;
-	
+
 	/* override the palette with our adjusted palette */
 	switch (texture->format)
 	{
 		case TEXFORMAT_PALETTE16:
 		case TEXFORMAT_PALETTEA16:
-		
+
 			/* if no adjustment necessary, return the raw palette */
 			assert(texture->palette != NULL);
 			adjusted = palette_entry_list_adjusted(texture->palette);
 			if (container->brightness == 1.0f && container->contrast == 1.0f && container->gamma == 1.0f)
 				return adjusted;
-			
+
 			/* if this is the machine palette, return our precomputed adjusted palette */
 			if (container->palclient != NULL && palette_client_get_palette(container->palclient) == texture->palette)
 				return container->bcglookup;
-			
+
 			/* otherwise, ensure we have memory allocated and compute the adjusted result ourself */
 			numentries = palette_get_num_colors(texture->palette) * palette_get_num_groups(texture->palette);
 			if (texture->bcglookup == NULL || texture->bcglookup_entries < numentries)
@@ -2681,15 +2681,15 @@ static const rgb_t *texture_get_adjusted_palette(render_texture *texture, render
 			return texture->bcglookup;
 
 		case TEXFORMAT_RGB15:
-		
+
 			/* if no adjustment necessary, return NULL */
 			if (container->brightness == 1.0f && container->contrast == 1.0f && container->gamma == 1.0f && texture->palette == NULL)
 				return NULL;
-			
+
 			/* if no palette, return the standard lookups */
 			if (texture->palette == NULL)
 				return container->bcglookup32;
-			
+
 			/* otherwise, ensure we have memory allocated and compute the adjusted result ourself */
 			assert(palette_get_num_colors(texture->palette) == 32);
 			adjusted = palette_entry_list_adjusted(texture->palette);
@@ -2709,19 +2709,19 @@ static const rgb_t *texture_get_adjusted_palette(render_texture *texture, render
 				texture->bcglookup[0x60 + index] = val << 24;
 			}
 			return texture->bcglookup;
-			
+
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
 		case TEXFORMAT_YUY16:
-		
+
 			/* if no adjustment necessary, return NULL */
 			if (container->brightness == 1.0f && container->contrast == 1.0f && container->gamma == 1.0f && texture->palette == NULL)
 				return NULL;
-			
+
 			/* if no palette, return the standard lookups */
 			if (texture->palette == NULL)
 				return container->bcglookup256;
-			
+
 			/* otherwise, ensure we have memory allocated and compute the adjusted result ourself */
 			assert(palette_get_num_colors(texture->palette) == 256);
 			adjusted = palette_entry_list_adjusted(texture->palette);
@@ -2745,7 +2745,7 @@ static const rgb_t *texture_get_adjusted_palette(render_texture *texture, render
 		default:
 			assert(FALSE);
 	}
-	
+
 	return NULL;
 }
 

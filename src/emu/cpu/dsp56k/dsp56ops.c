@@ -8,11 +8,11 @@
 
 // NOTES For register setting:
 // FM.3-4 : When A2 or B2 is read, the register contents occupy the low-order portion
-//			(bits 7-0) of the word; the high-order portion (bits 16-8) is sign-extended. When A2 or B2
-//			is written, the register receives the low-order portion of the word; the high-order portion is not used
-//		  : ...much more!
-//		  : ...shifter/limiter/overflow notes too.
-// 
+//          (bits 7-0) of the word; the high-order portion (bits 16-8) is sign-extended. When A2 or B2
+//          is written, the register receives the low-order portion of the word; the high-order portion is not used
+//        : ...much more!
+//        : ...shifter/limiter/overflow notes too.
+//
 //
 
 // Helper functions and macros

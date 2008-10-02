@@ -532,7 +532,7 @@ static READ8_HANDLER( nflfoot_ip2_r )
 static WRITE8_HANDLER( nflfoot_op4_w )
 {
 	const device_config *sio = devtag_get_device(machine, Z80SIO, "ipu_sio");
-	
+
 	/* bit 7 = J3-7 on IPU board = /RXDA on SIO */
 	logerror("%04X:op4_w(%d%d%d)\n", activecpu_get_pc(), (data >> 7) & 1, (data >> 6) & 1, (data >> 5) & 1);
 

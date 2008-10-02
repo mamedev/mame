@@ -9,9 +9,9 @@
 
   TODO:
   - add flipscreen according to schematics
-  - pitboss: dip switches 
+  - pitboss: dip switches
   - general - add named output notifiers
-  
+
 Notes: it's important that "user1" is 0xa0000 bytes with empty space filled
        with 0xff, because the built-in roms test checks how many question roms
        the games has and the type of each one.
@@ -62,7 +62,7 @@ static MACHINE_START(merit)
 {
 	question_address = 0;
 	ram_palette = auto_malloc(RAM_PALETTE_SIZE);
-	
+
 	state_save_register_global_pointer(ram_palette, RAM_PALETTE_SIZE);
 	state_save_register_global(lscnblk);
 	state_save_register_global(extra_video_bank_bit);
@@ -154,13 +154,13 @@ static READ8_HANDLER( palette_r )
 static WRITE8_HANDLER( palette_w )
 {
 	int co;
-	
+
 	video_screen_update_now(machine->primary_screen);
 	data &= 0x0f;
 
 	co = ((ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);
 	ram_palette[co] = data;
-	
+
 }
 
 
@@ -177,7 +177,7 @@ static MC6845_BEGIN_UPDATE( begin_update )
 		bit2 = BIT(i,2);
 		pens[i] = MAKE_RGB(dim*bit0, dim*bit1, dim*bit2);
 	}
-	
+
 	return pens;
 }
 
@@ -189,12 +189,12 @@ static MC6845_UPDATE_ROW( update_row )
 	pen_t *pens = (pen_t *)param;
 	UINT8 *gfx[2];
 	UINT16 x = 0;
-	int rlen; 
+	int rlen;
 
 	gfx[0] = memory_region(device->machine, "gfx1");
 	gfx[1] = memory_region(device->machine, "gfx2");
 	rlen = memory_region_length(device->machine, "gfx2");
-	
+
 	//ma = ma ^ 0x7ff;
 	for (cx = 0; cx < x_count; cx++)
 	{
@@ -220,7 +220,7 @@ static MC6845_UPDATE_ROW( update_row )
 			}
 			else
 				col |= 0x03;
-			
+
 			col = ram_palette[col & 0x3ff];
 			*BITMAP_ADDR32(bitmap, y, x) = pens[col ? col : (lscnblk ? 8 : 0)];
 
@@ -319,7 +319,7 @@ static ADDRESS_MAP_START( trvwhiz_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4c00, 0x4cff) AM_READWRITE(questions_r, high_offset_w)
 	AM_RANGE(0x5400, 0x54ff) AM_WRITE(low_offset_w)
 	AM_RANGE(0x5800, 0x58ff) AM_WRITE(med_offset_w)
-	AM_RANGE(0x6000, 0x67ff) AM_RAM 
+	AM_RANGE(0x6000, 0x67ff) AM_RAM
 	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
@@ -337,7 +337,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( phrcraze_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM 
+	AM_RANGE(0xa000, 0xbfff) AM_RAM
 	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc00c, 0xc00f) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
@@ -358,7 +358,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tictac_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x9fff) AM_RAM 
+	AM_RANGE(0x8000, 0x9fff) AM_RAM
 	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
@@ -379,7 +379,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( trvwhziv_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xa000, 0xbfff) AM_RAM 
+	AM_RANGE(0xa000, 0xbfff) AM_RAM
 	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
@@ -877,7 +877,7 @@ static const ay8910_interface merit_ay8912_interface =
 
 
 static MACHINE_DRIVER_START( pitboss )
-	MDRV_CPU_ADD("main",Z80, CPU_CLOCK)		
+	MDRV_CPU_ADD("main",Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(pitboss_map,0)
 	MDRV_CPU_IO_MAP(trvwhiz_io_map,0)
 
@@ -886,7 +886,7 @@ static MACHINE_DRIVER_START( pitboss )
 
 	MDRV_MACHINE_START(merit)
 	/* video hardware */
-	
+
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)	/* temporary, CRTC will configure screen */

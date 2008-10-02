@@ -96,7 +96,7 @@ WRITE8_HANDLER( gottlieb_laserdisc_video_control_w )
 	/* bit 3 genlock control (1 = show laserdisc image) */
 	laserdisc_overlay_enable(laserdisc, (data & 0x04) ? TRUE : FALSE);
 	laserdisc_video_enable(laserdisc, ((data & 0x0c) == 0x0c) ? TRUE : FALSE);
-	
+
 	/* configure the palette if the laserdisc is enabled */
 	transparent0 = (data >> 3) & 1;
 	gottlieb_paletteram_w(machine, 0, paletteram[0]);

@@ -60,7 +60,7 @@ static struct
 
 /*************************************
 
-	Timers
+    Timers
 
 *************************************/
 
@@ -278,7 +278,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 
 /*************************************
 
-	Input Handlers
+    Input Handlers
 
 *************************************/
 
@@ -1090,13 +1090,13 @@ WRITE8_HANDLER( snes_w_io )
 
 /*************************************
 
-	Memory Handlers
+    Memory Handlers
 
 *************************************/
 
 /*
 There are at least 4 different kind of boards for SNES carts, which we denote with
-mode_20, mode_21, mode_22 and mode_25. Below is a layout of the memory for each of 
+mode_20, mode_21, mode_22 and mode_25. Below is a layout of the memory for each of
 them, as described on the SNES dev manual. Notice we mirror ROM at loading time
 where necessary (e.g. banks 0x80 to 0xff at address 0x8000 for mode_20).
 
@@ -1105,21 +1105,21 @@ MODE_20
 address               |             |         |          |        |     |      |      |
 0xffff  ------------------------------------------------------------------------------|
              ROM      |     ROM /   |   ROM   |  ROM     |  ROM / |     | 0x00 | 0x40 |
-					  |     DSP     |         |          |  SRAM? |     |  to  |  to  |
+                      |     DSP     |         |          |  SRAM? |     |  to  |  to  |
 0x8000  ----------------------------------------------------------|     | 0x3f | 0x7f |
                    Reserv           |         |          |        |  W  |      |      |
-		                            |         |          |   S    |  R  |  m   |  m   |
+                                    |         |          |   S    |  R  |  m   |  m   |
 0x6000  ----------------------------|         |  DSP /   |   R    |  A  |  i   |  i   |
                      I/O            |  Reserv |          |   A    |  M  |  r   |  r   |
 0x2000  ----------------------------|         |  Reserv  |   M    |     |  r   |  r   |
-			 Low RAM (from 0x7e)    |         |          |        |     |  o   |  o   |
-		                            |         |          |        |     |  r   |  r   |
+             Low RAM (from 0x7e)    |         |          |        |     |  o   |  o   |
+                                    |         |          |        |     |  r   |  r   |
 0x0000  -------------------------------------------------------------------------------
 
 MODE_22 is the same, but banks 0x40 to 0x7e at address 0x000 to 0x7fff contain ROM (of
 course mirrored also at 0xc0 to 0xff). Mode 22 is quite similar to the board SHVC-2P3B
 shown on SNES Dev manual. It is used also in SDD-1 games (only for the first blocks of
-data). DSP data & status can be either at banks 0x20 to 0x40 at address 0x8000 or at 
+data). DSP data & status can be either at banks 0x20 to 0x40 at address 0x8000 or at
 banks 0x60 to 0x6f at address 0x0000.
 
 
@@ -1128,16 +1128,16 @@ MODE_21
 address               |             |         |      |     |         |      |
 0xffff  --------------------------------------------------------------------|
                          mirror               | 0xc0 |     | mirror  |      |
-					  upper half ROM          |  to  |     | up half |      |
-				     from 0xc0 to 0xff        | 0xff |     |   ROM   |      |
+                      upper half ROM          |  to  |     | up half |      |
+                     from 0xc0 to 0xff        | 0xff |     |   ROM   |      |
 0x8000  --------------------------------------|      |     |---------|      |
              DSP /    |    Reserv   |  SRAM   |      |  W  |         |      |
-		    Reserv    |             |         |  m   |  R  |   0x00  |  R   |
+            Reserv    |             |         |  m   |  R  |   0x00  |  R   |
 0x6000  --------------------------------------|  i   |  A  |    to   |  O   |
-						  I/O                 |  r   |  M  |   0x3f  |  M   |
+                          I/O                 |  r   |  M  |   0x3f  |  M   |
 0x2000  --------------------------------------|  r   |     |  mirror |      |
-			       Low RAM (from 0x7e)        |  o   |     |         |      |
-											  |  r   |     |         |      |
+                   Low RAM (from 0x7e)        |  o   |     |         |      |
+                                              |  r   |     |         |      |
 0x0000  ---------------------------------------------------------------------
 
 
@@ -1147,17 +1147,17 @@ the available banks at 0xc0 to 0xff.
      banks 0x00      0x20      0x3e       0x40    0x7e  0x80      0xb0     0xc0    0xff
 address               |         |          |       |     |         |        |       |
 0xffff  ----------------------------------------------------------------------------|
-				 mirror         |   Last   |       |     |       ROM        |       |
-			  upper half ROM    | 0.5Mbits |       |     |      mirror      |       |
-			 from 0x40 to 0x7e  |   ROM    |  ROM  |     |      up half     |  ROM  |
+                 mirror         |   Last   |       |     |       ROM        |       |
+              upper half ROM    | 0.5Mbits |       |     |      mirror      |       |
+             from 0x40 to 0x7e  |   ROM    |  ROM  |     |      up half     |  ROM  |
 0x8000  -----------------------------------|       |     |------------------|       |
              DSP /    |      Reserv        | next  |  W  | Reserv  |  SRAM  | first |
-		    Reserv    |                    |       |  R  |         |        |       |
+            Reserv    |                    |       |  R  |         |        |       |
 0x6000  -----------------------------------|  31   |  A  |------------------|  32   |
-					  I/O                  | Mbits |  M  |        0x00      | Mbits |
+                      I/O                  | Mbits |  M  |        0x00      | Mbits |
 0x2000  -----------------------------------|       |     |         to       |       |
-			    Low RAM (from 0x7e)        |       |     |        0x3f      |       |
-										   |       |     |       mirror     |       |
+                Low RAM (from 0x7e)        |       |     |        0x3f      |       |
+                                           |       |     |       mirror     |       |
 0x0000  -----------------------------------------------------------------------------
 
 
@@ -1373,7 +1373,7 @@ WRITE8_HANDLER( snes_w_bank2 )
 		}
 		else
 			logerror("Attempt to write to reserved address: %X\n", offset + 0x300000);
-	}	
+	}
 	/* some dsp1 games use these banks 0x30 to 0x3f at address 0x8000 */
 	else if ((snes_cart.mode == SNES_MODE_20) && has_dsp1)
 		DSP1_setDr(data);
@@ -1430,7 +1430,7 @@ WRITE8_HANDLER( snes_w_bank6 )
 		{
 			if (offset < 0x300000)
 				snes_w_bank1(machine, offset, data);
-			else 
+			else
 				snes_w_bank2(machine, offset - 0x300000, data);
 		}
 		else	/* Mode 25 has SRAM not mirrored from lower banks */
@@ -1439,7 +1439,7 @@ WRITE8_HANDLER( snes_w_bank6 )
 			{
 				if (offset < 0x300000)
 					snes_w_bank1(machine, offset, data);
-				else 
+				else
 					snes_w_bank2(machine, offset - 0x300000, data);
 			}
 			else if ((offset >= 0x300000) && (snes_cart.sram > 0))
@@ -1449,7 +1449,7 @@ WRITE8_HANDLER( snes_w_bank6 )
 				snes_ram[0xb06000 + (offset & mask)] = data;
 			}
 			else	/* Area in 0x6000-0x8000 && offset < 0x300000 is Reserved! */
-				logerror("Attempt to write to reserved address: %X\n", offset + 0x800000);		
+				logerror("Attempt to write to reserved address: %X\n", offset + 0x800000);
 		}
 	}
 	else
@@ -1483,7 +1483,7 @@ WRITE8_HANDLER( snes_w_bank7 )
 
 /*************************************
 
-	Driver Init
+    Driver Init
 
 *************************************/
 
@@ -1643,21 +1643,21 @@ DRIVER_INIT( snes )
 	total_blocks = (memory_region_length(machine, "user3") / 0x8000);
 	read_blocks = 0;
 
-	/* Loading all the data blocks from cart, we only partially cover banks 0x00 to 0x7f. Therefore, we 
-	 * have to mirror the blocks until we reach the end. E.g. for a 11Mbits image (44 blocks), we proceed 
-	 * as follows: 
-	 * 11 Mbits = 8 Mbits (blocks 1->32) + 2 Mbits (blocks 33->40) + 1 Mbit (blocks 41->44).
-	 * Hence, we fill memory up to 16 Mbits (banks 0x00 to 0x3f) mirroring the final part:
-	 * 8 Mbits (blocks 1->32) + 2 Mbits (blocks 33->40) + 1 Mbit (blocks 41->44) + 1 Mbit (blocks 41->44)
-	 *   + 2 Mbits (blocks 33->40) + 1 Mbit (blocks 41->44) + 1 Mbit (blocks 41->44).
-	 * And we repeat the same blocks in the second half of the banks (banks 0x40 to 0x7f).
-	 * This is likely what happens in the real SNES as well, because the unit cannot be aware of the exact 
-	 * size of data in the cart (procedure confirmed by byuu)
-	 */
+	/* Loading all the data blocks from cart, we only partially cover banks 0x00 to 0x7f. Therefore, we
+     * have to mirror the blocks until we reach the end. E.g. for a 11Mbits image (44 blocks), we proceed
+     * as follows:
+     * 11 Mbits = 8 Mbits (blocks 1->32) + 2 Mbits (blocks 33->40) + 1 Mbit (blocks 41->44).
+     * Hence, we fill memory up to 16 Mbits (banks 0x00 to 0x3f) mirroring the final part:
+     * 8 Mbits (blocks 1->32) + 2 Mbits (blocks 33->40) + 1 Mbit (blocks 41->44) + 1 Mbit (blocks 41->44)
+     *   + 2 Mbits (blocks 33->40) + 1 Mbit (blocks 41->44) + 1 Mbit (blocks 41->44).
+     * And we repeat the same blocks in the second half of the banks (banks 0x40 to 0x7f).
+     * This is likely what happens in the real SNES as well, because the unit cannot be aware of the exact
+     * size of data in the cart (procedure confirmed by byuu)
+     */
 
-	/* LoROM carts load data in banks 0x00 to 0x7f at address 0x8000 (actually up to 0x7d, because 0x7e and 
-	 * 0x7f are overwritten by WRAM). Each block is also mirrored in banks 0x80 to 0xff (up to 0xff for real) 
-	 */
+	/* LoROM carts load data in banks 0x00 to 0x7f at address 0x8000 (actually up to 0x7d, because 0x7e and
+     * 0x7f are overwritten by WRAM). Each block is also mirrored in banks 0x80 to 0xff (up to 0xff for real)
+     */
 	while (read_blocks < 128 && read_blocks < total_blocks)
 	{
 		/* Loading data */
@@ -1708,10 +1708,10 @@ DRIVER_INIT( snes_hirom )
 
 	/* See above for details about the way we fill banks 0x00 to 0x7f */
 
-	/* HiROM carts load data in banks 0xc0 to 0xff. Each bank is fully mirrored in banks 0x40 to 0x7f 
-	 * (actually up to 0x7d, because 0x7e and 0x7f are overwritten by WRAM). The top half (address 
-	 * range 0x8000 - 0xffff) of each bank is also mirrored in banks 0x00 to 0x3f and 0x80 to 0xbf. 
-	 */
+	/* HiROM carts load data in banks 0xc0 to 0xff. Each bank is fully mirrored in banks 0x40 to 0x7f
+     * (actually up to 0x7d, because 0x7e and 0x7f are overwritten by WRAM). The top half (address
+     * range 0x8000 - 0xffff) of each bank is also mirrored in banks 0x00 to 0x3f and 0x80 to 0xbf.
+     */
 	while (read_blocks < 64 && read_blocks < total_blocks)
 	{
 		/* Loading data */
@@ -1750,7 +1750,7 @@ DRIVER_INIT( snes_hirom )
 
 /*************************************
 
-	HDMA
+    HDMA
 
 *************************************/
 

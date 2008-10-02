@@ -1055,7 +1055,7 @@ static MACHINE_DRIVER_START( mcr3_base )
 	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/4)
 	MDRV_CPU_CONFIG(mcr_daisy_chain)
 	MDRV_CPU_VBLANK_INT_HACK(mcr_interrupt,2)
-	
+
 	MDRV_Z80CTC_ADD("ctc", mcr_ctc_intf)
 
 	MDRV_WATCHDOG_VBLANK_INIT(16)

@@ -104,15 +104,15 @@ static WRITE8_HANDLER( ld_controls )
 		case 0:
 			// write $00 at startup/reject
 			break;
-		
+
 		case 2:
 			// write $06 at startup/reject
 			break;
-		
+
 		case 3:
 			// write $8A at startup
 			break;
-		
+
 		case 5:
 			// write $9F at startup/reject
 			break;
@@ -120,7 +120,7 @@ static WRITE8_HANDLER( ld_controls )
 		case 6:
 			// write $C3 at startup/reject
 			break;
-		
+
 		case 7:
 			// write $90 at startup
 			break;
@@ -133,7 +133,7 @@ static READ8_HANDLER( ld_controls )
 	switch (offset)
 	{
 		case 4:
-			
+
 	}
 }
 
@@ -142,7 +142,7 @@ static WRITE8_HANDLER( unknown_port_w )
 {
 	// Writes to $00/$02/$00
 	// Values:
-	//	$04/$09/$0F
+	//  $04/$09/$0F
 	//  $04/$0E/$0F
 	//  $04/   /$0F
 }

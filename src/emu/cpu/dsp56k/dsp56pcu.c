@@ -211,7 +211,7 @@ static void pcu_reset(void)
 	IPR = 0x0000;
 
 	// FM.5-4
-//	I_bits_set(0x03); This is what the manual says, but i'm dubious!  Polygonet's HI interrupt wouldn't happen with the I bits set.
+//  I_bits_set(0x03); This is what the manual says, but i'm dubious!  Polygonet's HI interrupt wouldn't happen with the I bits set.
 	I_bits_set(0x00);
 	S_bits_set(0);
 	L_bit_set(0);

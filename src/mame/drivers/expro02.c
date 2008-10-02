@@ -1,4 +1,4 @@
-/* 
+/*
 
    Kaneko EXPRO-02 board
 

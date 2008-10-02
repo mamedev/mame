@@ -111,7 +111,7 @@ palette_t *palette_alloc(UINT32 numcolors, UINT32 numgroups)
 	if (palette == NULL)
 		goto error;
 	memset(palette, 0, sizeof(*palette));
-	
+
 	/* initialize overall controls */
 	palette->brightness = 0.0f;
 	palette->contrast = 1.0f;
@@ -475,7 +475,7 @@ const rgb_t *palette_entry_list_adjusted_rgb15(palette_t *palette)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    palette_set_brightness - set the overall 
+    palette_set_brightness - set the overall
     brightness for the palette
 -------------------------------------------------*/
 
@@ -499,7 +499,7 @@ void palette_set_brightness(palette_t *palette, float brightness)
 
 
 /*-------------------------------------------------
-    palette_set_contrast - set the overall 
+    palette_set_contrast - set the overall
     contrast for the palette
 -------------------------------------------------*/
 
@@ -520,7 +520,7 @@ void palette_set_contrast(palette_t *palette, float contrast)
 
 
 /*-------------------------------------------------
-    palette_set_gamma - set the overall 
+    palette_set_gamma - set the overall
     gamma for the palette
 -------------------------------------------------*/
 
@@ -532,7 +532,7 @@ void palette_set_gamma(palette_t *palette, float gamma)
 	if (palette->gamma == gamma)
 		return;
 	palette->gamma = gamma;
-	
+
 	/* recompute the gamma map */
 	gamma = 1.0f / gamma;
 	for (index = 0; index < 256; index++)
@@ -590,7 +590,7 @@ float palette_entry_get_contrast(palette_t *palette, UINT32 index)
 void palette_group_set_brightness(palette_t *palette, UINT32 group, float brightness)
 {
 	int index;
-	
+
 	/* convert incoming value to normalized result */
 	brightness = (brightness - 1.0f) * 256.0f;
 
@@ -723,8 +723,8 @@ static void update_adjusted_color(palette_t *palette, UINT32 group, UINT32 index
 	rgb_t adjusted;
 
 	/* compute the adjusted value */
-	adjusted = adjust_palette_entry(palette->entry_color[index], 
-				palette->group_bright[group] + palette->brightness, 
+	adjusted = adjust_palette_entry(palette->entry_color[index],
+				palette->group_bright[group] + palette->brightness,
 				palette->group_contrast[group] * palette->entry_contrast[index] * palette->contrast,
 				palette->gamma_map);
 

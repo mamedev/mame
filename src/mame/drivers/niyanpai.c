@@ -875,7 +875,7 @@ static MACHINE_DRIVER_START( niyanpai )
 	MDRV_CPU_CONFIG(daisy_chain_sound)
 	MDRV_CPU_PROGRAM_MAP(sound_readmem, sound_writemem)
 	MDRV_CPU_IO_MAP(sound_io_map,0)
-	
+
 	MDRV_Z80CTC_ADD("ctc", ctc_intf)
 
 	MDRV_MACHINE_RESET(niyanpai)
