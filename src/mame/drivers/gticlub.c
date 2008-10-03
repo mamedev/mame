@@ -1151,12 +1151,16 @@ ROM_START( hangplt )
         ROM_LOAD32_WORD( "685a14.12w",   0x000000, 0x400000, CRC(87437739) SHA1(0d45637af40938a54d5efd29c125b0fafd55f9a4) )
 ROM_END
 
+static TIMER_CALLBACK( irq_off )
+{
+	cpunum_set_input_line(machine, 1, param, CLEAR_LINE);
+}
+
 static void sound_irq_callback(running_machine *machine, int irq)
 {
-	if (irq == 0)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ1, PULSE_LINE);
-	else
-		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ2, PULSE_LINE);
+	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
+	cpunum_set_input_line(machine, 1, line, ASSERT_LINE);
+	timer_set(ATTOTIME_IN_USEC(1), NULL, line, irq_off);
 }
 
 static DRIVER_INIT(gticlub)

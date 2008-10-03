@@ -1896,8 +1896,8 @@ static INTERRUPT_GEN( interrupt_scudhamm )
 {
 	switch ( cpu_getiloops() )
 	{
-		case 0:		cpunum_set_input_line(machine, 0, 3, PULSE_LINE);	// update palette, layers etc. Not the sprites.
-		case 14:	cpunum_set_input_line(machine, 0, 2, PULSE_LINE);	// "real" vblank. It just sets a flag that
+		case 0:		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);	// update palette, layers etc. Not the sprites.
+		case 14:	cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	// "real" vblank. It just sets a flag that
 														// the main loop polls before updating the sprites.
 	}
 }
@@ -1949,8 +1949,8 @@ static INTERRUPT_GEN( interrupt_armchmp2)
 {
 	switch ( cpu_getiloops() )
 	{
-		case 0:		cpunum_set_input_line(machine, 0, 4, PULSE_LINE);
-		case 14:	cpunum_set_input_line(machine, 0, 2, PULSE_LINE);
+		case 0:		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+		case 14:	cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 	}
 }
 

@@ -567,11 +567,17 @@ void itech8_update_interrupts(running_machine *machine, int periodic, int tms340
  *
  *************************************/
 
+static TIMER_CALLBACK( irq_off )
+{
+	itech8_update_interrupts(machine, 0, -1, -1);
+}
+
+
 static INTERRUPT_GEN( generate_nmi )
 {
 	/* signal the NMI */
 	itech8_update_interrupts(machine, 1, -1, -1);
-	itech8_update_interrupts(machine, 0, -1, -1);
+	timer_set(ATTOTIME_IN_USEC(1), NULL, 0, irq_off);
 
 	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", video_screen_get_vpos(machine->primary_screen));
 }

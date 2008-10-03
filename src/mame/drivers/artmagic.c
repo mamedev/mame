@@ -129,6 +129,12 @@ static WRITE16_HANDLER( control_w )
  *
  *************************************/
 
+static TIMER_CALLBACK( irq_off )
+{
+	hack_irq = 0;
+	update_irq_state(machine);
+}
+
 static READ16_HANDLER( ultennis_hack_r )
 {
 	/* IRQ5 points to: jsr (a5); rte */
@@ -136,8 +142,7 @@ static READ16_HANDLER( ultennis_hack_r )
 	{
 		hack_irq = 1;
 		update_irq_state(machine);
-		hack_irq = 0;
-		update_irq_state(machine);
+		timer_set(ATTOTIME_IN_USEC(1), NULL, 0, irq_off);
 	}
 	return input_port_read(machine, "300000");
 }

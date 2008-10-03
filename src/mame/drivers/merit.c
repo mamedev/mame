@@ -812,7 +812,7 @@ static INPUT_PORTS_START( bigappg )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("IN3")
+	PORT_START("DSW")
 	PORT_DIPNAME( 0x01, 0x01, "4" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -858,7 +858,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 		NULL						/* Port C write */
 	},
 	{
-		DEVICE8_PORT("IN3"),		/* Port A read */
+		DEVICE8_PORT("DSW"),		/* Port A read */
 		NULL,						/* Port B read */
 		NULL,						/* Port C read */
 		NULL,						/* Port A write */

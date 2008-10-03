@@ -4269,8 +4269,10 @@ static void scsp_irq(running_machine *machine, int irq)
  	if (irq > 0)
 	{
 		scsp_last_line = irq;
-		cpunum_set_input_line(machine, 1, irq, PULSE_LINE);
+		cpunum_set_input_line(machine, 1, irq, ASSERT_LINE);
 	}
+	else
+		cpunum_set_input_line(machine, 1, -irq, CLEAR_LINE);
 }
 
 static const scsp_interface scsp_config =
