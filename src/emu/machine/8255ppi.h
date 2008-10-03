@@ -56,16 +56,16 @@ void ppi8255_set_port_a_read( const device_config *device, read8_device_func por
 void ppi8255_set_port_b_read( const device_config *device, read8_device_func port_b_read );
 void ppi8255_set_port_c_read( const device_config *device, read8_device_func port_c_read );
 
-void ppi8255_set_portAwrite( const device_config *device, write8_device_func port_a_write );
-void ppi8255_set_portBwrite( const device_config *device, write8_device_func port_b_write );
-void ppi8255_set_portCwrite( const device_config *device, write8_device_func port_c_write );
+void ppi8255_set_port_a_write( const device_config *device, write8_device_func port_a_write );
+void ppi8255_set_port_b_write( const device_config *device, write8_device_func port_b_write );
+void ppi8255_set_port_c_write( const device_config *device, write8_device_func port_c_write );
 
 void ppi8255_set_port_a( const device_config *device, UINT8 data );
 void ppi8255_set_port_b( const device_config *device, UINT8 data );
 void ppi8255_set_port_c( const device_config *device, UINT8 data );
 
-UINT8 ppi8255_get_portA( const device_config *device );
-UINT8 ppi8255_get_portB( const device_config *device );
-UINT8 ppi8255_get_portC( const device_config *device );
+UINT8 ppi8255_get_port_a( const device_config *device );
+UINT8 ppi8255_get_port_b( const device_config *device );
+UINT8 ppi8255_get_port_c( const device_config *device );
 
 #endif /* __8255PPI_H_ */
