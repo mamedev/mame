@@ -524,6 +524,7 @@ static const input_type_desc core_types[] =
 
 	INPUT_PORT_DIGITAL_TYPE( 0, OTHER,   KEYBOARD,            "Keyboard",               SEQ_DEF_0 )
 
+	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_ON_SCREEN_DISPLAY,"On Screen Display",      SEQ_DEF_1(KEYCODE_TILDE) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_DEBUG_BREAK,      "Break in Debugger",      SEQ_DEF_1(KEYCODE_TILDE) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_CONFIGURE,        "Config Menu",            SEQ_DEF_1(KEYCODE_TAB) )
 	INPUT_PORT_DIGITAL_TYPE( 0, UI,      UI_PAUSE,            "Pause",                  SEQ_DEF_1(KEYCODE_P) )
