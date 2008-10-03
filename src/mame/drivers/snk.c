@@ -2910,6 +2910,9 @@ static INPUT_PORTS_START( gwarb )
 	PORT_MODIFY("IN1")
 	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gwarb_rotary, (void*)0)
 
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(gwarb_rotary, (void*)1)
+
 	PORT_START("JOYSTICK_MODE")
 	PORT_CONFNAME( 0x01, 0x00, "Joystick mode" )
 	PORT_CONFSETTING( 0x00, "Normal Joystick" )
