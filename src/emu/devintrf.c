@@ -175,6 +175,44 @@ void device_list_remove(device_config **listheadptr, device_type type, const cha
 }
 
 
+/*-------------------------------------------------
+    device_build_tag - build a tag that combines 
+    the device's name and the given tag
+-------------------------------------------------*/
+
+const char *device_build_tag(astring *dest, const char *devicetag, const char *tag)
+{
+	if (devicetag != NULL)
+	{
+		astring_cpyc(dest, devicetag);
+		astring_catc(dest, ":");
+		astring_catc(dest, tag);
+	}
+	else
+		astring_cpyc(dest, tag);
+	return astring_c(dest);
+}
+
+
+/*-------------------------------------------------
+    device_inherit_tag - build a tag with the same 
+    device prefix as the source tag
+-------------------------------------------------*/
+
+const char *device_inherit_tag(astring *dest, const char *sourcetag, const char *tag)
+{
+	const char *divider = strrchr(sourcetag, ':');
+	if (divider != NULL)
+	{
+		astring_cpych(dest, sourcetag, divider + 1 - sourcetag);
+		astring_catc(dest, tag);
+	}
+	else
+		astring_cpyc(dest, tag);
+	return astring_c(dest);
+}
+
+
 
 /***************************************************************************
     TYPE-BASED DEVICE ACCESS

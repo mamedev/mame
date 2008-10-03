@@ -785,12 +785,17 @@ static void z80sio_irq_reti(const device_config *device)
 static DEVICE_START( z80sio )
 {
 	const z80sio_interface *intf = device->static_config;
+	astring *tempstring = astring_alloc();
 	z80sio *sio = get_safe_token(device);
 	void *ptr = (void *)device;
 	int cpunum = -1;
 
 	if (intf->cpu != NULL)
-		cpunum = mame_find_cpu_index(device->machine, intf->cpu);
+	{
+		cpunum = mame_find_cpu_index(device->machine, device_inherit_tag(tempstring, device->tag, intf->cpu));
+		if (cpunum == -1)
+			fatalerror("Z80SIO:Unable to find CPU %s\n", device_inherit_tag(tempstring, device->tag, intf->cpu));
+	}
 	if (cpunum != -1)
 		sio->clock = device->machine->config->cpu[cpunum].clock;
 	else
@@ -806,6 +811,7 @@ static DEVICE_START( z80sio )
 	sio->transmit_cb = intf->transmit_cb;
 	sio->receive_poll_cb = intf->receive_poll_cb;
 
+	astring_free(tempstring);
 	return DEVICE_START_OK;
 }
 

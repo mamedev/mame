@@ -214,12 +214,10 @@ static void vp931_init(laserdisc_state *ld)
 	ldplayer_data *player = ld->player;
 
 	/* find our CPU */
-	astring_printf(tempstring, "%s:%s", ld->device->tag, "vp931");
-	player->cpunum = mame_find_cpu_index(ld->device->machine, astring_c(tempstring));
+	player->cpunum = mame_find_cpu_index(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "vp931"));
 
 	/* find our timer */
-	astring_printf(tempstring, "%s:%s", ld->device->tag, "tracktimer");
-	player->tracktimer = device_list_find_by_tag(ld->device->machine->config->devicelist, TIMER, astring_c(tempstring));
+	player->tracktimer = device_list_find_by_tag(ld->device->machine->config->devicelist, TIMER, device_build_tag(tempstring, ld->device->tag, "tracktimer"));
 	timer_device_set_ptr(player->tracktimer, ld);
 
 	astring_free(tempstring);

@@ -367,7 +367,7 @@ const char *const address_space_names[ADDRESS_SPACES] = { "program", "data", "I/
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void address_map_detokenize(address_map *map, const game_driver *driver, const addrmap_token *tokens);
+static void address_map_detokenize(address_map *map, const game_driver *driver, const char *cputag, const addrmap_token *tokens);
 
 static void memory_init_cpudata(running_machine *machine);
 static void memory_init_preflight(running_machine *machine);
@@ -854,6 +854,7 @@ const data_accessors *memory_get_accessors(int spacenum, int databits, int endia
 
 address_map *address_map_alloc(const machine_config *config, const game_driver *driver, int cpunum, int spacenum)
 {
+	const char *cputag = config->cpu[cpunum].tag;
 	int cputype = config->cpu[cpunum].type;
 	const addrmap_token *internal_map = (const addrmap_token *)cputype_get_info_ptr(cputype, CPUINFO_PTR_INTERNAL_MEMORY_MAP + spacenum);
 	address_map *map;
@@ -863,13 +864,13 @@ address_map *address_map_alloc(const machine_config *config, const game_driver *
 
 	/* append the internal CPU map (first so it takes priority) */
 	if (internal_map != NULL)
-		address_map_detokenize(map, driver, internal_map);
+		address_map_detokenize(map, driver, cputag, internal_map);
 
 	/* construct the standard map */
 	if (config->cpu[cpunum].address_map[spacenum][0] != NULL)
-		address_map_detokenize(map, driver, config->cpu[cpunum].address_map[spacenum][0]);
+		address_map_detokenize(map, driver, cputag, config->cpu[cpunum].address_map[spacenum][0]);
 	if (config->cpu[cpunum].address_map[spacenum][1] != NULL)
-		address_map_detokenize(map, driver, config->cpu[cpunum].address_map[spacenum][1]);
+		address_map_detokenize(map, driver, cputag, config->cpu[cpunum].address_map[spacenum][1]);
 
 	return map;
 }
@@ -887,6 +888,12 @@ void address_map_free(address_map *map)
 	{
 		address_map_entry *entry = map->entrylist;
 		map->entrylist = entry->next;
+		if (entry->read_devtag_string != NULL)
+			astring_free(entry->read_devtag_string);
+		if (entry->write_devtag_string != NULL)
+			astring_free(entry->write_devtag_string);
+		if (entry->region_string != NULL)
+			astring_free(entry->region_string);
 		free(entry);
 	}
 
@@ -928,7 +935,7 @@ const address_map *memory_get_address_map(int cpunum, int spacenum)
 		fatalerror("%s: %s AM_RANGE(0x%x, 0x%x) setting %s already set!\n", driver->source_file, driver->name, entry->addrstart, entry->addrend, #field); \
 	} while (0)
 
-static void address_map_detokenize(address_map *map, const game_driver *driver, const addrmap_token *tokens)
+static void address_map_detokenize(address_map *map, const game_driver *driver, const char *cputag, const addrmap_token *tokens)
 {
 	address_map_entry **entryptr;
 	address_map_entry *entry;
@@ -967,7 +974,7 @@ static void address_map_detokenize(address_map *map, const game_driver *driver, 
 
 			/* including */
 			case ADDRMAP_TOKEN_INCLUDE:
-				address_map_detokenize(map, driver, TOKEN_GET_PTR(tokens, tokenptr));
+				address_map_detokenize(map, driver, cputag, TOKEN_GET_PTR(tokens, tokenptr));
 				for (entryptr = &map->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next) ;
 				entry = NULL;
 				break;
@@ -1030,7 +1037,9 @@ static void address_map_detokenize(address_map *map, const game_driver *driver, 
 				entry->read = TOKEN_GET_PTR(tokens, read);
 				entry->read_name = TOKEN_GET_STRING(tokens);
 				entry->read_devtype = TOKEN_GET_PTR(tokens, devtype);
-				entry->read_devtag = TOKEN_GET_STRING(tokens);
+				if (entry->read_devtag_string == NULL)
+					entry->read_devtag_string = astring_alloc();
+				entry->read_devtag = device_inherit_tag(entry->read_devtag_string, cputag, TOKEN_GET_STRING(tokens));
 				break;
 
 			case ADDRMAP_TOKEN_DEVICE_WRITE:
@@ -1040,7 +1049,9 @@ static void address_map_detokenize(address_map *map, const game_driver *driver, 
 				entry->write = TOKEN_GET_PTR(tokens, write);
 				entry->write_name = TOKEN_GET_STRING(tokens);
 				entry->write_devtype = TOKEN_GET_PTR(tokens, devtype);
-				entry->write_devtag = TOKEN_GET_STRING(tokens);
+				if (entry->write_devtag_string == NULL)
+					entry->write_devtag_string = astring_alloc();
+				entry->write_devtag = device_inherit_tag(entry->write_devtag_string, cputag, TOKEN_GET_STRING(tokens));
 				break;
 
 			case ADDRMAP_TOKEN_READ_PORT:
@@ -1052,7 +1063,9 @@ static void address_map_detokenize(address_map *map, const game_driver *driver, 
 				check_entry_field(region);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->rgnoffs, 32);
-				entry->region = TOKEN_GET_STRING(tokens);
+				if (entry->region_string == NULL)
+					entry->region_string = astring_alloc();
+				entry->region = device_inherit_tag(entry->region_string, cputag, TOKEN_GET_STRING(tokens));
 				break;
 
 			case ADDRMAP_TOKEN_SHARE:

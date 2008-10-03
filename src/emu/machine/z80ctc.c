@@ -463,13 +463,18 @@ static void z80ctc_irq_reti(const device_config *device)
 static DEVICE_START( z80ctc )
 {
 	const z80ctc_interface *intf = device->static_config;
+	astring *tempstring = astring_alloc();
 	z80ctc *ctc = get_safe_token(device);
 	char unique_tag[30];
 	int cpunum = -1;
 	int ch;
 
 	if (intf->cpu != NULL)
-		cpunum = mame_find_cpu_index(device->machine, intf->cpu);
+	{
+		cpunum = mame_find_cpu_index(device->machine, device_inherit_tag(tempstring, device->tag, intf->cpu));
+		if (cpunum == -1)
+			fatalerror("Z80CTC:Unable to find CPU %s\n", device_inherit_tag(tempstring, device->tag, intf->cpu));
+	}
 	if (cpunum != -1)
 		ctc->clock = device->machine->config->cpu[cpunum].clock;
 	else
@@ -503,6 +508,7 @@ static DEVICE_START( z80ctc )
 	    state_save_register_item(unique_tag, ch, channel->int_state);
 	}
 
+	astring_free(tempstring);
 	return DEVICE_START_OK;
 }
 

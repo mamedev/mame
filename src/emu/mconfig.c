@@ -23,26 +23,6 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 
 
 /***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    create_tag - create a combined tag,
-    allocating strings as necessary
--------------------------------------------------*/
-
-INLINE const char *create_tag(astring *result, const char *prefix, const char *tag)
-{
-	if (prefix != NULL && prefix[0] != 0)
-		astring_printf(result, "%s:%s", prefix, tag);
-	else
-		astring_cpyc(result, tag);
-	return astring_c(result);
-}
-
-
-
-/***************************************************************************
     MACHINE CONFIGURATIONS
 ***************************************************************************/
 
@@ -61,7 +41,7 @@ machine_config *machine_config_alloc(const machine_config_token *tokens)
 	memset(config, 0, sizeof(*config));
 
 	/* parse tokens into the config */
-	machine_config_detokenize(config, tokens, "", 0);
+	machine_config_detokenize(config, tokens, NULL, 0);
 	return config;
 }
 
@@ -271,20 +251,20 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 			case MCONFIG_TOKEN_DEVICE_ADD:
 				devtype = TOKEN_GET_PTR(tokens, devtype);
 				tag = TOKEN_GET_STRING(tokens);
-				device = device_list_add(&config->devicelist, devtype, create_tag(tempstring, tagprefix, tag));
+				device = device_list_add(&config->devicelist, devtype, device_build_tag(tempstring, tagprefix, tag));
 				break;
 
 			case MCONFIG_TOKEN_DEVICE_REMOVE:
 				devtype = TOKEN_GET_PTR(tokens, devtype);
 				tag = TOKEN_GET_STRING(tokens);
-				device_list_remove(&config->devicelist, devtype, create_tag(tempstring, tagprefix, tag));
+				device_list_remove(&config->devicelist, devtype, device_build_tag(tempstring, tagprefix, tag));
 				device = NULL;
 				break;
 
 			case MCONFIG_TOKEN_DEVICE_MODIFY:
 				devtype = TOKEN_GET_PTR(tokens, devtype);
 				tag = TOKEN_GET_STRING(tokens);
-				device = (device_config *)device_list_find_by_tag(config->devicelist, devtype, create_tag(tempstring, tagprefix, tag));
+				device = (device_config *)device_list_find_by_tag(config->devicelist, devtype, device_build_tag(tempstring, tagprefix, tag));
 				if (device == NULL)
 					fatalerror("Unable to find device: type=%s tag=%s\n", devtype_name(devtype), astring_c(tempstring));
 				break;
@@ -351,17 +331,17 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, type, 24, clock, 32);
 				tag = TOKEN_GET_STRING(tokens);
-				cpu = cpu_add(config, create_tag(tempstring, tagprefix, tag), type, clock);
+				cpu = cpu_add(config, device_build_tag(tempstring, tagprefix, tag), type, clock);
 				break;
 
 			case MCONFIG_TOKEN_CPU_MODIFY:
 				tag = TOKEN_GET_STRING(tokens);
-				cpu = cpu_find(config, create_tag(tempstring, tagprefix, tag));
+				cpu = cpu_find(config, device_build_tag(tempstring, tagprefix, tag));
 				break;
 
 			case MCONFIG_TOKEN_CPU_REMOVE:
 				tag = TOKEN_GET_STRING(tokens);
-				cpu_remove(config, create_tag(tempstring, tagprefix, tag));
+				cpu_remove(config, device_build_tag(tempstring, tagprefix, tag));
 				cpu = NULL;
 				break;
 
@@ -369,7 +349,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, type, 24, clock, 32);
 				tag = TOKEN_GET_STRING(tokens);
-				cpu = cpu_find(config, create_tag(tempstring, tagprefix, tag));
+				cpu = cpu_find(config, device_build_tag(tempstring, tagprefix, tag));
 				if (cpu == NULL)
 					fatalerror("Unable to find CPU: tag=%s\n", astring_c(tempstring));
 				cpu->type = type;
@@ -522,7 +502,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, type, 24, clock, 32);
 				tag = TOKEN_GET_STRING(tokens);
-				sound = sound_add(config, create_tag(tempstring, tagprefix, tag), type, clock);
+				sound = sound_add(config, device_build_tag(tempstring, tagprefix, tag), type, clock);
 				break;
 
 			case MCONFIG_TOKEN_SOUND_REMOVE:
@@ -531,7 +511,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 
 			case MCONFIG_TOKEN_SOUND_MODIFY:
 				tag = TOKEN_GET_STRING(tokens);
-				sound = sound_find(config, create_tag(tempstring, tagprefix, tag));
+				sound = sound_find(config, device_build_tag(tempstring, tagprefix, tag));
 				if (sound == NULL)
 					fatalerror("Unable to find sound: tag=%s\n", astring_c(tempstring));
 				sound->routes = 0;
@@ -546,7 +526,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT64_UNPACK3(tokens, entrytype, 8, type, 24, clock, 32);
 				tag = TOKEN_GET_STRING(tokens);
-				sound = sound_find(config, create_tag(tempstring, tagprefix, tag));
+				sound = sound_find(config, device_build_tag(tempstring, tagprefix, tag));
 				if (sound == NULL)
 					fatalerror("Unable to find sound: tag=%s\n", astring_c(tempstring));
 				sound->type = type;
@@ -578,7 +558,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 		{
 			tokens = device_get_info_ptr(device, DEVINFO_PTR_MACHINE_CONFIG);
 			if (tokens != NULL)
-				machine_config_detokenize(config, tokens, create_tag(tempstring, tagprefix, device->tag), depth + 1);
+				machine_config_detokenize(config, tokens, device->tag, depth + 1);
 		}
 
 	astring_free(tempstring);

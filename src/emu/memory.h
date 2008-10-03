@@ -202,6 +202,9 @@ typedef struct _address_map_entry address_map_entry;
 struct _address_map_entry
 {
 	address_map_entry *		next;				/* pointer to the next entry */
+	astring *				read_devtag_string;	/* string used to hold derived names */
+	astring *				write_devtag_string;/* string used to hold derived names */
+	astring *				region_string;		/* string used to hold derived names */
 
 	offs_t					addrstart;			/* start address */
 	offs_t					addrend;			/* end address */

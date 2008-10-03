@@ -215,6 +215,12 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 /* remove a device from a device list */
 void device_list_remove(device_config **listheadptr, device_type type, const char *tag);
 
+/* build a tag that combines the device's name and the given tag */
+const char *device_build_tag(astring *dest, const char *devicetag, const char *tag);
+
+/* build a tag with the same device prefix as the source tag*/
+const char *device_inherit_tag(astring *dest, const char *sourcetag, const char *tag);
+
 
 
 /* ----- type-based device access ----- */

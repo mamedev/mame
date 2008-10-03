@@ -259,8 +259,7 @@ static void pr8210_init(laserdisc_state *ld)
 	ldplayer_data *player = ld->player;
 
 	/* find our CPU */
-	astring_printf(tempstring, "%s:%s", ld->device->tag, "pr8210");
-	player->cpunum = mame_find_cpu_index(ld->device->machine, astring_c(tempstring));
+	player->cpunum = mame_find_cpu_index(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "pr8210"));
 	astring_free(tempstring);
 
 	/* do a soft reset */
@@ -884,8 +883,7 @@ static void simutrek_init(laserdisc_state *ld)
 	pr8210_init(ld);
 
 	/* find the Simutrek CPU */
-	astring_printf(tempstring, "%s:%s", ld->device->tag, "simutrek");
-	ld->player->simutrek.cpunum = mame_find_cpu_index(ld->device->machine, astring_c(tempstring));
+	ld->player->simutrek.cpunum = mame_find_cpu_index(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "simutrek"));
 	astring_free(tempstring);
 }
 
