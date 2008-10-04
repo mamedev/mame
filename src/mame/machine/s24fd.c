@@ -158,7 +158,7 @@ void s24_fd1094_driver_init(running_machine *machine)
 
 	s24_fd1094_cpuregion = (UINT16*)s24_mainram1;
 	s24_fd1094_cpuregionsize = 0x40000;
-	s24_fd1094_key = memory_region(Machine, "user3");
+	s24_fd1094_key = memory_region(machine, "fd1094key");
 
 	/* punt if no key; this allows us to be called even for non-s24_fd1094 games */
 	if (!s24_fd1094_key)

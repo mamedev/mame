@@ -341,6 +341,9 @@ Notes:
 #include "sound/dac.h"
 #include "sound/2151intf.h"
 
+#define MASTER_CLOCK		XTAL_20MHz
+
+
 UINT16* s24_mainram1;
 
 extern void s24_fd1094_machine_init(void);
@@ -429,7 +432,7 @@ static WRITE16_HANDLER( fdc_w )
 				break;
 			case 0x9:
 				logerror("Read multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track);
-				fdc_pt = memory_region(machine, "user2") + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
+				fdc_pt = memory_region(machine, "floppy") + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
 				fdc_span = track_size;
 				fdc_status = 3;
 				fdc_drq = 1;
@@ -437,7 +440,7 @@ static WRITE16_HANDLER( fdc_w )
 				break;
 			case 0xb:
 				logerror("Write multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track);
-				fdc_pt = memory_region(machine, "user2") + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
+				fdc_pt = memory_region(machine, "floppy") + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
 				fdc_span = track_size;
 				fdc_status = 3;
 				fdc_drq = 1;
@@ -713,7 +716,7 @@ static UINT8 curbank;
 
 static void reset_bank(running_machine *machine)
 {
-	if (memory_region(machine, "user1"))
+	if (memory_region(machine, "romboard"))
 	{
 		memory_set_bank(1, curbank & 15);
 		memory_set_bank(2, curbank & 15);
@@ -1004,35 +1007,78 @@ fc-ff ramhi
  *
  *************************************/
 
+/*
+ 000000-03FFFF : ROM (256K)
+ 040000-07FFFF : ROM (mirror)
+ 080000-0BFFFF : CPU A work RAM (256K)
+ 0C0000-0FFFFF : CPU A work RAM (mirror)
+
+ 100000-13FFFF : ROM (mirror)
+ 140000-17FFFF : ROM (mirror)
+ 180000-1BFFFF : ROM (mirror)
+ 1C0000-1FFFFF : ROM (mirror)
+
+ 200000-20FFFF : Tilemap generator name table RAM (64K)
+ 210000-21FFFF : Tilemap generator name table RAM (mirror) (*1)
+ 220000-27FFFF : Unused (returns $FFFF), write-only registers are:
+ 240000.w      : Framebuffer read-out starting X position ($FFCE = Tilemap pixel 0)
+ 260000.w      : Framebuffer read-out starting Y position ($FBF0 = Tilemap line 0)
+ 270001.b      : Display mode (00=normal, 01=invalid) (*3)
+ 280000-29FFFF : Tilemap generator pattern RAM (128K)
+ 2A0000-2BFFFF : Tilemap generator pattern RAM (mirror)
+ 2C0000-2DFFFF : Tilemap generator pattern RAM (mirror) 
+ 2E0000-2FFFFF : Tilemap generator pattern RAM (mirror)
+ 300000-3FFFFF : Mirror of 200000-2FFFFF
+
+ 400000-403FFF : Color RAM (16K)
+ 404000-407FFF : Mixer chip registers
+ 408000-5FFFFF : Mirror of 400000-407FFF
+
+ 600000-6FFFFF : Object generator RAM (256K) (*2)
+ 700000-7FFFFF : Mirror of 600000-6FFFFF
+
+ 800000-9FFFFF : I/O chip
+
+ A00000-AFFFFF : Interrupt controller and timer registers
+ B00000-BFFFFF : /EXCS0 and /DTK0 area (Floppy disk controller board)
+ C00000-CFFFFF : /EXCS1 and /DTK1 area (HotRod analog I/O board)
+ D00000-DFFFFF : /EXCS2 and /DTK2 area (30-pin I/O expansion connector)
+ E00000-EFFFFF : CPU hangs when accessing (no DTACK)
+
+ F00000-F3FFFF : CPU B work RAM (256K)
+ F40000-F7FFFF : CPU B work RAM (mirror)
+ F80000-FBFFFF : CPU A work RAM (mirror)
+ FC0000-FFFFFF : CPU A work RAM (mirror)
+*/
 static ADDRESS_MAP_START( system24_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x140000) AM_ROM AM_SHARE(1)
-	AM_RANGE(0x080000, 0x0fffff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE(sys24_tile_r, sys24_tile_w)
-	AM_RANGE(0x220000, 0x220001) AM_WRITENOP		// Unknown, always 0
-	AM_RANGE(0x240000, 0x240001) AM_WRITENOP		// Horizontal synchronization register
-	AM_RANGE(0x260000, 0x260001) AM_WRITENOP		// Vertical synchronization register
-	AM_RANGE(0x270000, 0x270001) AM_WRITENOP		// Video synchronization switch
-	AM_RANGE(0x280000, 0x29ffff) AM_READWRITE(sys24_char_r, sys24_char_w)
-	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(system24temp_sys16_paletteram1_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x404000, 0x40401f) AM_READWRITE(sys24_mixer_r, sys24_mixer_w)
-	AM_RANGE(0x600000, 0x63ffff) AM_READWRITE(sys24_sprite_r, sys24_sprite_w)
-	AM_RANGE(0x800000, 0x80007f) AM_READWRITE(system24temp_sys16_io_r, system24temp_sys16_io_w)
-	AM_RANGE(0x800100, 0x800101) AM_WRITE(ym_register_w)
-	AM_RANGE(0x800102, 0x800103) AM_READWRITE(ym_status_r, ym_data_w)
-	AM_RANGE(0xa00000, 0xa00007) AM_READWRITE(irq_r, irq_w)
-	AM_RANGE(0xb00000, 0xb00007) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0xb00008, 0xb0000f) AM_READWRITE(fdc_status_r, fdc_ctrl_w)
+	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x040000) AM_ROM AM_REGION("main", 0)
+	AM_RANGE(0x080000, 0x0bffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(2)
+	AM_RANGE(0x100000, 0x13ffff) AM_MIRROR(0x0c0000) AM_ROM AM_REGION("main", 0)
+	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x110000) AM_READWRITE(sys24_tile_r, sys24_tile_w)
+	AM_RANGE(0x220000, 0x220001) AM_MIRROR(0x100000) AM_WRITENOP		// Unknown, always 0
+	AM_RANGE(0x240000, 0x240001) AM_MIRROR(0x100000) AM_WRITENOP		// Horizontal synchronization register
+	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x100000) AM_WRITENOP		// Vertical synchronization register
+	AM_RANGE(0x270000, 0x270001) AM_MIRROR(0x100000) AM_WRITENOP		// Video synchronization switch
+	AM_RANGE(0x280000, 0x29ffff) AM_MIRROR(0x160000) AM_READWRITE(sys24_char_r, sys24_char_w)
+	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_RAM_WRITE(system24temp_sys16_paletteram1_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x404000, 0x40401f) AM_MIRROR(0x1fbfe0) AM_READWRITE(sys24_mixer_r, sys24_mixer_w)
+	AM_RANGE(0x600000, 0x63ffff) AM_MIRROR(0x1c0000) AM_READWRITE(sys24_sprite_r, sys24_sprite_w)
+	AM_RANGE(0x800000, 0x80007f) AM_MIRROR(0x1ffe00) AM_READWRITE(system24temp_sys16_io_r, system24temp_sys16_io_w)
+	AM_RANGE(0x800100, 0x800101) AM_MIRROR(0x1ffe00) AM_WRITE(ym_register_w)
+	AM_RANGE(0x800102, 0x800103) AM_MIRROR(0x1ffe00) AM_READWRITE(ym_status_r, ym_data_w)
+	AM_RANGE(0xa00000, 0xa00007) AM_MIRROR(0x0ffff8) AM_READWRITE(irq_r, irq_w)
+	AM_RANGE(0xb00000, 0xb00007) AM_MIRROR(0x07fff0) AM_READWRITE(fdc_r, fdc_w)
+	AM_RANGE(0xb00008, 0xb0000f) AM_MIRROR(0x07fff0) AM_READWRITE(fdc_status_r, fdc_ctrl_w)
 	AM_RANGE(0xb80000, 0xbbffff) AM_ROMBANK(1)
-	AM_RANGE(0xbc0000, 0xbc0001) AM_READWRITE(curbank_r, curbank_w)
-	AM_RANGE(0xbc0006, 0xbc0007) AM_READWRITE(mlatch_r, mlatch_w)
-	AM_RANGE(0xc00000, 0xc00011) AM_READWRITE(hotrod3_ctrl_r, hotrod3_ctrl_w)
+	AM_RANGE(0xbc0000, 0xbc0001) AM_MIRROR(0x03fff8) AM_READWRITE(curbank_r, curbank_w)
+	AM_RANGE(0xbc0006, 0xbc0007) AM_MIRROR(0x03fff8) AM_READWRITE(mlatch_r, mlatch_w)
+	AM_RANGE(0xc00000, 0xc00011) AM_MIRROR(0x07ffe0) AM_READWRITE(hotrod3_ctrl_r, hotrod3_ctrl_w)
 	AM_RANGE(0xc80000, 0xcbffff) AM_ROMBANK(2)
-	AM_RANGE(0xcc0000, 0xcc0001) AM_READWRITE(curbank_r, curbank_w)
-	AM_RANGE(0xcc0006, 0xcc0007) AM_READWRITE(mlatch_r, mlatch_w)
-AM_RANGE(0xd00300, 0xd00301) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xf00000, 0xf3ffff) AM_RAM AM_SHARE(3)
-	AM_RANGE(0xf40000, 0xf7ffff) AM_ROM AM_SHARE(1)
-	AM_RANGE(0xf80000, 0xffffff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xcc0000, 0xcc0001) AM_MIRROR(0x03fff8) AM_READWRITE(curbank_r, curbank_w)
+	AM_RANGE(0xcc0006, 0xcc0007) AM_MIRROR(0x03fff8) AM_READWRITE(mlatch_r, mlatch_w)
+//AM_RANGE(0xd00300, 0xd00301) AM_WRITE(SMH_NOP)
+	AM_RANGE(0xf00000, 0xf3ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(3)
+	AM_RANGE(0xf80000, 0xfbffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(2)
 ADDRESS_MAP_END
 
 /*************************************
@@ -1043,9 +1089,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( system24_cpu2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_SHARE(3) AM_BASE(&s24_mainram1)			// RAM here overrides the ROM mirror
-	AM_RANGE(0x040000, 0x07ffff) AM_ROM AM_SHARE(1)
-	AM_RANGE(0x080000, 0x0fffff) AM_RAM AM_SHARE(2)
-	AM_RANGE(0x100000, 0x13ffff) AM_MIRROR(0x040000) AM_ROM AM_SHARE(1)
+	AM_RANGE(0x040000, 0x07ffff) AM_ROM AM_REGION("main", 0)
+	AM_RANGE(0x080000, 0x0bffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(2)
+	AM_RANGE(0x100000, 0x13ffff) AM_MIRROR(0x040000) AM_ROM AM_REGION("main", 0)
 	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE(sys24_tile_r, sys24_tile_w)
 	AM_RANGE(0x220000, 0x220001) AM_WRITENOP		// Unknown, always 0
 	AM_RANGE(0x240000, 0x240001) AM_WRITENOP		// Horizontal synchronization register
@@ -1070,164 +1116,10 @@ static ADDRESS_MAP_START( system24_cpu2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xcc0006, 0xcc0007) AM_READWRITE(mlatch_r, mlatch_w)
 AM_RANGE(0xd00300, 0xd00301) AM_WRITE(SMH_NOP)
 	AM_RANGE(0xf00000, 0xf3ffff) AM_RAM AM_SHARE(3)
-	AM_RANGE(0xf40000, 0xf7ffff) AM_ROM AM_SHARE(1)
-	AM_RANGE(0xf80000, 0xffffff) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xf40000, 0xf7ffff) AM_ROM AM_REGION("main", 0)
+	AM_RANGE(0xf80000, 0xfbffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(2)
 ADDRESS_MAP_END
 
-
-/*************************************
- *
- *  Game-specific driver inits
- *
- *************************************/
-
-static DRIVER_INIT(qgh)
-{
-	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
-	mlatch_table = gqh_mlt;
-	track_size = 0;
-}
-
-static DRIVER_INIT(dcclub)
-{
-	system24temp_sys16_io_set_callbacks(dcclub_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
-	mlatch_table = dcclub_mlt;
-	track_size = 0;
-}
-
-static DRIVER_INIT(qrouka)
-{
-	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
-	mlatch_table = qrouka_mlt;
-	track_size = 0;
-}
-
-static DRIVER_INIT(quizmeku)
-{
-	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
-	mlatch_table = quizmeku_mlt;
-	track_size = 0;
-}
-
-static DRIVER_INIT(mahmajn)
-{
-
-	system24temp_sys16_io_set_callbacks(mahmajn_io_r, mahmajn_io_w, resetcontrol_w, iod_r, iod_w);
-	mlatch_table = mahmajn_mlt;
-	track_size = 0;
-	cur_input_line = 0;
-}
-
-static DRIVER_INIT(mahmajn2)
-{
-
-	system24temp_sys16_io_set_callbacks(mahmajn_io_r, mahmajn_io_w, resetcontrol_w, iod_r, iod_w);
-	mlatch_table = mahmajn2_mlt;
-	track_size = 0;
-	cur_input_line = 0;
-}
-
-static DRIVER_INIT(hotrod)
-{
-	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
-	mlatch_table = 0;
-
-	// Sector  Size
-	// 1       8192
-	// 2       1024
-	// 3       1024
-	// 4       1024
-	// 5        512
-	// 6        256
-
-	track_size = 0x2f00;
-}
-
-static DRIVER_INIT(bnzabros)
-{
-	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
-	mlatch_table = bnzabros_mlt;
-
-	// Sector  Size
-	// 1       2048
-	// 2       2048
-	// 3       2048
-	// 4       2048
-	// 5       2048
-	// 6       1024
-	// 7        256
-
-	track_size = 0x2d00;
-}
-
-static DRIVER_INIT(sspirits)
-{
-	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
-	mlatch_table = 0;
-	track_size = 0x2d00;
-	s24_fd1094_driver_init(machine);
-
-}
-
-static DRIVER_INIT(sspiritj)
-{
-	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
-	mlatch_table = 0;
-	track_size = 0x2f00;
-	s24_fd1094_driver_init(machine);
-
-}
-
-static DRIVER_INIT(dcclubfd)
-{
-	system24temp_sys16_io_set_callbacks(dcclub_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
-	mlatch_table = dcclub_mlt;
-	track_size = 0x2d00;
-	s24_fd1094_driver_init(machine);
-
-}
-
-
-static DRIVER_INIT(sgmast)
-{
-	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
-	mlatch_table = 0;
-	track_size = 0x2d00;
-	s24_fd1094_driver_init(machine);
-
-}
-
-static DRIVER_INIT(qsww)
-{
-	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
-	mlatch_table = 0;
-	track_size = 0x2d00;
-	s24_fd1094_driver_init(machine);
-}
-
-static DRIVER_INIT(gground)
-{
-	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
-	mlatch_table = 0;
-	track_size = 0x2d00;
-	s24_fd1094_driver_init(machine);
-}
-
-static DRIVER_INIT(crkdown)
-{
-	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
-	mlatch_table = 0;
-	track_size = 0x2d00;
-	s24_fd1094_driver_init(machine);
-}
-
-static DRIVER_INIT(roughrac)
-{
-	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
-	mlatch_table = 0;
-	track_size = 0x2d00;
-	s24_fd1094_driver_init(machine);
-}
 
 /*************************************
  *
@@ -1240,14 +1132,14 @@ static NVRAM_HANDLER(system24)
 	if(!track_size || !file)
 		return;
 	if(read_or_write)
-		mame_fwrite(file, memory_region(machine, "user2"), 2*track_size);
+		mame_fwrite(file, memory_region(machine, "floppy"), 2*track_size);
 	else
-		mame_fread(file, memory_region(machine, "user2"), 2*track_size);
+		mame_fread(file, memory_region(machine, "floppy"), 2*track_size);
 }
 
 static MACHINE_START( system24 )
 {
-	UINT8 *usr1 = memory_region(machine, "user1");
+	UINT8 *usr1 = memory_region(machine, "romboard");
 	if (usr1)
 	{
 		memory_configure_bank(1, 0, 16, usr1, 0x40000);
@@ -1897,14 +1789,14 @@ static const ym2151_interface ym2151_config =
  *************************************/
 
 static MACHINE_DRIVER_START( system24 )
-	MDRV_CPU_ADD("main", M68000, 10000000)
+	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(system24_cpu1_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(irq_vbl, 2)
 
-	MDRV_CPU_ADD("sub", M68000, 10000000)
+	MDRV_CPU_ADD("sub", M68000, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(system24_cpu2_map, 0)
 
-	MDRV_INTERLEAVE(4)
+	MDRV_INTERLEAVE(100)
 
 	MDRV_MACHINE_START(system24)
 	MDRV_MACHINE_RESET(system24)
@@ -1913,11 +1805,8 @@ static MACHINE_DRIVER_START( system24 )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(100))
+	MDRV_SCREEN_RAW_PARAMS(XTAL_16MHz, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(62*8, 48*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 62*8-1, 0*8, 48*8-1)
 
 	MDRV_PALETTE_LENGTH(8192*2)
 
@@ -1947,7 +1836,7 @@ ROM_START( hotrod )
 	ROM_LOAD16_BYTE( "epr-11339.ic2", 0x000000, 0x20000, CRC(75130e73) SHA1(e079739f4a3da3807aac570442c5afef1a7d7b0e) )
 	ROM_LOAD16_BYTE( "epr-11338.ic1", 0x000001, 0x20000, CRC(7d4a7ff3) SHA1(3d3af04d990d232ba0a8fe155de59bc632a0a461) )
 
-	ROM_REGION( 0x1d6000, "user2", 0)
+	ROM_REGION( 0x1d6000, "floppy", 0)
 	ROM_LOAD( "ds3-5000-01d_3p_turbo.img", 0x000000, 0x1d6000, CRC(627e8053) SHA1(d1a95f99078f5a29cccacfb1b30c3c9ead7b605c) )
 ROM_END
 
@@ -1956,7 +1845,7 @@ ROM_START( hotroda )
 	ROM_LOAD16_BYTE( "epr-11339.ic2", 0x000000, 0x20000, CRC(75130e73) SHA1(e079739f4a3da3807aac570442c5afef1a7d7b0e) )
 	ROM_LOAD16_BYTE( "epr-11338.ic1", 0x000001, 0x20000, CRC(7d4a7ff3) SHA1(3d3af04d990d232ba0a8fe155de59bc632a0a461) )
 
-	ROM_REGION( 0x1d6000, "user2", 0)
+	ROM_REGION( 0x1d6000, "floppy", 0)
 	ROM_LOAD( "ds3-5000-01d.img", 0x000000, 0x1d6000, CRC(abf67b02) SHA1(f397435eaad691ff5a38d6d1d27840ed95a62df3) ) // World? 3 Player TURBO
 ROM_END
 
@@ -1965,7 +1854,7 @@ ROM_START( hotrodj )
 	ROM_LOAD16_BYTE( "epr-11339.ic2", 0x000000, 0x20000, CRC(75130e73) SHA1(e079739f4a3da3807aac570442c5afef1a7d7b0e) )
 	ROM_LOAD16_BYTE( "epr-11338.ic1", 0x000001, 0x20000, CRC(7d4a7ff3) SHA1(3d3af04d990d232ba0a8fe155de59bc632a0a461) )
 
-	ROM_REGION( 0x1d6000, "user2", 0)
+	ROM_REGION( 0x1d6000, "floppy", 0)
 	ROM_LOAD( "ds3-5000-01a-rev-b.img", 0x000000, 0x1d6000, CRC(a39a0c2d) SHA1(ea8104c2266c48f480837aa7679c0a6f0c5e5452) ) // Japanese 4 Player
 ROM_END
 
@@ -1974,7 +1863,7 @@ ROM_START( qgh )
 	ROM_LOAD16_BYTE( "16900b", 0x000000, 0x20000, CRC(20d7b7d1) SHA1(345b228c27e5f2fef9a2b8b5f619c59450a070f8) )
 	ROM_LOAD16_BYTE( "16899b", 0x000001, 0x20000, CRC(397b3ba9) SHA1(1773212cd87dcff840f3953ec368be7e2394faf0) )
 
-	ROM_REGION16_BE( 0x400000, "user1", 0)
+	ROM_REGION16_BE( 0x400000, "romboard", 0)
 	ROM_LOAD16_BYTE( "16902a", 0x000000, 0x80000, CRC(d35b7706) SHA1(341bca0af6b6d3f326328a88cdc69c7897b83a0d) )
 	ROM_LOAD16_BYTE( "16901a", 0x000001, 0x80000, CRC(ab4bcb33) SHA1(8acd73096eb485c6dc83da6adfcc47d5d0f5b7f3) )
 	ROM_LOAD16_BYTE( "16904",  0x100000, 0x80000, CRC(10987c88) SHA1(66f893690565aed613427421958ebe225a20ad0f) )
@@ -1990,7 +1879,7 @@ ROM_START( qrouka )
 	ROM_LOAD16_BYTE( "14485", 0x000000, 0x20000, CRC(fc0085f9) SHA1(0250d1e17e19b541b85198ec4207e55bfbd5c32e) )
 	ROM_LOAD16_BYTE( "14484", 0x000001, 0x20000, CRC(f51c641c) SHA1(3f2fd0be7d58c75e88565393da5e810655413b53) )
 
-	ROM_REGION16_BE( 0x400000, "user1", 0)
+	ROM_REGION16_BE( 0x400000, "romboard", 0)
 	ROM_LOAD16_BYTE( "14482", 0x000000, 0x80000, CRC(7a13dd97) SHA1(bfe9950d2cd41f3f866520923c1ed7b8da1990ec) )
 	ROM_LOAD16_BYTE( "14483", 0x100000, 0x80000, CRC(f3eb51a0) SHA1(6904830ff5e7aa5f016e115572fb6da678896ede) )
 ROM_END
@@ -2000,7 +1889,7 @@ ROM_START( mahmajn )
 	ROM_LOAD16_BYTE( "epr14813.bin", 0x000000, 0x20000, CRC(ea38cf4b) SHA1(118ab2e0ae20a4db5e619945dfbb3f200de3979c) )
 	ROM_LOAD16_BYTE( "epr14812.bin", 0x000001, 0x20000, CRC(5a3cb4a7) SHA1(c0f21282140e8e6e927664f5f2b90525ae0207e9) )
 
-	ROM_REGION16_BE( 0x400000, "user1", 0)
+	ROM_REGION16_BE( 0x400000, "romboard", 0)
 	ROM_LOAD16_BYTE( "mpr14820.bin", 0x000000, 0x80000, CRC(8d2a03d3) SHA1(b3339bcd101bcfe042e2a1cfdc8baef0a86624df) )
 	ROM_LOAD16_BYTE( "mpr14819.bin", 0x000001, 0x80000, CRC(e84c4827) SHA1(54741295e1bdca7d0c78eb795a68b92212d43b2e) )
 	ROM_LOAD16_BYTE( "mpr14822.bin", 0x100000, 0x80000, CRC(7c3dcc51) SHA1(a199c2c71cda44a2c8755074c1007d83c8d45d2d) )
@@ -2016,7 +1905,7 @@ ROM_START( mahmajn2 )
 	ROM_LOAD16_BYTE( "epr16799.bin", 0x000000, 0x20000, CRC(3a34cf75) SHA1(d22bf6334668af29167cf4244d18f9cd2e7ff7d6) )
 	ROM_LOAD16_BYTE( "epr16798.bin", 0x000001, 0x20000, CRC(662923fa) SHA1(dcd3964d899d3f34dab22ffcd1a5af895804fae1) )
 
-	ROM_REGION16_BE( 0x400000, "user1", 0)
+	ROM_REGION16_BE( 0x400000, "romboard", 0)
 	ROM_LOAD16_BYTE( "mpr16801.bin", 0x000000, 0x80000, CRC(74855a17) SHA1(d2d8e7da7b261e7cb64605284d2c78fbd1465b69) )
 	ROM_LOAD16_BYTE( "mpr16800.bin", 0x000001, 0x80000, CRC(6dbc1e02) SHA1(cce5734243ff171759cecb5c05c12dc743a25c1d) )
 	ROM_LOAD16_BYTE( "mpr16803.bin", 0x100000, 0x80000, CRC(9b658dd6) SHA1(eaaae289a3555aa6a92f57eea964dbbf48c5c2a4) )
@@ -2032,7 +1921,7 @@ ROM_START( bnzabros )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION16_BE( 0x400000, "user1", 0)
+	ROM_REGION16_BE( 0x400000, "romboard", 0)
 	ROM_LOAD16_BYTE( "mpr-13188-h.2",  0x000000, 0x80000, CRC(d3802294) SHA1(7608e71e8ef398ac24dbf851994253bca5ace625) )
 	ROM_LOAD16_BYTE( "mpr-13187-h.1",  0x000001, 0x80000, CRC(e3d8c5f7) SHA1(5b1e8646debee2f2ef272ddd3320b0a17192fbbe) )
 	ROM_LOAD16_BYTE( "mpr-13190.4",    0x100000, 0x40000, CRC(0b4df388) SHA1(340478bba82069ab745d6d8703e6801411fd2fc4) )
@@ -2040,7 +1929,7 @@ ROM_START( bnzabros )
 	ROM_LOAD16_BYTE( "mpr-13189.3",    0x100001, 0x40000, CRC(5ea5a2f3) SHA1(514b5446303c50aeb1d6d10d0a3f210da2577e16) )
 	ROM_RELOAD ( 0x180001, 0x40000)
 
-	ROM_REGION( 0x1c2000, "user2", 0)
+	ROM_REGION( 0x1c2000, "floppy", 0)
 	ROM_LOAD( "ds3-5000-07d.img", 0x000000, 0x1c2000, CRC(ea7a3302) SHA1(5f92efb2e1135c1f3eeca38ba5789739a22dbd11) ) /* Region letter needs to be verfied */
 ROM_END
 
@@ -2049,7 +1938,7 @@ ROM_START( bnzabrsj )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION16_BE( 0x400000, "user1", 0)
+	ROM_REGION16_BE( 0x400000, "romboard", 0)
 	ROM_LOAD16_BYTE( "mpr-13188-h.2",  0x000000, 0x80000, CRC(d3802294) SHA1(7608e71e8ef398ac24dbf851994253bca5ace625) )
 	ROM_LOAD16_BYTE( "mpr-13187-h.1",  0x000001, 0x80000, CRC(e3d8c5f7) SHA1(5b1e8646debee2f2ef272ddd3320b0a17192fbbe) )
 	ROM_LOAD16_BYTE( "mpr-13190.4",    0x100000, 0x40000, CRC(0b4df388) SHA1(340478bba82069ab745d6d8703e6801411fd2fc4) )
@@ -2057,7 +1946,7 @@ ROM_START( bnzabrsj )
 	ROM_LOAD16_BYTE( "mpr-13189.3",    0x100001, 0x40000, CRC(5ea5a2f3) SHA1(514b5446303c50aeb1d6d10d0a3f210da2577e16) )
 	ROM_RELOAD ( 0x180001, 0x40000)
 
-	ROM_REGION( 0x1c2000, "user2", 0)
+	ROM_REGION( 0x1c2000, "floppy", 0)
 	ROM_LOAD( "ds3-5000-07b.img", 0x000000, 0x1c2000, CRC(efa7f2a7) SHA1(eb905bff88fa40324fb92b91ac8a5878648c26e5) )
 ROM_END
 
@@ -2066,7 +1955,7 @@ ROM_START( quizmeku ) // Quiz Mekuromeku Story
 	 ROM_LOAD16_BYTE( "epr15343.ic2", 0x000000, 0x20000, CRC(c72399a7) SHA1(bfbf0079ea63f89bca4ce9081aed5d5c1d9d169a) )
 	 ROM_LOAD16_BYTE( "epr15342.ic1", 0x000001, 0x20000, CRC(0968ac84) SHA1(4e1170ac123adaec32819754b5075531ff1925fe) )
 
-	 ROM_REGION16_BE( 0x400000, "user1", 0)
+	 ROM_REGION16_BE( 0x400000, "romboard", 0)
 	 ROM_LOAD16_BYTE( "epr15345.ic5", 0x000000, 0x80000, CRC(88030b5d) SHA1(d2feeedb9a64c3dc8dd25716209f945d12fa9b53) )
 	 ROM_LOAD16_BYTE( "epr15344.ic4", 0x000001, 0x80000, CRC(dd11b382) SHA1(2b0f49fb307a9aba0f295de64782ee095c557170) )
 	 ROM_LOAD16_BYTE( "mpr15347.ic7", 0x100000, 0x80000, CRC(0472677b) SHA1(93ae57a2817b6b54c99814fca28ef51f7ff5e559) )
@@ -2080,7 +1969,7 @@ ROM_START( sspirits )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x1c2000, "user2", 0)
+	ROM_REGION( 0x1c2000, "floppy", 0)
 	ROM_LOAD( "ds3-5000-02-.img", 0x000000, 0x1c2000, CRC(cefbda69) SHA1(5b47ae0f1584ce1eb697246273ba761bd9e981c1)  )
 ROM_END
 
@@ -2089,7 +1978,7 @@ ROM_START( sspiritj )
 	ROM_LOAD16_BYTE( "epr-11339.ic2", 0x000000, 0x20000, CRC(75130e73) SHA1(e079739f4a3da3807aac570442c5afef1a7d7b0e) )
 	ROM_LOAD16_BYTE( "epr-11338.ic1", 0x000001, 0x20000, CRC(7d4a7ff3) SHA1(3d3af04d990d232ba0a8fe155de59bc632a0a461) )
 
-	ROM_REGION( 0x1d6000, "user2", 0)
+	ROM_REGION( 0x1d6000, "floppy", 0)
 	ROM_LOAD( "ds3-5000-02-rev-a.img", 0x000000, 0x1d6000, CRC(0385470f) SHA1(62c1bfe3a88b2dee44629809e08b4b8a5770eaab)  )
 ROM_END
 
@@ -2098,10 +1987,10 @@ ROM_START( sspirtfc )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "user3", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-02c.key", 0x0000, 0x2000,  CRC(ebae170e) SHA1(b6d1e1b6943a35b96e98e426ecb39bb5a42fb643) )
 
-	ROM_REGION( 0x1c2000, "user2", 0)
+	ROM_REGION( 0x1c2000, "floppy", 0)
 	ROM_LOAD( "ds3-5000-02c.img", 0x000000, 0x1c2000, NO_DUMP )
 ROM_END
 
@@ -2110,10 +1999,10 @@ ROM_START( sgmast )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "user3", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-05d.key", 0x0000, 0x2000, NO_DUMP )
 
-	ROM_REGION( 0x1c2000, "user2", 0)
+	ROM_REGION( 0x1c2000, "floppy", 0)
 	/* not sure which of these images is best */
 	ROM_LOAD( "ds3-5000-05d.img",      0x000000, 0x1c2000, CRC(e9a69f93) SHA1(dc15e47ed78373688c1fab72a9605528068ad702) )
 	ROM_LOAD( "ds3-5000-05d_alt.img",  0x000000, 0x1c2000, CRC(e71a8ebf) SHA1(60feb0af1cfc0508c8d68c8572495eec1763dc93) )
@@ -2126,10 +2015,10 @@ ROM_START( sgmastc )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "user3", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-05c.key", 0x0000, 0x2000, CRC(ae0eabe5) SHA1(692d7565bf9c5b32cc80bb4bd88c9193aa04cbb0) )
 
-	ROM_REGION( 0x1c2000, "user2", 0)
+	ROM_REGION( 0x1c2000, "floppy", 0)
 	ROM_LOAD( "ds3-5000-05c.img", 0x000000, 0x1c2000, CRC(06c4f834) SHA1(5e178ed0edff7721c93f76da2e03ae188dc5efa4) )
 ROM_END
 
@@ -2138,10 +2027,10 @@ ROM_START( sgmastj )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "user3", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-05b.key", 0x0000, 0x2000, CRC(adc0c83b) SHA1(2328d82d5057062eeb0072fd57f0422218cf24fc) )
 
-	ROM_REGION( 0x1c2000, "user2", 0)
+	ROM_REGION( 0x1c2000, "floppy", 0)
 	ROM_LOAD( "ds3-5000-05b.img", 0x000000, 0x1c2000,  CRC(a136668c) SHA1(7203f9d11023605a0a4b52a4be330785c8f7b623) )
 ROM_END
 
@@ -2150,10 +2039,10 @@ ROM_START( qsww )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "user3", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-08b.key", 0x0000, 0x2000,  CRC(fe0a336a) SHA1(f7a5b2c1a057d0bb8c1ae0453c58aa8f5fb731b9) )
 
-	ROM_REGION( 0x1c2000, "user2", 0)
+	ROM_REGION( 0x1c2000, "floppy", 0)
 	ROM_LOAD( "ds3-5000-08b.img", 0x000000, 0x1c2000, CRC(5a886d38) SHA1(2e974a9ffe3534da4fb117c579b8b0e61a63542c) )
 ROM_END
 
@@ -2162,10 +2051,10 @@ ROM_START( gground )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "user3", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-03d.key", 0x0000, 0x2000,  CRC(e1785bbd) SHA1(b4bebb2829299f1c0815d6a5f317a2526b322f63) ) /* Also labeled "rev-A" but is it different? */
 
-	ROM_REGION( 0x1c2000, "user2", 0)
+	ROM_REGION( 0x1c2000, "floppy", 0)
 	ROM_LOAD( "ds3-5000-03d-rev-a.img", 0x000000, 0x1c2000, CRC(5c5910f2) SHA1(9ed564a03c0d4ca4a207f3ecfb7336c6cbcaa70f) )
 ROM_END
 
@@ -2174,10 +2063,10 @@ ROM_START( ggroundj )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "user3", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-03b.key", 0x0000, 0x2000,  CRC(84aecdba) SHA1(ceddf967359a6e76543fe1ab00be53d0a11fe1ab) )
 
-	ROM_REGION( 0x1c2000, "user2", 0)
+	ROM_REGION( 0x1c2000, "floppy", 0)
 	ROM_LOAD( "ds3-5000-03b.img", 0x000000, 0x1c2000, CRC(7200dac9) SHA1(07cf33bf2a0da36e3852de409959f30128cdbf77) )
 ROM_END
 
@@ -2186,10 +2075,10 @@ ROM_START( crkdown )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "user3", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-04c.key", 0x0000, 0x2000,  CRC(16e978cc) SHA1(0e1482b5efa93b732d4cf0990919cb3fc903dca7) )
 
-	ROM_REGION( 0x1c2000, "user2", 0)
+	ROM_REGION( 0x1c2000, "floppy", 0)
 	ROM_LOAD( "ds3-5000-04c.img", 0x000000, 0x1c2000, CRC(5edc01a5) SHA1(8eb1bf41f533d16c12930f5831f8bccd4d8de4f7) )
 ROM_END
 
@@ -2198,10 +2087,10 @@ ROM_START( crkdownu )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "user3", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-04d.key", 0x0000, 0x2000,  CRC(934ac358) SHA1(73418e22c9d201bc3fec5c63284858958c010e05) )
 
-	ROM_REGION( 0x1c2000, "user2", 0)
+	ROM_REGION( 0x1c2000, "floppy", 0)
 	ROM_LOAD( "ds3-5000-04d.img", 0x000000, 0x1c2000, CRC(8679032c) SHA1(887b245a70652897fbda736b60e81a123866ec12) )
 ROM_END
 
@@ -2210,10 +2099,10 @@ ROM_START( crkdownj )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "user3", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-04b.key", 0x0000, 0x2000,  CRC(4a99a202) SHA1(d7375f09e7246ecd60ba0e48f049e9e252af92a8) ) /* Also labeled "rev-A" but is it different? */
 
-	ROM_REGION( 0x1c2000, "user2", 0)
+	ROM_REGION( 0x1c2000, "floppy", 0)
 	ROM_LOAD( "ds3-5000-04b-rev-a.img", 0x000000, 0x1c2000, CRC(5daa1a9a) SHA1(ce2f07b83b607bbbdb70f1ae344c1d897d601809) )
 ROM_END
 
@@ -2222,7 +2111,7 @@ ROM_START( dcclub )
 	ROM_LOAD16_BYTE( "epr13948.bin", 0x000000, 0x20000, CRC(d6a031c8) SHA1(45b7e3cd2c7412e24f547cd4185166199d3938d5) )
 	ROM_LOAD16_BYTE( "epr13947.bin", 0x000001, 0x20000, CRC(7e3cff5e) SHA1(ff8cb776d2491796feeb8892c7e644e590438945) )
 
-	ROM_REGION16_BE( 0x400000, "user1", 0)
+	ROM_REGION16_BE( 0x400000, "romboard", 0)
 	ROM_LOAD16_BYTE( "epr-15345.2",  0x000000, 0x80000, CRC(d9e120c2) SHA1(b18b76733078d8534c6f0d8950632ab51e6a10ab) )
 	ROM_LOAD16_BYTE( "epr-15344.1",  0x000001, 0x80000, CRC(8f8b9f74) SHA1(de6b923118bea60197547ad016cb5d5e1a8f372b) )
 	ROM_LOAD16_BYTE( "mpr-14097-t.4",0x100000, 0x80000, CRC(4bd74cae) SHA1(5aa90bd5d2b8e2338ef0fe41d1f794e8d51321e1) )
@@ -2234,7 +2123,7 @@ ROM_START( dcclubj )
 	ROM_LOAD16_BYTE( "epr13948.bin", 0x000000, 0x20000, CRC(d6a031c8) SHA1(45b7e3cd2c7412e24f547cd4185166199d3938d5) )
 	ROM_LOAD16_BYTE( "epr13947.bin", 0x000001, 0x20000, CRC(7e3cff5e) SHA1(ff8cb776d2491796feeb8892c7e644e590438945) )
 
-	ROM_REGION16_BE( 0x400000, "user1", 0)
+	ROM_REGION16_BE( 0x400000, "romboard", 0)
 	ROM_LOAD16_BYTE( "epr-14095a.2", 0x000000, 0x80000, CRC(88d184e9) SHA1(519F3A22E1619DE9D5F13A45B85EBD249EBFA979) )
 	ROM_LOAD16_BYTE( "epr-14094a.1", 0x000001, 0x80000, CRC(7dd2b7d4) SHA1(C7EAF9E2700E0C55F7E867F5CD3FFAA5AAE97956) )
 	ROM_LOAD16_BYTE( "mpr-14097-t.4",0x100000, 0x80000, CRC(4bd74cae) SHA1(5aa90bd5d2b8e2338ef0fe41d1f794e8d51321e1) )
@@ -2246,10 +2135,10 @@ ROM_START( dcclubfd )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "user3", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-09d.key", 0x0000, 0x2000, CRC(a91ebffb) SHA1(70b8b4272ca456491f254d115b434bb4ce73f049) )
 
-	ROM_REGION( 0x1c2000, "user2", 0)
+	ROM_REGION( 0x1c2000, "floppy", 0)
 	ROM_LOAD( "ds3-5000-09d.img", 0x000000, 0x1c2000,  CRC(69870887) SHA1(e47a997c2c783bf6670ab213ebe2ee35492eba34) )
 ROM_END
 
@@ -2258,10 +2147,10 @@ ROM_START( roughrac )
 	ROM_LOAD16_BYTE( "epr-12187.ic2", 0x000000, 0x20000, CRC(e83783f3) SHA1(4b3b32df7de85aef9cd77c8a4ffc17e10466b638) )
 	ROM_LOAD16_BYTE( "epr-12186.ic1", 0x000001, 0x20000, CRC(ce76319d) SHA1(0ede61f0700f9161285c768fa97636f0e42b96f8) )
 
-	ROM_REGION( 0x2000, "user3", 0 )	/* decryption key */
+	ROM_REGION( 0x2000, "fd1094key", 0 )	/* decryption key */
 	ROM_LOAD( "317-0058-06b.key",    0x000000, 0x2000, CRC(6a5bf536) SHA1(3fc3e93ce8a47d7ee86da889efad2e7eca6e2ee9) )
 
-	ROM_REGION( 0x1c2000, "user2", 0)
+	ROM_REGION( 0x1c2000, "floppy", 0)
 	ROM_LOAD( "ds3-5000-06b.img",    0x000000, 0x1c2000, CRC(a7fb2149) SHA1(c04266ae31700b085ab45606aed83019a563de70) )
 ROM_END
 
@@ -2270,6 +2159,162 @@ ROM_END
            'c' = europe?
            'd' = US
 */
+
+
+/*************************************
+ *
+ *  Game-specific driver inits
+ *
+ *************************************/
+
+static DRIVER_INIT(qgh)
+{
+	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
+	mlatch_table = gqh_mlt;
+	track_size = 0;
+}
+
+static DRIVER_INIT(dcclub)
+{
+	system24temp_sys16_io_set_callbacks(dcclub_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
+	mlatch_table = dcclub_mlt;
+	track_size = 0;
+}
+
+static DRIVER_INIT(qrouka)
+{
+	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
+	mlatch_table = qrouka_mlt;
+	track_size = 0;
+}
+
+static DRIVER_INIT(quizmeku)
+{
+	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
+	mlatch_table = quizmeku_mlt;
+	track_size = 0;
+}
+
+static DRIVER_INIT(mahmajn)
+{
+
+	system24temp_sys16_io_set_callbacks(mahmajn_io_r, mahmajn_io_w, resetcontrol_w, iod_r, iod_w);
+	mlatch_table = mahmajn_mlt;
+	track_size = 0;
+	cur_input_line = 0;
+}
+
+static DRIVER_INIT(mahmajn2)
+{
+
+	system24temp_sys16_io_set_callbacks(mahmajn_io_r, mahmajn_io_w, resetcontrol_w, iod_r, iod_w);
+	mlatch_table = mahmajn2_mlt;
+	track_size = 0;
+	cur_input_line = 0;
+}
+
+static DRIVER_INIT(hotrod)
+{
+	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
+	mlatch_table = 0;
+
+	// Sector  Size
+	// 1       8192
+	// 2       1024
+	// 3       1024
+	// 4       1024
+	// 5        512
+	// 6        256
+
+	track_size = 0x2f00;
+}
+
+static DRIVER_INIT(bnzabros)
+{
+	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
+	mlatch_table = bnzabros_mlt;
+
+	// Sector  Size
+	// 1       2048
+	// 2       2048
+	// 3       2048
+	// 4       2048
+	// 5       2048
+	// 6       1024
+	// 7        256
+
+	track_size = 0x2d00;
+}
+
+static DRIVER_INIT(sspirits)
+{
+	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
+	mlatch_table = 0;
+	track_size = 0x2d00;
+	s24_fd1094_driver_init(machine);
+
+}
+
+static DRIVER_INIT(sspiritj)
+{
+	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
+	mlatch_table = 0;
+	track_size = 0x2f00;
+	s24_fd1094_driver_init(machine);
+
+}
+
+static DRIVER_INIT(dcclubfd)
+{
+	system24temp_sys16_io_set_callbacks(dcclub_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
+	mlatch_table = dcclub_mlt;
+	track_size = 0x2d00;
+	s24_fd1094_driver_init(machine);
+
+}
+
+
+static DRIVER_INIT(sgmast)
+{
+	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
+	mlatch_table = 0;
+	track_size = 0x2d00;
+	s24_fd1094_driver_init(machine);
+
+}
+
+static DRIVER_INIT(qsww)
+{
+	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
+	mlatch_table = 0;
+	track_size = 0x2d00;
+	s24_fd1094_driver_init(machine);
+}
+
+static DRIVER_INIT(gground)
+{
+	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
+	mlatch_table = 0;
+	track_size = 0x2d00;
+	s24_fd1094_driver_init(machine);
+}
+
+static DRIVER_INIT(crkdown)
+{
+	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
+	mlatch_table = 0;
+	track_size = 0x2d00;
+	s24_fd1094_driver_init(machine);
+}
+
+static DRIVER_INIT(roughrac)
+{
+	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
+	mlatch_table = 0;
+	track_size = 0x2d00;
+	s24_fd1094_driver_init(machine);
+}
+
 
 /*************************************
  *
