@@ -587,7 +587,9 @@ void decrypt_kof2k4se_68k( running_machine *machine )
 			free(dst);
 }
 
-/* Lans2004 (bootleg of Shock Troopers 2) */
+
+/* Lansquenet 2004 (Shock Troopers - 2nd Squad bootleg) */
+
 
 void lans2004_vx_decrypt( running_machine *machine )
 {
@@ -970,9 +972,11 @@ void kof2k3up_install_protection(running_machine *machine)
     memory_install_readwrite16_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x2fe000, 0x2fffff, 0, 0, kof2003_r, kof2003_w );
 }
 
-/* samsho5bl */
 
-void samsh5bl_px_decrypt( running_machine *machine )
+/* Samurai Shodown V / Samurai Spirits Zero (bootleg) */
+
+
+void samsho5b_px_decrypt( running_machine *machine )
 {
 	int px_size = memory_region_length( machine, "main" );
 	UINT8 *rom = memory_region( machine, "main" );
@@ -998,7 +1002,8 @@ void samsh5bl_px_decrypt( running_machine *machine )
 	free( buf );
 }
 
-void samsh5bl_vx_decrypt( running_machine *machine )
+
+void samsho5b_vx_decrypt( running_machine *machine )
 {
 	int vx_size = memory_region_length( machine, "ym" );
 	UINT8 *rom = memory_region( machine, "ym" );

@@ -33,13 +33,13 @@
           (see machine/neoprot.c)
       kof2002, matrim, samsho5, samsh5p
         - some basic block / bank swapping
-      svcchaos, kof2003, mslug5
+      svc, kof2003, mslug5
         - different scrambling with additional xor
 
     NeoGeo 'V' Rom encryption
       NEO-PCM2 chip used on various games
       type1 used on pnyaa, rotd, mslug4
-      type2 used on kof2002, matrim, mslug5, svcchaos,
+      type2 used on kof2002, matrim, mslug5, svc,
                     samsho5, samsh5s, kof2003
 
 ***************************************************************************/
@@ -669,7 +669,7 @@ void cmc50_neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
 }
 
 
-/* svcchaos has an additional scramble on top of the standard CMC scrambling */
+/* svc has an additional scramble on top of the standard CMC scrambling */
 void svcpcb_gfx_decrypt(running_machine *machine)
 {
 	static const UINT8 xor[ 4 ] = { 0x34, 0x21, 0xc4, 0xe9 };
@@ -970,7 +970,7 @@ void kof2000_decrypt_68k(running_machine *machine)
 }
 
 
-/* kof2002, matrim, samsho5, samsh5p have some simple block swapping */
+/* kof2002, matrim, samsho5, samsh5sp have some simple block swapping */
 void kof2002_decrypt_68k(running_machine *machine)
 {
 	int i;
@@ -1017,7 +1017,7 @@ void samsho5_decrypt_68k(running_machine *machine)
 }
 
 
-void samsh5p_decrypt_68k(running_machine *machine)
+void samsh5sp_decrypt_68k(running_machine *machine)
 {
 	int i;
 	static const int sec[]={0x000000,0x080000,0x500000,0x480000,0x600000,0x580000,0x700000,0x280000,0x100000,0x680000,0x400000,0x780000,0x200000,0x380000,0x300000,0x180000};
@@ -1033,7 +1033,7 @@ void samsh5p_decrypt_68k(running_machine *machine)
 }
 
 
-/* mslug5, svcchaos, kof2003 have updated P rom scramble */
+/* mslug5, svc, kof2003 have updated P rom scramble */
 void mslug5_decrypt_68k(running_machine *machine)
 {
 	static const UINT8 xor1[ 0x20 ] = { 0xc2, 0x4b, 0x74, 0xfd, 0x0b, 0x34, 0xeb, 0xd7, 0x10, 0x6d, 0xf9, 0xce, 0x5d, 0xd5, 0x61, 0x29, 0xf5, 0xbe, 0x0d, 0x82, 0x72, 0x45, 0x0f, 0x24, 0xb3, 0x34, 0x1b, 0x99, 0xea, 0x09, 0xf3, 0x03 };
@@ -1079,7 +1079,7 @@ void mslug5_decrypt_68k(running_machine *machine)
 }
 
 
-void svcchaos_px_decrypt(running_machine *machine)
+void svc_px_decrypt(running_machine *machine)
 {
 	static const UINT8 xor1[ 0x20 ] = { 0x3b, 0x6a, 0xf7, 0xb7, 0xe8, 0xa9, 0x20, 0x99, 0x9f, 0x39, 0x34, 0x0c, 0xc3, 0x9a, 0xa5, 0xc8, 0xb8, 0x18, 0xce, 0x56, 0x94, 0x44, 0xe3, 0x7a, 0xf7, 0xdd, 0x42, 0xf0, 0x18, 0x60, 0x92, 0x9f };
 	static const UINT8 xor2[ 0x20 ] = { 0x69, 0x0b, 0x60, 0xd6, 0x4f, 0x01, 0x40, 0x1a, 0x9f, 0x0b, 0xf0, 0x75, 0x58, 0x0e, 0x60, 0xb4, 0x14, 0x04, 0x20, 0xe4, 0xb9, 0x0d, 0x10, 0x89, 0xeb, 0x07, 0x30, 0x90, 0x50, 0x0e, 0x20, 0x26 };
@@ -1559,4 +1559,5 @@ void neogeo_cmc50_m1_decrypt(running_machine *machine)
 	}
 	#endif
 
+	free( buffer );
 }

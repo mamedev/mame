@@ -53,7 +53,7 @@ void kof98_decrypt_68k(running_machine *machine);
 void kof2002_decrypt_68k(running_machine *machine);
 void matrim_decrypt_68k(running_machine *machine);
 void mslug5_decrypt_68k(running_machine *machine);
-void svcchaos_px_decrypt(running_machine *machine);
+void svc_px_decrypt(running_machine *machine);
 void svcpcb_gfx_decrypt(running_machine *machine);
 void svcpcb_s1data_decrypt(running_machine *machine);
 void samsho5_decrypt_68k(running_machine *machine);
@@ -63,7 +63,7 @@ void kf2k3pcb_decrypt_s1data(running_machine *machine);
 void kof2003_decrypt_68k(running_machine *machine);
 void kof2003h_decrypt_68k(running_machine *machine);
 void kof2003biosdecode(running_machine *machine);
-void samsh5p_decrypt_68k(running_machine *machine);
+void samsh5sp_decrypt_68k(running_machine *machine);
 
 void neo_pcm2_snk_1999(running_machine *machine, int value);
 void neo_pcm2_swap(running_machine *machine, int value);
@@ -117,8 +117,8 @@ void kof2k3pl_px_decrypt(running_machine *machine);
 void kof2k3up_px_decrypt(running_machine *machine);
 void kof2k3up_install_protection(running_machine *machine);
 void kf2k3pl_install_protection(running_machine *machine);
-void samsh5bl_px_decrypt(running_machine *machine);
-void samsh5bl_vx_decrypt(running_machine *machine);
+void samsho5b_px_decrypt(running_machine *machine);
+void samsho5b_vx_decrypt(running_machine *machine);
 
 
 /*----------- defined in video/neogeo.c -----------*/
