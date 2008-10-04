@@ -295,6 +295,70 @@ MACHINE_DRIVER_END
 
 /*******************************************************/
 /*                                                     */
+/* Astro Sidam?                                        */
+/*                                                     */
+/*******************************************************/
+
+static ADDRESS_MAP_START( astropal_io_map, ADDRESS_SPACE_IO, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x7)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0x04) AM_READ_PORT("IN0")
+	AM_RANGE(0x01, 0x01) AM_MIRROR(0x04) AM_READ_PORT("IN1")
+	AM_RANGE(0x03, 0x03) AM_MIRROR(0x04) AM_READ_PORT("IN3")
+
+	AM_RANGE(0x03, 0x03) AM_WRITE(invaders_audio_1_w)
+	AM_RANGE(0x05, 0x05) AM_WRITE(invaders_audio_2_w)
+	AM_RANGE(0x06, 0x06) AM_WRITE(watchdog_reset_w)
+ADDRESS_MAP_END
+
+static INPUT_PORTS_START( astropal )
+	PORT_START("IN0")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x03, "5" )
+	PORT_BIT( 0xfc, IP_ACTIVE_LOW,  IPT_UNUSED )		/* never read */
+	
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW,  IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON2 ) 
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) 
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	
+	/* PORT_START("IN2") - never read */
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON3 ) 
+
+	/* Dummy port for cocktail mode (not used) */
+	INVADERS_CAB_TYPE_PORT
+	PORT_MODIFY(INVADERS_CAB_TYPE_PORT_TAG)
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	
+INPUT_PORTS_END
+
+static MACHINE_DRIVER_START( astropal )
+
+    /* basic machine hardware */
+    MDRV_IMPORT_FROM(invaders)
+    MDRV_CPU_MODIFY("main")
+	MDRV_CPU_IO_MAP(astropal_io_map, 0)
+
+MACHINE_DRIVER_END
+
+/*******************************************************/
+/*                                                     */
 /* Cosmo                                               */
 /*                                                     */
 /*******************************************************/
@@ -2464,7 +2528,7 @@ GAMEL(19??, tst_invd, invaders, invaders, sicv,     0, ROT0,   "Test ROM", "Spac
 GAMEL(19??, alieninv, invaders, invaders, searthin, 0, ROT270, "bootleg", "Alien Invasion Part II", 0, layout_invaders )
 GAMEL(1978, spceking, invaders, invaders, sicv,     0, ROT270, "Leijac Corporation (Konami)","Space King", 0, layout_invaders )
 GAMEL(1978, spcewars, invaders, spcewars, spcewars, 0, ROT270, "Sanritsu", "Space War (Sanritsu)", 0, layout_invaders )
-GAME (19??, astropal, 0,        invaders, spcewars, 0, ROT0,   "Sidam?", "Astropal", GAME_NOT_WORKING )
+GAME (19??, astropal, 0,        astropal, astropal, 0, ROT0,   "Sidam?", "Astropal", GAME_IMPERFECT_SOUND )
 GAMEL(1978, spacewr3, invaders, spcewars, sicv,     0, ROT270, "bootleg", "Space War Part 3", 0, layout_invaders )
 GAMEL(1978, invaderl, invaders, invaders, sicv,     0, ROT270, "Logitec", "Space Invaders (Logitec)", 0, layout_invaders )
 GAMEL(1978, invader4, invaders, invaders, sicv,     0, ROT270, "bootleg", "Space Invaders Part Four", 0, layout_invaders )
