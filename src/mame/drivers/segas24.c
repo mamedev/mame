@@ -342,6 +342,7 @@ Notes:
 #include "sound/2151intf.h"
 
 #define MASTER_CLOCK		XTAL_20MHz
+#define VIDEO_CLOCK			XTAL_32MHz
 
 
 UINT16* s24_mainram1;
@@ -1008,61 +1009,39 @@ fc-ff ramhi
  *************************************/
 
 /*
- 000000-03FFFF : ROM (256K)
- 040000-07FFFF : ROM (mirror)
- 080000-0BFFFF : CPU A work RAM (256K)
- 0C0000-0FFFFF : CPU A work RAM (mirror)
+ Both CPUs have the same memory map, except for the first 512K where
+ CPU A has ROM and CPU B has work RAM mapped there.
 
- 100000-13FFFF : ROM (mirror)
- 140000-17FFFF : ROM (mirror)
- 180000-1BFFFF : ROM (mirror)
- 1C0000-1FFFFF : ROM (mirror)
+ The memory map can be broken down into the following regions:
 
- 200000-20FFFF : Tilemap generator name table RAM (64K)
- 210000-21FFFF : Tilemap generator name table RAM (mirror) (*1)
- 220000-27FFFF : Unused (returns $FFFF), write-only registers are:
- 240000.w      : Framebuffer read-out starting X position ($FFCE = Tilemap pixel 0)
- 260000.w      : Framebuffer read-out starting Y position ($FBF0 = Tilemap line 0)
- 270001.b      : Display mode (00=normal, 01=invalid) (*3)
- 280000-29FFFF : Tilemap generator pattern RAM (128K)
- 2A0000-2BFFFF : Tilemap generator pattern RAM (mirror)
- 2C0000-2DFFFF : Tilemap generator pattern RAM (mirror) 
- 2E0000-2FFFFF : Tilemap generator pattern RAM (mirror)
- 300000-3FFFFF : Mirror of 200000-2FFFFF
-
- 400000-403FFF : Color RAM (16K)
- 404000-407FFF : Mixer chip registers
- 408000-5FFFFF : Mirror of 400000-407FFF
-
- 600000-6FFFFF : Object generator RAM (256K) (*2)
- 700000-7FFFFF : Mirror of 600000-6FFFFF
-
+ 000000-07FFFF : BIOS ROM (for CPU A only)
+                 CPU B work RAM (for CPU B only)
+ 080000-0FFFFF : CPU A work RAM
+ 100000-1FFFFF : BIOS ROM
+ 200000-3FFFFF : Tilemap generator
+ 400000-5FFFFF : Mixer chip
+ 600000-7FFFFF : Sprite generator
  800000-9FFFFF : I/O chip
+ A00000-AFFFFF : Timer and interrupt controller chip
+ B00000-EFFFFF : Extra chip selects for expansion
+ F00000-F7FFFF : CPU B work RAM
+ F80000-FFFFFF : CPU A work RAM
 
- A00000-AFFFFF : Interrupt controller and timer registers
- B00000-BFFFFF : /EXCS0 and /DTK0 area (Floppy disk controller board)
- C00000-CFFFFF : /EXCS1 and /DTK1 area (HotRod analog I/O board)
- D00000-DFFFFF : /EXCS2 and /DTK2 area (30-pin I/O expansion connector)
- E00000-EFFFFF : CPU hangs when accessing (no DTACK)
-
- F00000-F3FFFF : CPU B work RAM (256K)
- F40000-F7FFFF : CPU B work RAM (mirror)
- F80000-FBFFFF : CPU A work RAM (mirror)
- FC0000-FFFFFF : CPU A work RAM (mirror)
+ The BIOS ROM mirror at $100000 is common to both CPUs.
 */
 static ADDRESS_MAP_START( system24_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x040000) AM_ROM AM_REGION("main", 0)
-	AM_RANGE(0x080000, 0x0bffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(2)
+	AM_RANGE(0x080000, 0x0bffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x100000, 0x13ffff) AM_MIRROR(0x0c0000) AM_ROM AM_REGION("main", 0)
 	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x110000) AM_READWRITE(sys24_tile_r, sys24_tile_w)
-	AM_RANGE(0x220000, 0x220001) AM_MIRROR(0x100000) AM_WRITENOP		// Unknown, always 0
-	AM_RANGE(0x240000, 0x240001) AM_MIRROR(0x100000) AM_WRITENOP		// Horizontal synchronization register
-	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x100000) AM_WRITENOP		// Vertical synchronization register
-	AM_RANGE(0x270000, 0x270001) AM_MIRROR(0x100000) AM_WRITENOP		// Video synchronization switch
+	AM_RANGE(0x220000, 0x220001) AM_MIRROR(0x11fffe) AM_WRITENOP		/* Horizontal split position (ABSEL) */
+	AM_RANGE(0x240000, 0x240001) AM_MIRROR(0x11fffe) AM_WRITENOP		/* Scanline trigger position (XHOUT) */
+	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Frame trigger position (XVOUT) */
+	AM_RANGE(0x270000, 0x270001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Synchronization mode */
 	AM_RANGE(0x280000, 0x29ffff) AM_MIRROR(0x160000) AM_READWRITE(sys24_char_r, sys24_char_w)
 	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_RAM_WRITE(system24temp_sys16_paletteram1_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x404000, 0x40401f) AM_MIRROR(0x1fbfe0) AM_READWRITE(sys24_mixer_r, sys24_mixer_w)
-	AM_RANGE(0x600000, 0x63ffff) AM_MIRROR(0x1c0000) AM_READWRITE(sys24_sprite_r, sys24_sprite_w)
+	AM_RANGE(0x600000, 0x63ffff) AM_MIRROR(0x180000) AM_READWRITE(sys24_sprite_r, sys24_sprite_w)
 	AM_RANGE(0x800000, 0x80007f) AM_MIRROR(0x1ffe00) AM_READWRITE(system24temp_sys16_io_r, system24temp_sys16_io_w)
 	AM_RANGE(0x800100, 0x800101) AM_MIRROR(0x1ffe00) AM_WRITE(ym_register_w)
 	AM_RANGE(0x800102, 0x800103) AM_MIRROR(0x1ffe00) AM_READWRITE(ym_status_r, ym_data_w)
@@ -1076,10 +1055,11 @@ static ADDRESS_MAP_START( system24_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc80000, 0xcbffff) AM_ROMBANK(2)
 	AM_RANGE(0xcc0000, 0xcc0001) AM_MIRROR(0x03fff8) AM_READWRITE(curbank_r, curbank_w)
 	AM_RANGE(0xcc0006, 0xcc0007) AM_MIRROR(0x03fff8) AM_READWRITE(mlatch_r, mlatch_w)
-//AM_RANGE(0xd00300, 0xd00301) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xf00000, 0xf3ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(3)
-	AM_RANGE(0xf80000, 0xfbffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xf00000, 0xf3ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xf80000, 0xfbffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(1)
 ADDRESS_MAP_END
+
+
 
 /*************************************
  *
@@ -1088,37 +1068,35 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( system24_cpu2_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x03ffff) AM_RAM AM_SHARE(3) AM_BASE(&s24_mainram1)			// RAM here overrides the ROM mirror
-	AM_RANGE(0x040000, 0x07ffff) AM_ROM AM_REGION("main", 0)
-	AM_RANGE(0x080000, 0x0bffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(2)
-	AM_RANGE(0x100000, 0x13ffff) AM_MIRROR(0x040000) AM_ROM AM_REGION("main", 0)
-	AM_RANGE(0x200000, 0x20ffff) AM_READWRITE(sys24_tile_r, sys24_tile_w)
-	AM_RANGE(0x220000, 0x220001) AM_WRITENOP		// Unknown, always 0
-	AM_RANGE(0x240000, 0x240001) AM_WRITENOP		// Horizontal synchronization register
-	AM_RANGE(0x260000, 0x260001) AM_WRITENOP		// Vertical synchronization register
-	AM_RANGE(0x270000, 0x270001) AM_WRITENOP		// Video synchronization switch
-	AM_RANGE(0x280000, 0x29ffff) AM_READWRITE(sys24_char_r, sys24_char_w)
-	AM_RANGE(0x400000, 0x403fff) AM_RAM_WRITE(system24temp_sys16_paletteram1_w)
-	AM_RANGE(0x404000, 0x40401f) AM_READWRITE(sys24_mixer_r, sys24_mixer_w)
-	AM_RANGE(0x600000, 0x63ffff) AM_READWRITE(sys24_sprite_r, sys24_sprite_w)
-	AM_RANGE(0x800000, 0x80007f) AM_READWRITE(system24temp_sys16_io_r, system24temp_sys16_io_w)
-	AM_RANGE(0x800100, 0x800101) AM_WRITE(ym_register_w)
-	AM_RANGE(0x800102, 0x800103) AM_READWRITE(ym_status_r, ym_data_w)
-	AM_RANGE(0xa00000, 0xa00007) AM_READWRITE(irq_r, irq_w)
-	AM_RANGE(0xb00000, 0xb00007) AM_READWRITE(fdc_r, fdc_w)
-	AM_RANGE(0xb00008, 0xb0000f) AM_READWRITE(fdc_status_r, fdc_ctrl_w)
+	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(2) AM_BASE(&s24_mainram1)
+	AM_RANGE(0x080000, 0x0bffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(1)
+	AM_RANGE(0x100000, 0x13ffff) AM_MIRROR(0x0c0000) AM_ROM AM_REGION("main", 0)
+	AM_RANGE(0x200000, 0x20ffff) AM_MIRROR(0x110000) AM_READWRITE(sys24_tile_r, sys24_tile_w)
+	AM_RANGE(0x220000, 0x220001) AM_MIRROR(0x11fffe) AM_WRITENOP		/* Horizontal split position (ABSEL) */
+	AM_RANGE(0x240000, 0x240001) AM_MIRROR(0x11fffe) AM_WRITENOP		/* Scanline trigger position (XHOUT) */
+	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Frame trigger position (XVOUT) */
+	AM_RANGE(0x270000, 0x270001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Synchronization mode */
+	AM_RANGE(0x280000, 0x29ffff) AM_MIRROR(0x160000) AM_READWRITE(sys24_char_r, sys24_char_w)
+	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_RAM_WRITE(system24temp_sys16_paletteram1_w)
+	AM_RANGE(0x404000, 0x40401f) AM_MIRROR(0x1fbfe0) AM_READWRITE(sys24_mixer_r, sys24_mixer_w)
+	AM_RANGE(0x600000, 0x63ffff) AM_MIRROR(0x180000) AM_READWRITE(sys24_sprite_r, sys24_sprite_w)
+	AM_RANGE(0x800000, 0x80007f) AM_MIRROR(0x1ffe00) AM_READWRITE(system24temp_sys16_io_r, system24temp_sys16_io_w)
+	AM_RANGE(0x800100, 0x800101) AM_MIRROR(0x1ffe00) AM_WRITE(ym_register_w)
+	AM_RANGE(0x800102, 0x800103) AM_MIRROR(0x1ffe00) AM_READWRITE(ym_status_r, ym_data_w)
+	AM_RANGE(0xa00000, 0xa00007) AM_MIRROR(0x0ffff8) AM_READWRITE(irq_r, irq_w)
+	AM_RANGE(0xb00000, 0xb00007) AM_MIRROR(0x07fff0) AM_READWRITE(fdc_r, fdc_w)
+	AM_RANGE(0xb00008, 0xb0000f) AM_MIRROR(0x07fff0) AM_READWRITE(fdc_status_r, fdc_ctrl_w)
 	AM_RANGE(0xb80000, 0xbbffff) AM_ROMBANK(1)
-	AM_RANGE(0xbc0000, 0xbc0001) AM_READWRITE(curbank_r, curbank_w)
-	AM_RANGE(0xbc0006, 0xbc0007) AM_READWRITE(mlatch_r, mlatch_w)
-	AM_RANGE(0xc00000, 0xc00011) AM_READWRITE(hotrod3_ctrl_r, hotrod3_ctrl_w)
+	AM_RANGE(0xbc0000, 0xbc0001) AM_MIRROR(0x03fff8) AM_READWRITE(curbank_r, curbank_w)
+	AM_RANGE(0xbc0006, 0xbc0007) AM_MIRROR(0x03fff8) AM_READWRITE(mlatch_r, mlatch_w)
+	AM_RANGE(0xc00000, 0xc00011) AM_MIRROR(0x07ffe0) AM_READWRITE(hotrod3_ctrl_r, hotrod3_ctrl_w)
 	AM_RANGE(0xc80000, 0xcbffff) AM_ROMBANK(2)
-	AM_RANGE(0xcc0000, 0xcc0001) AM_READWRITE(curbank_r, curbank_w)
-	AM_RANGE(0xcc0006, 0xcc0007) AM_READWRITE(mlatch_r, mlatch_w)
-AM_RANGE(0xd00300, 0xd00301) AM_WRITE(SMH_NOP)
-	AM_RANGE(0xf00000, 0xf3ffff) AM_RAM AM_SHARE(3)
-	AM_RANGE(0xf40000, 0xf7ffff) AM_ROM AM_REGION("main", 0)
-	AM_RANGE(0xf80000, 0xfbffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xcc0000, 0xcc0001) AM_MIRROR(0x03fff8) AM_READWRITE(curbank_r, curbank_w)
+	AM_RANGE(0xcc0006, 0xcc0007) AM_MIRROR(0x03fff8) AM_READWRITE(mlatch_r, mlatch_w)
+	AM_RANGE(0xf00000, 0xf3ffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(2)
+	AM_RANGE(0xf80000, 0xfbffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(1)
 ADDRESS_MAP_END
+
 
 
 /*************************************
@@ -1147,7 +1125,7 @@ static MACHINE_START( system24 )
 	}
 }
 
-static MACHINE_RESET(system24)
+static MACHINE_RESET( system24 )
 {
 	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
 	prev_resetcontrol = resetcontrol = 0x06;
@@ -1782,6 +1760,8 @@ static const ym2151_interface ym2151_config =
 	irq_ym
 };
 
+
+
 /*************************************
  *
  *  Generic machine drivers
@@ -1805,7 +1785,7 @@ static MACHINE_DRIVER_START( system24 )
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_RAW_PARAMS(XTAL_16MHz, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/)
+	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK/2, 656, 0/*+69*/, 496/*+69*/, 424, 0/*+25*/, 384/*+25*/)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 
 	MDRV_PALETTE_LENGTH(8192*2)
@@ -1824,6 +1804,8 @@ static MACHINE_DRIVER_START( system24 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.50)
 MACHINE_DRIVER_END
+
+
 
 /*************************************
  *
@@ -2167,53 +2149,51 @@ ROM_END
  *
  *************************************/
 
-static DRIVER_INIT(qgh)
+static DRIVER_INIT( qgh )
 {
 	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = gqh_mlt;
 	track_size = 0;
 }
 
-static DRIVER_INIT(dcclub)
+static DRIVER_INIT( dcclub )
 {
 	system24temp_sys16_io_set_callbacks(dcclub_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = dcclub_mlt;
 	track_size = 0;
 }
 
-static DRIVER_INIT(qrouka)
+static DRIVER_INIT( qrouka )
 {
 	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = qrouka_mlt;
 	track_size = 0;
 }
 
-static DRIVER_INIT(quizmeku)
+static DRIVER_INIT( quizmeku )
 {
 	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = quizmeku_mlt;
 	track_size = 0;
 }
 
-static DRIVER_INIT(mahmajn)
+static DRIVER_INIT( mahmajn )
 {
-
 	system24temp_sys16_io_set_callbacks(mahmajn_io_r, mahmajn_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = mahmajn_mlt;
 	track_size = 0;
 	cur_input_line = 0;
 }
 
-static DRIVER_INIT(mahmajn2)
+static DRIVER_INIT( mahmajn2 )
 {
-
 	system24temp_sys16_io_set_callbacks(mahmajn_io_r, mahmajn_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = mahmajn2_mlt;
 	track_size = 0;
 	cur_input_line = 0;
 }
 
-static DRIVER_INIT(hotrod)
+static DRIVER_INIT( hotrod )
 {
 	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = 0;
@@ -2229,7 +2209,7 @@ static DRIVER_INIT(hotrod)
 	track_size = 0x2f00;
 }
 
-static DRIVER_INIT(bnzabros)
+static DRIVER_INIT( bnzabros )
 {
 	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = bnzabros_mlt;
@@ -2246,44 +2226,32 @@ static DRIVER_INIT(bnzabros)
 	track_size = 0x2d00;
 }
 
-static DRIVER_INIT(sspirits)
+static DRIVER_INIT( sspirits )
 {
 	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = 0;
 	track_size = 0x2d00;
 	s24_fd1094_driver_init(machine);
-
 }
 
-static DRIVER_INIT(sspiritj)
+static DRIVER_INIT( sspiritj )
 {
 	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = 0;
 	track_size = 0x2f00;
 	s24_fd1094_driver_init(machine);
-
 }
 
-static DRIVER_INIT(dcclubfd)
+static DRIVER_INIT( dcclubfd )
 {
 	system24temp_sys16_io_set_callbacks(dcclub_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = dcclub_mlt;
 	track_size = 0x2d00;
 	s24_fd1094_driver_init(machine);
-
 }
 
 
-static DRIVER_INIT(sgmast)
-{
-	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
-	mlatch_table = 0;
-	track_size = 0x2d00;
-	s24_fd1094_driver_init(machine);
-
-}
-
-static DRIVER_INIT(qsww)
+static DRIVER_INIT( sgmast )
 {
 	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = 0;
@@ -2291,7 +2259,7 @@ static DRIVER_INIT(qsww)
 	s24_fd1094_driver_init(machine);
 }
 
-static DRIVER_INIT(gground)
+static DRIVER_INIT( qsww )
 {
 	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = 0;
@@ -2299,7 +2267,7 @@ static DRIVER_INIT(gground)
 	s24_fd1094_driver_init(machine);
 }
 
-static DRIVER_INIT(crkdown)
+static DRIVER_INIT( gground )
 {
 	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = 0;
@@ -2307,7 +2275,15 @@ static DRIVER_INIT(crkdown)
 	s24_fd1094_driver_init(machine);
 }
 
-static DRIVER_INIT(roughrac)
+static DRIVER_INIT( crkdown )
+{
+	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
+	mlatch_table = 0;
+	track_size = 0x2d00;
+	s24_fd1094_driver_init(machine);
+}
+
+static DRIVER_INIT( roughrac )
 {
 	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
 	mlatch_table = 0;
