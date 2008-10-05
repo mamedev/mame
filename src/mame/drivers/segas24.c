@@ -762,11 +762,11 @@ static WRITE16_HANDLER( ym_data_w )
 
 static const UINT8  mahmajn_mlt[8] = { 5, 1, 6, 2, 3, 7, 4, 0 };
 static const UINT8 mahmajn2_mlt[8] = { 6, 0, 5, 3, 1, 4, 2, 7 };
-static const UINT8      gqh_mlt[8] = { 3, 7, 4, 0, 2, 6, 5, 1 };
+static const UINT8      qgh_mlt[8] = { 3, 7, 4, 0, 2, 6, 5, 1 };
 static const UINT8 bnzabros_mlt[8] = { 2, 4, 0, 5, 7, 3, 1, 6 };
 static const UINT8   qrouka_mlt[8] = { 1, 6, 4, 7, 0, 5, 3, 2 };
 static const UINT8 quizmeku_mlt[8] = { 0, 3, 2, 4, 6, 1, 7, 5 };
-static const UINT8   dcclub_mlt[8] = { 4, 3, 7, 0, 2, 6, 1, 5 };
+static const UINT8   dcclub_mlt[8] = { 4, 7, 3, 0, 2, 6, 5, 1 };
 
 static UINT8 mlatch;
 static const UINT8 *mlatch_table;
@@ -814,8 +814,8 @@ enum {
 static UINT16 irq_timera;
 static UINT8  irq_timerb;
 static UINT8  irq_allow0, irq_allow1;
-static int    irq_timer_pend0, irq_timer_pend1, irq_yms;
-static emu_timer *irq_timer;
+static int    irq_timer_pend0, irq_timer_pend1, irq_yms, irq_vblank, irq_sprite;
+static emu_timer *irq_timer, *irq_timer_clear;
 
 static TIMER_CALLBACK( irq_timer_cb )
 {
@@ -826,6 +826,15 @@ static TIMER_CALLBACK( irq_timer_cb )
 		cpunum_set_input_line(machine, 1, IRQ_TIMER+1, ASSERT_LINE);
 }
 
+static TIMER_CALLBACK( irq_timer_clear_cb )
+{
+	irq_sprite = irq_vblank = 0;
+	cpunum_set_input_line(machine, 0, IRQ_VBLANK+1, CLEAR_LINE);
+	cpunum_set_input_line(machine, 0, IRQ_SPRITE+1, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, IRQ_VBLANK+1, CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, IRQ_SPRITE+1, CLEAR_LINE);
+}
+
 static void irq_init(void)
 {
 	irq_timera = 0;
@@ -834,7 +843,10 @@ static void irq_init(void)
 	irq_allow1 = 0;
 	irq_timer_pend0 = 0;
 	irq_timer_pend1 = 0;
+	irq_vblank = 0;
+	irq_sprite = 0;
 	irq_timer = timer_alloc(irq_timer_cb, NULL);
+	irq_timer_clear = timer_alloc(irq_timer_clear_cb, NULL);
 }
 
 static void irq_timer_reset(void)
@@ -866,81 +878,46 @@ static WRITE16_HANDLER(irq_w)
 		break;
 	case 2:
 		irq_allow0 = data;
-		cpunum_set_input_line(machine, 0, IRQ_TIMER+1, irq_timer_pend0 && (irq_allow0 & (1 << IRQ_TIMER)) ? ASSERT_LINE : CLEAR_LINE);
+		irq_timer_pend0 = 0;
+		cpunum_set_input_line(machine, 0, IRQ_TIMER+1, CLEAR_LINE);
 		cpunum_set_input_line(machine, 0, IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, IRQ_VBLANK+1, irq_vblank && (irq_allow0 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 0, IRQ_SPRITE+1, irq_sprite && (irq_allow0 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	case 3:
 		irq_allow1 = data;
-		cpunum_set_input_line(machine, 1, IRQ_TIMER+1, irq_timer_pend1 && (irq_allow1 & (1 << IRQ_TIMER)) ? ASSERT_LINE : CLEAR_LINE);
+		irq_timer_pend1 = 0;
+		cpunum_set_input_line(machine, 1, IRQ_TIMER+1, CLEAR_LINE);
 		cpunum_set_input_line(machine, 1, IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, IRQ_VBLANK+1, irq_vblank && (irq_allow1 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
+		cpunum_set_input_line(machine, 1, IRQ_SPRITE+1, irq_sprite && (irq_allow1 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	}
 }
 
-
-static int ggground_kludge;
-/* This IRQ needs to be generated before the others or the GFX
-  don't get uploaded correctly and you see nothing */
-static TIMER_CALLBACK( gground_generate_kludge_irq )
-{
-		cpunum_set_input_line(machine, 1, 5, HOLD_LINE);
-}
-
-
 static READ16_HANDLER(irq_r)
 {
-	/* These hacks are for Gain Ground */
-	/* otherwise the interrupt occurs before the correct state has been
-       set and the game crashes before booting */
-	if (!strcmp(machine->gamedrv->name,"gground"))
-	{
-
-		if (activecpu_get_pc()==0x0084aa)
-		{
-			ggground_kludge = 1;
-			return mame_rand(machine);
-
-		}
-		if (activecpu_get_pc()==0x084ba)
-		{
-			/* Clear IRQ line so IRQ doesn't happen too early */
-			cpunum_set_input_line(machine, 1, 5, CLEAR_LINE);
-
-			/* set a timer to generate an irq at the needed point */
-			if (ggground_kludge == 1)
-			{
-				timer_set(ATTOTIME_IN_USEC(180000), NULL, 0, gground_generate_kludge_irq);
-				ggground_kludge = 0;
-			}
-			return 1;
-		}
-	}
-
-	if (!strcmp(machine->gamedrv->name,"ggroundj"))
-	{
-
-		if (activecpu_get_pc()==0x0084ac)
-		{
-			ggground_kludge = 1;
-			return mame_rand(machine);
-
-		}
-		if (activecpu_get_pc()==0x084bc)
-		{
-			/* Clear IRQ line so IRQ doesn't happen too early */
-			cpunum_set_input_line(machine, 1, 5, CLEAR_LINE);
-
-			/* set a timer to generate an irq at the needed point */
-			if (ggground_kludge == 1)
-			{
-				timer_set(ATTOTIME_IN_USEC(180000), NULL, 0, gground_generate_kludge_irq);
-				ggground_kludge = 0;
-			}
-			return 1;
-		}
-	}
-
+	extern int activecpu;
 	switch(offset) {
+	case 0: {
+		int pc = activecpu_get_pc();
+		static int turns;
+		if(pc == 0x84a4 || pc == 0x84a6)
+			return 0;
+		if(pc == 0x84aa || pc == 0x84ac) {
+			// limit = 0x1b5f
+			turns = 0x0100;
+			return 1;
+		}
+		if(pc == 0x84ba || pc == 0x84bc) {
+			// 26 cycles/read
+			turns--;
+			return turns ? 1 : 0x200;
+		}
+		// 84c8
+		// -> 85ac / 85bc?
+		break;
+	}
 	case 2:
 		irq_timer_pend0 = 0;
 		cpunum_set_input_line(machine, 0, IRQ_TIMER+1, CLEAR_LINE);
@@ -955,14 +932,25 @@ static READ16_HANDLER(irq_r)
 
 static INTERRUPT_GEN(irq_vbl)
 {
-	int irq = cpu_getiloops() ? IRQ_SPRITE : IRQ_VBLANK;
-	int mask = 1 << irq;
+	int irq, mask;
+
+	if(cpu_getiloops()) {
+		irq = IRQ_SPRITE;
+		irq_sprite = 1;
+	} else {
+		irq = IRQ_VBLANK;
+		irq_vblank = 1;
+	}
+
+	timer_adjust_oneshot(irq_timer_clear, ATTOTIME_IN_HZ(VIDEO_CLOCK/2/656.0), 0);
+
+	mask = 1 << irq;
 
 	if(irq_allow0 & mask)
-		cpunum_set_input_line(machine, 0, 1+irq, HOLD_LINE);
+		cpunum_set_input_line(machine, 0, 1+irq, ASSERT_LINE);
 
 	if(irq_allow1 & mask)
-		cpunum_set_input_line(machine, 1, 1+irq, HOLD_LINE);
+		cpunum_set_input_line(machine, 1, 1+irq, ASSERT_LINE);
 
 	if(!cpu_getiloops()) {
 		// Ensure one index pulse every 20 frames
@@ -2152,7 +2140,7 @@ ROM_END
 static DRIVER_INIT( qgh )
 {
 	system24temp_sys16_io_set_callbacks(hotrod_io_r, hotrod_io_w, resetcontrol_w, iod_r, iod_w);
-	mlatch_table = gqh_mlt;
+	mlatch_table = qgh_mlt;
 	track_size = 0;
 }
 
