@@ -28,6 +28,7 @@ static void taitoz_core_vh_start(running_machine *machine, int x_offs)
 
 VIDEO_START( taitoz )
 {
+	road_palbank = 3;
 	taitoz_core_vh_start(machine, 0);
 }
 
