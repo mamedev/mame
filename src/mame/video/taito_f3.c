@@ -366,7 +366,7 @@ static int twidth_mask;
 static int twidth_mask_bit;
 
 static UINT8 *tile_opaque_sp;
-static UINT8 *tile_opaque_pf;
+static UINT8 *tile_opaque_pf[4];
 
 
 static UINT8 add_sat[256][256];
@@ -599,7 +599,7 @@ VIDEO_EOF( f3 )
 VIDEO_START( f3 )
 {
 	const struct F3config *pCFG=&f3_config_table[0];
-	int tile, width, height;
+	int tile, width, height, i;
 
 	f3_alpha_level_2as=127;
 	f3_alpha_level_2ad=127;
@@ -626,7 +626,6 @@ VIDEO_START( f3 )
 	pf_line_inf=0;
 	pri_alp_bitmap=0;
 	tile_opaque_sp=0;
-	tile_opaque_pf=0;
 
 	/* Setup individual game */
 	do {
@@ -682,7 +681,8 @@ VIDEO_START( f3 )
 	height = video_screen_get_height(machine->primary_screen);
 	pri_alp_bitmap = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED8 );
 	tile_opaque_sp = (UINT8 *)auto_malloc(machine->gfx[2]->total_elements);
-	tile_opaque_pf = (UINT8 *)auto_malloc(machine->gfx[1]->total_elements);
+	for (i=0; i<4; i++)
+		tile_opaque_pf[i] = (UINT8 *)auto_malloc(machine->gfx[1]->total_elements);
 
 	tilemap_set_transparent_pen(pf1_tilemap,0);
 	tilemap_set_transparent_pen(pf2_tilemap,0);
@@ -745,18 +745,27 @@ VIDEO_START( f3 )
 		for (c = 0;c < pf_gfx->total_elements;c++)
 		{
 			int x,y;
-			int chk_trans_or_opa=0;
-			UINT8 *dp = pf_gfx->gfxdata + c * pf_gfx->char_modulo;
-			for (y = 0;y < pf_gfx->height;y++)
+			int extra_planes; /* 0 = 4bpp, 1=5bpp, 2=?, 3=6bpp */
+
+			for (extra_planes=0; extra_planes<4; extra_planes++)
 			{
-				for (x = 0;x < pf_gfx->width;x++)
+				int chk_trans_or_opa=0;
+				UINT8 extra_mask = ((extra_planes << 4) | 0x0f);
+				UINT8 *dp = pf_gfx->gfxdata + c * pf_gfx->char_modulo;
+				
+				for (y = 0;y < pf_gfx->height;y++)
 				{
-					if(!dp[x]) chk_trans_or_opa|=2;
-					else	   chk_trans_or_opa|=1;
+					for (x = 0;x < pf_gfx->width;x++)
+					{
+						if(!(dp[x] & extra_mask)) 
+							chk_trans_or_opa|=2;
+						else
+							chk_trans_or_opa|=1;
+					}
+					dp += pf_gfx->line_modulo;
 				}
-				dp += pf_gfx->line_modulo;
+				tile_opaque_pf[extra_planes][c]=chk_trans_or_opa;
 			}
-			tile_opaque_pf[c]=chk_trans_or_opa;
 		}
 	}
 }
@@ -1592,12 +1601,13 @@ static void visible_tile_check(running_machine *machine,
 	for(i=0;i<tile_num;i++)
 	{
 		UINT32 tile=pf_base[(tile_index)&twidth_mask];
+		UINT8  extra_planes = (tile>>(16+10)) & 3;
 		if(tile&0xffff)
 		{
 			trans_all=0;
 			if(opaque_all)
 			{
-				if(tile_opaque_pf[(tile&0xffff)%total_elements]!=1) opaque_all=0;
+				if(tile_opaque_pf[extra_planes][(tile&0xffff)%total_elements]!=1) opaque_all=0;
 			}
 
 			if(alpha_mode==1)
