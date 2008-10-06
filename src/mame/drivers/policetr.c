@@ -578,7 +578,7 @@ Note: If you set the dipswitch to service mode and reset the game within Mame.
       U110  050C
       u111  F343
       U112  201D
-      U113  FB4x (x maybe 0, 6 or 8.  The picture wasn't clear for this last number)
+      U113  FB46
 
       These are different then the current set and might have the checksum test corrected.
 
