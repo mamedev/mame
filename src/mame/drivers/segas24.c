@@ -1017,6 +1017,8 @@ fc-ff ramhi
 
  The BIOS ROM mirror at $100000 is common to both CPUs.
 */
+
+
 static ADDRESS_MAP_START( system24_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_MIRROR(0x040000) AM_ROM AM_REGION("main", 0)
 	AM_RANGE(0x080000, 0x0bffff) AM_MIRROR(0x040000) AM_RAM AM_SHARE(1)
@@ -1027,7 +1029,7 @@ static ADDRESS_MAP_START( system24_cpu1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Frame trigger position (XVOUT) */
 	AM_RANGE(0x270000, 0x270001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Synchronization mode */
 	AM_RANGE(0x280000, 0x29ffff) AM_MIRROR(0x160000) AM_READWRITE(sys24_char_r, sys24_char_w)
-	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_RAM_WRITE(system24temp_sys16_paletteram1_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_READWRITE(system24temp_sys16_paletteram1_r, system24temp_sys16_paletteram1_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x404000, 0x40401f) AM_MIRROR(0x1fbfe0) AM_READWRITE(sys24_mixer_r, sys24_mixer_w)
 	AM_RANGE(0x600000, 0x63ffff) AM_MIRROR(0x180000) AM_READWRITE(sys24_sprite_r, sys24_sprite_w)
 	AM_RANGE(0x800000, 0x80007f) AM_MIRROR(0x1ffe00) AM_READWRITE(system24temp_sys16_io_r, system24temp_sys16_io_w)
@@ -1065,7 +1067,7 @@ static ADDRESS_MAP_START( system24_cpu2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x260000, 0x260001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Frame trigger position (XVOUT) */
 	AM_RANGE(0x270000, 0x270001) AM_MIRROR(0x10fffe) AM_WRITENOP		/* Synchronization mode */
 	AM_RANGE(0x280000, 0x29ffff) AM_MIRROR(0x160000) AM_READWRITE(sys24_char_r, sys24_char_w)
-	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_RAM_WRITE(system24temp_sys16_paletteram1_w)
+	AM_RANGE(0x400000, 0x403fff) AM_MIRROR(0x1f8000) AM_READWRITE(system24temp_sys16_paletteram1_r, system24temp_sys16_paletteram1_w)
 	AM_RANGE(0x404000, 0x40401f) AM_MIRROR(0x1fbfe0) AM_READWRITE(sys24_mixer_r, sys24_mixer_w)
 	AM_RANGE(0x600000, 0x63ffff) AM_MIRROR(0x180000) AM_READWRITE(sys24_sprite_r, sys24_sprite_w)
 	AM_RANGE(0x800000, 0x80007f) AM_MIRROR(0x1ffe00) AM_READWRITE(system24temp_sys16_io_r, system24temp_sys16_io_w)
