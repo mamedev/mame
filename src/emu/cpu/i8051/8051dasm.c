@@ -244,7 +244,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 		case 0xc1:
 		case 0xe1:
 			addr = opram[PC++ - pc];
-			addr|= (PC++ & 0xf800) | ((op & 0xe0) << 3);
+			addr|= (PC & 0xf800) | ((op & 0xe0) << 3);
 			sprintf(dst, "ajmp  $%04X", addr);
 			break;
 
