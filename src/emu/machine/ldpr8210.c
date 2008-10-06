@@ -38,6 +38,17 @@
     CONSTANTS
 ***************************************************************************/
 
+/* Overlay constants, related to 720-pixel wide capture */
+#define OVERLAY_GROUP0_X				(82.0f / 720.0f)
+#define OVERLAY_GROUP1_X				(162.0f / 720.0f)
+#define OVERLAY_GROUP2_X				(322.0f / 720.0f)
+#define OVERLAY_GROUP3_X				(483.0f / 720.0f)
+#define OVERLAY_Y						(104/2)
+#define OVERLAY_PIXEL_WIDTH				(4.5f / 720.0f)
+#define OVERLAY_PIXEL_HEIGHT			2
+#define OVERLAY_X_PIXELS				5
+#define OVERLAY_Y_PIXELS				7
+
 /* Pioneer PR-8210 specific information */
 #define PR8210_SCAN_SPEED				(2000 / 30)			/* 2000 frames/second */
 #define PR8210_SEEK_FAST_SPEED			(4000 / 30)			/* 4000 frames/second */
@@ -61,7 +72,7 @@ typedef struct _pioneer_pia pioneer_pia;
 struct _pioneer_pia
 {
 	UINT8				frame[7];				/* (20-26) 7 characters for the chapter/frame */
-	UINT8				text[15];				/* (22-30) 15 characters for the display */
+	UINT8				text[17];				/* (20-30) 17 characters for the display */
 	UINT8				control;				/* (40) control lines */
 	UINT8				latchdisplay;			/*   flag: set if the display was latched */
 	UINT8				portb;					/* (60) port B value (LEDs) */
@@ -127,6 +138,9 @@ static WRITE8_HANDLER( pr8210_port1_w );
 static WRITE8_HANDLER( pr8210_port2_w );
 static READ8_HANDLER( pr8210_t0_r );
 static READ8_HANDLER( pr8210_t1_r );
+static void overlay_draw_group(bitmap_t *bitmap, const UINT8 *text, int count, float xstart);
+static void overlay_erase(bitmap_t *bitmap, float xstart, float xend);
+static void overlay_draw_char(bitmap_t *bitmap, UINT8 ch, float xstart);
 
 static void simutrek_init(laserdisc_state *ld);
 static void simutrek_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime);
@@ -139,6 +153,82 @@ static READ8_HANDLER( simutrek_port2_r );
 static WRITE8_HANDLER( simutrek_port2_w );
 static READ8_HANDLER( simutrek_data_r );
 static READ8_HANDLER( simutrek_t0_r );
+
+
+
+/***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
+
+/* bitmaps for the characters */
+static const UINT8 text_bitmap[0x40][7] =
+{
+	{ 0 },									/* @ */
+	{ 0x20,0x50,0x88,0x88,0xf8,0x88,0x88 },	/* A */
+	{ 0 },									/* B */
+	{ 0x70,0x88,0x80,0x80,0x80,0x88,0x70 },	/* C */
+	{ 0 },									/* D */
+	{ 0xf8,0x80,0x80,0xf0,0x80,0x80,0xf8 },	/* E */
+	{ 0xf8,0x80,0x80,0xf0,0x80,0x80,0x80 },	/* E */
+	{ 0 },									/* G */
+	{ 0x88,0x88,0x88,0xf8,0x88,0x88,0x88 },	/* H */
+	{ 0 },									/* I */
+	{ 0 },									/* J */
+	{ 0 },									/* K */
+	{ 0 },									/* L */
+	{ 0x88,0xd8,0xa8,0xa8,0xa8,0x88,0x88 },	/* M */
+	{ 0 },									/* N */
+	{ 0 },									/* O */
+	{ 0xf0,0x88,0x88,0xf0,0x80,0x80,0x80 },	/* P */
+	{ 0 },									/* Q */
+	{ 0xf0,0x88,0x88,0xf0,0xa0,0x90,0x88 },	/* R */
+	{ 0x70,0x88,0x80,0x70,0x08,0x88,0x70 },	/* S */
+	{ 0 },									/* T */
+	{ 0 },									/* U */
+	{ 0 },									/* V */
+	{ 0 },									/* W */
+	{ 0 },									/* X */
+	{ 0 },									/* Y */
+	{ 0 },									/* Z */
+	{ 0 },									/* [ */
+	{ 0 },									/* \ */
+	{ 0 },									/* ] */
+	{ 0 },									/* ^ */
+	{ 0 },									/* _ */
+
+	{ 0x00,0x00,0x00,0x00,0x00,0x00,0x00 },	/* <space> */
+	{ 0 },									/* ! */
+	{ 0 },									/* " */
+	{ 0 },									/* # */
+	{ 0 },									/* $ */
+	{ 0 },									/* % */
+	{ 0 },									/* & */
+	{ 0 },									/* ' */
+	{ 0 },									/* ( */
+	{ 0 },									/* ) */
+	{ 0 },									/* * */
+	{ 0 },									/* + */
+	{ 0 },									/* , */
+	{ 0 },									/* - */
+	{ 0x00,0x00,0x00,0x00,0x00,0x00,0x40 },	/* . */
+	{ 0 },									/* / */
+	{ 0x70,0x88,0x88,0x88,0x88,0x88,0x70 },	/* 0 */
+	{ 0x20,0x60,0x20,0x20,0x20,0x20,0x70 },	/* 1 */
+	{ 0x70,0x88,0x08,0x70,0x80,0x80,0xf8 },	/* 2 */
+	{ 0xf8,0x08,0x10,0x30,0x08,0x88,0x70 },	/* 3 */
+	{ 0x10,0x30,0x50,0x90,0xf8,0x10,0x10 },	/* 4 */
+	{ 0xf8,0x80,0xf0,0x08,0x08,0x88,0x70 },	/* 5 */
+	{ 0x78,0x80,0x80,0xf0,0x88,0x88,0x70 },	/* 6 */
+	{ 0xf8,0x08,0x08,0x10,0x20,0x40,0x80 },	/* 7 */
+	{ 0x70,0x88,0x88,0x70,0x88,0x88,0x70 },	/* 8 */
+	{ 0x70,0x88,0x88,0x78,0x08,0x08,0xf0 },	/* 9 */
+	{ 0 },									/* : */
+	{ 0 },									/* ; */
+	{ 0 },									/* < */
+	{ 0 },									/* = */
+	{ 0 },									/* > */
+	{ 0 }									/* ? */
+};
 
 
 
@@ -317,26 +407,6 @@ static INT32 pr8210_update(laserdisc_state *ld, const vbi_metadata *vbi, int fie
 	if (LOG_VBLANK_VBI)
 		printf("%3d:Update(%d)\n", video_screen_get_vpos(ld->screen), fieldnum);
 
-	/* update overlay */
-	if (player->pia.display || player->pia.latchdisplay)
-	{
-		char buffer[16] = { 0 };
-		int i;
-		for (i = 0; i < 15; i++)
-		{
-			UINT8 c = player->pia.text[i];
-			if (c >= 0xf0 && c <= 0xf9)
-				c = '0' + (c - 0xf0);
-			else if (c < 0x20 || c > 0x7f)
-				c = '?';
-			buffer[i] = c;
-		}
-		popmessage("%s", buffer);
-	}
-	else
-		popmessage(NULL);
-	player->pia.latchdisplay = 0;
-
 	/* if the spindle is on, we advance by 1 track after completing field #1 */
 	return (spdl_on) ? fieldnum : 0;
 }
@@ -350,7 +420,28 @@ static INT32 pr8210_update(laserdisc_state *ld, const vbi_metadata *vbi, int fie
 
 static void pr8210_overlay(laserdisc_state *ld, bitmap_t *bitmap)
 {
-//  ldplayer_data *player = ld->player;
+	ldplayer_data *player = ld->player;
+	
+	/* custom display */
+	if (player->pia.display)
+	{
+		overlay_draw_group(bitmap, &player->pia.text[2], 5, OVERLAY_GROUP1_X);
+		overlay_draw_group(bitmap, &player->pia.text[7], 5, OVERLAY_GROUP2_X);
+		overlay_draw_group(bitmap, &player->pia.text[12], 5, OVERLAY_GROUP3_X);
+	}
+	
+	/* chapter/frame display */
+	else
+	{
+		/* frame display */
+		if (player->pia.latchdisplay & 2)
+			overlay_draw_group(bitmap, &player->pia.text[2], 5, OVERLAY_GROUP1_X);
+	
+		/* chapter overlay */
+		if (player->pia.latchdisplay & 1)
+			overlay_draw_group(bitmap, &player->pia.text[0], 2, OVERLAY_GROUP0_X);
+	}
+	player->pia.latchdisplay = 0;
 }
 
 
@@ -517,6 +608,11 @@ static READ8_HANDLER( pr8210_pia_r )
 		case 0x22:	case 0x23:	case 0x24:	case 0x25:	case 0x26:
 			result = player->pia.frame[offset - 0x20];
 			break;
+		
+		/* (1D-1F,27) invalid read but normal */
+		case 0x1d:	case 0x1e:	case 0x1f:
+		case 0x27:
+			break;
 
 		/* (A0) port A value (from serial decoder) */
 		case 0xa0:
@@ -558,11 +654,12 @@ static WRITE8_HANDLER( pr8210_pia_w )
 
 	switch (offset)
 	{
-		/* (22-30) 15 characters for the display */
+		/* (20-30) 17 characters for the display */
+		case 0x20:	case 0x21:
 		case 0x22:	case 0x23:	case 0x24:	case 0x25:	case 0x26:
 		case 0x27:	case 0x28:	case 0x29:	case 0x2a:	case 0x2b:
 		case 0x2c:	case 0x2d:	case 0x2e:	case 0x2f:	case 0x30:
-			player->pia.text[offset - 0x22] = data;
+			player->pia.text[offset - 0x20] = data;
 			break;
 
 		/* (40) control lines */
@@ -572,16 +669,14 @@ static WRITE8_HANDLER( pr8210_pia_w )
 			if (!(data & 0x01) && (player->pia.control & 0x01))
 			{
 				memcpy(&player->pia.text[0], &player->pia.frame[0], 2);
-				memset(&player->pia.text[3], 0, 10);
-				player->pia.latchdisplay = 1;
+				player->pia.latchdisplay |= 1;
 			}
 
 			/* toggle bit 1 to latch frame number into display area */
 			if (!(data & 0x02) && (player->pia.control & 0x02))
 			{
-				memcpy(&player->pia.text[0], &player->pia.frame[2], 5);
-				memset(&player->pia.text[5], 0, 10);
-				player->pia.latchdisplay = 1;
+				memcpy(&player->pia.text[2], &player->pia.frame[2], 5);
+				player->pia.latchdisplay |= 2;
 			}
 			player->pia.control = data;
 			break;
@@ -788,6 +883,114 @@ static READ8_HANDLER( pr8210_t0_r )
 static READ8_HANDLER( pr8210_t1_r )
 {
 	return 1;
+}
+
+
+/*-------------------------------------------------
+    overlay_draw_group - draw a single group of
+    characters
+-------------------------------------------------*/
+
+static void overlay_draw_group(bitmap_t *bitmap, const UINT8 *text, int count, float xstart)
+{
+	int skip = TRUE;
+	int x;
+	
+	/* rease the background */
+	overlay_erase(bitmap, xstart, xstart + ((OVERLAY_X_PIXELS + 1) * count + 1) * OVERLAY_PIXEL_WIDTH);
+
+	/* draw each character, suppressing leading 0's */
+	for (x = 0; x < count; x++)
+		if (!skip || x == count - 1 || (text[x] & 0x3f) != 0x30)
+		{
+			skip = FALSE;
+			overlay_draw_char(bitmap, text[x], xstart + ((OVERLAY_X_PIXELS + 1) * x + 1) * OVERLAY_PIXEL_WIDTH);
+		}
+}
+
+
+/*-------------------------------------------------
+    overlay_erase - erase the background area 
+    where the text overlay will be displayed
+-------------------------------------------------*/
+
+static void overlay_erase(bitmap_t *bitmap, float xstart, float xend)
+{
+	UINT32 xmin = (UINT32)(xstart * 256.0f * (float)bitmap->width);
+	UINT32 xmax = (UINT32)(xend * 256.0f * (float)bitmap->width);
+	UINT32 x, y;
+	
+	for (y = OVERLAY_Y; y < (OVERLAY_Y + (OVERLAY_Y_PIXELS + 2) * OVERLAY_PIXEL_HEIGHT); y++)
+	{
+		UINT16 *dest = BITMAP_ADDR16(bitmap, y, xmin >> 8);
+		UINT16 ymin, ymax, yres;
+		
+		ymax = *dest >> 8;
+		ymin = ymax * 3 / 8;
+		yres = ymin + ((ymax - ymin) * (xmin & 0xff)) / 256;
+		*dest = (yres << 8) | (*dest & 0xff);
+		dest++;
+		
+		for (x = (xmin | 0xff) + 1; x < xmax; x += 0x100)
+		{
+			yres = (*dest >> 8) * 3 / 8;
+			*dest = (yres << 8) | (*dest & 0xff);
+			dest++;
+		}
+		
+		ymax = *dest >> 8;
+		ymin = ymax * 3 / 8;
+		yres = ymin + ((ymax - ymin) * (~xmax & 0xff)) / 256;
+		*dest = (yres << 8) | (*dest & 0xff);
+		dest++;
+	}
+}
+
+
+/*-------------------------------------------------
+    overlay_draw_char - draw a single character
+    of the text overlay
+-------------------------------------------------*/
+
+static void overlay_draw_char(bitmap_t *bitmap, UINT8 ch, float xstart)
+{
+	UINT32 xminbase = (UINT32)(xstart * 256.0f * (float)bitmap->width);
+	UINT32 xsize = (UINT32)(OVERLAY_PIXEL_WIDTH * 256.0f * (float)bitmap->width);
+	const UINT8 *chdataptr = &text_bitmap[ch & 0x3f][0];
+	UINT32 x, y, xx, yy;
+	
+	/* iterate over pixels */
+	for (y = 0; y < OVERLAY_Y_PIXELS; y++)
+	{
+		UINT8 chdata = *chdataptr++;
+		
+		for (x = 0; x < OVERLAY_X_PIXELS; x++, chdata <<= 1)
+			if (chdata & 0x80)
+			{
+				UINT32 xmin = xminbase + x * xsize;
+				UINT32 xmax = xmin + xsize;
+				for (yy = 0; yy < OVERLAY_PIXEL_HEIGHT; yy++)
+				{
+					UINT16 *dest = BITMAP_ADDR16(bitmap, OVERLAY_Y + (y + 1) * OVERLAY_PIXEL_HEIGHT + yy, xmin >> 8);
+					UINT16 ymin, ymax, yres;
+					
+					ymax = 0xff;
+					ymin = *dest >> 8;
+					yres = ymin + ((ymax - ymin) * (~xmin & 0xff)) / 256;
+					*dest = (yres << 8) | (*dest & 0xff);
+					dest++;
+					
+					for (xx = (xmin | 0xff) + 1; xx < xmax; xx += 0x100)
+						*dest++ = 0xf080;
+					
+					ymax = 0xff;
+					ymin = *dest >> 8;
+					yres = ymin + ((ymax - ymin) * (xmax & 0xff)) / 256;
+					*dest = (yres << 8) | (*dest & 0xff);
+					dest++;
+				}
+			}
+	}
 }
 
 

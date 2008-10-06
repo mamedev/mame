@@ -987,8 +987,8 @@ static void process_track_data(const device_config *device)
 		ldcore->frame[ldcore->videoindex].numfields++;
 
 	/* render the display if present */
-//  if (ldcore->display && ldcore->avconfig.video != NULL)
-//      render_display((UINT16 *)ldcore->avconfig.video->base, ldcore->avconfig.video->rowpixels, ldcore->avconfig.video->width, ldcore->last_frame);
+	if (ldcore->avconfig.video != NULL && ldcore->intf.overlay != NULL)
+		(*ldcore->intf.overlay)(ld, ldcore->avconfig.video);
 
 	/* pass the audio to the callback */
 	if (ldcore->config.audio != NULL)
