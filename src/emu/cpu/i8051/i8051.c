@@ -402,11 +402,13 @@ static READ32_HANDLER((*hold_eram_iaddr_callback));
 
 /* Any pending IRQ */
 #define SERIALPORT_IRQ    ((R_SCON & 0x03) && GET_ES)
+#define TIMERS_IRQ        ((GET_TF0 && GET_ET0) || (GET_TF1 && GET_ET1))
+#define EXTERNAL_IRQ      ((GET_IE0 && GET_EX0) || (GET_IE1 && GET_EX1))
 
 #if (HAS_I8052 || HAS_I8752)
-#define NO_PENDING_IRQ  !(R_TCON & 0xaa) && !(SERIALPORT_IRQ) && !(GET_ET2 && (GET_TF2 || GET_EXF2))
+#define NO_PENDING_IRQ  !(TIMERS_IRQ) && !(EXTERNAL_IRQ) && !(SERIALPORT_IRQ) && !(GET_ET2 && (GET_TF2 || GET_EXF2))
 #else
-#define NO_PENDING_IRQ  !(R_TCON & 0xaa) && !(SERIALPORT_IRQ)
+#define NO_PENDING_IRQ  !(TIMERS_IRQ) && !(EXTERNAL_IRQ) && !(SERIALPORT_IRQ)
 #endif
 
 /* Clear Current IRQ  */
@@ -606,7 +608,7 @@ int i8051_execute(int cycles)
 		if(PC != PPC)	op = cpu_readop(PC);
 
 		//Update Timer (if any timers are running)
-		if((GET_TR0 && GET_ET0) || (GET_TR1 && GET_ET1))
+		if(GET_TR0 || GET_TR1)
 			update_timer(i8051.prev_used_cycles);
 
 		//Update Serial (if serial port sending data)
