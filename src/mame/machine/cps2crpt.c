@@ -789,6 +789,7 @@ static const struct game_keys keys_table[] =
 	{ "armwar",   { 0x9e9d4c0b,0x8a39081f }, 0x100000 },	// 3039 0080 4020  move.w  $00804020,D0
 	{ "armwarr1", { 0x9e9d4c0b,0x8a39081f }, 0x100000 },	// 3039 0080 4020  move.w  $00804020,D0
 	{ "armwaru",  { 0xd4c0b8a3,0x9081f9e9 }, 0x100000 },	// 3039 0080 4020  move.w  $00804020,D0
+	{ "armwaru1", { 0xd4c0b8a3,0x9081f9e9 }, 0x100000 },	// 3039 0080 4020  move.w  $00804020,D0
 	{ "pgear",    { 0x9d4c0b8a,0x39081f9e }, 0x100000 },	// 3039 0080 4020  move.w  $00804020,D0
 	{ "pgearr1",  { 0x9d4c0b8a,0x39081f9e }, 0x100000 },	// 3039 0080 4020  move.w  $00804020,D0
 	{ "armwara",  { 0x1f9e9d4c,0x0b8a3908 }, 0x100000 },	// 3039 0080 4020  move.w  $00804020,D0
