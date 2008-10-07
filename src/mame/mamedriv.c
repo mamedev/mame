@@ -8249,11 +8249,13 @@ Other Sun games
 	DRIVER( lucky74 )	/* (c) 1988 Wing Co., Ltd */
 	DRIVER( lucky74a )	/* (c) 1988 Wing Co., Ltd */
 
-	/* InterFlip */
+	/* InterFlip / Recreativos Franco */
 	DRIVER( videopkr )	/* (c) 1984 InterFlip */
 	DRIVER( blckjack )	/* (c) 1984 InterFlip */
 	DRIVER( videodad )	/* (c) 1987 InterFlip */
 	DRIVER( videocba )	/* (c) 1987 InterFlip */
+	DRIVER( babypkr )	/* (c) 1987 Recreativos Franco */
+	DRIVER( babydad )	/* (c) 1987 Recreativos Franco */
 
 	/* H8/3048 italian gambling games */
 	DRIVER( laperla )	/* (c) 2002 Nazionale Elettronica */

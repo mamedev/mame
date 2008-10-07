@@ -1781,6 +1781,13 @@ $(DRIVERS)/turbo.o:		$(LAYOUT)/turbo.lh \
 
 $(DRIVERS)/videopin.o:	$(LAYOUT)/videopin.lh
 
+$(DRIVERS)/videopkr.o:	$(LAYOUT)/videopkr.lh \
+						$(LAYOUT)/blckjack.lh \
+						$(LAYOUT)/videodad.lh \
+						$(LAYOUT)/videocba.lh \
+						$(LAYOUT)/babypkr.lh \
+						$(LAYOUT)/babydad.lh
+
 $(DRIVERS)/warpwarp.o:	$(LAYOUT)/geebee.lh \
 						$(LAYOUT)/sos.lh
 
