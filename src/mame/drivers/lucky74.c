@@ -557,6 +557,11 @@
     DRIVER UPDATES:
 
 
+    [2008-10-07]
+
+    - Improved the button-lamps layout to be more realistic.
+
+
     [2008-08-08]
 
     - Reverse engineering of custom IC's 06B49P, 06B53P & 09R81P.
