@@ -277,6 +277,10 @@
     --- DRIVER UPDATES ---
 
 
+    [2008-10-07]
+    - Improved the button-lamps layout to all games. Now are more realistic.
+
+
     [2008-06-09]
     - Added Videomat (polish bootleg).
 
