@@ -156,8 +156,11 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	/* Start of VBlank */
 	if( snes_ppu.beam.current_vert == snes_ppu.beam.last_visible_line )
 	{
-		program_write_byte(OAMADDL, snes_ppu.oam.address_low ); /* Reset oam address */
-		program_write_byte(OAMADDH, snes_ppu.oam.address_high );
+		if(!(snes_ram[INIDISP]&0x80)) 
+		{
+			program_write_byte(OAMADDL, snes_ppu.oam.saved_address_low ); /* Reset oam address */
+			program_write_byte(OAMADDH, snes_ppu.oam.saved_address_high );
+		}
 		snes_ram[HVBJOY] |= 0x81;		/* Set vblank bit to on & indicate controllers being read */
 		snes_ram[RDNMI] |= 0x80;		/* Set NMI occured bit */
 
@@ -639,11 +642,13 @@ WRITE8_HANDLER( snes_w_io )
 			break;
 		case OAMADDL:	/* Address for accessing OAM (low) */
 			snes_ppu.oam.address_low = data;
+			snes_ppu.oam.saved_address_low = data;
 			snes_ppu.oam.address = ((snes_ppu.oam.address_high & 0x1) << 8) + data;
 			snes_ram[OAMDATA] = 0;
 			break;
 		case OAMADDH:	/* Address for accessing OAM (high) */
 			snes_ppu.oam.address_high = data & 0x1;
+			snes_ppu.oam.saved_address_high = data;
 			snes_ppu.oam.address = ((data & 0x1) << 8) + snes_ppu.oam.address_low;
 			snes_ppu.oam.priority_rotation = (data & 0x80) ? 1 : 0;
 			snes_ram[OAMDATA] = 0;
