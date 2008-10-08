@@ -137,14 +137,14 @@ static TIMER_CALLBACK( m72_scanline_interrupt )
 	if (scanline < 256 && scanline == m72_raster_irq_position - 128)
 	{
 		video_screen_update_partial(machine->primary_screen, scanline);
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, m72_irq_base + 2);
+		cputag_set_input_line_and_vector(machine, "main", 0, HOLD_LINE, m72_irq_base + 2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == 256)
 	{
 		video_screen_update_partial(machine->primary_screen, scanline);
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, m72_irq_base + 0);
+		cputag_set_input_line_and_vector(machine, "main", 0, HOLD_LINE, m72_irq_base + 0);
 	}
 
 	/* adjust for next scanline */
@@ -541,28 +541,70 @@ static DRIVER_INIT( loht )
 	/* since we skip the startup tests, clear video RAM to prevent garbage on title screen */
 	memset(m72_videoram2,0,0x4000);
 }
+#if 0
+int stepping = 0;
 
-static READ16_HANDLER( m72_main_mcu_r)
+static TIMER_CALLBACK( single_step )
 {
-	return protection_ram[offset];
+	if (param>0)
+		timer_set( ATTOTIME_IN_NSEC(20), NULL, param-1, single_step);
+	else
+		stepping = 0;
 }
+static TIMER_CALLBACK( delayed_ram16_w )
+{
+	UINT16 val = ((UINT32) param) & 0xffff;
+	UINT16 offset = (((UINT32) param) >> 16) & 0xffff;
+	UINT16 *ram = ptr;
+
+	ram[offset] = val;
+	
+	if (!stepping)
+	{
+		stepping = 1;
+		timer_call_after_resynch( NULL, 50, single_step);
+	}
+}
+#else
+static TIMER_CALLBACK( delayed_ram16_w )
+{
+	UINT16 val = ((UINT32) param) & 0xffff;
+	UINT16 offset = (((UINT32) param) >> 16) & 0xffff;
+	UINT16 *ram = ptr;
+
+	ram[offset] = val;
+}
+
+#endif
 
 static WRITE16_HANDLER( m72_main_mcu_w)
 {
-	COMBINE_DATA(&protection_ram[offset]);
+	UINT16 val = protection_ram[offset];
+
+	COMBINE_DATA(&val);
+
+	if (offset == 0x0fff/2 && ACCESSING_BITS_8_15)
+	{
+		protection_ram[offset] = val;
+		cputag_set_input_line(machine, "mcu", 0, PULSE_LINE);
+	}
+	else
+		timer_call_after_resynch( protection_ram, (offset<<16) | val, delayed_ram16_w);
 }
 
 static DRIVER_INIT( loht_mcu )
 {
+	int cpunum =  mame_find_cpu_index(machine, "main");
 
-	protection_ram = auto_malloc(0x10000);
+	protection_ram = auto_malloc(0x1000);
+	memset(protection_ram, 0xff, 0x1000);
+	memory_install_read16_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, SMH_BANK1);
+	memory_install_write16_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_w);
+	memory_set_bankptr(1, protection_ram);
 
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_r, m72_main_mcu_w);
-
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
+	memory_install_write16_handler(machine, cpunum, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
 
 }
-
 
 static DRIVER_INIT( xmultipl )
 {
@@ -741,7 +783,7 @@ static ADDRESS_MAP_START( kengo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa0000, 0xa0bff) AM_READWRITE(m72_palette1_r, m72_palette1_w) AM_BASE(&paletteram16)
 	AM_RANGE(0xa8000, 0xa8bff) AM_READWRITE(m72_palette2_r, m72_palette2_w) AM_BASE(&paletteram16_2)
 	AM_RANGE(0xb0000, 0xb0001) AM_WRITE(m72_irq_line_w)
-AM_RANGE(0xb4000, 0xb4001) AM_WRITE(SMH_NOP)	/* ??? */
+	AM_RANGE(0xb4000, 0xb4001) AM_WRITE(SMH_NOP)	/* ??? */
 	AM_RANGE(0xbc000, 0xbc001) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0xc0000, 0xc03ff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x80000, 0x83fff) AM_RAM_WRITE(m72_videoram1_w) AM_BASE(&m72_videoram1)
@@ -1627,8 +1669,17 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( m72_mcu_data_w )
 {
-	if (offset&1) protection_ram[offset/2] = (protection_ram[offset/2] & 0x00ff) | (data << 8);
-	else protection_ram[offset/2] = (protection_ram[offset/2] & 0xff00) | (data&0xff);
+	UINT16 val;
+	if (offset&1) val = (protection_ram[offset/2] & 0x00ff) | (data << 8);
+	else val = (protection_ram[offset/2] & 0xff00) | (data&0xff);
+
+	if (offset == 6 && data == 0xfe)
+		/* Hack - The v30 overshoots and will not see the unlock written to offset 6 
+		 * We thus delay the lock, i.e. storing an unconditional branch to 6
+		 * here. This is highly time critical ... */
+		timer_set(ATTOTIME_IN_USEC(10), protection_ram, ((offset >>1 ) << 16) | val, delayed_ram16_w);
+	else
+		timer_call_after_resynch( protection_ram, ((offset >>1 ) << 16) | val, delayed_ram16_w);
 }
 
 static READ8_HANDLER(m72_mcu_data_r )
@@ -1636,9 +1687,8 @@ static READ8_HANDLER(m72_mcu_data_r )
 	UINT8 ret;
 
 	if (offset&1) ret = (protection_ram[offset/2] & 0xff00)>>8;
-	else ret =(protection_ram[offset/2] & 0x00ff);
+	else ret = (protection_ram[offset/2] & 0x00ff);
 
-//  printf("ret %02x\n",ret);
 	return ret;
 }
 
@@ -1690,12 +1740,15 @@ static MACHINE_DRIVER_START( m72 )
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( m72_8751 )
-	MDRV_IMPORT_FROM(m72)
 
-	MDRV_CPU_ADD("mcu",I8751, 8000000)
+	MDRV_IMPORT_FROM(m72)
+	
+	MDRV_CPU_ADD("mcu",I8751, 16000000)
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_DATA_MAP(mcu_data_map,0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_pulse)
+	//MDRV_CPU_VBLANK_INT("main", irq0_line_pulse)
+	MDRV_INTERLEAVE(1000)
+
 MACHINE_DRIVER_END
 
 
