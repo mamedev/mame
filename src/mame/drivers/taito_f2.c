@@ -639,10 +639,6 @@ static READ16_HANDLER( yesnoj_input_r )
 
 static READ16_HANDLER( yesnoj_dsw_r )
 {
-#ifdef MAME_DEBUG
-	logerror("CPU #0 PC = %06x: read yesnoj DSW %01x\n", activecpu_get_pc(), yesnoj_dsw);
-#endif
-
 	return input_port_read(machine, "DSWA");
 }
 
