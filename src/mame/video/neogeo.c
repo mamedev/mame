@@ -414,7 +414,7 @@ INLINE int sprite_on_scanline(int scanline, int y, int rows)
 }
 
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, int scanline)
+static void draw_sprites(bitmap_t *bitmap, int scanline)
 {
 	int sprite_index;
 	int max_sprite_index;
@@ -650,12 +650,8 @@ static void parse_sprites(int scanline)
 	}
 
 	/* fill the rest of the sprite list with 0, including one extra entry */
-	for (; active_sprite_count <= MAX_SPRITES_PER_LINE ; active_sprite_count++)
-	{
-		*sprite_list = 0;
-
-		sprite_list++;
-	}
+	memset(sprite_list, 0,
+	       sizeof(sprite_list[0]) * (MAX_SPRITES_PER_LINE - active_sprite_count + 1));
 }
 
 
@@ -934,7 +930,7 @@ VIDEO_UPDATE( neogeo )
 	/* fill with background color first */
 	fillbitmap(bitmap, pens[0x0fff], cliprect);
 
-	draw_sprites(screen->machine, bitmap, cliprect->min_y);
+	draw_sprites(bitmap, cliprect->min_y);
 
 	draw_fixed_layer(screen->machine, bitmap, cliprect->min_y);
 

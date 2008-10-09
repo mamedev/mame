@@ -5,7 +5,6 @@
 ****************************************************************************/
 
 #include "driver.h"
-#include "profiler.h"
 #include "render.h"
 #include "cpu/i86/i86.h"
 #include "video/resnet.h"
@@ -1512,8 +1511,6 @@ static void buggybjr_draw_road(running_machine *machine, UINT8 *bitmap, int wide
 	wave0    = BIT(vregs.flags, BB_RDFLAG_WAVE0);
 	wave1    = BIT(vregs.flags, BB_RDFLAG_WAVE1);
 	rva_offs = BIT(vregs.flags, BB_RDFLAG_RVA7) ? 0x800 : 0xc00;
-
-	profiler_mark(PROFILER_USER1);
 
 	for (y = 0; y < 240; ++y)
 	{
