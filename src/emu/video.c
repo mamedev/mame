@@ -2078,7 +2078,8 @@ static void update_refresh_speed(running_machine *machine)
 				if (screen->token != NULL)
 				{
 					screen_state *state = get_safe_token(screen);
-					min_frame_period = MIN(min_frame_period, state->frame_period);
+					if (state->frame_period != 0)
+						min_frame_period = MIN(min_frame_period, state->frame_period);
 				}
 
 			/* compute a target speed as an integral percentage */
