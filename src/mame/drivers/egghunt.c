@@ -95,7 +95,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int code = ((egghunt_bgram[tile_index*2+1] << 8) | egghunt_bgram[tile_index*2]) & 0x3fff;
-	int colour = egghunt_atram[tile_index];
+	int colour = egghunt_atram[tile_index] & 0x3f;
 
 	if(code & 0x2000)
 	{
@@ -396,7 +396,7 @@ static MACHINE_DRIVER_START( egghunt )
 	MDRV_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 1*8, 31*8-1)
 
 	MDRV_GFXDECODE(egghunt)
-	MDRV_PALETTE_LENGTH(0x800)
+	MDRV_PALETTE_LENGTH(0x400)
 
 	MDRV_VIDEO_START(egghunt)
 	MDRV_VIDEO_UPDATE(egghunt)
