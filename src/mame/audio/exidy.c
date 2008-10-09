@@ -505,8 +505,7 @@ static READ8_HANDLER( exidy_sh8253_r )
 
 static READ8_HANDLER( exidy_sh6840_r )
 {
-	fatalerror("exidy_sh6840_r - unexpected read");
-
+	logerror("%04X:exidy_sh6840_r - unexpected read", activecpu_get_pc());
 	return 0;
 }
 
