@@ -546,15 +546,15 @@ static const gfx_layout charlayout =
 
 
 static GFXDECODE_START( syvalion )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0,     32*16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0,     32 )
 GFXDECODE_END
 
 static GFXDECODE_START( recordbr )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0,     32*16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0,     32 )
 GFXDECODE_END
 
 static GFXDECODE_START( dleague )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0,     32*16 )
+	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0,     32 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 32*16, 16    )	// seems to be bogus...?
 GFXDECODE_END
 

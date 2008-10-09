@@ -199,60 +199,52 @@ INPUT_PORTS_END
 
 static const gfx_layout charlayout1 =
 {
-	8,8,	/* 8*8 characters */
-	1024,	/* 1024 characters */
-	3,	/* 3 bits per pixel */
-	{ 0, 1024*8*8, 2*1024*8*8 },	/* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },	/* pretty straightforward layout */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8,8,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8
 };
 static const gfx_layout charlayout2 =
 {
-	8,8,	/* 8*8 characters */
-	2048,	/* 2048 characters */
-	4,	/* 4 bits per pixel */
-	{ 0, 2048*8*8, 2*2048*8*8, 3*2048*8*8 },	/* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },	/* pretty straightforward layout */
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8	/* every char takes 8 consecutive bytes */
+	8,8,
+	RGN_FRAC(1,4),
+	4,
+	{ RGN_FRAC(0,4), RGN_FRAC(1,4), RGN_FRAC(2,4), RGN_FRAC(3,4) },
+	{ STEP8(0,1) },
+	{ STEP8(0,8) },
+	8*8
 };
 static const gfx_layout spritelayout1 =
 {
-	16,16,	/* 16*16 sprites */
-	128,	/* 128 sprites */
-	3,	/* 3 bits per pixel */
-	{ 0, 256*16*16, 2*256*16*16 },	/* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7,	/* pretty straightforward layout */
-			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8 },
-	32*8	/* every sprite takes 32 consecutive bytes */
+	16,16,
+	RGN_FRAC(1,3),
+	3,
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	{ STEP8(0,1), STEP8(64,1) },
+	{ STEP8(0,8), STEP8(128,8) },
+	32*8
 };
 static const gfx_layout spritelayout2 =
 {
-	32,32,	/* 32*32 sprites */
-	32,	/* 32 sprites */
-	3,	/* 3 bits per pixel */
-	{ 0*64*32*32, 1*64*32*32, 2*64*32*32 },	/* the bitplanes are separated */
-	{ 0, 1, 2, 3, 4, 5, 6, 7,	/* pretty straightforward layout */
-			8*8+0, 8*8+1, 8*8+2, 8*8+3, 8*8+4, 8*8+5, 8*8+6, 8*8+7,
-			32*8+0, 32*8+1, 32*8+2, 32*8+3, 32*8+4, 32*8+5, 32*8+6, 32*8+7,
-			40*8+0, 40*8+1, 40*8+2, 40*8+3, 40*8+4, 40*8+5, 40*8+6, 40*8+7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8,
-			16*8, 17*8, 18*8, 19*8, 20*8, 21*8, 22*8, 23*8,
-			64*8, 65*8, 66*8, 67*8, 68*8, 69*8, 70*8, 71*8,
-			80*8, 81*8, 82*8, 83*8, 84*8, 85*8, 86*8, 87*8 },
-	128*8	/* every sprite takes 128 consecutive bytes */
+	32,32,
+	RGN_FRAC(1,6),
+	3,
+	{ RGN_FRAC(0,3), RGN_FRAC(1,3), RGN_FRAC(2,3) },
+	{ STEP8(0,1), STEP8(64,1), STEP8(256,1), STEP8(320,1) },
+	{ STEP8(0,8), STEP8(128,8), STEP8(512,8), STEP8(640,8) },
+	128*8
 };
 
 
 
 static GFXDECODE_START( pbaction )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout1,    0, 16 )	/*   0-127 characters */
-	GFXDECODE_ENTRY( "gfx2", 0x00000, charlayout2,  128,  8 )	/* 128-255 background */
-	GFXDECODE_ENTRY( "gfx3", 0x00000, spritelayout1,  0, 16 )	/*   0-127 normal sprites */
-	GFXDECODE_ENTRY( "gfx3", 0x01000, spritelayout2,  0, 16 )	/*   0-127 large sprites */
+	GFXDECODE_ENTRY( "fgchars", 0x00000, charlayout1,    0, 16 )	/*   0-127 characters */
+	GFXDECODE_ENTRY( "bgchars", 0x00000, charlayout2,  128,  8 )	/* 128-255 background */
+	GFXDECODE_ENTRY( "sprites", 0x00000, spritelayout1,  0, 16 )	/*   0-127 normal sprites */
+	GFXDECODE_ENTRY( "sprites", 0x01000, spritelayout2,  0, 16 )	/*   0-127 large sprites */
 GFXDECODE_END
 
 
@@ -319,18 +311,18 @@ ROM_START( pbaction )
 	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for sound board */
 	ROM_LOAD( "a-e3.bin",     0x0000,  0x2000, CRC(0e53a91f) SHA1(df2827197cd55c3685e5ac8b26c20800623cb932) )
 
-	ROM_REGION( 0x06000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "fgchars", ROMREGION_DISPOSE )
 	ROM_LOAD( "a-s6.bin",     0x00000, 0x2000, CRC(9a74a8e1) SHA1(bd27439b91f41db3fd7eedb44e828d61b793bda0) )
 	ROM_LOAD( "a-s7.bin",     0x02000, 0x2000, CRC(5ca6ad3c) SHA1(7c8eff087f18cc2ff0572ea45e681a3a1ec94fad) )
 	ROM_LOAD( "a-s8.bin",     0x04000, 0x2000, CRC(9f00b757) SHA1(74b6d926b8f456c8d0101f0232c5d3662423b396) )
 
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "bgchars", ROMREGION_DISPOSE )
 	ROM_LOAD( "a-j5.bin",     0x00000, 0x4000, CRC(21efe866) SHA1(0c0a05a26d793ba98b0f421d464ff4b1d301ff9e) )
 	ROM_LOAD( "a-j6.bin",     0x04000, 0x4000, CRC(7f984c80) SHA1(18795ecbcd2da94f1cfcce5559d652388d1b8bc0) )
 	ROM_LOAD( "a-j7.bin",     0x08000, 0x4000, CRC(df69e51b) SHA1(52ab15c63332f0fa98884fa9adc8d35b93c939c4) )
 	ROM_LOAD( "a-j8.bin",     0x0c000, 0x4000, CRC(0094cb8b) SHA1(58f48d24903b797e8451bf231f9e8df621685d9f) )
 
-	ROM_REGION( 0x06000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "sprites", ROMREGION_DISPOSE )
 	ROM_LOAD( "b-c7.bin",     0x00000, 0x2000, CRC(d1795ef5) SHA1(69ad8e419e340d2f548468ed7838102789b978da) )
 	ROM_LOAD( "b-d7.bin",     0x02000, 0x2000, CRC(f28df203) SHA1(060f70ed6386c808303a488c97691257681bd8f3) )
 	ROM_LOAD( "b-f7.bin",     0x04000, 0x2000, CRC(af6e9817) SHA1(56f47d25761b3850c49a3a81b5ea35f12bd77b14) )
@@ -349,18 +341,18 @@ ROM_START( pbactio2 )
 	ROM_REGION( 0x10000, "cpu2", 0 )	/* 64k for a third Z80 (not emulated) */
 	ROM_LOAD( "pba17.bin",    0x0000,  0x4000, CRC(2734ae60) SHA1(4edcdfac1611c49c4f890609efbe8352b8161f8e) )
 
-	ROM_REGION( 0x06000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "fgchars", ROMREGION_DISPOSE )
 	ROM_LOAD( "a-s6.bin",     0x00000, 0x2000, CRC(9a74a8e1) SHA1(bd27439b91f41db3fd7eedb44e828d61b793bda0) )
 	ROM_LOAD( "a-s7.bin",     0x02000, 0x2000, CRC(5ca6ad3c) SHA1(7c8eff087f18cc2ff0572ea45e681a3a1ec94fad) )
 	ROM_LOAD( "a-s8.bin",     0x04000, 0x2000, CRC(9f00b757) SHA1(74b6d926b8f456c8d0101f0232c5d3662423b396) )
 
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "bgchars", ROMREGION_DISPOSE )
 	ROM_LOAD( "a-j5.bin",     0x00000, 0x4000, CRC(21efe866) SHA1(0c0a05a26d793ba98b0f421d464ff4b1d301ff9e) )
 	ROM_LOAD( "a-j6.bin",     0x04000, 0x4000, CRC(7f984c80) SHA1(18795ecbcd2da94f1cfcce5559d652388d1b8bc0) )
 	ROM_LOAD( "a-j7.bin",     0x08000, 0x4000, CRC(df69e51b) SHA1(52ab15c63332f0fa98884fa9adc8d35b93c939c4) )
 	ROM_LOAD( "a-j8.bin",     0x0c000, 0x4000, CRC(0094cb8b) SHA1(58f48d24903b797e8451bf231f9e8df621685d9f) )
 
-	ROM_REGION( 0x06000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "sprites", ROMREGION_DISPOSE )
 	ROM_LOAD( "b-c7.bin",     0x00000, 0x2000, CRC(d1795ef5) SHA1(69ad8e419e340d2f548468ed7838102789b978da) )
 	ROM_LOAD( "b-d7.bin",     0x02000, 0x2000, CRC(f28df203) SHA1(060f70ed6386c808303a488c97691257681bd8f3) )
 	ROM_LOAD( "b-f7.bin",     0x04000, 0x2000, CRC(af6e9817) SHA1(56f47d25761b3850c49a3a81b5ea35f12bd77b14) )
@@ -375,18 +367,18 @@ ROM_START( pbactio3 )
 	ROM_REGION( 0x10000, "audio", 0 )	/* 64k for sound board */
 	ROM_LOAD( "pba1.bin",     0x0000,  0x2000, CRC(8b69b933) SHA1(eb0762579d52ed9f5b1a002ffe7e517c59650e22) )
 
-	ROM_REGION( 0x06000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "fgchars", ROMREGION_DISPOSE )
 	ROM_LOAD( "a-s6.bin",     0x00000, 0x2000, CRC(9a74a8e1) SHA1(bd27439b91f41db3fd7eedb44e828d61b793bda0) )
 	ROM_LOAD( "a-s7.bin",     0x02000, 0x2000, CRC(5ca6ad3c) SHA1(7c8eff087f18cc2ff0572ea45e681a3a1ec94fad) )
 	ROM_LOAD( "a-s8.bin",     0x04000, 0x2000, CRC(9f00b757) SHA1(74b6d926b8f456c8d0101f0232c5d3662423b396) )
 
-	ROM_REGION( 0x10000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x10000, "bgchars", ROMREGION_DISPOSE )
 	ROM_LOAD( "a-j5.bin",     0x00000, 0x4000, CRC(21efe866) SHA1(0c0a05a26d793ba98b0f421d464ff4b1d301ff9e) )
 	ROM_LOAD( "a-j6.bin",     0x04000, 0x4000, CRC(7f984c80) SHA1(18795ecbcd2da94f1cfcce5559d652388d1b8bc0) )
 	ROM_LOAD( "a-j7.bin",     0x08000, 0x4000, CRC(df69e51b) SHA1(52ab15c63332f0fa98884fa9adc8d35b93c939c4) )
 	ROM_LOAD( "a-j8.bin",     0x0c000, 0x4000, CRC(0094cb8b) SHA1(58f48d24903b797e8451bf231f9e8df621685d9f) )
 
-	ROM_REGION( 0x06000, "gfx3", ROMREGION_DISPOSE )
+	ROM_REGION( 0x06000, "sprites", ROMREGION_DISPOSE )
 	ROM_LOAD( "b-c7.bin",     0x00000, 0x2000, CRC(d1795ef5) SHA1(69ad8e419e340d2f548468ed7838102789b978da) )
 	ROM_LOAD( "b-d7.bin",     0x02000, 0x2000, CRC(f28df203) SHA1(060f70ed6386c808303a488c97691257681bd8f3) )
 	ROM_LOAD( "b-f7.bin",     0x04000, 0x2000, CRC(af6e9817) SHA1(56f47d25761b3850c49a3a81b5ea35f12bd77b14) )

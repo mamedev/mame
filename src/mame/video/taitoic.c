@@ -1788,7 +1788,7 @@ static void TC0080VCO_bg0_tilemap_draw(bitmap_t *bitmap,const rectangle *cliprec
 		int max_x = cliprect->max_x;
 		int min_y = cliprect->min_y;
 		int max_y = cliprect->max_y;
-		int screen_width = max_x - min_x + 1;
+		int screen_width = max_x + 1;
 		int width_mask=0x3ff;	/* underlying tilemap */
 
 

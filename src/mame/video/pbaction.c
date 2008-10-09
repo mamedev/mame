@@ -55,7 +55,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 {
 	int attr = colorram[tile_index];
 	int code = videoram[tile_index] + 0x10 * (attr & 0x70);
-	int color = attr & 0x0f;
+	int color = attr & 0x07;
 	int flags = (attr & 0x80) ? TILE_FLIPY : 0;
 
 	SET_TILE_INFO(1, code, color, flags);
