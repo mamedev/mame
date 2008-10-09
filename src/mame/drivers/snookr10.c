@@ -77,10 +77,10 @@
     To initialize NVRAM (for all games), keep pressed ESTATISTICA (key '9') + MANAGEMENT (key '0'),
     then press RESET (key F3), and finally release both (ESTATISTICA + MANAGEMENT) keys.
 
-    Enter ESTATISTICA (key '9'), to enter the stats mode. Press CANCELLA/PLAY (key 'N')
+    Enter ESTATISTICA (key '9'), to enter the stats mode. Press PLAY/CANCELLA (key 'N')
     for 5 seconds to reset all values to zero. Press START (key '1') to exit the mode.
 
-    Enter MANAGEMENT (key '0'), to enter the management mode. Press CANCELLA/PLAY (key 'N')
+    Enter MANAGEMENT (key '0'), to enter the management mode. Press PLAY/CANCELLA (key 'N')
     to access the PROGRAMAZZIONE (program mode), where you can change the game parameters.
     Press START (key '1') to exit both modes.
 
@@ -267,8 +267,8 @@
     $4001 - $4001   Input Port 1   ;R
     $4002 - $4002   Input Port 2   ;R
     $4003 - $4003   Input Port 3   ;R  , DIP switches.
-    $5000 - $5000   Output Port A  ;W  , lamps.
-    $5001 - $5001   Output Port B  ;W  , lamps.
+    $5000 - $5000   Output Port 0  ;W  , lamps & counters.
+    $5001 - $5001   Output Port 1  ;W  , lamps.
     $6000 - $6FFF   Video RAM
     $7000 - $7FFF   Color RAM
     $8000 - $FFFF   ROM Space
@@ -283,8 +283,8 @@
     $3002 - $3002   Input Port 2   ;R
     $3003 - $3003   Input Port 3   ;R  , DIP switches.
     $3004 - $3004   Input Port 4   ;R  , bit 7 in parallel with DIP switch 1.
-    $5000 - $5000   Output Port A  ;W  , lamps.
-    $5001 - $5001   Output Port B  ;W  , lamps.
+    $5000 - $5000   Output Port 0  ;W  , lamps & counters.
+    $5001 - $5001   Output Port 1  ;W  , lamps.
     $6000 - $6FFF   Video RAM
     $7000 - $7FFF   Color RAM
     $8000 - $FFFF   ROM Space
@@ -295,6 +295,13 @@
 
     *** Driver Updates ***
 
+
+    [2008/10/09]
+    - Reworked the button-lamps matrix system.
+    - Documented both output ports.
+    - Connected coin in, key in and payout counters.
+    - Improved the lamps layout to be more realistic.
+    - Updated technical notes.
 
     [2008/06/09]
     - Fixed the tilemap size.
@@ -346,7 +353,7 @@
 
     *** TO DO ***
 
-    - Fix lamps.
+    - Nothing. :)
 
 
 ***********************************************************************************/
@@ -368,6 +375,8 @@ VIDEO_START( snookr10 );
 VIDEO_START( apple10 );
 VIDEO_UPDATE( snookr10 );
 
+int outportl, outporth;
+int bit0, bit1, bit2, bit3, bit4, bit5;
 
 /**********************
 * Read/Write Handlers *
@@ -375,9 +384,11 @@ VIDEO_UPDATE( snookr10 );
 **********************/
 
 static READ8_HANDLER( dsw_port_1_r )
-/*-----------------------------------
+{
+/*
+   --------------------------------
     PORT 0x3004 ;INPUT PORT 4
--------------------------------------
+   --------------------------------
     BIT 0 =
     BIT 1 =
     BIT 2 =
@@ -386,82 +397,105 @@ static READ8_HANDLER( dsw_port_1_r )
     BIT 5 =
     BIT 6 =
     BIT 7 = Complement of DS1, bit 7
-------------------------------------*/
-{
+   ---------------------------------
+*/
 return input_port_read(machine, "SW1");
 }
+
 
 /**********************
 * Read/Write Handlers *
 *  - Output Ports -   *
 **********************/
 
-/*  Lamps are multiplexed using a 5 bit matrix.
+/*  Lamps are multiplexed using a 6 bit matrix.
     The first 4 bits are from Port A, and the
-    remaining one is from Port B.
+    remaining 2 are from Port B.
 
     LAMPS components:
 
-    START  = bit1 & bit3
-    CANCEL = bit0 & bit3
-    STOP1  = bit1 only
-    STOP2  = bit1 & bit2
-    STOP3  = bit1 only
-    STOP4  = bit1 & bit4
-    STOP5  = bit0 & bit4
+    START  = bit5
+    CANCEL = bit2
+    STOP1  = bit0
+    STOP2  = bit1
+    STOP3  = bit0
+    STOP4  = bit3
+    STOP5  = bit4
 */
 
 static WRITE8_HANDLER( output_port_0_w )
-/*-----------------------------
-    PORT 0x5000 ;OUTPUT PORT A
--------------------------------
-    BIT 0 =
-    BIT 1 = Lamps matrix, bit0
-    BIT 2 =
-    BIT 3 = Lamps matrix, bit1
-    BIT 4 =
-    BIT 5 = Lamps matrix, bit2
-    BIT 6 =
-    BIT 7 = Lamps matrix, bit3
-------------------------------*/
 {
-	int bit0, bit1, bit2, bit3, bit4;
+/*
+   ----------------------------
+    PORT 0x5000 ;OUTPUT PORT A
+   ----------------------------
+    BIT 0 = Coin counter.
+    BIT 1 = Lamps matrix, bit0.
+    BIT 2 = Payout x10.
+    BIT 3 = Lamps matrix, bit1.
+    BIT 4 = Key in.
+    BIT 5 = Lamps matrix, bit2.
+    BIT 6 =
+    BIT 7 = Lamps matrix, bit3.
+   ----------------------------
+*/
+	outportl = data;
 
 	bit0 = (data >> 1) & 1;
 	bit1 = (data >> 3) & 1;
 	bit2 = (data >> 5) & 1;
 	bit3 = (data >> 7) & 1;
-	bit4 = (input_port_read_safe(machine, "IN5", 0) & 1); /* "IN5" has yet to be implemented! */
+	bit4 = outporth & 1;
+	bit5 = (outporth >> 1) & 1;
 
-	output_set_lamp_value(1, (bit1 & bit3));	/* Lamp 1 - START  */
-	output_set_lamp_value(2, (bit0 & bit3));	/* Lamp 2 - CANCEL */
-	output_set_lamp_value(3, (bit1 | bit3));	/* Lamp 3 - STOP1  */
-	output_set_lamp_value(4, (bit1 & bit2));	/* Lamp 4 - STOP2  */
-	output_set_lamp_value(5, (bit1 | bit3));	/* Lamp 5 - STOP3  */
+	output_set_lamp_value(0, bit5);	/* Lamp 0 - START  */
+	output_set_lamp_value(1, bit2);	/* Lamp 1 - CANCEL */
+	output_set_lamp_value(2, bit0);	/* Lamp 2 - STOP1  */
+	output_set_lamp_value(3, bit1);	/* Lamp 3 - STOP2  */
+	output_set_lamp_value(4, bit0);	/* Lamp 4 - STOP3  */
+	output_set_lamp_value(5, bit3);	/* Lamp 5 - STOP4  */
+	output_set_lamp_value(6, bit4);	/* Lamp 6 - STOP5  */
+
+	coin_counter_w(0, data & 0x01);	/* Coin in */
+	coin_counter_w(1, data & 0x10);	/* Key in */
+	coin_counter_w(2, data & 0x04);	/* Payout x10 */
+
+//	logerror("high: %04x - low: %X \n", outporth, outportl);
+//	popmessage("written : %02X", data);
 }
 
 static WRITE8_HANDLER( output_port_1_w )
-/*-----------------------------
+{
+/*
+   ----------------------------
     PORT 0x5001 ;OUTPUT PORT B
--------------------------------
+   ----------------------------
     BIT 0 = Lamps matrix, bit4
-    BIT 1 =
+    BIT 1 = Lamps matrix, bit5
     BIT 2 =
     BIT 3 =
     BIT 4 =
     BIT 5 =
     BIT 6 =
     BIT 7 =
-------------------------------*/
-{
-	int bit0, bit1, bit4;
+   ----------------------------
+*/
+	outporth = data << 8;
 
-	bit0 = (input_port_read_safe(machine, "IN4", 0) >> 1) & 1; /* "IN4" has yet to be implemented! */
-	bit1 = (input_port_read_safe(machine, "IN4", 0) >> 3) & 1; /* "IN4" has yet to be implemented! */
-	bit4 = (data & 1);
+	bit0 = (outportl >> 1) & 1;
+	bit1 = (outportl >> 3) & 1;
+	bit2 = (outportl >> 5) & 1;
+	bit3 = (outportl >> 7) & 1;
+	bit4 = data & 1;
+	bit5 = (data >> 1) & 1;
 
-	output_set_lamp_value(6, (bit1 & bit4));	/* Lamp 6 - STOP4  */
-	output_set_lamp_value(7, (bit0 & bit4));	/* Lamp 7 - STOP5  */
+	output_set_lamp_value(0, bit5);	/* Lamp 0 - START  */
+	output_set_lamp_value(1, bit2);	/* Lamp 1 - CANCEL */
+	output_set_lamp_value(2, bit0);	/* Lamp 2 - STOP1  */
+	output_set_lamp_value(3, bit1);	/* Lamp 3 - STOP2  */
+	output_set_lamp_value(4, bit0);	/* Lamp 4 - STOP3  */
+	output_set_lamp_value(5, bit3);	/* Lamp 5 - STOP4  */
+	output_set_lamp_value(6, bit4);	/* Lamp 6 - STOP5  */
 }
 
 
