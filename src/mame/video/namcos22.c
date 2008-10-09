@@ -627,7 +627,7 @@ ApplyGamma( bitmap_t *bitmap )
 			for( x=0; x<bitmap->width; x++ )
 			{
 				int rgb = dest[x];
-				int r = rlut[XORPAT^(rgb>>16)];
+				int r = rlut[XORPAT^((rgb>>16)&0xff)];
 				int g = glut[XORPAT^((rgb>>8)&0xff)];
 				int b = blut[XORPAT^(rgb&0xff)];
 				dest[x] = (r<<16)|(g<<8)|b;
@@ -645,7 +645,7 @@ ApplyGamma( bitmap_t *bitmap )
 			for( x=0; x<bitmap->width; x++ )
 			{
 				int rgb = dest[x];
-				int r = rlut[rgb>>16];
+				int r = rlut[(rgb>>16)&0xff];
 				int g = glut[(rgb>>8)&0xff];
 				int b = blut[rgb&0xff];
 				dest[x] = (r<<16)|(g<<8)|b;
