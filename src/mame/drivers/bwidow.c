@@ -232,6 +232,9 @@
 #define IN_THRUST (1 << 4)
 #define IN_P1 (1 << 5)
 #define IN_P2 (1 << 6)
+#define OPTION_1_PLAYER_GAME_ONLY (1 << 2)
+#define OPTION_2_CREDIT_MINIMUM (1 << 1)
+#define OPTION_CHARGE_BY_ (1 << 0)
 
 
 /*************************************
@@ -253,9 +256,11 @@ static READ8_HANDLER( spacduel_IN3_r )
 	int res;
 	int res1;
 	int res2;
+	int res3;
 
 	res1 = input_port_read(machine, "IN3");
 	res2 = input_port_read(machine, "IN4");
+	res3 = input_port_read(machine, "DSW2");
 	res = 0x00;
 
 	switch (offset & 0x07)
@@ -282,12 +287,15 @@ static READ8_HANDLER( spacduel_IN3_r )
 			break;
 		case 5:  /* Player 2 */
 			if (res2 & IN_THRUST) res |= 0x80;
+			if ((res3 & OPTION_CHARGE_BY_) == 0) res |= 0x40;
 			break;
 		case 6:
 			if (res1 & IN_P2) res |= 0x80;
+			if ((res3 & OPTION_2_CREDIT_MINIMUM) == 0) res |= 0x40;
 			break;
 		case 7:
 			res = (0x00 /* upright */ | (0 & 0x40));
+			if ((res3 & OPTION_1_PLAYER_GAME_ONLY) == 0) res |= 0x40;
 			break;
 	}
 
@@ -634,6 +642,20 @@ static INPUT_PORTS_START( spacduel )
 	PORT_DIPSETTING (  0xa0, "1 each 3" )
 	PORT_DIPSETTING (  0x20, "1 each 2" )
 	PORT_DIPSETTING (  0x00, DEF_STR( None ) )
+
+	PORT_START("DSW2")
+	// Although a dip switch 1 setting is shown in the Space Duel - Operation, Maintenance, and Service Manual,
+	// this switch is not connected to anything on the PCB or in the schematics
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "P10/11:!1")
+	PORT_DIPNAME( 0x04, 0x04, "1-player game only" ) PORT_DIPLOCATION("P10/11:!2")
+	PORT_DIPSETTING (  0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING (  0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "2-credit minimum" ) PORT_DIPLOCATION("P10/11:!3")
+	PORT_DIPSETTING (  0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING (  0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x01, 0x01, "Charge by ..." ) PORT_DIPLOCATION("P10/11:!4")
+	PORT_DIPSETTING (  0x01, "player" )
+	PORT_DIPSETTING (  0x00, "game" )
 
 	/* See machine/spacduel.c for more info on these 2 ports */
 	PORT_START("IN3")	/* IN3 - Player 1 - spread over 8 memory locations */
