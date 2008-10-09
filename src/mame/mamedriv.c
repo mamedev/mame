@@ -3744,6 +3744,7 @@ Sep.1994 Quiz Ghost Hunter
 	DRIVER( cotton2 )	/* (c) 1997 Success */
 	DRIVER( cottonbm )	/* (c) 1998 Success */
 	DRIVER( decathlt )	/* (c) 1995 */
+	DRIVER( decathlo )	/* (c) 1995 */
 	DRIVER( diehard )	/* (c) 1996 */
 	DRIVER( dnmtdeka )	/* (c) 1996 */
 	DRIVER( ejihon )	/* (c) 1995 */
@@ -6144,6 +6145,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mk3 )		/* (c) 1994 Midway */
 	DRIVER( mk3r20 )	/* (c) 1994 Midway */
 	DRIVER( mk3r10 )	/* (c) 1994 Midway */
+	DRIVER( mk3p40 )	/* (c) 1994 Midway */
 	DRIVER( umk3 )		/* (c) 1994 Midway */
 	DRIVER( umk3r11 )	/* (c) 1994 Midway */
 	DRIVER( umk3r10 )	/* (c) 1994 Midway */

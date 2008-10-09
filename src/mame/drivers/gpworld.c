@@ -49,6 +49,7 @@ static UINT8 nmi_enable;
 static UINT8 start_lamp;
 static UINT8 ldp_read_latch;
 static UINT8 ldp_write_latch;
+static UINT8 brake_gas;
 
 static UINT8* tile_RAM;
 static UINT8* sprite_RAM;
@@ -225,6 +226,15 @@ static READ8_HANDLER( ldp_read )
 	return ldp_read_latch;
 }
 
+static READ8_HANDLER( pedal_in )
+{
+	if (brake_gas)
+		return 	input_port_read(machine, "INACCEL");
+	
+	return 	input_port_read(machine, "INBRAKE");
+	
+}
+
 /* WRITES */
 static WRITE8_HANDLER( ldp_write )
 {
@@ -235,9 +245,14 @@ static WRITE8_HANDLER( misc_io_write )
 {
 	start_lamp = (data & 0x04) >> 1;
 	nmi_enable = (data & 0x40) >> 6;
-/*  dunno      = (data & 0x80) >> 7; */
+	/*  dunno      = (data & 0x80) >> 7; */ //coin counter???
 
 	logerror("NMI : %x (0x%x)\n", nmi_enable, data);
+}
+
+static WRITE8_HANDLER( brake_gas_write )
+{
+	brake_gas = data & 0x01;
 }
 
 static WRITE8_HANDLER( palette_write )
@@ -268,10 +283,10 @@ static ADDRESS_MAP_START( mainmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000,0xd7ff) AM_RAM AM_BASE(&tile_RAM)
 	AM_RANGE(0xd800,0xd800) AM_READWRITE(ldp_read,ldp_write)
 /*  AM_RANGE(0xd801,0xd801) AM_READ(???) */
-	AM_RANGE(0xda00,0xda00) AM_READ_PORT("INWHEEL")
+	AM_RANGE(0xda00,0xda00) AM_READ_PORT("INWHEEL")	//8255 here....
 /*  AM_RANGE(0xda01,0xda01) AM_WRITE(???) */					/* These inputs are interesting - there are writes and reads all over these addr's */
-/*  AM_RANGE(0xda02,0xda02) AM_READ_PORT("???") */				/* Reads here during the input test. */
-	AM_RANGE(0xda20,0xda20) AM_READ_PORT("INACCEL")				/* Seems to control both the brake and accel at once - maybe tied to 0xda02? Or to the writes here... */
+	AM_RANGE(0xda02,0xda02) AM_WRITE(brake_gas_write)				/*bit 0 select gas/brake input */
+	AM_RANGE(0xda20,0xda20) AM_READ(pedal_in)
 
 	AM_RANGE(0xe000,0xffff) AM_RAM								/* Potentially not all work RAM? */
 ADDRESS_MAP_END
@@ -320,9 +335,12 @@ static INPUT_PORTS_START( gpworld )
 	PORT_BIT ( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME( "STRONG LEFT" ) PORT_CODE( KEYCODE_E )
 	PORT_BIT ( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME( "FIERCE LEFT" ) PORT_CODE( KEYCODE_W )
 
-	PORT_START("INACCEL")	/* both accelerator & brake right now :P */
+	PORT_START("INACCEL")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
 
+	PORT_START("INBRAKE")
+	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
+	
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )
@@ -490,6 +508,7 @@ static DRIVER_INIT( gpworld )
 {
 	nmi_enable = 0;
 	start_lamp = 0;
+	brake_gas = 0;
 	ldp_write_latch = ldp_read_latch = 0;
 }
 
