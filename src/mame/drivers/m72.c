@@ -558,7 +558,7 @@ static TIMER_CALLBACK( delayed_ram16_w )
 	UINT16 *ram = ptr;
 
 	ram[offset] = val;
-	
+
 	if (!stepping)
 	{
 		stepping = 1;
@@ -1674,9 +1674,9 @@ static WRITE8_HANDLER( m72_mcu_data_w )
 	else val = (protection_ram[offset/2] & 0xff00) | (data&0xff);
 
 	if (offset == 6 && data == 0xfe)
-		/* Hack - The v30 overshoots and will not see the unlock written to offset 6 
-		 * We thus delay the lock, i.e. storing an unconditional branch to 6
-		 * here. This is highly time critical ... */
+		/* Hack - The v30 overshoots and will not see the unlock written to offset 6
+         * We thus delay the lock, i.e. storing an unconditional branch to 6
+         * here. This is highly time critical ... */
 		timer_set(ATTOTIME_IN_USEC(10), protection_ram, ((offset >>1 ) << 16) | val, delayed_ram16_w);
 	else
 		timer_call_after_resynch( protection_ram, ((offset >>1 ) << 16) | val, delayed_ram16_w);
@@ -1742,7 +1742,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( m72_8751 )
 
 	MDRV_IMPORT_FROM(m72)
-	
+
 	MDRV_CPU_ADD("mcu",I8751, 16000000)
 	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_DATA_MAP(mcu_data_map,0)

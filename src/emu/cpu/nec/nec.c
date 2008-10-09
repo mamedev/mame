@@ -114,11 +114,6 @@ typedef UINT32 DWORD;
 #include "nec.h"
 #include "necintrf.h"
 
-/* enabling USE_SPEED_HACK will break lothb2 (m72.c) protection. It may cause issues 
- * on any system requiring close sync between two processors */
-
-#define USE_SPEED_HACK	(0)
-
 /* default configuration */
 static const nec_config default_config =
 {
@@ -869,12 +864,7 @@ OP( 0xe7, i_outax  ) { UINT8 port = FETCH; write_port_word(port, I.regs.w[AW]); 
 OP( 0xe8, i_call_d16 ) { UINT32 tmp; FETCHWORD(tmp); PUSH(I.ip); I.ip = (WORD)(I.ip+(INT16)tmp); CHANGE_PC; nec_ICount-=24; }
 OP( 0xe9, i_jmp_d16  ) { UINT32 tmp; FETCHWORD(tmp); I.ip = (WORD)(I.ip+(INT16)tmp); CHANGE_PC; nec_ICount-=15; }
 OP( 0xea, i_jmp_far  ) { UINT32 tmp,tmp1; FETCHWORD(tmp); FETCHWORD(tmp1); I.sregs[PS] = (WORD)tmp1; 	I.ip = (WORD)tmp; CHANGE_PC; nec_ICount-=27;  }
-OP( 0xeb, i_jmp_d8   ) { int tmp = (int)((INT8)FETCH); nec_ICount-=12;
-#if USE_SPEED_HACK
-	if (tmp==-2 && I.no_interrupt==0 && (I.pending_irq==0) && nec_ICount>0) nec_ICount%=12; /* cycle skip */
-#endif
-	I.ip = (WORD)(I.ip+tmp);
-}
+OP( 0xeb, i_jmp_d8   ) { int tmp = (int)((INT8)FETCH); nec_ICount-=12; I.ip = (WORD)(I.ip+tmp); }
 OP( 0xec, i_inaldx   ) { I.regs.b[AL] = read_port_byte(I.regs.w[DW]); CLKS(8,8,5);}
 OP( 0xed, i_inaxdx   ) { I.regs.w[AW] = read_port_word(I.regs.w[DW]); CLKW(12,12,7,12,8,5,I.regs.w[DW]); }
 OP( 0xee, i_outdxal  ) { write_port_byte(I.regs.w[DW], I.regs.b[AL]); CLKS(8,8,3);	}

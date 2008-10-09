@@ -176,7 +176,7 @@ void device_list_remove(device_config **listheadptr, device_type type, const cha
 
 
 /*-------------------------------------------------
-    device_build_tag - build a tag that combines 
+    device_build_tag - build a tag that combines
     the device's name and the given tag
 -------------------------------------------------*/
 
@@ -195,7 +195,7 @@ const char *device_build_tag(astring *dest, const char *devicetag, const char *t
 
 
 /*-------------------------------------------------
-    device_inherit_tag - build a tag with the same 
+    device_inherit_tag - build a tag with the same
     device prefix as the source tag
 -------------------------------------------------*/
 

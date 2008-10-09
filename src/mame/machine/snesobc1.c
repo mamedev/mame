@@ -57,7 +57,7 @@ WRITE8_HANDLER( obc1_write )
 	UINT16 address = offset & 0x1fff;
 	UINT8 temp;
 
-	switch(address) 
+	switch(address)
 	{
 		case 0x1ff0:
 			snes_ram[obc1_offset + (obc1_address << 2) + 0] = data;

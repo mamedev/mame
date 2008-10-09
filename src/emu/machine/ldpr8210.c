@@ -423,7 +423,7 @@ static INT32 pr8210_update(laserdisc_state *ld, const vbi_metadata *vbi, int fie
 static void pr8210_overlay(laserdisc_state *ld, bitmap_t *bitmap)
 {
 	ldplayer_data *player = ld->player;
-	
+
 	/* custom display */
 	if (player->pia.display)
 	{
@@ -431,14 +431,14 @@ static void pr8210_overlay(laserdisc_state *ld, bitmap_t *bitmap)
 		overlay_draw_group(bitmap, &player->pia.text[7], 5, OVERLAY_GROUP2_X);
 		overlay_draw_group(bitmap, &player->pia.text[12], 5, OVERLAY_GROUP3_X);
 	}
-	
+
 	/* chapter/frame display */
 	else
 	{
 		/* frame display */
 		if (player->pia.latchdisplay & 2)
 			overlay_draw_group(bitmap, &player->pia.text[2], 5, OVERLAY_GROUP1_X);
-	
+
 		/* chapter overlay */
 		if (player->pia.latchdisplay & 1)
 			overlay_draw_group(bitmap, &player->pia.text[0], 2, OVERLAY_GROUP0_X);
@@ -610,7 +610,7 @@ static READ8_HANDLER( pr8210_pia_r )
 		case 0x22:	case 0x23:	case 0x24:	case 0x25:	case 0x26:
 			result = player->pia.frame[offset - 0x20];
 			break;
-		
+
 		/* (1D-1F,27) invalid read but normal */
 		case 0x1d:	case 0x1e:	case 0x1f:
 		case 0x27:
@@ -897,7 +897,7 @@ static void overlay_draw_group(bitmap_t *bitmap, const UINT8 *text, int count, f
 {
 	int skip = TRUE;
 	int x;
-	
+
 	/* rease the background */
 	overlay_erase(bitmap, xstart, xstart + ((OVERLAY_X_PIXELS + 1) * count + 1) * OVERLAY_PIXEL_WIDTH);
 
@@ -912,7 +912,7 @@ static void overlay_draw_group(bitmap_t *bitmap, const UINT8 *text, int count, f
 
 
 /*-------------------------------------------------
-    overlay_erase - erase the background area 
+    overlay_erase - erase the background area
     where the text overlay will be displayed
 -------------------------------------------------*/
 
@@ -921,25 +921,25 @@ static void overlay_erase(bitmap_t *bitmap, float xstart, float xend)
 	UINT32 xmin = (UINT32)(xstart * 256.0f * (float)bitmap->width);
 	UINT32 xmax = (UINT32)(xend * 256.0f * (float)bitmap->width);
 	UINT32 x, y;
-	
+
 	for (y = OVERLAY_Y; y < (OVERLAY_Y + (OVERLAY_Y_PIXELS + 2) * OVERLAY_PIXEL_HEIGHT); y++)
 	{
 		UINT16 *dest = BITMAP_ADDR16(bitmap, y, xmin >> 8);
 		UINT16 ymin, ymax, yres;
-		
+
 		ymax = *dest >> 8;
 		ymin = ymax * 3 / 8;
 		yres = ymin + ((ymax - ymin) * (xmin & 0xff)) / 256;
 		*dest = (yres << 8) | (*dest & 0xff);
 		dest++;
-		
+
 		for (x = (xmin | 0xff) + 1; x < xmax; x += 0x100)
 		{
 			yres = (*dest >> 8) * 3 / 8;
 			*dest = (yres << 8) | (*dest & 0xff);
 			dest++;
 		}
-		
+
 		ymax = *dest >> 8;
 		ymin = ymax * 3 / 8;
 		yres = ymin + ((ymax - ymin) * (~xmax & 0xff)) / 256;
@@ -960,12 +960,12 @@ static void overlay_draw_char(bitmap_t *bitmap, UINT8 ch, float xstart)
 	UINT32 xsize = (UINT32)(OVERLAY_PIXEL_WIDTH * 256.0f * (float)bitmap->width);
 	const UINT8 *chdataptr = &text_bitmap[ch & 0x3f][0];
 	UINT32 x, y, xx, yy;
-	
+
 	/* iterate over pixels */
 	for (y = 0; y < OVERLAY_Y_PIXELS; y++)
 	{
 		UINT8 chdata = *chdataptr++;
-		
+
 		for (x = 0; x < OVERLAY_X_PIXELS; x++, chdata <<= 1)
 			if (chdata & 0x80)
 			{
@@ -975,16 +975,16 @@ static void overlay_draw_char(bitmap_t *bitmap, UINT8 ch, float xstart)
 				{
 					UINT16 *dest = BITMAP_ADDR16(bitmap, OVERLAY_Y + (y + 1) * OVERLAY_PIXEL_HEIGHT + yy, xmin >> 8);
 					UINT16 ymin, ymax, yres;
-					
+
 					ymax = 0xff;
 					ymin = *dest >> 8;
 					yres = ymin + ((ymax - ymin) * (~xmin & 0xff)) / 256;
 					*dest = (yres << 8) | (*dest & 0xff);
 					dest++;
-					
+
 					for (xx = (xmin | 0xff) + 1; xx < xmax; xx += 0x100)
 						*dest++ = 0xf080;
-					
+
 					ymax = 0xff;
 					ymin = *dest >> 8;
 					yres = ymin + ((ymax - ymin) * (xmax & 0xff)) / 256;

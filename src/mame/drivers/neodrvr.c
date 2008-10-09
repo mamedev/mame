@@ -637,20 +637,20 @@ INPUT_PORTS_END
 
 
 /*
-	Missing (undumped) sets:
-	. Rage of the Dragons (AES)
-	. Last Blade 2 (early revisions) ?
-	. Power Spikes II (early revisions) ?
-	. Metal Slug 3 (rev. Mar/17/2000 1:36)
-	. Metal Slug 4 (AES)
-	. Metal Slug 5 (PCB)
-	. 98 Best 44
+    Missing (undumped) sets:
+    . Rage of the Dragons (AES)
+    . Last Blade 2 (early revisions) ?
+    . Power Spikes II (early revisions) ?
+    . Metal Slug 3 (rev. Mar/17/2000 1:36)
+    . Metal Slug 4 (AES)
+    . Metal Slug 5 (PCB)
+    . 98 Best 44
 
-	Redump required:
-	. All set with BAD_DUMP roms
-	. Sets which have a p1h
+    Redump required:
+    . All set with BAD_DUMP roms
+    . Sets which have a p1h
 
-	All rom labels need to be reverified
+    All rom labels need to be reverified
 
 */
 
@@ -6445,8 +6445,8 @@ ROM_END
 
 
 /*
-	Most bootleg sets are incomplete (missing 'C', 'V' and 'M' roms).
-	Verification required.
+    Most bootleg sets are incomplete (missing 'C', 'V' and 'M' roms).
+    Verification required.
 
 */
 

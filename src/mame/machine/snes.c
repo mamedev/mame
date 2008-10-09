@@ -158,7 +158,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	/* Start of VBlank */
 	if( snes_ppu.beam.current_vert == snes_ppu.beam.last_visible_line )
 	{
-		if(!(snes_ram[INIDISP]&0x80)) 
+		if(!(snes_ram[INIDISP]&0x80))
 		{
 			program_write_byte(OAMADDL, snes_ppu.oam.saved_address_low ); /* Reset oam address */
 			program_write_byte(OAMADDH, snes_ppu.oam.saved_address_high );
@@ -1103,7 +1103,7 @@ WRITE8_HANDLER( snes_w_io )
 /*
 There are at least 4 different kind of boards for SNES carts, which we denote with
 mode_20, mode_21, mode_22 and mode_25. Below is a layout of the memory for each of
-them. Notice we mirror ROM at loading time where necessary (e.g. banks 0x80 to 0xff 
+them. Notice we mirror ROM at loading time where necessary (e.g. banks 0x80 to 0xff
 at address 0x8000 for mode_20).
 
 MODE_20
@@ -1124,8 +1124,8 @@ address               |             |         |          |        |     |      |
 
 MODE_22 is the same, but banks 0x40 to 0x7e at address 0x000 to 0x7fff contain ROM (of
 course mirrored also at 0xc0 to 0xff). Mode 22 is quite similar to the board SHVC-2P3B.
-It is used also in SDD-1 games (only for the first blocks of data). DSP data & status 
-can be either at banks 0x20 to 0x40 at address 0x8000 or at banks 0x60 to 0x6f at address 
+It is used also in SDD-1 games (only for the first blocks of data). DSP data & status
+can be either at banks 0x20 to 0x40 at address 0x8000 or at banks 0x60 to 0x6f at address
 0x0000.
 
 
@@ -1404,7 +1404,7 @@ WRITE8_HANDLER( snes_w_bank2 )
 		}
 		else
 			logerror("Attempt to write to reserved address: %X\n", offset + 0x300000);
-	}	
+	}
 	/* some dsp1 games use these banks 0x30 to 0x3f at address 0x8000 */
 	else if ((snes_cart.mode == SNES_MODE_20) && (has_addon_chip == HAS_DSP1))
 		DSP1_setDr(data);
@@ -1463,7 +1463,7 @@ WRITE8_HANDLER( snes_w_bank6 )
 		{
 			if (offset < 0x300000)
 				snes_w_bank1(machine, offset, data);
-			else 
+			else
 				snes_w_bank2(machine, offset - 0x300000, data);
 		}
 		else	/* Mode 25 has SRAM not mirrored from lower banks */
@@ -1472,7 +1472,7 @@ WRITE8_HANDLER( snes_w_bank6 )
 			{
 				if (offset < 0x300000)
 					snes_w_bank1(machine, offset, data);
-				else 
+				else
 					snes_w_bank2(machine, offset - 0x300000, data);
 			}
 			else if ((offset >= 0x300000) && (snes_cart.sram > 0))
@@ -1482,7 +1482,7 @@ WRITE8_HANDLER( snes_w_bank6 )
 				snes_ram[0xb06000 + (offset & mask)] = data;
 			}
 			else	/* Area in 0x6000-0x8000 && offset < 0x300000 is Reserved! */
-				logerror("Attempt to write to reserved address: %X\n", offset + 0x800000);		
+				logerror("Attempt to write to reserved address: %X\n", offset + 0x800000);
 		}
 	}
 	else if ((snes_cart.mode == SNES_MODE_20) && (has_addon_chip == HAS_DSP1) && (offset >= 0x200000))
@@ -1585,7 +1585,7 @@ static void snes_init_ram(running_machine *machine)
 		case HAS_DSP2:
 			DSP2_reset();
 			break;
-			
+
 		case HAS_OBC1:
 			obc1_init();
 			break;

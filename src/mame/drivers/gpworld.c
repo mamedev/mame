@@ -230,9 +230,9 @@ static READ8_HANDLER( pedal_in )
 {
 	if (brake_gas)
 		return 	input_port_read(machine, "INACCEL");
-	
+
 	return 	input_port_read(machine, "INBRAKE");
-	
+
 }
 
 /* WRITES */
@@ -340,7 +340,7 @@ static INPUT_PORTS_START( gpworld )
 
 	PORT_START("INBRAKE")
 	PORT_BIT( 0xff, 0x00, IPT_PEDAL2 ) PORT_SENSITIVITY(30) PORT_KEYDELTA(10) PORT_PLAYER(1)
-	
+
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2,3,4")
 	PORT_DIPSETTING(    0x70, DEF_STR( 4C_1C ) )

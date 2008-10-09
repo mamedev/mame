@@ -31,7 +31,7 @@ int DSP2_op0dinlen = 0;
 
 
 //convert bitmap to bitplane tile
-void DSP2_op01( void ) 
+void DSP2_op01( void )
 {
 //op01 size is always 32 bytes input and output
 //the hardware does strange things if you vary the size
@@ -43,7 +43,7 @@ void DSP2_op01( void )
 	int j;
 
 //process 8 blocks of 4 bytes each
-	for (j = 0; j < 8; j++) 
+	for (j = 0; j < 8; j++)
 	{
 		c0 = *p1++;
 		c1 = *p1++;
@@ -95,7 +95,7 @@ void DSP2_op03( void )
 }
 
 //replace bitmap using transparent color
-void DSP2_op05( void ) 
+void DSP2_op05( void )
 {
 	UINT8 color;
 // Overlay bitmap with transparency.
@@ -131,7 +131,7 @@ void DSP2_op05( void )
 
 	color = DSP2_op05transparent & 0x0f;
 
-	for (n = 0; n < DSP2_op05len; n++) 
+	for (n = 0; n < DSP2_op05len; n++)
 	{
 		c1 = *p1++;
 		c2 = *p2++;
@@ -141,20 +141,20 @@ void DSP2_op05( void )
 }
 
 //reverse bitmap
-void DSP2_op06( void ) 
+void DSP2_op06( void )
 {
 // Input:
 //    size
 //    bitmap
 	int i, j;
-	for (i = 0, j = DSP2_op06len - 1; i < DSP2_op06len; i++, j--) 
+	for (i = 0, j = DSP2_op06len - 1; i < DSP2_op06len; i++, j--)
 	{
 		DSP2_output[j] = (DSP2_parameters[i] << 4) | (DSP2_parameters[i] >> 4);
 	}
 }
 
 //multiply
-void DSP2_op09( void ) 
+void DSP2_op09( void )
 {
 	UINT32 r = 0;
 	DSP2_out_count = 4;
@@ -170,7 +170,7 @@ void DSP2_op09( void )
 }
 
 //scale bitmap
-void DSP2_op0d( void ) 
+void DSP2_op0d( void )
 {
 // Bit accurate hardware algorithm - uses fixed point math
 // This should match the DSP2 Op0D output exactly
@@ -190,21 +190,21 @@ void DSP2_op0d( void )
 	UINT32 pixloc;     // match size of multiplier
 	int    i, j;
 	UINT8  pixelarray[512];
-	if (DSP2_op0dinlen <= DSP2_op0doutlen) 
+	if (DSP2_op0dinlen <= DSP2_op0doutlen)
 	{
 		multiplier = 0x10000; // In our self defined fixed point 0x10000 == 1
-	} 
-	else 
+	}
+	else
 	{
 		multiplier = (DSP2_op0dinlen << 17) / ((DSP2_op0doutlen << 1) + 1);
 	}
 
 	pixloc = 0;
-	for (i = 0; i < DSP2_op0doutlen * 2; i++) 
+	for (i = 0; i < DSP2_op0doutlen * 2; i++)
 	{
 		j = pixloc >> 16;
 
-		if (j & 1) 
+		if (j & 1)
 			pixelarray[i] = (DSP2_parameters[j >> 1] & 0x0f);
 		else
 			pixelarray[i] = (DSP2_parameters[j >> 1] & 0xf0) >> 4;
@@ -212,14 +212,14 @@ void DSP2_op0d( void )
 		pixloc += multiplier;
 	}
 
-	for (i = 0; i < DSP2_op0doutlen; i++) 
+	for (i = 0; i < DSP2_op0doutlen; i++)
 	{
 		DSP2_output[i] = (pixelarray[i << 1] << 4) | pixelarray[(i << 1) + 1];
 	}
 }
 
 
-void DSP2_reset( void ) 
+void DSP2_reset( void )
 {
 	DSP2_waiting_for_command = 1;
 	DSP2_in_count  = 0;
@@ -239,10 +239,10 @@ void DSP2_reset( void )
 	DSP2_op0dinlen       = 0;
 }
 
-UINT8 DSP2_read( void ) 
+UINT8 DSP2_read( void )
 {
 	UINT8 r = 0xff;
-	if (DSP2_out_count) 
+	if (DSP2_out_count)
 	{
 		r = DSP2_output[DSP2_out_index++];
 		DSP2_out_index &= 511;
@@ -252,15 +252,15 @@ UINT8 DSP2_read( void )
 	return r;
 }
 
-void DSP2_write(UINT8 data) 
+void DSP2_write(UINT8 data)
 {
-	if(DSP2_waiting_for_command) 
+	if(DSP2_waiting_for_command)
 	{
 		DSP2_command  = data;
 		DSP2_in_index = 0;
 		DSP2_waiting_for_command = 0;
 
-		switch (data) 
+		switch (data)
 		{
 			case 0x01: DSP2_in_count = 32; break;
 			case 0x03: DSP2_in_count =  1; break;
@@ -273,35 +273,35 @@ void DSP2_write(UINT8 data)
 			case 0x0f: DSP2_in_count =  0; break;
 		}
 	}
-	else 
+	else
 	{
 		DSP2_parameters[DSP2_in_index++] = data;
 		DSP2_in_index &= 511;
 	}
 
-	if (DSP2_in_count == DSP2_in_index) 
+	if (DSP2_in_count == DSP2_in_index)
 	{
 		DSP2_waiting_for_command = 1;
 		DSP2_out_index = 0;
-		switch (DSP2_command) 
+		switch (DSP2_command)
 		{
-			case 0x01: 
+			case 0x01:
 				DSP2_out_count = 32;
 				DSP2_op01();
 				break;
 
-			case 0x03: 
+			case 0x03:
 				DSP2_op03();
 				break;
 
 			case 0x05:
-				if (DSP2_op05haslen) 
+				if (DSP2_op05haslen)
 				{
 					DSP2_op05haslen = 0;
 					DSP2_out_count  = DSP2_op05len;
 					DSP2_op05();
-				} 
-				else 
+				}
+				else
 				{
 					DSP2_op05len    = DSP2_parameters[0];
 					DSP2_in_index   = 0;
@@ -313,13 +313,13 @@ void DSP2_write(UINT8 data)
 				break;
 
 			case 0x06:
-				if (DSP2_op06haslen) 
+				if (DSP2_op06haslen)
 				{
 					DSP2_op06haslen = 0;
 					DSP2_out_count  = DSP2_op06len;
 					DSP2_op06();
-				} 
-				else 
+				}
+				else
 				{
 					DSP2_op06len    = DSP2_parameters[0];
 					DSP2_in_index   = 0;
@@ -338,13 +338,13 @@ void DSP2_write(UINT8 data)
 				break;
 
 			case 0x0d:
-				if (DSP2_op0dhaslen) 
+				if (DSP2_op0dhaslen)
 				{
 					DSP2_op0dhaslen = 0;
 					DSP2_out_count  = DSP2_op0doutlen;
 					DSP2_op0d();
-				} 
-				else 
+				}
+				else
 				{
 					DSP2_op0dinlen  = DSP2_parameters[0];
 					DSP2_op0doutlen = DSP2_parameters[1];
@@ -356,7 +356,7 @@ void DSP2_write(UINT8 data)
 				}
 				break;
 
-			case 0x0f: 
+			case 0x0f:
 				break;
 		}
 	}

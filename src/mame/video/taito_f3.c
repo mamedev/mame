@@ -752,12 +752,12 @@ VIDEO_START( f3 )
 				int chk_trans_or_opa=0;
 				UINT8 extra_mask = ((extra_planes << 4) | 0x0f);
 				UINT8 *dp = pf_gfx->gfxdata + c * pf_gfx->char_modulo;
-				
+
 				for (y = 0;y < pf_gfx->height;y++)
 				{
 					for (x = 0;x < pf_gfx->width;x++)
 					{
-						if(!(dp[x] & extra_mask)) 
+						if(!(dp[x] & extra_mask))
 							chk_trans_or_opa|=2;
 						else
 							chk_trans_or_opa|=1;

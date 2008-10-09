@@ -15,7 +15,7 @@
 TODO:
 
  - ffight2b -  dipswitches ($7eadd7 ?)
- - sblast2b -  dipswicthes 
+ - sblast2b -  dipswicthes
  - kiinstb -   fix gfx glitches, missing texts
 
 
@@ -146,10 +146,10 @@ static READ8_HANDLER(sb2b_6a6xxx_r)
 		case 0x94b: return 0x3a;
 		case 0xd1a:	return 0xc5;
 		case 0xfb7:	return 0x47;
-	}	
-	
+	}
+
 	logerror("Unknown protection read read %x @ %x\n",offset, activecpu_get_pc());
-	
+
 	return 0;
 }
 
@@ -631,25 +631,25 @@ static DRIVER_INIT( ffight2b )
 
 	DRIVER_INIT_CALL(snes);
 }
-  
+
 
 static const UINT8 data_substitution0[] = {0x88,0x02,0x2a,0x08,0x28,0xaa,0x8a,0x0a,0xa2,0x00,0x80,0xa0,0x22,0xa8,0x82,0x20,};
 static const UINT8 data_substitution1[] = {0x44,0x01,0x51,0x40,0x50,0x55,0x45,0x41,0x15,0x00,0x04,0x14,0x11,0x54,0x05,0x10,};
-static const UINT8 address_substitution_low[] = 
+static const UINT8 address_substitution_low[] =
 {
 	0x32,0x35,0x3a,0x28,0x2a,0x0c,0x36,0x38,0x29,0x39,0x04,0x2c,0x21,0x23,0x3d,0x2d,
 	0x3c,0x02,0x17,0x31,0x00,0x2e,0x0a,0x2f,0x25,0x26,0x27,0x30,0x33,0x01,0x18,0x19,
 	0x10,0x11,0x24,0x16,0x1b,0x0d,0x0e,0x12,0x13,0x05,0x22,0x34,0x1c,0x06,0x07,0x37,
 	0x08,0x3b,0x09,0x14,0x15,0x1d,0x0b,0x0f,0x1e,0x1f,0x2b,0x1a,0x03,0x20,0x3f,0x3e,
-}; 
-    
-static const UINT8  address_substitution_high[] =    
+};
+
+static const UINT8  address_substitution_high[] =
 {
 	0x1b,0x15,0x08,0x1f,0x06,0x02,0x13,0x0a,0x1d,0x04,0x0e,0x00,0x17,0x0c,0x11,0x19,
 	0x16,0x0d,0x1c,0x07,0x10,0x03,0x1a,0x0b,0x12,0x05,0x0f,0x18,0x1e,0x01,0x14,0x09,
 	0x2b,0x25,0x28,0x2f,0x26,0x22,0x23,0x2a,0x2d,0x24,0x2e,0x20,0x27,0x2c,0x21,0x29
 };
-	
+
 DRIVER_INIT( sblast2b )
 {
 	int i, cipherText, plainText, newAddress;
@@ -660,7 +660,7 @@ DRIVER_INIT( sblast2b )
        	cipherText = src[i];
        	plainText = data_substitution0[cipherText&0xf]|data_substitution1[cipherText>>4];
    		newAddress = (address_substitution_high[i>>15]<<15)|(i&0x7fc0)|(address_substitution_low[i&0x3f]);
-  
+
 		if(newAddress<0x10000)
 	 	{
 	 		plainText = BITSWAP8(plainText, 6,3,5,4,2,0,7,1) ^ 0xff;
@@ -670,7 +670,7 @@ DRIVER_INIT( sblast2b )
 	 	{
 	 		plainText =	BITSWAP8(plainText, 4,0,7,6,3,1,2,5) ^ 0xff;
 	 	}
-	 	else		
+	 	else
 	 	if(newAddress<0x30000)
 	 	{
 	 		plainText =	BITSWAP8(plainText, 5,7,6,1,4,3,0,2);
@@ -682,19 +682,19 @@ DRIVER_INIT( sblast2b )
 	 	}
         dst[newAddress] = plainText;
     }
- 
+
  	/*  boot vector */
     dst[0xfffc]=0xc0;
     dst[0xfffd]=0x7a;
-   
+
    	/*  protection checks */
  	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x75bd37, 0x75bd37, 0, 0, sb2b_75bd37_r);
   	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6a6000, 0x6a6fff, 0, 0, sb2b_6a6xxx_r);
-  	
+
   	/* extra inputs */
    	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x770071, 0x770071, 0, 0, sb2b_770071_r);
     memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x770079, 0x770079, 0, 0, sb2b_770079_r);
-    
+
     /* handler to read boot code */
     memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x007000, 0x007fff, 0, 0, sb2b_7xxx_r);
 
@@ -765,12 +765,12 @@ ROM_START( sblast2b )
 	ROM_LOAD("spc700.rom", 0, 0x40, CRC(44bb3a40) SHA1(97e352553e94242ae823547cd853eecda55c20f0) )
 
 	ROM_REGION(0x800,           "user6", ROMREGION_ERASEFF)
-	
+
 	ROM_REGION( 0x180000, "user7", ROMREGION_DISPOSE )
 	ROM_LOAD( "1.bin", 0x000000, 0x0080000, CRC(bea10c40) SHA1(d9cc65267b9b57145d714f2c17b436c1fb21513f) )
 	ROM_LOAD( "2.bin", 0x080000, 0x0080000, CRC(57d2b6e9) SHA1(1a7b347101f67b254e2f86294d501b0669431644) )
 	ROM_LOAD( "3.bin", 0x100000, 0x0080000, CRC(9e63a5ce) SHA1(1d18606fbb28b55a921fc37e1af1aff4caae9003) )
-	
+
 ROM_END
 
 GAME( 199?, kinstb,       0,     kinstb,	     kinstb,    kinstb,		ROT0, "bootleg",	"Killer Instinct (SNES bootleg)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

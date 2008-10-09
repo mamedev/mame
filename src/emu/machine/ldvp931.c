@@ -222,7 +222,7 @@ static void vp931_init(laserdisc_state *ld)
 	astring *tempstring = astring_alloc();
 	ldplayer_data *player = ld->player;
 	vp931_data_ready_func cbsave;
-	
+
 	/* reset our state */
 	cbsave = player->data_ready_cb;
 	memset(player, 0, sizeof(*player));

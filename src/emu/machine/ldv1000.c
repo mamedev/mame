@@ -149,14 +149,14 @@ static ADDRESS_MAP_START( ldv1000_portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static const ppi8255_interface ppi0intf = 
+static const ppi8255_interface ppi0intf =
 {
 	NULL,			ppi0_portb_r,	ppi0_portc_r,
 	ppi0_porta_w,	NULL,			ppi0_portc_w
 };
 
 
-static const ppi8255_interface ppi1intf = 
+static const ppi8255_interface ppi1intf =
 {
 	ppi1_porta_r,	NULL,			NULL,
 	NULL,			ppi1_portb_w,	ppi1_portc_w
@@ -184,7 +184,7 @@ static MACHINE_DRIVER_START( ldv1000 )
 	MDRV_CPU_CONFIG(daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(ldv1000_map,0)
 	MDRV_CPU_IO_MAP(ldv1000_portmap,0)
-	
+
 	MDRV_Z80CTC_ADD("ldvctc", ctcintf)
 	MDRV_PPI8255_ADD("ldvppi0", ppi0intf)
 	MDRV_PPI8255_ADD("ldvppi1", ppi1intf)
@@ -369,18 +369,18 @@ static TIMER_CALLBACK( vbi_data_fetch )
 	UINT8 focus_on = !(player->portb1 & 0x01);
 	UINT8 laser_on = (player->portb1 & 0x40);
 	UINT32 lines[3];
-	
+
 	/* appears to return data in reverse order */
 	lines[0] = laserdisc_get_field_code(ld->device, LASERDISC_CODE_LINE1718);
 	lines[1] = laserdisc_get_field_code(ld->device, LASERDISC_CODE_LINE17);
 	lines[2] = laserdisc_get_field_code(ld->device, LASERDISC_CODE_LINE16);
-	
+
 	/* fill in the details */
 	memset(player->vbi, 0, sizeof(player->vbi));
 	if (focus_on && laser_on)
 	{
 		int line;
-		
+
 		/* loop over lines */
 		for (line = 0; line < 3; line++)
 		{
@@ -400,7 +400,7 @@ static TIMER_CALLBACK( vbi_data_fetch )
 			}
 		}
 	}
-	
+
 	/* signal that data is ready and reset the readback index */
 	player->vbiready = TRUE;
 	player->vbiindex = 0;
@@ -422,7 +422,7 @@ static TIMER_DEVICE_CALLBACK( multijump_timer )
 	/* bit 5 of port B on PPI 1 selects the direction of slider movement */
 	direction = (player->portb1 & 0x20) ? 1 : -1;
 	ldcore_advance_slider(ld, direction);
-	
+
 	/* update down counter and reschedule */
 	if (--player->counter != 0)
 		timer_device_adjust_oneshot(timer, MULTIJUMP_TRACK_TIME, 0);
@@ -449,11 +449,11 @@ static void ctc_interrupt(const device_config *device, int state)
 static WRITE8_HANDLER( decoder_display_port_w )
 {
 	/*
-		TX/RX = /A0 (A0=0 -> TX, A0=1 -> RX)
-		
-		Display is 6-bit
-		Decoder is 4-bit
-	*/
+        TX/RX = /A0 (A0=0 -> TX, A0=1 -> RX)
+
+        Display is 6-bit
+        Decoder is 4-bit
+    */
 	laserdisc_state *ld = find_ldv1000(machine);
 	ldplayer_data *player = ld->player;
 
@@ -463,7 +463,7 @@ static WRITE8_HANDLER( decoder_display_port_w )
 		player->portselect = data;
 		player->dispindex = 0;
 	}
-	
+
 	/* writes to offset 2 constitute actual writes targeted toward the display and decoder chips */
 	else if (offset == 2)
 	{
@@ -507,7 +507,7 @@ static READ8_HANDLER( decoder_display_port_r )
 static READ8_HANDLER( controller_r )
 {
 	laserdisc_state *ld = find_ldv1000(machine);
-	
+
 	/* note that this is a cheesy implementation; the real thing relies on exquisite timing */
 	UINT8 result = ld->player->command ^ 0xff;
 	ld->player->command = 0xff;
@@ -562,11 +562,11 @@ static READ8_DEVICE_HANDLER( ppi0_portb_r )
 static READ8_DEVICE_HANDLER( ppi0_portc_r )
 {
 	/*
-		$10 = /VSYNC
-		$20 = IRQ from decoder chip
-		$40 = TRKG LOOP (N24-1)
-		$80 = DUMP (N20-1) -- code reads the state and waits for it to change
-	*/
+        $10 = /VSYNC
+        $20 = IRQ from decoder chip
+        $40 = TRKG LOOP (N24-1)
+        $80 = DUMP (N20-1) -- code reads the state and waits for it to change
+    */
 	laserdisc_state *ld = find_ldv1000(device->machine);
 	ldplayer_data *player = ld->player;
 	UINT8 result = 0x00;
@@ -588,15 +588,15 @@ static READ8_DEVICE_HANDLER( ppi0_portc_r )
 static WRITE8_DEVICE_HANDLER( ppi0_portc_w )
 {
 	/*
-		$01 = preload on up/down counters
-		$02 = /MULTI JUMP TRIG
-		$04 = SCAN MODE
-		$08 = n/c
-	*/
+        $01 = preload on up/down counters
+        $02 = /MULTI JUMP TRIG
+        $04 = SCAN MODE
+        $08 = n/c
+    */
 	laserdisc_state *ld = find_ldv1000(device->machine);
 	ldplayer_data *player = ld->player;
 	UINT8 prev = player->portc0;
-	
+
 	/* set the new value */
 	player->portc0 = data;
 	if (LOG_PORT_IO && ((data ^ prev) & 0x0f) != 0)
@@ -607,7 +607,7 @@ static WRITE8_DEVICE_HANDLER( ppi0_portc_w )
 		if (data & 0x04) printf(" SCANMODE");
 		printf("\n");
 	}
-	
+
 	/* on the rising edge of bit 0, clock the down counter load */
 	if ((data & 0x01) && !(prev & 0x01))
 		player->counter = player->counter_start;
@@ -626,15 +626,15 @@ static WRITE8_DEVICE_HANDLER( ppi0_portc_w )
 static READ8_DEVICE_HANDLER( ppi1_porta_r )
 {
 	/*
-		$01 = /FOCS LOCK
-		$02 = /SPDL LOCK
-		$04 = INSIDE
-		$08 = OUTSIDE
-		$10 = MOTOR STOP
-		$20 = +5V/test point
-		$40 = /INT LOCK
-		$80 = 8 INCH CHK
-	*/
+        $01 = /FOCS LOCK
+        $02 = /SPDL LOCK
+        $04 = INSIDE
+        $08 = OUTSIDE
+        $10 = MOTOR STOP
+        $20 = +5V/test point
+        $40 = /INT LOCK
+        $80 = 8 INCH CHK
+    */
 	laserdisc_state *ld = find_ldv1000(device->machine);
 	ldplayer_data *player = ld->player;
 	slider_position sliderpos = ldcore_get_slider_position(ld);
@@ -664,7 +664,7 @@ static READ8_DEVICE_HANDLER( ppi1_porta_r )
 	result |= 0x20;
 
 	/* bit 6: /INT LOCK */
-	
+
 	/* bit 7: 8 INCH CHK */
 
 	return result;
@@ -679,15 +679,15 @@ static READ8_DEVICE_HANDLER( ppi1_porta_r )
 static WRITE8_DEVICE_HANDLER( ppi1_portb_w )
 {
 	/*
-		$01 = /FOCS ON
-		$02 = /SPDL RUN
-		$04 = /JUMP TRIG
-		$08 = /SCAN A
-		$10 = SCAN B
-		$20 = SCAN C
-		$40 = /LASER ON
-		$80 = /SYNC ST0
-	*/
+        $01 = /FOCS ON
+        $02 = /SPDL RUN
+        $04 = /JUMP TRIG
+        $08 = /SCAN A
+        $10 = SCAN B
+        $20 = SCAN C
+        $40 = /LASER ON
+        $80 = /SYNC ST0
+    */
 	laserdisc_state *ld = find_ldv1000(device->machine);
 	ldplayer_data *player = ld->player;
 	UINT8 prev = player->portb1;
@@ -736,15 +736,15 @@ static WRITE8_DEVICE_HANDLER( ppi1_portb_w )
 static WRITE8_DEVICE_HANDLER( ppi1_portc_w )
 {
 	/*
-		$01 = AUD 1
-		$02 = AUD 2
-		$04 = AUDIO ENABLE
-		$08 = /VIDEO SQ
-		$10 = COMMAND
-		$20 = STATUS
-		$40 = SIZE 8/12
-		$80 = /LED CAV
-	*/
+        $01 = AUD 1
+        $02 = AUD 2
+        $04 = AUDIO ENABLE
+        $08 = /VIDEO SQ
+        $10 = COMMAND
+        $20 = STATUS
+        $40 = SIZE 8/12
+        $80 = /LED CAV
+    */
 	laserdisc_state *ld = find_ldv1000(device->machine);
 	ldplayer_data *player = ld->player;
 	UINT8 prev = player->portc1;
