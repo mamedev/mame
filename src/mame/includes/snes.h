@@ -351,6 +351,29 @@
 #define DSP_FIR_C6		0x6F
 #define DSP_FIR_C7		0x7F
 
+/* Special chips, checked at init and used in memory handlers */
+enum
+{
+HAS_NONE = 0,
+HAS_DSP1,
+HAS_DSP2,
+HAS_DSP3,
+HAS_DSP4,
+HAS_SUPERFX,
+HAS_SA1,
+HAS_SDD1,
+HAS_OBC1,
+HAS_RTC,
+HAS_Z80GB,
+HAS_C4,
+HAS_ST010,
+HAS_ST011,
+HAS_ST018,
+HAS_SPC7110,
+HAS_SPC7110_RTC,
+HAS_UNK
+};
+
 /*----------- defined in machine/snes.c -----------*/
 
 extern DRIVER_INIT( snes );
@@ -377,7 +400,7 @@ extern WRITE8_HANDLER( snes_w_bank5 );
 extern WRITE8_HANDLER( snes_w_bank6 );
 extern WRITE8_HANDLER( snes_w_bank7 );
 
-
+extern UINT8 has_addon_chip;
 
 extern void snes_gdma( UINT8 channels );
 extern void snes_hdma_init(void);
