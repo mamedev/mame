@@ -232,10 +232,14 @@ Input mapping incomplete. There's a 0x01 one which only seems to be
 used in printer [printer test?] mode. It seems to be a printer status
 input. With the value currently returned, it sounds an alarm and says
 [Japanese trans.] "Error detected on the printer. Call machine operator."
+Update (2008.10.09) Printer shall now be correct but it's still not clear
+how the inputs are physically connected and what the are supposed to do.
 
 The timer stays at 00:00. Missing RTC emulation?
 
 [Coin lockout/ctr?]
+
+Calendar / Time in "test mode" always reset to default settings.
 
 
 Quiz Crayon 2
@@ -302,7 +306,6 @@ Notes:
 
 static INT32 banknum = 0;
 static INT32 mjnquest_input;
-static INT32 yesnoj_dsw = 0;
 
 
 /**********************************************************
@@ -621,14 +624,15 @@ static READ16_HANDLER( yesnoj_input_r )
          case 0x00:
               return input_port_read(machine, "IN0");
 
-/* case 0x01 only used if "printer" DSW is on, and appears to
-   be printer status byte */
+         case 0x01:
+              return input_port_read(machine, "IN1");
 
          case 0x02:
-              return input_port_read(machine, "IN1");
+              return input_port_read(machine, "IN2");
     }
-
+#ifdef MAME_DEBUG
 	logerror("CPU #0 PC %06x: warning - read unmapped input_r offset %06x\n", activecpu_get_pc(), offset);
+#endif
 
 	return 0x0;
 }
@@ -639,16 +643,7 @@ static READ16_HANDLER( yesnoj_dsw_r )
 	logerror("CPU #0 PC = %06x: read yesnoj DSW %01x\n", activecpu_get_pc(), yesnoj_dsw);
 #endif
 
-	yesnoj_dsw = 1 - yesnoj_dsw;   /* game reads same word twice to get DSW A then B so we toggle */
-
-	if (yesnoj_dsw)
-	{
-		return input_port_read(machine, "DSWA");
-	}
-	else
-	{
-		return input_port_read(machine, "DSWB");
-	}
+	return input_port_read(machine, "DSWA");
 }
 
 /******************************************************************
@@ -1462,7 +1457,7 @@ static ADDRESS_MAP_START( yesnoj_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x700000, 0x70000b) AM_READ(yesnoj_unknown_r)   /* what's this? */
 	AM_RANGE(0x800000, 0x800003) AM_READ(taitof2_msb_sound_r)
 	AM_RANGE(0xa00000, 0xa0000f) AM_READ(yesnoj_input_r)
-	AM_RANGE(0xb00000, 0xb00001) AM_READ(yesnoj_dsw_r)   /* ?? (reads this twice in init) */
+	AM_RANGE(0xb00000, 0xb00001) AM_READ(yesnoj_dsw_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( yesnoj_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -3508,68 +3503,56 @@ static INPUT_PORTS_START( mjnquest )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( yesnoj )   // apparently no test mode, though text in rom suggests printer test
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN1")
-	TAITO_F2_SYSTEM_INPUT
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DSWA")	/* DSW A ??? */
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSWB")	/* DSW B ? */
-	PORT_DIPNAME( 0x01, 0x00, "Results Printer" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+INPUT_PORTS_START( yesnoj )
+	/* 0xb00000 -> 0x20c0e0.b ($40e0,A5) */
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x00, "Print Results" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x04, 0x04, "Printer" )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )   // same for both slots
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, "2 Players Game" )
+	PORT_DIPSETTING(    0x08, "1 Credit" )
+	PORT_DIPSETTING(    0x00, "2 Credits" )
+	TAITO_COINAGE_US_COIN_START
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START("DSWB")                                           /* does it physically exist ? */
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME( "P1 Yes" )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME( "P1 No" )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME( "P2 Yes" )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME( "P2 No" )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_SERVICE( 0x20, IP_ACTIVE_LOW )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )                 /* printer : paper time-out ? */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )                /* printer : unknown */
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SPECIAL )                /* printer : paper */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SPECIAL )                 /* printer : unknown */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_TILT )                    /* not mapped in "test mode" */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN2 )                   /* not mapped in "test mode" */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -5825,12 +5808,6 @@ static DRIVER_INIT( mjnquest )
 	}
 }
 
-static DRIVER_INIT( yesnoj )
-{
-	yesnoj_dsw = 0;
-	state_save_register_global(yesnoj_dsw);
-}
-
 static STATE_POSTLOAD( driveout_postload )
 {
 	reset_driveout_sound_region();
@@ -5888,7 +5865,7 @@ GAME( 1991, pulirulj, pulirula, pulirula, pulirulj, 0,        ROT0,   "Taito Cor
 GAME( 1991, metalb,   0,        metalb,   metalb,   0,        ROT0,   "Taito Corporation Japan", "Metal Black (World)", 0 )
 GAME( 1991, metalbj,  metalb,   metalb,   metalbj,  0,        ROT0,   "Taito Corporation", "Metal Black (Japan)", 0 )
 GAME( 1991, qzchikyu, 0,        qzchikyu, qzchikyu, 0,        ROT0,   "Taito Corporation", "Quiz Chikyu Bouei Gun (Japan)", 0 )
-GAME( 1992, yesnoj,   0,        yesnoj,   yesnoj,   yesnoj,   ROT0,   "Taito Corporation", "Yes/No Sinri Tokimeki Chart", 0 )
+GAME( 1992, yesnoj,   0,        yesnoj,   yesnoj,   0,        ROT0,   "Taito Corporation", "Yes/No Sinri Tokimeki Chart", 0 )
 GAME( 1992, deadconx, 0,        deadconx, deadconx, 0,        ROT0,   "Taito Corporation Japan", "Dead Connection (World)", 0 )
 GAME( 1992, deadconj, deadconx, deadconj, deadconj, 0,        ROT0,   "Taito Corporation", "Dead Connection (Japan)", 0 )
 GAME( 1992, dinorex,  0,        dinorex,  dinorex,  0,        ROT0,   "Taito Corporation Japan", "Dino Rex (World)", 0 )
