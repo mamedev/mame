@@ -1411,7 +1411,7 @@ void render_target_compute_visible_area(render_target *target, INT32 target_widt
 	if (target_pixel_aspect != 0.0f)
 	{
 		/* start with the aspect ratio of the square pixel layout */
-		width = (target->layerconfig & LAYER_CONFIG_ZOOM_TO_SCREEN) ? target->curview->scraspect : target->curview->aspect;
+		width = ((target->layerconfig & LAYER_CONFIG_ZOOM_TO_SCREEN) && target->curview->screens > 0) ? target->curview->scraspect : target->curview->aspect;
 		height = 1.0f;
 
 		/* first apply target orientation */

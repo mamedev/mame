@@ -293,7 +293,7 @@ void layout_view_recompute(layout_view *view, int layerconfig)
 	view->scraspect = (view->scrbounds.x1 - view->scrbounds.x0) / (view->scrbounds.y1 - view->scrbounds.y0);
 
 	/* if we're handling things normally, the target bounds are (0,0)-(1,1) */
-	if (!(layerconfig & LAYER_CONFIG_ZOOM_TO_SCREEN))
+	if (!(layerconfig & LAYER_CONFIG_ZOOM_TO_SCREEN) || view->screens == 0)
 	{
 		target_bounds.x0 = target_bounds.y0 = 0.0f;
 		target_bounds.x1 = target_bounds.y1 = 1.0f;
