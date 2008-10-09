@@ -162,17 +162,13 @@ static void update_irq_state(running_machine *machine)
 		/*  This is for games that supply an *IRQ Vector* on the data bus
             together with an IRQ level for each possible IRQ source */
 
+		UINT8 irq_level[8] = { 0 };
 		int i = 0;
-		while ( i < 8 )
-		{
+		for (i = 0; i < 8; i++)
 			if (irq & (1 << i))
-			{
-				cpunum_set_input_line(machine, 0, metro_irq_levels[i]&7, ASSERT_LINE);
-				return;
-			}
-			i++;
-		}
-		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+				irq_level[metro_irq_levels[i]&7] = 1;
+		for (i = 0; i < 8; i++)
+			cpunum_set_input_line(machine, 0, i, irq_level[i] ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else
 	{
