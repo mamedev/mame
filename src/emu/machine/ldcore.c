@@ -31,10 +31,22 @@
     CONSTANTS
 ***************************************************************************/
 
+/* these specs code from IEC 60857, for NTSC players */
+#define LEAD_IN_MIN_RADIUS_IN_UM	53500		/* 53.5 mm */
+#define PROGRAM_MIN_RADIUS_IN_UM	55000		/* 55 mm */
+#define PROGRAM_MAX_RADIUS_IN_UM	145000		/* 145 mm */
+#define LEAD_OUT_MIN_SIZE_IN_UM		2000		/* 2 mm */
+
+/* the track pitch is defined as a range; we pick a nominal pitch
+   that ensures we can fit 54,000 tracks */
+#define MIN_TRACK_PITCH_IN_NM		1400		/* 1.4 um */
+#define MAX_TRACK_PITCH_IN_NM		2000		/* 2 um */
+#define NOMINAL_TRACK_PITCH_IN_NM	((PROGRAM_MAX_RADIUS_IN_UM - PROGRAM_MIN_RADIUS_IN_UM) * 1000 / 54000)
+
 /* we simulate extra lead-in and lead-out tracks */
-#define VIRTUAL_LEAD_IN_TRACKS		200
+#define VIRTUAL_LEAD_IN_TRACKS		((PROGRAM_MIN_RADIUS_IN_UM - LEAD_IN_MIN_RADIUS_IN_UM) * 1000 / NOMINAL_TRACK_PITCH_IN_NM)
 #define MAX_TOTAL_TRACKS			54000
-#define VIRTUAL_LEAD_OUT_TRACKS		200
+#define VIRTUAL_LEAD_OUT_TRACKS		(LEAD_OUT_MIN_SIZE_IN_UM * 1000 / NOMINAL_TRACK_PITCH_IN_NM)
 
 
 
@@ -133,7 +145,6 @@ struct _sound_token
 static TIMER_CALLBACK( perform_player_update );
 static void read_track_data(laserdisc_state *ld);
 static void process_track_data(const device_config *device);
-//static void render_display(UINT16 *videodata, UINT32 rowpixels, UINT32 width, int frame);
 static void *custom_start(int clock, const custom_sound_interface *config);
 static void custom_stream_callback(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 static void configuration_load(running_machine *machine, int config_type, xml_data_node *parentnode);
@@ -159,100 +170,6 @@ static const ldplayer_interface *player_interfaces[] =
 const custom_sound_interface laserdisc_custom_interface =
 {
 	custom_start
-};
-
-static const UINT8 numberfont[10][8] =
-{
-	{
-		0x30,	// ..xx....
-		0x48,	// .x..x...
-		0x84,	// x....x..
-		0x84,	// x....x..
-		0x84,	// x....x..
-		0x48,	// .x..x...
-		0x30	// ..xx....
-	},
-	{
-		0x10,	// ...x....
-		0x30,	// ..xx....
-		0x50,	// .x.x....
-		0x10,	// ...x....
-		0x10,	// ...x....
-		0x10,	// ...x....
-		0x7c	// .xxxxx..
-	},
-	{
-		0x78,	// .xxxx...
-		0x84,	// x....x..
-		0x04,	// .....x..
-		0x38,	// ..xxx...
-		0x40,	// .x......
-		0x80,	// x.......
-		0xfc	// xxxxxx..
-	},
-	{
-		0x78,	// .xxxx...
-		0x84,	// x....x..
-		0x04,	// .....x..
-		0x38,	// ..xxx...
-		0x04,	// .....x..
-		0x84,	// x....x..
-		0x78	// .xxxx...
-	},
-	{
-		0x08,	// ....x...
-		0x18,	// ...xx...
-		0x28,	// ..x.x...
-		0x48,	// .x..x...
-		0xfc,	// xxxxxx..
-		0x08,	// ....x...
-		0x08	// ....x...
-	},
-	{
-		0xfc,	// xxxxxx..
-		0x80,	// x.......
-		0x80,	// x.......
-		0xf8,	// xxxxx...
-		0x04,	// .....x..
-		0x84,	// x....x..
-		0x78	// .xxxx...
-	},
-	{
-		0x38,	// ..xxx...
-		0x40,	// .x......
-		0x80,	// x.......
-		0xf8,	// xxxxx...
-		0x84,	// x....x..
-		0x84,	// x....x..
-		0x78	// .xxxx...
-	},
-	{
-		0xfc,	// xxxxxx..
-		0x04,	// .....x..
-		0x08,	// ....x...
-		0x10,	// ...x....
-		0x20,	// ..x.....
-		0x20,	// ..x.....
-		0x20	// ..x.....
-	},
-	{
-		0x78,	// .xxxx...
-		0x84,	// x....x..
-		0x84,	// x....x..
-		0x78,	// .xxxx...
-		0x84,	// x....x..
-		0x84,	// x....x..
-		0x78	// .xxxx...
-	},
-	{
-		0x78,	// .xxxx..
-		0x84,	// x....x.
-		0x84,	// x....x.
-		0x7c,	// .xxxxx.
-		0x04,	// .....x.
-		0x08,	// ....x..
-		0x70,	// .xxx...
-	}
 };
 
 
@@ -1019,65 +936,6 @@ static void process_track_data(const device_config *device)
 	/* update the input buffer pointer */
 	ldcore->audiobufin = (ldcore->audiobufin + ldcore->audiocursamples) % ldcore->audiobufsize;
 }
-
-
-/*-------------------------------------------------
-    render_display - draw the frame display
--------------------------------------------------*/
-
-#ifdef UNUSED_FUNCTION
-static void render_display(UINT16 *videodata, UINT32 rowpixels, UINT32 width, int frame)
-{
-	const int xscale = 4, yscale = 2;
-	char buffer[10];
-	int x = width / 10;
-	int y = 50;
-	int ch;
-	int delta;
-
-	/* do nothing if no data */
-	if (videodata == NULL)
-		return;
-
-	/* convert to a character string and render */
-	sprintf(buffer, "%5d", frame);
-
-	/* iterate over 5 positions: (-1,-1), (-1,1), (1,-1), (1,1) and (0,0) */
-	/* render all in black except the last one */
-	for (delta = 0; delta < 5; delta++)
-	{
-		int color = (delta < 4) ? 0x0080 : 0xff80;
-		int dx = (delta < 4) ? ((delta & 1) ? -1 : 1) : 0;
-		int dy = (delta < 4) ? ((delta & 2) ? -1 : 1) : 0;
-
-		/* iterate over 5 characters */
-		for (ch = 0; ch < 5; ch++)
-			if (buffer[ch] >= '0' && buffer[ch] <= '9')
-			{
-				const UINT8 *fontdata = &numberfont[buffer[ch] - '0'][0];
-				int cy, cx;
-
-				/* iterate over the rows of the character */
-				for (cy = 0; cy < 8; cy++)
-				{
-					UINT8 bits = *fontdata++;
-
-					/* and over the columns */
-					for (cx = 0; cx < 8; cx++)
-						if (bits & (0x80 >> cx))
-						{
-							int ix, iy;
-
-							/* fill in an xscale x yscale pixel */
-							for (iy = 0; iy < yscale; iy++)
-								for (ix = 0; ix < xscale; ix++)
-									videodata[(y + cy * yscale + iy + dy) * rowpixels + (x + (ch * 9 + cx) * xscale + ix + dx)] = color;
-						}
-				}
-			}
-	}
-}
-#endif
 
 
 /*-------------------------------------------------

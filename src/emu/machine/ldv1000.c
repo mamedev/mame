@@ -7,9 +7,19 @@
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
+**************************************************************************
+
+    Still to do:
+
+        * fix issues
+        * add OSD
+
 *************************************************************************/
 
 #include "ldcore.h"
+#include "machine/8255ppi.h"
+#include "machine/z80ctc.h"
+#include "cpu/z80/z80daisy.h"
 
 
 
@@ -17,10 +27,10 @@
     DEBUGGING
 ***************************************************************************/
 
-#define PRINTF_COMMANDS				1
-#define CMDPRINTF(x)				do { if (PRINTF_COMMANDS) mame_printf_debug x; } while (0)
-
-#define EMULATE_ROM					0
+#define LOG_PORT_IO					0
+#define LOG_STATUS_CHANGES			0
+#define LOG_FRAMES_SEEN				0
+#define LOG_COMMANDS				0
 
 
 
@@ -28,25 +38,10 @@
     CONSTANTS
 ***************************************************************************/
 
-/* Player-specific states */
-enum
-{
-	LDSTATE_SKIPPING = LDSTATE_OTHER,
-	LDSTATE_WAITING
-};
+#define SCAN_SPEED						(2000 / 30)			/* 2000 frames/second */
+#define SEEK_FAST_SPEED					(4000 / 30)			/* 4000 frames/second */
 
-/* Pioneer LD-V1000 specific information */
-enum
-{
-	LDV1000_MODE_STATUS,
-	LDV1000_MODE_GET_FRAME,
-	LDV1000_MODE_GET_1ST,
-	LDV1000_MODE_GET_2ND,
-	LDV1000_MODE_GET_RAM
-};
-
-#define LDV1000_SCAN_SPEED			(2000 / 30)			/* 2000 frames/second */
-#define LDV1000_SCAN_DURATION		(4)					/* scan for 4 vsyncs each time */
+#define MULTIJUMP_TRACK_TIME			ATTOTIME_IN_USEC(50)
 
 
 
@@ -57,21 +52,30 @@ enum
 /* player-specific data */
 struct _ldplayer_data
 {
-	/* general modes and states */
-	UINT8				audio1disable;			/* explicit disable for audio 1 */
-	UINT8				audio2disable;			/* explicit disable for audio 2 */
-	UINT8				framedisplay;			/* frame display */
-	INT32				parameter;				/* parameter for numbers */
+	/* low-level emulation data */
+	int					cpunum;					/* CPU index of the Z80 */
+	const device_config *ctc;					/* CTC device */
+	const device_config *multitimer;			/* multi-jump timer device */
 
-	UINT8				mode;					/* current mode */
-	UINT8				lastchapter;			/* last chapter seen */
-	UINT16				lastframe;				/* last frame seen */
-	UINT32				activereg;				/* active register index */
-	UINT8				ram[1024];				/* RAM */
-	UINT32				readpos;				/* current read position */
-	UINT32				readtotal;				/* current read position */
-	UINT8				readbuf[256];			/* temporary read buffer */
-	attotime			lastvsynctime;			/* time of last update/vsync */
+	/* communication status */
+	UINT8				command;				/* command byte to the player */
+	UINT8				status;					/* status byte from the player */
+	UINT8				vsync;					/* VSYNC state */
+
+	/* I/O port states */
+	UINT8				counter_start;			/* starting value for counter */
+	UINT8 				counter;				/* current counter value */
+	UINT8				portc0;					/* port C on PPI 0 */
+	UINT8				portb1;					/* port B on PPI 1 */
+	UINT8				portc1;					/* port C on PPI 1 */
+
+	/* display/decode circuit emulation */
+	UINT8				portselect;				/* selection of which port to access */
+	UINT8				display[2][20];			/* display lines */
+	UINT8				dispindex;				/* index within the display line */
+	UINT8				vbi[7*3];				/* VBI data */
+	UINT8				vbiready;				/* VBI ready flag */
+	UINT8				vbiindex;				/* index within the VBI data */
 };
 
 
@@ -81,90 +85,110 @@ struct _ldplayer_data
 ***************************************************************************/
 
 static void ldv1000_init(laserdisc_state *ld);
-static void ldv1000_soft_reset(laserdisc_state *ld);
-static void ldv1000_update_squelch(laserdisc_state *ld);
-static int ldv1000_switch_state(laserdisc_state *ld, UINT8 newstate, INT32 stateparam);
+static void ldv1000_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime);
 static INT32 ldv1000_update(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime);
 static void ldv1000_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data);
 static UINT8 ldv1000_status_strobe_r(laserdisc_state *ld);
 static UINT8 ldv1000_command_strobe_r(laserdisc_state *ld);
 static UINT8 ldv1000_status_r(laserdisc_state *ld);
 
+static TIMER_CALLBACK( vsync_off );
+static TIMER_CALLBACK( vbi_data_fetch );
+static TIMER_DEVICE_CALLBACK( multijump_timer );
+
+static void ctc_interrupt(const device_config *device, int state);
+
+static WRITE8_HANDLER( decoder_display_port_w );
+static READ8_HANDLER( decoder_display_port_r );
+static READ8_HANDLER( controller_r );
+static WRITE8_HANDLER( controller_w );
+static WRITE8_DEVICE_HANDLER( ppi0_porta_w );
+static READ8_DEVICE_HANDLER( ppi0_portb_r );
+static READ8_DEVICE_HANDLER( ppi0_portc_r );
+static WRITE8_DEVICE_HANDLER( ppi0_portc_w );
+static READ8_DEVICE_HANDLER( ppi1_porta_r );
+static WRITE8_DEVICE_HANDLER( ppi1_portb_w );
+static WRITE8_DEVICE_HANDLER( ppi1_portc_w );
+
 
 
 /***************************************************************************
-    22VP931 ROM AND MACHINE INTERFACES
+    INLINE FUNCTIONS
 ***************************************************************************/
 
-#if EMULATE_ROM
-static WRITE8_HANDLER( ld_controls )
+/*-------------------------------------------------
+    find_ldv1000 - find our device; assumes there
+    is only one
+-------------------------------------------------*/
+
+INLINE laserdisc_state *find_ldv1000(running_machine *machine)
 {
-	switch (offset)
-	{
-		case 0:
-			// write $00 at startup/reject
-			break;
-
-		case 2:
-			// write $06 at startup/reject
-			break;
-
-		case 3:
-			// write $8A at startup
-			break;
-
-		case 5:
-			// write $9F at startup/reject
-			break;
-
-		case 6:
-			// write $C3 at startup/reject
-			break;
-
-		case 7:
-			// write $90 at startup
-			break;
-	}
+	return ldcore_get_safe_token(device_list_first(machine->config->devicelist, LASERDISC));
 }
 
 
-static READ8_HANDLER( ld_controls )
-{
-	switch (offset)
-	{
-		case 4:
 
-	}
-}
-
-
-static WRITE8_HANDLER( unknown_port_w )
-{
-	// Writes to $00/$02/$00
-	// Values:
-	//  $04/$09/$0F
-	//  $04/$0E/$0F
-	//  $04/   /$0F
-}
-
+/***************************************************************************
+    LD-V1000 ROM AND MACHINE INTERFACES
+***************************************************************************/
 
 static ADDRESS_MAP_START( ldv1000_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_ROM
-	AM_RANGE(0x8000, 0x83ff) AM_MIRROR(0x400) AM_RAM
-	AM_RANGE(0xc000, 0xc007) AM_READWRITE(ld_controls)
+	AM_RANGE(0x0000, 0x1fff) AM_MIRROR(0x6000) AM_ROM
+	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM
+	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x9ff0) AM_DEVREADWRITE(PPI8255, "ldvppi0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x9ff0) AM_DEVREADWRITE(PPI8255, "ldvppi1", ppi8255_r, ppi8255_w)
 ADDRESS_MAP_END
 
 
-static ADDRESS_MAP_START( ldv1000_portmap, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( ldv1000_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x03) AM_WRITE(unknown_port_w)
-	AM_RANGE(0xc0, 0xc3) AM_DEVREADWRITE(Z80CTC, "ctc", z80ctc_r, z80ctc_w)
+	AM_RANGE(0x00, 0x07) AM_MIRROR(0x38) AM_READWRITE(decoder_display_port_r, decoder_display_port_w)
+	AM_RANGE(0x40, 0x40) AM_MIRROR(0x3f) AM_READ(controller_r)
+	AM_RANGE(0x80, 0x80) AM_MIRROR(0x3f) AM_WRITE(controller_w)
+	AM_RANGE(0xc0, 0xc3) AM_MIRROR(0x3c) AM_DEVREADWRITE(Z80CTC, "ldvctc", z80ctc_r, z80ctc_w)
 ADDRESS_MAP_END
+
+
+static const ppi8255_interface ppi0intf = 
+{
+	NULL,			ppi0_portb_r,	ppi0_portc_r,
+	ppi0_porta_w,	NULL,			ppi0_portc_w
+};
+
+
+static const ppi8255_interface ppi1intf = 
+{
+	ppi1_porta_r,	NULL,			NULL,
+	NULL,			ppi1_portb_w,	ppi1_portc_w
+};
+
+
+static const z80ctc_interface ctcintf =
+{
+	"ldv1000",
+	0,
+	0,
+	ctc_interrupt
+};
+
+
+static const z80_daisy_chain daisy_chain[] =
+{
+	{ Z80CTC, "ldvctc" },
+	{ NULL }
+};
 
 
 static MACHINE_DRIVER_START( ldv1000 )
-	MDRV_CPU_ADD("ldv1000", Z80, 4000000)
+	MDRV_CPU_ADD("ldv1000", Z80, XTAL_5MHz/2)
+	MDRV_CPU_CONFIG(daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(ldv1000_map,0)
+	MDRV_CPU_IO_MAP(ldv1000_portmap,0)
+	
+	MDRV_Z80CTC_ADD("ldvctc", ctcintf)
+	MDRV_PPI8255_ADD("ldvppi0", ppi0intf)
+	MDRV_PPI8255_ADD("ldvppi1", ppi1intf)
+	MDRV_TIMER_ADD("multitimer", multijump_timer)
 MACHINE_DRIVER_END
 
 
@@ -172,7 +196,6 @@ ROM_START( ldv1000 )
 	ROM_REGION( 0x2000, "ldv1000", ROMREGION_LOADBYNAME )
 	ROM_LOAD( "z03_1001_vyw-053_v1-0.bin", 0x0000, 0x2000, CRC(31ec4687) SHA1(52f91c304a878ba02b2fa1cda1a9489d6dd5a34f) )
 ROM_END
-#endif
 
 
 
@@ -185,15 +208,10 @@ const ldplayer_interface ldv1000_interface =
 	LASERDISC_TYPE_PIONEER_LDV1000,				/* type of the player */
 	sizeof(ldplayer_data),						/* size of the state */
 	"Pioneer LD-V1000",							/* name of the player */
-#if EMULATE_ROM
 	rom_ldv1000,								/* pointer to ROM region information */
 	machine_config_ldv1000,						/* pointer to machine configuration */
-#else
-	NULL,
-	NULL,
-#endif
 	ldv1000_init,								/* initialization callback */
-	NULL,										/* vsync callback */
+	ldv1000_vsync,								/* vsync callback */
 	ldv1000_update,								/* update callback */
 	NULL,										/* overlay callback */
 	ldv1000_data_w,								/* parallel data write */
@@ -213,521 +231,82 @@ const ldplayer_interface ldv1000_interface =
 
 
 /***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    requires_state_save - returns TRUE if the
-    given state will return to the previous
-    state when done
--------------------------------------------------*/
-
-INLINE int requires_state_save(UINT8 state)
-{
-	return (state == LDSTATE_SCANNING ||
-			state == LDSTATE_SKIPPING ||
-			state == LDSTATE_WAITING);
-}
-
-
-/*-------------------------------------------------
-    read_16bits_from_ram_be - read 16 bits from
-    player RAM in big-endian format
--------------------------------------------------*/
-
-INLINE UINT16 read_16bits_from_ram_be(UINT8 *ram, UINT32 offset)
-{
-	return (ram[offset + 0] << 8) | ram[offset + 1];
-}
-
-
-/*-------------------------------------------------
-    write_16bits_to_ram_be - write 16 bits to
-    player RAM in big endian format
--------------------------------------------------*/
-
-INLINE void write_16bits_to_ram_be(UINT8 *ram, UINT32 offset, UINT16 data)
-{
-	ram[offset + 0] = data >> 8;
-	ram[offset + 1] = data >> 0;
-}
-
-
-
-/***************************************************************************
     PIONEER LD-V1000 IMPLEMENTATION
 ***************************************************************************/
 
 /*-------------------------------------------------
-    ldv1000_init - Pioneer PR-8210-specific
-    initialization
+    ldv1000_init - player-specific initialization
 -------------------------------------------------*/
 
 static void ldv1000_init(laserdisc_state *ld)
 {
-	/* do a soft reset */
-	ldv1000_soft_reset(ld);
-}
-
-
-/*-------------------------------------------------
-    ldv1000_soft_reset - Pioneer LDV-1000-specific
-    soft reset
--------------------------------------------------*/
-
-static void ldv1000_soft_reset(laserdisc_state *ld)
-{
-	ldplayer_data *player = ld->player;
-	attotime curtime = timer_get_time();
-
-	ld->state.state = LDSTATE_NONE;
-	ld->state.substate = 0;
-	ld->state.param = 0;
-	ld->state.endtime = curtime;
-
-	player->audio1disable = 0;
-	player->audio2disable = 0;
-	player->parameter = 0;
-
-	player->mode = 0;
-	player->activereg = 0;
-	memset(player->ram, 0, sizeof(player->ram));
-	player->readpos = 0;
-	player->readtotal = 0;
-	memset(player->readbuf, 0, sizeof(player->readbuf));
-	player->lastvsynctime = curtime;
-
-	ldv1000_switch_state(ld, LDSTATE_PARKED, 0);
-}
-
-
-/*-------------------------------------------------
-    ldv1000_update_squelch - update the squelch
-    settings based on the current state
--------------------------------------------------*/
-
-static void ldv1000_update_squelch(laserdisc_state *ld)
-{
+	astring *tempstring = astring_alloc();
 	ldplayer_data *player = ld->player;
 
-	switch (ld->state.state)
-	{
-		/* video on, audio on */
-		case LDSTATE_PLAYING:
-			ldcore_set_audio_squelch(ld, player->audio1disable, player->audio2disable);
-			ldcore_set_video_squelch(ld, FALSE);
-			break;
+	/* reset our state */
+	memset(player, 0, sizeof(*player));
 
-		/* video on, audio off */
-		case LDSTATE_PAUSING:
-		case LDSTATE_PAUSED:
-		case LDSTATE_PLAYING_SLOW_REVERSE:
-		case LDSTATE_PLAYING_SLOW_FORWARD:
-		case LDSTATE_PLAYING_FAST_REVERSE:
-		case LDSTATE_PLAYING_FAST_FORWARD:
-		case LDSTATE_STEPPING_REVERSE:
-		case LDSTATE_STEPPING_FORWARD:
-		case LDSTATE_SCANNING:
-		case LDSTATE_SKIPPING:
-		case LDSTATE_WAITING:
-			ldcore_set_audio_squelch(ld, TRUE, TRUE);
-			ldcore_set_video_squelch(ld, FALSE);
-			break;
-
-		/* video off, audio off */
-		case LDSTATE_NONE:
-		case LDSTATE_EJECTING:
-		case LDSTATE_EJECTED:
-		case LDSTATE_PARKED:
-		case LDSTATE_LOADING:
-		case LDSTATE_SPINUP:
-		case LDSTATE_SEEKING:
-			ldcore_set_audio_squelch(ld, TRUE, TRUE);
-			ldcore_set_video_squelch(ld, TRUE);
-			break;
-	}
+	/* find our devices */
+	player->cpunum = mame_find_cpu_index(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "ldv1000"));
+	player->ctc = devtag_get_device(ld->device->machine, Z80CTC, device_build_tag(tempstring, ld->device->tag, "ldvctc"));
+	player->multitimer = devtag_get_device(ld->device->machine, TIMER, device_build_tag(tempstring, ld->device->tag, "multitimer"));
+	timer_device_set_ptr(player->multitimer, ld);
+	astring_free(tempstring);
 }
 
 
 /*-------------------------------------------------
-    ldv1000_switch_state - attempt to switch states
-    if appropriate, and ensure the squelch values
-    are correct
+    ldv1000_vsync - VSYNC callback, called at the
+    start of the blanking period
 -------------------------------------------------*/
 
-static int ldv1000_switch_state(laserdisc_state *ld, UINT8 newstate, INT32 parameter)
+static void ldv1000_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime)
 {
-	attotime curtime = timer_get_time();
+	slider_position sliderpos = ldcore_get_slider_position(ld);
+	ldplayer_data *player = ld->player;
 
-	/* if this is the same state, ignore */
-	if (ld->state.state == newstate)
-		return TRUE;
+	/* generate interrupts if we hit the edges */
+	z80ctc_trg1_w(player->ctc, 0, sliderpos == SLIDER_MINIMUM);
+	z80ctc_trg2_w(player->ctc, 0, sliderpos == SLIDER_MAXIMUM);
 
-	/* if we're in a timed state, we ignore changes until the time elapses */
-	if (attotime_compare(curtime, ld->state.endtime) < 0)
-		return FALSE;
+	/* signal VSYNC and set a timer to turn it off */
+	player->vsync = TRUE;
+	timer_set(attotime_mul(video_screen_get_scan_period(ld->screen), 4), ld, 0, vsync_off);
 
-	/* if moving to a state that requires it, save the old state */
-	if (requires_state_save(newstate) && !requires_state_save(ld->state.state))
-		ld->savestate = ld->state;
+	/* also set a timer to fetch the VBI data when it is ready */
+	timer_set(video_screen_get_time_until_pos(ld->screen, 19*2, 0), ld, 0, vbi_data_fetch);
 
-	/* set up appropriate squelch and timing */
-	ld->state.state = newstate;
-	ld->state.substate = 0;
-	ld->state.param = parameter;
-	ld->state.endtime = curtime;
-	ldv1000_update_squelch(ld);
-
-	/* if we're switching to a timed state, set the appropriate timer */
-	switch (ld->state.state)
-	{
-		case LDSTATE_EJECTING:
-			ld->state.endtime = attotime_add(curtime, GENERIC_EJECT_TIME);
-			break;
-
-		case LDSTATE_LOADING:
-			ld->state.endtime = attotime_add(curtime, GENERIC_LOAD_TIME);
-			break;
-
-		case LDSTATE_SPINUP:
-			ld->state.endtime = attotime_add(curtime, GENERIC_SPINUP_TIME);
-			break;
-
-		case LDSTATE_WAITING:
-			ld->state.endtime = attotime_add(curtime, attotime_mul(ATTOTIME_IN_MSEC(100), ld->state.param));
-			break;
-	}
-	return TRUE;
+	/* boost interleave for the first 1ms to improve communications */
+	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_MSEC(1));
 }
 
 
 /*-------------------------------------------------
-    ldv1000_update - Pioneer PR-8210-specific
-    update callback
+    ldv1000_update - update callback, called on
+    the first visible line of the frame
 -------------------------------------------------*/
 
 static INT32 ldv1000_update(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime)
 {
-	ldplayer_data *player = ld->player;
-	ldplayer_state newstate;
-	INT32 advanceby = 0;
-	int frame, chapter;
-
-	/* remember the last frame and chapter */
-	player->lastvsynctime = curtime;
-	frame = frame_from_metadata(vbi);
-	if (frame != FRAME_NOT_PRESENT)
-		player->lastframe = frame;
-	chapter = chapter_from_metadata(vbi);
-	if (chapter != CHAPTER_NOT_PRESENT)
-		player->lastchapter = chapter;
-
-	/* handle things based on the state */
-	switch (ld->state.state)
+	if (LOG_FRAMES_SEEN)
 	{
-		case LDSTATE_EJECTING:
-		case LDSTATE_EJECTED:
-		case LDSTATE_PARKED:
-		case LDSTATE_LOADING:
-		case LDSTATE_SPINUP:
-		case LDSTATE_PAUSING:
-		case LDSTATE_PAUSED:
-		case LDSTATE_PLAYING:
-		case LDSTATE_PLAYING_SLOW_REVERSE:
-		case LDSTATE_PLAYING_SLOW_FORWARD:
-		case LDSTATE_PLAYING_FAST_REVERSE:
-		case LDSTATE_PLAYING_FAST_FORWARD:
-		case LDSTATE_STEPPING_REVERSE:
-		case LDSTATE_STEPPING_FORWARD:
-		case LDSTATE_SCANNING:
-		case LDSTATE_SEEKING:
-			/* generic behaviors are appropriate for all of these commands */
-			advanceby = ldcore_generic_update(ld, vbi, fieldnum, curtime, &newstate);
-			ldv1000_switch_state(ld, newstate.state, newstate.param);
-			break;
-
-		case LDSTATE_SKIPPING:
-			/* just advance and return to previous state */
-			advanceby = ld->state.param;
-			ldv1000_switch_state(ld, ld->savestate.state, ld->savestate.param);
-			break;
-
-		case LDSTATE_WAITING:
-			/* keep trying to switch to the previous state until we succeed */
-			ldv1000_switch_state(ld, ld->savestate.state, ld->savestate.param);
-			break;
+		int frame = frame_from_metadata(vbi);
+		if (frame != FRAME_NOT_PRESENT) printf("== %d\n", frame);
 	}
-
-	return advanceby;
+	return fieldnum;
 }
 
 
 /*-------------------------------------------------
-    ldv1000_data_w - write callback when the
-    ENTER state is written
+    ldv1000_data_w - handle a parallel data write
+    to the LD-V1000
 -------------------------------------------------*/
 
 static void ldv1000_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 {
-	ldplayer_data *player = ld->player;
-	int target;
-
-	/* 0xff bytes are used for synchronization */
-	if (data == 0xff)
-		return;
-
-	/* handle commands */
-	switch (data)
-	{
-		case 0x3f:	CMDPRINTF(("ldv1000: 0\n"));
-			player->parameter = (player->parameter == -1) ? 0 : (player->parameter * 10 + 0);
-			return;
-
-		case 0x0f:	CMDPRINTF(("ldv1000: 1\n"));
-			player->parameter = (player->parameter == -1) ? 1 : (player->parameter * 10 + 1);
-			return;
-
-		case 0x8f:	CMDPRINTF(("ldv1000: 2\n"));
-			player->parameter = (player->parameter == -1) ? 2 : (player->parameter * 10 + 2);
-			return;
-
-		case 0x4f:	CMDPRINTF(("ldv1000: 3\n"));
-			player->parameter = (player->parameter == -1) ? 3 : (player->parameter * 10 + 3);
-			return;
-
-		case 0x2f:	CMDPRINTF(("ldv1000: 4\n"));
-			player->parameter = (player->parameter == -1) ? 4 : (player->parameter * 10 + 4);
-			return;
-
-		case 0xaf:	CMDPRINTF(("ldv1000: 5\n"));
-			player->parameter = (player->parameter == -1) ? 5 : (player->parameter * 10 + 5);
-			return;
-
-		case 0x6f:	CMDPRINTF(("ldv1000: 6\n"));
-			player->parameter = (player->parameter == -1) ? 6 : (player->parameter * 10 + 6);
-			return;
-
-		case 0x1f:	CMDPRINTF(("ldv1000: 7\n"));
-			player->parameter = (player->parameter == -1) ? 7 : (player->parameter * 10 + 7);
-			return;
-
-		case 0x9f:	CMDPRINTF(("ldv1000: 8\n"));
-			player->parameter = (player->parameter == -1) ? 8 : (player->parameter * 10 + 8);
-			return;
-
-		case 0x5f:	CMDPRINTF(("ldv1000: 9\n"));
-			player->parameter = (player->parameter == -1) ? 9 : (player->parameter * 10 + 9);
-			return;
-
-		case 0x7f:  CMDPRINTF(("ldv1000: %d Recall\n", player->parameter));
-			/* set the active register */
-			player->activereg = player->parameter;
-			/* should also display the register value */
-			break;
-
-		case 0x20:  CMDPRINTF(("ldv1000: x0 reverse (stop) - Badlands special\n"));
-			ldv1000_switch_state(ld, LDSTATE_PLAYING_FAST_REVERSE, 0);
-			break;
-
-		case 0x21:  CMDPRINTF(("ldv1000: x1/4 reverse - Badlands special\n"));
-			ldv1000_switch_state(ld, LDSTATE_PLAYING_SLOW_REVERSE, 4);
-			break;
-
-		case 0x22:  CMDPRINTF(("ldv1000: x1/2 reverse - Badlands special\n"));
-			ldv1000_switch_state(ld, LDSTATE_PLAYING_SLOW_REVERSE, 2);
-			break;
-
-		case 0x23:
-		case 0x24:
-		case 0x25:
-		case 0x26:
-		case 0x27:  CMDPRINTF(("ldv1000: x%d reverse - Badlands special\n", (data & 0x07) - 2));
-			ldv1000_switch_state(ld, LDSTATE_PLAYING_FAST_REVERSE, (data & 0x07) - 2);
-			break;
-
-		case 0xa0:  CMDPRINTF(("ldv1000: x0 forward (stop)\n"));
-			ldv1000_switch_state(ld, LDSTATE_PLAYING_FAST_FORWARD, 0);
-			break;
-
-		case 0xa1:  CMDPRINTF(("ldv1000: x1/4 forward\n"));
-			ldv1000_switch_state(ld, LDSTATE_PLAYING_SLOW_FORWARD, 4);
-			break;
-
-		case 0xa2:  CMDPRINTF(("ldv1000: x1/2 forward\n"));
-			ldv1000_switch_state(ld, LDSTATE_PLAYING_SLOW_FORWARD, 2);
-			break;
-
-		case 0xa3:
-		case 0xa4:
-		case 0xa5:
-		case 0xa6:
-		case 0xa7:  CMDPRINTF(("ldv1000: x%d forward\n", (data & 0x07) - 2));
-			ldv1000_switch_state(ld, LDSTATE_PLAYING_FAST_FORWARD, (data & 0x07) - 2);
-			break;
-
-		case 0xb1:
-		case 0xb2:
-		case 0xb3:
-		case 0xb4:
-		case 0xb5:
-		case 0xb6:
-		case 0xb7:
-		case 0xb8:
-		case 0xb9:
-		case 0xba:  CMDPRINTF(("ldv1000: Skip forward %d0\n", data & 0x0f));
-			/* note that this skips tracks, not frames */
-			ldv1000_switch_state(ld, LDSTATE_SKIPPING, 10 * (data & 0x0f));
-			break;
-
-		case 0x31:
-		case 0x32:
-		case 0x33:
-		case 0x34:
-		case 0x35:
-		case 0x36:
-		case 0x37:
-		case 0x38:
-		case 0x39:
-		case 0x3a:  CMDPRINTF(("ldv1000: Skip backwards %d0 - Badlands special\n", data & 0x0f));
-			/* note that this skips tracks, not frames */
-			ldv1000_switch_state(ld, LDSTATE_SKIPPING, -10 * (data & 0x0f));
-			break;
-
-		case 0xbf:	CMDPRINTF(("ldv1000: %d Clear\n", player->parameter));
-			/* clears register display and removes pending arguments */
-			player->parameter = -1;
-			break;
-
-		case 0xc2:	CMDPRINTF(("ldv1000: Get frame no.\n"));
-			/* returns the current frame number */
-			player->mode = LDV1000_MODE_GET_FRAME;
-			player->readpos = 0;
-			player->readtotal = 5;
-			sprintf((char *)player->readbuf, "%05d", player->lastframe);
-			break;
-
-		case 0xc3:	CMDPRINTF(("ldv1000: Get 2nd display\n"));
-			/* returns the data from the 2nd display line */
-			player->mode = LDV1000_MODE_GET_2ND;
-			player->readpos = 0;
-			player->readtotal = 8;
-			sprintf((char *)player->readbuf, "	 \x1c\x1c\x1c");
-			break;
-
-		case 0xc4:	CMDPRINTF(("ldv1000: Get 1st display\n"));
-			/* returns the data from the 1st display line */
-			player->mode = LDV1000_MODE_GET_1ST;
-			player->readpos = 0;
-			player->readtotal = 8;
-			sprintf((char *)player->readbuf, "	 \x1c\x1c\x1c");
-			break;
-
-		case 0xc8:	CMDPRINTF(("ldv1000: Transfer memory\n"));
-			/* returns the data from RAM */
-			player->mode = LDV1000_MODE_GET_RAM;
-			player->readpos = 0;
-			player->readtotal = 1024;
-			break;
-
-		case 0xcc:	CMDPRINTF(("ldv1000: Load\n"));
-			/* load program from disc -- not implemented */
-			break;
-
-		case 0xcd:	CMDPRINTF(("ldv1000: Display disable\n"));
-			/* disables the display of current command -- not implemented */
-			break;
-
-		case 0xce:	CMDPRINTF(("ldv1000: Display enable\n"));
-			/* enables the display of current command -- not implemented */
-			break;
-
-		case 0xf0:	CMDPRINTF(("ldv1000: Scan forward\n"));
-			if (ld->state.state != LDSTATE_SCANNING)
-				ldv1000_switch_state(ld, LDSTATE_SCANNING, SCANNING_PARAM(LDV1000_SCAN_SPEED, LDV1000_SCAN_DURATION));
-			else
-				ld->state.substate = 0;
-			break;
-
-		case 0xf1:  CMDPRINTF(("ldv1000: %d Display\n", player->parameter));
-			player->framedisplay = (player->parameter == -1) ? !player->framedisplay : (player->parameter & 1);
-			break;
-
-		case 0xf3:  CMDPRINTF(("ldv1000: %d Autostop\n", player->parameter));
-			target = (player->parameter != -1) ? player->parameter : read_16bits_from_ram_be(player->ram, (player->activereg++ * 2) % 1024);
-			if (target > player->lastframe)
-				ldv1000_switch_state(ld, LDSTATE_PLAYING, target);
-			else
-				ldv1000_switch_state(ld, LDSTATE_SEEKING, target);
-			break;
-
-		case 0xf4:  CMDPRINTF(("ldv1000: %d Audio track 1\n", player->parameter));
-			if (player->parameter == -1)
-				player->audio1disable ^= 1;
-			else
-				player->audio1disable = ~player->parameter & 1;
-			break;
-
-		case 0xf5:	CMDPRINTF(("ldv1000: %d Store\n", player->parameter));
-			/* store either the current frame number or an explicit value into the active register */
-			if (player->parameter == -1)
-				write_16bits_to_ram_be(player->ram, (player->activereg * 2) % 1024, player->lastframe);
-			else
-				write_16bits_to_ram_be(player->ram, (player->activereg * 2) % 1024, player->parameter);
-			player->activereg++;
-			break;
-
-		case 0xf6:	CMDPRINTF(("ldv1000: Step forward\n"));
-			ldv1000_switch_state(ld, LDSTATE_STEPPING_FORWARD, 0);
-			break;
-
-		case 0xf7:  CMDPRINTF(("ldv1000: %d Search\n", player->parameter));
-			target = (player->parameter != -1) ? player->parameter : read_16bits_from_ram_be(player->ram, (player->activereg * 2) % 1024);
-			player->activereg++;
-			ldv1000_switch_state(ld, LDSTATE_SEEKING, target);
-			break;
-
-		case 0xf8:	CMDPRINTF(("ldv1000: Scan reverse\n"));
-			if (ld->state.state != LDSTATE_SCANNING)
-				ldv1000_switch_state(ld, LDSTATE_SCANNING, SCANNING_PARAM(-LDV1000_SCAN_SPEED, LDV1000_SCAN_DURATION));
-			else
-				ld->state.substate = 0;
-			break;
-
-		case 0xf9:	CMDPRINTF(("ldv1000: Reject\n"));
-			ldv1000_switch_state(ld, LDSTATE_EJECTING, 0);
-			break;
-
-		case 0xfb:	CMDPRINTF(("ldv1000: %d Stop/Wait\n", player->parameter));
-			ldv1000_switch_state(ld, LDSTATE_WAITING, player->parameter);
-			break;
-
-		case 0xfc:  CMDPRINTF(("ldv1000: %d Audio track 2\n", player->parameter));
-			if (player->parameter == -1)
-				player->audio2disable ^= 1;
-			else
-				player->audio2disable = ~player->parameter & 1;
-			break;
-
-		case 0xfd:  CMDPRINTF(("ldv1000: Play\n"));
-			if (ld->state.state == LDSTATE_EJECTED)
-				ldv1000_switch_state(ld, LDSTATE_LOADING, 0);
-			else if (ld->state.state == LDSTATE_PARKED)
-				ldv1000_switch_state(ld, LDSTATE_SPINUP, 0);
-			else
-				ldv1000_switch_state(ld, LDSTATE_PLAYING, -1);
-			break;
-
-		case 0xfe:	CMDPRINTF(("ldv1000: Step reverse\n"));
-			ldv1000_switch_state(ld, LDSTATE_STEPPING_REVERSE, 0);
-			break;
-
-		default:	CMDPRINTF(("ldv1000: %d Unknown command %02X\n", player->parameter, data));
-			/* unknown command */
-			break;
-	}
-
-	/* reset the parameter after executing a command */
-	player->parameter = -1;
+	ld->player->command = data;
+	if (LOG_COMMANDS)
+		printf("-> COMMAND = %02X (%s)\n", data, (ld->player->portc1 & 0x10) ? "valid" : "invalid");
 }
 
 
@@ -738,15 +317,7 @@ static void ldv1000_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 
 static UINT8 ldv1000_status_strobe_r(laserdisc_state *ld)
 {
-	ldplayer_data *player = ld->player;
-
-	/* the status strobe is asserted (active low) 500-650usec after VSYNC */
-	/* for a duration of 26usec; we pick 600-626usec */
-	attotime delta = attotime_sub(timer_get_time(), player->lastvsynctime);
-	if (delta.attoseconds >= ATTOTIME_IN_USEC(600).attoseconds && delta.attoseconds < ATTOTIME_IN_USEC(626).attoseconds)
-		return ASSERT_LINE;
-
-	return CLEAR_LINE;
+	return (ld->player->portc1 & 0x20) ? ASSERT_LINE : CLEAR_LINE;
 }
 
 
@@ -757,81 +328,446 @@ static UINT8 ldv1000_status_strobe_r(laserdisc_state *ld)
 
 static UINT8 ldv1000_command_strobe_r(laserdisc_state *ld)
 {
-	ldplayer_data *player = ld->player;
-
-	/* the command strobe is asserted (active low) 54 or 84usec after the status */
-	/* strobe for a duration of 25usec; we pick 600+84 = 684-709usec */
-	/* for a duration of 26usec; we pick 600-626usec */
-	attotime delta = attotime_sub(timer_get_time(), player->lastvsynctime);
-	if (delta.attoseconds >= ATTOTIME_IN_USEC(684).attoseconds && delta.attoseconds < ATTOTIME_IN_USEC(709).attoseconds)
-		return ASSERT_LINE;
-
-	return CLEAR_LINE;
+	return (ld->player->portc1 & 0x10) ? ASSERT_LINE : CLEAR_LINE;
 }
 
 
 /*-------------------------------------------------
-    ldv1000_status_r - return state of the ready
-    line
+    ldv1000_status_r - handle a parallel data read
+    from the LD-V1000
 -------------------------------------------------*/
 
 static UINT8 ldv1000_status_r(laserdisc_state *ld)
 {
+	return ld->player->status;
+}
+
+
+/*-------------------------------------------------
+    vsync_off - timer callback to clear the VSYNC
+    flag
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( vsync_off )
+{
+	laserdisc_state *ld = ptr;
+	ld->player->vsync = FALSE;
+}
+
+
+/*-------------------------------------------------
+    vbi_data_fetch - timer callback to update the
+    VBI data in the PIA as soon as it is ready;
+    this must happy early in the frame because
+    the player logic relies on fetching it here
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( vbi_data_fetch )
+{
+	laserdisc_state *ld = ptr;
 	ldplayer_data *player = ld->player;
-	UINT8 status = 0xff;
-
-	/* switch off the current mode */
-	switch (player->mode)
+	UINT8 focus_on = !(player->portb1 & 0x01);
+	UINT8 laser_on = (player->portb1 & 0x40);
+	UINT32 lines[3];
+	
+	/* appears to return data in reverse order */
+	lines[0] = laserdisc_get_field_code(ld->device, LASERDISC_CODE_LINE1718);
+	lines[1] = laserdisc_get_field_code(ld->device, LASERDISC_CODE_LINE17);
+	lines[2] = laserdisc_get_field_code(ld->device, LASERDISC_CODE_LINE16);
+	
+	/* fill in the details */
+	memset(player->vbi, 0, sizeof(player->vbi));
+	if (focus_on && laser_on)
 	{
-		/* reading frame number returns 5 characters */
-		/* reading display lines returns 8 characters */
-		case LDV1000_MODE_GET_FRAME:
-		case LDV1000_MODE_GET_1ST:
-		case LDV1000_MODE_GET_2ND:
-			assert(player->readpos < player->readtotal);
-			status = player->readbuf[player->readpos++];
-			if (player->readpos == player->readtotal)
-				player->mode = LDV1000_MODE_STATUS;
-			break;
+		int line;
+		
+		/* loop over lines */
+		for (line = 0; line < 3; line++)
+		{
+			UINT8 *dest = &player->vbi[line * 7];
+			UINT32 data = lines[line];
 
-		/* reading RAM returns 1024 bytes */
-		case LDV1000_MODE_GET_RAM:
-			assert(player->readpos < player->readtotal);
-			status = player->ram[1023 - player->readpos++];
-			if (player->readpos == player->readtotal)
-				player->mode = LDV1000_MODE_STATUS;
-			break;
-
-		/* otherwise, we just compute a status code */
-		default:
-		case LDV1000_MODE_STATUS:
-			switch (ld->state.state)
+			/* the logic only processes leadin/leadout/frame number codes */
+			if (data == VBI_CODE_LEADIN || data == VBI_CODE_LEADOUT || (data & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE)
 			{
-				case LDSTATE_EJECTING:				status = 0x60;		break;
-				case LDSTATE_EJECTED:				status = 0xe0;		break;
-				case LDSTATE_PARKED:				status = 0xfc;		break;
-				case LDSTATE_LOADING:				status = 0x48;		break;
-				case LDSTATE_SPINUP:				status = 0x48;		break;
-				case LDSTATE_PAUSING:				status = 0xe5;		break;
-				case LDSTATE_PAUSED:				status = 0xe5;		break;
-				case LDSTATE_PLAYING:				status = 0xe4;		break;
-				case LDSTATE_PLAYING_SLOW_REVERSE:	status = 0xae;		break;
-				case LDSTATE_PLAYING_SLOW_FORWARD:	status = 0xae;		break;
-				case LDSTATE_PLAYING_FAST_REVERSE:	status = 0xae;		break;
-				case LDSTATE_PLAYING_FAST_FORWARD:	status = 0xae;		break;
-				case LDSTATE_STEPPING_FORWARD:		status = 0xe5;		break;
-				case LDSTATE_STEPPING_REVERSE:		status = 0xe5;		break;
-				case LDSTATE_SCANNING:				status = 0x4c;		break;
-				case LDSTATE_SEEKING:				status = 0x50;		break;
-//              case LASERDISC_SEARCH_FINISHED:     status = 0xd0;      break;
-//              case LASERDISC_AUTOSTOPPED:         status = 0x54;      break;
-				default:
-					fatalerror("Unexpected disc state in ldv1000_status_r\n");
-					break;
+				*dest++ = 0x09 | (((data & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE) ? 0x02 : 0x00);
+				*dest++ = 0x08;
+				*dest++ = (data >> 16) & 0x0f;
+				*dest++ = (data >> 12) & 0x0f;
+				*dest++ = (data >>  8) & 0x0f;
+				*dest++ = (data >>  4) & 0x0f;
+				*dest++ = (data >>  0) & 0x0f;
 			}
-			break;
+		}
+	}
+	
+	/* signal that data is ready and reset the readback index */
+	player->vbiready = TRUE;
+	player->vbiindex = 0;
+}
+
+
+/*-------------------------------------------------
+    multijump_timer - called once for each track
+    in a multijump sequence; we decrement the
+    down counter and autostop when we hit 0
+-------------------------------------------------*/
+
+static TIMER_DEVICE_CALLBACK( multijump_timer )
+{
+	laserdisc_state *ld = ptr;
+	ldplayer_data *player = ld->player;
+	int direction;
+
+	/* bit 5 of port B on PPI 1 selects the direction of slider movement */
+	direction = (player->portb1 & 0x20) ? 1 : -1;
+	ldcore_advance_slider(ld, direction);
+	
+	/* update down counter and reschedule */
+	if (--player->counter != 0)
+		timer_device_adjust_oneshot(timer, MULTIJUMP_TRACK_TIME, 0);
+}
+
+
+/*-------------------------------------------------
+    ctc_interrupt - called when the CTC triggers
+    an interrupt in the daisy chain
+-------------------------------------------------*/
+
+static void ctc_interrupt(const device_config *device, int state)
+{
+	laserdisc_state *ld = find_ldv1000(device->machine);
+	cpunum_set_input_line(device->machine, ld->player->cpunum, 0, state ? ASSERT_LINE : CLEAR_LINE);
+}
+
+
+/*-------------------------------------------------
+    decoder_display_port_w - handle writes to the
+    decoder/display chips
+-------------------------------------------------*/
+
+static WRITE8_HANDLER( decoder_display_port_w )
+{
+	/*
+		TX/RX = /A0 (A0=0 -> TX, A0=1 -> RX)
+		
+		Display is 6-bit
+		Decoder is 4-bit
+	*/
+	laserdisc_state *ld = find_ldv1000(machine);
+	ldplayer_data *player = ld->player;
+
+	/* writes to offset 0 select the target for reads/writes of actual data */
+	if (offset == 0)
+	{
+		player->portselect = data;
+		player->dispindex = 0;
+	}
+	
+	/* writes to offset 2 constitute actual writes targeted toward the display and decoder chips */
+	else if (offset == 2)
+	{
+		/* selections 0 and 1 represent the two display lines; only 6 bits are transferred */
+		if (player->portselect < 2)
+			player->display[player->portselect][player->dispindex++ % 20] = data & 0x3f;
+	}
+}
+
+
+/*-------------------------------------------------
+    decoder_display_port_r - handle reads from the
+    decoder/display chips
+-------------------------------------------------*/
+
+static READ8_HANDLER( decoder_display_port_r )
+{
+	laserdisc_state *ld = find_ldv1000(machine);
+	ldplayer_data *player = ld->player;
+	UINT8 result = 0;
+
+	/* reads from offset 3 constitute actual reads from the display and decoder chips */
+	if (offset == 3)
+	{
+		/* selection 4 represents the VBI data reading */
+		if (player->portselect == 4)
+		{
+			player->vbiready = FALSE;
+			result = player->vbi[player->vbiindex++ % ARRAY_LENGTH(player->vbi)];
+		}
+	}
+	return result;
+}
+
+
+/*-------------------------------------------------
+    controller_r - handle read of the data from
+    the controlling system
+-------------------------------------------------*/
+
+static READ8_HANDLER( controller_r )
+{
+	laserdisc_state *ld = find_ldv1000(machine);
+	
+	/* note that this is a cheesy implementation; the real thing relies on exquisite timing */
+	UINT8 result = ld->player->command ^ 0xff;
+	ld->player->command = 0xff;
+	return result;
+}
+
+
+/*-------------------------------------------------
+    controller_w - handle status latch writes
+-------------------------------------------------*/
+
+static WRITE8_HANDLER( controller_w )
+{
+	laserdisc_state *ld = find_ldv1000(machine);
+	if (LOG_STATUS_CHANGES && data != ld->player->status)
+		printf("%04X:CONTROLLER.W=%02X\n", activecpu_get_pc(), data);
+	ld->player->status = data;
+}
+
+
+/*-------------------------------------------------
+    ppi0_porta_w - handle writes to port A of
+    PPI #0
+-------------------------------------------------*/
+
+static WRITE8_DEVICE_HANDLER( ppi0_porta_w )
+{
+	laserdisc_state *ld = find_ldv1000(device->machine);
+	ld->player->counter_start = data;
+	if (LOG_PORT_IO)
+		printf("%04X:PORTA.0=%02X\n", activecpu_get_pc(), data);
+}
+
+
+/*-------------------------------------------------
+    ppi0_portb_r - handle reads from port B of
+    PPI #0
+-------------------------------------------------*/
+
+static READ8_DEVICE_HANDLER( ppi0_portb_r )
+{
+	laserdisc_state *ld = find_ldv1000(device->machine);
+	return ld->player->counter;
+}
+
+
+/*-------------------------------------------------
+    ppi0_portc_r - handle reads from port C of
+    PPI #0
+-------------------------------------------------*/
+
+static READ8_DEVICE_HANDLER( ppi0_portc_r )
+{
+	/*
+		$10 = /VSYNC
+		$20 = IRQ from decoder chip
+		$40 = TRKG LOOP (N24-1)
+		$80 = DUMP (N20-1) -- code reads the state and waits for it to change
+	*/
+	laserdisc_state *ld = find_ldv1000(device->machine);
+	ldplayer_data *player = ld->player;
+	UINT8 result = 0x00;
+
+	if (!player->vsync)
+		result |= 0x10;
+	if (!player->vbiready)
+		result |= 0x20;
+
+	return result;
+}
+
+
+/*-------------------------------------------------
+    ppi0_portc_w - handle writes to port C of
+    PPI #0
+-------------------------------------------------*/
+
+static WRITE8_DEVICE_HANDLER( ppi0_portc_w )
+{
+	/*
+		$01 = preload on up/down counters
+		$02 = /MULTI JUMP TRIG
+		$04 = SCAN MODE
+		$08 = n/c
+	*/
+	laserdisc_state *ld = find_ldv1000(device->machine);
+	ldplayer_data *player = ld->player;
+	UINT8 prev = player->portc0;
+	
+	/* set the new value */
+	player->portc0 = data;
+	if (LOG_PORT_IO && ((data ^ prev) & 0x0f) != 0)
+	{
+		printf("%04X:PORTC.0=%02X", activecpu_get_pc(), data);
+		if (data & 0x01) printf(" PRELOAD");
+		if (!(data & 0x02)) printf(" /MULTIJUMP");
+		if (data & 0x04) printf(" SCANMODE");
+		printf("\n");
+	}
+	
+	/* on the rising edge of bit 0, clock the down counter load */
+	if ((data & 0x01) && !(prev & 0x01))
+		player->counter = player->counter_start;
+
+	/* on the falling edge of bit 1, start the multi-jump timer */
+	if (!(data & 0x02) && (prev & 0x02))
+		timer_device_adjust_oneshot(player->multitimer, MULTIJUMP_TRACK_TIME, 0);
+}
+
+
+/*-------------------------------------------------
+    ppi1_porta_r - handle reads from port A of
+    PPI #1
+-------------------------------------------------*/
+
+static READ8_DEVICE_HANDLER( ppi1_porta_r )
+{
+	/*
+		$01 = /FOCS LOCK
+		$02 = /SPDL LOCK
+		$04 = INSIDE
+		$08 = OUTSIDE
+		$10 = MOTOR STOP
+		$20 = +5V/test point
+		$40 = /INT LOCK
+		$80 = 8 INCH CHK
+	*/
+	laserdisc_state *ld = find_ldv1000(device->machine);
+	ldplayer_data *player = ld->player;
+	slider_position sliderpos = ldcore_get_slider_position(ld);
+	UINT8 focus_on = !(player->portb1 & 0x01);
+	UINT8 spdl_on = !(player->portb1 & 0x02);
+	UINT8 result = 0x00;
+
+	/* bit 0: /FOCUS LOCK */
+	if (!focus_on)
+		result |= 0x01;
+
+	/* bit 1: /SPDL LOCK */
+	if (!spdl_on)
+		result |= 0x02;
+
+	/* bit 2: INSIDE signal */
+	if (sliderpos == SLIDER_MINIMUM)
+		result |= 0x04;
+
+	/* bit 3: OUTSIDE signal */
+	if (sliderpos == SLIDER_MAXIMUM)
+		result |= 0x08;
+
+	/* bit 4: MOTOR STOP */
+
+	/* bit 5: +5V/test point */
+	result |= 0x20;
+
+	/* bit 6: /INT LOCK */
+	
+	/* bit 7: 8 INCH CHK */
+
+	return result;
+}
+
+
+/*-------------------------------------------------
+    ppi1_portb_w - handle writes to port B of
+    PPI #1
+-------------------------------------------------*/
+
+static WRITE8_DEVICE_HANDLER( ppi1_portb_w )
+{
+	/*
+		$01 = /FOCS ON
+		$02 = /SPDL RUN
+		$04 = /JUMP TRIG
+		$08 = /SCAN A
+		$10 = SCAN B
+		$20 = SCAN C
+		$40 = /LASER ON
+		$80 = /SYNC ST0
+	*/
+	laserdisc_state *ld = find_ldv1000(device->machine);
+	ldplayer_data *player = ld->player;
+	UINT8 prev = player->portb1;
+	int direction;
+
+	/* set the new value */
+	player->portb1 = data;
+	if (LOG_PORT_IO && ((data ^ prev) & 0xff) != 0)
+	{
+		printf("%04X:PORTB.1=%02X:", activecpu_get_pc(), data);
+		if (!(data & 0x01)) printf(" FOCSON");
+		if (!(data & 0x02)) printf(" SPDLRUN");
+		if (!(data & 0x04)) printf(" JUMPTRIG");
+		if (!(data & 0x08)) printf(" SCANA (%c %c)", (data & 0x10) ? 'L' : 'H', (data & 0x20) ? 'F' : 'R');
+		if ( (data & 0x40)) printf(" LASERON");
+		if (!(data & 0x80)) printf(" SYNCST0");
+		printf("\n");
 	}
 
-	/* bit 7 indicates our busy status */
-	return status;
+	/* bit 5 selects the direction of slider movement for JUMP TRG and scanning */
+	direction = (data & 0x20) ? 1 : -1;
+
+	/* on the falling edge of bit 2, jump one track in either direction */
+	if (!(data & 0x04) && (prev & 0x04))
+		ldcore_advance_slider(ld, direction);
+
+	/* bit 3 low enables scanning */
+	if (!(data & 0x08))
+	{
+		/* bit 4 selects the speed */
+		int delta = (data & 0x10) ? SCAN_SPEED : SEEK_FAST_SPEED;
+		ldcore_set_slider_speed(ld, delta * direction);
+	}
+
+	/* bit 3 high stops scanning */
+	else
+		ldcore_set_slider_speed(ld, 0);
+}
+
+
+/*-------------------------------------------------
+    ppi1_portc_w - handle writes to port C of
+    PPI #1
+-------------------------------------------------*/
+
+static WRITE8_DEVICE_HANDLER( ppi1_portc_w )
+{
+	/*
+		$01 = AUD 1
+		$02 = AUD 2
+		$04 = AUDIO ENABLE
+		$08 = /VIDEO SQ
+		$10 = COMMAND
+		$20 = STATUS
+		$40 = SIZE 8/12
+		$80 = /LED CAV
+	*/
+	laserdisc_state *ld = find_ldv1000(device->machine);
+	ldplayer_data *player = ld->player;
+	UINT8 prev = player->portc1;
+
+	/* set the new value */
+	player->portc1 = data;
+	if (LOG_PORT_IO && ((data ^ prev) & 0xcf) != 0)
+	{
+		printf("%04X:PORTC.1=%02X", activecpu_get_pc(), data);
+		if (data & 0x01) printf(" AUD1");
+		if (data & 0x02) printf(" AUD2");
+		if (data & 0x04) printf(" AUDEN");
+		if (!(data & 0x08)) printf(" VIDEOSQ");
+		if (data & 0x10) printf(" COMMAND");
+		if (data & 0x20) printf(" STATUS");
+		if (data & 0x40) printf(" SIZE8");
+		if (!(data & 0x80)) printf(" CAV");
+		printf("\n");
+	}
+
+	/* video squelch is controlled by bit 3 */
+	ldcore_set_video_squelch(ld, (data & 0x08) == 0);
+
+	/* audio squelch is controlled by bits 0-2 */
+	ldcore_set_audio_squelch(ld, !(data & 0x04) || !(data & 0x01), !(data & 0x04) || !(data & 0x02));
 }

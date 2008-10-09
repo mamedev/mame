@@ -78,6 +78,7 @@ Hitachi HD647180 series:
 
 #include "debugger.h"
 #include "deprecat.h"
+#include "driver.h"
 #include "z180.h"
 #include "cpu/z80/z80daisy.h"
 
@@ -1900,7 +1901,7 @@ static void z180_init(int index, int clock, const void *config, int (*irqcallbac
 {
 	Z180.daisy = NULL;
 	if (config)
-		Z180.daisy = z80daisy_init(Machine, config);
+		Z180.daisy = z80daisy_init(Machine, Machine->config->cpu[cpu_getactivecpu()].tag, config);
 	Z180.irq_callback = irqcallback;
 
 	state_save_register_item("z180", index, Z180.AF.w.l);

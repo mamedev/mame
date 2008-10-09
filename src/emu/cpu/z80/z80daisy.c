@@ -20,8 +20,9 @@ struct _z80_daisy_state
 };
 
 
-z80_daisy_state *z80daisy_init(running_machine *machine, const z80_daisy_chain *daisy)
+z80_daisy_state *z80daisy_init(running_machine *machine, const char *cputag, const z80_daisy_chain *daisy)
 {
+	astring *tempstring = astring_alloc();
 	z80_daisy_state *head = NULL;
 	z80_daisy_state **tailptr = &head;
 
@@ -30,13 +31,16 @@ z80_daisy_state *z80daisy_init(running_machine *machine, const z80_daisy_chain *
 	{
 		*tailptr = auto_malloc(sizeof(**tailptr));
 		(*tailptr)->next = NULL;
-		(*tailptr)->device = devtag_get_device(machine, daisy->devtype, daisy->devname);
+		(*tailptr)->device = devtag_get_device(machine, daisy->devtype, device_inherit_tag(tempstring, cputag, daisy->devname));
+		if ((*tailptr)->device == NULL)
+			fatalerror("Unable to locate device '%s'", daisy->devname);
 		(*tailptr)->irq_state = (z80_daisy_irq_state)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_IRQ_STATE);
 		(*tailptr)->irq_ack = (z80_daisy_irq_ack)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_IRQ_ACK);
 		(*tailptr)->irq_reti = (z80_daisy_irq_reti)device_get_info_fct((*tailptr)->device, DEVINFO_FCT_IRQ_RETI);
 		tailptr = &(*tailptr)->next;
 	}
 
+	astring_free(tempstring);
 	return head;
 }
 

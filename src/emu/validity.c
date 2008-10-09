@@ -807,7 +807,7 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 			/* validate the global map parameters */
 			if (map->spacenum != spacenum)
 			{
-				mame_printf_error("%s: %s CPU #%d space %d has address space %d handlers!", driver->source_file, driver->name, cpunum, spacenum, map->spacenum);
+				mame_printf_error("%s: %s CPU #%d space %d has address space %d handlers!\n", driver->source_file, driver->name, cpunum, spacenum, map->spacenum);
 				error = TRUE;
 			}
 			if (map->databits != databus_width)

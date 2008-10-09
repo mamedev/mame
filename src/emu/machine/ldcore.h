@@ -225,7 +225,7 @@ INLINE int is_start_of_frame(const vbi_metadata *vbi)
 	/* is it not known if the white flag or the presence of a frame code
        determines the start of frame; the former seems to be the "official"
        way, but the latter seems to be the practical implementation */
-	return (vbi->white || (vbi->line1718 & 0xf80000) == 0xf80000);
+	return (vbi->white || (vbi->line1718 & VBI_MASK_CAV_PICTURE) == VBI_CODE_CAV_PICTURE);
 }
 
 
@@ -255,7 +255,7 @@ INLINE int frame_from_metadata(const vbi_metadata *metadata)
 
 INLINE int chapter_from_metadata(const vbi_metadata *metadata)
 {
-	if ((metadata->line1718 & 0xf00fff) == 0x800ddd)
+	if ((metadata->line1718 & VBI_MASK_CHAPTER) == VBI_CODE_CHAPTER)
 		return VBI_CHAPTER(metadata->line1718);
 	else if (metadata->line1718 == VBI_CODE_LEADIN)
 		return CHAPTER_LEAD_IN;

@@ -11,7 +11,6 @@
 
     Still to do:
 
-        * add overlay properly (need capture)
         * implement SLOW TRG
         * figure out Simutrek without jump hack
         * figure out serial protocol issues (current hack works nicely)
@@ -49,17 +48,17 @@
 #define OVERLAY_X_PIXELS				5
 #define OVERLAY_Y_PIXELS				7
 
-/* Pioneer PR-8210 specific information */
-#define PR8210_SCAN_SPEED				(2000 / 30)			/* 2000 frames/second */
-#define PR8210_SEEK_FAST_SPEED			(4000 / 30)			/* 4000 frames/second */
+/* scanning speeds */
+#define SCAN_SPEED						(2000 / 30)			/* 2000 frames/second */
+#define SEEK_FAST_SPEED					(4000 / 30)			/* 4000 frames/second */
 
 /* serial timing, mostly from the service manual, derived from the XTAL */
-#define PR8210_SERIAL_CLOCK				XTAL_455kHz
-#define PR8210_0_BIT_TIME				ATTOTIME_IN_HZ(PR8210_SERIAL_CLOCK / 512)
-#define PR8210_1_BIT_TIME				ATTOTIME_IN_HZ(PR8210_SERIAL_CLOCK / 1024)
-#define PR8210_MIDPOINT_TIME			ATTOTIME_IN_HZ(PR8210_SERIAL_CLOCK / 600)
-#define PR8210_MAX_WORD_TIME			ATTOTIME_IN_HZ(PR8210_SERIAL_CLOCK / 11520)
-#define PR8210_REJECT_DUPLICATE_TIME	ATTOTIME_IN_HZ(PR8210_SERIAL_CLOCK / 11520 / 4)
+#define SERIAL_CLOCK					XTAL_455kHz
+#define SERIAL_0_BIT_TIME				ATTOTIME_IN_HZ(SERIAL_CLOCK / 512)
+#define SERIAL_1_BIT_TIME				ATTOTIME_IN_HZ(SERIAL_CLOCK / 1024)
+#define SERIAL_MIDPOINT_TIME			ATTOTIME_IN_HZ(SERIAL_CLOCK / 600)
+#define SERIAL_MAX_WORD_TIME			ATTOTIME_IN_HZ(SERIAL_CLOCK / 11520)
+#define SERIAL_REJECT_DUPLICATE_TIME	ATTOTIME_IN_HZ(SERIAL_CLOCK / 11520 / 4)
 
 
 
@@ -129,8 +128,10 @@ static void pr8210_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int field
 static INT32 pr8210_update(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime);
 static void pr8210_overlay(laserdisc_state *ld, bitmap_t *bitmap);
 static void pr8210_control_w(laserdisc_state *ld, UINT8 prev, UINT8 data);
+
 static TIMER_CALLBACK( vsync_off );
 static TIMER_CALLBACK( vbi_data_fetch );
+
 static READ8_HANDLER( pr8210_pia_r );
 static WRITE8_HANDLER( pr8210_pia_w );
 static READ8_HANDLER( pr8210_bus_r );
@@ -138,6 +139,7 @@ static WRITE8_HANDLER( pr8210_port1_w );
 static WRITE8_HANDLER( pr8210_port2_w );
 static READ8_HANDLER( pr8210_t0_r );
 static READ8_HANDLER( pr8210_t1_r );
+
 static void overlay_draw_group(bitmap_t *bitmap, const UINT8 *text, int count, float xstart);
 static void overlay_erase(bitmap_t *bitmap, float xstart, float xend);
 static void overlay_draw_char(bitmap_t *bitmap, UINT8 ch, float xstart);
@@ -148,7 +150,9 @@ static INT32 simutrek_update(laserdisc_state *ld, const vbi_metadata *vbi, int f
 static UINT8 simutrek_ready_r(laserdisc_state *ld);
 static UINT8 simutrek_status_r(laserdisc_state *ld);
 static void simutrek_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data);
+
 static TIMER_CALLBACK( simutrek_latched_data_w );
+
 static READ8_HANDLER( simutrek_port2_r );
 static WRITE8_HANDLER( simutrek_port2_w );
 static READ8_HANDLER( simutrek_data_r );
@@ -169,7 +173,7 @@ static const UINT8 text_bitmap[0x40][7] =
 	{ 0x70,0x88,0x80,0x80,0x80,0x88,0x70 },	/* C */
 	{ 0 },									/* D */
 	{ 0xf8,0x80,0x80,0xf0,0x80,0x80,0xf8 },	/* E */
-	{ 0xf8,0x80,0x80,0xf0,0x80,0x80,0x80 },	/* E */
+	{ 0xf8,0x80,0x80,0xf0,0x80,0x80,0x80 },	/* F */
 	{ 0 },									/* G */
 	{ 0x88,0x88,0x88,0xf8,0x88,0x88,0x88 },	/* H */
 	{ 0 },									/* I */
@@ -338,8 +342,7 @@ const ldplayer_interface pr8210_interface =
 ***************************************************************************/
 
 /*-------------------------------------------------
-    pr8210_init - Pioneer PR-8210-specific
-    initialization
+    pr8210_init - player-specific initialization
 -------------------------------------------------*/
 
 static void pr8210_init(laserdisc_state *ld)
@@ -348,17 +351,16 @@ static void pr8210_init(laserdisc_state *ld)
 	attotime curtime = timer_get_time();
 	ldplayer_data *player = ld->player;
 
-	/* find our CPU */
-	player->cpunum = mame_find_cpu_index(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "pr8210"));
-	astring_free(tempstring);
-
-	/* do a soft reset */
-	player->lastcommand = 0;
-	player->accumulator = 0;
+	/* reset our state */
+	memset(player, 0, sizeof(*player));
 	player->lastcommandtime = curtime;
 	player->firstbittime = curtime;
 	player->lastbittime = curtime;
 	player->slowtrg = curtime;
+
+	/* find our CPU */
+	player->cpunum = mame_find_cpu_index(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "pr8210"));
+	astring_free(tempstring);
 
 	/* we don't have the Simutrek player overrides */
 	player->simutrek.cpunum = -1;
@@ -463,7 +465,7 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 
 		/* if we timed out since the first bit, reset the accumulator */
 		delta = attotime_sub(curtime, player->firstbittime);
-		if (attotime_compare(delta, PR8210_MAX_WORD_TIME) > 0)
+		if (attotime_compare(delta, SERIAL_MAX_WORD_TIME) > 0)
 		{
 			player->firstbittime = curtime;
 			player->accumulator = 0x5555;
@@ -477,7 +479,7 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 		player->lastbittime = curtime;
 
 		/* 0 bit delta is 1.05 msec, 1 bit delta is 2.11 msec */
-		longpulse = (attotime_compare(delta, PR8210_MIDPOINT_TIME) < 0) ? 0 : 1;
+		longpulse = (attotime_compare(delta, SERIAL_MIDPOINT_TIME) < 0) ? 0 : 1;
 		player->accumulator = (player->accumulator << 1) | longpulse;
 
 		/* log the deltas for debugging */
@@ -500,7 +502,7 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 			/* the MCU logic requires a 0 to execute many commands; however, nobody
                consistently sends a 0, whereas they do tend to send duplicate commands...
                if we assume that each duplicate causes a 0, we get the correct results */
-			rejectuntil = attotime_add(player->lastcommandtime, PR8210_REJECT_DUPLICATE_TIME);
+			rejectuntil = attotime_add(player->lastcommandtime, SERIAL_REJECT_DUPLICATE_TIME);
 			player->lastcommandtime = curtime;
 			if (player->pia.porta == player->lastcommand && attotime_compare(curtime, rejectuntil) < 0)
 				player->pia.porta = 0x00;
@@ -516,7 +518,7 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 			}
 
 			/* reset the first bit time so that the accumulator clears on the next write */
-			player->firstbittime = attotime_sub(curtime, PR8210_MAX_WORD_TIME);
+			player->firstbittime = attotime_sub(curtime, SERIAL_MAX_WORD_TIME);
 		}
 	}
 }
@@ -810,7 +812,7 @@ static WRITE8_HANDLER( pr8210_port1_w )
 	if (!(data & 0x02))
 	{
 		/* bit 2 selects the speed */
-		int delta = (data & 0x04) ? PR8210_SCAN_SPEED : PR8210_SEEK_FAST_SPEED;
+		int delta = (data & 0x04) ? SCAN_SPEED : SEEK_FAST_SPEED;
 		ldcore_set_slider_speed(ld, delta * direction);
 	}
 

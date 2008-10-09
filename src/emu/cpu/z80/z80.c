@@ -95,6 +95,7 @@
 
 #include "debugger.h"
 #include "deprecat.h"
+#include "driver.h"
 #include "z80.h"
 #include "z80daisy.h"
 
@@ -3499,7 +3500,7 @@ static void z80_init(int index, int clock, const void *config, int (*irqcallback
 	/* Reset registers to their initial values */
 	memset(&Z80, 0, sizeof(Z80));
 	if (config != NULL)
-		Z80.daisy = z80daisy_init(Machine, config);
+		Z80.daisy = z80daisy_init(Machine, Machine->config->cpu[cpu_getactivecpu()].tag, config);
 	Z80.irq_callback = irqcallback;
 	IX = IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	F = ZF;			/* Zero flag is set */

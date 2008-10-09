@@ -68,6 +68,8 @@ enum
 
 typedef void (*laserdisc_audio_func)(const device_config *device, int samplerate, int samples, const INT16 *ch0, const INT16 *ch1);
 
+typedef void (*vp931_data_ready_func)(const device_config *device, int state);
+
 typedef struct _laserdisc_config laserdisc_config;
 struct _laserdisc_config
 {
@@ -188,7 +190,7 @@ UINT8 laserdisc_line_r(const device_config *device, UINT8 line);
 void pr7820_set_slow_speed(const device_config *device, double frame_rate_scaler);
 
 /* set a callback for data ready on the Phillips 22VP931 */
-void vp931_set_data_ready_callback(const device_config *device, void (*callback)(const device_config *device, int state));
+void vp931_set_data_ready_callback(const device_config *device, vp931_data_ready_func callback);
 
 /* control the audio squelch of the Simutrek modified players */
 void simutrek_set_audio_squelch(const device_config *device, int state);

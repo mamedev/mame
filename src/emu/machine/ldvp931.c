@@ -34,9 +34,9 @@
     CONSTANTS
 ***************************************************************************/
 
-/* Philips 22VP931 specific information */
-#define VP931_SCAN_SPEED				(2000 / 30)			/* 2000 frames/second */
-#define VP931_SCAN_FAST_SPEED			(4000 / 30)			/* 4000 frames/second */
+/* scanning speeds */
+#define SCAN_SPEED						(2000 / 30)			/* 2000 frames/second */
+#define SCAN_FAST_SPEED					(4000 / 30)			/* 4000 frames/second */
 
 
 
@@ -50,23 +50,32 @@ struct _ldplayer_data
 	/* low-level emulation data */
 	int					cpunum;					/* CPU index of the 8049 */
 	const device_config *tracktimer;			/* timer device */
-	int					lastframe;
+	vp931_data_ready_func data_ready_cb; 		/* data ready callback */
+
+	/* I/O port states */
 	UINT8				out0;					/* output 0 state */
 	UINT8				out1;					/* output 1 state */
 	UINT8				port1;					/* port 1 state */
+
+	/* DATIC circuit implementation */
 	UINT8				daticval;				/* latched DATIC value */
 	UINT8				daticerp;				/* /ERP value from DATIC */
 	UINT8				datastrobe;				/* DATA STROBE line from DATIC */
+
+	/* communication status */
 	UINT8				fromcontroller;			/* command byte from the controller */
 	UINT8				fromcontroller_pending;	/* TRUE if data is pending */
 	UINT8				tocontroller;			/* command byte to the controller */
 	UINT8				tocontroller_pending;	/* TRUE if data is pending */
+
+	/* tracking */
 	INT8				trackdir;				/* direction of tracking */
 	UINT8				trackstate;				/* state of tracking */
+
+	/* debugging */
 	UINT8				cmdbuf[3];				/* 3 bytes worth of commands */
 	UINT8				cmdcount;				/* number of command bytes seen */
 	INT16				advanced;				/* number of frames advanced */
-	void (*data_ready_cb)(const device_config *device, int state); /* data ready callback */
 };
 
 
@@ -83,6 +92,13 @@ static UINT8 vp931_data_r(laserdisc_state *ld);
 static UINT8 vp931_ready(laserdisc_state *ld);
 static UINT8 vp931_data_ready(laserdisc_state *ld);
 
+static TIMER_CALLBACK( vbi_data_fetch );
+static TIMER_CALLBACK( deferred_data_w );
+static TIMER_CALLBACK( irq_off );
+static TIMER_CALLBACK( datastrobe_off );
+static TIMER_CALLBACK( erp_off );
+static TIMER_DEVICE_CALLBACK( track_timer );
+
 static WRITE8_HANDLER( output0_w );
 static WRITE8_HANDLER( output1_w );
 static WRITE8_HANDLER( lcd_w );
@@ -96,12 +112,6 @@ static READ8_HANDLER( port2_r );
 static WRITE8_HANDLER( port2_w );
 static READ8_HANDLER( t0_r );
 static READ8_HANDLER( t1_r );
-static TIMER_CALLBACK( vbi_data_fetch );
-static TIMER_CALLBACK( deferred_data_w );
-static TIMER_CALLBACK( irq_off );
-static TIMER_CALLBACK( datastrobe_off );
-static TIMER_CALLBACK( erp_off );
-static TIMER_DEVICE_CALLBACK( track_timer );
 
 
 
@@ -152,7 +162,7 @@ ROM_END
 
 
 /***************************************************************************
-    PR-8210 PLAYER INTERFACE
+    22VP931 PLAYER INTERFACE
 ***************************************************************************/
 
 const ldplayer_interface vp931_interface =
@@ -191,7 +201,7 @@ const ldplayer_interface vp931_interface =
     ready callback
 -------------------------------------------------*/
 
-void vp931_set_data_ready_callback(const device_config *device, void (*callback)(const device_config *device, int state))
+void vp931_set_data_ready_callback(const device_config *device, vp931_data_ready_func callback)
 {
 	laserdisc_state *ld = ldcore_get_safe_token(device);
 	ld->player->data_ready_cb = callback;
@@ -204,22 +214,24 @@ void vp931_set_data_ready_callback(const device_config *device, void (*callback)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    vp931_init - Pioneer PR-8210-specific
-    initialization
+    vp931_init - player-specific initialization
 -------------------------------------------------*/
 
 static void vp931_init(laserdisc_state *ld)
 {
 	astring *tempstring = astring_alloc();
 	ldplayer_data *player = ld->player;
+	vp931_data_ready_func cbsave;
+	
+	/* reset our state */
+	cbsave = player->data_ready_cb;
+	memset(player, 0, sizeof(*player));
+	player->data_ready_cb = cbsave;
 
-	/* find our CPU */
+	/* find our devices */
 	player->cpunum = mame_find_cpu_index(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "vp931"));
-
-	/* find our timer */
-	player->tracktimer = device_list_find_by_tag(ld->device->machine->config->devicelist, TIMER, device_build_tag(tempstring, ld->device->tag, "tracktimer"));
+	player->tracktimer = devtag_get_device(ld->device->machine, TIMER, device_build_tag(tempstring, ld->device->tag, "tracktimer"));
 	timer_device_set_ptr(player->tracktimer, ld);
-
 	astring_free(tempstring);
 }
 
@@ -317,6 +329,127 @@ static UINT8 vp931_data_ready(laserdisc_state *ld)
 
 
 /*-------------------------------------------------
+    vbi_data_fetch - called 4 times per scanline
+    on lines 16, 17, and 18 to feed the VBI data
+    through one byte at a time
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( vbi_data_fetch )
+{
+	laserdisc_state *ld = ptr;
+	ldplayer_data *player = ld->player;
+	int which = param & 3;
+	int line = param >> 2;
+	UINT32 code = 0;
+
+	/* fetch the code and compute the DATIC latched value */
+	if (line >= LASERDISC_CODE_LINE16 && line <= LASERDISC_CODE_LINE18)
+		code = laserdisc_get_field_code(ld->device, line);
+
+	/* at the start of each line, signal an interrupt and use a timer to turn it off */
+	if (which == 0)
+	{
+		cpunum_set_input_line(machine, player->cpunum, MCS48_INPUT_IRQ, ASSERT_LINE);
+		timer_set(ATTOTIME_IN_NSEC(5580), ld, 0, irq_off);
+	}
+
+	/* clock the data strobe on each subsequent callback */
+	else if (code != 0)
+	{
+		player->daticval = code >> (8 * (3 - which));
+		player->datastrobe = 1;
+		timer_set(ATTOTIME_IN_NSEC(5000), ld, 0, datastrobe_off);
+	}
+
+	/* determine the next bit to fetch and reprime ourself */
+	if (++which == 4)
+	{
+		which = 0;
+		line++;
+	}
+	if (line <= LASERDISC_CODE_LINE18 + 1)
+		timer_set(video_screen_get_time_until_pos(ld->screen, line*2, which * 2 * video_screen_get_width(ld->screen) / 4), ld, (line << 2) | which, vbi_data_fetch);
+}
+
+
+/*-------------------------------------------------
+    deferred_data_w - handle a write from the
+    external controller
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( deferred_data_w )
+{
+	laserdisc_state *ld = ptr;
+	ldplayer_data *player = ld->player;
+
+	/* set the value and mark it pending */
+	player->fromcontroller = param;
+	player->fromcontroller_pending = TRUE;
+
+	/* track the commands for debugging purposes */
+	if (player->cmdcount < ARRAY_LENGTH(player->cmdbuf))
+	{
+		player->cmdbuf[player->cmdcount++] = param;
+		if (LOG_COMMANDS && player->cmdcount == 3)
+			printf("Cmd: %02X %02X %02X\n", player->cmdbuf[0], player->cmdbuf[1], player->cmdbuf[2]);
+	}
+}
+
+
+/*-------------------------------------------------
+    irq_off - turn off the 8048 IRQ signal
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( irq_off )
+{
+	laserdisc_state *ld = ptr;
+	cpunum_set_input_line(machine, ld->player->cpunum, MCS48_INPUT_IRQ, CLEAR_LINE);
+}
+
+
+/*-------------------------------------------------
+    datastrobe_off - turn off the DATIC data
+    strobe signal
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( datastrobe_off )
+{
+	laserdisc_state *ld = ptr;
+	ld->player->datastrobe = 0;
+}
+
+
+/*-------------------------------------------------
+    erp_off - turn off the DATIC ERP signal
+-------------------------------------------------*/
+
+static TIMER_CALLBACK( erp_off )
+{
+	laserdisc_state *ld = ptr;
+	ld->player->daticerp = 0;
+}
+
+
+/*-------------------------------------------------
+    track_timer - advance by one half-track
+-------------------------------------------------*/
+
+static TIMER_DEVICE_CALLBACK( track_timer )
+{
+	laserdisc_state *ld = ptr;
+	ldplayer_data *player = ld->player;
+
+	/* advance by the count and toggle the state */
+	player->trackstate ^= 1;
+	if ((player->trackdir < 0 && !player->trackstate) || (player->trackdir > 0 && player->trackstate))
+	{
+		ldcore_advance_slider(ld, player->trackdir);
+		player->advanced += player->trackdir;
+	}
+}
+
+
+/*-------------------------------------------------
     output0_w - controls audio/video squelch
     and other bits
 -------------------------------------------------*/
@@ -392,7 +525,7 @@ static WRITE8_HANDLER( output1_w )
 	if (!(data & 0x02))
 	{
 		/* fast/slow is based on bit 2 */
-		speed = (data & 0x04) ? VP931_SCAN_FAST_SPEED : VP931_SCAN_SPEED;
+		speed = (data & 0x04) ? SCAN_FAST_SPEED : SCAN_SPEED;
 
 		/* direction is based on bit 0 */
 		if (data & 0x01)
@@ -646,125 +779,4 @@ static READ8_HANDLER( t1_r )
 {
 	laserdisc_state *ld = find_vp931(machine);
 	return ld->player->trackstate;
-}
-
-
-/*-------------------------------------------------
-    vbi_data_fetch - called 4 times per scanline
-    on lines 16, 17, and 18 to feed the VBI data
-    through one byte at a time
--------------------------------------------------*/
-
-static TIMER_CALLBACK( vbi_data_fetch )
-{
-	laserdisc_state *ld = ptr;
-	ldplayer_data *player = ld->player;
-	int which = param & 3;
-	int line = param >> 2;
-	UINT32 code = 0;
-
-	/* fetch the code and compute the DATIC latched value */
-	if (line >= LASERDISC_CODE_LINE16 && line <= LASERDISC_CODE_LINE18)
-		code = laserdisc_get_field_code(ld->device, line);
-
-	/* at the start of each line, signal an interrupt and use a timer to turn it off */
-	if (which == 0)
-	{
-		cpunum_set_input_line(machine, player->cpunum, MCS48_INPUT_IRQ, ASSERT_LINE);
-		timer_set(ATTOTIME_IN_NSEC(5580), ld, 0, irq_off);
-	}
-
-	/* clock the data strobe on each subsequent callback */
-	else if (code != 0)
-	{
-		player->daticval = code >> (8 * (3 - which));
-		player->datastrobe = 1;
-		timer_set(ATTOTIME_IN_NSEC(5000), ld, 0, datastrobe_off);
-	}
-
-	/* determine the next bit to fetch and reprime ourself */
-	if (++which == 4)
-	{
-		which = 0;
-		line++;
-	}
-	if (line <= LASERDISC_CODE_LINE18 + 1)
-		timer_set(video_screen_get_time_until_pos(ld->screen, line*2, which * 2 * video_screen_get_width(ld->screen) / 4), ld, (line << 2) | which, vbi_data_fetch);
-}
-
-
-/*-------------------------------------------------
-    deferred_data_w - handle a write from the
-    external controller
--------------------------------------------------*/
-
-static TIMER_CALLBACK( deferred_data_w )
-{
-	laserdisc_state *ld = ptr;
-	ldplayer_data *player = ld->player;
-
-	/* set the value and mark it pending */
-	player->fromcontroller = param;
-	player->fromcontroller_pending = TRUE;
-
-	/* track the commands for debugging purposes */
-	if (player->cmdcount < ARRAY_LENGTH(player->cmdbuf))
-	{
-		player->cmdbuf[player->cmdcount++] = param;
-		if (LOG_COMMANDS && player->cmdcount == 3)
-			printf("Cmd: %02X %02X %02X\n", player->cmdbuf[0], player->cmdbuf[1], player->cmdbuf[2]);
-	}
-}
-
-
-/*-------------------------------------------------
-    irq_off - turn off the 8048 IRQ signal
--------------------------------------------------*/
-
-static TIMER_CALLBACK( irq_off )
-{
-	laserdisc_state *ld = ptr;
-	cpunum_set_input_line(machine, ld->player->cpunum, MCS48_INPUT_IRQ, CLEAR_LINE);
-}
-
-
-/*-------------------------------------------------
-    datastrobe_off - turn off the DATIC data
-    strobe signal
--------------------------------------------------*/
-
-static TIMER_CALLBACK( datastrobe_off )
-{
-	laserdisc_state *ld = ptr;
-	ld->player->datastrobe = 0;
-}
-
-
-/*-------------------------------------------------
-    erp_off - turn off the DATIC ERP signal
--------------------------------------------------*/
-
-static TIMER_CALLBACK( erp_off )
-{
-	laserdisc_state *ld = ptr;
-	ld->player->daticerp = 0;
-}
-
-
-/*-------------------------------------------------
-    track_timer - advance by one half-track
--------------------------------------------------*/
-
-static TIMER_DEVICE_CALLBACK( track_timer )
-{
-	laserdisc_state *ld = ptr;
-	ldplayer_data *player = ld->player;
-
-	/* advance by the count and toggle the state */
-	player->trackstate ^= 1;
-	if ((player->trackdir < 0 && !player->trackstate) || (player->trackdir > 0 && player->trackstate))
-	{
-		ldcore_advance_slider(ld, player->trackdir);
-		player->advanced += player->trackdir;
-	}
 }
