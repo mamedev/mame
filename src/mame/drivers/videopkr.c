@@ -14,8 +14,8 @@
     * Video Dado,    1987, InterFlip.
     * Video Cordoba, 1987, InterFlip.
 
-    * Baby Poker,	 1989, Recreativos Franco.
-    * Baby Dado,	 1989, Recreativos Franco.
+    * Baby Poker,    1989, Recreativos Franco.
+    * Baby Dado,     1989, Recreativos Franco.
 
 
 ***************************************************************************
@@ -214,28 +214,33 @@
 **************************************************************************
 
 
-    [2008-10-07]
+    [2008-10-08]
 
     - Added Baby Poker Game.
-    - Added sound support to Baby Poker Game.
-    - Reworked the color routines.
     - Added Baby Dado Game.
+    - Mapped "Hand Pay" button for Baby Games.
+    - Added decoder to Jackpot mechanical counter.
+    - Added sound support to Baby Poker Game.
+    - Added tower lamps to Baby Games layouts.
+    - Reworked layouts for Baby Games.
+    - Reworked the color routines.
     - Added new color routines for Baby Games.
     - Redumped the videocba color PROM.
     - Added color switch. (It changes background color in some games).
     - Added "hopper full" switch support (for diverter function).
     - Added diverter function decoder.
+    - Added Button-lamps layout.
     - Added full functional mechanical counters decoding.
     - Added 7 Segment decoder and 7 Digit Counter functions.
     - Added button-lamps layout & mechanical counters simulation on layout.
       Mechanical counters to layout: Coin-In, Coin-Out and Coin to Drop.
     - Added NVRAM support to mechanical counters.
 
-
     TO DO
     =====
 
     * Add Tech. Notes for Baby board, a reworked and improved version on Video Poker hardware.
+    * Fix some missing pulses on mechanical counters.
     * Fix the bug on bookeeping mode (videodad & videocba).
     * Figure out the undocumented jumper.
     * Hopper simulation.
@@ -283,7 +288,7 @@ static UINT8 dc_40103;
 static UINT8 te_40103;
 static UINT8 ld_40103;
 
-UINT8 ant_cio, c_io, hp_1, hp_2, bell, aux3, dvrt;
+UINT8 ant_jckp, jckp, ant_cio, c_io, hp_1, hp_2, bell, aux3, dvrt;
 unsigned long count0, count1, count2, count3, count4;
 
 /* Baby vars */
@@ -390,7 +395,7 @@ PALETTE_INIT( babypkr )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int offs = tile_index;
-	int attr = color_ram[offs] + (input_port_read(machine, "IN2")); /* Color Switch Action */
+	int attr = color_ram[offs] + input_port_read(machine, "IN2"); /* Color Switch Action */
 	int code = video_ram[offs];
 	int color = attr;
 	SET_TILE_INFO(0, code, color, 0);
@@ -466,22 +471,20 @@ static READ8_HANDLER( videopkr_io_r )
 	{
 		case 0xef:	/* inputs are multiplexed through a diode matrix */
 		{
-			kbdin = ((input_port_read(machine, "IN1") & 0x0f ) << 8) + input_port_read(machine, "IN0");
 			hf = ((input_port_read(machine, "IN1") & 0x10 ) >> 4) & 1; 			/* Hopper full detection */
 			co = 0x10 * ((input_port_read(machine, "IN1") & 0x20 ) >> 5);		/* Coin Out detection */
-			
+			kbdin = ((input_port_read(machine, "IN1") & 0xaf ) << 8) + input_port_read(machine, "IN0");
+
 			switch (kbdin)
 			{
-				popmessage(":KBDIN=%04x - IN1: %X - IN0:%x", kbdin, input_port_read(machine, "IN1"), input_port_read(machine, "IN0"));
-				logerror("KBDIN=%04x - IN1: %X - IN0:%x\n", kbdin, input_port_read(machine, "IN1"), input_port_read(machine, "IN0"));
 				case 0x0000: valor = 0x00; break;
 				case 0x0001: valor = 0x01; break;	/* Door */
 				case 0x4000: valor = 0x02; break;
-				case 0x8000: valor = 0x03; break;
+				case 0x8000: valor = 0x03; break;	/* Hand Pay */
 				case 0x0002: valor = 0x04; break;	/* Books */
 				case 0x0004: valor = 0x05; break;	/* Coin In */
 				case 0x0008: valor = 0x07; break;	/* Start */
-				case 0x0010: valor = 0x08; break;   /* Discard */
+				case 0x0010: valor = 0x08; break;	/* Discard */
 				case 0x0020: valor = 0x09; break;	/* Cancel */
 				case 0x0040: valor = 0x0a; break;	/* Hold 1 */
 				case 0x0080: valor = 0x0b; break;	/* Hold 2 */
@@ -495,7 +498,7 @@ static READ8_HANDLER( videopkr_io_r )
 			{
 				valor = 0x0f;
 			}
-
+			
 			valor += co;
 			break;
 		}
@@ -594,8 +597,8 @@ static WRITE8_HANDLER( videopkr_io_w )
 			output_set_lamp_value(7, ((data >> 7) & 1));	/* Diverter */
 			p24_data = data;
 			hp_1 = (~p24_data >> 6) & 1;
-            hp_2 = (~p24_data >> 5) & 1;
-   			dvrt = (~p24_data >> 7) & 1;
+			hp_2 = (~p24_data >> 5) & 1;
+			dvrt = (~p24_data >> 7) & 1;
 			break;
 		}
 
@@ -621,12 +624,14 @@ static WRITE8_HANDLER( videopkr_p1_data_w )
 {
 	p1 = data;
 
-	output_set_lamp_value(8, (data & 1));			/* Aux_0 - */
+	output_set_lamp_value(8, (data & 1));			/* Aux_0 - Jackpot mech. counter (Baby Games)*/
 	output_set_lamp_value(9, ((data >> 1) & 1));	/* Aux_1 - */
 	output_set_lamp_value(10, ((data >> 2) & 1));	/* Aux_2 - */
 	output_set_lamp_value(11, ((data >> 3) & 1));	/* Aux_3 - */
 	output_set_lamp_value(12, ((data >> 4) & 1));	/* Aux_4 - Bell */
 	output_set_lamp_value(13, ((data >> 5) & 1));	/* Aux_5 - /CIO */
+
+	jckp = p1 & 1;
 
 	if ((~c_io & 1) & ant_cio & hp_1 & hp_2)
 	{
@@ -643,12 +648,18 @@ static WRITE8_HANDLER( videopkr_p1_data_w )
 		++count3;	/* Decoded Coin to Drop Mech. Counter */
 	}
 
+	if (~jckp & ant_jckp)
+	{
+		++count4;	/* Decoded Jackpot Mech. Counter */
+	}
+
 	count_7dig(count1, 0);
 	count_7dig(count2, 7);
 	count_7dig(count3, 14);
 	count_7dig(count4, 21);
 
 	ant_cio = c_io;
+	ant_jckp = jckp;
 }
 
 static WRITE8_HANDLER( videopkr_p2_data_w )
@@ -788,14 +799,6 @@ static READ8_HANDLER(baby_sound_p1_r)
 	bell = (p1 >> 4) & 1;
 	aux3 = (p1 >> 3) & 1;
 	baby_latch = c_io + (hp_1 << 1) + (hp_2 << 2) + (bell << 3) + (aux3 << 4) + 0xe0;
-	//c_io = (input_port_read(machine, "IN3")>> 0) & 0x01 ;
-	//hp_1 = (input_port_read(machine, "IN3")>> 1) & 0x01 ;
-	//hp_2 = (input_port_read(machine, "IN3")>> 2) & 0x01 ;
-	//bell = (input_port_read(machine, "IN3")>> 3) & 0x01 ;
-	//aux3 = (input_port_read(machine, "IN3")>> 4) & 0x01 ;
-	//baby_latch = c_io + (hp_1 << 1) + (hp_2 << 2) + (bell << 3) + (aux3 << 4) + 0xe0;
-	//popmessage("%02x", baby_latch);
-
 	return baby_latch;
 }
 
@@ -826,10 +829,10 @@ static WRITE8_HANDLER(baby_sound_p3_w)
 	sbp3 = data;
 	lmp_ports = sbp3 >> 1 & 0x07;
 
-	output_set_lamp_value(14, (lmp_ports >> 0) & 1);
-	output_set_lamp_value(15, (lmp_ports >> 1) & 1);
-	output_set_lamp_value(16, (lmp_ports >> 2) & 1);
-
+	output_set_value("TOP_1", (lmp_ports >> 0) & 1);
+	output_set_value("TOP_2", (lmp_ports >> 1) & 1);
+	output_set_value("TOP_3", (lmp_ports >> 2) & 1);
+	
 	if (!(sbp3 & 0x10))
 	{
 		ay8910_reset_ym(sndti_token(SOUND_AY8910, 0));
@@ -840,14 +843,14 @@ static WRITE8_HANDLER(baby_sound_p3_w)
 
 	switch (ay_intf)
 	{
-		case 0x00:  break;
+		case 0x00:	break;
 		case 0x01:	break;
 		case 0x02:	break;
 		case 0x03:	ay8910_write_port_0_w(machine, 1, sbp0); break;
 		case 0x04:	break;
-		case 0x05:  sbp0 = ay8910_read_port_0_r(machine, sbp0); break;
+		case 0x05:	sbp0 = ay8910_read_port_0_r(machine, sbp0); break;
 		case 0x06:	break;
-		case 0x07:  ay8910_control_port_0_w(machine, 0, sbp0); break;
+		case 0x07:	ay8910_control_port_0_w(machine, 0, sbp0); break;
 	}
 }
 
@@ -874,7 +877,7 @@ static ADDRESS_MAP_START( i8039_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_io_port, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00,          0xff         ) AM_READWRITE(videopkr_io_r, videopkr_io_w)
+	AM_RANGE(0x00         , 0xff         ) AM_READWRITE(videopkr_io_r, videopkr_io_w)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(videopkr_p1_data_r, videopkr_p1_data_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(videopkr_p2_data_r, videopkr_p2_data_w)
 	AM_RANGE(MCS48_PORT_P4, MCS48_PORT_P4) AM_WRITE(p4_w)
@@ -886,7 +889,7 @@ static ADDRESS_MAP_START( i8039_sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( i8039_sound_port, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00,          0xff         ) AM_READWRITE(sound_io_r, sound_io_w)
+	AM_RANGE(0x00         , 0xff         ) AM_READWRITE(sound_io_r, sound_io_w)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_WRITE(dac_0_data_w)
 	AM_RANGE(MCS48_PORT_P2, MCS48_PORT_P2) AM_READWRITE(sound_p2_r, sound_p2_w)
 ADDRESS_MAP_END
@@ -964,19 +967,18 @@ static INPUT_PORTS_START( blckjack )
 	PORT_DIPNAME( 0x20, 0x00, "Color Sw." )		PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On  ) )
-
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( videodad )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Door")  PORT_TOGGLE PORT_CODE(KEYCODE_0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Books") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Door")      PORT_TOGGLE PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Books")     PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )   PORT_IMPULSE(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Take")  PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Crap")  PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("6 or Less")   PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Seven") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("8 or More")   PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Take")      PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Crap")      PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("6 or Less") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Seven")     PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("8 or More") PORT_CODE(KEYCODE_C)
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Field")  PORT_CODE(KEYCODE_S)
@@ -1010,8 +1012,8 @@ static INPUT_PORTS_START( videocba )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_NAME("Hopper")  PORT_TOGGLE PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_NAME("Payout")  PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_NAME("Hopper") PORT_TOGGLE PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_NAME("Payout") PORT_CODE(KEYCODE_M)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 
@@ -1024,24 +1026,24 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( babypkr )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Door")    PORT_TOGGLE PORT_CODE(KEYCODE_0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Books")   PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Door")           PORT_TOGGLE PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Books")          PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )   PORT_IMPULSE(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Start")   PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Start")          PORT_CODE(KEYCODE_1)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Discard-Double") PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Cancel-Take")  PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Hold 1")  PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Hold 2")  PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("Cancel-Take")    PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Hold 1")         PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("Hold 2")         PORT_CODE(KEYCODE_X)
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Hold 3")  PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Hold 4")  PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Hold 5")  PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Bet")     PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_NAME("Hopper")  PORT_TOGGLE PORT_CODE(KEYCODE_8)
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_NAME("Payout")  PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON6 ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_BUTTON7 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Bet")    PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_NAME("Hopper") PORT_TOGGLE PORT_CODE(KEYCODE_8)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_NAME("Payout") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED  )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_NAME("Hand Pay")       PORT_CODE(KEYCODE_W)
 
 	PORT_START("IN2")
 	PORT_DIPNAME( 0x20, 0x00, "Color Sw." )		PORT_DIPLOCATION("SW1:1")
@@ -1052,11 +1054,11 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( babydad )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Door")		PORT_TOGGLE PORT_CODE(KEYCODE_0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Books")	PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Door")    PORT_TOGGLE PORT_CODE(KEYCODE_0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("Books")   PORT_CODE(KEYCODE_9)
 	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )   PORT_IMPULSE(2)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Take") 	PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Crap")     PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Take")    PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_NAME("Crap")    PORT_CODE(KEYCODE_2)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_NAME("6 or Less")   PORT_CODE(KEYCODE_N)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON4 ) PORT_NAME("Seven")    PORT_CODE(KEYCODE_Z)
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_NAME("8 or More")   PORT_CODE(KEYCODE_X)
@@ -1068,11 +1070,11 @@ static INPUT_PORTS_START( babydad )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_BUTTON9 ) PORT_NAME("Bet")    PORT_CODE(KEYCODE_3)
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON10) PORT_NAME("Hopper") PORT_TOGGLE PORT_CODE(KEYCODE_8)
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_BUTTON11) PORT_NAME("Payout") PORT_CODE(KEYCODE_M)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_NAME("VER1")   PORT_CODE(KEYCODE_K)
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON13) PORT_NAME("VER2")   PORT_CODE(KEYCODE_L)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED  )
+    PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_BUTTON12) PORT_NAME("Hand Pay")    PORT_CODE(KEYCODE_W)
 
 	PORT_START("IN2")
-	PORT_DIPNAME( 0x20, 0x00, "Color Sw." )       PORT_DIPLOCATION("SW1:1")
+	PORT_DIPNAME( 0x20, 0x00, "Color Sw." )		PORT_DIPLOCATION("SW1:1")
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On  ) )
 
@@ -1136,7 +1138,7 @@ static MACHINE_START(videopkr)
 	ant_cio = 0;
 	count0 = 0;
 	t1_timer = timer_alloc(sound_t1_callback, NULL);
-	timer_adjust_periodic(t1_timer, attotime_zero, 0, ATTOTIME_IN_HZ(50));	/* yep, 50Hz. */
+	timer_adjust_periodic(t1_timer, attotime_zero, 0, ATTOTIME_IN_HZ(50));	/* 50Hz. */
 }
 
 static const ay8910_interface ay8910_config =
@@ -1186,7 +1188,7 @@ static MACHINE_DRIVER_START( videopkr )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sound",	DAC, 0)
+	MDRV_SOUND_ADD("sound", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
 MACHINE_DRIVER_END
 
@@ -1250,8 +1252,8 @@ MACHINE_DRIVER_END
 
 ROM_START( videopkr )
 	ROM_REGION( 0x1000, "main", 0 )
-	ROM_LOAD( "vpoker.c5",	0x0000, 0x0800,	CRC(200d21e4) SHA1(d991c9f10a36a02491bb0aba32129675fed77a10) )
-	ROM_LOAD( "vpoker.c7",	0x0800, 0x0800,	CRC(f72c2a90) SHA1(e9c54d1f895cde0aaca4121a252da40594195a25) )
+	ROM_LOAD( "vpoker.c5",		0x0000, 0x0800,	CRC(200d21e4) SHA1(d991c9f10a36a02491bb0aba32129675fed77a10) )
+	ROM_LOAD( "vpoker.c7",		0x0800, 0x0800,	CRC(f72c2a90) SHA1(e9c54d1f895cde0aaca4121a252da40594195a25) )
 
 	ROM_REGION( 0x1000, "sound", 0 )	/* sound cpu program */
 	ROM_LOAD( "vpsona3.pbj",	0x0000, 0x0800,	CRC(a4f7bf7f) SHA1(a08287821f3471cb3e1ae0528811da930fd57387) )
@@ -1303,8 +1305,8 @@ ROM_END
 
 ROM_START( videocba )
 	ROM_REGION( 0x1000, "main", 0 )
-	ROM_LOAD( "vcc5org.old",	0x0000, 0x0800, CRC(96d72283) SHA1(056197a9e2ad40d1d6610bbe8a1855b81c0a6715) )
-	ROM_LOAD( "vcc7org.old",    0x0800, 0x0800, CRC(fdec55c1) SHA1(19b740f3b7f2acaa0fc09f4c0a2fe69721ebbcaf) )
+	ROM_LOAD( "vcc5org.old",	0x0000, 0x0800,	CRC(96d72283) SHA1(056197a9e2ad40d1d6610bbe8a1855b81c0a6715) )
+	ROM_LOAD( "vcc7org.old",	0x0800, 0x0800,	CRC(fdec55c1) SHA1(19b740f3b7f2acaa0fc09f4c0a2fe69721ebbcaf) )
 
 	ROM_REGION( 0x1000, "sound", 0 )	/* sound cpu program */
 	ROM_LOAD( "vcsona3.rod",	0x0000, 0x0800,	CRC(b0948d6c) SHA1(6c45d350288f69b4b2b5ac16ab2b418f14c6eded) )
@@ -1328,10 +1330,10 @@ ROM_START( babypkr )
 	ROM_LOAD( "dadvpbj.son",	0x0000, 0x1000,	CRC(7b71cd30) SHA1(d782c50689a5aea632b6d274a1a7435a092ad20c) )
 
 	ROM_REGION( 0x20000, "tiles", ROMREGION_DISPOSE )
-	ROM_LOAD( "vpbjep15.mme",	0x00000, 0x8000, CRC(cad0f7cf) SHA1(0721b8b30dbf2a5da2967b0cfce24b4cd62d3f9d) )
-	ROM_LOAD( "vpbjep14.mme",	0x08000, 0x8000, CRC(96f512fa) SHA1(f5344aeb57f53c43156e923fb7f0d8d37c73dbe9) )
-	ROM_LOAD( "vpbjep12.mme",   0x10000, 0x8000, CRC(cfdca530) SHA1(609a5ad6f34e6b5c1c35584ddc62d4ff87546415) )
-	ROM_LOAD( "vpbjep11.mme",   0x18000, 0x8000, CRC(44e6c489) SHA1(ca211cb3807c476cd8c5ac98b0d18b4b2724df45) )
+	ROM_LOAD( "vpbjep15.mme",	0x00000, 0x8000,CRC(cad0f7cf) SHA1(0721b8b30dbf2a5da2967b0cfce24b4cd62d3f9d) )
+	ROM_LOAD( "vpbjep14.mme",	0x08000, 0x8000,CRC(96f512fa) SHA1(f5344aeb57f53c43156e923fb7f0d8d37c73dbe9) )
+	ROM_LOAD( "vpbjep12.mme",	0x10000, 0x8000,CRC(cfdca530) SHA1(609a5ad6f34e6b5c1c35584ddc62d4ff87546415) )
+	ROM_LOAD( "vpbjep11.mme",	0x18000, 0x8000,CRC(44e6c489) SHA1(ca211cb3807c476cd8c5ac98b0d18b4b2724df45) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
 	ROM_LOAD( "babypok.col",	0x0000, 0x0100,	CRC(2b98e88a) SHA1(bb22ef090e9e5dddc5c160d41a5f52df0db6feb6) )
@@ -1339,19 +1341,19 @@ ROM_END
 
 ROM_START( babydad )
 	ROM_REGION( 0x4000, "main", 0 )
-	ROM_LOAD( "da400org.old",    0x0000, 0x4000,   CRC(cbca3a0c) SHA1(5d9428f26edf2c5531398a6ae36b4e9169b2c1c1) )
+	ROM_LOAD( "da400org.old",	0x0000, 0x4000,	CRC(cbca3a0c) SHA1(5d9428f26edf2c5531398a6ae36b4e9169b2c1c1) )
 
 	ROM_REGION( 0x1000, "sound", 0 )
-	ROM_LOAD( "dadvpbj.son",    0x0000, 0x1000,    CRC(7b71cd30) SHA1(d782c50689a5aea632b6d274a1a7435a092ad20c) )
+	ROM_LOAD( "dadvpbj.son",	0x0000, 0x1000,	CRC(7b71cd30) SHA1(d782c50689a5aea632b6d274a1a7435a092ad20c) )
 
 	ROM_REGION( 0x20000, "tiles", ROMREGION_DISPOSE )
-	ROM_LOAD( "ep15dad.dad",    0x00000, 0x8000, CRC(21bd102d) SHA1(52788d09dbe38fa29b8ff044a1c5249cad3d45b4) )
-	ROM_LOAD( "ep14dad.dad",    0x08000, 0x8000, CRC(b6e2c8a2) SHA1(352d88e1d764da5133de2be9987d4875f0c9237f) )
-	ROM_LOAD( "ep12dad.dad",    0x10000, 0x8000, CRC(98702beb) SHA1(6d42ea48df7546932570da1e9b0be7a1f01f930c) )
-	ROM_LOAD( "ep11dad.dad",    0x18000, 0x8000, CRC(90aac63b) SHA1(8b312f2313334b4b5b0344b786aa1a7a4979ea92) )
+	ROM_LOAD( "ep15dad.dad",	0x00000, 0x8000,CRC(21bd102d) SHA1(52788d09dbe38fa29b8ff044a1c5249cad3d45b4) )
+	ROM_LOAD( "ep14dad.dad",	0x08000, 0x8000,CRC(b6e2c8a2) SHA1(352d88e1d764da5133de2be9987d4875f0c9237f) )
+	ROM_LOAD( "ep12dad.dad",	0x10000, 0x8000,CRC(98702beb) SHA1(6d42ea48df7546932570da1e9b0be7a1f01f930c) )
+	ROM_LOAD( "ep11dad.dad",	0x18000, 0x8000,CRC(90aac63b) SHA1(8b312f2313334b4b5b0344b786aa1a7a4979ea92) )
 
 	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "babydad.col",    0x0000, 0x0100,  CRC(b3358b3f) SHA1(d499a08fefaa3566de2e6fcddd237d6dfa840d8a) )
+	ROM_LOAD( "babydad.col",	0x0000, 0x0100,	CRC(b3358b3f) SHA1(d499a08fefaa3566de2e6fcddd237d6dfa840d8a) )
 ROM_END
 
 
