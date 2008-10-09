@@ -700,7 +700,7 @@ rgb_t *compute_res_net_all(const UINT8 *prom, const res_net_decode_info *rdi, co
 	int i,j,k;
 	rgb_t *rgb;
 
-	rgb = malloc_or_die((rdi->end - rdi->start + 1)*sizeof(rgb_t));
+	rgb = auto_malloc((rdi->end - rdi->start + 1)*sizeof(rgb_t));
 	for (i=rdi->start; i<=rdi->end; i++)
 	{
 		UINT8 t[3] = {0,0,0};
