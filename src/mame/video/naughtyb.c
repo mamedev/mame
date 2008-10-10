@@ -92,9 +92,9 @@ PALETTE_INIT( naughtyb )
 	int i;
 
 	rgb = compute_res_net_all(color_prom, &naughtyb_decode_info, &naughtyb_net_info);
-
 	for (i = 0; i < 0x100; i++)
 		palette_set_color(machine, BITSWAP8(i,5,7,6,2,1,0,4,3), rgb[i]);
+	free(rgb);
 
 	palette_normalize_range(machine->palette, 0, 255, 0, 255);
 }

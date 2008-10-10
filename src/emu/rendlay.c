@@ -279,6 +279,9 @@ void layout_view_recompute(layout_view *view, int layerconfig)
 					else
 						union_render_bounds(&view->scrbounds, &item->rawbounds);
 					scrfirst = FALSE;
+
+					/* accumulate the screens in use while we're scanning */
+					view->screens |= 1 << item->index;
 				}
 			}
 		}
@@ -328,10 +331,6 @@ void layout_view_recompute(layout_view *view, int layerconfig)
 			item->bounds.x1 = target_bounds.x0 + (item->rawbounds.x1 - xoffs) * xscale;
 			item->bounds.y0 = target_bounds.y0 + (item->rawbounds.y0 - yoffs) * yscale;
 			item->bounds.y1 = target_bounds.y0 + (item->rawbounds.y1 - yoffs) * yscale;
-
-			/* accumulate the screens in use while we're scanning */
-			if (item->element == NULL)
-				view->screens |= 1 << item->index;
 		}
 	}
 }
