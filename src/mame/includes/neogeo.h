@@ -64,11 +64,10 @@ void kof2003_decrypt_68k(running_machine *machine);
 void kof2003h_decrypt_68k(running_machine *machine);
 void kof2003biosdecode(running_machine *machine);
 void samsh5sp_decrypt_68k(running_machine *machine);
-
 void neo_pcm2_snk_1999(running_machine *machine, int value);
 void neo_pcm2_swap(running_machine *machine, int value);
-
 void neogeo_cmc50_m1_decrypt(running_machine *machine);
+
 
 /*----------- defined in machine/neoprot.c -----------*/
 
@@ -111,11 +110,11 @@ void svcplus_px_hack(running_machine *machine);
 void svcplusa_px_decrypt(running_machine *machine);
 void svcsplus_px_decrypt(running_machine *machine);
 void svcsplus_px_hack(running_machine *machine);
-void kof2003b_px_decrypt(running_machine *machine);
-void kof2003b_install_protection(running_machine *machine);
-void kof2k3pl_px_decrypt(running_machine *machine);
-void kof2k3up_px_decrypt(running_machine *machine);
-void kof2k3up_install_protection(running_machine *machine);
+void kf2k3bl_px_decrypt(running_machine *machine);
+void kf2k3bl_install_protection(running_machine *machine);
+void kf2k3pl_px_decrypt(running_machine *machine);
+void kf2k3upl_px_decrypt(running_machine *machine);
+void kf2k3upl_install_protection(running_machine *machine);
 void kf2k3pl_install_protection(running_machine *machine);
 void samsho5b_px_decrypt(running_machine *machine);
 void samsho5b_vx_decrypt(running_machine *machine);

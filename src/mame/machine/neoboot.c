@@ -18,6 +18,7 @@
 
 /* General Bootleg Functions - used by more than 1 game */
 
+
 void neogeo_bootleg_cx_decrypt( running_machine *machine )
 {
 	int i;
@@ -33,6 +34,7 @@ void neogeo_bootleg_cx_decrypt( running_machine *machine )
 
 	free( buf );
 }
+
 
 void neogeo_bootleg_sx_decrypt( running_machine *machine, int value )
 {
@@ -62,9 +64,9 @@ void neogeo_bootleg_sx_decrypt( running_machine *machine, int value )
 
 /* The King of Gladiator (The King of Fighters '97 bootleg) */
 
-/* the protection patching here may be incomplete */
 
-// Thanks to Razoola for the info
+/* The protection patching here may be incomplete
+   Thanks to Razoola for the info */
 
 void kog_px_decrypt( running_machine *machine )
 {
@@ -127,7 +129,9 @@ void kog_px_decrypt( running_machine *machine )
 
 }
 
-/* Kof 10th Anniversary (bootleg of King of Fighters 2002 */
+
+/* The King of Fighters 10th Anniversary (The King of Fighters 2002 bootleg) */
+
 
 /* this uses RAM based tiles for the text layer, however the implementation
   is incomplete, at the moment the S data is copied from the program rom on
@@ -204,6 +208,10 @@ void decrypt_kof10th(running_machine *machine)
 	((UINT16*)src)[0x8bf8/2] = 0xf980;
 }
 
+
+/* The King of Fighters 10th Anniversary Extra Plus (The King of Fighters 2002 bootleg) */
+
+
 void decrypt_kf10thep(running_machine *machine)
 {
 	int i;
@@ -240,6 +248,10 @@ void decrypt_kf10thep(running_machine *machine)
 	memcpy(srom,sbuf,0x20000);
 	free(sbuf);
 }
+
+
+/* The King of Fighters 10th Anniversary 2005 Unique (The King of Fighters 2002 bootleg) */
+
 
 static void kf2k5uni_px_decrypt( running_machine *machine )
 {
@@ -286,7 +298,9 @@ void decrypt_kf2k5uni( running_machine *machine )
 	kf2k5uni_mx_decrypt(machine);
 }
 
-/* Kof2002 Magic Plus */
+
+/* The King of Fighters 2002 Magic Plus (bootleg) */
+
 
 void kf2k2mp_decrypt( running_machine *machine )
 {
@@ -309,7 +323,8 @@ void kf2k2mp_decrypt( running_machine *machine )
 	free(dst);
 }
 
-/* Kof2002 Magic Plus 2 */
+
+/* The King of Fighters 2002 Magic Plus II (bootleg) */
 
 
 void kof2km2_px_decrypt( running_machine *machine )
@@ -327,6 +342,7 @@ void kof2km2_px_decrypt( running_machine *machine )
 
 
 /* Crouching Tiger Hidden Dragon 2003 (bootleg of King of Fighters 2001) */
+
 
 /* descrambling information from razoola */
 static void cthd2003_neogeo_gfx_address_fix_do(running_machine *machine, int start, int end, int bit3shift, int bit2shift, int bit1shift, int bit0shift)
@@ -466,7 +482,9 @@ void patch_cthd2003( running_machine *machine )
  	mem16[0x9943e/2] = 0xdd03;
 }
 
+
 /* Crouching Tiger Hidden Dragon 2003 Super Plus (bootleg of King of Fighters 2001) */
+
 
 static void ct2k3sp_sx_decrypt( running_machine *machine )
 {
@@ -514,7 +532,9 @@ void decrypt_ct2k3sp( running_machine *machine )
 	cthd2003_c(machine, 0);
 }
 
+
 /* Crouching Tiger Hidden Dragon 2003 Super Plus alternate (bootleg of King of Fighters 2001) */
+
 
 void decrypt_ct2k3sa( running_machine *machine )
 {
@@ -570,7 +590,9 @@ void patch_ct2k3sa( running_machine *machine )
  	mem16[0x9943e/2] = 0xdd03;
 }
 
+
 /* King of Fighters Special Edition 2004 (bootleg of King of Fighters 2002) */
+
 
 void decrypt_kof2k4se_68k( running_machine *machine )
 {
@@ -636,6 +658,10 @@ void lans2004_decrypt_68k( running_machine *machine )
 	rom[0xBBE42/2] = 0x6002;
 }
 
+
+/* Metal Slug 5 Plus (bootleg) */
+
+
 static READ16_HANDLER( mslug5_prot_r )
 {
 	logerror("PC %06x: access protected\n",activecpu_get_pc());
@@ -669,6 +695,8 @@ void install_ms5plus_protection(running_machine *machine)
 }
 
 
+/* SNK vs. CAPCOM SVC CHAOS (bootleg) */
+
 
 void svcboot_px_decrypt( running_machine *machine )
 {
@@ -690,8 +718,6 @@ void svcboot_px_decrypt( running_machine *machine )
 	}
 	free( dst );
 }
-
-
 
 void svcboot_cx_decrypt( running_machine *machine )
 {
@@ -726,6 +752,8 @@ void svcboot_cx_decrypt( running_machine *machine )
 }
 
 
+/* SNK vs. CAPCOM SVC CHAOS Plus (bootleg set 1) */
+
 
 void svcplus_px_decrypt( running_machine *machine )
 {
@@ -753,8 +781,6 @@ void svcplus_px_decrypt( running_machine *machine )
 	free( dst );
 }
 
-
-
 void svcplus_px_hack( running_machine *machine )
 {
 	/* patched by the protection chip? */
@@ -768,6 +794,10 @@ void svcplus_px_hack( running_machine *machine )
 	src[ 0x0f8016 ] = 0xc1;
 	src[ 0x0f802c ] = 0x16;
 }
+
+
+/* SNK vs. CAPCOM SVC CHAOS Plus (bootleg set 2) */
+
 
 void svcplusa_px_decrypt( running_machine *machine )
 {
@@ -785,6 +815,8 @@ void svcplusa_px_decrypt( running_machine *machine )
 	free( dst );
 }
 
+
+/* SNK vs. CAPCOM SVC CHAOS Super Plus (bootleg) */
 
 
 void svcsplus_px_decrypt( running_machine *machine )
@@ -808,8 +840,6 @@ void svcsplus_px_decrypt( running_machine *machine )
 	}
 	free( dst );
 }
-
-
 
 void svcsplus_px_hack( running_machine *machine )
 {
@@ -838,13 +868,10 @@ static WRITE16_HANDLER( mv0_bankswitch_w )
 }
 #endif
 
-/* I think the code for the kof2003 bootlegs is wrong, they don't work */
 
-/***************************************************************************
- kof2003b
-****************************************************************************/
+/* The King of Fighters 2003 (bootleg set 1) */
 
-/* kof2003 bootleg init info */
+
 static UINT16 kof2003_tbl[4096];
 
 static READ16_HANDLER( kof2003_r)
@@ -887,7 +914,7 @@ static WRITE16_HANDLER( kof2003p_w )
 	}
 }
 
-void kof2003b_px_decrypt( running_machine *machine )
+void kf2k3bl_px_decrypt( running_machine *machine )
 {
 	int i;
 	static const UINT8 sec[] = {
@@ -905,17 +932,16 @@ void kof2003b_px_decrypt( running_machine *machine )
     free( buf );
 }
 
-void kof2003b_install_protection(running_machine *machine)
+void kf2k3bl_install_protection(running_machine *machine)
 {
     memory_install_readwrite16_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x2fe000, 0x2fffff, 0, 0, kof2003_r, kof2003_w );
 }
 
 
-/***************************************************************************
- kof2k3pl
-***************************************************************************/
+/* The King of Fighters 2004 Plus / Hero (The King of Fighters 2003 bootleg) */
 
-void kof2k3pl_px_decrypt( running_machine *machine )
+
+void kf2k3pl_px_decrypt( running_machine *machine )
 {
 	UINT16*tmp = malloc_or_die(0x100000);
 	UINT16*rom = (UINT16*)memory_region( machine, "main" );
@@ -940,12 +966,10 @@ void kf2k3pl_install_protection(running_machine *machine)
 }
 
 
-/***************************************************************************
- kof2k3up
-***************************************************************************/
+/* The King of Fighters 2004 Ultra Plus (The King of Fighters 2003 bootleg) */
 
 
-void kof2k3up_px_decrypt( running_machine *machine )
+void kf2k3upl_px_decrypt( running_machine *machine )
 {
 	{
 		UINT8 *src = memory_region(machine, "main");
@@ -967,7 +991,7 @@ void kof2k3up_px_decrypt( running_machine *machine )
 	}
 }
 
-void kof2k3up_install_protection(running_machine *machine)
+void kf2k3upl_install_protection(running_machine *machine)
 {
     memory_install_readwrite16_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x2fe000, 0x2fffff, 0, 0, kof2003_r, kof2003_w );
 }
