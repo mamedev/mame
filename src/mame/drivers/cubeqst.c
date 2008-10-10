@@ -404,6 +404,7 @@ INPUT_PORTS_END
  *************************************/
 
 static ADDRESS_MAP_START( m68k_program_map, ADDRESS_SPACE_PROGRAM, 16 )
+	ADDRESS_MAP_GLOBAL_MASK(0x03ffff)
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x020000, 0x027fff) AM_READWRITE(read_rotram, write_rotram)
 	AM_RANGE(0x028000, 0x028fff) AM_READWRITE(read_sndram, write_sndram)
