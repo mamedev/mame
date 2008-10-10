@@ -472,68 +472,7 @@ static MACHINE_DRIVER_START( galsnew )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
-/* the tile roms seem lineswapped.. but I don't know how to descramble them yet */
-DRIVER_INIT(galsnew)
-{
-	UINT32 *src = (UINT32 *)memory_region(machine, "gfx3" );
-	UINT32 *dst = (UINT32 *)memory_region(machine, "gfx2" );
-	int x, source, offset,inv;
 
-	for (x=0; x<0x80000;x++)
-	{
-		inv = ~x;
-		offset = x ^ (0xC30 | (inv >> 1 & 0x10200));
-		offset = (offset & ~0x07) | ((0x02 - (offset & 0x07)) & 0x07);
-		if(x&0x0010)
-			offset = (offset & ~0x60) | (((offset & 0x60) + 0x20) & 0x60);
-		if((x&((inv >> 1 & 0x10000) | 0x2000)) == 0x02000)
-			offset ^= 0x1000;
-		if(!(x&(0x1000 | (x >> 4 & 0x2000))))
-		{
-			offset ^= 0x100;
-			if(!(x&0x20000) && (x&0x12000) == 0x02000)
-			{
-				offset = (offset & ~0x180) | (((offset & 0x180) + 0x180) & 0x180);
-				if((x&0x180) == 0x100)
-				{
-					offset ^= 0x400;
-					if((x&0x480) == 0x400)
-						offset ^= 0x200;
-				}
-			}
-		}
-		else
-		{
-			offset = (offset & ~0x180) | (((offset & 0x180) + 0x80) & 0x180);
-			if((x&0x180) == 0x100)
-			{
-				offset ^= 0x400;
-				if((x&0x480) == 0x400)
-					offset ^= 0x200;
-			}
-		}
-		if((x&0x7) < 0x03)
-		{
-			if(!(x&0x800))
-			{
-				offset ^= 0x4000;
-				if(x&0x4000)
-				{
-					offset ^= 0x08;
-					if(x&0x08)
-						offset = (offset & ~0x70) | (((offset & 0x70) + 0x10) & 0x70);
-				}
-			}
-			offset ^= 0x800;
-		}
-		if((x & 0x30000) == 0x10000)
-			source = x;
-		else
-			source = x ^ 0x2000;
-
-		dst[source] = (src[offset] << 4 & 0xF0F0F0F0) | (src[offset] >> 4 & 0x0F0F0F0F);
-	}
-}
 
 ROM_START( galsnew ) /* EXPRO-02 PCB */
 	ROM_REGION( 0x40000, "main", 0 )	/* 68000 code */
@@ -651,6 +590,40 @@ ROM_START( galsnewj ) /* EXPRO-02 PCB */
 	ROM_RELOAD(             0x40000, 0x80000 )
 	ROM_LOAD( "pm007j.u47", 0xc0000, 0x80000, CRC(06780287) SHA1(8b9b57f6604b86d6dff42e5e51cd59a7111e1e79) )
 ROM_END
+
+
+
+DRIVER_INIT(galsnew)
+{
+	UINT32 *src = (UINT32 *)memory_region(machine, "gfx3" );
+	UINT32 *dst = (UINT32 *)memory_region(machine, "gfx2" );
+	int x, offset;
+
+
+	for (x = 0; x < 0x80000; x++)
+	{
+		offset = x;
+
+		// swap bits around to simplify further processing
+		offset = BITSWAP24(offset, 23,22,21,20,19, 18,15, 9,10,8,7,12,13,16,17, 6,5,4,3,14,11,2,1,0);
+
+		// invert 8 bits
+		offset ^= 0x0528f;
+
+		// addition affecting 9 bits
+		offset = (offset & ~0x001ff) | ((offset + 0x00043) & 0x001ff);
+
+		// subtraction affecting 8 bits
+		offset = (offset & ~0x1fe00) | ((offset - 0x09600) & 0x1fe00);
+
+		// reverse the initial bitswap
+		offset = BITSWAP24(offset, 23,22,21,20,19, 18,9,10,17,4,11,12,3,15,16,14,13,8,7,6,5,2,1,0);
+
+		// swap nibbles to use the same gfxdecode
+		dst[x] = (src[offset] << 4 & 0xF0F0F0F0) | (src[offset] >> 4 & 0x0F0F0F0F);
+	}
+}
+
 
 
 GAME( 1990, galsnew,  0,       galsnew, galsnew,  galsnew, ROT90, "Kaneko", "Gals Panic (US, EXPRO-02 PCB)", 0 )
