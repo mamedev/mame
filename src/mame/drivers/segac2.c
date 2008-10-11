@@ -100,7 +100,7 @@ static UINT8 		prot_write_buf;		/* remembers what was written */
 static UINT8		prot_read_buf;		/* remembers what was returned */
 
 /* palette-related variables */
-static UINT8		alt_palette_mode;
+UINT8		segac2_alt_palette_mode;
 static UINT8		palbank;
 static UINT8		bg_palbase;
 static UINT8		sp_palbase;
@@ -145,7 +145,7 @@ static MACHINE_RESET( segac2 )
 	/* reset the protection */
 	prot_write_buf = 0;
 	prot_read_buf = 0;
-	alt_palette_mode = 0;
+	segac2_alt_palette_mode = 0;
 
 	palbank = 0;
 	bg_palbase = 0;
@@ -242,7 +242,7 @@ static WRITE16_HANDLER( segac2_upd7759_w )
 static READ16_HANDLER( palette_r )
 {
 	offset &= 0x1ff;
-	if (alt_palette_mode)
+	if (segac2_alt_palette_mode)
 		offset = ((offset << 1) & 0x100) | ((offset << 2) & 0x80) | ((~offset >> 2) & 0x40) | ((offset >> 1) & 0x20) | (offset & 0x1f);
 	return paletteram16[offset + palbank * 0x200];
 }
@@ -253,10 +253,10 @@ extern UINT16* megadrive_vdp_palette_lookup_shadow;
 extern UINT16* megadrive_vdp_palette_lookup_highlight;
 
 
-UINT16 megadrive_vdp_palette_lookup_segac2[0x800];
-UINT16 megadrive_vdp_palette_lookup_sprite_segac2[0x800];
-UINT16 megadrive_vdp_palette_lookup_shadow_segac2[0x800];
-UINT16 megadrive_vdp_palette_lookup_highlight_segac2[0x800];
+UINT16* megadrive_vdp_palette_lookup_segac2;
+UINT16* megadrive_vdp_palette_lookup_sprite_segac2;
+UINT16* megadrive_vdp_palette_lookup_shadow_segac2;
+UINT16* megadrive_vdp_palette_lookup_highlight_segac2;
 
 
 /* handle writes to the paletteram */
@@ -267,7 +267,7 @@ static WRITE16_HANDLER( palette_w )
 
 	/* adjust for the palette bank */
 	offset &= 0x1ff;
-	if (alt_palette_mode)
+	if (segac2_alt_palette_mode)
 		offset = ((offset << 1) & 0x100) | ((offset << 2) & 0x80) | ((~offset >> 2) & 0x40) | ((offset >> 1) & 0x20) | (offset & 0x1f);
 	offset += palbank * 0x200;
 
@@ -326,35 +326,29 @@ static WRITE16_HANDLER( palette_w )
 
 ******************************************************************************/
 
+extern int segac2_bg_pal_lookup[4];
+extern int segac2_sp_pal_lookup[4];
+
 static void recompute_palette_tables(void)
 {
 	int i;
-
-	int genesis_bg_pal_lookup[4];
-	int genesis_sp_pal_lookup[4];
 
 	for (i = 0; i < 4; i++)
 	{
 		int bgpal = 0x000 + bg_palbase * 0x40 + i * 0x10;
 		int sppal = 0x100 + sp_palbase * 0x40 + i * 0x10;
 
-		if (!alt_palette_mode)
+		if (!segac2_alt_palette_mode)
 		{
-			genesis_bg_pal_lookup[i] = bgpal;
-			genesis_sp_pal_lookup[i] = sppal;
+			segac2_bg_pal_lookup[i] = 0x200 * palbank + bgpal;
+			segac2_sp_pal_lookup[i] = 0x200 * palbank + sppal;
 		}
 		else
 		{
-			genesis_bg_pal_lookup[i] = ((bgpal << 1) & 0x180) + ((~bgpal >> 2) & 0x40) + (bgpal & 0x30);
-			genesis_sp_pal_lookup[i] = ((~sppal << 2) & 0x100) + ((sppal << 2) & 0x80) + ((~sppal >> 2) & 0x40) + ((sppal >> 2) & 0x20) + (sppal & 0x10);
+			segac2_bg_pal_lookup[i] = 0x200 * palbank + ((bgpal << 1) & 0x180) + ((~bgpal >> 2) & 0x40) + (bgpal & 0x30);
+			segac2_sp_pal_lookup[i] = 0x200 * palbank + ((~sppal << 2) & 0x100) + ((sppal << 2) & 0x80) + ((~sppal >> 2) & 0x40) + ((sppal >> 2) & 0x20) + (sppal & 0x10);
 		}
 	}
-
-	megadrive_vdp_palette_lookup = &megadrive_vdp_palette_lookup_segac2[palbank * 0x200 + bg_palbase * 0x40];
-	megadrive_vdp_palette_lookup_sprite = &megadrive_vdp_palette_lookup_sprite_segac2[palbank * 0x200 + 0x100+sp_palbase * 0x40];
-	megadrive_vdp_palette_lookup_shadow = &megadrive_vdp_palette_lookup_shadow_segac2[palbank * 0x200 + bg_palbase * 0x40];
-	megadrive_vdp_palette_lookup_highlight = &megadrive_vdp_palette_lookup_highlight_segac2[palbank * 0x200 + bg_palbase * 0x40];
-
 
 }
 
@@ -522,7 +516,7 @@ static WRITE16_HANDLER( control_w )
 		prot_write_buf = prot_read_buf = 0;
 
 	/* bit 2 controls palette shuffling; only ribbit and twinsqua use this feature */
-	alt_palette_mode = ((~data & 4) >> 2);
+	segac2_alt_palette_mode = ((~data & 4) >> 2);
 	recompute_palette_tables();
 }
 
@@ -1389,6 +1383,12 @@ static const ym3438_interface ym3438_intf =
 VIDEO_START(segac2_new)
 {
 	VIDEO_START_CALL(megadriv);
+
+
+	megadrive_vdp_palette_lookup_segac2 = auto_malloc(0x1000);
+	megadrive_vdp_palette_lookup_sprite_segac2 = auto_malloc(0x1000);
+	megadrive_vdp_palette_lookup_shadow_segac2 = auto_malloc(0x1000);
+	megadrive_vdp_palette_lookup_highlight_segac2 = auto_malloc(0x1000);
 
 	megadrive_vdp_palette_lookup = megadrive_vdp_palette_lookup_segac2;
 	megadrive_vdp_palette_lookup_sprite = megadrive_vdp_palette_lookup_sprite_segac2;

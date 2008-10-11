@@ -72,6 +72,9 @@ static int megadrive_vblank_flag = 0;
 static int megadrive_irq6_pending = 0;
 static int megadrive_irq4_pending = 0;
 
+int segac2_bg_pal_lookup[4] = { 0x00, 0x10, 0x20, 0x30 };
+int segac2_sp_pal_lookup[4] = { 0x00, 0x10, 0x20, 0x30 };
+
 // hacks for C2
 int genvdp_use_cram = 1; // c2 uses it's own palette ram
 int genesis_has_z80 = 1; // c2 doesn't have a z80..
@@ -3015,6 +3018,17 @@ VIDEO_START(megadriv)
 
 	memset(megadrive_vdp_palette_lookup_shadow,0x00,0x40*2);
 	memset(megadrive_vdp_palette_lookup_highlight,0x00,0x40*2);
+
+	/* no special lookups */
+	segac2_bg_pal_lookup[0] = 0x00;
+	segac2_bg_pal_lookup[1] = 0x10;
+	segac2_bg_pal_lookup[2] = 0x20;
+	segac2_bg_pal_lookup[3] = 0x30;
+
+	segac2_sp_pal_lookup[0] = 0x00;
+	segac2_sp_pal_lookup[1] = 0x10;
+	segac2_sp_pal_lookup[2] = 0x20;
+	segac2_sp_pal_lookup[3] = 0x30;
 }
 
 VIDEO_UPDATE(megadriv)
@@ -4306,9 +4320,9 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 			UINT32 dat;
 			dat = video_renderline[x];
 			if (dat&0x10000)
-				lineptr[x] = megadrive_vdp_palette_lookup_sprite[dat&0x3f];
+				lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat&0x0f) | segac2_sp_pal_lookup[(dat&0x30)>>4]];
 			else
-				lineptr[x] = megadrive_vdp_palette_lookup[dat&0x3f];
+				lineptr[x] = megadrive_vdp_palette_lookup[(dat&0x0f) | segac2_bg_pal_lookup[(dat&0x30)>>4]];
 		}
 	}
 	else
@@ -4328,31 +4342,29 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 				case 0x10000: // (sprite) low priority, no shadow sprite, no highlight = shadow
 				case 0x12000: // (sprite) low priority, shadow sprite, no highlight = shadow
 				case 0x16000: // (sprite) normal pri,   shadow sprite, no highlight = shadow?
-					lineptr[x] = megadrive_vdp_palette_lookup_shadow[dat&0x3f];
+					lineptr[x] = megadrive_vdp_palette_lookup_shadow[(dat&0x0f)  | segac2_bg_pal_lookup[(dat&0x30)>>4]];
 					break;
 
 				case 0x4000: // normal pri, no shadow sprite, no highlight = normal;
 				case 0x8000: // low pri, highlight sprite = normal;
-					lineptr[x] = megadrive_vdp_palette_lookup[dat&0x3f];
+					lineptr[x] = megadrive_vdp_palette_lookup[(dat&0x0f)  | segac2_bg_pal_lookup[(dat&0x30)>>4]];
 					break;
 
 				case 0x14000: // (sprite) normal pri, no shadow sprite, no highlight = normal;
 				case 0x18000: // (sprite) low pri, highlight sprite = normal;
-					lineptr[x] = megadrive_vdp_palette_lookup_sprite[dat&0x3f];
+					lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat&0x0f)  | segac2_sp_pal_lookup[(dat&0x30)>>4]];
 					break;
 
 
 				case 0x0c000: // normal pri, highlight set = highlight?
 				case 0x1c000: // (sprite) normal pri, highlight set = highlight?
-					lineptr[x] = megadrive_vdp_palette_lookup_highlight[dat&0x3f];
+					lineptr[x] = megadrive_vdp_palette_lookup_highlight[(dat&0x0f) | segac2_bg_pal_lookup[(dat&0x30)>>4]];
 					break;
 
 				case 0x0a000: // shadow set, highlight set - not possible
 				case 0x0e000: // shadow set, highlight set, normal set, not possible
 				case 0x1a000: // (sprite)shadow set, highlight set - not possible
 				case 0x1e000: // (sprite)shadow set, highlight set, normal set, not possible
-					lineptr[x] = megadrive_vdp_palette_lookup_highlight[mame_rand(machine)&0x3f];
-
 				default:
 					lineptr[x] = mame_rand(Machine)&0x3f;
 				break;
