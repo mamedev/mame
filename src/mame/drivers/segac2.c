@@ -1,6 +1,6 @@
 /***********************************************************************************************
 
-    Sega System C/C2 Driver
+    Sega System C (System 14)/C2 Driver
     driver by David Haywood and Aaron Giles
     ---------------------------------------
     Last Update 15 Nov 2005
@@ -63,29 +63,17 @@
             Sega for producing some Fantastic Games...
             and anyone else who knows they've contributed :)
 
-************************************************************************************************
-
-    Hiscores:
-
-    Bloxeed  @ f400-????            [key = ???]
-    Columns  @ fc00-ffff            [key = '(C) SEGA 1990.JAN BY.TAKOSUKEZOU' @ fc00,ffe0]
-    Columns2 @ fc00-ffff            [key = '(C) SEGA 1990.SEP.COLUMNS2 JAPAN' @ fc00,fd00,fe00,ffe0]
-    Borench  @ f400-f5ff            [key = 'EIJI' in last word]
-    TForceAC @ 8100-817f/8180-81ff  [key = '(c)Tehcno soft90' @ 8070 and 80f0]
-    TantR    @ fc00-fcff/fd00-fdff  [key = 0xd483 in last word]
-    PuyoPuyo @ fc00-fdff/fe00-ffff  [key = 0x28e1 in first word]
-    Ichidant @ fc00-fcff/fd00-fdff  [key = 0x85a9 in last word]
-    StkClmns @ fc00-fc7f/fc80-fcff  [key = ???]
-    PuyoPuy2
-    PotoPoto
-    ZunkYou
-
 ***********************************************************************************************/
 
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "genesis.h"
+//#include "genesis.h"
+#include "megadriv.h"
+#include "sound/okim6295.h"
+#include "sound/sn76496.h"
+#include "sound/2612intf.h"
+#include "sound/upd7759.h"
 
 #define XL1_CLOCK			640000
 #define XL2_CLOCK			53693175
@@ -96,7 +84,7 @@
 #define LOG_IOCHIP			0
 
 
-
+static void recompute_palette_tables(void);
 
 /******************************************************************************
     Global variables
@@ -118,7 +106,6 @@ static UINT8		sp_palbase;
 
 /* sound-related variables */
 static UINT8		sound_banks;		/* number of sound banks */
-static UINT8		bloxeed_sound;		/* use kludge for bloxeed sound? */
 
 
 
@@ -137,14 +124,17 @@ static MACHINE_START( segac2 )
 	state_save_register_global(prot_write_buf);
 	state_save_register_global(prot_read_buf);
 
-	MACHINE_START_CALL(genesis);
+//	MACHINE_START_CALL(genesis);
 }
 
 
 static MACHINE_RESET( segac2 )
 {
+	megadrive_ram = generic_nvram16;
+
 	/* set up interrupts and such */
-	MACHINE_RESET_CALL(genesis);
+	MACHINE_RESET_CALL(megadriv);
+
 
 	/* determine how many sound banks */
 	sound_banks = 0;
@@ -159,6 +149,9 @@ static MACHINE_RESET( segac2 )
 	palbank = 0;
 	bg_palbase = 0;
 	sp_palbase = 0;
+
+	recompute_palette_tables();
+
 }
 
 
@@ -197,13 +190,6 @@ static WRITE16_HANDLER( ym3438_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		static UINT8 last_port;
-
-		/* kludge for Bloxeed - it seems to accidentally trip timer 2  */
-		/* and has no recourse for clearing the interrupt; until we    */
-		/* find more documentation on the 2612/3438, it's unknown what */
-		/* to do here */
-		if (bloxeed_sound && last_port == 0x27 && (offset & 1))
-			data &= ~0x08;
 
 		switch (offset)
 		{
@@ -260,11 +246,23 @@ static READ16_HANDLER( palette_r )
 	return paletteram16[offset + palbank * 0x200];
 }
 
+extern UINT16* megadrive_vdp_palette_lookup;
+extern UINT16* megadrive_vdp_palette_lookup_sprite; // for C2
+extern UINT16* megadrive_vdp_palette_lookup_shadow;
+extern UINT16* megadrive_vdp_palette_lookup_highlight;
+
+
+UINT16 megadrive_vdp_palette_lookup_segac2[0x800];
+UINT16 megadrive_vdp_palette_lookup_sprite_segac2[0x800];
+UINT16 megadrive_vdp_palette_lookup_shadow_segac2[0x800];
+UINT16 megadrive_vdp_palette_lookup_highlight_segac2[0x800];
+
 
 /* handle writes to the paletteram */
 static WRITE16_HANDLER( palette_w )
 {
 	int r,g,b,newword;
+	int tmpr,tmpg,tmpb;
 
 	/* adjust for the palette bank */
 	offset &= 0x1ff;
@@ -283,6 +281,16 @@ static WRITE16_HANDLER( palette_w )
 
 	/* set the color */
 	palette_set_color_rgb(machine, offset, pal5bit(r), pal5bit(g), pal5bit(b));
+
+	megadrive_vdp_palette_lookup_segac2[offset] = (b) | (g<<5) | (r<<10);
+	megadrive_vdp_palette_lookup_sprite_segac2[offset] = (b) | (g<<5) | (r<<10);
+
+	tmpr = r>>1;tmpg=g>>1;tmpb=b>>1;
+	megadrive_vdp_palette_lookup_shadow_segac2[offset] = (tmpb) | (tmpg<<5) | (tmpr<<10);
+
+	// how is it calculated on c2?
+	tmpr = tmpr|0x10; 	tmpg = tmpg|0x10; 	tmpb = tmpb|0x10;
+	megadrive_vdp_palette_lookup_highlight_segac2[offset] = (tmpb) | (tmpg<<5) | (tmpr<<10);
 }
 
 
@@ -321,6 +329,9 @@ static void recompute_palette_tables(void)
 {
 	int i;
 
+	int genesis_bg_pal_lookup[4];
+	int genesis_sp_pal_lookup[4];
+
 	for (i = 0; i < 4; i++)
 	{
 		int bgpal = 0x000 + bg_palbase * 0x40 + i * 0x10;
@@ -328,15 +339,22 @@ static void recompute_palette_tables(void)
 
 		if (!alt_palette_mode)
 		{
-			genesis_bg_pal_lookup[i] = palbank * 0x200 + bgpal;
-			genesis_sp_pal_lookup[i] = palbank * 0x200 + sppal;
+			genesis_bg_pal_lookup[i] = bgpal;
+			genesis_sp_pal_lookup[i] = sppal;
 		}
 		else
 		{
-			genesis_bg_pal_lookup[i] = palbank * 0x200 + ((bgpal << 1) & 0x180) + ((~bgpal >> 2) & 0x40) + (bgpal & 0x30);
-			genesis_sp_pal_lookup[i] = palbank * 0x200 + ((~sppal << 2) & 0x100) + ((sppal << 2) & 0x80) + ((~sppal >> 2) & 0x40) + ((sppal >> 2) & 0x20) + (sppal & 0x10);
+			genesis_bg_pal_lookup[i] = ((bgpal << 1) & 0x180) + ((~bgpal >> 2) & 0x40) + (bgpal & 0x30);
+			genesis_sp_pal_lookup[i] = ((~sppal << 2) & 0x100) + ((sppal << 2) & 0x80) + ((~sppal >> 2) & 0x40) + ((sppal >> 2) & 0x20) + (sppal & 0x10);
 		}
 	}
+
+	megadrive_vdp_palette_lookup = &megadrive_vdp_palette_lookup_segac2[palbank * 0x200 + bg_palbase * 0x40];
+	megadrive_vdp_palette_lookup_sprite = &megadrive_vdp_palette_lookup_sprite_segac2[palbank * 0x200 + 0x100+sp_palbase * 0x40];
+	megadrive_vdp_palette_lookup_shadow = &megadrive_vdp_palette_lookup_shadow_segac2[palbank * 0x200 + bg_palbase * 0x40];
+	megadrive_vdp_palette_lookup_highlight = &megadrive_vdp_palette_lookup_highlight_segac2[palbank * 0x200 + bg_palbase * 0x40];
+
+
 }
 
 
@@ -456,7 +474,7 @@ static WRITE16_HANDLER( io_chip_w )
 			newbank = data & 3;
 			if (newbank != palbank)
 			{
-				video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) + 1);
+				//video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) + 1);
 				palbank = newbank;
 				recompute_palette_tables();
 			}
@@ -495,7 +513,7 @@ static WRITE16_HANDLER( control_w )
 	data &= 0x0f;
 
 	/* bit 0 controls display enable */
-	segac2_enable_display(machine, ~data & 1);
+	//segac2_enable_display(machine, ~data & 1);
 
 	/* bit 1 resets the protection */
 	if (!(data & 2))
@@ -658,7 +676,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x880000, 0x880001) AM_MIRROR(0x13fefe) AM_WRITE(segac2_upd7759_w)
 	AM_RANGE(0x880100, 0x880101) AM_MIRROR(0x13fefe) AM_WRITE(counter_timer_w)
 	AM_RANGE(0x8c0000, 0x8c0fff) AM_MIRROR(0x13f000) AM_READWRITE(palette_r, palette_w) AM_BASE(&paletteram16)
-	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x18ff00) AM_READWRITE(genesis_vdp_r, genesis_vdp_w)
+	AM_RANGE(0xc00000, 0xc0001f) AM_MIRROR(0x18ff00) AM_READWRITE(megadriv_vdp_r, megadriv_vdp_w)
 	AM_RANGE(0xe00000, 0xe0ffff) AM_MIRROR(0x1f0000) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 ADDRESS_MAP_END
 
@@ -1342,9 +1360,14 @@ INPUT_PORTS_END
     Sound interfaces
 ******************************************************************************/
 
+void  segac2_irq2_interrupt(running_machine *machine, int state)
+{
+	//printf("sound irq %d\n", state);
+	cpunum_set_input_line(machine, 0, 2, state ? ASSERT_LINE : CLEAR_LINE);
+}
 static const ym3438_interface ym3438_intf =
 {
-	genesis_irq2_interrupt		/* IRQ handler */
+	segac2_irq2_interrupt,		/* IRQ handler */
 };
 
 
@@ -1361,30 +1384,50 @@ static const ym3438_interface ym3438_intf =
 
 ******************************************************************************/
 
+VIDEO_START(segac2_new)
+{
+	VIDEO_START_CALL(megadriv);
+
+	megadrive_vdp_palette_lookup = megadrive_vdp_palette_lookup_segac2;
+	megadrive_vdp_palette_lookup_sprite = megadrive_vdp_palette_lookup_sprite_segac2;
+	megadrive_vdp_palette_lookup_shadow = megadrive_vdp_palette_lookup_shadow_segac2;
+	megadrive_vdp_palette_lookup_highlight = megadrive_vdp_palette_lookup_highlight_segac2;
+
+}
+
+VIDEO_UPDATE(segac2_new)
+{
+	VIDEO_UPDATE_CALL(megadriv);
+	return 0;
+}
+
+
 static MACHINE_DRIVER_START( segac )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M68000, XL2_CLOCK/6)
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
-	MDRV_CPU_VBLANK_INT("main", genesis_vblank_interrupt)
+
 
 	MDRV_MACHINE_START(segac2)
 	MDRV_MACHINE_RESET(segac2)
 	MDRV_NVRAM_HANDLER(generic_randfill)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
+	//MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
 
-	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_ADD("megadriv", RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(342,262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 223)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
+	MDRV_SCREEN_SIZE(64*8, 64*8)
+	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 
 	MDRV_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(segac2)
-	MDRV_VIDEO_UPDATE(segac2)
+	MDRV_VIDEO_START(segac2_new)
+	MDRV_VIDEO_UPDATE(segac2_new)
+	MDRV_VIDEO_EOF( megadriv )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1414,16 +1457,6 @@ MACHINE_DRIVER_END
 /******************************************************************************
     Rom Definitions
 *******************************************************************************
-
-    All the known System C/C2 Dumps are listed here with the exception of
-    the version of Puzzle & Action (I believe its actually Ichidant-R) which
-    was credited to SpainDumps in the included text file.  This appears to be
-    a bad dump (half sized roms) however the roms do not match up exactly with
-    the good dump of the game.  English language sets are assumed to be the
-    parent where they exist.  Hopefully some more alternate version dumps will
-    turn up sometime soon for example English Language version of Tant-R or
-    Japanese Language versions of Borench (if of course these games were
-    released in other locations.
 
     Games are in Order of Date (Year) with System-C titles coming first.
 
@@ -1827,10 +1860,22 @@ it should be, otherwise I don't see how the formula could be computed.
 
 ******************************************************************************/
 
-static void segac2_common_init(int (*func)(int in))
+extern int genvdp_use_cram;
+extern int genesis_has_z80;
+extern int genesis_always_irq6;
+extern int genesis_other_hacks;
+extern DRIVER_INIT( megadriv_c2 );
+
+static void segac2_common_init(running_machine* machine, int (*func)(int in))
 {
+	DRIVER_INIT_CALL( megadriv_c2 );
+
 	prot_func = func;
-	bloxeed_sound = 0;
+
+	genvdp_use_cram = 0;
+	genesis_has_z80 = 0;
+	genesis_always_irq6 = 1;
+	genesis_other_hacks = 0;
 }
 
 
@@ -2060,118 +2105,120 @@ static int prot_func_pclubjv5(int in)
 
 static DRIVER_INIT( c2boot )
 {
-	segac2_common_init(NULL);
+	segac2_common_init(machine, NULL);
 }
 
 static DRIVER_INIT( bloxeedc )
 {
-	segac2_common_init(NULL);
-	bloxeed_sound = 1;
+	segac2_common_init(machine, NULL);
 }
 
 static DRIVER_INIT( columns )
 {
-	segac2_common_init(prot_func_columns);
+	segac2_common_init(machine, prot_func_columns);
 }
 
 static DRIVER_INIT( columns2 )
 {
-	segac2_common_init(prot_func_columns2);
+	segac2_common_init(machine, prot_func_columns2);
 }
 
 static DRIVER_INIT( tfrceac )
 {
-	segac2_common_init(prot_func_tfrceac);
+	segac2_common_init(machine, prot_func_tfrceac);
 }
 
 static DRIVER_INIT( tfrceacb )
 {
 	/* disable the palette bank switching from the protection chip */
-	segac2_common_init(NULL);
+	segac2_common_init(machine, NULL);
 	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x800000, 0x800001, 0, 0, SMH_NOP);
 }
 
 static DRIVER_INIT( borench )
 {
-	segac2_common_init(prot_func_borench);
+	segac2_common_init(machine, prot_func_borench);
 }
 
 static DRIVER_INIT( twinsqua )
 {
-	segac2_common_init(prot_func_twinsqua);
+	segac2_common_init(machine, prot_func_twinsqua);
 }
 
 static DRIVER_INIT( ribbit )
 {
-	segac2_common_init(prot_func_ribbit);
+	segac2_common_init(machine, prot_func_ribbit);
 }
 
 static DRIVER_INIT( puyo )
 {
-	segac2_common_init(prot_func_puyo);
+	segac2_common_init(machine, prot_func_puyo);
 }
 
 static DRIVER_INIT( tantr )
 {
-	segac2_common_init(prot_func_tantr);
+	segac2_common_init(machine, prot_func_tantr);
 }
 
 static DRIVER_INIT( tantrkor )
 {
-	segac2_common_init(prot_func_tantrkor);
+	segac2_common_init(machine, prot_func_tantrkor);
 }
 
 static DRIVER_INIT( potopoto )
 {
-	segac2_common_init(prot_func_potopoto);
+	segac2_common_init(machine, prot_func_potopoto);
 }
 
 static DRIVER_INIT( stkclmns )
 {
-	segac2_common_init(prot_func_stkclmns);
+	segac2_common_init(machine, prot_func_stkclmns);
 }
 
 static DRIVER_INIT( stkclmnj )
 {
-	segac2_common_init(prot_func_stkclmnj);
+	segac2_common_init(machine, prot_func_stkclmnj);
 }
 
 static DRIVER_INIT( ichir )
 {
-	segac2_common_init(prot_func_ichir);
+	segac2_common_init(machine, prot_func_ichir);
 }
 
 static DRIVER_INIT( ichirk )
 {
-	segac2_common_init(prot_func_ichirk);
+	segac2_common_init(machine, prot_func_ichirk);
 }
 
 static DRIVER_INIT( ichirj )
 {
-	segac2_common_init(prot_func_ichirj);
+	segac2_common_init(machine, prot_func_ichirj);
 }
 
 static DRIVER_INIT( ichirjbl )
 {
+
 	/* when did this actually work? - the protection is patched but the new check fails? */
 	UINT16 *rom = (UINT16 *)memory_region(machine, "main");
 	rom[0x390/2] = 0x6600;
+
+	segac2_common_init(machine, NULL);
 }
 
 static DRIVER_INIT( puyopuy2 )
 {
-	segac2_common_init(prot_func_puyopuy2);
+	segac2_common_init(machine, prot_func_puyopuy2);
 }
 
 static DRIVER_INIT( zunkyou )
 {
-	segac2_common_init(prot_func_zunkyou);
+	segac2_common_init(machine, prot_func_zunkyou);
 }
 
 
 static DRIVER_INIT( pclub )
 {
-	segac2_common_init(prot_func_pclub);
+	segac2_common_init(machine, prot_func_pclub);
 
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
@@ -2180,7 +2227,7 @@ static DRIVER_INIT( pclub )
 
 static DRIVER_INIT( pclubjv2 )
 {
-	segac2_common_init(prot_func_pclubjv2);
+	segac2_common_init(machine, prot_func_pclubjv2);
 
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
@@ -2189,7 +2236,7 @@ static DRIVER_INIT( pclubjv2 )
 
 static DRIVER_INIT( pclubjv4 )
 {
-	segac2_common_init(prot_func_pclubjv4);
+	segac2_common_init(machine, prot_func_pclubjv4);
 
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/
@@ -2198,7 +2245,7 @@ static DRIVER_INIT( pclubjv4 )
 
 static DRIVER_INIT( pclubjv5 )
 {
-	segac2_common_init(prot_func_pclubjv5);
+	segac2_common_init(machine, prot_func_pclubjv5);
 
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880120, 0x880121, 0, 0, printer_r );/*Print Club Vol.1*/
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x880124, 0x880125, 0, 0, printer_r );/*Print Club Vol.2*/

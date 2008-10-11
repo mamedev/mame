@@ -53,6 +53,7 @@ Known Non-Issues (confirmed on Real Genesis)
 #include "cpu/m68000/m68000.h"
 #include "megadriv.h"
 
+
 #define MEGADRIV_VDP_VRAM(address) megadrive_vdp_vram[(address)&0x7fff]
 
 /* the same on all systems? */
@@ -71,14 +72,21 @@ static int megadrive_vblank_flag = 0;
 static int megadrive_irq6_pending = 0;
 static int megadrive_irq4_pending = 0;
 
+// hacks for C2
+int genvdp_use_cram = 1; // c2 uses it's own palette ram
+int genesis_has_z80 = 1; // c2 doesn't have a z80..
+int genesis_always_irq6 = 0; // c2 never enables the irq6, different source??
+int genesis_other_hacks = 1; // misc hacks
+
 INLINE UINT16 get_hposition(void);
 
 static UINT8* sprite_renderline;
 static UINT8* highpri_renderline;
-static UINT16* video_renderline;
-static UINT16* megadrive_vdp_palette_lookup;
-static UINT16* megadrive_vdp_palette_lookup_shadow;
-static UINT16* megadrive_vdp_palette_lookup_highlight;
+static UINT32* video_renderline;
+UINT16* megadrive_vdp_palette_lookup;
+UINT16* megadrive_vdp_palette_lookup_sprite; // for C2
+UINT16* megadrive_vdp_palette_lookup_shadow;
+UINT16* megadrive_vdp_palette_lookup_highlight;
 UINT16* megadrive_ram;
 static UINT8 megadrive_vram_fill_pending = 0;
 static UINT16 megadrive_vram_fill_length = 0;
@@ -376,7 +384,7 @@ static void write_cram_value(running_machine *machine, int offset, int data)
 	megadrive_vdp_cram[offset] = data;
 
 	//logerror("Wrote to CRAM addr %04x data %04x\n",megadrive_vdp_address&0xfffe,megadrive_vdp_cram[megadrive_vdp_address>>1]);
-
+	if (genvdp_use_cram)
 	{
 		int r,g,b;
 	  	r = ((data >> 1)&0x07);
@@ -384,9 +392,9 @@ static void write_cram_value(running_machine *machine, int offset, int data)
 		b = ((data >> 9)&0x07);
 		palette_set_color_rgb(machine,offset,pal3bit(r),pal3bit(g),pal3bit(b));
 		megadrive_vdp_palette_lookup[offset] = (b<<2) | (g<<7) | (r<<12);
+		megadrive_vdp_palette_lookup_sprite[offset] = (b<<2) | (g<<7) | (r<<12);
 		megadrive_vdp_palette_lookup_shadow[offset] = (b<<1) | (g<<6) | (r<<11);
 		megadrive_vdp_palette_lookup_highlight[offset] = ((b|0x08)<<1) | ((g|0x08)<<6) | ((r|0x08)<<11);
-
 	}
 }
 
@@ -530,7 +538,7 @@ static void megadrive_vdp_set_register(running_machine *machine, int regnum, UIN
 	{
 		if (megadrive_irq6_pending)
 		{
-			if (MEGADRIVE_REG01_IRQ6_ENABLE)
+			if (MEGADRIVE_REG01_IRQ6_ENABLE )
 				cpunum_set_input_line(machine, 0,6,HOLD_LINE);
 			else
 				cpunum_set_input_line(machine, 0,6,CLEAR_LINE);
@@ -2994,13 +3002,17 @@ VIDEO_START(megadriv)
 
 	sprite_renderline = auto_malloc(1024);
 	highpri_renderline = auto_malloc(320);
-	video_renderline = auto_malloc(320*2);
+	video_renderline = auto_malloc(320*4);
 
 	megadrive_vdp_palette_lookup = auto_malloc(0x40*2);
+	megadrive_vdp_palette_lookup_sprite = auto_malloc(0x40*2);
+
 	megadrive_vdp_palette_lookup_shadow = auto_malloc(0x40*2);
 	megadrive_vdp_palette_lookup_highlight = auto_malloc(0x40*2);
 
 	memset(megadrive_vdp_palette_lookup,0x00,0x40*2);
+	memset(megadrive_vdp_palette_lookup_sprite,0x00,0x40*2);
+
 	memset(megadrive_vdp_palette_lookup_shadow,0x00,0x40*2);
 	memset(megadrive_vdp_palette_lookup_highlight,0x00,0x40*2);
 }
@@ -4172,7 +4184,11 @@ static void genesis_render_videoline_to_videobuffer(int scanline)
 		{
 			if (!MEGADRIVE_REG0C_SHADOW_HIGLIGHT)
 			{
-				if (sprite_renderline[x+128] & 0x40) video_renderline[x] = sprite_renderline[x+128]&0x3f;
+				if (sprite_renderline[x+128] & 0x40)
+				{
+					video_renderline[x] = sprite_renderline[x+128]&0x3f;
+					video_renderline[x] |= 0x10000; // mark as sprite pixel
+				}
 			}
 			else
 			{	/* Special Shadow / Highlight processing */
@@ -4186,6 +4202,7 @@ static void genesis_render_videoline_to_videobuffer(int scanline)
 					{
 						/* BUG in sprite chip, these colours are always normal intensity */
 						video_renderline[x] = spritedata | 0x4000;
+						video_renderline[x] |= 0x10000; // mark as sprite pixel
 					}
 					else if (spritedata==0x3e)
 					{
@@ -4201,6 +4218,7 @@ static void genesis_render_videoline_to_videobuffer(int scanline)
 					else
 					{
 						video_renderline[x] = spritedata;
+						video_renderline[x] |= 0x10000; // mark as sprite pixel
 					}
 
 				}
@@ -4240,7 +4258,11 @@ static void genesis_render_videoline_to_videobuffer(int scanline)
 			if (!MEGADRIVE_REG0C_SHADOW_HIGLIGHT)
 			{
 				/* Normal */
-				if (sprite_renderline[x+128] & 0x80) video_renderline[x] = sprite_renderline[x+128]&0x3f;
+				if (sprite_renderline[x+128] & 0x80)
+				{
+					video_renderline[x] = sprite_renderline[x+128]&0x3f;
+					video_renderline[x] |= 0x10000; // mark as sprite pixel
+				}
 			}
 			else
 			{
@@ -4262,10 +4284,10 @@ static void genesis_render_videoline_to_videobuffer(int scanline)
 					else
 					{
 						video_renderline[x] = spritedata | 0x4000;
+						video_renderline[x] |= 0x10000; // mark as sprite pixel
 					}
 				}
 			}
-
 		}
 }
 
@@ -4281,25 +4303,31 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 
 		for (x=0;x<320;x++)
 		{
-			UINT16 dat;
+			UINT32 dat;
 			dat = video_renderline[x];
-			lineptr[x] = megadrive_vdp_palette_lookup[dat&0x3f];
+			if (dat&0x10000)
+				lineptr[x] = megadrive_vdp_palette_lookup_sprite[dat&0x3f];
+			else
+				lineptr[x] = megadrive_vdp_palette_lookup[dat&0x3f];
 		}
 	}
 	else
 	{
 		for (x=0;x<320;x++)
 		{
-			UINT16 dat;
+			UINT32 dat;
 			dat = video_renderline[x];
 
 			/* Verify my handling.. I'm not sure all cases are correct */
 
-			switch (dat&0xe000)
+			switch (dat&0x1e000)
 			{
-				case 0x0000: // low priority, no shadow sprite, no highlight = shadow
-				case 0x2000: // low priority, shadow sprite, no highlight = shadow
-				case 0x6000: // normal pri,   shadow sprite, no highlight = shadow?
+				case 0x00000: // low priority, no shadow sprite, no highlight = shadow
+				case 0x02000: // low priority, shadow sprite, no highlight = shadow
+				case 0x06000: // normal pri,   shadow sprite, no highlight = shadow?
+				case 0x10000: // (sprite) low priority, no shadow sprite, no highlight = shadow
+				case 0x12000: // (sprite) low priority, shadow sprite, no highlight = shadow
+				case 0x16000: // (sprite) normal pri,   shadow sprite, no highlight = shadow?
 					lineptr[x] = megadrive_vdp_palette_lookup_shadow[dat&0x3f];
 					break;
 
@@ -4308,14 +4336,26 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 					lineptr[x] = megadrive_vdp_palette_lookup[dat&0x3f];
 					break;
 
-				case 0xc000: // normal pri, highlight set = highlight?
+				case 0x14000: // (sprite) normal pri, no shadow sprite, no highlight = normal;
+				case 0x18000: // (sprite) low pri, highlight sprite = normal;
+					lineptr[x] = megadrive_vdp_palette_lookup_sprite[dat&0x3f];
+					break;
+
+
+				case 0x0c000: // normal pri, highlight set = highlight?
+				case 0x1c000: // (sprite) normal pri, highlight set = highlight?
 					lineptr[x] = megadrive_vdp_palette_lookup_highlight[dat&0x3f];
 					break;
 
-				case 0xa000: // shadow set, highlight set - not possible
-				case 0xe000: // shadow set, highlight set, normal set, not possible
+				case 0x0a000: // shadow set, highlight set - not possible
+				case 0x0e000: // shadow set, highlight set, normal set, not possible
+				case 0x1a000: // (sprite)shadow set, highlight set - not possible
+				case 0x1e000: // (sprite)shadow set, highlight set, normal set, not possible
 					lineptr[x] = megadrive_vdp_palette_lookup_highlight[mame_rand(machine)&0x3f];
-					break;
+
+				default:
+					lineptr[x] = mame_rand(Machine)&0x3f;
+				break;
 
 
 			}
@@ -4707,7 +4747,8 @@ static TIMER_CALLBACK( scanline_timer_callback )
 
 
 
-
+if (genesis_has_z80)
+{
 		if (genesis_scanline_counter==megadrive_z80irq_scanline)
 		{
 			if ((genz80.z80_has_bus==1) && (genz80.z80_is_reset==0)) cpunum_set_input_line(machine, 1,0,HOLD_LINE);
@@ -4716,7 +4757,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 		{
 			cpunum_set_input_line(machine, 1,0,CLEAR_LINE);
 		}
-
+}
 
 	}
 	else /* pretend we're still on the same scanline to compensate for rounding errors */
@@ -4732,7 +4773,7 @@ static TIMER_CALLBACK( irq6_on_callback )
 
 	{
 //      megadrive_irq6_pending = 1;
-		if (MEGADRIVE_REG01_IRQ6_ENABLE) cpunum_set_input_line(machine, 0,6,HOLD_LINE);
+		if (MEGADRIVE_REG01_IRQ6_ENABLE || genesis_always_irq6) cpunum_set_input_line(machine, 0,6,HOLD_LINE);
 	}
 }
 
@@ -4785,7 +4826,8 @@ MACHINE_RESET( megadriv )
 		break;
 	}
 
-
+if (genesis_has_z80)
+{
 	genz80.z80_is_reset = 1;
 	cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
 	genz80.z80_has_bus = 1;
@@ -4793,6 +4835,7 @@ MACHINE_RESET( megadriv )
 	genz80.z80_bank_pos = 0;
 	genz80.z80_bank_addr = 0;
 	genesis_scanline_counter = -1;
+}
 
 	megadrive_imode = 0;
 
@@ -4808,18 +4851,23 @@ MACHINE_RESET( megadriv )
 	timer_adjust_oneshot(frame_timer, attotime_zero, 0);
 	timer_adjust_oneshot(scanline_timer,  attotime_zero, 0);
 
+if (genesis_other_hacks)
+{
 //  set_refresh_rate(megadriv_framerate);
 	cpunum_set_clockscale(machine, 0, 0.9950f); /* Fatal Rewind is very fussy... */
 //  cpunum_set_clockscale(machine, 0, 0.3800f); /* Fatal Rewind is very fussy... */
 
 	memset(megadrive_ram,0x00,0x10000);
-
+}
 
 	irq4counter = -1;
 	megadrive_total_scanlines = 262;
 	megadrive_visible_scanlines = 224;
 	megadrive_irq6_scanline = 224;
 	megadrive_z80irq_scanline = 226;
+
+
+
 }
 
 void megadriv_stop_scanline_timer(void)
@@ -5115,9 +5163,15 @@ static int megadriv_tas_callback(void)
 
 static void megadriv_init_common(running_machine *machine)
 {
+
+
+
+if (genesis_has_z80)
+{
 	genz80.z80_cpunum = 1;
 	genz80.z80_prgram = auto_malloc(0x2000);
 	memory_set_bankptr( 1, genz80.z80_prgram );
+}
 
 	cpunum_set_irq_callback(0, genesis_int_callback);
 	megadriv_backupram = NULL;
@@ -5161,9 +5215,28 @@ static void megadriv_init_common(running_machine *machine)
 
 }
 
+DRIVER_INIT( megadriv_c2 )
+{
+	genvdp_use_cram = 0;
+	genesis_has_z80 = 0;
+	genesis_always_irq6 = 1;
+	genesis_other_hacks = 0;
+
+	megadriv_init_common(machine);
+	hazemdchoice_megadrive_region_export = 1;
+	hazemdchoice_megadrive_region_pal = 0;
+	hazemdchoice_megadriv_framerate = 60;
+}
+
+
 
 DRIVER_INIT( megadriv )
 {
+	genvdp_use_cram = 1;
+	genesis_has_z80 = 1;
+	genesis_always_irq6 = 0;
+	genesis_other_hacks = 1;
+
 	megadriv_init_common(machine);
 	hazemdchoice_megadrive_region_export = 1;
 	hazemdchoice_megadrive_region_pal = 0;
@@ -5172,6 +5245,11 @@ DRIVER_INIT( megadriv )
 
 DRIVER_INIT( megadrij )
 {
+	genvdp_use_cram = 1;
+	genesis_has_z80 = 1;
+	genesis_always_irq6 = 0;
+	genesis_other_hacks = 1;
+
 	megadriv_init_common(machine);
 	hazemdchoice_megadrive_region_export = 0;
 	hazemdchoice_megadrive_region_pal = 0;
@@ -5180,6 +5258,11 @@ DRIVER_INIT( megadrij )
 
 DRIVER_INIT( megadrie )
 {
+	genvdp_use_cram = 1;
+	genesis_has_z80 = 1;
+	genesis_always_irq6 = 0;
+	genesis_other_hacks = 1;
+
 	megadriv_init_common(machine);
 	hazemdchoice_megadrive_region_export = 1;
 	hazemdchoice_megadrive_region_pal = 1;
@@ -5188,6 +5271,11 @@ DRIVER_INIT( megadrie )
 
 DRIVER_INIT( megadsvp )
 {
+	genvdp_use_cram = 1;
+	genesis_has_z80 = 1;
+	genesis_always_irq6 = 0;
+	genesis_other_hacks = 1;
+
 	megadriv_init_common(machine);
 	svp_init(machine);
 	hazemdchoice_megadrive_region_export = 1;
