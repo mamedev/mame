@@ -85,6 +85,7 @@
 
 
 static void recompute_palette_tables(void);
+static int segac2_enable_display;
 
 /******************************************************************************
     Global variables
@@ -514,6 +515,7 @@ static WRITE16_HANDLER( control_w )
 
 	/* bit 0 controls display enable */
 	//segac2_enable_display(machine, ~data & 1);
+	segac2_enable_display = ~data & 1;
 
 	/* bit 1 resets the protection */
 	if (!(data & 2))
@@ -1397,6 +1399,12 @@ VIDEO_START(segac2_new)
 
 VIDEO_UPDATE(segac2_new)
 {
+	if (!segac2_enable_display)
+	{
+		fillbitmap(bitmap, get_black_pen(screen->machine), NULL);
+		return 0;
+	}
+
 	VIDEO_UPDATE_CALL(megadriv);
 	return 0;
 }
