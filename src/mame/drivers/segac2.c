@@ -572,7 +572,7 @@ static WRITE16_HANDLER( prot_w )
 	/* if the palette changed, force an update */
 	if (new_sp_palbase != sp_palbase || new_bg_palbase != bg_palbase)
 	{
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) + 1);
+		//video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) + 1);
 		sp_palbase = new_sp_palbase;
 		bg_palbase = new_bg_palbase;
 		recompute_palette_tables();
