@@ -130,6 +130,18 @@ GP-U58 (16V8)
 GP-U60 (16V8)
 U77 (22CV10)
 U78 (22CV10)
+
+------------- Comad games ------------------
+
+The Comad games are clearly derived from this version of the game, not
+the one in galspanic.c.  Fantasia even still has the encrypted tile
+roms and makes use of the extra layer.  The other games write to the
+RAM for this layer, but don't have any roms.
+
+the layer is misplaced however, different scroll regs?
+
+
+
 */
 
 #include "driver.h"
@@ -359,7 +371,7 @@ WRITE16_HANDLER(galsnew_vram_1_bank_w)
 	}
 }
 
-static ADDRESS_MAP_START( galsnew, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( galsnew_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM // main program
 	AM_RANGE(0x080000, 0x0fffff) AM_ROM AM_REGION("user2",0) // other data
 	AM_RANGE(0x100000, 0x3fffff) AM_ROM AM_REGION("user1",0) // main data
@@ -399,6 +411,33 @@ static ADDRESS_MAP_START( galsnew, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(galsnew_vram_0_bank_w)	/* ??? */
 ADDRESS_MAP_END
 
+
+// bigger rom space, OKI commands moved
+//  no CALC mcu
+static ADDRESS_MAP_START( fantasia_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x4fffff) AM_ROM
+	AM_RANGE(0x500000, 0x51ffff) AM_RAM AM_BASE(&galsnew_bg_pixram)
+	AM_RANGE(0x520000, 0x53ffff) AM_RAM AM_BASE(&galsnew_fg_pixram)
+	AM_RANGE(0x580000, 0x580fff) AM_READWRITE(SMH_RAM,kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1)	// Layers 0
+	AM_RANGE(0x581000, 0x581fff) AM_READWRITE(SMH_RAM,kaneko16_vram_0_w) AM_BASE(&kaneko16_vram_0)	//
+	AM_RANGE(0x582000, 0x582fff) AM_RAM AM_BASE(&kaneko16_vscroll_1)									//
+	AM_RANGE(0x583000, 0x583fff) AM_RAM AM_BASE(&kaneko16_vscroll_0)									//
+	AM_RANGE(0x600000, 0x600fff) AM_READWRITE(SMH_RAM,galsnew_paletteram_w) AM_BASE(&paletteram16) // palette?
+	AM_RANGE(0x680000, 0x68001f) AM_READWRITE(SMH_RAM,kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs) // sprite regs? tileregs?
+	AM_RANGE(0x700000, 0x700fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)	 // sprites? 0x72f words tested
+	AM_RANGE(0x780000, 0x78001f) AM_READWRITE(SMH_RAM,kaneko16_sprites_regs_w) AM_BASE(&kaneko16_sprites_regs) // sprite regs? tileregs?
+	AM_RANGE(0x800000, 0x800001) AM_READ_PORT("DSW1")
+	AM_RANGE(0x800002, 0x800003) AM_READ_PORT("DSW2")
+	AM_RANGE(0x800004, 0x800005) AM_READ_PORT("DSW3")
+	AM_RANGE(0x800006, 0x800007) AM_NOP // ? used ?
+	AM_RANGE(0x900000, 0x900001) AM_WRITE(galsnew_6295_bankswitch_w)
+	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP	/* ??? */
+	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM
+	AM_RANGE(0xd80000, 0xd80001) AM_WRITE(galsnew_vram_1_bank_w)	/* ??? */
+	//AM_RANGE(0xe00000, 0xe00015) AM_READWRITE(galpanib_calc_r,galpanib_calc_w) /* CALC1 MCU interaction (simulated) */
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(galsnew_vram_0_bank_w)	/* ??? */
+	AM_RANGE(0xf00000, 0xf00001) AM_READWRITE(okim6295_status_0_msb_r,okim6295_data_0_msb_w)
+ADDRESS_MAP_END
 
 static INTERRUPT_GEN( galsnew_interrupt )
 {
@@ -440,7 +479,7 @@ static MACHINE_DRIVER_START( galsnew )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(galsnew,0)
+	MDRV_CPU_PROGRAM_MAP(galsnew_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(galsnew_interrupt,3)
 
 	/* CALC01 MCU @ 16Mhz (unknown type, simulated) */
@@ -472,7 +511,39 @@ static MACHINE_DRIVER_START( galsnew )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( fantasia )
 
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_CPU_PROGRAM_MAP(fantasia_map,0)
+	MDRV_CPU_VBLANK_INT_HACK(galsnew_interrupt,3)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(256, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-32-1)
+
+	MDRV_GFXDECODE(1x4bit_1x4bit)
+	MDRV_PALETTE_LENGTH(2048 + 32768)
+	MDRV_MACHINE_RESET( galsnew )
+
+	MDRV_VIDEO_START(galsnew)
+	MDRV_VIDEO_UPDATE(galsnew)
+	MDRV_PALETTE_INIT(berlwall)
+
+	/* arm watchdog */
+	//MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_SEC(3))	/* a guess, and certainly wrong */
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("oki", OKIM6295, 12000000/6)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
 
 ROM_START( galsnew ) /* EXPRO-02 PCB */
 	ROM_REGION( 0x40000, "main", 0 )	/* 68000 code */
@@ -592,6 +663,37 @@ ROM_START( galsnewj ) /* EXPRO-02 PCB */
 ROM_END
 
 
+ROM_START( fantasia )
+	ROM_REGION( 0x500000, "main", 0 )	/* 68000 code */
+	ROM_LOAD16_BYTE( "prog2_16.rom", 0x000000, 0x80000, CRC(e27c6c57) SHA1(420b66928c46e76fa2496f221691dd6c34542287) )
+	ROM_LOAD16_BYTE( "prog1_13.rom", 0x000001, 0x80000, CRC(68d27413) SHA1(84cb7d6523325496469d621f6f4da1b719162147) )
+	ROM_LOAD16_BYTE( "iscr6_09.rom", 0x100000, 0x80000, CRC(2a588393) SHA1(ef66ed94dd40a95a9b0fb5c3b075c1f654f60927) )
+	ROM_LOAD16_BYTE( "iscr5_05.rom", 0x100001, 0x80000, CRC(6160e0f0) SHA1(faec9d082c9039885afa4560aa87c05e9ecb5217) )
+	ROM_LOAD16_BYTE( "iscr4_08.rom", 0x200000, 0x80000, CRC(f776b743) SHA1(bd4d666ede454a56181e109745ac4b3203b2a87c) )
+	ROM_LOAD16_BYTE( "iscr3_04.rom", 0x200001, 0x80000, CRC(5df0dff2) SHA1(62ebd3c79f2e8ab30d6862cc4bf80f1b56f1f572) )
+	ROM_LOAD16_BYTE( "iscr2_07.rom", 0x300000, 0x80000, CRC(5707d861) SHA1(33f1cff693dfcb04edbf8738d3ea2a1884e6ff0c) )
+	ROM_LOAD16_BYTE( "iscr1_03.rom", 0x300001, 0x80000, CRC(36cb811a) SHA1(403cef012990b0e01b481b8afc6b5811e7137833) )
+	ROM_LOAD16_BYTE( "imag2_10.rom", 0x400000, 0x80000, CRC(1f14a395) SHA1(12ca5a5a30963ecf90f5a006029aa1098b9ee1df) )
+	ROM_LOAD16_BYTE( "imag1_06.rom", 0x400001, 0x80000, CRC(faf870e4) SHA1(163a9aa3e5c550d3760d32e31048a7aa1f93db7f) )
+
+	ROM_REGION( 0x80000, "gfx1", ROMREGION_DISPOSE )	/* sprites */
+	ROM_LOAD( "obj1_17.rom",  0x00000, 0x80000, CRC(aadb6eb7) SHA1(6eaa994ad7b4e8341360eaf5ddb46240316b7274) )
+
+	ROM_REGION( 0x140000, "oki", 0 )	/* OKIM6295 samples */
+	/* 00000-2ffff is fixed, 30000-3ffff is bank switched from all the ROMs */
+	ROM_LOAD( "mus-1_01.rom", 0x00000, 0x80000, CRC(22955efb) SHA1(791c18d1aa0c10810da05c199108f51f99fe1d49) )
+	ROM_RELOAD(               0x40000, 0x80000 )
+	ROM_LOAD( "mus-2_02.rom", 0xc0000, 0x80000, CRC(4cd4d6c3) SHA1(a617472a810aef6d82f5fe75ef2980c03c21c2fa) )
+
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* sprites */
+
+	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* tiles - encrypted */
+	ROM_LOAD16_BYTE( "gscr2_15.rom", 0x000001, 0x80000, CRC(46666768) SHA1(7281c4b45f6f9f6ad89fa2bb3f67f30433c0c513) )
+	ROM_LOAD16_BYTE( "gscr1_12.rom", 0x000000, 0x80000, CRC(4bd25be6) SHA1(9834f081c0390ccaa1234efd2393b6495e946c64) )
+	ROM_LOAD16_BYTE( "gscr4_14.rom", 0x100001, 0x80000, CRC(4e7e6ed4) SHA1(3e9e942e3de398edc8ac9f82769c3f41708d3741) )
+	ROM_LOAD16_BYTE( "gscr3_11.rom", 0x100000, 0x80000, CRC(6d00a4c5) SHA1(8fc0d78200b82ab87658d364ebe2f2e7239722e7) )
+ROM_END
+
 
 DRIVER_INIT(galsnew)
 {
@@ -629,3 +731,5 @@ DRIVER_INIT(galsnew)
 GAME( 1990, galsnew,  0,       galsnew, galsnew,  galsnew, ROT90, "Kaneko", "Gals Panic (US, EXPRO-02 PCB)", 0 )
 GAME( 1990, galsnewa, galsnew, galsnew, galsnewa, galsnew, ROT90, "Kaneko", "Gals Panic (Export, EXPRO-02 PCB)", 0 )
 GAME( 1990, galsnewj, galsnew, galsnew, galsnewa, galsnew, ROT90, "Kaneko (Taito license)", "Gals Panic (Japan, EXPRO-02 PCB)", 0 )
+
+GAME( 1994, fantasia, 0,       fantasia,    galsnew, galsnew, ROT90, "Comad & New Japan System", "Fantasia", GAME_NO_COCKTAIL )
