@@ -590,7 +590,7 @@ static void neogeo_gfx_decrypt(running_machine *machine, int extra_xor)
 
 
 /* the S data comes from the end of the C data */
-static void neogeo_sfix_decrypt(running_machine *machine)
+void neogeo_sfix_decrypt(running_machine *machine)
 {
 	int i;
 	int rom_size = memory_region_length(machine, "sprites");

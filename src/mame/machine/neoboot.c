@@ -1037,3 +1037,51 @@ void samsho5b_vx_decrypt( running_machine *machine )
 		rom[ i ] = BITSWAP8( rom[ i ], 0, 1, 5, 4, 3, 2, 6, 7 );
 }
 
+
+/* Matrimelee / Shin Gouketsuji Ichizoku Toukon (bootleg) */
+
+
+#define MATRIMBLZ80( i ) ( i^(BITSWAP8(i&0x3,4,3,1,2,0,7,6,5)<<8) )
+
+void matrimbl_decrypt( running_machine *machine )
+{
+	/* decrypt Z80 */
+	UINT8 *rom = memory_region( machine, "audio" )+0x10000;
+	UINT8 *buf = malloc_or_die( 0x20000 );
+	int i, j=0;
+	memcpy( buf, rom, 0x20000 );
+	for( i=0x00000; i<0x20000; i++ )
+	{
+		if ( i&0x10000 )
+		{
+			if ( i&0x800 )
+			{
+				j=MATRIMBLZ80( i );
+				j=j^0x10000;
+			}
+			else
+			{
+				j=MATRIMBLZ80(( i^0x01 ));
+			}
+		}
+		else
+		{
+			if ( i&0x800 )
+			{
+				j=MATRIMBLZ80(( i^0x01 ));
+				j=j^0x10000;
+			}
+			else
+			{
+				j=MATRIMBLZ80( i );
+			}
+		}
+		rom[ j ]=buf[ i ];
+	}
+	free( buf );
+	memcpy( rom-0x10000, rom, 0x10000 );
+
+	/* decrypt gfx */
+	cthd2003_c( machine, 0);
+}
+
