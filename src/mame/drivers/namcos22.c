@@ -2576,8 +2576,13 @@ static READ8_HANDLER( propcycle_mcu_adc_r )
 {
 	static UINT16 ddx, ddy;
 
-	ddx = ((input_port_read(machine, "STICKX")^0xff) - 1)<<2;
-	ddy = (input_port_read(machine, "STICKY") - 1)<<2;
+	ddx = input_port_read(machine, "STICKX")^0xff;
+	if (ddx > 0) ddx -= 1;
+	ddy = input_port_read(machine, "STICKY");
+	if (ddy > 0) ddy -= 1;
+
+	ddx <<= 2;
+	ddy <<= 2;
 
 	switch (offset)
 	{
