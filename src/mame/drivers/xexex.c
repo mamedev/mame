@@ -602,7 +602,6 @@ ROM_END
 static MACHINE_RESET( xexex )
 {
 	cur_control2 = 0;
-	init_eeprom_count = 0;
 	cur_sound_region = 0;
 	suspension_active = 0;
 	resume_trigger = 0;
@@ -623,6 +622,7 @@ static MACHINE_START( xexex )
 	state_save_register_postload(machine, xexex_postload, NULL);
 
 	resume_trigger = 1000;
+	init_eeprom_count = 0;
 
 	dmadelay_timer = timer_alloc(dmaend_callback, NULL);
 }
