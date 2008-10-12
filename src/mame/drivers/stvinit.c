@@ -1312,30 +1312,9 @@ DRIVER_INIT(suikoenb)
 	DRIVER_INIT_CALL(ic13);
 }
 
-static void sokyugrt_slave_speedup( UINT32 data )
-{
-	logerror( "SlaveSH2: Idle loop skip, data = %08X\n", data );
-	if (stv_enable_slave_sh2)
-		if ( activecpu_get_pc() == 0x0605eec0 )
-			if ( (data & 0x00800000) == 0 )
-				cpunum_spinuntil_trigger(1, 1000);
-}
-
-static READ32_HANDLER(sokyugrt_speedup_r)
-{
-	if ( activecpu_get_pc() == 0x0605d9da ) cpu_spinuntil_int();
-	return stv_workram_h[0x000788cc / 4];
-}
 
 DRIVER_INIT(sokyugrt)
 {
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x605d9da);
-	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	cpunum_set_info_int(1, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x605eec0);
-
-	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)sokyugrt_slave_speedup );
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060788cc, 0x060788cf, 0, 0, sokyugrt_speedup_r);
 	DRIVER_INIT_CALL(ic13);
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
 
