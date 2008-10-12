@@ -2176,6 +2176,16 @@ static void sh2_reset(void)
 	sh2->internal_irq_level = -1;
 }
 
+/*-------------------------------------------------
+    sh1_reset - reset the processor
+-------------------------------------------------*/
+
+static void sh1_reset(void)
+{
+	sh2_reset();
+	sh2->cpu_type = CPU_TYPE_SH1;
+}
+
 /* Execute cycles - returns number of cycles actually run */
 static int sh2_execute(int cycles)
 {
@@ -2459,6 +2469,20 @@ void sh2_get_info(UINT32 state, cpuinfo *info)
 
 		case CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK:		info->f = (genf*)sh2->ftcsr_read_callback; break;
 
+	}
+}
+
+void sh1_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_PTR_RESET:						info->reset = sh1_reset;				break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case CPUINFO_STR_NAME:	    					strcpy(info->s, "SH-1");				break;
+
+		default:							sh2_get_info(state, info);			break;
 	}
 }
 

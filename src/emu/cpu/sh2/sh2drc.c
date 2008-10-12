@@ -1034,6 +1034,7 @@ static void static_generate_entry_point(drcuml_state *drcuml)
 	load_fast_iregs(block);
 
 	/* check for interrupts */
+	UML_MOV(block, MEM(&sh2->irqline), IMM(0xffffffff));		// mov irqline, #-1
 	UML_CMP(block, MEM(&sh2->pending_nmi), IMM(0));			// cmp pending_nmi, #0
 	UML_JMPc(block, IF_Z, skip+2);					// jz skip+2
 
@@ -1044,16 +1045,18 @@ static void static_generate_entry_point(drcuml_state *drcuml)
 	UML_MOV(block, MEM(&sh2->evec), IMM(0xffffffff));		// mov evec, -1
 	UML_MOV(block, IREG(0), IMM(0xffffffff));			// mov r0, -1 (r0 = irq)
 	UML_AND(block, IREG(1),  IREG(0), IMM(0xffff));	     		// and r1, 0xffff
+
 	UML_LZCNT(block, IREG(1), MEM(&sh2->pending_irq));		// lzcnt r1, r1
 	UML_CMP(block, IREG(1), IMM(32));				// cmp r1, #32
-	UML_JMPc(block, IF_Z, skip+1);					// jz skip+1
+	UML_JMPc(block, IF_Z, skip+4);					// jz skip+4
 
 	UML_SUB(block, MEM(&sh2->irqline), IMM(31), IREG(1));	   	// sub irqline, #31, r1
 
+	UML_LABEL(block, skip+4);					// skip+4:
 	UML_CMP(block, MEM(&sh2->internal_irq_level), IMM(0xffffffff));	// cmp internal_irq_level, #-1
 	UML_JMPc(block, IF_Z, skip+3);					// jz skip+3
 	UML_CMP(block, MEM(&sh2->internal_irq_level), MEM(&sh2->irqline));		// cmp internal_irq_level, irqline
-	UML_JMPc(block, IF_BE, skip+3);					// ja skip+3
+	UML_JMPc(block, IF_LE, skip+3);					// jle skip+3
 
 	UML_MOV(block, MEM(&sh2->irqline), MEM(&sh2->internal_irq_level));		// mov r0, internal_irq_level
 
@@ -1409,14 +1412,15 @@ static void log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op)
 static void generate_update_cycles(drcuml_block *block, compiler_state *compiler, drcuml_ptype ptype, UINT64 pvalue, int allow_exception)
 {
 	/* check full interrupts if pending */
-	if (compiler->checkints)
+	if (compiler->checkints) 
 	{
 		drcuml_codelabel skip = compiler->labelnum++;
 
 		compiler->checkints = FALSE;
-		compiler->labelnum += 3;
+		compiler->labelnum += 4;
 
 		/* check for interrupts */
+		UML_MOV(block, MEM(&sh2->irqline), IMM(0xffffffff));		// mov irqline, #-1
 		UML_CMP(block, MEM(&sh2->pending_nmi), IMM(0));			// cmp pending_nmi, #0
 		UML_JMPc(block, IF_Z, skip+2);					// jz skip+2
 
@@ -1426,17 +1430,19 @@ static void generate_update_cycles(drcuml_block *block, compiler_state *compiler
 		UML_LABEL(block, skip+2);					// skip+2:
 		UML_MOV(block, MEM(&sh2->evec), IMM(0xffffffff));		// mov evec, -1
 		UML_MOV(block, IREG(0), IMM(0xffffffff));			// mov r0, -1 (r0 = irq)
-		UML_AND(block, IREG(1),  IREG(0), IMM(0xffff));	     		// and r1, 0xffff
-		UML_LZCNT(block, IREG(1), MEM(&sh2->pending_irq));		// lzcnt r1, r1
+		UML_AND(block, IREG(1),  IREG(0), IMM(0xffff));	     		// and r1, r0, 0xffff
+
+		UML_LZCNT(block, IREG(1), MEM(&sh2->pending_irq));		// lzcnt r1, pending_irq
 		UML_CMP(block, IREG(1), IMM(32));				// cmp r1, #32
-		UML_JMPc(block, IF_Z, skip+1);					// jz skip+1
+		UML_JMPc(block, IF_Z, skip+4);					// jz skip+4
 
 		UML_SUB(block, MEM(&sh2->irqline), IMM(31), IREG(1));	   	// sub irqline, #31, r1
 
+		UML_LABEL(block, skip+4);					// skip+4:
 		UML_CMP(block, MEM(&sh2->internal_irq_level), IMM(0xffffffff));	// cmp internal_irq_level, #-1
 		UML_JMPc(block, IF_Z, skip+3);					// jz skip+3
 		UML_CMP(block, MEM(&sh2->internal_irq_level), MEM(&sh2->irqline));		// cmp internal_irq_level, irqline
-		UML_JMPc(block, IF_BE, skip+3);					// ja skip+3
+		UML_JMPc(block, IF_LE, skip+3);					// jle skip+3
 
 		UML_MOV(block, MEM(&sh2->irqline), MEM(&sh2->internal_irq_level));		// mov r0, internal_irq_level
 

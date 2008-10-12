@@ -48,7 +48,6 @@ To Do:
 
   - see notes in video file -
 
-  Sol Divide's music is completely broken since the SH2 DRC
   Daraku is missing some screen blend effects
 
 
@@ -414,7 +413,17 @@ static READ32_HANDLER( psh_eeprom_r )
 
 static INTERRUPT_GEN(psikyosh_interrupt)
 {
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, 4, ASSERT_LINE);
+}
+
+// VBL handler writes 0x00 on entry, 0xc0 on exit
+// bit 0 controls game speed on readback, mechanism is a little weird
+static WRITE32_HANDLER( psikyosh_irqctrl_w )
+{
+	if (!(data & 0x00c00000))
+	{
+		cpunum_set_input_line(machine, 0, 4, CLEAR_LINE);
+	}
 }
 
 static WRITE32_HANDLER( paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w )
@@ -532,7 +541,7 @@ static ADDRESS_MAP_START( ps3v1_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03004000, 0x0300ffff) AM_WRITE(SMH_RAM) AM_BASE(&psikyosh_bgram) // backgrounds
 	AM_RANGE(0x03040000, 0x03044fff) AM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE(&paletteram32) // palette..
 	AM_RANGE(0x03050000, 0x030501ff) AM_WRITE(SMH_RAM) AM_BASE(&psikyosh_zoomram) // a gradient sometimes ...
-	AM_RANGE(0x0305ffdc, 0x0305ffdf) AM_WRITE(SMH_RAM) // also reads from this address
+	AM_RANGE(0x0305ffdc, 0x0305ffdf) AM_WRITE(psikyosh_irqctrl_w)
 	AM_RANGE(0x0305ffe0, 0x0305ffff) AM_WRITE(psikyosh_vidregs_w) AM_BASE(&psikyosh_vidregs) //  video registers
 	AM_RANGE(0x05000000, 0x05000003) AM_WRITE(psh_ymf_fm_w) // first 2 OPL4 register banks
 	AM_RANGE(0x05000004, 0x05000007) AM_WRITE(psh_ymf_pcm_w) // third OPL4 register bank
@@ -569,7 +578,7 @@ static ADDRESS_MAP_START( ps5_writemem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x04004000, 0x0400ffff) AM_WRITE(SMH_RAM) AM_BASE(&psikyosh_bgram) // backgrounds
 	AM_RANGE(0x04040000, 0x04044fff) AM_WRITE(paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w) AM_BASE(&paletteram32)
 	AM_RANGE(0x04050000, 0x040501ff) AM_WRITE(SMH_RAM) AM_BASE(&psikyosh_zoomram)
-	AM_RANGE(0x0405ffdc, 0x0405ffdf) AM_WRITE(SMH_RAM) // also reads from this address
+	AM_RANGE(0x0405ffdc, 0x0405ffdf) AM_WRITE(psikyosh_irqctrl_w) 
 	AM_RANGE(0x0405ffe0, 0x0405ffff) AM_WRITE(psikyosh_vidregs_w) AM_BASE(&psikyosh_vidregs) // video registers
 	AM_RANGE(0x05000000, 0x0507ffff) AM_WRITE(SMH_ROM) // data ROM
 	AM_RANGE(0x06000000, 0x060fffff) AM_WRITE(SMH_RAM) AM_BASE(&psh_ram)
