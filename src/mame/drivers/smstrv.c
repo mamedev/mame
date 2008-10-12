@@ -113,9 +113,23 @@ Someone on the MW forums has this iirc, but it isn't dumped yet - LN
 
 **** Notes from schematics (applies to all drivers):
 Framebuffer is six tms4416 16384*4 chips; chips are arranged as three
-planes of 16384*8 pixels per plane, one plane per color channel.
-Screen resolution is 54x256, if I(LN) am properly understanding the
-schematics on page 6.
+planes of 16384*8 bits per plane, one plane per color channel.
+Screen resolution is probably either 212x256 (two bits per plane, per
+pixel) or 424x256 (one bit per plane per pixel), depending on the pals
+installed. See schematics on page 6. The counters at U137 and U139
+compare against binary 0b110101 (53) in comparitor at U138, and as soon
+as it hits that, HDONE is pulled high on the next MCLR clock.
+This means there will be 53 (0-52) counts in the X counter before HDONE;
+as each count refers to one 8 bit address, and the addressed 4416 rams
+have between all of them 24 bits of output (8 per plane), the minimum
+horizontal displayed resolution is 53x256 (8 bits per color per pixel),
+and maximum is 8 times that. With proper pals (and proper mixing
+resistors or other PWM fun) it should be possible to get:
+53x256 8,8,8 RGB
+106x256 4,4,4 RGB
+212x256 2,2,2 RGB <- this seems the most likely to me (LN)
+424x256 1,1,1 RGB
+
 
 * The socket at U50 and the 3 pin connector J3 is for an
   undumped intel 8050 MCU used for rs232 serial communication,
