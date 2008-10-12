@@ -1304,12 +1304,16 @@ static void jamma_jvs_cmd_exec(void)
 /*****************************************************************************/
 
 
+static TIMER_CALLBACK( irq_off )
+{
+	cpunum_set_input_line(machine, 1, param, CLEAR_LINE);
+}
+
 static void sound_irq_callback(running_machine *machine, int irq)
 {
-	if (irq == 0)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ1, PULSE_LINE);
-	else
-		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ2, PULSE_LINE);
+	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
+	cpunum_set_input_line(machine, 1, line, ASSERT_LINE);
+	timer_set(ATTOTIME_IN_USEC(1), NULL, line, irq_off);
 }
 
 static DRIVER_INIT(hornet)
