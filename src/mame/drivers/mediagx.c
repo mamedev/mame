@@ -460,43 +460,39 @@ static void mediagx_config_reg_w(UINT8 data)
 	mediagx_config_regs[mediagx_config_reg_sel] = data;
 }
 
-static READ32_HANDLER( io20_r )
+static READ8_DEVICE_HANDLER( io20_r )
 {
-	UINT32 r = 0;
-	// 0x20 - 0x21, PIC
-	if (ACCESSING_BITS_0_15)
-	{
-		r |= read32le_with_read8_device_handler( pic8259_r, mediagx_devices.pic8259_1, offset, mem_mask);
-	}
-
+	UINT8 r = 0;
+	
 	// 0x22, 0x23, Cyrix configuration registers
-	if (ACCESSING_BITS_16_23)
+	if (offset == 0x02)
 	{
-
 	}
-	if (ACCESSING_BITS_24_31)
+	else if (offset == 0x03)
 	{
-		r |= mediagx_config_reg_r() << 24;
+		r = mediagx_config_reg_r();
+	}
+	else
+	{
+		r = pic8259_r(device, offset);
 	}
 	return r;
 }
 
-static WRITE32_HANDLER( io20_w )
+static WRITE8_DEVICE_HANDLER( io20_w )
 {
-	// 0x20 - 0x21, PIC
-	if (ACCESSING_BITS_0_15)
-	{
-		write32le_with_write8_device_handler( pic8259_w, mediagx_devices.pic8259_1, offset, data, mem_mask);
-	}
-
 	// 0x22, 0x23, Cyrix configuration registers
-	if (ACCESSING_BITS_16_23)
+	if (offset == 0x02)
 	{
-		mediagx_config_reg_sel = (data >> 16) & 0xff;
+		mediagx_config_reg_sel = data;
 	}
-	if (ACCESSING_BITS_24_31)
+	else if (offset == 0x03)
 	{
-		mediagx_config_reg_w((data >> 24) & 0xff);
+		mediagx_config_reg_w(data);
+	}
+	else
+	{
+		pic8259_w(device, offset, data);
 	}
 }
 
@@ -839,18 +835,18 @@ static ADDRESS_MAP_START( mediagx_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x40008300, 0x400083ff) AM_READWRITE(disp_ctrl_r, disp_ctrl_w)
 	AM_RANGE(0x40008400, 0x400084ff) AM_READWRITE(memory_ctrl_r, memory_ctrl_w)
 	AM_RANGE(0x40800000, 0x40bfffff) AM_RAM AM_BASE(&vram)
-	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("user1", 0)	/* System BIOS */
+	AM_RANGE(0xfffc0000, 0xffffffff) AM_ROM AM_REGION("bios", 0)	/* System BIOS */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START(mediagx_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0000, 0x001f) AM_DEVREADWRITE8(DMA8237, "dma8237_1", dma8237_r, dma8237_w, 0xffffffff)
-	AM_RANGE(0x0020, 0x0023) AM_READWRITE(io20_r, io20_w)
+	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8(PIC8259, "pic8259_master", io20_r, io20_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8(PIT8254, "pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(at_page8_r,				at_page8_w, 0xffffffff)
-	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE8(PIC8259, "pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
-	AM_RANGE(0x00c0, 0x00cf) AM_DEVREADWRITE8(DMA8237, "dma8237_2", at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
+	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8(PIC8259, "pic8259_slave", pic8259_r, pic8259_w, 0xffffffff)
+	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8(DMA8237, "dma8237_2", at_dma8237_2_r, at_dma8237_2_w, 0xffffffff)
 	AM_RANGE(0x00e8, 0x00eb) AM_NOP		// I/O delay port
 	AM_RANGE(0x01f0, 0x01f7) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ide_r, ide_w)
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(parallel_port_r, parallel_port_w)
@@ -953,15 +949,15 @@ static IRQ_CALLBACK(irq_callback)
 static MACHINE_START(mediagx)
 {
 	mediagx_devices.pit8254 = device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" );
-	mediagx_devices.pic8259_1 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_1" );
-	mediagx_devices.pic8259_2 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_2" );
+	mediagx_devices.pic8259_1 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_master" );
+	mediagx_devices.pic8259_2 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_slave" );
 	mediagx_devices.dma8237_1 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
 	mediagx_devices.dma8237_2 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
 }
 
 static MACHINE_RESET(mediagx)
 {
-	UINT8 *rom = memory_region(machine, "user1");
+	UINT8 *rom = memory_region(machine, "bios");
 
 	cpunum_set_irq_callback(0, irq_callback);
 
@@ -1051,10 +1047,10 @@ static MACHINE_DRIVER_START(mediagx)
 	MDRV_DEVICE_ADD( "dma8237_2", DMA8237 )
 	MDRV_DEVICE_CONFIG( dma8237_2_config )
 
-	MDRV_DEVICE_ADD( "pic8259_1", PIC8259 )
+	MDRV_DEVICE_ADD( "pic8259_master", PIC8259 )
 	MDRV_DEVICE_CONFIG( mediagx_pic8259_1_config )
 
-	MDRV_DEVICE_ADD( "pic8259_2", PIC8259 )
+	MDRV_DEVICE_ADD( "pic8259_slave", PIC8259 )
 	MDRV_DEVICE_CONFIG( mediagx_pic8259_2_config )
 
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
@@ -1229,7 +1225,7 @@ static DRIVER_INIT( a51site4 )
 /*****************************************************************************/
 
 ROM_START(a51site4)
-	ROM_REGION32_LE(0x40000, "user1", 0)
+	ROM_REGION32_LE(0x40000, "bios", 0)
 	ROM_LOAD("tinybios.rom", 0x00000, 0x40000, CRC(5ee189cc) SHA1(0b0d9321a4c59b1deea6854923e655a4d8c4fcfe))
 
 	ROM_REGION(0x08100, "gfx1", 0)
