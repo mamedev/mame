@@ -1,4 +1,9 @@
 /*
+SMS Manufacturing PCB Driver
+By Reip
+
+
+smstrv (Reip):
 Triva looking board
 Silk screened on front...
     P/N 1001
@@ -17,7 +22,7 @@ Large chips
     P8255A-5
     P8254
     D8255AC-5
-    D780C-1
+    D780C-1 (Z80A)
 
 16 Mhz crystal by D780C (U21)
 24 Mhz crystal by P8088 (u53)
@@ -83,6 +88,186 @@ ROM text showed...
     COPYRIGHT 1984 SMS MFG CORP
     TRIVIA HANGUP
     SMART ALECS
+
+
+
+
+smssshot (Lord Nightmare)
+SMS Sure Shot (poker?)
+* Same exact board as sms trivia, but "COMPONENT SIDE REV 01"
+  instead of rev 02.
+* 3 chips were removed from the board; two are shown as removed
+  in the schematic, one was removed later (an apparently
+  unnecessary data buffer on one of the z80 external latches)
+* Does NOT have a daughterboard with additional roms; in fact,
+  connector J1 for the ribbon cable to the daughterboard isn't
+  populated with pins at all
+* Serial Number A-108 etched in board, on back.
+
+
+smsbingo (Lord Nightmare)
+SMS Bingo
+Someone on the MW forums has this iirc, but it isn't dumped yet - LN
+
+
+
+**** Notes from schematics (applies to all drivers):
+Framebuffer is six tms4416 16384*4 chips; chips are arranged as three
+planes of 16384*8 pixels per plane, one plane per color channel.
+Screen resolution is 54x256, if I(LN) am properly understanding the
+schematics on page 6.
+
+* The socket at U50 and the 3 pin connector J3 is for an
+  undumped intel 8050 MCU used for rs232 serial communication,
+  for either linking together machines, or more likely for factory
+  testing. The function of this internal rom is probably simple
+  enough to HLE or to even rewrite from scratch, but I doubt the code
+  on any of the dumped games even touches it, it was probably for use
+  with a specific game or for a set of hardware test roms to report
+  errors.
+  (schematic page 4)
+  The pinout of J3 is:
+     pin 1 (toward bottom of pcb): rs232 input to pcb
+     (pre-level shifted to 5v i.e. with a max232 or mc1489)
+     pin 2 : ground
+     pin 3 : rs232 output to elsewhere (to be sent to a max232 or
+     mc1488 to shift to rs232 voltage levels)
+
+* The 8255 PPI at U13 (connected to the 8088) is connected to 75451
+  drivers on all pins EXCEPT pins PC3 thru PC0.
+  (schematic page 3)
+  PA7 - Display Light 1
+  PA6 - Display Light 2
+  PA5 - Display Light 3
+  PA4 - Display Light 4
+  PA3 - Display Light 5
+  PA2 - Bet Light
+  PA1 - Deal Light
+  PA0 - Draw Light
+  PB7 - Stand Light
+  PB6 - Cancel Light
+  PB5 - Coin Lock out A
+  PB4 - Coin Lock out B
+  PB3 - Setup Light
+  PB2 - Hopper Motor
+  PB1 - Coin in Counter (mechanical counter inside the machine)
+  PB0 - Knock off Counter (tilt? probably also a mechanical counter)
+  PC7 - unused
+  PC6 - unused
+  PC5 - unused
+  PC4 - Battery Charge control (for 8088 ram backup 3.6v Nicad)
+  PC3 - (pulled high externally, input) - unused? possibly for an ABC hopper
+  PC2 - (pulled high externally, input) - unused? possibly for an ABC hopper
+  PC1 - (pulled high externally, input) - "Hopper Count",
+      probably a beam to check the hopper coin out
+  PC0 - "Video BZ" (Video Blanking Zone, is an input)
+
+* The 8255 PPI at U2 (connected to the z80) is unused and not populated.
+  (All 3 ports have +5V pullups on all pins)
+
+* The 8255 PPI at U1 (connected to the z80) is used as follows:
+  (All 3 ports have +5V pullups on all pins)
+  PA7 - Lighted Button 1 (input)
+  PA6 - Lighted Button 2 (input)
+  PA5 - Lighted Button 3 (input)
+  PA4 - Lighted Button 4 (input)
+  PA3 - Lighted Button 5 (input)
+  PA2 - Bet Button (input)
+  PA1 - Deal Button (input)
+  PA0 - Draw Button (input)
+  PB7 - Stand Button (input)
+  PB6 - Cancel Button (input)
+  PB5 - Alt Coin (input)
+  PB4 - Remote Knockoff (tilt? input)
+  PB3 - Operator Mode (input)
+  PB2 - Coin Error reset (input)
+  PB1 - unused
+  PB0 - unused
+  PC7 - unused
+  PC6 - unused
+  PC5 - unused
+  PC4 - unused
+  PC3 - unused
+  PC2 - unused
+  PC1 - unused
+  PC0 - Coin (input)
+
+
+* The function of the pals is:
+LOCATION    DOTS        TYPE        PURPOSE
+U32         1Green      DMPAL10L8NC	Decodes the gated by U33/U34)
+   high address lines of the 8088, for mainboard ROM mapping. A
+   different pal is probably used depending on whether the
+   mainboard has 2764 or 27128 roms installed.
+   SMS Sure Shot: dumped ok as truth table, mainboard has 4 2764s
+   SMS Trivia: bad (chip shorted internally), mainboard has 2 27128s
+   SMS Bingo: not dumped
+   (schematic page 2)
+U38         3Blue		    PAL10L8CN   Decodes the (gated by U36)
+   high address lines of the z80 address bus, for mapping of the z80
+   ROM, RAM, Counter control, 4 z80-to-8088 ports (2 one direction,
+   2 the other), the ay-3-8910, and the two 8255 PPIs.
+   (schematic page 10)
+U39         3Green          PAL10L8CN   Accessory decoder to U38, helps
+   with the 4 z80-to-8088 ports.
+   (schematic page 10)
+U40         1Red	          PAL10L8CN   Connects to the low bits of the
+   8088 address bus for decoding writing to/reading from the 8088 side of
+   the 4 z80-to-8088 ports.
+   (schematic page 10, note this chip is mismarked as U9 on the page,
+    it is the chip in the lower left)
+U52         1Blue           PAL10L8CN   Decodes the (gated by U33/U34)
+   high address lines of the 8088, for main memory mapping of ram,
+   z80 communication, video, serial I/O (to U50), and the output-only
+   8255 at U13 (which controls button lights and the coin hopper)
+   SMS Sure Shot: dumped ok as truth table
+   SMS Trivia: checksum 0, probably bad
+   SMS Bingo: not dumped
+   (schematic page 1)
+U58         3Brown          DMPAL10H8NC Controls BDIR and BC1 on the
+   ay-3-8910 given the low two address bits of the z80 bits, the
+   ay-3-8910 enable line, and the buffered z80 RD and WR lines.
+   (schematic page 12)
+U80         2Blue           PAL10H8CN   State machine which controls StartH,
+   StartV, and the related functions involving the shifters for framebuffer
+   address and framebuffer output. Also lets framebuffer know when in hblank
+   or vblank. Is separate from the other "Video BZ" thing.
+   (schematic page 6)
+U94         2Green          PAL14H4CN   State machine controls the
+   read-modify-write logic for accessing the frame buffer (while outside
+   of vblank and hblank?), may allow writing red green and blue plane bytes
+   all to one address, one after the other
+   (schematic page 7)
+U109        2Brown          PAL14H4CN   Determines next state of the
+   'Pixel control' hardware, i.e. H and V current line counters
+   Also determines VBLANK/"Video BZ"
+   (schematic page 5)
+U110        2Red            PAL10L8CN   Translates output of U109
+   before being sent to counters/color reg latch/etc.
+   (schematic page 5)
+U128        Blue-Brown-Blue PAL10H8CN   One of three 'sync' pals which
+   control the memory and other timing subsystem, fed by a 4 bit counter.
+   this particular pal has one external feedback bit.
+   (schematic page 6)
+U129        Red-Green-Red   DMPAL10H8NC Second of three 'sync' pals
+   This one has 2 external feedback bits.
+   (schematic page 6)
+U130        3Red            PAL10H8CN   Third of three 'sync' pals'
+   This one has 3 external feedback bits plus three extra inputs from elsewhere
+   which are not readable on the schematic. Will trace them later.
+   (schematic page 6)
+U140        1Brown          PAL14H4CN   This and the next 5 pals are used
+   to shift the framebuffer data, 4 bits at a time. This is done in parallel
+   (8 bits per channel) for output. all 6 pals are the same.
+   (schematic page 7)
+U141        1Brown          PAL14H4CN
+U142		1Brown          PAL14H4CN
+U143		1Brown          PAL14H4CN
+U144		1Brown          PAL14H4CN
+U145		1Brown          PAL14H4CN
+
+
+
 */
 
 #include "driver.h"
