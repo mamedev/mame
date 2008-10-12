@@ -320,8 +320,10 @@ static WRITE8_HANDLER( powerdrv_op6_w )
 
 static READ8_HANDLER( stargrds_ip0_r )
 {
-	UINT8 result = input_port_read(machine, input_mux ? "MONO.IP0.ALT" : "MONO.IP0");
-	return result | ((soundsgood_status_r(machine, 0) << 4) & 0x10);
+	UINT8 result = input_port_read(machine, "MONO.IP0");
+	if (input_mux)
+		result = (result & ~0x0a) | (input_port_read(machine, "MONO.IP0.ALT") & 0x0a);
+	return (result & ~0x10) | ((soundsgood_status_r(machine, 0) << 4) & 0x10);
 }
 
 
@@ -848,14 +850,11 @@ static INPUT_PORTS_START( stargrds )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_PLAYER(3)
 
 	PORT_START("MONO.IP0.ALT")	/* IN0 (muxed) */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )		/* same as MONO.IN0 */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN3 )		
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )		/* same as MONO.IN0 */
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SPECIAL )	/* status from Sounds Good board */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_BIT( 0xf0, IP_ACTIVE_HIGH, IPT_UNUSED )		/* same as MONO.IN0 */
 INPUT_PORTS_END
 
 
