@@ -260,7 +260,7 @@ static READ8_HANDLER( spacduel_IN3_r )
 
 	res1 = input_port_read(machine, "IN3");
 	res2 = input_port_read(machine, "IN4");
-	res3 = input_port_read(machine, "DSW2");
+	res3 = input_port_read_safe(machine, "DSW2", 0);
 	res = 0x00;
 
 	switch (offset & 0x07)
