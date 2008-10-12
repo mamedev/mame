@@ -1085,12 +1085,17 @@ void simutrek_set_audio_squelch(const device_config *device, int state)
 static void simutrek_init(laserdisc_state *ld)
 {
 	astring *tempstring = astring_alloc();
+	ldplayer_data *player = ld->player;
 
 	/* standard PR-8210 initialization */
 	pr8210_init(ld);
+	
+	/* initialize the Simutrek state */
+	/* for proper synchronization of initial attract mode, this needs to be set */
+	player->simutrek.data_ready = 1;
 
 	/* find the Simutrek CPU */
-	ld->player->simutrek.cpunum = mame_find_cpu_index(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "simutrek"));
+	player->simutrek.cpunum = mame_find_cpu_index(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "simutrek"));
 	astring_free(tempstring);
 }
 
