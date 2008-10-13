@@ -5738,9 +5738,9 @@ ROM_START( hachamf )
 	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "hmf_05.rom",  0x000000, 0x020000, CRC(29fb04a2) SHA1(9654b90a66d0e2a0f9cd369cab29cdd0c6f77869) )	/* 8x8 tiles */
 
-	ROM_REGION( 0x80000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "hmf_04.rom",  0x000000, 0x080000, CRC(05a624e3) SHA1(e1b686b36c0adedfddf70eeb6411671bbcd897d8) )	/* 16x16 tiles */
-	//ROM_COPY( "gfx2",   0x0c8000, 0x000000, 0x038000)
+	ROM_REGION( 0x100000, "gfx2", ROMREGION_DISPOSE ) /* 16x16 tiles */
+	// the first half of this rom is missing, the game uses 2 banks, most of the graphics needed aren't present
+	ROM_LOAD( "hmf_04.rom",  0x080000, 0x080000, BAD_DUMP CRC(05a624e3) SHA1(e1b686b36c0adedfddf70eeb6411671bbcd897d8) )
 
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD16_WORD_SWAP( "hmf_08.rom",  0x000000, 0x100000, CRC(7fd0f556) SHA1(d1b4bec0946869d3d7bcb870d9ae3bd17395a231) )	/* Sprites */
