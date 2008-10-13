@@ -651,7 +651,7 @@ void sh2_exception(const char *message, int irqline)
 	else
 		sh2->sr = (sh2->sr & ~I) | (irqline << 4);
 
-//	printf("sh2_exception [%s] irqline %x evec %x save SR %x new SR %x\n", message, irqline, sh2->evec, sh2->irqsr, sh2->sr);
+//  printf("sh2_exception [%s] irqline %x evec %x save SR %x new SR %x\n", message, irqline, sh2->evec, sh2->irqsr, sh2->sr);
 	#else
 	sh2->r[15] -= 4;
 	WL( sh2->r[15], sh2->sr );		/* push SR onto stack */

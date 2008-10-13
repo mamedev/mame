@@ -1412,7 +1412,7 @@ static void log_add_disasm_comment(drcuml_block *block, UINT32 pc, UINT32 op)
 static void generate_update_cycles(drcuml_block *block, compiler_state *compiler, drcuml_ptype ptype, UINT64 pvalue, int allow_exception)
 {
 	/* check full interrupts if pending */
-	if (compiler->checkints) 
+	if (compiler->checkints)
 	{
 		drcuml_codelabel skip = compiler->labelnum++;
 

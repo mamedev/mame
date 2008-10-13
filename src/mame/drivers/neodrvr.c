@@ -652,10 +652,10 @@ INPUT_PORTS_END
 
     All rom labels need to be reverified
 
-	SMA protected sets:
-	On some SMA protected sets there is a small sub pcb found, LBA-SUB (2000.2.24), which replaces the
-	regular used 2x32mbit or 4x16mbit proms. LBA-SUB (2000.2.24) contains 4x16mbit mask proms.
-	MVS sets confirmed are garou, mslug3, mslug3a and kof2000.
+    SMA protected sets:
+    On some SMA protected sets there is a small sub pcb found, LBA-SUB (2000.2.24), which replaces the
+    regular used 2x32mbit or 4x16mbit proms. LBA-SUB (2000.2.24) contains 4x16mbit mask proms.
+    MVS sets confirmed are garou, mslug3, mslug3a and kof2000.
 */
 
 ROM_START( nam1975 ) /* MVS AND AES VERSION */

@@ -125,7 +125,7 @@ static MACHINE_START( segac2 )
 	state_save_register_global(prot_write_buf);
 	state_save_register_global(prot_read_buf);
 
-//	MACHINE_START_CALL(genesis);
+//  MACHINE_START_CALL(genesis);
 }
 
 

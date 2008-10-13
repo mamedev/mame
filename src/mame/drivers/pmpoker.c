@@ -47,9 +47,9 @@
 
 
     Game Notes:
-	==========
+    ==========
 
-	* goldnpkr & goldnpkb:
+    * goldnpkr & goldnpkb:
 
     "How to play"... (from "Golden Poker Double Up" instruction card)
 
@@ -550,7 +550,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 	int attr = colorram[tile_index];
 	int code = ((attr & 1) << 8) | videoram[tile_index];
-	int bank = (attr & 0x02) >> 1;	/* bit 1 switch the gfx banks */ 
+	int bank = (attr & 0x02) >> 1;	/* bit 1 switch the gfx banks */
  	int color = (attr & 0x3c) >> 2;	/* bits 2-3-4-5 for color */
 
 	SET_TILE_INFO(bank, code, color, 0);
@@ -587,7 +587,7 @@ static PALETTE_INIT( goldnpkr )
 		int bit0, bit1, bit2, r, g, b, inten, intenmin, intenmax;
 
 		intenmin = 0xe0;
-//		intenmin = 0xc2;	/* 2.5 Volts (75.757575% of the whole range) */
+//      intenmin = 0xc2;    /* 2.5 Volts (75.757575% of the whole range) */
 		intenmax = 0xff;	/* 3.3 Volts (the whole range) */
 
 		/* intensity component */
@@ -682,7 +682,7 @@ static READ8_HANDLER( mux_port_r )
 
 static WRITE8_HANDLER( mux_port_w )
 {
-//	popmessage("written : %02X", data);
+//  popmessage("written : %02X", data);
 	input_selector = (data ^ 0xff) & 0xf0;	/* bits 4-7, inverted */
 }
 
@@ -1550,9 +1550,9 @@ static const discrete_dac_r1_ladder dac_goldnpkr_ladder =
 
 	CAP_U(1.7)							/* filtering cap tied to ground */
 
-//	12,									/* voltage Bias resistor is tied to */
-//	RES_K(330),							/* additional resistor tied to vBias */
-//	0,									/* resistor tied to ground */
+//  12,                                 /* voltage Bias resistor is tied to */
+//  RES_K(330),                         /* additional resistor tied to vBias */
+//  0,                                  /* resistor tied to ground */
 };
 
 static DISCRETE_SOUND_START( goldnpkr )
@@ -2110,19 +2110,19 @@ static DRIVER_INIT( pmpoker )
 	pia_config(1, &pia1_intf);
 }
 /*
-	Golden Poker H/W sets:
+    Golden Poker H/W sets:
 
     newname    oldname    gameplay  music      settings    testmode
-	===================================================================
+    ===================================================================
     pmpoker    pmpoker    fast      minimal    hack        matrix/grill
     goldnpkr   goldnpkr   fast      y.doodle   excellent   matrix/grill
     goldnpkb   goldnpkb   normal    minimal    normal      matrix/grill
 
 
-	Potten's Poker H/W sets:
+    Potten's Poker H/W sets:
 
     newname    oldname    gameplay  music      settings    testmode
-	===================================================================
+    ===================================================================
     pottnpkr   goldnpkc   fast      y.doodle   normal      only grid
     potnpkra   jokerpkr   normal    normal     normal      only skill
     potnpkrb   pottnpkb   slow      y.doodle   normal      only grid
@@ -2131,10 +2131,10 @@ static DRIVER_INIT( pmpoker )
     potnpkre   --------   slow      y.doodle   normal      matrix/grill
 
 
-	Witch Card H/W sets:
+    Witch Card H/W sets:
 
     newname    oldname    gameplay  music      settings    testmode
-	===================================================================
+    ===================================================================
     bsuerte    --------   normal    minimal    only 1-10   matrix/grill
     bsuertea   --------   normal    minimal    only 1-10   matrix/grill
     goodluck   --------   fast      y.doodle   normal      matrix/grill
@@ -2150,10 +2150,10 @@ static DRIVER_INIT( royale )
 {
     /* $60bb, NOPing the ORA #$F0 (after read the PIA1 port B */
 
-//	UINT8 *ROM = memory_region(machine, "main");
+//  UINT8 *ROM = memory_region(machine, "main");
 
-//	ROM[0x60bb] = 0xea;
-//	ROM[0x60bc] = 0xea;
+//  ROM[0x60bb] = 0xea;
+//  ROM[0x60bc] = 0xea;
 
 	pia_config(0, &pia0_intf);
 	pia_config(1, &pia1_intf);

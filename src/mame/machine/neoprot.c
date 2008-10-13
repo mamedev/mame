@@ -114,7 +114,7 @@ void fatfury2_install_protection(running_machine *machine)
   The encrypted set has a rom overlay feature, checked at
   various points in the game.
   Special board is used: NEO-MVS PROGSF1 (1998.6.17)
-  The board has a ALTERA (EPM7128SQC100-15) chip which is tied to 242-P1 
+  The board has a ALTERA (EPM7128SQC100-15) chip which is tied to 242-P1
 ***************************************************************/
 
 static WRITE16_HANDLER ( kof98_prot_w )

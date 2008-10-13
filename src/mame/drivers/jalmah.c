@@ -201,16 +201,16 @@ static VIDEO_START( jalmah )
 static VIDEO_START( urashima )
 {
 	sc0_tilemap = tilemap_create(get_sc0_tile_info,bg_scan,16,16,256,32);
-//	sc1_tilemap = tilemap_create(get_sc1_tile_info,bg_scan,TILEMAP_TRANSPARENT,16,16,256,32);
-//	sc2_tilemap = tilemap_create(get_sc2_tile_info,bg_scan,TILEMAP_TRANSPARENT,16,16,256,32);
+//  sc1_tilemap = tilemap_create(get_sc1_tile_info,bg_scan,TILEMAP_TRANSPARENT,16,16,256,32);
+//  sc2_tilemap = tilemap_create(get_sc2_tile_info,bg_scan,TILEMAP_TRANSPARENT,16,16,256,32);
 	sc3_tilemap = tilemap_create(get_sc3_tile_info,tilemap_scan_cols,8,8,256,32);
 
 	jm_scrollram = auto_malloc(0x80);
 	jm_vregs = auto_malloc(0x40);
 
 	tilemap_set_transparent_pen(sc0_tilemap,15);
-//	tilemap_set_transparent_pen(sc1_tilemap,15);
-//	tilemap_set_transparent_pen(sc2_tilemap,15);
+//  tilemap_set_transparent_pen(sc1_tilemap,15);
+//  tilemap_set_transparent_pen(sc2_tilemap,15);
 	tilemap_set_transparent_pen(sc3_tilemap,15);
 }
 
@@ -434,13 +434,13 @@ static VIDEO_EOF( jalmah )
 	switch(mcu_prg)
 	{
 		/*
-	       	#define DAIREIKA_MCU (0x11)
-	        #define URASHIMA_MCU (0x12)
-	        #define MJZOOMIN_MCU (0x13)
-	        #define KAKUMEI_MCU  (0x21)
-	        #define KAKUMEI2_MCU (0x22)
-	        #define SUCHIPI_MCU  (0x23)
-	    */
+            #define DAIREIKA_MCU (0x11)
+            #define URASHIMA_MCU (0x12)
+            #define MJZOOMIN_MCU (0x13)
+            #define KAKUMEI_MCU  (0x21)
+            #define KAKUMEI2_MCU (0x22)
+            #define SUCHIPI_MCU  (0x23)
+        */
 			case MJZOOMIN_MCU:
 			case DAIREIKA_MCU: daireika_mcu_run(machine); break;
 			case URASHIMA_MCU: urashima_mcu_run(machine); break;
@@ -653,8 +653,8 @@ static ADDRESS_MAP_START( urashima, ADDRESS_SPACE_PROGRAM, 16 )
 	//       0x084000, 0x084001  ?
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16) /* Palette RAM */
 	AM_RANGE(0x090000, 0x09bfff) AM_RAM_WRITE(sc0_vram_w) AM_BASE(&sc0_vram)
-//	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(sc0_vram_w)
-//	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(sc0_vram_w)
+//  AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(sc0_vram_w)
+//  AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(sc0_vram_w)
 //  AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(sc1_vram_w) AM_BASE(&sc1_vram)/*unused*/
 //  AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(sc2_vram_w) AM_BASE(&sc2_vram)/*unused*/
 	/*$9c000-$9cfff Video Registers*/
@@ -1519,14 +1519,14 @@ static WRITE16_HANDLER( daireika_mcu_w )
 		jm_regs[0x0144/2] = 0x0800;
 
 		/*
-		33c5 0010 07fe move.w  D5, $1007fe.l
-		3A39 000F 000C move.w  $f000c, D5
-		da86			 add.w   D6,D5
-		0245 003f		 and.w   $3f,D5
-		33C5 000F 000C move.w  D5, $f000c.l
-		3a39 0010 07fe move.w  $1007fe, D5
-		4e75			 rts
-		*/
+        33c5 0010 07fe move.w  D5, $1007fe.l
+        3A39 000F 000C move.w  $f000c, D5
+        da86             add.w   D6,D5
+        0245 003f        and.w   $3f,D5
+        33C5 000F 000C move.w  D5, $f000c.l
+        3a39 0010 07fe move.w  $1007fe, D5
+        4e75             rts
+        */
 		for(i=0;i<0x11;i++)
 			jm_mcu_code[(0x0800/2)+i] = dai_mcu_code[i];
 

@@ -1070,7 +1070,7 @@ void simutrek_set_audio_squelch(const device_config *device, int state)
 {
 	laserdisc_state *ld = ldcore_get_safe_token(device);
 	ldplayer_data *player = ld->player;
-	if (LOG_SIMUTREK && player->simutrek.audio_squelch != (state == 0)) 
+	if (LOG_SIMUTREK && player->simutrek.audio_squelch != (state == 0))
 		printf("--> audio squelch = %d\n", state == 0);
 	player->simutrek.audio_squelch = (state == 0);
 	update_audio_squelch(ld);
@@ -1089,7 +1089,7 @@ static void simutrek_init(laserdisc_state *ld)
 
 	/* standard PR-8210 initialization */
 	pr8210_init(ld);
-	
+
 	/* initialize the Simutrek state */
 	/* for proper synchronization of initial attract mode, this needs to be set */
 	player->simutrek.data_ready = 1;

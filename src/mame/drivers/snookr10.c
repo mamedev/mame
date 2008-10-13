@@ -460,8 +460,8 @@ static WRITE8_HANDLER( output_port_0_w )
 	coin_counter_w(1, data & 0x10);	/* Key in */
 	coin_counter_w(2, data & 0x04);	/* Payout x10 */
 
-//	logerror("high: %04x - low: %X \n", outporth, outportl);
-//	popmessage("written : %02X", data);
+//  logerror("high: %04x - low: %X \n", outporth, outportl);
+//  popmessage("written : %02X", data);
 }
 
 static WRITE8_HANDLER( output_port_1_w )

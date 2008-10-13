@@ -498,7 +498,7 @@ static READ8_HANDLER( videopkr_io_r )
 			{
 				valor = 0x0f;
 			}
-			
+
 			valor += co;
 			break;
 		}
@@ -832,7 +832,7 @@ static WRITE8_HANDLER(baby_sound_p3_w)
 	output_set_value("TOP_1", (lmp_ports >> 0) & 1);
 	output_set_value("TOP_2", (lmp_ports >> 1) & 1);
 	output_set_value("TOP_3", (lmp_ports >> 2) & 1);
-	
+
 	if (!(sbp3 & 0x10))
 	{
 		ay8910_reset_ym(sndti_token(SOUND_AY8910, 0));

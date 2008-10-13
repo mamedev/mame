@@ -502,7 +502,7 @@ static MACHINE_DRIVER_START( cubeqst )
 	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
-	
+
 	MDRV_SOUND_ADD("rdac0", DAC, 0)
 	MDRV_SOUND_ROUTE(0, "right", 0.125)
 	MDRV_SOUND_ADD("ldac0", DAC, 0)

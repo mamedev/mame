@@ -671,7 +671,7 @@ static MACHINE_DRIVER_START( firefox )
 
 	MDRV_GFXDECODE(firefox)
 	MDRV_PALETTE_LENGTH(512)
-	
+
 	MDRV_VIDEO_START(firefox)
 
 	MDRV_LASERDISC_ADD("laserdisc", PHILLIPS_22VP931, "main", "ldsound")

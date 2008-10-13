@@ -246,19 +246,19 @@ static WRITE16_HANDLER( ddealer_mcu_shared_w )
 	switch(offset)
 	{
 		/*
-			shared_ram[0xe490/2]=0x4ef9;
-			shared_ram[0xe492/2]=0x0000;
-			shared_ram[0xe494/2]=0x9696;// write to tx tilemap
-			shared_ram[0xe4a0/2]=0x4ef9;
-			shared_ram[0xe4a2/2]=0x0000;
-			shared_ram[0xe4a4/2]=0x95fe;// write to bg tilemap,might be 0x9634
-			shared_ram[0xe4c0/2]=0x4ef9;
-			shared_ram[0xe4c2/2]=0x0000;
-			shared_ram[0xe4c4/2]=0x9634;// unsure about this,tx tilemap
-			shared_ram[0xe4e0/2]=0x4ef9;
-			shared_ram[0xe4e2/2]=0x0000;
-			shared_ram[0xe4e4/2]=0x5ac6;//palette ram buffer
-		*/
+            shared_ram[0xe490/2]=0x4ef9;
+            shared_ram[0xe492/2]=0x0000;
+            shared_ram[0xe494/2]=0x9696;// write to tx tilemap
+            shared_ram[0xe4a0/2]=0x4ef9;
+            shared_ram[0xe4a2/2]=0x0000;
+            shared_ram[0xe4a4/2]=0x95fe;// write to bg tilemap,might be 0x9634
+            shared_ram[0xe4c0/2]=0x4ef9;
+            shared_ram[0xe4c2/2]=0x0000;
+            shared_ram[0xe4c4/2]=0x9634;// unsure about this,tx tilemap
+            shared_ram[0xe4e0/2]=0x4ef9;
+            shared_ram[0xe4e2/2]=0x0000;
+            shared_ram[0xe4e4/2]=0x5ac6;//palette ram buffer
+        */
 		case 0x086/2: PROT_INPUT(0x086/2,0x1234,0x100/2,0x80000); break;
 		case 0x164/2: PROT_INPUT(0x164/2,0x5678,0x104/2,0x80002); break;
 		case 0x62e/2: PROT_INPUT(0x62e/2,0x9ca3,0x108/2,0x80008); break;
@@ -310,11 +310,11 @@ f5010->mirror for inputs player 2
 				mcu_shared_ram[0x000/2] = 0x0000;
 				mcu_shared_ram[0x002/2] = 0x0000;
 				mcu_shared_ram[0x004/2] = 0x4ef9;
-//				mcu_shared_ram[0x006/2] = 0x0000;
-//				mcu_shared_ram[0x008/2] = 0x0000;
-//				mcu_shared_ram[0x00a/2] = 0x0000;
-//				mcu_shared_ram[0x00c/2] = 0x0000;
-//				mcu_shared_ram[0x00e/2] = 0x0000;
+//              mcu_shared_ram[0x006/2] = 0x0000;
+//              mcu_shared_ram[0x008/2] = 0x0000;
+//              mcu_shared_ram[0x00a/2] = 0x0000;
+//              mcu_shared_ram[0x00c/2] = 0x0000;
+//              mcu_shared_ram[0x00e/2] = 0x0000;
 			}
 			break;
 		case 0x002/2:
@@ -521,20 +521,20 @@ static READ16_HANDLER( ddealer_mcu_r )
 
 /*static WRITE16_HANDLER( ddealer_mcu_w )
 {
-	if(data==1)
-	{
-		prot=1;
-		shared_ram[0xe000/2]=0;
-		shared_ram[0xe002/2]=0;
-		shared_ram[0xe004/2]=0;
-		shared_ram[0xe006/2]=0;
-	}
+    if(data==1)
+    {
+        prot=1;
+        shared_ram[0xe000/2]=0;
+        shared_ram[0xe002/2]=0;
+        shared_ram[0xe004/2]=0;
+        shared_ram[0xe006/2]=0;
+    }
 }
 */
 static DRIVER_INIT( ddealer )
 {
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe01c, 0xfe01d, 0, 0, ddealer_mcu_r );
-//	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe01e, 0xfe01f, 0, 0, ddealer_mcu_w );
+//  memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe01e, 0xfe01f, 0, 0, ddealer_mcu_w );
 }
 
 ROM_START( ddealer )

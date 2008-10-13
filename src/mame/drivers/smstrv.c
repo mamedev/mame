@@ -209,7 +209,7 @@ resistors or other PWM fun) it should be possible to get:
 
 * The function of the pals is:
 LOCATION    DOTS        TYPE        PURPOSE
-U32         1Green      DMPAL10L8NC	Decodes the gated by U33/U34)
+U32         1Green      DMPAL10L8NC Decodes the gated by U33/U34)
    high address lines of the 8088, for mainboard ROM mapping. A
    different pal is probably used depending on whether the
    mainboard has 2764 or 27128 roms installed.
@@ -217,7 +217,7 @@ U32         1Green      DMPAL10L8NC	Decodes the gated by U33/U34)
    SMS Trivia: bad (chip shorted internally), mainboard has 2 27128s
    SMS Bingo: not dumped
    (schematic page 2)
-U38         3Blue		    PAL10L8CN   Decodes the (gated by U36)
+U38         3Blue           PAL10L8CN   Decodes the (gated by U36)
    high address lines of the z80 address bus, for mapping of the z80
    ROM, RAM, Counter control, 4 z80-to-8088 ports (2 one direction,
    2 the other), the ay-3-8910, and the two 8255 PPIs.
@@ -225,7 +225,7 @@ U38         3Blue		    PAL10L8CN   Decodes the (gated by U36)
 U39         3Green          PAL10L8CN   Accessory decoder to U38, helps
    with the 4 z80-to-8088 ports.
    (schematic page 10)
-U40         1Red	          PAL10L8CN   Connects to the low bits of the
+U40         1Red              PAL10L8CN   Connects to the low bits of the
    8088 address bus for decoding writing to/reading from the 8088 side of
    the 4 z80-to-8088 ports.
    (schematic page 10, note this chip is mismarked as U9 on the page,
@@ -275,10 +275,10 @@ U140        1Brown          PAL14H4CN   This and the next 5 pals are used
    (8 bits per channel) for output. all 6 pals are the same.
    (schematic page 7)
 U141        1Brown          PAL14H4CN
-U142		1Brown          PAL14H4CN
-U143		1Brown          PAL14H4CN
-U144		1Brown          PAL14H4CN
-U145		1Brown          PAL14H4CN
+U142        1Brown          PAL14H4CN
+U143        1Brown          PAL14H4CN
+U144        1Brown          PAL14H4CN
+U145        1Brown          PAL14H4CN
 
 
 

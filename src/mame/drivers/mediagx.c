@@ -463,7 +463,7 @@ static void mediagx_config_reg_w(UINT8 data)
 static READ8_DEVICE_HANDLER( io20_r )
 {
 	UINT8 r = 0;
-	
+
 	// 0x22, 0x23, Cyrix configuration registers
 	if (offset == 0x02)
 	{
