@@ -61,8 +61,6 @@ fffe=reset e7cc
 
 static const device_config *laserdisc;
 static int m_n_disc_lock;
-static int m_n_disc_left_audio;
-static int m_n_disc_right_audio;
 static int m_n_disc_data;
 static int m_n_disc_read_data;
 
@@ -104,10 +102,7 @@ static WRITE8_HANDLER( firefox_disc_lock_w )
 
 static WRITE8_HANDLER( audio_enable_w )
 {
-	if (!(offset & 1))
-		m_n_disc_right_audio = data & 0x80;
-	else
-		m_n_disc_left_audio = data & 0x80;
+	sndti_set_output_gain(SOUND_CUSTOM, 0, ~offset & 1, (data & 0x80) ? 1.0 : 0.0);
 }
 
 static WRITE8_HANDLER( firefox_disc_reset_w )
@@ -502,7 +497,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START(audio_map, ADDRESS_SPACE_PROGRAM, 8)
+static ADDRESS_MAP_START( audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
 	AM_RANGE(0x0800, 0x087f) AM_MIRROR(0x0700) AM_RAM /* RIOT ram */
 	AM_RANGE(0x0880, 0x089f) AM_MIRROR(0x07e0) AM_DEVREADWRITE(RIOT6532,"riot",riot6532_r, riot6532_w)

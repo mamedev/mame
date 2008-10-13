@@ -383,14 +383,16 @@ static TIMER_CALLBACK( deferred_data_w )
 	ldplayer_data *player = ld->player;
 
 	/* set the value and mark it pending */
+	if (LOG_COMMANDS && player->fromcontroller_pending)
+		printf("Dropped previous command byte\n");
 	player->fromcontroller = param;
 	player->fromcontroller_pending = TRUE;
 
 	/* track the commands for debugging purposes */
 	if (player->cmdcount < ARRAY_LENGTH(player->cmdbuf))
 	{
-		player->cmdbuf[player->cmdcount++] = param;
-		if (LOG_COMMANDS && player->cmdcount == 3)
+		player->cmdbuf[player->cmdcount++ % 3] = param;
+		if (LOG_COMMANDS && player->cmdcount % 3 == 0)
 			printf("Cmd: %02X %02X %02X\n", player->cmdbuf[0], player->cmdbuf[1], player->cmdbuf[2]);
 	}
 }
