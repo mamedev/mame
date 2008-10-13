@@ -186,7 +186,7 @@ MACHINE_DRIVER_END
 
 Mosaic (c) 1999 F2 System
 
-CPU: Hyperstone E1-32XN
+   CPU: Hyperstone E1-32XN
  Video: QuickLogic QL2003-XPL84C
  Sound: OKI 6295, BS901 (YM2151) & BS902 (YM3012)
    OSC: 20MHz & 14.31818MHz
