@@ -19,6 +19,7 @@
 
 #include "driver.h"
 #include "cpu/cubeqcpu/cubeqcpu.h"
+#include "sound/dac.h"
 #include "deprecat.h"
 #include "sound/custom.h"
 #include "streams.h"
@@ -35,8 +36,6 @@
 #define CUBEQST_HBLANK		320
 #define CUBEQST_VCOUNT		280
 
-#define ALPHA_PEN			8192
-
 enum cpu_indices
 {
 	MAIN_CPU   = 0,
@@ -52,15 +51,16 @@ enum cpu_indices
  *
  *************************************/
 
-static UINT16 *palette_ram;
 static UINT8 *depth_buffer;
 static int video_field;
 
 static UINT8 io_latch;
 static UINT8 reset_latch;
 
-static int disk_on;
 static const device_config *laserdisc;
+static rgb_t *colormap;
+
+
 
 /*************************************
  *
@@ -69,13 +69,6 @@ static const device_config *laserdisc;
  *************************************/
 
 static const rectangle overlay_clip = { 0, 320-1, 0, 256-8 };
-
-/* Get a pen number from a palette RAM entry */
-INLINE int get_output_color(UINT16 a)
-{
-	return ((a & 0xf000) >> 3) | ((a & 0x700) >> 2) | ((a & 0x70) >> 1) | (a & 0x7);
-}
-
 
 static VIDEO_START( cubeqst )
 {
@@ -88,20 +81,25 @@ static PALETTE_INIT( cubeqst )
 {
 	int i;
 
-	for (i = 0; i < 8192; ++i)
+	colormap = auto_malloc(65536 * sizeof(colormap[0]));
+	for (i = 0; i < 65536; ++i)
 	{
-		UINT8 r, g, b, y;
+		UINT8 a, r, g, b, y;
 
-		b = i & 7;
-		g = (i >> 3) & 7;
-		r = (i >> 6) & 7;
-		y = ((i >> 9) & 0xf) * 2;
+		a = (i >> 3) & 1;
+		b = (i >> 0) & 7;
+		g = (i >> 4) & 7;
+		r = (i >> 8) & 7;
+		y = ((i >> 12) & 0xf) * 2;
 
-		palette_set_color_rgb(machine, i, y*r, y*g, y*b);
+		colormap[i] = MAKE_ARGB(a ? 0 : 255, y*r, y*g, y*b);
 	}
+}
 
-	/* use pen 8192 for transparent */
-	palette_set_color(machine, 8192, MAKE_ARGB(0,0,0,0));
+static WRITE16_HANDLER( palette_w )
+{
+	video_screen_update_now(machine->primary_screen);
+	COMBINE_DATA(&paletteram16[offset]);
 }
 
 /* TODO: This is a simplified version of what actually happens */
@@ -109,18 +107,13 @@ static VIDEO_UPDATE( cubeqst )
 {
 	int y;
 
-	int palentry = palette_ram[255];
-
 	/*
      * Clear the display with palette RAM entry 0xff
      * This will be either transparent or an actual colour
     */
 
 	/* Bit 3 selects LD/#GRAPHICS */
-	if ((palentry & (1 << 3)) && disk_on)
-		fillbitmap(bitmap, ALPHA_PEN, cliprect);
-	else
-		fillbitmap(bitmap, screen->machine->pens[get_output_color(palentry)], cliprect);
+	fillbitmap(bitmap, colormap[255], cliprect);
 
 	cpuintrf_push_context(LINE_CPU);
 
@@ -130,7 +123,8 @@ static VIDEO_UPDATE( cubeqst )
 		int i;
 		int num_entries = get_ptr_ram_val(y);
 		UINT32 *stk_ram = get_stack_ram();
-		UINT16 *dest = BITMAP_ADDR16(bitmap, y, 0);
+		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
+		UINT32 pen;
 
 		/* Zap the depth buffer */
 		memset(depth_buffer, 0xff, 512);
@@ -144,9 +138,6 @@ static VIDEO_UPDATE( cubeqst )
 
 			int entry1 = stk_ram[(y << 7) | ((i + 0) & 0x7f)];
 			int entry2 = stk_ram[(y << 7) | ((i + 1) & 0x7f)];
-
-			UINT16 palram;
-			UINT16 pen;
 
 			/* Determine which entry is the start point and which is the stop */
 			if ( entry1 & (1 << 19) )
@@ -170,17 +161,8 @@ static VIDEO_UPDATE( cubeqst )
 				// Shouldn't happen...
 			}
 
-			/* Get the 16-bit palette RAM entry */
-			palram = palette_ram[color];
-
-			if (palram & (1 << 3))
-				/* If transparent, draw using our special alpha pen */
-				pen = ALPHA_PEN;
-			else
-				/* Otherwise map the entry to a MAME pen */
-				pen = screen->machine->pens[get_output_color(palram)];
-
 			/* Draw the span, testing for depth */
+			pen = colormap[paletteram16[color]];
 			for (x = h1; x <= h2; ++x)
 			{
 				if (!(depth_buffer[x] < depth))
@@ -255,7 +237,7 @@ static WRITE16_HANDLER( ldaud_w )
 */
 static WRITE16_HANDLER( control_w )
 {
-	disk_on = data & 1;
+	laserdisc_video_enable(laserdisc, data & 1);
 }
 
 
@@ -412,10 +394,10 @@ static ADDRESS_MAP_START( m68k_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x038002, 0x038003) AM_READWRITE(chop_r, ldaud_w)
 	AM_RANGE(0x038008, 0x038009) AM_READWRITE(line_r, reset_w)
 	AM_RANGE(0x03800e, 0x03800f) AM_READWRITE(laserdisc_r, laserdisc_w)
-	AM_RANGE(0x03c800, 0x03c9ff) AM_RAM AM_BASE(&palette_ram)
+	AM_RANGE(0x03c800, 0x03c9ff) AM_RAM_WRITE(palette_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x03cc00, 0x03cc01) AM_WRITE(control_w)
-	AM_RANGE(0x03e000, 0x03efff) AM_RAM AM_MIRROR(0xfc0000) AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
-	AM_RANGE(0x03f000, 0x03ffff) AM_RAM AM_MIRROR(0xfc0000)
+	AM_RANGE(0x03e000, 0x03efff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x03f000, 0x03ffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -457,68 +439,17 @@ static MACHINE_RESET( cubeqst )
  *
  *************************************/
 
-static sound_stream *cquest_stream;
-
 /*
  *  The sound CPU outputs to a 12-bit 7521 DAC
  *  The DAC output is multiplexed between
  *  16 channels (8 per side).
  */
 
-static struct
-{
-	INT16 sample[2][8];
-} cquest_sound;
-
 /* Called by the sound CPU emulation */
 static void sound_dac_w(UINT16 data)
 {
-	int side = data & 1;
-	int chan = (data >> 1) & 7;
-	int value = ((data >> 4) & 0xfff);
-
-	/* Sign extend 12-bit to 16-bit */
-	int finalvalue = (value & 0x7ff) - (value & 0x800);
-	if (cquest_sound.sample[side][chan] != finalvalue)
-	{
-		stream_update(cquest_stream);
-		cquest_sound.sample[side][chan] = finalvalue;
-	}
+	dac_signed_data_16_w(data & 15, (data & 0xfff0) ^ 0x8000);
 }
-
-static void cquest_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)
-{
-	int side;
-
-	/* Clear the buffers */
-	memset(buffer[0], 0, length * sizeof(*buffer[0]));
-	memset(buffer[1], 0, length * sizeof(*buffer[1]));
-
-	for (side = 0; side < 2; ++side)
-	{
-		int chan;
-		for (chan = 0; chan < 8; ++chan)
-		{
-			int samp;
-			for (samp = 0; samp < length; ++samp)
-				buffer[side][samp] += (cquest_sound.sample[side][chan]) * 4;
-		}
-	}
-}
-
-static void *cquest_sh_start(int clock, const custom_sound_interface *config)
-{
-	/* Allocate the stream */
-	cquest_stream = stream_create(0, 2, Machine->sample_rate, NULL, cquest_stream_update);
-
-	return auto_malloc(1);
-}
-
-static const custom_sound_interface custom_interface =
-{
-	cquest_sh_start
-};
-
 
 static const cubeqst_snd_config snd_config =
 {
@@ -554,14 +485,13 @@ static MACHINE_DRIVER_START( cubeqst )
 	MDRV_MACHINE_RESET(cubeqst)
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_INDEXED16)
+	MDRV_LASERDISC_SCREEN_ADD_NTSC("main", BITMAP_FORMAT_RGB32)
 	MDRV_VIDEO_START(cubeqst)
 
-	MDRV_PALETTE_LENGTH(8192 + 1)
 	MDRV_PALETTE_INIT(cubeqst)
 
 	MDRV_LASERDISC_ADD("laserdisc", SIMUTREK_SPECIAL, "main", "ldsound")
-	MDRV_LASERDISC_OVERLAY(cubeqst, CUBEQST_HBLANK, CUBEQST_VCOUNT, BITMAP_FORMAT_INDEXED16)
+	MDRV_LASERDISC_OVERLAY(cubeqst, CUBEQST_HBLANK, CUBEQST_VCOUNT, BITMAP_FORMAT_RGB32)
 	MDRV_LASERDISC_OVERLAY_CLIP(0, 320-1, 0, 256-8)
 	MDRV_LASERDISC_OVERLAY_POSITION(0.002, -0.018)
 	MDRV_LASERDISC_OVERLAY_SCALE(1.0, 1.030)
@@ -572,11 +502,39 @@ static MACHINE_DRIVER_START( cubeqst )
 	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
-
-	MDRV_SOUND_ADD("cubeqst", CUSTOM, 1)
-	MDRV_SOUND_CONFIG(custom_interface)
-	MDRV_SOUND_ROUTE(1, "left", 1.0)
-	MDRV_SOUND_ROUTE(0, "right", 1.0)
+	
+	MDRV_SOUND_ADD("rdac0", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "right", 0.125)
+	MDRV_SOUND_ADD("ldac0", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "left", 0.125)
+	MDRV_SOUND_ADD("rdac1", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "right", 0.125)
+	MDRV_SOUND_ADD("ldac1", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "left", 0.125)
+	MDRV_SOUND_ADD("rdac2", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "right", 0.125)
+	MDRV_SOUND_ADD("ldac2", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "left", 0.125)
+	MDRV_SOUND_ADD("rdac3", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "right", 0.125)
+	MDRV_SOUND_ADD("ldac3", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "left", 0.125)
+	MDRV_SOUND_ADD("rdac4", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "right", 0.125)
+	MDRV_SOUND_ADD("ldac4", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "left", 0.125)
+	MDRV_SOUND_ADD("rdac5", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "right", 0.125)
+	MDRV_SOUND_ADD("ldac5", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "left", 0.125)
+	MDRV_SOUND_ADD("rdac6", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "right", 0.125)
+	MDRV_SOUND_ADD("ldac6", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "left", 0.125)
+	MDRV_SOUND_ADD("rdac7", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "right", 0.125)
+	MDRV_SOUND_ADD("ldac7", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "left", 0.125)
 MACHINE_DRIVER_END
 
 
