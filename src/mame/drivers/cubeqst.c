@@ -188,7 +188,7 @@ static INTERRUPT_GEN( vblank )
 {
 	int int_level = video_field == 0 ? 5 : 6;
 
-	cpunum_set_input_line(machine, MAIN_CPU, int_level, HOLD_LINE);
+	cputag_set_input_line(machine, "main_cpu", int_level, HOLD_LINE);
 
 	/* Update the laserdisc */
 	video_field ^= 1;
@@ -276,9 +276,9 @@ static void swap_linecpu_banks(void)
 */
 static WRITE16_HANDLER( reset_w )
 {
-	cpunum_set_input_line(machine, ROTATE_CPU, INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
-	cpunum_set_input_line(machine, LINE_CPU, INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
-	cpunum_set_input_line(machine, SOUND_CPU, INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine, "rotate_cpu", INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine, "line_cpu", INPUT_LINE_RESET, data & 1 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(machine, "sound_cpu", INPUT_LINE_RESET, data & 2 ? CLEAR_LINE : ASSERT_LINE);
 
 	/* Swap stack and pointer RAM banks on rising edge of display reset */
 	if (!BIT(reset_latch, 0) && BIT(data, 0))
@@ -427,9 +427,9 @@ static MACHINE_RESET( cubeqst )
 	reset_latch = 0;
 
 	/* Auxillary CPUs are held in reset */
-	cpunum_set_input_line(machine, SOUND_CPU, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(machine, ROTATE_CPU, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(machine, LINE_CPU, INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "sound_cpu", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "rotate_cpu", INPUT_LINE_RESET, ASSERT_LINE);
+	cputag_set_input_line(machine, "line_cpu", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
