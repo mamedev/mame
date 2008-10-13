@@ -134,6 +134,7 @@ static unsigned char *tile_palette;
 static unsigned char *sprite_palette;
 static const device_config *nvram_1c;
 static const device_config *nvram_1d;
+static tilemap *bgtiles;
 
 static int control_num;
 static UINT8 sound_to_main_flag;
@@ -146,22 +147,33 @@ static int sprite_bank;
  *
  *************************************/
 
+static TILE_GET_INFO( bgtile_get_info )
+{
+	SET_TILE_INFO(0, tileram[tile_index], 0, 0);
+}
+
+
+static WRITE8_HANDLER( tileram_w )
+{
+	tileram[offset] = data;
+	tilemap_mark_tile_dirty(bgtiles, offset);
+}
+
+
+static VIDEO_START( firefox )
+{
+	bgtiles = tilemap_create(bgtile_get_info, tilemap_scan_rows, 8,8, 64,64);
+	tilemap_set_transparent_pen(bgtiles, 0);
+	tilemap_set_scrolldy(bgtiles, video_screen_get_visible_area(machine->primary_screen)->min_y, 0);
+}
+
+
 static VIDEO_UPDATE( firefox )
 {
-	int x;
-	int y;
 	int sprite;
 	int gfxtop = video_screen_get_visible_area(screen)->min_y;
 
 	fillbitmap( bitmap, palette_get_color(screen->machine, 256), cliprect );
-
-	for( y = 0; y < 64; y++ )
-	{
-		for( x = 0; x < 64; x++ )
-		{
-			drawgfx( bitmap, screen->machine->gfx[ 0 ], tileram[ x + ( y * 64 ) ], 0, 0, 0, x * 8, gfxtop + y * 8, cliprect, TRANSPARENCY_PEN, 0 );
-		}
-	}
 
 	for( sprite = 0; sprite < 32; sprite++ )
 	{
@@ -176,15 +188,17 @@ static VIDEO_UPDATE( firefox )
 
 			for( row = 0; row < 8; row++ )
 			{
-				int color = 2 * ( ( flags >> 2 ) & 0x03 );
+				int color = ( flags >> 2 ) & 0x03;
 				int flipy = flags & 0x10;
 				int flipx = flags & 0x20;
 				int code = sprite_data[ 15 - row ] + ( 256 * ( ( flags >> 6 ) & 3 ) );
 
-				drawgfx( bitmap, screen->machine->gfx[ 1 ], code, color, flipx, flipy, x + 16, gfxtop + 500 - y - ( row * 16 ), cliprect, TRANSPARENCY_PEN, 0 );
+				drawgfx( bitmap, screen->machine->gfx[ 1 ], code, color, flipx, flipy, x + 8, gfxtop + 500 - y - ( row * 16 ), cliprect, TRANSPARENCY_PEN, 0 );
 			}
 		}
 	}
+
+	tilemap_draw( bitmap, cliprect, bgtiles, 0, 0 );
 
 	return 0;
 }
@@ -425,10 +439,10 @@ static void firq_gen(const device_config *device, int state)
 static MACHINE_START( firefox )
 {
 	memory_configure_bank(1, 0, 32, memory_region(machine, "main") + 0x10000, 0x1000);
-	nvram_1c = device_list_find_by_tag(machine->config->devicelist, X2212, "nvram_1c");
-	nvram_1d = device_list_find_by_tag(machine->config->devicelist, X2212, "nvram_1d");
+	nvram_1c = devtag_get_device(machine, X2212, "nvram_1c");
+	nvram_1d = devtag_get_device(machine, X2212, "nvram_1d");
 
-	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
+	laserdisc = devtag_get_device(machine, LASERDISC, "laserdisc");
 	vp931_set_data_ready_callback(laserdisc, firq_gen);
 
 	control_num = 0;
@@ -444,7 +458,7 @@ static MACHINE_START( firefox )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_BASE(&tileram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(tileram_w) AM_BASE(&tileram)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_BASE(&spriteram)
 	AM_RANGE(0x2800, 0x2aff) AM_READWRITE(SMH_RAM, sprite_palette_w) AM_BASE(&sprite_palette)
 	AM_RANGE(0x2b00, 0x2b00) AM_MIRROR(0x04ff) AM_WRITE(firefox_objram_bank_w)
@@ -605,17 +619,17 @@ static const gfx_layout tilelayout =
 static const gfx_layout spritelayout =
 {
 	16,16,
-	RGN_FRAC(1,5),
-	5,
-	{ RGN_FRAC(0,5), RGN_FRAC(1,5), RGN_FRAC(2,5), RGN_FRAC(3,5), RGN_FRAC(4,5) },
+	RGN_FRAC(1,6),
+	6,
+	{ RGN_FRAC(0,6), RGN_FRAC(1,6), RGN_FRAC(2,6), RGN_FRAC(3,6), RGN_FRAC(4,6), RGN_FRAC(5,6) },
 	{ STEP16(0,1) },
 	{ STEP16(0,16) },
 	32*8
 };
 
 static GFXDECODE_START( firefox )
-	GFXDECODE_ENTRY("tiles",   0, tilelayout,   0,   16)
-	GFXDECODE_ENTRY("sprites", 0, spritelayout, 256, 32)
+	GFXDECODE_ENTRY("tiles",   0, tilelayout,   0,   1)
+	GFXDECODE_ENTRY("sprites", 0, spritelayout, 256, 4)
 GFXDECODE_END
 
 
@@ -657,6 +671,8 @@ static MACHINE_DRIVER_START( firefox )
 
 	MDRV_GFXDECODE(firefox)
 	MDRV_PALETTE_LENGTH(512)
+	
+	MDRV_VIDEO_START(firefox)
 
 	MDRV_LASERDISC_ADD("laserdisc", PHILLIPS_22VP931, "main", "ldsound")
 	MDRV_LASERDISC_OVERLAY(firefox, 64*8, 525, BITMAP_FORMAT_RGB32)
@@ -727,19 +743,19 @@ ROM_START( firefox )
 	ROM_REGION( 0x2000, "tiles", ROMREGION_DISPOSE )
 	ROM_LOAD( "136026.125",     0x0000,  0x2000, CRC(8a32f9f1) SHA1(f899174f55cd4a24a3be4a0f4bb44d3e8e938586) ) /* 6p */
 
-	ROM_REGION( 0x28000, "sprites", ROMREGION_DISPOSE )
+	ROM_REGION( 0x30000, "sprites", ROMREGION_DISPOSE | ROMREGION_ERASE00 )
 	/* empty 6c */
 	/* empty 6a */
-	ROM_LOAD( "136026.124",     0x00000,  0x4000, CRC(5efe0f6c) SHA1(df35fd9267d966ab379c2f78ed418f4606741b28)) /* 5c */
-	ROM_LOAD( "136026.123",     0x04000,  0x4000, CRC(dffe48b3) SHA1(559907651bb425e26a834b467959b15092d23d27)) /* 5a */
-	ROM_LOAD( "136026.118",     0x08000,  0x4000, CRC(0ed4df15) SHA1(7aa599f428112fff4bfedf63fafc22f19fa66546)) /* 4c */
-	ROM_LOAD( "136026.122",     0x0c000,  0x4000, CRC(8e2c6616) SHA1(59cbd585028bb634034a9dfd552275bd41f01989)) /* 4a */
-	ROM_LOAD( "136026.117",     0x10000,  0x4000, CRC(79129084) SHA1(4219ff7cd444ad11e4cb9f1c30ac15fe0cfc5a17)) /* 3c */
-	ROM_LOAD( "136026.121",     0x14000,  0x4000, CRC(494972d4) SHA1(fa0e24e911b233e9644d7794ba03f76bfd39aa8c)) /* 3a */
-	ROM_LOAD( "136026.116",     0x18000,  0x4000, CRC(d5282d4e) SHA1(de5fdf82a615625aa77b39e035b4206216faaf9c)) /* 2c */
-	ROM_LOAD( "136026.120",     0x1c000,  0x4000, CRC(e1b95923) SHA1(b6d0c0af0a8f55e728cd0f4c3222745eefd57f50)) /* 2a */
-	ROM_LOAD( "136026.115",     0x20000,  0x4000, CRC(861abc82) SHA1(1845888d07162ae915364a2a91294731f1c5b3bd)) /* 1c */
-	ROM_LOAD( "136026.119",     0x24000,  0x4000, CRC(959471b1) SHA1(a032209a209f51d34360d5c7ad32ec62150158d2)) /* 1a */
+	ROM_LOAD( "136026.124",     0x08000,  0x4000, CRC(5efe0f6c) SHA1(df35fd9267d966ab379c2f78ed418f4606741b28)) /* 5c */
+	ROM_LOAD( "136026.123",     0x0c000,  0x4000, CRC(dffe48b3) SHA1(559907651bb425e26a834b467959b15092d23d27)) /* 5a */
+	ROM_LOAD( "136026.118",     0x10000,  0x4000, CRC(0ed4df15) SHA1(7aa599f428112fff4bfedf63fafc22f19fa66546)) /* 4c */
+	ROM_LOAD( "136026.122",     0x14000,  0x4000, CRC(8e2c6616) SHA1(59cbd585028bb634034a9dfd552275bd41f01989)) /* 4a */
+	ROM_LOAD( "136026.117",     0x18000,  0x4000, CRC(79129084) SHA1(4219ff7cd444ad11e4cb9f1c30ac15fe0cfc5a17)) /* 3c */
+	ROM_LOAD( "136026.121",     0x1c000,  0x4000, CRC(494972d4) SHA1(fa0e24e911b233e9644d7794ba03f76bfd39aa8c)) /* 3a */
+	ROM_LOAD( "136026.116",     0x20000,  0x4000, CRC(d5282d4e) SHA1(de5fdf82a615625aa77b39e035b4206216faaf9c)) /* 2c */
+	ROM_LOAD( "136026.120",     0x24000,  0x4000, CRC(e1b95923) SHA1(b6d0c0af0a8f55e728cd0f4c3222745eefd57f50)) /* 2a */
+	ROM_LOAD( "136026.115",     0x28000,  0x4000, CRC(861abc82) SHA1(1845888d07162ae915364a2a91294731f1c5b3bd)) /* 1c */
+	ROM_LOAD( "136026.119",     0x2c000,  0x4000, CRC(959471b1) SHA1(a032209a209f51d34360d5c7ad32ec62150158d2)) /* 1a */
 
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "firefox", 0, NO_DUMP )
@@ -767,19 +783,19 @@ ROM_START( firefoxa )
 	ROM_REGION( 0x2000, "tiles", ROMREGION_DISPOSE )
 	ROM_LOAD( "136026.125",     0x0000,  0x2000, CRC(8a32f9f1) SHA1(f899174f55cd4a24a3be4a0f4bb44d3e8e938586) ) /* 6p */
 
-	ROM_REGION( 0x28000, "sprites", ROMREGION_DISPOSE )
+	ROM_REGION( 0x30000, "sprites", ROMREGION_DISPOSE | ROMREGION_ERASE00 )
 	/* empty 6c */
 	/* empty 6a */
-	ROM_LOAD( "136026.124",     0x00000,  0x4000, CRC(5efe0f6c) SHA1(df35fd9267d966ab379c2f78ed418f4606741b28)) /* 5c */
-	ROM_LOAD( "136026.123",     0x04000,  0x4000, CRC(dffe48b3) SHA1(559907651bb425e26a834b467959b15092d23d27)) /* 5a */
-	ROM_LOAD( "136026.118",     0x08000,  0x4000, CRC(0ed4df15) SHA1(7aa599f428112fff4bfedf63fafc22f19fa66546)) /* 4c */
-	ROM_LOAD( "136026.122",     0x0c000,  0x4000, CRC(8e2c6616) SHA1(59cbd585028bb634034a9dfd552275bd41f01989)) /* 4a */
-	ROM_LOAD( "136026.117",     0x10000,  0x4000, CRC(79129084) SHA1(4219ff7cd444ad11e4cb9f1c30ac15fe0cfc5a17)) /* 3c */
-	ROM_LOAD( "136026.121",     0x14000,  0x4000, CRC(494972d4) SHA1(fa0e24e911b233e9644d7794ba03f76bfd39aa8c)) /* 3a */
-	ROM_LOAD( "136026.116",     0x18000,  0x4000, CRC(d5282d4e) SHA1(de5fdf82a615625aa77b39e035b4206216faaf9c)) /* 2c */
-	ROM_LOAD( "136026.120",     0x1c000,  0x4000, CRC(e1b95923) SHA1(b6d0c0af0a8f55e728cd0f4c3222745eefd57f50)) /* 2a */
-	ROM_LOAD( "136026.115",     0x20000,  0x4000, CRC(861abc82) SHA1(1845888d07162ae915364a2a91294731f1c5b3bd)) /* 1c */
-	ROM_LOAD( "136026.119",     0x24000,  0x4000, CRC(959471b1) SHA1(a032209a209f51d34360d5c7ad32ec62150158d2)) /* 1a */
+	ROM_LOAD( "136026.124",     0x08000,  0x4000, CRC(5efe0f6c) SHA1(df35fd9267d966ab379c2f78ed418f4606741b28)) /* 5c */
+	ROM_LOAD( "136026.123",     0x0c000,  0x4000, CRC(dffe48b3) SHA1(559907651bb425e26a834b467959b15092d23d27)) /* 5a */
+	ROM_LOAD( "136026.118",     0x10000,  0x4000, CRC(0ed4df15) SHA1(7aa599f428112fff4bfedf63fafc22f19fa66546)) /* 4c */
+	ROM_LOAD( "136026.122",     0x14000,  0x4000, CRC(8e2c6616) SHA1(59cbd585028bb634034a9dfd552275bd41f01989)) /* 4a */
+	ROM_LOAD( "136026.117",     0x18000,  0x4000, CRC(79129084) SHA1(4219ff7cd444ad11e4cb9f1c30ac15fe0cfc5a17)) /* 3c */
+	ROM_LOAD( "136026.121",     0x1c000,  0x4000, CRC(494972d4) SHA1(fa0e24e911b233e9644d7794ba03f76bfd39aa8c)) /* 3a */
+	ROM_LOAD( "136026.116",     0x20000,  0x4000, CRC(d5282d4e) SHA1(de5fdf82a615625aa77b39e035b4206216faaf9c)) /* 2c */
+	ROM_LOAD( "136026.120",     0x24000,  0x4000, CRC(e1b95923) SHA1(b6d0c0af0a8f55e728cd0f4c3222745eefd57f50)) /* 2a */
+	ROM_LOAD( "136026.115",     0x28000,  0x4000, CRC(861abc82) SHA1(1845888d07162ae915364a2a91294731f1c5b3bd)) /* 1c */
+	ROM_LOAD( "136026.119",     0x2c000,  0x4000, CRC(959471b1) SHA1(a032209a209f51d34360d5c7ad32ec62150158d2)) /* 1a */
 
 	DISK_REGION( "laserdisc" )
 	DISK_IMAGE_READONLY( "firefox", 0, NO_DUMP )
