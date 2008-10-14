@@ -918,6 +918,18 @@ WRITE8_HANDLER( paletteram_xRRRRRGGGGGBBBBB_le_w )
 	set_color_555(machine, offset / 2, 10, 5, 0, paletteram16_le(offset));
 }
 
+WRITE8_HANDLER( paletteram_xRRRRRGGGGGBBBBB_split1_w )
+{
+	paletteram[offset] = data;
+	set_color_555(machine, offset, 10, 5, 0, paletteram16_split(offset));
+}
+
+WRITE8_HANDLER( paletteram_xRRRRRGGGGGBBBBB_split2_w )
+{
+	paletteram_2[offset] = data;
+	set_color_555(machine, offset, 10, 5, 0, paletteram16_split(offset));
+}
+
 WRITE16_HANDLER( paletteram16_xRRRRRGGGGGBBBBB_word_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
