@@ -175,6 +175,11 @@
     DRIVER UPDATES:
 
 
+    [2008-10-14]
+
+    - Improved the button-lamps layouts to look more realistic.
+
+
     [2008-08-21]
 
     After an exhaustive analysis to the unknown writes, finally figured out the missing sound device.
