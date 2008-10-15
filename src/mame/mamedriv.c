@@ -2716,6 +2716,7 @@ V-V                           TP-027
 	DRIVER( gigawing )	/* 22/02/1999 (c) 1999 Takumi (US) */
 	DRIVER( gwingj )	/* 23/02/1999 (c) 1999 Takumi (Japan) */
 	DRIVER( gwinga )	/* 22/02/1999 (c) 1999 Takumi (Asia) */
+	DRIVER( gwingb )	/* 22/02/1999 (c) 1999 Takumi (Brazil) */
 	DRIVER( jyangoku )	/* 27/05/1999 (c) 1999 (Japan) */
 	DRIVER( dimahoo )	/* 21/01/2000 (c) 2000 Eighting/Raizing (US) */
 	DRIVER( dimahoou )	/* 21/01/2000 (c) 2000 Eighting/Raizing (US) */

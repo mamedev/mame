@@ -3209,6 +3209,27 @@ ROM_START( gwinga )
 	ROM_LOAD16_WORD_SWAP( "ggw.12m",   0x400000, 0x400000, CRC(4bee4e8f) SHA1(c440b5a38359ec3b8002f39690b79bf78703f5d0) )
 ROM_END
 
+ROM_START( gwingb )
+	ROM_REGION(CODE_SIZE, "main", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "ggwb.03a", 0x000000, 0x80000, CRC(a1f8a448) SHA1(a88ed9fea9ec08fda59a1ca9622dfb9f8afdda78) )
+	ROM_LOAD16_WORD_SWAP( "ggwb.04a", 0x080000, 0x80000, CRC(6a423e76) SHA1(f6ed20f09e852b4fad78ee32617122d5deb98789) )
+	ROM_LOAD16_WORD_SWAP( "ggwb.05a", 0x100000, 0x80000, CRC(3239d642) SHA1(2fe3984c46a72aedb30a28e3db5af2612bdf0045) )
+
+	ROM_REGION( 0x1000000, "gfx", 0 )
+	ROMX_LOAD( "ggw.13m",   0x000000, 0x400000, CRC(105530a4) SHA1(3be06c032985ea6bd3805d73a407bf748385087b) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "ggw.15m",   0x000002, 0x400000, CRC(9e774ab9) SHA1(adea1e844f3d9ccd5ad116ff8277f16a96e68d76) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "ggw.17m",   0x000004, 0x400000, CRC(466e0ba4) SHA1(9563455b95d36fafe508290659088b153539cfdf) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "ggw.19m",   0x000006, 0x400000, CRC(840c8dea) SHA1(ea04afce17f00b45d3d2cd5140d0dd7ab4bccc00) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION(QSOUND_SIZE, "audio", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "ggw.01",   0x00000, 0x08000, CRC(4c6351d5) SHA1(cef81fb7c4b8cb2ef1f8f3c27982aefbcbe38160) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+
+	ROM_REGION( 0x800000, "qsound", 0 ) /* QSound samples */
+	ROM_LOAD16_WORD_SWAP( "ggw.11m",   0x000000, 0x400000, CRC(e172acf5) SHA1(d7b0963d66165f3607d887741c5e7ab952bcf2ff) )
+	ROM_LOAD16_WORD_SWAP( "ggw.12m",   0x400000, 0x400000, CRC(4bee4e8f) SHA1(c440b5a38359ec3b8002f39690b79bf78703f5d0) )
+ROM_END
+
 
 ROM_START( hsf2 )
 	ROM_REGION( CODE_SIZE, "main", 0 )      /* 68000 code */
@@ -7515,6 +7536,7 @@ GAME( 2004, hsf2j,    hsf2,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Hy
 GAME( 1999, gigawing, 0,        cps2, cps2_2p2b, cps2,     ROT0,   "Capcom, supported by Takumi", "Giga Wing (USA 990222)", 0 )
 GAME( 1999, gwingj,   gigawing, cps2, cps2_2p2b, cps2,     ROT0,   "Capcom, supported by Takumi", "Giga Wing (Japan 990223)", 0 )
 GAME( 1999, gwinga,   gigawing, cps2, cps2_2p2b, cps2,     ROT0,   "Capcom, supported by Takumi", "Giga Wing (Asia 990222)", 0 )
+GAME( 1999, gwingb,   gigawing, cps2, cps2_2p2b, cps2,     ROT0,   "Capcom, supported by Takumi", "Giga Wing (Brazil 990222)", 0 )
 GAME( 2000, mmatrix,  0,        cps2, cps2_2p1b, cps2,     ROT0,   "Capcom, supported by Takumi", "Mars Matrix: Hyper Solid Shooting (USA 000412)", 0 )
 GAME( 2000, mmatrixj, mmatrix,  cps2, cps2_2p1b, cps2,     ROT0,   "Capcom, supported by Takumi", "Mars Matrix: Hyper Solid Shooting (Japan 000412)", 0 )
 

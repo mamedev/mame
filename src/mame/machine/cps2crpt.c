@@ -940,6 +940,7 @@ static const struct game_keys keys_table[] =
 	{ "gigawing", { 0xe52de290,0x1b60d780 }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
 	{ "gwingj",   { 0x1126196a,0xbef50895 }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
 	{ "gwinga",   { 0x3506a85a,0x66b1b768 }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
+	{ "gwingb",   { 0x0fe745b0,0x96ef7f9d }, 0x100000 },	// 0C81 1972 1027  cmpi.l  #$19721027,D1
 	{ "mmatrix",  { 0xac9ebd79,0x410467df }, 0x180000 },	// B6C0 B447 BACF  cmpa.w  D0,A3   cmp.w   D7,D2   cmpa.w  A7,A5
 	{ "mmatrixj", { 0x4df81e95,0x72ed9823 }, 0x180000 },	// B6C0 B447 BACF  cmpa.w  D0,A3   cmp.w   D7,D2   cmpa.w  A7,A5
 	{ "mpang",    { 0x95f741c6,0xe547a21b }, 0x100000 },	// 0C84 347D 89A3  cmpi.l  #$347D89A3,D4
