@@ -202,7 +202,7 @@ static chd_file *open_chd(const char *filename, movie_info *info)
 	info->interlaced = interlaced;
 	info->samplerate = rate;
 	info->channels = channels;
-	
+
 	/* allocate buffers */
 	if (!chd_allocate_buffers(info))
 		return NULL;
@@ -321,7 +321,7 @@ static int write_chd(chd_file *file, UINT32 field, movie_info *info)
 static void create_close_chd(chd_file *file)
 {
 	chd_error err;
-	
+
 	err = chd_compress_finish(file);
 	if (err != CHDERR_NONE)
 		fprintf(stderr, "Error finishing compression: %s\n", chd_error_string(err));
@@ -365,18 +365,18 @@ static int find_edge_near_field(chd_file *srcfile, UINT32 fieldnum, movie_info *
 	UINT32 fieldstart[100];
 	UINT32 soundend = 0;
 	UINT32 sampnum;
-	
+
 	/* clear the sound buffers */
 	memset(info->lsound, 0, info->samplerate * sizeof(*info->lsound));
 	memset(info->rsound, 0, info->samplerate * sizeof(*info->rsound));
-	
+
 	/* read 1 second around the target area */
 	firstfield = fieldnum - (fields_to_read / 2);
 	for (curfield = 0; curfield < fields_to_read; curfield++)
 	{
 		/* remember the start of each field */
 		fieldstart[curfield] = soundend;
-	
+
 		/* remember the sound offset where the initial fieldnum is */
 		if (firstfield + curfield == fieldnum)
 			targetsoundstart = soundend;
@@ -386,13 +386,13 @@ static int find_edge_near_field(chd_file *srcfile, UINT32 fieldnum, movie_info *
 		{
 			read_chd(srcfile, firstfield + curfield, info, soundend);
 			soundend += info->samples;
-			
+
 			/* also remember the offset at the end of the first field */
 			if (firstfieldend == 0)
 				firstfieldend = soundend;
 		}
 	}
-	
+
 	/* compute absolute deltas across the samples */
 	for (sampnum = 0; sampnum < soundend; sampnum++)
 	{
@@ -401,12 +401,12 @@ static int find_edge_near_field(chd_file *srcfile, UINT32 fieldnum, movie_info *
 	}
 
 	/* for each sample in the collection, find the highest deltas over the
-	   next few samples, and take the nth highest value (to remove outliers) */
+       next few samples, and take the nth highest value (to remove outliers) */
 	for (sampnum = 0; sampnum < soundend - MAXIMUM_WINDOW_SIZE; sampnum++)
 	{
 		UINT32 lmax = 0, rmax = 0;
 		UINT32 scannum;
-		
+
 		/* scan forward over the maximum window */
 		for (scannum = 0; scannum < MAXIMUM_WINDOW_SIZE; scannum++)
 		{
@@ -420,7 +420,7 @@ static int find_edge_near_field(chd_file *srcfile, UINT32 fieldnum, movie_info *
 		info->lsound[sampnum] = lmax;
 		info->rsound[sampnum] = rmax;
 	}
-	
+
 	/* now compute the average over the first field, which is assumed to be silence */
 	for (sampnum = 0; sampnum < firstfieldend; sampnum++)
 	{
@@ -439,8 +439,8 @@ static int find_edge_near_field(chd_file *srcfile, UINT32 fieldnum, movie_info *
 	firstldev = sqrt((double)firstldev / firstfieldend);
 	firstrdev = sqrt((double)firstrdev / firstfieldend);
 
-	/* scan forward through the samples, counting consecutive samples more than 
-	   SIGNAL_DEVIATIONS standard deviations away from silence */
+	/* scan forward through the samples, counting consecutive samples more than
+       SIGNAL_DEVIATIONS standard deviations away from silence */
 	for (sampnum = 0; sampnum < soundend; sampnum++)
 	{
 		/* left speaker */
@@ -454,12 +454,12 @@ static int find_edge_near_field(chd_file *srcfile, UINT32 fieldnum, movie_info *
 			rcount++;
 		else
 			rcount = 0;
-			
+
 		/* stop if we find enough */
 		if (lcount > MINIMUM_SIGNAL_COUNT || rcount > MINIMUM_SIGNAL_COUNT)
 			break;
 	}
-	
+
 	/* if we didn't find any, return failure */
 	if (sampnum >= soundend)
 	{
@@ -470,10 +470,10 @@ static int find_edge_near_field(chd_file *srcfile, UINT32 fieldnum, movie_info *
 
 	/* scan backwards to find the start of the signal */
 	for ( ; sampnum > 0; sampnum--)
-		if (info->lsound[sampnum - 1] < firstlavg + SIGNAL_START_DEVIATIONS * firstldev || 
+		if (info->lsound[sampnum - 1] < firstlavg + SIGNAL_START_DEVIATIONS * firstldev ||
 			info->rsound[sampnum - 1] < firstravg + SIGNAL_START_DEVIATIONS * firstrdev)
 			break;
-	
+
 	/* if we're to report the best field, figure out which field we are in */
 	if (report_best_field)
 	{
@@ -482,7 +482,7 @@ static int find_edge_near_field(chd_file *srcfile, UINT32 fieldnum, movie_info *
 				break;
 		printf("Field %5d: Edge found at offset %d (frame %.1f)\n", firstfield + curfield, sampnum - fieldstart[curfield], (double)(firstfield + curfield) * 0.5);
 	}
-	
+
 	/* otherwise, compute the delta from the provided field number */
 	else
 	{
@@ -553,27 +553,27 @@ int main(int argc, char *argv[])
 	printf("Video frame rate: %.2fHz\n", info.framerate);
 	printf("Sample rate: %dHz\n", info.samplerate);
 	printf("Total fields: %d\n", info.numfields);
-	
+
 	/* if we don't have a destination file, scan for edges */
 	if (dstfilename == NULL)
 	{
 		UINT32 fieldnum;
 		INT32 delta;
-		
-		for (fieldnum = 60; fieldnum < info.numfields - 60; fieldnum += 30)	
+
+		for (fieldnum = 60; fieldnum < info.numfields - 60; fieldnum += 30)
 		{
 			fprintf(stderr, "Field %5d\r", fieldnum);
 			find_edge_near_field(srcfile, fieldnum, &info, TRUE, &delta);
 		}
 	}
-	
+
 	/* otherwise, resample the source to the destination */
 	else
 	{
 		INT64 ioffset = (INT64)(offset * 65536.0 * 256.0);
 		INT64 islope = (INT64)(slope * 65536.0 * 256.0);
 		UINT32 fieldnum;
-		
+
 		/* open the destination file */
 		dstfile = create_chd(dstfilename, srcfile, &info);
 		if (dstfile == NULL)
@@ -593,11 +593,11 @@ int main(int argc, char *argv[])
 			INT32 dstbeginfield, dstendfield, dstfield;
 			INT64 dstpos, dststep;
 			UINT32 srcoffset;
-			
+
 			/* update progress (this ain't fast!) */
 			if (fieldnum % 10 == 0)
 				fprintf(stderr, "Field %d\r", fieldnum);
-			
+
 			/* determine the first and last fields needed to cover this range of samples */
 			if (dstbegin >= 0)
 				dstbeginfield = sample_number_to_field(&info, dstbegin >> 24, &dstbeginoffset);
@@ -615,10 +615,10 @@ int main(int argc, char *argv[])
 			}
 /*
 printf("%5d: start=%10d (%5d.%03d) end=%10d (%5d.%03d)\n",
-		fieldnum,
-		(INT32)(dstbegin >> 24), dstbeginfield, dstbeginoffset,
-		(INT32)(dstend >> 24), dstendfield, dstendoffset);
-*/			
+        fieldnum,
+        (INT32)(dstbegin >> 24), dstbeginfield, dstbeginoffset,
+        (INT32)(dstend >> 24), dstendfield, dstendoffset);
+*/
 			/* read all samples required into the end of the sound buffers */
 			dstoffset = srcend - srcbegin;
 			for (dstfield = dstbeginfield; dstfield <= dstendfield; dstfield++)
@@ -633,7 +633,7 @@ printf("%5d: start=%10d (%5d.%03d) end=%10d (%5d.%03d)\n",
 				}
 				dstoffset += info.samples;
 			}
-			
+
 			/* resample the destination samples to the source */
 			dstoffset = srcend - srcbegin;
 			dstpos = dstbegin;
@@ -644,14 +644,14 @@ printf("%5d: start=%10d (%5d.%03d) end=%10d (%5d.%03d)\n",
 				info.rsound[srcoffset] = info.rsound[dstoffset + dstbeginoffset + (dstpos >> 24) - (dstbegin >> 24)];
 				dstpos += dststep;
 			}
-			
+
 			/* read the original frame, pointing the sound buffer past where we've calculated */
 			read_chd(srcfile, fieldnum, &info, srcend - srcbegin);
-			
+
 			/* write it to the destination */
 			write_chd(dstfile, fieldnum, &info);
 		}
-		
+
 		/* close the destination file */
 		create_close_chd(dstfile);
 	}
