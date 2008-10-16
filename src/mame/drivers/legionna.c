@@ -40,8 +40,6 @@ Probably protection related,game updates paletteram with rom data (or bad progra
 
 Need a sound kludge to start.
 
-Bad Sprite rom - half size, causes missing sprite graphics.
-
 
 Godzilla
 --------

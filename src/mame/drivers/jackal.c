@@ -13,7 +13,6 @@ Notes:
   necessarily mean anything.
 
 TODO:
-- Sprite lag
 - Coin counters don't work correctly, because the register is overwritten by
   other routines and the coin counter bits rapidly toggle between 0 and 1.
 - running the sound CPU at the nominal clock rate, music stops working at the
