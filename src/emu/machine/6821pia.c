@@ -981,6 +981,19 @@ int pia_get_output_ca2(int which)
 	return p->out_ca2;
 }
 
+// Version of pia_get_output_ca2, which takes account of internal
+// pullup resistor 
+int pia_get_output_ca2_z(int which)
+{
+	pia6821 *p = &pias[which];
+
+	p->out_ca2_needs_pulled = FALSE;
+
+	// If it's an output, output the bit, if it's an input, it's
+	// pulled up
+	return p->out_ca2 | 
+	       C2_INPUT(p->ctl_a);
+}
 
 
 /*************************************

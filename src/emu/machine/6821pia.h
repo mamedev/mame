@@ -94,6 +94,7 @@ void pia_set_input_ca1(int which, int data);
 int pia_get_input_ca2(int which);
 void pia_set_input_ca2(int which, int data);
 int pia_get_output_ca2(int which);
+int pia_get_output_ca2_z(int which);
 
 
 
