@@ -199,9 +199,9 @@ static MC6845_UPDATE_ROW( update_row )
 	for (cx = 0; cx < x_count; cx++)
 	{
 		int i;
-		int attr = ram_attr[ma];
+		int attr = ram_attr[ma & 0x7ff];
 		int region = (attr & 0x40) >> 6;
-		int addr = ((ram_video[ma] | ((attr & 0x80) << 1) | (extra_video_bank_bit)) << 4) | (ra & 0x0f);
+		int addr = ((ram_video[ma & 0x7ff] | ((attr & 0x80) << 1) | (extra_video_bank_bit)) << 4) | (ra & 0x0f);
 		int colour = (attr & 0x7f) << 3;
 		UINT8	*data;
 
