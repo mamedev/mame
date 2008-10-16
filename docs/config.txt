@@ -128,7 +128,7 @@ F10       Toggle speed throttling.
 
 F11       Toggles speed display.
 
-Shift+F11 Toggles profiler display (debug builds only).
+Shift+F11 Toggles internal profiler display (if compiled in).
 
 F12       Saves a screen snapshot.
 
