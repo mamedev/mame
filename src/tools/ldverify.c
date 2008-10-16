@@ -650,7 +650,7 @@ static void verify_audio_final(void)
 static int usage(void)
 {
 	fprintf(stderr, "Usage: \n");
-	fprintf(stderr, "  ldverify [avifile.avi|chdfile.chd]\n");
+	fprintf(stderr, "  ldverify <avifile.avi|chdfile.chd>\n");
 	return 1;
 }
 

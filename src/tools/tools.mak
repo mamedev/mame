@@ -26,6 +26,7 @@ TOOLS += \
 	romcmp$(EXE) \
 	chdman$(EXE) \
 	jedutil$(EXE) \
+	ldresample$(EXE) \
 	ldverify$(EXE) \
 	regrep$(EXE) \
 	srcclean$(EXE) \
@@ -68,6 +69,19 @@ JEDUTILOBJS = \
 	$(TOOLSOBJ)/jedutil.o \
 
 jedutil$(EXE): $(JEDUTILOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
+	@echo Linking $@...
+	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
+
+
+
+#-------------------------------------------------
+# ldresample
+#-------------------------------------------------
+
+LDRESAMPLEOBJS = \
+	$(TOOLSOBJ)/ldresample.o \
+
+ldresample$(EXE): $(LDRESAMPLEOBJS) $(LIBUTIL) $(LIBOCORE) $(ZLIB) $(EXPAT)
 	@echo Linking $@...
 	$(LD) $(LDFLAGS) $^ $(LIBS) -o $@
 

@@ -3473,6 +3473,7 @@ src/tools/chdcd.c svneol=native#text/plain
 src/tools/chdcd.h svneol=native#text/plain
 src/tools/chdman.c svneol=native#text/plain
 src/tools/jedutil.c svneol=native#text/plain
+src/tools/ldresample.c svneol=native#text/plain
 src/tools/ldverify.c svneol=native#text/plain
 src/tools/regrep.c svneol=native#text/plain
 src/tools/romcmp.c svneol=native#text/plain
