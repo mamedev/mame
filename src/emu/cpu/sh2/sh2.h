@@ -89,6 +89,7 @@ typedef struct _sh2_cpu_core sh2_cpu_core;
 struct _sh2_cpu_core
 {
   int is_slave;
+  int  (*dma_callback_kludge)(UINT32 src, UINT32 dst, UINT32 data, int size);
 };
 
 extern void sh2_get_info(UINT32 state, cpuinfo *info);

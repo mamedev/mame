@@ -13,15 +13,6 @@ SCSI code by ElSemi
 
 ToDo: (in order or priority?)
 
-There are currently a bunch of hacks in here to workaround the way the encryption works on the actual
-PCB.  It seems that the SH2 DMA should bypass the encryption, returning values directly stored in the
-BIOS and/or flashROMs.  Without modification to the CPU core this isn't possible.  The hacks currently
-in the driver allow the Flash commands to be sent correctly from the BIOS rom (they're stored
-unencrypted) and allow the Flash type and Rom checksums to pass, needed for the flash routines.
-
-The SCSI / CD Rom controller code here is limited, it's designed for the needs of CPS3 only, we should
-fix MAME's generic implementation and use that.
-
 Street Fighter 3 2nd Impact uses flipped tilemaps during flashing, emulate this.
 
 Figure out proper IRQ10 generation:
@@ -32,7 +23,7 @@ Figure out proper IRQ10 generation:
 
 Alpha Blending Effects
     These are actually palette manipulation effects, not true blending.  How the values are used is
-    not currently 100% understood, however it seems good enough for Warzard etc. at the moment.
+    not currently 100% understood.  They are incorrect if you use player 2 in Warzard
 
 Linezoom
     Is it used anywhere??
@@ -53,7 +44,7 @@ Sprite positioning glitches
 
 Gaps in Sprite Zooming
  probably cause by use of drawgfx instead of processing as a single large sprite, but could also be due to the
- positioning of each part of the sprite.
+ positioning of each part of the sprite.  Warzard is confirmed to have gaps during some cutscenes on real hardware.
 
 ---
 
@@ -345,9 +336,9 @@ Notes:
 	#define DMA_XOR(a)	((a) ^ 2)
 #endif
 
-static int cps3_use_fastboot;
 
 static UINT32* decrypted_bios;
+
 static UINT32* decrypted_gamerom;
 static UINT32 cram_gfxflash_bank;
 static UINT32* cps3_nops;
@@ -616,7 +607,8 @@ static OPBASE_HANDLER( cps3_opbase_handler );
 
 /* Encryption */
 
-static UINT32 cps3_key1, cps3_key2, cps3_isSpecial;
+static UINT32 cps3_key1, cps3_key2;
+static int cps3_altEncryption; // sfiii2 has different encryption, data isn't encrypted outside of the bios
 
 static UINT16 rotate_left(UINT16 value, int n)
 {
@@ -699,14 +691,14 @@ static void cps3_decrypt_bios(running_machine *machine)
 		UINT32 xormask = cps3_mask(i, cps3_key1, cps3_key2);
 
 		/* a bit of a hack, don't decrypt the FLASH commands which are transfered by SH2 DMA */
-		if (((i<0x1ff00) || (i>0x1ff6b)) && (i<0x20000) )
-		{
+//		if (((i<0x1ff00) || (i>0x1ff6b)) && (i<0x20000) )
+//		{
 			decrypted_bios[i/4] = dword ^ xormask;
-		}
-		else
-		{
-			decrypted_bios[i/4] = dword;
-		}
+//		}
+//		else
+//		{
+//			decrypted_bios[i/4] = dword;
+//		}
 	}
 #if 0
 	/* Dump to file */
@@ -726,7 +718,7 @@ static void cps3_decrypt_bios(running_machine *machine)
 #endif
 }
 
-static DRIVER_INIT( cps3crpt )
+static DRIVER_INIT( cps3 )
 {
 	const char *gamename = machine->gamedrv->name;
 	const struct game_keys2 *k = &keys_table2[0];
@@ -737,7 +729,7 @@ static DRIVER_INIT( cps3crpt )
 
 	cps3_key1 = -1;
 	cps3_key2 = -1;
-	cps3_isSpecial = -1;
+	cps3_altEncryption = -1;
 
 	while (k->name)
 	{
@@ -746,7 +738,7 @@ static DRIVER_INIT( cps3crpt )
 			// we have a proper key set the global variables to it (so that we can decrypt code in ram etc.)
 			cps3_key1 = k->keys[0];
 			cps3_key2 = k->keys[1];
-			cps3_isSpecial = k->isSpecial;
+			cps3_altEncryption = k->isSpecial;
 			break;
 		}
 		++k;
@@ -1364,7 +1356,7 @@ static OPBASE_HANDLER( cps3_opbase_handler )
 		opbase->rom = (UINT8*)decrypted_gamerom-0x06000000;
 		opbase->ram = (UINT8*)decrypted_gamerom-0x06000000;
 
-		if (cps3_isSpecial) opbase->ram = (UINT8*) memory_region(machine, "user4")-0x06000000;
+		if (cps3_altEncryption) opbase->ram = (UINT8*) memory_region(machine, "user4")-0x06000000;
 
 
 		return ~0;
@@ -1562,79 +1554,13 @@ static UINT32 cps3_flashmain_r(int base, UINT32 offset, UINT32 mem_mask)
 	return result;
 }
 
-/* In certain situations (SH2 DMA?) the reads must bypass the encryption device,
-   this is used when checking the flash roms, and performing rom tests.  Without
-   modification to the SH2 core this requires PC based hacks to work correctly */
-static UINT32 cps3_bios_test_hack;
-static UINT32 cps3_game_test_hack;
-
-struct cps3_test_hacks
-{
-	const char *name;             /* game driver name */
-	const UINT32 bios_test_hack;
-	const UINT32 game_test_hack;
-};
-
-static const struct cps3_test_hacks testhack_table[] =
-{
-	// name        mainram address  code address
-	{ "jojo",      0x0011c2a,         0x6172566  },
-	{ "jojon",     0x0011c2a,         0x6172566  },
-	{ "jojoalt",   0x0011c2a,         0x6172796  },
-	{ "jojoaltn",  0x0011c2a,         0x6172796  },
-	{ "jojoba",    0x0011c8e,         0x61c45ba  },
-	{ "jojoban",   0x0011c8e,         0x61c45ba  },
-	{ "jojobane",  0x0011c8e,         0x61c45ba  },
-	{ "sfiii",     0x00166b2,         0x63cdff2  },
-	{ "sfiiiu",    0x00166b2,         0x63cdff2  },
-	{ "sfiiin",    0x00166b2,         0x63cdff2  },
-	{ "sfiii2",    0,                 0          },
-	{ "sfiii2u",   0,                 0          },
-	{ "sfiii2n",   0,                 0          },
-	{ "sfiii3",    0x0011c42,         0x613a9fa  },
-	{ "sfiii3n",   0x0011c42,         0x613a9fa  },
-	{ "sfiii3a",   0x0011c42,         0x613ab46  },
-	{ "sfiii3an",  0x0011c42,         0x613ab46  },
-	{ "warzard",   0x001652e,         0x60105ee  },
-	{ "redearth",  0x001652e,         0x60105ee  },
-	{ 0 }	// end of table
-};
-
-static DRIVER_INIT( cps3_testhacks )
-{
-	const char *gamename = machine->gamedrv->name;
-	const struct cps3_test_hacks *k = &testhack_table[0];
-
-	cps3_bios_test_hack = 0;
-	cps3_game_test_hack = 0;
-
-	while (k->name)
-	{
-		if (strcmp(k->name, gamename) == 0)
-		{
-			cps3_bios_test_hack = k->bios_test_hack;
-			cps3_game_test_hack = k->game_test_hack;
-
-			cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
-			cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, cps3_bios_test_hack);
-			cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 2);
-			cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, cps3_game_test_hack);
-
-			break;
-		}
-		++k;
-	}
-	printf("testhacks %08x %08x\n",cps3_bios_test_hack,cps3_game_test_hack);
-}
 
 
 static READ32_HANDLER( cps3_flash1_r )
 {
 	UINT32 retvalue = cps3_flashmain_r(0, offset,mem_mask);
 
-	if (activecpu_get_pc()==cps3_bios_test_hack) return retvalue; // initial flash tests / bios tests
-	if (activecpu_get_pc()==cps3_game_test_hack) return retvalue; // test menu rom tests
-	if (cps3_isSpecial) return retvalue; // sfiii2.. (no encrypted data)
+	if (cps3_altEncryption) return retvalue;
 
 	retvalue = retvalue ^ cps3_mask(0x6000000+offset*4, cps3_key1, cps3_key2);
 	return retvalue;
@@ -1644,9 +1570,7 @@ static READ32_HANDLER( cps3_flash2_r )
 {
 	UINT32 retvalue = cps3_flashmain_r(4, offset,mem_mask);
 
-	if (activecpu_get_pc()==cps3_bios_test_hack) return retvalue; // initial flash tests / bios tests
-	if (activecpu_get_pc()==cps3_game_test_hack) return retvalue; // test menu rom tests
-	if (cps3_isSpecial) return retvalue; // sfiii2.. (no encrypted data)
+	if (cps3_altEncryption) return retvalue;
 
 	retvalue = retvalue ^ cps3_mask(0x6800000+offset*4, cps3_key1, cps3_key2);
 	return retvalue;
@@ -2421,18 +2345,7 @@ static const custom_sound_interface custom_interface =
 };
 
 
-static emu_timer* fastboot_timer;
 
-static TIMER_CALLBACK( fastboot_timer_callback )
-{
-	UINT32 *rom =  (UINT32*)decrypted_gamerom;//memory_region ( machine, "user4" );
-	if (cps3_isSpecial) rom = (UINT32*)memory_region(machine, "user4");
-
-//  printf("fastboot callback %08x %08x", rom[0], rom[1]);
-	cpunum_set_reg(0,SH2_PC, rom[0]);
-	cpunum_set_reg(0,SH2_R15, rom[1]);
-	cpunum_set_reg(0,SH2_VBR, 0x6000000);
-}
 
 static const SCSIConfigTable dev_table =
 {
@@ -2460,13 +2373,6 @@ static MACHINE_START( cps3 )
 static MACHINE_RESET( cps3 )
 {
 	current_table_address = -1;
-
-	if (cps3_use_fastboot)
-	{
-		fastboot_timer = timer_alloc(fastboot_timer_callback, NULL);
-	//  printf("reset\n");
-		timer_adjust_oneshot(fastboot_timer, attotime_zero, 0);
-	}
 }
 
 #define MASTER_CLOCK	42954500
@@ -2660,6 +2566,67 @@ static NVRAM_HANDLER( cps3 )
 
 
 
+static UINT32 cps3_dma_callback(UINT32 src, UINT32 dst, UINT32 data, int size)
+{
+	/*
+	  on the actual CPS3 hardware the SH2 DMA bypasses the encryption.
+
+	  to handle this in MAME we use this callback, and reverse the effect of the
+	  encryption that would otherwise be applied.  this allows us to avoid per-game,
+	  per-PC hacks.  this approach is however still a little messy.
+
+	*/
+
+	/* I doubt this is endian safe.. needs checking / fixing */
+	if (size==0)
+	{
+		if ((src&3)==0) data <<=24;
+		if ((src&3)==1) data <<=16;
+		if ((src&3)==2) data <<=8;
+		if ((src&3)==3) data <<=0;
+	}
+
+
+	if (src<0x80000)
+	{
+		int offs = (src&0x07ffff)>>2;
+		data = data ^ cps3_mask(offs*4, cps3_key1, cps3_key2);
+	}
+	else if (src>=0x6000000 && src<0x6800000)
+	{
+		int offs = (src&0x07fffff)>>2;
+		if (!cps3_altEncryption) data = data ^ cps3_mask(0x6000000+offs*4, cps3_key1, cps3_key2);
+	}
+	else if (src>=0x6800000 && src<0x7000000)
+	{
+		int offs = (src&0x07fffff)>>2;
+		if (!cps3_altEncryption) data = data ^ cps3_mask(0x6800000+offs*4, cps3_key1, cps3_key2);
+	}
+	else
+	{
+		//printf("PC %08x :src %08x, dst %08x, returning %08x\n", activecpu_get_pc(), src, dst, data);
+	}
+
+	/* I doubt this is endian safe.. needs checking / fixing */
+	if (size==0)
+	{
+		if ((src&3)==0) data >>=24;
+		if ((src&3)==1)	data >>=16;
+		if ((src&3)==2)	data >>=8;
+		if ((src&3)==3) data >>=0;
+
+		data &=0x000000ff;
+	}
+
+	return data;
+}
+
+
+
+static const sh2_cpu_core sh2_conf_cps3 = {
+	0, // master
+	(void*)cps3_dma_callback
+};
 
 static MACHINE_DRIVER_START( cps3 )
 	/* basic machine hardware */
@@ -2667,6 +2634,7 @@ static MACHINE_DRIVER_START( cps3 )
 	MDRV_CPU_PROGRAM_MAP(cps3_map,0)
 	MDRV_CPU_VBLANK_INT("main", cps3_vbl_interrupt)
 	MDRV_CPU_PERIODIC_INT(cps3_other_interrupt,80) /* ?source? */
+	MDRV_CPU_CONFIG(sh2_conf_cps3)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -2971,272 +2939,183 @@ ROM_START( redeartn )
 	ROM_LOAD( "50",  0x2000000, 0x400000, CRC(2f5b44bd) SHA1(7ffdbed5b6899b7e31414a0828e04543d07435e4) )
 ROM_END
 
-/* Idle loop skipping speedups */
-static UINT32 cps3_speedup_ram_address;
-static UINT32 cps3_speedup_code_address;
 
-struct cps3_speedups
-{
-	const char *name;             /* game driver name */
-	const UINT32 ram_address;
-	const UINT32 code_address;
-};
+/*****************************************************************************************
+  CPS3 game region / special flag information
+*****************************************************************************************/
 
-static const struct cps3_speedups speedup_table[] =
-{
-	// name        mainram address  code address
-	{ "jojo",      0x223c0,         0x600065a  },
-	{ "jojon",     0x223c0,         0x600065a  },
-	{ "jojoalt",   0x223d8,         0x600065a  },
-	{ "jojoaltn",  0x223d8,         0x600065a  },
-	{ "jojoba",    0x267dc,         0x600065a  },
-	{ "jojoban",   0x267dc,         0x600065a  },
-	{ "jojobane",  0x267dc,         0x600065a  },
-	{ "sfiii",     0x0cc6c,         0x6000882  },
-	{ "sfiiiu",    0x0cc6c,         0x6000882  },
-	{ "sfiiin",    0x0cc6c,         0x6000882  },
-	{ "sfiii2",    0x0dfe4,         0x6000882  },
-	{ "sfiii2u",   0x0dfe4,         0x6000882  },
-	{ "sfiii2n",   0x0dfe4,         0x6000882  },
-	{ "sfiii3",    0x0d794,         0x6000882  },
-	{ "sfiii3n",   0x0d794,         0x6000882  },
-	{ "sfiii3a",   0x0d794,         0x6000882  },
-	{ "sfiii3an",  0x0d794,         0x6000882  },
-	{ "warzard",   0x2136c,         0x600194c  },
-	{ "redearth",  0x2136c,         0x600194c  },
-	{ 0 }	// end of table
-};
+/*****************************************************************************************
 
-static READ32_HANDLER(cps3_speedup_r)
-{
-//  printf("speedup read %08x %d\n",activecpu_get_pc(), cpu_getexecutingcpu());
-	if (cpu_getexecutingcpu()>=0) // prevent cheat search crash..
-		if (activecpu_get_pc()==cps3_speedup_code_address) {cpu_spinuntil_int();return cps3_mainram[cps3_speedup_ram_address/4];}
+	JoJo's Venture
 
-	return cps3_mainram[cps3_speedup_ram_address/4];
-}
+	XXXXXX 0
+	JAPAN 1
+	ASIA 2
+	EURO 3
+	USA 4
+	HISPANIC 5
+	BRAZIL 6
+	OCEANIA 7
 
-static DRIVER_INIT( cps3_speedups )
-{
-	const char *gamename = machine->gamedrv->name;
-	const struct cps3_speedups *k = &speedup_table[0];
+	DEVELOPMENT VERSION add 0x70 mask!
 
-	cps3_speedup_ram_address = 0;
-	cps3_speedup_code_address = 0;
+	UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+	rom[0x1fec8/4]^=0x00000001; // region hack (clear jpn)
 
-	while (k->name)
-	{
-		if (strcmp(k->name, gamename) == 0)
-		{
-			cps3_speedup_ram_address = k->ram_address;
-			cps3_speedup_code_address = k->code_address;
-			break;
-		}
-		++k;
-	}
+	rom[0x1fec8/4]^=0x00000004; // region
+	rom[0x1fec8/4]^=0x00000070; // DEV mode
+	rom[0x1fecc/4]^=0x01000000; // nocd
 
-	//printf("speedup %08x %08x\n",cps3_speedup_ram_address,cps3_speedup_code_address);
-
-	if (cps3_speedup_code_address!=0)
-	{
-		cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
-		cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, cps3_speedup_code_address);
-
-		memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, cps3_speedup_ram_address+0x02000000, cps3_speedup_ram_address+0x02000003, 0, 0, cps3_speedup_r );
-	}
-}
+*****************************************************************************************/
 
 
-/* PLEASE leave the region / NOCD information here even once CD emulation is done, its useful for debugging */
+/*****************************************************************************************
 
+	JoJo's Bizarre Adventure: Heritage for the Future
 
-static DRIVER_INIT( jojo )
-{
-	// XXXXXX 0
-	// JAPAN 1
-	// ASIA 2
-	// EURO 3
-	// USA 4
-	// HISPANIC 5
-	// BRAZIL 6
-	// OCEANIA 7
+	XXXXXX 0
+	JAPAN 1
+	ASIA 2
+	EURO 3
+	USA 4
+	HISPANIC 5
+	BRAZIL 6
+	OCEANIA 7
 
-	// DEVELOPMENT VERSION add 0x70 mask!
+	DEVELOPMENT VERSION add 0x70 mask!
 
-//  UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
-//  rom[0x1fec8/4]^=0x00000001; // region hack (clear jpn)
+	UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+	rom[0x1fec8/4]^=0x00000001; // region (clear jpn)
+	rom[0x1fec8/4]^=0x00000002; // region
+	rom[0x1fec8/4]^=0x00000070; // DEV mode
+	rom[0x1fecc/4]^=0x01000000; // nocd
 
-//  rom[0x1fec8/4]^=0x00000004; // region
-//  rom[0x1fec8/4]^=0x00000070; // DEV mode
-//  rom[0x1fecc/4]^=0x01000000; // nocd
+*****************************************************************************************/
 
-	cps3_use_fastboot = 0;
-	DRIVER_INIT_CALL(cps3crpt);
-	DRIVER_INIT_CALL(cps3_speedups);
-	DRIVER_INIT_CALL(cps3_testhacks);
+/*****************************************************************************************
 
+	Red Earth / Warzard
 
-}
+	JAPAN 1
+	ASIA 2
+	EURO 3
+	USA 4
+	HISPANIC 5
+	BRAZIL 6
+	OCEANIA 7
+	ASIA NCD 8
 
-static DRIVER_INIT (jojoba)
-{
-	// XXXXXX 0
-	// JAPAN 1
-	// ASIA 2
-	// EURO 3
-	// USA 4
-	// HISPANIC 5
-	// BRAZIL 6
-	// OCEANIA 7
-
-	// DEVELOPMENT VERSION add 0x70 mask!
-
-//  UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
-//  rom[0x1fec8/4]^=0x00000001; // region (clear jpn)
-//  rom[0x1fec8/4]^=0x00000002; // region
-//  rom[0x1fec8/4]^=0x00000070; // DEV mode
-//  rom[0x1fecc/4]^=0x01000000; // nocd
-
-	DRIVER_INIT_CALL(cps3crpt);
-	DRIVER_INIT_CALL(cps3_speedups);
-	DRIVER_INIT_CALL(cps3_testhacks);
-
-	cps3_use_fastboot = 0;
-}
-
-
-static DRIVER_INIT( warzard )
-{
-	// JAPAN 1
-	// ASIA 2
-	// EURO 3
-	// USA 4
-	// HISPANIC 5
-	// BRAZIL 6
-	// OCEANIA 7
-	// ASIA NCD 8
-
-//  UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
-//  rom[0x1fed8/4]^=0x00000001; // clear region to 0 (invalid)
-//  rom[0x1fed8/4]^=0x00000008; // region 8 - ASIA NO CD - doesn't actually skip the CD test on startup,
-	                            // only during game, must be another flag somewhere too, and we don't have
-	                            // any actual NCD dumps to compare (or it expects SCSI to report there being
+	UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+	rom[0x1fed8/4]^=0x00000001; // clear region to 0 (invalid)
+	rom[0x1fed8/4]^=0x00000008; // region 8 - ASIA NO CD - doesn't actually skip the CD
+	                            // test on startup, only during game, must be another flag
+	                            // somewhere too, and we don't have any actual NCD dumps
+	                            // to compare (or it expects SCSI to report there being
 	                            // no cd drive?)
 
-	DRIVER_INIT_CALL(cps3crpt);
-	DRIVER_INIT_CALL(cps3_speedups);
-	DRIVER_INIT_CALL(cps3_testhacks);
+*****************************************************************************************/
 
-	cps3_use_fastboot = 0; // required due to cd check, even with ASIA NO CD selected, not req. with CD emulation
-}
+/*****************************************************************************************
 
+	Street Fighter III: New Generation
 
-static DRIVER_INIT( sfiii )
-{
-	// JAPAN 1
-	// ASIA NCD 2
-	// EURO 3
-	// USA 4
-	// HISPANIC 5
-	// BRAZIL 6
-	// OCEANIA 7
-	// ASIA 8
+	JAPAN 1
+	ASIA NCD 2
+	EURO 3
+	USA 4
+	HISPANIC 5
+	BRAZIL 6
+	OCEANIA 7
+	ASIA 8
 
 	// bios rom also lists korea, but game rom does not.
 
-//  UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
-//  rom[0x1fec8/4]^=0x00000001; // region (clear region)
-//  rom[0x1fec8/4]^=0x00000008; // region
-//  rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test menu is region is ASIA NCD, otherwise it will report NG, Asia was probably the only NCD region for this
+	UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+	rom[0x1fec8/4]^=0x00000001; // region (clear region)
+	rom[0x1fec8/4]^=0x00000008; // region
+	rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test
+	                            // menu is region is ASIA NCD, otherwise it will report
+	                            // NG, Asia was probably the only NCD region for this
 
-	cps3_use_fastboot = 0;
+*****************************************************************************************/
 
-	DRIVER_INIT_CALL(cps3crpt);
-	DRIVER_INIT_CALL(cps3_speedups);
-	DRIVER_INIT_CALL(cps3_testhacks);
+/*****************************************************************************************
 
-}
+	Street Fighter III 2nd Impact
 
-static DRIVER_INIT( sfiii2 )
-{
-	// JAPAN 1
-	// ASIA NCD 2
-	// EURO 3
-	// USA 4
-	// HISPANIC 5
-	// BRAZIL 6
-	// OCEANIA 7
-	// ASIA 8
+	JAPAN 1
+	ASIA NCD 2
+	EURO 3
+	USA 4
+	HISPANIC 5
+	BRAZIL 6
+	OCEANIA 7
+	ASIA 8
 
-//  UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
-//  rom[0x1fec8/4]^=0x00000001; // region (clear region)
-//  rom[0x1fec8/4]^=0x00000008; // region
-//  rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test menu is region is ASIA NCD, otherwise it will report NG, Asia was probably the only NCD region for this
+	UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+	rom[0x1fec8/4]^=0x00000001; // region (clear region)
+	rom[0x1fec8/4]^=0x00000008; // region
+	rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test
+	                            // menu is region is ASIA NCD, otherwise it will report
+	                            // NG, Asia was probably the only NCD region for this
 
-	cps3_use_fastboot = 0; // not required
-
-	DRIVER_INIT_CALL(cps3crpt);
-	DRIVER_INIT_CALL(cps3_speedups);
-	DRIVER_INIT_CALL(cps3_testhacks);
-}
+*****************************************************************************************/
 
 
-static DRIVER_INIT( sfiii3 )
-{
-	// JAPAN 1
-	// ASIA 2
-	// EURO 3
-	// USA 4
-	// HISPANIC 5
-	// BRAZIL 6
-	// OCEANIA 7
+/*****************************************************************************************
 
-//  UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+	Street Fighter III 3rd Strike
 
-//  rom[0x1fec8/4]^=0x00000004; // region (clear region)
-//  rom[0x1fec8/4]^=0x00000001; // region
-//  rom[0x1fecc/4]^=0x01000000; // nocd
+	JAPAN 1
+	ASIA 2
+	EURO 3
+	USA 4
+	HISPANIC 5
+	BRAZIL 6
+	OCEANIA 7
 
-	DRIVER_INIT_CALL(cps3crpt);
-	DRIVER_INIT_CALL(cps3_speedups);
-	DRIVER_INIT_CALL(cps3_testhacks);
+	UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+	rom[0x1fec8/4]^=0x00000004; // region (clear region)
+	rom[0x1fec8/4]^=0x00000001; // region
+	rom[0x1fecc/4]^=0x01000000; // nocd
 
-	cps3_use_fastboot = 0;
-}
+*****************************************************************************************/
+
+
 
 /* todo: use BIOS for the bios roms, having clones only for CD / No CD */
 
-GAME( 1997, sfiii,   0,        cps3, cps3, sfiii,  ROT0,   "Capcom", "Street Fighter III: New Generation (Japan, 970204)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiiiu,  sfiii,    cps3, cps3, sfiii,  ROT0,   "Capcom", "Street Fighter III: New Generation (USA, 970204)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiii,   0,        cps3, cps3, cps3,  ROT0,   "Capcom", "Street Fighter III: New Generation (Japan, 970204)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiiiu,  sfiii,    cps3, cps3, cps3,  ROT0,   "Capcom", "Street Fighter III: New Generation (USA, 970204)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1997, sfiii2,  0,        cps3, cps3, sfiii2, ROT0,   "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan, 970930)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiii2u, sfiii2,   cps3, cps3, sfiii2, ROT0,   "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA, 970930)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiii2,  0,        cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan, 970930)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiii2u, sfiii2,   cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA, 970930)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1999, sfiii3,  0,        cps3, cps3, sfiii3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA, 990512)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3a, sfiii3,   cps3, cps3, sfiii3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA, 990608)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3,  0,        cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA, 990512)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3a, sfiii3,   cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA, 990608)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1998, jojo,    0,        cps3, cps3, jojo,   ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Japan, 981202)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, jojoalt, jojo,     cps3, cps3, jojo,   ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Japan, 990108)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojo,    0,        cps3, cps3, cps3, ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Japan, 981202)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojoalt, jojo,     cps3, cps3, cps3, ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Japan, 990108)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1999, jojoba,  0,        cps3, cps3, jojoba, ROT0,   "Capcom", "JoJo's Bizarre Adventure: Heritage for the Future / JoJo no Kimyouna Bouken: Miraie no Isan (Japan, 990913)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, jojoba,  0,        cps3, cps3, cps3, ROT0,   "Capcom", "JoJo's Bizarre Adventure: Heritage for the Future / JoJo no Kimyouna Bouken: Miraie no Isan (Japan, 990913)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1996, redearth,0,        cps3, cps3, warzard,  ROT0,   "Capcom", "Red Earth (Euro, 961121)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, warzard, redearth, cps3, cps3, warzard,  ROT0,   "Capcom", "Warzard (Japan, 961121)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, redearth,0,        cps3, cps3, cps3, ROT0,   "Capcom", "Red Earth (Euro, 961121)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, warzard, redearth, cps3, cps3, cps3, ROT0,   "Capcom", "Warzard (Japan, 961121)", GAME_IMPERFECT_GRAPHICS )
 
 /* NO-CD sets */
 
-GAME( 1997, sfiiin,  sfiii,    cps3, cps3, sfiii,  ROT0,   "Capcom", "Street Fighter III: New Generation (Asia, 970204, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiiin,  sfiii,    cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III: New Generation (Asia, 970204, NO CD)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1997, sfiii2n, sfiii2,   cps3, cps3, sfiii2, ROT0,   "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia, 970930, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiii2n, sfiii2,   cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia, 970930, NO CD)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1999, sfiii3n, sfiii3,   cps3, cps3, sfiii3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan, 990512, NO CD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3an,sfiii3,   cps3, cps3, sfiii3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan, 990608, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3n, sfiii3,   cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan, 990512, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3an,sfiii3,   cps3, cps3, cps3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan, 990608, NO CD)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1998, jojon,   jojo,     cps3, cps3, jojo,   ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Asia, 981202, NO CD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, jojoaltn,jojo,     cps3, cps3, jojo,   ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Asia, 990108, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojon,   jojo,     cps3, cps3, cps3, ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Asia, 981202, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojoaltn,jojo,     cps3, cps3, cps3, ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Asia, 990108, NO CD)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1999, jojoban, jojoba,   cps3, cps3, jojoba, ROT0,   "Capcom", "JoJo's Bizarre Adventure: Heritage for the Future / JoJo no Kimyouna Bouken: Miraie no Isan (Japan, 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, jojobane,jojoba,   cps3, cps3, jojoba, ROT0,   "Capcom", "JoJo's Bizarre Adventure: Heritage for the Future / JoJo no Kimyouna Bouken: Miraie no Isan (Euro, 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, jojoban, jojoba,   cps3, cps3, cps3, ROT0,   "Capcom", "JoJo's Bizarre Adventure: Heritage for the Future / JoJo no Kimyouna Bouken: Miraie no Isan (Japan, 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, jojobane,jojoba,   cps3, cps3, cps3, ROT0,   "Capcom", "JoJo's Bizarre Adventure: Heritage for the Future / JoJo no Kimyouna Bouken: Miraie no Isan (Euro, 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
 
 // We don't have any actual warzard / red earth no cd bios sets, but keep this here anyway
-GAME( 1996, redeartn,redearth, cps3, cps3, warzard,ROT0,   "Capcom", "Red Earth (961121, NO CD)", GAME_NOT_WORKING )
+GAME( 1996, redeartn,redearth, cps3, cps3, cps3, ROT0,   "Capcom", "Red Earth (961121, NO CD)", GAME_NOT_WORKING )

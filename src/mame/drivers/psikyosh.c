@@ -379,7 +379,17 @@ static NVRAM_HANDLER(93C56)
 					memcpy(eeprom_data+0xf0, mjgtaste_eeprom, 0x10);
 				}
 
+
+
 				eeprom_set_data(eeprom_data,0x100);
+			}
+			else if (memory_region(machine,"user1")) /* if there is an eeprom in the romdef, use that */
+ 			{
+				UINT8 eeprom_data[0x100];
+ 				printf("user1\n");
+ 				memcpy(eeprom_data, memory_region(machine,"user1"), 0x100);
+ 				eeprom_set_data(eeprom_data,0x100);
+
 			}
 		}
 	}
@@ -639,7 +649,6 @@ static MACHINE_DRIVER_START( psikyo5 )
 	MDRV_CPU_PROGRAM_MAP(ps5_readmem,ps5_writemem)
 MACHINE_DRIVER_END
 
-#if 0
 static MACHINE_DRIVER_START( psikyo5_240 )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(psikyo3v1)
@@ -651,7 +660,6 @@ static MACHINE_DRIVER_START( psikyo5_240 )
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
 MACHINE_DRIVER_END
-#endif
 
 static INPUT_PORTS_START( common )
 	PORT_START("INPUTS")
@@ -1125,274 +1133,67 @@ ROM_START( tgm2p )
     // might need byteswapping to reprogram actual chip/
     ROM_LOAD( "tgm2p.default.nv", 0x000, 0x100, CRC(b2328b40) SHA1(e6cda4d6f4e91b9f78d2ca84a5eee6c3bd03fe02) )
 ROM_END
+
 */
 
-/* are these right? should i fake the counter return?
-   'speedups / idle skipping isn't needed for 'hotgmck, hgkairak'
-   as the core catches and skips the idle loops automatically'
-*/
-
-static READ32_HANDLER( soldivid_speedup_r )
-{
- /*
-PC  : 0001AE74: MOV.L   @R14,R1
-PC  : 0001AE76: ADD     #$01,R1
-PC  : 0001AE78: MOV.L   R1,@R14
-PC  : 0001AE7A: MOV.L   @($7C,PC),R3
-PC  : 0001AE7C: MOV.L   @R3,R0
-PC  : 0001AE7E: TST     R0,R0
-PC  : 0001AE80: BT      $0001AE74
-*/
-	if (activecpu_get_pc()==0x0001AFAA) cpu_spinuntil_int(); // Character Select + InGame
-	if (activecpu_get_pc()==0x0001AE74) cpu_spinuntil_int(); // Everything Else?
-
-	return psh_ram[0x00000C/4];
-}
-
-static READ32_HANDLER( s1945ii_speedup_r )
-{
-/*
-PC  : 0609FC68: MOV.L   @R13,R1  // R13 is 600000C  R1 is counter  (read from r13)
-PC  : 0609FC6A: ADD     #$01,R1  // add 1 to counter
-PC  : 0609FC6C: MOV.L   R1,@R13  // write it back
-PC  : 0609FC6E: MOV.L   @($3C,PC),R3 // 609fdac into r3
-PC  : 0609FC70: MOV.L   @R3,R0  // whats there into r0
-PC  : 0609FC72: TST     R0,R0 // test
-PC  : 0609FC74: BT      $0609FC68
-*/
-	if (activecpu_get_pc()==0x609FC68) cpu_spinuntil_int(); // Title Screens
-	if (activecpu_get_pc()==0x609FED2) cpu_spinuntil_int(); // In Game
-	if (activecpu_get_pc()==0x60A0170) cpu_spinuntil_int(); // Attract Demo
-
-	return psh_ram[0x00000C/4];
-}
-
-static READ32_HANDLER( daraku_speedup_r )
-{
-/*
-PC  : 00047618: MOV.L   @($BC,PC),R0
-PC  : 0004761A: MOV.L   @R0,R1
-PC  : 0004761C: ADD     #$01,R1
-PC  : 0004761E: MOV.L   R1,@R0
-PC  : 00047620: MOV.L   @($BC,PC),R3
-PC  : 00047622: MOV.L   @R3,R0
-PC  : 00047624: TST     R0,R0
-PC  : 00047626: BT      $00047618
-*/
-	if (activecpu_get_pc()==0x0004761a) cpu_spinuntil_int(); // title
-	if (activecpu_get_pc()==0x00047976) cpu_spinuntil_int(); // ingame
-
-	return psh_ram[0x00000C/4];
-}
-
-static READ32_HANDLER( sbomberb_speedup_r )
-{
-/*
-PC  : 060A10EC: MOV.L   @R13,R3
-PC  : 060A10EE: ADD     #$01,R3
-PC  : 060A10F0: MOV.L   R3,@R13
-PC  : 060A10F2: MOV.L   @($34,PC),R1
-PC  : 060A10F4: MOV.L   @R1,R2
-PC  : 060A10F6: TST     R2,R2
-PC  : 060A10F8: BT      $060A10EC
-*/
-	if (activecpu_get_pc()==0x060A10EC) cpu_spinuntil_int(); // title
-	if (activecpu_get_pc()==0x060A1658) cpu_spinuntil_int(); // attract
-	if (activecpu_get_pc()==0x060A1380) cpu_spinuntil_int(); // game
-
-	return psh_ram[0x00000C/4];
-}
-
-static READ32_HANDLER( gunbird2_speedup_r )
-{
-/*
-PC  : 06028972: MOV.L   @R14,R3   // r14 is 604000c on this one
-PC  : 06028974: MOV.L   @($D4,PC),R1
-PC  : 06028976: ADD     #$01,R3
-PC  : 06028978: MOV.L   R3,@R14
-PC  : 0602897A: MOV.L   @R1,R2
-PC  : 0602897C: TST     R2,R2
-PC  : 0602897E: BT      $06028972
-*/
-	if (activecpu_get_pc()==0x06028972) cpu_spinuntil_int();
-	if (activecpu_get_pc()==0x06028E62) cpu_spinuntil_int();
-	if (activecpu_get_pc()==0x06028BE4) cpu_spinuntil_int();
-
-	return psh_ram[0x04000C/4];
-}
-
-static READ32_HANDLER( s1945iii_speedup_r )
-{
-	if (activecpu_get_pc()==0x0602B462) cpu_spinuntil_int(); // start up text
-	if (activecpu_get_pc()==0x0602B6E0) cpu_spinuntil_int(); // intro attract
-	if (activecpu_get_pc()==0x0602BC1C) cpu_spinuntil_int(); // game attract
-	if (activecpu_get_pc()==0x0602B97A) cpu_spinuntil_int(); // game
-
-	return psh_ram[0x06000C/4];
-}
-
-
-static READ32_HANDLER( dragnblz_speedup_r )
-{
-	if (activecpu_get_pc()==0x0602743e) cpu_spinuntil_int(); // startup texts
-	if (activecpu_get_pc()==0x060276e4) cpu_spinuntil_int(); // attract intro
-	if (activecpu_get_pc()==0x06027C72) cpu_spinuntil_int(); // attract game
-	if (activecpu_get_pc()==0x060279A6) cpu_spinuntil_int(); // game
-
-	return psh_ram[0x006000C/4];
-}
-
-static READ32_HANDLER( gnbarich_speedup_r )
-{
-/*
-PC  :0602CAE6: MOV.L   @R14,R3 // R14 = 0x606000C
-PC  :0602CAE8: MOV.L   @($F4,PC),R1
-PC  :0602CAEA: ADD     #$01,R3
-PC  :0602CAEC: MOV.L   R3,@R14 // R14 = 0x606000C
-PC  :0602CAEE: MOV.L   @R1,R2
-PC  :0602CAF0: TST     R2,R2
-PC  :0602CAF2: BT      $0602CAE6
-*/
-
-	if (activecpu_get_pc()==0x0602CAE6) cpu_spinuntil_int(); // title logos
-	if (activecpu_get_pc()==0x0602CD86) cpu_spinuntil_int(); // attract intro
-	if (activecpu_get_pc()==0x0602D2ee) cpu_spinuntil_int(); // game attract
-	if (activecpu_get_pc()==0x0602D040) cpu_spinuntil_int(); // game play
-
-	return psh_ram[0x006000C/4];
-}
-
-static READ32_HANDLER( mjgtaste_speedup_r )
-{
-
-	if (activecpu_get_pc()==0x6031f02) {cpu_spinuntil_int();return psh_ram[0x006000C/4];} // title logos
-	if (activecpu_get_pc()==0x603214a) {cpu_spinuntil_int();return psh_ram[0x006000C/4];} // attract game
-
-//  mame_printf_debug("at %08x\n",activecpu_get_pc());
-
-	return psh_ram[0x006000C/4];
-}
 
 static DRIVER_INIT( soldivid )
 {
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x1afaa);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x1ae74);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, soldivid_speedup_r );
 	use_factory_eeprom=eeprom_0;
 }
 
 static DRIVER_INIT( s1945ii )
 {
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x609fc68);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x609fed2);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 2);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60a0170);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, s1945ii_speedup_r );
 	use_factory_eeprom=eeprom_DEFAULT;
 }
 
 static DRIVER_INIT( daraku )
 {
 	UINT8 *RAM = memory_region(machine, "main");
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x4761a);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x47976);
 	memory_set_bankptr(1,&RAM[0x100000]);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, daraku_speedup_r );
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DARAKU;
 }
 
 static DRIVER_INIT( sbomberb )
 {
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60a10ec);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60a1658);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 2);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60a1380);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x600000c, 0x600000f, 0, 0, sbomberb_speedup_r );
 	use_factory_eeprom=eeprom_DEFAULT;
 }
 
 static DRIVER_INIT( gunbird2 )
 {
 	UINT8 *RAM = memory_region(machine, "main");
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6028972);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6028e62);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 2);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6028be4);
 	memory_set_bankptr(1,&RAM[0x100000]);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x604000c, 0x604000f, 0, 0, gunbird2_speedup_r );
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DEFAULT;
 }
 
 static DRIVER_INIT( s1945iii )
 {
 	UINT8 *RAM = memory_region(machine, "main");
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602b462);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602b6e0);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 2);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602bc1c);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 3);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602b97a);
 	memory_set_bankptr(1,&RAM[0x100000]);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, s1945iii_speedup_r );
+	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_S1945III;
 }
 
 static DRIVER_INIT( dragnblz )
 {
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602743e);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60276e4);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 2);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6027c72);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 3);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60279a6);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, dragnblz_speedup_r );
 	use_factory_eeprom=eeprom_DRAGNBLZ;
 }
 
 static DRIVER_INIT( gnbarich )
 {
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602cae6);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602cd86);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 2);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602d2ee);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 3);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602d040);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, gnbarich_speedup_r );
 	use_factory_eeprom=eeprom_GNBARICH;
 }
 
 static DRIVER_INIT( mjgtaste )
 {
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6031f02);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x603214a);
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x606000c, 0x606000f, 0, 0, mjgtaste_speedup_r );
 	use_factory_eeprom=eeprom_MJGTASTE;
 	/* needs to install mahjong controls too (can select joystick in test mode tho) */
 }

@@ -2156,7 +2156,11 @@ static void sh2_reset(void)
 	f = sh2->ftcsr_read_callback;
 	save_irqcallback = sh2->irq_callback;
 	save_is_slave = sh2->is_slave;
+	dma_callback_kludge = sh2->dma_callback_kludge;
+
 	memset(sh2, 0, sizeof(SH2));
+
+	sh2->dma_callback_kludge = dma_callback_kludge;
 	sh2->is_slave = save_is_slave;
 	sh2->ftcsr_read_callback = f;
 	sh2->irq_callback = save_irqcallback;

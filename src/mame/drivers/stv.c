@@ -2499,8 +2499,8 @@ static GFXDECODE_START( stv )
 
 GFXDECODE_END
 
-static const sh2_cpu_core sh2_conf_master = { 0 };
-static const sh2_cpu_core sh2_conf_slave  = { 1 };
+static const sh2_cpu_core sh2_conf_master = { 0, NULL };
+static const sh2_cpu_core sh2_conf_slave  = { 1, NULL };
 
 static int scsp_last_line = 0;
 
