@@ -13,65 +13,8 @@ to be honest i think some of these cause more problems than they're worth ...
 
 #define FIRST_SPEEDUP_SLOT	(2)			// in case we remove/alter the BIOS speedups later
 
-/*
-IC-13 rom shifter routine,on 2000000-21fffff the game maps the rom bytes on the
-ODD (in every sense) bytes.This gets the IC-13 rom status to good and ends a emulation
-weird issue once and for all...
-We need to remove this and add the whole thing into the ROM loading structure...
-*/
-static void ic13_shifter(running_machine *machine)
-{
-	UINT32 *rom = (UINT32 *)memory_region(machine, "user1");
-	UINT32 i;
-	UINT32 *tmp = malloc_or_die(0x80000*2);
 
-	for(i=(0);i<(0x100000-1);i+=8)
-	{
-		//mame_printf_debug("%08x\n",i);
-		tmp[((i)/4)+0] = rom[(i/2)/4]; /*0.0 -> 2.1 -> 4.2*/
-		tmp[((i)/4)+1] = rom[(i/2)/4]; /*1.0 -> 3.1 -> 5.2*/
-	}
 
-	for(i=(0);i<(0x100000-1);i+=8)
-	{
-		//mame_printf_debug("%08x\n",i);
-		tmp[(i/4)+0] = ((tmp[(i/4)+0] & 0xff000000) >> 8) | ((tmp[(i/4)+0] & 0x00ff0000) >> 16);
-		tmp[(i/4)+1] = ((tmp[(i/4)+1] & 0x0000ff00) << 8) | ((tmp[(i/4)+1] & 0x000000ff) >> 0);
-	}
-
-	for(i=(0);i<(0x100000-1);i+=4)
-	{
-		//mame_printf_debug("%08x\n",i);
-		rom[i/4] = tmp[(i)/4];
-	}
-
-	for(i=(0x300000);i<(0x400000-1);i+=8)
-	{
-		//mame_printf_debug("%08x\n",i);
-		tmp[((i-0x300000)/4)+0] = rom[(i/2)/4]; /*0.0 -> 2.1 -> 4.2*/
-		tmp[((i-0x300000)/4)+1] = rom[(i/2)/4]; /*1.0 -> 3.1 -> 5.2*/
-	}
-
-	for(i=(0);i<(0x100000-1);i+=8)
-	{
-		//mame_printf_debug("%08x\n",i);
-		tmp[(i/4)+0] = ((tmp[(i/4)+0] & 0xff000000) >> 8) | ((tmp[(i/4)+0] & 0x00ff0000) >> 16);
-		tmp[(i/4)+1] = ((tmp[(i/4)+1] & 0x0000ff00) << 8) | ((tmp[(i/4)+1] & 0x000000ff) >> 0);
-	}
-
-	for(i=(0x100000);i<(0x200000-1);i+=4)
-	{
-		//mame_printf_debug("%08x\n",i);
-		rom[i/4] = tmp[(i-0x100000)/4];
-	}
-	free(tmp);
-}
-
-DRIVER_INIT ( ic13 )
-{
-	ic13_shifter(machine);
-	DRIVER_INIT_CALL(stv);
-}
 /*
 EEPROM write 0000 to address 2d
 EEPROM write 0000 to address 2e
@@ -371,7 +314,7 @@ DRIVER_INIT(puyosun)
    	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, puyosun_speedup_r ); // idle loop of main cpu
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)puyosun_slave_speedup );
 
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 
 	minit_boost = sinit_boost = 0;
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
@@ -401,7 +344,7 @@ DRIVER_INIT(mausuke)
 
    	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, mausuke_speedup_r ); // idle loop of main cpu
 
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 
 	minit_boost = sinit_boost = 0;
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
@@ -552,7 +495,7 @@ DRIVER_INIT(dnmtdeka)
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60985a0, 0x60985a3, 0, 0, dnmtdeka_speedup_r ); // idle loop of main cpu
 	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060e0ad4, 0x060e0bc3, 0, 0, dnmtdeka_cmd_read, dnmtdeka_cmd_write );
 
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 }
 
 static int diehard_pending_commands;
@@ -645,7 +588,7 @@ DRIVER_INIT(diehard)
 	memory_install_write32_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x060e0dd8, 0x060e0ddb, 0, 0, diehard_cmd_ack_write );
 
 
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 }
 
 static READ32_HANDLER( fhboxers_speedup_r )
@@ -684,36 +627,11 @@ DRIVER_INIT(fhboxers)
    	memory_install_read32_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x6090740, 0x6090743, 0, 0, fhboxers_speedup2_r ); // idle loop of second cpu
   	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x06090bb4, 0x06090bb7, 0, 0, fhboxers_speedup3_r ); // idle loop of main cpu
 
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 }
 
 
-static READ32_HANDLER( bakubaku_speedup_r )
-{
-	if (activecpu_get_pc()==0x06036dc6) cpu_spinuntil_int(); // title logos
 
-	return stv_workram_h[0x0833f0/4];
-}
-
-static READ32_HANDLER( bakubaku_speedup2_r )
-{
-	if (activecpu_get_pc()==0x06033760) 	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
-
-	return stv_workram_h[0x0033762/4];
-}
-
-DRIVER_INIT(bakubaku)
-{
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6036dc6);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+1);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6033760);
-
-   	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60833f0, 0x60833f3, 0, 0, bakubaku_speedup_r ); // idle loop of main cpu
-   	memory_install_read32_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x60fdfe8, 0x60fdfeb, 0, 0, bakubaku_speedup2_r ); // turn off slave sh2, is it needed after boot ??
-
-	DRIVER_INIT_CALL(ic13);
-}
 
 static READ32_HANDLER( groovef_hack1_r )
 {
@@ -900,7 +818,7 @@ DRIVER_INIT( astrass )
 
 	install_astrass_protection(machine);
 
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 }
 
 /* Treasure Hunt idle loop skipping */
@@ -962,7 +880,7 @@ DRIVER_INIT(thunt)
 
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf *)thunt_slave_speedup);
 
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(1);
 }
@@ -999,7 +917,7 @@ DRIVER_INIT(sandor)
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060314f8, 0x060314fb, 0, 0, sandor_speedup_r );
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x06075a2c, 0x06075a2f, 0, 0, sandor_speedup2_r );
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf *)sandor_slave_speedup);
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(1);
 
 }
@@ -1107,7 +1025,7 @@ DRIVER_INIT(colmns97)
 
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)colmns97_slave_speedup );
 
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 
 	minit_boost = sinit_boost = 0;
 
@@ -1137,7 +1055,7 @@ DRIVER_INIT(winterht)
 
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)winterht_slave_speedup );
 
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(2);
 }
@@ -1167,7 +1085,7 @@ DRIVER_INIT(seabass)
 
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)seabass_slave_speedup );
 
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(5);
 }
@@ -1195,7 +1113,7 @@ DRIVER_INIT(vfremix)
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x06074f98, 0x06074f9b, 0, 0, vfremix_speedup_r );
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)vfremix_slave_speedup );
 
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(20);
 }
@@ -1225,7 +1143,7 @@ DRIVER_INIT(sss)
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060ffc10, 0x060ffc13, 0, 0, sss_speedup_r );
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)sss_slave_speedup );
 
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
 }
@@ -1277,7 +1195,7 @@ DRIVER_INIT(sasissu)
 
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)sasissu_slave_speedup );
 
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(2);
 }
@@ -1294,7 +1212,7 @@ DRIVER_INIT(gaxeduel)
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6012ee4);
 
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x002f4068, 0x002f406b, 0, 0, gaxeduel_speedup_r);
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 }
 
 static READ32_HANDLER(suikoenb_speedup_r)
@@ -1309,13 +1227,13 @@ DRIVER_INIT(suikoenb)
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6013f7a);
 
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x060705d0, 0x060705d3, 0, 0, suikoenb_speedup_r);
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 }
 
 
 DRIVER_INIT(sokyugrt)
 {
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
 
 }
@@ -1354,7 +1272,7 @@ DRIVER_INIT(znpwfv)
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)znpwfv_slave_speedup );
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, znpwfv_speedup_r );
 
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_NSEC(500);
 }
 
@@ -1381,7 +1299,7 @@ DRIVER_INIT(twcup98)
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)twcup98_slave_speedup );
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, twcup98_speedup_r );
 
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 	install_standard_protection(machine);
 
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(5);
@@ -1410,7 +1328,7 @@ DRIVER_INIT(smleague)
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)smleague_slave_speedup );
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, smleague_speedup_r );
 
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
 }
@@ -1429,7 +1347,7 @@ DRIVER_INIT(finlarch)
 
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, finlarch_speedup_r );
 
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 
 }
 
@@ -1465,7 +1383,7 @@ DRIVER_INIT(maruchan)
 	cpunum_set_info_fct(1, CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)maruchan_slave_speedup );
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, maruchan_speedup_r );
 
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
 }
@@ -1485,7 +1403,7 @@ DRIVER_INIT(pblbeach)
 
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0606c398, 0x0606c39b, 0, 0, pblbeach_speedup_r );
 
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 }
 
 static READ32_HANDLER( shanhigw_speedup_r )
@@ -1583,7 +1501,7 @@ DRIVER_INIT(ffreveng)
 DRIVER_INIT(decathlt)
 {
 	install_decathlt_protection(machine);
-	DRIVER_INIT_CALL(ic13);
+	DRIVER_INIT_CALL(stv);
 }
 
 static READ32_HANDLER( nameclv3_speedup_r )

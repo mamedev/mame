@@ -251,10 +251,12 @@ struct _rom_load_data
 #define ROM_LOAD32_WORD_SWAP(name,offset,length,hash) ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_SKIP(2))
 #define ROM_LOAD32_DWORD(name,offset,length,hash)	ROMX_LOAD(name, offset, length, hash, ROM_GROUPDWORD)
 
+/* ----- ROM_RELOAD related macros ----- */
+#define ROM_RELOAD(offset,length)					{ NULL, NULL, offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS },
+#define ROM_RELOAD_PLAIN(offset,length)					{ NULL, NULL, offset, length, ROMENTRYTYPE_RELOAD },
 
 /* ----- additional ROM-related macros ----- */
 #define ROM_CONTINUE(offset,length)					{ NULL, NULL, offset, length, ROMENTRYTYPE_CONTINUE | ROM_INHERITFLAGS },
-#define ROM_RELOAD(offset,length)					{ NULL, NULL, offset, length, ROMENTRYTYPE_RELOAD | ROM_INHERITFLAGS },
 #define ROM_IGNORE(length)							{ NULL, NULL, 0,      length, ROMENTRYTYPE_IGNORE | ROM_INHERITFLAGS },
 #define ROM_FILL(offset,length,value)				{ NULL, (const char *)value, offset, length, ROMENTRYTYPE_FILL },
 #define ROM_COPY(srctag,srcoffs,offset,length) 		{ srctag, (const char *)srcoffs, offset, length, ROMENTRYTYPE_COPY },
