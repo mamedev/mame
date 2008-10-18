@@ -3496,14 +3496,14 @@ ROM_START( brapboys ) /* Single PCB, fully populated, no rom sub board */
 	ROM_LOAD( "rb-013.u68",  0x300000, 0x100000, CRC(28c37fe8) SHA1(e10dd1a810983077328b44e6e33ce2e899c506d2) )
 
 	ROM_REGION( 0x100000, "oki1", 0 )	/* Samples */
-	/* order is probably wrong, but until it does more we can't tell */
-	ROM_LOAD( "rb-003.101",  0x000000, 0x080000, CRC(2cac25d7) SHA1(0412c317bf650a93051b9304d23035efde0c026a) )
-	ROM_LOAD( "rb-000.u43",  0x080000, 0x040000, CRC(c7c848ac) SHA1(77754efd6efeac50a40dcd530de504090257d8b3) )
+	/* Upper 128kB of M6295 address region is bank-switched? */
+	ROM_LOAD( "rb-000.u43",  0x000000, 0x080000, CRC(58ad1a62) SHA1(1d2643b5f6eac22682972a88d284e00de3e3b223) )
+	ROM_LOAD( "rb-003.101",  0x080000, 0x080000, CRC(2cac25d7) SHA1(0412c317bf650a93051b9304d23035efde0c026a) )
 
-	ROM_REGION( 0x100000, "oki2", 0 )	/* Samples */
-	/* order is probably wrong, but until it does more we can't tell */
-	ROM_LOAD( "rb-001.u44",   0x000000, 0x080000, CRC(09c779e3) SHA1(c9c9bf939d58d329b87e0aa08ec3d35f7440d3c7) )
-	ROM_LOAD( "rb-002.u45",   0x080000, 0x080000, CRC(55de7003) SHA1(cc349fd8671926cafed4d86d1a5cb671e591c408) )
+	ROM_REGION( 0x200000, "oki2", 0 )	/* Samples */
+	/* Upper 128kB of M6295 address region is bank-switched? */
+	ROM_LOAD( "rb-001.u44",   0x000000, 0x100000, CRC(7cf774b3) SHA1(3fb0a5096ce9480f97e311439042eb8cbc26efb4) )
+	ROM_LOAD( "rb-002.u45",   0x100000, 0x100000, CRC(e4b30444) SHA1(be6756dce3721226e0b7f5d4d168008c31aeea8e) )
 ROM_END
 
 ROM_START( brapboyj ) /* The Japanese version has an extra rom??? and used a rom sub board */
@@ -3532,14 +3532,14 @@ ROM_START( brapboyj ) /* The Japanese version has an extra rom??? and used a rom
 	ROM_LOAD( "rb-013.u68",  0x300000, 0x100000, CRC(28c37fe8) SHA1(e10dd1a810983077328b44e6e33ce2e899c506d2) )
 
 	ROM_REGION( 0x100000, "oki1", 0 )	/* Samples */
-	/* order is probably wrong, but until it does more we can't tell */
-	ROM_LOAD( "rb-003.101",  0x000000, 0x080000, CRC(2cac25d7) SHA1(0412c317bf650a93051b9304d23035efde0c026a) )
-	ROM_LOAD( "rb-000.u43",  0x080000, 0x040000, CRC(c7c848ac) SHA1(77754efd6efeac50a40dcd530de504090257d8b3) )
+	/* Upper 128kB of M6295 address region is bank-switched? */
+	ROM_LOAD( "rb-000.u43",  0x000000, 0x080000, CRC(58ad1a62) SHA1(1d2643b5f6eac22682972a88d284e00de3e3b223) )
+	ROM_LOAD( "rb-003.101",  0x080000, 0x080000, CRC(2cac25d7) SHA1(0412c317bf650a93051b9304d23035efde0c026a) )
 
-	ROM_REGION( 0x100000, "oki2", 0 )	/* Samples */
-	/* order is probably wrong, but until it does more we can't tell */
-	ROM_LOAD( "rb-001.u44",   0x000000, 0x080000, CRC(09c779e3) SHA1(c9c9bf939d58d329b87e0aa08ec3d35f7440d3c7) )
-	ROM_LOAD( "rb-002.u45",   0x080000, 0x080000, CRC(55de7003) SHA1(cc349fd8671926cafed4d86d1a5cb671e591c408) )
+	ROM_REGION( 0x200000, "oki2", 0 )	/* Samples */
+	/* Upper 128kB of M6295 address region is bank-switched? */
+	ROM_LOAD( "rb-001.u44",   0x000000, 0x100000, CRC(7cf774b3) SHA1(3fb0a5096ce9480f97e311439042eb8cbc26efb4) )
+	ROM_LOAD( "rb-002.u45",   0x100000, 0x100000, CRC(e4b30444) SHA1(be6756dce3721226e0b7f5d4d168008c31aeea8e) )
 ROM_END
 
 /**********************************************************************
