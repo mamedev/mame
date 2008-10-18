@@ -211,8 +211,7 @@ static void pcu_reset(void)
 	IPR = 0x0000;
 
 	// FM.5-4
-//  I_bits_set(0x03); This is what the manual says, but i'm dubious!  Polygonet's HI interrupt wouldn't happen with the I bits set.
-	I_bits_set(0x00);
+	I_bits_set(0x03);
 	S_bits_set(0);
 	L_bit_set(0);
 	S_bit_set(0);
@@ -287,7 +286,10 @@ static void pcu_service_interrupts(void)
 			{
 				// The host command input has a floating vector.
 				const UINT16 irq_vector = HV_bits() << 1;
+
+				core.ppc = PC;
 				PC = irq_vector;
+				change_pc(PC);
 
 				// TODO: 5-9 5-11 Gotta' Clear HC (HCP gets it too) when taking this exception!
 				HC_bit_set(0);

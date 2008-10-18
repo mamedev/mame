@@ -52,7 +52,7 @@ static size_t dsp56k_dasm_lsl		(const UINT16 op_byte, char* opcode_str, char* ar
 static size_t dsp56k_dasm_eor		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
 static size_t dsp56k_dasm_subl		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
 static size_t dsp56k_dasm_sub		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
-static size_t dsp56k_dasm_clr2		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
+static size_t dsp56k_dasm_clr24		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
 static size_t dsp56k_dasm_sbc		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
 static size_t dsp56k_dasm_cmp		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
 static size_t dsp56k_dasm_neg		(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register);
@@ -461,7 +461,7 @@ offs_t dsp56k_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 			/* CLR24 : .... .... 0101 F001 : A-62 */
 			else if ((op_byte & 0x00f7) == 0x0051)
 			{
-				size = dsp56k_dasm_clr2(op_byte, opcode_str, arg_str, d_register);
+				size = dsp56k_dasm_clr24(op_byte, opcode_str, arg_str, d_register);
 			}
 			/* SBC : .... .... 0101 F01J : A-198 */
 			else if ((op_byte & 0x00f6) == 0x0052)
@@ -1408,7 +1408,7 @@ static size_t dsp56k_dasm_sub(const UINT16 op_byte, char* opcode_str, char* arg_
 }
 
 /* CLR24 : .... .... 0101 F001 : A-62 */
-static size_t dsp56k_dasm_clr2(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
+static size_t dsp56k_dasm_clr24(const UINT16 op_byte, char* opcode_str, char* arg_str, char* d_register)
 {
 	char D[32];
 	decode_F_table(BITS(op_byte,0x08), D);
@@ -1820,7 +1820,7 @@ static size_t dsp56k_dasm_bscc_1(const UINT16 op, char* opcode_str, char* arg_st
 static size_t dsp56k_dasm_bsr(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str, const offs_t pc)
 {
 	sprintf(opcode_str, "bsr");
-	sprintf(arg_str, "%d (0x%04x)", (INT16)op2, pc + 2 + (INT16)op2);
+	sprintf(arg_str, "%x (0x%04x)", (INT16)op2, pc + 2 + (INT16)op2);
 	return (2 | DASMFLAG_STEP_OVER);
 }
 
@@ -2606,6 +2606,12 @@ static void decode_register_to_register_data_move(const UINT16 op, char* paralle
 
 	decode_IIII_table(BITS(op,0x0f00), S, D);
 
+	if (S[0] == 'F')
+	{
+		S[0] = d_register[0];
+		S[1] = 0x00;
+	}
+
 	if (D[0] == '^' && D[1] == 'F')
 	{
 		if (d_register[0] == 'B')
@@ -2613,7 +2619,7 @@ static void decode_register_to_register_data_move(const UINT16 op, char* paralle
 		else if (d_register[0] == 'A')
 			sprintf(D, "B");
 		else
-			sprintf(D, "A");
+			sprintf(D, "A");	/* In the case of no data ALU operation */
 	}
 
 	sprintf(parallel_move_str, "%s,%s", S, D);

@@ -461,9 +461,7 @@ static void dsp56k_exit(void)
     CORE INCLUDE
 ***************************************************************************/
 
-#define OP	core.op
-#define ROPCODE(pc)	cpu_readop16(pc)
-
+#define OP (core.op)
 #include "dsp56ops.c"
 
 /***************************************************************************
