@@ -5789,6 +5789,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ms4plus )	/* bootleg */
 	DRIVER( rotd )		/* 0264 (c) 2002 Evoga */
 	DRIVER( kof2002 )	/* 0265 (c) 2002 Eolith / Playmore */
+	DRIVER( kof2002b )	/* bootleg */
 	DRIVER( kf2k2pls )	/* bootleg */
 	DRIVER( kf2k2pla )	/* bootleg */
 	DRIVER( kf2k2mp )	/* bootleg */

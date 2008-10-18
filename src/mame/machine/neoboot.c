@@ -299,6 +299,43 @@ void decrypt_kf2k5uni( running_machine *machine )
 }
 
 
+/* The King of Fighters 2002 (bootleg) */
+
+
+// Thanks to IQ_132 for the info
+void kof2002b_gfx_decrypt(running_machine *machine, UINT8 *src, int size)
+{
+	int i, j;
+	int t[ 8 ][ 10 ] =
+	{
+		{ 0, 8, 7, 3, 4, 5, 6, 2, 1 },
+		{ 1, 0, 8, 4, 5, 3, 7, 6, 2 },
+		{ 2, 1, 0, 3, 4, 5, 8, 7, 6 },
+		{ 6, 2, 1, 5, 3, 4, 0, 8, 7 },
+		{ 7, 6, 2, 5, 3, 4, 1, 0, 8 },
+		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 },
+		{ 2, 1, 0, 4, 5, 3, 6, 7, 8 },
+		{ 8, 0, 7, 3, 4, 5, 6, 2, 1 },
+	};
+
+	UINT8 *dst = malloc_or_die( 0x10000 );
+
+	for ( i = 0; i < size; i+=0x10000 )
+	{
+		memcpy( dst, src+i, 0x10000 );
+
+		for ( j = 0; j < 0x200; j++ )
+		{
+			int n = (( j % 0x40) / 8 );
+			int ofst = BITSWAP16(j, 15, 14, 13, 12, 11, 10, 9, t[n][0], t[n][1], t[n][2],
+								 t[n][3], t[n][4], t[n][5], t[n][6], t[n][7], t[n][8]);
+			memcpy( src+i+ofst*128, dst+j*128, 128 );
+		}
+	}
+	free( dst );
+}
+
+
 /* The King of Fighters 2002 Magic Plus (bootleg) */
 
 
@@ -327,7 +364,7 @@ void kf2k2mp_decrypt( running_machine *machine )
 /* The King of Fighters 2002 Magic Plus II (bootleg) */
 
 
-void kof2km2_px_decrypt( running_machine *machine )
+void kf2k2mp2_px_decrypt( running_machine *machine )
 {
 	UINT8 *src = memory_region(machine, "main");
 	UINT8 *dst = malloc_or_die(0x600000);
@@ -1082,6 +1119,6 @@ void matrimbl_decrypt( running_machine *machine )
 	memcpy( rom-0x10000, rom, 0x10000 );
 
 	/* decrypt gfx */
-	cthd2003_c( machine, 0);
+	cthd2003_c( machine, 0 );
 }
 

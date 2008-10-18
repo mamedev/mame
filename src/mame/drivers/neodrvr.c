@@ -4528,7 +4528,7 @@ ROM_START( kof99 ) /* Original Version - Encrypted Code & GFX */ /* AES VERSION 
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -4564,7 +4564,7 @@ ROM_START( kof99a ) /* Original Version - Encrypted Code & GFX */ /* MVS VERSION
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -4602,7 +4602,7 @@ ROM_START( kof99e ) /* Original Version - Encrypted Code & GFX */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -4638,7 +4638,7 @@ ROM_START( kof99n ) /* Original Version - Encrypted GFX */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -4704,7 +4704,7 @@ ROM_START( ganryu ) /* Original Version - Encrypted GFX */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -4733,7 +4733,7 @@ ROM_START( garou ) /* Original Version - Encrypted GFX */ /* later revision */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 )	/* larger char set */
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -4769,7 +4769,7 @@ ROM_START( garouo ) /* Original Version - Encrypted GFX */ /* earlier revision *
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 )	/* larger char set */
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -4832,7 +4832,7 @@ ROM_START( s1945p ) /* Original Version, Encrypted GFX Roms */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -4866,7 +4866,7 @@ ROM_START( preisle2 ) /* Original Version, Encrypted GFX */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -4898,7 +4898,7 @@ ROM_START( mslug3 ) /* Original Version - Encrypted Code & GFX */ /* revision 20
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 ) /* larger char set */
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -4933,7 +4933,7 @@ ROM_START( mslug3h ) /* Original Version - Encrypted GFX */ /* AES VERSION */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 ) /* larger char set */
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -4969,7 +4969,7 @@ ROM_START( kof2000 ) /* Original Version, Encrypted Code + Sound + GFX Roms */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 )	/* larger char set */
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5004,7 +5004,7 @@ ROM_START( kof2000n ) /* Original Version, Encrypted Sound + GFX Roms */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 )	/* larger char set */
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5039,7 +5039,7 @@ ROM_START( bangbead ) /* Original Version - Encrypted GFX */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5092,7 +5092,7 @@ ROM_START( nitd ) /* Original Version - Encrypted GFX */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5119,7 +5119,7 @@ ROM_START( sengoku3 ) /* Original Version - Encrypted GFX */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5149,7 +5149,7 @@ ROM_START( kof2001 ) /* MVS VERSION */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5185,7 +5185,7 @@ ROM_START( kof2001h ) /* AES VERSION */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5221,7 +5221,7 @@ ROM_START( mslug4 ) /* Original Version - Encrypted GFX */ /* MVS VERSION */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 )	/* larger char set */
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5253,7 +5253,7 @@ ROM_START( rotd ) /* Encrypted Set */ /* MVS VERSION */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5288,7 +5288,7 @@ ROM_START( kof2002 ) /* Encrypted Set */ /* MVS AND AES VERSION */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5323,7 +5323,7 @@ ROM_START( matrim ) /* Encrypted Set */ /* MVS AND AES VERSION */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x80000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5357,7 +5357,7 @@ ROM_START( pnyaa ) /* Encrypted Set */ /* MVS VERSION */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5385,7 +5385,7 @@ ROM_START( mslug5 ) /* Encrypted Set */ /* MVS VERSION */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5420,7 +5420,7 @@ ROM_START( mslug5h ) /* Encrypted Set */ /* AES release of the game but is also 
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5455,7 +5455,7 @@ ROM_START( svc ) /* Encrypted Set */ /* MVS AND AES VERSION */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 ) /* larger char set */
 	ROM_FILL( 0x000000, 0x80000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5488,7 +5488,7 @@ ROM_START( samsho5 ) /* Encrypted Set */ /* MVS VERSION */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5523,7 +5523,7 @@ ROM_START( samsho5h ) /* Encrypted Set, Alternate Set */ /* AES VERSION */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5559,7 +5559,7 @@ ROM_START( kof2003 ) /* Encrypted Code + Sound + GFX Roms */ /* MVS VERSION */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 ) /* larger char set */
 	ROM_FILL( 0x000000, 0x80000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5595,7 +5595,7 @@ ROM_START( kof2003h ) /* Encrypted Code + Sound + GFX Roms */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x80000, "fixed", 0 ) /* larger char set */
 	ROM_FILL( 0x000000, 0x80000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5630,7 +5630,7 @@ ROM_START( samsh5sp ) /* Encrypted Set */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5664,7 +5664,7 @@ ROM_START( samsh5sh ) /* Encrypted Set */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5699,7 +5699,7 @@ ROM_START( samsh5sn ) /* Encrypted Set */
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5734,7 +5734,7 @@ ROM_START( jockeygp )
 
 	ROM_Y_ZOOM
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
+	/* The Encrypted Boards do not have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -5815,7 +5815,6 @@ ROM_START( ms5pcb ) /* Encrypted Set */
 	ROM_LOAD32_WORD_SWAP( "268-p1r.bin", 0x000000, 0x400000, NO_DUMP )
 	ROM_LOAD32_WORD_SWAP( "268-p2r.bin", 0x000002, 0x400000, NO_DUMP )
 
-	/* The Encrypted Boards do _not_ have an s1 rom, data for it comes from the Cx ROMs */
 	ROM_REGION( 0x20000, "fixed", 0 )
 	ROM_FILL( 0x000000, 0x20000, 0 )
 	ROM_REGION( 0x20000, "fixedbios", 0 )
@@ -6279,6 +6278,34 @@ ROM_START( ms4plus )
 ROM_END
 
 /* The King of Fighters 2002 bootlegs */
+
+ROM_START( kof2002b )
+	ROM_REGION( 0x500000, "main", 0 )
+	ROM_LOAD16_WORD_SWAP( "265-p1.bin", 0x000000, 0x100000, CRC(9ede7323) SHA1(ad9d45498777fda9fa58e75781f48e09aee705a6) )
+	ROM_LOAD16_WORD_SWAP( "2k2-p2.bin", 0x100000, 0x400000, CRC(6dbee4df) SHA1(9a9646c81b233b44213c624b898c19f83e9a07f8) )
+
+	NEO_SFIX_128K( "2k2-s1.bin", CRC(2255f5bf) SHA1(8a82b3e9717df30b580b9d0bac0b403f8102a002) )
+
+	/* Encrypted */
+	NEO_BIOS_AUDIO_ENCRYPTED_128K( "265-m1.bin", CRC(85aaa632) SHA1(744fba4ca3bc3a5873838af886efb97a8a316104) )
+
+	ROM_REGION( 0x1000000, "ym", 0 )
+	/* Encrypted */
+	ROM_LOAD( "265-v1.bin", 0x000000, 0x800000, CRC(15e8f3f5) SHA1(7c9e6426b9fa6db0158baa17a6485ffce057d889) )
+	ROM_LOAD( "265-v2.bin", 0x800000, 0x800000, CRC(da41d6f9) SHA1(a43021f1e58947dcbe3c8ca5283b20b649f0409d) )
+
+	NO_DELTAT_REGION
+
+	ROM_REGION( 0x4000000, "sprites", 0 )
+	ROM_LOAD16_BYTE( "2k2-c1.bin", 0x0000000, 0x800000, CRC(f25d3d66) SHA1(eb1da3e171c126d91e851ce141840709a2f62f8a) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "2k2-c2.bin", 0x0000001, 0x800000, CRC(e3e66f1d) SHA1(af93e9e134816353d6187a53959c6e418b83ad8d) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "2k2-c3.bin", 0x1000000, 0x800000, CRC(8732fa30) SHA1(81c482b375c04bcfbbc69e3e2a2e9ab567c9bb78) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "2k2-c4.bin", 0x1000001, 0x800000, CRC(0989fd40) SHA1(355d6b2c528319e41ce89952c5cf5bcc47cd6de0) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "2k2-c5.bin", 0x2000000, 0x800000, CRC(60635cd2) SHA1(0cf2c54e003edfcdbed64e0570e6b800e7ed3c1b) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "2k2-c6.bin", 0x2000001, 0x800000, CRC(bd736824) SHA1(d897fc8248ace145fef57d8aa393eaebc4a1ccc4) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "2k2-c7.bin", 0x3000000, 0x800000, CRC(2da8d8cf) SHA1(ab8aa88b8e1baba88e5fc01d0f3cb55503b6c81a) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "2k2-c8.bin", 0x3000001, 0x800000, CRC(2048404a) SHA1(d6d0f049ffc196334825328e0472b04e04bf6695) ) /* Plane 2,3 */
+ROM_END
 
 ROM_START( kf2k2pls )
 	ROM_REGION( 0x500000, "main", 0 )
@@ -7166,6 +7193,16 @@ static DRIVER_INIT( kof2002 )
 	DRIVER_INIT_CALL(neogeo);
 }
 
+static DRIVER_INIT( kof2002b )
+{
+	kof2002_decrypt_68k(machine);
+	neo_pcm2_swap(machine, 0);
+	neogeo_cmc50_m1_decrypt(machine);
+	kof2002b_gfx_decrypt(machine, memory_region(machine, "sprites"),0x4000000);
+	kof2002b_gfx_decrypt(machine, memory_region(machine, "fixed"),0x20000);
+	DRIVER_INIT_CALL(neogeo);
+}
+
 static DRIVER_INIT( kf2k2pls )
 {
 	kof2002_decrypt_68k(machine);
@@ -7187,7 +7224,7 @@ static DRIVER_INIT( kf2k2mp )
 
 static DRIVER_INIT( kf2k2mp2 )
 {
-	kof2km2_px_decrypt(machine);
+	kf2k2mp2_px_decrypt(machine);
 	neo_pcm2_swap(machine, 0);
 	neogeo_cmc50_m1_decrypt(machine);
 	neogeo_bootleg_sx_decrypt(machine, 1);
@@ -7647,6 +7684,7 @@ GAME( 2003, cthd2003, kof2001,  neogeo,   neogeo,   cthd2003, ROT0, "bootleg", "
 GAME( 2003, ct2k3sp,  kof2001,  neogeo,   neogeo,   ct2k3sp,  ROT0, "bootleg", "Crouching Tiger Hidden Dragon 2003 Super Plus (The King of Fighters 2001 bootleg)", 0 ) /* Protected Hack / Bootleg of kof2001 */
 GAME( 2003, ct2k3sa,  kof2001,  neogeo,   neogeo,   ct2k3sa,  ROT0, "bootleg", "Crouching Tiger Hidden Dragon 2003 Super Plus alternate (The King of Fighters 2001 bootleg)", 0 ) /* Hack / Bootleg of kof2001 */
 GAME( 2002, kof2002,  neogeo,   neogeo,   neogeo,   kof2002,  ROT0, "Eolith / Playmore", "The King of Fighters 2002" , 0 ) /* Encrypted GFX */
+GAME( 2002, kof2002b, kof2002,  neogeo,   neogeo,   kof2002b, ROT0, "bootleg", "The King of Fighters 2002 (bootleg)", 0 )
 GAME( 2002, kf2k2pls, kof2002,  neogeo,   neogeo,   kf2k2pls, ROT0, "bootleg", "The King of Fighters 2002 Plus (bootleg set 1)" , 0 ) /* Encrypted GFX */
 GAME( 2002, kf2k2pla, kof2002,  neogeo,   neogeo,   kf2k2pls, ROT0, "bootleg", "The King of Fighters 2002 Plus (bootleg set 2)" , 0 ) /* Encrypted GFX */
 GAME( 2002, kf2k2mp,  kof2002,  neogeo,   neogeo,   kf2k2mp,  ROT0, "bootleg", "The King of Fighters 2002 Magic Plus (bootleg)" , 0 ) /* Encrypted GFX */
@@ -7680,7 +7718,7 @@ GAME( 2003, samsh5sp, neogeo,   neogeo,   neogeo,   samsh5sp, ROT0, "Yuki Enterp
 GAME( 2003, samsh5sh, samsh5sp, neogeo,   neogeo,   samsh5sp, ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V Special / Samurai Spirits Zero Special (set 2, censored)", 0 )
 GAME( 2003, samsh5sn, samsh5sp, neogeo,   neogeo,   samsh5sp, ROT0, "Yuki Enterprise / SNK Playmore", "Samurai Shodown V Special / Samurai Spirits Zero Special (set 3, less censored)", 0 )
 
-/* there are other bootlegs kof2002b etc. kof96ep, kf2k1pls? -- work out which should be supported */
+/* there are other bootlegs kof96ep, kf2k1pls etc.? -- work out which should be supported */
 
 /* Alpha Denshi Co. / ADK (changed name in 1993) */
 GAME( 1990, maglord,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Alpha Denshi Co.", "Magician Lord (set 1)", 0 )
