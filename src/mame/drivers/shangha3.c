@@ -99,6 +99,20 @@ static WRITE16_HANDLER( heberpop_coinctrl_w )
 	}
 }
 
+static WRITE16_HANDLER( blocken_coinctrl_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		/* the sound ROM bank is selected by the main CPU! */
+		okim6295_set_bank_base(0, ((data >> 4) & 3) * 0x40000);
+ 
+		coin_lockout_w(0,~data & 0x04);
+		coin_lockout_w(1,~data & 0x04);
+		coin_counter_w(0,data & 0x01);
+		coin_counter_w(1,data & 0x02);
+	}
+}
+
 
 static WRITE16_HANDLER( heberpop_sound_command_w )
 {
@@ -174,7 +188,7 @@ static ADDRESS_MAP_START( blocken_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x100008, 0x100009) AM_WRITE(shangha3_blitter_go_w)
 	AM_RANGE(0x10000a, 0x10000b) AM_WRITE(SMH_NOP)	/* irq ack? */
-	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(heberpop_coinctrl_w)
+	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(blocken_coinctrl_w)
 	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(heberpop_sound_command_w)
 	AM_RANGE(0x200000, 0x200fff) AM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE(&paletteram16)
 	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(SMH_RAM) AM_BASE(&shangha3_ram) AM_SIZE(&shangha3_ram_size)	/* gfx & work ram */
@@ -664,8 +678,20 @@ ROM_START( blocken )
 	ROM_LOAD( "ic100j.bin",   0x200000, 0x80000, CRC(a34786fd) SHA1(7d4879cbaa055c2ddbe6d20dd946bf0e3e069d4d) )
 	/* 280000-37ffff empty */
 
-	ROM_REGION( 0x80000, "oki", 0 )	/* samples for M6295 */
-	ROM_LOAD( "ic53.bin",     0x0000, 0x80000, CRC(86108c56) SHA1(aa405fa2eec5cc178ef6226f229a12dac09504f0) )
+	ROM_REGION( 0x80000, "samples", 0 )	/* samples for M6295 */
+ 	ROM_LOAD( "ic53.bin",     0x0000, 0x80000, CRC(86108c56) SHA1(aa405fa2eec5cc178ef6226f229a12dac09504f0) )
+
+	ROM_REGION( 0x100000, "oki", 0 )
+	/* $00000-$20000 stays the same in all sound banks, */
+	/* the second half of the bank is what gets switched */
+	ROM_COPY( "samples", 0x000000, 0x000000, 0x020000)
+	ROM_COPY( "samples", 0x000000, 0x020000, 0x020000)
+	ROM_COPY( "samples", 0x000000, 0x040000, 0x020000)
+	ROM_COPY( "samples", 0x020000, 0x060000, 0x020000)
+	ROM_COPY( "samples", 0x000000, 0x080000, 0x020000)
+	ROM_COPY( "samples", 0x040000, 0x0a0000, 0x020000)
+	ROM_COPY( "samples", 0x000000, 0x0c0000, 0x020000)
+	ROM_COPY( "samples", 0x060000, 0x0e0000, 0x020000)	
 ROM_END
 
 
