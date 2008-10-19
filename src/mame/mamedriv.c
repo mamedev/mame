@@ -8274,6 +8274,8 @@ Other Sun games
 	DRIVER( blackt96 )	/* (c) 1996 D.G.R.M. of Korea */
 	DRIVER( lucky74 )	/* (c) 1988 Wing Co., Ltd */
 	DRIVER( lucky74a )	/* (c) 1988 Wing Co., Ltd */
+	DRIVER( magictg )	/* (c) 199? Acclaim */
+	DRIVER( magictga )	/* (c) 199? Acclaim */
 
 	/* InterFlip / Recreativos Franco */
 	DRIVER( videopkr )	/* (c) 1984 InterFlip */

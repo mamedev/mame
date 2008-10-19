@@ -1594,6 +1594,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/lucky8.o \
 	$(DRIVERS)/magic10.o \
 	$(DRIVERS)/magicfly.o \
+	$(DRIVERS)/magictg.o \
 	$(DRIVERS)/malzak.o $(VIDEO)/malzak.o \
 	$(DRIVERS)/mcatadv.o $(VIDEO)/mcatadv.o \
 	$(DRIVERS)/micro3d.o \
