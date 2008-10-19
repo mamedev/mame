@@ -189,12 +189,10 @@ static void execute_MM_table(UINT16 rnum, UINT16 MM);
 #ifdef UNUSED_FUNCTION
 static UINT16 execute_q_table(int x, UINT16 q);
 static void execute_z_table(int x, UINT16 z);
-static UINT16 assemble_D_from_P_table(UINT16 P, UINT16 ppppp);
 #endif
+static UINT16 assemble_address_from_Pppppp_table(UINT16 P, UINT16 ppppp);
 static UINT16 assemble_address_from_IO_short_address(UINT16 pp);
-#ifdef UNUSED_FUNCTION
 static UINT16 assemble_address_from_6bit_signed_relative_short_address(UINT16 srs);
-#endif
 
 static void dsp56k_process_loop(void);
 static void dsp56k_process_rep(size_t repSize);
@@ -1705,42 +1703,22 @@ static size_t dsp56k_op_asr16(const UINT16 op, UINT8* cycles)
 /* BFTSTL : 0001 0100 01Pp pppp BBB0 0000 iiii iiii : A-46 */
 static size_t dsp56k_op_bfop(const UINT16 op, const UINT16 op2, UINT8* cycles)
 {
-	/* S L E U N Z V C */
-	/* - * - - - - - ? */
-	/* C - Set if all bits specified by the mask are set. Cleared otherwise. Ignore bits which are
-	       not set in the mask. (BFCHG, BFSET, BFTSTH) */
-	/* C - Set if all bits specified by the mask are cleared. Cleared otherwise. Ignore bits which
-	       are not set in the mask. (BFCLR, BFTSTL) */
-	return 0;
-}
-
-/* BFCHG  : 0001 0100 101- --RR BBB1 0010 iiii iiii : A-38 */
-/* BFCLR  : 0001 0100 101- --RR BBB0 0100 iiii iiii : A-40 */
-/* BFSET  : 0001 0100 101- --RR BBB1 1000 iiii iiii : A-42 */
-/* BFTSTH : 0001 0100 001- --RR BBB1 0000 iiii iiii : A-44 */
-/* BFTSTL : 0001 0100 001- --RR BBB0 0000 iiii iiii : A-46 */
-static size_t dsp56k_op_bfop_1(const UINT16 op, const UINT16 op2, UINT8* cycles)
-{
 	UINT16 workAddr = 0x0000;
 	UINT16 workingWord = 0x0000;
 	UINT16 previousValue = 0x0000;
-	typed_pointer R = { NULL, DT_BYTE };
 	typed_pointer tempTP = { NULL, DT_BYTE };
 
 	UINT16 iVal = op2 & 0x00ff;
-
-	decode_RR_table(BITS(op,0x0003), &R);
 	decode_BBB_bitmask(BITS(op2,0xe000), &iVal);
 
-	workAddr = *((UINT16*)R.addr);
+	workAddr = assemble_address_from_Pppppp_table(BITS(OP,0x0020), BITS(OP,0x001f));
 	previousValue = data_read_word_16le(WORD(workAddr));
 	workingWord = previousValue;
 
 	switch(BITS(op2, 0x1f00))
 	{
 		case 0x12:	/* BFCHG */
-			workingWord = ~workingWord;
-			workingWord &= iVal;
+			workingWord ^= iVal;
 			break;
 		case 0x04:	/* BFCLR */
 			workingWord = workingWord & (~iVal);
@@ -1762,18 +1740,85 @@ static size_t dsp56k_op_bfop_1(const UINT16 op, const UINT16 op2, UINT8* cycles)
 
 	/* S L E U N Z V C */
 	/* - * - - - - - ? */
+	/* TODO: L */
 	switch(BITS(op2, 0x1f00))
 	{
 		case 0x12:	/* BFCHG */
-			if ((iVal & previousValue) == iVal) C_bit_set(1); break;
+			if ((iVal & previousValue) == iVal) C_bit_set(1); else C_bit_set(0); break;
 		case 0x04:	/* BFCLR */
 			if ((iVal & previousValue) == iVal) C_bit_set(1); else C_bit_set(0); break;
 		case 0x18:	/* BFSET */
-			if ((iVal & previousValue) == iVal) C_bit_set(1); break;
+			if ((iVal & previousValue) == iVal) C_bit_set(1); else C_bit_set(0); break;
 		case 0x10:	/* BFTSTH */
-			if ((iVal & previousValue) == iVal) C_bit_set(1); break;
+			if ((iVal & previousValue) == iVal) C_bit_set(1); else C_bit_set(0); break;
 		case 0x00:	/* BFTSTL */
-			if ((iVal & previousValue) == 0x0000) C_bit_set(1); break;
+			if ((iVal & previousValue) == 0x0000) C_bit_set(1); else C_bit_set(0); break;
+	}
+
+	cycles += 4; 	/* TODO: + mvb oscillator clock cycles */
+	return 2;
+}
+
+/* BFCHG  : 0001 0100 101- --RR BBB1 0010 iiii iiii : A-38 */
+/* BFCLR  : 0001 0100 101- --RR BBB0 0100 iiii iiii : A-40 */
+/* BFSET  : 0001 0100 101- --RR BBB1 1000 iiii iiii : A-42 */
+/* BFTSTH : 0001 0100 001- --RR BBB1 0000 iiii iiii : A-44 */
+/* BFTSTL : 0001 0100 001- --RR BBB0 0000 iiii iiii : A-46 */
+static size_t dsp56k_op_bfop_1(const UINT16 op, const UINT16 op2, UINT8* cycles)
+{
+	UINT16 workAddr = 0x0000;
+	UINT16 workingWord = 0x0000;
+	UINT16 previousValue = 0x0000;
+	typed_pointer R = { NULL, DT_BYTE };
+	typed_pointer tempTP = { NULL, DT_BYTE };
+
+	UINT16 iVal = op2 & 0x00ff;
+	decode_BBB_bitmask(BITS(op2,0xe000), &iVal);
+
+	decode_RR_table(BITS(op,0x0003), &R);
+
+	workAddr = *((UINT16*)R.addr);
+	previousValue = data_read_word_16le(WORD(workAddr));
+	workingWord = previousValue;
+
+	switch(BITS(op2, 0x1f00))
+	{
+		case 0x12:	/* BFCHG */
+			workingWord ^= iVal;
+			break;
+		case 0x04:	/* BFCLR */
+			workingWord = workingWord & (~iVal);
+			break;
+		case 0x18:	/* BFSET */
+			workingWord = workingWord | iVal;
+			break;
+		case 0x10:	/* BFTSTH */
+			/* Just the test below */
+			break;
+		case 0x00:	/* BFTSTL */
+			/* Just the test below */
+			break;
+	}
+
+	tempTP.addr = &workingWord;
+	tempTP.data_type = DT_WORD;
+	SetDataMemoryValue(tempTP, WORD(workAddr));
+
+	/* S L E U N Z V C */
+	/* - * - - - - - ? */
+	/* TODO: L */
+	switch(BITS(op2, 0x1f00))
+	{
+		case 0x12:	/* BFCHG */
+			if ((iVal & previousValue) == iVal) C_bit_set(1); else C_bit_set(0); break;
+		case 0x04:	/* BFCLR */
+			if ((iVal & previousValue) == iVal) C_bit_set(1); else C_bit_set(0); break;
+		case 0x18:	/* BFSET */
+			if ((iVal & previousValue) == iVal) C_bit_set(1); else C_bit_set(0); break;
+		case 0x10:	/* BFTSTH */
+			if ((iVal & previousValue) == iVal) C_bit_set(1); else C_bit_set(0); break;
+		case 0x00:	/* BFTSTL */
+			if ((iVal & previousValue) == 0x0000) C_bit_set(1); else C_bit_set(0); break;
 	}
 
 	cycles += 4; 	/* TODO: + mvb oscillator clock cycles */
@@ -1787,13 +1832,67 @@ static size_t dsp56k_op_bfop_1(const UINT16 op, const UINT16 op2, UINT8* cycles)
 /* BFTSTL : 0001 0100 000D DDDD BBB0 0000 iiii iiii : A-46 */
 static size_t dsp56k_op_bfop_2(const UINT16 op, const UINT16 op2, UINT8* cycles)
 {
+	UINT16 workingWord = 0x0000;
+	UINT16 previousValue = 0x0000;
+
+	UINT16 iVal = op2 & 0x00ff;
+	typed_pointer S = { NULL, DT_BYTE };
+
+	decode_BBB_bitmask(BITS(op2,0xe000), &iVal);
+	decode_DDDDD_table(BITS(op,0x001f), &S);
+
+	/* A & B are special */
+	if (S.data_type == DT_LONG_WORD)
+		previousValue = ((PAIR64*)S.addr)->w.h;
+	else
+		previousValue = *((UINT16*)S.addr);
+
+	workingWord = previousValue;
+
+	switch(BITS(op2, 0x1f00))
+	{
+		case 0x12:	/* BFCHG */
+			workingWord ^= iVal;
+			break;
+		case 0x04:	/* BFCLR */
+			workingWord = workingWord & (~iVal);
+			break;
+		case 0x18:	/* BFSET */
+			workingWord = workingWord | iVal;
+			break;
+		case 0x10:	/* BFTSTH */
+			/* Just the test below */
+			break;
+		case 0x00:	/* BFTSTL */
+			/* Just the test below */
+			break;
+	}
+
+	/* Put the data back where it belongs (A & B are special) */
+	if (S.data_type == DT_LONG_WORD)
+		((PAIR64*)S.addr)->w.h = workingWord;
+	else
+		*((UINT16*)S.addr) = workingWord;
+
 	/* S L E U N Z V C */
 	/* - * - - - - - ? */
-	/* C - Set if all bits specified by the mask are set. Cleared otherwise. Ignore bits which are
-	       not set in the mask. (BFCHG, BFSET, BFTSTH) */
-	/* C - Set if all bits specified by the mask are cleared. Cleared otherwise. Ignore bits which
-	       are not set in the mask. (BFCLR, BFTSTL) */
-	return 0;
+	/* TODO: L */
+	switch(BITS(op2, 0x1f00))
+	{
+		case 0x12:	/* BFCHG */
+			if ((iVal & previousValue) == iVal) C_bit_set(1); else C_bit_set(0); break;
+		case 0x04:	/* BFCLR */
+			if ((iVal & previousValue) == iVal) C_bit_set(1); else C_bit_set(0); break;
+		case 0x18:	/* BFSET */
+			if ((iVal & previousValue) == iVal) C_bit_set(1); else C_bit_set(0); break;
+		case 0x10:	/* BFTSTH */
+			if ((iVal & previousValue) == iVal) C_bit_set(1); else C_bit_set(0); break;
+		case 0x00:	/* BFTSTL */
+			if ((iVal & previousValue) == 0x0000) C_bit_set(1); else C_bit_set(0); break;
+	}
+
+	cycles += 4; 	/* TODO: + mvb oscillator clock cycles */
+	return 2;
 }
 
 /* Bcc : 0000 0111 --11 cccc xxxx xxxx xxxx xxxx : A-48 */
@@ -1807,6 +1906,27 @@ static size_t dsp56k_op_bcc(const UINT16 op, const UINT16 op2, UINT8* cycles)
 /* Bcc : 0010 11cc ccee eeee : A-48 */
 static size_t dsp56k_op_bcc_1(const UINT16 op, UINT8* cycles)
 {
+	int shouldBranch = decode_cccc_table(BITS(op,0x03c0));
+
+	if (shouldBranch)
+	{
+		INT16 offset = (INT16)assemble_address_from_6bit_signed_relative_short_address(BITS(op,0x003f));
+
+		PC += 1;
+		core.ppc = PC;
+		PC += offset;
+
+		change_pc(PC) ;
+
+		cycles += 4;
+		return 0;
+	}
+	else
+	{
+		cycles += 4;
+		return 1;
+	}
+
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
 	return 0;
@@ -2560,9 +2680,43 @@ static size_t dsp56k_op_movep(const UINT16 op, UINT8* cycles)
 /* MOVE(P) : 0000 110W RRmp pppp : A-156 */
 static size_t dsp56k_op_movep_1(const UINT16 op, UINT8* cycles)
 {
+	// X:<Rx> and X:<pp>
+	UINT16 W;
+	UINT16 pp;
+
+	typed_pointer SD = {NULL, DT_BYTE};
+	decode_RR_table(BITS(op,0x00c0), &SD);
+
+	pp = op & 0x001f;
+	pp = assemble_address_from_IO_short_address(pp);
+
+	W = BITS(OP,0x0100);
+
+	/* A little different than most W if's - opposite read and write */
+	if (W)
+	{
+		UINT16 data = data_read_word_16le(WORD(*((UINT16*)SD.addr)));
+
+		typed_pointer tempTP;
+		tempTP.addr = &data;
+		tempTP.data_type = DT_WORD;
+
+		SetDataMemoryValue(tempTP, WORD(pp));
+	}
+	else
+	{
+		/* TODO */
+		fatalerror("dsp56k : move(p) NOTHING HERE (yet)\n") ;
+	}
+
+	// Postincrement
+	execute_m_table(BITS(OP,0x00c0), BITS(OP,0x0020));
+
 	/* S L E U N Z V C */
 	/* * * - - - - - - */
-	return 0;
+	/* TODO: S, L */
+	cycles += 4;		/* TODO: + mvp oscillator cycles */
+	return 1;
 }
 
 /* MOVE(S) : 0001 100W HH0a aaaa : A-158 */
@@ -2594,7 +2748,7 @@ static size_t dsp56k_op_nop(const UINT16 op, UINT8* cycles)
 {
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	return 0;
+	return 1;
 }
 
 /* NORM : 0001 0101 0010 F0RR : A-172 */
@@ -3138,35 +3292,36 @@ static void execute_z_table(int x, UINT16 z)
 		(*rX) = (*rX)+(*nX) ;
 	}
 }
-
-static UINT16 assemble_D_from_P_table(UINT16 P, UINT16 ppppp)
+#endif
+static UINT16 assemble_address_from_Pppppp_table(UINT16 P, UINT16 ppppp)
 {
 	UINT16 destAddr = 0x00 ;
 
 	switch (P)
 	{
-		case 0x0: destAddr = ppppp ; break ;
-		case 0x1: destAddr = assemble_address_from_IO_short_address(ppppp) ; break ;
+		case 0x0: destAddr = ppppp;  break;		/* TODO:  Does this really only address up to 0x32? */
+		case 0x1: destAddr = assemble_address_from_IO_short_address(ppppp);  break;
 	}
 
 	return destAddr ;
 }
-#endif
+
 static UINT16 assemble_address_from_IO_short_address(UINT16 pp)
 {
 	UINT16 fullAddy = 0xffe0;
 	fullAddy |= pp;
 	return fullAddy;
 }
-#ifdef UNUSED_FUNCTION
+
 static UINT16 assemble_address_from_6bit_signed_relative_short_address(UINT16 srs)
 {
 	UINT16 fullAddy = srs ;
-	if (fullAddy & 0x0020) fullAddy |= 0xffc0 ;
+	if (fullAddy & 0x0020)
+		fullAddy |= 0xffc0 ;
 
 	return fullAddy ;
 }
-#endif
+
 static void dsp56k_process_loop(void)
 {
 	if (LF_bit())

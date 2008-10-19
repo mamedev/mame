@@ -31,7 +31,7 @@ static void mem_reset(void)
 /* Work */
 static READ16_HANDLER( peripheral_register_r )
 {
-	logerror("Peripheral read 0x%04x\n", O2A(offset));
+	// (printf) logerror("Peripheral read 0x%04x\n", O2A(offset));
 
 	switch (O2A(offset))
 	{
@@ -168,7 +168,7 @@ static WRITE16_HANDLER( peripheral_register_w )
 	// Its primary behavior is RAM
 	// COMBINE_DATA(&dsp56k_peripheral_ram[offset]);
 
-	logerror("Peripheral write 0x%04x = %04x\n", O2A(offset), data);
+	// (printf) logerror("Peripheral write 0x%04x = %04x\n", O2A(offset), data);
 
 	// 4-8
 	switch (O2A(offset))
@@ -928,4 +928,11 @@ static void dsp56k_io_reset(void)
 	BS_bit_set(1);
 	external_x_wait_states_set(0x1f);
 	external_p_wait_states_set(0x1f);
+}
+
+
+/* MISC*/
+UINT16 dsp56k_get_peripheral_memory(UINT16 addr)
+{
+	return dsp56k_peripheral_ram[A2O(addr)];
 }

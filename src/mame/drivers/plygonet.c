@@ -60,8 +60,15 @@ WRITE32_HANDLER( polygonet_ttl_ram_w );
 
 static int init_eeprom_count;
 
-static UINT32 *shared_ram;
-static UINT16 *dsp56k_shared_ram_16;
+/* 68k-side shared ram */
+static UINT32* shared_ram;
+
+static UINT16* dsp56k_p_mirror;
+static const UINT16 dsp56k_bank00_size = 0x1000;		static UINT16* dsp56k_bank00_ram;
+static const UINT16 dsp56k_bank01_size = 0x1000;		static UINT16* dsp56k_bank01_ram;	 
+static const UINT16 dsp56k_bank02_size = 0x4000;		static UINT16* dsp56k_bank02_ram;	 
+static const UINT16 dsp56k_shared_ram_16_size = 0x2000;	static UINT16* dsp56k_shared_ram_16; 
+static const UINT16 dsp56k_bank04_size = 0x1fc0;		static UINT16* dsp56k_bank04_ram;	 
 
 static const eeprom_interface eeprom_intf =
 {
@@ -181,23 +188,6 @@ static WRITE32_HANDLER( sound_irq_w )
 }
 
 /* DSP communications */
-#ifdef UNUSED_FUNCTION
-static int dsp_state;
-static READ32_HANDLER( dsp_r )
-{
-	static int dsp_states[] =
-	{
-		0, 1, 0, 1, 1,
-	};
-
-	logerror("Dsp Read %08x\n", offset);
-
-	logerror("dsp state %d at PC=%x\n", dsp_state, activecpu_get_pc());
-
-	return dsp_states[dsp_state]<<24;
-}
-#endif
-
 static READ32_HANDLER( dsp_host_interface_r )
 {
 	UINT32 value;
@@ -211,7 +201,7 @@ static READ32_HANDLER( dsp_host_interface_r )
 	if (mem_mask == 0x0000ff00)	{ value <<= 8;  }
 	if (mem_mask == 0xff000000) { value <<= 24; }
 
-	logerror("Dsp HI Read (host-side) %08x (HI %04x) = %08x\n", mem_mask, hi_addr, value);
+	logerror("Dsp HI Read (host-side) %08x (HI %04x) = %08x (@%x)\n", mem_mask, hi_addr, value, activecpu_get_pc());
 
 	return value;
 }
@@ -279,76 +269,15 @@ static WRITE32_HANDLER( dsp_host_interface_w )
 	dsp56k_host_interface_write(hi_addr, hi_data);
 }
 
-#ifdef UNUSED_FUNCTION
-static WRITE32_HANDLER( dsp_w )
+
+static READ32_HANDLER( network_r )
 {
-	logerror("write %08x %08x %08x\n", offset, mem_mask, data);
-
-	if (mem_mask == 0xff000000)
-	{
-		// write to 6000
-		if (data>>24 == 8)
-		{
-			dsp_state = 0;
-			logerror("entering state 0: uploaded program wakeup\n");
-		}
-	}
-	else
-	{
-		// write to 6002
-		if (data>>8 == 0x97)
-		{
-			unsigned char *RAM = (unsigned char *)shared_ram;
-			int i;
-			unsigned short write;
-
-			dsp_state = 1;
-			logerror("entering state 1: shared RAM test #1\n");
-
-			write = 0xfff0;
-			for (i = 0; i < 0x2000/2; i++)
-			{
-				RAM[i*4+3] = (write>>8)&0xff;
-				RAM[i*4+2] = (write&0xff);
-				write--;
-				RAM[i*4+1] = (write>>8)&0xff;
-				RAM[i*4]   = (write&0xff);
-				write--;
-			}
-		}
-
-		if (data>>8 == 0x98)
-		{
-			unsigned char *RAM = (unsigned char *)shared_ram;
-			int i;
-			unsigned short write, track;
-
-			dsp_state = 1;
-			logerror("entering state 3: shared RAM test #2\n");
-
-			track = 0xfff0;
-			for (i = 0; i < 0x2000/2; i++)
-			{
-				write = track ^ 0xffff;
-				RAM[i*4+3] = (write>>8)&0xff;
-				RAM[i*4+2] = (write&0xff);
-				track--;
-				write = track ^ 0xffff;
-				RAM[i*4+1] = (write>>8)&0xff;
-				RAM[i*4]   = (write&0xff);
-				track--;
-			}
-		}
-
-		if (data>>8 == 0x99)
-		{
-			logerror("entering state 4: DSP board RAM test\n");
-			dsp_state = 4;
-		}
-	}
+	return 0x08000000;
 }
-#endif
 
+
+/**********************************************************************************/
+/*******                            DSP56k maps                             *******/
 /**********************************************************************************/
 
 /* It's believed this is hard-wired to return (at least) bit 15 as 0 - causes a host interface bootup */
@@ -357,42 +286,209 @@ static READ16_HANDLER( dsp56k_bootload_r )
 	return 0x7fff;
 }
 
+
+/* The dsp56k's Port C Data register (0xffe3) :
+   Program code (function 4e) configures it as general purpose output I/O pins (ffc1 = 0000 & ffc3 = 0fff).
+
+   XXXX ---- ---- ----  . Reserved bits
+   ---- ???- -?-- ----  . unknown
+   ---- ---- --x- ----  . [Bank Group A] Enable bit for "001c banking"?
+   ---- ---- ---x xx--  . [Group A bank control] Believed to bank memory from 0x8000-0xbfff
+   ---- ---- ---- --x-  . [Bank Group B] Enable bit for "0181 banking"?
+   ---- ---x x--- ---x  . [Group B bank control] Believed to bank various other memory regions
+
+   001c banking is fairly easy - it happens in a loop and writes from 8000 to bfff
+   0181 banking is very weird  - it happens in a nested loop and writes from 6000-6fff, 7000-7fff, and 8000-ffbf
+								 bit 0002 turns on *just* before this happens.
+*/
+enum { BANK_GROUP_A, BANK_GROUP_B, INVALID_BANK_GROUP };
+
+static UINT8 dsp56k_bank_group(void)
+{
+	UINT16 portC = dsp56k_get_peripheral_memory(0xffe3);
+
+	/* If bank group B is on, it overrides bank group A */
+	if (portC & 0x0002)
+		return BANK_GROUP_B;
+	else if (portC & 0x0020)
+		return BANK_GROUP_A;
+
+	return INVALID_BANK_GROUP;
+}
+
+static UINT8 dsp56k_bank_num(UINT8 bank_group)
+{
+	UINT16 portC = dsp56k_get_peripheral_memory(0xffe3);
+
+	if (bank_group == BANK_GROUP_A)
+	{
+		const UINT16 bit3   = (portC & 0x0010) >> 2;
+		const UINT16 bits21 = (portC & 0x000c) >> 2;
+		return (bit3 | bits21);
+	}
+	else if (bank_group == BANK_GROUP_B)
+	{
+		const UINT16 bits32 = (portC & 0x0180) >> 6;
+		const UINT16 bit1   = (portC & 0x0001) >> 0;
+		return (bits32 | bit1);
+	}
+
+	if (bank_group == INVALID_BANK_GROUP)
+		fatalerror("Plygonet: dsp56k bank num invalid.\n");
+
+	return 0;
+}
+
+
+/* BANK HANDLERS */
+static READ16_HANDLER( dsp56k_ram_bank00_read )
+{
+	UINT8 en_group = dsp56k_bank_group();
+	UINT8 bank_num = dsp56k_bank_num(en_group);
+	UINT32 driver_bank_offset = (en_group * dsp56k_bank00_size * 8) + (bank_num * dsp56k_bank00_size);
+
+	return dsp56k_bank00_ram[driver_bank_offset + offset];
+}
+
+static WRITE16_HANDLER( dsp56k_ram_bank00_write )
+{
+	UINT8 en_group = dsp56k_bank_group();
+	UINT8 bank_num = dsp56k_bank_num(en_group);
+	UINT32 driver_bank_offset = (en_group * dsp56k_bank00_size * 8) + (bank_num * dsp56k_bank00_size);
+
+	COMBINE_DATA(&dsp56k_bank00_ram[driver_bank_offset + offset]);
+}
+
+
+static READ16_HANDLER( dsp56k_ram_bank01_read )
+{
+	UINT8 en_group = dsp56k_bank_group();
+	UINT8 bank_num = dsp56k_bank_num(en_group);
+	UINT32 driver_bank_offset = (en_group * dsp56k_bank01_size * 8) + (bank_num * dsp56k_bank01_size);
+
+	return dsp56k_bank01_ram[driver_bank_offset + offset];
+}
+
+static WRITE16_HANDLER( dsp56k_ram_bank01_write )
+{
+	UINT8 en_group = dsp56k_bank_group();
+	UINT8 bank_num = dsp56k_bank_num(en_group);
+	UINT32 driver_bank_offset = (en_group * dsp56k_bank01_size * 8) + (bank_num * dsp56k_bank01_size);
+
+	COMBINE_DATA(&dsp56k_bank01_ram[driver_bank_offset + offset]);
+
+	/* For now, *always* combine P:0x7000-0x7fff with bank01 with no regard to the banking hardware. */
+	dsp56k_p_mirror[offset] = data;
+}
+
+
+static READ16_HANDLER( dsp56k_ram_bank02_read )
+{
+	UINT8 en_group = dsp56k_bank_group();
+	UINT8 bank_num = dsp56k_bank_num(en_group);
+	UINT32 driver_bank_offset = (en_group * dsp56k_bank02_size * 8) + (bank_num * dsp56k_bank02_size);
+
+	return dsp56k_bank02_ram[driver_bank_offset + offset];
+}
+
+static WRITE16_HANDLER( dsp56k_ram_bank02_write )
+{
+	UINT8 en_group = dsp56k_bank_group();
+	UINT8 bank_num = dsp56k_bank_num(en_group);
+	UINT32 driver_bank_offset = (en_group * dsp56k_bank02_size * 8) + (bank_num * dsp56k_bank02_size);
+
+	COMBINE_DATA(&dsp56k_bank02_ram[driver_bank_offset + offset]);
+}
+
+
+static READ16_HANDLER( dsp56k_shared_ram_read )
+{
+	UINT8 en_group = dsp56k_bank_group();
+	UINT8 bank_num = dsp56k_bank_num(en_group);
+	UINT32 driver_bank_offset = (en_group * dsp56k_shared_ram_16_size * 8) + (bank_num * dsp56k_shared_ram_16_size);
+
+	return dsp56k_shared_ram_16[driver_bank_offset + offset];
+}
+
+static WRITE16_HANDLER( dsp56k_shared_ram_write )
+{
+	UINT8 en_group = dsp56k_bank_group();
+	UINT8 bank_num = dsp56k_bank_num(en_group);
+	UINT32 driver_bank_offset = (en_group * dsp56k_shared_ram_16_size * 8) + (bank_num * dsp56k_shared_ram_16_size);
+
+	COMBINE_DATA(&dsp56k_shared_ram_16[driver_bank_offset + offset]);
+
+	/* Bank group A with offset 0 is believed to be the shared region */
+	if (en_group == BANK_GROUP_A && bank_num == 0)
+	{
+		if (offset % 2)
+			shared_ram[offset>>1] = ((dsp56k_shared_ram_16[offset-1]) << 16) | dsp56k_shared_ram_16[offset] ;
+		else
+			shared_ram[offset>>1] = ((dsp56k_shared_ram_16[offset])   << 16) | dsp56k_shared_ram_16[offset+1] ;
+	}
+}
+
+
+static READ16_HANDLER( dsp56k_ram_bank04_read )
+{
+	UINT8 en_group = dsp56k_bank_group();
+	UINT8 bank_num = dsp56k_bank_num(en_group);
+	UINT32 driver_bank_offset = (en_group * dsp56k_bank04_size * 8) + (bank_num * dsp56k_bank04_size);
+
+	return dsp56k_bank04_ram[driver_bank_offset + offset];
+}
+
+static WRITE16_HANDLER( dsp56k_ram_bank04_write )
+{
+	UINT8 en_group = dsp56k_bank_group();
+	UINT8 bank_num = dsp56k_bank_num(en_group);
+	UINT32 driver_bank_offset = (en_group * dsp56k_bank04_size * 8) + (bank_num * dsp56k_bank04_size);
+
+	COMBINE_DATA(&dsp56k_bank04_ram[driver_bank_offset + offset]);
+}
+
+
+
 /**********************************************************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM		// PSAC2 tilemap
-	AM_RANGE(0x440000, 0x440fff) AM_RAM		// PSAC2 lineram
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM		/* PSAC2 tilemap */
+	AM_RANGE(0x440000, 0x440fff) AM_RAM		/* PSAC2 lineram */
 	AM_RANGE(0x480000, 0x480003) AM_READ(polygonet_eeprom_r)
 	AM_RANGE(0x4C0000, 0x4C0003) AM_WRITE(polygonet_eeprom_w)
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(shared_ram_write) AM_BASE(&shared_ram)
 	AM_RANGE(0x504000, 0x504003) AM_WRITE(dsp_w_lines)
-	/*AM_RANGE(0x506004, 0x506007) AM_READ(dsp_r)*/
 	AM_RANGE(0x506000, 0x50600f) AM_READWRITE(dsp_host_interface_r, dsp_host_interface_w)
-////AM_RANGE(0x506000, 0x506003) AM_WRITE(dsp_w)
 	AM_RANGE(0x540000, 0x540fff) AM_READWRITE(polygonet_ttl_ram_r, polygonet_ttl_ram_w)
 	AM_RANGE(0x541000, 0x54101f) AM_RAM
 	AM_RANGE(0x580000, 0x5807ff) AM_RAM
-	/*AM_RANGE(0x580800, 0x580803) AM_RAM*/		// network RAM / registers?
+	AM_RANGE(0x580800, 0x580803) AM_READWRITE(network_r, SMH_NOP)
+	AM_RANGE(0x580800, 0x580803) AM_RAM		/* network RAM | registers? */
 	AM_RANGE(0x600004, 0x600007) AM_WRITE(sound_w)
 	AM_RANGE(0x600008, 0x60000b) AM_READ(sound_r)
 	AM_RANGE(0x640000, 0x640003) AM_WRITE(sound_irq_w)
 	AM_RANGE(0x680000, 0x680003) AM_WRITE(watchdog_reset32_w)
 	AM_RANGE(0x700000, 0x73ffff) AM_READ(psac_rom_r)
 	AM_RANGE(0x780000, 0x79ffff) AM_READ(ttl_rom_r)
-	AM_RANGE(0xff8000, 0xffffff) AM_READ(SMH_RAM)
-	AM_RANGE(0xff8000, 0xffffff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0xff8000, 0xffffff) AM_RAM
 ADDRESS_MAP_END
 
 /**********************************************************************************/
 
 static ADDRESS_MAP_START( dsp_program_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_BASE(&dsp56k_p_mirror)	/* Unsure of size, but this corresponds to bank01 */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0xc000, 0xc000) AM_READ(dsp56k_bootload_r)
-	AM_RANGE(0x8000, 0x87ff) AM_RAM		// the dsp memtests here
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_data_map, ADDRESS_SPACE_DATA, 16 )
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&dsp56k_shared_ram_16)
+	AM_RANGE(0x0800, 0x5fff) AM_RAM		 /* Appears to not be affected by banking? */
+	AM_RANGE(0x6000, 0x6fff) AM_READWRITE(dsp56k_ram_bank00_read, dsp56k_ram_bank00_write)
+	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(dsp56k_ram_bank01_read, dsp56k_ram_bank01_write)
+	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(dsp56k_ram_bank02_read, dsp56k_ram_bank02_write)
+	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(dsp56k_shared_ram_read, dsp56k_shared_ram_write)
+	AM_RANGE(0xe000, 0xffbf) AM_READWRITE(dsp56k_ram_bank04_read, dsp56k_ram_bank04_write)
 ADDRESS_MAP_END
 
 /**********************************************************************************/
@@ -461,6 +557,8 @@ static MACHINE_START(polygonet)
 
 	/* Set the dsp56k lines */
 	/* It's presumed the hardware has hard-wired operating mode 1 (MODA = 1, MODB = 0) */
+	/* TODO: This should work, but the MAME core appears to do something funny.  
+	         Not a big deal - it's hacked in dsp_w_lines. */
 	//cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), INPUT_LINE_RESET, ASSERT_LINE);
 	//cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_MODA, ASSERT_LINE);
 	//cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_MODB, CLEAR_LINE);
@@ -483,6 +581,9 @@ static MACHINE_DRIVER_START( plygonet )
 
 	MDRV_GFXDECODE(plygonet)
 	MDRV_NVRAM_HANDLER(polygonet)
+
+	/* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
+	MDRV_INTERLEAVE(50000)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -525,9 +626,23 @@ INPUT_PORTS_END
 
 static DRIVER_INIT(polygonet)
 {
-	/* set default bankswitch */
+	/* Set default bankswitch */
 	cur_sound_region = 2;
 	reset_sound_region(machine);
+
+	/* Allocate space for the dsp56k banking */
+	dsp56k_bank00_ram    = auto_malloc(2 * 8 * dsp56k_bank00_size 		 * sizeof(UINT16));		/* 2 bank sets, 8 potential banks each */
+	dsp56k_bank01_ram    = auto_malloc(2 * 8 * dsp56k_bank01_size 		 * sizeof(UINT16));
+	dsp56k_bank02_ram    = auto_malloc(2 * 8 * dsp56k_bank02_size 		 * sizeof(UINT16));
+	dsp56k_shared_ram_16 = auto_malloc(2 * 8 * dsp56k_shared_ram_16_size * sizeof(UINT16));
+	dsp56k_bank04_ram    = auto_malloc(2 * 8 * dsp56k_bank04_size 		 * sizeof(UINT16));
+
+	/* Clear the newly-allocated memory */
+	memset(dsp56k_bank00_ram,    0, 2 * 8 * dsp56k_bank00_size		  * sizeof(UINT16));
+	memset(dsp56k_bank01_ram,    0, 2 * 8 * dsp56k_bank01_size		  * sizeof(UINT16));
+	memset(dsp56k_bank02_ram,    0, 2 * 8 * dsp56k_bank02_size		  * sizeof(UINT16));
+	memset(dsp56k_shared_ram_16, 0, 2 * 8 * dsp56k_shared_ram_16_size * sizeof(UINT16));
+	memset(dsp56k_bank04_ram,    0, 2 * 8 * dsp56k_bank04_size		  * sizeof(UINT16));
 }
 
 ROM_START( plygonet )
