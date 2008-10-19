@@ -89,6 +89,7 @@ other supported games as well.
 #include "iremipt.h"
 #include "m72.h"
 #include "cpu/nec/nec.h"
+#include "cpu/i8051/i8051.h"
 
 
 #define MASTER_CLOCK		XTAL_32MHz
@@ -98,6 +99,9 @@ other supported games as well.
 static UINT16 *protection_ram;
 static emu_timer *scanline_timer;
 static UINT8 m72_irq_base;
+static UINT8 mcu_snd_cmd_latch;
+static UINT8 mcu_sample_latch;
+static UINT32 mcu_sample_addr;
 
 static TIMER_CALLBACK( m72_scanline_interrupt );
 
@@ -108,11 +112,25 @@ static MACHINE_START( m72 )
 	scanline_timer = timer_alloc(m72_scanline_interrupt, NULL);
 }
 
+static TIMER_CALLBACK( synch_callback )
+{
+	//cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(8000000));
+	cpu_boost_interleave(ATTOTIME_IN_HZ(MASTER_CLOCK/4/12), ATTOTIME_IN_SEC(8));
+}
+
 static MACHINE_RESET( m72 )
 {
 	m72_irq_base = 0x20;
+	mcu_sample_addr = 0;
+	mcu_snd_cmd_latch = 0;
+
 	MACHINE_RESET_CALL(m72_sound);
+	
+	state_save_register_global(mcu_sample_addr);
+	state_save_register_global(mcu_snd_cmd_latch);
+
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_call_after_resynch( NULL, 0, synch_callback);
 }
 
 static MACHINE_RESET( xmultipl )
@@ -153,6 +171,170 @@ static TIMER_CALLBACK( m72_scanline_interrupt )
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), scanline);
 }
 
+/***************************************************************************
+
+Protection emulation
+
+Currently only available for lohtb2, since this is the only game
+with a dumped 8751.
+
+The protection device does
+
+* provide startup code
+* provide checksums
+* feed samples to the sound cpu
+
+***************************************************************************/
+
+static TIMER_CALLBACK( delayed_ram16_w )
+{
+	UINT16 val = ((UINT32) param) & 0xffff;
+	UINT16 offset = (((UINT32) param) >> 16) & 0xffff;
+	UINT16 *ram = ptr;
+
+	ram[offset] = val;
+}
+
+static TIMER_CALLBACK( mcu_irq0_clear )
+{
+	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
+}
+
+
+static WRITE16_HANDLER( m72_main_mcu_sound_w )
+{
+	if (data & 0xfff0)
+		logerror("sound_w: %04x %04x\n", mem_mask, data);
+
+	if (ACCESSING_BITS_0_7)
+	{
+		mcu_snd_cmd_latch = data;
+		cputag_set_input_line(machine, "mcu", 1, ASSERT_LINE);
+	}
+}
+
+static WRITE16_HANDLER( m72_main_mcu_w)
+{
+	UINT16 val = protection_ram[offset];
+
+	COMBINE_DATA(&val);
+
+	/* 0x07fe is used for synchronization as well. 
+	 * This address however will not trigger an interrupt 
+	 */
+
+	if (offset == 0x0fff/2 && ACCESSING_BITS_8_15)
+	{
+		protection_ram[offset] = val;
+		cputag_set_input_line(machine, "mcu", 0, ASSERT_LINE);
+		/* Line driven, most likely by write line */
+		timer_set(ATTOTIME_IN_CYCLES(2, mame_find_cpu_index(machine, "mcu")), NULL, 0, mcu_irq0_clear);
+	}
+	else
+		timer_call_after_resynch( protection_ram, (offset<<16) | val, delayed_ram16_w);
+}
+
+static WRITE8_HANDLER( m72_mcu_data_w )
+{
+	UINT16 val;
+	if (offset&1) val = (protection_ram[offset/2] & 0x00ff) | (data << 8);
+	else val = (protection_ram[offset/2] & 0xff00) | (data&0xff);
+
+	timer_call_after_resynch( protection_ram, ((offset >>1 ) << 16) | val, delayed_ram16_w);
+}
+
+static READ8_HANDLER(m72_mcu_data_r )
+{
+	UINT8 ret;
+	
+	if (offset&1) ret = (protection_ram[offset/2] & 0xff00)>>8;
+	else ret = (protection_ram[offset/2] & 0x00ff);
+
+	return ret;
+}
+
+static INTERRUPT_GEN( m72_mcu_int )
+{
+	mcu_snd_cmd_latch |= 0x11; /* 0x10 is special as well - FIXME */
+	cputag_set_input_line(machine, "mcu", 1, ASSERT_LINE);
+}
+
+static READ8_HANDLER(m72_mcu_sample_r )
+{
+	UINT8 sample;
+	sample = memory_region(machine, "samples")[mcu_sample_addr++];
+	return sample;
+}
+
+static WRITE8_HANDLER(m72_mcu_ack_w )
+{
+	cputag_set_input_line(machine, "mcu", 1, CLEAR_LINE);
+	mcu_snd_cmd_latch = 0;
+}
+
+static READ8_HANDLER(m72_mcu_snd_r )
+{
+	return mcu_snd_cmd_latch;
+}
+
+static READ8_HANDLER(m72_mcu_port_r )
+{
+	logerror("port read: %02x\n", offset);
+	return 0;
+}
+
+static WRITE8_HANDLER(m72_mcu_port_w )
+{
+	if (offset == 1)
+	{
+		mcu_sample_latch = data;
+		cputag_set_input_line(machine, "sound", INPUT_LINE_NMI, PULSE_LINE);
+	}
+	else
+		logerror("port: %02x %02x\n", offset, data);
+
+}
+
+static WRITE8_HANDLER( m72_mcu_low_w )
+{
+	mcu_sample_addr = (mcu_sample_addr & 0xffe000) | (data<<5);
+	logerror("low: %02x %02x %08x\n", offset, data, mcu_sample_addr);
+}
+
+static WRITE8_HANDLER( m72_mcu_high_w )
+{
+	mcu_sample_addr = (mcu_sample_addr & 0x1fff) | (data<<(8+5));
+	logerror("high: %02x %02x %08x\n", offset, data, mcu_sample_addr);
+}
+
+static WRITE8_HANDLER( m72_snd_cpu_sample_w )
+{
+	//dac_signed_data_w(0,data);
+	dac_data_w(0,data);
+}
+
+static READ8_HANDLER( m72_snd_cpu_sample_r )
+{
+	return mcu_sample_latch;
+}
+
+INLINE DRIVER_INIT( loht_mcu )
+{
+	int cpunum = mame_find_cpu_index(machine, "main");
+	int sndnum = mame_find_cpu_index(machine, "sound");
+	
+	protection_ram = auto_malloc(0x10000);
+	memory_install_read16_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xbffff, 0, 0, SMH_BANK1);
+	memory_install_write16_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_w);
+	memory_set_bankptr(1, protection_ram);
+
+	//memory_install_write16_handler(machine, cpunum, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
+	memory_install_write16_handler(machine, cpunum, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, m72_main_mcu_sound_w);
+
+	/* sound cpu */
+	memory_install_write8_handler(machine, sndnum, ADDRESS_SPACE_IO, 0x82, 0x82, 0xff, 0, m72_snd_cpu_sample_w);
+	memory_install_read8_handler (machine, sndnum, ADDRESS_SPACE_IO, 0x84, 0x84, 0xff, 0, m72_snd_cpu_sample_r);
+}
 
 
 /***************************************************************************
@@ -541,70 +723,6 @@ static DRIVER_INIT( loht )
 	/* since we skip the startup tests, clear video RAM to prevent garbage on title screen */
 	memset(m72_videoram2,0,0x4000);
 }
-#if 0
-int stepping = 0;
-
-static TIMER_CALLBACK( single_step )
-{
-	if (param>0)
-		timer_set( ATTOTIME_IN_NSEC(20), NULL, param-1, single_step);
-	else
-		stepping = 0;
-}
-static TIMER_CALLBACK( delayed_ram16_w )
-{
-	UINT16 val = ((UINT32) param) & 0xffff;
-	UINT16 offset = (((UINT32) param) >> 16) & 0xffff;
-	UINT16 *ram = ptr;
-
-	ram[offset] = val;
-
-	if (!stepping)
-	{
-		stepping = 1;
-		timer_call_after_resynch( NULL, 50, single_step);
-	}
-}
-#else
-static TIMER_CALLBACK( delayed_ram16_w )
-{
-	UINT16 val = ((UINT32) param) & 0xffff;
-	UINT16 offset = (((UINT32) param) >> 16) & 0xffff;
-	UINT16 *ram = ptr;
-
-	ram[offset] = val;
-}
-
-#endif
-
-static WRITE16_HANDLER( m72_main_mcu_w)
-{
-	UINT16 val = protection_ram[offset];
-
-	COMBINE_DATA(&val);
-
-	if (offset == 0x0fff/2 && ACCESSING_BITS_8_15)
-	{
-		protection_ram[offset] = val;
-		cputag_set_input_line(machine, "mcu", 0, PULSE_LINE);
-	}
-	else
-		timer_call_after_resynch( protection_ram, (offset<<16) | val, delayed_ram16_w);
-}
-
-static DRIVER_INIT( loht_mcu )
-{
-	int cpunum =  mame_find_cpu_index(machine, "main");
-
-	protection_ram = auto_malloc(0x1000);
-	memset(protection_ram, 0xff, 0x1000);
-	memory_install_read16_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, SMH_BANK1);
-	memory_install_write16_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_w);
-	memory_set_bankptr(1, protection_ram);
-
-	memory_install_write16_handler(machine, cpunum, ADDRESS_SPACE_IO, 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
-
-}
 
 static DRIVER_INIT( xmultipl )
 {
@@ -800,7 +918,7 @@ static ADDRESS_MAP_START( m72_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x02, 0x03) AM_WRITE(m72_port02_w)	/* coin counters, reset sound cpu, other stuff? */
 	AM_RANGE(0x04, 0x05) AM_WRITE(m72_dmaon_w)
 	AM_RANGE(0x06, 0x07) AM_WRITE(m72_irq_line_w)
-	AM_RANGE(0x40, 0x43) AM_WRITE(SMH_NOP) /* Interrupt controller, only written to at bootup */
+	//AM_RANGE(0x40, 0x43) AM_WRITE(SMH_NOP) /* Interrupt controller, only written to at bootup */
 	AM_RANGE(0x80, 0x81) AM_WRITE(m72_scrolly1_w)
 	AM_RANGE(0x82, 0x83) AM_WRITE(m72_scrollx1_w)
 	AM_RANGE(0x84, 0x85) AM_WRITE(m72_scrolly2_w)
@@ -916,6 +1034,42 @@ static ADDRESS_MAP_START( poundfor_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x42, 0x42) AM_WRITE(m72_sound_irq_ack_w)
 ADDRESS_MAP_END
 
+#if 0
+/* TODO: internal - should be removed */
+static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	//ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x0fff) AM_ROM
+ADDRESS_MAP_END
+#endif
+
+#if 0
+static ADDRESS_MAP_START( mcu_data_map, ADDRESS_SPACE_DATA, 8 )
+	//ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(m72_mcu_sample_r, m72_mcu_low_w)
+	AM_RANGE(0x0001, 0x0001) AM_WRITE(m72_mcu_high_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(m72_mcu_snd_r, m72_mcu_ack_w)
+	/* shared at b0000 - b0fff on the main cpu */
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_READWRITE(m72_mcu_data_r,m72_mcu_data_w )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
+	//ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x0000, 0x0003) AM_READWRITE(m72_mcu_port_r, m72_mcu_port_w)
+ADDRESS_MAP_END
+#else
+static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
+	/* External access */
+	AM_RANGE(0x0000, 0x0000) AM_READWRITE(m72_mcu_sample_r, m72_mcu_low_w)
+	AM_RANGE(0x0001, 0x0001) AM_WRITE(m72_mcu_high_w)
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(m72_mcu_snd_r, m72_mcu_ack_w)
+	/* shared at b0000 - b0fff on the main cpu */
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_READWRITE(m72_mcu_data_r,m72_mcu_data_w )
+	
+	/* Ports */
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(m72_mcu_port_r, m72_mcu_port_w)
+ADDRESS_MAP_END
+
+#endif
 
 #define COIN_MODE_1 \
 	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coinage ) ) PORT_CONDITION("DSW", 0x0400, PORTCOND_NOTEQUALS, 0x0000) PORT_DIPLOCATION("SW1:5,6,7,8") \
@@ -1661,45 +1815,7 @@ static MACHINE_DRIVER_START( rtype )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
 
-
-static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
-
-static WRITE8_HANDLER( m72_mcu_data_w )
-{
-	UINT16 val;
-	if (offset&1) val = (protection_ram[offset/2] & 0x00ff) | (data << 8);
-	else val = (protection_ram[offset/2] & 0xff00) | (data&0xff);
-
-	if (offset == 6 && data == 0xfe)
-		/* Hack - The v30 overshoots and will not see the unlock written to offset 6
-         * We thus delay the lock, i.e. storing an unconditional branch to 6
-         * here. This is highly time critical ... */
-		timer_set(ATTOTIME_IN_USEC(10), protection_ram, ((offset >>1 ) << 16) | val, delayed_ram16_w);
-	else
-		timer_call_after_resynch( protection_ram, ((offset >>1 ) << 16) | val, delayed_ram16_w);
-}
-
-static READ8_HANDLER(m72_mcu_data_r )
-{
-	UINT8 ret;
-
-	if (offset&1) ret = (protection_ram[offset/2] & 0xff00)>>8;
-	else ret = (protection_ram[offset/2] & 0x00ff);
-
-	return ret;
-}
-
-static ADDRESS_MAP_START( mcu_data_map, ADDRESS_SPACE_DATA, 8 )
-	ADDRESS_MAP_UNMAP_HIGH
-	/* shared at b0000 - b0fff on the main cpu */
-	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(m72_mcu_data_r,m72_mcu_data_w )
-ADDRESS_MAP_END
-
-
-static MACHINE_DRIVER_START( m72 )
+static MACHINE_DRIVER_START( m72_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main",V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -1709,8 +1825,6 @@ static MACHINE_DRIVER_START( m72 )
 	MDRV_CPU_ADD("sound",Z80, SOUND_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(sound_ram_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
-	MDRV_CPU_VBLANK_INT_HACK(fake_nmi,128)	/* clocked by V1? (Vigilante) */
-								/* IRQs are generated by main Z80 and YM2151 */
 
 	MDRV_MACHINE_START(m72)
 	MDRV_MACHINE_RESET(m72)
@@ -1739,15 +1853,25 @@ static MACHINE_DRIVER_START( m72 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 0.40)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( m72 )
+
+	MDRV_IMPORT_FROM(m72_base)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_VBLANK_INT_HACK(fake_nmi,128)	/* clocked by V1? (Vigilante) */
+							/* IRQs are generated by main Z80 and YM2151 */
+MACHINE_DRIVER_END
+
+
 static MACHINE_DRIVER_START( m72_8751 )
 
-	MDRV_IMPORT_FROM(m72)
-
-	MDRV_CPU_ADD("mcu",I8751, 16000000)
-	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
-	MDRV_CPU_DATA_MAP(mcu_data_map,0)
-	//MDRV_CPU_VBLANK_INT("main", irq0_line_pulse)
-	MDRV_INTERLEAVE(1000)
+	MDRV_IMPORT_FROM(m72_base)
+	
+	MDRV_CPU_ADD("mcu",I8751, MASTER_CLOCK/2)
+	/* internal - MDRV_CPU_PROGRAM_MAP(mcu_map,0) */
+	//MDRV_CPU_DATA_MAP(mcu_data_map,0)	
+	MDRV_CPU_IO_MAP(mcu_io_map,0)
+	MDRV_CPU_VBLANK_INT("main", m72_mcu_int)
+	//MDRV_INTERLEAVE(1000)
 
 MACHINE_DRIVER_END
 
@@ -2158,6 +2282,7 @@ static MACHINE_DRIVER_START( cosmccop )
 MACHINE_DRIVER_END
 
 static const nec_config kengo_config ={ gunforce_decryption_table, };
+
 static MACHINE_DRIVER_START( kengo )
 	MDRV_IMPORT_FROM( cosmccop )
 	MDRV_CPU_MODIFY("main")

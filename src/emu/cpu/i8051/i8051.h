@@ -43,108 +43,48 @@ enum
 	I8051_R0, I8051_R1, I8051_R2, I8051_R3, I8051_R4, I8051_R5, I8051_R6, I8051_R7, I8051_RB
 };
 
-#define I8051_INT0_LINE		0   /* External Interrupt 0 */
-#define I8051_INT1_LINE		1   /* External Interrupt 1 */
-#define I8051_T0_LINE		2   /* Timer 0 External Input */
-#define I8051_T1_LINE		3   /* Timer 1 External Input */
-#define I8051_RX_LINE		4   /* Serial Port Receive Line */
+enum
+{
+	I8051_INT0_LINE = 0, 	/* P3.2: External Interrupt 0 */
+	I8051_INT1_LINE,		/* P3.3: External Interrupt 1 */
+	I8051_RX_LINE,			/* P3.0: Serial Port Receive Line */
+	MCS51_T0_LINE,			/* P3,4: Timer 0 External Input */
+	MCS51_T1_LINE,			/* P3.5: Timer 1 External Input */
+	MCS51_T2_LINE,			/* P1.0: Timer 2 External Input */
+	MCS51_T2EX_LINE,		/* P1.1: Timer 2 Capture Reload Trigger */
+};
 
-/* definition of the special function registers. Note that the values are */
-/* the same as the internal memory address in the 8051 */
-#define		P0		0x80
-#define		SP		0x81
-#define		DPL		0x82
-#define		DPH		0x83
-#define		PCON		0x87
-#define		TCON		0x88
-#define		TMOD		0x89
-#define		TL0		0x8a
-#define		TL1		0x8b
-#define		TH0		0x8c
-#define		TH1		0x8d
-#define		P1		0x90
-#define		SCON		0x98
-#define		SBUF		0x99
-#define		P2		0xa0
-#define		IE		0xa8
-#define		P3		0xb0
-#define		IP		0xb8
-//8052 Only registers
-#if (HAS_I8052 || HAS_I8752)
- #define		T2CON	0xc8
- #define		RCAP2L	0xca
- #define		RCAP2H	0xcb
- #define		TL2	0xcc
- #define		TH2	0xcd
-#endif
-#define		PSW		0xd0
-#define		ACC		0xe0
-#define		B		0xf0
+/* special I/O space ports */
 
-/* commonly used bit address for the 8051 */
-#define		C		0xd7
-#define		P		0xd0
-#define		AC		0xd6
-#define		OV		0xd2
-#define		TF0		0x8d
-#define		TF1		0x8f
-#define		IE0		0x89
-#define		IE1		0x8b
-#define		TI		0x99
-#define		RI		0x98
+enum
+{
+	MCS51_PORT_P0	= 0x10000,
+	MCS51_PORT_P1	= 0x10001,
+	MCS51_PORT_P2	= 0x10002,
+	MCS51_PORT_P3	= 0x10003,
+	MCS51_PORT_TX	= 0x10004,	/* P3.1 */
+};
 
-#define TI_FLAG 1
-#define RI_FLAG 2
 
-extern void i8051_init (int index, int clock, const void *config, int (*irqcallback)(int));					/* Initialize save states */
-extern void i8051_reset (void);			/* Reset registers to the initial values */
-extern void i8051_exit	(void); 				/* Shut down CPU core */
-extern int  i8051_execute(int cycles);			/* Execute cycles - returns number of cycles actually run */
-extern void i8051_get_context (void *dst);	/* Get registers, return context size */
-extern void i8051_set_context (void *src);    	/* Set registers */
-extern unsigned i8051_get_intram (int offset);
-extern unsigned i8051_get_reg (int regnum);
-extern void i8051_set_reg (int regnum, unsigned val);
-extern void i8051_set_irq_line(int irqline, int state);
-extern void i8051_set_irq_callback(int (*callback)(int irqline));
-extern void i8051_state_save(void *file);
-extern void i8051_state_load(void *file);
-
-WRITE8_HANDLER( i8051_internal_w );
-READ8_HANDLER( i8051_internal_r );
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
 
 extern void i8051_set_serial_tx_callback(void (*callback)(int data));
 extern void i8051_set_serial_rx_callback(int (*callback)(void));
-extern void i8051_set_eram_iaddr_callback(READ32_HANDLER((*callback)));
 
-extern offs_t i8051_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+/* variants 4k internal rom and 128 byte internal memory */
+void i8051_get_info(UINT32 state, cpuinfo *info);
+void i8751_get_info(UINT32 state, cpuinfo *info);
+
+/* variants 8k internal rom and 256 byte internal memory and more registers */
+void i8052_get_info(UINT32 state, cpuinfo *info);
+void i8752_get_info(UINT32 state, cpuinfo *info);
 
 /****************************************************************************
- * 8752 Section
+ * Disassembler
  ****************************************************************************/
-#if (HAS_I8752)
-extern void i8752_init (int index, int clock, const void *config, int (*irqcallback)(int));					/* Initialize save states */
-extern void i8752_reset (void);			/* Reset registers to the initial values */
-extern void i8752_exit	(void); 				/* Shut down CPU core */
-extern int	i8752_execute(int cycles);			/* Execute cycles - returns number of cycles actually run */
-extern void i8752_get_context (void *dst);	/* Get registers, return context size */
-extern void i8752_set_context (void *src);		/* Set registers */
-extern unsigned i8752_get_reg (int regnum);
-extern void i8752_set_reg (int regnum, unsigned val);
-extern void i8752_set_irq_line(int irqline, int state);
-extern void i8752_set_irq_callback(int (*callback)(int irqline));
-extern void i8752_state_save(void *file);
-extern void i8752_state_load(void *file);
-extern void i8752_set_serial_tx_callback(void (*callback)(int data));
-extern void i8752_set_serial_rx_callback(int (*callback)(void));
-WRITE8_HANDLER( i8752_internal_w );
-READ8_HANDLER( i8752_internal_r );
-#endif	//(HAS_8752)
 
-
-void i8051_get_info(UINT32 state, cpuinfo *info);
-void i8052_get_info(UINT32 state, cpuinfo *info);
-void i8751_get_info(UINT32 state, cpuinfo *info);
-void i8752_get_info(UINT32 state, cpuinfo *info);
+offs_t i8051_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
 #endif /* __I8051_H__ */

@@ -435,13 +435,11 @@ static ADDRESS_MAP_START( soundmem_prg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( soundmem_data, ADDRESS_SPACE_DATA, 8 )
+static ADDRESS_MAP_START( soundmem_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0100, 0x0100) AM_READWRITE( okim6295_status_0_r, okim6295_data_0_w )
 	AM_RANGE(0x0101, 0x0101) AM_READ(soundlatch_r)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( soundmem_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0001, 0x0001) AM_WRITE( oki_setbank )
+	/* ports */
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE( oki_setbank )
 ADDRESS_MAP_END
 
 static VIDEO_START(sliver)
@@ -540,7 +538,6 @@ static MACHINE_DRIVER_START( sliver )
 
 	MDRV_CPU_ADD("audio", I8051, 8000000)
 	MDRV_CPU_PROGRAM_MAP(soundmem_prg,0)
-	MDRV_CPU_DATA_MAP(soundmem_data,0)
 	MDRV_CPU_IO_MAP(soundmem_io,0)
 
 

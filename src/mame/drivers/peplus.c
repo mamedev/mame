@@ -487,16 +487,6 @@ static READ8_HANDLER( peplus_sf000_r )
 	return sf000_ram[offset];
 }
 
-/* External RAM Callback for I8052 */
-static READ32_HANDLER( peplus_external_ram_iaddr )
-{
-	if (mem_mask == 0xff) {
-		return (io_port[2] << 8) | offset;
-	} else {
-		return offset;
-	}
-}
-
 /* Last Color in Every Palette is bgcolor */
 static READ8_HANDLER( peplus_bgcolor_r )
 {
@@ -541,7 +531,7 @@ static READ8_HANDLER( peplus_input_bank_a_r )
 		last_cycles = activecpu_gettotalcycles();
 	} else {
 		/* Process Next Coin Optic State */
-		if (curr_cycles - last_cycles > 600000 && coin_state != 0) {
+		if (curr_cycles - last_cycles > 600000/6 && coin_state != 0) {
 			coin_state++;
 			if (coin_state > 5)
 				coin_state = 0;
@@ -571,7 +561,7 @@ static READ8_HANDLER( peplus_input_bank_a_r )
 			break;
 	}
 
-	if (curr_cycles - last_door > 6000) { // Guessing with 6000
+	if (curr_cycles - last_door > 6000/12) { // Guessing with 6000
 		if ((input_port_read_safe(machine, "DOOR",0xff) & 0x01) == 0x01) {
 			door_open = (!door_open & 0x01);
 		} else {
@@ -580,7 +570,7 @@ static READ8_HANDLER( peplus_input_bank_a_r )
 		last_door = activecpu_gettotalcycles();
 	}
 
-	if (curr_cycles - last_coin_out > 600000 && coin_out_state != 0) { // Guessing with 600000
+	if (curr_cycles - last_coin_out > 600000/12 && coin_out_state != 0) { // Guessing with 600000
 		if (coin_out_state != 2) {
             coin_out_state = 2; // Coin-Out Off
         } else {
@@ -711,7 +701,7 @@ static ADDRESS_MAP_START( peplus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_ROM AM_BASE(&program_ram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( peplus_datamap, ADDRESS_SPACE_DATA, 8 )
+static ADDRESS_MAP_START( peplus_iomap, ADDRESS_SPACE_IO, 8 )
 	// Battery-backed RAM (0x1000-0x01fff Extended RAM for Superboards Only)
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(peplus_cmos_r, peplus_cmos_w) AM_BASE(&cmos_ram)
 
@@ -763,15 +753,10 @@ static ADDRESS_MAP_START( peplus_datamap, ADDRESS_SPACE_DATA, 8 )
 
     // Superboard Data
 	AM_RANGE(0xf000, 0xffff) AM_READWRITE(peplus_sf000_r, peplus_sf000_w) AM_BASE(&sf000_ram)
+
+	/* Ports start here */
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READ(peplus_io_r) AM_WRITE(peplus_io_w) AM_BASE(&io_port)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( peplus_iomap, ADDRESS_SPACE_IO, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0xff)
-
-	// I/O Ports
-	AM_RANGE(0x00, 0x03) AM_READ(peplus_io_r) AM_WRITE(peplus_io_w) AM_BASE(&io_port)
-ADDRESS_MAP_END
-
 
 /*************************
 *      Input ports       *
@@ -1010,7 +995,7 @@ static MACHINE_DRIVER_START( peplus )
 	// basic machine hardware
 	MDRV_CPU_ADD("main", I8052, 3686400*2)
 	MDRV_CPU_PROGRAM_MAP(peplus_map, 0)
-	MDRV_CPU_DATA_MAP(peplus_datamap, 0)
+	//MDRV_CPU_DATA_MAP(peplus_datamap, 0)
 	MDRV_CPU_IO_MAP(peplus_iomap, 0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
@@ -1047,9 +1032,6 @@ MACHINE_DRIVER_END
 /* Normal board */
 static void peplus_init(void)
 {
-	/* External RAM callback */
-	i8051_set_eram_iaddr_callback(peplus_external_ram_iaddr);
-
     /* EEPROM is a X2404P 4K-bit Serial I2C Bus */
 	i2cmem_init(0, I2CMEM_SLAVE_ADDRESS, 8, eeprom_NVRAM_SIZE, NULL);
 

@@ -78,6 +78,7 @@ static READ8_HANDLER(unk_r)
 {
 	static int var=0;
 	var^=0x10;
+	printf("var %d\n",var);
 	return var;
 }
 
@@ -98,7 +99,7 @@ static ADDRESS_MAP_START( mem_prg, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mem_data, ADDRESS_SPACE_DATA, 8 )
+static ADDRESS_MAP_START( mem_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_RAM
 	AM_RANGE(0x2003, 0x2003) AM_READ_PORT("IN0")
 	AM_RANGE(0x2005, 0x2005) AM_READ_PORT("IN1")
@@ -113,11 +114,10 @@ static ADDRESS_MAP_START( mem_data, ADDRESS_SPACE_DATA, 8 )
 	AM_RANGE(0x3003, 0x3003) AM_NOP
 	AM_RANGE(0xc000, 0xdfff) AM_WRITE(vram_w) AM_BASE(&videoram)
 	AM_RANGE(0xe000, 0xffff) AM_WRITE(attr_w) AM_BASE(&colorram)
+	/* Ports */
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(unk_r, video_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( mem_io, ADDRESS_SPACE_IO, 8 )
-  AM_RANGE(0x01, 0x01) AM_READWRITE(unk_r, video_w)
-ADDRESS_MAP_END
 
 static INPUT_PORTS_START( cardline )
 	PORT_START("IN0")
@@ -196,7 +196,6 @@ static MACHINE_DRIVER_START( cardline )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", I8051,12000000)
 	MDRV_CPU_PROGRAM_MAP(mem_prg,0)
-	MDRV_CPU_DATA_MAP(mem_data,0)
 	MDRV_CPU_IO_MAP(mem_io,0)
 
 	/* video hardware */

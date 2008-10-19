@@ -108,20 +108,26 @@ enum{   RX=0,TX,STATUS,SYN1,SYN2,DLE,MODE1,MODE2,COMMAND
 /* Probably wrong and a bit crap */
 static int data_to_i8031(void)
 {
-     mame_printf_debug("68k sent data: %x\n",M68681.TBB);
-     return M68681.TBB;
+	mame_printf_debug("68k sent data: %x\n",M68681.TBB);
+    M68681.SRB |=0x0400;                   // Data has been sent - TX ready for more.
+    // Write to sound board
+    if(M68681.IMR & 0x1000)
+    {
+    	cpunum_set_input_line_and_vector(Machine, 0,3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
+    }
+	return M68681.TBB;
 }
 
 static void data_from_i8031(int data)
 {
-     M68681.RBB  = data<<8;                         // Put into receive buffer.
-     M68681.SRB |= 0x0100;                          // Set Receiver B ready.
-     if(M68681.IMR & 0x1000)
-     {
-     	cpunum_set_input_line_and_vector(Machine, 0,3, HOLD_LINE, M68681.IVR);    // Generate a receiver interrupt.
-     	mame_printf_debug("INTERRUPT!!!\n");
-     }
-   mame_printf_debug("8031 sent data: %x\n",data);
+	M68681.RBB  = data<<8;                         // Put into receive buffer.
+	M68681.SRB |= 0x0100;                          // Set Receiver B ready.
+	if(M68681.IMR & 0x1000)
+	{
+		cpunum_set_input_line_and_vector(Machine, 0,3, HOLD_LINE, M68681.IVR);    // Generate a receiver interrupt.
+		mame_printf_debug("INTERRUPT!!!\n");
+	}
+	mame_printf_debug("8031 sent data: %x\n",data);
 }
 
 
@@ -205,14 +211,15 @@ static DRIVER_INIT( f15se )
 
 static DRIVER_INIT( f15se21 )
 {
+#if 1
        UINT16 *rom = (UINT16 *)memory_region(machine, "main");
-
        rom[0x2A8B3]=0x6006;                          //055166: 6606                     bne     5516e -> bra
        rom[0x2A8BF]=0x4E71;                          //05517E: 6704                     beq     55184 -> nop
        rom[0x28AD1]=0x4E71;                          //0515A2: 67F8                     beq     5159c -> nop
        rom[0x28A9E]=0x4E71;
        rom[0x28ABD]=0x4E71;
        rom[0x28C3B]=0x4E71;
+#endif
 }
 
 static INPUT_PORTS_START( stankatk )
@@ -492,8 +499,6 @@ switch(offset)
 
 }
 
-
-
 /* I should really re-write all this. */
 
 static WRITE16_HANDLER( m68681_w )
@@ -537,12 +542,17 @@ switch(offset)
       case 0x0a:        break;
 
       case 0x0b:        M68681.TBB = value;                   //  Fill transmit buffer
+#if 0
                         M68681.SRB |=0x0400;                   // Data has been sent - TX ready for more.
                         // Write to sound board
                         if(M68681.IMR & 0x1000)
                         {
                         	cpunum_set_input_line_and_vector(machine, 0,3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
                         }
+                        cpunum_set_input_line(machine, 2, I8051_RX_LINE, ASSERT_LINE);                      // Generate 8031 interrupt
+                        mame_printf_debug("Sound board TX: %4X at PC=%4X\n",value,activecpu_get_pc());
+#endif
+                        M68681.SRB &=~0x0400;                   // Data has been sent - TX ready for more.
                         cpunum_set_input_line(machine, 2, I8051_RX_LINE, ASSERT_LINE);                      // Generate 8031 interrupt
                         mame_printf_debug("Sound board TX: %4X at PC=%4X\n",value,activecpu_get_pc());
                         break;
@@ -588,7 +598,8 @@ switch(offset)
         case 0x09:     return M68681.SRB;                              // Status Register B
 
         case 0x0b:     mame_printf_debug("\nHost received: %x\n",M68681.RBB);
-                       M68681.SRB^=0x0100;                             // No longer have data.
+        				M68681.SRB^=0x0100;                             // No longer have data.
+        				//M68681.SRB &= ~0x0100;                             // No longer have data.
                        return M68681.RBB;
                                                                        // RX B - Monitor Port
 }
@@ -786,36 +797,36 @@ ADDRESS_MAP_END
 /* P1.7 = SELFTEST I         P3.7                                     */
 /*====================================================================*/
 
+static UINT8 port_latch[4];
 static WRITE8_HANDLER(sound_io_w)
 {
-
-switch(offset)
-{
-        case 0x01:  break;
-        case 0x03:  //if(data & 0x4) speech_bank=0;
-
-                    if(data & 0x10)
-                    {
-                    	upd7759_0_reset_w(machine,0,0);
-                    }
-                    else
-                    {
-                    	upd7759_0_reset_w(machine,0,1);
-                    }
-                    break;
-}
+	port_latch[offset] = data;
+	switch(offset)
+	{
+        case 0x01:  
+        	break;
+        case 0x03:  
+        	upd7759_set_bank_base(0, (data & 0x4) ? 0x20000 : 0);
+        	upd7759_0_reset_w(machine,0,(data & 0x10) ? 0 : 1);
+	}
 }
 
 static READ8_HANDLER(sound_io_r)
 {
+	switch(offset)
+	{
+	        case 0x01:  return (port_latch[offset] & 0x7f) | input_port_read_safe(machine, "SOUND", 0);		/* Test push switch */
+	        case 0x03:  return (port_latch[offset] & 0xf7) | (upd7759_0_busy_r(machine,0) ? 0x08 : 0);
+	        default:    return 0;
+	}
 
-switch(offset)
-{
-        case 0x01:  return input_port_read_safe(machine, "SOUND", 0);		/* Test push switch */
-        case 0x03:  return (int)(upd7759_0_busy_r(machine,0))<<3;
-        default:    return 0;
 }
 
+static WRITE8_HANDLER( upd7759_port_start_w)
+{
+	upd7759_0_start_w(machine, offset, 0);
+	upd7759_0_port_w(machine, offset, data);
+	upd7759_0_start_w(machine, offset, 1);
 }
 
 static ADDRESS_MAP_START( soundmem_prg, ADDRESS_SPACE_PROGRAM, 8 )
@@ -825,19 +836,16 @@ ADDRESS_MAP_END
 
 /* FFXX - 00XX    */
 
-static ADDRESS_MAP_START( soundmem_data, ADDRESS_SPACE_DATA, 8 )
+static ADDRESS_MAP_START( soundmem_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM                                  /* 2Kb RAM */
 	AM_RANGE(0xfd00, 0xfd00) AM_WRITE(ym2151_register_port_0_w)
 	AM_RANGE(0xfd01, 0xfd01) AM_READWRITE(ym2151_status_port_0_r,ym2151_data_port_0_w)
-	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(upd7759_0_port_w)
+	AM_RANGE(0xfe00, 0xfe00) AM_WRITE(upd7759_port_start_w)
 	AM_RANGE(0xff00, 0xff00) AM_WRITE(dac_0_data_w)   /* DAC A - used for S&H, special effects? */
 	AM_RANGE(0xff01, 0xff01) AM_WRITE(dac_1_data_w)   /* DAC B - 'SPEECH' */
+	/* ports */
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(sound_io_r,sound_io_w)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( soundmem_io, ADDRESS_SPACE_IO, 8 )
-         AM_RANGE(0x00, 0xff) AM_READWRITE(sound_io_r,sound_io_w)
-ADDRESS_MAP_END
-
 
 
 static const tms34010_config vgb_config =
@@ -864,7 +872,6 @@ static MACHINE_DRIVER_START( micro3d )
 
 	MDRV_CPU_ADD("audio", I8051, 11059000)
 	MDRV_CPU_PROGRAM_MAP(soundmem_prg,0)
-	MDRV_CPU_DATA_MAP(soundmem_data,0)
 	MDRV_CPU_IO_MAP(soundmem_io,0)
 
 	MDRV_MACHINE_RESET(micro3d)

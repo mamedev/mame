@@ -899,15 +899,13 @@ static ADDRESS_MAP_START( i8051_sound_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( i8051_sound_dat, ADDRESS_SPACE_DATA, 8 )
-	AM_RANGE(0x0000, 0x1ff) AM_RAM
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( i8051_sound_port, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x00, 0x00) AM_READWRITE(baby_sound_p0_r, baby_sound_p0_w)
-	AM_RANGE(0x01, 0x01) AM_READWRITE(baby_sound_p1_r, baby_sound_p1_w)
-	AM_RANGE(0x02, 0x02) AM_READWRITE(baby_sound_p2_r, baby_sound_p2_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(baby_sound_p3_r, baby_sound_p3_w)
+	AM_RANGE(0x0000, 0x1ff) AM_RAM
+	/* ports */
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_READWRITE(baby_sound_p0_r, baby_sound_p0_w)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(baby_sound_p1_r, baby_sound_p1_w)
+	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_READWRITE(baby_sound_p2_r, baby_sound_p2_w)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(baby_sound_p3_r, baby_sound_p3_w)
 ADDRESS_MAP_END
 
 
@@ -1228,7 +1226,6 @@ static MACHINE_DRIVER_START( babypkr )
 	MDRV_CPU_REPLACE("main", I8039, CPU_CLOCK_ALT)
 	MDRV_CPU_REPLACE("sound", I8051, CPU_CLOCK )
 	MDRV_CPU_PROGRAM_MAP(i8051_sound_mem, 0)
-	MDRV_CPU_DATA_MAP(i8051_sound_dat, 0)
 	MDRV_CPU_IO_MAP(i8051_sound_port, 0)
 
 	/* video hardware */

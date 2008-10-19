@@ -26,6 +26,7 @@
 #include "driver.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
+#include "cpu/i8051/i8051.h"
 
 static tilemap *bg_tilemap, *md_tilemap, *fg_tilemap;
 static UINT32 *bg_videoram, *md_videoram, *fg_videoram, *limenko_videoreg;
@@ -214,8 +215,8 @@ static READ8_HANDLER( spotty_sound_r )
 }
 
 static ADDRESS_MAP_START( spotty_sound_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(spotty_sound_r, okim6295_data_0_w) //? sound latch and ?
-	AM_RANGE(0x0003, 0x0003) AM_READWRITE(spotty_sound_cmd_r, spotty_sound_cmd_w) //not sure about anything...
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_READWRITE(spotty_sound_r, okim6295_data_0_w) //? sound latch and ?
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(spotty_sound_cmd_r, spotty_sound_cmd_w) //not sure about anything...
 ADDRESS_MAP_END
 
 /*****************************************************************************************************
@@ -675,7 +676,6 @@ static MACHINE_DRIVER_START( spotty )
 
 	MDRV_CPU_ADD("audio", I8051, 4000000)	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(spotty_sound_prg_map, 0)
-	MDRV_CPU_DATA_MAP(0, 0)
 	MDRV_CPU_IO_MAP(spotty_sound_io_map,0)
 
 	MDRV_NVRAM_HANDLER(93C46)
