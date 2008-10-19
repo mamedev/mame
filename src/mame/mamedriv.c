@@ -1490,6 +1490,7 @@ const game_driver * const drivers[] =
 	/* M107 */
 	DRIVER( firebarr )	/* (c) 1993 Irem (Japan) */
 	DRIVER( dsoccr94 )	/* (c) 1994 Irem (Data East Corporation license) */
+	DRIVER( kftgoal )	/* (c) 1994 Jaleco */
 	DRIVER( wpksoc )	/* (c) 1995 Jaleco */
 
 	/* Gottlieb/Mylstar games (Gottlieb became Mylstar in 1983) */
@@ -7750,6 +7751,7 @@ Other Sun games
 	DRIVER( policetr )	/* (c) 1996 P&P Marketing */
 	DRIVER( polict11 )	/* (c) 1996 P&P Marketing */
 	DRIVER( polict10 )	/* (c) 1996 P&P Marketing */
+	DRIVER( plctr13a )	/* (c) 1996 P&P Marketing */
 	DRIVER( plctr13b )	/* (c) 1996 P&P Marketing */
 	DRIVER( sshooter )	/* (c) 1998 P&P Marketing */
 	DRIVER( sshoot12 )	/* (c) 1998 P&P Marketing */
@@ -7859,6 +7861,7 @@ Other Sun games
 	DRIVER( skyarmy )	/* (c) 1982 Shoei */
 	DRIVER( lethalj )	/* (c) 1996 The Game Room */
 	DRIVER( eggventr )	/* (c) 1997 The Game Room */
+	DRIVER( eggvent8 )	/* (c) 1997 The Game Room */
 	DRIVER( eggvent7 )	/* (c) 1997 The Game Room */
 	DRIVER( eggventa )	/* (c) 1997 The Game Room (Allied Leisure license) */
 	DRIVER( eggvntdx )	/* (c) 1997 The Game Room */

@@ -26,7 +26,7 @@
     In The Hunt                        Irem    D8000011A1 020
     Risky Challenge/Gussun Oyoyo       Irem    D8000019A1 022 9331NK700
     Match It II/Shisensho II           Irem    D8000020A1 023 9320NK700
-    World PK Soccer                    Irem    D8000021A1
+    World PK Soccer/Kick for the Goal  Irem    D8000021A1 024 9335NK701
     Ninja Baseball Batman              Irem    D8000021A1 024 9335NK700
     Perfect Soldiers                   Irem    D8000022A1
     Dream Soccer '94                   Irem    D8000023A1 026
