@@ -1303,7 +1303,9 @@ ROM_START( monkelf )
 	ROM_LOAD( "2",  0x000000, 0x040000, CRC(05bc04d9) SHA1(b903edf39393cad2b4b6b58b10651304793aaa3e) )
 
 	ROM_REGION( 0x0200, "proms", 0 )		/* Priority PROM */
-	ROM_LOAD( "ph.bin",        0x0000, 0x0200, CRC(8359650a) SHA1(97d0105f06c64340fb19a541db03481a7e0b5e05) )
+//	ROM_LOAD( "ph.bin",        0x0000, 0x0200, CRC(8359650a) SHA1(97d0105f06c64340fb19a541db03481a7e0b5e05) )
+	// the bootleg prom is a different format, i don't know how to use it
+	ROM_LOAD( "82s147",        0x0000, 0x0200, CRC(547eccc0) SHA1(44dd92e899a7852d2fd937b7d45519315b8b4d4f) )
 ROM_END
 
 
