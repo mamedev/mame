@@ -109,6 +109,7 @@ DSW2 stored @ $f237
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/m6805/m6805.h"
+#include "cpu/i8051/i8051.h"
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 
@@ -603,13 +604,10 @@ ADDRESS_MAP_END
 
 
 /* I8751 memory handlers */
-static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM	AM_REGION("mcu", 0) // AM_ROM
-ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x01, 0x01) AM_WRITE(mcu_p1_w)
-	AM_RANGE(0x03, 0x03) AM_READWRITE(mcu_p3_r, mcu_p3_w)
+	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(mcu_p1_w)
+	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_READWRITE(mcu_p3_r, mcu_p3_w)
 ADDRESS_MAP_END
 
 
@@ -1059,7 +1057,6 @@ static MACHINE_DRIVER_START( sqix )
 	MDRV_CPU_VBLANK_INT_HACK(sqix_interrupt,6)	/* ??? */
 
 	MDRV_CPU_ADD("mcu", I8751, 12000000/3)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_IO_MAP(mcu_io_map,0)
 
 	MDRV_INTERLEAVE(500)
