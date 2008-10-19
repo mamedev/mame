@@ -1763,15 +1763,15 @@ const game_driver * const drivers[] =
 	DRIVER( drtopplj )	/* B19 (c) 1987 Taito Corporation (Japan) */
 	DRIVER( kageki )	/* B35 (c) 1988 Taito America Corporation + Romstar license (US) */
 	DRIVER( kagekij )	/* B35 (c) 1988 Taito Corporation (Japan) */
-	DRIVER( kagekia )	/* B35 (c) 1992 (hack?) */
+	DRIVER( kagekih )	/* B35 (c) 1992 (hack) */
 	DRIVER( chukatai )	/* B44 (c) 1988 Taito Corporation Japan (World) */
 	DRIVER( chukatau )	/* B44 (c) 1988 Taito Corporation (US) */
 	DRIVER( chukataj )	/* B44 (c) 1988 Taito Corporation (Japan) */
 	DRIVER( kabukiz )	/* B50 (c) 1988 Taito Corporation Japan (World) */
 	DRIVER( kabukizj )	/* B50 (c) 1988 Taito Corporation (Japan) */
 	DRIVER( tnzs )		/* B53 (c) 1988 Taito Corporation Japan (World) (new logo) */
-	DRIVER( tnzsjn )	/* B53 (c) 1988 Taito Corporation (Japan) (new logo) */
 	DRIVER( tnzsj )		/* B53 (c) 1988 Taito Corporation (Japan) (new logo) */
+	DRIVER( tnzsjo )	/* B53 (c) 1988 Taito Corporation (Japan) (new logo) */
 	DRIVER( tnzso )		/* B53?(c) 1988 Taito Corporation Japan (World) (old logo) */
 	DRIVER( insectx )	/* B97 (c) 1989 Taito Corporation Japan (World) */
 	DRIVER( champbwl )	/* (c)1989 Romstar.  not Taito, but the same Seta video chips */

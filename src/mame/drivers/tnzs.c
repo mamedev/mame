@@ -2,11 +2,11 @@
 
 
 Notes:
-- There are three versions of TNZS supported.
-  1) "tnzs". New hardware revision. 3 Z80 and no M-Chip (8742 MPU).
-  2) "tnzsj". Standard hardware. 2 Z80 and the M-Chip.
-  3) "tnzso". Standard hardware. Harder gameplay, old Taito logo. Maybe a prototype?
-  The three versions all have different levels!
+- There are four versions of TNZS supported.
+  1) "tnzs".   New hardware revision. 3 Z80 and no M-Chip (8742 MPU).
+  2) "tnzsj".  New hardware revision. 3 Z80 and no M-Chip (8742 MPU).
+  3) "tnzsjo". Standard hardware. 2 Z80 and the M-Chip.
+  4) "tnzso".  Standard hardware. Harder gameplay, old Taito logo. Maybe a prototype?
 
 - TNZS hidden level select: keep service coin pressed (default:9) and reset the game.
   When SERVICE SWITCH ERROR appears, release service coin and press 1 player start
@@ -14,6 +14,7 @@ Notes:
   starting level and press 1 player start to start. You'll also get 255 lives.
   If you have enough patience and go up until the level reads "Q-1" (which corresponds
   to 1-1), AND the "Invulnerability" dip switch is On, you'll be invulnerable.
+  Invulnerability isn't possible in 'tnzso' (level select is stucked to level 6-1).
 
 
 Hardware datails for the newer tnzs board (from pictures):
@@ -43,14 +44,384 @@ Hardware datails for the newer tnzs board (from pictures):
 
 
 
+Stephh's notes (based on the games Z80 code and some tests) :
+
+1) 'plumppop'
+
+  - Region stored at 0x7fff.b (CPU1) then 0xef49 (shared RAM)
+  - Sets :
+      * 'plumppop' : region = 0x00
+  - Coinage relies on bit 0 of the region (code at 0x5141 in CPU1) :
+      * .......0 : TAITO_COINAGE_JAPAN_OLD
+      * .......1 : TAITO_COINAGE_WORLD
+  - Notice screen relies on bit 1 of the region (code at 0x16e8) :
+      * ......0. : Yes
+      * ......1. : No
+  - Copyright relies on bits 2 and 3 of the region (code at 0x276d) :
+      * ....00.. : "TAITO CORPORATION" / "ALL RIGHTS RESERVED" (Japan)
+      * ....01.. : "TAITO AMERICA CORP." / "ALL RIGHTS RESERVED" (US)
+      * ....10.. : "TAITO CORP. JAPAN" / "ALL RIGHTS RESERVED" (World)
+      * ....11.. : "TAITO CORP. JAPAN" / "LICENCED TO -------"
+
+
+2) 'extrmatn' and clones
+
+2a) 'extrmatn'
+
+  - Region stored at 0x7fff.b (CPU1) then 0x16 is stored at 0xef1d (shared RAM) !
+  - Sets :
+      * 'extrmatn' : region = 0x16
+  - New value is stored at 0xef1d (shared RAM) :
+      * 'extrmatn' : 0x16
+  - Coinage relies on bit 0 of the region (code at 0x4703 in CPU1) :
+      * .......0 : TAITO_COINAGE_JAPAN_OLD
+      * .......1 : TAITO_COINAGE_WORLD
+  - Notice screen relies on bit 1 of the new value (code at 0x4285) :
+      * ......0. : Yes
+      * ......1. : No
+  - Copyright relies on bits 2 and 3 of the new value (code at 0x0cfe) :
+      * ....00.. : "TAITO CORPORATION" / "     FOR U.S.A.    " (Japan)
+      * ....01.. : "WORLD GAMES     " / "     FOR U.S.A.    " (US)
+      * ....10.. : "TAITO CORP. JAPAN" / "     FOR U.S.A.    " (World)
+      * ....11.. : "TAITO CORP. JAPAN" / "LICENCED TO        "
+  - 'ret' + modified byte to please checksum at 0x8df5 (bank = 0x07) : unknown effect
+
+2b) 'extrmatj'
+
+  - Region stored at 0x7fff.b (CPU1) then 0x00 is stored at 0xef1d (shared RAM) !
+  - Sets :
+      * 'extrmatj' : region = 0x00
+  - Coinage relies on bit 0 of the region (code at 0x4703 in CPU1) :
+      * .......0 : TAITO_COINAGE_JAPAN_OLD
+      * .......1 : TAITO_COINAGE_WORLD
+  - Notice screen relies on bit 1 of the new value (code at 0x4285) :
+      * ......0. : Yes
+      * ......1. : No
+  - Copyright relies on bits 2 and 3 of the new value (code at 0x0cfe) :
+      * ....00.. : "TAITO CORPORATION" / "ALL RIGHTS RESERVED" (Japan)
+      * ....01.. : "TAITO AMERICA CORP." / "ALL RIGHTS RESERVED" (US)
+      * ....10.. : "TAITO CORP. JAPAN" / "ALL RIGHTS RESERVED" (World)
+      * ....11.. : "TAITO CORP. JAPAN" / "LICENCED TO           "
+  - Code and data differences :
+      * 0x8df5 (bank = 0x07) : normal routine but still unknown effect
+      * 0x01e0 (CPU1) : 0x00 instead of 0x16 (value for region tests)
+
+
+3) 'arknoid2' and clones
+
+3a) 'arknoid2' and 'arknid2j'
+
+  - Region stored at 0x9fde.b (CPU1 - bank = 0x00) then stored at 0xe7f0 (shared RAM)
+  - Coin mode stored at 0x9fff.b (CPU1 - bank = 0x00) then stored at 0xe7f1 (shared RAM)
+  - Sets :
+      * 'arknoid2' : region = 0x02 - coin mode = 0x01
+      * 'arknid2j' : region = 0x00 - coin mode = 0x00
+  - Coinage relies on coin mode (code at 0x0b17 in CPU1) :
+      * 0x00 : TAITO_COINAGE_JAPAN_OLD
+      * else : TAITO_COINAGE_WORLD
+  - Notice screen relies on region (code at 0x495b) :
+      * 0x00 : Yes
+      * else : No
+  - Copyright relies on region (code at 0x4774) :
+      * 0x00 : "TAITO CORPORATION" / "ALL RIGHTS RESERVED" (Japan)
+      * 0x01 : "TAITO AMERICA CORP." / "ALL RIGHTS RESERVED" (US)
+      * 0x02 : "TAITO CORP. JAPAN" / "ALL RIGHTS RESERVED" (World)
+      * 0x03 : "TAITO AMERICA CORP." / "LICENCED TO ROMSTAR" / "FOR U.S.A."
+
+3b) 'arknid2u'
+
+  - Region stored at 0x9fde.b (CPU1 - bank = 0x00) then stored at 0xe7f0 (shared RAM)
+  - Coin mode stored at 0x9fff.b (CPU1 - bank = 0x00) then stored at 0xe7f1 (shared RAM)
+  - Sets :
+      * 'arknid2u' : region = 0x03 - coin mode = 0x00
+  - Coinage relies on coin mode (code at 0x0b17 in CPU1) :
+      * 0x00 : TAITO_COINAGE_JAPAN_OLD
+      * else : TAITO_COINAGE_WORLD
+  - Notice screen relies on region (code at 0x2e47) :
+      * 0x00 : Yes
+      * else : No
+  - Copyright relies on region (code at 0x475b) :
+      * 0x00 : "TAITO CORPORATION" / "ALL RIGHTS RESERVED" (Japan)
+      * 0x01 : "TAITO AMERICA CORP." / "ALL RIGHTS RESERVED" (US)
+      * 0x02 : "TAITO CORP. JAPAN" / "ALL RIGHTS RESERVED" (World)
+      * 0x03 : "TAITO AMERICA CORP." / "LICENCED TO ROMSTAR" / "FOR U.S.A."
+  - Levels differences :
+      * new level 1
+      * levels 3 left and 17 left are swapped
+      * levels 17 right and 20 right are swapped
+
+
+4) 'drtoppel' and clones
+
+  - Region stored at 0x7fff.b (CPU1) then 0xe000 (shared RAM)
+  - Sets :
+      * 'drtoppel' : region = 0x03
+      * 'drtopplu' : region = 0x02
+      * 'drtopplj' : region = 0x01
+  - These 3 games are 100% the same, only region differs !
+    However, dumps for 'drtoppel' and 'drtopplu' are unsure (wrong ROM numbers).
+  - Coinage relies on region (code at 0x5141 in CPU1) :
+      * 0x01 and 0x02 : TAITO_COINAGE_JAPAN_OLD
+      * 0x03 and 0x04 : TAITO_COINAGE_WORLD
+  - Notice screen relies on region (code at 0x9331 - bank = 0x03) :
+      * 0x01 : Yes
+      * else : No
+  - Title relies on region (code at 0x90a4 - bank = 0x03) :
+      * 0x01 : Japanese
+      * else : English
+  - Copyright relies on region (code at 0x9b62 - bank = 0x03) :
+      * 0x01 : "TAITO CORPORATION" / "ALL RIGHTS RESERVED" (Japan)
+      * 0x02 : "TAITO AMERICA CORP." / "ALL RIGHTS RESERVED" (US)
+      * else : "TAITO CORP. JAPAN" / "ALL RIGHTS RESERVED" (World / ???)
+
+
+5) 'kageki' and clones
+
+5a) 'kageki'
+
+  - Region stored at 0x9fff.b (CPU1 - bank = 0x03) then 0xe000 (shared RAM)
+  - Sets :
+      * 'kageki'   : region = 0x02
+  - Coinage relies on region (code at 0x0099 in CPU1) :
+      * 0x01 and 0x02 : TAITO_COINAGE_JAPAN_OLD
+      * 0x03 and 0x04 : TAITO_COINAGE_WORLD
+  - No notice screen
+  - Copyright relies on region (code at 0x1eeb) :
+      * 0x01 : "TAITO CORPORATION" / "ALL RIGHTS RESERVED" (Japan)
+      * 0x02 : "TAITO AMERICA CORP." / "LICENCED TO ROMSTAR" / "FOR U.S.A." (US)
+      * else : "TAITO CORP. JAPAN" / "ALL RIGHTS RESERVED" (World / ???)
+  - English text on bad guys screens when game starts + English samples
+  - 2 players gameplay : players fight against each other in a best of 3 VS match,
+    then the winner is allowed to fight against the CPU enemies.
+    This is the reason why I've named DSWA bit 0 as "Unused".
+    Note that if there is a draw (same energy for both players), player 1 wins.
+
+5b) 'kagekij'
+
+  - Region stored at 0x9fff.b (CPU1 - bank = 0x03) then 0xe000 (shared RAM)
+  - Sets :
+      * 'kagekij'  : region = 0x01
+  - Coinage relies on region (code at 0x0099 in CPU1) :
+      * 0x01 and 0x02 : TAITO_COINAGE_JAPAN_OLD
+      * 0x03 and 0x04 : TAITO_COINAGE_WORLD
+  - No notice screen
+  - Copyright relies on region (code at 0x1eb3) :
+      * 0x01 : "TAITO CORPORATION" / "ALL RIGHTS RESERVED" (Japan)
+      * 0x02 : "TAITO AMERICA CORP." / "ALL RIGHTS RESERVED" (US)
+      * else : "TAITO CORP. JAPAN" / "ALL RIGHTS RESERVED" (World / ???)
+  - Japanese text on bad guys screens when game starts + Japanese samples
+  - 2 players gameplay : players fight one after the other against CPU enemies.
+    Once an enemy is defeated or a player is dead, it's the other player turn.
+  - Code and data differences :
+      * CPU0 to be looked at carefully
+      * 0x9fff (CPU1 - bank = 0x03) : 0x01 instead of 0x02 (value for region tests)
+    
+5c) 'kagekih'
+
+  - Region stored at 0x9fff.b (CPU1 - bank = 0x03) then 0xe000 (shared RAM)
+  - Sets :
+      * 'kagekij'  : region = 0x01
+  - This set really looks like a hack :
+      * year has been changed from 1988 to 1992
+      * the game uses Japanese ROMS, but CPU0 ROM displays Engish text
+        on bad guys screens when game starts
+  - Coinage relies on region (code at 0x0099 in CPU1) :
+      * 0x01 and 0x02 : TAITO_COINAGE_JAPAN_OLD
+      * 0x03 and 0x04 : TAITO_COINAGE_WORLD
+  - No notice screen
+  - Copyright relies on region (code at 0x1ee0) :
+      * 0x01 : "TAITO CORPORATION" / "ALL RIGHTS RESERVED" (Japan)
+      * 0x02 : "TAITO AMERICA CORP." / "ALL RIGHTS RESERVED" (US)
+      * else : "TAITO CORP. JAPAN" / "ALL RIGHTS RESERVED" (World / ???)
+  - English text on bad guys screens when game starts but Japanese samples !
+  - 2 players gameplay : players fight against each other in a best of 3 VS match,
+    then the winner is allowed to fight against the CPU enemies.
+    This is the reason why I've named DSWA bit 0 as "Unused".
+    Note that if there is a draw (same energy for both players), player 1 wins.
+  - Code and data differences :
+      * CPU0 to be looked at carefully
+      * 0x9fff (CPU1 - bank = 0x03) : 0x01 instead of 0x02 (value for region tests)
+    
+
+6) 'chukatai' and clones
+
+  - Region stored at 0x9fff.b (CPU1 - bank = 0x03) then 0xe01a (shared RAM)
+  - Sets :
+      * 'chukatai' : region = 0x03
+      * 'chukatau' : region = 0x02
+      * 'chukataj' : region = 0x01
+  - These 3 games are 100% the same, only region differs !
+    However, dumps for 'chukatai' and 'chukatau' are unsure (wrong ROM numbers).
+  - Coinage relies on region (code at 0x0114 in CPU1) :
+      * 0x01 and 0x02 : TAITO_COINAGE_JAPAN_OLD
+      * 0x03 and 0x04 : TAITO_COINAGE_WORLD
+  - Notice screen relies on region (code at 0x0253) :
+      * 0x01 : Yes
+      * else : No
+  - Copyright relies on region (code at 0x0b38) :
+      * 0x01 : "TAITO CORPORATION" / "ALL RIGHTS RESERVED" (Japan)
+      * 0x02 : "TAITO AMERICA CORPORATION" / "ALL RIGHTS RESERVED" (US)
+      * else : "TAITO CORPORATION JAPAN" / "ALL RIGHTS RESERVED" (World / ???)
+    I still need to understand how the strings are displayed though.
+  - Power-ups display is affected by the region
+
+
+7) 'tnzs' and clones
+
+7a) 'tnzs' and 'tnzsj'
+
+  - Region stored at 0x7fff.b (CPU1)
+  - Sets :
+      * 'tnzs'     : region = 0x03
+      * 'tnzsj'    : region = 0x01
+  - These 2 games are 100% the same, only region differs !
+  - Code at 0x00fb (CPU1) changes region to another value :
+      * 0x01 -> 0x00
+      * 0x02 -> 0x06
+      * 0x03 -> 0x0b
+      * 0x04 -> 0x0e
+    This value is stored at 0xd035 (CPU1) then 0xef1d (shared RAM).
+  - Coinage relies on bit 0 of the new value (code at 0x0aa7 in CPU1) :
+      * .......0 : TAITO_COINAGE_JAPAN_OLD
+      * .......1 : TAITO_COINAGE_WORLD
+  - Notice screen relies on bit 1 of the new value (code at 0xbed0 - bank = 0x05) :
+      * ......0. : Yes
+      * ......1. : No
+  - Copyright relies on bits 2 and 3 of the new value (code at 0x12eb) :
+      * ....00.. : "TAITO CORPORATION" / "ALL RIGHTS RESERVED" (Japan)
+      * ....01.. : "TAITO AMERICA CORP." / "ALL RIGHTS RESERVED" (US)
+      * ....10.. : "TAITO CORP. JAPAN" / "ALL RIGHTS RESERVED" (World)
+      * ....11.. : "TAITO CORP. JAPAN" / "LICENCED TO           "
+  - New Taito logo
+
+7b) 'tnzsjo'
+
+  - Region stored at 0x7fff.b (CPU1)
+  - Sets :
+      * 'tnzsjo'   : region = 0x01
+  - Code at 0x00f7 (CPU1) changes region to another value :
+      * 0x01 -> 0x00
+      * 0x02 -> 0x06
+      * 0x03 -> 0x0b
+      * 0x04 -> 0x0e
+    This value is stored at 0xd035 (CPU1) then 0xef1d (shared RAM).
+  - Coinage relies on bit 0 of the new value (code at 0x5f68 in CPU1) :
+      * .......0 : TAITO_COINAGE_JAPAN_OLD
+      * .......1 : TAITO_COINAGE_WORLD
+  - Notice screen relies on bit 1 of the new value (code at 0xbbb5 - bank = 0x05) :
+      * ......0. : Yes
+      * ......1. : No
+  - Copyright relies on bits 2 and 3 of the new value (code at 0x12ed) :
+      * ....00.. : "TAITO CORPORATION" / "ALL RIGHTS RESERVED" (Japan)
+      * ....01.. : "TAITO AMERICA CORP." / "ALL RIGHTS RESERVED" (US)
+      * ....10.. : "TAITO CORP. JAPAN" / "ALL RIGHTS RESERVED" (World)
+      * ....11.. : "TAITO CORP. JAPAN" / "LICENCED TO           "
+  - New Taito logo
+  - levels are different from 'tnzs'
+
+7c) 'tnzso'
+
+  - Region stored at 0x7fff.b (CPU1)
+  - Sets :
+      * 'tnzso'    : region = 0x03
+  - Code at 0x021e (CPU1) changes region to another value :
+      * 0x01 -> 0x00
+      * 0x02 -> 0x06
+      * 0x03 -> 0x0b
+      * 0x04 -> 0x0e
+    This value is stored at 0xd46b (CPU1) then 0xef1d (shared RAM).
+  - Coinage relies on bit 0 of the new value (code at 0x5d91 in CPU1) :
+      * .......0 : TAITO_COINAGE_JAPAN_OLD
+      * .......1 : TAITO_COINAGE_WORLD
+  - Notice screen relies on bit 1 of the new value (code at 0x0cdd) :
+      * ......0. : Yes
+      * ......1. : No
+  - Copyright relies on bits 2 and 3 of the new value (code at 0x1062) :
+      * ....00.. : "TAITO CORPORATION" / "ALL RIGHTS RESERVED" (Japan)
+      * ....01.. : "TAITO AMERICA CORP." / "ALL RIGHTS RESERVED" (US)
+      * ....10.. : "TAITO CORP. JAPAN" / "ALL RIGHTS RESERVED" (World)
+      * ....11.. : "TAITO CORP. JAPAN" / "LICENCED TO           "
+  - Old Taito logo
+  - levels are different from 'tnzs' and 'tnzsjo'
+
+
+8) 'kabukiz' and clones
+
+  - No region byte : a value is loaded in register A each time it is needed !
+  - Sets :
+      * 'kabukiz'  : value = 0x02
+      * 'kabukizj' : value = 0x00
+  - Coinage relies on register A (code at 0x016c in CPU1)
+      * 0x02 : TAITO_COINAGE_WORLD
+      * else : TAITO_COINAGE_JAPAN_OLD
+  - Notice screen relies on register A (code at 0x0b30 in CPU1) :
+      * 0x00 : Yes
+      * else : No
+  - Copyright relies on register A (code at 0x0d4e in CPU1)
+      * 0x00 : "TAITO CORPORATION" / "ALL RIGHTS RESERVED" (Japan)
+      * 0x01 : "TAITO AMERICA CORP." / "ALL RIGHTS RESERVED" (US)
+      * else : "TAITO CORP. JAPAN" / "ALL RIGHTS RESERVED" (World)
+  - 'babukizj' has extra code in CPU1 to be looked at carefully.
+
+
+9) 'insectx'
+
+  - Region stored at 0x9fff.b (CPU1 - bank = 0x03) then 0xec21 (shared RAM)
+  - Sets :
+      * 'insectx'  : region = 0x03
+  - Coinage relies on region (code at 0x025b in CPU1) :
+      * 0x01 : TAITO_COINAGE_JAPAN_OLD
+      * 0x02 : TAITO_COINAGE_US
+      * else : TAITO_COINAGE_WORLD
+  - Notice screen relies on region (code at 0x0a6c) :
+      * 0x01 : Yes
+      * else : No
+  - Copyright relies on region (code at 0xac16 - bank = 0x02) :
+      * 0x01 : "TAITO CORPORATION" / "ALL RIGHTS RESERVED" (Japan)
+      * 0x02 : "TAITO AMERICA CORPORATION" / "ALL RIGHTS RESERVED" (US)
+      * else : "TAITO CORPORATION JAPAN" / "ALL RIGHTS RESERVED" (World)
+  - This game doesn't use standard settings for "Difficulty" Dip Switch :
+    look at table at 0x1b86 (4 * 2 bytes) and especially table at 0x4731
+    (4 bytes) which determines end of level boss energy via code at 0x46e2,
+    and you'll notice that "Easy" and "Hard" settings are swapped.
+    End of level boss energy is stored at 0xe484 and 0xe485 (LSB first).
+
+
+10) 'jpopnics'
+
+  - Region stored at 0x7fff.b (CPU1) then 0xef49 (shared RAM)
+  - Sets :
+      * 'jpopnics' : region = 0x00
+  - Coinage relies on bit 0 of the region (code at 0x5141 in CPU1) :
+      * .......0 : TAITO_COINAGE_JAPAN_OLD
+      * .......1 : TAITO_COINAGE_WORLD
+    However, coinage is in fact always 1C_1C for both coin slots due to
+    'ret' instruction at 0x5151 and way coins are handled at 0x4f60.
+  - Notice screen relies on bit 1 of the region (code at 0x16e8) :
+      * ......0. : Yes
+      * ......1. : No
+    Notice screen displays "Korea" instead of "Japan".
+  - Copyright relies on bits 2 and 3 of the region (code at 0x276d),
+    but table at 0x2781 is the same for any combinaison :
+      * ....??.. : "NICS CO. LTD. 1992" / "ALL RIGHTS RESERVED"
+
+
 TODO:
 -----
 - Find out how the hardware credit-counter works (MPU)
-- Verify dip switches
+- Fix MCU simulation errors :
+    * avoid credits to be increased when in "test mode" to avoid coin lockout
+      (needed to complete special test mode in 'extermatn' and 'arknoid2')
+    * why are credits limited to 9 in some games ?
+      pressing SERVICE1 allows to go up to 100 and cause this :
+        . 'plumppop' : freeze
+        . 'extrmatn' : reset
+        . 'arknoid2' : coin overflow
 - Fix video offsets (See Dr Toppel in Flip-Screen - also affects Chuka Taisen)
 - Video scroll side flicker in Chuka Taisen, Insector X, Dr Toppel, Kabuki Z
-- Sprite/background sync during scrolling, e.g. insectorx, kabukiz.
+- Sprite/background sync during scrolling, e.g. insectx, kabukiz.
 - Merge video driver with seta.c (it's the same thing but seta.c assumes a 16-bit CPU)
+- Figure out remaining unknown Dip Switches in 'plumppop' and 'jpopnics'
 
 Arkanoid 2:
   - What do writes at $f400 do ?
@@ -608,6 +979,7 @@ static ADDRESS_MAP_START( jpopnics_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xf003) AM_READ(arknoid2_sh_f000_r)
 ADDRESS_MAP_END
 
+
 #define COMMON_IN2\
 	PORT_START("IN2")\
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )\
@@ -629,38 +1001,95 @@ ADDRESS_MAP_END
 	PORT_BIT( 0x01, coinstate, IPT_COIN2 )\
 	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
 
-static INPUT_PORTS_START( extrmatn )
+
+static INPUT_PORTS_START( plumppop )
+	/* 0xb001 (CPU1) port 0 -> 0xef0e (shared RAM) */
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )               /* code at 0x6e99 - is it ever called ? */
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	TAITO_DSWA_BITS_1_TO_3
+	TAITO_COINAGE_JAPAN_OLD
+
+	/* 0xb001 (CPU1) port 1 -> 0xef0f (shared RAM) */
+	PORT_START("DSWB")
+	TAITO_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )            /* table at 0x2b86 */
+	PORT_DIPSETTING(    0x08, "50k 200k 150k+" )
+	PORT_DIPSETTING(    0x0c, "50k 250k 200k+" )
+	PORT_DIPSETTING(    0x04, "100k 300k 200k+" )
+	PORT_DIPSETTING(    0x00, "100k 400k 300k+" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )               /* code at 0x3dcc */
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Button 2 (Cheat)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Button 2 (Cheat)")    /* not working ? */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	COMMON_COIN1(IP_ACTIVE_HIGH)
+	COMMON_COIN2(IP_ACTIVE_HIGH)
+
+	PORT_START("AN1")		/* spinner 1 - read at f000/1 */
+	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START("AN2")		/* spinner 2 - read at f002/3 */
+	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2)
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( extrmatn )
+	/* 0xb001 (CPU1) port 0 -> 0xef0e (shared RAM) */
+	PORT_START("DSWA")
+	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
 	TAITO_COINAGE_JAPAN_OLD
 
+	/* 0xb001 (CPU1) port 1 -> 0xef0f (shared RAM) */
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	TAITO_DIFFICULTY
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0xc0, 0xc0, "Damage Multiplier" )
 	PORT_DIPSETTING(    0xc0, "*1" )
 	PORT_DIPSETTING(    0x80, "*1.5" )
@@ -678,39 +1107,27 @@ static INPUT_PORTS_START( extrmatn )
 	COMMON_COIN2(IP_ACTIVE_HIGH)
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( arknoid2 )
+	/* 0xb001 (CPU1) port 0 -> 0xe001 (shared RAM) */
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	TAITO_MACHINE_COCKTAIL
 	TAITO_COINAGE_WORLD
 
+	/* 0xb001 (CPU1) port 1 -> 0xe002 (shared RAM) */
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x00, "50k 150k" )
-	PORT_DIPSETTING(    0x0c, "100k 200k" )
-	PORT_DIPSETTING(    0x04, "50k Only" )
-	PORT_DIPSETTING(    0x08, "100k Only" )
+	TAITO_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )            /* table at 0x6f1e (W and J) or 0x6f1b (Romstar) */
+	PORT_DIPSETTING(    0x00, "50k 150k 150k+" )
+	PORT_DIPSETTING(    0x0c, "100k 200k 200k+" )
+	PORT_DIPSETTING(    0x04, "50k only" )
+	PORT_DIPSETTING(    0x08, "100k only" )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
@@ -751,187 +1168,28 @@ static INPUT_PORTS_START( arknid2u )
 	TAITO_COINAGE_JAPAN_OLD
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( plumppop )
-	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_OLD
-
-	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x08, "50k 150k" )
-	PORT_DIPSETTING(    0x0c, "70k 200k" )
-	PORT_DIPSETTING(    0x04, "100k 250k" )
-	PORT_DIPSETTING(    0x00, "200k 300k" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x20, "2" )
-	PORT_DIPSETTING(    0x30, "3" )
-	PORT_DIPSETTING(    0x10, "4" )
-	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
-
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Button 2 (Cheat)")// Cop out, I know, but I've never played this (EC)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Button 2 (Cheat)") PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	COMMON_COIN1(IP_ACTIVE_HIGH)
-	COMMON_COIN2(IP_ACTIVE_HIGH)
-
-	PORT_START("AN1")		/* spinner 1 - read at f000/1 */
-	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15)
-
-	PORT_START("AN2")		/* spinner 2 - read at f002/3 */
-	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2)
-INPUT_PORTS_END
-
-
-static INPUT_PORTS_START( jpopnics )
-	PORT_START("IN0")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("IN1")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Button 2 (Cheat)")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
-
-	PORT_START("IN2")
-	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P2 Button 2 (Cheat)") PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
-
- 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_OLD
-
-  	PORT_START("DSWB")
-  	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-  	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-  	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
-  	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-  	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-  	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-  	PORT_DIPSETTING(    0x08, "50k 150k" )
-  	PORT_DIPSETTING(    0x0c, "70k 200k" )
-  	PORT_DIPSETTING(    0x04, "100k 250k" )
-  	PORT_DIPSETTING(    0x00, "200k 300k" )
-  	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
-  	PORT_DIPSETTING(    0x20, "2" )
-  	PORT_DIPSETTING(    0x30, "3" )
-  	PORT_DIPSETTING(    0x10, "4" )
-  	PORT_DIPSETTING(    0x00, "5" )
-  	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-  	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-  	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-  	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
-  	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-  	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
-
-	PORT_START("COIN1")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("COIN2")
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("AN1")		/* spinner 1 - read at f000/1 */
-	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15)
-
-	PORT_START("AN2")		/* spinner 2 - read at f002/3 */
-	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2)
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( drtoppel )
+	/* 0xb001 (CPU1) port 0 -> 0xe042 (shared RAM) */
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	TAITO_MACHINE_COCKTAIL
 	TAITO_COINAGE_WORLD
 
+	/* 0xb001 (CPU1) port 1 -> 0xe043 (shared RAM) */
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x0c, "30000" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Unknown ) )
+	TAITO_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )            /* table at 0x256d (4 * 9 bytes) */
+	PORT_DIPSETTING(    0x0c, "30k 100k 200k 100k+" )            /* 30k  100k  200k  300k  400k  500k  600k  700k */
+	PORT_DIPSETTING(    0x00, "50k 100k 200k 200k+" )            /* 50k  100k  200k  400k  600k  800k 1000k 1200k */
+	PORT_DIPSETTING(    0x04, "30k 100k" )
+	PORT_DIPSETTING(    0x08, "30k only" )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x00, "5" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("IN0")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 1 )
@@ -951,42 +1209,71 @@ static INPUT_PORTS_START( drtopplu )
 	TAITO_COINAGE_JAPAN_OLD
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( chukatai )
+
+static INPUT_PORTS_START( kageki )
+	/* special (see kageki_csport_* handlers) -> 0xe03b (shared RAM) */
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	TAITO_MACHINE_NO_COCKTAIL                                    /* see notes */
+	TAITO_COINAGE_JAPAN_OLD
+
+	/* special (see kageki_csport_* handlers) -> 0xe03c (shared RAM) */
+	PORT_START("DSWB")
+	TAITO_DIFFICULTY
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
+
+	PORT_START("IN0")
+	TAITO_JOY_LRUD_2_BUTTONS_START( 1 )
+
+	PORT_START("IN1")
+	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( kagekij )
+	PORT_INCLUDE( kageki )
+
+	PORT_MODIFY("DSWA")
+	TAITO_MACHINE_COCKTAIL                                       /* see notes */
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( chukatai )
+	/* 0xb001 (CPU1) port 0 -> 0xe015 (shared RAM) */
+	PORT_START("DSWA")
+	TAITO_MACHINE_COCKTAIL
 	TAITO_COINAGE_WORLD
 
+	/* 0xb001 (CPU1) port 1 -> 0xe016 (shared RAM) */
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x08, "100k 300k 440k" )
-	PORT_DIPSETTING(    0x00, "100k 300k 500k" )
-	PORT_DIPSETTING(    0x0c, "100k 400k" )
-	PORT_DIPSETTING(    0x04, "100k 500k" )
+	TAITO_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )            /* tables : 1st at 0xb070 (bank = 0x02) and inc. at 0x09df */
+	PORT_DIPSETTING(    0x08, "40k 240k 200k+" )
+	PORT_DIPSETTING(    0x0c, "60k 360k 300k+" )
+	PORT_DIPSETTING(    0x04, "100k 500k 400k+" )
+	PORT_DIPSETTING(    0x00, "150k 650k 500k+" )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("IN0")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 1 )
@@ -1006,7 +1293,66 @@ static INPUT_PORTS_START( chukatau )
 	TAITO_COINAGE_JAPAN_OLD
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( tnzs )
+	/* 0xb002 (CPU1) -> 0xef0e (shared RAM) */
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x08, 0x08, "Invulnerability (Debug)" )        // see notes
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	TAITO_COINAGE_WORLD
+
+	/* 0xb003 (CPU1) -> 0xef0f (shared RAM) */
+	PORT_START("DSWB")
+	TAITO_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )            /* table at 0x09c84 */
+	PORT_DIPSETTING(    0x00, "50k 150k 150k+" )
+	PORT_DIPSETTING(    0x0c, "70k 200k 200k+" )
+	PORT_DIPSETTING(    0x04, "100k 250k 250k+" )
+	PORT_DIPSETTING(    0x08, "200k 300k 300k+" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x00, "4" )
+	PORT_DIPSETTING(    0x10, "5" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START("IN0")
+	TAITO_JOY_LRUD_2_BUTTONS_START( 1 )
+
+	PORT_START("IN1")
+	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tnzsj )
+	PORT_INCLUDE( tnzs )
+
+	PORT_MODIFY("DSWA")
+	TAITO_COINAGE_JAPAN_OLD
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( tnzsjo )
+	/* 0xb001 (CPU1) port 0 -> 0xef0e (shared RAM) */
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
@@ -1020,17 +1366,14 @@ static INPUT_PORTS_START( tnzs )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	TAITO_COINAGE_JAPAN_OLD
 
+	/* 0xb001 (CPU1) port 1 -> 0xef0f (shared RAM) */
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x00, "50000 150000" )
-	PORT_DIPSETTING(    0x0c, "70000 200000" )
-	PORT_DIPSETTING(    0x04, "100000 250000" )
-	PORT_DIPSETTING(    0x08, "200000 300000" )
+	TAITO_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )            /* table at 0x09caf */
+	PORT_DIPSETTING(    0x00, "50k 150k 150k+" )
+	PORT_DIPSETTING(    0x0c, "70k 200k 200k+" )
+	PORT_DIPSETTING(    0x04, "100k 250k 250k+" )
+	PORT_DIPSETTING(    0x08, "200k 300k 300k+" )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x20, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
@@ -1039,9 +1382,7 @@ static INPUT_PORTS_START( tnzs )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("IN0")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 1 )
@@ -1054,101 +1395,45 @@ static INPUT_PORTS_START( tnzs )
 	COMMON_COIN2(IP_ACTIVE_LOW)
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( tnzsb )
-	PORT_INCLUDE( tnzs )
+static INPUT_PORTS_START( tnzso )
+	PORT_INCLUDE( tnzsjo )
 
 	PORT_MODIFY("DSWA")
-	TAITO_COINAGE_WORLD
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2)
-
-	PORT_MODIFY("IN2")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-
-	PORT_MODIFY("COIN1")	/* not present in the bootleg */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_MODIFY("COIN2")	/* not present in the bootleg */
-	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
-INPUT_PORTS_END
-
-static INPUT_PORTS_START( tnzs2 )
-	PORT_INCLUDE( tnzs )
-
-	PORT_MODIFY("DSWA")
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )                        /* value read at 0x356b but not tested nor stored elsewhere */
 	TAITO_COINAGE_WORLD
 
 	PORT_MODIFY("DSWB")
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x00, "10000 100000" )
-	PORT_DIPSETTING(    0x0c, "10000 150000" )
-	PORT_DIPSETTING(    0x08, "10000 200000" )
-	PORT_DIPSETTING(    0x04, "10000 300000" )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )            /* table at 0x09afb */
+	PORT_DIPSETTING(    0x00, "10k 100k 100k+" )
+	PORT_DIPSETTING(    0x0c, "10k 150k 150k+" )
+	PORT_DIPSETTING(    0x04, "10k 200k 200k+" )
+	PORT_DIPSETTING(    0x08, "10k 300k 300k+" )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( kabukiz )
+	/* 0xb002 (CPU1) */
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	TAITO_MACHINE_COCKTAIL
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
+	/* 0xb003 (CPU1) */
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_OLD
+	TAITO_DIFFICULTY
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
+	TAITO_COINAGE_WORLD
 
 	PORT_START("IN0")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 1 )
 
 	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2)
+	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
@@ -1159,45 +1444,41 @@ static INPUT_PORTS_START( kabukiz )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( kabukizj )
+	PORT_INCLUDE( kabukiz )
+
+	PORT_MODIFY("DSWB")
+	TAITO_COINAGE_JAPAN_OLD
+INPUT_PORTS_END
+
+
 static INPUT_PORTS_START( insectx )
+	/* 0xb001 (CPU1) port 0 -> 0xec06 (shared RAM) */
 	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
+	TAITO_MACHINE_COCKTAIL
 	TAITO_COINAGE_WORLD
 
+	/* 0xb001 (CPU1) port 1 -> 0xec07 (shared RAM) */
 	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )            /* see notes */
+	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x08, "100k 200k 300k 440k" )
-	PORT_DIPSETTING(    0x0c, "100k 400k" )
-	PORT_DIPSETTING(    0x04, "100k 500k" )
-	PORT_DIPSETTING(    0x00, "150000 Only" )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )            /* code at 0xaacc - bank = 0x02 */
+	PORT_DIPSETTING(    0x08, "40k 240k 200k+" )
+	PORT_DIPSETTING(    0x0c, "60k 360k 300k+" )
+	PORT_DIPSETTING(    0x04, "100k 500k 400k+" )
+	PORT_DIPSETTING(    0x00, "150k 650k 500k+" )
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x10, "2" )
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("IN0")
 	TAITO_JOY_LRUD_2_BUTTONS_START( 1 )
@@ -1216,61 +1497,69 @@ static INPUT_PORTS_START( insectx )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( kageki )
-	PORT_START("DSWA")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	TAITO_COINAGE_JAPAN_OLD
 
-	PORT_START("DSWB")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Medium ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+static INPUT_PORTS_START( jpopnics )
+	/* 0xc600 (CPU1) -> 0xef0e (shared RAM) */
+ 	PORT_START("DSWA")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )               /* code at 0x6e99 - is it ever called ? */
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	TAITO_DSWA_BITS_1_TO_3
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )                        /* see notes */
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )                        /* see notes */
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )                        /* see notes */
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )                        /* see notes */
+
+	/* 0xc601 (CPU1) -> 0xef0f (shared RAM) */
+  	PORT_START("DSWB")
+	TAITO_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )            /* table at 0x2b86 */
+	PORT_DIPSETTING(    0x08, "50k 200k 150k+" )
+	PORT_DIPSETTING(    0x0c, "50k 250k 200k+" )
+	PORT_DIPSETTING(    0x04, "100k 300k 200k+" )
+	PORT_DIPSETTING(    0x00, "100k 400k 300k+" )
+  	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+  	PORT_DIPSETTING(    0x20, "2" )
+  	PORT_DIPSETTING(    0x30, "3" )
+  	PORT_DIPSETTING(    0x10, "4" )
+  	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )               /* code at 0x3dcc */
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
+  	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Allow_Continue ) )
+  	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+  	PORT_DIPSETTING(    0x80, DEF_STR( Yes ) )
 
 	PORT_START("IN0")
-	TAITO_JOY_LRUD_2_BUTTONS_START( 1 )
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
-	TAITO_JOY_LRUD_2_BUTTONS_START( 2 )
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Button 2 (Cheat)")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
 
 	PORT_START("IN2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Button 2 (Cheat)")    /* not working ? */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("COIN1")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("COIN2")
+	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("AN1")		/* spinner 1 - read at f000/1 */
+	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START("AN2")		/* spinner 2 - read at f002/3 */
+	PORT_BIT( 0xffff, 0x0000, IPT_DIAL ) PORT_SENSITIVITY(70) PORT_KEYDELTA(15) PORT_PLAYER(2)
 INPUT_PORTS_END
+
 
 static const gfx_layout tnzs_charlayout =
 {
@@ -1998,9 +2287,9 @@ ROM_END
     supported because it appears to be a different code revision to the other supported sets
 */
 
-ROM_START( kagekia )
+ROM_START( kagekih )
 	ROM_REGION( 0x30000, "main", 0 )
-	ROM_LOAD( "b35_16.11c", 0x00000, 0x08000, CRC(1cf67603) SHA1(0627285ac69e44312d7694c64b96a81489d8663c) )	/* World? (hacked) ver */
+	ROM_LOAD( "b35_16.11c", 0x00000, 0x08000, CRC(1cf67603) SHA1(0627285ac69e44312d7694c64b96a81489d8663c) )	/* hacked ver */
 	ROM_CONTINUE(           0x18000, 0x08000 )
 	ROM_LOAD( "b35-10.9c",  0x20000, 0x10000, CRC(b150457d) SHA1(a58e46e7dfdc93c2cc7c04d623d7754f85ba693b) )
 
@@ -2232,7 +2521,7 @@ ROM_START( tnzs )
 	ROM_LOAD( "b53-21.1",	0xe0000, 0x20000, CRC(9800c54d) SHA1(761647177d621ac2cdd8b009876eed35809f3c92) )
 ROM_END
 
-ROM_START( tnzsjn )
+ROM_START( tnzsj )
 	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b53-24.1",   0x00000, 0x08000, CRC(d66824c6) SHA1(fd381ac0dc52ce670c3fde320ea60a209e288a52) )
 	ROM_CONTINUE(           0x18000, 0x18000 )		/* banked at 8000-bfff */
@@ -2257,7 +2546,7 @@ ROM_END
 
 /* tnzs - old style PCB sets */
 
-ROM_START( tnzsj )
+ROM_START( tnzsjo )
 	ROM_REGION( 0x30000, "main", 0 )	/* 64k + bankswitch areas for the first CPU */
 	ROM_LOAD( "b53-10.32", 0x00000, 0x08000, CRC(a73745c6) SHA1(73eb38e75e08312d752332f988dc655084b4a86d) )
 	ROM_CONTINUE(          0x18000, 0x18000 )		/* banked at 8000-bfff */
@@ -2308,7 +2597,7 @@ ROM_END
 Kabuki Z
 Taito, 1988
 
-This PCB runs on Taito/Seta hardware and the exact same PCB as The New Zealand Story.
+This PCB runs on Taito/Seta hardware and the exact same newer PCB as The New Zealand Story.
 As such, everything here also applies to The New Zealand Story.
 
 PCB Layout
@@ -2415,17 +2704,16 @@ GAME( 1987, drtoppel, 0,        drtoppel, drtoppel, drtoppel, ROT90,  "Taito Cor
 GAME( 1987, drtopplu, drtoppel, drtoppel, drtopplu, drtoppel, ROT90,  "Taito America Corporation", "Dr. Toppel's Adventure (US)", 0 ) /* Possible region hack */
 GAME( 1987, drtopplj, drtoppel, drtoppel, drtopplu, drtoppel, ROT90,  "Taito Corporation", "Dr. Toppel's Tankentai (Japan)", 0 )
 GAME( 1988, kageki,   0,        kageki,   kageki,   kageki,   ROT90,  "Taito America Corporation (Romstar license)", "Kageki (US)", 0 )
-GAME( 1988, kagekij,  kageki,   kageki,   kageki,   kageki,   ROT90,  "Taito Corporation", "Kageki (Japan)", 0 )
-GAME( 1992, kagekia,  kageki,   kageki,   kageki,   kageki,   ROT90,  "Taito Corporation", "Kageki (World?, hack)", 0 ) // date is hacked at least, might also be a Japan set hacked to show english
+GAME( 1988, kagekij,  kageki,   kageki,   kagekij,  kageki,   ROT90,  "Taito Corporation", "Kageki (Japan)", 0 )
+GAME( 1992, kagekih,  kageki,   kageki,   kageki,   kageki,   ROT90,  "Taito Corporation", "Kageki (hack)", 0 ) // date is hacked at least, might also be a Japan set hacked to show english
 GAME( 1988, chukatai, 0,        tnzs,     chukatai, chukatai, ROT0,   "Taito Corporation Japan", "Chuka Taisen (World)", 0 ) /* Possible region hack */
 GAME( 1988, chukatau, chukatai, tnzs,     chukatau, chukatai, ROT0,   "Taito America Corporation", "Chuka Taisen (US)", 0 ) /* Possible region hack */
 GAME( 1988, chukataj, chukatai, tnzs,     chukatau, chukatai, ROT0,   "Taito Corporation", "Chuka Taisen (Japan)", 0 )
-GAME( 1988, tnzs,     0,        tnzsb,    tnzsb,    tnzsb,    ROT0,   "Taito Corporation Japan", "The NewZealand Story (World, newer) (newer PCB)", 0 )
-GAME( 1988, tnzsjn,   tnzs,     tnzsb,    tnzsb,    tnzsb,    ROT0,   "Taito Corporation", "The NewZealand Story (Japan) (newer PCB)", 0 )
-GAME( 1988, tnzsj,    tnzs,     tnzs,     tnzs,     tnzs,     ROT0,   "Taito Corporation", "The NewZealand Story (Japan) (older PCB)", 0 )
-GAME( 1988, tnzso,    tnzs,     tnzs,     tnzs2,    tnzs,     ROT0,   "Taito Corporation Japan", "The NewZealand Story (World, older) (older PCB)", 0 )
+GAME( 1988, tnzs,     0,        tnzsb,    tnzs,     tnzsb,    ROT0,   "Taito Corporation Japan", "The NewZealand Story (World, new version) (newer PCB)", 0 )
+GAME( 1988, tnzsj,    tnzs,     tnzsb,    tnzsj,    tnzsb,    ROT0,   "Taito Corporation", "The NewZealand Story (Japan, new version) (newer PCB)", 0 )
+GAME( 1988, tnzsjo,   tnzs,     tnzs,     tnzsjo,   tnzs,     ROT0,   "Taito Corporation", "The NewZealand Story (Japan, old version) (older PCB)", 0 )
+GAME( 1988, tnzso,    tnzs,     tnzs,     tnzso,    tnzs,     ROT0,   "Taito Corporation Japan", "The NewZealand Story (World, prototype?) (older PCB)", 0 )
 GAME( 1988, kabukiz,  0,        kabukiz,  kabukiz,  kabukiz,  ROT0,   "Taito Corporation Japan", "Kabuki-Z (World)", 0 )
-GAME( 1988, kabukizj, kabukiz,  kabukiz,  kabukiz,  kabukiz,  ROT0,   "Taito Corporation", "Kabuki-Z (Japan)", 0 )
+GAME( 1988, kabukizj, kabukiz,  kabukiz,  kabukizj, kabukiz,  ROT0,   "Taito Corporation", "Kabuki-Z (Japan)", 0 )
 GAME( 1989, insectx,  0,        insectx,  insectx,  insectx,  ROT0,   "Taito Corporation Japan", "Insector X (World)", 0 )
 GAME( 1992, jpopnics, 0,        jpopnics, jpopnics, 0,        ROT0,   "Nics", "Jumping Pop (Nics, Korean bootleg of Plump Pop)", GAME_IMPERFECT_GRAPHICS )
-
