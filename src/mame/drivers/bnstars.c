@@ -490,10 +490,12 @@ static VIDEO_START(bnstars)
 
 static VIDEO_UPDATE(bnstars)
 {
+	const device_config *left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
+	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
 
 	fillbitmap(priority_bitmap,0,cliprect);
 
-	if (screen==0)
+	if (screen==left_screen)
 	{
 		fillbitmap(bitmap,0,cliprect);	/* bg color */
 
@@ -511,7 +513,7 @@ static VIDEO_UPDATE(bnstars)
 
 		draw_sprites(screen->machine,bitmap,cliprect, ms32_spram, 0x20000, 0);
 	}
-	else
+	else if (screen == right_screen)
 	{
 		fillbitmap(bitmap,0x8000+0,cliprect);	/* bg color */
 
