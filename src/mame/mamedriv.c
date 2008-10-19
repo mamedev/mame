@@ -2069,28 +2069,30 @@ const game_driver * const drivers[] =
 	DRIVER( ktiger )	/* B30 / TP-011 (c) 1987 Taito Corporation (Japan) */
 	DRIVER( gulfwar2 )	/* (c) 1991 Comad */
 
-	DRIVER( rallybik )	/* B45 / TP-012 (c) 1988 Taito */
-	DRIVER( truxton )	/* B65 / TP-013B (c) 1988 Taito */
+	DRIVER( rallybik )	/* B45 / TP-O12 (c) 1988 Taito */
+	DRIVER( truxton )	/* B65 / TP-O13B (c) 1988 Taito */
 	DRIVER( hellfire )	/* B90 / TP-??? (c) 1989 Toaplan + Taito license */
 	DRIVER( hellfir1 )	/* B90 / TP-??? (c) 1989 Toaplan + Taito license */
 	DRIVER( hellfir2 )	/* B90 / TP-??? (c) 1989 Toaplan + Taito license */
-	DRIVER( zerowing )	/* TP-015 (c) 1989 Toaplan */
-	DRIVER( zerowng2 )	/* TP-015 (c) 1989 Toaplan */
-	DRIVER( demonwld )	/* TP-016 (c) 1990 Toaplan (+ Taito license when set to Japan) */
-	DRIVER( demonwl1 )	/* TP-016 (c) 1989 Toaplan + Taito license */
-	DRIVER( demonwl2 )	/* TP-016 (c) 1989 Toaplan */
-	DRIVER( demonwl3 )	/* TP-016 (c) 1989 Toaplan */
-	DRIVER( demonwl4 )	/* TP-016 (c) 1989 Toaplan */
-	DRIVER( fireshrk )	/* TP-017 (c) 1990 Toaplan */
-	DRIVER( samesame )	/* TP-017 (c) 1989 Toaplan */
-	DRIVER( samesam2 )	/* TP-017 (c) 1989 Toaplan */
-	DRIVER( outzone )	/* TP-018 (c) 1990 Toaplan */
-	DRIVER( outzonea )	/* TP-018 (c) 1990 Toaplan */
-	DRIVER( outzoneb )	/* TP-018 (c) 1990 Toaplan */
-	DRIVER( outzonec )	/* TP-018 (c) 1990 Toaplan */
-	DRIVER( vimana )	/* TP-019 (c) 1991 Toaplan (+ Tecmo license when set to Japan) */
-	DRIVER( vimana1 )	/* TP-019 (c) 1991 Toaplan (+ Tecmo license when set to Japan)  */
-	DRIVER( vimanan )	/* TP-019 (c) 1991 Toaplan (+ Nova Apparate GMBH & Co license) */
+	DRIVER( zerowing )	/* TP-O15 (c) 1989 Toaplan */
+	DRIVER( zerowng2 )	/* TP-O15 (c) 1989 Toaplan */
+	DRIVER( demonwld )	/* TP-O16 (c) 1990 Toaplan (+ Taito license when set to Japan) */
+	DRIVER( demonwl1 )	/* TP-O16 (c) 1989 Toaplan + Taito license */
+	DRIVER( demonwl2 )	/* TP-O16 (c) 1989 Toaplan */
+	DRIVER( demonwl3 )	/* TP-O16 (c) 1989 Toaplan */
+	DRIVER( demonwl4 )	/* TP-O16 (c) 1989 Toaplan */
+	DRIVER( fireshrk )	/* TP-O17 (c) 1990 Toaplan */
+	DRIVER( fireshd )	/* TP-O17 (c) 1990 Toaplan */
+	DRIVER( fireshdh )	/* TP-O17 (c) 1990 Toaplan */
+	DRIVER( samesame )	/* TP-O17 (c) 1989 Toaplan */
+	DRIVER( samesam2 )	/* TP-O17 (c) 1989 Toaplan */
+	DRIVER( outzone )	/* TP-O18 (c) 1990 Toaplan */
+	DRIVER( outzonea )	/* TP-O18 (c) 1990 Toaplan */
+	DRIVER( outzoneb )	/* TP-O18 (c) 1990 Toaplan */
+	DRIVER( outzonec )	/* TP-O18 (c) 1990 Toaplan */
+	DRIVER( vimana )	/* TP-O19 (c) 1991 Toaplan (+ Tecmo license when set to Japan) */
+	DRIVER( vimana1 )	/* TP-O19 (c) 1991 Toaplan (+ Tecmo license when set to Japan)  */
+	DRIVER( vimanan )	/* TP-O19 (c) 1991 Toaplan (+ Nova Apparate GMBH & Co license) */
 	DRIVER( snowbros )	/* MIN16-02 (c) 1990 Toaplan + Romstar license */
 	DRIVER( snowbroa )	/* MIN16-02 (c) 1990 Toaplan + Romstar license */
 	DRIVER( snowbrob )	/* MIN16-02 (c) 1990 Toaplan + Romstar license */
