@@ -1539,7 +1539,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/comebaby.o \
 	$(DRIVERS)/coolpool.o \
 	$(DRIVERS)/cowrace.o \
-	$(DRIVERS)/crystal.o $(VIDEO)/vrender0.o \
+	$(DRIVERS)/crystal.o $(DRIVERS)/psattack.o $(VIDEO)/vrender0.o \
 	$(DRIVERS)/cubeqst.o \
 	$(DRIVERS)/cybertnk.o \
 	$(DRIVERS)/dcheese.o $(VIDEO)/dcheese.o \

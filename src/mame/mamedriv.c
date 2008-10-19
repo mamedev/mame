@@ -7618,6 +7618,8 @@ Other Sun games
 	DRIVER( topbladv )	/* 2002 Sonokong. Top Blade V */
 	DRIVER( officeye )
 
+	DRIVER( psattack )	/* 2004 Uniana */
+
 	/* Bell Fruit Cobra Hardware */
 	DRIVER( inquiztr )	/* 1989 BFM */
 	DRIVER( escounts )	/* 1990 BFM */

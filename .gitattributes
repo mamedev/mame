@@ -1841,6 +1841,7 @@ src/mame/drivers/powerins.c svneol=native#text/plain
 src/mame/drivers/ppmast93.c svneol=native#text/plain
 src/mame/drivers/prehisle.c svneol=native#text/plain
 src/mame/drivers/progolf.c svneol=native#text/plain
+src/mame/drivers/psattack.c svneol=native#text/plain
 src/mame/drivers/psikyo.c svneol=native#text/plain
 src/mame/drivers/psikyo4.c svneol=native#text/plain
 src/mame/drivers/psikyosh.c svneol=native#text/plain
