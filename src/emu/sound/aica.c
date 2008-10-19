@@ -40,7 +40,7 @@
 #define LPCTL(slot)		((slot->udata.data[0x0]>>0x9)&0x0001)
 #define PCMS(slot)		((slot->udata.data[0x0]>>0x7)&0x0003)
 
-#define SA(slot)		(((slot->udata.data[0x0]&0x3F)<<16)|(slot->udata.data[0x4/2]))
+#define SA(slot)		(((slot->udata.data[0x0]&0x7F)<<16)|(slot->udata.data[0x4/2]))
 
 #define LSA(slot)		(slot->udata.data[0x8/2])
 
