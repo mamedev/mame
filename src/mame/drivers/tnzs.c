@@ -422,6 +422,9 @@ TODO:
 - Sprite/background sync during scrolling, e.g. insectx, kabukiz.
 - Merge video driver with seta.c (it's the same thing but seta.c assumes a 16-bit CPU)
 - Figure out remaining unknown Dip Switches in 'plumppop' and 'jpopnics'
+- Get rid of the COMMON_* macros to use generic INPUT_PORTS definition
+  and PORT_INCLUDE macro by changing the ym2203_config definition
+
 
 Arkanoid 2:
   - What do writes at $f400 do ?
@@ -940,18 +943,6 @@ static ADDRESS_MAP_START( jpopnics_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_RAM_WRITE(jpopnics_palette_w) AM_BASE(&paletteram)
 ADDRESS_MAP_END
 
-#ifdef UNUSED_FUNCTION
-READ8_HANDLER( moo_r )
-{
-	return mame_rand(machine);
-}
-
-READ8_HANDLER( bbb_r )
-{
-	return 0xff;
-}
-#endif
-
 static WRITE8_HANDLER( jpopnics_subbankswitch_w )
 {
 	UINT8 *RAM = memory_region(machine, "sub");
@@ -959,7 +950,6 @@ static WRITE8_HANDLER( jpopnics_subbankswitch_w )
 	/* bits 0-1 select ROM bank */
 	memory_set_bankptr (2, &RAM[0x10000 + 0x2000 * (data & 3)]);
 }
-
 
 static ADDRESS_MAP_START( jpopnics_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -1535,7 +1525,6 @@ static INPUT_PORTS_START( jpopnics )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Button 2 (Cheat)")
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
