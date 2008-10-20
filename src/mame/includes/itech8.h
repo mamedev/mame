@@ -38,6 +38,11 @@ WRITE8_HANDLER( itech8_blitter_w );
 WRITE8_HANDLER( itech8_tms34061_w );
 READ8_HANDLER( itech8_tms34061_r );
 
+WRITE8_HANDLER( grmatch_palette_w );
+WRITE8_HANDLER( grmatch_xscroll_w );
+TIMER_DEVICE_CALLBACK( grmatch_palette_update );
+
 VIDEO_UPDATE( itech8_2layer );
+VIDEO_UPDATE( itech8_grmatch );
 VIDEO_UPDATE( itech8_2page );
 VIDEO_UPDATE( itech8_2page_large );

@@ -86,6 +86,8 @@ void tms34061_start(running_machine *machine, const struct tms34061_interface *i
 	/* allocate memory for VRAM */
 	tms34061.vram = auto_malloc(tms34061.intf.vramsize + 256 * 2);
 	memset(tms34061.vram, 0, tms34061.intf.vramsize + 256 * 2);
+	/* not really a save state, just there for debugging purposes */
+	state_save_register_global_pointer(tms34061.vram, tms34061.intf.vramsize);
 
 	/* allocate memory for latch RAM */
 	tms34061.latchram = auto_malloc(tms34061.intf.vramsize + 256 * 2);
@@ -369,6 +371,7 @@ static void xypixel_w(int offset, UINT8 data)
 
 	/* mask to the VRAM size */
 	pixeloffs &= tms34061.vrammask;
+	if (VERBOSE) logerror("%04X:tms34061 xy (%04x) = %02x/%02x\n", activecpu_get_pc(), pixeloffs, data, tms34061.latchdata);
 
 	/* set the pixel data */
 	tms34061.vram[pixeloffs] = data;
@@ -424,6 +427,7 @@ void tms34061_w(int col, int row, int func, UINT8 data)
 			offs = ((row << tms34061.intf.rowshift) | col) & tms34061.vrammask;
 			if (tms34061.regs[TMS34061_CONTROL2] & 0x0040)
 				offs |= (tms34061.regs[TMS34061_CONTROL2] & 3) << 16;
+			if (VERBOSE) logerror("%04X:tms34061 direct (%04x) = %02x/%02x\n", activecpu_get_pc(), offs, data, tms34061.latchdata);
 			if (tms34061.vram[offs] != data || tms34061.latchram[offs] != tms34061.latchdata)
 			{
 				tms34061.vram[offs] = data;
@@ -437,6 +441,7 @@ void tms34061_w(int col, int row, int func, UINT8 data)
 			if (tms34061.regs[TMS34061_CONTROL2] & 0x0040)
 				offs |= (tms34061.regs[TMS34061_CONTROL2] & 3) << 16;
 			offs &= tms34061.vrammask;
+			if (VERBOSE) logerror("%04X:tms34061 shiftreg write (%04x)\n", activecpu_get_pc(), offs);
 
 			memcpy(&tms34061.vram[offs], tms34061.shiftreg, (size_t)1 << tms34061.intf.rowshift);
 			memset(&tms34061.latchram[offs], tms34061.latchdata, (size_t)1 << tms34061.intf.rowshift);
@@ -448,6 +453,7 @@ void tms34061_w(int col, int row, int func, UINT8 data)
 			if (tms34061.regs[TMS34061_CONTROL2] & 0x0040)
 				offs |= (tms34061.regs[TMS34061_CONTROL2] & 3) << 16;
 			offs &= tms34061.vrammask;
+			if (VERBOSE) logerror("%04X:tms34061 shiftreg read (%04x)\n", activecpu_get_pc(), offs);
 
 			tms34061.shiftreg = &tms34061.vram[offs];
 			break;
