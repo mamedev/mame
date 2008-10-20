@@ -112,6 +112,7 @@ Few words about protection:
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
+#include "sound/2203intf.h"
 
 static UINT16 *mcu_shared_ram;
 static UINT16 *sc3_vram,*sc0_vram;
@@ -332,13 +333,21 @@ f5010->mirror for inputs player 2
 	}
 }
 
+static WRITE16_HANDLER( YM2203_w )
+{
+	switch (offset) {
+	case 0: ym2203_control_port_0_w(machine,0,data & 0xff); break;
+	case 1: ym2203_write_port_0_w(machine,0,data & 0xff); break;
+	}
+}
+
 static ADDRESS_MAP_START( ddealer, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x080001) AM_READ_PORT("IN0")
 	AM_RANGE(0x080002, 0x080003) AM_READ_PORT("IN1")
 	AM_RANGE(0x080008, 0x080009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x08000a, 0x08000b) AM_READ_PORT("UNK")
-	AM_RANGE(0x084000, 0x084003) AM_RAM // ym ?
+	AM_RANGE(0x084000, 0x084003) AM_WRITE( YM2203_w ) // ym ?
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16) // palette ram
 	AM_RANGE(0x08c000, 0x08cfff) AM_RAM_WRITE(ddealer_vregs_w) AM_BASE(&ddealer_vregs) // palette ram
 	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(sc0_vram_w) AM_BASE(&sc0_vram) // bg tilemap
@@ -348,7 +357,6 @@ static ADDRESS_MAP_START( ddealer, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0ff000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
 
-/*copied from hachamf*/
 static INPUT_PORTS_START( ddealer )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
@@ -379,53 +387,55 @@ static INPUT_PORTS_START( ddealer )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x0100, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x0200, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x0300, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x0700, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x0600, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x0500, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x0400, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x3800, 0x3800, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x0800, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x1000, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x1800, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x3800, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x3000, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x2800, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x2000, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Language ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Japanese ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x40, "2" )
-	PORT_DIPSETTING(    0xc0, "3" )
-	PORT_DIPSETTING(    0x80, "4" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Language ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Japanese ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( English ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
 	PORT_START("UNK")
 INPUT_PORTS_END
@@ -473,7 +483,7 @@ static MACHINE_DRIVER_START( ddealer )
 	MDRV_CPU_ADD("main" , M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(ddealer,0)
 	MDRV_CPU_VBLANK_INT("main", ddealer_interrupt)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 112)
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 90)//guess,controls music tempo,112 is way too fast
 
 	MDRV_GFXDECODE(ddealer)
 
@@ -492,6 +502,8 @@ static MACHINE_DRIVER_START( ddealer )
 	MDRV_VIDEO_UPDATE(ddealer)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("ym", YM2203, 6000000 / 4)//guess
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_DRIVER_END
 
 
@@ -553,5 +565,5 @@ ROM_START( ddealer )
 	ROM_LOAD( "6.ic86", 0x100, 0x100, NO_DUMP )
 ROM_END
 
-GAME( 1991, ddealer,  0, ddealer, ddealer, ddealer,  ROT0, "NMK", "Double Dealer", GAME_NOT_WORKING | GAME_NO_SOUND)
+GAME( 1991, ddealer,  0, ddealer, ddealer, ddealer,  ROT0, "NMK", "Double Dealer", GAME_NOT_WORKING )
 
