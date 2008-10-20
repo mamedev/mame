@@ -2410,7 +2410,7 @@ static void scanline_draw(running_machine *machine, bitmap_t *bitmap, const rect
 				{
 					if(alpha_type==1)
 					{
-						if     (f3_alpha_level_2as==0   && f3_alpha_level_2ad==255) alpha_mode[i]=0;
+						if     (f3_alpha_level_2as==0   && f3_alpha_level_2ad==255) { alpha_mode[i]=3; alpha_mode_flag[i] |= 0x80;} 
 						else if(f3_alpha_level_2as==255 && f3_alpha_level_2ad==0  ) alpha_mode[i]=1;
 					}
 					else if(alpha_type==2)

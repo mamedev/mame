@@ -78,7 +78,7 @@ static READ8_HANDLER(unk_r)
 {
 	static int var=0;
 	var^=0x10;
-	printf("var %d\n",var);
+	//printf("var %d\n",var);
 	return var;
 }
 
@@ -194,9 +194,10 @@ static PALETTE_INIT(cardline)
 static MACHINE_DRIVER_START( cardline )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", I8051,12000000)
+	MDRV_CPU_ADD("main", I80C32,12000000)
 	MDRV_CPU_PROGRAM_MAP(mem_prg,0)
 	MDRV_CPU_IO_MAP(mem_io,0)
+	//MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)

@@ -73,6 +73,12 @@ enum
 extern void i8051_set_serial_tx_callback(void (*callback)(int data));
 extern void i8051_set_serial_rx_callback(int (*callback)(void));
 
+/* variants with no internal rom and 128 byte internal memory */
+void i8031_get_info(UINT32 state, cpuinfo *info);
+
+/* variants with no internal rom and 256 byte internal memory */
+void i8032_get_info(UINT32 state, cpuinfo *info);
+
 /* variants 4k internal rom and 128 byte internal memory */
 void i8051_get_info(UINT32 state, cpuinfo *info);
 void i8751_get_info(UINT32 state, cpuinfo *info);
@@ -80,6 +86,17 @@ void i8751_get_info(UINT32 state, cpuinfo *info);
 /* variants 8k internal rom and 256 byte internal memory and more registers */
 void i8052_get_info(UINT32 state, cpuinfo *info);
 void i8752_get_info(UINT32 state, cpuinfo *info);
+
+/* cmos variants */
+void i80c31_get_info(UINT32 state, cpuinfo *info);
+void i80c32_get_info(UINT32 state, cpuinfo *info);
+void i80c51_get_info(UINT32 state, cpuinfo *info);
+void i80c52_get_info(UINT32 state, cpuinfo *info);
+void i87c51_get_info(UINT32 state, cpuinfo *info);
+void i87c52_get_info(UINT32 state, cpuinfo *info);
+
+/* 4k internal perom and 128 internal ram and 2 analog comparators */
+void at89c4051_get_info(UINT32 state, cpuinfo *info);
 
 /****************************************************************************
  * Disassembler

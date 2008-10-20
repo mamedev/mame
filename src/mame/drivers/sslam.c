@@ -395,7 +395,7 @@ static WRITE16_HANDLER( sslam_snd_w )
 static WRITE16_HANDLER( powerbls_sound_w )
 {
 	soundlatch_w(machine,0,data & 0xff);
-	cpunum_set_input_line(machine, 1,I8051_INT1_LINE,PULSE_LINE);
+	cpunum_set_input_line(machine, 1,I8051_INT1_LINE,HOLD_LINE);
 }
 
 /* Memory Maps */
@@ -488,10 +488,6 @@ static WRITE8_HANDLER( playmark_snd_control_w )
 //  !(data & 0x80) -> sound enable
 //   (data & 0x40) -> always set
 }
-
-static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
-ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(MCS51_PORT_P1, MCS51_PORT_P1) AM_WRITE(playmark_snd_control_w)
@@ -734,7 +730,6 @@ static MACHINE_DRIVER_START( sslam )
 
 	MDRV_CPU_ADD("audio", I8051, 12000000)
 	MDRV_CPU_FLAGS(CPU_DISABLE)		/* Internal code is not dumped - 2 boards were protected */
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -765,8 +760,7 @@ static MACHINE_DRIVER_START( powerbls )
 	MDRV_CPU_PROGRAM_MAP(powerbls_map, 0)
 	MDRV_CPU_VBLANK_INT("main", irq2_line_hold)
 
-	MDRV_CPU_ADD("audio", I8051, 12000000)
-	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_ADD("audio", I80C51, 12000000)		/* 83C751 */
 	MDRV_CPU_IO_MAP(sound_io_map,0)
 
 	/* video hardware */

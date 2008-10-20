@@ -485,10 +485,6 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
@@ -1032,7 +1028,6 @@ static MACHINE_DRIVER_START( sharrier )
 	MDRV_IMPORT_FROM(sound_board_2203)
 
 	MDRV_CPU_ADD("mcu", I8751, 8000000)
-	MDRV_CPU_PROGRAM_MAP(mcu_map,0)
 	MDRV_CPU_IO_MAP(mcu_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_pulse)
 MACHINE_DRIVER_END

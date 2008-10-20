@@ -10,6 +10,7 @@
   TODO:
   - add flipscreen according to schematics
   - pitboss: dip switches
+  - casino5: seems to have 0x2000 ram, with 0x2000, will keep resetting.
   - general - add named output notifiers
 
 Notes: it's important that "user1" is 0xa0000 bytes with empty space filled
@@ -287,6 +288,7 @@ static WRITE8_DEVICE_HANDLER( misc_w )
 	/* other bits unknown */
 }
 
+
 static ADDRESS_MAP_START( pitboss_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
@@ -303,7 +305,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigappg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0xa000, 0xafff) AM_RAM
+	AM_RANGE(0xa000, 0xbfff) AM_RAM
 	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
@@ -313,6 +315,10 @@ static ADDRESS_MAP_START( bigappg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
+/* Address decoding is done by prom u13 on crt200a hardware. It decodes
+ * the following addr lines: 2,3,9,13,14,15 ==> E20C 
+ * ==> mirror 1DF3 & ~effective_addr_lines
+ * */
 
 static ADDRESS_MAP_START( trvwhiz_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
@@ -320,10 +326,10 @@ static ADDRESS_MAP_START( trvwhiz_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5400, 0x54ff) AM_WRITE(low_offset_w)
 	AM_RANGE(0x5800, 0x58ff) AM_WRITE(med_offset_w)
 	AM_RANGE(0x6000, 0x67ff) AM_RAM
-	AM_RANGE(0xa000, 0xa003) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc000, 0xc003) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
+	AM_RANGE(0xa000, 0xa003) AM_MIRROR(0x1df0) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc000, 0xc003) AM_MIRROR(0x1df0) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&ram_attr)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(&ram_video)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
@@ -338,55 +344,55 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( phrcraze_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc00c, 0xc00f) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc00c, 0xc00f) AM_MIRROR(0x1df0) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
 	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
 	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&ram_attr)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(&ram_video)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( phrcraze_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0xc004, 0xc004) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xc104, 0xc104) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xc004, 0xc004) AM_MIRROR(0x1cf3) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xc104, 0xc104) AM_MIRROR(0x1cf3) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( tictac_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_RAM
-	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1df0) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
 	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
 	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&ram_attr)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(&ram_video)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tictac_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0xc00c, 0xc00c) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0xc10c, 0xc10c) AM_WRITE(ay8910_write_port_0_w)
+	AM_RANGE(0xc00c, 0xc00c) AM_MIRROR(0x1cf3) AM_WRITE(ay8910_control_port_0_w)
+	AM_RANGE(0xc10c, 0xc10c) AM_MIRROR(0x1cf3) AM_WRITE(ay8910_write_port_0_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( trvwhziv_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xbfff) AM_RAM
-	AM_RANGE(0xc004, 0xc007) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
-	AM_RANGE(0xc008, 0xc00b) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1df0) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)
 	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
 	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
 	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
-	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
-	AM_RANGE(0xe001, 0xe001) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE(MC6845, "crtc", mc6845_register_w)
 	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&ram_attr)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(&ram_video)
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)

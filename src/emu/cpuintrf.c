@@ -62,10 +62,19 @@ void i8749_get_info(UINT32 state, cpuinfo *info);
 void n7751_get_info(UINT32 state, cpuinfo *info);
 void m58715_get_info(UINT32 state, cpuinfo *info);
 void i8x41_get_info(UINT32 state, cpuinfo *info);
+void i8031_get_info(UINT32 state, cpuinfo *info);
+void i8032_get_info(UINT32 state, cpuinfo *info);
 void i8051_get_info(UINT32 state, cpuinfo *info);
 void i8052_get_info(UINT32 state, cpuinfo *info);
 void i8751_get_info(UINT32 state, cpuinfo *info);
 void i8752_get_info(UINT32 state, cpuinfo *info);
+void i80c31_get_info(UINT32 state, cpuinfo *info);
+void i80c32_get_info(UINT32 state, cpuinfo *info);
+void i80c51_get_info(UINT32 state, cpuinfo *info);
+void i80c52_get_info(UINT32 state, cpuinfo *info);
+void i87c51_get_info(UINT32 state, cpuinfo *info);
+void i87c52_get_info(UINT32 state, cpuinfo *info);
+void at89c4051_get_info(UINT32 state, cpuinfo *info);
 void ds5002fp_get_info(UINT32 state, cpuinfo *info);
 void m6800_get_info(UINT32 state, cpuinfo *info);
 void m6801_get_info(UINT32 state, cpuinfo *info);
@@ -415,6 +424,12 @@ static const struct
 #if (HAS_I8X41)
 	{ CPU_I8X41, i8x41_get_info },
 #endif
+#if (HAS_I8031)
+	{ CPU_I8031, i8031_get_info },
+#endif
+#if (HAS_I8032)
+	{ CPU_I8032, i8032_get_info },
+#endif
 #if (HAS_I8051)
 	{ CPU_I8051, i8051_get_info },
 #endif
@@ -426,6 +441,27 @@ static const struct
 #endif
 #if (HAS_I8752)
 	{ CPU_I8752, i8752_get_info },
+#endif
+#if (HAS_I80C31)
+	{ CPU_I80C31, i80c31_get_info },
+#endif
+#if (HAS_I80C32)
+	{ CPU_I80C32, i80c32_get_info },
+#endif
+#if (HAS_I80C51)
+	{ CPU_I80C51, i80c51_get_info },
+#endif
+#if (HAS_I80C52)
+	{ CPU_I80C52, i80c52_get_info },
+#endif
+#if (HAS_I87C51)
+	{ CPU_I87C51, i87c51_get_info },
+#endif
+#if (HAS_I87C52)
+	{ CPU_I87C52, i87c52_get_info },
+#endif
+#if (HAS_AT89C4051)
+	{ CPU_AT89C4051, at89c4051_get_info },
 #endif
 #if (HAS_DS5002FP)
 	{ CPU_DS5002FP, ds5002fp_get_info },

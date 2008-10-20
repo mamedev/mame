@@ -189,10 +189,6 @@ static ADDRESS_MAP_START( spotty_io_map, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x5000, 0x5003) AM_WRITE(spotty_soundlatch_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( spotty_sound_prg_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
-
 static UINT8 spotty_sound_cmd=0;
 static WRITE8_HANDLER( spotty_sound_cmd_w )
 {
@@ -674,8 +670,7 @@ static MACHINE_DRIVER_START( spotty )
 	MDRV_CPU_IO_MAP(spotty_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD("audio", I8051, 4000000)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(spotty_sound_prg_map, 0)
+	MDRV_CPU_ADD("audio", AT89C4051, 4000000)	/* 4 MHz */
 	MDRV_CPU_IO_MAP(spotty_sound_io_map,0)
 
 	MDRV_NVRAM_HANDLER(93C46)

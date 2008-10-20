@@ -650,12 +650,21 @@ $(CPUOBJ)/i8x41/i8x41.o:	$(CPUSRC)/i8x41/i8x41.c \
 # Intel 8051 and derivatives
 #-------------------------------------------------
 
+CPUDEFS += -DHAS_I8031=$(if $(filter I8031,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I8032=$(if $(filter I8032,$(CPUS)),1,0)
 CPUDEFS += -DHAS_I8051=$(if $(filter I8051,$(CPUS)),1,0)
 CPUDEFS += -DHAS_I8052=$(if $(filter I8052,$(CPUS)),1,0)
 CPUDEFS += -DHAS_I8751=$(if $(filter I8751,$(CPUS)),1,0)
 CPUDEFS += -DHAS_I8752=$(if $(filter I8752,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I80C31=$(if $(filter I80C31,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I80C32=$(if $(filter I80C32,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I80C51=$(if $(filter I80C51,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I80C52=$(if $(filter I80C52,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I87C51=$(if $(filter I87C51,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I87C52=$(if $(filter I87C52,$(CPUS)),1,0)
+CPUDEFS += -DHAS_AT89C4051=$(if $(filter AT89C4051,$(CPUS)),1,0)
 
-ifneq ($(filter I8051 I8052 I8751 I8752,$(CPUS)),)
+ifneq ($(filter I8031 I8032 I8051 I8052 I8751 I8752 I80C31 I80C32 I80C51 I80C52 I87C51 I87C52 AT89C4051,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/i8051
 CPUOBJS += $(CPUOBJ)/i8051/i8051.o
 DBGOBJS += $(CPUOBJ)/i8051/8051dasm.o

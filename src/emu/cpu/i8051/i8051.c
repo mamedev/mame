@@ -69,10 +69,10 @@
  *  - T0 output clock ?
  * 
  * - Full Timer support (all modes)
+ * - Implement cmos features
  * - Fix serial communication - This is a big hack (but working) right now.
- * - Handle internal ram better (debugger visible)
- * - Fix limenko.c videopkr.c : Issue with core allocation of ram (duplicate savestate)
- * - Fix segas18.c (segaic16.c) memory handling. 
+ * - Implement 87C751 in sslam.c 
+ * - Fix cardline.c 
  * - Fix sslam.c and cardline.c 
  *      most likely due to different behaviour of I/O pins. The boards
  *      actually use 80CXX, i.e. CMOS versions.
@@ -80,6 +80,10 @@
  *      a 0 written to it's latch. At least cardline expects a 1 here. 
  * 
  * Done:
+ * - Fix segas18.c (segaic16.c) memory handling. 
+ * - Fix sslam.c 
+ * - Fix limenko.c videopkr.c : Issue with core allocation of ram (duplicate savestate)
+ * - Handle internal ram better (debugger visible)
  *  - Fixed port reading
  *  - Rewrote Macros for better readibility
  *  - Fixed and rewrote Interrupt handling
@@ -108,8 +112,10 @@
 
 enum
 {
-	FEATURE_NONE		= 0,
-	FEATURE_I8052_UART	= 1,
+	FEATURE_NONE			= 0,
+	FEATURE_I8052_UART		= 1,
+	FEATURE_CMOS_IDLE		= 2,
+	FEATURE_CMOS_POWERDOWN	= 4,
 };
 
 /* Internal address in SFR of registers */
@@ -611,7 +617,7 @@ INLINE void set_parity(void)
 
 INLINE UINT8 bit_address_r(UINT8 offset)
 {
-	int	word;
+	UINT8	word;
 	UINT8	mask;
 	int	bit_pos;
 	int	distance;	/* distance between bit addressable words */
@@ -622,7 +628,7 @@ INLINE UINT8 bit_address_r(UINT8 offset)
 		distance = 1;
 		word = ( (offset & 0x78) >> 3) * distance + 0x20;
 		bit_pos = offset & 0x7;
-		mask = 0x1 << bit_pos;
+		mask = (0x1 << bit_pos);
 		return((IRAM_R(word) & mask) >> bit_pos);
 	}
 	//SFR bit addressable registers
@@ -630,7 +636,7 @@ INLINE UINT8 bit_address_r(UINT8 offset)
 		distance = 8;
 		word = ( (offset & 0x78) >> 3) * distance + 0x80;
 		bit_pos = offset & 0x7;
-		mask = 0x1 << bit_pos;
+		mask = (0x1 << bit_pos);
 		return ((IRAM_R(word) & mask) >> bit_pos);
 	}
 }
@@ -1766,6 +1772,13 @@ static void mcs51_init(int index, int clock, const void *config, int (*irqcallba
 	state_save_register_item("mcs51", index, mcs51.recalc_parity );
 }
 
+static void i80c51_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	mcs51_init(index, clock, config, irqcallback);
+	
+	mcs51.features |= 	(FEATURE_CMOS_IDLE | FEATURE_CMOS_POWERDOWN);
+}
+
 /* Reset registers to the initial values */
 static void mcs51_reset(void)
 {
@@ -1865,6 +1878,12 @@ static void i8052_init (int index, int clock, const void *config, int (*irqcallb
 	mcs51.sfr_write = i8052_sfr_write;
 }
 
+static void i80c52_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	i8052_init(index, clock, config, irqcallback);
+	
+	mcs51.features |= (FEATURE_CMOS_IDLE | FEATURE_CMOS_POWERDOWN);
+}
 
 static void i8052_reset(void)
 {
@@ -1881,6 +1900,7 @@ static void i8052_reset(void)
 /***************************************************************************
     ADDRESS MAPS
 ***************************************************************************/
+
 
 /* FIXME: the memory maps should probably support rom banking for EA */
 static ADDRESS_MAP_START(program_12bit, ADDRESS_SPACE_PROGRAM, 8)
@@ -2068,6 +2088,22 @@ static void mcs51_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
+/**************************************************************************
+ * Specific get_info
+ **************************************************************************/
+
+void i8031_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = address_map_data_7bit;	break;
+
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I8031");				break;
+		default:										mcs51_get_info(state, info);			break;
+	}
+	/* --- the following bits of info are returned as NULL-terminated strings --- */
+}
+
 void i8051_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
@@ -2079,6 +2115,21 @@ void i8051_get_info(UINT32 state, cpuinfo *info)
 		default:										mcs51_get_info(state, info);			break;
 	}
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
+}
+
+void i8032_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		case CPUINFO_PTR_INIT:							info->init = i8052_init;				break;
+		case CPUINFO_PTR_RESET:							info->reset = i8052_reset;				break;
+
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = address_map_data_8bit;	break;
+
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I8032");				break;
+
+		default:										mcs51_get_info(state, info);			break;
+	}
 }
 
 void i8052_get_info(UINT32 state, cpuinfo *info)
@@ -2126,3 +2177,80 @@ void i8752_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
+/**************************************************************************
+ * CMOS get_info
+ **************************************************************************/
+
+void i80c31_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		case CPUINFO_PTR_INIT:							info->init = i80c51_init;				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C31");				break;
+		default:										i8031_get_info(state, info);			break;
+	}
+}
+
+void i80c51_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		case CPUINFO_PTR_INIT:							info->init = i80c51_init;				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C51");				break;
+		default:										i8051_get_info(state, info);			break;
+	}
+}
+
+void i80c32_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		case CPUINFO_PTR_INIT:							info->init = i80c52_init;				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C32");				break;
+		default:										i8032_get_info(state, info);			break;
+	}
+}
+
+void i80c52_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		case CPUINFO_PTR_INIT:							info->init = i80c52_init;				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C52");				break;
+		default:										i8052_get_info(state, info);			break;
+	}
+}
+
+void i87c51_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		case CPUINFO_PTR_INIT:							info->init = i80c51_init;				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I87C51");				break;
+		default:										i8751_get_info(state, info);			break;
+	}
+}
+
+void i87c52_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		case CPUINFO_PTR_INIT:							info->init = i80c52_init;				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I87C52");				break;
+		default:										i8752_get_info(state, info);			break;
+	}
+}
+
+/**************************************************************************
+ * Other variants get_info
+ **************************************************************************/
+
+void at89c4051_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		case CPUINFO_PTR_INIT:							info->init = i80c51_init;				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "AT89C4051");				break;
+		default:										i8051_get_info(state, info);			break;
+	}
+}

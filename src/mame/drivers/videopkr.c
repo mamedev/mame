@@ -1224,7 +1224,8 @@ static MACHINE_DRIVER_START( babypkr )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(videopkr)
 	MDRV_CPU_REPLACE("main", I8039, CPU_CLOCK_ALT)
-	MDRV_CPU_REPLACE("sound", I8051, CPU_CLOCK )
+	/* most likely romless or eprom */
+	MDRV_CPU_REPLACE("sound", I8031, CPU_CLOCK )
 	MDRV_CPU_PROGRAM_MAP(i8051_sound_mem, 0)
 	MDRV_CPU_IO_MAP(i8051_sound_port, 0)
 
