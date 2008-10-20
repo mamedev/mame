@@ -72,6 +72,7 @@
  * - Fix serial communication - This is a big hack (but working) right now.
  * - Handle internal ram better (debugger visible)
  * - Fix limenko.c videopkr.c : Issue with core allocation of ram (duplicate savestate)
+ * - Fix segas18.c (segaic16.c) memory handling. 
  * - Fix sslam.c and cardline.c 
  *      most likely due to different behaviour of I/O pins. The boards
  *      actually use 80CXX, i.e. CMOS versions.
@@ -417,7 +418,7 @@ struct _mcs51_regs
 #define GET_EX0			GET_BIT(IE, 0)
 
 /* 8052 Only flags */
-#define GET_PT2			GET_BIT(R_IP, 5)
+#define GET_PT2			GET_BIT(IP, 5)
 
 #define GET_PS			GET_BIT(IP, 4)
 #define GET_PT1			GET_BIT(IP, 3)
@@ -704,6 +705,7 @@ INLINE void transmit_receive(int source)
 			break;
 		//8 bit uart ( + start,stop bit ) - baud set by timer1 or timer2
 		case 1:
+		case 3:
 			if (source == 1)
 			{
 				mcs51.uart.tx_clk += (GET_TCLK ? 0 : !mcs51.uart.smod_div);
@@ -717,8 +719,8 @@ INLINE void transmit_receive(int source)
 			break;
 		//9 bit uart
 		case 2:
-		case 3:
-			LOG(("Serial mode 2 & 3 not supported in mcs51!\n"));
+			mcs51.uart.rx_clk += (source == 0) ? (GET_SMOD ? 6 : 3) : 0; /* clock / 12 * 3 / 8 (16) = clock / 32 (64)*/
+			mcs51.uart.tx_clk += (source == 0) ? (GET_SMOD ? 6 : 3) : 0; /* clock / 12 */
 			break;
 	}
 	/* transmit ? */
@@ -984,7 +986,7 @@ INLINE void serial_transmit(UINT8 data)
 		//9 bit uart
 		case 2:
 		case 3:
-			LOG(("Serial mode 2 & 3 not supported in mcs51!\n"));
+			LOG(("Serial mode %d not supported in mcs51!\n", mode));
 			break;
 	}
 }
@@ -1006,7 +1008,7 @@ INLINE void serial_receive(void)
 			//9 bit uart
 			case 2:
 			case 3:
-				LOG(("Serial mode 2 & 3 not supported in mcs51!\n"));
+				LOG(("Serial mode %d not supported in mcs51!\n", mode));
 				break;
 		}
 	}
@@ -1408,7 +1410,7 @@ static const UINT8 mcs51_cycles[] = {
  **********************************************************************************/
 static void check_irqs(void)
 {
-	UINT8 ints = IE & (GET_IE0 | (GET_TF0<<1) | (GET_IE1<<2) | (GET_TF1<<3) 
+	UINT8 ints = (GET_IE0 | (GET_TF0<<1) | (GET_IE1<<2) | (GET_TF1<<3) 
 			| ((GET_RI|GET_TI)<<4));
 	UINT8 ip = IP;
 	UINT8 int_vec = 0;
@@ -1420,6 +1422,9 @@ static void check_irqs(void)
 
 	if (mcs51.features & FEATURE_I8052_UART)
 		ints |= ((GET_TF2|GET_EXF2)<<5);
+	
+	/* mask out interrupts not enabled */
+	ints &= IE;
 
 	if (!ints)	return;
 
@@ -1485,7 +1490,7 @@ static void check_irqs(void)
 
 			break;
 		case V_TF1:
-			//Timer 0 - Always clear Flag
+			//Timer 1 - Always clear Flag
 			SET_TF1(0);
 			break;
 		case V_RITI:
