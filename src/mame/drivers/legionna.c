@@ -1842,6 +1842,43 @@ ROM_START( cupsoc )
 	ROM_LOAD( "copx-d1.bin",  0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) )
 ROM_END
 
+ROM_START( cupsoca )
+	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
+	ROM_LOAD32_BYTE( "1.bin",   0x000000, 0x040000, CRC(d5f76bd6) SHA1(5e7c3843f6f497a24b8236a9307d347fb24dd0d5) )
+	ROM_LOAD32_BYTE( "2.bin",   0x000001, 0x040000, CRC(34966aa1) SHA1(f07bca19bd92a60c04aa9b23e5d2d2eac073d2e4) )
+	ROM_LOAD32_BYTE( "3.bin",   0x000002, 0x040000, CRC(2b7934ec) SHA1(b78e7079e03b23853397a3848c93f60702ac1c33) )
+	ROM_LOAD32_BYTE( "4.bin",   0x000003, 0x040000, CRC(f4aa1d90) SHA1(eb94efc8cc623434b4c9a22e63d262e80ca84d83) )
+
+	ROM_REGION( 0x20000, "audio", 0 )	/* Z80 code, banked data */
+	ROM_LOAD( "seibu7.8a",    0x000000, 0x08000, CRC(f63329f9) SHA1(51736de48efc14415cfdf169b43623d4c95fde2b) )
+	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
+	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD16_BYTE( "6.bin",   0x000000, 0x010000, CRC(a9e15910) SHA1(305541b16a87d0e38871240fa2e111bb9332e93c) )
+	ROM_LOAD16_BYTE( "5.bin",   0x000001, 0x010000, CRC(73a3e024) SHA1(aeb359dd2dc9eb96330f494c44123bab3f5986a4) )
+
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "obj.8c",       0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
+
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE )	/* MBK tiles */
+	ROM_LOAD( "back-1.4y",    0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
+
+	ROM_REGION( 0x020000, "gfx4", ROMREGION_DISPOSE )	/* not used */
+
+	ROM_REGION( 0x080000, "gfx5", ROMREGION_DISPOSE )	/* BK3 tiles */
+	ROM_LOAD( "back-2.6y",    0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
+
+	ROM_REGION( 0x080000, "gfx6", ROMREGION_DISPOSE )	/* LBK tiles */
+	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
+
+	ROM_REGION( 0x040000, "oki", 0 )	/* ADPCM samples */
+	ROM_LOAD( "seibu8.7a",    0x000000, 0x040000, CRC(6f594808) SHA1(218aa12068aa587c7656355f6a6b86d97c868774) )
+
+	ROM_REGION( 0x080000, "user1", 0 )
+	ROM_LOAD( "copx-d1.bin",  0x000000, 0x080000, CRC(029bc402) SHA1(0f64e4c32d95abfa3920b39ed3cf0cc6eb50191b) )
+ROM_END
+
 ROM_START( cupsocs )
 	ROM_REGION( 0x100000, "main", 0 )	/* 68000 code */
 	ROM_LOAD32_BYTE( "1_10n.bin",   0x000000, 0x040000, CRC(b67835c5) SHA1(4fa562630d1f9cfb6f5bfff3295ebbdd227e4da5) )
@@ -2069,7 +2106,8 @@ GAME( 1993, godzilla, 0,        godzilla, godzilla, 0,        ROT0, "Banpresto",
 GAME( 1993, sdgndmrb, 0,        sdgndmrb, sdgndmrb, 0, 		  ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, denjinmk, ROT0, "Banpresto", "Denjin Makai", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 
-GAME( 1992, cupsoc,   0,        cupsoc,   cupsoc,   0,        ROT0, "Seibu", "Seibu Cup Soccer", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, cupsoc,   0,        cupsoc,   cupsoc,   0,        ROT0, "Seibu", "Seibu Cup Soccer (set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, cupsoca,  cupsoc,   cupsoc,   cupsoc,   0,        ROT0, "Seibu", "Seibu Cup Soccer (set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, cupsocs,  cupsoc,   cupsoc,   cupsoc,   0,        ROT0, "Seibu", "Seibu Cup Soccer :Selection: (set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, cupsocs2, cupsoc,   cupsoc,   cupsoc,   0,        ROT0, "Seibu", "Seibu Cup Soccer :Selection: (set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, cupsocsb, cupsoc,   cupsocbl, cupsoc,   cupsoc,   ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg)", GAME_NOT_WORKING | GAME_NO_SOUND )
