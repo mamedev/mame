@@ -5,7 +5,6 @@ Fast Lane(GX752) (c) 1987 Konami
 Driver by Manuel Abadia <manu@teleline.es>
 
 TODO:
-- is the game playable? How do you end a level?
 - colors don't seem 100% accurate.
 - verify that sound is correct (volume and bank switching)
 
