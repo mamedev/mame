@@ -11,8 +11,11 @@ Notes:
 
 TODO:
 -Add coin counter,coin lock etc.;
--Dynamic controls if you change the Panel Type DIP-SW;
--"Custom RAM" emulation might be a simple protection issue;
+-Controls dynamically changes if you turn on the Panel Type DIP-SW,I'd imagine that the "royal
+ panel" is just a dedicated panel for this game;
+-"Custom RAM" emulation: might be a (weak) protection device or related to the "Back-up RAM NG"
+ msg that pops up at every start-up.
+-Video registers...are they of a custom hardware or a common device?
 
 ============================================================================================
 Code disassembling
@@ -143,7 +146,7 @@ static WRITE8_HANDLER( eeprom_w )
 
 static WRITE8_HANDLER( port_c0_w )
 {
-//  logerror("PC %04x (Port $c0) value written %02x\n",activecpu_get_pc(),data);
+// 	logerror("PC %04x (Port $c0) value written %02x\n",activecpu_get_pc(),data);
 }
 
 
@@ -189,6 +192,23 @@ static WRITE8_HANDLER( mux_w )
 	mux_data = data & ~0xc0;
 }
 
+static WRITE8_HANDLER( yumefuda_videoregs_w )
+{
+	static UINT8 address;
+
+	if(offset == 0)
+		address = data;
+	else
+	{
+		switch(address)
+		{
+			case 0x0d: flip_screen_set(data & 0x80); break;
+			default:
+				logerror("Video Register %02x called with %02x data\n",address,data);
+		}
+	}
+}
+
 static READ8_HANDLER( in7_r )
 {
 	return input_port_read(machine, "DSW1");
@@ -226,6 +246,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( port_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
+	AM_RANGE(0x00, 0x01) AM_WRITE(yumefuda_videoregs_w)
 	AM_RANGE(0x40, 0x40) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
 	AM_RANGE(0x41, 0x41) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x80, 0x80) AM_WRITE(mux_w)
@@ -303,7 +324,7 @@ static INPUT_PORTS_START( yumefuda )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("P1 BET Button") PORT_CODE(KEYCODE_2)
 
-	/*These three are actually used if you use the Mahjong Panel type*/
+	/*These three are actually used if you use the Royal Panel type*/
 	PORT_START( "IN4")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
@@ -317,6 +338,7 @@ static INPUT_PORTS_START( yumefuda )
     PORT_START("DSW1")
 	PORT_BIT( 0xff, IP_ACTIVE_LOW, IPT_UNUSED )
 
+	/*Added by translating the manual*/
     PORT_START("DSW2")
 	PORT_DIPNAME( 0x01, 0x01, "Learn Mode" )//SW Dip-Switches
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -324,24 +346,24 @@ static INPUT_PORTS_START( yumefuda )
 	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Service_Mode ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Hopper Payout" )
+	PORT_DIPSETTING(    0x04, "Hanafuda Type" )//hanaawase
+	PORT_DIPSETTING(    0x00, "Royal Type" )
    	PORT_DIPNAME( 0x08, 0x08, "Panel Type" )
-    PORT_DIPSETTING(    0x08, "Hanafuda Panel" )
-    PORT_DIPSETTING(    0x00, "Mahjong Panel" )//TODO: needs dynamic controls
-    PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(    0x08, "Hanafuda Panel" )//hanaawase
+    PORT_DIPSETTING(    0x00, "Royal Panel" )
+    PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
     PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+    PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
     PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+    PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )//Screen Orientation
     PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
     PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-    PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )//Screen Flip
+    PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+    PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )//pressing Flip-Flop button makes the screen flip
 INPUT_PORTS_END
 
 /***************************************************************************************/
