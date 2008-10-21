@@ -341,13 +341,13 @@ static void cquestsnd_init(int index, int clock, const void *config, int (*irqca
 
 	memset(&cquestsnd, 0, sizeof(cquestsnd));
 
-	cquestsnd_state_register(index, "cquestsnd");
-
 	cquestsnd.dac_w = _config->dac_w;
 	cquestsnd.sound_data = (UINT16*)memory_region(Machine, _config->sound_data_region);
 
 	/* Allocate RAM shared with 68000 */
 	cquestsnd.sram = malloc(4096);
+
+	cquestsnd_state_register(index, "cquestsnd");
 }
 
 
@@ -407,11 +407,11 @@ static void cquestrot_init(int index, int clock, const void *_config, int (*irqc
 {
 	memset(&cquestrot, 0, sizeof(cquestrot));
 
-	cquestrot_state_register(index, "cquestrot");
-
 	/* Allocate RAM */
 	cquestrot.dram = malloc(16384 * sizeof(UINT16));  /* Shared with 68000 */
 	cquestrot.sram = malloc(2048 * sizeof(UINT16));   /* Private */
+
+	cquestrot_state_register(index, "cquestrot");
 }
 
 
@@ -483,13 +483,13 @@ static void cquestlin_init(int index, int clock, const void *_config, int (*irqc
 {
 	memset(&cquestlin, 0, sizeof(cquestlin));
 
-	cquestlin_state_register(index, "cquestlin");
-
 	/* Allocate RAM */
 	cquestlin.sram = malloc(4096 * sizeof(UINT16));      /* Shared with rotate CPU */
 	cquestlin.ptr_ram = malloc(1024);                    /* Pointer RAM */
 	cquestlin.e_stack = malloc(32768 * sizeof(UINT32));  /* Stack DRAM: 32kx20 */
 	cquestlin.o_stack = malloc(32768 * sizeof(UINT32));  /* Stack DRAM: 32kx20 */
+
+	cquestlin_state_register(index, "cquestlin");
 }
 
 
