@@ -126,7 +126,7 @@ static void adjust_xy(int offset)
 
 READ8_HANDLER( graph_processor_r )
 {
-	UINT8 ret = current_bitmap_videoram_accessed[(bitmap_videoram_address_y << 8) | bitmap_videoram_address_x];
+	UINT8 ret = current_bitmap_videoram_displayed[(bitmap_videoram_address_y << 8) | bitmap_videoram_address_x];
 
 	adjust_xy(offset);
 

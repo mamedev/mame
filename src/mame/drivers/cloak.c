@@ -166,13 +166,13 @@ static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(cloak_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE(1)
 	AM_RANGE(0x1000, 0x100f) AM_READWRITE(pokey1_r, pokey1_w)		/* DSW0 also */
-//  AM_RANGE(0x1008, 0x1008) AM_READ(SMH_RAM)
 	AM_RANGE(0x1800, 0x180f) AM_READWRITE(pokey2_r, pokey2_w)		/* DSW1 also */
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("P1")
 	AM_RANGE(0x2200, 0x2200) AM_READ_PORT("P2")
 	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2600, 0x2600) AM_WRITE(cloak_custom_w)
 	AM_RANGE(0x2800, 0x29ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x2f00, 0x2fff) AM_NOP
 	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
 	AM_RANGE(0x3200, 0x327f) AM_WRITE(cloak_paletteram_w)
 	AM_RANGE(0x3800, 0x3801) AM_WRITE(cloak_coin_counter_w)
@@ -398,6 +398,9 @@ ROM_START( cloak )
 	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "136023-107.bin",      0x0000, 0x1000, CRC(c42c84a4) SHA1(6f241e772f8b46c8d3acad2e967f1ab530886b11) )
 	ROM_LOAD( "136023-108.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "82s129.3n",  0x000, 0x100, NO_DUMP ) /* Vertical timing PROM */
 ROM_END
 
 
@@ -424,6 +427,9 @@ ROM_START( cloaksp )
 	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "136023-107.bin",      0x0000, 0x1000, CRC(c42c84a4) SHA1(6f241e772f8b46c8d3acad2e967f1ab530886b11) )
 	ROM_LOAD( "136023-108.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "82s129.3n",  0x000, 0x100, NO_DUMP ) /* Vertical timing PROM */
 ROM_END
 
 
@@ -450,6 +456,9 @@ ROM_START( cloakfr )
 	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "136023-107.bin",      0x0000, 0x1000, CRC(c42c84a4) SHA1(6f241e772f8b46c8d3acad2e967f1ab530886b11) )
 	ROM_LOAD( "136023-108.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "82s129.3n",  0x000, 0x100, NO_DUMP ) /* Vertical timing PROM */
 ROM_END
 
 
@@ -476,6 +485,9 @@ ROM_START( cloakgr )
 	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "136023-107.bin",      0x0000, 0x1000, CRC(c42c84a4) SHA1(6f241e772f8b46c8d3acad2e967f1ab530886b11) )
 	ROM_LOAD( "136023-108.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "82s129.3n",  0x000, 0x100, NO_DUMP ) /* Vertical timing PROM */
 ROM_END
 
 
@@ -502,6 +514,9 @@ ROM_START( agentx4 )
 	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "136107-023.bin",      0x0000, 0x1000, CRC(c42c84a4) SHA1(6f241e772f8b46c8d3acad2e967f1ab530886b11) )
 	ROM_LOAD( "136108-023.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "82s129.3n",  0x000, 0x100, NO_DUMP ) /* Vertical timing PROM */
 ROM_END
 
 
@@ -528,6 +543,9 @@ ROM_START( agentx3 )
 	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "136107-023.bin",      0x0000, 0x1000, CRC(c42c84a4) SHA1(6f241e772f8b46c8d3acad2e967f1ab530886b11) )
 	ROM_LOAD( "136108-023.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "82s129.3n",  0x000, 0x100, NO_DUMP ) /* Vertical timing PROM */
 ROM_END
 
 
@@ -554,6 +572,9 @@ ROM_START( agentx2 )
 	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "136107-023.bin",      0x0000, 0x1000, CRC(c42c84a4) SHA1(6f241e772f8b46c8d3acad2e967f1ab530886b11) )
 	ROM_LOAD( "136108-023.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "82s129.3n",  0x000, 0x100, NO_DUMP ) /* Vertical timing PROM */
 ROM_END
 
 
@@ -580,6 +601,9 @@ ROM_START( agentx1 )
 	ROM_REGION( 0x2000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "136107-023.bin",      0x0000, 0x1000, CRC(c42c84a4) SHA1(6f241e772f8b46c8d3acad2e967f1ab530886b11) )
 	ROM_LOAD( "136108-023.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
+
+	ROM_REGION( 0x100, "proms", 0 )
+	ROM_LOAD( "82s129.3n",  0x000, 0x100, NO_DUMP ) /* Vertical timing PROM */
 ROM_END
 
 
