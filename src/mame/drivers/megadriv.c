@@ -92,6 +92,13 @@ static int megadrive_irq4_pending = 0;
 /* 32x! */
 static int _32x_master_cpu_number;
 static int _32x_slave_cpu_number;
+static int _32x_is_connected;
+
+static UINT16* _32x_dram0;
+static UINT16* _32x_dram1;
+static UINT16 *_32x_display_dram, *_32x_access_dram;
+static UINT16* _32x_palette;
+static UINT16* _32x_palette_lookup;
 /* SegaCD! */
 static int _segacd_68k_cpu_number;
 /* SVP (virtua racing) */
@@ -4330,6 +4337,27 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 
 	}
 
+	if (_32x_is_connected)
+	{
+		UINT32 lineoffs;
+		lineoffs = _32x_access_dram[scanline];
+
+		for (x=0;x<320;x++)
+		{
+			UINT16 coldata;
+			coldata = _32x_access_dram[lineoffs];
+
+			{
+				lineptr[x] = _32x_palette_lookup[(coldata & 0xff00)>>8];
+				x++;
+				lineptr[x] = _32x_palette_lookup[(coldata & 0x00ff)];
+			}
+
+			lineoffs++;
+
+		}
+	}
+
 }
 
 static void genesis_render_scanline(running_machine *machine, int scanline)
@@ -5219,6 +5247,15 @@ static void megadriv_init_common(running_machine *machine)
 		printf("32x SLAVE SH2 cpu found %d\n", _32x_slave_cpu_number );
 	}
 
+	if ((_32x_master_cpu_number != -1) && (_32x_slave_cpu_number != -1))
+	{
+		_32x_is_connected = 1;
+	}
+	else
+	{
+		_32x_is_connected = 0;
+	}
+
 	_segacd_68k_cpu_number = mame_find_cpu_index(machine, "segacd_68k");
 	if (_segacd_68k_cpu_number != -1)
 	{
@@ -5393,7 +5430,40 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine)
 
 // these are tests for 'special case' hardware to make sure I don't break anything while rearranging things
 //
-#if 0
+
+static READ16_HANDLER( _32x_68k_dram_r )
+{
+	return _32x_access_dram[offset];
+}
+
+static WRITE16_HANDLER( _32x_68k_dram_w )
+{
+	COMBINE_DATA(&_32x_access_dram[offset]);
+}
+
+static READ16_HANDLER( _32x_68k_palette_r )
+{
+	return _32x_palette[offset];
+}
+
+static WRITE16_HANDLER( _32x_68k_palette_w )
+{
+	int r,g,b, p;
+
+	COMBINE_DATA(&_32x_palette[offset]);
+	data = _32x_palette[offset];
+
+	r = ((data >> 0)  & 0x1f);
+	g = ((data >> 5)  & 0x1f);
+	b = ((data >> 10) & 0x1f);
+	p = ((data >> 15) & 0x01); // priority 'through' bit
+
+	_32x_palette_lookup[offset] = (r << 10) | (g << 5) | (b << 0);
+
+	palette_set_color_rgb(Machine,offset+0x40,pal5bit(r),pal5bit(g),pal5bit(b));
+
+}
+
 DRIVER_INIT( _32x )
 {
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
@@ -5409,8 +5479,24 @@ DRIVER_INIT( _32x )
 //	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000100, 0x03fffff, 0, 0, SMH_NOP, SMH_NOP );
 //	memory_set_bankptr( 10, memory_region(machine, "32x_68k_bios") );
 
+	_32x_dram0 = auto_malloc(0x20000);
+	_32x_dram1 = auto_malloc(0x20000);
+
+	_32x_palette = auto_malloc(0x200);
+	_32x_palette_lookup = auto_malloc(0x200);
+
+	_32x_display_dram = _32x_dram0;
+	_32x_access_dram = _32x_dram1;
+
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0840000, 0x085ffff, 0, 0, _32x_68k_dram_r, _32x_68k_dram_w); // access to 'display ram' (framebuffer)
+
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15200, 0x0a153ff, 0, 0, _32x_68k_palette_r, _32x_68k_palette_w); // access to 'palette' xRRRRRGGGGGBBBBB
+
 	DRIVER_INIT_CALL(megadriv);
 }
+
+#if 1
+
 ROM_START( 32x_bios )
 	ROM_REGION16_BE( 0x400000, "main", ROMREGION_ERASE00 )
 
