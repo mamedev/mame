@@ -57,6 +57,7 @@ enum
 	XTAL_4_41MHz		= 4410000,		/* Pioneer PR-8210 ldplayer */
 	XTAL_4_43361MHz		= 4433610,		/* Cidelsa Draco */
 	XTAL_4_433619MHz	= 4433619,		/* PAL color subcarrier */
+	XTAL_4_608MHz		= 4608000,		/* Luxor ABC-77 keyboard */
 	XTAL_4_9152MHz   	= 4915200,
 	XTAL_5MHz    		= 5000000,		/* Mutant Night */
 	XTAL_5_7143MHz		= 5714300,		/* Cidelsa Destroyer */
