@@ -64,6 +64,7 @@ static int init_eeprom_count;
 static UINT32* shared_ram;
 
 static UINT16* dsp56k_p_mirror;
+static UINT16* dsp56k_p_8000;
 static const UINT16 dsp56k_bank00_size = 0x1000;		static UINT16* dsp56k_bank00_ram;
 static const UINT16 dsp56k_bank01_size = 0x1000;		static UINT16* dsp56k_bank01_ram;	 
 static const UINT16 dsp56k_bank02_size = 0x4000;		static UINT16* dsp56k_bank02_ram;	 
@@ -286,6 +287,21 @@ static READ16_HANDLER( dsp56k_bootload_r )
 	return 0x7fff;
 }
 
+static OPBASE_HANDLER( plygonet_dsp56k_opbase_handler )
+{
+	if (address >= 0x7000 && address <= 0x7fff)
+	{
+		opbase->rom = opbase->ram = (void*)(dsp56k_p_mirror - 0x7000);
+		return ~0;
+	}
+	else if (address >= 0x8000 && address <= 0x87ff)
+	{
+		opbase->rom = opbase->ram = (void*)(dsp56k_p_8000 - 0x8000);
+		return ~0;
+	}
+
+	return address;
+}
 
 /* The dsp56k's Port C Data register (0xffe3) :
    Program code (function 4e) configures it as general purpose output I/O pins (ffc1 = 0000 & ffc3 = 0fff).
@@ -465,6 +481,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x580000, 0x5807ff) AM_RAM
 	AM_RANGE(0x580800, 0x580803) AM_READWRITE(network_r, SMH_NOP)
 	AM_RANGE(0x580800, 0x580803) AM_RAM		/* network RAM | registers? */
+//	AM_RANGE(0x600000, 0x600000) 
 	AM_RANGE(0x600004, 0x600007) AM_WRITE(sound_w)
 	AM_RANGE(0x600008, 0x60000b) AM_READ(sound_r)
 	AM_RANGE(0x640000, 0x640003) AM_WRITE(sound_irq_w)
@@ -477,15 +494,15 @@ ADDRESS_MAP_END
 /**********************************************************************************/
 
 static ADDRESS_MAP_START( dsp_program_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_BASE(&dsp56k_p_mirror)	/* Unsure of size, but this corresponds to bank01 */
-	AM_RANGE(0x8000, 0x87ff) AM_RAM
+	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_BASE(&dsp56k_p_mirror)	/* Unsure of size, but 0x1000 matches bank01 */
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&dsp56k_p_8000)
 	AM_RANGE(0xc000, 0xc000) AM_READ(dsp56k_bootload_r)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_data_map, ADDRESS_SPACE_DATA, 16 )
-	AM_RANGE(0x0800, 0x5fff) AM_RAM		 /* Appears to not be affected by banking? */
+	AM_RANGE(0x0800, 0x5fff) AM_RAM			/* Appears to not be affected by banking? */
 	AM_RANGE(0x6000, 0x6fff) AM_READWRITE(dsp56k_ram_bank00_read, dsp56k_ram_bank00_write)
-	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(dsp56k_ram_bank01_read, dsp56k_ram_bank01_write)
+	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(dsp56k_ram_bank01_read, dsp56k_ram_bank01_write)	/* Mirrored in program space @ 0x8000 */
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(dsp56k_ram_bank02_read, dsp56k_ram_bank02_write)
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(dsp56k_shared_ram_read, dsp56k_shared_ram_write)
 	AM_RANGE(0xe000, 0xffbf) AM_READWRITE(dsp56k_ram_bank04_read, dsp56k_ram_bank04_write)
@@ -569,7 +586,7 @@ static MACHINE_DRIVER_START( plygonet )
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_VBLANK_INT_HACK(polygonet_interrupt, 2)
 
-	MDRV_CPU_ADD("dsp", DSP56156, 10000000)		/* should be 40.0 MHz/? */
+	MDRV_CPU_ADD("dsp", DSP56156, 10000000)		/* xtal is 40.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(dsp_program_map, 0)
 	MDRV_CPU_DATA_MAP(dsp_data_map, 0)
 
@@ -643,6 +660,9 @@ static DRIVER_INIT(polygonet)
 	memset(dsp56k_bank02_ram,    0, 2 * 8 * dsp56k_bank02_size		  * sizeof(UINT16));
 	memset(dsp56k_shared_ram_16, 0, 2 * 8 * dsp56k_shared_ram_16_size * sizeof(UINT16));
 	memset(dsp56k_bank04_ram,    0, 2 * 8 * dsp56k_bank04_size		  * sizeof(UINT16));
+
+	/* The dsp56k occasionally executes out of mapped memory */
+	memory_set_opbase_handler(1, plygonet_dsp56k_opbase_handler);
 }
 
 ROM_START( plygonet )

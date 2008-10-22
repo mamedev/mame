@@ -181,13 +181,11 @@ static void decode_JJJF_table(UINT16 JJJ, UINT16 F, typed_pointer* src_ret, type
 static void decode_JJF_table(UINT16 JJ, UINT16 F, typed_pointer* src_ret, typed_pointer* dst_ret);
 static void decode_QQF_special_table(UINT16 QQ, UINT16 F, void **S1, void **S2, void **D);
 static void decode_RR_table(UINT16 RR, typed_pointer* ret);
-#ifdef UNUSED_FUNCTION
 static void decode_Z_table(UINT16 Z, typed_pointer* ret);
-#endif
 static void execute_m_table(int x, UINT16 m);
 static void execute_MM_table(UINT16 rnum, UINT16 MM);
-#ifdef UNUSED_FUNCTION
 static UINT16 execute_q_table(int x, UINT16 q);
+#ifdef UNUSED_FUNCTION
 static void execute_z_table(int x, UINT16 z);
 #endif
 static UINT16 assemble_address_from_Pppppp_table(UINT16 P, UINT16 ppppp);
@@ -1258,9 +1256,25 @@ static size_t dsp56k_op_rnd(const UINT16 op_byte, typed_pointer* d_register, UIN
 /* TST : .... .... 0010 F001 : A-218 */
 static size_t dsp56k_op_tst(const UINT16 op_byte, typed_pointer* d_register, UINT64* p_accum, UINT8* cycles)
 {
+	typed_pointer D = {NULL, DT_LONG_WORD};
+
+	decode_F_table(BITS(op_byte,0x0008), &D);
+
+	*p_accum = *((UINT64*)D.addr);
+
+	d_register->addr = D.addr;
+	d_register->data_type = D.data_type;
+
 	/* S L E U N Z V C */
 	/* 0 * * * * * 0 0 */
-	return 0;
+	/* TODO: S, L, E, U */
+	if ((*((UINT64*)D.addr)) & U64(0x0000008000000000)) N_bit_set(1); else N_bit_set(0);
+	if ((*((UINT64*)D.addr)) == 0)                      Z_bit_set(1); else Z_bit_set(0);
+	V_bit_set(0);
+	C_bit_set(0);
+
+	cycles += 2;	/* TODO: + mv oscillator clock cycles */
+	return 1;
 }
 
 /* INC : .... .... 0010 F010 : A-104 */
@@ -1283,11 +1297,29 @@ static size_t dsp56k_op_inc24(const UINT16 op_byte, typed_pointer* d_register, U
 /* OR : .... .... 0010 F1JJ : A-176 */
 static size_t dsp56k_op_or(const UINT16 op_byte, typed_pointer* d_register, UINT64* p_accum, UINT8* cycles)
 {
+	typed_pointer S = {NULL, DT_BYTE};
+	typed_pointer D = {NULL, DT_BYTE};
+
+	decode_JJF_table(BITS(op_byte,0x0003), BITS(op_byte,0x0008), &S, &D);
+
+	/* Save some data for the parallel move */
+	*p_accum = *((UINT64*)D.addr);
+
+	/* OR a word of S with A1|B1 */
+	((PAIR64*)D.addr)->w.h = *((UINT16*)S.addr) | ((PAIR64*)D.addr)->w.h;
+
+	d_register->addr = D.addr;
+	d_register->data_type = D.data_type;
+
 	/* S L E U N Z V C */
 	/* * * - - ? ? 0 - */
-	/* N - Set if bit 31 of the result is set. Cleared otherwise. */
-    /* Z - Set if bits 16-31 of the result are zero. Cleared otherwise. */
-	return 0;
+	/* TODO: S, L */
+	if ( *((UINT64*)D.addr) & U64(0x0000000080000000))		 N_bit_set(1); else N_bit_set(0);
+	if ((*((UINT64*)D.addr) & U64(0x00000000ffff0000)) == 0) Z_bit_set(1); else Z_bit_set(0);
+	V_bit_set(0);
+
+	cycles += 2;		/* TODO: + mv oscillator cycles */
+	return 1;
 }
 
 /* ASR : .... .... 0011 F000 : A-32 */
@@ -1540,7 +1572,10 @@ static size_t dsp56k_op_and(const UINT16 op_byte, typed_pointer* d_register, UIN
 	
 	/* AND a word of S with A1|B1 */
 	((PAIR64*)D.addr)->w.h = *((UINT16*)S.addr) & ((PAIR64*)D.addr)->w.h;
-	
+
+	d_register->addr = D.addr;
+	d_register->data_type = D.data_type;
+
 	/* S L E U N Z V C */
 	/* * * - - ? ? 0 - */
 	/* TODO: S, L */
@@ -1913,9 +1948,9 @@ static size_t dsp56k_op_bcc_1(const UINT16 op, UINT8* cycles)
 		INT16 offset = (INT16)assemble_address_from_6bit_signed_relative_short_address(BITS(op,0x003f));
 
 		PC += 1;
+
 		core.ppc = PC;
 		PC += offset;
-
 		change_pc(PC) ;
 
 		cycles += 4;
@@ -2320,8 +2355,23 @@ static size_t dsp56k_op_jscc_1(const UINT16 op, UINT8* cycles)
 /* JSR : 0000 0001 0011 00-- xxxx xxxx xxxx xxxx : A-114 */
 static size_t dsp56k_op_jsr(const UINT16 op, const UINT16 op2, UINT8* cycles)
 {
+	/* TODO: It says "signed" absolute offset.  Weird. */
+	UINT16 branchOffset = op2;
+
+	/* TODO: Verify, since it's not in the docs, but it must be true */
+	PC += 2;
+
+	SP++;
+	SSH = PC;
+	SSL = SR;
+
+	core.ppc = PC;
+	PC = branchOffset;
+	change_pc(PC);
+
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
+	cycles += 4;		/* TODO: + jx oscillator cycles */
 	return 0;
 }
 
@@ -2452,23 +2502,87 @@ static size_t dsp56k_op_movec(const UINT16 op, UINT8* cycles)
 /* MOVE(C) : 0011 1WDD DDD1 q0RR : A-144 */
 static size_t dsp56k_op_movec_1(const UINT16 op, UINT8* cycles)
 {
+	UINT8 W;
+	UINT16 memOffset;
+	typed_pointer SD = {NULL, DT_BYTE};
+
+	W = BITS(op,0x0400);
+	decode_DDDDD_table(BITS(op,0x03e0), &SD);
+	memOffset = execute_q_table(BITS(op,0x0003), BITS(op,0x0008));
+
+	if (W)
+	{
+		/* Write D */
+		UINT16 tempData = data_read_word_16le(WORD(memOffset));
+		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
+		SetDestinationValue(temp_src, SD);
+	}
+	else
+	{
+		/* Read S */
+		UINT16 tempData = *((UINT16*)SD.addr);
+		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
+		SetDataMemoryValue(temp_src, WORD(memOffset));
+	}
+
 	/* S L E U N Z V C */
 	/* * ? ? ? ? ? ? ? */
 	/* All ? bits - If SR is specified as a destination operand, set according to the corresponding
 	   bit of the source operand. If SR is not specified as a destination operand, L is set if data
 	   limiting occurred. All ? bits are not affected otherwise.*/
-	return 0;
+	if (W && (SD.addr != &SR))
+	{
+		/* If you're writing to something other than the SR */
+		/* TODO */
+	}
+
+	cycles += 2;		/* + mvc oscillator clock cycles */
+	return 1;
 }
 
 /* MOVE(C) : 0011 1WDD DDD1 Z11- : A-144 */
 static size_t dsp56k_op_movec_2(const UINT16 op, UINT8* cycles)
 {
+	UINT8 W;
+	UINT16 memOffset;
+	typed_pointer SD = {NULL, DT_BYTE};
+	typed_pointer XMemOffset = {NULL, DT_BYTE};
+
+	W = BITS(op,0x0400);
+	decode_Z_table(BITS(op,0x0008), &XMemOffset);
+	decode_DDDDD_table(BITS(op,0x03e0), &SD);
+
+	memOffset = *((UINT16*)XMemOffset.addr);
+
+	if (W)
+	{
+		/* Write D */
+		UINT16 tempData = data_read_word_16le(WORD(memOffset));
+		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
+		SetDestinationValue(temp_src, SD);
+	}
+	else
+	{
+		/* Read S */
+		UINT16 tempData = *((UINT16*)SD.addr);
+		typed_pointer temp_src = { (void*)&tempData, DT_WORD };
+		SetDataMemoryValue(temp_src, WORD(memOffset));
+	}
+
+
 	/* S L E U N Z V C */
 	/* * ? ? ? ? ? ? ? */
 	/* All ? bits - If SR is specified as a destination operand, set according to the corresponding
 	   bit of the source operand. If SR is not specified as a destination operand, L is set if data
 	   limiting occurred. All ? bits are not affected otherwise.*/
-	return 0;
+	if (W && (SD.addr != &SR))
+	{
+		/* If you're writing to something other than the SR */
+		/* TODO */
+	}
+
+	cycles += 2;		/* + mvc oscillator clock cycles */
+	return 1;
 }
 
 /* MOVE(C) : 0011 1WDD DDD1 t10- xxxx xxxx xxxx xxxx : A-144 */
@@ -2803,16 +2917,43 @@ static size_t dsp56k_op_rep_1(const UINT16 op, UINT8* cycles)
 	
 	/* S L E U N Z V C */
 	/* - * - - - - - - */
-    /* TODO */
+    /* TODO: L */
 	return 1;
 }
 
 /* REP : 0000 0100 001D DDDD : A-180 */
 static size_t dsp56k_op_rep_2(const UINT16 op, UINT8* cycles)
 {
+	/* TODO: This is non-interruptable, probably have to turn off interrupts here */
+	UINT16 repValue;
+	typed_pointer D = {NULL, DT_BYTE};
+	decode_DDDDD_table(BITS(op,0x001f), &D);
+
+	/* TODO: handle special A&B source cases */
+	if (D.addr == &A || D.addr == &B)
+		logerror("DSP56k ERROR : Rep with A or B instruction not implemented yet!\n");
+
+	repValue = *((UINT16*)D.addr);
+
+	if (repValue != 0)
+	{
+		TEMP = LC;
+		LC = repValue;
+
+		core.repFlag = 1;
+		core.repAddr = PC + WORD(1);
+
+		cycles += 4;		/* TODO: + mv oscillator clock cycles */
+	}
+	else
+	{
+		cycles += 6;		/* TODO: + mv oscillator clock cycles */
+	}
+
 	/* S L E U N Z V C */
 	/* - * - - - - - - */
-	return 0;
+	/* TODO: L */
+	return 1;
 }
 
 /* REPcc : 0000 0001 0101 cccc : A-184 */
@@ -2834,9 +2975,17 @@ static size_t dsp56k_op_reset(const UINT16 op, UINT8* cycles)
 /* RTI : 0000 0000 0000 0111 : A-194 */
 static size_t dsp56k_op_rti(const UINT16 op, UINT8* cycles)
 {
+	core.ppc = PC;
+	PC = SSH;
+	change_pc(PC);
+
+	SR = SSL;
+	SP = SP - 1;
+
 	/* S L E U N Z V C */
-	/* - ? ? ? ? ? ? ? */
+	/* ? ? ? ? ? ? ? ? */
 	/* All ? bits - Set according to value pulled from the stack. */
+	cycles += 4;		/* TODO: + rx oscillator clock cycles */
 	return 0;
 }
 
@@ -2927,10 +3076,22 @@ static size_t dsp56k_op_tfr3(const UINT16 op, UINT8* cycles)
 /* TST(2) : 0001 0101 0001 -1DD : A-220 */
 static size_t dsp56k_op_tst2(const UINT16 op, UINT8* cycles)
 {
+	typed_pointer D = {NULL, DT_BYTE};
+	decode_DD_table(BITS(op,0x0003), &D);
+
 	/* S L E U N Z V C */
 	/* - * * * * * 0 0 */
 	/* (L,E,U should be set to 0) */
-	return 0;
+	L_bit_set(0);
+	E_bit_set(0);
+	// U_bit_set(0);	/* TODO: Conflicting opinions?  "Set if unnormalized."  Documentation is weird (A&B?) */
+	if ((*((UINT16*)D.addr)) &  0x8000) N_bit_set(1); else N_bit_set(0);
+	if ((*((UINT16*)D.addr)) == 0x0000) Z_bit_set(1); else Z_bit_set(0);
+	// V_bit_set(0);	/* TODO: Verify as well! */
+	C_bit_set(0);
+
+	cycles += 2;
+	return 1;
 }
 
 /* WAIT : 0000 0000 0000 1011 : A-222 */
@@ -3193,7 +3354,7 @@ static void decode_RR_table(UINT16 RR, typed_pointer* ret)
 		case 0x03: ret->addr = &R3;  ret->data_type = DT_WORD;  break;
 	}
 }
-#ifdef UNUSED_FUNCTION
+
 static void decode_Z_table(UINT16 Z, typed_pointer* ret)
 {
 	switch(Z)
@@ -3203,7 +3364,7 @@ static void decode_Z_table(UINT16 Z, typed_pointer* ret)
 		case 0x00: ret->addr = &B1;  ret->data_type = DT_WORD;  break;
 	}
 }
-#endif
+
 static void execute_m_table(int x, UINT16 m)
 {
 	UINT16 *rX = 0x00 ;
@@ -3245,19 +3406,19 @@ static void execute_MM_table(UINT16 rnum, UINT16 MM)
 		case 0x3: (*rX) = (*rX)+(*nX) ; break;
 	}
 }
-#ifdef UNUSED_FUNCTION
-// Returns R address
+
+/* Returns R value */
 static UINT16 execute_q_table(int x, UINT16 q)
 {
-	UINT16 *rX = 0x00 ;
-	UINT16 *nX = 0x00 ;
+	UINT16 *rX = 0x0000;
+	UINT16 *nX = 0x0000;
 
 	switch(x)
 	{
-		case 0x0: rX = &R0 ; nX = &N0 ; break ;
-		case 0x1: rX = &R1 ; nX = &N1 ; break ;
-		case 0x2: rX = &R2 ; nX = &N2 ; break ;
-		case 0x3: rX = &R3 ; nX = &N3 ; break ;
+		case 0x0: rX = &R0;  nX = &N0;  break;
+		case 0x1: rX = &R1;  nX = &N1;  break;
+		case 0x2: rX = &R2;  nX = &N2;  break;
+		case 0x3: rX = &R3;  nX = &N3;  break;
 	}
 
 	switch(q)
@@ -3266,10 +3427,12 @@ static UINT16 execute_q_table(int x, UINT16 q)
 		case 0x1: (*rX)--;					   return (*rX);	   break;	// This one is special - it's a *PRE-decrement*!
 	}
 
+	/* Should not get here */
 	exit(1);
 	return 0x00;
 }
 
+#ifdef UNUSED_FUNCTION
 static void execute_z_table(int x, UINT16 z)
 {
 	UINT16 *rX = 0x00 ;
