@@ -94,6 +94,9 @@ static int _32x_master_cpu_number;
 static int _32x_slave_cpu_number;
 /* SegaCD! */
 static int _segacd_68k_cpu_number;
+/* SVP (virtua racing) */
+static int _svp_cpu_number;
+
 
 static int _genesis_snd_z80_cpu_number;
 
@@ -2916,6 +2919,14 @@ MACHINE_DRIVER_START( megdsvp )
 	/* IRQs are not used by this CPU */
 MACHINE_DRIVER_END
 
+MACHINE_DRIVER_START( megdsvppal )
+	MDRV_IMPORT_FROM(megadpal)
+
+	MDRV_CPU_ADD("svp", SSP1601, MASTER_CLOCK_PAL / 7 * 3) /* ~23 MHz (guessed) */
+	MDRV_CPU_PROGRAM_MAP(svp_ssp_map, 0)
+	MDRV_CPU_IO_MAP(svp_ext_map, 0)
+	/* IRQs are not used by this CPU */
+MACHINE_DRIVER_END
 
 /****************************************** END SVP related *************************************/
 
@@ -5052,6 +5063,49 @@ MACHINE_DRIVER_START( megadriv )
 
 	MDRV_MACHINE_RESET(megadriv)
 
+	MDRV_SCREEN_ADD("megadriv", RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
+	MDRV_SCREEN_SIZE(64*8, 64*8)
+	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
+
+#ifndef MESS
+	MDRV_NVRAM_HANDLER(megadriv)
+#endif
+
+	MDRV_PALETTE_LENGTH(0x200)
+
+	MDRV_VIDEO_START(megadriv)
+	MDRV_VIDEO_UPDATE(megadriv) /* Copies a bitmap */
+	MDRV_VIDEO_EOF(megadriv) /* Used to Sync the timing */
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD("ym", YM2612, MASTER_CLOCK_NTSC/7) /* 7.67 MHz */
+	MDRV_SOUND_ROUTE(0, "left", 0.50)
+	MDRV_SOUND_ROUTE(1, "right", 0.50)
+
+	/* sound hardware */
+	MDRV_SOUND_ADD("sn", SN76496, MASTER_CLOCK_NTSC/15)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.25) /* 3.58 MHz */
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right",0.25) /* 3.58 MHz */
+MACHINE_DRIVER_END
+
+/************ PAL hardware has a different master clock *************/
+
+MACHINE_DRIVER_START( megadpal )
+	MDRV_CPU_ADD("main", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
+	MDRV_CPU_PROGRAM_MAP(megadriv_readmem,megadriv_writemem)
+	/* IRQs are handled via the timers */
+
+	MDRV_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_PAL / 15) /* 3.58 MHz */
+	MDRV_CPU_PROGRAM_MAP(z80_readmem,z80_writemem)
+	MDRV_CPU_IO_MAP(z80_portmap,0)
+	/* IRQ handled via the timers */
+
+	MDRV_MACHINE_RESET(megadriv)
 
 	MDRV_SCREEN_ADD("megadriv", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
@@ -5071,37 +5125,19 @@ MACHINE_DRIVER_START( megadriv )
 	MDRV_VIDEO_EOF(megadriv) /* Used to Sync the timing */
 
 	/* sound hardware */
-#if 0
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("ym", YM2612, MASTER_CLOCK_NTSC/7) /* 7.67 MHz */
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-
-	/* sound hardware */
-	MDRV_SOUND_ADD("sn", SN76496, MASTER_CLOCK_NTSC/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50) /* 3.58 MHz */
-#else
 	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("ym", YM2612, MASTER_CLOCK_NTSC/7) /* 7.67 MHz */
+	MDRV_SOUND_ADD("ym", YM2612, MASTER_CLOCK_PAL/7) /* 7.67 MHz */
 	MDRV_SOUND_ROUTE(0, "left", 0.50)
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("sn", SN76496, MASTER_CLOCK_NTSC/15)
+	MDRV_SOUND_ADD("sn", SN76496, MASTER_CLOCK_PAL/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 0.25) /* 3.58 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right",0.25) /* 3.58 MHz */
-#endif
-
 MACHINE_DRIVER_END
 
-MACHINE_DRIVER_START( megadpal )
-	MDRV_IMPORT_FROM(megadriv)
 
-	MDRV_SCREEN_MODIFY("megadriv")
-	MDRV_SCREEN_REFRESH_RATE(50)
-MACHINE_DRIVER_END
 
 static const sh2_cpu_core sh2_conf_master = { 0, NULL };
 static const sh2_cpu_core sh2_conf_slave  = { 1, NULL };
@@ -5189,6 +5225,12 @@ static void megadriv_init_common(running_machine *machine)
 		printf("Sega CD secondary 68k cpu found %d\n", _segacd_68k_cpu_number );
 	}
 
+	_svp_cpu_number = mame_find_cpu_index(machine, "svp");
+	if (_svp_cpu_number != -1)
+	{
+		printf("SVP (cpu) found %d\n", _svp_cpu_number );
+	}
+
 
 	if (genesis_has_z80)
 	{
@@ -5236,6 +5278,13 @@ static void megadriv_init_common(running_machine *machine)
 		}
 		mame_printf_debug("\n");
 	}
+
+	/* if we have an SVP cpu then do some extra initilization for it */
+	if (_svp_cpu_number != -1)
+	{
+		svp_init(machine);
+	}
+
 
 }
 
@@ -5287,19 +5336,6 @@ DRIVER_INIT( megadrie )
 	hazemdchoice_megadrive_region_export = 1;
 	hazemdchoice_megadrive_region_pal = 1;
 	hazemdchoice_megadriv_framerate = 50;
-}
-
-DRIVER_INIT( megadsvp )
-{
-	genvdp_use_cram = 1;
-	genesis_always_irq6 = 0;
-	genesis_other_hacks = 1;
-
-	megadriv_init_common(machine);
-	svp_init(machine);
-	hazemdchoice_megadrive_region_export = 1;
-	hazemdchoice_megadrive_region_pal = 0;
-	hazemdchoice_megadriv_framerate = 60;
 }
 
 
@@ -5355,6 +5391,8 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine)
 	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, z80_read_68k_banked_data, z80_write_68k_banked_data);
 }
 
+// these are tests for 'special case' hardware to make sure I don't break anything while rearranging things
+//
 #if 0
 DRIVER_INIT( _32x )
 {
@@ -5411,7 +5449,29 @@ ROM_START( 32x_scd )
 	ROM_LOAD( "32x_s_bios.bin", 0x000000,  0x000400, CRC(bfda1fe5) SHA1(4103668c1bbd66c5e24558e73d4f3f92061a109a) )
 ROM_END
 
+ROM_START( g_virr )
+	ROM_REGION( 0x400000, "main", 0 ) /* 68000 Code */
+	ROM_LOAD( "g_virr.bin", 0x000000, 0x200000, CRC(7e1a324a) SHA1(ff969ae53120cc4e7cb1a8a7e47458f2eb8a2165) )
+ROM_END
+ROM_START( g_virrj )
+	ROM_REGION( 0x400000, "main", 0 ) /* 68000 Code */
+	ROM_LOAD( "g_virrj.bin", 0x000000, 0x200000, CRC(53a293b5) SHA1(0ad38a3ab1cc99edac72184f8ae420e13df5cac6) )
+ROM_END
+ROM_START( g_virre )
+	ROM_REGION( 0x400000, "main", 0 ) /* 68000 Code */
+	ROM_LOAD( "g_virre.bin", 0x000000, 0x200000, CRC(9624d4ef) SHA1(2c3812f8a010571e51269a33a989598787d27c2d) )
+ROM_END
+ROM_START( g_virrea )
+	ROM_REGION( 0x400000, "main", 0 ) /* 68000 Code */
+	ROM_LOAD( "g_virrea.bin", 0x000000, 0x200000, CRC(5a943df9) SHA1(2c08ea556c79d48e88ff5202944c161ae1b41c63) )
+ROM_END
+
 GAME( 1994, 32x_bios,    0,        genesis_32x,        megadriv,    _32x,    ROT0,   "Sega", "32X Bios", GAME_NOT_WORKING )
 GAME( 1994, segacd,      0,        genesis_scd,        megadriv,    megadriv,ROT0,   "Sega", "Sega-CD Model 2 BIOS V2.11 (U)", GAME_NOT_WORKING )
 GAME( 1994, 32x_scd,     0,        genesis_32x_scd,    megadriv,    _32x,    ROT0,   "Sega", "Sega-CD Model 2 BIOS V2.11 (U) (with 32X)", GAME_NOT_WORKING )
+GAME( 1994, g_virr,      0,        megdsvp,            megadriv,   megadriv, ROT0,   "Sega", "Virtua Racing (U) [!]", 0 )
+GAME( 1994, g_virrj ,    g_virr,   megdsvp,            megadriv,   megadrij, ROT0,   "Sega", "Virtua Racing (J) [!]", 0 )
+GAME( 1994, g_virre ,    g_virr,   megdsvppal,         megadriv,   megadrie, ROT0,   "Sega", "Virtua Racing (E) [!]", 0 )
+GAME( 1994, g_virrea,    g_virr,   megdsvppal,         megadriv,   megadrie, ROT0,   "Sega", "Virtua Racing (E) [a1]", 0 )
+
 #endif
