@@ -3280,7 +3280,7 @@ static void genesis_render_videoline_to_videobuffer(int scanline)
 	/* Clear our Render Buffer */
 	for (x=0;x<320;x++)
 	{
-		video_renderline[x]=MEGADRIVE_REG07_BGCOLOUR;
+		video_renderline[x]=MEGADRIVE_REG07_BGCOLOUR | 0x20000; // mark as BG
 	}
 
 	memset(highpri_renderline, 0, 320);
@@ -4340,17 +4340,21 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 	if (_32x_is_connected)
 	{
 		UINT32 lineoffs;
-		lineoffs = _32x_access_dram[scanline];
+		lineoffs = _32x_display_dram[scanline];
 
 		for (x=0;x<320;x++)
 		{
 			UINT16 coldata;
-			coldata = _32x_access_dram[lineoffs];
+			coldata = _32x_display_dram[lineoffs];
 
 			{
-				lineptr[x] = _32x_palette_lookup[(coldata & 0xff00)>>8];
+				if  ((_32x_palette[(coldata & 0xff00)>>8] & 0x8000)==0x8000)
+					lineptr[x] = _32x_palette_lookup[(coldata & 0xff00)>>8];
+
 				x++;
-				lineptr[x] = _32x_palette_lookup[(coldata & 0x00ff)];
+
+				if  ((_32x_palette[(coldata & 0x00ff)>>0] & 0x8000)==0x8000)
+					lineptr[x] = _32x_palette_lookup[(coldata & 0x00ff)];
 			}
 
 			lineoffs++;
@@ -5431,6 +5435,58 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine)
 // these are tests for 'special case' hardware to make sure I don't break anything while rearranging things
 //
 
+/*
+a1518a / 410a
+
+vhp- ---- ---- --fb
+
+v = 1=vblank   r/o
+h = 1=hblank   r/o
+p = 0=palette access approval   r/o
+- = unused
+f = 0=MD framebuffer access, 1 = SH2   r/o
+b = 0=DRAM0 accessed by VDP, 1=DRAM1   r/w
+*/
+static UINT16 _32x_a1518a_reg;
+static READ16_HANDLER( _32x_68k_fbcontrol_r )
+{
+
+	UINT16 retdata = _32x_a1518a_reg;
+	UINT16 hpos = get_hposition();
+	int megadrive_hblank_flag = 0;
+
+	if (megadrive_vblank_flag) retdata |= 0x8000;
+
+	if (hpos>400) megadrive_hblank_flag = 1;
+	if (hpos>460) megadrive_hblank_flag = 0;
+
+	if (megadrive_hblank_flag) retdata |= 0x4000;
+
+	return retdata;
+}
+
+static WRITE16_HANDLER( _32x_68k_fbcontrol_w )
+{
+	// bit 0 is the framebuffer select;
+	_32x_a1518a_reg = (_32x_a1518a_reg & 0xfffe) | (data & 1);
+
+	if (_32x_a1518a_reg & 1)
+	{
+		_32x_access_dram = _32x_dram0;
+		_32x_display_dram = _32x_dram1;
+	}
+	else
+	{
+		_32x_display_dram = _32x_dram0;
+		_32x_access_dram = _32x_dram1;
+	}
+
+}
+
+
+
+
+
 static READ16_HANDLER( _32x_68k_dram_r )
 {
 	return _32x_access_dram[offset];
@@ -5464,6 +5520,23 @@ static WRITE16_HANDLER( _32x_68k_palette_w )
 
 }
 
+/*
+// returns MARS, the system ID of the 32x
+static READ16_HANDLER( _32x_68k_MARS_r )
+{
+	switch (offset)
+	{
+		case 0:
+			return 0x4d41;
+
+		case 1:
+			return 0x5253;
+	}
+
+	return 0x0000;
+}
+*/
+
 DRIVER_INIT( _32x )
 {
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
@@ -5482,8 +5555,15 @@ DRIVER_INIT( _32x )
 	_32x_dram0 = auto_malloc(0x20000);
 	_32x_dram1 = auto_malloc(0x20000);
 
+	memset(_32x_dram0, 0x00, 0x20000);
+	memset(_32x_dram1, 0x00, 0x20000);
+
 	_32x_palette = auto_malloc(0x200);
 	_32x_palette_lookup = auto_malloc(0x200);
+
+	memset(_32x_palette, 0x00, 0x200);
+	memset(_32x_palette_lookup, 0x00, 0x200);
+
 
 	_32x_display_dram = _32x_dram0;
 	_32x_access_dram = _32x_dram1;
@@ -5492,16 +5572,25 @@ DRIVER_INIT( _32x )
 
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15200, 0x0a153ff, 0, 0, _32x_68k_palette_r, _32x_68k_palette_w); // access to 'palette' xRRRRRGGGGGBBBBB
 
+	_32x_a1518a_reg = 0x00; // inital value
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a1518a, 0x0a1518b, 0, 0, _32x_68k_fbcontrol_r, _32x_68k_fbcontrol_w); // framebuffer control regs
+
+//	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a130ec, 0x0a151ef, 0, 0, _32x_68k_MARS_r); // system ID
+
+
 	DRIVER_INIT_CALL(megadriv);
 }
 
-#if 1
+#if 0
 
 ROM_START( 32x_bios )
 	ROM_REGION16_BE( 0x400000, "main", ROMREGION_ERASE00 )
 
 	ROM_REGION16_BE( 0x400000, "gamecart", 0 ) /* 68000 Code */
-	ROM_LOAD( "32x_babe.rom", 0x000000,  0x014f80, CRC(816b0cb4) SHA1(dc16d3170d5809b57192e03864b7136935eada64) )
+	ROM_LOAD( "32xquin.rom", 0x000000,  0x005d124, CRC(93d4b0a3) SHA1(128bd0b6e048c749da1a2f4c3abd6a867539a293))
+//	ROM_LOAD( "32x_babe.rom", 0x000000,  0x14f80, CRC(816b0cb4) SHA1(dc16d3170d5809b57192e03864b7136935eada64) )
+//	ROM_LOAD( "32xhot.rom", 0x000000,  0x01235c, CRC(da9c93c9) SHA1(a62652eb8ad8c62b36f6b1ffb96922d045c4e3ac))
+//	ROM_LOAD( "knux.rom", 0x000000,  0x300000, CRC(d0b0b842) SHA1(0c2fff7bc79ed26507c08ac47464c3af19f7ced7) )
 
 	ROM_REGION16_BE( 0x400000, "32x_68k_bios", 0 ) /* 68000 Code */
 	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
