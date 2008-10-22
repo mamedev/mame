@@ -1,16 +1,15 @@
 /*
 Double Dealer (c)NMK 1991
 
-Based on jalmah.c and nmk.c drivers
-Skeleton driver by Tomasz Slanina
-Protection vectors provided by Angelo Salese
+driver by Angelo Salese & David Haywood,based on early work by Tomasz Slanina
+
+Appears to be a down-grade of the nmk16 HW
 
 TODO:
--check Video Registers memory at 0x8c1e0-0x8c1ef.They appear to control cards movements,game should be in a playable state;
--finish the vector protection;
--implement coin simulation;
--merge this with the nmk16 driver.Appears to be similar to Hacha Mecha Fighter
-
+-When you use the "gun card" the game gives "minus" points,but points are always added,inaccurate protection?
+-Understand better the video emulation and convert it to tilemaps;
+-A Double Dealer manual is needed for the coinage settings and coin/credit simulation;
+-Decap + emulate MCU, required if the random number generation is going to be accurate;
 
 --
 
@@ -18,7 +17,7 @@ pcb marked  GD91071
 
 68000P10
 YM2203C
-91071-3 (????) marked as "3" on the pcb
+91071-3 (Mask ROM)
 NMK-110 8131 ( Mitsubishi M50747 MCU ?)
 NMK 901
 NMK 902
@@ -114,32 +113,21 @@ Few words about protection:
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
 
-static UINT16 *mcu_shared_ram;
-static UINT16 *sc3_vram,*sc0_vram;
+static UINT16 *mcu_shared_ram,*work_ram;
+static UINT16 *back_vram,*left_fg_vram_top, *right_fg_vram_top, *right_fg_vram_bottom, *left_fg_vram_bottom;
 static UINT16 *ddealer_vregs;
-static tilemap *sc3_tilemap,*sc0_tilemap;
-
+static tilemap *back_tilemap;
 static int respcount;
+static int ddealer_flipscreen;
 
-static TILEMAP_MAPPER( bg_scan )
+static WRITE16_HANDLER( ddealer_flipscreen_w )
 {
-	/* logical (col,row) -> memory offset */
-	return (row & 0x0f) + ((col & 0xff) << 4) + ((row & 0x70) << 8);
+	ddealer_flipscreen = data & 0x01;
 }
 
-static TILE_GET_INFO( get_sc0_tile_info )
+static TILE_GET_INFO( get_back_tile_info )
 {
-	int code = sc0_vram[tile_index];
-	SET_TILE_INFO(
-			1,
-			code & 0xfff,
-			code >> 12,
-			0);
-}
-
-static TILE_GET_INFO( get_sc3_tile_info )
-{
-	int code = sc3_vram[tile_index];
+	int code = back_vram[tile_index];
 	SET_TILE_INFO(
 			0,
 			code & 0xfff,
@@ -149,80 +137,223 @@ static TILE_GET_INFO( get_sc3_tile_info )
 
 static VIDEO_START( ddealer )
 {
-	sc3_tilemap = tilemap_create(get_sc3_tile_info,tilemap_scan_cols,8,8,64,32);
-	sc0_tilemap = tilemap_create(get_sc0_tile_info,bg_scan,16,16,256,32);
-
-	tilemap_set_transparent_pen(sc0_tilemap,15);
+	ddealer_flipscreen = 0;
+	back_tilemap = tilemap_create(get_back_tile_info,tilemap_scan_cols,8,8,64,32);
 }
 
-#if 0
-static void ddealer_protection(running_machine *machine)
+static void ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_t* bitmap, const rectangle *cliprect, int flipy)
 {
+	const gfx_element *gfx = Machine->gfx[1];
 
-	if(prot==0)
 	{
-		shared_ram[0xe000/2]=0x4ef9;
-		shared_ram[0xe002/2]=0x0000;
-		shared_ram[0xe004/2]=0x0796;
+		INT16 sx, sy;
+		int x,y, count;
+		UINT16* src;
+
+		sx =  ((vreg_base[0x4/2] & 0xff));
+		sx |= ((vreg_base[0x2/2] & 0xff) << 8);
+
+		sx &=0x7ff;
+		if (sx & 0x400) sx-=0x800;
+
+		sy =  ((vreg_base[0x8/2] & 0xff));
+		sy |= ((vreg_base[0x6/2] & 0xff) << 8);
+
+
+		if (!flipy)
+		{
+			sx -= 64; // video shift
+
+
+			/* the tilemaps seems to be split into top / bottom pieces */
+			count = 0;
+			src = top;
+			for (x=0;x<128;x++)
+			{
+				for (y=0;y<16;y++)
+				{
+					UINT16 tile = (src[count]&0x0fff);
+					UINT16 colr = (src[count]&0xf000)>>12;
+					count++;
+					drawgfx(bitmap,gfx,tile,colr,0,flipy,(x*16)-sx,(y*16)-sy,cliprect,TRANSPARENCY_PEN,15);
+				}
+			}
+			count = 0;
+			src = bottom;
+			sy -= 256;
+			for (x=0;x<128;x++)
+			{
+				for (y=0;y<16;y++)
+				{
+					UINT16 tile = (src[count]&0x0fff);
+					UINT16 colr = (src[count]&0xf000)>>12;
+					count++;
+					drawgfx(bitmap,gfx,tile,colr,0,flipy,(x*16)-sx,(y*16)-sy,cliprect,TRANSPARENCY_PEN,15);
+				}
+			}
+		}
+		else
+		{
+			sx -= 0x6d0;
+			sy -= 16;
+
+			/* the tilemaps seems to be split into top / bottom pieces */
+			count = 0;
+			src = top;
+			for (x=128;x>0;x--)
+			{
+				for (y=16;y>0;y--)
+				{
+					UINT16 tile = (src[count]&0x0fff);
+					UINT16 colr = (src[count]&0xf000)>>12;
+					count++;
+					drawgfx(bitmap,gfx,tile,colr,flipy,flipy,(x*16)+sx,(y*16)+sy,cliprect,TRANSPARENCY_PEN,15);
+				}
+			}
+			count = 0;
+			src = bottom;
+			sy -= 256;
+			for (x=128;x>0;x--)
+			{
+				for (y=16;y>0;y--)
+				{
+					UINT16 tile = (src[count]&0x0fff);
+					UINT16 colr = (src[count]&0xf000)>>12;
+					count++;
+					drawgfx(bitmap,gfx,tile,colr,flipy,flipy,(x*16)+sx,(y*16)+sy,cliprect,TRANSPARENCY_PEN,15);
+				}
+			}
+		}
 	}
-
-	shared_ram[0xe008/2]=0x0001;
-	shared_ram[0xe00a/2]=0x0001;
-	shared_ram[0xe00c/2]=0x0001;
-	shared_ram[0xe00e/2]=0x0001;
-
-	shared_ram[0xe010/2]=mame_rand(machine) & 0xffff;
-	shared_ram[0xe012/2]=mame_rand(machine) & 0xffff;
-	shared_ram[0xe014/2]=mame_rand(machine) & 0xffff;
-	shared_ram[0xe016/2]=mame_rand(machine) & 0xffff;
-
 }
-#endif
+
 
 static VIDEO_UPDATE( ddealer )
 {
-	tilemap_set_scrollx( sc3_tilemap, 0, -64);
+	tilemap_set_scrollx( back_tilemap, 0, ddealer_flipscreen? -192: -64);
+	tilemap_set_flip(back_tilemap, ddealer_flipscreen? TILEMAP_FLIPY|TILEMAP_FLIPX:0);
+	tilemap_draw(bitmap,cliprect,back_tilemap,0,0);
 
-	tilemap_draw(bitmap,cliprect,sc3_tilemap,0,0);
-	tilemap_draw(bitmap,cliprect,sc0_tilemap,0,0);
+	/* the fg tilemap handling is a little hacky right now,
+	   i'm not sure if it should be a single tilemap with
+	   rowscroll / linescroll, or two tilemaps which can be
+	   combined, the flipscreen case makes things more
+	   difficult to understand */
 
-	/*temporary*/
-	if(input_code_pressed_once(KEYCODE_Z))
-		mcu_shared_ram[0x000/2]++;
+	if (!ddealer_flipscreen)
+	{
+		if (ddealer_vregs[0xcc/2] & 0x80)
+		{
+			ddealer_draw_video_layer(&ddealer_vregs[0x1e0/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
+			ddealer_draw_video_layer(&ddealer_vregs[0xcc/2], right_fg_vram_top, right_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
+		}
+		else
+		{
+			ddealer_draw_video_layer(&ddealer_vregs[0x1e0/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
+		}
+	}
+	else
+	{
+		if (ddealer_vregs[0xcc/2] & 0x80)
+		{
+			ddealer_draw_video_layer(&ddealer_vregs[0xcc/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
+			ddealer_draw_video_layer(&ddealer_vregs[0x1e0/2], right_fg_vram_top, right_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
+		}
+		else
+		{
+			ddealer_draw_video_layer(&ddealer_vregs[0x1e0/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
+		}
+
+	}
+
 	return 0;
 }
 
-WRITE16_HANDLER( sc3_vram_w )
+static TIMER_DEVICE_CALLBACK( ddealer_mcu_sim )
 {
-	int oldword = sc3_vram[offset];
-	int newword = oldword;
-	COMBINE_DATA(&newword);
+	/*coin/credit simulation*/
+	/*$fe002 is used,might be for multiple coins for one credit settings.*/
+	static UINT8 input_pressed;
+	static UINT16 coin_input;
 
-	if (oldword != newword)
+	coin_input = (~(input_port_read(timer->machine, "IN0")));
+
+	if(coin_input & 0x01)//coin 1
 	{
-		sc3_vram[offset] = newword;
-		tilemap_mark_tile_dirty(sc3_tilemap,offset);
+		if((input_pressed & 0x01) == 0)
+			mcu_shared_ram[0x000/2]++;
+		input_pressed = (input_pressed & 0xfe) | 1;
 	}
+	else
+		input_pressed = (input_pressed & 0xfe);
+
+	if(coin_input & 0x02)//coin 2
+	{
+		if((input_pressed & 0x02) == 0)
+			mcu_shared_ram[0x000/2]++;
+		input_pressed = (input_pressed & 0xfd) | 2;
+	}
+	else
+		input_pressed = (input_pressed & 0xfd);
+
+	if(coin_input & 0x04)//service 1
+	{
+		if((input_pressed & 0x04) == 0)
+			mcu_shared_ram[0x000/2]++;
+		input_pressed = (input_pressed & 0xfb) | 4;
+	}
+	else
+		input_pressed = (input_pressed & 0xfb);
+
+	/*0x104/2 is some sort of "start-lock",i.e. used on the girl selection.
+	  Without it,the game "steals" one credit if you press the start button on that.*/
+	if(mcu_shared_ram[0x000/2] > 0 && work_ram[0x104/2] & 1)
+	{
+		if(coin_input & 0x08)//start 1
+		{
+			if((input_pressed & 0x08) == 0 && (~(work_ram[0x100/2] & 1)))
+				mcu_shared_ram[0x000/2]--;
+			input_pressed = (input_pressed & 0xf7) | 8;
+		}
+		else
+			input_pressed = (input_pressed & 0xf7);
+
+		if(coin_input & 0x10)//start 2
+		{
+			if((input_pressed & 0x10) == 0 && (~(work_ram[0x100/2] & 2)))
+				mcu_shared_ram[0x000/2]--;
+			input_pressed = (input_pressed & 0xef) | 0x10;
+		}
+		else
+			input_pressed = (input_pressed & 0xef);
+	}
+
+	/*random number generators,controls order of cards*/
+	mcu_shared_ram[0x10/2] = mame_rand(timer->machine) & 0xffff;
+	mcu_shared_ram[0x12/2] = mame_rand(timer->machine) & 0xffff;
+	mcu_shared_ram[0x14/2] = mame_rand(timer->machine) & 0xffff;
+	mcu_shared_ram[0x16/2] = mame_rand(timer->machine) & 0xffff;
 }
 
 
-WRITE16_HANDLER( sc0_vram_w )
-{
-	int oldword = sc0_vram[offset];
-	int newword = oldword;
-	COMBINE_DATA(&newword);
 
-	if (oldword != newword)
-	{
-		sc0_vram[offset] = newword;
-		tilemap_mark_tile_dirty(sc0_tilemap,offset);
-	}
+WRITE16_HANDLER( back_vram_w )
+{
+	COMBINE_DATA(&back_vram[offset]);
+	tilemap_mark_tile_dirty(back_tilemap,offset);
 }
+
 
 WRITE16_HANDLER( ddealer_vregs_w )
 {
 	COMBINE_DATA(&ddealer_vregs[offset]);
 }
+
+/******************************************************************************************************
+
+Protection handling,identical to Hacha Mecha Fighter / Thunder Dragon with different vectors.
+
+******************************************************************************************************/
 
 #define PROT_JSR(_offs_,_protvalue_,_pc_) \
 	if(mcu_shared_ram[(_offs_)/2] == _protvalue_) \
@@ -246,82 +377,45 @@ static WRITE16_HANDLER( ddealer_mcu_shared_w )
 
 	switch(offset)
 	{
-		/*
-            shared_ram[0xe490/2]=0x4ef9;
-            shared_ram[0xe492/2]=0x0000;
-            shared_ram[0xe494/2]=0x9696;// write to tx tilemap
-            shared_ram[0xe4a0/2]=0x4ef9;
-            shared_ram[0xe4a2/2]=0x0000;
-            shared_ram[0xe4a4/2]=0x95fe;// write to bg tilemap,might be 0x9634
-            shared_ram[0xe4c0/2]=0x4ef9;
-            shared_ram[0xe4c2/2]=0x0000;
-            shared_ram[0xe4c4/2]=0x9634;// unsure about this,tx tilemap
-            shared_ram[0xe4e0/2]=0x4ef9;
-            shared_ram[0xe4e2/2]=0x0000;
-            shared_ram[0xe4e4/2]=0x5ac6;//palette ram buffer
-        */
 		case 0x086/2: PROT_INPUT(0x086/2,0x1234,0x100/2,0x80000); break;
 		case 0x164/2: PROT_INPUT(0x164/2,0x5678,0x104/2,0x80002); break;
 		case 0x62e/2: PROT_INPUT(0x62e/2,0x9ca3,0x108/2,0x80008); break;
 		case 0x734/2: PROT_INPUT(0x734/2,0xaba2,0x10c/2,0x8000a); break;
+/*These enables something for sure,maybe the random number generator?*/
  //00054C: 33FC B891 000F E828        move.w  #$b891, $fe828.l
  //000554: 33FC C760 000F E950        move.w  #$c760, $fe950.l
  //00055C: 33FC D45F 000F EA7C        move.w  #$d45f, $fea7c.l
  //000564: 33FC E32E 000F ED4A        move.w  #$e32e, $fed4a.l
-//006992-7348-7518
-/*
-fe400->score sub-routine
-fe410-><unused>
-fe420->called before you enter into the gameplay,cards initialize? a39a will break lots of things
-fe430->called in some circumstances after 420 (ASM-wise)
-fe440->called during attract
 
-fe470->called when it should update the graphics
-A0 = f3072
-A2 = 9cf4c
-A3 = 9ce9c
-
-6176 is the player 2
-
-work ram addresses
-f031e->
-f3010->mirror for inputs player 1
-f5010->mirror for inputs player 2
-*/
-
-		case 0x40e/2: PROT_JSR(0x40e,0x8011,0x6992);//0x89e); break;//0x6992); break;
+		case 0x40e/2: PROT_JSR(0x40e,0x8011,0x6992); break;//score
 		case 0x41e/2: break;//unused
-		case 0x42e/2: PROT_JSR(0x42e,0x8007,0x6004); break;//0x89e); break;//0xa39a); break;
-		case 0x43e/2: PROT_JSR(0x43e,0x801d,0x89e);  break;//0x62f2); break;//0x6176); break;//0x6ebe); break;//0x9b6);  break;//801d
-		case 0x44e/2: PROT_JSR(0x44e,0x8028,0x68f6); break;
-		case 0x45e/2: PROT_JSR(0x45e,0x803e,0x6f90); break;
-		case 0x46e/2: PROT_JSR(0x46e,0x8033,0x93c2); break;
-		case 0x47e/2: PROT_JSR(0x47e,0x8026,0x89e);  break;//0x6786); break; //wrong,just to let pass the check
-		case 0x48e/2: PROT_JSR(0x48e,0x8012,0x6176); break;
-/**/	case 0x49e/2: PROT_JSR(0x49e,0x8004,0x9696); break;
-		case 0x4ae/2: PROT_JSR(0x4ae,0x8035,0x95fe); break;
-		case 0x4be/2: PROT_JSR(0x4be,0x8009,0x89e);  break;//0xa74);  break; //wrong
-/**/	case 0x4ce/2: PROT_JSR(0x4ce,0x802a,0x9656); break;//z
+		case 0x42e/2: PROT_JSR(0x42e,0x8007,0x6004); break;//cards on playfield/hand (ram side)
+		case 0x43e/2: PROT_JSR(0x43e,0x801d,0x6176); break;//second player sub-routine
+		case 0x44e/2: PROT_JSR(0x44e,0x8028,0x6932); break;//"gun card" logic
+		case 0x45e/2: PROT_JSR(0x45e,0x803e,0x6f90); break;//card delete
+		case 0x46e/2: PROT_JSR(0x46e,0x8033,0x93c2); break;//card movements
+		case 0x47e/2: PROT_JSR(0x47e,0x8026,0x67a0); break;//cards on playfield (vram side)
+		case 0x48e/2: PROT_JSR(0x48e,0x8012,0x6824); break;//cards on hand (vram side)
+		case 0x49e/2: PROT_JSR(0x49e,0x8004,0x9696); break;//write to text layer
+		case 0x4ae/2: PROT_JSR(0x4ae,0x8035,0x95fe); break;//write to scroll layer
+		case 0x4be/2: PROT_JSR(0x4be,0x8009,0x9634); break;//show girls sub-routine
+		case 0x4ce/2: PROT_JSR(0x4ce,0x802a,0x9656); break;
 		case 0x4de/2: PROT_JSR(0x4de,0x803b,0x96c2); break;
-/**/	case 0x4ee/2: PROT_JSR(0x4ee,0x800c,0x5ca4); break;//correct
-		case 0x4fe/2: PROT_JSR(0x4fe,0x8018,0x6004); break;//0x9818); break;//6004?
+		case 0x4ee/2: PROT_JSR(0x4ee,0x800c,0x5ca4); break;//palette ram buffer
+		case 0x4fe/2: PROT_JSR(0x4fe,0x8018,0x9818); break;
+		/*Start-up vector,I think that only the first ram address can be written by the main CPU,or it is a whole sequence.*/
 		case 0x000/2:
 			if(mcu_shared_ram[0x000/2] == 0x60fe)
 			{
-				mcu_shared_ram[0x000/2] = 0x0000;
-				mcu_shared_ram[0x002/2] = 0x0000;
+				mcu_shared_ram[0x000/2] = 0x0000;//coin counter
+				mcu_shared_ram[0x002/2] = 0x0000;//coin counter "decimal point"
 				mcu_shared_ram[0x004/2] = 0x4ef9;
-//              mcu_shared_ram[0x006/2] = 0x0000;
-//              mcu_shared_ram[0x008/2] = 0x0000;
-//              mcu_shared_ram[0x00a/2] = 0x0000;
-//              mcu_shared_ram[0x00c/2] = 0x0000;
-//              mcu_shared_ram[0x00e/2] = 0x0000;
 			}
 			break;
 		case 0x002/2:
 		case 0x004/2:
-			if(mcu_shared_ram[0x002/2] == 0x0000 && mcu_shared_ram[0x004/2] == 0x0214) //<- he believes to be astute...
-				mcu_shared_ram[0x004/2] = 0x4ef9;//0604
+			if(mcu_shared_ram[0x002/2] == 0x0000 && mcu_shared_ram[0x004/2] == 0x0214)
+				mcu_shared_ram[0x004/2] = 0x4ef9;
 			break;
 		case 0x008/2:
 			if(mcu_shared_ram[0x008/2] == 0x000f)
@@ -350,9 +444,16 @@ static ADDRESS_MAP_START( ddealer, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x084000, 0x084003) AM_WRITE( YM2203_w ) // ym ?
 	AM_RANGE(0x088000, 0x0887ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16) // palette ram
 	AM_RANGE(0x08c000, 0x08cfff) AM_RAM_WRITE(ddealer_vregs_w) AM_BASE(&ddealer_vregs) // palette ram
-	AM_RANGE(0x090000, 0x093fff) AM_RAM_WRITE(sc0_vram_w) AM_BASE(&sc0_vram) // bg tilemap
-	AM_RANGE(0x09c000, 0x09ffff) AM_RAM_WRITE(sc3_vram_w) AM_BASE(&sc3_vram) // fg tilemap
-	AM_RANGE(0x0f0000, 0x0fdfff) AM_RAM
+
+	/* this might actually be 1 tilemap with some funky rowscroll / columnscroll enabled, I'm not sure */
+	AM_RANGE(0x090000, 0x090fff) AM_RAM AM_BASE(&left_fg_vram_top)
+	AM_RANGE(0x091000, 0x091fff) AM_RAM AM_BASE(&right_fg_vram_top)
+	AM_RANGE(0x092000, 0x092fff) AM_RAM AM_BASE(&left_fg_vram_bottom)
+	AM_RANGE(0x093000, 0x093fff) AM_RAM AM_BASE(&right_fg_vram_bottom)
+	//AM_RANGE(0x094000, 0x094001) AM_NOP // always 0?
+	AM_RANGE(0x098000, 0x098001) AM_WRITE(ddealer_flipscreen_w)
+	AM_RANGE(0x09c000, 0x09cfff) AM_RAM_WRITE(back_vram_w) AM_BASE(&back_vram) // bg tilemap
+	AM_RANGE(0x0f0000, 0x0fdfff) AM_RAM AM_BASE(&work_ram)
 	AM_RANGE(0x0fe000, 0x0fefff) AM_RAM_WRITE(ddealer_mcu_shared_w) AM_BASE(&mcu_shared_ram)
 	AM_RANGE(0x0ff000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
@@ -364,9 +465,9 @@ static INPUT_PORTS_START( ddealer )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN ) //used,"test" in service mode,unknown purpose
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN ) //bryan:  test mode in some games?
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("IN1")
 	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
@@ -386,6 +487,7 @@ static INPUT_PORTS_START( ddealer )
 	PORT_BIT( 0x4000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
+	/*bits 0-7 are almost surely to be coinage.*/
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
@@ -412,7 +514,7 @@ static INPUT_PORTS_START( ddealer )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Demo_Sounds ) )
@@ -485,8 +587,9 @@ static MACHINE_DRIVER_START( ddealer )
 	MDRV_CPU_VBLANK_INT("main", ddealer_interrupt)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 90)//guess,controls music tempo,112 is way too fast
 
-	MDRV_GFXDECODE(ddealer)
+	// M50747 or NMK-110 8131 MCU
 
+	MDRV_GFXDECODE(ddealer)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -500,6 +603,8 @@ static MACHINE_DRIVER_START( ddealer )
 
 	MDRV_VIDEO_START(ddealer)
 	MDRV_VIDEO_UPDATE(ddealer)
+
+	MDRV_TIMER_ADD_PERIODIC("coinsim", ddealer_mcu_sim, HZ(10000)) // not real, but for simulating the MCU
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ym", YM2203, 6000000 / 4)//guess
@@ -523,36 +628,23 @@ static READ16_HANDLER( ddealer_mcu_r )
 
 	res = resp[respcount++];
 	if (resp[respcount]<0)
-	{
 		 respcount = 0;
-		// ddealer_protection(machine);
 
-	}
 	return res;
 }
 
-/*static WRITE16_HANDLER( ddealer_mcu_w )
-{
-    if(data==1)
-    {
-        prot=1;
-        shared_ram[0xe000/2]=0;
-        shared_ram[0xe002/2]=0;
-        shared_ram[0xe004/2]=0;
-        shared_ram[0xe006/2]=0;
-    }
-}
-*/
 static DRIVER_INIT( ddealer )
 {
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe01c, 0xfe01d, 0, 0, ddealer_mcu_r );
-//  memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfe01e, 0xfe01f, 0, 0, ddealer_mcu_w );
 }
 
 ROM_START( ddealer )
 	ROM_REGION( 0x40000, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "1.ic6", 0x00001, 0x20000, CRC(ce0dff50) SHA1(2d7a03f6b9609aea7511a4dc49560a901b0b9f19) )
 	ROM_LOAD16_BYTE( "2.ic28", 0x00000, 0x20000, CRC(f00c346f) SHA1(bd73efb19d5f9efc88210d92a82a3f4595b41097) )
+
+	ROM_REGION( 0x40000, "mcu", 0 ) /* M50747? MCU Code */
+	ROM_LOAD( "mcu", 0x0000, 0x1000, NO_DUMP ) // might be NMK-110 8131 chip
 
 	ROM_REGION( 0x20000, "gfx1", 0 ) /* BG0 */
 	ROM_LOAD( "4.ic65", 0x00000, 0x20000, CRC(4939ff1b) SHA1(af2f2feeef5520d775731a58cbfc8fcc913b7348) )
@@ -565,5 +657,5 @@ ROM_START( ddealer )
 	ROM_LOAD( "6.ic86", 0x100, 0x100, NO_DUMP )
 ROM_END
 
-GAME( 1991, ddealer,  0, ddealer, ddealer, ddealer,  ROT0, "NMK", "Double Dealer", GAME_NOT_WORKING )
+GAME( 1991, ddealer,  0, ddealer, ddealer, ddealer,  ROT0, "NMK", "Double Dealer", 0 )
 
