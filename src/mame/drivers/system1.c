@@ -1550,6 +1550,12 @@ static INPUT_PORTS_START( ufosensi )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
 static const gfx_layout charlayout =
 {
 	8,8,
@@ -1566,7 +1572,11 @@ static GFXDECODE_START( system1 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 512, 128 )
 GFXDECODE_END
 
-
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
 
 static MACHINE_DRIVER_START( system1 )
 
@@ -1660,6 +1670,18 @@ static MACHINE_DRIVER_START( chplft )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( dakkochn )
+
+	/* basic machine hardware */
+	MDRV_IMPORT_FROM( chplft )
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_IO_MAP(wbml_io_map,0)
+
+	/* video hardware */
+	MDRV_VIDEO_START(wbml)
+
+MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( brain )
 
@@ -1690,6 +1712,7 @@ static MACHINE_DRIVER_START( wbml )
 
 MACHINE_DRIVER_END
 
+
 static MACHINE_DRIVER_START( shtngmst )
 
 	/* basic machine hardware */
@@ -1705,7 +1728,6 @@ static MACHINE_DRIVER_START( shtngmst )
 	MDRV_SCREEN_VISIBLE_AREA(0*8+8, 32*8-1-8, 0*8, 28*8-1)
 
 	MDRV_VIDEO_UPDATE(choplifter)
-
 
 MACHINE_DRIVER_END
 
@@ -1726,6 +1748,7 @@ static MACHINE_DRIVER_START( noboranb )
 
 MACHINE_DRIVER_END
 
+
 static MACHINE_DRIVER_START( blckgalb )
 
 	/* basic machine hardware */
@@ -1738,6 +1761,7 @@ static MACHINE_DRIVER_START( blckgalb )
 
 MACHINE_DRIVER_END
 
+
 static MACHINE_DRIVER_START( ufosensi )
 
 	/* basic machine hardware */
@@ -1749,13 +1773,14 @@ static MACHINE_DRIVER_START( ufosensi )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(ufosensi)
+
 MACHINE_DRIVER_END
 
-/***************************************************************************
-
-  Game driver(s)
-
-***************************************************************************/
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 /* Since the standard System 1 PROM has part # 5317, Star Jacker, whose first */
 /* ROM is #5318, is probably the first or second System 1 game produced */
@@ -3911,9 +3936,15 @@ ROM_START( noboranb )
 	ROM_LOAD( "nobo_pr.13a", 0x0300, 0x0100, CRC(648350b8) SHA1(c7986aa9127ef5b50b845434cb4e81dff9861cd2) ) /* timing? (not used) */
 ROM_END
 
+/*************************************
+ *
+ *  Generic driver initialization
+ *
+ *************************************/
+
 static DRIVER_INIT( regulus )	{ regulus_decode(machine, "main"); }
 static DRIVER_INIT( mrviking )	{ mrviking_decode(machine, "main"); }
-static DRIVER_INIT( swat )		{ swat_decode(machine, "main"); }
+static DRIVER_INIT( swat )	{ swat_decode(machine, "main"); }
 static DRIVER_INIT( flicky )	{ flicky_decode(machine, "main"); }
 static DRIVER_INIT( wmatch )	{ wmatch_decode(machine, "main"); }
 static DRIVER_INIT( bullfgtj )	{ bullfgtj_decode(machine, "main"); }
@@ -3926,15 +3957,15 @@ static DRIVER_INIT( teddybb )	{ teddybb_decode(machine, "main"); }
 static DRIVER_INIT( hvymetal )	{ hvymetal_decode(machine, "main"); }
 static DRIVER_INIT( myheroj )	{ myheroj_decode(machine, "main"); }
 static DRIVER_INIT( 4dwarrio )	{ fdwarrio_decode(machine, "main"); }
-static DRIVER_INIT( wboy )		{ astrofl_decode(machine, "main"); }
-static DRIVER_INIT( wboy2 )		{ wboy2_decode(machine, "main"); }
+static DRIVER_INIT( wboy )	{ astrofl_decode(machine, "main"); }
+static DRIVER_INIT( wboy2 )	{ wboy2_decode(machine, "main"); }
 static DRIVER_INIT( gardia )	{ gardia_decode(machine, "main"); }
 static DRIVER_INIT( gardiab )	{ gardiab_decode(machine, "main"); }
 
 
 
 static DRIVER_INIT( blockgal )	{ mc8123_decrypt_rom(machine, "main", "user1", 0, 0); }
-static DRIVER_INIT( wbml )		{ mc8123_decrypt_rom(machine, "main", "user1", 1, 4); }
+static DRIVER_INIT( wbml )	{ mc8123_decrypt_rom(machine, "main", "user1", 1, 4); }
 static DRIVER_INIT( ufosensi )  { mc8123_decrypt_rom(machine, "main", "user1", 1, 4); }
 
 static UINT8 dakkochn_control;
@@ -4052,6 +4083,11 @@ static DRIVER_INIT( bootlegb )
 	memory_configure_bank_decrypted(1, 0, 4, memory_region(machine, "main") + 0x30000, 0x4000);
 }
 
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
 
 GAME( 1983, starjack, 0,        small,    starjack, 0,        ROT270, "Sega",            "Star Jacker (Sega)", GAME_SUPPORTS_SAVE )
 GAME( 1983, starjacs, starjack, small,    starjacs, 0,        ROT270, "Stern",           "Star Jacker (Stern)", GAME_SUPPORTS_SAVE )
@@ -4119,6 +4155,6 @@ GAME( 1987, wbmljo,   wbml,     wbml,     wbml,     wbml,     ROT0,   "Sega / We
 GAME( 1987, wbmljb,   wbml,     wbml,     wbml,     bootlegb, ROT0,   "bootleg",         "Wonder Boy in Monster Land (Japan not encrypted)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1987, wbmlb,    wbml,     wbml,     wbml,     bootlegb, ROT0,   "bootleg",         "Wonder Boy in Monster Land (English bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
 GAME( 1987, wbmlbg,   wbml,     wbml,     wbml,     bootlegb, ROT0,   "bootleg",         "Wonder Boy in Monster Land (Galaxy Electronics English bootleg)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE)
-GAME( 1987, dakkochn, 0,        wbml,     wbml,     dakkochn, ROT0,   "Whiteboard",      "DakkoChan House (MC-8123, 317-0014)", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1987, dakkochn, 0,        dakkochn, wbml,     dakkochn, ROT0,   "Whiteboard",      "DakkoChan House (MC-8123, 317-0014)", GAME_NOT_WORKING | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1988, ufosensi, 0,        ufosensi, ufosensi, ufosensi, ROT0,   "Sega",            "Ufo Senshi Yohko Chan (MC-8123, 317-0064)", GAME_SUPPORTS_SAVE )
 GAME( 1988, ufosensb, ufosensi, ufosensi, ufosensi, bootlegb, ROT0,   "bootleg",         "Ufo Senshi Yohko Chan (not encrypted)", GAME_SUPPORTS_SAVE )
