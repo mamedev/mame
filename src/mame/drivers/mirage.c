@@ -1,9 +1,8 @@
 /* Mirage Youjuu Mahjongden
 
 TODO:
--eeprom emulation?
--priorities
--sample banking
+-eeprom emulation? Software settings all changes if you toggle the "flip screen" dip-switch
+-priorities.
 
 Notes:To enter into Test Mode you need to keep pressed the Mahjong A button at start-up.
 */
@@ -133,22 +132,11 @@ static VIDEO_UPDATE(mirage)
 	return 0;
 }
 
-
-static READ16_HANDLER( mirage_controls_r )
-{
-	return input_port_read(machine, "SYSTEM_IN");
-}
-
-static READ16_HANDLER( random_readers )
-{
-	return mame_rand(machine);
-}
-
 static UINT32 mux_data;
 
 static WRITE16_HANDLER( mirage_mux_w )
 {
-	mux_data = data & 0xffff;
+	mux_data = data & 0x1f;
 }
 
 static READ16_HANDLER( mirage_input_r )
@@ -165,6 +153,26 @@ static READ16_HANDLER( mirage_input_r )
 	return 0xffff;
 }
 
+static WRITE16_HANDLER( okim1_rombank_w )
+{
+	if(ACCESSING_BITS_0_7)
+	{
+		UINT8 *oki = memory_region(machine, "oki2");
+		memcpy(&oki[0], &oki[(data & 3) * 0x40000] + 0x100000, 0x40000);
+	}
+}
+
+static WRITE16_HANDLER( okim0_rombank_w )
+{
+	/*bits 4-6 used?Volume control?*/
+
+	if(ACCESSING_BITS_0_7)
+	{
+		UINT8 *oki = memory_region(machine, "oki1");
+		memcpy(&oki[0], &oki[(data & 7) * 0x40000] + 0x200000, 0x40000);
+	}
+}
+
 static ADDRESS_MAP_START( mirage_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
 
@@ -178,16 +186,15 @@ static ADDRESS_MAP_START( mirage_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x130000, 0x1307ff) AM_READ(SMH_RAM)
 
-	AM_RANGE(0x140006, 0x140007) AM_READ(random_readers)
+//	AM_RANGE(0x140006, 0x140007) AM_READ(random_readers)
 
-	AM_RANGE(0x150006, 0x150007) AM_READ(SMH_NOP)
+//	AM_RANGE(0x150006, 0x150007) AM_READ(SMH_NOP)
 
 	AM_RANGE(0x16c006, 0x16c007) AM_READ(mirage_input_r)
 
-	AM_RANGE(0x16e002, 0x16e003) AM_READ(mirage_controls_r)
+	AM_RANGE(0x16e002, 0x16e003) AM_READ_PORT("SYSTEM_IN")
 
 	AM_RANGE(0x170000, 0x173fff) AM_READ(SMH_RAM)
-
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mirage_writemem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -204,15 +211,8 @@ static ADDRESS_MAP_START( mirage_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x130000, 0x1307ff) AM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE(&paletteram16)
 
-	AM_RANGE(0x140000, 0x140001) AM_READWRITE(okim6295_status_1_lsb_r, okim6295_data_1_lsb_w)
-	AM_RANGE(0x140002, 0x140003) AM_READWRITE(okim6295_status_1_lsb_r, okim6295_data_1_lsb_w)
-
-//  AM_RANGE(0x140008, 0x140009) AM_WRITE(okim1_rombank_w)
-
-	AM_RANGE(0x150000, 0x150001) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
-	AM_RANGE(0x150002, 0x150003) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
-
-//  AM_RANGE(0x150008, 0x150009) AM_WRITE(okim0_rombank_w)
+	AM_RANGE(0x140000, 0x14000f) AM_READWRITE(okim6295_status_1_lsb_r, okim6295_data_1_lsb_w)
+	AM_RANGE(0x150000, 0x15000f) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 
 	AM_RANGE(0x160000, 0x160001) AM_WRITE(SMH_NOP)
 
@@ -220,8 +220,8 @@ static ADDRESS_MAP_START( mirage_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x16a000, 0x16a001) AM_WRITE(SMH_NOP)
 
-	AM_RANGE(0x16c000, 0x16c001) AM_WRITE(SMH_NOP)
-	AM_RANGE(0x16c002, 0x16c003) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x16c000, 0x16c001) AM_WRITE(okim1_rombank_w)
+	AM_RANGE(0x16c002, 0x16c003) AM_WRITE(okim0_rombank_w)
 	AM_RANGE(0x16c004, 0x16c005) AM_WRITE(mirage_mux_w)
 
 	AM_RANGE(0x16e000, 0x16e001) AM_WRITE(SMH_NOP)
@@ -382,7 +382,7 @@ static MACHINE_DRIVER_START( mirage )
 
 	MDRV_SOUND_ADD("oki2", OKIM6295, 1000000)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
 
@@ -398,58 +398,18 @@ ROM_START( mirage )
   	ROM_LOAD16_BYTE( "mbl-01.11a", 0x000001, 0x200000, CRC(895be69a) SHA1(541d8f37fb4cf99312b80a0eb0d729fbbeab5f4f) )
 	ROM_LOAD16_BYTE( "mbl-02.12a", 0x000000, 0x200000, CRC(474f6104) SHA1(ff81b32b90192c3d5f27c436a9246aa6caaeeeee) )
 
-	ROM_REGION( 0x200000, "oki1", 0 )	/* M6295 samples */
+	ROM_REGION( 0x400000, "oki1", 0 )	/* M6295 samples */
 	ROM_LOAD( "mbl-03.10a", 0x000000, 0x200000, CRC(4a599703) SHA1(b49e84faa2d6acca952740d30fc8d1a33ac47e79) )
+	ROM_RELOAD(				0x200000, 0x200000 )
 
-	ROM_REGION( 0x100000, "oki2", 0 )	/* M6295 samples */
+	ROM_REGION( 0x200000, "oki2", 0 )	/* M6295 samples */
 	ROM_LOAD( "mbl-04.12k", 0x000000, 0x100000, CRC(b533123d) SHA1(2cb2f11331d00c2d282113932ed2836805f4fc6e) )
+	ROM_RELOAD(				0x100000, 0x100000 )
 ROM_END
-
-#if 0
-static void descramble_sound( running_machine *machine, const char *region )
-{
-	UINT8 *rom = memory_region(machine, region);
-	int length = memory_region_length(machine, region);
-	UINT8 *buf1 = malloc_or_die(length);
-	UINT32 x;
-
-	for (x=0;x<length;x++)
-	{
-		UINT32 addr;
-
-		addr = BITSWAP24 (x,23,22,21,0, 20,
-		                    19,18,17,16,
-		                    15,14,13,12,
-		                    11,10,9, 8,
-		                    7, 6, 5, 4,
-		                    3, 2, 1 );
-
-		buf1[addr] = rom[x];
-	}
-
-	memcpy(rom,buf1,length);
-
-	free (buf1);
-
-#if 0
-	{
-		FILE *fp;
-		fp=fopen("sound.dmp", "w+b");
-		if (fp)
-		{
-			fwrite(rom, length, 1, fp);
-			fclose(fp);
-		}
-	}
-#endif
-
-}
-#endif
 
 static DRIVER_INIT( mirage )
 {
 	deco56_decrypt_gfx(machine, "gfx1");
-	//descramble_sound(machine, "oki1");
 }
 
-GAME( 1994, mirage, 0,        mirage, mirage, mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1994, mirage, 0,        mirage, mirage, mirage, ROT0, "Mitchell", "Mirage Youjuu Mahjongden (Japan)", GAME_IMPERFECT_GRAPHICS )
