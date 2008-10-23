@@ -204,7 +204,7 @@ OP(09) { int tmp; RD_IMM; ORA;                      } /* 2 ORA IMM */
 OP(29) { int tmp; RD_IMM; AND;                      } /* 2 AND IMM */
 OP(49) { int tmp; RD_IMM; EOR;                      } /* 2 EOR IMM */
 OP(69) { int tmp; RD_IMM; ADC_C02;                  } /* 2/3 ADC IMM */
-OP(89) { int tmp; RD_IMM; BIT;                      } /* 2 BIT IMM */
+OP(89) { int tmp; RD_IMM; BIT_IMM_C02;              } /* 2 BIT IMM */
 OP(a9) { int tmp; RD_IMM; LDA;                      } /* 2 LDA IMM */
 OP(c9) { int tmp; RD_IMM; CMP;                      } /* 2 CMP IMM */
 OP(e9) { int tmp; RD_IMM; SBC_C02;                  } /* 2/3 SBC IMM */
