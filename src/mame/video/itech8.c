@@ -598,7 +598,7 @@ TIMER_DEVICE_CALLBACK( grmatch_palette_update )
 		/* the TMS34070s latch at the start of the frame, based on the first few bytes */
 		UINT32 page_offset = (tms_state.dispstart & 0x0ffff) | grmatch_xscroll;
 		int page, x;
-		
+
 		/* iterate over both pages */
 		for (page = 0; page < 2; page++)
 		{
@@ -688,12 +688,12 @@ VIDEO_UPDATE( itech8_grmatch )
 		{
 			UINT8 pix0 = base0[x / 2];
 			UINT8 pix2 = base2[x / 2];
-			
+
 			if ((pix0 & 0xf0) != 0)
 				dest[x] = grmatch_palette[0][pix0 >> 4];
 			else
 				dest[x] = grmatch_palette[1][pix2 >> 4];
-			
+
 			if ((pix0 & 0x0f) != 0)
 				dest[x + 1] = grmatch_palette[0][pix0 & 0x0f];
 			else

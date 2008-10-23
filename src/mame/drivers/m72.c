@@ -125,7 +125,7 @@ static MACHINE_RESET( m72 )
 	mcu_snd_cmd_latch = 0;
 
 	MACHINE_RESET_CALL(m72_sound);
-	
+
 	state_save_register_global(mcu_sample_addr);
 	state_save_register_global(mcu_snd_cmd_latch);
 
@@ -219,9 +219,9 @@ static WRITE16_HANDLER( m72_main_mcu_w)
 
 	COMBINE_DATA(&val);
 
-	/* 0x07fe is used for synchronization as well. 
-	 * This address however will not trigger an interrupt 
-	 */
+	/* 0x07fe is used for synchronization as well.
+     * This address however will not trigger an interrupt
+     */
 
 	if (offset == 0x0fff/2 && ACCESSING_BITS_8_15)
 	{
@@ -246,7 +246,7 @@ static WRITE8_HANDLER( m72_mcu_data_w )
 static READ8_HANDLER(m72_mcu_data_r )
 {
 	UINT8 ret;
-	
+
 	if (offset&1) ret = (protection_ram[offset/2] & 0xff00)>>8;
 	else ret = (protection_ram[offset/2] & 0x00ff);
 
@@ -323,7 +323,7 @@ INLINE DRIVER_INIT( loht_mcu )
 {
 	int cpunum = mame_find_cpu_index(machine, "main");
 	int sndnum = mame_find_cpu_index(machine, "sound");
-	
+
 	protection_ram = auto_malloc(0x10000);
 	memory_install_read16_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xbffff, 0, 0, SMH_BANK1);
 	memory_install_write16_handler(machine, cpunum, ADDRESS_SPACE_PROGRAM, 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_w);
@@ -1065,7 +1065,7 @@ static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(m72_mcu_snd_r, m72_mcu_ack_w)
 	/* shared at b0000 - b0fff on the main cpu */
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_READWRITE(m72_mcu_data_r,m72_mcu_data_w )
-	
+
 	/* Ports */
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(m72_mcu_port_r, m72_mcu_port_w)
 ADDRESS_MAP_END
@@ -1866,10 +1866,10 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( m72_8751 )
 
 	MDRV_IMPORT_FROM(m72_base)
-	
+
 	MDRV_CPU_ADD("mcu",I8751, MASTER_CLOCK/2)
 	/* internal - MDRV_CPU_PROGRAM_MAP(mcu_map,0) */
-	//MDRV_CPU_DATA_MAP(mcu_data_map,0)	
+	//MDRV_CPU_DATA_MAP(mcu_data_map,0)
 	MDRV_CPU_IO_MAP(mcu_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", m72_mcu_int)
 	//MDRV_INTERLEAVE(1000)

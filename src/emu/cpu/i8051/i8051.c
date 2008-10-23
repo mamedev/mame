@@ -58,8 +58,8 @@
  *                 to output a page offset into external ram, but it is totally based on the hardware setup.
  *
  *        Timing needs to be implemented via MAME timers perhaps?
- * 
- * 		  October, 2008, Couriersud - Major rewrite
+ *
+ *        October, 2008, Couriersud - Major rewrite
  *
  *****************************************************************************/
 
@@ -67,21 +67,21 @@
  *  - EA pin - defined by architecture, must implement:
  *    1 means external access, bypassing internal ROM
  *  - T0 output clock ?
- * 
+ *
  * - Full Timer support (all modes)
  * - Implement cmos features
  * - Fix serial communication - This is a big hack (but working) right now.
- * - Implement 87C751 in sslam.c 
- * - Fix cardline.c 
- * - Fix sslam.c and cardline.c 
+ * - Implement 87C751 in sslam.c
+ * - Fix cardline.c
+ * - Fix sslam.c and cardline.c
  *      most likely due to different behaviour of I/O pins. The boards
  *      actually use 80CXX, i.e. CMOS versions.
- *      "Normal" 805X will return a 0 if reading from a output port which has 
- *      a 0 written to it's latch. At least cardline expects a 1 here. 
- * 
+ *      "Normal" 805X will return a 0 if reading from a output port which has
+ *      a 0 written to it's latch. At least cardline expects a 1 here.
+ *
  * Done:
- * - Fix segas18.c (segaic16.c) memory handling. 
- * - Fix sslam.c 
+ * - Fix segas18.c (segaic16.c) memory handling.
+ * - Fix sslam.c
  * - Fix limenko.c videopkr.c : Issue with core allocation of ram (duplicate savestate)
  * - Handle internal ram better (debugger visible)
  *  - Fixed port reading
@@ -90,7 +90,7 @@
  *  - Now returns INTERNAL_DIVIDER, adjusted cycle counts
  *  - Remove unnecessary and duplicated code
  * - Remove unnecessary functions
- * - Rewrite to have sfr-registers stored in int_ram. 
+ * - Rewrite to have sfr-registers stored in int_ram.
  * - Debugger may now watch sfr-registers as well.
  * - implemented interrupt callbacks (HOLD_LINE now supported)
  * - Runtime switch for processor type - remove ifdefs
@@ -162,7 +162,7 @@ enum
 	V_IE1	= 0x013,	/* External Interrupt 1 */
 	V_TF1	= 0x01b,	/* Timer 1 Overflow */
 	V_RITI	= 0x023,	/* Serial Receive/Transmit */
-	
+
 	/* 8052 Only Vectors */
 	V_TF2	= 0x02b,	/* Timer 2 Overflow */
 };
@@ -172,11 +172,11 @@ enum
 ***************************************************************************/
 
 typedef struct _mcs51_uart mcs51_uart;
-struct _mcs51_uart 
+struct _mcs51_uart
 {
 	UINT8	data_out;		//Data to send out
 	UINT8	bits_to_send;	//How many bits left to send when transmitting out the serial port
-	
+
 	int		smod_div;		/* signal divided by 2^SMOD */
 	int		rx_clk;			/* rx clock */
 	int		tx_clk;			/* tx clock */
@@ -184,7 +184,7 @@ struct _mcs51_uart
 };
 
 typedef struct _mcs51_regs mcs51_regs;
-struct _mcs51_regs 
+struct _mcs51_regs
 {
 	//Internal stuff
 	UINT16	ppc;			//previous pc
@@ -195,7 +195,7 @@ struct _mcs51_regs
 	UINT8	rwm;			//Signals that the current instruction is a read/write/modify instruction
 
 	int		inst_cycles;		/* cycles for the current instruction */
-	int		ram_mask;  			/* second ram bank for indirect access available ? */ 
+	int		ram_mask;  			/* second ram bank for indirect access available ? */
 	int		num_interrupts;		/* number of interrupts supported */
 	int		recalc_parity;		/* recalculate parity before next instruction */
 	int		last_line_state;	/* last state of input lines line */
@@ -213,11 +213,11 @@ struct _mcs51_regs
 	// SFR Callbacks
 	void 	(*sfr_write)(size_t offset, UINT8 data);
 	UINT8	(*sfr_read)(size_t offset);
-	
+
 	//Interrupt Callback
 	int 	(*irq_callback)(int irqline);
 
-	//Serial Port TX/RX Callbacks 
+	//Serial Port TX/RX Callbacks
 	// TODO: Move to special port r/w
 	void    (*serial_tx_callback)(int data);	//Call back funciton when sending data out of serial port
 	int		(*serial_rx_callback)(void);		//Call back function to retrieve data when receiving serial port data
@@ -241,8 +241,8 @@ struct _mcs51_regs
 /* Read/Write a byte from/to External Data Memory (Usually RAM or other I/O) */
 #define DATAMEM_R(a)	(UINT8)io_read_byte_8le(a)
 #define DATAMEM_W(a,v)	io_write_byte_8le(a,v)
-//#define DATAMEM_R(a)	(UINT8)data_read_byte_8le(a)
-//#define DATAMEM_W(a,v)	data_write_byte_8le(a,v)
+//#define DATAMEM_R(a)  (UINT8)data_read_byte_8le(a)
+//#define DATAMEM_W(a,v)    data_write_byte_8le(a,v)
 
 /* Read/Write a byte from/to the Internal RAM */
 
@@ -276,12 +276,12 @@ struct _mcs51_regs
 #define RWM		mcs51.rwm
 
 /* SFR Registers - These are accessed directly for speed on read */
-/* Read accessors 												 */
+/* Read accessors                                                */
 
 #define SFR_A(a)		mcs51.sfr_ram[(a)]
 #define SET_SFR_A(a,v)	do { SFR_A(a) = (v); } while (0)
 
-#define ACC			((const UINT8) SFR_A(ADDR_ACC)) 
+#define ACC			((const UINT8) SFR_A(ADDR_ACC))
 #define PSW			((const UINT8) SFR_A(ADDR_PSW))
 
 #define P0			((const UINT8) SFR_A(ADDR_P0))
@@ -545,7 +545,7 @@ INLINE void update_ptrs(void)
   There is no way external hardware can distinguish between 8bit access and 16 bit access.
   During 16bit access the high order byte of the address is output on port 2. We therefore
   assume that most hardware will use port 2 for 8bit access as well.
-  
+
   On configurations where 8 bit access in conjunction with other ports is used,
   it is up to the driver to use AM_MIRROR to mask out the high level address and
   provide it's own mapping.
@@ -573,9 +573,9 @@ INLINE UINT8 iram_read(size_t offset)
 
 INLINE void iram_write(size_t offset, UINT8 data)
 {
-	if ((offset) < 0x80) 
+	if ((offset) < 0x80)
 		data_write_byte_8le(offset, data);
-	else 
+	else
 		mcs51.sfr_write(offset, data);
 }
 
@@ -606,7 +606,7 @@ INLINE void set_parity(void)
 	UINT8 p = 0;
 	int i;
 	UINT8 a = ACC;
-	
+
 	for (i=0; i<8; i++) {		//Test for each of the 8 bits in the ACC!
 		p ^= (a & 1);
 		a = (a >> 1);
@@ -657,9 +657,9 @@ INLINE void bit_address_w(UINT8 offset, UINT8 bit)
 		bit_pos = offset & 0x7;
 		bit = (bit & 0x1) << bit_pos;
 		mask = ~(1 << bit_pos) & 0xff;
-		result = IRAM_R(word) & mask;	
+		result = IRAM_R(word) & mask;
 		result = result | bit;
-		IRAM_W(word, result);			
+		IRAM_W(word, result);
 	}
 	/* SFR bit addressable registers */
 	else {
@@ -668,9 +668,9 @@ INLINE void bit_address_w(UINT8 offset, UINT8 bit)
 		bit_pos = offset & 0x7;
 		bit = (bit & 0x1) << bit_pos;
 		mask = ~(1 << bit_pos) & 0xff;
-		result = IRAM_R(word) & mask;	
+		result = IRAM_R(word) & mask;
 		result = result | bit;
-		IRAM_W(word, result);			
+		IRAM_W(word, result);
 	}
 }
 
@@ -699,7 +699,7 @@ INLINE void do_sub_flags(UINT8 a, UINT8 data, UINT8 c)
 INLINE void transmit_receive(int source)
 {
 	int mode = (GET_SM0<<1) | GET_SM1;
-	
+
 	if (source == 1) /* timer1 */
 		mcs51.uart.smod_div = (mcs51.uart.smod_div + 1) & (2-GET_SMOD);
 
@@ -744,9 +744,9 @@ INLINE void transmit_receive(int source)
 				//Set Interrupt Flag
 				SET_TI(1);
 				//Note: we'll let the main loop catch the interrupt
-			}					
+			}
 		}
-		
+
 	}
 	/* receive */
 	if (mcs51.uart.rx_clk >= 16)
@@ -769,33 +769,33 @@ INLINE void transmit_receive(int source)
 		}
 	}
 }
-	
+
 
 INLINE void update_timer_t0(int cycles)
 {
 	int mode = (GET_M0_1<<1) | GET_M0_0;
 	UINT32 count = 0;
 
-	if (GET_TR0) 
+	if (GET_TR0)
 	{
 		UINT32 delta;
-		
+
 		/* counter / external input */
 		delta = GET_CT0 ? mcs51.t0_cnt : cycles;
 		/* taken, reset */
 		mcs51.t0_cnt = 0;
 		/* TODO: Not sure about IE0. The manual specifies INT0=high,
-		 * which in turn means CLEAR_LINE.
-		 * IE0 may be edge triggered depending on IT0 */
+         * which in turn means CLEAR_LINE.
+         * IE0 may be edge triggered depending on IT0 */
 		if (GET_GATE0 && !GET_IE0)
 			delta = 0;
-			
+
 		switch(mode) {
 			case 0:			/* 13 Bit Timer Mode */
 				count = ((TH0<<5) | ( TL0 & 0x1f ) );
 				count += delta;
 				if ( count & 0xffffe000 ) /* Check for overflow */
-					SET_TF0(1);	
+					SET_TF0(1);
 				TH0 = (count>>5) & 0xff;
 				TL0 =  count & 0x1f ;
 				break;
@@ -817,7 +817,7 @@ INLINE void update_timer_t0(int cycles)
 				/* Update new values of the counter */
 				TL0 =  count & 0xff;
 				break;
-			case 3:	
+			case 3:
 				/* Split Timer 1 */
 				count = (UINT16) TL0 + delta;
 				if ( count & 0xffffff00 ) 				/* Check for overflow */
@@ -826,11 +826,11 @@ INLINE void update_timer_t0(int cycles)
 				break;
 		}
 	}
-	if (GET_TR1) 
+	if (GET_TR1)
 	{
-		switch(mode) 
+		switch(mode)
 		{
-		case 3:	
+		case 3:
 			/* Split Timer 2 */
 			count = (UINT16) TH0 + cycles;			/* No gate control or counting !*/
 			if ( count & 0xffffff00 ) 				/* Check for overflow */
@@ -846,18 +846,18 @@ INLINE void update_timer_t1(int cycles)
 	int mode = (GET_M1_1<<1) | GET_M1_0;
 	UINT32 count = 0;
 
-	if (GET_TR1) 
+	if (GET_TR1)
 	{
 		UINT32 delta;
 		int overflow = 0;
-		
+
 		/* counter / external input */
 		delta = GET_CT1 ? mcs51.t1_cnt : cycles;
 		/* taken, reset */
 		mcs51.t1_cnt = 0;
 		/* TODO: Not sure about IE0. The manual specifies INT0=high,
-		 * which in turn means CLEAR_LINE. Change to access last_state?
-		 * IE0 may be edge triggered depending on IT0 */
+         * which in turn means CLEAR_LINE. Change to access last_state?
+         * IE0 may be edge triggered depending on IT0 */
 		if (GET_GATE1 && !GET_IE1)
 			delta = 0;
 
@@ -867,8 +867,8 @@ INLINE void update_timer_t1(int cycles)
 				count = ((TH1<<5) | ( TL1 & 0x1f ) );
 				count += delta;
 				overflow = count & 0xffffe000; /* Check for overflow */
-				if ( overflow ) 
-					SET_TF1(1);	
+				if ( overflow )
+					SET_TF1(1);
 				TH1 = (count>>5) & 0xff;
 				TL1 =  count & 0x1f ;
 				break;
@@ -894,7 +894,7 @@ INLINE void update_timer_t1(int cycles)
 				/* Update new values of the counter */
 				TL1 =  count & 0xff;
 				break;
-			case 3:	
+			case 3:
 				/* do nothing */
 				break;
 		}
@@ -920,7 +920,7 @@ INLINE void update_timer_t2(int cycles)
 				{
 					SET_TF2(1);
 					count += ((RCAP2H<<8) | RCAP2L);
-				} 
+				}
 				else if (GET_EXEN2 && mcs51.t2ex_cnt>0)
 				{
 					count += ((RCAP2H<<8) | RCAP2L);
@@ -934,7 +934,7 @@ INLINE void update_timer_t2(int cycles)
 					SET_TF2(1);
 				TH2 = (count>>8) & 0xff;
 				TL2 =  count & 0xff;
-				
+
 				if (GET_EXEN2 && mcs51.t2ex_cnt>0)
 				{
 					RCAP2H = TH2;
@@ -1058,17 +1058,17 @@ static void execute_op(UINT8 op)
 		set_parity();
 		mcs51.recalc_parity = 0;
 	}
-	
+
 	switch( op )
 	{
-		
+
 		case 0x00:	nop();							break;	//NOP
 		case 0x01:	ajmp(op);						break;	//AJMP code addr
 		case 0x02:	ljmp();							break;	//LJMP code addr
 		case 0x03:	rr_a();							break;	//RR A
 		case 0x04:	inc_a();						break;	//INC A
 		case 0x05:	RWM=1; inc_mem(); RWM=0;		break;	//INC data addr
-		
+
 		case 0x06:
 		case 0x07:	inc_ir(op&1);					break;	//INC @R0/@R1
 
@@ -1080,35 +1080,35 @@ static void execute_op(UINT8 op)
 		case 0x0d:
 		case 0x0e:
 		case 0x0f:	inc_r(op&7);					break;	//INC R0 to R7
-		
+
 		case 0x10:	RWM=1; jbc(); RWM=0; 			break; 	//JBC bit addr, code addr
 		case 0x11: 	acall(op);						break;	//ACALL code addr
 		case 0x12:	lcall(); 						break;	//LCALL code addr
 		case 0x13:	rrc_a();						break;	//RRC A
 		case 0x14:	dec_a();						break;	//DEC A
 		case 0x15:	RWM=1; dec_mem(); RWM=0;		break;	//DEC data addr
-		
+
 		case 0x16:
-		case 0x17:	dec_ir(op&1); 					break;	//DEC @R0/@R1 
-		
-		case 0x18:  
+		case 0x17:	dec_ir(op&1); 					break;	//DEC @R0/@R1
+
+		case 0x18:
 		case 0x19:
 		case 0x1a:
 		case 0x1b:
 		case 0x1c:
 		case 0x1d:
 		case 0x1e:
-		case 0x1f:	dec_r(op&7); 					break;	//DEC R0 to R7 
-		
+		case 0x1f:	dec_r(op&7); 					break;	//DEC R0 to R7
+
 		case 0x20:	jb();							break;	//JB  bit addr, code addr
-		case 0x21:	ajmp(op);						break;	//AJMP code addr 
+		case 0x21:	ajmp(op);						break;	//AJMP code addr
 		case 0x22:	ret();							break;	//RET
 		case 0x23:	rl_a();							break;	//RL A
 		case 0x24:	add_a_byte();					break;	//ADD A, #data
 		case 0x25:	add_a_mem();					break;	//ADD A, data addr
 
 		case 0x26:
-		case 0x27:	add_a_ir(op&1);					break;	//ADD A, @R0/@R1 
+		case 0x27:	add_a_ir(op&1);					break;	//ADD A, @R0/@R1
 
 		case 0x28:
 		case 0x29:
@@ -1117,15 +1117,15 @@ static void execute_op(UINT8 op)
 		case 0x2c:
 		case 0x2d:
 		case 0x2e:
-		case 0x2f:	add_a_r(op&7);					break;	//ADD A, R0 to R7  
-		
+		case 0x2f:	add_a_r(op&7);					break;	//ADD A, R0 to R7
+
 		case 0x30:	jnb();							break;	//JNB bit addr, code addr
 		case 0x31:	acall(op);						break;	//ACALL code addr
 		case 0x32:	reti();							break;	//RETI
 		case 0x33:	rlc_a();						break;	//RLC A
 		case 0x34:	addc_a_byte();					break;	//ADDC A, #data
 		case 0x35:	addc_a_mem();					break;	//ADDC A, data addr
-		
+
 		case 0x36:
 		case 0x37:  addc_a_ir(op&1);				break;	//ADDC A, @R0/@R1
 
@@ -1136,17 +1136,17 @@ static void execute_op(UINT8 op)
 		case 0x3c:
 		case 0x3d:
 		case 0x3e:
-		case 0x3f:	addc_a_r(op&7);					break;	//ADDC A, R0 to R7 
-		
+		case 0x3f:	addc_a_r(op&7);					break;	//ADDC A, R0 to R7
+
 		case 0x40:	jc();							break;	//JC code addr
 		case 0x41:	ajmp(op);						break;	//AJMP code addr
 		case 0x42:	RWM=1; orl_mem_a();	RWM=0;		break;	//ORL data addr, A
 		case 0x43:	RWM=1; orl_mem_byte(); RWM=0;	break;	//ORL data addr, #data
 		case 0x44:	orl_a_byte();					break;
 		case 0x45:	orl_a_mem();					break;	//ORL A, data addr
-		
+
 		case 0x46:
-		case 0x47:	orl_a_ir(op&1); 				break;	//ORL A, @RO/@R1    
+		case 0x47:	orl_a_ir(op&1); 				break;	//ORL A, @RO/@R1
 
 		case 0x48:
 		case 0x49:
@@ -1155,17 +1155,17 @@ static void execute_op(UINT8 op)
 		case 0x4c:
 		case 0x4d:
 		case 0x4e:
-		case 0x4f: 	orl_a_r(op&7); 					break;	//ORL A, RO to R7  
-		
+		case 0x4f: 	orl_a_r(op&7); 					break;	//ORL A, RO to R7
+
 		case 0x50:	jnc(); 							break;	//JNC code addr
-		case 0x51:  acall(op);						break;	//ACALL code addr 
+		case 0x51:  acall(op);						break;	//ACALL code addr
 		case 0x52:	RWM=1; anl_mem_a(); RWM=0;		break;	//ANL data addr, A
 		case 0x53:	RWM=1; anl_mem_byte(); RWM=0;	break;	//ANL data addr, #data
 		case 0x54:	anl_a_byte();					break;	//ANL A, #data
 		case 0x55:	anl_a_mem();					break;	//ANL A, data addr
-		
+
 		case 0x56:
-		case 0x57:	anl_a_ir(op&1);					break;	//ANL A, @RO/@R1 
+		case 0x57:	anl_a_ir(op&1);					break;	//ANL A, @RO/@R1
 
 		case 0x58:
 		case 0x59:
@@ -1175,16 +1175,16 @@ static void execute_op(UINT8 op)
 		case 0x5d:
 		case 0x5e:
 		case 0x5f:	anl_a_r(op&7);					break;	//ANL A, RO to R7
-		
+
 		case 0x60:	jz();							break;	//JZ code addr
-		case 0x61:	ajmp(op); 						break;	//AJMP code addr 
+		case 0x61:	ajmp(op); 						break;	//AJMP code addr
 		case 0x62:	RWM=1; xrl_mem_a(); RWM=0;		break;	//XRL data addr, A
 		case 0x63:	RWM=1; xrl_mem_byte(); RWM=0;	break;	//XRL data addr, #data
 		case 0x64:	xrl_a_byte();					break;	//XRL A, #data
 		case 0x65:	xrl_a_mem();					break;	//XRL A, data addr
 
 		case 0x66:
-		case 0x67:	xrl_a_ir(op&1);					break;	//XRL A, @R0/@R1 
+		case 0x67:	xrl_a_ir(op&1);					break;	//XRL A, @R0/@R1
 
 		case 0x68:
 		case 0x69:
@@ -1193,17 +1193,17 @@ static void execute_op(UINT8 op)
 		case 0x6c:
 		case 0x6d:
 		case 0x6e:
-		case 0x6f:	xrl_a_r(op&7);					break;	//XRL A, R0 to R7  
-	
+		case 0x6f:	xrl_a_r(op&7);					break;	//XRL A, R0 to R7
+
 		case 0x70:	jnz();							break;	//JNZ code addr
-		case 0x71:	acall(op);						break;	//ACALL code addr  
+		case 0x71:	acall(op);						break;	//ACALL code addr
 		case 0x72:	orl_c_bitaddr();				break;	//ORL C, bit addr
 		case 0x73:	jmp_iadptr();					break;	//JMP @A+DPTR
 		case 0x74:	mov_a_byte();					break;	//MOV A, #data
 		case 0x75:	mov_mem_byte();					break;	//MOV data addr, #data
 
 		case 0x76:
-		case 0x77:	mov_ir_byte(op&1);				break;	//MOV @R0/@R1, #data     
+		case 0x77:	mov_ir_byte(op&1);				break;	//MOV @R0/@R1, #data
 
 		case 0x78:
 		case 0x79:
@@ -1212,17 +1212,17 @@ static void execute_op(UINT8 op)
 		case 0x7c:
 		case 0x7d:
 		case 0x7e:
-		case 0x7f:	mov_r_byte(op&7);				break;	//MOV R0 to R7, #data   
+		case 0x7f:	mov_r_byte(op&7);				break;	//MOV R0 to R7, #data
 
 		case 0x80:	sjmp();							break;	//SJMP code addr
-		case 0x81:	ajmp(op);						break;	//AJMP code addr     
+		case 0x81:	ajmp(op);						break;	//AJMP code addr
 		case 0x82:	anl_c_bitaddr();				break;	//ANL C, bit addr
 		case 0x83:	movc_a_iapc();					break;	//MOVC A, @A + PC
 		case 0x84:	div_ab();						break;	//DIV AB
 		case 0x85:	mov_mem_mem();					break;	//MOV data addr, data addr
 
 		case 0x86:
-		case 0x87:	mov_mem_ir(op&1);				break;	//MOV data addr, @R0/@R1  
+		case 0x87:	mov_mem_ir(op&1);				break;	//MOV data addr, @R0/@R1
 
 		case 0x88:
 		case 0x89:
@@ -1231,17 +1231,17 @@ static void execute_op(UINT8 op)
 		case 0x8c:
 		case 0x8d:
 		case 0x8e:
-		case 0x8f:	mov_mem_r(op&7);				break;	//MOV data addr,R0 to R7 
+		case 0x8f:	mov_mem_r(op&7);				break;	//MOV data addr,R0 to R7
 
 		case 0x90:	mov_dptr_byte();				break;	//MOV DPTR, #data
-		case 0x91:	acall(op);						break;	//ACALL code addr     
+		case 0x91:	acall(op);						break;	//ACALL code addr
 		case 0x92:	RWM = 1; mov_bitaddr_c(); RWM = 0; break;	//MOV bit addr, C
 		case 0x93:	movc_a_iadptr();				break;	//MOVC A, @A + DPTR
 		case 0x94:	subb_a_byte();					break;	//SUBB A, #data
 		case 0x95:	subb_a_mem();					break;	//SUBB A, data addr
 
 		case 0x96:
-		case 0x97:	subb_a_ir(op&1);				break;	//SUBB A, @R0/@R1  
+		case 0x97:	subb_a_ir(op&1);				break;	//SUBB A, @R0/@R1
 
 		case 0x98:
 		case 0x99:
@@ -1250,10 +1250,10 @@ static void execute_op(UINT8 op)
 		case 0x9c:
 		case 0x9d:
 		case 0x9e:
-		case 0x9f:	subb_a_r(op&7);					break;	//SUBB A, R0 to R7  
+		case 0x9f:	subb_a_r(op&7);					break;	//SUBB A, R0 to R7
 
 		case 0xa0:	orl_c_nbitaddr();				break;	//ORL C, /bit addr
-		case 0xa1:	ajmp(op);						break;	//AJMP code addr   
+		case 0xa1:	ajmp(op);						break;	//AJMP code addr
 		case 0xa2:	mov_c_bitaddr();				break;	//MOV C, bit addr
 		case 0xa3:	inc_dptr();						break;	//INC DPTR
 		case 0xa4:	mul_ab();						break;	//MUL AB
@@ -1269,17 +1269,17 @@ static void execute_op(UINT8 op)
 		case 0xac:
 		case 0xad:
 		case 0xae:
-		case 0xaf:	mov_r_mem(op&7);				break;	//MOV R0 to R7, data addr    
+		case 0xaf:	mov_r_mem(op&7);				break;	//MOV R0 to R7, data addr
 
 		case 0xb0:	anl_c_nbitaddr();				break;	//ANL C,/bit addr
-		case 0xb1:	acall(op);						break;	//ACALL code addr         
+		case 0xb1:	acall(op);						break;	//ACALL code addr
 		case 0xb2:	RWM=1; cpl_bitaddr(); RWM=0; 	break;	//CPL bit addr
 		case 0xb3:	cpl_c();						break;	//CPL C
 		case 0xb4:	cjne_a_byte();					break;	//CJNE A, #data, code addr
 		case 0xb5:	cjne_a_mem();					break;	//CJNE A, data addr, code addr
 
 		case 0xb6:
-		case 0xb7:	cjne_ir_byte(op&1); 			break;	//CJNE @R0/@R1, #data, code addr 
+		case 0xb7:	cjne_ir_byte(op&1); 			break;	//CJNE @R0/@R1, #data, code addr
 
 		case 0xb8:
 		case 0xb9:
@@ -1298,7 +1298,7 @@ static void execute_op(UINT8 op)
 		case 0xc5:	xch_a_mem();					break;	//XCH A, data addr
 
 		case 0xc6:
-		case 0xc7:  xch_a_ir(op&1);					break;	//XCH A, @RO/@R1       
+		case 0xc7:  xch_a_ir(op&1);					break;	//XCH A, @RO/@R1
 
 		case 0xc8:
 		case 0xc9:
@@ -1307,17 +1307,17 @@ static void execute_op(UINT8 op)
 		case 0xcc:
 		case 0xcd:
 		case 0xce:
-		case 0xcf:	xch_a_r(op&7);					break;	//XCH A, RO to R7  
+		case 0xcf:	xch_a_r(op&7);					break;	//XCH A, RO to R7
 
 		case 0xd0:	pop();							break;	//POP data addr
-		case 0xd1:	acall(op);						break;	//ACALL code addr  
+		case 0xd1:	acall(op);						break;	//ACALL code addr
 		case 0xd2:	RWM=1; setb_bitaddr(); RWM=0;	break;	//SETB bit addr
 		case 0xd3:	setb_c();						break;	//SETB C
 		case 0xd4:	da_a(); 						break;	//DA A
 		case 0xd5:	RWM=1; djnz_mem(); RWM=0;		break;	//DJNZ data addr, code addr
 
 		case 0xd6:
-		case 0xd7:  xchd_a_ir(op&1);				break;	//XCHD A, @R0/@R1    
+		case 0xd7:  xchd_a_ir(op&1);				break;	//XCHD A, @R0/@R1
 
 		case 0xd8:
 		case 0xd9:
@@ -1326,10 +1326,10 @@ static void execute_op(UINT8 op)
 		case 0xdc:
 		case 0xdd:
 		case 0xde:
-		case 0xdf:	djnz_r(op&7);					break;	//DJNZ R0 to R7,code addr  
+		case 0xdf:	djnz_r(op&7);					break;	//DJNZ R0 to R7,code addr
 
 		case 0xe0:	movx_a_idptr();					break;	//MOVX A,@DPTR
-		case 0xe1:	ajmp(op);						break;	//AJMP code addr           
+		case 0xe1:	ajmp(op);						break;	//AJMP code addr
 
 		case 0xe2:
 		case 0xe3:	movx_a_ir(op&1);				break;	//MOVX A, @R0/@R1
@@ -1337,7 +1337,7 @@ static void execute_op(UINT8 op)
 		case 0xe4:	clr_a();						break;	//CLR A
 		case 0xe5:	mov_a_mem();					break;	//MOV A, data addr
 		case 0xe6:
-		case 0xe7:	mov_a_ir(op&1);					break;	//MOV A,@RO/@R1 
+		case 0xe7:	mov_a_ir(op&1);					break;	//MOV A,@RO/@R1
 
 		case 0xe8:
 		case 0xe9:
@@ -1346,19 +1346,19 @@ static void execute_op(UINT8 op)
 		case 0xec:
 		case 0xed:
 		case 0xee:
-		case 0xef:	mov_a_r(op&7);					break;	//MOV A,R0 to R7   
+		case 0xef:	mov_a_r(op&7);					break;	//MOV A,R0 to R7
 
 		case 0xf0:	movx_idptr_a();					break;	//MOVX @DPTR,A
-		case 0xf1:	acall(op);						break;	//ACALL code addr 
+		case 0xf1:	acall(op);						break;	//ACALL code addr
 
 		case 0xf2:
-		case 0xf3:	movx_ir_a(op&1);				break;	//MOVX @R0/@R1,A   
-	
+		case 0xf3:	movx_ir_a(op&1);				break;	//MOVX @R0/@R1,A
+
 		case 0xf4:	cpl_a();						break;	//CPL A
 		case 0xf5:	mov_mem_a();					break;	//MOV data addr, A
-		
+
 		case 0xf6:
-		case 0xf7:	mov_ir_a(op&1);					break;	//MOV @R0/@R1, A 
+		case 0xf7:	mov_ir_a(op&1);					break;	//MOV @R0/@R1, A
 
 		case 0xf8:
 		case 0xf9:
@@ -1416,7 +1416,7 @@ static const UINT8 mcs51_cycles[] = {
  **********************************************************************************/
 static void check_irqs(void)
 {
-	UINT8 ints = (GET_IE0 | (GET_TF0<<1) | (GET_IE1<<2) | (GET_TF1<<3) 
+	UINT8 ints = (GET_IE0 | (GET_TF0<<1) | (GET_IE1<<2) | (GET_TF1<<3)
 			| ((GET_RI|GET_TI)<<4));
 	UINT8 ip = IP;
 	UINT8 int_vec = 0;
@@ -1428,18 +1428,18 @@ static void check_irqs(void)
 
 	if (mcs51.features & FEATURE_I8052_UART)
 		ints |= ((GET_TF2|GET_EXF2)<<5);
-	
+
 	/* mask out interrupts not enabled */
 	ints &= IE;
 
 	if (!ints)	return;
 
-	if(mcs51.irq_priority)	
+	if(mcs51.irq_priority)
 	{
-		LOG(("high priority irq in progress, skipping irq request\n")); 
-		return; 
+		LOG(("high priority irq in progress, skipping irq request\n"));
+		return;
 	}
-	
+
 	for (i=0; i<mcs51.num_interrupts; i++)
 	{
 		if (ints & (1<<i))
@@ -1453,16 +1453,16 @@ static void check_irqs(void)
 
 	//Skip the interrupt request if currently processing is lo priority, and the new request IS NOT HI PRIORITY!
 	if(mcs51.cur_irq < 0xff && !priority_request)
-	{ 
-		LOG(("low priority irq in progress already, skipping low irq request\n")); 
-		return; 
+	{
+		LOG(("low priority irq in progress already, skipping low irq request\n"));
+		return;
 	}
 
  	//Save current pc to stack, set pc to new interrupt vector
 	push_pc();
 	PC = int_vec;
 	change_pc(PC);
-	
+
 	/* interrupts take 24 cycles */
 	mcs51.inst_cycles += 2;
 
@@ -1476,7 +1476,7 @@ static void check_irqs(void)
 			//External Int Flag only cleared when configured as Edge Triggered..
 			if(GET_IT0)  /* for some reason having this, breaks alving dmd games */
 				SET_IE0(0);
-			
+
 			/* indicate we took the external IRQ */
 			if (mcs51.irq_callback != NULL)
 				(*mcs51.irq_callback)(0);
@@ -1516,7 +1516,7 @@ INLINE void burn_cycles(int cycles)
 
 	/* Update Serial (only for mode 0) */
 	update_serial(cycles);
-	
+
 	/* check_irqs */
 	check_irqs();
 }
@@ -1524,20 +1524,20 @@ INLINE void burn_cycles(int cycles)
 static void mcs51_set_irq_line(int irqline, int state)
 {
 	/* From the manual:
-	 * 
-	 * <cite>In operatiom all the interrupt tlags are latched into the
-	 * interrupt control system during State 5 of every ma-
-	 * chine cycle. The samples are polled during the follow-
-	 * ing machine cycle.</cite> 
-	 * 
-	 * ==> Since we do not emulate substates, this assumes that the signal is present
-	 * for at least one cycle (12 states)
-	 *      
-	 */
+     *
+     * <cite>In operatiom all the interrupt tlags are latched into the
+     * interrupt control system during State 5 of every ma-
+     * chine cycle. The samples are polled during the follow-
+     * ing machine cycle.</cite>
+     *
+     * ==> Since we do not emulate substates, this assumes that the signal is present
+     * for at least one cycle (12 states)
+     *
+     */
 	int new_state = (mcs51.last_line_state & ~(1 << irqline)) | ((state != CLEAR_LINE) << irqline);
 	/* detect 0->1 transistions */
 	int tr_state = (~mcs51.last_line_state) & new_state;
-	
+
 	switch( irqline )
 	{
 		//External Interrupt 0
@@ -1560,7 +1560,7 @@ static void mcs51_set_irq_line(int irqline, int state)
 				if (!GET_IT0) /* clear if level triggered */
 					SET_IE0(0);
 			}
-				
+
 			break;
 
 		//External Interrupt 1
@@ -1589,7 +1589,7 @@ static void mcs51_set_irq_line(int irqline, int state)
 			if (GET_BIT(tr_state, MCS51_T0_LINE))
 				mcs51.t0_cnt++;
 			break;
-			
+
 		case MCS51_T1_LINE:
 			if (GET_BIT(tr_state, MCS51_T1_LINE))
 				mcs51.t1_cnt++;
@@ -1601,21 +1601,21 @@ static void mcs51_set_irq_line(int irqline, int state)
 				if (GET_BIT(tr_state, MCS51_T2_LINE))
 					mcs51.t2_cnt++;
 			}
-			else 
+			else
 				fatalerror("mcs51: Trying to set T2_LINE on a non I8052 type cpu.\n");
 			break;
 
 		case MCS51_T2EX_LINE:
 			if (mcs51.features & FEATURE_I8052_UART)
 			{
-				if (GET_TR2 && GET_EXEN2) 
+				if (GET_TR2 && GET_EXEN2)
 					if (GET_BIT(tr_state, MCS51_T2EX_LINE))
 					{
 						SET_EXF2(1);
 						mcs51.t2ex_cnt++;
 					}
 			}
-			else 
+			else
 				fatalerror("mcs51: Trying to set T2EX_LINE on a non I8052 type cpu.\n");
 			break;
 		//Serial Port Receive
@@ -1634,7 +1634,7 @@ static void mcs51_set_irq_line(int irqline, int state)
 static int mcs51_execute(int cycles)
 {
 	UINT8 op;
-	
+
 	mcs51_icount = cycles;
 
 	/* external interrupts may have been set since we last checked */
@@ -1657,7 +1657,7 @@ static int mcs51_execute(int cycles)
 		/* burn the cycles */
 		mcs51_icount -= mcs51.inst_cycles;
 		burn_cycles(mcs51.inst_cycles);
-		
+
 	} while( mcs51_icount > 0 );
 
 	return cycles - mcs51_icount;
@@ -1672,7 +1672,7 @@ static void mcs51_sfr_write(size_t offset, UINT8 data)
 {
 	/* update register */
 	assert(offset >= 0x80 && offset <= 0xff);
-	
+
 	/* TODO: Move to memory map */
 	switch (offset)
 	{
@@ -1728,10 +1728,10 @@ static UINT8 mcs51_sfr_read(size_t offset)
 		case ADDR_DPL:
 		case ADDR_DPH:
 		case ADDR_PCON:
-		case ADDR_TCON:	
+		case ADDR_TCON:
 		case ADDR_TMOD:
 		case ADDR_TL0:
-		case ADDR_TL1:	
+		case ADDR_TL1:
 		case ADDR_TH0:
 		case ADDR_TH1:
 		case ADDR_SCON:
@@ -1775,7 +1775,7 @@ static void mcs51_init(int index, int clock, const void *config, int (*irqcallba
 static void i80c51_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	mcs51_init(index, clock, config, irqcallback);
-	
+
 	mcs51.features |= 	(FEATURE_CMOS_IDLE | FEATURE_CMOS_POWERDOWN);
 }
 
@@ -1788,13 +1788,13 @@ static void mcs51_reset(void)
 	hold_serial_tx_callback = NULL;
 	mcs51.serial_rx_callback = hold_serial_rx_callback;
 	hold_serial_rx_callback = NULL;
-	
+
 	mcs51.last_line_state = 0;
 	mcs51.t0_cnt = 0;
 	mcs51.t1_cnt = 0;
 	mcs51.t2_cnt = 0;
 	mcs51.t2ex_cnt = 0;
-	
+
 	/* these are all defined reset states */
 	PC = 0;
 	SP = 0x7;
@@ -1837,7 +1837,7 @@ static void i8052_sfr_write(size_t offset, UINT8 data)
 	switch (offset)
 	{
 		/* 8052 family specific */
-		case ADDR_T2CON:	
+		case ADDR_T2CON:
 		case ADDR_RCAP2L:
 		case ADDR_RCAP2H:
 		case ADDR_TL2:
@@ -1855,11 +1855,11 @@ static UINT8 i8052_sfr_read(size_t offset)
 	switch (offset)
 	{
 		/* 8052 family specific */
-		case ADDR_T2CON:	
+		case ADDR_T2CON:
 		case ADDR_RCAP2L:
-		case ADDR_RCAP2H:	
+		case ADDR_RCAP2H:
 		case ADDR_TL2:
-		case ADDR_TH2:	
+		case ADDR_TH2:
 			return data_read_byte_8le((size_t) offset | 0x100);
 		default:
 			return mcs51_sfr_read(offset);
@@ -1868,7 +1868,7 @@ static UINT8 i8052_sfr_read(size_t offset)
 
 static void i8052_init (int index, int clock, const void *config, int (*irqcallback)(int))
 {
-	mcs51_init(index, clock, config, irqcallback); 
+	mcs51_init(index, clock, config, irqcallback);
 
 	mcs51.ram_mask = 0xFF;  			/* 256 bytes of ram */
 	mcs51.num_interrupts = 6;			/* 6 interrupts */
@@ -1881,14 +1881,14 @@ static void i8052_init (int index, int clock, const void *config, int (*irqcallb
 static void i80c52_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	i8052_init(index, clock, config, irqcallback);
-	
+
 	mcs51.features |= (FEATURE_CMOS_IDLE | FEATURE_CMOS_POWERDOWN);
 }
 
 static void i8052_reset(void)
 {
 	mcs51_reset();
-	
+
 	//8052 Only registers
 	T2CON = 0;
 	RCAP2L = 0;
@@ -2032,7 +2032,7 @@ static void mcs51_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + I8051_R5: 			info->i = R_REG(5); 					break;
 		case CPUINFO_INT_REGISTER + I8051_R6: 			info->i = R_REG(6); 					break;
 		case CPUINFO_INT_REGISTER + I8051_R7: 			info->i = R_REG(7); 					break;
-		case CPUINFO_INT_REGISTER + I8051_RB: 			info->i = R_REG(8); 					break;	
+		case CPUINFO_INT_REGISTER + I8051_RB: 			info->i = R_REG(8); 					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = mcs51_set_info;			break;

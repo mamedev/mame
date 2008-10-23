@@ -215,7 +215,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - Code and data differences :
       * CPU0 to be looked at carefully
       * 0x9fff (CPU1 - bank = 0x03) : 0x01 instead of 0x02 (value for region tests)
-    
+
 5c) 'kagekih'
 
   - Region stored at 0x9fff.b (CPU1 - bank = 0x03) then 0xe000 (shared RAM)
@@ -241,7 +241,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - Code and data differences :
       * CPU0 to be looked at carefully
       * 0x9fff (CPU1 - bank = 0x03) : 0x01 instead of 0x02 (value for region tests)
-    
+
 
 6) 'chukatai' and clones
 

@@ -691,14 +691,14 @@ static void cps3_decrypt_bios(running_machine *machine)
 		UINT32 xormask = cps3_mask(i, cps3_key1, cps3_key2);
 
 		/* a bit of a hack, don't decrypt the FLASH commands which are transfered by SH2 DMA */
-//		if (((i<0x1ff00) || (i>0x1ff6b)) && (i<0x20000) )
-//		{
+//      if (((i<0x1ff00) || (i>0x1ff6b)) && (i<0x20000) )
+//      {
 			decrypted_bios[i/4] = dword ^ xormask;
-//		}
-//		else
-//		{
-//			decrypted_bios[i/4] = dword;
-//		}
+//      }
+//      else
+//      {
+//          decrypted_bios[i/4] = dword;
+//      }
 	}
 #if 0
 	/* Dump to file */
@@ -2569,13 +2569,13 @@ static NVRAM_HANDLER( cps3 )
 static UINT32 cps3_dma_callback(UINT32 src, UINT32 dst, UINT32 data, int size)
 {
 	/*
-	  on the actual CPS3 hardware the SH2 DMA bypasses the encryption.
+      on the actual CPS3 hardware the SH2 DMA bypasses the encryption.
 
-	  to handle this in MAME we use this callback, and reverse the effect of the
-	  encryption that would otherwise be applied.  this allows us to avoid per-game,
-	  per-PC hacks.  this approach is however still a little messy.
+      to handle this in MAME we use this callback, and reverse the effect of the
+      encryption that would otherwise be applied.  this allows us to avoid per-game,
+      per-PC hacks.  this approach is however still a little messy.
 
-	*/
+    */
 
 	/* I doubt this is endian safe.. needs checking / fixing */
 	if (size==0)
@@ -2946,138 +2946,138 @@ ROM_END
 
 /*****************************************************************************************
 
-	JoJo's Venture
+    JoJo's Venture
 
-	XXXXXX 0
-	JAPAN 1
-	ASIA 2
-	EURO 3
-	USA 4
-	HISPANIC 5
-	BRAZIL 6
-	OCEANIA 7
+    XXXXXX 0
+    JAPAN 1
+    ASIA 2
+    EURO 3
+    USA 4
+    HISPANIC 5
+    BRAZIL 6
+    OCEANIA 7
 
-	DEVELOPMENT VERSION add 0x70 mask!
+    DEVELOPMENT VERSION add 0x70 mask!
 
-	UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
-	rom[0x1fec8/4]^=0x00000001; // region hack (clear jpn)
+    UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+    rom[0x1fec8/4]^=0x00000001; // region hack (clear jpn)
 
-	rom[0x1fec8/4]^=0x00000004; // region
-	rom[0x1fec8/4]^=0x00000070; // DEV mode
-	rom[0x1fecc/4]^=0x01000000; // nocd
-
-*****************************************************************************************/
-
-
-/*****************************************************************************************
-
-	JoJo's Bizarre Adventure: Heritage for the Future
-
-	XXXXXX 0
-	JAPAN 1
-	ASIA 2
-	EURO 3
-	USA 4
-	HISPANIC 5
-	BRAZIL 6
-	OCEANIA 7
-
-	DEVELOPMENT VERSION add 0x70 mask!
-
-	UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
-	rom[0x1fec8/4]^=0x00000001; // region (clear jpn)
-	rom[0x1fec8/4]^=0x00000002; // region
-	rom[0x1fec8/4]^=0x00000070; // DEV mode
-	rom[0x1fecc/4]^=0x01000000; // nocd
-
-*****************************************************************************************/
-
-/*****************************************************************************************
-
-	Red Earth / Warzard
-
-	JAPAN 1
-	ASIA 2
-	EURO 3
-	USA 4
-	HISPANIC 5
-	BRAZIL 6
-	OCEANIA 7
-	ASIA NCD 8
-
-	UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
-	rom[0x1fed8/4]^=0x00000001; // clear region to 0 (invalid)
-	rom[0x1fed8/4]^=0x00000008; // region 8 - ASIA NO CD - doesn't actually skip the CD
-	                            // test on startup, only during game, must be another flag
-	                            // somewhere too, and we don't have any actual NCD dumps
-	                            // to compare (or it expects SCSI to report there being
-	                            // no cd drive?)
-
-*****************************************************************************************/
-
-/*****************************************************************************************
-
-	Street Fighter III: New Generation
-
-	JAPAN 1
-	ASIA NCD 2
-	EURO 3
-	USA 4
-	HISPANIC 5
-	BRAZIL 6
-	OCEANIA 7
-	ASIA 8
-
-	// bios rom also lists korea, but game rom does not.
-
-	UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
-	rom[0x1fec8/4]^=0x00000001; // region (clear region)
-	rom[0x1fec8/4]^=0x00000008; // region
-	rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test
-	                            // menu is region is ASIA NCD, otherwise it will report
-	                            // NG, Asia was probably the only NCD region for this
-
-*****************************************************************************************/
-
-/*****************************************************************************************
-
-	Street Fighter III 2nd Impact
-
-	JAPAN 1
-	ASIA NCD 2
-	EURO 3
-	USA 4
-	HISPANIC 5
-	BRAZIL 6
-	OCEANIA 7
-	ASIA 8
-
-	UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
-	rom[0x1fec8/4]^=0x00000001; // region (clear region)
-	rom[0x1fec8/4]^=0x00000008; // region
-	rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test
-	                            // menu is region is ASIA NCD, otherwise it will report
-	                            // NG, Asia was probably the only NCD region for this
+    rom[0x1fec8/4]^=0x00000004; // region
+    rom[0x1fec8/4]^=0x00000070; // DEV mode
+    rom[0x1fecc/4]^=0x01000000; // nocd
 
 *****************************************************************************************/
 
 
 /*****************************************************************************************
 
-	Street Fighter III 3rd Strike
+    JoJo's Bizarre Adventure: Heritage for the Future
 
-	JAPAN 1
-	ASIA 2
-	EURO 3
-	USA 4
-	HISPANIC 5
-	BRAZIL 6
-	OCEANIA 7
+    XXXXXX 0
+    JAPAN 1
+    ASIA 2
+    EURO 3
+    USA 4
+    HISPANIC 5
+    BRAZIL 6
+    OCEANIA 7
 
-	UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
-	rom[0x1fec8/4]^=0x00000004; // region (clear region)
-	rom[0x1fec8/4]^=0x00000001; // region
-	rom[0x1fecc/4]^=0x01000000; // nocd
+    DEVELOPMENT VERSION add 0x70 mask!
+
+    UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+    rom[0x1fec8/4]^=0x00000001; // region (clear jpn)
+    rom[0x1fec8/4]^=0x00000002; // region
+    rom[0x1fec8/4]^=0x00000070; // DEV mode
+    rom[0x1fecc/4]^=0x01000000; // nocd
+
+*****************************************************************************************/
+
+/*****************************************************************************************
+
+    Red Earth / Warzard
+
+    JAPAN 1
+    ASIA 2
+    EURO 3
+    USA 4
+    HISPANIC 5
+    BRAZIL 6
+    OCEANIA 7
+    ASIA NCD 8
+
+    UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+    rom[0x1fed8/4]^=0x00000001; // clear region to 0 (invalid)
+    rom[0x1fed8/4]^=0x00000008; // region 8 - ASIA NO CD - doesn't actually skip the CD
+                                // test on startup, only during game, must be another flag
+                                // somewhere too, and we don't have any actual NCD dumps
+                                // to compare (or it expects SCSI to report there being
+                                // no cd drive?)
+
+*****************************************************************************************/
+
+/*****************************************************************************************
+
+    Street Fighter III: New Generation
+
+    JAPAN 1
+    ASIA NCD 2
+    EURO 3
+    USA 4
+    HISPANIC 5
+    BRAZIL 6
+    OCEANIA 7
+    ASIA 8
+
+    // bios rom also lists korea, but game rom does not.
+
+    UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+    rom[0x1fec8/4]^=0x00000001; // region (clear region)
+    rom[0x1fec8/4]^=0x00000008; // region
+    rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test
+                                // menu is region is ASIA NCD, otherwise it will report
+                                // NG, Asia was probably the only NCD region for this
+
+*****************************************************************************************/
+
+/*****************************************************************************************
+
+    Street Fighter III 2nd Impact
+
+    JAPAN 1
+    ASIA NCD 2
+    EURO 3
+    USA 4
+    HISPANIC 5
+    BRAZIL 6
+    OCEANIA 7
+    ASIA 8
+
+    UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+    rom[0x1fec8/4]^=0x00000001; // region (clear region)
+    rom[0x1fec8/4]^=0x00000008; // region
+    rom[0x1fecc/4]^=0x01000000; // nocd - this ONLY skips the cd check in the bios test
+                                // menu is region is ASIA NCD, otherwise it will report
+                                // NG, Asia was probably the only NCD region for this
+
+*****************************************************************************************/
+
+
+/*****************************************************************************************
+
+    Street Fighter III 3rd Strike
+
+    JAPAN 1
+    ASIA 2
+    EURO 3
+    USA 4
+    HISPANIC 5
+    BRAZIL 6
+    OCEANIA 7
+
+    UINT32 *rom =  (UINT32*)memory_region ( machine, "user1" );
+    rom[0x1fec8/4]^=0x00000004; // region (clear region)
+    rom[0x1fec8/4]^=0x00000001; // region
+    rom[0x1fecc/4]^=0x01000000; // nocd
 
 *****************************************************************************************/
 

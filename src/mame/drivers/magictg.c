@@ -5,58 +5,58 @@
 Magic the Gathereing: Armageddon by Acclaim
 
 TOP Board
-.20u	27c4001	stickered	U20
-				#1537 V1.0	a 1 was hadwritten over the 0
+.20u    27c4001 stickered   U20
+                #1537 V1.0  a 1 was hadwritten over the 0
 
-.u7		stamped		(c) 1997
-				ACCLAIM COINOP
-				ARMAGEDDON
-				SND3 P/N 1605
-				9806 D
+.u7     stamped     (c) 1997
+                ACCLAIM COINOP
+                ARMAGEDDON
+                SND3 P/N 1605
+                9806 D
 
 
-.u8		stamped		(c) 1997 11/25/97
-				ACCLAIM COINOP
-				ARMAGEDDON
-				1534 SND0
-				9752 D
+.u8     stamped     (c) 1997 11/25/97
+                ACCLAIM COINOP
+                ARMAGEDDON
+                1534 SND0
+                9752 D
 
-.u13		stamped		(c) 1997 11/25/97
-				ACCLAIM COINOP
-				ARMAGEDDON
-				1536 SND2
-				9752 D
+.u13        stamped     (c) 1997 11/25/97
+                ACCLAIM COINOP
+                ARMAGEDDON
+                1536 SND2
+                9752 D
 
-.u14		stamped		(c) 1997 11/25/97
-				ACCLAIM COINOP
-				ARMAGEDDON
-				1535 SND1
-				9752 D
+.u14        stamped     (c) 1997 11/25/97
+                ACCLAIM COINOP
+                ARMAGEDDON
+                1535 SND1
+                9752 D
 
-Analog devices 	ADSP 2181
-Xilinx 		XC5202
+Analog devices  ADSP 2181
+Xilinx      XC5202
 dt71256 x2
-Analog Devices	AD1866R
+Analog Devices  AD1866R
 
 Bottom board
-.u32	27c801		stickered	4
-.u33	27c801		stickered	3
-.u34	27c801		stickered	2
-.u35	27c801		stickered	1
-.u58	AT17C128	stickered	CC3E
-.u66	GAL16V8D
+.u32    27c801      stickered   4
+.u33    27c801      stickered   3
+.u34    27c801      stickered   2
+.u35    27c801      stickered   1
+.u58    AT17C128    stickered   CC3E
+.u66    GAL16V8D
 
-Xilinx	XC4005E
-Xilinx	XC95108	stickered	ACCLAIM COIN-OP
-				CSC2_10.JED
-				B710/0B84
-				U40 p/N 1611
+Xilinx  XC4005E
+Xilinx  XC95108 stickered   ACCLAIM COIN-OP
+                CSC2_10.JED
+                B710/0B84
+                U40 p/N 1611
 
-3dFX	500-0003-03		x2
-	BF1684.1
-TI	TVP3409
-	V53C16258HK40		x24
-	V53C511816500K60	x4
+3dFX    500-0003-03     x2
+    BF1684.1
+TI  TVP3409
+    V53C16258HK40       x24
+    V53C511816500K60    x4
 2 big chips with heat sinks on them, one by each 3dFX part
 2 big chips with heat sinks on them, by the EPROMS
 14.31818 Oscillator by the TI part
@@ -66,44 +66,44 @@ KM622560LG-7 by Battery
 
 Bottom daughter board
 All read as 29F800B
-.u9		stamped		(c) 1997
-				ACCLAIM COINOP
-				ARMAGEDDON S0
-				1514 11/25/97
-				9803 D
+.u9     stamped     (c) 1997
+                ACCLAIM COINOP
+                ARMAGEDDON S0
+                1514 11/25/97
+                9803 D
 
 
-.u10		stamped		(c) 1997
-				ACCLAIM COINOP
-				ARMAGEDDON S1
-				1515 11/25/97
-				9803 D
+.u10        stamped     (c) 1997
+                ACCLAIM COINOP
+                ARMAGEDDON S1
+                1515 11/25/97
+                9803 D
 
-.u11		stamped		(c) 1997
-				ACCLAIM COINOP
-				ARMAGEDDON S3
-				1517 11/25/97
-				9803 D
+.u11        stamped     (c) 1997
+                ACCLAIM COINOP
+                ARMAGEDDON S3
+                1517 11/25/97
+                9803 D
 
-.u12		stamped		(c) 1997
-				ACCLAIM COINOP
-				ARMAGEDDON S2
-				1516 11/25/97
-				9803 D
+.u12        stamped     (c) 1997
+                ACCLAIM COINOP
+                ARMAGEDDON S2
+                1516 11/25/97
+                9803 D
 
-.u20		stamped		(c) 1997
-				ACCLAIM COINOP
-				ARMAGEDDON K0
-				1543 11/25/97
-				9752 D
+.u20        stamped     (c) 1997
+                ACCLAIM COINOP
+                ARMAGEDDON K0
+                1543 11/25/97
+                9752 D
 
-Xilinx 	XC4010E
-Zoran	ZR36120PQC
-Zoran	ZR36016PQC
-Xilinx	XC3120A
-	DT72811
-	DT71256	x2
-	DT72271
+Xilinx  XC4010E
+Zoran   ZR36120PQC
+Zoran   ZR36016PQC
+Xilinx  XC3120A
+    DT72811
+    DT71256 x2
+    DT72271
 29.500000 osciallator by ZR36120PQC
 Medium size chip with heat sink on it
 

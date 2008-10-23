@@ -207,12 +207,12 @@ static ADDRESS_MAP_START( mirage_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140000, 0x140001) AM_READWRITE(okim6295_status_1_lsb_r, okim6295_data_1_lsb_w)
 	AM_RANGE(0x140002, 0x140003) AM_READWRITE(okim6295_status_1_lsb_r, okim6295_data_1_lsb_w)
 
-//	AM_RANGE(0x140008, 0x140009) AM_WRITE(okim1_rombank_w)
+//  AM_RANGE(0x140008, 0x140009) AM_WRITE(okim1_rombank_w)
 
 	AM_RANGE(0x150000, 0x150001) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 	AM_RANGE(0x150002, 0x150003) AM_READWRITE(okim6295_status_0_lsb_r, okim6295_data_0_lsb_w)
 
-//	AM_RANGE(0x150008, 0x150009) AM_WRITE(okim0_rombank_w)
+//  AM_RANGE(0x150008, 0x150009) AM_WRITE(okim0_rombank_w)
 
 	AM_RANGE(0x160000, 0x160001) AM_WRITE(SMH_NOP)
 

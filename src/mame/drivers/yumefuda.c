@@ -146,7 +146,7 @@ static WRITE8_HANDLER( eeprom_w )
 
 static WRITE8_HANDLER( port_c0_w )
 {
-// 	logerror("PC %04x (Port $c0) value written %02x\n",activecpu_get_pc(),data);
+//  logerror("PC %04x (Port $c0) value written %02x\n",activecpu_get_pc(),data);
 }
 
 

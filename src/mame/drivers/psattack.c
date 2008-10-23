@@ -2,9 +2,9 @@
     P's Attack
     using VRender0 System on a Chip
 
-	This is basically the same hardware as Crystal System, but with a CF card for the game
+    This is basically the same hardware as Crystal System, but with a CF card for the game
 
-	Skeleton driver only
+    Skeleton driver only
 
 
 P's Attack (c) 2004 Uniana Co., Ltd

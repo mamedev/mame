@@ -66,10 +66,10 @@ static UINT32* shared_ram;
 static UINT16* dsp56k_p_mirror;
 static UINT16* dsp56k_p_8000;
 static const UINT16 dsp56k_bank00_size = 0x1000;		static UINT16* dsp56k_bank00_ram;
-static const UINT16 dsp56k_bank01_size = 0x1000;		static UINT16* dsp56k_bank01_ram;	 
-static const UINT16 dsp56k_bank02_size = 0x4000;		static UINT16* dsp56k_bank02_ram;	 
-static const UINT16 dsp56k_shared_ram_16_size = 0x2000;	static UINT16* dsp56k_shared_ram_16; 
-static const UINT16 dsp56k_bank04_size = 0x1fc0;		static UINT16* dsp56k_bank04_ram;	 
+static const UINT16 dsp56k_bank01_size = 0x1000;		static UINT16* dsp56k_bank01_ram;
+static const UINT16 dsp56k_bank02_size = 0x4000;		static UINT16* dsp56k_bank02_ram;
+static const UINT16 dsp56k_shared_ram_16_size = 0x2000;	static UINT16* dsp56k_shared_ram_16;
+static const UINT16 dsp56k_bank04_size = 0x1fc0;		static UINT16* dsp56k_bank04_ram;
 
 static const eeprom_interface eeprom_intf =
 {
@@ -315,7 +315,7 @@ static OPBASE_HANDLER( plygonet_dsp56k_opbase_handler )
 
    001c banking is fairly easy - it happens in a loop and writes from 8000 to bfff
    0181 banking is very weird  - it happens in a nested loop and writes from 6000-6fff, 7000-7fff, and 8000-ffbf
-								 bit 0002 turns on *just* before this happens.
+                                 bit 0002 turns on *just* before this happens.
 */
 enum { BANK_GROUP_A, BANK_GROUP_B, INVALID_BANK_GROUP };
 
@@ -481,7 +481,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x580000, 0x5807ff) AM_RAM
 	AM_RANGE(0x580800, 0x580803) AM_READWRITE(network_r, SMH_NOP)
 	AM_RANGE(0x580800, 0x580803) AM_RAM		/* network RAM | registers? */
-//	AM_RANGE(0x600000, 0x600000) 
+//  AM_RANGE(0x600000, 0x600000)
 	AM_RANGE(0x600004, 0x600007) AM_WRITE(sound_w)
 	AM_RANGE(0x600008, 0x60000b) AM_READ(sound_r)
 	AM_RANGE(0x640000, 0x640003) AM_WRITE(sound_irq_w)
@@ -574,8 +574,8 @@ static MACHINE_START(polygonet)
 
 	/* Set the dsp56k lines */
 	/* It's presumed the hardware has hard-wired operating mode 1 (MODA = 1, MODB = 0) */
-	/* TODO: This should work, but the MAME core appears to do something funny.  
-	         Not a big deal - it's hacked in dsp_w_lines. */
+	/* TODO: This should work, but the MAME core appears to do something funny.
+             Not a big deal - it's hacked in dsp_w_lines. */
 	//cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), INPUT_LINE_RESET, ASSERT_LINE);
 	//cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_MODA, ASSERT_LINE);
 	//cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_MODB, CLEAR_LINE);

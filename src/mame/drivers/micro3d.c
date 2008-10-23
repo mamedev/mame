@@ -803,9 +803,9 @@ static WRITE8_HANDLER(sound_io_w)
 	port_latch[offset] = data;
 	switch(offset)
 	{
-        case 0x01:  
+        case 0x01:
         	break;
-        case 0x03:  
+        case 0x03:
         	upd7759_set_bank_base(0, (data & 0x4) ? 0x20000 : 0);
         	upd7759_0_reset_w(machine,0,(data & 0x10) ? 0 : 1);
 	}

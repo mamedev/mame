@@ -105,7 +105,7 @@ static WRITE16_HANDLER( blocken_coinctrl_w )
 	{
 		/* the sound ROM bank is selected by the main CPU! */
 		okim6295_set_bank_base(0, ((data >> 4) & 3) * 0x40000);
- 
+
 		coin_lockout_w(0,~data & 0x04);
 		coin_lockout_w(1,~data & 0x04);
 		coin_counter_w(0,data & 0x01);
@@ -691,7 +691,7 @@ ROM_START( blocken )
 	ROM_COPY( "samples", 0x000000, 0x080000, 0x020000)
 	ROM_COPY( "samples", 0x040000, 0x0a0000, 0x020000)
 	ROM_COPY( "samples", 0x000000, 0x0c0000, 0x020000)
-	ROM_COPY( "samples", 0x060000, 0x0e0000, 0x020000)	
+	ROM_COPY( "samples", 0x060000, 0x0e0000, 0x020000)
 ROM_END
 
 

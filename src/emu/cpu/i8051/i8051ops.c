@@ -170,7 +170,7 @@ INLINE void cjne_a_byte(void)
 
 	if(ACC != data)						//Jump if values are not equal
 	{
-		PC = PC + rel_addr;	
+		PC = PC + rel_addr;
 		change_pc(PC);
 	}
 

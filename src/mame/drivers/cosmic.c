@@ -200,7 +200,7 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 {
     static int  sound_enabled=1;
     static int dive_bomb_b_select=0;
- 
+
     /* Sound Enable / Disable */
     if (offset == 11)
     {
@@ -231,7 +231,7 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 			  {
 
 			    case 2:
-				
+
 					if (sample_playing(2))
 					{
 					  sample_stop(2);
@@ -239,8 +239,8 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 					}
 					else
  		    			 sample_start(2, 3, 0); break;
-				
-				
+
+
 			    case 3:
 
 					if (sample_playing(3))
@@ -259,7 +259,7 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 	   				  sample_start(4, 5, 0); break;
 					}
 					else
-	 	    			 sample_start(4, 5, 0); break;		
+	 	    			 sample_start(4, 5, 0); break;
 
 
 
@@ -293,7 +293,7 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
  		    			 sample_start(7, 8, 0); break;
 			  }
 			}
-			
+
 		case 3: /*Dive Bombing Type B (G.S.B)*/
 
 			if (data)
@@ -322,17 +322,17 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 
 
 		case 6: if (data) sample_start(8, 9, 0); break; /*Fire Control*/
-			
+
 		case 7: if (data) sample_start(9, 10, 0); break; /*Small Explosion*/
 
 		case 8: if (data) sample_start(10, 11, 0); break; /*Loud Explosion*/
-		
+
 		case 9:
 		 if (data)
 		  sample_start(11, 1, 1);
 		else
 		 sample_stop(11);
-		 
+
 		break; /*Extend Sound control*/
 
 		case 12:
@@ -1001,7 +1001,7 @@ GFXDECODE_END
 static const char *cosmica_sample_names[] =
 {
 	"*cosmica",
-	"backgr.wav",	
+	"backgr.wav",
 	"extend.wav",
 	"divea.wav",
 	"diveb1.wav",
@@ -1009,11 +1009,11 @@ static const char *cosmica_sample_names[] =
 	"diveb3.wav",
 	"diveb4.wav",
 	"diveb5.wav",
-	"diveb6.wav",	
-	"fire.wav",	
-	"loudexp.wav",	
-	"smallexp.wav",	
-	"coin.wav",	
+	"diveb6.wav",
+	"fire.wav",
+	"loudexp.wav",
+	"smallexp.wav",
+	"coin.wav",
 	0       /* end of array */
 };
 

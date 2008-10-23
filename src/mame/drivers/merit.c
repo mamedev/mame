@@ -316,7 +316,7 @@ static ADDRESS_MAP_START( bigappg_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 /* Address decoding is done by prom u13 on crt200a hardware. It decodes
- * the following addr lines: 2,3,9,13,14,15 ==> E20C 
+ * the following addr lines: 2,3,9,13,14,15 ==> E20C
  * ==> mirror 1DF3 & ~effective_addr_lines
  * */
 

@@ -18,9 +18,9 @@
 /************************/
 /* Datatypes and macros */
 /************************/
-enum dataType { DT_BYTE, 
-				DT_WORD, 
-				DT_DOUBLE_WORD, 
+enum dataType { DT_BYTE,
+				DT_WORD,
+				DT_DOUBLE_WORD,
 				DT_LONG_WORD };
 
 struct _typed_pointer
@@ -1073,7 +1073,7 @@ static void execute_one(void)
 
 
 /***************************************************************************
-	Opcode implementations
+    Opcode implementations
 ***************************************************************************/
 
 /*******************************/
@@ -1360,7 +1360,7 @@ static size_t dsp56k_op_asl(const UINT16 op_byte, typed_pointer* d_register, UIN
 	/* S L E U N Z V C */
 	/* * * * * * * ? ? */
 	/* V - Set if an arithmetic overflow occurs in the 40 bit result. Also set if the most significant
-	       bit of the destination operand is changed as a result of the left shift. Cleared otherwise. */
+           bit of the destination operand is changed as a result of the left shift. Cleared otherwise. */
     /* C - Set if bit 39 of source operand is set. Cleared otherwise. */
 	return 0;
 }
@@ -1370,18 +1370,18 @@ static size_t dsp56k_op_lsr(const UINT16 op_byte, typed_pointer* d_register, UIN
 {
 	typed_pointer D = {NULL, DT_BYTE};
 	decode_F_table(BITS(op_byte,0x0008), &D);
-	
+
 	*p_accum = *((UINT64*)D.addr);
-	
+
 	((PAIR64*)D.addr)->w.h = (((PAIR64*)D.addr)->w.h) >> 1;
-	
+
 	/* Make sure bit 31 gets a 0 */
 	((PAIR64*)D.addr)->w.h &= (~0x8000);
-	
+
 	/* For the parallel move */
 	d_register->addr = D.addr;
 	d_register->data_type = D.data_type;
-	
+
 	/* S L E U N Z V C */
 	/* * * - - ? ? 0 ? */
 	/* TODO: S, L */
@@ -1389,7 +1389,7 @@ static size_t dsp56k_op_lsr(const UINT16 op_byte, typed_pointer* d_register, UIN
 	if (((PAIR64*)D.addr)->w.h == 0) Z_bit_set(1);
 	V_bit_set(0);
 	if (*p_accum & U64(0x0000000000010000)) C_bit_set(1);
-	
+
 	cycles += 2;		/* TODO: + mv oscillator cycles */
 	return 1;
 }
@@ -1421,7 +1421,7 @@ static size_t dsp56k_op_subl(const UINT16 op_byte, typed_pointer* d_register, UI
 	/* S L E U N Z V C */
 	/* * * * * * * ? * */
 	/* V - Set if an arithmetic overflow occurs in the 40 bit result. Also set if the most significant
-	       bit of the destination operand is changed as a result of the left shift. Cleared otherwise. */
+           bit of the destination operand is changed as a result of the left shift. Cleared otherwise. */
 	return 0;
 }
 
@@ -1564,12 +1564,12 @@ static size_t dsp56k_op_and(const UINT16 op_byte, typed_pointer* d_register, UIN
 {
 	typed_pointer S = {NULL, DT_BYTE};
 	typed_pointer D = {NULL, DT_BYTE};
-	
+
 	decode_JJF_table(BITS(op_byte,0x0003), BITS(op_byte,0x0008), &S, &D);
-	
+
 	/* Save some data for the parallel move */
 	*p_accum = *((UINT64*)D.addr);
-	
+
 	/* AND a word of S with A1|B1 */
 	((PAIR64*)D.addr)->w.h = *((UINT16*)S.addr) & ((PAIR64*)D.addr)->w.h;
 
@@ -1681,11 +1681,11 @@ static size_t dsp56k_op_andi(const UINT16 op, UINT8* cycles)
 		case 0x01:	/* MR */
 			SR &= ((immediate << 8) | 0x00ff);
 			break;
-	
+
 		case 0x02:	/* CCR */
 			SR &= (immediate | 0xff00);
 			break;
-	
+
 		case 0x03:	/* OMR */
 			OMR &= (UINT8)(immediate);
 			break;
@@ -1697,7 +1697,7 @@ static size_t dsp56k_op_andi(const UINT16 op, UINT8* cycles)
 	/* S L E U N Z V C */
 	/* - ? ? ? ? ? ? ? */
 	/* All ? bits - Cleared if the corresponding bit in the immediate data is cleared and if the operand
-	   is the CCR. Not affected otherwise. */
+       is the CCR. Not affected otherwise. */
 	cycles += 2;
 	return 1;
 }
@@ -1708,7 +1708,7 @@ static size_t dsp56k_op_asl4(const UINT16 op, UINT8* cycles)
 	/* S L E U N Z V C */
 	/* - ? * * * * ? ? */
 	/* V - Set if an arithmetic overflow occurs in the 40 bit result. Also set if bit 5 through 39 are
-	       not the same. */
+           not the same. */
 	/* C - Set if bit 36 of source operand is set. Cleared otherwise. */
 	return 0;
 }
@@ -2089,12 +2089,12 @@ static size_t dsp56k_op_chkaau(const UINT16 op, UINT8* cycles)
 {
 	/* S L E U N Z V C */
 	/* - - - - ? ? ? - */
-	/* V - Set if the result of the last address ALU update performed a modulo wrap. Cleared if 
-	       result of the last address ALU did not perform a modulo wrap.*/
+	/* V - Set if the result of the last address ALU update performed a modulo wrap. Cleared if
+           result of the last address ALU did not perform a modulo wrap.*/
 	/* Z - Set if the result of the last address ALU update is 0. Cleared if the result of the last
-	       address ALU is positive. */
+           address ALU is positive. */
 	/* N - Set if the result of the last address ALU update is negative. Cleared if the result of the
-	       last address ALU is positive. */
+           last address ALU is positive. */
 	return 0;
 }
 
@@ -2120,8 +2120,8 @@ static size_t dsp56k_op_div(const UINT16 op, UINT8* cycles)
 {
 	/* S L E U N Z V C */
 	/* - * - - - - ? ? */
-	/* V - Set if an arithmetic overflow occurs in the 40 bit result. Also set if the most significantst 
-	       bit of the destination operand is changed as a result of the left shift. Cleared otherwise. */
+	/* V - Set if an arithmetic overflow occurs in the 40 bit result. Also set if the most significantst
+           bit of the destination operand is changed as a result of the left shift. Cleared otherwise. */
 	/* C - Set if bit 39 of the result is cleared. Cleared otherwise. */
 	return 0;
 }
@@ -2416,11 +2416,11 @@ static size_t dsp56k_op_macsuuu(const UINT16 op, UINT8* cycles)
 	void* D = NULL;
 	void* S1 = NULL;
 	void* S2 = NULL;
-	
+
 	decode_QQF_special_table(BITS(op,0x0003), BITS(op,0x0008), &S1, &S2, &D);
-	
+
 	s = BITS(op,0x0004);
-	
+
 	/* Fixed-point 2's complement multiplication requires a shift */
 	if (s)
 	{
@@ -2436,9 +2436,9 @@ static size_t dsp56k_op_macsuuu(const UINT16 op, UINT8* cycles)
 		UINT32 s2 = (UINT32)(*((UINT16*)S2));
 		result = ( s1 * s2 ) << 1;
 	}
-	
+
 	(*((UINT64*)D)) += result;
-	
+
 	/* S L E U N Z V C */
 	/* - * * * * * * - */
 	/* TODO: L, E, U, V */
@@ -2487,8 +2487,8 @@ static size_t dsp56k_op_movec(const UINT16 op, UINT8* cycles)
 	/* S L E U N Z V C */
 	/* * ? ? ? ? ? ? ? */
 	/* All ? bits - If SR is specified as a destination operand, set according to the corresponding
-	   bit of the source operand. If SR is not specified as a destination operand, L is set if data
-	   limiting occurred. All ? bits are not affected otherwise.*/
+       bit of the source operand. If SR is not specified as a destination operand, L is set if data
+       limiting occurred. All ? bits are not affected otherwise.*/
 	if (W && (SD.addr != &SR))
 	{
 		/* If you're writing to something other than the SR */
@@ -2528,8 +2528,8 @@ static size_t dsp56k_op_movec_1(const UINT16 op, UINT8* cycles)
 	/* S L E U N Z V C */
 	/* * ? ? ? ? ? ? ? */
 	/* All ? bits - If SR is specified as a destination operand, set according to the corresponding
-	   bit of the source operand. If SR is not specified as a destination operand, L is set if data
-	   limiting occurred. All ? bits are not affected otherwise.*/
+       bit of the source operand. If SR is not specified as a destination operand, L is set if data
+       limiting occurred. All ? bits are not affected otherwise.*/
 	if (W && (SD.addr != &SR))
 	{
 		/* If you're writing to something other than the SR */
@@ -2573,8 +2573,8 @@ static size_t dsp56k_op_movec_2(const UINT16 op, UINT8* cycles)
 	/* S L E U N Z V C */
 	/* * ? ? ? ? ? ? ? */
 	/* All ? bits - If SR is specified as a destination operand, set according to the corresponding
-	   bit of the source operand. If SR is not specified as a destination operand, L is set if data
-	   limiting occurred. All ? bits are not affected otherwise.*/
+       bit of the source operand. If SR is not specified as a destination operand, L is set if data
+       limiting occurred. All ? bits are not affected otherwise.*/
 	if (W && (SD.addr != &SR))
 	{
 		/* If you're writing to something other than the SR */
@@ -2631,8 +2631,8 @@ static size_t dsp56k_op_movec_3(const UINT16 op, const UINT16 op2, UINT8* cycles
 	/* S L E U N Z V C */
 	/* * ? ? ? ? ? ? ? */
 	/* All ? bits - If SR is specified as a destination operand, set according to the corresponding
-	   bit of the source operand. If SR is not specified as a destination operand, L is set if data
-	   limiting occurred. All ? bits are not affected otherwise.*/
+       bit of the source operand. If SR is not specified as a destination operand, L is set if data
+       limiting occurred. All ? bits are not affected otherwise.*/
 	if (W && (SD.addr != &SR))
 	{
 		/* If you're writing to something other than the SR */
@@ -2657,8 +2657,8 @@ static size_t dsp56k_op_movec_4(const UINT16 op, UINT8* cycles)
 	/* S L E U N Z V C */
 	/* * ? ? ? ? ? ? ? */
 	/* All ? bits - If SR is specified as a destination operand, set according to the corresponding
-	   bit of the source operand. If SR is not specified as a destination operand, L is set if data
-	   limiting occurred. All ? bits are not affected otherwise.*/
+       bit of the source operand. If SR is not specified as a destination operand, L is set if data
+       limiting occurred. All ? bits are not affected otherwise.*/
 	if (D.addr != &SR)
 	{
 		/* If you're writing to something other than the SR */
@@ -2675,8 +2675,8 @@ static size_t dsp56k_op_movec_5(const UINT16 op, const UINT16 op2, UINT8* cycles
 	/* S L E U N Z V C */
 	/* * ? ? ? ? ? ? ? */
 	/* All ? bits - If SR is specified as a destination operand, set according to the corresponding
-	   bit of the source operand. If SR is not specified as a destination operand, L is set if data
-	   limiting occurred. All ? bits are not affected otherwise.*/
+       bit of the source operand. If SR is not specified as a destination operand, L is set if data
+       limiting occurred. All ? bits are not affected otherwise.*/
 	return 0;
 }
 
@@ -2870,8 +2870,8 @@ static size_t dsp56k_op_norm(const UINT16 op, UINT8* cycles)
 {
 	/* S L E U N Z V C */
 	/* - * * * * * ? - */
-	/* V - Set if an arithmetic overflow occurs in the 40 bit result. Also set if the most significantst 
-	       bit of the destination operand is changed as a result of the left shift. Cleared otherwise. */
+	/* V - Set if an arithmetic overflow occurs in the 40 bit result. Also set if the most significantst
+           bit of the destination operand is changed as a result of the left shift. Cleared otherwise. */
 	return 0;
 }
 
@@ -2881,7 +2881,7 @@ static size_t dsp56k_op_ori(const UINT16 op, UINT8* cycles)
 	/* S L E U N Z V C */
 	/* - ? ? ? ? ? ? ? */
 	/* All ? bits - Set if the corresponding bit in the immediate data is set and if the operand is the
-	   CCR. Not affected otherwise. */
+       CCR. Not affected otherwise. */
 	return 0;
 }
 
@@ -2898,23 +2898,23 @@ static size_t dsp56k_op_rep_1(const UINT16 op, UINT8* cycles)
 {
 	/* TODO: This is non-interruptable, probably have to turn off interrupts here */
 	UINT16 iVal = op & 0x00ff;
-	
+
 	if (iVal != 0)
 	{
 		TEMP = LC;
 		LC = iVal;
-		
+
 		core.repFlag = 1;
 		core.repAddr = PC + WORD(1);
-		
+
 		cycles += 4;		/* TODO: + mv oscillator clock cycles */
 	}
 	else
 	{
 		cycles += 6;		/* TODO: + mv oscillator clock cycles */
 	}
-	
-	
+
+
 	/* S L E U N Z V C */
 	/* - * - - - - - - */
     /* TODO: L */
@@ -3084,10 +3084,10 @@ static size_t dsp56k_op_tst2(const UINT16 op, UINT8* cycles)
 	/* (L,E,U should be set to 0) */
 	L_bit_set(0);
 	E_bit_set(0);
-	// U_bit_set(0);	/* TODO: Conflicting opinions?  "Set if unnormalized."  Documentation is weird (A&B?) */
+	// U_bit_set(0);    /* TODO: Conflicting opinions?  "Set if unnormalized."  Documentation is weird (A&B?) */
 	if ((*((UINT16*)D.addr)) &  0x8000) N_bit_set(1); else N_bit_set(0);
 	if ((*((UINT16*)D.addr)) == 0x0000) Z_bit_set(1); else Z_bit_set(0);
-	// V_bit_set(0);	/* TODO: Verify as well! */
+	// V_bit_set(0);    /* TODO: Verify as well! */
 	C_bit_set(0);
 
 	cycles += 2;
@@ -3113,7 +3113,7 @@ static size_t dsp56k_op_zero(const UINT16 op, UINT8* cycles)
 
 
 /***************************************************************************
-	Table decoding
+    Table decoding
 ***************************************************************************/
 static UINT16 decode_BBB_bitmask(UINT16 BBB, UINT16 *iVal)
 {
@@ -3162,39 +3162,39 @@ static void decode_DDDDD_table(UINT16 DDDDD, typed_pointer* ret)
 {
 	switch(DDDDD)
 	{
-		case 0x00: ret->addr = &X0;  ret->data_type = DT_WORD;       break; 
-		case 0x01: ret->addr = &Y0;  ret->data_type = DT_WORD;       break; 
-		case 0x02: ret->addr = &X1;  ret->data_type = DT_WORD;       break; 
-		case 0x03: ret->addr = &Y1;  ret->data_type = DT_WORD;       break; 
-		case 0x04: ret->addr = &A ;  ret->data_type = DT_LONG_WORD;  break; 
-		case 0x05: ret->addr = &B ;  ret->data_type = DT_LONG_WORD;  break; 
-		case 0x06: ret->addr = &A0;  ret->data_type = DT_WORD;       break; 
-		case 0x07: ret->addr = &B0;  ret->data_type = DT_WORD;       break; 
-		case 0x08: ret->addr = &LC;  ret->data_type = DT_WORD;       break; 
-		case 0x09: ret->addr = &SR;  ret->data_type = DT_WORD;       break; 
-		case 0x0a: ret->addr = &OMR; ret->data_type = DT_BYTE;       break; 
-		case 0x0b: ret->addr = &SP;  ret->data_type = DT_BYTE;       break; 
-		case 0x0c: ret->addr = &A1;  ret->data_type = DT_WORD;       break; 
-		case 0x0d: ret->addr = &B1;  ret->data_type = DT_WORD;       break; 
-		case 0x0e: ret->addr = &A2;  ret->data_type = DT_BYTE;       break; 
-		case 0x0f: ret->addr = &B2;  ret->data_type = DT_BYTE;       break; 
+		case 0x00: ret->addr = &X0;  ret->data_type = DT_WORD;       break;
+		case 0x01: ret->addr = &Y0;  ret->data_type = DT_WORD;       break;
+		case 0x02: ret->addr = &X1;  ret->data_type = DT_WORD;       break;
+		case 0x03: ret->addr = &Y1;  ret->data_type = DT_WORD;       break;
+		case 0x04: ret->addr = &A ;  ret->data_type = DT_LONG_WORD;  break;
+		case 0x05: ret->addr = &B ;  ret->data_type = DT_LONG_WORD;  break;
+		case 0x06: ret->addr = &A0;  ret->data_type = DT_WORD;       break;
+		case 0x07: ret->addr = &B0;  ret->data_type = DT_WORD;       break;
+		case 0x08: ret->addr = &LC;  ret->data_type = DT_WORD;       break;
+		case 0x09: ret->addr = &SR;  ret->data_type = DT_WORD;       break;
+		case 0x0a: ret->addr = &OMR; ret->data_type = DT_BYTE;       break;
+		case 0x0b: ret->addr = &SP;  ret->data_type = DT_BYTE;       break;
+		case 0x0c: ret->addr = &A1;  ret->data_type = DT_WORD;       break;
+		case 0x0d: ret->addr = &B1;  ret->data_type = DT_WORD;       break;
+		case 0x0e: ret->addr = &A2;  ret->data_type = DT_BYTE;       break;
+		case 0x0f: ret->addr = &B2;  ret->data_type = DT_BYTE;       break;
 
-		case 0x10: ret->addr = &R0;  ret->data_type = DT_WORD;       break; 
-		case 0x11: ret->addr = &R1;  ret->data_type = DT_WORD;       break; 
-		case 0x12: ret->addr = &R2;  ret->data_type = DT_WORD;       break; 
-		case 0x13: ret->addr = &R3;  ret->data_type = DT_WORD;       break; 
-		case 0x14: ret->addr = &M0;  ret->data_type = DT_WORD;       break; 
-		case 0x15: ret->addr = &M1;  ret->data_type = DT_WORD;       break; 
-		case 0x16: ret->addr = &M2;  ret->data_type = DT_WORD;       break; 
-		case 0x17: ret->addr = &M3;  ret->data_type = DT_WORD;       break; 
-		case 0x18: ret->addr = &SSH; ret->data_type = DT_WORD;       break; 
-		case 0x19: ret->addr = &SSL; ret->data_type = DT_WORD;       break; 
-		case 0x1a: ret->addr = &LA;  ret->data_type = DT_WORD;       break; 
+		case 0x10: ret->addr = &R0;  ret->data_type = DT_WORD;       break;
+		case 0x11: ret->addr = &R1;  ret->data_type = DT_WORD;       break;
+		case 0x12: ret->addr = &R2;  ret->data_type = DT_WORD;       break;
+		case 0x13: ret->addr = &R3;  ret->data_type = DT_WORD;       break;
+		case 0x14: ret->addr = &M0;  ret->data_type = DT_WORD;       break;
+		case 0x15: ret->addr = &M1;  ret->data_type = DT_WORD;       break;
+		case 0x16: ret->addr = &M2;  ret->data_type = DT_WORD;       break;
+		case 0x17: ret->addr = &M3;  ret->data_type = DT_WORD;       break;
+		case 0x18: ret->addr = &SSH; ret->data_type = DT_WORD;       break;
+		case 0x19: ret->addr = &SSL; ret->data_type = DT_WORD;       break;
+		case 0x1a: ret->addr = &LA;  ret->data_type = DT_WORD;       break;
 		//no 0x1b
-		case 0x1c: ret->addr = &N0;  ret->data_type = DT_WORD;       break; 
-		case 0x1d: ret->addr = &N1;  ret->data_type = DT_WORD;       break; 
-		case 0x1e: ret->addr = &N2;  ret->data_type = DT_WORD;       break; 
-		case 0x1f: ret->addr = &N3;  ret->data_type = DT_WORD;       break; 
+		case 0x1c: ret->addr = &N0;  ret->data_type = DT_WORD;       break;
+		case 0x1d: ret->addr = &N1;  ret->data_type = DT_WORD;       break;
+		case 0x1e: ret->addr = &N2;  ret->data_type = DT_WORD;       break;
+		case 0x1f: ret->addr = &N3;  ret->data_type = DT_WORD;       break;
 	}
 }
 
@@ -3496,7 +3496,7 @@ static void dsp56k_process_loop(void)
 				/* End of loop processing */
 				SR = SSL;	/* TODO: A-83.  I believe only the Loop Flag comes back here. */
 				SP--;
-				
+
 				LA = SSH;
 				LC = SSL;
 				SP--;
@@ -3536,7 +3536,7 @@ static void dsp56k_process_rep(size_t repSize)
 
 
 /***************************************************************************
-	Parallel Memory Ops
+    Parallel Memory Ops
 ***************************************************************************/
 /* Register to Register Data Move : 0100 IIII ---- ---- */
 static void execute_register_to_register_data_move(const UINT16 op, typed_pointer* d_register, UINT64* prev_accum_value)
@@ -3636,7 +3636,7 @@ static void execute_x_memory_data_move2(const UINT16 op, typed_pointer* d_regist
 
 
 /***************************************************************************
-	Helper Functions
+    Helper Functions
 ***************************************************************************/
 static UINT16 Dsp56kOpMask(UINT16 cur, UINT16 mask)
 {

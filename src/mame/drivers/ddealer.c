@@ -235,10 +235,10 @@ static VIDEO_UPDATE( ddealer )
 	tilemap_draw(bitmap,cliprect,back_tilemap,0,0);
 
 	/* the fg tilemap handling is a little hacky right now,
-	   i'm not sure if it should be a single tilemap with
-	   rowscroll / linescroll, or two tilemaps which can be
-	   combined, the flipscreen case makes things more
-	   difficult to understand */
+       i'm not sure if it should be a single tilemap with
+       rowscroll / linescroll, or two tilemaps which can be
+       combined, the flipscreen case makes things more
+       difficult to understand */
 
 	if (!ddealer_flipscreen)
 	{
@@ -306,7 +306,7 @@ static TIMER_DEVICE_CALLBACK( ddealer_mcu_sim )
 		input_pressed = (input_pressed & 0xfb);
 
 	/*0x104/2 is some sort of "start-lock",i.e. used on the girl selection.
-	  Without it,the game "steals" one credit if you press the start button on that.*/
+      Without it,the game "steals" one credit if you press the start button on that.*/
 	if(mcu_shared_ram[0x000/2] > 0 && work_ram[0x104/2] & 1)
 	{
 		if(coin_input & 0x08)//start 1

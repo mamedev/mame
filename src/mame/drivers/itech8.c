@@ -1866,7 +1866,7 @@ static MACHINE_DRIVER_START( grmatch )
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_grmatch)
-	
+
 	/* palette updater */
 	MDRV_TIMER_ADD_SCANLINE("palette", grmatch_palette_update, "main", 0, 0)
 MACHINE_DRIVER_END
