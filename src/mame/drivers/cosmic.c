@@ -195,6 +195,159 @@ static WRITE8_HANDLER( cosmicg_output_w )
     #endif
 }
 
+
+static WRITE8_HANDLER( cosmica_sound_output_w )
+{
+    static int  sound_enabled=1;
+    static int dive_bomb_b_select=0;
+ 
+    /* Sound Enable / Disable */
+    if (offset == 11)
+    {
+    	int count;
+    	if (data == 0)
+        	for(count=0; count<12; count++) sample_stop(count);
+	else
+	{
+	  sample_start(0, 0, 1); /*Background Noise*/
+	}
+
+    	sound_enabled = data;
+    }
+
+    if (sound_enabled)
+    {
+        switch (offset)
+        {
+		case 0: if (data) sample_start(1, 2, 0); break; /*Dive Bombing Type A*/
+
+		case 2:	/*Dive Bombing Type B (Main Control)*/
+
+
+			if (data)
+			{
+
+			  switch(dive_bomb_b_select)
+			  {
+
+			    case 2:
+				
+					if (sample_playing(2))
+					{
+					  sample_stop(2);
+	   				  sample_start(2, 3, 0); break;
+					}
+					else
+ 		    			 sample_start(2, 3, 0); break;
+				
+				
+			    case 3:
+
+					if (sample_playing(3))
+					{
+					  sample_stop(3);
+	   				  sample_start(3, 4, 0); break;
+					}
+					else
+ 		    			 sample_start(3, 4, 0); break;
+
+
+			    case 4:
+					if (sample_playing(4))
+					{
+					  sample_stop(4);
+	   				  sample_start(4, 5, 0); break;
+					}
+					else
+	 	    			 sample_start(4, 5, 0); break;		
+
+
+
+			    case 5:
+					if (sample_playing(5))
+					{
+					  sample_stop(5);
+	   				  sample_start(5, 6, 0); break;
+					}
+					else
+ 		    			 sample_start(5, 6, 0); break;
+
+
+			    case 6:
+					if (sample_playing(6))
+					{
+					  sample_stop(6);
+	   				  sample_start(6, 7, 0); break;
+					}
+					else
+ 		    			 sample_start(6, 7, 0); break;
+
+			    case 7:
+
+					if (sample_playing(7))
+					{
+					  sample_stop(7);
+	   				  sample_start(7, 8, 0); break;
+					}
+					else
+ 		    			 sample_start(7, 8, 0); break;
+			  }
+			}
+			
+		case 3: /*Dive Bombing Type B (G.S.B)*/
+
+			if (data)
+			  dive_bomb_b_select |= 0x04;
+			else
+			  dive_bomb_b_select &= 0xFB;
+			break;
+
+
+		case 4: /*Dive Bombing Type B (M.S.B)*/
+			if (data)
+			  dive_bomb_b_select |= 0x02;
+			else
+			  dive_bomb_b_select &= 0xFD;
+
+			break;
+
+		case 5: /*Dive Bombing Type B (L.S.B)*/
+
+
+			if (data)
+			  dive_bomb_b_select |= 0x01;
+			else
+			  dive_bomb_b_select &= 0xFE;
+			break;
+
+
+		case 6: if (data) sample_start(8, 9, 0); break; /*Fire Control*/
+			
+		case 7: if (data) sample_start(9, 10, 0); break; /*Small Explosion*/
+
+		case 8: if (data) sample_start(10, 11, 0); break; /*Loud Explosion*/
+		
+		case 9:
+		 if (data)
+		  sample_start(11, 1, 1);
+		else
+		 sample_stop(11);
+		 
+		break; /*Extend Sound control*/
+
+		case 12:
+		 if (data) sample_start(11,12, 0); break; /*Insert Coin*/
+        }
+    }
+
+    #ifdef MAME_DEBUG
+ 	logerror("Sound output %x=%x\n",offset,data);
+	#endif
+}
+
+
+
+
 static INTERRUPT_GEN( panic_interrupt )
 {
 	if (cpu_getiloops() != 0)
@@ -343,6 +496,7 @@ static ADDRESS_MAP_START( cosmica_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4000, 0x5fff) AM_WRITE(SMH_RAM) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x6000, 0x601f) AM_WRITE(SMH_RAM) AM_BASE(&spriteram) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x7000, 0x700b) AM_WRITE(cosmica_sound_output_w)
 	AM_RANGE(0x700c, 0x700d) AM_WRITE(cosmic_color_register_w)
 	AM_RANGE(0x700f, 0x700f) AM_WRITE(flip_screen_w)
 ADDRESS_MAP_END
@@ -844,6 +998,33 @@ static GFXDECODE_START( cosmica )
 GFXDECODE_END
 
 
+static const char *cosmica_sample_names[] =
+{
+	"*cosmica",
+	"backgr.wav",	
+	"extend.wav",
+	"divea.wav",
+	"diveb1.wav",
+	"diveb2.wav",
+	"diveb3.wav",
+	"diveb4.wav",
+	"diveb5.wav",
+	"diveb6.wav",	
+	"fire.wav",	
+	"loudexp.wav",	
+	"smallexp.wav",	
+	"coin.wav",	
+	0       /* end of array */
+};
+
+
+static const samples_interface cosmica_samples_interface =
+{
+	13,	/* 12 channels */
+	cosmica_sample_names
+};
+
+
 static const char *const panic_sample_names[] =
 {
 	"*panic",
@@ -952,6 +1133,17 @@ static MACHINE_DRIVER_START( cosmica )
 
 	MDRV_PALETTE_INIT(cosmica)
 	MDRV_VIDEO_UPDATE(cosmica)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("samples", SAMPLES, 0)
+	MDRV_SOUND_CONFIG(cosmica_samples_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 MACHINE_DRIVER_END
 
 
@@ -1406,8 +1598,8 @@ static DRIVER_INIT( nomnlnd )
 
 
 GAME( 1979, cosmicg,  0,       cosmicg,  cosmicg,  cosmicg, ROT270, "Universal", "Cosmic Guerilla", GAME_NO_COCKTAIL )
-GAME( 1979, cosmica,  0,       cosmica,  cosmica,  0,       ROT270, "Universal", "Cosmic Alien", GAME_NO_SOUND )
-GAME( 1979, cosmica2, cosmica, cosmica,  cosmica,  0,       ROT270, "Universal", "Cosmic Alien (older)", GAME_NO_SOUND )
+GAME( 1979, cosmica,  0,       cosmica,  cosmica,  0,       ROT270, "Universal", "Cosmic Alien", 0 )
+GAME( 1979, cosmica2, cosmica, cosmica,  cosmica,  0,       ROT270, "Universal", "Cosmic Alien (older)", 0 )
 GAME( 1980, nomnlnd,  0,       nomnlnd,  nomnlnd,  nomnlnd, ROT270, "Universal", "No Man's Land", GAME_IMPERFECT_SOUND )
 GAME( 1980, nomnlndg, nomnlnd, nomnlnd,  nomnlndg, nomnlnd, ROT270, "Universal (Gottlieb license)", "No Man's Land (Gottlieb)", GAME_IMPERFECT_SOUND )
 GAME( 1980, magspot,  0,       magspot,  magspot,  0,       ROT270, "Universal", "Magical Spot", GAME_IMPERFECT_SOUND )
