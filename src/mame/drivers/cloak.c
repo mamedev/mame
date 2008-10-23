@@ -400,7 +400,7 @@ ROM_START( cloak )
 	ROM_LOAD( "136023-108.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "82s129.3n",  0x000, 0x100, NO_DUMP ) /* Vertical timing PROM */
+	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) /* 82S129 Vertical timing PROM */
 ROM_END
 
 
@@ -429,7 +429,7 @@ ROM_START( cloaksp )
 	ROM_LOAD( "136023-108.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "82s129.3n",  0x000, 0x100, NO_DUMP ) /* Vertical timing PROM */
+	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) /* 82S129 Vertical timing PROM */
 ROM_END
 
 
@@ -458,7 +458,7 @@ ROM_START( cloakfr )
 	ROM_LOAD( "136023-108.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "82s129.3n",  0x000, 0x100, NO_DUMP ) /* Vertical timing PROM */
+	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) /* 82S129 Vertical timing PROM */
 ROM_END
 
 
@@ -487,7 +487,7 @@ ROM_START( cloakgr )
 	ROM_LOAD( "136023-108.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "82s129.3n",  0x000, 0x100, NO_DUMP ) /* Vertical timing PROM */
+	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) /* 82S129 Vertical timing PROM */
 ROM_END
 
 
@@ -516,7 +516,7 @@ ROM_START( agentx4 )
 	ROM_LOAD( "136108-023.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "82s129.3n",  0x000, 0x100, NO_DUMP ) /* Vertical timing PROM */
+	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) /* 82S129 Vertical timing PROM */
 ROM_END
 
 
@@ -545,7 +545,7 @@ ROM_START( agentx3 )
 	ROM_LOAD( "136108-023.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "82s129.3n",  0x000, 0x100, NO_DUMP ) /* Vertical timing PROM */
+	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) /* 82S129 Vertical timing PROM */
 ROM_END
 
 
@@ -574,7 +574,7 @@ ROM_START( agentx2 )
 	ROM_LOAD( "136108-023.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "82s129.3n",  0x000, 0x100, NO_DUMP ) /* Vertical timing PROM */
+	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) /* 82S129 Vertical timing PROM */
 ROM_END
 
 
@@ -603,7 +603,7 @@ ROM_START( agentx1 )
 	ROM_LOAD( "136108-023.bin",      0x1000, 0x1000, CRC(4fe13d58) SHA1(b21a32b2ff5363ab35fd1438344a04deb4077dbc) )
 
 	ROM_REGION( 0x100, "proms", 0 )
-	ROM_LOAD( "82s129.3n",  0x000, 0x100, NO_DUMP ) /* Vertical timing PROM */
+	ROM_LOAD( "136023-116.3n",  0x000, 0x100, CRC(ef2668e5) SHA1(442df346a40b1e20d599ed9877c699e00ab518ba) ) /* 82S129 Vertical timing PROM */
 ROM_END
 
 
