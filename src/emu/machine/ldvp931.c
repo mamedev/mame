@@ -102,6 +102,7 @@ static TIMER_DEVICE_CALLBACK( track_timer );
 static WRITE8_HANDLER( output0_w );
 static WRITE8_HANDLER( output1_w );
 static WRITE8_HANDLER( lcd_w );
+static READ8_HANDLER( unknown_r );
 static READ8_HANDLER( keypad_r );
 static READ8_HANDLER( datic_r );
 static READ8_HANDLER( from_controller_r );
@@ -137,7 +138,7 @@ INLINE laserdisc_state *find_vp931(running_machine *machine)
 
 static ADDRESS_MAP_START( vp931_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xcf) AM_READWRITE(keypad_r, output0_w)
-	AM_RANGE(0x10, 0x10) AM_MIRROR(0xcf) AM_WRITE(output1_w)
+	AM_RANGE(0x10, 0x10) AM_MIRROR(0xcf) AM_READWRITE(unknown_r, output1_w)
 	AM_RANGE(0x20, 0x20) AM_MIRROR(0xcf) AM_READWRITE(datic_r, lcd_w)
 	AM_RANGE(0x30, 0x30) AM_MIRROR(0xcf) AM_READWRITE(from_controller_r, to_controller_w)
 	AM_RANGE(MCS48_PORT_P1, MCS48_PORT_P1) AM_READWRITE(port1_r, port1_w)
@@ -549,6 +550,17 @@ static WRITE8_HANDLER( lcd_w )
         Frame number is written as 5 digits here; however, it is not actually
         connected
     */
+}
+
+
+/*-------------------------------------------------
+    unknown_r - unknown input port
+-------------------------------------------------*/
+
+static READ8_HANDLER( unknown_r )
+{
+	/* only bit $80 is checked and its effects are minor */
+	return 0x00;
 }
 
 
