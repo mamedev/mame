@@ -68,10 +68,11 @@
  *    1 means external access, bypassing internal ROM
  *  - T0 output clock ?
  *
+ * - Implement 80C52 extended serial capabilities
  * - Full Timer support (all modes)
  * - Implement cmos features
  * - Fix serial communication - This is a big hack (but working) right now.
- * - Implement 87C751 in sslam.c
+ * - Implement 83C751 in sslam.c
  * - Fix cardline.c
  * - Fix sslam.c and cardline.c
  *      most likely due to different behaviour of I/O pins. The boards
@@ -80,6 +81,7 @@
  *      a 0 written to it's latch. At least cardline expects a 1 here.
  *
  * Done:
+ * - Implemented 80C52 interrupt handling
  * - Fix segas18.c (segaic16.c) memory handling.
  * - Fix sslam.c
  * - Fix limenko.c videopkr.c : Issue with core allocation of ram (duplicate savestate)
@@ -112,10 +114,11 @@
 
 enum
 {
-	FEATURE_NONE			= 0,
-	FEATURE_I8052_UART		= 1,
-	FEATURE_CMOS_IDLE		= 2,
-	FEATURE_CMOS_POWERDOWN	= 4,
+	FEATURE_NONE			= 0x00,
+	FEATURE_I8052			= 0x01,
+	FEATURE_CMOS_IDLE		= 0x02,
+	FEATURE_CMOS_POWERDOWN	= 0x04,
+	FEATURE_I80C52			= 0x08,
 };
 
 /* Internal address in SFR of registers */
@@ -150,6 +153,11 @@ enum
  	ADDR_RCAP2H	= 0xcb,
  	ADDR_TL2	= 0xcc,
  	ADDR_TH2	= 0xcd,
+
+ 	/* 80C52 Only registers */
+ 	ADDR_IPH	= 0xb7,
+ 	ADDR_SADDR	= 0xa9,
+ 	ADDR_SADEN	= 0xb9,
 };
 
 /* PC vectors */
@@ -190,8 +198,6 @@ struct _mcs51_regs
 	UINT16	ppc;			//previous pc
 	UINT16	pc;				//current pc
 	UINT16	features;		//features of this cpu
-	UINT8	cur_irq;		//Holds value of any current IRQ being serviced
-	UINT8	irq_priority;	//Holds value of the current IRQ Priority Level
 	UINT8	rwm;			//Signals that the current instruction is a read/write/modify instruction
 
 	int		inst_cycles;		/* cycles for the current instruction */
@@ -203,12 +209,15 @@ struct _mcs51_regs
 	int		t1_cnt;				/* number of 0->1 transistions on T1 line */
 	int		t2_cnt;				/* number of 0->1 transistions on T2 line */
 	int		t2ex_cnt;			/* number of 0->1 transistions on T2EX line */
+	int		cur_irq_prio;		/* Holds value of the current IRQ Priority Level; -1 if no irq */
+	UINT8	irq_active;			/* mask which irq levels are serviced */	
+	UINT8	irq_prio[8];		/* interrupt priority */
 
 	mcs51_uart uart;			/* internal uart */
 
 	/* Internal Ram */
 	UINT8	*internal_ram;		/* 128 RAM (8031/51) + 128 RAM in second bank (8032/52) */
-	UINT8	*sfr_ram;		/* 128 SFR - these are in 0x80 - 0xFF */
+	UINT8	*sfr_ram;			/* 128 SFR - these are in 0x80 - 0xFF */
 
 	// SFR Callbacks
 	void 	(*sfr_write)(size_t offset, UINT8 data);
@@ -314,6 +323,11 @@ struct _mcs51_regs
 #define RCAP2H		SFR_A(ADDR_RCAP2H)
 #define TL2			SFR_A(ADDR_TL2)
 #define TH2			SFR_A(ADDR_TH2)
+
+/* 80C52 Only registers */
+#define IPH			SFR_A(ADDR_IPH)
+#define SADDR		SFR_A(ADDR_SADDR)
+#define SADEN		SFR_A(ADDR_SADEN)
 
 /* WRITE accessors */
 
@@ -497,7 +511,7 @@ struct _mcs51_regs
 #endif
 
 /* Clear Current IRQ  */
-#define CLEAR_CURRENT_IRQ() do { mcs51.cur_irq = 0xff; mcs51.irq_priority = 0; } while (0)
+#define CLEAR_CURRENT_IRQ() clear_current_irq()
 
 /***************************************************************************
     GLOBAL VARIABLES
@@ -523,6 +537,23 @@ static int (*hold_serial_rx_callback)(void);
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
+
+INLINE void clear_current_irq(void) 
+{
+	//printf("reti cip %d, act %02x\n",mcs51.cur_irq_prio,  mcs51.irq_active);
+	//assert(mcs51.cur_irq_prio >= 0 && mcs51.irq_active);
+	
+	if (mcs51.cur_irq_prio >= 0)
+		mcs51.irq_active &= ~(1 << mcs51.cur_irq_prio);	
+	if (mcs51.irq_active & 4)
+		mcs51.cur_irq_prio = 2;
+	else if (mcs51.irq_active & 2)
+		mcs51.cur_irq_prio = 1;
+	else if (mcs51.irq_active & 1)
+		mcs51.cur_irq_prio = 0;
+	else 
+		mcs51.cur_irq_prio = -1;
+}
 
 INLINE UINT8 r_acc(void) { return SFR_A(ADDR_ACC); }
 
@@ -967,7 +998,7 @@ INLINE void update_timers(int cycles)
 	update_timer_t0(cycles);
 	update_timer_t1(cycles);
 
-	if (mcs51.features & FEATURE_I8052_UART)
+	if (mcs51.features & FEATURE_I8052)
 	{
 		update_timer_t2(cycles);
 	}
@@ -1023,11 +1054,19 @@ INLINE void serial_receive(void)
 	}
 }
 
-//Check and update status of serial port
+/* Check and update status of serial port */
 INLINE void	update_serial(int cycles)
 {
 	while (--cycles>=0)
 		transmit_receive(0);
+}
+
+/* Check and update status of serial port */
+INLINE void	update_irq_prio(UINT8 ipl, UINT8 iph)
+{
+	int i;
+	for (i=0; i<8; i++)
+		mcs51.irq_prio[i] = ((ipl >> i) & 1) | (((iph >>i ) & 1) << 1);
 }
 
 /***************************************************************************
@@ -1421,15 +1460,14 @@ static void check_irqs(void)
 {
 	UINT8 ints = (GET_IE0 | (GET_TF0<<1) | (GET_IE1<<2) | (GET_TF1<<3)
 			| ((GET_RI|GET_TI)<<4));
-	UINT8 ip = IP;
 	UINT8 int_vec = 0;
-	UINT8 priority_request = 0;
+	int priority_request = -1;
 	int i;
 
 	//If All Inerrupts Disabled or no pending abort..
 	if(!GET_EA)	return;
 
-	if (mcs51.features & FEATURE_I8052_UART)
+	if (mcs51.features & FEATURE_I8052)
 		ints |= ((GET_TF2|GET_EXF2)<<5);
 
 	/* mask out interrupts not enabled */
@@ -1437,27 +1475,24 @@ static void check_irqs(void)
 
 	if (!ints)	return;
 
-	if(mcs51.irq_priority)
-	{
-		LOG(("high priority irq in progress, skipping irq request\n"));
-		return;
-	}
-
 	for (i=0; i<mcs51.num_interrupts; i++)
 	{
 		if (ints & (1<<i))
 		{
-			int_vec = (i<<3) | 3;
-			priority_request = (ip & (1<<i));
-			if (priority_request)
-				break;
+			if (mcs51.irq_prio[i] > priority_request)
+			{
+				priority_request = mcs51.irq_prio[i];
+				int_vec = (i<<3) | 3;
+			}
 		}
 	}
 
-	//Skip the interrupt request if currently processing is lo priority, and the new request IS NOT HI PRIORITY!
-	if(mcs51.cur_irq < 0xff && !priority_request)
+	/* Skip the interrupt request if currently processing interrupt
+	 * and the new request does not have a higher priority
+	 */
+	if(mcs51.irq_active && (priority_request <= mcs51.cur_irq_prio))
 	{
-		LOG(("low priority irq in progress already, skipping low irq request\n"));
+		LOG(("higher or equal priority irq in progress already, skipping ...\n"));
 		return;
 	}
 
@@ -1470,11 +1505,13 @@ static void check_irqs(void)
 	mcs51.inst_cycles += 2;
 
 	//Set current Irq & Priority being serviced
-	mcs51.cur_irq = int_vec;
-	mcs51.irq_priority = priority_request;
+	mcs51.cur_irq_prio = priority_request;
+	mcs51.irq_active |= (1 << priority_request);
+
+	//printf("irq cip %d, act %02x\n",mcs51.cur_irq_prio,  mcs51.irq_active);
 
 	//Clear any interrupt flags that should be cleared since we're servicing the irq!
-	switch(mcs51.cur_irq) {
+	switch(int_vec) {
 		case V_IE0:
 			//External Int Flag only cleared when configured as Edge Triggered..
 			if(GET_IT0)  /* for some reason having this, breaks alving dmd games */
@@ -1599,7 +1636,7 @@ static void mcs51_set_irq_line(int irqline, int state)
 			break;
 
 		case MCS51_T2_LINE:
-			if (mcs51.features & FEATURE_I8052_UART)
+			if (mcs51.features & FEATURE_I8052)
 			{
 				if (GET_BIT(tr_state, MCS51_T2_LINE))
 					mcs51.t2_cnt++;
@@ -1609,7 +1646,7 @@ static void mcs51_set_irq_line(int irqline, int state)
 			break;
 
 		case MCS51_T2EX_LINE:
-			if (mcs51.features & FEATURE_I8052_UART)
+			if (mcs51.features & FEATURE_I8052)
 			{
 				if (GET_TR2 && GET_EXEN2)
 					if (GET_BIT(tr_state, MCS51_T2EX_LINE))
@@ -1686,10 +1723,10 @@ static void mcs51_sfr_write(size_t offset, UINT8 data)
 		case ADDR_SBUF:	serial_transmit(data);		break;
 		case ADDR_PSW:	SET_PARITY();				break;
 		case ADDR_ACC:	SET_PARITY();				break;
+		case ADDR_IP:	update_irq_prio(data, 0);	break;
 		/* R_SBUF = data;        //This register is used only for "Receiving data coming in!" */
 
 		case ADDR_B:
-		case ADDR_IP:
 		case ADDR_SP:
 		case ADDR_DPL:
 		case ADDR_DPH:
@@ -1765,14 +1802,15 @@ static void mcs51_init(int index, int clock, const void *config, int (*irqcallba
 	state_save_register_item("mcs51", index, mcs51.ppc);
 	state_save_register_item("mcs51", index, mcs51.pc);
 	state_save_register_item("mcs51", index, mcs51.rwm );
-	state_save_register_item("mcs51", index, mcs51.cur_irq );
-	state_save_register_item("mcs51", index, mcs51.irq_priority );
+	state_save_register_item("mcs51", index, mcs51.cur_irq_prio );
 	state_save_register_item("mcs51", index, mcs51.last_line_state );
 	state_save_register_item("mcs51", index, mcs51.t0_cnt );
 	state_save_register_item("mcs51", index, mcs51.t1_cnt );
 	state_save_register_item("mcs51", index, mcs51.t2_cnt );
 	state_save_register_item("mcs51", index, mcs51.t2ex_cnt );
 	state_save_register_item("mcs51", index, mcs51.recalc_parity );
+	state_save_register_item_array("mcs51", index, mcs51.irq_prio );
+	state_save_register_item("mcs51", index, mcs51.irq_active );
 }
 
 static void i80c51_init(int index, int clock, const void *config, int (*irqcallback)(int))
@@ -1797,6 +1835,9 @@ static void mcs51_reset(void)
 	mcs51.t1_cnt = 0;
 	mcs51.t2_cnt = 0;
 	mcs51.t2ex_cnt = 0;
+	/* Flag as NO IRQ in Progress */
+	mcs51.irq_active = 0;
+	mcs51.cur_irq_prio = -1;
 
 	/* these are all defined reset states */
 	PC = 0;
@@ -1807,6 +1848,7 @@ static void mcs51_reset(void)
 	DPL = 0;
 	B = 0;
 	IP = 0;
+	update_irq_prio(IP, 0);
 	IE = 0;
 	SCON = 0;
 	TCON = 0;
@@ -1821,8 +1863,6 @@ static void mcs51_reset(void)
 	SET_P1(0xff);
 	SET_P0(0xff);
 
-	/* Flag as NO IRQ in Progress */
-	CLEAR_CURRENT_IRQ();
 }
 
 /* Shut down CPU core */
@@ -1876,16 +1916,9 @@ static void i8052_init (int index, int clock, const void *config, int (*irqcallb
 	mcs51.ram_mask = 0xFF;  			/* 256 bytes of ram */
 	mcs51.num_interrupts = 6;			/* 6 interrupts */
 
-	mcs51.features |= FEATURE_I8052_UART;
+	mcs51.features |= FEATURE_I8052;
 	mcs51.sfr_read = i8052_sfr_read;
 	mcs51.sfr_write = i8052_sfr_write;
-}
-
-static void i80c52_init(int index, int clock, const void *config, int (*irqcallback)(int))
-{
-	i8052_init(index, clock, config, irqcallback);
-
-	mcs51.features |= (FEATURE_CMOS_IDLE | FEATURE_CMOS_POWERDOWN);
 }
 
 static void i8052_reset(void)
@@ -1898,6 +1931,64 @@ static void i8052_reset(void)
 	RCAP2H = 0;
 	TL2 = 0;
 	TH2 = 0;
+}
+
+/****************************************************************************
+ * 8052 Section
+ ****************************************************************************/
+
+static void i80c52_sfr_write(size_t offset, UINT8 data)
+{
+	switch (offset)
+	{
+		/* 80c52 family specific */
+		case ADDR_IP:
+			update_irq_prio(data, IPH);
+			break;
+		case ADDR_IPH:
+			update_irq_prio(IP, data);
+			break;
+		case ADDR_SADDR:
+		case ADDR_SADEN:
+			break;
+
+		default:
+			i8052_sfr_write(offset, data);
+			return;
+	}
+	data_write_byte_8le((size_t) offset | 0x100, data);
+}
+
+static UINT8 i80c52_sfr_read(size_t offset)
+{
+	switch (offset)
+	{
+		/* 80c52 family specific */
+		case ADDR_IPH:
+		case ADDR_SADDR:
+		case ADDR_SADEN:
+			return data_read_byte_8le((size_t) offset | 0x100);
+		default:
+			return i8052_sfr_read(offset);
+	}
+}
+
+static void i80c52_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	i8052_init(index, clock, config, irqcallback);
+
+	mcs51.features |= (FEATURE_I80C52 | FEATURE_CMOS_IDLE | FEATURE_CMOS_POWERDOWN);
+	mcs51.sfr_read = i80c52_sfr_read;
+	mcs51.sfr_write = i80c52_sfr_write;
+}
+
+static void i80c52_reset(void)
+{
+	i8052_reset();
+
+	IRAM_W(ADDR_IPH, 0);
+	SADDR = 0;
+	SADEN = 0;
 }
 
 /***************************************************************************
@@ -2209,6 +2300,7 @@ void i80c32_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		case CPUINFO_PTR_INIT:							info->init = i80c52_init;				break;
+		case CPUINFO_PTR_RESET:							info->reset = i80c52_reset;				break;
 		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C32");				break;
 		default:										i8032_get_info(state, info);			break;
 	}
@@ -2219,6 +2311,7 @@ void i80c52_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		case CPUINFO_PTR_INIT:							info->init = i80c52_init;				break;
+		case CPUINFO_PTR_RESET:							info->reset = i80c52_reset;				break;
 		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C52");				break;
 		default:										i8052_get_info(state, info);			break;
 	}
@@ -2239,6 +2332,7 @@ void i87c52_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		case CPUINFO_PTR_INIT:							info->init = i80c52_init;				break;
+		case CPUINFO_PTR_RESET:							info->reset = i80c52_reset;				break;
 		case CPUINFO_STR_NAME:							strcpy(info->s, "I87C52");				break;
 		default:										i8752_get_info(state, info);			break;
 	}
