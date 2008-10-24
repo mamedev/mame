@@ -39,7 +39,7 @@
 typedef struct _nes_interface nes_interface;
 struct _nes_interface
 {
-	const char *region;  /* DMC regions */
+	const char *cpu_tag;  /* CPU tag */
 };
 
 READ8_HANDLER( nes_psg_0_r );
