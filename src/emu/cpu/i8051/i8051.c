@@ -474,10 +474,13 @@ struct _mcs51_regs
 #define GET_M0_0		GET_BIT(TMOD, 0)
 
 #define GET_SMOD		GET_BIT(PCON, 7)
-#define GET_GF1			GET_BIT(TMOD, 3)
+
+/* Only in 80C51BH & other cmos */
+
+#define GET_GF1			GET_BIT(TMOD, 3)		
 #define GET_GF0			GET_BIT(TMOD, 2)
-#define GET_PD			GET_BIT(TMOD, 1)		/* Only in 80C51BH */
-#define GET_IDL			GET_BIT(TMOD, 0)		/* Only in 80C51BH */
+#define GET_PD			GET_BIT(TMOD, 1)		
+#define GET_IDL			GET_BIT(TMOD, 0)
 
 /* 8052 Only flags */
 #define GET_TF2			GET_BIT(T2CON, 7)
@@ -1934,7 +1937,7 @@ static void i8052_reset(void)
 }
 
 /****************************************************************************
- * 8052 Section
+ * 80C52 Section
  ****************************************************************************/
 
 static void i80c52_sfr_write(size_t offset, UINT8 data)
@@ -1980,6 +1983,13 @@ static void i80c52_init(int index, int clock, const void *config, int (*irqcallb
 	mcs51.features |= (FEATURE_I80C52 | FEATURE_CMOS_IDLE | FEATURE_CMOS_POWERDOWN);
 	mcs51.sfr_read = i80c52_sfr_read;
 	mcs51.sfr_write = i80c52_sfr_write;
+}
+
+static void i80c31_init(int index, int clock, const void *config, int (*irqcallback)(int))
+{
+	i80c52_init(index, clock, config, irqcallback);
+
+	mcs51.ram_mask = 0x7F;  			/* 128 bytes of ram */
 }
 
 static void i80c52_reset(void)
@@ -2277,9 +2287,16 @@ void i8752_get_info(UINT32 state, cpuinfo *info)
 
 void i80c31_get_info(UINT32 state, cpuinfo *info)
 {
+	/* according to PHILIPS datasheet this is a stripped down version
+	 * of i80c52 with 128 bytes internal ram */
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = i80c51_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = i80c31_init;				break;
+		case CPUINFO_PTR_RESET:							info->reset = i80c52_reset;				break;
+
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = NULL;	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = address_map_data_7bit;	break;
+	
 		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C31");				break;
 		default:										i8031_get_info(state, info);			break;
 	}
