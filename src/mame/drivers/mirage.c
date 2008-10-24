@@ -158,7 +158,7 @@ static WRITE16_HANDLER( okim1_rombank_w )
 	if(ACCESSING_BITS_0_7)
 	{
 		UINT8 *oki = memory_region(machine, "oki2");
-		memcpy(&oki[0], &oki[(data & 3) * 0x40000] + 0x100000, 0x40000);
+		memcpy(&oki[0], &oki[(data & 3) * 0x40000] + 0x40000, 0x40000);
 	}
 }
 
@@ -169,7 +169,7 @@ static WRITE16_HANDLER( okim0_rombank_w )
 	if(ACCESSING_BITS_0_7)
 	{
 		UINT8 *oki = memory_region(machine, "oki1");
-		memcpy(&oki[0], &oki[(data & 7) * 0x40000] + 0x200000, 0x40000);
+		memcpy(&oki[0], &oki[(data & 7) * 0x40000] + 0x40000, 0x40000);
 	}
 }
 
@@ -398,13 +398,13 @@ ROM_START( mirage )
   	ROM_LOAD16_BYTE( "mbl-01.11a", 0x000001, 0x200000, CRC(895be69a) SHA1(541d8f37fb4cf99312b80a0eb0d729fbbeab5f4f) )
 	ROM_LOAD16_BYTE( "mbl-02.12a", 0x000000, 0x200000, CRC(474f6104) SHA1(ff81b32b90192c3d5f27c436a9246aa6caaeeeee) )
 
-	ROM_REGION( 0x400000, "oki1", 0 )	/* M6295 samples */
-	ROM_LOAD( "mbl-03.10a", 0x000000, 0x200000, CRC(4a599703) SHA1(b49e84faa2d6acca952740d30fc8d1a33ac47e79) )
-	ROM_RELOAD(				0x200000, 0x200000 )
+	ROM_REGION( 0x240000, "oki1", 0 )	/* M6295 samples */
+	ROM_LOAD( "mbl-03.10a", 0x040000, 0x200000, CRC(4a599703) SHA1(b49e84faa2d6acca952740d30fc8d1a33ac47e79) )
+	ROM_RELOAD(				0x000000, 0x040000 )
 
-	ROM_REGION( 0x200000, "oki2", 0 )	/* M6295 samples */
-	ROM_LOAD( "mbl-04.12k", 0x000000, 0x100000, CRC(b533123d) SHA1(2cb2f11331d00c2d282113932ed2836805f4fc6e) )
-	ROM_RELOAD(				0x100000, 0x100000 )
+	ROM_REGION( 0x140000, "oki2", 0 )	/* M6295 samples */
+	ROM_LOAD( "mbl-04.12k", 0x040000, 0x100000, CRC(b533123d) SHA1(2cb2f11331d00c2d282113932ed2836805f4fc6e) )
+	ROM_RELOAD(				0x000000, 0x040000 )
 ROM_END
 
 static DRIVER_INIT( mirage )
