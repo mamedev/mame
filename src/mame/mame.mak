@@ -1671,6 +1671,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/wldarrow.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
 	$(DRIVERS)/hikaru.o \
+	$(DRIVERS)/re900.o \
 
 
 #-------------------------------------------------
