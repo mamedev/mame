@@ -442,7 +442,7 @@ static MACHINE_DRIVER_START( superchs )
 	MDRV_VIDEO_UPDATE(superchs)
 
 	/* sound hardware */
-	TAITO_F3_SOUND_SYSTEM_ES5505(13343000)
+	TAITO_F3_SOUND_SYSTEM_ES5505(30476100/2)
 MACHINE_DRIVER_END
 
 /***************************************************************************/
