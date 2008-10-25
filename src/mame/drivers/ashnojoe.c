@@ -4,10 +4,6 @@
 
 driver by David Haywood and bits from Pierpaolo Prazzoli
 
-todo:
-- sound
-- frequencies
-- 1 unused rom
 
 Upper board marked: W9011
 
@@ -80,7 +76,8 @@ Coin B is not used
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 
-extern UINT16 *ashnojoetileram16, *ashnojoetileram16_2, *ashnojoetileram16_3, *ashnojoetileram16_4, *ashnojoetileram16_5, *ashnojoetileram16_6, *ashnojoetileram16_7;
+extern UINT16 *ashnojoetileram16, *ashnojoetileram16_2, *ashnojoetileram16_3, *ashnojoetileram16_4;
+extern UINT16 *ashnojoetileram16_5, *ashnojoetileram16_6, *ashnojoetileram16_7;
 extern UINT16 *ashnojoe_tilemap_reg;
 
 extern WRITE16_HANDLER( ashnojoe_tileram_w );
@@ -96,21 +93,24 @@ extern WRITE16_HANDLER( joe_tilemaps_yscroll_w );
 extern VIDEO_START( ashnojoe );
 extern VIDEO_UPDATE( ashnojoe );
 
+static UINT8 adpcm_byte;
+static int soundlatch_status;
+static int msm5205_vclk_toggle;
+
+
 static READ16_HANDLER(fake_4a00a_r)
 {
-	//if it returns 1 there's no sound. is it used to sync the game and sound?
-	//or just a debug enable/disble register?
+	/* If it returns 1 there's no sound. Is it used to sync the game and sound?
+	or just a debug enable/disable register? */
 	return 0;
-	//return 1;
 }
 
 static WRITE16_HANDLER( ashnojoe_soundlatch_w )
 {
-	if(ACCESSING_BITS_0_7)
+	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine,0,data & 0xff);
-		//needed?
-		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+		soundlatch_status = 1;
+		soundlatch_w(machine, 0, data & 0xff);
 	}
 }
 
@@ -124,9 +124,9 @@ static ADDRESS_MAP_START( ashnojoe_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x047000, 0x047fff) AM_RAM_WRITE(ashnojoe_tileram7_w) AM_BASE(&ashnojoetileram16_7)
 	AM_RANGE(0x048000, 0x048fff) AM_RAM_WRITE(ashnojoe_tileram_w) AM_BASE(&ashnojoetileram16)
 	AM_RANGE(0x049000, 0x049fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE(&paletteram16)
-	AM_RANGE(0x04a000, 0x04a001) AM_READ_PORT("P1")		// p1 inputs, coins
-	AM_RANGE(0x04a002, 0x04a003) AM_READ_PORT("P2")		// p2 inputs
-	AM_RANGE(0x04a004, 0x04a005) AM_READ_PORT("DSW")	// dipswitches
+	AM_RANGE(0x04a000, 0x04a001) AM_READ_PORT("P1")
+	AM_RANGE(0x04a002, 0x04a003) AM_READ_PORT("P2")
+	AM_RANGE(0x04a004, 0x04a005) AM_READ_PORT("DSW")
 	AM_RANGE(0x04a006, 0x04a007) AM_WRITE(SMH_RAM) AM_BASE(&ashnojoe_tilemap_reg)
 	AM_RANGE(0x04a008, 0x04a009) AM_WRITE(ashnojoe_soundlatch_w)
 	AM_RANGE(0x04a00a, 0x04a00b) AM_READ(fake_4a00a_r)	// ??
@@ -136,23 +136,21 @@ static ADDRESS_MAP_START( ashnojoe_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x0bffff) AM_ROM
 ADDRESS_MAP_END
 
-static READ8_HANDLER(fake_6_r)
+
+static WRITE8_HANDLER( adpcm_w )
 {
-	// if it returns 0 the cpu doesn't read from port $4 ?
-	int ret = 0;
-	ret ^= 1;
-	return ret;
-	/* FIXME: earlier attemts to remove ?
-    return 1;
-    return 0;
-    return mame_rand(machine);
-    */
+	adpcm_byte = data;
 }
 
-static WRITE8_HANDLER( adpcm_data_w )
+static READ8_HANDLER( sound_latch_r )
 {
-	msm5205_data_w(0, data & 0xf);
-	msm5205_data_w(0, data>>4);
+	soundlatch_status = 0;
+	return soundlatch_r(machine, 0);
+}
+
+static READ8_HANDLER( sound_latch_status_r )
+{
+	return soundlatch_status;
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -165,10 +163,11 @@ static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x00) AM_READWRITE(ym2203_status_port_0_r, ym2203_control_port_0_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(ym2203_read_port_0_r, ym2203_write_port_0_w)
-	AM_RANGE(0x02, 0x02) AM_WRITE(adpcm_data_w)
-	AM_RANGE(0x04, 0x04) AM_READ(soundlatch_r) //PC: 15D -> cp $7f
-	AM_RANGE(0x06, 0x06) AM_READ(fake_6_r/*soundlatch_r */) //PC: 14A -> and $1
+	AM_RANGE(0x02, 0x02) AM_WRITE(adpcm_w)
+	AM_RANGE(0x04, 0x04) AM_READ(sound_latch_r)
+	AM_RANGE(0x06, 0x06) AM_READ(sound_latch_status_r)
 ADDRESS_MAP_END
+
 
 static INPUT_PORTS_START( ashnojoe )
 	PORT_START("P1")	/* player 1 16-bit */
@@ -257,6 +256,7 @@ static INPUT_PORTS_START( ashnojoe )
 	PORT_DIPSETTING(      0x8000, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
 static const gfx_layout tiles8x8_layout =
 {
 	8,8,
@@ -289,33 +289,25 @@ static GFXDECODE_START( ashnojoe )
 	GFXDECODE_ENTRY( "gfx5", 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
-static void irqhandler(running_machine *machine, int irq)
+
+static void ym2203_irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static WRITE8_HANDLER(writeA)
+static WRITE8_HANDLER( ym2203_write_a )
 {
-	if (data == 0xff) return;	// this gets called at 8910 startup with 0xff before the 5205 exists, causing a crash
+	/* This gets called at 8910 startup with 0xff before the 5205 exists, causing a crash */
+	if (data == 0xff)
+		return;
 
 	msm5205_reset_w(0, !(data & 0x01));
 }
 
-static WRITE8_HANDLER(writeB)
+static WRITE8_HANDLER( ym2203_write_b )
 {
 	memory_set_bankptr(4, memory_region(machine, "adpcm") + ((data & 0xf) * 0x8000));
 }
-
-static void ashnojoe_adpcm_int (running_machine *machine, int data)
-{
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
-}
-
-static const msm5205_interface msm5205_config =
-{
-	ashnojoe_adpcm_int,	/* interrupt function */
-	MSM5205_S48_4B		/* 4KHz 4-bit */
-};
 
 static const ym2203_interface ym2203_config =
 {
@@ -324,11 +316,33 @@ static const ym2203_interface ym2203_config =
 		AY8910_DEFAULT_LOADS,
 		NULL,
 		NULL,
-		writeA,
-		writeB,
+		ym2203_write_a,
+		ym2203_write_b,
 	},
-	irqhandler
+	ym2203_irq_handler
 };
+
+static void ashnojoe_vclk_cb(running_machine *machine, int data)
+{
+	if (msm5205_vclk_toggle == 0)
+	{
+		msm5205_data_w(0, adpcm_byte >> 4);
+	}
+	else
+	{
+		msm5205_data_w(0, adpcm_byte & 0xf);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	}
+
+	msm5205_vclk_toggle ^= 1;
+}
+
+static const msm5205_interface msm5205_config =
+{
+	ashnojoe_vclk_cb,
+	MSM5205_S48_4B
+};
+
 
 static DRIVER_INIT( ashnojoe )
 {
@@ -338,11 +352,11 @@ static DRIVER_INIT( ashnojoe )
 static MACHINE_DRIVER_START( ashnojoe )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 8000000) /* 8 MHz (verified on pcb) */
+	MDRV_CPU_ADD("main", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(ashnojoe_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq1_line_hold)
 
-	MDRV_CPU_ADD("audio", Z80, 4000000) /* 4 MHz (verified on pcb) */
+	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
 	MDRV_CPU_IO_MAP(sound_portmap,0)
 
@@ -363,13 +377,13 @@ static MACHINE_DRIVER_START( ashnojoe )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym", YM2203, 4000000)  /* 4 MHz (verified on pcb) */
+	MDRV_SOUND_ADD("ym", YM2203, 4000000)
 	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.1)
 
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 ROM_START( scessjoe )
@@ -405,7 +419,7 @@ ROM_START( scessjoe )
 	ROM_LOAD16_WORD_SWAP( "sj408-nw.7g", 0x200000, 0x80000, CRC(6a3b1ea1) SHA1(e39a6e52d930f291bf237cf9db3d4b3d2fad53e0) )
 	ROM_LOAD16_WORD_SWAP( "sj409-nw.7j", 0x280000, 0x80000, CRC(d8764213) SHA1(89eadefb956863216c8e3d0380394aba35e8c856) )
 
-	ROM_REGION( 0x80000, "adpcm", 0 )   /* samples? */
+	ROM_REGION( 0x80000, "adpcm", 0 )
 	ROM_LOAD( "sj401-nw.10r", 0x00000, 0x80000, CRC(25dfab59) SHA1(7d50159204ba05323a2442778f35192e66117dda) )
 ROM_END
 
@@ -442,10 +456,9 @@ ROM_START( ashnojoe )
 	ROM_LOAD16_WORD_SWAP( "sj408-nw.7g", 0x200000, 0x80000, CRC(6a3b1ea1) SHA1(e39a6e52d930f291bf237cf9db3d4b3d2fad53e0) )
 	ROM_LOAD16_WORD_SWAP( "sj409-nw.7j", 0x280000, 0x80000, CRC(d8764213) SHA1(89eadefb956863216c8e3d0380394aba35e8c856) )
 
-	ROM_REGION( 0x80000, "adpcm", 0 )   /* samples? */
+	ROM_REGION( 0x80000, "adpcm", 0 )
 	ROM_LOAD( "sj401-nw.10r", 0x00000, 0x80000, CRC(25dfab59) SHA1(7d50159204ba05323a2442778f35192e66117dda) )
 ROM_END
 
-GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe, ROT0, "WAVE / Taito Corporation", "Success Joe (World)", GAME_IMPERFECT_SOUND )
-GAME( 1990, ashnojoe, scessjoe, ashnojoe, ashnojoe, ashnojoe, ROT0, "WAVE / Taito Corporation", "Ashita no Joe (Japan)", GAME_IMPERFECT_SOUND )
-
+GAME( 1990, scessjoe, 0,        ashnojoe, ashnojoe, ashnojoe, ROT0, "WAVE / Taito Corporation", "Success Joe (World)",   0 )
+GAME( 1990, ashnojoe, scessjoe, ashnojoe, ashnojoe, ashnojoe, ROT0, "WAVE / Taito Corporation", "Ashita no Joe (Japan)", 0 )
