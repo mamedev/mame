@@ -1598,6 +1598,7 @@ src/mame/drivers/jailbrek.c svneol=native#text/plain
 src/mame/drivers/jalmah.c svneol=native#text/plain
 src/mame/drivers/jchan.c svneol=native#text/plain
 src/mame/drivers/jedi.c svneol=native#text/plain
+src/mame/drivers/jokrwild.c svneol=native#text/plain
 src/mame/drivers/jollyjgr.c svneol=native#text/plain
 src/mame/drivers/jongkyo.c svneol=native#text/plain
 src/mame/drivers/jpmimpct.c svneol=native#text/plain

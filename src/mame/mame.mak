@@ -1590,6 +1590,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/itgambl3.o \
 	$(DRIVERS)/itgamble.o \
 	$(DRIVERS)/jackpool.o \
+	$(DRIVERS)/jokrwild.o \
 	$(DRIVERS)/jongkyo.o \
 	$(DRIVERS)/kingpin.o \
 	$(DRIVERS)/koikoi.o \
@@ -1634,6 +1635,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/quizpun2.o \
 	$(DRIVERS)/rbmk.o \
 	$(DRIVERS)/rcorsair.o \
+	$(DRIVERS)/re900.o \
 	$(DRIVERS)/sfkick.o \
 	$(DRIVERS)/shangkid.o $(VIDEO)/shangkid.o \
 	$(DRIVERS)/skyarmy.o \
@@ -1671,7 +1673,6 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/wldarrow.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
 	$(DRIVERS)/hikaru.o \
-	$(DRIVERS)/re900.o \
 
 
 #-------------------------------------------------

@@ -8279,6 +8279,7 @@ Other Sun games
 	DRIVER( magictg )	/* (c) 199? Acclaim */
 	DRIVER( magictga )	/* (c) 199? Acclaim */
 	DRIVER( re900 )		/* (c) 1990 Entretenimientos GEMINI */
+	DRIVER( jokrwild )	/* (c) 1988 Sigma */
 
 	/* InterFlip / Recreativos Franco */
 	DRIVER( videopkr )	/* (c) 1984 InterFlip */
