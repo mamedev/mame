@@ -25,18 +25,26 @@
     *** Hardware notes ***
 
 
-    - CPU  1x R6502P
-    - CRTC 1x MC6845P
-    - RAMs 1x MK48Z02B-20  CMOS 2K*8 zeropower SRAM (near prg ROM)
-           2x HM6116LP-4   2K*8 SRAM (near GFX ROMs)
-    - CLK  1x oscillator 10.000 MHz
+    - CPU:  1x R6502P.
 
-    - ROMs 1x AM27128      (NS3.1)
-           2x SEEQ DQ2764  (1, 2)
-           1x SGS M2764    (NS1)
-    - PLDs 1x PAL16R4A     (read protected)
+    - CRTC: 1x MC6845P.
 
-    - 1x TDA 2002      (8W. car radio audio amplifier)
+    - RAM:  1x MK48Z02B-20.  CMOS 2K*8 zeropower SRAM (NVRAM).
+            2x HM6116LP-4.   2K*8 SRAM (Video RAM, only 1st half used).
+
+    - CLK:  1x crystal @ 10.000 MHz.
+
+    - ROMs: 1x AM27128.      (NS3.1)
+            2x SEEQ DQ2764.  (1, 2)
+            1x SGS M2764.    (NS1)
+
+    - PLDs: 1x PAL16R4A.     (read protected)
+
+    - SOUND: 1-bit DAC + 1x TDA 2002 (8W. car radio audio amplifier)
+
+
+    Other components:
+
     - 3x OUAZ SS-112D  (relay 1 pole 12v)
     - 1x 4 DIP switches
     - 1x 30x2 edge connector
@@ -95,9 +103,6 @@
     | |________||10 MHz| |__________|     |_________|       |ss112d|8 |
     |           |______|                                    |______|__|
     |_________________________________________________________________|
-
-
-    Magic Fly & 7 e Mezzo PAL16R4A Fuse Maps were converted to the new bin format and added to respective sets.
 
 
     Pinouts (from 7mezzo pinout sheet)
@@ -164,7 +169,7 @@
     Memory Map (magicfly)
     ---------------------
 
-    $0000 - $00FF    RAM    ; Zero page (pointers and registers).
+    $0000 - $00FF    RAM    ; Zero page (pointers and registers) (NVRAM).
 
         ($0D)            ; Incremented each time a NMI is triggered.
         ($1D)            ; In case of 0x00, NMI do nothing and return.
@@ -193,13 +198,13 @@
         ($6E - $6F)      ; Balloon #3 secondi (bet).
         ($70 - $71)      ; Balloon #4 secondi (bet).
         ($72 - $73)      ; Balloon #5 secondi (bet).
-        ($94)            ; Store bit 7 of content to be ORed with $39 and written to input selector at $3000.
+        ($94)            ; Store bit 7 of contents to be ORed with $39 and written to output port ($3000).
         ($96 - $98)      ; Store values from content of $2800 (input port) & 0x80, & 0x40, & 0x10.
         ($9B - $A8)      ; Text scroll buffer.
 
-    $0100 - $01FF    RAM    ; 6502 Stack Pointer.
+    $0100 - $01FF    RAM    ; 6502 Stack Pointer (NVRAM).
 
-    $0200 - $07FF    RAM    ; General purpose RAM.
+    $0200 - $07FF    RAM    ; General purpose RAM (NVRAM).
 
     $0800 - $0801    MC6845 ; MC6845 use $0800 for register addressing and $0801 for register values (see code at $CE86).
 
@@ -213,12 +218,16 @@
     $1800 - $1BFF    Color RAM  ; Initialized in subroutine starting at $CF83, filled with value stored in $5F.
                                 ; (In 7mezzo is located at $CB13 using $64 and $65 to store video and color ram values.)
 
-    $2800 - $2800    Input port ; Multiplexed input port (code at $CE96). Only reads.
-                                ; NMI routine read from here and store new values in $003A - $003D and copy old ones to $003F - $0042.
-                                ; Code accept only bits 0-3 & 5 as valid. If another bit is activated will produce an I/O error. (code at $CD0C)
+    $2800 - $2800    Input port ; Multiplexed input port (code at $CE96).
+                                ; NMI routine read from here and store new values in $3A-$3D and copy old ones to $3F-$42.
+                                ; Code accept only bits 0-1-2-3-5 as valid inputs. For DIP switches, only bits 4-6-7 are valid.
+                                ; If an invalid bit is activated, it will produce an I/O error. (code at $CD0C)
 
-    $3000 - $3000    Input selector  ; Only writes. NMI write 0x01, 0x02, 0x04, 0x08.
-                                     ; Main code at $C152 do a complex loop with boolean operations and write 0x00/0x80 here.
+    $3000 - $3000    Output port:
+
+                         Input selector,  ; NMI writes the lower 4 bits to select input.
+                         Counters.        ; Bits 4-5-6 are used for Coin1, Coin2, and Payout counters.
+                         Sound DAC,       ; Bit 7 is used to transmit DAC data.
 
     $C000 - $FFFF    ROM space       ; Program ROMs.
 
@@ -244,6 +253,63 @@
     This is the only explanation I found to allow a normal boot, and seems to be
     created as a protection method that don't allow owners to use a ROM-swap on
     his boards, converting one game to another.
+
+
+*******************************************************************************
+
+
+    Game Notes
+    ----------
+
+    Settings (valid for both games):
+
+    Press F2 to enter the input test (game should be without credits).
+    In the input test, you can exit with BET + DEAL, or access the bookkeeping
+    mode pressing BET + DEAL again. In the bookkeping mode keep pressed the PAYOUT
+    key and press BET to change the percentage (all books will be erased). Press
+    again BET + DEAL to exit to a quick RAM & sound test, and then to game mode.
+
+
+    * Magic Fly
+
+    How to play...
+
+    Insert coins to get credits.
+    Choose a balloon to raise, and select it with SELECT button. Bet on other balloons
+    using the SELECT/BET key (to bet 1 credit) or BETx10 (to bet 10 credits). Once done,
+    press the DEAL/LAST BET key to start the game. All balloons will explode revealing
+    numbers. The last one to explode will be the raised one. If your number(s) are higher
+    than the one hidden in the raised balloon, you'll win!
+
+    You can repeat the last bet pressing the DEAL/LAST BET key.
+
+
+    * 7 e Mezzo
+
+    This game is a sort of blackjack, but using a spanish cards set. The objetive is
+    to get 7 and half points (as 21 in blackjack). If you got more than 7 and half,
+    you're busted.
+
+    All cards have their own value, except for 10, 11 and 12 that are half point.
+	Special hands have their own price.
+
+    Sun 7 + sun king = 100 (by credit).
+    Any 7 + any king =  16 (by credit).
+    Any 7 and half   =   8 (by credit).
+	Pass             =   2 (by credit).
+
+
+    How to play...
+
+    Insert coins to get credits.
+    Bet using the BET button. Press DEAL to get the cards.
+    You can hit a new card pressing DEAL, or stop pressing STAND. The dealer will hit
+    cards to the maximum allowed. If you beat the dealer, you'll be asked to enter the
+    double-up game. Press DOUBLE to go on, or TAKE to get the credits.
+
+    In the double-up game, a covered card should be shown. Press BIG or SMALL to get
+    your chance...
+
 
 
 *******************************************************************************
@@ -308,11 +374,18 @@
     - Added technical references to register $63 (magicfly).
     - Switched crystal to new predefined format.
 
+    [2008-10-25]
+    - Added sound support to magicfly and 7mezzo.
+    - Hooked coin counters to magicfly and 7mezzo.
+    - Inverted the graphics banks to be straight with the hardware accesses.
+    - Updated the memory map description and technical notes.
+    - Added game notes and documented the test/settings/bookkeeping modes.
+
 
     TODO:
 
     - Correct colors. (where is the palette?)
-    - Figure out the sound. (no remaining writes...)
+    - Confirm the CPU clock (there is some lag in MF controls).
     - Split the driver.
 
 
@@ -323,6 +396,7 @@
 
 #include "driver.h"
 #include "video/mc6845.h"
+#include "sound/dac.h"
 
 
 /*************************
@@ -351,14 +425,13 @@ static TILE_GET_INFO( get_magicfly_tile_info )
     ---- x---   Seems to be a kind of attribute (maybe related to color). Not totally understood yet.
     ---x ----   Tiles bank.
     -xx- ----   Aparently not used.
-    x--- ----   Mirrored from bit 3. The code check this one to boot the game.  */
+    x--- ----   Mirrored from bit 3. The code check this one to boot the game.
 
+*/
 	int attr = colorram[tile_index];
 	int code = videoram[tile_index];
 	int bank = (attr & 0x10) >> 4;   /* bit 4 switch the gfx banks */
 	int color = attr & 0x07;         /* bits 0-2 for color */
-
-	bank = bank ^ 1;    /* GFX banks are inverted */
 
     /* Seems that bit 7 is mirrored from bit 3 to have a normal boot */
     /* Boot only check the first color RAM offset */
@@ -382,14 +455,13 @@ static TILE_GET_INFO( get_7mezzo_tile_info )
     ---- x---   Seems to be a kind of attribute (maybe related to color). Not totally understood yet.
     ---x ----   Tiles bank.
     -xx- ----   Aparently not used.
-    x--- ----   Mirrored from bit 2. The code check this one to boot the game.  */
+    x--- ----   Mirrored from bit 2. The code check this one to boot the game.
 
+*/
 	int attr = colorram[tile_index];
 	int code = videoram[tile_index];
 	int bank = (attr & 0x10) >> 4;    /* bit 4 switch the gfx banks */
 	int color = attr & 0x07;          /* bits 0-2 for color */
-
-	bank = bank ^ 1;    /* GFX banks are inverted */
 
     /* Seems that bit 7 is mirrored from bit 2 to have a normal boot */
     /* Boot only check the first color RAM offset */
@@ -438,24 +510,39 @@ static PALETTE_INIT( magicfly )
 *         R/W Handlers        *
 ******************************/
 
-static int mux_data = 0;
+static int input_selector = 0;
 
 static READ8_HANDLER( mux_port_r )
 {
-	switch( mux_data & 0x0f )	/* bits 0-3 */
+	switch( input_selector )
 	{
-		case 0x01: return input_port_read(machine, "IN0-0");
-		case 0x02: return input_port_read(machine, "IN0-1");
-		case 0x04: return input_port_read(machine, "IN0-2");
-		case 0x08: return input_port_read(machine, "IN0-3");
-		case 0x00: return input_port_read(machine, "DSW0");
+		case 0x01: return input_port_read(machine, "IN0-0"); break;
+		case 0x02: return input_port_read(machine, "IN0-1"); break;
+		case 0x04: return input_port_read(machine, "IN0-2"); break;
+		case 0x08: return input_port_read(machine, "IN0-3"); break;
+		case 0x00: return input_port_read(machine, "DSW0"); break;
 	}
 	return 0xff;
 }
 
-static WRITE8_HANDLER( mux_w )
+static WRITE8_HANDLER( mux_port_w )
 {
-	mux_data = data;
+/*  - bits -
+    7654 3210
+    ---- xxxx   Input selector.
+    ---x ----   Coin 2.
+    --x- ----   Payout.
+    -x-- ----   Coin 1.
+    x--- ----   Sound DAC.
+
+*/
+	input_selector = data & 0x0f;	/* Input Selector */
+
+	dac_data_w(0, data & 0x80);		/* Sound DAC */
+
+	coin_counter_w(0, data & 0x40);	/* Coin1 */
+	coin_counter_w(1, data & 0x10);	/* Coin2 */
+	coin_counter_w(2, data & 0x20);	/* Payout */
 }
 
 
@@ -467,11 +554,11 @@ static ADDRESS_MAP_START( magicfly_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)    /* MK48Z02B NVRAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(magicfly_videoram_w) AM_BASE(&videoram)        /* HM6116LP #1 (2K x 8) RAM (only 1st half used) */
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(magicfly_colorram_w) AM_BASE(&colorram)        /* HM6116LP #2 (2K x 8) RAM (only 1st half used) */
-	AM_RANGE(0x2800, 0x2800) AM_READ(mux_port_r)  /* multiplexed input port */
-	AM_RANGE(0x3000, 0x3000) AM_WRITE(mux_w)      /* input selector */
-	AM_RANGE(0xc000, 0xffff) AM_ROM               /* ROM space */
+	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(magicfly_videoram_w) AM_BASE(&videoram)	/* HM6116LP #1 (2K x 8) RAM (only 1st half used) */
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(magicfly_colorram_w) AM_BASE(&colorram)	/* HM6116LP #2 (2K x 8) RAM (only 1st half used) */
+	AM_RANGE(0x2800, 0x2800) AM_READ(mux_port_r)	/* multiplexed input port */
+	AM_RANGE(0x3000, 0x3000) AM_WRITE(mux_port_w)	/* output port */
+	AM_RANGE(0xc000, 0xffff) AM_ROM					/* ROM space */
 ADDRESS_MAP_END
 
 
@@ -608,6 +695,17 @@ INPUT_PORTS_END
 *    Graphics Layouts    *
 *************************/
 
+static const gfx_layout tilelayout =
+{
+	8, 8,
+	256,
+	3,
+	{ 0, 0x2800*8, 0x4800*8 },	/* bitplanes are separated. */
+	{ 0, 1, 2, 3, 4, 5, 6, 7 },
+	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
+	8*8
+};
+
 static const gfx_layout charlayout =
 {
 	8, 8,
@@ -619,25 +717,14 @@ static const gfx_layout charlayout =
 	8*8
 };
 
-static const gfx_layout tilelayout =
-{
-	8, 8,
-	256,
-	3,
-	{ 0, (0x2800*8), (0x4800*8) },	/* bitplanes are separated. */
-	{ 0, 1, 2, 3, 4, 5, 6, 7 },
-	{ 0*8, 1*8, 2*8, 3*8, 4*8, 5*8, 6*8, 7*8 },
-	8*8
-};
-
 
 /******************************
 * Graphics Decode Information *
 ******************************/
 
 static GFXDECODE_START( magicfly )
-	GFXDECODE_ENTRY( "gfx1",	0x1800,	charlayout, 0, 16 )
-	GFXDECODE_ENTRY( "gfx1",	0x1000,	tilelayout, 16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x1000, tilelayout, 16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0x1800, charlayout, 0, 16 )
 GFXDECODE_END
 
 
@@ -670,13 +757,17 @@ static MACHINE_DRIVER_START( magicfly )
 	MDRV_VIDEO_UPDATE(magicfly)
 
 	MDRV_DEVICE_ADD("crtc", MC6845)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( 7mezzo )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(magicfly)
-	MDRV_CPU_MODIFY("main")
 
 	/* video hardware */
 	MDRV_VIDEO_START(7mezzo)
@@ -721,5 +812,5 @@ ROM_END
 *************************/
 
 /*    YEAR  NAME      PARENT  MACHINE   INPUT     INIT   ROT    COMPANY      FULLNAME    FLAGS... */
-GAME( 198?, magicfly, 0,      magicfly, magicfly, 0,     ROT0, "P&A Games", "Magic Fly", GAME_IMPERFECT_COLORS | GAME_NO_SOUND )
-GAME( 198?, 7mezzo,   0,      7mezzo,   7mezzo,   0,     ROT0, "Unknown",   "7 e Mezzo", GAME_IMPERFECT_COLORS | GAME_NO_SOUND )
+GAME( 198?, magicfly, 0,      magicfly, magicfly, 0,     ROT0, "P&A Games", "Magic Fly", GAME_IMPERFECT_COLORS )
+GAME( 198?, 7mezzo,   0,      7mezzo,   7mezzo,   0,     ROT0, "Unknown",   "7 e Mezzo", GAME_IMPERFECT_COLORS )
