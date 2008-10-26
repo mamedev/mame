@@ -89,10 +89,11 @@ void i8752_get_info(UINT32 state, cpuinfo *info);
 
 /* cmos variants */
 void i80c31_get_info(UINT32 state, cpuinfo *info);
-void i80c32_get_info(UINT32 state, cpuinfo *info);
 void i80c51_get_info(UINT32 state, cpuinfo *info);
-void i80c52_get_info(UINT32 state, cpuinfo *info);
 void i87c51_get_info(UINT32 state, cpuinfo *info);
+
+void i80c32_get_info(UINT32 state, cpuinfo *info);
+void i80c52_get_info(UINT32 state, cpuinfo *info);
 void i87c52_get_info(UINT32 state, cpuinfo *info);
 
 /* 4k internal perom and 128 internal ram and 2 analog comparators */

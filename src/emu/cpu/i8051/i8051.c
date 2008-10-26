@@ -70,7 +70,6 @@
  *
  * - Implement 80C52 extended serial capabilities
  * - Full Timer support (all modes)
- * - Implement cmos features
  * - Fix serial communication - This is a big hack (but working) right now.
  * - Implement 83C751 in sslam.c
  * - Fix cardline.c
@@ -81,6 +80,7 @@
  *      a 0 written to it's latch. At least cardline expects a 1 here.
  *
  * Done:
+ * - Implemented cmos features
  * - Implemented 80C52 interrupt handling
  * - Fix segas18.c (segaic16.c) memory handling.
  * - Fix sslam.c
@@ -116,9 +116,8 @@ enum
 {
 	FEATURE_NONE			= 0x00,
 	FEATURE_I8052			= 0x01,
-	FEATURE_CMOS_IDLE		= 0x02,
-	FEATURE_CMOS_POWERDOWN	= 0x04,
-	FEATURE_I80C52			= 0x08,
+	FEATURE_CMOS			= 0x02,
+	FEATURE_I80C52			= 0x04,
 };
 
 /* Internal address in SFR of registers */
@@ -158,6 +157,11 @@ enum
  	ADDR_IPH	= 0xb7,
  	ADDR_SADDR	= 0xa9,
  	ADDR_SADEN	= 0xb9,
+
+ 	/* Philips 80C52 */
+ 	AUXR		= 0x8e,
+ 	AUXR1		= 0xa2,
+
 };
 
 /* PC vectors */
@@ -329,6 +333,22 @@ struct _mcs51_regs
 #define SADDR		SFR_A(ADDR_SADDR)
 #define SADEN		SFR_A(ADDR_SADEN)
 
+/* Philips 80C52 */
+/* ============= */
+/* Reduced EMI Mode
+ * The AO bit (AUXR.0) in the AUXR register when set disables the
+ * ALE output.
+ */
+#define AUXR		SFR_A(ADDR_AUXR)
+
+/* The dual DPTR structure (see Figure 12) is a way by which the
+ * 80C52/54/58 will specify the address of an external data memory
+ * location. There are two 16-bit DPTR registers that address the
+ * external memory, and a single bit called DPS = AUXR1/bit0 that
+ * allows the program code to switch between them.
+ */
+#define AUXR1		SFR_A(ADDR_AUXR1)
+
 /* WRITE accessors */
 
 /* Shortcuts */
@@ -420,6 +440,11 @@ struct _mcs51_regs
 #define SET_CT2(n)		SET_BIT(T2CON, 1, n)	//Sets Timer 2 Counter/Timer Mode
 #define SET_CP(n)		SET_BIT(T2CON, 0, n)	//Sets Timer 2 Capture/Reload Mode
 
+#define SET_GF1(n)		SET_BIT(PCON, 3, n)		
+#define SET_GF0(n)		SET_BIT(PCON, 2, n)
+#define SET_PD(n)		SET_BIT(PCON, 1, n)		
+#define SET_IDL(n)		SET_BIT(PCON, 0, n)
+
 /* Macros for accessing flags */
 
 #define GET_CY			GET_BIT(PSW, 7)
@@ -477,10 +502,10 @@ struct _mcs51_regs
 
 /* Only in 80C51BH & other cmos */
 
-#define GET_GF1			GET_BIT(TMOD, 3)		
-#define GET_GF0			GET_BIT(TMOD, 2)
-#define GET_PD			GET_BIT(TMOD, 1)		
-#define GET_IDL			GET_BIT(TMOD, 0)
+#define GET_GF1			GET_BIT(PCON, 3)		
+#define GET_GF0			GET_BIT(PCON, 2)
+#define GET_PD			GET_BIT(PCON, 1)		
+#define GET_IDL			(GET_BIT(PCON, 0) & ~(GET_PD))	/* PD takes precedence! */
 
 /* 8052 Only flags */
 #define GET_TF2			GET_BIT(T2CON, 7)
@@ -1477,6 +1502,16 @@ static void check_irqs(void)
 	ints &= IE;
 
 	if (!ints)	return;
+	
+	/* CLear IDL - got enabled interrupt */
+	if (mcs51.features & FEATURE_CMOS)
+	{
+		/* any interrupt terminates idle mode */
+		SET_IDL(0);
+		/* external interrupt wakes up */
+		if (ints & (GET_IE0 | GET_IE1))
+			SET_PD(0);
+	}
 
 	for (i=0; i<mcs51.num_interrupts; i++)
 	{
@@ -1493,6 +1528,7 @@ static void check_irqs(void)
 	/* Skip the interrupt request if currently processing interrupt
 	 * and the new request does not have a higher priority
 	 */
+	
 	if(mcs51.irq_active && (priority_request <= mcs51.cur_irq_prio))
 	{
 		LOG(("higher or equal priority irq in progress already, skipping ...\n"));
@@ -1683,8 +1719,27 @@ static int mcs51_execute(int cycles)
 	/* external interrupts may have been set since we last checked */
 	mcs51.inst_cycles = 0;
 	check_irqs();
+
+	/* if in powerdown, just return */
+	if ((mcs51.features & FEATURE_CMOS) && GET_PD)
+	{
+		mcs51_icount = 0;
+		return cycles;
+	}
+
 	mcs51_icount -= mcs51.inst_cycles;
 	burn_cycles(mcs51.inst_cycles);
+
+	if ((mcs51.features & FEATURE_CMOS) && GET_IDL)
+	{
+		do
+		{
+			/* burn the cycles */
+			mcs51_icount--;
+			burn_cycles(1);
+		} while( mcs51_icount > 0 );
+		return cycles - mcs51_icount;
+	}
 
 	do
 	{
@@ -1820,7 +1875,7 @@ static void i80c51_init(int index, int clock, const void *config, int (*irqcallb
 {
 	mcs51_init(index, clock, config, irqcallback);
 
-	mcs51.features |= 	(FEATURE_CMOS_IDLE | FEATURE_CMOS_POWERDOWN);
+	mcs51.features |= FEATURE_CMOS;
 }
 
 /* Reset registers to the initial values */
@@ -1856,6 +1911,7 @@ static void mcs51_reset(void)
 	SCON = 0;
 	TCON = 0;
 	TMOD = 0;
+	PCON = 0;
 	TH1 = 0;
 	TH0 = 0;
 	TL1 = 0;
@@ -1865,6 +1921,26 @@ static void mcs51_reset(void)
 	SET_P2(0xff);
 	SET_P1(0xff);
 	SET_P0(0xff);
+
+	/* 8052 Only registers */
+	if (mcs51.features & FEATURE_I8052)
+	{
+		T2CON = 0;
+		RCAP2L = 0;
+		RCAP2H = 0;
+		TL2 = 0;
+		TH2 = 0;
+	}
+
+	/* 80C52 Only registers */
+	if (mcs51.features & FEATURE_I80C52)
+	{
+		IPH = 0;
+		update_irq_prio(IP, IPH);
+		SADDR = 0;
+		SADEN = 0;
+	}
+
 
 }
 
@@ -1924,18 +2000,6 @@ static void i8052_init (int index, int clock, const void *config, int (*irqcallb
 	mcs51.sfr_write = i8052_sfr_write;
 }
 
-static void i8052_reset(void)
-{
-	mcs51_reset();
-
-	//8052 Only registers
-	T2CON = 0;
-	RCAP2L = 0;
-	RCAP2H = 0;
-	TL2 = 0;
-	TH2 = 0;
-}
-
 /****************************************************************************
  * 80C52 Section
  ****************************************************************************/
@@ -1980,7 +2044,7 @@ static void i80c52_init(int index, int clock, const void *config, int (*irqcallb
 {
 	i8052_init(index, clock, config, irqcallback);
 
-	mcs51.features |= (FEATURE_I80C52 | FEATURE_CMOS_IDLE | FEATURE_CMOS_POWERDOWN);
+	mcs51.features |= (FEATURE_I80C52 | FEATURE_CMOS);
 	mcs51.sfr_read = i80c52_sfr_read;
 	mcs51.sfr_write = i80c52_sfr_write;
 }
@@ -1992,14 +2056,6 @@ static void i80c31_init(int index, int clock, const void *config, int (*irqcallb
 	mcs51.ram_mask = 0x7F;  			/* 128 bytes of ram */
 }
 
-static void i80c52_reset(void)
-{
-	i8052_reset();
-
-	IRAM_W(ADDR_IPH, 0);
-	SADDR = 0;
-	SADEN = 0;
-}
 
 /***************************************************************************
     ADDRESS MAPS
@@ -2226,7 +2282,6 @@ void i8032_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		case CPUINFO_PTR_INIT:							info->init = i8052_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = i8052_reset;				break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = address_map_data_8bit;	break;
 
@@ -2241,7 +2296,6 @@ void i8052_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		case CPUINFO_PTR_INIT:							info->init = i8052_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = i8052_reset;				break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = address_map_program_13bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = address_map_data_8bit;	break;
@@ -2270,7 +2324,6 @@ void i8752_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		case CPUINFO_PTR_INIT:							info->init = i8052_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = i8052_reset;				break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = address_map_program_13bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = address_map_data_8bit;	break;
@@ -2292,7 +2345,6 @@ void i80c31_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		case CPUINFO_PTR_INIT:							info->init = i80c31_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = i80c52_reset;				break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = NULL;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = address_map_data_7bit;	break;
@@ -2317,7 +2369,6 @@ void i80c32_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		case CPUINFO_PTR_INIT:							info->init = i80c52_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = i80c52_reset;				break;
 		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C32");				break;
 		default:										i8032_get_info(state, info);			break;
 	}
@@ -2328,7 +2379,6 @@ void i80c52_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		case CPUINFO_PTR_INIT:							info->init = i80c52_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = i80c52_reset;				break;
 		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C52");				break;
 		default:										i8052_get_info(state, info);			break;
 	}
@@ -2349,7 +2399,6 @@ void i87c52_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		case CPUINFO_PTR_INIT:							info->init = i80c52_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = i80c52_reset;				break;
 		case CPUINFO_STR_NAME:							strcpy(info->s, "I87C52");				break;
 		default:										i8752_get_info(state, info);			break;
 	}
