@@ -80,7 +80,7 @@ static size_t dsp56k_dasm_bcc_2		(const UINT16 op, char* opcode_str, char* arg_s
 static size_t dsp56k_dasm_bra		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str, const offs_t pc);
 static size_t dsp56k_dasm_bra_1		(const UINT16 op, char* opcode_str, char* arg_str, const offs_t pc);
 static size_t dsp56k_dasm_bra_2		(const UINT16 op, char* opcode_str, char* arg_str);
-static size_t dsp56k_dasm_brkc		(const UINT16 op, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_brkcc		(const UINT16 op, char* opcode_str, char* arg_str);
 static size_t dsp56k_dasm_bscc		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str, const offs_t pc);
 static size_t dsp56k_dasm_bscc_1	(const UINT16 op, char* opcode_str, char* arg_str);
 static size_t dsp56k_dasm_bsr		(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str, const offs_t pc);
@@ -732,7 +732,7 @@ offs_t dsp56k_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 	/* BRKc : 0000 0001 0001 cccc : A-52 */
 	else if ((op & 0xfff0) == 0x0110)
 	{
-		size = dsp56k_dasm_brkc(op, opcode_str, arg_str);
+		size = dsp56k_dasm_brkcc(op, opcode_str, arg_str);
 	}
 	/* BScc : 0000 0111 --01 cccc xxxx xxxx xxxx xxxx : A-54 */
 	else if (((op & 0xff30) == 0x0710) && ((op2 & 0x0000) == 0x0000))
@@ -1785,7 +1785,7 @@ static size_t dsp56k_dasm_bra_2(const UINT16 op, char* opcode_str, char* arg_str
 }
 
 /* BRKc : 0000 0001 0001 cccc : A-52 */
-static size_t dsp56k_dasm_brkc(const UINT16 op, char* opcode_str, char* arg_str)
+static size_t dsp56k_dasm_brkcc(const UINT16 op, char* opcode_str, char* arg_str)
 {
 	char M[32];
 	decode_cccc_table(BITS(op,0x000f), M);

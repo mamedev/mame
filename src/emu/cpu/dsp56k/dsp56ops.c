@@ -95,7 +95,7 @@ static size_t dsp56k_op_bcc_2	 (const UINT16 op, UINT8* cycles);
 static size_t dsp56k_op_bra		 (const UINT16 op, const UINT16 op2, UINT8* cycles);
 static size_t dsp56k_op_bra_1	 (const UINT16 op, UINT8* cycles);
 static size_t dsp56k_op_bra_2	 (const UINT16 op, UINT8* cycles);
-static size_t dsp56k_op_brkc	 (const UINT16 op, UINT8* cycles);
+static size_t dsp56k_op_brkcc	 (const UINT16 op, UINT8* cycles);
 static size_t dsp56k_op_bscc	 (const UINT16 op, const UINT16 op2, UINT8* cycles);
 static size_t dsp56k_op_bscc_1	 (const UINT16 op, UINT8* cycles);
 static size_t dsp56k_op_bsr		 (const UINT16 op, const UINT16 op2, UINT8* cycles);
@@ -164,6 +164,7 @@ static size_t dsp56k_op_zero	 (const UINT16 op, UINT8* cycles);
 
 
 static void execute_register_to_register_data_move(const UINT16 op, typed_pointer* d_register, UINT64* prev_accum_value);
+static void execute_address_register_update(const UINT16 op, typed_pointer* d_register, UINT64* prev_accum_value);
 static void execute_x_memory_data_move (const UINT16 op, typed_pointer* d_register, UINT64* prev_accum_value);
 static void execute_x_memory_data_move2(const UINT16 op, typed_pointer* d_register);
 
@@ -184,10 +185,8 @@ static void decode_RR_table(UINT16 RR, typed_pointer* ret);
 static void decode_Z_table(UINT16 Z, typed_pointer* ret);
 static void execute_m_table(int x, UINT16 m);
 static void execute_MM_table(UINT16 rnum, UINT16 MM);
-static UINT16 execute_q_table(int x, UINT16 q);
-#ifdef UNUSED_FUNCTION
-static void execute_z_table(int x, UINT16 z);
-#endif
+static UINT16 execute_q_table(int RR, UINT16 q);
+static void execute_z_table(int RR, UINT16 z);
 static UINT16 assemble_address_from_Pppppp_table(UINT16 P, UINT16 ppppp);
 static UINT16 assemble_address_from_IO_short_address(UINT16 pp);
 static UINT16 assemble_address_from_6bit_signed_relative_short_address(UINT16 srs);
@@ -555,7 +554,7 @@ static void execute_one(void)
 				execute_register_to_register_data_move(op, &d_register, &prev_accum_value);
 				break;
 			case kAddressRegister:
-				// TODO // decode_address_register_update(op, parallel_move_str);
+				execute_address_register_update(op, &d_register, &prev_accum_value);
 				break;
 			case kXMemoryDataMove:
 				execute_x_memory_data_move(op, &d_register, &prev_accum_value);
@@ -565,6 +564,7 @@ static void execute_one(void)
 				break;
 			case kXMemoryDataMoveWithDisp:
 				// TODO // decode_x_memory_data_move_with_short_displacement(op, op2, parallel_move_str);
+				logerror("DSP56k: Unemulated Memory Data Move With Disp Parallel move @ 0x%x\n", PC);
 				break;
 			}
 		}
@@ -722,7 +722,7 @@ static void execute_one(void)
 	/* BRKc : 0000 0001 0001 cccc : A-52 */
 	else if ((op & 0xfff0) == 0x0110)
 	{
-		size = dsp56k_op_brkc(op, &cycle_count);
+		size = dsp56k_op_brkcc(op, &cycle_count);
 	}
 	/* BScc : 0000 0111 --01 cccc xxxx xxxx xxxx xxxx : A-54 */
 	else if (((op & 0xff30) == 0x0710) && ((op2 & 0x0000) == 0x0000))
@@ -1288,10 +1288,34 @@ static size_t dsp56k_op_inc(const UINT16 op_byte, typed_pointer* d_register, UIN
 /* INC24 : .... .... 0010 F011 : A-106 */
 static size_t dsp56k_op_inc24(const UINT16 op_byte, typed_pointer* d_register, UINT64* p_accum, UINT8* cycles)
 {
+	UINT32 workBits24;
+
+	typed_pointer D = {NULL, DT_BYTE};
+	decode_F_table(BITS(op_byte,0x0008), &D);
+
+	/* Save some data for the parallel move */
+	*p_accum = *((UINT64*)D.addr);
+
+	/* TODO: I wonder if workBits24 should be signed? */
+	workBits24 = ((*((UINT64*)D.addr)) & U64(0x000000ffffff0000)) >> 16;
+	workBits24++;
+	workBits24 &= 0x00ffffff;		/* Solves -x issues */
+
+	/* Set the D bits with the dec result */
+	*((UINT64*)D.addr) &= U64(0x000000000000ffff);
+	*((UINT64*)D.addr) |= (((UINT64)(workBits24)) << 16);
+
+	d_register->addr = D.addr;
+	d_register->data_type = D.data_type;
+
 	/* S L E U N Z V C */
 	/* * * * * * ? * * */
-	/* Z - Set if the 24 most significant bits of the destination result are all zeroes. */
-	return 0;
+	/* TODO: S, L, E, U, V, C */
+	if ( *((UINT64*)D.addr) & U64(0x0000008000000000))		 N_bit_set(1);
+	if ((*((UINT64*)D.addr) & U64(0x000000ffffff0000)) == 0) Z_bit_set(1);
+
+	cycles += 2;		/* TODO: + mv oscillator clock cycles */
+	return 1;
 }
 
 /* OR : .... .... 0010 F1JJ : A-176 */
@@ -1705,12 +1729,31 @@ static size_t dsp56k_op_andi(const UINT16 op, UINT8* cycles)
 /* ASL4 : 0001 0101 0011 F001 : A-30 */
 static size_t dsp56k_op_asl4(const UINT16 op, UINT8* cycles)
 {
+	UINT64 p_accum = 0;
+	typed_pointer D = {NULL, DT_BYTE};
+	decode_F_table(BITS(op,0x0008), &D);
+
+	p_accum = *((UINT64*)D.addr);
+
+	*((UINT64*)D.addr) = (*((UINT64*)D.addr)) << 1;
+	*((UINT64*)D.addr) = (*((UINT64*)D.addr)) << 1;
+	*((UINT64*)D.addr) = (*((UINT64*)D.addr)) << 1;
+	*((UINT64*)D.addr) = (*((UINT64*)D.addr)) << 1;
+	*((UINT64*)D.addr) = (*((UINT64*)D.addr)) & U64(0x000000ffffffffff);
+
 	/* S L E U N Z V C */
 	/* - ? * * * * ? ? */
-	/* V - Set if an arithmetic overflow occurs in the 40 bit result. Also set if bit 5 through 39 are
-           not the same. */
+	/* TODO: L, E, U  */
+	/* V - Set if an arithmetic overflow occurs in the 40 bit result. Also set if bit 35 through 39 are
+		   not the same. */
 	/* C - Set if bit 36 of source operand is set. Cleared otherwise. */
-	return 0;
+	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_bit_set(1); else N_bit_set(0);
+	if (*((UINT64*)D.addr) == 0) Z_bit_set(1); else Z_bit_set(0);
+	if ( (*((UINT64*)D.addr) & U64(0x000000ff00000000)) != (p_accum & U64(0x000000ff00000000)) ) V_bit_set(1); else V_bit_set(0);
+	if (p_accum & U64(0x0000001000000000)) C_bit_set(1); else C_bit_set(0);
+
+	cycles += 2;
+	return 1;
 }
 
 /* ASR4 : 0001 0101 0011 F000 : A-34 */
@@ -1933,6 +1976,27 @@ static size_t dsp56k_op_bfop_2(const UINT16 op, const UINT16 op2, UINT8* cycles)
 /* Bcc : 0000 0111 --11 cccc xxxx xxxx xxxx xxxx : A-48 */
 static size_t dsp56k_op_bcc(const UINT16 op, const UINT16 op2, UINT8* cycles)
 {
+	int shouldBranch = decode_cccc_table(BITS(op,0x000f));
+
+	if (shouldBranch)
+	{
+		INT16 offset = (INT16)op2;
+
+		PC += 2;
+
+		core.ppc = PC;
+		PC += offset;
+		change_pc(PC);
+
+		cycles += 4;
+		return 0;
+	}
+	else
+	{
+		cycles += 4;
+		return 2;
+	}
+
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
 	return 0;
@@ -2011,9 +2075,34 @@ static size_t dsp56k_op_bra_2(const UINT16 op, UINT8* cycles)
 	return 0;
 }
 
-/* BRKc : 0000 0001 0001 cccc : A-52 */
-static size_t dsp56k_op_brkc(const UINT16 op, UINT8* cycles)
+/* BRKcc : 0000 0001 0001 cccc : A-52 */
+static size_t dsp56k_op_brkcc(const UINT16 op, UINT8* cycles)
 {
+	int shouldBreak = decode_cccc_table(BITS(op,0x000f));
+
+	if (shouldBreak)
+	{
+		/* TODO: I think this PC = LA thing is off-by-1, but it's working this way because its consistently so */
+		core.ppc = PC;
+		PC = LA;
+		change_pc(PC);
+
+		SR = SSL;	/* TODO: A-83.  I believe only the Loop Flag and Forever Flag come back here. */
+		SP--;
+
+		LA = SSH;
+		LC = SSL;
+		SP--;
+
+		cycles += 8;
+		return 0;
+	}
+	else
+	{
+		cycles += 2;
+		return 1;
+	}
+
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
 	return 0;
@@ -2238,9 +2327,25 @@ static size_t dsp56k_op_do_2(const UINT16 op, const UINT16 op2, UINT8* cycles)
 /* DO FOREVER : 0000 0000 0000 0010 xxxx xxxx xxxx xxxx : A-88 */
 static size_t dsp56k_op_doforever(const UINT16 op, const UINT16 op2, UINT8* cycles)
 {
+	/* First instruction cycle */
+	SP++;
+	SSH = LA;
+	SSL = LC;
+
+	/* Second instruction cycle */
+	SP++;
+	SSH = PC + 2;
+	SSL = SR;
+	LA = PC + 2 + op2;
+
+	/* Third instruction cycle */
+	LF_bit_set(1);
+	FV_bit_set(1);
+
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
-	return 0;
+	cycles += 6;
+	return 2;
 }
 
 /* ENDDO : 0000 0000 0000 1001 : A-92 */
@@ -3408,12 +3513,12 @@ static void execute_MM_table(UINT16 rnum, UINT16 MM)
 }
 
 /* Returns R value */
-static UINT16 execute_q_table(int x, UINT16 q)
+static UINT16 execute_q_table(int RR, UINT16 q)
 {
 	UINT16 *rX = 0x0000;
 	UINT16 *nX = 0x0000;
 
-	switch(x)
+	switch(RR)
 	{
 		case 0x0: rX = &R0;  nX = &N0;  break;
 		case 0x1: rX = &R1;  nX = &N1;  break;
@@ -3432,30 +3537,26 @@ static UINT16 execute_q_table(int x, UINT16 q)
 	return 0x00;
 }
 
-#ifdef UNUSED_FUNCTION
-static void execute_z_table(int x, UINT16 z)
+static void execute_z_table(int RR, UINT16 z)
 {
-	UINT16 *rX = 0x00 ;
-	UINT16 *nX = 0x00 ;
+	UINT16 *rX = 0x00;
+	UINT16 *nX = 0x00;
 
-	switch(x)
+	switch(RR)
 	{
-		case 0x0: rX = &R0 ; nX = &N0 ; break ;
-		case 0x1: rX = &R1 ; nX = &N1 ; break ;
-		case 0x2: rX = &R2 ; nX = &N2 ; break ;
-		case 0x3: rX = &R3 ; nX = &N3 ; break ;
+		case 0x0: rX = &R0;  nX = &N0;  break;
+		case 0x1: rX = &R1;  nX = &N1;  break;
+		case 0x2: rX = &R2;  nX = &N2;  break;
+		case 0x3: rX = &R3;  nX = &N3;  break;
 	}
 
-	if (!z)
+	switch(z)
 	{
-		(*rX)-- ;
-	}
-	else
-	{
-		(*rX) = (*rX)+(*nX) ;
+		case 0x0: (*rX)--;				 break;
+		case 0x1: (*rX) = (*rX) + (*nX); break;
 	}
 }
-#endif
+
 static UINT16 assemble_address_from_Pppppp_table(UINT16 P, UINT16 ppppp)
 {
 	UINT16 destAddr = 0x00 ;
@@ -3487,8 +3588,22 @@ static UINT16 assemble_address_from_6bit_signed_relative_short_address(UINT16 sr
 
 static void dsp56k_process_loop(void)
 {
-	if (LF_bit())
+	/* TODO: This might not work for dos nested in doForevers */
+	if (LF_bit() && FV_bit())
 	{
+		/* Do Forever*/
+		if (PC == LA)
+		{
+			LC--;
+
+			core.ppc = PC;
+			PC = SSH;
+			change_pc(PC);
+		}
+	}
+	else if (LF_bit())
+	{
+		/* Do */
 		if (PC == LA)
 		{
 			if (LC == 1)
@@ -3538,7 +3653,7 @@ static void dsp56k_process_rep(size_t repSize)
 /***************************************************************************
     Parallel Memory Ops
 ***************************************************************************/
-/* Register to Register Data Move : 0100 IIII ---- ---- */
+/* Register to Register Data Move : 0100 IIII ---- ---- : A-132 */
 static void execute_register_to_register_data_move(const UINT16 op, typed_pointer* d_register, UINT64* prev_accum_value)
 {
 	typed_pointer S = {NULL, DT_BYTE};
@@ -3558,6 +3673,12 @@ static void execute_register_to_register_data_move(const UINT16 op, typed_pointe
 	{
 		SetDestinationValue(S, D);
 	}
+}
+
+/* Address Register Update : 0011 0zRR ---- ---- : A-135 */
+static void execute_address_register_update(const UINT16 op, typed_pointer* d_register, UINT64* prev_accum_value)
+{
+	execute_z_table(BITS(op, 0x0300), BITS(op, 0x0400));
 }
 
 /* X Memory Data Move : 1mRR HHHW ---- ---- : A-137 */
