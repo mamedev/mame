@@ -266,7 +266,9 @@ static INPUT_PORTS_START( banbam )
 	PORT_DIPUNUSED_DIPLOC( 0x10, 0x10, "SW2:5" )	/*  These four dips are unused according to the manual */
 	PORT_DIPUNUSED_DIPLOC( 0x20, 0x20, "SW2:6" )
 	PORT_DIPUNUSED_DIPLOC( 0x40, 0x40, "SW2:7" )
-	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "SW2:8" )
+	PORT_DIPNAME( 0x80, 0x00, "Freeze" ) PORT_DIPLOCATION("SW2:8") //game stands in a tight loop at $14-$16 -> $866 if this is putted off
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 
 	PORT_START("P1")		/* d804 */
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
