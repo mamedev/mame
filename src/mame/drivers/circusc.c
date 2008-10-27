@@ -11,6 +11,40 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 To enter service mode, keep 1&2 pressed on reset
 
 
+'circusc2' ingame bug :
+-----------------------
+
+  "Test mode" displays 2, 3, 4 and 7 lives instead of 3, 4, 5 and 7
+  due to code at 0xcb38 :
+
+    CB38: B6 30 88         LDA   $1800
+    CB3B: 43               COMA  
+    CB3C: 84 2B            ANDA  #$03
+    CB3E: 81 8B            CMPA  #$03
+    CB40: 25 20            BCS   $CB44
+    CB42: 86 87            LDA   #$05
+    CB44: 8B 20            ADDA  #$02
+
+  In other sets, you have the following (code from 'circusc') :
+
+    CB38: B6 30 88         LDA   $1800
+    CB3B: 43               COMA  
+    CB3C: 84 2B            ANDA  #$03
+    CB3E: 81 8B            CMPA  #$03
+    CB40: 25 20            BCS   $CB44
+    CB42: 86 86            LDA   #$04
+    CB44: 8B 21            ADDA  #$03
+
+  Ingame lives are correct though (same code for 'circusc' and 'circusc2') :
+
+    6B93: 96 0D            LDA   $2F
+    6B95: 84 81            ANDA  #$03
+    6B97: 8B 2B            ADDA  #$03
+    6B99: 81 8E            CMPA  #$06
+    6B9B: 25 2A            BCS   $6B9F
+    6B9D: 86 8F            LDA   #$07
+
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -241,11 +275,9 @@ static INPUT_PORTS_START( circusc )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )	PORT_DIPLOCATION("SW2:4")
-	PORT_DIPSETTING(    0x08, "20000 70000" )
-	PORT_DIPSETTING(    0x00, "30000 80000" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )		PORT_DIPLOCATION("SW2:5")
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x08, "20k 90k 70k+" )
+	PORT_DIPSETTING(    0x00, "30k 110k 80k+" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SW2:5" )
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )	PORT_DIPLOCATION("SW2:6,7")
 	PORT_DIPSETTING(    0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
