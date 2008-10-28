@@ -169,27 +169,29 @@ static void execute_x_memory_data_move (const UINT16 op, typed_pointer* d_regist
 static void execute_x_memory_data_move2(const UINT16 op, typed_pointer* d_register);
 
 
-static UINT16 decode_BBB_bitmask(UINT16 BBB, UINT16 *iVal);
-static int decode_cccc_table(UINT16 cccc);
-static void decode_DDDDD_table(UINT16 DDDDD, typed_pointer* ret);
-static void decode_DD_table(UINT16 DD, typed_pointer* ret);
-static void decode_F_table(UINT16 F, typed_pointer* ret);
-static void decode_h0hF_table(UINT16 h0h, UINT16 F, typed_pointer* src_ret, typed_pointer* dst_ret);
-static void decode_HH_table(UINT16 HH, typed_pointer* ret);
-static void decode_HHH_table(UINT16 HHH, typed_pointer* ret);
-static void decode_IIII_table(UINT16 IIII, typed_pointer* src_ret, typed_pointer* dst_ret, void *working);
-static void decode_JJJF_table(UINT16 JJJ, UINT16 F, typed_pointer* src_ret, typed_pointer* dst_ret);
-static void decode_JJF_table(UINT16 JJ, UINT16 F, typed_pointer* src_ret, typed_pointer* dst_ret);
-static void decode_QQF_special_table(UINT16 QQ, UINT16 F, void **S1, void **S2, void **D);
-static void decode_RR_table(UINT16 RR, typed_pointer* ret);
-static void decode_Z_table(UINT16 Z, typed_pointer* ret);
-static void execute_m_table(int x, UINT16 m);
-static void execute_MM_table(UINT16 rnum, UINT16 MM);
-static UINT16 execute_q_table(int RR, UINT16 q);
-static void execute_z_table(int RR, UINT16 z);
-static UINT16 assemble_address_from_Pppppp_table(UINT16 P, UINT16 ppppp);
-static UINT16 assemble_address_from_IO_short_address(UINT16 pp);
-static UINT16 assemble_address_from_6bit_signed_relative_short_address(UINT16 srs);
+static UINT16	decode_BBB_bitmask(UINT16 BBB, UINT16 *iVal);
+static int		decode_cccc_table(UINT16 cccc);
+static void		decode_DDDDD_table(UINT16 DDDDD, typed_pointer* ret);
+static void		decode_DD_table(UINT16 DD, typed_pointer* ret);
+static void		decode_F_table(UINT16 F, typed_pointer* ret);
+static void		decode_h0hF_table(UINT16 h0h, UINT16 F, typed_pointer* src_ret, typed_pointer* dst_ret);
+static void		decode_HH_table(UINT16 HH, typed_pointer* ret);
+static void		decode_HHH_table(UINT16 HHH, typed_pointer* ret);
+static void		decode_IIII_table(UINT16 IIII, typed_pointer* src_ret, typed_pointer* dst_ret, void *working);
+static void		decode_JJJF_table(UINT16 JJJ, UINT16 F, typed_pointer* src_ret, typed_pointer* dst_ret);
+static void		decode_JJF_table(UINT16 JJ, UINT16 F, typed_pointer* src_ret, typed_pointer* dst_ret);
+static void		decode_QQF_special_table(UINT16 QQ, UINT16 F, void **S1, void **S2, void **D);
+static void		decode_RR_table(UINT16 RR, typed_pointer* ret);
+static void		decode_Z_table(UINT16 Z, typed_pointer* ret);
+
+static void		execute_m_table(int x, UINT16 m);
+static void		execute_MM_table(UINT16 rnum, UINT16 MM);
+static UINT16	execute_q_table(int RR, UINT16 q);
+static void		execute_z_table(int RR, UINT16 z);
+
+static UINT16	assemble_address_from_Pppppp_table(UINT16 P, UINT16 ppppp);
+static UINT16	assemble_address_from_IO_short_address(UINT16 pp);
+static UINT16	assemble_address_from_6bit_signed_relative_short_address(UINT16 srs);
 
 static void dsp56k_process_loop(void);
 static void dsp56k_process_rep(size_t repSize);
@@ -279,6 +281,7 @@ static void execute_one(void)
 
 		/* Now evaluate the parallel data move */
 		// TODO // decode_dual_x_memory_data_read(op, parallel_move_str, parallel_move_str2);
+		logerror("DSP56k: Unemulated Dual X Memory Data Move @ 0x%x\n", PC);
 	}
 	/* X Memory Data Write and Register Data Move : 0001 011k RRDD ---- : A-140 */
 	else if ((op & 0xfe00) == 0x1600)
@@ -299,6 +302,7 @@ static void execute_one(void)
 
 		/* Now evaluate the parallel data move */
 		// TODO // decode_x_memory_data_write_and_register_data_move(op, parallel_move_str, parallel_move_str2);
+		logerror("DSP56k: Unemulated Dual X Memory Data And Register Data Move @ 0x%x\n", PC);
 	}
 
 	/* Handle Other parallel types */
@@ -1240,9 +1244,23 @@ static size_t dsp56k_op_move(const UINT16 op_byte, typed_pointer* d_register, UI
 /* TFR : .... .... 0001 FJJJ : A-212 */
 static size_t dsp56k_op_tfr(const UINT16 op_byte, typed_pointer* d_register, UINT64* p_accum, UINT8* cycles)
 {
+	typed_pointer S = {NULL, DT_BYTE};
+	typed_pointer D = {NULL, DT_BYTE};
+
+	decode_JJJF_table(BITS(op_byte,0x0007),BITS(op_byte,0x0008), &S, &D);
+
+	*p_accum = *((UINT64*)D.addr);
+
+	SetDestinationValue(S, D);
+
+	d_register->addr = D.addr;
+	d_register->data_type = D.data_type;
+
 	/* S L E U N Z V C */
-	/* - - - - - - - - */
-	return 0;
+	/* * * - - - - - - */
+	/* TODO: S, L */
+	cycles += 2;		/* TODO: + mv oscillator cycles */
+	return 1;
 }
 
 /* RND : .... .... 0010 F000 : A-188 */
@@ -3678,7 +3696,7 @@ static void execute_register_to_register_data_move(const UINT16 op, typed_pointe
 /* Address Register Update : 0011 0zRR ---- ---- : A-135 */
 static void execute_address_register_update(const UINT16 op, typed_pointer* d_register, UINT64* prev_accum_value)
 {
-	execute_z_table(BITS(op, 0x0300), BITS(op, 0x0400));
+	execute_z_table(BITS(op,0x0300), BITS(op,0x0400));
 }
 
 /* X Memory Data Move : 1mRR HHHW ---- ---- : A-137 */
