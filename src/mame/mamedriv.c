@@ -2121,7 +2121,7 @@ const game_driver * const drivers[] =
 	/* More Toaplan Games */
 	DRIVER( tekipaki )	/* TP-020 (c) 1991 Toaplan */
 	DRIVER( ghox )		/* TP-021 (c) 1991 Toaplan */
-	DRIVER( ghoxa )		/* TP-021 (c) 1991 Toaplan */
+	DRIVER( ghoxj )		/* TP-021 (c) 1991 Toaplan */
 	DRIVER( dogyuun )	/* TP-022 (c) 1992 Toaplan */
 	DRIVER( kbash )		/* TP-023 (c) 1993 Toaplan */
 	DRIVER( kbash2 )	/* bootleg */
@@ -6946,9 +6946,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mayjin3 )
 
 	/* Atlus games */
-	DRIVER( powerins )	/* (c) 1993 Atlus (Japan) */
-	DRIVER( powerina )	/* (c) 1993 Atlus (Japan) */
-	DRIVER( powerinb )	/* (c) 1993 Atlus (Japan) */
+	DRIVER( powerins )	/* (c) 1993 Atlus (USA) */
+	DRIVER( powerinj )	/* (c) 1993 Atlus (Japan) */
+	DRIVER( powerina )	/* (c) 1993 Atlus (bootleg of USA version) */
+	DRIVER( powerinb )	/* (c) 1993 Atlus (bootleg of USA version) */
 	DRIVER( ohmygod )	/* (c) 1993 Atlus (Japan) */
 	DRIVER( naname )	/* (c) 1994 Atlus (Japan) */
 	DRIVER( blmbycar )	/* (c) 1994 ABM & Gecas - uses same gfx chip as powerins? */

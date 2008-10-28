@@ -15,7 +15,8 @@ Supported games:
     Name        Board No      Maker         Game name
     ----------------------------------------------------------------------------
     tekipaki    TP-020        Toaplan       Teki Paki
-    ghox        TP-021        Toaplan       Ghox
+    ghox        TP-021        Toaplan       Ghox (Spinner with single up/down axis control)
+    ghoxj       TP-021        Toaplan       Ghox (8-Way Joystick controls)
     dogyuun     TP-022        Toaplan       Dogyuun
     kbash       TP-023        Toaplan       Knuckle Bash
     kbash2      bootleg       Toaplan       Knuckle Bash 2
@@ -4200,7 +4201,7 @@ ROM_START( tekipaki )
 ROM_END
 
 
-ROM_START( ghox )
+ROM_START( ghox ) /* Spinner with single axis (up/down) controls */
 	ROM_REGION( 0x040000, "main", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "tp021-01.u10", 0x000000, 0x020000, CRC(9e56ac67) SHA1(daf241d9e55a6e60fc004ed61f787641595b1e62) )
 	ROM_LOAD16_BYTE( "tp021-02.u11", 0x000001, 0x020000, CRC(15cac60f) SHA1(6efa3a50a5dfe6ef4072738d6a7d0d95dca8a675) )
@@ -4217,7 +4218,7 @@ ROM_START( ghox )
 ROM_END
 
 
-ROM_START( ghoxa )
+ROM_START( ghoxj ) /* 8-way joystick for controls */
 	ROM_REGION( 0x040000, "main", 0 )			/* Main 68K code */
 	ROM_LOAD16_BYTE( "tp021-01a.u10", 0x000000, 0x020000, CRC(c11b13c8) SHA1(da7defc1d3b6ddded910ba56c31fbbdb5ed57b09) )
 	ROM_LOAD16_BYTE( "tp021-02a.u11", 0x000001, 0x020000, CRC(8d426767) SHA1(1ed4a8bcbf4352257e7d58cb5c2c91eb48c2f047) )
@@ -5049,8 +5050,8 @@ ROM_END
 
 /*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR COMPANY    FULLNAME     FLAGS ) */
 GAME( 1991, tekipaki, 0,        tekipaki, tekipaki, T2_Z180,  ROT0,   "Toaplan", "Teki Paki", GAME_NO_SOUND )
-GAME( 1991, ghox,     0,        ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (set 1)", GAME_NO_SOUND )
-GAME( 1991, ghoxa,    ghox,     ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (set 2)", GAME_NO_SOUND )
+GAME( 1991, ghox,     0,        ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (Spinner with Up/Down Axis)", GAME_NO_SOUND )
+GAME( 1991, ghoxj,    ghox,     ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (8-Way Joystick)", GAME_NO_SOUND )
 GAME( 1992, dogyuun,  0,        dogyuun,  dogyuun,  T2_V25,   ROT270, "Toaplan", "Dogyuun", GAME_NO_SOUND )
 GAME( 1993, kbash,    0,        kbash,    kbash,    T2_V25,   ROT0,   "Toaplan", "Knuckle Bash", GAME_IMPERFECT_SOUND )
 GAME( 1999, kbash2,   0,        kbash2,   kbash2,   T2_noZ80, ROT0,   "bootleg", "Knuckle Bash 2 (bootleg)", 0 )
