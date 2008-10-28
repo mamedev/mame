@@ -301,8 +301,8 @@ static void recompute_parameters(mc6845_t *mc6845, int postload)
 
 				visarea.min_x = 0;
 				visarea.min_y = 0;
-				visarea.max_x = max_visible_x;
-				visarea.max_y = max_visible_y;
+				visarea.max_x = hsync_on_pos - 1;
+				visarea.max_y = vsync_on_pos - 1;
 
 				if (LOG) logerror("M6845 config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
 								  horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
@@ -379,7 +379,7 @@ static void update_de_changed_timer(mc6845_t *mc6845)
 
 		/* delay display enable for 1 character time if skew is enabled */
 		if (mc6845->mode_control & MODE_DISPLAY_ENABLE_SKEW)
-			next_x++;
+			next_x += mc6845->hpixels_per_column;
 
 		if (next_y != -1)
 			duration = video_screen_get_time_until_pos(mc6845->screen, next_y, next_x);
@@ -663,7 +663,7 @@ void mc6845_update(const device_config *device, bitmap_t *bitmap, const rectangl
 		}
 
 		/* for each row in the visible region */
-		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+		for (y = cliprect->min_y; y <= MIN(cliprect->max_y, mc6845->max_visible_y); y++)
 		{
 			/* compute the current raster line */
 			UINT8 ra = y % (mc6845->max_ras_addr + 1);
@@ -680,7 +680,7 @@ void mc6845_update(const device_config *device, bitmap_t *bitmap, const rectangl
 
 			/* delay cursor for 1 character time if skew is enabled */
 			if (mc6845->mode_control & MODE_CURSOR_SKEW)
-				cursor_x++;
+				cursor_x += mc6845->hpixels_per_column;
 
 			/* call the external system to draw it */
 			mc6845->intf->update_row(device, bitmap, cliprect, mc6845->current_disp_addr, ra, y, mc6845->horiz_disp, cursor_x, param);
