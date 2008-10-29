@@ -91,7 +91,6 @@ other supported games as well.
 #include "cpu/nec/nec.h"
 #include "cpu/i8051/i8051.h"
 
-
 #define MASTER_CLOCK		XTAL_32MHz
 #define SOUND_CLOCK			XTAL_3_579545MHz
 
@@ -115,7 +114,7 @@ static MACHINE_START( m72 )
 static TIMER_CALLBACK( synch_callback )
 {
 	//cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(8000000));
-	cpu_boost_interleave(ATTOTIME_IN_HZ(MASTER_CLOCK/4/12), ATTOTIME_IN_SEC(8));
+	cpu_boost_interleave(ATTOTIME_IN_HZ(MASTER_CLOCK/4/12), ATTOTIME_IN_SEC(25));
 }
 
 static MACHINE_RESET( m72 )
@@ -195,11 +194,6 @@ static TIMER_CALLBACK( delayed_ram16_w )
 	ram[offset] = val;
 }
 
-static TIMER_CALLBACK( mcu_irq0_clear )
-{
-	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
-}
-
 
 static WRITE16_HANDLER( m72_main_mcu_sound_w )
 {
@@ -228,7 +222,8 @@ static WRITE16_HANDLER( m72_main_mcu_w)
 		protection_ram[offset] = val;
 		cputag_set_input_line(machine, "mcu", 0, ASSERT_LINE);
 		/* Line driven, most likely by write line */
-		timer_set(ATTOTIME_IN_CYCLES(2, mame_find_cpu_index(machine, "mcu")), NULL, 0, mcu_irq0_clear);
+		//timer_set(ATTOTIME_IN_CYCLES(2, mame_find_cpu_index(machine, "mcu")), NULL, 0, mcu_irq0_clear);
+		//timer_set(ATTOTIME_IN_CYCLES(0, mame_find_cpu_index(machine, "mcu")), NULL, 0, mcu_irq0_raise);
 	}
 	else
 		timer_call_after_resynch( protection_ram, (offset<<16) | val, delayed_ram16_w);
@@ -247,6 +242,11 @@ static READ8_HANDLER(m72_mcu_data_r )
 {
 	UINT8 ret;
 
+	if (offset == 0x0fff || offset == 0x0ffe)
+	{
+		cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
+	}
+	
 	if (offset&1) ret = (protection_ram[offset/2] & 0xff00)>>8;
 	else ret = (protection_ram[offset/2] & 0x00ff);
 
@@ -256,7 +256,7 @@ static READ8_HANDLER(m72_mcu_data_r )
 static INTERRUPT_GEN( m72_mcu_int )
 {
 	//mcu_snd_cmd_latch |= 0x11; /* 0x10 is special as well - FIXME */
-	mcu_snd_cmd_latch = 0x10 | (mame_rand(machine) & 1); /* 0x10 is special as well - FIXME */
+	mcu_snd_cmd_latch = 0x11;// | (mame_rand(machine) & 1); /* 0x10 is special as well - FIXME */
 	cputag_set_input_line(machine, "mcu", 1, ASSERT_LINE);
 }
 
@@ -335,6 +335,28 @@ INLINE DRIVER_INIT( loht_mcu )
 	/* sound cpu */
 	memory_install_write8_handler(machine, sndnum, ADDRESS_SPACE_IO, 0x82, 0x82, 0xff, 0, m72_snd_cpu_sample_w);
 	memory_install_read8_handler (machine, sndnum, ADDRESS_SPACE_IO, 0x84, 0x84, 0xff, 0, m72_snd_cpu_sample_r);
+
+#if 0
+	/* running the mcu at twice the speed, the following 
+	 * timeouts have to be modified.
+	 * At normal speed, the timing heavily depends on opcode
+	 * prefetching on the V30.
+	 */
+	{
+		UINT8 *rom=memory_region(machine, "mcu");
+		
+		rom[0x12d+5] += 1; printf(" 5: %d\n", rom[0x12d+5]);
+		rom[0x12d+8] += 5;  printf(" 8: %d\n", rom[0x12d+8]);
+		rom[0x12d+11] += 7; printf("11: %d\n", rom[0x12d+11]);
+		rom[0x12d+14] += 9; printf("14: %d\n", rom[0x12d+14]);
+		rom[0x12d+17] += 1; printf("17: %d\n", rom[0x12d+17]);
+		rom[0x12d+20] += 10; printf("20: %d\n", rom[0x12d+20]);
+		rom[0x12d+23] += 3; printf("23: %d\n", rom[0x12d+23]);
+		rom[0x12d+26] += 2; printf("26: %d\n", rom[0x12d+26]);
+		rom[0x12d+29] += 2; printf("29: %d\n", rom[0x12d+29]); 
+		rom[0x12d+32] += 16; printf("32: %d\n", rom[0x12d+32]); 
+	}
+#endif
 }
 
 
@@ -1035,29 +1057,6 @@ static ADDRESS_MAP_START( poundfor_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x42, 0x42) AM_WRITE(m72_sound_irq_ack_w)
 ADDRESS_MAP_END
 
-#if 0
-/* TODO: internal - should be removed */
-static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	//ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0fff) AM_ROM
-ADDRESS_MAP_END
-#endif
-
-#if 0
-static ADDRESS_MAP_START( mcu_data_map, ADDRESS_SPACE_DATA, 8 )
-	//ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(m72_mcu_sample_r, m72_mcu_low_w)
-	AM_RANGE(0x0001, 0x0001) AM_WRITE(m72_mcu_high_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(m72_mcu_snd_r, m72_mcu_ack_w)
-	/* shared at b0000 - b0fff on the main cpu */
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_READWRITE(m72_mcu_data_r,m72_mcu_data_w )
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
-	//ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x0000, 0x0003) AM_READWRITE(m72_mcu_port_r, m72_mcu_port_w)
-ADDRESS_MAP_END
-#else
 static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
 	/* External access */
 	AM_RANGE(0x0000, 0x0000) AM_READWRITE(m72_mcu_sample_r, m72_mcu_low_w)
@@ -1069,8 +1068,6 @@ static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
 	/* Ports */
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(m72_mcu_port_r, m72_mcu_port_w)
 ADDRESS_MAP_END
-
-#endif
 
 #define COIN_MODE_1 \
 	PORT_DIPNAME( 0x00f0, 0x00f0, DEF_STR( Coinage ) ) PORT_CONDITION("DSW", 0x0400, PORTCOND_NOTEQUALS, 0x0000) PORT_DIPLOCATION("SW1:5,6,7,8") \
@@ -1867,12 +1864,9 @@ static MACHINE_DRIVER_START( m72_8751 )
 
 	MDRV_IMPORT_FROM(m72_base)
 
-	MDRV_CPU_ADD("mcu",I8751, MASTER_CLOCK/2)
-	/* internal - MDRV_CPU_PROGRAM_MAP(mcu_map,0) */
-	//MDRV_CPU_DATA_MAP(mcu_data_map,0)
+	MDRV_CPU_ADD("mcu",I8751, MASTER_CLOCK/4)
 	MDRV_CPU_IO_MAP(mcu_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", m72_mcu_int)
-	//MDRV_INTERLEAVE(1000)
 
 MACHINE_DRIVER_END
 
