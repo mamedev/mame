@@ -101,15 +101,11 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 #define PutMemW(Seg,Off,x) { write_word(DefaultBase(Seg) + (Off), (x)); }
 
 #define FETCH_XOR(a)		((a) ^ I.mem.fetch_xor)
-#define FETCH (cpu_readop_arg(FETCH_XOR((I.sregs[PS]<<4)+I.ip++)))
+#define FETCH() (cpu_readop_arg(FETCH_XOR((I.sregs[PS]<<4)+I.ip++)))
 
-
-#define FETCHOP ()
 #define FETCHWORD(var) { var=cpu_readop_arg(FETCH_XOR((I.sregs[PS]<<4)+I.ip))+(cpu_readop_arg(FETCH_XOR((I.sregs[PS]<<4)+I.ip+1))<<8); I.ip+=2; }
 #define PUSH(val) { I.regs.w[SP]-=2; write_word((((I.sregs[SS]<<4)+I.regs.w[SP])),val); }
 #define POP(var) { var = read_word((((I.sregs[SS]<<4)+I.regs.w[SP]))); I.regs.w[SP]+=2; }
-#define PEEK(addr) ((BYTE)cpu_readop_arg(FETCH_XOR(addr)))
-#define PEEKOP(addr) ((BYTE)cpu_readop(FETCH_XOR(addr)))
 
 #define GetModRM UINT32 ModRM=cpu_readop_arg(FETCH_XOR((I.sregs[PS]<<4)+I.ip++))
 
@@ -167,7 +163,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 	I.regs.w[Reg]=tmp1
 
 #define JMP(flag)							\
-	int tmp = (int)((INT8)FETCH);			\
+	int tmp = (int)((INT8)FETCH());			\
 	if (flag)								\
 	{										\
 		static const UINT8 table[3]={3,10,10}; 	\
@@ -209,7 +205,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 	I.regs.b[AL] &= 0x0F
 
 #define BITOP_BYTE							\
-	ModRM = FETCH;							\
+	ModRM = FETCH();							\
 	if (ModRM >= 0xc0) {					\
 		tmp=I.regs.b[Mod_RM.RM.b[ModRM]];	\
 	}										\
@@ -219,7 +215,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
     }
 
 #define BITOP_WORD							\
-	ModRM = FETCH;							\
+	ModRM = FETCH();							\
 	if (ModRM >= 0xc0) {					\
 		tmp=I.regs.w[Mod_RM.RM.w[ModRM]];	\
 	}										\
