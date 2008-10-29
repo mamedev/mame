@@ -258,7 +258,7 @@
 
 #include "driver.h"
 #include "cpu/mcs48/mcs48.h"
-#include "cpu/i8051/i8051.h"
+#include "cpu/mcs51/mcs51.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "videopkr.lh"

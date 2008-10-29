@@ -17,7 +17,7 @@
 
 
 #include "driver.h"
-#include "cpu/i8051/i8051.h"
+#include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
 
 #include "cardline.lh"

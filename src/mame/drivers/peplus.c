@@ -159,7 +159,7 @@ Stephh's log (2007.11.28) :
 
 #include "driver.h"
 #include "sound/ay8910.h"
-#include "cpu/i8051/i8051.h"
+#include "cpu/mcs51/mcs51.h"
 #include "machine/i2cmem.h"
 
 #include "peplus.lh"

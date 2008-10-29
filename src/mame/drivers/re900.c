@@ -27,7 +27,7 @@
 #define TMS_CLOCK		VDP_CLOCK / 24
 
 #include "driver.h"
-#include "cpu/i8051/i8051.h"
+#include "cpu/mcs51/mcs51.h"
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"
 //#include "re900.lh"

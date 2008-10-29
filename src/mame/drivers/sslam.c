@@ -81,7 +81,7 @@ Notes:
 
 
 #include "driver.h"
-#include "cpu/i8051/i8051.h"
+#include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
 
 
@@ -395,7 +395,7 @@ static WRITE16_HANDLER( sslam_snd_w )
 static WRITE16_HANDLER( powerbls_sound_w )
 {
 	soundlatch_w(machine,0,data & 0xff);
-	cpunum_set_input_line(machine, 1,I8051_INT1_LINE,HOLD_LINE);
+	cpunum_set_input_line(machine, 1,MCS51_INT1_LINE,HOLD_LINE);
 }
 
 /* Memory Maps */

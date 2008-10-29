@@ -26,7 +26,7 @@
 #include "driver.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
-#include "cpu/i8051/i8051.h"
+#include "cpu/mcs51/mcs51.h"
 
 static tilemap *bg_tilemap, *md_tilemap, *fg_tilemap;
 static UINT32 *bg_videoram, *md_videoram, *fg_videoram, *limenko_videoreg;

@@ -34,7 +34,7 @@
  *****************************************************************************/
 
 #include "debugger.h"
-#include "i8051.h"
+#include "mcs51.h"
 
 #define SHOW_MEMORY_NAMES	1
 

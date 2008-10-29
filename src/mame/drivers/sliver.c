@@ -67,7 +67,7 @@ Notes:
 #include "driver.h"
 #include "deprecat.h"
 #include "sound/okim6295.h"
-#include "cpu/i8051/i8051.h"
+#include "cpu/mcs51/mcs51.h"
 
 #define FIFO_SIZE 1024
 #define IO_SIZE 	0x100
@@ -391,7 +391,7 @@ static WRITE16_HANDLER(io_data_w)
 static WRITE16_HANDLER(sound_w)
 {
 		soundlatch_w(machine,0,data & 0xff);
-		cpunum_set_input_line(machine, 1, I8051_INT0_LINE, HOLD_LINE);
+		cpunum_set_input_line(machine, 1, MCS51_INT0_LINE, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( sliver_map, ADDRESS_SPACE_PROGRAM, 16 )

@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *   i8051.h
+ *   mcs51.h
  *   Portable MCS-51 Family Emulator
  *
  *   Chips in the family:
@@ -28,26 +28,32 @@
  *  #2) 8051 simulator by Travis Marlatte
  *  #3) Portable UPI-41/8041/8741/8042/8742 emulator V0.1 by Juergen Buchmueller (MAME CORE)
  *
+ * 2008, October, Couriersud
+ * - Rewrite of timer, interrupt and serial code
+ * - addition of CMOS features
+ * - internal memory maps
+ * - addition of new processor types
+ * - full emulation of 8xCx2 processors
  *****************************************************************************/
 
 #pragma once
 
-#ifndef __I8051_H__
-#define __I8051_H__
+#ifndef __MCS51_H__
+#define __MCS51_H__
 
 #include "cpuintrf.h"
 
 enum
 {
-	I8051_PC=1, I8051_SP, I8051_PSW, I8051_ACC, I8051_B, I8051_DPH, I8051_DPL, I8051_IE,
-	I8051_R0, I8051_R1, I8051_R2, I8051_R3, I8051_R4, I8051_R5, I8051_R6, I8051_R7, I8051_RB
+	MCS51_PC=1, MCS51_SP, MCS51_PSW, MCS51_ACC, MCS51_B, MCS51_DPH, MCS51_DPL, MCS51_IE,
+	MCS51_R0, MCS51_R1, MCS51_R2, MCS51_R3, MCS51_R4, MCS51_R5, MCS51_R6, MCS51_R7, MCS51_RB
 };
 
 enum
 {
-	I8051_INT0_LINE = 0, 	/* P3.2: External Interrupt 0 */
-	I8051_INT1_LINE,		/* P3.3: External Interrupt 1 */
-	I8051_RX_LINE,			/* P3.0: Serial Port Receive Line */
+	MCS51_INT0_LINE = 0, 	/* P3.2: External Interrupt 0 */
+	MCS51_INT1_LINE,		/* P3.3: External Interrupt 1 */
+	MCS51_RX_LINE,			/* P3.0: Serial Port Receive Line */
 	MCS51_T0_LINE,			/* P3,4: Timer 0 External Input */
 	MCS51_T1_LINE,			/* P3.5: Timer 1 External Input */
 	MCS51_T2_LINE,			/* P1.0: Timer 2 External Input */
@@ -105,4 +111,4 @@ void at89c4051_get_info(UINT32 state, cpuinfo *info);
 
 offs_t i8051_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#endif /* __I8051_H__ */
+#endif /* __MCS51_H__ */

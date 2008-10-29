@@ -25,7 +25,7 @@
 #include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/tms34010/34010ops.h"
-#include "cpu/i8051/i8051.h"
+#include "cpu/mcs51/mcs51.h"
 #include "sound/2151intf.h"
 #include "sound/upd7759.h"
 #include "sound/dac.h"
@@ -549,11 +549,11 @@ switch(offset)
                         {
                         	cpunum_set_input_line_and_vector(machine, 0,3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
                         }
-                        cpunum_set_input_line(machine, 2, I8051_RX_LINE, ASSERT_LINE);                      // Generate 8031 interrupt
+                        cpunum_set_input_line(machine, 2, MCS51_RX_LINE, ASSERT_LINE);                      // Generate 8031 interrupt
                         mame_printf_debug("Sound board TX: %4X at PC=%4X\n",value,activecpu_get_pc());
 #endif
                         M68681.SRB &=~0x0400;                   // Data has been sent - TX ready for more.
-                        cpunum_set_input_line(machine, 2, I8051_RX_LINE, ASSERT_LINE);                      // Generate 8031 interrupt
+                        cpunum_set_input_line(machine, 2, MCS51_RX_LINE, ASSERT_LINE);                      // Generate 8031 interrupt
                         mame_printf_debug("Sound board TX: %4X at PC=%4X\n",value,activecpu_get_pc());
                         break;
 

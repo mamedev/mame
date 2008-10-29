@@ -102,7 +102,7 @@
 
 #include "debugger.h"
 #include "deprecat.h"
-#include "i8051.h"
+#include "mcs51.h"
 
 #define VERBOSE 1
 
@@ -1116,7 +1116,7 @@ void i8051_set_serial_rx_callback(int (*callback)(void))
     OPCODES
 ***************************************************************************/
 
-#include "i8051ops.c"
+#include "mcs51ops.c"
 
 
 static void execute_op(UINT8 op)
@@ -1618,12 +1618,12 @@ static void mcs51_set_irq_line(int irqline, int state)
 	switch( irqline )
 	{
 		//External Interrupt 0
-		case I8051_INT0_LINE:
+		case MCS51_INT0_LINE:
 			//Line Asserted?
 			if (state != CLEAR_LINE) {
 				//Need cleared->active line transition? (Logical 1-0 Pulse on the line) - CLEAR->ASSERT Transition since INT0 active lo!
 				if (GET_IT0) {
-					if (GET_BIT(tr_state, I8051_INT0_LINE))
+					if (GET_BIT(tr_state, MCS51_INT0_LINE))
 						SET_IE0(1);
 				}
 				else
@@ -1638,13 +1638,13 @@ static void mcs51_set_irq_line(int irqline, int state)
 			break;
 
 		//External Interrupt 1
-		case I8051_INT1_LINE:
+		case MCS51_INT1_LINE:
 
 			//Line Asserted?
 			if (state != CLEAR_LINE) {
 				//Need cleared->active line transition? (Logical 1-0 Pulse on the line) - CLEAR->ASSERT Transition since INT1 active lo!
 				if(GET_IT1){
-					if (GET_BIT(tr_state, I8051_INT1_LINE))
+					if (GET_BIT(tr_state, MCS51_INT1_LINE))
 						SET_IE1(1);
 				}
 				else
@@ -1690,7 +1690,7 @@ static void mcs51_set_irq_line(int irqline, int state)
 				fatalerror("mcs51: Trying to set T2EX_LINE on a non I8052 type cpu.\n");
 			break;
 		//Serial Port Receive
-		case I8051_RX_LINE:
+		case MCS51_RX_LINE:
 			//Is the enable flags for this interrupt set?
 			if (state != CLEAR_LINE)
 			{
@@ -2104,29 +2104,29 @@ static void mcs51_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_PC:							PC = info->i;							break;
 		case CPUINFO_INT_SP:							SP = info->i;		     				break;
 
-		case CPUINFO_INT_INPUT_STATE + I8051_INT0_LINE:	mcs51_set_irq_line(I8051_INT0_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + I8051_INT1_LINE:	mcs51_set_irq_line(I8051_INT1_LINE, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + MCS51_INT0_LINE:	mcs51_set_irq_line(MCS51_INT0_LINE, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + MCS51_INT1_LINE:	mcs51_set_irq_line(MCS51_INT1_LINE, info->i); break;
 		case CPUINFO_INT_INPUT_STATE + MCS51_T0_LINE:	mcs51_set_irq_line(MCS51_T0_LINE, info->i); break;
 		case CPUINFO_INT_INPUT_STATE + MCS51_T1_LINE:	mcs51_set_irq_line(MCS51_T1_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + I8051_RX_LINE:	mcs51_set_irq_line(I8051_RX_LINE, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + MCS51_RX_LINE:	mcs51_set_irq_line(MCS51_RX_LINE, info->i); break;
 
-		case CPUINFO_INT_REGISTER + I8051_PC: 			PC = info->i;								break;
-		case CPUINFO_INT_REGISTER + I8051_SP: 			SP = info->i;							break;
-		case CPUINFO_INT_REGISTER + I8051_PSW:			SET_PSW(info->i);							break;
-		case CPUINFO_INT_REGISTER + I8051_ACC:			SET_ACC(info->i);							break;
-		case CPUINFO_INT_REGISTER + I8051_B:  			B = info->i;								break;
-		case CPUINFO_INT_REGISTER + I8051_DPH:			DPH = info->i;							break;
-		case CPUINFO_INT_REGISTER + I8051_DPL:			DPL = info->i;							break;
-		case CPUINFO_INT_REGISTER + I8051_IE: 			IE = info->i;							break;
-		case CPUINFO_INT_REGISTER + I8051_R0: 			SET_REG(0, info->i); break;
-		case CPUINFO_INT_REGISTER + I8051_R1: 			SET_REG(1, info->i); break;
-		case CPUINFO_INT_REGISTER + I8051_R2: 			SET_REG(2, info->i); break;
-		case CPUINFO_INT_REGISTER + I8051_R3: 			SET_REG(3, info->i); break;
-		case CPUINFO_INT_REGISTER + I8051_R4: 			SET_REG(4, info->i); break;
-		case CPUINFO_INT_REGISTER + I8051_R5: 			SET_REG(5, info->i); break;
-		case CPUINFO_INT_REGISTER + I8051_R6: 			SET_REG(6, info->i); break;
-		case CPUINFO_INT_REGISTER + I8051_R7: 			SET_REG(7, info->i); break;
-		case CPUINFO_INT_REGISTER + I8051_RB: 			SET_RS(info->i); break;
+		case CPUINFO_INT_REGISTER + MCS51_PC: 			PC = info->i;								break;
+		case CPUINFO_INT_REGISTER + MCS51_SP: 			SP = info->i;							break;
+		case CPUINFO_INT_REGISTER + MCS51_PSW:			SET_PSW(info->i);							break;
+		case CPUINFO_INT_REGISTER + MCS51_ACC:			SET_ACC(info->i);							break;
+		case CPUINFO_INT_REGISTER + MCS51_B:  			B = info->i;								break;
+		case CPUINFO_INT_REGISTER + MCS51_DPH:			DPH = info->i;							break;
+		case CPUINFO_INT_REGISTER + MCS51_DPL:			DPL = info->i;							break;
+		case CPUINFO_INT_REGISTER + MCS51_IE: 			IE = info->i;							break;
+		case CPUINFO_INT_REGISTER + MCS51_R0: 			SET_REG(0, info->i); break;
+		case CPUINFO_INT_REGISTER + MCS51_R1: 			SET_REG(1, info->i); break;
+		case CPUINFO_INT_REGISTER + MCS51_R2: 			SET_REG(2, info->i); break;
+		case CPUINFO_INT_REGISTER + MCS51_R3: 			SET_REG(3, info->i); break;
+		case CPUINFO_INT_REGISTER + MCS51_R4: 			SET_REG(4, info->i); break;
+		case CPUINFO_INT_REGISTER + MCS51_R5: 			SET_REG(5, info->i); break;
+		case CPUINFO_INT_REGISTER + MCS51_R6: 			SET_REG(6, info->i); break;
+		case CPUINFO_INT_REGISTER + MCS51_R7: 			SET_REG(7, info->i); break;
+		case CPUINFO_INT_REGISTER + MCS51_RB: 			SET_RS(info->i); break;
 	}
 }
 
@@ -2168,23 +2168,23 @@ static void mcs51_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_PC:	 						info->i = PC;							break;
 		case CPUINFO_INT_SP:							info->i = SP;							break;
 
-		case CPUINFO_INT_REGISTER + I8051_PC: 			info->i = PC;							break;
-		case CPUINFO_INT_REGISTER + I8051_SP: 			info->i = SP;							break;
-		case CPUINFO_INT_REGISTER + I8051_PSW:			info->i = PSW;							break;
-		case CPUINFO_INT_REGISTER + I8051_ACC:			info->i = ACC;							break;
-		case CPUINFO_INT_REGISTER + I8051_B:  			info->i = B;							break;
-		case CPUINFO_INT_REGISTER + I8051_DPH:			info->i = DPH;							break;
-		case CPUINFO_INT_REGISTER + I8051_DPL:			info->i = DPL;							break;
-		case CPUINFO_INT_REGISTER + I8051_IE: 			info->i = IE;							break;
-		case CPUINFO_INT_REGISTER + I8051_R0: 			info->i = R_REG(0);	 					break;
-		case CPUINFO_INT_REGISTER + I8051_R1: 			info->i = R_REG(1); 					break;
-		case CPUINFO_INT_REGISTER + I8051_R2: 			info->i = R_REG(2); 					break;
-		case CPUINFO_INT_REGISTER + I8051_R3: 			info->i = R_REG(3); 					break;
-		case CPUINFO_INT_REGISTER + I8051_R4: 			info->i = R_REG(4); 					break;
-		case CPUINFO_INT_REGISTER + I8051_R5: 			info->i = R_REG(5); 					break;
-		case CPUINFO_INT_REGISTER + I8051_R6: 			info->i = R_REG(6); 					break;
-		case CPUINFO_INT_REGISTER + I8051_R7: 			info->i = R_REG(7); 					break;
-		case CPUINFO_INT_REGISTER + I8051_RB: 			info->i = R_REG(8); 					break;
+		case CPUINFO_INT_REGISTER + MCS51_PC: 			info->i = PC;							break;
+		case CPUINFO_INT_REGISTER + MCS51_SP: 			info->i = SP;							break;
+		case CPUINFO_INT_REGISTER + MCS51_PSW:			info->i = PSW;							break;
+		case CPUINFO_INT_REGISTER + MCS51_ACC:			info->i = ACC;							break;
+		case CPUINFO_INT_REGISTER + MCS51_B:  			info->i = B;							break;
+		case CPUINFO_INT_REGISTER + MCS51_DPH:			info->i = DPH;							break;
+		case CPUINFO_INT_REGISTER + MCS51_DPL:			info->i = DPL;							break;
+		case CPUINFO_INT_REGISTER + MCS51_IE: 			info->i = IE;							break;
+		case CPUINFO_INT_REGISTER + MCS51_R0: 			info->i = R_REG(0);	 					break;
+		case CPUINFO_INT_REGISTER + MCS51_R1: 			info->i = R_REG(1); 					break;
+		case CPUINFO_INT_REGISTER + MCS51_R2: 			info->i = R_REG(2); 					break;
+		case CPUINFO_INT_REGISTER + MCS51_R3: 			info->i = R_REG(3); 					break;
+		case CPUINFO_INT_REGISTER + MCS51_R4: 			info->i = R_REG(4); 					break;
+		case CPUINFO_INT_REGISTER + MCS51_R5: 			info->i = R_REG(5); 					break;
+		case CPUINFO_INT_REGISTER + MCS51_R6: 			info->i = R_REG(6); 					break;
+		case CPUINFO_INT_REGISTER + MCS51_R7: 			info->i = R_REG(7); 					break;
+		case CPUINFO_INT_REGISTER + MCS51_RB: 			info->i = R_REG(8); 					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = mcs51_set_info;			break;
@@ -2220,23 +2220,23 @@ static void mcs51_get_info(UINT32 state, cpuinfo *info)
 				PSW & 0x01 ? 'P':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + I8051_PC:        	sprintf(info->s, "PC:%04X", r->pc);		break;
-		case CPUINFO_STR_REGISTER + I8051_SP:        	sprintf(info->s, "SP:%02X", SP);		break;
-		case CPUINFO_STR_REGISTER + I8051_PSW:       	sprintf(info->s, "PSW:%02X", PSW);		break;
-		case CPUINFO_STR_REGISTER + I8051_ACC:       	sprintf(info->s, "A:%02X", ACC);		break;
-		case CPUINFO_STR_REGISTER + I8051_B:         	sprintf(info->s, "B:%02X", B);			break;
-		case CPUINFO_STR_REGISTER + I8051_DPH:       	sprintf(info->s, "DPH:%02X", DPH);		break;
-		case CPUINFO_STR_REGISTER + I8051_DPL:       	sprintf(info->s, "DPL:%02X", DPL);		break;
-		case CPUINFO_STR_REGISTER + I8051_IE:        	sprintf(info->s, "IE:%02X", IE);		break;
-		case CPUINFO_STR_REGISTER + I8051_R0:        	sprintf(info->s, "R0:%02X", R_REG(0)); 	break;
-		case CPUINFO_STR_REGISTER + I8051_R1:        	sprintf(info->s, "R1:%02X", R_REG(1)); 	break;
-		case CPUINFO_STR_REGISTER + I8051_R2:        	sprintf(info->s, "R2:%02X", R_REG(2)); 	break;
-		case CPUINFO_STR_REGISTER + I8051_R3:			sprintf(info->s, "R3:%02X", R_REG(3)); 	break;
-		case CPUINFO_STR_REGISTER + I8051_R4: 			sprintf(info->s, "R4:%02X", R_REG(4)); 	break;
-		case CPUINFO_STR_REGISTER + I8051_R5: 			sprintf(info->s, "R5:%02X", R_REG(5)); 	break;
-		case CPUINFO_STR_REGISTER + I8051_R6: 			sprintf(info->s, "R6:%02X", R_REG(6)); 	break;
-		case CPUINFO_STR_REGISTER + I8051_R7: 			sprintf(info->s, "R7:%02X", R_REG(7)); 	break;
-		case CPUINFO_STR_REGISTER + I8051_RB: 			sprintf(info->s, "RB:%02X", ((PSW & 0x18)>>3)); break;
+		case CPUINFO_STR_REGISTER + MCS51_PC:        	sprintf(info->s, "PC:%04X", r->pc);		break;
+		case CPUINFO_STR_REGISTER + MCS51_SP:        	sprintf(info->s, "SP:%02X", SP);		break;
+		case CPUINFO_STR_REGISTER + MCS51_PSW:       	sprintf(info->s, "PSW:%02X", PSW);		break;
+		case CPUINFO_STR_REGISTER + MCS51_ACC:       	sprintf(info->s, "A:%02X", ACC);		break;
+		case CPUINFO_STR_REGISTER + MCS51_B:         	sprintf(info->s, "B:%02X", B);			break;
+		case CPUINFO_STR_REGISTER + MCS51_DPH:       	sprintf(info->s, "DPH:%02X", DPH);		break;
+		case CPUINFO_STR_REGISTER + MCS51_DPL:       	sprintf(info->s, "DPL:%02X", DPL);		break;
+		case CPUINFO_STR_REGISTER + MCS51_IE:        	sprintf(info->s, "IE:%02X", IE);		break;
+		case CPUINFO_STR_REGISTER + MCS51_R0:        	sprintf(info->s, "R0:%02X", R_REG(0)); 	break;
+		case CPUINFO_STR_REGISTER + MCS51_R1:        	sprintf(info->s, "R1:%02X", R_REG(1)); 	break;
+		case CPUINFO_STR_REGISTER + MCS51_R2:        	sprintf(info->s, "R2:%02X", R_REG(2)); 	break;
+		case CPUINFO_STR_REGISTER + MCS51_R3:			sprintf(info->s, "R3:%02X", R_REG(3)); 	break;
+		case CPUINFO_STR_REGISTER + MCS51_R4: 			sprintf(info->s, "R4:%02X", R_REG(4)); 	break;
+		case CPUINFO_STR_REGISTER + MCS51_R5: 			sprintf(info->s, "R5:%02X", R_REG(5)); 	break;
+		case CPUINFO_STR_REGISTER + MCS51_R6: 			sprintf(info->s, "R6:%02X", R_REG(6)); 	break;
+		case CPUINFO_STR_REGISTER + MCS51_R7: 			sprintf(info->s, "R7:%02X", R_REG(7)); 	break;
+		case CPUINFO_STR_REGISTER + MCS51_RB: 			sprintf(info->s, "RB:%02X", ((PSW & 0x18)>>3)); break;
 	}
 }
 
