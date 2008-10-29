@@ -4,15 +4,18 @@ Alien Command (c) 1993 Jaleco
 
 driver by Angelo Salese
 
-seems like a particular version of the NMK16 board.
+Similar (same?) to the Cisco Heat board type.
 
 TODO:
--Understand what "devices" area needs to make this working...
+-Understand what "devices" area needs to make this working.It's likely that the upper switches
+controls the UFO's and the lower switches the astronauts.
+-Back tilemap paging is likely to be incorrect.
+-3D Artworks for the UFO's,Astronauts etc.
+-Merge to the Cisco Heat driver.
 
--Complete sound
-
--Back tilemap paging is likely to be incorrect...
-
+Notes:
+-The real HW is a redemption machine with two guns,similar to the "Cosmo Gang the Video"
+(Namco) bonus games.
 
 m68k irq table vectors
 lev 1 : 0x64 : 0000 04f0 - rte
@@ -157,60 +160,63 @@ static VIDEO_START( acommand )
 }
 
 
-/*copied from drivers/gticlub.c,to be completed*/
 #define LED_ON		0x01c00
-#define SHOW_LEDS	0
+#define LED_OFF		0x00000
+/*
+	 a
+	---
+f	| | b
+	-g-
+e	| | c
+	---
+	 d
+a & 1
+b & 2
+c & 4
+d & 8
+e & 10
+f & 20
+g & 40
+7f
+*/
+/*									  0    1    2	 3	  4    5    6	 7	  8	   9	a    b    c    d    e    f*/
+static const UINT8 led_fill[0x10] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x00,0x00,0x00,0x00,0x00,0x00};
 
-#if SHOW_LEDS
 static void draw_led(bitmap_t *bitmap, int x, int y,UINT8 value)
 {
-	plot_box(bitmap, x, y, 5, 9, 0x00000000);
+	plot_box(bitmap, x, y, 6, 10, 0x00000000);
 
-	/* Top */
-	if( (value & 0x40) == 0 ) {
-		*BITMAP_ADDR16(bitmap, y+0, x+1) = LED_ON;
-		*BITMAP_ADDR16(bitmap, y+0, x+2) = LED_ON;
-		*BITMAP_ADDR16(bitmap, y+0, x+3) = LED_ON;
-	}
-	/* Middle */
-	if( (value & 0x01) == 0 ) {
-		*BITMAP_ADDR16(bitmap, y+4, x+1) = LED_ON;
-		*BITMAP_ADDR16(bitmap, y+4, x+2) = LED_ON;
-		*BITMAP_ADDR16(bitmap, y+4, x+3) = LED_ON;
-	}
-	/* Bottom */
-	if( (value & 0x08) == 0 ) {
-		*BITMAP_ADDR16(bitmap, y+8, x+1) = LED_ON;
-		*BITMAP_ADDR16(bitmap, y+8, x+2) = LED_ON;
-		*BITMAP_ADDR16(bitmap, y+8, x+3) = LED_ON;
-	}
-	/* Top Left */
-	if( (value & 0x02) == 0 ) {
-		*BITMAP_ADDR16(bitmap, y+1, x+0) = LED_ON;
-		*BITMAP_ADDR16(bitmap, y+2, x+0) = LED_ON;
-		*BITMAP_ADDR16(bitmap, y+3, x+0) = LED_ON;
-	}
-	/* Top Right */
-	if( (value & 0x20) == 0 ) {
-		*BITMAP_ADDR16(bitmap, y+1, x+4) = LED_ON;
-		*BITMAP_ADDR16(bitmap, y+2, x+4) = LED_ON;
-		*BITMAP_ADDR16(bitmap, y+3, x+4) = LED_ON;
-	}
-	/* Bottom Left */
-	if( (value & 0x04) == 0 ) {
-		*BITMAP_ADDR16(bitmap, y+5, x+0) = LED_ON;
-		*BITMAP_ADDR16(bitmap, y+6, x+0) = LED_ON;
-		*BITMAP_ADDR16(bitmap, y+7, x+0) = LED_ON;
-	}
-	/* Bottom Right */
-	if( (value & 0x10) == 0 ) {
-		*BITMAP_ADDR16(bitmap, y+5, x+4) = LED_ON;
-		*BITMAP_ADDR16(bitmap, y+6, x+4) = LED_ON;
-		*BITMAP_ADDR16(bitmap, y+7, x+4) = LED_ON;
-	}
+	/*a*/
+	*BITMAP_ADDR16(bitmap, y+0, x+1) = ((led_fill[value] & 0x0001) ? LED_ON : LED_OFF);
+	*BITMAP_ADDR16(bitmap, y+0, x+2) = ((led_fill[value] & 0x0001) ? LED_ON : LED_OFF);
+	*BITMAP_ADDR16(bitmap, y+0, x+3) = ((led_fill[value] & 0x0001) ? LED_ON : LED_OFF);
+	/*b*/
+	*BITMAP_ADDR16(bitmap, y+1, x+4) = ((led_fill[value] & 0x0002) ? LED_ON : LED_OFF);
+	*BITMAP_ADDR16(bitmap, y+2, x+4) = ((led_fill[value] & 0x0002) ? LED_ON : LED_OFF);
+	*BITMAP_ADDR16(bitmap, y+3, x+4) = ((led_fill[value] & 0x0002) ? LED_ON : LED_OFF);
+	/*c*/
+	*BITMAP_ADDR16(bitmap, y+5, x+4) = ((led_fill[value] & 0x0004) ? LED_ON : LED_OFF);
+	*BITMAP_ADDR16(bitmap, y+6, x+4) = ((led_fill[value] & 0x0004) ? LED_ON : LED_OFF);
+	*BITMAP_ADDR16(bitmap, y+7, x+4) = ((led_fill[value] & 0x0004) ? LED_ON : LED_OFF);
+	/*d*/
+	*BITMAP_ADDR16(bitmap, y+8, x+1) = ((led_fill[value] & 0x0008) ? LED_ON : LED_OFF);
+	*BITMAP_ADDR16(bitmap, y+8, x+2) = ((led_fill[value] & 0x0008) ? LED_ON : LED_OFF);
+	*BITMAP_ADDR16(bitmap, y+8, x+3) = ((led_fill[value] & 0x0008) ? LED_ON : LED_OFF);
+	/*e*/
+	*BITMAP_ADDR16(bitmap, y+5, x+0) = ((led_fill[value] & 0x0010) ? LED_ON : LED_OFF);
+	*BITMAP_ADDR16(bitmap, y+6, x+0) = ((led_fill[value] & 0x0010) ? LED_ON : LED_OFF);
+	*BITMAP_ADDR16(bitmap, y+7, x+0) = ((led_fill[value] & 0x0010) ? LED_ON : LED_OFF);
+	/*f*/
+	*BITMAP_ADDR16(bitmap, y+1, x+0) = ((led_fill[value] & 0x0020) ? LED_ON : LED_OFF);
+	*BITMAP_ADDR16(bitmap, y+2, x+0) = ((led_fill[value] & 0x0020) ? LED_ON : LED_OFF);
+	*BITMAP_ADDR16(bitmap, y+3, x+0) = ((led_fill[value] & 0x0020) ? LED_ON : LED_OFF);
+	/*g*/
+	*BITMAP_ADDR16(bitmap, y+4, x+1) = ((led_fill[value] & 0x0040) ? LED_ON : LED_OFF);
+	*BITMAP_ADDR16(bitmap, y+4, x+2) = ((led_fill[value] & 0x0040) ? LED_ON : LED_OFF);
+	*BITMAP_ADDR16(bitmap, y+4, x+3) = ((led_fill[value] & 0x0040) ? LED_ON : LED_OFF);
 }
-#endif
-static UINT16 led0;
+
+static UINT16 led0,led1;
 
 static VIDEO_UPDATE( acommand )
 {
@@ -218,10 +224,14 @@ static VIDEO_UPDATE( acommand )
 	draw_sprites(screen->machine,bitmap,cliprect,0,0);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 
-	#if SHOW_LEDS
-		draw_led(bitmap, 3, 53, (led0 & 0xff00) >> 8);
-		popmessage("%04x",led0);
-	#endif
+	/*Order might be wrong,but these for sure are the led numbers tested*/
+	draw_led(bitmap,  0, 20, (led0 & 0x0f00) >> 8);
+	draw_led(bitmap,  6, 20, (led0 & 0x00f0) >> 4);
+	draw_led(bitmap, 12, 20, (led0 & 0x000f));
+
+	draw_led(bitmap, 256-18,20,(led0 & 0xf000) >> 12);
+	draw_led(bitmap, 256-12,20,(led1 & 0xf0) >> 4);
+	draw_led(bitmap, 256-6,20, (led1 & 0xf));
 	return 0;
 }
 
@@ -262,10 +272,10 @@ static WRITE16_HANDLER(ac_txscroll_w)
 
 static UINT16 *ac_devram;
 
-
 static READ16_HANDLER(ac_devices_r)
 {
-//  popmessage("(PC=%06x) read at %04x",activecpu_get_pc(),offset*2);
+  	logerror("(PC=%06x) read at %04x\n",activecpu_get_pc(),offset*2);
+
 	switch(offset)
 	{
 		case 0x0008/2:
@@ -283,32 +293,71 @@ static READ16_HANDLER(ac_devices_r)
             */
 			return input_port_read(machine, "IN0");
 		case 0x0014/2:
-			/*
-                write 0x40,read (~0x08)
-                write 0x08,read (~0x01)
-
-                ---- ---- ---- ---x Boss Door - limit switch
-            */
-			return (ac_devram[offset]);
 		case 0x0016/2:
 			return okim6295_status_0_r(machine,0);
 		case 0x0018/2:
-			/*
-                ---- ---- ---- x--- Astronaut - switch
-            */
-			return ac_devram[offset];
 		case 0x001a/2:
 			return okim6295_status_1_r(machine,0);
 		case 0x0040/2:
 			/*
-                x-x- x-x- x-x- xx-- (ACTIVE HIGH?) [eori #$aaac, D0]
+				"Upper switch / Under Switch"
+				xx-x ---- xx-x xx-x
+				-x-- ---- ---- ---- Catch Switch - 3
+				--x- ---- ---- ---- Lower Switch - 3
+                ---x ---- ---- ---- Upper Switch - 3
+                ---- -x-- ---- ---- Catch Switch - 2
+                ---- --x- ---- ---- Lower Switch - 2
+                ---- ---x ---- ---- Upper Switch - 2
+                ---- ---- -x-- ---- Catch Switch - 1
+                ---- ---- --x- ---- Lower Switch - 1 (active high)
+                ---- ---- ---x ---- Upper Switch - 1 (active low)
                 ---- ---- ---- --xx Boss Door - Motor
             */
-			return ac_devram[offset];
+        //22dc8
+		{
+			static UINT16 ufo_sw1;
+			ufo_sw1 = ac_devram[offset] & 3;
+			if(ac_devram[offset] & 0x10)
+				ufo_sw1|= 0x10;
+			if(ac_devram[offset] & 0x40)
+				ufo_sw1|= 0x20;
+			if(ac_devram[offset] & 0x100)
+				ufo_sw1|=0x100;
+			if(ac_devram[offset] & 0x400)
+				ufo_sw1|=0x200;
+			if(ac_devram[offset] & 0x1000)
+				ufo_sw1|=0x1000;
+			if(ac_devram[offset] & 0x4000)
+				ufo_sw1|=0x2000;
+//			if(ac_devram[0x0048/2] & 0x0001)
+//				ufo_sw1|=0x0040;
+//			if(ac_devram[0x0048/2] & 0x0004)
+//				ufo_sw1|=0x0400;
+//			if(ac_devram[0x0048/2] & 0x0100)
+//				ufo_sw1|=0x4000;
+			return ufo_sw1;
+		}
 		case 0x0044/2:
 			/*
-                xxxx xxxx x-x- x-x- (ACTIVE HIGH?) [eori #$ffaa, D0]
+			    ---- ---- --x- ---- Lower Switch - 5
+				---- ---- ---x ---- Upper Switch - 5
+			    ---- ---- ---- --x- Lower Switch - 4 (active high)
+                ---- ---- ---- ---x Upper Switch - 4 (active low)
             */
+		{
+			static UINT16 ufo_sw2;
+			ufo_sw2 = 0;
+			if(ac_devram[offset] & 0x01)
+				ufo_sw2|= 1;
+			if(ac_devram[offset] & 0x04)
+				ufo_sw2|= 2;
+			if(ac_devram[offset] & 0x10)
+				ufo_sw2|=0x10;
+			if(ac_devram[offset] & 0x40)
+				ufo_sw2|=0x20;
+			return ufo_sw2;
+		}
+		case 0x0048/2:
 			return ac_devram[offset];
 		case 0x005c/2:
 			/*
@@ -325,19 +374,22 @@ static WRITE16_HANDLER(ac_devices_w)
 	COMBINE_DATA(&ac_devram[offset]);
 	switch(offset)
 	{
-		case 0x16/2:
-			if(ACCESSING_BITS_0_7)
+		case 0x00/2:
+			if (ACCESSING_BITS_0_7)
 			{
-				logerror("Request to play sample %02x with rom 2\n",data);
-				okim6295_data_0_w(machine,0,data);
+				okim6295_set_bank_base(0, 0x40000 * (data & 0x3));
+				okim6295_set_bank_base(1, 0x40000 * (data & 0x30) >> 4);
 			}
 			break;
+		case 0x14/2:
+		case 0x16/2:
+			if(ACCESSING_BITS_0_7)
+				okim6295_data_0_w(machine,0,data);
+			break;
+		case 0x18/2:
 		case 0x1a/2:
 			if(ACCESSING_BITS_0_7)
-			{
-				logerror("Request to play sample %02x with rom 1\n",data);
 				okim6295_data_1_w(machine,0,data);
-			}
 			break;
 		case 0x1c/2:
 			/*IRQ mask?*/
@@ -347,10 +399,16 @@ static WRITE16_HANDLER(ac_devices_w)
 		case 0x44/2:
 			break;
 		case 0x48/2:
+			break;
+		case 0x50/2:
 			led0 = ac_devram[offset];
+			//popmessage("%04x",led0);
+			break;
+		case 0x54/2:
+			led1 = ac_devram[offset];
+			//popmessage("%04x",led0);
 			break;
 	}
-	logerror("%04x %04x\n",offset*2,data);
 }
 
 /*This is always zero ATM*/
@@ -360,7 +418,7 @@ static WRITE16_HANDLER(ac_unk2_w)
 		popmessage("UNK-2 enabled %04x",data);
 }
 
-static ADDRESS_MAP_START( acommand, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( acommand_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x082000, 0x082005) AM_WRITE(ac_bgscroll_w)
 	AM_RANGE(0x082100, 0x082105) AM_WRITE(ac_txscroll_w)
@@ -376,46 +434,30 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( acommand )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+    PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+    PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+    PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN1 )
+    PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN2 )
+    PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE( 0x0020, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x0040, 0x0040, "IN0" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+    PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x1000, 0x1000, "Ticket Dispenser - 1" )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x2000, 0x2000, "Ticket Dispenser - 2")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
@@ -426,7 +468,7 @@ static INPUT_PORTS_START( acommand )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x0001, 0x0001, "IN2" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
@@ -508,17 +550,18 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( acommand_irq )
 {
-	if (cpu_getiloops() == 0)
-		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
-	else if (cpu_getiloops() == 1)
-		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
+	switch ( cpu_getiloops() )
+	{
+		case 0:		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
+		case 1:		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+	}
 }
 
 static MACHINE_DRIVER_START( acommand )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main",M68000,12000000)
-	MDRV_CPU_PROGRAM_MAP(acommand,0)
+	MDRV_CPU_PROGRAM_MAP(acommand_map,0)
 	MDRV_CPU_VBLANK_INT_HACK(acommand_irq,2)
 
 	/* video hardware */
@@ -535,15 +578,17 @@ static MACHINE_DRIVER_START( acommand )
 	MDRV_VIDEO_UPDATE(acommand)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
 
-	MDRV_SOUND_ADD("oki1", OKIM6295, 2400000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ADD("oki1", OKIM6295, 2112000)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 
-	MDRV_SOUND_ADD("oki2", OKIM6295, 2400000)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ADD("oki2", OKIM6295, 2112000)
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.0)
 MACHINE_DRIVER_END
 
 /***************************************************************************
@@ -573,15 +618,15 @@ ROM_START( acommand )
 	ROM_LOAD16_BYTE( "jalgp7.bin",   0x300000, 0x080000, CRC(44b71098) SHA1(a6ec2573f9a266d4f8f315f6e99b12525011f512) )
 	ROM_LOAD16_BYTE( "jalgp8.bin",   0x300001, 0x080000, CRC(ce0b7838) SHA1(46e34971cb62565a3948d8c0a18086648c32e13b) )
 
-	ROM_REGION( 0x100000, "oki2", 0 )
-	ROM_LOAD( "jalcf1.bin",   0x000000, 0x100000, CRC(24af21d3) SHA1(f68ab81a6c833b57ae9eef916a1c8578f3d893dd) )
-
-	ROM_REGION( 0x100000, "oki1", 0 )
+	ROM_REGION( 0x100000, "oki1", 0 )	/* M6295 samples */
 	ROM_LOAD( "jalcf2.bin",   0x000000, 0x100000, CRC(b982fd97) SHA1(35ee5b1b9be762ccfefda24d73e329ceea876deb) )
+
+	ROM_REGION( 0x100000, "oki2", 0 )	/* M6295 samples */
+	ROM_LOAD( "jalcf1.bin",   0x000000, 0x100000, CRC(24af21d3) SHA1(f68ab81a6c833b57ae9eef916a1c8578f3d893dd) )
 
 	ROM_REGION( 0x100000, "user1", 0 ) /* ? these two below are identical*/
 	ROM_LOAD( "jalmr14.bin",   0x000000, 0x080000, CRC(9d428fb7) SHA1(02f72938d73db932bd217620a175a05215f6016a) )
 	ROM_LOAD( "jalmr17.bin",   0x080000, 0x080000, CRC(9d428fb7) SHA1(02f72938d73db932bd217620a175a05215f6016a) )
 ROM_END
 
-GAME( 1990, acommand,  0,       acommand,  acommand,  0, ROT0, "Jaleco", "Alien Command" , GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1994, acommand,  0,       acommand,  acommand,  0, ROT0, "Jaleco", "Alien Command" , GAME_NOT_WORKING )
