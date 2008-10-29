@@ -88,7 +88,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 
 /************************************************************************/
 
-#define CHANGE_PC change_pc((I.sregs[PS]<<4) + I.ip)
+#define CHANGE_PC do { EMPTY_PREFETCH(); change_pc((I.sregs[PS]<<4) + I.ip); } while (0)
 
 #define SegBase(Seg) (I.sregs[Seg] << 4)
 
@@ -100,14 +100,18 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 #define PutMemB(Seg,Off,x) { write_byte(DefaultBase(Seg) + (Off), (x)); }
 #define PutMemW(Seg,Off,x) { write_word(DefaultBase(Seg) + (Off), (x)); }
 
-#define FETCH_XOR(a)		((a) ^ I.mem.fetch_xor)
-#define FETCH() (cpu_readop_arg(FETCH_XOR((I.sregs[PS]<<4)+I.ip++)))
+/* prefetch timing */
 
-#define FETCHWORD(var) { var=cpu_readop_arg(FETCH_XOR((I.sregs[PS]<<4)+I.ip))+(cpu_readop_arg(FETCH_XOR((I.sregs[PS]<<4)+I.ip+1))<<8); I.ip+=2; }
+#define FETCH() 			fetch()
+#define FETCH_XOR(a)		((a) ^ I.mem.fetch_xor)
+#define FETCHWORD()			fetchword()
+#define EMPTY_PREFETCH()	I.prefetch_reset = 1
+
+
 #define PUSH(val) { I.regs.w[SP]-=2; write_word((((I.sregs[SS]<<4)+I.regs.w[SP])),val); }
 #define POP(var) { var = read_word((((I.sregs[SS]<<4)+I.regs.w[SP]))); I.regs.w[SP]+=2; }
 
-#define GetModRM UINT32 ModRM=cpu_readop_arg(FETCH_XOR((I.sregs[PS]<<4)+I.ip++))
+#define GetModRM UINT32 ModRM=FETCH()
 
 /* Cycle count macros:
     CLK  - cycle count is the same on all processors
@@ -163,7 +167,9 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 	I.regs.w[Reg]=tmp1
 
 #define JMP(flag)							\
-	int tmp = (int)((INT8)FETCH());			\
+	int tmp;								\
+	EMPTY_PREFETCH();						\
+	tmp = (int)((INT8)FETCH());				\
 	if (flag)								\
 	{										\
 		static const UINT8 table[3]={3,10,10}; 	\

@@ -37,10 +37,10 @@ static struct {
 {							\
 	WORD val;					\
 	if (ModRM >= 0xc0)				\
-		FETCHWORD(I.regs.w[Mod_RM.RM.w[ModRM]]) \
+		I.regs.w[Mod_RM.RM.w[ModRM]] = FETCHWORD(); \
 	else {						\
 		(*GetEA[ModRM])();			\
-		FETCHWORD(val)				\
+		val = FETCHWORD();				\
 		write_word( EA , val);			\
 	}						\
 }

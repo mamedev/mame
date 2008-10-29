@@ -166,6 +166,10 @@ typedef struct
 	memory_interface	mem;
 
 	const nec_config *config;
+	
+	int		prefetch_size;
+	int		prefetch_count;
+	int		prefetch_reset;
 
 
 } nec_Regs;
@@ -189,6 +193,45 @@ static char seg_prefix;		/* prefix segment indicator */
 #define INT_IRQ 0x01
 #define NMI_IRQ 0x02
 
+INLINE void prefetch(void)
+{
+	I.prefetch_count--;
+}
+
+static void do_prefetch(int previous_ICount)
+{
+	int diff = previous_ICount - (int) nec_ICount;
+
+	while (diff>0 && I.prefetch_count < I.prefetch_size)
+	{
+		diff -= 4;
+		I.prefetch_count++;
+	}
+
+	if (diff<0)
+		nec_ICount += diff;
+
+	if (I.prefetch_reset || I.prefetch_count<0)
+	{
+		I.prefetch_count = 0;
+		I.prefetch_reset = 0;
+	}
+
+}
+
+INLINE UINT8 fetch(void) 
+{
+	prefetch();
+	return cpu_readop_arg(FETCH_XOR((I.sregs[PS]<<4)+I.ip++));
+}
+
+INLINE UINT16 fetchword(void) 
+{
+	UINT16 r = FETCH();
+	r |= (FETCH()<<8);
+	return r;
+}
+
 #include "necinstr.h"
 #include "necea.h"
 #include "necmodrm.h"
@@ -199,7 +242,10 @@ static UINT8 parity_table[256];
 
 static UINT8 fetchop(void)
 {
-	UINT8 ret = cpu_readop( FETCH_XOR( ( I.sregs[PS]<<4)+I.ip++));
+	UINT8 ret;
+	
+	prefetch();
+	ret = cpu_readop( FETCH_XOR( ( I.sregs[PS]<<4)+I.ip++));
 
 	if (I.MF == 1)
 		if (I.config->v25v35_decryptiontable)
@@ -208,6 +254,7 @@ static UINT8 fetchop(void)
 		}
 	return ret;
 }
+
 
 
 /***************************************************************************/
@@ -553,8 +600,8 @@ OP( 0x65, i_repc  ) { 	UINT32 next = fetchop();	UINT16 c = I.regs.w[CW];
 	seg_prefix=FALSE;
 }
 
-OP( 0x68, i_push_d16 ) { UINT32 tmp;	FETCHWORD(tmp); PUSH(tmp);	CLKW(12,12,5,12,8,5,I.regs.w[SP]);	}
-OP( 0x69, i_imul_d16 ) { UINT32 tmp;	DEF_r16w; 	FETCHWORD(tmp); dst = (INT32)((INT16)src)*(INT32)((INT16)tmp); I.CarryVal = I.OverVal = (((INT32)dst) >> 15 != 0) && (((INT32)dst) >> 15 != -1);     RegWord(ModRM)=(WORD)dst;     nec_ICount-=(ModRM >=0xc0 )?38:47;}
+OP( 0x68, i_push_d16 ) { UINT32 tmp;	tmp = FETCHWORD(); PUSH(tmp);	CLKW(12,12,5,12,8,5,I.regs.w[SP]);	}
+OP( 0x69, i_imul_d16 ) { UINT32 tmp;	DEF_r16w; 	tmp = FETCHWORD(); dst = (INT32)((INT16)src)*(INT32)((INT16)tmp); I.CarryVal = I.OverVal = (((INT32)dst) >> 15 != 0) && (((INT32)dst) >> 15 != -1);     RegWord(ModRM)=(WORD)dst;     nec_ICount-=(ModRM >=0xc0 )?38:47;}
 OP( 0x6a, i_push_d8  ) { UINT32 tmp = (WORD)((INT16)((INT8)FETCH())); 	PUSH(tmp);	CLKW(11,11,5,11,7,3,I.regs.w[SP]);	}
 OP( 0x6b, i_imul_d8  ) { UINT32 src2; DEF_r16w; src2= (WORD)((INT16)((INT8)FETCH())); dst = (INT32)((INT16)src)*(INT32)((INT16)src2); I.CarryVal = I.OverVal = (((INT32)dst) >> 15 != 0) && (((INT32)dst) >> 15 != -1); RegWord(ModRM)=(WORD)dst; nec_ICount-=(ModRM >=0xc0 )?31:39; }
 OP( 0x6c, i_insb     ) { PutMemB(DS1,I.regs.w[IY],read_port_byte(I.regs.w[DW])); I.regs.w[IY]+= -2 * I.DF + 1; CLK(8); }
@@ -668,17 +715,17 @@ OP( 0x97, i_xchg_axdi ) { XchgAWReg(IY); CLK(3); }
 
 OP( 0x98, i_cbw       ) { I.regs.b[AH] = (I.regs.b[AL] & 0x80) ? 0xff : 0;		CLK(2);	}
 OP( 0x99, i_cwd       ) { I.regs.w[DW] = (I.regs.b[AH] & 0x80) ? 0xffff : 0;	CLK(4);	}
-OP( 0x9a, i_call_far  ) { UINT32 tmp, tmp2;	FETCHWORD(tmp); FETCHWORD(tmp2); PUSH(I.sregs[PS]); PUSH(I.ip); I.ip = (WORD)tmp; I.sregs[PS] = (WORD)tmp2; CHANGE_PC; CLKW(29,29,13,29,21,9,I.regs.w[SP]); }
+OP( 0x9a, i_call_far  ) { UINT32 tmp, tmp2;	tmp = FETCHWORD(); tmp2 = FETCHWORD(); PUSH(I.sregs[PS]); PUSH(I.ip); I.ip = (WORD)tmp; I.sregs[PS] = (WORD)tmp2; CHANGE_PC; CLKW(29,29,13,29,21,9,I.regs.w[SP]); }
 OP( 0x9b, i_wait      ) { if (!I.poll_state) I.ip--; CLK(5); }
 OP( 0x9c, i_pushf     ) { UINT16 tmp = CompressFlags(); PUSH( tmp ); CLKS(12,8,3); }
 OP( 0x9d, i_popf      ) { UINT32 tmp; POP(tmp); ExpandFlags(tmp); CLKS(12,8,5); if (I.TF) nec_trap(); }
 OP( 0x9e, i_sahf      ) { UINT32 tmp = (CompressFlags() & 0xff00) | (I.regs.b[AH] & 0xd5); ExpandFlags(tmp); CLKS(3,3,2); }
 OP( 0x9f, i_lahf      ) { I.regs.b[AH] = CompressFlags() & 0xff; CLKS(3,3,2); }
 
-OP( 0xa0, i_mov_aldisp ) { UINT32 addr; FETCHWORD(addr); I.regs.b[AL] = GetMemB(DS0, addr); CLKS(10,10,5); }
-OP( 0xa1, i_mov_axdisp ) { UINT32 addr; FETCHWORD(addr); I.regs.w[AW] = GetMemW(DS0, addr); CLKW(14,14,7,14,10,5,addr); }
-OP( 0xa2, i_mov_dispal ) { UINT32 addr; FETCHWORD(addr); PutMemB(DS0, addr, I.regs.b[AL]);  CLKS(9,9,3); }
-OP( 0xa3, i_mov_dispax ) { UINT32 addr; FETCHWORD(addr); PutMemW(DS0, addr, I.regs.w[AW]);  CLKW(13,13,5,13,9,3,addr); }
+OP( 0xa0, i_mov_aldisp ) { UINT32 addr; addr = FETCHWORD(); I.regs.b[AL] = GetMemB(DS0, addr); CLKS(10,10,5); }
+OP( 0xa1, i_mov_axdisp ) { UINT32 addr; addr = FETCHWORD(); I.regs.w[AW] = GetMemW(DS0, addr); CLKW(14,14,7,14,10,5,addr); }
+OP( 0xa2, i_mov_dispal ) { UINT32 addr; addr = FETCHWORD(); PutMemB(DS0, addr, I.regs.b[AL]);  CLKS(9,9,3); }
+OP( 0xa3, i_mov_dispax ) { UINT32 addr; addr = FETCHWORD(); PutMemW(DS0, addr, I.regs.w[AW]);  CLKW(13,13,5,13,9,3,addr); }
 OP( 0xa4, i_movsb      ) { UINT32 tmp = GetMemB(DS0,I.regs.w[IX]); PutMemB(DS1,I.regs.w[IY], tmp); I.regs.w[IY] += -2 * I.DF + 1; I.regs.w[IX] += -2 * I.DF + 1; CLKS(8,8,6); }
 OP( 0xa5, i_movsw      ) { UINT32 tmp = GetMemW(DS0,I.regs.w[IX]); PutMemW(DS1,I.regs.w[IY], tmp); I.regs.w[IY] += -4 * I.DF + 2; I.regs.w[IX] += -4 * I.DF + 2; CLKS(16,16,10); }
 OP( 0xa6, i_cmpsb      ) { UINT32 src = GetMemB(DS1, I.regs.w[IY]); UINT32 dst = GetMemB(DS0, I.regs.w[IX]); SUBB; I.regs.w[IY] += -2 * I.DF + 1; I.regs.w[IX] += -2 * I.DF + 1; CLKS(14,14,14); }
@@ -857,9 +904,9 @@ OP( 0xe5, i_inax   ) { UINT8 port = FETCH(); I.regs.w[AW] = read_port_word(port)
 OP( 0xe6, i_outal  ) { UINT8 port = FETCH(); write_port_byte(port, I.regs.b[AL]); CLKS(8,8,3);	}
 OP( 0xe7, i_outax  ) { UINT8 port = FETCH(); write_port_word(port, I.regs.w[AW]); CLKW(12,12,5,12,8,3,port);	}
 
-OP( 0xe8, i_call_d16 ) { UINT32 tmp; FETCHWORD(tmp); PUSH(I.ip); I.ip = (WORD)(I.ip+(INT16)tmp); CHANGE_PC; nec_ICount-=24; }
-OP( 0xe9, i_jmp_d16  ) { UINT32 tmp; FETCHWORD(tmp); I.ip = (WORD)(I.ip+(INT16)tmp); CHANGE_PC; nec_ICount-=15; }
-OP( 0xea, i_jmp_far  ) { UINT32 tmp,tmp1; FETCHWORD(tmp); FETCHWORD(tmp1); I.sregs[PS] = (WORD)tmp1; 	I.ip = (WORD)tmp; CHANGE_PC; nec_ICount-=27;  }
+OP( 0xe8, i_call_d16 ) { UINT32 tmp; tmp = FETCHWORD(); PUSH(I.ip); I.ip = (WORD)(I.ip+(INT16)tmp); CHANGE_PC; nec_ICount-=24; }
+OP( 0xe9, i_jmp_d16  ) { UINT32 tmp; tmp = FETCHWORD(); I.ip = (WORD)(I.ip+(INT16)tmp); CHANGE_PC; nec_ICount-=15; }
+OP( 0xea, i_jmp_far  ) { UINT32 tmp,tmp1; tmp = FETCHWORD(); tmp1 = FETCHWORD(); I.sregs[PS] = (WORD)tmp1; 	I.ip = (WORD)tmp; CHANGE_PC; nec_ICount-=27;  }
 OP( 0xeb, i_jmp_d8   ) { int tmp = (int)((INT8)FETCH()); nec_ICount-=12; I.ip = (WORD)(I.ip+tmp); }
 OP( 0xec, i_inaldx   ) { I.regs.b[AL] = read_port_byte(I.regs.w[DW]); CLKS(8,8,5);}
 OP( 0xed, i_inaxdx   ) { I.regs.w[AW] = read_port_word(I.regs.w[DW]); CLKW(12,12,7,12,8,5,I.regs.w[DW]); }
@@ -940,7 +987,7 @@ OP( 0xf6, i_f6pre ) { UINT32 tmp; UINT32 uresult,uresult2; INT32 result,result2;
 OP( 0xf7, i_f7pre   ) { UINT32 tmp,tmp2; UINT32 uresult,uresult2; INT32 result,result2;
 	GetModRM; tmp = GetRMWord(ModRM);
     switch (ModRM & 0x38) {
-		case 0x00: FETCHWORD(tmp2); tmp &= tmp2; I.CarryVal = I.OverVal = 0; SetSZPF_Word(tmp); nec_ICount-=(ModRM >=0xc0 )?4:11; break; /* TEST */
+		case 0x00: tmp2 = FETCHWORD(); tmp &= tmp2; I.CarryVal = I.OverVal = 0; SetSZPF_Word(tmp); nec_ICount-=(ModRM >=0xc0 )?4:11; break; /* TEST */
 		case 0x08: logerror("%06x: Undefined opcode 0xf7 0x08\n",activecpu_get_pc()); break;
  		case 0x10: PutbackRMWord(ModRM,~tmp); nec_ICount-=(ModRM >=0xc0 )?2:16; break; /* NOT */
 		case 0x18: I.CarryVal=(tmp!=0); tmp=(~tmp)+1; SetSZPF_Word(tmp); PutbackRMWord(ModRM,tmp&0xffff); nec_ICount-=(ModRM >=0xc0 )?2:16; break; /* NEG */
@@ -1199,8 +1246,11 @@ static void v30_init(int index, int clock, const void *config, int (*irqcallback
 	configure_memory_16bit();
 }
 static int v30_execute(int cycles) {
+	int prev_ICount;
+	
 	nec_ICount=cycles;
 	chip_type=V30;
+	I.prefetch_size = 6;
 
 	while(nec_ICount>0) {
 		/* Dispatch IRQ */
@@ -1217,7 +1267,9 @@ static int v30_execute(int cycles) {
 			I.no_interrupt--;
 
 		debugger_instruction_hook(Machine, (I.sregs[PS]<<4) + I.ip);
+		prev_ICount = nec_ICount;
 		nec_instruction[fetchop()]();
+		do_prefetch(prev_ICount);
     }
 	return cycles - nec_ICount;
 }
@@ -1227,6 +1279,8 @@ static int v30_execute(int cycles) {
 static void v33_init(int index, int clock, const void *config, int (*irqcallback)(int))
 {
 	nec_init(index, clock, config, irqcallback, 2);
+	I.prefetch_count = 0;
+	I.prefetch_size = 6;		/* ???? */
 	configure_memory_16bit();
 }
 static int v33_execute(int cycles)
