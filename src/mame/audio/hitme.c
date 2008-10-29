@@ -67,7 +67,7 @@ DISCRETE_SOUND_START(hitme)
 	DISCRETE_LOGIC_DFLIPFLOP(NODE_22,1,NODE_21,1,HITME_OUT1,HITME_ENABLE_VAL)
 
 	/* The output of the latch goes through a series of various capacitors in parallel. */
-	DISCRETE_COMP_ADDER(NODE_23,1,NODE_22,&desc_hitme_adder)
+	DISCRETE_COMP_ADDER(NODE_23,NODE_22,&desc_hitme_adder)
 
 	/* The combined capacitance is input to a 555 timer in astable mode. */
 	DISCRETE_555_ASTABLE(NODE_24,1,22e3,39e3,NODE_23,&desc_hitme_555)

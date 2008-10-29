@@ -626,7 +626,7 @@ DISCRETE_SOUND_START(montecar)
 	/* Also I shifted the frequencies up for it to  */
 	/* sound different from the player's car.       */
 	/************************************************/
-	DISCRETE_COMP_ADDER(NODE_30, 1, MONTECAR_DRONE_LOUD_DATA, &montecar_drone_vol_res)	// make sure to change the node value in the mixer table if you change this node number
+	DISCRETE_COMP_ADDER(NODE_30, MONTECAR_DRONE_LOUD_DATA, &montecar_drone_vol_res)	// make sure to change the node value in the mixer table if you change this node number
 
 	DISCRETE_ADJUSTMENT_TAG(NODE_40,
 				RES_K(260),	// R85 + R88 @ max

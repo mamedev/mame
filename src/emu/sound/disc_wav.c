@@ -39,6 +39,23 @@ struct dss_counter_context
 	double	t_left;		/* time unused during last sample in seconds */
 };
 
+#define DSS_INV_TAB_SIZE	500
+
+struct dss_inverter_osc_context
+{
+	double	w;
+	double  wc;
+	double	v_cap;
+	double  v_g2_old;
+	double	rp;
+	double  r1;
+	double  r2;
+	double  c;
+	double	tf_a;
+	double	tf_b;
+	double  tf_tab[DSS_INV_TAB_SIZE];
+};
+
 struct dss_lfsr_context
 {
 	unsigned int	lfsr_reg;
@@ -136,23 +153,6 @@ struct dss_squarewfix_context
 struct dss_trianglewave_context
 {
 	double phase;
-};
-
-#define DSS_INV_TAB_SIZE	500
-
-struct dss_inverter_osc_context
-{
-	double	w;
-	double  wc;
-	double	v_cap;
-	double  v_g2_old;
-	double	rp;
-	double  r1;
-	double  r2;
-	double  c;
-	double	tf_a;
-	double	tf_b;
-	double  tf_tab[DSS_INV_TAB_SIZE];
 };
 
 
@@ -1139,7 +1139,7 @@ static void dss_schmitt_osc_step(node_description *node)
 				/* calculate the overshoot time */
 				t = context->rc * log(1.0 / (1.0 - ((new_vCap - info->trshRise) / (info->vGate - v_cap))));
 				/* calculate new exponent because of reduced time */
-				exponent = 1.0 - exp(-t / context->rc);
+				exponent = RC_CHARGE_EXP_DT(context->rc, t);
 				v_cap    = new_vCap = info->trshRise;
 				context->state = 0;
 			}
@@ -1153,7 +1153,7 @@ static void dss_schmitt_osc_step(node_description *node)
 				/* calculate the overshoot time */
 				t = context->rc * log(1.0 / (1.0 - ((info->trshFall - new_vCap) / v_cap)));
 				/* calculate new exponent because of reduced time */
-				exponent = 1.0 - exp(-t / context->rc);
+				exponent = RC_CHARGE_EXP_DT(context->rc, t);
 				v_cap    = new_vCap = info->trshFall;
 				context->state = 1;
 			}
@@ -1198,8 +1198,7 @@ static void dss_schmitt_osc_reset(node_description *node)
      * So use this for the RC charge constant. */
 	rSource     = 1.0 / ((1.0 / info->rIn) + (1.0 / info->rFeedback));
 	context->rc = rSource * info->c;
-	context->exponent = -1.0 / (context->rc  * discrete_current_context->sample_rate);
-	context->exponent = 1.0 - exp(context->exponent);
+	context->exponent = RC_CHARGE_EXP(context->rc);
 
 	/* Cap is at 0V on power up.  Causing output to be high. */
 	context->v_cap = 0;

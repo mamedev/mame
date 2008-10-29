@@ -57,47 +57,7 @@
  *
  *************************************/
 
-struct _discrete_info
-{
-	/* emulation info */
-	int		sndindex;
-	int		sample_rate;
-	double	sample_time;
-
-	/* internal node tracking */
-	int node_count;
-	node_description **running_order;
-	node_description **indexed_node;
-	node_description *node_list;
-
-	/* the input streams */
-	int discrete_input_streams;
-	stream_sample_t *input_stream_data[DISCRETE_MAX_OUTPUTS];
-
-	/* output node tracking */
-	int discrete_outputs;
-	node_description *output_node[DISCRETE_MAX_OUTPUTS];
-
-	/* the output stream */
-	sound_stream *discrete_stream;
-
-	/* debugging statics */
-	FILE *disclogfile;
-
-	/* csvlog tracking */
-	int num_csvlogs;
-	FILE *disc_csv_file[DISCRETE_MAX_CSVLOGS];
-	node_description *csvlog_node[DISCRETE_MAX_CSVLOGS];
-	INT64 sample_num;
-
-	/* wavelog tracking */
-	int num_wavelogs;
-	wav_file *disc_wav_file[DISCRETE_MAX_WAVELOGS];
-	node_description *wavelog_node[DISCRETE_MAX_WAVELOGS];
-};
-typedef struct _discrete_info discrete_info;
-
-static discrete_info *discrete_current_context;
+discrete_info *discrete_current_context = NULL;
 
 
 
@@ -218,9 +178,9 @@ static const discrete_module module_list[] =
 	{ DST_ASWITCH     ,"DST_ASWITCH"     , 1 ,0                                      ,NULL                  ,dst_aswitch_step     },
 	{ DST_TRANSFORM   ,"DST_TRANSFORM"   , 1 ,0                                      ,NULL                  ,dst_transform_step   },
 	/* Component specific */
-	{ DST_COMP_ADDER  ,"DST_COMP_ADDER"  , 1 ,0                                      ,NULL                  ,dst_comp_adder_step  },
+	{ DST_COMP_ADDER  ,"DST_COMP_ADDER"  , 1 ,sizeof(struct dst_comp_adder_context)  ,dst_comp_adder_reset  ,dst_comp_adder_step  },
 	{ DST_DAC_R1      ,"DST_DAC_R1"      , 1 ,sizeof(struct dst_dac_r1_context)      ,dst_dac_r1_reset      ,dst_dac_r1_step      },
-	{ DST_DIODE_MIX   ,"DST_DIODE_MIX"   , 1 ,sizeof(struct dst_size_context)        ,dst_diode_mix_reset   ,dst_diode_mix_step   },
+	{ DST_DIODE_MIX   ,"DST_DIODE_MIX"   , 1 ,sizeof(struct dst_diode_mix__context)  ,dst_diode_mix_reset   ,dst_diode_mix_step   },
 	{ DST_INTEGRATE   ,"DST_INTEGRATE"   , 1 ,sizeof(struct dst_integrate_context)   ,dst_integrate_reset   ,dst_integrate_step   },
 	{ DST_MIXER       ,"DST_MIXER"       , 1 ,sizeof(struct dst_mixer_context)       ,dst_mixer_reset       ,dst_mixer_step       },
 	{ DST_OP_AMP      ,"DST_OP_AMP"      , 1 ,sizeof(struct dst_op_amp_context)      ,dst_op_amp_reset      ,dst_op_amp_step      },
@@ -304,6 +264,7 @@ static void *discrete_start(const char *tag, int sndindex, int clock, const void
 	else
 		info->sample_rate = Machine->sample_rate;
 	info->sample_time = 1.0 / info->sample_rate;
+	info->neg_sample_time = - info->sample_time;
 
 	/* create the logfile */
 	sprintf(name, "discrete%d.log", info->sndindex);

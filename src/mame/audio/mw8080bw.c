@@ -516,11 +516,9 @@ static DISCRETE_SOUND_START(maze)
 					16,							/* SIZE */
 					&maze_74147_table)
 	DISCRETE_COMP_ADDER(MAZE_R305_306_308,		/* value of selected parallel circuit R305, R306, R308 */
-					1,							/* ENAB */
 					NODE_32,					/* DATA */
 					&maze_r305_306_308)
 	DISCRETE_COMP_ADDER(MAZE_R303_309,			/* value of selected parallel circuit R303, R309 */
-					1,							/* ENAB */
 					MAZE_PLAYER_SEL,			/* DATA */
 					&maze_r303_309)
 	DISCRETE_OP_AMP_OSCILLATOR(NODE_36,			/* IC J1, pin 4 */
@@ -985,11 +983,9 @@ static DISCRETE_SOUND_START(checkmat)
      * Tone generator
      ************************************************/
 	DISCRETE_COMP_ADDER(CHECKMAT_R401_402_400,	/* value of selected parallel circuit R401, R402, R400 */
-					1,							/* ENAB */
 					CHECKMAT_TONE_DATA_45,		/* DATA */
 					&checkmat_r401_402_400)
 	DISCRETE_COMP_ADDER(CHECKMAT_R407_406_410,	/* value of selected parallel circuit R407, R406, R410 */
-					1,							/* ENAB */
 					CHECKMAT_TONE_DATA_67,		/* DATA */
 					&checkmat_r407_406_410)
 	DISCRETE_OP_AMP_OSCILLATOR(NODE_30,			/* IC N3/4, pin 4 */
@@ -3441,7 +3437,6 @@ static const discrete_mixer_desc invaders_mixer =
 #define INVADERS_FLEET(_board)															\
 	DISCRETE_INPUT_DATA  (INVADERS_NODE(INVADERS_FLEET_DATA, _board))					\
 	DISCRETE_COMP_ADDER(INVADERS_NODE(30, _board),                                      \
-					1,												/* ENAB */          \
 					INVADERS_NODE(INVADERS_FLEET_DATA, _board),		/* DATA */          \
 					&invaders_thump_resistors)                                          \
 	DISCRETE_555_ASTABLE(INVADERS_NODE(31, _board),					/* IC F3, pin 6 */  \

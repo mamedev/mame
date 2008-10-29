@@ -238,11 +238,11 @@
  * DISCRETE_TRANSFORM4(NODE,INP0,INP1,INP2,INP3,FUNCT)
  * DISCRETE_TRANSFORM5(NODE,INP0,INP1,INP2,INP3,INP4,FUNCT)
  *
- * DISCRETE_COMP_ADDER(NODE,ENAB,DATA,TABLE)
+ * DISCRETE_COMP_ADDER(NODE,DATA,TABLE)
  * DISCRETE_DAC_R1(NODE,ENAB,DATA,VDATA,LADDER)
- * DISCRETE_DIODE_MIXER2(NODE,VJUNC,IN0,IN1)
- * DISCRETE_DIODE_MIXER3(NODE,VJUNC,IN0,IN1,IN2)
- * DISCRETE_DIODE_MIXER4(NODE,VJUNC,IN0,IN1,IN2,IN3)
+ * DISCRETE_DIODE_MIXER2(NODE,IN0,IN1,TABLE)
+ * DISCRETE_DIODE_MIXER3(NODE,IN0,IN1,IN2,TABLE)
+ * DISCRETE_DIODE_MIXER4(NODE,IN0,IN1,IN2,IN3,TABLE)
  * DISCRETE_INTEGRATE(NODE,TRG0,TRG1,INFO)
  * DISCRETE_MIXER2(NODE,ENAB,IN0,IN1,INFO)
  * DISCRETE_MIXER3(NODE,ENAB,IN0,IN1,IN2,INFO)
@@ -300,11 +300,15 @@
  * DISCRETE_555_VCO1_CV(NODE,RESET,VIN,CTRLV,OPTIONS)
  * DISCRETE_566(NODE,ENAB,VMOD,R,C,OPTIONS)
  *
- * DISCRETE_CUSTOM1(NODE,ENAB,IN0,INFO)
- * DISCRETE_CUSTOM2(NODE,ENAB,IN0,IN1,INFO)
- * DISCRETE_CUSTOM3(NODE,ENAB,IN0,IN1,IN2,INFO)
- * DISCRETE_CUSTOM4(NODE,ENAB,IN0,IN1,IN2,IN3,INFO)
- * DISCRETE_CUSTOM5(NODE,ENAB,IN0,IN1,IN2,IN3,IN4,INFO)
+ * DISCRETE_CUSTOM1(NODE,IN0,INFO)
+ * DISCRETE_CUSTOM2(NODE,IN0,IN1,INFO)
+ * DISCRETE_CUSTOM3(NODE,IN0,IN1,IN2,INFO)
+ * DISCRETE_CUSTOM4(NODE,IN0,IN1,IN2,IN3,INFO)
+ * DISCRETE_CUSTOM5(NODE,IN0,IN1,IN2,IN3,IN4,INFO)
+ * DISCRETE_CUSTOM6(NODE,IN0,IN1,IN2,IN3,IN4,IN5,INFO)
+ * DISCRETE_CUSTOM7(NODE,IN0,IN1,IN2,IN3,IN4,IN5,IN6,INFO)
+ * DISCRETE_CUSTOM8(NODE,IN0,IN1,IN2,IN3,IN4,IN5,IN6,IN7,INFO)
+ * DISCRETE_CUSTOM9(NODE,IN0,IN1,IN2,IN3,IN4,IN5,IN6,IN7,IN8,INFO)
  *
  * DISCRETE_CSVLOG1(NODE1)
  * DISCRETE_CSVLOG2(NODE1,NODE2)
@@ -1683,11 +1687,11 @@
  *  Declaration syntax
  *
  *     DISCRETE_COMP_ADDER(name of node,
- *                         enable node or static value,
  *                         data node (static value is useless),
  *                         address of discrete_comp_adder_table structure)
  *
  *     discrete_comp_adder_table = {type, cDefault, length, c{}}
+ *          note: length can be a maximum of 8
  *
  *  Circuit Types:
  *     DISC_COMP_P_CAPACITOR - parallel capacitors
@@ -1760,10 +1764,14 @@
  *  Declaration syntax
  *
  *     DISCRETE_DIODE_MIXERx(name of node,
- *         (x = 2/3/4)       voltage drop of the diode junction (static value),
- *                           input 0 node,
+ *         (x = 2/3/4)       input 0 node,
  *                           input 1 node,
- *                           ...)
+ *                           ...,
+ *                           address of v_junction table)
+ *
+ *    v_junction table can be set to NULL if you want all diodes to
+ *                     default to a 0.5V drop.  Otherwise use a
+ *                     table of doubles to specify juntion voltages.
  *
  * EXAMPLES: see dkong
  *
@@ -2681,11 +2689,11 @@
  *                          enable,
  *                          input node (or value),
  *                          switch node (or value),
- *                          R in Ohms,
- *                          C1 in Farads,
- *                          C2 in Farads,
- *                          C3 in Farads,
- *                          C4 in Farads)
+ *                          R in Ohms (static value),
+ *                          C1 in Farads (static value),
+ *                          C2 in Farads (static value),
+ *                          C3 in Farads (static value),
+ *                          C4 in Farads (static value))
  *
  *     This is a typical filter circuit in circusc or scramble.
  *     Switches are usually CD4066 with a "open" resistance of
@@ -3095,6 +3103,8 @@
  *     DISC_566_OUT_TRIANGLE - Pin 4 Triangle Wave Output
  *     DISC_566_OUT_LOGIC    - Internal Flip/Flop Output
  *
+ * EXAMPLES: see Starship 1
+ *
  ***********************************************************************
  *
  * DISCRETE_74LS624 - VCO.
@@ -3142,19 +3152,20 @@
  ***********************************************************************
  *
  * DISCRETE_CUSTOMx - Link to custom code
- *     where x = 1 to 5
+ *     where x = 1 to 9
  *
  *  Declaration syntax
  *
  *     DISCRETE_CUSTOMx(name of node,
- *                      enable node or static value,
  *                      input 0 node or static value, ...)
  *
  *     discrete_custom_info = {reset, step, contextsize, custom}
  *                             reset  = address called to reset a node after creation or system reset
  *                             step   = address called to execute one time delta of output update
  *                             contextsize = size of context to create
- *                             custom = address of specific initialisation data
+ *                             custom = address of specific initialization data
+ *
+ * EXAMPLES: see Donkey Kong
  *
  ***********************************************************************
  =======================================================================
@@ -3235,6 +3246,30 @@
  *  Multiple outputs can be used up to DISCRETE_MAX_OUTPUTS.
  *
  ************************************************************************/
+
+#include "streams.h"
+#include "wavwrite.h"
+
+
+
+/*************************************
+ *
+ *  macros
+ *  see also: emu\machine\rescap.h
+ *
+ *************************************/
+
+/* calculate charge exponent using discrete sample time */
+#define RC_CHARGE_EXP(rc)				(1.0 - exp(discrete_current_context->neg_sample_time / (rc)))
+/* calculate charge exponent using given sample time */
+#define RC_CHARGE_EXP_DT(rc, dt)		(1.0 - exp(-(dt) / (rc)))
+#define RC_CHARGE_NEG_EXP_DT(rc, dt)	(1.0 - exp((dt) / (rc)))
+
+/* calculate discharge exponent using discrete sample time */
+#define RC_DISCHARGE_EXP(rc)			(exp(discrete_current_context->neg_sample_time / (rc)))
+/* calculate discharge exponent using given sample time */
+#define RC_DISCHARGE_EXP_DT(rc, dt)		(exp(-(dt) / (rc)))
+#define RC_DISCHARGE_NEG_EXP_DT(rc, dt)	(exp((dt) / (rc)))
 
 
 /*************************************
@@ -3520,6 +3555,57 @@ struct _node_description
 #endif
 };
 
+
+/*************************************
+ *
+ *  Core runtime info
+ *
+ *  this structure is exposed mainly
+ *  to read the sample rate info
+ *  and possibly context info
+ *
+ *************************************/
+
+typedef struct _discrete_info discrete_info;
+struct _discrete_info
+{
+	/* emulation info */
+	int		sndindex;
+	int		sample_rate;
+	double	sample_time;
+	double	neg_sample_time;
+
+	/* internal node tracking */
+	int node_count;
+	node_description **running_order;
+	node_description **indexed_node;
+	node_description *node_list;
+
+	/* the input streams */
+	int discrete_input_streams;
+	stream_sample_t *input_stream_data[DISCRETE_MAX_OUTPUTS];
+
+	/* output node tracking */
+	int discrete_outputs;
+	node_description *output_node[DISCRETE_MAX_OUTPUTS];
+
+	/* the output stream */
+	sound_stream *discrete_stream;
+
+	/* debugging statics */
+	FILE *disclogfile;
+
+	/* csvlog tracking */
+	int num_csvlogs;
+	FILE *disc_csv_file[DISCRETE_MAX_CSVLOGS];
+	node_description *csvlog_node[DISCRETE_MAX_CSVLOGS];
+	INT64 sample_num;
+
+	/* wavelog tracking */
+	int num_wavelogs;
+	wav_file *disc_wav_file[DISCRETE_MAX_WAVELOGS];
+	node_description *wavelog_node[DISCRETE_MAX_WAVELOGS];
+};
 
 
 /*************************************
@@ -4102,11 +4188,11 @@ enum
 #define DISCRETE_TRANSFORM4(NODE,INP0,INP1,INP2,INP3,FUNCT)             { NODE, DST_TRANSFORM   , 4, { INP0,INP1,INP2,INP3 }, { INP0,INP1,INP2,INP3 }, FUNCT, "DISCRETE_TRANSFORM4" },
 #define DISCRETE_TRANSFORM5(NODE,INP0,INP1,INP2,INP3,INP4,FUNCT)        { NODE, DST_TRANSFORM   , 5, { INP0,INP1,INP2,INP3,INP4 }, { INP0,INP1,INP2,INP3,INP4 }, FUNCT, "DISCRETE_TRANSFORM5" },
 /* Component specific */
-#define DISCRETE_COMP_ADDER(NODE,ENAB,DATA,TABLE)                       { NODE, DST_COMP_ADDER  , 2, { ENAB,DATA }, { ENAB,DATA }, TABLE, "DISCRETE_COMP_ADDER" },
+#define DISCRETE_COMP_ADDER(NODE,DATA,TABLE)                            { NODE, DST_COMP_ADDER  , 1, { DATA }, { DATA }, TABLE, "DISCRETE_COMP_ADDER" },
 #define DISCRETE_DAC_R1(NODE,ENAB,DATA,VDATA,LADDER)                    { NODE, DST_DAC_R1      , 3, { ENAB,DATA,VDATA }, { ENAB,DATA,VDATA }, LADDER, "DISCRETE_DAC_R1" },
-#define DISCRETE_DIODE_MIXER2(NODE,VJUNC,IN0,IN1)                       { NODE, DST_DIODE_MIX   , 3, { NODE_NC,IN0,IN1 }, { VJUNC,IN0,IN1 }, NULL, "DISCRETE_DIODE_MIXER2" },
-#define DISCRETE_DIODE_MIXER3(NODE,VJUNC,IN0,IN1,IN2)                   { NODE, DST_DIODE_MIX   , 4, { NODE_NC,IN0,IN1,IN2 }, { VJUNC,IN0,IN1,IN2 }, INFO, "DISCRETE_DIODE_MIXER3" },
-#define DISCRETE_DIODE_MIXER4(NODE,VJUNC,IN0,IN1,IN2,IN3)               { NODE, DST_DIODE_MIX   , 5, { NODE_NC,IN0,IN1,IN2,IN3 }, { VJUNC,IN0,IN1,IN2,IN3 }, INFO, "DISCRETE_DIODE_MIXER4" },
+#define DISCRETE_DIODE_MIXER2(NODE,IN0,IN1,TABLE)                       { NODE, DST_DIODE_MIX   , 3, { IN0,IN1 }, { IN0,IN1 }, TABLE, "DISCRETE_DIODE_MIXER2" },
+#define DISCRETE_DIODE_MIXER3(NODE,IN0,IN1,IN2,TABLE)                   { NODE, DST_DIODE_MIX   , 4, { IN0,IN1,IN2 }, { IN0,IN1,IN2 }, TABLE, "DISCRETE_DIODE_MIXER3" },
+#define DISCRETE_DIODE_MIXER4(NODE,IN0,IN1,IN2,IN3,TABLE)               { NODE, DST_DIODE_MIX   , 5, { IN0,IN1,IN2,IN3 }, { IN0,IN1,IN2,IN3 }, TABLE, "DISCRETE_DIODE_MIXER4" },
 #define DISCRETE_INTEGRATE(NODE,TRG0,TRG1,INFO)                         { NODE, DST_INTEGRATE   , 2, { TRG0,TRG1 }, { TRG0,TRG1 }, INFO, "DISCRETE_INTEGRATE" },
 #define DISCRETE_MIXER2(NODE,ENAB,IN0,IN1,INFO)                         { NODE, DST_MIXER       , 3, { ENAB,IN0,IN1 }, { ENAB,IN0,IN1 }, INFO, "DISCRETE_MIXER2" },
 #define DISCRETE_MIXER3(NODE,ENAB,IN0,IN1,IN2,INFO)                     { NODE, DST_MIXER       , 4, { ENAB,IN0,IN1,IN2 }, { ENAB,IN0,IN1,IN2 }, INFO, "DISCRETE_MIXER3" },
@@ -4136,7 +4222,7 @@ enum
 #define DISCRETE_RCDISC5(NODE,ENAB,INP0,RVAL,CVAL)                      { NODE, DST_RCDISC5     , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_RCDISC5" },
 #define DISCRETE_RCDISC_MODULATED(NODE,INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP)	{ NODE, DST_RCDISC_MOD, 8, { INP0,INP1,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { INP0,INP1,RVAL0,RVAL1,RVAL2,RVAL3,CVAL,VP }, NULL, "DISCRETE_RCDISC_MODULATED" },
 #define DISCRETE_RCFILTER(NODE,ENAB,INP0,RVAL,CVAL)                     { NODE, DST_RCFILTER    , 4, { ENAB,INP0,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL }, NULL, "DISCRETE_RCFILTER" },
-#define DISCRETE_RCFILTER_SW(NODE,ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4) { NODE, DST_RCFILTER_SW, 8, { ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4 }, { ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4 }, NULL, "DISCRETE_RCFILTER_SW" },
+#define DISCRETE_RCFILTER_SW(NODE,ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4) { NODE, DST_RCFILTER_SW, 8, { ENAB,INP0,SW,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,SW,RVAL,CVAL1,CVAL2,CVAL3,CVAL4 }, NULL, "DISCRETE_RCFILTER_SW" },
 #define DISCRETE_RCFILTER_VREF(NODE,ENAB,INP0,RVAL,CVAL,VREF)           { NODE, DST_RCFILTER    , 5, { ENAB,INP0,NODE_NC,NODE_NC,NODE_NC }, { ENAB,INP0,RVAL,CVAL,VREF }, NULL, "DISCRETE_RCFILTER_VREF" },
 #define DISCRETE_RCINTEGRATE(NODE,INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE)  { NODE, DST_RCINTEGRATE , 7, { INP0,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { INP0,RVAL0,RVAL1,RVAL2,CVAL,vP,TYPE }, NULL, "DISCRETE_RCINTEGRATE" },
 /* For testing - seem to be buggered.  Use versions not ending in N. */
@@ -4146,11 +4232,15 @@ enum
 
 /* from disc_dev.c */
 /* generic modules */
-#define DISCRETE_CUSTOM1(NODE,ENAB,IN0,INFO)                            { NODE, DST_CUSTOM      , 2, { ENAB,IN0 }, { ENAB,IN0 }, INFO, "DISCRETE_CUSTOM1" },
-#define DISCRETE_CUSTOM2(NODE,ENAB,IN0,IN1,INFO)                        { NODE, DST_CUSTOM      , 3, { ENAB,IN0,IN1 }, { ENAB,IN0,IN1 }, INFO, "DISCRETE_CUSTOM2" },
-#define DISCRETE_CUSTOM3(NODE,ENAB,IN0,IN1,IN2,INFO)                    { NODE, DST_CUSTOM      , 4, { ENAB,IN0,IN1,IN2 }, { ENAB,IN0,IN1,IN2 }, INFO, "DISCRETE_CUSTOM3" },
-#define DISCRETE_CUSTOM4(NODE,ENAB,IN0,IN1,IN2,IN3,INFO)                { NODE, DST_CUSTOM      , 5, { ENAB,IN0,IN1,IN2,IN3 }, { ENAB,IN0,IN1,IN2,IN3 }, INFO, "DISCRETE_CUSTOM4" },
-#define DISCRETE_CUSTOM5(NODE,ENAB,IN0,IN1,IN2,IN3,IN4,INFO)            { NODE, DST_CUSTOM      , 6, { ENAB,IN0,IN1,IN2,IN3,IN4 }, { ENAB,IN0,IN1,IN2,IN3,IN4 }, INFO, "DISCRETE_CUSTOM5" },
+#define DISCRETE_CUSTOM1(NODE,IN0,INFO)                                 { NODE, DST_CUSTOM      , 1, { IN0 }, { IN0 }, INFO, "DISCRETE_CUSTOM1" },
+#define DISCRETE_CUSTOM2(NODE,IN0,IN1,INFO)                             { NODE, DST_CUSTOM      , 2, { IN0,IN1 }, { IN0,IN1 }, INFO, "DISCRETE_CUSTOM2" },
+#define DISCRETE_CUSTOM3(NODE,IN0,IN1,IN2,INFO)                         { NODE, DST_CUSTOM      , 3, { IN0,IN1,IN2 }, { IN0,IN1,IN2 }, INFO, "DISCRETE_CUSTOM3" },
+#define DISCRETE_CUSTOM4(NODE,IN0,IN1,IN2,IN3,INFO)                     { NODE, DST_CUSTOM      , 4, { IN0,IN1,IN2,IN3 }, { IN0,IN1,IN2,IN3 }, INFO, "DISCRETE_CUSTOM4" },
+#define DISCRETE_CUSTOM5(NODE,IN0,IN1,IN2,IN3,IN4,INFO)                 { NODE, DST_CUSTOM      , 5, { IN0,IN1,IN2,IN3,IN4 }, { IN0,IN1,IN2,IN3,IN4 }, INFO, "DISCRETE_CUSTOM5" },
+#define DISCRETE_CUSTOM6(NODE,IN0,IN1,IN2,IN3,IN4,IN5,INFO)             { NODE, DST_CUSTOM      , 6, { IN0,IN1,IN2,IN3,IN4,IN5 }, { IN0,IN1,IN2,IN3,IN4,IN5 }, INFO, "DISCRETE_CUSTOM6" },
+#define DISCRETE_CUSTOM7(NODE,IN0,IN1,IN2,IN3,IN4,IN5,IN6,INFO)         { NODE, DST_CUSTOM      , 7, { IN0,IN1,IN2,IN3,IN4,IN5,IN6 }, { IN0,IN1,IN2,IN3,IN4,IN5,IN6 }, INFO, "DISCRETE_CUSTOM7" },
+#define DISCRETE_CUSTOM8(NODE,IN0,IN1,IN2,IN3,IN4,IN5,IN6,IN7,INFO)     { NODE, DST_CUSTOM      , 8, { IN0,IN1,IN2,IN3,IN4,IN5,IN6,IN7 }, { IN0,IN1,IN2,IN3,IN4,IN5,IN6,IN7 }, INFO, "DISCRETE_CUSTOM8" },
+#define DISCRETE_CUSTOM9(NODE,IN0,IN1,IN2,IN3,IN4,IN5,IN6,IN7,IN8,INFO) { NODE, DST_CUSTOM      , 9, { IN0,IN1,IN2,IN3,IN4,IN5,IN6,IN7,IN8 }, { IN0,IN1,IN2,IN3,IN4,IN5,IN6,IN7,IN8 }, INFO, "DISCRETE_CUSTOM9" },
 /* Component specific */
 #define DISCRETE_555_ASTABLE(NODE,RESET,R1,R2,C,OPTIONS)                { NODE, DSD_555_ASTBL   , 5, { RESET,R1,R2,C,NODE_NC }, { RESET,R1,R2,C,-1 }, OPTIONS, "DISCRETE_555_ASTABLE" },
 #define DISCRETE_555_ASTABLE_CV(NODE,RESET,R1,R2,C,CTRLV,OPTIONS)       { NODE, DSD_555_ASTBL   , 5, { RESET,R1,R2,C,CTRLV }, { RESET,R1,R2,C,CTRLV }, OPTIONS, "DISCRETE_555_ASTABLE_CV" },
@@ -4182,9 +4272,11 @@ enum
  *
  *************************************/
 
+extern discrete_info *discrete_current_context;
+
 node_description *discrete_find_node(void *chip, int node);
 
 WRITE8_HANDLER(discrete_sound_w);
-READ8_HANDLER(discrete_sound_r);
+READ8_HANDLER( discrete_sound_r);
 
 #endif /* __DISCRETE_H__ */

@@ -19,8 +19,10 @@
  * DST_RCDISC5           - Diode in series with R//C
  * DST_RCDISC_MOD        - RC triggered by logic and modulated
  * DST_RCFILTER          - Simple RC filter & also lowpass filter
+ * DST_RCFILTER_SW       - Usage of node_description values for switchable RC filter
  * DST_RCINTEGRATE       - Two diode inputs, transistor and a R/C charge
  *                         discharge network
+ * DST_SALLEN_KEY        - Sallen-Key filter circuit
  *
  ************************************************************************/
 
@@ -99,6 +101,7 @@ struct dst_rcfilter_context
 struct dst_rcfilter_sw_context
 {
 	double	vCap[4];
+	double	exp[4];
 };
 
 struct dst_rcintegrate_context
@@ -152,8 +155,7 @@ static void dst_crfilter_reset(node_description *node)
 {
 	struct dst_rcfilter_context *context = node->context;
 
-	context->exponent = -1.0 / (DST_CRFILTER__R * DST_CRFILTER__C * discrete_current_context->sample_rate);
-	context->exponent =  1.0 - exp(context->exponent);
+	context->exponent = RC_CHARGE_EXP(DST_CRFILTER__R * DST_CRFILTER__C);
 	context->vCap   = 0;
 	node->output[0] = DST_CRFILTER__IN;
 }
@@ -316,64 +318,6 @@ static void dst_filter2_reset(node_description *node)
 	node->output[0] = 0;
 }
 
-/************************************************************************
- *
- * DST_SALLEN_KEY - Sallen-Key filter circuit
- *
- * input[0]    - Enable input value
- * input[1]    - IN0 node
- * input[3]    - Filter Type
- *
- * also passed discrete_op_amp_filt_info structure
- *
- * 2008, couriersud
- ************************************************************************/
-#define DST_SALLEN_KEY__ENABLE	(*(node->input[0]))
-#define DST_SALLEN_KEY__INP0	(*(node->input[1]))
-#define DST_SALLEN_KEY__TYPE	(*(node->input[2]))
-
-static void dst_sallen_key_step(node_description *node)
-{
-	struct dss_filter2_context *context = node->context;
-
-	double gain = 1.0;
-
-	if (DST_SALLEN_KEY__ENABLE == 0.0)
-	{
-		gain = 0.0;
-	}
-
-	node->output[0] = -context->a1 * context->y1 - context->a2 * context->y2 +
-					context->b0 * gain * DST_SALLEN_KEY__INP0 + context->b1 * context->x1 + context->b2 * context->x2;
-
-	context->x2 = context->x1;
-	context->x1 = gain * DST_SALLEN_KEY__INP0;
-	context->y2 = context->y1;
-	context->y1 = node->output[0];
-}
-
-static void dst_sallen_key_reset(node_description *node)
-{
-	struct dss_filter2_context       *context = node->context;
-	const  discrete_op_amp_filt_info *info    = node->custom;
-
-	double freq, q;
-
-	switch ((int) DST_SALLEN_KEY__TYPE)
-	{
-		case DISC_SALLEN_KEY_LOW_PASS:
-		    freq = 1.0 / ( 2.0 * M_PI * sqrt(info->c1 * info->c2 * info->r1 * info->r2));
-		    q = sqrt(info->c1 * info->c2 * info->r1 * info->r2) / (info->c2 * (info->r1 + info->r2));
-		    break;
-		default:
-			fatalerror("Unknown sallen key filter type");
-	}
-
-	calculate_filter2_coefficients(freq, 1.0 / q, DISC_FILTER_LOWPASS,
-								   &context->a1, &context->a2,
-								   &context->b0, &context->b1, &context->b2);
-	node->output[0] = 0;
-}
 
 /************************************************************************
  *
@@ -521,20 +465,16 @@ static void dst_op_amp_filt_reset(node_description *node)
 	switch (context->type)
 	{
 		case DISC_OP_AMP_FILTER_IS_LOW_PASS_1:
-			context->exponentC1 = -1.0 / (info->rF * info->c1 * discrete_current_context->sample_rate);
-			context->exponentC1 =  1.0 - exp(context->exponentC1);
+			context->exponentC1 = RC_CHARGE_EXP(info->rF * info->c1);
 			context->exponentC2 =  0;
 			break;
 		case DISC_OP_AMP_FILTER_IS_HIGH_PASS_1:
-			context->exponentC1 = -1.0 / (context->rTotal * info->c1 * discrete_current_context->sample_rate);
-			context->exponentC1 =  1.0 - exp(context->exponentC1);
+			context->exponentC1 = RC_CHARGE_EXP(context->rTotal * info->c1);
 			context->exponentC2 =  0;
 			break;
 		case DISC_OP_AMP_FILTER_IS_BAND_PASS_1:
-			context->exponentC1 = -1.0 / (info->rF * info->c1 * discrete_current_context->sample_rate);
-			context->exponentC1 =  1.0 - exp(context->exponentC1);
-			context->exponentC2 = -1.0 / (context->rTotal * info->c2 * discrete_current_context->sample_rate);
-			context->exponentC2 =  1.0 - exp(context->exponentC2);
+			context->exponentC1 = RC_CHARGE_EXP(info->rF * info->c1);
+			context->exponentC2 = RC_CHARGE_EXP(context->rTotal * info->c2);
 			break;
 		case DISC_OP_AMP_FILTER_IS_BAND_PASS_1M | DISC_OP_AMP_IS_NORTON:
 			context->rTotal = 1.0 / (1.0 / info->r1 + 1.0 / info->r2);
@@ -559,16 +499,12 @@ static void dst_op_amp_filt_reset(node_description *node)
 			break;
 		}
 		case DISC_OP_AMP_FILTER_IS_BAND_PASS_0 | DISC_OP_AMP_IS_NORTON:
-			context->exponentC1 = -1.0 / ((1.0 / (1.0 / info->r1 + 1.0 / (info->r2 + info->r3 + info->r4))) * info->c1 * discrete_current_context->sample_rate);
-			context->exponentC1 =  1.0 - exp(context->exponentC1);
-			context->exponentC2 = -1.0 / ((1.0 / (1.0 / (info->r1 + info->r2) + 1.0 / (info->r3 + info->r4))) * info->c2 * discrete_current_context->sample_rate);
-			context->exponentC2 =  1.0 - exp(context->exponentC2);
-			context->exponentC3 = -1.0 / ((info->r1 + info->r2 + info->r3 + info->r4) * info->c3 * discrete_current_context->sample_rate);
-			context->exponentC3 =  1.0 - exp(context->exponentC3);
+			context->exponentC1 = RC_CHARGE_EXP(RES_2_PARALLEL(info->r1, info->r2 + info->r3 + info->r4) * info->c1);
+			context->exponentC2 = RC_CHARGE_EXP(RES_2_PARALLEL(info->r1 + info->r2, info->r3 + info->r4) * info->c2);
+			context->exponentC3 = RC_CHARGE_EXP((info->r1 + info->r2 + info->r3 + info->r4) * info->c3);
 			break;
 		case DISC_OP_AMP_FILTER_IS_HIGH_PASS_0 | DISC_OP_AMP_IS_NORTON:
-			context->exponentC1 = -1.0 / (info->r1 * info->c1 * discrete_current_context->sample_rate);
-			context->exponentC1 =  1.0 - exp(context->exponentC1);
+			context->exponentC1 = RC_CHARGE_EXP(info->r1 * info->c1);
 			break;
 	}
 
@@ -679,10 +615,8 @@ static void dst_rcdisc2_reset(node_description *node)
 
 	context->state = 0;
 	context->t = 0;
-	context->exponent0 = -1.0 * DST_RCDISC2__R0 * DST_RCDISC2__C;
-	context->exponent1 = -1.0 * DST_RCDISC2__R1 * DST_RCDISC2__C;
-	context->exponent0 = exp(discrete_current_context->sample_time/context->exponent0);
-	context->exponent1 = exp(discrete_current_context->sample_time/context->exponent1);
+	context->exponent0 = RC_DISCHARGE_EXP(DST_RCDISC2__R0 * DST_RCDISC2__C);
+	context->exponent1 = RC_DISCHARGE_EXP(DST_RCDISC2__R1 * DST_RCDISC2__C);
 }
 
 /************************************************************************
@@ -716,13 +650,13 @@ static void dst_rcdisc3_step(node_description *node)
 		diff = DST_RCDISC3__IN - node->output[0];
 		if( diff > 0 )
 		{
-			diff = diff - (diff * exp(discrete_current_context->sample_time / context->exponent0));
+			diff = diff - (diff * context->exponent0);
 		} else if( diff < 0)
 		{
 			if(diff < -0.5)
-				diff = diff - (diff * exp(discrete_current_context->sample_time / context->exponent1));
+				diff = diff - (diff * context->exponent1);
 			else
-				diff = diff - (diff * exp(discrete_current_context->sample_time / context->exponent0));
+				diff = diff - (diff * context->exponent0);
 		}
 		node->output[0] += diff;
 	}
@@ -740,8 +674,8 @@ static void dst_rcdisc3_reset(node_description *node)
 
 	context->state = 0;
 	context->t = 0;
-	context->exponent0 = -1.0 * DST_RCDISC3__R1 * DST_RCDISC3__C;
-	context->exponent1 = -1.0 *(DST_RCDISC3__R1 * DST_RCDISC3__R2)/( DST_RCDISC3__R1 + DST_RCDISC3__R2)* DST_RCDISC3__C;
+	context->exponent0 = RC_CHARGE_EXP(DST_RCDISC3__R1 * DST_RCDISC3__C);
+	context->exponent1 = RC_CHARGE_EXP(RES_2_PARALLEL(DST_RCDISC3__R1, DST_RCDISC3__R2) * DST_RCDISC3__C);
 }
 
 
@@ -832,21 +766,19 @@ static void  dst_rcdisc4_reset(node_description *node)
 			v = DST_RCDISC4__VP - .5;	/* diode drop */
 
 			/* When the input is 1, both R1 & R3 are basically in parallel. */
-			r  = 1.0 / (1.0 / DST_RCDISC4__R1 + 1.0 / DST_RCDISC4__R3);
+			r  = RES_2_PARALLEL(DST_RCDISC4__R1, DST_RCDISC4__R3);
 			rT = DST_RCDISC4__R2 + r;
 			i  = v / rT;
 			context->v[1] = i * r + .5;
-			rT = 1.0 / (1.0 / DST_RCDISC4__R2 + 1.0 / r);
-			context->exp[1] = -1.0 / (rT * DST_RCDISC4__C1 * discrete_current_context->sample_rate);
-			context->exp[1] =  1.0 - exp(context->exp[1]);
+			rT = RES_2_PARALLEL(DST_RCDISC4__R2, r);
+			context->exp[1] = RC_CHARGE_EXP(rT * DST_RCDISC4__C1);
 
 			/* When the input is 0, R1 is out of circuit. */
 			rT = DST_RCDISC4__R2 + DST_RCDISC4__R3;
 			i  = v / rT;
 			context->v[0] = i * DST_RCDISC4__R3 + .5;
-			rT = 1.0 / (1.0 / DST_RCDISC4__R2 + 1.0 / DST_RCDISC4__R3);
-			context->exp[0] = -1.0 / (rT * DST_RCDISC4__C1 * discrete_current_context->sample_rate);
-			context->exp[0] =  1.0 - exp(context->exp[0]);
+			rT = RES_2_PARALLEL(DST_RCDISC4__R2, DST_RCDISC4__R3);
+			context->exp[0] = RC_CHARGE_EXP(rT * DST_RCDISC4__C1);
 			break;
 
 		case 3:
@@ -855,15 +787,13 @@ static void  dst_rcdisc4_reset(node_description *node)
              * resistance, so we will just use .5k in series with R1.
              */
 			r = 500.0 + DST_RCDISC4__R1;
-			context->v[1] = DST_RCDISC4__R2 / (r + DST_RCDISC4__R2) * (5.0 - 0.5);
-			rT = 1.0 / ( 1.0 / r + 1.0 / DST_RCDISC4__R2);
-			context->exp[1] = -1.0 / (rT * DST_RCDISC4__C1 * discrete_current_context->sample_rate);
-			context->exp[1] =  1.0 - exp(context->exp[1]);
+			context->v[1] = RES_VOLTAGE_DIVIDER(r, DST_RCDISC4__R2) * (5.0 - 0.5);
+			rT = RES_2_PARALLEL(r, DST_RCDISC4__R2);
+			context->exp[1] = RC_CHARGE_EXP(rT * DST_RCDISC4__C1);
 
 			/* When the input is 0, R1 is out of circuit. */
 			context->v[0] = 0;
-			context->exp[0] = -1.0 / (DST_RCDISC4__R2 * DST_RCDISC4__C1 * discrete_current_context->sample_rate);
-			context->exp[0] =  1.0 - exp(context->exp[0]);
+			context->exp[0] = RC_CHARGE_EXP(DST_RCDISC4__R2 * DST_RCDISC4__C1);
 			break;
 	}
 }
@@ -901,7 +831,7 @@ static void  dst_rcdisc5_step(node_description *node)
 
 		if(diff < 0)
 			//diff = diff - (diff * exp(discrete_current_context->sample_time / context->exponent0));
-			diff = -node->output[0] + (node->output[0] * exp(discrete_current_context->sample_time / context->exponent0));
+			diff = -node->output[0] + (node->output[0] *  context->exponent0);
 		node->output[0] += diff;
 	}
 	else
@@ -918,7 +848,7 @@ static void  dst_rcdisc5_reset(node_description *node)
 
 	context->state = 0;
 	context->t = 0;
-	context->exponent0 = -1.0 * DST_RCDISC5__R * DST_RCDISC5__C;
+	context->exponent0 = RC_CHARGE_EXP(DST_RCDISC5__R * DST_RCDISC5__C);
 }
 
 
@@ -986,34 +916,33 @@ static void dst_rcdisc_mod_reset(node_description *node)
 	struct dst_rcdisc_mod_context *context = node->context;
 
 	double	rc[2], rc2[2];
-	double	neg_dt = 0.0 - discrete_current_context->sample_time;
 
 	/* pre-calculate fixed values */
 	/* DST_RCDISC_MOD__IN1 <= 0.5 */
 	rc[0] = DST_RCDISC_MOD__R1 + DST_RCDISC_MOD__R2;
 	if (rc[0] < 1) rc[0] = 1;
-	context->exp_low[0]  = exp(neg_dt / (DST_RCDISC_MOD__C * rc[0]));
+	context->exp_low[0]  = RC_DISCHARGE_EXP(DST_RCDISC_MOD__C * rc[0]);
 	context->gain[0]     = RES_VOLTAGE_DIVIDER(rc[0], DST_RCDISC_MOD__R4);
 	/* DST_RCDISC_MOD__IN1 > 0.5 */
 	rc[1] = DST_RCDISC_MOD__R2;
 	if (rc[1] < 1) rc[1] = 1;
-	context->exp_low[1]  = exp(neg_dt / (DST_RCDISC_MOD__C * rc[1]));
+	context->exp_low[1]  = RC_DISCHARGE_EXP(DST_RCDISC_MOD__C * rc[1]);
 	context->gain[1]     = RES_VOLTAGE_DIVIDER(rc[1], DST_RCDISC_MOD__R4);
 	/* DST_RCDISC_MOD__IN2 <= 0.6 */
 	rc2[0] = DST_RCDISC_MOD__R4;
 	/* DST_RCDISC_MOD__IN2 > 0.6 */
-	rc2[1] = DST_RCDISC_MOD__R3 * DST_RCDISC_MOD__R4 / (DST_RCDISC_MOD__R3 + DST_RCDISC_MOD__R4);
+	rc2[1] = RES_2_PARALLEL(DST_RCDISC_MOD__R3, DST_RCDISC_MOD__R4);
 	/* DST_RCDISC_MOD__IN1 <= 0.5 && DST_RCDISC_MOD__IN2 <= 0.6 */
-	context->exp_high[0] = exp(neg_dt / (DST_RCDISC_MOD__C * (rc[0] + rc2[0])));
+	context->exp_high[0] = RC_DISCHARGE_EXP(DST_RCDISC_MOD__C * (rc[0] + rc2[0]));
 	context->vd_gain[0]  = RES_VOLTAGE_DIVIDER(rc[0], rc2[0]);
 	/* DST_RCDISC_MOD__IN1 > 0.5  && DST_RCDISC_MOD__IN2 <= 0.6 */
-	context->exp_high[1] = exp(neg_dt / (DST_RCDISC_MOD__C * (rc[1] + rc2[0])));
+	context->exp_high[1] = RC_DISCHARGE_EXP(DST_RCDISC_MOD__C * (rc[1] + rc2[0]));
 	context->vd_gain[1]  = RES_VOLTAGE_DIVIDER(rc[1], rc2[0]);
 	/* DST_RCDISC_MOD__IN1 <= 0.5 && DST_RCDISC_MOD__IN2 > 0.6 */
-	context->exp_high[2] = exp(neg_dt / (DST_RCDISC_MOD__C * (rc[0] + rc2[1])));
+	context->exp_high[2] = RC_DISCHARGE_EXP(DST_RCDISC_MOD__C * (rc[0] + rc2[1]));
 	context->vd_gain[2]  = RES_VOLTAGE_DIVIDER(rc[0], rc2[1]);
 	/* DST_RCDISC_MOD__IN1 > 0.5  && DST_RCDISC_MOD__IN2 > 0.6 */
-	context->exp_high[3] = exp(neg_dt / (DST_RCDISC_MOD__C * (rc[1] + rc2[1])));
+	context->exp_high[3] = RC_DISCHARGE_EXP(DST_RCDISC_MOD__C * (rc[1] + rc2[1]));
 	context->vd_gain[3]  = RES_VOLTAGE_DIVIDER(rc[1], rc2[1]);
 
 	context->v_cap  = 0;
@@ -1060,8 +989,7 @@ static void dst_rcfilter_reset(node_description *node)
 {
 	struct dst_rcfilter_context *context = node->context;
 
-	context->exponent = -1.0 / (DST_RCFILTER__R * DST_RCFILTER__C * discrete_current_context->sample_rate);
-	context->exponent = 1.0 - exp(context->exponent);
+	context->exponent = RC_CHARGE_EXP(DST_RCFILTER__R * DST_RCFILTER__C);
 	context->vCap   = 0;
 	node->output[0] = 0;
 }
@@ -1090,7 +1018,6 @@ static void dst_rcfilter_sw_step(node_description *node)
 	struct dst_rcfilter_sw_context *context = node->context;
 
 	int i;
-	double rcexp;
 	int bits = (int)DST_RCFILTER_SW__SWITCH;
 	double us = 0, rs = 0;
 
@@ -1104,13 +1031,12 @@ static void dst_rcfilter_sw_step(node_description *node)
 				rs += DST_RCFILTER_SW__R;
 			}
 		}
-		node->output[0] = CD4066_ON_RES / ( CD4066_ON_RES + rs) * DST_RCFILTER_SW__VIN + DST_RCFILTER_SW__R / (CD4066_ON_RES + rs)  * us;
+		node->output[0] = RES_VOLTAGE_DIVIDER(rs, CD4066_ON_RES) * DST_RCFILTER_SW__VIN + DST_RCFILTER_SW__R / (CD4066_ON_RES + rs)  * us;
 		for (i = 0; i < 4; i++)
 		{
 			if (( bits & (1 << i)) != 0)
 			{
-				rcexp = 1.0 - exp(-1.0 / ( CD4066_ON_RES * DST_RCFILTER_SW__C(i)) * discrete_current_context->sample_rate);
-				context->vCap[i] += ((node->output[0] - context->vCap[i]) * rcexp);
+				context->vCap[i] += (node->output[0] - context->vCap[i]) * context->exp[i];
 			}
 		}
 	}
@@ -1128,6 +1054,7 @@ static void dst_rcfilter_sw_reset(node_description *node)
 
 	for (i = 0; i < 4; i++)
 		context->vCap[i] = 0;
+		context->exp[i] = RC_CHARGE_EXP(CD4066_ON_RES * DST_RCFILTER_SW__C(i));
 	node->output[0] = 0;
 }
 
@@ -1183,12 +1110,12 @@ static void  dst_rcintegrate_step(node_description *node)
 	{
 		/* discharge .... */
 		diff  = 0.0 - context->vCap;
-		iC    = 0.0 - context->c_exp1 * diff; /* iC */
+		iC    = context->c_exp1 * diff; /* iC */
 		diff -= diff * context->exp_exponent1;
 		context->vCap += diff;
 		iQ = 0;
 		vE = context->vCap * context->gain_r1_r2;
-		RG = vE / (-iC);
+		RG = vE / iC;
 	}
 	else
 	{
@@ -1255,6 +1182,65 @@ static void dst_rcintegrate_reset(node_description *node)
 	context->c_exp0 =  DST_RCINTEGRATE__C / context->exponent0 * context->exp_exponent0;
 	context->c_exp1 =  DST_RCINTEGRATE__C / context->exponent1 * context->exp_exponent1;
 
+	node->output[0] = 0;
+}
+
+/************************************************************************
+ *
+ * DST_SALLEN_KEY - Sallen-Key filter circuit
+ *
+ * input[0]    - Enable input value
+ * input[1]    - IN0 node
+ * input[3]    - Filter Type
+ *
+ * also passed discrete_op_amp_filt_info structure
+ *
+ * 2008, couriersud
+ ************************************************************************/
+#define DST_SALLEN_KEY__ENABLE	(*(node->input[0]))
+#define DST_SALLEN_KEY__INP0	(*(node->input[1]))
+#define DST_SALLEN_KEY__TYPE	(*(node->input[2]))
+
+static void dst_sallen_key_step(node_description *node)
+{
+	struct dss_filter2_context *context = node->context;
+
+	double gain = 1.0;
+
+	if (DST_SALLEN_KEY__ENABLE == 0.0)
+	{
+		gain = 0.0;
+	}
+
+	node->output[0] = -context->a1 * context->y1 - context->a2 * context->y2 +
+					context->b0 * gain * DST_SALLEN_KEY__INP0 + context->b1 * context->x1 + context->b2 * context->x2;
+
+	context->x2 = context->x1;
+	context->x1 = gain * DST_SALLEN_KEY__INP0;
+	context->y2 = context->y1;
+	context->y1 = node->output[0];
+}
+
+static void dst_sallen_key_reset(node_description *node)
+{
+	struct dss_filter2_context       *context = node->context;
+	const  discrete_op_amp_filt_info *info    = node->custom;
+
+	double freq, q;
+
+	switch ((int) DST_SALLEN_KEY__TYPE)
+	{
+		case DISC_SALLEN_KEY_LOW_PASS:
+		    freq = 1.0 / ( 2.0 * M_PI * sqrt(info->c1 * info->c2 * info->r1 * info->r2));
+		    q = sqrt(info->c1 * info->c2 * info->r1 * info->r2) / (info->c2 * (info->r1 + info->r2));
+		    break;
+		default:
+			fatalerror("Unknown sallen key filter type");
+	}
+
+	calculate_filter2_coefficients(freq, 1.0 / q, DISC_FILTER_LOWPASS,
+								   &context->a1, &context->a2,
+								   &context->b0, &context->b1, &context->b2);
 	node->output[0] = 0;
 }
 

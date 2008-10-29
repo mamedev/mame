@@ -205,7 +205,7 @@ DISCRETE_SOUND_START( madalien )
 		&madalien_555_1l)
 	// The speed frequencies seem strange but the components have been GuruVerified
 	// There is not much change in selected frequency.  99Hz, 110.6Hz, 124Hz
-	DISCRETE_COMP_ADDER(NODE_51, 1, MADALIEN_8910_PORTB_45, &madalien_555_1f_r_select)
+	DISCRETE_COMP_ADDER(NODE_51, MADALIEN_8910_PORTB_45, &madalien_555_1f_r_select)
 	DISCRETE_555_ASTABLE_CV(NODE_52,	// IC 1F pin 3 out
 		MADALIEN_8910_PORTB_45,			// enabled by gate O2 pin 13
 		NODE_51,
@@ -222,7 +222,7 @@ DISCRETE_SOUND_START( madalien )
 	DISCRETE_DAC_R1(NODE_55, 1, NODE_54, DEFAULT_TTL_V_LOGIC_1, &madalien_effect1a_dac)
 	DISCRETE_DAC_R1(NODE_56, 1, NODE_54, DEFAULT_TTL_V_LOGIC_1, &madalien_effect1b_dac)
 	DISCRETE_RCFILTER(NODE_57, 1, NODE_56, RES_K(22)/2 + RES_K(22), CAP_U(.033))
-	DISCRETE_COMP_ADDER(NODE_59, 1, MADALIEN_8910_PORTB_23, &madalien_effect_1b_vol_r)
+	DISCRETE_COMP_ADDER(NODE_59, MADALIEN_8910_PORTB_23, &madalien_effect_1b_vol_r)
 
 	/************************************************
      * Enemy motor

@@ -60,8 +60,8 @@ static DISCRETE_SOUND_START(qix)
 	DISCRETE_TRANSFORM2(QIX_VOL_DATA_R, QIX_VOL_DATA, 0x0f, "01&")
 
 	/* Work out the parallel resistance of the selected resistors. */
-	DISCRETE_COMP_ADDER(NODE_10, 1, QIX_VOL_DATA_L, &qix_attn_table)
-	DISCRETE_COMP_ADDER(NODE_20, 1, QIX_VOL_DATA_R, &qix_attn_table)
+	DISCRETE_COMP_ADDER(NODE_10, QIX_VOL_DATA_L, &qix_attn_table)
+	DISCRETE_COMP_ADDER(NODE_20, QIX_VOL_DATA_R, &qix_attn_table)
 
 	/* Then use it for the resistor divider network. */
 	DISCRETE_TRANSFORM3(NODE_11, NODE_10, RES_K(10), QIX_DAC_DATA, "001+/2*")

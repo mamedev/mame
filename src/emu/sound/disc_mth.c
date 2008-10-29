@@ -43,12 +43,23 @@
 
 #include <float.h>
 
+struct dst_comp_adder_context
+{
+	double	total[256];
+};
+
 struct dst_dac_r1_context
 {
 	double	i_bias;		/* current of the bias circuit */
 	double	exponent;	/* smoothing curve */
 	double	r_total;	/* all resistors in parallel */
 	int		last_data;
+};
+
+struct dst_diode_mix__context
+{
+	int		size;
+	double	v_junction[8];
 };
 
 struct dst_flipflop_context
@@ -71,8 +82,10 @@ struct dst_mixer_context
 	int		type;
 	int		size;
 	int		r_node_bit_flag;
+	int		c_bit_flag;
 	double	r_total;
 	double *r_node[DISC_MIXER_MAX_INPS];		/* Either pointer to resistance node output OR NULL */
+	double	r_last[DISC_MIXER_MAX_INPS];
 	double	exponent_rc[DISC_MIXER_MAX_INPS];	/* For high pass filtering cause by cIn */
 	double	v_cap[DISC_MIXER_MAX_INPS];			/* cap voltage of each input */
 	double	exponent_c_f;			/* Low pass on mixed inputs */
@@ -182,48 +195,58 @@ static void dst_adder_step(node_description *node)
  *
  * DST_COMP_ADDER  - Selectable parallel component adder
  *
- * input[0]    - Enable input value
- * input[1]    - Bit Select
+ * input[0]    - Bit Select
  *
  * Also passed discrete_comp_adder_table structure
  *
  * Mar 2004, D Renaud.
  ************************************************************************/
-#define DST_COMP_ADDER__ENABLE	(*(node->input[0]))
-#define DST_COMP_ADDER__SELECT	(int)(*(node->input[1]))
+#define DST_COMP_ADDER__SELECT	(*(node->input[0]))
 
 static void dst_comp_adder_step(node_description *node)
 {
-	const discrete_comp_adder_table *info = node->custom;
-	int bit;
+	struct dst_comp_adder_context    *context = node->context;
+	int select;
 
-	if(DST_COMP_ADDER__ENABLE)
+	select = (int)DST_COMP_ADDER__SELECT;
+	assert(select < 256);
+	node->output[0] = context->total[select];
+}
+
+static void dst_comp_adder_reset(node_description *node)
+{
+	const  discrete_comp_adder_table *info = node->custom;
+	struct dst_comp_adder_context    *context = node->context;
+
+	int i, bit;
+	int length = 1 << info->length;
+
+	assert(length <= 256);
+
+	/* pre-calculate all possible values to speed up step rooutine */
+	for(i = 0; i < length; i++)
 	{
 		switch (info->type)
 		{
 			case DISC_COMP_P_CAPACITOR:
-				node->output[0] = info->cDefault;
-				for(bit=0; bit < info->length; bit++)
+				context->total[i] = info->cDefault;
+				for(bit = 0; bit < info->length; bit++)
 				{
-					if (DST_COMP_ADDER__SELECT & (1 << bit)) node->output[0] += info->c[bit];
+					if (i & (1 << bit)) context->total[i] += info->c[bit];
 				}
 				break;
 			case DISC_COMP_P_RESISTOR:
-				node->output[0] = info->cDefault ? 1.0 / info->cDefault : 0;
-				for(bit=0; bit < info->length; bit++)
+				context->total[i] = (info->cDefault != 0) ? 1.0 / info->cDefault : 0;
+				for(bit = 0; bit < info->length; bit++)
 				{
-					if (DST_COMP_ADDER__SELECT & (1 << bit)) node->output[0] += 1.0 / info->c[bit];
+					if ((i & (1 << bit)) && (info->c[bit] != 0)) context->total[i] += 1.0 / info->c[bit];
 				}
-				if (node->output[0] != 0) node->output[0] = 1.0 / node->output[0];
+				if (context->total[i] != 0) context->total[i] = 1.0 / context->total[i];
 				break;
 		}
 	}
-	else
-	{
-		node->output[0] = 0;
-	}
+	node->output[0] = context->total[0];
 }
-
 
 /************************************************************************
  *
@@ -378,8 +401,7 @@ static void dst_dac_r1_reset(node_description *node)
 	if (info->cFilter)
 	{
 		/* Setup filter constants */
-		context->exponent = -1.0 / (context->r_total * info->cFilter  * discrete_current_context->sample_rate);
-		context->exponent =  1.0 - exp(context->exponent);
+		context->exponent = RC_CHARGE_EXP(context->r_total * info->cFilter);
 	}
 }
 
@@ -388,38 +410,53 @@ static void dst_dac_r1_reset(node_description *node)
 *
  * DST_DIODE_MIX  - Diode Mixer
  *
- * input[0]    - Enable input value
- * input[1]    - Diode junction voltage drop
- * input[2]    - Input 0
+ * input[0]    - Input 0
  * .....
  *
  * Dec 2004, D Renaud.
  ************************************************************************/
-#define DST_DIODE_MIX__VJUNC		(*(node->input[0]))
-#define DST_DIODE_MIX_INP_OFFSET	1
+#define DST_DIODE_MIX_INP_OFFSET	0
 #define DST_DIODE_MIX__INP(addr)	(*(node->input[DST_DIODE_MIX_INP_OFFSET + addr]))
 
 static void dst_diode_mix_step(node_description *node)
 {
-	struct	dst_size_context *context = node->context;
+	struct	dst_diode_mix__context *context = node->context;
 
-	double	max = 0;
+	double	val, max = 0;
 	int		addr;
 
 	for (addr = 0; addr < context->size; addr++)
 	{
-		if (DST_DIODE_MIX__INP(addr) > max) max = DST_DIODE_MIX__INP(addr);
+		val = DST_DIODE_MIX__INP(addr) - context->v_junction[addr];
+		if (val > max) max = val;
 	}
-	node->output[0] = max - DST_DIODE_MIX__VJUNC;
-	if (node->output[0] < 0) node->output[0] = 0;
+	if (max < 0) max = 0;
+	node->output[0] = max;
 }
 
 static void dst_diode_mix_reset(node_description *node)
 {
-	struct dst_size_context *context = node->context;
+	const  double *info = node->custom;
+	struct dst_diode_mix__context *context = node->context;
+
+	int		addr;
 
 	context->size = node->active_inputs - DST_DIODE_MIX_INP_OFFSET;
+	assert(context->size <= 8);
 
+	for (addr = 0; addr < context->size; addr++)
+	{
+		if (info == NULL)
+		{
+			/* setup default junction voltage */
+			context->v_junction[addr] = 0.5;
+		}
+		else
+		{
+			/* use supplied junction voltage */
+			context->v_junction[addr] = *info++;
+		}
+	}
 	dst_diode_mix_step(node);
 }
 
@@ -932,6 +969,7 @@ static void dst_lookup_table_step(node_description *node)
 		node->output[0] = table[addr];
 }
 
+
 /************************************************************************
  *
  * DST_MIXER  - Mixer/Gain stage
@@ -995,9 +1033,9 @@ static void dst_mixer_step(node_description *node)
 	int		bit, connected;
 
 	/* put commonly used stuff in local variables for speed */
-	double	value;
-	double	dt = discrete_current_context->sample_rate;
 	int		r_node_bit_flag = context->r_node_bit_flag;
+	int		c_bit_flag = context->c_bit_flag;
+	int		bit_mask = 1;
 	int		has_rF = (info->rF != 0);
 	int		type = context->type;
 	double	v_ref = info->vRef;
@@ -1018,19 +1056,19 @@ static void dst_mixer_step(node_description *node)
 				connected = 1;
 				vTemp     = DST_MIXER__IN(bit);
 
-				if (r_node_bit_flag & (1 << bit))
+				/* is there a resistor? */
+				if (r_node_bit_flag & bit_mask)
 				{
 					/* a node has the possibility of being disconnected from the circuit. */
-					value = *context->r_node[bit];
-					if (value == 0)
+					if (*context->r_node[bit] == 0)
 						connected = 0;
 					else
 					{
 						/* value currently holds resistance */
-						rTemp   += value;
+						rTemp   += *context->r_node[bit];
 						r_total += 1.0 / rTemp;
-						value = info->c[bit];
-						if (value != 0)
+						/* is there a capacitor? */
+						if (c_bit_flag & bit_mask)
 						{
 							switch (type)
 							{
@@ -1049,16 +1087,20 @@ static void dst_mixer_step(node_description *node)
 									rTemp2 = rTemp + rI;
 									break;
 							}
-							/* Re-calculate exponent if resistor is a node */
-							/* value currently holds capacitance */
-							context->exponent_rc[bit] =  1.0 - exp(-1.0 / (rTemp2 * value * dt));
+							/* Re-calculate exponent if resistor is a node and has changed value */
+							if (*context->r_node[bit] != context->r_last[bit])
+							{
+								context->exponent_rc[bit] =  RC_CHARGE_EXP(rTemp2 * info->c[bit]);
+								context->r_last[bit] = *context->r_node[bit];
+							}
 						}
 					}
 				}
 
 				if (connected)
 				{
-					if (info->c[bit] != 0)
+					/* is there a capacitor? */
+					if (c_bit_flag & bit_mask)
 					{
 						/* do input high pass filtering if needed. */
 						context->v_cap[bit] += (vTemp - v_ref - context->v_cap[bit]) * context->exponent_rc[bit];
@@ -1066,6 +1108,7 @@ static void dst_mixer_step(node_description *node)
 					}
 					i += ((type == DISC_MIXER_IS_OP_AMP) ? v_ref - vTemp : vTemp) / rTemp;
 				}
+			bit_mask = bit_mask << 1;
 			}
 		}
 		else
@@ -1075,7 +1118,7 @@ static void dst_mixer_step(node_description *node)
 			{
 				vTemp = DST_MIXER__IN(bit);
 
-				if (info->c[bit] != 0)
+				if (c_bit_flag & (1 << bit))
 				{
 					/* do input high pass filtering if needed. */
 					context->v_cap[bit] += (vTemp - v_ref - context->v_cap[bit]) * context->exponent_rc[bit];
@@ -1103,7 +1146,7 @@ static void dst_mixer_step(node_description *node)
 			if (r_node_bit_flag != 0)
 			{
 				/* Re-calculate exponent if resistor nodes are used */
-				context->exponent_c_f =  1.0 - exp(-1.0 / (r_total * info->cF  * dt));
+				context->exponent_c_f =  RC_CHARGE_EXP(r_total * info->cF);
 			}
 			context->v_cap_f += (v - v_ref - context->v_cap_f) * context->exponent_c_f;
 			v = context->v_cap_f;
@@ -1144,6 +1187,10 @@ static void dst_mixer_reset(node_description *node)
 		}
 		else
 			context->r_node[bit] = NULL;
+
+		/* flag any caps */
+		if (info->c[bit] != 0)
+			context->c_bit_flag |= 1 << bit;
 	}
 
 	context->size = node->active_inputs - 1;
@@ -1193,8 +1240,7 @@ static void dst_mixer_reset(node_description *node)
 					break;
 			}
 			/* Setup filter constants */
-			context->exponent_rc[bit] = -1.0 / (rTemp * info->c[bit]  * discrete_current_context->sample_rate);
-			context->exponent_rc[bit] =  1.0 - exp(context->exponent_rc[bit]);
+			context->exponent_rc[bit] = RC_CHARGE_EXP(rTemp * info->c[bit]);
 		}
 	}
 
@@ -1209,8 +1255,7 @@ static void dst_mixer_reset(node_description *node)
 	if (info->cF != 0)
 	{
 		/* Setup filter constants */
-		context->exponent_c_f = -1.0 / (((info->type == DISC_MIXER_IS_OP_AMP) ? info->rF : (1.0 / context->r_total))* info->cF  * discrete_current_context->sample_rate);
-		context->exponent_c_f =  1.0 - exp(context->exponent_c_f);
+		context->exponent_c_f = RC_CHARGE_EXP(((info->type == DISC_MIXER_IS_OP_AMP) ? info->rF : (1.0 / context->r_total)) * info->cF);
 	}
 
 	context->v_cap_amp      = 0;
@@ -1218,10 +1263,9 @@ static void dst_mixer_reset(node_description *node)
 	if (info->cAmp != 0)
 	{
 		/* Setup filter constants */
-		/* We will use 100000 ohms as an average final stage impedance. */
+		/* We will use 100k ohms as an average final stage impedance. */
 		/* Your amp/speaker system will have more effect on incorrect filtering then any value used here. */
-		context->exponent_c_amp = -1.0 / (100000 * info->cAmp  * discrete_current_context->sample_rate);
-		context->exponent_c_amp =  1.0 - exp(context->exponent_c_amp);
+		context->exponent_c_amp = RC_CHARGE_EXP(RES_K(100) * info->cAmp);
 	}
 
 	if (context->type == DISC_MIXER_IS_OP_AMP_WITH_RI) context->gain = info->rF / info->rI;
@@ -1770,8 +1814,7 @@ static void dst_op_amp_reset(node_description *node)
 		if (context->has_r4)
 		{
 			/* exponential charge */
-			context->exponent = -1.0 / (info->r4 * info->c  * discrete_current_context->sample_rate);
-			context->exponent =  1.0 - exp(context->exponent);
+			context->exponent = RC_CHARGE_EXP(info->r4 * info->c);
 		}
 		else
 			/* linear charge */
@@ -1840,12 +1883,9 @@ static void dst_op_amp_1sht_reset(node_description *node)
 	const  discrete_op_amp_1sht_info *info    = node->custom;
 	struct dst_op_amp_1sht_context   *context = node->context;
 
-	context->exponent1c = -1.0 / ((1.0 / (1.0 / info->r3 + 1.0 / info->r4)) * info->c1  * discrete_current_context->sample_rate);
-	context->exponent1c =  1.0 - exp(context->exponent1c);
-	context->exponent1d = -1.0 / (info->r4 * info->c1  * discrete_current_context->sample_rate);
-	context->exponent1d =  1.0 - exp(context->exponent1d);
-	context->exponent2  = -1.0 / (info->r2 * info->c2  * discrete_current_context->sample_rate);
-	context->exponent2  =  1.0 - exp(context->exponent2);
+	context->exponent1c = RC_CHARGE_EXP(RES_2_PARALLEL(info->r3, info->r4) * info->c1);
+	context->exponent1d = RC_CHARGE_EXP(info->r4 * info->c1);
+	context->exponent2  = RC_CHARGE_EXP(info->r2 * info->c2);
 	context->i_fixed  = (info->vP - OP_AMP_NORTON_VBE) / info->r1;
 	context->v_cap1   = context->v_cap2 = 0;
 	context->v_max    = info->vP - OP_AMP_NORTON_VBE;
@@ -1963,38 +2003,30 @@ static void dst_tvca_op_amp_reset(node_description *node)
 	context->v_out_max = info->vP - OP_AMP_NORTON_VBE;
 	/* This is probably overkill because R5 is usually much lower then r6 or r7,
      * but it is better to play it safe. */
-	context->v_trig[0] = (info->v1 - 0.6) * (info->r6 / (info->r6 + info->r5));
-	context->v_trig[1] = (info->v1 - 0.6 - OP_AMP_NORTON_VBE) * (context->r67 / (context->r67 + info->r5)) + OP_AMP_NORTON_VBE;
+	context->v_trig[0] = (info->v1 - 0.6) * RES_VOLTAGE_DIVIDER(info->r5, info->r6);
+	context->v_trig[1] = (info->v1 - 0.6 - OP_AMP_NORTON_VBE) * RES_VOLTAGE_DIVIDER(info->r5, context->r67) + OP_AMP_NORTON_VBE;
 	context->i_fixed   = context->v_out_max / info->r1;
 
 	context->v_cap1 = 0;
 	/* Charge rate thru r5 */
 	/* There can be a different charge rates depending on function F3. */
-	context->exponent_c[0] = -1.0 / ((1.0 / (1.0 / info->r5 + 1.0 / info->r6)) * info->c1 * discrete_current_context->sample_rate);
-	context->exponent_c[0] =  1.0 - exp(context->exponent_c[0]);
-	context->exponent_c[1] = -1.0 / ((1.0 / (1.0 / info->r5 + 1.0 / context->r67)) * info->c1 * discrete_current_context->sample_rate);
-	context->exponent_c[1] =  1.0 - exp(context->exponent_c[1]);
+	context->exponent_c[0] = RC_CHARGE_EXP(RES_2_PARALLEL(info->r5, info->r6) * info->c1);
+	context->exponent_c[1] = RC_CHARGE_EXP(RES_2_PARALLEL(info->r5, context->r67) * info->c1);
 	/* Discharge rate thru r6 + r7 */
-	context->exponent_d[1] = -1.0 / (context->r67 * info->c1 * discrete_current_context->sample_rate);
-	context->exponent_d[1] =  1.0 - exp(context->exponent_d[1]);
+	context->exponent_d[1] = RC_CHARGE_EXP(context->r67 * info->c1);
 	/* Discharge rate thru r6 */
 	if (info->r6 != 0)
 	{
-		context->exponent_d[0] = -1.0 / (info->r6 * info->c1 * discrete_current_context->sample_rate);
-		context->exponent_d[0] =  1.0 - exp(context->exponent_d[0]);
+		context->exponent_d[0] = RC_CHARGE_EXP(info->r6 * info->c1);
 	}
 	context->v_cap2       = 0;
-	context->v_trig2      = (info->v2 - 0.6 - OP_AMP_NORTON_VBE) * (info->r9 / (info->r8 + info->r9));
-	context->exponent2[0] = -1.0 / (info->r9 * info->c2 * discrete_current_context->sample_rate);
-	context->exponent2[0] =  1.0 - exp(context->exponent2[0]);
-	context->exponent2[1] = -1.0 / ((1.0 / (1.0 / info->r8 + 1.0 / info->r9)) * info->c2 * discrete_current_context->sample_rate);
-	context->exponent2[1] =  1.0 - exp(context->exponent2[1]);
+	context->v_trig2      = (info->v2 - 0.6 - OP_AMP_NORTON_VBE) * RES_VOLTAGE_DIVIDER(info->r8, info->r9);
+	context->exponent2[0] = RC_CHARGE_EXP(info->r9 * info->c2);
+	context->exponent2[1] = RC_CHARGE_EXP(RES_2_PARALLEL(info->r8, info->r9) * info->c2);
 	context->v_cap3  = 0;
-	context->v_trig3 = (info->v3 - 0.6 - OP_AMP_NORTON_VBE) * (info->r11 / (info->r10 + info->r11));
-	context->exponent3[0] = -1.0 / (info->r11 * info->c3 * discrete_current_context->sample_rate);
-	context->exponent3[0] =  1.0 - exp(context->exponent3[0]);
-	context->exponent3[1] = -1.0 / ((1.0 / (1.0 / info->r10 + 1.0 / info->r11)) * info->c3 * discrete_current_context->sample_rate);
-	context->exponent3[1] =  1.0 - exp(context->exponent3[1]);
+	context->v_trig3 = (info->v3 - 0.6 - OP_AMP_NORTON_VBE) * RES_VOLTAGE_DIVIDER(info->r10, info->r11);
+	context->exponent3[0] = RC_CHARGE_EXP(info->r11 * info->c3);
+	context->exponent3[1] = RC_CHARGE_EXP(RES_2_PARALLEL(info->r10, info->r11) * info->c3);
 
 	dst_tvca_op_amp_step(node);
 }

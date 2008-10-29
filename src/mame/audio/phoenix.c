@@ -389,7 +389,6 @@ DISCRETE_SOUND_START(phoenix)
 	/* - phoenix wing hit                           */
 	/************************************************/
 	DISCRETE_COMP_ADDER(NODE_30,				/* total capacitance of selected capacitors */
-						1,						/* ENAB */
 						PHOENIX_EFFECT_2_FREQ,	/* passed selection bits */
 						&phoenix_effect2_cap_sel)
 	/* Part of the frequency select also effects the gain */

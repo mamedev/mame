@@ -23,7 +23,7 @@
  *
  ************************************************************************/
 
-#define DEFAULT_555_CAP_BLEED	RES_M(10)
+#define DEFAULT_555_BLEED_R	RES_M(10)
 
 struct dsd_555_astbl_context
 {
@@ -42,8 +42,12 @@ struct dsd_555_astbl_context
 	double	exp_bleed;
 	double	exp_charge;
 	double	exp_discharge;
+	double	t_rc_bleed;
 	double	t_rc_charge;
 	double	t_rc_discharge;
+	double	last_r1;
+	double	last_r2;
+	double	last_c;
 };
 
 struct dsd_555_mstbl_context
@@ -147,7 +151,7 @@ struct dsd_ls624_context
 #define DSD_555_ASTBL_RC_MASK	0x0e
 
 /* charge/discharge constants */
-#define DSD_555_ASTBL_T_RC_BLEED		(DEFAULT_555_CAP_BLEED * DSD_555_ASTBL__C)
+#define DSD_555_ASTBL_T_RC_BLEED		(DEFAULT_555_BLEED_R * DSD_555_ASTBL__C)
 /* Use quick charge if specified. */
 #define DSD_555_ASTBL_T_RC_CHARGE		((DSD_555_ASTBL__R1 + ((info->options & DISC_555_ASTABLE_HAS_FAST_CHARGE_DIODE) ? 0 : DSD_555_ASTBL__R2)) * DSD_555_ASTBL__C)
 #define DSD_555_ASTBL_T_RC_DISCHARGE	(DSD_555_ASTBL__R2 * DSD_555_ASTBL__C)
@@ -161,11 +165,10 @@ static void dsd_555_astbl_step(node_description *node)
 	int		count_r = 0;
 	double	dt;								/* change in time */
 	double	x_time  = 0;					/* time since change happened */
-	double	t_rc    = 0;					/* RC time constant */
 	double	v_cap   = context->cap_voltage;	/* Current voltage on capacitor, before dt */
 	double	v_cap_next = 0;					/* Voltage on capacitor, after dt */
-	double	v_charge, exponent;
-	int		update_exponent, update_t_rc;
+	double	v_charge, exponent = 0;
+	int		update_exponent = 0;
 
 	/* put commonly used stuff in local variables for speed */
 	double	threshold = context->threshold;
@@ -246,9 +249,20 @@ static void dsd_555_astbl_step(node_description *node)
 	}
 	else
 	{
+		/* Update charge contstants and exponents if nodes changed */
+		if (context->has_rc_nodes && (DSD_555_ASTBL__R1 != context->last_r1 || DSD_555_ASTBL__C != context->last_c || DSD_555_ASTBL__R2 != context->last_r2))
+		{
+			context->t_rc_bleed  = DSD_555_ASTBL_T_RC_BLEED;
+			context->t_rc_charge = DSD_555_ASTBL_T_RC_CHARGE;
+			context->t_rc_discharge = DSD_555_ASTBL_T_RC_DISCHARGE;
+			context->exp_bleed  = RC_CHARGE_EXP(context->t_rc_bleed);
+			context->exp_charge = RC_CHARGE_EXP(context->t_rc_charge);
+			context->exp_discharge = RC_CHARGE_EXP(context->t_rc_discharge);
+			context->last_r1 = DSD_555_ASTBL__R1;
+			context->last_r2 = DSD_555_ASTBL__R2;
+			context->last_c  = DSD_555_ASTBL__C;
+		}
 		/* Keep looping until all toggling in time sample is used up. */
-		update_t_rc = context->has_rc_nodes;
-		update_exponent = update_t_rc;
 		do
 		{
 			if (context->flip_flop)
@@ -258,10 +272,7 @@ static void dsd_555_astbl_step(node_description *node)
 					/* Oscillation disabled because there is no longer any charge resistor. */
 					/* Bleed the cap due to circuit losses. */
 					if (update_exponent)
-					{
-						t_rc     = DSD_555_ASTBL_T_RC_BLEED;
-						exponent = 1.0 - exp(-(dt / t_rc));
-					}
+						exponent = RC_CHARGE_EXP_DT(context->t_rc_bleed, dt);
 					else
 						exponent = context->exp_bleed;
 					v_cap_next = v_cap - (v_cap * exponent);
@@ -270,12 +281,8 @@ static void dsd_555_astbl_step(node_description *node)
 				else
 				{
 					/* Charging */
-					if (update_t_rc)
-						t_rc = DSD_555_ASTBL_T_RC_CHARGE;
-					else
-						t_rc = context->t_rc_charge;
 					if (update_exponent)
-						exponent = 1.0 - exp(-(dt / t_rc ));
+						exponent = RC_CHARGE_EXP_DT(context->t_rc_charge, dt);
 					else
 						exponent = context->exp_charge;
 					v_cap_next = v_cap + ((v_charge - v_cap) * exponent);
@@ -285,7 +292,7 @@ static void dsd_555_astbl_step(node_description *node)
 					if (v_cap_next >= threshold)
 					{
 						/* calculate the overshoot time */
-						dt     = t_rc  * log(1.0 / (1.0 - ((v_cap_next - threshold) / (v_charge - v_cap))));
+						dt     = context->t_rc_charge  * log(1.0 / (1.0 - ((v_cap_next - threshold) / (v_charge - v_cap))));
 						x_time = dt;
 						v_cap  = threshold;
 						context->flip_flop = 0;
@@ -299,12 +306,8 @@ static void dsd_555_astbl_step(node_description *node)
 				/* Discharging */
 				if(DSD_555_ASTBL__R2 != 0)
 				{
-					if (update_t_rc)
-						t_rc = DSD_555_ASTBL_T_RC_DISCHARGE;
-					else
-						t_rc = context->t_rc_discharge;
 					if (update_exponent)
-						exponent = 1.0 - exp(-(dt / t_rc ));
+						exponent = RC_CHARGE_EXP_DT(context->t_rc_discharge, dt);
 					else
 						exponent = context->exp_discharge;
 					v_cap_next = v_cap - (v_cap * exponent);
@@ -320,7 +323,8 @@ static void dsd_555_astbl_step(node_description *node)
 				if (v_cap_next <= trigger)
 				{
 					/* calculate the overshoot time */
-					dt = t_rc  * log(1.0 / (1.0 - ((trigger - v_cap_next) / v_cap)));
+					if (v_cap_next < trigger)
+						dt = context->t_rc_discharge  * log(1.0 / (1.0 - ((trigger - v_cap_next) / v_cap)));
 					x_time = dt;
 					v_cap  = trigger;
 					context->flip_flop = 1;
@@ -376,9 +380,6 @@ static void dsd_555_astbl_reset(node_description *node)
 	struct dsd_555_astbl_context *context = node->context;
 	node_description *v_charge_node;
 
-	double	neg_dt = 0.0 - discrete_current_context->sample_time;
-	double	t_rc;
-
 	context->use_ctrlv   = (node->input_is_node >> 4) & 1;
 	context->output_type = info->options & DISC_555_OUT_MASK;
 
@@ -416,14 +417,12 @@ static void dsd_555_astbl_reset(node_description *node)
 		context->has_rc_nodes = 1;
 	else
 	{
-		t_rc = DSD_555_ASTBL_T_RC_BLEED;
-		context->exp_bleed  = 1.0 - exp(neg_dt / t_rc);
-		t_rc = DSD_555_ASTBL_T_RC_CHARGE;
-		context->exp_charge  = 1.0 - exp(neg_dt / t_rc);
-		context->t_rc_charge = t_rc;
-		t_rc = DSD_555_ASTBL_T_RC_DISCHARGE;
-		context->exp_discharge  = 1.0 - exp(neg_dt / t_rc);
-		context->t_rc_discharge = t_rc;
+		context->t_rc_bleed  = DSD_555_ASTBL_T_RC_BLEED;
+		context->exp_bleed   = RC_CHARGE_EXP(context->t_rc_bleed);
+		context->t_rc_charge = DSD_555_ASTBL_T_RC_CHARGE;
+		context->exp_charge  = RC_CHARGE_EXP(context->t_rc_charge);
+		context->t_rc_discharge = DSD_555_ASTBL_T_RC_DISCHARGE;
+		context->exp_discharge  = RC_CHARGE_EXP(context->t_rc_discharge);
 	}
 
 	context->output_is_ac = info->options & DISC_555_OUT_AC;
@@ -507,7 +506,7 @@ static void dsd_555_mstbl_step(node_description *node)
 			else
 			{
 				/* Charging */
-				v_cap_next = v_cap + ((info->v_pos - v_cap) * (1.0 - exp(-(discrete_current_context->sample_time / (DSD_555_MSTBL__R * DSD_555_MSTBL__C)))));
+				v_cap_next = v_cap + ((info->v_pos - v_cap) * RC_CHARGE_EXP(DSD_555_MSTBL__R * DSD_555_MSTBL__C));
 
 				/* Has it charged past upper limit? */
 				/* If trigger is still enabled, then we keep charging,
@@ -603,7 +602,7 @@ static void dsd_555_mstbl_reset(node_description *node)
 #define DSD_555_CC_RC_MASK	0x78
 
 /* charge/discharge constants */
-#define DSD_555_CC_T_RC_BLEED			(DEFAULT_555_CAP_BLEED * DSD_555_CC__C)
+#define DSD_555_CC_T_RC_BLEED			(DEFAULT_555_BLEED_R * DSD_555_CC__C)
 #define DSD_555_CC_T_RC_DISCHARGE_01	(DSD_555_CC__RDIS * DSD_555_CC__C)
 #define DSD_555_CC_T_RC_DISCHARGE_NO_I	(DSD_555_CC__RGND * DSD_555_CC__C)
 #define DSD_555_CC_T_RC_CHARGE			(r_charge * DSD_555_CC__C)
@@ -714,7 +713,7 @@ static void dsd_555_cc_step(node_description *node)
 					if (update_exponent)
 					{
 						t_rc     = DSD_555_CC_T_RC_BLEED;
-						exponent = 1.0 - exp(-(dt / t_rc));
+						exponent = RC_CHARGE_EXP_DT(t_rc, dt);
 					}
 					else
 						exponent = context->exp_bleed;
@@ -755,7 +754,7 @@ static void dsd_555_cc_step(node_description *node)
 				else
 					t_rc = context->t_rc_discharge_01;
 				if (update_exponent)
-					exponent = 1.0 - exp(-(dt / t_rc));
+					exponent = RC_CHARGE_EXP_DT(t_rc, dt);
 				else
 					exponent = context->exp_discharge_01;
 
@@ -808,7 +807,7 @@ static void dsd_555_cc_step(node_description *node)
 					else
 						t_rc = context->t_rc_discharge_no_i;
 					if (update_exponent)
-						exponent = 1.0 - exp(-(dt / t_rc));
+						exponent = RC_CHARGE_EXP_DT(t_rc, dt);
 					else
 						exponent = context->exp_discharge_no_i;
 
@@ -829,7 +828,7 @@ static void dsd_555_cc_step(node_description *node)
 					else
 						t_rc = context->t_rc_charge;
 					if (update_exponent)
-						exponent = 1.0 - exp(-(dt / t_rc));
+						exponent = RC_CHARGE_EXP_DT(t_rc, dt);
 					else
 						exponent = context->exp_charge;
 
@@ -857,7 +856,7 @@ static void dsd_555_cc_step(node_description *node)
 				else
 					t_rc = context->t_rc_discharge;
 				if (update_exponent)
-					exponent = 1.0 - exp(-(dt / t_rc));
+					exponent = RC_CHARGE_EXP_DT(t_rc, dt);
 				else
 					exponent = context->exp_discharge;
 
@@ -935,8 +934,7 @@ static void dsd_555_cc_reset(node_description *node)
 	const  discrete_555_cc_desc *info    = node->custom;
 	struct dsd_555_cc_context   *context = node->context;
 
-	double	neg_dt = 0.0 - discrete_current_context->sample_time;
-	double	r_temp, r_discharge = 0, r_charge = 0, t_rc;
+	double	r_temp, r_discharge = 0, r_charge = 0;
 
 	context->flip_flop   = 1;
 	context->cap_voltage = 0;
@@ -996,20 +994,15 @@ static void dsd_555_cc_reset(node_description *node)
 				break;
 		}
 
-		t_rc = DSD_555_CC_T_RC_BLEED;
-		context->exp_bleed  = 1.0 - exp(neg_dt / t_rc);
-		t_rc = DSD_555_CC_T_RC_DISCHARGE_01;
-		context->exp_discharge_01  = 1.0 - exp(neg_dt / t_rc);
-		context->t_rc_discharge_01 = t_rc;
-		t_rc = DSD_555_CC_T_RC_DISCHARGE_NO_I;
-		context->exp_discharge_no_i  = 1.0 - exp(neg_dt / t_rc);
-		context->t_rc_discharge_no_i = t_rc;
-		t_rc = DSD_555_CC_T_RC_CHARGE;
-		context->exp_charge  = 1.0 - exp(neg_dt / t_rc);
-		context->t_rc_charge = t_rc;
-		t_rc = DSD_555_CC_T_RC_DISCHARGE;
-		context->exp_discharge  = 1.0 - exp(neg_dt / t_rc);
-		context->t_rc_discharge = t_rc;
+		context->exp_bleed  = RC_CHARGE_EXP(DSD_555_CC_T_RC_BLEED);
+		context->t_rc_discharge_01 = DSD_555_CC_T_RC_DISCHARGE_01;
+		context->exp_discharge_01  = RC_CHARGE_EXP(context->t_rc_discharge_01);
+		context->t_rc_discharge_no_i = DSD_555_CC_T_RC_DISCHARGE_NO_I;
+		context->exp_discharge_no_i  = RC_CHARGE_EXP(context->t_rc_discharge_no_i);
+		context->t_rc_charge = DSD_555_CC_T_RC_CHARGE;
+		context->exp_charge  = RC_CHARGE_EXP(context->t_rc_charge);
+		context->t_rc_discharge = DSD_555_CC_T_RC_DISCHARGE;
+		context->exp_discharge  = RC_CHARGE_EXP(context->t_rc_discharge);
 	}
 
 	/* Step to set the output */
@@ -1606,7 +1599,7 @@ static void dsd_ls624_step(node_description *node)
 		double	dt;	/* change in time */
 		double	sample_t;
 		double	t;
-		int		lst, cntf=0, cntr=0;
+		int		lst, cntf = 0, cntr = 0;
 
 		sample_t = discrete_current_context->sample_time;	/* Change in time */
 		dt  = LS624_T(DSD_LS624__C, DSD_LS624__VRNG, DSD_LS624__VMOD);
@@ -1615,7 +1608,7 @@ static void dsd_ls624_step(node_description *node)
 		lst = context->state;
 		while (t + dt < sample_t)
 		{
-			context->state = (1-context->state);
+			context->state = (1 - context->state);
 			if (context->state)
 				cntr++;
 			else
@@ -1627,7 +1620,7 @@ static void dsd_ls624_step(node_description *node)
 		switch (context->out_type)
 		{
 			case DISC_LS624_OUT_ENERGY:
-				node->output[0] = ((double) lst) * (1.0+context->remain/sample_t) - ((double) context->state) * context->remain/sample_t;
+				node->output[0] = ((double)lst) * (1.0 + context->remain / sample_t) - ((double)context->state) * context->remain / sample_t;
 				break;
 			case DISC_LS624_OUT_LOGIC:
 				node->output[0] = context->state;
