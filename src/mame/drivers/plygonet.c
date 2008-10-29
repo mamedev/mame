@@ -150,16 +150,13 @@ static READ32_HANDLER( psac_rom_r )
 }
 
 /* irqs 3, 5, and 7 have valid vectors                */
-/* irq 3 does ??? (network)                           */
-/* irq 5 does ??? (polygon end of draw or VBL?)       */
+/* irq 3 is network.  don't generate if you don't emulate the network h/w! */
+/* irq 5 is vblank */
 /* irq 7 does nothing (it jsrs to a rts and then rte) */
 
 static INTERRUPT_GEN(polygonet_interrupt)
 {
-	if (cpu_getiloops())
-		cpunum_set_input_line(machine, 0, MC68000_IRQ_5, HOLD_LINE);
-	else
-		cpunum_set_input_line(machine, 0, MC68000_IRQ_3, HOLD_LINE);
+	cpunum_set_input_line(machine, 0, MC68000_IRQ_5, HOLD_LINE);
 }
 
 /* sound CPU communications */
@@ -277,7 +274,6 @@ static READ32_HANDLER( network_r )
 {
 	return 0x08000000;
 }
-
 
 /**********************************************************************************/
 /*******                            DSP56k maps                             *******/
@@ -466,13 +462,26 @@ static WRITE16_HANDLER( dsp56k_ram_bank04_write )
 }
 
 
+WRITE32_HANDLER( plygonet_palette_w )
+{
+	int r,g,b;
+
+	COMBINE_DATA(&paletteram32[offset]);
+
+ 	r = (paletteram32[offset] >>16) & 0xff;
+	g = (paletteram32[offset] >> 8) & 0xff;
+	b = (paletteram32[offset] >> 0) & 0xff;
+
+	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+}
+
 
 /**********************************************************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM		/* PSAC2 tilemap */
-	AM_RANGE(0x440000, 0x440fff) AM_RAM		/* PSAC2 lineram */
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(plygonet_palette_w) AM_BASE(&paletteram32)	// is all of this region the palette?
+	AM_RANGE(0x440000, 0x440fff) AM_RAM		/* PSAC2 lineram? */
 	AM_RANGE(0x480000, 0x480003) AM_READ(polygonet_eeprom_r)
 	AM_RANGE(0x4C0000, 0x4C0003) AM_WRITE(polygonet_eeprom_w)
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(shared_ram_write) AM_BASE(&shared_ram)
@@ -481,7 +490,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x540000, 0x540fff) AM_READWRITE(polygonet_ttl_ram_r, polygonet_ttl_ram_w)
 	AM_RANGE(0x541000, 0x54101f) AM_RAM
 	AM_RANGE(0x580000, 0x5807ff) AM_RAM
-	AM_RANGE(0x580800, 0x580803) AM_READWRITE(network_r, SMH_NOP)	/* network RAM | registers? */
+	AM_RANGE(0x580800, 0x580803) AM_READ(network_r) AM_WRITENOP	/* network RAM | registers? */
 //  AM_RANGE(0x600000, 0x600000)
 	AM_RANGE(0x600004, 0x600007) AM_WRITE(sound_w)
 	AM_RANGE(0x600008, 0x60000b) AM_READ(sound_r)
@@ -585,7 +594,7 @@ static MACHINE_START(polygonet)
 static MACHINE_DRIVER_START( plygonet )
 	MDRV_CPU_ADD("main", M68EC020, 16000000)	/* 16 MHz (xtal is 32.0 MHz) */
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
-	MDRV_CPU_VBLANK_INT_HACK(polygonet_interrupt, 2)
+	MDRV_CPU_VBLANK_INT("main", polygonet_interrupt)
 
 	MDRV_CPU_ADD("dsp", DSP56156, 10000000)		/* xtal is 40.0 MHz */
 	MDRV_CPU_PROGRAM_MAP(dsp_program_map, 0)

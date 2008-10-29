@@ -22,8 +22,9 @@ static TILE_GET_INFO( ttl_get_tile_info )
 {
 	int attr, code;
 
-	code = ttl_vram[tile_index]&0xff;
-	attr = 0;
+	code = ttl_vram[tile_index]&0xfff;
+
+	attr = ttl_vram[tile_index]>>12;	// palette in all 4 bits?
 
 	SET_TILE_INFO(ttl_gfx_index, code, attr, 0);
 }
