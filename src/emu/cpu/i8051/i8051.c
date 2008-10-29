@@ -867,7 +867,7 @@ INLINE void update_timer_t0(int cycles)
 				TL0 = count & 0xff;
 				break;
 			case 2:			/* 8 Bit Autoreload */
-				count = (UINT32) TL0 + delta;
+				count = ((UINT32) TL0) + delta;
 				if ( count & 0xffffff00 ) 				/* Check for overflow */
 				{
 					SET_TF0(1);
@@ -878,7 +878,7 @@ INLINE void update_timer_t0(int cycles)
 				break;
 			case 3:
 				/* Split Timer 1 */
-				count = (UINT16) TL0 + delta;
+				count = ((UINT32) TL0) + delta;
 				if ( count & 0xffffff00 ) 				/* Check for overflow */
 					SET_TF0(1);
 				TL0 = count & 0xff; 					/* Update new values of the counter */
@@ -891,7 +891,7 @@ INLINE void update_timer_t0(int cycles)
 		{
 		case 3:
 			/* Split Timer 2 */
-			count = (UINT16) TH0 + cycles;			/* No gate control or counting !*/
+			count = ((UINT32) TH0) + cycles;			/* No gate control or counting !*/
 			if ( count & 0xffffff00 ) 				/* Check for overflow */
 				SET_TF1(1);
 			TH0 = count & 0xff;						/* Update new values of the counter */
@@ -909,7 +909,7 @@ INLINE void update_timer_t1(int cycles)
 	if (GET_TR1)
 	{
 		UINT32 delta;
-		int overflow = 0;
+		UINT32 overflow = 0;
 
 		/* counter / external input */
 		delta = GET_CT1 ? mcs51.t1_cnt : cycles;
@@ -938,7 +938,7 @@ INLINE void update_timer_t1(int cycles)
 				TL1 = count & 0xff;
 				break;
 			case 2:			/* 8 Bit Autoreload */
-				count = (UINT32) TL1 + delta;
+				count = ((UINT32) TL1) + delta;
 				overflow = count & 0xffffff00; /* Check for overflow */
 				if ( overflow )
 				{
@@ -1020,8 +1020,6 @@ INLINE void update_timer_t2(int cycles)
 
 INLINE void update_timers(int cycles)
 {
-	if (cycles == 0)
-		return; /* nothing to do */
 	/* Update Timer 0 */
 	update_timer_t0(cycles);
 	update_timer_t1(cycles);
@@ -1623,16 +1621,13 @@ static void mcs51_set_irq_line(int irqline, int state)
 		case I8051_INT0_LINE:
 			//Line Asserted?
 			if (state != CLEAR_LINE) {
-				//Is the enable flag for this interrupt set?
-				if (GET_EX0) {
-					//Need cleared->active line transition? (Logical 1-0 Pulse on the line) - CLEAR->ASSERT Transition since INT0 active lo!
-					if (GET_IT0) {
-						if (GET_BIT(tr_state, I8051_INT0_LINE))
-							SET_IE0(1);
-					}
-					else
-						SET_IE0(1);		//Nope, just set it..
+				//Need cleared->active line transition? (Logical 1-0 Pulse on the line) - CLEAR->ASSERT Transition since INT0 active lo!
+				if (GET_IT0) {
+					if (GET_BIT(tr_state, I8051_INT0_LINE))
+						SET_IE0(1);
 				}
+				else
+					SET_IE0(1);		//Nope, just set it..
 			}
 			else
 			{
@@ -1647,15 +1642,13 @@ static void mcs51_set_irq_line(int irqline, int state)
 
 			//Line Asserted?
 			if (state != CLEAR_LINE) {
-				if(GET_EX1) {
-					//Need cleared->active line transition? (Logical 1-0 Pulse on the line) - CLEAR->ASSERT Transition since INT1 active lo!
-					if(GET_IT1){
-						if (GET_BIT(tr_state, I8051_INT1_LINE))
-							SET_IE1(1);
-					}
-					else
-						SET_IE1(1);		//Nope, just set it..
+				//Need cleared->active line transition? (Logical 1-0 Pulse on the line) - CLEAR->ASSERT Transition since INT1 active lo!
+				if(GET_IT1){
+					if (GET_BIT(tr_state, I8051_INT1_LINE))
+						SET_IE1(1);
 				}
+				else
+					SET_IE1(1);		//Nope, just set it..
 			}
 			else
 			{
@@ -1687,12 +1680,11 @@ static void mcs51_set_irq_line(int irqline, int state)
 		case MCS51_T2EX_LINE:
 			if (mcs51.features & FEATURE_I8052)
 			{
-				if (GET_TR2 && GET_EXEN2)
-					if (GET_BIT(tr_state, MCS51_T2EX_LINE))
-					{
-						SET_EXF2(1);
-						mcs51.t2ex_cnt++;
-					}
+				if (GET_BIT(tr_state, MCS51_T2EX_LINE))
+				{
+					SET_EXF2(1);
+					mcs51.t2ex_cnt++;
+				}
 			}
 			else
 				fatalerror("mcs51: Trying to set T2EX_LINE on a non I8052 type cpu.\n");
