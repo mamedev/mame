@@ -1053,8 +1053,10 @@ static void dst_rcfilter_sw_reset(node_description *node)
 	int i;
 
 	for (i = 0; i < 4; i++)
+	{
 		context->vCap[i] = 0;
 		context->exp[i] = RC_CHARGE_EXP(CD4066_ON_RES * DST_RCFILTER_SW__C(i));
+	}
 	node->output[0] = 0;
 }
 
