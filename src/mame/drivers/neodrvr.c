@@ -458,156 +458,160 @@ INPUT_PORTS_END
 	ROM_REGION( 0x20000, "zoomy", 0 )														\
 	ROM_LOAD( "000-lo.lo", 0x00000, 0x20000, CRC(5a86cff2) SHA1(5992277debadeb64d1c1c64b0a92d9293eaf7e4a) )
 
+
 /***************************************************************************
 
-    Neo-Geo game pcb infos:
-    =======================
+	Neo-Geo game pcb infos:
+	=======================
 
-    The Neo-Geo games for AES (home) and MVS (arcade) systems are cartridge based.
+	The Neo-Geo games for AES (home) and MVS (arcade) systems are cartridge based.
 
-    Each cartridge consists of two pcb's: CHA and PROG.
+	Each cartridge consists of two pcb's: CHA and PROG.
 
-    CHA pcb contains gfx data ('C' - rom), text layer data ('S' - rom) and sound driver ('M' - rom).
-    PROG pcb contains sample data ('V' - rom) and program code ('P' - rom).
+	CHA pcb contains gfx data ('C' - rom), text layer data ('S' - rom) and sound driver ('M' - rom).
+	PROG pcb contains sample data ('V' - rom) and program code ('P' - rom).
 
-    On most pcb's various custom/protection chips can also be found:
+	On most pcb's various custom/protection chips can also be found:
 
-    CHA:
-    . NEO-273
-    . NEO-CMC
-    . NEO-ZMC
-    . NEO-ZMC2
-    . PRO-CT0
-    . SNK-9201
+	CHA:
+	. NEO-273
+	. NEO-CMC
+	. NEO-ZMC
+	. NEO-ZMC2
+	. PRO-CT0
+	. SNK-9201
 
-    PROG:
-    . 0103 (QFP144)
-    . ALTERA (EPM7128SQC100-15)
-    . NEO-COMA
-    . NEO-PCM2 (SNK 1999)
-    . NEO-PCM2 (PLAYMORE 2002)
-    . NEO-PVC
-    . NEO-SMA
-    . PCM
-    . PRO-CT0
-    . SNK-9201
-
-
-    Known pcb's:
-    ============
-
-    MVS CHA:
-    -- SNK --
-    . NEO-MVS CHA-32
-    . NEO-MVS CHA-8M
-    . NEO-MVS CHA42G
-    . NEO-MVS CHA42G-1
-    . NEO-MVS CHA 42G-2
-    . NEO-MVS CHA 42G-3
-    . NEO-MVS CHA42G-3B
-    . NEO-MVS CHA256
-    . NEO-MVS CHA256B
-    . NEO-MVS PSTM CHA136
-    . NEO-MVS CHA512Y
-    . NEO-MVS CHAFIO (1999.6.14)
-    . MVS CHAFIO REV1.0 (KOF-2001)
-    . NEO-MVS CHAFIO (SNK 2002) - MADE IN KOREA
-    -- SNKPLAYMORE --
-    . NEO-MVS CHAFIO (2003.7.24)
-
-    MVS PROG:
-    -- SNK --
-    . NEO-MVS PROG-HERO
-    . NEO-MVS PROG-EP
-    . NEO-MVS PROG8M42
-    . NEO-MVS PROG16
-    . NEO-MVS PROG42G
-    . NEO-MVS PROG42G-1
-    . NEO-MVS PROG-G2
-    . NEO-MVS PROG 4096
-    . NEO-MVS PROG 4096 B
-    . NEO-MVS PROGGSC
-    . NEO-MVS PROGSM
-    . NEO-MVS PROGSS3
-    . NEO-MVS PROGTOP
-    . NEO-MVS PROGSF1 (1998.6.17)
-    . NEO-MVS PROGEOP (1999.2.2)
-    . NEO-MVS PROGLBA (1999.4.12) - LBA-SUB (2000.2.24)
-    . NEO-MVS PROGBK1
-    . NEO-MVS PROGBK2 (2000.3.21)
-    . MVS PROGBK2 REV1.0 (KOF-2001)
-    . NEO-MVS PROGBK2 (SNK 2002) - MADE IN KOREA
-    -- SNKPLAYMORE --
-    . NEO-MVS PROGBK2R (2003.8.26) - NEO-HYCS (2003.9.29)
-    . NEO-MVS PROGBK3R (2003.9.2) - NEO-HYCS (2003.9.29)
-    . NEO-MVS PROGBK3S (2003.10.1)
-    . NEO-MVS PROGBK2S (2003.10.xx)
+	PROG:
+	. 0103 (QFP144)
+	. ALTERA (EPM7128SQC100-15)
+	. NEO-COMA
+	. NEO-PCM2 (SNK 1999)
+	. NEO-PCM2 (PLAYMORE 2002)
+	. NEO-PVC
+	. NEO-SMA
+	. PCM
+	. PRO-CT0
+	. SNK-9201
 
 
-    AES CHA:
-    -- SNK --
-    . NEO-AEG CHA-32
-    . NEO-AEG CHA-8M
-    . NEO-AEG CHA42G
-    . NEO-AEG CHA42G-1
-    . NEO-AEG CHA42G-2B
-    . NEO-AEG CHA42G-3
-    . NEO-AEG CHA42G-4
-    . NEO-AEG CHA256
-    . NEO-AEG CHA256[B]
-    . NEO-AEG CHA256RY
-    . NEO-AEG CHA512Y
-    . NEO-AEG CHAFIO (1999.8.10)
-    -- SNKPLAYMORE --
-    . NEO-AEG CHAFIO (2003.7.24)
+	Known pcb's:
+	============
 
-    AES PROG:
-    -- SNK --
-    . NEO-AEG PROG-NAM
-    . NEO-AEG PROG-HERO
-    . NEO-AEG PROG-4A
-    . NEO-AEG PROG-4B
-    . NEO-AEG PROG 8M42
-    . NEO-AEG PROG B
-    . NEO-AEG PROG16
-    . NEO-AEG PROG42G
-    . NEO-AEG PROG42G-COM
-    . NEO-AEG PROG42G-1
-    . NEO-AEG PROG-G2
-    . NEO-AEG PROG4096 B
-    . NEO-AEG PROGGS
-    . NEO-AEG PROGTOP2
-    . NEO-AEG PROGLBA (1999.7.6)
-    . NEO-AEG PROGRK
-    . NEO-AEG PROGRKB
-    . NEO-AEG PROGBK1Y
-    . NEO-AEG PROGBK1F
-    -- PLAYMORE --
-    . NEO-AEG PROGBK2 (2002.4.1)
-    -- SNKPLAYMORE --
-    . NEO-AEG PROGBK3R (2003.8.29) - NEO-HYCS (2003.9.29)
-    . NEO-AEG PROGBK2S (2003.10.16)
+	MVS CHA:
+	-- SNK --
+	. NEO-MVS CHA-32
+	. NEO-MVS CHA-8M
+	. NEO-MVS CHA42G
+	. NEO-MVS CHA42G-1
+	. NEO-MVS CHA 42G-2
+	. NEO-MVS CHA 42G-3
+	. NEO-MVS CHA42G-3B
+	. NEO-MVS CHA256
+	. NEO-MVS CHA256B
+	. NEO-MVS PSTM CHA136
+	. NEO-MVS CHA512Y
+	. NEO-MVS CHAFIO (1999.6.14)
+	. MVS CHAFIO REV1.0 (KOF-2001)
+	. NEO-MVS CHAFIO (SNK 2002) - MADE IN KOREA
+	-- SNKPLAYMORE --
+	. NEO-MVS CHAFIO (2003.7.24)
+
+	MVS PROG:
+	-- SNK --
+	. NEO-MVS PROG-NAM
+	. NEO-MVS PROG-HERO
+	. NEO-MVS PROG-EP
+	. NEO-MVS PROG-8MB
+	. NEO-MVS PROG8M42
+	. NEO-MVS PROG16
+	. NEO-MVS PROG42G
+	. NEO-MVS PROG42G-COM
+	. NEO-MVS PROG42G-1
+	. NEO-MVS PROG-G2
+	. NEO-MVS PROG 4096
+	. NEO-MVS PROG 4096 B
+	. NEO-MVS PROGGSC
+	. NEO-MVS PROGSM
+	. NEO-MVS PROGSS3
+	. NEO-MVS PROGTOP
+	. NEO-MVS PROGSF1 (1998.6.17)
+	. NEO-MVS PROGEOP (1999.2.2)
+	. NEO-MVS PROGLBA (1999.4.12) - LBA-SUB (2000.2.24)
+	. NEO-MVS PROGBK1
+	. NEO-MVS PROGBK2 (2000.3.21)
+	. MVS PROGBK2 REV1.0 (KOF-2001)
+	. NEO-MVS PROGBK2 (SNK 2002) - MADE IN KOREA
+	-- SNKPLAYMORE --
+	. NEO-MVS PROGBK2R (2003.8.26) - NEO-HYCS (2003.9.29)
+	. NEO-MVS PROGBK3R (2003.9.2) - NEO-HYCS (2003.9.29)
+	. NEO-MVS PROGBK3S (2003.10.1)
+	. NEO-MVS PROGBK2S (2003.10.18)
 
 
-    Cartridge colours:
-    ==================
+	AES CHA:
+	-- SNK --
+	. NEO-AEG CHA-32
+	. NEO-AEG CHA-8M
+	. NEO-AEG CHA42G
+	. NEO-AEG CHA42G-1
+	. NEO-AEG CHA42G-2B
+	. NEO-AEG CHA42G-3
+	. NEO-AEG CHA42G-4
+	. NEO-AEG CHA256
+	. NEO-AEG CHA256[B]
+	. NEO-AEG CHA256RY
+	. NEO-AEG CHA512Y
+	. NEO-AEG CHAFIO (1999.8.10)
+	-- SNKPLAYMORE --
+	. NEO-AEG CHAFIO (2003.7.24)
 
-    MVS cartridges were produced in different colours.
+	AES PROG:
+	-- SNK --
+	. NEO-AEG PROG-NAM
+	. NEO-AEG PROG-HERO
+	. NEO-AEG PROG-4A
+	. NEO-AEG PROG-4B
+	. NEO-AEG PROG 8M42
+	. NEO-AEG PROG B
+	. NEO-AEG PROG16
+	. NEO-AEG PROG42G
+	. NEO-AEG PROG42G-COM
+	. NEO-AEG PROG42G-1
+	. NEO-AEG PROG-G2
+	. NEO-AEG PROG4096 B
+	. NEO-AEG PROGGS
+	. NEO-AEG PROGTOP2
+	. NEO-AEG PROGLBA (1999.7.6)
+	. NEO-AEG PROGRK
+	. NEO-AEG PROGRKB
+	. NEO-AEG PROGBK1Y
+	. NEO-AEG PROGBK1F
+	-- PLAYMORE --
+	. NEO-AEG PROGBK2 (2002.4.1)
+	-- SNKPLAYMORE --
+	. NEO-AEG PROGBK3R (2003.8.29) - NEO-HYCS (2003.9.29)
+	. NEO-AEG PROGBK2S (2003.10.16)
 
-    Known cartridge colours:
-    . Black
-    . Blue
-    . Green
-    . Grey
-    . Red
-    . Transparent
-    . Transparent Blue
-    . Transparent Green
-    . White
-    . Yellow
 
-    The above listed only covers SNK / PLAYMORE / SNKPLAYMORE pcb's. There also exists a
-    wide range of 'bootleg' pcb's.
+	Cartridge colours:
+	==================
+
+	MVS cartridges were produced in different colours.
+	
+	Known cartridge colours:
+	. Black
+	. Blue
+	. Green
+	. Grey
+	. Red
+	. Transparent
+	. Transparent Blue
+	. Transparent Green
+	. White
+	. Yellow
+
+	The above listed only covers SNK / PLAYMORE / SNKPLAYMORE pcb's. There also exists a
+	wide range of 'bootleg' pcb's.
 
 
     Neo-Geo game pcb infos by Johnboy
@@ -643,6 +647,7 @@ INPUT_PORTS_END
     . Power Spikes II (early revisions) ?
     . Metal Slug 3 (rev. Mar/17/2000 1:36)
     . Metal Slug 4 (AES)
+    . Metal Slug 4 (MVS, 1st revision)
     . Metal Slug 5 (PCB)
     . 98 Best 44
 
@@ -745,18 +750,18 @@ ROM_START( mahretsu )
 	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "004-p1.bin", 0x000000, 0x080000, CRC(fc6f53db) SHA1(64a62ca4c8fb68954e06121399c9402278bd0467) )
 
-	NEO_SFIX_64K( "004-s1.bin", BAD_DUMP CRC(b0d16529) SHA1(1483a3459309596ee3ecff68bdbde0809d82dd7a) )
+	NEO_SFIX_128K( "004-s1.bin", CRC(4e310702) SHA1(edb0a27fe51d5e7f5739715b7c8872b6d4459b06) )
 
-	NEO_BIOS_AUDIO_64K( "004-m1.bin", BAD_DUMP CRC(37965a73) SHA1(61ad03c74169f9f50a37048fb74300ee926ee766) )
+	NEO_BIOS_AUDIO_128K( "004-m1.bin", CRC(c71fbb3b) SHA1(59c58665b53da61352359d191a0569de5dd1f4b3) )
 
 	ROM_REGION( 0x100000, "ym", 0 )
-	ROM_LOAD( "004-v1.bin", 0x000000, 0x080000, CRC(b2fb2153) SHA1(36e0cc8927b11105de40188af46f6cf532794c10) )
-	ROM_LOAD( "004-v2.bin", 0x080000, 0x080000, CRC(8503317b) SHA1(ab22f1aba1e977ab234a4f1d73dc6ed789dbeb85) )
+	ROM_LOAD( "004-v11.bin", 0x000000, 0x080000, CRC(b2fb2153) SHA1(36e0cc8927b11105de40188af46f6cf532794c10) )
+	ROM_LOAD( "004-v12.bin", 0x080000, 0x080000, CRC(8503317b) SHA1(ab22f1aba1e977ab234a4f1d73dc6ed789dbeb85) )
 
 	ROM_REGION( 0x180000, "ym.deltat", 0 )
-	ROM_LOAD( "004-v3.bin", 0x000000, 0x080000, CRC(4999fb27) SHA1(2d4926a220ea21bdd5e816bb16f985fff089500a) )
-	ROM_LOAD( "004-v4.bin", 0x080000, 0x080000, CRC(776fa2a2) SHA1(e7d5a362ab7806b7b009700a435c815a20e8ec68) )
-	ROM_LOAD( "004-v5.bin", 0x100000, 0x080000, CRC(b3e7eeea) SHA1(4d1e97f380702a3a06e7f954b4caddd9c4119d8f) )
+	ROM_LOAD( "004-v21.bin", 0x000000, 0x080000, CRC(4999fb27) SHA1(2d4926a220ea21bdd5e816bb16f985fff089500a) )
+	ROM_LOAD( "004-v22.bin", 0x080000, 0x080000, CRC(776fa2a2) SHA1(e7d5a362ab7806b7b009700a435c815a20e8ec68) )
+	ROM_LOAD( "004-v23.bin", 0x100000, 0x080000, CRC(b3e7eeea) SHA1(4d1e97f380702a3a06e7f954b4caddd9c4119d8f) )
 
 	ROM_REGION( 0x200000, "sprites", ROMREGION_DISPOSE )
 	ROM_LOAD16_BYTE( "004-c1.bin", 0x000000, 0x80000, CRC(f1ae16bc) SHA1(df68feed4dcba1e1566032b01ebb7b478a1792bf) ) /* Plane 0,1 */
@@ -914,7 +919,7 @@ ROM_START( ncombat )
 	ROM_LOAD16_BYTE( "009-c6.bin", 0x200001, 0x80000, CRC(2eca8b19) SHA1(16764ef10e404325ba0a1a2ad3a4c0af287be21f) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( ncombath ) /* AES VERSION */
+ROM_START( ncombath ) /* MBS AND AES VERSION */
 	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "009-pg1.bin", 0x000000, 0x080000, CRC(8e9f0add) SHA1(d0b908a86a58f2537eea73a431038f1cd74a5a2f) )
 
@@ -965,7 +970,7 @@ ROM_START( cyberlip )
 	ROM_LOAD16_BYTE( "010-c6.bin", 0x200001, 0x80000, CRC(c495c567) SHA1(2f58475fbb5f1adafce027d396fb05dd71e8fb55) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( superspy )
+ROM_START( superspy ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "011-p1.bin",  0x000000, 0x080000, CRC(c7f944b5) SHA1(da7560e09187c68f1d9f7656218497b4464c56c9) )
 	ROM_LOAD16_WORD_SWAP( "011-sp2.bin", 0x080000, 0x020000, CRC(811a4faf) SHA1(8169dfaf79f52d80ecec402ce1b1ab9cafb7ebdd) )
@@ -989,7 +994,7 @@ ROM_START( superspy )
 	ROM_LOAD16_BYTE( "011-c4.bin", 0x200001, 0x100000, CRC(b7f63162) SHA1(077a81b2bb0a8f17c9df6945078608f74432877a) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( mutnat )
+ROM_START( mutnat ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "014-p1.bin", 0x000000, 0x080000, CRC(6f1699c8) SHA1(87206f67a619dede7959230f9ff3701b8b78957a) )
 
@@ -1057,7 +1062,7 @@ ROM_START( kotmh ) /* AES VERSION */
 	ROM_LOAD16_BYTE( "016-c4.bin", 0x200001, 0x100000, CRC(070506e2) SHA1(3a2ec365e1d87a9c5ce1ee9bea88402a8eef4ed7) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( sengoku )
+ROM_START( sengoku ) /* MVS VERSION */
 	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "017-p1.bin", 0x000000, 0x080000, CRC(f8a63983) SHA1(7a10ecb2f0fd8315641374c065d2602107b09e72) )
 	ROM_LOAD16_WORD_SWAP( "017-p2.bin", 0x080000, 0x020000, CRC(3024bbb3) SHA1(88892e1292dd60f35a76f9a22e623d4f0f9693cc) )
@@ -1595,7 +1600,7 @@ ROM_START( crsword )
 	ROM_LOAD16_BYTE( "037-c4.bin", 0x200001, 0x100000, CRC(4a24395d) SHA1(943f911f40985db901eaef4c28dfcda299fca73e) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( trally )
+ROM_START( trally ) /* MVS AND AES VERSION */
 	ROM_REGION( 0x100000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "038-p1.bin", 0x000000, 0x080000, CRC(1e52a576) SHA1(a1cb56354c3378e955b0cd482c3c41ae15add952) )
 	ROM_LOAD16_WORD_SWAP( "038-p2.bin", 0x080000, 0x080000, CRC(a5193e2f) SHA1(96803480439e90da23cdca70d59ff519ee85beeb) )
@@ -4402,13 +4407,14 @@ ROM_START( breakrev )
 
 	NO_DELTAT_REGION
 
-	ROM_REGION( 0x1400000, "sprites", ROMREGION_DISPOSE )
-	ROM_LOAD16_BYTE( "230-c1.bin", 0x0000000, 0x400000, CRC(68d4ae76) SHA1(2e820067f6963669f104bebf19e865fe4127b4dd) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "230-c2.bin", 0x0000001, 0x400000, CRC(fdee05cd) SHA1(efc4ffd790953ac7c25d5f045c64a9b49d24b096) ) /* Plane 2,3 */
-	ROM_LOAD16_BYTE( "230-c3.bin", 0x0800000, 0x400000, CRC(645077f3) SHA1(0ae74f3b4b3b88f128c6d8c0f35ffa53f5d67ef2) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "230-c4.bin", 0x0800001, 0x400000, CRC(63aeb74c) SHA1(9ff6930c0c3d79b46b86356e8565ce4fcd69ac38) ) /* Plane 2,3 */
-	ROM_LOAD16_BYTE( "245-c5.bin", 0x1000000, 0x200000, CRC(28ff1792) SHA1(0cc5c16ac42f52cee74f88235aef0671bee33b4c) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "245-c6.bin", 0x1000001, 0x200000, CRC(23c65644) SHA1(9dc74c3075cf0f738b6b41e5e8d89a74a6c9ef07) ) /* Plane 2,3 */
+	ROM_REGION( 0x1800000, "sprites", ROMREGION_DISPOSE )
+	/* The chip labels and sizes are correct */
+	ROM_LOAD16_BYTE( "245-c1.bin", 0x0000000, 0x400000, CRC(68d4ae76) SHA1(2e820067f6963669f104bebf19e865fe4127b4dd) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "245-c2.bin", 0x0000001, 0x400000, CRC(fdee05cd) SHA1(efc4ffd790953ac7c25d5f045c64a9b49d24b096) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "245-c3.bin", 0x0800000, 0x400000, CRC(645077f3) SHA1(0ae74f3b4b3b88f128c6d8c0f35ffa53f5d67ef2) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "245-c4.bin", 0x0800001, 0x400000, CRC(63aeb74c) SHA1(9ff6930c0c3d79b46b86356e8565ce4fcd69ac38) ) /* Plane 2,3 */
+	ROM_LOAD16_BYTE( "245-c5.bin", 0x1000000, 0x400000, CRC(b5f40e7f) SHA1(b332bac64dbb9a9dd66c5315f47ea08634d36f45) ) /* Plane 0,1 */
+	ROM_LOAD16_BYTE( "245-c6.bin", 0x1000001, 0x400000, CRC(d0337328) SHA1(dff86b75dc283bd4512557a5c64f16e6be6c16e4) ) /* Plane 2,3 */
 ROM_END
 
 ROM_START( shocktr2 )
@@ -4926,7 +4932,7 @@ ROM_START( mslug3 ) /* Original Version - Encrypted Code & GFX */ /* revision 20
 	ROM_LOAD16_BYTE( "256-c8.bin", 0x3000001, 0x800000, CRC(4d9be34c) SHA1(a737bdfa2b815aea7067e7af2636e83a9409c414) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( mslug3h ) /* Original Version - Encrypted GFX */ /* AES VERSION */
+ROM_START( mslug3h ) /* Original Version - Encrypted GFX */ /* MVS AND AES VERSION */
 	ROM_REGION( 0x500000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "256-ph1.bin", 0x000000, 0x100000, CRC(9c42ca85) SHA1(7a8f77a89867b889295ae9b9dfd4ba28f02d234d) )
 	ROM_LOAD16_WORD_SWAP( "256-ph2.bin", 0x100000, 0x400000, CRC(1f3d8ce8) SHA1(08b05a8abfb86ec09a5e758d6273acf1489961f9) )
@@ -4999,8 +5005,8 @@ ROM_END
 
 ROM_START( kof2000n ) /* Original Version, Encrypted Sound + GFX Roms */
 	ROM_REGION( 0x500000, "main", 0 )
-	ROM_LOAD16_WORD_SWAP( "257-p1n.bin", 0x000000, 0x100000, CRC(5f809dbe) SHA1(2bc233dcff5622de86d01e3b74b840c7caf12982) )
-	ROM_LOAD16_WORD_SWAP( "257-p2n.bin", 0x100000, 0x400000, CRC(693c2c5e) SHA1(dc9121b7369ef46596343cac055a00aec81704d4) )
+	ROM_LOAD16_WORD_SWAP( "257-pg1.bin", 0x000000, 0x100000, CRC(5f809dbe) SHA1(2bc233dcff5622de86d01e3b74b840c7caf12982) )
+	ROM_LOAD16_WORD_SWAP( "257-pg2.bin", 0x100000, 0x400000, CRC(693c2c5e) SHA1(dc9121b7369ef46596343cac055a00aec81704d4) )
 
 	ROM_Y_ZOOM
 
@@ -5214,7 +5220,7 @@ ROM_START( kof2001h ) /* AES VERSION */
 	ROM_LOAD16_BYTE( "262-c8-08-e0.bin", 0x3000001, 0x800000, CRC(59289a6b) SHA1(ddfce7c85b2a144975db5bb14b4b51aaf881880e) ) /* Plane 2,3 */
 ROM_END
 
-ROM_START( mslug4 ) /* Original Version - Encrypted GFX */ /* MVS VERSION */
+ROM_START( mslug4 ) /* Original Version - Encrypted GFX */ /* MVS VERSION */ /* 2nd revision */
 	ROM_REGION( 0x500000, "main", 0 )
 	ROM_LOAD16_WORD_SWAP( "263-pg1.bin", 0x000000, 0x100000, CRC(27e4def3) SHA1(a08785e8145981bb6b5332a3b2df7eb321253cca) )
 	ROM_LOAD16_WORD_SWAP( "263-p2.bin",  0x100000, 0x400000, CRC(fdb7aed8) SHA1(dbeaec38f44e58ffedba99e70fa1439c2bf0dfa3) )

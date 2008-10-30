@@ -686,6 +686,7 @@ void lans2004_decrypt_68k( running_machine *machine )
 		}
 	}
 
+	/* Patched by protection chip (Altera) ? */
 	rom[0x2D15C/2] = 0x000B;
 	rom[0x2D15E/2] = 0xBB00;
 	rom[0x2D1E4/2] = 0x6002;
