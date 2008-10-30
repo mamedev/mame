@@ -46,6 +46,11 @@ WRITE32_HANDLER( polygonet_ttl_ram_w )
 	tilemap_mark_tile_dirty(ttl_tilemap, offset*2+1);
 }
 
+static TILEMAP_MAPPER( plygonet_scan )
+{
+	return row * num_cols + (col^1);
+}
+
 VIDEO_START( polygonet )
 {
 	static const gfx_layout charlayout =
@@ -73,7 +78,7 @@ VIDEO_START( polygonet )
 	machine->gfx[ttl_gfx_index]->total_colors = machine->config->total_colors / 16;
 
 	// create the tilemap
-	ttl_tilemap = tilemap_create(ttl_get_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
+	ttl_tilemap = tilemap_create(ttl_get_tile_info, plygonet_scan,  8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(ttl_tilemap, 0);
 
