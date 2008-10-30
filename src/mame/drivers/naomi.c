@@ -796,7 +796,7 @@ static READ64_HANDLER( naomi_rom_board_r )
 
 static WRITE64_HANDLER( naomi_rom_board_w )
 {
-	if ((offset == 1) && ACCESSING_BITS_32_47)
+	if ((offset == 1) && (ACCESSING_BITS_32_47 || ACCESSING_BITS_32_63))
 	{
 		// DMA_OFFSETH
 		dma_offset &= 0xffff;
@@ -821,7 +821,7 @@ static WRITE64_HANDLER( naomi_rom_board_w )
 		rom_offset &= 0xffff0000;
 		rom_offset |= ((data >> 32) & 0xffff);
 	}
-	if ((offset == 1) && ACCESSING_BITS_0_15)
+	else if ((offset == 1) && ACCESSING_BITS_0_15)
 	{
 		// ROM_DATA
 		// Doa2 writes here (16 bit decryption key ?)
@@ -924,6 +924,7 @@ static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
 	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
 	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
+	AM_RANGE(0x13000000, 0x13ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
 	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("main", 0)
 ADDRESS_MAP_END
 
