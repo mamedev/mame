@@ -221,24 +221,24 @@ UINT32 cdrom_read_data(cdrom_file *file, UINT32 lbasector, void *buffer, UINT32 
 	}
 	else
 	{
-		/* return 2048 bytes of mode1 data from a 2336 byte mode 1 or 2 raw sector */
+		/* return 2048 bytes of mode 1 data from a 2352 byte mode 1 or 2 raw sector */
 		if ((datatype == CD_TRACK_MODE1) && ((tracktype == CD_TRACK_MODE1_RAW) || (tracktype == CD_TRACK_MODE2_RAW)))
 		{
 			memcpy(buffer, &file->cache[(sectoroffs * CD_FRAME_SIZE) + 16], 2048);
 			return 1;
 		}
 
-		/* return 2048 bytes of mode1 data from a mode2 form1 sector */
+		/* return 2048 bytes of mode 1 data from a mode2 form1 sector */
 		if ((datatype == CD_TRACK_MODE1) && (tracktype == CD_TRACK_MODE2_FORM1))
 		{
 			memcpy(buffer, &file->cache[(sectoroffs * CD_FRAME_SIZE) + 24], 2048);
 			return 1;
 		}
 
-		/* return mode 2 2336 byte data from a RAW sector */
+		/* return mode 2 2336 byte data from a 2352 byte mode 1 or 2 raw sector (skip the header) */
 		if ((datatype == CD_TRACK_MODE2) && ((tracktype == CD_TRACK_MODE1_RAW) || (tracktype == CD_TRACK_MODE2_RAW)))
 		{
-			memcpy(buffer, &file->cache[(sectoroffs * CD_FRAME_SIZE) + 16], 2048);
+			memcpy(buffer, &file->cache[(sectoroffs * CD_FRAME_SIZE) + 16], 2336);
 			return 1;
 		}
 
