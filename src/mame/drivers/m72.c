@@ -89,7 +89,7 @@ other supported games as well.
 #include "iremipt.h"
 #include "m72.h"
 #include "cpu/nec/nec.h"
-#include "cpu/i8051/i8051.h"
+#include "cpu/mcs51/mcs51.h"
 
 #define MASTER_CLOCK		XTAL_32MHz
 #define SOUND_CLOCK			XTAL_3_579545MHz
@@ -246,7 +246,7 @@ static READ8_HANDLER(m72_mcu_data_r )
 	{
 		cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
 	}
-	
+
 	if (offset&1) ret = (protection_ram[offset/2] & 0xff00)>>8;
 	else ret = (protection_ram[offset/2] & 0x00ff);
 
@@ -337,14 +337,14 @@ INLINE DRIVER_INIT( loht_mcu )
 	memory_install_read8_handler (machine, sndnum, ADDRESS_SPACE_IO, 0x84, 0x84, 0xff, 0, m72_snd_cpu_sample_r);
 
 #if 0
-	/* running the mcu at twice the speed, the following 
+	/* running the mcu at twice the speed, the following
 	 * timeouts have to be modified.
 	 * At normal speed, the timing heavily depends on opcode
 	 * prefetching on the V30.
 	 */
 	{
 		UINT8 *rom=memory_region(machine, "mcu");
-		
+
 		rom[0x12d+5] += 1; printf(" 5: %d\n", rom[0x12d+5]);
 		rom[0x12d+8] += 5;  printf(" 8: %d\n", rom[0x12d+8]);
 		rom[0x12d+11] += 7; printf("11: %d\n", rom[0x12d+11]);
@@ -353,8 +353,8 @@ INLINE DRIVER_INIT( loht_mcu )
 		rom[0x12d+20] += 10; printf("20: %d\n", rom[0x12d+20]);
 		rom[0x12d+23] += 3; printf("23: %d\n", rom[0x12d+23]);
 		rom[0x12d+26] += 2; printf("26: %d\n", rom[0x12d+26]);
-		rom[0x12d+29] += 2; printf("29: %d\n", rom[0x12d+29]); 
-		rom[0x12d+32] += 16; printf("32: %d\n", rom[0x12d+32]); 
+		rom[0x12d+29] += 2; printf("29: %d\n", rom[0x12d+29]);
+		rom[0x12d+32] += 16; printf("32: %d\n", rom[0x12d+32]);
 	}
 #endif
 }
