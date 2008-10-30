@@ -29,13 +29,9 @@
     CONSTANTS & DEFINES
 ***************************************************************************/
 
-#define BASE_STYLE			"font-family:'Courier New','Courier',monospace; font-size:12px; background:none; border:none; color:#000000;"
-#define COMMENT_STYLE		"color:#b30000"
-#define STRING_STYLE		"color:#666"
-#define PREPROCESSOR_STYLE	"color:#0000b3"
-#define KEYWORD_STYLE		"color:#0000b3"
-#define MAMEWORD_STYLE		"color:#7f007f"
-#define LINENUM_STYLE		"color:#999"
+#define PREPROC_CLASS		"preproc"
+#define KEYWORD_CLASS		"keyword"
+#define CUSTOM_CLASS		"custom"
 
 
 
@@ -107,71 +103,71 @@ static const ext_to_type extension_lookup[] =
 
 static const token_entry dummy_token_table[] =
 {
-	{ NULL, KEYWORD_STYLE }
+	{ NULL, KEYWORD_CLASS }
 };
 
 
 static const token_entry c_token_table[] =
 {
-	{ "#define", PREPROCESSOR_STYLE },
-	{ "#elif", PREPROCESSOR_STYLE },
-	{ "#else", PREPROCESSOR_STYLE },
-	{ "#endif", PREPROCESSOR_STYLE },
-	{ "#error", PREPROCESSOR_STYLE },
-	{ "#if", PREPROCESSOR_STYLE },
-	{ "#ifdef", PREPROCESSOR_STYLE },
-	{ "#ifndef", PREPROCESSOR_STYLE },
-	{ "#include", PREPROCESSOR_STYLE },
-	{ "#line", PREPROCESSOR_STYLE },
-	{ "#pragma", PREPROCESSOR_STYLE },
-	{ "#undef", PREPROCESSOR_STYLE },
+	{ "#define", PREPROC_CLASS },
+	{ "#elif", PREPROC_CLASS },
+	{ "#else", PREPROC_CLASS },
+	{ "#endif", PREPROC_CLASS },
+	{ "#error", PREPROC_CLASS },
+	{ "#if", PREPROC_CLASS },
+	{ "#ifdef", PREPROC_CLASS },
+	{ "#ifndef", PREPROC_CLASS },
+	{ "#include", PREPROC_CLASS },
+	{ "#line", PREPROC_CLASS },
+	{ "#pragma", PREPROC_CLASS },
+	{ "#undef", PREPROC_CLASS },
 
-	{ "auto", KEYWORD_STYLE },
-	{ "break", KEYWORD_STYLE },
-	{ "case", KEYWORD_STYLE },
-	{ "char", KEYWORD_STYLE },
-	{ "const", KEYWORD_STYLE },
-	{ "continue", KEYWORD_STYLE },
-	{ "default", KEYWORD_STYLE },
-	{ "do", KEYWORD_STYLE },
-	{ "double", KEYWORD_STYLE },
-	{ "else", KEYWORD_STYLE },
-	{ "enum", KEYWORD_STYLE },
-	{ "extern", KEYWORD_STYLE },
-	{ "float", KEYWORD_STYLE },
-	{ "for", KEYWORD_STYLE },
-	{ "goto", KEYWORD_STYLE },
-	{ "if", KEYWORD_STYLE },
-	{ "int", KEYWORD_STYLE },
-	{ "long", KEYWORD_STYLE },
-	{ "register", KEYWORD_STYLE },
-	{ "return", KEYWORD_STYLE },
-	{ "short", KEYWORD_STYLE },
-	{ "signed", KEYWORD_STYLE },
-	{ "sizeof", KEYWORD_STYLE },
-	{ "static", KEYWORD_STYLE },
-	{ "struct", KEYWORD_STYLE },
-	{ "switch", KEYWORD_STYLE },
-	{ "typedef", KEYWORD_STYLE },
-	{ "union", KEYWORD_STYLE },
-	{ "unsigned", KEYWORD_STYLE },
-	{ "void", KEYWORD_STYLE },
-	{ "volatile", KEYWORD_STYLE },
-	{ "while", KEYWORD_STYLE },
+	{ "auto", KEYWORD_CLASS },
+	{ "break", KEYWORD_CLASS },
+	{ "case", KEYWORD_CLASS },
+	{ "char", KEYWORD_CLASS },
+	{ "const", KEYWORD_CLASS },
+	{ "continue", KEYWORD_CLASS },
+	{ "default", KEYWORD_CLASS },
+	{ "do", KEYWORD_CLASS },
+	{ "double", KEYWORD_CLASS },
+	{ "else", KEYWORD_CLASS },
+	{ "enum", KEYWORD_CLASS },
+	{ "extern", KEYWORD_CLASS },
+	{ "float", KEYWORD_CLASS },
+	{ "for", KEYWORD_CLASS },
+	{ "goto", KEYWORD_CLASS },
+	{ "if", KEYWORD_CLASS },
+	{ "int", KEYWORD_CLASS },
+	{ "long", KEYWORD_CLASS },
+	{ "register", KEYWORD_CLASS },
+	{ "return", KEYWORD_CLASS },
+	{ "short", KEYWORD_CLASS },
+	{ "signed", KEYWORD_CLASS },
+	{ "sizeof", KEYWORD_CLASS },
+	{ "static", KEYWORD_CLASS },
+	{ "struct", KEYWORD_CLASS },
+	{ "switch", KEYWORD_CLASS },
+	{ "typedef", KEYWORD_CLASS },
+	{ "union", KEYWORD_CLASS },
+	{ "unsigned", KEYWORD_CLASS },
+	{ "void", KEYWORD_CLASS },
+	{ "volatile", KEYWORD_CLASS },
+	{ "while", KEYWORD_CLASS },
 
 /*
-    { "INLINE", MAMEWORD_STYLE },
-    { "INT8", MAMEWORD_STYLE },
-    { "UINT8", MAMEWORD_STYLE },
-    { "INT16", MAMEWORD_STYLE },
-    { "UINT16", MAMEWORD_STYLE },
-    { "INT32", MAMEWORD_STYLE },
-    { "UINT32", MAMEWORD_STYLE },
-    { "INT64", MAMEWORD_STYLE },
-    { "UINT64", MAMEWORD_STYLE },
-    { "ARRAY_LENGTH", MAMEWORD_STYLE },
+    { "INLINE", CUSTOM_CLASS },
+    { "INT8", CUSTOM_CLASS },
+    { "UINT8", CUSTOM_CLASS },
+    { "INT16", CUSTOM_CLASS },
+    { "UINT16", CUSTOM_CLASS },
+    { "INT32", CUSTOM_CLASS },
+    { "UINT32", CUSTOM_CLASS },
+    { "INT64", CUSTOM_CLASS },
+    { "UINT64", CUSTOM_CLASS },
+    { "ARRAY_LENGTH", CUSTOM_CLASS },
 */
-	{ NULL, KEYWORD_STYLE }
+	{ NULL, KEYWORD_CLASS }
 };
 
 
@@ -560,7 +556,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, const ast
 	core_fprintf(dst, "</h3>");
 
 	/* start with some tags */
-	core_fprintf(dst, "\t<pre style=\"" BASE_STYLE "\">\n");
+	core_fprintf(dst, "\t<pre class=\"source\">\n");
 
 	/* iterate over lines in the source file */
 	while (core_fgets(srcline, ARRAY_LENGTH(srcline), src) != NULL)
@@ -574,7 +570,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, const ast
 		int curcol = 0;
 
 		/* start with the line number */
-		dstptr += sprintf(dstptr, "<span style=\"" LINENUM_STYLE "\">%5d</span>&nbsp;&nbsp;", linenum++);
+		dstptr += sprintf(dstptr, "<span class=\"linenum\">%5d</span>&nbsp;&nbsp;", linenum++);
 
 		/* iterate over characters in the source line */
 		for (srcptr = srcline; *srcptr != 0; )
@@ -586,7 +582,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, const ast
 			{
 				if (!in_comment && ch == comment_start[0] && strncmp(srcptr - 1, comment_start, strlen(comment_start)) == 0)
 				{
-					dstptr += sprintf(dstptr, "<span style=\"" COMMENT_STYLE "\">%s", comment_start_esc);
+					dstptr += sprintf(dstptr, "<span class=\"comment\">%s", comment_start_esc);
 					curcol += strlen(comment_start);
 					srcptr += strlen(comment_start) - 1;
 					ch = 0;
@@ -605,7 +601,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, const ast
 			/* track whether or not we are within an inline (C++-style) comment */
 			if (!in_quotes && !in_comment && !in_inline_comment && ch == comment_inline[0] && strncmp(srcptr - 1, comment_inline, strlen(comment_inline)) == 0)
 			{
-				dstptr += sprintf(dstptr, "<span style=\"" COMMENT_STYLE "\">%s", comment_inline_esc);
+				dstptr += sprintf(dstptr, "<span class=\"comment\">%s", comment_inline_esc);
 				curcol += strlen(comment_inline);
 				srcptr += strlen(comment_inline) - 1;
 				ch = 0;
@@ -629,7 +625,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, const ast
 				for (curtoken = token_table; curtoken->token != NULL; curtoken++)
 					if (strncmp(srcptr - 1, curtoken->token, toklength) == 0 && strlen(curtoken->token) == toklength)
 					{
-						dstptr += sprintf(dstptr, "<span style=\"%s\">%s</span>", curtoken->color, curtoken->token);
+						dstptr += sprintf(dstptr, "<span class=\"%s\">%s</span>", curtoken->color, curtoken->token);
 						curcol += strlen(curtoken->token);
 						srcptr += strlen(curtoken->token) - 1;
 						ch = 0;
@@ -661,7 +657,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, const ast
 				if (!in_comment && !in_inline_comment && !in_quotes && (ch == '"' || ch == '\''))
 				{
 					if (color_quotes)
-						dstptr += sprintf(dstptr, "<span style=\"" STRING_STYLE "\">%c", ch);
+						dstptr += sprintf(dstptr, "<span class=\"string\">%c", ch);
 					else
 						*dstptr++ = ch;
 					in_quotes = ch;
