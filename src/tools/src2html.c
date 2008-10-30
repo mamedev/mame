@@ -5,6 +5,15 @@
     Copyright Nicola Salmoria and the MAME Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
+****************************************************************************
+
+	Template file format:
+	
+	<html header>
+	<!--PATH--> = insert path
+	<!--CONTENT--> = insert content
+	<html footer>
+
 ***************************************************************************/
 
 #include <stdio.h>
@@ -20,6 +29,7 @@
     CONSTANTS & DEFINES
 ***************************************************************************/
 
+#define BASE_STYLE			"font-family:'Courier New','Courier',monospace; font-size:12px; background:none; border:none; color:#000000;"
 #define COMMENT_STYLE		"color:#b30000"
 #define STRING_STYLE		"color:#666"
 #define PREPROCESSOR_STYLE	"color:#0000b3"
@@ -171,12 +181,12 @@ static const token_entry c_token_table[] =
 ***************************************************************************/
 
 /* core output functions */
-static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, const astring *dstdir);
-static int output_file(file_type type, int srcrootlen, int dstrootlen, const astring *srcfile, const astring *dstfile, int link_to_file);
+static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, const astring *dstdir, const astring *tempheader, const astring *tempfooter);
+static int output_file(file_type type, int srcrootlen, int dstrootlen, const astring *srcfile, const astring *dstfile, int link_to_file, const astring *tempheader, const astring *tempfooter);
 
 /* HTML helpers */
-static core_file *create_file_and_output_header(const astring *filename, const char *title, const char *subtitle);
-static void output_footer_and_close_file(core_file *file);
+static core_file *create_file_and_output_header(const astring *filename, const astring *template, const astring *path);
+static void output_footer_and_close_file(core_file *file, const astring *template, const astring *path);
 
 /* path helpers */
 static const astring *normalized_subpath(const astring *path, int start);
@@ -195,7 +205,8 @@ static astring *find_include_file(int srcrootlen, int dstrootlen, const astring 
 
 int main(int argc, char *argv[])
 {
-	astring *srcdir = NULL, *dstdir = NULL;
+	astring *srcdir = NULL, *dstdir = NULL, *tempfilename = NULL, *tempheader = NULL, *tempfooter = NULL;
+	core_file *tempfile;
 	int unadorned = 0;
 	int result;
 	int argnum;
@@ -216,7 +227,7 @@ int main(int argc, char *argv[])
 				incpathhead = &(*incpathhead)->next;
 			}
 		}
-
+		
 		/* other parameter */
 		else if (arg[0] != '-' && unadorned == 0)
 		{
@@ -228,24 +239,61 @@ int main(int argc, char *argv[])
 			dstdir = astring_dupc(arg);
 			unadorned++;
 		}
+		else if (arg[0] != '-' && unadorned == 2)
+		{
+			tempfilename = astring_dupc(arg);
+			unadorned++;
+		}
 		else
 			goto usage;
 	}
 
-	/* make sure we got 2 parameters */
-	if (srcdir == NULL || dstdir == NULL)
+	/* make sure we got 3 parameters */
+	if (srcdir == NULL || dstdir == NULL || tempfilename == NULL)
 		goto usage;
+	
+	/* read the template file into an astring */
+	if (core_fopen(astring_c(tempfilename), OPEN_FLAG_READ, &tempfile) == FILERR_NONE)
+	{
+		UINT64 filesize = core_fsize(tempfile);
+		void *buffer = malloc(filesize);
+		if (buffer != NULL)
+		{
+			core_fread(tempfile, buffer, filesize);
+			tempheader = astring_dupch(buffer, filesize);
+			free(buffer);
+		}
+		core_fclose(tempfile);
+	}
+	
+	/* verify the template */
+	if (tempheader == NULL)
+	{
+		fprintf(stderr, "Unable to read template file\n");
+		return 1;
+	}
+	result = astring_findc(tempheader, 0, "<!--CONTENT-->");
+	if (result == -1)
+	{
+		fprintf(stderr, "Template is missing a <!--CONTENT--> marker\n");
+		return 1;
+	}
+	tempfooter = astring_substr(astring_dup(tempheader), result + 14, -1);
+	tempheader = astring_substr(tempheader, 0, result);
 
 	/* recurse over subdirectories */
-	result = recurse_dir(astring_len(srcdir), astring_len(dstdir), srcdir, dstdir);
+	result = recurse_dir(astring_len(srcdir), astring_len(dstdir), srcdir, dstdir, tempheader, tempfooter);
 
 	/* free source and destination directories */
 	astring_free(srcdir);
 	astring_free(dstdir);
+	astring_free(tempfilename);
+	astring_free(tempheader);
+	astring_free(tempfooter);
 	return result;
 
 usage:
-	fprintf(stderr, "Usage:\n%s <srcroot> <destroot> [-Iincpath [-Iincpath [...]]]\n", argv[0]);
+	fprintf(stderr, "Usage:\n%s <srcroot> <destroot> <template.html> [-Iincpath [-Iincpath [...]]]\n", argv[0]);
 	return 1;
 }
 
@@ -267,7 +315,7 @@ static int compare_list_entries(const void *p1, const void *p2)
     recurse_dir - recurse through a directory
 -------------------------------------------------*/
 
-static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, const astring *dstdir)
+static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, const astring *dstdir, const astring *tempheader, const astring *tempfooter)
 {
 	static const osd_dir_entry_type typelist[] = { ENTTYPE_DIR, ENTTYPE_FILE };
 	const astring *srcdir_subpath;
@@ -284,22 +332,21 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 	/* create an index file */
 	indexname = astring_alloc();
 	astring_printf(indexname, "%s%c%s", astring_c(dstdir), PATH_SEPARATOR[0], "index.html");
-	indexfile = create_file_and_output_header(indexname, "MAME Source Code", astring_c(srcdir_subpath));
+	indexfile = create_file_and_output_header(indexname, tempheader, srcdir_subpath);
 	astring_free(indexname);
 
 	/* output the directory navigation */
 	core_fprintf(indexfile, "<h3>Viewing Directory: ");
 	output_path_as_links(indexfile, srcdir_subpath, TRUE, FALSE);
 	core_fprintf(indexfile, "</h3>");
-	astring_free((astring *)srcdir_subpath);
 
 	/* iterate first over directories, then over files */
 	for (entindex = 0; entindex < ARRAY_LENGTH(typelist) && result == 0; entindex++)
 	{
 		osd_dir_entry_type entry_type = typelist[entindex];
 		const osd_directory_entry *entry;
+		list_entry **listarray = NULL;
 		list_entry *list = NULL;
-		list_entry **listarray;
 		list_entry *curlist;
 		osd_directory *dir;
 		int found = 0;
@@ -346,6 +393,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 			listarray[found]->next = list;
 			list = listarray[found];
 		}
+		free(listarray);
 
 		/* iterate through each file */
 		for (curlist = list; curlist != NULL && result == 0; curlist = curlist->next)
@@ -381,7 +429,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 					astring_printf(dstfile, "%s%c%s.html", astring_c(dstdir), PATH_SEPARATOR[0], astring_c(curlist->name));
 					if (indexfile != NULL)
 						core_fprintf(indexfile, "\t<li><a href=\"%s.html\">%s</a></li>\n", astring_c(curlist->name), astring_c(curlist->name));
-					result = output_file(type, srcrootlen, dstrootlen, srcfile, dstfile, astring_cmp(srcdir, dstdir) == 0);
+					result = output_file(type, srcrootlen, dstrootlen, srcfile, dstfile, astring_cmp(srcdir, dstdir) == 0, tempheader, tempfooter);
 				}
 			}
 
@@ -391,7 +439,7 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 				astring_printf(dstfile, "%s%c%s", astring_c(dstdir), PATH_SEPARATOR[0], astring_c(curlist->name));
 				if (indexfile != NULL)
 					core_fprintf(indexfile, "\t<li><a href=\"%s/index.html\">%s/</a></li>\n", astring_c(curlist->name), astring_c(curlist->name));
-				result = recurse_dir(srcrootlen, dstrootlen, srcfile, dstfile);
+				result = recurse_dir(srcrootlen, dstrootlen, srcfile, dstfile, tempheader, tempfooter);
 			}
 
 			/* free memory for the names */
@@ -415,7 +463,8 @@ static int recurse_dir(int srcrootlen, int dstrootlen, const astring *srcdir, co
 
 error:
 	if (indexfile != NULL)
-		output_footer_and_close_file(indexfile);
+		output_footer_and_close_file(indexfile, tempfooter, srcdir_subpath);
+	astring_free((astring *)srcdir_subpath);
 	return result;
 }
 
@@ -425,7 +474,7 @@ error:
     HTML
 -------------------------------------------------*/
 
-static int output_file(file_type type, int srcrootlen, int dstrootlen, const astring *srcfile, const astring *dstfile, int link_to_file)
+static int output_file(file_type type, int srcrootlen, int dstrootlen, const astring *srcfile, const astring *dstfile, int link_to_file, const astring *tempheader, const astring *tempfooter)
 {
 	const char *comment_start, *comment_end, *comment_inline, *token_chars;
 	const char *comment_start_esc, *comment_end_esc, *comment_inline_esc;
@@ -497,7 +546,7 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, const ast
 	}
 
 	/* open the output file */
-	dst = create_file_and_output_header(dstfile, "MAME Source Code", astring_c(srcfile_subpath));
+	dst = create_file_and_output_header(dstfile, tempheader, srcfile_subpath);
 	if (dst == NULL)
 	{
 		fprintf(stderr, "Unable to write file '%s'\n", astring_c(dstfile));
@@ -509,10 +558,9 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, const ast
 	core_fprintf(dst, "<h3>Viewing File: ");
 	output_path_as_links(dst, srcfile_subpath, FALSE, link_to_file);
 	core_fprintf(dst, "</h3>");
-	astring_free((astring *)srcfile_subpath);
 
 	/* start with some tags */
-	core_fprintf(dst, "\t<pre style=\"font-family:'Courier New','Courier',monospace; font-size:12px;\">\n");
+	core_fprintf(dst, "\t<pre style=\"" BASE_STYLE "\">\n");
 
 	/* iterate over lines in the source file */
 	while (core_fgets(srcline, ARRAY_LENGTH(srcline), src) != NULL)
@@ -679,7 +727,8 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, const ast
 	core_fprintf(dst, "\t</pre>\n");
 
 	/* close the file */
-	output_footer_and_close_file(dst);
+	output_footer_and_close_file(dst, tempfooter, srcfile_subpath);
+	astring_free((astring *)srcfile_subpath);
 	core_fclose(src);
 	return 0;
 }
@@ -695,46 +744,22 @@ static int output_file(file_type type, int srcrootlen, int dstrootlen, const ast
     HTML file with a standard header
 -------------------------------------------------*/
 
-static core_file *create_file_and_output_header(const astring *filename, const char *title, const char *subtitle)
+static core_file *create_file_and_output_header(const astring *filename, const astring *template, const astring *path)
 {
+	astring *modified;
 	core_file *file;
-
+	
 	/* create the indexfile */
 	if (core_fopen(astring_c(filename), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, &file) != FILERR_NONE)
 		return NULL;
 
 	/* print a header */
-	core_fprintf(file,
-		"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
-		"\n"
-		"<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
-		"<head>\n"
-		"\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n"
-		"\t<title>%s</title>\n"
-		"\t<link rel=\"stylesheet\" href=\"http://mamedev.org/styles-site.css\" type=\"text/css\" />\n"
-		"</head>\n"
-		"\n"
-		"<body>\n"
-		"\t<div id=\"outer\">\n"
-		"\n"
-		"\t<div id=\"banner\">\n"
-		"\t<h1>%s</h1>\n"
-		"\t<h2>%s</h2>\n"
-		"\t</div>\n"
-		"\n"
-		"\t<div id=\"left\">\n"
-		"\t<div class=\"sidebar\">\n"
-		"\t<!--#include virtual=\"/links.txt\" -->\n"
-		"\t</div>\n"
-		"\t</div>\n"
-		"\n"
-		"\t<div id=\"center\">\n"
-		"\t<div class=\"content\">\n"
-		"\n",
-		title, title, (subtitle == NULL) ? "&nbsp;" : subtitle
-	);
+	modified = astring_dup(template);
+	astring_replacec(modified, 0, "<!--PATH-->", astring_c(path));
+	core_fwrite(file, astring_c(modified), astring_len(modified));
 
 	/* return the file */
+	astring_free(modified);
 	return file;
 }
 
@@ -744,17 +769,14 @@ static core_file *create_file_and_output_header(const astring *filename, const c
     standard footer to an HTML file and close it
 -------------------------------------------------*/
 
-static void output_footer_and_close_file(core_file *file)
+static void output_footer_and_close_file(core_file *file, const astring *template, const astring *path)
 {
-	core_fprintf(file,
-		"\n"
-		"\t</div>\n"
-		"\t</div>\n"
-		"\t</div>\n"
-		"</body>"
-		"\n"
-		"</html>\n"
-	);
+	astring *modified;
+
+	modified = astring_dup(template);
+	astring_replacec(modified, 0, "<!--PATH-->", astring_c(path));
+	core_fwrite(file, astring_c(modified), astring_len(modified));
+	astring_free(modified);
 	core_fclose(file);
 }
 
