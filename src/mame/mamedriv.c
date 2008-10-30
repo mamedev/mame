@@ -968,7 +968,8 @@ const game_driver * const drivers[] =
 	DRIVER( herbiedk )	/* (c) 1984 CVS */
 	DRIVER( herodk )	/* (c) 1984 Seatongrove + Crown license */
 	DRIVER( herodku )	/* (c) 1984 Seatongrove + Crown license */
-	DRIVER( dkongx )	/* 200? Jeff's Romhack */
+	DRIVER( dkongx )	/* 200? hack/bootleg by Jeff's Romhack */
+	DRIVER( dkongx11 )	/* 200? hack/bootleg by Jeff's Romhack */
 	DRIVER( skyskipr )	/* (c) 1981 */
 	DRIVER( popeye )	/* (c) 1982 */
 	DRIVER( popeyeu )	/* (c) 1982 */
