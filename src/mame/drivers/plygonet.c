@@ -512,7 +512,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( dsp_data_map, ADDRESS_SPACE_DATA, 16 )
 	AM_RANGE(0x0800, 0x5fff) AM_RAM			/* Appears to not be affected by banking? */
 	AM_RANGE(0x6000, 0x6fff) AM_READWRITE(dsp56k_ram_bank00_read, dsp56k_ram_bank00_write)
-	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(dsp56k_ram_bank01_read, dsp56k_ram_bank01_write)	/* Mirrored in program space @ 0x8000 */
+	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(dsp56k_ram_bank01_read, dsp56k_ram_bank01_write)	/* Mirrored in program space @ 0x7000 */
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(dsp56k_ram_bank02_read, dsp56k_ram_bank02_write)
 	AM_RANGE(0xc000, 0xdfff) AM_READWRITE(dsp56k_shared_ram_read, dsp56k_shared_ram_write)
 	AM_RANGE(0xe000, 0xffbf) AM_READWRITE(dsp56k_ram_bank04_read, dsp56k_ram_bank04_write)

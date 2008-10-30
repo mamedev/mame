@@ -181,6 +181,7 @@ static void		decode_IIII_table(UINT16 IIII, typed_pointer* src_ret, typed_pointe
 static void		decode_JJJF_table(UINT16 JJJ, UINT16 F, typed_pointer* src_ret, typed_pointer* dst_ret);
 static void		decode_JJF_table(UINT16 JJ, UINT16 F, typed_pointer* src_ret, typed_pointer* dst_ret);
 static void		decode_QQF_special_table(UINT16 QQ, UINT16 F, void **S1, void **S2, void **D);
+static void		decode_QQQF_special_table(UINT16 QQQ, UINT16 F, void **S1, void **S2, void **D);
 static void		decode_RR_table(UINT16 RR, typed_pointer* ret);
 static void		decode_Z_table(UINT16 Z, typed_pointer* ret);
 
@@ -1236,9 +1237,17 @@ static size_t dsp56k_op_add(const UINT16 op_byte, typed_pointer* d_register, UIN
 /* MOVE : .... .... 0001 0001 : A-128 */
 static size_t dsp56k_op_move(const UINT16 op_byte, typed_pointer* d_register, UINT64* p_accum, UINT8* cycles)
 {
+	/* Equivalent to a nop with a parallel move */
+	/* These can't be used later.  Hopefully compilers would pick this up. */
+	*p_accum = 0;
+	d_register->addr = NULL;
+	d_register->data_type = DT_BYTE;
+
 	/* S L E U N Z V C */
 	/* * * - - - - - - */
-	return 0;
+	/* TODO: S, L */
+	cycles += 2;	/* TODO: + mv oscillator cycles */
+	return 1;
 }
 
 /* TFR : .... .... 0001 FJJJ : A-212 */
@@ -1670,9 +1679,41 @@ static size_t dsp56k_op_cmpm(const UINT16 op_byte, typed_pointer* d_register, UI
 /* MPY : .... .... 1k00 FQQQ : A-160    -- CONFIRMED TYPO IN DOCS (HHHH vs HHHW) */
 static size_t dsp56k_op_mpy(const UINT16 op_byte, typed_pointer* d_register, UINT64* p_accum, UINT8* cycles)
 {
+	UINT16 k = 0;
+	INT64 result = 0;
+
+	INT32 s1 = 0;
+	INT32 s2 = 0;
+
+	void* D = NULL;
+	void* S1 = NULL;
+	void* S2 = NULL;
+
+	decode_QQQF_special_table(BITS(op_byte,0x0007), BITS(op_byte,0x0008), &S1, &S2, &D);
+
+	k = BITS(op_byte,0x0040);
+
+	/* Negative sign */
+	if (!k)
+		s1 = *((INT16*)S1);
+	else
+		s1 = (*((INT16*)S1)) * -1;
+
+	s2 = *((INT16*)S2);
+
+	/* Fixed-point 2's complement multiplication requires a shift */
+	result = ( s1 * s2 ) << 1;
+
+	(*((UINT64*)D)) = result & U64(0x000000ffffffffff);
+
 	/* S L E U N Z V C */
 	/* * * * * * * * - */
-	return 0;
+	/* TODO: S, L, E, V */
+	if ( *((UINT64*)D) & U64(0x0000008000000000))		N_bit_set(1);
+	if ((*((UINT64*)D) & U64(0x000000ffffffffff)) == 0) Z_bit_set(1);
+
+	cycles += 2;		/* TODO: +mv oscillator cycles */
+	return 1;
 }
 
 /* MPYR : .... .... 1k01 FQQQ : A-162 */
@@ -1753,10 +1794,7 @@ static size_t dsp56k_op_asl4(const UINT16 op, UINT8* cycles)
 
 	p_accum = *((UINT64*)D.addr);
 
-	*((UINT64*)D.addr) = (*((UINT64*)D.addr)) << 1;
-	*((UINT64*)D.addr) = (*((UINT64*)D.addr)) << 1;
-	*((UINT64*)D.addr) = (*((UINT64*)D.addr)) << 1;
-	*((UINT64*)D.addr) = (*((UINT64*)D.addr)) << 1;
+	*((UINT64*)D.addr) = (*((UINT64*)D.addr)) << 4;
 	*((UINT64*)D.addr) = (*((UINT64*)D.addr)) & U64(0x000000ffffffffff);
 
 	/* S L E U N Z V C */
@@ -1777,10 +1815,32 @@ static size_t dsp56k_op_asl4(const UINT16 op, UINT8* cycles)
 /* ASR4 : 0001 0101 0011 F000 : A-34 */
 static size_t dsp56k_op_asr4(const UINT16 op, UINT8* cycles)
 {
+	UINT64 p_accum = 0;
+	typed_pointer D = {NULL, DT_BYTE};
+	decode_F_table(BITS(op,0x0008), &D);
+
+	p_accum = *((UINT64*)D.addr);
+
+	*((UINT64*)D.addr) = (*((UINT64*)D.addr)) >> 4;
+	*((UINT64*)D.addr) = (*((UINT64*)D.addr)) & U64(0x000000ffffffffff);
+
+	/* The top 4 bits become the old bit 39 */
+	if (p_accum & U64(0x0000008000000000))
+		*((UINT64*)D.addr) |= U64(0x000000f000000000);
+	else
+		*((UINT64*)D.addr) &= (~U64(0x000000f000000000));
+
 	/* S L E U N Z V C */
 	/* - * * * * * 0 ? */
+	/* TODO: E, U  */
 	/* C - Set if bit 3 of source operand is set. Cleared otherwise. */
-	return 0;
+	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_bit_set(1); else N_bit_set(0);
+	if (*((UINT64*)D.addr) == 0) Z_bit_set(1); else Z_bit_set(0);
+	V_bit_set(0);
+	if (p_accum & U64(0x0000000000000008)) C_bit_set(1); else C_bit_set(0);
+
+	cycles += 2;
+	return 1;
 }
 
 /* ASR16 : 0001 0101 0111 F000 : A-36 */
@@ -2555,6 +2615,7 @@ static size_t dsp56k_op_macsuuu(const UINT16 op, UINT8* cycles)
 	else
 	{
 		/* Signed * Unsigned */
+		/* TODO: THERE IS A HUGE CHANCE THIS DOESN'T WORK RIGHT */
 		UINT32 s1 = (UINT32)((INT32)(*((UINT16*)S1)));
 		UINT32 s2 = (UINT32)(*((UINT16*)S2));
 		result = ( s1 * s2 ) << 1;
@@ -3464,6 +3525,31 @@ static void decode_QQF_special_table(UINT16 QQ, UINT16 F, void **S1, void **S2, 
 		case 0x5: *S1 = &X1;  *S2 = &Y0;  *D = &B;  break;
 		case 0x6: *S1 = &X1;  *S2 = &Y1;  *D = &A;  break;
 		case 0x7: *S1 = &X1;  *S2 = &Y1;  *D = &B;  break;
+	}
+}
+
+static void decode_QQQF_special_table(UINT16 QQQ, UINT16 F, void **S1, void **S2, void **D)
+{
+	UINT16 switchVal = (QQQ << 1) | F;
+
+	switch(switchVal)
+	{
+		case 0x0: *S1 = &X0;  *S2 = &X0;  *D = &A;  break;
+		case 0x1: *S1 = &X0;  *S2 = &X0;  *D = &B;  break;
+		case 0x2: *S1 = &X1;  *S2 = &X0;  *D = &A;  break;
+		case 0x3: *S1 = &X1;  *S2 = &X0;  *D = &B;  break;
+		case 0x4: *S1 = &A1;  *S2 = &Y0;  *D = &A;  break;
+		case 0x5: *S1 = &A1;  *S2 = &Y0;  *D = &B;  break;
+		case 0x6: *S1 = &B1;  *S2 = &X0;  *D = &A;  break;
+		case 0x7: *S1 = &B1;  *S2 = &X0;  *D = &B;  break;
+		case 0x8: *S1 = &Y0;  *S2 = &X0;  *D = &A;  break;
+		case 0x9: *S1 = &Y0;  *S2 = &X0;  *D = &B;  break;
+		case 0xa: *S1 = &Y1;  *S2 = &X0;  *D = &A;  break;
+		case 0xb: *S1 = &Y1;  *S2 = &X0;  *D = &B;  break;
+		case 0xc: *S1 = &Y0;  *S2 = &X1;  *D = &A;  break;
+		case 0xd: *S1 = &Y0;  *S2 = &X1;  *D = &B;  break;
+		case 0xe: *S1 = &Y1;  *S2 = &X1;  *D = &A;  break;
+		case 0xf: *S1 = &Y1;  *S2 = &X1;  *D = &B;  break;
 	}
 }
 
