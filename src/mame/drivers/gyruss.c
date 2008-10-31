@@ -13,12 +13,12 @@ a200-a27f /
 memory mapped ports:
 
 read:
-c080      IN0
+c080      IN0  (system inputs)
 c0a0      IN1
 c0c0      IN2
-c0e0      DSW0
-c000      DSW1
-c100      DSW2
+c0e0      DSW1
+c000      DSW2
+c100      DSW3
 
 write:
 a000-a1ff  Odd frame spriteram
@@ -221,25 +221,25 @@ static INPUT_PORTS_START( gyruss )
 	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_2WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_2WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_2WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_2WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_2WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* 1p shoot 2 - unused */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* 2p shoot 3 - unused */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_2WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_2WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_2WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* 2p shoot 2 - unused */
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("DSW1")
+	PORT_START("DSW1")   /* 8P Dip Switch */
 	PORT_DIPNAME( 0xf0, 0xf0, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x50, DEF_STR( 3C_1C ) )
@@ -275,7 +275,7 @@ static INPUT_PORTS_START( gyruss )
 	PORT_DIPSETTING(    0x09, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
 
-	PORT_START("DSW2")
+	PORT_START("DSW2")   /* 8P Dip Switch */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -284,10 +284,10 @@ static INPUT_PORTS_START( gyruss )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x08, "30000 60000" )
-	PORT_DIPSETTING(    0x00, "40000 70000" )
-	PORT_DIPNAME( 0x70, 0x70, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )       /* tables at 0x1653 (15 bytes) or 0x4bf3 (13 bytes) */
+	PORT_DIPSETTING(    0x08, "30k 90k 60k+" )              /* last bonus life at 810k : max. 14 bonus lives */ 
+	PORT_DIPSETTING(    0x00, "40k 110k 70k+" )             /* last bonus life at 810k : max. 12 bonus lives */
+	PORT_DIPNAME( 0x70, 0x30, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x70, "1 (Easiest)" )
 	PORT_DIPSETTING(    0x60, "2" )
 	PORT_DIPSETTING(    0x50, "3" )
@@ -300,22 +300,28 @@ static INPUT_PORTS_START( gyruss )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
-	PORT_START("DSW3")
+	PORT_START("DSW3")   /* 1P Dip Switch */
 	PORT_DIPNAME( 0x01, 0x00, "Demo Music" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	/* other bits probably unused */
 INPUT_PORTS_END
 
-/* This is identical to gyruss except for the bonus that has different
-   values */
 static INPUT_PORTS_START( gyrussce )
 	PORT_INCLUDE( gyruss )
 
-	PORT_MODIFY("DSW1")
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x08, "50000 70000" )
-	PORT_DIPSETTING(    0x00, "60000 80000" )
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )       /* tables at 0x1653 (15 bytes) or 0x4bf3 (13 bytes) */
+	PORT_DIPSETTING(    0x08, "50k 120k 70k+" )             /* last bonus life at 960k : max. 14 bonus lives */ 
+	PORT_DIPSETTING(    0x00, "60k 140k 80k+" )             /* last bonus life at 940k : max. 12 bonus lives */
+	PORT_DIPNAME( 0x70, 0x20, DEF_STR( Difficulty ) )       /* "Difficult" default setting according to Centuri manual */
+	PORT_DIPSETTING(    0x70, "1 (Easiest)" )
+	PORT_DIPSETTING(    0x60, "2" )
+	PORT_DIPSETTING(    0x50, "3" )
+	PORT_DIPSETTING(    0x40, "4" )
+	PORT_DIPSETTING(    0x30, "5 (Average)" )
+	PORT_DIPSETTING(    0x20, "6" )
+	PORT_DIPSETTING(    0x10, "7" )
+	PORT_DIPSETTING(    0x00, "8 (Hardest)" )
 INPUT_PORTS_END
 
 
@@ -682,6 +688,6 @@ static DRIVER_INIT( gyruss )
 }
 
 
-GAME( 1983, gyruss,   0,      gyruss, gyruss,   gyruss, ROT90, "Konami", "Gyruss (Konami)", GAME_SUPPORTS_SAVE )
-GAME( 1983, gyrussce, gyruss, gyruss, gyrussce, gyruss, ROT90, "Konami (Centuri license)", "Gyruss (Centuri)", GAME_SUPPORTS_SAVE )
-GAME( 1983, venus,    gyruss, gyruss, gyrussce, gyruss, ROT90, "bootleg", "Venus", GAME_SUPPORTS_SAVE )
+GAME( 1983, gyruss,   0,        gyruss,   gyruss,   gyruss, ROT90, "Konami", "Gyruss (Konami)", GAME_SUPPORTS_SAVE )
+GAME( 1983, gyrussce, gyruss,   gyruss,   gyrussce, gyruss, ROT90, "Konami (Centuri license)", "Gyruss (Centuri)", GAME_SUPPORTS_SAVE )
+GAME( 1983, venus,    gyruss,   gyruss,   gyruss,   gyruss, ROT90, "bootleg", "Venus", GAME_SUPPORTS_SAVE )

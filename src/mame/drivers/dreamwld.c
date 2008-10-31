@@ -34,7 +34,7 @@ Notes:
       VSync @ 58Hz
 
 
-Stephh's notes (based on the games M68000 code and some tests) :
+Stephh's notes (based on the game M68EC020 code and some tests) :
 
   - Don't trust the "test mode" as it displays Dip Switches infos
     that are in fact unused by the game ! Leftover from another game ?

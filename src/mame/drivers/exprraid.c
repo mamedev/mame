@@ -1,6 +1,6 @@
 /***************************************************************************
 
-Express Raider - (c) 1986 Data East USA
+Express Raider - (c) 1986 Data East Corporation / Data East USA
 
 Ernesto Corvi
 ernesto@imagina.com
@@ -157,7 +157,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
       * 0xe7dc : COIN1 - 0xe7e4 : COIN2 (Mode 1)
       * 0xe7ec : COIN1 - 0xe7f4 : COIN2 (Mode 2)
   - At the begining of each level, you have text in lower case
-    which doesn't give you any hints to pass the level nor advices.
+    which doesn't give you any hints to pass the level nor advice.
   - In this version, you always have 5 wagons for the "shoot" stages.
   - Continue play is always available but score is reset to 0.
 
