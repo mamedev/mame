@@ -2508,15 +2508,19 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( sh2_main_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x0000000 , 0x0003fff) AM_ROM
-	AM_RANGE(0x6000000 , 0x603ffff) AM_RAM AM_SHARE(10)
-	AM_RANGE(0x2000000 , 0x23fffff) AM_ROM AM_REGION("gamecart_sh2", 0)
+	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
+	AM_RANGE(0x06000000, 0x0603ffff) AM_RAM AM_SHARE(10)
+	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_REGION("gamecart_sh2", 0)
+
+	AM_RANGE(0xc0000000, 0xc00003ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sh2_slave_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x0000000 , 0x0003fff) AM_ROM
-	AM_RANGE(0x6000000 , 0x603ffff) AM_RAM AM_SHARE(10)
-	AM_RANGE(0x2000000 , 0x23fffff) AM_ROM AM_REGION("gamecart_sh2", 0)
+	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
+	AM_RANGE(0x06000000, 0x0603ffff) AM_RAM AM_SHARE(10)
+	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_REGION("gamecart_sh2", 0)
+
+	AM_RANGE(0xc0000000, 0xc00003ff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -5437,6 +5441,7 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine)
 // these are tests for 'special case' hardware to make sure I don't break anything while rearranging things
 //
 static int sh2_are_running;
+static int _32x_adapter_enabled;
 
 static int sh2_master_vint_enable, sh2_slave_vint_enable;
 static int sh2_master_hint_enable, sh2_slave_hint_enable;
@@ -5833,6 +5838,17 @@ void sh2_comms_write(int offset, UINT16 data, UINT16 mem_mask)
 }
 
 
+static READ16_HANDLER( _32x_68k_comms_r )
+{
+	return comms_port[offset];
+}
+
+static WRITE16_HANDLER( _32x_68k_comms_w )
+{
+	COMBINE_DATA(&comms_port[offset]);
+}
+
+
 static WRITE32_HANDLER( sh2_commsport_w )
 {
 	printf("comms write %d %08x %08x\n",offset, data, mem_mask);
@@ -5854,23 +5870,6 @@ static WRITE32_HANDLER( sh2_4000_master_w )
 static WRITE32_HANDLER( sh2_4000_slave_w )
 {
 
-}
-
-static WRITE16_HANDLER( _32x_68k_a15100_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		if (data & 0x02)
-		{
-			cpunum_set_input_line(machine, _32x_master_cpu_number, INPUT_LINE_RESET, CLEAR_LINE);
-			cpunum_set_input_line(machine, _32x_slave_cpu_number, INPUT_LINE_RESET, CLEAR_LINE);
-		}
-	}
-
-	if (ACCESSING_BITS_8_15)
-	{
-
-	}
 }
 
 static READ16_HANDLER( _32x_68k_a15184_r )
@@ -5959,19 +5958,85 @@ static WRITE16_HANDLER( _32x_68k_a15104_w )
 }
 
 
+static UINT16 a15100_reg;
+
+static READ16_HANDLER( _32x_68k_a15100_r )
+{
+	return a15100_reg | 0x0080;
+}
+
+static READ16_HANDLER( _32x_68k_bitmapmode_r )
+{
+	return 0x8001;
+}
+
+static WRITE16_HANDLER( _32x_68k_bitmapmode_w )
+{
+	printf("_32x_68k_bitmapmode_w (a15180) %04x %04x\n",data,mem_mask);
+}
+
+static WRITE16_HANDLER( _32x_68k_a15100_w )
+{
+	printf("_32x_68k_a15100_w\n");
+
+	if (ACCESSING_BITS_0_7)
+	{
+		a15100_reg = (a15100_reg & 0xff00) | (data & 0x00ff);
+
+		if (data & 0x02)
+		{
+			cpunum_set_input_line(machine, _32x_master_cpu_number, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(machine, _32x_slave_cpu_number, INPUT_LINE_RESET, CLEAR_LINE);
+		}
+
+		if (data & 0x01)
+		{
+			_32x_adapter_enabled = 1;
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0880000, 0x08fffff, 0, 0, SMH_BANK11, SMH_BANK11); // 'fixed' 512kb rom bank
+			memory_set_bankptr( 11, memory_region(machine, "gamecart") );
+
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0900000, 0x09fffff, 0, 0, SMH_BANK12, SMH_BANK12); // 'bankable' 1024kb rom bank
+			memory_set_bankptr( 12, memory_region(machine, "gamecart") );
+
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
+			memory_set_bankptr( 10, memory_region(machine, "32x_68k_bios") );
+
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15184, 0x0a15185, 0, 0, _32x_68k_a15184_r,    _32x_68k_a15184_w); // autofill length reg
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15186, 0x0a15187, 0, 0, _32x_68k_a15186_r,    _32x_68k_a15186_w); // autofill address reg
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15188, 0x0a15189, 0, 0, _32x_68k_a15188_r,    _32x_68k_a15188_w); // autofill data reg / start fill
+
+
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15180, 0x0a15181, 0, 0, _32x_68k_bitmapmode_r, _32x_68k_bitmapmode_w); // mode control regs
+
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a1518a, 0x0a1518b, 0, 0, _32x_68k_fbcontrol_r, _32x_68k_fbcontrol_w); // framebuffer control regs
+
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0840000, 0x085ffff, 0, 0, _32x_68k_dram_r, _32x_68k_dram_w); // access to 'display ram' (framebuffer)
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15200, 0x0a153ff, 0, 0, _32x_68k_palette_r, _32x_68k_palette_w); // access to 'palette' xRRRRRGGGGGBBBBB
+
+
+		}
+		else
+		{
+			_32x_adapter_enabled = 0;
+
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
+			memory_set_bankptr( 10, memory_region(machine, "gamecart") );
+
+
+		}
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		a15100_reg = (a15100_reg & 0x00ff) | (data & 0xff00);
+
+	}
+}
+
+
 DRIVER_INIT( _32x )
 {
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
-	memory_set_bankptr( 10, memory_region(machine, "gamecart") );
 
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0880000, 0x08fffff, 0, 0, SMH_BANK11, SMH_BANK11); // 'fixed' 512kb rom bank
-	memory_set_bankptr( 11, memory_region(machine, "gamecart") );
-
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0900000, 0x09fffff, 0, 0, SMH_BANK12, SMH_BANK12); // 'bankable' 1024kb rom bank
-	memory_set_bankptr( 12, memory_region(machine, "gamecart") );
-
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
-	memory_set_bankptr( 10, memory_region(machine, "32x_68k_bios") );
 
 	_32x_dram0 = auto_malloc(0x20000);
 	_32x_dram1 = auto_malloc(0x20000);
@@ -5989,22 +6054,22 @@ DRIVER_INIT( _32x )
 	_32x_display_dram = _32x_dram0;
 	_32x_access_dram = _32x_dram1;
 
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0840000, 0x085ffff, 0, 0, _32x_68k_dram_r, _32x_68k_dram_w); // access to 'display ram' (framebuffer)
+	_32x_adapter_enabled = 0;
 
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15200, 0x0a153ff, 0, 0, _32x_68k_palette_r, _32x_68k_palette_w); // access to 'palette' xRRRRRGGGGGBBBBB
+	if (_32x_adapter_enabled == 0)
+	{
+		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
+		memory_set_bankptr( 10, memory_region(machine, "gamecart") );
+	};
 
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15100, 0x0a15101, 0, 0, _32x_68k_a15100_w); // framebuffer control regs
-
+	a15100_reg = 0x0000;
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa15100, 0xa15101, 0, 0, _32x_68k_a15100_r, _32x_68k_a15100_w); // framebuffer control regs
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa15104, 0xa15105, 0, 0, _32x_68k_a15104_r,    _32x_68k_a15104_w); // 68k BANK rom set
 
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15184, 0x0a15185, 0, 0, _32x_68k_a15184_r,    _32x_68k_a15184_w); // autofill length reg
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15186, 0x0a15187, 0, 0, _32x_68k_a15186_r,    _32x_68k_a15186_w); // autofill address reg
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15188, 0x0a15189, 0, 0, _32x_68k_a15188_r,    _32x_68k_a15188_w); // autofill data reg / start fill
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa15120, 0xa1512f, 0, 0, _32x_68k_comms_r,    _32x_68k_comms_w); // comms regs
 
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a1518a, 0x0a1518b, 0, 0, _32x_68k_fbcontrol_r, _32x_68k_fbcontrol_w); // framebuffer control regs
-
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a130ec, 0x0a151ef, 0, 0, _32x_68k_MARS_r); // system ID
+	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a130ec, 0x0a130ef, 0, 0, _32x_68k_MARS_r); // system ID
 
 
 
@@ -6059,7 +6124,7 @@ ROM_START( 32x_bios )
 	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
 
 	ROM_REGION16_BE( 0x400000, "32x_68k_bios", 0 ) /* 68000 Code */
-	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
+//	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
 	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
 
 	ROM_REGION( 0x400000, "32x_master_sh2", 0 ) /* SH2 Code */
