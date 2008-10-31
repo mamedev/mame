@@ -40,7 +40,8 @@
 
     - PLDs: 1x PAL16R4A.     (read protected)
 
-    - SOUND: 1-bit DAC + 1x TDA 2002 (8W. car radio audio amplifier)
+    - SOUND: 1x delta-sigma DAC (1-bit/Bitstream).
+             1x TDA2002 (8W. car radio audio amplifier)
 
 
     Other components:
