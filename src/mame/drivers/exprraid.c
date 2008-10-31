@@ -157,7 +157,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
       * 0xe7dc : COIN1 - 0xe7e4 : COIN2 (Mode 1)
       * 0xe7ec : COIN1 - 0xe7f4 : COIN2 (Mode 2)
   - At the begining of each level, you have text in lower case
-    which doesn't give you any hints to pass the level.
+    which doesn't give you any hints to pass the level nor advices.
   - In this version, you always have 5 wagons for the "shoot" stages.
   - Continue play is always available but score is reset to 0.
 
@@ -313,9 +313,9 @@ static INPUT_PORTS_START( exprraid )
 	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x00)
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
-	PORT_DIPNAME( 0x10, 0x10, "Coin Mode" )
-	PORT_DIPSETTING(    0x10, "Mode 1" )                    /* tables at 0xe7e2 (COIN1) and 0xe7ea (COIN2) */
-	PORT_DIPSETTING(    0x00, "Mode 2" )                    /* tables at 0xe7f2 (COIN1) and 0xe7fa (COIN2) */
+	PORT_DIPNAME( 0x10, 0x10, "Coin Mode" )                 /* see notes */
+	PORT_DIPSETTING(    0x10, "Mode 1" )
+	PORT_DIPSETTING(    0x00, "Mode 2" )
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
