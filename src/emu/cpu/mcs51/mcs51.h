@@ -58,6 +58,8 @@ enum
 	MCS51_T1_LINE,			/* P3.5: Timer 1 External Input */
 	MCS51_T2_LINE,			/* P1.0: Timer 2 External Input */
 	MCS51_T2EX_LINE,		/* P1.1: Timer 2 Capture Reload Trigger */
+	
+	DS5002FP_PFI_LINE,		/* DS5002FP Power fail interrupt */
 };
 
 /* special I/O space ports */
@@ -71,6 +73,18 @@ enum
 	MCS51_PORT_TX	= 0x10004,	/* P3.1 */
 };
 
+/***************************************************************************
+    CONFIGURATION
+***************************************************************************/
+
+/* configuration of the DS5002FP */
+typedef struct _ds5002fp_config ds5002fp_config;
+struct _ds5002fp_config
+{
+	UINT8	mcon;					/* bootstrap loader MCON register */
+	UINT8	rpctl;					/* bootstrap loader RPCTL register */
+	UINT8	crc;					/* bootstrap loader CRC register */
+};
 
 /***************************************************************************
     FUNCTION PROTOTYPES
