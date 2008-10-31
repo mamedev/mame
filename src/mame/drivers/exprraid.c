@@ -5,8 +5,6 @@ Express Raider - (c) 1986 Data East USA
 Ernesto Corvi
 ernesto@imagina.com
 
-Last Modified 14th Jul 2003
-
 Memory Map:
 Main CPU: ( 6502 )
 0000-05ff RAM
@@ -21,6 +19,7 @@ Main CPU: ( 6502 )
 2800-2801 Protection
 3800-3800 VBblank ( bootleg 1 only )
 4000-ffff SMH_ROM
+ffc0-ffc0 VBblank ( bootleg 2 only )
 
 Sound Cpu: ( 6809 )
 0000-1fff RAM
@@ -57,6 +56,155 @@ sign has been defaced by the bootleggers
 
 2nd bootleg set expects to read vblank status from 0xFFC0, country warning
 sign is intact, however Credit is spelt incorrectly.
+
+
+Stephh's notes (based on the games M6502 code and some tests) :
+
+1) 'exprraid'
+
+  - "@ 1986 DATA EAST USA, INC." (US)
+  - Number of enemies on "shoot" stages is determined by the level
+    (see code at 0x5d21 where location 0x0e is level number-1).
+    Note that time tables are coded backwards (locomotive first,
+    then 5th wagon, then 4th wagon ... up to 1st wagon).
+    This number of enemies is also supposed to be determined
+    by "Difficulty" settings (DSW1 bits 3 and 4).
+    There is however an ingame bug that reads DSW1 bits 4 and 5 :
+
+      5D2F: AD 03 18      lda  $1803
+      5D32: 49 FF         eor  #$FF
+      5D34: 4A            lsr  a
+      5D35: 4A            lsr  a
+      5D36: 4A            lsr  a
+      5D37: 29 06         and  #$06
+
+    So number of enemies is also determined by "Demo Sound" setting !
+    Correct code shall be :
+
+      5D37: 29 03         and  #$03
+
+  - Time for each wagon on "shoot" stage is determined by the level
+    (see code at 0x6873 where location 0x0e is level number-1).
+    Note that time tables are coded backwards (locomotive first,
+    then 5th wagon, then 4th wagon ... up to 1st wagon).
+  - In the US manual, "bonus lives" settings are told be either
+    "Every 50000" or "50000/80000".
+    However, when you look at code at 0xe4a1, you'll notice that
+    settings shall be "50000 only" and "50000/80000".
+  - "Coin Mode" as well "Mode 2 Coinage" settings (DSW0 bits 0 to 4)
+    are undocumented in the US manual.
+    "Coin Mode" is tested though via code at 0xe7c5.
+    Coinage tables :
+      * 0xe7e2 : COIN1 - 0xe7ea : COIN2 (Mode 1)
+      * 0xe7f2 : COIN1 - 0xe7fa : COIN2 (Mode 2)
+  - "Force Coinage" (DSW1 bit 6) setting is undocumented in the US manual.
+    It is tested though via code at 0xe794.
+    When this Dip Switch is set to "On", pressing COIN1 or COIN2 always
+    adds 1 credit regardless of the "Coinage" and "Coin Mode" settings.
+  - At the begining of each level, you have text in upper case
+    which gives you some hints to pass the level or some advice.
+  - In this version, due to extra code at 0xfd80, you only have 4 wagons
+    for the "shoot" stages instead of 5.
+  - Continue play is always available and score is NOT reset to 0.
+
+2) 'exprrada'
+
+  - "@ 1986 DATA EAST CORPORATION" + no code to display the Warning screen (World)
+  - Same way to code number of enemies in "shoot" stages as in 'exprraid'
+    (code at 5ce4) and same ingame bug :
+
+      5CF4: AD 03 18      lda  $1803
+      5CF7: 49 FF         eor  #$FF
+      5CF9: 4A            lsr  a
+      5CFA: 4A            lsr  a
+      5CFB: 4A            lsr  a
+      5CFC: 29 06         and  #$06
+
+    Correct code shall be :
+
+      5CFC: 29 03         and  #$03
+
+    You'll notice by looking at the tables that there are sometimes
+    more enemies than in 'exprraid'.
+  - Time for each wagon on "shoot" stage is determined by the level
+    (see code at 0x6834 where location 0x0e is level number-1).
+    This time is also supposed to be determined by "Difficulty"
+    settings (DSW1 bits 3 and 4).
+    There is however an ingame bug that reads DSW1 bits 4 and 5 :
+
+      683B: AD 03 18      lda  $1803
+      683E: 49 FF         eor  #$FF
+      6840: 4A            lsr  a
+      6841: 4A            lsr  a
+      6842: 4A            lsr  a
+      6843: 4A            lsr  a
+      6844: 29 03         and  #$03
+
+    So Time is also determined by "Demo Sound" setting because of
+    extra "lsr a" instruction at 0x6843 !
+    Correct code shall be :
+
+      6843: EA            nop  
+
+    Fortunately, table at 0x685f is filled with 0x30 so you'll
+    always have 30 seconds to "clear" the wagon (which is more
+    than the time you have in 'exprraid').
+    For the locomotive, time is always set to 0x20 = 20 seconds
+    (which is again more than the time you have in 'exprraid').
+  - "Bonus lives" routine starts at 0xe49b.
+  - Coinage related stuff starts at 0xe78e.
+    Coinage tables :
+      * 0xe7dc : COIN1 - 0xe7e4 : COIN2 (Mode 1)
+      * 0xe7ec : COIN1 - 0xe7f4 : COIN2 (Mode 2)
+  - At the begining of each level, you have text in lower case
+    which doesn't give you any hints to pass the level.
+  - In this version, you always have 5 wagons for the "shoot" stages.
+  - Continue play is always available but score is reset to 0.
+
+3) 'wexpress'
+
+  - "@ 1986 DATA EAST CORPORATION" + no code to display the Warning screen (World)
+  - This version is based on 'exprrada' so all comments also fit
+    for this set. The main difference is that reads from 0x2800
+    and 0x2801 (protection) are either discarded (jumps are noped
+    or patched) or changed to read what shall be the correct value
+    (reads from 0x2801 occur almost all the time).
+    So IMO this set looks like a World bootleg .
+
+4) 'wexpresb'
+
+  - "@ 1986 DATA EAST CORPORATION" + extra code to display the Warning screen (Japan)
+  - Modified Warning screen
+  - This version is heavily based on 'exprrada' (even if I think
+    that there shall exist a "better" Japan undumped version)
+    so all comments also fit for this set. The main difference is
+    the way protection is bypassed (in a different way than 'wexpress'
+    as reads from 0x2801 only occur when a life is lost).
+    The other difference is that you can NOT continue a game.
+  - "Bonus lives" routine starts at 0xe4e5.
+  - Coinage related stuff starts at 0xe7d8.
+  - Coinage tables :
+      * 0xe826 : COIN1 - 0xe82e : COIN2 (Mode 1)
+      * 0xe836 : COIN1 - 0xe83e : COIN2 (Mode 2)
+
+5) 'wexpresc'
+
+  - "@ 1986 DATA EAST CORPORATION" + extra code to display the Warning screen (Japan)
+  - Original Warning screen
+  - "CREDIT" mispelled to "CRDDIT".
+  - This version is heavily based on 'exprrada' (even if I think
+    that there shall exist a "better" Japan undumped version)
+    so all comments also fit for this set. The main difference is
+    the way protection is bypassed (in a different way than 'wexpress'
+    but also in a different way than 'wexpresb' as reads from 0x2801
+    occur when you lose a life but also on "shoot" stages).
+    The other difference is that you can NOT continue a game as in 'wexpresb'.
+  - "Bonus lives" routine starts at 0xe4e5 (same as 'wexpresb')
+  - Coinage related stuff starts at 0xe7d8 (same as 'wexpresb').
+  - Coinage tables (same as 'wexpresb') :
+      * 0xe826 : COIN1 - 0xe82e : COIN2 (Mode 1)
+      * 0xe836 : COIN1 - 0xe83e : COIN2 (Mode 2)
+
 
 ***************************************************************************/
 
@@ -148,29 +296,39 @@ static INPUT_PORTS_START( exprraid )
 
 	PORT_START("DSW0")	/* DSW 0 - 0x1800 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_4C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_6C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x00)
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x04, DEF_STR( 3C_1C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
+	PORT_DIPSETTING(    0x0c, DEF_STR( 1C_1C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x00)
+	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) ) PORT_CONDITION("DSW0",0x10,PORTCOND_EQUALS,0x10)
+	PORT_DIPNAME( 0x10, 0x10, "Coin Mode" )
+	PORT_DIPSETTING(    0x10, "Mode 1" )                    /* tables at 0xe7e2 (COIN1) and 0xe7ea (COIN2) */
+	PORT_DIPSETTING(    0x00, "Mode 2" )                    /* tables at 0xe7f2 (COIN1) and 0xe7fa (COIN2) */
 	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Cabinet ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Cocktail ) )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("IN1")	/* IN 1 - 0x1801 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_START1 )
@@ -178,32 +336,35 @@ static INPUT_PORTS_START( exprraid )
 
 	PORT_START("IN2")	/* IN 2 - 0x1802 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("DSW1")	/* IN 3 - 0x1803 */
+	PORT_START("DSW1")	/* DSW 1 - 0x1803 */
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x01, "1" )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(	0x00, DEF_STR( Infinite ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x04, "50K+" )
-	PORT_DIPSETTING(    0x00, "50K 80K" )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )       /* see notes */
+	PORT_DIPSETTING(    0x00, "50k 80k" )
+	PORT_DIPSETTING(    0x04, "50k only" )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Difficulty ) )       /* see notes */
+	PORT_DIPSETTING(    0x18, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )      /* see notes */
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x40, 0x40, "Force Coinage = 1C/1C" )     /* see notes */
+	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 INPUT_PORTS_END
 
 
