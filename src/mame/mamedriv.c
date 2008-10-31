@@ -8281,7 +8281,8 @@ Other Sun games
 	DRIVER( lucky74a )	/* (c) 1988 Wing Co., Ltd */
 	DRIVER( magictg )	/* (c) 199? Acclaim */
 	DRIVER( magictga )	/* (c) 199? Acclaim */
-	DRIVER( re900 )		/* (c) 1990 Entretenimientos GEMINI */
+	DRIVER( re900 )		/* (c) 1993 Entretenimientos GEMINIS */
+	DRIVER( bs94 )		/* (c) 1994 Entretenimientos GEMINIS */
 	DRIVER( jokrwild )	/* (c) 1988 Sigma */
 
 	/* InterFlip / Recreativos Franco */

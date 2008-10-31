@@ -1769,6 +1769,8 @@ $(DRIVERS)/pmpoker.o:	$(LAYOUT)/pmpoker.lh \
 
 $(DRIVERS)/qix.o:		$(LAYOUT)/elecyoyo.lh
 
+$(DRIVERS)/re900.o:	$(LAYOUT)/re900.lh
+
 $(DRIVERS)/sbrkout.o:	$(LAYOUT)/sbrkout.lh
 
 $(DRIVERS)/sderby.o:	$(LAYOUT)/sderby.lh \
