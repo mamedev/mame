@@ -103,7 +103,7 @@ PALETTE_INIT( suprmous )
 		UINT8 g = BITSWAP8(color_prom[i + 0x20], 7, 6, 0, 1, 2, 3, 4, 5) & 0x1f;
 		UINT8 b = BITSWAP8(color_prom[i + 0x00], 0, 1, 2, 3, 4, 5, 6, 7) & 0x1f;
 
-		palette_set_color_rgb(machine, i + 8, pal5bit(r), pal5bit(g), pal5bit(b));
+		palette_set_color_rgb(machine, i, pal5bit(r), pal5bit(g), pal5bit(b));
 	}
 
 	/* allocate primary colors for the background and foreground
