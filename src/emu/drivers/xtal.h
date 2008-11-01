@@ -72,10 +72,11 @@ enum
 	XTAL_9_987MHz		= 9987000,		/* Crazy Balloon */
 	XTAL_10MHz   		= 10000000,
 	XTAL_10_595MHz  	= 10595000,		/* Mad Alien */
+	XTAL_10_730MHz   	= 10730000,		/* Ruleta RE-900 VDP Clock */
 	XTAL_10_733MHz   	= 10733000,		/* The Fairyland Story */
 	XTAL_10_738635MHz	= 10738635,		/* TMS9918 family */
 	XTAL_11MHz			= 11000000,		/* Mario I8039 sound */
-	XTAL_11_0592MHz  	= 11059200,		/* Lethal Justice */
+	XTAL_11_0592MHz  	= 11059200,		/* Lethal Justice, Ruleta RE-900 */
 	XTAL_11_2MHz  		= 11200000,		/* New York, New York */
 	XTAL_11_289MHz  	= 11289000,		/* Vanguard */
 	XTAL_11_6688MHz  	= 11668800,		/* Gameplan pixel clock */

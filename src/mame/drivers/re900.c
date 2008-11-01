@@ -70,8 +70,8 @@
 ***********************************************************************************/
 
 
-#define MASTER_CLOCK	11059200
-#define VDP_CLOCK		10730000
+#define MAIN_CLOCK		XTAL_11_0592MHz
+#define VDP_CLOCK		XTAL_10_730MHz
 #define TMS_CLOCK		VDP_CLOCK / 24
 
 #include "driver.h"
@@ -401,7 +401,7 @@ static const ay8910_interface ay8910_bs94 =
 static MACHINE_DRIVER_START( re900 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", I8051, MASTER_CLOCK)
+	MDRV_CPU_ADD("main", I8051, MAIN_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(mem_prg, 0)
 	MDRV_CPU_IO_MAP(mem_io, 0)
 	MDRV_CPU_VBLANK_INT("main", re900_video_interrupt) 

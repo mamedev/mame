@@ -2494,6 +2494,7 @@ src/mame/layout/pottnpkr.lay svneol=native#text/plain
 src/mame/layout/pulltabs.lay svneol=native#text/plain
 src/mame/layout/pyramid.lay svneol=native#text/plain
 src/mame/layout/quintoon.lay svneol=native#text/plain
+src/mame/layout/re900.lay svneol=native#text/plain
 src/mame/layout/rocknms.lay svneol=native#text/plain
 src/mame/layout/sbrkout.lay svneol=native#text/plain
 src/mame/layout/sderby.lay svneol=native#text/plain
