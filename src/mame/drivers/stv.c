@@ -122,9 +122,10 @@ ToDo / Notes:
  on SMPC or controls fail
 -mausuke/bakubaku/grdforce: need to sort out transparency on the colour mapped sprites
 -bakubaku: no sound? Caused by missing irq?
--myfairld: Doesn't work with -sound enabled because of a sound ram check at relative
- addresses of $700/$710/$720/$730,so I'm not removing the NOT_WORKING flag due of that.Also
- Micronet programmers had the "great" idea to *not* use the ST-V input standards,infact
+-myfairld: Apparently this game gives a black screen (either test mode and in-game mode),but let it wait for about
+ 10 seconds and the game will load everything.This is because of a hellishly slow m68k sub-routine located at 54c2.
+ Likely to not be a bug but an in-game design issue.
+-myfairld: Micronet programmers had the "great" idea to *not* use the ST-V input standards,infact
  joystick panel is mapped with input_port(10) instead of input_port(2),so for now use
  the mahjong panel instead.
 -kiwames: the VDP1 sprites refresh is too slow,causing the "Draw by request" mode to
@@ -176,8 +177,6 @@ cpu #0 (PC=0601023A): unmapped program memory dword write to 02000000 = 00000000
 #include "includes/stv.h"
 
 #define USE_SLAVE 1
-/*Enable the following to play 'myfairld' without using the -nosound switch.*/
-#define UGLY_SOUND_HACK 0
 
 #ifdef MAME_DEBUG
 #define LOG_CDB  0
@@ -722,7 +721,7 @@ static READ32_HANDLER ( stv_SMPC_r32 )
 	if (ACCESSING_BITS_24_31)	{ byte = 0; readdata = stv_SMPC_r8(machine, offset+byte) << 24; }
 	if (ACCESSING_BITS_16_23)	{ byte = 1; readdata = stv_SMPC_r8(machine, offset+byte) << 16; }
 	if (ACCESSING_BITS_8_15)	{ byte = 2; readdata = stv_SMPC_r8(machine, offset+byte) << 8;  }
-	if (ACCESSING_BITS_0_7)	{ byte = 3; readdata = stv_SMPC_r8(machine, offset+byte) << 0;  }
+	if (ACCESSING_BITS_0_7)		{ byte = 3; readdata = stv_SMPC_r8(machine, offset+byte) << 0;  }
 
 	return readdata;
 }
@@ -738,7 +737,7 @@ static WRITE32_HANDLER ( stv_SMPC_w32 )
 	if (ACCESSING_BITS_24_31)	{ byte = 0; writedata = data >> 24; }
 	if (ACCESSING_BITS_16_23)	{ byte = 1; writedata = data >> 16; }
 	if (ACCESSING_BITS_8_15)	{ byte = 2; writedata = data >> 8;  }
-	if (ACCESSING_BITS_0_7)	{ byte = 3; writedata = data >> 0;  }
+	if (ACCESSING_BITS_0_7)		{ byte = 3; writedata = data >> 0;  }
 
 	writedata &= 0xff;
 
@@ -784,12 +783,6 @@ static INTERRUPT_GEN( stv_interrupt )
 			cpunum_set_input_line_and_vector(machine, 0, 0xe, HOLD_LINE , 0x41);
 		}
 		stv_vblank = 0;
-		#if UGLY_SOUND_HACK
-		sound_ram[0x700/2] = 0x0000;
-		sound_ram[0x710/2] = 0x0000;
-		sound_ram[0x720/2] = 0x0000;
-		sound_ram[0x730/2] = 0x0000;
-		#endif
 	}
 	else if(scanline <= 223 && scanline >= 1)/*Correct?*/
 	{
@@ -3716,7 +3709,7 @@ GAME( 1997, nclubv3,   stvbios, stv, stv,  		nameclv3,  	ROT0,   "Sega", 	     	
 
 /* Almost */
 GAME( 1997, vmahjong,  stvbios, stv, stvmp,		stv,       	ROT0,   "Micronet",                 	"Virtual Mahjong (J 961214 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, myfairld,  stvbios, stv, stvmp,		stv,       	ROT0,   "Micronet",                 	"Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1998, myfairld,  stvbios, stv, stvmp,		stv,       	ROT0,   "Micronet",                 	"Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, twcup98,   stvbios, stv, stv,  		twcup98,   	ROT0,   "Tecmo",                    	"Tecmo World Cup '98 (JUET 980410 V1.000)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // player movement
 GAME( 1998, stress,    stvbios, stv, stv,  		stv,       	ROT0,   "Sega", 	     			  	"Stress Busters (J 981020 V1.000)", GAME_NOT_WORKING ) // needs printer
 
