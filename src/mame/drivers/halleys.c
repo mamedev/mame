@@ -158,6 +158,7 @@ Video sync   6 F   Video sync                 Post   6 F   Post
 // Compiler Directives
 
 #include "driver.h"
+#include "taitoipt.h"
 #include "deprecat.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
@@ -1430,7 +1431,10 @@ static VIDEO_UPDATE( halleys )
 	else
 		fillbitmap(bitmap, bgcolor, cliprect);
 
-	if (input_port_read(screen->machine, "FAKE")) copy_scroll_xp(bitmap, render_layer[3], *scrollx0, *scrolly0); // not used???
+#ifdef MAME_DEBUG
+	if (input_port_read(screen->machine, "DEBUG")) copy_scroll_xp(bitmap, render_layer[3], *scrollx0, *scrolly0); // not used???
+#endif
+
 	copy_scroll_xp(bitmap, render_layer[2], *scrollx1, *scrolly1);
 	copy_fixed_2b (bitmap, render_layer[1]);
 	copy_fixed_xp (bitmap, render_layer[0]);
@@ -1592,9 +1596,12 @@ static WRITE8_HANDLER( soundcommand_w )
 static READ8_HANDLER( coin_lockout_r )
 {
 	// This is a hack, but it lets you coin up when COIN1 or COIN2 are signaled.
-	// See NMI for the twisted logic that is involved in handling coin input.
+	// See NMI for the twisted logic that is involved in handling coin input :
+	//   0x8599 : 'benberob'
+	//   0x83e2 : 'halleys', 'halleysc', 'halleycj'
+	//   0x83df : 'halley87'
 	int inp = input_port_read(machine, "IN0");
-	int result = 0x01; // dual coin slots
+	int result = ((input_port_read(machine, "DSW4")) & 0x20) >> 5;
 
 	if (inp & 0x80) result |= 0x02;
 	if (inp & 0x40) result |= 0x04;
@@ -1627,25 +1634,25 @@ static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xff92, 0xff92) AM_READ_PORT("IN2")	// player 2
 	AM_RANGE(0xff93, 0xff93) AM_READ_PORT("IN3")	// unused?
 	AM_RANGE(0xff94, 0xff94) AM_READ(coin_lockout_r)
-	AM_RANGE(0xff95, 0xff95) AM_READ_PORT("DSW1")		// dipswitch 4
-	AM_RANGE(0xff96, 0xff96) AM_READ_PORT("DSW2")		// dipswitch 3
-	AM_RANGE(0xff97, 0xff97) AM_READ_PORT("DSW3")		// dipswitch 2
-	AM_RANGE(0xff00, 0xffbf) AM_READ(SMH_RAM)			// I/O read fall-through
+	AM_RANGE(0xff95, 0xff95) AM_READ_PORT("DSW1")	// dipswitch 4
+	AM_RANGE(0xff96, 0xff96) AM_READ_PORT("DSW2")	// dipswitch 3
+	AM_RANGE(0xff97, 0xff97) AM_READ_PORT("DSW3")	// dipswitch 2
+	AM_RANGE(0xff00, 0xffbf) AM_READ(SMH_RAM)		// I/O read fall-through
 
-	AM_RANGE(0xffc0, 0xffdf) AM_READ(SMH_RAM)        // palette read
+	AM_RANGE(0xffc0, 0xffdf) AM_READ(SMH_RAM)		// palette read
 	AM_RANGE(0xffe0, 0xffff) AM_READ(vector_r)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_WRITE(blitter_w) AM_BASE(&blitter_ram) AM_SIZE(&blitter_ramsize)
-	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(bgtile_w)       // background tiles?(Ben Bero Beh only)
+	AM_RANGE(0x1f00, 0x1fff) AM_WRITE(bgtile_w)		// background tiles?(Ben Bero Beh only)
 	AM_RANGE(0x1000, 0xefff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0xf000, 0xfeff) AM_WRITE(SMH_RAM)        // work ram
+	AM_RANGE(0xf000, 0xfeff) AM_WRITE(SMH_RAM)		// work ram
 
 	AM_RANGE(0xff8a, 0xff8a) AM_WRITE(soundcommand_w)
 	AM_RANGE(0xff9c, 0xff9c) AM_WRITE(firq_ack_w)
-	AM_RANGE(0xff00, 0xffbf) AM_WRITE(SMH_RAM) AM_BASE(&io_ram) AM_SIZE(&io_ramsize) // I/O write fall-through
+	AM_RANGE(0xff00, 0xffbf) AM_WRITE(SMH_RAM) AM_BASE(&io_ram) AM_SIZE(&io_ramsize)	// I/O write fall-through
 
 	AM_RANGE(0xffc0, 0xffdf) AM_WRITE(halleys_paletteram_IIRRGGBB_w) AM_BASE(&paletteram)
 	AM_RANGE(0xffe0, 0xffff) AM_WRITE(SMH_ROM)
@@ -1659,7 +1666,7 @@ static ADDRESS_MAP_START( sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4803, 0x4803) AM_READ(ay8910_read_port_2_r)
 	AM_RANGE(0x4805, 0x4805) AM_READ(ay8910_read_port_3_r)
 	AM_RANGE(0x5000, 0x5000) AM_READ(soundlatch_r)
-	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_ROM) // space for diagnostic ROM
+	AM_RANGE(0xe000, 0xefff) AM_READ(SMH_ROM)		// space for diagnostic ROM
 ADDRESS_MAP_END
 
 
@@ -1678,153 +1685,29 @@ ADDRESS_MAP_END
 
 //**************************************************************************
 // Port Maps
-/*
-    Halley's Comet
-    Taito/Coin-it 1986
-
-    Coin mechs system can be optioned by setting dip sw 1 position 6 on
-    for single coin selector. Position 6 off for twin coin selector.
-
-    Dip sw 2 is not used and all contacts should be set off.
-*/
-
-static INPUT_PORTS_START( halleys )
-	PORT_START("DSW1")	/* 0xff95 */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, "Test Mode" )
-	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
-
-	PORT_START("DSW2")	/* 0xff96 */
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easiest ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x0c, 0x04, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x0c, "20k/60k/680k" )
-	PORT_DIPSETTING(    0x08, "20k/80k/840k" )
-	PORT_DIPSETTING(    0x04, "20k/100k/920k" )
-	PORT_DIPSETTING(    0x00, "10k/50k/560k" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x20, "2" )
-	PORT_DIPSETTING(    0x30, "3" )
-	PORT_DIPSETTING(    0x10, "4" )
-	PORT_DIPSETTING(    0x00, "4 (no bonus ships)" )
-	PORT_DIPNAME( 0x40, 0x40, "Record Data" )
-	PORT_DIPSETTING(    0x40, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown(2-8)" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW3")	/* 0xff97 */
-	PORT_DIPNAME( 0x01, 0x01, "Unknown(3-1)" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1c, 0x1c, "Start Round" )
-	PORT_DIPSETTING( 0x1c, "1" )
-	PORT_DIPSETTING( 0x18, "4" )
-	PORT_DIPSETTING( 0x14, "7" )
-	PORT_DIPSETTING( 0x10, "10" )
-	PORT_DIPSETTING( 0x0c, "13" )
-	PORT_DIPSETTING( 0x08, "16" )
-	PORT_DIPSETTING( 0x04, "19" )
-	PORT_DIPSETTING( 0x00, "22" )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown(3-6)" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Invincibility (Cheat)")
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Unknown(3-8)" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("IN0")	/* 0xff90 */
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_TILT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(12)
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
-
-	PORT_START("IN1")	/* 0xff91 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Hyperspace")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Fire")
-
-	PORT_START("IN2")	/* 0xff92 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Hyperspace")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Fire")
-
-	PORT_START("IN3")	/* 0xff93 */
-
-	PORT_START("FAKE")	/* just to be safe */
-	PORT_DIPNAME( 0x01, 0x00, "Show Unused Layer" )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
-INPUT_PORTS_END
-
 
 static INPUT_PORTS_START( benberob )
 	PORT_START("DSW1")	/* 0xff95 */
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x02, "Every 100K" )
-	PORT_DIPSETTING(    0x00, "100K & Every 200K" )
-	PORT_DIPSETTING(    0x01, "150K & Every 300K" )
-	PORT_DIPSETTING(    0x03, "100K, 200K & 300K Only" )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )       /* code at 0xb00e */
+	PORT_DIPSETTING(    0x02, "Every 100k" )
+	PORT_DIPSETTING(    0x03, "100k 300k 200k+" )
+	PORT_DIPSETTING(    0x00, "100k 200k" )
+	PORT_DIPSETTING(    0x01, "150k 300k" )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "Infinite (Cheat)")
 	PORT_DIPSETTING(    0x08, "3" )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x18, "5" )
-	PORT_DIPNAME( 0x20, 0x20, "Unknown(1-6)" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x00, "Infinite (Cheat)" )
+	PORT_DIPUNKNOWN( 0x20, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Cocktail ) )
 
 	PORT_START("DSW2")	/* 0xff96 */
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
@@ -1863,29 +1746,41 @@ static INPUT_PORTS_START( benberob )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
 	PORT_START("DSW3")	/* 0xff97 */
-	PORT_DIPNAME( 0x01, 0x01, "Starting Round" )
-	PORT_DIPSETTING(    0x01, "1st Round" )
-	PORT_DIPSETTING(    0x00, "2nd Round" )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
 	PORT_DIPNAME( 0x02, 0x00, "Use Both Buttons" )
 	PORT_DIPSETTING(    0x02, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x0c, 0x08, "Bonus Countdown Time" )
-	PORT_DIPSETTING(    0x00, "1:15" )	/* Fastest countdown */
-	PORT_DIPSETTING(    0x04, "1:30" )
-	PORT_DIPSETTING(    0x08, "1:45" )
-	PORT_DIPSETTING(    0x0c, "2:00" )	/* Slowest countdown */
+	PORT_DIPNAME( 0x0c, 0x0c, "Timer Speed" )               /* table at 0xb10e */
+	PORT_DIPSETTING(    0x0c, "Slowest" )
+	PORT_DIPSETTING(    0x08, "Slow" )
+	PORT_DIPSETTING(    0x04, "Fast" )
+	PORT_DIPSETTING(    0x00, "Fastest" )
 	PORT_DIPNAME( 0x10, 0x00, "Show Coinage" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x20, 0x20, "Show Year" )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x40, 0x40, "No Hit (Cheat)")
+	PORT_DIPNAME( 0x40, 0x40, "No Hit (Cheat)" )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Maximum Credits" )
 	PORT_DIPSETTING(    0x80, "9" )
 	PORT_DIPSETTING(    0x00, "16" )
+
+	PORT_START("DSW4")	/* 0xff94 - read by coin_lockout_r */
+	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x20, 0x20, "Coin Slots" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
 
 	PORT_START("IN0")	/* 0xff90 */
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
@@ -1893,31 +1788,132 @@ static INPUT_PORTS_START( benberob )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START2 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_TILT )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_IMPULSE(12)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SERVICE1 ) PORT_IMPULSE(12)
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_START("IN1")	/* 0xff91 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("P1 Jump")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("P1 Extinguisher")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 
 	PORT_START("IN2")	/* 0xff92 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P2 Jump")
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P2 Extinguisher")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 
 	PORT_START("IN3")	/* 0xff93 */
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( halleys )
+	PORT_START("DSW1")	/* 0xff95 */
+	TAITO_MACHINE_COCKTAIL_LOC(SW4)
+	TAITO_COINAGE_JAPAN_OLD_LOC(SW4)
+
+	PORT_START("DSW2")	/* 0xff96 */
+	TAITO_DIFFICULTY_LOC(SW3)
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW3:3,4")   /* index of tables at 0x1a2f or 0x19b5 */
+	PORT_DIPSETTING(    0x00, "100k 600k 500k+" )           /* last bonus life at 5600k : max. 12 bonus lives */
+	PORT_DIPSETTING(    0x0c, "200k 800k 600k+" )           /* last bonus life at 6800k : max. 12 bonus lives */
+	PORT_DIPSETTING(    0x08, "200k 1000k 800k+" )          /* last bonus life at 9000k : max. 12 bonus lives */
+	PORT_DIPSETTING(    0x04, "200k 1200k 1000k+" )         /* last bonus life at 9200k : max. 10 bonus lives */
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )            PORT_DIPLOCATION("SW3:5,6")
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPSETTING(    0x30, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x00, "4 (No Points Bonus Lives)" ) /* code at 0xa509 or 0xa502 - 3 in the US manual */
+	PORT_DIPNAME( 0x40, 0x40, "Operation Data Recorder" )   PORT_DIPLOCATION("SW3:7")     /* from the US manual - what is this ? */
+	PORT_DIPSETTING(    0x40, "Not fixed" )
+	PORT_DIPSETTING(    0x00, "When fixed" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW3:8" )
+
+	/* From US manual : "DIP SW 2 is not used and all contacts should be set off."
+	   However, they enable debug features if you press START1 during the boot sequence. */
+	PORT_START("DSW3")	/* 0xff97 */
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:1" )
+	PORT_DIPNAME( 0x02, 0x02, "Free Play (Cheat)" )         PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1c, 0x1c, "Start Area (Cheat)" )        PORT_DIPLOCATION("SW2:3,4,5")
+	PORT_DIPSETTING( 0x1c, "1 (Earth)" )
+	PORT_DIPSETTING( 0x18, "4 (Venus)" )
+	PORT_DIPSETTING( 0x14, "7 (Mercury)" )
+	PORT_DIPSETTING( 0x10, "10 (Sun)" )
+	PORT_DIPSETTING( 0x0c, "13 (Pluto)" )                   /* spelled "Plato" */
+	PORT_DIPSETTING( 0x08, "16 (Neptune)" )
+	PORT_DIPSETTING( 0x04, "19 (Uranus)" )
+	PORT_DIPSETTING( 0x00, "22 (Saturn)" )
+	PORT_DIPUNUSED_DIPLOC( 0x20, IP_ACTIVE_LOW, "SW2:6" )
+	PORT_DIPNAME( 0x40, 0x40, "Invincibility (Cheat)")      PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Infinite Lives (Cheat)" )    PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	/* From US manual : "Coin mechs system can be optioned by setting DIP SW 1.
+	   Position 6 on for single coin selector.	Position 6 off for twin coin selector." */
+	PORT_START("DSW4")	/* 0xff94 - read by coin_lockout_r */
+	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW1:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x04, IP_ACTIVE_LOW, "SW1:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x08, IP_ACTIVE_LOW, "SW1:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x10, IP_ACTIVE_LOW, "SW1:5" )
+	PORT_DIPNAME( 0x20, 0x20, "Coin Slots" )                PORT_DIPLOCATION("SW1:6")
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x20, "2" )
+	PORT_DIPUNUSED_DIPLOC( 0x40, IP_ACTIVE_LOW, "SW1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW1:8" )
+
+	PORT_START("IN0")	/* 0xff90 */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_START1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW,  IPT_START2 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_TILT )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_SERVICE1 ) PORT_IMPULSE(12)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN1 )
+
+	PORT_START("IN1")	/* 0xff91 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
+
+	PORT_START("IN2")	/* 0xff92 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+
+	PORT_START("IN3")	/* 0xff93 */
+
+#ifdef MAME_DEBUG
+	PORT_START("DEBUG")	/* just to be safe */
+	PORT_DIPNAME( 0x01, 0x00, "Show Unused Layer" )
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Yes ) )
+#endif
 INPUT_PORTS_END
 
 
@@ -2256,7 +2252,7 @@ static DRIVER_INIT( halley87 )
 //**************************************************************************
 // Game Definitions
 
-GAME( 1984, benberob, 0,       benberob, benberob, benberob,  ROT0,  "Taito", "Ben Bero Beh (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS )
+GAME( 1984, benberob, 0,       benberob, benberob, benberob,  ROT0,  "Taito", "Ben Bero Beh (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_COLORS | GAME_NO_COCKTAIL )
 GAME( 1986, halleys,  0,       halleys,  halleys,  halleys,   ROT90, "Taito America Corporation (Coin-It license)", "Halley's Comet (US)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
 GAME( 1986, halleysc, halleys, halleys,  halleys,  halleys,   ROT90, "Taito Corporation", "Halley's Comet (Japan, Newer)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
 GAME( 1986, halleycj, halleys, halleys,  halleys,  halleys,   ROT90, "Taito Corporation", "Halley's Comet (Japan, Older)", GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL )
