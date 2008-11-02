@@ -476,7 +476,8 @@ INLINE void apu_regwrite(struct nesapu_info *info,int address, uint8 value)
       ** dereferences and load up the other triregs
       */
 
-      info->APU.tri.write_latency = 3;
+	/* used to be 3, but now we run the clock faster, so base it on samples/sync */
+      info->APU.tri.write_latency = (info->samps_per_sync + 239) / 240;
 
       if (info->APU.tri.enabled)
       {
