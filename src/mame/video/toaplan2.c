@@ -146,6 +146,7 @@ Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
+#include "includes/toaplan2.h"
 
 
 
@@ -154,10 +155,10 @@ Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
 #define TOAPLAN2_TOP_VRAM_SIZE  0x1000	/* Top Layer  RAM size */
 #define TOAPLAN2_SPRITERAM_SIZE 0x800	/* Sprite     RAM size */
 #define RAIZING_TX_GFXRAM_SIZE  0x8000	/* GFX data decode RAM size */
-extern  size_t toaplan2_tx_vram_size;		 /* 0x2000 Text layer RAM size */
-extern  size_t toaplan2_tx_offs_vram_size;	 /* 0x200 Text layer tile flip and positon ? */
-extern  size_t toaplan2_tx_scroll_vram_size; /* 0x200 Text layer scroll ? */
-extern  size_t batrider_paletteram16_size;
+size_t toaplan2_tx_vram_size;		 /* 0x2000 Text layer RAM size */
+size_t toaplan2_tx_offs_vram_size;	 /* 0x200 Text layer tile flip and positon ? */
+size_t toaplan2_tx_scroll_vram_size; /* 0x200 Text layer scroll ? */
+size_t batrider_paletteram16_size;
 
 
 
@@ -181,20 +182,20 @@ UINT16 *toaplan2_txvideoram16_offs;	/* Text layer tile flip and positon ? */
 UINT16 *toaplan2_txscrollram16;		/* Text layer scroll ? */
 UINT16 *toaplan2_tx_gfxram16;			/* Text Layer RAM based tiles */
 static UINT16 *raizing_tx_gfxram16;			/* Text Layer RAM based tiles (Batrider) */
-static int toaplan2_overflow_vram;		/* Teki Paki VRAM test is bugged. It goes out of range */
+static UINT16 toaplan2_overflow_vram;		/* Teki Paki VRAM test is bugged. It goes out of range */
 
-static int toaplan2_scroll_reg[2];
-static int toaplan2_voffs[2];
-static int bg_scrollx[2];
-static int bg_scrolly[2];
-static int fg_scrollx[2];
-static int fg_scrolly[2];
-static int top_scrollx[2];
-static int top_scrolly[2];
-static int sprite_scrollx[2];
-static int sprite_scrolly[2];
+static UINT16 toaplan2_scroll_reg[2];
+static UINT16 toaplan2_voffs[2];
+static UINT16 bg_scrollx[2];
+static UINT16 bg_scrolly[2];
+static UINT16 fg_scrollx[2];
+static UINT16 fg_scrolly[2];
+static UINT16 top_scrollx[2];
+static UINT16 top_scrolly[2];
+static UINT16 sprite_scrollx[2];
+static UINT16 sprite_scrolly[2];
 static int objectbank_dirty = 0;		/* dirty flag of object bank (for Batrider) */
-static int batrider_object_bank[8];		/* Batrider object bank */
+static UINT16 batrider_object_bank[8];		/* Batrider object bank */
 
 #ifdef MAME_DEBUG
 static int display_bg[2]  = { 1, 1 };
@@ -205,15 +206,13 @@ static int display_tx = 1;
 #endif
 static int display_sp[2] = { 1, 1 };
 
-static int sprite_priority[2][16];
-static int bg_flip[2] = { 0, 0 };
-static int fg_flip[2] = { 0, 0 };
-static int top_flip[2] = { 0, 0 };
-static int sprite_flip[2] = { 0, 0 };
-static int tx_flip = 0;
+static UINT8 bg_flip[2] = { 0, 0 };
+static UINT8 fg_flip[2] = { 0, 0 };
+static UINT8 top_flip[2] = { 0, 0 };
+static UINT8 sprite_flip[2] = { 0, 0 };
+static UINT8 tx_flip = 0;
 
-extern int toaplan2_sub_cpu;
-
+static UINT8 sprite_priority[2][16];
 static UINT8 top_tile_priority[2][16];
 static UINT8 fg_tile_priority[2][16];
 static UINT8 bg_tile_priority[2][16];
@@ -492,10 +491,58 @@ static void toaplan2_vh_start(int controller)
 	}
 }
 
+static void register_state_save(int vrams)
+{
+	state_save_register_global_array(toaplan2_scroll_reg);
+	state_save_register_global_array(toaplan2_voffs);
+	state_save_register_global_array(bg_scrollx);
+	state_save_register_global_array(bg_scrolly);
+	state_save_register_global_array(fg_scrollx);
+	state_save_register_global_array(fg_scrolly);
+	state_save_register_global_array(top_scrollx);
+	state_save_register_global_array(top_scrolly);
+	state_save_register_global_array(sprite_scrollx);
+	state_save_register_global_array(sprite_scrolly);
+	state_save_register_global_array(batrider_object_bank);
+
+	state_save_register_global_array(bg_flip);
+	state_save_register_global_array(fg_flip);
+	state_save_register_global_array(top_flip);
+	state_save_register_global_array(sprite_flip);
+	state_save_register_global(tx_flip);
+
+	state_save_register_global_2d_array(sprite_priority);
+	state_save_register_global_2d_array(top_tile_priority);
+	state_save_register_global_2d_array(fg_tile_priority);
+	state_save_register_global_2d_array(bg_tile_priority);
+
+	switch (vrams)
+	{
+	case 2:
+		state_save_register_global_pointer(spriteram16_new[1], TOAPLAN2_SPRITERAM_SIZE/2);
+		state_save_register_global_pointer(spriteram16_now[1], TOAPLAN2_SPRITERAM_SIZE/2);
+		state_save_register_global_pointer(topvideoram16[1], TOAPLAN2_TOP_VRAM_SIZE/2);
+		state_save_register_global_pointer(fgvideoram16[1], TOAPLAN2_FG_VRAM_SIZE/2);
+		state_save_register_global_pointer(bgvideoram16[1], TOAPLAN2_BG_VRAM_SIZE/2);
+		/* fall through */
+	case 1:
+		state_save_register_global_pointer(spriteram16_new[0], TOAPLAN2_SPRITERAM_SIZE/2);
+		state_save_register_global_pointer(spriteram16_now[0], TOAPLAN2_SPRITERAM_SIZE/2);
+		state_save_register_global_pointer(topvideoram16[0], TOAPLAN2_TOP_VRAM_SIZE/2);
+		state_save_register_global_pointer(fgvideoram16[0], TOAPLAN2_FG_VRAM_SIZE/2);
+		state_save_register_global_pointer(bgvideoram16[0], TOAPLAN2_BG_VRAM_SIZE/2);
+		/* fall through */
+	default:
+		break;
+	}
+
+}
+
 VIDEO_START( toaplan2_0 )
 {
 	defaultOffsets();
 	toaplan2_vh_start(0);
+	register_state_save(1);
 }
 
 VIDEO_START( toaplan2_1 )
@@ -503,6 +550,7 @@ VIDEO_START( toaplan2_1 )
 	toaplan2_vh_start(0);
 	toaplan2_vh_start(1);
 	defaultOffsets();
+	register_state_save(2);
 }
 
 VIDEO_START( truxton2_0 )
@@ -528,6 +576,8 @@ VIDEO_START( truxton2_0 )
 		defaultOffsets();
 		tilemap_set_scrolldx(tx_tilemap, 0x1d4 +1, 0x2a);
 	}
+
+	register_state_save(1);
 }
 
 VIDEO_START( bgaregga_0 )
@@ -536,12 +586,14 @@ VIDEO_START( bgaregga_0 )
 	truxton2_create_tilemaps_0();
 	tilemap_set_scrolldx(tx_tilemap, 0x1d4, 0x2a);
 	defaultOffsets();
+	register_state_save(1);
 }
 
 VIDEO_START( batrider_0 )
 {
 	raizing_tx_gfxram16 = auto_malloc(RAIZING_TX_GFXRAM_SIZE);
 	memset(raizing_tx_gfxram16,0,RAIZING_TX_GFXRAM_SIZE);
+	state_save_register_global_pointer(raizing_tx_gfxram16, RAIZING_TX_GFXRAM_SIZE/2);
 
 	toaplan2_vram_alloc(0);
 	spriteram16_n[0] = spriteram16_new[0];
@@ -550,6 +602,7 @@ VIDEO_START( batrider_0 )
 
 	tilemap_set_scrolldx(tx_tilemap, 0x1d4, 0x2a);
 	defaultOffsets();
+	register_state_save(1);
 }
 
 
@@ -559,7 +612,7 @@ VIDEO_START( batrider_0 )
 
 ***************************************************************************/
 
-static void toaplan2_voffs_w(offs_t offset, UINT16 data, UINT32 mem_mask, int controller)
+static void toaplan2_voffs_w(offs_t offset, UINT16 data, UINT16 mem_mask, int controller)
 {
 	if (data >= 0x1c00)
 		logerror("Hmmm, unknown video controller %01x layer being selected (%08x)\n",controller,data);
@@ -719,8 +772,8 @@ WRITE16_HANDLER( batrider_objectbank_w )
 
 static int toaplan2_videoram16_r(offs_t offset, int controller)
 {
-	static UINT16 video_data = 0;
-	static offs_t vram_offset;
+	UINT16 video_data = 0;
+	offs_t vram_offset;
 
 
 	switch (toaplan2_voffs[controller] & 0xfc00)
@@ -763,7 +816,7 @@ READ16_HANDLER( toaplan2_1_videoram16_r )
 	return toaplan2_videoram16_r(offset, 1);
 }
 
-static void toaplan2_videoram16_w(offs_t offset, UINT16 data, UINT32 mem_mask, int controller)
+static void toaplan2_videoram16_w(offs_t offset, UINT16 data, UINT16 mem_mask, int controller)
 {
 	offs_t vram_offset;
 
@@ -810,7 +863,7 @@ WRITE16_HANDLER( toaplan2_1_videoram16_w )
 }
 
 
-static void toaplan2_scroll_reg_select_w(offs_t offset, UINT16 data, UINT32 mem_mask, int controller)
+static void toaplan2_scroll_reg_select_w(offs_t offset, UINT16 data, UINT16 mem_mask, int controller)
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -835,7 +888,7 @@ WRITE16_HANDLER( toaplan2_1_scroll_reg_select_w )
 }
 
 
-static void toaplan2_scroll_reg_data_w(running_machine *machine, offs_t offset, UINT16 data, UINT32 mem_mask, int controller)
+static void toaplan2_scroll_reg_data_w(running_machine *machine, offs_t offset, UINT16 data, UINT16 mem_mask, int controller)
 {
 	/************************************************************************/
 	/***** layer X and Y flips can be set independantly, so emulate it ******/

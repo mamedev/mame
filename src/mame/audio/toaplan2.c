@@ -1,5 +1,6 @@
 #include "driver.h"
 #include "sound/okim6295.h"
+#include "includes/toaplan2.h"
 
 /****************************************************************************
   The Toaplan 2 hardware with V25+ secondary CPU controls the sound through

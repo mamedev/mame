@@ -252,6 +252,7 @@ To Do / Unknowns:
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
+#include "includes/toaplan2.h"
 
 
 /**************** Machine stuff ******************/
@@ -270,83 +271,16 @@ static UINT16 *toaplan2_shared_ram16;	/* Really 8bit RAM connected to Z180 */
 static UINT16 *V25_shared_ram;			/* Really 8bit RAM connected to Z180 */
 static UINT16 *fixeight_sec_cpu_mem;
 
-/************ Video RAM related values ************/
-extern UINT16 *toaplan2_txvideoram16;
-extern UINT16 *toaplan2_txvideoram16_offs;
-extern UINT16 *toaplan2_txscrollram16;
-extern UINT16 *toaplan2_tx_gfxram16;
-size_t toaplan2_tx_vram_size;
-size_t toaplan2_tx_offs_vram_size;
-size_t toaplan2_tx_scroll_vram_size;
-size_t batrider_paletteram16_size;
-
 /********** Status related values **********/
 int toaplan2_sub_cpu = 0;
-static int mcu_data = 0;
-static int video_status;
+static UINT16 mcu_data = 0;
+static UINT16 video_status;
 static INT8 old_p1_paddle_h;		/* For Ghox */
 static INT8 old_p2_paddle_h;
-static int current_bank;			/* Z80 bank used in Battle Garegga and Batrider */
+static INT8 current_bank;			/* Z80 bank used in Battle Garegga and Batrider */
 static int raizing_sndirq_line;		/* IRQ4 for batrider, IRQ2 for bbakraid */
-static int raizing_Z80_busreq;
+static UINT16 raizing_Z80_busreq;
 static int bbakraid_unlimited_ver;
-
-/**************** Video stuff ******************/
-WRITE16_HANDLER( toaplan2_0_voffs_w );
-WRITE16_HANDLER( toaplan2_1_voffs_w );
-
-READ16_HANDLER ( toaplan2_0_videoram16_r );
-READ16_HANDLER ( toaplan2_1_videoram16_r );
-WRITE16_HANDLER( toaplan2_0_videoram16_w );
-WRITE16_HANDLER( toaplan2_1_videoram16_w );
-
-READ16_HANDLER ( toaplan2_txvideoram16_r );
-WRITE16_HANDLER( toaplan2_txvideoram16_w );
-READ16_HANDLER ( toaplan2_txvideoram16_offs_r );
-WRITE16_HANDLER( toaplan2_txvideoram16_offs_w );
-READ16_HANDLER ( toaplan2_txscrollram16_r );
-WRITE16_HANDLER( toaplan2_txscrollram16_w );
-READ16_HANDLER ( toaplan2_tx_gfxram16_r );
-WRITE16_HANDLER( toaplan2_tx_gfxram16_w );
-READ16_HANDLER ( raizing_tx_gfxram16_r );
-WRITE16_HANDLER( raizing_tx_gfxram16_w );
-
-WRITE16_HANDLER( toaplan2_0_scroll_reg_select_w );
-WRITE16_HANDLER( toaplan2_1_scroll_reg_select_w );
-WRITE16_HANDLER( toaplan2_0_scroll_reg_data_w );
-WRITE16_HANDLER( toaplan2_1_scroll_reg_data_w );
-
-WRITE16_HANDLER( batrider_objectbank_w );
-WRITE16_HANDLER( batrider_textdata_decode );
-
-VIDEO_EOF( toaplan2_0 );
-VIDEO_EOF( toaplan2_1 );
-VIDEO_START( toaplan2_0 );
-VIDEO_START( toaplan2_1 );
-VIDEO_START( truxton2_0 );
-VIDEO_START( bgaregga_0 );
-VIDEO_START( batrider_0 );
-VIDEO_UPDATE( toaplan2_0 );
-VIDEO_UPDATE( truxton2_0 );
-VIDEO_UPDATE( dogyuun_1 );
-VIDEO_UPDATE( batsugun_1 );
-VIDEO_UPDATE( batrider_0 );
-VIDEO_UPDATE( mahoudai_0 );
-
-
-/********* Video wrappers for PIPIBIBI *********/
-READ16_HANDLER ( pipibibi_videoram16_r );
-WRITE16_HANDLER( pipibibi_videoram16_w );
-READ16_HANDLER ( pipibibi_spriteram16_r );
-WRITE16_HANDLER( pipibibi_spriteram16_w );
-WRITE16_HANDLER( pipibibi_scroll_w );
-
-
-/***************** Sound stuff *****************/
-void dogyuun_okisnd_w(running_machine *machine, int data);
-void kbash_okisnd_w(running_machine *machine, int data);
-void fixeight_okisnd_w(running_machine *machine, int data);
-void batsugun_okisnd_w(running_machine *machine, int data);
 
 static MACHINE_RESET(batsugun);
 #if USE_V25
@@ -412,24 +346,38 @@ static MACHINE_RESET( bgaregga )
 	MACHINE_RESET_CALL(toaplan2);
 }
 
+static void register_state_save(void)
+{
+	state_save_register_global(mcu_data);
+	state_save_register_global(video_status);
+	state_save_register_global(old_p1_paddle_h);
+	state_save_register_global(old_p2_paddle_h);
+	state_save_register_global(current_bank);
+	state_save_register_global(raizing_Z80_busreq);
+}
+
 static DRIVER_INIT( T2_Z80 )		/* init_t2_Z80(); */
 {
 	toaplan2_sub_cpu = CPU_2_Z80;
+	register_state_save();
 }
 
 static DRIVER_INIT( T2_Z180 )
 {
 	toaplan2_sub_cpu = CPU_2_HD647180;
+	register_state_save();
 }
 
 static DRIVER_INIT( T2_V25 )
 {
 	toaplan2_sub_cpu = CPU_2_V25;
+	register_state_save();
 }
 
 static DRIVER_INIT( T2_noZ80 )
 {
 	toaplan2_sub_cpu = CPU_2_NONE;
+	register_state_save();
 }
 
 static DRIVER_INIT( fixeight )
@@ -442,6 +390,7 @@ static DRIVER_INIT( fixeight )
 	#endif
 
 	toaplan2_sub_cpu = CPU_2_V25;
+	register_state_save();
 }
 
 static DRIVER_INIT( fixeighb )
@@ -450,6 +399,7 @@ static DRIVER_INIT( fixeighb )
 	memory_set_bankptr(1, &bgdata[0x40000]); /* $80000 - $fffff */
 
 	toaplan2_sub_cpu = CPU_2_NONE;
+	register_state_save();
 }
 
 static DRIVER_INIT( pipibibi )
@@ -531,12 +481,14 @@ static DRIVER_INIT( pipibibi )
 	}
 
 	toaplan2_sub_cpu = CPU_2_Z80;
+	register_state_save();
 }
 
 static DRIVER_INIT( batrider )
 {
 	raizing_sndirq_line = 4;
 	toaplan2_sub_cpu = CPU_2_Z80;
+	register_state_save();
 }
 
 static DRIVER_INIT( bbakraid )
@@ -544,6 +496,7 @@ static DRIVER_INIT( bbakraid )
 	bbakraid_unlimited_ver = 0;
 	raizing_sndirq_line = 2;
 	toaplan2_sub_cpu = CPU_2_Z80;
+	register_state_save();
 }
 
 static DRIVER_INIT( bbakradu )
@@ -551,6 +504,7 @@ static DRIVER_INIT( bbakradu )
 	bbakraid_unlimited_ver = 1;
 	raizing_sndirq_line = 2;
 	toaplan2_sub_cpu = CPU_2_Z80;
+	register_state_save();
 }
 
 
@@ -5049,37 +5003,37 @@ ROM_END
 /* Whoopee  init   to be changed to T2_Z180   when (if) HD647180 is dumped */
 
 /*  ( YEAR  NAME      PARENT    MACHINE   INPUT     INIT      MONITOR COMPANY    FULLNAME     FLAGS ) */
-GAME( 1991, tekipaki, 0,        tekipaki, tekipaki, T2_Z180,  ROT0,   "Toaplan", "Teki Paki", GAME_NO_SOUND )
-GAME( 1991, ghox,     0,        ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (Spinner with Up/Down Axis)", GAME_NO_SOUND )
-GAME( 1991, ghoxj,    ghox,     ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (8-Way Joystick)", GAME_NO_SOUND )
-GAME( 1992, dogyuun,  0,        dogyuun,  dogyuun,  T2_V25,   ROT270, "Toaplan", "Dogyuun", GAME_NO_SOUND )
-GAME( 1993, kbash,    0,        kbash,    kbash,    T2_V25,   ROT0,   "Toaplan", "Knuckle Bash", GAME_IMPERFECT_SOUND )
-GAME( 1999, kbash2,   0,        kbash2,   kbash2,   T2_noZ80, ROT0,   "bootleg", "Knuckle Bash 2 (bootleg)", 0 )
-GAME( 1992, truxton2, 0,        truxton2, truxton2, T2_noZ80, ROT270, "Toaplan", "Truxton II / Tatsujin Oh", 0 )
-GAME( 1991, pipibibs, 0,        pipibibs, pipibibs, T2_Z80,   ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu)", 0 )
-GAME( 1991, whoopee,  pipibibs, whoopee,  whoopee,  T2_Z80,   ROT0,   "Toaplan", "Whoopee!! / Pipi & Bibis", 0 )
-GAME( 1991, pipibibi, pipibibs, pipibibi, pipibibi, pipibibi, ROT0,   "[Toaplan] Ryouta Kikaku", "Pipi & Bibis / Whoopee!! (bootleg ?)", 0 )
-GAME( 1992, fixeight, 0,        fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
-GAME( 1992, fixeighb, fixeight, fixeighb, fixeighb, fixeighb, ROT270, "bootleg", "FixEight (bootleg)", 0 )
-GAME( 1992, grindstm, vfive,    vfive,    grindstm, T2_V25,   ROT270, "Toaplan", "Grind Stormer", GAME_NO_SOUND )
-GAME( 1992, grindsta, vfive,    vfive,    grindstm, T2_V25,   ROT270, "Toaplan", "Grind Stormer (older set)", GAME_NO_SOUND )
-GAME( 1993, vfive,    0,        vfive,    vfive,    T2_V25,   ROT270, "Toaplan", "V-Five (Japan)", GAME_NO_SOUND )
-GAME( 1993, batsugun, 0,        batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (set 1)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, batsugna, batsugun, batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1993, batugnsp, batsugun, batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (Special Ver.)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1994, snowbro2, 0,        snowbro2, snowbro2, T2_noZ80, ROT0,   "[Toaplan] Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise", 0 )
-GAME( 1993, mahoudai, 0,        mahoudai, mahoudai, T2_Z80,   ROT270, "Raizing (Able license)", "Mahou Daisakusen (Japan)", 0 )
-GAME( 1993, sstriker, mahoudai, mahoudai, sstriker, T2_Z80,   ROT270, "Raizing", "Sorcer Striker (World)" , 0) // from korean board
-GAME( 1993, sstrikra, mahoudai, mahoudai, sstriker, T2_Z80,   ROT270, "Raizing", "Sorcer Striker (World, alt)" , 0) // verified on two different PCBs
-GAME( 1994, shippumd, 0,        shippumd, shippumd, T2_Z80,   ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", 0 )
-GAME( 1994, kingdmgp, shippumd, shippumd, kingdmgp, T2_Z80,   ROT270, "Raizing / Eighting", "Kingdom Grandprix (World)" , 0) // from korean board, missing letters on credits screen but this is correct
-GAME( 1996, bgaregga, 0,        bgaregga, bgaregga, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)", 0 )
-GAME( 1996, bgareghk, bgaregga, bgaregga, bgareghk, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga (Austria / Hong Kong) (Sat Feb 3 1996)", 0 )
-GAME( 1996, bgaregnv, bgaregga, bgaregga, bgareghk, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga - New Version (Austria / Hong Kong) (Sat Mar 2 1996)" , 0) // displays New Version only when set to HK
-GAME( 1996, bgaregt2, bgaregga, bgaregga, bgaregga, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Europe / USA / Japan / Asia) (Sat Mar 2 1996)" , 0) // displays Type 2 only when set to Europe
-GAME( 1996, bgaregcn, bgaregga, bgaregga, bgaregcn, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)", 0 ) // displays Type 2 only when set to Denmark
-GAME( 1998, batrider, 0,        batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider - B Version (Japan) (Fri Feb 13 1998)", 0 )
-GAME( 1998, batridra, batrider, batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan) (Mon Dec 22 1997)", 0 )
-GAME( 1998, batridrk, batrider, batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Korea) (Fri Feb 13 1998)", 0 )
-GAME( 1999, bbakraid, 0,        bbakraid, bbakraid, bbakraid, ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", 0)
-GAME( 1999, bbakradu, bbakraid, bbakraid, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", 0)
+GAME( 1991, tekipaki, 0,        tekipaki, tekipaki, T2_Z180,  ROT0,   "Toaplan", "Teki Paki", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1991, ghox,     0,        ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (Spinner with Up/Down Axis)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1991, ghoxj,    ghox,     ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (8-Way Joystick)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuun,  0,        dogyuun,  dogyuun,  T2_V25,   ROT270, "Toaplan", "Dogyuun", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1993, kbash,    0,        kbash,    kbash,    T2_V25,   ROT0,   "Toaplan", "Knuckle Bash", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1999, kbash2,   0,        kbash2,   kbash2,   T2_noZ80, ROT0,   "bootleg", "Knuckle Bash 2 (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1992, truxton2, 0,        truxton2, truxton2, T2_noZ80, ROT270, "Toaplan", "Truxton II / Tatsujin Oh", GAME_SUPPORTS_SAVE )
+GAME( 1991, pipibibs, 0,        pipibibs, pipibibs, T2_Z80,   ROT0,   "Toaplan", "Pipi & Bibis / Whoopee!! (Z80 sound cpu)", GAME_SUPPORTS_SAVE )
+GAME( 1991, whoopee,  pipibibs, whoopee,  whoopee,  T2_Z80,   ROT0,   "Toaplan", "Whoopee!! / Pipi & Bibis", GAME_SUPPORTS_SAVE )
+GAME( 1991, pipibibi, pipibibs, pipibibi, pipibibi, pipibibi, ROT0,   "[Toaplan] Ryouta Kikaku", "Pipi & Bibis / Whoopee!! (bootleg ?)", GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeight, 0,        fixeight, fixeight, fixeight, ROT270, "Toaplan", "FixEight", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 1992, fixeighb, fixeight, fixeighb, fixeighb, fixeighb, ROT270, "bootleg", "FixEight (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1992, grindstm, vfive,    vfive,    grindstm, T2_V25,   ROT270, "Toaplan", "Grind Stormer", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1992, grindsta, vfive,    vfive,    grindstm, T2_V25,   ROT270, "Toaplan", "Grind Stormer (older set)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1993, vfive,    0,        vfive,    vfive,    T2_V25,   ROT270, "Toaplan", "V-Five (Japan)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1993, batsugun, 0,        batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (set 1)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1993, batsugna, batsugun, batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1993, batugnsp, batsugun, batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (Special Ver.)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1994, snowbro2, 0,        snowbro2, snowbro2, T2_noZ80, ROT0,   "[Toaplan] Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise", GAME_SUPPORTS_SAVE )
+GAME( 1993, mahoudai, 0,        mahoudai, mahoudai, T2_Z80,   ROT270, "Raizing (Able license)", "Mahou Daisakusen (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1993, sstriker, mahoudai, mahoudai, sstriker, T2_Z80,   ROT270, "Raizing", "Sorcer Striker (World)" , GAME_SUPPORTS_SAVE ) // from korean board
+GAME( 1993, sstrikra, mahoudai, mahoudai, sstriker, T2_Z80,   ROT270, "Raizing", "Sorcer Striker (World, alt)" , GAME_SUPPORTS_SAVE ) // verified on two different PCBs
+GAME( 1994, shippumd, 0,        shippumd, shippumd, T2_Z80,   ROT270, "Raizing / Eighting", "Shippu Mahou Daisakusen (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1994, kingdmgp, shippumd, shippumd, kingdmgp, T2_Z80,   ROT270, "Raizing / Eighting", "Kingdom Grandprix (World)" , GAME_SUPPORTS_SAVE ) // from korean board, missing letters on credits screen but this is correct
+GAME( 1996, bgaregga, 0,        bgaregga, bgaregga, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga (Europe / USA / Japan / Asia) (Sat Feb 3 1996)", GAME_SUPPORTS_SAVE )
+GAME( 1996, bgareghk, bgaregga, bgaregga, bgareghk, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga (Austria / Hong Kong) (Sat Feb 3 1996)", GAME_SUPPORTS_SAVE )
+GAME( 1996, bgaregnv, bgaregga, bgaregga, bgareghk, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga - New Version (Austria / Hong Kong) (Sat Mar 2 1996)" , GAME_SUPPORTS_SAVE ) // displays New Version only when set to HK
+GAME( 1996, bgaregt2, bgaregga, bgaregga, bgaregga, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Europe / USA / Japan / Asia) (Sat Mar 2 1996)" , GAME_SUPPORTS_SAVE ) // displays Type 2 only when set to Europe
+GAME( 1996, bgaregcn, bgaregga, bgaregga, bgaregcn, T2_Z80,   ROT270, "Raizing / Eighting", "Battle Garegga - Type 2 (Denmark / China) (Tue Apr 2 1996)", GAME_SUPPORTS_SAVE ) // displays Type 2 only when set to Denmark
+GAME( 1998, batrider, 0,        batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider - B Version (Japan) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
+GAME( 1998, batridra, batrider, batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Japan) (Mon Dec 22 1997)", GAME_SUPPORTS_SAVE )
+GAME( 1998, batridrk, batrider, batrider, batrider, batrider, ROT270, "Raizing / Eighting", "Armed Police Batrider (Korea) (Fri Feb 13 1998)", GAME_SUPPORTS_SAVE )
+GAME( 1999, bbakraid, 0,        bbakraid, bbakraid, bbakraid, ROT270, "Eighting", "Battle Bakraid (Japan) (Wed Apr 7 1999)", GAME_SUPPORTS_SAVE )
+GAME( 1999, bbakradu, bbakraid, bbakraid, bbakraid, bbakradu, ROT270, "Eighting", "Battle Bakraid - Unlimited Version (Japan) (Tue Jun 8 1999)", GAME_SUPPORTS_SAVE )
