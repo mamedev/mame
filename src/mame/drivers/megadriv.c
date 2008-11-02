@@ -96,6 +96,8 @@ static int _32x_is_connected;
 
 static int sh2_are_running;
 static int _32x_adapter_enabled;
+static int _32x_access_auth;
+static int _32x_screenshift;
 
 static int sh2_master_vint_enable, sh2_slave_vint_enable;
 static int sh2_master_hint_enable, sh2_slave_hint_enable;
@@ -2691,58 +2693,99 @@ static WRITE16_HANDLER( _32x_68k_fbcontrol_w )
 		_32x_display_dram = _32x_dram0;
 		_32x_access_dram = _32x_dram1;
 	}
-	//printf("_32x_68k_fbcontrol_w\n");
 }
 
 
 static READ32_HANDLER( sh2_4108_410a_r )
 {
 	UINT32 retvalue = 0x00000000;
-
 	if (ACCESSING_BITS_16_31) // 4108
 	{
 		UINT16 ret = 0x0000;
-
 		printf("sh2 read access 4108\n");
 		retvalue |= (ret << 16);
-
 	}
-
 	if (ACCESSING_BITS_0_15) // 410a
 	{
 		UINT16 ret = 0x0000;
-
 		ret = _32x_68k_fbcontrol_r(machine, offset*2+1, mem_mask);
 		retvalue |= ret;
 
 	}
-
 	return retvalue;
-
 }
-
 
 
 static WRITE32_HANDLER( sh2_4108_410a_w )
 {
 	if (ACCESSING_BITS_16_31) // 4108
 	{
-//		sh2_master_4018_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
 		printf("sh2 write access 4108\n");
-
 	}
-
 	if (ACCESSING_BITS_0_15) // 410a
 	{
 		_32x_68k_fbcontrol_w(machine,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff);
 	}
 }
 
+static READ16_HANDLER( _32x_4100_r )
+{
+	return 0x0000;
+}
+
+static READ16_HANDLER( _32x_4102_r )
+{
+	return 0x0000;
+}
+
+static READ32_HANDLER( sh2_4100_4102_r )
+{
+	UINT32 retvalue = 0x00000000;
+	if (ACCESSING_BITS_16_31) // 4100
+	{
+		UINT16 ret = 0x0000;
+		ret = _32x_4100_r(machine, offset*2, mem_mask>>16);
+		retvalue |= (ret << 16);
+	}
+	if (ACCESSING_BITS_0_15) // 4102
+	{
+		UINT16 ret = 0x0000;
+		ret = _32x_4102_r(machine, offset*2+1, mem_mask);
+		retvalue |= ret;
+
+	}
+	return retvalue;
+}
+
+
+static WRITE16_HANDLER( _32x_4100_w )
+{
+
+}
+
+static WRITE16_HANDLER( _32x_4102_w )
+{
+	_32x_screenshift = data & 1; // allows 1 pixel shifting
+	//printf("screenshift %d\n",_32x_screenshift);
+}
+
+static WRITE32_HANDLER( sh2_4100_4102_w )
+{
+	if (ACCESSING_BITS_16_31) // 4100
+	{
+		_32x_4100_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
+	}
+	if (ACCESSING_BITS_0_15) // 4102
+	{
+		_32x_4102_w(machine,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff);
+	}
+}
 
 
 static ADDRESS_MAP_START( sh2_main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 
+	AM_RANGE(0x00004100, 0x00004103) AM_READWRITE( sh2_4100_4102_r, sh2_4100_4102_w )
 	AM_RANGE(0x00004108, 0x0000410b) AM_READWRITE( sh2_4108_410a_r, sh2_4108_410a_w )
 
 	AM_RANGE(0x00004200, 0x000043ff) AM_WRITE(_32x_sh2_palette_w)
@@ -4595,21 +4638,28 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 	if (_32x_is_connected)
 	{
 		UINT32 lineoffs;
+		int start;
+
 		lineoffs = _32x_display_dram[scanline];
 
-		for (x=0;x<320;x++)
+		if (_32x_screenshift == 0) start=0;
+		else start = -1;
+
+		for (x=start;x<320;x++)
 		{
 			UINT16 coldata;
 			coldata = _32x_display_dram[lineoffs];
 
 			{
-				if  ((_32x_palette[(coldata & 0xff00)>>8] & 0x8000)==0x8000)
-					lineptr[x] = _32x_palette_lookup[(coldata & 0xff00)>>8];
+				if (x>=0)
+					if  ((_32x_palette[(coldata & 0xff00)>>8] & 0x8000)==0x8000)
+						lineptr[x] = _32x_palette_lookup[(coldata & 0xff00)>>8];
 
 				x++;
 
-				if  ((_32x_palette[(coldata & 0x00ff)>>0] & 0x8000)==0x8000)
-					lineptr[x] = _32x_palette_lookup[(coldata & 0x00ff)];
+				if (x>=0)
+					if  ((_32x_palette[(coldata & 0x00ff)>>0] & 0x8000)==0x8000)
+						lineptr[x] = _32x_palette_lookup[(coldata & 0x00ff)];
 			}
 
 			lineoffs++;
@@ -5719,6 +5769,22 @@ static WRITE16_HANDLER( sh2_slave_401a_w ) { cpunum_set_input_line(machine, _32x
 static WRITE16_HANDLER( sh2_master_401c_w ){ cpunum_set_input_line(machine, _32x_master_cpu_number,SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
 static WRITE16_HANDLER( sh2_slave_401c_w ) { cpunum_set_input_line(machine, _32x_slave_cpu_number, SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
 
+
+static READ32_HANDLER( sh2_master_4014_4016_r )
+{
+	if (ACCESSING_BITS_16_31)
+	{
+		sh2_master_4014_w(machine,offset*2,(0x0000>>16)&0xffff,(mem_mask>>16)&0xffff);
+	}
+
+	if (ACCESSING_BITS_0_15)
+	{
+		sh2_master_4016_w(machine,offset*2+1,(0x0000>>0)&0xffff,(mem_mask>>0)&0xffff);
+	}
+
+	return 0x0000;
+}
+
 static WRITE32_HANDLER( sh2_master_4014_4016_w )
 {
 	if (ACCESSING_BITS_16_31)
@@ -6006,16 +6072,6 @@ static WRITE16_HANDLER( _32x_68k_a15106_w )
 }
 
 
-static READ32_HANDLER( sh2_4000_master_r )
-{
-	return 0x82008200;
-}
-
-static READ32_HANDLER( sh2_4000_slave_r )
-{
-	return 0x82008200;
-}
-
 
 
 
@@ -6046,36 +6102,36 @@ UINT16 comms_port[8];
 
 static READ32_HANDLER( sh2_commsport_r )
 {
+	timer_call_after_resynch(NULL, 0, NULL);
 	return (comms_port[offset*2] << 16) | (comms_port[offset*2+1]);
-}
-
-void sh2_comms_write(int offset, UINT16 data, UINT16 mem_mask)
-{
-	comms_port[offset] = data;
 }
 
 
 static READ16_HANDLER( _32x_68k_comms_r )
 {
+	timer_call_after_resynch(NULL, 0, NULL);
 	return comms_port[offset];
 }
 
 static WRITE16_HANDLER( _32x_68k_comms_w )
 {
 	COMBINE_DATA(&comms_port[offset]);
+	timer_call_after_resynch(NULL, 0, NULL);
+
 }
 
 
 static WRITE32_HANDLER( sh2_commsport_w )
 {
-	printf("comms write %d %08x %08x\n",offset, data, mem_mask);
+//	printf("comms write %d %08x %08x\n",offset, data, mem_mask);
+
 	if (ACCESSING_BITS_16_31)
 	{
-		sh2_comms_write(offset*2, (data >> 16) & 0xffff, (mem_mask >> 16) & 0xffff);
+		_32x_68k_comms_w(machine,offset*2, (data >> 16) & 0xffff, (mem_mask >> 16) & 0xffff);
 	}
 	if (ACCESSING_BITS_0_15)
 	{
-		sh2_comms_write(offset*2+1, (data) & 0xffff, (mem_mask) & 0xffff);
+		_32x_68k_comms_w(machine,offset*2+1, (data) & 0xffff, (mem_mask) & 0xffff);
 	}
 }
 
@@ -6089,7 +6145,9 @@ static WRITE16_HANDLER( _sh2_master_irq_control_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		printf("_sh2_master_irq_control_w adapter use stuff write\n");
+		//printf("_sh2_master_irq_control_w adapter use stuff write\n");
+
+		_32x_access_auth = (data &0x80) >> 7;
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -6105,7 +6163,9 @@ static WRITE16_HANDLER( _sh2_slave_irq_control_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		printf("_sh2_slave_irq_control_w adapter use stuff write\n");
+		//printf("_sh2_slave_irq_control_w adapter use stuff write\n");
+		_32x_access_auth = (data &0x80) >> 7;
+
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -6122,15 +6182,14 @@ static WRITE32_HANDLER( sh2_4000_master_w )
 {
 	if (ACCESSING_BITS_16_31) // 4000
 	{
-		printf("sh2_4000_master_w %08x %08x\n",data,mem_mask);
+		//printf("sh2_4000_master_w %08x %08x\n",data,mem_mask);
 		_sh2_master_irq_control_w(machine, offset*2, (data >> 16) & 0xffff, (mem_mask >> 16) & 0xffff);
-
 
 	}
 
 	if (ACCESSING_BITS_0_15) // 4002
 	{
-		printf("sh2_4002_master_w %08x %08x\n",data,mem_mask);
+		//printf("sh2_4002_master_w %08x %08x\n",data,mem_mask);
 	}
 
 }
@@ -6139,16 +6198,93 @@ static WRITE32_HANDLER( sh2_4000_slave_w )
 {
 	if (ACCESSING_BITS_16_31) // 4000
 	{
-		printf("sh2_4000_slave_w %08x %08x\n",data,mem_mask);
+		//printf("sh2_4000_slave_w %08x %08x\n",data,mem_mask);
 		_sh2_slave_irq_control_w(machine, offset*2, (data >> 16) & 0xffff, (mem_mask >> 16) & 0xffff);
 
 	}
 
 	if (ACCESSING_BITS_0_15) // 4002
 	{
-		printf("sh2_4002_slave_w %08x %08x\n",data,mem_mask);
+		//printf("sh2_4002_slave_w %08x %08x\n",data,mem_mask);
 	}
 }
+
+/* 4000 - 4002 reads */
+
+static READ16_HANDLER( _32x_4000_master_r )
+{
+	UINT16 retvalue = 0x0200;
+	retvalue |= _32x_access_auth << 15;
+	return retvalue;
+}
+
+static READ16_HANDLER( _32x_4000_slave_r )
+{
+	UINT16 retvalue = 0x0200;
+	retvalue |= _32x_access_auth << 15;
+	return retvalue;
+}
+
+static READ16_HANDLER( _32x_4002_r )
+{
+	printf("read 4002\n");
+	return 0x0000;
+}
+
+static READ32_HANDLER( sh2_4000_master_r )
+{
+	UINT32 retvalue = 0x00000000;
+
+	if (ACCESSING_BITS_16_31) // 4000
+	{
+		UINT16 ret = 0x0000;
+		ret = _32x_4000_master_r(machine,offset*2,(mem_mask>>16)&0xffff);
+		retvalue |= ret << 16;
+	}
+
+	if (ACCESSING_BITS_0_15) // 4002
+	{
+		UINT16 ret = 0x0000;
+		ret = _32x_4002_r(machine,offset*2+1,(mem_mask>>0)&0xffff);
+		retvalue |= ret << 0;
+	}
+
+	return retvalue;
+}
+
+
+static READ32_HANDLER( sh2_4000_slave_r )
+{
+	UINT32 retvalue = 0x00000000;
+
+	if (ACCESSING_BITS_16_31) // 4000
+	{
+		UINT16 ret = 0x0000;
+		ret = _32x_4000_slave_r(machine,offset*2,(mem_mask>>16)&0xffff);
+		retvalue |= ret << 16;
+	}
+
+	if (ACCESSING_BITS_0_15) // 4002
+	{
+		UINT16 ret = 0x0000;
+		ret = _32x_4002_r(machine,offset*2+1,(mem_mask>>0)&0xffff);
+		retvalue |= ret << 0;
+	}
+
+	return retvalue;
+}
+
+
+
+
+
+
+
+
+
+
+
+
 
 static READ16_HANDLER( _32x_68k_a15184_r )
 {
@@ -6240,7 +6376,7 @@ static UINT16 a15100_reg;
 
 static READ16_HANDLER( _32x_68k_a15100_r )
 {
-	return a15100_reg | 0x0080;
+	return (_32x_access_auth<<15) | 0x0080;
 }
 
 static READ16_HANDLER( _32x_68k_bitmapmode_r )
@@ -6307,7 +6443,7 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		a15100_reg = (a15100_reg & 0x00ff) | (data & 0xff00);
-
+		_32x_access_auth = (data & 0x8000)>>15;
 	}
 }
 
@@ -6387,7 +6523,7 @@ DRIVER_INIT( _32x )
 	memory_install_readwrite32_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4003, 0, 0, sh2_4000_slave_r, sh2_4000_slave_w );
 
 	/* Install Interrupt Clear Registers */
-	memory_install_write32_handler(machine, 2, ADDRESS_SPACE_PROGRAM, 0x4014, 0x4017, 0, 0, sh2_master_4014_4016_w );
+	memory_install_readwrite32_handler(machine, 2, ADDRESS_SPACE_PROGRAM, 0x4014, 0x4017, 0, 0, sh2_master_4014_4016_r, sh2_master_4014_4016_w );
 	memory_install_write32_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x4014, 0x4017, 0, 0, sh2_slave_4014_4016_w );
 	memory_install_write32_handler(machine, 2, ADDRESS_SPACE_PROGRAM, 0x4018, 0x401b, 0, 0, sh2_master_4018_401a_w );
 	memory_install_write32_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x4018, 0x401b, 0, 0, sh2_slave_4018_401a_w );
@@ -6413,6 +6549,7 @@ DRIVER_INIT( _32x )
 	_32x_autofill_length = 0;
 	_32x_autofill_address = 0;
 	_32x_autofill_data = 0;
+	_32x_screenshift = 0;
 
 	DRIVER_INIT_CALL(megadriv);
 }
@@ -6431,8 +6568,9 @@ ROM_START( 32x_bios )
 //  ROM_LOAD( "32x_rot.bin", 0x000000,   0x0001638, CRC(98c25033) SHA1(8d9ab3084bd29e60b8cdf4b9f1cb755eb4c88d29) )
 // 	ROM_LOAD( "32x_3d.bin", 0x000000,   0x6568, CRC(0171743e) SHA1(bbe6fec182baae5e4d47d263fae6b419db5366ae) )
 // 	ROM_LOAD( "32x_spin.bin", 0x000000,   0x012c28, CRC(3d1d1191) SHA1(221a74408653e18cef8ce2f9b4d33ed93e4218b7) )
-// 	ROM_LOAD( "32x_doom.bin", 0x000000,   0x400000, CRC(208332fd) SHA1(b68e9c7af81853b8f05b8696033dfe4c80327e38) )
- 	ROM_LOAD( "32x_koli.bin", 0x000000,   0x400000, CRC(20ca53ef) SHA1(191ae0b525ecf32664086d8d748e0b35f776ddfe) ) // works but stutters.. probably flags
+// 	ROM_LOAD( "32x_doom.bin", 0x000000,   0x300000, CRC(208332fd) SHA1(b68e9c7af81853b8f05b8696033dfe4c80327e38) )
+ 	ROM_LOAD( "32x_koli.bin", 0x000000,   0x300000, CRC(20ca53ef) SHA1(191ae0b525ecf32664086d8d748e0b35f776ddfe) ) // works but stutters.. probably flags
+// 	ROM_LOAD( "32x_head.bin", 0x000000,   0x300000, CRC(1) SHA1(1) ) // works but stutters.. probably flags
 
 	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
 	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
