@@ -241,92 +241,63 @@ INPUT_PORTS_END
 
 
 static INPUT_PORTS_START( galsnewa )
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0003, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_BIT( 0x000C, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Lives ) )
+	PORT_INCLUDE( galsnew )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SWA:3")
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SWA:4")
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Lives ) )	PORT_DIPLOCATION("SWA:5,6")
 	PORT_DIPSETTING(      0x0010, "2" )
 	PORT_DIPSETTING(      0x0030, "3" )
 	PORT_DIPSETTING(      0x0020, "4" )
 	PORT_DIPSETTING(      0x0000, "5" )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Demo_Sounds ) )	PORT_DIPLOCATION("SWA:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unused ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0xC000, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DSW2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Flip_Screen ) )	/* flip screen? */
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Test ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(      0x0028, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x0040, 0x0040, "Coin B-1" )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "Coin B-2" )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	/* Coinage - Japan (0x03ffff.b = 01) and US (0x03ffff.b = 02)
-    PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )
-    PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
-    PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )
-    PORT_DIPSETTING(      0x0020, DEF_STR( 1C_2C ) )
-    PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) )
-    PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ) )
-    PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )
-    PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )
-    PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )
-    */
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)	/* "Shot2" in "test mode" */
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("DSW3")
-	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_TILT )
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static WRITE16_HANDLER( galsnew_paletteram_w )
-{
-	data = COMBINE_DATA(&paletteram16[offset]);
-	palette_set_color_rgb(machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
-}
+
+static INPUT_PORTS_START( galsnewj )
+	PORT_INCLUDE( galsnewa )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SWA:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPUNUSED_DIPLOC( 0x0008, 0x0008, "SWB:4" )
+	PORT_DIPNAME( 0x0030, 0x0030, DEF_STR( Coin_A ) )	PORT_DIPLOCATION("SWB:5,6")
+	PORT_DIPSETTING(      0x0010, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 1C_2C ) )
+	PORT_DIPNAME( 0x00c0, 0x00c0, DEF_STR( Coin_B ) )	PORT_DIPLOCATION("SWB:7,8")
+	PORT_DIPSETTING(      0x0040, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x00c0, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( 1C_2C ) )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( fantasia )
+	PORT_INCLUDE( galsnewa )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SWA:8")
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
+
+/*************************************
+ *
+ *  Sound handlers
+ *
+ *************************************/
 
 static WRITE16_HANDLER( galsnew_6295_bankswitch_w )
 {
@@ -335,6 +306,18 @@ static WRITE16_HANDLER( galsnew_6295_bankswitch_w )
 		UINT8 *rom = memory_region(machine, "oki");
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 	}
+}
+
+/*************************************
+ *
+ *  Video handlers
+ *
+ *************************************/
+
+static WRITE16_HANDLER( galsnew_paletteram_w )
+{
+	data = COMBINE_DATA(&paletteram16[offset]);
+	palette_set_color_rgb(machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
 
 static UINT16 vram_0_bank_num = 0, vram_1_bank_num = 0;
@@ -370,6 +353,12 @@ static WRITE16_HANDLER(galsnew_vram_1_bank_w)
 		vram_1_bank_num = data;
 	}
 }
+
+/*************************************
+ *
+ *  CPU memory handlers
+ *
+ *************************************/
 
 static ADDRESS_MAP_START( galsnew_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM // main program
@@ -439,6 +428,12 @@ static ADDRESS_MAP_START( fantasia_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf00000, 0xf00001) AM_READWRITE(okim6295_status_0_msb_r,okim6295_data_0_msb_w)
 ADDRESS_MAP_END
 
+/*************************************
+ *
+ *  Initialization & interrupts
+ *
+ *************************************/
+
 static INTERRUPT_GEN( galsnew_interrupt )
 {
 	cpunum_set_input_line(machine, 0, cpu_getiloops() + 3, HOLD_LINE);	/* IRQs 5, 4, and 3 */
@@ -458,6 +453,12 @@ static MACHINE_RESET( galsnew )
 	kaneko16_priority.sprite[3] = 8;	// above all
 }
 
+/*************************************
+ *
+ *  Graphics definitions
+ *
+ *************************************/
+
 static const gfx_layout layout_16x16x4 =
 {
 	16,16,
@@ -474,6 +475,12 @@ static GFXDECODE_START( 1x4bit_1x4bit )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_16x16x4, 0x100,	    0x40 ) // [0] Sprites
 	GFXDECODE_ENTRY( "gfx2", 0, layout_16x16x4, 0x400,		0x40 ) // [0] bg tiles
 GFXDECODE_END
+
+/*************************************
+ *
+ *  Machine driver
+ *
+ *************************************/
 
 static MACHINE_DRIVER_START( galsnew )
 
@@ -509,41 +516,26 @@ static MACHINE_DRIVER_START( galsnew )
 	MDRV_SOUND_ADD("oki", OKIM6295, 12000000/6)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
 MACHINE_DRIVER_END
+
 
 static MACHINE_DRIVER_START( fantasia )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M68000, 12000000)
+	MDRV_IMPORT_FROM( galsnew )
+	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(fantasia_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(galsnew_interrupt,3)
 
-	/* video hardware */
-	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-32-1)
+	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_SEC(0))	/* a guess, and certainly wrong */
 
-	MDRV_GFXDECODE(1x4bit_1x4bit)
-	MDRV_PALETTE_LENGTH(2048 + 32768)
-	MDRV_MACHINE_RESET( galsnew )
-
-	MDRV_VIDEO_START(galsnew)
-	MDRV_VIDEO_UPDATE(galsnew)
-	MDRV_PALETTE_INIT(berlwall)
-
-	/* arm watchdog */
-	//MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_SEC(3))    /* a guess, and certainly wrong */
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-
-	MDRV_SOUND_ADD("oki", OKIM6295, 12000000/6)
-	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
+
+/*************************************
+ *
+ *  ROM definition(s)
+ *
+ *************************************/
 
 ROM_START( galsnew ) /* EXPRO-02 PCB */
 	ROM_REGION( 0x40000, "main", 0 )	/* 68000 code */
@@ -694,6 +686,11 @@ ROM_START( fantasia )
 	ROM_LOAD16_BYTE( "gscr3_11.rom", 0x100000, 0x80000, CRC(6d00a4c5) SHA1(8fc0d78200b82ab87658d364ebe2f2e7239722e7) )
 ROM_END
 
+/*************************************
+ *
+ *  Generic driver initialization
+ *
+ *************************************/
 
 static DRIVER_INIT(galsnew)
 {
@@ -726,10 +723,14 @@ static DRIVER_INIT(galsnew)
 	}
 }
 
-
+/*************************************
+ *
+ *  Game driver(s)
+ *
+ *************************************/
 
 GAME( 1990, galsnew,  0,       galsnew, galsnew,  galsnew, ROT90, "Kaneko", "Gals Panic (US, EXPRO-02 PCB)", 0 )
 GAME( 1990, galsnewa, galsnew, galsnew, galsnewa, galsnew, ROT90, "Kaneko", "Gals Panic (Export, EXPRO-02 PCB)", 0 )
-GAME( 1990, galsnewj, galsnew, galsnew, galsnewa, galsnew, ROT90, "Kaneko (Taito license)", "Gals Panic (Japan, EXPRO-02 PCB)", 0 )
+GAME( 1990, galsnewj, galsnew, galsnew, galsnewj, galsnew, ROT90, "Kaneko (Taito license)", "Gals Panic (Japan, EXPRO-02 PCB)", 0 )
 
-GAME( 1994, fantasia, 0,       fantasia,    galsnew, galsnew, ROT90, "Comad & New Japan System", "Fantasia", GAME_NO_COCKTAIL )
+GAME( 1994, fantasia, 0,       fantasia,fantasia, galsnew, ROT90, "Comad & New Japan System", "Fantasia", GAME_NO_COCKTAIL )
