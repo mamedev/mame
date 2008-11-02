@@ -98,6 +98,9 @@ static int sh2_are_running;
 static int _32x_adapter_enabled;
 static int _32x_access_auth;
 static int _32x_screenshift;
+static int _32x_videopriority;
+static int _32x_displaymode;
+static int _32x_240mode;
 
 static int sh2_master_vint_enable, sh2_slave_vint_enable;
 static int sh2_master_hint_enable, sh2_slave_hint_enable;
@@ -2543,7 +2546,7 @@ static WRITE16_HANDLER( _32x_68k_palette_w )
 	b = ((data >> 10) & 0x1f);
 	p = ((data >> 15) & 0x01); // priority 'through' bit
 
-	_32x_palette_lookup[offset] = (r << 10) | (g << 5) | (b << 0);
+	_32x_palette_lookup[offset] = (r << 10) | (g << 5) | (b << 0) | (p << 15);
 
 	palette_set_color_rgb(Machine,offset+0x40,pal5bit(r),pal5bit(g),pal5bit(b));
 
@@ -2728,9 +2731,36 @@ static WRITE32_HANDLER( sh2_4108_410a_w )
 	}
 }
 
-static READ16_HANDLER( _32x_4100_r )
+
+
+static READ16_HANDLER( _32x_68k_bitmapmode_r )
 {
-	return 0x0000;
+	// the flag is inverted compared to the megadrive
+	int ntsc;
+	if (megadrive_region_pal) ntsc = 0;
+	else ntsc = 1;
+
+	return (ntsc << 15) |
+	       (_32x_videopriority << 7 ) |
+	       ( _32x_240mode << 6 ) |
+	       ( _32x_displaymode << 0 );
+
+}
+
+static WRITE16_HANDLER( _32x_68k_bitmapmode_w )
+{
+//	printf("_32x_68k_bitmapmode_w (a15180) %04x %04x\n",data,mem_mask);
+	if (ACCESSING_BITS_0_7)
+	{
+		_32x_videopriority = (data & 0x80) >> 7;
+		_32x_240mode   = (data & 0x40) >> 6;
+		_32x_displaymode   = (data & 0x03) >> 0;
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		// nothing?  (pal flag is read only)
+	}
 }
 
 static READ16_HANDLER( _32x_4102_r )
@@ -2744,7 +2774,7 @@ static READ32_HANDLER( sh2_4100_4102_r )
 	if (ACCESSING_BITS_16_31) // 4100
 	{
 		UINT16 ret = 0x0000;
-		ret = _32x_4100_r(machine, offset*2, mem_mask>>16);
+		ret = _32x_68k_bitmapmode_r(machine, offset*2, mem_mask>>16);
 		retvalue |= (ret << 16);
 	}
 	if (ACCESSING_BITS_0_15) // 4102
@@ -2758,10 +2788,12 @@ static READ32_HANDLER( sh2_4100_4102_r )
 }
 
 
+/*
 static WRITE16_HANDLER( _32x_4100_w )
 {
 
 }
+*/
 
 static WRITE16_HANDLER( _32x_4102_w )
 {
@@ -2773,7 +2805,7 @@ static WRITE32_HANDLER( sh2_4100_4102_w )
 {
 	if (ACCESSING_BITS_16_31) // 4100
 	{
-		_32x_4100_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
+		_32x_68k_bitmapmode_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
 	}
 	if (ACCESSING_BITS_0_15) // 4102
 	{
@@ -4565,6 +4597,8 @@ static void genesis_render_videoline_to_videobuffer(int scanline)
 		}
 }
 
+static UINT32 _32x_linerender[512]; // tmp buffer
+
 /* This converts our render buffer to real screen colours */
 static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine, int scanline)
 {
@@ -4572,70 +4606,8 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 	int x;
 	lineptr = BITMAP_ADDR16(render_bitmap, scanline, 0);
 
-	if (!MEGADRIVE_REG0C_SHADOW_HIGLIGHT)
-	{
-
-		for (x=0;x<320;x++)
-		{
-			UINT32 dat;
-			dat = video_renderline[x];
-			if (dat&0x10000)
-				lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat&0x0f) | segac2_sp_pal_lookup[(dat&0x30)>>4]];
-			else
-				lineptr[x] = megadrive_vdp_palette_lookup[(dat&0x0f) | segac2_bg_pal_lookup[(dat&0x30)>>4]];
-		}
-	}
-	else
-	{
-		for (x=0;x<320;x++)
-		{
-			UINT32 dat;
-			dat = video_renderline[x];
-
-			/* Verify my handling.. I'm not sure all cases are correct */
-
-			switch (dat&0x1e000)
-			{
-				case 0x00000: // low priority, no shadow sprite, no highlight = shadow
-				case 0x02000: // low priority, shadow sprite, no highlight = shadow
-				case 0x06000: // normal pri,   shadow sprite, no highlight = shadow?
-				case 0x10000: // (sprite) low priority, no shadow sprite, no highlight = shadow
-				case 0x12000: // (sprite) low priority, shadow sprite, no highlight = shadow
-				case 0x16000: // (sprite) normal pri,   shadow sprite, no highlight = shadow?
-					lineptr[x] = megadrive_vdp_palette_lookup_shadow[(dat&0x0f)  | segac2_bg_pal_lookup[(dat&0x30)>>4]];
-					break;
-
-				case 0x4000: // normal pri, no shadow sprite, no highlight = normal;
-				case 0x8000: // low pri, highlight sprite = normal;
-					lineptr[x] = megadrive_vdp_palette_lookup[(dat&0x0f)  | segac2_bg_pal_lookup[(dat&0x30)>>4]];
-					break;
-
-				case 0x14000: // (sprite) normal pri, no shadow sprite, no highlight = normal;
-				case 0x18000: // (sprite) low pri, highlight sprite = normal;
-					lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat&0x0f)  | segac2_sp_pal_lookup[(dat&0x30)>>4]];
-					break;
-
-
-				case 0x0c000: // normal pri, highlight set = highlight?
-				case 0x1c000: // (sprite) normal pri, highlight set = highlight?
-					lineptr[x] = megadrive_vdp_palette_lookup_highlight[(dat&0x0f) | segac2_bg_pal_lookup[(dat&0x30)>>4]];
-					break;
-
-				case 0x0a000: // shadow set, highlight set - not possible
-				case 0x0e000: // shadow set, highlight set, normal set, not possible
-				case 0x1a000: // (sprite)shadow set, highlight set - not possible
-				case 0x1e000: // (sprite)shadow set, highlight set, normal set, not possible
-				default:
-					lineptr[x] = mame_rand(Machine)&0x3f;
-				break;
-
-
-			}
-		}
-
-	}
-
-	if (_32x_is_connected)
+	/* render 32x output to a buffer */
+	if (_32x_is_connected && (_32x_displaymode != 0))
 	{
 		UINT32 lineoffs;
 		int start;
@@ -4652,14 +4624,18 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 
 			{
 				if (x>=0)
-					if  ((_32x_palette[(coldata & 0xff00)>>8] & 0x8000)==0x8000)
-						lineptr[x] = _32x_palette_lookup[(coldata & 0xff00)>>8];
+				{
+					//if  ((_32x_palette[(coldata & 0xff00)>>8] & 0x8000)==0x8000)
+					_32x_linerender[x] = _32x_palette_lookup[(coldata & 0xff00)>>8];
+				}
 
 				x++;
 
 				if (x>=0)
-					if  ((_32x_palette[(coldata & 0x00ff)>>0] & 0x8000)==0x8000)
-						lineptr[x] = _32x_palette_lookup[(coldata & 0x00ff)];
+				{
+					//if  ((_32x_palette[(coldata & 0x00ff)>>0] & 0x8000)==0x8000)
+					_32x_linerender[x] = _32x_palette_lookup[(coldata & 0x00ff)];
+				}
 			}
 
 			lineoffs++;
@@ -4667,6 +4643,155 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 		}
 	}
 
+
+	if (!MEGADRIVE_REG0C_SHADOW_HIGLIGHT)
+	{
+
+		for (x=0;x<320;x++)
+		{
+			UINT32 dat;
+			dat = video_renderline[x];
+			if ((dat&0x20000) && (_32x_is_connected) && (_32x_displaymode != 0))
+			{
+				if (_32x_linerender[x]&0x8000)
+				{
+					if (_32x_videopriority)
+					{
+						lineptr[x] = _32x_linerender[x]&0x7fff;
+					}
+					else
+					{
+						// display md bg?
+					}
+				}
+				else
+				{
+					if (_32x_videopriority)
+					{
+						// display md bg?
+					}
+					else
+					{
+						lineptr[x] = _32x_linerender[x]&0x7fff;
+					}
+				}
+			}
+			else
+			{
+				if (dat&0x10000)
+					lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat&0x0f) | segac2_sp_pal_lookup[(dat&0x30)>>4]];
+				else
+					lineptr[x] = megadrive_vdp_palette_lookup[(dat&0x0f) | segac2_bg_pal_lookup[(dat&0x30)>>4]];
+			}
+
+		}
+	}
+	else
+	{
+		for (x=0;x<320;x++)
+		{
+			UINT32 dat;
+			dat = video_renderline[x];
+
+			if ((dat&0x20000) && (_32x_is_connected) && (_32x_displaymode != 0))
+			{
+				if (_32x_linerender[x]&0x8000)
+				{
+					if (_32x_videopriority)
+					{
+						lineptr[x] = _32x_linerender[x]&0x7fff;
+					}
+					else
+					{
+						// display md bg?
+					}
+				}
+				else
+				{
+					if (_32x_videopriority)
+					{
+						// display md bg?
+					}
+					else
+					{
+						lineptr[x] = _32x_linerender[x]&0x7fff;
+					}
+				}
+
+			}
+			else
+			{
+				/* Verify my handling.. I'm not sure all cases are correct */
+				switch (dat&0x1e000)
+				{
+					case 0x00000: // low priority, no shadow sprite, no highlight = shadow
+					case 0x02000: // low priority, shadow sprite, no highlight = shadow
+					case 0x06000: // normal pri,   shadow sprite, no highlight = shadow?
+					case 0x10000: // (sprite) low priority, no shadow sprite, no highlight = shadow
+					case 0x12000: // (sprite) low priority, shadow sprite, no highlight = shadow
+					case 0x16000: // (sprite) normal pri,   shadow sprite, no highlight = shadow?
+						lineptr[x] = megadrive_vdp_palette_lookup_shadow[(dat&0x0f)  | segac2_bg_pal_lookup[(dat&0x30)>>4]];
+						break;
+
+					case 0x4000: // normal pri, no shadow sprite, no highlight = normal;
+					case 0x8000: // low pri, highlight sprite = normal;
+						lineptr[x] = megadrive_vdp_palette_lookup[(dat&0x0f)  | segac2_bg_pal_lookup[(dat&0x30)>>4]];
+						break;
+
+					case 0x14000: // (sprite) normal pri, no shadow sprite, no highlight = normal;
+					case 0x18000: // (sprite) low pri, highlight sprite = normal;
+						lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat&0x0f)  | segac2_sp_pal_lookup[(dat&0x30)>>4]];
+						break;
+
+
+					case 0x0c000: // normal pri, highlight set = highlight?
+					case 0x1c000: // (sprite) normal pri, highlight set = highlight?
+						lineptr[x] = megadrive_vdp_palette_lookup_highlight[(dat&0x0f) | segac2_bg_pal_lookup[(dat&0x30)>>4]];
+						break;
+
+					case 0x0a000: // shadow set, highlight set - not possible
+					case 0x0e000: // shadow set, highlight set, normal set, not possible
+					case 0x1a000: // (sprite)shadow set, highlight set - not possible
+					case 0x1e000: // (sprite)shadow set, highlight set, normal set, not possible
+					default:
+						lineptr[x] = mame_rand(Machine)&0x3f;
+					break;
+				}
+			}
+		}
+
+	}
+
+
+	if (_32x_is_connected && ( _32x_displaymode != 0))
+	{
+		for (x=0;x<320;x++)
+		{
+			if (_32x_linerender[x]&0x8000)
+			{
+				if (_32x_videopriority)
+				{
+					// display md screen?
+
+				}
+				else
+				{
+					lineptr[x] = _32x_linerender[x]&0x7fff;
+				}
+			}
+			else
+			{
+				if (_32x_videopriority)
+				{
+					lineptr[x] = _32x_linerender[x]&0x7fff;
+				}
+				else
+				{
+					// display md screen?
+				}
+			}
+		}
+	}
 }
 
 static void genesis_render_scanline(running_machine *machine, int scanline)
@@ -6379,15 +6504,6 @@ static READ16_HANDLER( _32x_68k_a15100_r )
 	return (_32x_access_auth<<15) | 0x0080;
 }
 
-static READ16_HANDLER( _32x_68k_bitmapmode_r )
-{
-	return 0x8001;
-}
-
-static WRITE16_HANDLER( _32x_68k_bitmapmode_w )
-{
-	printf("_32x_68k_bitmapmode_w (a15180) %04x %04x\n",data,mem_mask);
-}
 
 static WRITE16_HANDLER( _32x_68k_a15100_w )
 {
@@ -6550,6 +6666,9 @@ DRIVER_INIT( _32x )
 	_32x_autofill_address = 0;
 	_32x_autofill_data = 0;
 	_32x_screenshift = 0;
+	_32x_videopriority = 0; // MD priority
+	_32x_displaymode = 0;
+	_32x_240mode = 0;
 
 	DRIVER_INIT_CALL(megadriv);
 }
@@ -6568,8 +6687,8 @@ ROM_START( 32x_bios )
 //  ROM_LOAD( "32x_rot.bin", 0x000000,   0x0001638, CRC(98c25033) SHA1(8d9ab3084bd29e60b8cdf4b9f1cb755eb4c88d29) )
 //  ROM_LOAD( "32x_3d.bin", 0x000000,   0x6568, CRC(0171743e) SHA1(bbe6fec182baae5e4d47d263fae6b419db5366ae) )
 //  ROM_LOAD( "32x_spin.bin", 0x000000,   0x012c28, CRC(3d1d1191) SHA1(221a74408653e18cef8ce2f9b4d33ed93e4218b7) )
-//  ROM_LOAD( "32x_doom.bin", 0x000000,   0x300000, CRC(208332fd) SHA1(b68e9c7af81853b8f05b8696033dfe4c80327e38) )
- 	ROM_LOAD( "32x_koli.bin", 0x000000,   0x300000, CRC(20ca53ef) SHA1(191ae0b525ecf32664086d8d748e0b35f776ddfe) ) // works but stutters.. probably flags
+//ROM_LOAD( "32x_doom.bin", 0x000000,   0x300000, CRC(208332fd) SHA1(b68e9c7af81853b8f05b8696033dfe4c80327e38) )
+	ROM_LOAD( "32x_koli.bin", 0x000000,   0x300000, CRC(20ca53ef) SHA1(191ae0b525ecf32664086d8d748e0b35f776ddfe) ) // works but stutters.. probably flags
 //  ROM_LOAD( "32x_head.bin", 0x000000,   0x300000, CRC(1) SHA1(1) ) // works but stutters.. probably flags
 
 	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
