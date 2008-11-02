@@ -336,8 +336,9 @@ static MACHINE_RESET( bgaregga )
 	UINT8 *Z80 = (UINT8 *)memory_region(machine, "audio");
 
 	// Set Z80 bank switch - default bank is 2
-	current_bank = 2;
-	memory_set_bankptr(1, &Z80[0x10000]);
+	current_bank = 4;
+	memory_configure_bank(1, 0, 10, Z80, 0x4000);
+	memory_set_bank(1, 4);
 
 	if (memory_region(machine, "oki1") != NULL)
 		NMK112_init(0, "oki1", "oki2");
@@ -1031,17 +1032,12 @@ static WRITE8_HANDLER( bgaregga_E00C_w )
 
 static WRITE8_HANDLER( bgaregga_bankswitch_w )
 {
-	UINT8 *RAM = (UINT8 *)memory_region(machine, "audio");
-	int bankaddress;
-	int bank;
-
-	bank = (data & 0x0f) - 10;
+	int bank = (data & 0x0f) - 10 + 4;
 
 	if (bank != current_bank)
 	{
 		current_bank = bank;
-		bankaddress = 0x10000 + 0x4000 * current_bank;
-		memory_set_bankptr(1, &RAM[bankaddress]);
+		memory_set_bank(1, bank);
 	}
 }
 
@@ -1078,21 +1074,13 @@ static WRITE8_HANDLER( raizing_okim6295_bankselect_3 )
 
 static WRITE8_HANDLER( batrider_bankswitch_w )
 {
-	UINT8 *RAM = (UINT8 *)memory_region(machine, "audio");
-	int bankaddress;
-	int bank;
-
-	bank = data & 0x0f;
+	int bank = data & 0x0f;
+	bank = (bank > 1) ? bank + 2 : bank;
 
 	if (bank != current_bank)
 	{
 		current_bank = bank;
-		logerror("Z80 cpu set bank #%d\n", bank);
-		if (bank > 1)
-			bankaddress = 0x10000 + 0x4000 * (current_bank - 2);
-		else
-			bankaddress = 0x4000 * current_bank;
-		memory_set_bankptr(1, &RAM[bankaddress]);
+		memory_set_bank(1, bank);
 	}
 }
 
