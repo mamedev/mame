@@ -59,6 +59,7 @@ Note:   if MAME_DEBUG is defined, pressing Z or X with:
 /* Variables only used here: */
 
 static int cischeat_ip_select;
+static int shift_ret = 1;
 
 #ifdef MAME_DEBUG
 static int debugsprites;	// For debug purposes
@@ -141,6 +142,7 @@ static void prepare_shadows(void)
 /* 32 colour codes for the tiles */
 VIDEO_START( cischeat )
 {
+	shift_ret = 1;
 	VIDEO_START_CALL(megasys1);
 
  	megasys1_bits_per_color_code = 5;
@@ -184,13 +186,12 @@ VIDEO_START( bigrun )
 
 CUSTOM_INPUT( cischeat_shift_r )
 {
-	static int ret = 1; /* start with low shift */
 	switch ( (input_port_read(field->port->machine, "FAKE") >> 2) & 3 )
 	{
-		case 1 : ret = 1;	break;	// low  shift: button 3
-		case 2 : ret = 0;	break;	// high shift: button 4
+		case 1 : shift_ret = 1;	break;	// low  shift: button 3
+		case 2 : shift_ret = 0;	break;	// high shift: button 4
 	}
-	return ret;
+	return shift_ret;
 }
 
 /*

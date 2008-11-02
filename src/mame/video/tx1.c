@@ -75,7 +75,7 @@ enum
 	TX1_RDFLAG_TNLF,
 	TX1_RDFLAG_STLF,
 	TX1_RDFLAG_SCCHGF
-} tx1_roadreg;
+};
 
 static struct
 {

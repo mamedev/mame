@@ -47,7 +47,4 @@ WRITE8_HANDLER( starwars_main_wr_w );
 WRITE8_HANDLER( starwars_soundrst_w );
 
 READ8_HANDLER( starwars_sin_r );
-READ8_HANDLER( starwars_m6532_r );
-
 WRITE8_HANDLER( starwars_sout_w );
-WRITE8_HANDLER( starwars_m6532_w );

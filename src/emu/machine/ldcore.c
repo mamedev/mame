@@ -156,7 +156,7 @@ static void configuration_save(running_machine *machine, int config_type, xml_da
     GLOBAL VARIABLES
 ***************************************************************************/
 
-static const ldplayer_interface *player_interfaces[] =
+static const ldplayer_interface *const player_interfaces[] =
 {
 //  &pr7820_interface,
 	&pr8210_interface,

@@ -125,14 +125,14 @@ static int _svp_cpu_number;
 
 static int _genesis_snd_z80_cpu_number;
 
-int segac2_bg_pal_lookup[4] = { 0x00, 0x10, 0x20, 0x30 };
-int segac2_sp_pal_lookup[4] = { 0x00, 0x10, 0x20, 0x30 };
+int segac2_bg_pal_lookup[4];
+int segac2_sp_pal_lookup[4];
 
 // hacks for C2
-int genvdp_use_cram = 1; // c2 uses it's own palette ram
+int genvdp_use_cram = 0; // c2 uses it's own palette ram
 int genesis_has_z80;
 int genesis_always_irq6 = 0; // c2 never enables the irq6, different source??
-int genesis_other_hacks = 1; // misc hacks
+int genesis_other_hacks = 0; // misc hacks
 
 INLINE UINT16 get_hposition(void);
 

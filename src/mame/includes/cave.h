@@ -6,6 +6,8 @@
 
 /*----------- defined in video/cave.c -----------*/
 
+extern UINT16 *cave_spriteram16_2;
+
 extern int cave_spritetype;
 extern int cave_kludge;
 

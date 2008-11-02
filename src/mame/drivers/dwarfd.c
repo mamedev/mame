@@ -86,8 +86,8 @@ A |||                                                     |______|   |          
 #include "sound/ay8910.h"
 
 //should be taken from crt params
-static int maxy=25;
-static int maxx=80;
+static const int maxy=25;
+static const int maxx=80;
 static int bank=0;
 
 static UINT8 *videobuf;

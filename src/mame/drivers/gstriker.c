@@ -180,15 +180,15 @@ Frequencies: 68k is XTAL_32MHZ/2
 
 //UINT16 *gs_videoram3;
 static UINT16 *gs_mixer_regs;
+static UINT16 dmmy_8f_ret;
 
 
 /*** MISC READ / WRITE HANDLERS **********************************************/
 
 static READ16_HANDLER(dmmy_8f)
 {
-	static int ret = 0xFFFF;
-	ret = ~ret;
-	return ret;
+	dmmy_8f_ret = ~dmmy_8f_ret;
+	return dmmy_8f_ret;
 }
 
 /*** SOUND RELATED ***********************************************************/
@@ -986,6 +986,10 @@ static WRITE16_HANDLER( vbl_toggle_w )
 
 static void mcu_init( running_machine *machine )
 {
+	dmmy_8f_ret = 0xFFFF;
+	pending_command = 0;
+	mcu_data = 0;
+
 	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x20008a, 0x20008b, 0, 0, twrldc94_mcu_w);
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x20008a, 0x20008b, 0, 0, twrldc94_mcu_r);
 

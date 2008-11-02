@@ -664,7 +664,7 @@ static int gboard_scanline_counter;
 static int gboard_scanline_latch;
 static int gboard_banks[2];
 static int gboard_4screen;
-static int gboard_last_bank = 0xff;
+static int gboard_last_bank;
 static int gboard_command;
 
 static void gboard_scanline_cb( int num, int scanline, int vblank, int blanked )
@@ -946,6 +946,8 @@ DRIVER_INIT( pchboard )
 	gboard_banks[1] = 0x1f;
 	gboard_scanline_counter = 0;
 	gboard_scanline_latch = 0;
+	gboard_last_bank = 0xff;
+	gboard_command = 0;
 
 	/* common init */
 	DRIVER_INIT_CALL(playch10);

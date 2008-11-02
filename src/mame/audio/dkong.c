@@ -973,7 +973,7 @@ DISCRETE_SOUND_END
  *
  ****************************************************************/
 
-SOUND_START( dkong)
+static SOUND_START( dkong)
 {
 	dkong_state *state = machine->driver_data;
 

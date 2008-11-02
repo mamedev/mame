@@ -36,7 +36,7 @@
 
 /* Set the data in the chip to Monday 09/09/73 00:00:00     */
 /* If you ever read this Leejanne, you know what I mean :-) */
-struct pd4990a_s pd4990a =
+static const struct pd4990a_s pd4990a_initval =
 {
 	0x00,	/* seconds BCD */
 	0x00,	/* minutes BCD */
@@ -47,11 +47,13 @@ struct pd4990a_s pd4990a =
 	1		/* weekday BCD */
 };
 
+struct pd4990a_s pd4990a;
+
 static UINT32 shiftlo,shifthi;
 
 static int retraces = 0;	/* Assumes 60 retraces a second */
 static int testwaits= 0;
-static int maxwaits=  1;	/*switch test every frame*/
+static int maxwaits= 0;	/*switch test every frame*/
 static int testbit = 0;	/* Pulses a bit in order to simulate */
 					/* test output */
 static int outputbit=0;
@@ -326,6 +328,20 @@ WRITE16_HANDLER( pd4990a_control_16_w )
 
 void pd4990a_init(void)
 {
+	pd4990a = pd4990a_initval;
+	shiftlo = 0;
+	shifthi = 0;
+	retraces = 0;
+	testwaits = 0;
+	maxwaits = 1;
+	testbit = 0;
+	outputbit = 0;
+	bitno = 0;
+	reading = 0;
+	writting = 0;
+	clock_line = 0;
+	command_line =0;
+
 	state_save_register_item("pd4990a", 0, pd4990a.seconds);
 	state_save_register_item("pd4990a", 0, pd4990a.minutes);
 	state_save_register_item("pd4990a", 0, pd4990a.hours);

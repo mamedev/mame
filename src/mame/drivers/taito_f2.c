@@ -3499,7 +3499,7 @@ static INPUT_PORTS_START( mjnquest )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-INPUT_PORTS_START( yesnoj )
+static INPUT_PORTS_START( yesnoj )
 	/* 0xb00000 -> 0x20c0e0.b ($40e0,A5) */
 	PORT_START("DSWA")
 	PORT_DIPNAME( 0x01, 0x00, "Print Results" )

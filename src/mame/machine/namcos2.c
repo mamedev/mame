@@ -19,6 +19,12 @@ extern void namcos21_kickstart(running_machine *, int);
 int namcos2_gametype;
 
 static unsigned mFinalLapProtCount;
+static int namcos2_mcu_analog_ctrl;
+static int namcos2_mcu_analog_data;
+static int namcos2_mcu_analog_complete;
+static UINT8 *namcos2_eeprom;
+static int sendval;
+
 
 READ16_HANDLER( namcos2_flap_prot_r )
 {
@@ -69,7 +75,6 @@ READ16_HANDLER( namcos2_flap_prot_r )
 /*************************************************************/
 
 #define namcos2_eeprom_size 0x2000
-static UINT8 *namcos2_eeprom;
 
 static void
 ResetAllSubCPUs( running_machine *machine, int state )
@@ -102,6 +107,10 @@ MACHINE_RESET( namcos2 )
 {
 	int loop;
 	mFinalLapProtCount = 0;
+	namcos2_mcu_analog_ctrl=0;
+	namcos2_mcu_analog_data=0xaa;
+	namcos2_mcu_analog_complete=0;
+	sendval = 0;
 
 	/* Initialise the bank select in the sound CPU */
 	namcos2_sound_bankselect_w(machine,0,0); /* Page in bank 0 */
@@ -238,7 +247,7 @@ sws92g      1992    332         $014c
 suzuk8h2    1993
 sws93       1993    334         $014e
  *************************************************************/
-static int sendval = 0;
+
 READ16_HANDLER( namcos2_68k_key_r )
 {
 	switch (namcos2_gametype)
@@ -723,10 +732,6 @@ WRITE8_HANDLER( namcos2_sound_bankselect_w )
 /*  68705 IO CPU Support functions                            */
 /*                                                            */
 /**************************************************************/
-
-static int namcos2_mcu_analog_ctrl=0;
-static int namcos2_mcu_analog_data=0xaa;
-static int namcos2_mcu_analog_complete=0;
 
 WRITE8_HANDLER( namcos2_mcu_analog_ctrl_w )
 {

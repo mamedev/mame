@@ -232,13 +232,13 @@ static MC6845_UPDATE_ROW( update_row )
 }
 
 
-MC6845_ON_HSYNC_CHANGED(hsync_changed)
+static MC6845_ON_HSYNC_CHANGED(hsync_changed)
 {
 	/* update any video up to the current scanline */
 	video_screen_update_now(device->machine->primary_screen);
 }
 
-MC6845_ON_VSYNC_CHANGED(vsync_changed)
+static MC6845_ON_VSYNC_CHANGED(vsync_changed)
 {
 	cpunum_set_input_line(device->machine, 0, 0, vsync ? ASSERT_LINE : CLEAR_LINE);
 }

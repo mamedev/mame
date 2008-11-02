@@ -337,14 +337,14 @@ static TIMER_DEVICE_CALLBACK( ddealer_mcu_sim )
 
 
 
-WRITE16_HANDLER( back_vram_w )
+static WRITE16_HANDLER( back_vram_w )
 {
 	COMBINE_DATA(&back_vram[offset]);
 	tilemap_mark_tile_dirty(back_tilemap,offset);
 }
 
 
-WRITE16_HANDLER( ddealer_vregs_w )
+static WRITE16_HANDLER( ddealer_vregs_w )
 {
 	COMBINE_DATA(&ddealer_vregs[offset]);
 }

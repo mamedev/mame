@@ -518,7 +518,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-INPUT_PORTS_START( firefox )
+static INPUT_PORTS_START( firefox )
 	PORT_START("rdin0")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON2 )

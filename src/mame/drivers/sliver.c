@@ -80,7 +80,7 @@ static UINT16 io_reg[IO_SIZE];
 static UINT16 fifo[FIFO_SIZE];
 static UINT16 fptr;
 
-static int jpeg_addr=-1;
+static int jpeg_addr;
 static UINT16 jpeg1,jpeg2;
 static int jpeg_h=0;
 static int jpeg_w=0;
@@ -588,6 +588,7 @@ ROM_END
 
 static DRIVER_INIT(sliver)
 {
+	jpeg_addr = -1;
 	colorram=auto_malloc(256*3);
 }
 

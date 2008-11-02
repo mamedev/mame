@@ -375,8 +375,8 @@ VIDEO_START( snookr10 );
 VIDEO_START( apple10 );
 VIDEO_UPDATE( snookr10 );
 
-int outportl, outporth;
-int bit0, bit1, bit2, bit3, bit4, bit5;
+static int outportl, outporth;
+static int bit0, bit1, bit2, bit3, bit4, bit5;
 
 /**********************
 * Read/Write Handlers *

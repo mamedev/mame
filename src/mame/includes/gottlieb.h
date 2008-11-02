@@ -29,7 +29,6 @@ INPUT_PORTS_EXTERN( gottlieb2_sound );
 extern UINT8 gottlieb_gfxcharlo;
 extern UINT8 gottlieb_gfxcharhi;
 extern UINT8 *gottlieb_charram;
-extern UINT8 *gottlieb_riot_regs;
 
 extern WRITE8_HANDLER( gottlieb_videoram_w );
 extern WRITE8_HANDLER( gottlieb_charram_w );

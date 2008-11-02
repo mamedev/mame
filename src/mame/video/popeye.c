@@ -11,14 +11,12 @@
 UINT8 *popeye_background_pos;
 UINT8 *popeye_palettebank;
 static UINT8 *popeye_bitmapram;
-static size_t popeye_bitmapram_size = 0x2000;
+static const size_t popeye_bitmapram_size = 0x2000;
 
 static bitmap_t *tmpbitmap2;
 static int invertmask;
 static int bitmap_type;
 enum { TYPE_SKYSKIPR, TYPE_POPEYE };
-
-#define BGRAM_SIZE 0x2000
 
 static tilemap *fg_tilemap;
 

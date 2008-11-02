@@ -14,9 +14,6 @@ WRITE16_HANDLER( cps1_eeprom_port_w );
 INTERRUPT_GEN( cps1_qsound_interrupt );
 
 READ16_HANDLER( cps1_dsw_r );
-READ16_HANDLER( cps1_in1_r );
-READ16_HANDLER( cps1_in2_r );
-READ16_HANDLER( cps1_in3_r );
 WRITE16_HANDLER( cps1_coinctrl_w );
 INTERRUPT_GEN( cps1_interrupt );
 

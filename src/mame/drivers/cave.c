@@ -78,8 +78,6 @@ Versions known to exist but not dumped:
 #include "sound/okim6295.h"
 #include "sound/ymz280b.h"
 
-extern UINT16 *cave_spriteram16_2;
-
 /***************************************************************************
 
 

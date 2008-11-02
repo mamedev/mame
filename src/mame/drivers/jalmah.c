@@ -412,7 +412,7 @@ static VIDEO_UPDATE( jalmah )
 	return 0;
 }
 
-VIDEO_UPDATE( urashima )
+static VIDEO_UPDATE( urashima )
 {
 	/*this game doesn't use the RANGE register at all.*/
 	tilemap_set_scrollx( sc0_tilemap_0, 0, jm_scrollram[0]);
@@ -525,7 +525,7 @@ static WRITE16_HANDLER( jalmah_scroll_w )
 	}
 }
 
-WRITE16_HANDLER( urashima_bank_w )
+static WRITE16_HANDLER( urashima_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -628,7 +628,7 @@ if((0xffff - input_port_read(machine, tag)) & _bit_) { jm_shared_ram[_offset_] =
 /*Funky "DMA" / protection thing*/
 /*---- -x-- "DMA" execute.*/
 /*---- ---x used too very often,I don't have any clue of what it is,it might just be the source or the destination address.*/
-WRITE16_HANDLER( urashima_dma_w )
+static WRITE16_HANDLER( urashima_dma_w )
 {
 	if(data & 4)
 	{

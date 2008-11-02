@@ -247,12 +247,6 @@ static READ16_HANDLER( palette_r )
 	return paletteram16[offset + palbank * 0x200];
 }
 
-extern UINT16* megadrive_vdp_palette_lookup;
-extern UINT16* megadrive_vdp_palette_lookup_sprite; // for C2
-extern UINT16* megadrive_vdp_palette_lookup_shadow;
-extern UINT16* megadrive_vdp_palette_lookup_highlight;
-
-
 UINT16* megadrive_vdp_palette_lookup_segac2;
 UINT16* megadrive_vdp_palette_lookup_sprite_segac2;
 UINT16* megadrive_vdp_palette_lookup_shadow_segac2;
@@ -325,9 +319,6 @@ static WRITE16_HANDLER( palette_w )
     RAM address bits.
 
 ******************************************************************************/
-
-extern int segac2_bg_pal_lookup[4];
-extern int segac2_sp_pal_lookup[4];
 
 static void recompute_palette_tables(void)
 {
@@ -1867,12 +1858,6 @@ the expander or not. Looking at bit 1 of prot_func_tfrceac(), it would seem that
 it should be, otherwise I don't see how the formula could be computed.
 
 ******************************************************************************/
-
-extern int genvdp_use_cram;
-extern int genesis_has_z80;
-extern int genesis_always_irq6;
-extern int genesis_other_hacks;
-extern DRIVER_INIT( megadriv_c2 );
 
 static void segac2_common_init(running_machine* machine, int (*func)(int in))
 {

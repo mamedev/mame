@@ -114,12 +114,12 @@ Medium size chip with heat sink on it
 #include "cpu/mips/mips3.h"
 
 
-VIDEO_START(magictg)
+static VIDEO_START(magictg)
 {
 
 }
 
-VIDEO_UPDATE(magictg)
+static VIDEO_UPDATE(magictg)
 {
 	return 0;
 }

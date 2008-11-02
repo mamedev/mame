@@ -394,7 +394,6 @@ extern READ8_HANDLER( snes_r_bank6 );
 extern READ8_HANDLER( snes_r_bank7 );
 extern WRITE8_HANDLER( snes_w_bank1 );
 extern WRITE8_HANDLER( snes_w_bank2 );
-extern WRITE8_HANDLER( snes_w_bank3 );
 extern WRITE8_HANDLER( snes_w_bank4 );
 extern WRITE8_HANDLER( snes_w_bank5 );
 extern WRITE8_HANDLER( snes_w_bank6 );

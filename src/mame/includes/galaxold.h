@@ -105,16 +105,13 @@ DRIVER_INIT( pisces );
 DRIVER_INIT( checkmaj );
 DRIVER_INIT( dingo );
 DRIVER_INIT( dingoe );
-DRIVER_INIT( kingball );
 DRIVER_INIT( mooncrsu );
 DRIVER_INIT( mooncrst );
 DRIVER_INIT( mooncrgx );
 DRIVER_INIT( moonqsr );
 DRIVER_INIT( checkman );
-DRIVER_INIT( azurian );
 DRIVER_INIT( 4in1 );
 DRIVER_INIT( ladybugg );
-DRIVER_INIT( gmgalax );
 
 WRITE8_HANDLER( galaxold_nmi_enable_w );
 
@@ -131,17 +128,12 @@ WRITE8_HANDLER( galaxold_leds_w );
 READ8_HANDLER( scramblb_protection_1_r );
 READ8_HANDLER( scramblb_protection_2_r );
 
-WRITE8_HANDLER( kingball_speech_dip_w );
-WRITE8_HANDLER( kingball_sound1_w );
-WRITE8_HANDLER( kingball_sound2_w );
-
 WRITE8_HANDLER( _4in1_bank_w );
 CUSTOM_INPUT( _4in1_fake_port_r );
 
 WRITE8_HANDLER( zigzag_sillyprotection_w );
 
 INTERRUPT_GEN( hunchbks_vh_interrupt );
-INTERRUPT_GEN( gmgalax_vh_interrupt );
 
 
 /*----------- defined in machine/scramble.c -----------*/
@@ -175,7 +167,6 @@ DRIVER_INIT( anteater );
 DRIVER_INIT( rescue );
 DRIVER_INIT( minefld );
 DRIVER_INIT( losttomb );
-DRIVER_INIT( superbon );
 DRIVER_INIT( hustler );
 DRIVER_INIT( billiard );
 DRIVER_INIT( mrkougar );

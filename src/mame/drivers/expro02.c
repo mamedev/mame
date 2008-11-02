@@ -339,7 +339,7 @@ static WRITE16_HANDLER( galsnew_6295_bankswitch_w )
 
 static UINT16 vram_0_bank_num = 0, vram_1_bank_num = 0;
 
-WRITE16_HANDLER(galsnew_vram_0_bank_w)
+static WRITE16_HANDLER(galsnew_vram_0_bank_w)
 {
 	int i;
 	if(vram_0_bank_num != data)
@@ -355,7 +355,7 @@ WRITE16_HANDLER(galsnew_vram_0_bank_w)
 	}
 }
 
-WRITE16_HANDLER(galsnew_vram_1_bank_w)
+static WRITE16_HANDLER(galsnew_vram_1_bank_w)
 {
 	int i;
 	if(vram_1_bank_num != data)
@@ -695,7 +695,7 @@ ROM_START( fantasia )
 ROM_END
 
 
-DRIVER_INIT(galsnew)
+static DRIVER_INIT(galsnew)
 {
 	UINT32 *src = (UINT32 *)memory_region(machine, "gfx3" );
 	UINT32 *dst = (UINT32 *)memory_region(machine, "gfx2" );

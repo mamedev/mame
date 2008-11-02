@@ -998,7 +998,7 @@ static GFXDECODE_START( cosmica )
 GFXDECODE_END
 
 
-static const char *cosmica_sample_names[] =
+static const char *const cosmica_sample_names[] =
 {
 	"*cosmica",
 	"backgr.wav",

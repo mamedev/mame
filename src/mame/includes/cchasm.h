@@ -5,12 +5,15 @@
 *************************************************************************/
 
 #include "sound/custom.h"
+#include "machine/z80ctc.h"
 
 /*----------- defined in machine/cchasm.c -----------*/
 
 WRITE16_HANDLER( cchasm_led_w );
 
 /*----------- defined in audio/cchasm.c -----------*/
+
+extern z80ctc_interface cchasm_ctc_intf;
 
 READ8_HANDLER( cchasm_snd_io_r );
 WRITE8_HANDLER( cchasm_snd_io_w );

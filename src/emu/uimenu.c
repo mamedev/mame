@@ -217,9 +217,9 @@ static render_texture *hilight_texture;
 
 static render_texture *arrow_texture;
 
-static const char *priortext = "Return to Prior Menu";
-static const char *backtext = "Return to " CAPSTARTGAMENOUN;
-static const char *exittext = "Exit";
+static const char priortext[] = "Return to Prior Menu";
+static const char backtext[] = "Return to " CAPSTARTGAMENOUN;
+static const char exittext[] = "Exit";
 
 static const rgb_t text_fgcolor = MAKE_ARGB(0xff,0xff,0xff,0xff);
 static const rgb_t text_bgcolor = MAKE_ARGB(0xe0,0x80,0x80,0x80);

@@ -288,8 +288,8 @@ static UINT8 dc_40103;
 static UINT8 te_40103;
 static UINT8 ld_40103;
 
-UINT8 ant_jckp, jckp, ant_cio, c_io, hp_1, hp_2, bell, aux3, dvrt;
-unsigned long count0, count1, count2, count3, count4;
+static UINT8 ant_jckp, jckp, ant_cio, c_io, hp_1, hp_2, bell, aux3, dvrt;
+static unsigned long count0, count1, count2, count3, count4;
 
 /* Baby vars */
 static UINT8 sbp0, sbp2, sbp3;
@@ -302,7 +302,7 @@ static UINT8 sbp0, sbp2, sbp3;
 static tilemap *bg_tilemap;
 
 /* BCD to Seven Segment Decoder */
-UINT8 dec_7seg(int data)
+static UINT8 dec_7seg(int data)
 {
 	UINT8 segment;
 	switch (data)
@@ -324,7 +324,7 @@ UINT8 dec_7seg(int data)
 }
 
 /* Display a seven digit counter on layout - Index points to less significant digit*/
-void count_7dig(unsigned long data, UINT8 index)
+static void count_7dig(unsigned long data, UINT8 index)
 {
 	UINT8 i;
 	char strn[7];
@@ -336,7 +336,7 @@ void count_7dig(unsigned long data, UINT8 index)
 	}
 }
 
-PALETTE_INIT( videopkr )
+static PALETTE_INIT( videopkr )
 {
 	int j;
 
@@ -362,7 +362,7 @@ PALETTE_INIT( videopkr )
 	}
 }
 
-PALETTE_INIT( babypkr )
+static PALETTE_INIT( babypkr )
 {
 	int j;
 
@@ -402,18 +402,18 @@ static TILE_GET_INFO( get_bg_tile_info )
 }
 
 
-VIDEO_START( videopkr )
+static VIDEO_START( videopkr )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
-VIDEO_START( vidadcba )
+static VIDEO_START( vidadcba )
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 16, 8, 32, 32);
 }
 
 
-VIDEO_UPDATE( videopkr )
+static VIDEO_UPDATE( videopkr )
 {
 	tilemap_mark_all_tiles_dirty(bg_tilemap);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);

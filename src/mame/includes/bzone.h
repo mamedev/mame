@@ -10,7 +10,6 @@
 /*----------- defined in drivers/bzone.c -----------*/
 
 extern UINT8 rb_input_select;
-READ8_HANDLER( bzone_IN0_r );
 
 
 /*----------- defined in audio/bzone.c -----------*/

@@ -1008,7 +1008,7 @@ static WRITE32_HANDLER( bankoffset_w )
 
 static UINT32 m_n_dmaoffset;
 static UINT32 m_n_dmabias;
-static UINT32 m_n_tektagdmaoffset = 0xffffffff;
+static UINT32 m_n_tektagdmaoffset;
 
 static WRITE32_HANDLER( dmaoffset_w )
 {
@@ -1330,7 +1330,7 @@ static READ8_HANDLER( s12_mcu_rtc_r )
 	return ret;
 }
 
-static int s12_lastpB = 0x50, s12_setstate = 0, s12_setnum, s12_settings[8];
+static int s12_lastpB, s12_setstate, s12_setnum, s12_settings[8];
 
 static READ8_HANDLER( s12_mcu_portB_r )
 {
@@ -1438,6 +1438,17 @@ static DRIVER_INIT( namcos12 )
 	psx_dma_install_read_handler( 5, namcos12_rom_read );
 
 	memory_configure_bank( 1, 0, memory_region_length( machine, "user2" ) / 0x200000, memory_region( machine, "user2" ), 0x200000 );
+
+	s12_porta = 0;
+	s12_rtcstate = 0;
+	s12_lastpB = 0x50;
+	s12_setstate = 0;
+	s12_setnum = 0;
+	memset(s12_settings, 0, sizeof(s12_settings));
+
+	m_n_tektagdmaoffset = 0xffffffff;
+	m_n_dmaoffset = 0;
+	m_n_dmabias = 0;
 	m_n_bankoffset = 0;
 	memory_set_bank( 1, 0 );
 

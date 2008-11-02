@@ -163,7 +163,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 static UINT8 scroll;
 static UINT8 scrollhi;
 
-VIDEO_UPDATE( chanbara )
+static VIDEO_UPDATE( chanbara )
 {
 	tilemap_set_scrolly(bg2_tilemap,0,scroll | (scrollhi << 8));
 	tilemap_draw(bitmap, cliprect, bg2_tilemap, 0, 0);

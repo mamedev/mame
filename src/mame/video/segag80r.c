@@ -25,7 +25,7 @@ static UINT16 spaceod_vcounter;
 static UINT8 spaceod_fixed_color;
 static UINT8 spaceod_bg_control;
 static UINT8 spaceod_bg_detect;
-static UINT8 spaceod_bg_detect_tile_color = 1;
+static const UINT8 spaceod_bg_detect_tile_color = 1;
 
 static tilemap *bg_tilemap;
 static UINT8 bg_enable;

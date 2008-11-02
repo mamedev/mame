@@ -850,7 +850,7 @@ static UINT16 generate_cs16(UINT8 *rom, int size)
 }
 
 
-int m1_address_scramble(int address, UINT16 key)
+static int m1_address_scramble(int address, UINT16 key)
 {
 	int block;
 	int aux;

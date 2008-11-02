@@ -135,8 +135,12 @@ WRITE32_HANDLER( silkroad_fgram3_w )
 
 
 
+static int enable1, enable2, enable3;
+
 VIDEO_START(silkroad)
 {
+	enable1 = enable2 = enable3 = 1;
+
 	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,16,16,64, 64);
 		tilemap_set_transparent_pen(fg_tilemap,0);
 
@@ -146,8 +150,6 @@ VIDEO_START(silkroad)
 	fg3_tilemap = tilemap_create(get_fg3_tile_info,tilemap_scan_rows,16,16,64, 64);
 		tilemap_set_transparent_pen(fg3_tilemap,0);
 }
-
-static int enable1=1,enable2=1,enable3=1;
 
 VIDEO_UPDATE(silkroad)
 {

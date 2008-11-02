@@ -100,7 +100,7 @@ static VIDEO_UPDATE(twins)
 {
 	int y,x,count;
 	int i;
-	static int xxx=320,yyy=204;
+	static const int xxx=320,yyy=204;
 
 	fillbitmap(bitmap, get_black_pen(screen->machine), 0);
 
@@ -205,7 +205,7 @@ static VIDEO_UPDATE(twinsa)
 {
 	int y,x,count;
 	int i;
-	static int xxx=320,yyy=204;
+	static const int xxx=320,yyy=204;
 
 	fillbitmap(bitmap, get_black_pen(screen->machine), 0);
 

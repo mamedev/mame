@@ -232,6 +232,8 @@ static struct
 	int offset1;
 } kbdc8042;
 
+static int poll_delay;
+
 static void at_8042_check_keyboard(void);
 
 
@@ -266,6 +268,7 @@ static TIMER_CALLBACK( kbdc8042_time )
 
 void kbdc8042_init(const struct kbdc8042_interface *intf)
 {
+	poll_delay = 10;
 	memset(&kbdc8042, 0, sizeof(kbdc8042));
 	kbdc8042.type = intf->type;
 	kbdc8042.set_gate_a20 = intf->set_gate_a20;
@@ -347,7 +350,6 @@ static void at_8042_clear_keyboard_received(void)
 
 READ8_HANDLER(kbdc8042_8_r)
 {
-	static int poll_delay = 10;
 	UINT8 data = 0;
 
 	switch (offset) {

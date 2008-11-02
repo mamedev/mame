@@ -318,8 +318,12 @@ static void meritm_vdp1_interrupt(running_machine *machine, int i)
 	}
 }
 
+static int layer0_enabled, layer1_enabled;
+
 static VIDEO_START( meritm )
 {
+	layer0_enabled = layer1_enabled = 1;
+
 	vdp0_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	v9938_init (machine, 0, machine->primary_screen, vdp0_bitmap, MODEL_V9938, 0x20000, meritm_vdp0_interrupt);
 	v9938_reset(0);
@@ -335,8 +339,6 @@ static VIDEO_START( meritm )
 	state_save_register_global_bitmap(vdp1_bitmap);
 
 }
-
-static int layer0_enabled = 1, layer1_enabled = 1;
 
 static VIDEO_UPDATE( meritm )
 {
