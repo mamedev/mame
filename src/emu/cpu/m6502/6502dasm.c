@@ -80,7 +80,7 @@ enum opcodes {
 	bsr,
 /* 6510 + 65c02 mnemonics */
 	anc,  asr, ast,  arr,  asx,  axa,  dcp,  dea,
-	dop,  ina, isc,  lax,  phx,  phy,  plx,  ply,
+	dop,  ina, isb,  lax,  phx,  phy,  plx,  ply,
 	rla,  rra, sax,  slo,  sre,  sah,  say,  ssh,
 	sxh,  syh, top,  oal,  kil,
 /* 65ce02 mnemonics */
@@ -115,7 +115,7 @@ static const char *const token[]=
 	"bsr",
 /* 6510 mnemonics */
 	"anc", "asr", "ast", "arr", "asx", "axa", "dcp", "dea",
-	"dop", "ina", "isc", "lax", "phx", "phy", "plx", "ply",
+	"dop", "ina", "isb", "lax", "phx", "phy", "plx", "ply",
 	"rla", "rra", "sax", "slo", "sre", "sah", "say", "ssh",
 	"sxh", "syh", "top", "oal", "kil",
 /* 65ce02 mnemonics */
@@ -141,43 +141,43 @@ struct op6502_info
 
 static const struct op6502_info op6502[256] = {
 	{m6502_brk,imm},{ora,idx},{kil,non},{slo,idx},/* 00 */
-	{dop,imm},{ora,zpg},{asl,zpg},{slo,zpg},
+	{nop,zpg},{ora,zpg},{asl,zpg},{slo,zpg},
 	{php,imp},{ora,imm},{asl,acc},{anc,imm},
-	{top,iw2},{ora,aba},{asl,aba},{slo,aba},
-	{bpl,rel},{ora,idy},{nop,imp},{slo,idy},/* 10 */
-	{dop,imm},{ora,zpx},{asl,zpx},{slo,zpx},
-	{clc,imp},{ora,aby},{kil,non},{slo,aby},
-	{top,iw2},{ora,abx},{asl,abx},{slo,abx},
+	{nop,aba},{ora,aba},{asl,aba},{slo,aba},
+	{bpl,rel},{ora,idy},{kil,non},{slo,idy},/* 10 */
+	{nop,zpx},{ora,zpx},{asl,zpx},{slo,zpx},
+	{clc,imp},{ora,aby},{nop,imp},{slo,aby},
+	{nop,abx},{ora,abx},{asl,abx},{slo,abx},
 	{jsr,adr},{and,idx},{kil,non},{rla,idx},/* 20 */
 	{bit,zpg},{and,zpg},{rol,zpg},{rla,zpg},
 	{plp,imp},{and,imm},{rol,acc},{anc,imm},
 	{bit,aba},{and,aba},{rol,aba},{rla,aba},
 	{bmi,rel},{and,idy},{kil,non},{rla,idy},/* 30 */
-	{dop,imm},{and,zpx},{rol,zpx},{rla,zpx},
+	{nop,zpx},{and,zpx},{rol,zpx},{rla,zpx},
 	{sec,imp},{and,aby},{nop,imp},{rla,aby},
-	{top,iw2},{and,abx},{rol,abx},{rla,abx},
+	{nop,abx},{and,abx},{rol,abx},{rla,abx},
 	{rti,imp},{eor,idx},{kil,non},{sre,idx},/* 40 */
-	{dop,imm},{eor,zpg},{lsr,zpg},{sre,zpg},
+	{nop,zpg},{eor,zpg},{lsr,zpg},{sre,zpg},
 	{pha,imp},{eor,imm},{lsr,acc},{asr,imm},
 	{jmp,adr},{eor,aba},{lsr,aba},{sre,aba},
 	{bvc,rel},{eor,idy},{kil,non},{sre,idy},/* 50 */
-	{dop,imm},{eor,zpx},{lsr,zpx},{sre,zpx},
+	{nop,zpx},{eor,zpx},{lsr,zpx},{sre,zpx},
 	{cli,imp},{eor,aby},{nop,imp},{sre,aby},
-	{top,iw2},{eor,abx},{lsr,abx},{sre,abx},
+	{nop,abx},{eor,abx},{lsr,abx},{sre,abx},
 	{rts,imp},{adc,idx},{kil,non},{rra,idx},/* 60 */
-	{dop,imm},{adc,zpg},{ror,zpg},{rra,zpg},
+	{nop,zpg},{adc,zpg},{ror,zpg},{rra,zpg},
 	{pla,imp},{adc,imm},{ror,acc},{arr,imm},
 	{jmp,ind},{adc,aba},{ror,aba},{rra,aba},
 	{bvs,rel},{adc,idy},{kil,non},{rra,idy},/* 70 */
-	{dop,imm},{adc,zpx},{ror,zpx},{rra,zpx},
+	{nop,zpx},{adc,zpx},{ror,zpx},{rra,zpx},
 	{sei,imp},{adc,aby},{nop,imp},{rra,aby},
-	{top,iw2},{adc,abx},{ror,abx},{rra,abx},
-	{dop,imm},{sta,idx},{dop,imm},{sax,idx},/* 80 */
+	{nop,abx},{adc,abx},{ror,abx},{rra,abx},
+	{nop,imm},{sta,idx},{nop,imm},{sax,idx},/* 80 */
 	{sty,zpg},{sta,zpg},{stx,zpg},{sax,zpg},
-	{dey,imp},{dop,imm},{txa,imp},{axa,imm},
+	{dey,imp},{nop,imm},{txa,imp},{axa,imm},
 	{sty,aba},{sta,aba},{stx,aba},{sax,aba},
 	{bcc,rel},{sta,idy},{kil,non},{say,idy},/* 90 */
-	{sty,zpx},{sta,zpx},{stx,zpy},{sax,zpx},
+	{sty,zpx},{sta,zpx},{stx,zpy},{sax,zpy},
 	{tya,imp},{sta,aby},{txs,imp},{ssh,aby},
 	{syh,abx},{sta,abx},{sxh,aby},{sah,aby},
 	{ldy,imm},{lda,idx},{ldx,imm},{lax,idx},/* a0 */
@@ -185,25 +185,25 @@ static const struct op6502_info op6502[256] = {
 	{tay,imp},{lda,imm},{tax,imp},{oal,imm},
 	{ldy,aba},{lda,aba},{ldx,aba},{lax,aba},
 	{bcs,rel},{lda,idy},{kil,non},{lax,idy},/* b0 */
-	{ldy,zpx},{lda,zpx},{ldx,zpy},{lax,zpx},
+	{ldy,zpx},{lda,zpx},{ldx,zpy},{lax,zpy},
 	{clv,imp},{lda,aby},{tsx,imp},{ast,aby},
-	{ldy,abx},{lda,abx},{ldx,aby},{lax,abx},
-	{cpy,imm},{cmp,idx},{dop,imm},{dcp,idx},/* c0 */
+	{ldy,abx},{lda,abx},{ldx,aby},{lax,aby},
+	{cpy,imm},{cmp,idx},{nop,imm},{dcp,idx},/* c0 */
 	{cpy,zpg},{cmp,zpg},{dec,zpg},{dcp,zpg},
 	{iny,imp},{cmp,imm},{dex,imp},{asx,imm},
 	{cpy,aba},{cmp,aba},{dec,aba},{dcp,aba},
 	{bne,rel},{cmp,idy},{kil,non},{dcp,idy},/* d0 */
-	{dop,imm},{cmp,zpx},{dec,zpx},{dcp,zpx},
+	{nop,zpx},{cmp,zpx},{dec,zpx},{dcp,zpx},
 	{cld,imp},{cmp,aby},{nop,imp},{dcp,aby},
-	{top,iw2},{cmp,abx},{dec,abx},{dcp,abx},
-	{cpx,imm},{sbc,idx},{dop,imm},{isc,idx},/* e0 */
-	{cpx,zpg},{sbc,zpg},{inc,zpg},{isc,zpg},
+	{nop,abx},{cmp,abx},{dec,abx},{dcp,abx},
+	{cpx,imm},{sbc,idx},{nop,imm},{isb,idx},/* e0 */
+	{cpx,zpg},{sbc,zpg},{inc,zpg},{isb,zpg},
 	{inx,imp},{sbc,imm},{nop,imp},{sbc,imm},
-	{cpx,aba},{sbc,aba},{inc,aba},{isc,aba},
-	{beq,rel},{sbc,idy},{kil,non},{isc,idy},/* f0 */
-	{dop,imm},{sbc,zpx},{inc,zpx},{isc,zpx},
-	{sed,imp},{sbc,aby},{nop,imp},{isc,aby},
-	{top,iw2},{sbc,abx},{inc,abx},{isc,abx}
+	{cpx,aba},{sbc,aba},{inc,aba},{isb,aba},
+	{beq,rel},{sbc,idy},{kil,non},{isb,idy},/* f0 */
+	{nop,zpx},{sbc,zpx},{inc,zpx},{isb,zpx},
+	{sed,imp},{sbc,aby},{nop,imp},{isb,aby},
+	{nop,abx},{sbc,abx},{inc,abx},{isb,abx}
 };
 
 static const struct op6502_info op65c02[256] = {
