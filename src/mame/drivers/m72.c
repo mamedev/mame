@@ -338,10 +338,10 @@ INLINE DRIVER_INIT( loht_mcu )
 
 #if 0
 	/* running the mcu at twice the speed, the following
-	 * timeouts have to be modified.
-	 * At normal speed, the timing heavily depends on opcode
-	 * prefetching on the V30.
-	 */
+     * timeouts have to be modified.
+     * At normal speed, the timing heavily depends on opcode
+     * prefetching on the V30.
+     */
 	{
 		UINT8 *rom=memory_region(machine, "mcu");
 

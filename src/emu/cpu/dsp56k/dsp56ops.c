@@ -1801,7 +1801,7 @@ static size_t dsp56k_op_asl4(const UINT16 op, UINT8* cycles)
 	/* - ? * * * * ? ? */
 	/* TODO: L, E, U  */
 	/* V - Set if an arithmetic overflow occurs in the 40 bit result. Also set if bit 35 through 39 are
-		   not the same. */
+           not the same. */
 	/* C - Set if bit 36 of source operand is set. Cleared otherwise. */
 	if (*((UINT64*)D.addr) & U64(0x0000008000000000)) N_bit_set(1); else N_bit_set(0);
 	if (*((UINT64*)D.addr) == 0) Z_bit_set(1); else Z_bit_set(0);

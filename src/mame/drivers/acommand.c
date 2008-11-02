@@ -163,13 +163,13 @@ static VIDEO_START( acommand )
 #define LED_ON		0x01c00
 #define LED_OFF		0x00000
 /*
-	 a
-	---
-f	| | b
-	-g-
-e	| | c
-	---
-	 d
+     a
+    ---
+f   | | b
+    -g-
+e   | | c
+    ---
+     d
 a & 1
 b & 2
 c & 4
@@ -179,7 +179,7 @@ f & 20
 g & 40
 7f
 */
-/*									  0    1    2	 3	  4    5    6	 7	  8	   9	a    b    c    d    e    f*/
+/*                                    0    1    2    3    4    5    6    7    8    9    a    b    c    d    e    f*/
 static const UINT8 led_fill[0x10] = { 0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x00,0x00,0x00,0x00,0x00,0x00};
 
 static void draw_led(bitmap_t *bitmap, int x, int y,UINT8 value)
@@ -300,10 +300,10 @@ static READ16_HANDLER(ac_devices_r)
 			return okim6295_status_1_r(machine,0);
 		case 0x0040/2:
 			/*
-				"Upper switch / Under Switch"
-				xx-x ---- xx-x xx-x
-				-x-- ---- ---- ---- Catch Switch - 3
-				--x- ---- ---- ---- Lower Switch - 3
+                "Upper switch / Under Switch"
+                xx-x ---- xx-x xx-x
+                -x-- ---- ---- ---- Catch Switch - 3
+                --x- ---- ---- ---- Lower Switch - 3
                 ---x ---- ---- ---- Upper Switch - 3
                 ---- -x-- ---- ---- Catch Switch - 2
                 ---- --x- ---- ---- Lower Switch - 2
@@ -329,19 +329,19 @@ static READ16_HANDLER(ac_devices_r)
 				ufo_sw1|=0x1000;
 			if(ac_devram[offset] & 0x4000)
 				ufo_sw1|=0x2000;
-//			if(ac_devram[0x0048/2] & 0x0001)
-//				ufo_sw1|=0x0040;
-//			if(ac_devram[0x0048/2] & 0x0004)
-//				ufo_sw1|=0x0400;
-//			if(ac_devram[0x0048/2] & 0x0100)
-//				ufo_sw1|=0x4000;
+//          if(ac_devram[0x0048/2] & 0x0001)
+//              ufo_sw1|=0x0040;
+//          if(ac_devram[0x0048/2] & 0x0004)
+//              ufo_sw1|=0x0400;
+//          if(ac_devram[0x0048/2] & 0x0100)
+//              ufo_sw1|=0x4000;
 			return ufo_sw1;
 		}
 		case 0x0044/2:
 			/*
-			    ---- ---- --x- ---- Lower Switch - 5
-				---- ---- ---x ---- Upper Switch - 5
-			    ---- ---- ---- --x- Lower Switch - 4 (active high)
+                ---- ---- --x- ---- Lower Switch - 5
+                ---- ---- ---x ---- Upper Switch - 5
+                ---- ---- ---- --x- Lower Switch - 4 (active high)
                 ---- ---- ---- ---x Upper Switch - 4 (active low)
             */
 		{

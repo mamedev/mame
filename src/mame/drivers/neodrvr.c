@@ -461,157 +461,157 @@ INPUT_PORTS_END
 
 /***************************************************************************
 
-	Neo-Geo game pcb infos:
-	=======================
+    Neo-Geo game pcb infos:
+    =======================
 
-	The Neo-Geo games for AES (home) and MVS (arcade) systems are cartridge based.
+    The Neo-Geo games for AES (home) and MVS (arcade) systems are cartridge based.
 
-	Each cartridge consists of two pcb's: CHA and PROG.
+    Each cartridge consists of two pcb's: CHA and PROG.
 
-	CHA pcb contains gfx data ('C' - rom), text layer data ('S' - rom) and sound driver ('M' - rom).
-	PROG pcb contains sample data ('V' - rom) and program code ('P' - rom).
+    CHA pcb contains gfx data ('C' - rom), text layer data ('S' - rom) and sound driver ('M' - rom).
+    PROG pcb contains sample data ('V' - rom) and program code ('P' - rom).
 
-	On most pcb's various custom/protection chips can also be found:
+    On most pcb's various custom/protection chips can also be found:
 
-	CHA:
-	. NEO-273
-	. NEO-CMC
-	. NEO-ZMC
-	. NEO-ZMC2
-	. PRO-CT0
-	. SNK-9201
+    CHA:
+    . NEO-273
+    . NEO-CMC
+    . NEO-ZMC
+    . NEO-ZMC2
+    . PRO-CT0
+    . SNK-9201
 
-	PROG:
-	. 0103 (QFP144)
-	. ALTERA (EPM7128SQC100-15)
-	. NEO-COMA
-	. NEO-PCM2 (SNK 1999)
-	. NEO-PCM2 (PLAYMORE 2002)
-	. NEO-PVC
-	. NEO-SMA
-	. PCM
-	. PRO-CT0
-	. SNK-9201
-
-
-	Known pcb's:
-	============
-
-	MVS CHA:
-	-- SNK --
-	. NEO-MVS CHA-32
-	. NEO-MVS CHA-8M
-	. NEO-MVS CHA42G
-	. NEO-MVS CHA42G-1
-	. NEO-MVS CHA 42G-2
-	. NEO-MVS CHA 42G-3
-	. NEO-MVS CHA42G-3B
-	. NEO-MVS CHA256
-	. NEO-MVS CHA256B
-	. NEO-MVS PSTM CHA136
-	. NEO-MVS CHA512Y
-	. NEO-MVS CHAFIO (1999.6.14)
-	. MVS CHAFIO REV1.0 (KOF-2001)
-	. NEO-MVS CHAFIO (SNK 2002) - MADE IN KOREA
-	-- SNKPLAYMORE --
-	. NEO-MVS CHAFIO (2003.7.24)
-
-	MVS PROG:
-	-- SNK --
-	. NEO-MVS PROG-NAM
-	. NEO-MVS PROG-HERO
-	. NEO-MVS PROG-EP
-	. NEO-MVS PROG-8MB
-	. NEO-MVS PROG8M42
-	. NEO-MVS PROG16
-	. NEO-MVS PROG42G
-	. NEO-MVS PROG42G-COM
-	. NEO-MVS PROG42G-1
-	. NEO-MVS PROG-G2
-	. NEO-MVS PROG 4096
-	. NEO-MVS PROG 4096 B
-	. NEO-MVS PROGGSC
-	. NEO-MVS PROGSM
-	. NEO-MVS PROGSS3
-	. NEO-MVS PROGTOP
-	. NEO-MVS PROGSF1 (1998.6.17)
-	. NEO-MVS PROGEOP (1999.2.2)
-	. NEO-MVS PROGLBA (1999.4.12) - LBA-SUB (2000.2.24)
-	. NEO-MVS PROGBK1
-	. NEO-MVS PROGBK2 (2000.3.21)
-	. MVS PROGBK2 REV1.0 (KOF-2001)
-	. NEO-MVS PROGBK2 (SNK 2002) - MADE IN KOREA
-	-- SNKPLAYMORE --
-	. NEO-MVS PROGBK2R (2003.8.26) - NEO-HYCS (2003.9.29)
-	. NEO-MVS PROGBK3R (2003.9.2) - NEO-HYCS (2003.9.29)
-	. NEO-MVS PROGBK3S (2003.10.1)
-	. NEO-MVS PROGBK2S (2003.10.18)
+    PROG:
+    . 0103 (QFP144)
+    . ALTERA (EPM7128SQC100-15)
+    . NEO-COMA
+    . NEO-PCM2 (SNK 1999)
+    . NEO-PCM2 (PLAYMORE 2002)
+    . NEO-PVC
+    . NEO-SMA
+    . PCM
+    . PRO-CT0
+    . SNK-9201
 
 
-	AES CHA:
-	-- SNK --
-	. NEO-AEG CHA-32
-	. NEO-AEG CHA-8M
-	. NEO-AEG CHA42G
-	. NEO-AEG CHA42G-1
-	. NEO-AEG CHA42G-2B
-	. NEO-AEG CHA42G-3
-	. NEO-AEG CHA42G-4
-	. NEO-AEG CHA256
-	. NEO-AEG CHA256[B]
-	. NEO-AEG CHA256RY
-	. NEO-AEG CHA512Y
-	. NEO-AEG CHAFIO (1999.8.10)
-	-- SNKPLAYMORE --
-	. NEO-AEG CHAFIO (2003.7.24)
+    Known pcb's:
+    ============
 
-	AES PROG:
-	-- SNK --
-	. NEO-AEG PROG-NAM
-	. NEO-AEG PROG-HERO
-	. NEO-AEG PROG-4A
-	. NEO-AEG PROG-4B
-	. NEO-AEG PROG 8M42
-	. NEO-AEG PROG B
-	. NEO-AEG PROG16
-	. NEO-AEG PROG42G
-	. NEO-AEG PROG42G-COM
-	. NEO-AEG PROG42G-1
-	. NEO-AEG PROG-G2
-	. NEO-AEG PROG4096 B
-	. NEO-AEG PROGGS
-	. NEO-AEG PROGTOP2
-	. NEO-AEG PROGLBA (1999.7.6)
-	. NEO-AEG PROGRK
-	. NEO-AEG PROGRKB
-	. NEO-AEG PROGBK1Y
-	. NEO-AEG PROGBK1F
-	-- PLAYMORE --
-	. NEO-AEG PROGBK2 (2002.4.1)
-	-- SNKPLAYMORE --
-	. NEO-AEG PROGBK3R (2003.8.29) - NEO-HYCS (2003.9.29)
-	. NEO-AEG PROGBK2S (2003.10.16)
+    MVS CHA:
+    -- SNK --
+    . NEO-MVS CHA-32
+    . NEO-MVS CHA-8M
+    . NEO-MVS CHA42G
+    . NEO-MVS CHA42G-1
+    . NEO-MVS CHA 42G-2
+    . NEO-MVS CHA 42G-3
+    . NEO-MVS CHA42G-3B
+    . NEO-MVS CHA256
+    . NEO-MVS CHA256B
+    . NEO-MVS PSTM CHA136
+    . NEO-MVS CHA512Y
+    . NEO-MVS CHAFIO (1999.6.14)
+    . MVS CHAFIO REV1.0 (KOF-2001)
+    . NEO-MVS CHAFIO (SNK 2002) - MADE IN KOREA
+    -- SNKPLAYMORE --
+    . NEO-MVS CHAFIO (2003.7.24)
+
+    MVS PROG:
+    -- SNK --
+    . NEO-MVS PROG-NAM
+    . NEO-MVS PROG-HERO
+    . NEO-MVS PROG-EP
+    . NEO-MVS PROG-8MB
+    . NEO-MVS PROG8M42
+    . NEO-MVS PROG16
+    . NEO-MVS PROG42G
+    . NEO-MVS PROG42G-COM
+    . NEO-MVS PROG42G-1
+    . NEO-MVS PROG-G2
+    . NEO-MVS PROG 4096
+    . NEO-MVS PROG 4096 B
+    . NEO-MVS PROGGSC
+    . NEO-MVS PROGSM
+    . NEO-MVS PROGSS3
+    . NEO-MVS PROGTOP
+    . NEO-MVS PROGSF1 (1998.6.17)
+    . NEO-MVS PROGEOP (1999.2.2)
+    . NEO-MVS PROGLBA (1999.4.12) - LBA-SUB (2000.2.24)
+    . NEO-MVS PROGBK1
+    . NEO-MVS PROGBK2 (2000.3.21)
+    . MVS PROGBK2 REV1.0 (KOF-2001)
+    . NEO-MVS PROGBK2 (SNK 2002) - MADE IN KOREA
+    -- SNKPLAYMORE --
+    . NEO-MVS PROGBK2R (2003.8.26) - NEO-HYCS (2003.9.29)
+    . NEO-MVS PROGBK3R (2003.9.2) - NEO-HYCS (2003.9.29)
+    . NEO-MVS PROGBK3S (2003.10.1)
+    . NEO-MVS PROGBK2S (2003.10.18)
 
 
-	Cartridge colours:
-	==================
+    AES CHA:
+    -- SNK --
+    . NEO-AEG CHA-32
+    . NEO-AEG CHA-8M
+    . NEO-AEG CHA42G
+    . NEO-AEG CHA42G-1
+    . NEO-AEG CHA42G-2B
+    . NEO-AEG CHA42G-3
+    . NEO-AEG CHA42G-4
+    . NEO-AEG CHA256
+    . NEO-AEG CHA256[B]
+    . NEO-AEG CHA256RY
+    . NEO-AEG CHA512Y
+    . NEO-AEG CHAFIO (1999.8.10)
+    -- SNKPLAYMORE --
+    . NEO-AEG CHAFIO (2003.7.24)
 
-	MVS cartridges were produced in different colours.
-	
-	Known cartridge colours:
-	. Black
-	. Blue
-	. Green
-	. Grey
-	. Red
-	. Transparent
-	. Transparent Blue
-	. Transparent Green
-	. White
-	. Yellow
+    AES PROG:
+    -- SNK --
+    . NEO-AEG PROG-NAM
+    . NEO-AEG PROG-HERO
+    . NEO-AEG PROG-4A
+    . NEO-AEG PROG-4B
+    . NEO-AEG PROG 8M42
+    . NEO-AEG PROG B
+    . NEO-AEG PROG16
+    . NEO-AEG PROG42G
+    . NEO-AEG PROG42G-COM
+    . NEO-AEG PROG42G-1
+    . NEO-AEG PROG-G2
+    . NEO-AEG PROG4096 B
+    . NEO-AEG PROGGS
+    . NEO-AEG PROGTOP2
+    . NEO-AEG PROGLBA (1999.7.6)
+    . NEO-AEG PROGRK
+    . NEO-AEG PROGRKB
+    . NEO-AEG PROGBK1Y
+    . NEO-AEG PROGBK1F
+    -- PLAYMORE --
+    . NEO-AEG PROGBK2 (2002.4.1)
+    -- SNKPLAYMORE --
+    . NEO-AEG PROGBK3R (2003.8.29) - NEO-HYCS (2003.9.29)
+    . NEO-AEG PROGBK2S (2003.10.16)
 
-	The above listed only covers SNK / PLAYMORE / SNKPLAYMORE pcb's. There also exists a
-	wide range of 'bootleg' pcb's.
+
+    Cartridge colours:
+    ==================
+
+    MVS cartridges were produced in different colours.
+
+    Known cartridge colours:
+    . Black
+    . Blue
+    . Green
+    . Grey
+    . Red
+    . Transparent
+    . Transparent Blue
+    . Transparent Green
+    . White
+    . Yellow
+
+    The above listed only covers SNK / PLAYMORE / SNKPLAYMORE pcb's. There also exists a
+    wide range of 'bootleg' pcb's.
 
 
     Neo-Geo game pcb infos by Johnboy

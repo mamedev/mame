@@ -1290,7 +1290,7 @@ static void advance_eg_channel(FM_OPN *OPN, FM_SLOT *SLOT)
 			{
 				if ( !(OPN->eg_cnt & ((1<<SLOT->eg_sh_d2r)-1) ) )
 				{
-					
+
 					if ((OPN->type == TYPE_YM2612) || (OPN->type == TYPE_YM2608))
 					{
 						SLOT->volume += 6 * eg_inc[SLOT->eg_sel_d2r + ((OPN->eg_cnt>>SLOT->eg_sh_d2r)&7)];
@@ -1937,7 +1937,7 @@ static void OPNSetPres(FM_OPN *OPN, int pres, int timer_prescaler, int SSGpres)
 
 	/* maximal frequency is required for Phase overflow calculation, register size is 17 bits (Nemesis) */
 	OPN->fn_max = (UINT32)( (double)0x20000 * OPN->ST.freqbase * (1<<(FREQ_SH-10)) );
-	     	
+
 	/* LFO freq. table */
 	for(i = 0; i < 8; i++)
 	{

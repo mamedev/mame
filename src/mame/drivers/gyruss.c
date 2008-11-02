@@ -285,7 +285,7 @@ static INPUT_PORTS_START( gyruss )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )       /* tables at 0x1653 (15 bytes) or 0x4bf3 (13 bytes) */
-	PORT_DIPSETTING(    0x08, "30k 90k 60k+" )              /* last bonus life at 810k : max. 14 bonus lives */ 
+	PORT_DIPSETTING(    0x08, "30k 90k 60k+" )              /* last bonus life at 810k : max. 14 bonus lives */
 	PORT_DIPSETTING(    0x00, "40k 110k 70k+" )             /* last bonus life at 810k : max. 12 bonus lives */
 	PORT_DIPNAME( 0x70, 0x30, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x70, "1 (Easiest)" )
@@ -311,7 +311,7 @@ static INPUT_PORTS_START( gyrussce )
 
 	PORT_MODIFY("DSW2")
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Bonus_Life ) )       /* tables at 0x1653 (15 bytes) or 0x4bf3 (13 bytes) */
-	PORT_DIPSETTING(    0x08, "50k 120k 70k+" )             /* last bonus life at 960k : max. 14 bonus lives */ 
+	PORT_DIPSETTING(    0x08, "50k 120k 70k+" )             /* last bonus life at 960k : max. 14 bonus lives */
 	PORT_DIPSETTING(    0x00, "60k 140k 80k+" )             /* last bonus life at 940k : max. 12 bonus lives */
 	PORT_DIPNAME( 0x70, 0x20, DEF_STR( Difficulty ) )       /* "Difficult" default setting according to Centuri manual */
 	PORT_DIPSETTING(    0x70, "1 (Easiest)" )

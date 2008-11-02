@@ -292,12 +292,12 @@
     you're busted.
 
     All cards have their own value, except for 10, 11 and 12 that are half point.
-	Special hands have their own price.
+    Special hands have their own price.
 
     Sun 7 + sun king = 100 (by credit).
     Any 7 + any king =  16 (by credit).
     Any 7 and half   =   8 (by credit).
-	Pass             =   2 (by credit).
+    Pass             =   2 (by credit).
 
 
     How to play...

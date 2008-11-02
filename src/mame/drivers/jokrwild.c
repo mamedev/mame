@@ -124,10 +124,10 @@ static TILE_GET_INFO( get_bg_tile_info )
     ---- ----   color code.
     ---- ----   seems unused.
 */
-//	int attr = colorram[tile_index];
+//  int attr = colorram[tile_index];
 	int code = videoram[tile_index];
-//	int bank = (attr & 0x08) >> 3;
-//	int color = (attr & 0x03);
+//  int bank = (attr & 0x08) >> 3;
+//  int color = (attr & 0x03);
 
 	SET_TILE_INFO( 0 /* bank */, code, 0 /* color */, 0);
 }
@@ -163,7 +163,7 @@ static PALETTE_INIT( jokrwild )
 
 //static READ8_HANDLER( random_gen_r )
 //{
-//	return mame_rand(machine) & 0xff;
+//  return mame_rand(machine) & 0xff;
 //}
 
 
@@ -174,15 +174,15 @@ static PALETTE_INIT( jokrwild )
 static ADDRESS_MAP_START( jokrwild_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_WRITE(jokrwild_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x2000, 0x27ff) AM_RAM AM_WRITE(jokrwild_colorram_w) AM_BASE(&colorram)
-//	AM_RANGE(0x0010, 0x0010) AM_READ(random_gen_r)
-//	AM_RANGE(0x4004, 0x4007) AM_READWRITE(pia_0_r, pia_0_w)
-//	AM_RANGE(0x4008, 0x400b) AM_READWRITE(pia_1_r, pia_1_w)
-//	AM_RANGE(0x4010, 0x4010) AM_READNOP	/* R ???? */
+//  AM_RANGE(0x0010, 0x0010) AM_READ(random_gen_r)
+//  AM_RANGE(0x4004, 0x4007) AM_READWRITE(pia_0_r, pia_0_w)
+//  AM_RANGE(0x4008, 0x400b) AM_READWRITE(pia_1_r, pia_1_w)
+//  AM_RANGE(0x4010, 0x4010) AM_READNOP /* R ???? */
 	AM_RANGE(0x6000, 0x6000) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
 	AM_RANGE(0x6001, 0x6001) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
-//	AM_RANGE(0x6100, 0x6100) AM_READWRITENOP	/* R/W ???? */
-//	AM_RANGE(0x6200, 0x6203) another PIA?
-//	AM_RANGE(0x6300, 0x6300) unknown
+//  AM_RANGE(0x6100, 0x6100) AM_READWRITENOP    /* R/W ???? */
+//  AM_RANGE(0x6200, 0x6203) another PIA?
+//  AM_RANGE(0x6300, 0x6300) unknown
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -197,9 +197,9 @@ ADDRESS_MAP_END
   4004-400b R/W  ; 2x PIAs?
   4010      R    ; unknown.
 
-  6100	    R/W  ; unknown.
+  6100      R/W  ; unknown.
   6200-6203 R/W  ; extra PIA?
-  6300	    R    ; unknown.
+  6300      R    ; unknown.
 
 
 */
@@ -341,7 +341,7 @@ static MACHINE_DRIVER_START( jokrwild )
 	MDRV_CPU_PROGRAM_MAP(jokrwild_map, 0)
 	MDRV_CPU_VBLANK_INT("main", nmi_line_pulse)
 
-//	MDRV_NVRAM_HANDLER(generic_0fill)
+//  MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -420,8 +420,8 @@ static DRIVER_INIT( jokrwild )
 	}
 
 	/* Initializing PIAs... */
-//	pia_config(0, &pia0_intf);
-//	pia_config(1, &pia1_intf);
+//  pia_config(0, &pia0_intf);
+//  pia_config(1, &pia1_intf);
 }
 
 

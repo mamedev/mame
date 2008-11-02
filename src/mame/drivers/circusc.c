@@ -18,7 +18,7 @@ To enter service mode, keep 1&2 pressed on reset
   due to code at 0xcb38 :
 
     CB38: B6 30 88         LDA   $1800
-    CB3B: 43               COMA  
+    CB3B: 43               COMA
     CB3C: 84 2B            ANDA  #$03
     CB3E: 81 8B            CMPA  #$03
     CB40: 25 20            BCS   $CB44
@@ -28,7 +28,7 @@ To enter service mode, keep 1&2 pressed on reset
   In other sets, you have the following (code from 'circusc') :
 
     CB38: B6 30 88         LDA   $1800
-    CB3B: 43               COMA  
+    CB3B: 43               COMA
     CB3C: 84 2B            ANDA  #$03
     CB3E: 81 8B            CMPA  #$03
     CB40: 25 20            BCS   $CB44

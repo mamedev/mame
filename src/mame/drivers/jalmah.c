@@ -218,7 +218,7 @@ static VIDEO_START( jalmah )
 	sc2_tilemap_3 = tilemap_create(get_sc2_tile_info,range3_16x16,16,16,32,256);
 
 	sc3_tilemap_0 = tilemap_create(get_sc3_tile_info,tilemap_scan_cols,8,8,256,32);
-//	sc3_tilemap_1 = tilemap_create(get_sc3_tile_info,tilemap_scan_cols,8,8,256,32);
+//  sc3_tilemap_1 = tilemap_create(get_sc3_tile_info,tilemap_scan_cols,8,8,256,32);
 	sc3_tilemap_2 = tilemap_create(get_sc3_tile_info,range2_8x8,8,8,128,64);
 	sc3_tilemap_3 = tilemap_create(get_sc3_tile_info,range3_8x8,8,8,64,128);
 
@@ -261,52 +261,52 @@ static UINT8 sc0_prin,sc1_prin,sc2_prin,sc3_prin;
 
 static void jalmah_priority_system(void)
 {
-//	UINT8 *pri_rom = memory_region(Machine, "user1");
+//  UINT8 *pri_rom = memory_region(Machine, "user1");
 	/*
-	Case by case priorities:
-	kakumei: title screen     = 0/23  (0-1 unused)
-	         attract mode     = 0/0123 (?)
-	         card table       = 0/013 (2 unused)
-	         gameplay         = 0/0123
-	kakumei2:title screen     = 0/0123
-	         attract mode     = 4/013 (2 unused) also 4/0213
-	         card table       = 9/013 (2 unused)
-	         character screen = 9/013 (2 unused)
-	         gameplay         = 2/03  (1-2 unused) also 2/013 (2 unused)
-	         continue screen  = 9/013 (2 unused)
-	suchipi: title screen     = 0/03  (1-2 unused)
-	         attract mode     = 6/103 (2 unused) also 6/1023
-	         card table       = 1/013 (2 unused)
-	         character screen = 4/0213
-	         victory screen   = 6/0123 also 6/1023
-	         gameplay         = d/0123
-	mjzoomin doesn't seem to use the priority number (0/0123)
-	daireika/urashima uses priority number with the protection device
-	daireika: gameplay        = x/103 (2 unused),might be 6
-	good results:
-	0/0123
-	4/0213
-   	6/1023
-	*/
+    Case by case priorities:
+    kakumei: title screen     = 0/23  (0-1 unused)
+             attract mode     = 0/0123 (?)
+             card table       = 0/013 (2 unused)
+             gameplay         = 0/0123
+    kakumei2:title screen     = 0/0123
+             attract mode     = 4/013 (2 unused) also 4/0213
+             card table       = 9/013 (2 unused)
+             character screen = 9/013 (2 unused)
+             gameplay         = 2/03  (1-2 unused) also 2/013 (2 unused)
+             continue screen  = 9/013 (2 unused)
+    suchipi: title screen     = 0/03  (1-2 unused)
+             attract mode     = 6/103 (2 unused) also 6/1023
+             card table       = 1/013 (2 unused)
+             character screen = 4/0213
+             victory screen   = 6/0123 also 6/1023
+             gameplay         = d/0123
+    mjzoomin doesn't seem to use the priority number (0/0123)
+    daireika/urashima uses priority number with the protection device
+    daireika: gameplay        = x/103 (2 unused),might be 6
+    good results:
+    0/0123
+    4/0213
+    6/1023
+    */
 	static const UINT16 pri_scheme[0x10] = { 0x0123, 0x0123, 0x0123, 0x0123, 0x0213, 0x0123, 0x1023, 0x0123,
 											 0x0123, 0x1203, 0x0123, 0x0123, 0x0123, 0x0123, 0x0123, 0x0123    };
-//	UINT8 prinum[0x10];
+//  UINT8 prinum[0x10];
 
-//	for(i=0;i<0x10;i++)
-//		prinum[i] = pri_rom[i+pri*0x10];
+//  for(i=0;i<0x10;i++)
+//      prinum[i] = pri_rom[i+pri*0x10];
 	sc0_prin = (pri_scheme[pri] & 0xf000) >> 12;
 	sc1_prin = (pri_scheme[pri] & 0x0f00) >> 8;
 	sc2_prin = (pri_scheme[pri] & 0x00f0) >> 4;
 	sc3_prin = (pri_scheme[pri] & 0x000f) >> 0;
 
-//	popmessage("%04x",pri);
+//  popmessage("%04x",pri);
 	/*
-	popmessage("%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x %02x"
-	,prinum[0x00],prinum[0x01],prinum[0x02],prinum[0x03]
-	,prinum[0x04],prinum[0x05],prinum[0x06],prinum[0x07]
-	,prinum[0x08],prinum[0x09],prinum[0x0a],prinum[0x0b]
-	,prinum[0x0c],prinum[0x0d],prinum[0x0e],prinum[0x0f],pri);
-	*/
+    popmessage("%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x%02x %02x"
+    ,prinum[0x00],prinum[0x01],prinum[0x02],prinum[0x03]
+    ,prinum[0x04],prinum[0x05],prinum[0x06],prinum[0x07]
+    ,prinum[0x08],prinum[0x09],prinum[0x0a],prinum[0x0b]
+    ,prinum[0x0c],prinum[0x0d],prinum[0x0e],prinum[0x0f],pri);
+    */
 }
 
 static void draw_sc0_layer(bitmap_t *bitmap, const rectangle *cliprect,int trans)
@@ -374,7 +374,7 @@ static VIDEO_UPDATE( jalmah )
 	tilemap_set_scrollx( sc2_tilemap_3, 0, jm_scrollram[2] & 0x1ff);
 
 	tilemap_set_scrollx( sc3_tilemap_0, 0, jm_scrollram[3] & 0x7ff);
-//	empty
+//  empty
 	tilemap_set_scrollx( sc3_tilemap_2, 0, jm_scrollram[3] & 0x3ff);
 	tilemap_set_scrollx( sc3_tilemap_3, 0, jm_scrollram[3] & 0x1ff);
 
@@ -395,7 +395,7 @@ static VIDEO_UPDATE( jalmah )
 	tilemap_set_scrolly( sc2_tilemap_3, 0, jm_scrollram[6] & 0xfff);
 
 	tilemap_set_scrolly( sc3_tilemap_0, 0, jm_scrollram[7] & 0xff);
-//	empty
+//  empty
 	tilemap_set_scrolly( sc3_tilemap_2, 0, jm_scrollram[7] & 0x1ff);
 	tilemap_set_scrolly( sc3_tilemap_3, 0, jm_scrollram[7] & 0x3ff);
 
@@ -561,13 +561,13 @@ static WRITE16_HANDLER( urashima_vregs_w )
 		case 0x084/2: jm_scrollram[0] = data; break; //sc0 x offset
 		case 0x086/2: jm_scrollram[4] = data; break; //sc0 y offset
 
-//		case 0x182/2: jm_vregs[0] = data;	  break;
-//		case 0x184/2: jm_scrollram[0] = data; break;
-//		case 0x186/2: jm_scrollram[4] = data; break;
+//      case 0x182/2: jm_vregs[0] = data;     break;
+//      case 0x184/2: jm_scrollram[0] = data; break;
+//      case 0x186/2: jm_scrollram[4] = data; break;
 
-//		case 0x382/2: jm_vregs[0] = data;	  break;
-//		case 0x384/2: jm_scrollram[0] = data; break;
-//		case 0x386/2: jm_scrollram[4] = data; break;
+//      case 0x382/2: jm_vregs[0] = data;     break;
+//      case 0x384/2: jm_scrollram[0] = data; break;
+//      case 0x386/2: jm_scrollram[4] = data; break;
 
 		case 0x882/2: jm_vregs[3] = data;	  break; //sc3 plane enable
 		case 0x884/2: jm_scrollram[3] = data; break; //sc3 x offset
@@ -645,7 +645,7 @@ static void daireika_palette_dma(running_machine *machine,UINT16 val)
 	/*a0=301c0+jm_shared_ram[0x540/2] & 0xf00 */
 	/*a1=88000*/
 	src_addr = 0x301c0 + (val * 0x40);
-//	popmessage("%08x",src_addr);
+//  popmessage("%08x",src_addr);
 	for(index_1=0;index_1<0x200;index_1+=0x20)
 	{
 		tmp_addr = src_addr;
@@ -939,7 +939,7 @@ static ADDRESS_MAP_START( urashima, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(urashima_sc0_vram_w)
 	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(urashima_sc0_vram_w)
 //  AM_RANGE(0x094000, 0x097fff) AM_RAM_WRITE(urashima_sc1_vram_w) AM_BASE(&sc1_vram)/*unused*/
-// 	AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(urashima_sc2_vram_w) AM_BASE(&sc2_vram)/*unused*/
+//  AM_RANGE(0x098000, 0x09bfff) AM_RAM_WRITE(urashima_sc2_vram_w) AM_BASE(&sc2_vram)/*unused*/
 	/*$9c000-$9cfff Video Registers*/
 /**/AM_RANGE(0x09c000, 0x09dfff) AM_WRITE(urashima_vregs_w)
 /**///AM_RANGE(0x09c480, 0x09c49f) AM_READ(SMH_RAM) AM_WRITE(urashima_sc2vregs_w)
@@ -1339,7 +1339,7 @@ ROM_START( daireika )
 	ROM_LOAD( "mj10.bin", 0x00000, 0x80000, CRC(1f5509a5) SHA1(4dcdee0e159956cf73f5f85ce278479be2a9ca9f) )
 
 	ROM_REGION( 0x40000, "gfx3", 0 ) /* BG2 */
-//	ROM_COPY( "gfx4", 	  0x20000, 0x20000, 0x20000 )/*mj10.bin*/
+//  ROM_COPY( "gfx4",     0x20000, 0x20000, 0x20000 )/*mj10.bin*/
 	ROM_LOAD( "mj11.bin", 0x00000, 0x20000, CRC(14867c51) SHA1(b282b5048a55c9ad72ceb0d23f010a0fee78704f) )
 	ROM_LOAD( "mj12.bin", 0x20000, 0x20000, CRC(236f809f) SHA1(9e15dd8a810a9d4f7f75f084d6bd277ea7d0e40a) )
 
@@ -1575,7 +1575,7 @@ static READ16_HANDLER( urashima_mcu_r )
 	res = resp[respcount++];
 	if (respcount >= sizeof(resp)/sizeof(resp[0])) respcount = 0;
 
-//	logerror("%04x: mcu_r %02x\n",activecpu_get_pc(),res);
+//  logerror("%04x: mcu_r %02x\n",activecpu_get_pc(),res);
 
 	return res;
 }
@@ -1791,7 +1791,7 @@ static READ16_HANDLER( daireika_mcu_r )
 	res = resp[respcount++];
 	if (respcount >= sizeof(resp)/sizeof(resp[0])) respcount = 0;
 
-//	logerror("%04x: mcu_r %02x\n",activecpu_get_pc(),res);
+//  logerror("%04x: mcu_r %02x\n",activecpu_get_pc(),res);
 
 	return res;
 }
@@ -2067,7 +2067,7 @@ static READ16_HANDLER( mjzoomin_mcu_r )
 	res = resp[respcount++];
 	if (respcount >= sizeof(resp)/sizeof(resp[0])) respcount = 0;
 
-//	logerror("%04x: mcu_r %02x\n",activecpu_get_pc(),res);
+//  logerror("%04x: mcu_r %02x\n",activecpu_get_pc(),res);
 
 	return res;
 }
@@ -2202,7 +2202,7 @@ static READ16_HANDLER( kakumei_mcu_r )
 	res = resp[respcount++];
 	if (respcount >= sizeof(resp)/sizeof(resp[0])) respcount = 0;
 
-//	popmessage("%04x: mcu_r %02x",activecpu_get_pc(),res);
+//  popmessage("%04x: mcu_r %02x",activecpu_get_pc(),res);
 
 	return res;
 }
@@ -2223,7 +2223,7 @@ static READ16_HANDLER( suchipi_mcu_r )
 	res = resp[respcount++];
 	if (respcount >= sizeof(resp)/sizeof(resp[0])) respcount = 0;
 
-//	popmessage("%04x: mcu_r %02x",activecpu_get_pc(),res);
+//  popmessage("%04x: mcu_r %02x",activecpu_get_pc(),res);
 
 	return res;
 }

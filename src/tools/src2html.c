@@ -7,12 +7,12 @@
 
 ****************************************************************************
 
-	Template file format:
-	
-	<html header>
-	<!--PATH--> = insert path
-	<!--CONTENT--> = insert content
-	<html footer>
+    Template file format:
+
+    <html header>
+    <!--PATH--> = insert path
+    <!--CONTENT--> = insert content
+    <html footer>
 
 ***************************************************************************/
 
@@ -223,7 +223,7 @@ int main(int argc, char *argv[])
 				incpathhead = &(*incpathhead)->next;
 			}
 		}
-		
+
 		/* other parameter */
 		else if (arg[0] != '-' && unadorned == 0)
 		{
@@ -247,7 +247,7 @@ int main(int argc, char *argv[])
 	/* make sure we got 3 parameters */
 	if (srcdir == NULL || dstdir == NULL || tempfilename == NULL)
 		goto usage;
-	
+
 	/* read the template file into an astring */
 	if (core_fopen(astring_c(tempfilename), OPEN_FLAG_READ, &tempfile) == FILERR_NONE)
 	{
@@ -261,7 +261,7 @@ int main(int argc, char *argv[])
 		}
 		core_fclose(tempfile);
 	}
-	
+
 	/* verify the template */
 	if (tempheader == NULL)
 	{
@@ -744,7 +744,7 @@ static core_file *create_file_and_output_header(const astring *filename, const a
 {
 	astring *modified;
 	core_file *file;
-	
+
 	/* create the indexfile */
 	if (core_fopen(astring_c(filename), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, &file) != FILERR_NONE)
 		return NULL;

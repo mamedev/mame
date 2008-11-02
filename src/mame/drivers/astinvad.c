@@ -451,7 +451,7 @@ static INPUT_PORTS_START( spaceint )
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x04, "4" )
 	PORT_DIPSETTING(    0x02, "5" )
-//	PORT_DIPSETTING(    0x06, "5" )                         /* duplicate settings */
+//  PORT_DIPSETTING(    0x06, "5" )                         /* duplicate settings */
 	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
@@ -472,8 +472,8 @@ static INPUT_PORTS_START( spaceinj )
 	PORT_DIPNAME( 0x06, 0x00, DEF_STR( Lives ) )            /* code at 0x0d37 */
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
-//	PORT_DIPSETTING(    0x04, "5" )                         /* duplicate settings */
-//	PORT_DIPSETTING(    0x06, "5" )                         /* duplicate settings */
+//  PORT_DIPSETTING(    0x04, "5" )                         /* duplicate settings */
+//  PORT_DIPSETTING(    0x06, "5" )                         /* duplicate settings */
 INPUT_PORTS_END
 
 

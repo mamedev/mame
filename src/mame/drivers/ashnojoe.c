@@ -101,7 +101,7 @@ static int msm5205_vclk_toggle;
 static READ16_HANDLER(fake_4a00a_r)
 {
 	/* If it returns 1 there's no sound. Is it used to sync the game and sound?
-	or just a debug enable/disable register? */
+    or just a debug enable/disable register? */
 	return 0;
 }
 

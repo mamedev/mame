@@ -583,7 +583,7 @@ static INPUT_PORTS_START( astrof )
 	PORT_DIPSETTING(    0x03, "6" )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
-//	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )            /* duplicate settings */
+//  PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )            /* duplicate settings */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW:5,6")    /* table at 0xf6b2 */
@@ -636,7 +636,7 @@ static INPUT_PORTS_START( abattle )
 	PORT_DIPSETTING(    0x03, "6" )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
-//	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )            /* duplicate settings */
+//  PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )            /* duplicate settings */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW:5,6")    /* table at 0xf87a */
@@ -688,7 +688,7 @@ static INPUT_PORTS_START( spfghmk2 )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
-//	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )            /* duplicate settings */
+//  PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )            /* duplicate settings */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x30, 0x00, "Free Credit" )               PORT_DIPLOCATION("SW:5,6")    /* table at 0xfa58 */
@@ -739,7 +739,7 @@ static INPUT_PORTS_START( spfgmk22 )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
-//	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )            /* duplicate settings */
+//  PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )            /* duplicate settings */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x30, 0x00, "Free Credit" )               PORT_DIPLOCATION("SW:5,6")    /* table at 0xf9f8 */
@@ -796,7 +796,7 @@ static INPUT_PORTS_START( tomahawk )
 	PORT_DIPSETTING(    0x03, "6" )
 	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Coinage ) )          PORT_DIPLOCATION("SW:3,4")
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
-//	PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )            /* duplicate settings */
+//  PORT_DIPSETTING(    0x0c, DEF_STR( 2C_1C ) )            /* duplicate settings */
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_2C ) )
 	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Bonus_Life ) )       PORT_DIPLOCATION("SW:5,6")    /* table at 0xf428 */

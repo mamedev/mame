@@ -166,7 +166,7 @@ typedef struct
 	memory_interface	mem;
 
 	const nec_config *config;
-	
+
 	UINT8	prefetch_size;
 	UINT8	prefetch_cycles;
 	INT8	prefetch_count;
@@ -202,13 +202,13 @@ INLINE void prefetch(void)
 static void do_prefetch(int previous_ICount)
 {
 	int diff = previous_ICount - (int) nec_ICount;
-	
+
 	/* The implementation is not accurate, but comes close.
-	 * It does not respect that the V30 will fetch two bytes 
-	 * at once directly, but instead uses only 2 cycles instead
-	 * of 4. There are however only very few sources publicy
-	 * available and they are vague.
-	 */
+     * It does not respect that the V30 will fetch two bytes
+     * at once directly, but instead uses only 2 cycles instead
+     * of 4. There are however only very few sources publicy
+     * available and they are vague.
+     */
 	while (I.prefetch_count<0)
 	{
 		I.prefetch_count++;
@@ -233,13 +233,13 @@ static void do_prefetch(int previous_ICount)
 
 }
 
-INLINE UINT8 fetch(void) 
+INLINE UINT8 fetch(void)
 {
 	prefetch();
 	return cpu_readop_arg(FETCH_XOR((I.sregs[PS]<<4)+I.ip++));
 }
 
-INLINE UINT16 fetchword(void) 
+INLINE UINT16 fetchword(void)
 {
 	UINT16 r = FETCH();
 	r |= (FETCH()<<8);
@@ -257,7 +257,7 @@ static UINT8 parity_table[256];
 static UINT8 fetchop(void)
 {
 	UINT8 ret;
-	
+
 	prefetch();
 	ret = cpu_readop( FETCH_XOR( ( I.sregs[PS]<<4)+I.ip++));
 
@@ -298,7 +298,7 @@ static void nec_reset (void)
 	I.CarryVal = 0;
 	I.ParityVal = 0;
 
-	
+
 	I.sregs[PS] = 0xffff;
 
 	CHANGE_PC;

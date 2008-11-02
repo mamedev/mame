@@ -59,7 +59,7 @@
     We made a full artwork that allow you to play this game with bells and whistles.
 
 
-    * Buena Suerte ´94 Video Poker Game w/ Double Up feature - 1 Player.
+    * Buena Suerte ?94 Video Poker Game w/ Double Up feature - 1 Player.
 
     This game is a reprogrammed version of the Buena Suerte! poker game, to run on this
     GEMINIS RE900 hardware.
@@ -90,13 +90,13 @@ static UINT8 psg_pa, psg_pb = 0, mux_data = 0, ledant = 0, player = 1, stat_a= 1
 
 static READ8_HANDLER (re_psg_portA_r)
 {
-	if ((input_port_read(machine, "IN0") & 0x01) == 0) 
+	if ((input_port_read(machine, "IN0") & 0x01) == 0)
 	{
 		output_set_lamp_value(0,1);		// Operator Key ON
 	}
 
-	else 
-	{	
+	else
+	{
 		output_set_lamp_value(0,0);		// Operator Key OFF
 	}
 
@@ -139,7 +139,7 @@ static READ8_HANDLER (re_psg_portB_r)
 	}
 	/* End of Select Player Hack */
 
-	/* "INA": Unified port to share the player Keys among all players - Key In & Key Out have their own buttons on keyboard. */ 
+	/* "INA": Unified port to share the player Keys among all players - Key In & Key Out have their own buttons on keyboard. */
 	switch( mux_data )
 	{
 		case 0x01: retval = (input_port_read(machine, "IN6") | 0x80 ) - (( player == 6 ) ? (input_port_read(machine, "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 6 */
@@ -189,7 +189,7 @@ static WRITE8_HANDLER (re_mux_port_B_w)
 	{
 		output_set_lamp_value(20 + led, 1);
 
-		if (led != ledant) 
+		if (led != ledant)
 		{
 			output_set_lamp_value(20 + ledant, 0);
 			ledant = led;
@@ -199,8 +199,8 @@ static WRITE8_HANDLER (re_mux_port_B_w)
 
 static WRITE8_HANDLER (cpu_port_0_w)
 {
-//	output_set_lamp_value(7,1 ^ ( (data >> 4) & 1)); /* Cont. Sal */
-//	output_set_lamp_value(8,1 ^ ( (data >> 5) & 1)); /* Cont. Ent */
+//  output_set_lamp_value(7,1 ^ ( (data >> 4) & 1)); /* Cont. Sal */
+//  output_set_lamp_value(8,1 ^ ( (data >> 5) & 1)); /* Cont. Ent */
 }
 
 static WRITE8_HANDLER(re900_watchdog_reset_w)
@@ -218,14 +218,14 @@ static ADDRESS_MAP_START( mem_prg, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mem_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_READ (rom_r) 
+	AM_RANGE(0x0000, 0xbfff) AM_READ (rom_r)
 	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(TMS9928A_vram_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(TMS9928A_register_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0xe801, 0xe801) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0xe802, 0xe802) AM_READ(ay8910_read_port_0_r)
-	AM_RANGE(0xe000, 0xefff) AM_WRITE(re900_watchdog_reset_w) 
+	AM_RANGE(0xe000, 0xefff) AM_WRITE(re900_watchdog_reset_w)
 	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P0) AM_WRITE(cpu_port_0_w)
 	AM_RANGE(MCS51_PORT_P2, MCS51_PORT_P2) AM_NOP
 	AM_RANGE(MCS51_PORT_P3, MCS51_PORT_P3) AM_NOP
@@ -253,14 +253,14 @@ INPUT_PORTS_START( re900 )
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Operator Key") PORT_TOGGLE PORT_CODE(KEYCODE_0)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Auditor Key")  PORT_TOGGLE PORT_CODE(KEYCODE_9)
 
-	PORT_START("INA")  
+	PORT_START("INA")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Bet")
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Left")         PORT_CODE(KEYCODE_LEFT)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Right")        PORT_CODE(KEYCODE_RIGHT)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Up")           PORT_CODE(KEYCODE_UP)
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Down")         PORT_CODE(KEYCODE_DOWN)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED ) 
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN1")
@@ -281,7 +281,7 @@ INPUT_PORTS_START( re900 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P2 Key-In")   PORT_CODE(KEYCODE_2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P2 Key-Out")  PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN3")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -291,7 +291,7 @@ INPUT_PORTS_START( re900 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P3 Key-In")   PORT_CODE(KEYCODE_3)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P3 Key-Out")  PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN4")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -301,7 +301,7 @@ INPUT_PORTS_START( re900 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P4 Key-In")   PORT_CODE(KEYCODE_4)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P4 Key-Out")  PORT_CODE(KEYCODE_R)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN5")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -311,7 +311,7 @@ INPUT_PORTS_START( re900 )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P5 Key-In")   PORT_CODE(KEYCODE_5)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_SERVICE1 ) PORT_NAME("P5 Key-Out")  PORT_CODE(KEYCODE_T)
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED ) 
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("IN6")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -325,12 +325,12 @@ INPUT_PORTS_START( re900 )
 
 	PORT_START("IN_S")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON8 ) PORT_NAME("Player Select")  PORT_CODE(KEYCODE_L)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED ) 
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED ) 
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED ) 
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED ) 
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED ) 
-	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED ) 
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
@@ -381,7 +381,7 @@ static const ay8910_interface ay8910_re900 =
 	re_psg_portA_r,
 	re_psg_portB_r,
 	re_mux_port_A_w,
-	re_mux_port_B_w	
+	re_mux_port_B_w
 };
 
 static const ay8910_interface ay8910_bs94 =
@@ -404,7 +404,7 @@ static MACHINE_DRIVER_START( re900 )
 	MDRV_CPU_ADD("main", I8051, MAIN_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(mem_prg, 0)
 	MDRV_CPU_IO_MAP(mem_io, 0)
-	MDRV_CPU_VBLANK_INT("main", re900_video_interrupt) 
+	MDRV_CPU_VBLANK_INT("main", re900_video_interrupt)
 
 	/* video hardware */
 	MDRV_IMPORT_FROM(tms9928a)
@@ -413,7 +413,7 @@ static MACHINE_DRIVER_START( re900 )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-	/* sound hardware	*/
+	/* sound hardware   */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay_re900", AY8910, TMS_CLOCK) /* From TMS9128NL - Pin 37 (GROMCLK) */
 	MDRV_SOUND_CONFIG(ay8910_re900)
@@ -424,7 +424,7 @@ static MACHINE_DRIVER_START( bs94 )
 
 	MDRV_IMPORT_FROM(re900)
 
-	/* sound hardware	*/
+	/* sound hardware   */
 	MDRV_SOUND_MODIFY("ay_re900")
 	MDRV_SOUND_CONFIG(ay8910_bs94)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)

@@ -393,7 +393,7 @@ static void update_colors(running_machine *machine)
 static WRITE32_HANDLER( macrossp_palette_fade_w )
 {
 	fade_effect = ((data & 0xff00) >> 8) - 0x28;//it writes two times,first with a -0x28 then with the proper data
-//	popmessage("%02x",fade_effect);
+//  popmessage("%02x",fade_effect);
 	if(old_fade != fade_effect)
 	{
 		old_fade = fade_effect;

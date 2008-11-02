@@ -2672,7 +2672,7 @@ static READ16_HANDLER( _32x_68k_fbcontrol_r )
 
 	if (megadrive_hblank_flag) retdata |= 0x4000;
 
-//	printf("_32x_68k_fbcontrol_r\n");
+//  printf("_32x_68k_fbcontrol_r\n");
 
 
 	return retdata;
@@ -6123,7 +6123,7 @@ static WRITE16_HANDLER( _32x_68k_comms_w )
 
 static WRITE32_HANDLER( sh2_commsport_w )
 {
-//	printf("comms write %d %08x %08x\n",offset, data, mem_mask);
+//  printf("comms write %d %08x %08x\n",offset, data, mem_mask);
 
 	if (ACCESSING_BITS_16_31)
 	{
@@ -6560,23 +6560,23 @@ ROM_START( 32x_bios )
 	ROM_REGION16_BE( 0x400000, "main", ROMREGION_ERASE00 )
 
 	ROM_REGION16_BE( 0x400000, "gamecart", 0 ) /* 68000 Code */
-//	ROM_LOAD( "32xquin.rom", 0x000000,  0x005d124, CRC(93d4b0a3) SHA1(128bd0b6e048c749da1a2f4c3abd6a867539a293))
+//  ROM_LOAD( "32xquin.rom", 0x000000,  0x005d124, CRC(93d4b0a3) SHA1(128bd0b6e048c749da1a2f4c3abd6a867539a293))
 //  ROM_LOAD( "32x_babe.rom", 0x000000,  0x14f80, CRC(816b0cb4) SHA1(dc16d3170d5809b57192e03864b7136935eada64) )
 //  ROM_LOAD( "32xhot.rom", 0x000000,  0x01235c, CRC(da9c93c9) SHA1(a62652eb8ad8c62b36f6b1ffb96922d045c4e3ac))
-//	ROM_LOAD( "knux.rom", 0x000000,  0x300000, CRC(d0b0b842) SHA1(0c2fff7bc79ed26507c08ac47464c3af19f7ced7) )
-//	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
+//  ROM_LOAD( "knux.rom", 0x000000,  0x300000, CRC(d0b0b842) SHA1(0c2fff7bc79ed26507c08ac47464c3af19f7ced7) )
+//  ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
 //  ROM_LOAD( "32x_rot.bin", 0x000000,   0x0001638, CRC(98c25033) SHA1(8d9ab3084bd29e60b8cdf4b9f1cb755eb4c88d29) )
-// 	ROM_LOAD( "32x_3d.bin", 0x000000,   0x6568, CRC(0171743e) SHA1(bbe6fec182baae5e4d47d263fae6b419db5366ae) )
-// 	ROM_LOAD( "32x_spin.bin", 0x000000,   0x012c28, CRC(3d1d1191) SHA1(221a74408653e18cef8ce2f9b4d33ed93e4218b7) )
-// 	ROM_LOAD( "32x_doom.bin", 0x000000,   0x300000, CRC(208332fd) SHA1(b68e9c7af81853b8f05b8696033dfe4c80327e38) )
+//  ROM_LOAD( "32x_3d.bin", 0x000000,   0x6568, CRC(0171743e) SHA1(bbe6fec182baae5e4d47d263fae6b419db5366ae) )
+//  ROM_LOAD( "32x_spin.bin", 0x000000,   0x012c28, CRC(3d1d1191) SHA1(221a74408653e18cef8ce2f9b4d33ed93e4218b7) )
+//  ROM_LOAD( "32x_doom.bin", 0x000000,   0x300000, CRC(208332fd) SHA1(b68e9c7af81853b8f05b8696033dfe4c80327e38) )
  	ROM_LOAD( "32x_koli.bin", 0x000000,   0x300000, CRC(20ca53ef) SHA1(191ae0b525ecf32664086d8d748e0b35f776ddfe) ) // works but stutters.. probably flags
-// 	ROM_LOAD( "32x_head.bin", 0x000000,   0x300000, CRC(1) SHA1(1) ) // works but stutters.. probably flags
+//  ROM_LOAD( "32x_head.bin", 0x000000,   0x300000, CRC(1) SHA1(1) ) // works but stutters.. probably flags
 
 	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
 	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
 
 	ROM_REGION16_BE( 0x400000, "32x_68k_bios", 0 ) /* 68000 Code */
-//	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
+//  ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
 	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
 
 	ROM_REGION( 0x400000, "32x_master_sh2", 0 ) /* SH2 Code */

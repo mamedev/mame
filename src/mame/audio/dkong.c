@@ -451,13 +451,13 @@ static DISCRETE_SOUND_START(dkong2b)
 	DISCRETE_TRANSFORM4(NODE_71, DS_DAC,  DK_SUP_V/256.0, NODE_70, DS_DISCHARGE_INV, "01*3!2+*")
 
 	/* following the DAC are two opamps. The first is a current-to-voltage changer
-	 * for the DAC08 which delivers a variable output current.
-	 *
-	 * The second one is a Sallen Key filter ...
-	 * http://www.t-linespeakers.org/tech/filters/Sallen-Key.html
-	 * f = w / 2 / pi  = 1 / ( 2 * pi * 5.6k*sqrt(22n*10n)) = 1916 Hz
-	 * Q = 1/2 * sqrt(22n/10n)= 0.74
-	 */
+     * for the DAC08 which delivers a variable output current.
+     *
+     * The second one is a Sallen Key filter ...
+     * http://www.t-linespeakers.org/tech/filters/Sallen-Key.html
+     * f = w / 2 / pi  = 1 / ( 2 * pi * 5.6k*sqrt(22n*10n)) = 1916 Hz
+     * Q = 1/2 * sqrt(22n/10n)= 0.74
+     */
 	DISCRETE_SALLEN_KEY_FILTER(NODE_73, 1, NODE_71, DISC_SALLEN_KEY_LOW_PASS, &dkong_sallen_key_info)
 
 	/* Adjustment VR2 */
@@ -715,13 +715,13 @@ static DISCRETE_SOUND_START(radarscp)
 	DISCRETE_TRANSFORM4(NODE_171, DS_DAC,  DK_SUP_V/256.0, NODE_170, DS_DISCHARGE_INV, "01*3!2+*")
 
 	/* following the DAC are two opamps. The first is a current-to-voltage changer
-	 * for the DAC08 which delivers a variable output current.
-	 *
-	 * The second one is a Sallen Key filter ...
-	 * http://www.t-linespeakers.org/tech/filters/Sallen-Key.html
-	 * f = w / 2 / pi  = 1 / ( 2 * pi * 5.6k*sqrt(22n*10n)) = 1916 Hz
-	 * Q = 1/2 * sqrt(22n/10n)= 0.74
-	 */
+     * for the DAC08 which delivers a variable output current.
+     *
+     * The second one is a Sallen Key filter ...
+     * http://www.t-linespeakers.org/tech/filters/Sallen-Key.html
+     * f = w / 2 / pi  = 1 / ( 2 * pi * 5.6k*sqrt(22n*10n)) = 1916 Hz
+     * Q = 1/2 * sqrt(22n/10n)= 0.74
+     */
 	DISCRETE_SALLEN_KEY_FILTER(NODE_173, 1, NODE_171, DISC_SALLEN_KEY_LOW_PASS, &dkong_sallen_key_info)
 
 	/* Adjustment VR3 */
@@ -876,8 +876,8 @@ static DISCRETE_SOUND_START(dkongjr)
 	DISCRETE_74LS624( NODE_14, 1, NODE_13, 0.98*DK_SUP_V, JR_C22, DISC_LS624_OUT_ENERGY)
 	DISCRETE_RCDISC_MODULATED(NODE_15, NODE_12, NODE_14, 120, JR_R27, RES_K(0.001), JR_R28, JR_C28, DK_SUP_V)
 	/* The following circuit does not match 100%, however works.
-	 * To be exact, we need a C-R-C-R circuit, we actually do not have.
-	 */
+     * To be exact, we need a C-R-C-R circuit, we actually do not have.
+     */
 	DISCRETE_CRFILTER_VREF(NODE_16, 1, NODE_15, JR_R4, JR_C23, 2.5)
 	DISCRETE_RCFILTER(DS_OUT_SOUND1, 1, NODE_16, JR_R19, JR_C21)
 
@@ -890,8 +890,8 @@ static DISCRETE_SOUND_START(dkongjr)
 	DISCRETE_LS123_INV(NODE_25, DS_SOUND2_INV, JR_R17, JR_C27)
 	DISCRETE_RCDISC_MODULATED(NODE_26, NODE_25, NODE_21, 120, JR_R24, RES_K(0.001), JR_R18, JR_C29, DK_SUP_V)
 	/* The following circuit does not match 100%, however works.
-	 * To be exact, we need a C-R-C-R circuit, we actually do not have.
-	 */
+     * To be exact, we need a C-R-C-R circuit, we actually do not have.
+     */
 	DISCRETE_CRFILTER_VREF(NODE_27, 1, NODE_26, JR_R6, JR_C30, 2.5)
 	DISCRETE_RCFILTER(DS_OUT_SOUND2, 1, NODE_27, JR_R2, JR_C25)
 
@@ -943,13 +943,13 @@ static DISCRETE_SOUND_START(dkongjr)
 	DISCRETE_TRANSFORM4(NODE_171, DS_DAC,  DK_SUP_V/256.0, NODE_170, DS_DISCHARGE_INV, "01*3!2+*")
 
 	/* following the DAC are two opamps. The first is a current-to-voltage changer
-	 * for the DAC08 which delivers a variable output current.
-	 *
-	 * The second one is a Sallen Key filter ...
-	 * http://www.t-linespeakers.org/tech/filters/Sallen-Key.html
-	 * f = w / 2 / pi  = 1 / ( 2 * pi * 5.6k*sqrt(22n*10n)) = 1916 Hz
-	 * Q = 1/2 * sqrt(22n/10n)= 0.74
-	 */
+     * for the DAC08 which delivers a variable output current.
+     *
+     * The second one is a Sallen Key filter ...
+     * http://www.t-linespeakers.org/tech/filters/Sallen-Key.html
+     * f = w / 2 / pi  = 1 / ( 2 * pi * 5.6k*sqrt(22n*10n)) = 1916 Hz
+     * Q = 1/2 * sqrt(22n/10n)= 0.74
+     */
 
 	DISCRETE_SALLEN_KEY_FILTER(DS_OUT_DAC, 1, NODE_171, DISC_SALLEN_KEY_LOW_PASS, &dkong_sallen_key_info)
 
@@ -960,8 +960,8 @@ static DISCRETE_SOUND_START(dkongjr)
 	DISCRETE_MIXER5(NODE_288, 1, DS_OUT_SOUND9, DS_OUT_SOUND0, DS_OUT_SOUND2, DS_OUT_SOUND1, DS_OUT_DAC, &dkongjr_mixer_desc)
 
 	/* Amplifier: internal amplifier
-	 * Just a 1:n amplifier without filters - just the output filter
-	 */
+     * Just a 1:n amplifier without filters - just the output filter
+     */
 	DISCRETE_CRFILTER(NODE_295,1,NODE_288, 1000, JR_C13)
 	DISCRETE_OUTPUT(NODE_295, 32767.0/5.0 * 10)
 
@@ -1045,32 +1045,32 @@ Addresses found at @0x510, cpu2
   18 C1 (5100: NC)
   3  CLK  (5100: ROM-CK)
 
-	For documentation purposes:
+    For documentation purposes:
 
-	Addresses
-		{ 0x0000, 0x007a, 0x018b, 0x0320, 0x036c, 0x03c4, 0x041c, 0x0520, 0x063e }
-	and related samples interface
+    Addresses
+        { 0x0000, 0x007a, 0x018b, 0x0320, 0x036c, 0x03c4, 0x041c, 0x0520, 0x063e }
+    and related samples interface
 
-	static const char *const radarsc1_sample_names[] =
-	{
-		"*radarsc1",
-		"10.wav",
-		"12.wav",
-		"14.wav",
-		"16.wav",
-		"18.wav",
-		"1A.wav",
-		"1C.wav",
-		"1E.wav",
-		"20.wav",
-		0
-	};
+    static const char *const radarsc1_sample_names[] =
+    {
+        "*radarsc1",
+        "10.wav",
+        "12.wav",
+        "14.wav",
+        "16.wav",
+        "18.wav",
+        "1A.wav",
+        "1C.wav",
+        "1E.wav",
+        "20.wav",
+        0
+    };
 
-	static const samples_interface radarsc1_samples_interface =
-	{
-		8,
-		radarsc1_sample_names
-	};
+    static const samples_interface radarsc1_samples_interface =
+    {
+        8,
+        radarsc1_sample_names
+    };
 
 */
 
@@ -1091,16 +1091,16 @@ static WRITE8_HANDLER( M58817_command_w )
 static WRITE8_HANDLER( dkong_voice_w )
 {
 	/* only provided for documentation purposes
-	 * not actually used
-	 */
+     * not actually used
+     */
 	logerror("dkong_speech_w: 0x%02x\n", data);
 }
 
 static READ8_HANDLER( dkong_voice_status_r )
 {
 	/* only provided for documentation purposes
-	 * not actually used
-	 */
+     * not actually used
+     */
 	return 0;
 }
 
@@ -1231,11 +1231,11 @@ MACHINE_DRIVER_START( dkong2b_audio )
 	MDRV_LATCH8_DISCRETE_NODE(7, DS_SOUND7_INP)
 
 	/*   If P2.Bit7 -> is apparently an external signal decay or other output control
-	 *   If P2.Bit6 -> activates the external compressed sample ROM (not radarsc1)
-	 *   If P2.Bit5 -> Signal ANSN ==> Grid enable (radarsc1)
-	 *   If P2.Bit4 -> status code to main cpu
-	 *   P2.Bit2-0  -> select the 256 byte bank for external ROM
-	 */
+     *   If P2.Bit6 -> activates the external compressed sample ROM (not radarsc1)
+     *   If P2.Bit5 -> Signal ANSN ==> Grid enable (radarsc1)
+     *   If P2.Bit4 -> status code to main cpu
+     *   P2.Bit2-0  -> select the 256 byte bank for external ROM
+     */
 
 	MDRV_LATCH8_ADD( "virtual_p2" )	/* virtual latch for port B */
 	MDRV_LATCH8_INVERT( 0x20 )		/* signal is inverted       */

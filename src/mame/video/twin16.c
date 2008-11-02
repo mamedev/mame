@@ -27,7 +27,7 @@ static UINT16 gfx_bank;
 static UINT16 scrollx[3], scrolly[3];
 static UINT16 video_register;
 
-enum 
+enum
 {
 	TWIN16_SCREEN_FLIPY		= 0x01,	/* ? breaks devils world text layer */
 	TWIN16_SCREEN_FLIPX		= 0x02,	/* confirmed: Hard Puncher Intro */
@@ -60,7 +60,7 @@ WRITE16_HANDLER( fround_gfx_bank_w )
 
 WRITE16_HANDLER( twin16_video_register_w )
 {
-	switch (offset) 
+	switch (offset)
 	{
 		case 0:
 			COMBINE_DATA( &video_register );
@@ -120,9 +120,9 @@ static void draw_sprite( bitmap_t *bitmap,const UINT16 *pen_data, int pal_base, 
 
 					if( pen )
 					{
-						if(pdest[sx]<pval) 
-						{ 
-							dest[sx] = pal_base + pen; 
+						if(pdest[sx]<pval)
+						{
+							dest[sx] = pal_base + pen;
 						}
 						pdest[sx]|=0x10;
 					}
@@ -198,12 +198,12 @@ static void draw_sprites( bitmap_t *bitmap )
 	const UINT16 *source = 0x1800+buffered_spriteram16 + 0x800 - 4;
 	const UINT16 *finish = 0x1800+buffered_spriteram16;
 
-	for (; source >= finish; source -= 4) 
+	for (; source >= finish; source -= 4)
 	{
 		UINT16 attributes = source[3];
 		UINT16 code = source[0];
 
-		if((code!=0xffff) && (attributes&0x8000)) 
+		if((code!=0xffff) && (attributes&0x8000))
 		{
 			int xpos = source[1];
 			int ypos = source[2];
@@ -215,11 +215,11 @@ static void draw_sprites( bitmap_t *bitmap )
 			int flipy = attributes&0x0200;
 			int flipx = attributes&0x0100;
 
-			if( twin16_custom_video == 1 ) 
+			if( twin16_custom_video == 1 )
 			{
 				pen_data = twin16_gfx_rom + 0x80000;
 			}
-			else 
+			else
 			{
 				switch( (code>>12)&0x3 )
 				{ /* bank select */
@@ -301,7 +301,7 @@ static void draw_layer( bitmap_t *bitmap, int opaque )
 		dy = scrolly[2];
 		palette = 1;
 	}
-	else 
+	else
 	{
 		source += 0x0000;
 		dx = scrollx[1];
@@ -317,7 +317,7 @@ static void draw_layer( bitmap_t *bitmap, int opaque )
 		bank_table[1] = (gfx_bank>>(4*1))&0xf;
 		bank_table[0] = (gfx_bank>>(4*0))&0xf;
 	}
-	else 
+	else
 	{
 		gfx_base = twin16_tile_gfx_ram;
 		bank_table[0] = 0;
@@ -445,7 +445,7 @@ VIDEO_UPDATE( twin16 )
 	fillbitmap(priority_bitmap,0,cliprect);
 	draw_layer( bitmap,1 );
 
-	if (twin16_custom_video)		
+	if (twin16_custom_video)
 	{
 		draw_layer( bitmap,0 );
 		draw_sprites( bitmap );

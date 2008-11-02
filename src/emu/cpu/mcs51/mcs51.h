@@ -58,7 +58,7 @@ enum
 	MCS51_T1_LINE,			/* P3.5: Timer 1 External Input */
 	MCS51_T2_LINE,			/* P1.0: Timer 2 External Input */
 	MCS51_T2EX_LINE,		/* P1.1: Timer 2 Capture Reload Trigger */
-	
+
 	DS5002FP_PFI_LINE,		/* DS5002FP Power fail interrupt */
 };
 

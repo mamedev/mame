@@ -340,7 +340,7 @@ static READ16_HANDLER( tharrier_mcu_r )
 static WRITE16_HANDLER( macross2_sound_reset_w )
 {
 	/* PCB behaviour verified by Corrado Tomaselli at MAME Italia Forum:
-	   every time music changes Z80 is resetted */
+       every time music changes Z80 is resetted */
 	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 

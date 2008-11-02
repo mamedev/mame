@@ -144,7 +144,7 @@ Stephh's notes (based on the games M6502 code and some tests) :
     extra "lsr a" instruction at 0x6843 !
     Correct code shall be :
 
-      6843: EA            nop  
+      6843: EA            nop
 
     Fortunately, table at 0x685f is filled with 0x30 so you'll
     always have 30 seconds to "clear" the wagon (which is more
