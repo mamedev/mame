@@ -63,7 +63,6 @@
 
 #include "driver.h"
 #include "machine/rescap.h"
-#include "deprecat.h"
 #include "machine/6821pia.h"
 #include "machine/74123.h"
 #include "video/mc6845.h"
@@ -205,13 +204,13 @@ static const pia6821_interface pia_2_intf =
  *
  *************************************/
 
-static void ic48_1_74123_output_changed(int output)
+static WRITE8_DEVICE_HANDLER(ic48_1_74123_output_changed)
 {
-	pia_2_ca1_w(Machine, 0, output);
+	pia_2_ca1_w(device->machine, 0, data);
 }
 
 
-static const TTL74123_interface ic48_1_intf =
+static const ttl74123_config ic48_1_config =
 {
 	TTL74123_GROUNDED,	/* the hook up type */
 	RES_K(22),			/* resistor connected to RCext */
@@ -235,8 +234,6 @@ static MACHINE_START( nyny )
 	pia_config(1, &pia_1_intf);
 	pia_config(2, &pia_2_intf);
 
-	TTL74123_config(0, &ic48_1_intf);
-
 	/* setup for save states */
 	state_save_register_global(flipscreen);
 	state_save_register_global(star_enable);
@@ -255,7 +252,6 @@ static MACHINE_START( nyny )
 static MACHINE_RESET( nyny )
 {
 	pia_reset();
-	TTL74123_reset(0);
 }
 
 
@@ -397,7 +393,7 @@ static MC6845_END_UPDATE( end_update )
 
 static MC6845_ON_DE_CHANGED( display_enable_changed )
 {
-	TTL74123_A_w(0, display_enabled);
+	ttl74123_a_w(devtag_get_device(device->machine, TTL74123, "ic48_1"), 0, display_enabled);
 }
 
 
@@ -688,6 +684,11 @@ static MACHINE_DRIVER_START( nyny )
 
 	MDRV_DEVICE_ADD("crtc", MC6845)
 	MDRV_DEVICE_CONFIG(mc6845_intf)
+
+	/* 74LS123 */
+	
+	MDRV_DEVICE_ADD("ic48_1", TTL74123)
+	MDRV_DEVICE_CONFIG(ic48_1_config)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

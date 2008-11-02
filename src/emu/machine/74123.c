@@ -14,23 +14,29 @@
 #define	LOG		(0)
 
 
-typedef struct _TTL74123_state TTL74123_state;
+typedef struct _ttl74123_t ttl74123_t;
 
-struct _TTL74123_state
+struct _ttl74123_t
 {
-	const TTL74123_interface *intf;
-	int which;
+	const ttl74123_config *intf;
 
-	UINT8 A;			/* pin 1/9 */
-	UINT8 B;			/* pin 2/10 */
+	UINT8 a;			/* pin 1/9 */
+	UINT8 b;			/* pin 2/10 */
 	UINT8 clear;		/* pin 3/11 */
 	emu_timer *timer;
 };
 
-static TTL74123_state chips[MAX_TTL74123];
+/* ----------------------------------------------------------------------- */
+
+INLINE ttl74123_t *get_safe_token(const device_config *device) {
+	assert( device != NULL );
+	assert( device->token != NULL );
+	assert( device->type == TTL74123 );
+	return ( ttl74123_t * ) device->token;
+}
 
 
-static attotime compute_duration(TTL74123_state *chip)
+static attotime compute_duration(ttl74123_t *chip)
 {
 	double duration;
 
@@ -58,68 +64,38 @@ static attotime compute_duration(TTL74123_state *chip)
 }
 
 
-static int timer_running(TTL74123_state *chip)
+static int timer_running(ttl74123_t *chip)
 {
 	return (attotime_compare(timer_timeleft(chip->timer), attotime_zero) > 0) &&
 		   (attotime_compare(timer_timeleft(chip->timer), attotime_never) != 0);
 }
 
 
-static void set_output(TTL74123_state *chip)
+static void set_output(const device_config *device)
 {
+	ttl74123_t *chip = get_safe_token(device);
 	int output = timer_running(chip);
 
-	chip->intf->output_changed_cb(output);
+	chip->intf->output_changed_cb(device, 0, output);
 
-	if (LOG) logerror("74123 #%d:  Output: %d\n", chip->which, output);
+	if (LOG) logerror("74123 %s:  Output: %d\n", device->tag, output);
 }
 
 
 static TIMER_CALLBACK( clear_callback )
 {
-	TTL74123_state *chip = ptr;
+	const device_config *device = ptr;
 
-	set_output(chip);
+	set_output(device);
 }
 
 
-void TTL74123_config(int which, const TTL74123_interface *intf)
+
+
+static void start_pulse(const device_config *device)
 {
-	TTL74123_state *chip;
+	ttl74123_t *chip = get_safe_token(device);
 
-	assert_always(which < MAX_TTL74123, "Exceeded maximum number of 74123 chips");
-	assert_always(intf, "No interface specified");
-	assert_always((intf->connection_type == TTL74123_GROUNDED) && (intf->cap >= CAP_U(0.01)), "Only capacitors >= 0.01uF supported for GROUNDED type");
-	assert_always(intf->cap >= CAP_P(1000), "Only capacitors >= 1000pF supported ");
-
-	chip = &chips[which];
-
-	chip->intf = intf;
-	chip->which = which;
-	chip->timer = timer_alloc(clear_callback, chip);
-
-	/* start with the defaults */
-	chip->A = intf->A;
-    chip->B = intf->B;
-	chip->clear = intf->clear;
-
-	/* register for state saving */
-	state_save_register_item("TTL74123", which, chip->A);
-	state_save_register_item("TTL74123", which, chip->B);
-	state_save_register_item("TTL74123", which, chip->clear);
-}
-
-
-void TTL74123_reset(int which)
-{
-	TTL74123_state *chip = &chips[which];
-
-	set_output(chip);
-}
-
-
-static void start_pulse(TTL74123_state *chip)
-{
 	attotime duration = compute_duration(chip);
 
 	if (timer_running(chip))
@@ -131,11 +107,11 @@ static void start_pulse(TTL74123_state *chip)
 		{
 			timer_adjust_oneshot(chip->timer, duration, 0);
 
-			if (LOG) logerror("74123 #%d:  Retriggering pulse.  Duration: %f\n", chip->which, attotime_to_double(duration));
+			if (LOG) logerror("74123 %s:  Retriggering pulse.  Duration: %f\n", device->tag, attotime_to_double(duration));
 		}
 		else
 		{
-			if (LOG) logerror("74123 #%d:  Retriggering failed.\n", chip->which);
+			if (LOG) logerror("74123 %s:  Retriggering failed.\n", device->tag);
 		}
 	}
 	else
@@ -143,48 +119,129 @@ static void start_pulse(TTL74123_state *chip)
 		/* starting */
 		timer_adjust_oneshot(chip->timer, duration, 0);
 
-		set_output(chip);
+		set_output(device);
 
-		if (LOG) logerror("74123 #%d:  Starting pulse.  Duration: %f\n", chip->which, attotime_to_double(duration));
+		if (LOG) logerror("74123 %s:  Starting pulse.  Duration: %f\n", device->tag, attotime_to_double(duration));
 	}
 }
 
 
-void TTL74123_A_w(int which, int data)
+WRITE8_DEVICE_HANDLER( ttl74123_a_w )
 {
-	TTL74123_state *chip = &chips[which];
+	ttl74123_t *chip = get_safe_token(device);
 
 	/* start/regtrigger pulse if B=HI and falling edge on A (while clear is HI) */
-	if (!data && chip->A && chip->B && chip->clear)
-		start_pulse(chip);
+	if (!data && chip->a && chip->b && chip->clear)
+		start_pulse(device);
 
-	chip->A = data;
+	chip->a = data;
 }
 
 
-void TTL74123_B_w(int which, int data)
+WRITE8_DEVICE_HANDLER( ttl74123_b_w )
 {
-	TTL74123_state *chip = &chips[which];
+	ttl74123_t *chip = get_safe_token(device);
 
 	/* start/regtrigger pulse if A=LO and rising edge on B (while clear is HI) */
-	if (data && !chip->B && !chip->A && chip->clear)
-		start_pulse(chip);
+	if (data && !chip->b && !chip->a && chip->clear)
+		start_pulse(device);
 
-	chip->B = data;
+	chip->b = data;
 }
 
 
-void TTL74123_clear_w(int which, int data)
+WRITE8_DEVICE_HANDLER( ttl74123_clear_w )
 {
-	TTL74123_state *chip = &chips[which];
+	ttl74123_t *chip = get_safe_token(device);
 
 	/* clear the output if A=LO, B=HI and falling edge on clear */
-	if (!data && chip->clear && chip->B && !chip->A && !chip->clear)
+	if (!data && chip->clear && chip->b && !chip->a && !chip->clear)
 	{
 		timer_adjust_oneshot(chip->timer, attotime_zero, 0);
 
-		if (LOG) logerror("74123 #%d:  Cleared\n", which);
+		if (LOG) logerror("74123 #%s:  Cleared\n", device->tag );
 	}
 
 	chip->clear = data;
+}
+
+WRITE8_DEVICE_HANDLER( ttl74123_reset_w )
+{
+	set_output(device);
+}
+
+/* ----------------------------------------------------------------------- */
+
+/* device interface */
+
+static DEVICE_START( ttl74123 )
+{
+	ttl74123_t *chip = get_safe_token(device);
+	char unique_tag[30];
+
+	/* validate arguments */
+	assert(strlen(device->tag) < 20);
+
+	chip->intf = device->static_config;
+
+	assert_always(chip->intf, "No interface specified");
+	assert_always((chip->intf->connection_type == TTL74123_GROUNDED) && (chip->intf->cap >= CAP_U(0.01)), "Only capacitors >= 0.01uF supported for GROUNDED type");
+	assert_always(chip->intf->cap >= CAP_P(1000), "Only capacitors >= 1000pF supported ");
+
+	chip->timer = timer_alloc(clear_callback, (void *) device);
+
+	/* start with the defaults */
+	chip->a = chip->intf->a;
+    chip->b = chip->intf->b;
+	chip->clear = chip->intf->clear;
+
+	/* register for state saving */
+
+	state_save_combine_module_and_tag(unique_tag, "ttl74123", device->tag);
+
+	state_save_register_item(unique_tag, 0, chip->a);
+	state_save_register_item(unique_tag, 0, chip->b);
+	state_save_register_item(unique_tag, 0, chip->clear);
+
+	return DEVICE_START_OK;
+}
+
+
+static DEVICE_RESET( ttl74123 )
+{
+	set_output(device);
+}
+
+
+static DEVICE_SET_INFO( ttl74123 )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
+
+
+DEVICE_GET_INFO( ttl74123 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(ttl74123_t);						break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;										break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(ttl74123); 	break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(ttl74123);			break;
+		case DEVINFO_FCT_STOP:							/* Nothing */										break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(ttl74123);			break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "74123";									break;
+		case DEVINFO_STR_FAMILY:						info->s = "TTL";									break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";									break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;									break;
+		case DEVINFO_STR_CREDITS:						info->s = "Copyright Nicola Salmoria and the MAME Team"; break;
+	}
 }

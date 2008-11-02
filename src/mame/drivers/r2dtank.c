@@ -31,7 +31,6 @@ RAM = 4116 (x11)
 ********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/rescap.h"
 #include "machine/6821pia.h"
 #include "machine/74123.h"
@@ -225,10 +224,10 @@ static const ay8910_interface ay8910_2_interface =
  *
  *************************************/
 
-static void ttl74123_output_changed(int output)
+static WRITE8_DEVICE_HANDLER( ttl74123_output_changed )
 {
-	pia_0_ca1_w(Machine, 0, output);
-	ttl74123_output = output;
+	pia_0_ca1_w(device->machine, 0, data);
+	ttl74123_output = data;
 }
 
 
@@ -238,7 +237,7 @@ static CUSTOM_INPUT( get_ttl74123_output )
 }
 
 
-static const TTL74123_interface ttl74123_intf =
+static const ttl74123_config ttl74123_intf =
 {
 	TTL74123_GROUNDED,	/* the hook up type */
 	RES_K(22),			/* resistor connected to RCext */
@@ -278,8 +277,6 @@ static MACHINE_START( r2dtank )
 	pia_config(0, &pia_main_intf);
 	pia_config(1, &pia_audio_intf);
 
-	TTL74123_config(0, &ttl74123_intf);
-
 	/* setup for save states */
 	state_save_register_global(flipscreen);
 	state_save_register_global(ttl74123_output);
@@ -297,7 +294,6 @@ static MACHINE_START( r2dtank )
 static MACHINE_RESET( r2dtank )
 {
 	pia_reset();
-	TTL74123_reset(0);
 }
 
 
@@ -383,7 +379,7 @@ static MC6845_UPDATE_ROW( update_row )
 
 static MC6845_ON_DE_CHANGED( display_enable_changed )
 {
-	TTL74123_A_w(0, display_enabled);
+	ttl74123_a_w(devtag_get_device(device->machine, TTL74123, "74123"), 0, display_enabled);
 }
 
 
@@ -555,6 +551,11 @@ static MACHINE_DRIVER_START( r2dtank )
 
 	MDRV_DEVICE_ADD("crtc", MC6845)
 	MDRV_DEVICE_CONFIG(mc6845_intf)
+
+	/* 74LS123 */
+	
+	MDRV_DEVICE_ADD("74123", TTL74123)
+	MDRV_DEVICE_CONFIG(ttl74123_intf)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

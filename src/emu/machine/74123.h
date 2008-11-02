@@ -46,7 +46,7 @@
 #ifndef TTL74123_H
 #define TTL74123_H
 
-#define MAX_TTL74123 4
+#define TTL74123		DEVICE_GET_INFO_NAME(ttl74123)
 
 
 /* constants for the different ways the cap/res can be connected.
@@ -56,25 +56,29 @@
 #define TTL74123_GROUNDED					(3)
 
 
-typedef struct _TTL74123_interface TTL74123_interface;
-struct _TTL74123_interface
+typedef struct _ttl74123_config ttl74123_config;
+struct _ttl74123_config
 {
 	int connection_type;	/* the hook up type - one of the constants above */
 	double res;				/* resistor connected to RCext */
 	double cap;				/* capacitor connected to Cext and RCext */
-	int A;					/* initial/constant value of the A pin */
-	int B;					/* initial/constant value of the B pin */
+	int a;					/* initial/constant value of the A pin */
+	int b;					/* initial/constant value of the B pin */
 	int clear;				/* initial/constant value of the Clear pin */
-	void (*output_changed_cb)(int output);
+	write8_device_func	output_changed_cb;
 };
 
+/* device interface */
+DEVICE_GET_INFO( ttl74123 );
 
-void TTL74123_config(int which, const TTL74123_interface *intf);
-void TTL74123_reset(int which);
+/* write inputs */
 
-void TTL74123_A_w(int which, int data);
-void TTL74123_B_w(int which, int data);
-void TTL74123_clear_w(int which, int data);
+WRITE8_DEVICE_HANDLER( ttl74123_a_w );
+WRITE8_DEVICE_HANDLER( ttl74123_b_w );
+WRITE8_DEVICE_HANDLER( ttl74123_clear_w );
 
+/* reset the latch */
+
+WRITE8_DEVICE_HANDLER( ttl74123_reset_w );
 
 #endif

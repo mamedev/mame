@@ -189,7 +189,6 @@
 
 #include "driver.h"
 #include "machine/rescap.h"
-#include "deprecat.h"
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "video/mc6845.h"
@@ -342,13 +341,13 @@ static const pia6821_interface pia_4_intf =
  *
  *************************************/
 
-static void ic60_74123_output_changed(int output)
+static WRITE8_DEVICE_HANDLER( ic60_74123_output_changed)
 {
-	pia_2_ca1_w(Machine, 0, output);
+	pia_2_ca1_w(device->machine, 0, data);
 }
 
 
-static const TTL74123_interface ic60_intf =
+static const ttl74123_config ic60_intf =
 {
 	TTL74123_GROUNDED,	/* the hook up type */
 	RES_K(22),			/* resistor connected to RCext */
@@ -374,8 +373,6 @@ static MACHINE_START( spiders )
 	pia_config(3, &pia_3_intf);
 	pia_config(4, &pia_4_intf);
 
-	TTL74123_config(0, &ic60_intf);
-
 	/* setup for save states */
 	state_save_register_global(flipscreen);
 	state_save_register_global(gfx_rom_address);
@@ -395,7 +392,6 @@ static MACHINE_START( spiders )
 static MACHINE_RESET( spiders )
 {
 	pia_reset();
-	TTL74123_reset(0);
 }
 
 
@@ -491,7 +487,7 @@ static MC6845_UPDATE_ROW( update_row )
 
 static MC6845_ON_DE_CHANGED( display_enable_changed )
 {
-	TTL74123_A_w(0, display_enabled);
+	ttl74123_a_w(devtag_get_device(device->machine, TTL74123, "ic60"), 0, display_enabled);
 }
 
 
@@ -709,6 +705,11 @@ static MACHINE_DRIVER_START( spiders )
 
 	MDRV_DEVICE_ADD("crtc", MC6845)
 	MDRV_DEVICE_CONFIG(mc6845_intf)
+
+	/* 74LS123 */
+	
+	MDRV_DEVICE_ADD("ic60", TTL74123)
+	MDRV_DEVICE_CONFIG(ic60_intf)
 
 	/* audio hardware */
 	MDRV_IMPORT_FROM(spiders_audio)
