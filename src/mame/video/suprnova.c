@@ -1138,7 +1138,7 @@ VIDEO_UPDATE(skns)
 						}
 						else
 						{
-							bgpendata = 0;
+							bgpendata = pendata2&0x7fff;
 							bgpri = 0;;
 						}
 					}

@@ -245,9 +245,25 @@ static MACHINE_RESET( mechatt )
 
 /******************************************************************************/
 
-static READ16_HANDLER( sound_cpu_r )
+static int sound_status;
+
+static READ16_HANDLER( sound_status_r )
 {
-	return 0x01;
+	return sound_status;
+}
+
+static WRITE8_HANDLER( sound_status_w )
+{
+	sound_status = data;
+}
+
+static WRITE16_HANDLER( sound_cpu_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		soundlatch_w(machine, 0, data&0xff);
+		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	}
 }
 
 /* Eprom is byte wide, top half of word _must_ be 0xff */
@@ -283,12 +299,6 @@ static READ16_HANDLER( kludge_r )
 	return 0;
 }
 
-static WRITE16_HANDLER( sound_cpu_w )
-{
-	soundlatch_w(machine, 0, data&0xff);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
-}
-
 static READ16_HANDLER( mechatt_gun_r )
 {
 	int x, y;
@@ -311,9 +321,12 @@ static ADDRESS_MAP_START( bbuster_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x08ffff) AM_RAM AM_BASE(&bbuster_ram)
 	AM_RANGE(0x090000, 0x090fff) AM_RAM_WRITE(bbuster_video_w) AM_BASE(&videoram16)
 	AM_RANGE(0x0a0000, 0x0a0fff) AM_RAM AM_BASE(&spriteram16) AM_SIZE(&spriteram_size)
+	AM_RANGE(0x0a1000, 0x0a7fff) AM_RAM		/* service mode */
 	AM_RANGE(0x0a8000, 0x0a8fff) AM_RAM AM_BASE(&spriteram16_2) AM_SIZE(&spriteram_2_size)
+	AM_RANGE(0x0a9000, 0x0affff) AM_RAM		/* service mode */
 	AM_RANGE(0x0b0000, 0x0b1fff) AM_RAM_WRITE(bbuster_pf1_w) AM_BASE(&bbuster_pf1_data)
 	AM_RANGE(0x0b2000, 0x0b3fff) AM_RAM_WRITE(bbuster_pf2_w) AM_BASE(&bbuster_pf2_data)
+	AM_RANGE(0x0b4000, 0x0b5fff) AM_RAM		/* service mode */
 	AM_RANGE(0x0b8000, 0x0b8003) AM_WRITE(SMH_RAM) AM_BASE(&bbuster_pf1_scroll_data)
 	AM_RANGE(0x0b8008, 0x0b800b) AM_WRITE(SMH_RAM) AM_BASE(&bbuster_pf2_scroll_data)
 	AM_RANGE(0x0d0000, 0x0d0fff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE(&paletteram16)
@@ -322,7 +335,7 @@ static ADDRESS_MAP_START( bbuster_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0e0004, 0x0e0005) AM_READ_PORT("IN1")	/* Player 3 */
 	AM_RANGE(0x0e0008, 0x0e0009) AM_READ_PORT("DSW1")	/* Dip 1 */
 	AM_RANGE(0x0e000a, 0x0e000b) AM_READ_PORT("DSW2")	/* Dip 2 */
-	AM_RANGE(0x0e0018, 0x0e0019) AM_READ(sound_cpu_r)
+	AM_RANGE(0x0e0018, 0x0e0019) AM_READ(sound_status_r)
 	AM_RANGE(0x0e8000, 0x0e8001) AM_READWRITE(kludge_r, gun_select_w)
 	AM_RANGE(0x0e8002, 0x0e8003) AM_READ(control_3_r)
 	AM_RANGE(0x0f0008, 0x0f0009) AM_WRITE(SMH_NOP)
@@ -347,7 +360,7 @@ static ADDRESS_MAP_START( mechatt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0e0002, 0x0e0003) AM_READ_PORT("DSW1")
 	AM_RANGE(0x0e0004, 0x0e0007) AM_READ(mechatt_gun_r)
 	AM_RANGE(0x0e4002, 0x0e4003) AM_WRITE(SMH_NOP) /* Gun force feedback? */
-	AM_RANGE(0x0e8000, 0x0e8001) AM_READWRITE(sound_cpu_r, sound_cpu_w)
+	AM_RANGE(0x0e8000, 0x0e8001) AM_READWRITE(sound_status_r, sound_cpu_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -355,7 +368,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
-	AM_RANGE(0xf800, 0xf800) AM_READ(soundlatch_r)
+	AM_RANGE(0xf800, 0xf800) AM_READWRITE(soundlatch_r, sound_status_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_portmap, ADDRESS_SPACE_IO, 8 )

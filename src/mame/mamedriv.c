@@ -5169,6 +5169,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( firebeas )	/* (proto)          (c) 1983 */
 	DRIVER( firefox )	/* 136026           (c) 1984 */
 	DRIVER( firefoxa )	/* 136026           (c) 1984 */
+	DRIVER( roadrld )	/* 136026           (c) 1984 */
 	DRIVER( jedi )		/* 136030           (c) 1984 */
 
 	/* Atari System 1 games */

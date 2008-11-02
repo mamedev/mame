@@ -506,9 +506,7 @@ static INTERRUPT_GEN( renegade_interrupt )
     else coin = 0;
 */
 
-	static int count;
-	count = !count;
-	if (count)
+	if (cpu_getiloops())
 		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
 	else
 		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);

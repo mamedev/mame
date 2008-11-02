@@ -531,6 +531,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/quantum.o \
 	$(DRIVERS)/rampart.o $(VIDEO)/rampart.o \
 	$(DRIVERS)/relief.o $(VIDEO)/relief.o \
+	$(DRIVERS)/roadrld.o \
 	$(DRIVERS)/runaway.o $(VIDEO)/runaway.o \
 	$(DRIVERS)/sbrkout.o \
 	$(DRIVERS)/shuuz.o $(VIDEO)/shuuz.o \

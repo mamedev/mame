@@ -27,7 +27,8 @@ static UINT16 gfx_bank;
 static UINT16 scrollx[3], scrolly[3];
 static UINT16 video_register;
 
-enum {
+enum 
+{
 	TWIN16_SCREEN_FLIPY		= 0x01,	/* ? breaks devils world text layer */
 	TWIN16_SCREEN_FLIPX		= 0x02,	/* confirmed: Hard Puncher Intro */
 	TWIN16_UNKNOWN1			= 0x04,	/* ?Hard Puncher uses this */
@@ -44,7 +45,7 @@ WRITE16_HANDLER( twin16_videoram2_w )
 }
 
 WRITE16_HANDLER( twin16_paletteram_word_w )
-{ // identical to tmnt_paletteram_w
+{ 	// identical to tmnt_paletteram_w
 	COMBINE_DATA(paletteram16 + offset);
 	offset &= ~1;
 
@@ -59,83 +60,76 @@ WRITE16_HANDLER( fround_gfx_bank_w )
 
 WRITE16_HANDLER( twin16_video_register_w )
 {
-	switch (offset) {
-	case 0:
-		COMBINE_DATA( &video_register );
+	switch (offset) 
+	{
+		case 0:
+			COMBINE_DATA( &video_register );
 
-		flip_screen_x_set(video_register & TWIN16_SCREEN_FLIPX);
+			flip_screen_x_set(video_register & TWIN16_SCREEN_FLIPX);
 
-		if (twin16_custom_video)
-			flip_screen_y_set(video_register & TWIN16_SCREEN_FLIPY);
-		else
-			flip_screen_y_set(~video_register & TWIN16_SCREEN_FLIPY);
+			if (twin16_custom_video)
+				flip_screen_y_set(video_register & TWIN16_SCREEN_FLIPY);
+			else
+				flip_screen_y_set(~video_register & TWIN16_SCREEN_FLIPY);
 
-		break;
+			break;
 
-	case 1: COMBINE_DATA( &scrollx[0] ); break;
-	case 2: COMBINE_DATA( &scrolly[0] ); break;
-	case 3: COMBINE_DATA( &scrollx[1] ); break;
-	case 4: COMBINE_DATA( &scrolly[1] ); break;
-	case 5: COMBINE_DATA( &scrollx[2] ); break;
-	case 6: COMBINE_DATA( &scrolly[2] ); break;
+		case 1: COMBINE_DATA( &scrollx[0] ); break;
+		case 2: COMBINE_DATA( &scrolly[0] ); break;
+		case 3: COMBINE_DATA( &scrollx[1] ); break;
+		case 4: COMBINE_DATA( &scrolly[1] ); break;
+		case 5: COMBINE_DATA( &scrollx[2] ); break;
+		case 6: COMBINE_DATA( &scrolly[2] ); break;
 
-	default:
-		logerror("unknown video_register write:%d", data );
-		break;
+		default:
+			logerror("unknown video_register write:%d", data );
+			break;
 	}
 }
 
-static void draw_sprite( /* slow slow slow, but it's ok for now */
-	bitmap_t *bitmap,
-	const UINT16 *pen_data,
-	int pal_base,
-	int xpos, int ypos,
-	int width, int height,
-	int flipx, int flipy, int pri )
+/* slow slow slow, but it's ok for now */
+static void draw_sprite( bitmap_t *bitmap,const UINT16 *pen_data, int pal_base, int xpos, int ypos, int width, int height, int flipx, int flipy, int pri )
 {
-
 	int x,y,pval;
 	if( xpos>=320 ) xpos -= 65536;
 	if( ypos>=256 ) ypos -= 65536;
 
 	if (pri) pval=2; else pval=8;
 
+	for( y=0; y<height; y++ )
 	{
+		int sy = (flipy)?(ypos+height-1-y):(ypos+y);
+		if( sy>=16 && sy<256-16 )
 		{
-			for( y=0; y<height; y++ )
+			UINT16 *dest = BITMAP_ADDR16(bitmap, sy, 0);
+			UINT8 *pdest = BITMAP_ADDR8(priority_bitmap, sy, 0);
+
+			for( x=0; x<width; x++ )
 			{
-				int sy = (flipy)?(ypos+height-1-y):(ypos+y);
-				if( sy>=16 && sy<256-16 )
+				int sx = (flipx)?(xpos+width-1-x):(xpos+x);
+				if( sx>=0 && sx<320 )
 				{
-					UINT16 *dest = BITMAP_ADDR16(bitmap, sy, 0);
-					UINT8 *pdest = BITMAP_ADDR8(priority_bitmap, sy, 0);
-
-					for( x=0; x<width; x++ )
+					UINT16 pen = pen_data[x/4];
+					switch( x%4 )
 					{
-						int sx = (flipx)?(xpos+width-1-x):(xpos+x);
-						if( sx>=0 && sx<320 )
-						{
-							UINT16 pen = pen_data[x/4];
-							switch( x%4 )
-							{
-							case 0: pen = pen>>12; break;
-							case 1: pen = (pen>>8)&0xf; break;
-							case 2: pen = (pen>>4)&0xf; break;
-							case 3: pen = pen&0xf; break;
-							}
+						case 0: pen = pen>>12; break;
+						case 1: pen = (pen>>8)&0xf; break;
+						case 2: pen = (pen>>4)&0xf; break;
+						case 3: pen = pen&0xf; break;
+					}
 
-							if( pen )
-							{
-								if(pdest[sx]<pval) { dest[sx] = pal_base + pen; }
-
-								pdest[sx]|=0x10;
-							}
+					if( pen )
+					{
+						if(pdest[sx]<pval) 
+						{ 
+							dest[sx] = pal_base + pen; 
 						}
+						pdest[sx]|=0x10;
 					}
 				}
-				pen_data += width/4;
 			}
 		}
+		pen_data += width/4;
 	}
 }
 
@@ -148,9 +142,11 @@ void twin16_spriteram_process( void )
 	const UINT16 *finish = &spriteram16[0x1800];
 
 	memset( &spriteram16[0x1800], 0, 0x800 );
-	while( source<finish ){
+	while( source<finish )
+	{
 		UINT16 priority = source[0];
-		if( priority & 0x8000 ){
+		if( priority & 0x8000 )
+		{
 			UINT16 *dest = &spriteram16[0x1800 + 4*(priority&0xff)];
 
 			INT32 xpos = (0x10000*source[4])|source[5];
@@ -202,11 +198,13 @@ static void draw_sprites( bitmap_t *bitmap )
 	const UINT16 *source = 0x1800+buffered_spriteram16 + 0x800 - 4;
 	const UINT16 *finish = 0x1800+buffered_spriteram16;
 
-	for (; source >= finish; source -= 4) {
+	for (; source >= finish; source -= 4) 
+	{
 		UINT16 attributes = source[3];
 		UINT16 code = source[0];
 
-		if((code!=0xffff) && (attributes&0x8000)) {
+		if((code!=0xffff) && (attributes&0x8000)) 
+		{
 			int xpos = source[1];
 			int ypos = source[2];
 
@@ -217,11 +215,14 @@ static void draw_sprites( bitmap_t *bitmap )
 			int flipy = attributes&0x0200;
 			int flipx = attributes&0x0100;
 
-			if( twin16_custom_video == 1 ) {
+			if( twin16_custom_video == 1 ) 
+			{
 				pen_data = twin16_gfx_rom + 0x80000;
 			}
-			else {
-				switch( (code>>12)&0x3 ){ /* bank select */
+			else 
+			{
+				switch( (code>>12)&0x3 )
+				{ /* bank select */
 					case 0:
 					pen_data = twin16_gfx_rom;
 					break;
@@ -262,12 +263,14 @@ static void draw_sprites( bitmap_t *bitmap )
 
 			pen_data += code*0x40;
 
-			if( video_register&TWIN16_SCREEN_FLIPY ){
+			if( video_register&TWIN16_SCREEN_FLIPY )
+			{
 				if (ypos>65000) ypos=ypos-65536; /* Bit hacky */
 				ypos = 256-ypos-height;
 				flipy = !flipy;
 			}
-			if( video_register&TWIN16_SCREEN_FLIPX ){
+			if( video_register&TWIN16_SCREEN_FLIPX )
+			{
 				if (xpos>65000) xpos=xpos-65536; /* Bit hacky */
 				xpos = 320-xpos-width;
 				flipx = !flipx;
@@ -281,7 +284,8 @@ static void draw_sprites( bitmap_t *bitmap )
 	}
 }
 
-static void draw_layer( bitmap_t *bitmap, int opaque ){
+static void draw_layer( bitmap_t *bitmap, int opaque )
+{
 	const UINT16 *gfx_base;
 	const UINT16 *source = videoram16;
 	int i, xxor, yxor;
@@ -290,27 +294,31 @@ static void draw_layer( bitmap_t *bitmap, int opaque ){
 	int tile_flipx = 0; // video_register&TWIN16_TILE_FLIPX;
 	int tile_flipy = video_register&TWIN16_TILE_FLIPY;
 
-	if( ((video_register&TWIN16_PLANE_ORDER)?1:0) != opaque ){
+	if( ((video_register&TWIN16_PLANE_ORDER)?1:0) != opaque )
+	{
 		source += 0x1000;
 		dx = scrollx[2];
 		dy = scrolly[2];
 		palette = 1;
 	}
-	else {
+	else 
+	{
 		source += 0x0000;
 		dx = scrollx[1];
 		dy = scrolly[1];
 		palette = 0;
 	}
 
-	if( twin16_custom_video == 1 ){
+	if( twin16_custom_video == 1 )
+	{
 		gfx_base = twin16_gfx_rom;
 		bank_table[3] = (gfx_bank>>(4*3))&0xf;
 		bank_table[2] = (gfx_bank>>(4*2))&0xf;
 		bank_table[1] = (gfx_bank>>(4*1))&0xf;
 		bank_table[0] = (gfx_bank>>(4*0))&0xf;
 	}
-	else {
+	else 
+	{
 		gfx_base = twin16_tile_gfx_ram;
 		bank_table[0] = 0;
 		bank_table[1] = 1;
@@ -318,12 +326,14 @@ static void draw_layer( bitmap_t *bitmap, int opaque ){
 		bank_table[3] = 3;
 	}
 
-	if( video_register&TWIN16_SCREEN_FLIPX ){
+	if( video_register&TWIN16_SCREEN_FLIPX )
+	{
 		dx = 256-dx-64;
 		tile_flipx = !tile_flipx;
 	}
 
-	if( video_register&TWIN16_SCREEN_FLIPY ){
+	if( video_register&TWIN16_SCREEN_FLIPY )
+	{
 		dy = 256-dy;
 		tile_flipy = !tile_flipy;
 	}
@@ -418,18 +428,36 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( twin16 )
 {
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows_flip_y,
-		 8, 8, 64, 32);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows_flip_y, 8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 }
 
 VIDEO_START( fround )
 {
-	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows,
-		 8, 8, 64, 32);
+	fg_tilemap = tilemap_create(get_fg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
+}
+
+VIDEO_UPDATE( twin16 )
+{
+	fillbitmap(priority_bitmap,0,cliprect);
+	draw_layer( bitmap,1 );
+
+	if (twin16_custom_video)		
+	{
+		draw_layer( bitmap,0 );
+		draw_sprites( bitmap );
+	}
+	else	// devilw, vulcan - different priorities order? there should be an enable bit somewhere...
+	{
+		draw_sprites( bitmap );
+		draw_layer( bitmap,0 );
+	}
+
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	return 0;
 }
 
 VIDEO_EOF( twin16 )
@@ -442,22 +470,3 @@ VIDEO_EOF( twin16 )
 	buffer_spriteram16_w(machine,0,0,0xffff);
 }
 
-VIDEO_UPDATE( twin16 )
-{
-	fillbitmap(priority_bitmap,0,cliprect);
-	draw_layer( bitmap,1 );
-	draw_layer( bitmap,0 );
-	draw_sprites( bitmap );
-	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
-	return 0;
-}
-
-VIDEO_UPDATE( vulcan )
-{
-	fillbitmap(priority_bitmap,0,cliprect);
-	draw_layer( bitmap,1 );
-	draw_sprites( bitmap );
-	draw_layer( bitmap,0 );
-	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
-	return 0;
-}

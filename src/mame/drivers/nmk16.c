@@ -337,15 +337,17 @@ static READ16_HANDLER( tharrier_mcu_r )
 		return ~input_port_read(machine, "IN1");
 }
 
+static WRITE16_HANDLER( macross2_sound_reset_w )
+{
+	/* PCB behaviour verified by Corrado Tomaselli at MAME Italia Forum:
+	   every time music changes Z80 is resetted */
+	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+}
+
 static WRITE16_HANDLER( macross2_sound_command_w )
 {
 	if (ACCESSING_BITS_0_7)
 		soundlatch_w(machine,0,data & 0xff);
-}
-
-static READ16_HANDLER( macross2_sound_result_r )
-{
-	return soundlatch2_r(machine,0);
 }
 
 static WRITE8_HANDLER( macross2_sound_bank_w )
@@ -1005,7 +1007,7 @@ static ADDRESS_MAP_START( macross2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100002, 0x100003) AM_READ_PORT("IN1")
 	AM_RANGE(0x100008, 0x100009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x10000a, 0x10000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x10000e, 0x10000f) AM_READ(macross2_sound_result_r)	/* from Z80 */
+	AM_RANGE(0x10000e, 0x10000f) AM_READ(soundlatch2_word_r)	/* from Z80 */
 	AM_RANGE(0x120000, 0x1207ff) AM_READ(SMH_RAM)
 	AM_RANGE(0x140000, 0x14ffff) AM_READ(nmk_bgvideoram_r)
 	AM_RANGE(0x170000, 0x170fff) AM_READ(nmk_txvideoram_r)
@@ -1016,7 +1018,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( macross2_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x100014, 0x100015) AM_WRITE(nmk_flipscreen_w)
-	AM_RANGE(0x100016, 0x100017) AM_WRITE(SMH_NOP)	/* IRQ eanble? */
+	AM_RANGE(0x100016, 0x100017) AM_WRITE(macross2_sound_reset_w)	/* Z80 reset */
 	AM_RANGE(0x100018, 0x100019) AM_WRITE(nmk_tilebank_w)
 	AM_RANGE(0x10001e, 0x10001f) AM_WRITE(macross2_sound_command_w)	/* to Z80 */
 	AM_RANGE(0x120000, 0x1207ff) AM_WRITE(paletteram16_RRRRGGGGBBBBRGBx_word_w) AM_BASE(&paletteram16)
