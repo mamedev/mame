@@ -2566,6 +2566,25 @@ static WRITE32_HANDLER( _32x_sh2_palette_w)
 	}
 }
 
+static READ32_HANDLER( _32x_sh2_palette_r )
+{
+	UINT32 retvalue = 0x00000000;
+	if (ACCESSING_BITS_16_31)
+	{
+		UINT16 ret = 0x0000;
+		ret = _32x_68k_palette_r(machine, offset*2, mem_mask>>16);
+		retvalue |= (ret << 16);
+	}
+	if (ACCESSING_BITS_0_15) // 4102
+	{
+		UINT16 ret = 0x0000;
+		ret = _32x_68k_palette_r(machine, offset*2+1, mem_mask);
+		retvalue |= ret;
+
+	}
+	return retvalue;
+}
+
 
 static READ16_HANDLER( _32x_68k_dram_r )
 {
@@ -2820,7 +2839,7 @@ static ADDRESS_MAP_START( sh2_main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00004100, 0x00004103) AM_READWRITE( sh2_4100_4102_r, sh2_4100_4102_w )
 	AM_RANGE(0x00004108, 0x0000410b) AM_READWRITE( sh2_4108_410a_r, sh2_4108_410a_w )
 
-	AM_RANGE(0x00004200, 0x000043ff) AM_WRITE(_32x_sh2_palette_w)
+	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE(_32x_sh2_palette_r, _32x_sh2_palette_w)
 	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE(_32x_sh2_dram_r, _32x_sh2_dram_w)
 	AM_RANGE(0x04020000, 0x0403ffff) AM_WRITE(_32x_sh2_dram_overwrite_w)
 
@@ -2835,7 +2854,7 @@ static ADDRESS_MAP_START( sh2_slave_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x00004108, 0x0000410b) AM_READWRITE( sh2_4108_410a_r, sh2_4108_410a_w )
 
-	AM_RANGE(0x00004200, 0x000043ff) AM_WRITE(_32x_sh2_palette_w)
+	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE(_32x_sh2_palette_r, _32x_sh2_palette_w)
 	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE(_32x_sh2_dram_r, _32x_sh2_dram_w)
 	AM_RANGE(0x04020000, 0x0403ffff) AM_WRITE(_32x_sh2_dram_overwrite_w)
 
@@ -4597,7 +4616,7 @@ static void genesis_render_videoline_to_videobuffer(int scanline)
 		}
 }
 
-static UINT32 _32x_linerender[512]; // tmp buffer
+static UINT32 _32x_linerender[320+258]; // tmp buffer (bigger than it needs to be to simplify RLE decode)
 
 /* This converts our render buffer to real screen colours */
 static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine, int scanline)
@@ -4609,38 +4628,70 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 	/* render 32x output to a buffer */
 	if (_32x_is_connected && (_32x_displaymode != 0))
 	{
-		UINT32 lineoffs;
-		int start;
-
-		lineoffs = _32x_display_dram[scanline];
-
-		if (_32x_screenshift == 0) start=0;
-		else start = -1;
-
-		for (x=start;x<320;x++)
+		if (_32x_displaymode==1)
 		{
-			UINT16 coldata;
-			coldata = _32x_display_dram[lineoffs];
 
+			UINT32 lineoffs;
+			int start;
+
+			lineoffs = _32x_display_dram[scanline];
+
+			if (_32x_screenshift == 0) start=0;
+			else start = -1;
+
+			for (x=start;x<320;x++)
 			{
-				if (x>=0)
+				UINT16 coldata;
+				coldata = _32x_display_dram[lineoffs];
+
 				{
-					//if  ((_32x_palette[(coldata & 0xff00)>>8] & 0x8000)==0x8000)
-					_32x_linerender[x] = _32x_palette_lookup[(coldata & 0xff00)>>8];
+					if (x>=0)
+					{
+						_32x_linerender[x] = _32x_palette_lookup[(coldata & 0xff00)>>8];
+					}
+
+					x++;
+
+					if (x>=0)
+					{
+						_32x_linerender[x] = _32x_palette_lookup[(coldata & 0x00ff)];
+					}
 				}
 
-				x++;
+				lineoffs++;
 
-				if (x>=0)
-				{
-					//if  ((_32x_palette[(coldata & 0x00ff)>>0] & 0x8000)==0x8000)
-					_32x_linerender[x] = _32x_palette_lookup[(coldata & 0x00ff)];
-				}
 			}
-
-			lineoffs++;
-
 		}
+		else // mode 3 = RLE  (used by BRUTAL intro)
+		{
+			UINT32 lineoffs;
+			int start;
+
+			lineoffs = _32x_display_dram[scanline];
+
+			if (_32x_screenshift == 0) start=0;
+			else start = -1;
+
+            x = start;
+			while (x<320)
+			{
+				UINT16 coldata, length, l;
+				coldata = _32x_display_dram[lineoffs];
+				length = ((coldata & 0xff00)>>8)+1;
+				coldata = (coldata & 0x00ff)>>0;
+				for (l=0;l<length;l++)
+				{
+					if (x>=0)
+					{
+						_32x_linerender[x] = _32x_palette_lookup[(coldata)];
+					}
+					x++;
+				}
+
+				lineoffs++;
+
+			}
+		} // mode 2 is 15bpp, not supported yet
 	}
 
 
@@ -5155,6 +5206,8 @@ static TIMER_CALLBACK( scanline_timer_callback )
 	//  if (genesis_scanline_counter==0) irq4counter = MEGADRIVE_REG0A_HINT_VALUE;
 		// irq4counter = MEGADRIVE_REG0A_HINT_VALUE;
 
+
+
 		if (genesis_scanline_counter<=224)
 		{
 			irq4counter--;
@@ -5618,6 +5671,20 @@ MACHINE_DRIVER_START( genesis_32x )
 	MDRV_CPU_CONFIG(sh2_conf_master)
 
 	MDRV_CPU_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
+	MDRV_CPU_PROGRAM_MAP(sh2_slave_map, 0)
+	MDRV_CPU_CONFIG(sh2_conf_slave)
+
+MACHINE_DRIVER_END
+
+
+MACHINE_DRIVER_START( genesis_32x_pal )
+	MDRV_IMPORT_FROM(megadpal)
+
+	MDRV_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
+	MDRV_CPU_PROGRAM_MAP(sh2_main_map, 0)
+	MDRV_CPU_CONFIG(sh2_conf_master)
+
+	MDRV_CPU_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
 	MDRV_CPU_PROGRAM_MAP(sh2_slave_map, 0)
 	MDRV_CPU_CONFIG(sh2_conf_slave)
 
@@ -6281,6 +6348,10 @@ static WRITE16_HANDLER( _sh2_master_irq_control_w )
 		sh2_master_hint_enable = data & 0x4;
 		sh2_master_cmdint_enable = data & 0x2;
 		sh2_master_pwmint_enable = data & 0x1;
+
+		if (sh2_master_hint_enable) printf("sh2_master_hint_enable enable!\n");
+		if (sh2_master_pwmint_enable) printf("sh2_master_pwn_enable enable!\n");
+
 	}
 }
 
@@ -6299,6 +6370,10 @@ static WRITE16_HANDLER( _sh2_slave_irq_control_w )
 		sh2_slave_hint_enable = data & 0x4;
 		sh2_slave_cmdint_enable = data & 0x2;
 		sh2_slave_pwnint_enable = data & 0x1;
+
+		if (sh2_slave_hint_enable) printf("sh2_slave_hint_enable enable!\n");
+		if (sh2_slave_pwnint_enable) printf("sh2_slave_pwm_enable enable!\n");
+
 	}
 }
 
@@ -6507,8 +6582,6 @@ static READ16_HANDLER( _32x_68k_a15100_r )
 
 static WRITE16_HANDLER( _32x_68k_a15100_w )
 {
-	printf("_32x_68k_a15100_w\n");
-
 	if (ACCESSING_BITS_0_7)
 	{
 		a15100_reg = (a15100_reg & 0xff00) | (data & 0x00ff);
@@ -6567,8 +6640,8 @@ static int a15102_reg;
 
 static READ16_HANDLER( _32x_68k_a15102_r )
 {
-	printf("_32x_68k_a15102_r\n");
-	return a15102_reg;
+	//printf("_32x_68k_a15102_r\n");
+	return 0x0000;// a15102_reg;
 }
 
 static WRITE16_HANDLER( _32x_68k_a15102_w )
@@ -6586,7 +6659,7 @@ static WRITE16_HANDLER( _32x_68k_a15102_w )
 		if (data&0x2)
 		{
 			printf("68k -> SH2 slave int command\n");
-			cpunum_set_input_line(machine, _32x_slave_cpu_number,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
+			if (sh2_slave_cmdint_enable) cpunum_set_input_line(machine, _32x_slave_cpu_number,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
 		}
 	}
 }
@@ -6679,6 +6752,7 @@ ROM_START( 32x_bios )
 	ROM_REGION16_BE( 0x400000, "main", ROMREGION_ERASE00 )
 
 	ROM_REGION16_BE( 0x400000, "gamecart", 0 ) /* 68000 Code */
+	// test sets
 //  ROM_LOAD( "32xquin.rom", 0x000000,  0x005d124, CRC(93d4b0a3) SHA1(128bd0b6e048c749da1a2f4c3abd6a867539a293))
 //  ROM_LOAD( "32x_babe.rom", 0x000000,  0x14f80, CRC(816b0cb4) SHA1(dc16d3170d5809b57192e03864b7136935eada64) )
 //  ROM_LOAD( "32xhot.rom", 0x000000,  0x01235c, CRC(da9c93c9) SHA1(a62652eb8ad8c62b36f6b1ffb96922d045c4e3ac))
@@ -6687,9 +6761,17 @@ ROM_START( 32x_bios )
 //  ROM_LOAD( "32x_rot.bin", 0x000000,   0x0001638, CRC(98c25033) SHA1(8d9ab3084bd29e60b8cdf4b9f1cb755eb4c88d29) )
 //  ROM_LOAD( "32x_3d.bin", 0x000000,   0x6568, CRC(0171743e) SHA1(bbe6fec182baae5e4d47d263fae6b419db5366ae) )
 //  ROM_LOAD( "32x_spin.bin", 0x000000,   0x012c28, CRC(3d1d1191) SHA1(221a74408653e18cef8ce2f9b4d33ed93e4218b7) )
-//ROM_LOAD( "32x_doom.bin", 0x000000,   0x300000, CRC(208332fd) SHA1(b68e9c7af81853b8f05b8696033dfe4c80327e38) )
-	ROM_LOAD( "32x_koli.bin", 0x000000,   0x300000, CRC(20ca53ef) SHA1(191ae0b525ecf32664086d8d748e0b35f776ddfe) ) // works but stutters.. probably flags
-//  ROM_LOAD( "32x_head.bin", 0x000000,   0x300000, CRC(1) SHA1(1) ) // works but stutters.. probably flags
+	ROM_LOAD( "32x_doom.bin", 0x000000,   0x300000, CRC(208332fd) SHA1(b68e9c7af81853b8f05b8696033dfe4c80327e38) ) // works!
+//	ROM_LOAD( "32x_koli.bin", 0x000000,   0x300000, CRC(20ca53ef) SHA1(191ae0b525ecf32664086d8d748e0b35f776ddfe) ) // works but needs very tight cpu sync or game just stutters
+//  ROM_LOAD( "32x_head.bin", 0x000000,   0x300000,  CRC(ef5553ff) SHA1(4e872fbb44ecb2bd730abd8cc8f32f96b10582c0) ) // doesn't boot
+//	ROM_LOAD( "32x_pit.bin", 0x000000,   0x300000, CRC(f9126f15) SHA1(ee864d1677c6d976d0846eb5f8d8edb839acfb76) ) // ok, needs vram fill on intro screens tho?
+//	ROM_LOAD( "32x_spid.bin", 0x000000,   0x300000, CRC(29dce257) SHA1(7cc2ea1e10f110338ad880bd3e7ff3bce72e7e9e) ) // needs cmdint status reads, overwrite image support wrong?
+//	ROM_LOAD( "32x_carn.bin", 0x000000,   0x300000, CRC(7c7be6a2) SHA1(9a563ed821b483148339561ebd2b876efa58847b) ) // ?? doesn't boot
+//	ROM_LOAD( "32x_raw.bin", 0x000000,   0x400000, CRC(8eb7cd2c) SHA1(94b974f2f69f0c10bc18b349fa4ff95ca56fa47b) ) // needs cmdint status reads
+//	ROM_LOAD( "32x_darx.bin", 0x000000,   0x200000, CRC(22d7c906) SHA1(108b4ffed8643abdefa921cfb58389b119b47f3d) ) // ?? probably abuses the hardware, euro only ;D
+//	ROM_LOAD( "32x_prim.bin", 0x000000,   0x400000, CRC(e78a4d28) SHA1(5084dcca51d76173c383ab7d04cbc661673545f7) ) // needs screen clears
+//	ROM_LOAD( "32x_brut.bin", 0x000000,   0x300000, CRC(7a72c939) SHA1(40aa2c787f37772cdbd7280b8be06b15421fabae) ) // locks up left in attract, doesn't scroll, no idea...
+//  ROM_LOAD( "32x_temp.bin", 0x000000,  0x300000, CRC(14e5c575) SHA1(6673ba83570b4f2c1b4a22415a56594c3cc6c6a9) ) // needs ram fills and DREQ? (no main character)
 
 	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
 	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
