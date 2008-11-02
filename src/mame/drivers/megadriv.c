@@ -94,6 +94,22 @@ static int _32x_master_cpu_number;
 static int _32x_slave_cpu_number;
 static int _32x_is_connected;
 
+static int sh2_are_running;
+static int _32x_adapter_enabled;
+
+static int sh2_master_vint_enable, sh2_slave_vint_enable;
+static int sh2_master_hint_enable, sh2_slave_hint_enable;
+static int sh2_master_cmdint_enable, sh2_slave_cmdint_enable;
+static int sh2_master_pwmint_enable, sh2_slave_pwnint_enable;
+
+
+#define SH2_VRES_IRQ_LEVEL 14
+#define SH2_VINT_IRQ_LEVEL 12
+#define SH2_HINT_IRQ_LEVEL 10
+#define SH2_CINT_IRQ_LEVEL 8
+#define SH2_PINT_IRQ_LEVEL 6
+
+
 static UINT16* _32x_dram0;
 static UINT16* _32x_dram1;
 static UINT16 *_32x_display_dram, *_32x_access_dram;
@@ -2507,8 +2523,232 @@ ADDRESS_MAP_END
 /****************************************** 32X related ******************************************/
 
 
+
+static READ16_HANDLER( _32x_68k_palette_r )
+{
+	return _32x_palette[offset];
+}
+
+static WRITE16_HANDLER( _32x_68k_palette_w )
+{
+	int r,g,b, p;
+
+	COMBINE_DATA(&_32x_palette[offset]);
+	data = _32x_palette[offset];
+
+	r = ((data >> 0)  & 0x1f);
+	g = ((data >> 5)  & 0x1f);
+	b = ((data >> 10) & 0x1f);
+	p = ((data >> 15) & 0x01); // priority 'through' bit
+
+	_32x_palette_lookup[offset] = (r << 10) | (g << 5) | (b << 0);
+
+	palette_set_color_rgb(Machine,offset+0x40,pal5bit(r),pal5bit(g),pal5bit(b));
+
+}
+
+static WRITE32_HANDLER( _32x_sh2_palette_w)
+{
+
+	if (ACCESSING_BITS_16_31)
+	{
+		_32x_68k_palette_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
+	}
+
+	if (ACCESSING_BITS_0_15)
+	{
+		_32x_68k_palette_w(machine,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff);
+	}
+}
+
+
+static READ16_HANDLER( _32x_68k_dram_r )
+{
+	return _32x_access_dram[offset];
+}
+
+static WRITE16_HANDLER( _32x_68k_dram_w )
+{
+	COMBINE_DATA(&_32x_access_dram[offset]);
+}
+
+
+static WRITE32_HANDLER( _32x_sh2_dram_w)
+{
+
+	if (ACCESSING_BITS_16_31)
+	{
+		_32x_68k_dram_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
+	}
+
+	if (ACCESSING_BITS_0_15)
+	{
+		_32x_68k_dram_w(machine,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff);
+	}
+}
+
+
+static WRITE16_HANDLER( _32x_68k_dram_overwrite_w )
+{
+	if (ACCESSING_BITS_8_15)
+	{
+		if (data & 0xff00)
+		{
+			_32x_access_dram[offset] = (_32x_access_dram[offset]&0x00ff) | (data & 0xff00);
+		}
+	}
+
+	if (ACCESSING_BITS_0_7)
+	{
+		if (data & 0x00ff)
+		{
+			_32x_access_dram[offset] = (_32x_access_dram[offset]&0xff00) | (data & 0x00ff);
+		}
+	}
+}
+
+static WRITE32_HANDLER( _32x_sh2_dram_overwrite_w )
+{
+	if (ACCESSING_BITS_16_31)
+	{
+		_32x_68k_dram_overwrite_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
+	}
+
+	if (ACCESSING_BITS_0_15)
+	{
+		_32x_68k_dram_overwrite_w(machine,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff);
+	}
+}
+
+
+
+static READ32_HANDLER( _32x_sh2_dram_r )
+{
+	UINT32 retvalue = 0x00000000;
+
+	if (ACCESSING_BITS_16_31) // 4108
+	{
+		UINT16 ret = 0x0000;
+		ret = _32x_68k_dram_r(machine,offset*2,(mem_mask>>16)&0xffff);
+		retvalue |= ret << 16;
+	}
+
+	if (ACCESSING_BITS_0_15) // 4108
+	{
+		UINT16 ret = 0x0000;
+		ret = _32x_68k_dram_r(machine,offset*2+1,(mem_mask>>0)&0xffff);
+		retvalue |= ret << 0;
+	}
+
+	return retvalue;
+}
+
+
+/*
+a1518a / 410a
+
+vhp- ---- ---- --fb
+
+v = 1=vblank   r/o
+h = 1=hblank   r/o
+p = 0=palette access approval   r/o
+- = unused
+f = 0=MD framebuffer access, 1 = SH2   r/o
+b = 0=DRAM0 accessed by VDP, 1=DRAM1   r/w
+*/
+static UINT16 _32x_a1518a_reg;
+static READ16_HANDLER( _32x_68k_fbcontrol_r )
+{
+	UINT16 retdata = _32x_a1518a_reg;
+	UINT16 hpos = get_hposition();
+	int megadrive_hblank_flag = 0;
+
+	if (megadrive_vblank_flag) retdata |= 0x8000;
+
+	if (hpos>400) megadrive_hblank_flag = 1;
+	if (hpos>460) megadrive_hblank_flag = 0;
+
+	if (megadrive_hblank_flag) retdata |= 0x4000;
+
+//	printf("_32x_68k_fbcontrol_r\n");
+
+
+	return retdata;
+}
+
+static WRITE16_HANDLER( _32x_68k_fbcontrol_w )
+{
+	// bit 0 is the framebuffer select;
+	_32x_a1518a_reg = (_32x_a1518a_reg & 0xfffe) | (data & 1);
+
+	if (_32x_a1518a_reg & 1)
+	{
+		_32x_access_dram = _32x_dram0;
+		_32x_display_dram = _32x_dram1;
+	}
+	else
+	{
+		_32x_display_dram = _32x_dram0;
+		_32x_access_dram = _32x_dram1;
+	}
+	//printf("_32x_68k_fbcontrol_w\n");
+}
+
+
+static READ32_HANDLER( sh2_4108_410a_r )
+{
+	UINT32 retvalue = 0x00000000;
+
+	if (ACCESSING_BITS_16_31) // 4108
+	{
+		UINT16 ret = 0x0000;
+
+		printf("sh2 read access 4108\n");
+		retvalue |= (ret << 16);
+
+	}
+
+	if (ACCESSING_BITS_0_15) // 410a
+	{
+		UINT16 ret = 0x0000;
+
+		ret = _32x_68k_fbcontrol_r(machine, offset*2+1, mem_mask);
+		retvalue |= ret;
+
+	}
+
+	return retvalue;
+
+}
+
+
+
+static WRITE32_HANDLER( sh2_4108_410a_w )
+{
+	if (ACCESSING_BITS_16_31) // 4108
+	{
+//		sh2_master_4018_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
+		printf("sh2 write access 4108\n");
+
+	}
+
+	if (ACCESSING_BITS_0_15) // 410a
+	{
+		_32x_68k_fbcontrol_w(machine,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff);
+	}
+}
+
+
+
 static ADDRESS_MAP_START( sh2_main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
+
+	AM_RANGE(0x00004108, 0x0000410b) AM_READWRITE( sh2_4108_410a_r, sh2_4108_410a_w )
+
+	AM_RANGE(0x00004200, 0x000043ff) AM_WRITE(_32x_sh2_palette_w)
+	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE(_32x_sh2_dram_r, _32x_sh2_dram_w)
+	AM_RANGE(0x04020000, 0x0403ffff) AM_WRITE(_32x_sh2_dram_overwrite_w)
+
 	AM_RANGE(0x06000000, 0x0603ffff) AM_RAM AM_SHARE(10)
 	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_REGION("gamecart_sh2", 0)
 
@@ -2517,6 +2757,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sh2_slave_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
+
+	AM_RANGE(0x00004108, 0x0000410b) AM_READWRITE( sh2_4108_410a_r, sh2_4108_410a_w )
+
+	AM_RANGE(0x00004200, 0x000043ff) AM_WRITE(_32x_sh2_palette_w)
+	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE(_32x_sh2_dram_r, _32x_sh2_dram_w)
+	AM_RANGE(0x04020000, 0x0403ffff) AM_WRITE(_32x_sh2_dram_overwrite_w)
+
 	AM_RANGE(0x06000000, 0x0603ffff) AM_RAM AM_SHARE(10)
 	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_REGION("gamecart_sh2", 0)
 
@@ -4714,6 +4961,14 @@ static TIMER_CALLBACK( scanline_timer_callback )
 			timer_adjust_oneshot(irq6_on_timer,  ATTOTIME_IN_USEC(6), 0);
 			megadrive_irq6_pending = 1;
 			megadrive_vblank_flag = 1;
+
+			// 32x interrupt!
+			if (_32x_is_connected)
+			{
+				if (sh2_master_vint_enable) cpunum_set_input_line(machine,  _32x_master_cpu_number,SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
+				if (sh2_slave_vint_enable) cpunum_set_input_line(machine,  _32x_slave_cpu_number,SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
+			}
+
 		}
 
 		if (megadrive_vblank_flag>=224)
@@ -5190,6 +5445,7 @@ MACHINE_DRIVER_START( genesis_32x )
 	MDRV_CPU_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
 	MDRV_CPU_PROGRAM_MAP(sh2_slave_map, 0)
 	MDRV_CPU_CONFIG(sh2_conf_slave)
+
 MACHINE_DRIVER_END
 
 MACHINE_DRIVER_START( genesis_scd )
@@ -5440,19 +5696,6 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine)
 
 // these are tests for 'special case' hardware to make sure I don't break anything while rearranging things
 //
-static int sh2_are_running;
-static int _32x_adapter_enabled;
-
-static int sh2_master_vint_enable, sh2_slave_vint_enable;
-static int sh2_master_hint_enable, sh2_slave_hint_enable;
-static int sh2_master_cmdint_enable, sh2_slave_cmdint_enable;
-static int sh2_master_pwmint_enable, sh2_slave_pwnint_enable;
-
-#define SH2_VRES_IRQ_LEVEL 14
-#define SH2_VINT_IRQ_LEVEL 12
-#define SH2_HINT_IRQ_LEVEL 10
-#define SH2_CINT_IRQ_LEVEL 8
-#define SH2_PINT_IRQ_LEVEL 6
 
 static UINT16 _32x_autofill_length;
 static UINT16 _32x_autofill_address;
@@ -5506,11 +5749,14 @@ static WRITE32_HANDLER( sh2_master_4018_401a_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
+		printf("master 4018\n");
 		sh2_master_4018_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
 	}
 
 	if (ACCESSING_BITS_0_15)
 	{
+		printf("master 401a\n");
+
 		sh2_master_401a_w(machine,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff);
 	}
 }
@@ -5519,11 +5765,13 @@ static WRITE32_HANDLER( sh2_slave_4018_401a_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
+		printf("slave 4018\n");
 		sh2_slave_4018_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
 	}
 
 	if (ACCESSING_BITS_0_15)
 	{
+		printf("slave 401a\n");
 		sh2_slave_401a_w(machine,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff);
 	}
 }
@@ -5707,6 +5955,57 @@ Clears 'PWM' (Sound / Timer) Interrupt
 
 */
 
+
+/*
+
+15106 DREQ
+
+ ---- ---- F--- -K0R
+
+ F = Fifo FULL
+ K = 68k CPU Write mode (0 = no, 1 = CPU write)
+ 0 = always 0
+ R = RV (0 = no operation, 1 = DMA Start allowed)
+
+*/
+
+static UINT16 a15106_reg;
+
+
+static READ16_HANDLER( _32x_68k_a15106_r)
+{
+	UINT16 retval;
+
+	retval = a15106_reg;
+
+	//if (fifo_full) retval |= 0x0080;
+
+	return retval;
+}
+
+static WRITE16_HANDLER( _32x_68k_a15106_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		a15106_reg = data & 0x5;
+		printf("_32x_68k_a15106_w %04x\n", data);
+
+		if (a15106_reg & 0x4)
+			printf(" --- 68k Write Mode enabled\n");
+		else
+			printf(" --- 68k Write Mode disabled\n");
+
+		if (a15106_reg & 0x1)
+			printf(" --- DMA Start Allowed \n");
+		else
+			printf(" --- DMA Start No Operation\n");
+
+	}
+
+
+}
+
+
 static READ32_HANDLER( sh2_4000_master_r )
 {
 	return 0x82008200;
@@ -5719,95 +6018,13 @@ static READ32_HANDLER( sh2_4000_slave_r )
 
 
 
-/*
-a1518a / 410a
-
-vhp- ---- ---- --fb
-
-v = 1=vblank   r/o
-h = 1=hblank   r/o
-p = 0=palette access approval   r/o
-- = unused
-f = 0=MD framebuffer access, 1 = SH2   r/o
-b = 0=DRAM0 accessed by VDP, 1=DRAM1   r/w
-*/
-static UINT16 _32x_a1518a_reg;
-static READ16_HANDLER( _32x_68k_fbcontrol_r )
-{
-	UINT16 retdata = _32x_a1518a_reg;
-	UINT16 hpos = get_hposition();
-	int megadrive_hblank_flag = 0;
-
-	if (megadrive_vblank_flag) retdata |= 0x8000;
-
-	if (hpos>400) megadrive_hblank_flag = 1;
-	if (hpos>460) megadrive_hblank_flag = 0;
-
-	if (megadrive_hblank_flag) retdata |= 0x4000;
-
-	printf("_32x_68k_fbcontrol_r\n");
-
-
-	return retdata;
-}
-
-static WRITE16_HANDLER( _32x_68k_fbcontrol_w )
-{
-	// bit 0 is the framebuffer select;
-	_32x_a1518a_reg = (_32x_a1518a_reg & 0xfffe) | (data & 1);
-
-	if (_32x_a1518a_reg & 1)
-	{
-		_32x_access_dram = _32x_dram0;
-		_32x_display_dram = _32x_dram1;
-	}
-	else
-	{
-		_32x_display_dram = _32x_dram0;
-		_32x_access_dram = _32x_dram1;
-	}
-
-//	printf("_32x_68k_fbcontrol_w\n");
-
-
-}
 
 
 
 
 
-static READ16_HANDLER( _32x_68k_dram_r )
-{
-	return _32x_access_dram[offset];
-}
 
-static WRITE16_HANDLER( _32x_68k_dram_w )
-{
-	COMBINE_DATA(&_32x_access_dram[offset]);
-}
 
-static READ16_HANDLER( _32x_68k_palette_r )
-{
-	return _32x_palette[offset];
-}
-
-static WRITE16_HANDLER( _32x_68k_palette_w )
-{
-	int r,g,b, p;
-
-	COMBINE_DATA(&_32x_palette[offset]);
-	data = _32x_palette[offset];
-
-	r = ((data >> 0)  & 0x1f);
-	g = ((data >> 5)  & 0x1f);
-	b = ((data >> 10) & 0x1f);
-	p = ((data >> 15) & 0x01); // priority 'through' bit
-
-	_32x_palette_lookup[offset] = (r << 10) | (g << 5) | (b << 0);
-
-	palette_set_color_rgb(Machine,offset+0x40,pal5bit(r),pal5bit(g),pal5bit(b));
-
-}
 
 
 // returns MARS, the system ID of the 32x
@@ -5862,14 +6079,75 @@ static WRITE32_HANDLER( sh2_commsport_w )
 	}
 }
 
+//static int sh2_master_vint_enable, sh2_slave_vint_enable;
+//static int sh2_master_hint_enable, sh2_slave_hint_enable;
+//static int sh2_master_cmdint_enable, sh2_slave_cmdint_enable;
+//static int sh2_master_pwmint_enable, sh2_slave_pwnint_enable;
+
+
+static WRITE16_HANDLER( _sh2_master_irq_control_w )
+{
+	if (ACCESSING_BITS_8_15)
+	{
+		printf("_sh2_master_irq_control_w adapter use stuff write\n");
+	}
+
+	if (ACCESSING_BITS_0_7)
+	{
+		sh2_master_vint_enable = data & 0x8;
+		sh2_master_hint_enable = data & 0x4;
+		sh2_master_cmdint_enable = data & 0x2;
+		sh2_master_pwmint_enable = data & 0x1;
+	}
+}
+
+static WRITE16_HANDLER( _sh2_slave_irq_control_w )
+{
+	if (ACCESSING_BITS_8_15)
+	{
+		printf("_sh2_slave_irq_control_w adapter use stuff write\n");
+	}
+
+	if (ACCESSING_BITS_0_7)
+	{
+		sh2_slave_vint_enable = data & 0x8;
+		sh2_slave_hint_enable = data & 0x4;
+		sh2_slave_cmdint_enable = data & 0x2;
+		sh2_slave_pwnint_enable = data & 0x1;
+	}
+}
+
+
 static WRITE32_HANDLER( sh2_4000_master_w )
 {
+	if (ACCESSING_BITS_16_31) // 4000
+	{
+		printf("sh2_4000_master_w %08x %08x\n",data,mem_mask);
+		_sh2_master_irq_control_w(machine, offset*2, (data >> 16) & 0xffff, (mem_mask >> 16) & 0xffff);
+
+
+	}
+
+	if (ACCESSING_BITS_0_15) // 4002
+	{
+		printf("sh2_4002_master_w %08x %08x\n",data,mem_mask);
+	}
 
 }
 
 static WRITE32_HANDLER( sh2_4000_slave_w )
 {
+	if (ACCESSING_BITS_16_31) // 4000
+	{
+		printf("sh2_4000_slave_w %08x %08x\n",data,mem_mask);
+		_sh2_slave_irq_control_w(machine, offset*2, (data >> 16) & 0xffff, (mem_mask >> 16) & 0xffff);
 
+	}
+
+	if (ACCESSING_BITS_0_15) // 4002
+	{
+		printf("sh2_4002_slave_w %08x %08x\n",data,mem_mask);
+	}
 }
 
 static READ16_HANDLER( _32x_68k_a15184_r )
@@ -6033,6 +6311,35 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 	}
 }
 
+static int a15102_reg;
+
+static READ16_HANDLER( _32x_68k_a15102_r )
+{
+	printf("_32x_68k_a15102_r\n");
+	return a15102_reg;
+}
+
+static WRITE16_HANDLER( _32x_68k_a15102_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		a15102_reg = data;
+
+		if (data&0x1)
+		{
+			printf("68k -> SH2 master int command\n");
+			if (sh2_master_cmdint_enable) cpunum_set_input_line(machine, _32x_master_cpu_number,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
+		}
+
+		if (data&0x2)
+		{
+			printf("68k -> SH2 slave int command\n");
+			cpunum_set_input_line(machine, _32x_slave_cpu_number,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
+		}
+	}
+}
+
+
 
 DRIVER_INIT( _32x )
 {
@@ -6065,7 +6372,9 @@ DRIVER_INIT( _32x )
 
 	a15100_reg = 0x0000;
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa15100, 0xa15101, 0, 0, _32x_68k_a15100_r, _32x_68k_a15100_w); // framebuffer control regs
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa15102, 0xa15103, 0, 0, _32x_68k_a15102_r, _32x_68k_a15102_w); // send irq to sh2
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa15104, 0xa15105, 0, 0, _32x_68k_a15104_r,    _32x_68k_a15104_w); // 68k BANK rom set
+	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa15106, 0xa15107, 0, 0, _32x_68k_a15106_r,    _32x_68k_a15106_w); // dreq stuff
 
 	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa15120, 0xa1512f, 0, 0, _32x_68k_comms_r,    _32x_68k_comms_w); // comms regs
 
@@ -6108,7 +6417,7 @@ DRIVER_INIT( _32x )
 	DRIVER_INIT_CALL(megadriv);
 }
 
-#if 0
+#if 1
 
 ROM_START( 32x_bios )
 	ROM_REGION16_BE( 0x400000, "main", ROMREGION_ERASE00 )
@@ -6117,8 +6426,13 @@ ROM_START( 32x_bios )
 //	ROM_LOAD( "32xquin.rom", 0x000000,  0x005d124, CRC(93d4b0a3) SHA1(128bd0b6e048c749da1a2f4c3abd6a867539a293))
 //  ROM_LOAD( "32x_babe.rom", 0x000000,  0x14f80, CRC(816b0cb4) SHA1(dc16d3170d5809b57192e03864b7136935eada64) )
 //  ROM_LOAD( "32xhot.rom", 0x000000,  0x01235c, CRC(da9c93c9) SHA1(a62652eb8ad8c62b36f6b1ffb96922d045c4e3ac))
-	ROM_LOAD( "knux.rom", 0x000000,  0x300000, CRC(d0b0b842) SHA1(0c2fff7bc79ed26507c08ac47464c3af19f7ced7) )
+//	ROM_LOAD( "knux.rom", 0x000000,  0x300000, CRC(d0b0b842) SHA1(0c2fff7bc79ed26507c08ac47464c3af19f7ced7) )
 //	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
+//  ROM_LOAD( "32x_rot.bin", 0x000000,   0x0001638, CRC(98c25033) SHA1(8d9ab3084bd29e60b8cdf4b9f1cb755eb4c88d29) )
+// 	ROM_LOAD( "32x_3d.bin", 0x000000,   0x6568, CRC(0171743e) SHA1(bbe6fec182baae5e4d47d263fae6b419db5366ae) )
+// 	ROM_LOAD( "32x_spin.bin", 0x000000,   0x012c28, CRC(3d1d1191) SHA1(221a74408653e18cef8ce2f9b4d33ed93e4218b7) )
+// 	ROM_LOAD( "32x_doom.bin", 0x000000,   0x400000, CRC(208332fd) SHA1(b68e9c7af81853b8f05b8696033dfe4c80327e38) )
+ 	ROM_LOAD( "32x_koli.bin", 0x000000,   0x400000, CRC(20ca53ef) SHA1(191ae0b525ecf32664086d8d748e0b35f776ddfe) ) // works but stutters.. probably flags
 
 	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
 	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
