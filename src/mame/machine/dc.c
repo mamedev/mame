@@ -957,7 +957,7 @@ WRITE64_HANDLER( dc_aica_reg_w )
 
 READ32_HANDLER( dc_arm_aica_r )
 {
-	return aica_0_r(machine, offset*2, 0xffff);
+	return aica_0_r(machine, offset*2, 0xffff) & 0xffff;
 }
 
 WRITE32_HANDLER( dc_arm_aica_w )

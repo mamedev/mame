@@ -1189,8 +1189,18 @@ INLINE INT32 AICA_UpdateSlot(struct _AICA *AICA, struct _SLOT *slot)
 		AICA->udata.data[0x14/2] = addr1;
 		if (!(AFSEL(AICA)))
 		{
+			UINT16 res;
+
 			AICA->udata.data[0x10/2] |= slot->EG.state<<13;
-			AICA->udata.data[0x10/2] |= 0x3FF - (slot->EG.volume>>EG_SHIFT);
+
+			res = 0x3FF - (slot->EG.volume>>EG_SHIFT);
+
+			res *= 959;
+			res /= 1024;
+
+			if (res > 959) res = 959;
+
+			AICA->udata.data[0x10/2] = res;
 		}
 	}
 
