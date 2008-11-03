@@ -71,12 +71,21 @@ static int timer_running(ttl74123_t *chip)
 }
 
 
+static TIMER_CALLBACK( output_callback )
+{
+	const device_config *device = ptr;
+	ttl74123_t *chip = get_safe_token(device);
+
+	chip->intf->output_changed_cb(device, 0, param);
+}
+
+
 static void set_output(const device_config *device)
 {
 	ttl74123_t *chip = get_safe_token(device);
 	int output = timer_running(chip);
 
-	chip->intf->output_changed_cb(device, 0, output);
+	timer_set( attotime_zero, (void *) device, output, output_callback );
 
 	if (LOG) logerror("74123 %s:  Output: %d\n", device->tag, output);
 }
@@ -85,8 +94,10 @@ static void set_output(const device_config *device)
 static TIMER_CALLBACK( clear_callback )
 {
 	const device_config *device = ptr;
+	ttl74123_t *chip = get_safe_token(device);
+	int output = timer_running(chip);
 
-	set_output(device);
+	chip->intf->output_changed_cb(device, 0, output);
 }
 
 
@@ -154,14 +165,15 @@ WRITE8_DEVICE_HANDLER( ttl74123_clear_w )
 {
 	ttl74123_t *chip = get_safe_token(device);
 
-	/* clear the output if A=LO, B=HI and falling edge on clear */
-	if (!data && chip->clear && chip->b && !chip->a && !chip->clear)
+	/* start/regtrigger pulse if B=HI and A=LO and rising edge on clear */
+	if (data && !chip->a && chip->b && !chip->clear)
+		start_pulse(device);
+	else if (!data) 	/* clear the output  */
 	{
 		timer_adjust_oneshot(chip->timer, attotime_zero, 0);
 
 		if (LOG) logerror("74123 #%s:  Cleared\n", device->tag );
 	}
-
 	chip->clear = data;
 }
 
@@ -185,7 +197,7 @@ static DEVICE_START( ttl74123 )
 	chip->intf = device->static_config;
 
 	assert_always(chip->intf, "No interface specified");
-	assert_always((chip->intf->connection_type == TTL74123_GROUNDED) && (chip->intf->cap >= CAP_U(0.01)), "Only capacitors >= 0.01uF supported for GROUNDED type");
+	assert_always((chip->intf->connection_type != TTL74123_GROUNDED) || (chip->intf->cap >= CAP_U(0.01)), "Only capacitors >= 0.01uF supported for GROUNDED type");
 	assert_always(chip->intf->cap >= CAP_P(1000), "Only capacitors >= 1000pF supported ");
 
 	chip->timer = timer_alloc(clear_callback, (void *) device);
