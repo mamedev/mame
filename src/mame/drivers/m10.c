@@ -90,7 +90,7 @@ Notes (couriersud)
 
     From http://www.crazykong.com/tech/IremBoardList.txt
 
-    skychut:        M-11
+    skychut:        M-11 (?)
     andromed:       N/A
     ipminvad:       N/A
     spacbeam:       not listed
@@ -111,7 +111,9 @@ Notes (couriersud)
 
 ***************************************************************************/
 #include "driver.h"
+#include "machine/rescap.h"
 #include "sound/samples.h"
+#include "machine/74123.h"
 #include "m10.h"
 
 
@@ -121,7 +123,45 @@ Notes (couriersud)
  *
  *************************************/
 
-#define DEBUG		(0)
+#define DEBUG		(1)
+
+static WRITE8_DEVICE_HANDLER(ic8j1_output_changed)
+{
+	printf("ic8j1: %d %d\n", data, video_screen_get_vpos(device->machine->primary_screen));
+	cpunum_set_input_line(device->machine, 0, 0, !data ? CLEAR_LINE : ASSERT_LINE);
+}
+
+static WRITE8_DEVICE_HANDLER(ic8j2_output_changed)
+{
+	/* written from /Q to A with slight delight */
+	printf("ic8j2: %d\n", data);
+	ttl74123_a_w(device, 0, data);
+	ttl74123_a_w(devtag_get_device(device->machine, TTL74123, "ic8j1"), 0, data);
+}
+
+static const ttl74123_config ic8j1_intf =
+{
+	/* completely illegible */
+	TTL74123_NOT_GROUNDED_DIODE,	/* the hook up type */
+	RES_K(1),			/* resistor connected to RCext */
+	CAP_U(1),		/* capacitor connected to Cext and RCext */
+	1,					/* A pin - driven by the CRTC */
+	1,					/* B pin - pulled high */
+	1,					/* Clear pin - pulled high */
+	ic8j1_output_changed
+};
+
+static const ttl74123_config ic8j2_intf =
+{
+	TTL74123_NOT_GROUNDED_DIODE,	/* the hook up type */
+	/* 10k + 20k variable resistor */
+	RES_K(22),			/* resistor connected to RCext */
+	CAP_U(2.2),		/* capacitor connected to Cext and RCext */
+	1,					/* A pin - driven by the CRTC */
+	1,					/* B pin - pulled high */
+	1,					/* Clear pin - pulled high */
+	ic8j2_output_changed
+};
 
 /*************************************
  *
@@ -420,13 +460,19 @@ static WRITE8_HANDLER( m15_a100_w )
 static READ8_HANDLER( m10_a700_r )
 {
    	//printf("rd:%d\n",video_screen_get_vpos(machine->primary_screen));
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	printf("clear\n");
+	ttl74123_clear_w(devtag_get_device(machine, TTL74123, "ic8j1"), 0, 0);
+	ttl74123_clear_w(devtag_get_device(machine, TTL74123, "ic8j1"), 0, 1);
 	return 0x00;
 }
 
 static READ8_HANDLER( m11_a700_r )
 {
    	//printf("rd:%d\n",video_screen_get_vpos(machine->primary_screen));
+	//cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	printf("clear\n");
+	ttl74123_clear_w(devtag_get_device(machine, TTL74123, "ic8j1"), 0, 0);
+	ttl74123_clear_w(devtag_get_device(machine, TTL74123, "ic8j1"), 0, 1);
 	return 0x00;
 }
 
@@ -460,16 +506,18 @@ static TIMER_CALLBACK( interrupt_callback )
 
 }
 
+#if 0
 static INTERRUPT_GEN( m11_interrupt )
 {
 	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBEND, 0), NULL, -1,interrupt_callback);
+	//timer_set(video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBEND, 0), NULL, -1,interrupt_callback);
 }
 
 static INTERRUPT_GEN( m10_interrupt )
 {
 	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
 }
+#endif
 
 static INTERRUPT_GEN( m15_interrupt )
 {
@@ -769,7 +817,7 @@ static MACHINE_DRIVER_START( m10 )
 
 	MDRV_MACHINE_RESET(irem)
 
-	MDRV_CPU_VBLANK_INT("main", m10_interrupt)
+	//MDRV_CPU_VBLANK_INT("main", m10_interrupt)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -782,6 +830,13 @@ static MACHINE_DRIVER_START( m10 )
 	MDRV_PALETTE_INIT(m10)
 	MDRV_VIDEO_START(m10)
 	MDRV_VIDEO_UPDATE(m10)
+
+	/* 74LS123 */
+	
+	MDRV_DEVICE_ADD("ic8j1", TTL74123)
+	MDRV_DEVICE_CONFIG(ic8j1_intf)
+	MDRV_DEVICE_ADD("ic8j2", TTL74123)
+	MDRV_DEVICE_CONFIG(ic8j2_intf)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -798,10 +853,10 @@ static MACHINE_DRIVER_START( m11 )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(m10)
-	MDRV_CPU_REPLACE("main", M6502,IREMM10_CPU_CLOCK / 2)
+	MDRV_CPU_REPLACE("main", M6502,IREMM10_CPU_CLOCK)
 	//MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(m11_main,0)
-	MDRV_CPU_VBLANK_INT("main", m11_interrupt)
+	//MDRV_CPU_VBLANK_INT("main", m11_interrupt)
 
 	/* sound hardware */
 MACHINE_DRIVER_END

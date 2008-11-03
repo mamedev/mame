@@ -5,14 +5,14 @@
 ****************************************************************************/
 
 
-#define IREMM10_MASTER_CLOCK		(25000000)
+#define IREMM10_MASTER_CLOCK		(12500000)
 
-#define IREMM10_CPU_CLOCK		(IREMM10_MASTER_CLOCK/20)
-#define IREMM10_PIXEL_CLOCK		(IREMM10_MASTER_CLOCK/5)
-#define IREMM10_HTOTAL			(318)
-#define IREMM10_HBSTART			(248)
+#define IREMM10_CPU_CLOCK		(IREMM10_MASTER_CLOCK/16)
+#define IREMM10_PIXEL_CLOCK		(IREMM10_MASTER_CLOCK/2)
+#define IREMM10_HTOTAL			(360)	/* (0x100-0xd3)*8 */
+#define IREMM10_HBSTART			(248)	
 #define IREMM10_HBEND			(8)
-#define IREMM10_VTOTAL			(262)
+#define IREMM10_VTOTAL			(281)	/* (0x200-0xe7) */
 #define IREMM10_VBSTART			(240)
 #define IREMM10_VBEND			(16)
 
