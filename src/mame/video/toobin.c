@@ -17,6 +17,7 @@
  *************************************/
 
 static double brightness;
+static bitmap_t *pfbitmap;
 
 
 
@@ -101,6 +102,9 @@ VIDEO_START( toobin )
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,48);
 	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
+	
+	/* allocate a playfield bitmap for rendering */
+	pfbitmap = auto_bitmap_alloc(video_screen_get_width(machine->primary_screen), video_screen_get_height(machine->primary_screen), BITMAP_FORMAT_INDEXED16);
 }
 
 
@@ -227,42 +231,47 @@ WRITE16_HANDLER( toobin_slip_w )
 
 VIDEO_UPDATE( toobin )
 {
+	const rgb_t *palette = palette_entry_list_adjusted(screen->machine->palette);
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
-	int x, y, r;
+	int x, y;
 
 	/* draw the playfield */
 	fillbitmap(priority_bitmap, 0, cliprect);
-	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 1, 1);
-	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 2, 2);
-	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 3, 3);
+	tilemap_draw(pfbitmap, cliprect, atarigen_playfield_tilemap, 0, 0);
+	tilemap_draw(pfbitmap, cliprect, atarigen_playfield_tilemap, 1, 1);
+	tilemap_draw(pfbitmap, cliprect, atarigen_playfield_tilemap, 2, 2);
+	tilemap_draw(pfbitmap, cliprect, atarigen_playfield_tilemap, 3, 3);
 
 	/* draw and merge the MO */
 	mobitmap = atarimo_render(0, cliprect, &rectlist);
-	for (r = 0; r < rectlist.numrects; r++, rectlist.rect++)
-		for (y = rectlist.rect->min_y; y <= rectlist.rect->max_y; y++)
+	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	{
+		UINT32 *dest = BITMAP_ADDR32(bitmap, y, 0);
+		UINT16 *mo = BITMAP_ADDR16(mobitmap, y, 0);
+		UINT16 *pf = BITMAP_ADDR16(pfbitmap, y, 0);
+		UINT8 *pri = BITMAP_ADDR8(priority_bitmap, y, 0);
+		for (x = cliprect->min_x; x <= cliprect->max_x; x++)
 		{
-			UINT16 *mo = (UINT16 *)mobitmap->base + mobitmap->rowpixels * y;
-			UINT16 *pf = (UINT16 *)bitmap->base + bitmap->rowpixels * y;
-			UINT8 *pri = (UINT8 *)priority_bitmap->base + priority_bitmap->rowpixels * y;
-			for (x = rectlist.rect->min_x; x <= rectlist.rect->max_x; x++)
-				if (mo[x])
-				{
-					/* not verified: logic is all controlled in a PAL
+			UINT16 pix = pf[x];
+			if (mo[x])
+			{
+				/* not verified: logic is all controlled in a PAL
 
-                        factors: LBPRI1-0, LBPIX3, ANPIX1-0, PFPIX3, PFPRI1-0,
-                                 (~LBPIX3 & ~LBPIX2 & ~LBPIX1 & ~LBPIX0)
-                    */
+                   factors: LBPRI1-0, LBPIX3, ANPIX1-0, PFPIX3, PFPRI1-0,
+                            (~LBPIX3 & ~LBPIX2 & ~LBPIX1 & ~LBPIX0)
+               */
 
-					/* only draw if not high priority PF */
-					if (!pri[x] || !(pf[x] & 8))
-						pf[x] = mo[x];
+				/* only draw if not high priority PF */
+				if (!pri[x] || !(pix & 8))
+					pix = mo[x];
 
-					/* erase behind ourselves */
-					mo[x] = 0;
-				}
+				/* erase behind ourselves */
+				mo[x] = 0;
+			}
+			dest[x] = palette[pix];
 		}
+	}
 
 	/* add the alpha on top */
 	tilemap_draw(bitmap, cliprect, atarigen_alpha_tilemap, 0, 0);

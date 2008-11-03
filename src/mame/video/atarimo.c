@@ -406,7 +406,7 @@ void atarimo_init(running_machine *machine, int map, const atarimo_desc *desc)
 	mo->slipram       = (map == 0) ? &atarimo_0_slipram : &atarimo_1_slipram;
 
 	/* allocate the temp bitmap */
-	mo->bitmap        = video_screen_auto_bitmap_alloc(machine->primary_screen);
+	mo->bitmap        = auto_bitmap_alloc(video_screen_get_width(machine->primary_screen), video_screen_get_height(machine->primary_screen), BITMAP_FORMAT_INDEXED16);
 	fillbitmap(mo->bitmap, desc->transpen, NULL);
 
 	/* allocate the spriteram */
