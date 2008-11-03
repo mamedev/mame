@@ -333,7 +333,18 @@ static void recompute_parameters(mc6845_t *mc6845, int postload)
 
 INLINE int is_display_enabled(mc6845_t *mc6845)
 {
-	return !video_screen_get_vblank(mc6845->screen) && !video_screen_get_hblank(mc6845->screen);
+	int x = video_screen_get_hpos(mc6845->screen);
+	int x0 = 0;
+	int x1 = mc6845->max_visible_x;
+	int y = video_screen_get_vpos(mc6845->screen);
+
+	if (mc6845->mode_control & MODE_DISPLAY_ENABLE_SKEW)
+	{
+		x0 += mc6845->hpixels_per_column;
+		x1 += mc6845->hpixels_per_column;
+	}
+	
+	return (x >= x0) && (x <= x1) && (y <= mc6845->max_visible_y);
 }
 
 
