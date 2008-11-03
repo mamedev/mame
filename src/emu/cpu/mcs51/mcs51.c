@@ -613,6 +613,8 @@ static int mcs51_icount;
 
 static mcs51_regs mcs51;
 
+static void (*hold_serial_tx_callback)(int data);
+static int (*hold_serial_rx_callback)(void);
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -623,18 +625,12 @@ INLINE void serial_transmit(UINT8 data);
 
 /* Hold callback functions so they can be set by caller (before the cpu reset) */
 
-static void (*hold_serial_tx_callback)(int data);
-static int (*hold_serial_rx_callback)(void);
-
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
 
 INLINE void clear_current_irq(void)
 {
-	//printf("reti cip %d, act %02x\n",mcs51.cur_irq_prio,  mcs51.irq_active);
-	//assert(mcs51.cur_irq_prio >= 0 && mcs51.irq_active);
-
 	if (mcs51.cur_irq_prio >= 0)
 		mcs51.irq_active &= ~(1 << mcs51.cur_irq_prio);
 	if (mcs51.irq_active & 4)
@@ -660,6 +656,7 @@ INLINE void update_ptrs(void)
 
 
 /* Generate an external ram address for read/writing using indirect addressing mode */
+
 /*The lowest 8 bits of the address are passed in (from the R0/R1 register), however
   the hardware can be configured to set the rest of the address lines to any available output port pins, which
   means the only way we can implement this is to allow the driver to setup a callback to generate the
@@ -675,10 +672,45 @@ INLINE void update_ptrs(void)
   provide it's own mapping.
 */
 
+/*
+    The DS5002FP has 2 16 bits data address buses (the byte-wide bus and the expanded bus). The exact memory position accessed depends on the
+    partition mode, the memory range and the expanded bus select. The partition mode and the expanded bus select can be changed at any time.
+
+    In order to simplify memory mapping to the data address bus, the following address map is assumed for partitioned mode:
+
+    0x00000-0x0ffff -> data memory on the expanded bus
+    0x10000-0x1ffff -> data memory on the byte-wide bus
+
+    For non-partitioned mode the following memory map is assumed:
+
+    0x0000-0xffff -> data memory (the bus used to access it does not matter)
+*/
+
 INLINE offs_t external_ram_iaddr(offs_t offset, offs_t mem_mask)
 {
-	if (mem_mask == 0x00ff)
-		return (offset & mem_mask) | (P2 << 8);
+	/* Memory Range (RG1 and RG0 @ MCON and RPCTL registers) */
+	static const UINT16 ds5002fp_ranges[4] = { 0x1fff, 0x3fff, 0x7fff, 0xffff };
+	/* Memory Partition Table (RG1 & RG0 @ MCON & RPCTL registers) */
+	static const UINT32 ds5002fp_partitions[16] = {
+		0x0000, 0x1000, 0x2000, 0x3000, 0x4000, 0x5000, 0x6000,  0x7000,
+		0x8000, 0x9000, 0xa000, 0xb000, 0xc000, 0xd000, 0xe000,	0x10000 };
+
+	/* if partition mode is set, adjust offset based on the bus */
+	if (mcs51.features & FEATURE_DS5002FP)
+	{
+		if (!GET_PM) {
+			if (!GET_EXBS) {
+				if ((offset >= ds5002fp_partitions[GET_PA]) && (offset <= ds5002fp_ranges[mcs51.ds5002fp.range])) {
+					offset += 0x10000;
+				}
+			}
+		}
+	}
+	else
+	{
+		if (mem_mask == 0x00ff)
+			return (offset & mem_mask) | (P2 << 8);
+	}
 #if 0
     if(mcs51.eram_iaddr_callback)
         return mcs51.eram_iaddr_callback(machine,offset,mem_mask);
@@ -861,13 +893,11 @@ INLINE void transmit_receive(int source)
 		{
 			mcs51.uart.bits_to_send--;
 			if(mcs51.uart.bits_to_send == 0) {
-				//printf("Here1 %d\n",  mcs51.uart.bits_to_send);
 				//Call the callback function
 				if(mcs51.serial_tx_callback)
 					mcs51.serial_tx_callback(mcs51.uart.data_out);
 				//Set Interrupt Flag
 				SET_TI(1);
-				//Note: we'll let the main loop catch the interrupt
 			}
 		}
 
@@ -885,7 +915,7 @@ INLINE void transmit_receive(int source)
 				//Call our callball function to retrieve the data
 				if(mcs51.serial_rx_callback)
 					data = mcs51.serial_rx_callback();
-				//printf("RX Deliver %d\n", data);
+				LOG(("RX Deliver %d\n", data));
 				SET_SBUF(data);
 				//Flag the IRQ
 				SET_RI(1);
@@ -1004,7 +1034,6 @@ INLINE void update_timer_t1(int cycles)
 			if (GET_GATE1 && !GET_IE1)
 				delta = 0;
 
-			//printf("mode: %d\n", mode);
 			switch(mode) {
 				case 0:			/* 13 Bit Timer Mode */
 					count = ((TH1<<5) | ( TL1 & 0x1f ) );
@@ -1159,7 +1188,7 @@ INLINE void serial_transmit(UINT8 data)
 
 	//Flag that we're sending data
 	mcs51.uart.data_out = data;
-	//printf("serial_tansmit: %x %x\n", mode, data);
+	LOG(("serial_tansmit: %x %x\n", mode, data));
 	switch(mode) {
 		//8 bit shifter ( + start,stop bit ) - baud set by clock freq / 12
 		case 0:
@@ -1619,7 +1648,6 @@ static void check_irqs(void)
 
 	if (mcs51.features & FEATURE_DS5002FP)
 	{
-		printf("Here\n");
 		ints |= ((GET_PFW)<<5);
 		mcs51.irq_prio[6] = 3;	/* force highest priority */
 		/* mask out interrupts not enabled */
@@ -1681,8 +1709,6 @@ static void check_irqs(void)
 	mcs51.irq_active |= (1 << priority_request);
 
 	LOG(("Take: %d %02x\n", mcs51.cur_irq_prio, mcs51.irq_active));
-
-	//printf("irq cip %d, act %02x\n",mcs51.cur_irq_prio,  mcs51.irq_active);
 
 	//Clear any interrupt flags that should be cleared since we're servicing the irq!
 	switch(int_vec) {
@@ -2239,6 +2265,7 @@ static void i80c31_init(int index, int clock, const void *config, int (*irqcallb
  * DS5002FP Section
  ****************************************************************************/
 #if 0
+
 
 #define DS5_LOGW(a, d) 	LOG(("ds5002fp #%d: write to  " # a " register at 0x%04x, data=%x\n", cpu_getactivecpu(), PC, d))
 #define DS5_LOGR(a, d) 	LOG(("ds5002fp #%d: read from " # a " register at 0x%04x\n", cpu_getactivecpu(), PC))
