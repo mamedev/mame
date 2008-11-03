@@ -1407,8 +1407,7 @@ ROM_START( samuraia )
 	ROM_LOAD( "u34.bin",  0x000000, 0x100000, CRC(e6a75bd8) SHA1(1aa84ea54584b6c8b2846194b48bf6d2afa67fee) )
 	ROM_LOAD( "u35.bin",  0x100000, 0x100000, CRC(c4ca0164) SHA1(c75422de2e0127cdc23d8c223b674a5bd85b00fb) )
 
-//  ROM_REGION( 0x100000, "ymf", 0 )  /* Samples */
-	ROM_REGION( 0x100000, "ymf", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "ym", 0 )	/* Samples */
 	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(9a7f6c34) SHA1(c549b209bce1d2c6eeb512db198ad20c3f5fb0ea) )
 
 	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
@@ -1433,8 +1432,7 @@ ROM_START( sngkace )
 	ROM_LOAD( "u34.bin",  0x000000, 0x100000, CRC(e6a75bd8) SHA1(1aa84ea54584b6c8b2846194b48bf6d2afa67fee) )
 	ROM_LOAD( "u35.bin",  0x100000, 0x100000, CRC(c4ca0164) SHA1(c75422de2e0127cdc23d8c223b674a5bd85b00fb) )
 
-//  ROM_REGION( 0x100000, "ymf", 0 )  /* Samples */
-	ROM_REGION( 0x100000, "ymf", 0 )	/* Samples */
+	ROM_REGION( 0x100000, "ym", 0 )	/* Samples */
 	ROM_LOAD( "u68.bin",  0x000000, 0x100000, CRC(9a7f6c34) SHA1(c549b209bce1d2c6eeb512db198ad20c3f5fb0ea) )
 
 	ROM_REGION( 0x040000, "user1", 0 )	/* Sprites LUT */
@@ -1445,8 +1443,8 @@ ROM_END
 static DRIVER_INIT( sngkace )
 {
 	{
-		UINT8 *RAM	=	memory_region(machine, "ymf");
-		int len				=	memory_region_length(machine, "ymf");
+		UINT8 *RAM	=	memory_region(machine, "ym");
+		int len		=	memory_region_length(machine, "ym");
 		int i;
 
 		/* Bit 6&7 of the samples are swapped. Naughty, naughty... */
@@ -1605,7 +1603,7 @@ ROM_START( btlkroad )
 	ROM_LOAD( "u14.bin",  0x000000, 0x200000, CRC(282d89c3) SHA1(3b4b17f4a37efa2f7e232488aaba7c77d10c84d2) )
 	ROM_LOAD( "u24.bin",  0x200000, 0x200000, CRC(bbe9d3d1) SHA1(9da0b0b993e8271a8119e9c2f602e52325983f79) )
 	ROM_LOAD( "u15.bin",  0x400000, 0x200000, CRC(d4d1b07c) SHA1(232109db8f6e137fbc8826f38a96057067cb19dc) )
-//  ROM_LOAD( "u25.bin",  CRC(00600000) , 0x100000  NOT PRESENT
+//  ROM_LOAD( "u25.bin",  0x600000, 0x100000  NOT PRESENT
 
 	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layers 0 + 1 */
 	ROM_LOAD( "u33.bin",  0x000000, 0x200000, CRC(4c8577f1) SHA1(d27043514632954a06667ac63f4a4e4a31870511) )
