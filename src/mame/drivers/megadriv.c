@@ -105,8 +105,8 @@ static int _32x_240mode;
 static int sh2_master_vint_enable, sh2_slave_vint_enable;
 static int sh2_master_hint_enable, sh2_slave_hint_enable;
 static int sh2_master_cmdint_enable, sh2_slave_cmdint_enable;
-static int sh2_master_pwmint_enable, sh2_slave_pwnint_enable;
-
+static int sh2_master_pwmint_enable, sh2_slave_pwmint_enable;
+static int sh2_hint_in_vbl;
 
 #define SH2_VRES_IRQ_LEVEL 14
 #define SH2_VINT_IRQ_LEVEL 12
@@ -2528,6 +2528,81 @@ ADDRESS_MAP_END
 /****************************************** 32X related ******************************************/
 
 
+static UINT16 _32x_autofill_length;
+static UINT16 _32x_autofill_address;
+static UINT16 _32x_autofill_data;
+
+
+
+static READ16_HANDLER( _32x_68k_a15184_r )
+{
+	return _32x_autofill_length;
+}
+
+static WRITE16_HANDLER( _32x_68k_a15184_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		_32x_autofill_length = data & 0xff;
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+
+	}
+}
+
+static READ16_HANDLER( _32x_68k_a15186_r )
+{
+	return _32x_autofill_address;
+}
+
+static WRITE16_HANDLER( _32x_68k_a15186_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		_32x_autofill_address = (_32x_autofill_address & 0xff00) | (data & 0x00ff);
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		_32x_autofill_address = (_32x_autofill_address & 0x00ff) | (data & 0xff00);
+	}
+}
+
+static READ16_HANDLER( _32x_68k_a15188_r )
+{
+	return _32x_autofill_data;
+}
+
+static WRITE16_HANDLER( _32x_68k_a15188_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		_32x_autofill_data = (_32x_autofill_data & 0xff00) | (data & 0x00ff);
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		_32x_autofill_data = (_32x_autofill_data & 0x00ff) | (data & 0xff00);
+	}
+
+	// do the fill - shouldn't be instant..
+	{
+		int i;
+		UINT16 upper = _32x_autofill_address & 0xff00;
+		UINT8 lower = _32x_autofill_address & 0x00ff;
+
+		for (i=0; i<_32x_autofill_length+1;i++)
+		{
+			UINT16 address = upper | lower;
+			_32x_access_dram[address] = _32x_autofill_data;
+			lower++;
+		}
+	}
+}
+
+
 
 static READ16_HANDLER( _32x_68k_palette_r )
 {
@@ -2650,14 +2725,14 @@ static READ32_HANDLER( _32x_sh2_dram_r )
 {
 	UINT32 retvalue = 0x00000000;
 
-	if (ACCESSING_BITS_16_31) // 4108
+	if (ACCESSING_BITS_16_31)
 	{
 		UINT16 ret = 0x0000;
 		ret = _32x_68k_dram_r(machine,offset*2,(mem_mask>>16)&0xffff);
 		retvalue |= ret << 16;
 	}
 
-	if (ACCESSING_BITS_0_15) // 4108
+	if (ACCESSING_BITS_0_15)
 	{
 		UINT16 ret = 0x0000;
 		ret = _32x_68k_dram_r(machine,offset*2+1,(mem_mask>>0)&0xffff);
@@ -2724,7 +2799,7 @@ static READ32_HANDLER( sh2_4108_410a_r )
 	if (ACCESSING_BITS_16_31) // 4108
 	{
 		UINT16 ret = 0x0000;
-		printf("sh2 read access 4108\n");
+		ret = _32x_68k_a15188_r(machine, offset*2, mem_mask>>16); // autofill data
 		retvalue |= (ret << 16);
 	}
 	if (ACCESSING_BITS_0_15) // 410a
@@ -2742,13 +2817,26 @@ static WRITE32_HANDLER( sh2_4108_410a_w )
 {
 	if (ACCESSING_BITS_16_31) // 4108
 	{
-		printf("sh2 write access 4108\n");
+		_32x_68k_a15188_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);  // autofill data
 	}
 	if (ACCESSING_BITS_0_15) // 410a
 	{
 		_32x_68k_fbcontrol_w(machine,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff);
 	}
 }
+
+static WRITE32_HANDLER( sh2_4104_4106_w )
+{
+	if (ACCESSING_BITS_16_31) // 4104
+	{
+		_32x_68k_a15184_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);  // autofill length
+	}
+	if (ACCESSING_BITS_0_15) // 4106
+	{
+		_32x_68k_a15186_w(machine,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff); // autofill address
+	}
+}
+
 
 
 
@@ -2833,10 +2921,15 @@ static WRITE32_HANDLER( sh2_4100_4102_w )
 }
 
 
+
+
+
+
 static ADDRESS_MAP_START( sh2_main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 
 	AM_RANGE(0x00004100, 0x00004103) AM_READWRITE( sh2_4100_4102_r, sh2_4100_4102_w )
+	AM_RANGE(0x00004104, 0x00004107) AM_WRITE( sh2_4104_4106_w )
 	AM_RANGE(0x00004108, 0x0000410b) AM_READWRITE( sh2_4108_410a_r, sh2_4108_410a_w )
 
 	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE(_32x_sh2_palette_r, _32x_sh2_palette_w)
@@ -2846,12 +2939,14 @@ static ADDRESS_MAP_START( sh2_main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x06000000, 0x0603ffff) AM_RAM AM_SHARE(10)
 	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_REGION("gamecart_sh2", 0)
 
-	AM_RANGE(0xc0000000, 0xc00003ff) AM_RAM
+	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sh2_slave_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 
+	AM_RANGE(0x00004100, 0x00004103) AM_READWRITE( sh2_4100_4102_r, sh2_4100_4102_w )
+	AM_RANGE(0x00004104, 0x00004107) AM_WRITE( sh2_4104_4106_w )
 	AM_RANGE(0x00004108, 0x0000410b) AM_READWRITE( sh2_4108_410a_r, sh2_4108_410a_w )
 
 	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE(_32x_sh2_palette_r, _32x_sh2_palette_w)
@@ -2861,7 +2956,7 @@ static ADDRESS_MAP_START( sh2_slave_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x06000000, 0x0603ffff) AM_RAM AM_SHARE(10)
 	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_REGION("gamecart_sh2", 0)
 
-	AM_RANGE(0xc0000000, 0xc00003ff) AM_RAM
+	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -5939,9 +6034,7 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine)
 // these are tests for 'special case' hardware to make sure I don't break anything while rearranging things
 //
 
-static UINT16 _32x_autofill_length;
-static UINT16 _32x_autofill_address;
-static UINT16 _32x_autofill_data;
+
 
 static UINT16 _32x_a15104;
 
@@ -6294,21 +6387,21 @@ UINT16 comms_port[8];
 
 static READ32_HANDLER( sh2_commsport_r )
 {
-	timer_call_after_resynch(NULL, 0, NULL);
+//	timer_call_after_resynch(NULL, 0, NULL);
 	return (comms_port[offset*2] << 16) | (comms_port[offset*2+1]);
 }
 
 
 static READ16_HANDLER( _32x_68k_comms_r )
 {
-	timer_call_after_resynch(NULL, 0, NULL);
+//	timer_call_after_resynch(NULL, 0, NULL);
 	return comms_port[offset];
 }
 
 static WRITE16_HANDLER( _32x_68k_comms_w )
 {
 	COMBINE_DATA(&comms_port[offset]);
-	timer_call_after_resynch(NULL, 0, NULL);
+//	timer_call_after_resynch(NULL, 0, NULL);
 
 }
 
@@ -6330,7 +6423,7 @@ static WRITE32_HANDLER( sh2_commsport_w )
 //static int sh2_master_vint_enable, sh2_slave_vint_enable;
 //static int sh2_master_hint_enable, sh2_slave_hint_enable;
 //static int sh2_master_cmdint_enable, sh2_slave_cmdint_enable;
-//static int sh2_master_pwmint_enable, sh2_slave_pwnint_enable;
+//static int sh2_master_pwmint_enable, sh2_slave_pwmint_enable;
 
 
 static WRITE16_HANDLER( _sh2_master_irq_control_w )
@@ -6344,6 +6437,7 @@ static WRITE16_HANDLER( _sh2_master_irq_control_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
+		sh2_hint_in_vbl = data & 0x80;
 		sh2_master_vint_enable = data & 0x8;
 		sh2_master_hint_enable = data & 0x4;
 		sh2_master_cmdint_enable = data & 0x2;
@@ -6366,13 +6460,14 @@ static WRITE16_HANDLER( _sh2_slave_irq_control_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
+		sh2_hint_in_vbl = data & 0x80;
 		sh2_slave_vint_enable = data & 0x8;
 		sh2_slave_hint_enable = data & 0x4;
 		sh2_slave_cmdint_enable = data & 0x2;
-		sh2_slave_pwnint_enable = data & 0x1;
+		sh2_slave_pwmint_enable = data & 0x1;
 
 		if (sh2_slave_hint_enable) printf("sh2_slave_hint_enable enable!\n");
-		if (sh2_slave_pwnint_enable) printf("sh2_slave_pwm_enable enable!\n");
+		if (sh2_slave_pwmint_enable) printf("sh2_slave_pwm_enable enable!\n");
 
 	}
 }
@@ -6415,6 +6510,13 @@ static READ16_HANDLER( _32x_4000_master_r )
 {
 	UINT16 retvalue = 0x0200;
 	retvalue |= _32x_access_auth << 15;
+
+	retvalue |=	sh2_hint_in_vbl;;
+	retvalue |= sh2_master_vint_enable;
+	retvalue |= sh2_master_hint_enable;
+	retvalue |= sh2_master_cmdint_enable;
+	retvalue |= sh2_master_pwmint_enable;
+
 	return retvalue;
 }
 
@@ -6422,6 +6524,12 @@ static READ16_HANDLER( _32x_4000_slave_r )
 {
 	UINT16 retvalue = 0x0200;
 	retvalue |= _32x_access_auth << 15;
+	retvalue |=	sh2_hint_in_vbl;;
+	retvalue |= sh2_slave_vint_enable;
+	retvalue |= sh2_slave_hint_enable;
+	retvalue |= sh2_slave_cmdint_enable;
+	retvalue |= sh2_slave_pwmint_enable;
+
 	return retvalue;
 }
 
@@ -6482,68 +6590,6 @@ static READ32_HANDLER( sh2_4000_slave_r )
 
 
 
-
-
-
-
-static READ16_HANDLER( _32x_68k_a15184_r )
-{
-	return _32x_autofill_length;
-}
-
-static WRITE16_HANDLER( _32x_68k_a15184_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		_32x_autofill_length = data & 0xff;
-		printf("32x set autofill length to %02x\n",_32x_autofill_length);
-	}
-
-	if (ACCESSING_BITS_8_15)
-	{
-
-	}
-}
-
-static READ16_HANDLER( _32x_68k_a15186_r )
-{
-	return _32x_autofill_address;
-}
-
-static WRITE16_HANDLER( _32x_68k_a15186_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		_32x_autofill_address = (_32x_autofill_address & 0xff00) | (data & 0x00ff);
-	}
-
-	if (ACCESSING_BITS_8_15)
-	{
-		_32x_autofill_address = (_32x_autofill_address & 0x00ff) | (data & 0xff00);
-	}
-
-	printf("32x set autofill address to %04x\n",_32x_autofill_address);
-}
-
-static READ16_HANDLER( _32x_68k_a15188_r )
-{
-	return _32x_autofill_data;
-}
-
-static WRITE16_HANDLER( _32x_68k_a15188_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		_32x_autofill_data = (_32x_autofill_data & 0xff00) | (data & 0x00ff);
-	}
-
-	if (ACCESSING_BITS_8_15)
-	{
-		_32x_autofill_data = (_32x_autofill_data & 0x00ff) | (data & 0xff00);
-	}
-
-	printf("32x set autofill data to %04x (performing fill)\n",_32x_autofill_data);
-}
 
 
 
@@ -6641,7 +6687,7 @@ static int a15102_reg;
 static READ16_HANDLER( _32x_68k_a15102_r )
 {
 	//printf("_32x_68k_a15102_r\n");
-	return 0x0000;// a15102_reg;
+	return 0x0000;//a15102_reg;
 }
 
 static WRITE16_HANDLER( _32x_68k_a15102_w )
@@ -6727,7 +6773,7 @@ DRIVER_INIT( _32x )
 	sh2_master_vint_enable = sh2_slave_vint_enable = 0;
 	sh2_master_hint_enable = sh2_slave_hint_enable = 0;
 	sh2_master_cmdint_enable = sh2_slave_cmdint_enable = 0;
-	sh2_master_pwmint_enable = sh2_slave_pwnint_enable = 0;
+	sh2_master_pwmint_enable = sh2_slave_pwmint_enable = 0;
 
 	// start in a reset state
 	sh2_are_running = 0;
@@ -6742,6 +6788,10 @@ DRIVER_INIT( _32x )
 	_32x_videopriority = 0; // MD priority
 	_32x_displaymode = 0;
 	_32x_240mode = 0;
+
+// checking if these help brutal, they don't.
+//	cpunum_set_info_int(2, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+//	cpunum_set_info_int(3, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	DRIVER_INIT_CALL(megadriv);
 }
@@ -6765,13 +6815,14 @@ ROM_START( 32x_bios )
 //	ROM_LOAD( "32x_koli.bin", 0x000000,   0x300000, CRC(20ca53ef) SHA1(191ae0b525ecf32664086d8d748e0b35f776ddfe) ) // works but needs very tight cpu sync or game just stutters
 //  ROM_LOAD( "32x_head.bin", 0x000000,   0x300000,  CRC(ef5553ff) SHA1(4e872fbb44ecb2bd730abd8cc8f32f96b10582c0) ) // doesn't boot
 //	ROM_LOAD( "32x_pit.bin", 0x000000,   0x300000, CRC(f9126f15) SHA1(ee864d1677c6d976d0846eb5f8d8edb839acfb76) ) // ok, needs vram fill on intro screens tho?
-//	ROM_LOAD( "32x_spid.bin", 0x000000,   0x300000, CRC(29dce257) SHA1(7cc2ea1e10f110338ad880bd3e7ff3bce72e7e9e) ) // needs cmdint status reads, overwrite image support wrong?
+//	ROM_LOAD( "32x_spid.bin", 0x000000,   0x300000, CRC(29dce257) SHA1(7cc2ea1e10f110338ad880bd3e7ff3bce72e7e9e) ) // needs cmdint status reads, overwrite image support wrong? priority handling wrong??
 //	ROM_LOAD( "32x_carn.bin", 0x000000,   0x300000, CRC(7c7be6a2) SHA1(9a563ed821b483148339561ebd2b876efa58847b) ) // ?? doesn't boot
 //	ROM_LOAD( "32x_raw.bin", 0x000000,   0x400000, CRC(8eb7cd2c) SHA1(94b974f2f69f0c10bc18b349fa4ff95ca56fa47b) ) // needs cmdint status reads
 //	ROM_LOAD( "32x_darx.bin", 0x000000,   0x200000, CRC(22d7c906) SHA1(108b4ffed8643abdefa921cfb58389b119b47f3d) ) // ?? probably abuses the hardware, euro only ;D
-//	ROM_LOAD( "32x_prim.bin", 0x000000,   0x400000, CRC(e78a4d28) SHA1(5084dcca51d76173c383ab7d04cbc661673545f7) ) // needs screen clears
+//	ROM_LOAD( "32x_prim.bin", 0x000000,   0x400000, CRC(e78a4d28) SHA1(5084dcca51d76173c383ab7d04cbc661673545f7) ) // needs tight sync or fails after sega logo - works with tight sync, but VERY slow
 //	ROM_LOAD( "32x_brut.bin", 0x000000,   0x300000, CRC(7a72c939) SHA1(40aa2c787f37772cdbd7280b8be06b15421fabae) ) // locks up left in attract, doesn't scroll, no idea...
 //  ROM_LOAD( "32x_temp.bin", 0x000000,  0x300000, CRC(14e5c575) SHA1(6673ba83570b4f2c1b4a22415a56594c3cc6c6a9) ) // needs ram fills and DREQ? (no main character)
+//  ROM_LOAD( "32x_vr.bin", 0x000000,  0x300000, CRC(1) SHA1(1) ) // doesn't work
 
 	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
 	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
