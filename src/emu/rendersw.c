@@ -1650,6 +1650,140 @@ static void FUNC_PREFIX(draw_quad_rgb32)(const render_primitive *prim, void *dst
 }
 
 
+/*-------------------------------------------------
+    draw_quad_rgb32_add - perform
+    rasterization by using RGB add
+-------------------------------------------------*/
+
+static void FUNC_PREFIX(draw_quad_rgb32_add)(const render_primitive *prim, void *dstdata, UINT32 pitch, quad_setup_data *setup)
+{
+	const rgb_t *palbase = prim->texture.palette;
+	INT32 dudx = setup->dudx;
+	INT32 dvdx = setup->dvdx;
+	INT32 endx = setup->endx;
+	INT32 x, y;
+
+	/* simply can't do this without reading from the dest */
+	if (NO_DEST_READ)
+		return;
+
+	/* fast case: no coloring, no alpha */
+	if (prim->color.r >= 1.0f && prim->color.g >= 1.0f && prim->color.b >= 1.0f && IS_OPAQUE(prim->color.a))
+	{
+		/* loop over rows */
+		for (y = setup->starty; y < setup->endy; y++)
+		{
+			PIXEL_TYPE *dest = (PIXEL_TYPE *)dstdata + y * pitch + setup->startx;
+			INT32 curu = setup->startu + (y - setup->starty) * setup->dudy;
+			INT32 curv = setup->startv + (y - setup->starty) * setup->dvdy;
+
+			/* no lookup case */
+			if (palbase == NULL)
+			{
+				/* loop over cols */
+				for (x = setup->startx; x < endx; x++)
+				{
+					UINT32 pix = GET_TEXEL(argb32)(&prim->texture, curu, curv);
+					UINT32 dpix = NO_DEST_READ ? 0 : *dest;
+					UINT32 r = SOURCE32_R(pix) + DEST_R(dpix);
+					UINT32 g = SOURCE32_G(pix) + DEST_G(dpix);
+					UINT32 b = SOURCE32_B(pix) + DEST_B(dpix);
+					r = (r | -(r >> (8 - SRCSHIFT_R))) & (0xff >> SRCSHIFT_R);
+					g = (g | -(g >> (8 - SRCSHIFT_G))) & (0xff >> SRCSHIFT_G);
+					b = (b | -(b >> (8 - SRCSHIFT_B))) & (0xff >> SRCSHIFT_B);
+					*dest++ = DEST_ASSEMBLE_RGB(r, g, b);
+					curu += dudx;
+					curv += dvdx;
+				}
+			}
+
+			/* lookup case */
+			else
+			{
+				/* loop over cols */
+				for (x = setup->startx; x < endx; x++)
+				{
+					UINT32 pix = GET_TEXEL(argb32)(&prim->texture, curu, curv);
+					UINT32 dpix = NO_DEST_READ ? 0 : *dest;
+					UINT32 r = (palbase[(pix >> 16) & 0xff] >> SRCSHIFT_R) + DEST_R(dpix);
+					UINT32 g = (palbase[(pix >> 8) & 0xff] >> SRCSHIFT_G) + DEST_G(dpix);
+					UINT32 b = (palbase[(pix >> 0) & 0xff] >> SRCSHIFT_B) + DEST_B(dpix);
+					r = (r | -(r >> (8 - SRCSHIFT_R))) & (0xff >> SRCSHIFT_R);
+					g = (g | -(g >> (8 - SRCSHIFT_G))) & (0xff >> SRCSHIFT_G);
+					b = (b | -(b >> (8 - SRCSHIFT_B))) & (0xff >> SRCSHIFT_B);
+					*dest++ = DEST_ASSEMBLE_RGB(r, g, b);
+					curu += dudx;
+					curv += dvdx;
+				}
+			}
+		}
+	}
+
+	/* alpha and/or coloring case */
+	else
+	{
+		UINT32 sr = (UINT32)(256.0f * prim->color.r);
+		UINT32 sg = (UINT32)(256.0f * prim->color.g);
+		UINT32 sb = (UINT32)(256.0f * prim->color.b);
+		UINT32 sa = (UINT32)(256.0f * prim->color.a);
+
+		/* clamp R,G,B and inverse A to 0-256 range */
+		if (sr > 0x100) { if ((INT32)sr < 0) sr = 0; else sr = 0x100; }
+		if (sg > 0x100) { if ((INT32)sg < 0) sg = 0; else sg = 0x100; }
+		if (sb > 0x100) { if ((INT32)sb < 0) sb = 0; else sb = 0x100; }
+		if (sa > 0x100) { if ((INT32)sa < 0) sa = 0; else sa = 0x100; }
+
+		/* loop over rows */
+		for (y = setup->starty; y < setup->endy; y++)
+		{
+			PIXEL_TYPE *dest = (PIXEL_TYPE *)dstdata + y * pitch + setup->startx;
+			INT32 curu = setup->startu + (y - setup->starty) * setup->dudy;
+			INT32 curv = setup->startv + (y - setup->starty) * setup->dvdy;
+
+			/* no lookup case */
+			if (palbase == NULL)
+			{
+				/* loop over cols */
+				for (x = setup->startx; x < endx; x++)
+				{
+					UINT32 pix = GET_TEXEL(argb32)(&prim->texture, curu, curv);
+					UINT32 dpix = NO_DEST_READ ? 0 : *dest;
+					UINT32 r = ((SOURCE32_R(pix) * sr * sa) >> 16) + DEST_R(dpix);
+					UINT32 g = ((SOURCE32_G(pix) * sg * sa) >> 16) + DEST_G(dpix);
+					UINT32 b = ((SOURCE32_B(pix) * sb * sa) >> 16) + DEST_B(dpix);
+					r = (r | -(r >> (8 - SRCSHIFT_R))) & (0xff >> SRCSHIFT_R);
+					g = (g | -(g >> (8 - SRCSHIFT_G))) & (0xff >> SRCSHIFT_G);
+					b = (b | -(b >> (8 - SRCSHIFT_B))) & (0xff >> SRCSHIFT_B);
+					*dest++ = DEST_ASSEMBLE_RGB(r, g, b);
+					curu += dudx;
+					curv += dvdx;
+				}
+			}
+
+			/* lookup case */
+			else
+			{
+				/* loop over cols */
+				for (x = setup->startx; x < endx; x++)
+				{
+					UINT32 pix = GET_TEXEL(argb32)(&prim->texture, curu, curv);
+					UINT32 dpix = NO_DEST_READ ? 0 : *dest;
+					UINT32 r = ((palbase[(pix >> 16) & 0xff] * sr * sa) >> (16 + SRCSHIFT_R)) + DEST_R(dpix);
+					UINT32 g = ((palbase[(pix >> 8) & 0xff] * sr * sa) >> (16 + SRCSHIFT_R)) + DEST_G(dpix);
+					UINT32 b = ((palbase[(pix >> 0) & 0xff] * sr * sa) >> (16 + SRCSHIFT_R)) + DEST_B(dpix);
+					r = (r | -(r >> (8 - SRCSHIFT_R))) & (0xff >> SRCSHIFT_R);
+					g = (g | -(g >> (8 - SRCSHIFT_G))) & (0xff >> SRCSHIFT_G);
+					b = (b | -(b >> (8 - SRCSHIFT_B))) & (0xff >> SRCSHIFT_B);
+					*dest++ = DEST_ASSEMBLE_RGB(r, g, b);
+					curu += dudx;
+					curv += dvdx;
+				}
+			}
+		}
+	}
+}
+
+
 
 /***************************************************************************
     32-BIT ARGB QUAD RASTERIZERS
@@ -2165,6 +2299,10 @@ static void FUNC_PREFIX(setup_and_draw_textured_quad)(const render_primitive *pr
 		case PRIMFLAG_TEXFORMAT(TEXFORMAT_RGB32) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA):
 		case PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32) | PRIMFLAG_BLENDMODE(BLENDMODE_NONE):
 			FUNC_PREFIX(draw_quad_rgb32)(prim, dstdata, pitch, &setup);
+			break;
+
+		case PRIMFLAG_TEXFORMAT(TEXFORMAT_RGB32) | PRIMFLAG_BLENDMODE(BLENDMODE_ADD):
+			FUNC_PREFIX(draw_quad_rgb32_add)(prim, dstdata, pitch, &setup);
 			break;
 
 		case PRIMFLAG_TEXFORMAT(TEXFORMAT_ARGB32) | PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA):
