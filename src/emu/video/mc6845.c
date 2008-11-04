@@ -44,18 +44,6 @@ enum
 };
 
 
-/* mode control bits */
-
-#define MODE_INTERLACED				0x01 /* not supported */
-#define MODE_VIDEO					0x02 /* not supported */
-#define MODE_ROW_COLUMN_ADDRESSING	0x04 /* not supported */
-#define MODE_TRANSPARENT_ADDRESSING	0x08 /* not supported */
-#define MODE_DISPLAY_ENABLE_SKEW	0x10
-#define MODE_CURSOR_SKEW			0x20
-#define MODE_RA4_IS_UPDATE_STROBE	0x40 /* not supported */
-#define MODE_INTERLEAVED_UPDATES	0x80 /* not supported */
-
-
 /* tags for state saving */
 static const char * const device_tags[NUM_TYPES] = {     "mc6845", "mc6845-1", "c6545-1", "r6545-1", "h46505", "hd6845", "sy6545-1" };
 
@@ -64,7 +52,6 @@ static const int supports_disp_start_addr_r[NUM_TYPES] = {  TRUE,       TRUE,   
 static const int supports_vert_sync_width[NUM_TYPES]   = { FALSE,       TRUE,      TRUE,      TRUE,    FALSE,     TRUE,       TRUE };
 static const int supports_status_reg_d5[NUM_TYPES]     = { FALSE,      FALSE,      TRUE,      TRUE,    FALSE,    FALSE,       TRUE };
 static const int supports_status_reg_d6[NUM_TYPES]     = { FALSE,      FALSE,      TRUE,      TRUE,    FALSE,    FALSE,       TRUE };
-static const int supports_status_reg_d7[NUM_TYPES]     = { FALSE,      FALSE,     FALSE,     FALSE,    FALSE,    FALSE,       TRUE };
 
 
 typedef struct _mc6845_t mc6845_t;
@@ -90,7 +77,6 @@ struct _mc6845_t
 	UINT16	disp_start_addr;	/* 0x0c/0x0d */
 	UINT16	cursor_addr;		/* 0x0e/0x0f */
 	UINT16	light_pen_addr;		/* 0x10/0x11 */
-	UINT16	update_addr;		/* 0x12/0x13 */
 
 	/* other internal state */
 	UINT64	clock;
@@ -118,7 +104,6 @@ struct _mc6845_t
 	UINT16	vsync_off_pos;
 	UINT16  current_disp_addr;	/* the display address currently drawn */
 	UINT8	light_pen_latched;
-	int		update_ready;
 	int		has_valid_parameters;
 };
 
@@ -174,10 +159,6 @@ READ8_DEVICE_HANDLER( mc6845_status_r )
 	if (supports_status_reg_d6[mc6845->device_type] && mc6845->light_pen_latched)
 	   ret = ret | 0x40;
 
-	/* update ready */
-	if (supports_status_reg_d7[mc6845->device_type] && mc6845->update_ready)
-	   ret = ret | 0x80;
-
 	return ret;
 }
 
@@ -195,7 +176,6 @@ READ8_DEVICE_HANDLER( mc6845_register_r )
 		case 0x0f:  ret = (mc6845->cursor_addr    >> 0) & 0xff; break;
 		case 0x10:  ret = (mc6845->light_pen_addr >> 8) & 0xff; mc6845->light_pen_latched = FALSE; break;
 		case 0x11:  ret = (mc6845->light_pen_addr >> 0) & 0xff; mc6845->light_pen_latched = FALSE; break;
-		case 0x1f:  mc6845->update_ready = 0; mc6845->update_addr = (mc6845->update_addr + 1) & 0x3fff; break;
 
 		/* all other registers are write only and return 0 */
 		default: break;
@@ -231,14 +211,11 @@ WRITE8_DEVICE_HANDLER( mc6845_register_w )
 		case 0x0f:  mc6845->cursor_addr      = ((data & 0xff) << 0) | (mc6845->cursor_addr & 0xff00); break;
 		case 0x10: /* read-only */ break;
 		case 0x11: /* read-only */ break;
-		case 0x12:  mc6845->update_addr      = ((data & 0x3f) << 8) | (mc6845->update_addr & 0x00ff); break;
-		case 0x13:  mc6845->update_addr      = ((data & 0xff) << 0) | (mc6845->update_addr & 0xff00); break;
-		case 0x1f:  mc6845->update_ready = 0; mc6845->update_addr = (mc6845->update_addr + 1) & 0x3fff; break;
 		default: break;
 	}
 
-	/* display message if the Mode Control register has unsupported bits active */
-	if ((mc6845->register_address_latch == 0x08) && (mc6845->mode_control & ~(MODE_DISPLAY_ENABLE_SKEW | MODE_CURSOR_SKEW)))
+	/* display message if the Mode Control register is not zero */
+	if ((mc6845->register_address_latch == 0x08) && (mc6845->mode_control != 0))
 		popmessage("Mode Control %02X is not supported!!!", mc6845->mode_control);
 
 	recompute_parameters(mc6845, FALSE);
@@ -301,8 +278,8 @@ static void recompute_parameters(mc6845_t *mc6845, int postload)
 
 				visarea.min_x = 0;
 				visarea.min_y = 0;
-				visarea.max_x = hsync_on_pos - 1;
-				visarea.max_y = vsync_on_pos - 1;
+				visarea.max_x = max_visible_x;
+				visarea.max_y = max_visible_y;
 
 				if (LOG) logerror("M6845 config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
 								  horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
@@ -333,18 +310,7 @@ static void recompute_parameters(mc6845_t *mc6845, int postload)
 
 INLINE int is_display_enabled(mc6845_t *mc6845)
 {
-	int x = video_screen_get_hpos(mc6845->screen);
-	int x0 = 0;
-	int x1 = mc6845->max_visible_x;
-	int y = video_screen_get_vpos(mc6845->screen);
-
-	if (mc6845->mode_control & MODE_DISPLAY_ENABLE_SKEW)
-	{
-		x0 += mc6845->hpixels_per_column;
-		x1 += mc6845->hpixels_per_column;
-	}
-	
-	return (x >= x0) && (x <= x1) && (y <= mc6845->max_visible_y);
+	return !video_screen_get_vblank(mc6845->screen) && !video_screen_get_hblank(mc6845->screen);
 }
 
 
@@ -388,10 +354,6 @@ static void update_de_changed_timer(mc6845_t *mc6845)
 				next_y = 0;
 		}
 
-		/* delay display enable for 1 character time if skew is enabled */
-		if (mc6845->mode_control & MODE_DISPLAY_ENABLE_SKEW)
-			next_x += mc6845->hpixels_per_column;
-
 		if (next_y != -1)
 			duration = video_screen_get_time_until_pos(mc6845->screen, next_y, next_x);
 		else
@@ -415,6 +377,10 @@ static void update_hsync_changed_timers(mc6845_t *mc6845)
 		/* trigger on the next line */
 		else
 			next_y = (video_screen_get_vpos(mc6845->screen) + 1) % mc6845->vert_pix_total;
+
+		/* if the next line is not in the visible region, go to the beginning of the screen */
+		if (next_y > mc6845->max_visible_y)
+			next_y = 0;
 
 		timer_adjust_oneshot(mc6845->hsync_on_timer,  video_screen_get_time_until_pos(mc6845->screen, next_y, mc6845->hsync_on_pos) , 0);
 		timer_adjust_oneshot(mc6845->hsync_off_timer, video_screen_get_time_until_pos(mc6845->screen, next_y, mc6845->hsync_off_pos), 0);
@@ -674,7 +640,7 @@ void mc6845_update(const device_config *device, bitmap_t *bitmap, const rectangl
 		}
 
 		/* for each row in the visible region */
-		for (y = cliprect->min_y; y <= MIN(cliprect->max_y, mc6845->max_visible_y); y++)
+		for (y = cliprect->min_y; y <= cliprect->max_y; y++)
 		{
 			/* compute the current raster line */
 			UINT8 ra = y % (mc6845->max_ras_addr + 1);
@@ -688,10 +654,6 @@ void mc6845_update(const device_config *device, bitmap_t *bitmap, const rectangl
 
 			/* compute the cursor X position, or -1 if not visible */
 			INT8 cursor_x = cursor_visible ? (mc6845->cursor_addr - mc6845->current_disp_addr) : -1;
-
-			/* delay cursor for 1 character time if skew is enabled */
-			if (mc6845->mode_control & MODE_CURSOR_SKEW)
-				cursor_x += mc6845->hpixels_per_column;
 
 			/* call the external system to draw it */
 			mc6845->intf->update_row(device, bitmap, cliprect, mc6845->current_disp_addr, ra, y, mc6845->horiz_disp, cursor_x, param);
@@ -784,8 +746,6 @@ static device_start_err common_start(const device_config *device, int device_typ
 	state_save_register_item(unique_tag, 0, mc6845->light_pen_latched);
 	state_save_register_item(unique_tag, 0, mc6845->cursor_state);
 	state_save_register_item(unique_tag, 0, mc6845->cursor_blink_count);
-	state_save_register_item(unique_tag, 0, mc6845->update_addr);
-	state_save_register_item(unique_tag, 0, mc6845->update_ready);
 
 	return DEVICE_START_OK;
 }
