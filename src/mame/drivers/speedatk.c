@@ -5,9 +5,9 @@ Speed Attack! (c) 1984 Seta Kikaku Corp.
 driver by Pierpaolo Prazzoli & Angelo Salese, based on early work by David Haywood
 
 TODO:
- - Coinage Dip Switch doesn't match the readme? Also there are wrong coin insertions even
-   with the bit impulse macro. There are chances that there's a circuitry which controls
-   both...
+ - Video emulation requires a major conversion to the HD46505SP C.R.T. chip (MC6845 clone)
+ - It's possible that there is only one coin chute and not two,needs a real board to know
+   more about it.
 
 How to play:
  - A to D selects a card.
@@ -78,10 +78,11 @@ PS / PD :  key matrix
 #include "sound/ay8910.h"
 
 static UINT8 mux_data;
+static UINT8 km_status,coin_settings;
 
 extern WRITE8_HANDLER( speedatk_videoram_w );
 extern WRITE8_HANDLER( speedatk_colorram_w );
-extern WRITE8_HANDLER( speedatk_flip_screen_w );
+extern WRITE8_HANDLER( speedatk_videoregs_w );
 extern PALETTE_INIT( speedatk );
 extern VIDEO_START( speedatk );
 extern VIDEO_UPDATE( speedatk );
@@ -92,6 +93,21 @@ extern VIDEO_UPDATE( speedatk );
  * it handles the multiplexer device between player one and two.                       */
 static READ8_HANDLER( key_matrix_r )
 {
+	static UINT8 coin_impulse;
+
+	if(coin_impulse > 0)
+	{
+		coin_impulse--;
+		return 0x80;
+	}
+
+	if((input_port_read(machine,"COINS") & 1) || (input_port_read(machine,"COINS") & 2))
+	{
+		coin_impulse = coin_settings;
+		coin_impulse--;
+		return 0x80;
+	}
+
 	switch(mux_data)
 	{
 		case 0x02:
@@ -109,7 +125,6 @@ static READ8_HANDLER( key_matrix_r )
 				case 0x100: return 0x10;
 				case 0x200: return 0x20;
 				case 0x400: return 0x40;
-				case 0x800: return 0x80;
 				default:	return 0x00;
 			}
 		}
@@ -128,7 +143,6 @@ static READ8_HANDLER( key_matrix_r )
 				case 0x100: return 0x10;
 				case 0x200: return 0x20;
 				case 0x400: return 0x40;
-				case 0x800: return 0x80;
 				default:	return 0x00;
 			}
 		}
@@ -143,41 +157,42 @@ static WRITE8_HANDLER( key_matrix_w )
 	mux_data = data;
 }
 
-static READ8_HANDLER( read_8001 )
+/*Key matrix status,used for coin settings and I don't know what else...*/
+static READ8_HANDLER( key_matrix_status_r )
 {
-	return 1;
+	/*bit 0: busy flag,active low*/
+	return (km_status & 0xfe) | 1;
 }
 
-static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x8000, 0x8000) AM_READ(key_matrix_r)
-	AM_RANGE(0x8001, 0x8001) AM_READ(read_8001)
-	AM_RANGE(0x8588, 0x858f) AM_READ(SMH_RAM)
-	AM_RANGE(0x8800, 0x8bff) AM_READ(SMH_RAM)
-	AM_RANGE(0x8c00, 0x8fff) AM_READ(SMH_RAM)
-	AM_RANGE(0xa000, 0xa3ff) AM_READ(SMH_RAM)
-	AM_RANGE(0xb000, 0xb3ff) AM_READ(SMH_RAM)
+static WRITE8_HANDLER( key_matrix_status_w )
+{
+	km_status = data;
+	if(km_status & 0x80 && km_status < 0xa0)
+		coin_settings = km_status & 0xf;
+}
+
+static ADDRESS_MAP_START( speedatk_mem, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x8000) AM_READWRITE(key_matrix_r,key_matrix_w)
+	AM_RANGE(0x8001, 0x8001) AM_READWRITE(key_matrix_status_r,key_matrix_status_w)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(speedatk_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(speedatk_colorram_w) AM_BASE(&colorram)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x8000, 0x8000) AM_WRITE(key_matrix_w)
-	AM_RANGE(0x8588, 0x858f) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8800, 0x8bff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0x8c00, 0x8fff) AM_WRITE(SMH_RAM)
-	AM_RANGE(0xa000, 0xa3ff) AM_WRITE(speedatk_videoram_w) AM_BASE(&videoram)
-	AM_RANGE(0xb000, 0xb3ff) AM_WRITE(speedatk_colorram_w) AM_BASE(&colorram)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
+static ADDRESS_MAP_START( speedatk_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x01, 0x01) AM_WRITE(speedatk_flip_screen_w)
+	AM_RANGE(0x00, 0x01) AM_WRITE(speedatk_videoregs_w) // HD46505SP video registers
+	AM_RANGE(0x24, 0x24) AM_WRITE(SMH_NOP) //video timing
 	AM_RANGE(0x40, 0x40) AM_READ_PORT("DSW") AM_WRITE(ay8910_control_port_0_w)
 	AM_RANGE(0x41, 0x41) AM_WRITE(ay8910_write_port_0_w)
-	/* are these not used? after they're read it sets bit 7 */
-	AM_RANGE(0x60, 0x60) AM_READ(SMH_NOP)
-	AM_RANGE(0x61, 0x61) AM_READ(SMH_NOP)
-	AM_RANGE(0x68, 0x68) AM_READ(SMH_NOP)
+	/*Used only during attract mode,unknown meaning.*/
+	AM_RANGE(0x60, 0x60) AM_READWRITE(SMH_NOP,SMH_NOP)//write the result to $62/$65
+	AM_RANGE(0x61, 0x61) AM_READ(SMH_NOP)//write the result to $66
+	AM_RANGE(0x62, 0x62) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x65, 0x65) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x66, 0x66) AM_WRITE(SMH_NOP)
+	AM_RANGE(0x68, 0x68) AM_READ(SMH_NOP)//bit 7 controls writings to ram address at $880f-$8810
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( speedatk )
@@ -197,11 +212,10 @@ static INPUT_PORTS_START( speedatk )
 	PORT_DIPSETTING(    0x20, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Hardest ) )
-	/* Doesn't work? */
 	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xc0, "1 Coin/10 Credits" )
 
 	PORT_START("P1")
@@ -216,7 +230,6 @@ static INPUT_PORTS_START( speedatk )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(1) //P1 Turn
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x800, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
 
 	PORT_START("P2")
 	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2) //P2 A
@@ -230,7 +243,10 @@ static INPUT_PORTS_START( speedatk )
 	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_BUTTON5 ) PORT_PLAYER(2) //P2 Turn
 	PORT_BIT( 0x0200, IP_ACTIVE_HIGH, IPT_UNUSED )
 	PORT_BIT( 0x0400, IP_ACTIVE_HIGH, IPT_UNUSED )
-	PORT_BIT( 0x0800, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(2)
+
+	PORT_START("COINS")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
 static const gfx_layout charlayout_1bpp =
@@ -263,8 +279,8 @@ GFXDECODE_END
 
 static MACHINE_DRIVER_START( speedatk )
 	MDRV_CPU_ADD("main", Z80,12000000/2)
-	MDRV_CPU_PROGRAM_MAP(readmem,writemem)
-	MDRV_CPU_IO_MAP(io_map,0)
+	MDRV_CPU_PROGRAM_MAP(speedatk_mem,0)
+	MDRV_CPU_IO_MAP(speedatk_io,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	/* video hardware */
@@ -302,13 +318,13 @@ ROM_START( speedatk )
 	ROM_REGION( 0x6000, "gfx2", ROMREGION_DISPOSE )
 	ROM_LOAD( "cb0-5",        0x0000, 0x2000, CRC(47a966e7) SHA1(fdaa0f88656afc431bae367679ce6298fa962e0f) )
 	ROM_LOAD( "cb0-6",        0x2000, 0x2000, CRC(cc1da937) SHA1(1697bb008bfa5c33a282bd470ac39c324eea7509) )
-	ROM_COPY( "gfx2",    0x0000, 0x4000, 0x1000 ) /* Fill the blank space with cards gfx */
-	ROM_COPY( "gfx1",    0x1000, 0x5000, 0x1000 ) /* Gfx from cb0-7 */
+	ROM_COPY( "gfx2",    	  0x0000, 0x4000, 0x1000 ) /* Fill the blank space with cards gfx */
+	ROM_COPY( "gfx1",    	  0x1000, 0x5000, 0x1000 ) /* Gfx from cb0-7 */
 
 	ROM_REGION( 0x0120, "proms", 0 )
 	ROM_LOAD( "cb1.bpr",      0x0000, 0x0020, CRC(a0176c23) SHA1(133fb9eef8a6595cac2dcd7edce4789899a59e84) ) /* color PROM */
 	ROM_LOAD( "cb2.bpr",      0x0020, 0x0100, CRC(a604cf96) SHA1(a4ef6e77dcd3abe4c27e8e636222a5ee711a51f5) ) /* lookup table */
 ROM_END
 
-GAME( 1984, speedatk, 0, speedatk, speedatk, 0, ROT0, "Seta Kikaku Corp.", "Speed Attack!", 0 )
+GAME( 1984, speedatk, 0, speedatk, speedatk, 0, ROT0, "Seta Kikaku Corp.", "Speed Attack! (Japan)", 0 )
 
