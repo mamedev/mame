@@ -11,6 +11,7 @@
 
 #include "driver.h"
 #include "profiler.h"
+#include "eminline.h"
 #include "debugger.h"
 
 
@@ -115,6 +116,7 @@ static attotime perfect_interleave;
 static void cpuexec_exit(running_machine *machine);
 static void cpuexec_reset(running_machine *machine);
 static void cpu_inittimers(running_machine *machine);
+static void update_clock_information(running_machine *machine, int cpunum);
 static TIMER_CALLBACK( end_interleave_boost );
 static TIMER_CALLBACK( trigger_partial_frame_interrupt );
 static void compute_perfect_interleave(running_machine *machine);
@@ -135,6 +137,7 @@ void cpuexec_init(running_machine *machine)
 	int cpunum;
 
 	/* loop over all our CPUs */
+	memset(cpu, 0, sizeof(cpu));
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 	{
 		cpu_type cputype = machine->config->cpu[cpunum].type;
@@ -145,15 +148,13 @@ void cpuexec_init(running_machine *machine)
 			break;
 
 		/* initialize the cpuinfo struct */
-		memset(&cpu[cpunum], 0, sizeof(cpu[cpunum]));
 		cpu[cpunum].suspend = SUSPEND_REASON_RESET;
 		cpu[cpunum].clock = (UINT64)machine->config->cpu[cpunum].clock * cputype_clock_multiplier(cputype) / cputype_clock_divider(cputype);
 		cpu[cpunum].clockscale = 1.0;
 		cpu[cpunum].localtime = attotime_zero;
 
 		/* compute the cycle times */
-		cycles_per_second[cpunum] = cpu[cpunum].clockscale * cpu[cpunum].clock;
-		attoseconds_per_cycle[cpunum] = ATTOSECONDS_PER_SECOND / (cpu[cpunum].clockscale * cpu[cpunum].clock);
+		update_clock_information(machine, cpunum);
 
 		/* register some of our variables for later */
 		state_save_register_item("cpu", cpunum, cpu[cpunum].suspend);
@@ -189,8 +190,9 @@ void cpuexec_init(running_machine *machine)
 	add_reset_callback(machine, cpuexec_reset);
 	add_exit_callback(machine, cpuexec_exit);
 
-	/* compute the perfect interleave factor */
-	compute_perfect_interleave(machine);
+	/* allocate timers to handle interleave boosts */
+	interleave_boost_timer = timer_alloc(NULL, NULL);
+	interleave_boost_timer_end = timer_alloc(end_interleave_boost, NULL);
 }
 
 
@@ -267,6 +269,10 @@ void cpuexec_timeslice(running_machine *machine)
 		/* only process if we're not suspended */
 		if (!cpu[cpunum].suspend)
 		{
+			attotime delta = attotime_sub(target, cpu[cpunum].localtime);
+			if (delta.seconds >= 0)
+			{
+			
 			/* compute how long to run */
 			cycles_running = ATTOTIME_TO_CYCLES(cpunum, attotime_sub(target, cpu[cpunum].localtime));
 			LOG(("  cpu %d: %d cycles\n", cpunum, cycles_running));
@@ -305,6 +311,7 @@ void cpuexec_timeslice(running_machine *machine)
 						target = base;
 					LOG(("         (new target)\n"));
 				}
+			}
 			}
 		}
 	}
@@ -447,7 +454,7 @@ static void update_clock_information(running_machine *machine, int cpunum)
 	/* recompute cps and spc */
 	cycles_per_second[cpunum] = (double)cpu[cpunum].clock * cpu[cpunum].clockscale;
 	attoseconds_per_cycle[cpunum] = ATTOSECONDS_PER_SECOND / ((double)cpu[cpunum].clock * cpu[cpunum].clockscale);
-
+	
 	/* re-compute the perfect interleave factor */
 	compute_perfect_interleave(machine);
 }
@@ -902,16 +909,17 @@ static void compute_perfect_interleave(running_machine *machine)
 	perfect_interleave = attotime_zero;
 	perfect_interleave.attoseconds = ATTOSECONDS_PER_SECOND - 1;
 	for (cpunum = 1; machine->config->cpu[cpunum].type != CPU_DUMMY; cpunum++)
-	{
-		/* find the 2nd smallest cycle interval */
-		if (attoseconds_per_cycle[cpunum] < smallest)
+		if (attoseconds_per_cycle[cpunum] != 0)
 		{
-			perfect_interleave.attoseconds = smallest;
-			smallest = attoseconds_per_cycle[cpunum];
+			/* find the 2nd smallest cycle interval */
+			if (attoseconds_per_cycle[cpunum] < smallest)
+			{
+				perfect_interleave.attoseconds = smallest;
+				smallest = attoseconds_per_cycle[cpunum];
+			}
+			else if (attoseconds_per_cycle[cpunum] < perfect_interleave.attoseconds)
+				perfect_interleave.attoseconds = attoseconds_per_cycle[cpunum];
 		}
-		else if (attoseconds_per_cycle[cpunum] < perfect_interleave.attoseconds)
-			perfect_interleave.attoseconds = attoseconds_per_cycle[cpunum];
-	}
 
 	/* adjust the final value */
 	if (perfect_interleave.attoseconds == ATTOSECONDS_PER_SECOND - 1)
@@ -939,10 +947,6 @@ static void cpu_inittimers(running_machine *machine)
 	timeslice_period = attotime_make(0, refresh_attosecs / ipf);
 	timeslice_timer = timer_alloc(cpu_timeslicecallback, NULL);
 	timer_adjust_periodic(timeslice_timer, timeslice_period, 0, timeslice_period);
-
-	/* allocate timers to handle interleave boosts */
-	interleave_boost_timer = timer_alloc(NULL, NULL);
-	interleave_boost_timer_end = timer_alloc(end_interleave_boost, NULL);
 
 	/* register the interrupt handler callbacks */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
