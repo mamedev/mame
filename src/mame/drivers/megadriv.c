@@ -642,7 +642,7 @@ static UINT16 vdp_get_word_from_68k_mem_default(UINT32 source)
 	}
 	else
 	{
-		mame_printf_debug("DMA Read unmapped %06x\n",source);
+		printf("DMA Read unmapped %06x\n",source);
 		return mame_rand(Machine);
 	}
 
@@ -2429,7 +2429,7 @@ static READ8_HANDLER( z80_read_68k_banked_data )
 	}
 	else
 	{
-		//mame_printf_debug("unhandled z80 bank read, gen.z80_bank_addr %08x\n",genz80.z80_bank_addr);
+		printf("unhandled z80 bank read, gen.z80_bank_addr %08x\n",genz80.z80_bank_addr);
 		return 0x0000;
 	}
 
@@ -2480,7 +2480,7 @@ static WRITE8_HANDLER( z80_write_68k_banked_data )
 	else
 	{
 
-		//mame_printf_debug("z80 write to 68k address %06x\n",fulladdress);
+		printf("z80 write to 68k address %06x\n",fulladdress);
 	}
 
 }
@@ -4757,7 +4757,7 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 
 			}
 		}
-		else // mode 3 = RLE  (used by BRUTAL intro)
+		else if (_32x_displaymode==3) // mode 3 = RLE  (used by BRUTAL intro)
 		{
 			UINT32 lineoffs;
 			int start;
@@ -4786,7 +4786,41 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 				lineoffs++;
 
 			}
-		} // mode 2 is 15bpp, not supported yet
+		}
+		else // MODE 2 - 15bpp mode, not used by any commercial games?
+		{
+			UINT32 lineoffs;
+			int start;
+
+			lineoffs = _32x_display_dram[scanline];
+
+			if (_32x_screenshift == 0) start=0;
+			else start = -1;
+
+            x = start;
+			while (x<320)
+			{
+				UINT16 coldata;
+				coldata = _32x_display_dram[lineoffs&0xffff];
+
+				// need to swap red and blue around for MAME
+				{
+					int r = ((coldata >> 0)  & 0x1f);
+					int g = ((coldata >> 5)  & 0x1f);
+					int b = ((coldata >> 10) & 0x1f);
+					int p = ((coldata >> 15) & 0x01); // priority 'through' bit
+
+					coldata = (r << 10) | (g << 5) | (b << 0) | (p << 15);
+
+				}
+
+				if (x>=0)
+					_32x_linerender[x] = coldata;
+
+				x++;
+				lineoffs++;
+			}
+		}
 	}
 
 
@@ -6387,21 +6421,21 @@ UINT16 comms_port[8];
 
 static READ32_HANDLER( sh2_commsport_r )
 {
-//	timer_call_after_resynch(NULL, 0, NULL);
+	timer_call_after_resynch(NULL, 0, NULL);
 	return (comms_port[offset*2] << 16) | (comms_port[offset*2+1]);
 }
 
 
 static READ16_HANDLER( _32x_68k_comms_r )
 {
-//	timer_call_after_resynch(NULL, 0, NULL);
+	timer_call_after_resynch(NULL, 0, NULL);
 	return comms_port[offset];
 }
 
 static WRITE16_HANDLER( _32x_68k_comms_w )
 {
 	COMBINE_DATA(&comms_port[offset]);
-//	timer_call_after_resynch(NULL, 0, NULL);
+	timer_call_after_resynch(NULL, 0, NULL);
 
 }
 
@@ -6811,7 +6845,7 @@ ROM_START( 32x_bios )
 //  ROM_LOAD( "32x_rot.bin", 0x000000,   0x0001638, CRC(98c25033) SHA1(8d9ab3084bd29e60b8cdf4b9f1cb755eb4c88d29) )
 //  ROM_LOAD( "32x_3d.bin", 0x000000,   0x6568, CRC(0171743e) SHA1(bbe6fec182baae5e4d47d263fae6b419db5366ae) )
 //  ROM_LOAD( "32x_spin.bin", 0x000000,   0x012c28, CRC(3d1d1191) SHA1(221a74408653e18cef8ce2f9b4d33ed93e4218b7) )
-	ROM_LOAD( "32x_doom.bin", 0x000000,   0x300000, CRC(208332fd) SHA1(b68e9c7af81853b8f05b8696033dfe4c80327e38) ) // works!
+//	ROM_LOAD( "32x_doom.bin", 0x000000,   0x300000, CRC(208332fd) SHA1(b68e9c7af81853b8f05b8696033dfe4c80327e38) ) // works!
 //	ROM_LOAD( "32x_koli.bin", 0x000000,   0x300000, CRC(20ca53ef) SHA1(191ae0b525ecf32664086d8d748e0b35f776ddfe) ) // works but needs very tight cpu sync or game just stutters
 //  ROM_LOAD( "32x_head.bin", 0x000000,   0x300000,  CRC(ef5553ff) SHA1(4e872fbb44ecb2bd730abd8cc8f32f96b10582c0) ) // doesn't boot
 //	ROM_LOAD( "32x_pit.bin", 0x000000,   0x300000, CRC(f9126f15) SHA1(ee864d1677c6d976d0846eb5f8d8edb839acfb76) ) // ok, needs vram fill on intro screens tho?
@@ -6819,10 +6853,11 @@ ROM_START( 32x_bios )
 //	ROM_LOAD( "32x_carn.bin", 0x000000,   0x300000, CRC(7c7be6a2) SHA1(9a563ed821b483148339561ebd2b876efa58847b) ) // ?? doesn't boot
 //	ROM_LOAD( "32x_raw.bin", 0x000000,   0x400000, CRC(8eb7cd2c) SHA1(94b974f2f69f0c10bc18b349fa4ff95ca56fa47b) ) // needs cmdint status reads
 //	ROM_LOAD( "32x_darx.bin", 0x000000,   0x200000, CRC(22d7c906) SHA1(108b4ffed8643abdefa921cfb58389b119b47f3d) ) // ?? probably abuses the hardware, euro only ;D
-//	ROM_LOAD( "32x_prim.bin", 0x000000,   0x400000, CRC(e78a4d28) SHA1(5084dcca51d76173c383ab7d04cbc661673545f7) ) // needs tight sync or fails after sega logo - works with tight sync, but VERY slow
+	ROM_LOAD( "32x_prim.bin", 0x000000,   0x400000, CRC(e78a4d28) SHA1(5084dcca51d76173c383ab7d04cbc661673545f7) ) // needs tight sync or fails after sega logo - works with tight sync, but VERY slow
 //	ROM_LOAD( "32x_brut.bin", 0x000000,   0x300000, CRC(7a72c939) SHA1(40aa2c787f37772cdbd7280b8be06b15421fabae) ) // locks up left in attract, doesn't scroll, no idea...
 //  ROM_LOAD( "32x_temp.bin", 0x000000,  0x300000, CRC(14e5c575) SHA1(6673ba83570b4f2c1b4a22415a56594c3cc6c6a9) ) // needs ram fills and DREQ? (no main character)
-//  ROM_LOAD( "32x_vr.bin", 0x000000,  0x300000, CRC(1) SHA1(1) ) // doesn't work
+//  ROM_LOAD( "32x_vr.bin", 0x000000,  0x300000, CRC(7896b62e) SHA1(18dfdeb50780c2623e60a6587d7ed701a1cf81f1) ) // doesn't work
+//  ROM_LOAD( "32x_h15.bin", 0x000000,  0x0024564,  CRC(938f4e1d) SHA1(ab7270121be53c6c82c4cb45f8f41dd24eb3a2a5) ) // test demo for 15bpp mode
 
 	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
 	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
