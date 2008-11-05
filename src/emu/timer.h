@@ -33,6 +33,7 @@ enum
 };
 
 
+
 /***************************************************************************
     MACROS
 ***************************************************************************/
@@ -177,6 +178,12 @@ attotime timer_next_fire_time(void);
 
 /* adjust the global time; this is also where we fire the timers */
 void timer_set_global_time(running_machine *machine, attotime newbase);
+
+/* add a scheduling quantum; the smallest active one is the one that is in use */
+void timer_add_scheduling_quantum(running_machine *machine, attoseconds_t quantum, attotime duration);
+
+/* control the minimum useful quantum (used by cpuexec only) */
+void timer_set_minimum_quantum(running_machine *machine, attoseconds_t quantum);
 
 
 

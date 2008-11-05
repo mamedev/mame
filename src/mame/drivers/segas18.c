@@ -190,7 +190,7 @@ static void system18_generic_init(running_machine *machine, int _rom_board)
 
 static TIMER_CALLBACK( boost_interleave )
 {
-	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_MSEC(10));
+	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_MSEC(10));
 }
 
 

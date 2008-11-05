@@ -304,7 +304,7 @@ static WRITE8_DEVICE_HANDLER( sindbadm_soundport_w )
 {
 	soundlatch_w(device->machine,0,data);
 	cpunum_set_input_line(device->machine, 1, INPUT_LINE_NMI, PULSE_LINE);
-	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(50));
+	cpu_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(50));
 }
 
 

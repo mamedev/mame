@@ -132,7 +132,7 @@ static WRITE8_HANDLER( audio_reset_w )
 	if (data == 0)
 	{
 		device_reset(state->riot);
-		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(10));
+		cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(10));
 	}
 }
 
@@ -172,7 +172,7 @@ static void r6532_irq(const device_config *device, int state)
 {
 	cpunum_set_input_line(device->machine, 1, 0, state);
 	if (state == ASSERT_LINE)
-		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(10));
+		cpu_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(10));
 }
 
 

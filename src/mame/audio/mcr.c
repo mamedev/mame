@@ -544,7 +544,7 @@ static TIMER_CALLBACK( csdeluxe_delayed_data_w )
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
-	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
+	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 static READ16_HANDLER( csdeluxe_pia_r )
@@ -667,7 +667,7 @@ static TIMER_CALLBACK( soundsgood_delayed_data_w )
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
-	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(250));
+	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(250));
 }
 
 
@@ -761,7 +761,7 @@ static TIMER_CALLBACK( turbocs_delayed_data_w )
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
-	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
+	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 

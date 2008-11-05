@@ -316,7 +316,7 @@ static TIMER_CALLBACK( deferred_iop_w )
 	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);	/* ???  I have no idea who should generate this! */
 										/* the DSP polls the status bit so it isn't strictly */
 										/* necessary to also have an IRQ */
-	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(50));
+	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50));
 }
 
 

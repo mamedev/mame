@@ -89,7 +89,7 @@ static TIMER_CALLBACK( sound_callback )
 {
 	riot6532_porta_in_set(riot, 0x40, 0x40);
 	main_data = param;
-	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
+	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 
@@ -132,7 +132,7 @@ static TIMER_CALLBACK( main_callback )
 
 	riot6532_porta_in_set(riot, 0x80, 0x80);
 	sound_data = param;
-	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
+	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 WRITE8_HANDLER( starwars_main_wr_w )

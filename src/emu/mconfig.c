@@ -13,6 +13,11 @@
 #include "devintrf.h"
 #include <ctype.h>
 
+#if defined(_MSC_VER)
+#pragma optimize ("", off)
+#endif
+
+
 
 /***************************************************************************
     FUNCTION PROTOTYPES

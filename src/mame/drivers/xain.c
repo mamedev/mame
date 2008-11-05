@@ -175,7 +175,7 @@ static WRITE8_HANDLER( xain_sharedram_w )
 	/* so let's resync every time they are changed to avoid deadlocks */
 	if ((offset == 0x003d || offset == 0x003e)
 			&& xain_sharedram[offset] != data)
-		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(20));
+		cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(20));
 	xain_sharedram[offset] = data;
 }
 

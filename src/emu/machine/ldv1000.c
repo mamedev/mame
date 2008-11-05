@@ -277,7 +277,7 @@ static void ldv1000_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fiel
 	timer_set(video_screen_get_time_until_pos(ld->screen, 19*2, 0), ld, 0, vbi_data_fetch);
 
 	/* boost interleave for the first 1ms to improve communications */
-	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_MSEC(1));
+	cpu_boost_interleave(ld->device->machine, attotime_zero, ATTOTIME_IN_MSEC(1));
 }
 
 

@@ -1476,7 +1476,7 @@ int dcs_control_r(void)
 {
 	/* only boost for DCS2 boards */
 	if (!dcs.auto_ack && !transfer.hle_enabled)
-		cpu_boost_interleave(ATTOTIME_IN_NSEC(500), ATTOTIME_IN_USEC(5));
+		cpu_boost_interleave(Machine, ATTOTIME_IN_NSEC(500), ATTOTIME_IN_USEC(5));
 	return dcs.latch_control;
 }
 
@@ -1534,7 +1534,7 @@ static void dcs_delayed_data_w(running_machine *machine, int data)
 		logerror("%08X:dcs_data_w(%04X)\n", activecpu_get_pc(), data);
 
 	/* boost the interleave temporarily */
-	cpu_boost_interleave(ATTOTIME_IN_NSEC(500), ATTOTIME_IN_USEC(5));
+	cpu_boost_interleave(machine, ATTOTIME_IN_NSEC(500), ATTOTIME_IN_USEC(5));
 
 	/* set the IRQ line on the ADSP */
 	cpunum_set_input_line(machine, dcs.cpunum, ADSP2105_IRQ2, ASSERT_LINE);

@@ -811,7 +811,7 @@ static TIMER_CALLBACK( delayed_sound_reset )
 
 	/* allocate a high frequency timer until a response is generated */
 	/* the main CPU is *very* sensistive to the timing of the response */
-	cpu_boost_interleave(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
+	cpu_boost_interleave(machine, SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
 }
 
 
@@ -833,7 +833,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 
 	/* allocate a high frequency timer until a response is generated */
 	/* the main CPU is *very* sensistive to the timing of the response */
-	cpu_boost_interleave(SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
+	cpu_boost_interleave(machine, SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
 }
 
 

@@ -2012,7 +2012,7 @@ static WRITE32_HANDLER( stv_scsp_regs_w32 )
 static WRITE32_HANDLER( minit_w )
 {
 	logerror("cpu #%d (PC=%08X) MINIT write = %08x\n",cpu_getactivecpu(), activecpu_get_pc(),data);
-	cpu_boost_interleave(minit_boost_timeslice, ATTOTIME_IN_USEC(minit_boost));
+	cpu_boost_interleave(machine, minit_boost_timeslice, ATTOTIME_IN_USEC(minit_boost));
 	cpu_trigger(machine, 1000);
 	cpunum_set_info_int(1, CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
 }
@@ -2020,7 +2020,7 @@ static WRITE32_HANDLER( minit_w )
 static WRITE32_HANDLER( sinit_w )
 {
 	logerror("cpu #%d (PC=%08X) SINIT write = %08x\n",cpu_getactivecpu(), activecpu_get_pc(),data);
-	cpu_boost_interleave(sinit_boost_timeslice, ATTOTIME_IN_USEC(sinit_boost));
+	cpu_boost_interleave(machine, sinit_boost_timeslice, ATTOTIME_IN_USEC(sinit_boost));
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
 }
 

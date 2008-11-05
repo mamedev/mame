@@ -347,7 +347,7 @@ logerror("Z80 sends command %02x\n",param);
 	from_z80 = param;
 	from_mcu_pending = 0;
 	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
-	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(200));
+	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(200));
 }
 
 static TIMER_CALLBACK( delayed_mcu_z80_w )

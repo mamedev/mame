@@ -298,7 +298,7 @@ static UINT8 vp931_data_r(laserdisc_state *ld)
 	}
 
 	/* also boost interleave for 4 scanlines to ensure proper communications */
-	cpu_boost_interleave(attotime_zero, attotime_mul(video_screen_get_scan_period(ld->screen), 4));
+	cpu_boost_interleave(ld->device->machine, attotime_zero, attotime_mul(video_screen_get_scan_period(ld->screen), 4));
 	return player->tocontroller;
 }
 
@@ -632,7 +632,7 @@ static WRITE8_HANDLER( to_controller_w )
 		(*player->data_ready_cb)(ld->device, TRUE);
 
 	/* also boost interleave for 4 scanlines to ensure proper communications */
-	cpu_boost_interleave(attotime_zero, attotime_mul(video_screen_get_scan_period(ld->screen), 4));
+	cpu_boost_interleave(ld->device->machine, attotime_zero, attotime_mul(video_screen_get_scan_period(ld->screen), 4));
 }
 
 

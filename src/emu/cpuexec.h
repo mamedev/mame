@@ -39,6 +39,7 @@ enum
 	SUSPEND_REASON_SPIN 	= 0x0004,
 	SUSPEND_REASON_TRIGGER 	= 0x0008,
 	SUSPEND_REASON_DISABLE 	= 0x0010,
+	SUSPEND_REASON_TIMESLICE= 0x0020,
 	SUSPEND_ANY_REASON 		= ~0
 };
 
@@ -311,7 +312,7 @@ void cpuexec_timeslice(running_machine *machine);
 /* ----- CPU scheduling----- */
 
 /* temporarily boosts the interleave factor */
-void cpu_boost_interleave(attotime timeslice_time, attotime boost_duration);
+void cpu_boost_interleave(running_machine *machine, attotime timeslice_time, attotime boost_duration);
 
 /* aborts the timeslice for the active CPU */
 void activecpu_abort_timeslice(void);

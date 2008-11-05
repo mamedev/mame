@@ -181,7 +181,7 @@ static TIMER_CALLBACK( sound_command_w )
        quickly. Otherwise the main CPU gives up with sound. Boosting
        the interleave for a while helps. */
 
-	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
+	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 

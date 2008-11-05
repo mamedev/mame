@@ -107,7 +107,7 @@ static void update_main_irqs(running_machine *machine)
 	if (irq)
 	{
 		cpunum_set_input_line(machine, 0, irq, ASSERT_LINE);
-		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
+		cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 	}
 }
 
@@ -199,7 +199,7 @@ static READ8_HANDLER( sound_data_r )
 static void xboard_reset(void)
 {
 	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
-	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
+	cpu_boost_interleave(Machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 
@@ -455,7 +455,7 @@ static UINT16 *loffire_sync;
 static WRITE16_HANDLER( loffire_sync0_w )
 {
 	COMBINE_DATA(&loffire_sync[offset]);
-	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(10));
+	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(10));
 }
 
 

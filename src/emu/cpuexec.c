@@ -51,7 +51,6 @@
 /* internal trigger IDs */
 enum
 {
-	TRIGGER_TIMESLICE 	= -1000,
 	TRIGGER_INT 		= -2000,
 	TRIGGER_YIELDTIME 	= -3000,
 	TRIGGER_SUSPENDTIME = -4000
@@ -99,15 +98,6 @@ static int cycles_running;
 static int cycles_stolen;
 
 
-/* timer variables */
-static emu_timer *timeslice_timer;
-static attotime timeslice_period;
-
-static emu_timer *interleave_boost_timer;
-static emu_timer *interleave_boost_timer_end;
-static attotime perfect_interleave;
-
-
 
 /***************************************************************************
     FUNCTION PROTOTYPES
@@ -117,7 +107,6 @@ static void cpuexec_exit(running_machine *machine);
 static void cpuexec_reset(running_machine *machine);
 static void cpu_inittimers(running_machine *machine);
 static void update_clock_information(running_machine *machine, int cpunum);
-static TIMER_CALLBACK( end_interleave_boost );
 static TIMER_CALLBACK( trigger_partial_frame_interrupt );
 static void compute_perfect_interleave(running_machine *machine);
 
@@ -189,10 +178,6 @@ void cpuexec_init(running_machine *machine)
 	}
 	add_reset_callback(machine, cpuexec_reset);
 	add_exit_callback(machine, cpuexec_exit);
-
-	/* allocate timers to handle interleave boosts */
-	interleave_boost_timer = timer_alloc(NULL, NULL);
-	interleave_boost_timer_end = timer_alloc(end_interleave_boost, NULL);
 }
 
 
@@ -254,32 +239,28 @@ void cpuexec_timeslice(running_machine *machine)
 	LOG(("------------------\n"));
 	LOG(("cpu_timeslice: target = %s\n", attotime_string(target, 9)));
 
-	/* process any pending suspends */
+	/* apply pending suspension changes */
 	for (cpunum = 0; machine->config->cpu[cpunum].type != CPU_DUMMY; cpunum++)
 	{
-		if (cpu[cpunum].suspend != cpu[cpunum].nextsuspend)
-			LOG(("--> updated CPU%d suspend from %X to %X\n", cpunum, cpu[cpunum].suspend, cpu[cpunum].nextsuspend));
-		cpu[cpunum].suspend = cpu[cpunum].nextsuspend;
-		cpu[cpunum].eatcycles = cpu[cpunum].nexteatcycles;
+		cpuexec_data *cpudata = &cpu[cpunum];
+		cpudata->suspend = cpudata->nextsuspend;
+		cpudata->nextsuspend &= ~SUSPEND_REASON_TIMESLICE;
+		cpudata->eatcycles = cpudata->nexteatcycles;
 	}
 
-	/* loop over CPUs */
+	/* loop over non-suspended CPUs */
 	for (cpunum = 0; machine->config->cpu[cpunum].type != CPU_DUMMY; cpunum++)
 	{
-		/* only process if we're not suspended */
-		if (!cpu[cpunum].suspend)
+		cpuexec_data *cpudata = &cpu[cpunum];
+		if (cpudata->suspend == 0)
 		{
-			attotime delta = attotime_sub(target, cpu[cpunum].localtime);
-			if (delta.seconds >= 0)
+			attotime delta = attotime_sub(target, cpudata->localtime);
+			if (delta.seconds >= 0 && delta.attoseconds >= attoseconds_per_cycle[cpunum])
 			{
-			
-			/* compute how long to run */
-			cycles_running = ATTOTIME_TO_CYCLES(cpunum, attotime_sub(target, cpu[cpunum].localtime));
-			LOG(("  cpu %d: %d cycles\n", cpunum, cycles_running));
+				/* compute how long to run */
+				cycles_running = ATTOTIME_TO_CYCLES(cpunum, delta);
+				LOG(("  cpu %d: %d cycles\n", cpunum, cycles_running));
 
-			/* run for the requested number of cycles */
-			if (cycles_running > 0)
-			{
 				profiler_mark(PROFILER_CPU1 + cpunum);
 
 				/* note that this global variable cycles_stolen can be modified */
@@ -298,20 +279,16 @@ void cpuexec_timeslice(running_machine *machine)
 				profiler_mark(PROFILER_END);
 
 				/* account for these cycles */
-				cpu[cpunum].totalcycles += ran;
-				cpu[cpunum].localtime = attotime_add(cpu[cpunum].localtime, ATTOTIME_IN_CYCLES(ran, cpunum));
-				LOG(("         %d ran, %d total, time = %s\n", ran, (INT32)cpu[cpunum].totalcycles, attotime_string(cpu[cpunum].localtime, 9)));
+				cpudata->totalcycles += ran;
+				cpudata->localtime = attotime_add_attoseconds(cpudata->localtime, ran * attoseconds_per_cycle[cpunum]);
+				LOG(("         %d ran, %d total, time = %s\n", ran, (INT32)cpudata->totalcycles, attotime_string(cpudata->localtime, 9)));
 
 				/* if the new local CPU time is less than our target, move the target up */
-				if (attotime_compare(cpu[cpunum].localtime, target) < 0)
+				if (attotime_compare(cpudata->localtime, target) < 0)
 				{
-					if (attotime_compare(cpu[cpunum].localtime, base) > 0)
-						target = cpu[cpunum].localtime;
-					else
-						target = base;
+					target = attotime_max(cpudata->localtime, base);
 					LOG(("         (new target)\n"));
 				}
-			}
 			}
 		}
 	}
@@ -319,23 +296,19 @@ void cpuexec_timeslice(running_machine *machine)
 	/* update the local times of all CPUs */
 	for (cpunum = 0; machine->config->cpu[cpunum].type != CPU_DUMMY; cpunum++)
 	{
+		cpuexec_data *cpudata = &cpu[cpunum];
+
 		/* if we're suspended and counting, process */
-		if (cpu[cpunum].suspend && cpu[cpunum].eatcycles && attotime_compare(cpu[cpunum].localtime, target) < 0)
+		if (cpudata->suspend != 0 && cpudata->eatcycles && attotime_compare(cpudata->localtime, target) < 0)
 		{
 			/* compute how long to run */
-			cycles_running = ATTOTIME_TO_CYCLES(cpunum, attotime_sub(target, cpu[cpunum].localtime));
+			cycles_running = ATTOTIME_TO_CYCLES(cpunum, attotime_sub(target, cpudata->localtime));
 			LOG(("  cpu %d: %d cycles (suspended)\n", cpunum, cycles_running));
 
-			cpu[cpunum].totalcycles += cycles_running;
-			cpu[cpunum].localtime = attotime_add(cpu[cpunum].localtime, ATTOTIME_IN_CYCLES(cycles_running, cpunum));
-			LOG(("         %d skipped, %d total, time = %s\n", cycles_running, (INT32)cpu[cpunum].totalcycles, attotime_string(cpu[cpunum].localtime, 9)));
+			cpudata->totalcycles += cycles_running;
+			cpudata->localtime = attotime_add(cpudata->localtime, ATTOTIME_IN_CYCLES(cycles_running, cpunum));
+			LOG(("         %d skipped, %d total, time = %s\n", cycles_running, (INT32)cpudata->totalcycles, attotime_string(cpudata->localtime, 9)));
 		}
-
-		/* update the suspend state */
-		if (cpu[cpunum].suspend != cpu[cpunum].nextsuspend)
-			LOG(("--> updated CPU%d suspend from %X to %X\n", cpunum, cpu[cpunum].suspend, cpu[cpunum].nextsuspend));
-		cpu[cpunum].suspend = cpu[cpunum].nextsuspend;
-		cpu[cpunum].eatcycles = cpu[cpunum].nexteatcycles;
 	}
 
 	/* update the global time */
@@ -353,20 +326,12 @@ void cpuexec_timeslice(running_machine *machine)
     interleave factor
 -------------------------------------------------*/
 
-void cpu_boost_interleave(attotime timeslice_time, attotime boost_duration)
+void cpu_boost_interleave(running_machine *machine, attotime timeslice_time, attotime boost_duration)
 {
-	/* if you pass 0 for the timeslice_time, it means pick something reasonable */
-	if (attotime_compare(timeslice_time, perfect_interleave) < 0)
-		timeslice_time = perfect_interleave;
-
-	LOG(("cpu_boost_interleave(%s, %s)\n", attotime_string(timeslice_time, 9), attotime_string(boost_duration, 9)));
-
-	/* adjust the interleave timer */
-	timer_adjust_periodic(interleave_boost_timer, timeslice_time, 0, timeslice_time);
-
-	/* adjust the end timer, but only if we are going to extend it */
-	if (!timer_enabled(interleave_boost_timer_end) || attotime_compare(timer_timeleft(interleave_boost_timer_end), boost_duration) < 0)
-		timer_adjust_oneshot(interleave_boost_timer_end, boost_duration, 0);
+	/* ignore timeslices > 1 second */
+	if (timeslice_time.seconds > 0)
+		return;
+	timer_add_scheduling_quantum(machine, timeslice_time.attoseconds, boost_duration);
 }
 
 
@@ -400,12 +365,8 @@ void cpunum_suspend(int cpunum, int reason, int eatcycles)
 {
 	VERIFY_CPUNUM(cpunum_suspend);
 	LOG(("cpunum_suspend (CPU=%d, r=%X, eat=%d)\n", cpunum, reason, eatcycles));
-
-	/* set the pending suspend bits, and force a resync */
 	cpu[cpunum].nextsuspend |= reason;
 	cpu[cpunum].nexteatcycles = eatcycles;
-	if (cpu_getexecutingcpu() >= 0)
-		activecpu_abort_timeslice();
 }
 
 
@@ -418,11 +379,7 @@ void cpunum_resume(int cpunum, int reason)
 {
 	VERIFY_CPUNUM(cpunum_resume);
 	LOG(("cpunum_resume (CPU=%d, r=%X)\n", cpunum, reason));
-
-	/* clear the pending suspend bits, and force a resync */
 	cpu[cpunum].nextsuspend &= ~reason;
-	if (cpu_getexecutingcpu() >= 0)
-		activecpu_abort_timeslice();
 }
 
 
@@ -612,8 +569,8 @@ static void cpunum_suspend_until_trigger(int cpunum, int trigger, int eatcycles)
 void cpu_yield(void)
 {
 	int cpunum = cpu_getexecutingcpu();
-	VERIFY_EXECUTINGCPU(cpu_yielduntil_trigger);
-	cpunum_suspend_until_trigger(cpunum, TRIGGER_TIMESLICE, FALSE);
+	VERIFY_EXECUTINGCPU(cpu_yield);
+	cpunum_suspend(cpunum, SUSPEND_REASON_TIMESLICE, FALSE);
 }
 
 
@@ -625,8 +582,8 @@ void cpu_yield(void)
 void cpu_spin(void)
 {
 	int cpunum = cpu_getexecutingcpu();
-	VERIFY_EXECUTINGCPU(cpu_yielduntil_trigger);
-	cpunum_suspend_until_trigger(cpunum, TRIGGER_TIMESLICE, TRUE);
+	VERIFY_EXECUTINGCPU(cpu_spin);
+	cpunum_suspend(cpunum, SUSPEND_REASON_TIMESLICE, TRUE);
 }
 
 
@@ -873,59 +830,39 @@ static TIMER_CALLBACK( cpu_timedintcallback )
 
 
 /*-------------------------------------------------
-    cpu_timeslicecallback - timer callback for
-    timeslicing
--------------------------------------------------*/
-
-static TIMER_CALLBACK( cpu_timeslicecallback )
-{
-	cpu_trigger(machine, TRIGGER_TIMESLICE);
-}
-
-
-/*-------------------------------------------------
-    end_interleave_boost - timer callback to end
-    temporary interleave boost
--------------------------------------------------*/
-
-static TIMER_CALLBACK( end_interleave_boost )
-{
-	timer_adjust_oneshot(interleave_boost_timer, attotime_never, 0);
-	LOG(("end_interleave_boost\n"));
-}
-
-
-/*-------------------------------------------------
     compute_perfect_interleave - compute the
     "perfect" interleave interval
 -------------------------------------------------*/
 
 static void compute_perfect_interleave(running_machine *machine)
 {
-	attoseconds_t smallest = attoseconds_per_cycle[0];
-	int cpunum;
+	if (attoseconds_per_cycle[0] != 0)
+	{
+		attoseconds_t smallest = attoseconds_per_cycle[0] * cputype_min_cycles(machine->config->cpu[0].type);
+		attoseconds_t perfect = ATTOSECONDS_PER_SECOND - 1;
+		int cpunum;
 
-	/* start with a huge time factor and find the 2nd smallest cycle time */
-	perfect_interleave = attotime_zero;
-	perfect_interleave.attoseconds = ATTOSECONDS_PER_SECOND - 1;
-	for (cpunum = 1; machine->config->cpu[cpunum].type != CPU_DUMMY; cpunum++)
-		if (attoseconds_per_cycle[cpunum] != 0)
-		{
-			/* find the 2nd smallest cycle interval */
-			if (attoseconds_per_cycle[cpunum] < smallest)
+		/* start with a huge time factor and find the 2nd smallest cycle time */
+		for (cpunum = 1; machine->config->cpu[cpunum].type != CPU_DUMMY; cpunum++)
+			if (attoseconds_per_cycle[cpunum] != 0)
 			{
-				perfect_interleave.attoseconds = smallest;
-				smallest = attoseconds_per_cycle[cpunum];
+				attoseconds_t curtime = attoseconds_per_cycle[cpunum] * cputype_min_cycles(machine->config->cpu[cpunum].type);
+				
+				/* find the 2nd smallest cycle interval */
+				if (curtime < smallest)
+				{
+					perfect = smallest;
+					smallest = curtime;
+				}
+				else if (curtime < perfect)
+					perfect = attoseconds_per_cycle[cpunum];
 			}
-			else if (attoseconds_per_cycle[cpunum] < perfect_interleave.attoseconds)
-				perfect_interleave.attoseconds = attoseconds_per_cycle[cpunum];
-		}
 
-	/* adjust the final value */
-	if (perfect_interleave.attoseconds == ATTOSECONDS_PER_SECOND - 1)
-		perfect_interleave.attoseconds = attoseconds_per_cycle[0];
+		/* adjust the final value */
+		timer_set_minimum_quantum(machine, perfect);
 
-	LOG(("Perfect interleave = %s, smallest = %.9f\n", attotime_string(perfect_interleave, 9), ATTOSECONDS_TO_DOUBLE(smallest)));
+		LOG(("Perfect interleave = %.9f, smallest = %.9f\n", ATTOSECONDS_TO_DOUBLE(perfect), ATTOSECONDS_TO_DOUBLE(smallest)));
+	}
 }
 
 
@@ -944,9 +881,7 @@ static void cpu_inittimers(running_machine *machine)
 	if (ipf <= 0)
 		ipf = 1;
 	refresh_attosecs = (numscreens == 0) ? HZ_TO_ATTOSECONDS(60) : video_screen_get_frame_period(machine->primary_screen).attoseconds;
-	timeslice_period = attotime_make(0, refresh_attosecs / ipf);
-	timeslice_timer = timer_alloc(cpu_timeslicecallback, NULL);
-	timer_adjust_periodic(timeslice_timer, timeslice_period, 0, timeslice_period);
+	timer_add_scheduling_quantum(machine, refresh_attosecs / ipf, attotime_never);
 
 	/* register the interrupt handler callbacks */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)

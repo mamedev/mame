@@ -349,7 +349,7 @@ int mame_execute(core_options *options)
 					video_frame_update(machine, FALSE);
 
 				/* handle save/load */
-				if (mame->saveload_schedule_callback)
+				if (mame->saveload_schedule_callback != NULL)
 					(*mame->saveload_schedule_callback)(machine);
 
 				profiler_mark(PROFILER_END);

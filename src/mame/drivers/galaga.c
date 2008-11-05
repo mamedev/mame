@@ -899,6 +899,8 @@ static MACHINE_RESET( digdug )
 {
 	int i;
 
+cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_SEC(1000));
+
 	/* Reset all latches */
 	for (i = 0;i < 8;i++)
 		bosco_latch_w(machine,i,0);

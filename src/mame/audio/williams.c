@@ -666,7 +666,7 @@ void williams_adpcm_data_w(int data)
 	{
 		cpunum_set_input_line(Machine, sound_cpunum, M6809_IRQ_LINE, ASSERT_LINE);
 		williams_sound_int_state = 1;
-		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(100));
+		cpu_boost_interleave(Machine, attotime_zero, ATTOTIME_IN_USEC(100));
 	}
 }
 

@@ -43,7 +43,7 @@ static TIMER_CALLBACK( pitnrun_mcu_real_data_w )
 WRITE8_HANDLER( pitnrun_mcu_data_w )
 {
 	timer_call_after_resynch(NULL, data,pitnrun_mcu_real_data_w);
-	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(5));
+	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(5));
 }
 
 READ8_HANDLER( pitnrun_mcu_status_r )

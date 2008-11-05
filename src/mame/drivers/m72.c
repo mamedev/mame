@@ -113,8 +113,8 @@ static MACHINE_START( m72 )
 
 static TIMER_CALLBACK( synch_callback )
 {
-	//cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(8000000));
-	cpu_boost_interleave(ATTOTIME_IN_HZ(MASTER_CLOCK/4/12), ATTOTIME_IN_SEC(25));
+	//cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(8000000));
+	cpu_boost_interleave(machine, ATTOTIME_IN_HZ(MASTER_CLOCK/4/12), ATTOTIME_IN_SEC(25));
 }
 
 static MACHINE_RESET( m72 )

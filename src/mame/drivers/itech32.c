@@ -788,7 +788,7 @@ static WRITE32_HANDLER( tms1_68k_ram_w )
 	if (offset == 0) COMBINE_DATA(tms1_boot);
 	if (offset == 0x382 && tms_spinning[0]) STOP_TMS_SPINNING(machine, 0);
 	if (!tms_spinning[0])
-		cpu_boost_interleave(ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
+		cpu_boost_interleave(machine, ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
 }
 
 
@@ -797,21 +797,21 @@ static WRITE32_HANDLER( tms2_68k_ram_w )
 	COMBINE_DATA(&tms2_ram[offset]);
 	if (offset == 0x382 && tms_spinning[1]) STOP_TMS_SPINNING(machine, 1);
 	if (!tms_spinning[1])
-		cpu_boost_interleave(ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
+		cpu_boost_interleave(machine, ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
 }
 
 
 static WRITE32_HANDLER( tms1_trigger_w )
 {
 	COMBINE_DATA(&tms1_ram[offset]);
-	cpu_boost_interleave(ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
+	cpu_boost_interleave(machine, ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
 }
 
 
 static WRITE32_HANDLER( tms2_trigger_w )
 {
 	COMBINE_DATA(&tms2_ram[offset]);
-	cpu_boost_interleave(ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
+	cpu_boost_interleave(machine, ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
 }
 
 

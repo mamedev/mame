@@ -559,7 +559,7 @@ static WRITE16_HANDLER( audio_command_w )
 		audio_cpu_assert_nmi(machine);
 
 		/* boost the interleave to let the audio CPU read the command */
-		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(50));
+		cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50));
 
 		if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", activecpu_get_pc(), data, mem_mask);
 	}

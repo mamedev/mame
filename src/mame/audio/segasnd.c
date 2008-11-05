@@ -363,7 +363,7 @@ WRITE8_HANDLER( sega_usb_data_w )
 	timer_call_after_resynch(NULL, data, delayed_usb_data_w);
 
 	/* boost the interleave so that sequences can be sent */
-	cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(250));
+	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(250));
 }
 
 

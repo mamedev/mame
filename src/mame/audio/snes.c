@@ -1311,7 +1311,7 @@ WRITE8_HANDLER( spc_io_w )
 		case 0x7:		/* Port 3 */
 //          mame_printf_debug("SPC: %02x to APU @ %d (PC=%x)\n", data, offset&3, activecpu_get_pc());
 			spc_port_out[offset - 4] = data;
-			cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(20));
+			cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(20));
 			break;
 		case 0xA:		/* Timer 0 */
 		case 0xB:		/* Timer 1 */

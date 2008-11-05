@@ -84,7 +84,7 @@ static WRITE16_HANDLER( fuuki16_sound_command_w )
 		soundlatch_w(machine,0,data & 0xff);
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 //      cpu_spinuntil_time(ATTOTIME_IN_USEC(50));   // Allow the other CPU to reply
-		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(50)); // Fixes glitching in rasters
+		cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50)); // Fixes glitching in rasters
 	}
 }
 

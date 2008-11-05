@@ -30,6 +30,7 @@
 ***************************************************************************/
 
 #define MAX_TIMERS		256
+#define MAX_QUANTA		16
 
 
 
@@ -77,6 +78,21 @@ struct _timer_state
 };
 
 
+/*-------------------------------------------------
+    quantum_slot - a single minimum quantum 
+    request
+-------------------------------------------------*/
+
+typedef struct _quantum_slot quantum_slot;
+struct _quantum_slot
+{
+	attoseconds_t			actual;			/* actual duration of the quantum */
+	attoseconds_t			requested;		/* duration of the requested quantum */
+	attotime				expire;			/* absolute expiration time of this quantum */
+};
+
+
+
 /***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
@@ -96,6 +112,11 @@ static attotime global_basetime;
 static emu_timer *callback_timer;
 static int callback_timer_modified;
 static attotime callback_timer_expire_time;
+
+/* scheduling quanta */
+static quantum_slot quantum_list[MAX_QUANTA];
+static quantum_slot *quantum_current;
+static attoseconds_t quantum_minimum;
 
 
 
@@ -292,6 +313,14 @@ void timer_init(running_machine *machine)
 		timers[i].next = &timers[i+1];
 	timers[MAX_TIMERS-1].next = NULL;
 	timer_free_tail = &timers[MAX_TIMERS-1];
+	
+	/* reset the quanta */
+	memset(quantum_list, 0, sizeof(quantum_list));
+	quantum_list[0].requested = ATTOSECONDS_IN_MSEC(100);
+	quantum_list[0].actual = ATTOSECONDS_IN_MSEC(100);
+	quantum_list[0].expire = attotime_never;
+	quantum_current = &quantum_list[0];
+	quantum_minimum = ATTOSECONDS_IN_NSEC(1) / 1000;
 }
 
 
@@ -318,7 +347,21 @@ void timer_destructor(void *ptr, size_t size)
 
 attotime timer_next_fire_time(void)
 {
-	return timer_head->expire;
+	attotime quantum_time;
+	
+	/* if the current quantum has expired, find a new one */
+	if (attotime_compare(global_basetime, quantum_current->expire) >= 0)
+	{
+		int curr;
+		
+		quantum_current->requested = 0;
+		quantum_current = &quantum_list[0];
+		for (curr = 1; curr < ARRAY_LENGTH(quantum_list); curr++)
+			if (quantum_list[curr].requested < quantum_current->requested)
+				quantum_current = &quantum_list[curr];
+	}
+	quantum_time = attotime_add_attoseconds(global_basetime, quantum_current->actual);
+	return attotime_min(quantum_time, timer_head->expire);
 }
 
 
@@ -381,6 +424,81 @@ void timer_set_global_time(running_machine *machine, attotime newbase)
 			}
 		}
 	}
+}
+
+
+/*-------------------------------------------------
+    timer_add_scheduling_quantum - add a 
+    scheduling quantum; the smallest active one 
+    is the one that is in use
+-------------------------------------------------*/
+
+void timer_add_scheduling_quantum(running_machine *machine, attoseconds_t quantum, attotime duration)
+{
+	attotime curtime = timer_get_time();
+	attotime expire = attotime_add(curtime, duration);
+	int curr, blank = -1;
+
+	/* a 0 request (minimum) needs to be non-zero to occupy a slot */
+	if (quantum == 0)
+		quantum = 1;
+			
+	/* find an equal-duration slot or an empty slot */
+	for (curr = 1; curr < ARRAY_LENGTH(quantum_list); curr++)
+	{
+		quantum_slot *slot = &quantum_list[curr];
+		
+		/* look for a matching quantum and extend it */
+		if (slot->requested == quantum)
+		{
+			slot->expire = attotime_max(slot->expire, expire);
+			return;
+		}
+		
+		/* remember any empty slots in case of no match */
+		if (slot->requested == 0)
+		{
+			if (blank == -1)
+				blank = curr;
+		}
+
+		/* otherwise, expire any expired slots */
+		else if (attotime_compare(curtime, slot->expire) >= 0)
+			slot->requested = 0;
+	}
+	
+	/* fatal error if no slots left */
+	assert_always(blank != -1, "Out of scheduling quantum slots!");
+
+	/* fill in the item */
+	quantum_list[blank].requested = quantum;
+	quantum_list[blank].actual = MAX(quantum_list[curr].requested, quantum_minimum);
+	quantum_list[blank].expire = expire;
+	
+	/* update the minimum */
+	if (quantum < quantum_current->requested)
+		quantum_current = &quantum_list[blank];
+}
+
+
+/*-------------------------------------------------
+    timer_set_minimum_quantum - control the 
+    minimum useful quantum (used by cpuexec only)
+-------------------------------------------------*/
+
+void timer_set_minimum_quantum(running_machine *machine, attoseconds_t quantum)
+{
+	int curr;
+	
+	/* do nothing if nothing changed */
+	if (quantum_minimum == quantum)
+		return;
+	quantum_minimum = quantum;
+	
+	/* adjust all the actuals; this doesn't affect the current */
+	for (curr = 0; curr < ARRAY_LENGTH(quantum_list); curr++)
+		if (quantum_list[curr].requested != 0)
+			quantum_list[curr].actual = MAX(quantum_list[curr].requested, quantum_minimum);
 }
 
 

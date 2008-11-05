@@ -77,7 +77,7 @@ static void update_main_irqs(running_machine *machine)
 	cpunum_set_input_line(machine, 2, 6, timer_irq_state && vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
 
 	if(timer_irq_state || vblank_irq_state)
-		cpu_boost_interleave(attotime_zero, ATTOTIME_IN_USEC(50));
+		cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50));
 }
 
 
