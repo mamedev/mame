@@ -76,6 +76,8 @@ struct _cpuexec_data
 	attotime 	localtime;				/* local time, relative to the timer system's global time */
 	INT32		clock;					/* current active clock */
 	double		clockscale;				/* current active clock scale factor */
+	INT32		divisor;				/* 32-bit attoseconds_per_cycle divisor */
+	UINT8		divshift;				/* right shift amount to fit the divisor into 32 bits */
 
 	emu_timer *	timedint_timer;			/* reference to this CPU's periodic interrupt timer */
 
@@ -232,6 +234,7 @@ static void cpuexec_exit(running_machine *machine)
 
 void cpuexec_timeslice(running_machine *machine)
 {
+	int call_debugger = ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
 	attotime target = timer_next_fire_time();
 	attotime base = timer_get_time();
 	int cpunum, ran;
@@ -258,7 +261,7 @@ void cpuexec_timeslice(running_machine *machine)
 			if (delta.seconds >= 0 && delta.attoseconds >= attoseconds_per_cycle[cpunum])
 			{
 				/* compute how long to run */
-				cycles_running = ATTOTIME_TO_CYCLES(cpunum, delta);
+				cycles_running = div_64x32(delta.attoseconds >> cpudata->divshift, cpudata->divisor);
 				LOG(("  cpu %d: %d cycles\n", cpunum, cycles_running));
 
 				profiler_mark(PROFILER_CPU1 + cpunum);
@@ -266,9 +269,14 @@ void cpuexec_timeslice(running_machine *machine)
 				/* note that this global variable cycles_stolen can be modified */
 				/* via the call to the cpunum_execute */
 				cycles_stolen = 0;
-				debugger_start_cpu_hook(machine, cpunum, target);
-				ran = cpunum_execute(cpunum, cycles_running);
-				debugger_stop_cpu_hook(machine, cpunum);
+				if (!call_debugger)
+					ran = cpunum_execute(cpunum, cycles_running);
+				else
+				{
+					debugger_start_cpu_hook(machine, cpunum, target);
+					ran = cpunum_execute(cpunum, cycles_running);
+					debugger_stop_cpu_hook(machine, cpunum);
+				}
 
 #ifdef MAME_DEBUG
 				if (ran < cycles_stolen)
@@ -301,12 +309,14 @@ void cpuexec_timeslice(running_machine *machine)
 		/* if we're suspended and counting, process */
 		if (cpudata->suspend != 0 && cpudata->eatcycles && attotime_compare(cpudata->localtime, target) < 0)
 		{
+			attotime delta = attotime_sub(target, cpudata->localtime);
+
 			/* compute how long to run */
-			cycles_running = ATTOTIME_TO_CYCLES(cpunum, attotime_sub(target, cpudata->localtime));
+			cycles_running = div_64x32(delta.attoseconds >> cpudata->divshift, cpudata->divisor);
 			LOG(("  cpu %d: %d cycles (suspended)\n", cpunum, cycles_running));
 
 			cpudata->totalcycles += cycles_running;
-			cpudata->localtime = attotime_add(cpudata->localtime, ATTOTIME_IN_CYCLES(cycles_running, cpunum));
+			cpudata->localtime = attotime_add_attoseconds(cpudata->localtime, cycles_running * attoseconds_per_cycle[cpunum]);
 			LOG(("         %d skipped, %d total, time = %s\n", cycles_running, (INT32)cpudata->totalcycles, attotime_string(cpudata->localtime, 9)));
 		}
 	}
@@ -408,9 +418,21 @@ int cpunum_is_suspended(int cpunum, int reason)
 
 static void update_clock_information(running_machine *machine, int cpunum)
 {
+	INT64 attos;
+	
 	/* recompute cps and spc */
 	cycles_per_second[cpunum] = (double)cpu[cpunum].clock * cpu[cpunum].clockscale;
 	attoseconds_per_cycle[cpunum] = ATTOSECONDS_PER_SECOND / ((double)cpu[cpunum].clock * cpu[cpunum].clockscale);
+
+	/* update the CPU's divisor */
+	attos = attoseconds_per_cycle[cpunum];
+	cpu[cpunum].divshift = 0;
+	while (attos >= (1UL << 31))
+	{
+		cpu[cpunum].divshift++;
+		attos >>= 1;
+	}
+	cpu[cpunum].divisor = attos;
 	
 	/* re-compute the perfect interleave factor */
 	compute_perfect_interleave(machine);
