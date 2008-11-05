@@ -472,7 +472,7 @@ void timer_add_scheduling_quantum(running_machine *machine, attoseconds_t quantu
 
 	/* fill in the item */
 	quantum_list[blank].requested = quantum;
-	quantum_list[blank].actual = MAX(quantum_list[curr].requested, quantum_minimum);
+	quantum_list[blank].actual = MAX(quantum_list[blank].requested, quantum_minimum);
 	quantum_list[blank].expire = expire;
 	
 	/* update the minimum */
