@@ -357,7 +357,7 @@ attotime timer_next_fire_time(void)
 		quantum_current->requested = 0;
 		quantum_current = &quantum_list[0];
 		for (curr = 1; curr < ARRAY_LENGTH(quantum_list); curr++)
-			if (quantum_list[curr].requested < quantum_current->requested)
+			if (quantum_list[curr].requested != 0 && quantum_list[curr].requested < quantum_current->requested)
 				quantum_current = &quantum_list[curr];
 	}
 	quantum_time = attotime_add_attoseconds(global_basetime, quantum_current->actual);
