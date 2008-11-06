@@ -22,8 +22,6 @@ enum
 	CPUINFO_PTR_M68K_TAS_CALLBACK
 };
 
-extern int m68k_ICount;
-
 /* Redirect memory calls */
 
 typedef struct _m68k_memory_interface m68k_memory_interface;
