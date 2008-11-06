@@ -2429,7 +2429,7 @@ static READ8_HANDLER( z80_read_68k_banked_data )
 	}
 	else
 	{
-		printf("unhandled z80 bank read, gen.z80_bank_addr %08x\n",genz80.z80_bank_addr);
+//		printf("unhandled z80 bank read, gen.z80_bank_addr %08x\n",genz80.z80_bank_addr);
 		return 0x0000;
 	}
 
@@ -2923,10 +2923,658 @@ static WRITE32_HANDLER( sh2_4100_4102_w )
 
 
 
+static UINT16 _32x_a15104;
+
+// 4014 VRES IRQ Clear Register
+static WRITE16_HANDLER( sh2_master_4014_w ){cpunum_set_input_line(machine,  _32x_master_cpu_number,SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( sh2_slave_4014_w ) { cpunum_set_input_line(machine, _32x_slave_cpu_number, SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
+// 4016 VINT IRQ Clear Register
+static WRITE16_HANDLER( sh2_master_4016_w ){cpunum_set_input_line(machine,  _32x_master_cpu_number,SH2_VINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( sh2_slave_4016_w ) { cpunum_set_input_line(machine, _32x_slave_cpu_number, SH2_VINT_IRQ_LEVEL,CLEAR_LINE);}
+// 4018 HINT IRQ Clear Register
+static WRITE16_HANDLER( sh2_master_4018_w ){ cpunum_set_input_line(machine, _32x_master_cpu_number,SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( sh2_slave_4018_w ) { cpunum_set_input_line(machine, _32x_slave_cpu_number, SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
+// 401A CMD IRQ Clear Register
+static WRITE16_HANDLER( sh2_master_401a_w ){ cpunum_set_input_line(machine, _32x_master_cpu_number,SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( sh2_slave_401a_w ) { cpunum_set_input_line(machine, _32x_slave_cpu_number, SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
+// 401C PWM IRQ Clear Register
+static WRITE16_HANDLER( sh2_master_401c_w ){ cpunum_set_input_line(machine, _32x_master_cpu_number,SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( sh2_slave_401c_w ) { cpunum_set_input_line(machine, _32x_slave_cpu_number, SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
+
+
+static WRITE32_HANDLER( sh2_master_4014_4016_w )
+{
+	if (ACCESSING_BITS_16_31)
+	{
+		sh2_master_4014_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
+	}
+
+	if (ACCESSING_BITS_0_15)
+	{
+		sh2_master_4016_w(machine,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff);
+	}
+}
+
+static WRITE32_HANDLER( sh2_slave_4014_4016_w )
+{
+	if (ACCESSING_BITS_16_31)
+	{
+		sh2_slave_4014_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
+	}
+
+	if (ACCESSING_BITS_0_15)
+	{
+		sh2_slave_4016_w(machine,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff);
+	}
+}
+
+static WRITE32_HANDLER( sh2_master_4018_401a_w )
+{
+	if (ACCESSING_BITS_16_31)
+	{
+		sh2_master_4018_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
+	}
+
+	if (ACCESSING_BITS_0_15)
+	{
+		sh2_master_401a_w(machine,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff);
+	}
+}
+
+static WRITE32_HANDLER( sh2_slave_4018_401a_w )
+{
+	if (ACCESSING_BITS_16_31)
+	{
+		printf("slave 4018\n");
+		sh2_slave_4018_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
+	}
+
+	if (ACCESSING_BITS_0_15)
+	{
+		printf("slave 401a\n");
+		sh2_slave_401a_w(machine,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff);
+	}
+}
+
+static WRITE32_HANDLER( sh2_master_401c_401e_w )
+{
+	if (ACCESSING_BITS_16_31)
+	{
+		sh2_master_401c_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
+	}
+
+	if (ACCESSING_BITS_0_15)
+	{
+		printf("401e master write?! %08x %08x\n",data,mem_mask);
+	}
+}
+
+static WRITE32_HANDLER( sh2_slave_401c_401e_w )
+{
+	if (ACCESSING_BITS_16_31)
+	{
+		sh2_slave_401c_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
+	}
+
+	if (ACCESSING_BITS_0_15)
+	{
+		printf("401e slave write?! %08x %08x\n",data,mem_mask);
+	}
+}
+/*
+
+-------------------------------------------------------------------------------------------------
+4000  (sh2 side)
+-------------------------------------------------------------------------------------------------
+
+f--- --ec h--- VHCP
+
+f = framebuffer permission (0 md, 1 sh2)
+e = Adapter enabled (0 no, 1 yes)
+c = Cart Inserted (0 yes, 1 no)
+h = H Interrupt allowed within Vblank (0 no, 1 yes)
+
+*** these are independent for each SH2 ***
+V = V Interrupt Mask (0 masked, 1 allowed)
+H = H Interrupt Mask (0 masked, 1 allowed)
+C = Command Interrupt Mask (0 masked, 1 allowed)
+P = PWM Interrupt Mask (0 masked, 1 allowed)
+
+-------------------------------------------------------------------------------------------------
+4002 Stand By Change Register
+-------------------------------------------------------------------------------------------------
+
+Write Only
+Prohibited from Application
+
+-------------------------------------------------------------------------------------------------
+4004 H Count Register (H Interrupt)
+-------------------------------------------------------------------------------------------------
+0 = every line
+
+-------------------------------------------------------------------------------------------------
+4006 DReq Control Register
+-------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------
+4008 68k To SH2 DReq Source Address Register ( High Bits )
+-------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------
+400A 68k To SH2 DReq Source Address Register ( Low Bits )
+-------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------
+400C 68k To SH2 DReq Destination Address Register ( High Bits )
+-------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------
+400E 68k To SH2 DReq Destination Address Register ( Low Bits )
+-------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------
+4010 68k To SH2 DReq Length Register
+-------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------
+4012 FIFO Register
+-------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------
+4014 VRES IRQ Clear Register
+-------------------------------------------------------------------------------------------------
+Clears Interrupt which is caused by pressing RESET button
+
+-------------------------------------------------------------------------------------------------
+4016 VINT IRQ Clear Register
+-------------------------------------------------------------------------------------------------
+Clears Vertical Blank Interrupt
+
+-------------------------------------------------------------------------------------------------
+4018 HINT IRQ Clear Register
+-------------------------------------------------------------------------------------------------
+Clears Horizontal Blank Interrupt
+
+-------------------------------------------------------------------------------------------------
+401A CMD IRQ Clear Register
+-------------------------------------------------------------------------------------------------
+Clears 'Command' Interrupt
+
+-------------------------------------------------------------------------------------------------
+401C PWM IRQ Clear Register
+-------------------------------------------------------------------------------------------------
+Clears 'PWM' (Sound / Timer) Interrupt
+
+-------------------------------------------------------------------------------------------------
+401E ??????????????????????
+-------------------------------------------------------------------------------------------------
+
+-------------------------------------------------------------------------------------------------
+4020 Comms Reg 1
+------------------------------------------------------------------------------------------------
+4022 Comms Reg 2
+------------------------------------------------------------------------------------------------
+4024 Comms Reg 3
+------------------------------------------------------------------------------------------------
+4026 Comms Reg 4
+------------------------------------------------------------------------------------------------
+4028 Comms Reg 5
+------------------------------------------------------------------------------------------------
+402A Comms Reg 6
+------------------------------------------------------------------------------------------------
+402C Comms Reg 7
+------------------------------------------------------------------------------------------------
+402E Comms Reg 8
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+4030 PWM Control Register
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+4032 Cycle Register
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+4034 LCH Pulse Width Register
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+4036 RCH Pulse Width Register
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+4038 Mono Pulse Width Register
+------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------------
+4100 Bitmap Mode Register
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+4102 Screen Shift Control Register
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+4104 Auto Fill Length Register
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+4106 Auto Fill Start Address Register
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+4108 Auto Fill Data Register
+------------------------------------------------------------------------------------------------
+
+------------------------------------------------------------------------------------------------
+410A Frame Buffer Control Register
+------------------------------------------------------------------------------------------------
+
+
+*/
+
+
+/*
+
+15106 DREQ
+
+ ---- ---- F--- -K0R
+
+ F = Fifo FULL
+ K = 68k CPU Write mode (0 = no, 1 = CPU write)
+ 0 = always 0
+ R = RV (0 = no operation, 1 = DMA Start allowed)
+
+*/
+
+static UINT16 a15106_reg;
+
+
+static READ16_HANDLER( _32x_68k_a15106_r)
+{
+	UINT16 retval;
+
+	retval = a15106_reg;
+
+	//if (fifo_full) retval |= 0x0080;
+
+	return retval;
+}
+
+static WRITE16_HANDLER( _32x_68k_a15106_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		a15106_reg = data & 0x5;
+
+		//printf("_32x_68k_a15106_w %04x\n", data);
+		/*
+		if (a15106_reg & 0x4)
+			printf(" --- 68k Write Mode enabled\n");
+		else
+			printf(" --- 68k Write Mode disabled\n");
+
+		if (a15106_reg & 0x1)
+			printf(" --- DMA Start Allowed \n");
+		else
+			printf(" --- DMA Start No Operation\n");
+
+		*/
+	}
+}
+
+// returns MARS, the system ID of the 32x
+static READ16_HANDLER( _32x_68k_MARS_r )
+{
+    switch (offset)
+    {
+        case 0:
+            return 0x4d41;
+
+        case 1:
+            return 0x5253;
+    }
+
+    return 0x0000;
+}
+
+static UINT16 comms_port[8];
+
+static READ32_HANDLER( sh2_commsport_r )
+{
+//	timer_call_after_resynch(NULL, 0, NULL);
+	return (comms_port[offset*2] << 16) | (comms_port[offset*2+1]);
+}
+
+
+static READ16_HANDLER( _32x_68k_comms_r )
+{
+//	timer_call_after_resynch(NULL, 0, NULL);
+	return comms_port[offset];
+}
+
+static WRITE16_HANDLER( _32x_68k_comms_w )
+{
+	COMBINE_DATA(&comms_port[offset]);
+//	timer_call_after_resynch(NULL, 0, NULL);
+}
+
+
+static WRITE32_HANDLER( sh2_commsport_w )
+{
+//  printf("comms write %d %08x %08x\n",offset, data, mem_mask);
+
+	if (ACCESSING_BITS_16_31)
+	{
+		_32x_68k_comms_w(machine,offset*2, (data >> 16) & 0xffff, (mem_mask >> 16) & 0xffff);
+	}
+	if (ACCESSING_BITS_0_15)
+	{
+		_32x_68k_comms_w(machine,offset*2+1, (data) & 0xffff, (mem_mask) & 0xffff);
+	}
+}
+
+//static int sh2_master_vint_enable, sh2_slave_vint_enable;
+//static int sh2_master_hint_enable, sh2_slave_hint_enable;
+//static int sh2_master_cmdint_enable, sh2_slave_cmdint_enable;
+//static int sh2_master_pwmint_enable, sh2_slave_pwmint_enable;
+
+
+static WRITE16_HANDLER( _sh2_master_irq_control_w )
+{
+	if (ACCESSING_BITS_8_15)
+	{
+		//printf("_sh2_master_irq_control_w adapter use stuff write\n");
+
+		_32x_access_auth = (data &0x80) >> 7;
+	}
+
+	if (ACCESSING_BITS_0_7)
+	{
+		sh2_hint_in_vbl = data & 0x80;
+		sh2_master_vint_enable = data & 0x8;
+		sh2_master_hint_enable = data & 0x4;
+		sh2_master_cmdint_enable = data & 0x2;
+		sh2_master_pwmint_enable = data & 0x1;
+
+		if (sh2_master_hint_enable) printf("sh2_master_hint_enable enable!\n");
+		if (sh2_master_pwmint_enable) printf("sh2_master_pwn_enable enable!\n");
+
+	}
+}
+
+static WRITE16_HANDLER( _sh2_slave_irq_control_w )
+{
+	if (ACCESSING_BITS_8_15)
+	{
+		//printf("_sh2_slave_irq_control_w adapter use stuff write\n");
+		_32x_access_auth = (data &0x80) >> 7;
+
+	}
+
+	if (ACCESSING_BITS_0_7)
+	{
+		sh2_hint_in_vbl = data & 0x80;
+		sh2_slave_vint_enable = data & 0x8;
+		sh2_slave_hint_enable = data & 0x4;
+		sh2_slave_cmdint_enable = data & 0x2;
+		sh2_slave_pwmint_enable = data & 0x1;
+
+		if (sh2_slave_hint_enable) printf("sh2_slave_hint_enable enable!\n");
+		if (sh2_slave_pwmint_enable) printf("sh2_slave_pwm_enable enable!\n");
+
+	}
+}
+
+
+static WRITE32_HANDLER( sh2_4000_master_w )
+{
+	if (ACCESSING_BITS_16_31) // 4000
+	{
+		//printf("sh2_4000_master_w %08x %08x\n",data,mem_mask);
+		_sh2_master_irq_control_w(machine, offset*2, (data >> 16) & 0xffff, (mem_mask >> 16) & 0xffff);
+
+	}
+
+	if (ACCESSING_BITS_0_15) // 4002
+	{
+		//printf("sh2_4002_master_w %08x %08x\n",data,mem_mask);
+	}
+
+}
+
+static WRITE32_HANDLER( sh2_4000_slave_w )
+{
+	if (ACCESSING_BITS_16_31) // 4000
+	{
+		//printf("sh2_4000_slave_w %08x %08x\n",data,mem_mask);
+		_sh2_slave_irq_control_w(machine, offset*2, (data >> 16) & 0xffff, (mem_mask >> 16) & 0xffff);
+
+	}
+
+	if (ACCESSING_BITS_0_15) // 4002
+	{
+		//printf("sh2_4002_slave_w %08x %08x\n",data,mem_mask);
+	}
+}
+
+/* 4000 - 4002 reads */
+
+static READ16_HANDLER( _32x_4000_master_r )
+{
+	UINT16 retvalue = 0x0200;
+	retvalue |= _32x_access_auth << 15;
+
+	retvalue |=	sh2_hint_in_vbl;;
+	retvalue |= sh2_master_vint_enable;
+	retvalue |= sh2_master_hint_enable;
+	retvalue |= sh2_master_cmdint_enable;
+	retvalue |= sh2_master_pwmint_enable;
+
+	return retvalue;
+}
+
+static READ16_HANDLER( _32x_4000_slave_r )
+{
+	UINT16 retvalue = 0x0200;
+	retvalue |= _32x_access_auth << 15;
+	retvalue |=	sh2_hint_in_vbl;;
+	retvalue |= sh2_slave_vint_enable;
+	retvalue |= sh2_slave_hint_enable;
+	retvalue |= sh2_slave_cmdint_enable;
+	retvalue |= sh2_slave_pwmint_enable;
+
+	return retvalue;
+}
+
+static READ16_HANDLER( _32x_4002_r )
+{
+	printf("read 4002\n");
+	return 0x0000;
+}
+
+static READ32_HANDLER( sh2_4000_master_r )
+{
+	UINT32 retvalue = 0x00000000;
+
+	if (ACCESSING_BITS_16_31) // 4000
+	{
+		UINT16 ret = 0x0000;
+		ret = _32x_4000_master_r(machine,offset*2,(mem_mask>>16)&0xffff);
+		retvalue |= ret << 16;
+	}
+
+	if (ACCESSING_BITS_0_15) // 4002
+	{
+		UINT16 ret = 0x0000;
+		ret = _32x_4002_r(machine,offset*2+1,(mem_mask>>0)&0xffff);
+		retvalue |= ret << 0;
+	}
+
+	return retvalue;
+}
+
+
+static READ32_HANDLER( sh2_4000_slave_r )
+{
+	UINT32 retvalue = 0x00000000;
+
+	if (ACCESSING_BITS_16_31) // 4000
+	{
+		UINT16 ret = 0x0000;
+		ret = _32x_4000_slave_r(machine,offset*2,(mem_mask>>16)&0xffff);
+		retvalue |= ret << 16;
+	}
+
+	if (ACCESSING_BITS_0_15) // 4002
+	{
+		UINT16 ret = 0x0000;
+		ret = _32x_4002_r(machine,offset*2+1,(mem_mask>>0)&0xffff);
+		retvalue |= ret << 0;
+	}
+
+	return retvalue;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+static READ16_HANDLER( _32x_68k_a15104_r )
+{
+	return _32x_a15104;
+}
+
+static WRITE16_HANDLER( _32x_68k_a15104_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		_32x_a15104 = (_32x_a15104 & 0xff00) | (data & 0x00ff);
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		_32x_a15104 = (_32x_a15104 & 0x00ff) | (data & 0xff00);
+	}
+
+	memory_set_bankptr( 12, memory_region(machine, "gamecart")+((_32x_a15104&0x3)*0x100000) );
+
+
+}
+
+
+static UINT16 a15100_reg;
+
+static READ16_HANDLER( _32x_68k_a15100_r )
+{
+	return (_32x_access_auth<<15) | 0x0080;
+}
+
+
+static WRITE16_HANDLER( _32x_68k_a15100_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		a15100_reg = (a15100_reg & 0xff00) | (data & 0x00ff);
+
+		if (data & 0x02)
+		{
+			cpunum_set_input_line(machine, _32x_master_cpu_number, INPUT_LINE_RESET, CLEAR_LINE);
+			cpunum_set_input_line(machine, _32x_slave_cpu_number, INPUT_LINE_RESET, CLEAR_LINE);
+		}
+
+		if (data & 0x01)
+		{
+			_32x_adapter_enabled = 1;
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0880000, 0x08fffff, 0, 0, SMH_BANK11, SMH_BANK11); // 'fixed' 512kb rom bank
+			memory_set_bankptr( 11, memory_region(machine, "gamecart") );
+
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0900000, 0x09fffff, 0, 0, SMH_BANK12, SMH_BANK12); // 'bankable' 1024kb rom bank
+			memory_set_bankptr( 12, memory_region(machine, "gamecart") );
+
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
+			memory_set_bankptr( 10, memory_region(machine, "32x_68k_bios") );
+
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15184, 0x0a15185, 0, 0, _32x_68k_a15184_r,    _32x_68k_a15184_w); // autofill length reg
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15186, 0x0a15187, 0, 0, _32x_68k_a15186_r,    _32x_68k_a15186_w); // autofill address reg
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15188, 0x0a15189, 0, 0, _32x_68k_a15188_r,    _32x_68k_a15188_w); // autofill data reg / start fill
+
+
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15180, 0x0a15181, 0, 0, _32x_68k_bitmapmode_r, _32x_68k_bitmapmode_w); // mode control regs
+
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a1518a, 0x0a1518b, 0, 0, _32x_68k_fbcontrol_r, _32x_68k_fbcontrol_w); // framebuffer control regs
+
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0840000, 0x085ffff, 0, 0, _32x_68k_dram_r, _32x_68k_dram_w); // access to 'display ram' (framebuffer)
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15200, 0x0a153ff, 0, 0, _32x_68k_palette_r, _32x_68k_palette_w); // access to 'palette' xRRRRRGGGGGBBBBB
+
+
+		}
+		else
+		{
+			_32x_adapter_enabled = 0;
+
+			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
+			memory_set_bankptr( 10, memory_region(machine, "gamecart") );
+
+
+		}
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		a15100_reg = (a15100_reg & 0x00ff) | (data & 0xff00);
+		_32x_access_auth = (data & 0x8000)>>15;
+	}
+}
+
+static int a15102_reg;
+
+static READ16_HANDLER( _32x_68k_a15102_r )
+{
+	//printf("_32x_68k_a15102_r\n");
+	return 0x0000;//a15102_reg;
+}
+
+static WRITE16_HANDLER( _32x_68k_a15102_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		a15102_reg = data;
+
+		if (data&0x1)
+		{
+			if (sh2_master_cmdint_enable) cpunum_set_input_line(machine, _32x_master_cpu_number,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
+		}
+
+		if (data&0x2)
+		{
+			if (sh2_slave_cmdint_enable) cpunum_set_input_line(machine, _32x_slave_cpu_number,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
+		}
+	}
+}
 
 
 static ADDRESS_MAP_START( sh2_main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
+
+	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE( sh2_4000_master_r, sh2_4000_master_w )
+
+	AM_RANGE(0x00004014, 0x00004017) AM_WRITE( sh2_master_4014_4016_w ) // IRQ clear
+	AM_RANGE(0x00004018, 0x0000401b) AM_WRITE( sh2_master_4018_401a_w ) // IRQ clear
+	AM_RANGE(0x0000401c, 0x0000401f) AM_WRITE( sh2_master_401c_401e_w ) // IRQ clear
+
+	AM_RANGE(0x00004020, 0x0000402f) AM_READWRITE( sh2_commsport_r, sh2_commsport_w )
 
 	AM_RANGE(0x00004100, 0x00004103) AM_READWRITE( sh2_4100_4102_r, sh2_4100_4102_w )
 	AM_RANGE(0x00004104, 0x00004107) AM_WRITE( sh2_4104_4106_w )
@@ -2944,6 +3592,14 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sh2_slave_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
+
+	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE( sh2_4000_slave_r, sh2_4000_slave_w )
+
+	AM_RANGE(0x00004014, 0x00004017) AM_WRITE( sh2_slave_4014_4016_w ) // IRQ clear
+	AM_RANGE(0x00004018, 0x0000401b) AM_WRITE( sh2_slave_4018_401a_w ) // IRQ clear
+	AM_RANGE(0x0000401c, 0x0000401f) AM_WRITE( sh2_slave_401c_401e_w ) // IRQ clear
+
+	AM_RANGE(0x00004020, 0x0000402f) AM_READWRITE( sh2_commsport_r, sh2_commsport_w )
 
 	AM_RANGE(0x00004100, 0x00004103) AM_READWRITE( sh2_4100_4102_r, sh2_4100_4102_w )
 	AM_RANGE(0x00004104, 0x00004107) AM_WRITE( sh2_4104_4106_w )
@@ -5803,6 +6459,12 @@ MACHINE_DRIVER_START( genesis_32x )
 	MDRV_CPU_PROGRAM_MAP(sh2_slave_map, 0)
 	MDRV_CPU_CONFIG(sh2_conf_slave)
 
+	// brutal needs at least 30000 or the backgrounds don't animate properly / lock up, and the game
+	// freezes.  Some stage seem to need as high as 80000 ?   this *KILLS* performance
+	//
+	// boosting the interleave here actually makes Kolibri run incorrectly however, that
+	// one works best just boosting the interleave on communications?!
+	MDRV_INTERLEAVE(30000)
 MACHINE_DRIVER_END
 
 
@@ -6070,682 +6732,6 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine)
 
 
 
-static UINT16 _32x_a15104;
-
-// 4014 VRES IRQ Clear Register
-static WRITE16_HANDLER( sh2_master_4014_w ){cpunum_set_input_line(machine,  _32x_master_cpu_number,SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( sh2_slave_4014_w ) { cpunum_set_input_line(machine, _32x_slave_cpu_number, SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
-// 4016 VINT IRQ Clear Register
-static WRITE16_HANDLER( sh2_master_4016_w ){cpunum_set_input_line(machine,  _32x_master_cpu_number,SH2_VINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( sh2_slave_4016_w ) { cpunum_set_input_line(machine, _32x_slave_cpu_number, SH2_VINT_IRQ_LEVEL,CLEAR_LINE);}
-// 4018 HINT IRQ Clear Register
-static WRITE16_HANDLER( sh2_master_4018_w ){ cpunum_set_input_line(machine, _32x_master_cpu_number,SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( sh2_slave_4018_w ) { cpunum_set_input_line(machine, _32x_slave_cpu_number, SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
-// 401A CMD IRQ Clear Register
-static WRITE16_HANDLER( sh2_master_401a_w ){ cpunum_set_input_line(machine, _32x_master_cpu_number,SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( sh2_slave_401a_w ) { cpunum_set_input_line(machine, _32x_slave_cpu_number, SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
-// 401C PWM IRQ Clear Register
-static WRITE16_HANDLER( sh2_master_401c_w ){ cpunum_set_input_line(machine, _32x_master_cpu_number,SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( sh2_slave_401c_w ) { cpunum_set_input_line(machine, _32x_slave_cpu_number, SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
-
-
-static READ32_HANDLER( sh2_master_4014_4016_r )
-{
-	if (ACCESSING_BITS_16_31)
-	{
-		sh2_master_4014_w(machine,offset*2,(0x0000>>16)&0xffff,(mem_mask>>16)&0xffff);
-	}
-
-	if (ACCESSING_BITS_0_15)
-	{
-		sh2_master_4016_w(machine,offset*2+1,(0x0000>>0)&0xffff,(mem_mask>>0)&0xffff);
-	}
-
-	return 0x0000;
-}
-
-static WRITE32_HANDLER( sh2_master_4014_4016_w )
-{
-	if (ACCESSING_BITS_16_31)
-	{
-		sh2_master_4014_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
-	}
-
-	if (ACCESSING_BITS_0_15)
-	{
-		sh2_master_4016_w(machine,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff);
-	}
-}
-
-static WRITE32_HANDLER( sh2_slave_4014_4016_w )
-{
-	if (ACCESSING_BITS_16_31)
-	{
-		sh2_slave_4014_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
-	}
-
-	if (ACCESSING_BITS_0_15)
-	{
-		sh2_slave_4016_w(machine,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff);
-	}
-}
-
-static WRITE32_HANDLER( sh2_master_4018_401a_w )
-{
-	if (ACCESSING_BITS_16_31)
-	{
-		printf("master 4018\n");
-		sh2_master_4018_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
-	}
-
-	if (ACCESSING_BITS_0_15)
-	{
-		printf("master 401a\n");
-
-		sh2_master_401a_w(machine,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff);
-	}
-}
-
-static WRITE32_HANDLER( sh2_slave_4018_401a_w )
-{
-	if (ACCESSING_BITS_16_31)
-	{
-		printf("slave 4018\n");
-		sh2_slave_4018_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
-	}
-
-	if (ACCESSING_BITS_0_15)
-	{
-		printf("slave 401a\n");
-		sh2_slave_401a_w(machine,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff);
-	}
-}
-
-static WRITE32_HANDLER( sh2_master_401c_401e_w )
-{
-	if (ACCESSING_BITS_16_31)
-	{
-		sh2_master_401c_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
-	}
-
-	if (ACCESSING_BITS_0_15)
-	{
-		printf("401e master write?! %08x %08x\n",data,mem_mask);
-	}
-}
-
-static WRITE32_HANDLER( sh2_slave_401c_401e_w )
-{
-	if (ACCESSING_BITS_16_31)
-	{
-		sh2_slave_401c_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff);
-	}
-
-	if (ACCESSING_BITS_0_15)
-	{
-		printf("401e slave write?! %08x %08x\n",data,mem_mask);
-	}
-}
-/*
-
--------------------------------------------------------------------------------------------------
-4000  (sh2 side)
--------------------------------------------------------------------------------------------------
-
-f--- --ec h--- VHCP
-
-f = framebuffer permission (0 md, 1 sh2)
-e = Adapter enabled (0 no, 1 yes)
-c = Cart Inserted (0 yes, 1 no)
-h = H Interrupt allowed within Vblank (0 no, 1 yes)
-
-*** these are independent for each SH2 ***
-V = V Interrupt Mask (0 masked, 1 allowed)
-H = H Interrupt Mask (0 masked, 1 allowed)
-C = Command Interrupt Mask (0 masked, 1 allowed)
-P = PWM Interrupt Mask (0 masked, 1 allowed)
-
--------------------------------------------------------------------------------------------------
-4002 Stand By Change Register
--------------------------------------------------------------------------------------------------
-
-Write Only
-Prohibited from Application
-
--------------------------------------------------------------------------------------------------
-4004 H Count Register (H Interrupt)
--------------------------------------------------------------------------------------------------
-0 = every line
-
--------------------------------------------------------------------------------------------------
-4006 DReq Control Register
--------------------------------------------------------------------------------------------------
-
--------------------------------------------------------------------------------------------------
-4008 68k To SH2 DReq Source Address Register ( High Bits )
--------------------------------------------------------------------------------------------------
-
--------------------------------------------------------------------------------------------------
-400A 68k To SH2 DReq Source Address Register ( Low Bits )
--------------------------------------------------------------------------------------------------
-
--------------------------------------------------------------------------------------------------
-400C 68k To SH2 DReq Destination Address Register ( High Bits )
--------------------------------------------------------------------------------------------------
-
--------------------------------------------------------------------------------------------------
-400E 68k To SH2 DReq Destination Address Register ( Low Bits )
--------------------------------------------------------------------------------------------------
-
--------------------------------------------------------------------------------------------------
-4010 68k To SH2 DReq Length Register
--------------------------------------------------------------------------------------------------
-
--------------------------------------------------------------------------------------------------
-4012 FIFO Register
--------------------------------------------------------------------------------------------------
-
--------------------------------------------------------------------------------------------------
-4014 VRES IRQ Clear Register
--------------------------------------------------------------------------------------------------
-Clears Interrupt which is caused by pressing RESET button
-
--------------------------------------------------------------------------------------------------
-4016 VINT IRQ Clear Register
--------------------------------------------------------------------------------------------------
-Clears Vertical Blank Interrupt
-
--------------------------------------------------------------------------------------------------
-4018 HINT IRQ Clear Register
--------------------------------------------------------------------------------------------------
-Clears Horizontal Blank Interrupt
-
--------------------------------------------------------------------------------------------------
-401A CMD IRQ Clear Register
--------------------------------------------------------------------------------------------------
-Clears 'Command' Interrupt
-
--------------------------------------------------------------------------------------------------
-401C PWM IRQ Clear Register
--------------------------------------------------------------------------------------------------
-Clears 'PWM' (Sound / Timer) Interrupt
-
--------------------------------------------------------------------------------------------------
-401E ??????????????????????
--------------------------------------------------------------------------------------------------
-
--------------------------------------------------------------------------------------------------
-4020 Comms Reg 1
-------------------------------------------------------------------------------------------------
-4022 Comms Reg 2
-------------------------------------------------------------------------------------------------
-4024 Comms Reg 3
-------------------------------------------------------------------------------------------------
-4026 Comms Reg 4
-------------------------------------------------------------------------------------------------
-4028 Comms Reg 5
-------------------------------------------------------------------------------------------------
-402A Comms Reg 6
-------------------------------------------------------------------------------------------------
-402C Comms Reg 7
-------------------------------------------------------------------------------------------------
-402E Comms Reg 8
-------------------------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------------------------
-4030 PWM Control Register
-------------------------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------------------------
-4032 Cycle Register
-------------------------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------------------------
-4034 LCH Pulse Width Register
-------------------------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------------------------
-4036 RCH Pulse Width Register
-------------------------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------------------------
-4038 Mono Pulse Width Register
-------------------------------------------------------------------------------------------------
-
-
-------------------------------------------------------------------------------------------------
-4100 Bitmap Mode Register
-------------------------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------------------------
-4102 Screen Shift Control Register
-------------------------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------------------------
-4104 Auto Fill Length Register
-------------------------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------------------------
-4106 Auto Fill Start Address Register
-------------------------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------------------------
-4108 Auto Fill Data Register
-------------------------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------------------------
-410A Frame Buffer Control Register
-------------------------------------------------------------------------------------------------
-
-
-*/
-
-
-/*
-
-15106 DREQ
-
- ---- ---- F--- -K0R
-
- F = Fifo FULL
- K = 68k CPU Write mode (0 = no, 1 = CPU write)
- 0 = always 0
- R = RV (0 = no operation, 1 = DMA Start allowed)
-
-*/
-
-static UINT16 a15106_reg;
-
-
-static READ16_HANDLER( _32x_68k_a15106_r)
-{
-	UINT16 retval;
-
-	retval = a15106_reg;
-
-	//if (fifo_full) retval |= 0x0080;
-
-	return retval;
-}
-
-static WRITE16_HANDLER( _32x_68k_a15106_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		a15106_reg = data & 0x5;
-		printf("_32x_68k_a15106_w %04x\n", data);
-
-		if (a15106_reg & 0x4)
-			printf(" --- 68k Write Mode enabled\n");
-		else
-			printf(" --- 68k Write Mode disabled\n");
-
-		if (a15106_reg & 0x1)
-			printf(" --- DMA Start Allowed \n");
-		else
-			printf(" --- DMA Start No Operation\n");
-
-	}
-
-
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-// returns MARS, the system ID of the 32x
-static READ16_HANDLER( _32x_68k_MARS_r )
-{
-    switch (offset)
-    {
-        case 0:
-            return 0x4d41;
-
-        case 1:
-            return 0x5253;
-    }
-
-    return 0x0000;
-}
-
-UINT16 comms_port[8];
-
-static READ32_HANDLER( sh2_commsport_r )
-{
-	timer_call_after_resynch(NULL, 0, NULL);
-	return (comms_port[offset*2] << 16) | (comms_port[offset*2+1]);
-}
-
-
-static READ16_HANDLER( _32x_68k_comms_r )
-{
-	timer_call_after_resynch(NULL, 0, NULL);
-	return comms_port[offset];
-}
-
-static WRITE16_HANDLER( _32x_68k_comms_w )
-{
-	COMBINE_DATA(&comms_port[offset]);
-	timer_call_after_resynch(NULL, 0, NULL);
-
-}
-
-
-static WRITE32_HANDLER( sh2_commsport_w )
-{
-//  printf("comms write %d %08x %08x\n",offset, data, mem_mask);
-
-	if (ACCESSING_BITS_16_31)
-	{
-		_32x_68k_comms_w(machine,offset*2, (data >> 16) & 0xffff, (mem_mask >> 16) & 0xffff);
-	}
-	if (ACCESSING_BITS_0_15)
-	{
-		_32x_68k_comms_w(machine,offset*2+1, (data) & 0xffff, (mem_mask) & 0xffff);
-	}
-}
-
-//static int sh2_master_vint_enable, sh2_slave_vint_enable;
-//static int sh2_master_hint_enable, sh2_slave_hint_enable;
-//static int sh2_master_cmdint_enable, sh2_slave_cmdint_enable;
-//static int sh2_master_pwmint_enable, sh2_slave_pwmint_enable;
-
-
-static WRITE16_HANDLER( _sh2_master_irq_control_w )
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		//printf("_sh2_master_irq_control_w adapter use stuff write\n");
-
-		_32x_access_auth = (data &0x80) >> 7;
-	}
-
-	if (ACCESSING_BITS_0_7)
-	{
-		sh2_hint_in_vbl = data & 0x80;
-		sh2_master_vint_enable = data & 0x8;
-		sh2_master_hint_enable = data & 0x4;
-		sh2_master_cmdint_enable = data & 0x2;
-		sh2_master_pwmint_enable = data & 0x1;
-
-		if (sh2_master_hint_enable) printf("sh2_master_hint_enable enable!\n");
-		if (sh2_master_pwmint_enable) printf("sh2_master_pwn_enable enable!\n");
-
-	}
-}
-
-static WRITE16_HANDLER( _sh2_slave_irq_control_w )
-{
-	if (ACCESSING_BITS_8_15)
-	{
-		//printf("_sh2_slave_irq_control_w adapter use stuff write\n");
-		_32x_access_auth = (data &0x80) >> 7;
-
-	}
-
-	if (ACCESSING_BITS_0_7)
-	{
-		sh2_hint_in_vbl = data & 0x80;
-		sh2_slave_vint_enable = data & 0x8;
-		sh2_slave_hint_enable = data & 0x4;
-		sh2_slave_cmdint_enable = data & 0x2;
-		sh2_slave_pwmint_enable = data & 0x1;
-
-		if (sh2_slave_hint_enable) printf("sh2_slave_hint_enable enable!\n");
-		if (sh2_slave_pwmint_enable) printf("sh2_slave_pwm_enable enable!\n");
-
-	}
-}
-
-
-static WRITE32_HANDLER( sh2_4000_master_w )
-{
-	if (ACCESSING_BITS_16_31) // 4000
-	{
-		//printf("sh2_4000_master_w %08x %08x\n",data,mem_mask);
-		_sh2_master_irq_control_w(machine, offset*2, (data >> 16) & 0xffff, (mem_mask >> 16) & 0xffff);
-
-	}
-
-	if (ACCESSING_BITS_0_15) // 4002
-	{
-		//printf("sh2_4002_master_w %08x %08x\n",data,mem_mask);
-	}
-
-}
-
-static WRITE32_HANDLER( sh2_4000_slave_w )
-{
-	if (ACCESSING_BITS_16_31) // 4000
-	{
-		//printf("sh2_4000_slave_w %08x %08x\n",data,mem_mask);
-		_sh2_slave_irq_control_w(machine, offset*2, (data >> 16) & 0xffff, (mem_mask >> 16) & 0xffff);
-
-	}
-
-	if (ACCESSING_BITS_0_15) // 4002
-	{
-		//printf("sh2_4002_slave_w %08x %08x\n",data,mem_mask);
-	}
-}
-
-/* 4000 - 4002 reads */
-
-static READ16_HANDLER( _32x_4000_master_r )
-{
-	UINT16 retvalue = 0x0200;
-	retvalue |= _32x_access_auth << 15;
-
-	retvalue |=	sh2_hint_in_vbl;;
-	retvalue |= sh2_master_vint_enable;
-	retvalue |= sh2_master_hint_enable;
-	retvalue |= sh2_master_cmdint_enable;
-	retvalue |= sh2_master_pwmint_enable;
-
-	return retvalue;
-}
-
-static READ16_HANDLER( _32x_4000_slave_r )
-{
-	UINT16 retvalue = 0x0200;
-	retvalue |= _32x_access_auth << 15;
-	retvalue |=	sh2_hint_in_vbl;;
-	retvalue |= sh2_slave_vint_enable;
-	retvalue |= sh2_slave_hint_enable;
-	retvalue |= sh2_slave_cmdint_enable;
-	retvalue |= sh2_slave_pwmint_enable;
-
-	return retvalue;
-}
-
-static READ16_HANDLER( _32x_4002_r )
-{
-	printf("read 4002\n");
-	return 0x0000;
-}
-
-static READ32_HANDLER( sh2_4000_master_r )
-{
-	UINT32 retvalue = 0x00000000;
-
-	if (ACCESSING_BITS_16_31) // 4000
-	{
-		UINT16 ret = 0x0000;
-		ret = _32x_4000_master_r(machine,offset*2,(mem_mask>>16)&0xffff);
-		retvalue |= ret << 16;
-	}
-
-	if (ACCESSING_BITS_0_15) // 4002
-	{
-		UINT16 ret = 0x0000;
-		ret = _32x_4002_r(machine,offset*2+1,(mem_mask>>0)&0xffff);
-		retvalue |= ret << 0;
-	}
-
-	return retvalue;
-}
-
-
-static READ32_HANDLER( sh2_4000_slave_r )
-{
-	UINT32 retvalue = 0x00000000;
-
-	if (ACCESSING_BITS_16_31) // 4000
-	{
-		UINT16 ret = 0x0000;
-		ret = _32x_4000_slave_r(machine,offset*2,(mem_mask>>16)&0xffff);
-		retvalue |= ret << 16;
-	}
-
-	if (ACCESSING_BITS_0_15) // 4002
-	{
-		UINT16 ret = 0x0000;
-		ret = _32x_4002_r(machine,offset*2+1,(mem_mask>>0)&0xffff);
-		retvalue |= ret << 0;
-	}
-
-	return retvalue;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-static READ16_HANDLER( _32x_68k_a15104_r )
-{
-	return _32x_a15104;
-}
-
-static WRITE16_HANDLER( _32x_68k_a15104_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		_32x_a15104 = (_32x_a15104 & 0xff00) | (data & 0x00ff);
-	}
-
-	if (ACCESSING_BITS_8_15)
-	{
-		_32x_a15104 = (_32x_a15104 & 0x00ff) | (data & 0xff00);
-	}
-
-	memory_set_bankptr( 12, memory_region(machine, "gamecart")+((_32x_a15104&0x3)*0x100000) );
-
-
-}
-
-
-static UINT16 a15100_reg;
-
-static READ16_HANDLER( _32x_68k_a15100_r )
-{
-	return (_32x_access_auth<<15) | 0x0080;
-}
-
-
-static WRITE16_HANDLER( _32x_68k_a15100_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		a15100_reg = (a15100_reg & 0xff00) | (data & 0x00ff);
-
-		if (data & 0x02)
-		{
-			cpunum_set_input_line(machine, _32x_master_cpu_number, INPUT_LINE_RESET, CLEAR_LINE);
-			cpunum_set_input_line(machine, _32x_slave_cpu_number, INPUT_LINE_RESET, CLEAR_LINE);
-		}
-
-		if (data & 0x01)
-		{
-			_32x_adapter_enabled = 1;
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0880000, 0x08fffff, 0, 0, SMH_BANK11, SMH_BANK11); // 'fixed' 512kb rom bank
-			memory_set_bankptr( 11, memory_region(machine, "gamecart") );
-
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0900000, 0x09fffff, 0, 0, SMH_BANK12, SMH_BANK12); // 'bankable' 1024kb rom bank
-			memory_set_bankptr( 12, memory_region(machine, "gamecart") );
-
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
-			memory_set_bankptr( 10, memory_region(machine, "32x_68k_bios") );
-
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15184, 0x0a15185, 0, 0, _32x_68k_a15184_r,    _32x_68k_a15184_w); // autofill length reg
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15186, 0x0a15187, 0, 0, _32x_68k_a15186_r,    _32x_68k_a15186_w); // autofill address reg
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15188, 0x0a15189, 0, 0, _32x_68k_a15188_r,    _32x_68k_a15188_w); // autofill data reg / start fill
-
-
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15180, 0x0a15181, 0, 0, _32x_68k_bitmapmode_r, _32x_68k_bitmapmode_w); // mode control regs
-
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a1518a, 0x0a1518b, 0, 0, _32x_68k_fbcontrol_r, _32x_68k_fbcontrol_w); // framebuffer control regs
-
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0840000, 0x085ffff, 0, 0, _32x_68k_dram_r, _32x_68k_dram_w); // access to 'display ram' (framebuffer)
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15200, 0x0a153ff, 0, 0, _32x_68k_palette_r, _32x_68k_palette_w); // access to 'palette' xRRRRRGGGGGBBBBB
-
-
-		}
-		else
-		{
-			_32x_adapter_enabled = 0;
-
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
-			memory_set_bankptr( 10, memory_region(machine, "gamecart") );
-
-
-		}
-	}
-
-	if (ACCESSING_BITS_8_15)
-	{
-		a15100_reg = (a15100_reg & 0x00ff) | (data & 0xff00);
-		_32x_access_auth = (data & 0x8000)>>15;
-	}
-}
-
-static int a15102_reg;
-
-static READ16_HANDLER( _32x_68k_a15102_r )
-{
-	//printf("_32x_68k_a15102_r\n");
-	return 0x0000;//a15102_reg;
-}
-
-static WRITE16_HANDLER( _32x_68k_a15102_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		a15102_reg = data;
-
-		if (data&0x1)
-		{
-			printf("68k -> SH2 master int command\n");
-			if (sh2_master_cmdint_enable) cpunum_set_input_line(machine, _32x_master_cpu_number,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
-		}
-
-		if (data&0x2)
-		{
-			printf("68k -> SH2 slave int command\n");
-			if (sh2_slave_cmdint_enable) cpunum_set_input_line(machine, _32x_slave_cpu_number,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
-		}
-	}
-}
-
-
-
 DRIVER_INIT( _32x )
 {
 
@@ -6787,21 +6773,6 @@ DRIVER_INIT( _32x )
 
 
 
-	/* SH2 stuff */
-	memory_install_readwrite32_handler(machine, 2, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4003, 0, 0, sh2_4000_master_r, sh2_4000_master_w);
-	memory_install_readwrite32_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4003, 0, 0, sh2_4000_slave_r, sh2_4000_slave_w );
-
-	/* Install Interrupt Clear Registers */
-	memory_install_readwrite32_handler(machine, 2, ADDRESS_SPACE_PROGRAM, 0x4014, 0x4017, 0, 0, sh2_master_4014_4016_r, sh2_master_4014_4016_w );
-	memory_install_write32_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x4014, 0x4017, 0, 0, sh2_slave_4014_4016_w );
-	memory_install_write32_handler(machine, 2, ADDRESS_SPACE_PROGRAM, 0x4018, 0x401b, 0, 0, sh2_master_4018_401a_w );
-	memory_install_write32_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x4018, 0x401b, 0, 0, sh2_slave_4018_401a_w );
-	memory_install_write32_handler(machine, 2, ADDRESS_SPACE_PROGRAM, 0x401c, 0x401f, 0, 0, sh2_master_401c_401e_w );
-	memory_install_write32_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x401c, 0x401f, 0, 0, sh2_slave_401c_401e_w );
-
-
-	memory_install_readwrite32_handler(machine, 2, ADDRESS_SPACE_PROGRAM, 0x4020, 0x402f, 0, 0, sh2_commsport_r, sh2_commsport_w );
-	memory_install_readwrite32_handler(machine, 3, ADDRESS_SPACE_PROGRAM, 0x4020, 0x402f, 0, 0, sh2_commsport_r, sh2_commsport_w );
 
 	/* Interrupts are masked / disabled at first */
 	sh2_master_vint_enable = sh2_slave_vint_enable = 0;
@@ -6833,7 +6804,6 @@ DRIVER_INIT( _32x )
 #if 1
 
 ROM_START( 32x_bios )
-	ROM_REGION16_BE( 0x400000, "main", ROMREGION_ERASE00 )
 
 	ROM_REGION16_BE( 0x400000, "gamecart", 0 ) /* 68000 Code */
 	// test sets
@@ -6853,8 +6823,8 @@ ROM_START( 32x_bios )
 //	ROM_LOAD( "32x_carn.bin", 0x000000,   0x300000, CRC(7c7be6a2) SHA1(9a563ed821b483148339561ebd2b876efa58847b) ) // ?? doesn't boot
 //	ROM_LOAD( "32x_raw.bin", 0x000000,   0x400000, CRC(8eb7cd2c) SHA1(94b974f2f69f0c10bc18b349fa4ff95ca56fa47b) ) // needs cmdint status reads
 //	ROM_LOAD( "32x_darx.bin", 0x000000,   0x200000, CRC(22d7c906) SHA1(108b4ffed8643abdefa921cfb58389b119b47f3d) ) // ?? probably abuses the hardware, euro only ;D
-	ROM_LOAD( "32x_prim.bin", 0x000000,   0x400000, CRC(e78a4d28) SHA1(5084dcca51d76173c383ab7d04cbc661673545f7) ) // needs tight sync or fails after sega logo - works with tight sync, but VERY slow
-//	ROM_LOAD( "32x_brut.bin", 0x000000,   0x300000, CRC(7a72c939) SHA1(40aa2c787f37772cdbd7280b8be06b15421fabae) ) // locks up left in attract, doesn't scroll, no idea...
+//	ROM_LOAD( "32x_prim.bin", 0x000000,   0x400000, CRC(e78a4d28) SHA1(5084dcca51d76173c383ab7d04cbc661673545f7) ) // needs tight sync or fails after sega logo - works with tight sync, but VERY slow
+	ROM_LOAD( "32x_brut.bin", 0x000000,   0x300000, CRC(7a72c939) SHA1(40aa2c787f37772cdbd7280b8be06b15421fabae) ) // locks up left in attract, doesn't scroll, no idea...
 //  ROM_LOAD( "32x_temp.bin", 0x000000,  0x300000, CRC(14e5c575) SHA1(6673ba83570b4f2c1b4a22415a56594c3cc6c6a9) ) // needs ram fills and DREQ? (no main character)
 //  ROM_LOAD( "32x_vr.bin", 0x000000,  0x300000, CRC(7896b62e) SHA1(18dfdeb50780c2623e60a6587d7ed701a1cf81f1) ) // doesn't work
 //  ROM_LOAD( "32x_h15.bin", 0x000000,  0x0024564,  CRC(938f4e1d) SHA1(ab7270121be53c6c82c4cb45f8f41dd24eb3a2a5) ) // test demo for 15bpp mode
@@ -6865,6 +6835,11 @@ ROM_START( 32x_bios )
 	ROM_REGION16_BE( 0x400000, "32x_68k_bios", 0 ) /* 68000 Code */
 //  ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
 	ROM_LOAD( "32x_g_bios.bin", 0x000000,  0x000100, CRC(5c12eae8) SHA1(dbebd76a448447cb6e524ac3cb0fd19fc065d944) )
+
+	ROM_REGION16_BE( 0x400000, "main", ROMREGION_ERASE00 )
+	// temp, rom should only be visible here when one of the regs is set, tempo needs it
+	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
+	ROM_COPY( "32x_68k_bios", 0x0, 0x0, 0x100)
 
 	ROM_REGION( 0x400000, "32x_master_sh2", 0 ) /* SH2 Code */
 	ROM_LOAD( "32x_m_bios.bin", 0x000000,  0x000800, CRC(dd9c46b8) SHA1(1e5b0b2441a4979b6966d942b20cc76c413b8c5e) )
