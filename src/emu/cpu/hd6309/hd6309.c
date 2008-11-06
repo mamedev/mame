@@ -143,7 +143,8 @@ typedef struct
 	UINT8	ireg;		/* First opcode */
 	UINT8	irq_state[2];
 	int 	extra_cycles; /* cycles used up by interrupts */
-	int 	(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	UINT8	int_state;	/* SYNC and CWAI flags */
 	UINT8	nmi_state;
 } hd6309_Regs;
@@ -452,7 +453,7 @@ static void CHECK_IRQ_LINES( void )
 		CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */
 		PCD=RM16(0xfff6);
 		CHANGE_PC;
-		(void)(*hd6309.irq_callback)(HD6309_FIRQ_LINE);
+		(void)(*hd6309.irq_callback)(hd6309.device, HD6309_FIRQ_LINE);
 	}
 	else
 	if( hd6309.irq_state[HD6309_IRQ_LINE]!=CLEAR_LINE && !(CC & CC_II) )
@@ -486,7 +487,7 @@ static void CHECK_IRQ_LINES( void )
 		CC |= CC_II;					/* inhibit IRQ */
 		PCD=RM16(0xfff8);
 		CHANGE_PC;
-		(void)(*hd6309.irq_callback)(HD6309_IRQ_LINE);
+		(void)(*hd6309.irq_callback)(hd6309.device, HD6309_IRQ_LINE);
 	}
 }
 
@@ -517,9 +518,10 @@ static STATE_POSTLOAD( hd6309_postload )
 	UpdateState();
 }
 
-static void hd6309_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( hd6309 )
 {
 	hd6309.irq_callback = irqcallback;
+	hd6309.device = device;
 
 	state_save_register_item("hd6309", index, PC);
 	state_save_register_item("hd6309", index, U);
@@ -540,7 +542,7 @@ static void hd6309_init(int index, int clock, const void *config, int (*irqcallb
 /****************************************************************************/
 /* Reset registers to their initial values                                  */
 /****************************************************************************/
-static void hd6309_reset(void)
+static CPU_RESET( hd6309 )
 {
 	hd6309.int_state = 0;
 	hd6309.nmi_state = CLEAR_LINE;
@@ -558,7 +560,7 @@ static void hd6309_reset(void)
 	UpdateState();
 }
 
-static void hd6309_exit(void)
+static CPU_EXIT( hd6309 )
 {
 	/* nothing to do ? */
 }
@@ -623,7 +625,7 @@ static void set_irq_line(int irqline, int state)
 #include "6309ops.c"
 
 /* execute instructions on this CPU until icount expires */
-static int hd6309_execute(int cycles)	/* NS 970908 */
+static CPU_EXECUTE( hd6309 )	/* NS 970908 */
 {
 	hd6309_ICount = cycles - hd6309.extra_cycles;
 	hd6309.extra_cycles = 0;
@@ -1292,10 +1294,10 @@ void hd6309_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = hd6309_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = hd6309_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = hd6309_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = hd6309_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = hd6309_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = hd6309_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = hd6309_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(hd6309);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(hd6309);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(hd6309);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(hd6309);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = hd6309_dasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &hd6309_ICount;			break;

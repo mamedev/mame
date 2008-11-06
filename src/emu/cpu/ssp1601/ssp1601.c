@@ -497,7 +497,7 @@ static UINT32 ptr2_read(int op)
 // -----------------------------------------------------
 
 
-static void ssp1601_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( ssp1601 )
 {
 	state_save_register_item(CHIP_NAME, index, rX);
 	state_save_register_item(CHIP_NAME, index, rY);
@@ -516,12 +516,12 @@ static void ssp1601_init(int index, int clock, const void *config, int (*irqcall
 	ssp1601.gr[0].w.h = 0xffff; // constant reg
 }
 
-static void ssp1601_exit(void)
+static CPU_EXIT( ssp1601 )
 {
 	/* nothing to do */
 }
 
-static void ssp1601_reset(void)
+static CPU_RESET( ssp1601 )
 {
 	rPC = 0x400;
 	rSTACK = 0; // ? using ascending stack
@@ -529,7 +529,7 @@ static void ssp1601_reset(void)
 }
 
 
-static int ssp1601_execute(int cycles)
+static CPU_EXECUTE( ssp1601 )
 {
 	g_cycles = cycles;
 
@@ -861,10 +861,10 @@ void ssp1601_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = ssp1601_set_info;	break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = ssp1601_get_context; break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = ssp1601_set_context; break;
-		case CPUINFO_PTR_INIT:							info->init = ssp1601_init;			break;
-		case CPUINFO_PTR_RESET:							info->reset = ssp1601_reset;			break;
-		case CPUINFO_PTR_EXIT:							info->exit = ssp1601_exit;			break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = ssp1601_execute;		break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ssp1601);			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ssp1601);			break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ssp1601);			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ssp1601);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = ssp1601_dasm;	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &g_cycles;			break;

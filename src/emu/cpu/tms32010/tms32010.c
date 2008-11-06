@@ -710,7 +710,7 @@ static const opcode_fn opcode_7F_other[32]=
 /****************************************************************************
  *  Inits CPU emulation
  ****************************************************************************/
-static void tms32010_init (int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( tms32010 )
 {
 	state_save_register_item("tms32010", index, R.PC);
 	state_save_register_item("tms32010", index, R.PREVPC);
@@ -732,7 +732,7 @@ static void tms32010_init (int index, int clock, const void *config, int (*irqca
 /****************************************************************************
  *  Reset registers to their initial values
  ****************************************************************************/
-static void tms32010_reset (void)
+static CPU_RESET( tms32010 )
 {
 	R.PC    = 0;
 	R.STR   = 0x7efe;	// OV cleared
@@ -748,7 +748,7 @@ static void tms32010_reset (void)
 /****************************************************************************
  *  Shut down CPU emulation
  ****************************************************************************/
-static void tms32010_exit (void)
+static CPU_EXIT( tms32010 )
 {
 	/* nothing to do ? */
 }
@@ -776,7 +776,7 @@ static int Ext_IRQ(void)
 /****************************************************************************
  *  Execute IPeriod. Return 0 if emulation should be stopped
  ****************************************************************************/
-static int tms32010_execute(int cycles)
+static CPU_EXECUTE( tms32010 )
 {
 	tms32010_icount = cycles;
 
@@ -925,10 +925,10 @@ void tms32010_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = tms32010_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = tms32010_get_context; break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = tms32010_set_context; break;
-		case CPUINFO_PTR_INIT:							info->init = tms32010_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = tms32010_reset;			break;
-		case CPUINFO_PTR_EXIT:							info->exit = tms32010_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = tms32010_execute;		break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tms32010);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms32010);			break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(tms32010);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tms32010);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tms32010_dasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tms32010_icount;		break;

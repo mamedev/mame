@@ -526,7 +526,7 @@ static void pdp1_set_irq_line (int irqline, int state)
 }
 
 
-static void pdp1_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( pdp1 )
 {
 	const pdp1_reset_param_t *param = config;
 	int i;
@@ -580,7 +580,7 @@ static void pdp1_init(int index, int clock, const void *config, int (*irqcallbac
 	pulse_start_clear();
 }
 
-static void pdp1_reset (void)
+static CPU_RESET( pdp1 )
 {
 	/* nothing to do */
 }
@@ -618,7 +618,7 @@ static const char instruction_kind[32] =
 
 
 /* execute instructions on this CPU until icount expires */
-static int pdp1_execute(int cycles)
+static CPU_EXECUTE( pdp1 )
 {
 	pdp1_ICount = cycles;
 
@@ -1018,9 +1018,9 @@ void pdp1_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_PTR_SET_INFO:						info->setinfo = pdp1_set_info;			break;
 	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = pdp1_get_context;	break;
 	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = pdp1_set_context;	break;
-	case CPUINFO_PTR_INIT:							info->init = pdp1_init;					break;
-	case CPUINFO_PTR_RESET:							info->reset = pdp1_reset;				break;
-	case CPUINFO_PTR_EXECUTE:						info->execute = pdp1_execute;			break;
+	case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(pdp1);					break;
+	case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(pdp1);				break;
+	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(pdp1);			break;
 	case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 
 	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = pdp1_dasm;			break;

@@ -244,7 +244,8 @@ struct _mcs51_regs
 	UINT8	(*sfr_read)(mcs51_regs *mcs51, size_t offset);
 
 	/* Interrupt Callback */
-	int 	(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 
 	/* Serial Port TX/RX Callbacks */
 	// TODO: Move to special port r/w
@@ -1721,7 +1722,7 @@ static void check_irqs(mcs51_regs *mcs51)
 
 			/* indicate we took the external IRQ */
 			if (mcs51->irq_callback != NULL)
-				(*mcs51->irq_callback)(0);
+				(*mcs51->irq_callback)(mcs51->device, 0);
 
 			break;
 		case V_TF0:
@@ -1734,7 +1735,7 @@ static void check_irqs(mcs51_regs *mcs51)
 				SET_IE1(0);
 			/* indicate we took the external IRQ */
 			if (mcs51->irq_callback != NULL)
-				(*mcs51->irq_callback)(1);
+				(*mcs51->irq_callback)(mcs51->device, 1);
 
 			break;
 		case V_TF1:
@@ -1885,9 +1886,9 @@ static void mcs51_set_irq_line(mcs51_regs *mcs51, int irqline, int state)
 }
 
 /* Execute cycles - returns number of cycles actually run */
-static int mcs51_execute(int cycles)
+static CPU_EXECUTE( mcs51 )
 {
-	mcs51_regs *mcs51 = token; 
+	mcs51_regs *mcs51 = device->token; 
 	UINT8 op;
 
 	mcs51->icount = cycles;
@@ -2035,14 +2036,14 @@ static UINT8 mcs51_sfr_read(mcs51_regs *mcs51, size_t offset)
 }
 
 
-static void mcs51_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( mcs51 )
 {
-	mcs51_regs *mcs51;
-	
-	token = auto_malloc(sizeof(*mcs51));
-	mcs51 = token;
+	mcs51_regs *mcs51 = device->token;
+
+	token = device->token;	// temporary
 	
 	mcs51->irq_callback = irqcallback;
+	mcs51->device = device;
 
 	mcs51->features = FEATURE_NONE;
 	mcs51->ram_mask = 0x7F;  			/* 128 bytes of ram */
@@ -2065,19 +2066,17 @@ static void mcs51_init(int index, int clock, const void *config, int (*irqcallba
 	state_save_register_item("mcs51", index, mcs51->irq_active );
 }
 
-static void i80c51_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( i80c51 )
 {
-	mcs51_regs *mcs51;
-	mcs51_init(index, clock, config, irqcallback);
-
-	mcs51 = token;
+	mcs51_regs *mcs51 = device->token;
+	CPU_INIT_CALL(mcs51);
 	mcs51->features |= FEATURE_CMOS;
 }
 
 /* Reset registers to the initial values */
-static void mcs51_reset(void)
+static CPU_RESET( mcs51 )
 {
-	mcs51_regs *mcs51 = token;
+	mcs51_regs *mcs51 = device->token;
 
 	update_ptrs(mcs51);
 	//Set up serial call back handlers
@@ -2162,7 +2161,7 @@ static void mcs51_reset(void)
 }
 
 /* Shut down CPU core */
-static void mcs51_exit(void)
+static CPU_EXIT( mcs51 )
 {
 	/* nothing to do */
 }
@@ -2205,11 +2204,10 @@ static UINT8 i8052_sfr_read(mcs51_regs *mcs51, size_t offset)
 	}
 }
 
-static void i8052_init (int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( i8052 )
 {
-	mcs51_regs *mcs51;
-	mcs51_init(index, clock, config, irqcallback);
-	mcs51 = token;
+	mcs51_regs *mcs51 = device->token;
+	CPU_INIT_CALL(mcs51);
 	
 	mcs51->ram_mask = 0xFF;  			/* 256 bytes of ram */
 	mcs51->num_interrupts = 6;			/* 6 interrupts */
@@ -2259,22 +2257,20 @@ static UINT8 i80c52_sfr_read(mcs51_regs *mcs51, size_t offset)
 	}
 }
 
-static void i80c52_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( i80c52 )
 {
-	mcs51_regs *mcs51;
-	i8052_init(index, clock, config, irqcallback);
-	mcs51 = token;
+	mcs51_regs *mcs51 = device->token;
+	CPU_INIT_CALL(i8052);
 	
 	mcs51->features |= (FEATURE_I80C52 | FEATURE_CMOS);
 	mcs51->sfr_read = i80c52_sfr_read;
 	mcs51->sfr_write = i80c52_sfr_write;
 }
 
-static void i80c31_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( i80c31 )
 {
-	mcs51_regs *mcs51;
-	i80c52_init(index, clock, config, irqcallback);
-	mcs51 = token;
+	mcs51_regs *mcs51 = device->token;
+	CPU_INIT_CALL(i8052);
 
 	mcs51->ram_mask = 0x7F;  			/* 128 bytes of ram */
 }
@@ -2352,15 +2348,14 @@ static UINT8 ds5002fp_sfr_read(mcs51_regs *mcs51, size_t offset)
 	return data_read_byte_8le((size_t) offset | 0x100);
 }
 
-static void ds5002fp_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( ds5002fp )
 {
 	/* default configuration */
 	static const ds5002fp_config default_config = { 0x00, 0x00, 0x00 };
 	const ds5002fp_config *sconfig = config ? config : &default_config;
-	mcs51_regs *mcs51;
+	mcs51_regs *mcs51 = device->token;
 	
 	mcs51_init(index, clock, config, irqcallback);
-	mcs51 = token;
 	
 	mcs51->ds5002fp.config = sconfig;
 	mcs51->features |= (FEATURE_DS5002FP | FEATURE_CMOS);
@@ -2405,8 +2400,6 @@ ADDRESS_MAP_END
 
 static void mcs51_get_context(void *dst)
 {
-	if( dst )
-		*(void **)dst = token;
 }
 
 static void mcs51_set_context(void *src)
@@ -2414,7 +2407,7 @@ static void mcs51_set_context(void *src)
 	mcs51_regs *mcs51;
 	
 	if( src )
-		token = *(void **)src;
+		token = src;
 	
 	mcs51 = token;
 	change_pc(PC);
@@ -2474,7 +2467,7 @@ static void mcs51_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(mcs51);				break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(mcs51_regs);			break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
@@ -2521,10 +2514,10 @@ static void mcs51_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = mcs51_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = mcs51_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = mcs51_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = mcs51_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = mcs51_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = mcs51_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = mcs51_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(mcs51);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(mcs51);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(mcs51);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(mcs51);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i8051_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &mcs51->icount;			break;
@@ -2604,7 +2597,7 @@ void i8032_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = i8052_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8052);				break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = address_map_data_8bit;	break;
 
@@ -2618,7 +2611,7 @@ void i8052_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = i8052_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8052);				break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = address_map_program_13bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = address_map_data_8bit;	break;
@@ -2646,7 +2639,7 @@ void i8752_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = i8052_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8052);				break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = address_map_program_13bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = address_map_data_8bit;	break;
@@ -2667,7 +2660,7 @@ void i80c31_get_info(UINT32 state, cpuinfo *info)
      * of i80c52 with 128 bytes internal ram */
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = i80c31_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c31);				break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = NULL;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = address_map_data_7bit;	break;
@@ -2681,7 +2674,7 @@ void i80c51_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = i80c51_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c51);				break;
 		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C51");				break;
 		default:										i8051_get_info(state, info);			break;
 	}
@@ -2691,7 +2684,7 @@ void i80c32_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = i80c52_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c52);				break;
 		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C32");				break;
 		default:										i8032_get_info(state, info);			break;
 	}
@@ -2701,7 +2694,7 @@ void i80c52_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = i80c52_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c52);				break;
 		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C52");				break;
 		default:										i8052_get_info(state, info);			break;
 	}
@@ -2711,7 +2704,7 @@ void i87c51_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = i80c51_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c51);				break;
 		case CPUINFO_STR_NAME:							strcpy(info->s, "I87C51");				break;
 		default:										i8751_get_info(state, info);			break;
 	}
@@ -2721,7 +2714,7 @@ void i87c52_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = i80c52_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c52);				break;
 		case CPUINFO_STR_NAME:							strcpy(info->s, "I87C52");				break;
 		default:										i8752_get_info(state, info);			break;
 	}
@@ -2735,7 +2728,7 @@ void at89c4051_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = i80c51_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c51);				break;
 		case CPUINFO_STR_NAME:							strcpy(info->s, "AT89C4051");				break;
 		default:										i8051_get_info(state, info);			break;
 	}

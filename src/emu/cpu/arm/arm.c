@@ -230,7 +230,8 @@ typedef struct
 	UINT32 coproRegister[16];
 	UINT8 pendingIrq;
 	UINT8 pendingFiq;
-	int (*irq_callback)(int);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 } ARM_REGS;
 
 static ARM_REGS arm;
@@ -300,23 +301,25 @@ INLINE void SetRegister( int rIndex, UINT32 value )
 
 /***************************************************************************/
 
-static void arm_reset(void)
+static CPU_RESET( arm )
 {
-	int (*save_irqcallback)(int) = arm.irq_callback;
+	cpu_irq_callback save_irqcallback = arm.irq_callback;
+	const device_config *save_device = arm.device;
 	memset(&arm, 0, sizeof(arm));
 	arm.irq_callback = save_irqcallback;
+	arm.device = save_device;
 
 	/* start up in SVC mode with interrupts disabled. */
 	R15 = eARM_MODE_SVC|I_MASK|F_MASK;
 	change_pc(R15 & ADDRESS_MASK);
 }
 
-static void arm_exit(void)
+static CPU_EXIT( arm )
 {
 	/* nothing to do here */
 }
 
-static int arm_execute( int cycles )
+static CPU_EXECUTE( arm )
 {
 	UINT32 pc;
 	UINT32 insn;
@@ -509,9 +512,10 @@ static offs_t arm_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 
 	return 4 | arm_disasm(buffer, pc, opcode);
 }
 
-static void arm_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( arm )
 {
 	arm.irq_callback = irqcallback;
+	arm.device = device;
 
 	state_save_register_item_array("arm", index, arm.sArmRegister);
 	state_save_register_item_array("arm", index, arm.coproRegister);
@@ -1525,10 +1529,10 @@ void arm_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = arm_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = arm_get_context;		break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = arm_set_context;		break;
-		case CPUINFO_PTR_INIT:							info->init = arm_init;					break;
-		case CPUINFO_PTR_RESET:							info->reset = arm_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = arm_exit;					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = arm_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(arm);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(arm);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(arm);					break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(arm);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = arm_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &arm_icount;				break;

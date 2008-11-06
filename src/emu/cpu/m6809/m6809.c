@@ -101,7 +101,8 @@ typedef struct
 	UINT8	ireg;		/* First opcode */
 	UINT8	irq_state[2];
     int     extra_cycles; /* cycles used up by interrupts */
-    int     (*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
     UINT8   int_state;  /* SYNC and CWAI flags */
     UINT8   nmi_state;
 } m6809_Regs;
@@ -178,7 +179,7 @@ static PAIR ea;         /* effective address */
 		CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */		\
 		PCD=RM16(0xfff6);												\
 		CHANGE_PC;														\
-		(void)(*m6809.irq_callback)(M6809_FIRQ_LINE);					\
+		(void)(*m6809.irq_callback)(m6809.device, M6809_FIRQ_LINE);		\
 	}																	\
 	else																\
 	if( m6809.irq_state[M6809_IRQ_LINE]!=CLEAR_LINE && !(CC & CC_II) )	\
@@ -206,7 +207,7 @@ static PAIR ea;         /* effective address */
 		CC |= CC_II;					/* inhibit IRQ */				\
 		PCD=RM16(0xfff8);												\
 		CHANGE_PC;														\
-		(void)(*m6809.irq_callback)(M6809_IRQ_LINE);					\
+		(void)(*m6809.irq_callback)(m6809.device, M6809_IRQ_LINE);		\
 	}
 
 /* public globals */
@@ -417,7 +418,7 @@ static void m6809_set_context(void *src)
 /****************************************************************************/
 /* Reset registers to their initial values                                  */
 /****************************************************************************/
-static void m6809_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( m6809 )
 {
 	state_save_register_item("m6809", index, PC);
 	state_save_register_item("m6809", index, PPC);
@@ -433,9 +434,10 @@ static void m6809_init(int index, int clock, const void *config, int (*irqcallba
 	state_save_register_item("m6809", index, m6809.nmi_state);
 
 	m6809.irq_callback = irqcallback;
+	m6809.device = device;
 }
 
-static void m6809_reset(void)
+static CPU_RESET( m6809 )
 {
 	m6809.int_state = 0;
 	m6809.nmi_state = CLEAR_LINE;
@@ -451,7 +453,7 @@ static void m6809_reset(void)
 	CHANGE_PC;
 }
 
-static void m6809_exit(void)
+static CPU_EXIT( m6809 )
 {
 	/* nothing to do ? */
 }
@@ -512,7 +514,7 @@ static void set_irq_line(int irqline, int state)
 #include "6809ops.c"
 
 /* execute instructions on this CPU until icount expires */
-static int m6809_execute(int cycles)	/* NS 970908 */
+static CPU_EXECUTE( m6809 )	/* NS 970908 */
 {
     m6809_ICount = cycles - m6809.extra_cycles;
 	m6809.extra_cycles = 0;
@@ -1170,10 +1172,10 @@ void m6809_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m6809_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m6809_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m6809_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = m6809_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = m6809_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = m6809_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = m6809_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6809);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6809);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m6809);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6809);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6809_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6809_ICount;			break;

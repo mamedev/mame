@@ -342,7 +342,7 @@ INLINE void save_fast_iregs(drcuml_block *block)
     mips3_init - initialize the processor
 -------------------------------------------------*/
 
-static void mips3_init(mips3_flavor flavor, int bigendian, int index, int clock, const mips3_config *config, int (*irqcallback)(int))
+static void mips3_init(mips3_flavor flavor, int bigendian, const device_config *device, int index, int clock, const mips3_config *config, cpu_irq_callback irqcallback)
 {
 	drcfe_config feconfig =
 	{
@@ -366,7 +366,7 @@ static void mips3_init(mips3_flavor flavor, int bigendian, int index, int clock,
 	memset(mips3, 0, sizeof(*mips3));
 
 	/* initialize the core */
-	mips3com_init(mips3, flavor, bigendian, index, clock, config, irqcallback);
+	mips3com_init(mips3, flavor, bigendian, device, index, clock, config, irqcallback);
 
 	/* allocate the implementation-specific state from the full cache */
 	mips3->impstate = drccache_memory_alloc_near(cache, sizeof(*mips3->impstate));
@@ -474,7 +474,7 @@ static void mips3_init(mips3_flavor flavor, int bigendian, int index, int clock,
     mips3_reset - reset the processor
 -------------------------------------------------*/
 
-static void mips3_reset(void)
+static CPU_RESET( mips3 )
 {
 	/* reset the common code and mark the cache dirty */
 	mips3com_reset(mips3);
@@ -488,7 +488,7 @@ static void mips3_reset(void)
     specified number of cycles
 -------------------------------------------------*/
 
-static int mips3_execute(int cycles)
+static CPU_EXECUTE( mips3 )
 {
 	drcuml_state *drcuml = mips3->impstate->drcuml;
 	int execute_result;
@@ -524,7 +524,7 @@ static int mips3_execute(int cycles)
     mips3_exit - cleanup from execution
 -------------------------------------------------*/
 
-static void mips3_exit(void)
+static CPU_EXIT( mips3 )
 {
 	mips3com_exit(mips3);
 
@@ -629,9 +629,9 @@ static void mips3_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = mips3_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = mips3_set_context;	break;
 		case CPUINFO_PTR_INIT:							/* provided per-CPU */					break;
-		case CPUINFO_PTR_RESET:							info->reset = mips3_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = mips3_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = mips3_execute;			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(mips3);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(mips3);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(mips3);			break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = mips3_dasm;			break;
 		case CPUINFO_PTR_TRANSLATE:						info->translate = mips3_translate;		break;
 
@@ -3619,14 +3619,14 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
 ***************************************************************************/
 
 #if (HAS_R4600)
-static void r4600be_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( r4600be )
 {
-	mips3_init(MIPS3_TYPE_R4600, TRUE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R4600, TRUE, device, index, clock, config, irqcallback);
 }
 
-static void r4600le_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( r4600le )
 {
-	mips3_init(MIPS3_TYPE_R4600, FALSE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R4600, FALSE, device, index, clock, config, irqcallback);
 }
 
 void r4600be_get_info(UINT32 state, cpuinfo *info)
@@ -3637,7 +3637,7 @@ void r4600be_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = r4600be_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4600be);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R4600 (big)");			break;
@@ -3655,7 +3655,7 @@ void r4600le_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = r4600le_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4600le);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R4600 (little)");		break;
@@ -3673,14 +3673,14 @@ void r4600le_get_info(UINT32 state, cpuinfo *info)
 ***************************************************************************/
 
 #if (HAS_R4650)
-static void r4650be_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( r4650be )
 {
-	mips3_init(MIPS3_TYPE_R4650, TRUE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R4650, TRUE, device, index, clock, config, irqcallback);
 }
 
-static void r4650le_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( r4650le )
 {
-	mips3_init(MIPS3_TYPE_R4650, FALSE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R4650, FALSE, device, index, clock, config, irqcallback);
 }
 
 void r4650be_get_info(UINT32 state, cpuinfo *info)
@@ -3691,7 +3691,7 @@ void r4650be_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = r4650be_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4650be);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "IDT R4650 (big)");		break;
@@ -3709,7 +3709,7 @@ void r4650le_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = r4650le_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4650le);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "IDT R4650 (little)");	break;
@@ -3727,14 +3727,14 @@ void r4650le_get_info(UINT32 state, cpuinfo *info)
 ***************************************************************************/
 
 #if (HAS_R4700)
-static void r4700be_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( r4700be )
 {
-	mips3_init(MIPS3_TYPE_R4700, TRUE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R4700, TRUE, device, index, clock, config, irqcallback);
 }
 
-static void r4700le_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( r4700le )
 {
-	mips3_init(MIPS3_TYPE_R4700, FALSE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R4700, FALSE, device, index, clock, config, irqcallback);
 }
 
 void r4700be_get_info(UINT32 state, cpuinfo *info)
@@ -3745,7 +3745,7 @@ void r4700be_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = r4700be_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4700be);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R4700 (big)");			break;
@@ -3763,7 +3763,7 @@ void r4700le_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = r4700le_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4700le);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R4700 (little)");		break;
@@ -3781,14 +3781,14 @@ void r4700le_get_info(UINT32 state, cpuinfo *info)
 ***************************************************************************/
 
 #if (HAS_R5000)
-static void r5000be_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( r5000be )
 {
-	mips3_init(MIPS3_TYPE_R5000, TRUE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R5000, TRUE, device, index, clock, config, irqcallback);
 }
 
-static void r5000le_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( r5000le )
 {
-	mips3_init(MIPS3_TYPE_R5000, FALSE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_R5000, FALSE, device, index, clock, config, irqcallback);
 }
 
 void r5000be_get_info(UINT32 state, cpuinfo *info)
@@ -3799,7 +3799,7 @@ void r5000be_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = r5000be_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r5000be);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R5000 (big)");			break;
@@ -3817,7 +3817,7 @@ void r5000le_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = r5000le_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r5000le);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R5000 (little)");		break;
@@ -3835,14 +3835,14 @@ void r5000le_get_info(UINT32 state, cpuinfo *info)
 ***************************************************************************/
 
 #if (HAS_QED5271)
-static void qed5271be_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( qed5271be )
 {
-	mips3_init(MIPS3_TYPE_QED5271, TRUE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_QED5271, TRUE, device, index, clock, config, irqcallback);
 }
 
-static void qed5271le_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( qed5271le )
 {
-	mips3_init(MIPS3_TYPE_QED5271, FALSE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_QED5271, FALSE, device, index, clock, config, irqcallback);
 }
 
 void qed5271be_get_info(UINT32 state, cpuinfo *info)
@@ -3853,7 +3853,7 @@ void qed5271be_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = qed5271be_init;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(qed5271be);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "QED5271 (big)");		break;
@@ -3871,7 +3871,7 @@ void qed5271le_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = qed5271le_init;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(qed5271le);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "QED5271 (little)");	break;
@@ -3889,14 +3889,14 @@ void qed5271le_get_info(UINT32 state, cpuinfo *info)
 ***************************************************************************/
 
 #if (HAS_RM7000)
-static void rm7000be_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( rm7000be )
 {
-	mips3_init(MIPS3_TYPE_RM7000, TRUE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_RM7000, TRUE, device, index, clock, config, irqcallback);
 }
 
-static void rm7000le_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( rm7000le )
 {
-	mips3_init(MIPS3_TYPE_RM7000, FALSE, index, clock, config, irqcallback);
+	mips3_init(MIPS3_TYPE_RM7000, FALSE, device, index, clock, config, irqcallback);
 }
 
 void rm7000be_get_info(UINT32 state, cpuinfo *info)
@@ -3907,7 +3907,7 @@ void rm7000be_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = rm7000be_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(rm7000be);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "RM7000 (big)");		break;
@@ -3925,7 +3925,7 @@ void rm7000le_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = rm7000le_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(rm7000le);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "RM7000 (little)");		break;

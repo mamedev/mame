@@ -313,7 +313,7 @@ static void take_interrupt(int irq)
 
 		/* else call back the cpu interface to retrieve the vector */
 		else
-			irq_vector = (*Z180.irq_callback)(0);
+			irq_vector = (*Z180.irq_callback)(Z180.device, 0);
 
 		LOG(("Z180 #%d single int. irq_vector $%02x\n", cpu_getactivecpu(), irq_vector));
 

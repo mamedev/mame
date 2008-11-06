@@ -58,7 +58,8 @@ typedef struct
 		UINT16 limit;
 		UINT8 rights;
 	} ldtr, tr;
-    int     (*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
     INT32     AuxVal, OverVal, SignVal, ZeroVal, CarryVal, DirVal; /* 0 or non-0 valued flags */
     UINT8	ParityVal;
 	UINT8	TF, IF; 	/* 0 or 1 valued flags */
@@ -82,7 +83,7 @@ static char seg_prefix;         /* prefix segment indicator */
 
 static UINT8 parity_table[256];
 
-static struct i80x86_timing cycles;
+static struct i80x86_timing timing;
 
 /***************************************************************************/
 
@@ -134,7 +135,7 @@ static void i80286_set_a20_line(int state)
 	I.amask = state ? 0x00ffffff : 0x000fffff;
 }
 
-static void i80286_reset (void)
+static CPU_RESET( i80286 )
 {
 	static int urinit=1;
 
@@ -211,14 +212,14 @@ static void set_irq_line(int irqline, int state)
 	}
 }
 
-static int i80286_execute(int num_cycles)
+static CPU_EXECUTE( i80286 )
 {
 	/* copy over the cycle counts if they're not correct */
-	if (cycles.id != 80286)
-		cycles = i80286_cycles;
+	if (timing.id != 80286)
+		timing = i80286_cycles;
 
 	/* adjust for any interrupts that came in */
-	i80286_ICount = num_cycles;
+	i80286_ICount = cycles;
 	i80286_ICount -= I.extra_cycles;
 	I.extra_cycles = 0;
 
@@ -238,7 +239,7 @@ static int i80286_execute(int num_cycles)
 	i80286_ICount -= I.extra_cycles;
 	I.extra_cycles = 0;
 
-	return num_cycles - i80286_ICount;
+	return cycles - i80286_ICount;
 }
 
 extern int i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int mode);
@@ -248,7 +249,7 @@ static offs_t i80286_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UIN
 	return i386_dasm_one(buffer, pc, oprom, 16);
 }
 
-static void i80286_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( i80286 )
 {
 	static const char type[] = "80286";
 	state_save_register_item_array(type, index, I.regs.w);
@@ -287,6 +288,7 @@ static void i80286_init(int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item(type, index, I.extra_cycles);
 
 	I.irq_callback = irqcallback;
+	I.device = device;
 
 	/* If a reset parameter is given, take it as pointer to an address mask */
 	if( config )
@@ -439,10 +441,10 @@ void i80286_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = i80286_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = i80286_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = i80286_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = i80286_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = i80286_reset;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80286);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(i80286);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = NULL;						break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = i80286_execute;			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i80286);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i80286_dasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &i80286_ICount;			break;

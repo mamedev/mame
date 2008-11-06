@@ -57,7 +57,8 @@ typedef struct
 	UINT8	cc; 			/* Condition codes */
 
 	UINT16	pending_interrupts; /* MB */
-	int 	(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	int 	irq_state[9];		/* KW Additional lines for HD63705 */
 	int		nmi_state;
 } m6805_Regs;
@@ -292,7 +293,7 @@ static void m68705_Interrupt(void)
 			PUSHBYTE(m6805.cc);
 			SEI;
 			if (m6805.irq_callback)
-				(*m6805.irq_callback)(0);
+				(*m6805.irq_callback)(m6805.device, 0);
 
 			if ((m6805.pending_interrupts & (1<<M68705_IRQ_LINE)) != 0 )
 			{
@@ -329,7 +330,7 @@ static void Interrupt(void)
         SEI;
 		/* no vectors supported, just do the callback to clear irq_state if needed */
 		if (m6805.irq_callback)
-			(*m6805.irq_callback)(0);
+			(*m6805.irq_callback)(m6805.device, 0);
 
 		RM16( 0x1ffc, &pPC);
 		change_pc(PC);
@@ -357,7 +358,7 @@ static void Interrupt(void)
         SEI;
 		/* no vectors supported, just do the callback to clear irq_state if needed */
 		if (m6805.irq_callback)
-			(*m6805.irq_callback)(0);
+			(*m6805.irq_callback)(m6805.device, 0);
 
 
 #if (HAS_HD63705)
@@ -440,17 +441,20 @@ static void state_register(const char *type, int index)
 	state_save_register_item_array(type, index, m6805.irq_state);
 }
 
-static void m6805_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( m6805 )
 {
 	state_register("m6805", index);
 	m6805.irq_callback = irqcallback;
+	m6805.device = device;
 }
 
-static void m6805_reset(void)
+static CPU_RESET( m6805 )
 {
-	int (*save_irqcallback)(int) = m6805.irq_callback;
+	cpu_irq_callback save_irqcallback = m6805.irq_callback;
+	const device_config *save_device = m6805.device;
 	memset(&m6805, 0, sizeof(m6805));
 	m6805.irq_callback = save_irqcallback;
+	m6805.device = save_device;
 	/* Force CPU sub-type and relevant masks */
 	m6805.subtype	= SUBTYPE_M6805;
 	SP_MASK = 0x07f;
@@ -463,7 +467,7 @@ static void m6805_reset(void)
 	change_pc(PC);
 }
 
-static void m6805_exit(void)
+static CPU_EXIT( m6805 )
 {
 	/* nothing to do */
 }
@@ -506,7 +510,7 @@ static void set_irq_line(int irqline, int state)
 
 
 /* execute instructions on this CPU until icount expires */
-static int m6805_execute(int cycles)
+static CPU_EXECUTE( m6805 )
 {
 	UINT8 ireg;
 	m6805_ICount = cycles;
@@ -804,15 +808,16 @@ static int m6805_execute(int cycles)
  * M68705 section
  ****************************************************************************/
 #if (HAS_M68705)
-static void m68705_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( m68705 )
 {
 	state_register("m68705", index);
 	m6805.irq_callback = irqcallback;
+	m6805.device = device;
 }
 
-static void m68705_reset(void)
+static CPU_RESET( m68705 )
 {
-	m6805_reset();
+	CPU_RESET_CALL(m6805);
 	/* Overide default 6805 type */
 	m6805.subtype = SUBTYPE_M68705;
 	RM16( 0xfffe, &m6805.pc );
@@ -831,15 +836,16 @@ static void m68705_set_irq_line(int irqline, int state)
  * HD63705 section
  ****************************************************************************/
 #if (HAS_HD63705)
-static void hd63705_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( hd63705 )
 {
 	state_register("hd63705", index);
 	m6805.irq_callback = irqcallback;
+	m6805.device = device;
 }
 
-static void hd63705_reset(void)
+static CPU_RESET( hd63705 )
 {
-	m6805_reset();
+	CPU_RESET_CALL(m6805);
 
 	/* Overide default 6805 types */
 	m6805.subtype	= SUBTYPE_HD63705;
@@ -939,10 +945,10 @@ void m6805_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m6805_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m6805_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m6805_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = m6805_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = m6805_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = m6805_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = m6805_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6805);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6805);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m6805);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6805);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6805_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6805_ICount;			break;
@@ -999,8 +1005,8 @@ void m68705_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m68705_set_info;		break;
-		case CPUINFO_PTR_INIT:							info->init = m68705_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = m68705_reset;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m68705);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m68705);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M68705");				break;
@@ -1054,8 +1060,8 @@ void hd63705_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = hd63705_set_info;		break;
-		case CPUINFO_PTR_INIT:							info->init = hd63705_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = hd63705_reset;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(hd63705);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(hd63705);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "HD63705");				break;

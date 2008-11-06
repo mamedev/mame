@@ -77,7 +77,7 @@ static TIMER_CALLBACK(sc61860_2ms_tick)
 #include "scops.c"
 #include "sctable.c"
 
-static void sc61860_reset(void)
+static CPU_RESET( sc61860 )
 {
 	sc61860.timer.t2ms=0;
 	sc61860.timer.t512ms=0;
@@ -86,7 +86,7 @@ static void sc61860_reset(void)
 	change_pc(sc61860.pc);
 }
 
-static void sc61860_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( sc61860 )
 {
 	sc61860.config = (sc61860_cpu_core *) config;
 	timer_pulse(ATTOTIME_IN_HZ(500), NULL, 0, sc61860_2ms_tick);
@@ -107,7 +107,7 @@ static void sc61860_set_context (void *src)
 	}
 }
 
-static int sc61860_execute(int cycles)
+static CPU_EXECUTE( sc61860 )
 {
 	sc61860_ICount = cycles;
 
@@ -210,9 +210,9 @@ void sc61860_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = sc61860_set_info;				break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = sc61860_get_context;			break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = sc61860_set_context;			break;
-		case CPUINFO_PTR_INIT:							info->init = sc61860_init;						break;
-		case CPUINFO_PTR_RESET:							info->reset = sc61860_reset;					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = sc61860_execute;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(sc61860);						break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(sc61860);					break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(sc61860);				break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;								break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = sc61860_dasm;				break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sc61860_ICount;					break;

@@ -522,10 +522,12 @@ static void arm7_core_init(const char *cpuname, int index)
 // CPU RESET
 static void arm7_core_reset(void)
 {
-    int (*save_irqcallback)(int) = ARM7.irq_callback;
+    cpu_irq_callback save_irqcallback = ARM7.irq_callback;
+    const device_config *save_device = ARM7.device;
 
     memset(&ARM7, 0, sizeof(ARM7));
     ARM7.irq_callback = save_irqcallback;
+    ARM7.device = save_device;
 
     /* start up in SVC mode with interrupts disabled. */
     SwitchMode(eARM7_MODE_SVC);

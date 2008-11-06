@@ -14,6 +14,7 @@
 #ifndef __CPUINTRF_H__
 #define __CPUINTRF_H__
 
+#include "devintrf.h"
 #include "cpuint.h"
 #include "cpuexec.h"
 #include "watchdog.h"
@@ -207,6 +208,28 @@ enum
 
 
 /***************************************************************************
+    MACROS
+***************************************************************************/
+
+#define CPU_INIT_NAME(name)		cpu_init_##name
+#define CPU_INIT(name)			void CPU_INIT_NAME(name)(const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback)
+#define CPU_INIT_CALL(name)		CPU_INIT_NAME(name)(device, index, clock, config, irqcallback)
+
+#define CPU_RESET_NAME(name)	cpu_reset_##name
+#define CPU_RESET(name)			void CPU_RESET_NAME(name)(const device_config *device)
+#define CPU_RESET_CALL(name)	CPU_RESET_NAME(name)(device)
+
+#define CPU_EXIT_NAME(name)		cpu_exit_##name
+#define CPU_EXIT(name)			void CPU_EXIT_NAME(name)(const device_config *device)
+#define CPU_EXIT_CALL(name)		CPU_EXIT_NAME(name)(device)
+
+#define CPU_EXECUTE_NAME(name)	cpu_execute_##name
+#define CPU_EXECUTE(name)		int CPU_EXECUTE_NAME(name)(const device_config *device, int cycles)
+#define CPU_EXECUTE_CALL(name)	CPU_EXECUTE_NAME(name)(device, cycles)
+
+
+
+/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -215,14 +238,16 @@ typedef union _cpuinfo cpuinfo;
 
 
 /* define the various callback functions */
+typedef int (*cpu_irq_callback)(const device_config *device, int irqnum);
+
 typedef void (*cpu_get_info_func)(UINT32 state, cpuinfo *info);
 typedef void (*cpu_set_info_func)(UINT32 state, cpuinfo *info);
 typedef void (*cpu_get_context_func)(void *buffer);
 typedef void (*cpu_set_context_func)(void *buffer);
-typedef void (*cpu_init_func)(int index, int clock, const void *config, int (*irqcallback)(int));
-typedef void (*cpu_reset_func)(void);
-typedef void (*cpu_exit_func)(void);
-typedef int	(*cpu_execute_func)(int cycles);
+typedef void (*cpu_init_func)(const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback);
+typedef void (*cpu_reset_func)(const device_config *device);
+typedef void (*cpu_exit_func)(const device_config *device);
+typedef int	(*cpu_execute_func)(const device_config *device, int cycles);
 typedef void (*cpu_burn_func)(int cycles);
 typedef offs_t (*cpu_disassemble_func)(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 typedef int	(*cpu_translate_func)(int space, int intention, offs_t *address);
@@ -283,7 +308,6 @@ struct _cpu_interface
 	/* other info */
 	size_t					context_size;
 	INT8					address_shift;
-	int *					icount;
 };
 
 
@@ -296,7 +320,7 @@ struct _cpu_interface
 void cpuintrf_init(running_machine *machine);
 
 /* set up the interface for one CPU of a given type */
-int	cpuintrf_init_cpu(int cpunum, cpu_type cputype, int clock, const void *config, int (*irqcallback)(int));
+int	cpuintrf_init_cpu(int cpunum, cpu_type cputype, int clock, const void *config, cpu_irq_callback irqcallback);
 
 /* clean up the interface for one CPU */
 void cpuintrf_exit_cpu(int cpunum);

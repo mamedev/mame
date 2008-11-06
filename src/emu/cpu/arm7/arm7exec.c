@@ -31,7 +31,7 @@
  *
  *         It should be included as follows in your cpu core:
  *
- *         int arm7_execute(int cycles)
+ *         CPU_EXECUTE( arm7 )
  *         {
  *         #include "arm7exec.c"
  *         }

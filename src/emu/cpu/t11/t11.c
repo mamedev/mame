@@ -32,7 +32,8 @@ typedef struct
     UINT8	wait_state;
     UINT8	irq_state;
     INT32	interrupt_cycles;
-    int		(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 } t11_Regs;
 
 static t11_Regs t11;
@@ -208,7 +209,7 @@ static void t11_check_irqs(void)
 		/* call the callback; if we don't get -1 back, use the return value as our vector */
 		if (t11.irq_callback != NULL)
 		{
-			int new_vector = (*t11.irq_callback)(t11.irq_state & 15);
+			int new_vector = (*t11.irq_callback)(t11.device, t11.irq_state & 15);
 			if (new_vector != -1)
 				vector = new_vector;
 		}
@@ -284,7 +285,7 @@ static void t11_set_context(void *src)
  *
  *************************************/
 
-static void t11_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( t11 )
 {
 	static const UINT16 initial_pc[] =
 	{
@@ -295,6 +296,7 @@ static void t11_init(int index, int clock, const void *config, int (*irqcallback
 
 	t11.initial_pc = initial_pc[setup->mode >> 13];
 	t11.irq_callback = irqcallback;
+	t11.device = device;
 
 	state_save_register_item("t11", index, t11.ppc.w.l);
 	state_save_register_item("t11", index, t11.reg[0].w.l);
@@ -314,7 +316,7 @@ static void t11_init(int index, int clock, const void *config, int (*irqcallback
 }
 
 
-static void t11_exit(void)
+static CPU_EXIT( t11 )
 {
 	/* nothing to do */
 }
@@ -327,7 +329,7 @@ static void t11_exit(void)
  *
  *************************************/
 
-static void t11_reset(void)
+static CPU_RESET( t11 )
 {
 	/* initial SP is 376 octal, or 0xfe */
 	SP = 0x00fe;
@@ -382,7 +384,7 @@ static void set_irq_line(int irqline, int state)
  *
  *************************************/
 
-static int t11_execute(int cycles)
+static CPU_EXECUTE( t11 )
 {
 	t11_ICount = cycles;
 	t11_ICount -= t11.interrupt_cycles;
@@ -498,10 +500,10 @@ void t11_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = t11_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = t11_get_context;		break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = t11_set_context;		break;
-		case CPUINFO_PTR_INIT:							info->init = t11_init;					break;
-		case CPUINFO_PTR_RESET:							info->reset = t11_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = t11_exit;					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = t11_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(t11);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(t11);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(t11);					break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(t11);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = t11_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &t11_ICount;				break;

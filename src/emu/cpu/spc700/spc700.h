@@ -38,16 +38,16 @@ enum
 /* implementation APIs below.                                       */
 
 
-void spc700_init(int index, int clock, const void *config, int (*irqcallback)(int));
+CPU_INIT( spc700 );
 
 /* Pulse the RESET pin on the CPU */
-void spc700_reset(void);
+CPU_RESET( spc700 );
 
 /* Set the RESET line on the CPU */
 void spc700_set_reset_line(int state, void* param);
 
 /* Clean up after the emulation core - Not used in this core - */
-void spc700_exit(void);
+CPU_EXIT( spc700 );
 
 /* Get the current CPU context */
 unsigned spc700_get_context(void *dst);
@@ -83,7 +83,7 @@ void spc700_set_nmi_line(int state);
 void spc700_set_irq_line(int line, int state);
 
 /* Set the callback that will be called when an interrupt is serviced */
-void spc700_set_irq_callback(int (*callback)(int));
+void spc700_set_irq_callback(cpu_irq_callback callback);
 
 /* Save the current CPU state to disk */
 void spc700_state_save(void *file);

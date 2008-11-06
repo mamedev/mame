@@ -319,12 +319,13 @@ static STATE_POSTLOAD( h8_onstateload )
 	h8_set_ccr(h8.ccr);
 }
 
-static void h8_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( h8 )
 {
 	memset(&h8, 0, sizeof(h8));
 	h8.h8iflag = 1;
 
 	h8.irq_cb = irqcallback;
+	h8.device = device;
 
 	state_save_register_item("H8/3002", index, h8.h8err);
 	state_save_register_item_array("H8/3002", index, h8.regs);
@@ -343,13 +344,13 @@ static void h8_init(int index, int clock, const void *config, int (*irqcallback)
 	h8_itu_init();
 }
 
-static void h8_3007_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( h8_3007 )
 {
-	h8_init(index, clock, config, irqcallback);
+	CPU_INIT_CALL(h8);
 	h8_3007_itu_init();
 }
 
-static void h8_reset(void)
+static CPU_RESET( h8 )
 {
 	h8.h8err = 0;
 	h8.pc = h8_mem_read32(0) & 0xffffff;
@@ -453,7 +454,7 @@ static void h8_check_irqs(void)
 		// external IRQs
 		if (source >= 12 && source <= 17)
 		{
-			(*h8.irq_cb)(source - 12 + H8_IRQ0);
+			(*h8.irq_cb)(h8.device, source - 12 + H8_IRQ0);
 		}
 
 		if (source != 0xff)
@@ -461,7 +462,7 @@ static void h8_check_irqs(void)
 	}
 }
 
-static int h8_execute(int cycles)
+static CPU_EXECUTE( h8 )
 {
 	UINT16 opcode=0;
 
@@ -4070,10 +4071,10 @@ void h8_3002_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_PTR_SET_INFO:					info->setinfo     = h8_set_info;				break;
 	case CPUINFO_PTR_GET_CONTEXT:				info->getcontext  = h8_get_context;				break;
 	case CPUINFO_PTR_SET_CONTEXT:				info->setcontext= h8_set_context;				break;
-	case CPUINFO_PTR_INIT:						info->init        = h8_init;					break;
-	case CPUINFO_PTR_RESET:						info->reset       = h8_reset;					break;
+	case CPUINFO_PTR_INIT:						info->init        = CPU_INIT_NAME(h8);					break;
+	case CPUINFO_PTR_RESET:						info->reset       = CPU_RESET_NAME(h8);					break;
 	case CPUINFO_PTR_EXIT:						info->exit        = 0;							break;
-	case CPUINFO_PTR_EXECUTE:					info->execute     = h8_execute;					break;
+	case CPUINFO_PTR_EXECUTE:					info->execute     = CPU_EXECUTE_NAME(h8);					break;
 	case CPUINFO_PTR_BURN:						info->burn        = 0;							break;
 	case CPUINFO_PTR_DISASSEMBLE:				info->disassemble = h8_disasm;					break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:		info->icount      = &h8_cyccnt;					break;
@@ -4154,7 +4155,7 @@ void h8_3007_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = address_map_h8_3007_internal_map;  break;
-		case CPUINFO_PTR_INIT:				info->init = h8_3007_init;		break;
+		case CPUINFO_PTR_INIT:				info->init = CPU_INIT_NAME(h8_3007);		break;
 		case CPUINFO_STR_NAME:				strcpy(info->s, "H8/3007");		break;
 		default:
 			h8_3002_get_info(state,info);

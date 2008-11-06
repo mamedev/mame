@@ -768,11 +768,11 @@ special_fetch:
 }
 
 
-static void apexc_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( apexc )
 {
 }
 
-static void apexc_reset(void)
+static CPU_RESET( apexc )
 {
 	/* mmmh...  I don't know what happens on reset with an actual APEXC. */
 
@@ -797,7 +797,7 @@ static void apexc_set_context(void *src)
 		apexc = * ((apexc_regs*)src);
 }
 
-static int apexc_execute(int cycles)
+static CPU_EXECUTE( apexc )
 {
 	apexc_ICount = cycles;
 
@@ -895,9 +895,9 @@ void apexc_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_PTR_SET_INFO:						info->setinfo = apexc_set_info;			break;
 	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = apexc_get_context;	break;
 	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = apexc_set_context;	break;
-	case CPUINFO_PTR_INIT:							info->init = apexc_init;				break;
-	case CPUINFO_PTR_RESET:							info->reset = apexc_reset;				break;
-	case CPUINFO_PTR_EXECUTE:						info->execute = apexc_execute;			break;
+	case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(apexc);				break;
+	case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(apexc);				break;
+	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(apexc);			break;
 	case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = apexc_dasm;			break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &apexc_ICount;			break;

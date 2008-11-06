@@ -22,7 +22,7 @@ static void PREFIX86(_interrupt)(unsigned int_num)
 	WORD ip = I.pc - I.base[CS];
 
 	if (int_num == -1)
-		int_num = (*I.irq_callback)(0);
+		int_num = (*I.irq_callback)(I.device, 0);
 
 #ifdef I80286
 	if (PM) {
@@ -44,7 +44,7 @@ static void PREFIX86(_interrupt)(unsigned int_num)
 #endif
 	CHANGE_PC(I.pc);
 
-	I.extra_cycles += cycles.exception;
+	I.extra_cycles += timing.exception;
 }
 
 static void PREFIX86(_trap)(void)
@@ -62,11 +62,11 @@ static void PREFIX86(_rotate_shift_Byte)(unsigned ModRM, unsigned count)
 
 	if (count==0)
 	{
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.rot_reg_base : cycles.rot_m8_base;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.rot_reg_base : timing.rot_m8_base;
 	}
 	else if (count==1)
 	{
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.rot_reg_1 : cycles.rot_m8_1;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.rot_reg_1 : timing.rot_m8_1;
 
 		switch (ModRM & 0x38)
 		{
@@ -123,7 +123,7 @@ static void PREFIX86(_rotate_shift_Byte)(unsigned ModRM, unsigned count)
 	}
 	else
 	{
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.rot_reg_base + cycles.rot_reg_bit : cycles.rot_m8_base + cycles.rot_m8_bit;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.rot_reg_base + timing.rot_reg_bit : timing.rot_m8_base + timing.rot_m8_bit;
 
 		switch (ModRM & 0x38)
 		{
@@ -195,11 +195,11 @@ static void PREFIX86(_rotate_shift_Word)(unsigned ModRM, unsigned count)
 
 	if (count==0)
 	{
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.rot_reg_base : cycles.rot_m16_base;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.rot_reg_base : timing.rot_m16_base;
 	}
 	else if (count==1)
 	{
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.rot_reg_1 : cycles.rot_m16_1;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.rot_reg_1 : timing.rot_m16_1;
 
 		switch (ModRM & 0x38)
 		{
@@ -314,7 +314,7 @@ static void PREFIX86(_rotate_shift_Word)(unsigned ModRM, unsigned count)
 	}
 	else
 	{
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.rot_reg_base + cycles.rot_reg_bit : cycles.rot_m8_base + cycles.rot_m16_bit;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.rot_reg_base + timing.rot_reg_bit : timing.rot_m8_base + timing.rot_m16_bit;
 
 		switch (ModRM & 0x38)
 		{
@@ -393,75 +393,75 @@ static void PREFIX(rep)(int flagval)
 	case 0x26:  /* ES: */
 		seg_prefix=TRUE;
 		prefix_base=I.base[ES];
-		ICOUNT -= cycles.override;
+		ICOUNT -= timing.override;
 		PREFIX(rep)(flagval);
 		break;
 	case 0x2e:  /* CS: */
 		seg_prefix=TRUE;
 		prefix_base=I.base[CS];
-		ICOUNT -= cycles.override;
+		ICOUNT -= timing.override;
 		PREFIX(rep)(flagval);
 		break;
 	case 0x36:  /* SS: */
 		seg_prefix=TRUE;
 		prefix_base=I.base[SS];
-		ICOUNT -= cycles.override;
+		ICOUNT -= timing.override;
 		PREFIX(rep)(flagval);
 		break;
 	case 0x3e:  /* DS: */
 		seg_prefix=TRUE;
 		prefix_base=I.base[DS];
-		ICOUNT -= cycles.override;
+		ICOUNT -= timing.override;
 		PREFIX(rep)(flagval);
 		break;
 #ifndef I8086
 	case 0x6c:	/* REP INSB */
-		ICOUNT -= cycles.rep_ins8_base;
+		ICOUNT -= timing.rep_ins8_base;
 		for (; count > 0; count--)
 		{
 			if (ICOUNT <= 0) { I.pc = I.prevpc; break; }
 			PutMemB(ES,I.regs.w[DI],read_port_byte(I.regs.w[DX]));
 			I.regs.w[DI] += I.DirVal;
-			ICOUNT -= cycles.rep_ins8_count;
+			ICOUNT -= timing.rep_ins8_count;
 		}
 		I.regs.w[CX]=count;
 		break;
 	case 0x6d:  /* REP INSW */
-		ICOUNT -= cycles.rep_ins16_base;
+		ICOUNT -= timing.rep_ins16_base;
 		for (; count > 0; count--)
 		{
 			if (ICOUNT <= 0) { I.pc = I.prevpc; break; }
 			PutMemW(ES,I.regs.w[DI],read_port_word(I.regs.w[DX]));
 			I.regs.w[DI] += 2 * I.DirVal;
-			ICOUNT -= cycles.rep_ins16_count;
+			ICOUNT -= timing.rep_ins16_count;
 		}
 		I.regs.w[CX]=count;
 		break;
 	case 0x6e:  /* REP OUTSB */
-		ICOUNT -= cycles.rep_outs8_base;
+		ICOUNT -= timing.rep_outs8_base;
 		for (; count > 0; count--)
 		{
 			if (ICOUNT <= 0) { I.pc = I.prevpc; break; }
 			write_port_byte(I.regs.w[DX],GetMemB(DS,I.regs.w[SI]));
 			I.regs.w[SI] += I.DirVal; /* GOL 11/27/01 */
-			ICOUNT -= cycles.rep_outs8_count;
+			ICOUNT -= timing.rep_outs8_count;
 		}
 		I.regs.w[CX]=count;
 		break;
 	case 0x6f:  /* REP OUTSW */
-		ICOUNT -= cycles.rep_outs16_base;
+		ICOUNT -= timing.rep_outs16_base;
 		for (; count > 0; count--)
 		{
 			if (ICOUNT <= 0) { I.pc = I.prevpc; break; }
 			write_port_word(I.regs.w[DX],GetMemW(DS,I.regs.w[SI]));
 			I.regs.w[SI] += 2 * I.DirVal; /* GOL 11/27/01 */
-			ICOUNT -= cycles.rep_outs16_count;
+			ICOUNT -= timing.rep_outs16_count;
 		}
 		I.regs.w[CX]=count;
 		break;
 #endif
 	case 0xa4:  /* REP MOVSB */
-		ICOUNT -= cycles.rep_movs8_base;
+		ICOUNT -= timing.rep_movs8_base;
 		for (; count > 0; count--)
 		{
 			BYTE tmp;
@@ -471,12 +471,12 @@ static void PREFIX(rep)(int flagval)
 			PutMemB(ES,I.regs.w[DI], tmp);
 			I.regs.w[DI] += I.DirVal;
 			I.regs.w[SI] += I.DirVal;
-			ICOUNT -= cycles.rep_movs8_count;
+			ICOUNT -= timing.rep_movs8_count;
 		}
 		I.regs.w[CX]=count;
 		break;
 	case 0xa5:  /* REP MOVSW */
-		ICOUNT -= cycles.rep_movs16_base;
+		ICOUNT -= timing.rep_movs16_base;
 		for (; count > 0; count--)
 		{
 			WORD tmp;
@@ -486,12 +486,12 @@ static void PREFIX(rep)(int flagval)
 			PutMemW(ES,I.regs.w[DI], tmp);
 			I.regs.w[DI] += 2 * I.DirVal;
 			I.regs.w[SI] += 2 * I.DirVal;
-			ICOUNT -= cycles.rep_movs16_count;
+			ICOUNT -= timing.rep_movs16_count;
 		}
 		I.regs.w[CX]=count;
 		break;
 	case 0xa6:  /* REP(N)E CMPSB */
-		ICOUNT -= cycles.rep_cmps8_base;
+		ICOUNT -= timing.rep_cmps8_base;
 		for (I.ZeroVal = !flagval; (ZF == flagval) && (count > 0); count--)
 		{
 			unsigned dst, src;
@@ -502,12 +502,12 @@ static void PREFIX(rep)(int flagval)
 		    SUBB(src,dst); /* opposite of the usual convention */
 			I.regs.w[DI] += I.DirVal;
 			I.regs.w[SI] += I.DirVal;
-			ICOUNT -= cycles.rep_cmps8_count;
+			ICOUNT -= timing.rep_cmps8_count;
 		}
 		I.regs.w[CX]=count;
 		break;
 	case 0xa7:  /* REP(N)E CMPSW */
-		ICOUNT -= cycles.rep_cmps16_base;
+		ICOUNT -= timing.rep_cmps16_base;
 		for (I.ZeroVal = !flagval; (ZF == flagval) && (count > 0); count--)
 		{
 			unsigned dst, src;
@@ -518,56 +518,56 @@ static void PREFIX(rep)(int flagval)
 		    SUBW(src,dst); /* opposite of the usual convention */
 			I.regs.w[DI] += 2 * I.DirVal;
 			I.regs.w[SI] += 2 * I.DirVal;
-			ICOUNT -= cycles.rep_cmps16_count;
+			ICOUNT -= timing.rep_cmps16_count;
 		}
 		I.regs.w[CX]=count;
 		break;
 	case 0xaa:  /* REP STOSB */
-		ICOUNT -= cycles.rep_stos8_base;
+		ICOUNT -= timing.rep_stos8_base;
 		for (; count > 0; count--)
 		{
 			if (ICOUNT <= 0) { I.pc = I.prevpc; break; }
 			PutMemB(ES,I.regs.w[DI],I.regs.b[AL]);
 			I.regs.w[DI] += I.DirVal;
-			ICOUNT -= cycles.rep_stos8_count;
+			ICOUNT -= timing.rep_stos8_count;
 		}
 		I.regs.w[CX]=count;
 		break;
 	case 0xab:  /* REP STOSW */
-		ICOUNT -= cycles.rep_stos16_base;
+		ICOUNT -= timing.rep_stos16_base;
 		for (; count > 0; count--)
 		{
 			if (ICOUNT <= 0) { I.pc = I.prevpc; break; }
 			PutMemW(ES,I.regs.w[DI],I.regs.w[AX]);
 			I.regs.w[DI] += 2 * I.DirVal;
-			ICOUNT -= cycles.rep_stos16_count;
+			ICOUNT -= timing.rep_stos16_count;
 		}
 		I.regs.w[CX]=count;
 		break;
 	case 0xac:  /* REP LODSB */
-		ICOUNT -= cycles.rep_lods8_base;
+		ICOUNT -= timing.rep_lods8_base;
 		for (; count > 0; count--)
 		{
 			if (ICOUNT <= 0) { I.pc = I.prevpc; break; }
 			I.regs.b[AL] = GetMemB(DS,I.regs.w[SI]);
 			I.regs.w[SI] += I.DirVal;
-			ICOUNT -= cycles.rep_lods8_count;
+			ICOUNT -= timing.rep_lods8_count;
 		}
 		I.regs.w[CX]=count;
 		break;
 	case 0xad:  /* REP LODSW */
-		ICOUNT -= cycles.rep_lods16_base;
+		ICOUNT -= timing.rep_lods16_base;
 		for (; count > 0; count--)
 		{
 			if (ICOUNT <= 0) { I.pc = I.prevpc; break; }
 			I.regs.w[AX] = GetMemW(DS,I.regs.w[SI]);
 			I.regs.w[SI] += 2 * I.DirVal;
-			ICOUNT -= cycles.rep_lods16_count;
+			ICOUNT -= timing.rep_lods16_count;
 		}
 		I.regs.w[CX]=count;
 		break;
 	case 0xae:  /* REP(N)E SCASB */
-		ICOUNT -= cycles.rep_scas8_base;
+		ICOUNT -= timing.rep_scas8_base;
 		for (I.ZeroVal = !flagval; (ZF == flagval) && (count > 0); count--)
 		{
 			unsigned src, dst;
@@ -577,12 +577,12 @@ static void PREFIX(rep)(int flagval)
 			dst = I.regs.b[AL];
 		    SUBB(dst,src);
 			I.regs.w[DI] += I.DirVal;
-			ICOUNT -= cycles.rep_scas8_count;
+			ICOUNT -= timing.rep_scas8_count;
 		}
 		I.regs.w[CX]=count;
 		break;
 	case 0xaf:  /* REP(N)E SCASW */
-		ICOUNT -= cycles.rep_scas16_base;
+		ICOUNT -= timing.rep_scas16_base;
 		for (I.ZeroVal = !flagval; (ZF == flagval) && (count > 0); count--)
 		{
 			unsigned src, dst;
@@ -592,7 +592,7 @@ static void PREFIX(rep)(int flagval)
 			dst = I.regs.w[AX];
 		    SUBW(dst,src);
 			I.regs.w[DI] += 2 * I.DirVal;
-			ICOUNT -= cycles.rep_scas16_count;
+			ICOUNT -= timing.rep_scas16_count;
 		}
 		I.regs.w[CX]=count;
 		break;
@@ -605,7 +605,7 @@ static void PREFIX(rep)(int flagval)
 static void PREFIX86(_add_br8)(void)    /* Opcode 0x00 */
 {
 	DEF_br8(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr8 : cycles.alu_mr8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr8 : timing.alu_mr8;
 	ADDB(dst,src);
     PutbackRMByte(ModRM,dst);
 }
@@ -613,7 +613,7 @@ static void PREFIX86(_add_br8)(void)    /* Opcode 0x00 */
 static void PREFIX86(_add_wr16)(void)    /* Opcode 0x01 */
 {
     DEF_wr16(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr16 : cycles.alu_mr16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr16 : timing.alu_mr16;
 	ADDW(dst,src);
 	PutbackRMWord(ModRM,dst);
 }
@@ -621,7 +621,7 @@ static void PREFIX86(_add_wr16)(void)    /* Opcode 0x01 */
 static void PREFIX86(_add_r8b)(void)    /* Opcode 0x02 */
 {
 	DEF_r8b(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr8 : cycles.alu_rm8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr8 : timing.alu_rm8;
     ADDB(dst,src);
     RegByte(ModRM)=dst;
 }
@@ -629,7 +629,7 @@ static void PREFIX86(_add_r8b)(void)    /* Opcode 0x02 */
 static void PREFIX86(_add_r16w)(void)    /* Opcode 0x03 */
 {
     DEF_r16w(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr16 : cycles.alu_rm16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr16 : timing.alu_rm16;
 	ADDW(dst,src);
 	RegWord(ModRM)=dst;
 }
@@ -638,7 +638,7 @@ static void PREFIX86(_add_r16w)(void)    /* Opcode 0x03 */
 static void PREFIX86(_add_ald8)(void)    /* Opcode 0x04 */
 {
     DEF_ald8(dst,src);
-	ICOUNT -= cycles.alu_ri8;
+	ICOUNT -= timing.alu_ri8;
     ADDB(dst,src);
 	I.regs.b[AL]=dst;
 }
@@ -647,7 +647,7 @@ static void PREFIX86(_add_ald8)(void)    /* Opcode 0x04 */
 static void PREFIX86(_add_axd16)(void)    /* Opcode 0x05 */
 {
     DEF_axd16(dst,src);
-	ICOUNT -= cycles.alu_ri16;
+	ICOUNT -= timing.alu_ri16;
 	ADDW(dst,src);
 	I.regs.w[AX]=dst;
 }
@@ -655,7 +655,7 @@ static void PREFIX86(_add_axd16)(void)    /* Opcode 0x05 */
 
 static void PREFIX86(_push_es)(void)    /* Opcode 0x06 */
 {
-	ICOUNT -= cycles.push_seg;
+	ICOUNT -= timing.push_seg;
 	PUSH(I.sregs[ES]);
 }
 
@@ -670,13 +670,13 @@ static void PREFIX86(_pop_es)(void)    /* Opcode 0x07 */
 	POP(I.sregs[ES]);
 	I.base[ES] = SegBase(ES);
 #endif
-	ICOUNT -= cycles.pop_seg;
+	ICOUNT -= timing.pop_seg;
 }
 
 static void PREFIX86(_or_br8)(void)    /* Opcode 0x08 */
 {
     DEF_br8(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr8 : cycles.alu_mr8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr8 : timing.alu_mr8;
 	ORB(dst,src);
     PutbackRMByte(ModRM,dst);
 }
@@ -684,7 +684,7 @@ static void PREFIX86(_or_br8)(void)    /* Opcode 0x08 */
 static void PREFIX86(_or_wr16)(void)    /* Opcode 0x09 */
 {
 	DEF_wr16(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr16 : cycles.alu_mr16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr16 : timing.alu_mr16;
     ORW(dst,src);
     PutbackRMWord(ModRM,dst);
 }
@@ -692,7 +692,7 @@ static void PREFIX86(_or_wr16)(void)    /* Opcode 0x09 */
 static void PREFIX86(_or_r8b)(void)    /* Opcode 0x0a */
 {
 	DEF_r8b(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr8 : cycles.alu_rm8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr8 : timing.alu_rm8;
     ORB(dst,src);
     RegByte(ModRM)=dst;
 }
@@ -700,7 +700,7 @@ static void PREFIX86(_or_r8b)(void)    /* Opcode 0x0a */
 static void PREFIX86(_or_r16w)(void)    /* Opcode 0x0b */
 {
     DEF_r16w(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr16 : cycles.alu_rm16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr16 : timing.alu_rm16;
     ORW(dst,src);
     RegWord(ModRM)=dst;
 }
@@ -708,7 +708,7 @@ static void PREFIX86(_or_r16w)(void)    /* Opcode 0x0b */
 static void PREFIX86(_or_ald8)(void)    /* Opcode 0x0c */
 {
     DEF_ald8(dst,src);
-	ICOUNT -= cycles.alu_ri8;
+	ICOUNT -= timing.alu_ri8;
     ORB(dst,src);
 	I.regs.b[AL]=dst;
 }
@@ -716,14 +716,14 @@ static void PREFIX86(_or_ald8)(void)    /* Opcode 0x0c */
 static void PREFIX86(_or_axd16)(void)    /* Opcode 0x0d */
 {
     DEF_axd16(dst,src);
-	ICOUNT -= cycles.alu_ri16;
+	ICOUNT -= timing.alu_ri16;
 	ORW(dst,src);
 	I.regs.w[AX]=dst;
 }
 
 static void PREFIX86(_push_cs)(void)    /* Opcode 0x0e */
 {
-	ICOUNT -= cycles.push_seg;
+	ICOUNT -= timing.push_seg;
 	PUSH(I.sregs[CS]);
 }
 
@@ -732,7 +732,7 @@ static void PREFIX86(_push_cs)(void)    /* Opcode 0x0e */
 static void PREFIX86(_adc_br8)(void)    /* Opcode 0x10 */
 {
     DEF_br8(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr8 : cycles.alu_mr8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr8 : timing.alu_mr8;
     src+=CF;
     ADDB(dst,src);
     PutbackRMByte(ModRM,dst);
@@ -741,7 +741,7 @@ static void PREFIX86(_adc_br8)(void)    /* Opcode 0x10 */
 static void PREFIX86(_adc_wr16)(void)    /* Opcode 0x11 */
 {
     DEF_wr16(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr16 : cycles.alu_mr16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr16 : timing.alu_mr16;
     src+=CF;
     ADDW(dst,src);
 	PutbackRMWord(ModRM,dst);
@@ -750,7 +750,7 @@ static void PREFIX86(_adc_wr16)(void)    /* Opcode 0x11 */
 static void PREFIX86(_adc_r8b)(void)    /* Opcode 0x12 */
 {
     DEF_r8b(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr8 : cycles.alu_rm8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr8 : timing.alu_rm8;
 	src+=CF;
     ADDB(dst,src);
     RegByte(ModRM)=dst;
@@ -759,7 +759,7 @@ static void PREFIX86(_adc_r8b)(void)    /* Opcode 0x12 */
 static void PREFIX86(_adc_r16w)(void)    /* Opcode 0x13 */
 {
     DEF_r16w(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr16 : cycles.alu_rm16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr16 : timing.alu_rm16;
 	src+=CF;
     ADDW(dst,src);
     RegWord(ModRM)=dst;
@@ -768,7 +768,7 @@ static void PREFIX86(_adc_r16w)(void)    /* Opcode 0x13 */
 static void PREFIX86(_adc_ald8)(void)    /* Opcode 0x14 */
 {
     DEF_ald8(dst,src);
-	ICOUNT -= cycles.alu_ri8;
+	ICOUNT -= timing.alu_ri8;
     src+=CF;
     ADDB(dst,src);
 	I.regs.b[AL] = dst;
@@ -777,7 +777,7 @@ static void PREFIX86(_adc_ald8)(void)    /* Opcode 0x14 */
 static void PREFIX86(_adc_axd16)(void)    /* Opcode 0x15 */
 {
 	DEF_axd16(dst,src);
-	ICOUNT -= cycles.alu_ri16;
+	ICOUNT -= timing.alu_ri16;
 	src+=CF;
     ADDW(dst,src);
 	I.regs.w[AX]=dst;
@@ -786,7 +786,7 @@ static void PREFIX86(_adc_axd16)(void)    /* Opcode 0x15 */
 static void PREFIX86(_push_ss)(void)    /* Opcode 0x16 */
 {
 	PUSH(I.sregs[SS]);
-	ICOUNT -= cycles.push_seg;
+	ICOUNT -= timing.push_seg;
 }
 
 static void PREFIX86(_pop_ss)(void)    /* Opcode 0x17 */
@@ -799,14 +799,14 @@ static void PREFIX86(_pop_ss)(void)    /* Opcode 0x17 */
 	POP(I.sregs[SS]);
 	I.base[SS] = SegBase(SS);
 #endif
-	ICOUNT -= cycles.pop_seg;
+	ICOUNT -= timing.pop_seg;
 	PREFIX(_instruction)[FETCHOP](); /* no interrupt before next instruction */
 }
 
 static void PREFIX86(_sbb_br8)(void)    /* Opcode 0x18 */
 {
     DEF_br8(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr8 : cycles.alu_mr8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr8 : timing.alu_mr8;
     src+=CF;
     SUBB(dst,src);
     PutbackRMByte(ModRM,dst);
@@ -815,7 +815,7 @@ static void PREFIX86(_sbb_br8)(void)    /* Opcode 0x18 */
 static void PREFIX86(_sbb_wr16)(void)    /* Opcode 0x19 */
 {
     DEF_wr16(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr16 : cycles.alu_mr16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr16 : timing.alu_mr16;
     src+=CF;
 	SUBW(dst,src);
 	PutbackRMWord(ModRM,dst);
@@ -824,7 +824,7 @@ static void PREFIX86(_sbb_wr16)(void)    /* Opcode 0x19 */
 static void PREFIX86(_sbb_r8b)(void)    /* Opcode 0x1a */
 {
 	DEF_r8b(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr8 : cycles.alu_rm8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr8 : timing.alu_rm8;
 	src+=CF;
     SUBB(dst,src);
     RegByte(ModRM)=dst;
@@ -833,7 +833,7 @@ static void PREFIX86(_sbb_r8b)(void)    /* Opcode 0x1a */
 static void PREFIX86(_sbb_r16w)(void)    /* Opcode 0x1b */
 {
     DEF_r16w(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr16 : cycles.alu_rm16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr16 : timing.alu_rm16;
 	src+=CF;
     SUBW(dst,src);
     RegWord(ModRM)= dst;
@@ -842,7 +842,7 @@ static void PREFIX86(_sbb_r16w)(void)    /* Opcode 0x1b */
 static void PREFIX86(_sbb_ald8)(void)    /* Opcode 0x1c */
 {
     DEF_ald8(dst,src);
-	ICOUNT -= cycles.alu_ri8;
+	ICOUNT -= timing.alu_ri8;
     src+=CF;
     SUBB(dst,src);
 	I.regs.b[AL] = dst;
@@ -851,7 +851,7 @@ static void PREFIX86(_sbb_ald8)(void)    /* Opcode 0x1c */
 static void PREFIX86(_sbb_axd16)(void)    /* Opcode 0x1d */
 {
     DEF_axd16(dst,src);
-	ICOUNT -= cycles.alu_ri16;
+	ICOUNT -= timing.alu_ri16;
 	src+=CF;
     SUBW(dst,src);
 	I.regs.w[AX]=dst;
@@ -860,7 +860,7 @@ static void PREFIX86(_sbb_axd16)(void)    /* Opcode 0x1d */
 static void PREFIX86(_push_ds)(void)    /* Opcode 0x1e */
 {
 	PUSH(I.sregs[DS]);
-	ICOUNT -= cycles.push_seg;
+	ICOUNT -= timing.push_seg;
 }
 
 static void PREFIX86(_pop_ds)(void)    /* Opcode 0x1f */
@@ -873,13 +873,13 @@ static void PREFIX86(_pop_ds)(void)    /* Opcode 0x1f */
 	POP(I.sregs[DS]);
 	I.base[DS] = SegBase(DS);
 #endif
-	ICOUNT -= cycles.push_seg;
+	ICOUNT -= timing.push_seg;
 }
 
 static void PREFIX86(_and_br8)(void)    /* Opcode 0x20 */
 {
     DEF_br8(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr8 : cycles.alu_mr8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr8 : timing.alu_mr8;
     ANDB(dst,src);
     PutbackRMByte(ModRM,dst);
 }
@@ -887,7 +887,7 @@ static void PREFIX86(_and_br8)(void)    /* Opcode 0x20 */
 static void PREFIX86(_and_wr16)(void)    /* Opcode 0x21 */
 {
     DEF_wr16(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr16 : cycles.alu_mr16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr16 : timing.alu_mr16;
     ANDW(dst,src);
     PutbackRMWord(ModRM,dst);
 }
@@ -895,7 +895,7 @@ static void PREFIX86(_and_wr16)(void)    /* Opcode 0x21 */
 static void PREFIX86(_and_r8b)(void)    /* Opcode 0x22 */
 {
     DEF_r8b(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr8 : cycles.alu_rm8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr8 : timing.alu_rm8;
     ANDB(dst,src);
     RegByte(ModRM)=dst;
 }
@@ -903,7 +903,7 @@ static void PREFIX86(_and_r8b)(void)    /* Opcode 0x22 */
 static void PREFIX86(_and_r16w)(void)    /* Opcode 0x23 */
 {
     DEF_r16w(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr16 : cycles.alu_rm16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr16 : timing.alu_rm16;
 	ANDW(dst,src);
     RegWord(ModRM)=dst;
 }
@@ -911,7 +911,7 @@ static void PREFIX86(_and_r16w)(void)    /* Opcode 0x23 */
 static void PREFIX86(_and_ald8)(void)    /* Opcode 0x24 */
 {
     DEF_ald8(dst,src);
-	ICOUNT -= cycles.alu_ri8;
+	ICOUNT -= timing.alu_ri8;
     ANDB(dst,src);
 	I.regs.b[AL] = dst;
 }
@@ -919,7 +919,7 @@ static void PREFIX86(_and_ald8)(void)    /* Opcode 0x24 */
 static void PREFIX86(_and_axd16)(void)    /* Opcode 0x25 */
 {
     DEF_axd16(dst,src);
-	ICOUNT -= cycles.alu_ri16;
+	ICOUNT -= timing.alu_ri16;
     ANDW(dst,src);
 	I.regs.w[AX]=dst;
 }
@@ -928,7 +928,7 @@ static void PREFIX86(_es)(void)    /* Opcode 0x26 */
 {
 	seg_prefix=TRUE;
 	prefix_base=I.base[ES];
-	ICOUNT -= cycles.override;
+	ICOUNT -= timing.override;
 	PREFIX(_instruction)[FETCHOP]();
 }
 
@@ -949,13 +949,13 @@ static void PREFIX86(_daa)(void)    /* Opcode 0x27 */
 	}
 
 	SetSZPF_Byte(I.regs.b[AL]);
-	ICOUNT -= cycles.daa;
+	ICOUNT -= timing.daa;
 }
 
 static void PREFIX86(_sub_br8)(void)    /* Opcode 0x28 */
 {
     DEF_br8(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr8 : cycles.alu_mr8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr8 : timing.alu_mr8;
     SUBB(dst,src);
     PutbackRMByte(ModRM,dst);
 }
@@ -963,7 +963,7 @@ static void PREFIX86(_sub_br8)(void)    /* Opcode 0x28 */
 static void PREFIX86(_sub_wr16)(void)    /* Opcode 0x29 */
 {
     DEF_wr16(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr16 : cycles.alu_mr16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr16 : timing.alu_mr16;
     SUBW(dst,src);
     PutbackRMWord(ModRM,dst);
 }
@@ -971,7 +971,7 @@ static void PREFIX86(_sub_wr16)(void)    /* Opcode 0x29 */
 static void PREFIX86(_sub_r8b)(void)    /* Opcode 0x2a */
 {
     DEF_r8b(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr8 : cycles.alu_rm8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr8 : timing.alu_rm8;
 	SUBB(dst,src);
     RegByte(ModRM)=dst;
 }
@@ -979,7 +979,7 @@ static void PREFIX86(_sub_r8b)(void)    /* Opcode 0x2a */
 static void PREFIX86(_sub_r16w)(void)    /* Opcode 0x2b */
 {
     DEF_r16w(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr16 : cycles.alu_rm16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr16 : timing.alu_rm16;
     SUBW(dst,src);
     RegWord(ModRM)=dst;
 }
@@ -987,7 +987,7 @@ static void PREFIX86(_sub_r16w)(void)    /* Opcode 0x2b */
 static void PREFIX86(_sub_ald8)(void)    /* Opcode 0x2c */
 {
     DEF_ald8(dst,src);
-	ICOUNT -= cycles.alu_ri8;
+	ICOUNT -= timing.alu_ri8;
     SUBB(dst,src);
 	I.regs.b[AL] = dst;
 }
@@ -995,7 +995,7 @@ static void PREFIX86(_sub_ald8)(void)    /* Opcode 0x2c */
 static void PREFIX86(_sub_axd16)(void)    /* Opcode 0x2d */
 {
 	DEF_axd16(dst,src);
-	ICOUNT -= cycles.alu_ri16;
+	ICOUNT -= timing.alu_ri16;
     SUBW(dst,src);
 	I.regs.w[AX]=dst;
 }
@@ -1004,7 +1004,7 @@ static void PREFIX86(_cs)(void)    /* Opcode 0x2e */
 {
     seg_prefix=TRUE;
 	prefix_base=I.base[CS];
-	ICOUNT -= cycles.override;
+	ICOUNT -= timing.override;
 	PREFIX(_instruction)[FETCHOP]();
 }
 
@@ -1026,13 +1026,13 @@ static void PREFIX86(_das)(void)    /* Opcode 0x2f */
 	}
 
 	SetSZPF_Byte(I.regs.b[AL]);
-	ICOUNT -= cycles.das;
+	ICOUNT -= timing.das;
 }
 
 static void PREFIX86(_xor_br8)(void)    /* Opcode 0x30 */
 {
     DEF_br8(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr8 : cycles.alu_mr8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr8 : timing.alu_mr8;
     XORB(dst,src);
 	PutbackRMByte(ModRM,dst);
 }
@@ -1040,7 +1040,7 @@ static void PREFIX86(_xor_br8)(void)    /* Opcode 0x30 */
 static void PREFIX86(_xor_wr16)(void)    /* Opcode 0x31 */
 {
 	DEF_wr16(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr16 : cycles.alu_mr16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr16 : timing.alu_mr16;
 	XORW(dst,src);
     PutbackRMWord(ModRM,dst);
 }
@@ -1048,7 +1048,7 @@ static void PREFIX86(_xor_wr16)(void)    /* Opcode 0x31 */
 static void PREFIX86(_xor_r8b)(void)    /* Opcode 0x32 */
 {
     DEF_r8b(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr8 : cycles.alu_rm8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr8 : timing.alu_rm8;
     XORB(dst,src);
     RegByte(ModRM)=dst;
 }
@@ -1056,7 +1056,7 @@ static void PREFIX86(_xor_r8b)(void)    /* Opcode 0x32 */
 static void PREFIX86(_xor_r16w)(void)    /* Opcode 0x33 */
 {
     DEF_r16w(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr16 : cycles.alu_rm16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr16 : timing.alu_rm16;
     XORW(dst,src);
 	RegWord(ModRM)=dst;
 }
@@ -1064,7 +1064,7 @@ static void PREFIX86(_xor_r16w)(void)    /* Opcode 0x33 */
 static void PREFIX86(_xor_ald8)(void)    /* Opcode 0x34 */
 {
 	DEF_ald8(dst,src);
-	ICOUNT -= cycles.alu_ri8;
+	ICOUNT -= timing.alu_ri8;
     XORB(dst,src);
 	I.regs.b[AL] = dst;
 }
@@ -1072,7 +1072,7 @@ static void PREFIX86(_xor_ald8)(void)    /* Opcode 0x34 */
 static void PREFIX86(_xor_axd16)(void)    /* Opcode 0x35 */
 {
     DEF_axd16(dst,src);
-	ICOUNT -= cycles.alu_ri16;
+	ICOUNT -= timing.alu_ri16;
     XORW(dst,src);
 	I.regs.w[AX]=dst;
 }
@@ -1081,7 +1081,7 @@ static void PREFIX86(_ss)(void)    /* Opcode 0x36 */
 {
 	seg_prefix=TRUE;
 	prefix_base=I.base[SS];
-	ICOUNT -= cycles.override;
+	ICOUNT -= timing.override;
 	PREFIX(_instruction)[FETCHOP]();
 }
 
@@ -1103,48 +1103,48 @@ static void PREFIX86(_aaa)(void)    /* Opcode 0x37 */
 		I.CarryVal = 0;
     }
 	I.regs.b[AL] &= 0x0F;
-	ICOUNT -= cycles.aaa;
+	ICOUNT -= timing.aaa;
 }
 
 static void PREFIX86(_cmp_br8)(void)    /* Opcode 0x38 */
 {
     DEF_br8(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr8 : cycles.alu_rm8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr8 : timing.alu_rm8;
     SUBB(dst,src);
 }
 
 static void PREFIX86(_cmp_wr16)(void)    /* Opcode 0x39 */
 {
 	DEF_wr16(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr16 : cycles.alu_rm16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr16 : timing.alu_rm16;
     SUBW(dst,src);
 }
 
 static void PREFIX86(_cmp_r8b)(void)    /* Opcode 0x3a */
 {
     DEF_r8b(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr8 : cycles.alu_rm8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr8 : timing.alu_rm8;
     SUBB(dst,src);
 }
 
 static void PREFIX86(_cmp_r16w)(void)    /* Opcode 0x3b */
 {
 	DEF_r16w(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr16 : cycles.alu_rm16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr16 : timing.alu_rm16;
     SUBW(dst,src);
 }
 
 static void PREFIX86(_cmp_ald8)(void)    /* Opcode 0x3c */
 {
     DEF_ald8(dst,src);
-	ICOUNT -= cycles.alu_ri8;
+	ICOUNT -= timing.alu_ri8;
     SUBB(dst,src);
 }
 
 static void PREFIX86(_cmp_axd16)(void)    /* Opcode 0x3d */
 {
     DEF_axd16(dst,src);
-	ICOUNT -= cycles.alu_ri16;
+	ICOUNT -= timing.alu_ri16;
     SUBW(dst,src);
 }
 
@@ -1152,7 +1152,7 @@ static void PREFIX86(_ds)(void)    /* Opcode 0x3e */
 {
 	seg_prefix=TRUE;
 	prefix_base=I.base[DS];
-	ICOUNT -= cycles.override;
+	ICOUNT -= timing.override;
 	PREFIX(_instruction)[FETCHOP]();
 }
 
@@ -1174,7 +1174,7 @@ static void PREFIX86(_aas)(void)    /* Opcode 0x3f */
 		I.CarryVal = 0;
     }
 	I.regs.b[AL] &= 0x0F;
-	ICOUNT -= cycles.aas;
+	ICOUNT -= timing.aas;
 }
 
 #define IncWordReg(Reg) 					\
@@ -1185,7 +1185,7 @@ static void PREFIX86(_aas)(void)    /* Opcode 0x3f */
 	SetAF(tmp1,tmp,1);						\
 	SetSZPF_Word(tmp1); 					\
 	I.regs.w[Reg]=tmp1; 					\
-	ICOUNT -= cycles.incdec_r16;			\
+	ICOUNT -= timing.incdec_r16;			\
 }
 
 static void PREFIX86(_inc_ax)(void)    /* Opcode 0x40 */
@@ -1236,7 +1236,7 @@ static void PREFIX86(_inc_di)(void)    /* Opcode 0x47 */
     SetAF(tmp1,tmp,1); 						\
 	SetSZPF_Word(tmp1);						\
 	I.regs.w[Reg]=tmp1; 					\
-	ICOUNT -= cycles.incdec_r16;			\
+	ICOUNT -= timing.incdec_r16;			\
 }
 
 static void PREFIX86(_dec_ax)(void)    /* Opcode 0x48 */
@@ -1281,98 +1281,98 @@ static void PREFIX86(_dec_di)(void)    /* Opcode 0x4f */
 
 static void PREFIX86(_push_ax)(void)    /* Opcode 0x50 */
 {
-	ICOUNT -= cycles.push_r16;
+	ICOUNT -= timing.push_r16;
 	PUSH(I.regs.w[AX]);
 }
 
 static void PREFIX86(_push_cx)(void)    /* Opcode 0x51 */
 {
-	ICOUNT -= cycles.push_r16;
+	ICOUNT -= timing.push_r16;
 	PUSH(I.regs.w[CX]);
 }
 
 static void PREFIX86(_push_dx)(void)    /* Opcode 0x52 */
 {
-	ICOUNT -= cycles.push_r16;
+	ICOUNT -= timing.push_r16;
 	PUSH(I.regs.w[DX]);
 }
 
 static void PREFIX86(_push_bx)(void)    /* Opcode 0x53 */
 {
-	ICOUNT -= cycles.push_r16;
+	ICOUNT -= timing.push_r16;
 	PUSH(I.regs.w[BX]);
 }
 
 static void PREFIX86(_push_sp)(void)    /* Opcode 0x54 */
 {
-	ICOUNT -= cycles.push_r16;
+	ICOUNT -= timing.push_r16;
 	PUSH(I.regs.w[SP]);
 }
 
 static void PREFIX86(_push_bp)(void)    /* Opcode 0x55 */
 {
-	ICOUNT -= cycles.push_r16;
+	ICOUNT -= timing.push_r16;
 	PUSH(I.regs.w[BP]);
 }
 
 
 static void PREFIX86(_push_si)(void)    /* Opcode 0x56 */
 {
-	ICOUNT -= cycles.push_r16;
+	ICOUNT -= timing.push_r16;
 	PUSH(I.regs.w[SI]);
 }
 
 static void PREFIX86(_push_di)(void)    /* Opcode 0x57 */
 {
-	ICOUNT -= cycles.push_r16;
+	ICOUNT -= timing.push_r16;
 	PUSH(I.regs.w[DI]);
 }
 
 static void PREFIX86(_pop_ax)(void)    /* Opcode 0x58 */
 {
-	ICOUNT -= cycles.pop_r16;
+	ICOUNT -= timing.pop_r16;
 	POP(I.regs.w[AX]);
 }
 
 static void PREFIX86(_pop_cx)(void)    /* Opcode 0x59 */
 {
-	ICOUNT -= cycles.pop_r16;
+	ICOUNT -= timing.pop_r16;
 	POP(I.regs.w[CX]);
 }
 
 static void PREFIX86(_pop_dx)(void)    /* Opcode 0x5a */
 {
-	ICOUNT -= cycles.pop_r16;
+	ICOUNT -= timing.pop_r16;
 	POP(I.regs.w[DX]);
 }
 
 static void PREFIX86(_pop_bx)(void)    /* Opcode 0x5b */
 {
-	ICOUNT -= cycles.pop_r16;
+	ICOUNT -= timing.pop_r16;
 	POP(I.regs.w[BX]);
 }
 
 static void PREFIX86(_pop_sp)(void)    /* Opcode 0x5c */
 {
-	ICOUNT -= cycles.pop_r16;
+	ICOUNT -= timing.pop_r16;
 	POP(I.regs.w[SP]);
 }
 
 static void PREFIX86(_pop_bp)(void)    /* Opcode 0x5d */
 {
-	ICOUNT -= cycles.pop_r16;
+	ICOUNT -= timing.pop_r16;
 	POP(I.regs.w[BP]);
 }
 
 static void PREFIX86(_pop_si)(void)    /* Opcode 0x5e */
 {
-	ICOUNT -= cycles.pop_r16;
+	ICOUNT -= timing.pop_r16;
 	POP(I.regs.w[SI]);
 }
 
 static void PREFIX86(_pop_di)(void)    /* Opcode 0x5f */
 {
-	ICOUNT -= cycles.pop_r16;
+	ICOUNT -= timing.pop_r16;
 	POP(I.regs.w[DI]);
 }
 
@@ -1382,10 +1382,10 @@ static void PREFIX86(_jo)(void)    /* Opcode 0x70 */
 	if (OF)
 	{
 		I.pc += tmp;
-		ICOUNT -= cycles.jcc_t;
+		ICOUNT -= timing.jcc_t;
 /* ASG - can probably assume this is safe
         CHANGE_PC(I.pc);*/
-	} else ICOUNT -= cycles.jcc_nt;
+	} else ICOUNT -= timing.jcc_nt;
 }
 
 static void PREFIX86(_jno)(void)    /* Opcode 0x71 */
@@ -1393,10 +1393,10 @@ static void PREFIX86(_jno)(void)    /* Opcode 0x71 */
 	int tmp = (int)((INT8)FETCH);
 	if (!OF) {
 		I.pc += tmp;
-		ICOUNT -= cycles.jcc_t;
+		ICOUNT -= timing.jcc_t;
 /* ASG - can probably assume this is safe
         CHANGE_PC(I.pc);*/
-	} else ICOUNT -= cycles.jcc_nt;
+	} else ICOUNT -= timing.jcc_nt;
 }
 
 static void PREFIX86(_jb)(void)    /* Opcode 0x72 */
@@ -1404,10 +1404,10 @@ static void PREFIX86(_jb)(void)    /* Opcode 0x72 */
 	int tmp = (int)((INT8)FETCH);
 	if (CF) {
 		I.pc += tmp;
-		ICOUNT -= cycles.jcc_t;
+		ICOUNT -= timing.jcc_t;
 /* ASG - can probably assume this is safe
         CHANGE_PC(I.pc);*/
-	} else ICOUNT -= cycles.jcc_nt;
+	} else ICOUNT -= timing.jcc_nt;
 }
 
 static void PREFIX86(_jnb)(void)    /* Opcode 0x73 */
@@ -1415,10 +1415,10 @@ static void PREFIX86(_jnb)(void)    /* Opcode 0x73 */
 	int tmp = (int)((INT8)FETCH);
 	if (!CF) {
 		I.pc += tmp;
-		ICOUNT -= cycles.jcc_t;
+		ICOUNT -= timing.jcc_t;
 /* ASG - can probably assume this is safe
         CHANGE_PC(I.pc);*/
-	} else ICOUNT -= cycles.jcc_nt;
+	} else ICOUNT -= timing.jcc_nt;
 }
 
 static void PREFIX86(_jz)(void)    /* Opcode 0x74 */
@@ -1426,10 +1426,10 @@ static void PREFIX86(_jz)(void)    /* Opcode 0x74 */
 	int tmp = (int)((INT8)FETCH);
 	if (ZF) {
 		I.pc += tmp;
-		ICOUNT -= cycles.jcc_t;
+		ICOUNT -= timing.jcc_t;
 /* ASG - can probably assume this is safe
         CHANGE_PC(I.pc);*/
-	} else ICOUNT -= cycles.jcc_nt;
+	} else ICOUNT -= timing.jcc_nt;
 }
 
 static void PREFIX86(_jnz)(void)    /* Opcode 0x75 */
@@ -1437,10 +1437,10 @@ static void PREFIX86(_jnz)(void)    /* Opcode 0x75 */
 	int tmp = (int)((INT8)FETCH);
 	if (!ZF) {
 		I.pc += tmp;
-		ICOUNT -= cycles.jcc_t;
+		ICOUNT -= timing.jcc_t;
 /* ASG - can probably assume this is safe
         CHANGE_PC(I.pc);*/
-	} else ICOUNT -= cycles.jcc_nt;
+	} else ICOUNT -= timing.jcc_nt;
 }
 
 static void PREFIX86(_jbe)(void)    /* Opcode 0x76 */
@@ -1448,10 +1448,10 @@ static void PREFIX86(_jbe)(void)    /* Opcode 0x76 */
 	int tmp = (int)((INT8)FETCH);
     if (CF || ZF) {
 		I.pc += tmp;
-		ICOUNT -= cycles.jcc_t;
+		ICOUNT -= timing.jcc_t;
 /* ASG - can probably assume this is safe
         CHANGE_PC(I.pc);*/
-	} else ICOUNT -= cycles.jcc_nt;
+	} else ICOUNT -= timing.jcc_nt;
 }
 
 static void PREFIX86(_jnbe)(void)    /* Opcode 0x77 */
@@ -1459,10 +1459,10 @@ static void PREFIX86(_jnbe)(void)    /* Opcode 0x77 */
 	int tmp = (int)((INT8)FETCH);
 	 if (!(CF || ZF)) {
 		I.pc += tmp;
-		ICOUNT -= cycles.jcc_t;
+		ICOUNT -= timing.jcc_t;
 /* ASG - can probably assume this is safe
         CHANGE_PC(I.pc);*/
-	} else ICOUNT -= cycles.jcc_nt;
+	} else ICOUNT -= timing.jcc_nt;
 }
 
 static void PREFIX86(_js)(void)    /* Opcode 0x78 */
@@ -1470,10 +1470,10 @@ static void PREFIX86(_js)(void)    /* Opcode 0x78 */
 	int tmp = (int)((INT8)FETCH);
     if (SF) {
 		I.pc += tmp;
-		ICOUNT -= cycles.jcc_t;
+		ICOUNT -= timing.jcc_t;
 /* ASG - can probably assume this is safe
         CHANGE_PC(I.pc);*/
-	} else ICOUNT -= cycles.jcc_nt;
+	} else ICOUNT -= timing.jcc_nt;
 }
 
 static void PREFIX86(_jns)(void)    /* Opcode 0x79 */
@@ -1481,10 +1481,10 @@ static void PREFIX86(_jns)(void)    /* Opcode 0x79 */
 	int tmp = (int)((INT8)FETCH);
     if (!SF) {
 		I.pc += tmp;
-		ICOUNT -= cycles.jcc_t;
+		ICOUNT -= timing.jcc_t;
 /* ASG - can probably assume this is safe
         CHANGE_PC(I.pc);*/
-	} else ICOUNT -= cycles.jcc_nt;
+	} else ICOUNT -= timing.jcc_nt;
 }
 
 static void PREFIX86(_jp)(void)    /* Opcode 0x7a */
@@ -1492,10 +1492,10 @@ static void PREFIX86(_jp)(void)    /* Opcode 0x7a */
 	int tmp = (int)((INT8)FETCH);
     if (PF) {
 		I.pc += tmp;
-		ICOUNT -= cycles.jcc_t;
+		ICOUNT -= timing.jcc_t;
 /* ASG - can probably assume this is safe
         CHANGE_PC(I.pc);*/
-	} else ICOUNT -= cycles.jcc_nt;
+	} else ICOUNT -= timing.jcc_nt;
 }
 
 static void PREFIX86(_jnp)(void)    /* Opcode 0x7b */
@@ -1503,10 +1503,10 @@ static void PREFIX86(_jnp)(void)    /* Opcode 0x7b */
 	int tmp = (int)((INT8)FETCH);
     if (!PF) {
 		I.pc += tmp;
-		ICOUNT -= cycles.jcc_t;
+		ICOUNT -= timing.jcc_t;
 /* ASG - can probably assume this is safe
         CHANGE_PC(I.pc);*/
-	} else ICOUNT -= cycles.jcc_nt;
+	} else ICOUNT -= timing.jcc_nt;
 }
 
 static void PREFIX86(_jl)(void)    /* Opcode 0x7c */
@@ -1514,10 +1514,10 @@ static void PREFIX86(_jl)(void)    /* Opcode 0x7c */
 	int tmp = (int)((INT8)FETCH);
     if ((SF!=OF)&&!ZF) {
 		I.pc += tmp;
-		ICOUNT -= cycles.jcc_t;
+		ICOUNT -= timing.jcc_t;
 /* ASG - can probably assume this is safe
         CHANGE_PC(I.pc);*/
-	} else ICOUNT -= cycles.jcc_nt;
+	} else ICOUNT -= timing.jcc_nt;
 }
 
 static void PREFIX86(_jnl)(void)    /* Opcode 0x7d */
@@ -1525,10 +1525,10 @@ static void PREFIX86(_jnl)(void)    /* Opcode 0x7d */
 	int tmp = (int)((INT8)FETCH);
     if (ZF||(SF==OF)) {
 		I.pc += tmp;
-		ICOUNT -= cycles.jcc_t;
+		ICOUNT -= timing.jcc_t;
 /* ASG - can probably assume this is safe
         CHANGE_PC(I.pc);*/
-	} else ICOUNT -= cycles.jcc_nt;
+	} else ICOUNT -= timing.jcc_nt;
 }
 
 static void PREFIX86(_jle)(void)    /* Opcode 0x7e */
@@ -1536,10 +1536,10 @@ static void PREFIX86(_jle)(void)    /* Opcode 0x7e */
 	int tmp = (int)((INT8)FETCH);
     if (ZF||(SF!=OF)) {
 		I.pc += tmp;
-		ICOUNT -= cycles.jcc_t;
+		ICOUNT -= timing.jcc_t;
 /* ASG - can probably assume this is safe
         CHANGE_PC(I.pc);*/
-	} else ICOUNT -= cycles.jcc_nt;
+	} else ICOUNT -= timing.jcc_nt;
 }
 
 static void PREFIX86(_jnle)(void)    /* Opcode 0x7f */
@@ -1547,10 +1547,10 @@ static void PREFIX86(_jnle)(void)    /* Opcode 0x7f */
 	int tmp = (int)((INT8)FETCH);
     if ((SF==OF)&&!ZF) {
 		I.pc += tmp;
-		ICOUNT -= cycles.jcc_t;
+		ICOUNT -= timing.jcc_t;
 /* ASG - can probably assume this is safe
         CHANGE_PC(I.pc);*/
-	} else ICOUNT -= cycles.jcc_nt;
+	} else ICOUNT -= timing.jcc_nt;
 }
 
 static void PREFIX86(_80pre)(void)    /* Opcode 0x80 */
@@ -1564,43 +1564,43 @@ static void PREFIX86(_80pre)(void)    /* Opcode 0x80 */
     case 0x00:  /* ADD eb,d8 */
         ADDB(dst,src);
         PutbackRMByte(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri8 : cycles.alu_mi8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8;
 		break;
     case 0x08:  /* OR eb,d8 */
         ORB(dst,src);
 		PutbackRMByte(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri8 : cycles.alu_mi8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8;
 		break;
     case 0x10:  /* ADC eb,d8 */
         src+=CF;
         ADDB(dst,src);
 		PutbackRMByte(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri8 : cycles.alu_mi8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8;
 		break;
     case 0x18:  /* SBB eb,b8 */
 		src+=CF;
 		SUBB(dst,src);
         PutbackRMByte(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri8 : cycles.alu_mi8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8;
 		break;
     case 0x20:  /* AND eb,d8 */
         ANDB(dst,src);
 		PutbackRMByte(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri8 : cycles.alu_mi8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8;
 		break;
     case 0x28:  /* SUB eb,d8 */
         SUBB(dst,src);
         PutbackRMByte(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri8 : cycles.alu_mi8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8;
 		break;
     case 0x30:  /* XOR eb,d8 */
         XORB(dst,src);
 		PutbackRMByte(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri8 : cycles.alu_mi8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8;
 		break;
     case 0x38:  /* CMP eb,d8 */
         SUBB(dst,src);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri8 : cycles.alu_mi8_ro;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8_ro;
 		break;
 	}
 }
@@ -1618,43 +1618,43 @@ static void PREFIX86(_81pre)(void)    /* Opcode 0x81 */
     case 0x00:  /* ADD ew,d16 */
 		ADDW(dst,src);
 		PutbackRMWord(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri16 : cycles.alu_mi16;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri16 : timing.alu_mi16;
 		break;
     case 0x08:  /* OR ew,d16 */
         ORW(dst,src);
         PutbackRMWord(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri16 : cycles.alu_mi16;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri16 : timing.alu_mi16;
 		break;
 	case 0x10:	/* ADC ew,d16 */
 		src+=CF;
 		ADDW(dst,src);
         PutbackRMWord(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri16 : cycles.alu_mi16;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri16 : timing.alu_mi16;
 		break;
     case 0x18:  /* SBB ew,d16 */
         src+=CF;
 		SUBW(dst,src);
         PutbackRMWord(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri16 : cycles.alu_mi16;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri16 : timing.alu_mi16;
 		break;
     case 0x20:  /* AND ew,d16 */
         ANDW(dst,src);
 		PutbackRMWord(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri16 : cycles.alu_mi16;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri16 : timing.alu_mi16;
 		break;
     case 0x28:  /* SUB ew,d16 */
         SUBW(dst,src);
         PutbackRMWord(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri16 : cycles.alu_mi16;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri16 : timing.alu_mi16;
 		break;
     case 0x30:  /* XOR ew,d16 */
 		XORW(dst,src);
         PutbackRMWord(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri16 : cycles.alu_mi16;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri16 : timing.alu_mi16;
 		break;
     case 0x38:  /* CMP ew,d16 */
         SUBW(dst,src);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri16 : cycles.alu_mi16_ro;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri16 : timing.alu_mi16_ro;
 		break;
     }
 }
@@ -1670,43 +1670,43 @@ static void PREFIX86(_82pre)(void)	 /* Opcode 0x82 */
 	case 0x00:	/* ADD eb,d8 */
 		ADDB(dst,src);
 		PutbackRMByte(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri8 : cycles.alu_mi8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8;
 		break;
 	case 0x08:	/* OR eb,d8 */
 		ORB(dst,src);
 		PutbackRMByte(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri8 : cycles.alu_mi8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8;
 		break;
 	case 0x10:	/* ADC eb,d8 */
 		src+=CF;
 		ADDB(dst,src);
 		PutbackRMByte(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri8 : cycles.alu_mi8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8;
 		break;
 	case 0x18:	/* SBB eb,d8 */
         src+=CF;
 		SUBB(dst,src);
 		PutbackRMByte(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri8 : cycles.alu_mi8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8;
 		break;
 	case 0x20:	/* AND eb,d8 */
 		ANDB(dst,src);
 		PutbackRMByte(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri8 : cycles.alu_mi8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8;
 		break;
 	case 0x28:	/* SUB eb,d8 */
 		SUBB(dst,src);
 		PutbackRMByte(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri8 : cycles.alu_mi8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8;
 		break;
 	case 0x30:	/* XOR eb,d8 */
 		XORB(dst,src);
 		PutbackRMByte(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri8 : cycles.alu_mi8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8;
 		break;
 	case 0x38:	/* CMP eb,d8 */
 		SUBB(dst,src);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri8 : cycles.alu_mi8_ro;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8_ro;
 		break;
 	}
 }
@@ -1722,43 +1722,43 @@ static void PREFIX86(_83pre)(void)    /* Opcode 0x83 */
     case 0x00:  /* ADD ew,d16 */
         ADDW(dst,src);
         PutbackRMWord(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_r16i8 : cycles.alu_m16i8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_r16i8 : timing.alu_m16i8;
 		break;
     case 0x08:  /* OR ew,d16 */
 		ORW(dst,src);
         PutbackRMWord(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_r16i8 : cycles.alu_m16i8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_r16i8 : timing.alu_m16i8;
 		break;
     case 0x10:  /* ADC ew,d16 */
         src+=CF;
 		ADDW(dst,src);
         PutbackRMWord(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_r16i8 : cycles.alu_m16i8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_r16i8 : timing.alu_m16i8;
 		break;
 	case 0x18:	/* SBB ew,d16 */
 		src+=CF;
         SUBW(dst,src);
         PutbackRMWord(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_r16i8 : cycles.alu_m16i8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_r16i8 : timing.alu_m16i8;
 		break;
 	case 0x20:	/* AND ew,d16 */
         ANDW(dst,src);
         PutbackRMWord(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_r16i8 : cycles.alu_m16i8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_r16i8 : timing.alu_m16i8;
 		break;
     case 0x28:  /* SUB ew,d16 */
 		SUBW(dst,src);
 		PutbackRMWord(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_r16i8 : cycles.alu_m16i8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_r16i8 : timing.alu_m16i8;
 		break;
     case 0x30:  /* XOR ew,d16 */
 		XORW(dst,src);
         PutbackRMWord(ModRM,dst);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_r16i8 : cycles.alu_m16i8;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_r16i8 : timing.alu_m16i8;
 		break;
     case 0x38:  /* CMP ew,d16 */
         SUBW(dst,src);
-        ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_r16i8 : cycles.alu_m16i8_ro;
+        ICOUNT -= (ModRM >= 0xc0) ? timing.alu_r16i8 : timing.alu_m16i8_ro;
 		break;
     }
 }
@@ -1766,21 +1766,21 @@ static void PREFIX86(_83pre)(void)    /* Opcode 0x83 */
 static void PREFIX86(_test_br8)(void)    /* Opcode 0x84 */
 {
     DEF_br8(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr8 : cycles.alu_rm8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr8 : timing.alu_rm8;
     ANDB(dst,src);
 }
 
 static void PREFIX86(_test_wr16)(void)    /* Opcode 0x85 */
 {
     DEF_wr16(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_rr16 : cycles.alu_rm16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.alu_rr16 : timing.alu_rm16;
 	ANDW(dst,src);
 }
 
 static void PREFIX86(_xchg_br8)(void)    /* Opcode 0x86 */
 {
     DEF_br8(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.xchg_rr8 : cycles.xchg_rm8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.xchg_rr8 : timing.xchg_rm8;
     RegByte(ModRM)=dst;
     PutbackRMByte(ModRM,src);
 }
@@ -1788,7 +1788,7 @@ static void PREFIX86(_xchg_br8)(void)    /* Opcode 0x86 */
 static void PREFIX86(_xchg_wr16)(void)    /* Opcode 0x87 */
 {
     DEF_wr16(dst,src);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.xchg_rr16 : cycles.xchg_rm16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.xchg_rr16 : timing.xchg_rm16;
     RegWord(ModRM)=dst;
     PutbackRMWord(ModRM,src);
 }
@@ -1797,7 +1797,7 @@ static void PREFIX86(_mov_br8)(void)    /* Opcode 0x88 */
 {
 	unsigned ModRM = FETCH;
     BYTE src = RegByte(ModRM);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.mov_rr8 : cycles.mov_mr8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.mov_rr8 : timing.mov_mr8;
     PutRMByte(ModRM,src);
 }
 
@@ -1805,7 +1805,7 @@ static void PREFIX86(_mov_wr16)(void)    /* Opcode 0x89 */
 {
 	unsigned ModRM = FETCH;
     WORD src = RegWord(ModRM);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.mov_rr16 : cycles.mov_mr16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.mov_rr16 : timing.mov_mr16;
     PutRMWord(ModRM,src);
 }
 
@@ -1813,7 +1813,7 @@ static void PREFIX86(_mov_r8b)(void)    /* Opcode 0x8a */
 {
 	unsigned ModRM = FETCH;
     BYTE src = GetRMByte(ModRM);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.mov_rr8 : cycles.mov_rm8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.mov_rr8 : timing.mov_rm8;
     RegByte(ModRM)=src;
 }
 
@@ -1821,14 +1821,14 @@ static void PREFIX86(_mov_r16w)(void)    /* Opcode 0x8b */
 {
 	unsigned ModRM = FETCH;
 	WORD src = GetRMWord(ModRM);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.mov_rr8 : cycles.mov_rm16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.mov_rr8 : timing.mov_rm16;
 	RegWord(ModRM)=src;
 }
 
 static void PREFIX86(_mov_wsreg)(void)    /* Opcode 0x8c */
 {
 	unsigned ModRM = FETCH;
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.mov_rs : cycles.mov_ms;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.mov_rs : timing.mov_ms;
 #ifdef I80286
 	if (ModRM & 0x20) {	/* HJB 12/13/98 1xx is invalid */
 		i80286_trap2(ILLEGAL_INSTRUCTION);
@@ -1843,7 +1843,7 @@ static void PREFIX86(_mov_wsreg)(void)    /* Opcode 0x8c */
 static void PREFIX86(_lea)(void)    /* Opcode 0x8d */
 {
 	unsigned ModRM = FETCH;
-	ICOUNT -= cycles.lea;
+	ICOUNT -= timing.lea;
 	(void)(*GetEA[ModRM])();
 	RegWord(ModRM)=EO;	/* HJB 12/13/98 effective offset (no segment part) */
 }
@@ -1853,7 +1853,7 @@ static void PREFIX86(_mov_sregw)(void)    /* Opcode 0x8e */
 	unsigned ModRM = FETCH;
     WORD src = GetRMWord(ModRM);
 
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.mov_sr : cycles.mov_sm;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.mov_sr : timing.mov_sm;
 #ifdef I80286
     switch (ModRM & 0x38)
     {
@@ -1897,7 +1897,7 @@ static void PREFIX86(_popw)(void)    /* Opcode 0x8f */
 	unsigned ModRM = FETCH;
     WORD tmp;
 	POP(tmp);
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.pop_r16 : cycles.pop_m16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.pop_r16 : timing.pop_m16;
 	PutRMWord(ModRM,tmp);
 }
 
@@ -1908,14 +1908,14 @@ static void PREFIX86(_popw)(void)    /* Opcode 0x8f */
 	tmp = I.regs.w[Reg]; 			\
 	I.regs.w[Reg] = I.regs.w[AX]; 	\
 	I.regs.w[AX] = tmp; 			\
-	ICOUNT -= cycles.xchg_ar16; 	\
+	ICOUNT -= timing.xchg_ar16; 	\
 }
 
 
 static void PREFIX86(_nop)(void)    /* Opcode 0x90 */
 {
     /* this is XchgAXReg(AX); */
-	ICOUNT -= cycles.nop;
+	ICOUNT -= timing.nop;
 }
 
 static void PREFIX86(_xchg_axcx)(void)    /* Opcode 0x91 */
@@ -1955,13 +1955,13 @@ static void PREFIX86(_xchg_axdi)(void)    /* Opcode 0x97 */
 
 static void PREFIX86(_cbw)(void)    /* Opcode 0x98 */
 {
-	ICOUNT -= cycles.cbw;
+	ICOUNT -= timing.cbw;
 	I.regs.b[AH] = (I.regs.b[AL] & 0x80) ? 0xff : 0;
 }
 
 static void PREFIX86(_cwd)(void)    /* Opcode 0x99 */
 {
-	ICOUNT -= cycles.cwd;
+	ICOUNT -= timing.cwd;
 	I.regs.w[DX] = (I.regs.b[AH] & 0x80) ? 0xffff : 0;
 }
 
@@ -1987,7 +1987,7 @@ static void PREFIX86(_call_far)(void)
 	I.base[CS] = SegBase(CS);
 	I.pc = (I.base[CS] + (WORD)tmp) & AMASK;
 #endif
-	ICOUNT -= cycles.call_far;
+	ICOUNT -= timing.call_far;
 	CHANGE_PC(I.pc);
 }
 
@@ -1999,13 +1999,13 @@ static void PREFIX86(_wait)(void)    /* Opcode 0x9b */
 		I.pc--;
 	}
 	else
-		ICOUNT -= cycles.wait;
+		ICOUNT -= timing.wait;
 }
 
 static void PREFIX86(_pushf)(void)    /* Opcode 0x9c */
 {
 	unsigned tmp;
-	ICOUNT -= cycles.pushf;
+	ICOUNT -= timing.pushf;
 
 	tmp = CompressFlags();
 #ifdef I80286
@@ -2019,7 +2019,7 @@ static void PREFIX86(_popf)(void)    /* Opcode 0x9d */
 {
 	unsigned tmp;
     POP(tmp);
-	ICOUNT -= cycles.popf;
+	ICOUNT -= timing.popf;
     ExpandFlags(tmp);
 
 	if (I.TF) PREFIX(_trap)();
@@ -2032,14 +2032,14 @@ static void PREFIX86(_popf)(void)    /* Opcode 0x9d */
 static void PREFIX86(_sahf)(void)    /* Opcode 0x9e */
 {
 	unsigned tmp = (CompressFlags() & 0xff00) | (I.regs.b[AH] & 0xd5);
-	ICOUNT -= cycles.sahf;
+	ICOUNT -= timing.sahf;
     ExpandFlags(tmp);
 }
 
 static void PREFIX86(_lahf)(void)    /* Opcode 0x9f */
 {
 	I.regs.b[AH] = CompressFlags() & 0xff;
-	ICOUNT -= cycles.lahf;
+	ICOUNT -= timing.lahf;
 }
 
 
@@ -2050,7 +2050,7 @@ static void PREFIX86(_mov_aldisp)(void)    /* Opcode 0xa0 */
 	addr = FETCH;
 	addr += FETCH << 8;
 
-	ICOUNT -= cycles.mov_am8;
+	ICOUNT -= timing.mov_am8;
 	I.regs.b[AL] = GetMemB(DS, addr);
 }
 
@@ -2061,7 +2061,7 @@ static void PREFIX86(_mov_axdisp)(void)    /* Opcode 0xa1 */
 	addr = FETCH;
 	addr += FETCH << 8;
 
-	ICOUNT -= cycles.mov_am16;
+	ICOUNT -= timing.mov_am16;
 	I.regs.w[AX] = GetMemW(DS, addr);
 }
 
@@ -2072,7 +2072,7 @@ static void PREFIX86(_mov_dispal)(void)    /* Opcode 0xa2 */
 	addr = FETCH;
 	addr += FETCH << 8;
 
-	ICOUNT -= cycles.mov_ma8;
+	ICOUNT -= timing.mov_ma8;
 	PutMemB(DS, addr, I.regs.b[AL]);
 }
 
@@ -2083,7 +2083,7 @@ static void PREFIX86(_mov_dispax)(void)    /* Opcode 0xa3 */
 	addr = FETCH;
 	addr += FETCH << 8;
 
-	ICOUNT -= cycles.mov_ma16;
+	ICOUNT -= timing.mov_ma16;
 	PutMemW(DS, addr, I.regs.w[AX]);
 }
 
@@ -2093,7 +2093,7 @@ static void PREFIX86(_movsb)(void)    /* Opcode 0xa4 */
 	PutMemB(ES,I.regs.w[DI], tmp);
 	I.regs.w[DI] += I.DirVal;
 	I.regs.w[SI] += I.DirVal;
-	ICOUNT -= cycles.movs8;
+	ICOUNT -= timing.movs8;
 }
 
 static void PREFIX86(_movsw)(void)    /* Opcode 0xa5 */
@@ -2102,7 +2102,7 @@ static void PREFIX86(_movsw)(void)    /* Opcode 0xa5 */
 	PutMemW(ES,I.regs.w[DI], tmp);
 	I.regs.w[DI] += 2 * I.DirVal;
 	I.regs.w[SI] += 2 * I.DirVal;
-	ICOUNT -= cycles.movs16;
+	ICOUNT -= timing.movs16;
 }
 
 static void PREFIX86(_cmpsb)(void)    /* Opcode 0xa6 */
@@ -2112,7 +2112,7 @@ static void PREFIX86(_cmpsb)(void)    /* Opcode 0xa6 */
     SUBB(src,dst); /* opposite of the usual convention */
 	I.regs.w[DI] += I.DirVal;
 	I.regs.w[SI] += I.DirVal;
-	ICOUNT -= cycles.cmps8;
+	ICOUNT -= timing.cmps8;
 }
 
 static void PREFIX86(_cmpsw)(void)    /* Opcode 0xa7 */
@@ -2122,20 +2122,20 @@ static void PREFIX86(_cmpsw)(void)    /* Opcode 0xa7 */
 	SUBW(src,dst); /* opposite of the usual convention */
 	I.regs.w[DI] += 2 * I.DirVal;
 	I.regs.w[SI] += 2 * I.DirVal;
-	ICOUNT -= cycles.cmps16;
+	ICOUNT -= timing.cmps16;
 }
 
 static void PREFIX86(_test_ald8)(void)    /* Opcode 0xa8 */
 {
     DEF_ald8(dst,src);
-	ICOUNT -= cycles.alu_ri8;
+	ICOUNT -= timing.alu_ri8;
     ANDB(dst,src);
 }
 
 static void PREFIX86(_test_axd16)(void)    /* Opcode 0xa9 */
 {
     DEF_axd16(dst,src);
-	ICOUNT -= cycles.alu_ri16;
+	ICOUNT -= timing.alu_ri16;
     ANDW(dst,src);
 }
 
@@ -2143,28 +2143,28 @@ static void PREFIX86(_stosb)(void)    /* Opcode 0xaa */
 {
 	PutMemB(ES,I.regs.w[DI],I.regs.b[AL]);
 	I.regs.w[DI] += I.DirVal;
-	ICOUNT -= cycles.stos8;
+	ICOUNT -= timing.stos8;
 }
 
 static void PREFIX86(_stosw)(void)    /* Opcode 0xab */
 {
 	PutMemW(ES,I.regs.w[DI],I.regs.w[AX]);
 	I.regs.w[DI] += 2 * I.DirVal;
-	ICOUNT -= cycles.stos16;
+	ICOUNT -= timing.stos16;
 }
 
 static void PREFIX86(_lodsb)(void)    /* Opcode 0xac */
 {
 	I.regs.b[AL] = GetMemB(DS,I.regs.w[SI]);
 	I.regs.w[SI] += I.DirVal;
-	ICOUNT -= cycles.lods8;
+	ICOUNT -= timing.lods8;
 }
 
 static void PREFIX86(_lodsw)(void)    /* Opcode 0xad */
 {
 	I.regs.w[AX] = GetMemW(DS,I.regs.w[SI]);
 	I.regs.w[SI] += 2 * I.DirVal;
-	ICOUNT -= cycles.lods16;
+	ICOUNT -= timing.lods16;
 }
 
 static void PREFIX86(_scasb)(void)    /* Opcode 0xae */
@@ -2173,7 +2173,7 @@ static void PREFIX86(_scasb)(void)    /* Opcode 0xae */
 	unsigned dst = I.regs.b[AL];
     SUBB(dst,src);
 	I.regs.w[DI] += I.DirVal;
-	ICOUNT -= cycles.scas8;
+	ICOUNT -= timing.scas8;
 }
 
 static void PREFIX86(_scasw)(void)    /* Opcode 0xaf */
@@ -2182,111 +2182,111 @@ static void PREFIX86(_scasw)(void)    /* Opcode 0xaf */
 	unsigned dst = I.regs.w[AX];
     SUBW(dst,src);
 	I.regs.w[DI] += 2 * I.DirVal;
-	ICOUNT -= cycles.scas16;
+	ICOUNT -= timing.scas16;
 }
 
 static void PREFIX86(_mov_ald8)(void)    /* Opcode 0xb0 */
 {
 	I.regs.b[AL] = FETCH;
-	ICOUNT -= cycles.mov_ri8;
+	ICOUNT -= timing.mov_ri8;
 }
 
 static void PREFIX86(_mov_cld8)(void)    /* Opcode 0xb1 */
 {
 	I.regs.b[CL] = FETCH;
-	ICOUNT -= cycles.mov_ri8;
+	ICOUNT -= timing.mov_ri8;
 }
 
 static void PREFIX86(_mov_dld8)(void)    /* Opcode 0xb2 */
 {
 	I.regs.b[DL] = FETCH;
-	ICOUNT -= cycles.mov_ri8;
+	ICOUNT -= timing.mov_ri8;
 }
 
 static void PREFIX86(_mov_bld8)(void)    /* Opcode 0xb3 */
 {
 	I.regs.b[BL] = FETCH;
-	ICOUNT -= cycles.mov_ri8;
+	ICOUNT -= timing.mov_ri8;
 }
 
 static void PREFIX86(_mov_ahd8)(void)    /* Opcode 0xb4 */
 {
 	I.regs.b[AH] = FETCH;
-	ICOUNT -= cycles.mov_ri8;
+	ICOUNT -= timing.mov_ri8;
 }
 
 static void PREFIX86(_mov_chd8)(void)    /* Opcode 0xb5 */
 {
 	I.regs.b[CH] = FETCH;
-	ICOUNT -= cycles.mov_ri8;
+	ICOUNT -= timing.mov_ri8;
 }
 
 static void PREFIX86(_mov_dhd8)(void)    /* Opcode 0xb6 */
 {
 	I.regs.b[DH] = FETCH;
-	ICOUNT -= cycles.mov_ri8;
+	ICOUNT -= timing.mov_ri8;
 }
 
 static void PREFIX86(_mov_bhd8)(void)    /* Opcode 0xb7 */
 {
 	I.regs.b[BH] = FETCH;
-	ICOUNT -= cycles.mov_ri8;
+	ICOUNT -= timing.mov_ri8;
 }
 
 static void PREFIX86(_mov_axd16)(void)    /* Opcode 0xb8 */
 {
 	I.regs.b[AL] = FETCH;
 	I.regs.b[AH] = FETCH;
-	ICOUNT -= cycles.mov_ri16;
+	ICOUNT -= timing.mov_ri16;
 }
 
 static void PREFIX86(_mov_cxd16)(void)    /* Opcode 0xb9 */
 {
 	I.regs.b[CL] = FETCH;
 	I.regs.b[CH] = FETCH;
-	ICOUNT -= cycles.mov_ri16;
+	ICOUNT -= timing.mov_ri16;
 }
 
 static void PREFIX86(_mov_dxd16)(void)    /* Opcode 0xba */
 {
 	I.regs.b[DL] = FETCH;
 	I.regs.b[DH] = FETCH;
-	ICOUNT -= cycles.mov_ri16;
+	ICOUNT -= timing.mov_ri16;
 }
 
 static void PREFIX86(_mov_bxd16)(void)    /* Opcode 0xbb */
 {
 	I.regs.b[BL] = FETCH;
 	I.regs.b[BH] = FETCH;
-	ICOUNT -= cycles.mov_ri16;
+	ICOUNT -= timing.mov_ri16;
 }
 
 static void PREFIX86(_mov_spd16)(void)    /* Opcode 0xbc */
 {
 	I.regs.b[SPL] = FETCH;
 	I.regs.b[SPH] = FETCH;
-	ICOUNT -= cycles.mov_ri16;
+	ICOUNT -= timing.mov_ri16;
 }
 
 static void PREFIX86(_mov_bpd16)(void)    /* Opcode 0xbd */
 {
 	I.regs.b[BPL] = FETCH;
 	I.regs.b[BPH] = FETCH;
-	ICOUNT -= cycles.mov_ri16;
+	ICOUNT -= timing.mov_ri16;
 }
 
 static void PREFIX86(_mov_sid16)(void)    /* Opcode 0xbe */
 {
 	I.regs.b[SIL] = FETCH;
 	I.regs.b[SIH] = FETCH;
-	ICOUNT -= cycles.mov_ri16;
+	ICOUNT -= timing.mov_ri16;
 }
 
 static void PREFIX86(_mov_did16)(void)    /* Opcode 0xbf */
 {
 	I.regs.b[DIL] = FETCH;
 	I.regs.b[DIH] = FETCH;
-	ICOUNT -= cycles.mov_ri16;
+	ICOUNT -= timing.mov_ri16;
 }
 
 static void PREFIX86(_ret_d16)(void)    /* Opcode 0xc2 */
@@ -2296,7 +2296,7 @@ static void PREFIX86(_ret_d16)(void)    /* Opcode 0xc2 */
 	POP(I.pc);
 	I.pc = (I.pc + I.base[CS]) & AMASK;
 	I.regs.w[SP]+=count;
-	ICOUNT -= cycles.ret_near_imm;
+	ICOUNT -= timing.ret_near_imm;
 	CHANGE_PC(I.pc);
 }
 
@@ -2304,7 +2304,7 @@ static void PREFIX86(_ret)(void)    /* Opcode 0xc3 */
 {
 	POP(I.pc);
 	I.pc = (I.pc + I.base[CS]) & AMASK;
-	ICOUNT -= cycles.ret_near;
+	ICOUNT -= timing.ret_near;
 	CHANGE_PC(I.pc);
 }
 
@@ -2320,7 +2320,7 @@ static void PREFIX86(_les_dw)(void)    /* Opcode 0xc4 */
 	I.sregs[ES] = GetnextRMWord;
 	I.base[ES] = SegBase(ES);
 #endif
-	ICOUNT -= cycles.load_ptr;
+	ICOUNT -= timing.load_ptr;
 }
 
 static void PREFIX86(_lds_dw)(void)    /* Opcode 0xc5 */
@@ -2335,20 +2335,20 @@ static void PREFIX86(_lds_dw)(void)    /* Opcode 0xc5 */
 	I.sregs[DS] = GetnextRMWord;
 	I.base[DS] = SegBase(DS);
 #endif
-	ICOUNT -= cycles.load_ptr;
+	ICOUNT -= timing.load_ptr;
 }
 
 static void PREFIX86(_mov_bd8)(void)    /* Opcode 0xc6 */
 {
 	unsigned ModRM = FETCH;
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.mov_ri8 : cycles.mov_mi8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.mov_ri8 : timing.mov_mi8;
 	PutImmRMByte(ModRM);
 }
 
 static void PREFIX86(_mov_wd16)(void)    /* Opcode 0xc7 */
 {
 	unsigned ModRM = FETCH;
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.mov_ri16 : cycles.mov_mi16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.mov_ri16 : timing.mov_mi16;
 	PutImmRMWord(ModRM);
 }
 
@@ -2371,7 +2371,7 @@ static void PREFIX86(_retf_d16)(void)    /* Opcode 0xca */
 	I.pc = (I.pc + I.base[CS]) & AMASK;
 #endif
 	I.regs.w[SP]+=count;
-	ICOUNT -= cycles.ret_far_imm;
+	ICOUNT -= timing.ret_far_imm;
 	CHANGE_PC(I.pc);
 }
 
@@ -2390,34 +2390,34 @@ static void PREFIX86(_retf)(void)    /* Opcode 0xcb */
 	I.base[CS] = SegBase(CS);
 	I.pc = (I.pc + I.base[CS]) & AMASK;
 #endif
-	ICOUNT -= cycles.ret_far;
+	ICOUNT -= timing.ret_far;
 	CHANGE_PC(I.pc);
 }
 
 static void PREFIX86(_int3)(void)    /* Opcode 0xcc */
 {
-	ICOUNT -= cycles.int3;
+	ICOUNT -= timing.int3;
 	PREFIX(_interrupt)(3);
 }
 
 static void PREFIX86(_int)(void)    /* Opcode 0xcd */
 {
 	unsigned int_num = FETCH;
-	ICOUNT -= cycles.int_imm;
+	ICOUNT -= timing.int_imm;
 	PREFIX(_interrupt)(int_num);
 }
 
 static void PREFIX86(_into)(void)    /* Opcode 0xce */
 {
 	if (OF) {
-		ICOUNT -= cycles.into_t;
+		ICOUNT -= timing.into_t;
 		PREFIX(_interrupt)(4);
-	} else ICOUNT -= cycles.into_nt;
+	} else ICOUNT -= timing.into_nt;
 }
 
 static void PREFIX86(_iret)(void)    /* Opcode 0xcf */
 {
-	ICOUNT -= cycles.iret;
+	ICOUNT -= timing.iret;
 #ifdef I80286
 	{
 		int tmp, tmp2;
@@ -2468,7 +2468,7 @@ static void PREFIX86(_aam)(void)    /* Opcode 0xd4 */
 {
 	unsigned mult = FETCH;
 
-	ICOUNT -= cycles.aam;
+	ICOUNT -= timing.aam;
 	if (mult == 0)
 		PREFIX(_interrupt)(0);
 	else
@@ -2484,7 +2484,7 @@ static void PREFIX86(_aad)(void)    /* Opcode 0xd5 */
 {
 	unsigned mult = FETCH;
 
-	ICOUNT -= cycles.aad;
+	ICOUNT -= timing.aad;
 
 	I.regs.b[AL] = I.regs.b[AH] * mult + I.regs.b[AL];
 	I.regs.b[AH] = 0;
@@ -2499,14 +2499,14 @@ static void PREFIX86(_xlat)(void)    /* Opcode 0xd7 */
 {
 	unsigned dest = I.regs.w[BX]+I.regs.b[AL];
 
-	ICOUNT -= cycles.xlat;
+	ICOUNT -= timing.xlat;
 	I.regs.b[AL] = GetMemB(DS, dest);
 }
 
 static void PREFIX86(_escape)(void)    /* Opcodes 0xd8, 0xd9, 0xda, 0xdb, 0xdc, 0xdd, 0xde and 0xdf */
 {
 	unsigned ModRM = FETCH;
-	ICOUNT -= cycles.nop;
+	ICOUNT -= timing.nop;
     GetRMByte(ModRM);
 }
 
@@ -2518,11 +2518,11 @@ static void PREFIX86(_loopne)(void)    /* Opcode 0xe0 */
 	I.regs.w[CX]=tmp;
 
     if (!ZF && tmp) {
-		ICOUNT -= cycles.loop_t;
+		ICOUNT -= timing.loop_t;
 		I.pc += disp;
 /* ASG - can probably assume this is safe
         CHANGE_PC(I.pc);*/
-	} else ICOUNT -= cycles.loop_nt;
+	} else ICOUNT -= timing.loop_nt;
 }
 
 static void PREFIX86(_loope)(void)    /* Opcode 0xe1 */
@@ -2533,11 +2533,11 @@ static void PREFIX86(_loope)(void)    /* Opcode 0xe1 */
 	I.regs.w[CX]=tmp;
 
 	if (ZF && tmp) {
-		ICOUNT -= cycles.loope_t;
+		ICOUNT -= timing.loope_t;
 		 I.pc += disp;
 /* ASG - can probably assume this is safe
          CHANGE_PC(I.pc);*/
-	 } else ICOUNT -= cycles.loope_nt;
+	 } else ICOUNT -= timing.loope_nt;
 }
 
 static void PREFIX86(_loop)(void)    /* Opcode 0xe2 */
@@ -2548,11 +2548,11 @@ static void PREFIX86(_loop)(void)    /* Opcode 0xe2 */
 	I.regs.w[CX]=tmp;
 
     if (tmp) {
-		ICOUNT -= cycles.loop_t;
+		ICOUNT -= timing.loop_t;
 		I.pc += disp;
 /* ASG - can probably assume this is safe
         CHANGE_PC(I.pc);*/
-	} else ICOUNT -= cycles.loop_nt;
+	} else ICOUNT -= timing.loop_nt;
 }
 
 static void PREFIX86(_jcxz)(void)    /* Opcode 0xe3 */
@@ -2560,19 +2560,19 @@ static void PREFIX86(_jcxz)(void)    /* Opcode 0xe3 */
 	int disp = (int)((INT8)FETCH);
 
 	if (I.regs.w[CX] == 0) {
-		ICOUNT -= cycles.jcxz_t;
+		ICOUNT -= timing.jcxz_t;
 		I.pc += disp;
 /* ASG - can probably assume this is safe
         CHANGE_PC(I.pc);*/
 	} else
-		ICOUNT -= cycles.jcxz_nt;
+		ICOUNT -= timing.jcxz_nt;
 }
 
 static void PREFIX86(_inal)(void)    /* Opcode 0xe4 */
 {
 	unsigned port = FETCH;
 
-	ICOUNT -= cycles.in_imm8;
+	ICOUNT -= timing.in_imm8;
 	I.regs.b[AL] = read_port_byte(port);
 }
 
@@ -2580,7 +2580,7 @@ static void PREFIX86(_inax)(void)    /* Opcode 0xe5 */
 {
 	unsigned port = FETCH;
 
-	ICOUNT -= cycles.in_imm16;
+	ICOUNT -= timing.in_imm16;
 	I.regs.w[AX] = read_port_word(port);
 }
 
@@ -2588,7 +2588,7 @@ static void PREFIX86(_outal)(void)    /* Opcode 0xe6 */
 {
 	unsigned port = FETCH;
 
-	ICOUNT -= cycles.out_imm8;
+	ICOUNT -= timing.out_imm8;
 	write_port_byte(port, I.regs.b[AL]);
 }
 
@@ -2596,7 +2596,7 @@ static void PREFIX86(_outax)(void)    /* Opcode 0xe7 */
 {
 	unsigned port = FETCH;
 
-	ICOUNT -= cycles.out_imm16;
+	ICOUNT -= timing.out_imm16;
 	write_port_word(port, I.regs.w[AX]);
 }
 
@@ -2609,7 +2609,7 @@ static void PREFIX86(_call_d16)(void)    /* Opcode 0xe8 */
 	PUSH(ip);
 	ip += tmp;
 	I.pc = (ip + I.base[CS]) & AMASK;
-	ICOUNT -= cycles.call_near;
+	ICOUNT -= timing.call_near;
 	CHANGE_PC(I.pc);
 }
 
@@ -2620,7 +2620,7 @@ static void PREFIX86(_jmp_d16)(void)    /* Opcode 0xe9 */
 	FETCHWORD(tmp);
 	ip = I.pc - I.base[CS] + tmp;
 	I.pc = (ip + I.base[CS]) & AMASK;
-	ICOUNT -= cycles.jmp_near;
+	ICOUNT -= timing.jmp_near;
 	CHANGE_PC(I.pc);
 }
 
@@ -2641,7 +2641,7 @@ static void PREFIX86(_jmp_far)(void)    /* Opcode 0xea */
 	I.base[CS] = SegBase(CS);
 	I.pc = (I.base[CS] + tmp) & AMASK;
 #endif
-	ICOUNT -= cycles.jmp_far;
+	ICOUNT -= timing.jmp_far;
 	CHANGE_PC(I.pc);
 }
 
@@ -2651,12 +2651,12 @@ static void PREFIX86(_jmp_d8)(void)    /* Opcode 0xeb */
 	I.pc += tmp;
 /* ASG - can probably assume this is safe
     CHANGE_PC(I.pc);*/
-	ICOUNT -= cycles.jmp_short;
+	ICOUNT -= timing.jmp_short;
 }
 
 static void PREFIX86(_inaldx)(void)    /* Opcode 0xec */
 {
-	ICOUNT -= cycles.in_dx8;
+	ICOUNT -= timing.in_dx8;
 	I.regs.b[AL] = read_port_byte(I.regs.w[DX]);
 }
 
@@ -2664,13 +2664,13 @@ static void PREFIX86(_inaxdx)(void)    /* Opcode 0xed */
 {
 	unsigned port = I.regs.w[DX];
 
-	ICOUNT -= cycles.in_dx16;
+	ICOUNT -= timing.in_dx16;
 	I.regs.w[AX] = read_port_word(port);
 }
 
 static void PREFIX86(_outdxal)(void)    /* Opcode 0xee */
 {
-	ICOUNT -= cycles.out_dx8;
+	ICOUNT -= timing.out_dx8;
 	write_port_byte(I.regs.w[DX], I.regs.b[AL]);
 }
 
@@ -2678,14 +2678,14 @@ static void PREFIX86(_outdxax)(void)    /* Opcode 0xef */
 {
 	unsigned port = I.regs.w[DX];
 
-	ICOUNT -= cycles.out_dx16;
+	ICOUNT -= timing.out_dx16;
 	write_port_word(port, I.regs.w[AX]);
 }
 
 /* I think thats not a V20 instruction...*/
 static void PREFIX86(_lock)(void)    /* Opcode 0xf0 */
 {
-	ICOUNT -= cycles.nop;
+	ICOUNT -= timing.nop;
 	PREFIX(_instruction)[FETCHOP]();  /* un-interruptible */
 }
 #endif
@@ -2709,7 +2709,7 @@ static void PREFIX86(_hlt)(void)    /* Opcode 0xf4 */
 
 static void PREFIX86(_cmc)(void)    /* Opcode 0xf5 */
 {
-	ICOUNT -= cycles.flag_ops;
+	ICOUNT -= timing.flag_ops;
 	I.CarryVal = !CF;
 }
 
@@ -2725,7 +2725,7 @@ static void PREFIX86(_f6pre)(void)
     {
     case 0x00:  /* TEST Eb, data8 */
     case 0x08:  /* ??? */
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri8 : cycles.alu_mi8_ro;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri8 : timing.alu_mi8_ro;
 		tmp &= FETCH;
 
 		I.CarryVal = I.OverVal = I.AuxVal = 0;
@@ -2733,18 +2733,18 @@ static void PREFIX86(_f6pre)(void)
 		break;
 
     case 0x10:  /* NOT Eb */
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.negnot_r8 : cycles.negnot_m8;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.negnot_r8 : timing.negnot_m8;
 		PutbackRMByte(ModRM,~tmp);
 		break;
 
 	 case 0x18:  /* NEG Eb */
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.negnot_r8 : cycles.negnot_m8;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.negnot_r8 : timing.negnot_m8;
         tmp2=0;
         SUBB(tmp2,tmp);
         PutbackRMByte(ModRM,tmp2);
 		break;
     case 0x20:  /* MUL AL, Eb */
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.mul_r8 : cycles.mul_m8;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.mul_r8 : timing.mul_m8;
 		{
 			UINT16 result;
 			tmp2 = I.regs.b[AL];
@@ -2760,7 +2760,7 @@ static void PREFIX86(_f6pre)(void)
 		}
 		break;
 	 case 0x28:  /* IMUL AL, Eb */
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.imul_r8 : cycles.imul_m8;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.imul_r8 : timing.imul_m8;
 		{
 			INT16 result;
 
@@ -2778,7 +2778,7 @@ static void PREFIX86(_f6pre)(void)
 		}
 		break;
     case 0x30:  /* DIV AL, Ew */
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.div_r8 : cycles.div_m8;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.div_r8 : timing.div_m8;
 		{
 			UINT16 result;
 
@@ -2805,7 +2805,7 @@ static void PREFIX86(_f6pre)(void)
 		}
 		break;
     case 0x38:  /* IDIV AL, Ew */
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.idiv_r8 : cycles.idiv_m8;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.idiv_r8 : timing.idiv_m8;
 		{
 
 			INT16 result;
@@ -2850,7 +2850,7 @@ static void PREFIX86(_f7pre)(void)
     {
     case 0x00:  /* TEST Ew, data16 */
     case 0x08:  /* ??? */
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.alu_ri16 : cycles.alu_mi16_ro;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.alu_ri16 : timing.alu_mi16_ro;
 		tmp2 = FETCH;
 		tmp2 += FETCH << 8;
 
@@ -2861,19 +2861,19 @@ static void PREFIX86(_f7pre)(void)
 		break;
 
     case 0x10:  /* NOT Ew */
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.negnot_r16 : cycles.negnot_m16;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.negnot_r16 : timing.negnot_m16;
 		tmp = ~tmp;
 		PutbackRMWord(ModRM,tmp);
 		break;
 
     case 0x18:  /* NEG Ew */
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.negnot_r16 : cycles.negnot_m16;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.negnot_r16 : timing.negnot_m16;
         tmp2 = 0;
         SUBW(tmp2,tmp);
         PutbackRMWord(ModRM,tmp2);
 		break;
     case 0x20:  /* MUL AX, Ew */
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.mul_r16 : cycles.mul_m16;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.mul_r16 : timing.mul_m16;
 		{
 			UINT32 result;
 			tmp2 = I.regs.w[AX];
@@ -2892,7 +2892,7 @@ static void PREFIX86(_f7pre)(void)
 		break;
 
     case 0x28:  /* IMUL AX, Ew */
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.imul_r16 : cycles.imul_m16;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.imul_r16 : timing.imul_m16;
 		{
 			INT32 result;
 
@@ -2912,7 +2912,7 @@ static void PREFIX86(_f7pre)(void)
 		}
 		break;
 	 case 0x30:  /* DIV AX, Ew */
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.div_r16 : cycles.div_m16;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.div_r16 : timing.div_m16;
 		{
 			UINT32 result;
 
@@ -2941,7 +2941,7 @@ static void PREFIX86(_f7pre)(void)
 		}
 		break;
     case 0x38:  /* IDIV AX, Ew */
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.idiv_r16 : cycles.idiv_m16;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.idiv_r16 : timing.idiv_m16;
 		{
 			INT32 result;
 
@@ -2974,25 +2974,25 @@ static void PREFIX86(_f7pre)(void)
 
 static void PREFIX86(_clc)(void)    /* Opcode 0xf8 */
 {
-	ICOUNT -= cycles.flag_ops;
+	ICOUNT -= timing.flag_ops;
 	I.CarryVal = 0;
 }
 
 static void PREFIX86(_stc)(void)    /* Opcode 0xf9 */
 {
-	ICOUNT -= cycles.flag_ops;
+	ICOUNT -= timing.flag_ops;
 	I.CarryVal = 1;
 }
 
 static void PREFIX86(_cli)(void)    /* Opcode 0xfa */
 {
-	ICOUNT -= cycles.flag_ops;
+	ICOUNT -= timing.flag_ops;
 	SetIF(0);
 }
 
 static void PREFIX86(_sti)(void)    /* Opcode 0xfb */
 {
-	ICOUNT -= cycles.flag_ops;
+	ICOUNT -= timing.flag_ops;
 	SetIF(1);
 	PREFIX(_instruction)[FETCHOP](); /* no interrupt before next instruction */
 
@@ -3003,13 +3003,13 @@ static void PREFIX86(_sti)(void)    /* Opcode 0xfb */
 
 static void PREFIX86(_cld)(void)    /* Opcode 0xfc */
 {
-	ICOUNT -= cycles.flag_ops;
+	ICOUNT -= timing.flag_ops;
 	SetDF(0);
 }
 
 static void PREFIX86(_std)(void)    /* Opcode 0xfd */
 {
-	ICOUNT -= cycles.flag_ops;
+	ICOUNT -= timing.flag_ops;
 	SetDF(1);
 }
 
@@ -3019,7 +3019,7 @@ static void PREFIX86(_fepre)(void)    /* Opcode 0xfe */
 	unsigned tmp = GetRMByte(ModRM);
     unsigned tmp1;
 
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.incdec_r8 : cycles.incdec_m8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.incdec_r8 : timing.incdec_m8;
     if ((ModRM & 0x38) == 0)  /* INC eb */
 	 {
 		tmp1 = tmp+1;
@@ -3048,7 +3048,7 @@ static void PREFIX86(_ffpre)(void)    /* Opcode 0xff */
     switch(ModRM & 0x38)
     {
     case 0x00:  /* INC ew */
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.incdec_r16 : cycles.incdec_m16;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.incdec_r16 : timing.incdec_m16;
 		tmp = GetRMWord(ModRM);
 		tmp1 = tmp+1;
 
@@ -3060,7 +3060,7 @@ static void PREFIX86(_ffpre)(void)    /* Opcode 0xff */
 		break;
 
     case 0x08:  /* DEC ew */
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.incdec_r16 : cycles.incdec_m16;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.incdec_r16 : timing.incdec_m16;
 		tmp = GetRMWord(ModRM);
 		tmp1 = tmp-1;
 
@@ -3072,7 +3072,7 @@ static void PREFIX86(_ffpre)(void)    /* Opcode 0xff */
 		break;
 
     case 0x10:  /* CALL ew */
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.call_r16 : cycles.call_m16;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.call_r16 : timing.call_m16;
 		tmp = GetRMWord(ModRM);
 		ip = I.pc - I.base[CS];
 		PUSH(ip);
@@ -3081,7 +3081,7 @@ static void PREFIX86(_ffpre)(void)    /* Opcode 0xff */
 		break;
 
 	case 0x18:  /* CALL FAR ea */
-		ICOUNT -= cycles.call_m32;
+		ICOUNT -= timing.call_m32;
 		tmp = I.sregs[CS];	/* HJB 12/13/98 need to skip displacements of EA */
 		tmp1 = GetRMWord(ModRM);
 		ip = I.pc - I.base[CS];
@@ -3098,14 +3098,14 @@ static void PREFIX86(_ffpre)(void)    /* Opcode 0xff */
 		break;
 
     case 0x20:  /* JMP ea */
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.jmp_r16 : cycles.jmp_m16;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.jmp_r16 : timing.jmp_m16;
 		ip = GetRMWord(ModRM);
 		I.pc = (I.base[CS] + ip) & AMASK;
 		CHANGE_PC(I.pc);
 		break;
 
     case 0x28:  /* JMP FAR ea */
-		ICOUNT -= cycles.jmp_m32;
+		ICOUNT -= timing.jmp_m32;
 
 #ifdef I80286
 		tmp = GetRMWord(ModRM);
@@ -3120,7 +3120,7 @@ static void PREFIX86(_ffpre)(void)    /* Opcode 0xff */
 		break;
 
     case 0x30:  /* PUSH ea */
-		ICOUNT -= (ModRM >= 0xc0) ? cycles.push_r16 : cycles.push_m16;
+		ICOUNT -= (ModRM >= 0xc0) ? timing.push_r16 : timing.push_m16;
 		tmp = GetRMWord(ModRM);
 		PUSH(tmp);
 		break;

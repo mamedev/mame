@@ -21,7 +21,7 @@ struct _f3853_config
 };
 
 void f3853_init(const f3853_config *config);
-void f3853_reset(void);
+CPU_RESET( f3853 );
 
 // ports 0x0c - 0x0f
  READ8_HANDLER(f3853_r);

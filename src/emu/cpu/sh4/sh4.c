@@ -3237,7 +3237,7 @@ INLINE void op1111(UINT16 opcode)
  *  MAME CPU INTERFACE
  *****************************************************************************/
 
-static void sh4_reset(void)
+static CPU_RESET( sh4 )
 {
 	void *tsaved[4];
 	emu_timer *tsave[5];
@@ -3247,7 +3247,8 @@ static void sh4_reset(void)
 	int	savecpu_clock, savebus_clock, savepm_clock;
 
 	void (*f)(UINT32 data);
-	int (*save_irqcallback)(int);
+	cpu_irq_callback save_irqcallback;
+	const device_config *save_device;
 
 	cpunum = sh4.cpu_number;
 	m = sh4.m;
@@ -3263,6 +3264,7 @@ static void sh4_reset(void)
 
 	f = sh4.ftcsr_read_callback;
 	save_irqcallback = sh4.irq_callback;
+	save_device = sh4.device;
 	save_is_slave = sh4.is_slave;
 	savecpu_clock = sh4.cpu_clock;
 	savebus_clock = sh4.bus_clock;
@@ -3274,6 +3276,7 @@ static void sh4_reset(void)
 	sh4.pm_clock = savepm_clock;
 	sh4.ftcsr_read_callback = f;
 	sh4.irq_callback = save_irqcallback;
+	sh4.device = save_device;
 
 	sh4.dma_timer[0] = tsaved[0];
 	sh4.dma_timer[1] = tsaved[1];
@@ -3314,7 +3317,7 @@ static void sh4_reset(void)
 }
 
 /* Execute cycles - returns number of cycles actually run */
-static int sh4_execute(int cycles)
+static CPU_EXECUTE( sh4 )
 {
 	sh4.sh4_icount = cycles;
 
@@ -3389,7 +3392,7 @@ static offs_t sh4_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 
 	return DasmSH4( buffer, pc, (oprom[1] << 8) | oprom[0] );
 }
 
-static void sh4_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( sh4 )
 {
 	const struct sh4_config *conf = config;
 
@@ -3399,6 +3402,7 @@ static void sh4_init(int index, int clock, const void *config, int (*irqcallback
 
 	sh4.cpu_number = index;
 	sh4.irq_callback = irqcallback;
+	sh4.device = device;
 	sh4_default_exception_priorities();
 	sh4.irln = 15;
 	sh4.test_irq = 0;
@@ -3704,9 +3708,9 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = sh4_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = sh4_get_context;		break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = sh4_set_context;		break;
-		case CPUINFO_PTR_INIT:							info->init = sh4_init;					break;
-		case CPUINFO_PTR_RESET:							info->reset = sh4_reset;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = sh4_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(sh4);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(sh4);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(sh4);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = sh4_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sh4.sh4_icount;				break;

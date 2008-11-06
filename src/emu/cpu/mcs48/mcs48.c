@@ -94,7 +94,8 @@ struct _mcs48_state
 
 	UINT16		a11;				/* A11 value, either 0x000 or 0x800 */
 
-	int			(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	int			icount;
 
 	int			inst_cycles;		/* cycles for the current instruction */
@@ -700,14 +701,11 @@ static const mcs48_opcode opcode_table[256]=
     mcs48_init - generic MCS-48 initialization
 -------------------------------------------------*/
 
-static void mcs48_init(int index, int clock, const void *config, int (*irqcallback)(int), UINT16 romsize)
+static void mcs48_init(const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback, UINT16 romsize)
 {
-	mcs48_state *mcs48;
-	
-	token = auto_malloc(sizeof(*mcs48));
-	mcs48 = token;
-	
-	memset(mcs48, 0, sizeof(*mcs48));
+	mcs48_state *mcs48 = device->token;
+
+	token = device->token;	// temporary
 
 	/* External access line
      * EA=1 : read from external rom
@@ -718,6 +716,7 @@ static void mcs48_init(int index, int clock, const void *config, int (*irqcallba
 	mcs48->ea = (romsize ? 0 : 1);
 
 	mcs48->irq_callback = irqcallback;
+	mcs48->device = device;
 	mcs48->int_rom_size = romsize;
 
 	state_save_register_item("mcs48", index, mcs48->prevpc.w.l);
@@ -749,9 +748,9 @@ static void mcs48_init(int index, int clock, const void *config, int (*irqcallba
 -------------------------------------------------*/
 
 #if (HAS_I8035 || HAS_MB8884)
-static void i8035_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( i8035 )
 {
-	mcs48_init(index, clock, config, irqcallback, 0x0);
+	mcs48_init(device, index, clock, config, irqcallback, 0x0);
 }
 #endif
 
@@ -763,9 +762,9 @@ static void i8035_init(int index, int clock, const void *config, int (*irqcallba
 -------------------------------------------------*/
 
 #if (HAS_I8041 || HAS_I8048 || HAS_I8648 || HAS_I8748 || HAS_N7751)
-static void i8041_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( i8041 )
 {
-	mcs48_init(index, clock, config, irqcallback, 0x400);
+	mcs48_init(device, index, clock, config, irqcallback, 0x400);
 }
 #endif
 
@@ -777,9 +776,9 @@ static void i8041_init(int index, int clock, const void *config, int (*irqcallba
 -------------------------------------------------*/
 
 #if (HAS_I8039)
-static void i8039_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( i8039 )
 {
-	mcs48_init(index, clock, config, irqcallback, 0x0);
+	mcs48_init(device, index, clock, config, irqcallback, 0x0);
 }
 #endif
 
@@ -791,9 +790,9 @@ static void i8039_init(int index, int clock, const void *config, int (*irqcallba
 -------------------------------------------------*/
 
 #if (HAS_I8049 || HAS_I8749 || HAS_M58715)
-static void i8049_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( i8049 )
 {
-	mcs48_init(index, clock, config, irqcallback, 0x800);
+	mcs48_init(device, index, clock, config, irqcallback, 0x800);
 }
 #endif
 
@@ -802,9 +801,9 @@ static void i8049_init(int index, int clock, const void *config, int (*irqcallba
     mcs48_reset - general reset routine
 -------------------------------------------------*/
 
-static void mcs48_reset(void)
+static CPU_RESET( mcs48 )
 {
-	mcs48_state *mcs48 = token;
+	mcs48_state *mcs48 = device->token;
 
 	/* confirmed from reset description */
 	PC = 0;
@@ -855,7 +854,7 @@ static void check_irqs(mcs48_state *mcs48)
 
 		/* indicate we took the external IRQ */
 		if (mcs48->irq_callback != NULL)
-			(*mcs48->irq_callback)(0);
+			(*mcs48->irq_callback)(mcs48->device, 0);
 	}
 
 	/* timer overflow interrupts follow */
@@ -923,9 +922,9 @@ static void burn_cycles(mcs48_state *mcs48, int count)
     of cycles
 -------------------------------------------------*/
 
-static int mcs48_execute(int cycles)
+static CPU_EXECUTE( mcs48 )
 {
-	mcs48_state *mcs48 = token;
+	mcs48_state *mcs48 = device->token;
 	unsigned opcode;
 
 	mcs48->icount = cycles;
@@ -995,8 +994,6 @@ ADDRESS_MAP_END
 
 static void mcs48_get_context(void *dst)
 {
-	if( dst )
-		*(void **)dst = token;
 }
 
 
@@ -1009,7 +1006,7 @@ static void mcs48_set_context(void *src)
 {
 	mcs48_state *mcs48;
 	if( src )
-		token = *(void **)src;
+		token = src;
 	mcs48 = token;
 	update_regptr(mcs48);
 	change_pc(PC);	
@@ -1063,7 +1060,7 @@ static void mcs48_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:							info->i = sizeof(mcs48);				break;
+		case CPUINFO_INT_CONTEXT_SIZE:							info->i = sizeof(mcs48_state);			break;
 		case CPUINFO_INT_INPUT_LINES:							info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:					info->i = MCS48_INPUT_IRQ;				break;
 		case CPUINFO_INT_ENDIANNESS:							info->i = CPU_IS_LE;					break;
@@ -1110,9 +1107,9 @@ static void mcs48_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:								info->setinfo = mcs48_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:							info->getcontext = mcs48_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:							info->setcontext = mcs48_set_context;	break;
-		case CPUINFO_PTR_INIT:									/*info->init = i8039_init;*/			break;
-		case CPUINFO_PTR_RESET:									info->reset = mcs48_reset;				break;
-		case CPUINFO_PTR_EXECUTE:								info->execute = mcs48_execute;			break;
+		case CPUINFO_PTR_INIT:									/*info->init = CPU_INIT_NAME(i8039);*/			break;
+		case CPUINFO_PTR_RESET:									info->reset = CPU_RESET_NAME(mcs48);				break;
+		case CPUINFO_PTR_EXECUTE:								info->execute = CPU_EXECUTE_NAME(mcs48);			break;
 		case CPUINFO_PTR_BURN:									info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:							info->disassemble = mcs48_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:					info->icount = &mcs48->icount;			break;
@@ -1172,7 +1169,7 @@ void i8035_get_info(UINT32 state, cpuinfo *info)
 	{
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
-		case CPUINFO_PTR_INIT:											info->init = i8035_init;							break;
+		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8035);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8035");							break;
 		default:														mcs48_get_info(state, info);						break;
 	}
@@ -1187,7 +1184,7 @@ void i8041_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
-		case CPUINFO_PTR_INIT:											info->init = i8041_init;							break;
+		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8041");							break;
 		default:														mcs48_get_info(state, info);						break;
 	}
@@ -1202,7 +1199,7 @@ void i8048_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
-		case CPUINFO_PTR_INIT:											info->init = i8041_init;							break;
+		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8048");							break;
 		default:														mcs48_get_info(state, info);						break;
 	}
@@ -1217,7 +1214,7 @@ void i8648_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
-		case CPUINFO_PTR_INIT:											info->init = i8041_init;							break;
+		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8648");							break;
 		default:														mcs48_get_info(state, info);						break;
 	}
@@ -1232,7 +1229,7 @@ void i8748_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
-		case CPUINFO_PTR_INIT:											info->init = i8041_init;							break;
+		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8748");							break;
 		default:														mcs48_get_info(state, info);						break;
 	}
@@ -1246,7 +1243,7 @@ void mb8884_get_info(UINT32 state, cpuinfo *info)
 	{
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
-		case CPUINFO_PTR_INIT:											info->init = i8035_init;							break;
+		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8035);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "MB8884");							break;
 		default:														mcs48_get_info(state, info);						break;
 	}
@@ -1261,7 +1258,7 @@ void n7751_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
-		case CPUINFO_PTR_INIT:											info->init = i8041_init;							break;
+		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "N7751");							break;
 		default:														mcs48_get_info(state, info);						break;
 	}
@@ -1277,7 +1274,7 @@ void i8039_get_info(UINT32 state, cpuinfo *info)
 	{
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 7;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
-		case CPUINFO_PTR_INIT:											info->init = i8039_init;							break;
+		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8039);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8039");							break;
 		default:														mcs48_get_info(state, info);						break;
 	}
@@ -1292,7 +1289,7 @@ void i8049_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 7;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_11bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
-		case CPUINFO_PTR_INIT:											info->init = i8049_init;							break;
+		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8049);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8049");							break;
 		default:														mcs48_get_info(state, info);						break;
 	}
@@ -1307,7 +1304,7 @@ void i8749_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 7;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_11bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
-		case CPUINFO_PTR_INIT:											info->init = i8049_init;							break;
+		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8049);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8749");							break;
 		default:														mcs48_get_info(state, info);						break;
 	}
@@ -1322,7 +1319,7 @@ void m58715_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 7;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_11bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
-		case CPUINFO_PTR_INIT:											info->init = i8049_init;							break;
+		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8049);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "M58715");							break;
 		default:														mcs48_get_info(state, info);						break;
 	}

@@ -123,7 +123,8 @@ typedef struct {
 	UINT8	p2;
 	UINT8	p2_hs;
 	UINT8	ram_mask;
-	int 	(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	i8x41_config	*config;
 }	I8X41;
 
@@ -581,7 +582,7 @@ INLINE void en_tcnti(void)
 INLINE void in_a_dbb(void)
 {
 	if( i8x41.irq_callback )
-		(*i8x41.irq_callback)(I8X41_INT_IBF);
+		(*i8x41.irq_callback)(i8x41.device, I8X41_INT_IBF);
 
 	STATE &= ~IBF;					/* clear input buffer full flag */
 	if( ENABLE & FLAGS )
@@ -1323,9 +1324,10 @@ static const UINT8 i8x41_cycles[] = {
  *  Inits CPU emulation
  ****************************************************************************/
 
-static void i8x41_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( i8x41 )
 {
 	i8x41.irq_callback = irqcallback;
+	i8x41.device = device;
 	i8x41.config = (i8x41_config *)config;
 
 	state_save_register_item("i8x41", index, i8x41.ppc);
@@ -1350,12 +1352,14 @@ static void i8x41_init(int index, int clock, const void *config, int (*irqcallba
  *  Reset registers to their initial values
  ****************************************************************************/
 
-static void i8x41_reset(void)
+static CPU_RESET( i8x41 )
 {
-	int (*save_irqcallback)(int) = i8x41.irq_callback;
+	cpu_irq_callback save_irqcallback = i8x41.irq_callback;
+	const device_config *save_device = i8x41.device;
 	i8x41_config	*save_config = i8x41.config;
 	memset(&i8x41, 0, sizeof(I8X41));
 	i8x41.irq_callback = save_irqcallback;
+	i8x41.device = save_device;
 	i8x41.config = save_config;
 
 	/* default to 8041 behaviour for DBBI/DBBO and extended commands */
@@ -1381,7 +1385,7 @@ static void i8x41_reset(void)
  *  Shut down CPU emulation
  ****************************************************************************/
 
-static void i8x41_exit(void)
+static CPU_EXIT( i8x41 )
 {
 	/* nothing to do */
 }
@@ -1391,7 +1395,7 @@ static void i8x41_exit(void)
  *  Execute cycles - returns number of cycles actually run
  ****************************************************************************/
 
-static int i8x41_execute(int cycles)
+static CPU_EXECUTE( i8x41 )
 {
 	int inst_cycles, T1_level;
 
@@ -2279,10 +2283,10 @@ void i8x41_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = i8x41_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = i8x41_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = i8x41_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = i8x41_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = i8x41_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = i8x41_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = i8x41_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8x41);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(i8x41);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(i8x41);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i8x41);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i8x41_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &i8x41_ICount;			break;

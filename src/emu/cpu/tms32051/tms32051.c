@@ -146,7 +146,8 @@ typedef struct {
 		INT32 treg2;
 	} shadow;
 
-	int (*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 } TMS_REGS;
 
 static TMS_REGS tms;
@@ -209,12 +210,12 @@ static void delay_slot(UINT16 startpc)
 
 /*****************************************************************************/
 
-static void tms_init(int index, int clock, const void *_config, int (*irqcallback)(int))
+static CPU_INIT( tms )
 {
 
 }
 
-static void tms_reset(void)
+static CPU_RESET( tms )
 {
 	int i;
 	UINT16 src, dst, length;
@@ -314,7 +315,7 @@ static void tms_interrupt(int irq)
 	check_interrupts();
 }
 
-static void tms_exit(void)
+static CPU_EXIT( tms )
 {
 	/* TODO */
 }
@@ -335,9 +336,9 @@ static void tms_set_context(void *src)
 	CHANGE_PC(tms.pc);
 }
 
-static int tms_execute(int num_cycles)
+static CPU_EXECUTE( tms )
 {
-	tms_icount = num_cycles;
+	tms_icount = cycles;
 
 	while(tms_icount > 0)
 	{
@@ -395,7 +396,7 @@ static int tms_execute(int num_cycles)
 			}
 		}
 	}
-	return num_cycles - tms_icount;
+	return cycles - tms_icount;
 }
 
 
@@ -624,10 +625,10 @@ static void tms_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = tms_get_context;		break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = tms_set_context;		break;
-		case CPUINFO_PTR_INIT:							info->init = tms_init;					break;
-		case CPUINFO_PTR_RESET:							info->reset = tms_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = tms_exit;					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = tms_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tms);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(tms);					break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tms);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tms32051_dasm;		break;
 		case CPUINFO_PTR_READ:							info->read = tms_debug_read;			break;

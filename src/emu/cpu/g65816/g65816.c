@@ -182,7 +182,7 @@ int (*const g65816i_execute[5])(int cycles) =
 /* ======================================================================== */
 
 
-static void g65816_reset(void)
+static CPU_RESET( g65816 )
 {
 		/* Start the CPU */
 		CPU_STOPPED = 0;
@@ -225,13 +225,13 @@ static void g65816_reset(void)
 }
 
 /* Exit and clean up */
-static void g65816_exit(void)
+static CPU_EXIT( g65816 )
 {
 	/* nothing to do yet */
 }
 
 /* Execute some instructions */
-static int g65816_execute(int cycles)
+static CPU_EXECUTE( g65816 )
 {
 	return FTABLE_EXECUTE(cycles);
 }
@@ -303,7 +303,7 @@ static void g65816_set_irq_line(int line, int state)
 }
 
 /* Set the callback that is called when servicing an interrupt */
-static void g65816_set_irq_callback(int (*callback)(int))
+static void g65816_set_irq_callback(cpu_irq_callback callback)
 {
 	INT_ACK = callback;
 }
@@ -326,9 +326,10 @@ static STATE_POSTLOAD( g65816_restore_state )
 	g65816i_jumping(REGISTER_PB | REGISTER_PC);
 }
 
-static void g65816_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( g65816 )
 {
 	g65816_set_irq_callback(irqcallback);
+	g65816i_cpu.device = device;
 
 	state_save_register_item("G65816", index, g65816i_cpu.a);
 	state_save_register_item("G65816", index, g65816i_cpu.b);
@@ -456,10 +457,10 @@ void g65816_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = g65816_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = g65816_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = g65816_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = g65816_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = g65816_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = g65816_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = g65816_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(g65816);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(g65816);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(g65816);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(g65816);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = g65816_dasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &g65816_ICount;			break;

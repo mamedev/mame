@@ -114,17 +114,17 @@ struct _ds5002fp_config
 	UINT8	crc;					/* bootstrap loader CRC register */
 };
 
-extern void ds5002fp_init (int index, int clock, const void *config, int (*irqcallback)(int));					/* Initialize save states */
-extern void ds5002fp_reset (void);			/* Reset registers to the initial values */
-extern void ds5002fp_exit	(void); 				/* Shut down CPU core */
-extern int  ds5002fp_execute(int cycles);			/* Execute cycles - returns number of cycles actually run */
+extern CPU_INIT( ds5002fp );					/* Initialize save states */
+extern CPU_RESET( ds5002fp );			/* Reset registers to the initial values */
+extern CPU_EXIT( ds5002fp ); 				/* Shut down CPU core */
+extern CPU_EXECUTE( ds5002fp );			/* Execute cycles - returns number of cycles actually run */
 extern void ds5002fp_get_context (void *dst);	/* Get registers, return context size */
 extern void ds5002fp_set_context (void *src);    	/* Set registers */
 extern unsigned ds5002fp_get_intram (int offset);
 extern unsigned ds5002fp_get_reg (int regnum);
 extern void ds5002fp_set_reg (int regnum, unsigned val);
 extern void ds5002fp_set_irq_line(int irqline, int state);
-extern void ds5002fp_set_irq_callback(int (*callback)(int irqline));
+extern void ds5002fp_set_irq_callback(cpu_irq_callback callback);
 extern void ds5002fp_state_save(void *file);
 extern void ds5002fp_state_load(void *file);
 

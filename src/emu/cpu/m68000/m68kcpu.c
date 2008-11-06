@@ -870,13 +870,10 @@ unsigned int m68k_get_virq(m68ki_cpu_core *m68k, unsigned int level)
 	return (m68k->virq_state & (1 << level)) ? 1 : 0;
 }
 
-m68ki_cpu_core *m68k_init(void)
+void m68k_init(m68ki_cpu_core *m68k)
 {
 	static UINT32 emulation_initialized = 0;
-	m68ki_cpu_core *m68k;
 	
-	m68k = auto_malloc(sizeof(m68ki_cpu_core));
-
 	/* The first call to this function initializes the opcode handler jump table */
 	if(!emulation_initialized)
 		{
@@ -893,8 +890,6 @@ m68ki_cpu_core *m68k_init(void)
 	m68k_set_pc_changed_callback(m68k, NULL);
 	m68k_set_fc_callback(m68k, NULL);
 	m68k_set_instr_hook_callback(m68k, NULL);
-	
-	return m68k;
 }
 
 /* Pulse the RESET line on the CPU */

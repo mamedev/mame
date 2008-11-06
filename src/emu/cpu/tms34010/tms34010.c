@@ -59,7 +59,8 @@ typedef struct tms34010_regs
 	UINT8 is_34020;
 	UINT8 reset_deferred;
 	UINT8 hblank_stable;
-	int (*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	const tms34010_config *config;
 	const device_config *screen;
 	emu_timer *scantimer;
@@ -620,7 +621,7 @@ static void check_interrupt(void)
 
 		/* call the callback for externals */
 		if (irqline >= 0)
-			(void)(*state.irq_callback)(irqline);
+			(void)(*state.irq_callback)(state.device, irqline);
 	}
 }
 
@@ -630,18 +631,19 @@ static void check_interrupt(void)
     Reset the CPU emulation
 ***************************************************************************/
 
-static void tms34010_init(int index, int clock, const void *_config, int (*irqcallback)(int))
+static CPU_INIT( tms34010 )
 {
-	const tms34010_config *config = _config ? _config : &default_config;
+	const tms34010_config *configdata = config ? config : &default_config;
 
 	external_host_access = FALSE;
 
-	state.config = config;
+	state.config = configdata;
 	state.irq_callback = irqcallback;
-	state.screen = device_list_find_by_tag(Machine->config->devicelist, VIDEO_SCREEN, config->screen_tag);
+	state.device = device;
+	state.screen = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, configdata->screen_tag);
 
 	/* if we have a scanline callback, make us the owner of this screen */
-	if (config->scanline_callback != NULL)
+	if (configdata->scanline_callback != NULL)
 	{
 		int i;
 
@@ -675,13 +677,14 @@ static void tms34010_init(int index, int clock, const void *_config, int (*irqca
 	state_save_register_postload(Machine, tms34010_state_postload, NULL);
 }
 
-static void tms34010_reset(void)
+static CPU_RESET( tms34010 )
 {
 	/* zap the state and copy in the config pointer */
 	const tms34010_config *config = state.config;
 	const device_config *screen = state.screen;
 	UINT16 *shiftreg = state.shiftreg;
-	int (*save_irqcallback)(int) = state.irq_callback;
+	cpu_irq_callback save_irqcallback = state.irq_callback;
+	const device_config *save_device = state.device;
 	emu_timer *save_scantimer = state.scantimer;
 
 	memset(&state, 0, sizeof(state));
@@ -690,6 +693,7 @@ static void tms34010_reset(void)
 	state.screen = screen;
 	state.shiftreg = shiftreg;
 	state.irq_callback = save_irqcallback;
+	state.device = save_device;
 	state.scantimer = save_scantimer;
 
 	/* fetch the initial PC and reset the state */
@@ -705,9 +709,9 @@ static void tms34010_reset(void)
 }
 
 #if (HAS_TMS34020)
-static void tms34020_reset(void)
+static CPU_RESET( tms34020 )
 {
-	tms34010_reset();
+	CPU_RESET_CALL(tms34010);
 	state.is_34020 = 1;
 }
 #endif
@@ -718,7 +722,7 @@ static void tms34020_reset(void)
     Shut down the CPU emulation
 ***************************************************************************/
 
-static void tms34010_exit(void)
+static CPU_EXIT( tms34010 )
 {
 	state.shiftreg = NULL;
 }
@@ -821,7 +825,7 @@ static TIMER_CALLBACK( internal_interrupt_callback )
     Execute
 ***************************************************************************/
 
-static int tms34010_execute(int cycles)
+static CPU_EXECUTE( tms34010 )
 {
 	/* Get out if CPU is halted. Absolutely no interrupts must be taken!!! */
 	if (IOREG(REG_HSTCTLH) & 0x8000)
@@ -1890,10 +1894,10 @@ void tms34010_get_info(UINT32 _state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = tms34010_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = tms34010_get_context; break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = tms34010_set_context; break;
-		case CPUINFO_PTR_INIT:							info->init = tms34010_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = tms34010_reset;			break;
-		case CPUINFO_PTR_EXIT:							info->exit = tms34010_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = tms34010_execute;		break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tms34010);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms34010);			break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(tms34010);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tms34010);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tms34010_dasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tms34010_ICount;		break;
@@ -1981,7 +1985,7 @@ void tms34020_get_info(UINT32 _state, cpuinfo *info)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = tms34020_get_context; break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = tms34020_set_context; break;
-		case CPUINFO_PTR_RESET:							info->reset = tms34020_reset;			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms34020);			break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tms34020_dasm;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

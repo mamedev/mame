@@ -196,7 +196,8 @@ typedef struct _DS5002FP {
 	UINT8	IntRam[0xff+1];	//Max 256 Bytes of Internal RAM (8031/51 have 128, 8032/52 have 256)
 
 	//Interrupt Callback
-	int 	(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 
 	//Serial Port TX/RX Call backs
 	void    (*serial_tx_callback)(int data);	//Call back funciton when sending data out of serial port
@@ -534,11 +535,12 @@ static const UINT32 ds5002fp_partitions[16] = {
 /* Include Opcode functions */
 #include "ds5002fpops.c"
 
-void ds5002fp_init(int index, int clock, const void *_config, int (*irqcallback)(int))
+static CPU_INIT( ds5002fp )
 {
-	const ds5002fp_config *config = _config ? _config : &default_config;
+	const ds5002fp_config *configdata = config ? config : &default_config;
 
-	ds5002fp.config = config;
+	ds5002fp.config = configdata;
+	ds5002fp.device = device;
 	ds5002fp_set_irq_callback(irqcallback);
 
 	//Internal stuff
@@ -591,16 +593,19 @@ void ds5002fp_init(int index, int clock, const void *_config, int (*irqcallback)
 }
 
 /* Reset registers to the initial values */
-void ds5002fp_reset(void)
+CPU_RESET( ds5002fp )
 {
-	int (*save_irqcallback)(int);
+	cpu_irq_callback save_irqcallback;
 	const ds5002fp_config *save_config;
+	const device_config *save_device;
 
 	save_irqcallback = ds5002fp.irq_callback;
 	save_config = ds5002fp.config;
+	save_device = ds5002fp.device;
 	memset(&ds5002fp, 0, sizeof(DS5002FP));
 	ds5002fp.irq_callback = save_irqcallback;
 	ds5002fp.config = save_config;
+	ds5002fp.device = save_device;
 
 	memset(&uart, 0, sizeof(DS5002FP_UART));
 	ds5002fp.subtype = 8051;
@@ -666,13 +671,13 @@ void ds5002fp_reset(void)
 }
 
 /* Shut down CPU core */
-void ds5002fp_exit(void)
+CPU_EXIT( ds5002fp )
 {
 	/* nothing to do */
 }
 
 /* Execute cycles - returns number of cycles actually run */
-int ds5002fp_execute(int cycles)
+CPU_EXECUTE( ds5002fp )
 {
 	//In stop mode, no op takes place
 	if (R_PCON & 0x02) {
@@ -1722,9 +1727,9 @@ INLINE UINT8 check_interrupts(void)
 }
 
 
-void ds5002fp_set_irq_callback(int (*callback)(int irqline))
+void ds5002fp_set_irq_callback(cpu_irq_callback irq_callback)
 {
-	ds5002fp.irq_callback = callback;
+	ds5002fp.irq_callback = irq_callback;
 }
 
 void ds5002fp_set_serial_tx_callback(void (*callback)(int data))
@@ -2535,10 +2540,10 @@ void ds5002fp_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = ds5002fp_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = ds5002fp_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = ds5002fp_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = ds5002fp_init;					break;
-		case CPUINFO_PTR_RESET:							info->reset = ds5002fp_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = ds5002fp_exit;					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = ds5002fp_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ds5002fp);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ds5002fp);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ds5002fp);					break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ds5002fp);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;							break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = ds5002fp_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &ds5002fp_icount;			break;

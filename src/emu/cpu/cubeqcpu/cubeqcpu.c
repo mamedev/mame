@@ -335,7 +335,7 @@ static void cquestsnd_state_register(int index, const char *type)
 	state_save_register_postload(Machine, cquestsnd_postload, NULL);
 }
 
-static void cquestsnd_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( cquestsnd )
 {
 	cubeqst_snd_config* _config = (cubeqst_snd_config*)config;
 
@@ -351,13 +351,13 @@ static void cquestsnd_init(int index, int clock, const void *config, int (*irqca
 }
 
 
-static void cquestsnd_reset(void)
+static CPU_RESET( cquestsnd )
 {
 	cquestsnd.pc = 0;
 }
 
 
-static void cquestsnd_exit(void)
+static CPU_EXIT( cquestsnd )
 {
 	free(cquestsnd.sram);
 }
@@ -403,7 +403,7 @@ static void cquestrot_state_register(int index, const char *type)
 	state_save_register_postload(Machine, cquestrot_postload, NULL);
 }
 
-static void cquestrot_init(int index, int clock, const void *_config, int (*irqcallback)(int))
+static CPU_INIT( cquestrot )
 {
 	memset(&cquestrot, 0, sizeof(cquestrot));
 
@@ -415,7 +415,7 @@ static void cquestrot_init(int index, int clock, const void *_config, int (*irqc
 }
 
 
-static void cquestrot_reset(void)
+static CPU_RESET( cquestrot )
 {
 	cquestrot.pc = 0;
 	cquestrot.wc = 0;
@@ -424,7 +424,7 @@ static void cquestrot_reset(void)
 }
 
 
-static void cquestrot_exit(void)
+static CPU_EXIT( cquestrot )
 {
 	free(cquestrot.dram);
 	free(cquestrot.sram);
@@ -479,7 +479,7 @@ static void cquestlin_state_register(int index, const char *type)
 	state_save_register_postload(Machine, cquestlin_postload, NULL);
 }
 
-static void cquestlin_init(int index, int clock, const void *_config, int (*irqcallback)(int))
+static CPU_INIT( cquestlin )
 {
 	memset(&cquestlin, 0, sizeof(cquestlin));
 
@@ -493,7 +493,7 @@ static void cquestlin_init(int index, int clock, const void *_config, int (*irqc
 }
 
 
-static void cquestlin_reset(void)
+static CPU_RESET( cquestlin )
 {
 	cquestlin.clkcnt = 0;
 	cquestlin.pc[FOREGROUND] = 0;
@@ -501,7 +501,7 @@ static void cquestlin_reset(void)
 }
 
 
-static void cquestlin_exit(void)
+static CPU_EXIT( cquestlin )
 {
 	free(cquestlin.sram);
 	free(cquestlin.e_stack);
@@ -539,7 +539,7 @@ static int do_sndjmp(int jmp)
 	return 0;
 }
 
-static int cquestsnd_execute(int cycles)
+static CPU_EXECUTE( cquestsnd )
 {
 	int calldebugger = ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
@@ -873,7 +873,7 @@ INLINE int do_rotjmp(int jmp)
 #define ROT_SRAM_ADDRESS	((cquestrot.dsrclatch & 2) ? cquestrot.yrlatch : (cquestrot.rsrclatch | 0x700))
 
 
-static int cquestrot_execute(int cycles)
+static CPU_EXECUTE( cquestrot )
 {
 	int calldebugger = ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
@@ -1377,7 +1377,7 @@ UINT32* get_stack_ram(void)
 }
 
 
-static int cquestlin_execute(int cycles)
+static CPU_EXECUTE( cquestlin )
 {
 #define LINE_PC ((cquestlin.pc[prog] & 0x7f) | ((prog == BACKGROUND) ? 0x80 : 0))
 
@@ -1911,10 +1911,10 @@ void cquestsnd_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = cquestsnd_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = cquestsnd_get_context;break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = cquestsnd_set_context;break;
-		case CPUINFO_PTR_INIT:							info->init = cquestsnd_init;			break;
-		case CPUINFO_PTR_RESET:							info->reset = cquestsnd_reset;			break;
-		case CPUINFO_PTR_EXIT:							info->exit = cquestsnd_exit;			break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = cquestsnd_execute;		break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cquestsnd);			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cquestsnd);			break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(cquestsnd);			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cquestsnd);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = cquestsnd_dasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cquestsnd_icount;		break;
@@ -2027,10 +2027,10 @@ void cquestrot_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = cquestrot_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = cquestrot_get_context;break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = cquestrot_set_context;break;
-		case CPUINFO_PTR_INIT:							info->init = cquestrot_init;			break;
-		case CPUINFO_PTR_RESET:							info->reset = cquestrot_reset;			break;
-		case CPUINFO_PTR_EXIT:							info->exit = cquestrot_exit;			break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = cquestrot_execute;		break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cquestrot);			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cquestrot);			break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(cquestrot);			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cquestrot);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = cquestrot_dasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cquestrot_icount;		break;
@@ -2145,10 +2145,10 @@ void cquestlin_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = cquestlin_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = cquestlin_get_context;break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = cquestlin_set_context;break;
-		case CPUINFO_PTR_INIT:							info->init = cquestlin_init;			break;
-		case CPUINFO_PTR_RESET:							info->reset = cquestlin_reset;			break;
-		case CPUINFO_PTR_EXIT:							info->exit = cquestlin_exit;			break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = cquestlin_execute;		break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cquestlin);			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cquestlin);			break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(cquestlin);			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cquestlin);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = cquestlin_dasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cquestlin_icount;		break;

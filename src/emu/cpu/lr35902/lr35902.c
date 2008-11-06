@@ -63,7 +63,8 @@ typedef struct {
 	UINT8	IF;
 	int	irq_state;
 	int	ei_delay;
-	int	(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	/* Timer stuff */
 	void	(*timer_fired_func)(int cycles);
 	/* Fetch & execute related */
@@ -178,10 +179,11 @@ static const int CyclesCB[256] =
 	 8, 8, 8, 8, 8, 8,16, 8, 8, 8, 8, 8, 8, 8,16, 8
 };
 
-static void lr35902_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( lr35902 )
 {
 	Regs.w.config = (const lr35902_cpu_core *) config;
 	Regs.w.irq_callback = irqcallback;
+	Regs.w.device = device;
 }
 
 /*** Reset lr353902 registers: ******************************/
@@ -189,7 +191,7 @@ static void lr35902_init(int index, int clock, const void *config, int (*irqcall
 /*** file before starting execution with lr35902_execute()***/
 /*** It sets the registers to their initial values.       ***/
 /************************************************************/
-static void lr35902_reset(void)
+static CPU_RESET( lr35902 )
 {
 	Regs.w.AF = 0x0000;
 	Regs.w.BC = 0x0000;
@@ -273,7 +275,7 @@ INLINE void lr35902_ProcessInterrupts (void)
 				}
 				if ( Regs.w.enable & IME ) {
 					if ( Regs.w.irq_callback )
-						(*Regs.w.irq_callback)(irqline);
+						(*Regs.w.irq_callback)(Regs.w.device, irqline);
 					Regs.w.enable &= ~IME;
 					Regs.w.IF &= ~(1 << irqline);
 					CYCLES_PASSED( 20 );
@@ -292,7 +294,7 @@ INLINE void lr35902_ProcessInterrupts (void)
 /*** Execute lr35902 code for cycles cycles, return nr of ***/
 /*** cycles actually executed.                            ***/
 /************************************************************/
-static int lr35902_execute (int cycles)
+static CPU_EXECUTE( lr35902 )
 {
 	lr35902_ICount = cycles;
 
@@ -463,9 +465,9 @@ void lr35902_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_PTR_SET_INFO:						info->setinfo = lr35902_set_info;		break;
 	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = lr35902_get_context;	break;
 	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = lr35902_set_context;	break;
-	case CPUINFO_PTR_INIT:							info->init = lr35902_init;				break;
-	case CPUINFO_PTR_RESET:							info->reset = lr35902_reset;			break;
-	case CPUINFO_PTR_EXECUTE:						info->execute = lr35902_execute;		break;
+	case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(lr35902);				break;
+	case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(lr35902);			break;
+	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(lr35902);		break;
 	case CPUINFO_PTR_BURN:							info->burn = lr35902_burn;				break;
 	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = lr35902_dasm;		break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &lr35902_ICount;			break;

@@ -71,7 +71,8 @@ typedef struct
 	UINT8	nmi_state;
 	UINT8	irq_state;
 	UINT8   so_state;
-	int 	(*irq_callback)(int irqline);	/* IRQ callback */
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	read8_machine_func rdmem_id;					/* readmem callback for indexed instructions */
 	write8_machine_func wrmem_id;				/* writemem callback for indexed instructions */
 
@@ -127,10 +128,11 @@ static WRITE8_HANDLER( default_wdmem_id ) { program_write_byte_8le(offset, data)
  *
  *****************************************************************************/
 
-static void m6502_common_init(int index, int clock, const void *config, int (*irqcallback)(int), UINT8 subtype, void (*const *insn)(void), const char *type)
+static void m6502_common_init(const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(void), const char *type)
 {
 	memset(&m6502, 0, sizeof(m6502));
 	m6502.irq_callback = irqcallback;
+	m6502.device = device;
 	m6502.subtype = subtype;
 	m6502.insn = insn;
 	m6502.rdmem_id = default_rdmem_id;
@@ -157,12 +159,12 @@ static void m6502_common_init(int index, int clock, const void *config, int (*ir
 #endif
 }
 
-static void m6502_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( m6502 )
 {
-	m6502_common_init(index, clock, config, irqcallback, SUBTYPE_6502, insn6502, "m6502");
+	m6502_common_init(device, index, clock, config, irqcallback, SUBTYPE_6502, insn6502, "m6502");
 }
 
-static void m6502_reset(void)
+static CPU_RESET( m6502 )
 {
 	/* wipe out the rest of the m6502 structure */
 	/* read the reset vector into PC */
@@ -179,7 +181,7 @@ static void m6502_reset(void)
 	change_pc(PCD);
 }
 
-static void m6502_exit(void)
+static CPU_EXIT( m6502 )
 {
 	/* nothing to do yet */
 }
@@ -213,13 +215,13 @@ INLINE void m6502_take_irq(void)
 		PCH = RDMEM(EAD+1);
 		LOG(("M6502#%d takes IRQ ($%04x)\n", cpu_getactivecpu(), PCD));
 		/* call back the cpuintrf to let it clear the line */
-		if (m6502.irq_callback) (*m6502.irq_callback)(0);
+		if (m6502.irq_callback) (*m6502.irq_callback)(m6502.device, 0);
 		change_pc(PCD);
 	}
 	m6502.pending_irq = 0;
 }
 
-static int m6502_execute(int cycles)
+static CPU_EXECUTE( m6502 )
 {
 	m6502_ICount = cycles;
 
@@ -323,9 +325,9 @@ static void m6502_set_irq_line(int irqline, int state)
  ****************************************************************************/
 #if (HAS_N2A03)
 
-static void n2a03_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( n2a03 )
 {
-	m6502_common_init(index, clock, config, irqcallback, SUBTYPE_2A03, insn2a03, "n2a03");
+	m6502_common_init(device, index, clock, config, irqcallback, SUBTYPE_2A03, insn2a03, "n2a03");
 }
 
 /* The N2A03 is integrally tied to its PSG (they're on the same die).
@@ -344,14 +346,14 @@ void n2a03_irq(void)
  ****************************************************************************/
 #if (HAS_M6510)
 
-static void m6510_init (int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( m6510 )
 {
-	m6502_common_init(index, clock, config, irqcallback, SUBTYPE_6510, insn6510, "m6510");
+	m6502_common_init(device, index, clock, config, irqcallback, SUBTYPE_6510, insn6510, "m6510");
 }
 
-static void m6510_reset (void)
+static CPU_RESET( m6510 )
 {
-	m6502_reset();
+	CPU_RESET_CALL(m6502);
 	m6502.port = 0xff;
 	m6502.ddr = 0x00;
 }
@@ -407,14 +409,14 @@ ADDRESS_MAP_END
  ****************************************************************************/
 #if (HAS_M65C02)
 
-static void m65c02_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( m65c02 )
 {
-	m6502_common_init(index, clock, config, irqcallback, SUBTYPE_65C02, insn65c02, "m65c02");
+	m6502_common_init(device, index, clock, config, irqcallback, SUBTYPE_65C02, insn65c02, "m65c02");
 }
 
-static void m65c02_reset (void)
+static CPU_RESET( m65c02 )
 {
-	m6502_reset();
+	CPU_RESET_CALL(m6502);
 	P &=~F_D;
 }
 
@@ -432,13 +434,13 @@ INLINE void m65c02_take_irq(void)
 		PCH = RDMEM(EAD+1);
 		LOG(("M65c02#%d takes IRQ ($%04x)\n", cpu_getactivecpu(), PCD));
 		/* call back the cpuintrf to let it clear the line */
-		if (m6502.irq_callback) (*m6502.irq_callback)(0);
+		if (m6502.irq_callback) (*m6502.irq_callback)(m6502.device, 0);
 		change_pc(PCD);
 	}
 	m6502.pending_irq = 0;
 }
 
-static int m65c02_execute(int cycles)
+static CPU_EXECUTE( m65c02 )
 {
 	m6502_ICount = cycles;
 
@@ -513,9 +515,9 @@ static void m65c02_set_irq_line(int irqline, int state)
  * 65SC02 section
  ****************************************************************************/
 #if (HAS_M65SC02)
-static void m65sc02_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( m65sc02 )
 {
-	m6502_common_init(index, clock, config, irqcallback, SUBTYPE_65SC02, insn65sc02, "m65sc02");
+	m6502_common_init(device, index, clock, config, irqcallback, SUBTYPE_65SC02, insn65sc02, "m65sc02");
 }
 #endif
 
@@ -524,15 +526,15 @@ static void m65sc02_init(int index, int clock, const void *config, int (*irqcall
  ****************************************************************************/
 #if (HAS_DECO16)
 
-static void deco16_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( deco16 )
 {
-	m6502_common_init(index, clock, config, irqcallback, SUBTYPE_DECO16, insndeco16, "deco16");
+	m6502_common_init(device, index, clock, config, irqcallback, SUBTYPE_DECO16, insndeco16, "deco16");
 }
 
 
-static void deco16_reset (void)
+static CPU_RESET( deco16 )
 {
-	m6502_reset();
+	CPU_RESET_CALL(m6502);
 	m6502.subtype = SUBTYPE_DECO16;
 	m6502.insn = insndeco16;
 
@@ -561,7 +563,7 @@ INLINE void deco16_take_irq(void)
 		PCH = RDMEM(EAD);
 		LOG(("M6502#%d takes IRQ ($%04x)\n", cpu_getactivecpu(), PCD));
 		/* call back the cpuintrf to let it clear the line */
-		if (m6502.irq_callback) (*m6502.irq_callback)(0);
+		if (m6502.irq_callback) (*m6502.irq_callback)(m6502.device, 0);
 		change_pc(PCD);
 	}
 	m6502.pending_irq = 0;
@@ -609,7 +611,7 @@ static void deco16_set_irq_line(int irqline, int state)
 	}
 }
 
-static int deco16_execute(int cycles)
+static CPU_EXECUTE( deco16 )
 {
 	m6502_ICount = cycles;
 
@@ -742,10 +744,10 @@ void m6502_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m6502_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m6502_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m6502_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = m6502_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = m6502_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = m6502_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = m6502_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6502);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6502);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m6502);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6502);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6502_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6502_ICount;			break;
@@ -793,7 +795,7 @@ void n2a03_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = n2a03_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(n2a03);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "N2A03");				break;
@@ -827,8 +829,8 @@ void m6510_get_info(UINT32 state, cpuinfo *info)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m6510_set_info;			break;
-		case CPUINFO_PTR_INIT:							info->init = m6510_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = m6510_reset;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6510);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6510);				break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6510_dasm;			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:			info->internal_map8 = address_map_m6510_mem; break;
 		case CPUINFO_PTR_M6510_PORTREAD:				info->f = (genf *) m6502.port_read;		break;
@@ -922,9 +924,9 @@ void m65c02_get_info(UINT32 state, cpuinfo *info)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m65c02_set_info;		break;
-		case CPUINFO_PTR_INIT:							info->init = m65c02_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = m65c02_reset;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = m65c02_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m65c02);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m65c02);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m65c02);			break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m65c02_dasm;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -946,7 +948,7 @@ void m65sc02_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = m65sc02_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m65sc02);				break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m65sc02_dasm;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -990,9 +992,9 @@ void deco16_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = deco16_set_info;		break;
-		case CPUINFO_PTR_INIT:							info->init = deco16_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = deco16_reset;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = deco16_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(deco16);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(deco16);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(deco16);			break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = deco16_dasm;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

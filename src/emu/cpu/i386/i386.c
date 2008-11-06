@@ -340,7 +340,7 @@ static void i386_check_irq_line(void)
 	if ( (I.irq_state) && I.IF )
 	{
 		I.cycles -= 2;
-		i386_trap(I.irq_callback(0), 1);
+		i386_trap(I.irq_callback(I.device, 0), 1);
 	}
 }
 
@@ -491,7 +491,7 @@ static STATE_POSTLOAD( i386_postload )
 	CHANGE_PC(I.eip);
 }
 
-static void i386_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( i386 )
 {
 	int i, j;
 	static const int regs8[8] = {AL,CL,DL,BL,AH,CH,DH,BH};
@@ -521,6 +521,7 @@ static void i386_init(int index, int clock, const void *config, int (*irqcallbac
 	}
 
 	I.irq_callback = irqcallback;
+	I.device = device;
 
 	state_save_register_item_array(state_type, index,	I.reg.d);
 	state_save_register_item(state_type, index, I.sreg[ES].selector);
@@ -609,13 +610,16 @@ static void build_opcode_table(UINT32 features)
 	}
 }
 
-static void i386_reset(void)
+static CPU_RESET( i386 )
 {
-	int (*save_irqcallback)(int);
+	cpu_irq_callback save_irqcallback;
+	const device_config *save_device;
 
 	save_irqcallback = I.irq_callback;
+	save_device = I.device;
 	memset( &I, 0, sizeof(I386_REGS) );
 	I.irq_callback = save_irqcallback;
+	I.device = save_device;
 
 	I.sreg[CS].selector = 0xf000;
 	I.sreg[CS].base		= 0xffff0000;
@@ -691,16 +695,16 @@ static void i386_set_a20_line(int state)
 	}
 }
 
-static int i386_execute(int num_cycles)
+static CPU_EXECUTE( i386 )
 {
-	I.cycles = num_cycles;
-	I.base_cycles = num_cycles;
+	I.cycles = cycles;
+	I.base_cycles = cycles;
 	CHANGE_PC(I.eip);
 
 	if (I.halted)
 	{
-		I.tsc += num_cycles;
-		return num_cycles;
+		I.tsc += cycles;
+		return cycles;
 	}
 
 	while( I.cycles > 0 )
@@ -716,9 +720,9 @@ static int i386_execute(int num_cycles)
 		i386_check_irq_line();
 		I386OP(decode_opcode)();
 	}
-	I.tsc += (num_cycles - I.cycles);
+	I.tsc += (cycles - I.cycles);
 
-	return num_cycles - I.cycles;
+	return cycles - I.cycles;
 }
 
 /*************************************************************************/
@@ -955,9 +959,9 @@ void i386_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:	      				info->setinfo = i386_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = i386_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = i386_set_context;	break;
-		case CPUINFO_PTR_INIT:		      				info->init = i386_init;					break;
-		case CPUINFO_PTR_RESET:		      				info->reset = i386_reset;				break;
-		case CPUINFO_PTR_EXECUTE:	      				info->execute = i386_execute;			break;
+		case CPUINFO_PTR_INIT:		      				info->init = CPU_INIT_NAME(i386);					break;
+		case CPUINFO_PTR_RESET:		      				info->reset = CPU_RESET_NAME(i386);				break;
+		case CPUINFO_PTR_EXECUTE:	      				info->execute = CPU_EXECUTE_NAME(i386);			break;
 		case CPUINFO_PTR_BURN:		      				info->burn = NULL;						break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER: 			info->icount = &I.cycles;				break;
 		case CPUINFO_PTR_TRANSLATE:						info->translate = translate_address_cb;	break;
@@ -1059,18 +1063,22 @@ void i386_get_info(UINT32 state, cpuinfo *info)
 
 #if (HAS_I486)
 
-static void i486_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( i486 )
 {
-	i386_init(index, clock, config, irqcallback);
+	CPU_INIT_CALL(i386);
 }
 
-static void i486_reset(void)
+static CPU_RESET( i486 )
 {
-	int (*save_irqcallback)(int);
+	cpu_irq_callback save_irqcallback;
+	const device_config *save_device;
 
 	save_irqcallback = I.irq_callback;
+	save_device = I.device;
 	memset( &I, 0, sizeof(I386_REGS) );
 	I.irq_callback = save_irqcallback;
+	I.device = save_device;
+
 	I.sreg[CS].selector = 0xf000;
 	I.sreg[CS].base		= 0xffff0000;
 	I.sreg[CS].limit	= 0xffff;
@@ -1099,7 +1107,7 @@ static void i486_reset(void)
 	CHANGE_PC(I.eip);
 }
 
-static void i486_exit(void)
+static CPU_EXIT( i486 )
 {
 }
 
@@ -1127,9 +1135,9 @@ void i486_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		case CPUINFO_PTR_SET_INFO:	      				info->setinfo = i486_set_info;			break;
-		case CPUINFO_PTR_INIT:		      				info->init = i486_init;					break;
-		case CPUINFO_PTR_RESET:		      				info->reset = i486_reset;				break;
-		case CPUINFO_PTR_EXIT:		      				info->exit = i486_exit;					break;
+		case CPUINFO_PTR_INIT:		      				info->init = CPU_INIT_NAME(i486);					break;
+		case CPUINFO_PTR_RESET:		      				info->reset = CPU_RESET_NAME(i486);				break;
+		case CPUINFO_PTR_EXIT:		      				info->exit = CPU_EXIT_NAME(i486);					break;
 
 		case CPUINFO_INT_REGISTER + X87_CTRL:			info->i = I.fpu_control_word;			break;
 		case CPUINFO_INT_REGISTER + X87_STATUS:			info->i = I.fpu_status_word;			break;
@@ -1165,18 +1173,22 @@ void i486_get_info(UINT32 state, cpuinfo *info)
 
 #if (HAS_PENTIUM)
 
-static void pentium_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( pentium )
 {
-	i386_init(index, clock, config, irqcallback);
+	CPU_INIT_CALL(i386);
 }
 
-static void pentium_reset(void)
+static CPU_RESET( pentium )
 {
-	int (*save_irqcallback)(int);
+	cpu_irq_callback save_irqcallback;
+	const device_config *save_device;
 
 	save_irqcallback = I.irq_callback;
+	save_device = I.device;
 	memset( &I, 0, sizeof(I386_REGS) );
 	I.irq_callback = save_irqcallback;
+	I.device = save_device;
+
 	I.sreg[CS].selector = 0xf000;
 	I.sreg[CS].base		= 0xffff0000;
 	I.sreg[CS].limit	= 0xffff;
@@ -1225,7 +1237,7 @@ static void pentium_reset(void)
 	CHANGE_PC(I.eip);
 }
 
-static void pentium_exit(void)
+static CPU_EXIT( pentium )
 {
 }
 
@@ -1253,9 +1265,9 @@ void pentium_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		case CPUINFO_PTR_SET_INFO:	      				info->setinfo = pentium_set_info;		break;
-		case CPUINFO_PTR_INIT:		      				info->init = pentium_init;				break;
-		case CPUINFO_PTR_RESET:		      				info->reset = pentium_reset;			break;
-		case CPUINFO_PTR_EXIT:		      				info->exit = pentium_exit;				break;
+		case CPUINFO_PTR_INIT:		      				info->init = CPU_INIT_NAME(pentium);				break;
+		case CPUINFO_PTR_RESET:		      				info->reset = CPU_RESET_NAME(pentium);			break;
+		case CPUINFO_PTR_EXIT:		      				info->exit = CPU_EXIT_NAME(pentium);				break;
 
 		case CPUINFO_INT_REGISTER + X87_CTRL:			info->i = I.fpu_control_word;			break;
 		case CPUINFO_INT_REGISTER + X87_STATUS:			info->i = I.fpu_status_word;			break;
@@ -1291,18 +1303,22 @@ void pentium_get_info(UINT32 state, cpuinfo *info)
 
 #if (HAS_MEDIAGX)
 
-static void mediagx_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( mediagx )
 {
-	i386_init(index, clock, config, irqcallback);
+	CPU_INIT_CALL(i386);
 }
 
-static void mediagx_reset(void)
+static CPU_RESET( mediagx )
 {
-	int (*save_irqcallback)(int);
+	cpu_irq_callback save_irqcallback;
+	const device_config *save_device;
 
 	save_irqcallback = I.irq_callback;
+	save_device = I.device;
 	memset( &I, 0, sizeof(I386_REGS) );
 	I.irq_callback = save_irqcallback;
+	I.device = save_device;
+
 	I.sreg[CS].selector = 0xf000;
 	I.sreg[CS].base		= 0xffff0000;
 	I.sreg[CS].limit	= 0xffff;
@@ -1351,7 +1367,7 @@ static void mediagx_reset(void)
 	CHANGE_PC(I.eip);
 }
 
-static void mediagx_exit(void)
+static CPU_EXIT( mediagx )
 {
 }
 
@@ -1379,9 +1395,9 @@ void mediagx_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		case CPUINFO_PTR_SET_INFO:	      				info->setinfo = mediagx_set_info;		break;
-		case CPUINFO_PTR_INIT:		      				info->init = mediagx_init;				break;
-		case CPUINFO_PTR_RESET:		      				info->reset = mediagx_reset;			break;
-		case CPUINFO_PTR_EXIT:		      				info->exit = mediagx_exit;				break;
+		case CPUINFO_PTR_INIT:		      				info->init = CPU_INIT_NAME(mediagx);				break;
+		case CPUINFO_PTR_RESET:		      				info->reset = CPU_RESET_NAME(mediagx);			break;
+		case CPUINFO_PTR_EXIT:		      				info->exit = CPU_EXIT_NAME(mediagx);				break;
 
 		case CPUINFO_INT_REGISTER + X87_CTRL:			info->i = I.fpu_control_word;			break;
 		case CPUINFO_INT_REGISTER + X87_STATUS:			info->i = I.fpu_status_word;			break;

@@ -51,7 +51,7 @@ static void ppcdrc_init(void)
 	drconfig.pcptr            = (UINT32 *)&ppc.pc;
 	drconfig.icountptr        = (UINT32 *)&ppc_icount;
 	drconfig.esiptr           = NULL;
-	drconfig.cb_reset         = ppcdrc_reset;
+	drconfig.cb_reset         = CPU_RESET_NAME(ppcdrc);
 	drconfig.cb_recompile     = ppcdrc_recompile;
 	drconfig.cb_entrygen      = ppcdrc_entrygen;
 
@@ -110,7 +110,7 @@ static void ppcdrc_reset(drc_core *drc)
 	}
 }
 
-static void ppcdrc_exit(void)
+static CPU_EXIT( ppcdrc )
 {
 	drc_exit(ppc.drc);
 }

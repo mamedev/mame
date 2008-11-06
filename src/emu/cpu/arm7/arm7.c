@@ -82,12 +82,13 @@ static int ARM7_ICOUNT;
 /***************************************************************************
  * CPU SPECIFIC IMPLEMENTATIONS
  **************************************************************************/
-static void arm7_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( arm7 )
 {
     // must call core
     arm7_core_init("arm7", index);
 
     ARM7.irq_callback = irqcallback;
+    ARM7.device = device;
 
 #if TEST_COPROC_FUNCS
     // setup co-proc callbacks example
@@ -99,18 +100,18 @@ static void arm7_init(int index, int clock, const void *config, int (*irqcallbac
 #endif
 }
 
-static void arm7_reset(void)
+static CPU_RESET( arm7 )
 {
     // must call core reset
     arm7_core_reset();
 }
 
-static void arm7_exit(void)
+static CPU_EXIT( arm7 )
 {
     /* nothing to do here */
 }
 
-static int arm7_execute(int cycles)
+static CPU_EXECUTE( arm7 )
 {
 /* include the arm7 core execute code */
 #include "arm7exec.c"
@@ -322,10 +323,10 @@ void arm7_get_info(UINT32 state, cpuinfo *info)
         case CPUINFO_PTR_SET_INFO:              info->setinfo = arm7_set_info;                  break;
         case CPUINFO_PTR_GET_CONTEXT:           info->getcontext = arm7_get_context;            break;
         case CPUINFO_PTR_SET_CONTEXT:           info->setcontext = arm7_set_context;            break;
-        case CPUINFO_PTR_INIT:                  info->init = arm7_init;                         break;
-        case CPUINFO_PTR_RESET:                 info->reset = arm7_reset;                       break;
-        case CPUINFO_PTR_EXIT:                  info->exit = arm7_exit;                         break;
-        case CPUINFO_PTR_EXECUTE:               info->execute = arm7_execute;                   break;
+        case CPUINFO_PTR_INIT:                  info->init = CPU_INIT_NAME(arm7);                         break;
+        case CPUINFO_PTR_RESET:                 info->reset = CPU_RESET_NAME(arm7);                       break;
+        case CPUINFO_PTR_EXIT:                  info->exit = CPU_EXIT_NAME(arm7);                         break;
+        case CPUINFO_PTR_EXECUTE:               info->execute = CPU_EXECUTE_NAME(arm7);                   break;
         case CPUINFO_PTR_BURN:                  info->burn = NULL;                              break;
         case CPUINFO_PTR_DISASSEMBLE:           info->disassemble = arm7_dasm;                  break;
         case CPUINFO_PTR_INSTRUCTION_COUNTER:   info->icount = &ARM7_ICOUNT;                    break;

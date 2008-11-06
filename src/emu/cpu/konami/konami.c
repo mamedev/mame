@@ -55,7 +55,8 @@ typedef struct
 	UINT8	ireg;		/* first opcode */
     UINT8   irq_state[2];
     int     extra_cycles; /* cycles used up by interrupts */
-    int     (*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
     UINT8   int_state;  /* SYNC and CWAI flags */
 	UINT8	nmi_state;
 	void 	(*setlines_callback)( int lines ); /* callback called when A16-A23 are set */
@@ -131,7 +132,7 @@ static PAIR ea;         /* effective address */
 		CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */		\
 		PCD = RM16(0xfff6); 											\
 		change_pc(PC);					/* TS 971002 */ 				\
-		(void)(*konami.irq_callback)(KONAMI_FIRQ_LINE);					\
+		(void)(*konami.irq_callback)(konami.device, KONAMI_FIRQ_LINE);	\
 	}																	\
 	else																\
 	if( konami.irq_state[KONAMI_IRQ_LINE]!=CLEAR_LINE && !(CC & CC_II) )\
@@ -159,7 +160,7 @@ static PAIR ea;         /* effective address */
 		CC |= CC_II;					/* inhibit IRQ */				\
 		PCD = RM16(0xfff8); 											\
 		change_pc(PC);					/* TS 971002 */ 				\
-		(void)(*konami.irq_callback)(KONAMI_IRQ_LINE);					\
+		(void)(*konami.irq_callback)(konami.device, KONAMI_IRQ_LINE);	\
 	}
 
 /* public globals */
@@ -388,9 +389,10 @@ static void konami_set_context(void *src)
 /****************************************************************************/
 /* Reset registers to their initial values                                  */
 /****************************************************************************/
-static void konami_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( konami )
 {
 	konami.irq_callback = irqcallback;
+	konami.device = device;
 
 	state_save_register_item("KONAMI", index, PC);
 	state_save_register_item("KONAMI", index, U);
@@ -406,7 +408,7 @@ static void konami_init(int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("KONAMI", index, konami.irq_state[1]);
 }
 
-static void konami_reset(void)
+static CPU_RESET( konami )
 {
 	konami.int_state = 0;
 	konami.nmi_state = CLEAR_LINE;
@@ -422,7 +424,7 @@ static void konami_reset(void)
     change_pc(PC);    /* TS 971002 */
 }
 
-static void konami_exit(void)
+static CPU_EXIT( konami )
 {
 }
 
@@ -482,7 +484,7 @@ static void set_irq_line(int irqline, int state)
 #include "konamops.c"
 
 /* execute instructions on this CPU until icount expires */
-static int konami_execute(int cycles)
+static CPU_EXECUTE( konami )
 {
 	konami_ICount = cycles - konami.extra_cycles;
 	konami.extra_cycles = 0;
@@ -600,10 +602,10 @@ void konami_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = konami_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = konami_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = konami_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = konami_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = konami_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = konami_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = konami_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(konami);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(konami);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(konami);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(konami);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = konami_dasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &konami_ICount;			break;

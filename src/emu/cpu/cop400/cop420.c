@@ -304,7 +304,7 @@ static TIMER_CALLBACK(cop420_microbus_tick)
 /****************************************************************************
  * Initialize emulation
  ****************************************************************************/
-static void cop420_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( cop420 )
 {
 	int i;
 
@@ -395,9 +395,9 @@ static void cop420_init(int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("cop420", index, R.halt);
 }
 
-static void cop421_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( cop421 )
 {
-	cop420_init(index, clock, config, irqcallback);
+	CPU_INIT_CALL(cop420);
 
 	/* microbus option is not available */
 
@@ -408,9 +408,9 @@ static void cop421_init(int index, int clock, const void *config, int (*irqcallb
 	R.IN_mask = 0; // IN lines not available
 }
 
-static void cop422_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( cop422 )
 {
-	cop420_init(index, clock, config, irqcallback);
+	CPU_INIT_CALL(cop420);
 
 	/* microbus option is not available */
 
@@ -426,7 +426,7 @@ static void cop422_init(int index, int clock, const void *config, int (*irqcallb
 /****************************************************************************
  * Reset registers to their initial values
  ****************************************************************************/
-static void cop420_reset(void)
+static CPU_RESET( cop420 )
 {
 	PC = 0;
 	A = 0;
@@ -443,7 +443,7 @@ static void cop420_reset(void)
 /****************************************************************************
  * Execute cycles CPU cycles. Return number of cycles really executed
  ****************************************************************************/
-static int cop420_execute(int cycles)
+static CPU_EXECUTE( cop420 )
 {
 	UINT8 opcode;
 
@@ -639,9 +639,9 @@ void cop420_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = cop420_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = cop420_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = cop420_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = cop420_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = cop420_reset;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = cop420_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cop420);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cop420);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cop420);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = cop420_dasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cop420_ICount;			break;
@@ -684,7 +684,7 @@ void cop421_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = cop421_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cop421);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "COP421");				break;
@@ -701,7 +701,7 @@ void cop422_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = cop422_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cop422);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "COP422");				break;
@@ -731,17 +731,17 @@ void cop402_get_info(UINT32 state, cpuinfo *info)
 
 /* COP44x */
 
-static void cop426_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( cop426 )
 {
-	cop420_init(index, clock, config, irqcallback);
+	CPU_INIT_CALL(cop420);
 
 	R.G_mask = 0x0e; // only G2, G3 available
 	R.D_mask = 0x0e; // only D2, D3 available
 }
 
-static void cop445_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( cop445 )
 {
-	cop420_init(index, clock, config, irqcallback);
+	CPU_INIT_CALL(cop420);
 
 	R.G_mask = 0x07;
 	R.D_mask = 0x03;
@@ -788,7 +788,7 @@ void cop445_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = cop445_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cop445);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "COP445");				break;
@@ -839,7 +839,7 @@ void cop426_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = cop426_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cop426);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "COP426");				break;

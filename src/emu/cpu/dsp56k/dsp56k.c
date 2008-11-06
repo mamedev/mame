@@ -38,9 +38,9 @@
 /***************************************************************************
     LOCAL DECLARATIONS
 ***************************************************************************/
-static void dsp56k_init(int index, int clock, const void *_config, int (*irqcallback)(int));
-static void dsp56k_reset(void);
-static void dsp56k_exit(void);
+static CPU_INIT( dsp56k );
+static CPU_RESET( dsp56k );
+static CPU_EXIT( dsp56k );
 
 /***************************************************************************
     MACROS
@@ -208,6 +208,7 @@ typedef struct
 	UINT32			op;
 	int				interrupt_cycles;
 	void			(*output_pins_changed)(UINT32 pins);
+	const device_config *device;
 } dsp56k_core;
 
 
@@ -333,7 +334,7 @@ static void set_irq_line(int irqline, int state)
 			{
 				/* If it changes state from asserted to cleared.  Call the reset function. */
 				if (core.reset_state == TRUE)
-					dsp56k_reset();
+					cpu_reset_dsp56k(core.device);
 
 				core.reset_state = FALSE;
 			}
@@ -377,7 +378,7 @@ static void dsp56k_set_context(void *src)
 /***************************************************************************
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
-static void dsp56k_init(int index, int clock, const void *_config, int (*irqcallback)(int))
+static CPU_INIT( dsp56k )
 {
 	// Call specific module inits
 	pcu_init(index);
@@ -399,6 +400,7 @@ static void dsp56k_init(int index, int clock, const void *_config, int (*irqcall
 
 	//core.config = _config;
 	//core.irq_callback = irqcallback;
+	core.device = device;
 }
 
 static void agu_reset(void)
@@ -431,7 +433,7 @@ static void alu_reset(void)
 }
 
 
-static void dsp56k_reset(void)
+static CPU_RESET( dsp56k )
 {
 	logerror("Dsp56k reset\n");
 
@@ -451,7 +453,7 @@ static void dsp56k_reset(void)
 }
 
 
-static void dsp56k_exit(void)
+static CPU_EXIT( dsp56k )
 {
 }
 
@@ -468,7 +470,7 @@ static void dsp56k_exit(void)
     CORE EXECUTION LOOP
 ***************************************************************************/
 
-static int dsp56k_execute(int cycles)
+static CPU_EXECUTE( dsp56k )
 {
 	/* If reset line is asserted, do nothing */
 	if (core.reset_state)
@@ -675,10 +677,10 @@ void dsp56k_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = dsp56k_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = dsp56k_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = dsp56k_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = dsp56k_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = dsp56k_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = dsp56k_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = dsp56k_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(dsp56k);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(dsp56k);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(dsp56k);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(dsp56k);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = dsp56k_dasm;		break;
 		case CPUINFO_PTR_DEBUG_SETUP_COMMANDS:			info->setup_commands = NULL;			break;

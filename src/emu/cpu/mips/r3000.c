@@ -148,7 +148,8 @@ struct _r3000_state
 	int			icount;
 	int			interrupt_cycles;
 	int			hasfpu;
-	int 		(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 
 	/* endian-dependent load/store */
 	void		(*lwl)(r3000_state *r3000, UINT32 op);
@@ -315,9 +316,6 @@ static void set_irq_line(r3000_state *r3000, int irqline, int state)
 
 static void r3000_get_context(void *dst)
 {
-	/* copy the context */
-	if (dst)
-		*(void **)dst = token;
 }
 
 
@@ -327,7 +325,7 @@ static void r3000_set_context(void *src)
 	
 	/* copy the context */
 	if (src)
-		token = *(void **)src;
+		token = src;
 
 	r3000 = token;
 	change_pc(r3000->pc);
@@ -342,23 +340,23 @@ static void r3000_set_context(void *src)
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-static void r3000_init(int index, int clock, const void *_config, int (*irqcallback)(int))
+static CPU_INIT( r3000 )
 {
-	const r3000_cpu_core *config = _config;
-	r3000_state *r3000;
+	const r3000_cpu_core *configdata = config;
+	r3000_state *r3000 = device->token;
 	
-	token = auto_malloc(sizeof(r3000_state));
-	r3000 = token;
+	token = device->token;	// temporary
 
 	/* allocate memory */
-	r3000->icache = auto_malloc(config->icache);
-	r3000->dcache = auto_malloc(config->dcache);
+	r3000->icache = auto_malloc(configdata->icache);
+	r3000->dcache = auto_malloc(configdata->dcache);
 
-	r3000->icache_size = config->icache;
-	r3000->dcache_size = config->dcache;
-	r3000->hasfpu = config->hasfpu;
+	r3000->icache_size = configdata->icache;
+	r3000->dcache_size = configdata->dcache;
+	r3000->hasfpu = configdata->hasfpu;
 
 	r3000->irq_callback = irqcallback;
+	r3000->device = device;
 }
 
 
@@ -398,18 +396,18 @@ static void r3000_reset(r3000_state *r3000, int bigendian)
 	change_pc(r3000->pc);
 }
 
-static void r3000be_reset(void)
+static CPU_RESET( r3000be )
 {
-	r3000_reset(token, 1);
+	r3000_reset(device->token, 1);
 }
 
-static void r3000le_reset(void)
+static CPU_RESET( r3000le )
 {
-	r3000_reset(token, 0);
+	r3000_reset(device->token, 0);
 }
 
 
-static void r3000_exit(void)
+static CPU_EXIT( r3000 )
 {
 }
 
@@ -735,9 +733,9 @@ INLINE void handle_cop3(r3000_state *r3000, UINT32 op)
     CORE EXECUTION LOOP
 ***************************************************************************/
 
-static int r3000_execute(int cycles)
+static CPU_EXECUTE( r3000 )
 {
-	r3000_state *r3000 = token;
+	r3000_state *r3000 = device->token;
 	
 	/* count cycles and interrupt cycles */
 	r3000->icount = cycles;
@@ -1227,7 +1225,7 @@ static void r3000_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(r3000);				break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(r3000_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 6;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
@@ -1299,10 +1297,10 @@ static void r3000_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = r3000_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = r3000_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = r3000_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = r3000_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r3000);				break;
 		case CPUINFO_PTR_RESET:							/* provided per-CPU */					break;
-		case CPUINFO_PTR_EXIT:							info->exit = r3000_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = r3000_execute;			break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(r3000);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(r3000);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = r3000_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &r3000->icount;			break;
@@ -1367,7 +1365,7 @@ void r3000be_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = r3000be_reset;			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(r3000be);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R3000 (big)");			break;
@@ -1385,7 +1383,7 @@ void r3000le_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = r3000le_reset;			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(r3000le);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R3000 (little)");		break;
@@ -1403,7 +1401,7 @@ void r3041be_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = r3000be_reset;			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(r3000be);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R3041 (big)");			break;
@@ -1421,7 +1419,7 @@ void r3041le_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = r3000le_reset;			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(r3000le);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R3041 (little)");		break;

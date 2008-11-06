@@ -216,7 +216,7 @@ ADDRESS_MAP_END
 /****************************************************************************
  * Initialize emulation
  ****************************************************************************/
-static void cop410_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( cop410 )
 {
 	int i;
 
@@ -277,9 +277,9 @@ static void cop410_init(int index, int clock, const void *config, int (*irqcallb
 	state_save_register_item("cop410", index, R.halt);
 }
 
-static void cop411_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( cop411 )
 {
-	cop410_init(index, clock, config, irqcallback);
+	CPU_INIT_CALL(cop410);
 
 	/* the COP411 is like the COP410, just with less output ports */
 	R.G_mask = 0x07;
@@ -289,7 +289,7 @@ static void cop411_init(int index, int clock, const void *config, int (*irqcallb
 /****************************************************************************
  * Reset registers to their initial values
  ****************************************************************************/
-static void cop410_reset(void)
+static CPU_RESET( cop410 )
 {
 	PC = 0;
 	A = 0;
@@ -305,7 +305,7 @@ static void cop410_reset(void)
 /****************************************************************************
  * Execute cycles CPU cycles. Return number of cycles really executed
  ****************************************************************************/
-static int cop410_execute(int cycles)
+static CPU_EXECUTE( cop410 )
 {
 	UINT8 opcode;
 
@@ -484,9 +484,9 @@ void cop410_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = cop410_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = cop410_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = cop410_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = cop410_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = cop410_reset;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = cop410_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cop410);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cop410);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cop410);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = cop410_dasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cop410_ICount;			break;
@@ -529,7 +529,7 @@ void cop411_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = cop411_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cop411);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "COP411");				break;

@@ -22,7 +22,8 @@ struct _h83002_state
 	UINT8  h8nflag, h8vflag, h8cflag, h8zflag, h8iflag, h8hflag;
 	UINT8  h8uflag, h8uiflag;
 
-	int (*irq_cb)(int);
+	cpu_irq_callback irq_cb;
+	const device_config *device;
 
 	// H8/3002 onboard peripherals stuff
 

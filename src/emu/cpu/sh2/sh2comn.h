@@ -111,7 +111,8 @@ typedef struct
 	UINT32 pcflushes[16];			// pcflush entries
 
 	INT8	irq_line_state[17];
-	int 	(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	UINT32	*m;
 	INT8  nmi_line_state;
 
@@ -169,7 +170,7 @@ typedef struct
 TIMER_CALLBACK( sh2_timer_callback );
 TIMER_CALLBACK( sh2_dmac_callback );
 
-void sh2_common_init(int alloc, int index, int clock, const void *config, int (*irqcallback)(int));
+void sh2_common_init(int alloc, const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback);
 void sh2_recalc_irq(void);
 void sh2_set_irq_line(int irqline, int state);
 void sh2_set_frt_input(int cpunum, int state);

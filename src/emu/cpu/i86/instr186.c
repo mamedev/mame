@@ -16,7 +16,7 @@ static void PREFIX186(_pusha)(void)    /* Opcode 0x60 */
 {
 	unsigned tmp=I.regs.w[SP];
 
-	ICOUNT -= cycles.pusha;
+	ICOUNT -= timing.pusha;
 	PUSH(I.regs.w[AX]);
 	PUSH(I.regs.w[CX]);
 	PUSH(I.regs.w[DX]);
@@ -31,7 +31,7 @@ static void PREFIX186(_popa)(void)    /* Opcode 0x61 */
 {
 	 unsigned tmp;
 
-	ICOUNT -= cycles.popa;
+	ICOUNT -= timing.popa;
 	POP(I.regs.w[DI]);
 	POP(I.regs.w[SI]);
 	POP(I.regs.w[BP]);
@@ -52,14 +52,14 @@ static void PREFIX186(_bound)(void)    /* Opcode 0x62 */
 		I.pc-=2;
 		PREFIX86(_interrupt)(5);
 	}
-	ICOUNT -= cycles.bound;
+	ICOUNT -= timing.bound;
 }
 
 static void PREFIX186(_push_d16)(void)    /* Opcode 0x68 */
 {
 	unsigned tmp = FETCH;
 
-	ICOUNT -= cycles.push_imm;
+	ICOUNT -= timing.push_imm;
 	tmp += FETCH << 8;
 	PUSH(tmp);
 }
@@ -70,7 +70,7 @@ static void PREFIX186(_imul_d16)(void)    /* Opcode 0x69 */
 	unsigned src2=FETCH;
 	src+=(FETCH<<8);
 
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.imul_rri16 : cycles.imul_rmi16;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.imul_rri16 : timing.imul_rmi16;
 
 	dst = (INT32)((INT16)src)*(INT32)((INT16)src2);
 	I.CarryVal = I.OverVal = (((INT32)dst) >> 15 != 0) && (((INT32)dst) >> 15 != -1);
@@ -82,7 +82,7 @@ static void PREFIX186(_push_d8)(void)    /* Opcode 0x6a */
 {
 	unsigned tmp = (WORD)((INT16)((INT8)FETCH));
 
-	ICOUNT -= cycles.push_imm;
+	ICOUNT -= timing.push_imm;
 	PUSH(tmp);
 }
 
@@ -91,7 +91,7 @@ static void PREFIX186(_imul_d8)(void)    /* Opcode 0x6b */
 	DEF_r16w(dst,src);
 	unsigned src2= (WORD)((INT16)((INT8)FETCH));
 
-	ICOUNT -= (ModRM >= 0xc0) ? cycles.imul_rri8 : cycles.imul_rmi8;
+	ICOUNT -= (ModRM >= 0xc0) ? timing.imul_rri8 : timing.imul_rmi8;
 
 	dst = (INT32)((INT16)src)*(INT32)((INT16)src2);
 	I.CarryVal = I.OverVal = (((INT32)dst) >> 15 != 0) && (((INT32)dst) >> 15 != -1);
@@ -100,28 +100,28 @@ static void PREFIX186(_imul_d8)(void)    /* Opcode 0x6b */
 
 static void PREFIX186(_insb)(void)    /* Opcode 0x6c */
 {
-	ICOUNT -= cycles.ins8;
+	ICOUNT -= timing.ins8;
 	PutMemB(ES,I.regs.w[DI],read_port_byte(I.regs.w[DX]));
 	I.regs.w[DI] += I.DirVal;
 }
 
 static void PREFIX186(_insw)(void)    /* Opcode 0x6d */
 {
-	ICOUNT -= cycles.ins16;
+	ICOUNT -= timing.ins16;
 	PutMemW(ES,I.regs.w[DI],read_port_word(I.regs.w[DX]));
 	I.regs.w[DI] += 2 * I.DirVal;
 }
 
 static void PREFIX186(_outsb)(void)    /* Opcode 0x6e */
 {
-	ICOUNT -= cycles.outs8;
+	ICOUNT -= timing.outs8;
 	write_port_byte(I.regs.w[DX],GetMemB(DS,I.regs.w[SI]));
 	I.regs.w[SI] += I.DirVal; /* GOL 11/27/01 */
 }
 
 static void PREFIX186(_outsw)(void)    /* Opcode 0x6f */
 {
-	ICOUNT -= cycles.outs16;
+	ICOUNT -= timing.outs16;
 	write_port_word(I.regs.w[DX],GetMemW(DS,I.regs.w[SI]));
 	I.regs.w[SI] += 2 * I.DirVal; /* GOL 11/27/01 */
 }
@@ -148,7 +148,7 @@ static void PREFIX186(_enter)(void)    /* Opcode 0xc8 */
 
 	nb += FETCH << 8;
 	level = FETCH;
-	ICOUNT -= (level == 0) ? cycles.enter0 : (level == 1) ? cycles.enter1 : cycles.enter_base + level * cycles.enter_count;
+	ICOUNT -= (level == 0) ? timing.enter0 : (level == 1) ? timing.enter1 : timing.enter_base + level * timing.enter_count;
 	PUSH(I.regs.w[BP]);
 	I.regs.w[BP]=I.regs.w[SP];
 	I.regs.w[SP] -= nb;
@@ -159,7 +159,7 @@ static void PREFIX186(_enter)(void)    /* Opcode 0xc8 */
 
 static void PREFIX186(_leave)(void)    /* Opcode 0xc9 */
 {
-	ICOUNT -= cycles.leave;
+	ICOUNT -= timing.leave;
 	I.regs.w[SP]=I.regs.w[BP];
 	POP(I.regs.w[BP]);
 }

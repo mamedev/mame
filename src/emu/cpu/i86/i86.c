@@ -40,7 +40,8 @@ typedef struct
 	UINT32 base[4];
 	UINT16 sregs[4];
 	UINT16 flags;
-	int (*irq_callback) (int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	INT32 AuxVal, OverVal, SignVal, ZeroVal, CarryVal, DirVal;		/* 0 or non-0 valued flags */
 	UINT8 ParityVal;
 	UINT8 TF, IF;				   /* 0 or 1 valued flags */
@@ -70,7 +71,7 @@ static char seg_prefix;				   /* prefix segment indicator */
 
 static UINT8 parity_table[256];
 
-static struct i80x86_timing cycles;
+static struct i80x86_timing timing;
 
 /* The interrupt number of a pending external interrupt pending NMI is 2.   */
 /* For INTR interrupts, the level is caught on the bus during an INTA cycle */
@@ -116,7 +117,7 @@ static void i8086_state_register(int index)
 	state_save_register_item(type, index, I.test_state);	/* PJB 03/05 */
 }
 
-static void i8086_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( i8086 )
 {
 	unsigned int i, j, c;
 	static const BREGS reg_name[8] = {AL, CL, DL, BL, AH, CH, DH, BH};
@@ -142,27 +143,31 @@ static void i8086_init(int index, int clock, const void *config, int (*irqcallba
 	}
 
 	I.irq_callback = irqcallback;
+	I.device = device;
 
 	i8086_state_register(index);
 	configure_memory_16bit();
 }
 
 #if (HAS_I8088||HAS_I80188)
-static void i8088_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( i8088 )
 {
-	i8086_init(index, clock, config, irqcallback);
+	CPU_INIT_CALL(i8086);
 	configure_memory_8bit();
 }
 #endif
 
-static void i8086_reset(void)
+static CPU_RESET( i8086 )
 {
-	int (*save_irqcallback)(int);
+	cpu_irq_callback save_irqcallback;
+	const device_config *save_device;
     memory_interface save_mem;
 
 	save_irqcallback = I.irq_callback;
+	save_device = I.device;
 	save_mem = I.mem;
 	memset(&I, 0, sizeof (I));
+	I.device = save_device;
 	I.irq_callback = save_irqcallback;
 	I.mem = save_mem;
 
@@ -174,7 +179,7 @@ static void i8086_reset(void)
 	change_pc(I.pc);
 }
 
-static void i8086_exit(void)
+static CPU_EXIT( i8086 )
 {
 	/* nothing to do ? */
 }
@@ -228,14 +233,14 @@ static void set_test_line(int state)
         I.test_state = !state;
 }
 
-static int i8086_execute(int num_cycles)
+static CPU_EXECUTE( i8086 )
 {
 	/* copy over the cycle counts if they're not correct */
-	if (cycles.id != 8086)
-		cycles = i8086_cycles;
+	if (timing.id != 8086)
+		timing = i8086_cycles;
 
 	/* adjust for any interrupts that came in */
-	i8086_ICount = num_cycles;
+	i8086_ICount = cycles;
 	i8086_ICount -= I.extra_cycles;
 	I.extra_cycles = 0;
 
@@ -256,7 +261,7 @@ static int i8086_execute(int num_cycles)
 	i8086_ICount -= I.extra_cycles;
 	I.extra_cycles = 0;
 
-	return num_cycles - i8086_ICount;
+	return cycles - i8086_ICount;
 }
 
 
@@ -282,14 +287,14 @@ static offs_t i8086_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT
 #include "instr186.c"
 #undef I80186
 
-static int i80186_execute(int num_cycles)
+static CPU_EXECUTE( i80186 )
 {
 	/* copy over the cycle counts if they're not correct */
-	if (cycles.id != 80186)
-		cycles = i80186_cycles;
+	if (timing.id != 80186)
+		timing = i80186_cycles;
 
 	/* adjust for any interrupts that came in */
-	i8086_ICount = num_cycles;
+	i8086_ICount = cycles;
 	i8086_ICount -= I.extra_cycles;
 	I.extra_cycles = 0;
 
@@ -309,7 +314,7 @@ static int i80186_execute(int num_cycles)
 	i8086_ICount -= I.extra_cycles;
 	I.extra_cycles = 0;
 
-	return num_cycles - i8086_ICount;
+	return cycles - i8086_ICount;
 }
 
 #endif
@@ -430,10 +435,10 @@ void i8086_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = i8086_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = i8086_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = i8086_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = i8086_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = i8086_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = i8086_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = i8086_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8086);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(i8086);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(i8086);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i8086);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i8086_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &i8086_ICount;			break;
@@ -500,7 +505,7 @@ void i8088_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = i8088_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8088);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "8088");				break;
@@ -525,7 +530,7 @@ void i80186_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 2;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_EXECUTE:						info->execute = i80186_execute;			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i80186);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "80186");				break;
@@ -550,8 +555,8 @@ void i80188_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = i8088_init;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = i80186_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8088);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i80186);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "80188");				break;

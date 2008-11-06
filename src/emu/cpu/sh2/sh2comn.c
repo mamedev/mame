@@ -651,12 +651,12 @@ void sh2_exception(const char *message, int irqline)
 		{
 			if(sh2->m[0x38] & 0x00010000)
 			{
-				vector = sh2->irq_callback(irqline);
+				vector = sh2->irq_callback(sh2->device, irqline);
 				LOG(("SH-2 #%d exception #%d (external vector: $%x) after [%s]\n", cpu_getactivecpu(), irqline, vector, message));
 			}
 			else
 			{
-				sh2->irq_callback(irqline);
+				sh2->irq_callback(sh2->device, irqline);
 				vector = 64 + irqline/2;
 				LOG(("SH-2 #%d exception #%d (autovector: $%x) after [%s]\n", cpu_getactivecpu(), irqline, vector, message));
 			}
@@ -698,7 +698,7 @@ void sh2_exception(const char *message, int irqline)
 	#endif
 }
 
-void sh2_common_init(int alloc, int index, int clock, const void *config, int (*irqcallback)(int))
+void sh2_common_init(int alloc, const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback)
 {
 	const sh2_cpu_core *conf = config;
 
@@ -732,6 +732,7 @@ void sh2_common_init(int alloc, int index, int clock, const void *config, int (*
 	}
 	sh2->cpu_number = index;
 	sh2->irq_callback = irqcallback;
+	sh2->device = device;
 
 	state_save_register_item("sh2", index, sh2->pc);
 	state_save_register_item("sh2", index, sh2->r[15]);

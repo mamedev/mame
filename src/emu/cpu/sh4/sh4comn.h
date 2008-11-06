@@ -60,7 +60,8 @@ typedef struct
 	int		exception_requesting[128];
 
 	INT8	irq_line_state[17];
-	int 	(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	UINT32	*m;
 	INT8	nmi_line_state;
 

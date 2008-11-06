@@ -96,7 +96,8 @@ struct _m37710i_cpu_struct
 	uint im4;		/* Immediate load target */
 	uint irq_delay;		/* delay 1 instruction before checking irq */
 	uint irq_level;		/* irq level */
-	int (*int_ack)(int); /* Interrupt Acknowledge */
+	cpu_irq_callback int_ack;
+	const device_config *device;
 	uint stopped;		/* Sets how the CPU is stopped */
 	void (*const *opcodes)(void);		/* opcodes with no prefix */
 	void (*const *opcodes42)(void);	/* opcodes with 0x42 prefix */

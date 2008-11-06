@@ -249,7 +249,8 @@ typedef struct {
 	UINT8 opcode;
 
 	UINT8 irq_state;
-	int (*irq_callback)(int);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	UINT32 a20_mask;
 
 	int cpuid_max_input_value_eax;

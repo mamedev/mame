@@ -77,7 +77,8 @@ typedef struct {
 	UINT8	nmi_state;
 	UINT8	irq_state;
 	UINT8	so_state;
-	int 	(*irq_callback)(int irqline);	/* IRQ callback */
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	read8_machine_func rdmem_id;					/* readmem callback for indexed instructions */
 	write8_machine_func wrmem_id;				/* readmem callback for indexed instructions */
 }	m6509_Regs;
@@ -122,14 +123,15 @@ ADDRESS_MAP_END
 static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8le(offset); }
 static WRITE8_HANDLER( default_wdmem_id ) { program_write_byte_8le(offset, data); }
 
-static void m6509_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( m6509 )
 {
 	m6509.rdmem_id = default_rdmem_id;
 	m6509.wrmem_id = default_wdmem_id;
 	m6509.irq_callback = irqcallback;
+	m6509.device = device;
 }
 
-static void m6509_reset (void)
+static CPU_RESET( m6509 )
 {
 	m6509.insn = insn6509;
 
@@ -150,7 +152,7 @@ static void m6509_reset (void)
 	change_pc(PCD);
 }
 
-static void m6509_exit(void)
+static CPU_EXIT( m6509 )
 {
 	/* nothing to do yet */
 }
@@ -187,13 +189,13 @@ INLINE void m6509_take_irq(void)
 		PCH = RDMEM(EAD+1);
 		LOG(("M6509#%d takes IRQ ($%04x)\n", cpu_getactivecpu(), PCD));
 		/* call back the cpuintrf to let it clear the line */
-		if (m6509.irq_callback) (*m6509.irq_callback)(0);
+		if (m6509.irq_callback) (*m6509.irq_callback)(m6509.device, 0);
 		change_pc(PCD);
 	}
 	m6509.pending_irq = 0;
 }
 
-static int m6509_execute(int cycles)
+static CPU_EXECUTE( m6509 )
 {
 	m6502_ICount = cycles;
 
@@ -367,10 +369,10 @@ void m6509_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m6509_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m6509_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m6509_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = m6509_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = m6509_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = m6509_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = m6509_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6509);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6509);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m6509);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6509);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6502_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6502_ICount;			break;

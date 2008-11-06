@@ -126,7 +126,8 @@ typedef struct
 	UINT16 *internal_ram;
 	UINT16 *internal_ram_block0, *internal_ram_block1;
 
-	int (*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	void (*opcode_handler)(void);
 	UINT64 opcode;
 	UINT64 fetch_opcode;
@@ -418,7 +419,7 @@ static offs_t sharc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT
 }
 
 
-static void sharc_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( sharc )
 {
 	const sharc_config *cfg = config;
 	int saveindex;
@@ -426,6 +427,7 @@ static void sharc_init(int index, int clock, const void *config, int (*irqcallba
 	sharc.boot_mode = cfg->boot_mode;
 
 	sharc.irq_callback = irqcallback;
+	sharc.device = device;
 
 	build_opcode_table();
 
@@ -549,7 +551,7 @@ static void sharc_init(int index, int clock, const void *config, int (*irqcallba
 	state_save_register_item("sharc", index, sharc.astat_old_old_old);
 }
 
-static void sharc_reset(void)
+static CPU_RESET( sharc )
 {
 	memset(sharc.internal_ram, 0, 2 * 0x10000 * sizeof(UINT16));
 
@@ -591,7 +593,7 @@ static void sharc_reset(void)
 	sharc.interrupt_active = 0;
 }
 
-static void sharc_exit(void)
+static CPU_EXIT( sharc )
 {
 	/* TODO */
 }
@@ -683,7 +685,7 @@ static void check_interrupts(void)
 	}
 }
 
-static int sharc_execute(int cycles)
+static CPU_EXECUTE( sharc )
 {
 	sharc_icount = cycles;
 
@@ -1203,10 +1205,10 @@ static void sharc_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = sharc_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = sharc_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = sharc_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = sharc_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = sharc_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = sharc_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(sharc);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(sharc);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(sharc);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(sharc);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = sharc_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sharc_icount;			break;

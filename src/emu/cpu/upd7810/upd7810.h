@@ -163,7 +163,8 @@ typedef struct {
 	const struct opcode_s *op74;
 	void (*handle_timers)(int cycles);
 	UPD7810_CONFIG config;
-	int (*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 }	UPD7810;
 
 offs_t upd7810_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);

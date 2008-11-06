@@ -270,7 +270,7 @@ void m68k_set_cpu_type(m68ki_cpu_core *m68k, unsigned int cpu_type);
 /* Do whatever initialisations the core requires.  Should be called
  * at least once at init time.
  */
-m68ki_cpu_core *m68k_init(void);
+void m68k_init(m68ki_cpu_core *m68k);
 
 /* Pulse the RESET pin on the CPU.
  * You *MUST* reset the CPU at least once to initialize the emulation

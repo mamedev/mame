@@ -65,7 +65,7 @@ static void cdp1802_set_context (void *src)
 	cdp1802 = *(CDP1802_Regs *)src;
 }
 
-static void cdp1802_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( cdp1802 )
 {
 	cdp1802.intf = (cdp1802_interface *) config;
 
@@ -829,7 +829,7 @@ static void cdp1802_run(running_machine *machine)
 	}
 }
 
-static int cdp1802_execute(int cycles)
+static CPU_EXECUTE( cdp1802 )
 {
 	running_machine *machine = Machine;
 
@@ -905,7 +905,7 @@ static void cdp1802_set_dmaout_line(int state)
 	cdp1802.dmaout = state;
 }
 
-static void cdp1802_reset(void)
+static CPU_RESET( cdp1802 )
 {
 	cdp1802.mode = CDP1802_MODE_RESET;
 }
@@ -1022,9 +1022,9 @@ void cdp1802_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = cdp1802_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = cdp1802_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = cdp1802_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = cdp1802_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = cdp1802_reset;			break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = cdp1802_execute;		break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cdp1802);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cdp1802);			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cdp1802);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = cdp1802_dasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cdp1802_ICount;			break;

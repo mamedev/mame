@@ -29,7 +29,7 @@ extern offs_t rsp_dasm_one(char *buffer, offs_t pc, UINT32 op);
 static FILE *exec_output;
 
 
-static rsp_config *config;
+static rsp_config *configdata;
 
 
 typedef struct
@@ -58,7 +58,8 @@ typedef struct
 	UINT32 ppc;
 	UINT32 nextpc;
 
-	int (*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 } RSP_REGS;
 
 
@@ -230,11 +231,11 @@ static UINT32 get_cop0_reg(int reg)
 {
 	if (reg >= 0 && reg < 8)
 	{
-		return (config->sp_reg_r)(Machine, reg, 0x00000000);
+		return (configdata->sp_reg_r)(Machine, reg, 0x00000000);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		return (config->dp_reg_r)(Machine, reg - 8, 0x00000000);
+		return (configdata->dp_reg_r)(Machine, reg - 8, 0x00000000);
 	}
 	else
 	{
@@ -246,11 +247,11 @@ static void set_cop0_reg(int reg, UINT32 data)
 {
 	if (reg >= 0 && reg < 8)
 	{
-		(config->sp_reg_w)(Machine, reg, data, 0x00000000);
+		(configdata->sp_reg_w)(Machine, reg, data, 0x00000000);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		(config->dp_reg_w)(Machine, reg - 8, data, 0x00000000);
+		(configdata->dp_reg_w)(Machine, reg - 8, data, 0x00000000);
 	}
 	else
 	{
@@ -342,16 +343,17 @@ static const int vector_elements_2[16][8] =
 	{ 7, 7, 7, 7, 7, 7, 7, 7 },		// 7
 };
 
-static void rsp_init(int index, int clock, const void *_config, int (*irqcallback)(int))
+static CPU_INIT( rsp )
 {
     int regIdx;
     int accumIdx;
-	config = (rsp_config *)_config;
+	configdata = (rsp_config *)config;
 
 	if (LOG_INSTRUCTION_EXECUTION)
 		exec_output = fopen("rsp_execute.txt", "wt");
 
 	rsp.irq_callback = irqcallback;
+	rsp.device = device;
 
 #if 1
     // Inaccurate.  RSP registers power on to a random state...
@@ -383,7 +385,7 @@ static void rsp_init(int index, int clock, const void *_config, int (*irqcallbac
     rsp.step_count = 0;
 }
 
-static void rsp_exit(void)
+static CPU_EXIT( rsp )
 {
 #if SAVE_DISASM
 	{
@@ -429,7 +431,7 @@ static void rsp_exit(void)
 	exec_output = NULL;
 }
 
-static void rsp_reset(void)
+static CPU_RESET( rsp )
 {
 	rsp.nextpc = ~0;
 }
@@ -2578,7 +2580,7 @@ static void handle_vector_ops(UINT32 op)
 	}
 }
 
-static int rsp_execute(int cycles)
+static CPU_EXECUTE( rsp )
 {
 	UINT32 op;
 
@@ -2623,7 +2625,7 @@ static int rsp_execute(int cycles)
 					case 0x09:	/* JALR */		JUMP_PC_L(RSVAL, RDREG); break;
 					case 0x0d:	/* BREAK */
 					{
-						(config->sp_set_status)(0x3);
+						(configdata->sp_set_status)(0x3);
 						rsp_icount = MIN(rsp_icount, 1);
 
 						if (LOG_INSTRUCTION_EXECUTION) fprintf(exec_output, "\n---------- break ----------\n\n");
@@ -2999,10 +3001,10 @@ void rsp_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = rsp_get_context;		break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = rsp_set_context;		break;
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = rsp_set_info;			break;
-		case CPUINFO_PTR_INIT:							info->init = rsp_init;					break;
-		case CPUINFO_PTR_RESET:							info->reset = rsp_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = rsp_exit;					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = rsp_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(rsp);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(rsp);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(rsp);					break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(rsp);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = rsp_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &rsp_icount;				break;

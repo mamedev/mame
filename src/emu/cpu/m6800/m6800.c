@@ -1,6 +1,6 @@
 /*** m6800: Portable 6800 class  emulator *************************************
 
-    m6800.c
+    m68xx.c
 
     References:
 
@@ -28,7 +28,7 @@ History
 
 990316  HJB
     Renamed to 6800, since that's the basic CPU.
-    Added different cycle count tables for M6800/2/8, M6801/3 and HD63701.
+    Added different cycle count tables for M6800/2/8, M6801/3 and m68xx.
 
 990314  HJB
     Also added the M6800 subtype.
@@ -110,7 +110,8 @@ typedef struct
 	UINT8	irq_state[2];	/* IRQ line state [IRQ1,TIN] */
 	UINT8	ic_eddge;		/* InputCapture eddge , b.0=fall,b.1=raise */
 
-	int		(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	int 	extra_cycles;	/* cycles used for interrupts */
 	void	(* const * insn)(void);	/* instruction table */
 	const UINT8 *cycles;			/* clock cycle of instruction table */
@@ -139,42 +140,35 @@ typedef struct
 }   m6800_Regs;
 
 /* 680x registers */
-static m6800_Regs m6800;
+static m6800_Regs m68xx;
 
 static emu_timer *m6800_rx_timer;
 static emu_timer *m6800_tx_timer;
 
-#define m6801   m6800
-#define m6802   m6800
-#define m6803	m6800
-#define m6808	m6800
-#define hd63701 m6800
-#define nsc8105 m6800
+#define	pPPC	m68xx.ppc
+#define pPC 	m68xx.pc
+#define pS		m68xx.s
+#define pX		m68xx.x
+#define pD		m68xx.d
 
-#define	pPPC	m6800.ppc
-#define pPC 	m6800.pc
-#define pS		m6800.s
-#define pX		m6800.x
-#define pD		m6800.d
+#define PC		m68xx.pc.w.l
+#define PCD		m68xx.pc.d
+#define S		m68xx.s.w.l
+#define SD		m68xx.s.d
+#define X		m68xx.x.w.l
+#define D		m68xx.d.w.l
+#define A		m68xx.d.b.h
+#define B		m68xx.d.b.l
+#define CC		m68xx.cc
 
-#define PC		m6800.pc.w.l
-#define PCD		m6800.pc.d
-#define S		m6800.s.w.l
-#define SD		m6800.s.d
-#define X		m6800.x.w.l
-#define D		m6800.d.w.l
-#define A		m6800.d.b.h
-#define B		m6800.d.b.l
-#define CC		m6800.cc
-
-#define CT		m6800.counter.w.l
-#define CTH		m6800.counter.w.h
-#define CTD		m6800.counter.d
-#define OC		m6800.output_compare.w.l
-#define OCH		m6800.output_compare.w.h
-#define OCD		m6800.output_compare.d
-#define TOH		m6800.timer_over.w.l
-#define TOD		m6800.timer_over.d
+#define CT		m68xx.counter.w.l
+#define CTH		m68xx.counter.w.h
+#define CTD		m68xx.counter.d
+#define OC		m68xx.output_compare.w.l
+#define OCH		m68xx.output_compare.w.h
+#define OCD		m68xx.output_compare.d
+#define TOH		m68xx.timer_over.w.l
+#define TOD		m68xx.timer_over.d
 
 static PAIR ea; 		/* effective address */
 #define EAD ea.d
@@ -186,7 +180,7 @@ static int m6800_ICount;
 /* point of next timer event */
 static UINT32 timer_next;
 
-/* DS -- THESE ARE RE-DEFINED IN m6800.h TO RAM, ROM or FUNCTIONS IN cpuintrf.c */
+/* DS -- THESE ARE RE-DEFINED IN m68xx.h TO RAM, ROM or FUNCTIONS IN cpuintrf.c */
 #define RM				M6800_RDMEM
 #define WM				M6800_WRMEM
 #define M_RDOP			M6800_RDOP
@@ -202,7 +196,7 @@ static UINT32 timer_next;
 #define PULLWORD(w) S++; w.d = RM(SD)<<8; S++; w.d |= RM(SD)
 
 #define MODIFIED_tcsr {	\
-	m6800.irq2 = (m6800.tcsr&(m6800.tcsr<<3))&(TCSR_ICF|TCSR_OCF|TCSR_TOF); \
+	m68xx.irq2 = (m68xx.tcsr&(m68xx.tcsr<<3))&(TCSR_ICF|TCSR_OCF|TCSR_TOF); \
 }
 
 #define SET_TIMER_EVENT {					\
@@ -269,19 +263,19 @@ enum
 	debugger_instruction_hook(Machine, PCD);						\
 	ireg=M_RDOP(PCD);						\
 	PC++;									\
-	(*m6800.insn[ireg])();					\
-	INCREMENT_COUNTER(m6800.cycles[ireg]);	\
+	(*m68xx.insn[ireg])();					\
+	INCREMENT_COUNTER(m68xx.cycles[ireg]);	\
 }
 
 /* check the IRQ lines for pending interrupts */
 #define CHECK_IRQ_LINES() {										\
 	if( !(CC & 0x10) )											\
 	{															\
-		if( m6800.irq_state[M6800_IRQ_LINE] != CLEAR_LINE )		\
+		if( m68xx.irq_state[M6800_IRQ_LINE] != CLEAR_LINE )		\
 		{	/* standard IRQ */									\
 			ENTER_INTERRUPT("M6800#%d take IRQ1\n",0xfff8);		\
-			if( m6800.irq_callback )							\
-				(void)(*m6800.irq_callback)(M6800_IRQ_LINE);	\
+			if( m68xx.irq_callback )							\
+				(void)(*m68xx.irq_callback)(m68xx.device, M6800_IRQ_LINE);	\
 		}														\
 		else													\
 			m6800_check_irq2();									\
@@ -531,11 +525,11 @@ INLINE void WM16( UINT32 Addr, PAIR *p )
 static void ENTER_INTERRUPT(const char *message,UINT16 irq_vector)
 {
 	LOG((message, cpu_getactivecpu()));
-	if( m6800.wai_state & (M6800_WAI|M6800_SLP) )
+	if( m68xx.wai_state & (M6800_WAI|M6800_SLP) )
 	{
-		if( m6800.wai_state & M6800_WAI )
-			m6800.extra_cycles += 4;
-		m6800.wai_state &= ~(M6800_WAI|M6800_SLP);
+		if( m68xx.wai_state & M6800_WAI )
+			m68xx.extra_cycles += 4;
+		m68xx.wai_state &= ~(M6800_WAI|M6800_SLP);
 	}
 	else
 	{
@@ -544,7 +538,7 @@ static void ENTER_INTERRUPT(const char *message,UINT16 irq_vector)
 		PUSHBYTE(A);
 		PUSHBYTE(B);
 		PUSHBYTE(CC);
-		m6800.extra_cycles += 12;
+		m68xx.extra_cycles += 12;
 	}
 	SEI;
 	PCD = RM16( irq_vector );
@@ -553,23 +547,23 @@ static void ENTER_INTERRUPT(const char *message,UINT16 irq_vector)
 
 static void m6800_check_irq2(void)
 {
-	if ((m6800.tcsr & (TCSR_EICI|TCSR_ICF)) == (TCSR_EICI|TCSR_ICF))
+	if ((m68xx.tcsr & (TCSR_EICI|TCSR_ICF)) == (TCSR_EICI|TCSR_ICF))
 	{
 		TAKE_ICI;
-		if( m6800.irq_callback )
-			(void)(*m6800.irq_callback)(M6800_TIN_LINE);
+		if( m68xx.irq_callback )
+			(void)(*m68xx.irq_callback)(m68xx.device, M6800_TIN_LINE);
 	}
-	else if ((m6800.tcsr & (TCSR_EOCI|TCSR_OCF)) == (TCSR_EOCI|TCSR_OCF))
+	else if ((m68xx.tcsr & (TCSR_EOCI|TCSR_OCF)) == (TCSR_EOCI|TCSR_OCF))
 	{
 		TAKE_OCI;
 	}
-	else if ((m6800.tcsr & (TCSR_ETOI|TCSR_TOF)) == (TCSR_ETOI|TCSR_TOF))
+	else if ((m68xx.tcsr & (TCSR_ETOI|TCSR_TOF)) == (TCSR_ETOI|TCSR_TOF))
 	{
 		TAKE_TOI;
 	}
-	else if (((m6800.trcsr & (M6800_TRCSR_RIE|M6800_TRCSR_RDRF)) == (M6800_TRCSR_RIE|M6800_TRCSR_RDRF)) ||
-			 ((m6800.trcsr & (M6800_TRCSR_RIE|M6800_TRCSR_ORFE)) == (M6800_TRCSR_RIE|M6800_TRCSR_ORFE)) ||
-			 ((m6800.trcsr & (M6800_TRCSR_TIE|M6800_TRCSR_TDRE)) == (M6800_TRCSR_TIE|M6800_TRCSR_TDRE)))
+	else if (((m68xx.trcsr & (M6800_TRCSR_RIE|M6800_TRCSR_RDRF)) == (M6800_TRCSR_RIE|M6800_TRCSR_RDRF)) ||
+			 ((m68xx.trcsr & (M6800_TRCSR_RIE|M6800_TRCSR_ORFE)) == (M6800_TRCSR_RIE|M6800_TRCSR_ORFE)) ||
+			 ((m68xx.trcsr & (M6800_TRCSR_TIE|M6800_TRCSR_TDRE)) == (M6800_TRCSR_TIE|M6800_TRCSR_TDRE)))
 	{
 		TAKE_SCI;
 	}
@@ -582,10 +576,10 @@ static void check_timer_event(void)
 	if( CTD >= OCD)
 	{
 		OCH++;	// next IRQ point
-		m6800.tcsr |= TCSR_OCF;
-		m6800.pending_tcsr |= TCSR_OCF;
+		m68xx.tcsr |= TCSR_OCF;
+		m68xx.pending_tcsr |= TCSR_OCF;
 		MODIFIED_tcsr;
-		if ( !(CC & 0x10) && (m6800.tcsr & TCSR_EOCI))
+		if ( !(CC & 0x10) && (m68xx.tcsr & TCSR_EOCI))
 			TAKE_OCI;
 	}
 	/* TOI */
@@ -595,10 +589,10 @@ static void check_timer_event(void)
 #if 0
 		CLEANUP_conters;
 #endif
-		m6800.tcsr |= TCSR_TOF;
-		m6800.pending_tcsr |= TCSR_TOF;
+		m68xx.tcsr |= TCSR_TOF;
+		m68xx.pending_tcsr |= TCSR_TOF;
 		MODIFIED_tcsr;
-		if ( !(CC & 0x10) && (m6800.tcsr & TCSR_ETOI))
+		if ( !(CC & 0x10) && (m68xx.tcsr & TCSR_ETOI))
 			TAKE_TOI;
 	}
 	/* set next event */
@@ -614,13 +608,13 @@ static void check_timer_event(void)
 #if (HAS_M6801||HAS_M6803||HAS_HD63701)
 static void m6800_tx(int value)
 {
-	m6800.port2_data = (m6800.port2_data & 0xef) | (value << 4);
+	m68xx.port2_data = (m68xx.port2_data & 0xef) | (value << 4);
 
-	if(m6800.port2_ddr == 0xff)
-		io_write_byte_8be(M6803_PORT2,m6800.port2_data);
+	if(m68xx.port2_ddr == 0xff)
+		io_write_byte_8be(M6803_PORT2,m68xx.port2_data);
 	else
-		io_write_byte_8be(M6803_PORT2,(m6800.port2_data & m6800.port2_ddr)
-			| (io_read_byte_8be(M6803_PORT2) & (m6800.port2_ddr ^ 0xff)));
+		io_write_byte_8be(M6803_PORT2,(m68xx.port2_data & m68xx.port2_ddr)
+			| (io_read_byte_8be(M6803_PORT2) & (m68xx.port2_ddr ^ 0xff)));
 }
 
 static int m6800_rx(void)
@@ -632,125 +626,125 @@ static TIMER_CALLBACK(m6800_tx_tick)
 {
     int cpunum = param;
 
-	if (m6800.trcsr & M6800_TRCSR_TE)
+	if (m68xx.trcsr & M6800_TRCSR_TE)
 	{
 		// force Port 2 bit 4 as output
-		m6800.port2_ddr |= M6800_PORT2_IO4;
+		m68xx.port2_ddr |= M6800_PORT2_IO4;
 
-		switch (m6800.txstate)
+		switch (m68xx.txstate)
 		{
 		case M6800_TX_STATE_INIT:
-			m6800.tx = 1;
-			m6800.txbits++;
+			m68xx.tx = 1;
+			m68xx.txbits++;
 
-			if (m6800.txbits == 10)
+			if (m68xx.txbits == 10)
 			{
-				m6800.txstate = M6800_TX_STATE_READY;
-				m6800.txbits = M6800_SERIAL_START;
+				m68xx.txstate = M6800_TX_STATE_READY;
+				m68xx.txbits = M6800_SERIAL_START;
 			}
 			break;
 
 		case M6800_TX_STATE_READY:
-			switch (m6800.txbits)
+			switch (m68xx.txbits)
 			{
 			case M6800_SERIAL_START:
-				if (m6800.trcsr & M6800_TRCSR_TDRE)
+				if (m68xx.trcsr & M6800_TRCSR_TDRE)
 				{
 					// transmit buffer is empty, send consecutive '1's
-					m6800.tx = 1;
+					m68xx.tx = 1;
 				}
 				else
 				{
 					// transmit buffer is full, send data
 
 					// load TDR to shift register
-					m6800.tsr = m6800.tdr;
+					m68xx.tsr = m68xx.tdr;
 
 					// transmit buffer is empty, set TDRE flag
-					m6800.trcsr |= M6800_TRCSR_TDRE;
+					m68xx.trcsr |= M6800_TRCSR_TDRE;
 
 					// send start bit '0'
-					m6800.tx = 0;
+					m68xx.tx = 0;
 
-					m6800.txbits++;
+					m68xx.txbits++;
 				}
 				break;
 
 			case M6800_SERIAL_STOP:
 				// send stop bit '1'
-				m6800.tx = 1;
+				m68xx.tx = 1;
 
 			    cpuintrf_push_context(cpunum);
 				CHECK_IRQ_LINES();
 				cpuintrf_pop_context();
 
-				m6800.txbits = M6800_SERIAL_START;
+				m68xx.txbits = M6800_SERIAL_START;
 				break;
 
 			default:
 				// send data bit '0' or '1'
-				m6800.tx = m6800.tsr & 0x01;
+				m68xx.tx = m68xx.tsr & 0x01;
 
 				// shift transmit register
-				m6800.tsr >>= 1;
+				m68xx.tsr >>= 1;
 
-				m6800.txbits++;
+				m68xx.txbits++;
 				break;
 			}
 			break;
 		}
 	}
 
-	m6800_tx(m6800.tx);
+	m6800_tx(m68xx.tx);
 }
 
 static TIMER_CALLBACK(m6800_rx_tick)
 {
     int cpunum = param;
 
-	if (m6800.trcsr & M6800_TRCSR_RE)
+	if (m68xx.trcsr & M6800_TRCSR_RE)
 	{
-		if (m6800.trcsr & M6800_TRCSR_WU)
+		if (m68xx.trcsr & M6800_TRCSR_WU)
 		{
 			// wait for 10 bits of '1'
 
 			if (m6800_rx() == 1)
 			{
-				m6800.rxbits++;
+				m68xx.rxbits++;
 
-				if (m6800.rxbits == 10)
+				if (m68xx.rxbits == 10)
 				{
-					m6800.trcsr &= ~M6800_TRCSR_WU;
-					m6800.rxbits = M6800_SERIAL_START;
+					m68xx.trcsr &= ~M6800_TRCSR_WU;
+					m68xx.rxbits = M6800_SERIAL_START;
 				}
 			}
 			else
 			{
-				m6800.rxbits = M6800_SERIAL_START;
+				m68xx.rxbits = M6800_SERIAL_START;
 			}
 		}
 		else
 		{
 			// receive data
 
-			switch (m6800.rxbits)
+			switch (m68xx.rxbits)
 			{
 			case M6800_SERIAL_START:
 				if (m6800_rx() == 0)
 				{
 					// start bit found
-					m6800.rxbits++;
+					m68xx.rxbits++;
 				}
 				break;
 
 			case M6800_SERIAL_STOP:
 				if (m6800_rx() == 1)
 				{
-					if (m6800.trcsr & M6800_TRCSR_RDRF)
+					if (m68xx.trcsr & M6800_TRCSR_RDRF)
 					{
 						// overrun error
 
-						m6800.trcsr |= M6800_TRCSR_ORFE;
+						m68xx.trcsr |= M6800_TRCSR_ORFE;
 
 					    cpuintrf_push_context(cpunum);
 						CHECK_IRQ_LINES();
@@ -758,13 +752,13 @@ static TIMER_CALLBACK(m6800_rx_tick)
 					}
 					else
 					{
-						if (!(m6800.trcsr & M6800_TRCSR_ORFE))
+						if (!(m68xx.trcsr & M6800_TRCSR_ORFE))
 						{
 							// transfer data into receive register
-							m6800.rdr = m6800.rsr;
+							m68xx.rdr = m68xx.rsr;
 
 							// set RDRF flag
-							m6800.trcsr |= M6800_TRCSR_RDRF;
+							m68xx.trcsr |= M6800_TRCSR_RDRF;
 
 							cpuintrf_push_context(cpunum);
 							CHECK_IRQ_LINES();
@@ -776,31 +770,31 @@ static TIMER_CALLBACK(m6800_rx_tick)
 				{
 					// framing error
 
-					if (!(m6800.trcsr & M6800_TRCSR_ORFE))
+					if (!(m68xx.trcsr & M6800_TRCSR_ORFE))
 					{
 						// transfer unframed data into receive register
-						m6800.rdr = m6800.rsr;
+						m68xx.rdr = m68xx.rsr;
 					}
 
-					m6800.trcsr |= M6800_TRCSR_ORFE;
-					m6800.trcsr &= ~M6800_TRCSR_RDRF;
+					m68xx.trcsr |= M6800_TRCSR_ORFE;
+					m68xx.trcsr &= ~M6800_TRCSR_RDRF;
 
 					cpuintrf_push_context(cpunum);
 					CHECK_IRQ_LINES();
 					cpuintrf_pop_context();
 				}
 
-				m6800.rxbits = M6800_SERIAL_START;
+				m68xx.rxbits = M6800_SERIAL_START;
 				break;
 
 			default:
 				// shift receive register
-				m6800.rsr >>= 1;
+				m68xx.rsr >>= 1;
 
 				// receive bit into register
-				m6800.rsr |= (m6800_rx() << 7);
+				m68xx.rsr |= (m6800_rx() << 7);
 
-				m6800.rxbits++;
+				m68xx.rxbits++;
 				break;
 			}
 		}
@@ -813,94 +807,95 @@ static TIMER_CALLBACK(m6800_rx_tick)
  ****************************************************************************/
 static void state_register(const char *type, int index)
 {
-	state_save_register_item(type, index, m6800.ppc.w.l);
-	state_save_register_item(type, index, m6800.pc.w.l);
-	state_save_register_item(type, index, m6800.s.w.l);
-	state_save_register_item(type, index, m6800.x.w.l);
-	state_save_register_item(type, index, m6800.d.w.l);
-	state_save_register_item(type, index, m6800.cc);
-	state_save_register_item(type, index, m6800.wai_state);
-	state_save_register_item(type, index, m6800.nmi_state);
-	state_save_register_item_array(type, index, m6800.irq_state);
-	state_save_register_item(type, index, m6800.ic_eddge);
+	state_save_register_item(type, index, m68xx.ppc.w.l);
+	state_save_register_item(type, index, m68xx.pc.w.l);
+	state_save_register_item(type, index, m68xx.s.w.l);
+	state_save_register_item(type, index, m68xx.x.w.l);
+	state_save_register_item(type, index, m68xx.d.w.l);
+	state_save_register_item(type, index, m68xx.cc);
+	state_save_register_item(type, index, m68xx.wai_state);
+	state_save_register_item(type, index, m68xx.nmi_state);
+	state_save_register_item_array(type, index, m68xx.irq_state);
+	state_save_register_item(type, index, m68xx.ic_eddge);
 
-	state_save_register_item(type, index, m6800.port1_ddr);
-	state_save_register_item(type, index, m6800.port2_ddr);
-	state_save_register_item(type, index, m6800.port3_ddr);
-	state_save_register_item(type, index, m6800.port4_ddr);
-	state_save_register_item(type, index, m6800.port1_data);
-	state_save_register_item(type, index, m6800.port2_data);
-	state_save_register_item(type, index, m6800.port3_data);
-	state_save_register_item(type, index, m6800.port4_data);
-	state_save_register_item(type, index, m6800.tcsr);
-	state_save_register_item(type, index, m6800.pending_tcsr);
-	state_save_register_item(type, index, m6800.irq2);
-	state_save_register_item(type, index, m6800.ram_ctrl);
+	state_save_register_item(type, index, m68xx.port1_ddr);
+	state_save_register_item(type, index, m68xx.port2_ddr);
+	state_save_register_item(type, index, m68xx.port3_ddr);
+	state_save_register_item(type, index, m68xx.port4_ddr);
+	state_save_register_item(type, index, m68xx.port1_data);
+	state_save_register_item(type, index, m68xx.port2_data);
+	state_save_register_item(type, index, m68xx.port3_data);
+	state_save_register_item(type, index, m68xx.port4_data);
+	state_save_register_item(type, index, m68xx.tcsr);
+	state_save_register_item(type, index, m68xx.pending_tcsr);
+	state_save_register_item(type, index, m68xx.irq2);
+	state_save_register_item(type, index, m68xx.ram_ctrl);
 
-	state_save_register_item(type, index, m6800.counter.d);
-	state_save_register_item(type, index, m6800.output_compare.d);
-	state_save_register_item(type, index, m6800.input_capture);
-	state_save_register_item(type, index, m6800.timer_over.d);
+	state_save_register_item(type, index, m68xx.counter.d);
+	state_save_register_item(type, index, m68xx.output_compare.d);
+	state_save_register_item(type, index, m68xx.input_capture);
+	state_save_register_item(type, index, m68xx.timer_over.d);
 
-	state_save_register_item(type, index, m6800.clock);
-	state_save_register_item(type, index, m6800.trcsr);
-	state_save_register_item(type, index, m6800.rmcr);
-	state_save_register_item(type, index, m6800.rdr);
-	state_save_register_item(type, index, m6800.tdr);
-	state_save_register_item(type, index, m6800.rsr);
-	state_save_register_item(type, index, m6800.tsr);
-	state_save_register_item(type, index, m6800.rxbits);
-	state_save_register_item(type, index, m6800.txbits);
-	state_save_register_item(type, index, m6800.txstate);
-	state_save_register_item(type, index, m6800.trcsr_read);
-	state_save_register_item(type, index, m6800.tx);
+	state_save_register_item(type, index, m68xx.clock);
+	state_save_register_item(type, index, m68xx.trcsr);
+	state_save_register_item(type, index, m68xx.rmcr);
+	state_save_register_item(type, index, m68xx.rdr);
+	state_save_register_item(type, index, m68xx.tdr);
+	state_save_register_item(type, index, m68xx.rsr);
+	state_save_register_item(type, index, m68xx.tsr);
+	state_save_register_item(type, index, m68xx.rxbits);
+	state_save_register_item(type, index, m68xx.txbits);
+	state_save_register_item(type, index, m68xx.txstate);
+	state_save_register_item(type, index, m68xx.trcsr_read);
+	state_save_register_item(type, index, m68xx.tx);
 }
 
-static void m6800_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( m6800 )
 {
-//  m6800.subtype   = SUBTYPE_M6800;
-	m6800.insn = m6800_insn;
-	m6800.cycles = cycles_6800;
-	m6800.irq_callback = irqcallback;
+//  m68xx.subtype   = SUBTYPE_M6800;
+	m68xx.insn = m6800_insn;
+	m68xx.cycles = cycles_6800;
+	m68xx.irq_callback = irqcallback;
+	m68xx.device = device;
 	state_register("m6800", index);
 }
 
-static void m6800_reset(void)
+static CPU_RESET( m6800 )
 {
 	SEI;				/* IRQ disabled */
 	PCD = RM16( 0xfffe );
 	CHANGE_PC();
 
-	m6800.wai_state = 0;
-	m6800.nmi_state = 0;
-	m6800.irq_state[M6800_IRQ_LINE] = 0;
-	m6800.irq_state[M6800_TIN_LINE] = 0;
-	m6800.ic_eddge = 0;
+	m68xx.wai_state = 0;
+	m68xx.nmi_state = 0;
+	m68xx.irq_state[M6800_IRQ_LINE] = 0;
+	m68xx.irq_state[M6800_TIN_LINE] = 0;
+	m68xx.ic_eddge = 0;
 
-	m6800.port1_ddr = 0x00;
-	m6800.port2_ddr = 0x00;
+	m68xx.port1_ddr = 0x00;
+	m68xx.port2_ddr = 0x00;
 	/* TODO: on reset port 2 should be read to determine the operating mode (bits 0-2) */
-	m6800.tcsr = 0x00;
-	m6800.pending_tcsr = 0x00;
-	m6800.irq2 = 0;
+	m68xx.tcsr = 0x00;
+	m68xx.pending_tcsr = 0x00;
+	m68xx.irq2 = 0;
 	CTD = 0x0000;
 	OCD = 0xffff;
 	TOD = 0xffff;
-	m6800.ram_ctrl |= 0x40;
+	m68xx.ram_ctrl |= 0x40;
 
-	m6800.trcsr = M6800_TRCSR_TDRE;
-	m6800.rmcr = 0;
+	m68xx.trcsr = M6800_TRCSR_TDRE;
+	m68xx.rmcr = 0;
 	if (m6800_rx_timer) timer_enable(m6800_rx_timer, 0);
 	if (m6800_tx_timer) timer_enable(m6800_tx_timer, 0);
-	m6800.txstate = M6800_TX_STATE_INIT;
-	m6800.txbits = m6800.rxbits = 0;
-	m6800.trcsr_read = 0;
+	m68xx.txstate = M6800_TX_STATE_INIT;
+	m68xx.txbits = m68xx.rxbits = 0;
+	m68xx.trcsr_read = 0;
 }
 
 /****************************************************************************
  * Shut down CPU emulation
  ****************************************************************************/
-static void m6800_exit(void)
+static CPU_EXIT( m6800 )
 {
 	/* nothing to do */
 }
@@ -911,7 +906,7 @@ static void m6800_exit(void)
 static void m6800_get_context(void *dst)
 {
 	if( dst )
-		*(m6800_Regs*)dst = m6800;
+		*(m6800_Regs*)dst = m68xx;
 }
 
 
@@ -921,7 +916,7 @@ static void m6800_get_context(void *dst)
 static void m6800_set_context(void *src)
 {
 	if( src )
-		m6800 = *(m6800_Regs*)src;
+		m68xx = *(m6800_Regs*)src;
 	CHANGE_PC();
 	CHECK_IRQ_LINES(); /* HJB 990417 */
 }
@@ -931,9 +926,9 @@ static void set_irq_line(int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
 	{
-		if (m6800.nmi_state == state) return;
+		if (m68xx.nmi_state == state) return;
 		LOG(("M6800#%d set_nmi_line %d \n", cpu_getactivecpu(), state));
-		m6800.nmi_state = state;
+		m68xx.nmi_state = state;
 		if (state == CLEAR_LINE) return;
 
 		/* NMI */
@@ -943,9 +938,9 @@ static void set_irq_line(int irqline, int state)
 	{
 		int eddge;
 
-		if (m6800.irq_state[irqline] == state) return;
+		if (m68xx.irq_state[irqline] == state) return;
 		LOG(("M6800#%d set_irq_line %d,%d\n", cpu_getactivecpu(), irqline, state));
-		m6800.irq_state[irqline] = state;
+		m68xx.irq_state[irqline] = state;
 
 		switch(irqline)
 		{
@@ -954,12 +949,12 @@ static void set_irq_line(int irqline, int state)
 			break;
 		case M6800_TIN_LINE:
 			eddge = (state == CLEAR_LINE ) ? 2 : 0;
-			if( ((m6800.tcsr&TCSR_IEDG) ^ (state==CLEAR_LINE ? TCSR_IEDG : 0))==0 )
+			if( ((m68xx.tcsr&TCSR_IEDG) ^ (state==CLEAR_LINE ? TCSR_IEDG : 0))==0 )
 				return;
 			/* active edge in */
-			m6800.tcsr |= TCSR_ICF;
-			m6800.pending_tcsr |= TCSR_ICF;
-			m6800.input_capture = CT;
+			m68xx.tcsr |= TCSR_ICF;
+			m68xx.pending_tcsr |= TCSR_ICF;
+			m68xx.input_capture = CT;
 			MODIFIED_tcsr;
 			if( !(CC & 0x10) )
 				m6800_check_irq2();
@@ -974,18 +969,18 @@ static void set_irq_line(int irqline, int state)
 /****************************************************************************
  * Execute cycles CPU cycles. Return number of cycles really executed
  ****************************************************************************/
-static int m6800_execute(int cycles)
+static CPU_EXECUTE( m6800 )
 {
 	UINT8 ireg;
 	m6800_ICount = cycles;
 
 	CLEANUP_conters;
-	INCREMENT_COUNTER(m6800.extra_cycles);
-	m6800.extra_cycles = 0;
+	INCREMENT_COUNTER(m68xx.extra_cycles);
+	m68xx.extra_cycles = 0;
 
 	do
 	{
-		if( m6800.wai_state & M6800_WAI )
+		if( m68xx.wai_state & M6800_WAI )
 		{
 			EAT_CYCLES;
 		}
@@ -1259,8 +1254,8 @@ static int m6800_execute(int cycles)
 		}
 	} while( m6800_ICount>0 );
 
-	INCREMENT_COUNTER(m6800.extra_cycles);
-	m6800.extra_cycles = 0;
+	INCREMENT_COUNTER(m68xx.extra_cycles);
+	m68xx.extra_cycles = 0;
 
 	return cycles - m6800_ICount;
 }
@@ -1269,14 +1264,15 @@ static int m6800_execute(int cycles)
  * M6801 almost (fully?) equal to the M6803
  ****************************************************************************/
 #if (HAS_M6801)
-static void m6801_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( m6801 )
 {
-//  m6800.subtype = SUBTYPE_M6801;
-	m6800.insn = m6803_insn;
-	m6800.cycles = cycles_6803;
-	m6800.irq_callback = irqcallback;
+//  m68xx.subtype = SUBTYPE_M6801;
+	m68xx.insn = m6803_insn;
+	m68xx.cycles = cycles_6803;
+	m68xx.irq_callback = irqcallback;
+	m68xx.device = device;
 
-	m6800.clock = clock;
+	m68xx.clock = clock;
 	m6800_rx_timer = timer_alloc(m6800_rx_tick, NULL);
 	m6800_tx_timer = timer_alloc(m6800_tx_tick, NULL);
 
@@ -1288,12 +1284,13 @@ static void m6801_init(int index, int clock, const void *config, int (*irqcallba
  * M6802 almost (fully?) equal to the M6800
  ****************************************************************************/
 #if (HAS_M6802)
-static void m6802_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( m6802 )
 {
-//  m6800.subtype   = SUBTYPE_M6802;
-	m6800.insn = m6800_insn;
-	m6800.cycles = cycles_6800;
-	m6800.irq_callback = irqcallback;
+//  m68xx.subtype   = SUBTYPE_M6802;
+	m68xx.insn = m6800_insn;
+	m68xx.cycles = cycles_6800;
+	m68xx.irq_callback = irqcallback;
+	m68xx.device = device;
 	state_register("m6802", index);
 }
 #endif
@@ -1302,14 +1299,15 @@ static void m6802_init(int index, int clock, const void *config, int (*irqcallba
  * M6803 almost (fully?) equal to the M6801
  ****************************************************************************/
 #if (HAS_M6803)
-static void m6803_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( m6803 )
 {
-//  m6800.subtype = SUBTYPE_M6803;
-	m6800.insn = m6803_insn;
-	m6800.cycles = cycles_6803;
-	m6800.irq_callback = irqcallback;
+//  m68xx.subtype = SUBTYPE_M6803;
+	m68xx.insn = m6803_insn;
+	m68xx.cycles = cycles_6803;
+	m68xx.irq_callback = irqcallback;
+	m68xx.device = device;
 
-	m6800.clock = clock;
+	m68xx.clock = clock;
 	m6800_rx_timer = timer_alloc(m6800_rx_tick, NULL);
 	m6800_tx_timer = timer_alloc(m6800_tx_tick, NULL);
 
@@ -1321,18 +1319,18 @@ static void m6803_init(int index, int clock, const void *config, int (*irqcallba
  * Execute cycles CPU cycles. Return number of cycles really executed
  ****************************************************************************/
 #if (HAS_M6803||HAS_M6801)
-static int m6803_execute(int cycles)
+static CPU_EXECUTE( m6803 )
 {
 	UINT8 ireg;
 	m6800_ICount = cycles;
 
 	CLEANUP_conters;
-	INCREMENT_COUNTER(m6803.extra_cycles);
-	m6803.extra_cycles = 0;
+	INCREMENT_COUNTER(m68xx.extra_cycles);
+	m68xx.extra_cycles = 0;
 
 	do
 	{
-		if( m6803.wai_state & M6800_WAI )
+		if( m68xx.wai_state & M6800_WAI )
 		{
 			EAT_CYCLES;
 		}
@@ -1606,8 +1604,8 @@ static int m6803_execute(int cycles)
 		}
 	} while( m6800_ICount>0 );
 
-	INCREMENT_COUNTER(m6803.extra_cycles);
-	m6803.extra_cycles = 0;
+	INCREMENT_COUNTER(m68xx.extra_cycles);
+	m68xx.extra_cycles = 0;
 
 	return cycles - m6800_ICount;
 }
@@ -1630,12 +1628,13 @@ ADDRESS_MAP_END
  * M6808 almost (fully?) equal to the M6800
  ****************************************************************************/
 #if (HAS_M6808)
-static void m6808_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( m6808 )
 {
-//  m6800.subtype = SUBTYPE_M6808;
-	m6800.insn = m6800_insn;
-	m6800.cycles = cycles_6800;
-	m6800.irq_callback = irqcallback;
+//  m68xx.subtype = SUBTYPE_M6808;
+	m68xx.insn = m6800_insn;
+	m68xx.cycles = cycles_6800;
+	m68xx.irq_callback = irqcallback;
+	m68xx.device = device;
 	state_register("m6808", index);
 }
 #endif
@@ -1645,14 +1644,15 @@ static void m6808_init(int index, int clock, const void *config, int (*irqcallba
  ****************************************************************************/
 #if (HAS_HD63701)
 
-static void hd63701_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( hd63701 )
 {
-//  m6800.subtype = SUBTYPE_HD63701;
-	m6800.insn = hd63701_insn;
-	m6800.cycles = cycles_63701;
-	m6800.irq_callback = irqcallback;
+//  m68xx.subtype = SUBTYPE_HD63701;
+	m68xx.insn = hd63701_insn;
+	m68xx.cycles = cycles_63701;
+	m68xx.irq_callback = irqcallback;
+	m68xx.device = device;
 
-	m6800.clock = clock;
+	m68xx.clock = clock;
 	m6800_rx_timer = timer_alloc(m6800_rx_tick, NULL);
 	m6800_tx_timer = timer_alloc(m6800_tx_tick, NULL);
 
@@ -1661,18 +1661,18 @@ static void hd63701_init(int index, int clock, const void *config, int (*irqcall
 /****************************************************************************
  * Execute cycles CPU cycles. Return number of cycles really executed
  ****************************************************************************/
-static int hd63701_execute(int cycles)
+static CPU_EXECUTE( hd63701 )
 {
 	UINT8 ireg;
 	m6800_ICount = cycles;
 
 	CLEANUP_conters;
-	INCREMENT_COUNTER(hd63701.extra_cycles);
-	hd63701.extra_cycles = 0;
+	INCREMENT_COUNTER(m68xx.extra_cycles);
+	m68xx.extra_cycles = 0;
 
 	do
 	{
-		if( hd63701.wai_state & (HD63701_WAI|HD63701_SLP) )
+		if( m68xx.wai_state & (HD63701_WAI|HD63701_SLP) )
 		{
 			EAT_CYCLES;
 		}
@@ -1946,8 +1946,8 @@ static int hd63701_execute(int cycles)
 		}
 	} while( m6800_ICount>0 );
 
-	INCREMENT_COUNTER(hd63701.extra_cycles);
-	hd63701.extra_cycles = 0;
+	INCREMENT_COUNTER(m68xx.extra_cycles);
+	m68xx.extra_cycles = 0;
 
 	return cycles - m6800_ICount;
 }
@@ -1983,28 +1983,28 @@ WRITE8_HANDLER( hd63701_internal_registers_w )
  * is at least one new opcode ($fc)
  ****************************************************************************/
 #if (HAS_NSC8105)
-static void nsc8105_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( nsc8105 )
 {
-//  m6800.subtype = SUBTYPE_NSC8105;
-	m6800.insn = nsc8105_insn;
-	m6800.cycles = cycles_nsc8105;
+//  m68xx.subtype = SUBTYPE_NSC8105;
+	m68xx.insn = nsc8105_insn;
+	m68xx.cycles = cycles_nsc8105;
 	state_register("nsc8105", index);
 }
 /****************************************************************************
  * Execute cycles CPU cycles. Return number of cycles really executed
  ****************************************************************************/
-static int nsc8105_execute(int cycles)
+static CPU_EXECUTE( nsc8105 )
 {
 	UINT8 ireg;
 	m6800_ICount = cycles;
 
 	CLEANUP_conters;
-	INCREMENT_COUNTER(nsc8105.extra_cycles);
-	nsc8105.extra_cycles = 0;
+	INCREMENT_COUNTER(m68xx.extra_cycles);
+	m68xx.extra_cycles = 0;
 
 	do
 	{
-		if( nsc8105.wai_state & NSC8105_WAI )
+		if( m68xx.wai_state & NSC8105_WAI )
 		{
 			EAT_CYCLES;
 		}
@@ -2278,8 +2278,8 @@ static int nsc8105_execute(int cycles)
 		}
 	} while( m6800_ICount>0 );
 
-	INCREMENT_COUNTER(nsc8105.extra_cycles);
-	nsc8105.extra_cycles = 0;
+	INCREMENT_COUNTER(m68xx.extra_cycles);
+	m68xx.extra_cycles = 0;
 
 	return cycles - m6800_ICount;
 }
@@ -2293,80 +2293,80 @@ static READ8_HANDLER( m6803_internal_registers_r )
 	switch (offset)
 	{
 		case 0x00:
-			return m6800.port1_ddr;
+			return m68xx.port1_ddr;
 		case 0x01:
-			return m6800.port2_ddr;
+			return m68xx.port2_ddr;
 		case 0x02:
-			return (io_read_byte_8be(M6803_PORT1) & (m6800.port1_ddr ^ 0xff))
-					| (m6800.port1_data & m6800.port1_ddr);
+			return (io_read_byte_8be(M6803_PORT1) & (m68xx.port1_ddr ^ 0xff))
+					| (m68xx.port1_data & m68xx.port1_ddr);
 		case 0x03:
-			return (io_read_byte_8be(M6803_PORT2) & (m6800.port2_ddr ^ 0xff))
-					| (m6800.port2_data & m6800.port2_ddr);
+			return (io_read_byte_8be(M6803_PORT2) & (m68xx.port2_ddr ^ 0xff))
+					| (m68xx.port2_data & m68xx.port2_ddr);
 		case 0x04:
-			return m6800.port3_ddr;
+			return m68xx.port3_ddr;
 		case 0x05:
-			return m6800.port4_ddr;
+			return m68xx.port4_ddr;
 		case 0x06:
-			return (io_read_byte_8be(M6803_PORT3) & (m6800.port3_ddr ^ 0xff))
-					| (m6800.port3_data & m6800.port3_ddr);
+			return (io_read_byte_8be(M6803_PORT3) & (m68xx.port3_ddr ^ 0xff))
+					| (m68xx.port3_data & m68xx.port3_ddr);
 		case 0x07:
-			return (io_read_byte_8be(M6803_PORT4) & (m6800.port4_ddr ^ 0xff))
-					| (m6800.port4_data & m6800.port4_ddr);
+			return (io_read_byte_8be(M6803_PORT4) & (m68xx.port4_ddr ^ 0xff))
+					| (m68xx.port4_data & m68xx.port4_ddr);
 		case 0x08:
-			m6800.pending_tcsr = 0;
-			return m6800.tcsr;
+			m68xx.pending_tcsr = 0;
+			return m68xx.tcsr;
 		case 0x09:
-			if(!(m6800.pending_tcsr&TCSR_TOF))
+			if(!(m68xx.pending_tcsr&TCSR_TOF))
 			{
-				m6800.tcsr &= ~TCSR_TOF;
+				m68xx.tcsr &= ~TCSR_TOF;
 				MODIFIED_tcsr;
 			}
-			return m6800.counter.b.h;
+			return m68xx.counter.b.h;
 		case 0x0a:
-			return m6800.counter.b.l;
+			return m68xx.counter.b.l;
 		case 0x0b:
-			if(!(m6800.pending_tcsr&TCSR_OCF))
+			if(!(m68xx.pending_tcsr&TCSR_OCF))
 			{
-				m6800.tcsr &= ~TCSR_OCF;
+				m68xx.tcsr &= ~TCSR_OCF;
 				MODIFIED_tcsr;
 			}
-			return m6800.output_compare.b.h;
+			return m68xx.output_compare.b.h;
 		case 0x0c:
-			if(!(m6800.pending_tcsr&TCSR_OCF))
+			if(!(m68xx.pending_tcsr&TCSR_OCF))
 			{
-				m6800.tcsr &= ~TCSR_OCF;
+				m68xx.tcsr &= ~TCSR_OCF;
 				MODIFIED_tcsr;
 			}
-			return m6800.output_compare.b.l;
+			return m68xx.output_compare.b.l;
 		case 0x0d:
-			if(!(m6800.pending_tcsr&TCSR_ICF))
+			if(!(m68xx.pending_tcsr&TCSR_ICF))
 			{
-				m6800.tcsr &= ~TCSR_ICF;
+				m68xx.tcsr &= ~TCSR_ICF;
 				MODIFIED_tcsr;
 			}
-			return (m6800.input_capture >> 0) & 0xff;
+			return (m68xx.input_capture >> 0) & 0xff;
 		case 0x0e:
-			return (m6800.input_capture >> 8) & 0xff;
+			return (m68xx.input_capture >> 8) & 0xff;
 		case 0x0f:
 			logerror("CPU #%d PC %04x: warning - read from unsupported register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),offset);
 			return 0;
 		case 0x10:
-			return m6800.rmcr;
+			return m68xx.rmcr;
 		case 0x11:
-			m6800.trcsr_read = 1;
-			return m6800.trcsr;
+			m68xx.trcsr_read = 1;
+			return m68xx.trcsr;
 		case 0x12:
-			if (m6800.trcsr_read)
+			if (m68xx.trcsr_read)
 			{
-				m6800.trcsr_read = 0;
-				m6800.trcsr = m6800.trcsr & 0x3f;
+				m68xx.trcsr_read = 0;
+				m68xx.trcsr = m68xx.trcsr & 0x3f;
 			}
-			return m6800.rdr;
+			return m68xx.rdr;
 		case 0x13:
-			return m6800.tdr;
+			return m68xx.tdr;
 		case 0x14:
 			logerror("CPU #%d PC %04x: read RAM control register\n",cpu_getactivecpu(),activecpu_get_pc());
-			return m6800.ram_ctrl;
+			return m68xx.ram_ctrl;
 		case 0x15:
 		case 0x16:
 		case 0x17:
@@ -2391,94 +2391,94 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 	switch (offset)
 	{
 		case 0x00:
-			if (m6800.port1_ddr != data)
+			if (m68xx.port1_ddr != data)
 			{
-				m6800.port1_ddr = data;
-				if(m6800.port1_ddr == 0xff)
-					io_write_byte_8be(M6803_PORT1,m6800.port1_data);
+				m68xx.port1_ddr = data;
+				if(m68xx.port1_ddr == 0xff)
+					io_write_byte_8be(M6803_PORT1,m68xx.port1_data);
 				else
-					io_write_byte_8be(M6803_PORT1,(m6800.port1_data & m6800.port1_ddr)
-						| (io_read_byte_8be(M6803_PORT1) & (m6800.port1_ddr ^ 0xff)));
+					io_write_byte_8be(M6803_PORT1,(m68xx.port1_data & m68xx.port1_ddr)
+						| (io_read_byte_8be(M6803_PORT1) & (m68xx.port1_ddr ^ 0xff)));
 			}
 			break;
 		case 0x01:
-			if (m6800.port2_ddr != data)
+			if (m68xx.port2_ddr != data)
 			{
-				m6800.port2_ddr = data;
-				if(m6800.port2_ddr == 0xff)
-					io_write_byte_8be(M6803_PORT2,m6800.port2_data);
+				m68xx.port2_ddr = data;
+				if(m68xx.port2_ddr == 0xff)
+					io_write_byte_8be(M6803_PORT2,m68xx.port2_data);
 				else
-					io_write_byte_8be(M6803_PORT2,(m6800.port2_data & m6800.port2_ddr)
-						| (io_read_byte_8be(M6803_PORT2) & (m6800.port2_ddr ^ 0xff)));
+					io_write_byte_8be(M6803_PORT2,(m68xx.port2_data & m68xx.port2_ddr)
+						| (io_read_byte_8be(M6803_PORT2) & (m68xx.port2_ddr ^ 0xff)));
 
-				if (m6800.port2_ddr & 2)
+				if (m68xx.port2_ddr & 2)
 					logerror("CPU #%d PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",cpu_getactivecpu(),activecpu_get_pc());
 			}
 			break;
 		case 0x02:
-			m6800.port1_data = data;
-			if(m6800.port1_ddr == 0xff)
-				io_write_byte_8be(M6803_PORT1,m6800.port1_data);
+			m68xx.port1_data = data;
+			if(m68xx.port1_ddr == 0xff)
+				io_write_byte_8be(M6803_PORT1,m68xx.port1_data);
 			else
-				io_write_byte_8be(M6803_PORT1,(m6800.port1_data & m6800.port1_ddr)
-					| (io_read_byte_8be(M6803_PORT1) & (m6800.port1_ddr ^ 0xff)));
+				io_write_byte_8be(M6803_PORT1,(m68xx.port1_data & m68xx.port1_ddr)
+					| (io_read_byte_8be(M6803_PORT1) & (m68xx.port1_ddr ^ 0xff)));
 			break;
 		case 0x03:
-			if (m6800.trcsr & M6800_TRCSR_TE)
+			if (m68xx.trcsr & M6800_TRCSR_TE)
 			{
-				m6800.port2_data = (data & 0xef) | (m6800.tx << 4);
+				m68xx.port2_data = (data & 0xef) | (m68xx.tx << 4);
 			}
 			else
 			{
-				m6800.port2_data = data;
+				m68xx.port2_data = data;
 			}
-			if(m6800.port2_ddr == 0xff)
-				io_write_byte_8be(M6803_PORT2,m6800.port2_data);
+			if(m68xx.port2_ddr == 0xff)
+				io_write_byte_8be(M6803_PORT2,m68xx.port2_data);
 			else
-				io_write_byte_8be(M6803_PORT2,(m6800.port2_data & m6800.port2_ddr)
-					| (io_read_byte_8be(M6803_PORT2) & (m6800.port2_ddr ^ 0xff)));
+				io_write_byte_8be(M6803_PORT2,(m68xx.port2_data & m68xx.port2_ddr)
+					| (io_read_byte_8be(M6803_PORT2) & (m68xx.port2_ddr ^ 0xff)));
 			break;
 		case 0x04:
-			if (m6800.port3_ddr != data)
+			if (m68xx.port3_ddr != data)
 			{
-				m6800.port3_ddr = data;
-				if(m6800.port3_ddr == 0xff)
-					io_write_byte_8be(M6803_PORT3,m6800.port3_data);
+				m68xx.port3_ddr = data;
+				if(m68xx.port3_ddr == 0xff)
+					io_write_byte_8be(M6803_PORT3,m68xx.port3_data);
 				else
-					io_write_byte_8be(M6803_PORT3,(m6800.port3_data & m6800.port3_ddr)
-						| (io_read_byte_8be(M6803_PORT3) & (m6800.port3_ddr ^ 0xff)));
+					io_write_byte_8be(M6803_PORT3,(m68xx.port3_data & m68xx.port3_ddr)
+						| (io_read_byte_8be(M6803_PORT3) & (m68xx.port3_ddr ^ 0xff)));
 			}
 			break;
 		case 0x05:
-			if (m6800.port4_ddr != data)
+			if (m68xx.port4_ddr != data)
 			{
-				m6800.port4_ddr = data;
-				if(m6800.port4_ddr == 0xff)
-					io_write_byte_8be(M6803_PORT4,m6800.port4_data);
+				m68xx.port4_ddr = data;
+				if(m68xx.port4_ddr == 0xff)
+					io_write_byte_8be(M6803_PORT4,m68xx.port4_data);
 				else
-					io_write_byte_8be(M6803_PORT4,(m6800.port4_data & m6800.port4_ddr)
-						| (io_read_byte_8be(M6803_PORT4) & (m6800.port4_ddr ^ 0xff)));
+					io_write_byte_8be(M6803_PORT4,(m68xx.port4_data & m68xx.port4_ddr)
+						| (io_read_byte_8be(M6803_PORT4) & (m68xx.port4_ddr ^ 0xff)));
 			}
 			break;
 		case 0x06:
-			m6800.port3_data = data;
-			if(m6800.port3_ddr == 0xff)
-				io_write_byte_8be(M6803_PORT3,m6800.port3_data);
+			m68xx.port3_data = data;
+			if(m68xx.port3_ddr == 0xff)
+				io_write_byte_8be(M6803_PORT3,m68xx.port3_data);
 			else
-				io_write_byte_8be(M6803_PORT3,(m6800.port3_data & m6800.port3_ddr)
-					| (io_read_byte_8be(M6803_PORT3) & (m6800.port3_ddr ^ 0xff)));
+				io_write_byte_8be(M6803_PORT3,(m68xx.port3_data & m68xx.port3_ddr)
+					| (io_read_byte_8be(M6803_PORT3) & (m68xx.port3_ddr ^ 0xff)));
 			break;
 		case 0x07:
-			m6800.port4_data = data;
-			if(m6800.port4_ddr == 0xff)
-				io_write_byte_8be(M6803_PORT4,m6800.port4_data);
+			m68xx.port4_data = data;
+			if(m68xx.port4_ddr == 0xff)
+				io_write_byte_8be(M6803_PORT4,m68xx.port4_data);
 			else
-				io_write_byte_8be(M6803_PORT4,(m6800.port4_data & m6800.port4_ddr)
-					| (io_read_byte_8be(M6803_PORT4) & (m6800.port4_ddr ^ 0xff)));
+				io_write_byte_8be(M6803_PORT4,(m68xx.port4_data & m68xx.port4_ddr)
+					| (io_read_byte_8be(M6803_PORT4) & (m68xx.port4_ddr ^ 0xff)));
 			break;
 		case 0x08:
-			m6800.tcsr = data;
-			m6800.pending_tcsr &= m6800.tcsr;
+			m68xx.tcsr = data;
+			m68xx.pending_tcsr &= m68xx.tcsr;
 			MODIFIED_tcsr;
 			if( !(CC & 0x10) )
 				m6800_check_irq2();
@@ -2495,16 +2495,16 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			MODIFIED_counters;
 			break;
 		case 0x0b:
-			if( m6800.output_compare.b.h != data)
+			if( m68xx.output_compare.b.h != data)
 			{
-				m6800.output_compare.b.h = data;
+				m68xx.output_compare.b.h = data;
 				MODIFIED_counters;
 			}
 			break;
 		case 0x0c:
-			if( m6800.output_compare.b.l != data)
+			if( m68xx.output_compare.b.l != data)
 			{
-				m6800.output_compare.b.l = data;
+				m68xx.output_compare.b.l = data;
 				MODIFIED_counters;
 			}
 			break;
@@ -2517,9 +2517,9 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			logerror("CPU #%d PC %04x: warning - write %02x to unsupported internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
 			break;
 		case 0x10:
-			m6800.rmcr = data & 0x0f;
+			m68xx.rmcr = data & 0x0f;
 
-			switch ((m6800.rmcr & M6800_RMCR_CC_MASK) >> 2)
+			switch ((m68xx.rmcr & M6800_RMCR_CC_MASK) >> 2)
 			{
 			case 0:
 			case 3: // not implemented
@@ -2530,32 +2530,32 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			case 1:
 			case 2:
 				{
-					int divisor = M6800_RMCR_SS[m6800.rmcr & M6800_RMCR_SS_MASK];
+					int divisor = M6800_RMCR_SS[m68xx.rmcr & M6800_RMCR_SS_MASK];
 
-					timer_adjust_periodic(m6800_rx_timer, attotime_zero, cpu_getactivecpu(), ATTOTIME_IN_HZ(m6800.clock / divisor));
-					timer_adjust_periodic(m6800_tx_timer, attotime_zero, cpu_getactivecpu(), ATTOTIME_IN_HZ(m6800.clock / divisor));
+					timer_adjust_periodic(m6800_rx_timer, attotime_zero, cpu_getactivecpu(), ATTOTIME_IN_HZ(m68xx.clock / divisor));
+					timer_adjust_periodic(m6800_tx_timer, attotime_zero, cpu_getactivecpu(), ATTOTIME_IN_HZ(m68xx.clock / divisor));
 				}
 				break;
 			}
 			break;
 		case 0x11:
-			if ((data & M6800_TRCSR_TE) && !(m6800.trcsr & M6800_TRCSR_TE))
+			if ((data & M6800_TRCSR_TE) && !(m68xx.trcsr & M6800_TRCSR_TE))
 			{
-				m6800.txstate = M6800_TX_STATE_INIT;
+				m68xx.txstate = M6800_TX_STATE_INIT;
 			}
-			m6800.trcsr = (m6800.trcsr & 0xe0) | (data & 0x1f);
+			m68xx.trcsr = (m68xx.trcsr & 0xe0) | (data & 0x1f);
 			break;
 		case 0x13:
-			if (m6800.trcsr_read)
+			if (m68xx.trcsr_read)
 			{
-				m6800.trcsr_read = 0;
-				m6800.trcsr &= ~M6800_TRCSR_TDRE;
+				m68xx.trcsr_read = 0;
+				m68xx.trcsr &= ~M6800_TRCSR_TDRE;
 			}
-			m6800.tdr = data;
+			m68xx.tdr = data;
 			break;
 		case 0x14:
 			logerror("CPU #%d PC %04x: write %02x to RAM control register\n",cpu_getactivecpu(),activecpu_get_pc(),data);
-			m6800.ram_ctrl = data;
+			m68xx.ram_ctrl = data;
 			break;
 		case 0x15:
 		case 0x16:
@@ -2590,13 +2590,13 @@ static void m6800_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(INPUT_LINE_NMI, info->i);	break;
 
 		case CPUINFO_INT_PC:							PC = info->i; CHANGE_PC();				break;
-		case CPUINFO_INT_REGISTER + M6800_PC:			m6800.pc.w.l = info->i;					break;
+		case CPUINFO_INT_REGISTER + M6800_PC:			m68xx.pc.w.l = info->i;					break;
 		case CPUINFO_INT_SP:							S = info->i;							break;
-		case CPUINFO_INT_REGISTER + M6800_S:			m6800.s.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + M6800_CC:			m6800.cc = info->i;						break;
-		case CPUINFO_INT_REGISTER + M6800_A:			m6800.d.b.h = info->i;					break;
-		case CPUINFO_INT_REGISTER + M6800_B:			m6800.d.b.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + M6800_X:			m6800.x.w.l = info->i;					break;
+		case CPUINFO_INT_REGISTER + M6800_S:			m68xx.s.w.l = info->i;					break;
+		case CPUINFO_INT_REGISTER + M6800_CC:			m68xx.cc = info->i;						break;
+		case CPUINFO_INT_REGISTER + M6800_A:			m68xx.d.b.h = info->i;					break;
+		case CPUINFO_INT_REGISTER + M6800_B:			m68xx.d.b.l = info->i;					break;
+		case CPUINFO_INT_REGISTER + M6800_X:			m68xx.x.w.l = info->i;					break;
 	}
 }
 
@@ -2611,7 +2611,7 @@ void m6800_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m6800);				break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m68xx);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
@@ -2632,30 +2632,30 @@ void m6800_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + M6800_IRQ_LINE:	info->i = m6800.irq_state[M6800_IRQ_LINE]; break;
-		case CPUINFO_INT_INPUT_STATE + M6800_TIN_LINE:	info->i = m6800.irq_state[M6800_TIN_LINE]; break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = m6800.nmi_state;				break;
+		case CPUINFO_INT_INPUT_STATE + M6800_IRQ_LINE:	info->i = m68xx.irq_state[M6800_IRQ_LINE]; break;
+		case CPUINFO_INT_INPUT_STATE + M6800_TIN_LINE:	info->i = m68xx.irq_state[M6800_TIN_LINE]; break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = m68xx.nmi_state;				break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = m6800.ppc.w.l;				break;
+		case CPUINFO_INT_PREVIOUSPC:					info->i = m68xx.ppc.w.l;				break;
 
 		case CPUINFO_INT_PC:							info->i = PC;							break;
-		case CPUINFO_INT_REGISTER + M6800_PC:			info->i = m6800.pc.w.l;					break;
+		case CPUINFO_INT_REGISTER + M6800_PC:			info->i = m68xx.pc.w.l;					break;
 		case CPUINFO_INT_SP:							info->i = S;							break;
-		case CPUINFO_INT_REGISTER + M6800_S:			info->i = m6800.s.w.l;					break;
-		case CPUINFO_INT_REGISTER + M6800_CC:			info->i = m6800.cc;						break;
-		case CPUINFO_INT_REGISTER + M6800_A:			info->i = m6800.d.b.h;					break;
-		case CPUINFO_INT_REGISTER + M6800_B:			info->i = m6800.d.b.l;					break;
-		case CPUINFO_INT_REGISTER + M6800_X:			info->i = m6800.x.w.l;					break;
-		case CPUINFO_INT_REGISTER + M6800_WAI_STATE:	info->i = m6800.wai_state;				break;
+		case CPUINFO_INT_REGISTER + M6800_S:			info->i = m68xx.s.w.l;					break;
+		case CPUINFO_INT_REGISTER + M6800_CC:			info->i = m68xx.cc;						break;
+		case CPUINFO_INT_REGISTER + M6800_A:			info->i = m68xx.d.b.h;					break;
+		case CPUINFO_INT_REGISTER + M6800_B:			info->i = m68xx.d.b.l;					break;
+		case CPUINFO_INT_REGISTER + M6800_X:			info->i = m68xx.x.w.l;					break;
+		case CPUINFO_INT_REGISTER + M6800_WAI_STATE:	info->i = m68xx.wai_state;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m6800_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m6800_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m6800_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = m6800_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = m6800_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = m6800_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = m6800_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6800);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6800);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m6800);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6800);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6800_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6800_ICount;			break;
@@ -2669,23 +2669,23 @@ void m6800_get_info(UINT32 state, cpuinfo *info)
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",
-				m6800.cc & 0x80 ? '?':'.',
-				m6800.cc & 0x40 ? '?':'.',
-				m6800.cc & 0x20 ? 'H':'.',
-				m6800.cc & 0x10 ? 'I':'.',
-				m6800.cc & 0x08 ? 'N':'.',
-				m6800.cc & 0x04 ? 'Z':'.',
-				m6800.cc & 0x02 ? 'V':'.',
-				m6800.cc & 0x01 ? 'C':'.');
+				m68xx.cc & 0x80 ? '?':'.',
+				m68xx.cc & 0x40 ? '?':'.',
+				m68xx.cc & 0x20 ? 'H':'.',
+				m68xx.cc & 0x10 ? 'I':'.',
+				m68xx.cc & 0x08 ? 'N':'.',
+				m68xx.cc & 0x04 ? 'Z':'.',
+				m68xx.cc & 0x02 ? 'V':'.',
+				m68xx.cc & 0x01 ? 'C':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + M6800_A:			sprintf(info->s, "A:%02X", m6800.d.b.h); break;
-		case CPUINFO_STR_REGISTER + M6800_B:			sprintf(info->s, "B:%02X", m6800.d.b.l); break;
-		case CPUINFO_STR_REGISTER + M6800_PC:			sprintf(info->s, "PC:%04X", m6800.pc.w.l); break;
-		case CPUINFO_STR_REGISTER + M6800_S:			sprintf(info->s, "S:%04X", m6800.s.w.l); break;
-		case CPUINFO_STR_REGISTER + M6800_X:			sprintf(info->s, "X:%04X", m6800.x.w.l); break;
-		case CPUINFO_STR_REGISTER + M6800_CC:			sprintf(info->s, "CC:%02X", m6800.cc); break;
-		case CPUINFO_STR_REGISTER + M6800_WAI_STATE:	sprintf(info->s, "WAI:%X", m6800.wai_state); break;
+		case CPUINFO_STR_REGISTER + M6800_A:			sprintf(info->s, "A:%02X", m68xx.d.b.h); break;
+		case CPUINFO_STR_REGISTER + M6800_B:			sprintf(info->s, "B:%02X", m68xx.d.b.l); break;
+		case CPUINFO_STR_REGISTER + M6800_PC:			sprintf(info->s, "PC:%04X", m68xx.pc.w.l); break;
+		case CPUINFO_STR_REGISTER + M6800_S:			sprintf(info->s, "S:%04X", m68xx.s.w.l); break;
+		case CPUINFO_STR_REGISTER + M6800_X:			sprintf(info->s, "X:%04X", m68xx.x.w.l); break;
+		case CPUINFO_STR_REGISTER + M6800_CC:			sprintf(info->s, "CC:%02X", m68xx.cc); break;
+		case CPUINFO_STR_REGISTER + M6800_WAI_STATE:	sprintf(info->s, "WAI:%X", m68xx.wai_state); break;
 	}
 }
 
@@ -2705,8 +2705,8 @@ void m6801_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 9;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = m6801_init;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = m6803_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6801);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6803);			break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6801_dasm;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2731,7 +2731,7 @@ void m6802_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = m6802_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6802);				break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6802_dasm;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2758,8 +2758,8 @@ void m6803_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 9;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = m6803_init;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = m6803_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6803);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6803);			break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6803_dasm;			break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = address_map_m6803_mem; break;
@@ -2786,7 +2786,7 @@ void m6808_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = m6808_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6808);				break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6808_dasm;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2813,8 +2813,8 @@ void hd63701_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 9;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = hd63701_init;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = hd63701_execute;		break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(hd63701);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(hd63701);		break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = hd63701_dasm;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2839,8 +2839,8 @@ void nsc8105_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = nsc8105_init;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = nsc8105_execute;		break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(nsc8105);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(nsc8105);		break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = nsc8105_dasm;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

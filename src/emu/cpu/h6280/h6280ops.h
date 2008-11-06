@@ -98,13 +98,13 @@
 			 !(h6280.irq_mask & 0x2) )							\
 		{														\
 			DO_INTERRUPT(H6280_IRQ1_VEC);						\
-			(*h6280.irq_callback)(0);							\
+			(*h6280.irq_callback)(h6280.device, 0);				\
 		} else													\
 		if ( h6280.irq_state[1] != CLEAR_LINE &&				\
 			 !(h6280.irq_mask & 0x1) )							\
 		{														\
 			DO_INTERRUPT(H6280_IRQ2_VEC);						\
-			(*h6280.irq_callback)(1);							\
+			(*h6280.irq_callback)(h6280.device, 1);				\
         }                                                       \
     }
 

@@ -191,6 +191,6 @@ typedef struct {
 /* opcode execution table */
 extern Z8000_exec *z8000_exec;
 
-extern void z8000_init(int index, int clock, const void *config, int (*irqcallback)(int));
+extern CPU_INIT( z8000 );
 extern void z8000_deinit(void);
 

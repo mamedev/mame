@@ -183,7 +183,7 @@ INLINE void set_decrementer(powerpc_state *ppc, UINT32 newdec)
     structure based on the configured type
 -------------------------------------------------*/
 
-void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, int index, int clock, const powerpc_config *config, int (*irqcallback)(int))
+void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, const device_config *device, int index, int clock, const powerpc_config *config, cpu_irq_callback irqcallback)
 {
 	/* initialize based on the config */
 	memset(ppc, 0, sizeof(*ppc));
@@ -194,6 +194,7 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 	ppc->tb_divisor = tb_divisor;
 	ppc->cpu_clock = clock;
 	ppc->irq_callback = irqcallback;
+	ppc->device = device;
 	ppc->system_clock = (config != NULL) ? config->bus_frequency : clock;
 	ppc->tb_divisor = (ppc->tb_divisor * clock + ppc->system_clock / 2 - 1) / ppc->system_clock;
 

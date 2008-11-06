@@ -208,7 +208,8 @@ typedef struct			/* Page 3-6 (45) shows all registers */
 	int		init_load_addr;			/* 0=No, 1=Yes, 2=Once for repeat mode */
 	int		tms32025_irq_cycles;
 	int		tms32025_dec_cycles;
-	int		(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	UINT16 *datamap_save[16];
 	UINT16 *pgmmap_save[12];
 } tms32025_Regs;
@@ -1728,10 +1729,11 @@ static const opcode_fn opcode_CE_subset[256]=
 /****************************************************************************
  *  Inits CPU emulation
  ****************************************************************************/
-static void tms32025_init (int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( tms32025 )
 {
 	R.intRAM = auto_malloc(0x800*2);
 	R.irq_callback = irqcallback;
+	R.device = device;
 
 	state_save_register_item("tms32025", index, R.PC);
 	state_save_register_item("tms32025", index, R.STR0);
@@ -1770,7 +1772,7 @@ static void tms32025_init (int index, int clock, const void *config, int (*irqca
 /****************************************************************************
  *  Reset registers to their initial values
  ****************************************************************************/
-static void tms32025_reset (void)
+static CPU_RESET( tms32025 )
 {
 	SET_PC(0);			/* Starting address on a reset */
 	R.STR0 |= 0x0600;	/* INTM and unused bit set to 1 */
@@ -1804,9 +1806,9 @@ static void tms32025_reset (void)
 }
 
 #if (HAS_TMS32026)
-static void tms32026_reset (void)
+static CPU_RESET( tms32026 )
 {
-	tms32025_reset();
+	CPU_RESET_CALL(tms32025);
 
 	/* Reset the Data/Program address banks */
 	memset(tms32025_pgmmap, 0, sizeof(tms32025_pgmmap));
@@ -1832,7 +1834,7 @@ static void tms32026_reset (void)
 /****************************************************************************
  *  Shut down CPU emulation
  ****************************************************************************/
-static void tms32025_exit (void)
+static CPU_EXIT( tms32025 )
 {
 }
 
@@ -1858,7 +1860,7 @@ static int process_IRQs(void)
 		if ((R.IFR & 0x01) && (IMR & 0x01)) {		/* IRQ line 0 */
 			//logerror("TMS32025:  Active INT0\n");
 			SET_PC(0x0002);
-			(*R.irq_callback)(0);
+			(*R.irq_callback)(R.device, 0);
 			R.idle = 0;
 			R.IFR &= (~0x01);
 			SET0(INTM_FLAG);
@@ -1867,7 +1869,7 @@ static int process_IRQs(void)
 		if ((R.IFR & 0x02) && (IMR & 0x02)) {		/* IRQ line 1 */
 			//logerror("TMS32025:  Active INT1\n");
 			SET_PC(0x0004);
-			(*R.irq_callback)(1);
+			(*R.irq_callback)(R.device, 1);
 			R.idle = 0;
 			R.IFR &= (~0x02);
 			SET0(INTM_FLAG);
@@ -1876,7 +1878,7 @@ static int process_IRQs(void)
 		if ((R.IFR & 0x04) && (IMR & 0x04)) {		/* IRQ line 2 */
 			//logerror("TMS32025:  Active INT2\n");
 			SET_PC(0x0006);
-			(*R.irq_callback)(2);
+			(*R.irq_callback)(R.device, 2);
 			R.idle = 0;
 			R.IFR &= (~0x04);
 			SET0(INTM_FLAG);
@@ -1952,7 +1954,7 @@ again:
 /****************************************************************************
  *  Execute ICount cycles. Exit when 0 or less
  ****************************************************************************/
-static int tms32025_execute(int cycles)
+static CPU_EXECUTE( tms32025 )
 {
 	tms32025_icount = cycles;
 
@@ -2382,10 +2384,10 @@ void tms32025_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = tms32025_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = tms32025_get_context; break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = tms32025_set_context; break;
-		case CPUINFO_PTR_INIT:							info->init = tms32025_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = tms32025_reset;			break;
-		case CPUINFO_PTR_EXIT:							info->exit = tms32025_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = tms32025_execute;		break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tms32025);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms32025);			break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(tms32025);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tms32025);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tms32025_dasm;		break;
 		case CPUINFO_PTR_READ:							info->read = tms32025_read;				break;
@@ -2468,7 +2470,7 @@ void tms32026_get_info(UINT32 _state, cpuinfo *info)
 	switch (_state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_RESET:							info->reset = tms32026_reset;			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms32026);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS32026");			break;

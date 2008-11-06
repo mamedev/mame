@@ -74,7 +74,8 @@ static struct v60info {
 	Flags flags;
 	UINT8 irq_line;
 	UINT8 nmi_line;
-	int (*irq_cb)(int irqline);
+	cpu_irq_callback irq_cb;
+	const device_config *device;
 	UINT32 PPC;
 } v60;
 
@@ -294,16 +295,17 @@ static UINT32 opUNHANDLED(void)
 #include "optable.c"
 
 #ifdef UNUSED_FUNCTION
-static int v60_default_irq_cb(int irqline)
+static int v60_default_irq_cb(const device_config *device, int irqline)
 {
 	return 0;
 }
 #endif
 
-static void base_init(const char *type, int index, int (*irqcallback)(int))
+static void base_init(const char *type, const device_config *device, int index, cpu_irq_callback irqcallback)
 {
 	v60_stall_io = 0;
 	v60.irq_cb = irqcallback;
+	v60.device = device;
 	v60.irq_line = CLEAR_LINE;
 	v60.nmi_line = CLEAR_LINE;
 
@@ -317,25 +319,25 @@ static void base_init(const char *type, int index, int (*irqcallback)(int))
 	state_save_register_item(type, index, _Z);
 }
 
-static void v60_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( v60 )
 {
-	base_init("v60", index, irqcallback);
+	base_init("v60", device, index, irqcallback);
 	// Set PIR (Processor ID) for NEC v60. LSB is reserved to NEC,
 	// so I don't know what it contains.
 	PIR = 0x00006000;
 	v60.info = v60_i;
 }
 
-static void v70_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( v70 )
 {
-	base_init("v70", index, irqcallback);
+	base_init("v70", device, index, irqcallback);
 	// Set PIR (Processor ID) for NEC v70. LSB is reserved to NEC,
 	// so I don't know what it contains.
 	PIR = 0x00007000;
 	v60.info = v70_i;
 }
 
-static void v60_reset(void)
+static CPU_RESET( v60 )
 {
 	PSW		= 0x10000000;
 	PC		= v60.info.start_pc;
@@ -351,7 +353,7 @@ static void v60_reset(void)
 	_Z	= 0;
 }
 
-static void v60_exit(void)
+static CPU_EXIT( v60 )
 {
 }
 
@@ -383,7 +385,7 @@ static void v60_try_irq(void)
 		if(v60.irq_line != ASSERT_LINE)
 			v60.irq_line = CLEAR_LINE;
 
-		vector = v60.irq_cb(0);
+		vector = v60.irq_cb(v60.device, 0);
 
 		v60_do_irq(vector + 0x40);
 	} else if(v60.irq_line == PULSE_LINE)
@@ -417,7 +419,7 @@ static void set_irq_line(int irqline, int state)
 
 // Actual cycles/instruction is unknown
 
-static int v60_execute(int cycles)
+static CPU_EXECUTE( v60 )
 {
 	UINT32 inc;
 
@@ -635,10 +637,10 @@ void v60_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = v60_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = v60_get_context;		break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = v60_set_context;		break;
-		case CPUINFO_PTR_INIT:							info->init = v60_init;					break;
-		case CPUINFO_PTR_RESET:							info->reset = v60_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = v60_exit;					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = v60_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(v60);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(v60);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(v60);					break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(v60);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = v60_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &v60_ICount;				break;
@@ -728,7 +730,7 @@ void v70_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = v70_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(v70);					break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = v70_dasm;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

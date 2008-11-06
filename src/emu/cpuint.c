@@ -54,16 +54,16 @@ static int input_event_index[MAX_CPU][MAX_INPUT_LINES];
  *
  *************************************/
 
-static int cpu_0_irq_callback(int line);
-static int cpu_1_irq_callback(int line);
-static int cpu_2_irq_callback(int line);
-static int cpu_3_irq_callback(int line);
-static int cpu_4_irq_callback(int line);
-static int cpu_5_irq_callback(int line);
-static int cpu_6_irq_callback(int line);
-static int cpu_7_irq_callback(int line);
+static int cpu_0_irq_callback(const device_config *device, int line);
+static int cpu_1_irq_callback(const device_config *device, int line);
+static int cpu_2_irq_callback(const device_config *device, int line);
+static int cpu_3_irq_callback(const device_config *device, int line);
+static int cpu_4_irq_callback(const device_config *device, int line);
+static int cpu_5_irq_callback(const device_config *device, int line);
+static int cpu_6_irq_callback(const device_config *device, int line);
+static int cpu_7_irq_callback(const device_config *device, int line);
 
-int (*const cpu_irq_callbacks[MAX_CPU])(int) =
+cpu_irq_callback cpu_irq_callbacks[MAX_CPU] =
 {
 	cpu_0_irq_callback,
 	cpu_1_irq_callback,
@@ -399,7 +399,7 @@ void cpunum_set_irq_callback(int cpunum, int (*callback)(running_machine *, int)
  *
  *************************************/
 
-INLINE int cpu_irq_callback(running_machine *machine, int cpunum, int line)
+INLINE int generic_irq_callback(running_machine *machine, int cpunum, int line)
 {
 	int vector = input_line_vector[cpunum][line];
 
@@ -424,14 +424,11 @@ INLINE int cpu_irq_callback(running_machine *machine, int cpunum, int line)
 	return vector;
 }
 
-static int cpu_0_irq_callback(int line) { return cpu_irq_callback(Machine, 0, line); }
-static int cpu_1_irq_callback(int line) { return cpu_irq_callback(Machine, 1, line); }
-static int cpu_2_irq_callback(int line) { return cpu_irq_callback(Machine, 2, line); }
-static int cpu_3_irq_callback(int line) { return cpu_irq_callback(Machine, 3, line); }
-static int cpu_4_irq_callback(int line) { return cpu_irq_callback(Machine, 4, line); }
-static int cpu_5_irq_callback(int line) { return cpu_irq_callback(Machine, 5, line); }
-static int cpu_6_irq_callback(int line) { return cpu_irq_callback(Machine, 6, line); }
-static int cpu_7_irq_callback(int line) { return cpu_irq_callback(Machine, 7, line); }
-
-
-
+static int cpu_0_irq_callback(const device_config *device, int line) { return generic_irq_callback(device->machine, 0, line); }
+static int cpu_1_irq_callback(const device_config *device, int line) { return generic_irq_callback(device->machine, 1, line); }
+static int cpu_2_irq_callback(const device_config *device, int line) { return generic_irq_callback(device->machine, 2, line); }
+static int cpu_3_irq_callback(const device_config *device, int line) { return generic_irq_callback(device->machine, 3, line); }
+static int cpu_4_irq_callback(const device_config *device, int line) { return generic_irq_callback(device->machine, 4, line); }
+static int cpu_5_irq_callback(const device_config *device, int line) { return generic_irq_callback(device->machine, 5, line); }
+static int cpu_6_irq_callback(const device_config *device, int line) { return generic_irq_callback(device->machine, 6, line); }
+static int cpu_7_irq_callback(const device_config *device, int line) { return generic_irq_callback(device->machine, 7, line); }

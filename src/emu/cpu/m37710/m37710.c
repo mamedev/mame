@@ -768,7 +768,7 @@ void m37710i_update_irqs(void)
 
 	if (wantedIRQ != -1)
 	{
-		if (INT_ACK) INT_ACK(wantedIRQ);
+		if (INT_ACK) INT_ACK(m37710i_cpu.device, wantedIRQ);
 
 		// make sure we're running to service the interrupt
 		CPU_STOPPED &= ~STOP_LEVEL_WAI;
@@ -808,7 +808,7 @@ void m37710i_update_irqs(void)
 
 /* external functions */
 
-static void m37710_reset(void)
+static CPU_RESET( m37710 )
 {
 	/* Start the CPU */
 	CPU_STOPPED = 0;
@@ -848,7 +848,7 @@ static void m37710_reset(void)
 }
 
 /* Exit and clean up */
-void m37710_exit(void)
+CPU_EXIT( m37710 )
 {
 	/* nothing to do yet */
 }
@@ -870,7 +870,7 @@ void m37710_yield(void)
 #endif
 
 /* Execute some instructions */
-static int m37710_execute(int cycles)
+static CPU_EXECUTE( m37710 )
 {
 	m37710_fullCount = cycles;
 
@@ -950,7 +950,7 @@ static void m37710_set_irq_line(int line, int state)
 
 /* Set the callback that is called when servicing an interrupt */
 #ifdef UNUSED_FUNCTION
-void m37710_set_irq_callback(int (*callback)(int))
+void m37710_set_irq_callback(cpu_irq_callback callback)
 {
 	INT_ACK = callback;
 }
@@ -973,13 +973,14 @@ static STATE_POSTLOAD( m37710_restore_state )
 	m37710i_jumping(REG_PB | REG_PC);
 }
 
-static void m37710_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( m37710 )
 {
 	int i;
 
 	memset(&m37710i_cpu, 0, sizeof(m37710i_cpu));
 
 	INT_ACK = irqcallback;
+	m37710i_cpu.device = device;
 
 	m37710_ICount = 0;
 	m37710_fullCount = 0;
@@ -1146,10 +1147,10 @@ void m37710_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m37710_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m37710_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m37710_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = m37710_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = m37710_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = m37710_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = m37710_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m37710);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m37710);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m37710);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m37710);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m37710_dasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m37710_ICount;			break;

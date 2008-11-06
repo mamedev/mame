@@ -281,7 +281,8 @@ struct _cpuintrf_data
 	cpu_interface intf;		 		/* copy of the interface data */
 	cpu_type cputype; 					/* type index of this CPU */
 	int family; 					/* family index of this CPU */
-	void *context;					/* dynamically allocated context buffer */
+	device_config device;			/* dummy device for now */
+	int *icount;
 };
 
 
@@ -954,7 +955,7 @@ INLINE void set_cpu_context(running_machine *machine, int cpunum)
 
 	/* if we need to change contexts, save the one that was there */
 	if (oldcontext != cpunum && oldcontext != -1)
-		(*cpu[oldcontext].intf.get_context)(cpu[oldcontext].context);
+		(*cpu[oldcontext].intf.get_context)(cpu[oldcontext].device.token);
 
 	/* swap memory spaces */
 	activecpu = cpunum;
@@ -963,7 +964,7 @@ INLINE void set_cpu_context(running_machine *machine, int cpunum)
 	/* if the new CPU's context is not swapped in, do it now */
 	if (oldcontext != cpunum)
 	{
-		(*cpu[cpunum].intf.set_context)(cpu[cpunum].context);
+		(*cpu[cpunum].intf.set_context)(cpu[cpunum].device.token);
 		cpu_active_context[newfamily] = cpunum;
 	}
 }
@@ -1162,24 +1163,26 @@ void cpuintrf_set_dasm_override(int cpunum, offs_t (*dasm_override)(char *buffer
  *
  *************************************/
 
-int cpuintrf_init_cpu(int cpunum, cpu_type cputype, int clock, const void *config, int (*irqcallback)(int))
+int cpuintrf_init_cpu(int cpunum, cpu_type cputype, int clock, const void *config, cpu_irq_callback irqcallback)
 {
 	cpuinfo info;
 
-	/* allocate a context buffer for the CPU */
-	cpu[cpunum].context = auto_malloc(cpu[cpunum].intf.context_size);
-	memset(cpu[cpunum].context, 0, cpu[cpunum].intf.context_size);
+	/* create a fake device for the CPU */
+	memset(&cpu[cpunum].device, 0, sizeof(cpu[cpunum].device));
+	cpu[cpunum].device.machine = Machine;
+	cpu[cpunum].device.token = auto_malloc(cpu[cpunum].intf.context_size);
+	memset(cpu[cpunum].device.token, 0, cpu[cpunum].intf.context_size);
 
 	/* initialize the CPU and stash the context */
 	activecpu = cpunum;
-	(*cpu[cpunum].intf.init)(cpunum, clock, config, irqcallback);
-	(*cpu[cpunum].intf.get_context)(cpu[cpunum].context);
+	(*cpu[cpunum].intf.init)(&cpu[cpunum].device, cpunum, clock, config, irqcallback);
+	(*cpu[cpunum].intf.get_context)(cpu[cpunum].device.token);
 	activecpu = -1;
 
 	/* get the instruction count pointer */
 	info.icount = NULL;
 	(*cpu[cpunum].intf.get_info)(CPUINFO_PTR_INSTRUCTION_COUNTER, &info);
-	cpu[cpunum].intf.icount = info.icount;
+	cpu[cpunum].icount = info.icount;
 
 	/* clear out the registered CPU for this family */
 	cpu_active_context[cpu[cpunum].family] = -1;
@@ -1201,7 +1204,7 @@ void cpuintrf_exit_cpu(int cpunum)
 	{
 		/* switch contexts to the CPU during the exit */
 		cpuintrf_push_context(cpunum);
-		(*cpu[cpunum].intf.exit)();
+		(*cpu[cpunum].intf.exit)(&cpu[cpunum].device);
 		cpuintrf_pop_context();
 	}
 }
@@ -1295,14 +1298,14 @@ void activecpu_set_info_fct(UINT32 state, genf *data)
 void activecpu_adjust_icount(int delta)
 {
 	VERIFY_ACTIVECPU(activecpu_adjust_icount);
-	*cpu[activecpu].intf.icount += delta;
+	*cpu[activecpu].icount += delta;
 }
 
 
 int activecpu_get_icount(void)
 {
 	VERIFY_ACTIVECPU(activecpu_get_icount);
-	return *cpu[activecpu].intf.icount;
+	return *cpu[activecpu].icount;
 }
 
 
@@ -1529,7 +1532,7 @@ int cpunum_execute(int cpunum, int cycles)
 	cpuintrf_push_context(cpunum);
 	executingcpu = cpunum;
 	memory_set_opbase(activecpu_get_physical_pc_byte());
-	ran = (*cpu[cpunum].intf.execute)(cycles);
+	ran = (*cpu[cpunum].intf.execute)(&cpu[cpunum].device, cycles);
 	executingcpu = -1;
 	cpuintrf_pop_context();
 	return ran;
@@ -1545,7 +1548,7 @@ void cpunum_reset(int cpunum)
 	VERIFY_CPUNUM(cpunum_reset);
 	cpuintrf_push_context(cpunum);
 	memory_set_opbase(0);
-	(*cpu[cpunum].intf.reset)();
+	(*cpu[cpunum].intf.reset)(&cpu[cpunum].device);
 	cpuintrf_pop_context();
 }
 
@@ -1585,7 +1588,7 @@ void cpunum_write_byte(int cpunum, offs_t address, UINT8 data)
 void *cpunum_get_context_ptr(int cpunum)
 {
 	VERIFY_CPUNUM(cpunum_get_context_ptr);
-	return (cpu_active_context[cpu[cpunum].family] == cpunum) ? NULL : cpu[cpunum].context;
+	return (cpu_active_context[cpu[cpunum].family] == cpunum) ? NULL : cpu[cpunum].device.token;
 }
 
 
@@ -1704,10 +1707,10 @@ struct dummy_context
 static struct dummy_context dummy_state;
 static int dummy_icount;
 
-static void dummy_init(int index, int clock, const void *config, int (*irqcallback)(int)) { }
-static void dummy_reset(void) { }
-static void dummy_exit(void) { }
-static int dummy_execute(int cycles) { return cycles; }
+static CPU_INIT( dummy ) { }
+static CPU_RESET( dummy ) { }
+static CPU_EXIT( dummy ) { }
+static CPU_EXECUTE( dummy ) { return cycles; }
 static void dummy_get_context(void *regs) { }
 static void dummy_set_context(void *regs) { }
 
@@ -1757,10 +1760,10 @@ void dummy_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = dummy_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = dummy_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = dummy_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = dummy_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = dummy_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = dummy_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = dummy_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(dummy);		break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(dummy);	break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(dummy);		break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(dummy);break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = dummy_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &dummy_icount;			break;

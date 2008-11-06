@@ -76,7 +76,8 @@ typedef struct
 	UINT32	irq_state;
 	UINT8	no_interrupt;
 
-	int     (*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 } nec_Regs;
 
 /***************************************************************************/
@@ -106,15 +107,18 @@ static UINT8 parity_table[256];
 
 /***************************************************************************/
 
-static void nec_reset (void)
+static CPU_RESET( nec )
 {
     unsigned int i,j,c;
     static const BREGS reg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
-    int (*save_irqcallback)(int);
+	cpu_irq_callback save_irqcallback;
+	const device_config *save_device;
 
 	save_irqcallback = I.irq_callback;
+	save_device = I.device;
 	memset( &I, 0, sizeof(I) );
 	I.irq_callback = save_irqcallback;
+	I.device = save_device;
 
 	I.sregs[CS] = 0xffff;
 
@@ -143,7 +147,7 @@ static void nec_reset (void)
     }
 }
 
-static void nec_exit (void)
+static CPU_EXIT( nec )
 {
 
 }
@@ -158,7 +162,7 @@ static void nec_interrupt(unsigned int_num,BOOLEAN md_flag)
 
 	if (int_num == -1)
 	{
-		int_num = (*I.irq_callback)(0);
+		int_num = (*I.irq_callback)(I.device, 0);
 
 		I.irq_state = CLEAR_LINE;
 		I.pending_irq &= ~INT_IRQ;
@@ -922,7 +926,7 @@ static offs_t nec_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 
 	return necv_dasm_one(buffer, pc, oprom);
 }
 
-static void nec_init(int index, int clock, const void *config, int (*irqcallback)(int), int type)
+static void nec_init(const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback, int type)
 {
 	static const char *const names[]={"V20","V30","V33","V30MZ"};
 
@@ -946,10 +950,11 @@ static void nec_init(int index, int clock, const void *config, int (*irqcallback
 	state_save_register_item(names[type], index, I.ParityVal);
 
 	I.irq_callback = irqcallback;
+	I.device = device;
 }
 
-static void v30mz_init(int index, int clock, const void *config, int (*irqcallback)(int)) { nec_init(index, clock, config, irqcallback, 3); }
-static int v30mz_execute(int cycles)
+static CPU_INIT( v30mz ) { nec_init(device, index, clock, config, irqcallback, 3); }
+static CPU_EXECUTE( v30mz )
 {
 	nec_ICount=cycles;
 	chip_type=V30MZ;
@@ -1092,8 +1097,8 @@ void v30mz_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = nec_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = nec_get_context;		break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = nec_set_context;		break;
-		case CPUINFO_PTR_RESET:							info->reset = nec_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = nec_exit;					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(nec);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(nec);					break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = nec_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &nec_ICount;				break;
@@ -1143,9 +1148,9 @@ void v30mz_get_info(UINT32 state, cpuinfo *info)
         case CPUINFO_STR_REGISTER + NEC_VECTOR:			sprintf(info->s = cpuintrf_temp_str(), "V:%02X", I.int_vector); break;
 
 	/* --- the following bits of info are returned as pointers to data or functions --- */
-	case CPUINFO_PTR_INIT:		info->init = v30mz_init;
+	case CPUINFO_PTR_INIT:		info->init = CPU_INIT_NAME(v30mz);
 					break;
-	case CPUINFO_PTR_EXECUTE:	info->execute = v30mz_execute;
+	case CPUINFO_PTR_EXECUTE:	info->execute = CPU_EXECUTE_NAME(v30mz);
 					break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */

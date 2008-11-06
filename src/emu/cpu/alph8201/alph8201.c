@@ -662,7 +662,7 @@ static const s_opcode opcode_8301[256]=
 /****************************************************************************
  * Initialize emulation
  ****************************************************************************/
-static void ALPHA8201_init (int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( ALPHA8201 )
 {
 	state_save_register_item_array("ALPHA8201", index, R.RAM);
 	state_save_register_item("ALPHA8201", index, R.PREVPC);
@@ -689,7 +689,7 @@ static void ALPHA8201_init (int index, int clock, const void *config, int (*irqc
 /****************************************************************************
  * Reset registers to their initial values
  ****************************************************************************/
-static void ALPHA8201_reset (void)
+static CPU_RESET( ALPHA8201 )
 {
 	PC     = 0;
 	regPTR = 0;
@@ -712,7 +712,7 @@ static void ALPHA8201_reset (void)
 /****************************************************************************
  * Shut down CPU emulation
  ****************************************************************************/
-static void ALPHA8201_exit (void)
+static CPU_EXIT( ALPHA8201 )
 {
 	/* nothing to do ? */
 }
@@ -802,11 +802,11 @@ mame_printf_debug("ALPHA8201:  PC = %03x,  opcode = %02x\n", PC, opcode);
 }
 
 #if (HAS_ALPHA8201)
-static int ALPHA8201_execute(int cycles) { return alpha8xxx_execute(opcode_8201,cycles); }
+static CPU_EXECUTE( ALPHA8201 ) { return alpha8xxx_execute(opcode_8201,cycles); }
 #endif
 
 #if (HAS_ALPHA8301)
-static int ALPHA8301_execute(int cycles) { return alpha8xxx_execute(opcode_8301,cycles); }
+static CPU_EXECUTE( ALPHA8301 ) { return alpha8xxx_execute(opcode_8301,cycles); }
 #endif
 
 /****************************************************************************
@@ -947,9 +947,9 @@ static void alpha8xxx_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = ALPHA8201_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = ALPHA8201_get_context; break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = ALPHA8201_set_context; break;
-		case CPUINFO_PTR_INIT:							info->init = ALPHA8201_init;			break;
-		case CPUINFO_PTR_RESET:							info->reset = ALPHA8201_reset;			break;
-		case CPUINFO_PTR_EXIT:							info->exit = ALPHA8201_exit;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ALPHA8201);			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ALPHA8201);			break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ALPHA8201);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = ALPHA8201_dasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &ALPHA8201_ICount;		break;
@@ -992,7 +992,7 @@ void alpha8201_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 	case CPUINFO_STR_NAME:							strcpy(info->s, "ALPHA-8201");				break;
-	case CPUINFO_PTR_EXECUTE:						info->execute = ALPHA8201_execute;			break;
+	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ALPHA8201);			break;
 	default:
 		/* 8201 / 8301 */
 		alpha8xxx_get_info(state,info);
@@ -1006,7 +1006,7 @@ void alpha8301_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 	case CPUINFO_STR_NAME:							strcpy(info->s, "ALPHA-8301");				break;
-	case CPUINFO_PTR_EXECUTE:						info->execute = ALPHA8301_execute;			break;
+	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ALPHA8301);			break;
 	default:
 		/* 8201 / 8301 */
 		alpha8xxx_get_info(state,info);

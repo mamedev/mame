@@ -40,7 +40,8 @@ typedef struct {
     UINT8   ir;     /* instruction register */
     UINT16  ras[8]; /* 8 return address stack entries */
 	UINT8	irq_state;
-    int     (*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 }   s2650_Regs;
 
 static s2650_Regs S;
@@ -127,7 +128,7 @@ static void s2650_set_sense(int state);
 				S.halt = 0; 									\
 				S.iar = (S.iar + 1) & PMSK; 					\
 			}													\
-			vector = (*S.irq_callback)(0) & 0xff;				\
+			vector = (*S.irq_callback)(S.device, 0) & 0xff;		\
 			/* build effective address within first 8K page */	\
 			S.ea = S2650_relative[vector] & PMSK;				\
 			if (vector & 0x80)		/* indirect bit set ? */	\
@@ -766,9 +767,10 @@ static void ABS_EA(void) _ABS_EA()
 static void BRA_EA(void) _BRA_EA()
 #endif
 
-static void s2650_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( s2650 )
 {
 	S.irq_callback = irqcallback;
+	S.device = device;
 
 	state_save_register_item("s2650", index, S.ppc);
 	state_save_register_item("s2650", index, S.page);
@@ -784,16 +786,18 @@ static void s2650_init(int index, int clock, const void *config, int (*irqcallba
 	state_save_register_item("s2650", index, S.irq_state);
 }
 
-static void s2650_reset(void)
+static CPU_RESET( s2650 )
 {
-	int (*save_irqcallback)(int) = S.irq_callback;
+	cpu_irq_callback save_irqcallback = S.irq_callback;
+	const device_config *save_device = S.device;
 	memset(&S, 0, sizeof(S));
 	S.irq_callback = save_irqcallback;
+	S.device = save_device;
 	S.psl = COM | WC;
 	S.psu = 0;
 }
 
-static void s2650_exit(void)
+static CPU_EXIT( s2650 )
 {
 	/* nothing to do */
 }
@@ -858,7 +862,7 @@ static int s2650_get_sense(void)
     return (((S.psu & SI) ? 1 : 0) | ((io_read_byte_8le(S2650_SENSE_PORT) & SI) ? 1 : 0));
 }
 
-static int s2650_execute(int cycles)
+static CPU_EXECUTE( s2650 )
 {
 	s2650_ICount = cycles;
 	do
@@ -1564,10 +1568,10 @@ void s2650_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = s2650_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = s2650_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = s2650_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = s2650_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = s2650_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = s2650_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = s2650_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(s2650);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(s2650);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(s2650);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(s2650);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = s2650_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &s2650_ICount;			break;

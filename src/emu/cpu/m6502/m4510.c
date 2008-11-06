@@ -141,7 +141,8 @@ typedef struct {
 	UINT8	irq_state;
 	UINT16  low, high;
 	UINT32	mem[8];
-	int 	(*irq_callback)(int irqline);	/* IRQ callback */
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	read8_machine_func rdmem_id;					/* readmem callback for indexed instructions */
 	write8_machine_func wrmem_id;				/* writemem callback for indexed instructions */
 
@@ -177,15 +178,16 @@ INLINE int m4510_cpu_readop_arg(void)
 static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8le(M4510_MEM(offset)); }
 static WRITE8_HANDLER( default_wrmem_id ) { program_write_byte_8le(M4510_MEM(offset), data); }
 
-static void m4510_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( m4510 )
 {
 	m4510.interrupt_inhibit = 0;
 	m4510.rdmem_id = default_rdmem_id;
 	m4510.wrmem_id = default_wrmem_id;
 	m4510.irq_callback = irqcallback;
+	m4510.device = device;
 }
 
-static void m4510_reset (void)
+static CPU_RESET( m4510 )
 {
 	m4510.insn = insn4510;
 
@@ -215,7 +217,7 @@ static void m4510_reset (void)
 	m4510.ddr = 0x00;
 }
 
-static void m4510_exit(void)
+static CPU_EXIT( m4510 )
 {
 	/* nothing to do yet */
 }
@@ -250,13 +252,13 @@ INLINE void m4510_take_irq(void)
 		PCH = RDMEM(EAD+1);
 		LOG(("M4510#%d takes IRQ ($%04x)\n", cpu_getactivecpu(), PCD));
 		/* call back the cpuintrf to let it clear the line */
-		if (m4510.irq_callback) (*m4510.irq_callback)(0);
+		if (m4510.irq_callback) (*m4510.irq_callback)(m4510.device, 0);
 		CHANGE_PC;
 	}
 	m4510.pending_irq = 0;
 }
 
-static int m4510_execute(int cycles)
+static CPU_EXECUTE( m4510 )
 {
 	m4510_ICount = cycles;
 
@@ -492,10 +494,10 @@ void m4510_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m4510_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m4510_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m4510_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = m4510_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = m4510_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = m4510_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = m4510_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m4510);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m4510);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m4510);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m4510);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m4510_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m4510_ICount;			break;

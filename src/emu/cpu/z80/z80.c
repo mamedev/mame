@@ -135,7 +135,8 @@ struct _z80_state
 	UINT8	irq_state;			/* irq line state */
 	UINT8	after_ei;			/* are we in the EI shadow? */
 	UINT32	ea;
-	int		(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	int		icount;
 	z80_daisy_state *daisy;
 };
@@ -3366,7 +3367,7 @@ static void take_interrupt(z80_state *z80)
 
 	/* else call back the cpu interface to retrieve the vector */
 	else
-		irq_vector = (*z80->irq_callback)(0);
+		irq_vector = (*z80->irq_callback)(z80->device, 0);
 
 	LOG(("Z80 #%d single int. irq_vector $%02x\n", cpu_getactivecpu(), irq_vector));
 
@@ -3424,14 +3425,13 @@ static void take_interrupt(z80_state *z80)
 /****************************************************************************
  * Processor initialization
  ****************************************************************************/
-static void z80_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( z80 )
 {
-	z80_state *z80;
+	z80_state *z80 = device->token;
 	int i, p;
 	
-	token = auto_malloc(sizeof(z80_state));
-	z80 = token;
-
+	token = device->token;	// temporary
+	
 	/* setup cycle tables */
 	cc[Z80_TABLE_op] = cc_op;
 	cc[Z80_TABLE_cb] = cc_cb;
@@ -3554,6 +3554,7 @@ static void z80_init(int index, int clock, const void *config, int (*irqcallback
 	if (config != NULL)
 		z80->daisy = z80daisy_init(Machine, Machine->config->cpu[cpu_getactivecpu()].tag, config);
 	z80->irq_callback = irqcallback;
+	z80->device = device;
 	IX = IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	F = ZF;			/* Zero flag is set */
 }
@@ -3561,9 +3562,9 @@ static void z80_init(int index, int clock, const void *config, int (*irqcallback
 /****************************************************************************
  * Do a reset
  ****************************************************************************/
-static void z80_reset(void)
+static CPU_RESET( z80 )
 {
-	z80_state *z80 = token;
+	z80_state *z80 = device->token;
 	
 	PC = 0x0000;
 	I = 0;
@@ -3581,7 +3582,7 @@ static void z80_reset(void)
 	MEMPTR=PCD;
 }
 
-static void z80_exit(void)
+static CPU_EXIT( z80 )
 {
 #if BIG_FLAGS_ARRAY
 	if (SZHVC_add) free(SZHVC_add);
@@ -3594,9 +3595,9 @@ static void z80_exit(void)
 /****************************************************************************
  * Execute 'cycles' T-states. Return number of T-states really executed
  ****************************************************************************/
-static int z80_execute(int cycles)
+static CPU_EXECUTE( z80 )
 {
-	z80_state *z80 = token;
+	z80_state *z80 = device->token;
 	
 	z80->icount = cycles;
 
@@ -3655,8 +3656,6 @@ static void z80_burn(int cycles)
  ****************************************************************************/
 static void z80_get_context (void *dst)
 {
-	if( dst )
-		*(void **)dst = token;
 }
 
 /****************************************************************************
@@ -3666,7 +3665,7 @@ static void z80_set_context (void *src)
 {
 	z80_state *z80;
 	if( src )
-		token = *(void **)src;
+		token = src;
 	z80 = token;
 	change_pc(PCD);	
 }
@@ -3760,7 +3759,7 @@ void z80_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:				info->i = sizeof(token);					break;
+		case CPUINFO_INT_CONTEXT_SIZE:				info->i = sizeof(z80_state);				break;
 		case CPUINFO_INT_INPUT_LINES:				info->i = 1;								break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:		info->i = 0xff;								break;
 		case CPUINFO_INT_ENDIANNESS:				info->i = CPU_IS_LE;						break;
@@ -3819,10 +3818,10 @@ void z80_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:					info->setinfo = z80_set_info;				break;
 		case CPUINFO_PTR_GET_CONTEXT:				info->getcontext = z80_get_context;			break;
 		case CPUINFO_PTR_SET_CONTEXT:				info->setcontext = z80_set_context;			break;
-		case CPUINFO_PTR_INIT:						info->init = z80_init;						break;
-		case CPUINFO_PTR_RESET:						info->reset = z80_reset;					break;
-		case CPUINFO_PTR_EXIT:						info->exit = z80_exit;						break;
-		case CPUINFO_PTR_EXECUTE:					info->execute = z80_execute;				break;
+		case CPUINFO_PTR_INIT:						info->init = CPU_INIT_NAME(z80);						break;
+		case CPUINFO_PTR_RESET:						info->reset = CPU_RESET_NAME(z80);					break;
+		case CPUINFO_PTR_EXIT:						info->exit = CPU_EXIT_NAME(z80);						break;
+		case CPUINFO_PTR_EXECUTE:					info->execute = CPU_EXECUTE_NAME(z80);				break;
 		case CPUINFO_PTR_BURN:						info->burn = NULL;							break;
 		case CPUINFO_PTR_DISASSEMBLE:				info->disassemble = z80_dasm;				break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:				info->icount = &z80->icount;		break;

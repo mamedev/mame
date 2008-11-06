@@ -301,7 +301,7 @@ INLINE void m37710i_interrupt_hardware(uint vector)
 	m37710i_set_flag_i(IFLAG_SET);
 	REG_PB = 0;
 	m37710i_jump_16(m37710i_read_16_normal(vector));
-	if(INT_ACK) INT_ACK(0);
+	if(INT_ACK) INT_ACK(m37710i_cpu.device, 0);
 }
 
 INLINE void m37710i_interrupt_software(uint vector)

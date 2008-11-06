@@ -85,7 +85,8 @@ typedef struct
 	UINT32		nextpc;
 	UINT8		irq_state;
 	int			interrupt_cycles;
-	int 		(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 } asap_regs;
 
 
@@ -378,8 +379,8 @@ INLINE void check_irqs(void)
 	if (asap.irq_state && asap.iflag)
 	{
 		generate_exception(EXCEPTION_INTERRUPT);
-		if (asap.irq_callback)
-			(*asap.irq_callback)(ASAP_IRQ0);
+		if (asap.irq_callback != NULL)
+			(*asap.irq_callback)(asap.device, ASAP_IRQ0);
 	}
 }
 
@@ -470,13 +471,14 @@ static void init_tables(void)
 	}
 }
 
-static void asap_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( asap )
 {
 	init_tables();
 	asap.irq_callback = irqcallback;
+	asap.device = device;
 }
 
-static void asap_reset(void)
+static CPU_RESET( asap )
 {
 	/* initialize the state */
 	src2val[REGBASE + 0] = 0;
@@ -493,7 +495,7 @@ static void asap_reset(void)
 }
 
 
-static void asap_exit(void)
+static CPU_EXIT( asap )
 {
 	opcode = NULL;
 	src2val = NULL;
@@ -532,7 +534,7 @@ INLINE void execute_instruction(void)
 	(*opcode[asap.op.d >> 21])();
 }
 
-static int asap_execute(int cycles)
+static CPU_EXECUTE( asap )
 {
 	/* count cycles and interrupt cycles */
 	asap_icount = cycles;
@@ -1837,10 +1839,10 @@ void asap_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = asap_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = asap_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = asap_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = asap_init;					break;
-		case CPUINFO_PTR_RESET:							info->reset = asap_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = asap_exit;					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = asap_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(asap);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(asap);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(asap);					break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(asap);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = asap_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &asap_icount;			break;

@@ -137,7 +137,8 @@ typedef struct
     UINT8 nmi_state;
     UINT8 irq_state[3];
 	UINT8 irq_pending;
-    int (*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 
 #if LAZY_FLAGS
     INT32 NZ;             /* last value (lazy N and Z flag) */
@@ -156,7 +157,7 @@ static void set_irq_line(int irqline, int state);
 #include "tblh6280.c"
 
 /*****************************************************************************/
-static void h6280_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( h6280 )
 {
 	state_save_register_item("h6280", index, h6280.ppc.w.l);
 	state_save_register_item("h6280", index, h6280.pc.w.l);
@@ -186,17 +187,21 @@ static void h6280_init(int index, int clock, const void *config, int (*irqcallba
 	state_save_register_item("h6280", index, h6280.io_buffer);
 
 	h6280.irq_callback = irqcallback;
+	h6280.device = device;
 }
 
-static void h6280_reset(void)
+static CPU_RESET( h6280 )
 {
-	int (*save_irqcallback)(int);
+	cpu_irq_callback save_irqcallback;
+	const device_config *save_device;
 	int i;
 
 	/* wipe out the h6280 structure */
 	save_irqcallback = h6280.irq_callback;
+	save_device = h6280.device;
 	memset(&h6280, 0, sizeof(h6280_Regs));
 	h6280.irq_callback = save_irqcallback;
+	h6280.device = save_device;
 
 	/* set I and B flags */
 	P = _fI | _fB;
@@ -224,12 +229,12 @@ static void h6280_reset(void)
 	h6280.irq_pending = 0;
 }
 
-static void h6280_exit(void)
+static CPU_EXIT( h6280 )
 {
 	/* nothing */
 }
 
-static int h6280_execute(int cycles)
+static CPU_EXECUTE( h6280 )
 {
 	int in;
 	h6280_ICount = cycles;
@@ -505,10 +510,10 @@ void h6280_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = h6280_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = h6280_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = h6280_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = h6280_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = h6280_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = h6280_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = h6280_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(h6280);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(h6280);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(h6280);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(h6280);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = h6280_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &h6280_ICount;			break;

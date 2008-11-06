@@ -67,7 +67,8 @@ enum
     UINT8 pendingAbtP;                  \
     UINT8 pendingUnd;                   \
     UINT8 pendingSwi;                   \
-    int (*irq_callback)(int);
+    cpu_irq_callback irq_callback;		\
+    const device_config *device;
 
 
 /****************************************************************************************************

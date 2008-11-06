@@ -44,8 +44,8 @@ static void tms7000_get_context(void *dst);
 static void tms7000_set_context(void *src);
 static void tms7000_check_IRQ_lines( void );
 static void tms7000_do_interrupt( UINT16 address, UINT8 line );
-static int tms7000_execute(int cycles);
-static int tms7000_exl_execute(int cycles);
+static CPU_EXECUTE( tms7000 );
+static CPU_EXECUTE( tms7000_exl );
 static void tms7000_service_timer1( void );
 static UINT16 bcd_add( UINT16 a, UINT16 b );
 static UINT16 bcd_tencomp( UINT16 a );
@@ -105,7 +105,8 @@ typedef struct
 	UINT8		irq_state[3];	/* State of the three IRQs */
 	UINT8		rf[0x80];	/* Register file (SJE) */
 	UINT8		pf[0x100];	/* Perpherial file */
-	int 		(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	UINT8		t1_capture_latch; /* Timer 1 capture latch */
 	INT8		t1_prescaler;	/* Timer 1 prescaler (5 bits) */
 	INT16		t1_decrementer;	/* Timer 1 decrementer (8 bits) */
@@ -183,11 +184,12 @@ static void tms7000_set_context(void *src)
         tms7000_check_IRQ_lines();
 }
 
-static void tms7000_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( tms7000 )
 {
 	int cpu = cpu_getactivecpu();
 
 	tms7000.irq_callback = irqcallback;
+	tms7000.device = device;
 
 	memset(tms7000.pf, 0, 0x100);
 	memset(tms7000.rf, 0, 0x80);
@@ -210,11 +212,9 @@ static void tms7000_init(int index, int clock, const void *config, int (*irqcall
 	state_save_register_item("tms7000", cpu, tms7000.t1_decrementer);
 
 	state_save_register_item("tms7000", cpu, tms7000.idle_state);
-
-	tms7000.irq_callback = irqcallback;
 }
 
-static void tms7000_reset(void)
+static CPU_RESET( tms7000 )
 {
 //  tms7000.architecture = (int)param;
 
@@ -329,9 +329,9 @@ void tms7000_get_info(UINT32 state, cpuinfo *info)
         case CPUINFO_PTR_SET_INFO:	info->setinfo = tms7000_set_info;	break;
         case CPUINFO_PTR_GET_CONTEXT:	info->getcontext = tms7000_get_context;	break;
         case CPUINFO_PTR_SET_CONTEXT:	info->setcontext = tms7000_set_context;	break;
-        case CPUINFO_PTR_INIT:	info->init = tms7000_init;	break;
-        case CPUINFO_PTR_RESET:	info->reset = tms7000_reset;	break;
-        case CPUINFO_PTR_EXECUTE:	info->execute = tms7000_execute;	break;
+        case CPUINFO_PTR_INIT:	info->init = CPU_INIT_NAME(tms7000);	break;
+        case CPUINFO_PTR_RESET:	info->reset = CPU_RESET_NAME(tms7000);	break;
+        case CPUINFO_PTR_EXECUTE:	info->execute = CPU_EXECUTE_NAME(tms7000);	break;
         case CPUINFO_PTR_BURN:	info->burn = NULL;	/* Not supported */break;
         case CPUINFO_PTR_DISASSEMBLE:	info->disassemble = tms7000_dasm;	break;
         case CPUINFO_PTR_INSTRUCTION_COUNTER:	info->icount = &tms7000_icount;	break;
@@ -372,7 +372,7 @@ void tms7000_exl_get_info(UINT32 state, cpuinfo *info)
     switch( state )
     {
 		case CPUINFO_PTR_EXECUTE:
-			info->execute = tms7000_exl_execute;
+			info->execute = CPU_EXECUTE_NAME(tms7000_exl);
 			break;
 		default:
 			tms7000_get_info(state, info);
@@ -456,13 +456,13 @@ static void tms7000_do_interrupt( UINT16 address, UINT8 line )
 		tms7000.idle_state = 0;
 	}
 
-	(void)(*tms7000.irq_callback)(line);
+	(void)(*tms7000.irq_callback)(tms7000.device, line);
 }
 
 #include "tms70op.c"
 #include "tms70tb.c"
 
-static int tms7000_execute(int cycles)
+static CPU_EXECUTE( tms7000 )
 {
 	int op;
 
@@ -501,7 +501,7 @@ static int tms7000_execute(int cycles)
 	return cycles - tms7000_icount;
 }
 
-static int tms7000_exl_execute(int cycles)
+static CPU_EXECUTE( tms7000_exl )
 {
 	int op;
 

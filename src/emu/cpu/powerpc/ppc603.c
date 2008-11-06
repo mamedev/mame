@@ -178,7 +178,7 @@ static void ppc603_set_irq_line(int irqline, int state)
 		ppc.interrupt_pending |= 0x1;
 		if (ppc.irq_callback)
 		{
-			ppc.irq_callback(irqline);
+			ppc.irq_callback(ppc.device, irqline);
 		}
 	}
 }
@@ -214,7 +214,7 @@ INLINE void ppc603_check_interrupts(void)
 	}
 }
 
-static void ppc603_reset(void)
+static CPU_RESET( ppc603 )
 {
 	ppc.pc = ppc.npc = 0xfff00100;
 
@@ -227,7 +227,7 @@ static void ppc603_reset(void)
 }
 
 
-static int ppc603_execute(int cycles)
+static CPU_EXECUTE( ppc603 )
 {
 	int exception_type;
 	UINT32 opcode;

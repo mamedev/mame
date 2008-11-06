@@ -16,7 +16,8 @@ typedef struct
 	PAIR		af2,bc2,de2,hl2;
 	UINT8		halt, after_EI;
 	UINT16		irq_state, irq_mask;
-	int			(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	int			extra_cycles;		// extra cycles for interrupts
 	UINT8		internal_registers[48];
 	UINT32		ixbase,iybase;
@@ -1317,7 +1318,7 @@ static void set_irq_line(int irq, int state)
 INLINE void Cyc(void)	{	t90_ICount -= cyc_t;	}
 INLINE void Cyc_f(void)	{	t90_ICount -= cyc_f;	}
 
-static int t90_execute(int cycles)
+static CPU_EXECUTE( t90 )
 {
 	UINT8    a8,b8;
 	UINT16   a16,b16;
@@ -1965,7 +1966,7 @@ static int t90_execute(int cycles)
 	return cycles - t90_ICount;
 }
 
-static void t90_reset(void)
+static CPU_RESET( t90 )
 {
 	T90.irq_state = 0;
 	T90.irq_mask = 0;
@@ -1980,7 +1981,7 @@ static void t90_reset(void)
 */
 }
 
-static void t90_exit(void)
+static CPU_EXIT( t90 )
 {
 }
 
@@ -2620,7 +2621,7 @@ static WRITE8_HANDLER( t90_internal_registers_w )
 	T90.internal_registers[offset] = data;
 }
 
-static void t90_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( t90 )
 {
 	int i, p;
 
@@ -2652,6 +2653,7 @@ static void t90_init(int index, int clock, const void *config, int (*irqcallback
 
 	memset(&T90, 0, sizeof(T90));
 	T90.irq_callback = irqcallback;
+	T90.device = device;
 
 	T90.timer_period = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(cpu_getactivecpu())), 8);
 
@@ -2779,10 +2781,10 @@ void tmp90840_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:									info->setinfo = t90_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:								info->getcontext = t90_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:								info->setcontext = t90_set_context;	break;
-		case CPUINFO_PTR_INIT:										info->init = t90_init;				break;
-		case CPUINFO_PTR_RESET:										info->reset = t90_reset;			break;
-		case CPUINFO_PTR_EXIT:										info->exit = t90_exit;				break;
-		case CPUINFO_PTR_EXECUTE:									info->execute = t90_execute;		break;
+		case CPUINFO_PTR_INIT:										info->init = CPU_INIT_NAME(t90);				break;
+		case CPUINFO_PTR_RESET:										info->reset = CPU_RESET_NAME(t90);			break;
+		case CPUINFO_PTR_EXIT:										info->exit = CPU_EXIT_NAME(t90);				break;
+		case CPUINFO_PTR_EXECUTE:									info->execute = CPU_EXECUTE_NAME(t90);		break;
 		case CPUINFO_PTR_BURN:										info->burn = t90_burn;				break;
 		case CPUINFO_PTR_DISASSEMBLE:								info->disassemble = t90_dasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:						info->icount = &t90_ICount;			break;

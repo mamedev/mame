@@ -127,7 +127,7 @@ static void tx0_write(offs_t address, int data)
 		;
 }
 
-static void tx0_init_common(int is_64kw, int index, int clock, const void *config, int (*irqcallback)(int))
+static void tx0_init_common(int is_64kw, const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback)
 {
 	int i;
 	tx0_reset_param_t *param = (tx0_reset_param_t *) config;
@@ -145,17 +145,17 @@ static void tx0_init_common(int is_64kw, int index, int clock, const void *confi
 	tx0.ir_mask = is_64kw ? 03 : 037;
 }
 
-static void tx0_init_64kw(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( tx0_64kw )
 {
-	tx0_init_common(1, index, clock, config, irqcallback);
+	tx0_init_common(1, device, index, clock, config, irqcallback);
 }
 
-static void tx0_init_8kw(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( tx0_8kw)
 {
-	tx0_init_common(0, index, clock, config, irqcallback);
+	tx0_init_common(0, device, index, clock, config, irqcallback);
 }
 
-static void tx0_reset(void)
+static CPU_RESET( tx0 )
 {
 	/* reset CPU flip-flops */
 	pulse_reset();
@@ -177,7 +177,7 @@ static void tx0_set_context(void *src)
 
 
 /* execute instructions on this CPU until icount expires */
-static int tx0_execute_64kw(int cycles)
+static CPU_EXECUTE( tx0_64kw )
 {
 	tx0_ICount = cycles;
 
@@ -285,7 +285,7 @@ static int tx0_execute_64kw(int cycles)
 }
 
 /* execute instructions on this CPU until icount expires */
-static int tx0_execute_8kw(int cycles)
+static CPU_EXECUTE( tx0_8kw )
 {
 	tx0_ICount = cycles;
 
@@ -513,9 +513,9 @@ void tx0_64kw_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_PTR_SET_INFO:						info->setinfo = tx0_set_info;			break;
 	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = tx0_get_context;		break;
 	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = tx0_set_context;		break;
-	case CPUINFO_PTR_INIT:							info->init = tx0_init_64kw;				break;
-	case CPUINFO_PTR_RESET:							info->reset = tx0_reset;				break;
-	case CPUINFO_PTR_EXECUTE:						info->execute = tx0_execute_64kw;		break;
+	case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tx0_64kw);	break;
+	case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tx0);		break;
+	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tx0_64kw);	break;
 	case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tx0_dasm_64kw;		break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tx0_ICount;				break;
@@ -639,11 +639,11 @@ void tx0_8kw_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_PTR_SET_INFO:						info->setinfo = tx0_set_info;			break;
 	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = tx0_get_context;		break;
 	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = tx0_set_context;		break;
-	case CPUINFO_PTR_INIT:							info->init = tx0_init_8kw;				break;
-	case CPUINFO_PTR_RESET:							info->reset = tx0_reset;				break;
-	case CPUINFO_PTR_EXECUTE:						info->execute = tx0_execute_8kw;		break;
+	case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tx0_8kw);	break;
+	case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tx0);		break;
+	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tx0_8kw);	break;
 	case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tx0_dasm_8kw;	break;
+	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tx0_dasm_8kw;		break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tx0_ICount;				break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */

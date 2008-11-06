@@ -148,7 +148,8 @@ typedef struct {
 	UINT32	IRQ1;		/* executed interrupt address */
 	UINT8   STATUS;		/* status word */
 	INT8	irq_state[4];
-	int 	(*irq_callback)(int);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	void	(*sod_callback)(int state);
 	int		(*sid_callback)(void);
 }	i8085_Regs;
@@ -1243,7 +1244,7 @@ static void Interrupt(void)
 	if( I.ISRV == IM_INTR )
 	{
 		LOG(("Interrupt get INTR vector\n"));
-		I.IRQ1 = (I.irq_callback)(0);
+		I.IRQ1 = (I.irq_callback)(I.device, 0);
 	}
 
 	if( I.cputype )
@@ -1251,21 +1252,21 @@ static void Interrupt(void)
 		if( I.ISRV == IM_RST55 )
 		{
 			LOG(("Interrupt get RST5.5 vector\n"));
-			//I.IRQ1 = (I.irq_callback)(1);
+			//I.IRQ1 = (I.irq_callback)(I.device, 1);
 			I.irq_state[I8085_RST55_LINE] = CLEAR_LINE; //AT: processing RST5.5, reset interrupt line
 		}
 
 		if( I.ISRV == IM_RST65	)
 		{
 			LOG(("Interrupt get RST6.5 vector\n"));
-			//I.IRQ1 = (I.irq_callback)(2);
+			//I.IRQ1 = (I.irq_callback)(I.device, 2);
 			I.irq_state[I8085_RST65_LINE] = CLEAR_LINE; //AT: processing RST6.5, reset interrupt line
 		}
 
 		if( I.ISRV == IM_RST75 )
 		{
 			LOG(("Interrupt get RST7.5 vector\n"));
-			//I.IRQ1 = (I.irq_callback)(3);
+			//I.IRQ1 = (I.irq_callback)(I.device, 3);
 			I.irq_state[I8085_RST75_LINE] = CLEAR_LINE; //AT: processing RST7.5, reset interrupt line
 		}
 	}
@@ -1301,7 +1302,7 @@ static void Interrupt(void)
 	}
 }
 
-static int i8085_execute(int cycles)
+static CPU_EXECUTE( i8085 )
 {
 
 	i8085_ICount = cycles;
@@ -1356,11 +1357,12 @@ static void init_tables (void)
 /****************************************************************************
  * Init the 8085 emulation
  ****************************************************************************/
-static void i8085_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( i8085 )
 {
 	init_tables();
 	I.cputype = 1;
 	I.irq_callback = irqcallback;
+	I.device = device;
 
 	state_save_register_item("i8085", index, I.AF.w.l);
 	state_save_register_item("i8085", index, I.BC.w.l);
@@ -1382,18 +1384,21 @@ static void i8085_init(int index, int clock, const void *config, int (*irqcallba
 /****************************************************************************
  * Reset the 8085 emulation
  ****************************************************************************/
-static void i8085_reset(void)
+static CPU_RESET( i8085 )
 {
-	int (*save_irqcallback)(int);
+	cpu_irq_callback save_irqcallback;
+	const device_config *save_device;
 	void (*save_sodcallback)(int);
 	int (*save_sidcallback)(void);
 	int cputype_bak = I.cputype;
 
 	init_tables();
+	save_device = I.device;
 	save_irqcallback = I.irq_callback;
 	save_sodcallback = I.sod_callback;
 	save_sidcallback = I.sid_callback;
 	memset(&I, 0, sizeof(i8085_Regs));
+	I.device = save_device;
 	I.irq_callback = save_irqcallback;
 	I.sod_callback = save_sodcallback;
 	I.sid_callback = save_sidcallback;
@@ -1405,7 +1410,7 @@ static void i8085_reset(void)
 /****************************************************************************
  * Shut down the CPU emulation
  ****************************************************************************/
-static void i8085_exit(void)
+static CPU_EXIT( i8085 )
 {
 	/* nothing to do */
 }
@@ -1591,11 +1596,12 @@ static void i8085_set_irq_line(int irqline, int state)
  **************************************************************************/
 #if (HAS_8080)
 
-static void i8080_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( i8080 )
 {
 	init_tables();
 	I.cputype = 0;
 	I.irq_callback = irqcallback;
+	I.device = device;
 
 	state_save_register_item("i8080", index, I.AF.w.l);
 	state_save_register_item("i8080", index, I.BC.w.l);
@@ -1736,10 +1742,10 @@ void i8085_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = i8085_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = i8085_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = i8085_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = i8085_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = i8085_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = i8085_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = i8085_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8085);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(i8085);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(i8085);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i8085);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i8085_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &i8085_ICount;			break;
@@ -1808,7 +1814,7 @@ void i8080_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = i8080_set_info;			break;
-		case CPUINFO_PTR_INIT:							info->init = i8080_init;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8080);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "8080");				break;

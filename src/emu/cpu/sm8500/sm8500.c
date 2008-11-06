@@ -47,7 +47,8 @@ typedef struct {
 	UINT8 IFLAGS;
 	UINT8 CheckInterrupts;
 	int halted;
-	int (*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	UINT8 internal_ram[0x500];
 } sm8500_regs;
 
@@ -77,8 +78,9 @@ UINT8* sm8500_internal_ram( void )
 	return regs.internal_ram;
 }
 
-static void sm8500_init(int index, int clock, const void *config, int (*irqcallback)(int)) {
+static CPU_INIT( sm8500 ) {
 	regs.irq_callback = irqcallback;
+	regs.device = device;
 	if ( config != NULL ) {
 		regs.config.handle_dma = ((SM8500_CONFIG *)config)->handle_dma;
 		regs.config.handle_timers = ((SM8500_CONFIG *)config)->handle_timers;
@@ -89,7 +91,7 @@ static void sm8500_init(int index, int clock, const void *config, int (*irqcallb
 	regs.register_base = regs.internal_ram;
 }
 
-static void sm8500_reset( void )
+static CPU_RESET( sm8500 )
 {
 	regs.PC = 0x1020;
 	regs.IE0 = 0;
@@ -107,7 +109,7 @@ static void sm8500_reset( void )
 	regs.halted = 0;
 }
 
-static void sm8500_exit( void )
+static CPU_EXIT( sm8500 )
 {
 }
 
@@ -201,7 +203,7 @@ INLINE void sm8500_process_interrupts(void) {
 	}
 }
 
-static int sm8500_execute( int cycles )
+static CPU_EXECUTE( sm8500 )
 {
 	UINT8	op;
 	UINT16 oldpc;
@@ -492,10 +494,10 @@ void sm8500_get_info( UINT32 state, cpuinfo *info )
 	case CPUINFO_PTR_SET_INFO:				info->setinfo = sm8500_set_info; break;
 	case CPUINFO_PTR_GET_CONTEXT:				info->getcontext = sm8500_get_context; break;
 	case CPUINFO_PTR_SET_CONTEXT:				info->setcontext = sm8500_set_context; break;
-	case CPUINFO_PTR_INIT:					info->init = sm8500_init; break;
-	case CPUINFO_PTR_RESET:					info->reset = sm8500_reset; break;
-	case CPUINFO_PTR_EXIT:					info->exit = sm8500_exit; break;
-	case CPUINFO_PTR_EXECUTE:				info->execute = sm8500_execute; break;
+	case CPUINFO_PTR_INIT:					info->init = CPU_INIT_NAME(sm8500); break;
+	case CPUINFO_PTR_RESET:					info->reset = CPU_RESET_NAME(sm8500); break;
+	case CPUINFO_PTR_EXIT:					info->exit = CPU_EXIT_NAME(sm8500); break;
+	case CPUINFO_PTR_EXECUTE:				info->execute = CPU_EXECUTE_NAME(sm8500); break;
 	case CPUINFO_PTR_BURN:					info->burn = sm8500_burn; break;
 	case CPUINFO_PTR_DISASSEMBLE:			info->disassemble = sm8500_dasm; break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sm8500_icount; break;

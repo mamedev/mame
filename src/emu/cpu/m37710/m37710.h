@@ -96,7 +96,7 @@ extern int m37710_ICount;				/* cycle count */
 /* ======================================================================== */
 
 /* Clean up after the emulation core - Not used in this core - */
-void m37710_exit(void);
+CPU_EXIT( m37710 );
 
 /* Save the current CPU state to disk */
 void m37710_state_save(void *file);

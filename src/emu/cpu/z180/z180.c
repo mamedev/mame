@@ -117,7 +117,8 @@ typedef struct {
 	UINT8	irq_state[3];		/* irq line states (INT0,INT1,INT2) */
 	UINT8	after_EI;			/* are we in the EI shadow? */
 	z80_daisy_state *daisy;
-	int 	(*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 }	Z180_Regs;
 
 #define CF	0x01
@@ -1897,12 +1898,13 @@ static void z180_write_iolines(UINT32 data)
 }
 
 
-static void z180_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( z180 )
 {
 	Z180.daisy = NULL;
 	if (config)
 		Z180.daisy = z80daisy_init(Machine, Machine->config->cpu[cpu_getactivecpu()].tag, config);
 	Z180.irq_callback = irqcallback;
+	Z180.device = device;
 
 	state_save_register_item("z180", index, Z180.AF.w.l);
 	state_save_register_item("z180", index, Z180.BC.w.l);
@@ -1934,10 +1936,11 @@ static void z180_init(int index, int clock, const void *config, int (*irqcallbac
 /****************************************************************************
  * Reset registers to their initial values
  ****************************************************************************/
-static void z180_reset(void)
+static CPU_RESET( z180 )
 {
 	z80_daisy_state *save_daisy;
-	int (*save_irqcallback)(int);
+	cpu_irq_callback save_irqcallback;
+	const device_config *save_device;
 	int i, p;
 #if BIG_FLAGS_ARRAY
 	int oldval, newval, val;
@@ -2018,9 +2021,11 @@ static void z180_reset(void)
 
 	save_daisy = Z180.daisy;
 	save_irqcallback = Z180.irq_callback;
+	save_device = Z180.device;
 	memset(&Z180, 0, sizeof(Z180));
 	Z180.daisy = save_daisy;
 	Z180.irq_callback = save_irqcallback;
+	Z180.device = device;
 	_IX = _IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	_F = ZF;			/* Zero flag is set */
 	Z180.nmi_state = CLEAR_LINE;
@@ -2182,7 +2187,7 @@ static void check_interrupts(void)
 /****************************************************************************
  * Execute 'cycles' T-states. Return number of T-states really executed
  ****************************************************************************/
-static int z180_execute(int cycles)
+static CPU_EXECUTE( z180 )
 {
 	int old_icount = cycles;
 	z180_icount = cycles;
@@ -2589,9 +2594,9 @@ void z180_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = z180_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = z180_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = z180_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = z180_init;					break;
-		case CPUINFO_PTR_RESET:							info->reset = z180_reset;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = z180_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(z180);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(z180);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(z180);			break;
 		case CPUINFO_PTR_BURN:							info->burn = z180_burn;					break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = z180_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &z180_icount;			break;

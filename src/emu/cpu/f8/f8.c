@@ -50,7 +50,8 @@ typedef struct {
 	UINT8	dbus;	/* data bus value */
 	UINT16	io; 	/* last I/O address */
     UINT16  irq_vector;
-	int 	(*irq_callback)(int irqline);
+    cpu_irq_callback irq_callback;
+    const device_config *device;
     UINT8   r[64];  /* scratchpad RAM */
     int     irq_request;
 }	f8_Regs;
@@ -278,7 +279,7 @@ static void ROMC_0F(void)
      * must move the contents of the data bus into the low order
      * byte of PC0.
      */
-    f8.irq_vector = (*f8.irq_callback)(0);
+    f8.irq_vector = (*f8.irq_callback)(f8.device, 0);
     f8.dbus = f8.irq_vector & 0x00ff;
     f8.pc1 = f8.pc0;
     f8.pc0 = (f8.pc0 & 0xff00) | f8.dbus;
@@ -1530,15 +1531,18 @@ static void f8_ns_isar_d(void)
 	f8.is = (f8.is & 0x38) | ((f8.is - 1) & 0x07);
 }
 
-static void f8_reset(void)
+static CPU_RESET( f8 )
 {
 	UINT8 data;
 	int i;
-	int (*old_callback)(int);
+	cpu_irq_callback save_callback;
+	const device_config *save_device;
 
-	old_callback = f8.irq_callback;
+	save_callback = f8.irq_callback;
+	save_device = f8.device;
 	memset(&f8, 0, sizeof(f8_Regs));
-	f8.irq_callback = old_callback;
+	f8.irq_callback = save_callback;
+	f8.device = save_device;
     f8.w&=~I;
 
 	/* save PC0 to PC1 and reset PC0 */
@@ -1569,7 +1573,7 @@ static void f8_reset(void)
 }
 
 /* Execute cycles - returns number of cycles actually run */
-static int f8_execute(int cycles)
+static CPU_EXECUTE( f8 )
 {
     f8_icount = cycles;
 
@@ -1893,9 +1897,10 @@ static void f8_set_context (void *src)
 
 unsigned f8_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-static void f8_init (int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( f8 )
 {
 	f8.irq_callback = irqcallback;
+	f8.device = device;
 }
 
 static void f8_set_info(UINT32 state, cpuinfo *info)
@@ -2109,9 +2114,9 @@ void f8_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_PTR_SET_INFO:						info->setinfo = f8_set_info;			break;
 	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = f8_get_context;		break;
 	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = f8_set_context;		break;
-	case CPUINFO_PTR_INIT:							info->init = f8_init;					break;
-	case CPUINFO_PTR_RESET:							info->reset = f8_reset;					break;
-	case CPUINFO_PTR_EXECUTE:						info->execute = f8_execute;				break;
+	case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(f8);					break;
+	case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(f8);					break;
+	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(f8);				break;
 	case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 
 	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = f8_dasm;			break;

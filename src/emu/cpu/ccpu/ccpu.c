@@ -134,13 +134,13 @@ void ccpu_wdt_timer_trigger(void)
 }
 
 
-static void ccpu_init(int index, int clock, const void *_config, int (*irqcallback)(int))
+static CPU_INIT( ccpu )
 {
-	const ccpu_config *config = _config;
+	const ccpu_config *configdata = config;
 
 	/* copy input params */
-	ccpu.external_input = config->external_input ? config->external_input : read_jmi;
-	ccpu.vector_callback = config->vector_callback;
+	ccpu.external_input = configdata->external_input ? configdata->external_input : read_jmi;
+	ccpu.vector_callback = configdata->vector_callback;
 
 	state_save_register_item("ccpu", clock, ccpu.PC);
 	state_save_register_item("ccpu", clock, ccpu.A);
@@ -164,7 +164,7 @@ static void ccpu_init(int index, int clock, const void *_config, int (*irqcallba
 }
 
 
-static void ccpu_reset(void)
+static CPU_RESET( ccpu )
 {
 	/* zero registers */
 	ccpu.PC = 0;
@@ -196,7 +196,7 @@ static void ccpu_reset(void)
     CORE EXECUTION LOOP
 ***************************************************************************/
 
-static int ccpu_execute(int cycles)
+static CPU_EXECUTE( ccpu )
 {
 	if (ccpu.waiting)
 		return cycles;
@@ -782,10 +782,10 @@ void ccpu_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = ccpu_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = ccpu_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = ccpu_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = ccpu_init;					break;
-		case CPUINFO_PTR_RESET:							info->reset = ccpu_reset;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ccpu);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ccpu);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = NULL;						break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = ccpu_execute;			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ccpu);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = ccpu_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &ccpu_icount;			break;

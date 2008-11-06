@@ -115,7 +115,7 @@ static void mb86233_set_context(void *src)
     Initialization and Shutdown
 ***************************************************************************/
 
-static void mb86233_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( mb86233 )
 {
 	mb86233_cpu_core * _config = (mb86233_cpu_core *)config;
 	(void)index;
@@ -139,7 +139,7 @@ static void mb86233_init(int index, int clock, const void *config, int (*irqcall
 	state_save_register_global_pointer(mb86233.RAM,2 * 0x200 * sizeof(UINT32));
 }
 
-static void mb86233_reset(void)
+static CPU_RESET( mb86233 )
 {
 	/* zero registers and flags */
 	mb86233.pc = 0;
@@ -964,7 +964,7 @@ static UINT32 INDIRECT( UINT32 reg, int source )
     Core Execution Loop
 ***************************************************************************/
 
-static int mb86233_execute(int cycles)
+static CPU_EXECUTE( mb86233 )
 {
 
 	mb86233_icount = cycles;
@@ -1712,10 +1712,10 @@ void mb86233_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = mb86233_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = mb86233_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = mb86233_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = mb86233_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = mb86233_reset;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(mb86233);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(mb86233);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = NULL;						break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = mb86233_execute;		break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(mb86233);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = mb86233_dasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &mb86233_icount;			break;

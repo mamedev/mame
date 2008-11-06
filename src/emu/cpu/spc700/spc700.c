@@ -122,7 +122,8 @@ typedef struct
 	uint line_nmi;	/* Status of the NMI line */
 	uint line_rst;	/* Status of the RESET line */
 	uint ir;		/* Instruction Register */
-	int (*int_ack)(int); /* Interrupt Acknowledge */
+	cpu_irq_callback int_ack;
+	const device_config *device;
 	uint stopped;	/* stopped status */
 } spc700i_cpu_struct;
 
@@ -547,7 +548,7 @@ INLINE void SERVICE_IRQ(void)
 	PUSH_8(GET_REG_P_INT());
 	FLAG_I = IFLAG_SET;
 	if(INT_ACK)
-		INT_ACK(0);
+		INT_ACK(spc700i_cpu.device, 0);
 	JUMP(read_16_VEC(VECTOR_IRQ));
 }
 #endif
@@ -1256,13 +1257,14 @@ INLINE void SET_FLAG_I(uint value)
 /* ================================= API ================================== */
 /* ======================================================================== */
 
-void spc700_init(int index, int clock, const void *config, int (*irqcallback)(int))
+CPU_INIT( spc700 )
 {
 	INT_ACK = irqcallback;
+	spc700i_cpu.device = device;
 }
 
 
-void spc700_reset(void)
+CPU_RESET( spc700 )
 {
 	CPU_STOPPED = 0;
 #if !SPC700_OPTIMIZE_SNES
@@ -1281,7 +1283,7 @@ void spc700_reset(void)
 }
 
 /* Exit and clean up */
-void spc700_exit(void)
+CPU_EXIT( spc700 )
 {
 	/* nothing to do yet */
 }
@@ -1361,7 +1363,7 @@ void spc700_set_irq_line(int line, int state)
 }
 
 /* Set the callback that is called when servicing an interrupt */
-void spc700_set_irq_callback(int (*callback)(int))
+void spc700_set_irq_callback(cpu_irq_callback callback)
 {
 	INT_ACK = callback;
 }
@@ -1409,9 +1411,9 @@ void spc700_state_load(void *file)
 //int dump_flag = 0;
 
 /* Execute instructions for <clocks> cycles */
-int spc700_execute(int clocks)
+CPU_EXECUTE( spc700 )
 {
-	CLOCKS = CPU_STOPPED ? 0 : clocks;
+	CLOCKS = CPU_STOPPED ? 0 : cycles;
 	while(CLOCKS > 0)
 	{
 		REG_PPC = REG_PC;
@@ -1705,7 +1707,7 @@ int spc700_execute(int clocks)
 			case 0xff: OP_STOP  ( 3               ); break; /* STOP          */
 		}
 	}
-	return clocks - CLOCKS;
+	return cycles - CLOCKS;
 }
 
 
@@ -1790,10 +1792,10 @@ void spc700_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = spc700_set_info;		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = spc700_get_context_mame;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = spc700_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = spc700_init;				break;
-		case CPUINFO_PTR_RESET:							info->reset = spc700_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = spc700_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = spc700_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(spc700);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(spc700);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(spc700);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(spc700);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = spc700_dasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &spc700_ICount;			break;

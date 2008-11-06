@@ -28,7 +28,8 @@ typedef struct
 	UINT32 reg[65];
 	UINT8 irq_line;
 	UINT8 nmi_line;
-	int (*irq_cb)(int irqline);
+	cpu_irq_callback irq_cb;
+	const device_config *device;
 	UINT32 PPC;
 	UINT32 op;
 } v810info;
@@ -946,11 +947,12 @@ static UINT32 (*const OpCodeTable[64])(void) =
 	/* 0x3f */ opOUTW  	// out.w reg2, disp16[reg1]     6b
 };
 
-static void v810_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( v810 )
 {
 	v810.irq_line = CLEAR_LINE;
 	v810.nmi_line = CLEAR_LINE;
 	v810.irq_cb = irqcallback;
+	v810.device = device;
 
 	state_save_register_item_array("v810", index, v810.reg);
 	state_save_register_item("v810", index, v810.irq_line);
@@ -959,7 +961,7 @@ static void v810_init(int index, int clock, const void *config, int (*irqcallbac
 
 }
 
-static void v810_reset(void)
+static CPU_RESET( v810 )
 {
 	int i;
 	for(i=0;i<64;i++)	v810.reg[i]=0;
@@ -968,7 +970,7 @@ static void v810_reset(void)
 	ECR	= 0x0000fff0;
 }
 
-static int v810_execute(int cycles)
+static CPU_EXECUTE( v810 )
 {
 	v810_ICount = cycles;
 	while(v810_ICount>=0)
@@ -1178,10 +1180,10 @@ void v810_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = v810_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = v810_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = v810_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = v810_init;					break;
-		case CPUINFO_PTR_RESET:							info->reset = v810_reset;				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(v810);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(v810);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = NULL;						break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = v810_execute;			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(v810);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = v810_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &v810_ICount;			break;

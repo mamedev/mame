@@ -16,7 +16,7 @@ HNZVC
 //INLINE void illegal( void )
 static void illegal( void )
 {
-	logerror("M6808: illegal opcode: address %04X, op %02X\n",PC,(int) M_RDOP_ARG(PC)&0xFF);
+	logerror("m6800: illegal opcode: address %04X, op %02X\n",PC,(int) M_RDOP_ARG(PC)&0xFF);
 }
 
 /* HD63701 only */
@@ -24,7 +24,7 @@ static void illegal( void )
 //INLINE void trap( void )
 static void trap( void )
 {
-	logerror("M6808: illegal opcode: address %04X, op %02X\n",PC,(int) M_RDOP_ARG(PC)&0xFF);
+	logerror("m6800: illegal opcode: address %04X, op %02X\n",PC,(int) M_RDOP_ARG(PC)&0xFF);
 	TAKE_TRAP;
 }
 #endif
@@ -204,7 +204,7 @@ INLINE void daa( void )
 INLINE void slp (void)
 {
 	/* wait for next IRQ (same as waiting of wai) */
-	m6808.wai_state |= HD63701_SLP;
+	m68xx.wai_state |= HD63701_SLP;
 	EAT_CYCLES;
 }
 #endif
@@ -355,13 +355,13 @@ INLINE void ins (void)
 /* $32 PULA inherent ----- */
 INLINE void pula (void)
 {
-	PULLBYTE(m6808.d.b.h);
+	PULLBYTE(m68xx.d.b.h);
 }
 
 /* $33 PULB inherent ----- */
 INLINE void pulb (void)
 {
-	PULLBYTE(m6808.d.b.l);
+	PULLBYTE(m68xx.d.b.l);
 }
 
 /* $34 DES inherent ----- */
@@ -379,13 +379,13 @@ INLINE void txs (void)
 /* $36 PSHA inherent ----- */
 INLINE void psha (void)
 {
-	PUSHBYTE(m6808.d.b.h);
+	PUSHBYTE(m68xx.d.b.h);
 }
 
 /* $37 PSHB inherent ----- */
 INLINE void pshb (void)
 {
-	PUSHBYTE(m6808.d.b.l);
+	PUSHBYTE(m68xx.d.b.l);
 }
 
 /* $38 PULX inherent ----- */
@@ -441,14 +441,14 @@ INLINE void wai( void )
      * WAI stacks the entire machine state on the
      * hardware stack, then waits for an interrupt.
      */
-	m6808.wai_state |= M6800_WAI;
+	m68xx.wai_state |= M6800_WAI;
 	PUSHWORD(pPC);
 	PUSHWORD(pX);
 	PUSHBYTE(A);
 	PUSHBYTE(B);
 	PUSHBYTE(CC);
 	CHECK_IRQ_LINES();
-	if (m6808.wai_state & M6800_WAI) EAT_CYCLES;
+	if (m68xx.wai_state & M6800_WAI) EAT_CYCLES;
 }
 
 /* $3f SWI absolute indirect ----- */
@@ -1092,7 +1092,7 @@ INLINE void bsr( void )
 /* $8e LDS immediate -**0- */
 INLINE void lds_im( void )
 {
-	IMMWORD(m6808.s);
+	IMMWORD(m68xx.s);
 	CLR_NZV;
 	SET_NZ16(S);
 }
@@ -1103,7 +1103,7 @@ INLINE void sts_im( void )
 	CLR_NZV;
 	SET_NZ16(S);
 	IMM16;
-	WM16(EAD,&m6808.s);
+	WM16(EAD,&m68xx.s);
 }
 
 /* $90 SUBA direct ?**** */
@@ -1244,7 +1244,7 @@ INLINE void jsr_di( void )
 /* $9e LDS direct -**0- */
 INLINE void lds_di( void )
 {
-	DIRWORD(m6808.s);
+	DIRWORD(m68xx.s);
 	CLR_NZV;
 	SET_NZ16(S);
 }
@@ -1255,7 +1255,7 @@ INLINE void sts_di( void )
 	CLR_NZV;
 	SET_NZ16(S);
 	DIRECT;
-	WM16(EAD,&m6808.s);
+	WM16(EAD,&m68xx.s);
 }
 
 /* $a0 SUBA indexed ?**** */
@@ -1396,7 +1396,7 @@ INLINE void jsr_ix( void )
 /* $ae LDS indexed -**0- */
 INLINE void lds_ix( void )
 {
-	IDXWORD(m6808.s);
+	IDXWORD(m68xx.s);
 	CLR_NZV;
 	SET_NZ16(S);
 }
@@ -1407,7 +1407,7 @@ INLINE void sts_ix( void )
 	CLR_NZV;
 	SET_NZ16(S);
 	INDEXED;
-	WM16(EAD,&m6808.s);
+	WM16(EAD,&m68xx.s);
 }
 
 /* $b0 SUBA extended ?**** */
@@ -1548,7 +1548,7 @@ INLINE void jsr_ex( void )
 /* $be LDS extended -**0- */
 INLINE void lds_ex( void )
 {
-	EXTWORD(m6808.s);
+	EXTWORD(m68xx.s);
 	CLR_NZV;
 	SET_NZ16(S);
 }
@@ -1559,7 +1559,7 @@ INLINE void sts_ex( void )
 	CLR_NZV;
 	SET_NZ16(S);
 	EXTENDED;
-	WM16(EAD,&m6808.s);
+	WM16(EAD,&m68xx.s);
 }
 
 /* $c0 SUBB immediate ?**** */
@@ -1669,7 +1669,7 @@ INLINE void addb_im( void )
 /* $CC LDD immediate -**0- */
 INLINE void ldd_im( void )
 {
-	IMMWORD(m6808.d);
+	IMMWORD(m68xx.d);
 	CLR_NZV;
 	SET_NZ16(D);
 }
@@ -1681,13 +1681,13 @@ INLINE void std_im( void )
 	IMM16;
 	CLR_NZV;
 	SET_NZ16(D);
-	WM16(EAD,&m6808.d);
+	WM16(EAD,&m68xx.d);
 }
 
 /* $ce LDX immediate -**0- */
 INLINE void ldx_im( void )
 {
-	IMMWORD(m6808.x);
+	IMMWORD(m68xx.x);
 	CLR_NZV;
 	SET_NZ16(X);
 }
@@ -1698,7 +1698,7 @@ INLINE void stx_im( void )
 	CLR_NZV;
 	SET_NZ16(X);
 	IMM16;
-	WM16(EAD,&m6808.x);
+	WM16(EAD,&m68xx.x);
 }
 
 /* $d0 SUBB direct ?**** */
@@ -1807,7 +1807,7 @@ INLINE void addb_di( void )
 /* $dc LDD direct -**0- */
 INLINE void ldd_di( void )
 {
-	DIRWORD(m6808.d);
+	DIRWORD(m68xx.d);
 	CLR_NZV;
 	SET_NZ16(D);
 }
@@ -1818,13 +1818,13 @@ INLINE void std_di( void )
 	DIRECT;
 	CLR_NZV;
 	SET_NZ16(D);
-	WM16(EAD,&m6808.d);
+	WM16(EAD,&m68xx.d);
 }
 
 /* $de LDX direct -**0- */
 INLINE void ldx_di( void )
 {
-	DIRWORD(m6808.x);
+	DIRWORD(m68xx.x);
 	CLR_NZV;
 	SET_NZ16(X);
 }
@@ -1835,7 +1835,7 @@ INLINE void stx_di( void )
 	CLR_NZV;
 	SET_NZ16(X);
 	DIRECT;
-	WM16(EAD,&m6808.x);
+	WM16(EAD,&m68xx.x);
 }
 
 /* $e0 SUBB indexed ?**** */
@@ -1944,7 +1944,7 @@ INLINE void addb_ix( void )
 /* $ec LDD indexed -**0- */
 INLINE void ldd_ix( void )
 {
-	IDXWORD(m6808.d);
+	IDXWORD(m68xx.d);
 	CLR_NZV;
 	SET_NZ16(D);
 }
@@ -1964,13 +1964,13 @@ INLINE void std_ix( void )
 	INDEXED;
 	CLR_NZV;
 	SET_NZ16(D);
-	WM16(EAD,&m6808.d);
+	WM16(EAD,&m68xx.d);
 }
 
 /* $ee LDX indexed -**0- */
 INLINE void ldx_ix( void )
 {
-	IDXWORD(m6808.x);
+	IDXWORD(m68xx.x);
 	CLR_NZV;
 	SET_NZ16(X);
 }
@@ -1981,7 +1981,7 @@ INLINE void stx_ix( void )
 	CLR_NZV;
 	SET_NZ16(X);
 	INDEXED;
-	WM16(EAD,&m6808.x);
+	WM16(EAD,&m68xx.x);
 }
 
 /* $f0 SUBB extended ?**** */
@@ -2095,7 +2095,7 @@ INLINE void addb_ex( void )
 /* $fc LDD extended -**0- */
 INLINE void ldd_ex( void )
 {
-	EXTWORD(m6808.d);
+	EXTWORD(m68xx.d);
 	CLR_NZV;
 	SET_NZ16(D);
 }
@@ -2119,13 +2119,13 @@ INLINE void std_ex( void )
 	EXTENDED;
 	CLR_NZV;
 	SET_NZ16(D);
-	WM16(EAD,&m6808.d);
+	WM16(EAD,&m68xx.d);
 }
 
 /* $fe LDX extended -**0- */
 INLINE void ldx_ex( void )
 {
-	EXTWORD(m6808.x);
+	EXTWORD(m68xx.x);
 	CLR_NZV;
 	SET_NZ16(X);
 }
@@ -2136,5 +2136,5 @@ INLINE void stx_ex( void )
 	CLR_NZV;
 	SET_NZ16(X);
 	EXTENDED;
-	WM16(EAD,&m6808.x);
+	WM16(EAD,&m68xx.x);
 }

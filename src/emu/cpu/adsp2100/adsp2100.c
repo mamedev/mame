@@ -241,7 +241,8 @@ typedef struct
 	UINT16		ifc;
     UINT8    	irq_state[9];
     UINT8    	irq_latch[9];
-    int			(*irq_callback)(int irqline);
+    cpu_irq_callback irq_callback;
+    const device_config *device;
 
 	/* other internal states */
     int			icount;
@@ -551,9 +552,6 @@ static void set_irq_line(adsp2100_state *adsp, int irqline, int state)
 
 static void adsp21xx_get_context(void *dst)
 {
-	/* copy the context */
-	if (dst)
-		*(void **)dst = token;
 }
 
 
@@ -563,7 +561,7 @@ static void adsp21xx_set_context(void *src)
 	if (src)
 	{
 		adsp2100_state *adsp;
-		token = *(void **)src;
+		token = src;
 		adsp = token;
 		CHANGEPC(adsp);
 		check_irqs(adsp);
@@ -576,13 +574,11 @@ static void adsp21xx_set_context(void *src)
     INITIALIZATION AND SHUTDOWN
 ***************************************************************************/
 
-static adsp2100_state *adsp21xx_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static adsp2100_state *adsp21xx_init(const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback)
 {
-	adsp2100_state *adsp;
+	adsp2100_state *adsp = device->token;
 	
-	/* allocate state */
-	token = adsp = auto_malloc(sizeof(adsp2100_state));
-	memset(adsp, 0, sizeof(adsp2100_state));
+	token = device->token;	// temporary
 
 	/* create the tables */
 	if (!create_tables())
@@ -590,6 +586,7 @@ static adsp2100_state *adsp21xx_init(int index, int clock, const void *config, i
 
 	/* set the IRQ callback */
 	adsp->irq_callback = irqcallback;
+	adsp->device = device;
 	
 	/* set up ALU register pointers */
 	adsp->alu_xregs[0] = &adsp->core.ax0;
@@ -714,9 +711,9 @@ static adsp2100_state *adsp21xx_init(int index, int clock, const void *config, i
 }
 
 
-static void adsp21xx_reset(void)
+static CPU_RESET( adsp21xx )
 {
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = device->token;
 	int irq;
 
 	/* ensure that zero is zero */
@@ -874,7 +871,7 @@ static int create_tables(void)
 }
 
 
-static void adsp21xx_exit(void)
+static CPU_EXIT( adsp21xx )
 {
 	if (reverse_table != NULL)
 		free(reverse_table);
@@ -915,10 +912,10 @@ static void adsp21xx_exit(void)
 ***************************************************************************/
 
 /* execute instructions on this CPU until icount expires */
-static int adsp21xx_execute(int cycles)
+static CPU_EXECUTE( adsp21xx )
 {
 	int check_debugger = ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = device->token;
 
 	/* reset the core */
 	set_mstat(adsp, adsp->mstat);
@@ -1799,7 +1796,7 @@ static void adsp21xx_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(void *);				break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(adsp2100_state);		break;
 		case CPUINFO_INT_INPUT_LINES:					/* set per CPU */						break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
@@ -1925,9 +1922,9 @@ static void adsp21xx_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = adsp21xx_set_context;break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = adsp21xx_get_context;break;
 		case CPUINFO_PTR_INIT:							/* set per CPU */						break;
-		case CPUINFO_PTR_RESET:							info->reset = adsp21xx_reset;			break;
-		case CPUINFO_PTR_EXIT:							info->exit = adsp21xx_exit;				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = adsp21xx_execute;		break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(adsp21xx);			break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(adsp21xx);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(adsp21xx);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = adsp21xx_dasm;		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &adsp->icount;			break;
@@ -2069,9 +2066,9 @@ static void adsp21xx_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
  * ADSP2100 section
  **************************************************************************/
 
-static void adsp2100_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( adsp2100 )
 {
-	adsp2100_state *adsp = adsp21xx_init(index, clock, config, irqcallback);
+	adsp2100_state *adsp = adsp21xx_init(device, index, clock, config, irqcallback);
 	adsp->chip_type = CHIP_TYPE_ADSP2100;
 	adsp->mstat_mask = 0x0f;
 	adsp->imask_mask = 0x0f;
@@ -2107,7 +2104,7 @@ void adsp2100_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_STATE + ADSP2100_IRQ3:	info->i = adsp->irq_state[ADSP2100_IRQ3]; 	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = adsp2100_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(adsp2100);					break;
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = adsp2100_set_info;			break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = adsp21xx_set_context; 	break;
 
@@ -2127,9 +2124,9 @@ void adsp2100_get_info(UINT32 state, cpuinfo *info)
  * ADSP2101 section
  **************************************************************************/
 
-static void adsp2101_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( adsp2101 )
 {
-	adsp2100_state *adsp = adsp21xx_init(index, clock, config, irqcallback);
+	adsp2100_state *adsp = adsp21xx_init(device, index, clock, config, irqcallback);
 	adsp->chip_type = CHIP_TYPE_ADSP2101;
 	adsp->mstat_mask = 0x7f;
 	adsp->imask_mask = 0x3f;
@@ -2174,7 +2171,7 @@ void adsp2101_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_STATE + ADSP2101_TIMER:	info->i = adsp->irq_state[ADSP2101_TIMER]; 		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = adsp2101_init;						break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(adsp2101);						break;
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = adsp2101_set_info;				break;
 
 		case CPUINFO_PTR_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback;		break;
@@ -2197,9 +2194,9 @@ void adsp2101_get_info(UINT32 state, cpuinfo *info)
  * ADSP2104 section
  **************************************************************************/
 
-static void adsp2104_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( adsp2104 )
 {
-	adsp2100_state *adsp = adsp21xx_init(index, clock, config, irqcallback);
+	adsp2100_state *adsp = adsp21xx_init(device, index, clock, config, irqcallback);
 	adsp->chip_type = CHIP_TYPE_ADSP2104;
 	adsp->mstat_mask = 0x7f;
 	adsp->imask_mask = 0x3f;
@@ -2249,7 +2246,7 @@ void adsp2104_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_STATE + ADSP2104_TIMER:	info->i = adsp->irq_state[ADSP2104_TIMER]; 		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = adsp2104_init;						break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(adsp2104);						break;
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = adsp2104_set_info;				break;
 
 		case CPUINFO_PTR_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback;		break;
@@ -2272,9 +2269,9 @@ void adsp2104_get_info(UINT32 state, cpuinfo *info)
  * ADSP2105 section
  **************************************************************************/
 
-static void adsp2105_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( adsp2105 )
 {
-	adsp2100_state *adsp = adsp21xx_init(index, clock, config, irqcallback);
+	adsp2100_state *adsp = adsp21xx_init(device, index, clock, config, irqcallback);
 	adsp->chip_type = CHIP_TYPE_ADSP2105;
 	adsp->mstat_mask = 0x7f;
 	adsp->imask_mask = 0x3f;
@@ -2318,7 +2315,7 @@ void adsp2105_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_STATE + ADSP2105_IRQ2:	info->i = adsp->irq_state[ADSP2105_IRQ2]; 	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = adsp2105_init;					break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(adsp2105);					break;
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = adsp2105_set_info;			break;
 
 		case CPUINFO_PTR_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback;	break;
@@ -2341,9 +2338,9 @@ void adsp2105_get_info(UINT32 state, cpuinfo *info)
  * ADSP2115 section
  **************************************************************************/
 
-static void adsp2115_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( adsp2115 )
 {
-	adsp2100_state *adsp = adsp21xx_init(index, clock, config, irqcallback);
+	adsp2100_state *adsp = adsp21xx_init(device, index, clock, config, irqcallback);
 	adsp->chip_type = CHIP_TYPE_ADSP2115;
 	adsp->mstat_mask = 0x7f;
 	adsp->imask_mask = 0x3f;
@@ -2393,7 +2390,7 @@ void adsp2115_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_STATE + ADSP2115_TIMER:	info->i = adsp->irq_state[ADSP2115_TIMER]; 		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = adsp2115_init;						break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(adsp2115);						break;
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = adsp2115_set_info;				break;
 
 		case CPUINFO_PTR_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback;		break;
@@ -2416,9 +2413,9 @@ void adsp2115_get_info(UINT32 state, cpuinfo *info)
  * ADSP2181 section
  **************************************************************************/
 
-static void adsp2181_init(int index, int clock, const void *config, int (*irqcallback)(int))
+static CPU_INIT( adsp2181 )
 {
-	adsp2100_state *adsp = adsp21xx_init(index, clock, config, irqcallback);
+	adsp2100_state *adsp = adsp21xx_init(device, index, clock, config, irqcallback);
 	adsp->chip_type = CHIP_TYPE_ADSP2181;
 	adsp->mstat_mask = 0x7f;
 	adsp->imask_mask = 0x3ff;
@@ -2478,7 +2475,7 @@ void adsp2181_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = -1;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_INIT:							info->init = adsp2181_init;						break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(adsp2181);						break;
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = adsp2181_set_info;				break;
 
 		case CPUINFO_PTR_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback; 		break;

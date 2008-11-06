@@ -140,7 +140,7 @@ INLINE void ppc403_check_interrupts(void)
 	}
 }
 
-static void ppc403_reset(void)
+static CPU_RESET( ppc403 )
 {
 	ppc.pc = ppc.npc = 0xfffffffc;
 
@@ -148,7 +148,7 @@ static void ppc403_reset(void)
 	change_pc(ppc.pc);
 }
 
-static int ppc403_execute(int cycles)
+static CPU_EXECUTE( ppc403 )
 {
 	UINT32 fit_trigger_cycle;
 	ppc_icount = cycles;
@@ -424,7 +424,7 @@ static void ppc403_set_irq_line(int irqline, int state)
 
 				if (ppc.irq_callback)
 				{
-					ppc.irq_callback(irqline);
+					ppc.irq_callback(ppc.device, irqline);
 				}
 			}
 		}

@@ -535,7 +535,7 @@ static const Z8000_init table[] = {
 {0, 	0,	   0,	0,	0,0,									 0},
 };
 
-void z8000_init(int index, int clock, const void *config, int (*irqcallback)(int))
+CPU_INIT( z8000 )
 {
     int i;
 	const Z8000_init *init;
@@ -584,6 +584,7 @@ void z8000_init(int index, int clock, const void *config, int (*irqcallback)(int
 	}
 
 	Z.irq_callback = irqcallback;
+	Z.device = device;
 }
 
 void z8000_deinit(void)

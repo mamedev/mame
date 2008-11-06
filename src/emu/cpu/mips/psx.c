@@ -180,7 +180,8 @@ typedef struct
 	int multiplier_operation;
 	UINT32 multiplier_operand1;
 	UINT32 multiplier_operand2;
-	int (*irq_callback)(int irqline);
+	cpu_irq_callback irq_callback;
+	const device_config *device;
 	UINT8 (*readbyte)( UINT32 );
 	UINT16 (*readhalf)( UINT32 );
 	UINT32 (*readword)( UINT32 );
@@ -1580,14 +1581,15 @@ static void mips_state_register( const char *type, int index )
 	state_save_register_postload( Machine, mips_postload, NULL );
 }
 
-static void mips_init( int index, int clock, const void *config, int (*irqcallback)(int) )
+static CPU_INIT( mips )
 {
 	mipscpu.irq_callback = irqcallback;
+	mipscpu.device = device;
 
 	mips_state_register( "psxcpu", index );
 }
 
-static void mips_reset( void )
+static CPU_RESET( mips )
 {
 	mipscpu.delayr = 0;
 	mipscpu.delayv = 0;
@@ -1607,7 +1609,7 @@ static void mips_reset( void )
 	mips_set_pc( 0xbfc00000 );
 }
 
-static void mips_exit( void )
+static CPU_EXIT( mips )
 {
 }
 
@@ -1788,7 +1790,7 @@ static void mips_bc( int cop, int sr_cu, int condition )
 	}
 }
 
-static int mips_execute( int cycles )
+static CPU_EXECUTE( mips )
 {
 	mips_ICount = cycles;
 	do
@@ -2854,7 +2856,7 @@ static void set_irq_line( int irqline, int state )
             There is also a problem with PULSE_LINE interrupts as the interrupt
             pending bits aren't latched the emulated code won't know what caused
             the interrupt. */
-			(*mipscpu.irq_callback)( irqline );
+			(*mipscpu.irq_callback)( mipscpu.device, irqline );
 		}
 		break;
 	}
@@ -4160,10 +4162,10 @@ static void mips_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = mips_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = mips_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = mips_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = mips_init;					break;
-		case CPUINFO_PTR_RESET:							info->reset = mips_reset;				break;
-		case CPUINFO_PTR_EXIT:							info->exit = mips_exit;					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = mips_execute;			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(mips);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(mips);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(mips);					break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(mips);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = mips_dasm;			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &mips_ICount;			break;

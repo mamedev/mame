@@ -14,6 +14,8 @@
 #include "eminline.h"
 #include "debugger.h"
 
+extern const cpu_irq_callback cpu_irq_callbacks[];
+
 
 
 

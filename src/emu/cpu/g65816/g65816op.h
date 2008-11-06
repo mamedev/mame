@@ -384,7 +384,7 @@ INLINE void g65816i_interrupt_hardware(uint vector)
 	g65816i_set_flag_i(IFLAG_SET);
 	REGISTER_PB = 0;
 	g65816i_jump_16(g65816i_read_16_vector(vector));
-	if(INT_ACK) INT_ACK(0);
+	if(INT_ACK) INT_ACK(g65816i_cpu.device, 0);
 #else
 	CLK(8);
 	g65816i_push_8(REGISTER_PB>>16);
@@ -394,7 +394,7 @@ INLINE void g65816i_interrupt_hardware(uint vector)
 	g65816i_set_flag_i(IFLAG_SET);
 	REGISTER_PB = 0;
 	g65816i_jump_16(g65816i_read_16_vector(vector));
-	if(INT_ACK) INT_ACK(0);
+	if(INT_ACK) INT_ACK(g65816i_cpu.device, 0);
 #endif
 }
 
