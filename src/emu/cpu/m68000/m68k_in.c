@@ -1818,7 +1818,7 @@ M68KMAKE_OP(andi, 32, ., .)
 
 M68KMAKE_OP(andi, 16, toc, .)
 {
-	m68ki_set_ccr(m68k, m68ki_get_ccr() & OPER_I_16(m68k));
+	m68ki_set_ccr(m68k, m68ki_get_ccr(m68k) & OPER_I_16(m68k));
 }
 
 
@@ -5178,7 +5178,7 @@ M68KMAKE_OP(eori, 32, ., .)
 
 M68KMAKE_OP(eori, 16, toc, .)
 {
-	m68ki_set_ccr(m68k, m68ki_get_ccr() ^ OPER_I_16(m68k));
+	m68ki_set_ccr(m68k, m68ki_get_ccr(m68k) ^ OPER_I_16(m68k));
 }
 
 
@@ -6703,7 +6703,7 @@ M68KMAKE_OP(move, 16, frc, d)
 {
 	if(CPU_TYPE_IS_010_PLUS(m68k->cpu_type))
 	{
-		DY = MASK_OUT_BELOW_16(DY) | m68ki_get_ccr();
+		DY = MASK_OUT_BELOW_16(DY) | m68ki_get_ccr(m68k);
 		return;
 	}
 	m68ki_exception_illegal(m68k);
@@ -6714,7 +6714,7 @@ M68KMAKE_OP(move, 16, frc, .)
 {
 	if(CPU_TYPE_IS_010_PLUS(m68k->cpu_type))
 	{
-		m68ki_write_16(m68k, M68KMAKE_GET_EA_AY_16, m68ki_get_ccr());
+		m68ki_write_16(m68k, M68KMAKE_GET_EA_AY_16, m68ki_get_ccr(m68k));
 		return;
 	}
 	m68ki_exception_illegal(m68k);
@@ -8315,7 +8315,7 @@ M68KMAKE_OP(ori, 32, ., .)
 
 M68KMAKE_OP(ori, 16, toc, .)
 {
-	m68ki_set_ccr(m68k, m68ki_get_ccr() | OPER_I_16(m68k));
+	m68ki_set_ccr(m68k, m68ki_get_ccr(m68k) | OPER_I_16(m68k));
 }
 
 

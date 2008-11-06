@@ -948,14 +948,14 @@ INLINE void m68ki_write_32_pd_fc(m68ki_cpu_core *m68k, UINT32 address, UINT32 fc
 INLINE UINT32 m68ki_get_ea_pcdi(m68ki_cpu_core *m68k)
 {
 	UINT32 old_pc = REG_PC;
-	m68ki_use_program_space(); /* auto-disable */
+	m68ki_use_program_space(m68k); /* auto-disable */
 	return old_pc + MAKE_INT_16(m68ki_read_imm_16(m68k));
 }
 
 
 INLINE UINT32 m68ki_get_ea_pcix(m68ki_cpu_core *m68k)
 {
-	m68ki_use_program_space(); /* auto-disable */
+	m68ki_use_program_space(m68k); /* auto-disable */
 	return m68ki_get_ea_ix(m68k, REG_PC);
 }
 

@@ -780,7 +780,7 @@ int m68k_execute(m68ki_cpu_core *m68k, int num_cycles)
 			m68ki_trace_t1(); /* auto-disable (see m68kcpu.h) */
 
 			/* Set the address space for reads */
-			m68ki_use_data_space(); /* auto-disable (see m68kcpu.h) */
+			m68ki_use_data_space(m68k); /* auto-disable (see m68kcpu.h) */
 
 			/* Call external hook to peek at CPU */
 			debugger_instruction_hook(Machine, REG_PC);
