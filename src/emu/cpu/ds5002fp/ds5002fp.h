@@ -114,10 +114,6 @@ struct _ds5002fp_config
 	UINT8	crc;					/* bootstrap loader CRC register */
 };
 
-extern CPU_INIT( ds5002fp );					/* Initialize save states */
-extern CPU_RESET( ds5002fp );			/* Reset registers to the initial values */
-extern CPU_EXIT( ds5002fp ); 				/* Shut down CPU core */
-extern CPU_EXECUTE( ds5002fp );			/* Execute cycles - returns number of cycles actually run */
 extern void ds5002fp_get_context (void *dst);	/* Get registers, return context size */
 extern void ds5002fp_set_context (void *src);    	/* Set registers */
 extern unsigned ds5002fp_get_intram (int offset);

@@ -46,7 +46,7 @@
 /***************************************************************************
     PCU
 ***************************************************************************/
-static CPU_RESET( pcu );
+//static CPU_RESET( pcu );
 #define PC  (core.PCU.pc)
 #define LA  (core.PCU.la)
 #define LC  (core.PCU.lc)

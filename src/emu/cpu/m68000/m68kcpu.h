@@ -28,6 +28,7 @@
 
 typedef struct _m68ki_cpu_core m68ki_cpu_core;
 
+#include "devintrf.h"
 #include "m68k.h"
 #include <limits.h>
 #include <setjmp.h>
