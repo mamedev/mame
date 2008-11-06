@@ -13,44 +13,44 @@
 #define ZFLAG			0x01
 
 /* extracts flags */
-#define GET_SS			(adsp2100.astat & SSFLAG)
-#define GET_MV			(adsp2100.astat & MVFLAG)
-#define GET_Q			(adsp2100.astat &  QFLAG)
-#define GET_S			(adsp2100.astat &  SFLAG)
-#define GET_C			(adsp2100.astat &  CFLAG)
-#define GET_V			(adsp2100.astat &  VFLAG)
-#define GET_N			(adsp2100.astat &  NFLAG)
-#define GET_Z			(adsp2100.astat &  ZFLAG)
+#define GET_SS			(adsp->astat & SSFLAG)
+#define GET_MV			(adsp->astat & MVFLAG)
+#define GET_Q			(adsp->astat &  QFLAG)
+#define GET_S			(adsp->astat &  SFLAG)
+#define GET_C			(adsp->astat &  CFLAG)
+#define GET_V			(adsp->astat &  VFLAG)
+#define GET_N			(adsp->astat &  NFLAG)
+#define GET_Z			(adsp->astat &  ZFLAG)
 
 /* clears flags */
-#define CLR_SS			(adsp2100.astat &= ~SSFLAG)
-#define CLR_MV			(adsp2100.astat &= ~MVFLAG)
-#define CLR_Q			(adsp2100.astat &=  ~QFLAG)
-#define CLR_S			(adsp2100.astat &=  ~SFLAG)
-#define CLR_C			(adsp2100.astat &=  ~CFLAG)
-#define CLR_V			(adsp2100.astat &=  ~VFLAG)
-#define CLR_N			(adsp2100.astat &=  ~NFLAG)
-#define CLR_Z			(adsp2100.astat &=  ~ZFLAG)
+#define CLR_SS			(adsp->astat &= ~SSFLAG)
+#define CLR_MV			(adsp->astat &= ~MVFLAG)
+#define CLR_Q			(adsp->astat &=  ~QFLAG)
+#define CLR_S			(adsp->astat &=  ~SFLAG)
+#define CLR_C			(adsp->astat &=  ~CFLAG)
+#define CLR_V			(adsp->astat &=  ~VFLAG)
+#define CLR_N			(adsp->astat &=  ~NFLAG)
+#define CLR_Z			(adsp->astat &=  ~ZFLAG)
 
 /* sets flags */
-#define SET_SS			(adsp2100.astat |= SSFLAG)
-#define SET_MV			(adsp2100.astat |= MVFLAG)
-#define SET_Q			(adsp2100.astat |=  QFLAG)
-#define SET_S			(adsp2100.astat |=  SFLAG)
-#define SET_C			(adsp2100.astat |=  CFLAG)
-#define SET_V			(adsp2100.astat |=  VFLAG)
-#define SET_Z			(adsp2100.astat |=  ZFLAG)
-#define SET_N			(adsp2100.astat |=  NFLAG)
+#define SET_SS			(adsp->astat |= SSFLAG)
+#define SET_MV			(adsp->astat |= MVFLAG)
+#define SET_Q			(adsp->astat |=  QFLAG)
+#define SET_S			(adsp->astat |=  SFLAG)
+#define SET_C			(adsp->astat |=  CFLAG)
+#define SET_V			(adsp->astat |=  VFLAG)
+#define SET_Z			(adsp->astat |=  ZFLAG)
+#define SET_N			(adsp->astat |=  NFLAG)
 
 /* flag clearing; must be done before setting */
-#define CLR_FLAGS		(adsp2100.astat &= adsp2100.astat_clear)
+#define CLR_FLAGS		(adsp->astat &= adsp->astat_clear)
 
 /* compute flags */
-#define CALC_Z(r)		(adsp2100.astat |= ((r & 0xffff) == 0))
-#define CALC_N(r)		(adsp2100.astat |= (r >> 14) & 0x02)
-#define CALC_V(s,d,r)	(adsp2100.astat |= ((s ^ d ^ r ^ (r >> 1)) >> 13) & 0x04)
-#define CALC_C(r)		(adsp2100.astat |= (r >> 13) & 0x08)
-#define CALC_C_SUB(r)	(adsp2100.astat |= (~r >> 13) & 0x08)
+#define CALC_Z(r)		(adsp->astat |= ((r & 0xffff) == 0))
+#define CALC_N(r)		(adsp->astat |= (r >> 14) & 0x02)
+#define CALC_V(s,d,r)	(adsp->astat |= ((s ^ d ^ r ^ (r >> 1)) >> 13) & 0x04)
+#define CALC_C(r)		(adsp->astat |= (r >> 13) & 0x08)
+#define CALC_C_SUB(r)	(adsp->astat |= (~r >> 13) & 0x08)
 #define CALC_NZ(r) 		CLR_FLAGS; CALC_N(r); CALC_Z(r)
 #define CALC_NZV(s,d,r) CLR_FLAGS; CALC_N(r); CALC_Z(r); CALC_V(s,d,r)
 #define CALC_NZVC(s,d,r) CLR_FLAGS; CALC_N(r); CALC_Z(r); CALC_V(s,d,r); CALC_C(r)
@@ -81,22 +81,22 @@ static const INT32 constants[] =
 #define MSTAT_GOMODE	0x40			/* go mode enable */
 
 /* you must call this in order to change MSTAT */
-INLINE void set_mstat(int new_value)
+INLINE void set_mstat(adsp2100_state *adsp, int new_value)
 {
-	if ((new_value ^ adsp2100.mstat) & MSTAT_BANK)
+	if ((new_value ^ adsp->mstat) & MSTAT_BANK)
 	{
-		ADSPCORE temp = adsp2100.core;
-		adsp2100.core = adsp2100.alt;
-		adsp2100.alt = temp;
+		ADSPCORE temp = adsp->core;
+		adsp->core = adsp->alt;
+		adsp->alt = temp;
 	}
-	if ((new_value ^ adsp2100.mstat) & MSTAT_TIMER)
-		if (adsp2100.timer_fired_func)
-			(*adsp2100.timer_fired_func)((new_value & MSTAT_TIMER) != 0);
+	if ((new_value ^ adsp->mstat) & MSTAT_TIMER)
+		if (adsp->timer_fired_func)
+			(*adsp->timer_fired_func)((new_value & MSTAT_TIMER) != 0);
 	if (new_value & MSTAT_STICKYV)
-		adsp2100.astat_clear = ~(CFLAG | NFLAG | ZFLAG);
+		adsp->astat_clear = ~(CFLAG | NFLAG | ZFLAG);
 	else
-		adsp2100.astat_clear = ~(CFLAG | VFLAG | NFLAG | ZFLAG);
-	adsp2100.mstat = new_value;
+		adsp->astat_clear = ~(CFLAG | VFLAG | NFLAG | ZFLAG);
+	adsp->mstat = new_value;
 }
 
 
@@ -120,67 +120,67 @@ INLINE void set_mstat(int new_value)
     PC stack handlers
 ===========================================================================*/
 
-INLINE UINT32 pc_stack_top(void)
+INLINE UINT32 pc_stack_top(adsp2100_state *adsp)
 {
-	if (adsp2100.pc_sp > 0)
-		return adsp2100.pc_stack[adsp2100.pc_sp - 1];
+	if (adsp->pc_sp > 0)
+		return adsp->pc_stack[adsp->pc_sp - 1];
 	else
-		return adsp2100.pc_stack[0];
+		return adsp->pc_stack[0];
 }
 
-INLINE void set_pc_stack_top(UINT32 top)
+INLINE void set_pc_stack_top(adsp2100_state *adsp, UINT32 top)
 {
-	if (adsp2100.pc_sp > 0)
-		adsp2100.pc_stack[adsp2100.pc_sp - 1] = top;
+	if (adsp->pc_sp > 0)
+		adsp->pc_stack[adsp->pc_sp - 1] = top;
 	else
-		adsp2100.pc_stack[0] = top;
+		adsp->pc_stack[0] = top;
 }
 
-INLINE void pc_stack_push(void)
+INLINE void pc_stack_push(adsp2100_state *adsp)
 {
-	if (adsp2100.pc_sp < PC_STACK_DEPTH)
+	if (adsp->pc_sp < PC_STACK_DEPTH)
 	{
-		adsp2100.pc_stack[adsp2100.pc_sp] = adsp2100.pc;
-		adsp2100.pc_sp++;
-		adsp2100.sstat &= ~PC_EMPTY;
+		adsp->pc_stack[adsp->pc_sp] = adsp->pc;
+		adsp->pc_sp++;
+		adsp->sstat &= ~PC_EMPTY;
 	}
 	else
-		adsp2100.sstat |= PC_OVER;
+		adsp->sstat |= PC_OVER;
 }
 
-INLINE void pc_stack_push_val(UINT32 val)
+INLINE void pc_stack_push_val(adsp2100_state *adsp, UINT32 val)
 {
-	if (adsp2100.pc_sp < PC_STACK_DEPTH)
+	if (adsp->pc_sp < PC_STACK_DEPTH)
 	{
-		adsp2100.pc_stack[adsp2100.pc_sp] = val;
-		adsp2100.pc_sp++;
-		adsp2100.sstat &= ~PC_EMPTY;
+		adsp->pc_stack[adsp->pc_sp] = val;
+		adsp->pc_sp++;
+		adsp->sstat &= ~PC_EMPTY;
 	}
 	else
-		adsp2100.sstat |= PC_OVER;
+		adsp->sstat |= PC_OVER;
 }
 
-INLINE void pc_stack_pop(void)
+INLINE void pc_stack_pop(adsp2100_state *adsp)
 {
-	if (adsp2100.pc_sp > 0)
+	if (adsp->pc_sp > 0)
 	{
-		adsp2100.pc_sp--;
-		if (adsp2100.pc_sp == 0)
-			adsp2100.sstat |= PC_EMPTY;
+		adsp->pc_sp--;
+		if (adsp->pc_sp == 0)
+			adsp->sstat |= PC_EMPTY;
 	}
-	adsp2100.pc = adsp2100.pc_stack[adsp2100.pc_sp];
-	CHANGEPC();
+	adsp->pc = adsp->pc_stack[adsp->pc_sp];
+	CHANGEPC(adsp);
 }
 
-INLINE UINT32 pc_stack_pop_val(void)
+INLINE UINT32 pc_stack_pop_val(adsp2100_state *adsp)
 {
-	if (adsp2100.pc_sp > 0)
+	if (adsp->pc_sp > 0)
 	{
-		adsp2100.pc_sp--;
-		if (adsp2100.pc_sp == 0)
-			adsp2100.sstat |= PC_EMPTY;
+		adsp->pc_sp--;
+		if (adsp->pc_sp == 0)
+			adsp->sstat |= PC_EMPTY;
 	}
-	return adsp2100.pc_stack[adsp2100.pc_sp];
+	return adsp->pc_stack[adsp->pc_sp];
 }
 
 
@@ -188,35 +188,35 @@ INLINE UINT32 pc_stack_pop_val(void)
     CNTR stack handlers
 ===========================================================================*/
 
-INLINE UINT32 cntr_stack_top(void)
+INLINE UINT32 cntr_stack_top(adsp2100_state *adsp)
 {
-	if (adsp2100.cntr_sp > 0)
-		return adsp2100.cntr_stack[adsp2100.cntr_sp - 1];
+	if (adsp->cntr_sp > 0)
+		return adsp->cntr_stack[adsp->cntr_sp - 1];
 	else
-		return adsp2100.cntr_stack[0];
+		return adsp->cntr_stack[0];
 }
 
-INLINE void cntr_stack_push(void)
+INLINE void cntr_stack_push(adsp2100_state *adsp)
 {
-	if (adsp2100.cntr_sp < CNTR_STACK_DEPTH)
+	if (adsp->cntr_sp < CNTR_STACK_DEPTH)
 	{
-		adsp2100.cntr_stack[adsp2100.cntr_sp] = adsp2100.cntr;
-		adsp2100.cntr_sp++;
-		adsp2100.sstat &= ~COUNT_EMPTY;
+		adsp->cntr_stack[adsp->cntr_sp] = adsp->cntr;
+		adsp->cntr_sp++;
+		adsp->sstat &= ~COUNT_EMPTY;
 	}
 	else
-		adsp2100.sstat |= COUNT_OVER;
+		adsp->sstat |= COUNT_OVER;
 }
 
-INLINE void cntr_stack_pop(void)
+INLINE void cntr_stack_pop(adsp2100_state *adsp)
 {
-	if (adsp2100.cntr_sp > 0)
+	if (adsp->cntr_sp > 0)
 	{
-		adsp2100.cntr_sp--;
-		if (adsp2100.cntr_sp == 0)
-			adsp2100.sstat |= COUNT_EMPTY;
+		adsp->cntr_sp--;
+		if (adsp->cntr_sp == 0)
+			adsp->sstat |= COUNT_EMPTY;
 	}
-	adsp2100.cntr = adsp2100.cntr_stack[adsp2100.cntr_sp];
+	adsp->cntr = adsp->cntr_stack[adsp->cntr_sp];
 }
 
 
@@ -224,43 +224,43 @@ INLINE void cntr_stack_pop(void)
     LOOP stack handlers
 ===========================================================================*/
 
-INLINE UINT32 loop_stack_top(void)
+INLINE UINT32 loop_stack_top(adsp2100_state *adsp)
 {
-	if (adsp2100.loop_sp > 0)
-		return adsp2100.loop_stack[adsp2100.loop_sp - 1];
+	if (adsp->loop_sp > 0)
+		return adsp->loop_stack[adsp->loop_sp - 1];
 	else
-		return adsp2100.loop_stack[0];
+		return adsp->loop_stack[0];
 }
 
-INLINE void loop_stack_push(UINT32 value)
+INLINE void loop_stack_push(adsp2100_state *adsp, UINT32 value)
 {
-	if (adsp2100.loop_sp < LOOP_STACK_DEPTH)
+	if (adsp->loop_sp < LOOP_STACK_DEPTH)
 	{
-		adsp2100.loop_stack[adsp2100.loop_sp] = value;
-		adsp2100.loop_sp++;
-		adsp2100.loop = value >> 4;
-		adsp2100.loop_condition = value & 15;
-		adsp2100.sstat &= ~LOOP_EMPTY;
+		adsp->loop_stack[adsp->loop_sp] = value;
+		adsp->loop_sp++;
+		adsp->loop = value >> 4;
+		adsp->loop_condition = value & 15;
+		adsp->sstat &= ~LOOP_EMPTY;
 	}
 	else
-		adsp2100.sstat |= LOOP_OVER;
+		adsp->sstat |= LOOP_OVER;
 }
 
-INLINE void loop_stack_pop(void)
+INLINE void loop_stack_pop(adsp2100_state *adsp)
 {
-	if (adsp2100.loop_sp > 0)
+	if (adsp->loop_sp > 0)
 	{
-		adsp2100.loop_sp--;
-		if (adsp2100.loop_sp == 0)
+		adsp->loop_sp--;
+		if (adsp->loop_sp == 0)
 		{
-			adsp2100.loop = 0xffff;
-			adsp2100.loop_condition = 0;
-			adsp2100.sstat |= LOOP_EMPTY;
+			adsp->loop = 0xffff;
+			adsp->loop_condition = 0;
+			adsp->sstat |= LOOP_EMPTY;
 		}
 		else
 		{
-			adsp2100.loop = adsp2100.loop_stack[adsp2100.loop_sp -1] >> 4;
-			adsp2100.loop_condition = adsp2100.loop_stack[adsp2100.loop_sp - 1] & 15;
+			adsp->loop = adsp->loop_stack[adsp->loop_sp -1] >> 4;
+			adsp->loop_condition = adsp->loop_stack[adsp->loop_sp - 1] & 15;
 		}
 	}
 }
@@ -270,32 +270,32 @@ INLINE void loop_stack_pop(void)
     STAT stack handlers
 ===========================================================================*/
 
-INLINE void stat_stack_push(void)
+INLINE void stat_stack_push(adsp2100_state *adsp)
 {
-	if (adsp2100.stat_sp < STAT_STACK_DEPTH)
+	if (adsp->stat_sp < STAT_STACK_DEPTH)
 	{
-		adsp2100.stat_stack[adsp2100.stat_sp][0] = adsp2100.mstat;
-		adsp2100.stat_stack[adsp2100.stat_sp][1] = adsp2100.imask;
-		adsp2100.stat_stack[adsp2100.stat_sp][2] = adsp2100.astat;
-		adsp2100.stat_sp++;
-		adsp2100.sstat &= ~STATUS_EMPTY;
+		adsp->stat_stack[adsp->stat_sp][0] = adsp->mstat;
+		adsp->stat_stack[adsp->stat_sp][1] = adsp->imask;
+		adsp->stat_stack[adsp->stat_sp][2] = adsp->astat;
+		adsp->stat_sp++;
+		adsp->sstat &= ~STATUS_EMPTY;
 	}
 	else
-		adsp2100.sstat |= STATUS_OVER;
+		adsp->sstat |= STATUS_OVER;
 }
 
-INLINE void stat_stack_pop(void)
+INLINE void stat_stack_pop(adsp2100_state *adsp)
 {
-	if (adsp2100.stat_sp > 0)
+	if (adsp->stat_sp > 0)
 	{
-		adsp2100.stat_sp--;
-		if (adsp2100.stat_sp == 0)
-			adsp2100.sstat |= STATUS_EMPTY;
+		adsp->stat_sp--;
+		if (adsp->stat_sp == 0)
+			adsp->sstat |= STATUS_EMPTY;
 	}
-	set_mstat(adsp2100.stat_stack[adsp2100.stat_sp][0]);
-	adsp2100.imask = adsp2100.stat_stack[adsp2100.stat_sp][1];
-	adsp2100.astat = adsp2100.stat_stack[adsp2100.stat_sp][2];
- 	check_irqs();
+	set_mstat(adsp, adsp->stat_stack[adsp->stat_sp][0]);
+	adsp->imask = adsp->stat_stack[adsp->stat_sp][1];
+	adsp->astat = adsp->stat_stack[adsp->stat_sp][2];
+ 	check_irqs(adsp);
 }
 
 
@@ -304,15 +304,15 @@ INLINE void stat_stack_pop(void)
     condition code checking
 ===========================================================================*/
 
-INLINE int CONDITION(int c)
+INLINE int CONDITION(adsp2100_state *adsp, int c)
 {
 	if (c != 14)
-		return condition_table[((c) << 8) | adsp2100.astat];
-	else if ((INT32)--adsp2100.cntr > 0)
+		return condition_table[((c) << 8) | adsp->astat];
+	else if ((INT32)--adsp->cntr > 0)
 		return 1;
 	else
 	{
-		cntr_stack_pop();
+		cntr_stack_pop(adsp);
 		return 0;
 	}
 }
@@ -323,104 +323,104 @@ INLINE int CONDITION(int c)
     register writing
 ===========================================================================*/
 
-static void wr_inval(INT32 val) { logerror( "ADSP %04x: Writing to an invalid register!\n", adsp2100.ppc ); }
-static void wr_ax0(INT32 val)   { adsp2100.core.ax0.s = val; }
-static void wr_ax1(INT32 val)   { adsp2100.core.ax1.s = val; }
-static void wr_mx0(INT32 val)   { adsp2100.core.mx0.s = val; }
-static void wr_mx1(INT32 val)   { adsp2100.core.mx1.s = val; }
-static void wr_ay0(INT32 val)   { adsp2100.core.ay0.s = val; }
-static void wr_ay1(INT32 val)   { adsp2100.core.ay1.s = val; }
-static void wr_my0(INT32 val)   { adsp2100.core.my0.s = val; }
-static void wr_my1(INT32 val)   { adsp2100.core.my1.s = val; }
-static void wr_si(INT32 val)    { adsp2100.core.si.s = val; }
-static void wr_se(INT32 val)    { adsp2100.core.se.s = (INT8)val; }
-static void wr_ar(INT32 val)    { adsp2100.core.ar.s = val; }
-static void wr_mr0(INT32 val)   { adsp2100.core.mr.mrx.mr0.s = val; }
-static void wr_mr1(INT32 val)   { adsp2100.core.mr.mrx.mr1.s = val; adsp2100.core.mr.mrx.mr2.s = (INT16)val >> 15; }
-static void wr_mr2(INT32 val)   { adsp2100.core.mr.mrx.mr2.s = (INT8)val; }
-static void wr_sr0(INT32 val)   { adsp2100.core.sr.srx.sr0.s = val; }
-static void wr_sr1(INT32 val)   { adsp2100.core.sr.srx.sr1.s = val; }
-static void wr_i0(INT32 val)    { adsp2100.i[0] = val & 0x3fff; adsp2100.base[0] = val & adsp2100.lmask[0]; }
-static void wr_i1(INT32 val)    { adsp2100.i[1] = val & 0x3fff; adsp2100.base[1] = val & adsp2100.lmask[1]; }
-static void wr_i2(INT32 val)    { adsp2100.i[2] = val & 0x3fff; adsp2100.base[2] = val & adsp2100.lmask[2]; }
-static void wr_i3(INT32 val)    { adsp2100.i[3] = val & 0x3fff; adsp2100.base[3] = val & adsp2100.lmask[3]; }
-static void wr_i4(INT32 val)    { adsp2100.i[4] = val & 0x3fff; adsp2100.base[4] = val & adsp2100.lmask[4]; }
-static void wr_i5(INT32 val)    { adsp2100.i[5] = val & 0x3fff; adsp2100.base[5] = val & adsp2100.lmask[5]; }
-static void wr_i6(INT32 val)    { adsp2100.i[6] = val & 0x3fff; adsp2100.base[6] = val & adsp2100.lmask[6]; }
-static void wr_i7(INT32 val)    { adsp2100.i[7] = val & 0x3fff; adsp2100.base[7] = val & adsp2100.lmask[7]; }
-static void wr_m0(INT32 val)    { adsp2100.m[0] = (INT32)(val << 18) >> 18; }
-static void wr_m1(INT32 val)    { adsp2100.m[1] = (INT32)(val << 18) >> 18; }
-static void wr_m2(INT32 val)    { adsp2100.m[2] = (INT32)(val << 18) >> 18; }
-static void wr_m3(INT32 val)    { adsp2100.m[3] = (INT32)(val << 18) >> 18; }
-static void wr_m4(INT32 val)    { adsp2100.m[4] = (INT32)(val << 18) >> 18; }
-static void wr_m5(INT32 val)    { adsp2100.m[5] = (INT32)(val << 18) >> 18; }
-static void wr_m6(INT32 val)    { adsp2100.m[6] = (INT32)(val << 18) >> 18; }
-static void wr_m7(INT32 val)    { adsp2100.m[7] = (INT32)(val << 18) >> 18; }
-static void wr_l0(INT32 val)    { adsp2100.l[0] = val & 0x3fff; adsp2100.lmask[0] = mask_table[val & 0x3fff]; adsp2100.base[0] = adsp2100.i[0] & adsp2100.lmask[0]; }
-static void wr_l1(INT32 val)    { adsp2100.l[1] = val & 0x3fff; adsp2100.lmask[1] = mask_table[val & 0x3fff]; adsp2100.base[1] = adsp2100.i[1] & adsp2100.lmask[1]; }
-static void wr_l2(INT32 val)    { adsp2100.l[2] = val & 0x3fff; adsp2100.lmask[2] = mask_table[val & 0x3fff]; adsp2100.base[2] = adsp2100.i[2] & adsp2100.lmask[2]; }
-static void wr_l3(INT32 val)    { adsp2100.l[3] = val & 0x3fff; adsp2100.lmask[3] = mask_table[val & 0x3fff]; adsp2100.base[3] = adsp2100.i[3] & adsp2100.lmask[3]; }
-static void wr_l4(INT32 val)    { adsp2100.l[4] = val & 0x3fff; adsp2100.lmask[4] = mask_table[val & 0x3fff]; adsp2100.base[4] = adsp2100.i[4] & adsp2100.lmask[4]; }
-static void wr_l5(INT32 val)    { adsp2100.l[5] = val & 0x3fff; adsp2100.lmask[5] = mask_table[val & 0x3fff]; adsp2100.base[5] = adsp2100.i[5] & adsp2100.lmask[5]; }
-static void wr_l6(INT32 val)    { adsp2100.l[6] = val & 0x3fff; adsp2100.lmask[6] = mask_table[val & 0x3fff]; adsp2100.base[6] = adsp2100.i[6] & adsp2100.lmask[6]; }
-static void wr_l7(INT32 val)    { adsp2100.l[7] = val & 0x3fff; adsp2100.lmask[7] = mask_table[val & 0x3fff]; adsp2100.base[7] = adsp2100.i[7] & adsp2100.lmask[7]; }
-static void wr_astat(INT32 val) { adsp2100.astat = val & 0x00ff; }
-static void wr_mstat(INT32 val) { set_mstat(val & mstat_mask); }
-static void wr_sstat(INT32 val) { adsp2100.sstat = val & 0x00ff; }
-static void wr_imask(INT32 val) { adsp2100.imask = val & imask_mask; check_irqs(); }
-static void wr_icntl(INT32 val) { adsp2100.icntl = val & 0x001f; check_irqs(); }
-static void wr_cntr(INT32 val)  { cntr_stack_push(); adsp2100.cntr = val & 0x3fff; }
-static void wr_sb(INT32 val)    { adsp2100.core.sb.s = (INT32)(val << 27) >> 27; }
-static void wr_px(INT32 val)    { adsp2100.px = val; }
-static void wr_ifc(INT32 val)
+static void wr_inval(adsp2100_state *adsp, INT32 val) { logerror( "ADSP %04x: Writing to an invalid register!\n", adsp->ppc ); }
+static void wr_ax0(adsp2100_state *adsp, INT32 val)   { adsp->core.ax0.s = val; }
+static void wr_ax1(adsp2100_state *adsp, INT32 val)   { adsp->core.ax1.s = val; }
+static void wr_mx0(adsp2100_state *adsp, INT32 val)   { adsp->core.mx0.s = val; }
+static void wr_mx1(adsp2100_state *adsp, INT32 val)   { adsp->core.mx1.s = val; }
+static void wr_ay0(adsp2100_state *adsp, INT32 val)   { adsp->core.ay0.s = val; }
+static void wr_ay1(adsp2100_state *adsp, INT32 val)   { adsp->core.ay1.s = val; }
+static void wr_my0(adsp2100_state *adsp, INT32 val)   { adsp->core.my0.s = val; }
+static void wr_my1(adsp2100_state *adsp, INT32 val)   { adsp->core.my1.s = val; }
+static void wr_si(adsp2100_state *adsp, INT32 val)    { adsp->core.si.s = val; }
+static void wr_se(adsp2100_state *adsp, INT32 val)    { adsp->core.se.s = (INT8)val; }
+static void wr_ar(adsp2100_state *adsp, INT32 val)    { adsp->core.ar.s = val; }
+static void wr_mr0(adsp2100_state *adsp, INT32 val)   { adsp->core.mr.mrx.mr0.s = val; }
+static void wr_mr1(adsp2100_state *adsp, INT32 val)   { adsp->core.mr.mrx.mr1.s = val; adsp->core.mr.mrx.mr2.s = (INT16)val >> 15; }
+static void wr_mr2(adsp2100_state *adsp, INT32 val)   { adsp->core.mr.mrx.mr2.s = (INT8)val; }
+static void wr_sr0(adsp2100_state *adsp, INT32 val)   { adsp->core.sr.srx.sr0.s = val; }
+static void wr_sr1(adsp2100_state *adsp, INT32 val)   { adsp->core.sr.srx.sr1.s = val; }
+static void wr_i0(adsp2100_state *adsp, INT32 val)    { adsp->i[0] = val & 0x3fff; adsp->base[0] = val & adsp->lmask[0]; }
+static void wr_i1(adsp2100_state *adsp, INT32 val)    { adsp->i[1] = val & 0x3fff; adsp->base[1] = val & adsp->lmask[1]; }
+static void wr_i2(adsp2100_state *adsp, INT32 val)    { adsp->i[2] = val & 0x3fff; adsp->base[2] = val & adsp->lmask[2]; }
+static void wr_i3(adsp2100_state *adsp, INT32 val)    { adsp->i[3] = val & 0x3fff; adsp->base[3] = val & adsp->lmask[3]; }
+static void wr_i4(adsp2100_state *adsp, INT32 val)    { adsp->i[4] = val & 0x3fff; adsp->base[4] = val & adsp->lmask[4]; }
+static void wr_i5(adsp2100_state *adsp, INT32 val)    { adsp->i[5] = val & 0x3fff; adsp->base[5] = val & adsp->lmask[5]; }
+static void wr_i6(adsp2100_state *adsp, INT32 val)    { adsp->i[6] = val & 0x3fff; adsp->base[6] = val & adsp->lmask[6]; }
+static void wr_i7(adsp2100_state *adsp, INT32 val)    { adsp->i[7] = val & 0x3fff; adsp->base[7] = val & adsp->lmask[7]; }
+static void wr_m0(adsp2100_state *adsp, INT32 val)    { adsp->m[0] = (INT32)(val << 18) >> 18; }
+static void wr_m1(adsp2100_state *adsp, INT32 val)    { adsp->m[1] = (INT32)(val << 18) >> 18; }
+static void wr_m2(adsp2100_state *adsp, INT32 val)    { adsp->m[2] = (INT32)(val << 18) >> 18; }
+static void wr_m3(adsp2100_state *adsp, INT32 val)    { adsp->m[3] = (INT32)(val << 18) >> 18; }
+static void wr_m4(adsp2100_state *adsp, INT32 val)    { adsp->m[4] = (INT32)(val << 18) >> 18; }
+static void wr_m5(adsp2100_state *adsp, INT32 val)    { adsp->m[5] = (INT32)(val << 18) >> 18; }
+static void wr_m6(adsp2100_state *adsp, INT32 val)    { adsp->m[6] = (INT32)(val << 18) >> 18; }
+static void wr_m7(adsp2100_state *adsp, INT32 val)    { adsp->m[7] = (INT32)(val << 18) >> 18; }
+static void wr_l0(adsp2100_state *adsp, INT32 val)    { adsp->l[0] = val & 0x3fff; adsp->lmask[0] = mask_table[val & 0x3fff]; adsp->base[0] = adsp->i[0] & adsp->lmask[0]; }
+static void wr_l1(adsp2100_state *adsp, INT32 val)    { adsp->l[1] = val & 0x3fff; adsp->lmask[1] = mask_table[val & 0x3fff]; adsp->base[1] = adsp->i[1] & adsp->lmask[1]; }
+static void wr_l2(adsp2100_state *adsp, INT32 val)    { adsp->l[2] = val & 0x3fff; adsp->lmask[2] = mask_table[val & 0x3fff]; adsp->base[2] = adsp->i[2] & adsp->lmask[2]; }
+static void wr_l3(adsp2100_state *adsp, INT32 val)    { adsp->l[3] = val & 0x3fff; adsp->lmask[3] = mask_table[val & 0x3fff]; adsp->base[3] = adsp->i[3] & adsp->lmask[3]; }
+static void wr_l4(adsp2100_state *adsp, INT32 val)    { adsp->l[4] = val & 0x3fff; adsp->lmask[4] = mask_table[val & 0x3fff]; adsp->base[4] = adsp->i[4] & adsp->lmask[4]; }
+static void wr_l5(adsp2100_state *adsp, INT32 val)    { adsp->l[5] = val & 0x3fff; adsp->lmask[5] = mask_table[val & 0x3fff]; adsp->base[5] = adsp->i[5] & adsp->lmask[5]; }
+static void wr_l6(adsp2100_state *adsp, INT32 val)    { adsp->l[6] = val & 0x3fff; adsp->lmask[6] = mask_table[val & 0x3fff]; adsp->base[6] = adsp->i[6] & adsp->lmask[6]; }
+static void wr_l7(adsp2100_state *adsp, INT32 val)    { adsp->l[7] = val & 0x3fff; adsp->lmask[7] = mask_table[val & 0x3fff]; adsp->base[7] = adsp->i[7] & adsp->lmask[7]; }
+static void wr_astat(adsp2100_state *adsp, INT32 val) { adsp->astat = val & 0x00ff; }
+static void wr_mstat(adsp2100_state *adsp, INT32 val) { set_mstat(adsp, val & adsp->mstat_mask); }
+static void wr_sstat(adsp2100_state *adsp, INT32 val) { adsp->sstat = val & 0x00ff; }
+static void wr_imask(adsp2100_state *adsp, INT32 val) { adsp->imask = val & adsp->imask_mask; check_irqs(adsp); }
+static void wr_icntl(adsp2100_state *adsp, INT32 val) { adsp->icntl = val & 0x001f; check_irqs(adsp); }
+static void wr_cntr(adsp2100_state *adsp, INT32 val)  { cntr_stack_push(adsp); adsp->cntr = val & 0x3fff; }
+static void wr_sb(adsp2100_state *adsp, INT32 val)    { adsp->core.sb.s = (INT32)(val << 27) >> 27; }
+static void wr_px(adsp2100_state *adsp, INT32 val)    { adsp->px = val; }
+static void wr_ifc(adsp2100_state *adsp, INT32 val)
 {
-	adsp2100.ifc = val;
+	adsp->ifc = val;
 #if (HAS_ADSP2181)
-	if (chip_type >= CHIP_TYPE_ADSP2181)
+	if (adsp->chip_type >= CHIP_TYPE_ADSP2181)
 	{
 		/* clear timer */
-		if (val & 0x0002) adsp2100.irq_latch[ADSP2181_IRQ0] = 0;
-		if (val & 0x0004) adsp2100.irq_latch[ADSP2181_IRQ1] = 0;
+		if (val & 0x0002) adsp->irq_latch[ADSP2181_IRQ0] = 0;
+		if (val & 0x0004) adsp->irq_latch[ADSP2181_IRQ1] = 0;
 		/* clear BDMA */
-		if (val & 0x0010) adsp2100.irq_latch[ADSP2181_IRQE] = 0;
-		if (val & 0x0020) adsp2100.irq_latch[ADSP2181_SPORT0_RX] = 0;
-		if (val & 0x0040) adsp2100.irq_latch[ADSP2181_SPORT0_TX] = 0;
-		if (val & 0x0080) adsp2100.irq_latch[ADSP2181_IRQ2] = 0;
+		if (val & 0x0010) adsp->irq_latch[ADSP2181_IRQE] = 0;
+		if (val & 0x0020) adsp->irq_latch[ADSP2181_SPORT0_RX] = 0;
+		if (val & 0x0040) adsp->irq_latch[ADSP2181_SPORT0_TX] = 0;
+		if (val & 0x0080) adsp->irq_latch[ADSP2181_IRQ2] = 0;
 		/* force timer */
-		if (val & 0x0200) adsp2100.irq_latch[ADSP2181_IRQ0] = 1;
-		if (val & 0x0400) adsp2100.irq_latch[ADSP2181_IRQ1] = 1;
+		if (val & 0x0200) adsp->irq_latch[ADSP2181_IRQ0] = 1;
+		if (val & 0x0400) adsp->irq_latch[ADSP2181_IRQ1] = 1;
 		/* force BDMA */
-		if (val & 0x1000) adsp2100.irq_latch[ADSP2181_IRQE] = 1;
-		if (val & 0x2000) adsp2100.irq_latch[ADSP2181_SPORT0_RX] = 1;
-		if (val & 0x4000) adsp2100.irq_latch[ADSP2181_SPORT0_TX] = 1;
-		if (val & 0x8000) adsp2100.irq_latch[ADSP2181_IRQ2] = 1;
+		if (val & 0x1000) adsp->irq_latch[ADSP2181_IRQE] = 1;
+		if (val & 0x2000) adsp->irq_latch[ADSP2181_SPORT0_RX] = 1;
+		if (val & 0x4000) adsp->irq_latch[ADSP2181_SPORT0_TX] = 1;
+		if (val & 0x8000) adsp->irq_latch[ADSP2181_IRQ2] = 1;
 	}
 	else
 #endif
 	{
 		/* clear timer */
-		if (val & 0x002) adsp2100.irq_latch[ADSP2101_IRQ0] = 0;
-		if (val & 0x004) adsp2100.irq_latch[ADSP2101_IRQ1] = 0;
-		if (val & 0x008) adsp2100.irq_latch[ADSP2101_SPORT0_RX] = 0;
-		if (val & 0x010) adsp2100.irq_latch[ADSP2101_SPORT0_TX] = 0;
-		if (val & 0x020) adsp2100.irq_latch[ADSP2101_IRQ2] = 0;
+		if (val & 0x002) adsp->irq_latch[ADSP2101_IRQ0] = 0;
+		if (val & 0x004) adsp->irq_latch[ADSP2101_IRQ1] = 0;
+		if (val & 0x008) adsp->irq_latch[ADSP2101_SPORT0_RX] = 0;
+		if (val & 0x010) adsp->irq_latch[ADSP2101_SPORT0_TX] = 0;
+		if (val & 0x020) adsp->irq_latch[ADSP2101_IRQ2] = 0;
 		/* set timer */
-		if (val & 0x080) adsp2100.irq_latch[ADSP2101_IRQ0] = 1;
-		if (val & 0x100) adsp2100.irq_latch[ADSP2101_IRQ1] = 1;
-		if (val & 0x200) adsp2100.irq_latch[ADSP2101_SPORT0_RX] = 1;
-		if (val & 0x400) adsp2100.irq_latch[ADSP2101_SPORT0_TX] = 1;
-		if (val & 0x800) adsp2100.irq_latch[ADSP2101_IRQ2] = 1;
+		if (val & 0x080) adsp->irq_latch[ADSP2101_IRQ0] = 1;
+		if (val & 0x100) adsp->irq_latch[ADSP2101_IRQ1] = 1;
+		if (val & 0x200) adsp->irq_latch[ADSP2101_SPORT0_RX] = 1;
+		if (val & 0x400) adsp->irq_latch[ADSP2101_SPORT0_TX] = 1;
+		if (val & 0x800) adsp->irq_latch[ADSP2101_IRQ2] = 1;
 	}
-	check_irqs();
+	check_irqs(adsp);
 }
-static void wr_tx0(INT32 val)	{ if (adsp2100.sport_tx_callback) (*adsp2100.sport_tx_callback)(0, val); }
-static void wr_tx1(INT32 val)	{ if (adsp2100.sport_tx_callback) (*adsp2100.sport_tx_callback)(1, val); }
-static void wr_owrctr(INT32 val) { adsp2100.cntr = val & 0x3fff; }
-static void wr_topstack(INT32 val) { pc_stack_push_val(val & 0x3fff); }
+static void wr_tx0(adsp2100_state *adsp, INT32 val)	{ if (adsp->sport_tx_callback) (*adsp->sport_tx_callback)(0, val); }
+static void wr_tx1(adsp2100_state *adsp, INT32 val)	{ if (adsp->sport_tx_callback) (*adsp->sport_tx_callback)(1, val); }
+static void wr_owrctr(adsp2100_state *adsp, INT32 val) { adsp->cntr = val & 0x3fff; }
+static void wr_topstack(adsp2100_state *adsp, INT32 val) { pc_stack_push_val(adsp, val & 0x3fff); }
 
-#define WRITE_REG(grp,reg,val) ((*wr_reg[grp][reg])(val))
+#define WRITE_REG(adsp,grp,reg,val) ((*wr_reg[grp][reg])(adsp,val))
 
-static void (*const wr_reg[4][16])(INT32) =
+static void (*const wr_reg[4][16])(adsp2100_state*, INT32) =
 {
 	{
 		wr_ax0, wr_ax1, wr_mx0, wr_mx1, wr_ay0, wr_ay1, wr_my0, wr_my1,
@@ -446,62 +446,62 @@ static void (*const wr_reg[4][16])(INT32) =
     register reading
 ===========================================================================*/
 
-static INT32 rd_inval(void) { logerror( "ADSP %04x: Writing to an invalid register!\n", adsp2100.ppc ); return 0; }
-static INT32 rd_ax0(void)   { return adsp2100.core.ax0.s; }
-static INT32 rd_ax1(void)   { return adsp2100.core.ax1.s; }
-static INT32 rd_mx0(void)   { return adsp2100.core.mx0.s; }
-static INT32 rd_mx1(void)   { return adsp2100.core.mx1.s; }
-static INT32 rd_ay0(void)   { return adsp2100.core.ay0.s; }
-static INT32 rd_ay1(void)   { return adsp2100.core.ay1.s; }
-static INT32 rd_my0(void)   { return adsp2100.core.my0.s; }
-static INT32 rd_my1(void)   { return adsp2100.core.my1.s; }
-static INT32 rd_si(void)    { return adsp2100.core.si.s; }
-static INT32 rd_se(void)    { return adsp2100.core.se.s; }
-static INT32 rd_ar(void)    { return adsp2100.core.ar.s; }
-static INT32 rd_mr0(void)   { return adsp2100.core.mr.mrx.mr0.s; }
-static INT32 rd_mr1(void)   { return adsp2100.core.mr.mrx.mr1.s; }
-static INT32 rd_mr2(void)   { return adsp2100.core.mr.mrx.mr2.s; }
-static INT32 rd_sr0(void)   { return adsp2100.core.sr.srx.sr0.s; }
-static INT32 rd_sr1(void)   { return adsp2100.core.sr.srx.sr1.s; }
-static INT32 rd_i0(void)    { return adsp2100.i[0]; }
-static INT32 rd_i1(void)    { return adsp2100.i[1]; }
-static INT32 rd_i2(void)    { return adsp2100.i[2]; }
-static INT32 rd_i3(void)    { return adsp2100.i[3]; }
-static INT32 rd_i4(void)    { return adsp2100.i[4]; }
-static INT32 rd_i5(void)    { return adsp2100.i[5]; }
-static INT32 rd_i6(void)    { return adsp2100.i[6]; }
-static INT32 rd_i7(void)    { return adsp2100.i[7]; }
-static INT32 rd_m0(void)    { return adsp2100.m[0]; }
-static INT32 rd_m1(void)    { return adsp2100.m[1]; }
-static INT32 rd_m2(void)    { return adsp2100.m[2]; }
-static INT32 rd_m3(void)    { return adsp2100.m[3]; }
-static INT32 rd_m4(void)    { return adsp2100.m[4]; }
-static INT32 rd_m5(void)    { return adsp2100.m[5]; }
-static INT32 rd_m6(void)    { return adsp2100.m[6]; }
-static INT32 rd_m7(void)    { return adsp2100.m[7]; }
-static INT32 rd_l0(void)    { return adsp2100.l[0]; }
-static INT32 rd_l1(void)    { return adsp2100.l[1]; }
-static INT32 rd_l2(void)    { return adsp2100.l[2]; }
-static INT32 rd_l3(void)    { return adsp2100.l[3]; }
-static INT32 rd_l4(void)    { return adsp2100.l[4]; }
-static INT32 rd_l5(void)    { return adsp2100.l[5]; }
-static INT32 rd_l6(void)    { return adsp2100.l[6]; }
-static INT32 rd_l7(void)    { return adsp2100.l[7]; }
-static INT32 rd_astat(void) { return adsp2100.astat; }
-static INT32 rd_mstat(void) { return adsp2100.mstat; }
-static INT32 rd_sstat(void) { return adsp2100.sstat; }
-static INT32 rd_imask(void) { return adsp2100.imask; }
-static INT32 rd_icntl(void) { return adsp2100.icntl; }
-static INT32 rd_cntr(void)  { return adsp2100.cntr; }
-static INT32 rd_sb(void)    { return adsp2100.core.sb.s; }
-static INT32 rd_px(void)    { return adsp2100.px; }
-static INT32 rd_rx0(void)	{ if (adsp2100.sport_rx_callback) return (*adsp2100.sport_rx_callback)(0); else return 0; }
-static INT32 rd_rx1(void)	{ if (adsp2100.sport_rx_callback) return (*adsp2100.sport_rx_callback)(1); else return 0; }
-static INT32 rd_stacktop(void)	{ return pc_stack_pop_val(); }
+static INT32 rd_inval(adsp2100_state *adsp) { logerror( "ADSP %04x: Writing to an invalid register!\n", adsp->ppc ); return 0; }
+static INT32 rd_ax0(adsp2100_state *adsp)   { return adsp->core.ax0.s; }
+static INT32 rd_ax1(adsp2100_state *adsp)   { return adsp->core.ax1.s; }
+static INT32 rd_mx0(adsp2100_state *adsp)   { return adsp->core.mx0.s; }
+static INT32 rd_mx1(adsp2100_state *adsp)   { return adsp->core.mx1.s; }
+static INT32 rd_ay0(adsp2100_state *adsp)   { return adsp->core.ay0.s; }
+static INT32 rd_ay1(adsp2100_state *adsp)   { return adsp->core.ay1.s; }
+static INT32 rd_my0(adsp2100_state *adsp)   { return adsp->core.my0.s; }
+static INT32 rd_my1(adsp2100_state *adsp)   { return adsp->core.my1.s; }
+static INT32 rd_si(adsp2100_state *adsp)    { return adsp->core.si.s; }
+static INT32 rd_se(adsp2100_state *adsp)    { return adsp->core.se.s; }
+static INT32 rd_ar(adsp2100_state *adsp)    { return adsp->core.ar.s; }
+static INT32 rd_mr0(adsp2100_state *adsp)   { return adsp->core.mr.mrx.mr0.s; }
+static INT32 rd_mr1(adsp2100_state *adsp)   { return adsp->core.mr.mrx.mr1.s; }
+static INT32 rd_mr2(adsp2100_state *adsp)   { return adsp->core.mr.mrx.mr2.s; }
+static INT32 rd_sr0(adsp2100_state *adsp)   { return adsp->core.sr.srx.sr0.s; }
+static INT32 rd_sr1(adsp2100_state *adsp)   { return adsp->core.sr.srx.sr1.s; }
+static INT32 rd_i0(adsp2100_state *adsp)    { return adsp->i[0]; }
+static INT32 rd_i1(adsp2100_state *adsp)    { return adsp->i[1]; }
+static INT32 rd_i2(adsp2100_state *adsp)    { return adsp->i[2]; }
+static INT32 rd_i3(adsp2100_state *adsp)    { return adsp->i[3]; }
+static INT32 rd_i4(adsp2100_state *adsp)    { return adsp->i[4]; }
+static INT32 rd_i5(adsp2100_state *adsp)    { return adsp->i[5]; }
+static INT32 rd_i6(adsp2100_state *adsp)    { return adsp->i[6]; }
+static INT32 rd_i7(adsp2100_state *adsp)    { return adsp->i[7]; }
+static INT32 rd_m0(adsp2100_state *adsp)    { return adsp->m[0]; }
+static INT32 rd_m1(adsp2100_state *adsp)    { return adsp->m[1]; }
+static INT32 rd_m2(adsp2100_state *adsp)    { return adsp->m[2]; }
+static INT32 rd_m3(adsp2100_state *adsp)    { return adsp->m[3]; }
+static INT32 rd_m4(adsp2100_state *adsp)    { return adsp->m[4]; }
+static INT32 rd_m5(adsp2100_state *adsp)    { return adsp->m[5]; }
+static INT32 rd_m6(adsp2100_state *adsp)    { return adsp->m[6]; }
+static INT32 rd_m7(adsp2100_state *adsp)    { return adsp->m[7]; }
+static INT32 rd_l0(adsp2100_state *adsp)    { return adsp->l[0]; }
+static INT32 rd_l1(adsp2100_state *adsp)    { return adsp->l[1]; }
+static INT32 rd_l2(adsp2100_state *adsp)    { return adsp->l[2]; }
+static INT32 rd_l3(adsp2100_state *adsp)    { return adsp->l[3]; }
+static INT32 rd_l4(adsp2100_state *adsp)    { return adsp->l[4]; }
+static INT32 rd_l5(adsp2100_state *adsp)    { return adsp->l[5]; }
+static INT32 rd_l6(adsp2100_state *adsp)    { return adsp->l[6]; }
+static INT32 rd_l7(adsp2100_state *adsp)    { return adsp->l[7]; }
+static INT32 rd_astat(adsp2100_state *adsp) { return adsp->astat; }
+static INT32 rd_mstat(adsp2100_state *adsp) { return adsp->mstat; }
+static INT32 rd_sstat(adsp2100_state *adsp) { return adsp->sstat; }
+static INT32 rd_imask(adsp2100_state *adsp) { return adsp->imask; }
+static INT32 rd_icntl(adsp2100_state *adsp) { return adsp->icntl; }
+static INT32 rd_cntr(adsp2100_state *adsp)  { return adsp->cntr; }
+static INT32 rd_sb(adsp2100_state *adsp)    { return adsp->core.sb.s; }
+static INT32 rd_px(adsp2100_state *adsp)    { return adsp->px; }
+static INT32 rd_rx0(adsp2100_state *adsp)	{ if (adsp->sport_rx_callback) return (*adsp->sport_rx_callback)(0); else return 0; }
+static INT32 rd_rx1(adsp2100_state *adsp)	{ if (adsp->sport_rx_callback) return (*adsp->sport_rx_callback)(1); else return 0; }
+static INT32 rd_stacktop(adsp2100_state *adsp)	{ return pc_stack_pop_val(adsp); }
 
-#define READ_REG(grp,reg) ((*rd_reg[grp][reg])())
+#define READ_REG(adsp,grp,reg) ((*rd_reg[grp][reg])(adsp))
 
-static INT32 (*const rd_reg[4][16])(void) =
+static INT32 (*const rd_reg[4][16])(adsp2100_state *adsp) =
 {
 	{
 		rd_ax0, rd_ax1, rd_mx0, rd_mx1, rd_ay0, rd_ay1, rd_my0, rd_my1,
@@ -527,16 +527,16 @@ static INT32 (*const rd_reg[4][16])(void) =
     Modulus addressing logic
 ===========================================================================*/
 
-INLINE void modify_address(UINT32 ireg, UINT32 mreg)
+INLINE void modify_address(adsp2100_state *adsp, UINT32 ireg, UINT32 mreg)
 {
-	UINT32 base = adsp2100.base[ireg];
-	UINT32 i = adsp2100.i[ireg];
-	UINT32 l = adsp2100.l[ireg];
+	UINT32 base = adsp->base[ireg];
+	UINT32 i = adsp->i[ireg];
+	UINT32 l = adsp->l[ireg];
 
-	i += adsp2100.m[mreg];
+	i += adsp->m[mreg];
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
-	adsp2100.i[ireg] = i;
+	adsp->i[ireg] = i;
 }
 
 
@@ -545,15 +545,15 @@ INLINE void modify_address(UINT32 ireg, UINT32 mreg)
     Data memory accessors
 ===========================================================================*/
 
-INLINE void data_write_dag1(UINT32 op, INT32 val)
+INLINE void data_write_dag1(adsp2100_state *adsp, UINT32 op, INT32 val)
 {
 	UINT32 ireg = (op >> 2) & 3;
 	UINT32 mreg = op & 3;
-	UINT32 base = adsp2100.base[ireg];
-	UINT32 i = adsp2100.i[ireg];
-	UINT32 l = adsp2100.l[ireg];
+	UINT32 base = adsp->base[ireg];
+	UINT32 i = adsp->i[ireg];
+	UINT32 l = adsp->l[ireg];
 
-	if ( adsp2100.mstat & MSTAT_REVERSE )
+	if ( adsp->mstat & MSTAT_REVERSE )
 	{
 		UINT32 ir = reverse_table[ i & 0x3fff ];
 		WWORD_DATA(ir, val);
@@ -561,23 +561,23 @@ INLINE void data_write_dag1(UINT32 op, INT32 val)
 	else
 		WWORD_DATA(i, val);
 
-	i += adsp2100.m[mreg];
+	i += adsp->m[mreg];
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
-	adsp2100.i[ireg] = i;
+	adsp->i[ireg] = i;
 }
 
 
-INLINE UINT32 data_read_dag1(UINT32 op)
+INLINE UINT32 data_read_dag1(adsp2100_state *adsp, UINT32 op)
 {
 	UINT32 ireg = (op >> 2) & 3;
 	UINT32 mreg = op & 3;
-	UINT32 base = adsp2100.base[ireg];
-	UINT32 i = adsp2100.i[ireg];
-	UINT32 l = adsp2100.l[ireg];
+	UINT32 base = adsp->base[ireg];
+	UINT32 i = adsp->i[ireg];
+	UINT32 l = adsp->l[ireg];
 	UINT32 res;
 
-	if (adsp2100.mstat & MSTAT_REVERSE)
+	if (adsp->mstat & MSTAT_REVERSE)
 	{
 		UINT32 ir = reverse_table[i & 0x3fff];
 		res = RWORD_DATA(ir);
@@ -585,45 +585,45 @@ INLINE UINT32 data_read_dag1(UINT32 op)
 	else
 		res = RWORD_DATA(i);
 
-	i += adsp2100.m[mreg];
+	i += adsp->m[mreg];
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
-	adsp2100.i[ireg] = i;
+	adsp->i[ireg] = i;
 
 	return res;
 }
 
-INLINE void data_write_dag2(UINT32 op, INT32 val)
+INLINE void data_write_dag2(adsp2100_state *adsp, UINT32 op, INT32 val)
 {
 	UINT32 ireg = 4 + ((op >> 2) & 3);
 	UINT32 mreg = 4 + (op & 3);
-	UINT32 base = adsp2100.base[ireg];
-	UINT32 i = adsp2100.i[ireg];
-	UINT32 l = adsp2100.l[ireg];
+	UINT32 base = adsp->base[ireg];
+	UINT32 i = adsp->i[ireg];
+	UINT32 l = adsp->l[ireg];
 
 	WWORD_DATA(i, val);
 
-	i += adsp2100.m[mreg];
+	i += adsp->m[mreg];
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
-	adsp2100.i[ireg] = i;
+	adsp->i[ireg] = i;
 }
 
 
-INLINE UINT32 data_read_dag2(UINT32 op)
+INLINE UINT32 data_read_dag2(adsp2100_state *adsp, UINT32 op)
 {
 	UINT32 ireg = 4 + ((op >> 2) & 3);
 	UINT32 mreg = 4 + (op & 3);
-	UINT32 base = adsp2100.base[ireg];
-	UINT32 i = adsp2100.i[ireg];
-	UINT32 l = adsp2100.l[ireg];
+	UINT32 base = adsp->base[ireg];
+	UINT32 i = adsp->i[ireg];
+	UINT32 l = adsp->l[ireg];
 
 	UINT32 res = RWORD_DATA(i);
 
-	i += adsp2100.m[mreg];
+	i += adsp->m[mreg];
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
-	adsp2100.i[ireg] = i;
+	adsp->i[ireg] = i;
 
 	return res;
 }
@@ -632,40 +632,40 @@ INLINE UINT32 data_read_dag2(UINT32 op)
     Program memory accessors
 ===========================================================================*/
 
-INLINE void pgm_write_dag2(UINT32 op, INT32 val)
+INLINE void pgm_write_dag2(adsp2100_state *adsp, UINT32 op, INT32 val)
 {
 	UINT32 ireg = 4 + ((op >> 2) & 3);
 	UINT32 mreg = 4 + (op & 3);
-	UINT32 base = adsp2100.base[ireg];
-	UINT32 i = adsp2100.i[ireg];
-	UINT32 l = adsp2100.l[ireg];
+	UINT32 base = adsp->base[ireg];
+	UINT32 i = adsp->i[ireg];
+	UINT32 l = adsp->l[ireg];
 
-	WWORD_PGM(i, (val << 8) | adsp2100.px);
+	WWORD_PGM(i, (val << 8) | adsp->px);
 
-	i += adsp2100.m[mreg];
+	i += adsp->m[mreg];
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
-	adsp2100.i[ireg] = i;
+	adsp->i[ireg] = i;
 }
 
 
-INLINE UINT32 pgm_read_dag2(UINT32 op)
+INLINE UINT32 pgm_read_dag2(adsp2100_state *adsp, UINT32 op)
 {
 	UINT32 ireg = 4 + ((op >> 2) & 3);
 	UINT32 mreg = 4 + (op & 3);
-	UINT32 base = adsp2100.base[ireg];
-	UINT32 i = adsp2100.i[ireg];
-	UINT32 l = adsp2100.l[ireg];
+	UINT32 base = adsp->base[ireg];
+	UINT32 i = adsp->i[ireg];
+	UINT32 l = adsp->l[ireg];
 	UINT32 res;
 
 	res = RWORD_PGM(i);
-	adsp2100.px = res;
+	adsp->px = res;
 	res >>= 8;
 
-	i += adsp2100.m[mreg];
+	i += adsp->m[mreg];
 	if (i < base) i += l;
 	else if (i >= base + l) i -= l;
-	adsp2100.i[ireg] = i;
+	adsp->i[ireg] = i;
 
 	return res;
 }
@@ -673,85 +673,19 @@ INLINE UINT32 pgm_read_dag2(UINT32 op)
 
 
 /*===========================================================================
-    ALU register reading
+    register reading
 ===========================================================================*/
 
-#define ALU_GETXREG_UNSIGNED(x) (*(UINT16 *)alu_xregs[x])
-#define ALU_GETXREG_SIGNED(x)   (*( INT16 *)alu_xregs[x])
-#define ALU_GETYREG_UNSIGNED(y) (*(UINT16 *)alu_yregs[y])
-#define ALU_GETYREG_SIGNED(y)   (*( INT16 *)alu_yregs[y])
+#define ALU_GETXREG_UNSIGNED(a,x) (*(UINT16 *)(a)->alu_xregs[x])
+#define ALU_GETYREG_UNSIGNED(a,y) (*(UINT16 *)(a)->alu_yregs[y])
 
-static const void *const alu_xregs[8] =
-{
-	&adsp2100.core.ax0,
-	&adsp2100.core.ax1,
-	&adsp2100.core.ar,
-	&adsp2100.core.mr.mrx.mr0,
-	&adsp2100.core.mr.mrx.mr1,
-	&adsp2100.core.mr.mrx.mr2,
-	&adsp2100.core.sr.srx.sr0,
-	&adsp2100.core.sr.srx.sr1
-};
+#define MAC_GETXREG_UNSIGNED(a,x) (*(UINT16 *)(a)->mac_xregs[x])
+#define MAC_GETXREG_SIGNED(a,x)   (*( INT16 *)(a)->mac_xregs[x])
+#define MAC_GETYREG_UNSIGNED(a,y) (*(UINT16 *)(a)->mac_yregs[y])
+#define MAC_GETYREG_SIGNED(a,y)   (*( INT16 *)(a)->mac_yregs[y])
 
-static const void *const alu_yregs[4] =
-{
-	&adsp2100.core.ay0,
-	&adsp2100.core.ay1,
-	&adsp2100.core.af,
-	&adsp2100.core.zero
-};
-
-
-
-/*===========================================================================
-    MAC register reading
-===========================================================================*/
-
-#define MAC_GETXREG_UNSIGNED(x) (*(UINT16 *)mac_xregs[x])
-#define MAC_GETXREG_SIGNED(x)   (*( INT16 *)mac_xregs[x])
-#define MAC_GETYREG_UNSIGNED(y) (*(UINT16 *)mac_yregs[y])
-#define MAC_GETYREG_SIGNED(y)   (*( INT16 *)mac_yregs[y])
-
-static const void *const mac_xregs[8] =
-{
-	&adsp2100.core.mx0,
-	&adsp2100.core.mx1,
-	&adsp2100.core.ar,
-	&adsp2100.core.mr.mrx.mr0,
-	&adsp2100.core.mr.mrx.mr1,
-	&adsp2100.core.mr.mrx.mr2,
-	&adsp2100.core.sr.srx.sr0,
-	&adsp2100.core.sr.srx.sr1
-};
-
-static const void *const mac_yregs[4] =
-{
-	&adsp2100.core.my0,
-	&adsp2100.core.my1,
-	&adsp2100.core.mf,
-	&adsp2100.core.zero
-};
-
-
-
-/*===========================================================================
-    SHIFT register reading
-===========================================================================*/
-
-#define SHIFT_GETXREG_UNSIGNED(x) (*(UINT16 *)shift_xregs[x])
-#define SHIFT_GETXREG_SIGNED(x)   (*( INT16 *)shift_xregs[x])
-
-static const void *const shift_xregs[8] =
-{
-	&adsp2100.core.si,
-	&adsp2100.core.si,
-	&adsp2100.core.ar,
-	&adsp2100.core.mr.mrx.mr0,
-	&adsp2100.core.mr.mrx.mr1,
-	&adsp2100.core.mr.mrx.mr2,
-	&adsp2100.core.sr.srx.sr0,
-	&adsp2100.core.sr.srx.sr1
-};
+#define SHIFT_GETXREG_UNSIGNED(a,x) (*(UINT16 *)(a)->shift_xregs[x])
+#define SHIFT_GETXREG_SIGNED(a,x)   (*( INT16 *)(a)->shift_xregs[x])
 
 
 
@@ -759,7 +693,7 @@ static const void *const shift_xregs[8] =
     ALU operations (result in AR)
 ===========================================================================*/
 
-static void alu_op_ar(int op)
+static void alu_op_ar(adsp2100_state *adsp, int op)
 {
 	INT32 xop = (op >> 8) & 7;
 	INT32 yop = (op >> 11) & 3;
@@ -769,12 +703,12 @@ static void alu_op_ar(int op)
 	{
 		case 0x00<<13:
 			/* Y                Clear when y = 0 */
-			res = ALU_GETYREG_UNSIGNED(yop);
+			res = ALU_GETYREG_UNSIGNED(adsp, yop);
 			CALC_NZ(res);
 			break;
 		case 0x01<<13:
 			/* Y + 1            PASS 1 when y = 0 */
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = yop + 1;
 			CALC_NZ(res);
 			if (yop == 0x7fff) SET_V;
@@ -782,27 +716,27 @@ static void alu_op_ar(int op)
 			break;
 		case 0x02<<13:
 			/* X + Y + C */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			yop += GET_C >> 3;
 			res = xop + yop;
 			CALC_NZVC(xop, yop, res);
 			break;
 		case 0x03<<13:
 			/* X + Y            X when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = xop + yop;
 			CALC_NZVC(xop, yop, res);
 			break;
 		case 0x04<<13:
 			/* NOT Y */
-			res = ALU_GETYREG_UNSIGNED(yop) ^ 0xffff;
+			res = ALU_GETYREG_UNSIGNED(adsp, yop) ^ 0xffff;
 			CALC_NZ(res);
 			break;
 		case 0x05<<13:
 			/* -Y */
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = -yop;
 			CALC_NZ(res);
 			if (yop == 0x8000) SET_V;
@@ -810,21 +744,21 @@ static void alu_op_ar(int op)
 			break;
 		case 0x06<<13:
 			/* X - Y + C - 1    X + C - 1 when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = xop - yop + (GET_C >> 3) - 1;
 			CALC_NZVC_SUB(xop, yop, res);
 			break;
 		case 0x07<<13:
 			/* X - Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = xop - yop;
 			CALC_NZVC_SUB(xop, yop, res);
 			break;
 		case 0x08<<13:
 			/* Y - 1            PASS -1 when y = 0 */
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = yop - 1;
 			CALC_NZ(res);
 			if (yop == 0x8000) SET_V;
@@ -832,47 +766,47 @@ static void alu_op_ar(int op)
 			break;
 		case 0x09<<13:
 			/* Y - X            -X when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = yop - xop;
 			CALC_NZVC_SUB(yop, xop, res);
 			break;
 		case 0x0a<<13:
 			/* Y - X + C - 1    -X + C - 1 when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = yop - xop + (GET_C >> 3) - 1;
 			CALC_NZVC_SUB(yop, xop, res);
 			break;
 		case 0x0b<<13:
 			/* NOT X */
-			res = ALU_GETXREG_UNSIGNED(xop) ^ 0xffff;
+			res = ALU_GETXREG_UNSIGNED(adsp, xop) ^ 0xffff;
 			CALC_NZ(res);
 			break;
 		case 0x0c<<13:
 			/* X AND Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = xop & yop;
 			CALC_NZ(res);
 			break;
 		case 0x0d<<13:
 			/* X OR Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = xop | yop;
 			CALC_NZ(res);
 			break;
 		case 0x0e<<13:
 			/* X XOR Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = xop ^ yop;
 			CALC_NZ(res);
 			break;
 		case 0x0f<<13:
 			/* ABS X */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = (xop & 0x8000) ? -xop : xop;
 			if (xop == 0) SET_Z;
 			if (xop == 0x8000) SET_N, SET_V;
@@ -885,10 +819,10 @@ static void alu_op_ar(int op)
 	}
 
 	/* saturate */
-	if ((adsp2100.mstat & MSTAT_SATURATE) && GET_V) res = GET_C ? -32768 : 32767;
+	if ((adsp->mstat & MSTAT_SATURATE) && GET_V) res = GET_C ? -32768 : 32767;
 
 	/* set the final value */
-	adsp2100.core.ar.u = res;
+	adsp->core.ar.u = res;
 }
 
 
@@ -897,7 +831,7 @@ static void alu_op_ar(int op)
     ALU operations (result in AR, constant yop)
 ===========================================================================*/
 
-static void alu_op_ar_const(int op)
+static void alu_op_ar_const(adsp2100_state *adsp, int op)
 {
 	INT32 xop = (op >> 8) & 7;
 	INT32 yop = constants[((op >> 5) & 0x07) | ((op >> 8) & 0x18)];
@@ -919,14 +853,14 @@ static void alu_op_ar_const(int op)
 			break;
 		case 0x02<<13:
 			/* X + Y + C */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			yop += GET_C >> 3;
 			res = xop + yop;
 			CALC_NZVC(xop, yop, res);
 			break;
 		case 0x03<<13:
 			/* X + Y            X when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = xop + yop;
 			CALC_NZVC(xop, yop, res);
 			break;
@@ -944,13 +878,13 @@ static void alu_op_ar_const(int op)
 			break;
 		case 0x06<<13:
 			/* X - Y + C - 1    X + C - 1 when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = xop - yop + (GET_C >> 3) - 1;
 			CALC_NZVC_SUB(xop, yop, res);
 			break;
 		case 0x07<<13:
 			/* X - Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = xop - yop;
 			CALC_NZVC_SUB(xop, yop, res);
 			break;
@@ -963,42 +897,42 @@ static void alu_op_ar_const(int op)
 			break;
 		case 0x09<<13:
 			/* Y - X            -X when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = yop - xop;
 			CALC_NZVC_SUB(yop, xop, res);
 			break;
 		case 0x0a<<13:
 			/* Y - X + C - 1    -X + C - 1 when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = yop - xop + (GET_C >> 3) - 1;
 			CALC_NZVC_SUB(yop, xop, res);
 			break;
 		case 0x0b<<13:
 			/* NOT X */
-			res = ALU_GETXREG_UNSIGNED(xop) ^ 0xffff;
+			res = ALU_GETXREG_UNSIGNED(adsp, xop) ^ 0xffff;
 			CALC_NZ(res);
 			break;
 		case 0x0c<<13:
 			/* X AND Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = xop & yop;
 			CALC_NZ(res);
 			break;
 		case 0x0d<<13:
 			/* X OR Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = xop | yop;
 			CALC_NZ(res);
 			break;
 		case 0x0e<<13:
 			/* X XOR Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = xop ^ yop;
 			CALC_NZ(res);
 			break;
 		case 0x0f<<13:
 			/* ABS X */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = (xop & 0x8000) ? -xop : xop;
 			if (xop == 0) SET_Z;
 			if (xop == 0x8000) SET_N, SET_V;
@@ -1011,10 +945,10 @@ static void alu_op_ar_const(int op)
 	}
 
 	/* saturate */
-	if ((adsp2100.mstat & MSTAT_SATURATE) && GET_V) res = GET_C ? -32768 : 32767;
+	if ((adsp->mstat & MSTAT_SATURATE) && GET_V) res = GET_C ? -32768 : 32767;
 
 	/* set the final value */
-	adsp2100.core.ar.u = res;
+	adsp->core.ar.u = res;
 }
 
 
@@ -1023,7 +957,7 @@ static void alu_op_ar_const(int op)
     ALU operations (result in AF)
 ===========================================================================*/
 
-static void alu_op_af(int op)
+static void alu_op_af(adsp2100_state *adsp, int op)
 {
 	INT32 xop = (op >> 8) & 7;
 	INT32 yop = (op >> 11) & 3;
@@ -1033,12 +967,12 @@ static void alu_op_af(int op)
 	{
 		case 0x00<<13:
 			/* Y                Clear when y = 0 */
-			res = ALU_GETYREG_UNSIGNED(yop);
+			res = ALU_GETYREG_UNSIGNED(adsp, yop);
 			CALC_NZ(res);
 			break;
 		case 0x01<<13:
 			/* Y + 1            PASS 1 when y = 0 */
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = yop + 1;
 			CALC_NZ(res);
 			if (yop == 0x7fff) SET_V;
@@ -1046,27 +980,27 @@ static void alu_op_af(int op)
 			break;
 		case 0x02<<13:
 			/* X + Y + C */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			yop += GET_C >> 3;
 			res = xop + yop;
 			CALC_NZVC(xop, yop, res);
 			break;
 		case 0x03<<13:
 			/* X + Y            X when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = xop + yop;
 			CALC_NZVC(xop, yop, res);
 			break;
 		case 0x04<<13:
 			/* NOT Y */
-			res = ALU_GETYREG_UNSIGNED(yop) ^ 0xffff;
+			res = ALU_GETYREG_UNSIGNED(adsp, yop) ^ 0xffff;
 			CALC_NZ(res);
 			break;
 		case 0x05<<13:
 			/* -Y */
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = -yop;
 			CALC_NZ(res);
 			if (yop == 0x8000) SET_V;
@@ -1074,21 +1008,21 @@ static void alu_op_af(int op)
 			break;
 		case 0x06<<13:
 			/* X - Y + C - 1    X + C - 1 when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = xop - yop + (GET_C >> 3) - 1;
 			CALC_NZVC_SUB(xop, yop, res);
 			break;
 		case 0x07<<13:
 			/* X - Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = xop - yop;
 			CALC_NZVC_SUB(xop, yop, res);
 			break;
 		case 0x08<<13:
 			/* Y - 1            PASS -1 when y = 0 */
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = yop - 1;
 			CALC_NZ(res);
 			if (yop == 0x8000) SET_V;
@@ -1096,47 +1030,47 @@ static void alu_op_af(int op)
 			break;
 		case 0x09<<13:
 			/* Y - X            -X when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = yop - xop;
 			CALC_NZVC_SUB(yop, xop, res);
 			break;
 		case 0x0a<<13:
 			/* Y - X + C - 1    -X + C - 1 when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = yop - xop + (GET_C >> 3) - 1;
 			CALC_NZVC_SUB(yop, xop, res);
 			break;
 		case 0x0b<<13:
 			/* NOT X */
-			res = ALU_GETXREG_UNSIGNED(xop) ^ 0xffff;
+			res = ALU_GETXREG_UNSIGNED(adsp, xop) ^ 0xffff;
 			CALC_NZ(res);
 			break;
 		case 0x0c<<13:
 			/* X AND Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = xop & yop;
 			CALC_NZ(res);
 			break;
 		case 0x0d<<13:
 			/* X OR Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = xop | yop;
 			CALC_NZ(res);
 			break;
 		case 0x0e<<13:
 			/* X XOR Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = xop ^ yop;
 			CALC_NZ(res);
 			break;
 		case 0x0f<<13:
 			/* ABS X */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = (xop & 0x8000) ? -xop : xop;
 			if (xop == 0) SET_Z;
 			if (xop == 0x8000) SET_N, SET_V;
@@ -1149,7 +1083,7 @@ static void alu_op_af(int op)
 	}
 
 	/* set the final value */
-	adsp2100.core.af.u = res;
+	adsp->core.af.u = res;
 }
 
 
@@ -1158,7 +1092,7 @@ static void alu_op_af(int op)
     ALU operations (result in AF, constant yop)
 ===========================================================================*/
 
-static void alu_op_af_const(int op)
+static void alu_op_af_const(adsp2100_state *adsp, int op)
 {
 	INT32 xop = (op >> 8) & 7;
 	INT32 yop = constants[((op >> 5) & 0x07) | ((op >> 8) & 0x18)];
@@ -1180,14 +1114,14 @@ static void alu_op_af_const(int op)
 			break;
 		case 0x02<<13:
 			/* X + Y + C */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			yop += GET_C >> 3;
 			res = xop + yop;
 			CALC_NZVC(xop, yop, res);
 			break;
 		case 0x03<<13:
 			/* X + Y            X when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = xop + yop;
 			CALC_NZVC(xop, yop, res);
 			break;
@@ -1205,13 +1139,13 @@ static void alu_op_af_const(int op)
 			break;
 		case 0x06<<13:
 			/* X - Y + C - 1    X + C - 1 when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = xop - yop + (GET_C >> 3) - 1;
 			CALC_NZVC_SUB(xop, yop, res);
 			break;
 		case 0x07<<13:
 			/* X - Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = xop - yop;
 			CALC_NZVC_SUB(xop, yop, res);
 			break;
@@ -1224,42 +1158,42 @@ static void alu_op_af_const(int op)
 			break;
 		case 0x09<<13:
 			/* Y - X            -X when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = yop - xop;
 			CALC_NZVC_SUB(yop, xop, res);
 			break;
 		case 0x0a<<13:
 			/* Y - X + C - 1    -X + C - 1 when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = yop - xop + (GET_C >> 3) - 1;
 			CALC_NZVC_SUB(yop, xop, res);
 			break;
 		case 0x0b<<13:
 			/* NOT X */
-			res = ALU_GETXREG_UNSIGNED(xop) ^ 0xffff;
+			res = ALU_GETXREG_UNSIGNED(adsp, xop) ^ 0xffff;
 			CALC_NZ(res);
 			break;
 		case 0x0c<<13:
 			/* X AND Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = xop & yop;
 			CALC_NZ(res);
 			break;
 		case 0x0d<<13:
 			/* X OR Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = xop | yop;
 			CALC_NZ(res);
 			break;
 		case 0x0e<<13:
 			/* X XOR Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = xop ^ yop;
 			CALC_NZ(res);
 			break;
 		case 0x0f<<13:
 			/* ABS X */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = (xop & 0x8000) ? -xop : xop;
 			if (xop == 0) SET_Z;
 			if (xop == 0x8000) SET_N, SET_V;
@@ -1272,7 +1206,7 @@ static void alu_op_af_const(int op)
 	}
 
 	/* set the final value */
-	adsp2100.core.af.u = res;
+	adsp->core.af.u = res;
 }
 
 
@@ -1281,7 +1215,7 @@ static void alu_op_af_const(int op)
     ALU operations (no result)
 ===========================================================================*/
 
-static void alu_op_none(int op)
+static void alu_op_none(adsp2100_state *adsp, int op)
 {
 	INT32 xop = (op >> 8) & 7;
 	INT32 yop = (op >> 11) & 3;
@@ -1291,12 +1225,12 @@ static void alu_op_none(int op)
 	{
 		case 0x00<<13:
 			/* Y                Clear when y = 0 */
-			res = ALU_GETYREG_UNSIGNED(yop);
+			res = ALU_GETYREG_UNSIGNED(adsp, yop);
 			CALC_NZ(res);
 			break;
 		case 0x01<<13:
 			/* Y + 1            PASS 1 when y = 0 */
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = yop + 1;
 			CALC_NZ(res);
 			if (yop == 0x7fff) SET_V;
@@ -1304,27 +1238,27 @@ static void alu_op_none(int op)
 			break;
 		case 0x02<<13:
 			/* X + Y + C */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			yop += GET_C >> 3;
 			res = xop + yop;
 			CALC_NZVC(xop, yop, res);
 			break;
 		case 0x03<<13:
 			/* X + Y            X when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = xop + yop;
 			CALC_NZVC(xop, yop, res);
 			break;
 		case 0x04<<13:
 			/* NOT Y */
-			res = ALU_GETYREG_UNSIGNED(yop) ^ 0xffff;
+			res = ALU_GETYREG_UNSIGNED(adsp, yop) ^ 0xffff;
 			CALC_NZ(res);
 			break;
 		case 0x05<<13:
 			/* -Y */
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = -yop;
 			CALC_NZ(res);
 			if (yop == 0x8000) SET_V;
@@ -1332,21 +1266,21 @@ static void alu_op_none(int op)
 			break;
 		case 0x06<<13:
 			/* X - Y + C - 1    X + C - 1 when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = xop - yop + (GET_C >> 3) - 1;
 			CALC_NZVC_SUB(xop, yop, res);
 			break;
 		case 0x07<<13:
 			/* X - Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = xop - yop;
 			CALC_NZVC_SUB(xop, yop, res);
 			break;
 		case 0x08<<13:
 			/* Y - 1            PASS -1 when y = 0 */
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = yop - 1;
 			CALC_NZ(res);
 			if (yop == 0x8000) SET_V;
@@ -1354,47 +1288,47 @@ static void alu_op_none(int op)
 			break;
 		case 0x09<<13:
 			/* Y - X            -X when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = yop - xop;
 			CALC_NZVC_SUB(yop, xop, res);
 			break;
 		case 0x0a<<13:
 			/* Y - X + C - 1    -X + C - 1 when y = 0 */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = yop - xop + (GET_C >> 3) - 1;
 			CALC_NZVC_SUB(yop, xop, res);
 			break;
 		case 0x0b<<13:
 			/* NOT X */
-			res = ALU_GETXREG_UNSIGNED(xop) ^ 0xffff;
+			res = ALU_GETXREG_UNSIGNED(adsp, xop) ^ 0xffff;
 			CALC_NZ(res);
 			break;
 		case 0x0c<<13:
 			/* X AND Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = xop & yop;
 			CALC_NZ(res);
 			break;
 		case 0x0d<<13:
 			/* X OR Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = xop | yop;
 			CALC_NZ(res);
 			break;
 		case 0x0e<<13:
 			/* X XOR Y */
-			xop = ALU_GETXREG_UNSIGNED(xop);
-			yop = ALU_GETYREG_UNSIGNED(yop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
+			yop = ALU_GETYREG_UNSIGNED(adsp, yop);
 			res = xop ^ yop;
 			CALC_NZ(res);
 			break;
 		case 0x0f<<13:
 			/* ABS X */
-			xop = ALU_GETXREG_UNSIGNED(xop);
+			xop = ALU_GETXREG_UNSIGNED(adsp, xop);
 			res = (xop & 0x8000) ? -xop : xop;
 			if (xop == 0) SET_Z;
 			if (xop == 0x8000) SET_N, SET_V;
@@ -1410,9 +1344,9 @@ static void alu_op_none(int op)
     MAC operations (result in MR)
 ===========================================================================*/
 
-static void mac_op_mr(int op)
+static void mac_op_mr(adsp2100_state *adsp, int op)
 {
-	INT8 shift = ((adsp2100.mstat & MSTAT_INTEGER) >> 4) ^ 1;
+	INT8 shift = ((adsp->mstat & MSTAT_INTEGER) >> 4) ^ 1;
 	INT32 xop = (op >> 8) & 7;
 	INT32 yop = (op >> 11) & 3;
 	INT32 temp;
@@ -1425,8 +1359,8 @@ static void mac_op_mr(int op)
 			return;
 		case 0x01<<13:
 			/* X * Y (RND) */
-			xop = MAC_GETXREG_SIGNED(xop);
-			yop = MAC_GETYREG_SIGNED(yop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
+			yop = MAC_GETYREG_SIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
 			res = (INT64)temp;
 #if 0
@@ -1441,10 +1375,10 @@ static void mac_op_mr(int op)
 			break;
 		case 0x02<<13:
 			/* MR + X * Y (RND) */
-			xop = MAC_GETXREG_SIGNED(xop);
-			yop = MAC_GETYREG_SIGNED(yop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
+			yop = MAC_GETYREG_SIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 #if 0
 			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
 			else res += (res & 0x8000) << 1;
@@ -1457,10 +1391,10 @@ static void mac_op_mr(int op)
 			break;
 		case 0x03<<13:
 			/* MR - X * Y (RND) */
-			xop = MAC_GETXREG_SIGNED(xop);
-			yop = MAC_GETYREG_SIGNED(yop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
+			yop = MAC_GETYREG_SIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 #if 0
 			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
 			else res += (res & 0x8000) << 1;
@@ -1473,87 +1407,87 @@ static void mac_op_mr(int op)
 			break;
 		case 0x04<<13:
 			/* X * Y (SS)       Clear when y = 0 */
-			xop = MAC_GETXREG_SIGNED(xop);
-			yop = MAC_GETYREG_SIGNED(yop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
+			yop = MAC_GETYREG_SIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
 			res = (INT64)temp;
 			break;
 		case 0x05<<13:
 			/* X * Y (SU) */
-			xop = MAC_GETXREG_SIGNED(xop);
-			yop = MAC_GETYREG_UNSIGNED(yop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
+			yop = MAC_GETYREG_UNSIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
 			res = (INT64)temp;
 			break;
 		case 0x06<<13:
 			/* X * Y (US) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
-			yop = MAC_GETYREG_SIGNED(yop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
+			yop = MAC_GETYREG_SIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
 			res = (INT64)temp;
 			break;
 		case 0x07<<13:
 			/* X * Y (UU) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
-			yop = MAC_GETYREG_UNSIGNED(yop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
+			yop = MAC_GETYREG_UNSIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
 			res = (INT64)temp;
 			break;
 		case 0x08<<13:
 			/* MR + X * Y (SS) */
-			xop = MAC_GETXREG_SIGNED(xop);
-			yop = MAC_GETYREG_SIGNED(yop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
+			yop = MAC_GETYREG_SIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 			break;
 		case 0x09<<13:
 			/* MR + X * Y (SU) */
-			xop = MAC_GETXREG_SIGNED(xop);
-			yop = MAC_GETYREG_UNSIGNED(yop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
+			yop = MAC_GETYREG_UNSIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 			break;
 		case 0x0a<<13:
 			/* MR + X * Y (US) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
-			yop = MAC_GETYREG_SIGNED(yop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
+			yop = MAC_GETYREG_SIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 			break;
 		case 0x0b<<13:
 			/* MR + X * Y (UU) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
-			yop = MAC_GETYREG_UNSIGNED(yop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
+			yop = MAC_GETYREG_UNSIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 			break;
 		case 0x0c<<13:
 			/* MR - X * Y (SS) */
-			xop = MAC_GETXREG_SIGNED(xop);
-			yop = MAC_GETYREG_SIGNED(yop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
+			yop = MAC_GETYREG_SIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 			break;
 		case 0x0d<<13:
 			/* MR - X * Y (SU) */
-			xop = MAC_GETXREG_SIGNED(xop);
-			yop = MAC_GETYREG_UNSIGNED(yop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
+			yop = MAC_GETYREG_UNSIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 			break;
 		case 0x0e<<13:
 			/* MR - X * Y (US) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
-			yop = MAC_GETYREG_SIGNED(yop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
+			yop = MAC_GETYREG_SIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 			break;
 		case 0x0f<<13:
 			/* MR - X * Y (UU) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
-			yop = MAC_GETYREG_UNSIGNED(yop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
+			yop = MAC_GETYREG_UNSIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 			break;
 		default:
 			res = 0;	/* just to keep the compiler happy */
@@ -1564,7 +1498,7 @@ static void mac_op_mr(int op)
 	temp = (res >> 31) & 0x1ff;
 	CLR_MV;
 	if (temp != 0x000 && temp != 0x1ff) SET_MV;
-	adsp2100.core.mr.mr = res;
+	adsp->core.mr.mr = res;
 }
 
 
@@ -1573,9 +1507,9 @@ static void mac_op_mr(int op)
     MAC operations (result in MR, yop == xop)
 ===========================================================================*/
 
-static void mac_op_mr_xop(int op)
+static void mac_op_mr_xop(adsp2100_state *adsp, int op)
 {
-	INT8 shift = ((adsp2100.mstat & MSTAT_INTEGER) >> 4) ^ 1;
+	INT8 shift = ((adsp->mstat & MSTAT_INTEGER) >> 4) ^ 1;
 	INT32 xop = (op >> 8) & 7;
 	INT32 temp;
 	INT64 res;
@@ -1587,7 +1521,7 @@ static void mac_op_mr_xop(int op)
 			return;
 		case 0x01<<13:
 			/* X * Y (RND) */
-			xop = MAC_GETXREG_SIGNED(xop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
 			res = (INT64)temp;
 #if 0
@@ -1602,9 +1536,9 @@ static void mac_op_mr_xop(int op)
 			break;
 		case 0x02<<13:
 			/* MR + X * Y (RND) */
-			xop = MAC_GETXREG_SIGNED(xop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 #if 0
 			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
 			else res += (res & 0x8000) << 1;
@@ -1617,9 +1551,9 @@ static void mac_op_mr_xop(int op)
 			break;
 		case 0x03<<13:
 			/* MR - X * Y (RND) */
-			xop = MAC_GETXREG_SIGNED(xop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 #if 0
 			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
 			else res += (res & 0x8000) << 1;
@@ -1632,75 +1566,75 @@ static void mac_op_mr_xop(int op)
 			break;
 		case 0x04<<13:
 			/* X * Y (SS)       Clear when y = 0 */
-			xop = MAC_GETXREG_SIGNED(xop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
 			res = (INT64)temp;
 			break;
 		case 0x05<<13:
 			/* X * Y (SU) */
-			xop = MAC_GETXREG_SIGNED(xop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
 			res = (INT64)temp;
 			break;
 		case 0x06<<13:
 			/* X * Y (US) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
 			res = (INT64)temp;
 			break;
 		case 0x07<<13:
 			/* X * Y (UU) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
 			res = (INT64)temp;
 			break;
 		case 0x08<<13:
 			/* MR + X * Y (SS) */
-			xop = MAC_GETXREG_SIGNED(xop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 			break;
 		case 0x09<<13:
 			/* MR + X * Y (SU) */
-			xop = MAC_GETXREG_SIGNED(xop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 			break;
 		case 0x0a<<13:
 			/* MR + X * Y (US) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 			break;
 		case 0x0b<<13:
 			/* MR + X * Y (UU) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 			break;
 		case 0x0c<<13:
 			/* MR - X * Y (SS) */
-			xop = MAC_GETXREG_SIGNED(xop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 			break;
 		case 0x0d<<13:
 			/* MR - X * Y (SU) */
-			xop = MAC_GETXREG_SIGNED(xop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 			break;
 		case 0x0e<<13:
 			/* MR - X * Y (US) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 			break;
 		case 0x0f<<13:
 			/* MR - X * Y (UU) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 			break;
 		default:
 			res = 0;	/* just to keep the compiler happy */
@@ -1711,7 +1645,7 @@ static void mac_op_mr_xop(int op)
 	temp = (res >> 31) & 0x1ff;
 	CLR_MV;
 	if (temp != 0x000 && temp != 0x1ff) SET_MV;
-	adsp2100.core.mr.mr = res;
+	adsp->core.mr.mr = res;
 }
 
 
@@ -1720,9 +1654,9 @@ static void mac_op_mr_xop(int op)
     MAC operations (result in MF)
 ===========================================================================*/
 
-static void mac_op_mf(int op)
+static void mac_op_mf(adsp2100_state *adsp, int op)
 {
-	INT8 shift = ((adsp2100.mstat & MSTAT_INTEGER) >> 4) ^ 1;
+	INT8 shift = ((adsp->mstat & MSTAT_INTEGER) >> 4) ^ 1;
 	INT32 xop = (op >> 8) & 7;
 	INT32 yop = (op >> 11) & 3;
 	INT32 temp;
@@ -1735,8 +1669,8 @@ static void mac_op_mf(int op)
 			return;
 		case 0x01<<13:
 			/* X * Y (RND) */
-			xop = MAC_GETXREG_SIGNED(xop);
-			yop = MAC_GETYREG_SIGNED(yop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
+			yop = MAC_GETYREG_SIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
 			res = (INT64)temp;
 #if 0
@@ -1751,10 +1685,10 @@ static void mac_op_mf(int op)
 			break;
 		case 0x02<<13:
 			/* MR + X * Y (RND) */
-			xop = MAC_GETXREG_SIGNED(xop);
-			yop = MAC_GETYREG_SIGNED(yop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
+			yop = MAC_GETYREG_SIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 #if 0
 			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
 			else res += (res & 0x8000) << 1;
@@ -1767,10 +1701,10 @@ static void mac_op_mf(int op)
 			break;
 		case 0x03<<13:
 			/* MR - X * Y (RND) */
-			xop = MAC_GETXREG_SIGNED(xop);
-			yop = MAC_GETYREG_SIGNED(yop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
+			yop = MAC_GETYREG_SIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 #if 0
 			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
 			else res += (res & 0x8000) << 1;
@@ -1783,87 +1717,87 @@ static void mac_op_mf(int op)
 			break;
 		case 0x04<<13:
 			/* X * Y (SS)       Clear when y = 0 */
-			xop = MAC_GETXREG_SIGNED(xop);
-			yop = MAC_GETYREG_SIGNED(yop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
+			yop = MAC_GETYREG_SIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
 			res = (INT64)temp;
 			break;
 		case 0x05<<13:
 			/* X * Y (SU) */
-			xop = MAC_GETXREG_SIGNED(xop);
-			yop = MAC_GETYREG_UNSIGNED(yop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
+			yop = MAC_GETYREG_UNSIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
 			res = (INT64)temp;
 			break;
 		case 0x06<<13:
 			/* X * Y (US) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
-			yop = MAC_GETYREG_SIGNED(yop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
+			yop = MAC_GETYREG_SIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
 			res = (INT64)temp;
 			break;
 		case 0x07<<13:
 			/* X * Y (UU) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
-			yop = MAC_GETYREG_UNSIGNED(yop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
+			yop = MAC_GETYREG_UNSIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
 			res = (INT64)temp;
 			break;
 		case 0x08<<13:
 			/* MR + X * Y (SS) */
-			xop = MAC_GETXREG_SIGNED(xop);
-			yop = MAC_GETYREG_SIGNED(yop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
+			yop = MAC_GETYREG_SIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 			break;
 		case 0x09<<13:
 			/* MR + X * Y (SU) */
-			xop = MAC_GETXREG_SIGNED(xop);
-			yop = MAC_GETYREG_UNSIGNED(yop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
+			yop = MAC_GETYREG_UNSIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 			break;
 		case 0x0a<<13:
 			/* MR + X * Y (US) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
-			yop = MAC_GETYREG_SIGNED(yop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
+			yop = MAC_GETYREG_SIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 			break;
 		case 0x0b<<13:
 			/* MR + X * Y (UU) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
-			yop = MAC_GETYREG_UNSIGNED(yop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
+			yop = MAC_GETYREG_UNSIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 			break;
 		case 0x0c<<13:
 			/* MR - X * Y (SS) */
-			xop = MAC_GETXREG_SIGNED(xop);
-			yop = MAC_GETYREG_SIGNED(yop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
+			yop = MAC_GETYREG_SIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 			break;
 		case 0x0d<<13:
 			/* MR - X * Y (SU) */
-			xop = MAC_GETXREG_SIGNED(xop);
-			yop = MAC_GETYREG_UNSIGNED(yop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
+			yop = MAC_GETYREG_UNSIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 			break;
 		case 0x0e<<13:
 			/* MR - X * Y (US) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
-			yop = MAC_GETYREG_SIGNED(yop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
+			yop = MAC_GETYREG_SIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 			break;
 		case 0x0f<<13:
 			/* MR - X * Y (UU) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
-			yop = MAC_GETYREG_UNSIGNED(yop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
+			yop = MAC_GETYREG_UNSIGNED(adsp, yop);
 			temp = (xop * yop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 			break;
 		default:
 			res = 0;	/* just to keep the compiler happy */
@@ -1871,7 +1805,7 @@ static void mac_op_mf(int op)
 	}
 
 	/* set the final value */
-	adsp2100.core.mf.u = (UINT32)res >> 16;
+	adsp->core.mf.u = (UINT32)res >> 16;
 }
 
 
@@ -1880,9 +1814,9 @@ static void mac_op_mf(int op)
     MAC operations (result in MF, yop == xop)
 ===========================================================================*/
 
-static void mac_op_mf_xop(int op)
+static void mac_op_mf_xop(adsp2100_state *adsp, int op)
 {
-	INT8 shift = ((adsp2100.mstat & MSTAT_INTEGER) >> 4) ^ 1;
+	INT8 shift = ((adsp->mstat & MSTAT_INTEGER) >> 4) ^ 1;
 	INT32 xop = (op >> 8) & 7;
 	INT32 temp;
 	INT64 res;
@@ -1894,7 +1828,7 @@ static void mac_op_mf_xop(int op)
 			return;
 		case 0x01<<13:
 			/* X * Y (RND) */
-			xop = MAC_GETXREG_SIGNED(xop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
 			res = (INT64)temp;
 #if 0
@@ -1909,9 +1843,9 @@ static void mac_op_mf_xop(int op)
 			break;
 		case 0x02<<13:
 			/* MR + X * Y (RND) */
-			xop = MAC_GETXREG_SIGNED(xop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 #if 0
 			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
 			else res += (res & 0x8000) << 1;
@@ -1924,9 +1858,9 @@ static void mac_op_mf_xop(int op)
 			break;
 		case 0x03<<13:
 			/* MR - X * Y (RND) */
-			xop = MAC_GETXREG_SIGNED(xop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 #if 0
 			if ((res & 0xffff) == 0x8000) res &= ~((UINT64)0x10000);
 			else res += (res & 0x8000) << 1;
@@ -1939,75 +1873,75 @@ static void mac_op_mf_xop(int op)
 			break;
 		case 0x04<<13:
 			/* X * Y (SS)       Clear when y = 0 */
-			xop = MAC_GETXREG_SIGNED(xop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
 			res = (INT64)temp;
 			break;
 		case 0x05<<13:
 			/* X * Y (SU) */
-			xop = MAC_GETXREG_SIGNED(xop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
 			res = (INT64)temp;
 			break;
 		case 0x06<<13:
 			/* X * Y (US) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
 			res = (INT64)temp;
 			break;
 		case 0x07<<13:
 			/* X * Y (UU) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
 			res = (INT64)temp;
 			break;
 		case 0x08<<13:
 			/* MR + X * Y (SS) */
-			xop = MAC_GETXREG_SIGNED(xop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 			break;
 		case 0x09<<13:
 			/* MR + X * Y (SU) */
-			xop = MAC_GETXREG_SIGNED(xop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 			break;
 		case 0x0a<<13:
 			/* MR + X * Y (US) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 			break;
 		case 0x0b<<13:
 			/* MR + X * Y (UU) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr + (INT64)temp;
+			res = adsp->core.mr.mr + (INT64)temp;
 			break;
 		case 0x0c<<13:
 			/* MR - X * Y (SS) */
-			xop = MAC_GETXREG_SIGNED(xop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 			break;
 		case 0x0d<<13:
 			/* MR - X * Y (SU) */
-			xop = MAC_GETXREG_SIGNED(xop);
+			xop = MAC_GETXREG_SIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 			break;
 		case 0x0e<<13:
 			/* MR - X * Y (US) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 			break;
 		case 0x0f<<13:
 			/* MR - X * Y (UU) */
-			xop = MAC_GETXREG_UNSIGNED(xop);
+			xop = MAC_GETXREG_UNSIGNED(adsp, xop);
 			temp = (xop * xop) << shift;
-			res = adsp2100.core.mr.mr - (INT64)temp;
+			res = adsp->core.mr.mr - (INT64)temp;
 			break;
 		default:
 			res = 0;	/* just to keep the compiler happy */
@@ -2015,7 +1949,7 @@ static void mac_op_mf_xop(int op)
 	}
 
 	/* set the final value */
-	adsp2100.core.mf.u = (UINT32)res >> 16;
+	adsp->core.mf.u = (UINT32)res >> 16;
 }
 
 
@@ -2024,9 +1958,9 @@ static void mac_op_mf_xop(int op)
     SHIFT operations (result in SR/SE/SB)
 ===========================================================================*/
 
-static void shift_op(int op)
+static void shift_op(adsp2100_state *adsp, int op)
 {
-	INT8 sc = adsp2100.core.se.s;
+	INT8 sc = adsp->core.se.s;
 	INT32 xop = (op >> 8) & 7;
 	UINT32 res;
 
@@ -2034,99 +1968,99 @@ static void shift_op(int op)
 	{
 		case 0x00<<11:
 			/* LSHIFT (HI) */
-			xop = SHIFT_GETXREG_UNSIGNED(xop) << 16;
+			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? ((UINT32)xop >> -sc) : 0;
-			adsp2100.core.sr.sr = res;
+			adsp->core.sr.sr = res;
 			break;
 		case 0x01<<11:
 			/* LSHIFT (HI, OR) */
-			xop = SHIFT_GETXREG_UNSIGNED(xop) << 16;
+			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? ((UINT32)xop >> -sc) : 0;
-			adsp2100.core.sr.sr |= res;
+			adsp->core.sr.sr |= res;
 			break;
 		case 0x02<<11:
 			/* LSHIFT (LO) */
-			xop = SHIFT_GETXREG_UNSIGNED(xop);
+			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : 0;
-			adsp2100.core.sr.sr = res;
+			adsp->core.sr.sr = res;
 			break;
 		case 0x03<<11:
 			/* LSHIFT (LO, OR) */
-			xop = SHIFT_GETXREG_UNSIGNED(xop);
+			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : 0;
-			adsp2100.core.sr.sr |= res;
+			adsp->core.sr.sr |= res;
 			break;
 		case 0x04<<11:
 			/* ASHIFT (HI) */
-			xop = SHIFT_GETXREG_SIGNED(xop) << 16;
+			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : (xop >> 31);
-			adsp2100.core.sr.sr = res;
+			adsp->core.sr.sr = res;
 			break;
 		case 0x05<<11:
 			/* ASHIFT (HI, OR) */
-			xop = SHIFT_GETXREG_SIGNED(xop) << 16;
+			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : (xop >> 31);
-			adsp2100.core.sr.sr |= res;
+			adsp->core.sr.sr |= res;
 			break;
 		case 0x06<<11:
 			/* ASHIFT (LO) */
-			xop = SHIFT_GETXREG_SIGNED(xop);
+			xop = SHIFT_GETXREG_SIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : (xop >> 31);
-			adsp2100.core.sr.sr = res;
+			adsp->core.sr.sr = res;
 			break;
 		case 0x07<<11:
 			/* ASHIFT (LO, OR) */
-			xop = SHIFT_GETXREG_SIGNED(xop);
+			xop = SHIFT_GETXREG_SIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : (xop >> 31);
-			adsp2100.core.sr.sr |= res;
+			adsp->core.sr.sr |= res;
 			break;
 		case 0x08<<11:
 			/* NORM (HI) */
-			xop = SHIFT_GETXREG_SIGNED(xop) << 16;
+			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			if (sc > 0)
 			{
-				xop = ((UINT32)xop >> 1) | ((adsp2100.astat & CFLAG) << 28);
+				xop = ((UINT32)xop >> 1) | ((adsp->astat & CFLAG) << 28);
 				res = xop >> (sc - 1);
 			}
 			else res = (sc > -32) ? (xop << -sc) : 0;
-			adsp2100.core.sr.sr = res;
+			adsp->core.sr.sr = res;
 			break;
 		case 0x09<<11:
 			/* NORM (HI, OR) */
-			xop = SHIFT_GETXREG_SIGNED(xop) << 16;
+			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			if (sc > 0)
 			{
-				xop = ((UINT32)xop >> 1) | ((adsp2100.astat & CFLAG) << 28);
+				xop = ((UINT32)xop >> 1) | ((adsp->astat & CFLAG) << 28);
 				res = xop >> (sc - 1);
 			}
 			else res = (sc > -32) ? (xop << -sc) : 0;
-			adsp2100.core.sr.sr |= res;
+			adsp->core.sr.sr |= res;
 			break;
 		case 0x0a<<11:
 			/* NORM (LO) */
-			xop = SHIFT_GETXREG_UNSIGNED(xop);
+			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop >> sc) : 0;
 			else res = (sc > -32) ? (xop << -sc) : 0;
-			adsp2100.core.sr.sr = res;
+			adsp->core.sr.sr = res;
 			break;
 		case 0x0b<<11:
 			/* NORM (LO, OR) */
-			xop = SHIFT_GETXREG_UNSIGNED(xop);
+			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop >> sc) : 0;
 			else res = (sc > -32) ? (xop << -sc) : 0;
-			adsp2100.core.sr.sr |= res;
+			adsp->core.sr.sr |= res;
 			break;
 		case 0x0c<<11:
 			/* EXP (HI) */
-			xop = SHIFT_GETXREG_SIGNED(xop) << 16;
+			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			res = 0;
 			if (xop < 0)
 			{
@@ -2139,14 +2073,14 @@ static void shift_op(int op)
 				xop |= 0x8000;
 				while ((xop & 0x40000000) == 0) res++, xop <<= 1;
 			}
-			adsp2100.core.se.s = -res;
+			adsp->core.se.s = -res;
 			break;
 		case 0x0d<<11:
 			/* EXP (HIX) */
-			xop = SHIFT_GETXREG_SIGNED(xop) << 16;
+			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			if (GET_V)
 			{
-				adsp2100.core.se.s = 1;
+				adsp->core.se.s = 1;
 				if (xop < 0) CLR_SS;
 				else SET_SS;
 			}
@@ -2164,14 +2098,14 @@ static void shift_op(int op)
 					xop |= 0x8000;
 					while ((xop & 0x40000000) == 0) res++, xop <<= 1;
 				}
-				adsp2100.core.se.s = -res;
+				adsp->core.se.s = -res;
 			}
 			break;
 		case 0x0e<<11:
 			/* EXP (LO) */
-			if (adsp2100.core.se.s == -15)
+			if (adsp->core.se.s == -15)
 			{
-				xop = SHIFT_GETXREG_SIGNED(xop);
+				xop = SHIFT_GETXREG_SIGNED(adsp, xop);
 				res = 15;
 				if (GET_SS)
 					while ((xop & 0x8000) != 0) res++, xop <<= 1;
@@ -2180,12 +2114,12 @@ static void shift_op(int op)
 					xop = (xop << 1) | 1;
 					while ((xop & 0x10000) == 0) res++, xop <<= 1;
 				}
-				adsp2100.core.se.s = -res;
+				adsp->core.se.s = -res;
 			}
 			break;
 		case 0x0f<<11:
 			/* EXPADJ */
-			xop = SHIFT_GETXREG_SIGNED(xop) << 16;
+			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			res = 0;
 			if (xop < 0)
 				while ((xop & 0x40000000) != 0) res++, xop <<= 1;
@@ -2194,8 +2128,8 @@ static void shift_op(int op)
 				xop |= 0x8000;
 				while ((xop & 0x40000000) == 0) res++, xop <<= 1;
 			}
-			if (res < -adsp2100.core.sb.s)
-				adsp2100.core.sb.s = -res;
+			if (res < -adsp->core.sb.s)
+				adsp->core.sb.s = -res;
 			break;
 	}
 }
@@ -2206,7 +2140,7 @@ static void shift_op(int op)
     Immediate SHIFT operations (result in SR/SE/SB)
 ===========================================================================*/
 
-static void shift_op_imm(int op)
+static void shift_op_imm(adsp2100_state *adsp, int op)
 {
 	INT8 sc = (INT8)op;
 	INT32 xop = (op >> 8) & 7;
@@ -2216,95 +2150,95 @@ static void shift_op_imm(int op)
 	{
 		case 0x00<<11:
 			/* LSHIFT (HI) */
-			xop = SHIFT_GETXREG_UNSIGNED(xop) << 16;
+			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? ((UINT32)xop >> -sc) : 0;
-			adsp2100.core.sr.sr = res;
+			adsp->core.sr.sr = res;
 			break;
 		case 0x01<<11:
 			/* LSHIFT (HI, OR) */
-			xop = SHIFT_GETXREG_UNSIGNED(xop) << 16;
+			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? ((UINT32)xop >> -sc) : 0;
-			adsp2100.core.sr.sr |= res;
+			adsp->core.sr.sr |= res;
 			break;
 		case 0x02<<11:
 			/* LSHIFT (LO) */
-			xop = SHIFT_GETXREG_UNSIGNED(xop);
+			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : 0;
-			adsp2100.core.sr.sr = res;
+			adsp->core.sr.sr = res;
 			break;
 		case 0x03<<11:
 			/* LSHIFT (LO, OR) */
-			xop = SHIFT_GETXREG_UNSIGNED(xop);
+			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : 0;
-			adsp2100.core.sr.sr |= res;
+			adsp->core.sr.sr |= res;
 			break;
 		case 0x04<<11:
 			/* ASHIFT (HI) */
-			xop = SHIFT_GETXREG_SIGNED(xop) << 16;
+			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : (xop >> 31);
-			adsp2100.core.sr.sr = res;
+			adsp->core.sr.sr = res;
 			break;
 		case 0x05<<11:
 			/* ASHIFT (HI, OR) */
-			xop = SHIFT_GETXREG_SIGNED(xop) << 16;
+			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : (xop >> 31);
-			adsp2100.core.sr.sr |= res;
+			adsp->core.sr.sr |= res;
 			break;
 		case 0x06<<11:
 			/* ASHIFT (LO) */
-			xop = SHIFT_GETXREG_SIGNED(xop);
+			xop = SHIFT_GETXREG_SIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : (xop >> 31);
-			adsp2100.core.sr.sr = res;
+			adsp->core.sr.sr = res;
 			break;
 		case 0x07<<11:
 			/* ASHIFT (LO, OR) */
-			xop = SHIFT_GETXREG_SIGNED(xop);
+			xop = SHIFT_GETXREG_SIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : (xop >> 31);
-			adsp2100.core.sr.sr |= res;
+			adsp->core.sr.sr |= res;
 			break;
 		case 0x08<<11:
 			/* NORM (HI) */
-			xop = SHIFT_GETXREG_SIGNED(xop) << 16;
+			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			if (sc > 0)
 			{
-				xop = ((UINT32)xop >> 1) | ((adsp2100.astat & CFLAG) << 28);
+				xop = ((UINT32)xop >> 1) | ((adsp->astat & CFLAG) << 28);
 				res = xop >> (sc - 1);
 			}
 			else res = (sc > -32) ? (xop << -sc) : 0;
-			adsp2100.core.sr.sr = res;
+			adsp->core.sr.sr = res;
 			break;
 		case 0x09<<11:
 			/* NORM (HI, OR) */
-			xop = SHIFT_GETXREG_SIGNED(xop) << 16;
+			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			if (sc > 0)
 			{
-				xop = ((UINT32)xop >> 1) | ((adsp2100.astat & CFLAG) << 28);
+				xop = ((UINT32)xop >> 1) | ((adsp->astat & CFLAG) << 28);
 				res = xop >> (sc - 1);
 			}
 			else res = (sc > -32) ? (xop << -sc) : 0;
-			adsp2100.core.sr.sr |= res;
+			adsp->core.sr.sr |= res;
 			break;
 		case 0x0a<<11:
 			/* NORM (LO) */
-			xop = SHIFT_GETXREG_UNSIGNED(xop);
+			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop >> sc) : 0;
 			else res = (sc > -32) ? (xop << -sc) : 0;
-			adsp2100.core.sr.sr = res;
+			adsp->core.sr.sr = res;
 			break;
 		case 0x0b<<11:
 			/* NORM (LO, OR) */
-			xop = SHIFT_GETXREG_UNSIGNED(xop);
+			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop >> sc) : 0;
 			else res = (sc > -32) ? (xop << -sc) : 0;
-			adsp2100.core.sr.sr |= res;
+			adsp->core.sr.sr |= res;
 			break;
 	}
 }
