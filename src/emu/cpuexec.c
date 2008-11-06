@@ -319,6 +319,10 @@ void cpuexec_timeslice(running_machine *machine)
 			cpudata->localtime = attotime_add_attoseconds(cpudata->localtime, cycles_running * attoseconds_per_cycle[cpunum]);
 			LOG(("         %d skipped, %d total, time = %s\n", cycles_running, (INT32)cpudata->totalcycles, attotime_string(cpudata->localtime, 9)));
 		}
+		
+		/* update the suspend state (breaks steeltal if we don't) */
+		cpudata->suspend = cpudata->nextsuspend;
+		cpudata->eatcycles = cpudata->nexteatcycles;
 	}
 
 	/* update the global time */
@@ -377,6 +381,8 @@ void cpunum_suspend(int cpunum, int reason, int eatcycles)
 	LOG(("cpunum_suspend (CPU=%d, r=%X, eat=%d)\n", cpunum, reason, eatcycles));
 	cpu[cpunum].nextsuspend |= reason;
 	cpu[cpunum].nexteatcycles = eatcycles;
+	if (cpu_getexecutingcpu() >= 0)
+		activecpu_abort_timeslice();
 }
 
 
@@ -390,6 +396,8 @@ void cpunum_resume(int cpunum, int reason)
 	VERIFY_CPUNUM(cpunum_resume);
 	LOG(("cpunum_resume (CPU=%d, r=%X)\n", cpunum, reason));
 	cpu[cpunum].nextsuspend &= ~reason;
+	if (cpu_getexecutingcpu() >= 0)
+		activecpu_abort_timeslice();
 }
 
 
