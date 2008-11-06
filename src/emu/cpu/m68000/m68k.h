@@ -181,8 +181,6 @@ void m68k_write_memory_32(m68ki_cpu_core *m68k, unsigned int address, unsigned i
  * predecrement destination mode is executed.
  * To simulate real 68k behavior, first write the high word to
  * [address+2], and then write the low word to [address].
- *
- * Enable this functionality with M68K_SIMULATE_PD_WRITES in m68kconf.h.
  */
 void m68k_write_memory_32_pd(m68ki_cpu_core *m68k, unsigned int address, unsigned int value);
 
@@ -201,7 +199,6 @@ void m68k_write_memory_32_pd(m68ki_cpu_core *m68k, unsigned int address, unsigne
  */
 
 /* Set the callback for an interrupt acknowledge.
- * You must enable M68K_EMULATE_INT_ACK in m68kconf.h.
  * The CPU will call the callback with the interrupt level being acknowledged.
  * The host program must return either a vector from 0x02-0xff, or one of the
  * special interrupt acknowledge values specified earlier in this header.
@@ -214,7 +211,6 @@ void m68k_set_int_ack_callback(m68ki_cpu_core *m68k, void *param, int  (*callbac
 
 
 /* Set the callback for a breakpoint acknowledge (68010+).
- * You must enable M68K_EMULATE_BKPT_ACK in m68kconf.h.
  * The CPU will call the callback with whatever was in the data field of the
  * BKPT instruction for 68020+, or 0 for 68010.
  * Default behavior: do nothing.
@@ -223,7 +219,6 @@ void m68k_set_bkpt_ack_callback(m68ki_cpu_core *m68k, void (*callback)(unsigned 
 
 
 /* Set the callback for the RESET instruction.
- * You must enable M68K_EMULATE_RESET in m68kconf.h.
  * The CPU calls this callback every time it encounters a RESET instruction.
  * Default behavior: do nothing.
  */
@@ -231,7 +226,6 @@ void m68k_set_reset_instr_callback(m68ki_cpu_core *m68k, void  (*callback)(void)
 
 
 /* Set the callback for the CMPI.L #v, Dn instruction.
- * You must enable M68K_CMPILD_HAS_CALLBACK in m68kconf.h.
  * The CPU calls this callback every time it encounters a CMPI.L #v, Dn instruction.
  * Default behavior: do nothing.
  */
@@ -239,28 +233,17 @@ void m68k_set_cmpild_instr_callback(m68ki_cpu_core *m68k, void  (*callback)(unsi
 
 
 /* Set the callback for the RTE instruction.
- * You must enable M68K_RTE_HAS_CALLBACK in m68kconf.h.
  * The CPU calls this callback every time it encounters a RTE instruction.
  * Default behavior: do nothing.
  */
 void m68k_set_rte_instr_callback(m68ki_cpu_core *m68k, void  (*callback)(void));
 
 /* Set the callback for the TAS instruction.
- * You must enable M68K_TAS_HAS_CALLBACK in m68kconf.h.
  * The CPU calls this callback every time it encounters a TAS instruction.
  * Default behavior: return 1, allow writeback.
  */
 void m68k_set_tas_instr_callback(m68ki_cpu_core *m68k, int  (*callback)(void));
 
-
-
-/* Set the callback for informing of a large PC change.
- * You must enable M68K_MONITOR_PC in m68kconf.h.
- * The CPU calls this callback with the new PC value every time the PC changes
- * by a large value (currently set for changes by longwords).
- * Default behavior: do nothing.
- */
-void m68k_set_pc_changed_callback(m68ki_cpu_core *m68k, void  (*callback)(unsigned int new_pc));
 
 
 /* Set the callback for CPU function code changes.
@@ -271,15 +254,6 @@ void m68k_set_pc_changed_callback(m68ki_cpu_core *m68k, void  (*callback)(unsign
  * Default behavior: do nothing.
  */
 void m68k_set_fc_callback(m68ki_cpu_core *m68k, void  (*callback)(unsigned int new_fc));
-
-
-/* Set a callback for the instruction cycle of the CPU.
- * You must enable M68K_INSTRUCTION_HOOK in m68kconf.h.
- * The CPU calls this callback just before fetching the opcode in the
- * instruction cycle.
- * Default behavior: do nothing.
- */
-void m68k_set_instr_hook_callback(m68ki_cpu_core *m68k, void  (*callback)(unsigned int pc));
 
 
 
@@ -378,9 +352,7 @@ unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigne
 /* ============================== MAME STUFF ============================== */
 /* ======================================================================== */
 
-#if M68K_COMPILE_FOR_MAME == OPT_ON
 #include "m68kmame.h"
-#endif /* M68K_COMPILE_FOR_MAME */
 
 
 /* ======================================================================== */

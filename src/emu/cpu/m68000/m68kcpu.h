@@ -30,10 +30,7 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 
 #include "m68k.h"
 #include <limits.h>
-
-#if M68K_EMULATE_ADDRESS_ERROR
 #include <setjmp.h>
-#endif /* M68K_EMULATE_ADDRESS_ERROR */
 
 /* ======================================================================== */
 /* ==================== ARCHITECTURE-DEPENDANT DEFINES ==================== */
@@ -374,7 +371,7 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 /* These defines are dependant on the configuration defines in m68kconf.h */
 
 /* Disable certain comparisons if we're not using all CPU types */
-#if M68K_EMULATE_040
+#if HAS_M68040
 	#define CPU_TYPE_IS_040_PLUS(A)    ((A) & CPU_TYPE_040)
 	#define CPU_TYPE_IS_040_LESS(A)    1
 #else
@@ -382,7 +379,7 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 	#define CPU_TYPE_IS_040_LESS(A)    1
 #endif
 
-#if M68K_EMULATE_020
+#if HAS_M68020
 	#define CPU_TYPE_IS_020_PLUS(A)    ((A) & (CPU_TYPE_020 | CPU_TYPE_040))
 	#define CPU_TYPE_IS_020_LESS(A)    1
 #else
@@ -390,7 +387,7 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 	#define CPU_TYPE_IS_020_LESS(A)    1
 #endif
 
-#if M68K_EMULATE_EC020
+#if HAS_M68EC020
 	#define CPU_TYPE_IS_EC020_PLUS(A)  ((A) & (CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_040))
 	#define CPU_TYPE_IS_EC020_LESS(A)  ((A) & (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010 | CPU_TYPE_EC020))
 #else
@@ -398,7 +395,7 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 	#define CPU_TYPE_IS_EC020_LESS(A)  CPU_TYPE_IS_020_LESS(A)
 #endif
 
-#if M68K_EMULATE_010
+#if HAS_M68010
 	#define CPU_TYPE_IS_010(A)         ((A) == CPU_TYPE_010)
 	#define CPU_TYPE_IS_010_PLUS(A)    ((A) & (CPU_TYPE_010 | CPU_TYPE_EC020 | CPU_TYPE_020 | CPU_TYPE_040))
 	#define CPU_TYPE_IS_010_LESS(A)    ((A) & (CPU_TYPE_000 | CPU_TYPE_008 | CPU_TYPE_010))
@@ -408,13 +405,13 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 	#define CPU_TYPE_IS_010_LESS(A)    CPU_TYPE_IS_EC020_LESS(A)
 #endif
 
-#if M68K_EMULATE_020 || M68K_EMULATE_EC020
+#if HAS_M68020 || HAS_M68EC020
 	#define CPU_TYPE_IS_020_VARIANT(A) ((A) & (CPU_TYPE_EC020 | CPU_TYPE_020))
 #else
 	#define CPU_TYPE_IS_020_VARIANT(A) 0
 #endif
 
-#if M68K_EMULATE_040 || M68K_EMULATE_020 || M68K_EMULATE_EC020 || M68K_EMULATE_010
+#if HAS_M68040 || HAS_M68020 || HAS_M68EC020 || HAS_M68010
 	#define CPU_TYPE_IS_000(A)         ((A) == CPU_TYPE_000 || (A) == CPU_TYPE_008)
 #else
 	#define CPU_TYPE_IS_000(A)         1
@@ -432,87 +429,21 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 
 
 /* Enable or disable callback functions */
-#if M68K_EMULATE_INT_ACK
-	#if M68K_EMULATE_INT_ACK == OPT_SPECIFY_HANDLER
-		#define m68ki_int_ack(M, A) M68K_INT_ACK_CALLBACK(M, A)
-	#else
-		#define m68ki_int_ack(M, A) CALLBACK_INT_ACK((M)->int_ack_param, A)
-	#endif
-#else
-	/* Default action is to used autovector mode, which is most common */
-	#define m68ki_int_ack(M, A) M68K_INT_ACK_AUTOVECTOR
-#endif /* M68K_EMULATE_INT_ACK */
+#define m68ki_int_ack(M, A) CALLBACK_INT_ACK((M)->int_ack_param, A)
 
-#if M68K_EMULATE_BKPT_ACK
-	#if M68K_EMULATE_BKPT_ACK == OPT_SPECIFY_HANDLER
-		#define m68ki_bkpt_ack(A) M68K_BKPT_ACK_CALLBACK(A)
-	#else
-		#define m68ki_bkpt_ack(A) CALLBACK_BKPT_ACK(A)
-	#endif
-#else
-	#define m68ki_bkpt_ack(A)
-#endif /* M68K_EMULATE_BKPT_ACK */
+#define m68ki_bkpt_ack(A) CALLBACK_BKPT_ACK(A)
 
-#if M68K_EMULATE_RESET
-	#if M68K_EMULATE_RESET == OPT_SPECIFY_HANDLER
-		#define m68ki_output_reset() M68K_RESET_CALLBACK()
-	#else
-		#define m68ki_output_reset() CALLBACK_RESET_INSTR()
-	#endif
-#else
-	#define m68ki_output_reset()
-#endif /* M68K_EMULATE_RESET */
+#define m68ki_output_reset() CALLBACK_RESET_INSTR()
 
-#if M68K_CMPILD_HAS_CALLBACK
-	#if M68K_CMPILD_HAS_CALLBACK == OPT_SPECIFY_HANDLER
-		#define m68ki_cmpild_callback(v,r) M68K_CMPILD_CALLBACK(v,r)
-	#else
-		#define m68ki_cmpild_callback(v,r) CALLBACK_CMPILD_INSTR(v,r)
-	#endif
-#else
-	#define m68ki_cmpild_callback(v,r)
-#endif /* M68K_CMPILD_HAS_CALLBACK */
+#define m68ki_cmpild_callback(v,r) CALLBACK_CMPILD_INSTR(v,r)
 
-#if M68K_RTE_HAS_CALLBACK
-	#if M68K_RTE_HAS_CALLBACK == OPT_SPECIFY_HANDLER
-		#define m68ki_rte_callback() M68K_RTE_CALLBACK()
-	#else
-		#define m68ki_rte_callback() CALLBACK_RTE_INSTR()
-	#endif
-#else
-	#define m68ki_rte_callback()
-#endif /* M68K_RTE_HAS_CALLBACK */
+#define m68ki_rte_callback() CALLBACK_RTE_INSTR()
 
-#if M68K_TAS_HAS_CALLBACK
-	#if M68K_TAS_HAS_CALLBACK == OPT_SPECIFY_HANDLER
-		#define m68ki_tas_callback() M68K_TAS_CALLBACK()
-	#else
-		#define m68ki_tas_callback() CALLBACK_TAS_INSTR()
-	#endif
-#else
-	#define m68ki_tas_callback()
-#endif /* M68K_TAS_HAS_CALLBACK */
+#define m68ki_tas_callback() CALLBACK_TAS_INSTR()
 
+#define m68ki_instr_hook(pc) debugger_instruction_hook(Machine, pc)
 
-#if M68K_INSTRUCTION_HOOK
-	#if M68K_INSTRUCTION_HOOK == OPT_SPECIFY_HANDLER
-		#define m68ki_instr_hook(pc) M68K_INSTRUCTION_CALLBACK(pc)
-	#else
-		#define m68ki_instr_hook(pc) CALLBACK_INSTR_HOOK(pc)
-	#endif
-#else
-	#define m68ki_instr_hook()
-#endif /* M68K_INSTRUCTION_HOOK */
-
-#if M68K_MONITOR_PC
-	#if M68K_MONITOR_PC == OPT_SPECIFY_HANDLER
-		#define m68ki_pc_changed(A) M68K_SET_PC_CALLBACK(ADDRESS_68K(A))
-	#else
-		#define m68ki_pc_changed(A) CALLBACK_PC_CHANGED(ADDRESS_68K(A))
-	#endif
-#else
-	#define m68ki_pc_changed(A)
-#endif /* M68K_MONITOR_PC */
+#define m68ki_pc_changed(A) change_pc(ADDRESS_68K(A))
 
 
 /* Enable or disable function code emulation */
@@ -553,39 +484,31 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 
 
 /* Address error */
-#if M68K_EMULATE_ADDRESS_ERROR
-	#include <setjmp.h>
-
-	#define m68ki_set_address_error_trap(m68k) \
-		if(setjmp(m68k->aerr_trap) != 0) \
+#define m68ki_set_address_error_trap(m68k) \
+	if(setjmp(m68k->aerr_trap) != 0) \
+	{ \
+		m68ki_exception_address_error(m68k); \
+		if(CPU_STOPPED) \
 		{ \
-			m68ki_exception_address_error(m68k); \
-			if(CPU_STOPPED) \
-			{ \
-				SET_CYCLES(m68k, 0); \
-				return m68k->initial_cycles; \
-			} \
-		}
+			SET_CYCLES(m68k, 0); \
+			return m68k->initial_cycles; \
+		} \
+	}
 
-	#define m68ki_check_address_error(m68k, ADDR, WRITE_MODE, FC) \
-		if((ADDR)&1) \
-		{ \
-			m68k->aerr_address = ADDR; \
-			m68k->aerr_write_mode = WRITE_MODE; \
-			m68k->aerr_fc = FC; \
-			longjmp(m68k->aerr_trap, 1); \
-		}
+#define m68ki_check_address_error(m68k, ADDR, WRITE_MODE, FC) \
+	if((ADDR)&1) \
+	{ \
+		m68k->aerr_address = ADDR; \
+		m68k->aerr_write_mode = WRITE_MODE; \
+		m68k->aerr_fc = FC; \
+		longjmp(m68k->aerr_trap, 1); \
+	}
 
-	#define m68ki_check_address_error_010_less(m68k, ADDR, WRITE_MODE, FC) \
-		if (CPU_TYPE_IS_010_LESS(CPU_TYPE)) \
-		{ \
-			m68ki_check_address_error(m68k, ADDR, WRITE_MODE, FC) \
-		}
-#else
-	#define m68ki_set_address_error_trap(M)
-	#define m68ki_check_address_error(M, ADDR, WRITE_MODE, FC)
-	#define m68ki_check_address_error_010_less(M, ADDR, WRITE_MODE, FC)
-#endif /* M68K_ADDRESS_ERROR */
+#define m68ki_check_address_error_010_less(m68k, ADDR, WRITE_MODE, FC) \
+	if (CPU_TYPE_IS_010_LESS(CPU_TYPE)) \
+	{ \
+		m68ki_check_address_error(m68k, ADDR, WRITE_MODE, FC) \
+	}
 
 /* Logging */
 #if M68K_LOG_ENABLE
@@ -809,12 +732,7 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 #define m68ki_write_8(M, A, V)		m68ki_write_8_fc (M, A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
 #define m68ki_write_16(M, A, V)		m68ki_write_16_fc(M, A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
 #define m68ki_write_32(M, A, V)		m68ki_write_32_fc(M, A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
-
-#if M68K_SIMULATE_PD_WRITES
 #define m68ki_write_32_pd(M, A, V)	m68ki_write_32_pd_fc(M, A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
-#else
-#define m68ki_write_32_pd(M, A, V)	m68ki_write_32_fc(M, A, FLAG_S | FUNCTION_CODE_USER_DATA, V)
-#endif
 
 /* map read immediate 8 to read immediate 16 */
 #define m68ki_read_imm_8(M)			MASK_OUT_ABOVE_8(m68ki_read_imm_16(M))
@@ -900,10 +818,7 @@ struct _m68ki_cpu_core
 	uint tracing;
 	uint address_space;
 
-#if M68K_EMULATE_ADDRESS_ERROR
 	jmp_buf aerr_trap;
-#endif /* M68K_EMULATE_ADDRESS_ERROR */
-
 	uint    aerr_address;
 	uint    aerr_write_mode;
 	uint    aerr_fc;
@@ -949,9 +864,7 @@ INLINE uint m68ki_read_32_fc (m68ki_cpu_core *m68k, uint address, uint fc);
 INLINE void m68ki_write_8_fc (m68ki_cpu_core *m68k, uint address, uint fc, uint value);
 INLINE void m68ki_write_16_fc(m68ki_cpu_core *m68k, uint address, uint fc, uint value);
 INLINE void m68ki_write_32_fc(m68ki_cpu_core *m68k, uint address, uint fc, uint value);
-#if M68K_SIMULATE_PD_WRITES
 INLINE void m68ki_write_32_pd_fc(m68ki_cpu_core *m68k, uint address, uint fc, uint value);
-#endif /* M68K_SIMULATE_PD_WRITES */
 
 /* Indexed and PC-relative ea fetching */
 INLINE uint m68ki_get_ea_pcdi(m68ki_cpu_core *m68k);
@@ -1068,11 +981,11 @@ char* m68ki_disassemble_quick(unsigned int pc, unsigned int cpu_type);
  */
 INLINE uint m68ki_read_imm_16(m68ki_cpu_core *m68k)
 {
+	uint result;
+
 	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
 	m68ki_check_address_error(m68k, REG_PC, MODE_READ, FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
-#if M68K_EMULATE_PREFETCH
-{
-	uint result;
+
 	if(REG_PC != CPU_PREF_ADDR)
 	{
 		CPU_PREF_ADDR = REG_PC;
@@ -1084,14 +997,9 @@ INLINE uint m68ki_read_imm_16(m68ki_cpu_core *m68k)
 	CPU_PREF_DATA = m68k_read_immediate_16(m68k, ADDRESS_68K(CPU_PREF_ADDR));
 	return result;
 }
-#else
-	REG_PC += 2;
-	return m68k_read_immediate_16(m68k, ADDRESS_68K(REG_PC-2));
-#endif /* M68K_EMULATE_PREFETCH */
-}
+
 INLINE uint m68ki_read_imm_32(m68ki_cpu_core *m68k)
 {
-#if M68K_EMULATE_PREFETCH
 	uint temp_val;
 
 	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
@@ -1113,12 +1021,6 @@ INLINE uint m68ki_read_imm_32(m68ki_cpu_core *m68k)
 	CPU_PREF_DATA = m68k_read_immediate_16(m68k, ADDRESS_68K(CPU_PREF_ADDR));
 
 	return temp_val;
-#else
-	m68ki_set_fc(FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
-	m68ki_check_address_error(m68k, REG_PC, MODE_READ, FLAG_S | FUNCTION_CODE_USER_PROGRAM); /* auto-disable (see m68kcpu.h) */
-	REG_PC += 4;
-	return m68k_read_immediate_32(m68k, ADDRESS_68K(REG_PC-4));
-#endif /* M68K_EMULATE_PREFETCH */
 }
 
 
@@ -1167,14 +1069,12 @@ INLINE void m68ki_write_32_fc(m68ki_cpu_core *m68k, uint address, uint fc, uint 
 	m68k_write_memory_32(m68k, ADDRESS_68K(address), value);
 }
 
-#if M68K_SIMULATE_PD_WRITES
 INLINE void m68ki_write_32_pd_fc(m68ki_cpu_core *m68k, uint address, uint fc, uint value)
 {
 	m68ki_set_fc(fc); /* auto-disable (see m68kcpu.h) */
 	m68ki_check_address_error_010_less(m68k, address, MODE_WRITE, fc); /* auto-disable (see m68kcpu.h) */
 	m68k_write_memory_32_pd(m68k, ADDRESS_68K(address), value);
 }
-#endif
 
 
 /* --------------------- Effective Address Calculation -------------------- */
@@ -1828,12 +1728,10 @@ INLINE void m68ki_exception_trace(m68ki_cpu_core *m68k)
 
 	if(CPU_TYPE_IS_010_LESS(CPU_TYPE))
 	{
-		#if M68K_EMULATE_ADDRESS_ERROR == OPT_ON
 		if(CPU_TYPE_IS_000(CPU_TYPE))
 		{
 			CPU_INSTR_MODE = INSTRUCTION_NO;
 		}
-		#endif /* M68K_EMULATE_ADDRESS_ERROR */
 		m68ki_stack_frame_0000(m68k, REG_PC, sr, EXCEPTION_TRACE);
 	}
 	else
@@ -1853,12 +1751,10 @@ INLINE void m68ki_exception_privilege_violation(m68ki_cpu_core *m68k)
 {
 	uint sr = m68ki_init_exception(m68k);
 
-	#if M68K_EMULATE_ADDRESS_ERROR == OPT_ON
 	if(CPU_TYPE_IS_000(CPU_TYPE))
 	{
 		CPU_INSTR_MODE = INSTRUCTION_NO;
 	}
-	#endif /* M68K_EMULATE_ADDRESS_ERROR */
 
 	m68ki_stack_frame_0000(m68k, REG_PPC, sr, EXCEPTION_PRIVILEGE_VIOLATION);
 	m68ki_jump_vector(m68k, EXCEPTION_PRIVILEGE_VIOLATION);
@@ -1915,12 +1811,10 @@ INLINE void m68ki_exception_illegal(m68ki_cpu_core *m68k)
 
 	sr = m68ki_init_exception(m68k);
 
-	#if M68K_EMULATE_ADDRESS_ERROR == OPT_ON
 	if(CPU_TYPE_IS_000(CPU_TYPE))
 	{
 		CPU_INSTR_MODE = INSTRUCTION_NO;
 	}
-	#endif /* M68K_EMULATE_ADDRESS_ERROR */
 
 	m68ki_stack_frame_0000(m68k, REG_PPC, sr, EXCEPTION_ILLEGAL_INSTRUCTION);
 	m68ki_jump_vector(m68k, EXCEPTION_ILLEGAL_INSTRUCTION);
@@ -1974,12 +1868,10 @@ void m68ki_exception_interrupt(m68ki_cpu_core *m68k, uint int_level)
 	uint sr;
 	uint new_pc;
 
-	#if M68K_EMULATE_ADDRESS_ERROR == OPT_ON
 	if(CPU_TYPE_IS_000(CPU_TYPE))
 	{
 		CPU_INSTR_MODE = INSTRUCTION_NO;
 	}
-	#endif /* M68K_EMULATE_ADDRESS_ERROR */
 
 	/* Turn off the stopped state */
 	CPU_STOPPED &= ~STOP_LEVEL_STOP;
@@ -2032,11 +1924,6 @@ void m68ki_exception_interrupt(m68ki_cpu_core *m68k, uint int_level)
 
 	/* Defer cycle counting until later */
 	USE_CYCLES(m68k, CYC_EXCEPTION[vector]);
-
-#if !M68K_EMULATE_INT_ACK
-	/* Automatically clear IRQ if we are not using an acknowledge scheme */
-	CPU_INT_LEVEL = 0;
-#endif /* M68K_EMULATE_INT_ACK */
 }
 
 

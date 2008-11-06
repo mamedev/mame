@@ -53,7 +53,7 @@
 #include "machine/eeprom.h"
 #include "video/segaic24.h"
 #include "cpu/i960/i960.h"
-#include "cpu/m68000/m68k.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/sharc/sharc.h"
 #include "cpu/mb86233/mb86233.h"
 #include "sound/scsp.h"
@@ -905,7 +905,7 @@ static int to_68k;
 
 static int snd_68k_ready_r(void)
 {
-	int sr = cpunum_get_reg(1, M68K_REG_SR);
+	int sr = cpunum_get_reg(1, M68K_SR);
 
 	if ((sr & 0x0700) > 0x0100)
 	{

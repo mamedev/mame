@@ -108,7 +108,8 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "machine/fd1094.h"
-#include "cpu/m68000/m68k.h"
+#include "cpu/m68000/m68kcpu.h"
+#undef REG_PC
 
 #include "debug/debugcmd.h"
 #include "debug/debugcon.h"

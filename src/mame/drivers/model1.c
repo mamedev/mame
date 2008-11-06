@@ -629,7 +629,7 @@ Notes:
 #include "machine/eeprom.h"
 #include "system16.h"
 #include "video/segaic24.h"
-#include "cpu/m68000/m68k.h"
+#include "cpu/m68000/m68000.h"
 #include "cpu/mb86233/mb86233.h"
 #include "sound/multipcm.h"
 #include "sound/2612intf.h"
@@ -838,7 +838,7 @@ static WRITE16_HANDLER(mr2_w)
 
 static READ16_HANDLER( snd_68k_ready_r )
 {
-	int sr = cpunum_get_reg(1, M68K_REG_SR);
+	int sr = cpunum_get_reg(1, M68K_SR);
 
 	if ((sr & 0x0700) > 0x0100)
 	{

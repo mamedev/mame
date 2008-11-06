@@ -125,13 +125,8 @@
 
 
 /* Opcode flags */
-#if M68K_COMPILE_FOR_MAME == OPT_ON
 #define SET_OPCODE_FLAGS(x)	g_opcode_type = x;
 #define COMBINE_OPCODE_FLAGS(x) ((x) | g_opcode_type | DASMFLAG_SUPPORTED)
-#else
-#define SET_OPCODE_FLAGS(x)
-#define COMBINE_OPCODE_FLAGS(X) (x)
-#endif
 
 
 /* ======================================================================== */

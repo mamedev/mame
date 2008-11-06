@@ -333,7 +333,7 @@ Notes:
 
 #include "driver.h"
 #include "deprecat.h"
-#include "cpu/m68000/m68k.h"
+#include "cpu/m68000/m68000.h"
 #include "segas24.h"
 #include "system16.h"
 #include "video/segaic24.h"

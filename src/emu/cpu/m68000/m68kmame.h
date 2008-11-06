@@ -11,47 +11,24 @@
 #include "deprecat.h"
 #include "m68000.h"
 
+#ifndef __M68KCPU_H__
+#define m68ki_cpu_core void
+#endif
+
+#define OPT_ON 1
+#define OPT_OFF 0
+
 /* Configuration switches (see m68kconf.h for explanation) */
 #define M68K_SEPARATE_READS         OPT_ON
 
-#define M68K_SIMULATE_PD_WRITES     OPT_ON
-
-#define M68K_EMULATE_INT_ACK        OPT_ON
-#define M68K_INT_ACK_CALLBACK(A)
-
-#define M68K_EMULATE_BKPT_ACK       OPT_OFF
-#define M68K_BKPT_ACK_CALLBACK()
-
 #define M68K_EMULATE_TRACE          OPT_OFF
-
-#define M68K_EMULATE_RESET          OPT_ON
-#define M68K_RESET_CALLBACK()
-
-#define M68K_CMPILD_HAS_CALLBACK     OPT_ON
-#define M68K_CMPILD_CALLBACK()
-
-#define M68K_RTE_HAS_CALLBACK       OPT_ON
-#define M68K_RTE_CALLBACK()
-
-#define M68K_TAS_HAS_CALLBACK       OPT_ON
-#define M68K_TAS_CALLBACK()
 
 #define M68K_EMULATE_FC             OPT_OFF
 #define M68K_SET_FC_CALLBACK(A)
 
-#define M68K_MONITOR_PC             OPT_SPECIFY_HANDLER
-#define M68K_SET_PC_CALLBACK(A)     change_pc(A)
-
-#define M68K_INSTRUCTION_HOOK       OPT_SPECIFY_HANDLER
-#define M68K_INSTRUCTION_CALLBACK(A) debugger_instruction_hook(Machine, A)
-
-#define M68K_EMULATE_PREFETCH       OPT_ON
-
 #define M68K_LOG_ENABLE             OPT_OFF
 #define M68K_LOG_1010_1111          OPT_OFF
 #define M68K_LOG_FILEHANDLE         errorlog
-
-#define M68K_EMULATE_ADDRESS_ERROR  OPT_ON
 
 #define M68K_USE_64_BIT             OPT_OFF
 
@@ -133,40 +110,6 @@ INLINE void m68kx_write_memory_32_pd(m68ki_cpu_core *m68k, unsigned int address,
 
 void m68k_set_encrypted_opcode_range(int cpunum, offs_t start, offs_t end);
 
-
-/* M68K Variants */
-#if HAS_M68008
-#define M68K_EMULATE_008            OPT_ON
-#else
-#define M68K_EMULATE_008            OPT_OFF
-#endif
-
-#if HAS_M68010
-#define M68K_EMULATE_010            OPT_ON
-#else
-#define M68K_EMULATE_010            OPT_OFF
-#endif
-
-#undef  M68K_EMULATE_010
-#define M68K_EMULATE_010            OPT_ON
-
-#if HAS_M68EC020
-#define M68K_EMULATE_EC020          OPT_ON
-#else
-#define M68K_EMULATE_EC020          OPT_OFF
-#endif
-
-#if HAS_M68020
-#define M68K_EMULATE_020            OPT_ON
-#else
-#define M68K_EMULATE_020            OPT_OFF
-#endif
-
-#if HAS_M68040
-#define M68K_EMULATE_040			OPT_ON
-#else
-#define M68K_EMULATE_040			OPT_OFF
-#endif
 
 /* ======================================================================== */
 /* ============================== END OF FILE ============================= */

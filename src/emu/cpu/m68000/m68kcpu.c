@@ -32,6 +32,7 @@ static const char copyright_notice[] =
 /* ================================ INCLUDES ============================== */
 /* ======================================================================== */
 
+#include <setjmp.h>
 #include "m68kcpu.h"
 #include "m68kops.h"
 #include "m68kfpu.c"
@@ -443,10 +444,8 @@ static int default_int_ack_callback(void *param, int int_level)
 }
 
 /* Breakpoint acknowledge */
-static unsigned int default_bkpt_ack_callback_data;
 static void default_bkpt_ack_callback(unsigned int data)
 {
-	default_bkpt_ack_callback_data = data;
 }
 
 /* Called when a reset instruction is executed */
@@ -488,11 +487,6 @@ static void default_set_fc_callback(unsigned int new_fc)
 static void default_instr_hook_callback(unsigned int pc)
 {
 }
-
-
-#if M68K_EMULATE_ADDRESS_ERROR
-	#include <setjmp.h>
-#endif /* M68K_EMULATE_ADDRESS_ERROR */
 
 
 /* ======================================================================== */
@@ -925,10 +919,8 @@ void m68k_pulse_reset(m68ki_cpu_core *m68k)
 	m68ki_set_sm_flag(m68k, SFLAG_SET | MFLAG_CLEAR);
 
 	/* Invalidate the prefetch queue */
-#if M68K_EMULATE_PREFETCH
 	/* Set to arbitrary number since our first fetch is from 0 */
 	CPU_PREF_ADDR = 0x1000;
-#endif /* M68K_EMULATE_PREFETCH */
 
 	/* Read the initial stack pointer and program counter */
 	m68ki_jump(m68k, 0);
@@ -958,8 +950,6 @@ unsigned int m68k_context_size()
 /* ======================================================================== */
 /* ============================== MAME STUFF ============================== */
 /* ======================================================================== */
-
-#if M68K_COMPILE_FOR_MAME == OPT_ON
 
 #include "deprecat.h"
 
@@ -1009,8 +999,6 @@ void m68k_state_register(m68ki_cpu_core *m68k, const char *type, int index)
 	state_save_register_presave(Machine, m68k_prepare_substate, m68k);
 	state_save_register_postload(Machine, m68k_post_load, m68k);
 }
-
-#endif /* M68K_COMPILE_FOR_MAME */
 
 /* ======================================================================== */
 /* ============================== END OF FILE ============================= */

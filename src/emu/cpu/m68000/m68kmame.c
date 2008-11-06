@@ -197,7 +197,6 @@ static void m68000_set_context(void *src)
 
 static offs_t m68000_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	M68K_SET_PC_CALLBACK(pc);
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68000);
 }
 
@@ -245,7 +244,6 @@ static void m68008_set_context(void *src)
 
 static offs_t m68008_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	M68K_SET_PC_CALLBACK(pc);
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68008);
 }
 
@@ -267,7 +265,6 @@ static void m68010_init(int index, int clock, const void *config, int (*irqcallb
 
 static offs_t m68010_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	M68K_SET_PC_CALLBACK(pc);
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68010);
 }
 
@@ -316,7 +313,6 @@ static void m68020_set_context(void *src)
 
 static offs_t m68020_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	M68K_SET_PC_CALLBACK(pc);
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68020);
 }
 
@@ -337,7 +333,6 @@ static void m68ec020_init(int index, int clock, const void *config, int (*irqcal
 
 static offs_t m68ec020_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	M68K_SET_PC_CALLBACK(pc);
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68EC020);
 }
 
@@ -387,7 +382,6 @@ static void m68040_set_context(void *src)
 
 static offs_t m68040_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	M68K_SET_PC_CALLBACK(pc);
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68040);
 }
 
