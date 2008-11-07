@@ -55,8 +55,8 @@
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-
-typedef struct {
+typedef struct 	_m65ce02_Regs m65ce02_Regs; 
+struct 	_m65ce02_Regs {
 	void	(*const *insn)(void); /* pointer to the function pointer table */
 	PAIR	ppc;			/* previous program counter */
 	PAIR	pc;				/* program counter */
@@ -77,13 +77,9 @@ typedef struct {
 	const device_config *device;
 	read8_machine_func rdmem_id;					/* readmem callback for indexed instructions */
 	write8_machine_func wrmem_id;				/* writemem callback for indexed instructions */
-}	m65ce02_Regs;
+};
 
-
-static int m65ce02_ICount = 0;
-
-static m65ce02_Regs m65ce02;
-
+static void *token;
 /***************************************************************
  * include the opcode macros, functions and tables
  ***************************************************************/
@@ -148,7 +144,7 @@ INLINE void m65ce02_take_irq(void)
 	if( !(P & F_I) )
 	{
 		EAD = M65CE02_IRQ_VEC;
-		m65ce02_ICount -= 7;
+		m65ce02->icount -= 7;
 		PUSH(PCH);
 		PUSH(PCL);
 		PUSH(P & ~F_B);
@@ -165,7 +161,7 @@ INLINE void m65ce02_take_irq(void)
 
 static CPU_EXECUTE( m65ce02 )
 {
-	m65ce02_ICount = cycles;
+	m65ce02->icount = cycles;
 
 	change_pc(PCD);
 
@@ -202,9 +198,9 @@ static CPU_EXECUTE( m65ce02 )
 		if( m65ce02.pending_irq )
 			m65ce02_take_irq();
 
-	} while (m65ce02_ICount > 0);
+	} while (m65ce02->icount > 0);
 
-	return cycles - m65ce02_ICount;
+	return cycles - m65ce02->icount;
 }
 
 static void m65ce02_set_irq_line(int irqline, int state)
@@ -217,7 +213,7 @@ static void m65ce02_set_irq_line(int irqline, int state)
 		{
 			LOG(("M65ce02#%d set_nmi_line(ASSERT)\n", cpu_getactivecpu()));
 			EAD = M65CE02_NMI_VEC;
-			m65ce02_ICount -= 7;
+			m65ce02->icount -= 7;
 			PUSH(PCH);
 			PUSH(PCL);
 			PUSH(P & ~F_B);
@@ -330,7 +326,7 @@ void m65ce02_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m65ce02);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m65ce02_dasm;			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m65ce02_ICount;			break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m65ce02->icount;			break;
 		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	info->f = (genf *) m65ce02.rdmem_id;		break;
 		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) m65ce02.wrmem_id;		break;
 

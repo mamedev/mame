@@ -24,7 +24,7 @@
  *****************************************************************************/
 
 #undef	OP
-#define OP(nn) INLINE void m6509_##nn(void)
+#define OP(nn) INLINE void m6509_##nn(m6509_Regs *m6502)
 
 OP(00) {                  BRK;                 } /* 7 BRK */
 OP(20) {                  JSR;                 } /* 6 JSR */
@@ -314,7 +314,7 @@ OP(bf) { int tmp; RD_ABY_P; LAX;                } /* 4 LAX ABY page penalty */
 OP(df) { int tmp; RD_ABX_NP; WB_EA; DCP; WB_EA; } /* 7 DCP ABX */
 OP(ff) { int tmp; RD_ABX_NP; WB_EA; ISB; WB_EA; } /* 7 ISB ABX */
 
-static void (*const insn6509[0x100])(void) = {
+static void (*const insn6509[0x100])(m6509_Regs *) = {
 	m6509_00,m6509_01,m6509_02,m6509_03,m6509_04,m6509_05,m6509_06,m6509_07,
 	m6509_08,m6509_09,m6509_0a,m6509_0b,m6509_0c,m6509_0d,m6509_0e,m6509_0f,
 	m6509_10,m6509_11,m6509_12,m6509_13,m6509_14,m6509_15,m6509_16,m6509_17,

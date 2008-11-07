@@ -21,9 +21,9 @@
 
 #undef	OP
 #ifdef M4510
-#define OP(nn) INLINE void m4510_##nn(void)
+#define OP(nn) INLINE void m4510_##nn(m4510_Regs *m4510)
 #else
-#define OP(nn) INLINE void m65ce02_##nn(void)
+#define OP(nn) INLINE void m65ce02_##nn(m65ce02_Regs *m65ce02)
 #endif
 
 /*****************************************************************************
@@ -326,7 +326,7 @@ OP(df) { int tmp; RD_ZPG; BBS(5); } /* 4 BBS5 ZPG */
 OP(ff) { int tmp; RD_ZPG; BBS(7); } /* 4 BBS7 ZPG */
 
 #ifdef M4510
-static void (*const insn4510[0x100])(void) = {
+static void (*const insn4510[0x100])(m4510_Regs *) = {
 	m4510_00,m4510_01,m4510_02,m4510_03,m4510_04,m4510_05,m4510_06,m4510_07,
 	m4510_08,m4510_09,m4510_0a,m4510_0b,m4510_0c,m4510_0d,m4510_0e,m4510_0f,
 	m4510_10,m4510_11,m4510_12,m4510_13,m4510_14,m4510_15,m4510_16,m4510_17,
@@ -361,7 +361,7 @@ static void (*const insn4510[0x100])(void) = {
 	m4510_f8,m4510_f9,m4510_fa,m4510_fb,m4510_fc,m4510_fd,m4510_fe,m4510_ff
 };
 #else
-static void (*const insn65ce02[0x100])(void) = {
+static void (*const insn65ce02[0x100])(m4510_Regs *) = {
 	m65ce02_00,m65ce02_01,m65ce02_02,m65ce02_03,m65ce02_04,m65ce02_05,m65ce02_06,m65ce02_07,
 	m65ce02_08,m65ce02_09,m65ce02_0a,m65ce02_0b,m65ce02_0c,m65ce02_0d,m65ce02_0e,m65ce02_0f,
 	m65ce02_10,m65ce02_11,m65ce02_12,m65ce02_13,m65ce02_14,m65ce02_15,m65ce02_16,m65ce02_17,

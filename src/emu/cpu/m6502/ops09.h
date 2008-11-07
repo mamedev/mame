@@ -20,18 +20,15 @@
  *
  *****************************************************************************/
 
-#define m6502 m6509
-#define m6502_ICount m6509_ICount
+#define ZPWH	m6502->zp.w.h
 
-#define ZPWH	m6509.zp.w.h
+#define EAWH	m6502->ea.w.h
 
-#define EAWH	m6509.ea.w.h
+#define PBWH	m6502->pc_bank.w.h
+#define PB		m6502->pc_bank.d
 
-#define PBWH	m6509.pc_bank.w.h
-#define PB		m6509.pc_bank.d
-
-#define IBWH	m6509.ind_bank.w.h
-#define IB		m6509.ind_bank.d
+#define IBWH	m6502->ind_bank.w.h
+#define IB		m6502->ind_bank.d
 
 #undef CHANGE_PC
 #define CHANGE_PC change_pc(PCD|PB)
@@ -40,25 +37,25 @@
  *  RDOP    read an opcode
  ***************************************************************/
 #undef RDOP
-#define RDOP() cpu_readop((PCW++)|PB); m6502_ICount -= 1
+#define RDOP() cpu_readop((PCW++)|PB); m6502->icount -= 1
 
 /***************************************************************
  *  RDOPARG read an opcode argument
  ***************************************************************/
 #undef RDOPARG
-#define RDOPARG() cpu_readop_arg((PCW++)|PB); m6502_ICount -= 1
+#define RDOPARG() cpu_readop_arg((PCW++)|PB); m6502->icount -= 1
 
 /***************************************************************
  *  RDMEM   read memory
  ***************************************************************/
 #undef RDMEM
-#define RDMEM(addr) program_read_byte_8le(addr); m6502_ICount -= 1
+#define RDMEM(addr) program_read_byte_8le(addr); m6502->icount -= 1
 
 /***************************************************************
  *  WRMEM   write memory
  ***************************************************************/
 #undef WRMEM
-#define WRMEM(addr,data) program_write_byte_8le(addr,data); m6502_ICount -= 1
+#define WRMEM(addr,data) program_write_byte_8le(addr,data); m6502->icount -= 1
 
 /***************************************************************
  * push a register onto the stack
@@ -134,7 +131,7 @@
 	EAH = RDMEM(ZPD);											\
 	EAWH = PBWH;												\
     if (EAL + Y > 0xff)                                         \
-		m6509_ICount--; 										\
+		m6502->icount--; 										\
 	EAW += Y
 
 
@@ -150,7 +147,7 @@
 	EAH = RDMEM(ZPD);											\
 	EAWH = IBWH;												\
     if (EAL + Y > 0xff)                                         \
-		m6509_ICount--; 										\
+		m6502->icount--; 										\
 	EAW += Y
 
 /***************************************************************
@@ -178,14 +175,14 @@
 	{															\
 		tmp = RDOPARG();										\
 		EAW = PCW + (signed char)tmp;							\
-		m6509_ICount -= (PCH == EAH) ? 1 : 2;					\
+		m6502->icount -= (PCH == EAH) ? 1 : 2;					\
 		PCD = EAD|PB;											\
 		CHANGE_PC;												\
 	}															\
 	else														\
 	{															\
 		PCW++;													\
-		m6509_ICount -= 1;										\
+		m6502->icount -= 1;										\
 	}
 
 /* 6502 ********************************************************

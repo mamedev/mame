@@ -32,7 +32,7 @@
 
 
 #undef	OP
-#define OP(nn) INLINE void n2a03_##nn(void)
+#define OP(nn) INLINE void n2a03_##nn(m6502_Regs *m6502)
 
 /*****************************************************************************
  *****************************************************************************
@@ -60,7 +60,7 @@ OP(ed) { int tmp; RD_ABS; SBC_NES;	  } /* 4 SBC ABS */
 OP(7d) { int tmp; RD_ABX_P; ADC_NES;	  } /* 4 ADC ABX page penalty */
 OP(fd) { int tmp; RD_ABX_P; SBC_NES;	  } /* 4 SBC ABX page penalty */
 
-static void (*const insn2a03[0x100])(void) = {
+static void (*const insn2a03[0x100])(m6502_Regs *m6502) = {
 	m6502_00,m6502_01,m6502_02,m6502_03,m6502_04,m6502_05,m6502_06,m6502_07,
 	m6502_08,m6502_09,m6502_0a,m6502_0b,m6502_0c,m6502_0d,m6502_0e,m6502_0f,
 	m6502_10,m6502_11,m6502_12,m6502_13,m6502_14,m6502_15,m6502_16,m6502_17,

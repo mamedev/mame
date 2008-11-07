@@ -53,10 +53,11 @@
 /****************************************************************************
  * The 6502 registers.
  ****************************************************************************/
-typedef struct
+typedef struct _m6502_Regs m6502_Regs;
+struct _m6502_Regs
 {
 	UINT8	subtype;		/* currently selected cpu sub type */
-	void	(*const *insn)(void); /* pointer to the function pointer table */
+	void	(*const *insn)(m6502_Regs *); /* pointer to the function pointer table */
 	PAIR	ppc;			/* previous program counter */
 	PAIR	pc; 			/* program counter */
 	PAIR	sp; 			/* stack pointer (always 100 - 1FF) */
@@ -71,8 +72,12 @@ typedef struct
 	UINT8	nmi_state;
 	UINT8	irq_state;
 	UINT8   so_state;
+
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	int		int_occured;
+	int		icount;
+
 	read8_machine_func rdmem_id;					/* readmem callback for indexed instructions */
 	write8_machine_func wrmem_id;				/* writemem callback for indexed instructions */
 
@@ -83,12 +88,11 @@ typedef struct
 	void	(*port_write)(UINT8 direction, UINT8 data);
 #endif
 
-}	m6502_Regs;
+};
 
-static int m6502_IntOccured = 0;
-static int m6502_ICount = 0;
 
-static m6502_Regs m6502;
+static void *token;
+//static m6502_Regs *m6502;
 
 static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8le(offset); }
 static WRITE8_HANDLER( default_wdmem_id ) { program_write_byte_8le(offset, data); }
@@ -128,33 +132,36 @@ static WRITE8_HANDLER( default_wdmem_id ) { program_write_byte_8le(offset, data)
  *
  *****************************************************************************/
 
-static void m6502_common_init(const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(void), const char *type)
+static void m6502_common_init(const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback, UINT8 subtype, void (*const *insn)(m6502_Regs *m6502), const char *type)
 {
-	memset(&m6502, 0, sizeof(m6502));
-	m6502.irq_callback = irqcallback;
-	m6502.device = device;
-	m6502.subtype = subtype;
-	m6502.insn = insn;
-	m6502.rdmem_id = default_rdmem_id;
-	m6502.wrmem_id = default_wdmem_id;
+	m6502_Regs *m6502 = device->token;
 
-	state_save_register_item(type, index, m6502.pc.w.l);
-	state_save_register_item(type, index, m6502.sp.w.l);
-	state_save_register_item(type, index, m6502.p);
-	state_save_register_item(type, index, m6502.a);
-	state_save_register_item(type, index, m6502.x);
-	state_save_register_item(type, index, m6502.y);
-	state_save_register_item(type, index, m6502.pending_irq);
-	state_save_register_item(type, index, m6502.after_cli);
-	state_save_register_item(type, index, m6502.nmi_state);
-	state_save_register_item(type, index, m6502.irq_state);
-	state_save_register_item(type, index, m6502.so_state);
+	token = device->token;	// temporary
+	
+	m6502->irq_callback = irqcallback;
+	m6502->device = device;
+	m6502->subtype = subtype;
+	m6502->insn = insn;
+	m6502->rdmem_id = default_rdmem_id;
+	m6502->wrmem_id = default_wdmem_id;
+
+	state_save_register_item(type, index, m6502->pc.w.l);
+	state_save_register_item(type, index, m6502->sp.w.l);
+	state_save_register_item(type, index, m6502->p);
+	state_save_register_item(type, index, m6502->a);
+	state_save_register_item(type, index, m6502->x);
+	state_save_register_item(type, index, m6502->y);
+	state_save_register_item(type, index, m6502->pending_irq);
+	state_save_register_item(type, index, m6502->after_cli);
+	state_save_register_item(type, index, m6502->nmi_state);
+	state_save_register_item(type, index, m6502->irq_state);
+	state_save_register_item(type, index, m6502->so_state);
 
 #if (HAS_M6510) || (HAS_M6510T) || (HAS_M8502) || (HAS_M7501)
 	if (subtype == SUBTYPE_6510)
 	{
-		state_save_register_item(type, index, m6502.port);
-		state_save_register_item(type, index, m6502.ddr);
+		state_save_register_item(type, index, m6502->port);
+		state_save_register_item(type, index, m6502->ddr);
 	}
 #endif
 }
@@ -166,17 +173,18 @@ static CPU_INIT( m6502 )
 
 static CPU_RESET( m6502 )
 {
+	m6502_Regs *m6502 = device->token;
 	/* wipe out the rest of the m6502 structure */
 	/* read the reset vector into PC */
 	PCL = RDMEM(M6502_RST_VEC);
 	PCH = RDMEM(M6502_RST_VEC+1);
 
-	m6502.sp.d = 0x01ff;	/* stack pointer starts at page 1 offset FF */
-	m6502.p = F_T|F_I|F_Z|F_B|(P&F_D);	/* set T, I and Z flags */
-	m6502.pending_irq = 0;	/* nonzero if an IRQ is pending */
-	m6502.after_cli = 0;	/* pending IRQ and last insn cleared I */
-	m6502.irq_state = 0;
-	m6502.nmi_state = 0;
+	m6502->sp.d = 0x01ff;	/* stack pointer starts at page 1 offset FF */
+	m6502->p = F_T|F_I|F_Z|F_B|(P&F_D);	/* set T, I and Z flags */
+	m6502->pending_irq = 0;	/* nonzero if an IRQ is pending */
+	m6502->after_cli = 0;	/* pending IRQ and last insn cleared I */
+	m6502->irq_state = 0;
+	m6502->nmi_state = 0;
 
 	change_pc(PCD);
 }
@@ -188,25 +196,26 @@ static CPU_EXIT( m6502 )
 
 static void m6502_get_context (void *dst)
 {
-	if( dst )
-		*(m6502_Regs*)dst = m6502;
 }
 
 static void m6502_set_context (void *src)
 {
+	m6502_Regs *m6502;
+	
 	if( src )
 	{
-		m6502 = *(m6502_Regs*)src;
+		token = src;
+		m6502 = token;
 		change_pc(PCD);
 	}
 }
 
-INLINE void m6502_take_irq(void)
+INLINE void m6502_take_irq(m6502_Regs *m6502)
 {
 	if( !(P & F_I) )
 	{
 		EAD = M6502_IRQ_VEC;
-		m6502_ICount -= 2;
+		m6502->icount -= 2;
 		PUSH(PCH);
 		PUSH(PCL);
 		PUSH(P & ~F_B);
@@ -215,15 +224,17 @@ INLINE void m6502_take_irq(void)
 		PCH = RDMEM(EAD+1);
 		LOG(("M6502#%d takes IRQ ($%04x)\n", cpu_getactivecpu(), PCD));
 		/* call back the cpuintrf to let it clear the line */
-		if (m6502.irq_callback) (*m6502.irq_callback)(m6502.device, 0);
+		if (m6502->irq_callback) (*m6502->irq_callback)(m6502->device, 0);
 		change_pc(PCD);
 	}
-	m6502.pending_irq = 0;
+	m6502->pending_irq = 0;
 }
 
 static CPU_EXECUTE( m6502 )
 {
-	m6502_ICount = cycles;
+	m6502_Regs *m6502 = device->token;
+	
+	m6502->icount = cycles;
 
 	change_pc(PCD);
 
@@ -235,21 +246,21 @@ static CPU_EXECUTE( m6502 )
 		debugger_instruction_hook(Machine, PCD);
 
 		/* if an irq is pending, take it now */
-		if( m6502.pending_irq )
-			m6502_take_irq();
+		if( m6502->pending_irq )
+			m6502_take_irq(m6502);
 
 		op = RDOP();
-		(*m6502.insn[op])();
+		(*m6502->insn[op])(m6502);
 
 		/* check if the I flag was just reset (interrupts enabled) */
-		if( m6502.after_cli )
+		if( m6502->after_cli )
 		{
 			LOG(("M6502#%d after_cli was >0", cpu_getactivecpu()));
-			m6502.after_cli = 0;
-			if (m6502.irq_state != CLEAR_LINE)
+			m6502->after_cli = 0;
+			if (m6502->irq_state != CLEAR_LINE)
 			{
 				LOG((": irq line is asserted: set pending IRQ\n"));
-				m6502.pending_irq = 1;
+				m6502->pending_irq = 1;
 			}
 			else
 			{
@@ -257,34 +268,34 @@ static CPU_EXECUTE( m6502 )
 			}
 		}
 		else {
-			if ( m6502.pending_irq == 2 ) {
-				if ( m6502_IntOccured - m6502_ICount > 1 ) {
-					m6502.pending_irq = 1;
+			if ( m6502->pending_irq == 2 ) {
+				if ( m6502->int_occured - m6502->icount > 1 ) {
+					m6502->pending_irq = 1;
 				}
 			}
-			if( m6502.pending_irq == 1 )
-				m6502_take_irq();
-			if ( m6502.pending_irq == 2 ) {
-				m6502.pending_irq = 1;
+			if( m6502->pending_irq == 1 )
+				m6502_take_irq(m6502);
+			if ( m6502->pending_irq == 2 ) {
+				m6502->pending_irq = 1;
 			}
 		}
 
-	} while (m6502_ICount > 0);
+	} while (m6502->icount > 0);
 
-	return cycles - m6502_ICount;
+	return cycles - m6502->icount;
 }
 
-static void m6502_set_irq_line(int irqline, int state)
+static void m6502_set_irq_line(m6502_Regs *m6502, int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
 	{
-		if (m6502.nmi_state == state) return;
-		m6502.nmi_state = state;
+		if (m6502->nmi_state == state) return;
+		m6502->nmi_state = state;
 		if( state != CLEAR_LINE )
 		{
 			LOG(( "M6502#%d set_nmi_line(ASSERT)\n", cpu_getactivecpu()));
 			EAD = M6502_NMI_VEC;
-			m6502_ICount -= 2;
+			m6502->icount -= 2;
 			PUSH(PCH);
 			PUSH(PCL);
 			PUSH(P & ~F_B);
@@ -299,21 +310,21 @@ static void m6502_set_irq_line(int irqline, int state)
 	{
 		if( irqline == M6502_SET_OVERFLOW )
 		{
-			if( m6502.so_state && !state )
+			if( m6502->so_state && !state )
 			{
 				LOG(( "M6502#%d set overflow\n", cpu_getactivecpu()));
 				P|=F_V;
 			}
-			m6502.so_state=state;
+			m6502->so_state=state;
 			return;
 		}
-		m6502.irq_state = state;
+		m6502->irq_state = state;
 		if( state != CLEAR_LINE )
 		{
 			LOG(( "M6502#%d set_irq_line(ASSERT)\n", cpu_getactivecpu()));
-			m6502.pending_irq = 1;
-//          m6502.pending_irq = 2;
-			m6502_IntOccured = m6502_ICount;
+			m6502->pending_irq = 1;
+//          m6502->pending_irq = 2;
+			m6502->int_occured = m6502->icount;
 		}
 	}
 }
@@ -334,9 +345,11 @@ static CPU_INIT( n2a03 )
    Bit 7 of address $4011 (the PSG's DPCM control register), when set,
    causes an IRQ to be generated.  This function allows the IRQ to be called
    from the PSG core when such an occasion arises. */
-void n2a03_irq(void)
+void n2a03_irq()
 {
-  m6502_take_irq();
+	m6502_Regs *m6502 = token;
+
+	m6502_take_irq(m6502);
 }
 #endif
 
@@ -353,29 +366,32 @@ static CPU_INIT( m6510 )
 
 static CPU_RESET( m6510 )
 {
+	m6502_Regs *m6502 = device->token;
+	
 	CPU_RESET_CALL(m6502);
-	m6502.port = 0xff;
-	m6502.ddr = 0x00;
+	m6502->port = 0xff;
+	m6502->ddr = 0x00;
 }
 
-static UINT8 m6510_get_port(void)
+static UINT8 m6510_get_port(m6502_Regs *m6502)
 {
-	return (m6502.port & m6502.ddr) | (m6502.ddr ^ 0xff);
+	return (m6502->port & m6502->ddr) | (m6502->ddr ^ 0xff);
 }
 
 static READ8_HANDLER( m6510_read_0000 )
 {
+	m6502_Regs *m6502 = token;
 	UINT8 result = 0x00;
 
 	switch(offset)
 	{
 		case 0x0000:	/* DDR */
-			result = m6502.ddr;
+			result = m6502->ddr;
 			break;
 		case 0x0001:	/* Data Port */
-			if (m6502.port_read)
-				result = m6502.port_read( m6502.ddr );
-			result = (m6502.ddr & m6502.port) | (~m6502.ddr & result);
+			if (m6502->port_read)
+				result = m6502->port_read( m6502->ddr );
+			result = (m6502->ddr & m6502->port) | (~m6502->ddr & result);
 			break;
 	}
 	return result;
@@ -383,18 +399,20 @@ static READ8_HANDLER( m6510_read_0000 )
 
 static WRITE8_HANDLER( m6510_write_0000 )
 {
+	m6502_Regs *m6502 = token;
+	
 	switch(offset)
 	{
 		case 0x0000:	/* DDR */
-			m6502.ddr = data;
+			m6502->ddr = data;
 			break;
 		case 0x0001:	/* Data Port */
-			m6502.port = data;
+			m6502->port = data;
 			break;
 	}
 
-	if (m6502.port_write)
-		m6502.port_write( m6502.ddr, m6502.port & m6502.ddr );
+	if (m6502->port_write)
+		m6502->port_write( m6502->ddr, m6502->port & m6502->ddr );
 }
 
 static ADDRESS_MAP_START(m6510_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -416,16 +434,18 @@ static CPU_INIT( m65c02 )
 
 static CPU_RESET( m65c02 )
 {
+	m6502_Regs *m6502 = device->token;
+	
 	CPU_RESET_CALL(m6502);
 	P &=~F_D;
 }
 
-INLINE void m65c02_take_irq(void)
+INLINE void m65c02_take_irq(m6502_Regs *m6502)
 {
 	if( !(P & F_I) )
 	{
 		EAD = M6502_IRQ_VEC;
-		m6502_ICount -= 2;
+		m6502->icount -= 2;
 		PUSH(PCH);
 		PUSH(PCL);
 		PUSH(P & ~F_B);
@@ -434,15 +454,17 @@ INLINE void m65c02_take_irq(void)
 		PCH = RDMEM(EAD+1);
 		LOG(("M65c02#%d takes IRQ ($%04x)\n", cpu_getactivecpu(), PCD));
 		/* call back the cpuintrf to let it clear the line */
-		if (m6502.irq_callback) (*m6502.irq_callback)(m6502.device, 0);
+		if (m6502->irq_callback) (*m6502->irq_callback)(m6502->device, 0);
 		change_pc(PCD);
 	}
-	m6502.pending_irq = 0;
+	m6502->pending_irq = 0;
 }
 
 static CPU_EXECUTE( m65c02 )
 {
-	m6502_ICount = cycles;
+	m6502_Regs *m6502 = device->token;
+	
+	m6502->icount = cycles;
 
 	change_pc(PCD);
 
@@ -454,22 +476,22 @@ static CPU_EXECUTE( m65c02 )
 		debugger_instruction_hook(Machine, PCD);
 
 		op = RDOP();
-		(*m6502.insn[op])();
+		(*m6502->insn[op])(m6502);
 
 		/* if an irq is pending, take it now */
-		if( m6502.pending_irq )
-			m65c02_take_irq();
+		if( m6502->pending_irq )
+			m65c02_take_irq(m6502);
 
 
 		/* check if the I flag was just reset (interrupts enabled) */
-		if( m6502.after_cli )
+		if( m6502->after_cli )
 		{
 			LOG(("M6502#%d after_cli was >0", cpu_getactivecpu()));
-			m6502.after_cli = 0;
-			if (m6502.irq_state != CLEAR_LINE)
+			m6502->after_cli = 0;
+			if (m6502->irq_state != CLEAR_LINE)
 			{
 				LOG((": irq line is asserted: set pending IRQ\n"));
-				m6502.pending_irq = 1;
+				m6502->pending_irq = 1;
 			}
 			else
 			{
@@ -477,25 +499,25 @@ static CPU_EXECUTE( m65c02 )
 			}
 		}
 		else
-		if( m6502.pending_irq )
-			m65c02_take_irq();
+		if( m6502->pending_irq )
+			m65c02_take_irq(m6502);
 
-	} while (m6502_ICount > 0);
+	} while (m6502->icount > 0);
 
-	return cycles - m6502_ICount;
+	return cycles - m6502->icount;
 }
 
-static void m65c02_set_irq_line(int irqline, int state)
+static void m65c02_set_irq_line(m6502_Regs *m6502, int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
 	{
-		if (m6502.nmi_state == state) return;
-		m6502.nmi_state = state;
+		if (m6502->nmi_state == state) return;
+		m6502->nmi_state = state;
 		if( state != CLEAR_LINE )
 		{
 			LOG(( "M6502#%d set_nmi_line(ASSERT)\n", cpu_getactivecpu()));
 			EAD = M6502_NMI_VEC;
-			m6502_ICount -= 2;
+			m6502->icount -= 2;
 			PUSH(PCH);
 			PUSH(PCL);
 			PUSH(P & ~F_B);
@@ -507,7 +529,7 @@ static void m65c02_set_irq_line(int irqline, int state)
 		}
 	}
 	else
-		m6502_set_irq_line(irqline,state);
+		m6502_set_irq_line(m6502, irqline,state);
 }
 #endif
 
@@ -534,27 +556,29 @@ static CPU_INIT( deco16 )
 
 static CPU_RESET( deco16 )
 {
+	m6502_Regs *m6502 = device->token;
+	
 	CPU_RESET_CALL(m6502);
-	m6502.subtype = SUBTYPE_DECO16;
-	m6502.insn = insndeco16;
+	m6502->subtype = SUBTYPE_DECO16;
+	m6502->insn = insndeco16;
 
     PCL = RDMEM(DECO16_RST_VEC+1);
     PCH = RDMEM(DECO16_RST_VEC);
 
-	m6502.sp.d = 0x01ff;	/* stack pointer starts at page 1 offset FF */
-	m6502.p = F_T|F_I|F_Z|F_B|(P&F_D);	/* set T, I and Z flags */
-	m6502.pending_irq = 0;	/* nonzero if an IRQ is pending */
-	m6502.after_cli = 0;	/* pending IRQ and last insn cleared I */
+	m6502->sp.d = 0x01ff;	/* stack pointer starts at page 1 offset FF */
+	m6502->p = F_T|F_I|F_Z|F_B|(P&F_D);	/* set T, I and Z flags */
+	m6502->pending_irq = 0;	/* nonzero if an IRQ is pending */
+	m6502->after_cli = 0;	/* pending IRQ and last insn cleared I */
 
 	change_pc(PCD);
 }
 
-INLINE void deco16_take_irq(void)
+INLINE void deco16_take_irq(m6502_Regs *m6502)
 {
 	if( !(P & F_I) )
 	{
 		EAD = DECO16_IRQ_VEC;
-		m6502_ICount -= 2;
+		m6502->icount -= 2;
 		PUSH(PCH);
 		PUSH(PCL);
 		PUSH(P & ~F_B);
@@ -563,23 +587,23 @@ INLINE void deco16_take_irq(void)
 		PCH = RDMEM(EAD);
 		LOG(("M6502#%d takes IRQ ($%04x)\n", cpu_getactivecpu(), PCD));
 		/* call back the cpuintrf to let it clear the line */
-		if (m6502.irq_callback) (*m6502.irq_callback)(m6502.device, 0);
+		if (m6502->irq_callback) (*m6502->irq_callback)(m6502->device, 0);
 		change_pc(PCD);
 	}
-	m6502.pending_irq = 0;
+	m6502->pending_irq = 0;
 }
 
-static void deco16_set_irq_line(int irqline, int state)
+static void deco16_set_irq_line(m6502_Regs *m6502, int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
 	{
-		if (m6502.nmi_state == state) return;
-		m6502.nmi_state = state;
+		if (m6502->nmi_state == state) return;
+		m6502->nmi_state = state;
 		if( state != CLEAR_LINE )
 		{
 			LOG(( "M6502#%d set_nmi_line(ASSERT)\n", cpu_getactivecpu()));
 			EAD = DECO16_NMI_VEC;
-			m6502_ICount -= 7;
+			m6502->icount -= 7;
 			PUSH(PCH);
 			PUSH(PCL);
 			PUSH(P & ~F_B);
@@ -594,26 +618,28 @@ static void deco16_set_irq_line(int irqline, int state)
 	{
 		if( irqline == M6502_SET_OVERFLOW )
 		{
-			if( m6502.so_state && !state )
+			if( m6502->so_state && !state )
 			{
 				LOG(( "M6502#%d set overflow\n", cpu_getactivecpu()));
 				P|=F_V;
 			}
-			m6502.so_state=state;
+			m6502->so_state=state;
 			return;
 		}
-		m6502.irq_state = state;
+		m6502->irq_state = state;
 		if( state != CLEAR_LINE )
 		{
 			LOG(( "M6502#%d set_irq_line(ASSERT)\n", cpu_getactivecpu()));
-			m6502.pending_irq = 1;
+			m6502->pending_irq = 1;
 		}
 	}
 }
 
 static CPU_EXECUTE( deco16 )
 {
-	m6502_ICount = cycles;
+	m6502_Regs *m6502 = device->token;
+	
+	m6502->icount = cycles;
 
 	change_pc(PCD);
 
@@ -625,22 +651,22 @@ static CPU_EXECUTE( deco16 )
 		debugger_instruction_hook(Machine, PCD);
 
 		op = RDOP();
-		(*m6502.insn[op])();
+		(*m6502->insn[op])(m6502);
 
 		/* if an irq is pending, take it now */
-		if( m6502.pending_irq )
-			deco16_take_irq();
+		if( m6502->pending_irq )
+			deco16_take_irq(m6502);
 
 
 		/* check if the I flag was just reset (interrupts enabled) */
-		if( m6502.after_cli )
+		if( m6502->after_cli )
 		{
 			LOG(("M6502#%d after_cli was >0", cpu_getactivecpu()));
-			m6502.after_cli = 0;
-			if (m6502.irq_state != CLEAR_LINE)
+			m6502->after_cli = 0;
+			if (m6502->irq_state != CLEAR_LINE)
 			{
 				LOG((": irq line is asserted: set pending IRQ\n"));
-				m6502.pending_irq = 1;
+				m6502->pending_irq = 1;
 			}
 			else
 			{
@@ -648,12 +674,12 @@ static CPU_EXECUTE( deco16 )
 			}
 		}
 		else
-		if( m6502.pending_irq )
-			deco16_take_irq();
+		if( m6502->pending_irq )
+			deco16_take_irq(m6502);
 
-	} while (m6502_ICount > 0);
+	} while (m6502->icount > 0);
 
-	return cycles - m6502_ICount;
+	return cycles - m6502->icount;
 }
 
 #endif
@@ -666,27 +692,29 @@ static CPU_EXECUTE( deco16 )
 
 static void m6502_set_info(UINT32 state, cpuinfo *info)
 {
+	m6502_Regs *m6502 = token;
+	
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + M6502_IRQ_LINE:		m6502_set_irq_line(M6502_IRQ_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M6502_SET_OVERFLOW:	m6502_set_irq_line(M6502_SET_OVERFLOW, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		m6502_set_irq_line(INPUT_LINE_NMI, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M6502_IRQ_LINE:		m6502_set_irq_line(m6502, M6502_IRQ_LINE, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M6502_SET_OVERFLOW:	m6502_set_irq_line(m6502, M6502_SET_OVERFLOW, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		m6502_set_irq_line(m6502, INPUT_LINE_NMI, info->i); break;
 
 		case CPUINFO_INT_PC:							PCW = info->i; change_pc(PCD);			break;
-		case CPUINFO_INT_REGISTER + M6502_PC:			m6502.pc.w.l = info->i;					break;
+		case CPUINFO_INT_REGISTER + M6502_PC:			m6502->pc.w.l = info->i;					break;
 		case CPUINFO_INT_SP:							S = info->i;							break;
-		case CPUINFO_INT_REGISTER + M6502_S:			m6502.sp.b.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + M6502_P:			m6502.p = info->i;						break;
-		case CPUINFO_INT_REGISTER + M6502_A:			m6502.a = info->i;						break;
-		case CPUINFO_INT_REGISTER + M6502_X:			m6502.x = info->i;						break;
-		case CPUINFO_INT_REGISTER + M6502_Y:			m6502.y = info->i;						break;
-		case CPUINFO_INT_REGISTER + M6502_EA:			m6502.ea.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + M6502_ZP:			m6502.zp.w.l = info->i;					break;
+		case CPUINFO_INT_REGISTER + M6502_S:			m6502->sp.b.l = info->i;					break;
+		case CPUINFO_INT_REGISTER + M6502_P:			m6502->p = info->i;						break;
+		case CPUINFO_INT_REGISTER + M6502_A:			m6502->a = info->i;						break;
+		case CPUINFO_INT_REGISTER + M6502_X:			m6502->x = info->i;						break;
+		case CPUINFO_INT_REGISTER + M6502_Y:			m6502->y = info->i;						break;
+		case CPUINFO_INT_REGISTER + M6502_EA:			m6502->ea.w.l = info->i;					break;
+		case CPUINFO_INT_REGISTER + M6502_ZP:			m6502->zp.w.l = info->i;					break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m6502.rdmem_id = (read8_machine_func) info->f; break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m6502.wrmem_id = (write8_machine_func) info->f; break;
+		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m6502->rdmem_id = (read8_machine_func) info->f; break;
+		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m6502->wrmem_id = (write8_machine_func) info->f; break;
 	}
 }
 
@@ -698,10 +726,12 @@ static void m6502_set_info(UINT32 state, cpuinfo *info)
 
 void m6502_get_info(UINT32 state, cpuinfo *info)
 {
+	m6502_Regs *m6502 = token;
+	
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m6502);				break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m6502_Regs);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
@@ -722,23 +752,23 @@ void m6502_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + M6502_IRQ_LINE:		info->i = m6502.irq_state;			break;
-		case CPUINFO_INT_INPUT_STATE + M6502_SET_OVERFLOW:	info->i = m6502.so_state;			break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		info->i = m6502.nmi_state;			break;
+		case CPUINFO_INT_INPUT_STATE + M6502_IRQ_LINE:		info->i = m6502->irq_state;			break;
+		case CPUINFO_INT_INPUT_STATE + M6502_SET_OVERFLOW:	info->i = m6502->so_state;			break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		info->i = m6502->nmi_state;			break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = m6502.ppc.w.l;				break;
+		case CPUINFO_INT_PREVIOUSPC:					info->i = m6502->ppc.w.l;				break;
 
 		case CPUINFO_INT_PC:							info->i = PCD;							break;
-		case CPUINFO_INT_REGISTER + M6502_PC:			info->i = m6502.pc.w.l;					break;
+		case CPUINFO_INT_REGISTER + M6502_PC:			info->i = m6502->pc.w.l;					break;
 		case CPUINFO_INT_SP:							info->i = S;							break;
-		case CPUINFO_INT_REGISTER + M6502_S:			info->i = m6502.sp.b.l;					break;
-		case CPUINFO_INT_REGISTER + M6502_P:			info->i = m6502.p;						break;
-		case CPUINFO_INT_REGISTER + M6502_A:			info->i = m6502.a;						break;
-		case CPUINFO_INT_REGISTER + M6502_X:			info->i = m6502.x;						break;
-		case CPUINFO_INT_REGISTER + M6502_Y:			info->i = m6502.y;						break;
-		case CPUINFO_INT_REGISTER + M6502_EA:			info->i = m6502.ea.w.l;					break;
-		case CPUINFO_INT_REGISTER + M6502_ZP:			info->i = m6502.zp.w.l;					break;
-		case CPUINFO_INT_REGISTER + M6502_SUBTYPE:		info->i = m6502.subtype;				break;
+		case CPUINFO_INT_REGISTER + M6502_S:			info->i = m6502->sp.b.l;					break;
+		case CPUINFO_INT_REGISTER + M6502_P:			info->i = m6502->p;						break;
+		case CPUINFO_INT_REGISTER + M6502_A:			info->i = m6502->a;						break;
+		case CPUINFO_INT_REGISTER + M6502_X:			info->i = m6502->x;						break;
+		case CPUINFO_INT_REGISTER + M6502_Y:			info->i = m6502->y;						break;
+		case CPUINFO_INT_REGISTER + M6502_EA:			info->i = m6502->ea.w.l;					break;
+		case CPUINFO_INT_REGISTER + M6502_ZP:			info->i = m6502->zp.w.l;					break;
+		case CPUINFO_INT_REGISTER + M6502_SUBTYPE:		info->i = m6502->subtype;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = m6502_set_info;			break;
@@ -750,9 +780,9 @@ void m6502_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6502);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6502_dasm;			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6502_ICount;			break;
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	info->f = (genf *) m6502.rdmem_id;		break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) m6502.wrmem_id;		break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6502->icount;			break;
+		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	info->f = (genf *) m6502->rdmem_id;		break;
+		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) m6502->wrmem_id;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M6502");				break;
@@ -763,24 +793,24 @@ void m6502_get_info(UINT32 state, cpuinfo *info)
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",
-				m6502.p & 0x80 ? 'N':'.',
-				m6502.p & 0x40 ? 'V':'.',
-				m6502.p & 0x20 ? 'R':'.',
-				m6502.p & 0x10 ? 'B':'.',
-				m6502.p & 0x08 ? 'D':'.',
-				m6502.p & 0x04 ? 'I':'.',
-				m6502.p & 0x02 ? 'Z':'.',
-				m6502.p & 0x01 ? 'C':'.');
+				m6502->p & 0x80 ? 'N':'.',
+				m6502->p & 0x40 ? 'V':'.',
+				m6502->p & 0x20 ? 'R':'.',
+				m6502->p & 0x10 ? 'B':'.',
+				m6502->p & 0x08 ? 'D':'.',
+				m6502->p & 0x04 ? 'I':'.',
+				m6502->p & 0x02 ? 'Z':'.',
+				m6502->p & 0x01 ? 'C':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + M6502_PC:			sprintf(info->s, "PC:%04X", m6502.pc.w.l); break;
-		case CPUINFO_STR_REGISTER + M6502_S:			sprintf(info->s, "S:%02X", m6502.sp.b.l); break;
-		case CPUINFO_STR_REGISTER + M6502_P:			sprintf(info->s, "P:%02X", m6502.p); break;
-		case CPUINFO_STR_REGISTER + M6502_A:			sprintf(info->s, "A:%02X", m6502.a); break;
-		case CPUINFO_STR_REGISTER + M6502_X:			sprintf(info->s, "X:%02X", m6502.x); break;
-		case CPUINFO_STR_REGISTER + M6502_Y:			sprintf(info->s, "Y:%02X", m6502.y); break;
-		case CPUINFO_STR_REGISTER + M6502_EA:			sprintf(info->s, "EA:%04X", m6502.ea.w.l); break;
-		case CPUINFO_STR_REGISTER + M6502_ZP:			sprintf(info->s, "ZP:%03X", m6502.zp.w.l); break;
+		case CPUINFO_STR_REGISTER + M6502_PC:			sprintf(info->s, "PC:%04X", m6502->pc.w.l); break;
+		case CPUINFO_STR_REGISTER + M6502_S:			sprintf(info->s, "S:%02X", m6502->sp.b.l); break;
+		case CPUINFO_STR_REGISTER + M6502_P:			sprintf(info->s, "P:%02X", m6502->p); break;
+		case CPUINFO_STR_REGISTER + M6502_A:			sprintf(info->s, "A:%02X", m6502->a); break;
+		case CPUINFO_STR_REGISTER + M6502_X:			sprintf(info->s, "X:%02X", m6502->x); break;
+		case CPUINFO_STR_REGISTER + M6502_Y:			sprintf(info->s, "Y:%02X", m6502->y); break;
+		case CPUINFO_STR_REGISTER + M6502_EA:			sprintf(info->s, "EA:%04X", m6502->ea.w.l); break;
+		case CPUINFO_STR_REGISTER + M6502_ZP:			sprintf(info->s, "ZP:%03X", m6502->zp.w.l); break;
 	}
 }
 
@@ -813,11 +843,13 @@ void n2a03_get_info(UINT32 state, cpuinfo *info)
 
 static void m6510_set_info(UINT32 state, cpuinfo *info)
 {
+	m6502_Regs *m6502 = token;
+	
 	switch (state)
 	{
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6510_PORTREAD:	m6502.port_read = (UINT8 (*)(UINT8)) info->f;	break;
-		case CPUINFO_PTR_M6510_PORTWRITE:	m6502.port_write = (void (*)(UINT8,UINT8)) info->f;	break;
+		case CPUINFO_PTR_M6510_PORTREAD:	m6502->port_read = (UINT8 (*)(UINT8)) info->f;	break;
+		case CPUINFO_PTR_M6510_PORTWRITE:	m6502->port_write = (void (*)(UINT8,UINT8)) info->f;	break;
 
 		default:							m6502_set_info(state, info);						break;
 	}
@@ -825,6 +857,8 @@ static void m6510_set_info(UINT32 state, cpuinfo *info)
 
 void m6510_get_info(UINT32 state, cpuinfo *info)
 {
+	m6502_Regs *m6502 = token;
+	
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -833,14 +867,14 @@ void m6510_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6510);				break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6510_dasm;			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:			info->internal_map8 = address_map_m6510_mem; break;
-		case CPUINFO_PTR_M6510_PORTREAD:				info->f = (genf *) m6502.port_read;		break;
-		case CPUINFO_PTR_M6510_PORTWRITE:				info->f = (genf *) m6502.port_write;	break;
+		case CPUINFO_PTR_M6510_PORTREAD:				info->f = (genf *) m6502->port_read;		break;
+		case CPUINFO_PTR_M6510_PORTWRITE:				info->f = (genf *) m6502->port_write;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M6510");				break;
 
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_M6510_PORT:					info->i = m6510_get_port();				break;
+		case CPUINFO_INT_M6510_PORT:					info->i = m6510_get_port(m6502);				break;
 
 		default:										m6502_get_info(state, info);			break;
 	}
@@ -909,10 +943,12 @@ void m8502_get_info(UINT32 state, cpuinfo *info)
 
 static void m65c02_set_info(UINT32 state, cpuinfo *info)
 {
+	m6502_Regs *m6502 = token;
+	
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	m65c02_set_irq_line(INPUT_LINE_NMI, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	m65c02_set_irq_line(m6502, INPUT_LINE_NMI, info->i); break;
 
 		default:										m6502_set_info(state, info);			break;
 	}
@@ -971,12 +1007,14 @@ void m65sc02_get_info(UINT32 state, cpuinfo *info)
 
 static void deco16_set_info(UINT32 state, cpuinfo *info)
 {
+	m6502_Regs *m6502 = token;
+	
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + M6502_IRQ_LINE:		deco16_set_irq_line(M6502_IRQ_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M6502_SET_OVERFLOW:	deco16_set_irq_line(M6502_SET_OVERFLOW, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		deco16_set_irq_line(INPUT_LINE_NMI, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M6502_IRQ_LINE:		deco16_set_irq_line(m6502, M6502_IRQ_LINE, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M6502_SET_OVERFLOW:	deco16_set_irq_line(m6502, M6502_SET_OVERFLOW, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		deco16_set_irq_line(m6502, INPUT_LINE_NMI, info->i); break;
 
 		default:										m6502_set_info(state, info);			break;
 	}
