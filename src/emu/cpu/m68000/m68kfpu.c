@@ -435,7 +435,7 @@ static void WRITE_EA_FPE(m68ki_cpu_core *m68k, int ea, fp_reg fpr)
 
 static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 {
-	int ea = REG_IR & 0x3f;
+	int ea = m68k->ir & 0x3f;
 	int rm = (w2 >> 14) & 0x1;
 	int src = (w2 >> 10) & 0x7;
 	int dst = (w2 >>  7) & 0x7;
@@ -573,7 +573,7 @@ static void fpgen_rm_reg(m68ki_cpu_core *m68k, UINT16 w2)
 
 static void fmove_reg_mem(m68ki_cpu_core *m68k, UINT16 w2)
 {
-	int ea = REG_IR & 0x3f;
+	int ea = m68k->ir & 0x3f;
 	int src = (w2 >>  7) & 0x7;
 	int dst = (w2 >> 10) & 0x7;
 	//int kfactor = w2 & 0x7f;
@@ -631,7 +631,7 @@ static void fmove_reg_mem(m68ki_cpu_core *m68k, UINT16 w2)
 
 static void fmove_fpcr(m68ki_cpu_core *m68k, UINT16 w2)
 {
-	int ea = REG_IR & 0x3f;
+	int ea = m68k->ir & 0x3f;
 	int dir = (w2 >> 13) & 0x1;
 	int reg = (w2 >> 10) & 0x7;
 
@@ -662,7 +662,7 @@ static void fmove_fpcr(m68ki_cpu_core *m68k, UINT16 w2)
 static void fmovem(m68ki_cpu_core *m68k, UINT16 w2)
 {
 	int i;
-	int ea = REG_IR & 0x3f;
+	int ea = m68k->ir & 0x3f;
 	int dir = (w2 >> 13) & 0x1;
 	int mode = (w2 >> 11) & 0x3;
 	int reglist = w2 & 0xff;
@@ -712,7 +712,7 @@ static void fmovem(m68ki_cpu_core *m68k, UINT16 w2)
 static void fbcc16(m68ki_cpu_core *m68k)
 {
 	INT32 offset;
-	int condition = REG_IR & 0x3f;
+	int condition = m68k->ir & 0x3f;
 
 	offset = (INT16)(OPER_I_16(m68k));
 
@@ -729,7 +729,7 @@ static void fbcc16(m68ki_cpu_core *m68k)
 static void fbcc32(m68ki_cpu_core *m68k)
 {
 	INT32 offset;
-	int condition = REG_IR & 0x3f;
+	int condition = m68k->ir & 0x3f;
 
 	offset = OPER_I_32(m68k);
 
@@ -746,7 +746,7 @@ static void fbcc32(m68ki_cpu_core *m68k)
 
 void m68040_fpu_op0(m68ki_cpu_core *m68k)
 {
-	switch ((REG_IR >> 6) & 0x3)
+	switch ((m68k->ir >> 6) & 0x3)
 	{
 		case 0:
 		{
@@ -796,15 +796,15 @@ void m68040_fpu_op0(m68ki_cpu_core *m68k)
 			break;
 		}
 
-		default:	fatalerror("m68040_fpu_op0: unimplemented main op %d\n", (REG_IR >> 6)	& 0x3);
+		default:	fatalerror("m68040_fpu_op0: unimplemented main op %d\n", (m68k->ir >> 6)	& 0x3);
 	}
 }
 
 void m68040_fpu_op1(m68ki_cpu_core *m68k)
 {
-	int ea = REG_IR & 0x3f;
+	int ea = m68k->ir & 0x3f;
 
-	switch ((REG_IR >> 6) & 0x3)
+	switch ((m68k->ir >> 6) & 0x3)
 	{
 		case 0:		// FSAVE <ea>
 		{
@@ -820,7 +820,7 @@ void m68040_fpu_op1(m68ki_cpu_core *m68k)
 			break;
 		}
 
-		default:	fatalerror("m68040_fpu_op1: unimplemented op %d at %08X\n", (REG_IR >> 6) & 0x3, REG_PC-2);
+		default:	fatalerror("m68040_fpu_op1: unimplemented op %d at %08X\n", (m68k->ir >> 6) & 0x3, REG_PC-2);
 	}
 }
 

@@ -962,8 +962,8 @@ void generate_opcode_cc_variants(FILE* filep, body_struct* body, replace_struct*
 	for(i=2;i<16;i++)
 	{
 		/* Add replace strings for this condition code */
-		sprintf(repl, "COND_%s()", g_cc_table[i][1]);
-		sprintf(replnot, "COND_NOT_%s()", g_cc_table[i][1]);
+		sprintf(repl, "COND_%s(m68k)", g_cc_table[i][1]);
+		sprintf(replnot, "COND_NOT_%s(m68k)", g_cc_table[i][1]);
 
 		add_replace_string(replace, ID_OPHANDLER_CC, repl);
 		add_replace_string(replace, ID_OPHANDLER_NOT_CC, replnot);

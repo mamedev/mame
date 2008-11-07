@@ -576,28 +576,28 @@ void m68k_set_reg(m68ki_cpu_core *m68k, m68k_register_t regnum, unsigned int val
 		case M68K_REG_PC:	m68ki_jump(m68k, MASK_OUT_ABOVE_32(value)); return;
 		case M68K_REG_SR:	m68ki_set_sr(m68k, value); return;
 		case M68K_REG_SP:	REG_SP = MASK_OUT_ABOVE_32(value); return;
-		case M68K_REG_USP:	if(FLAG_S)
+		case M68K_REG_USP:	if(m68k->s_flag)
 								REG_USP = MASK_OUT_ABOVE_32(value);
 							else
 								REG_SP = MASK_OUT_ABOVE_32(value);
 							return;
-		case M68K_REG_ISP:	if(FLAG_S && !FLAG_M)
+		case M68K_REG_ISP:	if(m68k->s_flag && !m68k->m_flag)
 								REG_SP = MASK_OUT_ABOVE_32(value);
 							else
 								REG_ISP = MASK_OUT_ABOVE_32(value);
 							return;
-		case M68K_REG_MSP:	if(FLAG_S && FLAG_M)
+		case M68K_REG_MSP:	if(m68k->s_flag && m68k->m_flag)
 								REG_SP = MASK_OUT_ABOVE_32(value);
 							else
 								REG_MSP = MASK_OUT_ABOVE_32(value);
 							return;
-		case M68K_REG_VBR:	REG_VBR = MASK_OUT_ABOVE_32(value); return;
-		case M68K_REG_SFC:	REG_SFC = value & 7; return;
-		case M68K_REG_DFC:	REG_DFC = value & 7; return;
-		case M68K_REG_CACR:	REG_CACR = MASK_OUT_ABOVE_32(value); return;
-		case M68K_REG_CAAR:	REG_CAAR = MASK_OUT_ABOVE_32(value); return;
+		case M68K_REG_VBR:	m68k->vbr = MASK_OUT_ABOVE_32(value); return;
+		case M68K_REG_SFC:	m68k->sfc = value & 7; return;
+		case M68K_REG_DFC:	m68k->dfc = value & 7; return;
+		case M68K_REG_CACR:	m68k->cacr = MASK_OUT_ABOVE_32(value); return;
+		case M68K_REG_CAAR:	m68k->caar = MASK_OUT_ABOVE_32(value); return;
 		case M68K_REG_PPC:	REG_PPC = MASK_OUT_ABOVE_32(value); return;
-		case M68K_REG_IR:	REG_IR = MASK_OUT_ABOVE_16(value); return;
+		case M68K_REG_IR:	m68k->ir = MASK_OUT_ABOVE_16(value); return;
 		case M68K_REG_PREF_ADDR:	m68k->pref_addr = MASK_OUT_ABOVE_32(value); return;
 		case M68K_REG_CPU_TYPE: m68k_set_cpu_type(m68k, value); return;
 		default:			return;
@@ -789,9 +789,9 @@ int m68k_execute(m68ki_cpu_core *m68k, int num_cycles)
 			REG_PPC = REG_PC;
 
 			/* Read an instruction and call its handler */
-			REG_IR = m68ki_read_imm_16(m68k);
-			m68ki_instruction_jump_table[REG_IR](m68k);
-			USE_CYCLES(m68k, m68k->cyc_instruction[REG_IR]);
+			m68k->ir = m68ki_read_imm_16(m68k);
+			m68ki_instruction_jump_table[m68k->ir](m68k);
+			USE_CYCLES(m68k, m68k->cyc_instruction[m68k->ir]);
 
 			/* Trace m68k_exception, if necessary */
 			m68ki_exception_if_trace(); /* auto-disable (see m68kcpu.h) */
@@ -902,14 +902,14 @@ void m68k_pulse_reset(m68ki_cpu_core *m68k)
 	m68k->run_mode = RUN_MODE_BERR_AERR_RESET;
 
 	/* Turn off tracing */
-	FLAG_T1 = FLAG_T0 = 0;
+	m68k->t1_flag = m68k->t0_flag = 0;
 	m68ki_clear_trace();
 	/* Interrupt mask to level 7 */
-	FLAG_INT_MASK = 0x0700;
+	m68k->int_mask = 0x0700;
 	m68k->int_level = 0;
 	m68k->virq_state = 0;
 	/* Reset VBR */
-	REG_VBR = 0;
+	m68k->vbr = 0;
 	/* Go to supervisor mode */
 	m68ki_set_sm_flag(m68k, SFLAG_SET | MFLAG_CLEAR);
 
@@ -980,11 +980,11 @@ void m68k_state_register(m68ki_cpu_core *m68k, const char *type, int index)
 	state_save_register_item(type, index, REG_USP);
 	state_save_register_item(type, index, REG_ISP);
 	state_save_register_item(type, index, REG_MSP);
-	state_save_register_item(type, index, REG_VBR);
-	state_save_register_item(type, index, REG_SFC);
-	state_save_register_item(type, index, REG_DFC);
-	state_save_register_item(type, index, REG_CACR);
-	state_save_register_item(type, index, REG_CAAR);
+	state_save_register_item(type, index, m68k->vbr);
+	state_save_register_item(type, index, m68k->sfc);
+	state_save_register_item(type, index, m68k->dfc);
+	state_save_register_item(type, index, m68k->cacr);
+	state_save_register_item(type, index, m68k->caar);
 	state_save_register_item(type, index, m68k_substate.sr);
 	state_save_register_item(type, index, m68k->int_level);
 	state_save_register_item(type, index, m68k_substate.stopped);
