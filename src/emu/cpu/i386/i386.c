@@ -17,6 +17,9 @@
 
 #include "debug/debugcpu.h"
 
+/* seems to be defined on mingw-gcc */
+#undef i386
+
 int i386_parity_table[256];
 MODRM_TABLE i386_MODRM_table[256];
 
@@ -491,7 +494,7 @@ static STATE_POSTLOAD( i386_postload )
 	CHANGE_PC(I.eip);
 }
 
-static CPU_INIT( _i386 )
+static CPU_INIT( i386 )
 {
 	int i, j;
 	static const int regs8[8] = {AL,CL,DL,BL,AH,CH,DH,BH};
@@ -610,7 +613,7 @@ static void build_opcode_table(UINT32 features)
 	}
 }
 
-static CPU_RESET( _i386 )
+static CPU_RESET( i386 )
 {
 	cpu_irq_callback save_irqcallback;
 	const device_config *save_device;
@@ -695,7 +698,7 @@ static void i386_set_a20_line(int state)
 	}
 }
 
-static CPU_EXECUTE( _i386 )
+static CPU_EXECUTE( i386 )
 {
 	I.cycles = cycles;
 	I.base_cycles = cycles;
@@ -959,9 +962,9 @@ void i386_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_SET_INFO:	      				info->setinfo = i386_set_info;			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = i386_get_context;	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = i386_set_context;	break;
-		case CPUINFO_PTR_INIT:		      				info->init = CPU_INIT_NAME(_i386);					break;
-		case CPUINFO_PTR_RESET:		      				info->reset = CPU_RESET_NAME(_i386);				break;
-		case CPUINFO_PTR_EXECUTE:	      				info->execute = CPU_EXECUTE_NAME(_i386);			break;
+		case CPUINFO_PTR_INIT:		      				info->init = CPU_INIT_NAME(i386);					break;
+		case CPUINFO_PTR_RESET:		      				info->reset = CPU_RESET_NAME(i386);				break;
+		case CPUINFO_PTR_EXECUTE:	      				info->execute = CPU_EXECUTE_NAME(i386);			break;
 		case CPUINFO_PTR_BURN:		      				info->burn = NULL;						break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER: 			info->icount = &I.cycles;				break;
 		case CPUINFO_PTR_TRANSLATE:						info->translate = translate_address_cb;	break;
@@ -1065,7 +1068,7 @@ void i386_get_info(UINT32 state, cpuinfo *info)
 
 static CPU_INIT( i486 )
 {
-	CPU_INIT_CALL(_i386);
+	CPU_INIT_CALL(i386);
 }
 
 static CPU_RESET( i486 )
@@ -1175,7 +1178,7 @@ void i486_get_info(UINT32 state, cpuinfo *info)
 
 static CPU_INIT( pentium )
 {
-	CPU_INIT_CALL(_i386);
+	CPU_INIT_CALL(i386);
 }
 
 static CPU_RESET( pentium )
@@ -1305,7 +1308,7 @@ void pentium_get_info(UINT32 state, cpuinfo *info)
 
 static CPU_INIT( mediagx )
 {
-	CPU_INIT_CALL(_i386);
+	CPU_INIT_CALL(i386);
 }
 
 static CPU_RESET( mediagx )
