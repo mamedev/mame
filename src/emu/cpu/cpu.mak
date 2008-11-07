@@ -663,8 +663,9 @@ CPUDEFS += -DHAS_I80C52=$(if $(filter I80C52,$(CPUS)),1,0)
 CPUDEFS += -DHAS_I87C51=$(if $(filter I87C51,$(CPUS)),1,0)
 CPUDEFS += -DHAS_I87C52=$(if $(filter I87C52,$(CPUS)),1,0)
 CPUDEFS += -DHAS_AT89C4051=$(if $(filter AT89C4051,$(CPUS)),1,0)
+CPUDEFS += -DHAS_DS5002FP=$(if $(filter DS5002FP,$(CPUS)),1,0)
 
-ifneq ($(filter I8031 I8032 I8051 I8052 I8751 I8752 I80C31 I80C32 I80C51 I80C52 I87C51 I87C52 AT89C4051,$(CPUS)),)
+ifneq ($(filter DS5002FP I8031 I8032 I8051 I8052 I8751 I8752 I80C31 I80C32 I80C51 I80C52 I87C51 I87C52 AT89C4051,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/mcs51
 CPUOBJS += $(CPUOBJ)/mcs51/mcs51.o
 DBGOBJS += $(CPUOBJ)/mcs51/mcs51dasm.o
@@ -673,22 +674,6 @@ endif
 $(CPUOBJ)/mcs51/mcs51.o:	$(CPUSRC)/mcs51/mcs51.c \
 							$(CPUSRC)/mcs51/mcs51.h \
 							$(CPUSRC)/mcs51/mcs51ops.c
-
-
-
-#-------------------------------------------------
-# DS5002FP
-#-------------------------------------------------
-
-CPUDEFS += -DHAS_DS5002FP=$(if $(filter DS5002FP,$(CPUS)),1,0)
-
-ifneq ($(filter DS5002FP,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/ds5002fp
-CPUOBJS += $(CPUOBJ)/ds5002fp/ds5002fp.o
-DBGOBJS += $(CPUOBJ)/ds5002fp/ds5002fpdasm.o
-endif
-
-
 
 #-------------------------------------------------
 # Intel 80x86 series

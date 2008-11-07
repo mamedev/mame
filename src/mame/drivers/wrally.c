@@ -96,7 +96,7 @@ produces a high clock frequency, slow movements a low freq.
 
 #include "driver.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/ds5002fp/ds5002fp.h"
+#include "cpu/mcs51/mcs51.h"
 #include "sound/okim6295.h"
 #include "includes/wrally.h"
 
@@ -127,21 +127,21 @@ static READ8_HANDLER( dallas_share_r )
 {
 	UINT8 *shareram = (UINT8 *)wrally_shareram;
 
-	return shareram[BYTE_XOR_LE(offset)];
+	return shareram[BYTE_XOR_LE(offset) ^ 1];
 }
 
 static WRITE8_HANDLER( dallas_share_w )
 {
 	UINT8 *shareram = (UINT8 *)wrally_shareram;
 
-	shareram[BYTE_XOR_LE(offset)] = data;
+	shareram[BYTE_XOR_LE(offset) ^ 1] = data;
 }
 
 static ADDRESS_MAP_START( dallas_rom, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM									/* Code in NVRAM */
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( dallas_ram, ADDRESS_SPACE_DATA, 8 )
+static ADDRESS_MAP_START( dallas_ram, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_READWRITE(dallas_share_r, dallas_share_w)	AM_MASK(0x3fff)		/* Shared RAM with the main CPU */
 ADDRESS_MAP_END
 
@@ -254,10 +254,9 @@ static MACHINE_DRIVER_START( wrally )
 	MDRV_CPU_ADD("mcu", DS5002FP, XTAL_24MHz/2)	/* verified on pcb */
 	MDRV_CPU_CONFIG(dallas_config)
 	MDRV_CPU_PROGRAM_MAP(dallas_rom, 0)
-	MDRV_CPU_DATA_MAP(dallas_ram, 0)
+	MDRV_CPU_IO_MAP(dallas_ram, 0)
 
 	MDRV_INTERLEAVE(640)					/* heavy sync */
-	MDRV_MACHINE_RESET(wrally)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -363,6 +362,6 @@ ROM_START( wrallyb ) /* Board Marked 930217, Atari License */
 ROM_END
 
 
-GAME( 1993, wrally,  0,      wrally, wrally, wrally, ROT0, "Gaelco", "World Rally (set 1)", 0 ) /* Dallas DS5002FP power failure shows as: "Tension  baja " */
-GAME( 1993, wrallya, wrally, wrally, wrally, wrally, ROT0, "Gaelco", "World Rally (set 2)", 0 ) /* Dallas DS5002FP power failure shows as: "Power  Failure" */
-GAME( 1993, wrallyb, wrally, wrally, wrally, wrally, ROT0, "Gaelco (Atari license)", "World Rally (US, 930217)", 0 )
+GAME( 1993, wrally,  0,      wrally, wrally, 0, ROT0, "Gaelco", "World Rally (set 1)", 0 ) /* Dallas DS5002FP power failure shows as: "Tension  baja " */
+GAME( 1993, wrallya, wrally, wrally, wrally, 0, ROT0, "Gaelco", "World Rally (set 2)", 0 ) /* Dallas DS5002FP power failure shows as: "Power  Failure" */
+GAME( 1993, wrallyb, wrally, wrally, wrally, 0, ROT0, "Gaelco (Atari license)", "World Rally (US, 930217)", 0 )

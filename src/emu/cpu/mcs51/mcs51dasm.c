@@ -36,6 +36,17 @@
 #include "debugger.h"
 #include "mcs51.h"
 
+enum
+{
+	FEATURE_NONE			= 0x00,
+	FEATURE_I8052			= 0x01,
+	FEATURE_CMOS			= 0x02,
+	FEATURE_I80C52			= 0x04,
+	FEATURE_DS5002FP		= 0x08,
+	FEATURE_I83C751			= 0x08,
+};
+
+
 #define SHOW_MEMORY_NAMES	1
 
 #ifdef SHOW_MEMORY_NAMES
@@ -43,143 +54,244 @@
 /*Display the memory address names for data & bit address access*/
 
 //SFR Names
-static const char sfr[128][7] = {
-    "p0",     "sp",     "dpl",    "dph",    /* 80 - 83 */
-    "adat",   "85h",    "86h",    "pcon",   /* 84 - 87 */
-    "tcon",   "tmod",   "tl0",    "tl1",    /* 88 - 8b */
-    "th0",    "th1",    "pwcm",   "pwmp",   /* 8a - 8f */
-    "p1",     "91h",    "92h",    "93h",    /* 90 - 93 */
-    "94h",    "95h",    "96h",    "97h",    /* 94 - 97 */
-    "scon",   "sbuf",   "9ah",    "9bh",    /* 98 - 9b */
-    "9ch",    "9dh",    "9eh",    "9fh",    /* 9c - 9f */
-    "p2",     "0a1h",   "0a2h",   "0a3h",   /* a0 - a3 */
-    "0a4h",   "0a5h",   "0a6h",   "0a7h",   /* a4 - a7 */
-    "ie",     "cml0",   "cml1",   "cml2",   /* a8 - ab */
-    "ctl0",   "ctl1",   "ctl2",   "ctl3",   /* ac - af */
-    "p3",     "0b1h",   "0b2h",   "0b3h",   /* b0 - b3 */
-    "0b4h",   "0b5h",   "0b6h",   "0b7h",   /* b4 - b7 */
-    "ip",     "0b9h",   "0bah",   "0bbh",   /* b8 - bb */
-    "0bch",   "0bdh",   "0beh",   "0bfh",   /* bc - bf */
-    "p4",     "0c1h",   "0c2h",   "0c3h",   /* c0 - c3 */
-    "p5",     "adcon",  "adch",   "0c7h",   /* c4 - c7 */
-    "t2con",  "cmh0",   "rcap2l", "rcap2h", /* c8 - cb */
-    "tl2",    "th2",    "cth2",   "cth3",   /* cc - cf */
-    "psw",    "0d1h",   "0d2h",   "0d3h",   /* d0 - d3 */
-    "0d4h",   "0d5h",   "0d6h",   "0d7h",   /* d4 - d7 */
-    "i2cfg",  "s1sta",  "s1dat",  "s1adr",  /* d8 - db */
-    "0dch",   "0ddh",   "0deh",   "0dfh",   /* dc - df */
-    "acc",    "0e1h",   "0e2h",   "0e3h",   /* e0 - e3 */
-    "0e4h",   "0e5h",   "0e6h",   "0e7h",   /* e4 - e7 */
-    "csr",    "0e9h",   "tm2con", "ctcon",  /* e8 - eb */
-    "tml2",   "tmh2",   "ste",    "rte",    /* ec - ef */
-    "b",      "0f1h",   "0f2h",   "0f3h",   /* f0 - f3 */
-    "0f4h",   "0f5h",   "0f6h",   "0f7h",   /* f4 - f7 */
-    "i2sta",  "0f9h",   "0fah",   "0fbh",   /* f8 - fb */
-    "pwm0",   "pwm1",   "pwena",  "t3"      /* fc - ff */
+
+static struct {
+	int feature;
+	int addr;
+	const char *name;
+} mem_name_feature[] = 
+{
+	{ FEATURE_NONE, 0x00, "rb0r0" },
+	{ FEATURE_NONE, 0x01, "rb0r1" },
+	{ FEATURE_NONE, 0x02, "rb0r2" },
+	{ FEATURE_NONE, 0x03, "rb0r3" },
+	{ FEATURE_NONE, 0x04, "rb0r4" },
+	{ FEATURE_NONE, 0x05, "rb0r5" },
+	{ FEATURE_NONE, 0x06, "rb0r6" },
+	{ FEATURE_NONE, 0x07, "rb0r7" },
+	{ FEATURE_NONE, 0x08, "rb1r0" },
+	{ FEATURE_NONE, 0x09, "rb1r1" },
+	{ FEATURE_NONE, 0x0a, "rb1r2" },
+	{ FEATURE_NONE, 0x0b, "rb1r3" },
+	{ FEATURE_NONE, 0x0c, "rb1r4" },
+	{ FEATURE_NONE, 0x0d, "rb1r5" },
+	{ FEATURE_NONE, 0x0e, "rb1r6" },
+	{ FEATURE_NONE, 0x0f, "rb1r7" },
+	{ FEATURE_NONE, 0x10, "rb2r0" },
+	{ FEATURE_NONE, 0x11, "rb2r1" },
+	{ FEATURE_NONE, 0x12, "rb2r2" },
+	{ FEATURE_NONE, 0x13, "rb2r3" },
+	{ FEATURE_NONE, 0x14, "rb2r4" },
+	{ FEATURE_NONE, 0x15, "rb2r5" },
+	{ FEATURE_NONE, 0x16, "rb2r6" },
+	{ FEATURE_NONE, 0x17, "rb2r7" },
+	{ FEATURE_NONE, 0x18, "rb3r0" },
+	{ FEATURE_NONE, 0x19, "rb3r1" },
+	{ FEATURE_NONE, 0x1a, "rb3r2" },
+	{ FEATURE_NONE, 0x1b, "rb3r3" },
+	{ FEATURE_NONE, 0x1c, "rb3r4" },
+	{ FEATURE_NONE, 0x1d, "rb3r5" },
+	{ FEATURE_NONE, 0x1e, "rb3r6" },
+	{ FEATURE_NONE, 0x1f, "rb3r7" },
+	
+	{ FEATURE_NONE, 0x80, "p0"		},
+	{ FEATURE_NONE, 0x81, "sp"		},
+	{ FEATURE_NONE, 0x82, "dpl"		},
+	{ FEATURE_NONE, 0x83, "dph"		},
+	{ FEATURE_NONE, 0x87, "pcon"	},
+	{ FEATURE_NONE, 0x88, "tcon"	},
+	{ FEATURE_NONE, 0x89, "tmod"	},
+	{ FEATURE_NONE, 0x8a, "tl0"		},
+	{ FEATURE_NONE, 0x8b, "tl1"		},
+	{ FEATURE_NONE, 0x8c, "th0"		},
+	{ FEATURE_NONE, 0x8d, "th1"		},
+	{ FEATURE_NONE, 0x90, "p1"		},
+	{ FEATURE_NONE, 0x98, "scon"	},
+	{ FEATURE_NONE, 0x99, "sbuf"	},
+	{ FEATURE_NONE, 0xa0, "p2"		},
+	{ FEATURE_NONE, 0xa8, "ie"		},
+	{ FEATURE_NONE, 0xb0, "p3"		},
+	{ FEATURE_NONE, 0xb8, "ip"		},
+	{ FEATURE_NONE, 0xd0, "psw"		},
+	{ FEATURE_NONE, 0xe0, "acc"		},
+	{ FEATURE_NONE, 0xf0, "b"		},
+	
+	{ FEATURE_I8052, 0xc8, "t2con"	},
+	{ FEATURE_I8052, 0xca, "rcap2l"	},
+	{ FEATURE_I8052, 0xcb, "rcap2h"	},
+	{ FEATURE_I8052, 0xcc, "tl2"	},
+	{ FEATURE_I8052, 0xcd, "th2"	},
+	
+	{ FEATURE_I80C52, 0xb7, "iph"	},
+	{ FEATURE_I80C52, 0xa9, "saddr"	},
+	{ FEATURE_I80C52, 0xb9, "saden"	},
+
+	{ FEATURE_DS5002FP, 0x8e, "pwcm"	},
+	{ FEATURE_DS5002FP, 0x8f, "pwmp"	},
+	{ FEATURE_DS5002FP, 0xc1, "crcr"	},
+	{ FEATURE_DS5002FP, 0xc2, "crcl"	},
+	{ FEATURE_DS5002FP, 0xc3, "crch"	},
+	{ FEATURE_DS5002FP, 0xc6, "mcon"	},
+	{ FEATURE_DS5002FP, 0xc7, "ta"		},
+	{ FEATURE_DS5002FP, 0xcf, "rnr"		},
+	{ FEATURE_DS5002FP, 0xd8, "rpctl"	},
+	{ FEATURE_DS5002FP, 0xd9, "rps"		},
+
+	{ FEATURE_I83C751, 	0x98, "i2con"	},
+	{ FEATURE_I83C751, 	0x99, "i2dat"	},
+	{ FEATURE_I83C751, 	0xd8, "i2cfg"	},
+	{ FEATURE_I83C751, 	0xf8, "i2sta"	},	/* read only */
+
+	/* bit addresses */
+	
+	{ FEATURE_NONE, 0x188, "it0"		},
+	{ FEATURE_NONE, 0x189, "ie0"		},
+	{ FEATURE_NONE, 0x18a, "it1"		},
+	{ FEATURE_NONE, 0x18b, "ie1"		},
+	{ FEATURE_NONE, 0x18c, "tr0"		},
+	{ FEATURE_NONE, 0x18d, "tf0"		},
+	{ FEATURE_NONE, 0x18e, "tr1"		},
+	{ FEATURE_NONE, 0x18f, "tf1"		},
+
+	{ FEATURE_NONE, 0x198, "ri"			},
+	{ FEATURE_NONE, 0x199, "ti"			},
+	{ FEATURE_NONE, 0x19a, "rb8"		},
+	{ FEATURE_NONE, 0x19b, "tb8"		},
+	{ FEATURE_NONE, 0x19c, "ren"		},
+	{ FEATURE_NONE, 0x19d, "sm2"		},
+	{ FEATURE_NONE, 0x19e, "sm1"		},
+	{ FEATURE_NONE, 0x19f, "sm0"		},
+
+	{ FEATURE_I83C751, 0x198, "xstp"		}, /* read: no function */
+	{ FEATURE_I83C751, 0x199, "xstr"		}, /* read: MASTER */
+	{ FEATURE_I83C751, 0x19a, "cstp"		}, /* read: STP */
+	{ FEATURE_I83C751, 0x19b, "cstr"		}, /* read: STR */
+	{ FEATURE_I83C751, 0x19c, "carl"		}, /* read: ARL */
+	{ FEATURE_I83C751, 0x19d, "cdr"		}, /* read: DRDY */
+	{ FEATURE_I83C751, 0x19e, "idle"		}, /* read: ATN */
+	{ FEATURE_I83C751, 0x19f, "cxa"		}, /* read: RDAT */
+
+	{ FEATURE_NONE, 0x1a8, "ex0"		},
+	{ FEATURE_NONE, 0x1a9, "et0"		},
+	{ FEATURE_NONE, 0x1aa, "ex1"		},
+	{ FEATURE_NONE, 0x1ab, "et1"		},
+	{ FEATURE_NONE, 0x1ac, "es"			},
+	{ FEATURE_NONE, 0x1ad, "ie.5"		},
+	{ FEATURE_NONE, 0x1ae, "ie.6"		},
+	{ FEATURE_NONE, 0x1af, "ea"			},
+
+	{ FEATURE_I83C751, 0x1ac, "ei2"		},
+	{ FEATURE_I8052, 0x1ad, "et2"		},
+
+	/* FIXME: port 3 - depends on external circuits and not really
+	 * implemented in the core. TBD */
+	{ FEATURE_NONE, 0x1b0, "rxd"		},
+	{ FEATURE_NONE, 0x1b1, "txd"		},
+	{ FEATURE_NONE, 0x1b2, "int0"		},
+	{ FEATURE_NONE, 0x1b3, "int1"		},
+	{ FEATURE_NONE, 0x1b4, "t0"			},
+	{ FEATURE_NONE, 0x1b5, "t1"			},
+	{ FEATURE_NONE, 0x1b6, "wr"			},
+	{ FEATURE_NONE, 0x1b7, "rd"			},
+
+	{ FEATURE_NONE, 0x1b8, "px0"		},
+	{ FEATURE_NONE, 0x1b9, "pt0"		},
+	{ FEATURE_NONE, 0x1ba, "px1"		},
+	{ FEATURE_NONE, 0x1bb, "pt1"		},
+	{ FEATURE_NONE, 0x1bc, "ps"			},
+	{ FEATURE_NONE, 0x1bd, "ip.5"		},
+	{ FEATURE_NONE, 0x1be, "ip.6"		},
+	{ FEATURE_NONE, 0x1bf, "ip.7"		},
+
+	{ FEATURE_I8052, 0x1bd, "pt2"		},
+	{ FEATURE_I83C751, 0x1bc, "pi2"		},
+
+	{ FEATURE_I8052, 0x1c8, "cprl2"		},
+	{ FEATURE_I8052, 0x1c9, "ct2"		},
+	{ FEATURE_I8052, 0x1ca, "tr2"		},
+	{ FEATURE_I8052, 0x1cb, "exen2"		},
+	{ FEATURE_I8052, 0x1cc, "tclk"		},
+	{ FEATURE_I8052, 0x1cd, "rclk"		},
+	{ FEATURE_I8052, 0x1ce, "exf2"		},
+	{ FEATURE_I8052, 0x1cf, "tf2"		},
+
+	{ FEATURE_NONE, 0x1d0, "p"			},
+	{ FEATURE_NONE, 0x1d1, "psw.1"		},
+	{ FEATURE_NONE, 0x1d2, "ov"			},
+	{ FEATURE_NONE, 0x1d3, "rs0"		},
+	{ FEATURE_NONE, 0x1d4, "rs1"		},
+	{ FEATURE_NONE, 0x1d5, "f0"			},
+	{ FEATURE_NONE, 0x1d6, "ac"			},
+	{ FEATURE_NONE, 0x1d7, "cy"			},
+
+	{ FEATURE_DS5002FP, 0x1d8, "rg0"	}, 
+	{ FEATURE_DS5002FP, 0x1d9, "rpc"	}, 
+	{ FEATURE_DS5002FP, 0x1da, "dma"	}, 
+	{ FEATURE_DS5002FP, 0x1db, "ibi"	}, 
+	{ FEATURE_DS5002FP, 0x1dc, "ae"		}, 
+	{ FEATURE_DS5002FP, 0x1dd, "exbs"	}, 
+	{ FEATURE_DS5002FP, 0x1de, "d8.6"	}, 
+	{ FEATURE_DS5002FP, 0x1df, "rnr"	},
+
+	{ FEATURE_I83C751, 0x1d8, "ct0"		}, 
+	{ FEATURE_I83C751, 0x1d9, "ct1"		}, 
+	{ FEATURE_I83C751, 0x1da, "i2cfg.2"	}, 
+	{ FEATURE_I83C751, 0x1db, "i2cfg.3"	}, 
+	{ FEATURE_I83C751, 0x1dc, "tirun"	}, 
+	{ FEATURE_I83C751, 0x1dd, "clrti"	}, 
+	{ FEATURE_I83C751, 0x1de, "masterq"	}, 
+	{ FEATURE_I83C751, 0x1df, "slaven"	},
+
+	{ FEATURE_I83C751, 0x1f8, "xstp"	}, 
+	{ FEATURE_I83C751, 0x1f9, "xstr"	}, 
+	{ FEATURE_I83C751, 0x1fa, "makstp"	}, 
+	{ FEATURE_I83C751, 0x1fb, "makstr"	}, 
+	{ FEATURE_I83C751, 0x1fc, "xactv"	}, 
+	{ FEATURE_I83C751, 0x1fd, "xdata"	}, 
+	{ FEATURE_I83C751, 0x1fe, "idle"	}, 
+	{ FEATURE_I83C751, 0x1ff, "i2sta.7"	},
+
+	/* unkown 
+	 * "ibf",    "obf",    "idsm",   "obfc",    e8 - eb 
+	 * "ma0",    "ma1",    "mb0",    "mb1",     ec - ef 
+	 */
+
+	{ -1 }
 };
 
-//SFR Addressable bits
-static const char sfrbits[128][8] = {
-    "p0.0",   "p0.1",   "p0.2",   "p0.3",   /* 80 - 83 */
-    "p0.4",   "p0.5",   "p0.6",   "p0.7",   /* 84 - 87 */
-    "it0",    "ie0",    "it1",    "ie1",    /* 88 - 8b */
-    "tr0",    "tf0",    "tr1",    "tf1",    /* 8c - 8f */
-    "p1.0",   "p1.1",   "p1.2",   "p1.3",   /* 90 - 93 */
-    "p1.4",   "p1.5",   "p1.6",   "p1.7",   /* 94 - 97 */
-    "ri",     "ti",     "rb8",    "tb8",    /* 98 - 9b */
-    "ren",    "sm2",    "sm1",    "sm0",    /* 9c - 9f */
-    "p2.0",   "p2.1",   "p2.2",   "p2.3",   /* a0 - a3 */
-    "p2.4",   "p2.5",   "p2.6",   "p2.7",   /* a4 - a7 */
-    "ex0",    "et0",    "ex1",    "et1",    /* a8 - ab */
-    "es",     "ie.5",   "ie.6",   "ea",     /* ac - af */
-    "rxd",    "txd",    "int0",   "int1",   /* b0 - b3 */
-    "t0",     "t1",     "wr",     "rd",     /* b4 - b7 */
-    "px0",    "pt0",    "px1",    "pt1",    /* b8 - bb */
-    "ps",     "ip.5",   "ip.6",   "ip.7",   /* bc - bf */
-    "0c0h.0", "0c0h.1", "0c0h.2", "0c0h.3", /* c0 - c3 */
-    "0c0h.4", "0c0h.5", "0c0h.6", "0c0h.7", /* c4 - c7 */
-    "cprl2",  "ct2",    "tr2",    "exen2",  /* c8 - cb */
-    "tclk",   "rclk",   "exf2",   "tf2",    /* cc - cf */
-    "p",      "psw.1",  "ov",     "rs0",    /* d0 - d3 */
-    "rs1",    "f0",     "ac",     "cy",     /* d4 - d7 */
-    "ct0",    "ct1",    "i2cfg.2","i2cfg.3",/* d8 - db */
-    "tirun",  "clrti",  "mastrq", "slaven", /* dc - df */
-    "acc.0",  "acc.1",  "acc.2",  "acc.3",  /* e0 - e3 */
-    "acc.4",  "acc.5",  "acc.6",  "acc.7",  /* e4 - e7 */
-    "ibf",    "obf",    "idsm",   "obfc",   /* e8 - eb */
-    "ma0",    "ma1",    "mb0",    "mb1",    /* ec - ef */
-    "b.0",    "b.1",    "b.2",    "b.3",    /* f0 - f3 */
-    "b.4",    "b.5",    "b.6",    "b.7",    /* f4 - f7 */
-    "xstp",   "xstr",   "makstp", "makstr", /* f8 - fb */
-    "xactv",  "xdata",  "idle",   "i2sta.7" /* fc - ff */
-} ;
+static void init_mem_names(int feature_set, const char **mem_names)
+{
+	int i;
+	int feature;
+	
+	/* Set defaults / i8051 */
+	for (i = 0; feature = mem_name_feature[i].feature, feature >= 0; i++)
+	{
+		if ( feature == FEATURE_NONE )
+			mem_names[mem_name_feature[i].addr] = mem_name_feature[i].name;
+	}
 
-//Names for bit addressable memory
-static const char membits[128][6] = {
-    "20h.0",  "20h.1",  "20h.2",  "20h.3",
-    "20h.4",  "20h.5",  "20h.6",  "20h.7",
-    "21h.0",  "21h.1",  "21h.2",  "21h.3",
-    "21h.4",  "21h.5",  "21h.6",  "21h.7",
-    "22h.0",  "22h.1",  "22h.2",  "22h.3",
-    "22h.4",  "22h.5",  "22h.6",  "22h.7",
-    "23h.0",  "23h.1",  "23h.2",  "23h.3",
-    "23h.4",  "23h.5",  "23h.6",  "23h.7",
-    "24h.0",  "24h.1",  "24h.2",  "24h.3",
-    "24h.4",  "24h.5",  "24h.6",  "24h.7",
-    "25h.0",  "25h.1",  "25h.2",  "25h.3",
-    "25h.4",  "25h.5",  "25h.6",  "25h.7",
-    "26h.0",  "26h.1",  "26h.2",  "26h.3",
-    "26h.4",  "26h.5",  "26h.6",  "26h.7",
-    "27h.0",  "27h.1",  "27h.2",  "27h.3",
-    "27h.4",  "27h.5",  "27h.6",  "27h.7",
-    "28h.0",  "28h.1",  "28h.2",  "28h.3",
-    "28h.4",  "28h.5",  "28h.6",  "28h.7",
-    "29h.0",  "29h.1",  "29h.2",  "29h.3",
-    "29h.4",  "29h.5",  "29h.6",  "29h.7",
-    "2ah.0",  "2ah.1",  "2ah.2",  "2ah.3",
-    "2ah.4",  "2ah.5",  "2ah.6",  "2ah.7",
-    "2bh.0",  "2bh.1",  "2bh.2",  "2bh.3",
-    "2bh.4",  "2bh.5",  "2bh.6",  "2bh.7",
-    "2ch.0",  "2ch.1",  "2ch.2",  "2ch.3",
-    "2ch.4",  "2ch.5",  "2ch.6",  "2ch.7",
-    "2dh.0",  "2dh.1",  "2dh.2",  "2dh.3",
-    "2dh.4",  "2dh.5",  "2dh.6",  "2dh.7",
-    "2eh.0",  "2eh.1",  "2eh.2",  "2eh.3",
-    "2eh.4",  "2eh.5",  "2eh.6",  "2eh.7",
-    "2fh.0",  "2fh.1",  "2fh.2",  "2fh.3",
-    "2fh.4",  "2fh.5",  "2fh.6",  "2fh.7"
-};
+	/* Set specific memory names */
+	for (i = 0; feature = mem_name_feature[i].feature, feature >= 0; i++)
+	{
+		if (feature & feature_set)
+			mem_names[mem_name_feature[i].addr] = mem_name_feature[i].name;
+	}
 
-//Regiser Bank memory names
-static const char regbank[][6] = {
-    "rb0r0",  "rb0r1",  "rb0r2",  "rb0r3",
-    "rb0r4",  "rb0r5",  "rb0r6",  "rb0r7",
-    "rb1r0",  "rb1r1",  "rb1r2",  "rb1r3",
-    "rb1r4",  "rb1r5",  "rb1r6",  "rb1r7",
-    "rb2r0",  "rb2r1",  "rb2r2",  "rb2r3",
-    "rb2r4",  "rb2r5",  "rb2r6",  "rb2r7",
-    "rb3r0",  "rb3r1",  "rb3r2",  "rb3r3",
-    "rb3r4",  "rb3r5",  "rb3r6",  "rb3r7"
-};
+}
 
-static const char *get_data_address( UINT8 arg )
+static const char *get_data_address( const char **mem_names, UINT8 arg )
 {
 	char *buffer = cpuintrf_temp_str();
 
-	if(arg < 0x80)
-	{
-		//Ram locations 0-0x1F are considered register access in 3 banks
-		if(arg < 0x1f)
-			sprintf(buffer,"%s",regbank[arg]);
-		else
-			sprintf(buffer,"$%02X",arg);
-	}
+	if (mem_names[arg] == NULL)
+		sprintf(buffer,"$%02X",arg);
 	else
-		sprintf(buffer,"%s",sfr[arg-0x80]);
+		sprintf(buffer,"%s", mem_names[arg]);
 	return buffer;
 }
 
-static const char *get_bit_address( UINT8 arg )
+static const char *get_bit_address( const char **mem_names, UINT8 arg )
 {
 	char *buffer = cpuintrf_temp_str();
 
@@ -187,12 +299,22 @@ static const char *get_bit_address( UINT8 arg )
 	{
 		//Bit address 0-7F can be referred to as 20.0, 20.1, to 20.7 for address 0, and 2f.0,2f.1 to 2f.7 for address 7f
 		if(arg < 0x7f)
-			sprintf(buffer,"%s",membits[arg]);
+			sprintf(buffer,"$%02X.%d",(arg >> 3) | 0x20, arg & 0x07);
 		else
 			sprintf(buffer,"$%02X",arg);
 	}
 	else
-		sprintf(buffer,"%s",sfrbits[arg-0x80]);
+	{
+		if (mem_names[arg | 0x100] == NULL)
+		{
+			if (mem_names[arg & 0xf8] == NULL)
+				sprintf(buffer,"$%02X.%d", arg & 0xf8, arg & 0x07);
+			else
+				sprintf(buffer,"%s.%d", mem_names[arg & 0xf8], arg & 0x07);
+		}
+		else
+			sprintf(buffer,"%s", mem_names[arg | 0x100]);
+	}
 	return buffer;
 }
 
@@ -216,8 +338,7 @@ static const char *get_bit_address( UINT8 arg )
 
 #endif
 
-
-unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opram)
+static offs_t mcs51_dasm( const char **mem_names, char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	UINT32 flags = 0;
 	unsigned PC = pc;
@@ -267,7 +388,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//INC data addr
 		case 0x05:				/* 1: 0000 0101 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "inc   %s", sym);
 			break;
 
@@ -291,7 +412,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//JBC bit addr, code addr
 		case 0x10:				/* 1: 0001 0000 */
-			sym = get_bit_address(opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, opram[PC++ - pc]);
 			rel  = opram[PC++ - pc];
 			sprintf(dst, "jbc   %s,$%04X", sym, PC + rel);
 			break;
@@ -330,7 +451,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//DEC data addr
 		case 0x15:				/* 1: 0001 0101 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "dec   %s", sym);
 			break;
 
@@ -355,7 +476,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//JB  bit addr, code addr
 		case 0x20:				/* 1: 0010 0000 */
-			sym = get_bit_address(opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, opram[PC++ - pc]);
 			rel  = opram[PC++ - pc];
 			sprintf(dst, "jb    %s,$%04X", sym, (PC + rel));
 			break;
@@ -378,7 +499,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//ADD A, data addr
 		case 0x25:				/* 1: 0010 0101 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "add   a,%s", sym);
 			break;
 
@@ -403,7 +524,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//JNB bit addr, code addr
 		case 0x30:				/* 1: 0011 0000 */
-			sym = get_bit_address(opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, opram[PC++ - pc]);
 			rel  = opram[PC++ - pc];
 			sprintf(dst, "jnb   %s,$%04X", sym, (PC + rel));
 			break;
@@ -426,7 +547,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//ADDC A, data addr
 		case 0x35:				/* 1: 0011 0101 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "addc  a,%s", sym);
 			break;
 
@@ -456,13 +577,13 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//ORL data addr, A
 		case 0x42:				/* 1: 0100 0010 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "orl   %s,a", sym);
 			break;
 
 		//ORL data addr, #data
 		case 0x43:				/* 1: 0100 0011 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "orl   %s,#$%02X", sym, opram[PC++ - pc]);
 			break;
 
@@ -474,7 +595,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//ORL A, data addr
 		case 0x45:				/* 1: 0100 0101 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "orl   a,%s", sym);
 			break;
 
@@ -505,14 +626,14 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 		//Unable to test
 		//ANL data addr, A
 		case 0x52:				/* 1: 0101 0010 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "anl   %s,a", sym);
 			break;
 
 		//Unable to test
 		//ANL data addr, #data
 		case 0x53:				/* 1: 0101 0011 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "anl   %s,#$%02X", sym, opram[PC++ - pc]);
 			break;
 
@@ -523,7 +644,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//ANL A, data addr
 		case 0x55:				/* 1: 0101 0101 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "anl   a,%s", sym);
 			break;
 
@@ -555,13 +676,13 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 		//Unable to test
 		//XRL data addr, A
 		case 0x62:				/* 1: 0110 0010 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "xrl   %s,a", sym);
 			break;
 
 		//XRL data addr, #data
 		case 0x63:				/* 1: 0110 0011 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "xrl   %s,#$%02X", sym, opram[PC++ - pc]);
 			break;
 
@@ -572,7 +693,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//XRL A, data addr
 		case 0x65:				/* 1: 0110 0101 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "xrl   a,%s", sym);
 			break;
 
@@ -604,7 +725,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 		//Unable to test
 		//ORL C, bit addr
 		case 0x72:				/* 1: 0111 0010 */
-			sym = get_bit_address(opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "orl   c,%s", sym);
 			break;
 
@@ -621,7 +742,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//MOV data addr, #data
 		case 0x75:				/* 1: 0111 0101 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "mov   %s,#$%02X", sym, opram[PC++ - pc]);
 			break;
 
@@ -652,7 +773,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//ANL C, bit addr
 		case 0x82:				/* 1: 1000 0010 */
-			sym = get_bit_address(opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "anl   c,%s", sym);
 			break;
 
@@ -668,8 +789,8 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//MOV data addr, data addr  (Note: 1st address is src, 2nd is dst, but the mov command works as mov dst,src)
 		case 0x85:				/* 1: 1000 0101 */
-			sym  = get_data_address(opram[PC++ - pc]);
-			sym2 = get_data_address(opram[PC++ - pc]);
+			sym  = get_data_address(mem_names, opram[PC++ - pc]);
+			sym2 = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "mov   %s,%s", sym2, sym);
 			break;
 
@@ -677,7 +798,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 		//MOV data addr, @R0/@R1/* 1: 1000 011i */
 		case 0x86:
 		case 0x87:
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "mov   %s,@r%d", sym, op&1);
 			break;
 
@@ -690,7 +811,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 		case 0x8d:
 		case 0x8e:
 		case 0x8f:
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "mov   %s,r%d", sym, op&7);
 			break;
 
@@ -703,7 +824,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//MOV bit addr, C
 		case 0x92:				/* 1: 1001 0010 */
-			sym = get_bit_address(opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "mov   %s,c", sym);
 			break;
 
@@ -719,7 +840,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//SUBB A, data addr
 		case 0x95:				/* 1: 1001 0101 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "subb  a,%s", sym);
 			break;
 
@@ -745,13 +866,13 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 		//Unable to test
 		//ORL C, /bit addr
 		case 0xa0:				  /* 1: 1010 0000 */
-			sym = get_bit_address(opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "orl   c,/%s", sym);
 			break;
 
 		//MOV C, bit addr
 		case 0xa2:				  /* 1: 1010 0010 */
-			sym = get_bit_address(opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "mov   c,%s", sym);
 			break;
 
@@ -774,7 +895,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 		//MOV @R0/@R1, data addr  /* 1: 1010 011i */
 		case 0xa6:
 		case 0xa7:
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "mov   @r%d,%s", op&1, sym);
 			break;
 
@@ -787,19 +908,19 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 		case 0xad:
 		case 0xae:
 		case 0xaf:
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "mov   r%d,%s", op&7, sym);
 			break;
 
 		//ANL C,/bit addr
 		case 0xb0:						 /* 1: 1011 0000 */
-			sym = get_bit_address(opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "anl   c,/%s", sym);
 			break;
 
 		//CPL bit addr
 		case 0xb2:						 /* 1: 1011 0010 */
-			sym = get_bit_address(opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "cpl   %s", sym);
 			break;
 
@@ -818,7 +939,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//CJNE A, data addr, code addr
 		case 0xb5:						 /* 1: 1011 0101 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			rel  = opram[PC++ - pc];
 			sprintf(dst, "cjne  a,%s,$%04X", sym, PC + rel);
 			break;
@@ -848,13 +969,13 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//PUSH data addr
 		case 0xc0:						/* 1: 1100 0000 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "push  %s", sym);
 			break;
 
 		//CLR bit addr
 		case 0xc2:						/* 1: 1100 0010 */
-			sym = get_bit_address(opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "clr   %s", sym);
 			break;
 
@@ -870,7 +991,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//XCH A, data addr
 		case 0xc5:						/* 1: 1100 0101 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "xch   a,%s", sym);
 			break;
 
@@ -894,13 +1015,13 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//POP data addr
 		case 0xd0:						/* 1: 1101 0000 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "pop   %s", sym);
 			break;
 
 		//SETB bit addr
 		case 0xd2:						/* 1: 1101 0010 */
-			sym = get_bit_address(opram[PC++ - pc]);
+			sym = get_bit_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "setb  %s", sym);
 			break;
 
@@ -917,7 +1038,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//DJNZ data addr, code addr
 		case 0xd5:						/* 1: 1101 0101 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			rel  = opram[PC++ - pc];
 			sprintf(dst, "djnz  %s,$%04X", sym, PC + rel);
 			flags = DASMFLAG_STEP_OVER;
@@ -962,7 +1083,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//MOV A, data addr
 		case 0xe5:						/* 1: 1110 0101 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "mov   a,%s", sym);
 			break;
 
@@ -1004,7 +1125,7 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 
 		//MOV data addr, A
 		case 0xf5:						/* 1: 1111 0101 */
-			sym = get_data_address(opram[PC++ - pc]);
+			sym = get_data_address(mem_names, opram[PC++ - pc]);
 			sprintf(dst, "mov   %s,a", sym);
 			break;
 
@@ -1030,4 +1151,70 @@ unsigned i8051_dasm(char *dst, unsigned pc, const UINT8 *oprom, const UINT8 *opr
 			sprintf(dst, "illegal");
     }
 	return (PC - pc) | flags | DASMFLAG_SUPPORTED;
+
+}
+
+offs_t i8051_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+{
+	static const char *mem_names[0x200];
+	static int mem_names_initialized = 0;
+	
+	if (!mem_names_initialized)
+	{
+        init_mem_names(	FEATURE_NONE, mem_names);
+    	mem_names_initialized = 1;
+	}
+	return mcs51_dasm(mem_names, dst, pc, oprom, opram);
+}
+
+offs_t i8052_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+{
+	static const char *mem_names[0x200];
+	static int mem_names_initialized = 0;
+	
+	if (!mem_names_initialized)
+	{
+        init_mem_names(	FEATURE_I8052, mem_names);
+    	mem_names_initialized = 1;
+	}
+	return mcs51_dasm(mem_names, dst, pc, oprom, opram);
+}
+
+offs_t i80c51_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+{
+	static const char *mem_names[0x200];
+	static int mem_names_initialized = 0;
+	
+	if (!mem_names_initialized)
+	{
+        init_mem_names(	FEATURE_CMOS, mem_names);
+    	mem_names_initialized = 1;
+	}
+	return mcs51_dasm(mem_names, dst, pc, oprom, opram);
+}
+
+offs_t i80c52_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+{
+	static const char *mem_names[0x200];
+	static int mem_names_initialized = 0;
+	
+	if (!mem_names_initialized)
+	{
+        init_mem_names(	FEATURE_I8052 | FEATURE_CMOS | FEATURE_I80C52, mem_names);
+    	mem_names_initialized = 1;
+	}
+	return mcs51_dasm(mem_names, dst, pc, oprom, opram);
+}
+
+offs_t ds5002fp_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+{
+	static const char *mem_names[0x200];
+	static int mem_names_initialized = 0;
+	
+	if (!mem_names_initialized)
+	{
+        init_mem_names(	FEATURE_DS5002FP | FEATURE_CMOS, mem_names);
+    	mem_names_initialized = 1;
+	}
+	return mcs51_dasm(mem_names, dst, pc, oprom, opram);
 }

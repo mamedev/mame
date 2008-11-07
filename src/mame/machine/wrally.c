@@ -8,7 +8,7 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "cpu/ds5002fp/ds5002fp.h"
+#include "cpu/mcs51/mcs51.h"
 #include "gaelcrpt.h"
 #include "includes/wrally.h"
 
@@ -50,24 +50,3 @@ WRITE16_HANDLER( wrally_coin_lockout_w )
 	coin_lockout_w( (offset >> 3) & 0x01, ~data & 0x01);
 }
 
-/* Converts memory offsets to the format expected by the Dallas */
-static READ32_HANDLER( wrally_external_ram_iaddr )
-{
-	return offset ^= 0x0001;
-}
-
-/***************************************************************************
-
-    World Rally init/reset machine
-
-***************************************************************************/
-
-DRIVER_INIT( wrally )
-{
-}
-
-MACHINE_RESET( wrally )
-{
-	/* sets the function to convert addresses for shared memory with the dallas */
-	ds5002fp_set_ebram_iaddr_callback(wrally_external_ram_iaddr);
-}

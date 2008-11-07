@@ -30,11 +30,51 @@
  *
  *****************************************************************************/
 
+/*****************************************************************************
+ *   DS5002FP emulator by Manuel Abadia
+ * 
+ *   October 2008, couriersud: Merged back in mcs51
+ *
+ *   What has been added?
+ *      - Extra SFRs
+ *      - Bytewide Bus Support
+ *      - Memory Partition and Memory Range
+ *      - Bootstrap Configuration
+ *      - Power Fail Interrupt
+ *      - Timed Access
+ *      - Stop Mode
+ *      - Idle Mode
+ *
+ *   What is not implemented?
+ *      - Peripherals and Reprogrammable Peripheral Controller
+ *      - CRC-16
+ *      - Watchdog timer
+ *
+ *   The main features of the DS5002FP are:
+ *      - 100% code-compatible with 8051
+ *      - Directly addresses 64kB program/64kB data memory
+ *      - Nonvolatile memory control circuitry
+ *      - 10-year data retention in the absence of power
+ *      - In-system reprogramming via serial port
+ *      - Dedicated memory bus, preserving four 8-bit ports for general purpose I/O
+ *      - Power-fail reset
+ *      - Early warning power-fail interrupt
+ *      - Watchdog timer
+ *      - Accesses up to 128kB on the bytewide bus
+ *      - Decodes memory for 32kB x 8 or 128kB x 8 SRAMs
+ *      - Four additional decoded peripheral-chip enables
+ *      - CRC hardware for checking memory validity
+ *      - Optionally emulates an 8042-style slave interface
+ *      - Memory encryption using an 80-bit encryption key
+ *      - Automatic random generation of encryption keys
+ *      - Self-destruct input for tamper protection
+ *      - Optional top-coating prevents microprobe
+ *
+ *****************************************************************************/
+
 /******************************************************************************
  *  Notes:
- *        *Important*: Internal ROM needs to be treated the same as external rom by the programmer
- *                     creating the driver (ie, use standard cpu rom region)
- *
+ * 
  *        The term cycles is used here to really refer to clock oscilations, because 1 machine cycle
  *        actually takes 12 oscilations.
  *
@@ -53,12 +93,6 @@
  *        July 28,2004: Fixed MOVX command and added External Ram Paging Support
  *        July 31,2004: Added Serial Mode 0 Support & Fixed Interrupt Flags for Serial Port
  *
- *        NOW Implemented: RAM paging using hardware configured addressing...
- *        (July 28,2004)   the "MOVX a,@R0/R1" and "MOVX @R0/R1,a" commands can use any of the other ports
- *                 to output a page offset into external ram, but it is totally based on the hardware setup.
- *
- *        Timing needs to be implemented via MAME timers perhaps?
- *
  *        October, 2008, Couriersud - Major rewrite
  *
  *****************************************************************************/
@@ -69,17 +103,20 @@
  *  - T0 output clock ?
  *
  * - Implement 80C52 extended serial capabilities
- * - Full Timer support (all modes)
  * - Fix serial communication - This is a big hack (but working) right now.
  * - Implement 83C751 in sslam.c
  * - Fix cardline.c
- * - Fix sslam.c and cardline.c
  *      most likely due to different behaviour of I/O pins. The boards
  *      actually use 80CXX, i.e. CMOS versions.
  *      "Normal" 805X will return a 0 if reading from a output port which has
  *      a 0 written to it's latch. At least cardline expects a 1 here.
  *
- * Done:
+ * Done: (Couriersud)
+ * - Merged DS5002FP
+ * - Disassembler now uses type specific memory names
+ * - Merged DS5002FP disasm
+ * - added 83C751 memory names to disassembler
+ * - Pointer-ified
  * - Implemented cmos features
  * - Implemented 80C52 interrupt handling
  * - Fix segas18.c (segaic16.c) memory handling.
@@ -592,19 +629,6 @@ struct _mcs51_regs
 #define PUSH_PC()		push_pc(mcs51)
 #define POP_PC()		pop_pc(mcs51)
 
-#if 0
-/* Any pending IRQ */
-#define SERIALPORT_IRQ    ((R_SCON & 0x03) && GET_ES)
-#define TIMERS_IRQ        ((GET_TF0 && GET_ET0) || (GET_TF1 && GET_ET1))
-#define EXTERNAL_IRQ      ((GET_IE0 && GET_EX0) || (GET_IE1 && GET_EX1))
-
-#if (HAS_I8052 || HAS_I8752)
-#define NO_PENDING_IRQ  !(TIMERS_IRQ) && !(EXTERNAL_IRQ) && !(SERIALPORT_IRQ) && !(GET_ET2 && (GET_TF2 || GET_EXF2))
-#else
-#define NO_PENDING_IRQ  !(TIMERS_IRQ) && !(EXTERNAL_IRQ) && !(SERIALPORT_IRQ)
-#endif
-#endif
-
 /* Clear Current IRQ  */
 #define CLEAR_CURRENT_IRQ() clear_current_irq(mcs51)
 
@@ -712,12 +736,6 @@ INLINE offs_t external_ram_iaddr(mcs51_regs *mcs51, offs_t offset, offs_t mem_ma
 		if (mem_mask == 0x00ff)
 			return (offset & mem_mask) | (P2 << 8);
 	}
-#if 0
-    if(mcs51->eram_iaddr_callback)
-        return mcs51->eram_iaddr_callback(machine,offset,mem_mask);
-    else
-        if (mem_mask <= 0x100) LOG(("mcs51 #%d: external ram address requested (8 bit offset=%02x), but no callback available! at PC:%04x\n", cpu_getactivecpu(), offset, PC));
-#endif
 	return offset;
 }
 
@@ -1961,7 +1979,6 @@ static void mcs51_sfr_write(mcs51_regs *mcs51, size_t offset, UINT8 data)
 	/* update register */
 	assert(offset >= 0x80 && offset <= 0xff);
 
-	/* TODO: Move to memory map */
 	switch (offset)
 	{
 		case ADDR_P0:	OUT(MCS51_PORT_P0,data);			break;
@@ -2278,7 +2295,7 @@ static CPU_INIT( i80c31 )
 /****************************************************************************
  * DS5002FP Section
  ****************************************************************************/
-#ifdef MCS51_TO_BE_ENABLED_LATER
+#if 1 //#ifdef MCS51_TO_BE_ENABLED_LATER
 
 
 #define DS5_LOGW(a, d) 	LOG(("ds5002fp #%d: write to  " # a " register at 0x%04x, data=%x\n", cpu_getactivecpu(), PC, d))
@@ -2331,19 +2348,19 @@ static UINT8 ds5002fp_sfr_read(mcs51_regs *mcs51, size_t offset)
 {
 	switch (offset)
 	{
-		case ADDR_CRCR: 	DS5_LOGR(CRCR, data); 	break;
+		case ADDR_CRCR: 	DS5_LOGR(CRCR, data); 		break;
 		case ADDR_CRCL: 	DS5_LOGR(CRCL, data);		break;
-		case ADDR_CRCH: 	DS5_LOGR(CRCH, data); 	break;
+		case ADDR_CRCH: 	DS5_LOGR(CRCH, data); 		break;
 		case ADDR_MCON: 	DS5_LOGR(MCON, data);		break;
-		case ADDR_TA: 		DS5_LOGR(TA, data);		break;
+		case ADDR_TA: 		DS5_LOGR(TA, data);			break;
 		case ADDR_RNR: 		DS5_LOGR(RNR, data);		break;
-		case ADDR_RPCTL: 	DS5_LOGR(RPCTL, data);	break;
+		case ADDR_RPCTL: 	DS5_LOGR(RPCTL, data);		break;
 		case ADDR_RPS: 		DS5_LOGR(RPS, data);		break;
 		case ADDR_PCON:
 			SET_PFW(0);		/* reset PFW flag */
-			return mcs51_sfr_read(mcs51, offset); /* FIXME: cmos features ??? */
+			return mcs51_sfr_read(mcs51, offset); 
 		default:
-			return mcs51_sfr_read(mcs51, offset); /* FIXME: cmos features ??? */
+			return mcs51_sfr_read(mcs51, offset);
 	}
 	return data_read_byte_8le((size_t) offset | 0x100);
 }
@@ -2355,7 +2372,7 @@ static CPU_INIT( ds5002fp )
 	const ds5002fp_config *sconfig = config ? config : &default_config;
 	mcs51_regs *mcs51 = device->token;
 	
-	mcs51_init(index, clock, config, irqcallback);
+	CPU_INIT_CALL( mcs51 );
 	
 	mcs51->ds5002fp.config = sconfig;
 	mcs51->features |= (FEATURE_DS5002FP | FEATURE_CMOS);
@@ -2373,8 +2390,6 @@ static CPU_INIT( ds5002fp )
     ADDRESS MAPS
 ***************************************************************************/
 
-
-/* FIXME: the memory maps should probably support rom banking for EA */
 static ADDRESS_MAP_START(program_12bit, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00, 0x0fff) AM_ROM
 ADDRESS_MAP_END
@@ -2467,69 +2482,69 @@ static void mcs51_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(mcs51_regs);			break;
-		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 12;							break;
-		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 5;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 20; /* rough guess */			break;
-		case CPUINFO_INT_INPUT_LINES:        			info->i = 3;							break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(mcs51_regs);				break;
+		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;								break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;						break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;								break;
+		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 12;								break;
+		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;								break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 5;								break;
+		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;								break;
+		case CPUINFO_INT_MAX_CYCLES:					info->i = 20; /* rough guess */				break;
+		case CPUINFO_INT_INPUT_LINES:        			info->i = 3;								break;
 
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 8;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;						break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;						break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;						break;
+		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 8;						break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 9; /* due to sfr mapping */					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:	info->i = 8;						break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 	info->i = 17;						break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 	info->i = 0;						break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;						break;
+		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:	info->i = 8;							break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 	info->i = 18; /* 128k for ds5002fp */							break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 	info->i = 0;							break;
+		
+		case CPUINFO_INT_PREVIOUSPC:					info->i = PPC;								break;
+		case CPUINFO_INT_PC:	 						info->i = PC;								break;
+		case CPUINFO_INT_SP:							info->i = SP;								break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = PPC;							break;
-		case CPUINFO_INT_PC:	 						info->i = PC;							break;
-		case CPUINFO_INT_SP:							info->i = SP;							break;
-
-		case CPUINFO_INT_REGISTER + MCS51_PC: 			info->i = PC;							break;
-		case CPUINFO_INT_REGISTER + MCS51_SP: 			info->i = SP;							break;
-		case CPUINFO_INT_REGISTER + MCS51_PSW:			info->i = PSW;							break;
-		case CPUINFO_INT_REGISTER + MCS51_ACC:			info->i = ACC;							break;
-		case CPUINFO_INT_REGISTER + MCS51_B:  			info->i = B;							break;
-		case CPUINFO_INT_REGISTER + MCS51_DPH:			info->i = DPH;							break;
-		case CPUINFO_INT_REGISTER + MCS51_DPL:			info->i = DPL;							break;
-		case CPUINFO_INT_REGISTER + MCS51_IE: 			info->i = IE;							break;
-		case CPUINFO_INT_REGISTER + MCS51_R0: 			info->i = R_REG(0);	 					break;
-		case CPUINFO_INT_REGISTER + MCS51_R1: 			info->i = R_REG(1); 					break;
-		case CPUINFO_INT_REGISTER + MCS51_R2: 			info->i = R_REG(2); 					break;
-		case CPUINFO_INT_REGISTER + MCS51_R3: 			info->i = R_REG(3); 					break;
-		case CPUINFO_INT_REGISTER + MCS51_R4: 			info->i = R_REG(4); 					break;
-		case CPUINFO_INT_REGISTER + MCS51_R5: 			info->i = R_REG(5); 					break;
-		case CPUINFO_INT_REGISTER + MCS51_R6: 			info->i = R_REG(6); 					break;
-		case CPUINFO_INT_REGISTER + MCS51_R7: 			info->i = R_REG(7); 					break;
-		case CPUINFO_INT_REGISTER + MCS51_RB: 			info->i = R_REG(8); 					break;
+		case CPUINFO_INT_REGISTER + MCS51_PC: 			info->i = PC;								break;
+		case CPUINFO_INT_REGISTER + MCS51_SP: 			info->i = SP;								break;
+		case CPUINFO_INT_REGISTER + MCS51_PSW:			info->i = PSW;								break;
+		case CPUINFO_INT_REGISTER + MCS51_ACC:			info->i = ACC;								break;
+		case CPUINFO_INT_REGISTER + MCS51_B:  			info->i = B;								break;
+		case CPUINFO_INT_REGISTER + MCS51_DPH:			info->i = DPH;								break;
+		case CPUINFO_INT_REGISTER + MCS51_DPL:			info->i = DPL;								break;
+		case CPUINFO_INT_REGISTER + MCS51_IE: 			info->i = IE;								break;
+		case CPUINFO_INT_REGISTER + MCS51_R0: 			info->i = R_REG(0);		 					break;
+		case CPUINFO_INT_REGISTER + MCS51_R1: 			info->i = R_REG(1); 						break;
+		case CPUINFO_INT_REGISTER + MCS51_R2: 			info->i = R_REG(2); 						break;
+		case CPUINFO_INT_REGISTER + MCS51_R3: 			info->i = R_REG(3); 						break;
+		case CPUINFO_INT_REGISTER + MCS51_R4: 			info->i = R_REG(4); 						break;
+		case CPUINFO_INT_REGISTER + MCS51_R5: 			info->i = R_REG(5); 						break;
+		case CPUINFO_INT_REGISTER + MCS51_R6: 			info->i = R_REG(6); 						break;
+		case CPUINFO_INT_REGISTER + MCS51_R7: 			info->i = R_REG(7); 						break;
+		case CPUINFO_INT_REGISTER + MCS51_RB: 			info->i = R_REG(8); 						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = mcs51_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = mcs51_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = mcs51_set_context;	break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(mcs51);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(mcs51);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(mcs51);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(mcs51);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i8051_dasm;			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &mcs51->icount;			break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = mcs51_set_info;				break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = mcs51_get_context;		break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = mcs51_set_context;		break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(mcs51);			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(mcs51);		break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(mcs51);			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(mcs51);	break;
+		case CPUINFO_PTR_BURN:							info->burn = NULL;							break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i8051_dasm;				break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &mcs51->icount;				break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = NULL;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = NULL;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_IO:      info->internal_map8 = NULL;	break;
 
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I8051");				break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "MCS-51");				break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I8051");					break;
+		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "MCS-51");					break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");						break;
+		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);					break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Steve Ellenoff"); break;
 
 		case CPUINFO_STR_FLAGS:
@@ -2545,21 +2560,21 @@ static void mcs51_get_info(UINT32 state, cpuinfo *info)
 			break;
 
 		case CPUINFO_STR_REGISTER + MCS51_PC:        	sprintf(info->s, "PC:%04X", mcs51->pc);		break;
-		case CPUINFO_STR_REGISTER + MCS51_SP:        	sprintf(info->s, "SP:%02X", SP);		break;
-		case CPUINFO_STR_REGISTER + MCS51_PSW:       	sprintf(info->s, "PSW:%02X", PSW);		break;
-		case CPUINFO_STR_REGISTER + MCS51_ACC:       	sprintf(info->s, "A:%02X", ACC);		break;
-		case CPUINFO_STR_REGISTER + MCS51_B:         	sprintf(info->s, "B:%02X", B);			break;
-		case CPUINFO_STR_REGISTER + MCS51_DPH:       	sprintf(info->s, "DPH:%02X", DPH);		break;
-		case CPUINFO_STR_REGISTER + MCS51_DPL:       	sprintf(info->s, "DPL:%02X", DPL);		break;
-		case CPUINFO_STR_REGISTER + MCS51_IE:        	sprintf(info->s, "IE:%02X", IE);		break;
-		case CPUINFO_STR_REGISTER + MCS51_R0:        	sprintf(info->s, "R0:%02X", R_REG(0)); 	break;
-		case CPUINFO_STR_REGISTER + MCS51_R1:        	sprintf(info->s, "R1:%02X", R_REG(1)); 	break;
-		case CPUINFO_STR_REGISTER + MCS51_R2:        	sprintf(info->s, "R2:%02X", R_REG(2)); 	break;
-		case CPUINFO_STR_REGISTER + MCS51_R3:			sprintf(info->s, "R3:%02X", R_REG(3)); 	break;
-		case CPUINFO_STR_REGISTER + MCS51_R4: 			sprintf(info->s, "R4:%02X", R_REG(4)); 	break;
-		case CPUINFO_STR_REGISTER + MCS51_R5: 			sprintf(info->s, "R5:%02X", R_REG(5)); 	break;
-		case CPUINFO_STR_REGISTER + MCS51_R6: 			sprintf(info->s, "R6:%02X", R_REG(6)); 	break;
-		case CPUINFO_STR_REGISTER + MCS51_R7: 			sprintf(info->s, "R7:%02X", R_REG(7)); 	break;
+		case CPUINFO_STR_REGISTER + MCS51_SP:        	sprintf(info->s, "SP:%02X", SP);			break;
+		case CPUINFO_STR_REGISTER + MCS51_PSW:       	sprintf(info->s, "PSW:%02X", PSW);			break;
+		case CPUINFO_STR_REGISTER + MCS51_ACC:       	sprintf(info->s, "A:%02X", ACC);			break;
+		case CPUINFO_STR_REGISTER + MCS51_B:         	sprintf(info->s, "B:%02X", B);				break;
+		case CPUINFO_STR_REGISTER + MCS51_DPH:       	sprintf(info->s, "DPH:%02X", DPH);			break;
+		case CPUINFO_STR_REGISTER + MCS51_DPL:       	sprintf(info->s, "DPL:%02X", DPL);			break;
+		case CPUINFO_STR_REGISTER + MCS51_IE:        	sprintf(info->s, "IE:%02X", IE);			break;
+		case CPUINFO_STR_REGISTER + MCS51_R0:        	sprintf(info->s, "R0:%02X", R_REG(0)); 		break;
+		case CPUINFO_STR_REGISTER + MCS51_R1:        	sprintf(info->s, "R1:%02X", R_REG(1)); 		break;
+		case CPUINFO_STR_REGISTER + MCS51_R2:        	sprintf(info->s, "R2:%02X", R_REG(2)); 		break;
+		case CPUINFO_STR_REGISTER + MCS51_R3:			sprintf(info->s, "R3:%02X", R_REG(3)); 		break;
+		case CPUINFO_STR_REGISTER + MCS51_R4: 			sprintf(info->s, "R4:%02X", R_REG(4)); 		break;
+		case CPUINFO_STR_REGISTER + MCS51_R5: 			sprintf(info->s, "R5:%02X", R_REG(5)); 		break;
+		case CPUINFO_STR_REGISTER + MCS51_R6: 			sprintf(info->s, "R6:%02X", R_REG(6)); 		break;
+		case CPUINFO_STR_REGISTER + MCS51_R7: 			sprintf(info->s, "R7:%02X", R_REG(7)); 		break;
 		case CPUINFO_STR_REGISTER + MCS51_RB: 			sprintf(info->s, "RB:%02X", ((PSW & 0x18)>>3)); break;
 	}
 }
@@ -2573,9 +2588,8 @@ void i8031_get_info(UINT32 state, cpuinfo *info)
 	switch (state)
 	{
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = address_map_data_7bit;	break;
-
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I8031");				break;
-		default:										mcs51_get_info(state, info);			break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I8031");					break;
+		default:										mcs51_get_info(state, info);				break;
 	}
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
 }
@@ -2586,9 +2600,8 @@ void i8051_get_info(UINT32 state, cpuinfo *info)
 	{
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = address_map_program_12bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = address_map_data_7bit;	break;
-
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I8051");				break;
-		default:										mcs51_get_info(state, info);			break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I8051");					break;
+		default:										mcs51_get_info(state, info);				break;
 	}
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
 }
@@ -2597,13 +2610,11 @@ void i8032_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8052);				break;
-
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8052);			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = address_map_data_8bit;	break;
-
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I8032");				break;
-
-		default:										mcs51_get_info(state, info);			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i8052_dasm;				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I8032");					break;
+		default:										mcs51_get_info(state, info);				break;
 	}
 }
 
@@ -2611,14 +2622,12 @@ void i8052_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8052);				break;
-
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8052);			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = address_map_program_13bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = address_map_data_8bit;	break;
-
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I8052");				break;
-
-		default:										mcs51_get_info(state, info);			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i8052_dasm;				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I8052");					break;
+		default:										mcs51_get_info(state, info);				break;
 	}
 }
 
@@ -2628,10 +2637,8 @@ void i8751_get_info(UINT32 state, cpuinfo *info)
 	{
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = address_map_program_12bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = address_map_data_7bit;	break;
-
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I8751");				break;
-
-		default:										mcs51_get_info(state, info);			break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I8751");					break;
+		default:										mcs51_get_info(state, info);				break;
 	}
 }
 
@@ -2639,14 +2646,12 @@ void i8752_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8052);				break;
-
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8052);			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = address_map_program_13bit;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = address_map_data_8bit;	break;
-
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I8752");				break;
-
-		default:										mcs51_get_info(state, info);			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i8052_dasm;				break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I8752");					break;
+		default:										mcs51_get_info(state, info);				break;
 	}
 }
 
@@ -2660,13 +2665,12 @@ void i80c31_get_info(UINT32 state, cpuinfo *info)
      * of i80c52 with 128 bytes internal ram */
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c31);				break;
-
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c31);			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = NULL;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = address_map_data_7bit;	break;
-
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C31");				break;
-		default:										i8031_get_info(state, info);			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i80c51_dasm;			break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C31");					break;
+		default:										i8031_get_info(state, info);				break;
 	}
 }
 
@@ -2674,9 +2678,10 @@ void i80c51_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c51);				break;
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C51");				break;
-		default:										i8051_get_info(state, info);			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c51);			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i80c51_dasm;			break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C51");					break;
+		default:										i8051_get_info(state, info);				break;
 	}
 }
 
@@ -2684,9 +2689,10 @@ void i80c32_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c52);				break;
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C32");				break;
-		default:										i8032_get_info(state, info);			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c52);			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i80c52_dasm;			break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C32");					break;
+		default:										i8032_get_info(state, info);				break;
 	}
 }
 
@@ -2694,9 +2700,10 @@ void i80c52_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c52);				break;
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C52");				break;
-		default:										i8052_get_info(state, info);			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c52);			break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I80C52");					break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i80c52_dasm;			break;
+		default:										i8052_get_info(state, info);				break;
 	}
 }
 
@@ -2704,9 +2711,10 @@ void i87c51_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c51);				break;
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I87C51");				break;
-		default:										i8751_get_info(state, info);			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c51);			break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I87C51");					break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i80c51_dasm;			break;
+		default:										i8751_get_info(state, info);				break;
 	}
 }
 
@@ -2714,9 +2722,10 @@ void i87c52_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c52);				break;
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I87C52");				break;
-		default:										i8752_get_info(state, info);			break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c52);			break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I87C52");					break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i80c52_dasm;			break;
+		default:										i8752_get_info(state, info);				break;
 	}
 }
 
@@ -2728,8 +2737,24 @@ void at89c4051_get_info(UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c51);				break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80c51);			break;
 		case CPUINFO_STR_NAME:							strcpy(info->s, "AT89C4051");				break;
-		default:										i8051_get_info(state, info);			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i80c51_dasm;			break;
+		default:										i8051_get_info(state, info);				break;
+	}
+}
+
+void ds5002fp_get_info(UINT32 state, cpuinfo *info)
+{
+	switch (state)
+	{
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ds5002fp);		break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "DS5002FP");				break;
+		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Dallas");					break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");						break;
+		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);					break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Manuel Abadia"); break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = ds5002fp_dasm;			break;
+		default:										i8051_get_info(state, info);				break;
 	}
 }
