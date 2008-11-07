@@ -792,7 +792,8 @@ TODO: understand where it gets 0x02020000,it must be 0x0000000
 
 static READ32_HANDLER( astrass_hack_r )
 {
-	if(activecpu_get_pc()==0x60011b8) return 0x00000000;
+	/*PC reads at 0x60011ba if -debug is active?*/
+	if(activecpu_get_pc()==0x60011b8 || activecpu_get_pc() == 0x60011ba) return 0x00000000;
 
 	return stv_workram_h[0x000770/4];
 }
@@ -812,7 +813,7 @@ DRIVER_INIT( astrass )
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+1);
 	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x605b9da);
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000770, 0x6000773, 0, 0, astrass_hack_r );
+	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x06000770, 0x06000773, 0, 0, astrass_hack_r );
 
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0608e4d8, 0x0608e4db, 0, 0, astrass_speedup_r );
 

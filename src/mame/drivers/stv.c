@@ -86,15 +86,12 @@ ToDo / Notes:
 -To enter into an Advanced Test Mode,keep pressed the Test Button (F2) on the start-up.
 
 (Main issues)
--complete the Master/Slave communication.
--clean up the IC13 rom loading.
 -Clean-ups and split the various chips(SCU,SMPC)into their respective files.
--CD block:complete it & add proper CD image support into MAME.
--the Cart-Dev mode...we need the proper ST-V Cart-Dev bios to be dumped in order to
- make this work,but probably this will never be done...
--fix some strange sound cpu memory accesses,there are various issues about this.
+-CD block:complete it.
+-The Cart-Dev mode hangs even with the -dev bios,I would like to see what it does on the real HW.
+-IC13 games on the bios dev doesn't even load the cartridge / crashes the emulation at start-up,
+ rom rearrange needed?
 -finish the DSP core.
--Complete the window system in VDP2 (Still in progress).
 -Add the RS232c interface (serial port),needed by fhboxers.
 -(PCB owners) check if the clocks documented in the manuals are really right for ST-V.
 -SCSP to master irq: see if there is a sound cpu mask bit.
@@ -112,57 +109,44 @@ ToDo / Notes:
   It rotates clockwise IIRC.Also the ST-V logo when the game is in Multi mode rotates too.
  -The MIDI communication check fails even on a ST-V board,somebody needs to check if there
   is a MIDI port on the real PCB...
+-All games except shienryu: add default eeprom if necessary (1P/3P games for example).
+-Video emulation bugs: check stvvdp2.c file.
 
 (per-game issues)
 -groovef: hangs soon after loaded,caused by two memory addresses in the Work RAM-H range.
  Kludged for now to work.
 -various: find idle skip if possible.
--suikoenb/shanhigw + others: why do we get 2 credits on startup with sound enabled?
+-suikoenb/shanhigw + others: why do we get 2 credits on startup? Cause should be by a communication with the M68k
 -colmns97/puyosun/mausuke/cotton2/cottonbm: interrupt issues? we can't check the SCU mask
  on SMPC or controls fail
 -mausuke/bakubaku/grdforce: need to sort out transparency on the colour mapped sprites
--bakubaku: no sound? Caused by missing irq?
+-bakubaku: sound part is largely incomplete,caused by a tight loop at location PC=1048 of the sound cpu part.
 -myfairld: Apparently this game gives a black screen (either test mode and in-game mode),but let it wait for about
  10 seconds and the game will load everything.This is because of a hellishly slow m68k sub-routine located at 54c2.
  Likely to not be a bug but an in-game design issue.
 -myfairld: Micronet programmers had the "great" idea to *not* use the ST-V input standards,infact
  joystick panel is mapped with input_port(10) instead of input_port(2),so for now use
  the mahjong panel instead.
--kiwames: the VDP1 sprites refresh is too slow,causing the "Draw by request" mode to
- flicker.Moved back to default ATM...
--pblbeach: Sprites are offset, because it doesn't clear vdp1 local coordinates set by bios,
- I guess that they are cleared when some vdp1 register is written (kludged for now)
+-danchih: hanafuda panel doesn't work.
 -decathlt: Is currently using a strange protection DMA abus control,and it uses some sort of RLE
  compression/encryption that serves as a gfxdecode.
--vmahjong: the vdp1 textures are too dark(women).
--findlove: controls doesn't work?
--Weird design choices:
- introdon: has the working button as BUTTON2 and not BUTTON1
- batmanfr: BUTTON1 isn't used at all.
--seabass: Player sprite is corrupt/missing during movements,caused
- by incomplete framebuffer switching.
--sss: Missing backgrounds during gameplay. <- seems just too dark (night),probably
- just the positioning isn't correct...
--elandore: Polygons structures/textures aren't right in gameplay,known as protection
- for the humans structures,imperfect VDP1 emulation for the dragons.
--hanagumi: ending screens have corrupt graphics. (*untested*)
+-findlove: controls doesn't work? Playing with the debugger at location $6063720 it makes it get furter,but controls
+ still doesn't work,missing irq?
 -batmanfr: Missing sound,caused by an extra ADSP chip which is on the cart.The CPU is a
  ADSP-2181,and it's the same used by NBA Jam Extreme (ZN game).
--twcup98: missing Tecmo logo
 -vfremix: when you play Akira, there is a problem with third match: game doesn't upload all textures
  and tiles and doesn't enable display, although gameplay is normal - wait a while to get back
- to title screen after loosing a match
+ to title screen after losing a match
 -sokyugrt: gameplay seems to be not smooth, timing?
--kiwames: hangs on title screen
 -seabass: crashes in stvcd.c - there is no CD and we report than we have one, and game tries
  to read something, however it doesn't do it after nvram is deleted?
--Here's the list of unmapped read/writes:
-*<all games>
-cpu #0 (PC=0000365C): unmapped program memory dword write to 057FFFFC = 000D0000 & FFFF0000
-cpu #0 (PC=00003654): unmapped program memory dword write to 057FFFFC = 000C0000 & FFFF0000
-*bakubaku:
-cpu #0 (PC=0601022E): unmapped program memory dword write to 02000000 = 00000000 & FFFFFFFF
-cpu #0 (PC=0601023A): unmapped program memory dword write to 02000000 = 00000000 & FFFFFFFF
+-Protection issues:
+ \-ffreveng: boot vectors;
+ \-decathlt: in-game graphics;
+ \-elandore: human textures;
+ \-twcup98: tecmo logo / sprite movements;
+ \-astrass: text layer (kludged for now);
+
 
 */
 
@@ -463,7 +447,7 @@ static UINT8 stv_SMPC_r8 (running_machine *machine, int offset)
 
 	return_data = smpc_ram[offset];
 
-	if ((offset == 0x61)) // ?? many games need this or the controls don't work
+	if (offset == 0x61) // ?? many games need this or the controls don't work
 		return_data = 0x20 ^ 0xff;
 
 	if (offset == 0x75)//PDR1 read
@@ -698,7 +682,6 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 				smpc_ram[0x5f]=0x1a;
 				NMI_reset = 1;
 				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
-
 				break;
 			default:
 				if(LOG_SMPC) logerror ("cpu #%d (PC=%08X) SMPC: undocumented Command %02x\n", cpu_getactivecpu(), activecpu_get_pc(), data);
@@ -888,7 +871,8 @@ static int port_i;
 
 static READ32_HANDLER ( stv_io_r32 )
 {
-	//if(LOG_IOGA) logerror("(PC=%08X): I/O r %08X & %08X\n", activecpu_get_pc(), offset*4, mem_mask);
+//	if(LOG_IOGA) logerror("(PC=%08X): I/O r %08X & %08X\n", activecpu_get_pc(), offset*4, mem_mask);
+//	popmessage("SEL: %02x MUX: %02x %02x %02x %02x %02x",port_sel,mux_data,ioga[1],ioga[2],ioga[3],ioga[5]);
 
 	switch(offset)
 	{
@@ -936,13 +920,10 @@ static READ32_HANDLER ( stv_io_r32 )
 		}
 		case 1:
 		if ( strcmp(machine->gamedrv->name,"critcrsh") == 0 )
-		{
 			return ((input_port_read(machine, "SYSTEM") << 16) & ((input_port_read(machine, "P1") & 1) ? 0xffef0000 : 0xffff0000)) | (ioga[1]);
-		}
 		else
-		{
 			return (input_port_read(machine, "SYSTEM") << 16) | (ioga[1]);
-		}
+
 		case 2:
 		switch(port_sel)
 		{
@@ -952,7 +933,6 @@ static READ32_HANDLER ( stv_io_r32 )
 			case 0x10:  return ((ioga[2] & 0xffff) << 16) | 0xffff;
 			case 0x60:  return 0xffffffff;/**/
 			default:
-			//popmessage("offs: 2 %02x",port_sel);
 			return 0xffffffff;
 		}
 		break;
@@ -1007,7 +987,7 @@ static READ32_HANDLER ( stv_io_r32 )
 
 static WRITE32_HANDLER ( stv_io_w32 )
 {
-	//if(LOG_IOGA) logerror("(PC=%08X): I/O w %08X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
+//	if(LOG_IOGA) logerror("(PC=%08X): I/O w %08X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
 
 	switch(offset)
 	{
@@ -2952,6 +2932,7 @@ ROM_START( finlarch )
 
 	ROM_REGION32_BE( 0x3000000, "user1", 0 ) /* SH2 code */
 	ROM_LOAD16_BYTE( "finlarch.13",               0x0000001, 0x0100000, CRC(4505fa9e) SHA1(96c6399146cf9c8f1d27a8fb6a265f937258004a) )
+	ROM_RELOAD ( 0x0100001, 0x0080000 )
 
 	ROM_LOAD16_WORD_SWAP( "mpr18257.2",    0x0400000, 0x0400000, CRC(137fdf55) SHA1(07a02fe531b3707e063498f5bc9749bd1b4cadb3) ) // good
 	ROM_RELOAD(                            0x1400000, 0x0400000 )
@@ -3684,6 +3665,7 @@ GAME( 1996, introdon,  stvbios, stv, stv,  		stv,       	ROT0,   "Sunsoft / Succ
 GAME( 1995, kiwames,   stvbios, stv, stvmp,		stv,       	ROT0,   "Athena",   				  	"Pro Mahjong Kiwame S (J 951020 V1.208)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, maruchan,  stvbios, stv, stv,  		maruchan,  	ROT0,   "Sega / Toyosuisan", 	      	"Maru-Chan de Goo! (J 971216 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, mausuke,   stvbios, stv, stv,  		mausuke,   	ROT0,   "Data East",				  	"Mausuke no Ojama the World (J 960314 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, myfairld,  stvbios, stv, stvmp,		stv,       	ROT0,   "Micronet",                 	"Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, othellos,  stvbios, stv, stv,  		othellos,  	ROT0,   "Success",  				  	"Othello Shiyouyo (J 980423 V1.002)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, pblbeach,  stvbios, stv, stv,  		pblbeach,  	ROT0,   "T&E Soft",                   	"Pebble Beach - The Great Shot (JUE 950913 V0.990)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, prikura,   stvbios, stv, stv,  		prikura,   	ROT0,   "Atlus",    				  	"Princess Clara Daisakusen (J 960910 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
@@ -3709,14 +3691,13 @@ GAME( 1997, nclubv3,   stvbios, stv, stv,  		nameclv3,  	ROT0,   "Sega", 	     	
 
 /* Almost */
 GAME( 1997, vmahjong,  stvbios, stv, stvmp,		stv,       	ROT0,   "Micronet",                 	"Virtual Mahjong (J 961214 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, myfairld,  stvbios, stv, stvmp,		stv,       	ROT0,   "Micronet",                 	"Virtual Mahjong 2 - My Fair Lady (J 980608 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, twcup98,   stvbios, stv, stv,  		twcup98,   	ROT0,   "Tecmo",                    	"Tecmo World Cup '98 (JUET 980410 V1.000)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // player movement
 GAME( 1998, stress,    stvbios, stv, stv,  		stv,       	ROT0,   "Sega", 	     			  	"Stress Busters (J 981020 V1.000)", GAME_NOT_WORKING ) // needs printer
 
 /* Doing Something.. but not enough yet */
 GAME( 1998, elandore,  stvbios, stv, stv,  		elandore,  	ROT0,   "Sai-Mate",   			  		"Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon (JUET 980922 V1.006)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1995, vfremix,   stvbios, stv, stv,  		vfremix,   	ROT0,   "Sega", 	     			  	"Virtua Fighter Remix (JUETBKAL 950428 V1.000)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1997, findlove,  stvbios, stv, stv,  		stv,       	ROT0,   "Daiki / FCF",    	      		"Find Love (J 971212 V1.000)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1997, findlove,  stvbios, stv, stv,  		stv,  		ROT0,   "Daiki / FCF",    	      		"Find Love (J 971212 V1.000)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1996, decathlt,  stvbios, stv, stv,  		decathlt,  	ROT0,   "Sega", 	     			  	"Decathlete (JUET 960709 V1.001)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1996, decathlo,  decathlt,stv, stv,  		decathlt, 	ROT0,  	"Sega", 	     			  	"Decathlete (JUET 960424 V1.000)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 
