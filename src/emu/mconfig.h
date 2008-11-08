@@ -302,18 +302,18 @@ union _machine_config_token
 
 #define MDRV_CPU_PROGRAM_MAP(_map1, _map2) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_PROGRAM_MAP, 8), \
-	TOKEN_PTR(voidptr, address_map_##_map1), \
-	TOKEN_PTR(voidptr, address_map_##_map2), \
+	TOKEN_PTR(voidptr, ADDRESS_MAP_NAME(_map1)), \
+	TOKEN_PTR(voidptr, ADDRESS_MAP_NAME(_map2)), \
 
 #define MDRV_CPU_DATA_MAP(_map1, _map2)	\
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_DATA_MAP, 8), \
-	TOKEN_PTR(voidptr, address_map_##_map1), \
-	TOKEN_PTR(voidptr, address_map_##_map2), \
+	TOKEN_PTR(voidptr, ADDRESS_MAP_NAME(_map1)), \
+	TOKEN_PTR(voidptr, ADDRESS_MAP_NAME(_map2)), \
 
 #define MDRV_CPU_IO_MAP(_map1, _map2) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_IO_MAP, 8), \
-	TOKEN_PTR(voidptr, address_map_##_map1), \
-	TOKEN_PTR(voidptr, address_map_##_map2), \
+	TOKEN_PTR(voidptr, ADDRESS_MAP_NAME(_map1)), \
+	TOKEN_PTR(voidptr, ADDRESS_MAP_NAME(_map2)), \
 
 #define MDRV_CPU_VBLANK_INT(_tag, _func) \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_CPU_VBLANK_INT, 8), \

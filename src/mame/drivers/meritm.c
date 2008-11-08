@@ -850,14 +850,14 @@ static MACHINE_START(meritm_crt250)
 	memory_configure_bank(1, 0, 8, memory_region(machine, "main"), 0x10000);
 	meritm_bank = 0xff;
 	meritm_crt250_switch_banks();
-	machine_start_merit_common(machine);
+	MACHINE_START_CALL(merit_common);
 	state_save_register_global(meritm_bank);
 
 };
 
 static MACHINE_START(meritm_crt250_questions)
 {
-	machine_start_meritm_crt250(machine);
+	MACHINE_START_CALL(meritm_crt250);
 	state_save_register_global(questions_loword_address);
 };
 
@@ -871,7 +871,7 @@ static MACHINE_START(meritm_crt260)
 	meritm_bank = 0xff;
 	meritm_psd_a15 = 0;
 	meritm_switch_banks();
-	machine_start_merit_common(machine);
+	MACHINE_START_CALL(merit_common);
 	pc16552d_init(0, UART_CLK, NULL, pc16650d_tx_callback);
 	microtouch_init(meritm_microtouch_tx_callback, meritm_touch_coord_transform);
 	state_save_register_global(meritm_bank);

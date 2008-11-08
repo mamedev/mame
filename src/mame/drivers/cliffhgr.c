@@ -669,7 +669,7 @@ static const TMS9928a_interface tms9928a_interface =
 	vdp_interrupt
 };
 
-extern const discrete_sound_block cliffhgr_discrete_interface[];
+DISCRETE_SOUND_EXTERN( cliffhgr );
 
 
 

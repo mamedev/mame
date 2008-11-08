@@ -627,8 +627,9 @@ union _addrmap64_token
 
 
 /* start/end tags for the address map */
+#define ADDRESS_MAP_NAME(_name) address_map_##_name
 #define ADDRESS_MAP_START(_name, _space, _bits) \
-	const addrmap##_bits##_token address_map_##_name[] = { \
+	const addrmap##_bits##_token ADDRESS_MAP_NAME(_name)[] = { \
 	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_START, 8, _space, 8, _bits, 8),
 
 #define ADDRESS_MAP_END \
@@ -636,7 +637,7 @@ union _addrmap64_token
 
 /* use this to declare external references to an address map */
 #define ADDRESS_MAP_EXTERN(_name, _bits) \
-	extern const addrmap##_bits##_token address_map_##_name[]
+	extern const addrmap##_bits##_token ADDRESS_MAP_NAME(_name)[]
 
 
 /* global controls */

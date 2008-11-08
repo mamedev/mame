@@ -866,7 +866,7 @@ CPU_GET_INFO( m6510 )
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6510);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6510);				break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6510);			break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:			info->internal_map8 = address_map_m6510_mem; break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:			info->internal_map8 = ADDRESS_MAP_NAME(m6510_mem); break;
 		case CPUINFO_PTR_M6510_PORTREAD:				info->f = (genf *) m6502->port_read;		break;
 		case CPUINFO_PTR_M6510_PORTWRITE:				info->f = (genf *) m6502->port_write;	break;
 

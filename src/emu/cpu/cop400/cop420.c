@@ -647,9 +647,9 @@ CPU_GET_INFO( cop420 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cop420_ICount;			break;
 
 /*      case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
-            info->internal_map8 = address_map_cop420_internal_rom;                              break;*/
+            info->internal_map8 = ADDRESS_MAP_NAME(cop420_internal_rom);                              break;*/
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:
- 			info->internal_map8 = address_map_cop420_internal_ram;								break;
+ 			info->internal_map8 = ADDRESS_MAP_NAME(cop420_internal_ram);								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "COP420");				break;
@@ -769,9 +769,9 @@ CPU_GET_INFO( cop444 )
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
- 			info->internal_map8 = address_map_cop444_internal_rom;								break;
+ 			info->internal_map8 = ADDRESS_MAP_NAME(cop444_internal_rom);								break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:
- 			info->internal_map8 = address_map_cop444_internal_ram;								break;
+ 			info->internal_map8 = ADDRESS_MAP_NAME(cop444_internal_ram);								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "COP444");				break;
@@ -806,9 +806,9 @@ CPU_GET_INFO( cop424 )
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
- 			info->internal_map8 = address_map_cop424_internal_rom;								break;
+ 			info->internal_map8 = ADDRESS_MAP_NAME(cop424_internal_rom);								break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:
- 			info->internal_map8 = address_map_cop424_internal_ram;								break;
+ 			info->internal_map8 = ADDRESS_MAP_NAME(cop424_internal_ram);								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "COP424");				break;

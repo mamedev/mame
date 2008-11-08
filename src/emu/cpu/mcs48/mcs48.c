@@ -1114,8 +1114,8 @@ static CPU_GET_INFO( mcs48 )
 		case CPUINFO_PTR_DISASSEMBLE:							info->disassemble = CPU_DISASSEMBLE_NAME(mcs48);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:					info->icount = &mcs48->icount;			break;
 
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: /*info->internal_map8 = address_map_program_10bit;*/ break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 	/*info->internal_map8 = address_map_data_7bit;*/ break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: /*info->internal_map8 = ADDRESS_MAP_NAME(program_10bit);*/ break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 	/*info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);*/ break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:									/*strcpy(info->s, "I8039");*/			break;
@@ -1168,7 +1168,7 @@ CPU_GET_INFO( i8035 )
 	switch (state)
 	{
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_6bit);		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8035);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8035");							break;
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
@@ -1182,8 +1182,8 @@ CPU_GET_INFO( i8041 )
 	switch (state)
 	{
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_10bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_6bit);		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8041");							break;
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
@@ -1197,8 +1197,8 @@ CPU_GET_INFO( i8048 )
 	switch (state)
 	{
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_10bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_6bit);		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8048");							break;
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
@@ -1212,8 +1212,8 @@ CPU_GET_INFO( i8648 )
 	switch (state)
 	{
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_10bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_6bit);		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8648");							break;
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
@@ -1227,8 +1227,8 @@ CPU_GET_INFO( i8748 )
 	switch (state)
 	{
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_10bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_6bit);		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8748");							break;
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
@@ -1242,7 +1242,7 @@ CPU_GET_INFO( mb8884 )
 	switch (state)
 	{
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_6bit);		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8035);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "MB8884");							break;
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
@@ -1256,8 +1256,8 @@ CPU_GET_INFO( n7751 )
 	switch (state)
 	{
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_10bit;	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_10bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_6bit);		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "N7751");							break;
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
@@ -1273,7 +1273,7 @@ CPU_GET_INFO( i8039 )
 	switch (state)
 	{
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 7;										break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8039);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8039");							break;
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
@@ -1287,8 +1287,8 @@ CPU_GET_INFO( i8049 )
 	switch (state)
 	{
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 7;										break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_11bit;	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_11bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8049);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8049");							break;
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
@@ -1302,8 +1302,8 @@ CPU_GET_INFO( i8749 )
 	switch (state)
 	{
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 7;										break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_11bit;	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_11bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8049);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8749");							break;
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
@@ -1317,8 +1317,8 @@ CPU_GET_INFO( m58715 )
 	switch (state)
 	{
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 7;										break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = address_map_program_11bit;	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_11bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8049);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "M58715");							break;
 		default:														CPU_GET_INFO_CALL(mcs48);							break;

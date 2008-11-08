@@ -493,9 +493,9 @@ CPU_GET_INFO( cop410 )
 		case CPUINFO_PTR_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop410);	break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
-            info->internal_map8 = address_map_cop410_internal_rom;                              break;
+			info->internal_map8 = ADDRESS_MAP_NAME(cop410_internal_rom);                              break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:
- 			info->internal_map8 = address_map_cop410_internal_ram;								break;
+ 			info->internal_map8 = ADDRESS_MAP_NAME(cop410_internal_ram);								break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "COP410");				break;

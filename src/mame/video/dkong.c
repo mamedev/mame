@@ -902,14 +902,17 @@ static void check_palette(running_machine *machine)
 		newset = input_port_read_direct(port);
 		if (newset != state->vidhw)
 		{
+			const UINT8 *color_prom;
 			state->vidhw = newset;
 			switch (newset)
 			{
 				case 0x00:
-					palette_init_radarscp(machine, memory_region(machine, "proms"));
+					color_prom = memory_region(machine, "proms");
+					PALETTE_INIT_CALL(radarscp);
 					break;
 				case 0x01:
-					palette_init_dkong2b(machine, memory_region(machine, "proms"));
+					color_prom = memory_region(machine, "proms");
+					PALETTE_INIT_CALL(dkong2b);
 					break;
 			}
 		}

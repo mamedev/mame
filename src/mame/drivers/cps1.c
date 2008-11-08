@@ -8343,7 +8343,7 @@ static DRIVER_INIT( sf2mdt )
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x70c010, 0x70c011, 0, 0, sf2mdt_r);
 	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x70c018, 0x70c019, 0, 0, sf2mdt_r);
 
-	driver_init_cps1(machine);
+	DRIVER_INIT_CALL(cps1);
 }
 
 

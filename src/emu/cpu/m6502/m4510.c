@@ -527,7 +527,7 @@ CPU_GET_INFO( m4510 )
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m4510);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m4510->icount;			break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:			info->internal_map8 = address_map_m4510_mem; break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:			info->internal_map8 = ADDRESS_MAP_NAME(m4510_mem); break;
 		case CPUINFO_PTR_TRANSLATE:						info->translate = CPU_TRANSLATE_NAME(m4510);		break;
 		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	info->f = (genf *) m4510->rdmem_id;		break;
 		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) m4510->wrmem_id;		break;

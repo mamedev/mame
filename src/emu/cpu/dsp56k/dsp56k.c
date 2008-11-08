@@ -690,9 +690,9 @@ CPU_GET_INFO( dsp56k )
 		case CPUINFO_PTR_READOP:						info->readop = NULL;					break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &dsp56k_icount;			break;
  		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:
- 			info->internal_map16 = address_map_dsp56156_x_data_map;								break;
+ 			info->internal_map16 = ADDRESS_MAP_NAME(dsp56156_x_data_map);								break;
  		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
- 			info->internal_map16 = address_map_dsp56156_program_map;							break;
+ 			info->internal_map16 = ADDRESS_MAP_NAME(dsp56156_program_map);							break;
 
 		// --- the following bits of info are returned as NULL-terminated strings ---
 		case CPUINFO_STR_NAME:							strcpy(info->s, "DSP56156");			break;

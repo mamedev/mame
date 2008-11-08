@@ -259,8 +259,8 @@ static const char *const diskregions[] = { "cdrom0", "cdrom1" };
 
 /* EEPROM handlers */
 
-static void (*nvram_handler_security_cart_0)( running_machine *machine, mame_file *file, int read_or_write );
-static void (*nvram_handler_security_cart_1)( running_machine *machine, mame_file *file, int read_or_write );
+static nvram_handler_func nvram_handler_security_cart_0;
+static nvram_handler_func nvram_handler_security_cart_1;
 
 static NVRAM_HANDLER( konami573 )
 {

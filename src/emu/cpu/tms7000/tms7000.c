@@ -335,7 +335,7 @@ CPU_GET_INFO( tms7000 )
         case CPUINFO_PTR_BURN:	info->burn = NULL;	/* Not supported */break;
         case CPUINFO_PTR_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(tms7000);	break;
         case CPUINFO_PTR_INSTRUCTION_COUNTER:	info->icount = &tms7000_icount;	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:	info->internal_map8 = address_map_tms7000_mem; break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:	info->internal_map8 = ADDRESS_MAP_NAME(tms7000_mem); break;
 
         /* --- the following bits of info are returned as NULL-terminated strings --- */
         case CPUINFO_STR_NAME:	strcpy(info->s = cpuintrf_temp_str(), "TMS7000"); break;
