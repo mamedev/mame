@@ -375,7 +375,7 @@ static CPU_EXECUTE( cop410 )
 /****************************************************************************
  * Get all registers in given buffer
  ****************************************************************************/
-static void cop410_get_context (void *dst)
+static CPU_GET_CONTEXT( cop410 )
 {
 	if( dst )
 		*(COP410_Regs*)dst = R;
@@ -385,7 +385,7 @@ static void cop410_get_context (void *dst)
 /****************************************************************************
  * Set all registers to given values
  ****************************************************************************/
-static void cop410_set_context (void *src)
+static CPU_SET_CONTEXT( cop410 )
 {
 	if( src )
 		R = *(COP410_Regs*)src;
@@ -394,7 +394,7 @@ static void cop410_set_context (void *src)
 /**************************************************************************
  * Validity check
  **************************************************************************/
-static int cop410_validity_check(const game_driver *driver, const void *config)
+static CPU_VALIDITY_CHECK( cop410 )
 {
 	int error = FALSE;
 	const cop400_interface *intf = (const cop400_interface *) config;
@@ -412,7 +412,7 @@ static int cop410_validity_check(const game_driver *driver, const void *config)
  * Generic set_info
  **************************************************************************/
 
-static void cop410_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( cop410 )
 {
 	switch (state)
 	{
@@ -437,7 +437,7 @@ static void cop410_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void cop410_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( cop410 )
 {
 	switch (state)
 	{
@@ -481,16 +481,16 @@ void cop410_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + COP400_SKL:			info->i = SKL;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = cop410_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = cop410_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = cop410_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cop410);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(cop410);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(cop410);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cop410);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cop410);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cop410);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = cop410_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cop410);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cop410_ICount;			break;
-		case CPUINFO_PTR_VALIDITY_CHECK:				info->validity_check = cop410_validity_check;	break;
+		case CPUINFO_PTR_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop410);	break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
             info->internal_map8 = address_map_cop410_internal_rom;                              break;
@@ -522,7 +522,7 @@ void cop410_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void cop411_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( cop411 )
 {
 	// COP411 is a 20-pin package version of the COP410, missing D2/D3/G3/CKO
 
@@ -535,11 +535,11 @@ void cop411_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "COP411");				break;
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "National Semiconductor COPS"); break;
 
-		default: cop410_get_info(state, info); break;
+		default: CPU_GET_INFO_CALL(cop410); break;
 	}
 }
 
-void cop401_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( cop401 )
 {
 	// COP401 is a ROMless version of the COP410
 
@@ -551,6 +551,6 @@ void cop401_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:
  			info->internal_map8 = NULL;															break;
 
-		default: cop410_get_info(state, info); break;
+		default: CPU_GET_INFO_CALL(cop410); break;
 	}
 }

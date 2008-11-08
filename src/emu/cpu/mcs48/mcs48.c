@@ -992,7 +992,7 @@ ADDRESS_MAP_END
     destination
 -------------------------------------------------*/
 
-static void mcs48_get_context(void *dst)
+static CPU_GET_CONTEXT( mcs48 )
 {
 }
 
@@ -1002,7 +1002,7 @@ static void mcs48_get_context(void *dst)
     from the source
 -------------------------------------------------*/
 
-static void mcs48_set_context(void *src)
+static CPU_SET_CONTEXT( mcs48 )
 {
 	mcs48_state *mcs48;
 	if( src )
@@ -1017,7 +1017,7 @@ static void mcs48_set_context(void *src)
     on the CPU core
 -------------------------------------------------*/
 
-static void mcs48_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( mcs48 )
 {
 	mcs48_state *mcs48 = token;
 	
@@ -1053,7 +1053,7 @@ static void mcs48_set_info(UINT32 state, cpuinfo *info)
     information from the CPU core
 -------------------------------------------------*/
 
-static void mcs48_get_info(UINT32 state, cpuinfo *info)
+static CPU_GET_INFO( mcs48 )
 {
 	mcs48_state *mcs48 = token;
 
@@ -1104,14 +1104,14 @@ static void mcs48_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + MCS48_EA:					info->i = mcs48->ea;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:								info->setinfo = mcs48_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:							info->getcontext = mcs48_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:							info->setcontext = mcs48_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:								info->setinfo = CPU_SET_INFO_NAME(mcs48);			break;
+		case CPUINFO_PTR_GET_CONTEXT:							info->getcontext = CPU_GET_CONTEXT_NAME(mcs48);	break;
+		case CPUINFO_PTR_SET_CONTEXT:							info->setcontext = CPU_SET_CONTEXT_NAME(mcs48);	break;
 		case CPUINFO_PTR_INIT:									/*info->init = CPU_INIT_NAME(i8039);*/			break;
 		case CPUINFO_PTR_RESET:									info->reset = CPU_RESET_NAME(mcs48);				break;
 		case CPUINFO_PTR_EXECUTE:								info->execute = CPU_EXECUTE_NAME(mcs48);			break;
 		case CPUINFO_PTR_BURN:									info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:							info->disassemble = mcs48_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:							info->disassemble = CPU_DISASSEMBLE_NAME(mcs48);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:					info->icount = &mcs48->icount;			break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: /*info->internal_map8 = address_map_program_10bit;*/ break;
@@ -1163,7 +1163,7 @@ static void mcs48_get_info(UINT32 state, cpuinfo *info)
 ***************************************************************************/
 
 #if (HAS_I8035)
-void i8035_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( i8035 )
 {
 	switch (state)
 	{
@@ -1171,13 +1171,13 @@ void i8035_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8035);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8035");							break;
-		default:														mcs48_get_info(state, info);						break;
+		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
 #endif
 
 #if (HAS_I8041)
-void i8041_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( i8041 )
 {
 	switch (state)
 	{
@@ -1186,13 +1186,13 @@ void i8041_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8041");							break;
-		default:														mcs48_get_info(state, info);						break;
+		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
 #endif
 
 #if (HAS_I8048)
-void i8048_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( i8048 )
 {
 	switch (state)
 	{
@@ -1201,13 +1201,13 @@ void i8048_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8048");							break;
-		default:														mcs48_get_info(state, info);						break;
+		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
 #endif
 
 #if (HAS_I8648)
-void i8648_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( i8648 )
 {
 	switch (state)
 	{
@@ -1216,13 +1216,13 @@ void i8648_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8648");							break;
-		default:														mcs48_get_info(state, info);						break;
+		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
 #endif
 
 #if (HAS_I8748)
-void i8748_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( i8748 )
 {
 	switch (state)
 	{
@@ -1231,13 +1231,13 @@ void i8748_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8748");							break;
-		default:														mcs48_get_info(state, info);						break;
+		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
 #endif
 
 #if (HAS_MB8884)
-void mb8884_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( mb8884 )
 {
 	switch (state)
 	{
@@ -1245,13 +1245,13 @@ void mb8884_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8035);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "MB8884");							break;
-		default:														mcs48_get_info(state, info);						break;
+		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
 #endif
 
 #if (HAS_N7751)
-void n7751_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( n7751 )
 {
 	switch (state)
 	{
@@ -1260,7 +1260,7 @@ void n7751_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_6bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "N7751");							break;
-		default:														mcs48_get_info(state, info);						break;
+		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
 #endif
@@ -1268,7 +1268,7 @@ void n7751_get_info(UINT32 state, cpuinfo *info)
 
 
 #if (HAS_I8039)
-void i8039_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( i8039 )
 {
 	switch (state)
 	{
@@ -1276,13 +1276,13 @@ void i8039_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8039);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8039");							break;
-		default:														mcs48_get_info(state, info);						break;
+		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
 #endif
 
 #if (HAS_I8049)
-void i8049_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( i8049 )
 {
 	switch (state)
 	{
@@ -1291,13 +1291,13 @@ void i8049_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8049);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8049");							break;
-		default:														mcs48_get_info(state, info);						break;
+		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
 #endif
 
 #if (HAS_I8749)
-void i8749_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( i8749 )
 {
 	switch (state)
 	{
@@ -1306,13 +1306,13 @@ void i8749_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8049);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8749");							break;
-		default:														mcs48_get_info(state, info);						break;
+		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
 #endif
 
 #if (HAS_M58715)
-void m58715_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m58715 )
 {
 	switch (state)
 	{
@@ -1321,7 +1321,7 @@ void m58715_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = address_map_data_7bit;		break;
 		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8049);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "M58715");							break;
-		default:														mcs48_get_info(state, info);						break;
+		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
 }
 #endif

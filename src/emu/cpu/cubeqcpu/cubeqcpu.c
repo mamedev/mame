@@ -257,7 +257,7 @@ READ16_HANDLER( read_rotram )
     CONTEXT SWITCHING
 ***************************************************************************/
 
-static void cquestsnd_get_context(void *dst)
+static CPU_GET_CONTEXT( cquestsnd )
 {
 	/* Copy the context */
 	if (dst)
@@ -265,7 +265,7 @@ static void cquestsnd_get_context(void *dst)
 }
 
 
-static void cquestsnd_set_context(void *src)
+static CPU_SET_CONTEXT( cquestsnd )
 {
 	/* Copy the context */
 	if (src)
@@ -273,7 +273,7 @@ static void cquestsnd_set_context(void *src)
 }
 
 
-static void cquestrot_get_context(void *dst)
+static CPU_GET_CONTEXT( cquestrot )
 {
 	/* Copy the context */
 	if (dst)
@@ -281,7 +281,7 @@ static void cquestrot_get_context(void *dst)
 }
 
 
-static void cquestrot_set_context(void *src)
+static CPU_SET_CONTEXT( cquestrot )
 {
 	/* Copy the context */
 	if (src)
@@ -289,7 +289,7 @@ static void cquestrot_set_context(void *src)
 }
 
 
-static void cquestlin_get_context(void *dst)
+static CPU_GET_CONTEXT( cquestlin )
 {
 	/* Copy the context */
 	if (dst)
@@ -297,7 +297,7 @@ static void cquestlin_get_context(void *dst)
 }
 
 
-static void cquestlin_set_context(void *src)
+static CPU_SET_CONTEXT( cquestlin )
 {
 	/* Copy the context */
 	if (src)
@@ -747,7 +747,7 @@ static CPU_EXECUTE( cquestsnd )
     SOUND DISASSEMBLY HOOK
 ***************************************************************************/
 
-static offs_t cquestsnd_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( cquestsnd )
 {
 	static const char *const jmps[] =
 	{
@@ -1200,7 +1200,7 @@ static CPU_EXECUTE( cquestrot )
     ROTATE DISASSEMBLY HOOK
 ***************************************************************************/
 
-static offs_t cquestrot_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( cquestrot )
 {
 	static const char *const jmps[] =
 	{
@@ -1758,7 +1758,7 @@ static CPU_EXECUTE( cquestlin )
     LINE DRAWER DISASSEMBLY HOOK
 ***************************************************************************/
 
-static offs_t cquestlin_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( cquestlin )
 {
 	static const char *const jmps[] =
 	{
@@ -1843,7 +1843,7 @@ static offs_t cquestlin_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const 
  * Sound set_info
  **************************************************************************/
 
-static void cquestsnd_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( cquestsnd )
 {
 	switch (state)
 	{
@@ -1878,7 +1878,7 @@ static void cquestsnd_set_info(UINT32 state, cpuinfo *info)
  * Sound get_info
  **************************************************************************/
 
-void cquestsnd_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( cquestsnd )
 {
 	switch (state)
 	{
@@ -1908,15 +1908,15 @@ void cquestsnd_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + CQUESTSND_ADRCNTR:		info->i = cquestsnd.adrcntr;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = cquestsnd_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = cquestsnd_get_context;break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = cquestsnd_set_context;break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cquestsnd);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(cquestsnd);break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(cquestsnd);break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cquestsnd);			break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cquestsnd);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(cquestsnd);			break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cquestsnd);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = cquestsnd_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cquestsnd);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cquestsnd_icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1956,7 +1956,7 @@ void cquestsnd_get_info(UINT32 state, cpuinfo *info)
  * Rotate set_info
  **************************************************************************/
 
-static void cquestrot_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( cquestrot )
 {
 	switch (state)
 	{
@@ -1996,7 +1996,7 @@ static void cquestrot_set_info(UINT32 state, cpuinfo *info)
  * Rotate get_info
  **************************************************************************/
 
-void cquestrot_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( cquestrot )
 {
 	switch (state)
 	{
@@ -2024,15 +2024,15 @@ void cquestrot_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + CQUESTROT_PC:		info->i = cquestrot.pc;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = cquestrot_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = cquestrot_get_context;break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = cquestrot_set_context;break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cquestrot);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(cquestrot);break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(cquestrot);break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cquestrot);			break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cquestrot);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(cquestrot);			break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cquestrot);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = cquestrot_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cquestrot);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cquestrot_icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2081,7 +2081,7 @@ void cquestrot_get_info(UINT32 state, cpuinfo *info)
  * Line drawer set_info
  **************************************************************************/
 
-static void cquestlin_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( cquestlin )
 {
 	switch (state)
 	{
@@ -2114,7 +2114,7 @@ static void cquestlin_set_info(UINT32 state, cpuinfo *info)
  * Line drawer get_info
  **************************************************************************/
 
-void cquestlin_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( cquestlin )
 {
 	switch (state)
 	{
@@ -2142,15 +2142,15 @@ void cquestlin_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + CQUESTLIN_FGPC:		info->i = cquestlin.pc[cquestlin.clkcnt & 3 ? BACKGROUND : FOREGROUND];	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = cquestlin_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = cquestlin_get_context;break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = cquestlin_set_context;break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cquestlin);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(cquestlin);break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(cquestlin);break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cquestlin);			break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cquestlin);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(cquestlin);			break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cquestlin);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = cquestlin_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cquestlin);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cquestlin_icount;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

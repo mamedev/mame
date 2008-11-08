@@ -75,7 +75,7 @@ struct _lh5801_cpu_core
 #define LH5801_INT_NONE 0
 #define LH5801_IRQ 1
 
-void lh5801_get_info(UINT32 state, cpuinfo *info);
-extern offs_t lh5801_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_GET_INFO( lh5801 );
+extern CPU_DISASSEMBLE( lh5801 );
 
 #endif /* __LH5801_H__ */

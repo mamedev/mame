@@ -151,39 +151,39 @@ struct _powerpc_config
 ***************************************************************************/
 
 #if (HAS_PPC403GA)
-void ppc403ga_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( ppc403ga );
 #endif
 
 #if (HAS_PPC403GCX)
-void ppc403gcx_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( ppc403gcx );
 #endif
 
 #if (HAS_PPC601)
-void ppc601_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( ppc601 );
 #endif
 
 #if (HAS_PPC602)
-void ppc602_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( ppc602 );
 #endif
 
 #if (HAS_PPC603)
-void ppc603_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( ppc603 );
 #endif
 
 #if (HAS_PPC603E)
-void ppc603e_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( ppc603e );
 #endif
 
 #if (HAS_PPC603R)
-void ppc603r_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( ppc603r );
 #endif
 
 #if (HAS_PPC604)
-void ppc604_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( ppc604 );
 #endif
 
 #if (HAS_MPC8240)
-void mpc8240_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( mpc8240 );
 #endif
 
 

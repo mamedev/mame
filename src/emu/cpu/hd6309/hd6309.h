@@ -18,7 +18,7 @@ enum
 
 
 /* PUBLIC FUNCTIONS */
-void hd6309_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( hd6309 );
 
 /****************************************************************************/
 /* Read a byte from given memory location                                   */

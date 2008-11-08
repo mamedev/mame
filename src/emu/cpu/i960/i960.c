@@ -1964,14 +1964,14 @@ static CPU_EXECUTE( i960 )
 	return cycles - i960_icount;
 }
 
-static void i960_get_context(void *context)
+static CPU_GET_CONTEXT( i960 )
 {
-	*(i960_state *)context = i960;
+	*(i960_state *)dst = i960;
 }
 
-static void i960_set_context(void *context)
+static CPU_SET_CONTEXT( i960 )
 {
-	i960 = *(i960_state *)context;
+	i960 = *(i960_state *)src;
 }
 
 static void set_irq_line(int irqline, int state)
@@ -2042,7 +2042,7 @@ static void set_irq_line(int irqline, int state)
 	}
 }
 
-static void i960_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( i960 )
 {
 	if(state >= CPUINFO_INT_REGISTER+I960_R0 && state <= CPUINFO_INT_REGISTER + I960_G15) {
 		i960.r[state - (CPUINFO_INT_REGISTER + I960_R0)] = info->i;
@@ -2080,7 +2080,7 @@ static CPU_INIT( i960 )
 	state_save_register_item_array("i960", index, i960.rcache_frame_addr);
 }
 
-static offs_t i960_disasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( i960  )
 {
 	disassemble_t dis;
 
@@ -2112,7 +2112,7 @@ static CPU_RESET( i960 )
 	i960.rcache_pos = 0;
 }
 
-void i960_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( i960 )
 {
 	if(state >= CPUINFO_INT_REGISTER+I960_R0 && state <= CPUINFO_INT_REGISTER + I960_G15) {
 		info->i = i960.r[state - (CPUINFO_INT_REGISTER + I960_R0)];
@@ -2121,15 +2121,15 @@ void i960_get_info(UINT32 state, cpuinfo *info)
 
 	switch(state) {
 		// Interface functions and variables
-	case CPUINFO_PTR_SET_INFO:					info->setinfo     = i960_set_info;				break;
-	case CPUINFO_PTR_GET_CONTEXT:				info->getcontext  = i960_get_context;			break;
-	case CPUINFO_PTR_SET_CONTEXT:				info->setcontext  = i960_set_context;			break;
-	case CPUINFO_PTR_INIT:						info->init        = CPU_INIT_NAME(i960);					break;
-	case CPUINFO_PTR_RESET:						info->reset       = CPU_RESET_NAME(i960);					break;
+	case CPUINFO_PTR_SET_INFO:					info->setinfo     = CPU_SET_INFO_NAME(i960);	break;
+	case CPUINFO_PTR_GET_CONTEXT:				info->getcontext  = CPU_GET_CONTEXT_NAME(i960);	break;
+	case CPUINFO_PTR_SET_CONTEXT:				info->setcontext  = CPU_SET_CONTEXT_NAME(i960);	break;
+	case CPUINFO_PTR_INIT:						info->init        = CPU_INIT_NAME(i960);		break;
+	case CPUINFO_PTR_RESET:						info->reset       = CPU_RESET_NAME(i960);		break;
 	case CPUINFO_PTR_EXIT:						info->exit        = 0;							break;
-	case CPUINFO_PTR_EXECUTE:					info->execute     = CPU_EXECUTE_NAME(i960);				break;
+	case CPUINFO_PTR_EXECUTE:					info->execute     = CPU_EXECUTE_NAME(i960);		break;
 	case CPUINFO_PTR_BURN:						info->burn        = 0;							break;
-	case CPUINFO_PTR_DISASSEMBLE:				info->disassemble = i960_disasm;				break;
+	case CPUINFO_PTR_DISASSEMBLE:				info->disassemble = CPU_DISASSEMBLE_NAME(i960);	break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:		info->icount      = &i960_icount;				break;
 	case CPUINFO_INT_CONTEXT_SIZE:				info->i           = sizeof(i960_state);			break;
 	case CPUINFO_INT_MIN_INSTRUCTION_BYTES:		info->i           = 4;							break;

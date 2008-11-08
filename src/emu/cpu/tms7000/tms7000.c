@@ -40,8 +40,8 @@
 /* Private prototypes */
 
 static void tms7000_set_irq_line(int irqline, int state);
-static void tms7000_get_context(void *dst);
-static void tms7000_set_context(void *src);
+static CPU_GET_CONTEXT( tms7000 );
+static CPU_SET_CONTEXT( tms7000 );
 static void tms7000_check_IRQ_lines( void );
 static void tms7000_do_interrupt( UINT16 address, UINT8 line );
 static CPU_EXECUTE( tms7000 );
@@ -167,7 +167,7 @@ ADDRESS_MAP_END
  * Get all registers in given buffer
  ****************************************************************************/
 
-static void tms7000_get_context(void *dst)
+static CPU_GET_CONTEXT( tms7000 )
 {
 	if( dst )
 		*(tms7000_Regs*)dst = tms7000;
@@ -176,7 +176,7 @@ static void tms7000_get_context(void *dst)
 /****************************************************************************
  * Set all registers to given values
  ****************************************************************************/
-static void tms7000_set_context(void *src)
+static CPU_SET_CONTEXT( tms7000 )
 {
 	if( src )
 		tms7000 = *(tms7000_Regs*)src;
@@ -257,7 +257,7 @@ static CPU_RESET( tms7000 )
  * Generic set_info
  **************************************************************************/
 
-static void tms7000_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( tms7000 )
 {
     switch (state)
     {
@@ -282,7 +282,7 @@ static void tms7000_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void tms7000_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( tms7000 )
 {
 
     switch( state )
@@ -326,14 +326,14 @@ void tms7000_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + TMS7000_T1_DEC: info->i = tms7000.t1_decrementer; break;
 
         /* --- the following bits of info are returned as pointers to data or functions --- */
-        case CPUINFO_PTR_SET_INFO:	info->setinfo = tms7000_set_info;	break;
-        case CPUINFO_PTR_GET_CONTEXT:	info->getcontext = tms7000_get_context;	break;
-        case CPUINFO_PTR_SET_CONTEXT:	info->setcontext = tms7000_set_context;	break;
+        case CPUINFO_PTR_SET_INFO:	info->setinfo = CPU_SET_INFO_NAME(tms7000);	break;
+        case CPUINFO_PTR_GET_CONTEXT:	info->getcontext = CPU_GET_CONTEXT_NAME(tms7000);	break;
+        case CPUINFO_PTR_SET_CONTEXT:	info->setcontext = CPU_SET_CONTEXT_NAME(tms7000);	break;
         case CPUINFO_PTR_INIT:	info->init = CPU_INIT_NAME(tms7000);	break;
         case CPUINFO_PTR_RESET:	info->reset = CPU_RESET_NAME(tms7000);	break;
         case CPUINFO_PTR_EXECUTE:	info->execute = CPU_EXECUTE_NAME(tms7000);	break;
         case CPUINFO_PTR_BURN:	info->burn = NULL;	/* Not supported */break;
-        case CPUINFO_PTR_DISASSEMBLE:	info->disassemble = tms7000_dasm;	break;
+        case CPUINFO_PTR_DISASSEMBLE:	info->disassemble = CPU_DISASSEMBLE_NAME(tms7000);	break;
         case CPUINFO_PTR_INSTRUCTION_COUNTER:	info->icount = &tms7000_icount;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:	info->internal_map8 = address_map_tms7000_mem; break;
 
@@ -367,7 +367,7 @@ void tms7000_get_info(UINT32 state, cpuinfo *info)
     }
 }
 
-void tms7000_exl_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( tms7000_exl )
 {
     switch( state )
     {
@@ -375,7 +375,7 @@ void tms7000_exl_get_info(UINT32 state, cpuinfo *info)
 			info->execute = CPU_EXECUTE_NAME(tms7000_exl);
 			break;
 		default:
-			tms7000_get_info(state, info);
+			CPU_GET_INFO_CALL(tms7000);
 			break;
 	}
 }

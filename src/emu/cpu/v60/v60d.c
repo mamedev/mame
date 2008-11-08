@@ -1460,14 +1460,14 @@ static int (*const dasm_optable[256])(unsigned ipc, unsigned pc, char *out) =
 	/* 0xFF */ dopCLRTLB
 };
 
-offs_t v60_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( v60 )
 {
 	rombase = oprom;
 	pcbase = pc;
 	return dasm_optable[oprom[0]](pc, pc+1, buffer) | DASMFLAG_SUPPORTED;
 }
 
-offs_t v70_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( v70 )
 {
 	rombase = oprom;
 	pcbase = pc;

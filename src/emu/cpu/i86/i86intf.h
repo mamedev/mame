@@ -27,6 +27,6 @@ enum
 };
 
 /* Public functions */
-void i8086_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( i8086 );
 
 #endif /* __I86INTF_H__ */

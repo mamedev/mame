@@ -68,12 +68,12 @@ struct _mb88_cpu_core
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-void mb88_get_info(UINT32 state, cpuinfo *info);
-void mb8841_get_info(UINT32 state, cpuinfo *info);
-void mb8842_get_info(UINT32 state, cpuinfo *info);
-void mb8843_get_info(UINT32 state, cpuinfo *info);
-void mb8844_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( mb88 );
+CPU_GET_INFO( mb8841 );
+CPU_GET_INFO( mb8842 );
+CPU_GET_INFO( mb8843 );
+CPU_GET_INFO( mb8844 );
 
-offs_t mb88_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( mb88 );
 
 #endif /* __MB88XX_H__ */

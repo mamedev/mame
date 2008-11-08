@@ -320,14 +320,14 @@ static CPU_EXIT( tms )
 	/* TODO */
 }
 
-static void tms_get_context(void *dst)
+static CPU_GET_CONTEXT( tms )
 {
 	/* copy the context */
 	if (dst)
 		*(TMS_REGS *)dst = tms;
 }
 
-static void tms_set_context(void *src)
+static CPU_SET_CONTEXT( tms )
 {
 	/* copy the context */
 	if (src)
@@ -544,7 +544,7 @@ ADDRESS_MAP_END
  * Generic set_info
  **************************************************************************/
 
-static void tms_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( tms )
 {
 	switch (state)
 	{
@@ -553,7 +553,7 @@ static void tms_set_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-static int tms_debug_read(int space, UINT32 offset, int size, UINT64 *value)
+static CPU_READ( tms )
 {
 	if (space == ADDRESS_SPACE_PROGRAM)
 	{
@@ -566,7 +566,7 @@ static int tms_debug_read(int space, UINT32 offset, int size, UINT64 *value)
 	return 1;
 }
 
-static void tms_get_info(UINT32 state, cpuinfo *info)
+static CPU_GET_INFO( tms )
 {
 	switch(state)
 	{
@@ -623,15 +623,15 @@ static void tms_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + TMS32051_AR7:		info->i = tms.ar[7];					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = tms_get_context;		break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = tms_set_context;		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(tms);		break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(tms);		break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tms);					break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(tms);					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tms);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tms32051_dasm;		break;
-		case CPUINFO_PTR_READ:							info->read = tms_debug_read;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms32051);		break;
+		case CPUINFO_PTR_READ:							info->read = CPU_READ_NAME(tms);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tms_icount;				break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = address_map_internal_pgm; break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: info->internal_map16 = address_map_internal_data; break;
@@ -672,7 +672,7 @@ static void tms_get_info(UINT32 state, cpuinfo *info)
 }
 
 #if (HAS_TMS32051)
-static void tms32051_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( tms32051 )
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
 	{
@@ -705,21 +705,21 @@ static void tms32051_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + TMS32051_AR6:		tms.ar[6] = info->i; 					break;
 		case CPUINFO_INT_REGISTER + TMS32051_AR7:		tms.ar[7] = info->i; 					break;
 
-		default:										tms_set_info(state, info);				break;
+		default:										CPU_SET_INFO_CALL(tms);				break;
 	}
 }
 
-void tms32051_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( tms32051 )
 {
 	switch(state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = tms32051_set_info;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tms32051);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "TMS32051");			break;
 
-		default:										tms_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(tms);				break;
 	}
 }
 #endif

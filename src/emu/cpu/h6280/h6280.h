@@ -34,7 +34,7 @@ enum
 #define H6280_IRQ1_VEC	0xfff8
 #define H6280_IRQ2_VEC	0xfff6			/* Aka BRK vector */
 
-void h6280_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( h6280 );
 
 
 READ8_HANDLER( h6280_irq_status_r );
@@ -47,6 +47,6 @@ WRITE8_HANDLER( h6280_timer_w );
 UINT8 h6280io_get_buffer(void);
 void h6280io_set_buffer(UINT8);
 
-offs_t h6280_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( h6280 );
 
 #endif /* __H6280_H__ */

@@ -1290,24 +1290,18 @@ CPU_EXIT( spc700 )
 
 
 /* Get the current CPU context */
-unsigned spc700_get_context(void *dst_context)
+CPU_GET_CONTEXT( spc700 )
 {
-	if(dst_context)
-		*(spc700i_cpu_struct*)dst_context = spc700i_cpu;
-	return sizeof(spc700i_cpu);
-}
-
-static void spc700_get_context_mame(void *dst_context)
-{
-	spc700_get_context(dst_context);
+	if(dst)
+		*(spc700i_cpu_struct*)dst = spc700i_cpu;
 }
 
 /* Set the current CPU context */
-void spc700_set_context(void *src_context)
+CPU_SET_CONTEXT( spc700 )
 {
-	if(src_context)
+	if(src)
 	{
-		spc700i_cpu = *(spc700i_cpu_struct*)src_context;
+		spc700i_cpu = *(spc700i_cpu_struct*)src;
 		JUMP(REG_PC);
 	}
 }
@@ -1715,7 +1709,7 @@ CPU_EXECUTE( spc700 )
  * Generic set_info
  **************************************************************************/
 
-static void spc700_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( spc700 )
 {
 	switch (state)
 	{
@@ -1740,7 +1734,7 @@ static void spc700_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void spc700_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( spc700 )
 {
 	uint p = ((spc700i_cpu.flag_n & 0x80)			|
 				((spc700i_cpu.flag_v & 0x80) >> 1)	|
@@ -1789,15 +1783,15 @@ void spc700_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + SPC700_Y:			info->i = REG_Y;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = spc700_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = spc700_get_context_mame;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = spc700_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(spc700);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(spc700);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(spc700);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(spc700);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(spc700);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(spc700);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(spc700);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = spc700_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(spc700);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &spc700_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

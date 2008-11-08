@@ -439,13 +439,13 @@ static CPU_EXECUTE( v60 )
 	return cycles - v60_ICount;
 }
 
-static void v60_get_context(void *dst)
+static CPU_GET_CONTEXT( v60 )
 {
 	if(dst)
 		*(struct v60info *)dst = v60;
 }
 
-static void v60_set_context(void *src)
+static CPU_SET_CONTEXT( v60 )
 {
 	if(src)
 	{
@@ -455,15 +455,15 @@ static void v60_set_context(void *src)
 }
 
 
-offs_t v60_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-offs_t v70_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( v60 );
+CPU_DISASSEMBLE( v70 );
 
 
 /**************************************************************************
  * Generic set_info
  **************************************************************************/
 
-static void v60_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( v60 )
 {
 	switch (state)
 	{
@@ -541,7 +541,7 @@ static void v60_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void v60_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( v60 )
 {
 	switch (state)
 	{
@@ -634,15 +634,15 @@ void v60_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + V60_ADTMR1:			info->i = ADTMR1;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = v60_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = v60_get_context;		break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = v60_set_context;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(v60);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(v60);		break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(v60);		break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(v60);					break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(v60);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(v60);					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(v60);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = v60_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(v60);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &v60_ICount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -720,7 +720,7 @@ void v60_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void v70_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( v70 )
 {
 	switch (state)
 	{
@@ -731,11 +731,11 @@ void v70_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(v70);					break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = v70_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(v70);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "V70");					break;
 
-		default:										v60_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(v60);					break;
 	}
 }

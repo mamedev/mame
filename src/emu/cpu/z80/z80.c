@@ -334,7 +334,7 @@ static const UINT8 *cc[6];
 #define Z80_TABLE_fd	Z80_TABLE_xy
 
 static void take_interrupt(z80_state *z80);
-static void z80_burn(int cycles);
+static CPU_BURN( z80 );
 
 typedef void (*funcptr)(z80_state *z80);
 
@@ -563,7 +563,7 @@ INLINE void BURNODD(z80_state *z80, int cycles, int opcodes, int cyclesum)
 	PC--;														\
 	HALT = 1;													\
 	if( z80->irq_state == CLEAR_LINE )							\
-		z80_burn( z80->icount );								\
+		CPU_BURN_NAME(z80)( z80->device, z80->icount );			\
 }
 
 /***************************************************************
@@ -3638,7 +3638,7 @@ static CPU_EXECUTE( z80 )
 /****************************************************************************
  * Burn 'cycles' T-states. Adjust R register for the lost time
  ****************************************************************************/
-static void z80_burn(int cycles)
+static CPU_BURN( z80 )
 {
 	z80_state *z80 = token;
 	
@@ -3654,14 +3654,14 @@ static void z80_burn(int cycles)
 /****************************************************************************
  * Get all registers in given buffer
  ****************************************************************************/
-static void z80_get_context (void *dst)
+static CPU_GET_CONTEXT( z80 )
 {
 }
 
 /****************************************************************************
  * Set all registers to given values
  ****************************************************************************/
-static void z80_set_context (void *src)
+static CPU_SET_CONTEXT( z80 )
 {
 	z80_state *z80;
 	if( src )
@@ -3699,7 +3699,7 @@ static void set_irq_line(z80_state *z80, int irqline, int state)
  * Generic set_info
  **************************************************************************/
 
-static void z80_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( z80 )
 {
 	z80_state *z80 = token;
 	switch (state)
@@ -3753,7 +3753,7 @@ static void z80_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void z80_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( z80 )
 {
 	z80_state *z80 = token;
 	switch (state)
@@ -3815,15 +3815,15 @@ void z80_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + Z80_HALT:		info->i = z80->halt;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:					info->setinfo = z80_set_info;				break;
-		case CPUINFO_PTR_GET_CONTEXT:				info->getcontext = z80_get_context;			break;
-		case CPUINFO_PTR_SET_CONTEXT:				info->setcontext = z80_set_context;			break;
+		case CPUINFO_PTR_SET_INFO:					info->setinfo = CPU_SET_INFO_NAME(z80);				break;
+		case CPUINFO_PTR_GET_CONTEXT:				info->getcontext = CPU_GET_CONTEXT_NAME(z80);			break;
+		case CPUINFO_PTR_SET_CONTEXT:				info->setcontext = CPU_SET_CONTEXT_NAME(z80);			break;
 		case CPUINFO_PTR_INIT:						info->init = CPU_INIT_NAME(z80);						break;
 		case CPUINFO_PTR_RESET:						info->reset = CPU_RESET_NAME(z80);					break;
 		case CPUINFO_PTR_EXIT:						info->exit = CPU_EXIT_NAME(z80);						break;
 		case CPUINFO_PTR_EXECUTE:					info->execute = CPU_EXECUTE_NAME(z80);				break;
 		case CPUINFO_PTR_BURN:						info->burn = NULL;							break;
-		case CPUINFO_PTR_DISASSEMBLE:				info->disassemble = z80_dasm;				break;
+		case CPUINFO_PTR_DISASSEMBLE:				info->disassemble = CPU_DISASSEMBLE_NAME(z80);				break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:				info->icount = &z80->icount;		break;
 		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_op:	info->p = (void *)cc[Z80_TABLE_op];	break;
 		case CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_cb:	info->p = (void *)cc[Z80_TABLE_cb];	break;

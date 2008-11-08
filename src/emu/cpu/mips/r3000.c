@@ -314,12 +314,12 @@ static void set_irq_line(r3000_state *r3000, int irqline, int state)
     CONTEXT SWITCHING
 ***************************************************************************/
 
-static void r3000_get_context(void *dst)
+static CPU_GET_CONTEXT( r3000 )
 {
 }
 
 
-static void r3000_set_context(void *src)
+static CPU_SET_CONTEXT( r3000 )
 {
 	r3000_state *r3000;
 	
@@ -934,7 +934,7 @@ static CPU_EXECUTE( r3000 )
     DISASSEMBLY HOOK
 ***************************************************************************/
 
-static offs_t r3000_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( r3000 )
 {
 	extern unsigned dasmr3k(char *, unsigned, UINT32);
 	r3000_state *r3000 = token;
@@ -1160,7 +1160,7 @@ static void swr_le(r3000_state *r3000, UINT32 op)
  * Generic set_info
  **************************************************************************/
 
-static void r3000_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( r3000 )
 {
 	r3000_state *r3000 = token;
 	switch (state)
@@ -1219,7 +1219,7 @@ static void r3000_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-static void r3000_get_info(UINT32 state, cpuinfo *info)
+static CPU_GET_INFO( r3000 )
 {
 	r3000_state *r3000 = token;
 	switch (state)
@@ -1294,15 +1294,15 @@ static void r3000_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + R3000_R31:			info->i = r3000->r[31];					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = r3000_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = r3000_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = r3000_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(r3000);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(r3000);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(r3000);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r3000);				break;
 		case CPUINFO_PTR_RESET:							/* provided per-CPU */					break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(r3000);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(r3000);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = r3000_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(r3000);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &r3000->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1357,7 +1357,7 @@ static void r3000_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void r3000be_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( r3000be )
 {
 	switch (state)
 	{
@@ -1370,12 +1370,12 @@ void r3000be_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R3000 (big)");			break;
 
-		default:										r3000_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(r3000);			break;
 	}
 }
 
 
-void r3000le_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( r3000le )
 {
 	switch (state)
 	{
@@ -1388,12 +1388,12 @@ void r3000le_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R3000 (little)");		break;
 
-		default:										r3000_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(r3000);			break;
 	}
 }
 
 
-void r3041be_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( r3041be )
 {
 	switch (state)
 	{
@@ -1406,12 +1406,12 @@ void r3041be_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R3041 (big)");			break;
 
-		default:										r3000_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(r3000);			break;
 	}
 }
 
 
-void r3041le_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( r3041le )
 {
 	switch (state)
 	{
@@ -1424,6 +1424,6 @@ void r3041le_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R3041 (little)");		break;
 
-		default:										r3000_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(r3000);			break;
 	}
 }

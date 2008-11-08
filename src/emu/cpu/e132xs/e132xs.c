@@ -1766,21 +1766,21 @@ static CPU_EXIT( hyperstone )
 	// nothing to do
 }
 
-static void hyperstone_get_context(void *regs)
+static CPU_GET_CONTEXT( hyperstone )
 {
 	/* copy the context */
-	if( regs )
-		*(hyperstone_regs *)regs = hyperstone;
+	if( dst )
+		*(hyperstone_regs *)dst = hyperstone;
 }
 
-static void hyperstone_set_context(void *regs)
+static CPU_SET_CONTEXT( hyperstone )
 {
 	/* copy the context */
-	if (regs)
-		hyperstone = *(hyperstone_regs *)regs;
+	if (src)
+		hyperstone = *(hyperstone_regs *)src;
 }
 
-static offs_t hyperstone_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( hyperstone )
 {
 	return dasm_hyperstone( buffer, pc, oprom, GET_H, GET_FP );
 }
@@ -4800,7 +4800,7 @@ static CPU_EXECUTE( hyperstone )
  * Generic set_info
  **************************************************************************/
 
-static void hyperstone_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( hyperstone )
 {
 	switch (state)
 	{
@@ -4936,7 +4936,7 @@ static void hyperstone_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-static void hyperstone_get_info(UINT32 state, cpuinfo *info)
+static CPU_GET_INFO( hyperstone )
 {
 	switch (state)
 	{
@@ -5080,15 +5080,15 @@ static void hyperstone_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + E132XS_L63:			info->i =  hyperstone.local_regs[63];	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = hyperstone_set_info;	break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = hyperstone_get_context; break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = hyperstone_set_context; break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(hyperstone);	break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(hyperstone); break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(hyperstone); break;
 		case CPUINFO_PTR_INIT:							info->init = NULL;						break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(hyperstone);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(hyperstone);			break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(hyperstone);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = hyperstone_dasm;	break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hyperstone);	break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &hyperstone_ICount;		break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map16 = NULL;	break;
@@ -5238,7 +5238,7 @@ static void hyperstone_get_info(UINT32 state, cpuinfo *info)
 
 
 #if (HAS_E116T)
-void e116t_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( e116t )
 {
 	switch (state)
 	{
@@ -5255,13 +5255,13 @@ void e116t_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-16T");				break;
 
 		default:
-			hyperstone_get_info(state, info);
+			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
 #endif
 
 #if (HAS_E116XT)
-void e116xt_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( e116xt )
 {
 	switch (state)
 	{
@@ -5278,13 +5278,13 @@ void e116xt_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-16XT");				break;
 
 		default:
-			hyperstone_get_info(state, info);
+			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
 #endif
 
 #if (HAS_E116XS)
-void e116xs_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( e116xs )
 {
 	switch (state)
 	{
@@ -5301,13 +5301,13 @@ void e116xs_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-16XS");				break;
 
 		default:
-			hyperstone_get_info(state, info);
+			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
 #endif
 
 #if (HAS_E116XSR)
-void e116xsr_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( e116xsr )
 {
 	switch (state)
 	{
@@ -5324,13 +5324,13 @@ void e116xsr_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-16XSR");			break;
 
 		default:
-			hyperstone_get_info(state, info);
+			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
 #endif
 
 #if (HAS_E132N)
-void e132n_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( e132n )
 {
 	switch (state)
 	{
@@ -5347,13 +5347,13 @@ void e132n_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32N");				break;
 
 		default:
-			hyperstone_get_info(state, info);
+			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
 #endif
 
 #if (HAS_E132T)
-void e132t_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( e132t )
 {
 	switch (state)
 	{
@@ -5370,13 +5370,13 @@ void e132t_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32T");				break;
 
 		default:
-			hyperstone_get_info(state, info);
+			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
 #endif
 
 #if (HAS_E132XN)
-void e132xn_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( e132xn )
 {
 	switch (state)
 	{
@@ -5393,13 +5393,13 @@ void e132xn_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32XN");				break;
 
 		default:
-			hyperstone_get_info(state, info);
+			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
 #endif
 
 #if (HAS_E132XT)
-void e132xt_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( e132xt )
 {
 	switch (state)
 	{
@@ -5416,13 +5416,13 @@ void e132xt_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32XT");				break;
 
 		default:
-			hyperstone_get_info(state, info);
+			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
 #endif
 
 #if (HAS_E132XS)
-void e132xs_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( e132xs )
 {
 	switch (state)
 	{
@@ -5439,13 +5439,13 @@ void e132xs_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32XS");				break;
 
 		default:
-			hyperstone_get_info(state, info);
+			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
 #endif
 
 #if (HAS_E132XSR)
-void e132xsr_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( e132xsr )
 {
 	switch (state)
 	{
@@ -5462,13 +5462,13 @@ void e132xsr_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "E1-32XSR");			break;
 
 		default:
-			hyperstone_get_info(state, info);
+			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
 #endif
 
 #if (HAS_GMS30C2116)
-void gms30c2116_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( gms30c2116 )
 {
 	switch (state)
 	{
@@ -5485,13 +5485,13 @@ void gms30c2116_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "GMS30C2116");			break;
 
 		default:
-			hyperstone_get_info(state, info);
+			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
 #endif
 
 #if (HAS_GMS30C2132)
-void gms30c2132_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( gms30c2132 )
 {
 	switch (state)
 	{
@@ -5508,13 +5508,13 @@ void gms30c2132_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "GMS30C2132");			break;
 
 		default:
-			hyperstone_get_info(state, info);
+			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
 #endif
 
 #if (HAS_GMS30C2216)
-void gms30c2216_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( gms30c2216 )
 {
 	switch (state)
 	{
@@ -5531,13 +5531,13 @@ void gms30c2216_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "GMS30C2216");			break;
 
 		default:
-			hyperstone_get_info(state, info);
+			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
 #endif
 
 #if (HAS_GMS30C2232)
-void gms30c2232_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( gms30c2232 )
 {
 	switch (state)
 	{
@@ -5554,7 +5554,7 @@ void gms30c2232_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "GMS30C2232");			break;
 
 		default:
-			hyperstone_get_info(state, info);
+			CPU_GET_INFO_CALL(hyperstone);
 	}
 }
 #endif

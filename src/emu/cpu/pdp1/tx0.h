@@ -44,13 +44,13 @@ struct _tx0_reset_param_t
 };
 
 /* PUBLIC FUNCTIONS */
-void tx0_64kw_get_info(UINT32 state, cpuinfo *info);
-void tx0_8kw_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( tx0_64kw );
+CPU_GET_INFO( tx0_8kw );
 
 #define READ_TX0_18BIT(A) ((signed)program_read_dword_32be((A)<<2))
 #define WRITE_TX0_18BIT(A,V) (program_write_dword_32be((A)<<2,(V)))
 
-unsigned tx0_dasm_64kw(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-unsigned tx0_dasm_8kw(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( tx0_64kw );
+CPU_DISASSEMBLE( tx0_8kw );
 
 #endif /* __TX0_H__ */

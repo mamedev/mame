@@ -344,7 +344,7 @@ INLINE unsigned int read_16_immediate(void)
 	return result | (*rombase++ << 8);
 }
 
-offs_t spc700_dasm(char *buff, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( spc700 )
 {
 	const opcode_struct* opcode;
 	UINT32 flags = 0;
@@ -356,8 +356,8 @@ offs_t spc700_dasm(char *buff, offs_t pc, const UINT8 *oprom, const UINT8 *opram
 	rombase = oprom;
 	opcode = g_opcodes + read_8_immediate();
 
-	sprintf(buff, "%s ", g_opnames[opcode->name]);
-	ptr = buff + strlen(buff);
+	sprintf(buffer, "%s ", g_opnames[opcode->name]);
+	ptr = buffer + strlen(buffer);
 
 	if (opcode->name == CALL)
 		flags = DASMFLAG_STEP_OVER;

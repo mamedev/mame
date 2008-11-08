@@ -28,8 +28,8 @@ enum
 /****************************************************************************/
 /* Return register contents                                                 */
 /****************************************************************************/
-extern void lr35902_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( lr35902 );
 
-extern unsigned lr35902_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram );
+extern CPU_DISASSEMBLE( lr35902 );
 
 #endif /* __LR35902_H__ */

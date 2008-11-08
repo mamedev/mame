@@ -118,7 +118,7 @@
 #define false 0
 #endif
 
-extern offs_t hd6309_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+extern CPU_DISASSEMBLE( hd6309 );
 
 /*#define BIG_SWITCH*/
 
@@ -494,7 +494,7 @@ static void CHECK_IRQ_LINES( void )
 /****************************************************************************
  * Get all registers in given buffer
  ****************************************************************************/
-static void hd6309_get_context(void *dst)
+static CPU_GET_CONTEXT( hd6309 )
 {
 	if( dst )
 		*(hd6309_Regs*)dst = hd6309;
@@ -503,7 +503,7 @@ static void hd6309_get_context(void *dst)
 /****************************************************************************
  * Set all registers to given values
  ****************************************************************************/
-static void hd6309_set_context(void *src)
+static CPU_SET_CONTEXT( hd6309 )
 {
 	if( src )
 		hd6309 = *(hd6309_Regs*)src;
@@ -1209,7 +1209,7 @@ INLINE void fetch_effective_address( void )
  * Generic set_info
  **************************************************************************/
 
-static void hd6309_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( hd6309 )
 {
 	switch (state)
 	{
@@ -1242,7 +1242,7 @@ static void hd6309_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void hd6309_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( hd6309 )
 {
 	switch (state)
 	{
@@ -1291,15 +1291,15 @@ void hd6309_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + HD6309_DP:			info->i = DP;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = hd6309_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = hd6309_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = hd6309_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(hd6309);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(hd6309);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(hd6309);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(hd6309);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(hd6309);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(hd6309);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(hd6309);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = hd6309_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hd6309);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &hd6309_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

@@ -392,7 +392,7 @@ static void InitDasm32025(void)
 	OpInizialized = 1;
 }
 
-offs_t tms32025_dasm(char *str, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( tms32025 )
 {
 	UINT32 flags = 0;
 	int a, b, c, d, k, m, n, p, r, s, t, w, x;	/* these can all be filled in by parsing an instruction */
@@ -401,7 +401,7 @@ offs_t tms32025_dasm(char *str, offs_t pc, const UINT8 *oprom, const UINT8 *opra
 	int cnt = 1;
 	int code;
 	int bit;
-	char *strtmp;
+	char *buffertmp;
 	const char *cp;				/* character pointer in OpFormats */
 
 	if (!OpInizialized) InitDasm32025();
@@ -422,10 +422,10 @@ offs_t tms32025_dasm(char *str, offs_t pc, const UINT8 *oprom, const UINT8 *opra
 	}
 	if (op == -1)
 	{
-		sprintf(str,"???? dw %04Xh",code);
+		sprintf(buffer,"???? dw %04Xh",code);
 		return cnt | DASMFLAG_SUPPORTED;
 	}
-	strtmp = str;
+	buffertmp = buffer;
 	if (Op[op].extcode)
 	{
 		bit = 31;
@@ -499,13 +499,13 @@ offs_t tms32025_dasm(char *str, offs_t pc, const UINT8 *oprom, const UINT8 *opra
 				default:
 					fatalerror("illegal escape character in format '%s'",Op[op].fmt);
 			}
-			q = num; while (*q) *str++ = *q++;
-			*str = '\0';
+			q = num; while (*q) *buffer++ = *q++;
+			*buffer = '\0';
 		}
 		else
 		{
-			*str++ = *cp++;
-			*str = '\0';
+			*buffer++ = *cp++;
+			*buffer = '\0';
 		}
 	}
 	return cnt | flags | DASMFLAG_SUPPORTED;

@@ -51,7 +51,7 @@ enum
  *  Public Functions
  */
 
-void tms32010_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( tms32010 );
 
 
 
@@ -126,6 +126,6 @@ void tms32010_get_info(UINT32 state, cpuinfo *info);
 
 
 
-offs_t tms32010_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( tms32010 );
 
 #endif	/* __TMS32010_H__ */

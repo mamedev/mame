@@ -984,13 +984,13 @@ static CPU_EXECUTE( v810 )
 	return cycles-v810_ICount;
 }
 
-static void v810_get_context(void *dst)
+static CPU_GET_CONTEXT( v810 )
 {
 	if(dst)
 		*(v810info *)dst = v810;
 }
 
-static void v810_set_context(void *src)
+static CPU_SET_CONTEXT( v810 )
 {
 	if(src)
 		v810 = *(v810info *)src;
@@ -1004,7 +1004,7 @@ static void set_irq_line(int irqline, int state)
  * Generic set_info
  **************************************************************************/
 
-static void v810_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( v810 )
 {
 	switch (state)
 	{
@@ -1085,7 +1085,7 @@ static void v810_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void v810_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( v810 )
 {
 	switch (state)
 	{
@@ -1177,15 +1177,15 @@ void v810_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + V810_ADTRE:			info->i = ADTRE;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = v810_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = v810_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = v810_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(v810);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(v810);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(v810);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(v810);					break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(v810);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = NULL;						break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(v810);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = v810_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(v810);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &v810_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

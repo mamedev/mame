@@ -24,8 +24,8 @@ enum
 /* Fake Sense Line */
 #define S2650_SENSE_PORT 0x102
 
-extern void s2650_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( s2650 );
 
-extern offs_t s2650_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+extern CPU_DISASSEMBLE( s2650 );
 
 #endif /* __S2650_H__ */

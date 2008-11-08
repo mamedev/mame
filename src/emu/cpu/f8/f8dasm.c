@@ -7,7 +7,7 @@ static const char *const rname[16] = {
 	"R8", "J",  "HU", "HL", "KU", "KL", "QU", "QL"
 };
 
-unsigned f8_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( f8 )
 {
 	unsigned size = 0;
 	UINT8 op = oprom[size++];

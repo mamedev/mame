@@ -17,7 +17,7 @@ enum
 };
 
 #if (HAS_SSP1601)
-void ssp1601_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( ssp1601 );
 #endif
 
 extern unsigned dasm_ssp1601(char *buffer, unsigned pc, const UINT8 *oprom);

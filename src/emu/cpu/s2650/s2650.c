@@ -802,13 +802,13 @@ static CPU_EXIT( s2650 )
 	/* nothing to do */
 }
 
-static void s2650_get_context(void *dst)
+static CPU_GET_CONTEXT( s2650 )
 {
 	if( dst )
 		*(s2650_Regs*)dst = S;
 }
 
-static void s2650_set_context(void *src)
+static CPU_SET_CONTEXT( s2650 )
 {
 	if( src )
 	{
@@ -1479,7 +1479,7 @@ static CPU_EXECUTE( s2650 )
  * Generic set_info
  **************************************************************************/
 
-static void s2650_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( s2650 )
 {
 	switch (state)
 	{
@@ -1515,7 +1515,7 @@ static void s2650_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void s2650_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( s2650 )
 {
 	switch (state)
 	{
@@ -1565,15 +1565,15 @@ void s2650_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + S2650_FO:			info->i = s2650_get_flag();				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = s2650_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = s2650_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = s2650_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(s2650);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(s2650);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(s2650);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(s2650);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(s2650);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(s2650);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(s2650);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = s2650_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(s2650);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &s2650_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

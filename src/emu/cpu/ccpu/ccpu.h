@@ -53,9 +53,9 @@ struct _ccpu_config
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-void ccpu_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( ccpu );
 void ccpu_wdt_timer_trigger(void);
 
-offs_t ccpu_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( ccpu );
 
 #endif /* __CCPU_H__ */

@@ -71,7 +71,7 @@ enum
 	CDP1802_I,		// Holds High-Order Instruction Digit
 };
 
-void cdp1802_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( cdp1802 );
 
 typedef cdp1802_control_mode (*cdp1802_mode_read_func)(running_machine *machine);
 #define CDP1802_MODE_READ(name) cdp1802_control_mode name(running_machine *machine)
@@ -115,6 +115,6 @@ struct _cdp1802_interface
 };
 #define CDP1802_INTERFACE(name) const cdp1802_interface (name) =
 
-offs_t cdp1802_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( cdp1802 );
 
 #endif /* __CDP1802_H__ */

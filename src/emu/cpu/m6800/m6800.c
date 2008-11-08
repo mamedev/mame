@@ -903,7 +903,7 @@ static CPU_EXIT( m6800 )
 /****************************************************************************
  * Get all registers in given buffer
  ****************************************************************************/
-static void m6800_get_context(void *dst)
+static CPU_GET_CONTEXT( m6800 )
 {
 	if( dst )
 		*(m6800_Regs*)dst = m68xx;
@@ -913,7 +913,7 @@ static void m6800_get_context(void *dst)
 /****************************************************************************
  * Set all registers to given values
  ****************************************************************************/
-static void m6800_set_context(void *src)
+static CPU_SET_CONTEXT( m6800 )
 {
 	if( src )
 		m68xx = *(m6800_Regs*)src;
@@ -2580,7 +2580,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
  * Generic set_info
  **************************************************************************/
 
-static void m6800_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( m6800 )
 {
 	switch (state)
 	{
@@ -2606,7 +2606,7 @@ static void m6800_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void m6800_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m6800 )
 {
 	switch (state)
 	{
@@ -2649,15 +2649,15 @@ void m6800_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M6800_WAI_STATE:	info->i = m68xx.wai_state;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = m6800_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m6800_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m6800_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6800);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(m6800);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(m6800);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6800);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6800);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m6800);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6800);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6800_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6800);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6800_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2695,7 +2695,7 @@ void m6800_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void m6801_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m6801 )
 {
 	switch (state)
 	{
@@ -2707,12 +2707,12 @@ void m6801_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6801);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6803);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6801_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6801);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M6801");				break;
 
-		default:										m6800_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(m6800);				break;
 	}
 }
 #endif
@@ -2723,7 +2723,7 @@ void m6801_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void m6802_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m6802 )
 {
 	switch (state)
 	{
@@ -2732,12 +2732,12 @@ void m6802_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6802);				break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6802_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6802);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M6802");				break;
 
-		default:										m6800_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(m6800);				break;
 	}
 }
 #endif
@@ -2748,7 +2748,7 @@ void m6802_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void m6803_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m6803 )
 {
 	switch (state)
 	{
@@ -2760,14 +2760,14 @@ void m6803_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6803);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6803);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6803_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6803);			break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = address_map_m6803_mem; break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M6803");				break;
 
-		default:										m6800_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(m6800);				break;
 	}
 }
 #endif
@@ -2778,7 +2778,7 @@ void m6803_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void m6808_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m6808 )
 {
 	switch (state)
 	{
@@ -2787,12 +2787,12 @@ void m6808_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6808);				break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6808_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6808);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M6808");				break;
 
-		default:										m6800_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(m6800);				break;
 	}
 }
 #endif
@@ -2803,7 +2803,7 @@ void m6808_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void hd63701_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( hd63701 )
 {
 	switch (state)
 	{
@@ -2815,12 +2815,12 @@ void hd63701_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(hd63701);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(hd63701);		break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = hd63701_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hd63701);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "HD63701");				break;
 
-		default:										m6800_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(m6800);				break;
 	}
 }
 #endif
@@ -2831,7 +2831,7 @@ void hd63701_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void nsc8105_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( nsc8105 )
 {
 	switch (state)
 	{
@@ -2841,12 +2841,12 @@ void nsc8105_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(nsc8105);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(nsc8105);		break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = nsc8105_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(nsc8105);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "NSC8105");				break;
 
-		default:										m6800_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(m6800);				break;
 	}
 }
 #endif

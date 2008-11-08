@@ -3374,20 +3374,20 @@ static CPU_EXECUTE( sh4 )
 }
 
 /* Get registers, return context size */
-static void sh4_get_context(void *dst)
+static CPU_GET_CONTEXT( sh4 )
 {
 	if( dst )
 		memcpy(dst, &sh4, sizeof(SH4));
 }
 
 /* Set registers */
-static void sh4_set_context(void *src)
+static CPU_SET_CONTEXT( sh4 )
 {
 	if( src )
 		memcpy(&sh4, src, sizeof(SH4));
 }
 
-static offs_t sh4_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( sh4 )
 {
 	return DasmSH4( buffer, pc, (oprom[1] << 8) | oprom[0] );
 }
@@ -3478,7 +3478,7 @@ static CPU_INIT( sh4 )
  * Generic set_info
  **************************************************************************/
 
-static void sh4_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( sh4 )
 {
 	switch (state)
 	{
@@ -3640,7 +3640,7 @@ ADDRESS_MAP_END
  * Generic get_info
  **************************************************************************/
 
-void sh4_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( sh4 )
 {
 	switch (state)
 	{
@@ -3705,14 +3705,14 @@ void sh4_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + SH4_EA:				info->i = sh4.ea;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = sh4_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = sh4_get_context;		break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = sh4_set_context;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(sh4);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(sh4);		break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(sh4);		break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(sh4);					break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(sh4);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(sh4);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = sh4_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(sh4);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sh4.sh4_icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

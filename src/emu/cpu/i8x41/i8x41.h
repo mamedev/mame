@@ -96,8 +96,8 @@ enum
  *  Public Functions
  */
 
-extern void i8x41_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( i8x41 );
 
-extern offs_t i8x41_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+extern CPU_DISASSEMBLE( i8x41 );
 
 #endif /* __I8X41_H__ */

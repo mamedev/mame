@@ -336,7 +336,7 @@ static void InitDasm8201(void)
 	OpInizialized = 1;
 }
 
-offs_t ALPHA8201_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( ALPHA8201 )
 {
 	offs_t dasmflags = 0;
 	int i;

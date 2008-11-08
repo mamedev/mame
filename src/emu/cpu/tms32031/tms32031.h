@@ -69,8 +69,8 @@ enum
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-extern void tms32031_get_info(UINT32 state, cpuinfo *info);
-extern void tms32032_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( tms32031 );
+extern CPU_GET_INFO( tms32032 );
 
 extern float convert_tms3203x_fp_to_float(UINT32 floatdata);
 extern double convert_tms3203x_fp_to_double(UINT32 floatdata);

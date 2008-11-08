@@ -328,7 +328,7 @@ static CPU_EXECUTE( lr35902 )
 	return cycles - lr35902_ICount;
 }
 
-static void lr35902_burn(int cycles)
+static CPU_BURN( lr35902 )
 {
     if( cycles > 0 )
     {
@@ -341,7 +341,7 @@ static void lr35902_burn(int cycles)
 /****************************************************************************/
 /* Set all registers to given values                                        */
 /****************************************************************************/
-static void lr35902_set_context (void *src)
+static CPU_SET_CONTEXT( lr35902 )
 {
 	if( src )
 		Regs = *(lr35902_regs *)src;
@@ -351,7 +351,7 @@ static void lr35902_set_context (void *src)
 /****************************************************************************/
 /* Get all registers in given buffer                                        */
 /****************************************************************************/
-static void lr35902_get_context (void *dst)
+static CPU_GET_CONTEXT( lr35902 )
 {
 	if( dst )
 		*(lr35902_regs *)dst = Regs;
@@ -389,7 +389,7 @@ static void lr35902_clear_pending_interrupts (void)
 }
 #endif
 
-static void lr35902_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( lr35902 )
 {
 	switch (state)
 	{
@@ -415,7 +415,7 @@ static void lr35902_set_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void lr35902_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( lr35902 )
 {
 	switch (state)
 	{
@@ -462,14 +462,14 @@ void lr35902_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_INT_REGISTER + LR35902_SPEED:		info->i = 0x7E | ( ( Regs.w.gb_speed - 1 ) << 7 ) | Regs.w.gb_speed_change_pending; break;
 
 	/* --- the following bits of info are returned as pointers to data or functions --- */
-	case CPUINFO_PTR_SET_INFO:						info->setinfo = lr35902_set_info;		break;
-	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = lr35902_get_context;	break;
-	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = lr35902_set_context;	break;
+	case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(lr35902);		break;
+	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(lr35902);	break;
+	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(lr35902);	break;
 	case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(lr35902);				break;
 	case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(lr35902);			break;
 	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(lr35902);		break;
-	case CPUINFO_PTR_BURN:							info->burn = lr35902_burn;				break;
-	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = lr35902_dasm;		break;
+	case CPUINFO_PTR_BURN:							info->burn = CPU_BURN_NAME(lr35902);				break;
+	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(lr35902);		break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &lr35902_ICount;			break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */

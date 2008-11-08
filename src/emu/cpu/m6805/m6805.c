@@ -475,7 +475,7 @@ static CPU_EXIT( m6805 )
 /****************************************************************************
  * Get all registers in given buffer
  ****************************************************************************/
-static void m6805_get_context(void *dst)
+static CPU_GET_CONTEXT( m6805 )
 {
 	if( dst )
 		*(m6805_Regs*)dst = m6805;
@@ -485,7 +485,7 @@ static void m6805_get_context(void *dst)
 /****************************************************************************
  * Set all registers to given values
  ****************************************************************************/
-static void m6805_set_context(void *src)
+static CPU_SET_CONTEXT( m6805 )
 {
 	if( src )
 	{
@@ -880,7 +880,7 @@ static void hd63705_set_irq_line(int irqline, int state)
  * Generic set_info
  **************************************************************************/
 
-static void m6805_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( m6805 )
 {
 	switch (state)
 	{
@@ -903,7 +903,7 @@ static void m6805_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void m6805_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m6805 )
 {
 	switch (state)
 	{
@@ -942,15 +942,15 @@ void m6805_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M6805_CC:			info->i = CC;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = m6805_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m6805_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m6805_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6805);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(m6805);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(m6805);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6805);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6805);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m6805);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6805);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6805_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6805);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6805_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -985,18 +985,18 @@ void m6805_get_info(UINT32 state, cpuinfo *info)
 /**************************************************************************
  * CPU-specific set_info
  **************************************************************************/
-static void m68705_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( m68705 )
 {
 	switch(state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_INPUT_STATE + M68705_INT_TIMER:	m68705_set_irq_line(M68705_INT_TIMER, info->i); break;
 
-		default:										m6805_set_info(state,info);				break;
+		default:										CPU_SET_INFO_CALL(m6805);				break;
 	}
 }
 
-void m68705_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m68705 )
 {
 	switch (state)
 	{
@@ -1004,14 +1004,14 @@ void m68705_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_STATE + M68705_INT_TIMER:	info->i = m6805.irq_state[M68705_INT_TIMER]; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = m68705_set_info;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m68705);		break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m68705);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m68705);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M68705");				break;
 
-		default:										m6805_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(m6805);				break;
 	}
 }
 #endif
@@ -1022,7 +1022,7 @@ void m68705_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-static void hd63705_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( hd63705 )
 {
 	switch (state)
 	{
@@ -1037,11 +1037,11 @@ static void hd63705_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_STATE + HD63705_INT_ADCONV:	hd63705_set_irq_line(HD63705_INT_ADCONV, info->i); break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		hd63705_set_irq_line(INPUT_LINE_NMI, info->i); break;
 
-		default:											m6805_set_info(state, info);		break;
+		default:											CPU_SET_INFO_CALL(m6805);				break;
 	}
 }
 
-void hd63705_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( hd63705 )
 {
 	switch (state)
 	{
@@ -1059,7 +1059,7 @@ void hd63705_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = hd63705_set_info;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(hd63705);		break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(hd63705);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(hd63705);			break;
 
@@ -1068,7 +1068,7 @@ void hd63705_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Keith Wilkins, Juergen Buchmueller"); break;
 
-		default:										m6805_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(m6805);				break;
 	}
 }
 #endif

@@ -362,7 +362,7 @@ static const char *const m6809_regs_te[16] =
 	"A", "B", "CC", "DP", "inv", "inv", "inv", "inv"
 };
 
-offs_t m6809_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( m6809 )
 {
 	UINT8 opcode, mode, pb, pbm, reg;
 	const UINT8 *operandarray;

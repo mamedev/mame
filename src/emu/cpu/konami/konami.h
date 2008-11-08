@@ -22,7 +22,7 @@ enum
 #define KONAMI_FIRQ_LINE 1   /* FIRQ line number */
 
 /* PUBLIC FUNCTIONS */
-void konami_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( konami );
 
 /****************************************************************************/
 /* Read a byte from given memory location                                   */
@@ -55,6 +55,6 @@ void konami_get_info(UINT32 state, cpuinfo *info);
 #    define TRUE (!FALSE)
 #endif
 
-offs_t konami_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( konami );
 
 #endif /* __KONAMI_H__ */

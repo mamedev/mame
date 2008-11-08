@@ -6,6 +6,6 @@
 #include "i86intf.h"
 
 /* Public functions */
-void i8088_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( i8088 );
 
 #endif /* __I88INTF_H__ */

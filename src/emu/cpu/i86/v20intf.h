@@ -8,6 +8,6 @@
 #include "v30intrf.h"
 
 /* Public functions */
-void v20_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( v20 );
 
 #endif /* __V20INTF_H__ */

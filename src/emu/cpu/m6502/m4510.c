@@ -237,11 +237,11 @@ static CPU_EXIT( m4510 )
 	/* nothing to do yet */
 }
 
-static void m4510_get_context (void *dst)
+static CPU_GET_CONTEXT( m4510 )
 {
 }
 
-static void m4510_set_context (void *src)
+static CPU_SET_CONTEXT( m4510 )
 {
 	m4510_Regs *m4510;
 	if( src )
@@ -397,12 +397,12 @@ static ADDRESS_MAP_START(m4510_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x0000, 0x0001) AM_READWRITE(m4510_read_0000, m4510_write_0000)
 ADDRESS_MAP_END
 
-static int m4510_translate(int space, int intention, offs_t *addr)
+static CPU_TRANSLATE( m4510 )
 {
 	m4510_Regs *m4510 = token;
 	
 	if (space == ADDRESS_SPACE_PROGRAM)
-		*addr = M4510_MEM(*addr);
+		*address = M4510_MEM(*address);
 	return TRUE;
 }
 
@@ -410,7 +410,7 @@ static int m4510_translate(int space, int intention, offs_t *addr)
  * Generic set_info
  **************************************************************************/
 
-static void m4510_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( m4510 )
 {
 	m4510_Regs *m4510 = token;
 	
@@ -457,7 +457,7 @@ static void m4510_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void m4510_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m4510 )
 {
 	m4510_Regs *m4510 = token;
 	
@@ -517,18 +517,18 @@ void m4510_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_M6510_PORT:					info->i = m4510_get_port(m4510);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = m4510_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m4510_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m4510_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m4510);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(m4510);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(m4510);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m4510);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m4510);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m4510);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m4510);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m4510_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m4510);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m4510->icount;			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:			info->internal_map8 = address_map_m4510_mem; break;
-		case CPUINFO_PTR_TRANSLATE:						info->translate = m4510_translate;		break;
+		case CPUINFO_PTR_TRANSLATE:						info->translate = CPU_TRANSLATE_NAME(m4510);		break;
 		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	info->f = (genf *) m4510->rdmem_id;		break;
 		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) m4510->wrmem_id;		break;
 		case CPUINFO_PTR_M6510_PORTREAD:				info->f = (genf *) m4510->port_read;		break;

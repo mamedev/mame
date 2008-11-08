@@ -104,32 +104,32 @@ void pic16c5x_config(int data);
 
 
 #if (HAS_PIC16C54)
-void pic16C54_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( pic16C54 );
 #endif
 
 
 #if (HAS_PIC16C55)
-void pic16C55_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( pic16C55 );
 #endif
 
 
 #if (HAS_PIC16C56)
-void pic16C56_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( pic16C56 );
 #endif
 
 
 #if (HAS_PIC16C57)
-void pic16C57_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( pic16C57 );
 #endif
 
 
 #if (HAS_PIC16C58)
-void pic16C58_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( pic16C58 );
 #endif
 
 
 #if (HAS_PIC16C54) || (HAS_PIC16C55) || (HAS_PIC16C56) || (HAS_PIC16C57) || (HAS_PIC16C58)
-offs_t pic16C5x_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( pic16C5x );
 #endif
 
 

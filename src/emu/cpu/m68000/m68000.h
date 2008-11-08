@@ -72,7 +72,7 @@ struct _m68k_encryption_interface
 #define MC68000_INT_ACK_AUTOVECTOR    -1
 #define MC68000_INT_ACK_SPURIOUS      -2
 
-void m68000_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( m68000 );
 extern void m68000_memory_interface_set(int Entry,void * memory_routine);
 
 /****************************************************************************
@@ -89,7 +89,7 @@ extern void m68000_memory_interface_set(int Entry,void * memory_routine);
 #define MC68008_INT_ACK_AUTOVECTOR		MC68000_INT_ACK_AUTOVECTOR
 #define MC68008_INT_ACK_SPURIOUS		MC68000_INT_ACK_SPURIOUS
 
-void m68008_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( m68008 );
 #endif
 
 /****************************************************************************
@@ -106,7 +106,7 @@ void m68008_get_info(UINT32 state, cpuinfo *info);
 #define MC68010_INT_ACK_AUTOVECTOR		MC68000_INT_ACK_AUTOVECTOR
 #define MC68010_INT_ACK_SPURIOUS		MC68000_INT_ACK_SPURIOUS
 
-void m68010_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( m68010 );
 #endif
 
 /****************************************************************************
@@ -123,7 +123,7 @@ void m68010_get_info(UINT32 state, cpuinfo *info);
 #define MC68EC020_INT_ACK_AUTOVECTOR	MC68000_INT_ACK_AUTOVECTOR
 #define MC68EC020_INT_ACK_SPURIOUS		MC68000_INT_ACK_SPURIOUS
 
-void m68ec020_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( m68ec020 );
 #endif
 
 /****************************************************************************
@@ -140,7 +140,7 @@ void m68ec020_get_info(UINT32 state, cpuinfo *info);
 #define MC68020_INT_ACK_AUTOVECTOR		MC68000_INT_ACK_AUTOVECTOR
 #define MC68020_INT_ACK_SPURIOUS		MC68000_INT_ACK_SPURIOUS
 
-void m68020_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( m68020 );
 #endif
 
 /****************************************************************************
@@ -157,7 +157,7 @@ void m68020_get_info(UINT32 state, cpuinfo *info);
 #define MC68040_INT_ACK_AUTOVECTOR		MC68000_INT_ACK_AUTOVECTOR
 #define MC68040_INT_ACK_SPURIOUS		MC68000_INT_ACK_SPURIOUS
 
-void m68040_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( m68040 );
 #endif
 
 // C Core header

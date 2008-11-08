@@ -129,8 +129,8 @@ extern UINT8 z180_readmem(offs_t offset);
 extern void z180_writemem(offs_t offset, UINT8 data);
 extern void z180_setOPbase(int pc);
 
-extern void z180_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( z180 );
 
-offs_t z180_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( z180 );
 
 #endif /* __Z180_H__ */

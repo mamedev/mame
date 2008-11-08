@@ -434,7 +434,7 @@ static CPU_EXECUTE( arm )
 } /* arm_execute */
 
 
-static void arm_get_context(void *dst)
+static CPU_GET_CONTEXT( arm )
 {
 	if( dst )
 	{
@@ -442,7 +442,7 @@ static void arm_get_context(void *dst)
 	}
 }
 
-static void arm_set_context(void *src)
+static CPU_SET_CONTEXT( arm )
 {
 	if (src)
 	{
@@ -506,7 +506,7 @@ static void set_irq_line(int irqline, int state)
 	arm_check_irq_state();
 }
 
-static offs_t arm_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( arm )
 {
 	UINT32 opcode = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
 	return 4 | arm_disasm(buffer, pc, opcode);
@@ -1414,7 +1414,7 @@ static void HandleCoPro( UINT32 insn)
  * Generic set_info
  **************************************************************************/
 
-static void arm_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( arm )
 {
 	switch (state)
 	{
@@ -1462,7 +1462,7 @@ static void arm_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void arm_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( arm )
 {
 	switch (state)
 	{
@@ -1526,15 +1526,15 @@ void arm_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + ARM32_SR14:			info->i = arm.sArmRegister[eR14_SVC];	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = arm_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = arm_get_context;		break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = arm_set_context;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(arm);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(arm);		break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(arm);		break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(arm);					break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(arm);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(arm);					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(arm);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = arm_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(arm);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &arm_icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

@@ -2045,7 +2045,7 @@ static CPU_EXECUTE( i8x41 )
  *  Get all registers in given buffer
  ****************************************************************************/
 
-static void i8x41_get_context(void *dst)
+static CPU_GET_CONTEXT( i8x41 )
 {
 	if( dst )
 		memcpy(dst, &i8x41, sizeof(I8X41));
@@ -2056,7 +2056,7 @@ static void i8x41_get_context(void *dst)
  *  Set all registers to given values
  ****************************************************************************/
 
-static void i8x41_set_context(void *src)
+static CPU_SET_CONTEXT( i8x41 )
 {
 	if( src )
 		memcpy(&i8x41, src, sizeof(I8X41));
@@ -2117,7 +2117,7 @@ static void set_irq_line(int irqline, int state)
  * Generic set_info
  **************************************************************************/
 
-static void i8x41_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( i8x41 )
 {
 	switch (state)
 	{
@@ -2207,7 +2207,7 @@ static void i8x41_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void i8x41_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( i8x41 )
 {
 	switch (state)
 	{
@@ -2280,15 +2280,15 @@ void i8x41_get_info(UINT32 state, cpuinfo *info)
 			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = i8x41_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = i8x41_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = i8x41_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(i8x41);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(i8x41);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(i8x41);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8x41);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(i8x41);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(i8x41);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i8x41);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i8x41_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i8x41);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &i8x41_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

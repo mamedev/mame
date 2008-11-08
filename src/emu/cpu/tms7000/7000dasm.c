@@ -358,7 +358,7 @@ static const opcodeinfo opcodes[] = {
 	{0x00, "NOP", 23, 0 }
 };
 
-unsigned tms7000_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram )
+CPU_DISASSEMBLE( tms7000 )
 {
 	int opcode, i, size = 1;
 	int pos = 0;

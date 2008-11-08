@@ -179,18 +179,18 @@ static CPU_EXECUTE( m68000 )
 	return m68k_execute(device->token, cycles);
 }
 
-static void m68000_get_context(void *dst)
+static CPU_GET_CONTEXT( m68000 )
 {
 }
 
-static void m68000_set_context(void *src)
+static CPU_SET_CONTEXT( m68000 )
 {
 	if (m68k_memory_intf.read8 != program_read_byte_16be)
 		m68k_memory_intf = interface_d16;
 	token = src;
 }
 
-static offs_t m68000_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( m68000 )
 {
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68000);
 }
@@ -226,18 +226,18 @@ static CPU_EXECUTE( m68008 )
 	return m68k_execute(device->token, cycles);
 }
 
-static void m68008_get_context(void *dst)
+static CPU_GET_CONTEXT( m68008 )
 {
 }
 
-static void m68008_set_context(void *src)
+static CPU_SET_CONTEXT( m68008 )
 {
 	if (m68k_memory_intf.read8 != program_read_byte_8be)
 		m68k_memory_intf = interface_d8;
 	token = src;
 }
 
-static offs_t m68008_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( m68008 )
 {
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68008);
 }
@@ -260,7 +260,7 @@ static CPU_INIT( m68010 )
 	m68k_set_int_ack_callback(m68k, (void *)device, (int (*)(void *param, int int_level)) irqcallback);
 }
 
-static offs_t m68010_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( m68010 )
 {
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68010);
 }
@@ -297,18 +297,18 @@ static CPU_EXECUTE( m68020 )
 	return m68k_execute(device->token, cycles);
 }
 
-static void m68020_get_context(void *dst)
+static CPU_GET_CONTEXT( m68020 )
 {
 }
 
-static void m68020_set_context(void *src)
+static CPU_SET_CONTEXT( m68020 )
 {
 	if (m68k_memory_intf.read8 != program_read_byte_32be)
 		m68k_memory_intf = interface_d32;
 	token = src;
 }
 
-static offs_t m68020_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( m68020 )
 {
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68020);
 }
@@ -330,7 +330,7 @@ static CPU_INIT( m68ec020 )
 	m68k_set_int_ack_callback(m68k, (void *)device, (int (*)(void *param, int int_level)) irqcallback);
 }
 
-static offs_t m68ec020_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( m68ec020 )
 {
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68EC020);
 }
@@ -368,18 +368,18 @@ static CPU_EXECUTE( m68040 )
 	return m68k_execute(device->token, cycles);
 }
 
-static void m68040_get_context(void *dst)
+static CPU_GET_CONTEXT( m68040 )
 {
 }
 
-static void m68040_set_context(void *src)
+static CPU_SET_CONTEXT( m68040 )
 {
 	if (m68k_memory_intf.read8 != program_read_byte_32be)
 		m68k_memory_intf = interface_d32;
 	token = src;
 }
 
-static offs_t m68040_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( m68040 )
 {
 	return m68k_disassemble_raw(buffer, pc, oprom, opram, M68K_CPU_TYPE_68040);
 }
@@ -390,7 +390,7 @@ static offs_t m68040_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UIN
  * Generic set_info
  **************************************************************************/
 
-static void m68000_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( m68000 )
 {
 	m68ki_cpu_core *m68k = token;
 	switch (state)
@@ -442,7 +442,7 @@ static void m68000_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void m68000_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m68000 )
 {
 	m68ki_cpu_core *m68k = token;
 	int sr;
@@ -509,15 +509,15 @@ void m68000_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M68K_PREF_DATA:		info->i = m68k_get_reg(m68k, M68K_REG_PREF_DATA); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = m68000_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m68000_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m68000_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m68000);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(m68000);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(m68000);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m68000);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m68000);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m68000);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m68000);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m68000_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m68000);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m68k->remaining_cycles;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -576,7 +576,7 @@ void m68000_get_info(UINT32 state, cpuinfo *info)
 
 #if HAS_M68008
 
-static void m68008_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( m68008 )
 {
 	m68ki_cpu_core *m68k = token;
 	switch (state)
@@ -622,7 +622,7 @@ static void m68008_set_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void m68008_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m68008 )
 {
 	m68ki_cpu_core *m68k = token;
 	int sr;
@@ -689,15 +689,15 @@ void m68008_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M68K_PREF_DATA:		info->i = m68k_get_reg(m68k, M68K_REG_PREF_DATA); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = m68008_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m68008_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m68008_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m68008);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(m68008);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(m68008);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m68008);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m68008);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m68008);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m68008);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m68008_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m68008);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m68k->remaining_cycles;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -761,7 +761,7 @@ void m68008_get_info(UINT32 state, cpuinfo *info)
  **************************************************************************/
 #if HAS_M68010
 
-static void m68010_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( m68010 )
 {
 	m68ki_cpu_core *m68k = token;
 	switch (state)
@@ -771,11 +771,11 @@ static void m68010_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M68K_SFC:  			m68k_set_reg(m68k, M68K_REG_SFC, info->i);	break;
 		case CPUINFO_INT_REGISTER + M68K_DFC:  			m68k_set_reg(m68k, M68K_REG_DFC, info->i);	break;
 
-		default:										m68000_set_info(state, info);			break;
+		default:										CPU_SET_INFO_CALL(m68000);					break;
 	}
 }
 
-void m68010_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m68010 )
 {
 	m68ki_cpu_core *m68k = token;
 	switch (state)
@@ -786,9 +786,9 @@ void m68010_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M68K_DFC:  			info->i = m68k_get_reg(m68k, M68K_REG_DFC); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = m68010_set_info;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m68010);		break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m68010);				break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m68010_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m68010);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "68010");				break;
@@ -796,7 +796,7 @@ void m68010_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_REGISTER + M68K_DFC:			sprintf(info->s, "DFC:%X",   m68k_get_reg(m68k, M68K_REG_DFC)); break;
 		case CPUINFO_STR_REGISTER + M68K_VBR:			sprintf(info->s, "VBR:%08X", m68k_get_reg(m68k, M68K_REG_VBR)); break;
 
-		default:										m68000_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(m68000);					break;
 	}
 }
 
@@ -806,7 +806,7 @@ void m68010_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-static void m68020_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( m68020 )
 {
 	m68ki_cpu_core *m68k = token;
 	switch (state)
@@ -858,7 +858,7 @@ static void m68020_set_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void m68020_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m68020 )
 {
 	m68ki_cpu_core *m68k = token;
 	int sr;
@@ -931,15 +931,15 @@ void m68020_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M68K_DFC:			info->i = m68k_get_reg(m68k, M68K_REG_DFC); /* 68010+ */ break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = m68020_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m68020_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m68020_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m68020);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(m68020);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(m68020);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m68020);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m68020);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m68020);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m68020);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m68020_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m68020);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m68k->remaining_cycles;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1008,7 +1008,7 @@ void m68020_get_info(UINT32 state, cpuinfo *info)
  **************************************************************************/
 #if HAS_M68EC020
 
-static void m68ec020_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( m68ec020 )
 {
 	m68ki_cpu_core *m68k = token;
 	switch (state)
@@ -1016,11 +1016,11 @@ static void m68ec020_set_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_PC:  							m68k_set_reg(m68k, M68K_REG_PC, info->i&0x00ffffff); break;
 
-		default:										m68020_set_info(state, info);			break;
+		default:										CPU_SET_INFO_CALL(m68020);					break;
 	}
 }
 
-void m68ec020_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m68ec020 )
 {
 	m68ki_cpu_core *m68k = token;
 	switch (state)
@@ -1030,14 +1030,14 @@ void m68ec020_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_PC:							info->i = m68k_get_reg(m68k, M68K_REG_PC)&0x00ffffff; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = m68ec020_set_info;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m68ec020);		break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m68ec020);				break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m68ec020_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m68ec020);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "68EC020");				break;
 
-		default:										m68020_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(m68020);					break;
 	}
 }
 
@@ -1048,7 +1048,7 @@ void m68ec020_get_info(UINT32 state, cpuinfo *info)
  **************************************************************************/
 
 #if HAS_M68040
-static void m68040_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( m68040 )
 {
 	m68ki_cpu_core *m68k = token;
 	switch (state)
@@ -1100,7 +1100,7 @@ static void m68040_set_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void m68040_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m68040 )
 {
 	m68ki_cpu_core *m68k = token;
 	int sr;
@@ -1173,15 +1173,15 @@ void m68040_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M68K_DFC:			info->i = m68k_get_reg(m68k, M68K_REG_DFC); /* 68010+ */ break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = m68040_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m68040_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m68040_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m68040);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(m68040);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(m68040);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m68040);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m68040);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m68040);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m68040);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m68040_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m68040);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m68k->remaining_cycles;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

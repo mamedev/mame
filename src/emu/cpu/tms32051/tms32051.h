@@ -4,9 +4,9 @@
 #define __TMS32051_H__
 
 #if (HAS_TMS32051)
-void tms32051_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( tms32051 );
 #endif
 
-offs_t tms32051_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( tms32051 );
 
 #endif /* __TMS32051_H__ */

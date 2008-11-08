@@ -11,7 +11,7 @@ enum { M6805_PC=1, M6805_S, M6805_CC, M6805_A, M6805_X, M6805_IRQ_STATE };
 
 #define M6805_IRQ_LINE		0
 
-extern void m6805_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( m6805 );
 
 /****************************************************************************
  * 68705 section
@@ -28,7 +28,7 @@ extern void m6805_get_info(UINT32 state, cpuinfo *info);
 #define M68705_IRQ_LINE				M6805_IRQ_LINE
 #define M68705_INT_TIMER			0x01
 
-extern void m68705_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( m68705 );
 #endif
 
 /****************************************************************************
@@ -57,7 +57,7 @@ extern void m68705_get_info(UINT32 state, cpuinfo *info);
 #define	HD63705_INT_ADCONV			0x07
 #define HD63705_INT_NMI				0x08
 
-extern void hd63705_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( hd63705 );
 #endif
 
 /****************************************************************************/
@@ -84,6 +84,6 @@ extern void hd63705_get_info(UINT32 state, cpuinfo *info);
 /****************************************************************************/
 #define M6805_RDOP_ARG(Addr) ((unsigned)cpu_readop_arg(Addr))
 
-offs_t m6805_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( m6805 );
 
 #endif /* __M6805_H__ */

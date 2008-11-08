@@ -51,6 +51,6 @@ struct _mb86233_cpu_core
 	const char *tablergn;
 };
 
-extern void mb86233_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( mb86233 );
 
 #endif /* __MB86233_H__ */

@@ -15,6 +15,6 @@ enum
         MINX_XI, MINX_YI,
 };
 
-extern unsigned minx_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram );
+extern CPU_DISASSEMBLE( minx );
 
 #endif /* __MINX_H__ */

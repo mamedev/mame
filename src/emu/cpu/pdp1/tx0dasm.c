@@ -2,7 +2,7 @@
 #include <string.h>
 #include "cpu/pdp1/tx0.h"
 
-unsigned tx0_dasm_64kw(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( tx0_64kw )
 {
 	int md;
 	int x;
@@ -28,7 +28,7 @@ unsigned tx0_dasm_64kw(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 
 	return 1;
 }
 
-unsigned tx0_dasm_8kw(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( tx0_8kw )
 {
 	int md;
 	int x;

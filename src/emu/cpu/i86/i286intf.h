@@ -43,6 +43,6 @@ enum
 };
 
 /* Public functions */
-void i80286_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( i80286 );
 
 #endif /* __I286INTF_H__ */

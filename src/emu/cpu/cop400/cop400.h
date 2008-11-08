@@ -82,25 +82,25 @@ struct _cop400_interface
 */
 
 /* COP 41x */
-extern void cop401_get_info(UINT32 state, cpuinfo *info);
-extern void cop410_get_info(UINT32 state, cpuinfo *info);
-extern void cop411_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( cop401 );
+extern CPU_GET_INFO( cop410 );
+extern CPU_GET_INFO( cop411 );
 
 /* COP 42x */
-extern void cop402_get_info(UINT32 state, cpuinfo *info);
-extern void cop420_get_info(UINT32 state, cpuinfo *info);
-extern void cop421_get_info(UINT32 state, cpuinfo *info);
-extern void cop422_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( cop402 );
+extern CPU_GET_INFO( cop420 );
+extern CPU_GET_INFO( cop421 );
+extern CPU_GET_INFO( cop422 );
 
 /* COP 44x */
-extern void cop404_get_info(UINT32 state, cpuinfo *info);
-extern void cop424_get_info(UINT32 state, cpuinfo *info);
-extern void cop425_get_info(UINT32 state, cpuinfo *info);
-extern void cop426_get_info(UINT32 state, cpuinfo *info);
-extern void cop444_get_info(UINT32 state, cpuinfo *info);
-extern void cop445_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( cop404 );
+extern CPU_GET_INFO( cop424 );
+extern CPU_GET_INFO( cop425 );
+extern CPU_GET_INFO( cop426 );
+extern CPU_GET_INFO( cop444 );
+extern CPU_GET_INFO( cop445 );
 
-offs_t cop410_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-offs_t cop420_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( cop410 );
+CPU_DISASSEMBLE( cop420 );
 
 #endif  /* __COP400__ */

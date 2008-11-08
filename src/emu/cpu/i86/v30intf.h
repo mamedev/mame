@@ -6,6 +6,6 @@
 #include "i86intf.h"
 
 /* Public functions */
-void v30_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( v30 );
 
 #endif /* __V30INTF_H__ */

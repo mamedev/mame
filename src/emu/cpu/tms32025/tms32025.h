@@ -70,10 +70,10 @@ enum
  *  Public Functions
  */
 
-extern void tms32025_get_info(UINT32 state, cpuinfo *info);
-extern void tms32026_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( tms32025 );
+extern CPU_GET_INFO( tms32026 );
 
 
-offs_t tms32025_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( tms32025 );
 
 #endif	/* __TMS32025_H__ */

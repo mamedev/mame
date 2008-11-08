@@ -203,7 +203,7 @@ static void InitDasm8039(void)
 	OpInizialized = 1;
 }
 
-offs_t mcs48_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( mcs48 )
 {
 	int b, a, d, r, p;	/* these can all be filled in by parsing an instruction */
 	int i;

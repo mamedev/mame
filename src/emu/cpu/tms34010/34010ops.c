@@ -16,9 +16,9 @@
 #define ZEXTEND(val,width) if (width) (val) &= ((UINT32)0xffffffff >> (32 - (width)))
 #define SEXTEND(val,width) if (width) (val) = (INT32)((val) << (32 - (width))) >> (32 - (width))
 
-#define SXYTOL(val)	((((INT16)(val).y * state.convsp) + ((INT16)(val).x << state.pixelshift)) + OFFSET)
-#define DXYTOL(val)	((((INT16)(val).y * state.convdp) + ((INT16)(val).x << state.pixelshift)) + OFFSET)
-#define MXYTOL(val)	((((INT16)(val).y * state.convmp) + ((INT16)(val).x << state.pixelshift)) + OFFSET)
+#define SXYTOL(val)	((((INT16)(val).y * tms.convsp) + ((INT16)(val).x << tms.pixelshift)) + OFFSET)
+#define DXYTOL(val)	((((INT16)(val).y * tms.convdp) + ((INT16)(val).x << tms.pixelshift)) + OFFSET)
+#define MXYTOL(val)	((((INT16)(val).y * tms.convmp) + ((INT16)(val).x << tms.pixelshift)) + OFFSET)
 
 #define COUNT_CYCLES(x)	tms34010_ICount -= x
 #define COUNT_UNKNOWN_CYCLES(x) COUNT_CYCLES(x)
@@ -33,28 +33,28 @@
 
 #define SIGN(val)			((val) & 0x80000000)
 
-#define CLR_Z					state.st &= ~STBIT_Z
-#define CLR_V					state.st &= ~STBIT_V
-#define CLR_C					state.st &= ~STBIT_C
-#define CLR_N					state.st &= ~STBIT_N
-#define CLR_NZ					state.st &= ~(STBIT_N | STBIT_Z)
-#define CLR_CZ					state.st &= ~(STBIT_C | STBIT_Z)
-#define CLR_ZV					state.st &= ~(STBIT_Z | STBIT_V)
-#define CLR_NZV					state.st &= ~(STBIT_N | STBIT_Z | STBIT_V)
-#define CLR_NCZ					state.st &= ~(STBIT_N | STBIT_C | STBIT_Z)
-#define CLR_NCZV				state.st &= ~(STBIT_N | STBIT_C | STBIT_Z | STBIT_V)
+#define CLR_Z					tms.st &= ~STBIT_Z
+#define CLR_V					tms.st &= ~STBIT_V
+#define CLR_C					tms.st &= ~STBIT_C
+#define CLR_N					tms.st &= ~STBIT_N
+#define CLR_NZ					tms.st &= ~(STBIT_N | STBIT_Z)
+#define CLR_CZ					tms.st &= ~(STBIT_C | STBIT_Z)
+#define CLR_ZV					tms.st &= ~(STBIT_Z | STBIT_V)
+#define CLR_NZV					tms.st &= ~(STBIT_N | STBIT_Z | STBIT_V)
+#define CLR_NCZ					tms.st &= ~(STBIT_N | STBIT_C | STBIT_Z)
+#define CLR_NCZV				tms.st &= ~(STBIT_N | STBIT_C | STBIT_Z | STBIT_V)
 
-#define SET_V_BIT_LO(val,bit)	state.st |= ((val) << (28 - (bit))) & STBIT_V
-#define SET_V_BIT_HI(val,bit)	state.st |= ((val) >> ((bit) - 28)) & STBIT_V
-#define SET_V_LOG(val)			state.st |= (val) << 28
-#define SET_Z_BIT_LO(val,bit)	state.st |= ((val) << (29 - (bit))) & STBIT_Z
-#define SET_Z_BIT_HI(val,bit)	state.st |= ((val) >> ((bit) - 29)) & STBIT_Z
-#define SET_Z_LOG(val)			state.st |= (val) << 29
-#define SET_C_BIT_LO(val,bit)	state.st |= ((val) << (30 - (bit))) & STBIT_C
-#define SET_C_BIT_HI(val,bit)	state.st |= ((val) >> ((bit) - 30)) & STBIT_C
-#define SET_C_LOG(val)			state.st |= (val) << 30
-#define SET_N_BIT(val,bit)		state.st |= ((val) << (31 - (bit))) & STBIT_N
-#define SET_N_LOG(val)			state.st |= (val) << 31
+#define SET_V_BIT_LO(val,bit)	tms.st |= ((val) << (28 - (bit))) & STBIT_V
+#define SET_V_BIT_HI(val,bit)	tms.st |= ((val) >> ((bit) - 28)) & STBIT_V
+#define SET_V_LOG(val)			tms.st |= (val) << 28
+#define SET_Z_BIT_LO(val,bit)	tms.st |= ((val) << (29 - (bit))) & STBIT_Z
+#define SET_Z_BIT_HI(val,bit)	tms.st |= ((val) >> ((bit) - 29)) & STBIT_Z
+#define SET_Z_LOG(val)			tms.st |= (val) << 29
+#define SET_C_BIT_LO(val,bit)	tms.st |= ((val) << (30 - (bit))) & STBIT_C
+#define SET_C_BIT_HI(val,bit)	tms.st |= ((val) >> ((bit) - 30)) & STBIT_C
+#define SET_C_LOG(val)			tms.st |= (val) << 30
+#define SET_N_BIT(val,bit)		tms.st |= ((val) << (31 - (bit))) & STBIT_N
+#define SET_N_LOG(val)			tms.st |= (val) << 31
 
 #define SET_Z_VAL(val)			SET_Z_LOG((val) == 0)
 #define SET_N_VAL(val)			SET_N_BIT(val, 31)
@@ -97,8 +97,8 @@ static void unimpl(void)
 	/* extra check to prevent bad things */
 	if (PC == 0 || opcode_table[cpu_readop16(TOBYTE(PC)) >> 4] == unimpl)
 	{
-		cpunum_set_input_line(state.screen->machine, cpu_getactivecpu(), INPUT_LINE_HALT, ASSERT_LINE);
-		debugger_break(state.screen->machine);
+		cpunum_set_input_line(tms.screen->machine, cpu_getactivecpu(), INPUT_LINE_HALT, ASSERT_LINE);
+		debugger_break(tms.screen->machine);
 	}
 }
 
@@ -499,7 +499,7 @@ static void cmpi_l_b(void) { CMPI_L(B); }
 
 static void dint(void)
 {
-	state.st &= ~STBIT_IE;
+	tms.st &= ~STBIT_IE;
 	COUNT_CYCLES(3);
 }
 
@@ -599,7 +599,7 @@ static void divu_b(void) { DIVU(B); }
 
 static void eint(void)
 {
-	state.st |= STBIT_IE;
+	tms.st |= STBIT_IE;
 	check_interrupt();
 	COUNT_CYCLES(3);
 }
@@ -608,9 +608,9 @@ static void eint(void)
 {																\
 	UINT8 shift = F ? 6 : 0;									\
 	INT32 *rd = &R##REG(DSTREG);								\
-	UINT32 temp = (state.st >> shift) & 0x3f;					\
-	state.st &= ~(0x3f << shift);								\
-	state.st |= (*rd & 0x3f) << shift;							\
+	UINT32 temp = (tms.st >> shift) & 0x3f;					\
+	tms.st &= ~(0x3f << shift);								\
+	tms.st |= (*rd & 0x3f) << shift;							\
 	*rd = temp;													\
 	COUNT_CYCLES(1);											\
 }
@@ -669,7 +669,7 @@ static void mmfm_b(void) { MMFM(B); }
 	COUNT_CYCLES(2);											\
 	{															\
 		INT32 rd = DSTREG;										\
-		if (state.is_34020)										\
+		if (tms.is_34020)										\
 		{														\
 			CLR_N;												\
 			SET_N_VAL(R##REG(rd) ^ 0x80000000);					\
@@ -834,8 +834,8 @@ static void setc(void)
 #define SETF(F)													\
 {																\
 	UINT8 shift = F ? 6 : 0;									\
-	state.st &= ~(0x3f << shift);								\
-	state.st |= (state.op & 0x3f) << shift;						\
+	tms.st &= ~(0x3f << shift);								\
+	tms.st |= (tms.op & 0x3f) << shift;						\
 	COUNT_CYCLES(1+F);											\
 }
 static void setf0(void) { SETF(0); }
@@ -1513,7 +1513,7 @@ static void dsjne_b (void) { DSJNE(B); }
 
 #define DSJS(R)													\
 {									   							\
-	if (state.op & 0x0400)										\
+	if (tms.op & 0x0400)										\
 	{															\
 		if (--R##REG(DSTREG))									\
 		{														\
@@ -2040,12 +2040,12 @@ New 34020 ops:
 }
 static void addxyi_a(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	ADD_XYI(A);
 }
 static void addxyi_b(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	ADD_XYI(B);
 }
 
@@ -2055,7 +2055,7 @@ static void blmove(void)
 	offs_t dst = BREG(2);
 	offs_t bits = BREG(7);
 
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 
 	/* src and dst are aligned */
 	if (!(src & 0x0f) && !(dst & 0x0f))
@@ -2108,91 +2108,91 @@ static void blmove(void)
 
 static void cexec_l(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cexec_l\n");
 }
 
 static void cexec_s(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cexec_s\n");
 }
 
 static void clip(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:clip\n");
 }
 
 static void cmovcg_a(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cmovcg_a\n");
 }
 
 static void cmovcg_b(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cmovcg_b\n");
 }
 
 static void cmovcm_f(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cmovcm_f\n");
 }
 
 static void cmovcm_b(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cmovcm_b\n");
 }
 
 static void cmovgc_a(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cmovgc_a\n");
 }
 
 static void cmovgc_b(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cmovgc_b\n");
 }
 
 static void cmovgc_a_s(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cmovgc_a_s\n");
 }
 
 static void cmovgc_b_s(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cmovgc_b_s\n");
 }
 
 static void cmovmc_f(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cmovmc_f\n");
 }
 
 static void cmovmc_f_va(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cmovmc_f_va\n");
 }
 
 static void cmovmc_f_vb(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cmovmc_f_vb\n");
 }
 
 static void cmovmc_b(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cmovmc_b\n");
 }
 
@@ -2208,125 +2208,125 @@ static void cmovmc_b(void)
 }
 static void cmp_k_a(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	CMPK(A);
 }
 static void cmp_k_b(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	CMPK(B);
 }
 
 static void cvdxyl_a(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cvdxyl_a\n");
 }
 
 static void cvdxyl_b(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cvdxyl_b\n");
 }
 
 static void cvmxyl_a(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cvmxyl_a\n");
 }
 
 static void cvmxyl_b(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cvmxyl_b\n");
 }
 
 static void cvsxyl_a(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cvsxyl_a\n");
 }
 
 static void cvsxyl_b(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:cvsxyl_b\n");
 }
 
 static void exgps_a(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:exgps_a\n");
 }
 
 static void exgps_b(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:exgps_b\n");
 }
 
 static void fline(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:fline\n");
 }
 
 static void fpixeq(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:fpixeq\n");
 }
 
 static void fpixne(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:fpixne\n");
 }
 
 static void getps_a(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:getps_a\n");
 }
 
 static void getps_b(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:getps_b\n");
 }
 
 static void idle(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:idle\n");
 }
 
 static void linit(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:linit\n");
 }
 
 static void mwait(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 }
 
 static void pfill_xy(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:pfill_xy\n");
 }
 
 static void pixblt_l_m_l(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:pixblt_l_m_l\n");
 }
 
 static void retm(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:retm\n");
 }
 
@@ -2355,7 +2355,7 @@ static void rmo_b(void) { RMO(B); }
 #define RPIX(R)									\
 {												\
 	UINT32 v = R##REG(DSTREG);					\
-	switch (state.pixelshift)					\
+	switch (tms.pixelshift)					\
 	{											\
 		case 0:									\
 			v = (v & 1) ? 0xffffffff : 0x00000000;\
@@ -2396,72 +2396,72 @@ static void rmo_b(void) { RMO(B); }
 
 static void rpix_a(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	RPIX(A);
 }
 
 static void rpix_b(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	RPIX(B);
 }
 
 static void setcdp(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:setcdp\n");
 }
 
 static void setcmp(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:setcmp\n");
 }
 
 static void setcsp(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:setcsp\n");
 }
 
 static void swapf_a(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:swapf_a\n");
 }
 
 static void swapf_b(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:swapf_b\n");
 }
 
 static void tfill_xy(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:tfill_xy\n");
 }
 
 static void trapl(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:trapl\n");
 }
 
 static void vblt_b_l(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:vblt_b_l\n");
 }
 
 static void vfill_l(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:vfill_l\n");
 }
 
 static void vlcol(void)
 {
-	if (!state.is_34020) { unimpl(); return; }
+	if (!tms.is_34020) { unimpl(); return; }
 	logerror("020:vlcol\n");
 }

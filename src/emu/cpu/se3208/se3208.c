@@ -1809,13 +1809,13 @@ static CPU_EXIT( SE3208 )
 }
 
 
-static void SE3208_get_context(void *dst)
+static CPU_GET_CONTEXT( SE3208 )
 {
 	if(dst)
 		memcpy(dst,&Context,sizeof(Context));
 }
 
-static void SE3208_set_context(void *src)
+static CPU_SET_CONTEXT( SE3208 )
 {
 	if(src)
 		memcpy(&Context,src,sizeof(Context));
@@ -1830,7 +1830,7 @@ static void set_irq_line(int line,int state)
 }
 
 
-static void SE3208_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( SE3208 )
 {
 	switch (state)
 	{
@@ -1856,7 +1856,7 @@ static void SE3208_set_info(UINT32 state, cpuinfo *info)
 }
 
 
-void SE3208_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( SE3208 )
 {
 	switch (state)
 	{
@@ -1903,15 +1903,15 @@ void SE3208_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + SE3208_R7:			info->i = Context.R[ 7];				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = SE3208_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = SE3208_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = SE3208_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(SE3208);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(SE3208);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(SE3208);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(SE3208);		break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(SE3208);	break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(SE3208);		break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(SE3208);break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = SE3208_Dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(SE3208);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &SE3208_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

@@ -550,12 +550,12 @@ static void set_irq_line(adsp2100_state *adsp, int irqline, int state)
     CONTEXT SWITCHING
 ***************************************************************************/
 
-static void adsp21xx_get_context(void *dst)
+static CPU_GET_CONTEXT( adsp21xx )
 {
 }
 
 
-static void adsp21xx_set_context(void *src)
+static CPU_SET_CONTEXT( adsp21xx )
 {
 	/* copy the context */
 	if (src)
@@ -1669,7 +1669,7 @@ static CPU_EXECUTE( adsp21xx )
     DEBUGGER DEFINITIONS
 ***************************************************************************/
 
-extern offs_t adsp21xx_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+extern CPU_DISASSEMBLE( adsp21xx );
 
 
 
@@ -1677,7 +1677,7 @@ extern offs_t adsp21xx_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const U
  * Generic set_info
  **************************************************************************/
 
-static void adsp21xx_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( adsp21xx )
 {
 	adsp2100_state *adsp = token;
 	switch (state)
@@ -1790,7 +1790,7 @@ static void adsp21xx_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-static void adsp21xx_get_info(UINT32 state, cpuinfo *info)
+static CPU_GET_INFO( adsp21xx )
 {
 	adsp2100_state *adsp = token;
 	switch (state)
@@ -1919,14 +1919,14 @@ static void adsp21xx_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						/* set per CPU */						break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = adsp21xx_set_context;break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = adsp21xx_get_context;break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(adsp21xx);break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(adsp21xx);break;
 		case CPUINFO_PTR_INIT:							/* set per CPU */						break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(adsp21xx);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(adsp21xx);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(adsp21xx);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = adsp21xx_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(adsp21xx);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &adsp->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2074,7 +2074,7 @@ static CPU_INIT( adsp2100 )
 	adsp->imask_mask = 0x0f;
 }
 
-static void adsp2100_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( adsp2100 )
 {
 	adsp2100_state *adsp = token;
 	switch (state)
@@ -2086,12 +2086,12 @@ static void adsp2100_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_STATE + ADSP2100_IRQ3:	set_irq_line(adsp, ADSP2100_IRQ3, info->i);	break;
 
 		default:
-			adsp21xx_set_info(state, info);
+			CPU_SET_INFO_CALL(adsp21xx);
 			break;
 	}
 }
 
-void adsp2100_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( adsp2100 )
 {
 	adsp2100_state *adsp = token;
 	switch (state)
@@ -2105,14 +2105,14 @@ void adsp2100_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(adsp2100);					break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = adsp2100_set_info;			break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = adsp21xx_set_context; 	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2100);			break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(adsp21xx); 	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP2100");				break;
 
 		default:
-			adsp21xx_get_info(state, info);
+			CPU_GET_INFO_CALL(adsp21xx);
 			break;
 	}
 }
@@ -2132,7 +2132,7 @@ static CPU_INIT( adsp2101 )
 	adsp->imask_mask = 0x3f;
 }
 
-static void adsp2101_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( adsp2101 )
 {
 	adsp2100_state *adsp = token;
 	switch (state)
@@ -2151,12 +2151,12 @@ static void adsp2101_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_ADSP2100_TIMER_HANDLER:		adsp->timer_fired_func = (ADSP2100_TIMER_CALLBACK)info->f;	break;
 
 		default:
-			adsp21xx_set_info(state, info);
+			CPU_SET_INFO_CALL(adsp21xx);
 			break;
 	}
 }
 
-void adsp2101_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( adsp2101 )
 {
 	adsp2100_state *adsp = token;
 	switch (state)
@@ -2172,7 +2172,7 @@ void adsp2101_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(adsp2101);						break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = adsp2101_set_info;				break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2101);				break;
 
 		case CPUINFO_PTR_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback;		break;
 		case CPUINFO_PTR_ADSP2100_TX_HANDLER:			info->f = (genf *)adsp->sport_tx_callback;		break;
@@ -2182,7 +2182,7 @@ void adsp2101_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP2101");					break;
 
 		default:
-			adsp21xx_get_info(state, info);
+			CPU_GET_INFO_CALL(adsp21xx);
 			break;
 	}
 }
@@ -2207,7 +2207,7 @@ void adsp2104_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 	adsp21xx_load_boot_data(srcdata, dstdata);
 }
 
-static void adsp2104_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( adsp2104 )
 {
 	adsp2100_state *adsp = token;
 	switch (state)
@@ -2226,12 +2226,12 @@ static void adsp2104_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_ADSP2100_TIMER_HANDLER:		adsp->timer_fired_func = (ADSP2100_TIMER_CALLBACK)info->f;	break;
 
 		default:
-			adsp21xx_set_info(state, info);
+			CPU_SET_INFO_CALL(adsp21xx);
 			break;
 	}
 }
 
-void adsp2104_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( adsp2104 )
 {
 	adsp2100_state *adsp = token;
 	switch (state)
@@ -2247,7 +2247,7 @@ void adsp2104_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(adsp2104);						break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = adsp2104_set_info;				break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2104);				break;
 
 		case CPUINFO_PTR_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback;		break;
 		case CPUINFO_PTR_ADSP2100_TX_HANDLER:			info->f = (genf *)adsp->sport_tx_callback;		break;
@@ -2257,7 +2257,7 @@ void adsp2104_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP2104");					break;
 
 		default:
-			adsp21xx_get_info(state, info);
+			CPU_GET_INFO_CALL(adsp21xx);
 			break;
 	}
 }
@@ -2282,7 +2282,7 @@ void adsp2105_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 	adsp21xx_load_boot_data(srcdata, dstdata);
 }
 
-static void adsp2105_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( adsp2105 )
 {
 	adsp2100_state *adsp = token;
 	switch (state)
@@ -2298,12 +2298,12 @@ static void adsp2105_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_ADSP2100_TIMER_HANDLER:		adsp->timer_fired_func = (ADSP2100_TIMER_CALLBACK)info->f;	break;
 
 		default:
-			adsp21xx_set_info(state, info);
+			CPU_SET_INFO_CALL(adsp21xx);
 			break;
 	}
 }
 
-void adsp2105_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( adsp2105 )
 {
 	adsp2100_state *adsp = token;
 	switch (state)
@@ -2316,7 +2316,7 @@ void adsp2105_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(adsp2105);					break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = adsp2105_set_info;			break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2105);			break;
 
 		case CPUINFO_PTR_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback;	break;
 		case CPUINFO_PTR_ADSP2100_TX_HANDLER:			info->f = (genf *)adsp->sport_tx_callback;	break;
@@ -2326,7 +2326,7 @@ void adsp2105_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP2105");				break;
 
 		default:
-			adsp21xx_get_info(state, info);
+			CPU_GET_INFO_CALL(adsp21xx);
 			break;
 	}
 }
@@ -2351,7 +2351,7 @@ void adsp2115_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 	adsp21xx_load_boot_data(srcdata, dstdata);
 }
 
-static void adsp2115_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( adsp2115 )
 {
 	adsp2100_state *adsp = token;
 	switch (state)
@@ -2370,12 +2370,12 @@ static void adsp2115_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_ADSP2100_TIMER_HANDLER:		adsp->timer_fired_func = (ADSP2100_TIMER_CALLBACK)info->f;	break;
 
 		default:
-			adsp21xx_set_info(state, info);
+			CPU_SET_INFO_CALL(adsp21xx);
 			break;
 	}
 }
 
-void adsp2115_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( adsp2115 )
 {
 	adsp2100_state *adsp = token;
 	switch (state)
@@ -2391,7 +2391,7 @@ void adsp2115_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(adsp2115);						break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = adsp2115_set_info;				break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2115);				break;
 
 		case CPUINFO_PTR_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback;		break;
 		case CPUINFO_PTR_ADSP2100_TX_HANDLER:			info->f = (genf *)adsp->sport_tx_callback;		break;
@@ -2401,7 +2401,7 @@ void adsp2115_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP2115");					break;
 
 		default:
-			adsp21xx_get_info(state, info);
+			CPU_GET_INFO_CALL(adsp21xx);
 			break;
 	}
 }
@@ -2426,7 +2426,7 @@ void adsp2181_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 	adsp21xx_load_boot_data(srcdata, dstdata);
 }
 
-static void adsp2181_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( adsp2181 )
 {
 	adsp2100_state *adsp = token;
 	switch (state)
@@ -2448,12 +2448,12 @@ static void adsp2181_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_ADSP2100_TIMER_HANDLER:		adsp->timer_fired_func = (ADSP2100_TIMER_CALLBACK)info->f;	break;
 
 		default:
-			adsp21xx_set_info(state, info);
+			CPU_SET_INFO_CALL(adsp21xx);
 			break;
 	}
 }
 
-void adsp2181_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( adsp2181 )
 {
 	adsp2100_state *adsp = token;
 	switch (state)
@@ -2476,7 +2476,7 @@ void adsp2181_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(adsp2181);						break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = adsp2181_set_info;				break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(adsp2181);				break;
 
 		case CPUINFO_PTR_ADSP2100_RX_HANDLER:			info->f = (genf *)adsp->sport_rx_callback; 		break;
 		case CPUINFO_PTR_ADSP2100_TX_HANDLER:			info->f = (genf *)adsp->sport_tx_callback; 		break;
@@ -2486,7 +2486,7 @@ void adsp2181_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "ADSP2181");					break;
 
 		default:
-			adsp21xx_get_info(state, info);
+			CPU_GET_INFO_CALL(adsp21xx);
 			break;
 	}
 }

@@ -8,6 +8,6 @@ enum
 
 #define SE3208_INT	0
 
-extern void SE3208_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( SE3208 );
 
-offs_t SE3208_Dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( SE3208 );

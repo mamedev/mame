@@ -96,13 +96,13 @@ static int mb86233_icount;
     Context Switching
 ***************************************************************************/
 
-static void mb86233_get_context(void *dst)
+static CPU_GET_CONTEXT( mb86233 )
 {
 	/* copy the context */
 	*(MB86233_REGS *)dst = mb86233;
 }
 
-static void mb86233_set_context(void *src)
+static CPU_SET_CONTEXT( mb86233 )
 {
 	/* copy the context */
 	if (src)
@@ -1598,7 +1598,7 @@ static CPU_EXECUTE( mb86233 )
     DISASSEMBLY HOOK
 ***************************************************************************/
 
-static offs_t mb86233_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( mb86233 )
 {
 	extern UINT32 dasm_mb86233(char *, UINT32);
 
@@ -1612,7 +1612,7 @@ static offs_t mb86233_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UI
     Information Setters
 ***************************************************************************/
 
-static void mb86233_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( mb86233 )
 {
 	switch (state)
 	{
@@ -1651,7 +1651,7 @@ static void mb86233_set_info(UINT32 state, cpuinfo *info)
     Information Getters
 ***************************************************************************/
 
-void mb86233_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( mb86233 )
 {
 	switch (state)
 	{
@@ -1709,15 +1709,15 @@ void mb86233_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + MB86233_R15:		info->i = GETGPR(15);					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = mb86233_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = mb86233_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = mb86233_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(mb86233);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(mb86233);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(mb86233);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(mb86233);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(mb86233);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = NULL;						break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(mb86233);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = mb86233_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(mb86233);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &mb86233_icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

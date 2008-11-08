@@ -201,7 +201,7 @@ static const lr35902dasm mnemonic_main[256]= {
  * Disassemble opcode at PC and return number of bytes it takes
  ****************************************************************************/
 
-unsigned lr35902_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram )
+CPU_DISASSEMBLE( lr35902 )
 {
 	const lr35902dasm *d;
 	const char *symbol, *src;

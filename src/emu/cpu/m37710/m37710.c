@@ -881,15 +881,15 @@ static CPU_EXECUTE( m37710 )
 
 
 /* Get the current CPU context */
-static void m37710_get_context(void *dst_context)
+static CPU_GET_CONTEXT( m37710 )
 {
-	*(m37710i_cpu_struct*)dst_context = m37710i_cpu;
+	*(m37710i_cpu_struct*)dst = m37710i_cpu;
 }
 
 /* Set the current CPU context */
-static void m37710_set_context(void *src_context)
+static CPU_SET_CONTEXT( m37710 )
 {
-	m37710i_cpu = *(m37710i_cpu_struct*)src_context;
+	m37710i_cpu = *(m37710i_cpu_struct*)src;
 	m37710i_jumping(REG_PB | REG_PC);
 }
 
@@ -959,7 +959,7 @@ void m37710_set_irq_callback(cpu_irq_callback callback)
 /* Disassemble an instruction */
 #include "m7700ds.h"
 
-static offs_t m37710_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( m37710 )
 {
 	return m7700_disassemble(buffer, (pc&0xffff), pc>>16, oprom, FLAG_M, FLAG_X);
 }
@@ -1047,7 +1047,7 @@ static CPU_INIT( m37710 )
  * Generic set_info
  **************************************************************************/
 
-static void m37710_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( m37710 )
 {
 	switch (state)
 	{
@@ -1094,7 +1094,7 @@ ADDRESS_MAP_END
  * Generic get_info
  **************************************************************************/
 
-void m37710_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m37710 )
 {
 	switch (state)
 	{
@@ -1144,15 +1144,15 @@ void m37710_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M37710_IRQ_STATE:	info->i = m37710_get_reg(M37710_IRQ_STATE); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = m37710_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m37710_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m37710_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m37710);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(m37710);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(m37710);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m37710);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m37710);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m37710);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m37710);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m37710_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m37710);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m37710_ICount;			break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = address_map_m37710_internal_map; break;
@@ -1202,7 +1202,7 @@ void m37710_get_info(UINT32 state, cpuinfo *info)
 }
 
 // 37702 is identical except with an internal ROM, so just change the name
-void m37702_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m37702 )
 {
 	if (state == CPUINFO_STR_NAME)
 	{
@@ -1210,7 +1210,7 @@ void m37702_get_info(UINT32 state, cpuinfo *info)
 		return;
 	}
 
-	m37710_get_info(state, info);
+	CPU_GET_INFO_CALL(m37710);
 }
 
 /* ======================================================================== */

@@ -165,8 +165,8 @@ enum
 #define TMS34010_WV			0x0800		/* Window Violation Interrupt */
 
 /* IO registers accessor */
-#define IOREG(reg)					(state.IOregs[reg])
-#define SMART_IOREG(reg)			(state.IOregs[state.is_34020 ? REG020_##reg : REG_##reg])
+#define IOREG(reg)					(tms.IOregs[reg])
+#define SMART_IOREG(reg)			(tms.IOregs[tms.is_34020 ? REG020_##reg : REG_##reg])
 #define PBH 						(IOREG(REG_CONTROL) & 0x0100)
 #define PBV 						(IOREG(REG_CONTROL) & 0x0200)
 

@@ -424,7 +424,7 @@ static int offs(INT8 offset)
 /****************************************************************************
  * Disassemble opcode at PC and return number of bytes it takes
  ****************************************************************************/
-unsigned z80_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( z80 )
 {
     const z80dasm *d;
 	const char *src, *ixy;

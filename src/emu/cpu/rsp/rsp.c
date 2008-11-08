@@ -2855,7 +2855,7 @@ static CPU_EXECUTE( rsp )
 
 /*****************************************************************************/
 
-static void rsp_get_context(void *dst)
+static CPU_GET_CONTEXT( rsp )
 {
 	/* copy the context */
 	if (dst)
@@ -2863,7 +2863,7 @@ static void rsp_get_context(void *dst)
 }
 
 
-static void rsp_set_context(void *src)
+static CPU_SET_CONTEXT( rsp )
 {
 	/* copy the context */
 	if (src)
@@ -2873,7 +2873,7 @@ static void rsp_set_context(void *src)
 
 /*****************************************************************************/
 
-static offs_t rsp_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( rsp )
 {
 	UINT32 op = LITTLE_ENDIANIZE_INT32(*(UINT32 *)opram);
 	return rsp_dasm_one(buffer, pc, op);
@@ -2881,7 +2881,7 @@ static offs_t rsp_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 
 
 /*****************************************************************************/
 
-static void rsp_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( rsp )
 {
 	switch (state)
 	{
@@ -2927,7 +2927,7 @@ static void rsp_set_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void rsp_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( rsp )
 {
 	switch(state)
 	{
@@ -2998,15 +2998,15 @@ void rsp_get_info(UINT32 state, cpuinfo *info)
         case CPUINFO_INT_REGISTER + RSP_STEPCNT:        info->i = rsp.step_count;               break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = rsp_get_context;		break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = rsp_set_context;		break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = rsp_set_info;			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(rsp);		break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(rsp);		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(rsp);			break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(rsp);					break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(rsp);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(rsp);					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(rsp);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = rsp_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(rsp);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &rsp_icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

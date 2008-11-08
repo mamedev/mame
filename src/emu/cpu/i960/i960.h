@@ -61,7 +61,7 @@ enum
   I960_IRQ3 = 3
 };
 
-void i960_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( i960 );
 void i960_noburst(void);
 void i960_stall(void);
 

@@ -238,37 +238,37 @@ static unsigned Dasm680x (int subtype, char *buf, unsigned pc, const UINT8 *opro
 	}
 }
 
-offs_t m6800_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( m6800 )
 {
 	return Dasm680x(6800,buffer,pc,oprom,opram);
 }
 
-offs_t m6801_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( m6801 )
 {
 	return Dasm680x(6801,buffer,pc,oprom,opram);
 }
 
-offs_t m6802_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( m6802 )
 {
 	return Dasm680x(6802,buffer,pc,oprom,opram);
 }
 
-offs_t m6803_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( m6803 )
 {
 	return Dasm680x(6803,buffer,pc,oprom,opram);
 }
 
-offs_t m6808_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( m6808 )
 {
 	return Dasm680x(6808,buffer,pc,oprom,opram);
 }
 
-offs_t hd63701_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( hd63701 )
 {
 	return Dasm680x(63701,buffer,pc,oprom,opram);
 }
 
-offs_t nsc8105_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( nsc8105 )
 {
 	return Dasm680x(8105,buffer,pc,oprom,opram);
 }

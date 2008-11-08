@@ -71,11 +71,11 @@ enum
 #define UPD7810_INTF2		1
 #define UPD7810_INTFE1      4
 
-void upd7810_get_info(UINT32 state, cpuinfo *info);
-void upd7807_get_info(UINT32 state, cpuinfo *info);
-void upd7801_get_info(UINT32 state, cpuinfo *info);
-void upd78c05_get_info(UINT32 state, cpuinfo *info);
-void upd78c06_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( upd7810 );
+CPU_GET_INFO( upd7807 );
+CPU_GET_INFO( upd7801 );
+CPU_GET_INFO( upd78c05 );
+CPU_GET_INFO( upd78c06 );
 
 typedef struct {
 	PAIR	ppc;	/* previous program counter */
@@ -167,9 +167,9 @@ typedef struct {
 	const device_config *device;
 }	UPD7810;
 
-offs_t upd7810_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-offs_t upd7807_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-offs_t upd7801_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-offs_t upd78c05_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( upd7810 );
+CPU_DISASSEMBLE( upd7807 );
+CPU_DISASSEMBLE( upd7801 );
+CPU_DISASSEMBLE( upd78c05 );
 
 #endif /* __UPD7810_H__ */

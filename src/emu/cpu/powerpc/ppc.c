@@ -1706,7 +1706,7 @@ static CPU_EXIT( ppc604 )
 
 
 
-static void ppc_get_context(void *dst)
+static CPU_GET_CONTEXT( ppc )
 {
 	/* copy the context */
 	if (dst)
@@ -1714,7 +1714,7 @@ static void ppc_get_context(void *dst)
 }
 
 
-static void ppc_set_context(void *src)
+static CPU_SET_CONTEXT( ppc )
 {
 	/* copy the context */
 	if (src)
@@ -1727,7 +1727,7 @@ static void ppc_set_context(void *src)
  * Generic set_info
  **************************************************************************/
 
-static void ppc_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( ppc )
 {
 	switch (state)
 	{
@@ -1777,7 +1777,7 @@ static void ppc_set_info(UINT32 state, cpuinfo *info)
 }
 
 #if (HAS_PPC403)
-static void ppc403_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( ppc403 )
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 8)
 	{
@@ -1794,7 +1794,7 @@ static void ppc403_set_info(UINT32 state, cpuinfo *info)
 #endif
 
 #if (HAS_PPC603)
-static void ppc603_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( ppc603 )
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
 	{
@@ -1810,7 +1810,7 @@ static void ppc603_set_info(UINT32 state, cpuinfo *info)
 }
 #endif
 
-static void ppc_get_info(UINT32 state, cpuinfo *info)
+static CPU_GET_INFO( ppc )
 {
 	switch(state)
 	{
@@ -1886,10 +1886,10 @@ static void ppc_get_info(UINT32 state, cpuinfo *info)
 
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = ppc_get_context;		break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = ppc_set_context;		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(ppc);		break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(ppc);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = ppc_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(ppc);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &ppc_icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1946,7 +1946,7 @@ static void ppc_get_info(UINT32 state, cpuinfo *info)
 }
 
 #if (HAS_PPC403)
-void ppc403_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc403 )
 {
 	switch(state)
 	{
@@ -1957,7 +1957,7 @@ void ppc403_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + PPC_EXISR:			info->i = EXISR;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = ppc403_set_info;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc403);		break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc403);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ppc403);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ppc403);				break;
@@ -1974,7 +1974,7 @@ void ppc403_get_info(UINT32 state, cpuinfo *info)
 #endif
 
 #if (HAS_PPC603)
-void ppc603_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc603 )
 {
 	switch(state)
 	{
@@ -1989,14 +1989,14 @@ void ppc603_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + PPC_DEC:			info->i = read_decrementer();			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = ppc603_set_info;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc603);		break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc603);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ppc603);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ppc603);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc603);			break;
-		case CPUINFO_PTR_READ:							info->read = ppc_read;					break;
-		case CPUINFO_PTR_WRITE:							info->write = ppc_write;				break;
-		case CPUINFO_PTR_READOP:						info->readop = ppc_readop;				break;
+		case CPUINFO_PTR_READ:							info->read = CPU_GET_READ_NAME(ppc);					break;
+		case CPUINFO_PTR_WRITE:							info->write = CPU_GET_WRITE_NAME(ppc);				break;
+		case CPUINFO_PTR_READOP:						info->readop = CPU_GET_READOP_NAME(ppc);				break;
 		case CPUINFO_PTR_TRANSLATE:						info->translate = ppc_translate_address_cb;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2011,7 +2011,7 @@ void ppc603_get_info(UINT32 state, cpuinfo *info)
 /* PowerPC 602 */
 
 #if (HAS_PPC602)
-static void ppc602_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( ppc602 )
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
 	{
@@ -2025,7 +2025,7 @@ static void ppc602_set_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void ppc602_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc602 )
 {
 	switch(state)
 	{
@@ -2038,14 +2038,14 @@ void ppc602_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = ppc602_set_info;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc602);		break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc602);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ppc602);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ppc602);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc602);			break;
-		case CPUINFO_PTR_READ:							info->read = ppc_read;					break;
-		case CPUINFO_PTR_WRITE:							info->write = ppc_write;				break;
-		case CPUINFO_PTR_READOP:						info->readop = ppc_readop;				break;
+		case CPUINFO_PTR_READ:							info->read = CPU_GET_READ_NAME(ppc);					break;
+		case CPUINFO_PTR_WRITE:							info->write = CPU_GET_WRITE_NAME(ppc);				break;
+		case CPUINFO_PTR_READOP:						info->readop = CPU_GET_READOP_NAME(ppc);				break;
 		case CPUINFO_PTR_TRANSLATE:						info->translate = ppc_translate_address_cb;	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2060,7 +2060,7 @@ void ppc602_get_info(UINT32 state, cpuinfo *info)
 /* Motorola MPC8240 */
 
 #if (HAS_MPC8240)
-static void mpc8240_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( mpc8240 )
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
 	{
@@ -2073,7 +2073,7 @@ static void mpc8240_set_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void mpc8240_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( mpc8240 )
 {
 	switch(state)
 	{
@@ -2085,14 +2085,14 @@ void mpc8240_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = mpc8240_set_info;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(mpc8240);		break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(mpc8240);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ppc603);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(mpc8240);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc603);			break;
-		case CPUINFO_PTR_READ:							info->read = ppc_read;					break;
-		case CPUINFO_PTR_WRITE:							info->write = ppc_write;				break;
-		case CPUINFO_PTR_READOP:						info->readop = ppc_readop;				break;
+		case CPUINFO_PTR_READ:							info->read = CPU_GET_READ_NAME(ppc);					break;
+		case CPUINFO_PTR_WRITE:							info->write = CPU_GET_WRITE_NAME(ppc);				break;
+		case CPUINFO_PTR_READOP:						info->readop = CPU_GET_READOP_NAME(ppc);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "MPC8240");				break;
@@ -2105,7 +2105,7 @@ void mpc8240_get_info(UINT32 state, cpuinfo *info)
 /* PPC601 */
 
 #if (HAS_PPC601)
-static void ppc601_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( ppc601 )
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
 	{
@@ -2118,7 +2118,7 @@ static void ppc601_set_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void ppc601_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc601 )
 {
 	switch(state)
 	{
@@ -2130,14 +2130,14 @@ void ppc601_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = ppc601_set_info;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc601);		break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc601);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ppc603);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ppc601);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc603);			break;
-		case CPUINFO_PTR_READ:							info->read = ppc_read;					break;
-		case CPUINFO_PTR_WRITE:							info->write = ppc_write;				break;
-		case CPUINFO_PTR_READOP:						info->readop = ppc_readop;				break;
+		case CPUINFO_PTR_READ:							info->read = CPU_GET_READ_NAME(ppc);					break;
+		case CPUINFO_PTR_WRITE:							info->write = CPU_GET_WRITE_NAME(ppc);				break;
+		case CPUINFO_PTR_READOP:						info->readop = CPU_GET_READOP_NAME(ppc);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PPC601");				break;
@@ -2150,7 +2150,7 @@ void ppc601_get_info(UINT32 state, cpuinfo *info)
 /* PPC604 */
 
 #if (HAS_PPC604)
-static void ppc604_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( ppc604 )
 {
 	if (state >= CPUINFO_INT_INPUT_STATE && state <= CPUINFO_INT_INPUT_STATE + 5)
 	{
@@ -2163,7 +2163,7 @@ static void ppc604_set_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void ppc604_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc604 )
 {
 	switch(state)
 	{
@@ -2175,14 +2175,14 @@ void ppc604_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = ppc604_set_info;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppc604);		break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc604);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ppc603);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ppc604);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppc603);			break;
-		case CPUINFO_PTR_READ:							info->read = ppc_read;					break;
-		case CPUINFO_PTR_WRITE:							info->write = ppc_write;				break;
-		case CPUINFO_PTR_READOP:						info->readop = ppc_readop;				break;
+		case CPUINFO_PTR_READ:							info->read = CPU_GET_READ_NAME(ppc);					break;
+		case CPUINFO_PTR_WRITE:							info->write = CPU_GET_WRITE_NAME(ppc);				break;
+		case CPUINFO_PTR_READOP:						info->readop = CPU_GET_READOP_NAME(ppc);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PPC604");				break;

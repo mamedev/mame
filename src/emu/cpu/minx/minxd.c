@@ -417,7 +417,8 @@ case M_HL:  dst += sprintf( dst, "%c[HL]", fill ); break;		\
 case OP:    dst += sprintf( dst, "%c$%02X", fill, op ); break;		\
 case OP1:   dst += sprintf( dst, "%c$%02X", fill, op1 ); break;
 
-unsigned minx_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram ) {
+CPU_DISASSEMBLE( minx )
+{
 	const minxdasm *instr;
 	UINT8 op, op1;
 	INT8  ofs8 = 0;

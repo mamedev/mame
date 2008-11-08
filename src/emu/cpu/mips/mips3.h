@@ -226,28 +226,28 @@ struct _mips3_config
 ***************************************************************************/
 
 #if (HAS_R4600)
-void r4600be_get_info(UINT32 state, cpuinfo *info);
-void r4600le_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( r4600be );
+CPU_GET_INFO( r4600le );
 #endif
 
 #if (HAS_R4700)
-void r4700be_get_info(UINT32 state, cpuinfo *info);
-void r4700le_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( r4700be );
+CPU_GET_INFO( r4700le );
 #endif
 
 #if (HAS_R5000)
-void r5000be_get_info(UINT32 state, cpuinfo *info);
-void r5000le_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( r5000be );
+CPU_GET_INFO( r5000le );
 #endif
 
 #if (HAS_QED5271)
-void qed5271be_get_info(UINT32 state, cpuinfo *info);
-void qed5271le_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( qed5271be );
+CPU_GET_INFO( qed5271le );
 #endif
 
 #if (HAS_RM7000)
-void rm7000be_get_info(UINT32 state, cpuinfo *info);
-void rm7000le_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( rm7000be );
+CPU_GET_INFO( rm7000le );
 #endif
 
 

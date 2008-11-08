@@ -1056,13 +1056,13 @@ static void i_invalid(void)
 
 /*****************************************************************************/
 
-static void nec_get_context(void *dst)
+static CPU_GET_CONTEXT( nec )
 {
 	if( dst )
 		*(nec_Regs*)dst = I;
 }
 
-static void nec_set_context(void *src)
+static CPU_SET_CONTEXT( nec )
 {
 	if( src )
 	{
@@ -1103,7 +1103,7 @@ static void set_poll_line(int state)
 	I.poll_state = state;
 }
 
-static offs_t nec_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( nec )
 {
 	return necv_dasm_one(buffer, pc, oprom, I.config);
 }
@@ -1300,7 +1300,7 @@ static CPU_INIT( v33 )
  * Generic set_info
  **************************************************************************/
 
-static void nec_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( nec )
 {
 	switch (state)
 	{
@@ -1356,7 +1356,7 @@ static void nec_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-static void nec_get_info(UINT32 state, cpuinfo *info)
+static CPU_GET_INFO( nec )
 {
 	int flags;
 
@@ -1411,15 +1411,15 @@ static void nec_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + NEC_PENDING:		info->i = I.pending_irq;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = nec_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = nec_get_context;		break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = nec_set_context;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(nec);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(nec);		break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(nec);		break;
 		case CPUINFO_PTR_INIT:							/* set per-CPU */						break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(nec);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(nec);					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(necv);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = nec_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(nec);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &nec_ICount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1475,7 +1475,7 @@ static void nec_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void v20_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( v20 )
 {
 	switch (state)
 	{
@@ -1489,7 +1489,7 @@ void v20_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "V20");					break;
 
-		default:										nec_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
 }
 #endif
@@ -1500,7 +1500,7 @@ void v20_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void v25_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( v25 )
 {
 	switch (state)
 	{
@@ -1514,7 +1514,7 @@ void v25_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "V25");					break;
 
-		default:										nec_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
 }
 #endif
@@ -1525,7 +1525,7 @@ void v25_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void v30_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( v30 )
 {
 	switch (state)
 	{
@@ -1535,7 +1535,7 @@ void v30_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "V30");					break;
 
-		default:										nec_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
 }
 #endif
@@ -1546,7 +1546,7 @@ void v30_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void v33_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( v33 )
 {
 	switch (state)
 	{
@@ -1556,7 +1556,7 @@ void v33_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "V33");					break;
 
-		default:										nec_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
 }
 #endif
@@ -1567,7 +1567,7 @@ void v33_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void v35_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( v35 )
 {
 	switch (state)
 	{
@@ -1577,7 +1577,7 @@ void v35_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "V35");					break;
 
-		default:										nec_get_info(state, info);				break;
+		default:										CPU_GET_INFO_CALL(nec);				break;
 	}
 }
 #endif

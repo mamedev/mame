@@ -82,11 +82,11 @@ extern const char *const v60_reg_names[];
 void v60_stall(void);
 
 #if HAS_V60
-void v60_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( v60 );
 #endif /* HAS_V60 */
 
 #if HAS_V70
-void v70_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( v70 );
 #endif /* HAS_V70 */
 
 #endif /* __V60_H__ */

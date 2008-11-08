@@ -83,7 +83,7 @@
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
-extern offs_t m6809_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+extern CPU_DISASSEMBLE( m6809 );
 
 
 INLINE void fetch_effective_address( void );
@@ -396,7 +396,7 @@ INLINE void WM16( UINT32 Addr, PAIR *p )
 /****************************************************************************
  * Get all registers in given buffer
  ****************************************************************************/
-static void m6809_get_context(void *dst)
+static CPU_GET_CONTEXT( m6809 )
 {
 	if( dst )
 		*(m6809_Regs*)dst = m6809;
@@ -405,7 +405,7 @@ static void m6809_get_context(void *dst)
 /****************************************************************************
  * Set all registers to given values
  ****************************************************************************/
-static void m6809_set_context(void *src)
+static CPU_SET_CONTEXT( m6809 )
 {
 	if( src )
 		m6809 = *(m6809_Regs*)src;
@@ -1095,7 +1095,7 @@ INLINE void fetch_effective_address( void )
  * Generic set_info
  **************************************************************************/
 
-static void m6809_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( m6809 )
 {
 	switch (state)
 	{
@@ -1124,7 +1124,7 @@ static void m6809_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void m6809_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m6809 )
 {
 	switch (state)
 	{
@@ -1169,15 +1169,15 @@ void m6809_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M6809_DP:			info->i = DP;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = m6809_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m6809_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m6809_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6809);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(m6809);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(m6809);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6809);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6809);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m6809);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6809);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6809_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6809);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6809_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1216,7 +1216,7 @@ void m6809_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific set_info
  **************************************************************************/
 
-void m6809e_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m6809e )
 {
 	switch (state)
 	{
@@ -1227,6 +1227,6 @@ void m6809e_get_info(UINT32 state, cpuinfo *info)
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M6809E");				break;
 
-		default:										m6809_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(m6809);				break;
 	}
 }

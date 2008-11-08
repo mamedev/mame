@@ -39,9 +39,9 @@ enum
 
 #define M4510_IRQ_LINE					M6502_IRQ_LINE
 
-void m4510_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( m4510 );
 
 
-extern unsigned m4510_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+extern CPU_DISASSEMBLE( m4510 );
 
 #endif /* __M4510_H__ */

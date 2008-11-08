@@ -78,10 +78,10 @@ static const char *const ints[4] = {
 	"",    "vi",  "nvi",   "vi,nvi"
 };
 
-offs_t z8000_dasm(char *buff, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( z8000 )
 {
 	int new_pc = pc, i, tmp;
-	char *dst = buff;
+	char *dst = buffer;
 	const char *src;
 	Z8000_exec *o;
 	UINT32 flags = 0;

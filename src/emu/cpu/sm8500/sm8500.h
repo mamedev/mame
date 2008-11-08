@@ -35,7 +35,7 @@ enum
 
 extern UINT8* sm8500_internal_ram( void ) ;
 extern unsigned sm8500_get_reg( int regnum );
-extern void sm8500_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( sm8500 );
 
 UINT8 sm85cpu_mem_readbyte( UINT32 offset );
 void sm85cpu_mem_writebyte( UINT32 offset, UINT8 data );
@@ -53,6 +53,6 @@ INLINE void sm85cpu_mem_writeword( UINT32 address, UINT16 value )
 	sm85cpu_mem_writebyte( ( address + 1 ) & 0xffff, value & 0xff );
 }
 
-extern unsigned sm8500_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram );
+extern CPU_DISASSEMBLE( sm8500 );
 
 #endif /* __SM8500_H__ */

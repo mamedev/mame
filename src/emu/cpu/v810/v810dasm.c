@@ -29,11 +29,10 @@ static const char *const dRegs[]=
 #define GET2s(opcode) dRegs[((opcode)>>5)&0x1f]
 #define GETRs(opcode) dRegs[32+((opcode)&0x1f)]
 
-offs_t v810_dasm(char *buffer, offs_t oldpc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( v810 )
 {
 	UINT32 flags = 0;
 	UINT32 opc,opc2;
-	UINT32 pc=oldpc;
 	unsigned size;
 	opc = R_OP(pc);
 	opc2 = R_OP(pc+2);

@@ -41,8 +41,8 @@ enum
 	ALPHA8201_R4,ALPHA8201_R5,ALPHA8201_R6,ALPHA8201_R7
 };
 
-extern void alpha8201_get_info(UINT32 state, cpuinfo *info);
-extern void alpha8301_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( alpha8201 );
+extern CPU_GET_INFO( alpha8301 );
 
 /*
  *   Read a UINT8 from given memory location
@@ -68,6 +68,6 @@ extern void alpha8301_get_info(UINT32 state, cpuinfo *info);
  */
 #define ALPHA8201_RDOP_ARG(A) ((unsigned)cpu_readop_arg(A))
 
-offs_t ALPHA8201_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( ALPHA8201 );
 
 #endif  /* __ALPH8201_H__ */

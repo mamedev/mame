@@ -1154,7 +1154,7 @@ static offs_t mcs51_dasm( const char **mem_names, char *dst, offs_t pc, const UI
 
 }
 
-offs_t i8051_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( i8051 )
 {
 	static const char *mem_names[0x200];
 	static int mem_names_initialized = 0;
@@ -1164,10 +1164,10 @@ offs_t i8051_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
         init_mem_names(	FEATURE_NONE, mem_names);
     	mem_names_initialized = 1;
 	}
-	return mcs51_dasm(mem_names, dst, pc, oprom, opram);
+	return mcs51_dasm(mem_names, buffer, pc, oprom, opram);
 }
 
-offs_t i8052_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( i8052 )
 {
 	static const char *mem_names[0x200];
 	static int mem_names_initialized = 0;
@@ -1177,10 +1177,10 @@ offs_t i8052_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
         init_mem_names(	FEATURE_I8052, mem_names);
     	mem_names_initialized = 1;
 	}
-	return mcs51_dasm(mem_names, dst, pc, oprom, opram);
+	return mcs51_dasm(mem_names, buffer, pc, oprom, opram);
 }
 
-offs_t i80c51_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( i80c51 )
 {
 	static const char *mem_names[0x200];
 	static int mem_names_initialized = 0;
@@ -1190,10 +1190,10 @@ offs_t i80c51_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
         init_mem_names(	FEATURE_CMOS, mem_names);
     	mem_names_initialized = 1;
 	}
-	return mcs51_dasm(mem_names, dst, pc, oprom, opram);
+	return mcs51_dasm(mem_names, buffer, pc, oprom, opram);
 }
 
-offs_t i80c52_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( i80c52 )
 {
 	static const char *mem_names[0x200];
 	static int mem_names_initialized = 0;
@@ -1203,10 +1203,10 @@ offs_t i80c52_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
         init_mem_names(	FEATURE_I8052 | FEATURE_CMOS | FEATURE_I80C52, mem_names);
     	mem_names_initialized = 1;
 	}
-	return mcs51_dasm(mem_names, dst, pc, oprom, opram);
+	return mcs51_dasm(mem_names, buffer, pc, oprom, opram);
 }
 
-offs_t ds5002fp_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( ds5002fp )
 {
 	static const char *mem_names[0x200];
 	static int mem_names_initialized = 0;
@@ -1216,5 +1216,5 @@ offs_t ds5002fp_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opra
         init_mem_names(	FEATURE_DS5002FP | FEATURE_CMOS, mem_names);
     	mem_names_initialized = 1;
 	}
-	return mcs51_dasm(mem_names, dst, pc, oprom, opram);
+	return mcs51_dasm(mem_names, buffer, pc, oprom, opram);
 }

@@ -95,7 +95,7 @@ int g65816_ICount = 0;
 uint g65816i_source;
 uint g65816i_destination;
 
-static int g65816_readop(UINT32 offset, int size, UINT64 *value)
+static CPU_READOP( g65816 )
 {
 	*value = g65816_read_8_immediate(offset);
 
@@ -238,18 +238,18 @@ static CPU_EXECUTE( g65816 )
 
 
 /* Get the current CPU context */
-static void g65816_get_context(void *dst_context)
+static CPU_GET_CONTEXT( g65816 )
 {
-	if(dst_context)
-		*(g65816i_cpu_struct*)dst_context = g65816i_cpu;
+	if(dst)
+		*(g65816i_cpu_struct*)dst = g65816i_cpu;
 }
 
 /* Set the current CPU context */
-static void g65816_set_context(void *src_context)
+static CPU_SET_CONTEXT( g65816 )
 {
-	if(src_context)
+	if(src)
 	{
-		g65816i_cpu = *(g65816i_cpu_struct*)src_context;
+		g65816i_cpu = *(g65816i_cpu_struct*)src;
 		g65816i_jumping(REGISTER_PB | REGISTER_PC);
 	}
 }
@@ -312,7 +312,7 @@ static void g65816_set_irq_callback(cpu_irq_callback callback)
 /* Disassemble an instruction */
 #include "g65816ds.h"
 
-static offs_t g65816_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( g65816 )
 {
 	return g65816_disassemble(buffer, (pc & 0x00ffff), (pc & 0xff0000) >> 16, oprom, FLAG_M, FLAG_X);
 }
@@ -363,7 +363,7 @@ static CPU_INIT( g65816 )
  * Generic set_info
  **************************************************************************/
 
-static void g65816_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( g65816 )
 {
 	switch (state)
 	{
@@ -402,7 +402,7 @@ static void g65816_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void g65816_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( g65816 )
 {
 	switch (state)
 	{
@@ -454,19 +454,19 @@ void g65816_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + G65816_IRQ_STATE:	info->i = g65816_get_reg(G65816_IRQ_STATE); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = g65816_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = g65816_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = g65816_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(g65816);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(g65816);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(g65816);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(g65816);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(g65816);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(g65816);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(g65816);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = g65816_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(g65816);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &g65816_ICount;			break;
 		case CPUINFO_PTR_G65816_READVECTOR_CALLBACK:	info->f = (genf *) READ_VECTOR;			break;
 
-		case CPUINFO_PTR_READOP:						info->readop = g65816_readop;			break;
+		case CPUINFO_PTR_READOP:						info->readop = CPU_READOP_NAME(g65816);			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "G65C816");				break;

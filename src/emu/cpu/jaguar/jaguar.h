@@ -98,11 +98,11 @@ struct _jaguar_cpu_core
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-extern void jaguargpu_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( jaguargpu );
 extern void jaguargpu_ctrl_w(int cpunum, offs_t offset, UINT32 data, UINT32 mem_mask);
 extern UINT32 jaguargpu_ctrl_r(int cpunum, offs_t offset);
 
-extern void jaguardsp_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( jaguardsp );
 extern void jaguardsp_ctrl_w(int cpunum, offs_t offset, UINT32 data, UINT32 mem_mask);
 extern UINT32 jaguardsp_ctrl_r(int cpunum, offs_t offset);
 

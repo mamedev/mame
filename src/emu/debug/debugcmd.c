@@ -247,10 +247,10 @@ void debug_command_init(running_machine *machine)
 	/* ask all the CPUs if they would like to register functions or symbols */
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 	{
-		void (*setup_commands)(void);
-		setup_commands = cpunum_get_info_fct(cpunum, CPUINFO_PTR_DEBUG_SETUP_COMMANDS);
-		if (setup_commands)
-			setup_commands();
+		cpu_debug_init_func debug_init;
+		debug_init = cpunum_get_info_fct(cpunum, CPUINFO_PTR_DEBUG_INIT);
+		if (debug_init != NULL)
+			(*debug_init)();
 	}
 
 	add_exit_callback(machine, debug_command_exit);

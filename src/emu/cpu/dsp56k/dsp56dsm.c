@@ -208,7 +208,7 @@ enum bbbType  { BBB_UPPER, BBB_MIDDLE, BBB_LOWER };
 /*****************************/
 /* Main disassembly function */
 /*****************************/
-offs_t dsp56k_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( dsp56k )
 {
 	/* ORDER: Handle parallel types in the ALU */
 	/*        Handle the rest */

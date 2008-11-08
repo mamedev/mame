@@ -736,7 +736,7 @@ static CPU_EXIT( ppcdrc )
     current context
 -------------------------------------------------*/
 
-static void ppcdrc_get_context(void *dst)
+static CPU_GET_CONTEXT( ppcdrc )
 {
 	if (dst != NULL)
 		*(powerpc_state **)dst = ppc;
@@ -748,7 +748,7 @@ static void ppcdrc_get_context(void *dst)
     into the global state
 -------------------------------------------------*/
 
-static void ppcdrc_set_context(void *src)
+static CPU_SET_CONTEXT( ppcdrc )
 {
 	if (src != NULL)
 		ppc = *(powerpc_state **)src;
@@ -760,7 +760,7 @@ static void ppcdrc_set_context(void *src)
     address translation
 -------------------------------------------------*/
 
-static int ppcdrc_translate(int space, int intention, offs_t *address)
+static CPU_TRANSLATE( ppcdrc )
 {
 	return ppccom_translate_address(ppc, space, intention, address);
 }
@@ -770,7 +770,7 @@ static int ppcdrc_translate(int space, int intention, offs_t *address)
     ppcdrc_dasm - disassemble an instruction
 -------------------------------------------------*/
 
-static offs_t ppcdrc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( ppcdrc )
 {
 	return ppccom_dasm(ppc, buffer, pc, oprom, opram);
 }
@@ -781,7 +781,7 @@ static offs_t ppcdrc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UIN
     CPU instance
 -------------------------------------------------*/
 
-static void ppcdrc_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( ppcdrc )
 {
 	switch (state)
 	{
@@ -812,7 +812,7 @@ static void ppcdrc_set_info(UINT32 state, cpuinfo *info)
     CPU instance
 -------------------------------------------------*/
 
-static void ppcdrc_get_info(UINT32 state, cpuinfo *info)
+static CPU_GET_INFO( ppcdrc )
 {
 	switch (state)
 	{
@@ -821,15 +821,15 @@ static void ppcdrc_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = ppcdrc_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = ppcdrc_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = ppcdrc_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppcdrc);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(ppcdrc);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(ppcdrc);	break;
 		case CPUINFO_PTR_INIT:							/* provided per-CPU */					break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(ppcdrc);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(ppcdrc);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ppcdrc);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = ppcdrc_dasm;		break;
-		case CPUINFO_PTR_TRANSLATE:						info->translate = ppcdrc_translate;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(ppcdrc);		break;
+		case CPUINFO_PTR_TRANSLATE:						info->translate = CPU_TRANSLATE_NAME(ppcdrc);		break;
 		case CPUINFO_PTR_CONTEXT:						info->p = ppc;							break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -4190,9 +4190,9 @@ static void log_opcode_desc(drcuml_state *drcuml, const opcode_desc *desclist, i
     information getter
 -------------------------------------------------*/
 
-static void ppcdrc4xx_get_info(UINT32 state, cpuinfo *info)
+static CPU_GET_INFO( ppcdrc4xx )
 {
-	ppcdrc_get_info(state, info);
+	CPU_GET_INFO_CALL(ppcdrc);
 	ppc4xx_get_info(ppc, state, info);
 }
 
@@ -4202,9 +4202,9 @@ static void ppcdrc4xx_get_info(UINT32 state, cpuinfo *info)
     information setter
 -------------------------------------------------*/
 
-static void ppcdrc4xx_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( ppcdrc4xx )
 {
-	ppcdrc_set_info(state, info);
+	CPU_SET_INFO_CALL(ppcdrc);
 	ppc4xx_set_info(ppc, state, info);
 }
 
@@ -4229,7 +4229,7 @@ static CPU_INIT( ppc403ga )
     information getter
 -------------------------------------------------*/
 
-void ppc403ga_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc403ga )
 {
 	switch (state)
 	{
@@ -4237,13 +4237,13 @@ void ppc403ga_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc403ga);				break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = ppcdrc4xx_set_info;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppcdrc4xx);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 403GA");		break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppcdrc4xx_get_info(state, info);		break;
+		default:										CPU_GET_INFO_CALL(ppcdrc4xx);		break;
 	}
 }
 
@@ -4268,7 +4268,7 @@ static CPU_INIT( ppc403gcx )
     information getter
 -------------------------------------------------*/
 
-void ppc403gcx_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc403gcx )
 {
 	switch (state)
 	{
@@ -4276,13 +4276,13 @@ void ppc403gcx_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(ppc403gcx);			break;
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = ppcdrc4xx_set_info;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ppcdrc4xx);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 403GCX");		break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppcdrc4xx_get_info(state, info);		break;
+		default:										CPU_GET_INFO_CALL(ppcdrc4xx);		break;
 	}
 }
 
@@ -4312,7 +4312,7 @@ static CPU_INIT( ppc601 )
     information getter
 -------------------------------------------------*/
 
-void ppc601_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc601 )
 {
 	switch (state)
 	{
@@ -4325,7 +4325,7 @@ void ppc601_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 601");			break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppcdrc_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(ppcdrc);			break;
 	}
 }
 
@@ -4350,7 +4350,7 @@ static CPU_INIT( ppc602 )
     information getter
 -------------------------------------------------*/
 
-void ppc602_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc602 )
 {
 	switch (state)
 	{
@@ -4363,7 +4363,7 @@ void ppc602_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 602");			break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppcdrc_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(ppcdrc);			break;
 	}
 }
 
@@ -4388,7 +4388,7 @@ static CPU_INIT( ppc603 )
     information getter
 -------------------------------------------------*/
 
-void ppc603_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc603 )
 {
 	switch (state)
 	{
@@ -4401,7 +4401,7 @@ void ppc603_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 603");			break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppcdrc_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(ppcdrc);			break;
 	}
 }
 
@@ -4426,7 +4426,7 @@ static CPU_INIT( ppc603e )
     information getter
 -------------------------------------------------*/
 
-void ppc603e_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc603e )
 {
 	switch (state)
 	{
@@ -4439,7 +4439,7 @@ void ppc603e_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 603e");		break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppcdrc_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(ppcdrc);			break;
 	}
 }
 
@@ -4464,7 +4464,7 @@ static CPU_INIT( ppc603r )
     information getter
 -------------------------------------------------*/
 
-void ppc603r_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc603r )
 {
 	switch (state)
 	{
@@ -4477,7 +4477,7 @@ void ppc603r_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 603R");		break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppcdrc_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(ppcdrc);			break;
 	}
 }
 
@@ -4502,7 +4502,7 @@ static CPU_INIT( ppc604 )
     information getter
 -------------------------------------------------*/
 
-void ppc604_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( ppc604 )
 {
 	switch (state)
 	{
@@ -4515,7 +4515,7 @@ void ppc604_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC 604");			break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppcdrc_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(ppcdrc);			break;
 	}
 }
 
@@ -4545,7 +4545,7 @@ static CPU_INIT( mpc8240 )
     information getter
 -------------------------------------------------*/
 
-void mpc8240_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( mpc8240 )
 {
 	switch (state)
 	{
@@ -4558,7 +4558,7 @@ void mpc8240_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:							strcpy(info->s, "PowerPC MPC8240");		break;
 
 		/* --- everything else is handled generically --- */
-		default:										ppcdrc_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(ppcdrc);			break;
 	}
 }
 

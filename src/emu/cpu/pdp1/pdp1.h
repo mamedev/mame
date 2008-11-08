@@ -44,7 +44,7 @@ struct _pdp1_reset_param_t
 #define IOT_NO_COMPLETION_PULSE -1
 
 /* PUBLIC FUNCTIONS */
-void pdp1_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( pdp1 );
 
 #define READ_PDP_18BIT(A) ((signed)program_read_dword_32be((A)<<2))
 #define WRITE_PDP_18BIT(A,V) (program_write_dword_32be((A)<<2,(V)))
@@ -77,6 +77,6 @@ void pdp1_get_info(UINT32 state, cpuinfo *info);
 #define IOT 035
 #define OPR 037
 
-unsigned pdp1_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( pdp1 );
 
 #endif /* __PDP1_H__ */

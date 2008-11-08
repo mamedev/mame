@@ -208,7 +208,7 @@ enum
 extern unsigned DasmMIPS( char *buffer, UINT32 pc, const UINT8 *opram );
 
 #if (HAS_PSXCPU)
-extern void psxcpu_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( psxcpu );
 #endif
 
 #endif /* __PSX_H__ */

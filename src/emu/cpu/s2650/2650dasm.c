@@ -221,10 +221,10 @@ static char *ADR(int pc)
 }
 
 /* disassemble one instruction at PC into buff. return byte size of instr */
-offs_t s2650_dasm(char *buff, offs_t PC, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( s2650 )
 {
 	UINT32 flags = 0;
-	int pc = PC;
+	int PC = pc;
 	int op = oprom[0];
 	int rv = op & 3;
 
@@ -236,146 +236,146 @@ offs_t s2650_dasm(char *buff, offs_t PC, const UINT8 *oprom, const UINT8 *opram)
 	{
 		case 0x00: case 0x01: case 0x02: case 0x03:
 #if HJB
-			sprintf(buff, "ld   r0,r%d", rv);
+			sprintf(buffer, "ld   r0,r%d", rv);
 #else
-			sprintf(buff, "lodz,%d", rv);
+			sprintf(buffer, "lodz,%d", rv);
 #endif
             break;
 		case 0x04: case 0x05: case 0x06: case 0x07:
 #if HJB
-			sprintf(buff, "ld   r%d,%s", rv, IMM(pc));
+			sprintf(buffer, "ld   r%d,%s", rv, IMM(pc));
 #else
-			sprintf(buff, "lodi,%d %s", rv, IMM(pc));
+			sprintf(buffer, "lodi,%d %s", rv, IMM(pc));
 #endif
             pc+=1;
 			break;
 		case 0x08: case 0x09: case 0x0a: case 0x0b:
 #if HJB
-			sprintf(buff, "ld   r%d,(%s)", rv, REL(pc));
+			sprintf(buffer, "ld   r%d,(%s)", rv, REL(pc));
 #else
-            sprintf(buff, "lodr,%d %s", rv, REL(pc));
+            sprintf(buffer, "lodr,%d %s", rv, REL(pc));
 #endif
             pc+=1;
 			break;
 		case 0x0c: case 0x0d: case 0x0e: case 0x0f:
 #if HJB
-			sprintf(buff, "ld   %s", ABS(1,rv,pc));
+			sprintf(buffer, "ld   %s", ABS(1,rv,pc));
 #else
-			sprintf(buff, "loda,%s", ABS(1,rv,pc));
+			sprintf(buffer, "loda,%s", ABS(1,rv,pc));
 #endif
             pc+=2;
 			break;
 		case 0x10: case 0x11:
 #if HJB
-			sprintf(buff, "**** $%02X",op);
+			sprintf(buffer, "**** $%02X",op);
 #else
-			sprintf(buff, "****   $%02X",op);
+			sprintf(buffer, "****   $%02X",op);
 #endif
 			break;
 		case 0x12:
 #if HJB
-			sprintf(buff, "ld   psu,r0");
+			sprintf(buffer, "ld   psu,r0");
 #else
-            sprintf(buff, "spsu");
+            sprintf(buffer, "spsu");
 #endif
             break;
 		case 0x13:
 #if HJB
-			sprintf(buff, "ld   psl,r0");
+			sprintf(buffer, "ld   psl,r0");
 #else
-            sprintf(buff, "spsl");
+            sprintf(buffer, "spsl");
 #endif
             break;
 		case 0x14: case 0x15: case 0x16: case 0x17:
 #if HJB
 			if (rv == 3)
-				sprintf(buff, "ret");
+				sprintf(buffer, "ret");
             else
-				sprintf(buff, "ret  %c", cc[rv]);
+				sprintf(buffer, "ret  %c", cc[rv]);
 #else
-            sprintf(buff, "retc   %c", cc[rv]);
+            sprintf(buffer, "retc   %c", cc[rv]);
 #endif
             flags = DASMFLAG_STEP_OUT;
             break;
 		case 0x18: case 0x19: case 0x1a: case 0x1b:
 #if HJB
 			if (rv == 3)
-				sprintf(buff, "jr   %s", REL(pc));
+				sprintf(buffer, "jr   %s", REL(pc));
 			else
-				sprintf(buff, "jr   %c,%s", cc[rv], REL(pc));
+				sprintf(buffer, "jr   %c,%s", cc[rv], REL(pc));
 #else
-            sprintf(buff, "bctr,%c %s", cc[rv], REL(pc));
+            sprintf(buffer, "bctr,%c %s", cc[rv], REL(pc));
 #endif
             pc+=1;
 			break;
 		case 0x1c: case 0x1d: case 0x1e: case 0x1f:
 #if HJB
 			if (rv == 3)
-				sprintf(buff, "jp   %s", ADR(pc));
+				sprintf(buffer, "jp   %s", ADR(pc));
 			else
-				sprintf(buff, "jp   %c,%s", cc[rv], ADR(pc));
+				sprintf(buffer, "jp   %c,%s", cc[rv], ADR(pc));
 #else
-            sprintf(buff, "bcta,%c %s", cc[rv], ADR(pc));
+            sprintf(buffer, "bcta,%c %s", cc[rv], ADR(pc));
 #endif
             pc+=2;
 			break;
 		case 0x20: case 0x21: case 0x22: case 0x23:
 #if HJB
-			sprintf(buff, "xor  r0,r%d", rv);
+			sprintf(buffer, "xor  r0,r%d", rv);
 #else
-            sprintf(buff, "eorz,%d", rv);
+            sprintf(buffer, "eorz,%d", rv);
 #endif
             break;
 		case 0x24: case 0x25: case 0x26: case 0x27:
 #if HJB
-			sprintf(buff, "xor  r%d,%s", rv, IMM(pc));
+			sprintf(buffer, "xor  r%d,%s", rv, IMM(pc));
 #else
-            sprintf(buff, "eori,%d %s", rv, IMM(pc));
+            sprintf(buffer, "eori,%d %s", rv, IMM(pc));
 #endif
             pc+=1;
 			break;
 		case 0x28: case 0x29: case 0x2a: case 0x2b:
 #if HJB
-			sprintf(buff, "xor  r%d,(%s)", rv, REL(pc));
+			sprintf(buffer, "xor  r%d,(%s)", rv, REL(pc));
 #else
-            sprintf(buff, "eorr,%d %s", rv, REL(pc));
+            sprintf(buffer, "eorr,%d %s", rv, REL(pc));
 #endif
             pc+=1;
 			break;
 		case 0x2c: case 0x2d: case 0x2e: case 0x2f:
 #if HJB
-			sprintf(buff, "xor  %s", ABS(1,rv,pc));
+			sprintf(buffer, "xor  %s", ABS(1,rv,pc));
 #else
-			sprintf(buff, "eora,%s", ABS(1,rv,pc));
+			sprintf(buffer, "eora,%s", ABS(1,rv,pc));
 #endif
             pc+=2;
 			break;
 		case 0x30: case 0x31: case 0x32: case 0x33:
 #if HJB
-			sprintf(buff, "in   r%d,(ctrl)", rv);
+			sprintf(buffer, "in   r%d,(ctrl)", rv);
 #else
-            sprintf(buff, "redc,%d", rv);
+            sprintf(buffer, "redc,%d", rv);
 #endif
             break;
 		case 0x34: case 0x35: case 0x36: case 0x37:
 #if HJB
 			if (rv == 3)
-				sprintf(buff, "iret");
+				sprintf(buffer, "iret");
             else
-				sprintf(buff, "iret %c", cc[rv]);
+				sprintf(buffer, "iret %c", cc[rv]);
 #else
-            sprintf(buff, "rete   %c", cc[rv]);
+            sprintf(buffer, "rete   %c", cc[rv]);
 #endif
             flags = DASMFLAG_STEP_OUT;
             break;
 		case 0x38: case 0x39: case 0x3a: case 0x3b:
 #if HJB
 			if (rv == 3)
-				sprintf(buff, "calr %s", REL(pc));
+				sprintf(buffer, "calr %s", REL(pc));
 			else
-				sprintf(buff, "calr %c,%s", cc[rv], REL(pc));
+				sprintf(buffer, "calr %c,%s", cc[rv], REL(pc));
 #else
-            sprintf(buff, "bstr,%c %s", cc[rv], REL(pc));
+            sprintf(buffer, "bstr,%c %s", cc[rv], REL(pc));
 #endif
             pc+=1;
             flags = DASMFLAG_STEP_OVER;
@@ -383,482 +383,482 @@ offs_t s2650_dasm(char *buff, offs_t PC, const UINT8 *oprom, const UINT8 *opram)
 		case 0x3c: case 0x3d: case 0x3e: case 0x3f:
 #if HJB
 			if (rv == 3)
-				sprintf(buff, "call %s", ADR(pc));
+				sprintf(buffer, "call %s", ADR(pc));
 			else
-				sprintf(buff, "call %c,%s", cc[rv], ADR(pc));
+				sprintf(buffer, "call %c,%s", cc[rv], ADR(pc));
 #else
-            sprintf(buff, "bsta,%c %s", cc[rv], ADR(pc));
+            sprintf(buffer, "bsta,%c %s", cc[rv], ADR(pc));
 #endif
             pc+=2;
             flags = DASMFLAG_STEP_OVER;
 			break;
 		case 0x40:
-			sprintf(buff, "halt");
+			sprintf(buffer, "halt");
 			break;
 		case 0x41: case 0x42: case 0x43:
 #if HJB
-			sprintf(buff, "and  r0,r%d", rv);
+			sprintf(buffer, "and  r0,r%d", rv);
 #else
-            sprintf(buff, "andz,%d", rv);
+            sprintf(buffer, "andz,%d", rv);
 #endif
             break;
 		case 0x44: case 0x45: case 0x46: case 0x47:
 #if HJB
-			sprintf(buff, "and  r%d,%s", rv, IMM(pc));
+			sprintf(buffer, "and  r%d,%s", rv, IMM(pc));
 #else
-            sprintf(buff, "andi,%d %s", rv, IMM(pc));
+            sprintf(buffer, "andi,%d %s", rv, IMM(pc));
 #endif
             pc+=1;
 			break;
 		case 0x48: case 0x49: case 0x4a: case 0x4b:
 #if HJB
-			sprintf(buff, "and  r%d,(%s)", rv, REL(pc));
+			sprintf(buffer, "and  r%d,(%s)", rv, REL(pc));
 #else
-            sprintf(buff, "andr,%d %s", rv, REL(pc));
+            sprintf(buffer, "andr,%d %s", rv, REL(pc));
 #endif
             pc+=1;
 			break;
 		case 0x4c: case 0x4d: case 0x4e: case 0x4f:
 #if HJB
-			sprintf(buff, "and  %s", ABS(1,rv,pc));
+			sprintf(buffer, "and  %s", ABS(1,rv,pc));
 #else
-			sprintf(buff, "anda,%s", ABS(1,rv,pc));
+			sprintf(buffer, "anda,%s", ABS(1,rv,pc));
 #endif
             pc+=2;
 			break;
 		case 0x50: case 0x51: case 0x52: case 0x53:
 #if HJB
-			sprintf(buff, "ror  r%d", rv);
+			sprintf(buffer, "ror  r%d", rv);
 #else
-            sprintf(buff, "rrr,%d", rv);
+            sprintf(buffer, "rrr,%d", rv);
 #endif
             break;
 		case 0x54: case 0x55: case 0x56: case 0x57:
 #if HJB
-			sprintf(buff, "in   r%d,(%s)", rv, IMM(pc));
+			sprintf(buffer, "in   r%d,(%s)", rv, IMM(pc));
 #else
-            sprintf(buff, "rede,%d %s", rv, IMM(pc));
+            sprintf(buffer, "rede,%d %s", rv, IMM(pc));
 #endif
             pc+=1;
 			break;
 		case 0x58: case 0x59: case 0x5a: case 0x5b:
 #if HJB
-			sprintf(buff, "jrnz r%d,%s", rv, REL(pc));
+			sprintf(buffer, "jrnz r%d,%s", rv, REL(pc));
 #else
-            sprintf(buff, "brnr,%d %s", rv, REL(pc));
+            sprintf(buffer, "brnr,%d %s", rv, REL(pc));
 #endif
             pc+=1;
 			break;
 		case 0x5c: case 0x5d: case 0x5e: case 0x5f:
 #if HJB
-			sprintf(buff, "jpnz r%d,%s", rv, ADR(pc));
+			sprintf(buffer, "jpnz r%d,%s", rv, ADR(pc));
 #else
-            sprintf(buff, "brna,%d %s", rv, ADR(pc));
+            sprintf(buffer, "brna,%d %s", rv, ADR(pc));
 #endif
             pc+=2;
 			break;
 		case 0x60: case 0x61: case 0x62: case 0x63:
 #if HJB
-			sprintf(buff, "or   r0,r%d", rv);
+			sprintf(buffer, "or   r0,r%d", rv);
 #else
-            sprintf(buff, "iorz,%d", rv);
+            sprintf(buffer, "iorz,%d", rv);
 #endif
             break;
 		case 0x64: case 0x65: case 0x66: case 0x67:
 #if HJB
-			sprintf(buff, "or   r%d,%s", rv, IMM(pc));
+			sprintf(buffer, "or   r%d,%s", rv, IMM(pc));
 #else
-            sprintf(buff, "iori,%d %s", rv, IMM(pc));
+            sprintf(buffer, "iori,%d %s", rv, IMM(pc));
 #endif
             pc+=1;
 			break;
 		case 0x68: case 0x69: case 0x6a: case 0x6b:
 #if HJB
-			sprintf(buff, "or   r%d,(%s)", rv, REL(pc));
+			sprintf(buffer, "or   r%d,(%s)", rv, REL(pc));
 #else
-            sprintf(buff, "iorr,%d %s", rv, REL(pc));
+            sprintf(buffer, "iorr,%d %s", rv, REL(pc));
 #endif
             pc+=1;
 			break;
 		case 0x6c: case 0x6d: case 0x6e: case 0x6f:
 #if HJB
-			sprintf(buff, "or   %s", ABS(1,rv,pc));
+			sprintf(buffer, "or   %s", ABS(1,rv,pc));
 #else
-			sprintf(buff, "iora,%s", ABS(1,rv,pc));
+			sprintf(buffer, "iora,%s", ABS(1,rv,pc));
 #endif
             pc+=2;
 			break;
 		case 0x70: case 0x71: case 0x72: case 0x73:
 #if HJB
-			sprintf(buff, "in   r%d,(data)", rv);
+			sprintf(buffer, "in   r%d,(data)", rv);
 #else
-            sprintf(buff, "redd,%d", rv);
+            sprintf(buffer, "redd,%d", rv);
 #endif
             break;
 		case 0x74:
 #if HJB
-			sprintf(buff, "res  psu,%s", IMM_PSU(pc));
+			sprintf(buffer, "res  psu,%s", IMM_PSU(pc));
 #else
-            sprintf(buff, "cpsu   %s", IMM_PSU(pc));
+            sprintf(buffer, "cpsu   %s", IMM_PSU(pc));
 #endif
             pc+=1;
 			break;
 		case 0x75:
 #if HJB
-			sprintf(buff, "res  psl,%s", IMM_PSL(pc));
+			sprintf(buffer, "res  psl,%s", IMM_PSL(pc));
 #else
-            sprintf(buff, "cpsl   %s", IMM_PSL(pc));
+            sprintf(buffer, "cpsl   %s", IMM_PSL(pc));
 #endif
             pc+=1;
 			break;
 		case 0x76:
 #if HJB
-			sprintf(buff, "set  psu,%s", IMM_PSU(pc));
+			sprintf(buffer, "set  psu,%s", IMM_PSU(pc));
 #else
-            sprintf(buff, "ppsu   %s", IMM_PSU(pc));
+            sprintf(buffer, "ppsu   %s", IMM_PSU(pc));
 #endif
             pc+=1;
 			break;
 		case 0x77:
 #if HJB
-			sprintf(buff, "set  psl,%s", IMM_PSL(pc));
+			sprintf(buffer, "set  psl,%s", IMM_PSL(pc));
 #else
-            sprintf(buff, "ppsl   %s", IMM_PSL(pc));
+            sprintf(buffer, "ppsl   %s", IMM_PSL(pc));
 #endif
             pc+=1;
 			break;
 		case 0x78: case 0x79: case 0x7a: case 0x7b:
 #if HJB
-			sprintf(buff, "call r%d-nz,%s", rv, REL(pc));
+			sprintf(buffer, "call r%d-nz,%s", rv, REL(pc));
 #else
-            sprintf(buff, "bsnr,%d %s", rv, REL(pc));
+            sprintf(buffer, "bsnr,%d %s", rv, REL(pc));
 #endif
             pc+=1;
             flags = DASMFLAG_STEP_OVER;
 			break;
 		case 0x7c: case 0x7d: case 0x7e: case 0x7f:
 #if HJB
-			sprintf(buff, "call r%d-nz,%s", rv, ADR(pc));
+			sprintf(buffer, "call r%d-nz,%s", rv, ADR(pc));
 #else
-            sprintf(buff, "bsna,%d %s", rv, ADR(pc));
+            sprintf(buffer, "bsna,%d %s", rv, ADR(pc));
 #endif
             pc+=2;
             flags = DASMFLAG_STEP_OVER;
 			break;
 		case 0x80: case 0x81: case 0x82: case 0x83:
 #if HJB
-			sprintf(buff, "add  r0,r%d", rv);
+			sprintf(buffer, "add  r0,r%d", rv);
 #else
-            sprintf(buff, "addz,%d", rv);
+            sprintf(buffer, "addz,%d", rv);
 #endif
             break;
 		case 0x84: case 0x85: case 0x86: case 0x87:
 #if HJB
-			sprintf(buff, "add  r%d,%s", rv, IMM(pc));
+			sprintf(buffer, "add  r%d,%s", rv, IMM(pc));
 #else
-            sprintf(buff, "addi,%d %s", rv, IMM(pc));
+            sprintf(buffer, "addi,%d %s", rv, IMM(pc));
 #endif
             pc+=1;
 			break;
 		case 0x88: case 0x89: case 0x8a: case 0x8b:
 #if HJB
-			sprintf(buff, "add  r%d,(%s)", rv, REL(pc));
+			sprintf(buffer, "add  r%d,(%s)", rv, REL(pc));
 #else
-            sprintf(buff, "addr,%d %s", rv, REL(pc));
+            sprintf(buffer, "addr,%d %s", rv, REL(pc));
 #endif
             pc+=1;
 			break;
 		case 0x8c: case 0x8d: case 0x8e: case 0x8f:
 #if HJB
-			sprintf(buff, "add  %s", ABS(1,rv,pc));
+			sprintf(buffer, "add  %s", ABS(1,rv,pc));
 #else
-			sprintf(buff, "adda,%s", ABS(1,rv,pc));
+			sprintf(buffer, "adda,%s", ABS(1,rv,pc));
 #endif
             pc+=2;
 			break;
 		case 0x90: case 0x91:
 #if HJB
-			sprintf(buff, "**** $%02X",op);
+			sprintf(buffer, "**** $%02X",op);
 #else
-			sprintf(buff, "****   $%02X",op);
+			sprintf(buffer, "****   $%02X",op);
 #endif
 			break;
 		case 0x92:
 #if HJB
-			sprintf(buff, "ld   r0,psu");
+			sprintf(buffer, "ld   r0,psu");
 #else
-            sprintf(buff, "lpsu");
+            sprintf(buffer, "lpsu");
 #endif
             break;
 		case 0x93:
 #if HJB
-			sprintf(buff, "ld   r0,psl");
+			sprintf(buffer, "ld   r0,psl");
 #else
-            sprintf(buff, "lpsl");
+            sprintf(buffer, "lpsl");
 #endif
             break;
 		case 0x94: case 0x95: case 0x96: case 0x97:
 #if HJB
-			sprintf(buff, "daa  r%d", rv);
+			sprintf(buffer, "daa  r%d", rv);
 #else
-            sprintf(buff, "dar,%d", rv);
+            sprintf(buffer, "dar,%d", rv);
 #endif
             break;
 		case 0x98: case 0x99: case 0x9a:
 #if HJB
-			sprintf(buff, "jr   n%c,%s", cc[rv], REL(pc));
+			sprintf(buffer, "jr   n%c,%s", cc[rv], REL(pc));
 #else
-            sprintf(buff, "bcfr,%c %s", cc[rv], REL(pc));
+            sprintf(buffer, "bcfr,%c %s", cc[rv], REL(pc));
 #endif
             pc+=1;
 			break;
 		case 0x9b:
 #if HJB
-			sprintf(buff, "jr0  %s", REL0(pc));
+			sprintf(buffer, "jr0  %s", REL0(pc));
 #else
-			sprintf(buff, "zbrr   %s", REL0(pc));
+			sprintf(buffer, "zbrr   %s", REL0(pc));
 #endif
             pc+=1;
 			break;
 		case 0x9c: case 0x9d: case 0x9e:
 #if HJB
-			sprintf(buff, "jp   n%c,%s", cc[rv], ADR(pc));
+			sprintf(buffer, "jp   n%c,%s", cc[rv], ADR(pc));
 #else
-            sprintf(buff, "bcfa,%c %s", cc[rv], ADR(pc));
+            sprintf(buffer, "bcfa,%c %s", cc[rv], ADR(pc));
 #endif
             pc+=2;
 			break;
 		case 0x9f:
 #if HJB
-			sprintf(buff, "jp   %s+r3", ADR(pc));
+			sprintf(buffer, "jp   %s+r3", ADR(pc));
 #else
-            sprintf(buff, "bxa    %s", ADR(pc));
+            sprintf(buffer, "bxa    %s", ADR(pc));
 #endif
             pc+=2;
 			break;
 		case 0xa0: case 0xa1: case 0xa2: case 0xa3:
 #if HJB
-			sprintf(buff, "sub  r0,r%d", rv);
+			sprintf(buffer, "sub  r0,r%d", rv);
 #else
-            sprintf(buff, "subz,%d", rv);
+            sprintf(buffer, "subz,%d", rv);
 #endif
             break;
 		case 0xa4: case 0xa5: case 0xa6: case 0xa7:
 #if HJB
-			sprintf(buff, "sub  r%d,%s", rv, IMM(pc));
+			sprintf(buffer, "sub  r%d,%s", rv, IMM(pc));
 #else
-            sprintf(buff, "subi,%d %s", rv, IMM(pc));
+            sprintf(buffer, "subi,%d %s", rv, IMM(pc));
 #endif
             pc+=1;
 			break;
 		case 0xa8: case 0xa9: case 0xaa: case 0xab:
 #if HJB
-			sprintf(buff, "sub  r%d,(%s)", rv, REL(pc));
+			sprintf(buffer, "sub  r%d,(%s)", rv, REL(pc));
 #else
-            sprintf(buff, "subr,%d %s", rv, REL(pc));
+            sprintf(buffer, "subr,%d %s", rv, REL(pc));
 #endif
             pc+=1;
 			break;
 		case 0xac: case 0xad: case 0xae: case 0xaf:
 #if HJB
-			sprintf(buff, "sub  %s", ABS(1,rv,pc));
+			sprintf(buffer, "sub  %s", ABS(1,rv,pc));
 #else
-			sprintf(buff, "suba,%s", ABS(1,rv,pc));
+			sprintf(buffer, "suba,%s", ABS(1,rv,pc));
 #endif
             pc+=2;
 			break;
 		case 0xb0: case 0xb1: case 0xb2: case 0xb3:
 #if HJB
-			sprintf(buff, "out  (ctrl),r%d", rv);
+			sprintf(buffer, "out  (ctrl),r%d", rv);
 #else
-            sprintf(buff, "wrtc,%d", rv);
+            sprintf(buffer, "wrtc,%d", rv);
 #endif
             break;
 		case 0xb4:
 #if HJB
-			sprintf(buff, "bit  psu,%s", IMM_PSU(pc));
+			sprintf(buffer, "bit  psu,%s", IMM_PSU(pc));
 #else
-            sprintf(buff, "tpsu   %s", IMM_PSU(pc));
+            sprintf(buffer, "tpsu   %s", IMM_PSU(pc));
 #endif
             pc+=1;
 			break;
 		case 0xb5:
 #if HJB
-			sprintf(buff, "bit  psl,%s", IMM_PSL(pc));
+			sprintf(buffer, "bit  psl,%s", IMM_PSL(pc));
 #else
-            sprintf(buff, "tpsl   %s", IMM_PSL(pc));
+            sprintf(buffer, "tpsl   %s", IMM_PSL(pc));
 #endif
             pc+=1;
 			break;
 		case 0xb6: case 0xb7:
 #if HJB
-			sprintf(buff, "**** $%02X",op);
+			sprintf(buffer, "**** $%02X",op);
 #else
-			sprintf(buff, "****   $%02X",op);
+			sprintf(buffer, "****   $%02X",op);
 #endif
 			break;
 		case 0xb8: case 0xb9: case 0xba:
 #if HJB
-			sprintf(buff, "calr n%c,%s", cc[rv], REL(pc));
+			sprintf(buffer, "calr n%c,%s", cc[rv], REL(pc));
 #else
-            sprintf(buff, "bsfr,%c %s", cc[rv], REL(pc));
+            sprintf(buffer, "bsfr,%c %s", cc[rv], REL(pc));
 #endif
             pc+=1;
             flags = DASMFLAG_STEP_OVER;
 			break;
 		case 0xbb:
 #if HJB
-			sprintf(buff, "cal0 %s", REL0(pc));
+			sprintf(buffer, "cal0 %s", REL0(pc));
 #else
-            sprintf(buff, "zbsr   %s", REL0(pc));
+            sprintf(buffer, "zbsr   %s", REL0(pc));
 #endif
             pc+=1;
             flags = DASMFLAG_STEP_OVER;
 			break;
 		case 0xbc: case 0xbd: case 0xbe:
 #if HJB
-			sprintf(buff, "call n%c,%s", cc[rv], ADR(pc));
+			sprintf(buffer, "call n%c,%s", cc[rv], ADR(pc));
 #else
-            sprintf(buff, "bsfa,%c %s", cc[rv], ADR(pc));
+            sprintf(buffer, "bsfa,%c %s", cc[rv], ADR(pc));
 #endif
             pc+=2;
             flags = DASMFLAG_STEP_OVER;
 			break;
 		case 0xbf:
 #if HJB
-			sprintf(buff, "call %s+r3", ADR(pc));
+			sprintf(buffer, "call %s+r3", ADR(pc));
 #else
-            sprintf(buff, "bsxa   %s", ADR(pc));
+            sprintf(buffer, "bsxa   %s", ADR(pc));
 #endif
             pc+=2;
             flags = DASMFLAG_STEP_OVER;
 			break;
 		case 0xc0:
-			sprintf(buff, "nop");
+			sprintf(buffer, "nop");
 			break;
 		case 0xc1: case 0xc2: case 0xc3:
 #if HJB
-			sprintf(buff, "ld   r%d,r0", rv);
+			sprintf(buffer, "ld   r%d,r0", rv);
 #else
-            sprintf(buff, "strz,%d", rv);
+            sprintf(buffer, "strz,%d", rv);
 #endif
             break;
 		case 0xc4: case 0xc5: case 0xc6: case 0xc7:
 #if HJB
-			sprintf(buff, "**** $%02X",op);
+			sprintf(buffer, "**** $%02X",op);
 #else
-			sprintf(buff, "****   $%02X",op);
+			sprintf(buffer, "****   $%02X",op);
 #endif
 			break;
 		case 0xc8: case 0xc9: case 0xca: case 0xcb:
 #if HJB
-			sprintf(buff, "ld   (%s),r%d", REL(pc), rv);
+			sprintf(buffer, "ld   (%s),r%d", REL(pc), rv);
 #else
-            sprintf(buff, "strr,%d %s", rv, REL(pc));
+            sprintf(buffer, "strr,%d %s", rv, REL(pc));
 #endif
             pc+=1;
 			break;
 		case 0xcc: case 0xcd: case 0xce: case 0xcf:
 #if HJB
-			sprintf(buff, "ld   %s", ABS(0,rv,pc));
+			sprintf(buffer, "ld   %s", ABS(0,rv,pc));
 #else
-			sprintf(buff, "stra,%s", ABS(1,rv,pc));
+			sprintf(buffer, "stra,%s", ABS(1,rv,pc));
 #endif
 			pc+=2;
 			break;
 		case 0xd0: case 0xd1: case 0xd2: case 0xd3:
 #if HJB
-			sprintf(buff, "rol  r%d", rv);
+			sprintf(buffer, "rol  r%d", rv);
 #else
-            sprintf(buff, "rrl,%d", rv);
+            sprintf(buffer, "rrl,%d", rv);
 #endif
             break;
 		case 0xd4: case 0xd5: case 0xd6: case 0xd7:
 #if HJB
-			sprintf(buff, "out  (%s),r%d", IMM(pc), rv);
+			sprintf(buffer, "out  (%s),r%d", IMM(pc), rv);
 #else
-            sprintf(buff, "wrte,%d %s", rv, IMM(pc));
+            sprintf(buffer, "wrte,%d %s", rv, IMM(pc));
 #endif
             pc+=1;
 			break;
 		case 0xd8: case 0xd9: case 0xda: case 0xdb:
 #if HJB
-			sprintf(buff, "ijnz r%d,%s", rv, REL(pc));
+			sprintf(buffer, "ijnz r%d,%s", rv, REL(pc));
 #else
-            sprintf(buff, "birr,%d %s", rv, REL(pc));
+            sprintf(buffer, "birr,%d %s", rv, REL(pc));
 #endif
             pc+=1;
             flags = DASMFLAG_STEP_OVER;
 			break;
 		case 0xdc: case 0xdd: case 0xde: case 0xdf:
 #if HJB
-			sprintf(buff, "ijnz r%d,%s", rv, ADR(pc));
+			sprintf(buffer, "ijnz r%d,%s", rv, ADR(pc));
 #else
-            sprintf(buff, "bira,%d %s", rv, ADR(pc));
+            sprintf(buffer, "bira,%d %s", rv, ADR(pc));
 #endif
             pc+=2;
             flags = DASMFLAG_STEP_OVER;
 			break;
 		case 0xe0: case 0xe1: case 0xe2: case 0xe3:
 #if HJB
-			sprintf(buff, "cp   r0,%d", rv);
+			sprintf(buffer, "cp   r0,%d", rv);
 #else
-            sprintf(buff, "comz,%d", rv);
+            sprintf(buffer, "comz,%d", rv);
 #endif
             break;
 		case 0xe4: case 0xe5: case 0xe6: case 0xe7:
 #if HJB
-			sprintf(buff, "cp   r%d,%s", rv, IMM(pc));
+			sprintf(buffer, "cp   r%d,%s", rv, IMM(pc));
 #else
-            sprintf(buff, "comi,%d %s", rv, IMM(pc));
+            sprintf(buffer, "comi,%d %s", rv, IMM(pc));
 #endif
             pc+=1;
 			break;
 		case 0xe8: case 0xe9: case 0xea: case 0xeb:
 #if HJB
-			sprintf(buff, "cp   r%d,(%s)", rv, REL(pc));
+			sprintf(buffer, "cp   r%d,(%s)", rv, REL(pc));
 #else
-            sprintf(buff, "comr,%d %s", rv, REL(pc));
+            sprintf(buffer, "comr,%d %s", rv, REL(pc));
 #endif
             pc+=1;
 			break;
 		case 0xec: case 0xed: case 0xee: case 0xef:
 #if HJB
-			sprintf(buff, "cp   %s", ABS(1,rv,pc));
+			sprintf(buffer, "cp   %s", ABS(1,rv,pc));
 #else
-			sprintf(buff, "coma,%s", ABS(1,rv,pc));
+			sprintf(buffer, "coma,%s", ABS(1,rv,pc));
 #endif
             pc+=2;
 			break;
 		case 0xf0: case 0xf1: case 0xf2: case 0xf3:
 #if HJB
-			sprintf(buff, "out  (data),r%d", rv);
+			sprintf(buffer, "out  (data),r%d", rv);
 #else
-            sprintf(buff, "wrtd,%d", rv);
+            sprintf(buffer, "wrtd,%d", rv);
 #endif
             break;
 		case 0xf4: case 0xf5: case 0xf6: case 0xf7:
 #if HJB
-			sprintf(buff, "test r%d,%s", rv, IMM(pc));
+			sprintf(buffer, "test r%d,%s", rv, IMM(pc));
 #else
-            sprintf(buff, "tmi,%d  %s", rv, IMM(pc));
+            sprintf(buffer, "tmi,%d  %s", rv, IMM(pc));
 #endif
             pc+=1;
 			break;
 		case 0xf8: case 0xf9: case 0xfa: case 0xfb:
 #if HJB
-			sprintf(buff, "djnz r%d,%s", rv, REL(pc));
+			sprintf(buffer, "djnz r%d,%s", rv, REL(pc));
 #else
-            sprintf(buff, "bdrr,%d %s", rv, REL(pc));
+            sprintf(buffer, "bdrr,%d %s", rv, REL(pc));
 #endif
             pc+=1;
             flags = DASMFLAG_STEP_OVER;
 			break;
 		case 0xfc: case 0xfd: case 0xfe: case 0xff:
 #if HJB
-			sprintf(buff, "djnz r%d,%s", rv, ADR(pc));
+			sprintf(buffer, "djnz r%d,%s", rv, ADR(pc));
 #else
-            sprintf(buff, "bdra,%d %s", rv, ADR(pc));
+            sprintf(buffer, "bdra,%d %s", rv, ADR(pc));
 #endif
             pc+=2;
             flags = DASMFLAG_STEP_OVER;

@@ -285,13 +285,13 @@ static CPU_EXECUTE( h6280 )
 	return cycles - h6280_ICount;
 }
 
-static void h6280_get_context (void *dst)
+static CPU_GET_CONTEXT( h6280 )
 {
 	if( dst )
 		*(h6280_Regs*)dst = h6280;
 }
 
-static void h6280_set_context (void *src)
+static CPU_SET_CONTEXT( h6280 )
 {
 	if( src )
 		h6280 = *(h6280_Regs*)src;
@@ -385,10 +385,10 @@ WRITE8_HANDLER( h6280_timer_w )
 	}
 }
 
-static int h6280_translate(int space, int intention, offs_t *addr)
+static CPU_TRANSLATE( h6280 )
 {
 	if (space == ADDRESS_SPACE_PROGRAM)
-		*addr = TRANSLATED(*addr);
+		*address = TRANSLATED(*address);
 	return TRUE;
 }
 
@@ -408,7 +408,7 @@ void h6280io_set_buffer(UINT8 data)
  * Generic set_info
  **************************************************************************/
 
-static void h6280_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( h6280 )
 {
 	switch (state)
 	{
@@ -449,7 +449,7 @@ static void h6280_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void h6280_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( h6280 )
 {
 	switch (state)
 	{
@@ -507,17 +507,17 @@ void h6280_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + H6280_M8:			info->i = h6280.mmr[7];					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = h6280_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = h6280_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = h6280_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(h6280);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(h6280);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(h6280);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(h6280);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(h6280);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(h6280);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(h6280);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = h6280_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(h6280);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &h6280_ICount;			break;
-		case CPUINFO_PTR_TRANSLATE:						info->translate = h6280_translate;		break;
+		case CPUINFO_PTR_TRANSLATE:						info->translate = CPU_TRANSLATE_NAME(h6280);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "HuC6280");				break;

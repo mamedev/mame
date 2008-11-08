@@ -35,8 +35,8 @@ enum
 
 #define M65CE02_IRQ_LINE				M6502_IRQ_LINE
 
-void m65ce02_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( m65ce02 );
 
-extern unsigned m65ce02_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+extern CPU_DISASSEMBLE( m65ce02 );
 
 #endif /* __M65CE02_H__ */

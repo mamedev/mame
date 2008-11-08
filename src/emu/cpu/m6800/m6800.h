@@ -24,7 +24,7 @@ enum
 									/* fall  eddge : ASSERT_LINE -> CLEAR_LINE      */
 									/* it is usuali to use PULSE_LINE state         */
 
-extern void m6800_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( m6800 );
 
 /****************************************************************************
  * For now make the 6801 using the m6800 variables and functions
@@ -43,7 +43,7 @@ extern void m6800_get_info(UINT32 state, cpuinfo *info);
 #define M6801_WAI					M6800_WAI
 #define M6801_IRQ_LINE				M6800_IRQ_LINE
 
-extern void m6801_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( m6801 );
 #endif
 
 /****************************************************************************
@@ -63,7 +63,7 @@ extern void m6801_get_info(UINT32 state, cpuinfo *info);
 #define M6802_WAI					M6800_WAI
 #define M6802_IRQ_LINE				M6800_IRQ_LINE
 
-extern void m6802_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( m6802 );
 #endif
 
 /****************************************************************************
@@ -84,7 +84,7 @@ extern void m6802_get_info(UINT32 state, cpuinfo *info);
 #define M6803_IRQ_LINE				M6800_IRQ_LINE
 #define M6803_TIN_LINE				M6800_TIN_LINE
 
-extern void m6803_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( m6803 );
 #endif
 
 #if (HAS_M6801||HAS_M6803||HAS_HD63701)
@@ -120,7 +120,7 @@ extern void m6803_get_info(UINT32 state, cpuinfo *info);
 #define M6808_WAI                   M6800_WAI
 #define M6808_IRQ_LINE              M6800_IRQ_LINE
 
-extern void m6808_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( m6808 );
 #endif
 
 /****************************************************************************
@@ -142,7 +142,7 @@ extern void m6808_get_info(UINT32 state, cpuinfo *info);
 #define HD63701_IRQ_LINE			 M6800_IRQ_LINE
 #define HD63701_TIN_LINE			 M6800_TIN_LINE
 
-extern void hd63701_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( hd63701 );
 
 void hd63701_trap_pc(void);
 
@@ -179,7 +179,7 @@ WRITE8_HANDLER( hd63701_internal_registers_w );
 #define NSC8105_IRQ_LINE			 M6800_IRQ_LINE
 #define NSC8105_TIN_LINE			 M6800_TIN_LINE
 
-extern void nsc8105_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( nsc8105 );
 #endif
 
 /****************************************************************************/
@@ -214,12 +214,12 @@ extern void nsc8105_get_info(UINT32 state, cpuinfo *info);
 #    define TRUE (!FALSE)
 #endif
 
-offs_t m6800_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-offs_t m6801_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-offs_t m6802_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-offs_t m6803_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-offs_t m6808_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-offs_t hd63701_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-offs_t nsc8105_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( m6800 );
+CPU_DISASSEMBLE( m6801 );
+CPU_DISASSEMBLE( m6802 );
+CPU_DISASSEMBLE( m6803 );
+CPU_DISASSEMBLE( m6808 );
+CPU_DISASSEMBLE( hd63701 );
+CPU_DISASSEMBLE( nsc8105 );
 
 #endif /* __M6800_H__ */

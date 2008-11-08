@@ -1883,19 +1883,19 @@ static CPU_EXECUTE( f8 )
     return cycles - f8_icount;
 }
 
-static void f8_get_context (void *dst)
+static CPU_GET_CONTEXT( f8 )
 {
 	if (dst)
 		*(f8_Regs *) dst = f8;
 }
 
-static void f8_set_context (void *src)
+static CPU_SET_CONTEXT( f8 )
 {
 	if (src)
 		f8 = *(f8_Regs *) src;
 }
 
-unsigned f8_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( f8 );
 
 static CPU_INIT( f8 )
 {
@@ -1903,7 +1903,7 @@ static CPU_INIT( f8 )
 	f8.device = device;
 }
 
-static void f8_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( f8 )
 {
 	switch (state)
 	{
@@ -2001,7 +2001,7 @@ static void f8_set_info(UINT32 state, cpuinfo *info)
 	return;
 }
 
-void f8_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( f8 )
 {
 	switch (state)
 	{
@@ -2111,15 +2111,15 @@ void f8_get_info(UINT32 state, cpuinfo *info)
     	info->i = f8.r[state - (CPUINFO_INT_REGISTER + F8_R16) + 16];	break;
 
 	/* --- the following bits of info are returned as pointers to data or functions --- */
-	case CPUINFO_PTR_SET_INFO:						info->setinfo = f8_set_info;			break;
-	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = f8_get_context;		break;
-	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = f8_set_context;		break;
+	case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(f8);			break;
+	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(f8);		break;
+	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(f8);		break;
 	case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(f8);					break;
 	case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(f8);					break;
 	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(f8);				break;
 	case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 
-	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = f8_dasm;			break;
+	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(f8);			break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &f8_icount;				break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */

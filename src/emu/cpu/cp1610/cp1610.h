@@ -36,9 +36,9 @@ enum
 #define CP1610_INT_INTR		INPUT_LINE_NMI	/* Non-Maskable */
 
 
-void cp1610_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( cp1610 );
 
-unsigned cp1610_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( cp1610 );
 
 // Temporary
 #define cp1610_readop(A) program_read_word_16be((A)<<1)

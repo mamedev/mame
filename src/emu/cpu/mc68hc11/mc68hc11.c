@@ -364,14 +364,14 @@ static CPU_EXIT( hc11 )
 
 }
 
-static void hc11_get_context(void *dst)
+static CPU_GET_CONTEXT( hc11 )
 {
 	if (dst) {
 		*(HC11_REGS*)dst = hc11;
 	}
 }
 
-static void hc11_set_context(void *src)
+static CPU_SET_CONTEXT( hc11 )
 {
 	if (src) {
 		hc11 = *(HC11_REGS*)src;
@@ -399,7 +399,7 @@ static CPU_EXECUTE( hc11 )
 
 /*****************************************************************************/
 
-static void mc68hc11_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( mc68hc11 )
 {
 	switch (state)
 	{
@@ -414,7 +414,7 @@ static void mc68hc11_set_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void mc68hc11_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( mc68hc11 )
 {
 	switch(state)
 	{
@@ -453,9 +453,9 @@ void mc68hc11_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + HC11_IY:			info->i = hc11.iy;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = mc68hc11_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = hc11_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = hc11_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(mc68hc11);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(hc11);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(hc11);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(hc11);					break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(hc11);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(hc11);					break;

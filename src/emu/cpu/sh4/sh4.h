@@ -101,7 +101,7 @@ struct sh4_ddt_dma
 	int mode;
 };
 
-extern void sh4_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( sh4 );
 
 WRITE32_HANDLER( sh4_internal_w );
 READ32_HANDLER( sh4_internal_r );

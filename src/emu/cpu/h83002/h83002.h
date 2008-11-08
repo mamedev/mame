@@ -73,7 +73,7 @@ enum
 	H8_SERIAL_B
 };
 
-void h8_3002_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( h8_3002 );
 
 void h8_3002_InterruptRequest(UINT8 source);
 

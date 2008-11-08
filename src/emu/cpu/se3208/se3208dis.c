@@ -1400,14 +1400,14 @@ static _OP DecodeOp(UINT16 Opcode)
 }
 
 
-offs_t SE3208_Dasm(char *Buffer, offs_t PC, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( SE3208 )
 {
 	UINT16 Opcode;
 
 	CLRFLAG(FLAG_E);
 	Context.ER=0;
 
-	Context.PC=PC;
+	Context.PC=pc;
 	Opcode=oprom[0] | (oprom[1] << 8);
-	return 2 | ((*DecodeOp(Opcode))(Opcode,Buffer)) | DASMFLAG_SUPPORTED;
+	return 2 | ((*DecodeOp(Opcode))(Opcode,buffer)) | DASMFLAG_SUPPORTED;
 }

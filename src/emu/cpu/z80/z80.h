@@ -31,8 +31,8 @@ enum
 	CPUINFO_PTR_Z80_CYCLE_TABLE_LAST = CPUINFO_PTR_Z80_CYCLE_TABLE + Z80_TABLE_ex
 };
 
-extern void z80_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( z80 );
 
-extern unsigned z80_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+extern CPU_DISASSEMBLE( z80 );
 
 #endif /* __Z80_H__ */

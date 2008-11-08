@@ -157,7 +157,7 @@ static const char *const opcode_strings[0x0100] =
 };
 #endif
 
-offs_t m6805_dasm(char *buf, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( m6805 )
 {
     int code, bit;
 	UINT16 ea;
@@ -170,40 +170,40 @@ offs_t m6805_dasm(char *buf, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 	else if (disasm[code][0] == rts || disasm[code][0] == rti)
 		flags = DASMFLAG_STEP_OUT;
 
-	buf += sprintf(buf, "%-6s", op_name_str[disasm[code][0]]);
+	buffer += sprintf(buffer, "%-6s", op_name_str[disasm[code][0]]);
 
 	switch( disasm[code][1] )
 	{
 	case _btr:	/* bit test and relative branch */
 		bit = (code >> 1) & 7;
-		sprintf (buf, "%d,$%02X,$%03X", bit, opram[1], pc + 3 + (INT8)opram[2]);
+		sprintf (buffer, "%d,$%02X,$%03X", bit, opram[1], pc + 3 + (INT8)opram[2]);
 		return 3 | flags | DASMFLAG_SUPPORTED;
 	case _bit:	/* bit test */
 		bit = (code >> 1) & 7;
-		sprintf (buf, "%d,$%03X", bit, opram[1]);
+		sprintf (buffer, "%d,$%03X", bit, opram[1]);
 		return 2 | flags | DASMFLAG_SUPPORTED;
 	case _rel:	/* relative */
-		sprintf (buf, "$%03X", pc + 2 + (INT8)opram[1]);
+		sprintf (buffer, "$%03X", pc + 2 + (INT8)opram[1]);
 		return 2 | flags | DASMFLAG_SUPPORTED;
 	case _imm:	/* immediate */
-		sprintf (buf, "#$%02X", opram[1]);
+		sprintf (buffer, "#$%02X", opram[1]);
 		return 2 | flags | DASMFLAG_SUPPORTED;
 	case _dir:	/* direct (zero page address) */
-        sprintf (buf, "$%02X", opram[1]);
+        sprintf (buffer, "$%02X", opram[1]);
 		return 2 | flags | DASMFLAG_SUPPORTED;
 	case _ext:	/* extended (16 bit address) */
 		ea = (opram[1] << 8) + opram[2];
-		sprintf (buf, "$%04X", ea);
+		sprintf (buffer, "$%04X", ea);
 		return 3 | flags | DASMFLAG_SUPPORTED;
 	case _idx:	/* indexed */
-		sprintf (buf, "(x)");
+		sprintf (buffer, "(x)");
 		return 1 | flags | DASMFLAG_SUPPORTED;
 	case _ix1:	/* indexed + byte (zero page) */
-		sprintf (buf, "(x+$%02X)", opram[1]);
+		sprintf (buffer, "(x+$%02X)", opram[1]);
 		return 2 | flags | DASMFLAG_SUPPORTED;
 	case _ix2:	/* indexed + word (16 bit address) */
 		ea = (opram[1] << 8) + opram[2];
-		sprintf (buf, "(x+$%04X)", ea);
+		sprintf (buffer, "(x+$%04X)", ea);
 		return 3 | flags | DASMFLAG_SUPPORTED;
     default:    /* implicit */
 		return 1 | flags | DASMFLAG_SUPPORTED;

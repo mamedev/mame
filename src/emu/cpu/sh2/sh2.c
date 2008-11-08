@@ -2252,20 +2252,20 @@ static CPU_EXECUTE( sh2 )
 }
 
 /* Get registers, return context size */
-static void sh2_get_context(void *dst)
+static CPU_GET_CONTEXT( sh2 )
 {
 	if( dst )
 		*(SH2 **)dst = sh2;
 }
 
 /* Set registers */
-static void sh2_set_context(void *src)
+static CPU_SET_CONTEXT( sh2 )
 {
 	if( src )
 		sh2 = *(SH2 **)src;
 }
 
-static offs_t sh2_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( sh2 )
 {
 	return DasmSH2( buffer, pc, (oprom[0] << 8) | oprom[1] );
 }
@@ -2284,7 +2284,7 @@ static CPU_INIT( sh2 )
  * Generic set_info
  **************************************************************************/
 
-static void sh2_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( sh2 )
 {
 	switch (state)
 	{
@@ -2348,7 +2348,7 @@ static void sh2_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void sh2_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( sh2 )
 {
 	switch (state)
 	{
@@ -2423,14 +2423,14 @@ void sh2_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + SH2_EA:				info->i = sh2->ea;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = sh2_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = sh2_get_context;		break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = sh2_set_context;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(sh2);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(sh2);		break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(sh2);		break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(sh2);					break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(sh2);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(sh2);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = sh2_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(sh2);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sh2_icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -2479,7 +2479,7 @@ void sh2_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void sh1_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( sh1 )
 {
 	switch (state)
 	{

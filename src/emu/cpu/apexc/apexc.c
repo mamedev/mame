@@ -785,13 +785,13 @@ static CPU_RESET( apexc )
                                 which enables easy booting (just press run on the panel) */
 }
 
-static void apexc_get_context(void *dst)
+static CPU_GET_CONTEXT( apexc )
 {
 	if (dst)
 		* ((apexc_regs*) dst) = apexc;
 }
 
-static void apexc_set_context(void *src)
+static CPU_SET_CONTEXT( apexc )
 {
 	if (src)
 		apexc = * ((apexc_regs*)src);
@@ -816,7 +816,7 @@ static CPU_EXECUTE( apexc )
 	return cycles - apexc_ICount;
 }
 
-static void apexc_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( apexc )
 {
 	switch (state)
 	{
@@ -849,7 +849,7 @@ static void apexc_set_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void apexc_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( apexc )
 {
 	switch (state)
 	{
@@ -892,14 +892,14 @@ void apexc_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_INT_REGISTER + APEXC_STATE:		info->i = apexc.running;				break;
 	case CPUINFO_INT_REGISTER + APEXC_ML_FULL:		info->i = effective_address(apexc.ml);	break;
 
-	case CPUINFO_PTR_SET_INFO:						info->setinfo = apexc_set_info;			break;
-	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = apexc_get_context;	break;
-	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = apexc_set_context;	break;
+	case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(apexc);			break;
+	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(apexc);	break;
+	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(apexc);	break;
 	case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(apexc);				break;
 	case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(apexc);				break;
 	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(apexc);			break;
 	case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = apexc_dasm;			break;
+	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(apexc);			break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &apexc_ICount;			break;
 
 	case CPUINFO_STR_NAME:							strcpy(info->s = cpuintrf_temp_str(), "APEXC"); break;

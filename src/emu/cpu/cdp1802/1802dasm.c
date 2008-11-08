@@ -96,10 +96,10 @@ static const struct { const char *mnemonic; Adr adr; } table[]={
 
 };
 
-offs_t cdp1802_dasm(char *dst, offs_t oldpc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( cdp1802 )
 {
 	UINT32 flags = 0;
-	int pc;
+	int oldpc = pc;
 	int oper;
 	UINT16 absolut;
 	oldpc&=0xffff;
@@ -109,9 +109,9 @@ offs_t cdp1802_dasm(char *dst, offs_t oldpc, const UINT8 *oprom, const UINT8 *op
 	switch(oper&0xf0) {
 	case 0:
 		if (oper==0) {
-			sprintf(dst,"%-5s",table[oper].mnemonic);
+			sprintf(buffer,"%-5s",table[oper].mnemonic);
 		} else {
-			sprintf(dst,"%-5sR%.1x",table[(oper&0xf0)|1].mnemonic, oper&0x0f);
+			sprintf(buffer,"%-5sR%.1x",table[(oper&0xf0)|1].mnemonic, oper&0x0f);
 		}
 		break;
 	case 0xd0:
@@ -126,42 +126,42 @@ offs_t cdp1802_dasm(char *dst, offs_t oldpc, const UINT8 *oprom, const UINT8 *op
 	case 0xa0:
 	case 0xb0:
 	case 0xe0:
-		sprintf(dst,"%-5sR%.1x",table[oper&0xf0].mnemonic, oper&0x0f);
+		sprintf(buffer,"%-5sR%.1x",table[oper&0xf0].mnemonic, oper&0x0f);
 		break;
 	default:
 		switch(oper&0xf8) {
 		case 0x60:
 			if (oper==0x60) {
-				sprintf(dst,"%-5s",table[oper].mnemonic);
+				sprintf(buffer,"%-5s",table[oper].mnemonic);
 			} else {
-				sprintf(dst,"%-5s%d",table[(oper&0xf8)|1].mnemonic, oper&0x7);
+				sprintf(buffer,"%-5s%d",table[(oper&0xf8)|1].mnemonic, oper&0x7);
 			}
 			break;
 		case 0x68:
-			sprintf(dst,"%-5s%d",table[(oper&0xf8)|1].mnemonic, oper&0x7);
+			sprintf(buffer,"%-5s%d",table[(oper&0xf8)|1].mnemonic, oper&0x7);
 			break;
 		default:
 			switch (table[oper].adr) {
 			case Imp:
-				sprintf(dst,"%-5s",table[oper].mnemonic);
+				sprintf(buffer,"%-5s",table[oper].mnemonic);
 				if (oper == 0x70 || oper == 0x71)
 					flags = DASMFLAG_STEP_OUT;
 				break;
 			case Imm:
-				sprintf(dst,"%-5s#%.2x",table[oper].mnemonic,oprom[pc++ - oldpc]);
+				sprintf(buffer,"%-5s#%.2x",table[oper].mnemonic,oprom[pc++ - oldpc]);
 				break;
 			case Low:
 				absolut=oprom[pc++ - oldpc];
 				absolut|=pc&0xff00;
-				sprintf(dst,"%-5s%.4x",table[oper].mnemonic,absolut);
+				sprintf(buffer,"%-5s%.4x",table[oper].mnemonic,absolut);
 				break;
 			case Abs:
 				absolut=oprom[pc++ - oldpc]<<8;
 				absolut|=oprom[pc++ - oldpc];
-				sprintf(dst,"%-5s%.4x",table[oper].mnemonic,absolut);
+				sprintf(buffer,"%-5s%.4x",table[oper].mnemonic,absolut);
 				break;
 			default:
-				sprintf(dst,"%-5s%.2x","ill",oper);
+				sprintf(buffer,"%-5s%.2x","ill",oper);
 				break;
 			}
 			break;

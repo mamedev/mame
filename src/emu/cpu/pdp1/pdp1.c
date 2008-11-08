@@ -585,13 +585,13 @@ static CPU_RESET( pdp1 )
 	/* nothing to do */
 }
 
-static void pdp1_get_context (void *dst)
+static CPU_GET_CONTEXT( pdp1 )
 {
 	if (dst)
 		*(pdp1_Regs *) dst = pdp1;
 }
 
-static void pdp1_set_context (void *src)
+static CPU_SET_CONTEXT( pdp1 )
 {
 	if (src)
 		pdp1 = *(pdp1_Regs *) src;
@@ -864,7 +864,7 @@ static CPU_EXECUTE( pdp1 )
 }
 
 
-static void pdp1_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( pdp1 )
 {
 	switch (state)
 	{
@@ -930,7 +930,7 @@ static void pdp1_set_info(UINT32 state, cpuinfo *info)
 }
 
 
-void pdp1_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( pdp1 )
 {
 	switch (state)
 	{
@@ -1015,15 +1015,15 @@ void pdp1_get_info(UINT32 state, cpuinfo *info)
 	case CPUINFO_INT_REGISTER + PDP1_IOS:			info->i = pdp1.ios;						break;
 
 	/* --- the following bits of info are returned as pointers to data or functions --- */
-	case CPUINFO_PTR_SET_INFO:						info->setinfo = pdp1_set_info;			break;
-	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = pdp1_get_context;	break;
-	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = pdp1_set_context;	break;
+	case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(pdp1);			break;
+	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(pdp1);	break;
+	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(pdp1);	break;
 	case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(pdp1);					break;
 	case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(pdp1);				break;
 	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(pdp1);			break;
 	case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 
-	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = pdp1_dasm;			break;
+	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(pdp1);			break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &pdp1_ICount;			break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */

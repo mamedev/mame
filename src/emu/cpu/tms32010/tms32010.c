@@ -811,7 +811,7 @@ static CPU_EXECUTE( tms32010 )
 /****************************************************************************
  *  Get all registers in given buffer
  ****************************************************************************/
-static void tms32010_get_context (void *dst)
+static CPU_GET_CONTEXT( tms32010 )
 {
 	if( dst )
 		*(tms32010_Regs*)dst = R;
@@ -820,7 +820,7 @@ static void tms32010_get_context (void *dst)
 /****************************************************************************
  *  Set all registers to given values
  ****************************************************************************/
-static void tms32010_set_context (void *src)
+static CPU_SET_CONTEXT( tms32010 )
 {
 	if (src)
 		R = *(tms32010_Regs*)src;
@@ -851,7 +851,7 @@ ADDRESS_MAP_END
  *  Generic set_info
  **************************************************************************/
 
-static void tms32010_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( tms32010 )
 {
 	switch (state)
 	{
@@ -879,7 +879,7 @@ static void tms32010_set_info(UINT32 state, cpuinfo *info)
  *  Generic get_info
  **************************************************************************/
 
-void tms32010_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( tms32010 )
 {
 	switch (state)
 	{
@@ -922,15 +922,15 @@ void tms32010_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + TMS32010_AR1: 		info->i = R.AR[1];						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = tms32010_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = tms32010_get_context; break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = tms32010_set_context; break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tms32010);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(tms32010); break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(tms32010); break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tms32010);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms32010);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(tms32010);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tms32010);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tms32010_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms32010);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tms32010_icount;		break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:	info->internal_map16 = address_map_tms32010_ram; break;
 

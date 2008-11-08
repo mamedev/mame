@@ -11,7 +11,7 @@
 
 #include "cpuintrf.h"
 
-offs_t cop410_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( cop410 )
 {
 	UINT8 opcode = oprom[0];
 	UINT8 next_opcode = oprom[1];

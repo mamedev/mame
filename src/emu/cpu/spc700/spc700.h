@@ -53,7 +53,7 @@ CPU_EXIT( spc700 );
 unsigned spc700_get_context(void *dst);
 
 /* Set the current CPU context */
-void spc700_set_context(void *src);
+CPU_SET_CONTEXT( spc700 );
 
 /* Get the current Program Counter */
 unsigned spc700_get_pc(void);
@@ -130,7 +130,7 @@ void spc700_branching(unsigned int new_pc);
 
 #include "cpuintrf.h"
 
-extern void spc700_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( spc700 );
 
 #define spc700_read_8(addr) program_read_byte_8le(addr)
 #define spc700_write_8(addr,data) program_write_byte_8le(addr,data)

@@ -138,13 +138,13 @@ static CPU_RESET( saturn )
 	change_pc(saturn.pc);
 }
 
-static void saturn_get_context (void *dst)
+static CPU_GET_CONTEXT( saturn )
 {
 	if( dst )
 		*(Saturn_Regs*)dst = saturn;
 }
 
-static void saturn_set_context (void *src)
+static CPU_SET_CONTEXT( saturn )
 {
 	if( src )
 	{
@@ -248,7 +248,7 @@ static void IntReg64(Saturn64 r, INT64 d)
 }
 
 
-static void saturn_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( saturn )
 {
 	switch (state)
 	{
@@ -303,7 +303,7 @@ static INT64 Reg64Int(Saturn64 r)
 	return x;
 }
 
-void saturn_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( saturn )
 {
 	switch (state)
 	{
@@ -365,14 +365,14 @@ void saturn_get_info(UINT32 state, cpuinfo *info)
 	        case CPUINFO_INT_REGISTER + SATURN_SLEEPING:		info->i = saturn.sleeping;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = saturn_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = saturn_get_context;		break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = saturn_set_context;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(saturn);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(saturn);		break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(saturn);		break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(saturn);					break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(saturn);					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(saturn);				break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;							break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = saturn_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(saturn);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &saturn_ICount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

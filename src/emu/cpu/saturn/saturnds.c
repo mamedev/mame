@@ -1277,7 +1277,7 @@ static const int field_adr_a[]=
 static const int field_adr_b[]=
 { FieldP, FieldWP, FieldXS, FieldX, FieldS, FieldM, FieldB, FieldW };
 
-unsigned saturn_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( saturn )
 {
 	int adr=0;
 
@@ -1299,7 +1299,7 @@ unsigned saturn_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opra
 			cont=0;
 			bin[binsize++]=number_2_hex[op];
 			bin[binsize]=0;
-			sprintf(dst, "???%s",bin);
+			sprintf(buffer, "???%s",bin);
 			break;
 		default:
 			bin[binsize++]=number_2_hex[op];
@@ -1318,7 +1318,7 @@ unsigned saturn_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opra
 				cont = 0;
 				bin[binsize++]=number_2_hex[op];
 				bin[binsize]=0;
-				sprintf(dst, "???%s",bin);
+				sprintf(buffer, "???%s",bin);
 				break;
 			}
 			break;
@@ -1326,32 +1326,32 @@ unsigned saturn_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opra
 			cont=0;
 			switch (level->adr==AdrNone?adr:level->adr) {
 			case AdrNone:
-				strcpy(dst, mnemonics[level->mnemonic].name[set]);
+				strcpy(buffer, mnemonics[level->mnemonic].name[set]);
 				break;
 			case Imm:
-				sprintf(dst, mnemonics[level->mnemonic].name[set], oprom[pos++]);
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], oprom[pos++]);
 				break;
 			case ImmCount:
-				sprintf(dst, mnemonics[level->mnemonic].name[set], oprom[pos++]+1);
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], oprom[pos++]+1);
 				break;
 			case AdrImmCount:
-				sprintf(dst, mnemonics[level->mnemonic].name[set], field_2_string(adr), oprom[pos++]+1);
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], field_2_string(adr), oprom[pos++]+1);
 				break;
 			case AdrCount: // mnemonics have string %s for address field
 				snprintf(number,sizeof(number),"%x",oprom[pos++]+1);
-				sprintf(dst, mnemonics[level->mnemonic].name[set], number);
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], number);
 				break;
 			case Imm2:
 				v=oprom[pos++];
 				v|=oprom[pos++]<<4;
-				sprintf(dst, mnemonics[level->mnemonic].name[set], v);
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], v);
 				break;
 			case Imm4:
 				v=oprom[pos++];
 				v|=oprom[pos++]<<4;
 				v|=oprom[pos++]<<8;
 				v|=oprom[pos++]<<12;
-				sprintf(dst, mnemonics[level->mnemonic].name[set], v);
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], v);
 				break;
 			case Imm5:
 				v=oprom[pos++];
@@ -1359,116 +1359,116 @@ unsigned saturn_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opra
 				v|=oprom[pos++]<<8;
 				v|=oprom[pos++]<<12;
 				v|=oprom[pos++]<<16;
-				sprintf(dst, mnemonics[level->mnemonic].name[set], v);
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], v);
 				break;
 			case ImmCload:
 				c=i=oprom[pos++] & 0xf;
 				number[i+1]=0;
 				for (;i>=0; i--) number[i]=number_2_hex[oprom[pos++] & 0xf];
-				sprintf(dst, mnemonics[level->mnemonic].name[set], c+1, number);
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], c+1, number);
 				break;
 			case Dis3:
 				SATURN_PEEKOP_DIS12(v);
 				c=(pc+pos-3+v)&0xfffff;
-				sprintf(dst, mnemonics[level->mnemonic].name[set], c );
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], c );
 				break;
 			case Dis3Call:
 				SATURN_PEEKOP_DIS12(v);
 				c=(pc+pos+v)&0xfffff;
-				sprintf(dst, mnemonics[level->mnemonic].name[set], c );
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], c );
 				break;
 			case Dis4:
 				SATURN_PEEKOP_DIS16(v);
 				c=(pc+pos-4+v)&0xfffff;
-				sprintf(dst, mnemonics[level->mnemonic].name[set], c );
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], c );
 				break;
 			case Dis4Call:
 				SATURN_PEEKOP_DIS16(v);
 				c=(pc+pos+v)&0xfffff;
-				sprintf(dst, mnemonics[level->mnemonic].name[set], c );
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], c );
 				break;
 			case Abs:
 				SATURN_PEEKOP_ADR(v);
-				sprintf(dst, mnemonics[level->mnemonic].name[set], v );
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], v );
 				break;
 			case BranchReturn:
 				SATURN_PEEKOP_DIS8(v);
 				if (v==0) {
-					strcpy(dst, mnemonics[level->mnemonic+1].name[set]);
+					strcpy(buffer, mnemonics[level->mnemonic+1].name[set]);
 				} else {
 					c=(pc+pos-2+v)&0xfffff;
-					sprintf(dst, mnemonics[level->mnemonic].name[set], c);
+					sprintf(buffer, mnemonics[level->mnemonic].name[set], c);
 				}
 				break;
 			case ABranchReturn:
 				SATURN_PEEKOP_DIS8(v);
 				if (v==0) {
-					sprintf(dst, mnemonics[level->mnemonic+1].name[set], A);
+					sprintf(buffer, mnemonics[level->mnemonic+1].name[set], A);
 				} else {
 					c=(pc+pos-2+v)&0xfffff;
-					sprintf(dst, mnemonics[level->mnemonic].name[set], A, c);
+					sprintf(buffer, mnemonics[level->mnemonic].name[set], A, c);
 				}
 				break;
 			case xBranchReturn:
 				SATURN_PEEKOP_DIS8(v);
 				if (v==0) {
-					sprintf(dst, mnemonics[level->mnemonic+1].name[set], field_2_string(adr));
+					sprintf(buffer, mnemonics[level->mnemonic+1].name[set], field_2_string(adr));
 				} else {
 					c=(pc+pos-2+v)&0xfffff;
-					sprintf(dst, mnemonics[level->mnemonic].name[set], field_2_string(adr), c);
+					sprintf(buffer, mnemonics[level->mnemonic].name[set], field_2_string(adr), c);
 				}
 				break;
 			case TestBranchRet:
 				i=oprom[pos++];
 				SATURN_PEEKOP_DIS8(v);
 				if (v==0) {
-					sprintf(dst, mnemonics[level->mnemonic+1].name[set], i);
+					sprintf(buffer, mnemonics[level->mnemonic+1].name[set], i);
 				} else {
 					c=(pc+pos-2+v)&0xfffff;
-					sprintf(dst, mnemonics[level->mnemonic].name[set], i, c);
+					sprintf(buffer, mnemonics[level->mnemonic].name[set], i, c);
 				}
 				break;
 			case ImmBranch:
 				i=oprom[pos++];
 				SATURN_PEEKOP_DIS8(v);
 				c=(pc+pos-2+v)&0xfffff;
-				sprintf(dst, mnemonics[level->mnemonic].name[set], i, c);
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], i, c);
 				break;
 			case FieldP:
-				sprintf(dst, mnemonics[level->mnemonic].name[set], P );
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], P );
 				break;
 			case FieldWP:
-				sprintf(dst, mnemonics[level->mnemonic].name[set], WP );
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], WP );
 				break;
 			case FieldXS:
-				sprintf(dst, mnemonics[level->mnemonic].name[set], XS );
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], XS );
 				break;
 			case FieldX:
-				sprintf(dst, mnemonics[level->mnemonic].name[set], X );
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], X );
 				break;
 			case FieldS:
-				sprintf(dst, mnemonics[level->mnemonic].name[set], S );
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], S );
 				break;
 			case FieldM:
-				sprintf(dst, mnemonics[level->mnemonic].name[set], M );
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], M );
 				break;
 			case FieldB:
-				sprintf(dst, mnemonics[level->mnemonic].name[set], B );
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], B );
 				break;
 			case FieldA:
-				sprintf(dst, mnemonics[level->mnemonic].name[set], A );
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], A );
 				break;
 			case FieldW:
-				sprintf(dst, mnemonics[level->mnemonic].name[set], W );
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], W );
 				break;
 			case AdrA:
-				sprintf(dst, mnemonics[level->mnemonic].name[set], adr_a[oprom[pos++] & 0x7] );
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], adr_a[oprom[pos++] & 0x7] );
 				break;
 			case AdrAF:
-				sprintf(dst, mnemonics[level->mnemonic].name[set], adr_af[oprom[pos++] & 0xf] );
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], adr_af[oprom[pos++] & 0xf] );
 				break;
 			case AdrB:
-				sprintf(dst, mnemonics[level->mnemonic].name[set], adr_b[oprom[pos++] & 0x7] );
+				sprintf(buffer, mnemonics[level->mnemonic].name[set], adr_b[oprom[pos++] & 0x7] );
 				break;
 			}
 			break;

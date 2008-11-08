@@ -94,16 +94,19 @@ Other references can be found on spies.com:
 #if (TMS99XX_MODEL == TI990_10_ID)
 
 	#define TMS99XX_PREFIX ti990_10
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( ti990_10 )
 	#define TMS99XX_CPU_NAME "TI990/10"
 
 #elif (TMS99XX_MODEL == TMS9900_ID)
 
 	#define TMS99XX_PREFIX tms9900
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9900 )
 	#define TMS99XX_CPU_NAME "TMS9900"
 
 #elif (TMS99XX_MODEL == TMS9940_ID)
 
 	#define TMS99XX_PREFIX tms9940
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9940 )
 	#define TMS99XX_CPU_NAME "TMS9940"
 
 	#error "tms9940 is not yet supported"
@@ -111,11 +114,13 @@ Other references can be found on spies.com:
 #elif (TMS99XX_MODEL == TMS9980_ID)
 
 	#define TMS99XX_PREFIX tms9980a
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9980a )
 	#define TMS99XX_CPU_NAME "TMS9980A/TMS9981"
 
 #elif (TMS99XX_MODEL == TMS9985_ID)
 
 	#define TMS99XX_PREFIX tms9985
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9985 )
 	#define TMS99XX_CPU_NAME "TMS9985"
 
 	#error "tms9985 is not yet supported"
@@ -123,6 +128,7 @@ Other references can be found on spies.com:
 #elif (TMS99XX_MODEL == TMS9989_ID)
 
 	#define TMS99XX_PREFIX tms9989
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9989 )
 	#define TMS99XX_CPU_NAME "TMS9989"
 
 	#error "tms9989 is not yet supported"
@@ -130,11 +136,13 @@ Other references can be found on spies.com:
 #elif (TMS99XX_MODEL == TMS9995_ID)
 
 	#define TMS99XX_PREFIX tms9995
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9995 )
 	#define TMS99XX_CPU_NAME "TMS9995"
 
 #elif (TMS99XX_MODEL == TMS99000_ID)
 
 	#define TMS99XX_PREFIX tms99000
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99000 )
 	#define TMS99XX_CPU_NAME "TMS99000"
 
 	#error "tms99000 is not yet supported"
@@ -142,6 +150,7 @@ Other references can be found on spies.com:
 #elif (TMS99XX_MODEL == TMS99105A_ID)
 
 	#define TMS99XX_PREFIX tms99105a
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99105a )
 	#define TMS99XX_CPU_NAME "TMS99105A"
 
 	#error "tms99105a is not yet supported"
@@ -149,6 +158,7 @@ Other references can be found on spies.com:
 #elif (TMS99XX_MODEL == TMS99110A_ID)
 
 	#define TMS99XX_PREFIX tms99110a
+	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99110a )
 	#define TMS99XX_CPU_NAME "TMS99110A"
 
 	#error "tms99110a is not yet supported"
@@ -165,7 +175,6 @@ Other references can be found on spies.com:
 #define RESET_PARAM(prefix)			concat2(prefix,reset_param)
 
 #define TMS99XX_ICOUNT				ICOUNT(TMS99XX_PREFIX)
-#define TMS99XX_GET_INFO			GET_INFO(TMS99XX_PREFIX)
 #define TMS99XX_RESET_PARAM			RESET_PARAM(TMS99XX_PREFIX)
 
 
@@ -1551,7 +1560,7 @@ static CPU_EXECUTE( tms99xx )
 	return cycles - TMS99XX_ICOUNT;
 }
 
-static void tms99xx_get_context(void *dst)
+static CPU_GET_CONTEXT( tms99xx )
 {
 	setstat();
 
@@ -1559,7 +1568,7 @@ static void tms99xx_get_context(void *dst)
 		*(tms99xx_Regs*)dst = I;
 }
 
-static void tms99xx_set_context(void *src)
+static CPU_SET_CONTEXT( tms99xx )
 {
 	if( src )
 	{
@@ -1959,7 +1968,7 @@ static void field_interrupt(void)
 
 #endif
 
-static unsigned tms99xx_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( tms99xx )
 {
 	return Dasm9900(buffer, pc, TMS99XX_MODEL, oprom, opram);
 }
@@ -4589,7 +4598,7 @@ INLINE void execute(UINT16 opcode)
  * Generic set_info
  **************************************************************************/
 
-static void tms99xx_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( tms99xx )
 {
 	switch (state)
 	{
@@ -4794,15 +4803,15 @@ void TMS99XX_GET_INFO(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + TMS9900_R15:		info->i = READREG_DEBUG(R15);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = tms99xx_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = tms99xx_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = tms99xx_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tms99xx);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(tms99xx);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(tms99xx);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tms99xx);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tms99xx);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(tms99xx);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tms99xx);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = tms99xx_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tms99xx);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &TMS99XX_ICOUNT;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

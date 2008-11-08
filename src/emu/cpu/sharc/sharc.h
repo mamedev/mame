@@ -28,7 +28,7 @@ extern void sharc_external_iop_write(UINT32 address, UINT32 data);
 extern void sharc_external_dma_write(UINT32 address, UINT64 data);
 
 #if (HAS_ADSP21062)
-void adsp21062_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( adsp21062 );
 #endif
 
 extern UINT32 sharc_dasm_one(char *buffer, offs_t pc, UINT64 opcode);

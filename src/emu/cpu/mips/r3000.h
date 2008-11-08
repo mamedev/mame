@@ -60,10 +60,10 @@ struct _r3000_cpu_core
     PUBLIC FUNCTIONS
 ***************************************************************************/
 
-extern void r3000be_get_info(UINT32 state, cpuinfo *info);
-extern void r3000le_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( r3000be );
+extern CPU_GET_INFO( r3000le );
 
-extern void r3041be_get_info(UINT32 state, cpuinfo *info);
-extern void r3041le_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( r3041be );
+extern CPU_GET_INFO( r3041le );
 
 #endif /* __R3000_H__ */

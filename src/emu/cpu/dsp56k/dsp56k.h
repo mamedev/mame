@@ -76,7 +76,7 @@ enum _parallel_move_type
 };
 typedef enum _parallelMoveType parallelMoveType;
 
-extern void dsp56k_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( dsp56k );
 
 void  dsp56k_host_interface_write(UINT8 offset, UINT8 data);
 UINT8 dsp56k_host_interface_read(UINT8 offset);

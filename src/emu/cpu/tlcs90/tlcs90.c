@@ -989,21 +989,21 @@ static int sprint_arg(char *buffer, UINT32 pc, const char *pre, const e_mode mod
 	return 0;
 }
 
-unsigned t90_dasm(char *buffer, UINT32 oldpc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( t90 )
 {
 	int len;
 
-	addr = oldpc;
+	addr = pc;
 
 	decode();
 	op &= ~OP_16;
 
 	buffer	+=	sprintf		( buffer,			"%-5s",				op_names[ op ] );	// strlen("callr") == 5
-	len		=	sprint_arg	( buffer, oldpc,	" ",				mode1, r1, r1b );
+	len		=	sprint_arg	( buffer, pc,		" ",				mode1, r1, r1b );
 	buffer	+=	len;
-	buffer	+=	sprint_arg	( buffer, oldpc,	(len>1)?",":"",		mode2, r2, r2b );
+	buffer	+=	sprint_arg	( buffer, pc,		(len>1)?",":"",		mode2, r2, r2b );
 
-	return (addr - oldpc) | DASMFLAG_SUPPORTED;
+	return (addr - pc) | DASMFLAG_SUPPORTED;
 }
 
 
@@ -1985,18 +1985,18 @@ static CPU_EXIT( t90 )
 {
 }
 
-static void t90_burn(int cycles)
+static CPU_BURN( t90 )
 {
 	t90_ICount -= 4 * ((cycles + 3) / 4);
 }
 
-static void t90_get_context (void *dst)
+static CPU_GET_CONTEXT( t90 )
 {
 	if( dst )
 		*(t90_Regs*)dst = T90;
 }
 
-static void t90_set_context (void *src)
+static CPU_SET_CONTEXT( t90 )
 {
 	if( src )
 		T90 = *(t90_Regs*)src;
@@ -2692,7 +2692,7 @@ static ADDRESS_MAP_START(tmp91641_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(	T90_IOBASE, T90_IOBASE+47	) AM_READWRITE( t90_internal_registers_r, t90_internal_registers_w )
 ADDRESS_MAP_END
 
-static void t90_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( t90 )
 {
 	switch (state)
 	{
@@ -2723,7 +2723,7 @@ static void t90_set_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void tmp90840_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( tmp90840 )
 {
 	switch (state)
 	{
@@ -2778,15 +2778,15 @@ void tmp90840_get_info(UINT32 state, cpuinfo *info)
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 
-		case CPUINFO_PTR_SET_INFO:									info->setinfo = t90_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:								info->getcontext = t90_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:								info->setcontext = t90_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:									info->setinfo = CPU_SET_INFO_NAME(t90);		break;
+		case CPUINFO_PTR_GET_CONTEXT:								info->getcontext = CPU_GET_CONTEXT_NAME(t90);	break;
+		case CPUINFO_PTR_SET_CONTEXT:								info->setcontext = CPU_SET_CONTEXT_NAME(t90);	break;
 		case CPUINFO_PTR_INIT:										info->init = CPU_INIT_NAME(t90);				break;
 		case CPUINFO_PTR_RESET:										info->reset = CPU_RESET_NAME(t90);			break;
 		case CPUINFO_PTR_EXIT:										info->exit = CPU_EXIT_NAME(t90);				break;
 		case CPUINFO_PTR_EXECUTE:									info->execute = CPU_EXECUTE_NAME(t90);		break;
-		case CPUINFO_PTR_BURN:										info->burn = t90_burn;				break;
-		case CPUINFO_PTR_DISASSEMBLE:								info->disassemble = t90_dasm;		break;
+		case CPUINFO_PTR_BURN:										info->burn = CPU_BURN_NAME(t90);				break;
+		case CPUINFO_PTR_DISASSEMBLE:								info->disassemble = CPU_DISASSEMBLE_NAME(t90);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:						info->icount = &t90_ICount;			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = address_map_tmp90840_mem; break;
 
@@ -2828,7 +2828,7 @@ void tmp90840_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void tmp90841_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( tmp90841 )
 {
 	switch (state)
 	{
@@ -2841,10 +2841,10 @@ void tmp90841_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:				strcpy(info->s = cpuintrf_temp_str(), "TMP90841");			return;
 	}
 
-	tmp90840_get_info(state,info);
+	CPU_GET_INFO_CALL(tmp90840);
 }
 
-void tmp91640_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( tmp91640 )
 {
 	switch (state)
 	{
@@ -2857,10 +2857,10 @@ void tmp91640_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:				strcpy(info->s = cpuintrf_temp_str(), "TMP91640");			return;
 	}
 
-	tmp90840_get_info(state,info);
+	CPU_GET_INFO_CALL(tmp90840);
 }
 
-void tmp91641_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( tmp91641 )
 {
 	switch (state)
 	{
@@ -2873,5 +2873,5 @@ void tmp91641_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_STR_NAME:				strcpy(info->s = cpuintrf_temp_str(), "TMP91641");			return;
 	}
 
-	tmp90840_get_info(state,info);
+	CPU_GET_INFO_CALL(tmp90840);
 }

@@ -1742,7 +1742,7 @@ static unsigned Dasm340x0(char *buff, UINT32 pc, int is_34020)
 	return (_pc - __pc) | flags | DASMFLAG_SUPPORTED;
 }
 
-offs_t tms34010_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( tms34010 )
 {
 	rombase = oprom;
 	rambase = opram;
@@ -1750,7 +1750,7 @@ offs_t tms34010_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *o
 	return Dasm340x0(buffer, pc, 0);
 }
 
-offs_t tms34020_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( tms34020 )
 {
 	rombase = oprom;
 	rambase = opram;

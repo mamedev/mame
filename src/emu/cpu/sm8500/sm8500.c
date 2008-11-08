@@ -243,7 +243,7 @@ static CPU_EXECUTE( sm8500 )
 	return cycles - sm8500_icount;
 }
 
-static void sm8500_burn( int cycles )
+static CPU_BURN( sm8500 )
 {
 	if ( cycles > 0 ) {
 		/* burn a number of 4 cycles */
@@ -252,11 +252,11 @@ static void sm8500_burn( int cycles )
 	}
 }
 
-static void sm8500_set_context( void *src )
+static CPU_SET_CONTEXT( sm8500 )
 {
 }
 
-static void sm8500_get_context( void *dst )
+static CPU_GET_CONTEXT( sm8500 )
 {
 }
 
@@ -372,7 +372,7 @@ static void sm8500_set_irq_line( int irqline, int state )
 	}
 }
 
-static void sm8500_set_info( UINT32 state, cpuinfo *info )
+static CPU_SET_INFO( sm8500 )
 {
 	switch(state)
 	{
@@ -424,7 +424,7 @@ static void sm8500_set_info( UINT32 state, cpuinfo *info )
 	}
 }
 
-void sm8500_get_info( UINT32 state, cpuinfo *info )
+CPU_GET_INFO( sm8500 )
 {
 	switch(state)
 	{
@@ -491,15 +491,15 @@ void sm8500_get_info( UINT32 state, cpuinfo *info )
 	case CPUINFO_INT_PREVIOUSPC:				info->i = 0x0000; break;
 
 
-	case CPUINFO_PTR_SET_INFO:				info->setinfo = sm8500_set_info; break;
-	case CPUINFO_PTR_GET_CONTEXT:				info->getcontext = sm8500_get_context; break;
-	case CPUINFO_PTR_SET_CONTEXT:				info->setcontext = sm8500_set_context; break;
+	case CPUINFO_PTR_SET_INFO:				info->setinfo = CPU_SET_INFO_NAME(sm8500); break;
+	case CPUINFO_PTR_GET_CONTEXT:				info->getcontext = CPU_GET_CONTEXT_NAME(sm8500); break;
+	case CPUINFO_PTR_SET_CONTEXT:				info->setcontext = CPU_SET_CONTEXT_NAME(sm8500); break;
 	case CPUINFO_PTR_INIT:					info->init = CPU_INIT_NAME(sm8500); break;
 	case CPUINFO_PTR_RESET:					info->reset = CPU_RESET_NAME(sm8500); break;
 	case CPUINFO_PTR_EXIT:					info->exit = CPU_EXIT_NAME(sm8500); break;
 	case CPUINFO_PTR_EXECUTE:				info->execute = CPU_EXECUTE_NAME(sm8500); break;
-	case CPUINFO_PTR_BURN:					info->burn = sm8500_burn; break;
-	case CPUINFO_PTR_DISASSEMBLE:			info->disassemble = sm8500_dasm; break;
+	case CPUINFO_PTR_BURN:					info->burn = CPU_BURN_NAME(sm8500); break;
+	case CPUINFO_PTR_DISASSEMBLE:			info->disassemble = CPU_DISASSEMBLE_NAME(sm8500); break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sm8500_icount; break;
 
 	case CPUINFO_STR_NAME:					strcpy( info->s = cpuintrf_temp_str(), "sm8500" ); break;

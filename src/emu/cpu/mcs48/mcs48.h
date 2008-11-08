@@ -72,21 +72,21 @@ enum
 ***************************************************************************/
 
 /* variants with 64 bytes of internal RAM and up to 1k of internal ROM */
-void i8035_get_info(UINT32 state, cpuinfo *info);
-void i8041_get_info(UINT32 state, cpuinfo *info);
-void i8048_get_info(UINT32 state, cpuinfo *info);
-void i8648_get_info(UINT32 state, cpuinfo *info);
-void i8748_get_info(UINT32 state, cpuinfo *info);
-void mb8884_get_info(UINT32 state, cpuinfo *info);
-void n7751_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( i8035 );
+CPU_GET_INFO( i8041 );
+CPU_GET_INFO( i8048 );
+CPU_GET_INFO( i8648 );
+CPU_GET_INFO( i8748 );
+CPU_GET_INFO( mb8884 );
+CPU_GET_INFO( n7751 );
 
 /* variants with 128 bytes of internal RAM and up to 2k of internal ROM */
-void i8039_get_info(UINT32 state, cpuinfo *info);
-void i8049_get_info(UINT32 state, cpuinfo *info);
-void i8749_get_info(UINT32 state, cpuinfo *info);
-void m58715_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( i8039 );
+CPU_GET_INFO( i8049 );
+CPU_GET_INFO( i8749 );
+CPU_GET_INFO( m58715 );
 
 /* disassembler */
-offs_t mcs48_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( mcs48 );
 
 #endif  /* __I8039_H__ */

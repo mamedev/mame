@@ -18,7 +18,7 @@ enum
                     from the contents of ML and WS */
 };
 
-void apexc_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( apexc );
 
 #ifndef SUPPORT_ODD_WORD_SIZES
 #define apexc_readmem(address)	program_read_dword_32be((address)<<2)
@@ -33,7 +33,7 @@ without danger */
 #define apexc_writemem_masked(address, data, mask)	cpu_writemem13_32masked((address), (data), (mask))
 #endif
 
-unsigned apexc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( apexc );
 
 #define apexc_readop(address)	apexc_readmem(address)
 

@@ -167,13 +167,13 @@ static CPU_RESET( i80286 )
 
 /* ASG 971222 -- added these interface functions */
 
-static void i80286_get_context(void *dst)
+static CPU_GET_CONTEXT( i80286 )
 {
 	if( dst )
 		*(i80286_Regs*)dst = I;
 }
 
-static void i80286_set_context(void *src)
+static CPU_SET_CONTEXT( i80286 )
 {
 	if( src )
 	{
@@ -244,7 +244,7 @@ static CPU_EXECUTE( i80286 )
 
 extern int i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int mode);
 
-static offs_t i80286_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( i80286 )
 {
 	return i386_dasm_one(buffer, pc, oprom, 16);
 }
@@ -307,7 +307,7 @@ static CPU_INIT( i80286 )
  * Generic set_info
  **************************************************************************/
 
-static void i80286_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( i80286 )
 {
 	switch (state)
 	{
@@ -378,7 +378,7 @@ static void i80286_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  ****************************************************************************/
 
-void i80286_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( i80286 )
 {
 	switch (state)
 	{
@@ -438,15 +438,15 @@ void i80286_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + I80286_TR_LIMIT:	info->i = I.tr.limit;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = i80286_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = i80286_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = i80286_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(i80286);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(i80286);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(i80286);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i80286);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(i80286);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = NULL;						break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i80286);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i80286_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i80286);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &i80286_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

@@ -23,7 +23,7 @@ enum
 #define I8085_RST65_LINE	2
 #define I8085_RST75_LINE	3
 
-void i8085_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( i8085 );
 
 /**************************************************************************
  * I8080 section
@@ -50,9 +50,9 @@ void i8085_get_info(UINT32 state, cpuinfo *info);
 
 #define I8080_INTR_LINE         I8085_INTR_LINE
 
-void i8080_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( i8080 );
 #endif
 
-offs_t i8085_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( i8085 );
 
 #endif

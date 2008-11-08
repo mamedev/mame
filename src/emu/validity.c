@@ -720,7 +720,7 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 	/* loop over all the CPUs */
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 	{
-		extern void dummy_get_info(UINT32 state, cpuinfo *info);
+		extern CPU_GET_INFO( dummy );
 		const cpu_config *cpu = &config->cpu[cpunum];
 		int spacenum, checknum;
 
@@ -750,7 +750,7 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 		error |= validate_tag(driver, "CPU", cpu->tag);
 
 		/* checks to see if this driver is using a dummy CPU */
-		if (cputype_get_interface(cpu->type)->get_info == dummy_get_info)
+		if (cputype_get_interface(cpu->type)->get_info == CPU_GET_INFO_NAME(dummy))
 		{
 			mame_printf_error("%s: %s uses non-present CPU\n", driver->source_file, driver->name);
 			error = TRUE;

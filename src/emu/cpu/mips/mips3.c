@@ -244,14 +244,14 @@ static void check_irqs(void)
     CORE CALLBACKS
 ***************************************************************************/
 
-static void mips3_get_context(void *dst)
+static CPU_GET_CONTEXT( mips3 )
 {
 	if (dst != NULL)
 		*(mips3_regs *)dst = mips3;
 }
 
 
-static void mips3_set_context(void *src)
+static CPU_SET_CONTEXT( mips3 )
 {
 	if (src != NULL)
 		mips3 = *(mips3_regs *)src;
@@ -290,14 +290,14 @@ static CPU_RESET( mips3 )
 }
 
 
-static int mips3_translate(int space, int intention, offs_t *address)
+static CPU_TRANSLATE( mips3 )
 {
 	/* common translate */
 	return mips3com_translate_address(&mips3.core, space, intention, address);
 }
 
 
-offs_t mips3_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( mips3 )
 {
 	/* common disassemble */
 	return mips3com_dasm(&mips3.core, buffer, pc, oprom, opram);
@@ -2112,14 +2112,14 @@ static void sdr_le(UINT32 op)
     GENERIC GET/SET INFO
 ***************************************************************************/
 
-static void mips3_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( mips3 )
 {
 	/* everything is handled generically here */
 	mips3com_set_info(&mips3.core, state, info);
 }
 
 
-void mips3_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( mips3 )
 {
 	switch (state)
 	{
@@ -2128,14 +2128,14 @@ void mips3_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_PREVIOUSPC:					info->i = mips3.ppc;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = mips3_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = mips3_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = mips3_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(mips3);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(mips3);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(mips3);	break;
 		case CPUINFO_PTR_INIT:							/* provided per-CPU */					break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(mips3);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(mips3);			break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = mips3_dasm;			break;
-		case CPUINFO_PTR_TRANSLATE:						info->translate = mips3_translate;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(mips3);			break;
+		case CPUINFO_PTR_TRANSLATE:						info->translate = CPU_GET_TRANSLATE_NAME(mips3);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
@@ -2166,7 +2166,7 @@ static CPU_INIT( r4600le )
 	mips3com_init(&mips3.core, MIPS3_TYPE_R4600, FALSE, index, clock, config, irqcallback, memory);
 }
 
-void r4600be_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( r4600be )
 {
 	switch (state)
 	{
@@ -2184,7 +2184,7 @@ void r4600be_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void r4600le_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( r4600le )
 {
 	switch (state)
 	{
@@ -2224,7 +2224,7 @@ static CPU_INIT( r4650le )
 	mips3com_init(&mips3.core, MIPS3_TYPE_R4650, FALSE, index, clock, config, irqcallback, memory);
 }
 
-void r4650be_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( r4650be )
 {
 	switch (state)
 	{
@@ -2242,7 +2242,7 @@ void r4650be_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void r4650le_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( r4650le )
 {
 	switch (state)
 	{
@@ -2282,7 +2282,7 @@ static CPU_INIT( r4700le )
 	mips3com_init(&mips3.core, MIPS3_TYPE_R4700, FALSE, index, clock, config, irqcallback, memory);
 }
 
-void r4700be_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( r4700be )
 {
 	switch (state)
 	{
@@ -2301,7 +2301,7 @@ void r4700be_get_info(UINT32 state, cpuinfo *info)
 }
 
 
-void r4700le_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( r4700le )
 {
 	switch (state)
 	{
@@ -2341,7 +2341,7 @@ static CPU_INIT( r5000le )
 	mips3com_init(&mips3.core, MIPS3_TYPE_R5000, FALSE, index, clock, config, irqcallback, memory);
 }
 
-void r5000be_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( r5000be )
 {
 	switch (state)
 	{
@@ -2359,7 +2359,7 @@ void r5000be_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void r5000le_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( r5000le )
 {
 	switch (state)
 	{
@@ -2399,7 +2399,7 @@ static CPU_INIT( qed5271le )
 	mips3com_init(&mips3.core, MIPS3_TYPE_QED5271, FALSE, index, clock, config, irqcallback, memory);
 }
 
-void qed5271be_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( qed5271be )
 {
 	switch (state)
 	{
@@ -2417,7 +2417,7 @@ void qed5271be_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void qed5271le_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( qed5271le )
 {
 	switch (state)
 	{
@@ -2457,7 +2457,7 @@ static CPU_INIT( rm7000le )
 	mips3com_init(&mips3.core, MIPS3_TYPE_RM7000, FALSE, index, clock, config, irqcallback, memory);
 }
 
-void rm7000be_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( rm7000be )
 {
 	switch (state)
 	{
@@ -2475,7 +2475,7 @@ void rm7000be_get_info(UINT32 state, cpuinfo *info)
 	}
 }
 
-void rm7000le_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( rm7000le )
 {
 	switch (state)
 	{

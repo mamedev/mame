@@ -879,13 +879,13 @@ static void i_invalid(void)
 
 /*****************************************************************************/
 
-static void nec_get_context(void *dst)
+static CPU_GET_CONTEXT( nec )
 {
 	if( dst )
 		*(nec_Regs*)dst = I;
 }
 
-static void nec_set_context(void *src)
+static CPU_SET_CONTEXT( nec )
 {
 	if( src )
 	{
@@ -921,7 +921,7 @@ static void set_irq_line(int irqline, int state)
 	}
 }
 
-static offs_t nec_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( nec )
 {
 	return necv_dasm_one(buffer, pc, oprom);
 }
@@ -985,7 +985,7 @@ static CPU_EXECUTE( v30mz )
  * Generic set_info
  **************************************************************************/
 
-static void nec_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( nec )
 {
 	switch (state)
 	{
@@ -1040,7 +1040,7 @@ static void nec_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void v30mz_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( v30mz )
 {
 	int flags;
 
@@ -1094,13 +1094,13 @@ void v30mz_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + NEC_PENDING:		info->i = I.pending_irq;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = nec_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = nec_get_context;		break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = nec_set_context;		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(nec);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(nec);		break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(nec);		break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(nec);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(nec);					break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = nec_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(nec);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &nec_ICount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

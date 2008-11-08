@@ -349,15 +349,15 @@ void minx_get_info( UINT32 state, cpuinfo *info )
 	case CPUINFO_INT_REGISTER + MINX_XI:
 	case CPUINFO_INT_REGISTER + MINX_YI:						info->i = minx_get_reg( state - CPUINFO_INT_REGISTER ); break;
 	case CPUINFO_INT_PREVIOUSPC:								info->i = 0x0000; break;
-	case CPUINFO_PTR_SET_INFO:									info->setinfo = minx_set_info; break;
-	case CPUINFO_PTR_GET_CONTEXT:								info->getcontext = minx_get_context; break;
-	case CPUINFO_PTR_SET_CONTEXT:								info->setcontext = minx_set_context; break;
+	case CPUINFO_PTR_SET_INFO:									info->setinfo = CPU_SET_INFO_NAME(minx); break;
+	case CPUINFO_PTR_GET_CONTEXT:								info->getcontext = CPU_GET_CONTEXT_NAME(minx); break;
+	case CPUINFO_PTR_SET_CONTEXT:								info->setcontext = CPU_SET_CONTEXT_NAME(minx); break;
 	case CPUINFO_PTR_INIT:										info->init = CPU_INIT_NAME(minx); break;
 	case CPUINFO_PTR_RESET:										info->reset = CPU_RESET_NAME(minx); break;
 	case CPUINFO_PTR_EXIT:										info->exit = CPU_EXIT_NAME(minx); break;
 	case CPUINFO_PTR_EXECUTE:									info->execute = CPU_EXECUTE_NAME(minx); break;
-	case CPUINFO_PTR_BURN:										info->burn = minx_burn; break;
-	case CPUINFO_PTR_DISASSEMBLE:								info->disassemble = minx_dasm; break;
+	case CPUINFO_PTR_BURN:										info->burn = CPU_GET_BURN_NAME(minx); break;
+	case CPUINFO_PTR_DISASSEMBLE:								info->disassemble = CPU_DISASSEMBLE_NAME(minx); break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:						info->icount = &minx_icount; break;
 	case CPUINFO_STR_NAME:										strcpy( info->s = cpuintrf_temp_str(), "Minx" ); break;
 	case CPUINFO_STR_CORE_FAMILY:								strcpy( info->s = cpuintrf_temp_str(), "Nintendo Minx" ); break;

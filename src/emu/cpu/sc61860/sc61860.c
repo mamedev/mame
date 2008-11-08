@@ -92,13 +92,13 @@ static CPU_INIT( sc61860 )
 	timer_pulse(ATTOTIME_IN_HZ(500), NULL, 0, sc61860_2ms_tick);
 }
 
-static void sc61860_get_context (void *dst)
+static CPU_GET_CONTEXT( sc61860 )
 {
 	if( dst )
 		*(SC61860_Regs*)dst = sc61860;
 }
 
-static void sc61860_set_context (void *src)
+static CPU_SET_CONTEXT( sc61860 )
 {
 	if( src )
 	{
@@ -145,7 +145,7 @@ static CPU_EXECUTE( sc61860 )
  * Generic set_info
  **************************************************************************/
 
-static void sc61860_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( sc61860 )
 {
 	switch (state)
 	{
@@ -168,7 +168,7 @@ static void sc61860_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void sc61860_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( sc61860 )
 {
 	switch (state)
 	{
@@ -207,14 +207,14 @@ void sc61860_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + SC61860_ZERO:			info->i =  sc61860.zero;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = sc61860_set_info;				break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = sc61860_get_context;			break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = sc61860_set_context;			break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(sc61860);				break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(sc61860);			break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(sc61860);			break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(sc61860);						break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(sc61860);					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(sc61860);				break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;								break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = sc61860_dasm;				break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(sc61860);				break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sc61860_ICount;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

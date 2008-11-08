@@ -55,12 +55,12 @@ static int cdp1802_ICount;
 
 static CDP1802_Regs cdp1802;
 
-static void cdp1802_get_context (void *dst)
+static CPU_GET_CONTEXT( cdp1802 )
 {
 	*(CDP1802_Regs *)dst = cdp1802;
 }
 
-static void cdp1802_set_context (void *src)
+static CPU_SET_CONTEXT( cdp1802 )
 {
 	cdp1802 = *(CDP1802_Regs *)src;
 }
@@ -914,7 +914,7 @@ static CPU_RESET( cdp1802 )
  * Generic set_info
  **************************************************************************/
 
-static void cdp1802_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( cdp1802 )
 {
 	switch (state)
 	{
@@ -956,7 +956,7 @@ static void cdp1802_set_info(UINT32 state, cpuinfo *info)
 /****************************************************************************
  * Return a formatted string for a register
  ****************************************************************************/
-void cdp1802_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( cdp1802 )
 {
 	switch(state)
 	{
@@ -1019,14 +1019,14 @@ void cdp1802_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + CDP1802_PC:			info->i = cdp1802.r[cdp1802.p];			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = cdp1802_set_info;		break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = cdp1802_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = cdp1802_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cdp1802);		break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(cdp1802);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(cdp1802);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cdp1802);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cdp1802);			break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cdp1802);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = cdp1802_dasm;		break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cdp1802);		break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cdp1802_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

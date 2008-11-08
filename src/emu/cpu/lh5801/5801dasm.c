@@ -650,7 +650,7 @@ static const Entry table_fd[0x100]={
 	{ ILL2 }
 };
 
-offs_t lh5801_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( lh5801 )
 {
 	int pos = 0;
 	int oper;
@@ -667,67 +667,67 @@ offs_t lh5801_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 	}
 	switch (entry->ins) {
 	case ILL:
-		sprintf(dst,"%s %.2x", InsNames[entry->ins], oper);break;
+		sprintf(buffer,"%s %.2x", InsNames[entry->ins], oper);break;
 	case ILL2:
-		sprintf(dst,"%s fd%.2x", InsNames[entry->ins], oper);break;
+		sprintf(buffer,"%s fd%.2x", InsNames[entry->ins], oper);break;
 	default:
 		switch(entry->adr) {
 		case Imp:
-			sprintf(dst,"%s", InsNames[entry->ins]);break;
+			sprintf(buffer,"%s", InsNames[entry->ins]);break;
 		case Reg:
-			sprintf(dst,"%s %s", InsNames[entry->ins],RegNames[entry->reg]);break;
+			sprintf(buffer,"%s %s", InsNames[entry->ins],RegNames[entry->reg]);break;
 		case RegImm:
-			sprintf(dst,"%s %s,%.2x", InsNames[entry->ins],
+			sprintf(buffer,"%s %s,%.2x", InsNames[entry->ins],
 					RegNames[entry->reg], oprom[pos++]);
 			break;
 		case RegImm16:
 			absolut=oprom[pos++]<<8;
 			absolut|=oprom[pos++];
-			sprintf(dst,"%s %s,%.4x", InsNames[entry->ins],RegNames[entry->reg],absolut );
+			sprintf(buffer,"%s %s,%.4x", InsNames[entry->ins],RegNames[entry->reg],absolut );
 			break;
 		case Vec:
-			sprintf(dst,"%s (ff%.2x)", InsNames[entry->ins],oprom[pos++]);break;
+			sprintf(buffer,"%s (ff%.2x)", InsNames[entry->ins],oprom[pos++]);break;
 		case Vej:
-			sprintf(dst,"%s (ff%.2x)", InsNames[entry->ins], oper);break;
+			sprintf(buffer,"%s (ff%.2x)", InsNames[entry->ins], oper);break;
 		case Imm:
-			sprintf(dst,"%s %.2x", InsNames[entry->ins],oprom[pos++]);break;
+			sprintf(buffer,"%s %.2x", InsNames[entry->ins],oprom[pos++]);break;
 		case Imm16:
 			absolut=oprom[pos++]<<8;
 			absolut|=oprom[pos++];
-			sprintf(dst,"%s %.4x", InsNames[entry->ins],absolut );break;
+			sprintf(buffer,"%s %.4x", InsNames[entry->ins],absolut );break;
 		case RelP:
 			temp=oprom[pos++];
-			sprintf(dst,"%s %.4x", InsNames[entry->ins],pc+pos+temp );break;
+			sprintf(buffer,"%s %.4x", InsNames[entry->ins],pc+pos+temp );break;
 		case RelM:
 			temp=oprom[pos++];
-			sprintf(dst,"%s %.4x", InsNames[entry->ins],pc+pos-temp );break;
+			sprintf(buffer,"%s %.4x", InsNames[entry->ins],pc+pos-temp );break;
 		case Abs:
 			absolut=oprom[pos++]<<8;
 			absolut|=oprom[pos++];
-			sprintf(dst,"%s (%.4x)", InsNames[entry->ins],absolut );break;
+			sprintf(buffer,"%s (%.4x)", InsNames[entry->ins],absolut );break;
 		case ME1Abs:
 			absolut=oprom[pos++]<<8;
 			absolut|=oprom[pos++];
-			sprintf(dst,"%s #(%.4x)", InsNames[entry->ins],absolut );break;
+			sprintf(buffer,"%s #(%.4x)", InsNames[entry->ins],absolut );break;
 		case AbsImm:
 			absolut=oprom[pos++]<<8;
 			absolut|=oprom[pos++];
-			sprintf(dst,"%s (%.4x),%.2x", InsNames[entry->ins],absolut,
+			sprintf(buffer,"%s (%.4x),%.2x", InsNames[entry->ins],absolut,
 					oprom[pos++]);break;
 		case ME1AbsImm:
 			absolut=oprom[pos++]<<8;
 			absolut|=oprom[pos++];
-			sprintf(dst,"%s #(%.4x),%.2x", InsNames[entry->ins],absolut,
+			sprintf(buffer,"%s #(%.4x),%.2x", InsNames[entry->ins],absolut,
 					oprom[pos++]);break;
 		case ME0:
-			sprintf(dst,"%s (%s)", InsNames[entry->ins],RegNames[entry->reg] );break;
+			sprintf(buffer,"%s (%s)", InsNames[entry->ins],RegNames[entry->reg] );break;
 		case ME0Imm:
-			sprintf(dst,"%s (%s),%.2x", InsNames[entry->ins],RegNames[entry->reg],oprom[pos++] );
+			sprintf(buffer,"%s (%s),%.2x", InsNames[entry->ins],RegNames[entry->reg],oprom[pos++] );
 			break;
 		case ME1:
-			sprintf(dst,"%s #(%s)", InsNames[entry->ins],RegNames[entry->reg] );break;
+			sprintf(buffer,"%s #(%s)", InsNames[entry->ins],RegNames[entry->reg] );break;
 		case ME1Imm:
-			sprintf(dst,"%s #(%s),%.2x", InsNames[entry->ins],RegNames[entry->reg],oprom[pos++] );
+			sprintf(buffer,"%s #(%s),%.2x", InsNames[entry->ins],RegNames[entry->reg],oprom[pos++] );
 			break;
 		}
 	}

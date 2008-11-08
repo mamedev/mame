@@ -742,48 +742,48 @@ static unsigned internal_m6502_dasm(const struct op6502_info *opinfo, char *buff
 	return (pc - PC) | flags;
 }
 
-unsigned m6502_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( m6502 )
 {
 	return internal_m6502_dasm(op6502, buffer, pc, oprom, opram);
 }
 
 #if (HAS_M65SC02)
-unsigned m65sc02_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( m65sc02 )
 {
 	return internal_m6502_dasm(op65sc02, buffer, pc, oprom, opram);
 }
 #endif
 
 #if (HAS_M65C02||HAS_M65SC02||HAS_DECO16)
-unsigned m65c02_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( m65c02 )
 {
 	return internal_m6502_dasm(op65c02, buffer, pc, oprom, opram);
 }
 #endif
 
 #if (HAS_M65CE02)
-unsigned m65ce02_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( m65ce02 )
 {
 	return internal_m6502_dasm(op65ce02, buffer, pc, oprom, opram);
 }
 #endif
 
 #if (HAS_M6510)
-unsigned m6510_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( m6510 )
 {
 	return internal_m6502_dasm(op6502, buffer, pc, oprom, opram);
 }
 #endif
 
 #if (HAS_DECO16)
-unsigned deco16_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( deco16 )
 {
 	return internal_m6502_dasm(opdeco16, buffer, pc, oprom, opram);
 }
 #endif
 
 #if (HAS_M4510)
-unsigned m4510_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( m4510 )
 {
 	return internal_m6502_dasm(op4510, buffer, pc, oprom, opram);
 }

@@ -230,7 +230,7 @@ static int aluconst(char *buffer, int dest, int op)
 
 
 /* execute instructions on this CPU until icount expires */
-offs_t adsp21xx_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( adsp21xx )
 {
 	unsigned int op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16);
 	unsigned dasmflags = 0;

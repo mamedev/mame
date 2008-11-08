@@ -371,7 +371,7 @@ static UINT32 ppc_readop_translated(offs_t address)
 /***********************************************************************/
 
 
-static offs_t ppc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+static CPU_DISASSEMBLE( ppc )
 {
 	UINT32 op;
 	op = BIG_ENDIANIZE_INT32(*((UINT32 *) oprom));
@@ -381,7 +381,7 @@ static offs_t ppc_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 
 /***********************************************************************/
 
 #if (HAS_PPC601||HAS_PPC602||HAS_PPC603||HAS_PPC604||HAS_MPC8240)
-static int ppc_readop(UINT32 offset, int size, UINT64 *value)
+static CPU_READOP( ppc )
 {
 	if (!(ppc.msr & MSR_IR))
 		return 0;
@@ -402,7 +402,7 @@ static int ppc_readop(UINT32 offset, int size, UINT64 *value)
 	return 1;
 }
 
-static int ppc_read(int space, UINT32 offset, int size, UINT64 *value)
+static CPU_READ( ppc )
 {
 	if (!(ppc.msr & MSR_DR))
 		return 0;
@@ -423,7 +423,7 @@ static int ppc_read(int space, UINT32 offset, int size, UINT64 *value)
 	return 1;
 }
 
-static int ppc_write(int space, UINT32 offset, int size, UINT64 value)
+static CPU_WRITE( ppc )
 {
 	if (!(ppc.msr & MSR_DR))
 		return 0;

@@ -16,8 +16,8 @@ enum
 #define M6809_IRQ_LINE	0	/* IRQ line number */
 #define M6809_FIRQ_LINE 1   /* FIRQ line number */
 
-void m6809_get_info(UINT32 state, cpuinfo *info);
-void m6809e_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( m6809 );
+CPU_GET_INFO( m6809e );
 
 /****************************************************************************/
 /* Read a byte from given memory location                                   */

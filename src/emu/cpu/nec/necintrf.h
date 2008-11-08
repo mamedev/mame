@@ -13,8 +13,8 @@ enum
 };
 
 /* Public functions */
-extern void v20_get_info(UINT32 state, cpuinfo *info);
-extern void v30_get_info(UINT32 state, cpuinfo *info);
-extern void v33_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( v20 );
+extern CPU_GET_INFO( v30 );
+extern CPU_GET_INFO( v33 );
 
 #endif

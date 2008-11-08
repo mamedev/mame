@@ -92,7 +92,7 @@ struct _sh2_cpu_core
   int  (*dma_callback_kludge)(UINT32 src, UINT32 dst, UINT32 data, int size);
 };
 
-extern void sh2_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( sh2 );
 
 WRITE32_HANDLER( sh2_internal_w );
 READ32_HANDLER( sh2_internal_r );

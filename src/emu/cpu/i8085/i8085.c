@@ -1418,7 +1418,7 @@ static CPU_EXIT( i8085 )
 /****************************************************************************
  * Get the current 8085 context
  ****************************************************************************/
-static void i8085_get_context(void *dst)
+static CPU_GET_CONTEXT( i8085 )
 {
 	if( dst )
 		*(i8085_Regs*)dst = I;
@@ -1427,7 +1427,7 @@ static void i8085_get_context(void *dst)
 /****************************************************************************
  * Set the current 8085 context
  ****************************************************************************/
-static void i8085_set_context(void *src)
+static CPU_SET_CONTEXT( i8085 )
 {
 	if( src )
 	{
@@ -1649,7 +1649,7 @@ static void i8080_set_irq_line(int irqline, int state)
  * Generic set_info
  **************************************************************************/
 
-static void i8085_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( i8085 )
 {
 	switch (state)
 	{
@@ -1689,7 +1689,7 @@ static void i8085_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void i8085_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( i8085 )
 {
 	switch (state)
 	{
@@ -1739,15 +1739,15 @@ void i8085_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + I8085_STATUS:		info->i = I.STATUS;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = i8085_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = i8085_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = i8085_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(i8085);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(i8085);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(i8085);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8085);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(i8085);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(i8085);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i8085);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = i8085_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(i8085);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &i8085_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1790,7 +1790,7 @@ void i8085_get_info(UINT32 state, cpuinfo *info)
  * CPU-specific get_info/set_info
  **************************************************************************/
 
-static void i8080_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( i8080 )
 {
 	switch (state)
 	{
@@ -1798,11 +1798,11 @@ static void i8080_set_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_STATE + I8080_INTR_LINE:	i8080_set_irq_line(I8080_INTR_LINE, info->i); break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	i8080_set_irq_line(INPUT_LINE_NMI, info->i); break;
 
-		default:										i8085_set_info(state, info);			break;
+		default:										CPU_SET_INFO_CALL(i8085); break;
 	}
 }
 
-void i8080_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( i8080 )
 {
 	switch (state)
 	{
@@ -1813,13 +1813,13 @@ void i8080_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = (I.IREQ & IM_TRAP) ? ASSERT_LINE : CLEAR_LINE; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = i8080_set_info;			break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(i8080);			break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(i8080);				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "8080");				break;
 
-		default:										i8085_get_info(state, info);			break;
+		default:										CPU_GET_INFO_CALL(i8085); break;
 	}
 }
 #endif

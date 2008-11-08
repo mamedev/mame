@@ -86,14 +86,14 @@ struct _tms34010_config
 VIDEO_UPDATE( tms340x0 );
 void tms34010_get_display_params(int cpunum, tms34010_display_params *params);
 
-void tms34010_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( tms34010 );
 
 int 		tms34010_io_display_blanked(int cpu);
 int 		tms34010_get_DPYSTRT(int cpu);
 
 
 /* PUBLIC FUNCTIONS - 34020 */
-void tms34020_get_info(UINT32 state, cpuinfo *info);
+CPU_GET_INFO( tms34020 );
 
 int 		tms34020_io_display_blanked(int cpu);
 int 		tms34020_get_DPYSTRT(int cpu);
@@ -124,7 +124,7 @@ READ16_HANDLER( tms34020_io_register_r );
 #define TOWORD(bitaddr) ((offs_t)(bitaddr) >> 4)
 
 
-offs_t tms34010_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-offs_t tms34020_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+CPU_DISASSEMBLE( tms34010 );
+CPU_DISASSEMBLE( tms34020 );
 
 #endif /* __TMS34010_H__ */

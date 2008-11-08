@@ -13,6 +13,6 @@ enum
 };
 
 /* Public functions */
-extern void v30mz_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( v30mz );
 
 #endif /* __NECINTRF_H__ */

@@ -10,7 +10,7 @@
 #include "mb88xx.h"
 
 
-offs_t mb88_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( mb88 )
 {
 	unsigned startpc = pc;
 	UINT8 op = oprom[pc++ - startpc];

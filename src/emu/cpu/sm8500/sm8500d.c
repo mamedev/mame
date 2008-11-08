@@ -171,7 +171,7 @@ static const sm8500dasm mnemonic[256] = {
 
 };
 
-unsigned sm8500_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram )
+CPU_DISASSEMBLE( sm8500 )
 {
 	const sm8500dasm *instr;
 	char *dst;

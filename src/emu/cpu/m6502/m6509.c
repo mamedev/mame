@@ -175,11 +175,11 @@ static CPU_EXIT( m6509 )
 	/* nothing to do yet */
 }
 
-static void m6509_get_context (void *dst)
+static CPU_GET_CONTEXT( m6509 )
 {
 }
 
-static void m6509_set_context (void *src)
+static CPU_SET_CONTEXT( m6509 )
 {
 	m6509_Regs *m6502;
 	
@@ -311,7 +311,7 @@ static void m6509_set_irq_line(m6509_Regs *m6509, int irqline, int state)
  * Generic set_info
  **************************************************************************/
 
-static void m6509_set_info(UINT32 state, cpuinfo *info)
+static CPU_SET_INFO( m6509 )
 {
 	m6509_Regs *m6509 = token;
 	m6509_Regs *m6502 = m6509;
@@ -348,7 +348,7 @@ static void m6509_set_info(UINT32 state, cpuinfo *info)
  * Generic get_info
  **************************************************************************/
 
-void m6509_get_info(UINT32 state, cpuinfo *info)
+CPU_GET_INFO( m6509 )
 {
 	m6509_Regs *m6502 = token;
 	m6509_Regs *m6509 = m6502;
@@ -397,15 +397,15 @@ void m6509_get_info(UINT32 state, cpuinfo *info)
 		case CPUINFO_INT_REGISTER + M6509_ZP:			info->i = m6509->zp.w.l;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = m6509_set_info;			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = m6509_get_context;	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = m6509_set_context;	break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6509);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(m6509);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(m6509);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6509);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6509);				break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m6509);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6509);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = m6502_dasm;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6502);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6502->icount;			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:			info->internal_map8 = address_map_m6509_mem; break;
 		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	info->f = (genf *) m6509->rdmem_id;		break;

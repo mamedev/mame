@@ -48,9 +48,9 @@ enum
 
 /* PUBLIC FUNCTIONS */
 extern void tms7000_A6EC1( void ); /* External event counter */
-extern void tms7000_get_info(UINT32 state, cpuinfo *info);
-extern void tms7000_exl_get_info(UINT32 state, cpuinfo *info);
+extern CPU_GET_INFO( tms7000 );
+extern CPU_GET_INFO( tms7000_exl );
 
-extern unsigned tms7000_dasm( char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram );
+extern CPU_DISASSEMBLE( tms7000 );
 
 #endif /* __TMS7000_H__ */

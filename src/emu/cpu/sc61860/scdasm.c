@@ -163,7 +163,7 @@ static const struct { const char *mnemonic; Adr adr; } table[]={
 	{ 0 }, { 0 }, { 0 }, { 0 },  { 0 }, { 0 }, { 0 }, { 0 },
 };
 
-unsigned sc61860_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+CPU_DISASSEMBLE( sc61860 )
 {
 	const UINT8 *base_oprom = oprom;
 	int oper=*(oprom++);
@@ -172,42 +172,42 @@ unsigned sc61860_dasm(char *dst, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 
 	switch(oper&0xc0) {
 	case 0x80:
-		sprintf(dst,"%-6s%.2x",table[oper&0x80].mnemonic, oper&0x3f);
+		sprintf(buffer,"%-6s%.2x",table[oper&0x80].mnemonic, oper&0x3f);
 		break;
 	default:
 		switch(oper&0xe0) {
 		case 0xe0:
-			sprintf(dst,"%-6s%.4x",table[oper&0xe0].mnemonic,
+			sprintf(buffer,"%-6s%.4x",table[oper&0xe0].mnemonic,
 					*(oprom++)|((oper&0x1f)<<8));
 			break;
 		default:
 			switch (table[oper].adr) {
-			case Ill: sprintf(dst,"?%.2x",oper);break;
-			case Imp: sprintf(dst,"%s",table[oper].mnemonic); break;
-			case Imm: sprintf(dst,"%-6s%.2x",table[oper].mnemonic, *(oprom++)); break;
+			case Ill: sprintf(buffer,"?%.2x",oper);break;
+			case Imp: sprintf(buffer,"%s",table[oper].mnemonic); break;
+			case Imm: sprintf(buffer,"%-6s%.2x",table[oper].mnemonic, *(oprom++)); break;
 			case ImmW:
 				adr=(oprom[0]<<8)|oprom[1];oprom+=2;
-				sprintf(dst,"%-6s%.4x",table[oper].mnemonic, adr);
+				sprintf(buffer,"%-6s%.4x",table[oper].mnemonic, adr);
 				break;
 			case Abs:
 				adr=(oprom[0]<<8)|oprom[1];oprom+=2;
-				sprintf(dst,"%-6s%.4x",table[oper].mnemonic, adr);
+				sprintf(buffer,"%-6s%.4x",table[oper].mnemonic, adr);
 				break;
 			case RelM:
 				adr=pc-*(oprom++);
-				sprintf(dst,"%-6s%.4x",table[oper].mnemonic, adr&0xffff);
+				sprintf(buffer,"%-6s%.4x",table[oper].mnemonic, adr&0xffff);
 				break;
 			case RelP:
 				adr=pc+*(oprom++);
-				sprintf(dst,"%-6s%.4x",table[oper].mnemonic, adr&0xffff);
+				sprintf(buffer,"%-6s%.4x",table[oper].mnemonic, adr&0xffff);
 				break;
 			case Ptc:
 				t=*(oprom++);
 				adr=(oprom[0]<<8)|oprom[1];oprom+=2;
-				sprintf(dst,"%-6s%.2x,%.4x",table[oper].mnemonic,t, adr);
+				sprintf(buffer,"%-6s%.2x,%.4x",table[oper].mnemonic,t, adr);
 				break;
 			case Etc:
-				sprintf(dst,"%-6s",table[oper].mnemonic);
+				sprintf(buffer,"%-6s",table[oper].mnemonic);
 				/*H imm, abs */
 				/* abs */
 				break;
