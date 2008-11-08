@@ -9,6 +9,8 @@
     6/27/99 Jim Hernandez -- 1st Attempt at Fixing Drone Star Castle sound and
                              pitch adjustments.
     6/30/99 MLR added Rip Off, Solar Quest, Armor Attack (no samples yet)
+    11/04/08 Jim Hernandez -- Fixed Drone Star Castle sound again. It was 
+                              broken for a long time due to some changes.
 
     Bugs: Sometimes the death explosion (small explosion) does not trigger.
 
@@ -114,7 +116,7 @@ static void generic_init(running_machine *machine, void (*callback)(UINT8, UINT8
     last_frame = 0;
 
 	/* reset Star Castle pitch */
-    current_pitch = 0x20000;
+    current_pitch = 0x10000;
 
     /* register for save states */
     state_save_register_global(sound_control);
@@ -868,15 +870,15 @@ static void starcas_sound_w(UINT8 sound_val, UINT8 bits_changed)
 
 		/* latch the drone pitch */
 		target_pitch = (current_shift & 7) + ((current_shift & 2) << 2);
-        target_pitch = 0x10000 + (target_pitch << 12);
+        target_pitch = 0x5800 + (target_pitch << 12);
 
         /* once per frame slide the pitch toward the target */
         if (video_screen_get_frame_number(Machine->primary_screen) > last_frame)
         {
             if (current_pitch > target_pitch)
-                current_pitch -= 300;
+                current_pitch -= 225;
             if (current_pitch < target_pitch)
-                current_pitch += 200;
+                current_pitch += 150;
             sample_set_freq(4, current_pitch);
             last_frame = video_screen_get_frame_number(Machine->primary_screen);
         }
