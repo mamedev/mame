@@ -48,6 +48,7 @@ TODO:
 #include "sound/dac.h"
 #include "sound/ay8910.h"
 #include "sound/3812intf.h"
+#include "includes/nbmj8891.h"
 
 
 #define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
@@ -56,29 +57,6 @@ TODO:
 #else
 #define DAC_0_WRITE	dac_0_data_w
 #endif
-
-
-extern VIDEO_UPDATE( nbmj8891 );
-extern VIDEO_START( nbmj8891_1layer );
-extern VIDEO_START( nbmj8891_2layer );
-
-extern READ8_HANDLER( nbmj8891_palette_type1_r );
-extern WRITE8_HANDLER( nbmj8891_palette_type1_w );
-extern READ8_HANDLER( nbmj8891_palette_type2_r );
-extern WRITE8_HANDLER( nbmj8891_palette_type2_w );
-extern READ8_HANDLER( nbmj8891_palette_type3_r );
-extern WRITE8_HANDLER( nbmj8891_palette_type3_w );
-extern WRITE8_HANDLER( nbmj8891_blitter_w );
-extern WRITE8_HANDLER( nbmj8891_scrolly_w );
-extern WRITE8_HANDLER( nbmj8891_vramsel_w );
-extern WRITE8_HANDLER( nbmj8891_romsel_w );
-extern WRITE8_HANDLER( nbmj8891_clutsel_w );
-extern READ8_HANDLER( nbmj8891_clut_r );
-extern WRITE8_HANDLER( nbmj8891_clut_w );
-extern WRITE8_HANDLER( nbmj8891_taiwanmb_blitter_w );
-extern WRITE8_HANDLER( nbmj8891_taiwanmb_gfxflag_w );
-extern WRITE8_HANDLER( nbmj8891_taiwanmb_gfxdraw_w );
-extern WRITE8_HANDLER( nbmj8891_taiwanmb_mcu_w );
 
 
 static DRIVER_INIT( gionbana )

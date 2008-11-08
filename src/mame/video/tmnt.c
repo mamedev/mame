@@ -1,6 +1,7 @@
 #include "driver.h"
 #include "machine/eeprom.h"
 #include "video/konamiic.h"
+#include "includes/tmnt.h"
 
 
 static int layer_colorbase[3],sprite_colorbase,bg_colorbase;

@@ -8,6 +8,7 @@
 */
 
 #include "driver.h"
+#include "includes/nmk16.h"
 
 UINT16 *nmk_bgvideoram,*nmk_fgvideoram,*nmk_txvideoram;
 UINT16 *gunnail_scrollram, *gunnail_scrollramy;

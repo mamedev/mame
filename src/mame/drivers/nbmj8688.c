@@ -34,6 +34,8 @@ TODO:
 #include "sound/3812intf.h"
 #include "rendlay.h"
 #include "nbmj8688.lh"
+#include "includes/nbmj8688.h"
+
 
 #define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
 #if SIGNED_DAC
@@ -41,36 +43,6 @@ TODO:
 #else
 #define DAC_0_WRITE	dac_0_data_w
 #endif
-
-
-extern PALETTE_INIT( mbmj8688_8bit );
-extern PALETTE_INIT( mbmj8688_12bit );
-extern PALETTE_INIT( mbmj8688_16bit );
-extern VIDEO_UPDATE( mbmj8688 );
-extern VIDEO_UPDATE( mbmj8688_LCD );
-extern VIDEO_START( mbmj8688_8bit );
-extern VIDEO_START( mbmj8688_hybrid_12bit );
-extern VIDEO_START( mbmj8688_pure_12bit );
-extern VIDEO_START( mbmj8688_hybrid_16bit );
-extern VIDEO_START( mbmj8688_pure_16bit );
-extern VIDEO_START( mbmj8688_pure_16bit_LCD );
-
-extern WRITE8_HANDLER( nbmj8688_clut_w );
-extern WRITE8_HANDLER( nbmj8688_blitter_w );
-extern WRITE8_HANDLER( mjsikaku_gfxflag2_w );
-extern WRITE8_HANDLER( mjsikaku_gfxflag3_w );
-extern WRITE8_HANDLER( mjsikaku_scrolly_w );
-extern WRITE8_HANDLER( mjsikaku_romsel_w );
-extern WRITE8_HANDLER( secolove_romsel_w );
-extern WRITE8_HANDLER( seiha_romsel_w );
-extern WRITE8_HANDLER( crystalg_romsel_w );
-
-extern WRITE8_HANDLER( nbmj8688_HD61830B_0_instr_w );
-extern WRITE8_HANDLER( nbmj8688_HD61830B_0_data_w );
-extern WRITE8_HANDLER( nbmj8688_HD61830B_1_instr_w );
-extern WRITE8_HANDLER( nbmj8688_HD61830B_1_data_w );
-extern WRITE8_HANDLER( nbmj8688_HD61830B_both_instr_w );
-extern WRITE8_HANDLER( nbmj8688_HD61830B_both_data_w );
 
 
 static DRIVER_INIT( mjsikaku )

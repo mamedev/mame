@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "nb1413m3.h"
+#include "includes/nbmj8991.h"
 
 
 static int nbmj8991_scrollx, nbmj8991_scrolly;

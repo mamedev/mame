@@ -8,6 +8,7 @@
 ******************************************************************************/
 
 #include "driver.h"
+#include "includes/nbmj9195.h"
 
 
 #define	VRAM_MAX	2

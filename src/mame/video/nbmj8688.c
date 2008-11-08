@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "nb1413m3.h"
+#include "includes/nbmj8688.h"
 
 
 static int mjsikaku_scrolly;

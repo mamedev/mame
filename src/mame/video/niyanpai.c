@@ -7,6 +7,7 @@
 ******************************************************************************/
 
 #include "driver.h"
+#include "includes/niyanpai.h"
 
 
 #define	VRAM_MAX	3

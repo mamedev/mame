@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "includes/armedf.h"
 
 
 UINT16 armedf_vreg;

@@ -115,6 +115,7 @@ BG0 palette intensity ( $C47F, $C4FF )
 
 #include "driver.h"
 #include "jalblend.h"
+#include "includes/argus.h"
 
 
 UINT8 *argus_paletteram;

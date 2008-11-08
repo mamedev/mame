@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "includes/aerofgt.h"
 
 
 UINT16 *aerofgt_rasterram;

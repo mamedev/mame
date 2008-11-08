@@ -39,6 +39,7 @@ Memo:
 #include "sound/dac.h"
 #include "sound/3812intf.h"
 #include "cpu/z80/z80daisy.h"
+#include "includes/niyanpai.h"
 
 
 #define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
@@ -50,26 +51,6 @@ Memo:
 #define DAC_1_WRITE	dac_1_data_w
 #endif
 
-
-
-extern VIDEO_UPDATE( niyanpai );
-extern VIDEO_START( niyanpai );
-
-extern READ16_HANDLER( niyanpai_palette_r );
-extern WRITE16_HANDLER( niyanpai_palette_w );
-
-extern READ16_HANDLER( niyanpai_blitter_0_r );
-extern READ16_HANDLER( niyanpai_blitter_1_r );
-extern READ16_HANDLER( niyanpai_blitter_2_r );
-extern WRITE16_HANDLER( niyanpai_blitter_0_w );
-extern WRITE16_HANDLER( niyanpai_blitter_1_w );
-extern WRITE16_HANDLER( niyanpai_blitter_2_w );
-extern WRITE16_HANDLER( niyanpai_clut_0_w );
-extern WRITE16_HANDLER( niyanpai_clut_1_w );
-extern WRITE16_HANDLER( niyanpai_clut_2_w );
-extern WRITE16_HANDLER( niyanpai_clutsel_0_w );
-extern WRITE16_HANDLER( niyanpai_clutsel_1_w );
-extern WRITE16_HANDLER( niyanpai_clutsel_2_w );
 
 
 static int musobana_inputport;

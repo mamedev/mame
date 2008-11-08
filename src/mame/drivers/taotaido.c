@@ -65,20 +65,9 @@ zooming might be wrong
 
 #include "driver.h"
 #include "sound/2610intf.h"
+#include "includes/taotaido.h"
 
 #define TAOTAIDO_SHOW_ALL_INPUTS	0
-
-UINT16 *taotaido_spriteram;
-UINT16 *taotaido_spriteram2;
-UINT16 *taotaido_scrollram;
-UINT16 *taotaido_bgram;
-
-WRITE16_HANDLER( taotaido_sprite_character_bank_select_w );
-WRITE16_HANDLER( taotaido_tileregs_w );
-WRITE16_HANDLER( taotaido_bgvideoram_w );
-VIDEO_START( taotaido );
-VIDEO_UPDATE( taotaido );
-VIDEO_EOF( taotaido );
 
 static int pending_command;
 

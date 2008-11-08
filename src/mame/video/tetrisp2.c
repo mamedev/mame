@@ -39,9 +39,8 @@ To Do:
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/tetrisp2.h"
 
-
-extern UINT16 tetrisp2_systemregs[0x10];
 
 /* Variables needed by driver: */
 

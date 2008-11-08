@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "includes/wc90.h"
 
 
 UINT8 *wc90_fgvideoram,*wc90_bgvideoram,*wc90_txvideoram;

@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "includes/dooyong.h"
 
 
 UINT8 *dooyong_txvideoram;

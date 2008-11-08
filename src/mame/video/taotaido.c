@@ -9,15 +9,16 @@ zooming might be wrong (only used on title logo?)
 */
 
 #include "driver.h"
+#include "includes/taotaido.h"
+
+UINT16 *taotaido_spriteram;
+UINT16 *taotaido_spriteram2;
+UINT16 *taotaido_scrollram;
+UINT16 *taotaido_bgram;
 
 static UINT16 taotaido_sprite_character_bank_select[8];
 static UINT16 taotaido_video_bank_select[8];
 static tilemap *bg_tilemap;
-
-extern UINT16 *taotaido_spriteram;
-extern UINT16 *taotaido_spriteram2;
-extern UINT16 *taotaido_scrollram;
-extern UINT16 *taotaido_bgram;
 
 static UINT16 *taotaido_spriteram_old, *taotaido_spriteram_older;
 static UINT16 *taotaido_spriteram2_old, *taotaido_spriteram2_older;

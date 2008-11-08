@@ -25,6 +25,7 @@ Notes:
 #include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "cpu/z80/z80daisy.h"
+#include "includes/nbmj9195.h"
 
 
 #define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
@@ -35,26 +36,6 @@ Notes:
 #define DAC_0_WRITE	dac_0_data_w
 #define DAC_1_WRITE	dac_1_data_w
 #endif
-
-
-extern VIDEO_UPDATE( nbmj9195 );
-extern VIDEO_START( nbmj9195_1layer );
-extern VIDEO_START( nbmj9195_2layer );
-extern VIDEO_START( nbmj9195_nb22090 );
-
-extern READ8_HANDLER( nbmj9195_palette_r );
-extern WRITE8_HANDLER( nbmj9195_palette_w );
-extern READ8_HANDLER( nbmj9195_nb22090_palette_r );
-extern WRITE8_HANDLER( nbmj9195_nb22090_palette_w );
-
-extern READ8_HANDLER( nbmj9195_blitter_0_r );
-extern READ8_HANDLER( nbmj9195_blitter_1_r );
-extern WRITE8_HANDLER( nbmj9195_blitter_0_w );
-extern WRITE8_HANDLER( nbmj9195_blitter_1_w );
-extern WRITE8_HANDLER( nbmj9195_clut_0_w );
-extern WRITE8_HANDLER( nbmj9195_clut_1_w );
-extern void nbmj9195_clutsel_w(int data);
-extern void nbmj9195_gfxflag2_w(int data);
 
 
 static int nbmj9195_inputport;

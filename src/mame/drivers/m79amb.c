@@ -48,24 +48,9 @@ Ports:
   8002 Sound Control (According to Manual)
   8003 D0=SelfTest LED
 
- */
-#include "driver.h"
-
-INTERRUPT_GEN( invaders_interrupt );
-void ramtek_sh_update(void);
-
-
-/***************************************************************************
-
-  video.c
-
-  Functions to emulate the video hardware of the machine.
-
-***************************************************************************/
+*/
 
 #include "driver.h"
-
-
 
 static UINT8 *ramtek_videoram;
 static UINT8 *mask;

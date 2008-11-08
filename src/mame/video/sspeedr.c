@@ -5,6 +5,8 @@ Taito Super Speed Race video emulation
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/sspeedr.h"
+
 
 static int toggle;
 

@@ -5,27 +5,8 @@ Taito Super Speed Race driver
 ***************************************************************************/
 
 #include "driver.h"
-
 #include "sspeedr.lh"
-
-extern WRITE8_HANDLER( sspeedr_driver_horz_w );
-extern WRITE8_HANDLER( sspeedr_driver_horz_2_w );
-extern WRITE8_HANDLER( sspeedr_driver_vert_w );
-extern WRITE8_HANDLER( sspeedr_driver_pic_w );
-
-extern WRITE8_HANDLER( sspeedr_drones_horz_w );
-extern WRITE8_HANDLER( sspeedr_drones_horz_2_w );
-extern WRITE8_HANDLER( sspeedr_drones_vert_w );
-extern WRITE8_HANDLER( sspeedr_drones_mask_w );
-
-extern WRITE8_HANDLER( sspeedr_track_horz_w );
-extern WRITE8_HANDLER( sspeedr_track_horz_2_w );
-extern WRITE8_HANDLER( sspeedr_track_vert_w );
-extern WRITE8_HANDLER( sspeedr_track_ice_w );
-
-extern VIDEO_START( sspeedr );
-extern VIDEO_UPDATE( sspeedr );
-extern VIDEO_EOF( sspeedr );
+#include "includes/sspeedr.h"
 
 static UINT8 led_TIME[2];
 static UINT8 led_SCORE[24];

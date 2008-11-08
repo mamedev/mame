@@ -90,9 +90,6 @@ Blitter source graphics
 
 static int i8039_status;
 
-WRITE8_HANDLER( tutankhm_sh_irqtrigger_w );
-
-
 static WRITE8_HANDLER( junofrst_bankselect_w )
 {
 	memory_set_bank(1, data & 0x0f);

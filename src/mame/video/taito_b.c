@@ -1,5 +1,6 @@
 #include "driver.h"
 #include "profiler.h"
+#include "includes/taito_b.h"
 
 UINT16 *taitob_scroll;
 UINT16 *TC0180VCU_ram;

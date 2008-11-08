@@ -34,6 +34,7 @@ Notes:
 #include "sound/ay8910.h"
 #include "sound/3812intf.h"
 #include "sound/dac.h"
+#include "includes/nbmj8991.h"
 
 
 #define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
@@ -44,18 +45,6 @@ Notes:
 #define DAC_0_WRITE	dac_0_data_w
 #define DAC_1_WRITE	dac_1_data_w
 #endif
-
-
-extern VIDEO_UPDATE( nbmj8991_type1 );				// galkoku
-extern VIDEO_UPDATE( nbmj8991_type2 );				// pstadium
-extern VIDEO_START( nbmj8991 );						// pstadium
-
-extern WRITE8_HANDLER( nbmj8991_palette_type1_w );	// galkoku
-extern WRITE8_HANDLER( nbmj8991_palette_type2_w );	// galkaika
-extern WRITE8_HANDLER( nbmj8991_palette_type3_w );	// pstadium
-extern WRITE8_HANDLER( nbmj8991_blitter_w );
-extern READ8_HANDLER( nbmj8991_clut_r );
-extern WRITE8_HANDLER( nbmj8991_clut_w );
 
 
 static WRITE8_HANDLER( nbmj8991_soundbank_w )

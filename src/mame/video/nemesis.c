@@ -5,6 +5,8 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/nemesis.h"
+
 
 UINT16 *nemesis_videoram1b;
 UINT16 *nemesis_videoram2b;
