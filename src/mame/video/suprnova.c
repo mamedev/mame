@@ -16,6 +16,7 @@ Tilemap flip flags were reversed
 
 #include "driver.h"
 #include "deprecat.h"
+#include "includes/suprnova.h"
 
 static bitmap_t *sprite_bitmap;
 
@@ -111,13 +112,6 @@ static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rec
 
 
 #define SUPRNOVA_DECODE_BUFFER_SIZE 0x2000
-
-extern UINT32 *skns_tilemapA_ram, *skns_tilemapB_ram, *skns_v3slc_ram;
-extern UINT32 *skns_palette_ram;
-extern UINT32 *skns_pal_regs, *skns_v3_regs, *skns_spc_regs;
-extern UINT32 skns_v3t_dirty[0x4000]; // allocate this elsewhere?
-extern UINT32 skns_v3t_4bppdirty[0x8000]; // allocate this elsewhere?
-extern int skns_v3t_somedirty,skns_v3t_4bpp_somedirty;
 
 static UINT8 decodebuffer[SUPRNOVA_DECODE_BUFFER_SIZE];
 static int depthA=0;

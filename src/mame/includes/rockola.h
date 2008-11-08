@@ -7,7 +7,7 @@
 #include "sound/discrete.h"
 
 
-/*----------- defined in sndhrdw/rokola.c -----------*/
+/*----------- defined in audio/rockola.c -----------*/
 
 extern const custom_sound_interface custom_interface;
 extern const samples_interface sasuke_samples_interface;
@@ -34,3 +34,28 @@ void rockola_set_music_freq(int freq);
 int rockola_music0_playing(void);
 
 DISCRETE_SOUND_EXTERN( fantasy );
+
+
+/*----------- defined in video/rockola.c -----------*/
+
+extern UINT8 *rockola_videoram2;
+extern UINT8 *rockola_charram;
+
+WRITE8_HANDLER( rockola_videoram_w );
+WRITE8_HANDLER( rockola_videoram2_w );
+WRITE8_HANDLER( rockola_colorram_w );
+WRITE8_HANDLER( rockola_charram_w );
+WRITE8_HANDLER( rockola_flipscreen_w );
+WRITE8_HANDLER( rockola_scrollx_w );
+WRITE8_HANDLER( rockola_scrolly_w );
+
+PALETTE_INIT( rockola );
+VIDEO_START( rockola );
+VIDEO_UPDATE( rockola );
+
+WRITE8_HANDLER( satansat_b002_w );
+WRITE8_HANDLER( satansat_backcolor_w );
+
+PALETTE_INIT( satansat );
+VIDEO_START( satansat );
+

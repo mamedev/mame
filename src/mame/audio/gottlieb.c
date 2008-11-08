@@ -14,6 +14,7 @@
 #include "sound/ay8910.h"
 //#include "sound/votrax.h"
 #include "sound/sp0250.h"
+#include "includes/gottlieb.h"
 
 
 #define SOUND1_CLOCK		XTAL_3_579545MHz

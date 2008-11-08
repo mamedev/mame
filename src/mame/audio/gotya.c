@@ -1,5 +1,7 @@
 #include "driver.h"
 #include "sound/samples.h"
+#include "includes/gotya.h"
+
 
 struct gotya_sample
 {

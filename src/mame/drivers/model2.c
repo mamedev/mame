@@ -59,11 +59,7 @@
 #include "sound/scsp.h"
 #include "sound/multipcm.h"
 #include "sound/2612intf.h"
-
-extern VIDEO_START(model2);
-extern VIDEO_UPDATE(model2);
-
-extern void model2_3d_set_zclip( UINT8 clip );
+#include "includes/model2.h"
 
 UINT32 *model2_bufferram, *model2_colorxlat;
 static UINT32 *model2_workram, *model2_backup1, *model2_backup2;
@@ -630,7 +626,7 @@ static WRITE32_HANDLER(copro_sharc_iop_w)
 /* GEO */
 
 UINT32 geo_read_start_address = 0;
-static UINT32 geo_write_start_address = 0;
+UINT32 geo_write_start_address = 0;
 
 static WRITE32_HANDLER( geo_ctl1_w )
 {

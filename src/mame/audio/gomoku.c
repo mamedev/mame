@@ -9,7 +9,7 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "streams.h"
-#include "sound/custom.h"
+#include "includes/gomoku.h"
 
 
 /* 4 voices max */

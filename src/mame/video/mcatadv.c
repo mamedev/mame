@@ -12,11 +12,7 @@ ToDo: Fix Sprites & Rowscroll/Select for Cocktail
 
 #include "driver.h"
 #include "profiler.h"
-
-/* Defined in driver */
-extern UINT16 *mcatadv_videoram1, *mcatadv_videoram2;
-extern UINT16 *mcatadv_scroll, *mcatadv_scroll2;
-extern UINT16 *mcatadv_vidregs;
+#include "includes/mcatadv.h"
 
 static tilemap *mcatadv_tilemap1,  *mcatadv_tilemap2;
 static UINT16 *spriteram_old, *vidregs_old;

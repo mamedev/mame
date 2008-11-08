@@ -22,28 +22,8 @@ todo:
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/custom.h"
+#include "includes/gomoku.h"
 
-
-extern PALETTE_INIT( gomoku );
-extern VIDEO_START( gomoku );
-extern VIDEO_UPDATE( gomoku );
-
-extern WRITE8_HANDLER( gomoku_videoram_w );
-extern WRITE8_HANDLER( gomoku_colorram_w );
-extern WRITE8_HANDLER( gomoku_bgram_w );
-extern WRITE8_HANDLER( gomoku_flipscreen_w );
-extern WRITE8_HANDLER( gomoku_bg_dispsw_w );
-
-extern UINT8 *gomoku_videoram;
-extern UINT8 *gomoku_colorram;
-extern UINT8 *gomoku_bgram;
-
-extern UINT8 *gomoku_soundregs1;
-extern UINT8 *gomoku_soundregs2;
-extern WRITE8_HANDLER( gomoku_sound1_w );
-extern WRITE8_HANDLER( gomoku_sound2_w );
-
-extern void *gomoku_sh_start(int clock, const custom_sound_interface *config);
 
 /* input ports are rotated 90 degrees */
 static READ8_HANDLER( input_port_r )

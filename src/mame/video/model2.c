@@ -86,19 +86,12 @@
 
 *********************************************************************************************************************************/
 #include "driver.h"
+#include "eminline.h"
 #include "video/segaic24.h"
 #include "video/poly.h"
-#include "eminline.h"
+#include "includes/model2.h"
 
 #define DEBUG 0
-
-extern UINT32 geo_read_start_address;
-extern UINT32 geo_write_start_address;
-extern UINT32 *model2_bufferram;
-extern UINT32 *model2_colorxlat;
-extern UINT32 *model2_textureram0;
-extern UINT32 *model2_textureram1;
-extern UINT32 *model2_lumaram;
 
 static poly_manager *poly;
 

@@ -52,22 +52,8 @@ it as ASCII text.
 #include "driver.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
+#include "includes/btime.h"
 
-
-/* from video/btime.c */
-extern UINT8 *btime_videoram;
-extern size_t btime_videoram_size;
-extern UINT8 *btime_colorram;
-
-PALETTE_INIT( btime );
-VIDEO_START( btime );
-VIDEO_UPDATE( eggs );
-
-READ8_HANDLER( btime_mirrorvideoram_r );
-WRITE8_HANDLER( btime_mirrorvideoram_w );
-READ8_HANDLER( btime_mirrorcolorram_r );
-WRITE8_HANDLER( btime_mirrorcolorram_w );
-WRITE8_HANDLER( btime_video_control_w );
 
 static ADDRESS_MAP_START( dommy_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_RAM)

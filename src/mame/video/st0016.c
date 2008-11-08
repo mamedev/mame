@@ -21,8 +21,6 @@ static int st0016_ramgfx;
 
 //super eagle shot
 static bitmap_t *speglsht_bitmap;
-extern UINT32 *speglsht_framebuffer;
-extern UINT32  speglsht_videoreg;
 
 static const gfx_layout charlayout =
 {

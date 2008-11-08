@@ -35,22 +35,7 @@ TODO: Emulated sound
 
 #include "driver.h"
 #include "sound/samples.h"
-
-
-extern UINT8 *gotya_scroll;
-extern UINT8 *gotya_videoram2;
-
-extern WRITE8_HANDLER( gotya_videoram_w );
-extern WRITE8_HANDLER( gotya_colorram_w );
-extern WRITE8_HANDLER( gotya_videoram2_w );
-
-extern PALETTE_INIT( gotya );
-extern VIDEO_START( gotya );
-extern VIDEO_UPDATE( gotya );
-
-extern WRITE8_HANDLER( gotya_video_control_w );
-
-extern WRITE8_HANDLER( gotya_soundlatch_w );
+#include "includes/gotya.h"
 
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )

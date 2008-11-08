@@ -201,8 +201,7 @@ there are 9 PALS on the pcb (not dumped)
 #include "driver.h"
 #include "deprecat.h"
 #include "sound/ymz280b.h"
-
-extern UINT32* skns_spc_regs;
+#include "includes/suprnova.h"
 
 
 /***************************************************************************
@@ -407,8 +406,6 @@ static INTERRUPT_GEN( jchan_vblank )
 		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
 }
 
-
-
 static VIDEO_START(jchan)
 {
 	/* so we can use suprnova.c */
@@ -416,8 +413,6 @@ static VIDEO_START(jchan)
 	spriteram_size = 0x4000;
 	skns_spc_regs = auto_malloc (0x40);
 }
-
-extern void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect );
 
 
 static VIDEO_UPDATE(jchan)

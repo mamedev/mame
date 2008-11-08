@@ -13,17 +13,7 @@ Tomasz Slanina
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
-
-
-VIDEO_START( changela );
-VIDEO_UPDATE( changela );
-
-WRITE8_HANDLER( changela_colors_w );
-WRITE8_HANDLER( changela_mem_device_select_w );
-WRITE8_HANDLER( changela_mem_device_w );
-READ8_HANDLER( changela_mem_device_r );
-WRITE8_HANDLER( changela_slope_rom_addr_hi_w );
-WRITE8_HANDLER( changela_slope_rom_addr_lo_w );
+#include "includes/changela.h"
 
 
 static UINT8 portA_in,portA_out,ddrA;

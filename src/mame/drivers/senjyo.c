@@ -69,42 +69,10 @@ I/O read/write
 ***************************************************************************/
 
 #include "driver.h"
-#include "machine/z80ctc.h"
-#include "machine/z80pio.h"
 #include "sound/sn76496.h"
 #include "sound/samples.h"
-#include "cpu/z80/z80daisy.h"
 #include "machine/segacrpt.h"
-
-
-
-extern UINT8 *senjyo_fgscroll;
-extern UINT8 *senjyo_scrollx1,*senjyo_scrolly1;
-extern UINT8 *senjyo_scrollx2,*senjyo_scrolly2;
-extern UINT8 *senjyo_scrollx3,*senjyo_scrolly3;
-extern UINT8 *senjyo_fgvideoram,*senjyo_fgcolorram;
-extern UINT8 *senjyo_bg1videoram,*senjyo_bg2videoram,*senjyo_bg3videoram;
-extern UINT8 *senjyo_radarram;
-extern UINT8 *senjyo_bgstripesram;
-WRITE8_HANDLER( senjyo_fgvideoram_w );
-WRITE8_HANDLER( senjyo_fgcolorram_w );
-WRITE8_HANDLER( senjyo_bg1videoram_w );
-WRITE8_HANDLER( senjyo_bg2videoram_w );
-WRITE8_HANDLER( senjyo_bg3videoram_w );
-WRITE8_HANDLER( senjyo_bgstripes_w );
-
-VIDEO_START( senjyo );
-VIDEO_UPDATE( senjyo );
-extern int is_senjyo, senjyo_scrollhack;
-
-/* in audio/senjyo.c */
-extern const z80_daisy_chain senjyo_daisy_chain[];
-extern const z80pio_interface senjyo_pio_intf;
-void senjyo_sh_start(void);
-
-WRITE8_HANDLER( senjyo_volume_w );
-
-
+#include "includes/senjyo.h"
 
 
 static int int_delay_kludge;
@@ -622,8 +590,6 @@ static const samples_interface senjyo_samples_interface =
 	senjyo_sh_start
 };
 
-
-extern const z80ctc_interface senjyo_ctc_intf;
 
 static MACHINE_DRIVER_START( senjyo )
 

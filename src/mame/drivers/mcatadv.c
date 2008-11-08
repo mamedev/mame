@@ -137,15 +137,8 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
 #include "driver.h"
 #include "sound/2610intf.h"
+#include "includes/mcatadv.h"
 
-VIDEO_UPDATE( mcatadv );
-VIDEO_START( mcatadv );
-VIDEO_EOF( mcatadv );
-VIDEO_UPDATE( nost );
-VIDEO_START( nost );
-
-WRITE16_HANDLER( mcatadv_videoram1_w );
-WRITE16_HANDLER( mcatadv_videoram2_w );
 UINT16* mcatadv_videoram1, *mcatadv_videoram2;
 UINT16* mcatadv_scroll, *mcatadv_scroll2;
 UINT16* mcatadv_vidregs;

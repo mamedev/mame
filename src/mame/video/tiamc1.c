@@ -8,6 +8,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/tiamc1.h"
 
 
 UINT8 *tiamc1_tileram;

@@ -84,6 +84,7 @@ Stephh's notes :
 #include "driver.h"
 #include "cpu/upd7810/upd7810.h"
 #include "sound/okim6295.h"
+#include "includes/fitfight.h"
 
 
 UINT16 *fitfight_spriteram;
@@ -100,12 +101,6 @@ UINT16 *fof_txt_tileram;
 char bbprot_kludge;
 
 static UINT16 fitfight_700000_data = 0;
-
-WRITE16_HANDLER( fof_bak_tileram_w );
-WRITE16_HANDLER( fof_mid_tileram_w );
-WRITE16_HANDLER( fof_txt_tileram_w );
-VIDEO_START(fitfight);
-VIDEO_UPDATE(fitfight);
 
 static READ16_HANDLER(fitfight_700000_r)
 {

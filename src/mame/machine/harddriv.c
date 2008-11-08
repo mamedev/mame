@@ -14,6 +14,7 @@
 #include "machine/atarigen.h"
 #include "machine/asic65.h"
 #include "audio/atarijsa.h"
+#include "includes/slapstic.h"
 #include "harddriv.h"
 
 
@@ -78,16 +79,6 @@ UINT32 *rddsp32_sync[2];
 UINT32 gsp_speedup_count[4];
 UINT32 msp_speedup_count[4];
 UINT32 adsp_speedup_count[4];
-
-
-/* from slapstic.c */
-int slapstic_tweak(offs_t offset);
-void slapstic_reset(void);
-
-
-/* from video */
-extern UINT8 *hdgsp_vram;
-
 
 
 /*************************************

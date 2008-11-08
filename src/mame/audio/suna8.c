@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "sound/samples.h"
+#include "includes/suna8.h"
 
 static INT16 *samplebuf;
 static int sample;

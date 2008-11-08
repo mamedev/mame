@@ -115,8 +115,6 @@ static UINT8 *shared;
 UINT32 *speglsht_framebuffer;
 UINT32  speglsht_videoreg;
 
-extern UINT8 *st0016_charram;
-
 static ADDRESS_MAP_START( st0016_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)

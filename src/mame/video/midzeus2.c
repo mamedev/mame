@@ -57,8 +57,6 @@ struct _poly_extra_data
  *
  *************************************/
 
-extern UINT32 *zeusbase;
-
 static poly_manager *poly;
 static UINT8 log_fifo;
 

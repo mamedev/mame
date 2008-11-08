@@ -1,5 +1,6 @@
 #include "driver.h"
 #include "video/konamiic.h"
+#include "includes/xmen.h"
 
 
 static int layer_colorbase[3],sprite_colorbase,bg_colorbase;
@@ -127,14 +128,6 @@ VIDEO_UPDATE( xmen )
 	K053247_sprites_draw(screen->machine, bitmap,cliprect);
 	return 0;
 }
-
-extern UINT16 xmen_current_frame;
-extern UINT16*xmen6p_spriteramleft;
-extern UINT16*xmen6p_spriteramright;
-extern UINT16*xmen6p_tilemapleft;
-extern UINT16*xmen6p_tilemapright;
-extern WRITE8_HANDLER( K052109_w );
-
 
 
 VIDEO_UPDATE( xmen6p )

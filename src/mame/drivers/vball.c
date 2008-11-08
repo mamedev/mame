@@ -93,29 +93,7 @@ VBlank = 58Hz
 #include "cpu/z80/z80.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
-
-/* from video */
-extern UINT8 *vb_attribram;
-extern UINT8 *vb_spriteram;
-extern UINT8 *vb_videoram;
-extern UINT8 *vb_scrolly_lo;
-extern int vb_scrollx_hi;
-extern int vb_scrolly_hi;
-extern int vb_scrollx_lo;
-extern int vball_gfxset;
-
-VIDEO_START( vb );
-VIDEO_UPDATE( vb );
-extern void vb_bgprombank_w(running_machine *machine, int bank);
-extern void vb_spprombank_w(running_machine *machine, int bank);
-extern WRITE8_HANDLER( vb_attrib_w );
-extern WRITE8_HANDLER( vb_videoram_w );
-extern void vb_mark_all_dirty(void);
-
-INTERRUPT_GEN( vball_interrupt );
-
-/* end of extern code & data */
-
+#include "includes/vball.h"
 
 
 /* bit 0 = bank switch

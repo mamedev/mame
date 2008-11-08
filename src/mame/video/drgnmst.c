@@ -3,18 +3,11 @@
 // layer priority register not fully understood
 
 #include "driver.h"
+#include "includes/drgnmst.h"
 
-extern UINT16 *drgnmst_vidregs;
-
-extern UINT16 *drgnmst_fg_videoram;
 static tilemap *drgnmst_fg_tilemap;
-extern UINT16 *drgnmst_bg_videoram;
 static tilemap *drgnmst_bg_tilemap;
-extern UINT16 *drgnmst_md_videoram;
 static tilemap *drgnmst_md_tilemap;
-
-extern UINT16 *drgnmst_rowscrollram;
-extern UINT16 *drgnmst_vidregs2;
 
 
 static TILE_GET_INFO( get_drgnmst_fg_tile_info )

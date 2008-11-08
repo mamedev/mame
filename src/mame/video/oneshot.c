@@ -1,16 +1,7 @@
 /* One Shot One Kill Video Hardware */
 
 #include "driver.h"
-
-extern UINT16 *oneshot_sprites;
-extern UINT16 *oneshot_bg_videoram;
-extern UINT16 *oneshot_mid_videoram;
-extern UINT16 *oneshot_fg_videoram;
-extern UINT16 *oneshot_scroll;
-
-extern int gun_x_p1,gun_y_p1,gun_x_p2,gun_y_p2;
-extern int gun_x_shift;
-
+#include "includes/oneshot.h"
 
 static tilemap *oneshot_bg_tilemap;
 static tilemap *oneshot_mid_tilemap;

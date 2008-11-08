@@ -72,10 +72,8 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
 #include "sound/2610intf.h"
+#include "includes/inufuku.h"
 
-
-VIDEO_UPDATE( inufuku );
-VIDEO_START( inufuku );
 
 UINT16 *inufuku_bg_videoram;
 UINT16 *inufuku_bg_rasterram;
@@ -84,14 +82,6 @@ UINT16 *inufuku_spriteram1;
 UINT16 *inufuku_spriteram2;
 size_t inufuku_spriteram1_size;
 static UINT16 pending_command;
-
-WRITE16_HANDLER( inufuku_paletteram_w );
-READ16_HANDLER( inufuku_bg_videoram_r );
-WRITE16_HANDLER( inufuku_bg_videoram_w );
-READ16_HANDLER( inufuku_text_videoram_r );
-WRITE16_HANDLER( inufuku_text_videoram_w );
-WRITE16_HANDLER( inufuku_palettereg_w );
-WRITE16_HANDLER( inufuku_scrollreg_w );
 
 
 /******************************************************************************

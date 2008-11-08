@@ -1,17 +1,11 @@
 /* Aquarium */
 
 #include "driver.h"
-
-extern UINT16 *aquarium_scroll;
+#include "includes/aquarium.h"
 
 static tilemap *aquarium_txt_tilemap;
-extern UINT16 *aquarium_txt_videoram;
-
 static tilemap *aquarium_mid_tilemap;
-extern UINT16 *aquarium_mid_videoram;
-
 static tilemap *aquarium_bak_tilemap;
-extern UINT16 *aquarium_bak_videoram;
 
 /* gcpinbal.c modified */
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int y_offs)

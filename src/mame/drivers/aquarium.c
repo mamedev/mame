@@ -52,6 +52,7 @@ Stephh's notes (based on the game M68000 code and some tests) :
 #include "driver.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
+#include "includes/aquarium.h"
 
 #define AQUARIUS_HACK	0
 
@@ -62,13 +63,6 @@ UINT16 *aquarium_scroll;
 UINT16 *aquarium_txt_videoram;
 UINT16 *aquarium_mid_videoram;
 UINT16 *aquarium_bak_videoram;
-
-WRITE16_HANDLER( aquarium_txt_videoram_w );
-WRITE16_HANDLER( aquarium_mid_videoram_w );
-WRITE16_HANDLER( aquarium_bak_videoram_w );
-
-VIDEO_START(aquarium);
-VIDEO_UPDATE(aquarium);
 
 #if AQUARIUS_HACK
 static MACHINE_RESET( aquarium )

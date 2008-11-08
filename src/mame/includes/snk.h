@@ -70,7 +70,3 @@ extern WRITE8_HANDLER( snk_tx_videoram_w );
 extern WRITE8_HANDLER( snk_bg_videoram_w );
 extern WRITE8_HANDLER( marvins_fg_videoram_w );
 extern WRITE8_HANDLER( marvins_bg_videoram_w );
-
-/*----------- defined in drivers/hal21.c -----------*/
-
-extern PALETTE_INIT( aso );

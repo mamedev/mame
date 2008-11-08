@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/m6502/m6502.h"
+#include "includes/vball.h"
 
 int vb_scrollx_hi=0;
 int vb_scrollx_lo=0;

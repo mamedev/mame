@@ -115,32 +115,7 @@
 */
 
 #include "driver.h"
-#include "sound/custom.h"
-
-/* routines defined in video */
-extern PALETTE_INIT( tiamc1 );
-extern VIDEO_START( tiamc1 );
-extern VIDEO_UPDATE( tiamc1 );
-
-extern WRITE8_HANDLER( tiamc1_palette_w );
-extern WRITE8_HANDLER( tiamc1_videoram_w );
-extern WRITE8_HANDLER( tiamc1_bankswitch_w );
-extern WRITE8_HANDLER( tiamc1_sprite_x_w );
-extern WRITE8_HANDLER( tiamc1_sprite_y_w );
-extern WRITE8_HANDLER( tiamc1_sprite_a_w );
-extern WRITE8_HANDLER( tiamc1_sprite_n_w );
-extern WRITE8_HANDLER( tiamc1_bg_vshift_w );
-extern WRITE8_HANDLER( tiamc1_bg_hshift_w );
-
-extern UINT8 *tiamc1_charram, *tiamc1_tileram;
-extern UINT8 *tiamc1_spriteram_x, *tiamc1_spriteram_y, *tiamc1_spriteram_n,
-	*tiamc1_spriteram_a;
-
-/* routines defined in audio */
-extern void *tiamc1_sh_start(int clock, const custom_sound_interface *config);
-extern WRITE8_HANDLER( tiamc1_timer0_w );
-extern WRITE8_HANDLER( tiamc1_timer1_w );
-extern WRITE8_HANDLER( tiamc1_timer1_gate_w );
+#include "includes/tiamc1.h"
 
 static UINT8 *video_ram;
 

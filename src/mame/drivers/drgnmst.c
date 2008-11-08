@@ -37,6 +37,7 @@ Notes:
 #include "driver.h"
 #include "cpu/pic16c5x/pic16c5x.h"
 #include "sound/okim6295.h"
+#include "includes/drgnmst.h"
 
 
 static UINT16 drgnmst_snd_command;
@@ -53,13 +54,6 @@ UINT16 *drgnmst_fg_videoram;
 UINT16 *drgnmst_bg_videoram;
 UINT16 *drgnmst_md_videoram;
 UINT16 *drgnmst_vidregs2;
-
-
-WRITE16_HANDLER( drgnmst_fg_videoram_w );
-WRITE16_HANDLER( drgnmst_bg_videoram_w );
-WRITE16_HANDLER( drgnmst_md_videoram_w );
-VIDEO_START(drgnmst);
-VIDEO_UPDATE(drgnmst);
 
 
 static WRITE16_HANDLER( drgnmst_coin_w )

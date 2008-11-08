@@ -10,6 +10,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "includes/polyplay.h"
 
 
 UINT8 *polyplay_characterram;

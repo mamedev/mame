@@ -12,15 +12,7 @@ Todo: Priority between tree0 and tree1.
 ***************************************************************************/
 
 #include "driver.h"
-
-
-extern UINT8 changela_tree0_col;
-extern UINT8 changela_tree1_col;
-extern UINT8 changela_left_bank_col;
-extern UINT8 changela_right_bank_col;
-extern UINT8 changela_boat_shore_col;
-extern UINT8 changela_collision_reset;
-extern UINT8 changela_tree_collision_reset;
+#include "includes/changela.h"
 
 
 static UINT32 slopeROM_bank;

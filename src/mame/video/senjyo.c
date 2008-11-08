@@ -8,6 +8,7 @@
 
 #include "driver.h"
 #include "machine/segacrpt.h"
+#include "includes/senjyo.h"
 
 UINT8 *senjyo_fgscroll;
 UINT8 *senjyo_scrollx1,*senjyo_scrolly1;

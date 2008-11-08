@@ -1,20 +1,11 @@
 /* Fit of Fighting Video Hardware */
 
 #include "driver.h"
+#include "includes/fitfight.h"
 
-extern UINT16 *fitfight_spriteram;
-extern UINT16 *fof_700000;
-extern UINT16 *fof_900000;
-extern UINT16 *fof_a00000;
-
-extern UINT16 *fof_bak_tileram;
 static tilemap *fof_bak_tilemap;
-extern UINT16 *fof_mid_tileram;
 static tilemap *fof_mid_tilemap;
-extern UINT16 *fof_txt_tileram;
 static tilemap *fof_txt_tilemap;
-
-extern char bbprot_kludge;
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int layer )
 {

@@ -10,8 +10,6 @@
 
 UINT8 *toypop_videoram;
 
-extern UINT8 *m68000_sharedram;
-
 static tilemap *bg_tilemap;
 UINT16 *toypop_bg_image;
 static int bitmapflip,palettebank;

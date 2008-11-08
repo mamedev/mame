@@ -281,31 +281,6 @@ Stephh's notes (based on the games M6502 code and some tests) :
 #endif
 
 
-/* video */
-
-extern UINT8 *rockola_videoram2;
-extern UINT8 *rockola_charram;
-
-WRITE8_HANDLER( rockola_videoram_w );
-WRITE8_HANDLER( rockola_videoram2_w );
-WRITE8_HANDLER( rockola_colorram_w );
-WRITE8_HANDLER( rockola_charram_w );
-WRITE8_HANDLER( rockola_flipscreen_w );
-WRITE8_HANDLER( rockola_scrollx_w );
-WRITE8_HANDLER( rockola_scrolly_w );
-
-PALETTE_INIT( rockola );
-VIDEO_START( rockola );
-VIDEO_UPDATE( rockola );
-
-WRITE8_HANDLER( satansat_charram_w );
-WRITE8_HANDLER( satansat_b002_w );
-WRITE8_HANDLER( satansat_backcolor_w );
-
-PALETTE_INIT( satansat );
-VIDEO_START( satansat );
-
-
 /* binary counter (1.4MHz update) */
 static UINT8 sasuke_counter;
 static emu_timer *sasuke_timer;

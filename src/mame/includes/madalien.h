@@ -27,7 +27,7 @@ extern UINT8 *madalien_headlight_pos;
 MACHINE_DRIVER_EXTERN( madalien_video );
 
 
-/*----------- defined in sndhrdw/madalien.c -----------*/
+/*----------- defined in audio/madalien.c -----------*/
 
 DISCRETE_SOUND_EXTERN( madalien );
 

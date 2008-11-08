@@ -9,6 +9,7 @@
 ******************************************************************************/
 
 #include "driver.h"
+#include "includes/gomoku.h"
 
 
 static int gomoku_flipscreen;

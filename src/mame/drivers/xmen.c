@@ -21,14 +21,15 @@ likewise be a 2 screen game
 #include "sound/2151intf.h"
 #include "sound/k054539.h"
 #include "rendlay.h"
-
-VIDEO_START( xmen );
-VIDEO_START( xmen6p );
-VIDEO_UPDATE( xmen );
-VIDEO_UPDATE( xmen6p );
-VIDEO_EOF( xmen6p );
+#include "includes/xmen.h"
 
 UINT16 xmen_current_frame;
+
+/* 6p version */
+UINT16*xmen6p_spriteramleft;
+UINT16*xmen6p_spriteramright;
+UINT16*xmen6p_tilemapleft;
+UINT16*xmen6p_tilemapright;
 
 /***************************************************************************
 
@@ -187,12 +188,6 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xf800) AM_WRITE(sound_bankswitch_w)
 ADDRESS_MAP_END
 
-
-/* 6p version */
-UINT16*xmen6p_spriteramleft;
-UINT16*xmen6p_spriteramright;
-UINT16*xmen6p_tilemapleft;
-UINT16*xmen6p_tilemapright;
 
 static ADDRESS_MAP_START( 6p_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM

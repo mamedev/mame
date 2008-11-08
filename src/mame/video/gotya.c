@@ -1,5 +1,7 @@
 #include "driver.h"
 #include "video/resnet.h"
+#include "includes/gotya.h"
+
 
 UINT8 *gotya_scroll;
 UINT8 *gotya_videoram2;

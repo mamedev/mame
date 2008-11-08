@@ -81,29 +81,19 @@ emulated now. ;)
 #include "driver.h"
 #include "cpu/z80/z80.h"
 #include "sound/samples.h"
+#include "includes/polyplay.h"
 
-/* video hardware access */
-extern UINT8 *polyplay_characterram;
-PALETTE_INIT( polyplay );
-VIDEO_UPDATE( polyplay );
-READ8_HANDLER( polyplay_characterram_r );
-WRITE8_HANDLER( polyplay_characterram_w );
 
 /* I/O Port handling */
 static READ8_HANDLER( polyplay_random_read );
 
 /* sound handling */
-void polyplay_set_channel1(int active);
-void polyplay_set_channel2(int active);
 static int prescale1;
 static int prescale2;
 static int channel1_active;
 static int channel1_const;
 static int channel2_active;
 static int channel2_const;
-void polyplay_play_channel1(int data);
-void polyplay_play_channel2(int data);
-void polyplay_sh_start(void);
 
 /* timer handling */
 static TIMER_CALLBACK( polyplay_timer_callback );

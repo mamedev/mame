@@ -24,8 +24,6 @@
 #define M_LN2		0.69314718055994530942
 #endif
 
-extern WRITE8_HANDLER( rockola_flipscreen_w );
-
 #define TONE_VOLUME	50
 #define CHANNELS	3
 

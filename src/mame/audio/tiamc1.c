@@ -33,7 +33,7 @@
 
 #include "driver.h"
 #include "streams.h"
-#include "sound/custom.h"
+#include "includes/tiamc1.h"
 
 #define CLOCK_DIVIDER 16
 #define BUF_LEN 100000

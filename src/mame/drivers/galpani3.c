@@ -66,8 +66,8 @@ Dumped by Uki
 #include "driver.h"
 #include "deprecat.h"
 #include "sound/ymz280b.h"
+#include "includes/suprnova.h"
 
-extern UINT32* skns_spc_regs;
 
 /***************************************************************************
 
@@ -96,9 +96,6 @@ static VIDEO_START(galpani3)
 	spriteram_size = 0x4000;
 	skns_spc_regs = auto_malloc (0x40);
 }
-
-extern void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect );
-
 
 static VIDEO_UPDATE(galpani3)
 {

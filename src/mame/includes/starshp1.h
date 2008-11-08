@@ -72,7 +72,7 @@ VIDEO_EOF( starshp1 );
 VIDEO_START( starshp1 );
 
 
-/*----------- defined in sound/starshp1.c -----------*/
+/*----------- defined in audio/starshp1.c -----------*/
 
 DISCRETE_SOUND_EXTERN( starshp1 );
 

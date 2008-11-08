@@ -43,33 +43,7 @@ Notes:
 #include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
-
-extern int suna8_text_dim; /* specifies format of text layer */
-
-extern UINT8 suna8_rombank, suna8_spritebank, suna8_palettebank;
-extern UINT8 suna8_unknown;
-
-/* Functions defined in video: */
-
-WRITE8_HANDLER( suna8_spriteram_w );			// for debug
-WRITE8_HANDLER( suna8_banked_spriteram_w );	// for debug
-
-READ8_HANDLER( suna8_banked_paletteram_r );
-READ8_HANDLER( suna8_banked_spriteram_r );
-
-WRITE8_HANDLER( suna8_banked_paletteram_w );
-WRITE8_HANDLER( brickzn_banked_paletteram_w );
-
-VIDEO_START( suna8_textdim0 );
-VIDEO_START( suna8_textdim8 );
-VIDEO_START( suna8_textdim12 );
-VIDEO_UPDATE( suna8 );
-
-/* Functions defined in audio: */
-
-WRITE8_HANDLER( suna8_play_samples_w );
-WRITE8_HANDLER( suna8_samples_number_w );
-void suna8_sh_start(void);
+#include "includes/suna8.h"
 
 /***************************************************************************
 

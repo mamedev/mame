@@ -32,6 +32,7 @@ TO DO :
 #include "driver.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
+#include "includes/oneshot.h"
 
 
 UINT16 *oneshot_sprites;
@@ -42,14 +43,6 @@ UINT16 *oneshot_scroll;
 
 int gun_x_p1,gun_y_p1,gun_x_p2,gun_y_p2;
 int gun_x_shift;
-
-WRITE16_HANDLER( oneshot_bg_videoram_w );
-WRITE16_HANDLER( oneshot_mid_videoram_w );
-WRITE16_HANDLER( oneshot_fg_videoram_w );
-VIDEO_START( oneshot );
-VIDEO_UPDATE( oneshot );
-VIDEO_UPDATE( maddonna );
-
 
 static READ16_HANDLER( oneshot_in0_word_r )
 {
