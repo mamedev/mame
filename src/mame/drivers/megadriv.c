@@ -3002,18 +3002,11 @@ static WRITE16_HANDLER( _32x_68k_a15188_w )
 	// do the fill - shouldn't be instant..
 	{
 		int i;
-		UINT16 upper = _32x_autofill_address & 0xff00;
-		UINT8 lower = _32x_autofill_address & 0x00ff;
-		UINT16 address;// = upper | lower;
-
 		for (i=0; i<_32x_autofill_length+1;i++)
 		{
-			address = upper | lower;
-			_32x_access_dram[address] = _32x_autofill_data;
-			lower++;
+			_32x_access_dram[_32x_autofill_address] = _32x_autofill_data;
+			_32x_autofill_address = (_32x_autofill_address & 0xff00) | ((_32x_autofill_address+1) & 0x00ff);
 		}
-
-		_32x_autofill_address = address;
 	}
 }
 
