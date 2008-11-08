@@ -7,18 +7,8 @@
 ***************************************************************************/
 
 /*
-NOTES:
-*** There seems to be a disagreement in dasm with bytes like this : 0500 0307
-    On one hand, you can dasm it like this :  add      Y1,A          X:(R2+00),Y0
-    On the other, you can dasm it like this : move(m)  P:(R2+00),B0
-    The interesting doc pages for this are the following : move(m) . A-155
-                                                           mem move + short displacement . A-139
-                                                           add . A-23
-    (POSSIBILITY : Maybe Add can't have a mem move + short displacement parallel move?)
-    (CURRENT SOLUTION : I'm completely ignoring mem move + short displacements for now)
-
-*** This disassembler has been 75% tested.  There may remain some bugs, but it disassembles
-    Polygonet Commanders' memtest code 100% accurate (to my knowledge).
+  This disassembler has been 75% tested.  There may remain some bugs, but it disassembles
+  Polygonet Commanders' memtest code 100% accurate (to my knowledge).
 */
 
 #include "dsp56k.h"
@@ -26,13 +16,12 @@ NOTES:
 /*******************/
 /* Dasm prototypes */
 /*******************/
-static size_t dsp56k_dasm_add_2		(const UINT16 op_byte, char* opcode_str, char* arg_str);
+static size_t dsp56k_dasm_addsub_2	(const UINT16 op_byte, char* opcode_str, char* arg_str);
 static size_t dsp56k_dasm_mac_1		(const UINT16 op_byte, char* opcode_str, char* arg_str);
 static size_t dsp56k_dasm_macr_1	(const UINT16 op_byte, char* opcode_str, char* arg_str);
 static size_t dsp56k_dasm_move_1	(const UINT16 op_byte, char* opcode_str, char* arg_str);
 static size_t dsp56k_dasm_mpy_1		(const UINT16 op_byte, char* opcode_str, char* arg_str);
 static size_t dsp56k_dasm_mpyr_1	(const UINT16 op_byte, char* opcode_str, char* arg_str);
-static size_t dsp56k_dasm_sub_1		(const UINT16 op_byte, char* opcode_str, char* arg_str);
 static size_t dsp56k_dasm_tfr_2		(const UINT16 op_byte, char* opcode_str, char* arg_str);
 static size_t dsp56k_dasm_mpy_2		(const UINT16 op_byte, char* opcode_str, char* arg_str);
 static size_t dsp56k_dasm_mac_2		(const UINT16 op_byte, char* opcode_str, char* arg_str);
@@ -189,7 +178,7 @@ static void assemble_ea_from_z_table (UINT16 z, int n, char *ea);
 
 static void assemble_D_from_P_table(UINT16 P, UINT16 ppppp, char *D);
 static void assemble_arguments_from_W_table(UINT16 W, char *args, char ma, char *SD, char *ea);
-static void assemble_reg_from_W_table(UINT16 W, char *args, char ma, char *SD, UINT8 xx);
+static void assemble_reg_from_W_table(UINT16 W, char *args, char ma, char *SD, INT8 xx);
 
 static void assemble_address_from_IO_short_address(UINT16 pp, char *ea);
 static INT8 get_6_bit_signed_value(UINT16 bits);
@@ -240,9 +229,10 @@ offs_t dsp56k_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 		UINT16 op_byte = op & 0x00ff;
 
 		/* ADD : 011m mKKK 0rru Fuuu : A-22 */
+		/* SUB : 011m mKKK 0rru Fuuu : A-202 */
 		if ((op & 0xe080) == 0x6000)
 		{
-			size = dsp56k_dasm_add_2(op_byte, opcode_str, arg_str);
+			size = dsp56k_dasm_addsub_2(op_byte, opcode_str, arg_str);
 		}
 		/* MAC : 011m mKKK 1xx0 F1QQ : A-122 */
 		else if ((op & 0xe094) == 0x6084)
@@ -268,11 +258,6 @@ offs_t dsp56k_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 		else if ((op & 0xe094) == 0x6090)
 		{
 			size = dsp56k_dasm_mpyr_1(op_byte, opcode_str, arg_str);
-		}
-		/* SUB : 011m mKKK 0rru Fuuu : A-202 */
-		else if ((op & 0xe080) == 0x6000)
-		{
-			size = dsp56k_dasm_sub_1(op_byte, opcode_str, arg_str);
 		}
 		/* TFR : 011m mKKK 0rr1 F0DD : A-212 */
 		else if ((op & 0xe094) == 0x6010)
@@ -356,10 +341,20 @@ offs_t dsp56k_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 		/* X Memory Data Move with short displacement : 0000 0101 BBBB BBBB ---- HHHW ---- ---- : A-139 */
 		else if ((op & 0xff00) == 0x0500)
 		{
-			/* See notes at top of file! */
-			/* op_byte = op2 & 0x00ff; */
-			/* parallelType = kXMemoryDataMoveWithDisp; */
-			/* DO NOTHING FOR NOW */
+			/* Now check it against all the other potential collisions */
+			/* This is necessary because "don't care bits" get in the way. */
+			/*
+			MOVE(M) : 	0000 0101 BBBB BBBB 0000 001W --0- -HHH : A-152
+			MOVE(C) : 	0000 0101 BBBB BBBB 0011 1WDD DDD0 ---- : A-144
+			MOVE : 		0000 0101 BBBB BBBB ---- HHHW 0001 0001 : A-128
+			*/
+			if (((op2 & 0xfe20) != 0x0200) &&
+				((op2 & 0xf810) != 0x3800) &&
+				((op2 & 0x00ff) != 0x0011))
+			{
+				op_byte = op2 & 0x00ff;
+				parallelType = kXMemoryDataMoveWithDisp;
+			}
 		}
 
 
@@ -1084,7 +1079,8 @@ offs_t dsp56k_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opr
 /*******************************/
 
 /* ADD : 011m mKKK 0rru Fuuu : A-22 */
-static size_t dsp56k_dasm_add_2(const UINT16 op_byte, char* opcode_str, char* arg_str)
+/* SUB : 011m mKKK 0rru Fuuu : A-202 */
+static size_t dsp56k_dasm_addsub_2(const UINT16 op_byte, char* opcode_str, char* arg_str)
 {
 	/* TODO: How strange.  Same as SUB?  Investigate */
 	char D[32];
@@ -1157,19 +1153,6 @@ static size_t dsp56k_dasm_mpyr_1(const UINT16 op_byte, char* opcode_str, char* a
 	decode_QQF_table(BITS(op_byte,0x03), BITS(op_byte,0x08), S1, S2, D);
 	sprintf(arg_str, "%s,%s,%s", S1, S2, D);
 	sprintf(opcode_str, "mpyr");
-	return 1;
-}
-
-/* SUB : 011m mKKK 0rru Fuuu : A-202 */
-static size_t dsp56k_dasm_sub_1(const UINT16 op_byte, char* opcode_str, char* arg_str)
-{
-	/* TODO - overlap with ADD (up above) */
-	char D[32];
-	char S1[32];
-	char arg[32];
-	decode_uuuuF_table(BITS(op_byte,0x17), BITS(op_byte,0x08), arg, S1, D);
-	sprintf(opcode_str, "%s", arg);
-	sprintf(arg_str, "%s,%s", S1, D);
 	return 1;
 }
 
@@ -1820,7 +1803,7 @@ static size_t dsp56k_dasm_bscc_1(const UINT16 op, char* opcode_str, char* arg_st
 static size_t dsp56k_dasm_bsr(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str, const offs_t pc)
 {
 	sprintf(opcode_str, "bsr");
-	sprintf(arg_str, "%x (0x%04x)", (INT16)op2, pc + 2 + (INT16)op2);
+	sprintf(arg_str, "%d (0x%04x)", (INT16)op2, pc + 2 + (INT16)op2);
 	return (2 | DASMFLAG_STEP_OVER);
 }
 
@@ -2105,7 +2088,7 @@ static size_t dsp56k_dasm_macsuuu(const UINT16 op, char* opcode_str, char* arg_s
 /* MOVE : 0000 0101 BBBB BBBB ---- HHHW 0001 0001 : A-128 */
 static size_t dsp56k_dasm_move_2(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
 {
-	UINT8 B;
+	INT8 B;
 	char SD[32];
 	char args[32];
 	B = BITS(op,0x00ff);
@@ -2194,7 +2177,7 @@ static size_t dsp56k_dasm_movec_4(const UINT16 op, char* opcode_str, char* arg_s
 /* MOVE(C) : 0000 0101 BBBB BBBB 0011 1WDD DDD0 ---- : A-144 */
 static size_t dsp56k_dasm_movec_5(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
 {
-	UINT8 B;
+	INT8 B;
 	char SD[32];
 	char args[32];
 	B = BITS(op,0x00ff);
@@ -2249,7 +2232,7 @@ static size_t dsp56k_dasm_movem_1(const UINT16 op, char* opcode_str, char* arg_s
 /* MOVE(M) : 0000 0101 BBBB BBBB 0000 001W --0- -HHH : A-152 */
 static size_t dsp56k_dasm_movem_2(const UINT16 op, const UINT16 op2, char* opcode_str, char* arg_str)
 {
-	UINT8 B;
+	INT8 B;
 	char SD[32];
 	char args[32];
 	B = BITS(op,0x00ff);
@@ -2935,6 +2918,7 @@ static void decode_kSign_table(UINT16 k, char *plusMinus)
 
 static void decode_KKK_table(UINT16 KKK, char *D1, char *D2)
 {
+	/* TODO: Fix ^Fs */
 	switch(KKK)
 	{
 		case 0x0: sprintf(D1, "^F"); sprintf(D2, "X0"); break;
@@ -3053,6 +3037,11 @@ static void decode_ss_table(UINT16 ss, char *arithmetic)
 static void decode_uuuuF_table(UINT16 uuuu, UINT16 F, char *arg, char *S, char *D)
 {
 	UINT16 switchVal = (uuuu << 1) | F;
+
+	/* An invalid uuuuF has been seen in the wild */
+	sprintf(D, "sub?");
+	sprintf(S, "add?");
+	sprintf(arg, "invalid");
 
 	switch(switchVal)
 	{
@@ -3175,8 +3164,9 @@ static void assemble_arguments_from_W_table(UINT16 W, char *args, char ma, char 
 	}
 }
 
-static void assemble_reg_from_W_table(UINT16 W, char *args, char ma, char *SD, UINT8 xx)
+static void assemble_reg_from_W_table(UINT16 W, char *args, char ma, char *SD, INT8 xx)
 {
+	/* TODO : xx is said to be signed on page A-139.  Nowhere else.  Are they all signed? */
 	switch(W)
 	{
 		case 0x0: sprintf(args, "%s,%c:(R2+%02x)", SD, ma, xx); break;
