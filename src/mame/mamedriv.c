@@ -6292,6 +6292,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( zaryavos )	/* (c) 1983 Nova Games of Canada (prototype) */
 	DRIVER( timelimt )	/* (c) 1983 Chuo Co. Ltd */
 	DRIVER( progress )	/* (c) 1984 Chuo Co. Ltd */
+	DRIVER( koroleva )		/* (c) 1988 Terminal */
 	DRIVER( rtriv )		/* (c) 198? Romar */
 
 	/* TIA-MC1 hardware games */
