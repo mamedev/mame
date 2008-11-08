@@ -36,6 +36,8 @@
 
     Fix 32X support (not used by any arcade systems?)
      - this seems to require far greater sync and timing accuracy on rom / ram access than MAME can provide
+     - World Series Baseball 95 (and others) are odd, they write data to the normal DRAM framebuffer
+       expecting it to act like the 'overwrite area' (where 00 bytes ignored)  this can't be right..
 
 
 
@@ -2623,7 +2625,6 @@ static WRITE16_HANDLER( _32x_68k_dram_w )
 static READ16_HANDLER( _32x_68k_dram_overwrite_r )
 {
 	return _32x_access_dram[offset+0x10000];
-	return 0x0000;
 }
 
 static WRITE16_HANDLER( _32x_68k_dram_overwrite_w )
@@ -3389,7 +3390,7 @@ static WRITE16_HANDLER( _32x_sh2_paletteram16_w ) { _32x_68k_palette_w(machine,o
 /**********************************************************************************************/
 
 static READ16_HANDLER( _32x_sh2_framebuffer_dram16_r ) { return _32x_68k_dram_r(machine,offset,mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_framebuffer_dram16_w ) { return _32x_68k_dram_w(machine,offset,data,mem_mask); }
+static WRITE16_HANDLER( _32x_sh2_framebuffer_dram16_w ) { _32x_68k_dram_w(machine,offset,data,mem_mask); }
 
 /**********************************************************************************************/
 // SH2 side 4020000 - 403ffff
@@ -3398,7 +3399,7 @@ static WRITE16_HANDLER( _32x_sh2_framebuffer_dram16_w ) { return _32x_68k_dram_w
 /**********************************************************************************************/
 
 static READ16_HANDLER( _32x_sh2_framebuffer_overwrite_dram16_r ) { return _32x_68k_dram_overwrite_r(machine,offset,mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_framebuffer_overwrite_dram16_w ) { return _32x_68k_dram_overwrite_w(machine,offset,data,mem_mask); }
+static WRITE16_HANDLER( _32x_sh2_framebuffer_overwrite_dram16_w ) { _32x_68k_dram_overwrite_w(machine,offset,data,mem_mask); }
 
 
 
@@ -6709,8 +6710,8 @@ DRIVER_INIT( _32x )
 	_32x_240mode = 0;
 
 // checking if these help brutal, they don't.
-//	cpunum_set_info_int(2, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
-//	cpunum_set_info_int(3, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	cpunum_set_info_int(2, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_COMPATIBLE_OPTIONS);
+	cpunum_set_info_int(3, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_COMPATIBLE_OPTIONS);
 
 	DRIVER_INIT_CALL(megadriv);
 }
@@ -6742,7 +6743,7 @@ ROM_START( 32x_bios )
 //	ROM_LOAD( "32x_darx.bin", 0x000000,  0x200000, CRC(22d7c906) SHA1(108b4ffed8643abdefa921cfb58389b119b47f3d) ) // ?? probably abuses the hardware, euro only ;D
 //	ROM_LOAD( "32x_prim.bin", 0x000000,  0x400000, CRC(e78a4d28) SHA1(5084dcca51d76173c383ab7d04cbc661673545f7) ) // needs tight sync or fails after sega logo - works with tight sync, but VERY slow
 //	ROM_LOAD( "32x_brut.bin", 0x000000,  0x300000, CRC(7a72c939) SHA1(40aa2c787f37772cdbd7280b8be06b15421fabae) ) // needs *very* heavy sync to work..
-	ROM_LOAD( "32x_temp.bin", 0x000000,  0x300000, CRC(14e5c575) SHA1(6673ba83570b4f2c1b4a22415a56594c3cc6c6a9) ) // works (heavy slowdowns) RV emulation - really should hide 68k rom when transfer is off
+//	ROM_LOAD( "32x_temp.bin", 0x000000,  0x300000, CRC(14e5c575) SHA1(6673ba83570b4f2c1b4a22415a56594c3cc6c6a9) ) // works (heavy slowdowns) RV emulation - really should hide 68k rom when transfer is off
 //  ROM_LOAD( "32x_vr.bin",   0x000000,  0x300000, CRC(7896b62e) SHA1(18dfdeb50780c2623e60a6587d7ed701a1cf81f1) ) // doesn't work
 //	ROM_LOAD( "32x_vf.bin",   0x000000,  0x400000, CRC(b5de9626) SHA1(f35754f4bfe3a53722d7a799f88face0fd13c424) ) // locks up when starting game
 //	ROM_LOAD( "32x_zaxx.bin", 0x000000,  0x200000, CRC(447d44be) SHA1(60c390f76c394bdd221936c21aecbf98aec49a3d) ) // nothing
@@ -6763,7 +6764,7 @@ ROM_START( 32x_bios )
 //	ROM_LOAD( "32x_nba.bin",  0x000000,  0x400000, CRC(6b7994aa) SHA1(c8af3e74c49514669ba6652ec0c81bccf77873b6) ) // crash
 //	ROM_LOAD( "32x_nfl.bin",  0x000000,  0x300000, CRC(0bc7018d) SHA1(a0dc24f2f3a7fc5bfd12791cf25af7f7888843cf) ) // doesn't boot
 //	ROM_LOAD( "32x_rbi.bin",  0x000000,  0x200000, CRC(ff795fdc) SHA1(4f90433a4403fd74cafeea49272689046de4ae43) ) // doesn't boot
-//	ROM_LOAD( "32x_wsb.bin",  0x000000,  0x300000, CRC(6de1bc75) SHA1(ab3026eae46a775adb7eaebc13702699557ddc41) ) // working - overwrite problems
+	ROM_LOAD( "32x_wsb.bin",  0x000000,  0x300000, CRC(6de1bc75) SHA1(ab3026eae46a775adb7eaebc13702699557ddc41) ) // working - overwrite problems
 //	ROM_LOAD( "32x_mk2.bin",  0x000000,  0x400000, CRC(211085ce) SHA1(f75698de887d0ef980f73e35fc4615887a9ad58f) ) // working
 //	ROM_LOAD( "32x_sang.bin", 0x000000,  0x400000, CRC(e4de7625) SHA1(74a3ba27c55cff12409bf6c9324ece6247abbad1) ) // hangs after sega logo
 
