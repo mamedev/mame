@@ -171,6 +171,7 @@ src/emu/cpu/i86/v33intf.h svneol=native#text/plain
 src/emu/cpu/i8x41/8x41dasm.c svneol=native#text/plain
 src/emu/cpu/i8x41/i8x41.c svneol=native#text/plain
 src/emu/cpu/i8x41/i8x41.h svneol=native#text/plain
+src/emu/cpu/i8x41/i8x41ops.c svneol=native#text/plain
 src/emu/cpu/i960/i960.c svneol=native#text/plain
 src/emu/cpu/i960/i960.h svneol=native#text/plain
 src/emu/cpu/i960/i960dis.c svneol=native#text/plain
