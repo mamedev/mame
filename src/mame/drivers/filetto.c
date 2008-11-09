@@ -5,17 +5,18 @@ Filetto (c) 1990 Novarmatic
 driver by Angelo Salese & Chris Hardy
 
 TODO:
-- Move the emulation of the VGA/CGA/EGA in a proper file,various old arcade games uses them,
-  namely several Mega-Touch type games...
-- The current emulation hasn't any PC-specific chip hooked-up,it just have the minimum
-  requirements & some kludges to let this boot.
-- Can't reset (currently for "Duplicate save state function (0, 0x41b900)"),pit8253 issue
-  probably.
+- Use the MESS implementation of the CGA video emulation;
+- Add a proper FDC device,if you enable it will give a boot error,probably because it
+  expects that in the floppy drive shouldn't be anything,there's currently a kludge that
+  does the trick;
+- Add sound,"buzzer" PC sound plus the UM5100 sound chip,might be connected to the
+  prototyping card;
 
 ********************************************************************************************
 HW notes:
-The PCB is a (un?)modified IBM-PC with a CGA adapter & a prototyping card that controls the
-interface between the pc and the Jamma connectors.
+The PCB is a un-modified IBM-PC with a CGA adapter & a prototyping card that controls the
+interface between the pc and the Jamma connectors.Additionally there's also a UM5100 sound
+chip for the sound.
 PCB Part Number: S/N 90289764 NOVARXT
 PCB Contents:
 1x UMC 8923S-UM5100 voice processor (upper board)
@@ -26,6 +27,7 @@ PCB Contents:
 1x UMC 8928LP-UM8272A floppy disk controller (lower board)
 1x UMC 8935CS-UM82C11 Printer Adapter Interface (lower board)
 1x UMC 8936CS-UM8250B Programmable asynchronous communications element (lower board)
+There isn't any keyboard found connected to the pcb.
 ********************************************************************************************
 SW notes:
 The software of this game can be extracted with a normal Windows program extractor.
@@ -49,7 +51,7 @@ Vector & irq notes (Mainly a memo for me):
 
 7c69 -> int $13 (FDC check),done
 7c6c
-16ef9 -> read dsw?
+16ef9 -> read dsw
 159cd []
 [2361c]
 12eae
@@ -66,6 +68,10 @@ AH
 #include "video/generic.h"
 #include "machine/pit8253.h"
 #include "machine/8255ppi.h"
+#include "machine/8237dma.h"
+#include "machine/pic8259.h"
+#include "machine/mc146818.h"
+#include "sound/hc55516.h"
 
 #define SET_VISIBLE_AREA(_x_,_y_) \
 	{ \
@@ -110,7 +116,7 @@ static READ8_HANDLER( vga_hvretrace_r )
 	return (hv_blank);
 }
 
-
+//was using magenta/cyan/white instead of red/green/brown
 /*Basic Graphic mode */
 static void cga_graphic_bitmap(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs)
 {
@@ -288,7 +294,10 @@ static WRITE8_HANDLER( vga_regs_w )
 	if(offset == 1)
 	{
 		if(video_index <= 0x18)
+		{
 			video_regs[video_index] = data;
+			//logerror("write %02x to video register [%02x]",data,video_index);
+		}
 		else
 			logerror("(PC=%05x) Warning: Undefined VGA reg port write (I=%02x D=%02x)\n",activecpu_get_pc(),video_index,data);
 	}
@@ -299,13 +308,24 @@ static WRITE8_HANDLER( vga_vram_w )
 	vga_vram[offset] = data;
 }
 
+/*end of Video HW file*/
+
+static struct {
+	const device_config	*pit8254;
+	const device_config	*pic8259_1;
+	const device_config	*pic8259_2;
+	const device_config	*dma8237_1;
+	const device_config	*dma8237_2;
+} filetto_devices;
+
+
 static UINT8 disk_data[2];
 
 static READ8_HANDLER( disk_iobank_r )
 {
-	printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,activecpu_get_pc());
-	if(offset == 1)
-		return input_port_read(machine, "DSW");
+	//printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,activecpu_get_pc());
+	//if(offset == 0) return input_port_read(machine, "DSW");
+	if(offset == 1) return input_port_read(machine, "IN1");
 
 	return disk_data[offset];
 }
@@ -334,7 +354,7 @@ static WRITE8_HANDLER( disk_iobank_w )
 */
 	int newbank = 0;
 
-	printf("bank %d set to %02X\n", offset,data);
+//	printf("bank %d set to %02X\n", offset,data);
 
 	if (data == 0xF0)
 	{
@@ -352,7 +372,7 @@ static WRITE8_HANDLER( disk_iobank_w )
 			newbank = 3;
 	}
 
-	printf("newbank = %d\n", newbank);
+//	printf("newbank = %d\n", newbank);
 
 	if (newbank != bank)
 	{
@@ -365,31 +385,13 @@ static WRITE8_HANDLER( disk_iobank_w )
 	disk_data[offset] = data;
 }
 
-
-/*RTC?*/
-static READ8_HANDLER( undefined_r )
-{
-	logerror("(PC=%05x) Warning: Undefined read\n",activecpu_get_pc());
-	return 0x00;
-}
-
-static WRITE8_HANDLER( nmi_enable_w )
-{
-	//if(data & 0x80)
-		//cpunum_set_input_line(machine, 0, INPUT_LINE_NMI,ASSERT_LINE);
-	//if(!(data & 0x80))
-		//cpunum_set_input_line(machine, 0, INPUT_LINE_NMI,CLEAR_LINE);
-}
-
-static READ8_HANDLER( kludge_r )
-{
-	return mame_rand(machine);
-}
+/*********************************
+Pit8253
+*********************************/
 
 static PIT8253_OUTPUT_CHANGED( pc_timer0_w )
 {
-	//if (state)
-	//  pic8259_0_issue_irq(0);
+    pic8259_set_irq_line(filetto_devices.pic8259_1, 0, state);
 }
 
 static const struct pit8253_config pc_pit8253_config =
@@ -407,15 +409,6 @@ static const struct pit8253_config pc_pit8253_config =
 		}
 	}
 };
-
-static UINT8 drive_data;
-
-static WRITE8_HANDLER( drive_selection_w )
-{
-	drive_data = data;
-	/*Write to this area then expects that location [43e] has the bit 7 activated*/
-	work_ram[0x3e] = 0x80;
-}
 
 static UINT8 port_b_data;
 static UINT8 wss1_data,wss2_data;
@@ -436,7 +429,7 @@ static READ8_DEVICE_HANDLER( port_a_r )
 	}
 	else//keyboard emulation
 	{
-		cpunum_set_input_line(device->machine, 0,1,PULSE_LINE);
+		//cpunum_set_input_line(device->machine, 0,1,PULSE_LINE);
 		return 0x00;//Keyboard is disconnected
 		//return 0xaa;//Keyboard code
 	}
@@ -452,9 +445,12 @@ static READ8_DEVICE_HANDLER( port_c_r )
 	return wss2_data;//???
 }
 
+/*'buzzer' sound routes here*/
 static WRITE8_DEVICE_HANDLER( port_b_w )
 {
 	port_b_data = data;
+//	hc55516_digit_w(0, data);
+//	popmessage("%02x",data);
 }
 
 static WRITE8_DEVICE_HANDLER( wss_1_w )
@@ -493,19 +489,6 @@ static const ppi8255_interface filetto_ppi8255_intf[2] =
 	}
 };
 
-static UINT8 irq_data[2];
-
-static READ8_HANDLER( irq_ctrl_8259_r )
-{
-	return irq_data[offset];
-}
-
-static WRITE8_HANDLER( irq_ctrl_8259_w )
-{
-//  usrintf_showmessage("Write to irq device %02x %02x\n",offset,data);
-	irq_data[offset] = data;
-}
-
 /*Floppy Disk Controller 765 device*/
 /*Currently we only emulate it at a point that the BIOS will pass the checks*/
 static UINT8 status;
@@ -517,7 +500,7 @@ static UINT8 status;
 static READ8_HANDLER( fdc765_status_r )
 {
 	static UINT8 tmp,clr_status;
-	popmessage("Read FDC status @ PC=%05x",activecpu_get_pc());
+//	popmessage("Read FDC status @ PC=%05x",activecpu_get_pc());
 	tmp = status | 0x80;
 	clr_status++;
 	if(clr_status == 0x10)
@@ -539,34 +522,157 @@ static WRITE8_HANDLER( fdc765_data_w )
 	status = (FDC_WRITE);
 }
 
+static UINT8 drive_data;
+
+static WRITE8_HANDLER( drive_selection_w )
+{
+	drive_data = data;
+	/*write to this area then expects that location [43e] has the bit 7 activated*/
+	work_ram[0x3e] = 0x80;
+}
+
+/******************
+DMA8237 Controller
+******************/
+
+static UINT8 dma_offset[2][4];
+static UINT8 at_pages[0x10];
+
+static DMA8237_MEM_READ( pc_dma_read_byte )
+{
+	UINT8 result;
+	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
+		& 0xFF0000;
+
+	cpuintrf_push_context(0);
+	result = program_read_byte(page_offset + offset);
+	cpuintrf_pop_context();
+
+	return result;
+}
+
+
+static DMA8237_MEM_WRITE( pc_dma_write_byte )
+{
+	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
+		& 0xFF0000;
+
+	cpuintrf_push_context(0);
+	program_write_byte(page_offset + offset, data);
+	cpuintrf_pop_context();
+}
+
+static READ8_HANDLER(dma_page_select_r)
+{
+	UINT8 data = at_pages[offset % 0x10];
+
+	switch(offset % 8) {
+	case 1:
+		data = dma_offset[(offset / 8) & 1][2];
+		break;
+	case 2:
+		data = dma_offset[(offset / 8) & 1][3];
+		break;
+	case 3:
+		data = dma_offset[(offset / 8) & 1][1];
+		break;
+	case 7:
+		data = dma_offset[(offset / 8) & 1][0];
+		break;
+	}
+	return data;
+}
+
+
+static WRITE8_HANDLER(dma_page_select_w)
+{
+	at_pages[offset % 0x10] = data;
+
+	switch(offset % 8) {
+	case 1:
+		dma_offset[(offset / 8) & 1][2] = data;
+		break;
+	case 2:
+		dma_offset[(offset / 8) & 1][3] = data;
+		break;
+	case 3:
+		dma_offset[(offset / 8) & 1][1] = data;
+		break;
+	case 7:
+		dma_offset[(offset / 8) & 1][0] = data;
+		break;
+	}
+}
+
+
+static const struct dma8237_interface dma8237_1_config =
+{
+	0,
+	1.0e-6, // 1us
+
+	pc_dma_read_byte,
+	pc_dma_write_byte,
+
+	{ 0, 0, NULL, NULL },
+	{ 0, 0, NULL, NULL },
+	NULL
+};
+
+/******************
+8259 IRQ controller
+******************/
+
+static PIC8259_SET_INT_LINE( pic8259_1_set_int_line ) {
+	cpunum_set_input_line(device->machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+}
+
+static const struct pic8259_interface pic8259_1_config = {
+	pic8259_1_set_int_line
+};
+
+static PIC8259_SET_INT_LINE( pic8259_2_set_int_line ) {
+	pic8259_set_irq_line( filetto_devices.pic8259_1, 2, interrupt);
+}
+
+static const struct pic8259_interface pic8259_2_config = {
+	pic8259_2_set_int_line
+};
+
+static IRQ_CALLBACK(irq_callback)
+{
+	int r = 0;
+	r = pic8259_acknowledge(filetto_devices.pic8259_2);
+	if (r==0)
+	{
+		r = pic8259_acknowledge(filetto_devices.pic8259_1);
+	}
+	return r;
+}
+
 static ADDRESS_MAP_START( filetto_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM //irq vectors
 	AM_RANGE(0x00400, 0x007ff) AM_RAM AM_BASE(&work_ram)
 	AM_RANGE(0x00800, 0x9ffff) AM_RAM //work RAM 640KB
-//  AM_RANGE(0xa0000, 0xb7fff) AM_RAM //VGA RAM
 	AM_RANGE(0xa0000, 0xbffff) AM_READWRITE(SMH_RAM,vga_vram_w) AM_BASE(&vga_vram)//VGA RAM
 	AM_RANGE(0xc0000, 0xcffff) AM_READ(SMH_BANK1)
-
 	AM_RANGE(0xf0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( filetto_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x0000, 0x000f) AM_RAM //AM_READWRITE(dma8237_0_r,dma8237_0_w) //8237 DMA Controller
-	AM_RANGE(0x0020, 0x0021) AM_READWRITE(irq_ctrl_8259_r,irq_ctrl_8259_w)//AM_READWRITE(pic8259_0_r,pic8259_0_w) //8259 Interrupt control
-	AM_RANGE(0x0040, 0x0043) AM_READ(kludge_r) //AM_READWRITE(pit8253_0_r,pit8253_0_w) //8253 PIT
-	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r,ppi8255_w) //PPI 8255
-	AM_RANGE(0x0064, 0x0066) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r,ppi8255_w) //PPI 8255
-	AM_RANGE(0x0073, 0x0073) AM_READ(undefined_r)
-	AM_RANGE(0x0080, 0x0087) AM_RAM //AM_READWRITE(dma_page_select_r,dma_page_select_w)
-	AM_RANGE(0x00a0, 0x00a0) AM_WRITE(nmi_enable_w)
-	//AM_RANGE(0x0200, 0x020f) AM_RAM //game port
+	AM_RANGE(0x0000, 0x000f) AM_DEVREADWRITE(DMA8237, "dma8237_1", dma8237_r, dma8237_w ) //8237 DMA Controller
+	AM_RANGE(0x0020, 0x002f) AM_DEVREADWRITE(PIC8259, "pic8259_1", pic8259_r, pic8259_w ) //8259 Interrupt control
+	AM_RANGE(0x0040, 0x0043) AM_DEVREADWRITE(PIT8253, "pit8253", pit8253_r, pit8253_w)    //8253 PIT
+	AM_RANGE(0x0060, 0x0063) AM_DEVREADWRITE(PPI8255, "ppi8255_0", ppi8255_r, ppi8255_w)  //PPI 8255
+	AM_RANGE(0x0064, 0x0066) AM_DEVREADWRITE(PPI8255, "ppi8255_1", ppi8255_r, ppi8255_w)  //PPI 8255
+	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port_r,mc146818_port_w)
+	AM_RANGE(0x0080, 0x0087) AM_READWRITE(dma_page_select_r,dma_page_select_w)
+	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE(PIC8259, "pic8259_2", pic8259_r, pic8259_w )
+//	AM_RANGE(0x0200, 0x020f) AM_RAM //game port
+	AM_RANGE(0x0201, 0x0201) AM_READ_PORT("COIN") //game port
 	AM_RANGE(0x0278, 0x027f) AM_RAM //printer (parallel) port latch
 	AM_RANGE(0x02f8, 0x02ff) AM_RAM //Modem port
-
-	AM_RANGE(0x0310, 0x0311) AM_READWRITE(disk_iobank_r,disk_iobank_w) //Prototyping card (???)
-	AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0")
-
-//  AM_RANGE(0x0300, 0x031f) AM_RAM //Prototyping card (???)
+	AM_RANGE(0x0310, 0x0311) AM_READWRITE(disk_iobank_r,disk_iobank_w) //Prototyping card
+	AM_RANGE(0x0312, 0x0312) AM_READ_PORT("IN0") //Prototyping card,read only
 	AM_RANGE(0x0378, 0x037f) AM_RAM //printer (parallel) port
 	AM_RANGE(0x03bc, 0x03bf) AM_RAM //printer port
 	AM_RANGE(0x03b4, 0x03b5) AM_READWRITE(vga_regs_r,vga_regs_w) //various VGA/CGA/EGA regs
@@ -582,50 +688,36 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( filetto )
 	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED ) //START1
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(1)
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED ) //START2
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_2WAY PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 
-	/*
-    DSW1
-    bit 0   = coinage (0=1co/1cr, 1= 2co/1cr)
-    bit 1   = demo_sounds (0=no,1=yes)
-    bit 2   = extra play (0=no extra play,1=play at 6th match reached)
-    bit 3   = difficulty (0=normal,1=hard)
-    bit 4-7 = <unused>
-    DSW2
-    <unused>
-    */
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_START("IN1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "Extra Play" )
+	PORT_DIPSETTING(    0x04, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, "Play at 6th match reached" )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("COIN")
+	PORT_BIT( 0x0f, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0xe0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static const gfx_layout dos_chars =
@@ -669,7 +761,6 @@ BROWN = 6
 LIGHT GRAY = 7
 */
 
-
 static PALETTE_INIT(filetto)
 {
 	/*Note:palette colors are 6bpp...
@@ -698,20 +789,20 @@ static PALETTE_INIT(filetto)
 	palette_set_color(machine, 29+2,MAKE_RGB(0xff,0xff,0xff));
 
 	palette_set_color(machine, 0xf0,MAKE_RGB(0x00,0x00,0x00));
-	palette_set_color(machine, 0xf1,MAKE_RGB(0x00,0x00,0x9f));
-	palette_set_color(machine, 0xf2,MAKE_RGB(0x00,0x9f,0x00));
-	palette_set_color(machine, 0xf3,MAKE_RGB(0x00,0x9f,0x9f));
-	palette_set_color(machine, 0xf4,MAKE_RGB(0x9f,0x00,0x00));
-	palette_set_color(machine, 0xf5,MAKE_RGB(0x9f,0x00,0x9f));
-	palette_set_color(machine, 0xf6,MAKE_RGB(0x9f,0x9f,0x00));
-	palette_set_color(machine, 0xf7,MAKE_RGB(0x9f,0x9f,0x9f));
-	palette_set_color(machine, 0xf8,MAKE_RGB(0x3f,0x3f,0x3f));
-	palette_set_color(machine, 0xf9,MAKE_RGB(0x3f,0x3f,0xff));
-	palette_set_color(machine, 0xfa,MAKE_RGB(0x3f,0xff,0x3f));
-	palette_set_color(machine, 0xfb,MAKE_RGB(0x3f,0xff,0xff));
-	palette_set_color(machine, 0xfc,MAKE_RGB(0xff,0x3f,0x10));
-	palette_set_color(machine, 0xfd,MAKE_RGB(0xff,0x3f,0xff));
-	palette_set_color(machine, 0xfe,MAKE_RGB(0xff,0xff,0x3f));
+	palette_set_color(machine, 0xf1,MAKE_RGB(0x00,0x00,0xaa));
+	palette_set_color(machine, 0xf2,MAKE_RGB(0x00,0xaa,0x00));
+	palette_set_color(machine, 0xf3,MAKE_RGB(0x00,0xaa,0xaa));
+	palette_set_color(machine, 0xf4,MAKE_RGB(0xaa,0x00,0x00));
+	palette_set_color(machine, 0xf5,MAKE_RGB(0xaa,0x00,0xaa));
+	palette_set_color(machine, 0xf6,MAKE_RGB(0xaa,0xaa,0x00));
+	palette_set_color(machine, 0xf7,MAKE_RGB(0xaa,0xaa,0xaa));
+	palette_set_color(machine, 0xf8,MAKE_RGB(0x55,0x55,0x55));
+	palette_set_color(machine, 0xf9,MAKE_RGB(0x55,0x55,0xff));
+	palette_set_color(machine, 0xfa,MAKE_RGB(0x55,0xff,0x55));
+	palette_set_color(machine, 0xfb,MAKE_RGB(0x55,0xff,0xff));
+	palette_set_color(machine, 0xfc,MAKE_RGB(0xff,0x55,0x55));
+	palette_set_color(machine, 0xfd,MAKE_RGB(0xff,0x55,0xff));
+	palette_set_color(machine, 0xfe,MAKE_RGB(0xff,0xff,0x55));
 	palette_set_color(machine, 0xff,MAKE_RGB(0xff,0xff,0xff));
 }
 
@@ -721,7 +812,7 @@ static PALETTE_INIT(filetto)
 #define VBLANK_1 if(!(hv_blank & 8)) hv_blank^= 8;
 #define VBLANK_0 if(hv_blank & 8) hv_blank^= 8;
 
-static INTERRUPT_GEN( filetto_irq )
+static INTERRUPT_GEN( filetto_vblank )
 {
 	/*TODO: Timings are guessed*/
 	/*H-Blank*/
@@ -739,13 +830,19 @@ static MACHINE_RESET( filetto )
 	bank = -1;
 	lastvalue = -1;
 	hv_blank = 0;
+	cpunum_set_irq_callback(0, irq_callback);
+	filetto_devices.pit8254 = device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" );
+	filetto_devices.pic8259_1 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_1" );
+	filetto_devices.pic8259_2 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_2" );
+	filetto_devices.dma8237_1 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
+	filetto_devices.dma8237_2 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
 }
 
 static MACHINE_DRIVER_START( filetto )
 	MDRV_CPU_ADD("main", I8088, 8000000)
 	MDRV_CPU_PROGRAM_MAP(filetto_map,0)
 	MDRV_CPU_IO_MAP(filetto_io,0)
-	MDRV_CPU_VBLANK_INT_HACK(filetto_irq,200)
+	MDRV_CPU_VBLANK_INT_HACK(filetto_vblank,200)
 
 	MDRV_MACHINE_RESET( filetto )
 
@@ -754,6 +851,15 @@ static MACHINE_DRIVER_START( filetto )
 
 	MDRV_PPI8255_ADD( "ppi8255_0", filetto_ppi8255_intf[0] )
 	MDRV_PPI8255_ADD( "ppi8255_1", filetto_ppi8255_intf[1] )
+
+	MDRV_DEVICE_ADD( "dma8237_1", DMA8237 )
+	MDRV_DEVICE_CONFIG( dma8237_1_config )
+
+	MDRV_DEVICE_ADD( "pic8259_1", PIC8259 )
+	MDRV_DEVICE_CONFIG( pic8259_1_config )
+
+	MDRV_DEVICE_ADD( "pic8259_2", PIC8259 )
+	MDRV_DEVICE_CONFIG( pic8259_2_config )
 
 	MDRV_GFXDECODE(filetto)
 
@@ -770,12 +876,19 @@ static MACHINE_DRIVER_START( filetto )
 
 	MDRV_VIDEO_START(filetto)
 	MDRV_VIDEO_UPDATE(filetto)
+
+	/*Sound Hardware*/
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("voice", HC55516, 8000000/4)//8923S-UM5100 is a HC55536 with ROM hook-up
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+
+//  PC "buzzer" sound
 MACHINE_DRIVER_END
 
 
 ROM_START( filetto )
 	ROM_REGION( 0x100000, "main", 0 )
-
 	ROM_LOAD("u49.bin", 0xfc000, 0x2000, CRC(1be6948a) SHA1(9c433f63d347c211ee4663f133e8417221bc4bf0))
 	ROM_RELOAD(         0xf8000, 0x2000 )
 	ROM_RELOAD(         0xf4000, 0x2000 )
@@ -784,7 +897,6 @@ ROM_START( filetto )
 	ROM_RELOAD(         0xfa000, 0x2000 )
 	ROM_RELOAD(         0xf6000, 0x2000 )
 	ROM_RELOAD(         0xf2000, 0x2000 )
-
 
 	ROM_REGION( 0x40000, "user1", 0 ) // program data
 	ROM_LOAD( "m0.u1", 0x00000, 0x10000, CRC(2408289d) SHA1(eafc144a557a79b58bcb48545cb9c9778e61fcd3) )
@@ -795,7 +907,7 @@ ROM_START( filetto )
 	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD("u67.bin", 0x0000, 0x2000, CRC(09710122) SHA1(de84bdd9245df287bbd3bb808f0c3531d13a3545) )
 
-	ROM_REGION( 0x40000, "user2", ROMREGION_DISPOSE ) // unknown
+	ROM_REGION( 0x40000, "user2", ROMREGION_DISPOSE ) // UM5100 sample roms?
 	ROM_LOAD16_BYTE("v1.u15",  0x00000, 0x20000, CRC(613ddd07) SHA1(ebda3d559315879819cb7034b5696f8e7861fe42) )
 	ROM_LOAD16_BYTE("v2.u14",  0x00001, 0x20000, CRC(427e012e) SHA1(50514a6307e63078fe7444a96e39d834684db7df) )
 ROM_END
@@ -805,5 +917,5 @@ static DRIVER_INIT( filetto )
 	//...
 }
 
-GAME( 1990, filetto,    0, filetto,    filetto,   filetto, ROT0,  "Novarmatic", "Filetto (v1.05 901009)",GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1990, filetto,    0, filetto,    filetto,   filetto, ROT0,  "Novarmatic", "Filetto (v1.05 901009)",GAME_NO_SOUND | GAME_IMPERFECT_COLORS)
 
