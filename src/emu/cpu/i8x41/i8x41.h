@@ -40,19 +40,6 @@
  * I8X41_STAT is A0 = 1 and R only
  */
 
-enum _i8x41_type
-{
-	TYPE_I8X41,
-	TYPE_I8X42
-};
-typedef enum _i8x41_type i8x41_type;
-
-typedef struct _i8x41_config i8x41_config;
-struct _i8x41_config
-{
-	i8x41_type	type;
-};
-
 /****************************************************************************
  *  Interrupt constants
  */
@@ -96,7 +83,11 @@ enum
  *  Public Functions
  */
 
-extern CPU_GET_INFO( i8x41 );
+extern CPU_GET_INFO( i8041 );
+extern CPU_GET_INFO( i8741 );
+extern CPU_GET_INFO( i8042 );
+extern CPU_GET_INFO( i8242 );
+extern CPU_GET_INFO( i8742 );
 
 extern CPU_DISASSEMBLE( i8x41 );
 

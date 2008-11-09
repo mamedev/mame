@@ -27,10 +27,8 @@ T0 output clock
     8021    64   1k   21  (ROM, reduced instruction set)
 
     8035    64    0   27  (external ROM)
-    8041    64   1k   18  (ROM)
     8048    64   1k   27  (ROM)
     8648    64   1k   27  (OTPROM)
-    8741    64   1k   18  (EPROM)
     8748    64   1k   27  (EPROM)
     8884    64   1k
     N7751  128   2k
@@ -756,13 +754,13 @@ static CPU_INIT( i8035 )
 
 
 /*-------------------------------------------------
-    i8041_init - initialization for systems with
+    i8048_init - initialization for systems with
     1k of internal ROM and 64 bytes of internal
     RAM
 -------------------------------------------------*/
 
-#if (HAS_I8041 || HAS_I8048 || HAS_I8648 || HAS_I8748 || HAS_N7751)
-static CPU_INIT( i8041 )
+#if (HAS_I8048 || HAS_I8648 || HAS_I8748 || HAS_N7751)
+static CPU_INIT( i8048 )
 {
 	mcs48_init(device, index, clock, config, irqcallback, 0x400);
 }
@@ -1176,21 +1174,6 @@ CPU_GET_INFO( i8035 )
 }
 #endif
 
-#if (HAS_I8041)
-CPU_GET_INFO( i8041 )
-{
-	switch (state)
-	{
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_10bit);	break;
-		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_6bit);		break;
-		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
-		case CPUINFO_STR_NAME:											strcpy(info->s, "I8041");							break;
-		default:														CPU_GET_INFO_CALL(mcs48);							break;
-	}
-}
-#endif
-
 #if (HAS_I8048)
 CPU_GET_INFO( i8048 )
 {
@@ -1199,7 +1182,7 @@ CPU_GET_INFO( i8048 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_10bit);	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_6bit);		break;
-		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
+		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8048);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8048");							break;
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
@@ -1214,7 +1197,7 @@ CPU_GET_INFO( i8648 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_10bit);	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_6bit);		break;
-		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
+		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8048);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8648");							break;
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
@@ -1229,7 +1212,7 @@ CPU_GET_INFO( i8748 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_10bit);	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_6bit);		break;
-		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
+		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8048);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "I8748");							break;
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}
@@ -1258,7 +1241,7 @@ CPU_GET_INFO( n7751 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 			info->i = 6;										break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_10bit);	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_6bit);		break;
-		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8041);							break;
+		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8048);							break;
 		case CPUINFO_STR_NAME:											strcpy(info->s, "N7751");							break;
 		default:														CPU_GET_INFO_CALL(mcs48);							break;
 	}

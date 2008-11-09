@@ -73,7 +73,6 @@ enum
 
 /* variants with 64 bytes of internal RAM and up to 1k of internal ROM */
 CPU_GET_INFO( i8035 );
-CPU_GET_INFO( i8041 );
 CPU_GET_INFO( i8048 );
 CPU_GET_INFO( i8648 );
 CPU_GET_INFO( i8748 );

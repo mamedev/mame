@@ -606,7 +606,6 @@ $(CPUOBJ)/i8085/i8085.o:	$(CPUSRC)/i8085/i8085.c \
 #-------------------------------------------------
 
 CPUDEFS += -DHAS_I8035=$(if $(filter I8035,$(CPUS)),1,0)
-CPUDEFS += -DHAS_I8041=$(if $(filter I8041,$(CPUS)),1,0)
 CPUDEFS += -DHAS_I8048=$(if $(filter I8048,$(CPUS)),1,0)
 CPUDEFS += -DHAS_I8648=$(if $(filter I8648,$(CPUS)),1,0)
 CPUDEFS += -DHAS_I8748=$(if $(filter I8748,$(CPUS)),1,0)
@@ -618,7 +617,7 @@ CPUDEFS += -DHAS_I8749=$(if $(filter I8749,$(CPUS)),1,0)
 CPUDEFS += -DHAS_N7751=$(if $(filter N7751,$(CPUS)),1,0)
 CPUDEFS += -DHAS_M58715=$(if $(filter M58715,$(CPUS)),1,0)
 
-ifneq ($(filter I8035 I8041 I8048 I8648 I8748 MB8884 I8039 I8049 I8749 N7751 M58715,$(CPUS)),)
+ifneq ($(filter I8035 I8048 I8648 I8748 MB8884 I8039 I8049 I8749 N7751 M58715,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/mcs48
 CPUOBJS += $(CPUOBJ)/mcs48/mcs48.o
 DBGOBJS += $(CPUOBJ)/mcs48/mcs48dsm.o
@@ -633,9 +632,13 @@ $(CPUOBJ)/mcs48/mcs48.o:	$(CPUSRC)/mcs48/mcs48.c \
 # Intel 8x41
 #-------------------------------------------------
 
-CPUDEFS += -DHAS_I8X41=$(if $(filter I8X41,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I8041=$(if $(filter I8041,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I8741=$(if $(filter I8741,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I8042=$(if $(filter I8042,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I8242=$(if $(filter I8242,$(CPUS)),1,0)
+CPUDEFS += -DHAS_I8742=$(if $(filter I8742,$(CPUS)),1,0)
 
-ifneq ($(filter I8X41,$(CPUS)),)
+ifneq ($(filter I8041 I8741 I8042 I8242 I8742 ,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/i8x41
 CPUOBJS += $(CPUOBJ)/i8x41/i8x41.o
 DBGOBJS += $(CPUOBJ)/i8x41/8x41dasm.o

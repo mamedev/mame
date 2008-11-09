@@ -892,17 +892,6 @@ static ADDRESS_MAP_START( tnzsb_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-
-static ADDRESS_MAP_START( i8742_readmem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_READ(SMH_ROM)
-	AM_RANGE(0x0800, 0x08ff) AM_RAM				/* Internal i8742 RAM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( i8742_writemem, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x07ff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x0800, 0x08ff) AM_WRITE(SMH_RAM)	/* Internal i8742 RAM */
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( i8742_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x02, 0x02) AM_WRITE(tnzs_port2_w)
 	AM_RANGE(I8X41_p1, I8X41_p1) AM_READ(tnzs_port1_r)
@@ -1726,9 +1715,6 @@ static MACHINE_DRIVER_START( drtoppel )
 MACHINE_DRIVER_END
 
 
-static const i8x41_config i8042_config = { TYPE_I8X42 };
-
-
 static MACHINE_DRIVER_START( tnzs )
 
 	/* basic machine hardware */
@@ -1740,10 +1726,8 @@ static MACHINE_DRIVER_START( tnzs )
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_CPU_ADD("mcu", I8X41,12000000/2)	/* 400KHz ??? - Main board Crystal is 12MHz */
-	MDRV_CPU_PROGRAM_MAP(i8742_readmem,i8742_writemem)
-	MDRV_CPU_IO_MAP(i8742_io_map,0)
-	MDRV_CPU_CONFIG( i8042_config )
+	MDRV_CPU_ADD("mcu", I8742 ,12000000/2)	/* 400KHz ??? - Main board Crystal is 12MHz */
+	MDRV_CPU_IO_MAP(i8742_io_map,0) 
 
 	MDRV_INTERLEAVE(100)
 

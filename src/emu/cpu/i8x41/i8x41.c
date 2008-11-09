@@ -102,11 +102,24 @@
  *
  *****************************************************************************/
 
+/*
+    Chip   RAM  ROM 
+    ----   ---  --- 
+    8041   128   1k  (ROM)
+    8741   128   1k  (EPROM)
+    8042   256   2k  (ROM)
+    8742   256   2k  (EPROM)
+
+	http://cpucharts.wallsoferyx.net/icmatrix0.html
+
+*/
+
 #include "debugger.h"
 #include "deprecat.h"
 #include "i8x41.h"
 
-typedef struct {
+typedef struct _upi41 I8X41;
+struct _upi41 {
 	UINT16	ppc;
 	UINT16	pc;
 	UINT8	timer;
@@ -125,17 +138,20 @@ typedef struct {
 	UINT8	ram_mask;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
-	i8x41_config	*config;
-}	I8X41;
+};
 
 static int i8x41_ICount;
 
 static I8X41 i8x41;
 
 #define RM(a)	program_read_byte_8le(a)
-#define WM(a,v) program_write_byte_8le(a,v)
+
+#define IRAM_R(a)	data_read_byte_8le((a) & i8x41.ram_mask)
+#define IRAM_W(a,v) data_write_byte_8le((a)  & i8x41.ram_mask, v)
+
 #define RP(a)	io_read_byte_8le(a)
 #define WP(a,v) io_write_byte_8le(a,v)
+
 #define ROP(pc) cpu_readop(pc)
 #define ROP_ARG(pc) cpu_readop_arg(pc)
 
@@ -151,11 +167,10 @@ static I8X41 i8x41;
  * 400-7ff      (more) internal for 8x42 type (2K)
  * 800-8ff      internal RAM
  */
-#define M_IRAM	0x800	/* internal RAM is mapped here */
-#define M_BANK0 0x800	/* register bank 0 (8 times 8 bits) */
-#define M_STACK 0x808	/* stack (8 times 16 bits) */
-#define M_BANK1 0x818	/* register bank 1 (8 times 8 bits) */
-#define M_USER	0x820	/* user memory (224 times 8 bits) */
+#define M_BANK0 0x000	/* register bank 0 (8 times 8 bits) */
+#define M_STACK 0x008	/* stack (8 times 16 bits) */
+#define M_BANK1 0x018	/* register bank 1 (8 times 8 bits) */
+#define M_USER	0x020	/* user memory (224 times 8 bits) */
 
 /* PSW flag bits */
 #define FC		0x80	/* carry flag */
@@ -207,8 +222,8 @@ static I8X41 i8x41;
 #define CONTROL		i8x41.control
 
 
-#define GETR(n) (RM(((PSW & BS) ? M_BANK1:M_BANK0)+(n)))
-#define SETR(n,v) (WM(((PSW & BS) ? M_BANK1:M_BANK0)+(n), (v)))
+#define GETR(n) (IRAM_R(((PSW & BS) ? M_BANK1:M_BANK0)+(n)))
+#define SETR(n,v) (IRAM_W(((PSW & BS) ? M_BANK1:M_BANK0)+(n), (v)))
 
 static void set_irq_line(int irqline, int state);
 
@@ -218,8 +233,8 @@ static void set_irq_line(int irqline, int state);
 
 INLINE void PUSH_PC_TO_STACK(void)
 {
-	WM( M_STACK + (PSW&SP) * 2 + 0, PC & 0xff);
-	WM( M_STACK + (PSW&SP) * 2 + 1, ((PC >> 8) & 0x0f) | (PSW & 0xf0) );
+	IRAM_W( M_STACK + (PSW&SP) * 2 + 0, PC & 0xff);
+	IRAM_W( M_STACK + (PSW&SP) * 2 + 1, ((PC >> 8) & 0x0f) | (PSW & 0xf0) );
 	PSW = (PSW & ~SP) | ((PSW + 1) & SP);
 }
 
@@ -253,7 +268,7 @@ INLINE void add_r(int r)
  ***********************************/
 INLINE void add_rm(int r)
 {
-	UINT8 res = A + RM( M_IRAM + (GETR(r) & i8x41.ram_mask) );
+	UINT8 res = A + IRAM_R(GETR(r));
 	if( res < A ) PSW |= FC;
 	if( (res & 0x0f) < (A & 0x0f) ) PSW |= FA;
 	A = res;
@@ -290,7 +305,7 @@ INLINE void addc_r(int r)
  ***********************************/
 INLINE void addc_rm(int r)
 {
-	UINT8 res = A + RM( M_IRAM + (GETR(r) & i8x41.ram_mask) ) + (PSW >> 7);
+	UINT8 res = A + IRAM_R(GETR(r)) + (PSW >> 7);
 	if( res <= A ) PSW |= FC;
 	if( (res & 0x0f) <= (A & 0x0f) ) PSW |= FA;
 	A = res;
@@ -324,7 +339,7 @@ INLINE void anl_r(int r)
  ***********************************/
 INLINE void anl_rm(int r)
 {
-	A = A & RM( M_IRAM + (GETR(r) & i8x41.ram_mask) );
+	A = A & IRAM_R(GETR(r));
 }
 
 /***********************************
@@ -636,8 +651,8 @@ INLINE void inc_r(int r)
  ***********************************/
 INLINE void inc_rm(int r)
 {
-	UINT16 addr = M_IRAM + (GETR(r) & i8x41.ram_mask);
-	WM( addr, RM(addr) + 1 );
+	UINT16 addr = GETR(r);
+	IRAM_W( addr, IRAM_R(addr) + 1 );
 }
 
 /***********************************
@@ -879,7 +894,7 @@ INLINE void mov_a_r(int r)
  ***********************************/
 INLINE void mov_a_rm(int r)
 {
-	A = RM( M_IRAM + (GETR(r) & i8x41.ram_mask) );
+	A = IRAM_R(GETR(r));
 }
 
 /***********************************
@@ -926,7 +941,7 @@ INLINE void mov_r_i(int r)
  ***********************************/
 INLINE void mov_rm_a(int r)
 {
-	WM( M_IRAM + (GETR(r) & i8x41.ram_mask), A );
+	IRAM_W(GETR(r), A );
 }
 
 /***********************************
@@ -937,7 +952,7 @@ INLINE void mov_rm_i(int r)
 {
 	UINT8 val = ROP_ARG(PC);
 	PC += 1;
-	WM( M_IRAM + (GETR(r) & i8x41.ram_mask), val );
+	IRAM_W(GETR(r), val );
 }
 
 /***********************************
@@ -1027,7 +1042,7 @@ INLINE void orl_r(int r)
  ***********************************/
 INLINE void orl_rm(int r)
 {
-	A = A | RM( M_IRAM + (GETR(r) & i8x41.ram_mask) );
+	A = A | IRAM_R(GETR(r));
 }
 
 /***********************************
@@ -1115,8 +1130,8 @@ INLINE void ret(void)
 {
 	UINT8 msb;
 	PSW = (PSW & ~SP) | ((PSW - 1) & SP);
-	msb = RM(M_STACK + (PSW&SP) * 2 + 1);
-	PC = RM(M_STACK + (PSW&SP) * 2 + 0);
+	msb = IRAM_R(M_STACK + (PSW&SP) * 2 + 1);
+	PC = IRAM_R(M_STACK + (PSW&SP) * 2 + 0);
 	PC |= (msb << 8) & 0x700;
 }
 
@@ -1128,8 +1143,8 @@ INLINE void retr(void)
 {
 	UINT8 msb;
 	PSW = (PSW & ~SP) | ((PSW - 1) & SP);
-	msb = RM(M_STACK + (PSW&SP) * 2 + 1);
-	PC = RM(M_STACK + (PSW&SP) * 2 + 0);
+	msb = IRAM_R(M_STACK + (PSW&SP) * 2 + 1);
+	PC = IRAM_R(M_STACK + (PSW&SP) * 2 + 0);
 	PC |= (msb << 8) & 0x700;
 	PSW = (PSW & 0x0f) | (msb & 0xf0);
 	CONTROL &= ~IRQ_IGNR;
@@ -1248,9 +1263,9 @@ INLINE void xch_a_r(int r)
  ***********************************/
 INLINE void xch_a_rm(int r)
 {
-	UINT16 addr = M_IRAM + (GETR(r) & i8x41.ram_mask);
-	UINT8 tmp = RM(addr);
-	WM( addr, A );
+	UINT16 addr = GETR(r);
+	UINT8 tmp = IRAM_R(addr);
+	IRAM_W( addr, A );
 	A = tmp;
 }
 
@@ -1260,9 +1275,9 @@ INLINE void xch_a_rm(int r)
  ***********************************/
 INLINE void xchd_a_rm(int r)
 {
-	UINT16 addr = M_IRAM + (GETR(r) & i8x41.ram_mask);
-	UINT8 tmp = RM(addr);
-	WM( addr, (tmp & 0xf0) | (A & 0x0f) );
+	UINT16 addr = GETR(r);
+	UINT8 tmp = IRAM_R(addr);
+	IRAM_W( addr, (tmp & 0xf0) | (A & 0x0f) );
 	A = (A & 0xf0) | (tmp & 0x0f);
 }
 
@@ -1281,7 +1296,7 @@ INLINE void xrl_r(int r)
  ***********************************/
 INLINE void xrl_rm(int r)
 {
-	A = A ^ RM( M_IRAM + (GETR(r) & i8x41.ram_mask) );
+	A = A ^ IRAM_R(GETR(r));
 }
 
 /***********************************
@@ -1328,7 +1343,8 @@ static CPU_INIT( i8x41 )
 {
 	i8x41.irq_callback = irqcallback;
 	i8x41.device = device;
-	i8x41.config = (i8x41_config *)config;
+	i8x41.subtype = 8041;
+	i8x41.ram_mask = I8X41_intRAM_MASK;
 
 	state_save_register_item("i8x41", index, i8x41.ppc);
 	state_save_register_item("i8x41", index, i8x41.pc);
@@ -1347,6 +1363,14 @@ static CPU_INIT( i8x41 )
 	state_save_register_item("i8x41", index, i8x41.p2_hs);
 }
 
+static CPU_INIT( i8042 )
+{
+	CPU_INIT_CALL(i8x41);
+	i8x41.subtype = 8042;
+	i8x41.ram_mask = I8X42_intRAM_MASK;
+}
+
+
 
 /****************************************************************************
  *  Reset registers to their initial values
@@ -1354,23 +1378,15 @@ static CPU_INIT( i8x41 )
 
 static CPU_RESET( i8x41 )
 {
-	cpu_irq_callback save_irqcallback = i8x41.irq_callback;
-	const device_config *save_device = i8x41.device;
-	i8x41_config	*save_config = i8x41.config;
-	memset(&i8x41, 0, sizeof(I8X41));
-	i8x41.irq_callback = save_irqcallback;
-	i8x41.device = save_device;
-	i8x41.config = save_config;
-
-	/* default to 8041 behaviour for DBBI/DBBO and extended commands */
-	i8x41.subtype = 8041;
-	i8x41.ram_mask = I8X41_intRAM_MASK;
-	if ( i8x41.config != NULL && i8x41.config->type == TYPE_I8X42 )
-	{
-		i8x41.subtype = 8042;
-		i8x41.ram_mask = I8X42_intRAM_MASK;
-	}
-
+	i8x41.ppc = 0;
+	i8x41.pc = 0;
+	i8x41.timer = 0;
+	i8x41.prescaler = 0;
+	i8x41.a = 0;
+	i8x41.psw = 0;
+	i8x41.state = 0;
+	i8x41.enable = 0;
+	
 	ENABLE = IBFI | TCNTI;
 	DBBI = 0xff;
 	DBBO = 0xff;
@@ -2117,6 +2133,26 @@ static void set_irq_line(int irqline, int state)
  * Generic set_info
  **************************************************************************/
 
+/***************************************************************************
+    ADDRESS MAPS
+***************************************************************************/
+
+static ADDRESS_MAP_START(program_10bit, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE(0x00, 0x3ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(program_11bit, ADDRESS_SPACE_PROGRAM, 8)
+	AM_RANGE(0x00, 0x7ff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(data_7bit, ADDRESS_SPACE_DATA, 8)
+	AM_RANGE(0x00, 0x7f) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START(data_8bit, ADDRESS_SPACE_DATA, 8)
+	AM_RANGE(0x00, 0xff) AM_RAM
+ADDRESS_MAP_END
+
 static CPU_SET_INFO( i8x41 )
 {
 	switch (state)
@@ -2207,7 +2243,7 @@ static CPU_SET_INFO( i8x41 )
  * Generic get_info
  **************************************************************************/
 
-CPU_GET_INFO( i8x41 )
+CPU_GET_INFO( i8041 )
 {
 	switch (state)
 	{
@@ -2226,12 +2262,15 @@ CPU_GET_INFO( i8x41 )
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 8;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM:	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 8;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 8;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 16;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;					break;
+
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_10bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);		break;
 
 		case CPUINFO_INT_INPUT_STATE + I8X41_INT_IBF:	info->i = (STATE & IBF) ? ASSERT_LINE : CLEAR_LINE; break;
 		case CPUINFO_INT_INPUT_STATE + I8X41_INT_TEST1:	info->i = (STATE & TEST1) ? ASSERT_LINE : CLEAR_LINE; break;
@@ -2292,8 +2331,8 @@ CPU_GET_INFO( i8x41 )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &i8x41_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "I8X41");				break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Intel 8x41");			break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "I8041");				break;
+		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "UPI-41/42");			break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "0.6");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Juergen Buchmueller, all rights reserved."); break;
@@ -2330,3 +2369,54 @@ CPU_GET_INFO( i8x41 )
 		case CPUINFO_STR_REGISTER + I8X41_STAT:			sprintf(info->s, "STAT:%02X", i8x41.state);	break;
 	}
 }
+
+
+#if (HAS_I8741)
+CPU_GET_INFO( i8741 )
+{
+	switch (state)
+	{
+		case CPUINFO_STR_NAME:											strcpy(info->s, "I8741");							break;
+		default:														CPU_GET_INFO_CALL(i8041);							break;
+	}
+}
+#endif
+
+#if (HAS_I8042)
+CPU_GET_INFO( i8042 )
+{
+	switch (state)
+	{
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:	info->internal_map8 = ADDRESS_MAP_NAME(program_11bit);	break;
+		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 		info->internal_map8 = ADDRESS_MAP_NAME(data_8bit);		break;
+		case CPUINFO_PTR_INIT:											info->init = CPU_INIT_NAME(i8042);					break;
+		case CPUINFO_STR_NAME:											strcpy(info->s, "I8042");							break;
+		default:														CPU_GET_INFO_CALL(i8041);							break;
+	}
+}
+
+#endif
+
+#if (HAS_I8242)
+CPU_GET_INFO( i8242 )
+{
+	switch (state)
+	{
+		case CPUINFO_STR_NAME:											strcpy(info->s, "I8242");							break;
+		default:														CPU_GET_INFO_CALL(i8042);							break;
+	}
+}
+
+#endif
+
+#if (HAS_I8742)
+CPU_GET_INFO( i8742 )
+{
+	switch (state)
+	{
+		case CPUINFO_STR_NAME:											strcpy(info->s, "I8742");							break;
+		default:														CPU_GET_INFO_CALL(i8042);							break;
+	}
+}
+
+#endif

@@ -138,10 +138,6 @@ static ADDRESS_MAP_START( decocass_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( decocass_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x03ff) AM_ROM
-	AM_RANGE(0x0800, 0x087f) AM_RAM
-ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( decocass_mcu_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x01, 0x01) AM_READWRITE(i8041_p1_r, i8041_p1_w)
@@ -389,11 +385,10 @@ static MACHINE_DRIVER_START( decocass )
 	MDRV_CPU_ADD("audio", M6502,500000) /* 500 kHz */
 	MDRV_CPU_PROGRAM_MAP(decocass_sound_map,0)
 
-	MDRV_CPU_ADD("mcu", I8X41,500000*15) /* 500 kHz ( I doubt it is 400kHz Al! )*/
-	MDRV_CPU_PROGRAM_MAP(decocass_mcu_map,0)
+	MDRV_CPU_ADD("mcu", I8041,500000*15) /* 500 kHz ( I doubt it is 400kHz Al! )*/
 	MDRV_CPU_IO_MAP(decocass_mcu_portmap,0)
 
-	MDRV_INTERLEAVE(7)				/* interleave CPUs */
+	MDRV_INTERLEAVE(70)				/* interleave CPUs */
 
 	MDRV_MACHINE_RESET(decocass)
 
