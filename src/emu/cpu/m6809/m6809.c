@@ -97,14 +97,14 @@ typedef struct
 	PAIR	dp; 		/* Direct Page register (page in MSB) */
 	PAIR	u, s;		/* Stack pointers */
 	PAIR	x, y;		/* Index registers */
-    UINT8   cc;
+	UINT8	cc;
 	UINT8	ireg;		/* First opcode */
 	UINT8	irq_state[2];
-    int     extra_cycles; /* cycles used up by interrupts */
+	int 	extra_cycles; /* cycles used up by interrupts */
 	cpu_irq_callback irq_callback;
 	const device_config *device;
-    UINT8   int_state;  /* SYNC and CWAI flags */
-    UINT8   nmi_state;
+	UINT8	int_state;	/* SYNC and CWAI flags */
+	UINT8	nmi_state;
 } m6809_Regs;
 
 /* flag bits in the cc register */
@@ -156,7 +156,7 @@ static PAIR ea;         /* effective address */
 #define M6809_SYNC		16	/* set when SYNC is waiting for an interrupt */
 #define M6809_LDS		32	/* set when LDS occured at least once */
 
-#define CHECK_IRQ_LINES 												\
+#define CHECK_IRQ_LINES() 												\
 	if( m6809.irq_state[M6809_IRQ_LINE] != CLEAR_LINE ||				\
 		m6809.irq_state[M6809_FIRQ_LINE] != CLEAR_LINE )				\
 		m6809.int_state &= ~M6809_SYNC; /* clear SYNC flag */			\
@@ -411,7 +411,7 @@ static CPU_SET_CONTEXT( m6809 )
 		m6809 = *(m6809_Regs*)src;
 	CHANGE_PC;
 
-    CHECK_IRQ_LINES;
+    ;
 }
 
 
@@ -503,7 +503,7 @@ static void set_irq_line(int irqline, int state)
 	    LOG(("M6809#%d set_irq_line %d, %d\n", cpu_getactivecpu(), irqline, state));
 		m6809.irq_state[irqline] = state;
 		if (state == CLEAR_LINE) return;
-		CHECK_IRQ_LINES;
+		;
 	}
 }
 
@@ -1108,7 +1108,7 @@ static CPU_SET_INFO( m6809 )
 		case CPUINFO_INT_REGISTER + M6809_PC:			PC = info->i; CHANGE_PC;				break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + M6809_S:			S = info->i;							break;
-		case CPUINFO_INT_REGISTER + M6809_CC:			CC = info->i; CHECK_IRQ_LINES;			break;
+		case CPUINFO_INT_REGISTER + M6809_CC:			CC = info->i; ;			break;
 		case CPUINFO_INT_REGISTER + M6809_U:			U = info->i;							break;
 		case CPUINFO_INT_REGISTER + M6809_A:			A = info->i;							break;
 		case CPUINFO_INT_REGISTER + M6809_B:			B = info->i;							break;
