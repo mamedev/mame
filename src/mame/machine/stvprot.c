@@ -4,7 +4,7 @@
  figure out properly
  clean up
  fix remaining games
- split apart? (this might be a per game thing rather than a generic device..)
+ split them on a per-game basis
 
  Known Protected ST-V Games
 
@@ -256,7 +256,7 @@ static READ32_HANDLER( a_bus_ctrl_r )
 				case ELANDORE_CTRL_4_DRAGON:
 				case ELANDORE_CTRL_5_DRAGON:
 				case ELANDORE_CTRL_6_DRAGON:
-					ctrl_index++;
+					//ctrl_index++;
 					return ROM[ctrl_index];
 			}
 		}
@@ -299,28 +299,28 @@ static WRITE32_HANDLER ( a_bus_ctrl_w )
 			case 0x77770000: ctrl_index = 0; break;
 			/*elandore*/
 			case ELANDORE_CTRL_1_HUMAN: // (human polygons)
-				ctrl_index = ((0x00000000/4) + ((a_bus[2] & 0xff)<<16) + ((a_bus[2] & 0xffff0000)>>16)/4)-1;
+				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
 				break;
 			case ELANDORE_CTRL_2_HUMAN: // (human polygons)
-				ctrl_index = ((0x00000000/4) + ((a_bus[2] & 0xff)<<16) + ((a_bus[2] & 0xffff0000)>>16)/4)-1;
+				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
 				break;
 			case ELANDORE_CTRL_1_DRAGON://KAIN / THUNDER (dragon polygons)
-				ctrl_index = ((0x00000000/4) + ((a_bus[2] & 0xff)<<16) + ((a_bus[2] & 0xffff0000)>>16)/4)-1;
+				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
 				break;
 			case ELANDORE_CTRL_2_DRAGON://REVI CURIO / DARK (dragon polygons)
-				ctrl_index = ((0x00000000/4) + ((a_bus[2] & 0xff)<<16) + ((a_bus[2] & 0xffff0000)>>16)/4)-1;
+				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
 				break;
 			case ELANDORE_CTRL_3_DRAGON://RUBONE / POISON (dragon polygons)
-				ctrl_index = ((0x00000000/4) + ((a_bus[2] & 0xff)<<16) + ((a_bus[2] & 0xffff0000)>>16)/4)-1;
+				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
 				break;
 			case ELANDORE_CTRL_4_DRAGON://TINA / MAGICAL GIRL (dragon polygons)
-				ctrl_index = ((0x00000000/4) + ((a_bus[2] & 0xff)<<16) + ((a_bus[2] & 0xffff0000)>>16)/4)-1;
+				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
 				break;
 			case ELANDORE_CTRL_5_DRAGON://KEYAKI / FIRE (dragon polygons)
-				ctrl_index = ((0x00000000/4) + ((a_bus[2] & 0xff)<<16) + ((a_bus[2] & 0xffff0000)>>16)/4)-1;
+				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
 				break;
 			case ELANDORE_CTRL_6_DRAGON://SION / WIND (dragon polygons)
-				ctrl_index = ((0x00000000/4) + ((a_bus[2] & 0xff)<<16) + ((a_bus[2] & 0xffff0000)>>16)/4)-1;
+				ctrl_index = ((0x0000000/4) + ((a_bus[2] & 0xff)<<12) + ((a_bus[2] & 0x0fff0000)>>16)/4);
 				break;
 		}
 	}
