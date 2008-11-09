@@ -411,7 +411,7 @@ static CPU_SET_CONTEXT( m6809 )
 		m6809 = *(m6809_Regs*)src;
 	CHANGE_PC;
 
-    ;
+    CHECK_IRQ_LINES();
 }
 
 
@@ -503,7 +503,7 @@ static void set_irq_line(int irqline, int state)
 	    LOG(("M6809#%d set_irq_line %d, %d\n", cpu_getactivecpu(), irqline, state));
 		m6809.irq_state[irqline] = state;
 		if (state == CLEAR_LINE) return;
-		;
+		CHECK_IRQ_LINES();
 	}
 }
 
@@ -1108,7 +1108,7 @@ static CPU_SET_INFO( m6809 )
 		case CPUINFO_INT_REGISTER + M6809_PC:			PC = info->i; CHANGE_PC;				break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + M6809_S:			S = info->i;							break;
-		case CPUINFO_INT_REGISTER + M6809_CC:			CC = info->i; ;			break;
+		case CPUINFO_INT_REGISTER + M6809_CC:			CC = info->i; CHECK_IRQ_LINES();			break;
 		case CPUINFO_INT_REGISTER + M6809_U:			U = info->i;							break;
 		case CPUINFO_INT_REGISTER + M6809_A:			A = info->i;							break;
 		case CPUINFO_INT_REGISTER + M6809_B:			B = info->i;							break;
