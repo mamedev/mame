@@ -1,6 +1,6 @@
 /*
 
- TSI S14001A emulator v1.20
+ TSI S14001A emulator v1.31a
  By Jonathan Gevaryahu ("Lord Nightmare") with help from Kevin Horton ("kevtris")
  MAME conversion and integration by R. Belmont
  Clock Frequency control updated by Zsolt Vasvari
@@ -19,11 +19,95 @@
  1.30 move main dac to 4 bits only with no extension (4->16 bit range extension is now done by output).
  Added a somewhat better, but still not perfect, filtering system - LN
  1.31 fix a minor bug with the dac range. wolfpack clips again, and I'm almost sure its an encoding error on the original speech - LN (0.125u9)
+ 1.31a Add chip pinout and other notes
 
  TODO:
  * increase accuracy of internal S14001A 'filter' for both driven and undriven cycles (its not terribly inaccurate for undriven cycles, but the dc sliding of driven cycles is not emulated)
  * add option for and attach Frank P.'s emulation of the Analog external filter from the vsu-1000 using the discrete core.
 */
+
+/* Chip Pinout:
+The original datasheet (which is lost as far as I know) clearly called the
+s14001a chip the 'CRC chip', or 'Custom Rom Controller', as it appears with
+this name on the Stern and Canon schematics, as well as on some TSI speech
+print advertisements.
+Labels are not based on the labels used by the Atari wolf pack and Stern
+schematics, as these are inconsistent. Atari calls the speech address/input
+pins SAx while Stern calls them Cx. Also Atari and Canon both have the bit
+ordering for the word select bus backwards, which may indicate it was so on
+the original datasheet. Stern has it correct, and I've used their Cx labeling.
+
+                     ______    ______
+                   _|o     \__/      |_
+           +5V -- |_|1             40|_| -> /BUSY*
+                   _|                |_
+         ?TEST ?? |_|2             39|_| <- ROM D7
+                   _|                |_
+XTAL CLOCK/CKC -> |_|3             38|_| -> ROM A11
+                   _|                |_
+ ROM CLOCK/CKR <- |_|4             37|_| <- ROM D6
+                   _|                |_
+    ?DAC TEST? ?? |_|5             36|_| -> ROM A10
+                   _|                |_
+    ?DAC TEST? ?? |_|6             35|_| -> ROM A9
+                   _|                |_
+    ?DAC TEST? ?? |_|7             34|_| <- ROM D5
+                   _|                |_
+    ?DAC TEST? ?? |_|8             33|_| -> ROM A8
+                   _|                |_
+       ROM /EN <- |_|9             32|_| <- ROM D4
+                   _|       S        |_
+         START -> |_|10 7   1   T  31|_| -> ROM A7
+                   _|   7   4   S    |_
+     AUDIO OUT <- |_|11 3   0   I  30|_| <- ROM D3
+                   _|   7   0        |_
+        ROM A0 <- |_|12     1      29|_| -> ROM A6
+                   _|       A        |_
+ SPEECH BUS C0 -> |_|13            28|_| <- SPEECH BUS C5
+                   _|                |_
+        ROM A1 <- |_|14            27|_| <- ROM D2
+                   _|                |_
+ SPEECH BUS C1 -> |_|15            26|_| <- SPEECH BUS C4
+                   _|                |_
+        ROM A2 <- |_|16            25|_| <- ROM D1
+                   _|                |_
+ SPEECH BUS C2 -> |_|17            24|_| <- SPEECH BUS C3
+                   _|                |_
+        ROM A3 <- |_|18            23|_| <- ROM D0
+                   _|                |_
+        ROM A4 <- |_|19            22|_| -> ROM A5
+                   _|                |_
+           GND -- |_|20            21|_| -- -10V
+                    |________________|
+
+*Note from Kevin Horton when testing the hookup of the S14001A: the /BUSY line
+is not a standard voltage line: when it is in its HIGH state (i.e. not busy) it
+puts out a voltage of -10 volts, so it needs to be dropped back to a sane
+voltage level before it can be passed to any sort of modern IC. The address
+lines for the speech rom (A0-A11) do not have this problem, they output at a
+TTL/CMOS compatible voltage. The AUDIO OUT pin also outputs a voltage below GND,
+and the TEST pins may do so too.
+
+START is pulled high when a word is to be said and the word number is on the
+input lines. The Canon 'Canola' uses a seperate 'rom strobe' signal independent
+of the chip to either enable or clock the speech rom. Its likely that they did
+this to be able to force the speech chip to stop talking, which is normally
+impossible. The later 'version 3' TSI speech board as featured in an advertisement
+in the John Cater book probably also has this feature, in addition to external
+speech rom banking.
+
+Because it requires -10V to operate, the chip manufacturing process must be PMOS.
+
+/-----------\
+> Operation <
+\-----------/
+Put the 6-bit address of the word to be said onto the C0-C5 lines.
+Then clock the START line low-high-low. As long as the START line is held high,
+the first address byte of the first word will be read repeatedly every clock,
+with the rom enable line enabled. Once START has gone low-high-low, the /BUSY
+line will go low until 3 clocks after the chip is done speaking.
+*/
+
 
 /* state map:
 
