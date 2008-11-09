@@ -1839,7 +1839,7 @@ static INPUT_PORTS_START( halleys )
 	PORT_DIPUNUSED_DIPLOC( 0x80, IP_ACTIVE_LOW, "SW3:8" )
 
 	/* From US manual : "DIP SW 2 is not used and all contacts should be set off."
-	   However, they enable debug features if you press START1 during the boot sequence. */
+       However, they enable debug features if you press START1 during the boot sequence. */
 	PORT_START("DSW3")	/* 0xff97 */
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW2:1" )
 	PORT_DIPNAME( 0x02, 0x02, "Free Play (Cheat)" )         PORT_DIPLOCATION("SW2:2")
@@ -1863,7 +1863,7 @@ static INPUT_PORTS_START( halleys )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	/* From US manual : "Coin mechs system can be optioned by setting DIP SW 1.
-	   Position 6 on for single coin selector.	Position 6 off for twin coin selector." */
+       Position 6 on for single coin selector.  Position 6 off for twin coin selector." */
 	PORT_START("DSW4")	/* 0xff94 - read by coin_lockout_r */
 	PORT_DIPUNUSED_DIPLOC( 0x01, IP_ACTIVE_LOW, "SW1:1" )
 	PORT_DIPUNUSED_DIPLOC( 0x02, IP_ACTIVE_LOW, "SW1:2" )

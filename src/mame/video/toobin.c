@@ -102,7 +102,7 @@ VIDEO_START( toobin )
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,48);
 	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
-	
+
 	/* allocate a playfield bitmap for rendering */
 	pfbitmap = auto_bitmap_alloc(video_screen_get_width(machine->primary_screen), video_screen_get_height(machine->primary_screen), BITMAP_FORMAT_INDEXED16);
 }

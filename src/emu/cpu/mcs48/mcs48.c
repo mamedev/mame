@@ -1009,7 +1009,7 @@ static CPU_SET_CONTEXT( mcs48 )
 		token = src;
 	mcs48 = token;
 	update_regptr(mcs48);
-	change_pc(PC);	
+	change_pc(PC);
 }
 
 /*-------------------------------------------------
@@ -1020,7 +1020,7 @@ static CPU_SET_CONTEXT( mcs48 )
 static CPU_SET_INFO( mcs48 )
 {
 	mcs48_state *mcs48 = token;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */

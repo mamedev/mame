@@ -18,7 +18,7 @@
  *   - This entire notice must remain in the source code.
  *
  *   Changes in 3.8 [Miodrag Milanovic]
- *   - Added MEMPTR register (according to informations provided 
+ *   - Added MEMPTR register (according to informations provided
  *     by Vladimir Kladov
  *   - BIT n,(HL) now return valid values due to use of MEMPTR
  *   - Fixed BIT 6,(XY+o) undocumented instructions
@@ -805,7 +805,7 @@ INLINE UINT32 ARG16(z80_state *z80)
 	}															\
 	else														\
 	{															\
-		MEMPTR = ARG16(z80);  /* implicit call PC+=2;	*/		\
+		MEMPTR = ARG16(z80);  /* implicit call PC+=2;   */		\
 	}
 
 /***************************************************************
@@ -882,7 +882,7 @@ INLINE UINT32 ARG16(z80_state *z80)
 	PUSH( pc );													\
 	PCD = addr;													\
 	MEMPTR = PC;												\
-	change_pc(PCD);							
+	change_pc(PCD);
 
 /***************************************************************
  * INC  r8
@@ -3429,9 +3429,9 @@ static CPU_INIT( z80 )
 {
 	z80_state *z80 = device->token;
 	int i, p;
-	
+
 	token = device->token;	// temporary
-	
+
 	/* setup cycle tables */
 	cc[Z80_TABLE_op] = cc_op;
 	cc[Z80_TABLE_cb] = cc_cb;
@@ -3565,7 +3565,7 @@ static CPU_INIT( z80 )
 static CPU_RESET( z80 )
 {
 	z80_state *z80 = device->token;
-	
+
 	PC = 0x0000;
 	I = 0;
 	R = 0;
@@ -3598,7 +3598,7 @@ static CPU_EXIT( z80 )
 static CPU_EXECUTE( z80 )
 {
 	z80_state *z80 = device->token;
-	
+
 	z80->icount = cycles;
 
 	/* check for NMIs on the way in; they can only be set externally */
@@ -3641,7 +3641,7 @@ static CPU_EXECUTE( z80 )
 static CPU_BURN( z80 )
 {
 	z80_state *z80 = token;
-	
+
 	if( cycles > 0 )
 	{
 		/* NOP takes 4 cycles per instruction */
@@ -3667,7 +3667,7 @@ static CPU_SET_CONTEXT( z80 )
 	if( src )
 		token = src;
 	z80 = token;
-	change_pc(PCD);	
+	change_pc(PCD);
 }
 
 /****************************************************************************

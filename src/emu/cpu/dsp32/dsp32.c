@@ -354,7 +354,7 @@ static CPU_INIT( dsp32c )
 	/* copy in config data */
 	if (configdata)
 		dsp32.output_pins_changed = configdata->output_pins_changed;
-	
+
 	dsp32.device = device;
 }
 

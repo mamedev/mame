@@ -249,7 +249,7 @@ typedef struct
 	int			chip_type;
 	int			mstat_mask;
 	int			imask_mask;
-	
+
 	/* register maps */
 	void *		alu_xregs[8];
 	void *		alu_yregs[4];
@@ -577,7 +577,7 @@ static CPU_SET_CONTEXT( adsp21xx )
 static adsp2100_state *adsp21xx_init(const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback)
 {
 	adsp2100_state *adsp = device->token;
-	
+
 	token = device->token;	// temporary
 
 	/* create the tables */
@@ -587,7 +587,7 @@ static adsp2100_state *adsp21xx_init(const device_config *device, int index, int
 	/* set the IRQ callback */
 	adsp->irq_callback = irqcallback;
 	adsp->device = device;
-	
+
 	/* set up ALU register pointers */
 	adsp->alu_xregs[0] = &adsp->core.ax0;
 	adsp->alu_xregs[1] = &adsp->core.ax1;
@@ -601,7 +601,7 @@ static adsp2100_state *adsp21xx_init(const device_config *device, int index, int
 	adsp->alu_yregs[1] = &adsp->core.ay1;
 	adsp->alu_yregs[2] = &adsp->core.af;
 	adsp->alu_yregs[3] = &adsp->core.zero;
-	
+
 	/* set up MAC register pointers */
 	adsp->mac_xregs[0] = &adsp->core.mx0;
 	adsp->mac_xregs[1] = &adsp->core.mx1;
@@ -706,7 +706,7 @@ static adsp2100_state *adsp21xx_init(const device_config *device, int index, int
 	state_save_register_item("adsp2100", index, adsp->ifc);
 	state_save_register_item_array("adsp2100", index, adsp->irq_state);
 	state_save_register_item_array("adsp2100", index, adsp->irq_latch);
-	
+
 	return adsp;
 }
 

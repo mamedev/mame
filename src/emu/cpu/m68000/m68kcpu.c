@@ -873,7 +873,7 @@ unsigned int m68k_get_virq(m68ki_cpu_core *m68k, unsigned int level)
 void m68k_init(m68ki_cpu_core *m68k)
 {
 	static UINT32 emulation_initialized = 0;
-	
+
 	/* The first call to this function initializes the opcode handler jump table */
 	if(!emulation_initialized)
 		{

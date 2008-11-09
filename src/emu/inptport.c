@@ -3137,8 +3137,8 @@ static void field_config_insert(input_field_config *field, input_port_value *dis
 	for (scanfieldptr = &field->port->fieldlist; *scanfieldptr != NULL; scanfieldptr = scanfieldnextptr)
 	{
 		scanfieldnextptr = &(*scanfieldptr)->next;
-		if (((*scanfieldptr)->mask & field->mask) != 0 && (field->condition.condition == PORTCOND_ALWAYS || 
-		                                                   (*scanfieldptr)->condition.condition == PORTCOND_ALWAYS || 
+		if (((*scanfieldptr)->mask & field->mask) != 0 && (field->condition.condition == PORTCOND_ALWAYS ||
+		                                                   (*scanfieldptr)->condition.condition == PORTCOND_ALWAYS ||
 		                                                   condition_equal(&(*scanfieldptr)->condition, &field->condition)))
 		{
 			/* reduce the mask of the field we found */

@@ -245,10 +245,10 @@ static const char *const g_cpcc[64] =
 static UINT32 dasm_read_imm_8(UINT32 advance)
 {
 	UINT32 result;
-//	if (g_rawop)
+//  if (g_rawop)
 		result = g_rawop[g_cpu_pc + 1 - g_rawbasepc];
-//	else
-//		result = m68k_read_disassembler_16(g_cpu_pc & g_address_mask) & 0xff;
+//  else
+//      result = m68k_read_disassembler_16(g_cpu_pc & g_address_mask) & 0xff;
 	g_cpu_pc += advance;
 	return result;
 }
@@ -256,11 +256,11 @@ static UINT32 dasm_read_imm_8(UINT32 advance)
 static UINT32 dasm_read_imm_16(UINT32 advance)
 {
 	UINT32 result;
-//	if (g_rawop)
+//  if (g_rawop)
 		result = (g_rawop[g_cpu_pc + 0 - g_rawbasepc] << 8) |
 		          g_rawop[g_cpu_pc + 1 - g_rawbasepc];
-//	else
-//		result = m68k_read_disassembler_16(g_cpu_pc & g_address_mask) & 0xff;
+//  else
+//      result = m68k_read_disassembler_16(g_cpu_pc & g_address_mask) & 0xff;
 	g_cpu_pc += advance;
 	return result;
 }
@@ -268,13 +268,13 @@ static UINT32 dasm_read_imm_16(UINT32 advance)
 static UINT32 dasm_read_imm_32(UINT32 advance)
 {
 	UINT32 result;
-//	if (g_rawop)
+//  if (g_rawop)
 		result = (g_rawop[g_cpu_pc + 0 - g_rawbasepc] << 24) |
 		         (g_rawop[g_cpu_pc + 1 - g_rawbasepc] << 16) |
 		         (g_rawop[g_cpu_pc + 2 - g_rawbasepc] << 8) |
 		          g_rawop[g_cpu_pc + 3 - g_rawbasepc];
-//	else
-//		result = m68k_read_disassembler_32(g_cpu_pc & g_address_mask) & 0xff;
+//  else
+//      result = m68k_read_disassembler_32(g_cpu_pc & g_address_mask) & 0xff;
 	g_cpu_pc += advance;
 	return result;
 }

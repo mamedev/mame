@@ -367,10 +367,10 @@ static void execute_one(void)
 			/* Now check it against all the other potential collisions */
 			/* This is necessary because "don't care bits" get in the way. */
 			/*
-			MOVE(M) : 	0000 0101 BBBB BBBB 0000 001W --0- -HHH : A-152
-			MOVE(C) : 	0000 0101 BBBB BBBB 0011 1WDD DDD0 ---- : A-144
-			MOVE : 		0000 0101 BBBB BBBB ---- HHHW 0001 0001 : A-128
-			*/
+            MOVE(M) :   0000 0101 BBBB BBBB 0000 001W --0- -HHH : A-152
+            MOVE(C) :   0000 0101 BBBB BBBB 0011 1WDD DDD0 ---- : A-144
+            MOVE :      0000 0101 BBBB BBBB ---- HHHW 0001 0001 : A-128
+            */
 			if (((op2 & 0xfe20) != 0x0200) &&
 				((op2 & 0xf810) != 0x3800) &&
 				((op2 & 0x00ff) != 0x0011))
@@ -1821,7 +1821,7 @@ static size_t dsp56k_op_cmpm(const UINT16 op_byte, typed_pointer* d_register, UI
 	typed_pointer S = {NULL, DT_BYTE};
 	typed_pointer D = {NULL, DT_BYTE};
 
-	decode_JJJF_table(BITS(op_byte,0x0007),BITS(op_byte,0x0008), &S, &D);	
+	decode_JJJF_table(BITS(op_byte,0x0007),BITS(op_byte,0x0008), &S, &D);
 
 	*p_accum = *((UINT64*)D.addr);
 
@@ -1833,7 +1833,7 @@ static size_t dsp56k_op_cmpm(const UINT16 op_byte, typed_pointer* d_register, UI
 			absS |= U64(0xffffff8000000000);
 	}
 	else
-	{	
+	{
 		absS = (*((UINT16*)S.addr)) << 16;
 		if (absS &  U64(0x0000000080000000))
 			absS |= U64(0xffffffff80000000);
@@ -1842,13 +1842,13 @@ static size_t dsp56k_op_cmpm(const UINT16 op_byte, typed_pointer* d_register, UI
 
 	/* Sign extend and get absolute value of the destination */
 	if (D.addr == &A || D.addr == &B)
-	{	
+	{
 		absD = *((UINT64*)D.addr);
 		if (absD &  U64(0x0000008000000000))
 			absD |= U64(0xffffff8000000000);
 	}
 	else
-	{	
+	{
 		absD = (*((UINT16*)D.addr)) << 16;
 		if (absS &  U64(0x0000000080000000))
 			absS |= U64(0xffffffff80000000);
@@ -4032,64 +4032,64 @@ static void decode_uuuuF_table(UINT16 uuuu, UINT16 F, UINT8 add_sub_other, typed
 
 	switch(switchVal)
 	{
-		case 0x00: add_sub_other = OP_ADD;  
+		case 0x00: add_sub_other = OP_ADD;
 				   src_ret->addr = &X0; src_ret->data_type = DT_WORD;
 				   dst_ret->addr = &A;  dst_ret->data_type = DT_LONG_WORD; break;
-		case 0x08: add_sub_other = OP_SUB;  
+		case 0x08: add_sub_other = OP_SUB;
 				   src_ret->addr = &X0; src_ret->data_type = DT_WORD;
 				   dst_ret->addr = &A;  dst_ret->data_type = DT_LONG_WORD; break;
-		case 0x01: add_sub_other = OP_ADD;  
+		case 0x01: add_sub_other = OP_ADD;
 				   src_ret->addr = &X0; src_ret->data_type = DT_WORD;
 				   dst_ret->addr = &B;  dst_ret->data_type = DT_LONG_WORD; break;
-		case 0x09: add_sub_other = OP_SUB;  
+		case 0x09: add_sub_other = OP_SUB;
 				   src_ret->addr = &X0; src_ret->data_type = DT_WORD;
 				   dst_ret->addr = &B;  dst_ret->data_type = DT_LONG_WORD; break;
-		case 0x02: add_sub_other = OP_ADD;  
+		case 0x02: add_sub_other = OP_ADD;
 				   src_ret->addr = &Y0; src_ret->data_type = DT_WORD;
 				   dst_ret->addr = &A;  dst_ret->data_type = DT_LONG_WORD; break;
-		case 0x0a: add_sub_other = OP_SUB;  
+		case 0x0a: add_sub_other = OP_SUB;
 				   src_ret->addr = &Y0; src_ret->data_type = DT_WORD;
 				   dst_ret->addr = &A;  dst_ret->data_type = DT_LONG_WORD; break;
-		case 0x03: add_sub_other = OP_ADD;  
+		case 0x03: add_sub_other = OP_ADD;
 				   src_ret->addr = &Y0; src_ret->data_type = DT_WORD;
 				   dst_ret->addr = &B;  dst_ret->data_type = DT_LONG_WORD; break;
-		case 0x0b: add_sub_other = OP_SUB;  
+		case 0x0b: add_sub_other = OP_SUB;
 				   src_ret->addr = &Y0; src_ret->data_type = DT_WORD;
 				   dst_ret->addr = &B;  dst_ret->data_type = DT_LONG_WORD; break;
-		case 0x04: add_sub_other = OP_ADD;  
+		case 0x04: add_sub_other = OP_ADD;
 				   src_ret->addr = &X1; src_ret->data_type = DT_WORD;
 				   dst_ret->addr = &A;  dst_ret->data_type = DT_LONG_WORD; break;
-		case 0x0c: add_sub_other = OP_SUB;  
+		case 0x0c: add_sub_other = OP_SUB;
 				   src_ret->addr = &X1; src_ret->data_type = DT_WORD;
 				   dst_ret->addr = &A;  dst_ret->data_type = DT_LONG_WORD; break;
-		case 0x05: add_sub_other = OP_ADD;  
+		case 0x05: add_sub_other = OP_ADD;
 				   src_ret->addr = &X1; src_ret->data_type = DT_WORD;
 				   dst_ret->addr = &B;  dst_ret->data_type = DT_LONG_WORD; break;
-		case 0x0d: add_sub_other = OP_SUB;  
+		case 0x0d: add_sub_other = OP_SUB;
 				   src_ret->addr = &X1; src_ret->data_type = DT_WORD;
 				   dst_ret->addr = &B;  dst_ret->data_type = DT_LONG_WORD; break;
-		case 0x06: add_sub_other = OP_ADD;  
+		case 0x06: add_sub_other = OP_ADD;
 				   src_ret->addr = &Y1; src_ret->data_type = DT_WORD;
 				   dst_ret->addr = &A;  dst_ret->data_type = DT_LONG_WORD; break;
-		case 0x0e: add_sub_other = OP_SUB;  
+		case 0x0e: add_sub_other = OP_SUB;
 				   src_ret->addr = &Y1; src_ret->data_type = DT_WORD;
 				   dst_ret->addr = &A;  dst_ret->data_type = DT_LONG_WORD; break;
-		case 0x07: add_sub_other = OP_ADD;  
+		case 0x07: add_sub_other = OP_ADD;
 				   src_ret->addr = &Y1; src_ret->data_type = DT_WORD;
 				   dst_ret->addr = &B;  dst_ret->data_type = DT_LONG_WORD; break;
-		case 0x0f: add_sub_other = OP_SUB;  
+		case 0x0f: add_sub_other = OP_SUB;
 				   src_ret->addr = &Y1; src_ret->data_type = DT_WORD;
 				   dst_ret->addr = &B;  dst_ret->data_type = DT_LONG_WORD; break;
-		case 0x18: add_sub_other = OP_ADD;  
+		case 0x18: add_sub_other = OP_ADD;
 				   src_ret->addr = &B;  src_ret->data_type = DT_LONG_WORD;
 				   dst_ret->addr = &A;  dst_ret->data_type = DT_LONG_WORD; break;
-		case 0x1a: add_sub_other = OP_SUB;  
+		case 0x1a: add_sub_other = OP_SUB;
 				   src_ret->addr = &B;  src_ret->data_type = DT_LONG_WORD;
 				   dst_ret->addr = &A;  dst_ret->data_type = DT_LONG_WORD; break;
-		case 0x19: add_sub_other = OP_ADD;  
+		case 0x19: add_sub_other = OP_ADD;
 				   src_ret->addr = &A;  src_ret->data_type = DT_LONG_WORD;
 				   dst_ret->addr = &B;  dst_ret->data_type = DT_LONG_WORD; break;
-		case 0x1b: add_sub_other = OP_SUB;  
+		case 0x1b: add_sub_other = OP_SUB;
 				   src_ret->addr = &A;  src_ret->data_type = DT_LONG_WORD;
 				   dst_ret->addr = &B;  dst_ret->data_type = DT_LONG_WORD; break;
 	}
@@ -4458,8 +4458,8 @@ static void execute_dual_x_memory_data_read(const UINT16 op, typed_pointer* d_re
 	if (R.addr == &R3)
 		fatalerror("Dsp56k: Error. Dual x memory data read specified R3 as its first source!");
 
-	/* The note on A-142 is very interesting.  
-	   You can effectively access external memory in the last 64 bytes of X data memory! */
+	/* The note on A-142 is very interesting.
+       You can effectively access external memory in the last 64 bytes of X data memory! */
 	if (*((UINT16*)D2.addr) >= 0xffc0)
 		fatalerror("Dsp56k: Unimplemented access to external X Data Memory >= 0xffc0 in Dual X Memory Data Read.");
 

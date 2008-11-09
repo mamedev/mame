@@ -321,7 +321,7 @@ void cpuexec_timeslice(running_machine *machine)
 			cpudata->localtime = attotime_add_attoseconds(cpudata->localtime, cycles_running * attoseconds_per_cycle[cpunum]);
 			LOG(("         %d skipped, %d total, time = %s\n", cycles_running, (INT32)cpudata->totalcycles, attotime_string(cpudata->localtime, 9)));
 		}
-		
+
 		/* update the suspend state (breaks steeltal if we don't) */
 		cpudata->suspend = cpudata->nextsuspend;
 		cpudata->eatcycles = cpudata->nexteatcycles;
@@ -429,7 +429,7 @@ int cpunum_is_suspended(int cpunum, int reason)
 static void update_clock_information(running_machine *machine, int cpunum)
 {
 	INT64 attos;
-	
+
 	/* recompute cps and spc */
 	cycles_per_second[cpunum] = (double)cpu[cpunum].clock * cpu[cpunum].clockscale;
 	attoseconds_per_cycle[cpunum] = ATTOSECONDS_PER_SECOND / ((double)cpu[cpunum].clock * cpu[cpunum].clockscale);
@@ -443,7 +443,7 @@ static void update_clock_information(running_machine *machine, int cpunum)
 		attos >>= 1;
 	}
 	cpu[cpunum].divisor = attos;
-	
+
 	/* re-compute the perfect interleave factor */
 	compute_perfect_interleave(machine);
 }
@@ -879,7 +879,7 @@ static void compute_perfect_interleave(running_machine *machine)
 			if (attoseconds_per_cycle[cpunum] != 0)
 			{
 				attoseconds_t curtime = attoseconds_per_cycle[cpunum] * cputype_min_cycles(machine->config->cpu[cpunum].type);
-				
+
 				/* find the 2nd smallest cycle interval */
 				if (curtime < smallest)
 				{

@@ -137,7 +137,7 @@ static void m6502_common_init(const device_config *device, int index, int clock,
 	m6502_Regs *m6502 = device->token;
 
 	token = device->token;	// temporary
-	
+
 	m6502->irq_callback = irqcallback;
 	m6502->device = device;
 	m6502->subtype = subtype;
@@ -201,7 +201,7 @@ static CPU_GET_CONTEXT( m6502 )
 static CPU_SET_CONTEXT( m6502 )
 {
 	m6502_Regs *m6502;
-	
+
 	if( src )
 	{
 		token = src;
@@ -233,7 +233,7 @@ INLINE void m6502_take_irq(m6502_Regs *m6502)
 static CPU_EXECUTE( m6502 )
 {
 	m6502_Regs *m6502 = device->token;
-	
+
 	m6502->icount = cycles;
 
 	change_pc(PCD);
@@ -367,7 +367,7 @@ static CPU_INIT( m6510 )
 static CPU_RESET( m6510 )
 {
 	m6502_Regs *m6502 = device->token;
-	
+
 	CPU_RESET_CALL(m6502);
 	m6502->port = 0xff;
 	m6502->ddr = 0x00;
@@ -400,7 +400,7 @@ static READ8_HANDLER( m6510_read_0000 )
 static WRITE8_HANDLER( m6510_write_0000 )
 {
 	m6502_Regs *m6502 = token;
-	
+
 	switch(offset)
 	{
 		case 0x0000:	/* DDR */
@@ -435,7 +435,7 @@ static CPU_INIT( m65c02 )
 static CPU_RESET( m65c02 )
 {
 	m6502_Regs *m6502 = device->token;
-	
+
 	CPU_RESET_CALL(m6502);
 	P &=~F_D;
 }
@@ -463,7 +463,7 @@ INLINE void m65c02_take_irq(m6502_Regs *m6502)
 static CPU_EXECUTE( m65c02 )
 {
 	m6502_Regs *m6502 = device->token;
-	
+
 	m6502->icount = cycles;
 
 	change_pc(PCD);
@@ -557,7 +557,7 @@ static CPU_INIT( deco16 )
 static CPU_RESET( deco16 )
 {
 	m6502_Regs *m6502 = device->token;
-	
+
 	CPU_RESET_CALL(m6502);
 	m6502->subtype = SUBTYPE_DECO16;
 	m6502->insn = insndeco16;
@@ -638,7 +638,7 @@ static void deco16_set_irq_line(m6502_Regs *m6502, int irqline, int state)
 static CPU_EXECUTE( deco16 )
 {
 	m6502_Regs *m6502 = device->token;
-	
+
 	m6502->icount = cycles;
 
 	change_pc(PCD);
@@ -693,7 +693,7 @@ static CPU_EXECUTE( deco16 )
 static CPU_SET_INFO( m6502 )
 {
 	m6502_Regs *m6502 = token;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -727,7 +727,7 @@ static CPU_SET_INFO( m6502 )
 CPU_GET_INFO( m6502 )
 {
 	m6502_Regs *m6502 = token;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -844,7 +844,7 @@ CPU_GET_INFO( n2a03 )
 static CPU_SET_INFO( m6510 )
 {
 	m6502_Regs *m6502 = token;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as pointers to data or functions --- */
@@ -858,7 +858,7 @@ static CPU_SET_INFO( m6510 )
 CPU_GET_INFO( m6510 )
 {
 	m6502_Regs *m6502 = token;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
@@ -944,7 +944,7 @@ CPU_GET_INFO( m8502 )
 static CPU_SET_INFO( m65c02 )
 {
 	m6502_Regs *m6502 = token;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -1008,7 +1008,7 @@ CPU_GET_INFO( m65sc02 )
 static CPU_SET_INFO( deco16 )
 {
 	m6502_Regs *m6502 = token;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */

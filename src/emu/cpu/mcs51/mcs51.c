@@ -32,7 +32,7 @@
 
 /*****************************************************************************
  *   DS5002FP emulator by Manuel Abadia
- * 
+ *
  *   October 2008, couriersud: Merged back in mcs51
  *
  *   What has been added?
@@ -74,7 +74,7 @@
 
 /******************************************************************************
  *  Notes:
- * 
+ *
  *        The term cycles is used here to really refer to clock oscilations, because 1 machine cycle
  *        actually takes 12 oscilations.
  *
@@ -267,7 +267,7 @@ struct _mcs51_regs
 	int		cur_irq_prio;		/* Holds value of the current IRQ Priority Level; -1 if no irq */
 	UINT8	irq_active;			/* mask which irq levels are serviced */
 	UINT8	irq_prio[8];		/* interrupt priority */
-	
+
 	int		icount;
 
 	mcs51_uart uart;			/* internal uart */
@@ -1906,7 +1906,7 @@ static void mcs51_set_irq_line(mcs51_regs *mcs51, int irqline, int state)
 /* Execute cycles - returns number of cycles actually run */
 static CPU_EXECUTE( mcs51 )
 {
-	mcs51_regs *mcs51 = device->token; 
+	mcs51_regs *mcs51 = device->token;
 	UINT8 op;
 
 	mcs51->icount = cycles;
@@ -2058,7 +2058,7 @@ static CPU_INIT( mcs51 )
 	mcs51_regs *mcs51 = device->token;
 
 	token = device->token;	// temporary
-	
+
 	mcs51->irq_callback = irqcallback;
 	mcs51->device = device;
 
@@ -2225,7 +2225,7 @@ static CPU_INIT( i8052 )
 {
 	mcs51_regs *mcs51 = device->token;
 	CPU_INIT_CALL(mcs51);
-	
+
 	mcs51->ram_mask = 0xFF;  			/* 256 bytes of ram */
 	mcs51->num_interrupts = 6;			/* 6 interrupts */
 
@@ -2278,7 +2278,7 @@ static CPU_INIT( i80c52 )
 {
 	mcs51_regs *mcs51 = device->token;
 	CPU_INIT_CALL(i8052);
-	
+
 	mcs51->features |= (FEATURE_I80C52 | FEATURE_CMOS);
 	mcs51->sfr_read = i80c52_sfr_read;
 	mcs51->sfr_write = i80c52_sfr_write;
@@ -2358,7 +2358,7 @@ static UINT8 ds5002fp_sfr_read(mcs51_regs *mcs51, size_t offset)
 		case ADDR_RPS: 		DS5_LOGR(RPS, data);		break;
 		case ADDR_PCON:
 			SET_PFW(0);		/* reset PFW flag */
-			return mcs51_sfr_read(mcs51, offset); 
+			return mcs51_sfr_read(mcs51, offset);
 		default:
 			return mcs51_sfr_read(mcs51, offset);
 	}
@@ -2371,9 +2371,9 @@ static CPU_INIT( ds5002fp )
 	static const ds5002fp_config default_config = { 0x00, 0x00, 0x00 };
 	const ds5002fp_config *sconfig = config ? config : &default_config;
 	mcs51_regs *mcs51 = device->token;
-	
+
 	CPU_INIT_CALL( mcs51 );
-	
+
 	mcs51->ds5002fp.config = sconfig;
 	mcs51->features |= (FEATURE_DS5002FP | FEATURE_CMOS);
 	mcs51->sfr_read = ds5002fp_sfr_read;
@@ -2420,10 +2420,10 @@ static CPU_GET_CONTEXT( mcs51 )
 static CPU_SET_CONTEXT( mcs51 )
 {
 	mcs51_regs *mcs51;
-	
+
 	if( src )
 		token = src;
-	
+
 	mcs51 = token;
 	change_pc(PC);
 	update_ptrs(mcs51);
@@ -2436,7 +2436,7 @@ static CPU_SET_CONTEXT( mcs51 )
 static CPU_SET_INFO( mcs51 )
 {
 	mcs51_regs *mcs51 = token;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -2502,7 +2502,7 @@ static CPU_GET_INFO( mcs51 )
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:	info->i = 8;							break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 	info->i = 18; /* 128k for ds5002fp */							break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 	info->i = 0;							break;
-		
+
 		case CPUINFO_INT_PREVIOUSPC:					info->i = PPC;								break;
 		case CPUINFO_INT_PC:	 						info->i = PC;								break;
 		case CPUINFO_INT_SP:							info->i = SP;								break;

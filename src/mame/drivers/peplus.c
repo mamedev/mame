@@ -440,7 +440,7 @@ static READ8_DEVICE_HANDLER( peplus_crtc_display_r )
 
 static READ8_DEVICE_HANDLER( peplus_crtc_lpen1_r )
 {
-	return mc6845_status_r(device, offset); 
+	return mc6845_status_r(device, offset);
 	//return 0x40;
 }
 

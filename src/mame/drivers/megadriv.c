@@ -2685,17 +2685,17 @@ static WRITE16_HANDLER( _32x_68k_a15106_w )
 
 		//printf("_32x_68k_a15106_w %04x\n", data);
 		/*
-		if (a15106_reg & 0x4)
-			printf(" --- 68k Write Mode enabled\n");
-		else
-			printf(" --- 68k Write Mode disabled\n");
+        if (a15106_reg & 0x4)
+            printf(" --- 68k Write Mode enabled\n");
+        else
+            printf(" --- 68k Write Mode disabled\n");
 
-		if (a15106_reg & 0x1)
-			printf(" --- DMA Start Allowed \n");
-		else
-			printf(" --- DMA Start No Operation\n");
+        if (a15106_reg & 0x1)
+            printf(" --- DMA Start Allowed \n");
+        else
+            printf(" --- DMA Start No Operation\n");
 
-		*/
+        */
 	}
 }
 
@@ -2887,7 +2887,7 @@ static READ16_HANDLER( _32x_68k_a15180_r )
 
 static WRITE16_HANDLER( _32x_68k_a15180_w )
 {
-//	printf("_32x_68k_a15180_w (a15180) %04x %04x\n",data,mem_mask);
+//  printf("_32x_68k_a15180_w (a15180) %04x %04x\n",data,mem_mask);
 	if (ACCESSING_BITS_0_7)
 	{
 		_32x_videopriority = (data & 0x80) >> 7;
@@ -6722,46 +6722,46 @@ ROM_START( 32x_bios )
 //  ROM_LOAD( "32x_3d.bin",   0x000000,  0x006568, CRC(0171743e) SHA1(bbe6fec182baae5e4d47d263fae6b419db5366ae) )
 //  ROM_LOAD( "32x_h15.bin",  0x000000,  0x024564, CRC(938f4e1d) SHA1(ab7270121be53c6c82c4cb45f8f41dd24eb3a2a5) ) // test demo for 15bpp mode
 //  ROM_LOAD( "32x_spin.bin", 0x000000,  0x012c28, CRC(3d1d1191) SHA1(221a74408653e18cef8ce2f9b4d33ed93e4218b7) )
-//	ROM_LOAD( "32x_ecco.bin", 0x000000,  0x300000, CRC(b06178df) SHA1(10409f2245b058e8a32cba51e1ea391ca4480108) ) // fails after sega logo
+//  ROM_LOAD( "32x_ecco.bin", 0x000000,  0x300000, CRC(b06178df) SHA1(10409f2245b058e8a32cba51e1ea391ca4480108) ) // fails after sega logo
 
 	// actual games, for testing
 //  ROM_LOAD( "32x_knux.rom", 0x000000,  0x300000, CRC(d0b0b842) SHA1(0c2fff7bc79ed26507c08ac47464c3af19f7ced7) )
-//	ROM_LOAD( "32x_doom.bin", 0x000000,  0x300000, CRC(208332fd) SHA1(b68e9c7af81853b8f05b8696033dfe4c80327e38) ) // works!
-//	ROM_LOAD( "32x_koli.bin", 0x000000,  0x300000, CRC(20ca53ef) SHA1(191ae0b525ecf32664086d8d748e0b35f776ddfe) ) // works but needs sync ONLY on command writes / reads or game stutters?!
+//  ROM_LOAD( "32x_doom.bin", 0x000000,  0x300000, CRC(208332fd) SHA1(b68e9c7af81853b8f05b8696033dfe4c80327e38) ) // works!
+//  ROM_LOAD( "32x_koli.bin", 0x000000,  0x300000, CRC(20ca53ef) SHA1(191ae0b525ecf32664086d8d748e0b35f776ddfe) ) // works but needs sync ONLY on command writes / reads or game stutters?!
 //  ROM_LOAD( "32x_head.bin", 0x000000,  0x300000, CRC(ef5553ff) SHA1(4e872fbb44ecb2bd730abd8cc8f32f96b10582c0) ) // doesn't boot
-//	ROM_LOAD( "32x_pit.bin",  0x000000,  0x300000, CRC(f9126f15) SHA1(ee864d1677c6d976d0846eb5f8d8edb839acfb76) ) // ok, needs vram fill on intro screens tho?
-//	ROM_LOAD( "32x_spid.bin", 0x000000,  0x300000, CRC(29dce257) SHA1(7cc2ea1e10f110338ad880bd3e7ff3bce72e7e9e) ) // needs cmdint status reads, overwrite image support wrong? priority handling wrong??
-//	ROM_LOAD( "32x_carn.bin", 0x000000,  0x300000, CRC(7c7be6a2) SHA1(9a563ed821b483148339561ebd2b876efa58847b) ) // ?? doesn't boot
-//	ROM_LOAD( "32x_raw.bin",  0x000000,  0x400000, CRC(8eb7cd2c) SHA1(94b974f2f69f0c10bc18b349fa4ff95ca56fa47b) ) // needs cmdint status reads
-//	ROM_LOAD( "32x_darx.bin", 0x000000,  0x200000, CRC(22d7c906) SHA1(108b4ffed8643abdefa921cfb58389b119b47f3d) ) // ?? probably abuses the hardware, euro only ;D
-//	ROM_LOAD( "32x_prim.bin", 0x000000,  0x400000, CRC(e78a4d28) SHA1(5084dcca51d76173c383ab7d04cbc661673545f7) ) // needs tight sync or fails after sega logo - works with tight sync, but VERY slow
-//	ROM_LOAD( "32x_brut.bin", 0x000000,  0x300000, CRC(7a72c939) SHA1(40aa2c787f37772cdbd7280b8be06b15421fabae) ) // needs *very* heavy sync to work..
-//	ROM_LOAD( "32x_temp.bin", 0x000000,  0x300000, CRC(14e5c575) SHA1(6673ba83570b4f2c1b4a22415a56594c3cc6c6a9) ) // works (heavy slowdowns) RV emulation - really should hide 68k rom when transfer is off
+//  ROM_LOAD( "32x_pit.bin",  0x000000,  0x300000, CRC(f9126f15) SHA1(ee864d1677c6d976d0846eb5f8d8edb839acfb76) ) // ok, needs vram fill on intro screens tho?
+//  ROM_LOAD( "32x_spid.bin", 0x000000,  0x300000, CRC(29dce257) SHA1(7cc2ea1e10f110338ad880bd3e7ff3bce72e7e9e) ) // needs cmdint status reads, overwrite image support wrong? priority handling wrong??
+//  ROM_LOAD( "32x_carn.bin", 0x000000,  0x300000, CRC(7c7be6a2) SHA1(9a563ed821b483148339561ebd2b876efa58847b) ) // ?? doesn't boot
+//  ROM_LOAD( "32x_raw.bin",  0x000000,  0x400000, CRC(8eb7cd2c) SHA1(94b974f2f69f0c10bc18b349fa4ff95ca56fa47b) ) // needs cmdint status reads
+//  ROM_LOAD( "32x_darx.bin", 0x000000,  0x200000, CRC(22d7c906) SHA1(108b4ffed8643abdefa921cfb58389b119b47f3d) ) // ?? probably abuses the hardware, euro only ;D
+//  ROM_LOAD( "32x_prim.bin", 0x000000,  0x400000, CRC(e78a4d28) SHA1(5084dcca51d76173c383ab7d04cbc661673545f7) ) // needs tight sync or fails after sega logo - works with tight sync, but VERY slow
+//  ROM_LOAD( "32x_brut.bin", 0x000000,  0x300000, CRC(7a72c939) SHA1(40aa2c787f37772cdbd7280b8be06b15421fabae) ) // needs *very* heavy sync to work..
+//  ROM_LOAD( "32x_temp.bin", 0x000000,  0x300000, CRC(14e5c575) SHA1(6673ba83570b4f2c1b4a22415a56594c3cc6c6a9) ) // works (heavy slowdowns) RV emulation - really should hide 68k rom when transfer is off
 //  ROM_LOAD( "32x_vr.bin",   0x000000,  0x300000, CRC(7896b62e) SHA1(18dfdeb50780c2623e60a6587d7ed701a1cf81f1) ) // doesn't work
-//	ROM_LOAD( "32x_vf.bin",   0x000000,  0x400000, CRC(b5de9626) SHA1(f35754f4bfe3a53722d7a799f88face0fd13c424) ) // locks up when starting game
-//	ROM_LOAD( "32x_zaxx.bin", 0x000000,  0x200000, CRC(447d44be) SHA1(60c390f76c394bdd221936c21aecbf98aec49a3d) ) // nothing
-//	ROM_LOAD( "32x_trek.bin", 0x000000,  0x200000, CRC(dd9708b9) SHA1(e5248328b64a1ec4f1079c88ee53ef8d48e99e58) ) // boots, seems to run.. enables hints tho
-//	ROM_LOAD( "32x_sw.bin",   0x000000,  0x280000, CRC(2f16b44a) SHA1(f4ffaaf1d8330ea971643021be3f3203e1ea065d) ) // gets stuck in impossible (buggy?) 68k loop
-//	ROM_LOAD( "32x_wwfa.bin", 0x000000,  0x400000, CRC(61833503) SHA1(551eedc963cba0e1410b3d229b332ef9ea061469) ) // 32x game gfx missing, doesn't progress properly into game
-//	ROM_LOAD( "32x_shar.bin", 0x000000,  0x200000, CRC(86e7f989) SHA1(f32a52a7082761982024e40291dbd962a835b231) ) // doesn't boot
-//	ROM_LOAD( "32x_golf.bin", 0x000000,  0x300000, CRC(d3d0a2fe) SHA1(dc77b1e5c888c2c4284766915a5020bb14ee681d) ) // works
-//	ROM_LOAD( "32x_moto.bin", 0x000000,  0x200000, CRC(a21c5761) SHA1(5f1a107991aaf9eff0b3ce864b2e3151f56abe7b) ) // works (with sound!)
-//	ROM_LOAD( "32x_tmek.bin", 0x000000,  0x300000, CRC(66d2c48f) SHA1(173c8425921d83db3e8d181158e7599364f4c0f6) ) // works?
-//	ROM_LOAD( "32x_bcr.bin",  0x000000,  0x300000, CRC(936c3d27) SHA1(9b5fd499eaa442d48a2c97fceb1d505dc8e8ddff) ) // overwrite image problems, locks going ingame
-//	ROM_LOAD( "32x_blak.bin", 0x000000,  0x300000, CRC(d1a60a47) SHA1(4bf120cf056fe1417ca5b02fa0372ef33cb8ec11) ) // works?
-//	ROM_LOAD( "32x_shad.bin", 0x000000,  0x200000, CRC(60c49e4d) SHA1(561c8c63dbcabc0b1b6f31673ca75a0bde7abc72) ) // works (nasty sound)
-//	ROM_LOAD( "32x_abur.bin", 0x000000,  0x200000, CRC(204044c4) SHA1(9cf575feb036e2f26e78350154d5eb2fd3825325) ) // doesn't boot
-//	ROM_LOAD( "32x_darx.bin", 0x000000,  0x200000, CRC(22d7c906) SHA1(108b4ffed8643abdefa921cfb58389b119b47f3d) ) // doesn't boot (PAL only too)
-//	ROM_LOAD( "32x_fifa.bin", 0x000000,  0x300000, CRC(fb14a7c8) SHA1(131ebb717dee4dd1d8f5ab2b9393c23785d3a359) ) // crash
-//	ROM_LOAD( "32x_tman.bin", 0x000000,  0x400000, CRC(14eac7a6) SHA1(7588b0b8f4e93d5fdc920d3ab7e464154e423da9) ) // ok, some bad gfx
-//	ROM_LOAD( "32x_nba.bin",  0x000000,  0x400000, CRC(6b7994aa) SHA1(c8af3e74c49514669ba6652ec0c81bccf77873b6) ) // crash
-//	ROM_LOAD( "32x_nfl.bin",  0x000000,  0x300000, CRC(0bc7018d) SHA1(a0dc24f2f3a7fc5bfd12791cf25af7f7888843cf) ) // doesn't boot
-//	ROM_LOAD( "32x_rbi.bin",  0x000000,  0x200000, CRC(ff795fdc) SHA1(4f90433a4403fd74cafeea49272689046de4ae43) ) // doesn't boot
+//  ROM_LOAD( "32x_vf.bin",   0x000000,  0x400000, CRC(b5de9626) SHA1(f35754f4bfe3a53722d7a799f88face0fd13c424) ) // locks up when starting game
+//  ROM_LOAD( "32x_zaxx.bin", 0x000000,  0x200000, CRC(447d44be) SHA1(60c390f76c394bdd221936c21aecbf98aec49a3d) ) // nothing
+//  ROM_LOAD( "32x_trek.bin", 0x000000,  0x200000, CRC(dd9708b9) SHA1(e5248328b64a1ec4f1079c88ee53ef8d48e99e58) ) // boots, seems to run.. enables hints tho
+//  ROM_LOAD( "32x_sw.bin",   0x000000,  0x280000, CRC(2f16b44a) SHA1(f4ffaaf1d8330ea971643021be3f3203e1ea065d) ) // gets stuck in impossible (buggy?) 68k loop
+//  ROM_LOAD( "32x_wwfa.bin", 0x000000,  0x400000, CRC(61833503) SHA1(551eedc963cba0e1410b3d229b332ef9ea061469) ) // 32x game gfx missing, doesn't progress properly into game
+//  ROM_LOAD( "32x_shar.bin", 0x000000,  0x200000, CRC(86e7f989) SHA1(f32a52a7082761982024e40291dbd962a835b231) ) // doesn't boot
+//  ROM_LOAD( "32x_golf.bin", 0x000000,  0x300000, CRC(d3d0a2fe) SHA1(dc77b1e5c888c2c4284766915a5020bb14ee681d) ) // works
+//  ROM_LOAD( "32x_moto.bin", 0x000000,  0x200000, CRC(a21c5761) SHA1(5f1a107991aaf9eff0b3ce864b2e3151f56abe7b) ) // works (with sound!)
+//  ROM_LOAD( "32x_tmek.bin", 0x000000,  0x300000, CRC(66d2c48f) SHA1(173c8425921d83db3e8d181158e7599364f4c0f6) ) // works?
+//  ROM_LOAD( "32x_bcr.bin",  0x000000,  0x300000, CRC(936c3d27) SHA1(9b5fd499eaa442d48a2c97fceb1d505dc8e8ddff) ) // overwrite image problems, locks going ingame
+//  ROM_LOAD( "32x_blak.bin", 0x000000,  0x300000, CRC(d1a60a47) SHA1(4bf120cf056fe1417ca5b02fa0372ef33cb8ec11) ) // works?
+//  ROM_LOAD( "32x_shad.bin", 0x000000,  0x200000, CRC(60c49e4d) SHA1(561c8c63dbcabc0b1b6f31673ca75a0bde7abc72) ) // works (nasty sound)
+//  ROM_LOAD( "32x_abur.bin", 0x000000,  0x200000, CRC(204044c4) SHA1(9cf575feb036e2f26e78350154d5eb2fd3825325) ) // doesn't boot
+//  ROM_LOAD( "32x_darx.bin", 0x000000,  0x200000, CRC(22d7c906) SHA1(108b4ffed8643abdefa921cfb58389b119b47f3d) ) // doesn't boot (PAL only too)
+//  ROM_LOAD( "32x_fifa.bin", 0x000000,  0x300000, CRC(fb14a7c8) SHA1(131ebb717dee4dd1d8f5ab2b9393c23785d3a359) ) // crash
+//  ROM_LOAD( "32x_tman.bin", 0x000000,  0x400000, CRC(14eac7a6) SHA1(7588b0b8f4e93d5fdc920d3ab7e464154e423da9) ) // ok, some bad gfx
+//  ROM_LOAD( "32x_nba.bin",  0x000000,  0x400000, CRC(6b7994aa) SHA1(c8af3e74c49514669ba6652ec0c81bccf77873b6) ) // crash
+//  ROM_LOAD( "32x_nfl.bin",  0x000000,  0x300000, CRC(0bc7018d) SHA1(a0dc24f2f3a7fc5bfd12791cf25af7f7888843cf) ) // doesn't boot
+//  ROM_LOAD( "32x_rbi.bin",  0x000000,  0x200000, CRC(ff795fdc) SHA1(4f90433a4403fd74cafeea49272689046de4ae43) ) // doesn't boot
 	ROM_LOAD( "32x_wsb.bin",  0x000000,  0x300000, CRC(6de1bc75) SHA1(ab3026eae46a775adb7eaebc13702699557ddc41) ) // working - overwrite problems
-//	ROM_LOAD( "32x_mk2.bin",  0x000000,  0x400000, CRC(211085ce) SHA1(f75698de887d0ef980f73e35fc4615887a9ad58f) ) // working
-//	ROM_LOAD( "32x_sang.bin", 0x000000,  0x400000, CRC(e4de7625) SHA1(74a3ba27c55cff12409bf6c9324ece6247abbad1) ) // hangs after sega logo
+//  ROM_LOAD( "32x_mk2.bin",  0x000000,  0x400000, CRC(211085ce) SHA1(f75698de887d0ef980f73e35fc4615887a9ad58f) ) // working
+//  ROM_LOAD( "32x_sang.bin", 0x000000,  0x400000, CRC(e4de7625) SHA1(74a3ba27c55cff12409bf6c9324ece6247abbad1) ) // hangs after sega logo
 
-//	ROM_LOAD( "32x_mars.bin", 0x000000,  0x400000, CRC(8f7260fb) SHA1(7654c6d3cf2883c30df51cf38d723ab7902280c4) ) // official hw test program? reports lots of errors seems to get stuck on test 39?
+//  ROM_LOAD( "32x_mars.bin", 0x000000,  0x400000, CRC(8f7260fb) SHA1(7654c6d3cf2883c30df51cf38d723ab7902280c4) ) // official hw test program? reports lots of errors seems to get stuck on test 39?
 
 	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
 	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)

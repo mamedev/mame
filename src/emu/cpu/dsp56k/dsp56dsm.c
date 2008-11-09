@@ -344,10 +344,10 @@ CPU_DISASSEMBLE( dsp56k )
 			/* Now check it against all the other potential collisions */
 			/* This is necessary because "don't care bits" get in the way. */
 			/*
-			MOVE(M) : 	0000 0101 BBBB BBBB 0000 001W --0- -HHH : A-152
-			MOVE(C) : 	0000 0101 BBBB BBBB 0011 1WDD DDD0 ---- : A-144
-			MOVE : 		0000 0101 BBBB BBBB ---- HHHW 0001 0001 : A-128
-			*/
+            MOVE(M) :   0000 0101 BBBB BBBB 0000 001W --0- -HHH : A-152
+            MOVE(C) :   0000 0101 BBBB BBBB 0011 1WDD DDD0 ---- : A-144
+            MOVE :      0000 0101 BBBB BBBB ---- HHHW 0001 0001 : A-128
+            */
 			if (((op2 & 0xfe20) != 0x0200) &&
 				((op2 & 0xf810) != 0x3800) &&
 				((op2 & 0x00ff) != 0x0011))

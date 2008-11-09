@@ -59,7 +59,7 @@ static struct {
 	int feature;
 	int addr;
 	const char *name;
-} mem_name_feature[] = 
+} mem_name_feature[] =
 {
 	{ FEATURE_NONE, 0x00, "rb0r0" },
 	{ FEATURE_NONE, 0x01, "rb0r1" },
@@ -93,7 +93,7 @@ static struct {
 	{ FEATURE_NONE, 0x1d, "rb3r5" },
 	{ FEATURE_NONE, 0x1e, "rb3r6" },
 	{ FEATURE_NONE, 0x1f, "rb3r7" },
-	
+
 	{ FEATURE_NONE, 0x80, "p0"		},
 	{ FEATURE_NONE, 0x81, "sp"		},
 	{ FEATURE_NONE, 0x82, "dpl"		},
@@ -115,13 +115,13 @@ static struct {
 	{ FEATURE_NONE, 0xd0, "psw"		},
 	{ FEATURE_NONE, 0xe0, "acc"		},
 	{ FEATURE_NONE, 0xf0, "b"		},
-	
+
 	{ FEATURE_I8052, 0xc8, "t2con"	},
 	{ FEATURE_I8052, 0xca, "rcap2l"	},
 	{ FEATURE_I8052, 0xcb, "rcap2h"	},
 	{ FEATURE_I8052, 0xcc, "tl2"	},
 	{ FEATURE_I8052, 0xcd, "th2"	},
-	
+
 	{ FEATURE_I80C52, 0xb7, "iph"	},
 	{ FEATURE_I80C52, 0xa9, "saddr"	},
 	{ FEATURE_I80C52, 0xb9, "saden"	},
@@ -143,7 +143,7 @@ static struct {
 	{ FEATURE_I83C751, 	0xf8, "i2sta"	},	/* read only */
 
 	/* bit addresses */
-	
+
 	{ FEATURE_NONE, 0x188, "it0"		},
 	{ FEATURE_NONE, 0x189, "ie0"		},
 	{ FEATURE_NONE, 0x18a, "it1"		},
@@ -184,7 +184,7 @@ static struct {
 	{ FEATURE_I8052, 0x1ad, "et2"		},
 
 	/* FIXME: port 3 - depends on external circuits and not really
-	 * implemented in the core. TBD */
+     * implemented in the core. TBD */
 	{ FEATURE_NONE, 0x1b0, "rxd"		},
 	{ FEATURE_NONE, 0x1b1, "txd"		},
 	{ FEATURE_NONE, 0x1b2, "int0"		},
@@ -224,37 +224,37 @@ static struct {
 	{ FEATURE_NONE, 0x1d6, "ac"			},
 	{ FEATURE_NONE, 0x1d7, "cy"			},
 
-	{ FEATURE_DS5002FP, 0x1d8, "rg0"	}, 
-	{ FEATURE_DS5002FP, 0x1d9, "rpc"	}, 
-	{ FEATURE_DS5002FP, 0x1da, "dma"	}, 
-	{ FEATURE_DS5002FP, 0x1db, "ibi"	}, 
-	{ FEATURE_DS5002FP, 0x1dc, "ae"		}, 
-	{ FEATURE_DS5002FP, 0x1dd, "exbs"	}, 
-	{ FEATURE_DS5002FP, 0x1de, "d8.6"	}, 
+	{ FEATURE_DS5002FP, 0x1d8, "rg0"	},
+	{ FEATURE_DS5002FP, 0x1d9, "rpc"	},
+	{ FEATURE_DS5002FP, 0x1da, "dma"	},
+	{ FEATURE_DS5002FP, 0x1db, "ibi"	},
+	{ FEATURE_DS5002FP, 0x1dc, "ae"		},
+	{ FEATURE_DS5002FP, 0x1dd, "exbs"	},
+	{ FEATURE_DS5002FP, 0x1de, "d8.6"	},
 	{ FEATURE_DS5002FP, 0x1df, "rnr"	},
 
-	{ FEATURE_I83C751, 0x1d8, "ct0"		}, 
-	{ FEATURE_I83C751, 0x1d9, "ct1"		}, 
-	{ FEATURE_I83C751, 0x1da, "i2cfg.2"	}, 
-	{ FEATURE_I83C751, 0x1db, "i2cfg.3"	}, 
-	{ FEATURE_I83C751, 0x1dc, "tirun"	}, 
-	{ FEATURE_I83C751, 0x1dd, "clrti"	}, 
-	{ FEATURE_I83C751, 0x1de, "masterq"	}, 
+	{ FEATURE_I83C751, 0x1d8, "ct0"		},
+	{ FEATURE_I83C751, 0x1d9, "ct1"		},
+	{ FEATURE_I83C751, 0x1da, "i2cfg.2"	},
+	{ FEATURE_I83C751, 0x1db, "i2cfg.3"	},
+	{ FEATURE_I83C751, 0x1dc, "tirun"	},
+	{ FEATURE_I83C751, 0x1dd, "clrti"	},
+	{ FEATURE_I83C751, 0x1de, "masterq"	},
 	{ FEATURE_I83C751, 0x1df, "slaven"	},
 
-	{ FEATURE_I83C751, 0x1f8, "xstp"	}, 
-	{ FEATURE_I83C751, 0x1f9, "xstr"	}, 
-	{ FEATURE_I83C751, 0x1fa, "makstp"	}, 
-	{ FEATURE_I83C751, 0x1fb, "makstr"	}, 
-	{ FEATURE_I83C751, 0x1fc, "xactv"	}, 
-	{ FEATURE_I83C751, 0x1fd, "xdata"	}, 
-	{ FEATURE_I83C751, 0x1fe, "idle"	}, 
+	{ FEATURE_I83C751, 0x1f8, "xstp"	},
+	{ FEATURE_I83C751, 0x1f9, "xstr"	},
+	{ FEATURE_I83C751, 0x1fa, "makstp"	},
+	{ FEATURE_I83C751, 0x1fb, "makstr"	},
+	{ FEATURE_I83C751, 0x1fc, "xactv"	},
+	{ FEATURE_I83C751, 0x1fd, "xdata"	},
+	{ FEATURE_I83C751, 0x1fe, "idle"	},
 	{ FEATURE_I83C751, 0x1ff, "i2sta.7"	},
 
-	/* unkown 
-	 * "ibf",    "obf",    "idsm",   "obfc",    e8 - eb 
-	 * "ma0",    "ma1",    "mb0",    "mb1",     ec - ef 
-	 */
+	/* unkown
+     * "ibf",    "obf",    "idsm",   "obfc",    e8 - eb
+     * "ma0",    "ma1",    "mb0",    "mb1",     ec - ef
+     */
 
 	{ -1 }
 };
@@ -263,7 +263,7 @@ static void init_mem_names(int feature_set, const char **mem_names)
 {
 	int i;
 	int feature;
-	
+
 	/* Set defaults / i8051 */
 	for (i = 0; feature = mem_name_feature[i].feature, feature >= 0; i++)
 	{
@@ -1158,7 +1158,7 @@ CPU_DISASSEMBLE( i8051 )
 {
 	static const char *mem_names[0x200];
 	static int mem_names_initialized = 0;
-	
+
 	if (!mem_names_initialized)
 	{
         init_mem_names(	FEATURE_NONE, mem_names);
@@ -1171,7 +1171,7 @@ CPU_DISASSEMBLE( i8052 )
 {
 	static const char *mem_names[0x200];
 	static int mem_names_initialized = 0;
-	
+
 	if (!mem_names_initialized)
 	{
         init_mem_names(	FEATURE_I8052, mem_names);
@@ -1184,7 +1184,7 @@ CPU_DISASSEMBLE( i80c51 )
 {
 	static const char *mem_names[0x200];
 	static int mem_names_initialized = 0;
-	
+
 	if (!mem_names_initialized)
 	{
         init_mem_names(	FEATURE_CMOS, mem_names);
@@ -1197,7 +1197,7 @@ CPU_DISASSEMBLE( i80c52 )
 {
 	static const char *mem_names[0x200];
 	static int mem_names_initialized = 0;
-	
+
 	if (!mem_names_initialized)
 	{
         init_mem_names(	FEATURE_I8052 | FEATURE_CMOS | FEATURE_I80C52, mem_names);
@@ -1210,7 +1210,7 @@ CPU_DISASSEMBLE( ds5002fp )
 {
 	static const char *mem_names[0x200];
 	static int mem_names_initialized = 0;
-	
+
 	if (!mem_names_initialized)
 	{
         init_mem_names(	FEATURE_DS5002FP | FEATURE_CMOS, mem_names);

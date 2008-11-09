@@ -5146,7 +5146,7 @@ WRITE32_HANDLER ( stv_vdp2_cram_w )
 	int r,g,b;
 	COMBINE_DATA(&stv_vdp2_cram[offset]);
 
-//	popmessage("%01x\n",STV_VDP2_CRMD);
+//  popmessage("%01x\n",STV_VDP2_CRMD);
 
 	switch( STV_VDP2_CRMD )
 	{

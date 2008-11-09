@@ -97,14 +97,14 @@ static void *token;
 static READ8_HANDLER( m6509_read_00000 )
 {
 	m6509_Regs *m6509 = token;
-	
+
 	return m6509->pc_bank.b.h2;
 }
 
 static READ8_HANDLER( m6509_read_00001 )
 {
 	m6509_Regs *m6509 = token;
-	
+
 	return m6509->ind_bank.b.h2;
 }
 
@@ -112,7 +112,7 @@ static WRITE8_HANDLER( m6509_write_00000 )
 {
 	m6509_Regs *m6509 = token;
 	m6509_Regs *m6502 = m6509;
-	
+
 	m6509->pc_bank.b.h2=data&0xf;
 	m6509->pc.w.h=m6509->pc_bank.w.h;
 	change_pc(PCD);
@@ -122,7 +122,7 @@ static WRITE8_HANDLER( m6509_write_00000 )
 static WRITE8_HANDLER( m6509_write_00001 )
 {
 	m6509_Regs *m6509 = token;
-	
+
 	m6509->ind_bank.b.h2=data&0xf;
 }
 
@@ -137,9 +137,9 @@ static WRITE8_HANDLER( default_wdmem_id ) { program_write_byte_8le(offset, data)
 static CPU_INIT( m6509 )
 {
 	m6509_Regs *m6509 = device->token;
-	
+
 	token = device->token;	// temporary
-	
+
 	m6509->rdmem_id = default_rdmem_id;
 	m6509->wrmem_id = default_wdmem_id;
 	m6509->irq_callback = irqcallback;
@@ -150,7 +150,7 @@ static CPU_RESET( m6509 )
 {
 	m6509_Regs *m6509 = device->token;
 	m6509_Regs *m6502 = m6509;
-	
+
 	m6509->insn = insn6509;
 
 	m6509->pc_bank.d=m6509->ind_bank.d=0;
@@ -182,7 +182,7 @@ static CPU_GET_CONTEXT( m6509 )
 static CPU_SET_CONTEXT( m6509 )
 {
 	m6509_Regs *m6502;
-	
+
 	if( src )
 	{
 		token = src;
@@ -219,7 +219,7 @@ static CPU_EXECUTE( m6509 )
 {
 	m6509_Regs *m6502 = device->token;
 	m6509_Regs *m6509 = m6502;
-	
+
 	m6502->icount = cycles;
 
 	change_pc(PCD);
@@ -265,7 +265,7 @@ static CPU_EXECUTE( m6509 )
 static void m6509_set_irq_line(m6509_Regs *m6509, int irqline, int state)
 {
 	m6509_Regs *m6502 = m6509;
-	
+
 	if (irqline == INPUT_LINE_NMI)
 	{
 		if (m6509->nmi_state == state) return;
@@ -315,7 +315,7 @@ static CPU_SET_INFO( m6509 )
 {
 	m6509_Regs *m6509 = token;
 	m6509_Regs *m6502 = m6509;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -352,7 +352,7 @@ CPU_GET_INFO( m6509 )
 {
 	m6509_Regs *m6502 = token;
 	m6509_Regs *m6509 = m6502;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

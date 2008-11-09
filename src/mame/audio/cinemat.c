@@ -9,7 +9,7 @@
     6/27/99 Jim Hernandez -- 1st Attempt at Fixing Drone Star Castle sound and
                              pitch adjustments.
     6/30/99 MLR added Rip Off, Solar Quest, Armor Attack (no samples yet)
-    11/04/08 Jim Hernandez -- Fixed Drone Star Castle sound again. It was 
+    11/04/08 Jim Hernandez -- Fixed Drone Star Castle sound again. It was
                               broken for a long time due to some changes.
 
     Bugs: Sometimes the death explosion (small explosion) does not trigger.

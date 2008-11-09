@@ -141,11 +141,11 @@ struct _m4510_Regs {
 	UINT8	irq_state;
 	UINT16  low, high;
 	UINT32	mem[8];
-	
+
 	cpu_irq_callback irq_callback;
 	const device_config *device;
 	int 	icount;
-	
+
 	read8_machine_func rdmem_id;					/* readmem callback for indexed instructions */
 	write8_machine_func wrmem_id;				/* writemem callback for indexed instructions */
 
@@ -179,20 +179,20 @@ INLINE int m4510_cpu_readop_arg(m4510_Regs *m4510)
 static READ8_HANDLER( default_rdmem_id )
 {
 	m4510_Regs *m4510 = token;
-	return program_read_byte_8le(M4510_MEM(offset)); 
+	return program_read_byte_8le(M4510_MEM(offset));
 }
-static WRITE8_HANDLER( default_wrmem_id ) 
+static WRITE8_HANDLER( default_wrmem_id )
 {
 	m4510_Regs *m4510 = token;
-	program_write_byte_8le(M4510_MEM(offset), data); 
+	program_write_byte_8le(M4510_MEM(offset), data);
 }
 
 static CPU_INIT( m4510 )
 {
 	m4510_Regs *m4510 = device->token;
-	
+
 	token = device->token;
-	
+
 	m4510->interrupt_inhibit = 0;
 	m4510->rdmem_id = default_rdmem_id;
 	m4510->wrmem_id = default_wrmem_id;
@@ -203,7 +203,7 @@ static CPU_INIT( m4510 )
 static CPU_RESET( m4510 )
 {
 	m4510_Regs *m4510 = device->token;
-	
+
 	m4510->insn = insn4510;
 
 	/* wipe out the rest of the m65ce02 structure */
@@ -276,7 +276,7 @@ INLINE void m4510_take_irq(m4510_Regs *m4510)
 static CPU_EXECUTE( m4510 )
 {
 	m4510_Regs *m4510 = token;
-	
+
 	m4510->icount = cycles;
 
 	CHANGE_PC;
@@ -378,7 +378,7 @@ static READ8_HANDLER( m4510_read_0000 )
 static WRITE8_HANDLER( m4510_write_0000 )
 {
 	m4510_Regs *m4510 = token;
-	
+
 	switch(offset)
 	{
 		case 0x0000:	/* DDR */
@@ -400,7 +400,7 @@ ADDRESS_MAP_END
 static CPU_TRANSLATE( m4510 )
 {
 	m4510_Regs *m4510 = token;
-	
+
 	if (space == ADDRESS_SPACE_PROGRAM)
 		*address = M4510_MEM(*address);
 	return TRUE;
@@ -413,7 +413,7 @@ static CPU_TRANSLATE( m4510 )
 static CPU_SET_INFO( m4510 )
 {
 	m4510_Regs *m4510 = token;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -460,7 +460,7 @@ static CPU_SET_INFO( m4510 )
 CPU_GET_INFO( m4510 )
 {
 	m4510_Regs *m4510 = token;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

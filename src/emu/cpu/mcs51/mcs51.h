@@ -122,7 +122,7 @@ CPU_GET_INFO( at89c4051 );
 /*
  * The DS5002FP has 2 16 bits data address buses (the byte-wide bus and the expanded bus). The exact memory position accessed depends on the
  * partition mode, the memory range and the expanded bus select. The partition mode and the expanded bus select can be changed at any time.
- * 
+ *
  * In order to simplify memory mapping to the data address bus, the following address map is assumed for partitioned mode:
 
  * 0x00000-0x0ffff -> data memory on the expanded bus
@@ -131,7 +131,7 @@ CPU_GET_INFO( at89c4051 );
  * For non-partitioned mode the following memory map is assumed:
 
  * 0x0000-0xffff -> data memory (the bus used to access it does not matter)
- * 
+ *
  * Internal ram 128k and security features
  */
 
