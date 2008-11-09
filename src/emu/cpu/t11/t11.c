@@ -292,7 +292,7 @@ static CPU_INIT( t11 )
 		0xc000, 0x8000, 0x4000, 0x2000,
 		0x1000, 0x0000, 0xf600, 0xf400
 	};
-	const struct t11_setup *setup = config;
+	const struct t11_setup *setup = device->static_config;
 
 	t11.initial_pc = initial_pc[setup->mode >> 13];
 	t11.irq_callback = irqcallback;

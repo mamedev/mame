@@ -1280,7 +1280,7 @@ static void register_for_save_state(int index)
 
 static CPU_INIT( tms99xx )
 {
-	const TMS99XX_RESET_PARAM *param = (const TMS99XX_RESET_PARAM *) config;
+	const TMS99XX_RESET_PARAM *param = (const TMS99XX_RESET_PARAM *) device->static_config;
 
 	register_for_save_state(index);
 

@@ -127,10 +127,10 @@ static void tx0_write(offs_t address, int data)
 		;
 }
 
-static void tx0_init_common(int is_64kw, const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback)
+static void tx0_init_common(int is_64kw, const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
 {
 	int i;
-	tx0_reset_param_t *param = (tx0_reset_param_t *) config;
+	tx0_reset_param_t *param = (tx0_reset_param_t *) device->static_config;
 
 	/* clean-up */
 	memset (&tx0, 0, sizeof (tx0));
@@ -147,12 +147,12 @@ static void tx0_init_common(int is_64kw, const device_config *device, int index,
 
 static CPU_INIT( tx0_64kw )
 {
-	tx0_init_common(1, device, index, clock, config, irqcallback);
+	tx0_init_common(1, device, index, clock, irqcallback);
 }
 
 static CPU_INIT( tx0_8kw)
 {
-	tx0_init_common(0, device, index, clock, config, irqcallback);
+	tx0_init_common(0, device, index, clock, irqcallback);
 }
 
 static CPU_RESET( tx0 )

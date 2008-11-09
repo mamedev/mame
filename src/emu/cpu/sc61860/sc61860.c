@@ -88,7 +88,7 @@ static CPU_RESET( sc61860 )
 
 static CPU_INIT( sc61860 )
 {
-	sc61860.config = (sc61860_cpu_core *) config;
+	sc61860.config = (sc61860_cpu_core *) device->static_config;
 	timer_pulse(ATTOTIME_IN_HZ(500), NULL, 0, sc61860_2ms_tick);
 }
 

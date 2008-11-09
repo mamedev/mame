@@ -81,9 +81,9 @@ UINT8* sm8500_internal_ram( void )
 static CPU_INIT( sm8500 ) {
 	regs.irq_callback = irqcallback;
 	regs.device = device;
-	if ( config != NULL ) {
-		regs.config.handle_dma = ((SM8500_CONFIG *)config)->handle_dma;
-		regs.config.handle_timers = ((SM8500_CONFIG *)config)->handle_timers;
+	if ( device->static_config != NULL ) {
+		regs.config.handle_dma = ((SM8500_CONFIG *)device->static_config)->handle_dma;
+		regs.config.handle_timers = ((SM8500_CONFIG *)device->static_config)->handle_timers;
 	} else {
 		regs.config.handle_dma = NULL;
 		regs.config.handle_timers = NULL;

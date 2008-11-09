@@ -18,7 +18,6 @@
 #include "cpuint.h"
 #include "cpuexec.h"
 #include "watchdog.h"
-#include "mame.h"
 #include "state.h"
 
 
@@ -119,7 +118,7 @@ enum
 	CPUINFO_PTR_SET_INFO = CPUINFO_PTR_FIRST,			/* R/O: void (*set_info)(UINT32 state, INT64 data, void *ptr) */
 	CPUINFO_PTR_GET_CONTEXT,							/* R/O: void (*get_context)(void *buffer) */
 	CPUINFO_PTR_SET_CONTEXT,							/* R/O: void (*set_context)(void *buffer) */
-	CPUINFO_PTR_INIT,									/* R/O: void (*init)(int index, int clock, const void *config, int (*irqcallback)(int)) */
+	CPUINFO_PTR_INIT,									/* R/O: void (*init)(int index, int clock, int (*irqcallback)(int)) */
 	CPUINFO_PTR_RESET,									/* R/O: void (*reset)(void) */
 	CPUINFO_PTR_EXIT,									/* R/O: void (*exit)(void) */
 	CPUINFO_PTR_EXECUTE,								/* R/O: int (*execute)(int cycles) */
@@ -228,8 +227,8 @@ enum
 #define CPU_SET_CONTEXT_CALL(name)	CPU_SET_CONTEXT_NAME(name)(buffer)
 
 #define CPU_INIT_NAME(name)			cpu_init_##name
-#define CPU_INIT(name)				void CPU_INIT_NAME(name)(const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback)
-#define CPU_INIT_CALL(name)			CPU_INIT_NAME(name)(device, index, clock, config, irqcallback)
+#define CPU_INIT(name)				void CPU_INIT_NAME(name)(const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
+#define CPU_INIT_CALL(name)			CPU_INIT_NAME(name)(device, index, clock, irqcallback)
 
 #define CPU_RESET_NAME(name)		cpu_reset_##name
 #define CPU_RESET(name)				void CPU_RESET_NAME(name)(const device_config *device)
@@ -292,7 +291,7 @@ typedef void (*cpu_get_info_func)(UINT32 state, cpuinfo *info);
 typedef void (*cpu_set_info_func)(UINT32 state, cpuinfo *info);
 typedef void (*cpu_get_context_func)(void *buffer);
 typedef void (*cpu_set_context_func)(void *buffer);
-typedef void (*cpu_init_func)(const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback);
+typedef void (*cpu_init_func)(const device_config *device, int index, int clock, cpu_irq_callback irqcallback);
 typedef void (*cpu_reset_func)(const device_config *device);
 typedef void (*cpu_exit_func)(const device_config *device);
 typedef int	(*cpu_execute_func)(const device_config *device, int cycles);

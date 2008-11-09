@@ -286,7 +286,7 @@ struct _cpuintrf_data
 	cpu_interface intf;		 		/* copy of the interface data */
 	cpu_type cputype; 					/* type index of this CPU */
 	int family; 					/* family index of this CPU */
-	device_config device;			/* dummy device for now */
+	device_config *device;			/* dummy device for now */
 	int *icount;
 };
 
@@ -972,7 +972,7 @@ INLINE void set_cpu_context(running_machine *machine, int cpunum)
 
 	/* if we need to change contexts, save the one that was there */
 	if (oldcontext != cpunum && oldcontext != -1)
-		(*cpu[oldcontext].intf.get_context)(cpu[oldcontext].device.token);
+		(*cpu[oldcontext].intf.get_context)(cpu[oldcontext].device->token);
 
 	/* swap memory spaces */
 	activecpu = cpunum;
@@ -981,7 +981,7 @@ INLINE void set_cpu_context(running_machine *machine, int cpunum)
 	/* if the new CPU's context is not swapped in, do it now */
 	if (oldcontext != cpunum)
 	{
-		(*cpu[cpunum].intf.set_context)(cpu[cpunum].device.token);
+		(*cpu[cpunum].intf.set_context)(cpu[cpunum].device->token);
 		cpu_active_context[newfamily] = cpunum;
 	}
 }
@@ -1185,15 +1185,21 @@ int cpuintrf_init_cpu(int cpunum, cpu_type cputype, int clock, const void *confi
 	cpuinfo info;
 
 	/* create a fake device for the CPU */
-	memset(&cpu[cpunum].device, 0, sizeof(cpu[cpunum].device));
-	cpu[cpunum].device.machine = Machine;
-	cpu[cpunum].device.token = auto_malloc(cpu[cpunum].intf.context_size);
-	memset(cpu[cpunum].device.token, 0, cpu[cpunum].intf.context_size);
+	cpu[cpunum].device = auto_malloc(sizeof(*cpu[cpunum].device) + strlen(Machine->config->cpu[cpunum].tag));
+	memset(cpu[cpunum].device, 0, sizeof(*cpu[cpunum].device));
+	strcpy(cpu[cpunum].device->tag, Machine->config->cpu[cpunum].tag);
+	cpu[cpunum].device->static_config = config;
+	cpu[cpunum].device->machine = Machine;
+	cpu[cpunum].device->token = auto_malloc(cpu[cpunum].intf.context_size);
+	memset(cpu[cpunum].device->token, 0, cpu[cpunum].intf.context_size);
+	
+	/* put a pointer to the device in the machine */
+	Machine->cpu[cpunum] = cpu[cpunum].device;
 
 	/* initialize the CPU and stash the context */
 	activecpu = cpunum;
-	(*cpu[cpunum].intf.init)(&cpu[cpunum].device, cpunum, clock, config, irqcallback);
-	(*cpu[cpunum].intf.get_context)(cpu[cpunum].device.token);
+	(*cpu[cpunum].intf.init)(cpu[cpunum].device, cpunum, clock, irqcallback);
+	(*cpu[cpunum].intf.get_context)(cpu[cpunum].device->token);
 	activecpu = -1;
 
 	/* get the instruction count pointer */
@@ -1221,7 +1227,7 @@ void cpuintrf_exit_cpu(int cpunum)
 	{
 		/* switch contexts to the CPU during the exit */
 		cpuintrf_push_context(cpunum);
-		(*cpu[cpunum].intf.exit)(&cpu[cpunum].device);
+		(*cpu[cpunum].intf.exit)(cpu[cpunum].device);
 		cpuintrf_pop_context();
 	}
 }
@@ -1549,7 +1555,7 @@ int cpunum_execute(int cpunum, int cycles)
 	cpuintrf_push_context(cpunum);
 	executingcpu = cpunum;
 	memory_set_opbase(activecpu_get_physical_pc_byte());
-	ran = (*cpu[cpunum].intf.execute)(&cpu[cpunum].device, cycles);
+	ran = (*cpu[cpunum].intf.execute)(cpu[cpunum].device, cycles);
 	executingcpu = -1;
 	cpuintrf_pop_context();
 	return ran;
@@ -1565,7 +1571,7 @@ void cpunum_reset(int cpunum)
 	VERIFY_CPUNUM(cpunum_reset);
 	cpuintrf_push_context(cpunum);
 	memory_set_opbase(0);
-	(*cpu[cpunum].intf.reset)(&cpu[cpunum].device);
+	(*cpu[cpunum].intf.reset)(cpu[cpunum].device);
 	cpuintrf_pop_context();
 }
 
@@ -1605,7 +1611,7 @@ void cpunum_write_byte(int cpunum, offs_t address, UINT8 data)
 void *cpunum_get_context_ptr(int cpunum)
 {
 	VERIFY_CPUNUM(cpunum_get_context_ptr);
-	return (cpu_active_context[cpu[cpunum].family] == cpunum) ? NULL : cpu[cpunum].device.token;
+	return (cpu_active_context[cpu[cpunum].family] == cpunum) ? NULL : cpu[cpunum].device->token;
 }
 
 

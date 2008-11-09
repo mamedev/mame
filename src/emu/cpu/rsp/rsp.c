@@ -347,7 +347,7 @@ static CPU_INIT( rsp )
 {
     int regIdx;
     int accumIdx;
-	configdata = (rsp_config *)config;
+	configdata = (rsp_config *)device->static_config;
 
 	if (LOG_INSTRUCTION_EXECUTION)
 		exec_output = fopen("rsp_execute.txt", "wt");

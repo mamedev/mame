@@ -20,7 +20,6 @@
 ***************************************************************************/
 
 #include "devintrf.h"
-#include "mamecore.h"
 
 #define DRIVER_INIT(name)			void driver_init_##name(running_machine *machine)
 #define DRIVER_INIT_CALL(name)		driver_init_##name(machine)

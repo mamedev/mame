@@ -117,7 +117,7 @@ static CPU_SET_CONTEXT( mb86233 )
 
 static CPU_INIT( mb86233 )
 {
-	mb86233_cpu_core * _config = (mb86233_cpu_core *)config;
+	mb86233_cpu_core * _config = (mb86233_cpu_core *)device->static_config;
 	(void)index;
 	(void)clock;
 	(void)irqcallback;

@@ -1901,8 +1901,8 @@ static void z180_write_iolines(UINT32 data)
 static CPU_INIT( z180 )
 {
 	Z180.daisy = NULL;
-	if (config)
-		Z180.daisy = z80daisy_init(Machine, Machine->config->cpu[cpu_getactivecpu()].tag, config);
+	if (device->static_config)
+		Z180.daisy = z80daisy_init(Machine, Machine->config->cpu[cpu_getactivecpu()].tag, device->static_config);
 	Z180.irq_callback = irqcallback;
 	Z180.device = device;
 

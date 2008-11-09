@@ -93,7 +93,7 @@ static LH5801_Regs lh5801= { 0 };
 static CPU_INIT( lh5801 )
 {
 	memset(&lh5801, 0, sizeof(lh5801));
-	lh5801.config = (const lh5801_cpu_core *) config;
+	lh5801.config = (const lh5801_cpu_core *) device->static_config;
 }
 
 static CPU_RESET( lh5801 )

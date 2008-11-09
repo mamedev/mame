@@ -413,7 +413,7 @@ static CPU_SET_CONTEXT( tms32031 )
 
 static CPU_INIT( tms32031 )
 {
-	const struct tms32031_config *configdata = config;
+	const struct tms32031_config *configdata = device->static_config;
 	int i;
 	char namebuf[30];
 

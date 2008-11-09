@@ -976,7 +976,7 @@ static void ppc_init(void)
 #if HAS_PPC403
 static CPU_INIT( ppc403 )
 {
-	const ppc_config *configdata = config;
+	const ppc_config *configdata = device->static_config;
 
 	ppc_init();
 
@@ -1024,7 +1024,7 @@ static CPU_EXIT( ppc403 )
 #if (HAS_PPC603)
 static CPU_INIT( ppc603 )
 {
-	const ppc_config *configdata = config;
+	const ppc_config *configdata = device->static_config;
 	int pll_config = 0;
 	float multiplier;
 	int i ;
@@ -1170,7 +1170,7 @@ static CPU_EXIT( ppc603 )
 static CPU_INIT( ppc602 )
 {
 	float multiplier;
-	const ppc_config *configdata = config;
+	const ppc_config *configdata = device->static_config;
 
 	int i ;
 
@@ -1315,7 +1315,7 @@ static void mpc8240_tlbld(UINT32 op)
 static CPU_INIT( mpc8240 )
 {
 	float multiplier;
-	const ppc_config *configdata = config;
+	const ppc_config *configdata = device->static_config;
 
 	int i ;
 
@@ -1447,7 +1447,7 @@ static CPU_EXIT( mpc8240 )
 #if (HAS_PPC601)
 static CPU_INIT( ppc601 )
 {
-	const ppc_config *configdata = config;
+	const ppc_config *configdata = device->static_config;
 	float multiplier;
 	int i ;
 
@@ -1576,7 +1576,7 @@ static CPU_EXIT( ppc601 )
 #if (HAS_PPC604)
 static CPU_INIT( ppc604 )
 {
-	const ppc_config *configdata = config;
+	const ppc_config *configdata = device->static_config;
 	float multiplier;
 	int i ;
 

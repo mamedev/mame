@@ -181,7 +181,7 @@ static const int CyclesCB[256] =
 
 static CPU_INIT( lr35902 )
 {
-	Regs.w.config = (const lr35902_cpu_core *) config;
+	Regs.w.config = (const lr35902_cpu_core *) device->static_config;
 	Regs.w.irq_callback = irqcallback;
 	Regs.w.device = device;
 }

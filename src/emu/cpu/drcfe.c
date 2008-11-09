@@ -19,6 +19,7 @@
 
 #include <stddef.h>
 #include "cpuintrf.h"
+#include "mame.h"
 #include "drcfe.h"
 
 

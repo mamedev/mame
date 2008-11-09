@@ -633,7 +633,7 @@ static void check_interrupt(void)
 
 static CPU_INIT( tms34010 )
 {
-	const tms34010_config *configdata = config ? config : &default_config;
+	const tms34010_config *configdata = device->static_config ? device->static_config : &default_config;
 
 	external_host_access = FALSE;
 

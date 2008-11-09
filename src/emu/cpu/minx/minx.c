@@ -112,7 +112,7 @@ static CPU_INIT( minx )
 {
 	regs.irq_callback = irqcallback;
 	regs.device = device;
-	if ( config != NULL )
+	if ( device->static_config != NULL )
 	{
 	}
 	else

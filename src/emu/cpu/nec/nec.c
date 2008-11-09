@@ -1108,9 +1108,9 @@ static CPU_DISASSEMBLE( nec )
 	return necv_dasm_one(buffer, pc, oprom, I.config);
 }
 
-static void nec_init(const device_config *device, int index, int clock, const void *_config, cpu_irq_callback irqcallback, int type)
+static void nec_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, int type)
 {
-	const nec_config *config = _config ? _config : &default_config;
+	const nec_config *config = device->static_config ? device->static_config : &default_config;
 
 
 	static const char *const names[]={"V20","V30","V33"};
@@ -1262,7 +1262,7 @@ static CPU_EXECUTE( necv )
 #if (HAS_V20||HAS_V25)
 static CPU_INIT( v20 )
 {
-	nec_init(device, index, clock, config, irqcallback, 0);
+	nec_init(device, index, clock, irqcallback, 0);
 	configure_memory_8bit();
 	I.chip_type=V20;
 	I.prefetch_size = 4;		/* 3 words */
@@ -1273,7 +1273,7 @@ static CPU_INIT( v20 )
 #if (HAS_V30||HAS_V35)
 static CPU_INIT( v30 )
 {
-	nec_init(device, index, clock, config, irqcallback, 1);
+	nec_init(device, index, clock, irqcallback, 1);
 	configure_memory_16bit();
 	I.chip_type=V30;
 	I.prefetch_size = 6;		/* 3 words */
@@ -1285,7 +1285,7 @@ static CPU_INIT( v30 )
 #if (HAS_V33)
 static CPU_INIT( v33 )
 {
-	nec_init(device, index, clock, config, irqcallback, 2);
+	nec_init(device, index, clock, irqcallback, 2);
 	I.chip_type=V33;
 	I.prefetch_size = 6;		/* ???? */
 	I.prefetch_cycles = 2;		/* two cycles per byte / four per word */

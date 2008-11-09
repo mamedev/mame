@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "ppccom.h"
+#include "mame.h"
 #include "deprecat.h"
 
 
@@ -183,8 +184,10 @@ INLINE void set_decrementer(powerpc_state *ppc, UINT32 newdec)
     structure based on the configured type
 -------------------------------------------------*/
 
-void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, const device_config *device, int index, int clock, const powerpc_config *config, cpu_irq_callback irqcallback)
+void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_divisor, const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
 {
+	const powerpc_config *config = device->static_config;
+
 	/* initialize based on the config */
 	memset(ppc, 0, sizeof(*ppc));
 	ppc->cpunum = cpu_getactivecpu();

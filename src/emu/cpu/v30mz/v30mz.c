@@ -926,7 +926,7 @@ static CPU_DISASSEMBLE( nec )
 	return necv_dasm_one(buffer, pc, oprom);
 }
 
-static void nec_init(const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback, int type)
+static void nec_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, int type)
 {
 	static const char *const names[]={"V20","V30","V33","V30MZ"};
 
@@ -953,7 +953,7 @@ static void nec_init(const device_config *device, int index, int clock, const vo
 	I.device = device;
 }
 
-static CPU_INIT( v30mz ) { nec_init(device, index, clock, config, irqcallback, 3); }
+static CPU_INIT( v30mz ) { nec_init(device, index, clock, irqcallback, 3); }
 static CPU_EXECUTE( v30mz )
 {
 	nec_ICount=cycles;

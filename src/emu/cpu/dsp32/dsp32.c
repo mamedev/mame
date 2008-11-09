@@ -349,7 +349,7 @@ static CPU_SET_CONTEXT( dsp32c )
 
 static CPU_INIT( dsp32c )
 {
-	const dsp32_config *configdata = config;
+	const dsp32_config *configdata = device->static_config;
 
 	/* copy in config data */
 	if (configdata)

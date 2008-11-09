@@ -27,6 +27,7 @@
 #include <ctype.h>
 
 #include "cpuintrf.h"
+#include "mame.h"
 static const UINT8 *rombase;
 static const UINT8 *rambase;
 static offs_t pcbase;

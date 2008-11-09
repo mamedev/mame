@@ -342,7 +342,7 @@ static CPU_SET_CONTEXT( r3000 )
 
 static CPU_INIT( r3000 )
 {
-	const r3000_cpu_core *configdata = config;
+	const r3000_cpu_core *configdata = device->static_config;
 	r3000_state *r3000 = device->token;
 
 	token = device->token;	// temporary

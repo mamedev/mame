@@ -1532,7 +1532,7 @@ static void upd78c05_timers(int cycles)
 
 static CPU_INIT( upd7810 )
 {
-	upd7810.config = *(const UPD7810_CONFIG*) config;
+	upd7810.config = *(const UPD7810_CONFIG*) device->static_config;
 	upd7810.irq_callback = irqcallback;
 	upd7810.device = device;
 

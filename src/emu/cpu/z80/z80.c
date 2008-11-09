@@ -3551,8 +3551,8 @@ static CPU_INIT( z80 )
 
 	/* Reset registers to their initial values */
 	memset(z80, 0, sizeof(*z80));
-	if (config != NULL)
-		z80->daisy = z80daisy_init(Machine, Machine->config->cpu[cpu_getactivecpu()].tag, config);
+	if (device->static_config != NULL)
+		z80->daisy = z80daisy_init(Machine, Machine->config->cpu[cpu_getactivecpu()].tag, device->static_config);
 	z80->irq_callback = irqcallback;
 	z80->device = device;
 	IX = IY = 0xffff; /* IX and IY are FFFF after a reset! */

@@ -310,7 +310,7 @@ static CPU_INIT( cop420 )
 
 	memset(&R, 0, sizeof(R));
 
-	R.intf = (cop400_interface *) config;
+	R.intf = (cop400_interface *) device->static_config;
 
 	assert(R.intf != NULL);
 

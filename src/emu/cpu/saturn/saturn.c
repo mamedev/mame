@@ -100,7 +100,7 @@ static Saturn_Regs saturn;
 
 static CPU_INIT( saturn )
 {
-	saturn.config = (saturn_cpu_core *) config;
+	saturn.config = (saturn_cpu_core *) device->static_config;
 	saturn.irq_callback = irqcallback;
 	saturn.device = device;
 

@@ -291,8 +291,8 @@ static CPU_INIT( i80286 )
 	I.device = device;
 
 	/* If a reset parameter is given, take it as pointer to an address mask */
-	if( config )
-		I.amask = *(unsigned*)config;
+	if( device->static_config )
+		I.amask = *(unsigned*)device->static_config;
 	else
 		I.amask = 0x00ffff;
 

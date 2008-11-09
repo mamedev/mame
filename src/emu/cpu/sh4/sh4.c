@@ -3394,7 +3394,7 @@ static CPU_DISASSEMBLE( sh4 )
 
 static CPU_INIT( sh4 )
 {
-	const struct sh4_config *conf = config;
+	const struct sh4_config *conf = device->static_config;
 
 	sh4_common_init();
 

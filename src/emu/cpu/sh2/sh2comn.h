@@ -170,7 +170,7 @@ typedef struct
 TIMER_CALLBACK( sh2_timer_callback );
 TIMER_CALLBACK( sh2_dmac_callback );
 
-void sh2_common_init(int alloc, const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback);
+void sh2_common_init(int alloc, const device_config *device, int index, int clock, cpu_irq_callback irqcallback);
 void sh2_recalc_irq(void);
 void sh2_set_irq_line(int irqline, int state);
 void sh2_set_frt_input(int cpunum, int state);

@@ -433,7 +433,7 @@ static void jaguar_state_register(int index, const char *type)
 
 static CPU_INIT( jaguargpu )
 {
-	const jaguar_cpu_core *configdata = config;
+	const jaguar_cpu_core *configdata = device->static_config;
 
 	memset(&jaguar, 0, sizeof(jaguar));
 
@@ -447,7 +447,7 @@ static CPU_INIT( jaguargpu )
 
 static CPU_INIT( jaguardsp )
 {
-	const jaguar_cpu_core *configdata = config;
+	const jaguar_cpu_core *configdata = device->static_config;
 
 	memset(&jaguar, 0, sizeof(jaguar));
 

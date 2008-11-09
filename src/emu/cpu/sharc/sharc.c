@@ -421,7 +421,7 @@ static CPU_DISASSEMBLE( sharc )
 
 static CPU_INIT( sharc )
 {
-	const sharc_config *cfg = config;
+	const sharc_config *cfg = device->static_config;
 	int saveindex;
 
 	sharc.boot_mode = cfg->boot_mode;

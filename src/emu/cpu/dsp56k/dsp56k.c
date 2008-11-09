@@ -398,7 +398,7 @@ static CPU_INIT( dsp56k )
 	// state_save_register_item("dsp56k", index, modA_state);
 	// ...
 
-	//core.config = _config;
+	//core.config = device->static_config;
 	//core.irq_callback = irqcallback;
 	core.device = device;
 }

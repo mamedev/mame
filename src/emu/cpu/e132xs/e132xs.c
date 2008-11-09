@@ -1565,7 +1565,7 @@ static void set_irq_line(int irqline, int state)
 		ISR &= ~(1 << irqline);
 }
 
-static void hyperstone_init(const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback, int scale_mask)
+static void hyperstone_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, int scale_mask)
 {
 	state_save_register_item_array("E132XS", index, hyperstone.global_regs);
 	state_save_register_item_array("E132XS", index, hyperstone.local_regs);
@@ -1584,7 +1584,7 @@ static void hyperstone_init(const device_config *device, int index, int clock, c
 }
 
 #if (HAS_E116T || HAS_E116XT || HAS_E116XS || HAS_E116XSR || HAS_GMS30C2116 || HAS_GMS30C2216)
-static void e116_init(const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback, int scale_mask)
+static void e116_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, int scale_mask)
 {
 	hyp_cpu_read_byte      = program_read_byte_16be;
 	hyp_cpu_read_half_word = program_read_word_16be;
@@ -1598,54 +1598,54 @@ static void e116_init(const device_config *device, int index, int clock, const v
 
 	hyp_type_16bit = 1;
 
-	hyperstone_init(device, index, clock, config, irqcallback, scale_mask);
+	hyperstone_init(device, index, clock, irqcallback, scale_mask);
 }
 #endif
 
 #if (HAS_E116T)
 static CPU_INIT( e116t )
 {
-	e116_init(device, index, clock, config, irqcallback, 0);
+	e116_init(device, index, clock, irqcallback, 0);
 }
 #endif
 
 #if (HAS_E116XT)
 static CPU_INIT( e116xt )
 {
-	e116_init(device, index, clock, config, irqcallback, 3);
+	e116_init(device, index, clock, irqcallback, 3);
 }
 #endif
 
 #if (HAS_E116XS)
 static CPU_INIT( e116xs )
 {
-	e116_init(device, index, clock, config, irqcallback, 7);
+	e116_init(device, index, clock, irqcallback, 7);
 }
 #endif
 
 #if (HAS_E116XSR)
 static CPU_INIT( e116xsr )
 {
-	e116_init(device, index, clock, config, irqcallback, 7);
+	e116_init(device, index, clock, irqcallback, 7);
 }
 #endif
 
 #if (HAS_GMS30C2116)
 static CPU_INIT( gms30c2116 )
 {
-	e116_init(device, index, clock, config, irqcallback, 0);
+	e116_init(device, index, clock, irqcallback, 0);
 }
 #endif
 
 #if (HAS_GMS30C2216)
 static CPU_INIT( gms30c2216 )
 {
-	e116_init(device, index, clock, config, irqcallback, 0);
+	e116_init(device, index, clock, irqcallback, 0);
 }
 #endif
 
 #if (HAS_E132N || HAS_E132T || HAS_E132XN || HAS_E132XT || HAS_E132XS || HAS_E132XSR || HAS_GMS30C2132 || HAS_GMS30C2232)
-static void e132_init(const device_config *device, int index, int clock, const void *config, cpu_irq_callback irqcallback, int scale_mask)
+static void e132_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, int scale_mask)
 {
 	hyp_cpu_read_byte      = program_read_byte_32be;
 	hyp_cpu_read_half_word = program_read_word_32be;
@@ -1659,63 +1659,63 @@ static void e132_init(const device_config *device, int index, int clock, const v
 
 	hyp_type_16bit = 0;
 
-	hyperstone_init(device, index, clock, config, irqcallback, scale_mask);
+	hyperstone_init(device, index, clock, irqcallback, scale_mask);
 }
 #endif
 
 #if (HAS_E132N)
 static CPU_INIT( e132n )
 {
-	e132_init(device, index, clock, config, irqcallback, 0);
+	e132_init(device, index, clock, irqcallback, 0);
 }
 #endif
 
 #if (HAS_E132T)
 static CPU_INIT( e132t )
 {
-	e132_init(device, index, clock, config, irqcallback, 0);
+	e132_init(device, index, clock, irqcallback, 0);
 }
 #endif
 
 #if (HAS_E132XN)
 static CPU_INIT( e132xn )
 {
-	e132_init(device, index, clock, config, irqcallback, 3);
+	e132_init(device, index, clock, irqcallback, 3);
 }
 #endif
 
 #if (HAS_E132XT)
 static CPU_INIT( e132xt )
 {
-	e132_init(device, index, clock, config, irqcallback, 3);
+	e132_init(device, index, clock, irqcallback, 3);
 }
 #endif
 
 #if (HAS_E132XS)
 static CPU_INIT( e132xs )
 {
-	e132_init(device, index, clock, config, irqcallback, 7);
+	e132_init(device, index, clock, irqcallback, 7);
 }
 #endif
 
 #if (HAS_E132XSR)
 static CPU_INIT( e132xsr )
 {
-	e132_init(device, index, clock, config, irqcallback, 7);
+	e132_init(device, index, clock, irqcallback, 7);
 }
 #endif
 
 #if (HAS_GMS30C2132)
 static CPU_INIT( gms30c2132 )
 {
-	e132_init(device, index, clock, config, irqcallback, 0);
+	e132_init(device, index, clock, irqcallback, 0);
 }
 #endif
 
 #if (HAS_GMS30C2232)
 static CPU_INIT( gms30c2232 )
 {
-	e132_init(device, index, clock, config, irqcallback, 0);
+	e132_init(device, index, clock, irqcallback, 0);
 }
 #endif
 

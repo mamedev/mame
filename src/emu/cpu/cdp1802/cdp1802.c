@@ -67,7 +67,7 @@ static CPU_SET_CONTEXT( cdp1802 )
 
 static CPU_INIT( cdp1802 )
 {
-	cdp1802.intf = (cdp1802_interface *) config;
+	cdp1802.intf = (cdp1802_interface *) device->static_config;
 
 	cdp1802.mode = CDP1802_MODE_RESET;
 	cdp1802.prevmode = cdp1802.mode;

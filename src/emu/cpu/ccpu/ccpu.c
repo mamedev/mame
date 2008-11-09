@@ -136,7 +136,7 @@ void ccpu_wdt_timer_trigger(void)
 
 static CPU_INIT( ccpu )
 {
-	const ccpu_config *configdata = config;
+	const ccpu_config *configdata = device->static_config;
 
 	/* copy input params */
 	ccpu.external_input = configdata->external_input ? configdata->external_input : read_jmi;

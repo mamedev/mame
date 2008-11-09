@@ -528,7 +528,7 @@ static void pdp1_set_irq_line (int irqline, int state)
 
 static CPU_INIT( pdp1 )
 {
-	const pdp1_reset_param_t *param = config;
+	const pdp1_reset_param_t *param = device->static_config;
 	int i;
 
 	/* clean-up */

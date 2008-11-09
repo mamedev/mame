@@ -121,9 +121,9 @@ static CPU_SET_CONTEXT( mb88 )
 
 static CPU_INIT( mb88 )
 {
-	if ( config )
+	if ( device->static_config )
 	{
-		const mb88_cpu_core *_config = (const mb88_cpu_core*)config;
+		const mb88_cpu_core *_config = (const mb88_cpu_core*)device->static_config;
 		mb88.PLA = _config->PLA_config;
 	}
 

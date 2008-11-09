@@ -337,7 +337,7 @@ static void cquestsnd_state_register(int index, const char *type)
 
 static CPU_INIT( cquestsnd )
 {
-	cubeqst_snd_config* _config = (cubeqst_snd_config*)config;
+	cubeqst_snd_config* _config = (cubeqst_snd_config*)device->static_config;
 
 	memset(&cquestsnd, 0, sizeof(cquestsnd));
 

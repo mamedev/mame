@@ -2369,7 +2369,7 @@ static CPU_INIT( ds5002fp )
 {
 	/* default configuration */
 	static const ds5002fp_config default_config = { 0x00, 0x00, 0x00 };
-	const ds5002fp_config *sconfig = config ? config : &default_config;
+	const ds5002fp_config *sconfig = device->static_config ? device->static_config : &default_config;
 	mcs51_regs *mcs51 = device->token;
 
 	CPU_INIT_CALL( mcs51 );
