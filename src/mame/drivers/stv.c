@@ -143,7 +143,7 @@ ToDo / Notes:
 -Protection issues:
  \-ffreveng: boot vectors;
  \-decathlt: in-game graphics;
- \-elandore: human textures;
+ \-elandore: human / dragons textures;
  \-twcup98: tecmo logo / sprite movements;
  \-astrass: text layer (kludged for now);
 

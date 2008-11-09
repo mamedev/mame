@@ -9,10 +9,10 @@
  Known Protected ST-V Games
 
  Astra Superstars (text layer gfx transfer)
- Elandoree (gfx transfer of textures for some characters)
+ Elandoree (gfx transfer of textures)
  Final Fight Revenge (boot vectors etc.?)
- Radiant Silvergun (game start protection)
- Steep Slope Sliders (gfx transfer of some character portraits)
+ Radiant Silvergun (game start protection ?)
+ Steep Slope Sliders (gfx transfer of character portraits)
  Decathlete (transfer of all gfx data)
  Tecmo World Cup '98 (tecmo logo, player movement?)
 
@@ -48,7 +48,15 @@ the data used by the games in the various circumstances for reference:
  [0]        [1]        [2]        [3]
  No protection                               test mode
  No protection                               attract mode
- 0x000y0000 0x00000000 0xe69000f9 0xff7f0000 gameplay,VDP-1 write (textures on humans)
+ 0x000y0000 0x00000000 0x****00** 0xff7f0000 gameplay,VDP-1 write (textures on humans)
+ 0x000y0000 0x00000000 0x****00** 0xffbf0000 gameplay,VDP-1 write (textures on humans)
+
+ 0x000y0000 0x00000000 0x****00** 0xf9ff0000 gameplay,VDP-1 write (textures on dragons)
+ 0x000y0000 0x00000000 0x****00** 0xfbff0000 gameplay,VDP-1 write (textures on dragons)
+ 0x000y0000 0x00000000 0x****00** 0xfe7f0000 gameplay,VDP-1 write (textures on dragons)
+ 0x000y0000 0x00000000 0x****00** 0xfd7f0000 gameplay,VDP-1 write (textures on dragons)
+ 0x000y0000 0x00000000 0x****00** 0xfeff0000 gameplay,VDP-1 write (textures on dragons)
+ 0x000y0000 0x00000000 0x****00** 0xf9bf0000 gameplay,VDP-1 write (textures on dragons)
 
 -Final Fight Revenge [ffreveng]
  [0]        [1]        [2]        [3]
@@ -117,6 +125,17 @@ Wrong vectors (at least not where I tested it):
 0x0603B1B2 (1st) (crashes the sh2)
 */
 static const UINT32 vector_prot[] = { 0x0603B1B2,0x234 };
+
+#define ELANDORE_CTRL_1_HUMAN   0xff7f0000
+#define ELANDORE_CTRL_2_HUMAN   0xffbf0000
+
+#define ELANDORE_CTRL_1_DRAGON  0xf9ff0000
+#define ELANDORE_CTRL_2_DRAGON  0xfbff0000
+#define ELANDORE_CTRL_3_DRAGON  0xfe7f0000
+#define ELANDORE_CTRL_4_DRAGON  0xfd7f0000
+#define ELANDORE_CTRL_5_DRAGON  0xfeff0000
+#define ELANDORE_CTRL_6_DRAGON  0xf9bf0000
+
 
 static READ32_HANDLER( a_bus_ctrl_r )
 {
@@ -228,14 +247,15 @@ static READ32_HANDLER( a_bus_ctrl_r )
 					ctrl_index += 4;
 					return val;
 				}
-				case 0xff7f0000://elandore
-					if(a_bus[2] == 0xe69000f9)
-					{
-						ctrl_index++;
-						return ROM[ctrl_index];
-					}
-					else return 0x12345678;
-				case 0xffbf0000:
+				//elandore
+				case ELANDORE_CTRL_1_HUMAN:
+				case ELANDORE_CTRL_2_HUMAN:
+				case ELANDORE_CTRL_1_DRAGON:
+				case ELANDORE_CTRL_2_DRAGON:
+				case ELANDORE_CTRL_3_DRAGON:
+				case ELANDORE_CTRL_4_DRAGON:
+				case ELANDORE_CTRL_5_DRAGON:
+				case ELANDORE_CTRL_6_DRAGON:
 					ctrl_index++;
 					return ROM[ctrl_index];
 			}
@@ -255,6 +275,7 @@ static WRITE32_HANDLER ( a_bus_ctrl_w )
 	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",activecpu_get_pc(),offset,data);
 	if(offset == 3)
 	{
+		//printf("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
 		switch(a_bus[3])
 		{
 			/*astrass,I need an original test mode screen to compare...*/
@@ -277,8 +298,30 @@ static WRITE32_HANDLER ( a_bus_ctrl_w )
 			/*rsgun*/
 			case 0x77770000: ctrl_index = 0; break;
 			/*elandore*/
-			case 0xff7f0000: ctrl_index = ((0x400000)/4)-1; break;
-			case 0xffbf0000: ctrl_index = (0x1c40000/4)-1; break;
+			case ELANDORE_CTRL_1_HUMAN: // (human polygons)
+				ctrl_index = ((0x00000000/4) + ((a_bus[2] & 0xff)<<16) + ((a_bus[2] & 0xffff0000)>>16)/4)-1;
+				break;
+			case ELANDORE_CTRL_2_HUMAN: // (human polygons)
+				ctrl_index = ((0x00000000/4) + ((a_bus[2] & 0xff)<<16) + ((a_bus[2] & 0xffff0000)>>16)/4)-1;
+				break;
+			case ELANDORE_CTRL_1_DRAGON://KAIN / THUNDER (dragon polygons)
+				ctrl_index = ((0x00000000/4) + ((a_bus[2] & 0xff)<<16) + ((a_bus[2] & 0xffff0000)>>16)/4)-1;
+				break;
+			case ELANDORE_CTRL_2_DRAGON://REVI CURIO / DARK (dragon polygons)
+				ctrl_index = ((0x00000000/4) + ((a_bus[2] & 0xff)<<16) + ((a_bus[2] & 0xffff0000)>>16)/4)-1;
+				break;
+			case ELANDORE_CTRL_3_DRAGON://RUBONE / POISON (dragon polygons)
+				ctrl_index = ((0x00000000/4) + ((a_bus[2] & 0xff)<<16) + ((a_bus[2] & 0xffff0000)>>16)/4)-1;
+				break;
+			case ELANDORE_CTRL_4_DRAGON://TINA / MAGICAL GIRL (dragon polygons)
+				ctrl_index = ((0x00000000/4) + ((a_bus[2] & 0xff)<<16) + ((a_bus[2] & 0xffff0000)>>16)/4)-1;
+				break;
+			case ELANDORE_CTRL_5_DRAGON://KEYAKI / FIRE (dragon polygons)
+				ctrl_index = ((0x00000000/4) + ((a_bus[2] & 0xff)<<16) + ((a_bus[2] & 0xffff0000)>>16)/4)-1;
+				break;
+			case ELANDORE_CTRL_6_DRAGON://SION / WIND (dragon polygons)
+				ctrl_index = ((0x00000000/4) + ((a_bus[2] & 0xff)<<16) + ((a_bus[2] & 0xffff0000)>>16)/4)-1;
+				break;
 		}
 	}
 	//popmessage("%04x %04x",data,offset/4);
