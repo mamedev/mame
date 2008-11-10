@@ -248,7 +248,7 @@ void debug_command_init(running_machine *machine)
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 	{
 		cpu_debug_init_func debug_init;
-		debug_init = cpu_get_info_fct(machine->cpu[cpunum], CPUINFO_PTR_DEBUG_INIT);
+		debug_init = (cpu_debug_init_func)cpu_get_info_fct(machine->cpu[cpunum], CPUINFO_PTR_DEBUG_INIT);
 		if (debug_init != NULL)
 			(*debug_init)(machine->cpu[cpunum]);
 	}
